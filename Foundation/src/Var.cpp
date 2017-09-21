@@ -337,6 +337,19 @@ void Var::empty()
 }
 
 
+void Var::clear()
+{
+#ifdef POCO_NO_SOO
+	delete _pHolder;
+	_pHolder = 0;
+#else
+	if (_placeholder.isLocal()) this->~Var();
+	else delete content();
+	_placeholder.erase();
+#endif
+}
+
+
 Var& Var::getAt(std::size_t n)
 {
 	if (isVector())

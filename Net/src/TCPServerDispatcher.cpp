@@ -103,18 +103,15 @@ void TCPServerDispatcher::run()
 
 	for (;;)
 	{
-		try {
+		try
+		{
 			AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
 			if (pNf)
 			{
 				TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
 				if (pCNf)
 				{
-	#if __cplusplus < 201103L
-					std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-	#else
 					std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-	#endif
 					poco_check_ptr(pConnection.get());
 					beginConnection();
 					pConnection->start();

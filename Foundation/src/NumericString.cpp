@@ -58,11 +58,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::string::size_type frac = str.length() - decSepPos - 1;
 
 	std::string::size_type ePos = str.find_first_of("eE");
-#if __cplusplus < 201103L
-	std::auto_ptr<std::string> eStr;
-#else
 	std::unique_ptr<std::string> eStr;
-#endif
 	if (ePos != std::string::npos)
 	{
 		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));
@@ -78,7 +74,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 		}
 		else if ((frac > precision) && (decSepPos != std::string::npos))
 		{
-			int pos = decSepPos + 1 + precision;
+			int pos = static_cast<int>(decSepPos) + 1 + precision;
 			if (str[pos] >= '5') // we must round up
 			{
 				char carry = 0;

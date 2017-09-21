@@ -68,6 +68,12 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
   
   matrix:
+    - builder: cygwin
+
+    - builder: msbuild
+      vsver: 150
+      linkmode: shared
+
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -80,9 +86,9 @@ environment:
 #      vsver: 140
 #      linkmode: static_mt
 
-    - builder: msbuild
-      vsver: 150
-      linkmode: shared
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: shared
 
 #    - builder: msbuild
 #      vsver: 150
@@ -98,10 +104,6 @@ environment:
 #    - builder: cmake
 #      vsver: 140
 
-    - builder: cygwin
-
-
-     
 matrix:
   fast_finish: true
 
@@ -139,6 +141,7 @@ install:
         {
           $env:PATH = "c:\cygwin64\bin;" + $env:PATH
         }
+        g++ --version
       }
   - uname -a
   - cat /proc/cpuinfo
@@ -471,8 +474,8 @@ before_test:
       Write-Host -ForegroundColor Yellow $line;
       foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }      
       Write-Host -ForegroundColor Yellow $line;
-      
-      
+
+
 after_test:
 
 

@@ -120,7 +120,6 @@ void AbstractConfigurationTest::testGetInt64()
 	try
 	{
 		Int64 x = pConf->getInt64("prop1");
-		x=x;
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)

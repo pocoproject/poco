@@ -25,21 +25,21 @@ public:
 	{
 		MAX_DATA_SIZE = 10000
 	};
-	
+
 	CryptoTest(const std::string& name);
 	~CryptoTest();
 
 	void testEncryptDecrypt();
 	void testEncryptDecryptWithSalt();
-    void testEncryptDecryptWithSaltSha1();
+	void testEncryptDecryptWithSaltSha1();
 	void testEncryptDecryptDESECB();
 	void testStreams();
 	void testPassword();
-    void testPasswordSha1();
+	void testPasswordSha1();
 	void testEncryptInterop();
 	void testDecryptInterop();
 	void testCertificate();
-	
+
 	void setUp();
 	void tearDown();
 

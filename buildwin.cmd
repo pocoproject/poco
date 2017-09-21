@@ -145,7 +145,7 @@ if not defined VSINSTALLDIR (
   echo Error: No Visual C++ environment found.
   echo Please run this script from a Visual Studio Command Prompt
   echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
-  goto :EOF
+  goto :buildfailed
 )
 
 set VCPROJ_EXT=vcproj

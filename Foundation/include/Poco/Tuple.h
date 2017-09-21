@@ -18,11 +18,82 @@
 #define Foundation_Tuple_INCLUDED
 
 
+// TODO: std::tuple doesn't accept partial initialization
+
+//#define POCO_CXX11_TUPLE_FINISHED
+
+
 #include "Poco/Foundation.h"
+#if defined(POCO_CXX11_TUPLE_FINISHED)
+#include <tuple>
+#endif
 #include "Poco/TypeList.h"
 
 
 namespace Poco {
+
+
+#if defined(POCO_CXX11_TUPLE_FINISHED)
+
+template<class ...Types>
+class Tuple : public std::tuple<Types...>
+{
+public:
+	//using std::tuple<Types...>::tuple;
+
+	Tuple() : std::tuple<Types...>()
+	{
+
+	}
+
+	/*
+	Tuple(Types... args) : std::tuple<Types...>(args...)
+	{
+
+	}
+	*/
+
+	template < typename ...Args >
+	Tuple(Args&&... args) : std::tuple<Types...>(std::forward<Args>(args)...)
+	{
+
+	}
+
+	//Tuple(const Tuple<Types...> &other) = delete;
+	//Tuple(const Tuple<Types...> &&other) = delete;
+
+	/*
+	Tuple(Types&... args) : std::tuple<Types...>(args...)
+	{
+
+	}
+
+	Tuple(Types&&... args) : std::tuple<Types...>(args...)
+	{
+
+	}
+	*/
+
+	enum TupleLengthType
+	{
+		length = std::tuple_size<std::tuple<Types...>>::value
+	};
+
+	template <int N, typename C>
+	void set(C value)
+	{
+		std::get<N>(*this) = value;
+	}
+
+	template <int N>
+	typename std::tuple_element<N, std::tuple<Types...>>::type& get()
+	{
+		return std::get<N>(*this);
+	}
+};
+
+
+#else
 
 
 #if defined(_MSC_VER) 
@@ -1740,6 +1811,7 @@ private:
 	Type _data;
 };
 
+#endif
 
 } // namespace Poco
 

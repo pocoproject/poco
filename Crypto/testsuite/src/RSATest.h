@@ -24,14 +24,14 @@ public:
 	RSATest(const std::string& name);
 	~RSATest();
 
-	void testNewKeys();
-	void testNewKeysNoPassphrase();
-	void testSign();
-	void testSignSha256();
-	void testSignManipulated();
+	void testRSANewKeys();
+	void testRSANewKeysNoPassphrase();
+	void testRSASign();
+	void testRSASignSha256();
+	void testRSASignManipulated();
 	void testRSACipher();
 	void testRSACipherLarge();
-	void testCertificate();
+	void testRSACertificate();
 
 	void setUp();
 	void tearDown();

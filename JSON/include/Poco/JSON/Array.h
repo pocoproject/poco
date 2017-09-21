@@ -71,6 +71,15 @@ public:
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
 
+	Array(Array&& other);
+		/// Move constructor
+
+	Array& operator=(const Array& other);
+		/// Assignment operator.
+
+	Array& operator=(Array&& other);
+		/// Move assignment operator.
+
 	virtual ~Array();
 		/// Destroys the Array.
 
@@ -165,6 +174,7 @@ public:
 		/// Removes the element on the given index.
 
 	operator const Poco::Dynamic::Array& () const;
+		/// Conversion operator to Dynamic::Array.
 
 	static Poco::Dynamic::Array makeArray(const JSON::Array::Ptr& arr);
 		/// Utility function for creation of array.
@@ -173,10 +183,13 @@ public:
 		/// Clears the contents of the array.
 
 private:
+	void resetDynArray() const;
+
 	typedef SharedPtr<Poco::Dynamic::Array> ArrayPtr;
 
 	ValueVec         _values;
 	mutable ArrayPtr _pArray;
+	mutable bool     _modified;
 };
 
 
@@ -224,6 +237,7 @@ inline bool Array::isArray(ConstIterator& it) const
 inline void Array::add(const Dynamic::Var& value)
 {
 	_values.push_back(value);
+	_modified = true;
 }
 
 
@@ -231,6 +245,7 @@ inline void Array::set(unsigned int index, const Dynamic::Var& value)
 {
 	if (index >= _values.size()) _values.resize(index + 1);
 	_values[index] = value;
+	_modified = true;
 }
 
 
@@ -354,11 +369,6 @@ public:
 	const JSON::Array::Ptr& value() const
 	{
 		return _val;
-	}
-
-	bool isArray() const
-	{
-		return false;
 	}
 
 	bool isInteger() const
@@ -493,11 +503,6 @@ public:
 	const JSON::Array& value() const
 	{
 		return _val;
-	}
-
-	bool isArray() const
-	{
-		return false;
 	}
 
 	bool isInteger() const

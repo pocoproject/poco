@@ -26,8 +26,15 @@
 #endif
 
 
-// Define to enable C++11 support
-#define POCO_ENABLE_CPP11
+// NOTE: As of POCO C++ Libraries release 2.0.0, compiling POCO
+// without c++11 support is deprecated.
+
+// Define to enable C++14 support
+// #define POCO_ENABLE_CPP14
+
+
+// Define to force disable C++14 support
+// #define POCO_DISABLE_CPP14
 
 
 // Define to disable implicit linking

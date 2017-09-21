@@ -31,11 +31,18 @@
 // NetSSL_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
-	#if defined(NetSSL_EXPORTS)
-		#define NetSSL_API __declspec(dllexport)
+#if defined(_WIN32)
+	#if defined(POCO_DLL)
+		#if defined(NetSSL_EXPORTS)
+			#define NetSSL_API __declspec(dllexport)
+		#else
+			#define NetSSL_API __declspec(dllimport)
+		#endif
 	#else
-		#define NetSSL_API __declspec(dllimport)
+		#if (POCO_MSVS_VERSION >= 2015) // needed for OpenSSL
+			#pragma comment(lib, "legacy_stdio_definitions.lib")
+			#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
+		#endif
 	#endif
 #endif
 
@@ -50,12 +57,35 @@
 
 
 //
-// Automatically link NetSSL library.
+// Automatically link NetSSL and OpenSSL library.
 //
 #if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(NetSSL_EXPORTS)
-		#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
+	#if defined(_WIN64)
+		#define POCO_PLATFORM_BITS "64"
+	#else
+		#define POCO_PLATFORM_BITS "32"
 	#endif
+
+	#if defined (_DEBUG)
+		#define POCO_DEBUG_POSTFIX "d"
+	#else
+		#define POCO_DEBUG_POSTFIX ""
+	#endif
+
+	#if !defined(POCO_NO_AUTOMATIC_LIBS)
+		#if !defined(POCO_EXTERNAL_OPENSSL)
+			#if defined (_DLL)
+				#pragma comment(lib, "libeay" POCO_PLATFORM_BITS "MD" POCO_DEBUG_POSTFIX ".lib")
+				#pragma comment(lib, "ssleay" POCO_PLATFORM_BITS "MD" POCO_DEBUG_POSTFIX ".lib")
+			#else
+				#pragma comment(lib, "libeay" POCO_PLATFORM_BITS "MT" POCO_DEBUG_POSTFIX ".lib")
+				#pragma comment(lib, "ssleay" POCO_PLATFORM_BITS "MT" POCO_DEBUG_POSTFIX ".lib")
+			#endif
+		#endif // POCO_EXTERNAL_OPENSSL
+		#if !defined(NetSSL_EXPORTS)
+			#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
+		#endif
+	#endif // POCO_NO_AUTOMATIC_LIBS
 #endif
 
 

@@ -15,8 +15,8 @@ LINKMODE ?= SHARED
 #
 # Define Tools
 #
-CC      = clang$(CLANG_VERSION)
-CXX     = clang++$(CLANG_VERSION)
+CC     ?= clang
+CXX    ?= clang++
 LINK    = $(CXX)
 LIB     = ${CROSS_COMPILE}ar -cr
 RANLIB  = ${CROSS_COMPILE}ranlib
@@ -41,7 +41,7 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = 
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -Wall -Wno-sign-compare
+CXXFLAGS        = -Wall -Wno-sign-compare -stdlib=libstdc++ -ftemplate-depth=340
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =
@@ -53,9 +53,9 @@ STATICOPT_LINK  = -static
 SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
-DEBUGOPT_CC     = -g -D_DEBUG
-DEBUGOPT_CXX    = -g -D_DEBUG
-DEBUGOPT_LINK   = -g
+DEBUGOPT_CC     = -D_DEBUG
+DEBUGOPT_CXX    = -D_DEBUG
+DEBUGOPT_LINK   = 
 RELEASEOPT_CC   = -O2 -DNDEBUG
 RELEASEOPT_CXX  = -O2 -DNDEBUG
 RELEASEOPT_LINK = -O2
@@ -68,7 +68,7 @@ SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=6
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -ldl -lrt
+SYSLIBS  += -lpthread -ldl -lrt
 
 #
 # C++11/14 detection

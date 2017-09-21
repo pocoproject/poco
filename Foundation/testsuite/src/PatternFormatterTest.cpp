@@ -14,6 +14,7 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/Message.h"
 #include "Poco/DateTime.h"
+#include "Poco/Exception.h"
 
 
 using Poco::PatternFormatter;

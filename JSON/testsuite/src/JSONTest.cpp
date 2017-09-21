@@ -627,7 +627,7 @@ void JSONTest::testObjectProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assert (false);
 	}
 
 	assert(result.type() == typeid(Object::Ptr));
@@ -637,17 +637,39 @@ void JSONTest::testObjectProperty()
 	assert (!object->isArray("test"));
 
 	Var test = object->get("test");
-	assert(test.type() == typeid(Object::Ptr));
+	assert (test.type() == typeid(Object::Ptr));
 	Object::Ptr subObject = test.extract<Object::Ptr>();
 
 	test = subObject->get("property");
-	assert(test.isString());
+	assert (test.isString());
 	std::string value = test.convert<std::string>();
-	assert(value.compare("value") == 0);
+	assert (value.compare("value") == 0);
 
 	DynamicStruct ds = *object;
 	assert (ds["test"].isStruct());
 	assert (ds["test"]["property"] == "value");
+
+	// make sure that Object is recognized as such
+	{
+		Object obj;
+		Object inner;
+		inner.set("some_number", 5);
+		inner.set("some_string", "xyz");
+		std::string key = "new_object";
+		obj.set(key, inner);
+		assert(obj.isObject(key));
+	}
+
+	// make sure that Object pointer is recognized as Object
+	{
+		Object obj;
+		Poco::JSON::Object::Ptr inner = new Poco::JSON::Object;
+		inner->set("some_number", 5);
+		inner->set("some_string", "xyz");
+		std::string key = "new_object";
+		obj.set(key, inner);
+		assert(obj.isObject(key));
+	}
 }
 
 
@@ -687,6 +709,18 @@ void JSONTest::testObjectArray()
 	assert (ds["test"]["test1"][1] == 2);
 	assert (ds["test"]["test1"][2] == 3);
 	assert (ds["test"]["test2"] == 4);
+
+	object->set("test3", "another top level value");
+	ds = std::move(*object);
+	assert (ds.size() == 2);
+	assert (ds["test"].isStruct());
+	assert (ds["test"]["test1"].isArray());
+	assert (ds["test"]["test1"].size() == 3);
+	assert (ds["test"]["test1"][0] == 1);
+	assert (ds["test"]["test1"][1] == 2);
+	assert (ds["test"]["test1"][2] == 3);
+	assert (ds["test"]["test2"] == 4);
+	assert (ds["test3"] == "another top level value");
 }
 
 
@@ -706,6 +740,7 @@ void JSONTest::testArrayOfObjects()
 		assert(false);
 	}
 
+	assert(result.isArray());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 	Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
 	Object::Ptr object = arr->getObject(0);
@@ -1004,10 +1039,17 @@ void JSONTest::testSetArrayElement()
 	Var result = parser.parse(json);
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 
+	Poco::Dynamic::Array dynArray = *array;
+	assert(dynArray.size() == 0);
+
 	// array[0] = 7
 	array->set(0, 7);
 	assert(array->size() == 1);
 	assert(array->getElement<int>(0) == 7);
+
+	dynArray = *array;
+	assert(dynArray.size() == 1);
+	assert(dynArray[0] == 7);
 
 	// array[2] = "foo"
 	array->set(2, std::string("foo"));
@@ -1016,12 +1058,27 @@ void JSONTest::testSetArrayElement()
 	assert(array->isNull(1));
 	assert(array->getElement<std::string>(2) == "foo");
 
+	dynArray = *array;
+	assert(dynArray.size() == 3);
+	assert(dynArray[0] == 7);
+	assert(dynArray[1].isEmpty());
+	assert(dynArray[2] == "foo");
+
 	// array[1] = 13
 	array->set(1, 13);
 	assert(array->size() == 3);
 	assert(array->getElement<int>(0) == 7);
 	assert(array->getElement<int>(1) == 13);
 	assert(array->getElement<std::string>(2) == "foo");
+
+	dynArray = std::move(*array);
+	assert(dynArray.size() == 3);
+	assert(dynArray[0] == 7);
+	assert(dynArray[1] == 13);
+	assert(dynArray[2] == "foo");
+
+	dynArray.clear();
+	assert(dynArray.size() == 0);
 }
 
 
@@ -1140,6 +1197,9 @@ void JSONTest::testComment()
 		fail ("must fail");
 	}
 	catch(Poco::SyntaxException&)
+	{
+	}
+	catch (JSONException&)
 	{
 	}
 
@@ -1627,7 +1687,7 @@ void JSONTest::testValidJanssonFiles()
 			if ( inputFile.exists() )
 			{
 				Poco::FileInputStream fis(filePath.toString());
-				std::cout << filePath.toString() << std::endl;
+				std::cout << filePath.toString() << " ... ";
 
 				Parser parser;
 				Var result;
@@ -1667,13 +1727,13 @@ void JSONTest::testInvalidJanssonFiles()
 	{
 		Poco::Path filePath(*it, "input");
 
-		if ( filePath.isFile() )
+		if (filePath.isFile())
 		{
 			Poco::File inputFile(filePath);
-			if ( inputFile.exists() )
+			if (inputFile.exists())
 			{
 				Poco::FileInputStream fis(filePath.toString());
-				std::cout << filePath.toString() << std::endl;
+				std::cout << filePath.toString() << " ... ";
 
 				Parser parser;
 				parser.setAllowNullByte(false);
@@ -1687,12 +1747,10 @@ void JSONTest::testInvalidJanssonFiles()
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
-				catch(JSONException&)
+				catch(Poco::Exception& /*ex*/)
 				{
-					continue;
+					std::cout << /*" (" << ex.displayText() << ") " <<*/ "Ok!" << std::endl;
 				}
-				catch(Poco::SyntaxException&)
-				{ }
 			}
 		}
 	}
@@ -1716,7 +1774,7 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 			if ( inputFile.exists() )
 			{
 				Poco::FileInputStream fis(filePath.toString());
-				std::cout << filePath.toString() << std::endl;
+				std::cout << filePath.toString() << " ... ";
 
 				Parser parser;
 				parser.setAllowNullByte(false);
@@ -1730,12 +1788,10 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
-				catch(JSONException&)
+				catch(Poco::Exception& /*ex*/)
 				{
-					continue;
+					std::cout << /*" (" << ex.displayText() << ") " <<*/ "Ok!" << std::endl;
 				}
-				catch(Poco::SyntaxException&)
-				{ }
 			}
 		}
 	}
@@ -1796,13 +1852,13 @@ void JSONTest::testUnicode()
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xC2 << (char)0x92 << ']';
+	os << "[\"" << (char)0xC2 << (char)0x92 << "\"]";
 	result = parser.parse(os.str());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xAC << ']';
+	os << "[\"" << (char)0xAC << "\"]";
 	try
 	{
 		parser.parse(os.str());
@@ -1812,13 +1868,13 @@ void JSONTest::testUnicode()
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xE2 << (char)0x82 << (char)0xAC << ']';
+	os << "[\"" << (char)0xE2 << (char)0x82 << (char)0xAC << "\"]";
 	result = parser.parse(os.str());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xA2 << ']';
+	os << "[\"" << (char)0xA2 << "\"]";
 	try
 	{
 		parser.parse(os.str());
@@ -1828,7 +1884,7 @@ void JSONTest::testUnicode()
 
 	parser.reset();
 	os.str("");
-	os << '[' << (char)0xF0 << (char)0xA4 << (char)0xAD << (char)0xAD << ']';
+	os << "[\"" << (char)0xF0 << (char)0xA4 << (char)0xAD << (char)0xAD << "\"]";
 	result = parser.parse(os.str());
 	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
 }

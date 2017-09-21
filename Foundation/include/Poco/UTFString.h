@@ -260,43 +260,15 @@ struct UTF32CharTraits
 };
 
 
-//#if defined(POCO_ENABLE_CPP11) //TODO
-	//	typedef char16_t       UTF16Char;
-	//	typedef std::u16string UTF16String;
-	//	typedef char32_t       UTF32Char;
-	//	typedef std::u32string UTF32String;
-//#else
-	#ifdef POCO_NO_WSTRING
-		typedef Poco::UInt16                                  UTF16Char;
-		typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
-		typedef UInt32                                        UTF32Char;
-		typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
-	#else // POCO_NO_WSTRING
-		#if defined(POCO_OS_FAMILY_WINDOWS)
-			typedef wchar_t                                       UTF16Char;
-			typedef std::wstring                                  UTF16String;
-			typedef UInt32                                        UTF32Char;
-			typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
-		#elif defined(__SIZEOF_WCHAR_T__) //gcc
-			#if (__SIZEOF_WCHAR_T__ == 2)
-				typedef wchar_t                                       UTF16Char;
-				typedef std::wstring                                  UTF16String;
-				typedef UInt32                                        UTF32Char;
-				typedef std::basic_string<UTF32Char, UTF32CharTraits> UTF32String;
-			#elif (__SIZEOF_WCHAR_T__ == 4)
-				typedef Poco::UInt16                                  UTF16Char;
-				typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
-				typedef wchar_t                                       UTF32Char;
-				typedef std::wstring                                  UTF32String;
-			#endif
-		#else // default to 32-bit wchar_t
-			typedef Poco::UInt16                                  UTF16Char;
-			typedef std::basic_string<UTF16Char, UTF16CharTraits> UTF16String;
-			typedef wchar_t                                       UTF32Char;
-			typedef std::wstring                                  UTF32String;
-		#endif //POCO_OS_FAMILY_WINDOWS
-	#endif //POCO_NO_WSTRING
-//#endif // POCO_ENABLE_CPP11
+#if defined(POCO_OS_FAMILY_WINDOWS)
+typedef wchar_t      UTF16Char;
+typedef std::wstring UTF16String;
+#else
+typedef char16_t       UTF16Char;
+typedef std::u16string UTF16String;
+#endif // POCO_OS_FAMILY_WINDOWS
+typedef char32_t       UTF32Char;
+typedef std::u32string UTF32String;
 
 
 } // namespace Poco

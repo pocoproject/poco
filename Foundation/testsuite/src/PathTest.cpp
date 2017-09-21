@@ -384,7 +384,7 @@ void PathTest::testExpandVariableFromPath()
 #else
 	return;
 #endif
-  
+
 	Poco::Path p;
 	std::string s = p.expand(pathWithoutVar);
 	assert(s == correctStringWithoutVar);

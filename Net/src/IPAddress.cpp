@@ -138,9 +138,6 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length)
-#ifndef POCO_HAVE_ALIGNMENT
-	: _pImpl(0)
-#endif
 {
 	if (length == sizeof(struct in_addr))
 		newIPv4(addr);
@@ -188,9 +185,6 @@ IPAddress::IPAddress(unsigned prefix, Family family)
 
 #if defined(_WIN32)
 IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
-#ifndef POCO_HAVE_ALIGNMENT
-	: _pImpl(0)
-#endif
 {
 	ADDRESS_FAMILY family = socket_address.lpSockaddr->sa_family;
 	if (family == AF_INET)
@@ -254,7 +248,7 @@ Poco::UInt32 IPAddress::scope() const
 	return pImpl()->scope();
 }
 
-	
+
 std::string IPAddress::toString() const
 {
 	return pImpl()->toString();
@@ -356,13 +350,12 @@ bool IPAddress::operator == (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-    {
+	{
 #if defined(POCO_HAVE_IPv6)
-        if ( scope() != a.scope() )
-            return false;
+		if (scope() != a.scope()) return false;
 #endif
 		return std::memcmp(addr(), a.addr(), l1) == 0;
-    }
+	}
 	else return false;
 }
 
@@ -380,30 +373,30 @@ bool IPAddress::operator < (const IPAddress& a) const
 	if (l1 == l2)
     {
 #if defined(POCO_HAVE_IPv6)
-        if ( scope() != a.scope() )
-            return scope() < a.scope();
+		if (scope() != a.scope())
+			return scope() < a.scope();
 #endif
 		return std::memcmp(addr(), a.addr(), l1) < 0;
-    }
+	}
 	else return l1 < l2;
 }
 
 
 bool IPAddress::operator <= (const IPAddress& a) const
 {
-    return !(a < *this);
+	return !(a < *this);
 }
 
 
 bool IPAddress::operator > (const IPAddress& a) const
 {
-    return a < *this;
+	return a < *this;
 }
 
 
 bool IPAddress::operator >= (const IPAddress& a) const
 {
-    return !(*this < a);
+	return !(*this < a);
 }
 
 
@@ -506,7 +499,7 @@ poco_socklen_t IPAddress::length() const
 	return pImpl()->length();
 }
 
-	
+
 const void* IPAddress::addr() const
 {
 	return pImpl()->addr();

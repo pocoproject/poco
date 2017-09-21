@@ -318,8 +318,8 @@ void CoreTest::testBuffer()
 
 void CoreTest::testAtomicCounter()
 {
-	AtomicCounter ac;
-	
+	AtomicCounter ac(0);
+
 	assert (ac.value() == 0);
 	assert (ac++ == 0);
 	assert (ac-- == 1);

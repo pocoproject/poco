@@ -1954,6 +1954,8 @@ void VarTest::testDynamicStructBasics()
 	aStruct.erase("First Name");
 	assert (aStruct.size() == 1);
 	assert (*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assert (aStruct.size() == 0);
 }
 
 
