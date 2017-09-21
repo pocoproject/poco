@@ -796,7 +796,7 @@ void MySQLTest::recreatePersonLongTextTable()
 void MySQLTest::recreatePersonDateTimeTable()
 {
 	dropTable("Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME(6))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -894,7 +894,7 @@ void MySQLTest::recreateAnyTable()
 	dropTable("Anys");
 	try {
 		*_pSession << "CREATE TABLE Anys (int_8 TINYINT, int_16 SMALLINT, int_32 MEDIUMINT, int_64 BIGINT, flt FLOAT, dbl DOUBLE, "
-									"str0 VARCHAR(255), str1 TEXT, date0 DATE, time0 TIME, date_time0 DATETIME, empty INTEGER)", now;
+									"str0 VARCHAR(255), str1 TEXT, date0 DATE, time0 TIME, date_time0 DATETIME(6), empty INTEGER)", now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateAnyTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateAnyTable()"); }
