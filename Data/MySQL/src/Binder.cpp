@@ -169,7 +169,7 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 	mt.hour = val.hour();
 	mt.minute = val.minute();
 	mt.second = val.second();
-	mt.second_part = val.millisecond();
+	mt.second_part = val.millisecond() * 1000 + val.microsecond();
 
 	mt.time_type  = MYSQL_TIMESTAMP_DATETIME;
 
