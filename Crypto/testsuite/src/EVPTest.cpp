@@ -18,6 +18,8 @@
 #include "CppUnit/TestSuite.h"
 #include <sstream>
 #include <fstream>
+#include <iostream>
+#include <cstring>
 
 
 using namespace Poco::Crypto;
@@ -126,7 +128,7 @@ void EVPTest::testRSAEVPPKey()
 		assert (sizePub1 && (sizePub1 == sizePub2));
 		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
-#endif POCO_ENABLE_CPP11
+#endif // POCO_ENABLE_CPP11
 
 		BIO_free(bioPub2);
 		BIO_free(bioPriv2);
@@ -269,7 +271,7 @@ void EVPTest::testECEVPPKey()
 		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
 		assert (sizePub1 && (sizePub1 == sizePub2));
 		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
-#endif POCO_ENABLE_CPP11
+#endif // POCO_ENABLE_CPP11
 
 		BIO_free(bioPub2);
 		BIO_free(bioPriv2);
