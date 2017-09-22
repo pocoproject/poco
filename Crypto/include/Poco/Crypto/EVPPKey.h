@@ -27,6 +27,7 @@
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <sstream>
+#include <typeinfo>
 
 
 namespace Poco {
@@ -146,8 +147,8 @@ private:
 		const std::string& keyFile,
 		const std::string& pass = "")
 	{
-		poco_assert_dbg (((typeid(K) == typeid(RSA) || typeid(K) == typeid(EC_KEY)) && getFunc) ||
-						((typeid(K) == typeid(EVP_PKEY)) && !getFunc));
+		poco_assert_dbg (((typeid(K*) == typeid(RSA*) || typeid(K*) == typeid(EC_KEY*)) && getFunc) ||
+						((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc));
 		poco_check_ptr (ppKey);
 		poco_assert_dbg (!*ppKey);
 
@@ -192,8 +193,8 @@ private:
 		std::istream* pIstr,
 		const std::string& pass = "")
 	{
-		poco_assert_dbg (((typeid(K) == typeid(RSA) || typeid(K) == typeid(EC_KEY)) && getFunc) ||
-						((typeid(K) == typeid(EVP_PKEY)) && !getFunc));
+		poco_assert_dbg (((typeid(K*) == typeid(RSA*) || typeid(K*) == typeid(EC_KEY*)) && getFunc) ||
+						((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc));
 		poco_check_ptr(ppKey);
 		poco_assert_dbg(!*ppKey);
 
