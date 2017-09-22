@@ -120,6 +120,7 @@ public:
 		/// Returns pointer to the OpenSSL EVP_PKEY structure.
 
 private:
+	static int type(EVP_PKEY* pEVPPKey);
 	void newECKey(const char* group);
 	void duplicate(EVP_PKEY* pEVPPKey);
 	void setKey(ECKey* pKey);
@@ -244,11 +245,17 @@ private:
 // inlines
 //
 
+inline int EVPPKey::type(EVP_PKEY* pEVPPKey)
+{
+	if (!pEVPPKey) return NID_undef;
+
+	return EVP_PKEY_type(EVP_PKEY_id(pEVPPKey));
+}
+
+
 inline int EVPPKey::type() const
 {
-	if (!_pEVPPKey) return NID_undef;
-
-	return EVP_PKEY_type(_pEVPPKey->type);
+	return type(_pEVPPKey);
 }
 
 

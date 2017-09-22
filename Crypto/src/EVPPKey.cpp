@@ -213,33 +213,34 @@ void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 	if (!_pEVPPKey) throw NullPointerException("EVPPKey::duplicate(): "
 		"EVP_PKEY_new() returned null.");
 
-	switch (pEVPPKey->type)
+	int keyType = type(pEVPPKey);
+	switch (keyType)
 	{
-		case EVP_PKEY_RSA:
+	case EVP_PKEY_RSA:
+	{
+		RSA* pRSA = EVP_PKEY_get1_RSA(pEVPPKey);
+		if (pRSA)
 		{
-			RSA* pRSA = EVP_PKEY_get1_RSA(pEVPPKey);
-			if (pRSA)
-			{
-				EVP_PKEY_set1_RSA(_pEVPPKey, pRSA);
-				RSA_free(pRSA);
-			}
-			else throw OpenSSLException();
-			break;
+			EVP_PKEY_set1_RSA(_pEVPPKey, pRSA);
+			RSA_free(pRSA);
 		}
-		case EVP_PKEY_EC:
+		else throw OpenSSLException();
+		break;
+	}
+	case EVP_PKEY_EC:
+	{
+		EC_KEY* pEC = EVP_PKEY_get1_EC_KEY(pEVPPKey);
+		if (pEC)
 		{
-			EC_KEY* pEC = EVP_PKEY_get1_EC_KEY(pEVPPKey);
-			if (pEC)
-			{
-				EVP_PKEY_set1_EC_KEY(_pEVPPKey, pEC);
-				EC_KEY_free(pEC);
-			}
-			else throw OpenSSLException("EVPPKey:duplicate()");
-			break;
+			EVP_PKEY_set1_EC_KEY(_pEVPPKey, pEC);
+			EC_KEY_free(pEC);
 		}
-		default:
-			throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
-				NumberFormatter::format(pEVPPKey->type));
+		else throw OpenSSLException();
+		break;
+	}
+	default:
+		throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
+			NumberFormatter::format(keyType));
 	}
 }
 
