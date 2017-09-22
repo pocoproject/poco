@@ -221,10 +221,11 @@ int DateTime::dayOfYear() const
 
 int DateTime::daysOfMonth(int year, int month)
 {
+	poco_assert (year >= 0 && year <= 9999);
 	poco_assert (month >= 1 && month <= 12);
 
 	static int daysOfMonthTable[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	
+
 	if (month == 2 && isLeapYear(year))
 		return 29;
 	else
