@@ -29,9 +29,7 @@
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 
-#if __cplusplus >= 201103L
 #include <tuple>
-#endif
 
 #if POCO_MSVS_VERSION == 2015
 #define HAVE_STRUCT_TIMESPEC
@@ -1622,7 +1620,6 @@ void SQLExecutor::tupleVector()
 	poco_assert (ret == v);
 }
 
-#if __cplusplus >= 201103L
 
 void SQLExecutor::stdTuples()
 {
@@ -1671,8 +1668,6 @@ void SQLExecutor::stdTupleVector()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (ret == v);
 }
-
-#endif //__cplusplus >= 201103L
 
 
 void SQLExecutor::internalExtraction()

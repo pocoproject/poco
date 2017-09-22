@@ -36,9 +36,7 @@
 #include <iomanip>
 #include <set>
 
-#if __cplusplus >= 201103L
 #include <tuple>
-#endif
 
 
 using namespace Poco::Data::Keywords;
