@@ -216,7 +216,8 @@ void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 	if (!_pEVPPKey) throw NullPointerException("EVPPKey::duplicate(): "
 		"EVP_PKEY_new() returned null.");
 
-	switch (pEVPPKey->type)
+	int keyType = type(pEVPPKey);
+	switch (keyType)
 	{
 		case EVP_PKEY_RSA:
 		{
@@ -242,7 +243,7 @@ void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 		}
 		default:
 			throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
-				NumberFormatter::format(pEVPPKey->type));
+				NumberFormatter::format(keyType));
 	}
 }
 

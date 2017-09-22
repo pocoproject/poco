@@ -95,11 +95,11 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 				PKCS12_SAFEBAG* pBag = PKCS12_add_cert(&pBags, pCert);
 				if (pBag)
 				{
-					char*pBuffer = PKCS12_get_friendlyname(pBag);
+					char* pBuffer = PKCS12_get_friendlyname(pBag);
 					if(pBuffer)
 					{
 						_pkcsFriendlyname = pBuffer;
-						CRYPTO_free(pBuffer);
+						OPENSSL_free(pBuffer);
 					}else _pkcsFriendlyname.clear();
 					if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
 				}

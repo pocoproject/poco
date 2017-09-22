@@ -121,8 +121,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\VS_120\win64\bin\debug\*64MDd.dll ..\bin64\* 1&gt;nul
-xcopy /y ..\openssl\VS_120\win64\bin\debug\*64MDd.lib ..\lib64\* 1&gt;nul
+      <Command>xcopy /y ..\openssl\VS_120\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul
 exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
@@ -156,8 +157,8 @@ exit 0</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\VS_120\win64\bin\release\*64MD.dll ..\bin64\* 1&gt;nul
-xcopy /y ..\openssl\VS_120\win64\bin\release\*64MD.lib ..\lib64\* 1&gt;nul
+      <Command>xcopy /y ..\openssl\VS_120\win64\bin\release\*.dll ..\bin64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\bin\release\*.lib ..\lib64\* 1&gt;nul
 exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
@@ -194,8 +195,8 @@ exit 0</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\VS_120\win64\lib\debug\*64MTd.lib ..\lib64\* 1&gt;nul
-xcopy /y ..\openssl\VS_120\win64\lib\debug\*64MTd.pdb ..\lib64\* 1&gt;nul
+      <Command>xcopy /y ..\openssl\VS_120\win64\lib\debug\*.lib ..\lib64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\lib\debug\*.pdb ..\lib64\* 1&gt;nul
 exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
@@ -222,7 +223,7 @@ exit 0</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\VS_120\win64\lib\release\*64MT.lib ..\lib64\* 1&gt;nul
+      <Command>xcopy /y ..\openssl\VS_120\win64\lib\release\*.lib ..\lib64\* 1&gt;nul
 exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
@@ -250,8 +251,9 @@ exit 0</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\VS_120\win64\bin\debug\*64MDd.dll ..\bin64\* 1&gt;nul
-xcopy /y ..\openssl\VS_120\win64\bin\debug\*64MDd.lib ..\lib64\* 1&gt;nul
+      <Command>xcopy /y ..\openssl\VS_120\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul
 exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
@@ -278,8 +280,8 @@ exit 0</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\VS_120\win64\bin\release\*64MD.dll ..\bin64\* 1&gt;nul
-xcopy /y ..\openssl\VS_120\win64\bin\release\*64MD.lib ..\lib64\* 1&gt;nul
+      <Command>xcopy /y ..\openssl\VS_120\win64\bin\release\*.dll ..\bin64\* 1&gt;nul
+xcopy /y ..\openssl\VS_120\win64\bin\release\*.lib ..\lib64\* 1&gt;nul
 exit 0</Command>
     </PreBuildEvent>
     <ClCompile>

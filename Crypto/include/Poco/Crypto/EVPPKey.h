@@ -121,8 +121,8 @@ public:
 private:
 	EVPPKey();
 
+	static int type(EVP_PKEY* pEVPPKey);
 	void newECKey(const char* group);
-
 	void duplicate(EVP_PKEY* pEVPPKey);
 
 	void setKey(ECKey* pKey);
@@ -247,13 +247,18 @@ private:
 // inlines
 //
 
-inline int EVPPKey::type() const
+inline int EVPPKey::type(EVP_PKEY* pEVPPKey)
 {
-	if (!_pEVPPKey) return NID_undef;
+	if (!pEVPPKey) return NID_undef;
 
-	return EVP_PKEY_type(_pEVPPKey->type);
+	return EVP_PKEY_type(EVP_PKEY_id(pEVPPKey));
 }
 
+
+inline int EVPPKey::type() const
+{
+	return type(_pEVPPKey);
+}
 
 inline bool EVPPKey::isSupported(int type) const
 {

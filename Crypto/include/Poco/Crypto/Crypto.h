@@ -101,13 +101,8 @@ enum RSAPaddingMode
 
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
 		#if !defined(POCO_EXTERNAL_OPENSSL)
-			#if defined (_DLL)
-				#pragma comment(lib, "libeay" POCO_PLATFORM_BITS "MD" POCO_DEBUG_POSTFIX ".lib")
-				#pragma comment(lib, "ssleay" POCO_PLATFORM_BITS "MD" POCO_DEBUG_POSTFIX ".lib")
-			#else
-				#pragma comment(lib, "libeay" POCO_PLATFORM_BITS "MT" POCO_DEBUG_POSTFIX ".lib")
-				#pragma comment(lib, "ssleay" POCO_PLATFORM_BITS "MT" POCO_DEBUG_POSTFIX ".lib")
-			#endif
+				#pragma comment(lib, "libcrypto.lib")
+				#pragma comment(lib, "libssl.lib")
 		#endif // POCO_EXTERNAL_OPENSSL
 		#if !defined(Crypto_EXPORTS)
 			#pragma comment(lib, "PocoCrypto" POCO_LIB_SUFFIX)
