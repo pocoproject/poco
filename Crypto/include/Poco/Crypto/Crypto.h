@@ -87,18 +87,6 @@ enum RSAPaddingMode
 // Automatically link Crypto and OpenSSL libraries.
 //
 #if defined(_MSC_VER)
-	#if defined(_WIN64)
-		#define POCO_PLATFORM_BITS "64"
-	#else
-		#define POCO_PLATFORM_BITS "32"
-	#endif
-
-	#if defined (_DEBUG)
-		#define POCO_DEBUG_POSTFIX "d"
-	#else
-		#define POCO_DEBUG_POSTFIX ""
-	#endif
-
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
 		#if !defined(POCO_EXTERNAL_OPENSSL)
 				#pragma comment(lib, "libcrypto.lib")
