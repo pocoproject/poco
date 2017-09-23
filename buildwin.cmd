@@ -83,6 +83,9 @@ if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
 if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
+if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32)
+if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64)
+
 rem SAMPLES [samples|nosamples]
 set SAMPLES=%4
 if "%SAMPLES%"=="" (set SAMPLES=samples)
@@ -232,7 +235,6 @@ if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
 if %VS_VERSION%==vs150 (set EXTRASW=/m /p:VisualStudioVersion=15.0)
 )
-
 
 set DEBUG_SHARED=0
 set RELEASE_SHARED=0
@@ -532,6 +534,7 @@ for /f %%G in ('findstr /R "." components') do (
       echo. && echo.
     )
     if %RELEASE_SHARED%==1 (
+      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
