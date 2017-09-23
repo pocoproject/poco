@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|Win32">
@@ -32,7 +32,7 @@
     <RootNamespace>Crypto</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -63,27 +63,27 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
-  <ImportGroup Label="ExtensionSettings"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'" Label="PropertySheets">
-    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props"/>
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoCryptod</TargetName>
@@ -121,12 +121,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\VS_120\win32\bin\debug\*.dll ..\bin\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\bin\debug\*.lib ..\lib\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\bin\debug\*.pdb ..\bin\* 1>nul
+exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\VS_120\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -136,7 +138,7 @@ xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -155,8 +157,9 @@ xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\VS_120\win32\bin\release\*.dll ..\bin\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\bin\release\*.lib ..\lib\* 1>nul
+exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -164,7 +167,7 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\VS_120\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -172,9 +175,9 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
@@ -192,12 +195,13 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\lib\debug\*32MTd.lib ..\lib\*
-xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\VS_120\win32\lib\debug\*.lib ..\lib\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\lib\debug\*.pdb ..\lib\* 1>nul
+exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\VS_120\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -207,7 +211,7 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <ProgramDataBaseFileName>..\lib\PocoCryptomtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -219,7 +223,8 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\lib\release\*32MT.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\VS_120\win32\lib\release\*.lib ..\lib\* 1>nul
+exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -227,7 +232,7 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\VS_120\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -235,9 +240,9 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
@@ -246,12 +251,14 @@ xcopy /y ..\openssl\win32\lib\debug\*32MTd.pdb ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\debug\*32MDd.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\VS_120\win32\bin\debug\*.dll ..\bin\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\bin\debug\*.lib ..\lib\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\bin\debug\*.pdb ..\bin\* 1>nul
+exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\VS_120\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -261,7 +268,7 @@ xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <ProgramDataBaseFileName>..\lib\PocoCryptomdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -273,8 +280,9 @@ xcopy /y ..\openssl\win32\bin\debug\*32MDd.lib ..\lib\*</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <PreBuildEvent>
-      <Command>xcopy /y ..\openssl\win32\bin\release\*32MD.dll ..\bin\*
-xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
+      <Command>xcopy /y ..\openssl\VS_120\win32\bin\release\*.dll ..\bin\* 1>nul
+xcopy /y ..\openssl\VS_120\win32\bin\release\*.lib ..\lib\* 1>nul
+exit 0</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -282,7 +290,7 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\Foundation\include;..\openssl\VS_120\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -290,10 +298,10 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader/>
+      <PrecompiledHeader />
       <ProgramDataBaseFileName>..\lib\PocoCryptomd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat/>
+      <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
@@ -302,37 +310,53 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Poco\Crypto\Cipher.h"/>
-    <ClInclude Include="include\Poco\Crypto\CipherFactory.h"/>
-    <ClInclude Include="include\Poco\Crypto\CipherImpl.h"/>
-    <ClInclude Include="include\Poco\Crypto\CipherKey.h"/>
-    <ClInclude Include="include\Poco\Crypto\CipherKeyImpl.h"/>
-    <ClInclude Include="include\Poco\Crypto\Crypto.h"/>
-    <ClInclude Include="include\Poco\Crypto\CryptoStream.h"/>
-    <ClInclude Include="include\Poco\Crypto\CryptoTransform.h"/>
-    <ClInclude Include="include\Poco\Crypto\DigestEngine.h"/>
-    <ClInclude Include="include\Poco\Crypto\OpenSSLInitializer.h"/>
-    <ClInclude Include="include\Poco\Crypto\RSACipherImpl.h"/>
-    <ClInclude Include="include\Poco\Crypto\RSADigestEngine.h"/>
-    <ClInclude Include="include\Poco\Crypto\RSAKey.h"/>
-    <ClInclude Include="include\Poco\Crypto\RSAKeyImpl.h"/>
-    <ClInclude Include="include\Poco\Crypto\X509Certificate.h"/>
+    <ClInclude Include="include\Poco\Crypto\Cipher.h" />
+    <ClInclude Include="include\Poco\Crypto\CipherFactory.h" />
+    <ClInclude Include="include\Poco\Crypto\CipherImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\CipherKey.h" />
+    <ClInclude Include="include\Poco\Crypto\CipherKeyImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\Crypto.h" />
+    <ClInclude Include="include\Poco\Crypto\CryptoException.h" />
+    <ClInclude Include="include\Poco\Crypto\CryptoStream.h" />
+    <ClInclude Include="include\Poco\Crypto\CryptoTransform.h" />
+    <ClInclude Include="include\Poco\Crypto\DigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\ECDSADigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\ECKey.h" />
+    <ClInclude Include="include\Poco\Crypto\ECKeyImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\EVPPKey.h" />
+    <ClInclude Include="include\Poco\Crypto\KeyPair.h" />
+    <ClInclude Include="include\Poco\Crypto\KeyPairImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\OpenSSLInitializer.h" />
+    <ClInclude Include="include\Poco\Crypto\PKCS12Container.h" />
+    <ClInclude Include="include\Poco\Crypto\RSACipherImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\RSADigestEngine.h" />
+    <ClInclude Include="include\Poco\Crypto\RSAKey.h" />
+    <ClInclude Include="include\Poco\Crypto\RSAKeyImpl.h" />
+    <ClInclude Include="include\Poco\Crypto\X509Certificate.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Cipher.cpp"/>
-    <ClCompile Include="src\CipherFactory.cpp"/>
-    <ClCompile Include="src\CipherImpl.cpp"/>
-    <ClCompile Include="src\CipherKey.cpp"/>
-    <ClCompile Include="src\CipherKeyImpl.cpp"/>
-    <ClCompile Include="src\CryptoStream.cpp"/>
-    <ClCompile Include="src\CryptoTransform.cpp"/>
-    <ClCompile Include="src\DigestEngine.cpp"/>
-    <ClCompile Include="src\OpenSSLInitializer.cpp"/>
-    <ClCompile Include="src\RSACipherImpl.cpp"/>
-    <ClCompile Include="src\RSADigestEngine.cpp"/>
-    <ClCompile Include="src\RSAKey.cpp"/>
-    <ClCompile Include="src\RSAKeyImpl.cpp"/>
-    <ClCompile Include="src\X509Certificate.cpp"/>
+    <ClCompile Include="src\Cipher.cpp" />
+    <ClCompile Include="src\CipherFactory.cpp" />
+    <ClCompile Include="src\CipherImpl.cpp" />
+    <ClCompile Include="src\CipherKey.cpp" />
+    <ClCompile Include="src\CipherKeyImpl.cpp" />
+    <ClCompile Include="src\CryptoException.cpp" />
+    <ClCompile Include="src\CryptoStream.cpp" />
+    <ClCompile Include="src\CryptoTransform.cpp" />
+    <ClCompile Include="src\DigestEngine.cpp" />
+    <ClCompile Include="src\ECDSADigestEngine.cpp" />
+    <ClCompile Include="src\ECKey.cpp" />
+    <ClCompile Include="src\ECKeyImpl.cpp" />
+    <ClCompile Include="src\EVPPKey.cpp" />
+    <ClCompile Include="src\KeyPair.cpp" />
+    <ClCompile Include="src\KeyPairImpl.cpp" />
+    <ClCompile Include="src\OpenSSLInitializer.cpp" />
+    <ClCompile Include="src\PKCS12Container.cpp" />
+    <ClCompile Include="src\RSACipherImpl.cpp" />
+    <ClCompile Include="src\RSADigestEngine.cpp" />
+    <ClCompile Include="src\RSAKey.cpp" />
+    <ClCompile Include="src\RSAKeyImpl.cpp" />
+    <ClCompile Include="src\X509Certificate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
@@ -344,6 +368,6 @@ xcopy /y ..\openssl\win32\bin\release\*32MD.lib ..\lib\*</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
-  <ImportGroup Label="ExtensionTargets"/>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

@@ -1,8 +1,6 @@
 //
 // Data.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Data.h#4 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Data
@@ -30,7 +28,7 @@
 // from a DLL simpler. All files within this DLL are compiled with the Data_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// Data_API functions as being imported from a DLL, wheras this DLL sees symbols
+// Data_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)

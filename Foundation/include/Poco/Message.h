@@ -1,8 +1,6 @@
 //
 // Message.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Message.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Message
@@ -79,7 +77,10 @@ public:
 		
 	Message(const Message& msg);
 		/// Creates a Message by copying another one.
-		
+
+	Message(Message&& msg);
+		/// Creates a Message by copying another one.
+
 	Message(const Message& msg, const std::string& text);
 		/// Creates a Message by copying all but the text from another message.
 		
@@ -88,7 +89,10 @@ public:
 	
 	Message& operator = (const Message& msg);
 		/// Assignment operator.
-		
+
+	Message& operator = (Message&& msg);
+		/// Assignment operator.
+
 	void swap(Message& msg);
 		/// Swaps the message with another one.	
 		

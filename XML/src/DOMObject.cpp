@@ -1,8 +1,6 @@
 //
 // DOMObject.cpp
 //
-// $Id: //poco/1.4/XML/src/DOMObject.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

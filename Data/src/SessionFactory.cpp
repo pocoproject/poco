@@ -1,8 +1,6 @@
 //
 // SessionFactory.cpp
 //
-// $Id: //poco/Main/Data/src/SessionFactory.cpp#6 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SessionFactory

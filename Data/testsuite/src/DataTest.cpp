@@ -1,8 +1,6 @@
 //
 // DataTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#12 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -1404,8 +1402,6 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
-#if __cplusplus >= 201103L
-
 void DataTest::testStdTuple()
 {
 	using Row = std::tuple<std::string, std::string, int>;
@@ -1416,8 +1412,6 @@ void DataTest::testStdTuple()
 	std::vector<Row> rows;
 	sess << "SELECT name, address, age FROM Person", into(rows) , now;
 }
-
-#endif // __cplusplus >= 201103L
 
 
 void DataTest::setUp()

@@ -1,8 +1,6 @@
 //
 // X509Certificate.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/X509Certificate.h#2 $
-//
 // Library: Crypto
 // Package: Certificate
 // Module:  X509Certificate
@@ -142,6 +140,9 @@ public:
 
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
+
+	void print(std::ostream& out) const;
+		/// Prints the certificate information to ostream.
 
 protected:
 	void load(std::istream& stream);

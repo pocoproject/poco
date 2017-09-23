@@ -1,8 +1,6 @@
 //
 // RepeatedTest.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/RepeatedTest.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_RepeatedTest_INCLUDED
@@ -45,7 +43,7 @@ private:
 
 
 // Counts the number of test cases that will be run by this test.
-inline RepeatedTest::countTestCases ()
+inline int RepeatedTest::countTestCases ()
 {
 	return TestDecorator::countTestCases() * _timesRepeat;
 }

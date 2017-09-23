@@ -1,8 +1,6 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timestamp.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timestamp
@@ -27,16 +25,7 @@
 #undef min
 #undef max
 #include <limits>
-#if defined(POCO_OS_FAMILY_UNIX)
-#include <time.h>
-#include <unistd.h>
-#if defined(POCO_VXWORKS)
-#include <timers.h>
-#else
-#include <sys/time.h>
-#include <sys/times.h>
-#endif
-#endif
+#include <chrono>
 
 
 #ifndef POCO_HAVE_CLOCK_GETTIME
@@ -217,40 +206,8 @@ Timestamp Timestamp::fromUtcTime(UtcTimeVal val)
 
 void Timestamp::update()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS)
-
-	FILETIME ft;
-#if defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)
-	GetSystemTimeAsFileTimeWithMillisecondResolution(&ft);
-#else
-	GetSystemTimeAsFileTime(&ft);
-#endif
-
-	ULARGE_INTEGER epoch; // UNIX epoch (1970-01-01 00:00:00) expressed in Windows NT FILETIME
-	epoch.LowPart  = 0xD53E8000;
-	epoch.HighPart = 0x019DB1DE;
-
-	ULARGE_INTEGER ts;
-	ts.LowPart  = ft.dwLowDateTime;
-	ts.HighPart = ft.dwHighDateTime;
-	ts.QuadPart -= epoch.QuadPart;
-	_ts = ts.QuadPart/10;
-
-#elif defined(POCO_HAVE_CLOCK_GETTIME)
-
-	struct timespec ts;
-	if (clock_gettime(CLOCK_REALTIME, &ts))
-		throw SystemException("cannot get time of day");
-	_ts = TimeVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
-
-#else
-
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL))
-		throw SystemException("cannot get time of day");
-	_ts = TimeVal(tv.tv_sec)*resolution() + tv.tv_usec;
-	
-#endif
+	_ts = std::chrono::duration_cast<std::chrono::microseconds>
+		(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 

@@ -1,8 +1,6 @@
 //
 // DOMObject.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DOMObject.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

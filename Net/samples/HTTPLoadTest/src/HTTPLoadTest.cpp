@@ -1,8 +1,6 @@
 //
 // HTTPLoadTest.cpp
 //
-// $Id: //poco/1.4/Net/samples/HTTPLoadTest/src/HTTPLoadTest.cpp#1 $
-//
 // This sample demonstrates the HTTPClientSession class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -188,7 +186,7 @@ void HTTPClient::printStats(std::string uri, int repetitions, int success, Poco:
 	std::cout << std::endl << "--------------" << std::endl 
 		<< "Statistics for " << uri << std::endl << "--------------" 
 		<< std::endl
-		<< repetitions << " attempts, " << success << " succesful (" 
+		<< repetitions << " attempts, " << success << " successful (" 
 		<<  ((float) success / (float) repetitions) * 100.0 << "%)" << std::endl
 		<< "Avg response time: " << ((float) usec / (float) repetitions) / 1000.0 << "ms, " << std::endl
 		<< "Avg requests/second handled: " << ((float) success  /((float) usec / 1000000.0)) << std::endl

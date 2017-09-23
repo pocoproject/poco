@@ -1,8 +1,6 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/1.4/Data/PostgreSQL/src/Connector.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Connector

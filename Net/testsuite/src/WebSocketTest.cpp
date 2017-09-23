@@ -1,8 +1,6 @@
 //
 // WebSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.cpp#3 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -58,6 +56,8 @@ namespace
 				do
 				{
 					n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
+					if (n == 0)
+						break;
 					ws.sendFrame(buffer.begin(), n, flags);
 				}
 				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);

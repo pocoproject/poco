@@ -1,8 +1,6 @@
 //
 // XMLTestSuite.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLTestSuite.h#1 $
-//
 // Definition of the XMLTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

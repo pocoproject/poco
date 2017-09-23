@@ -1,8 +1,6 @@
 //
 // IntValidator.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/IntValidator.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  IntValidator

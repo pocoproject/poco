@@ -16,7 +16,7 @@ development. Of course, POCO is also ready for enterprise-level
 challenges.
 
 <%
-<img src="images/poco.png" width="320" height="255" alt="POCO Libraries" border="0">
+<img src="images/poco.png" width="320" height="255" alt="POCO Libraries" border="0"/>
 %>
 
 POCO consists of four core libraries, and a number of add-on libraries.
@@ -201,7 +201,7 @@ complete access to an XML
 document, using a tree-style object hierarchy. For this to work, the DOM
 parser provided by POCO has to load the entire document into memory. To
 reduce the memory footprint of the DOM document, the POCO DOM
-implementation uses string pooling, storing frequently occuring strings
+implementation uses string pooling, storing frequently occurring strings
 such as element and attribute names only once. The XML library is based
 on the Expat open source XML parser library (http://www.libexpat.org). 
 Built on top of Expat

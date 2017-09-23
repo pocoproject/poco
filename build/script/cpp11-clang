@@ -1,0 +1,24 @@
+#! /bin/sh
+#
+# cpp11-clang
+#
+# Detect compatible Clang version and add c++11/14 flags
+#
+
+CLANGMAJOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_major__ | sed -e 's/^.* //g')
+CLANGMINOR   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_minor__ | sed -e 's/^.* //g')
+CLANGPATCH   := $(shell $(CXX) -x c++ /dev/null -dM -E | grep __clang_patchlevel__ | sed -e 's/^.* //g')
+CLANGVERSION := $(CLANGMAJOR)$(CLANGMINOR)$(CLANGPATCH)
+
+#
+# Clang 3.4 doesn't accept -std=c++14, only -std=c++1y.
+#
+
+# C++14 needs Clang 3.4
+ifeq ($(shell test $(CLANGVERSION) -ge 340 && echo 1), 1)
+	CXXFLAGS += -std=c++1y
+# C++11 needs Clang 3.3
+else ifeq ($(shell test $(CLANGVERSION) -ge 330 && echo 1), 1)
+	CXXFLAGS += -std=c++0x
+endif
+

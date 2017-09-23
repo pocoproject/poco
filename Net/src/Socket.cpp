@@ -1,8 +1,6 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.4/Net/src/Socket.cpp#3 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  Socket
@@ -79,9 +77,10 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	if (epollSize == 0) return 0;
 
 	int epollfd = -1;
-	{
+	{		
 		struct epoll_event eventsIn[epollSize];
-		memset(eventsIn, 0, sizeof(eventsIn));
+		memset(eventsIn, 0, sizeof(epoll_event) * epollSize );
+		
 		struct epoll_event* eventLast = eventsIn;
 		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
 		{
@@ -167,7 +166,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	}
 
 	struct epoll_event eventsOut[epollSize];
-	memset(eventsOut, 0, sizeof(eventsOut));
+	memset(eventsOut, 0, sizeof(epoll_event) * epollSize );	
 
 	Poco::Timespan remainingTime(timeout);
 	int rc;

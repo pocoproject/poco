@@ -1,8 +1,6 @@
 //
 // RSADigestEngine.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSADigestEngine.cpp#1 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSADigestEngine
@@ -76,7 +74,7 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 		if (sigLen < _signature.size())
 			_signature.resize(sigLen);
 	}
-    return _signature;
+	return _signature;
 }
 
 	

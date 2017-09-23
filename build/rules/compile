@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/rules/compile#1 $
-#
 # compile
 #
 # Compile rule definitions for makefiles

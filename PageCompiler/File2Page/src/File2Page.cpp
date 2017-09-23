@@ -1,8 +1,6 @@
 //
 // File2Page.cpp
 //
-// $Id: //poco/1.4/PageCompiler/File2Page/src/File2Page.cpp#4 $
-//
 // An application that creates a Page Compiler source file from an
 // ordinary file.
 //

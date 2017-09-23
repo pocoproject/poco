@@ -1,8 +1,6 @@
 //
 // HelpFormatterTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/HelpFormatterTest.h#1 $
-//
 // Definition of the HelpFormatterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

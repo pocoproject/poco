@@ -1,8 +1,6 @@
 //
 // NamePool.h
 //
-// $Id: //poco/1.4/XML/include/Poco/XML/NamePool.h#1 $
-//
 // Library: XML
 // Package: XML
 // Module:  NamePool
@@ -74,6 +72,7 @@ private:
 
 	NamePoolItem* _pItems;
 	unsigned long _size;
+	unsigned long _salt;
 	int           _rc;
 };
 

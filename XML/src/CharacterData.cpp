@@ -1,8 +1,6 @@
 //
 // CharacterData.cpp
 //
-// $Id: //poco/1.4/XML/src/CharacterData.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -23,16 +21,16 @@ namespace Poco {
 namespace XML {
 
 
-CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& rData): 
+CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data): 
 	AbstractNode(pOwnerDocument),
-	_data(rData)
+	_data(data)
 {
 }
 
 
-CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& rData): 
-	AbstractNode(pOwnerDocument, rData),
-	_data(rData._data)
+CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& data): 
+	AbstractNode(pOwnerDocument, data),
+	_data(data._data)
 {
 }
 
@@ -42,17 +40,17 @@ CharacterData::~CharacterData()
 }
 
 
-void CharacterData::setData(const XMLString& rData)
+void CharacterData::setData(const XMLString& data)
 {
 	if (events())
 	{
 		XMLString oldData = _data;
-		_data = rData;
+		_data = data;
 		dispatchCharacterDataModified(oldData, _data);
 	}
 	else
 	{
-		_data = rData;
+		_data = data;
 	}
 }
 

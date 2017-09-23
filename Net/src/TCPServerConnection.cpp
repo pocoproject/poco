@@ -1,8 +1,6 @@
 //
 // TCPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/TCPServerConnection.cpp#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerConnection

@@ -1,8 +1,6 @@
 //
 // ObjectPool.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ObjectPool.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ObjectPool
@@ -41,7 +39,7 @@ class PoolableObjectFactory
 	/// a policy class to change the behavior of the ObjectPool when
 	/// creating new objects, returning used objects back to the pool
 	/// and destroying objects, when the pool itself is destroyed or
-	/// shrinked.
+	/// shrunk.
 {
 public:
 	P createObject()

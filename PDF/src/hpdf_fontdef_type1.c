@@ -401,7 +401,7 @@ HPDF_Type1FontDef_Load  (HPDF_MMgr         mmgr,
         return NULL;
     }
 
-    /* if font-data is specified, the font data is embeded */
+    /* if font-data is specified, the font data is embedded */
     if (font_data) {
         ret = LoadFontData (fontdef, font_data);
         if (ret != HPDF_OK) {

@@ -1,8 +1,6 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLWriter.cpp#5 $
-//
 // Library: XML
 // Package: XML
 // Module:  XMLWriter
@@ -1027,9 +1025,9 @@ void XMLWriter::writeIndent() const
 }
 
 
-void XMLWriter::writeIndent(int indent) const
+void XMLWriter::writeIndent(int depth) const
 {
-	for (int i = 0; i < indent; ++i)
+	for (int i = 0; i < depth; ++i)
 		writeMarkup(_indent);
 }
 

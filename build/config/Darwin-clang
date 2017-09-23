@@ -53,7 +53,7 @@ SHAREDLIBLINKEXT = .dylib
 # Compiler and Linker Flags
 #
 CFLAGS          = $(ARCHFLAGS) $(OSFLAGS)
-CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++03 -stdlib=libstdc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++11 -stdlib=libstdc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
 LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++
 SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++
 DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++
@@ -78,4 +78,9 @@ SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -I$(OPENSSL_DIR)/include
 #
 # System Specific Libraries
 #
-SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl 
+SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-appleclang

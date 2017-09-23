@@ -1,8 +1,6 @@
 //
 // AbstractPreparation.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractPreparation.h#4 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractPreparation

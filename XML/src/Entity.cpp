@@ -1,8 +1,6 @@
 //
 // Entity.cpp
 //
-// $Id: //poco/1.4/XML/src/Entity.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -24,12 +22,12 @@ namespace XML {
 const XMLString Entity::NODE_NAME = toXMLString("#entity");
 
 
-Entity::Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& rPublicId, const XMLString& rSystemId, const XMLString& rNotationName): 
+Entity::Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName): 
 	AbstractContainerNode(pOwnerDocument),
 	_name(name),
-	_publicId(rPublicId),
-	_systemId(rSystemId),
-	_notationName(rNotationName)
+	_publicId(publicId),
+	_systemId(systemId),
+	_notationName(notationName)
 {
 }
 

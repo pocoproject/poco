@@ -1,8 +1,6 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.5/Data/PostgreSQL/include/Poco/Data/PostgreSQL/Binder.h#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  Binder

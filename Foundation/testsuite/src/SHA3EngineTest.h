@@ -1,8 +1,6 @@
 //
 // SHA3EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SHA3EngineTest.h#1 $
-//
 // Definition of the SHA3EngineTest class.
 //
 // Copyright (c) 2017, Applied Informatics Software Engineering GmbH

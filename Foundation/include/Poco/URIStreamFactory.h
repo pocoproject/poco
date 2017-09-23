@@ -1,8 +1,6 @@
 //
 // URIStreamFactory.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/URIStreamFactory.h#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URIStreamFactory

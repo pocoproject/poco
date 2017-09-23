@@ -1,8 +1,6 @@
 //
 // NetworkInterface.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NetworkInterface.h#4 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  NetworkInterface
@@ -99,7 +97,7 @@ public:
 		IPv4_OR_IPv6  /// Return interfaces with IPv4 or IPv6 address
 	};
 
-	static const unsigned NO_INDEX = ~0;
+	static const unsigned NO_INDEX = ~(static_cast<unsigned>(0));
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	static const char MAC_SEPARATOR = '-';
 #else

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Crypto/testsuite/Makefile#1 $
-#
 # Makefile for Poco Crypto testsuite
 #
 
@@ -16,7 +14,8 @@ SYSLIBS += -lssl -lcrypto -lz -ldl
 endif
 
 objects = CryptoTestSuite Driver \
-	CryptoTest DigestEngineTest RSATest
+	CryptoTest DigestEngineTest ECTest \
+	EVPTest RSATest PKCS12ContainerTest
 
 target         = testrunner
 target_version = 1

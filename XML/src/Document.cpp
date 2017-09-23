@@ -1,8 +1,6 @@
 //
 // Document.cpp
 //
-// $Id: //poco/1.4/XML/src/Document.cpp#2 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -227,21 +225,21 @@ Node* Document::importNode(Node* importedNode, bool deep)
 }
 
 
-Element* Document::createElementNS(const XMLString& rNamespaceURI, const XMLString& qualifiedName) const
+Element* Document::createElementNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
 {
-	return new Element(const_cast<Document*>(this), rNamespaceURI, Name::localName(qualifiedName), qualifiedName);
+	return new Element(const_cast<Document*>(this), namespaceURI, Name::localName(qualifiedName), qualifiedName);
 }
 
 
-Attr* Document::createAttributeNS(const XMLString& rNamespaceURI, const XMLString& qualifiedName) const
+Attr* Document::createAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
 {
-	return new Attr(const_cast<Document*>(this), 0, rNamespaceURI, Name::localName(qualifiedName), qualifiedName, EMPTY_STRING);
+	return new Attr(const_cast<Document*>(this), 0, namespaceURI, Name::localName(qualifiedName), qualifiedName, EMPTY_STRING);
 }
 
 
-NodeList* Document::getElementsByTagNameNS(const XMLString& rNamespaceURI, const XMLString& rLocalName) const
+NodeList* Document::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return new ElementsByTagNameListNS(const_cast<Document*>(this), rNamespaceURI, rLocalName);	
+	return new ElementsByTagNameListNS(const_cast<Document*>(this), namespaceURI, localName);	
 }
 
 

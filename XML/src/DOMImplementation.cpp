@@ -1,8 +1,6 @@
 //
 // DOMImplementation.cpp
 //
-// $Id: //poco/1.4/XML/src/DOMImplementation.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

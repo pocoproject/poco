@@ -1,8 +1,6 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/SQLExecutor.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -45,12 +43,7 @@ typedef unsigned int    uint;           /* System V compatibility */
 typedef unsigned long   ulong;          /* System V compatibility */
 #endif
 
-#include <my_global.h>
 #include <mysql.h>
-
-#ifdef max
-#undef max
-#endif
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -62,6 +55,7 @@ using Poco::DateTime;
 using Poco::NumberParser;
 using Poco::Any;
 using Poco::AnyCast;
+using Poco::DynamicAny;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::BadCastException;
@@ -560,6 +554,128 @@ void SQLExecutor::doubles()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (ret == data);
+}
+
+void SQLExecutor::any()
+{
+	std::string funct = "any()";
+	Any i8 = Poco::Int8(42);
+	Any i16 = Poco::Int16(420);
+	Any i32 = Poco::UInt32(42058);
+	Any i64 = Poco::Int64(2205861);
+	Any f = float(42.5);
+	Any d = double(4278.5);
+	Any s = std::string("42");
+	Any date = Date(DateTime());
+	Any t = Time(DateTime());
+	Any dateTime = DateTime(2017, 9, 2, 18, 49, 15, 227, 987);
+	Any e;
+	assert (e.empty());
+
+	try { *_pSession << "INSERT INTO Anys VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)",
+				use(i8), use(i16), use(i32), use(i64), use(f), use(d), use(s), use(s), use(date),
+				use(t), use(dateTime), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Anys", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (count == 1);
+
+	i8 = Poco::Int8(0);
+	i16 = Poco::Int16(0);
+	i32 = Poco::Int32(0);
+	i64 = Poco::Int64(0);
+	f = 0.0f;
+	d = 0.0;
+	s = std::string("");
+	Any s2 = std::string("");
+	Any dateR = Date();
+	Any tR = Time();
+	Any dateTimeR = DateTime();
+	e = 1;
+	assert (!e.empty());
+
+	try { *_pSession << "SELECT * FROM Anys", into(i8), into(i16), into(i32), into(i64),
+				into(f), into(d), into(s), into(s2), into(dateR), into(tR), into(dateTimeR), into(e), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assert (42 == AnyCast<Poco::Int8>(i8));
+	assert (420 == AnyCast<Poco::Int16>(i16));
+	assert (42058 == AnyCast<Poco::Int32>(i32));
+	assert (2205861 == AnyCast<Poco::Int64>(i64));
+	assert (42.5f == AnyCast<float>(f));
+	assert (4278.5 == AnyCast<double>(d));
+	assert ("42" == AnyCast<std::string>(s));
+	assert ("42" == AnyCast<std::string>(s2));
+	assert (AnyCast<Date>(date) == AnyCast<Date>(dateR));
+	assert (AnyCast<Time>(t) == AnyCast<Time>(tR));
+	assert (AnyCast<DateTime>(dateTimeR) == AnyCast<DateTime>(dateTime));
+	assert (e.empty());
+}
+
+void SQLExecutor::dynamicAny()
+{
+	std::string funct = "dynamicAny()";
+	DynamicAny i8 = Poco::Int8(42);
+	DynamicAny i16 = Poco::Int16(420);
+	DynamicAny i32 = Poco::UInt32(42058);
+	DynamicAny i64 = Poco::Int64(2205861);
+	DynamicAny f = float(42.5);
+	DynamicAny d = double(4278.5);
+	DynamicAny s = std::string("42");
+	DynamicAny date = Date(DateTime());
+	DynamicAny t = Time(DateTime());
+	DynamicAny dateTime = DateTime();
+	DynamicAny e;
+	assert (e.isEmpty());
+
+	try { *_pSession << "INSERT INTO Anys VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)",
+				use(i8), use(i16), use(i32), use(i64), use(f), use(d), use(s), use(s), use(date),
+				use(t), use(dateTime), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Anys", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (count == 1);
+
+	i8 = Poco::Int8(0);
+	i16 = Poco::Int16(0);
+	i32 = Poco::Int32(0);
+	i64 = Poco::Int64(0);
+	f = 0.0f;
+	d = 0.0;
+	s = std::string("");
+	DynamicAny s2 = std::string("");
+	DynamicAny dateR = Date();
+	DynamicAny tR = Time();
+	DynamicAny dateTimeR = DateTime();
+	e = 1;
+	assert (!e.isEmpty());
+
+	try { *_pSession << "SELECT * FROM Anys", into(i8), into(i16), into(i32), into(i64),
+				into(f), into(d), into(s), into(s2), into(dateR), into(tR), into(dateTimeR), into(e), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assert (42 == i8);
+	assert (420 == i16);
+	assert (42058 == i32);
+	assert (2205861 == i64);
+	assert (42.5f == f);
+	assert (4278.5 == d);
+	assert ("42" == s);
+	assert ("42" == s2);
+	assert (date == dateR);
+	assert (t == tR);
+	assert (dateTimeR.convert<DateTime>() == dateTime.convert<DateTime>());
+	assert (e.isEmpty());
 }
 
 
@@ -1281,7 +1397,7 @@ void SQLExecutor::dateTime()
 	std::string lastName("Bart");
 	std::string firstName("Simpson");
 	std::string address("Springfield");
-	DateTime birthday(1980, 4, 1, 5, 45, 12);
+	DateTime birthday(1980, 4, 1, 5, 45, 12, 354, 879);
 	
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
@@ -1429,6 +1545,33 @@ void SQLExecutor::blobStmt()
 	poco_assert (res == blob);
 }
 
+void SQLExecutor::longText()
+{
+	std::string funct = "longText()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string info("0123456789");
+
+	Poco::Data::CLOB img("0123456789", 10);
+	int count = 0;
+	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(info), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assert (count == 1);
+
+	std::string res;
+	poco_assert (res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Info FROM Person", into(res));
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (res == info);
+}
 
 void SQLExecutor::tuples()
 {

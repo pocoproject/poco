@@ -1,8 +1,6 @@
 //
 // Notifier.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Notifier.h#2 $
-//
 // Library: Data/SQLite
 // Package: SQLite
 // Module:  Notifier
@@ -121,7 +119,7 @@ public:
 	static int sqliteCommitCallbackFn(void* pVal);
 		/// Commit callback event dispatcher. If an exception occurs, it is caught inside this function,
 		/// non-zero value is returned, which causes SQLite engine to turn commit into a rollback.
-		/// Therefore, callers should check for return value - if it is zero, callback completed successfuly
+		/// Therefore, callers should check for return value - if it is zero, callback completed successfully
 		/// and transaction was committed.
 
 	static void sqliteRollbackCallbackFn(void* pVal);

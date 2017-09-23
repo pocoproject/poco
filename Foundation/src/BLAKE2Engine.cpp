@@ -289,9 +289,8 @@ static void blake2b_compress(blake2b_state *S, const uint8_t block[BLAKE2B_BLOCK
 	}
 }
 
-BLAKE2Engine::BLAKE2Engine(ALGORITHM algorithm)
-	: _algorithm(algorithm)
-	, _context(NULL)
+BLAKE2Engine::BLAKE2Engine(ALGORITHM algorithm): _context(NULL),
+	_algorithm(algorithm)
 {
 	_digest.reserve(digestLength());
 	reset();

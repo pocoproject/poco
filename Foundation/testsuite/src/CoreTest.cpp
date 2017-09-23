@@ -1,8 +1,6 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CoreTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -320,8 +318,8 @@ void CoreTest::testBuffer()
 
 void CoreTest::testAtomicCounter()
 {
-	AtomicCounter ac;
-	
+	AtomicCounter ac(0);
+
 	assert (ac.value() == 0);
 	assert (ac++ == 0);
 	assert (ac-- == 1);

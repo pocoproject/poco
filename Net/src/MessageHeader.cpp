@@ -1,8 +1,6 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#4 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MessageHeader
@@ -330,7 +328,7 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 	}
 	else 
 	{
-		// Not conversion necesary.
+		// Not conversion necessary.
 		outs = tempout;
 	}
 }
@@ -341,7 +339,7 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 	std::string outs, tmp = text;
 	do {
 		std::string tmp2;
-		// find the begining of the next rfc2047 chunk 
+		// find the beginning of the next rfc2047 chunk
 		size_t pos = tmp.find("=?");
 		if (pos == std::string::npos) {
 			// No more found, return

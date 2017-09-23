@@ -66,6 +66,7 @@ BINDIR="bin/$OSNAME/$OSARCH/"
 runs=0
 failures=0
 failedTests=""
+failedExits=""
 status=0
 
 for comp in $components ;
@@ -89,9 +90,12 @@ do
 
 				runs=`expr $runs + 1`
 				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $TESTRUNNERARGS"
-				if [ $? -ne 0 ] ; then
+				rc=$?
+				if [ $rc -ne 0 ] ; then
+					echo "failed="$comp
 					failures=`expr $failures + 1`
 					failedTests="$failedTests $comp"
+					failedExits="$failedExits $rc"
 					status=1
 				fi
 			fi
@@ -108,5 +112,5 @@ do
 	echo "Failed: $test"
 done
 echo ""
-
+echo "status="$status
 exit $status

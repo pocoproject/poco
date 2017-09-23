@@ -56,7 +56,6 @@ private:
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
 	void recreateLogTable();
-	void recreateNumericTable();
 	void testStoredProcedure();
 	void testStoredProcedureDynamicAny();
 	void testStoredProcedureAny();

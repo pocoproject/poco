@@ -1,8 +1,6 @@
 //
 // AttributesParserTest.cpp
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/AttributesParserTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

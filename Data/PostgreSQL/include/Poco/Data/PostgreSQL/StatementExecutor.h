@@ -1,8 +1,6 @@
 //
 // StatementExecutor.h
 //
-// $Id: //poco/1.5/Data/PostgreSQL/include/Poco/Data/PostgreSQL/StatementExecutor.h#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  StatementExecutor
@@ -58,7 +56,7 @@ public:
 		/// Prepares the statement for execution.
 
 	void bindParams(const InputParameterVector& anInputParameterVector);
-		/// Binds the params - REQUIRED if the statment has input parameters/placeholders
+		/// Binds the params - REQUIRED if the statement has input parameters/placeholders
 		/// Pointer and list elements must stay valid for the lifetime of the StatementExecutor!
 
 	void execute();

@@ -1,8 +1,6 @@
 //
 // MySQLTest.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/MySQLTest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -116,7 +114,7 @@ void MySQLTest::connectNoDB()
 	dbConnString =  "host=" + getHost();
 	dbConnString +=	";user="  + getUser();
 	dbConnString += ";password="  + getPass();
-	dbConnString += ";compress=true;auto-reconnect=true";
+	dbConnString += ";compress=true;auto-reconnect=true;protocol=tcp";
 
 	try
 	{
@@ -208,7 +206,7 @@ void MySQLTest::testInsertSingleBulk()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->insertSingleBulk();
 }
 
@@ -217,7 +215,7 @@ void MySQLTest::testInsertSingleBulkVec()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->insertSingleBulkVec();
 }
 
@@ -226,7 +224,7 @@ void MySQLTest::testLimit()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limits();
 }
 
@@ -235,7 +233,7 @@ void MySQLTest::testLimitZero()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitZero();
 }
 
@@ -244,7 +242,7 @@ void MySQLTest::testLimitOnce()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitOnce();
 }
 
@@ -253,7 +251,7 @@ void MySQLTest::testLimitPrepare()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->limitPrepare();
 }
 
@@ -263,7 +261,7 @@ void MySQLTest::testPrepare()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreateIntsTable();
+	recreateStringsTable();
 	_pExecutor->prepare();
 }
 
@@ -497,6 +495,14 @@ void MySQLTest::testBLOBStmt()
 }
 
 
+void MySQLTest::testLongText()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonLongTextTable();
+	_pExecutor->longText();
+}
+
 void MySQLTest::testUnsignedInts()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -521,6 +527,22 @@ void MySQLTest::testDouble()
 
 	recreateFloatsTable();
 	_pExecutor->doubles();
+}
+
+void MySQLTest::testAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateAnyTable();
+	_pExecutor->any();
+}
+
+void MySQLTest::testDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateAnyTable();
+	_pExecutor->dynamicAny();
 }
 
 
@@ -763,11 +785,18 @@ void MySQLTest::recreatePersonBLOBTable()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
 
+void MySQLTest::recreatePersonLongTextTable()
+{
+	dropTable("Person");
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Info LONGTEXT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonBLOBTable()"); }
+}
 
 void MySQLTest::recreatePersonDateTimeTable()
 {
 	dropTable("Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME(6))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -793,8 +822,8 @@ void MySQLTest::recreatePersonTimeTable()
 
 void MySQLTest::recreateIntsTable()
 {
-	dropTable("Strings");
-	try { *_pSession << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropTable("Ints");
+	try { *_pSession << "CREATE TABLE Ints (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -860,6 +889,17 @@ void MySQLTest::recreateNullableStringTable()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateNullableStringTable()"); }
 }
 
+void MySQLTest::recreateAnyTable()
+{
+	dropTable("Anys");
+	try {
+		*_pSession << "CREATE TABLE Anys (int_8 TINYINT, int_16 SMALLINT, int_32 MEDIUMINT, int_64 BIGINT, flt FLOAT, dbl DOUBLE, "
+									"str0 VARCHAR(255), str1 TEXT, date0 DATE, time0 TIME, date_time0 DATETIME(6), empty INTEGER)", now;
+	}
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateAnyTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateAnyTable()"); }
+}
+
 
 void MySQLTest::recreateVectorsTable()
 {
@@ -893,6 +933,7 @@ CppUnit::Test* MySQLTest::suite()
 	_dbConnString += ";compress=true";
 	_dbConnString += ";auto-reconnect=true";
 	_dbConnString += ";secure-auth=true";
+	_dbConnString += ";protocol=tcp";
 
 	try
 	{
@@ -957,9 +998,12 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDateTime);
 	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, MySQLTest, testLongText);
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
+	CppUnit_addTest(pSuite, MySQLTest, testAny);
+	CppUnit_addTest(pSuite, MySQLTest, testDynamicAny);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
 #if __cplusplus >= 201103L

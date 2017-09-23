@@ -1,8 +1,6 @@
 //
 // ODBCSQLServerTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCSQLServerTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -18,6 +16,7 @@
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
+#include "Poco/UTFString.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -41,6 +40,7 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
+using Poco::UTF16String;
 
 
 // uncomment to force FreeTDS on Windows
@@ -297,27 +297,47 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		k += 2;
 	}
-/*TODO - currently fails with following error:
 
-[Microsoft][ODBC SQL Server Driver][SQL Server]Invalid parameter 
-2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.  
-Deprecated types are not supported as output parameters.  Use current large object types instead.
+	{
+		session().setFeature("autoBind", true);
+		session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam; "
+			"END;"
+			, now;
 
-	session().setFeature("autoBind", true);
-	session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
-		"BEGIN "
-		"SET @outParam = @inParam; "
-		"END;"
-	, now;
+		std::string inParam = "123";
+		std::string outParam;
+		try {
+			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+		}
+		catch(StatementException& ex) {
+			std::cout << ex.toString();
+		}
+		assert(outParam == inParam);
+		dropObject("PROCEDURE", "storedProcedure");
+	}
 
-	std::string inParam = "123";
-	std::string outParam;
-	try{
-	session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
-	}catch(StatementException& ex){std::cout << ex.toString();}
-	assert(outParam == inParam);
-	dropObject("PROCEDURE", "storedProcedure");
-	*/
+	{
+		session().setFeature("autoBind", true);
+		session() << "CREATE PROCEDURE storedProcedure(@inParam NVARCHAR(MAX), @outParam NVARCHAR(MAX) OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam; "
+			"END;"
+			, now;
+
+		UTF16String::value_type cs[] = { L'1', L'2', L'3', L'\0' };
+		UTF16String inParam(cs);
+		UTF16String outParam;
+		try {
+			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+		}
+		catch (StatementException& ex) {
+			std::cout << ex.toString();
+		}
+		assert(outParam == inParam);
+		dropObject("PROCEDURE", "storedProcedure");
+	}
 }
 
 
@@ -589,8 +609,8 @@ void ODBCSQLServerTest::recreatePersonDateTimeTable()
 
 void ODBCSQLServerTest::recreateIntsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::ints());
+	try { session() << "CREATE TABLE " << ExecUtil::ints() <<" (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }

@@ -1,8 +1,6 @@
 //
 // ICMPv4PacketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPv4PacketImpl.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPv4PacketImpl

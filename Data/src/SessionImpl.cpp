@@ -1,8 +1,6 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/Main/Data/src/SessionImpl.cpp#3 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SessionImpl

@@ -1,8 +1,6 @@
 //
 // CryptoTransform.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CryptoTransform.h#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CryptoTransform
@@ -52,11 +50,10 @@ public:
 		/// no padding is performed, the total amount of data encrypted or decrypted must then be a multiple of 
 		/// the block size or an error will occur.
 		
-	virtual std::streamsize transform(
-		const unsigned char* input,
-		std::streamsize		 inputLength,
-		unsigned char*		 output,
-		std::streamsize		 outputLength) = 0;
+	virtual std::streamsize transform(const unsigned char* input,
+		std::streamsize inputLength,
+		unsigned char* output,
+		std::streamsize outputLength) = 0;
 		/// Transforms a chunk of data. The inputLength is arbitrary and does not
 		/// need to be a multiple of the block size. The output buffer has a maximum
 		/// capacity of the given outputLength that must be at least

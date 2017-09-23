@@ -1,8 +1,6 @@
 //
 // IPAddress.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/IPAddress.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  IPAddress
@@ -367,11 +365,7 @@ public:
 
 private:
 	typedef Poco::Net::Impl::IPAddressImpl Impl;
-#ifdef POCO_HAVE_ALIGNMENT
 	typedef Impl* Ptr;
-#else
-	typedef Poco::AutoPtr<Impl> Ptr;
-#endif
 
 	Ptr pImpl() const;
 	void newIPv4();
@@ -385,30 +379,17 @@ private:
 #endif
 	void destruct();
 
-#ifdef POCO_HAVE_ALIGNMENT
 	char* storage();
 
-	#ifdef POCO_ENABLE_CPP11
-		static const unsigned sz = sizeof(Poco::Net::Impl::IPv6AddressImpl);
-		typedef std::aligned_storage<sz>::type AlignerType;
+	static const unsigned sz = sizeof(Poco::Net::Impl::IPv6AddressImpl);
+	typedef std::aligned_storage<sz>::type AlignerType;
 
-		union
-		{
-			char buffer[sz];
-		private:
-			AlignerType aligner;
-		}
-	#else // !POCO_ENABLE_CPP11
-		#if defined(POCO_HAVE_IPv6)
-			AlignedCharArrayUnion <Poco::Net::Impl::IPv6AddressImpl>
-		#else
-			AlignedCharArrayUnion <Poco::Net::Impl::IPv4AddressImpl>
-		#endif
-	#endif // POCO_ENABLE_CPP11
-		_memory;
-#else // !POCO_HAVE_ALIGNMENT
-	Ptr _pImpl;
-#endif // POCO_HAVE_ALIGNMENT
+	union
+	{
+		char buffer[sz];
+	private:
+		AlignerType aligner;
+	} _memory;
 };
 
 
@@ -419,50 +400,31 @@ private:
 
 inline void IPAddress::destruct()
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	pImpl()->~IPAddressImpl();
-#endif
 }
 
 
 inline IPAddress::Ptr IPAddress::pImpl() const
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
-#else
-	if (_pImpl) return _pImpl;
-	throw NullPointerException("IPaddress implementation pointer is NULL.");
-#endif
 }
 
 
 inline void IPAddress::newIPv4()
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv4AddressImpl;
-#else
-	_pImpl = new Poco::Net::Impl::IPv4AddressImpl;
-#endif
 }
 
 
 inline void IPAddress::newIPv4(const void* hostAddr)
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv4AddressImpl(hostAddr);
-#else
-	_pImpl = new Poco::Net::Impl::IPv4AddressImpl(hostAddr);
-#endif
 }
 
 
 inline void IPAddress::newIPv4(unsigned prefix)
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv4AddressImpl(prefix);
-#else
-	_pImpl = new Poco::Net::Impl::IPv4AddressImpl(prefix);
-#endif
 }
 
 
@@ -471,53 +433,35 @@ inline void IPAddress::newIPv4(unsigned prefix)
 
 inline void IPAddress::newIPv6()
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv6AddressImpl;
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl;
-#endif
 }
 
 
 inline void IPAddress::newIPv6(const void* hostAddr)
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr);
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(hostAddr);
-#endif
 }
 
 
 inline void IPAddress::newIPv6(const void* hostAddr, Poco::UInt32 scope)
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr, scope);
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(hostAddr, scope);
-#endif
 }
 
 
 inline void IPAddress::newIPv6(unsigned prefix)
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	new (storage()) Poco::Net::Impl::IPv6AddressImpl(prefix);
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(prefix);
-#endif
 }
 
 
 #endif // POCO_HAVE_IPv6
 
 
-#ifdef POCO_HAVE_ALIGNMENT
 inline char* IPAddress::storage()
 {
 	return _memory.buffer;
 }
-#endif
 
 
 } } // namespace Poco::Net

@@ -1,8 +1,6 @@
 //
 // Any.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Any.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:	Any
@@ -40,11 +38,6 @@ template <class> class VarHolderImpl;
 }
 
 #ifndef POCO_NO_SOO
-
-#ifndef POCO_ENABLE_CPP11
-	// C++11 needed for std::aligned_storage
-	#error "Any SOO can only be enabled with C++11 support"
-#endif
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
 union Placeholder
