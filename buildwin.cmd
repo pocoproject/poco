@@ -83,8 +83,8 @@ if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
 if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
-if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32)
-if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64)
+if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
+if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64))
 
 rem SAMPLES [samples|nosamples]
 set SAMPLES=%4
@@ -534,7 +534,6 @@ for /f %%G in ('findstr /R "." components') do (
       echo. && echo.
     )
     if %RELEASE_SHARED%==1 (
-      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
