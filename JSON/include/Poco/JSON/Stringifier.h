@@ -38,18 +38,11 @@ public:
 		///
 		/// This is just a "shortcut" to stringify(any, out) with name indicating the function effect.
 
-	static void stringify(const Dynamic::Var& any, bool preserveInsertionOrder, std::ostream& out, unsigned int indent = 0);
-		/// Writes a string representation of the value to the output stream while optionally preserving the insertion order.
-		///
-		/// When indent is 0, the generated string will be created as small as possible (condensed).
-		/// When preserveInsertionOrder is true, the original order of object members will be preserved.
-		/// This is a "shortcut" to stringify(any, out, indent, -1, preserveInsertionOrder).
-
-	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0, int step = -1, bool preserveInsertionOrder = false);
+	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0, int step = -1);
 		/// Writes a string representation of the value to the output stream.
 		///
 		/// When indent is 0, the string will be created as small as possible.
-		/// When preserveInsertionOrder is true, the original order of object members will be preserved;
+		/// When preserveInsertionOrder is true, the original string object members order will be preserved;
 		/// otherwise, object members are sorted by their names.
 
 	static void formatString(const std::string& value, std::ostream& out);
@@ -57,18 +50,9 @@ public:
 };
 
 
-//
-// inlines
-//
 inline void Stringifier::condense(const Dynamic::Var& any, std::ostream& out)
 {
-	stringify(any, out, 0, -1, true);
-}
-
-
-inline void Stringifier::stringify(const Dynamic::Var& any, bool preserveInsertionOrder, std::ostream& out, unsigned int indent)
-{
-	stringify(any, out, indent, -1, preserveInsertionOrder);
+	stringify(any, out, 0, -1);
 }
 
 

@@ -34,7 +34,7 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;JSON_EXPORTS"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;JSON_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
@@ -114,7 +114,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;JSON_EXPORTS"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;JSON_EXPORTS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -439,15 +439,62 @@
 			<File
 				RelativePath=".\src\Array.cpp"/>
 			<File
-				RelativePath=".\src\ParseHandler.cpp"/>
-			<File
 				RelativePath=".\src\Handler.cpp"/>
 			<File
 				RelativePath=".\src\JSONException.cpp"/>
 			<File
 				RelativePath=".\src\Object.cpp"/>
 			<File
+				RelativePath=".\src\ParseHandler.cpp"/>
+			<File
 				RelativePath=".\src\Parser.cpp"/>
+			<File
+				RelativePath=".\src\ParserImpl.cpp"/>
+			<File
+				RelativePath=".\src\pd_json.c">
+				<FileConfiguration
+					Name="debug_shared|Digi JumpStart (ARMV4I)">
+					<Tool
+						Name="VCCLCompilerTool"
+						ForceConformanceInForLoopScope="true"
+						CompileAs="2"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="release_shared|Digi JumpStart (ARMV4I)">
+					<Tool
+						Name="VCCLCompilerTool"
+						ForceConformanceInForLoopScope="true"
+						CompileAs="2"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="debug_static_mt|Digi JumpStart (ARMV4I)">
+					<Tool
+						Name="VCCLCompilerTool"
+						ForceConformanceInForLoopScope="true"
+						CompileAs="2"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="release_static_mt|Digi JumpStart (ARMV4I)">
+					<Tool
+						Name="VCCLCompilerTool"
+						ForceConformanceInForLoopScope="true"
+						CompileAs="2"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="debug_static_md|Digi JumpStart (ARMV4I)">
+					<Tool
+						Name="VCCLCompilerTool"
+						ForceConformanceInForLoopScope="true"
+						CompileAs="2"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="release_static_md|Digi JumpStart (ARMV4I)">
+					<Tool
+						Name="VCCLCompilerTool"
+						ForceConformanceInForLoopScope="true"
+						CompileAs="2"/>
+				</FileConfiguration>
+			</File>
 			<File
 				RelativePath=".\src\PrintHandler.cpp"/>
 			<File
@@ -472,9 +519,15 @@
 			<File
 				RelativePath=".\include\Poco\JSON\Object.h"/>
 			<File
+				RelativePath=".\include\Poco\JSON\ParseHandler.h"/>
+			<File
 				RelativePath=".\include\Poco\JSON\Parser.h"/>
 			<File
-				RelativePath=".\include\Poco\JSON\ParseHandler.h"/>
+				RelativePath=".\include\Poco\JSON\ParserImpl.h"/>
+			<File
+				RelativePath=".\include\pd_json.h"/>
+			<File
+				RelativePath=".\include\pd_json_private.h"/>
 			<File
 				RelativePath=".\include\Poco\JSON\PrintHandler.h"/>
 			<File

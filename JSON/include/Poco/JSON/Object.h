@@ -79,8 +79,21 @@ public:
 		/// Struct is not copied to keep the operation as
 		/// efficient as possible (when needed, it will be generated upon request).
 
+#ifdef POCO_ENABLE_CPP11
+
+	Object(Object&& other);
+		/// Move constructor
+
+	Object &operator =(Object &&other);
+		// Move asignment operator
+
+#endif // POCO_ENABLE_CPP11
+
 	virtual ~Object();
 		/// Destroys the Object.
+
+	Object &operator =(const Object &other);
+		// Assignment operator
 
 	Iterator begin()
 	{
@@ -214,6 +227,8 @@ public:
 		/// Insertion order preservation property is left intact.
 
 private:
+	void resetDynStruct() const;
+
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
 	{
@@ -256,6 +271,7 @@ private:
 	KeyPtrList        _keys;
 	bool              _preserveInsOrder;
 	mutable StructPtr _pStruct;
+	mutable bool      _modified;
 };
 
 
@@ -278,7 +294,8 @@ inline bool Object::isArray(const std::string& key) const
 
 inline bool Object::isArray(ConstIterator& it) const
 {
-	return it != _values.end() && it->second.type() == typeid(Array::Ptr);
+	const std::type_info& ti = it->second.type();
+	return it != _values.end() && (ti == typeid(Array::Ptr) || ti == typeid(Array));
 }
 
 
@@ -298,7 +315,8 @@ inline bool Object::isObject(const std::string& key) const
 
 inline bool Object::isObject(ConstIterator& it) const
 {
-	return it != _values.end() && it->second.type() == typeid(Object::Ptr);
+	const std::type_info& ti = it->second.type();
+	return it != _values.end() && (ti == typeid(Object::Ptr) || ti == typeid(Object));
 }
 
 
@@ -324,6 +342,7 @@ inline void Object::remove(const std::string& key)
 			}
 		}
 	}
+	_modified = true;
 }
 
 

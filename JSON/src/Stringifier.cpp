@@ -17,6 +17,7 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/JSONString.h"
 #include <iomanip>
 
 
@@ -27,7 +28,7 @@ namespace Poco {
 namespace JSON {
 
 
-void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, bool preserveInsertionOrder)
+void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step)
 {
 	if (step == -1) step = indent;
 
@@ -57,36 +58,25 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	}
 	else if (any.isNumeric() || any.isBoolean())
 	{
-		out << any.convert<std::string>();
+		std::string value = any.convert<std::string>();
+		if (any.type() == typeid(char)) formatString(value, out);
+		else out << value;
 	}
-	else
+	else if (any.isString() || any.isDateTime() || any.isDate() || any.isTime())
 	{
 		std::string value = any.convert<std::string>();
 		formatString(value, out);
+	}
+	else
+	{
+		out << any.convert<std::string>();
 	}
 }
 
 
 void Stringifier::formatString(const std::string& value, std::ostream& out)
 {
-	out << '"';
-	for (std::string::const_iterator it = value.begin(),
-		 end = value.end(); it != end; ++it)
-	{
-		switch (*it)
-		{
-		case '\\': out << "\\\\"; break;
-		case '"': out << "\\\""; break;
-		case '/': out << "\\/"; break;
-		case '\b': out << "\\b"; break;
-		case '\f': out << "\\f"; break;
-		case '\n': out << "\\n"; break;
-		case '\r': out << "\\r"; break;
-		case '\t': out << "\\t"; break;
-		default: out << *it; break;
-		}
-	}
-	out << '"';
+	Poco::toJSON(value, out);
 }
 
 

@@ -26,14 +26,17 @@ namespace Poco {
 namespace JSON {
 
 
-Object::Object(bool preserveInsertionOrder): _preserveInsOrder(preserveInsertionOrder)
+Object::Object(bool preserveInsOrder):
+	_preserveInsOrder(preserveInsOrder),
+	_modified(false)
 {
 }
 
 
 Object::Object(const Object& copy) : _values(copy._values),
 	_preserveInsOrder(copy._preserveInsOrder),
-	_pStruct(0)
+	_pStruct(!copy._modified ? copy._pStruct : 0),
+	_modified(copy._modified)
 {
 	if (_preserveInsOrder)
 	{
@@ -48,8 +51,52 @@ Object::Object(const Object& copy) : _values(copy._values),
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+
+
+Object::Object(Object&& other) :
+	_values(std::move(other._values)),
+	_keys(std::move(other._keys)),
+	_preserveInsOrder(other._preserveInsOrder),
+	_pStruct(!other._modified ? other._pStruct : 0),
+	_modified(other._modified)
+{
+}
+
+
+Object &Object::operator= (Object &&other)
+{
+	if (&other != this)
+	{
+		_values = std::move(other._values);
+		_keys = std::move(other._keys);
+		_preserveInsOrder = other._preserveInsOrder;
+		_pStruct = !other._modified ? other._pStruct : 0;
+		_modified = other._modified;
+	}
+	return *this;
+}
+
+
+#endif // POCO_ENABLE_CPP11
+
+
 Object::~Object()
 {
+}
+
+
+Object &Object::operator= (const Object &other)
+{
+	if (&other != this)
+	{
+		_values = other._values;
+		_keys = other._keys;
+		_preserveInsOrder = other._preserveInsOrder;
+		_pStruct = !other._modified ? other._pStruct : 0;
+		_modified = other._modified;
+	}
+	return *this;
 }
 
 
@@ -137,6 +184,7 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 		}
 		_keys.push_back(&ret.first->first);
 	}
+	_modified = true;
 }
 
 
@@ -168,13 +216,26 @@ Poco::DynamicStruct Object::makeStruct(const Object::Ptr& obj)
 }
 
 
-Object::operator const Poco::DynamicStruct& () const
+void Object::resetDynStruct() const
 {
 	if (!_pStruct)
+		_pStruct = new Poco::DynamicStruct;
+	else
+		_pStruct->clear();
+}
+
+
+Object::operator const Poco::DynamicStruct& () const
+{
+	if (!_values.size())
+	{
+		resetDynStruct();
+	}
+	else if (_modified)
 	{
 		ValueMap::const_iterator it = _values.begin();
 		ValueMap::const_iterator end = _values.end();
-		_pStruct = new Poco::DynamicStruct;
+		resetDynStruct();
 		for (; it != end; ++it)
 		{
 			if (isObject(it))
@@ -201,6 +262,7 @@ void Object::clear()
 	_values.clear();
 	_keys.clear();
 	_pStruct = 0;
+	_modified = true;
 }
 
 
