@@ -563,7 +563,6 @@ void MySQLTest::testTupleVector()
 	_pExecutor->tupleVector();
 }
 
-#if __cplusplus >= 201103L
 
 void MySQLTest::testStdTuple()
 {
@@ -582,7 +581,6 @@ void MySQLTest::testStdTupleVector()
 	_pExecutor->stdTupleVector();
 }
 
-#endif // __cplusplus >= 201103L
 
 void MySQLTest::testInternalExtraction()
 {
@@ -1006,10 +1004,8 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDynamicAny);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
-#if __cplusplus >= 201103L
 	CppUnit_addTest(pSuite, MySQLTest, testStdTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testStdTupleVector);
-#endif
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);

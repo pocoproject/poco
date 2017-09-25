@@ -304,6 +304,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\DialogServer.h" />
+    <ClInclude Include="src\FTPSClientSessionTest.h" />
+    <ClInclude Include="src\FTPSClientTestSuite.h" />
     <ClInclude Include="src\HTTPSClientSessionTest.h" />
     <ClInclude Include="src\HTTPSClientTestSuite.h" />
     <ClInclude Include="src\HTTPSServerTest.h" />
@@ -319,7 +322,10 @@
     <ClInclude Include="src\X509CertificateTestSuite.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DialogServer.cpp" />
     <ClCompile Include="src\Driver.cpp" />
+    <ClCompile Include="src\FTPSClientSessionTest.cpp" />
+    <ClCompile Include="src\FTPSClientTestSuite.cpp" />
     <ClCompile Include="src\HTTPSClientSessionTest.cpp" />
     <ClCompile Include="src\HTTPSClientTestSuite.cpp" />
     <ClCompile Include="src\HTTPSServerTest.cpp" />
