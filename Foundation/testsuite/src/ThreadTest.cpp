@@ -386,7 +386,6 @@ void ThreadTest::testThreadFunctor()
 
 	assert (!thread.isRunning());
 
-#if __cplusplus >= 201103L
 
 	Thread thread2;
 
@@ -402,7 +401,6 @@ void ThreadTest::testThreadFunctor()
 
 	assert (!thread2.isRunning());
 
-#endif
 }
 
 

@@ -91,12 +91,8 @@ public:
 	void testTuple();
 	void testTupleVector();
 
-#if __cplusplus >= 201103L
-
 	void testStdTuple();
 	void testStdTupleVector();
-
-#endif
 
 	void testInternalExtraction();
 

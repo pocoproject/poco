@@ -36,9 +36,7 @@
 #include <iomanip>
 #include <set>
 
-#if __cplusplus >= 201103L
 #include <tuple>
-#endif
 
 
 using namespace Poco::Data::Keywords;
@@ -1445,9 +1443,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
-#if __cplusplus >= 201103L
 	CppUnit_addTest(pSuite, DataTest, testStdTuple);
-#endif
 
 
 	return pSuite;
