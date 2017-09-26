@@ -153,6 +153,16 @@ void EVPTest::testRSAEVPSaveLoadStream()
 	std::istringstream iPub(pubKey);
 	std::istringstream iPriv(privKey);
 	EVPPKey key2(&iPub, &iPriv, "testpwd");
+
+	assert (key == key2);
+	assert (!(key != key2));
+	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
+	EVPPKey keyNE(&rsaKeyNE);
+	assert (key != keyNE);
+	assert (!(key == keyNE));
+	assert (key2 != keyNE);;
+	assert (!(key2 == keyNE));
+
 	std::ostringstream strPub2;
 	std::ostringstream strPriv2;
 	key2.save(&strPub2, &strPriv2, "testpwd");
@@ -294,6 +304,16 @@ void EVPTest::testECEVPSaveLoadStream()
 		std::istringstream iPub(pubKey);
 		std::istringstream iPriv(privKey);
 		EVPPKey key2(&iPub, &iPriv, "testpwd");
+
+		assert (key == key2);
+		assert (!(key != key2));
+		ECKey ecKeyNE("secp112r2");
+		EVPPKey keyNE(&ecKeyNE);
+		assert (key != keyNE);
+		assert (!(key == keyNE));
+		assert (key2 != keyNE);
+		assert (!(key2 == keyNE));
+
 		std::ostringstream strPub2;
 		std::ostringstream strPriv2;
 		key2.save(&strPub2, &strPriv2, "testpwd");

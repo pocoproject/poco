@@ -46,7 +46,21 @@ void PKCS12ContainerTest::testFullPKCS12()
 		full(PKCS12Container(file, "crypto"));
 
 		std::ifstream ifs(file, std::ios::binary);
-		full(PKCS12Container(ifs, "crypto"));
+		PKCS12Container pkcs(ifs, "crypto");
+		full(pkcs);
+
+		PKCS12Container pkcs2(pkcs);
+		full(pkcs2);
+
+		PKCS12Container pkcs3(pkcs);
+		pkcs3 = pkcs2;
+		full(pkcs3);
+
+		pkcs3 = std::move(pkcs);
+		full(pkcs3);
+
+		PKCS12Container pkcs4(std::move(pkcs2));
+		full(pkcs4);
 	}
 	catch (Poco::Exception& ex)
 	{
