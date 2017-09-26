@@ -46,11 +46,21 @@ public:
 	explicit PKCS12Container(const std::string& str, const std::string& password = "");
 		/// Creates the PKCS12Container object from a string.
 
-	PKCS12Container(const PKCS12Container& cert);
+	PKCS12Container(const PKCS12Container& cont);
 		/// Copy constructor.
 
-	PKCS12Container& operator = (const PKCS12Container& cert);
+	PKCS12Container& operator = (const PKCS12Container& cont);
 		/// Assignment operator.
+
+#ifdef POCO_ENABLE_CPP11
+
+	PKCS12Container(PKCS12Container&& cont);
+		/// Move constructor.
+
+	PKCS12Container& operator = (PKCS12Container&& cont);
+		/// Move assignment operator.
+
+#endif // POCO_ENABLE_CPP11
 
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.

@@ -45,7 +45,26 @@ void PKCS12ContainerTest::testFullPKCS12()
 		full(PKCS12Container(file.c_str(), "crypto"));
 
 		std::ifstream ifs(file.c_str(), std::ios::binary);
-		full(PKCS12Container(ifs, "crypto"));
+		PKCS12Container pkcs(ifs, "crypto");
+		full(pkcs);
+
+		PKCS12Container pkcs2(pkcs);
+		full(pkcs2);
+
+		PKCS12Container pkcs3(pkcs);
+		pkcs3 = pkcs2;
+		full(pkcs3);
+
+#ifdef POCO_ENABLE_CPP11
+
+		pkcs3 = std::move(pkcs);
+		full(pkcs3);
+
+		PKCS12Container pkcs4(std::move(pkcs2));
+		full(pkcs4);
+
+#endif // POCO_ENABLE_CPP11
+
 	}
 	catch (Poco::Exception& ex)
 	{

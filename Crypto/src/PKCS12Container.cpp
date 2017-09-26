@@ -24,7 +24,7 @@ namespace Poco {
 namespace Crypto {
 
 
-	PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password): _pKey(0)
+PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password): _pKey(0)
 {
 	std::ostringstream ostr;
 	Poco::StreamCopier::copyStream(istr, ostr);
@@ -36,12 +36,12 @@ namespace Crypto {
 		PKCS12* pPKCS12 = 0;
 		d2i_PKCS12_bio(pBIO, &pPKCS12);
 		BIO_free(pBIO);
-		if (!pPKCS12) throw OpenSSLException();
+		if (!pPKCS12) throw OpenSSLException("PKCS12Container(istream&, const string&)");
 		load(pPKCS12, password);
 	}
 	else
 	{
-		throw OpenSSLException();
+		throw Poco::NullPointerException("PKCS12Container(istream&, const string&)");
 	}
 }
 
@@ -53,7 +53,7 @@ PKCS12Container::PKCS12Container(const std::string& path, const std::string& pas
 	{
 		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, NULL);
 		fclose (pFile);
-		if (!pPKCS12) throw OpenSSLException();
+		if (!pPKCS12) throw OpenSSLException("PKCS12Container(const string&, const string&)");
 		load(pPKCS12, password);
 	}
 	else
@@ -63,15 +63,57 @@ PKCS12Container::PKCS12Container(const std::string& path, const std::string& pas
 }
 
 
-PKCS12Container::PKCS12Container(const PKCS12Container& cont)
+PKCS12Container::PKCS12Container(const PKCS12Container& other):
+	_pKey(EVPPKey::duplicate(other._pKey, &_pKey)),
+	_pX509Cert(new X509Certificate(*other._pX509Cert)),
+	_caCertList(other._caCertList),
+	_pkcsFriendlyname(other._pkcsFriendlyname)
 {
 }
 
 
-PKCS12Container& PKCS12Container::operator = (const PKCS12Container& cert)
+PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 {
+	if (&other != this)
+	{
+		if (_pKey) EVP_PKEY_free(_pKey);
+		_pKey = EVPPKey::duplicate(other._pKey, &_pKey);
+		_pX509Cert.reset(new X509Certificate(*other._pX509Cert));
+		_caCertList = other._caCertList;
+		_pkcsFriendlyname = other._pkcsFriendlyname;
+	}
 	return *this;
 }
+
+
+#ifdef POCO_ENABLE_CPP11
+
+
+PKCS12Container::PKCS12Container(PKCS12Container&& other):
+	_pKey(other._pKey),
+	_pX509Cert(std::move(other._pX509Cert)),
+	_caCertList(std::move(other._caCertList)),
+	_pkcsFriendlyname(std::move(other._pkcsFriendlyname))
+{
+	other._pKey = 0;
+}
+
+
+PKCS12Container& PKCS12Container::operator = (PKCS12Container&& other)
+{
+	if (&other != this)
+	{
+		if (_pKey) EVP_PKEY_free(_pKey);
+		_pKey = other._pKey; other._pKey = 0;
+		_pX509Cert = std::move(other._pX509Cert);
+		_caCertList = std::move(other._caCertList);
+		_pkcsFriendlyname = std::move(other._pkcsFriendlyname);
+	}
+	return *this;
+}
+
+
+#endif // POCO_ENABLE_CPP11
 
 
 PKCS12Container::~PKCS12Container()

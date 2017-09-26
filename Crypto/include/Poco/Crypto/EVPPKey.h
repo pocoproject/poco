@@ -85,16 +85,33 @@ public:
 		/// Assignment operator.
 
 #ifdef POCO_ENABLE_CPP11
+
 	EVPPKey(EVPPKey&& other);
 		/// Move constructor.
 
 	EVPPKey& operator=(EVPPKey&& other);
 		/// Assignment move operator.
+
 #endif // POCO_ENABLE_CPP11
 
 	~EVPPKey();
 		/// Destroys the EVPPKey.
 
+	bool operator == (const EVPPKey& other) const;
+		/// Comparison operator.
+		/// Returns true if public key components and parameters
+		/// of the other key are equal to this key.
+		///
+		/// Works as expected when one key contains only public key,
+		/// while the other one contains private (thus also public) key.
+
+	bool operator != (const EVPPKey& other) const;
+		/// Comparison operator.
+		/// Returns true if public key components and parameters
+		/// of the other key are different from this key.
+		///
+		/// Works as expected when one key contains only public key,
+		/// while the other one contains private (thus also public) key.
 	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and/or private keys to the given files.
 		///
@@ -119,10 +136,14 @@ public:
 	operator EVP_PKEY*();
 		/// Returns pointer to the OpenSSL EVP_PKEY structure.
 
+	static EVP_PKEY* duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey);
+		/// Duplicates pFromKey into *pToKey and returns
+		// the pointer to duplicated EVP_PKEY.
+
 private:
 	EVPPKey();
 
-	static int type(EVP_PKEY* pEVPPKey);
+	static int type(const EVP_PKEY* pEVPPKey);
 	void newECKey(const char* group);
 	void duplicate(EVP_PKEY* pEVPPKey);
 
@@ -248,7 +269,20 @@ private:
 // inlines
 //
 
-inline int EVPPKey::type(EVP_PKEY* pEVPPKey)
+inline bool EVPPKey::operator == (const EVPPKey& other) const
+{
+	poco_assert_dbg(other._pEVPPKey && _pEVPPKey);
+	return (1 == EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey));
+}
+
+
+inline bool EVPPKey::operator != (const EVPPKey& other) const
+{
+	return !(other == *this);
+}
+
+
+inline int EVPPKey::type(const EVP_PKEY* pEVPPKey)
 {
 	if (!pEVPPKey) return NID_undef;
 
