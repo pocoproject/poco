@@ -54,7 +54,7 @@ int ICMPClient::ping(const std::string& address, int repeat) const
 }
 
 
-int ICMPClient::ping(SocketAddress& address, int repeat) const
+int ICMPClient::ping(const SocketAddress& address, int repeat) const
 {
 	if (repeat <= 0) return 0;
 
@@ -114,7 +114,7 @@ int ICMPClient::pingIPv4(const std::string& address, int repeat)
 }
 
 
-int ICMPClient::ping(SocketAddress& address, IPAddress::Family family, int repeat)
+int ICMPClient::ping(const SocketAddress& address, IPAddress::Family family, int repeat)
 {
 	if (repeat <= 0) return 0;
 
