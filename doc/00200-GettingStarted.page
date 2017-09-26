@@ -137,6 +137,13 @@ https://github.com/pocoproject/openssl/tree/master/VS_120
 In case you are using pre-built binaries, please make sure to copy the
 entire directory to C:\%POCO_BASE%\openssl\
 
+Or, %POCO_BASE%\openssl directory can be deleted and openssl
+repository cloned:
+
+cd %POCO_BASE%
+rmdir /s /q openssl
+git clone https://github.com/pocoproject/openssl
+
 All libraries are located in their proper folders (eg. win64/bin/debug/),
 and all are named identically (libcrypto and libssl).
 
