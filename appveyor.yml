@@ -33,7 +33,7 @@ services:
 # Server name: localhost
 # Server port: 5432
 # postgres account password: Password12!
-  - postgresql94
+  - postgresql
 
   
 image:
