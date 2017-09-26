@@ -87,12 +87,11 @@ PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 
 
 PKCS12Container::PKCS12Container(PKCS12Container&& other):
+	_pKey(other._pKey),
 	_pX509Cert(std::move(other._pX509Cert)),
 	_caCertList(std::move(other._caCertList)),
 	_pkcsFriendlyname(std::move(other._pkcsFriendlyname))
 {
-	if (_pKey) EVP_PKEY_free(_pKey);
-	_pKey = other._pKey;
 	other._pKey = 0;
 }
 
