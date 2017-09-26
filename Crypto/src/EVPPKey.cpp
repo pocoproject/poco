@@ -104,7 +104,9 @@ EVPPKey::~EVPPKey()
 }
 
 
-void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
+void EVPPKey::save(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase) const
 {
 	if (!publicKeyFile.empty())
 	{
@@ -163,7 +165,9 @@ void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateK
 }
 
 
-void EVPPKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
+void EVPPKey::save(std::ostream* pPublicKeyStream,
+	std::ostream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase) const
 {
 	if (pPublicKeyStream)
 	{

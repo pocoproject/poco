@@ -70,12 +70,16 @@ public:
 		setKey(pKey);
 	}
 
-	EVPPKey(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase = "");
+	EVPPKey(const std::string& publicKeyFile,
+		const std::string& privateKeyFile,
+		const std::string& privateKeyPassphrase = "");
 		/// Creates the EVPPKey, by reading public and private key from the given files and
 		/// using the given passphrase for the private key. Can only by used for signing if
 		/// a private key is available.
 
-	EVPPKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase = "");
+	EVPPKey(std::istream* pPublicKeyStream,
+		std::istream* pPrivateKeyStream,
+		const std::string& privateKeyPassphrase = "");
 		/// Creates the EVPPKey. Can only by used for signing if pPrivKey
 		/// is not null. If a private key file is specified, you don't need to
 		/// specify a public key file. OpenSSL will auto-create it from the private key.
@@ -95,13 +99,17 @@ public:
 	~EVPPKey();
 		/// Destroys the EVPPKey.
 
-	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+	void save(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and/or private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	void save(std::ostream* pPublicKeyStream,
+		std::ostream* pPrivateKeyStream = 0,
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and/or private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
