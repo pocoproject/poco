@@ -68,7 +68,9 @@ public:
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
 		/// Can be used to sign data and verify signatures.
 
-	RSAKey(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+	RSAKey(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "");
 		/// Creates the RSAKey, by reading public and private key from the given files and
 		/// using the given passphrase for the private key.
 		///
@@ -77,7 +79,9 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
-	RSAKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	RSAKey(std::istream* pPublicKeyStream,
+		std::istream* pPrivateKeyStream = 0,
+		const std::string& privateKeyPassphrase = "");
 		/// Creates the RSAKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.
 		///

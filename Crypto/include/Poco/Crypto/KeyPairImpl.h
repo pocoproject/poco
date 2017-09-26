@@ -53,13 +53,17 @@ public:
 	virtual int size() const = 0;
 		/// Returns the key size.
 
-	virtual void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "") = 0;
+	virtual void save(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "") const = 0;
 		/// Exports the public and private keys to the given files. 
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	virtual void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "") = 0;
+	virtual void save(std::ostream* pPublicKeyStream,
+		std::ostream* pPrivateKeyStream = 0,
+		const std::string& privateKeyPassphrase = "") const = 0;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
