@@ -181,6 +181,14 @@ necessary paths to the INCLUDE and LIB environment variables. You might also
 have to edit the project settings if the names of the OpenSSL libraries
 from your build differ from the names used in the project files.
 
+!!!NOTE:
+To disable internal automatic linking of supplied binaries in pre-generated
+POCO VS projects, define POCO_EXTERNAL_OPENSSL in your build environment.
+Alternatively, you can either rename your binaries, or edit the
+%POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h file if the names of the
+OpenSSL libraries from your build differ from the names used thereof
+(look for "#pragma comment" lines in Crypto.h).
+
 
 !ODBC
 
