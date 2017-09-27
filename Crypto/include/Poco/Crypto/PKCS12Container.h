@@ -38,13 +38,13 @@ class Crypto_API PKCS12Container
 	/// This class implements PKCS#12 container functionality.
 {
 public:
-	typedef std::vector<X509Certificate> CAList;
+	typedef X509Certificate::List CAList;
 
 	explicit PKCS12Container(std::istream& istr, const std::string& password = "");
 		/// Creates the PKCS12Container object from a stream.
 
-	explicit PKCS12Container(const std::string& str, const std::string& password = "");
-		/// Creates the PKCS12Container object from a string.
+	explicit PKCS12Container(const std::string& path, const std::string& password = "");
+		/// Creates the PKCS12Container object from a file.
 
 	PKCS12Container(const PKCS12Container& cont);
 		/// Copy constructor.

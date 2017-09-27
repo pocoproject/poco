@@ -13,6 +13,7 @@
 
 
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 #include "Poco/DateTimeParser.h"
@@ -291,6 +292,39 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 	X509* pCert = const_cast<X509*>(_pCert);
 	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
 	return X509_cmp(pCert, pOtherCert) == 0;
+}
+
+
+X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
+{
+	List caCertList;
+	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
+	if (pBIO == NULL) throw OpenFileException("X509Certificate::readPEM()");
+	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+	while(x)
+	{
+		caCertList.push_back(X509Certificate(x));
+		x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+	}
+	BIO_free(pBIO);
+	return caCertList;
+}
+
+
+void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
+{
+	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "a");
+	if (pBIO == NULL) throw OpenFileException("X509Certificate::writePEM()");
+	List::const_iterator it = list.begin();
+	List::const_iterator end = list.end();
+	for (; it != end; ++it)
+	{
+		if (!PEM_write_bio_X509(pBIO, const_cast<X509*>(it->certificate())))
+		{
+			throw OpenSSLException("X509Certificate::writePEM()");
+		}
+	}
+	BIO_free(pBIO);
 }
 
 
