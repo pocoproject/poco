@@ -271,7 +271,7 @@ RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 
 void RSAKeyImpl::save(const std::string& publicKeyFile,
 	const std::string& privateKeyFile,
-	const std::string& privateKeyPassphrase)
+	const std::string& privateKeyPassphrase) const
 {
 	if (!publicKeyFile.empty())
 	{
@@ -325,7 +325,7 @@ void RSAKeyImpl::save(const std::string& publicKeyFile,
 
 void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
 	std::ostream* pPrivateKeyStream,
-	const std::string& privateKeyPassphrase)
+	const std::string& privateKeyPassphrase) const
 {
 	if (pPublicKeyStream)
 	{

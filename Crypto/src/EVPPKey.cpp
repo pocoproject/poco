@@ -37,7 +37,7 @@ EVPPKey::EVPPKey(const char* ecCurveName)
 
 EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey)
 {
-	duplicate(pEVPPKey);
+	duplicate(pEVPPKey, &_pEVPPKey);
 }
 
 
@@ -73,7 +73,7 @@ EVPPKey::EVPPKey(std::istream* pPublicKeyStream,
 
 EVPPKey::EVPPKey(const EVPPKey& other)
 {
-	duplicate(other._pEVPPKey);
+	duplicate(other._pEVPPKey, &_pEVPPKey);
 }
 
 
@@ -85,7 +85,7 @@ EVPPKey::EVPPKey(EVPPKey&& other): _pEVPPKey(other._pEVPPKey)
 
 EVPPKey& EVPPKey::operator=(const EVPPKey& other)
 {
-	duplicate(other._pEVPPKey);
+	duplicate(other._pEVPPKey, &_pEVPPKey);
 	return *this;
 }
 
@@ -104,7 +104,9 @@ EVPPKey::~EVPPKey()
 }
 
 
-void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
+void EVPPKey::save(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase) const
 {
 	if (!publicKeyFile.empty())
 	{
@@ -163,7 +165,9 @@ void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateK
 }
 
 
-void EVPPKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
+void EVPPKey::save(std::ostream* pPublicKeyStream,
+	std::ostream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase) const
 {
 	if (pPublicKeyStream)
 	{
@@ -204,24 +208,26 @@ void EVPPKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStre
 }
 
 
-void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
+EVP_PKEY* EVPPKey::duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey)
 {
-	if (!pEVPPKey) throw NullPointerException("EVPPKey::duplicate(): "
+	poco_check_ptr(pToKey);
+
+	if (!pFromKey) throw NullPointerException("EVPPKey::duplicate(): "
 		"provided key pointer is null.");
 
-	_pEVPPKey = EVP_PKEY_new();
-	if (!_pEVPPKey) throw NullPointerException("EVPPKey::duplicate(): "
+	*pToKey = EVP_PKEY_new();
+	if (!*pToKey) throw NullPointerException("EVPPKey::duplicate(): "
 		"EVP_PKEY_new() returned null.");
 
-	int keyType = type(pEVPPKey);
+	int keyType = type(pFromKey);
 	switch (keyType)
 	{
 	case EVP_PKEY_RSA:
 	{
-		RSA* pRSA = EVP_PKEY_get1_RSA(pEVPPKey);
+		RSA* pRSA = EVP_PKEY_get1_RSA(const_cast<EVP_PKEY*>(pFromKey));
 		if (pRSA)
 		{
-			EVP_PKEY_set1_RSA(_pEVPPKey, pRSA);
+			EVP_PKEY_set1_RSA(*pToKey, pRSA);
 			RSA_free(pRSA);
 		}
 		else throw OpenSSLException();
@@ -229,10 +235,10 @@ void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 	}
 	case EVP_PKEY_EC:
 	{
-		EC_KEY* pEC = EVP_PKEY_get1_EC_KEY(pEVPPKey);
+		EC_KEY* pEC = EVP_PKEY_get1_EC_KEY(const_cast<EVP_PKEY*>(pFromKey));
 		if (pEC)
 		{
-			EVP_PKEY_set1_EC_KEY(_pEVPPKey, pEC);
+			EVP_PKEY_set1_EC_KEY(*pToKey, pEC);
 			EC_KEY_free(pEC);
 		}
 		else throw OpenSSLException();
@@ -242,6 +248,7 @@ void EVPPKey::duplicate(EVP_PKEY* pEVPPKey)
 		throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
 			NumberFormatter::format(keyType));
 	}
+	return *pToKey;
 }
 
 

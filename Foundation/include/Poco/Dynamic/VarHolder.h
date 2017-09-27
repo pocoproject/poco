@@ -406,7 +406,7 @@ private:
 			throw RangeException("Value too large.");
 		}
 		else
-		if (from > static_cast<F>(std::numeric_limits<T>::max()))
+		if (from > std::numeric_limits<T>::max())
 		{
 			throw RangeException("Value too large.");
 		}
