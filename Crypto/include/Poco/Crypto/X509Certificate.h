@@ -22,6 +22,7 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
+#include <vector>
 #include <set>
 #include <istream>
 #include <openssl/ssl.h>
@@ -35,6 +36,8 @@ class Crypto_API X509Certificate
 	/// This class represents a X509 Certificate.
 {
 public:
+	typedef std::vector<X509Certificate> List;
+
 	enum NID
 		/// Name identifier for extracting information from
 		/// a certificate subject's or issuer's distinguished name.
@@ -143,6 +146,13 @@ public:
 
 	void print(std::ostream& out) const;
 		/// Prints the certificate information to ostream.
+
+	static List readPEM(const std::string& pemFileName);
+		/// Reads and returns a list of certificates from
+		/// the specified PEM file.
+
+	static void writePEM(const std::string& pemFileName, const List& list);
+		/// Writes the list of certificates to the specified PEM file.
 
 protected:
 	void load(std::istream& stream);
