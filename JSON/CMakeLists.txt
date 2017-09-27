@@ -8,6 +8,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
+POCO_SOURCES(SRCS pdjson src/pd_json.c)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
