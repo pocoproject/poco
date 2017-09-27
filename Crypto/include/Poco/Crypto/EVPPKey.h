@@ -112,6 +112,7 @@ public:
 		///
 		/// Works as expected when one key contains only public key,
 		/// while the other one contains private (thus also public) key.
+
 	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and/or private keys to the given files.
 		///
