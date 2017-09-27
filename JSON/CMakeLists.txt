@@ -2,6 +2,10 @@ set(LIBNAME "JSON")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
+if (WIN32)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif (WIN32)
+
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
@@ -9,6 +13,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 POCO_SOURCES(SRCS pdjson src/pd_json.c)
+SET_SOURCE_FILES_PROPERTIES(src/pd_json.c PROPERTIES LANGUAGE CXX)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
