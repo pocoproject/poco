@@ -8,14 +8,29 @@
 #include <errno.h>
 #include "pd_json.h"
 
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+
+#define json_error(json, format, ...)                             \
+  if (!json->error) {                                             \
+      json->error = 1;                                            \
+      _snprintf_s(json->errmsg, sizeof(json->errmsg), _TRUNCATE,  \
+               "error: %lu: " format,                             \
+               (unsigned long) json->lineno,                      \
+               __VA_ARGS__);                                      \
+  }                                                               \
+
+#else
+
 #define json_error(json, format, ...)                             \
     if (!json->error) {                                           \
         json->error = 1;                                          \
-        _snprintf(json->errmsg, sizeof(json->errmsg),              \
+        snprintf(json->errmsg, sizeof(json->errmsg),              \
                  "error: %lu: " format,                           \
                  (unsigned long) json->lineno,                    \
                  __VA_ARGS__);                                    \
     }                                                             \
+
+#endif // POCO_MSVS_VERSION
 
 #define STACK_INC 4
 
