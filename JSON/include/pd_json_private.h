@@ -6,6 +6,10 @@
 #endif // __STDC_VERSION__
 #include <stdio.h>
 
+#if defined(__cplusplus) && !defined(POCO_OS_FAMILY_WINDOWS)
+extern "C" {
+#endif
+
 struct json_source {
     int (*get) (struct json_source *);
     int (*peek) (struct json_source *);
@@ -48,5 +52,9 @@ struct json_stream {
     struct json_allocator alloc;
     char errmsg[128];
 };
+
+#if defined(__cplusplus) && !defined(POCO_OS_FAMILY_WINDOWS)
+}
+#endif
 
 #endif

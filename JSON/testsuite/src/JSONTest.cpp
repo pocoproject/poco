@@ -1083,7 +1083,7 @@ void JSONTest::testSetArrayElement()
 	assert(dynArray[1] == 13);
 	assert(dynArray[2] == "foo");
 
-#endif POCO_ENABLE_CPP11
+#endif // POCO_ENABLE_CPP11
 
 	dynArray.clear();
 	assert(dynArray.size() == 0);

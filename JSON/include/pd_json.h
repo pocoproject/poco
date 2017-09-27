@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 
+#if defined(__cplusplus) && !defined(POCO_OS_FAMILY_WINDOWS)
+extern "C" {
+#endif
+
 enum json_type {
     JSON_ERROR = 1, JSON_DONE,
     JSON_OBJECT, JSON_OBJECT_END, JSON_ARRAY, JSON_ARRAY_END,
@@ -38,5 +42,9 @@ size_t json_get_lineno(json_stream *json);
 size_t json_get_position(json_stream *json);
 size_t json_get_depth(json_stream *json);
 const char *json_get_error(json_stream *json);
+
+#if defined(__cplusplus) && !defined(POCO_OS_FAMILY_WINDOWS)
+}
+#endif
 
 #endif

@@ -109,7 +109,7 @@ static void init(json_stream *json)
     json->error = 0;
     json->errmsg[0] = '\0';
     json->ntokens = 0;
-    json->next = (json_type) 0;
+    json->next = (enum json_type) 0;
     json->streaming = true;
 
     json->stack = NULL;
@@ -654,7 +654,7 @@ enum json_type json_next(json_stream *json)
         return JSON_ERROR;
     if (json->next != 0) {
         enum json_type next = json->next;
-        json->next = (json_type) 0;
+        json->next = (enum json_type) 0;
         return next;
     }
     if (json->ntokens > 0 && json->stack_top == (size_t)-1) {
