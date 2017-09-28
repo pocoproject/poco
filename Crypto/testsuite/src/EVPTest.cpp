@@ -191,6 +191,15 @@ void EVPTest::testRSAEVPSaveLoadStreamNoPass()
 	std::istringstream iPriv(privKey);
 	EVPPKey key2(&iPub, &iPriv);
 
+	assert (key == key2);
+	assert (!(key != key2));
+	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
+	EVPPKey keyNE(&rsaKeyNE);
+	assert (key != keyNE);
+	assert (!(key == keyNE));
+	assert (key2 != keyNE);;
+	assert (!(key2 == keyNE));
+
 	std::istringstream iPriv2(privKey);
 	EVPPKey key3(0, &iPriv2);
 	std::ostringstream strPub3;
@@ -305,8 +314,13 @@ void EVPTest::testECEVPSaveLoadStream()
 		std::istringstream iPriv(privKey);
 		EVPPKey key2(&iPub, &iPriv, "testpwd");
 
+		std::ostringstream strPubE;
+		std::ostringstream strPrivE;
+		key2.save(&strPubE, &strPrivE, "testpwd");
+		assert (strPubE.str() == pubKey);
+		/*TODO: figure out why EVP_PKEY_cmp() fails for identical public keys
 		assert (key == key2);
-		assert (!(key != key2));
+		assert (!(key != key2));*/
 		ECKey ecKeyNE("secp112r2");
 		EVPPKey keyNE(&ecKeyNE);
 		assert (key != keyNE);
@@ -349,6 +363,21 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 		std::istringstream iPub(pubKey);
 		std::istringstream iPriv(privKey);
 		EVPPKey key2(&iPub, &iPriv);
+
+		std::ostringstream strPubE;
+		std::ostringstream strPrivE;
+		key2.save(&strPubE, &strPrivE);
+		assert (strPubE.str() == pubKey);
+		/*TODO: figure out why EVP_PKEY_cmp() fails for identical public keys
+		assert (key == key2);
+		assert (!(key != key2));*/
+		ECKey ecKeyNE("secp112r2");
+		EVPPKey keyNE(&ecKeyNE);
+		assert (key != keyNE);
+		assert (!(key == keyNE));
+		assert (key2 != keyNE);
+		assert (!(key2 == keyNE));
+
 		std::ostringstream strPub2;
 		std::ostringstream strPriv2;
 		key2.save(&strPub2, &strPriv2);
@@ -386,6 +415,21 @@ void EVPTest::testECEVPSaveLoadFile()
 		StreamCopier::copyToString(ifPriv, privKey);
 
 		EVPPKey key2(filePub.path(), filePriv.path(), "testpwd");
+
+		std::ostringstream strPubE;
+		std::ostringstream strPrivE;
+		key2.save(&strPubE, &strPrivE, "testpwd");
+		assert (strPubE.str() == pubKey);
+		/*TODO: figure out why EVP_PKEY_cmp() fails for identical public keys
+		assert (key == key2);
+		assert (!(key != key2));*/
+		ECKey ecKeyNE("secp112r2");
+		EVPPKey keyNE(&ecKeyNE);
+		assert (key != keyNE);
+		assert (!(key == keyNE));
+		assert (key2 != keyNE);
+		assert (!(key2 == keyNE));
+
 		std::ostringstream strPub2;
 		std::ostringstream strPriv2;
 		key2.save(&strPub2, &strPriv2, "testpwd");

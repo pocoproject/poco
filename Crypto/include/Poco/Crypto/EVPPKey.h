@@ -158,7 +158,7 @@ private:
 
 	typedef EVP_PKEY* (*PEM_read_FILE_Key_fn)(FILE*, EVP_PKEY**, pem_password_cb*, void*);
 	typedef EVP_PKEY* (*PEM_read_BIO_Key_fn)(BIO*, EVP_PKEY**, pem_password_cb*, void*);
-	typedef void* (*EVP_PKEY_get_Key_fn)(EVP_PKEY* pkey);
+	typedef void* (*EVP_PKEY_get_Key_fn)(EVP_PKEY*);
 
 	// The following load*() functions are used by both native and EVP_PKEY type key
 	// loading from BIO/FILE.
@@ -176,29 +176,35 @@ private:
 		poco_check_ptr (ppKey);
 		poco_assert_dbg (!*ppKey);
 
+		FILE* pFile = 0;
 		if (!keyFile.empty())
 		{
 			if (!getFunc) *ppKey = (K*)EVP_PKEY_new();
 			EVP_PKEY* pKey = getFunc ? EVP_PKEY_new() : (EVP_PKEY*)*ppKey;
 			if (pKey)
 			{
-				FILE* pFile = fopen(keyFile.c_str(), "r");
+				pFile = fopen(keyFile.c_str(), "r");
 				if (pFile)
 				{
-					readFunc(pFile, &pKey, passCB, pass.empty() ? (void*)0 : (void*)pass.c_str());
-					fclose(pFile);
-					if (getFunc)
+					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
+					void* pPassword = pass.empty() ? (void*)0 : (void*)pass.c_str();
+					if (readFunc(pFile, &pKey, pCB, pPassword))
 					{
-						*ppKey = (K*)getFunc(pKey);
-						EVP_PKEY_free(pKey);
+						fclose(pFile); pFile = 0;
+						if(getFunc)
+						{
+							*ppKey = (K*)getFunc(pKey);
+							EVP_PKEY_free(pKey);
+						}
+						else *ppKey = (K*)pKey;
+						if(!*ppKey) goto error;
+						return true;
 					}
-					else *ppKey = (K*)pKey;
-					if (!*ppKey) goto error;
-					return true;
+					goto error;
 				}
 				else
 				{
-					EVP_PKEY_free(pKey);
+					if (getFunc) EVP_PKEY_free(pKey);
 					throw IOException("ECKeyImpl, cannot open file", keyFile);
 				}
 			}
@@ -207,6 +213,7 @@ private:
 		return false;
 
 	error:
+		if (pFile) fclose(pFile);
 		throw OpenSSLException("EVPKey::loadKey(string)");
 	}
 
@@ -222,21 +229,24 @@ private:
 		poco_check_ptr(ppKey);
 		poco_assert_dbg(!*ppKey);
 
+		BIO* pBIO = 0;
 		if (pIstr)
 		{
 			std::ostringstream ostr;
 			Poco::StreamCopier::copyStream(*pIstr, ostr);
 			std::string key = ostr.str();
-			BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(key.data()), static_cast<int>(key.size()));
+			pBIO = BIO_new_mem_buf(const_cast<char*>(key.data()), static_cast<int>(key.size()));
 			if (pBIO)
 			{
 				if (!getFunc) *ppKey = (K*)EVP_PKEY_new();
 				EVP_PKEY* pKey = getFunc ? EVP_PKEY_new() : (EVP_PKEY*)*ppKey;
 				if (pKey)
 				{
-					if (readFunc(pBIO, &pKey, passCB, pass.empty() ? (void*)0 : (void*)pass.c_str()))
+					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
+					void* pPassword = pass.empty() ? (void*)0 : (void*)pass.c_str();
+					if (readFunc(pBIO, &pKey, pCB, pPassword))
 					{
-						BIO_free(pBIO);
+						BIO_free(pBIO); pBIO = 0;
 						if (getFunc)
 						{
 							*ppKey = (K*)getFunc(pKey);
@@ -246,19 +256,17 @@ private:
 						if (!*ppKey) goto error;
 						return true;
 					}
+					if (getFunc) EVP_PKEY_free(pKey);
 					goto error;
 				}
-				else
-				{
-					BIO_free(pBIO);
-					goto error;
-				}
+				else goto error;
 			}
 			else goto error;
 		}
 		return false;
 
 	error:
+		if (pBIO) BIO_free(pBIO);
 		throw OpenSSLException("EVPKey::loadKey(stream)");
 	}
 
@@ -275,7 +283,9 @@ private:
 inline bool EVPPKey::operator == (const EVPPKey& other) const
 {
 	poco_assert_dbg(other._pEVPPKey && _pEVPPKey);
-	return (1 == EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey));
+	int r = EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey);
+	if (r < 0) throw OpenSSLException("EVPPKey::operator ==()");
+	return (1 == r);
 }
 
 
