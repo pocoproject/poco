@@ -85,8 +85,8 @@ ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 	if (EVPPKey::loadKey(&_pEC, PEM_read_PrivateKey, EVP_PKEY_get1_EC_KEY, privateKeyFile, privateKeyPassphrase))
 	{
 		checkEC(Poco::format("ECKeyImpl(%s, %s, %s)",
-				publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? "" : "***"),
-				"PEM_read_PrivateKey() or EVP_PKEY_get1_EC_KEY()");
+			publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+			"PEM_read_PrivateKey() or EVP_PKEY_get1_EC_KEY()");
 		return; // private key is enough
 	}
 
@@ -96,8 +96,8 @@ ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 		throw OpenSSLException("ECKeyImpl(const string&, const string&, const string&");
 	}
 	checkEC(Poco::format("ECKeyImpl(%s, %s, %s)",
-			publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? "" : "***"),
-			"PEM_read_PUBKEY() or EVP_PKEY_get1_EC_KEY()");
+		publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+		"PEM_read_PUBKEY() or EVP_PKEY_get1_EC_KEY()");
 }
 
 
@@ -108,8 +108,8 @@ ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 	if (EVPPKey::loadKey(&_pEC, PEM_read_bio_PrivateKey, EVP_PKEY_get1_EC_KEY, pPrivateKeyStream, privateKeyPassphrase))
 	{
 		checkEC(Poco::format("ECKeyImpl(stream, stream, %s)",
-				privateKeyPassphrase.empty() ? "" : "***"),
-				"PEM_read_bio_PrivateKey() or EVP_PKEY_get1_EC_KEY()");
+			privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+			"PEM_read_bio_PrivateKey() or EVP_PKEY_get1_EC_KEY()");
 		return; // private key is enough
 	}
 
@@ -119,8 +119,8 @@ ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 		throw OpenSSLException("ECKeyImpl(istream*, istream*, const string&");
 	}
 	checkEC(Poco::format("ECKeyImpl(stream, stream, %s)",
-			privateKeyPassphrase.empty() ? "" : "***"),
-			"PEM_read_bio_PUBKEY() or EVP_PKEY_get1_EC_KEY()");
+		privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+		"PEM_read_bio_PUBKEY() or EVP_PKEY_get1_EC_KEY()");
 }
 
 
@@ -196,7 +196,8 @@ std::string ECKeyImpl::getCurveName(int nid)
 
 	if (-1 == nid) nid = pCurves[0].nid;
 	int bufLen = 128;
-	char buf[bufLen] = {0};
+	char buf[bufLen];
+	std::memset(buf, 0, bufLen);
 	OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(nid), 0);
 	curveName = buf;
 	OPENSSL_free(pCurves);
