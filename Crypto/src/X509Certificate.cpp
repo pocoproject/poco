@@ -17,6 +17,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/Format.h"
 #include <sstream>
 #include <openssl/pem.h>
 #ifdef _WIN32
@@ -294,12 +295,14 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 	return X509_cmp(pCert, pOtherCert) == 0;
 }
 
+
 X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 {
 	List caCertList;
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
 	if (pBIO == NULL) throw OpenFileException("X509Certificate::readPEM()");
 	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+	if (!x) throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
 	while(x)
 	{
 		caCertList.push_back(X509Certificate(x));
