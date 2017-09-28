@@ -37,24 +37,30 @@ void ECTest::testECNewKeys()
 {
 	try
 	{
-		ECKey key("secp521r1");
-		std::ostringstream strPub;
-		std::ostringstream strPriv;
-		key.save(&strPub, &strPriv, "testpwd");
-		std::string pubKey = strPub.str();
-		std::string privKey = strPriv.str();
+		std::string curveName = ECKey::getCurveName();
+		if (!curveName.empty())
+		{
+			ECKey key(curveName);
+			std::ostringstream strPub;
+			std::ostringstream strPriv;
+			key.save(&strPub, &strPriv, "testpwd");
+			std::string pubKey = strPub.str();
+			std::string privKey = strPriv.str();
 
-		// now do the round trip
-		std::istringstream iPub(pubKey);
-		std::istringstream iPriv(privKey);
-		ECKey key2(&iPub, &iPriv, "testpwd");
+			// now do the round trip
+			std::istringstream iPub(pubKey);
+			std::istringstream iPriv(privKey);
+			ECKey key2(&iPub, &iPriv, "testpwd");
 
-		std::istringstream iPriv2(privKey);
-		ECKey key3(0, &iPriv2,  "testpwd");
-		std::ostringstream strPub3;
-		key3.save(&strPub3);
-		std::string pubFromPrivate = strPub3.str();
-		assert (pubFromPrivate == pubKey);
+			std::istringstream iPriv2(privKey);
+			ECKey key3(0, &iPriv2, "testpwd");
+			std::ostringstream strPub3;
+			key3.save(&strPub3);
+			std::string pubFromPrivate = strPub3.str();
+			assert (pubFromPrivate == pubKey);
+		}
+		else
+			std::cerr << "No elliptic curves found!" << std::endl;
 	}
 	catch (Poco::Exception& ex)
 	{
@@ -68,24 +74,30 @@ void ECTest::testECNewKeysNoPassphrase()
 {
 	try
 	{
-		ECKey key("secp521r1");
-		std::ostringstream strPub;
-		std::ostringstream strPriv;
-		key.save(&strPub, &strPriv);
-		std::string pubKey = strPub.str();
-		std::string privKey = strPriv.str();
+		std::string curveName = ECKey::getCurveName();
+		if (!curveName.empty())
+		{
+			ECKey key(curveName);
+			std::ostringstream strPub;
+			std::ostringstream strPriv;
+			key.save(&strPub, &strPriv);
+			std::string pubKey = strPub.str();
+			std::string privKey = strPriv.str();
 
-		// now do the round trip
-		std::istringstream iPub(pubKey);
-		std::istringstream iPriv(privKey);
-		ECKey key2(&iPub, &iPriv);
+			// now do the round trip
+			std::istringstream iPub(pubKey);
+			std::istringstream iPriv(privKey);
+			ECKey key2(&iPub, &iPriv);
 
-		std::istringstream iPriv2(privKey);
-		ECKey key3(0, &iPriv2);
-		std::ostringstream strPub3;
-		key3.save(&strPub3);
-		std::string pubFromPrivate = strPub3.str();
-		assert (pubFromPrivate == pubKey);
+			std::istringstream iPriv2(privKey);
+			ECKey key3(0, &iPriv2);
+			std::ostringstream strPub3;
+			key3.save(&strPub3);
+			std::string pubFromPrivate = strPub3.str();
+			assert (pubFromPrivate == pubKey);
+		}
+		else
+			std::cerr << "No elliptic curves found!" << std::endl;
 	}
 	catch (Poco::Exception& ex)
 	{
@@ -99,21 +111,27 @@ void ECTest::testECDSASignSha256()
 {
 	try
 	{
-		std::string msg("Test this sign message");
-		ECKey key("secp521r1");
-		ECDSADigestEngine eng(key, "SHA256");
-		eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-		const Poco::DigestEngine::Digest& sig = eng.signature();
+		std::string curveName = ECKey::getCurveName();
+		if (!curveName.empty())
+		{
+			std::string msg("Test this sign message");
+			ECKey key(curveName);
+			ECDSADigestEngine eng(key, "SHA256");
+			eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
+			const Poco::DigestEngine::Digest& sig = eng.signature();
 
-		// verify
-		std::ostringstream strPub;
-		key.save(&strPub);
-		std::string pubKey = strPub.str();
-		std::istringstream iPub(pubKey);
-		ECKey keyPub(&iPub);
-		ECDSADigestEngine eng2(keyPub, "SHA256");
-		eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-		assert(eng2.verify(sig));
+			// verify
+			std::ostringstream strPub;
+			key.save(&strPub);
+			std::string pubKey = strPub.str();
+			std::istringstream iPub(pubKey);
+			ECKey keyPub(&iPub);
+			ECDSADigestEngine eng2(keyPub, "SHA256");
+			eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
+			assert(eng2.verify(sig));
+		}
+		else
+			std::cerr << "No elliptic curves found!" << std::endl;
 	}
 	catch (Poco::Exception& ex)
 	{
@@ -127,23 +145,29 @@ void ECTest::testECDSASignManipulated()
 {
 	try
 	{
-		std::string msg("Test this sign message");
-		std::string msgManip("Test that sign message");
-		ECKey key("secp521r1");
-		ECDSADigestEngine eng(key, "SHA256");
-		eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-		const Poco::DigestEngine::Digest& sig = eng.signature();
-		std::string hexDig = Poco::DigestEngine::digestToHex(sig);
+		std::string curveName = ECKey::getCurveName();
+		if (!curveName.empty())
+		{
+			std::string msg("Test this sign message");
+			std::string msgManip("Test that sign message");
+			ECKey key(curveName);
+			ECDSADigestEngine eng(key, "SHA256");
+			eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
+			const Poco::DigestEngine::Digest& sig = eng.signature();
+			std::string hexDig = Poco::DigestEngine::digestToHex(sig);
 
-		// verify
-		std::ostringstream strPub;
-		key.save(&strPub);
-		std::string pubKey = strPub.str();
-		std::istringstream iPub(pubKey);
-		ECKey keyPub(&iPub);
-		ECDSADigestEngine eng2(keyPub, "SHA256");
-		eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
-		assert (!eng2.verify(sig));
+			// verify
+			std::ostringstream strPub;
+			key.save(&strPub);
+			std::string pubKey = strPub.str();
+			std::istringstream iPub(pubKey);
+			ECKey keyPub(&iPub);
+			ECDSADigestEngine eng2(keyPub, "SHA256");
+			eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
+			assert (!eng2.verify(sig));
+		}
+		else
+			std::cerr << "No elliptic curves found!" << std::endl;
 	}
 	catch (Poco::Exception& ex)
 	{

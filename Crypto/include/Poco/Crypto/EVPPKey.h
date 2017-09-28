@@ -194,7 +194,11 @@ private:
 							*ppKey = (K*)getFunc(pKey);
 							EVP_PKEY_free(pKey);
 						}
-						else *ppKey = (K*)pKey;
+						else
+						{
+							poco_assert_dbg (typeid(K*) == typeid(EVP_PKEY*));
+							*ppKey = (K*)pKey;
+						}
 						if(!*ppKey) goto error;
 						return true;
 					}
@@ -250,7 +254,11 @@ private:
 							*ppKey = (K*)getFunc(pKey);
 							EVP_PKEY_free(pKey);
 						}
-						else *ppKey = (K*)pKey;
+						else
+						{
+							poco_assert_dbg (typeid(K*) == typeid(EVP_PKEY*));
+							*ppKey = (K*)pKey;
+						}
 						if (!*ppKey) goto error;
 						return true;
 					}
@@ -278,12 +286,12 @@ private:
 // inlines
 //
 
+
 inline bool EVPPKey::operator == (const EVPPKey& other) const
 {
-	poco_assert_dbg(other._pEVPPKey && _pEVPPKey);
-	int r = EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey);
-	if (r < 0) throw OpenSSLException("EVPPKey::operator ==()");
-	return (1 == r);
+	poco_check_ptr (other._pEVPPKey);
+	poco_check_ptr (_pEVPPKey);
+	return (1 == EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey));
 }
 
 
