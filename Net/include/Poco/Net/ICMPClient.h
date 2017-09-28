@@ -44,7 +44,7 @@ public:
 	mutable Poco::BasicEvent<ICMPEventArgs> pingError;
 	mutable Poco::BasicEvent<ICMPEventArgs> pingEnd;
 
-	explicit ICMPClient(SocketAddress::Family family);
+	explicit ICMPClient(SocketAddress::Family family, int dataSize = 48, int ttl = 128, int timeout = 50000);
 		/// Creates an ICMP client.
 
 	~ICMPClient();
@@ -62,13 +62,22 @@ public:
 		/// 
 		/// Returns the number of valid replies.
 
-	static int ping(SocketAddress& address, SocketAddress::Family family, int repeat = 1);
+	static int ping(SocketAddress& address,
+		SocketAddress::Family family,
+		int repeat = 1,
+		int dataSize = 48,
+		int ttl = 128,
+		int timeout = 50000);
 		/// Pings the specified address [repeat] times.
 		/// Notifications are not posted for events.
 		/// 
 		/// Returns the number of valid replies.
 
-	static int pingIPv4(const std::string& address, int repeat = 1);
+	static int pingIPv4(const std::string& address,
+		int repeat = 1,
+		int dataSize = 48,
+		int ttl = 128,
+		int timeout = 50000);
 		/// Calls ICMPClient::ping(SocketAddress&, int) and
 		/// returns the result.
 		/// 
@@ -76,6 +85,9 @@ public:
 
 private:
 	mutable SocketAddress::Family _family;
+	int _dataSize;
+	int _ttl;
+	int _timeout;
 };
 
 
