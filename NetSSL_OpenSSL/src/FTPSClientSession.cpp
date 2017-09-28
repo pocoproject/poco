@@ -41,10 +41,8 @@ FTPSClientSession::FTPSClientSession(const std::string& host,
 										Poco::UInt16 port,
 										const std::string& username,
 										const std::string& password) :
-	FTPClientSession(host, port)
+	FTPClientSession(host, port, username, password)
 {
-	if(!username.empty())
-		login(username, password);	
 }
 
 void FTPSClientSession::tryFTPSmode(bool bTryFTPS)
