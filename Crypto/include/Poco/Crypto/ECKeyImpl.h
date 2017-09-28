@@ -104,7 +104,17 @@ public:
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
+	static std::string getCurveName(int nid = -1);
+		/// Returns elliptical curve name corresponding to
+		/// the given nid; if nid is not found, returns
+		/// empty string.
+		///
+		/// If nid is -1, returns first curve name.
+		///
+		/// If no curves are found, returns empty string;
+
 private:
+	void checkEC(const std::string& method, const std::string& func) const;
 	void freeEC();
 
 	EC_KEY* _pEC;
