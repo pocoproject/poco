@@ -34,8 +34,11 @@ namespace Poco {
 namespace Net {
 
 
-ICMPClient::ICMPClient(SocketAddress::Family family): 
-	_family(family)
+ICMPClient::ICMPClient(SocketAddress::Family family, int dataSize, int ttl, int timeout):
+	_family(family),
+	_dataSize(dataSize),
+	_ttl(ttl),
+	_timeout(timeout)
 {
 }
 
@@ -58,7 +61,7 @@ int ICMPClient::ping(SocketAddress& address, int repeat) const
 {
 	if (repeat <= 0) return 0;
 
-	ICMPSocket icmpSocket(_family);
+	ICMPSocket icmpSocket(_family, _dataSize, _ttl, _timeout);
 	SocketAddress returnAddress;
 
 	ICMPEventArgs eventArgs(address, repeat, icmpSocket.dataSize(), icmpSocket.ttl());
@@ -105,20 +108,23 @@ int ICMPClient::ping(SocketAddress& address, int repeat) const
 }
 
 
-int ICMPClient::pingIPv4(const std::string& address, int repeat)
+int ICMPClient::pingIPv4(const std::string& address, int repeat,
+	int dataSize, int ttl, int timeout)
 {
 	if (repeat <= 0) return 0;
 
 	SocketAddress a(address, 0);
-	return ping(a, IPAddress::IPv4, repeat);
+	return ping(a, IPAddress::IPv4, repeat, dataSize, ttl, timeout);
 }
 
 
-int ICMPClient::ping(SocketAddress& address, IPAddress::Family family, int repeat)
+int ICMPClient::ping(SocketAddress& address,
+	IPAddress::Family family, int repeat,
+	int dataSize, int ttl, int timeout)
 {
 	if (repeat <= 0) return 0;
 
-	ICMPSocket icmpSocket(family);
+	ICMPSocket icmpSocket(family, dataSize, ttl, timeout);
 	SocketAddress returnAddress;
 	int received = 0;
 
