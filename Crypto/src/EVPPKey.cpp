@@ -26,18 +26,21 @@ namespace Crypto {
 EVPPKey::EVPPKey(const std::string& ecCurveName): _pEVPPKey(0)
 {
 	newECKey(ecCurveName.c_str());
+	poco_check_ptr(_pEVPPKey);
 }
 
 
 EVPPKey::EVPPKey(const char* ecCurveName): _pEVPPKey(0)
 {
 	newECKey(ecCurveName);
+	poco_check_ptr(_pEVPPKey);
 }
 
 
 EVPPKey::EVPPKey(EVP_PKEY* pEVPPKey): _pEVPPKey(0)
 {
 	duplicate(pEVPPKey, &_pEVPPKey);
+	poco_check_ptr(_pEVPPKey);
 }
 
 
@@ -46,13 +49,17 @@ EVPPKey::EVPPKey(const std::string& publicKeyFile,
 	const std::string& privateKeyPassphrase): _pEVPPKey(0)
 {
 	if (loadKey(&_pEVPPKey, PEM_read_PrivateKey, (EVP_PKEY_get_Key_fn)0, privateKeyFile, privateKeyPassphrase))
+	{
+		poco_check_ptr(_pEVPPKey);
 		return; // private key is enough
+	}
 
 	// no private key, this must be public key only, otherwise throw
 	if (!loadKey(&_pEVPPKey, PEM_read_PUBKEY, (EVP_PKEY_get_Key_fn)0, publicKeyFile))
 	{
 		throw OpenSSLException("ECKeyImpl(const string&, const string&, const string&");
 	}
+	poco_check_ptr(_pEVPPKey);
 }
 
 
@@ -61,25 +68,31 @@ EVPPKey::EVPPKey(std::istream* pPublicKeyStream,
 	const std::string& privateKeyPassphrase): _pEVPPKey(0)
 {
 	if (loadKey(&_pEVPPKey, PEM_read_bio_PrivateKey, (EVP_PKEY_get_Key_fn)0, pPrivateKeyStream, privateKeyPassphrase))
+	{
+		poco_check_ptr(_pEVPPKey);
 		return; // private key is enough
+	}
 
 	// no private key, this must be public key only, otherwise throw
 	if (!loadKey(&_pEVPPKey, PEM_read_bio_PUBKEY, (EVP_PKEY_get_Key_fn)0, pPublicKeyStream))
 	{
 		throw OpenSSLException("ECKeyImpl(istream*, istream*, const string&");
 	}
+	poco_check_ptr(_pEVPPKey);
 }
 
 
 EVPPKey::EVPPKey(const EVPPKey& other)
 {
 	duplicate(other._pEVPPKey, &_pEVPPKey);
+	poco_check_ptr(_pEVPPKey);
 }
 
 
 EVPPKey& EVPPKey::operator=(const EVPPKey& other)
 {
 	duplicate(other._pEVPPKey, &_pEVPPKey);
+	poco_check_ptr(_pEVPPKey);
 	return *this;
 }
 
@@ -89,6 +102,7 @@ EVPPKey& EVPPKey::operator=(const EVPPKey& other)
 EVPPKey::EVPPKey(EVPPKey&& other): _pEVPPKey(other._pEVPPKey)
 {
 	other._pEVPPKey = nullptr;
+	poco_check_ptr(_pEVPPKey);
 }
 
 
@@ -96,6 +110,7 @@ EVPPKey& EVPPKey::operator=(EVPPKey&& other)
 {
 	_pEVPPKey = other._pEVPPKey;
 	other._pEVPPKey = nullptr;
+	poco_check_ptr(_pEVPPKey);
 	return *this;
 }
 
@@ -109,7 +124,7 @@ EVPPKey::~EVPPKey()
 
 void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase) const
 {
-	if (!publicKeyFile.empty())
+	if (!publicKeyFile.empty() && (publicKeyFile != privateKeyFile))
 	{
 		BIO* bio = BIO_new(BIO_s_file());
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key file", publicKeyFile);
@@ -168,7 +183,7 @@ void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateK
 
 void EVPPKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase) const
 {
-	if (pPublicKeyStream)
+	if (pPublicKeyStream && (pPublicKeyStream != pPrivateKeyStream))
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key");
@@ -227,7 +242,7 @@ EVP_PKEY* EVPPKey::duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey)
 				EVP_PKEY_set1_RSA(*pToKey, pRSA);
 				RSA_free(pRSA);
 			}
-			else throw OpenSSLException();
+			else throw OpenSSLException("EVPPKey::duplicate(): EVP_PKEY_get1_RSA()");
 			break;
 		}
 		case EVP_PKEY_EC:
@@ -237,6 +252,14 @@ EVP_PKEY* EVPPKey::duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey)
 			{
 				EVP_PKEY_set1_EC_KEY(*pToKey, pEC);
 				EC_KEY_free(pEC);
+				int cmp = EVP_PKEY_cmp_parameters(*pToKey, pFromKey);
+				if (cmp < 0)
+					throw OpenSSLException("EVPPKey::duplicate(): EVP_PKEY_cmp_parameters()");
+				if (0 == cmp)
+				{
+					if(!EVP_PKEY_copy_parameters(*pToKey, pFromKey))
+						throw OpenSSLException("EVPPKey::duplicate(): EVP_PKEY_copy_parameters()");
+				}
 			}
 			else throw OpenSSLException();
 			break;
@@ -245,6 +268,7 @@ EVP_PKEY* EVPPKey::duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey)
 			throw NotImplementedException("EVPPKey:duplicate(); Key type: " +
 				NumberFormatter::format(keyType));
 	}
+
 	return *pToKey;
 }
 
@@ -283,10 +307,14 @@ void EVPPKey::setKey(RSAKey* pKey)
 
 int EVPPKey::passCB(char* buf, int size, int, void* pass)
 {
-	int len = (int) strlen((char*)pass);
-	if (len > size) len = size;
-	memcpy(buf, pass, len);
-	return len;
+	if (pass)
+	{
+		int len = (int)strlen((char*)pass);
+		if(len > size) len = size;
+		memcpy(buf, pass, len);
+		return len;
+	}
+	return 0;
 }
 
 

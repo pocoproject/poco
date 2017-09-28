@@ -237,38 +237,46 @@ void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList, c
 
 void PKCS12ContainerTest::testPEMReadWrite()
 {
-	std::string file = getTestFilesPath("certs-only", "pem");
-	X509Certificate::List certsOnly = X509Certificate::readPEM(file);
-	assert (certsOnly.size() == 5);
-	// PEM is written by openssl in reverse order from p12
-	std::vector<int> certOrder;
-	for (int i = (int) certsOnly.size() - 1; i >= 0 ; --i) certOrder.push_back(i);
-	certsOnlyList(certsOnly, certOrder);
+	try
+	{
+		std::string file = getTestFilesPath("certs-only", "pem");
+		X509Certificate::List certsOnly = X509Certificate::readPEM(file);
+		assert (certsOnly.size() == 5);
+		// PEM is written by openssl in reverse order from p12
+		std::vector<int> certOrder;
+		for(int i = (int)certsOnly.size() - 1; i >= 0; --i) certOrder.push_back(i);
+		certsOnlyList(certsOnly, certOrder);
 
-	TemporaryFile tmpFile;
-	X509Certificate::writePEM(tmpFile.path(), certsOnly);
+		TemporaryFile tmpFile;
+		X509Certificate::writePEM(tmpFile.path(), certsOnly);
 
-	certsOnly.clear();
-	certsOnly = X509Certificate::readPEM(tmpFile.path());
-	certsOnlyList(certsOnly, certOrder);
+		certsOnly.clear();
+		certsOnly = X509Certificate::readPEM(tmpFile.path());
+		certsOnlyList(certsOnly, certOrder);
 
-	file = getTestFilesPath("full", "pem");
-	X509Certificate::List full = X509Certificate::readPEM(file);
-	assert (full.size() == 3);
-	fullCert(full[0]);
-	full.erase(full.begin());
-	assert (full.size() == 2);
+		file = getTestFilesPath("full", "pem");
+		X509Certificate::List full = X509Certificate::readPEM(file);
+		assert (full.size() == 3);
+		fullCert(full[0]);
+		full.erase(full.begin());
+		assert (full.size() == 2);
 
-	certOrder.clear();
-	for (int i = (int) full.size() - 1; i >= 0 ; --i) certOrder.push_back(i);
-	fullList(full, certOrder);
+		certOrder.clear();
+		for(int i = (int)full.size() - 1; i >= 0; --i) certOrder.push_back(i);
+		fullList(full, certOrder);
 
-	TemporaryFile tmpFile2;
-	X509Certificate::writePEM(tmpFile2.path(), full);
+		TemporaryFile tmpFile2;
+		X509Certificate::writePEM(tmpFile2.path(), full);
 
-	full.clear();
-	full = X509Certificate::readPEM(tmpFile2.path());
-	fullList(full, certOrder);
+		full.clear();
+		full = X509Certificate::readPEM(tmpFile2.path());
+		fullList(full, certOrder);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
@@ -294,7 +302,7 @@ std::string PKCS12ContainerTest::getTestFilesPath(const std::string& name, const
 	}
 
 	ostr.str("");
-	ostr << "/Crypto/testsuite/data/" << name << ".p12";
+	ostr << "/Crypto/testsuite/data/" << name << '.' << ext;
 	fileName = Poco::Environment::get("POCO_BASE") + ostr.str();
 	path = fileName;
 
