@@ -67,7 +67,8 @@ PKCS12Container::PKCS12Container(const PKCS12Container& other):
 	_pKey(EVPPKey::duplicate(other._pKey, &_pKey)),
 	_pX509Cert(new X509Certificate(*other._pX509Cert)),
 	_caCertList(other._caCertList),
-	_pkcsFriendlyname(other._pkcsFriendlyname)
+	_caCertNames(other._caCertNames),
+	_pkcsFriendlyName(other._pkcsFriendlyName)
 {
 }
 
@@ -80,7 +81,8 @@ PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 		_pKey = EVPPKey::duplicate(other._pKey, &_pKey);
 		_pX509Cert.reset(new X509Certificate(*other._pX509Cert));
 		_caCertList = other._caCertList;
-		_pkcsFriendlyname = other._pkcsFriendlyname;
+		_caCertNames = other._caCertNames;
+		_pkcsFriendlyName = other._pkcsFriendlyName;
 	}
 	return *this;
 }
@@ -93,7 +95,8 @@ PKCS12Container::PKCS12Container(PKCS12Container&& other):
 	_pKey(other._pKey),
 	_pX509Cert(std::move(other._pX509Cert)),
 	_caCertList(std::move(other._caCertList)),
-	_pkcsFriendlyname(std::move(other._pkcsFriendlyname))
+	_caCertNames(std::move(other._caCertNames)),
+	_pkcsFriendlyName(std::move(other._pkcsFriendlyName))
 {
 	other._pKey = 0;
 }
@@ -107,7 +110,8 @@ PKCS12Container& PKCS12Container::operator = (PKCS12Container&& other)
 		_pKey = other._pKey; other._pKey = 0;
 		_pX509Cert = std::move(other._pX509Cert);
 		_caCertList = std::move(other._caCertList);
-		_pkcsFriendlyname = std::move(other._pkcsFriendlyname);
+		_caCertNames = std::move(other._caCertNames);
+		_pkcsFriendlyName = std::move(other._pkcsFriendlyName);
 	}
 	return *this;
 }
@@ -122,6 +126,31 @@ PKCS12Container::~PKCS12Container()
 }
 
 
+std::string PKCS12Container::extractFriendlyName(X509* pCert)
+{
+	std::string friendlyName;
+	if(pCert)
+	{
+		STACK_OF(PKCS12_SAFEBAG)*pBags = 0;
+		PKCS12_SAFEBAG*pBag = PKCS12_add_cert(&pBags, pCert);
+		if(pBag)
+		{
+			char* pBuffer = PKCS12_get_friendlyname(pBag);
+			if(pBuffer)
+			{
+				friendlyName = pBuffer;
+				OPENSSL_free(pBuffer);
+			}
+			if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
+		}
+		else throw OpenSSLException("PKCS12Container::extractFriendlyName()");
+	}
+	else throw NullPointerException("PKCS12Container::extractFriendlyName()");
+
+	return friendlyName;
+}
+
+
 void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 {
 	if (pPKCS12)
@@ -132,30 +161,25 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 		{
 			if (pCert)
 			{
-				STACK_OF(PKCS12_SAFEBAG)* pBags = 0;
 				_pX509Cert.reset(new X509Certificate(pCert, true));
-				PKCS12_SAFEBAG* pBag = PKCS12_add_cert(&pBags, pCert);
-				if (pBag)
-				{
-					char* pBuffer = PKCS12_get_friendlyname(pBag);
-					if(pBuffer)
-					{
-						_pkcsFriendlyname = pBuffer;
-						OPENSSL_free(pBuffer);
-					}else _pkcsFriendlyname.clear();
-					if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
-				}
-				else throw OpenSSLException();
+				_pkcsFriendlyName = extractFriendlyName(pCert);
 			}
 			else _pX509Cert.reset();
 
 			_caCertList.clear();
+			_caCertNames.clear();
 			if (pCA)
 			{
 				int certCount = sk_X509_num(pCA);
 				for (int i = 0; i < certCount; ++i)
 				{
-					_caCertList.push_back(X509Certificate(sk_X509_value(pCA, i), true));
+					X509* pX509 = sk_X509_value(pCA, i);
+					if (pX509)
+					{
+						_caCertList.push_back(X509Certificate(pX509, true));
+						_caCertNames.push_back(extractFriendlyName(pX509));
+					}
+					else throw OpenSSLException("PKCS12Container::load()");
 				}
 			}
 		}
@@ -165,7 +189,8 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 		}
 		PKCS12_free(pPKCS12);
 		sk_X509_pop_free(pCA, X509_free);
-		X509_free(pCert);
+		if (pCert) X509_free(pCert);
+		poco_assert_dbg (_caCertList.size() == _caCertNames.size());
 	}
 	else
 	{

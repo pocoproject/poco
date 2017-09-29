@@ -87,7 +87,7 @@ void PKCS12ContainerTest::full(const PKCS12Container& pkcs12)
 
 	std::vector<int> certOrder;
 	for (int i = 0; i < 2; ++i) certOrder.push_back(i);
-	fullList(pkcs12.getCACerts(), certOrder);
+	fullList(pkcs12.getCACerts(), pkcs12.getFriendlyNamesCA(), certOrder);
 }
 
 
@@ -117,9 +117,18 @@ void PKCS12ContainerTest::fullCert(const X509Certificate& x509)
 }
 
 
-void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList, const std::vector<int>& certOrder)
+void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
+		const PKCS12Container::CANameList& caNamesList,
+		const std::vector<int>& certOrder)
 {
 	assert (certOrder.size() == caList.size());
+	assert ((0 == caNamesList.size()) || (certOrder.size() == caNamesList.size()));
+
+	if (caNamesList.size())
+	{
+		assert (caNamesList[certOrder[0]].empty());
+		assert (caNamesList[certOrder[1]].empty());
+	}
 
 	assert (caList[certOrder[0]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
 	assert (caList[certOrder[0]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
@@ -167,16 +176,28 @@ void PKCS12ContainerTest::certsOnly(const PKCS12Container& pkcs12)
 {
 	assert (!pkcs12.hasKey());
 	assert (!pkcs12.hasX509Certificate());
+	assert (pkcs12.getFriendlyName().empty());
 
 	std::vector<int> certOrder;
 	for (int i = 0; i < 5; ++i) certOrder.push_back(i);
-	certsOnlyList(pkcs12.getCACerts(), certOrder);
+	certsOnlyList(pkcs12.getCACerts(), pkcs12.getFriendlyNamesCA(), certOrder);
 }
 
 
-void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList, const std::vector<int>& certOrder)
+void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
+	const PKCS12Container::CANameList& caNamesList, const std::vector<int>& certOrder)
 {
 	assert (certOrder.size() == caList.size());
+	assert ((0 == caNamesList.size()) || (certOrder.size() == caNamesList.size()));
+
+	if (caNamesList.size())
+	{
+		assert (caNamesList[certOrder[0]].empty());
+		assert (caNamesList[certOrder[1]].empty());
+		assert (caNamesList[certOrder[2]].empty());
+		assert (caNamesList[certOrder[3]] == "vally-ca");
+		assert (caNamesList[certOrder[4]] == "vally-ca");
+	}
 
 	assert (caList[certOrder[0]].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
 	assert (caList[certOrder[0]].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
@@ -245,14 +266,14 @@ void PKCS12ContainerTest::testPEMReadWrite()
 		// PEM is written by openssl in reverse order from p12
 		std::vector<int> certOrder;
 		for(int i = (int)certsOnly.size() - 1; i >= 0; --i) certOrder.push_back(i);
-		certsOnlyList(certsOnly, certOrder);
+		certsOnlyList(certsOnly, PKCS12Container::CANameList(), certOrder);
 
 		TemporaryFile tmpFile;
 		X509Certificate::writePEM(tmpFile.path(), certsOnly);
 
 		certsOnly.clear();
 		certsOnly = X509Certificate::readPEM(tmpFile.path());
-		certsOnlyList(certsOnly, certOrder);
+		certsOnlyList(certsOnly, PKCS12Container::CANameList(), certOrder);
 
 		file = getTestFilesPath("full", "pem");
 		X509Certificate::List full = X509Certificate::readPEM(file);
@@ -263,14 +284,14 @@ void PKCS12ContainerTest::testPEMReadWrite()
 
 		certOrder.clear();
 		for(int i = (int)full.size() - 1; i >= 0; --i) certOrder.push_back(i);
-		fullList(full, certOrder);
+		fullList(full, PKCS12Container::CANameList(), certOrder);
 
 		TemporaryFile tmpFile2;
 		X509Certificate::writePEM(tmpFile2.path(), full);
 
 		full.clear();
 		full = X509Certificate::readPEM(tmpFile2.path());
-		fullList(full, certOrder);
+		fullList(full, PKCS12Container::CANameList(), certOrder);
 	}
 	catch (Poco::Exception& ex)
 	{

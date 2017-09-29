@@ -39,10 +39,14 @@ private:
 	std::string getTestFilesPath(const std::string& name,
 		const std::string& ext = "p12");
 	void certsOnly(const Poco::Crypto::PKCS12Container& pkcs12);
-	void certsOnlyList(const Poco::Crypto::PKCS12Container::CAList& caList, const std::vector<int>& certOrder);
+	void certsOnlyList(const Poco::Crypto::PKCS12Container::CAList& caList,
+		const Poco::Crypto::PKCS12Container::CANameList& caNamesList,
+		const std::vector<int>& certOrder);
 	void full(const Poco::Crypto::PKCS12Container& pkcs12);
 	void fullCert(const Poco::Crypto::X509Certificate& x509);
-	void fullList(const Poco::Crypto::PKCS12Container::CAList& caList, const std::vector<int>& certOrder);
+	void fullList(const Poco::Crypto::PKCS12Container::CAList& caList,
+		const Poco::Crypto::PKCS12Container::CANameList& caNamesList,
+		const std::vector<int>& certOrder);
 };
 
 
