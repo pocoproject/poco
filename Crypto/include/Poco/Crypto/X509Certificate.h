@@ -83,6 +83,13 @@ public:
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
+	long version() const;
+		/// Returns the version of the certificate.
+
+	const std::string& serialNumber() const;
+		/// Returns the certificate serial number as a
+		/// string in decimal encoding.
+
 	const std::string& issuerName() const;
 		/// Returns the certificate issuer's distinguished name. 
 		
@@ -144,6 +151,9 @@ public:
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
 
+	std::string signatureAlgorithm() const;
+		/// Returns the certificate signature algorithm long name.
+
 	void print(std::ostream& out) const;
 		/// Prints the certificate information to ostream.
 
@@ -174,6 +184,7 @@ private:
 	
 	std::string _issuerName;
 	std::string _subjectName;
+	std::string _serialNumber;
 	X509*       _pCert;
 	OpenSSLInitializer _openSSLInitializer;
 };
@@ -182,6 +193,22 @@ private:
 //
 // inlines
 //
+
+inline long X509Certificate::version() const
+{
+	// This is defined by standards (X.509 et al) to be
+	// one less than the certificate version.
+	// So, eg. a version 3 certificate will return 2.
+	return X509_get_version(_pCert) + 1;
+}
+
+
+inline const std::string& X509Certificate::serialNumber() const
+{
+	return _serialNumber;
+}
+
+
 inline const std::string& X509Certificate::issuerName() const
 {
 	return _issuerName;

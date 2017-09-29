@@ -102,7 +102,7 @@ void PKCS12ContainerTest::fullCert(const X509Certificate& x509)
 	std::string organizationName(x509.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
 	std::string organizationUnitName(x509.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
 	std::string emailAddress(x509.subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS));
-	std::string serialNumber(x509.subjectName(X509Certificate::NID_SERIAL_NUMBER));
+	std::string serialNumber(x509.serialNumber());
 
 	assert (subjectName == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Server");
 	assert (issuerName == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
@@ -113,7 +113,9 @@ void PKCS12ContainerTest::fullCert(const X509Certificate& x509)
 	assert (organizationName == "Crypto Vally");
 	assert (organizationUnitName.empty());
 	assert (emailAddress.empty());
-	assert (serialNumber.empty());
+	assert (serialNumber == "1000");
+	assert (x509.version() == 3);
+	assert (x509.signatureAlgorithm() == "sha256WithRSAEncryption");
 }
 
 
@@ -139,7 +141,9 @@ void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[0]].serialNumber() == "C3ECA1FCEAA16055");
+	assert (caList[certOrder[0]].version() == 3);
+	assert (caList[certOrder[0]].signatureAlgorithm() == "sha256WithRSAEncryption");
 
 	assert (caList[certOrder[1]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
 	assert (caList[certOrder[1]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
@@ -150,7 +154,9 @@ void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
 	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[1]].serialNumber() == "1000");
+	assert (caList[certOrder[1]].version() == 3);
+	assert (caList[certOrder[1]].signatureAlgorithm() == "sha256WithRSAEncryption");
 }
 
 
@@ -208,7 +214,9 @@ void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Let's Encrypt");
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[0]].serialNumber() == "D3B17226342332DCF40528512AEC9C6A");
+	assert (caList[certOrder[0]].version() == 3);
+	assert (caList[certOrder[0]].signatureAlgorithm() == "sha256WithRSAEncryption");
 
 	assert (caList[certOrder[1]].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
 	assert (caList[certOrder[1]].issuerName() == "/O=Digital Signature Trust Co./CN=DST Root CA X3");
@@ -219,7 +227,9 @@ void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Let's Encrypt");
 	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[1]].serialNumber() == "0A0141420000015385736A0B85ECA708");
+	assert (caList[certOrder[1]].version() == 3);
+	assert (caList[certOrder[1]].signatureAlgorithm() == "sha256WithRSAEncryption");
 
 	assert (caList[certOrder[2]].subjectName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
 	assert (caList[certOrder[2]].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
@@ -230,7 +240,9 @@ void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Internet Security Research Group");
 	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[2]].serialNumber() == "8210CFB0D240E3594463E0BB63828B00");
+	assert (caList[certOrder[2]].version() == 3);
+	assert (caList[certOrder[2]].signatureAlgorithm() == "sha256WithRSAEncryption");
 
 	assert (caList[certOrder[3]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
 	assert (caList[certOrder[3]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
@@ -241,7 +253,9 @@ void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
 	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[3]].serialNumber() == "C3ECA1FCEAA16055");
+	assert (caList[certOrder[3]].version() == 3);
+	assert (caList[certOrder[3]].signatureAlgorithm() == "sha256WithRSAEncryption");
 
 	assert (caList[certOrder[4]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
 	assert (caList[certOrder[4]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
@@ -252,7 +266,9 @@ void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
 	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
 	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
 	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[4]].serialNumber()== "1000");
+	assert (caList[certOrder[4]].version() == 3);
+	assert (caList[certOrder[4]].signatureAlgorithm() == "sha256WithRSAEncryption");
 }
 
 

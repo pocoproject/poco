@@ -6,6 +6,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
+include $(POCO_BASE)/build/script/openssl_ver
+
 # Note: linking order is important, do not change it.
 ifeq ($(POCO_CONFIG),FreeBSD)
 SYSLIBS += -lssl -lcrypto -lz

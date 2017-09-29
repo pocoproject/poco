@@ -77,6 +77,7 @@ X509Certificate::X509Certificate(X509* pCert, bool shared):
 X509Certificate::X509Certificate(const X509Certificate& cert):
 	_issuerName(cert._issuerName),
 	_subjectName(cert._subjectName),
+	_serialNumber(cert._serialNumber),
 	_pCert(cert._pCert)
 {
 	_pCert = X509_dup(_pCert);
@@ -96,6 +97,7 @@ void X509Certificate::swap(X509Certificate& cert)
 	using std::swap;
 	swap(cert._issuerName, _issuerName);
 	swap(cert._subjectName, _subjectName);
+	swap(cert._serialNumber, _serialNumber);
 	swap(cert._pCert, _pCert);
 }
 
@@ -199,6 +201,17 @@ void X509Certificate::init()
 	_issuerName = buffer;
 	X509_NAME_oneline(X509_get_subject_name(_pCert), buffer, sizeof(buffer));
 	_subjectName = buffer;
+	BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509*>(_pCert)), 0);
+	if (pBN)
+	{
+		char* pSN = BN_bn2hex(pBN);
+		if (pSN)
+		{
+			_serialNumber = pSN;
+			OPENSSL_free(pSN);
+		}
+		BN_free(pBN);
+	}
 }
 
 
@@ -293,6 +306,31 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 	X509* pCert = const_cast<X509*>(_pCert);
 	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
 	return X509_cmp(pCert, pOtherCert) == 0;
+}
+
+
+std::string X509Certificate::signatureAlgorithm() const
+{
+	int sigNID = NID_undef;
+
+#if (OPENSSL_VERSION_NUMBER >=  0x1010000fL)
+	sigNID = X509_get_signature_nid(_pCert);
+#else
+	poco_check_ptr(_pCert->sig_alg);
+	sigNID = OBJ_obj2nid(_pCert->sig_alg->algorithm);
+#endif
+
+	if (sigNID != NID_undef)
+	{
+		const char* pAlgName = OBJ_nid2ln(sigNID);
+		if (pAlgName) return std::string(pAlgName);
+		else throw OpenSSLException(Poco::format("X509Certificate::"
+				"signatureAlgorithm(): OBJ_nid2ln(%d)", sigNID));
+	}
+	else
+		throw NotFoundException("X509Certificate::signatureAlgorithm()");
+
+	return "";
 }
 
 
