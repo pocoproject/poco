@@ -204,9 +204,12 @@ void FTPClientSession::close()
 	try { logout(); }
 	catch(...){ }
 	_serverReady = false;
-	_pControlSocket->close();	
-	delete _pControlSocket;
-	_pControlSocket = 0;	
+	if (_pControlSocket)
+	{
+		_pControlSocket->close();
+		delete _pControlSocket;
+		_pControlSocket = 0;
+	}
 }
 
 
