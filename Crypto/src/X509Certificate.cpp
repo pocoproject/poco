@@ -347,18 +347,15 @@ void X509Certificate::print(std::ostream& out) const
 
 void X509Certificate::printAll(std::ostream& out) const
 {
-	//char * X509_NAME_oneline(const X509_NAME *a, char *buf, int size);
 	X509_NAME *subj = X509_get_subject_name(_pCert);
 
-	std::cout << "=====================" << std::endl;
 	for (int i = 0; i < X509_NAME_entry_count(subj); ++i)
 	{
 		X509_NAME_ENTRY* e = X509_NAME_get_entry(subj, i);
 		ASN1_STRING* d = X509_NAME_ENTRY_get_data(e);
 		unsigned char* str = ASN1_STRING_data(d);
-		std::cout << (char*) str << std::endl;
+		out << (char*) str << std::endl;
 	}
-	std::cout << "=====================" << std::endl;
 }
 
 
