@@ -11,11 +11,11 @@
 #include "PKCS12ContainerTest.h"
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
-#include "Poco/Crypto/X509Certificate.h"
-#include "Poco/Crypto/PKCS12Container.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -23,9 +23,11 @@
 
 using Poco::Crypto::PKCS12Container;
 using Poco::Crypto::X509Certificate;
+using Poco::Crypto::EVPPKey;
 using Poco::Environment;
 using Poco::Path;
 using Poco::File;
+using Poco::TemporaryFile;
 
 
 PKCS12ContainerTest::PKCS12ContainerTest(const std::string& name): CppUnit::TestCase(name)
@@ -46,7 +48,21 @@ void PKCS12ContainerTest::testFullPKCS12()
 		full(PKCS12Container(file, "crypto"));
 
 		std::ifstream ifs(file, std::ios::binary);
-		full(PKCS12Container(ifs, "crypto"));
+		PKCS12Container pkcs(ifs, "crypto");
+		full(pkcs);
+
+		PKCS12Container pkcs2(pkcs);
+		full(pkcs2);
+
+		PKCS12Container pkcs3(pkcs);
+		pkcs3 = pkcs2;
+		full(pkcs3);
+
+		pkcs3 = std::move(pkcs);
+		full(pkcs3);
+
+		PKCS12Container pkcs4(std::move(pkcs2));
+		full(pkcs4);
 	}
 	catch (Poco::Exception& ex)
 	{
@@ -61,9 +77,20 @@ void PKCS12ContainerTest::full(const PKCS12Container& pkcs12)
 	assert ("vally" == pkcs12.getFriendlyName());
 
 	assert (pkcs12.hasKey());
-	assert (pkcs12.hasX509Certificate());
-	X509Certificate x509 = pkcs12.getX509Certificate();
+	EVPPKey pKey = pkcs12.getKey();
+	assert (EVP_PKEY_RSA == pKey.type());
 
+	assert (pkcs12.hasX509Certificate());
+	fullCert(pkcs12.getX509Certificate());
+
+	std::vector<int> certOrder;
+	for (int i = 0; i < 2; ++i) certOrder.push_back(i);
+	fullList(pkcs12.getCACerts(), pkcs12.getFriendlyNamesCA(), certOrder);
+}
+
+
+void PKCS12ContainerTest::fullCert(const X509Certificate& x509)
+{
 	std::string subjectName(x509.subjectName());
 	std::string issuerName(x509.issuerName());
 	std::string commonName(x509.commonName());
@@ -85,31 +112,42 @@ void PKCS12ContainerTest::full(const PKCS12Container& pkcs12)
 	assert (organizationUnitName.empty());
 	assert (emailAddress.empty());
 	assert (serialNumber.empty());
+}
 
-	PKCS12Container::CAList caList = pkcs12.getCACerts();
-	assert (2 == caList.size());
 
-	assert (caList[0].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
-	assert (caList[0].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
-	assert (caList[0].commonName() == "CV Root CA v3");
-	assert (caList[0].subjectName(X509Certificate::NID_COUNTRY) == "CH");
-	assert (caList[0].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
-	assert (caList[0].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
-	assert (caList[0].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+void PKCS12ContainerTest::fullList(const PKCS12Container::CAList& caList,
+	const PKCS12Container::CANameList& caNamesList, const std::vector<int>& certOrder)
+{
+	assert (certOrder.size() == caList.size());
+	assert ((0 == caNamesList.size()) || (certOrder.size() == caNamesList.size()));
 
-	assert (caList[1].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
-	assert (caList[1].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
-	assert (caList[1].commonName() == "CV Intermediate CA v3");
-	assert (caList[1].subjectName(X509Certificate::NID_COUNTRY) == "CH");
-	assert (caList[1].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
-	assert (caList[1].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
-	assert (caList[1].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	if (caNamesList.size())
+	{
+		assert (caNamesList[certOrder[0]].empty());
+		assert (caNamesList[certOrder[1]].empty());
+	}
+
+	assert (caList[certOrder[0]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
+	assert (caList[certOrder[0]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
+	assert (caList[certOrder[0]].commonName() == "CV Root CA v3");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_COUNTRY) == "CH");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+
+	assert (caList[certOrder[1]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
+	assert (caList[certOrder[1]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
+	assert (caList[certOrder[1]].commonName() == "CV Intermediate CA v3");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_COUNTRY) == "CH");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
 }
 
 
@@ -118,9 +156,9 @@ void PKCS12ContainerTest::testCertsOnlyPKCS12()
 	try
 	{
 		std::string file = getTestFilesPath("certs-only");
-		certsOnly(PKCS12Container(file, "crypto"));
+		certsOnly(PKCS12Container(file.c_str(), "crypto"));
 
-		std::ifstream ifs(file, std::ios::binary);
+		std::ifstream ifs(file.c_str(), std::ios::binary);
 		certsOnly(PKCS12Container(ifs, "crypto"));
 	}
 	catch (Poco::Exception& ex)
@@ -135,66 +173,128 @@ void PKCS12ContainerTest::certsOnly(const PKCS12Container& pkcs12)
 {
 	assert (!pkcs12.hasKey());
 	assert (!pkcs12.hasX509Certificate());
+	assert (pkcs12.getFriendlyName().empty());
 
-	PKCS12Container::CAList caList = pkcs12.getCACerts();
+	std::vector<int> certOrder;
+	for (int i = 0; i < 5; ++i) certOrder.push_back(i);
+	certsOnlyList(pkcs12.getCACerts(), pkcs12.getFriendlyNamesCA(), certOrder);
+}
 
-	assert (5 == caList.size());
 
-	assert (caList[0].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
-	assert (caList[0].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
-	assert (caList[0].commonName() == "Let's Encrypt Authority X3");
-	assert (caList[0].subjectName(X509Certificate::NID_COUNTRY) == "US");
-	assert (caList[0].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_STATE_OR_PROVINCE).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Let's Encrypt");
-	assert (caList[0].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[0].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+void PKCS12ContainerTest::certsOnlyList(const PKCS12Container::CAList& caList,
+	const PKCS12Container::CANameList& caNamesList, const std::vector<int>& certOrder)
+{
+	assert (certOrder.size() == caList.size());
+	assert ((0 == caNamesList.size()) || (certOrder.size() == caNamesList.size()));
 
-	assert (caList[1].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
-	assert (caList[1].issuerName() == "/O=Digital Signature Trust Co./CN=DST Root CA X3");
-	assert (caList[1].commonName() == "Let's Encrypt Authority X3");
-	assert (caList[1].subjectName(X509Certificate::NID_COUNTRY) == "US");
-	assert (caList[1].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_STATE_OR_PROVINCE).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Let's Encrypt");
-	assert (caList[1].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[1].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	if (caNamesList.size())
+	{
+		assert (caNamesList[certOrder[0]].empty());
+		assert (caNamesList[certOrder[1]].empty());
+		assert (caNamesList[certOrder[2]].empty());
+		assert (caNamesList[certOrder[3]] == "vally-ca");
+		assert (caNamesList[certOrder[4]] == "vally-ca");
+	}
 
-	assert (caList[2].subjectName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
-	assert (caList[2].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
-	assert (caList[2].commonName() == "ISRG Root X1");
-	assert (caList[2].subjectName(X509Certificate::NID_COUNTRY) == "US");
-	assert (caList[2].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[2].subjectName(X509Certificate::NID_STATE_OR_PROVINCE).empty());
-	assert (caList[2].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Internet Security Research Group");
-	assert (caList[2].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[2].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[2].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[0]].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
+	assert (caList[certOrder[0]].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
+	assert (caList[certOrder[0]].commonName() == "Let's Encrypt Authority X3");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_COUNTRY) == "US");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Let's Encrypt");
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[0]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
 
-	assert (caList[3].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
-	assert (caList[3].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
-	assert (caList[3].commonName() == "CV Root CA v3");
-	assert (caList[3].subjectName(X509Certificate::NID_COUNTRY) == "CH");
-	assert (caList[3].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[3].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
-	assert (caList[3].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
-	assert (caList[3].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[3].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[3].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[1]].subjectName() == "/C=US/O=Let's Encrypt/CN=Let's Encrypt Authority X3");
+	assert (caList[certOrder[1]].issuerName() == "/O=Digital Signature Trust Co./CN=DST Root CA X3");
+	assert (caList[certOrder[1]].commonName() == "Let's Encrypt Authority X3");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_COUNTRY) == "US");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Let's Encrypt");
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[1]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
 
-	assert (caList[4].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
-	assert (caList[4].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
-	assert (caList[4].commonName() == "CV Intermediate CA v3");
-	assert (caList[4].subjectName(X509Certificate::NID_COUNTRY) == "CH");
-	assert (caList[4].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
-	assert (caList[4].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
-	assert (caList[4].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
-	assert (caList[4].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
-	assert (caList[4].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
-	assert (caList[4].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+	assert (caList[certOrder[2]].subjectName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
+	assert (caList[certOrder[2]].issuerName() == "/C=US/O=Internet Security Research Group/CN=ISRG Root X1");
+	assert (caList[certOrder[2]].commonName() == "ISRG Root X1");
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_COUNTRY) == "US");
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE).empty());
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Internet Security Research Group");
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[2]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
 
+	assert (caList[certOrder[3]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
+	assert (caList[certOrder[3]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
+	assert (caList[certOrder[3]].commonName() == "CV Root CA v3");
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_COUNTRY) == "CH");
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[3]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+
+	assert (caList[certOrder[4]].subjectName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Intermediate CA v3");
+	assert (caList[certOrder[4]].issuerName() == "/C=CH/ST=Zug/O=Crypto Vally/CN=CV Root CA v3");
+	assert (caList[certOrder[4]].commonName() == "CV Intermediate CA v3");
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_COUNTRY) == "CH");
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_LOCALITY_NAME).empty());
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == "Zug");
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_ORGANIZATION_NAME) == "Crypto Vally");
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME).empty());
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+	assert (caList[certOrder[4]].subjectName(X509Certificate::NID_SERIAL_NUMBER).empty());
+}
+
+
+void PKCS12ContainerTest::testPEMReadWrite()
+{
+	try
+	{
+		std::string file = getTestFilesPath("certs-only", "pem");
+		X509Certificate::List certsOnly = X509Certificate::readPEM(file);
+		assert (certsOnly.size() == 5);
+		// PEM is written by openssl in reverse order from p12
+		std::vector<int> certOrder;
+		for(int i = (int)certsOnly.size() - 1; i >= 0; --i) certOrder.push_back(i);
+		certsOnlyList(certsOnly, PKCS12Container::CANameList(), certOrder);
+
+		TemporaryFile tmpFile;
+		X509Certificate::writePEM(tmpFile.path(), certsOnly);
+
+		certsOnly.clear();
+		certsOnly = X509Certificate::readPEM(tmpFile.path());
+		certsOnlyList(certsOnly, PKCS12Container::CANameList(), certOrder);
+
+		file = getTestFilesPath("full", "pem");
+		X509Certificate::List full = X509Certificate::readPEM(file);
+		assert (full.size() == 3);
+		fullCert(full[0]);
+		full.erase(full.begin());
+		assert (full.size() == 2);
+
+		certOrder.clear();
+		for(int i = (int)full.size() - 1; i >= 0; --i) certOrder.push_back(i);
+		fullList(full, PKCS12Container::CANameList(), certOrder);
+
+		TemporaryFile tmpFile2;
+		X509Certificate::writePEM(tmpFile2.path(), full);
+
+		full.clear();
+		full = X509Certificate::readPEM(tmpFile2.path());
+		fullList(full, PKCS12Container::CANameList(), certOrder);
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
 }
 
 
@@ -208,10 +308,10 @@ void PKCS12ContainerTest::tearDown()
 }
 
 
-std::string PKCS12ContainerTest::getTestFilesPath(const std::string& name)
+std::string PKCS12ContainerTest::getTestFilesPath(const std::string& name, const std::string& ext)
 {
 	std::ostringstream ostr;
-	ostr << "data/" << name << ".p12";
+	ostr << "data/" << name << '.' << ext;
 	std::string fileName(ostr.str());
 	Poco::Path path(fileName);
 	if (Poco::File(path).exists())
@@ -220,7 +320,7 @@ std::string PKCS12ContainerTest::getTestFilesPath(const std::string& name)
 	}
 
 	ostr.str("");
-	ostr << "/Crypto/testsuite/data/" << name << ".p12";
+	ostr << "/Crypto/testsuite/data/" << name << '.' << ext;
 	fileName = Poco::Environment::get("POCO_BASE") + ostr.str();
 	path = fileName;
 
@@ -239,6 +339,7 @@ CppUnit::Test* PKCS12ContainerTest::suite()
 
 	CppUnit_addTest(pSuite, PKCS12ContainerTest, testFullPKCS12);
 	CppUnit_addTest(pSuite, PKCS12ContainerTest, testCertsOnlyPKCS12);
+	CppUnit_addTest(pSuite, PKCS12ContainerTest, testPEMReadWrite);
 
 	return pSuite;
 }

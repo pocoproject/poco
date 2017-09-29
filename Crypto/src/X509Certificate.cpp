@@ -13,9 +13,11 @@
 
 
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/Format.h"
 #include <sstream>
 #include <openssl/pem.h>
 #ifdef _WIN32
@@ -294,6 +296,40 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 }
 
 
+X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
+{
+	List caCertList;
+	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
+	if (pBIO == NULL) throw OpenFileException("X509Certificate::readPEM()");
+	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+	if (!x) throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
+	while(x)
+	{
+		caCertList.push_back(X509Certificate(x));
+		x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
+	}
+	BIO_free(pBIO);
+	return caCertList;
+}
+
+
+void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
+{
+	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "a");
+	if (pBIO == NULL) throw OpenFileException("X509Certificate::writePEM()");
+	List::const_iterator it = list.begin();
+	List::const_iterator end = list.end();
+	for (; it != end; ++it)
+	{
+		if (!PEM_write_bio_X509(pBIO, const_cast<X509*>(it->certificate())))
+		{
+			throw OpenSSLException("X509Certificate::writePEM()");
+		}
+	}
+	BIO_free(pBIO);
+}
+
+
 void X509Certificate::print(std::ostream& out) const
 {
 	out << "subjectName: " << subjectName() << std::endl;
@@ -306,6 +342,20 @@ void X509Certificate::print(std::ostream& out) const
 	out << "organizationUnitName: " << subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME) << std::endl;
 	out << "emailAddress: " << subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS) << std::endl;
 	out << "serialNumber: " << subjectName(X509Certificate::NID_SERIAL_NUMBER) << std::endl;
+}
+
+
+void X509Certificate::printAll(std::ostream& out) const
+{
+	X509_NAME *subj = X509_get_subject_name(_pCert);
+
+	for (int i = 0; i < X509_NAME_entry_count(subj); ++i)
+	{
+		X509_NAME_ENTRY* e = X509_NAME_get_entry(subj, i);
+		ASN1_STRING* d = X509_NAME_ENTRY_get_data(e);
+		unsigned char* str = ASN1_STRING_data(d);
+		out << (char*) str << std::endl;
+	}
 }
 
 

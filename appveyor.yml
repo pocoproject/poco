@@ -5,7 +5,7 @@ cache:
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
-  - C:\Program Files (x86)\PostgreSQL\9.4
+  - C:\Program Files (x86)\PostgreSQL\9.6
 
 
 branches:
@@ -33,7 +33,7 @@ services:
 # Server name: localhost
 # Server port: 5432
 # postgres account password: Password12!
-  - postgresql94
+  - postgresql
 
   
 image:
@@ -59,8 +59,8 @@ environment:
   MYSQL32ZIP:   mysql-5.7.18-win32.zip
   MYSQL32:      C:\mysql-5.7.18-win32
   MYSQL64:      C:\Program Files\MySql\MySQL Server 5.7
-  POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.4
-  POSTGRES64:   C:\Program Files\PostgreSQL\9.4
+  POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.6
+  POSTGRES64:   C:\Program Files\PostgreSQL\9.6
   OPENSSLURL:   https://slproweb.com/download
   OPENSSL32EXE: Win32OpenSSL-1_1_0f.exe
   OPENSSL64EXE: Win64OpenSSL-1_1_0f.exe
@@ -68,14 +68,12 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
   
   matrix:
-    - builder: cygwin
-
     - builder: msbuild
-      vsver: 150
+      vsver: 140
       linkmode: shared
 
     - builder: msbuild
-      vsver: 140
+      vsver: 150
       linkmode: shared
 
 #    - builder: msbuild
@@ -103,6 +101,8 @@ environment:
 
 #    - builder: cmake
 #      vsver: 140
+
+    - builder: cygwin
 
 matrix:
   fast_finish: true
@@ -240,14 +240,14 @@ install:
         {
           Write-Host "Installing $env:POSTGRES32 ..." -ForegroundColor Cyan
           Write-Host "Downloading..."
-          $exePath = "$($env:USERPROFILE)\postgresql-9.4.5-1-windows.exe"
-          (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.4.5-1-windows.exe', $exePath)
+          $exePath = "$($env:USERPROFILE)\postgresql-9.6.5-1-windows.exe"
+          (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.6.5-1-windows.exe', $exePath)
           Write-Host "Installing..."
           cmd /c start /wait $exePath --mode unattended --superpassword Password12!
           del $exePath
           Write-Host "Setting up services..."
-          Stop-Service postgresql-9.4
-          Set-Service -Name postgresql-9.4 -StartupType Manual
+          Stop-Service postgresql-9.6
+          Set-Service -Name postgresql-9.6 -StartupType Manual
           Write-Host "$env:POSTGRES32 installed" -ForegroundColor Green
         }
       }

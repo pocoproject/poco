@@ -70,6 +70,12 @@
     <Filter Include="X509Certificate\Source Files">
       <UniqueIdentifier>{d863807d-abe4-408b-8143-a4dfd71ec1f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FTPSClient">
+      <UniqueIdentifier>{7b591bb1-fe24-46a1-9600-61b8069af598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DialogServer">
+      <UniqueIdentifier>{b2da75be-6989-4126-9c5a-265a4f72fe23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HTTPSTestServer.h">
@@ -110,6 +116,15 @@
     </ClInclude>
     <ClInclude Include="src\X509CertificateTestSuite.h">
       <Filter>X509Certificate\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FTPSClientSessionTest.h">
+      <Filter>FTPSClient</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FTPSClientTestSuite.h">
+      <Filter>FTPSClient</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DialogServer.h">
+      <Filter>DialogServer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +169,15 @@
     </ClCompile>
     <ClCompile Include="src\X509CertificateTestSuite.cpp">
       <Filter>X509Certificate\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientSessionTest.cpp">
+      <Filter>FTPSClient</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientTestSuite.cpp">
+      <Filter>FTPSClient</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DialogServer.cpp">
+      <Filter>DialogServer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
