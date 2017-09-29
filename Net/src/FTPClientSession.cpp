@@ -75,13 +75,7 @@ FTPClientSession::FTPClientSession(const std::string& host,
 {
 	_pControlSocket->setReceiveTimeout(_timeout);
 	if (!username.empty())
-	{
 		login(username, password);
-	}
-	else
-	{
-		receiveServerReadyReply();
-	}
 }
 
 
