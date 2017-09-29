@@ -24,9 +24,6 @@
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #pragma message (OPENSSL_VERSION_TEXT)
-#elif defined (POCO_COMPILER_GCC)
-#pragma message OPENSSL_VERSION_TEXT
-// clang?
 #endif
 
 using Poco::RandomInputStream;
