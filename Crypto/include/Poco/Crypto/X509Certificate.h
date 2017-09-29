@@ -147,6 +147,9 @@ public:
 	void print(std::ostream& out) const;
 		/// Prints the certificate information to ostream.
 
+	void printAll(std::ostream& out) const;
+		/// Prints all the certificate names to ostream.
+
 	static List readPEM(const std::string& pemFileName);
 		/// Reads and returns a list of certificates from
 		/// the specified PEM file.

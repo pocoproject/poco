@@ -39,6 +39,7 @@ class Crypto_API PKCS12Container
 {
 public:
 	typedef X509Certificate::List CAList;
+	typedef std::vector<std::string> CANameList;
 
 	explicit PKCS12Container(std::istream& istr, const std::string& password = "");
 		/// Creates the PKCS12Container object from a stream.
@@ -80,8 +81,12 @@ public:
 	const std::string& getFriendlyName() const;
 		/// Returns the friendly name of the certificate bag.
 
+	const CANameList& getFriendlyNamesCA() const;
+		/// Returns a list of CA certificates friendly names.
+
 private:
 	void load(PKCS12* pPKCS12, const std::string& password = "");
+	std::string extractFriendlyName(X509* pCert);
 
 	typedef std::unique_ptr<X509Certificate> CertPtr;
 
@@ -89,7 +94,8 @@ private:
 	EVP_PKEY*          _pKey = 0;
 	CertPtr            _pX509Cert;
 	CAList             _caCertList;
-	std::string        _pkcsFriendlyname;
+	CANameList         _caCertNames;
+	std::string        _pkcsFriendlyName;
 };
 
 
@@ -113,13 +119,19 @@ inline const X509Certificate& PKCS12Container::getX509Certificate() const
 
 inline const std::string& PKCS12Container::getFriendlyName() const
 {
-	return _pkcsFriendlyname;
+	return _pkcsFriendlyName;
 }
 
 
 inline const PKCS12Container::CAList& PKCS12Container::getCACerts() const
 {
 	return _caCertList;
+}
+
+
+inline const PKCS12Container::CANameList& PKCS12Container::getFriendlyNamesCA() const
+{
+	return _caCertNames;
 }
 
 
