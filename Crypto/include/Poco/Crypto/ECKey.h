@@ -79,7 +79,6 @@ public:
 	ECKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
 
-
 	static std::string getCurveName(int nid = -1);
 		/// Returns elliptical curve name corresponding to
 		/// the given nid; if nid is not found, returns
@@ -88,6 +87,16 @@ public:
 		/// If nid is -1, returns first curve name.
 		///
 		/// If no curves are found, returns empty string;
+
+	static int getCurveNID(std::string& name);
+		/// Returns the NID of the specified curve.
+		///
+		/// If name is empty, returns the first curve NID
+		/// and updates the name accordingly.
+
+	static bool hasCurve(const std::string& name);
+		/// Returns true if the named curve is found,
+		/// false otherwise.
 
 private:
 	ECKeyImpl::Ptr _pImpl;
@@ -106,6 +115,18 @@ inline ECKeyImpl::Ptr ECKey::impl() const
 inline std::string ECKey::getCurveName(int nid)
 {
 	return ECKeyImpl::getCurveName(nid);
+}
+
+
+inline int ECKey::getCurveNID(std::string& name)
+{
+	return ECKeyImpl::getCurveNID(name);
+}
+
+
+inline bool ECKey::hasCurve(const std::string& name)
+{
+	return ECKeyImpl::hasCurve(name);
 }
 
 
