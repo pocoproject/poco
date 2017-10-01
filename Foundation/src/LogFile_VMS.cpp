@@ -1,8 +1,6 @@
 //
 // LogFile_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LogFile_VMS.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LogFile

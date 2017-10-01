@@ -1,8 +1,6 @@
 //
 // Decompress.cpp
 //
-// $Id: //poco/1.4/Zip/src/Decompress.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  Decompress
@@ -39,7 +37,7 @@ Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flatt
 {
 	_outDir.makeAbsolute();
 	_outDir.makeDirectory();
-	poco_assert (_in.good());
+	if (!_in.good()) throw Poco::IOException("Bad input stream");
 	Poco::File tmp(_outDir);
 	if (!tmp.exists())
 	{

@@ -1,8 +1,6 @@
 //
 // TCPServer.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/TCPServer.h#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServer
@@ -80,7 +78,7 @@ class Net_API TCPServer: public Poco::Runnable
 public:
 	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber = 0, TCPServerParams::Ptr pParams = 0);
 		/// Creates the TCPServer, with ServerSocket listening on the given port.
-		/// Default port is zero, allowing any availble port. The port number
+		/// Default port is zero, allowing any available port. The port number
 		/// can be queried through TCPServer::port() member.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory
@@ -188,6 +186,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline const ServerSocket& TCPServer::socket() const
 {
 	return _socket;

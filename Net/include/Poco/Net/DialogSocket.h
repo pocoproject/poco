@@ -1,8 +1,6 @@
 //
 // DialogSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/DialogSocket.h#2 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DialogSocket
@@ -22,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/StreamSocket.h"
+#include <cstdlib>
 
 
 namespace Poco {
@@ -80,7 +79,7 @@ public:
 
 	DialogSocket& operator = (const DialogSocket& socket);
 		/// Assignment operator.
-
+		
 	void sendByte(unsigned char ch);
 		/// Sends a single byte over the socket connection.
 
@@ -189,13 +188,14 @@ public:
 protected:
 	void allocBuffer();
 	void refill();
-	bool receiveLine(std::string& line);
-	int receiveStatusLine(std::string& line);
+	bool receiveLine(std::string& line, std::size_t lineLengthLimit = 0);
+	int receiveStatusLine(std::string& line, std::size_t lineLengthLimit = 0);
 
 private:
 	enum
 	{
 		RECEIVE_BUFFER_SIZE = 1024,
+		MAX_LINE_LENGTH     = 4096,
 		EOF_CHAR            = -1
 	};
 	

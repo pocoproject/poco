@@ -1,8 +1,6 @@
 //
 // Base32Test.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/Base32Test.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

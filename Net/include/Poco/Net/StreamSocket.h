@@ -1,8 +1,6 @@
 //
 // StreamSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/StreamSocket.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  StreamSocket
@@ -111,7 +109,7 @@ public:
 
 	int sendBytes(Poco::FIFOBuffer& buffer);
 		/// Sends the contents of the given buffer through
-		/// the socket. FIFOBuffer has writable/readable transiton
+		/// the socket. FIFOBuffer has writable/readable transition
 		/// notifications which may be enabled to notify the caller when
 		/// the buffer transitions between empty, partially full and
 		/// full states.
@@ -137,7 +135,7 @@ public:
 	int receiveBytes(Poco::FIFOBuffer& buffer);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received. FIFOBuffer has 
-		/// writable/readable transiton notifications which may be enabled 
+		/// writable/readable transition notifications which may be enabled 
 		/// to notify the caller when the buffer transitions between empty, 
 		/// partially full and full states.
 		///

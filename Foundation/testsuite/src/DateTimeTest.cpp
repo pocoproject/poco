@@ -1,8 +1,6 @@
 //
 // DateTimeTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -847,6 +845,15 @@ void DateTimeTest::testUTC()
 }
 
 
+void DateTimeTest::testLeapSeconds()
+{
+	DateTime dt1(2015, 6, 30, 23, 59, 60);
+	DateTime dt2(2015, 7,  1,  0,  0,  0);
+	
+	assert (dt1 == dt2);
+}
+
+
 void DateTimeTest::setUp()
 {
 }
@@ -878,6 +885,7 @@ CppUnit::Test* DateTimeTest::suite()
 	CppUnit_addTest(pSuite, DateTimeTest, testDayOfWeek);
 	CppUnit_addTest(pSuite, DateTimeTest, testIncrementDecrement);
 	CppUnit_addTest(pSuite, DateTimeTest, testUTC);
+	CppUnit_addTest(pSuite, DateTimeTest, testLeapSeconds);
 
 	return pSuite;
 }

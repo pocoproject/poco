@@ -1,8 +1,6 @@
 //
 // TestDecorator.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestDecorator.cpp#1 $
-//
 
 
 #include "CppUnit/TestDecorator.h"

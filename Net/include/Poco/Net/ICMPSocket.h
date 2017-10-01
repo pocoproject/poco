@@ -1,8 +1,6 @@
 //
 // ICMPSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPSocket.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocket
@@ -42,7 +40,7 @@ public:
 	ICMPSocket(const Socket& socket);
 		/// Creates the ICMPSocket with the SocketImpl
 		/// from another socket. The SocketImpl must be
-		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
+		/// a ICMPSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
 	~ICMPSocket();
@@ -80,37 +78,11 @@ public:
 protected:
 	ICMPSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
-		/// The socket takes owership of the SocketImpl.
+		/// The socket takes ownership of the SocketImpl.
 		///
 		/// The SocketImpl must be a ICMPSocketImpl, otherwise
 		/// an InvalidArgumentException will be thrown.
-
-private:
-	int _dataSize; 
-	int _ttl;
-	int _timeout;
 };
-
-
-//
-// inlines
-//
-inline int ICMPSocket::dataSize() const
-{
-	return _dataSize;
-}
-
-
-inline int ICMPSocket::ttl() const
-{
-	return _ttl;
-}
-
-
-inline int ICMPSocket::timeout() const
-{
-	return _timeout;
-}
 
 
 } } // namespace Poco::Net

@@ -1,8 +1,6 @@
 //
 // LogRotation.cpp
 //
-// $Id: LogRotation.cpp 580 2008-06-01 20:56:01Z ryppka $
-//
 // This class demonstrates the Log rotation feature.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

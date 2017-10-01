@@ -1,8 +1,6 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/Main/Data/src/RecordSet.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RecordSet
@@ -41,7 +39,6 @@ RecordSet::RecordSet(const Statement& rStatement,
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(0),
 	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
@@ -55,7 +52,6 @@ RecordSet::RecordSet(Session& rSession,
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(0),
 	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
@@ -70,7 +66,6 @@ RecordSet::RecordSet(const RecordSet& other):
 	_pFilter(other._pFilter),
 	_totalRowCount(other._totalRowCount)
 {
-	if (_pFilter) _pFilter->duplicate();
 }
 
 
@@ -80,7 +75,6 @@ RecordSet::~RecordSet()
 	{
 		delete _pBegin;
 		delete _pEnd;
-		if (_pFilter) _pFilter->release();
 
 		RowMap::iterator it = _rowMap.begin();
 		RowMap::iterator end = _rowMap.end();
@@ -253,8 +247,7 @@ bool RecordSet::moveFirst()
 			return true;
 		}
 
-		std::size_t currentRow = _currentRow;
-		currentRow = 0;
+		std::size_t currentRow = 0;
 		while (!isAllowed(currentRow))
 		{
 			if (currentRow >= subTotalRowCount() - 1) return false;
@@ -300,8 +293,7 @@ bool RecordSet::moveLast()
 {
 	if (subTotalRowCount() > 0)
 	{
-		std::size_t currentRow = _currentRow;
-		currentRow = subTotalRowCount() - 1;
+		std::size_t currentRow = subTotalRowCount() - 1;
 		if (!isFiltered())
 		{
 			_currentRow = currentRow;
@@ -379,11 +371,9 @@ std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t 
 }
 
 
-void RecordSet::filter(RowFilter* pFilter)
+void RecordSet::filter(const Poco::AutoPtr<RowFilter>& pFilter)
 {
-	if (_pFilter) _pFilter->release();
 	_pFilter = pFilter;
-	if (_pFilter) _pFilter->duplicate();
 }
 
 

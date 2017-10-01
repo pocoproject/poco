@@ -1,8 +1,6 @@
 //
 // LoggingConfigurator.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/LoggingConfigurator.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  LoggingConfigurator
@@ -38,7 +36,7 @@ class Util_API LoggingConfigurator
 	///
 	/// The LoggingConfigurator sets up and connects formatters, channels 
 	/// and loggers. To accomplish its work, the LoggingConfigurator relies on the
-	/// functionality provided by the LoggingFactory und LoggingRegistry classes.
+	/// functionality provided by the LoggingFactory and LoggingRegistry classes.
 	///
 	/// The LoggingConfigurator expects all configuration data to be under a root
 	/// property named "logging".

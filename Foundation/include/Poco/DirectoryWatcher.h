@@ -1,8 +1,6 @@
 //
 // DirectoryWatcher.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryWatcher.h#2 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryWatcher

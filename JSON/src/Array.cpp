@@ -26,14 +26,54 @@ namespace Poco {
 namespace JSON {
 
 
-Array::Array()
+Array::Array(): _modified(false)
 {
 }
 
 
-Array::Array(const Array& copy) : _values(copy._values)
+Array::Array(const Array& other) : _values(other._values),
+	_pArray(other._pArray),
+	_modified(other._modified)
 {
 }
+
+
+Array &Array::operator=(const Array& other)
+{
+	if (&other != this)
+	{
+		_values = other._values;
+		_pArray = other._pArray;
+		_modified = other._modified;
+	}
+	return *this;
+}
+
+#ifdef POCO_ENABLE_CPP11
+
+
+Array::Array(Array&& other) :
+	_values(std::move(other._values)),
+	_pArray(!other._modified ? other._pArray : 0),
+	_modified(other._modified)
+{
+	_pArray = 0;
+}
+
+Array &Array::operator= (Array&& other)
+{
+	if (&other != this)
+	{
+		_values = std::move(other._values);
+		_pArray = other._pArray;
+		other._pArray = 0;
+		_modified = other._modified;
+	}
+	return *this;
+}
+
+
+#endif // POCO_ENABLE_CPP11
 
 
 Array::~Array()
@@ -48,7 +88,7 @@ Var Array::get(unsigned int index) const
 	{
 		value = _values.at(index);
 	}
-	catch(std::out_of_range&)
+	catch (std::out_of_range&)
 	{
 		//Ignore, we return an empty value
 	}
@@ -61,7 +101,7 @@ Array::Ptr Array::getArray(unsigned int index) const
 	Array::Ptr result;
 
 	Var value = get(index);
-	if ( value.type() == typeid(Array::Ptr) )
+	if (value.type() == typeid(Array::Ptr))
 	{
 		result = value.extract<Array::Ptr>();
 	}
@@ -74,7 +114,7 @@ Object::Ptr Array::getObject(unsigned int index) const
 	Object::Ptr result;
 
 	Var value = get(index);
-	if ( value.type() == typeid(Object::Ptr) )
+	if (value.type() == typeid(Object::Ptr))
 	{
 		result = value.extract<Object::Ptr>();
 	}
@@ -84,7 +124,7 @@ Object::Ptr Array::getObject(unsigned int index) const
 
 bool Array::isNull(unsigned int index) const
 {
-	if ( index < _values.size() )
+	if (index < _values.size())
 	{
 		Dynamic::Var value = _values[index];
 		return value.isEmpty();
@@ -122,11 +162,11 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 
 	for (ValueVec::const_iterator it = _values.begin(); it != _values.end();)
 	{
-		for(int i = 0; i < indent; i++) out << ' ';
+		for (int i = 0; i < indent; i++) out << ' ';
 
 		Stringifier::stringify(*it, out, indent + step, step);
 
-		if ( ++it != _values.end() )
+		if (++it != _values.end())
 		{
 			out << ",";
 			if (step > 0) out << '\n';
@@ -144,13 +184,26 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 }
 
 
-Array::operator const Poco::Dynamic::Array& () const
+void Array::resetDynArray() const
 {
 	if (!_pArray)
+		_pArray = new Poco::Dynamic::Array;
+	else
+		_pArray->clear();
+}
+
+
+Array::operator const Poco::Dynamic::Array& () const
+{
+	if (!_values.size())
+	{
+		resetDynArray();
+	}
+	else if (_modified)
 	{
 		ValueVec::const_iterator it = _values.begin();
 		ValueVec::const_iterator end = _values.end();
-		_pArray = new Poco::Dynamic::Array;
+		resetDynArray();
 		int index = 0;
 		for (; it != end; ++it, ++index)
 		{
@@ -167,6 +220,7 @@ Array::operator const Poco::Dynamic::Array& () const
 				_pArray->insert(_pArray->end(), *it);
 			}
 		}
+		_modified = false;
 	}
 
 	return *_pArray;

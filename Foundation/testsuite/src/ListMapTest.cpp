@@ -1,8 +1,6 @@
 //
 // ListMapTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ListMapTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

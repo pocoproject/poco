@@ -1,8 +1,6 @@
 //
 // CipherKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKeyImpl.h#3 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKeyImpl
@@ -56,7 +54,8 @@ public:
 	CipherKeyImpl(const std::string& name, 
 		const std::string& passphrase, 
 		const std::string& salt,
-		int iterationCount);
+		int iterationCount,
+		const std::string& digest);
 		/// Creates a new CipherKeyImpl object, using
 		/// the given cipher name, passphrase, salt value
 		/// and iteration count.
@@ -118,6 +117,7 @@ private:
 
 private:
 	const EVP_CIPHER*  _pCipher;
+	const EVP_MD*      _pDigest;
 	std::string	       _name;
 	ByteVec		       _key;
 	ByteVec		       _iv;

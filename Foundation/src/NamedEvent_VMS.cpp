@@ -1,8 +1,6 @@
 //
 // NamedEvent_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedEvent_VMS.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent

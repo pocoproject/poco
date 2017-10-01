@@ -1,9 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#8 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteStatementImpl
 //
@@ -273,7 +271,10 @@ std::size_t SQLiteStatementImpl::next()
 		}
 		_stepCalled = false;
 		if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
-		_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
+		if (extracts.begin() != extracts.end())
+		{
+			_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
+		}
 	}
 	else if (SQLITE_DONE == _nextResponse)
 	{

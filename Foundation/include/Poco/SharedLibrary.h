@@ -1,8 +1,6 @@
 //
 // SharedLibrary.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedLibrary.h#3 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -122,7 +120,9 @@ public:
 		/// Returns the platform-specific filename suffix
 		/// for shared libraries (including the period).
 		/// In debug mode, the suffix also includes a
-		/// "d" to specify the debug version of a library.
+		/// "d" to specify the debug version of a library
+		/// (e.g., "d.so", "d.dll") unless the library has 
+		/// been compiled with -DPOCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX.
 		
 private:
 	SharedLibrary(const SharedLibrary&);

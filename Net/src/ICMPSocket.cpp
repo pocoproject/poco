@@ -1,8 +1,6 @@
 //
 // ICMPSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPSocket.cpp#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocket
@@ -27,10 +25,7 @@ namespace Net {
 
 
 ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout): 
-	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout)),
-	_dataSize(dataSize), 
-	_ttl(ttl),
-	_timeout(timeout)
+	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout))
 {
 }
 
@@ -75,6 +70,24 @@ int ICMPSocket::sendTo(const SocketAddress& address, int flags)
 int ICMPSocket::receiveFrom(SocketAddress& address, int flags)
 {
 	return impl()->receiveFrom(0, 0, address, flags);
+}
+
+
+int ICMPSocket::dataSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->dataSize();
+}
+
+
+int ICMPSocket::ttl() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->ttl();
+}
+
+
+int ICMPSocket::timeout() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->timeout();
 }
 
 

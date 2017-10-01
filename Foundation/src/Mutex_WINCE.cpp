@@ -1,8 +1,6 @@
 //
 // Mutex_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex_WINCE.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex

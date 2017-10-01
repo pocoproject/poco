@@ -1,8 +1,6 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#5 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel

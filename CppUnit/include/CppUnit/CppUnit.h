@@ -1,8 +1,6 @@
 //
 // CppUnit.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/CppUnit.h#1 $
-//
 
 
 #ifndef CppUnit_CppUnit_INCLUDED

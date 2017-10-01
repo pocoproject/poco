@@ -29,54 +29,54 @@ namespace MongoDB {
 
 
 class MongoDB_API MessageHeader
-	/// Represents the header which is always prepended to a request
-	/// or response of MongoDB
+	/// Represents the message header which is always prepended to a 
+	/// MongoDB request or response message.
 {
 public:
 	static const unsigned int MSG_HEADER_SIZE = 16;
 
-	typedef enum
+	enum OpCode
 	{
-		  Reply = 1
-		, Msg = 1000
-		, Update = 2001
-		, Insert = 2002
-		, Query = 2004
-		, GetMore = 2005
-		, Delete = 2006
-		, KillCursors = 2007
-	} OpCode;
+		OP_REPLY = 1,
+		OP_MSG = 1000,
+		OP_UPDATE = 2001,
+		OP_INSERT = 2002,
+		OP_QUERY = 2004,
+		OP_GET_MORE = 2005,
+		OP_DELETE = 2006,
+		OP_KILL_CURSORS = 2007
+	};
+
+	explicit MessageHeader(OpCode);
+		/// Creates the MessageHeader using the given OpCode.
 
 	virtual ~MessageHeader();
-		/// Destructor
+		/// Destroys the MessageHeader.
 
 	void read(BinaryReader& reader);
-		/// Reads the header
+		/// Reads the header using the given BinaryReader.
 
 	void write(BinaryWriter& writer);
-		/// Writes the header
+		/// Writes the header using the given BinaryWriter.
 
 	Int32 getMessageLength() const;
-		/// Returns the message length
+		/// Returns the message length.
 
 	OpCode opCode() const;
-		/// Returns the OpCode
+		/// Returns the OpCode.
 
 	Int32 getRequestID() const;
-		/// Returns the request id of the current message
+		/// Returns the request ID of the current message.
 
 	void setRequestID(Int32 id);
-		/// Sets the request id of the current message
+		/// Sets the request ID of the current message.
 
 	Int32 responseTo() const;
 		/// Returns the request id from the original request. 
 
 private:
-	MessageHeader(OpCode opcode);
-		/// Constructor.
-
 	void setMessageLength(Int32 length);
-		/// Sets the message length
+		/// Sets the message length.
 
 	Int32 _messageLength;
 	Int32 _requestID;
@@ -87,6 +87,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline MessageHeader::OpCode MessageHeader::opCode() const
 {
 	return _opCode;
@@ -126,4 +129,4 @@ inline Int32 MessageHeader::responseTo() const
 } } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_MessageHeader_INCLUDED
+#endif // MongoDB_MessageHeader_INCLUDED

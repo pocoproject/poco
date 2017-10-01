@@ -1,8 +1,6 @@
 //
 // Windows1250Encoding.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Windows1250Encoding.h#2 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  Windows1250Encoding

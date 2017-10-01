@@ -1,8 +1,6 @@
 //
 // CryptoTransform.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CryptoTransform.cpp#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CryptoTransform

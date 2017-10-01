@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/rules/global#1 $
-#
 # global
 #
 # Global build configuration
@@ -276,7 +274,7 @@ endif
 #
 # Compose compiler flags
 #
-COMMONFLAGS = -DPOCO_BUILD_HOST=$(HOSTNAME) -DPOCO_TARGET_OSNAME=$(OSNAME) -DPOCO_TARGET_OSARCH=$(OSARCH) $(POCO_FLAGS)
+COMMONFLAGS = -DPOCO_BUILD_HOST='"'$(HOSTNAME)'"' -DPOCO_TARGET_OSNAME='"'$(OSNAME)'"' -DPOCO_TARGET_OSARCH='"'$(OSARCH)'"' $(POCO_FLAGS)
 CFLAGS     += $(COMMONFLAGS) $(SYSFLAGS)
 CXXFLAGS   += $(COMMONFLAGS) $(SYSFLAGS)
 LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)

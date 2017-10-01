@@ -1,8 +1,6 @@
 //
 // PooledSessionHolder.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/PooledSessionHolder.h#1 $
-//
 // Library: Data
 // Package: SessionPooling
 // Module:  PooledSessionHolder

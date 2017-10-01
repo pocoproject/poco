@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/rules/dylib#1 $
-#
 # dylib
 #
 # Rule definitions for building dynamically loadable shared libraries

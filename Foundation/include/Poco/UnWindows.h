@@ -1,8 +1,6 @@
 //
 // UnWindows.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UnWindows.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  UnWindows

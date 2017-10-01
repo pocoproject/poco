@@ -1,8 +1,6 @@
 //
 // BufferedBidirectionalStreamBuf.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BufferedBidirectionalStreamBuf.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamBuf

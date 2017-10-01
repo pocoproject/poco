@@ -1,9 +1,7 @@
 //
 // SQLite.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLite.h#3 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLite
 //

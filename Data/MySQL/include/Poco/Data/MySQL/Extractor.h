@@ -1,9 +1,7 @@
 //
 // Extractor.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/Extractor.h#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Extractor
 //

@@ -1,8 +1,6 @@
 //
 // Tuple.cpp
 //
-// $Id: //poco/Main/Data/samples/Tuple/src/Tuple.cpp#1 $
-//
 // This sample demonstrates the Data library.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

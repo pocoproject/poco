@@ -1,8 +1,6 @@
 //
 // VarTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.h#2 $
-//
 // Tests for Any types
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -67,6 +65,7 @@ public:
 	void testJSONDeserializePrimitives();
 	void testJSONDeserializeArray();
 	void testJSONDeserializeStruct();
+	void testJSONRoundtripStruct(); 
 	void testJSONDeserializeComplex();
 	void testDate();
 	void testEmpty();
@@ -133,9 +132,17 @@ private:
 		assert (!std::numeric_limits<TU>::is_signed);
 
 		TS iMin = std::numeric_limits<TS>::min();
-		Poco::Dynamic::Var da = iMin;
-		try { TU i; i = da.convert<TU>(); fail("must fail"); }
+		Poco::Dynamic::Var dMin = iMin;
+		try { TU i; i = dMin.convert<TU>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
+
+		if(sizeof(TS) == sizeof(TU))
+		{
+			TU iMax = std::numeric_limits<TU>::max();
+			Poco::Dynamic::Var dMax = iMax;
+			try { TS i; i = dMax.convert<TS>(); fail("must fail"); }
+			catch (Poco::RangeException&) {}
+		}
 	}
 
 	template<typename TL, typename TS>

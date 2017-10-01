@@ -1,8 +1,6 @@
 //
 // NamedEvent_WIN32U.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedEvent_WIN32U.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent

@@ -1,8 +1,6 @@
 //
 // MailMessage.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MailMessage.h#2 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailMessage
@@ -207,7 +205,7 @@ public:
 		const std::string& mediaType,
 		const std::string& filename = "");
 		/// Returns either default StringPartSource part store or, 
-		/// if the part store factory was provided during contruction,
+		/// if the part store factory was provided during construction,
 		/// the one created by PartStoreFactory.
 		/// Returned part store is allocated on the heap; it is caller's 
 		/// responsibility to delete it after use. Typical use is handler 

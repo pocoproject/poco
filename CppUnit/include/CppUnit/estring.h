@@ -1,8 +1,6 @@
 //
 // estring.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/estring.h#1 $
-//
 
 
 #ifndef CppUnit_estring_INCLUDED

@@ -1,8 +1,6 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#1 $
-//
 // This sample demonstrates the NotificationQueue, ThreadPool,
 // FastMutex and ScopedLock classes.
 //

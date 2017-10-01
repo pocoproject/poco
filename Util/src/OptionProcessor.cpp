@@ -1,8 +1,6 @@
 //
 // OptionProcessor.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionProcessor.cpp#2 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionProcessor

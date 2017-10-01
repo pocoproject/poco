@@ -1,8 +1,6 @@
 //
 // Timezone_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_UNIX.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timezone

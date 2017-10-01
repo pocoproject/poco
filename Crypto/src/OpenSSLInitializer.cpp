@@ -1,8 +1,6 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#3 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  OpenSSLInitializer
@@ -24,7 +22,9 @@
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
 #include <openssl/conf.h>
 #endif
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#pragma message (OPENSSL_VERSION_TEXT)
+#endif
 
 using Poco::RandomInputStream;
 using Poco::Thread;

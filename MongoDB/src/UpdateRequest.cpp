@@ -7,8 +7,6 @@
 // Package: MongoDB
 // Module:  UpdateRequest
 //
-// Implementation of the UpdateRequest class.
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,8 +21,8 @@ namespace Poco {
 namespace MongoDB {
 
 
-UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::Flags flags) 
-	: RequestMessage(MessageHeader::Update), 
+UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::Flags flags):
+	RequestMessage(MessageHeader::OP_UPDATE), 
 	_flags(flags),
 	_fullCollectionName(collectionName),
 	_selector(),

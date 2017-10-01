@@ -1,8 +1,6 @@
 //
 // Statement.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#18 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Statement

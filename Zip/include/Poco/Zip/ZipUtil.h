@@ -1,8 +1,6 @@
 //
 // ZipUtil.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipUtil.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipUtil

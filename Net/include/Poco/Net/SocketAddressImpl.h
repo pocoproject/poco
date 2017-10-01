@@ -1,8 +1,6 @@
 //
 // SocketAddressImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketAddressImpl.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketAddressImpl
@@ -71,7 +69,7 @@ public:
 	poco_socklen_t length() const;
 	const struct sockaddr* addr() const;
 	int af() const;
-	Family family() const;
+	IPAddress::Family family() const;
 	std::string toString() const;
 
 private:

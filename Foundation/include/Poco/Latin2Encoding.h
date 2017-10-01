@@ -1,8 +1,6 @@
 //
 // Latin2Encoding.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Latin2Encoding.h#2 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  Latin2Encoding

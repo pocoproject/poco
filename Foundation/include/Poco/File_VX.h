@@ -1,8 +1,6 @@
 //
 // File_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/File_VX.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File

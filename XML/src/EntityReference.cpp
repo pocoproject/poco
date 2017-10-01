@@ -1,8 +1,6 @@
 //
 // EntityReference.cpp
 //
-// $Id: //poco/1.4/XML/src/EntityReference.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

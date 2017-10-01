@@ -1,8 +1,6 @@
 //
 // SSLManager.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager
@@ -18,6 +16,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
 #include "Poco/Util/Application.h"
@@ -120,7 +119,17 @@ Context::Ptr SSLManager::defaultClientContext()
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
 	if (!_ptrDefaultClientContext)
-		initDefaultContext(false);
+	{
+		try
+		{
+			initDefaultContext(false);
+		} 
+		catch (Poco::IllegalStateException&)
+		{
+			_ptrClientCertificateHandler = new RejectCertificateHandler(false);
+			_ptrDefaultClientContext = new Context(Context::CLIENT_USE, "");
+		}
+	}
 
 	return _ptrDefaultClientContext;
 }

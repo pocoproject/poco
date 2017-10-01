@@ -1,8 +1,6 @@
 //
 // PDF.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/PDF.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  PDF

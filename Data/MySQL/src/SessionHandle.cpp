@@ -1,9 +1,7 @@
 //
 // SesssionHandle.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionHandle.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionHandle
 //
@@ -150,8 +148,17 @@ void SessionHandle::close()
 
 void SessionHandle::startTransaction()
 {
-	if (mysql_autocommit(_pHandle, false) != 0)
-		throw TransactionException("Start transaction failed.", _pHandle);
+	int rc = mysql_autocommit(_pHandle, false);
+	if (rc != 0)
+	{
+		// retry if connection lost
+		int err = mysql_errno(_pHandle);
+		if (err == 2006 /* CR_SERVER_GONE_ERROR */ || err == 2013 /* CR_SERVER_LOST */)
+		{
+			rc = mysql_autocommit(_pHandle, false);
+		}
+	}
+	if (rc != 0) throw TransactionException("Start transaction failed.", _pHandle);
 }
 
 

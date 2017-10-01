@@ -1,8 +1,6 @@
 //
 // CodeWriter.h
 //
-// $Id: //poco/1.4/PageCompiler/src/CodeWriter.h#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -67,6 +65,7 @@ protected:
 	void handlerClass(std::ostream& ostr, const std::string& base, const std::string& ctorArg);
 	void factoryClass(std::ostream& ostr, const std::string& base);
 	void factoryImpl(std::ostream& ostr, const std::string& arg);
+	std::string cleanupHandler(std::string handler);
 
 private:
 	CodeWriter();

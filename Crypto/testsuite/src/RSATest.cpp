@@ -1,8 +1,6 @@
 //
 // RSATest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/RSATest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
