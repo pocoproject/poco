@@ -441,7 +441,7 @@ build_script:
         {
             $generator = "Visual Studio 15 2017"
         }
-        $defs =' -G'$generator;
+        $defs =" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
         if ($env:platform -eq "x64")
         {
