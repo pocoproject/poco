@@ -96,11 +96,11 @@ environment:
 #      vsver: 150
 #      linkmode: static_mt
 
-#    - builder: cmake
-#      vsver: 120
+    - builder: cmake
+      vsver: 140
 
-#    - builder: cmake
-#      vsver: 140
+    - builder: cmake
+      vsver: 150
 
     - builder: cygwin
 
