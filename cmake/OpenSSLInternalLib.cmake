@@ -1,7 +1,7 @@
 # warning: this must be defined before target, otherwise
 # the link_directories() directive is ignored
 if(MSVC AND USING_INTERNAL_OPENSSL)
-  message(STATUS "Crypto: using internal OpenSSL from ${OPENSSL_ROOT_DIR}")
+  message(STATUS "${LIBNAME}: using internal OpenSSL from ${OPENSSL_ROOT_DIR}")
 
   if(POCO_STATIC)
     set(POCO_WIN_LIB_DIR "lib")
