@@ -435,8 +435,11 @@ build_script:
         }
         $defs =' -G"NMake Makefiles"';
         $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
-        $defs+=" -DOPENSSL_ROOT_DIR=$openssl";
-        $defs+=" -DENABLE_NETSSL=OFF";
+        if ($env:platform -eq "x64")
+        {
+            $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
+        }
+        $defs+=" -DENABLE_NETSSL=ON";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
         $defs+=" -DENABLE_DATA_MYSQL=OFF";
         $defs+=" -DENABLE_REDIS=OFF";
