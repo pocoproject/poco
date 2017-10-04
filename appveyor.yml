@@ -443,7 +443,7 @@ build_script:
         }
         $defs = "--config RelWithDebInfo"
         $defs+=" -G" + $generator;
-        $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
+        $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
         if ($env:vsver -eq "150")
         {
             $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
