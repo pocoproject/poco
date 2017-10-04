@@ -441,9 +441,10 @@ build_script:
         {
             $generator = '"Visual Studio 15 2017"'
         }
-        $defs =" -G" + $generator;
+        $defs = "--config RelWithDebInfo"
+        $defs+=" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
-        if ($env:vsver -eq "140")
+        if ($env:vsver -eq "150")
         {
             $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
         }
