@@ -68,7 +68,13 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
   
   matrix:
-    - builder: msbuild
+    - builder: cmake
+      vsver: 140
+
+    - builder: cmake
+      vsver: 150
+
+     - builder: msbuild
       vsver: 140
       linkmode: shared
 
@@ -95,12 +101,6 @@ environment:
 #    - builder: msbuild
 #      vsver: 150
 #      linkmode: static_mt
-
-    - builder: cmake
-      vsver: 140
-
-    - builder: cmake
-      vsver: 150
 
     - builder: cygwin
 
