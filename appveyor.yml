@@ -435,15 +435,15 @@ build_script:
         }
         if ($env:vsver -eq "140")
         {
-            $generator = "Visual Studio 14 2015"
+            $generator = '"Visual Studio 14 2015"'
         }
         if ($env:vsver -eq "150")
         {
-            $generator = "Visual Studio 15 2017"
+            $generator = '"Visual Studio 15 2017"'
         }
         $defs =" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
-        if ($env:platform -eq "x64")
+        if ($env:vsver -eq "140")
         {
             $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
         }
