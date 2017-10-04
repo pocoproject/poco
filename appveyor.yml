@@ -74,7 +74,7 @@ environment:
     - builder: cmake
       vsver: 150
 
-     - builder: msbuild
+    - builder: msbuild
       vsver: 140
       linkmode: shared
 
