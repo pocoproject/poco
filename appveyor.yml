@@ -580,8 +580,8 @@ test_script:
           ctest --config RelWithDebInfo -N
           Write-Host -ForegroundColor Yellow $line;
 
-          Write-Host -ForegroundColor Yellow 'ctest -VV -E Data*'
-          ctest --config RelWithDebInfo -VV -E Data* -E Crypto*
+          Write-Host -ForegroundColor Yellow 'ctest -C RelWithDebInfo -VV -E Data*'
+          ctest -C RelWithDebInfo -VV -E Data*
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
