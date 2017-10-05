@@ -32,6 +32,9 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
+Poco::FastMutex ICMPClientTest::_mutex;
+
+
 ICMPClientTest::ICMPClientTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
@@ -65,6 +68,8 @@ void ICMPClientTest::testPing()
 #endif
 
 	unregisterDelegates(icmpClient);
+	// wait for delegates to finish printing
+	Poco::FastMutex::ScopedLock l(_mutex);
 }
 
 
@@ -90,6 +95,8 @@ void ICMPClientTest::testBigPing()
 #endif
 
 	unregisterDelegates(icmpClient);
+	// wait for delegates to finish printing
+	Poco::FastMutex::ScopedLock l(_mutex);
 }
 
 
@@ -123,6 +130,7 @@ void ICMPClientTest::tearDown()
 
 void ICMPClientTest::onBegin(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " 
 		<< args.dataSize() << " bytes of data:" 
@@ -133,6 +141,7 @@ void ICMPClientTest::onBegin(const void* pSender, ICMPEventArgs& args)
 
 void ICMPClientTest::onReply(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << "Reply from " << args.hostAddress()
 		<< " bytes=" << args.dataSize() 
@@ -144,6 +153,7 @@ void ICMPClientTest::onReply(const void* pSender, ICMPEventArgs& args)
 
 void ICMPClientTest::onError(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << args.error();
 	std::cerr << os.str() << std::endl;
@@ -152,6 +162,7 @@ void ICMPClientTest::onError(const void* pSender, ICMPEventArgs& args)
 
 void ICMPClientTest::onEnd(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	int received = args.received();
 	os << std::endl << "--- Ping statistics for " << args.hostAddress() << " ---"

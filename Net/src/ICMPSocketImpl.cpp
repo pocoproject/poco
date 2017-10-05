@@ -15,9 +15,7 @@
 #include "Poco/Net/ICMPSocketImpl.h"
 #include "Poco/Net/ICMPv4PacketImpl.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
-#include "Poco/Exception.h"
+#include "Poco/Format.h"
 #include "Poco/Buffer.h"
 
 
@@ -37,6 +35,7 @@ ICMPSocketImpl::ICMPSocketImpl(IPAddress::Family family, int dataSize, int ttl, 
 	_timeout(timeout)
 {
 	setOption(IPPROTO_IP, IP_TTL, ttl);
+	setBlocking(true);
 	setReceiveTimeout(Timespan(timeout));
 }
 
@@ -61,19 +60,38 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 	try
 	{
 		Poco::Timestamp ts;
+		int rc;
+		int expected = _icmpPacket.packetSize();
 		do
 		{
-			if (ts.isElapsed(_timeout))
+			// guard against a DoS attack
+			if (ts.isElapsed(_timeout)) throw TimeoutException();
+			buffer.clear();
+			SocketAddress respAddr;
+			rc = SocketImpl::receiveFrom(buffer.begin(), expected, respAddr, flags);
+			if (rc == 0) break;
+			if (respAddr == address)
 			{
-				// This guards against a possible DoS attack, where sending
-				// fake ping responses will cause an endless loop.
-				throw TimeoutException();
+				expected -= rc;
+				if (expected == 0)
+				{
+					if (_icmpPacket.validReplyID(buffer.begin(), maxPacketSize)) break;
+					int type = 0, code = 0;
+					std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
+					if (!err.empty()) throw ICMPException(err);
+					throw ICMPException("Invalid ICMP reply");
+				}
 			}
-			SocketImpl::receiveFrom(buffer.begin(), maxPacketSize, address, flags);
+			else
+			{
+				throw ICMPException(Poco::format("Reply from an unknown IP address "
+												 "(requested %s, received %s).",
+												 address.host().toString(), respAddr.host().toString()));
+			}
 		}
-		while (!_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
+		while (expected && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
 	}
-	catch (TimeoutException&)
+	catch (ICMPException&)
 	{
 		throw;
 	}
