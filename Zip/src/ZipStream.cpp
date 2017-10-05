@@ -61,7 +61,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 		std::string crc(4, ' ');
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start, fileEntry.needsZip64());
+			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, static_cast<Poco::UInt32>(start), fileEntry.needsZip64());
 		}
 		else
 		{
@@ -73,7 +73,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 	{
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start, fileEntry.needsZip64());
+			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, static_cast<Poco::UInt32>(start), fileEntry.needsZip64());
 		}
 		else
 		{
@@ -155,7 +155,7 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_ptrBuf) return 0; // directory entry
 	_ptrBuf->read(buffer, length);
-	int cnt = _ptrBuf->gcount();
+	int cnt = static_cast<int>(_ptrBuf->gcount());
 	if (cnt > 0)
 	{
 		_crc32.update(buffer, cnt);
@@ -193,14 +193,14 @@ int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 		return 0;
 	_bytesWritten += length;
 	_ptrOBuf->write(buffer, length);
-	_crc32.update(buffer, length);
-	return length;
+	_crc32.update(buffer, static_cast<unsigned int>(length));
+	return static_cast<int>(length);
 }
 
 
 void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 {
-    extraDataSize = 0;
+	extraDataSize = 0;
 	if (_ptrOBuf && _pHeader)
 	{
 		_ptrOBuf->flush();

@@ -932,14 +932,15 @@ ENTROPY_DEBUG(const char * label, unsigned long entropy) {
 static unsigned long
 generate_hash_secret_salt(XML_Parser parser)
 {
-  Poco::UInt64 entropy;
-  (void)parser;
 #if defined(EXPAT_POCO)
+  Poco::UInt64 entropy;
   Poco::RandomInputStream rstr;
   Poco::BinaryReader rrdr(rstr);
   rrdr >> entropy;
-  return ENTROPY_DEBUG("RandomInputStream", entropy);
+  return ENTROPY_DEBUG("RandomInputStream", (unsigned long)entropy);
 #else
+  unsigned long entropy;
+  (void)parser;
 #if defined(HAVE_ARC4RANDOM_BUF) || defined(__CloudABI__)
   (void)gather_time_entropy;
   arc4random_buf(&entropy, sizeof(entropy));

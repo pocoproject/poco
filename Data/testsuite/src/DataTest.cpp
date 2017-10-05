@@ -1177,7 +1177,7 @@ void DataTest::testSimpleRowFormatter()
 	std::streamsize sp = rf.getSpacing();
 
 	std::string line(std::string::size_type(sz * 5 + sp * 4), '-');
-	std::string spacer(sp, ' ');
+	std::string spacer(static_cast<std::size_t>(sp), ' ');
 	std::ostringstream os;
 	os << std::left 
 		<< std::setw(sz) << "field0"
