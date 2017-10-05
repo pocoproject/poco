@@ -99,6 +99,9 @@ BinaryWriter& BinaryWriter::operator << (unsigned int value)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+
+
 BinaryWriter& BinaryWriter::operator << (long value)
 {
 #if defined(POCO_LONG_IS_64_BIT)
@@ -117,6 +120,9 @@ BinaryWriter& BinaryWriter::operator << (unsigned long value)
 	return write((UInt32) value, _flipBytes);
 #endif
 }
+
+
+#endif // POCO_LONG_IS_64_BIT
 
 
 BinaryWriter& BinaryWriter::operator << (float value)

@@ -99,6 +99,9 @@ BinaryReader& BinaryReader::operator >> (unsigned int& value)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+
+
 BinaryReader& BinaryReader::operator >> (long& value)
 {
 #if defined(POCO_LONG_IS_64_BIT)
@@ -117,6 +120,9 @@ BinaryReader& BinaryReader::operator >> (unsigned long& value)
 	return read((UInt32&) value, _flipBytes);
 #endif
 }
+
+
+#endif // POCO_LONG_IS_64_BIT
 
 
 BinaryReader& BinaryReader::operator >> (float& value)

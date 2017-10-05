@@ -144,6 +144,9 @@ void NumberFormatter::appendHex(std::string& str, unsigned value, int width)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+
+
 void NumberFormatter::append(std::string& str, long value)
 {
 	char result[NF_MAX_INT_STRING_LEN];
@@ -232,6 +235,9 @@ void NumberFormatter::appendHex(std::string& str, unsigned long value, int width
 	uIntToStr(value, 0x10, result, sz, false, width, '0');
 	str.append(result, sz);
 }
+
+
+#endif // POCO_LONG_IS_64_BIT
 
 
 void NumberFormatter::append(std::string& str, Int64 value)

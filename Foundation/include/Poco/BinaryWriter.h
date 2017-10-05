@@ -76,8 +76,10 @@ public:
 	BinaryWriter& operator << (unsigned short value);
 	BinaryWriter& operator << (int value);
 	BinaryWriter& operator << (unsigned int value);
+#ifndef POCO_LONG_IS_64_BIT
 	BinaryWriter& operator << (long value);
 	BinaryWriter& operator << (unsigned long value);
+#endif // POCO_LONG_IS_64_BIT
 	BinaryWriter& operator << (float value);
 	BinaryWriter& operator << (double value);
 	BinaryWriter& operator << (Int64 value);
