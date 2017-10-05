@@ -3043,7 +3043,7 @@ private:
 };
 
 
-#endif // 64bit
+#endif // POCO_LONG_IS_64_BIT
 
 
 template <typename T>
