@@ -1,8 +1,6 @@
 //
 // StreamCopier.cpp
 //
-// $Id: //poco/1.4/Foundation/src/StreamCopier.cpp#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamCopier

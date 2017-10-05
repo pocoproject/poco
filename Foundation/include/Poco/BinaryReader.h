@@ -1,8 +1,6 @@
 //
 // BinaryReader.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BinaryReader.h#3 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  BinaryReaderWriter
@@ -152,6 +150,12 @@ public:
 		/// Returns the number of available bytes in the stream.
 
 private:
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4800) // forcing value to bool 'true' or 'false' (performance warning)
+#endif
+
 	template<typename T>
 	BinaryReader& read(T& value, bool flipBytes)
 	{
@@ -159,6 +163,10 @@ private:
 		if (flipBytes) value = ByteOrder::flipBytes(value);
 		return *this;
 	}
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(pop)
+#endif
 
 	template<typename T>
 	void read7BitEncoded(T& value)

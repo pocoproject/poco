@@ -1,8 +1,6 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timer.cpp#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Timer

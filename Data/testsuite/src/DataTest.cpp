@@ -1,8 +1,6 @@
 //
 // DataTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#12 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -38,9 +36,7 @@
 #include <iomanip>
 #include <set>
 
-#if __cplusplus >= 201103L
 #include <tuple>
-#endif
 
 
 using namespace Poco::Data::Keywords;
@@ -1404,8 +1400,6 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
-#if __cplusplus >= 201103L
-
 void DataTest::testStdTuple()
 {
 	using Row = std::tuple<std::string, std::string, int>;
@@ -1416,8 +1410,6 @@ void DataTest::testStdTuple()
 	std::vector<Row> rows;
 	sess << "SELECT name, address, age FROM Person", into(rows) , now;
 }
-
-#endif // __cplusplus >= 201103L
 
 
 void DataTest::setUp()
@@ -1451,9 +1443,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
-#if __cplusplus >= 201103L
 	CppUnit_addTest(pSuite, DataTest, testStdTuple);
-#endif
 
 
 	return pSuite;

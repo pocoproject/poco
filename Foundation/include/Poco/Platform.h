@@ -1,8 +1,6 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform
@@ -231,6 +229,9 @@
 	#define POCO_COMPILER_MSVC
 #elif defined(__clang__)
 	#define POCO_COMPILER_CLANG
+	#if defined(__apple_build_version__)
+		#define POCO_COMPILER_APPLECLANG
+	#endif
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
 #elif defined (__MINGW32__) || defined (__MINGW64__)

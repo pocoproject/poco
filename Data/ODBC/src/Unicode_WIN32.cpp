@@ -1,8 +1,6 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Unicode_WIN32.cpp#3 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  Unicode

@@ -1,8 +1,6 @@
 //
 // Position.cpp
 //
-// $Id: //poco/Main/Data/src/Position.cpp#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Position

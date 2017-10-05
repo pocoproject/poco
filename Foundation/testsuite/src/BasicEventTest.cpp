@@ -1,8 +1,6 @@
 //
 // BasicEventTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/BasicEventTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -19,6 +17,7 @@
 #include "Poco/FunctionDelegate.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/StdFunctionDelegate.h"
 
 
 using namespace Poco;
@@ -317,6 +316,22 @@ void BasicEventTest::testAsyncNotify()
 	assert (_count == LARGEINC);
 }
 
+
+void BasicEventTest::testLambda()
+{
+	int count = 0;
+	auto f = StdFunctionDelegate<int>([&](const void *, int &args) { count += args; });
+
+	Simple += f;
+	int cparam = 1;
+	Simple.notify(this, cparam);
+	assert(count == 1);
+
+	Simple -= f;
+	assert(Simple.empty());
+}
+
+
 void BasicEventTest::onStaticVoid(const void* pSender)
 {
 	BasicEventTest* p = const_cast<BasicEventTest*>(reinterpret_cast<const BasicEventTest*>(pSender));
@@ -436,5 +451,6 @@ CppUnit::Test* BasicEventTest::suite()
 	CppUnit_addTest(pSuite, BasicEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, BasicEventTest, testAsyncNotify);
 	CppUnit_addTest(pSuite, BasicEventTest, testNullMutex);
+	CppUnit_addTest(pSuite, BasicEventTest, testLambda);
 	return pSuite;
 }

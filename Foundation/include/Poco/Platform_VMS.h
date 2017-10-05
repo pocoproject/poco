@@ -1,8 +1,6 @@
 //
 // Platform_VMS.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform_VMS.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform

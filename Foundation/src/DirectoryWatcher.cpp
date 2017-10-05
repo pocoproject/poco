@@ -1,8 +1,6 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#4 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryWatcher
@@ -534,6 +532,7 @@ DirectoryWatcher::DirectoryWatcher(const std::string& path, int otherEventMask, 
 	bool forceScan) :
 	_directory(path),
 	_eventMask(otherEventMask),
+	_eventsSuspended(0),
 	_scanInterval(otherScanInterval),
 	_forceScan(forceScan)
 {
@@ -545,6 +544,7 @@ DirectoryWatcher::DirectoryWatcher(const Poco::File& otherDirectory, int otherEv
 	bool forceScan) :
 	_directory(otherDirectory),
 	_eventMask(otherEventMask),
+	_eventsSuspended(0),
 	_scanInterval(otherScanInterval),
 	_forceScan(forceScan)
 {

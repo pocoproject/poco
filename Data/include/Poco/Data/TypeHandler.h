@@ -1,8 +1,6 @@
 //
 // TypeHandler.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#13 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  TypeHandler
@@ -30,9 +28,7 @@
 #include "Poco/SharedPtr.h"
 #include <cstddef>
 
-#if __cplusplus >= 201103L
 #include <tuple>
-#endif
 
 namespace Poco {
 namespace Data {
@@ -2107,7 +2103,6 @@ private:
 };
 
 
-#if __cplusplus >= 201103L
 
 template<std::size_t N>
 struct TupleBind
@@ -2230,7 +2225,6 @@ private:
 	TypeHandler& operator=(const TypeHandler&);
 };
 
-#endif // __cplusplus >= 201103L
 
 } } // namespace Poco::Data
 

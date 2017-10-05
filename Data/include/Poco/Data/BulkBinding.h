@@ -1,8 +1,6 @@
 //
 // BulkBinding.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/BulkBinding.h#6 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  BulkBinding

@@ -1,8 +1,6 @@
 //
 // DefaultStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DefaultStrategy.h#3 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  DefaultStrategy

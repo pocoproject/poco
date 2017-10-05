@@ -1,8 +1,6 @@
 //
 // AsyncChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AsyncChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  AsyncChannel

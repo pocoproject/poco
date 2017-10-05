@@ -1,8 +1,6 @@
 //
 // BinaryWriter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BinaryWriter.h#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  BinaryReaderWriter
@@ -161,6 +159,12 @@ public:
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4800) // forcing value to bool 'true' or 'false' (performance warning)
+#endif
+
 	template<typename T>
 	BinaryWriter& write(T value, bool flipBytes)
 	{
@@ -175,6 +179,10 @@ private:
 		}
 		return *this;
 	}
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(pop)
+#endif
 
 	template<typename T>
 	void write7BitEncoded(T value)

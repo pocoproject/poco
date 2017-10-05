@@ -1,8 +1,6 @@
 //
 // MetaObject.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/MetaObject.h#1 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  ClassLoader

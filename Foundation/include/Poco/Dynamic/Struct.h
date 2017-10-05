@@ -1,8 +1,6 @@
 //
 // Struct.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Struct.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Struct
@@ -169,6 +167,12 @@ public:
 		/// Returns true if the Struct doesn't contain any members
 	{
 		return _data.empty();
+	}
+
+	inline void clear()
+		/// Clears the Struct contents
+	{
+		_data.clear();
 	}
 
 	SizeType size() const

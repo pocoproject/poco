@@ -1,8 +1,6 @@
 //
 // Var.cpp
 //
-// $Id: //poco/svn/Foundation/src/Var.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Var
@@ -327,6 +325,19 @@ bool Var::operator && (const Var& other) const
 
 
 void Var::empty()
+{
+#ifdef POCO_NO_SOO
+	delete _pHolder;
+	_pHolder = 0;
+#else
+	if (_placeholder.isLocal()) this->~Var();
+	else delete content();
+	_placeholder.erase();
+#endif
+}
+
+
+void Var::clear()
 {
 #ifdef POCO_NO_SOO
 	delete _pHolder;

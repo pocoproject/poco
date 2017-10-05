@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/cpp11-clang#1 $
-#
 # cpp11-clang
 #
 # Detect compatible Clang version and add c++11/14 flags
@@ -21,6 +19,6 @@ ifeq ($(shell test $(CLANGVERSION) -ge 340 && echo 1), 1)
 	CXXFLAGS += -std=c++1y
 # C++11 needs Clang 3.3
 else ifeq ($(shell test $(CLANGVERSION) -ge 330 && echo 1), 1)
-  CXXFLAGS += -std=c++0x
+	CXXFLAGS += -std=c++0x
 endif
 

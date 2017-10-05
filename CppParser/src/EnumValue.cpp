@@ -1,8 +1,6 @@
 //
 // EnumValue.cpp
 //
-// $Id: //poco/1.4/CppParser/src/EnumValue.cpp#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  EnumValue

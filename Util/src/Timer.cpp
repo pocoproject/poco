@@ -1,8 +1,6 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.4/Util/src/Timer.cpp#2 $
-//
 // Library: Util
 // Package: Timer
 // Module:  Timer
@@ -30,8 +28,8 @@ namespace Util {
 class TimerNotification: public Poco::Notification
 {
 public:
-	TimerNotification(Poco::TimedNotificationQueue& rQueue):
-		_queue(rQueue)
+	TimerNotification(Poco::TimedNotificationQueue& queue):
+		_queue(queue)
 	{
 	}
 	
@@ -54,8 +52,8 @@ private:
 class StopNotification: public TimerNotification
 {
 public:
-	StopNotification(Poco::TimedNotificationQueue& rQueue):
-		TimerNotification(rQueue)
+	StopNotification(Poco::TimedNotificationQueue& queue):
+		TimerNotification(queue)
 	{
 	}
 	
@@ -74,8 +72,8 @@ public:
 class CancelNotification: public TimerNotification
 {
 public:
-	CancelNotification(Poco::TimedNotificationQueue& rQueue):
-		TimerNotification(rQueue)
+	CancelNotification(Poco::TimedNotificationQueue& queue):
+		TimerNotification(queue)
 	{
 	}
 	
@@ -103,8 +101,8 @@ private:
 class TaskNotification: public TimerNotification
 {
 public:
-	TaskNotification(Poco::TimedNotificationQueue& rQueue, TimerTask::Ptr pTask):
-		TimerNotification(rQueue),
+	TaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask):
+		TimerNotification(queue),
 		_pTask(pTask)
 	{
 	}
@@ -151,8 +149,8 @@ private:
 class PeriodicTaskNotification: public TaskNotification
 {
 public:
-	PeriodicTaskNotification(Poco::TimedNotificationQueue& rQueue, TimerTask::Ptr pTask, long interval):
-		TaskNotification(rQueue, pTask),
+	PeriodicTaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask, long interval):
+		TaskNotification(queue, pTask),
 		_interval(interval)
 	{
 	}
@@ -185,8 +183,8 @@ private:
 class FixedRateTaskNotification: public TaskNotification
 {
 public:
-	FixedRateTaskNotification(Poco::TimedNotificationQueue& rQueue, TimerTask::Ptr pTask, long interval, Poco::Clock clock):
-		TaskNotification(rQueue, pTask),
+	FixedRateTaskNotification(Poco::TimedNotificationQueue& queue, TimerTask::Ptr pTask, long interval, Poco::Clock clock):
+		TaskNotification(queue, pTask),
 		_interval(interval),
 		_nextExecution(clock)
 	{

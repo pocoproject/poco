@@ -1,8 +1,6 @@
 //
 // UnWindows.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UnWindows.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  UnWindows
@@ -43,6 +41,9 @@
 #if defined(_WIN32)
 	#if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
 		#define WIN32_LEAN_AND_MEAN
+	#endif
+	#if !defined(NOMINMAX)
+		#define NOMINMAX
 	#endif
 #endif
 

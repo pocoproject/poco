@@ -1,8 +1,6 @@
 //
 // ZipLocalFileHeader.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipLocalFileHeader.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipLocalFileHeader

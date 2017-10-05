@@ -1,8 +1,6 @@
 //
 // PostgreSQLTypes.cpp
 //
-// $Id: //poco/1.4/Data/PostgreSQL/src/PostgreSQLTypes.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  PostgreSQLTypes

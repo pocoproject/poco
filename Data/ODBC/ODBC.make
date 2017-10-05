@@ -1,8 +1,6 @@
 #
 # ODBC.make
 #
-# $Id: //poco/1.4/Data/ODBC/ODBC.make#1 $
-#
 # Makefile fragment for finding ODBC library
 #
 
@@ -15,7 +13,7 @@ ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
 POCO_ODBC_LIB = /usr/lib/$(OSARCH)-linux-gnu
 else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
 POCO_ODBC_LIB = /usr/lib64
-else 
+else
 POCO_ODBC_LIB = /usr/lib
 endif
 endif

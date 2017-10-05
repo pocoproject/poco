@@ -1,8 +1,6 @@
 //
 // FTPClientSession.cpp
 //
-// $Id: //poco/svn/Net/src/FTPClientSession.cpp#2 $
-//
 // Library: Net
 // Package: FTP
 // Module:  FTPClientSession
@@ -31,9 +29,9 @@ namespace Net {
 
 
 FTPClientSession::FTPClientSession():
-	_port(0),
 	_pControlSocket(0),
 	_pDataStream(0),
+	_port(0),		
 	_passiveMode(true),
 	_fileType(TYPE_BINARY),
 	_supports1738(true),
@@ -45,10 +43,10 @@ FTPClientSession::FTPClientSession():
 
 	
 FTPClientSession::FTPClientSession(const StreamSocket& socket):
-	_host(socket.address().host().toString()),
-	_port(socket.address().port()),
 	_pControlSocket(new DialogSocket(socket)),
 	_pDataStream(0),
+	_host(socket.address().host().toString()),
+	_port(socket.address().port()),
 	_passiveMode(true),
 	_fileType(TYPE_BINARY),
 	_supports1738(true),
@@ -64,10 +62,10 @@ FTPClientSession::FTPClientSession(const std::string& host,
 	Poco::UInt16 port,
 	const std::string& username,
 	const std::string& password):
-	_host(host),
-	_port(port),
 	_pControlSocket(new DialogSocket(SocketAddress(host, port))),
 	_pDataStream(0),
+	_host(host),
+	_port(port),		
 	_passiveMode(true),
 	_fileType(TYPE_BINARY),
 	_supports1738(true),
@@ -75,10 +73,9 @@ FTPClientSession::FTPClientSession(const std::string& host,
 	_isLoggedIn(false),
 	_timeout(DEFAULT_TIMEOUT)
 {
+	_pControlSocket->setReceiveTimeout(_timeout);
 	if (!username.empty())
 		login(username, password);
-	else
-		_pControlSocket->setReceiveTimeout(_timeout);
 }
 
 
@@ -92,7 +89,6 @@ FTPClientSession::~FTPClientSession()
 	{
 	}
 }
-
 
 void FTPClientSession::setTimeout(const Poco::Timespan& timeout)
 {
@@ -136,11 +132,26 @@ void FTPClientSession::open(const std::string& host,
 	}
 	else
 	{
-		_pControlSocket = new DialogSocket(SocketAddress(_host, _port));
-		_pControlSocket->setReceiveTimeout(_timeout);
+		if (!_pControlSocket)
+		{
+			_pControlSocket = new DialogSocket(SocketAddress(_host, _port));
+			_pControlSocket->setReceiveTimeout(_timeout);
+		}
+		receiveServerReadyReply();
 	}
 }
 
+void  FTPClientSession::receiveServerReadyReply()
+{
+	if (_serverReady)
+		return;
+	std::string response;
+	int status = _pControlSocket->receiveStatusMessage(response);
+	if (!isPositiveCompletion(status))
+		throw FTPException("Cannot receive status message", response, status);
+
+	_serverReady = true;
+}
 
 void FTPClientSession::login(const std::string& username, const std::string& password)
 {
@@ -153,15 +164,7 @@ void FTPClientSession::login(const std::string& username, const std::string& pas
 		_pControlSocket = new DialogSocket(SocketAddress(_host, _port));
 		_pControlSocket->setReceiveTimeout(_timeout);
 	}
-
-	if (!_serverReady)
-	{
-		status = _pControlSocket->receiveStatusMessage(response);
-		if (!isPositiveCompletion(status))
-			throw FTPException("Cannot login to server", response, status);
-
-		_serverReady = true;
-	}
+	receiveServerReadyReply();
 
 	status = sendCommand("USER", username, response);
 	if (isPositiveIntermediate(status))
@@ -183,20 +186,24 @@ void FTPClientSession::logout()
 	{
 		try { endTransfer(); }
 		catch (...) { }
-		std::string response;
-		sendCommand("QUIT", response);
 		_isLoggedIn = false;
+		std::string response;		
+		sendCommand("QUIT", response);		
 	}
 }
 
 
 void FTPClientSession::close()
 {
-	logout();
-	_pControlSocket->close();
-	delete _pControlSocket;
-	_pControlSocket = 0;
+	try { logout(); }
+	catch(...){ }
 	_serverReady = false;
+	if (_pControlSocket)
+	{
+		_pControlSocket->close();
+		delete _pControlSocket;
+		_pControlSocket = 0;
+	}
 }
 
 
@@ -592,6 +599,5 @@ void FTPClientSession::endTransfer()
 			throw FTPException("Data transfer failed", response, status);
 	}
 }
-
 
 } } // namespace Poco::Net

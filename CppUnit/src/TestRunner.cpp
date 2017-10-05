@@ -1,8 +1,6 @@
 //
 // TestRunner.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestRunner.cpp#1 $
-//
 
 
 #include "Poco/CppUnit/TestRunner.h"
@@ -16,7 +14,7 @@ namespace CppUnit {
 
 
 TestRunner::TestRunner():
-	_ostr(std::cout)
+	_ostr(std::clog)
 {
 }
 

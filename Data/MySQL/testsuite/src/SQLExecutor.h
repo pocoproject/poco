@@ -1,8 +1,6 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/SQLExecutor.h#1 $
-//
 // Definition of the SQLExecutor class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -89,13 +87,13 @@ public:
 	void unsignedInts();
 	void floats();
 	void doubles();
+	void any();
+	void dynamicAny();
 	void tuples();
 	void tupleVector();
 
-#if __cplusplus >= 201103L
 	void stdTuples();
 	void stdTupleVector();
-#endif
 
 	void internalExtraction();
 	void doNull();

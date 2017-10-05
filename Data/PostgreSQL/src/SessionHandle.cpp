@@ -1,8 +1,6 @@
 //
 // SessionHandle.cpp
 //
-// $Id: //poco/1.5/Data/PostgreSQL/src/SessionHandle.cpp#1 $
-//
 // Library: Data/PostgreSQL
 // Package: PostgreSQL
 // Module:  SessionHandle

@@ -1,8 +1,6 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedMemory_WIN32.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  SharedMemoryImpl

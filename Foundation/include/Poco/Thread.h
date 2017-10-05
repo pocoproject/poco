@@ -1,8 +1,6 @@
 //
 // Thread.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -24,19 +22,7 @@
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
 #include "Poco/Environment.h"
-
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Thread_WINCE.h"
-#else
-#include "Poco/Thread_WIN32.h"
-#endif
-#elif defined(POCO_VXWORKS)
-#include "Poco/Thread_VX.h"
-#else
-#include "Poco/Thread_POSIX.h"
-#endif
+#include "Poco/Thread_STD.h"
 
 
 namespace Poco {

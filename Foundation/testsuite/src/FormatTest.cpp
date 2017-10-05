@@ -1,8 +1,6 @@
 //
 // FormatTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FormatTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
@@ -266,7 +264,12 @@ void FormatTest::testAnyInt()
 	char c = 42;
 	std::string s(format("%?i", c));
 	assert (s == "42");
-	
+
+	c = 43;
+	s.clear();
+	format(s, "%?i", c);
+	assert(s == "43");
+
 	bool b = true;
 	s = format("%?i", b);
 	assert (s == "1");

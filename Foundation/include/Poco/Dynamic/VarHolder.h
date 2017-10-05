@@ -1,8 +1,6 @@
 //
 // VarHolder.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/VarHolder.h#3 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarHolder
@@ -92,7 +90,6 @@ void containerToJSON(C& cont, std::string& val)
 	}
 	for (; it != itEnd; ++it)
 	{
-		
 		val.append(", ");
 		appendJSONValue(val, *it);
 	}

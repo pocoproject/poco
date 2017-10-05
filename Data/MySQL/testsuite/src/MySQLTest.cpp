@@ -1,8 +1,6 @@
 //
 // MySQLTest.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/MySQLTest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -531,6 +529,22 @@ void MySQLTest::testDouble()
 	_pExecutor->doubles();
 }
 
+void MySQLTest::testAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateAnyTable();
+	_pExecutor->any();
+}
+
+void MySQLTest::testDynamicAny()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateAnyTable();
+	_pExecutor->dynamicAny();
+}
+
 
 void MySQLTest::testTuple()
 {
@@ -549,7 +563,6 @@ void MySQLTest::testTupleVector()
 	_pExecutor->tupleVector();
 }
 
-#if __cplusplus >= 201103L
 
 void MySQLTest::testStdTuple()
 {
@@ -568,7 +581,6 @@ void MySQLTest::testStdTupleVector()
 	_pExecutor->stdTupleVector();
 }
 
-#endif // __cplusplus >= 201103L
 
 void MySQLTest::testInternalExtraction()
 {
@@ -782,7 +794,7 @@ void MySQLTest::recreatePersonLongTextTable()
 void MySQLTest::recreatePersonDateTimeTable()
 {
 	dropTable("Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME(6))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -873,6 +885,17 @@ void MySQLTest::recreateNullableStringTable()
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateNullableStringTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateNullableStringTable()"); }
+}
+
+void MySQLTest::recreateAnyTable()
+{
+	dropTable("Anys");
+	try {
+		*_pSession << "CREATE TABLE Anys (int_8 TINYINT, int_16 SMALLINT, int_32 MEDIUMINT, int_64 BIGINT, flt FLOAT, dbl DOUBLE, "
+									"str0 VARCHAR(255), str1 TEXT, date0 DATE, time0 TIME, date_time0 DATETIME(6), empty INTEGER)", now;
+	}
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateAnyTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateAnyTable()"); }
 }
 
 
@@ -977,12 +1000,12 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
+	CppUnit_addTest(pSuite, MySQLTest, testAny);
+	CppUnit_addTest(pSuite, MySQLTest, testDynamicAny);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
-#if __cplusplus >= 201103L
 	CppUnit_addTest(pSuite, MySQLTest, testStdTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testStdTupleVector);
-#endif
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);

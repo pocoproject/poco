@@ -1,8 +1,6 @@
 //
 // FPEnvironment.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FPEnvironment.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -24,6 +22,8 @@
 #include "FPEnvironment_DEC.cpp"
 #elif defined(sun) || defined(__sun)
 #include "FPEnvironment_SUN.cpp"
+#elif defined(__QNX__)
+#include "FPEnvironment_QNX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "FPEnvironment_C99.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)

@@ -1,8 +1,6 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  OpenSSL
@@ -33,11 +31,18 @@
 // NetSSL_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
-	#if defined(NetSSL_EXPORTS)
-		#define NetSSL_API __declspec(dllexport)
+#if defined(_WIN32)
+	#if defined(POCO_DLL)
+		#if defined(NetSSL_EXPORTS)
+			#define NetSSL_API __declspec(dllexport)
+		#else
+			#define NetSSL_API __declspec(dllimport)
+		#endif
 	#else
-		#define NetSSL_API __declspec(dllimport)
+		#if (POCO_MSVS_VERSION >= 2015) // needed for OpenSSL
+			#pragma comment(lib, "legacy_stdio_definitions.lib")
+			#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
+		#endif
 	#endif
 #endif
 
@@ -52,12 +57,18 @@
 
 
 //
-// Automatically link NetSSL library.
+// Automatically link NetSSL and OpenSSL library.
 //
 #if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(NetSSL_EXPORTS)
-		#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
-	#endif
+	#if !defined(POCO_NO_AUTOMATIC_LIBS)
+		#if !defined(POCO_EXTERNAL_OPENSSL)
+			#pragma comment(lib, "libcrypto.lib")
+			#pragma comment(lib, "libssl.lib")
+		#endif // POCO_EXTERNAL_OPENSSL
+		#if !defined(NetSSL_EXPORTS)
+			#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
+		#endif
+	#endif // POCO_NO_AUTOMATIC_LIBS
 #endif
 
 
