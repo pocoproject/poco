@@ -932,7 +932,7 @@ ENTROPY_DEBUG(const char * label, unsigned long entropy) {
 static unsigned long
 generate_hash_secret_salt(XML_Parser parser)
 {
-  unsigned long entropy;
+  Poco::UInt64 entropy;
   (void)parser;
 #if defined(EXPAT_POCO)
   Poco::RandomInputStream rstr;

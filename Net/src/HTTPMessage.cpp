@@ -69,7 +69,7 @@ void HTTPMessage::setVersion(const std::string& version)
 void HTTPMessage::setContentLength(std::streamsize length)
 {
 	if (length != UNKNOWN_CONTENT_LENGTH)
-		set(CONTENT_LENGTH, NumberFormatter::format(length));
+		set(CONTENT_LENGTH, NumberFormatter::format(static_cast<Poco::UInt64>(length)));
 	else
 		erase(CONTENT_LENGTH);
 }

@@ -111,7 +111,7 @@ void SMTPChannel::log(const Message& msg)
 			content	<< "Timestamp: " << DateTimeFormatter::format(msg.getTime(), DateTimeFormat::RFC822_FORMAT) << "\r\n";
 
 		content	<< "Priority: " << NumberFormatter::format(msg.getPriority()) << "\r\n"
-			<< "Process ID: " << NumberFormatter::format(msg.getPid()) << "\r\n"
+			<< "Process ID: " << msg.getPid() << "\r\n"
 			<< "Thread: " << msg.getThread() << " (ID: " << msg.getTid() << ")\r\n"
 			<< "Message text: " << msg.getText() << "\r\n\r\n";
 
