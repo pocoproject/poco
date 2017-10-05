@@ -69,6 +69,9 @@ public:
 	int dataSize() const;
 		/// Returns the data size in bytes.
 
+	int packetSize() const;
+		/// Returns the packet size in bytes.
+
 	int ttl() const;
 		/// Returns the Time-To-Live value.
 

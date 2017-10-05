@@ -79,6 +79,12 @@ int ICMPSocket::dataSize() const
 }
 
 
+int ICMPSocket::packetSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->packetSize();
+}
+
+
 int ICMPSocket::ttl() const
 {
 	return static_cast<ICMPSocketImpl*>(impl())->ttl();
