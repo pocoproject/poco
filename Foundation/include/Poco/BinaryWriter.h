@@ -80,12 +80,8 @@ public:
 	BinaryWriter& operator << (unsigned long value);
 	BinaryWriter& operator << (float value);
 	BinaryWriter& operator << (double value);
-
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 	BinaryWriter& operator << (Int64 value);
 	BinaryWriter& operator << (UInt64 value);
-#endif
-
 	BinaryWriter& operator << (const std::string& value);
 	BinaryWriter& operator << (const char* value);
 
@@ -114,7 +110,6 @@ public:
 		/// written out. value is then shifted by seven bits and the next byte is written. 
 		/// This process is repeated until the entire integer has been written.
 
-#if defined(POCO_HAVE_INT64)
 	void write7BitEncoded(UInt64 value);
 		/// Writes a 64-bit unsigned integer in a compressed format.
 		/// The value written out seven bits at a time, starting 
@@ -125,7 +120,6 @@ public:
 		/// If value will not fit in seven bits, the high bit is set on the first byte and 
 		/// written out. value is then shifted by seven bits and the next byte is written. 
 		/// This process is repeated until the entire integer has been written.
-#endif
 
 	void writeRaw(const std::string& rawData);
 		/// Writes the string as-is to the stream.
@@ -141,19 +135,19 @@ public:
 
 	void flush();
 		/// Flushes the underlying stream.
-		
+
 	bool good();
 		/// Returns _ostr.good();
-		
+
 	bool fail();
 		/// Returns _ostr.fail();
-	
+
 	bool bad();
 		/// Returns _ostr.bad();
-		
+
 	std::ostream& stream() const;
 		/// Returns the underlying stream.
-		
+
 	StreamByteOrder byteOrder() const;
 		/// Returns the byte ordering used by the writer, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.

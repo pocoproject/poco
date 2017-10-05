@@ -75,12 +75,8 @@ public:
 	BinaryReader& operator >> (unsigned long& value);
 	BinaryReader& operator >> (float& value);
 	BinaryReader& operator >> (double& value);
-
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 	BinaryReader& operator >> (Int64& value);
 	BinaryReader& operator >> (UInt64& value);
-#endif
-
 	BinaryReader& operator >> (std::string& value);
 
 	template <typename T>
@@ -105,12 +101,10 @@ public:
 		/// See BinaryWriter::write7BitEncoded() for a description
 		/// of the compression algorithm.
 
-#if defined(POCO_HAVE_INT64)
 	void read7BitEncoded(UInt64& value);
 		/// Reads a 64-bit unsigned integer in compressed format.
 		/// See BinaryWriter::write7BitEncoded() for a description
 		/// of the compression algorithm.
-#endif
 
 	void readRaw(std::streamsize length, std::string& value);
 		/// Reads length bytes of raw data into value.
@@ -249,7 +243,7 @@ inline bool BinaryReader::good()
 	return _istr.good();
 }
 
-	
+
 inline bool BinaryReader::fail()
 {
 	return _istr.fail();
@@ -273,7 +267,7 @@ inline std::istream& BinaryReader::stream() const
 	return _istr;
 }
 
-	
+
 inline BinaryReader::StreamByteOrder BinaryReader::byteOrder() const
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)

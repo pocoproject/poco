@@ -239,7 +239,7 @@ void JSONTest::testNumber64Property()
 	assert (!ds["test"].isEmpty());
 	assert (ds["test"].isNumeric());
 	assert (ds["test"].isInteger());
-	assert (ds["test"] == -5000000000000000);
+	assert (ds["test"] == static_cast<Poco::Int64>(-5000000000000000));
 	value = ds["test"];
 	assert(value == -5000000000000000);
 
@@ -247,7 +247,7 @@ void JSONTest::testNumber64Property()
 	assert (!rds["test"].isEmpty());
 	assert (rds["test"].isNumeric());
 	assert (rds["test"].isInteger());
-	assert (rds["test"] == -5000000000000000);
+	assert (rds["test"] == static_cast<Poco::Int64>(-5000000000000000));
 	value = rds["test"];
 	assert(value == -5000000000000000);
 }

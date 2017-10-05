@@ -87,11 +87,9 @@ void BinaryReaderWriterTest::write(BinaryWriter& writer)
 	writer << (unsigned) 123456;
 	writer << (long) -1234567890;
 	writer << (unsigned long) 1234567890;
-	
-#if defined(POCO_HAVE_INT64)
+
 	writer << (Int64) -1234567890;
 	writer << (UInt64) 1234567890;
-#endif
 
 	writer << (float) 1.5;
 	writer << (double) -1.5;
@@ -108,14 +106,12 @@ void BinaryReaderWriterTest::write(BinaryWriter& writer)
 	writer.write7BitEncoded((UInt32) 100000);
 	writer.write7BitEncoded((UInt32) 1000000);
 
-#if defined(POCO_HAVE_INT64)
 	writer.write7BitEncoded((UInt64) 100);
 	writer.write7BitEncoded((UInt64) 1000);
 	writer.write7BitEncoded((UInt64) 10000);
 	writer.write7BitEncoded((UInt64) 100000);
 	writer.write7BitEncoded((UInt64) 1000000);
-#endif
-	
+
 	std::vector<int> vec;
 	vec.push_back(1);
 	vec.push_back(2);
@@ -133,7 +129,7 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 	assert (b);
 	reader >> b;
 	assert (!b);
-	
+
 	char c;
 	reader >> c;
 	assert (c == 'a');
@@ -162,24 +158,22 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 	reader >> ulongv;
 	assert (ulongv == 1234567890);
 
-#if defined(POCO_HAVE_INT64)
 	Int64 int64v;
 	reader >> int64v;
 	assert (int64v == -1234567890);
-	
+
 	UInt64 uint64v;
 	reader >> uint64v;
 	assert (uint64v == 1234567890);
-#endif
 
 	float floatv;
 	reader >> floatv;
 	assert (floatv == 1.5);
-	
+
 	double doublev;
 	reader >> doublev;
 	assert (doublev == -1.5);
-	
+
 	std::string str;
 	reader >> str;
 	assert (str == "foo");
@@ -189,7 +183,7 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 	assert (str == "bar");
 	reader >> str;
 	assert (str == "");
-	
+
 	UInt32 uint32v;
 	reader.read7BitEncoded(uint32v);
 	assert (uint32v == 100);
@@ -202,7 +196,6 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 	reader.read7BitEncoded(uint32v);
 	assert (uint32v == 1000000);
 
-#if defined(POCO_HAVE_INT64)
 	reader.read7BitEncoded(uint64v);
 	assert (uint64v == 100);
 	reader.read7BitEncoded(uint64v);
@@ -213,7 +206,6 @@ void BinaryReaderWriterTest::read(BinaryReader& reader)
 	assert (uint64v == 100000);
 	reader.read7BitEncoded(uint64v);
 	assert (uint64v == 1000000);
-#endif
 
 	std::vector<int> vec;
 	reader >> vec;

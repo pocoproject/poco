@@ -1129,7 +1129,6 @@ void ODBCTest::testMultipleResults()
 
 void ODBCTest::testMultipleResultsNoProj()
 {
-	if (! &session()) fail("Test not available.");
 	session().setFeature("autoBind", true); // DB2 fails without that
 	for (int autoE = 0; autoE < 2; ++autoE)
 	{

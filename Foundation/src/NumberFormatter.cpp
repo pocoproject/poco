@@ -234,9 +234,6 @@ void NumberFormatter::appendHex(std::string& str, unsigned long value, int width
 }
 
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
-
 void NumberFormatter::append(std::string& str, Int64 value)
 {
 	char result[NF_MAX_INT_STRING_LEN];
@@ -327,9 +324,6 @@ void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
 }
 
 
-#endif // defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
-
 void NumberFormatter::append(std::string& str, float value)
 {
 	char buffer[NF_MAX_FLT_STRING_LEN];
@@ -381,7 +375,7 @@ void NumberFormatter::append(std::string& str, const void* ptr)
 	char buffer[24];
 #if defined(POCO_PTR_IS_64_BIT)
 	#if defined(POCO_LONG_IS_64_BIT)
-		std::sprintf(buffer, "%016lX", (UIntPtr) ptr);
+		std::sprintf(buffer, "%016lX", (long) ptr);
 	#else
 		std::sprintf(buffer, "%016" I64_FMT "X", (UIntPtr) ptr);
 	#endif

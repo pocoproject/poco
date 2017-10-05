@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Types.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Preparation.h"
 #include "Poco/Data/TypeHandler.h"
@@ -862,6 +863,30 @@ inline AbstractExtraction::Ptr into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
 {
 	return new Extraction<T>(t);
+}
+
+
+template <>
+inline AbstractExtraction::Ptr into(long& t)
+	/// Convenience function to allow for a more compact creation of an extraction object.
+{
+#ifndef POCO_LONG_IS_64_BIT
+	return new Extraction<long>(t);
+#else
+	return new Extraction<Poco::Int64>(reinterpret_cast<Poco::Int64&>(t));
+#endif
+}
+
+
+template <>
+inline AbstractExtraction::Ptr into(unsigned long& t)
+	/// Convenience function to allow for a more compact creation of an extraction object.
+{
+#ifndef POCO_LONG_IS_64_BIT
+	return new Extraction<unsigned long>(t);
+#else
+	return new Extraction<Poco::UInt64>(reinterpret_cast<Poco::UInt64&>(t));
+#endif
 }
 
 

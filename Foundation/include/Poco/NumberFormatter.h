@@ -150,8 +150,6 @@ public:
 		/// If prefix is true, "0x" prefix is prepended to the 
 		/// resulting string.
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
 	static std::string format(Int64 value);
 		/// Formats a 64-bit integer value in decimal notation.
 
@@ -199,8 +197,6 @@ public:
 		/// right justified and zero-padded in a field having at least
 		/// the specified width. If prefix is true, "0x" prefix is
 		/// prepended to the resulting string.
-
-#endif // defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 
 	static std::string format(float value);
 		/// Formats a float value in decimal floating-point notation,
@@ -325,8 +321,6 @@ public:
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
 	static void append(std::string& str, Int64 value);
 		/// Formats a 64-bit integer value in decimal notation.
 
@@ -368,8 +362,6 @@ public:
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
-
-#endif // defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 
 	static void append(std::string& str, float value);
 		/// Formats a float value in decimal floating-point notation,
@@ -570,9 +562,6 @@ inline std::string NumberFormatter::formatHex(unsigned long value, int width, bo
 }
 
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
-
 inline std::string NumberFormatter::format(Int64 value)
 {
 	std::string result;
@@ -651,9 +640,6 @@ inline std::string NumberFormatter::formatHex(UInt64 value, int width, bool pref
 	uIntToStr(value, 0x10, result, prefix, width, '0');
 	return result;
 }
-
-
-#endif // defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 
 
 inline std::string NumberFormatter::format(float value)

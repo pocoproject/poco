@@ -99,8 +99,8 @@ void VarTest::testInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -187,8 +187,9 @@ void VarTest::testInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -275,8 +276,9 @@ void VarTest::testInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -363,8 +365,9 @@ void VarTest::testInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -451,8 +454,9 @@ void VarTest::testUInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -539,8 +543,8 @@ void VarTest::testUInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -627,8 +631,8 @@ void VarTest::testUInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -715,8 +719,8 @@ void VarTest::testUInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -803,8 +807,8 @@ void VarTest::testBool()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 1);
@@ -874,8 +878,8 @@ void VarTest::testChar()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -948,8 +952,8 @@ void VarTest::testFloat()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1040,8 +1044,8 @@ void VarTest::testDouble()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1128,8 +1132,8 @@ void VarTest::testString()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1182,6 +1186,7 @@ void VarTest::testString()
 
 void VarTest::testLong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	long src = 32;
 	Var a1 = src;
 
@@ -1265,11 +1270,13 @@ void VarTest::testLong()
 	assert (a3 == 32);
 	a3 *= 2;
 	assert (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
 void VarTest::testULong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	unsigned long src = 32;
 	Var a1 = src;
 
@@ -1353,6 +1360,7 @@ void VarTest::testULong()
 	assert (a3 == 32);
 	a3 *= 2;
 	assert (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
@@ -1436,6 +1444,8 @@ void VarTest::testComparisonOperators()
 	assert (any1 >= 0);
 	assert (0 <= any1);
 
+#if !defined(POCO_LONG_IS_64_BIT)
+
 	any1 = 1L;
 	assert (any1 == any2);
 	assert (any1 == 1L);
@@ -1458,6 +1468,8 @@ void VarTest::testComparisonOperators()
 	assert (1L <= any1);
 	assert (any1 >= 0);
 	assert (0 <= any1);
+
+#endif // !defined(POCO_LONG_IS_64_BIT)
 
 	any1 = 0x31;
 	assert (any1 == '1');
@@ -1815,8 +1827,8 @@ void VarTest::testIsArray()
 	double s11(13.555);
 	bool s12(true);
 	char s13('c');
-	long s14(232323);
-	unsigned long s15(21233232u);
+	Int64 s14(232323);
+	UInt64 s15(21233232u);
 	std::vector<Var> s16;
 	DynamicStruct s17;
 
@@ -2530,7 +2542,7 @@ void VarTest::testEmpty()
 	testEmptyComparisons<Poco::Int32>();
 	testEmptyComparisons<Poco::UInt64>();
 	testEmptyComparisons<Poco::Int64>();
-#ifdef POCO_LONG_IS_64_BIT
+#ifndef POCO_LONG_IS_64_BIT
 	testEmptyComparisons<unsigned long>();
 	testEmptyComparisons<long>();
 #endif
