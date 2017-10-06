@@ -113,11 +113,7 @@ mkdir -p ${target}/build/vxconfig
 cp ${POCO_BASE}/build/config/* ${target}/build/config
 cp ${POCO_BASE}/build/rules/* ${target}/build/rules
 cp ${POCO_BASE}/build/vxconfig/* ${target}/build/vxconfig
-cp ${POCO_BASE}/build/script/makedepend.* ${target}/build/script
-cp ${POCO_BASE}/build/script/makeldpath ${target}/build/script
-cp ${POCO_BASE}/build/script/shlibln ${target}/build/script
-cp ${POCO_BASE}/build/script/projname ${target}/build/script
-cp ${POCO_BASE}/build/script/vxprogen ${target}/build/script
+cp ${POCO_BASE}/build/script/* ${target}/build/script
 cp ${POCO_BASE}/buildwin.cmd ${target}
 cp ${POCO_BASE}/configure ${target}
 cp ${POCO_BASE}/libversion ${target}
