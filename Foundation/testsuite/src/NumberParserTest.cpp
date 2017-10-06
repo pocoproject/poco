@@ -72,6 +72,7 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
 	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
 	assert(NumberParser::parseHex("0X12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0x99a") == 0x99a);
 	assert(NumberParser::parseHex("00") == 0);
 	assert(NumberParser::parseOct("123") == 0123);
 	assert(NumberParser::parseOct("0123") == 0123);
@@ -252,6 +253,13 @@ void NumberParserTest::testParseError()
 		NumberParser::parseHex("23z");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
+
+	try
+	{
+		NumberParser::parseHex("xxx");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException&) {}
 	
 #if defined(POCO_HAVE_INT64)
 
