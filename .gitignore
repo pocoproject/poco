@@ -152,3 +152,5 @@ openssl/packages/
 !openssl/win64/lib/release/*.lib
 
 /Debug
+build_vs140.cmd
+NetSSL_Win/src/Context2.cpp
