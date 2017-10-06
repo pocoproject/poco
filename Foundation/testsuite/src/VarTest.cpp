@@ -131,8 +131,18 @@ void VarTest::testInt8()
 		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
-	catch (Poco::BadCastException&)
+	catch (Poco::BadCastException&) { }
+
+	try
 	{
+		Poco::UInt8 usrc = 200;
+		a1 = usrc;
+		src = a1;
+		fail("out of range - must throw");
+	}
+	catch (Poco::RangeException&)
+	{
+		a1 = src;
 	}
 
 	Var a3 = a1 + 1;
