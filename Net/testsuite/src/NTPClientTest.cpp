@@ -15,6 +15,7 @@
 #include "Poco/Net/NTPEventArgs.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/ICMPClient.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Delegate.h"
 #include "Poco/DateTimeFormatter.h"
@@ -27,6 +28,7 @@ using Poco::Net::NTPClient;
 using Poco::Net::NTPEventArgs;
 using Poco::Net::SocketAddress;
 using Poco::Net::IPAddress;
+using Poco::Net::ICMPClient;
 using Poco::Net::HostNotFoundException;
 using Poco::Delegate;
 using Poco::AutoPtr;
@@ -46,6 +48,11 @@ NTPClientTest::~NTPClientTest()
 
 void NTPClientTest::testTimeSync()
 {
+	if (ICMPClient::pingIPv4("pool.ntp.org") <= 0)
+	{
+		std::cerr << "pool.ntp.org not accessibe, test skipped" << std::endl;
+		return;
+	}
 	assert(_ntpClient.request("pool.ntp.org") > 0);
 }
 

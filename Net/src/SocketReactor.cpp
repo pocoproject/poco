@@ -102,7 +102,7 @@ void SocketReactor::run()
 			if (nSockets == 0)
 			{
 				onIdle();
-				Thread::trySleep(_timeout.totalMilliseconds());
+				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
