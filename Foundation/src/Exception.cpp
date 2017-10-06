@@ -15,22 +15,29 @@
 #include "Poco/Exception.h"
 #include <typeinfo>
 
+// for saveBacktrace
+#include <execinfo.h>
+#include <cstdlib>
+#include <sstream>
 
 namespace Poco {
 
 
 Exception::Exception(int otherCode): _pNested(0), _code(otherCode)
 {
+	saveBacktrace();
 }
 
 
 Exception::Exception(const std::string& msg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
 {
+	saveBacktrace();
 }
 
 
 Exception::Exception(const std::string& msg, const std::string& arg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
 {
+	saveBacktrace();
 	if (!arg.empty())
 	{
 		_msg.append(": ");
@@ -41,6 +48,22 @@ Exception::Exception(const std::string& msg, const std::string& arg, int otherCo
 
 Exception::Exception(const std::string& msg, const Exception& nestedException, int otherCode): _msg(msg), _pNested(nestedException.clone()), _code(otherCode)
 {
+	saveBacktrace();
+}
+
+
+void Exception::saveBacktrace()
+{
+	std::stringstream s;
+	void * array[25];
+	int nSize = backtrace(array, 25);
+	char ** symbols = backtrace_symbols(array, nSize);
+	for (int i = 0; i < nSize; i++)
+	{
+		s << symbols[i] << std::endl;
+	}
+	free(symbols);
+	_bt = s.str();
 }
 
 
@@ -102,6 +125,10 @@ std::string Exception::displayText() const
 	return txt;
 }
 
+std::string Exception::backtraceText() const
+{
+	return _bt;
+}
 
 void Exception::extendedMessage(const std::string& arg)
 {
