@@ -26,6 +26,7 @@
 #include <limits>
 #include <clocale>
 #include <istream>
+#include "pd_json.h"
 
 
 namespace Poco {
@@ -33,6 +34,7 @@ namespace JSON {
 
 
 ParserImpl::ParserImpl(const Handler::Ptr& pHandler, std::size_t bufSize):
+	_pJSON(new json_stream),
 	_pHandler(pHandler),
 	_depth(JSON_UNLIMITED_DEPTH),
 	_decimalPoint('.'),
@@ -44,6 +46,7 @@ ParserImpl::ParserImpl(const Handler::Ptr& pHandler, std::size_t bufSize):
 
 ParserImpl::~ParserImpl()
 {
+	delete _pJSON;
 }
 
 
@@ -54,7 +57,7 @@ void ParserImpl::handle(const std::string& json)
 
 	try
 	{
-		json_open_buffer(&_json, json.data(), json.size());
+		json_open_buffer(_pJSON, json.data(), json.size());
 		checkError();
 		//////////////////////////////////
 		// Underlying parser is capable of parsing multiple consecutive JSONs;
@@ -62,16 +65,16 @@ void ParserImpl::handle(const std::string& json)
 		// excessive characters past valid JSON end, this MUST be called
 		// AFTER opening the buffer - otherwise it is overwritten by
 		// json_open*() call, which calls internal init()
-		json_set_streaming(&_json, false);
+		json_set_streaming(_pJSON, false);
 		/////////////////////////////////
 		handle(); checkError();
-		if (JSON_DONE != json_next(&_json))
+		if (JSON_DONE != json_next(_pJSON))
 			throw JSONException("Excess characters found after JSON end.");
-		json_close(&_json);
+		json_close(_pJSON);
 	}
 	catch (std::exception&)
 	{
-		json_close(&_json);
+		json_close(_pJSON);
 		throw;
 	}
 }
@@ -135,11 +138,11 @@ void ParserImpl::stripComments(std::string& json)
 
 void ParserImpl::handleArray()
 {
-	json_type tok = json_peek(&_json);
+	json_type tok = json_peek(_pJSON);
 	while (tok != JSON_ARRAY_END && checkError())
 	{
 		handle();
-		tok = json_peek(&_json);
+		tok = json_peek(_pJSON);
 	}
 
 	if (tok == JSON_ARRAY_END) handle();
@@ -149,13 +152,13 @@ void ParserImpl::handleArray()
 
 void ParserImpl::handleObject()
 {
-	json_type tok = json_peek(&_json);
+	json_type tok = json_peek(_pJSON);
 	while (tok != JSON_OBJECT_END && checkError())
 	{
-		json_next(&_json);
-		if (_pHandler) _pHandler->key(std::string(json_get_string(&_json, NULL)));
+		json_next(_pJSON);
+		if (_pHandler) _pHandler->key(std::string(json_get_string(_pJSON, NULL)));
 		handle();
-		tok = json_peek(&_json);
+		tok = json_peek(_pJSON);
 	}
 
 	if (tok == JSON_OBJECT_END) handle();
@@ -165,7 +168,7 @@ void ParserImpl::handleObject()
 
 void ParserImpl::handle()
 {
-	enum json_type type = json_next(&_json);
+	enum json_type type = json_next(_pJSON);
 	switch (type)
 	{
 		case JSON_DONE:
@@ -183,7 +186,7 @@ void ParserImpl::handle()
 		{
 			if (_pHandler)
 			{
-				std::string str(json_get_string(&_json, NULL));
+				std::string str(json_get_string(_pJSON, NULL));
 				if (str.find(_decimalPoint) != str.npos || str.find('e') != str.npos || str.find('E') != str.npos)
 				{
 					_pHandler->value(NumberParser::parseFloat(str));
@@ -200,7 +203,7 @@ void ParserImpl::handle()
 			break;
 		}
 		case JSON_STRING:
-			if (_pHandler) _pHandler->value(std::string(json_get_string(&_json, NULL)));
+			if (_pHandler) _pHandler->value(std::string(json_get_string(_pJSON, NULL)));
 			break;
 		case JSON_OBJECT:
 			if (_pHandler) _pHandler->startObject();
@@ -218,11 +221,19 @@ void ParserImpl::handle()
 			return;
 		case JSON_ERROR:
 		{
-			const char* pErr = json_get_error(&_json);
+			const char* pErr = json_get_error(_pJSON);
 			std::string err(pErr ? pErr : "JSON parser error.");
 			throw JSONException(err);
 		}
 	}
+}
+
+
+bool ParserImpl::checkError()
+{
+	const char* err = json_get_error(_pJSON);
+	if (err) throw Poco::JSON::JSONException(err);
+	return true;
 }
 
 
