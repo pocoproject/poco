@@ -260,7 +260,7 @@ void NumberParserTest::testParseError()
 		failmsg("must throw SyntaxException");
 	}
 	catch (SyntaxException&) {}
-	
+
 #if defined(POCO_HAVE_INT64)
 
 	try
@@ -286,7 +286,7 @@ void NumberParserTest::testParseError()
 		NumberParser::parseHex64("12345z");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
-	
+
 	try
 	{
 		NumberParser::parseHex64(format("123%c45", ts));
