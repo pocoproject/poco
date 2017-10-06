@@ -397,8 +397,9 @@ protected:
 	}
 
 private:
+
 	template <typename F, typename T>
-	void checkUpperLimit(const F& from) const
+	void POCO_UNUSED checkUpperLimit(const F& from) const
 	{
 		if ((sizeof(T) < sizeof(F)) &&
 			(from > static_cast<F>(std::numeric_limits<T>::max())))
@@ -411,6 +412,7 @@ private:
 			throw RangeException("Value too large.");
 		}
 	}
+
 
 	template <typename F, typename T>
 	void checkUpperLimitFloat(const F& from) const
