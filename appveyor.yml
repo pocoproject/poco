@@ -68,6 +68,12 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
   
   matrix:
+    - builder: cmake
+      vsver: 140
+
+    - builder: cmake
+      vsver: 150
+
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -95,12 +101,6 @@ environment:
 #    - builder: msbuild
 #      vsver: 150
 #      linkmode: static_mt
-
-    - builder: cmake
-      vsver: 140
-
-    - builder: cmake
-      vsver: 150
 
     - builder: cygwin
 
@@ -433,10 +433,22 @@ build_script:
         {
             $openssl = $env:OPENSSL64
         }
-        $defs =' -G"NMake Makefiles"';
-        $defs+=" -DCMAKE_BUILD_TYPE=$env:configuration";
-        $defs+=" -DOPENSSL_ROOT_DIR=$openssl";
-        $defs+=" -DENABLE_NETSSL=OFF";
+        if ($env:vsver -eq "140")
+        {
+            $generator = '"Visual Studio 14 2015"'
+        }
+        if ($env:vsver -eq "150")
+        {
+            $generator = '"Visual Studio 15 2017"'
+        }
+        $defs = "--config RelWithDebInfo"
+        $defs+=" -G" + $generator;
+        $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
+        if ($env:vsver -eq "150")
+        {
+            $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
+        }
+        $defs+=" -DENABLE_NETSSL=ON";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
         $defs+=" -DENABLE_DATA_MYSQL=OFF";
         $defs+=" -DENABLE_REDIS=OFF";
@@ -565,11 +577,11 @@ test_script:
         {
           pushd cmake-build;
           Write-Host -ForegroundColor Yellow $line;
-          ctest -N
+          ctest --config RelWithDebInfo -N
           Write-Host -ForegroundColor Yellow $line;
 
-          Write-Host -ForegroundColor Yellow 'ctest -VV -E Data*'
-          ctest -VV -E Data* -E Crypto*
+          Write-Host -ForegroundColor Yellow 'ctest -C Debug -VV -E Data*'
+          ctest -C Debug -VV -E Data*
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
