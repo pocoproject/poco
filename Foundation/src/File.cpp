@@ -45,6 +45,7 @@ File::File()
 
 File::File(const std::string& rPath): FileImpl(rPath)
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 }
 
 
@@ -77,6 +78,7 @@ File& File::operator = (const File& file)
 
 File& File::operator = (const std::string& rPath)
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 	setPathImpl(rPath);
 	return *this;
 }
@@ -212,6 +214,7 @@ File& File::setExecutable(bool flag)
 	
 void File::copyTo(const std::string& rPath) const
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 	Path src(getPathImpl());
 	Path dest(rPath);
 	File destFile(rPath);
@@ -229,6 +232,7 @@ void File::copyTo(const std::string& rPath) const
 
 void File::copyDirectory(const std::string& rPath) const
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 	File target(rPath);
 	target.createDirectories();
 
@@ -245,6 +249,7 @@ void File::copyDirectory(const std::string& rPath) const
 
 void File::moveTo(const std::string& rPath)
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 	copyTo(rPath);
 	remove(true);
 	setPathImpl(rPath);
@@ -253,6 +258,7 @@ void File::moveTo(const std::string& rPath)
 	
 void File::renameTo(const std::string& rPath)
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 	renameToImpl(rPath);
 	setPathImpl(rPath);
 }
