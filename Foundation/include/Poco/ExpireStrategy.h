@@ -24,6 +24,7 @@
 #include "Poco/Bugcheck.h"
 #include "Poco/Timestamp.h"
 #include "Poco/EventArgs.h"
+#include "Poco/Exception.h"
 #include <set>
 #include <map>
 

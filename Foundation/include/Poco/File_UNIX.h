@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Timestamp.h"
 
 
 namespace Poco {
