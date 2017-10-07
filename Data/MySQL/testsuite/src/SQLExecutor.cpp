@@ -1263,7 +1263,7 @@ void SQLExecutor::dateTime()
 	std::string lastName("Bart");
 	std::string firstName("Simpson");
 	std::string address("Springfield");
-	DateTime birthday(1980, 4, 1, 5, 45, 12);
+	DateTime birthday(1980, 4, 1, 5, 45, 12, 354, 879);
 	
 	int count = 0;
 	try { *_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday), now; }
