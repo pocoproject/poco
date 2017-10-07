@@ -858,6 +858,20 @@ void PathTest::testParseWindows4()
 	assert (p.toString(Path::PATH_WINDOWS) == "a\\b\\c\\d");
 }
 
+void PathTest::testParseWindows5()
+{
+	Path p;
+	p.parse("/c:/windows/system32/", Path::PATH_WINDOWS);
+	assert(!p.isRelative());
+	assert(p.isAbsolute());
+	assert(p.getDevice() == "c");
+	assert(p.depth() == 2);
+	assert(p[0] == "windows");
+	assert(p[1] == "system32");
+	assert(p.isDirectory());
+	assert(!p.isFile());
+	assert(p.toString(Path::PATH_WINDOWS) == "c:\\windows\\system32\\");
+}
 
 void PathTest::testParseVMS1()
 {
@@ -1670,6 +1684,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testParseWindows2);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows3);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows4);
+	CppUnit_addTest(pSuite, PathTest, testParseWindows5);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS1);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS2);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS3);
