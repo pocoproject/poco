@@ -473,9 +473,11 @@ void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTr
 void MailMessage::readHeader(std::istream& istr)
 {
 	clear();
-	MessageHeader::read(istr);
+	MessageHeader::RecipientList recipients;
+	MessageHeader::read(istr, &recipients);
 	istr.get(); // \r
 	if ('\n' == istr.peek()) istr.get(); // \n
+	for (const auto& r : recipients) addRecipient(r);
 }
 
 
@@ -495,36 +497,36 @@ void MailMessage::readMultipart(std::istream& istr, PartHandler& handler)
 
 void MailMessage::readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler)
 {
-    std::string encoding;
-    if (header.has(HEADER_CONTENT_TRANSFER_ENCODING))
-    {
-        encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
-        // get rid of a parameter if one is set
-        std::string::size_type pos = encoding.find(';');
-        if (pos != std::string::npos)
-            encoding.resize(pos);
-    }
-    if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
-    {
-        QuotedPrintableDecoder decoder(istr);
-        handlePart(decoder, header, handler);
-        _encoding = ENCODING_QUOTED_PRINTABLE;
-    }
-    else if (icompare(encoding, CTE_BASE64) == 0)
-    {
-        Base64Decoder decoder(istr);
-        handlePart(decoder, header, handler);
-        _encoding = ENCODING_BASE64;
-    }
-    else
-    {
-        if (icompare(encoding, CTE_7BIT) == 0)
-            _encoding = ENCODING_7BIT;
-        else if (icompare(encoding, CTE_8BIT) == 0)
-            _encoding = ENCODING_8BIT;
+	std::string encoding;
+	if (header.has(HEADER_CONTENT_TRANSFER_ENCODING))
+	{
+		encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
+		// get rid of a parameter if one is set
+		std::string::size_type pos = encoding.find(';');
+		if (pos != std::string::npos)
+		    encoding.resize(pos);
+	}
+	if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
+	{
+		QuotedPrintableDecoder decoder(istr);
+		handlePart(decoder, header, handler);
+		_encoding = ENCODING_QUOTED_PRINTABLE;
+	}
+	else if (icompare(encoding, CTE_BASE64) == 0)
+	{
+		Base64Decoder decoder(istr);
+		handlePart(decoder, header, handler);
+		_encoding = ENCODING_BASE64;
+	}
+	else
+	{
+		if (icompare(encoding, CTE_7BIT) == 0)
+			_encoding = ENCODING_7BIT;
+		else if (icompare(encoding, CTE_8BIT) == 0)
+			_encoding = ENCODING_8BIT;
 
-        handlePart(istr, header, handler);
-    }
+		handlePart(istr, header, handler);
+	}
 }
 
 

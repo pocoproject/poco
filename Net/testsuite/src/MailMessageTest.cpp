@@ -243,6 +243,19 @@ void MailMessageTest::testWriteManyRecipients()
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 	);
+
+	const Poco::Net::MailMessage::Recipients& recipients = message.recipients();
+	assert (recipients.size() == 5);
+	assert (recipients[0].getAddress() == "john.doe@no.where");
+	assert (recipients[0].getRealName() == "John Doe");
+	assert (recipients[1].getAddress() == "jane.doe@no.where");
+	assert (recipients[1].getRealName() == "Jane Doe");
+	assert (recipients[2].getAddress() == "walter.foo@no.where");
+	assert (recipients[2].getRealName() == "Frank Foo");
+	assert (recipients[3].getAddress() == "bernie.bar@no.where");
+	assert (recipients[3].getRealName() == "Bernie Bar");
+	assert (recipients[4].getAddress() == "joe.spammer@no.where");
+	assert (recipients[4].getRealName() == "Joe Spammer");
 }
 
 
@@ -539,7 +552,7 @@ void MailMessageTest::testReadWriteMultiPart()
 
 	message.read(istr);
 	message.write(ostr);
-	
+
 	std::string msgout(ostr.str());
 	assert (msgout == msgin);
 }
