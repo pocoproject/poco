@@ -82,7 +82,12 @@
 #endif
 
 #if !defined(POCO_NO_WINDOWS_H)
-#include <windows.h>
+	#include <windows.h>
+	#ifdef __MINGW32__
+		#include <Winsock2.h>
+		#include <Iphlpapi.h>
+		#include <ws2tcpip.h>
+	#endif // __MINGW32__
 #endif
 
 // To prevent Platform_WIN32.h to modify version defines,
