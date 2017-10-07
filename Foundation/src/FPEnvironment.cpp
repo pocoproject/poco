@@ -14,10 +14,6 @@
 
 // pull in platform identification macros needed below
 #include "Poco/Platform.h"
-
-
-// header file must be included after platform-specific part
-// due to _XOPEN_SOURCE conflict on Tru64 (see FPEnvironment_DEC.cpp)
 #include "Poco/FPEnvironment.h"
 
 
