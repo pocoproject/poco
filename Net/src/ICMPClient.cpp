@@ -72,7 +72,7 @@ int ICMPClient::ping(const SocketAddress& address, int repeat) const
 			int sent = icmpSocket.sendTo(address);
 			if (icmpSocket.packetSize() == sent)
 			{
-				SocketAddress responseAddress;
+				SocketAddress responseAddress(address);
 				++eventArgs;
 				int t = icmpSocket.receiveFrom(responseAddress);
 				poco_assert (address.host() == responseAddress.host());
@@ -136,7 +136,7 @@ int ICMPClient::ping(const SocketAddress& address,
 		{
 			if (icmpSocket.sendTo(address) == icmpSocket.packetSize())
 			{
-				SocketAddress responseAddress;
+				SocketAddress responseAddress(address);
 				icmpSocket.receiveFrom(responseAddress);
 				poco_assert (address.host() == responseAddress.host());
 				++received;
