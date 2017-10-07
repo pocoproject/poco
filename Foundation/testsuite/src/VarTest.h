@@ -97,12 +97,12 @@ private:
 	{
 		TL iMin = std::numeric_limits<TS>::min();
 		Poco::Dynamic::Var da = iMin - 1;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 
 		TL iMax = std::numeric_limits<TS>::max();
 		da = iMax + 1;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
 
@@ -115,13 +115,13 @@ private:
 		{
 			TL iMin = static_cast<TL>(std::numeric_limits<TS>::min());
 			da = iMin * 10;
-			try { TS i; i = da.convert<TS>(); fail("must fail"); }
+			try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 			catch (Poco::RangeException&) {}
 		}
 
 		TL iMax = static_cast<TL>(std::numeric_limits<TS>::max());
 		da = iMax * 10;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
 
@@ -133,14 +133,14 @@ private:
 
 		TS iMin = std::numeric_limits<TS>::min();
 		Poco::Dynamic::Var dMin = iMin;
-		try { TU i; i = dMin.convert<TU>(); fail("must fail"); }
+		try { TU POCO_UNUSED i; i = dMin.convert<TU>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 
 		if(sizeof(TS) == sizeof(TU))
 		{
 			TU iMax = std::numeric_limits<TU>::max();
 			Poco::Dynamic::Var dMax = iMax;
-			try { TS i; i = dMax.convert<TS>(); fail("must fail"); }
+			try { TS POCO_UNUSED i; i = dMax.convert<TS>(); fail("must fail"); }
 			catch (Poco::RangeException&) {}
 		}
 	}
@@ -150,7 +150,7 @@ private:
 	{
 		TL iMax = std::numeric_limits<TS>::max();
 		Poco::Dynamic::Var da = iMax + 1;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
 

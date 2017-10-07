@@ -227,7 +227,7 @@ void AnyTest::testInt()
 	std::string* s = AnyCast<std::string>(&a);
 	assert (s == NULL);
 
-	int tmp = AnyCast<int>(a);
+	int POCO_UNUSED tmp = AnyCast<int>(a);
 	const Any c = a;
 	tmp = AnyCast<int>(a);
 }

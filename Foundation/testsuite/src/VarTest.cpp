@@ -128,7 +128,7 @@ void VarTest::testInt8()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -216,7 +216,7 @@ void VarTest::testInt16()
 
 	try
 	{
-		Int32 value2; value2 = a1.extract<Int32>();
+		Int32 POCO_UNUSED value2; value2 = a1.extract<Int32>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -304,7 +304,7 @@ void VarTest::testInt32()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -392,7 +392,7 @@ void VarTest::testInt64()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -480,7 +480,7 @@ void VarTest::testUInt8()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -568,7 +568,7 @@ void VarTest::testUInt16()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -656,7 +656,7 @@ void VarTest::testUInt32()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -744,7 +744,7 @@ void VarTest::testUInt64()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -832,7 +832,7 @@ void VarTest::testBool()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -903,7 +903,7 @@ void VarTest::testChar()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -915,7 +915,7 @@ void VarTest::testChar()
 void VarTest::testFloat()
 {
 	Var any("0");
-	float f = any;
+	float POCO_UNUSED f = any;
 
 	float src = 32.0f;
 	Var a1 = src;
@@ -977,7 +977,7 @@ void VarTest::testFloat()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1007,7 +1007,7 @@ void VarTest::testDouble()
 {
 	double d = 0;
 	Var v(d);
-	float f = v;
+	float POCO_UNUSED f = v;
 
 	double src = 32.0;
 	Var a1 = src;
@@ -1069,7 +1069,7 @@ void VarTest::testDouble()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1153,7 +1153,7 @@ void VarTest::testString()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1242,7 +1242,7 @@ void VarTest::testLong()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1330,7 +1330,7 @@ void VarTest::testULong()
 
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1371,7 +1371,7 @@ void VarTest::testUDT()
 
 	try
 	{
-		float f = da1;
+		float POCO_UNUSED f = da1;
 		fail ("must fail");
 	}
 	catch (BadCastException&) { }
@@ -1712,12 +1712,12 @@ void VarTest::testLimitsFloat()
 	{
 		double iMin = -1 * std::numeric_limits<float>::max();
 		Var da = iMin * 10;
-		try { float f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must fail"); }
 		catch (RangeException&) {}
 
 		double iMax = std::numeric_limits<float>::max();
 		da = iMax * 10;
-		try { float f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must fail"); }
 		catch (RangeException&) {}
 	}
 }
@@ -2539,13 +2539,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int i = da;
+		int POCO_UNUSED i = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int i = da.extract<int>();
+		int POCO_UNUSED i = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }

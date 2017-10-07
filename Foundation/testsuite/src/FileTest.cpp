@@ -45,7 +45,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.canRead();
+		bool POCO_UNUSED flag = f.canRead();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -54,7 +54,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.canWrite();
+		bool POCO_UNUSED flag = f.canWrite();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -63,7 +63,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.isFile();
+		bool POCO_UNUSED flag = f.isFile();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -72,7 +72,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.isDirectory();
+		bool POCO_UNUSED flag = f.isDirectory();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -81,7 +81,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		Timestamp ts = f.created();
+		Timestamp POCO_UNUSED ts = f.created();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -90,7 +90,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		Timestamp ts = f.getLastModified();
+		Timestamp POCO_UNUSED ts = f.getLastModified();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -109,7 +109,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		File::FileSize fs = f.getSize();
+		File::FileSize POCO_UNUSED fs = f.getSize();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)

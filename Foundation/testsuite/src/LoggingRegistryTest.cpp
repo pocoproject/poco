@@ -126,7 +126,7 @@ void LoggingRegistryTest::testUnregister()
 	
 	try
 	{
-		Channel* pC = reg.channelForName("c1");
+		Channel* POCO_UNUSED pC = reg.channelForName("c1");
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)
@@ -135,7 +135,7 @@ void LoggingRegistryTest::testUnregister()
 
 	try
 	{
-		Formatter* pF = reg.formatterForName("f2");
+		Formatter* POCO_UNUSED pF = reg.formatterForName("f2");
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

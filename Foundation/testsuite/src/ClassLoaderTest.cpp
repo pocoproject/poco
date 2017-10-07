@@ -50,7 +50,7 @@ void ClassLoaderTest::testClassLoader1()
 	
 	try
 	{
-		const ClassLoader<TestPlugin>::Meta& meta = cl.classFor("PluginA");
+		const ClassLoader<TestPlugin>::Meta& POCO_UNUSED meta = cl.classFor("PluginA");
 		fail("not found - must throw exception");
 	}
 	catch (NotFoundException&)
@@ -63,7 +63,7 @@ void ClassLoaderTest::testClassLoader1()
 
 	try
 	{
-		const ClassLoader<TestPlugin>::Manif& manif = cl.manifestFor(path);
+		const ClassLoader<TestPlugin>::Manif& POCO_UNUSED manif = cl.manifestFor(path);
 		fail("not found - must throw exception");
 	}
 	catch (NotFoundException&)
@@ -122,7 +122,7 @@ void ClassLoaderTest::testClassLoader2()
 	
 	try
 	{
-		TestPlugin& plgB = cl.instance("PluginB");
+		TestPlugin& POCO_UNUSED plgB = cl.instance("PluginB");
 		fail("not a singleton - must throw");
 	}
 	catch (InvalidAccessException&)
@@ -131,7 +131,7 @@ void ClassLoaderTest::testClassLoader2()
 	
 	try
 	{
-		TestPlugin* pPluginC = cl.create("PluginC");
+		TestPlugin* POCO_UNUSED pPluginC = cl.create("PluginC");
 		fail("cannot create a singleton - must throw");
 	}
 	catch (InvalidAccessException&)

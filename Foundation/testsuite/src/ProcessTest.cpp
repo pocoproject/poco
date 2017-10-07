@@ -234,7 +234,7 @@ void ProcessTest::testIsRunning()
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(100, 'x');
 	ostr.close();
-	int rc = ph.wait();
+	int POCO_UNUSED rc = ph.wait();
 	assert (!Process::isRunning(ph));
 	assert (!Process::isRunning(id));
 #endif // !defined(_WIN32_WCE)
