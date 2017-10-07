@@ -397,65 +397,10 @@ private:
 // inlines
 //
 
-
-inline void IPAddress::destruct()
-{
-	pImpl()->~IPAddressImpl();
-}
-
-
 inline IPAddress::Ptr IPAddress::pImpl() const
 {
 	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
 }
-
-
-inline void IPAddress::newIPv4()
-{
-	new (storage()) Poco::Net::Impl::IPv4AddressImpl;
-}
-
-
-inline void IPAddress::newIPv4(const void* hostAddr)
-{
-	new (storage()) Poco::Net::Impl::IPv4AddressImpl(hostAddr);
-}
-
-
-inline void IPAddress::newIPv4(unsigned prefix)
-{
-	new (storage()) Poco::Net::Impl::IPv4AddressImpl(prefix);
-}
-
-
-#if defined(POCO_HAVE_IPv6)
-
-
-inline void IPAddress::newIPv6()
-{
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl;
-}
-
-
-inline void IPAddress::newIPv6(const void* hostAddr)
-{
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr);
-}
-
-
-inline void IPAddress::newIPv6(const void* hostAddr, Poco::UInt32 scope)
-{
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr, scope);
-}
-
-
-inline void IPAddress::newIPv6(unsigned prefix)
-{
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(prefix);
-}
-
-
-#endif // POCO_HAVE_IPv6
 
 
 inline char* IPAddress::storage()

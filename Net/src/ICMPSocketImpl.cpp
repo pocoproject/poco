@@ -89,10 +89,10 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 		}
 		while (expected && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
 	}
-    catch (ICMPException&)
-    {
-        throw;
-    }
+	catch (ICMPException&)
+	{
+		throw;
+	}
 	catch (Exception&)
 	{
 		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize);
