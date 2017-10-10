@@ -42,6 +42,9 @@ const std::string StatementImpl::DEQUE = "deque";
 const std::string StatementImpl::UNKNOWN = "unknown";
 
 
+const std::size_t StatementImpl::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
+
+
 StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
 	_extrLimit(upperLimit(Limit::LIMIT_UNLIMITED, false)),
@@ -50,9 +53,9 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_storage(STORAGE_UNKNOWN_IMPL),
 	_ostr(),
 	_curDataSet(0),
-	_pendingDSNo(0),
 	_bulkBinding(BULK_UNDEFINED),
-	_bulkExtraction(BULK_UNDEFINED)
+	_bulkExtraction(BULK_UNDEFINED),
+	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 {
 	if (!_rSession.isConnected())
 		throw NotConnectedException(_rSession.connectionString());
@@ -82,28 +85,23 @@ std::size_t StatementImpl::execute(const bool& rReset)
 	if (_lowerLimit > _extrLimit.value())
 		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
 
-	size_t pds = _pendingDSNo;
-	while (pds > currentDataSet()) activateNextDataSet();
-
-	const size_t savedDs = currentDataSet();
 	do
 	{
 		compile();
 		if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
+		{
 			lim += executeWithoutLimit();
+			assignSubTotal(true);
+		}
 		else
+		{
 			lim += executeWithLimit();
+			assignSubTotal(false);
+		}
 	} while (canCompile());
-
-	// rewind ds back here!!!!
-	pds = currentDataSet();
-	while (savedDs < currentDataSet()) activatePreviousDataSet();
-	_pendingDSNo = pds;
 
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
 		_state = ST_DONE;
-
-	assignSubTotal(rReset, savedDs);
 
 	if (lim < _lowerLimit)
 		throw LimitException("Did not receive enough data.");
@@ -112,13 +110,13 @@ std::size_t StatementImpl::execute(const bool& rReset)
 }
 
 
-void StatementImpl::assignSubTotal(bool doReset, size_t firstDs)
+void StatementImpl::assignSubTotal(bool doReset)
 {
 	if (_extractors.size() == _subTotalRowCount.size())
 	{
-		CountVec::iterator it = _subTotalRowCount.begin() + firstDs;
+		CountVec::iterator it = _subTotalRowCount.begin();
 		CountVec::iterator end = _subTotalRowCount.end();
-		for (size_t counter = firstDs; it != end; ++it, ++counter)
+		for (size_t counter = 0; it != end; ++it, ++counter)
 		{
 			if (_extractors[counter].size())
 			{
@@ -385,11 +383,7 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 
 std::size_t StatementImpl::activateNextDataSet()
 {
-	if (_curDataSet + 1 < dataSetCount())
-	{
-		_pendingDSNo = ++_curDataSet;
-		return _curDataSet;
-	}
+	if (_curDataSet + 1 < dataSetCount()) return ++_curDataSet;
 	else
 		throw NoDataException("End of data sets reached.");
 }
@@ -397,11 +391,7 @@ std::size_t StatementImpl::activateNextDataSet()
 
 std::size_t StatementImpl::activatePreviousDataSet()
 {
-	if (_curDataSet > 0)
-	{
-		_pendingDSNo = --_curDataSet;
-		return _curDataSet;
-	}
+	if (_curDataSet > 0) return --_curDataSet;
 	else
 		throw NoDataException("Beginning of data sets reached.");
 }
@@ -466,7 +456,7 @@ std::size_t StatementImpl::rowsExtracted(int dataSet) const
 		if (_extractors[dataSet].size() > 0)
 			return _extractors[dataSet][0]->numOfRowsHandled();
 	}
-	
+
 	return 0;
 }
 

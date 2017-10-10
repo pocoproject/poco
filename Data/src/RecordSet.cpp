@@ -30,16 +30,12 @@ namespace Poco {
 namespace Data {
 
 
-const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
-
-
 RecordSet::RecordSet(const Statement& rStatement,
 	RowFormatter::Ptr pRowFormatter): 
 	Statement(rStatement),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-	_pEnd(new RowIterator(this, true)),
-	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+	_pEnd(new RowIterator(this, true))
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
@@ -51,8 +47,7 @@ RecordSet::RecordSet(Session& rSession,
 	Statement((rSession << query, now)),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-	_pEnd(new RowIterator(this, true)),
-	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+	_pEnd(new RowIterator(this, true))
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
@@ -63,8 +58,7 @@ RecordSet::RecordSet(const RecordSet& other):
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(other._pFilter),
-	_totalRowCount(other._totalRowCount)
+	_pFilter(other._pFilter)
 {
 }
 
@@ -94,7 +88,7 @@ RecordSet& RecordSet::reset(const Statement& stmt)
 	delete _pEnd;
 	_pEnd = 0;
 	_currentRow = 0;
-	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
+	Statement::setTotalRowCount(StatementImpl::UNKNOWN_TOTAL_ROW_COUNT);
 	
 	RowMap::iterator it = _rowMap.begin();
 	RowMap::iterator end = _rowMap.end();
@@ -400,12 +394,6 @@ void RecordSet::filter(const Poco::AutoPtr<RowFilter>& pFilter)
 bool RecordSet::isFiltered() const
 {
 	return _pFilter && !_pFilter->isEmpty();
-}
-
-
-void RecordSet::setTotalRowCount(const std::string& sql)
-{
-	session() << sql, into(_totalRowCount), now;
 }
 
 

@@ -346,6 +346,27 @@ public:
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
 
+	std::size_t totalRowCount() const;
+		//@ deprecated
+		/// Replaced with subTotalRowCount() and getTotalRowCount().
+
+	std::size_t getTotalRowCount() const;
+		/// Returns the total number of rows in the RecordSet.
+		/// The number of rows reported is independent of filtering.
+		/// If the total row count has not been set externally
+		/// (either explicitly or implicitly through SQL), the value
+		/// returned shall only be accurate if the statement limit
+		/// is less or equal to the total row count.
+
+	void setTotalRowCount(std::size_t totalRowCount);
+		/// Explicitly sets the total row count.
+
+	void setTotalRowCount(const std::string& sql);
+		/// Implicitly sets the total row count.
+		/// The supplied sql must return exactly one column
+		/// and one row. The returned value must be an unsigned
+		/// integer. The value is set as the total number of rows.
+
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the current data set.
@@ -432,6 +453,24 @@ private:
 inline std::size_t Statement::subTotalRowCount(int dataSet) const
 {
 	return _pImpl->subTotalRowCount(dataSet);
+}
+
+
+inline std::size_t Statement::getTotalRowCount() const
+{
+	return _pImpl->getTotalRowCount();
+}
+
+
+inline std::size_t Statement::totalRowCount() const
+{
+	return getTotalRowCount();
+}
+
+
+inline void Statement::setTotalRowCount(std::size_t count)
+{
+	_pImpl->setTotalRowCount(count);
 }
 
 

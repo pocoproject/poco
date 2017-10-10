@@ -16,6 +16,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/Rowfilter.h"
 #include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
@@ -48,6 +49,7 @@ using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
+using Poco::Data::RowFilter;
 using Poco::Data::JSONRowFormatter;
 using Poco::Data::Column;
 using Poco::Data::Row;
@@ -2307,6 +2309,115 @@ void SQLiteTest::testRowIterator()
 }
 
 
+void SQLiteTest::testRowIteratorLimit()
+{
+	Session ses(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	ses << "DROP TABLE IF EXISTS Vectors", now;
+	ses << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	ses << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now;
+
+	int count = 0;
+	Statement stmt = (ses << "select * from Vectors", Poco::Data::Keywords::limit(1));
+	while (!stmt.done())
+	{
+		stmt.execute(false);
+		Poco::Data::RecordSet rs(stmt);
+		auto rowIt = rs.begin() + count;
+		assert (++count == rs.rowCount());
+		assert ((*rowIt)["int0"] == count);
+
+		int cnt = 0;
+		for (rowIt = rs.begin(); rowIt != rs.end(); ++rowIt)
+			assert ((*rowIt)["int0"] == ++cnt);
+	}
+}
+
+
+void SQLiteTest::testFilter()
+{
+	Session ses(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	ses << "DROP TABLE IF EXISTS Vectors", now;
+	ses << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+
+	std::vector<Tuple<int, double, std::string> > v;
+	v.push_back(Tuple<int, double, std::string>(1, 1.5f, "3"));
+	v.push_back(Tuple<int, double, std::string>(2, 2.5f, "4"));
+	v.push_back(Tuple<int, double, std::string>(3, 3.5f, "5"));
+	v.push_back(Tuple<int, double, std::string>(4, 4.5f, "6"));
+
+	ses << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now;
+
+	Statement stmt = (ses << "select * from Vectors", now);
+	RecordSet rset(stmt);
+	assert (rset.totalRowCount() == 4);
+	RowFilter::Ptr pRF = new RowFilter(&rset);
+	assert (pRF->isEmpty());
+	std::string intFldName = "int0";
+	pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);
+	assert (!pRF->isEmpty());
+
+	Var da;
+	try
+	{
+		da = rset.value(0, 1);
+		fail("must fail");
+	}
+	catch (InvalidAccessException&)
+	{
+		da = rset.value(0, 1, false);
+		assert(2 == da);
+		da = rset.value(0, 0);
+		assert(1 == da);
+	}
+
+	assert(rset.rowCount() == 1);
+	assert(rset.moveFirst());
+	assert(1 == rset[intFldName]);
+	assert(!rset.moveNext());
+	pRF->add("flt0", RowFilter::VALUE_LESS_THAN_OR_EQUAL, 3.5f);
+	assert(rset.rowCount() == 3);
+	assert(rset.moveNext());
+	assert(2.5 == rset["flt0"]);
+	assert(rset.moveNext());
+	assert(3.5 == rset["flt0"]);
+	assert(!rset.moveNext());
+	pRF->add("str0", RowFilter::VALUE_EQUAL, 6);
+	assert(rset.rowCount() == 4);
+	assert(rset.moveLast());
+	assert("6" == rset["str0"]);
+	pRF->remove("flt0");
+	assert(rset.rowCount() == 2);
+	assert(rset.moveFirst());
+	assert("3" == rset["str0"]);
+	assert(rset.moveNext());
+	assert("6" == rset["str0"]);
+	pRF->remove(intFldName);
+	pRF->remove("str0");
+	assert(pRF->isEmpty());
+	pRF->add("str0", "!=", 3);
+	assert(rset.rowCount() == 3);
+
+	RowFilter::Ptr pRF1 = new RowFilter(pRF, RowFilter::OP_AND);
+	pRF1->add(intFldName, "==", 2);
+	assert(rset.rowCount() == 1);
+	pRF1->add(intFldName, "<", 2);
+	assert(rset.rowCount() == 1);
+	pRF1->add(intFldName, ">", 3);
+	assert(rset.rowCount() == 2);
+	pRF->removeFilter(pRF1);
+	pRF->remove("str0");
+	assert(pRF->isEmpty());
+	assert(rset.rowCount() == 4);
+}
+
+
 void SQLiteTest::testAsync()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2326,10 +2437,12 @@ void SQLiteTest::testAsync()
 	assert (stmt1.wait() == rowCount);
 
 	stmt1.execute();
-	try {
+	try
+	{
 		stmt1.execute();
 		fail ("must fail");
-	} catch (InvalidAccessException&)
+	}
+	catch (InvalidAccessException&)
 	{
 		stmt1.wait();
 		stmt1.execute();
@@ -2342,10 +2455,12 @@ void SQLiteTest::testAsync()
 
 	assert (stmt.execute() == 0);
 	assert (stmt.isAsync());
-	try {
+	try
+	{
 		result = stmt.executeAsync();
 		fail ("must fail");
-	} catch (InvalidAccessException&)
+	}
+	catch (InvalidAccessException&)
 	{
 		stmt.wait();
 		result = stmt.executeAsync();
@@ -3560,6 +3675,7 @@ void SQLiteTest::tearDown()
 {
 }
 
+
 void SQLiteTest::testIncrementVacuum()
 {
 	std::string lastName("lastname");
@@ -3663,6 +3779,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorLimit);
+	CppUnit_addTest(pSuite, SQLiteTest, testFilter);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
