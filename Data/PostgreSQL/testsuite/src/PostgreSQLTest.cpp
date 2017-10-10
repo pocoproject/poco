@@ -122,6 +122,7 @@ void PostgreSQLTest::testConnectNoDB()
 	dbConnString +=  "host=" + getHost();
 	dbConnString += " user=" + getUser();
 	dbConnString +=	" password=" + getPass();
+	dbConnString += " port=" + getPort();
 	
 	try
 	{
@@ -889,7 +890,12 @@ void PostgreSQLTest::testTupleWithNullable()
 
 void PostgreSQLTest::dropTable(const std::string& tableName)
 {
-	try { *_pSession << format("DROP TABLE IF EXISTS %s", tableName), now; }
+	try
+	{
+		*_pSession << "SET client_min_messages=warning", now;
+		*_pSession << format("DROP TABLE IF EXISTS %s", tableName), now;
+		*_pSession << "RESET client_min_messages", now;
+	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("dropTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("dropTable()"); }
 }
