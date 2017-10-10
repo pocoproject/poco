@@ -16,7 +16,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
-#include "Poco/Data/Rowfilter.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"

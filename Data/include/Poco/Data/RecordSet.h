@@ -96,8 +96,7 @@ public:
 		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-		_pEnd(new RowIterator(this, true)),
-		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+		_pEnd(new RowIterator(this, true))
 		/// Creates the RecordSet.
 	{
 		setRowFormatter(Keywords::format(rowFormatter));
