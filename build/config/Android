@@ -8,7 +8,7 @@
 # General Settings
 #
 LINKMODE           ?= STATIC
-ANDROID_ABI        ?= armeabi
+ANDROID_ABI        ?= armeabi-v7a
 POCO_TARGET_OSNAME  = Android
 POCO_TARGET_OSARCH  = $(ANDROID_ABI)
 
@@ -33,8 +33,8 @@ endif
 #
 # Define Tools
 #
-CC      = $(TOOL)-gcc
-CXX     = $(TOOL)-g++
+CC      = $(TOOL)-clang
+CXX     = $(TOOL)-clang++
 LINK    = $(CXX)
 STRIP   = $(TOOL)-strip
 LIB     = $(TOOL)-ar -cr
@@ -56,10 +56,10 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(ARCHFLAGS) -fpic -ffunction-sections -funwind-tables -fstack-protector -fno-strict-aliasing -finline-limit=64
+CFLAGS          = $(ARCHFLAGS) -fpic -ffunction-sections -funwind-tables -fstack-protector -fno-strict-aliasing
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = $(ARCHFLAGS) -fpic -ffunction-sections -funwind-tables -fstack-protector -fno-strict-aliasing -finline-limit=64 -frtti -fexceptions
+CXXFLAGS        = $(ARCHFLAGS) -fpic -ffunction-sections -funwind-tables -fstack-protector -fno-strict-aliasing -frtti -fexceptions
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS      += 
@@ -87,3 +87,9 @@ SYSFLAGS = -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SH
 # System Specific Libraries
 #
 SYSLIBS  = -lstdc++ -lsupc++
+
+#
+# C++11/14 detection
+#
+include $(POCO_BASE)/build/script/cpp11-clang
+
