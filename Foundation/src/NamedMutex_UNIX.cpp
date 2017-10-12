@@ -86,6 +86,8 @@ NamedMutexImpl::~NamedMutexImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 	sem_close(_sem);
+#else
+	semctl(_semid, 0, IPC_RMID, 0);
 #endif
 }
 
