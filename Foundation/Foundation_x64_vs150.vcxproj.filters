@@ -945,6 +945,12 @@
     <ClCompile Include="src\VarIterator.cpp">
       <Filter>Dynamic\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Checksum32.cpp">
+      <Filter>Core\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Checksum64.cpp">
+      <Filter>Core\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1933,6 +1939,15 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Dynamic\VarIterator.h">
       <Filter>Dynamic\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Checksum32.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Checksum64.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ChecksumImpl.h">
+      <Filter>Core\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

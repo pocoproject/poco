@@ -8,7 +8,8 @@ include $(POCO_BASE)/build/rules/global
 
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
-	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
+	BinaryReader BinaryWriter Bugcheck ByteOrder Channel \
+	Checksum Checksum32 Checksum64 Clock Configurable ConsoleChannel \
 	Condition CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event Error EventArgs EventChannel ErrorHandler Exception FIFOBufferStream FPEnvironment  \
