@@ -46,6 +46,7 @@ private:
 	sem_t* _sem;
 #else
 	int _semid;  // semaphore id
+	bool _owned;
 #endif
 };
 

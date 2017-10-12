@@ -72,12 +72,17 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 		union semun arg;
 		arg.val = 1;
 		semctl(_semid, 0, SETVAL, arg);
+		_owned = true;
+		return;
 	}
 	else if (errno == EEXIST)
 	{
 		_semid = semget(key, 1, 0);
+		_owned = false;
+		if (_semid >= 0) return;
 	}
-	else throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
+
+	throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
 #endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 }
 
@@ -86,6 +91,8 @@ NamedMutexImpl::~NamedMutexImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	sem_close(_sem);
+#else
+	if (_owned) semctl(_semid, 0, IPC_RMID, 0);
 #endif
 }
 
