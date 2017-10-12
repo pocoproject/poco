@@ -30,6 +30,7 @@ public:
 	void testFormatHex();
 	void testFormatFloat();
 	void testAppend();
+	void testInfNaN();
 
 	void setUp();
 	void tearDown();

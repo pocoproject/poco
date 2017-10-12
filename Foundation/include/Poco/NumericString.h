@@ -527,12 +527,15 @@ Foundation_API std::string& doubleToFixedStr(std::string& str,
 	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
-Foundation_API float strToFloat(const char* str);
+Foundation_API float strToFloat(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// Function uses double_convesrion::DoubleToStringConverter to do the conversion.
 
 
-Foundation_API bool strToFloat(const std::string&, float& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToFloat(const std::string&, float& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
@@ -541,11 +544,14 @@ Foundation_API bool strToFloat(const std::string&, float& result, char decSep = 
 	/// Returns true if successful, false otherwise.
 
 
-Foundation_API double strToDouble(const char* str);
+Foundation_API double strToDouble(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 
 
-Foundation_API bool strToDouble(const std::string& str, double& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToDouble(const std::string& str, double& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be

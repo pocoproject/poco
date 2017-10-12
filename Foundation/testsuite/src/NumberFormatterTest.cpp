@@ -276,6 +276,34 @@ void NumberFormatterTest::testAppend()
 }
 
 
+void NumberFormatterTest::testInfNaN()
+{
+	if (std::numeric_limits<double>::has_quiet_NaN)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<double>::quiet_NaN()) == "nan");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<double>::quiet_NaN()) == "nan");
+	}
+
+	if (std::numeric_limits<double>::has_infinity)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<double>::infinity()) == "inf");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<double>::infinity()) == "-inf");
+	}
+
+	if (std::numeric_limits<float>::has_quiet_NaN)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<float>::quiet_NaN()) == "nan");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<float>::quiet_NaN()) == "nan");
+	}
+
+	if (std::numeric_limits<float>::has_infinity)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<float>::infinity()) == "inf");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<float>::infinity()) == "-inf");
+	}
+}
+
+
 void NumberFormatterTest::setUp()
 {
 }
@@ -296,6 +324,7 @@ CppUnit::Test* NumberFormatterTest::suite()
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatHex);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatFloat);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testAppend);
+	CppUnit_addTest(pSuite, NumberFormatterTest, testInfNaN);
 
 	return pSuite;
 }
