@@ -34,6 +34,7 @@ public:
 		TYPE_CRC64_IMPL
 	};
 
+	virtual ~ChecksumImpl() {}
 	virtual void update(const char* data, unsigned length) = 0;
 	virtual void update(const std::string& data) = 0;
 	virtual void update(char data) = 0;
