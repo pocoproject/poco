@@ -39,7 +39,7 @@ class MySQL_API MySQLException: public Poco::Data::DataException
 {
 public:
 
-	MySQLException(const std::string& msg);
+	MySQLException(const std::string& msg, int errCode = 0);
 		/// Creates MySQLException.
 
 	MySQLException(const MySQLException& exc);
