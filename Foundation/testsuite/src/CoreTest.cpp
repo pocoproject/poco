@@ -360,8 +360,42 @@ void CoreTest::testAtomicCounter()
 }
 
 
+class NonDefaultConstructible
+{
+public:
+	NonDefaultConstructible(int val): _val(val)
+	{
+	}
+
+	NonDefaultConstructible operator=(int val)
+	{
+		_val = val;
+	}
+
+	bool operator == (const NonDefaultConstructible& other) const
+	{
+		return (_val == other._val);
+	}
+
+	int value() const
+	{
+		return _val;
+	}
+
+private:
+	NonDefaultConstructible();
+	int _val;
+};
+
+
 void CoreTest::testNullable()
 {
+	Nullable<NonDefaultConstructible> ndc;
+	assert (ndc.isNull());
+	ndc = 42;
+	assert (!ndc.isNull());
+	assert (ndc.value() == 42);
+
 	Nullable<int> i;
 	Nullable<double> f;
 	Nullable<std::string> s;
