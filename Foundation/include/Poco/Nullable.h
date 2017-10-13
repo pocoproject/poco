@@ -36,7 +36,7 @@ enum NullType
 template <typename C>
 class Nullable
 	/// Nullable is a simple wrapper class for value types
-	/// that allows objects or native type variables
+	/// that allows objects or native type variables 
 	/// to have "null" value.
 	///
 	/// The class is useful for passing parameters to functions
@@ -60,34 +60,34 @@ class Nullable
 public:
 	Nullable(): 
 		/// Creates an empty Nullable.
+		_value(),
 		_isNull(true),
 		_null()
 	{
-		std::memset(_value, 0, sizeof(C));
 	}
 
 	Nullable(const NullType&): 
 		/// Creates an empty Nullable.
+		_value(),
 		_isNull(true),
 		_null()
 	{
-		std::memset(_value, 0, sizeof(C));
 	}
 
 	Nullable(const C& value): 
 		/// Creates a Nullable with the given value.
+		_value(value), 
 		_isNull(false),
 		_null()
 	{
-		new(_value) C(value);
 	}
 	
 	Nullable(const Nullable& other):
 		/// Creates a Nullable by copying another one.
+		_value(other._value),
 		_isNull(other._isNull),
 		_null()
 	{
-		new(_value) C(other.value());
 	}
 
 	~Nullable()
@@ -98,7 +98,7 @@ public:
 	Nullable& assign(const C& value)
 		/// Assigns a value to the Nullable.
 	{
-		new (_value) C(value);
+		_value  = value;
 		_isNull = false;
 		return *this;
 	}
@@ -140,23 +140,20 @@ public:
 	void swap(Nullable& other)
 		/// Swaps this Nullable with other.
 	{
-		char tmp[sizeof(C)];
-		std::memcpy(tmp, _value, sizeof(C));
-		std::memcpy(_value, other._value, sizeof(C));
-		std::memcpy(other._value, tmp, sizeof(C));
+		std::swap(_value, other._value);
 		std::swap(_isNull, other._isNull);
 	}
 
 	bool operator == (const Nullable<C>& other) const
 		/// Compares two Nullables for equality
 	{
-		return (_isNull && other._isNull) || (_isNull == other._isNull && value() == other.value());
+		return (_isNull && other._isNull) || (_isNull == other._isNull && _value == other._value);
 	}
 
-	bool operator == (const C& val) const
+	bool operator == (const C& value) const
 		/// Compares Nullable with value for equality
 	{
-		return (!_isNull && value() == val);
+		return (!_isNull && _value == value);
 	}
 
 	bool operator == (const NullType&) const
@@ -165,10 +162,10 @@ public:
 		return _isNull;
 	}
 
-	bool operator != (const C& val) const
+	bool operator != (const C& value) const
 		/// Compares Nullable with value for non equality
 	{
-		return !(*this == val);
+		return !(*this == value);
 	}
 
 	bool operator != (const Nullable<C>& other) const
@@ -191,7 +188,7 @@ public:
 		if (_isNull && other._isNull) return false;
 
 		if (!_isNull && !other._isNull)
-			return (value() < other.value());
+			return (_value < other._value);
 
 		if (_isNull && !other._isNull) return true;
 
@@ -212,7 +209,7 @@ public:
 		/// Throws a NullValueException if the Nullable is empty.
 	{
 		if (!_isNull)
-			return *reinterpret_cast<C*>(_value);
+			return _value;
 		else
 			throw NullValueException();
 	}
@@ -223,7 +220,7 @@ public:
 		/// Throws a NullValueException if the Nullable is empty.
 	{
 		if (!_isNull)
-			return *reinterpret_cast<const C*>(_value);
+			return _value;
 		else
 			throw NullValueException();
 	}
@@ -232,7 +229,7 @@ public:
 		/// Returns the Nullable's value, or the
 		/// given default value if the Nullable is empty.
 	{
-		return _isNull ? deflt : *reinterpret_cast<const C*>(_value);
+		return _isNull ? deflt : _value;
 	}
 
 	operator C& ()
@@ -259,7 +256,7 @@ public:
 	{
 		return _isNull;
 	}
-
+	
 	void clear()
 		/// Clears the Nullable.
 	{
@@ -267,7 +264,7 @@ public:
 	}
 
 private:
-	char     _value[sizeof(C)];
+	C        _value;
 	bool     _isNull;
 	NullType _null;
 };
