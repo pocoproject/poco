@@ -174,7 +174,6 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				// now push back the header to the stream, so that the ZipLocalFileHeader can read it
 				Poco::Int32 size = static_cast<Poco::Int32>(nfo.getFullHeaderSize());
 				_expectedCrc32 = nfo.getCRC32();
-				const char* rawHeader = nfo.getRawHeader();
 				_pIstr->seekg(-size, std::ios::cur);
 				if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 				if (!crcValid())
