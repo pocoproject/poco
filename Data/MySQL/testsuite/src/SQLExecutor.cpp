@@ -554,6 +554,7 @@ void SQLExecutor::doubles()
 	poco_assert (ret == data);
 }
 
+
 void SQLExecutor::any()
 {
 	std::string funct = "any()";
@@ -614,6 +615,7 @@ void SQLExecutor::any()
 	assert (AnyCast<DateTime>(dateTimeR) == AnyCast<DateTime>(dateTime));
 	assert (e.empty());
 }
+
 
 void SQLExecutor::dynamicAny()
 {
@@ -2144,4 +2146,24 @@ void SQLExecutor::reconnect()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (count == age);
 	poco_assert (_pSession->isConnected());
+}
+
+
+void SQLExecutor::trigger()
+{
+	std::string funct = "trigger()";
+
+	try { *_pSession << "CREATE TRIGGER Strings AFTER INSERT ON Strings FOR EACH ROW SET @sum = @sum + NEW.str;", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	try { *_pSession << "INSERT INTO Strings VALUES (1,2,3,4,5)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (count == 5);
 }

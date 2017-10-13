@@ -103,6 +103,8 @@ public:
 	void testNullableString();
 	void testTupleWithNullable();
 
+	void testTrigger();
+
 	void testSessionTransaction();
 	void testTransaction();
 

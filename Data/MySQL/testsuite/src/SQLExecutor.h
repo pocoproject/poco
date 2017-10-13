@@ -98,6 +98,8 @@ public:
 	void internalExtraction();
 	void doNull();
 
+	void trigger();
+
 	void sessionTransaction(const std::string& connect);
 	void transaction(const std::string& connect);
 

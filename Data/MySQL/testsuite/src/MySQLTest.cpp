@@ -511,6 +511,13 @@ void MySQLTest::testUnsignedInts()
 	_pExecutor->unsignedInts();
 }
 
+void MySQLTest::testTrigger()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateUnsignedIntsTable();
+	_pExecutor->trigger();
+}
 
 void MySQLTest::testFloat()
 {
@@ -1013,6 +1020,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testTupleWithNullable);
 	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
+	CppUnit_addTest(pSuite, MySQLTest, testTrigger);
 	CppUnit_addTest(pSuite, MySQLTest, testReconnect);
 
 	return pSuite;
