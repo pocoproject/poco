@@ -73,10 +73,12 @@ public:
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
+		/// Timeout value is in seconds.
 		/// Throws RangeException if the timeout value is overflow.
 
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.
+		/// Timeout value is in seconds.
 
 	void begin();
 		/// Starts a transaction.
@@ -157,7 +159,7 @@ inline const std::string& SessionImpl::connectorName() const
 
 inline std::size_t SessionImpl::getConnectionTimeout()
 {
-	return static_cast<std::size_t>(_timeout);
+	return static_cast<std::size_t>(_timeout/1000);
 }
 
 
