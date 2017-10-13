@@ -132,7 +132,7 @@ std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, 
 
 	if (stmt.length() > 0)
 	{
-		str += "\t[statemnt]: ";
+		str += "\t[statement]: ";
 		str += stmt;
 	}
 
