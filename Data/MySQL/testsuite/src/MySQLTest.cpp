@@ -737,6 +737,7 @@ void MySQLTest::testTupleWithNullable()
 
 	*_pSession << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now;
 
+	assert (result.size() == 6);
 	assert(result[0].get<1>() == std::string("Address"));
 	assert(result[0].get<2>() == 10);
 

@@ -71,6 +71,38 @@ namespace
 	private:
 		AtomicCounter& _counter;
 	};
+
+	class NonDefaultConstructible
+	{
+	public:
+		NonDefaultConstructible(int val) : _val(val)
+		{
+		}
+
+		NonDefaultConstructible operator=(int val)
+		{
+			_val = val;
+		}
+
+		bool operator == (const NonDefaultConstructible& other) const
+		{
+			return (_val == other._val);
+		}
+
+		bool operator < (const NonDefaultConstructible& other) const
+		{
+			return (_val < other._val);
+		}
+
+		int value() const
+		{
+			return _val;
+		}
+
+	private:
+		NonDefaultConstructible();
+		int _val;
+	};
 }
 
 
@@ -362,6 +394,21 @@ void CoreTest::testAtomicCounter()
 
 void CoreTest::testNullable()
 {
+	Nullable<NonDefaultConstructible> ndc1;
+	Nullable<NonDefaultConstructible> ndc2;
+	assert (ndc1.isNull());
+	assert (ndc2.isNull());
+	assert (ndc1 == ndc2);
+	assert (!(ndc1 != ndc2));
+	assert (!(ndc1 > ndc2));
+	bool ge = (ndc1 >= ndc2);
+	assert (ndc1 >= ndc2);
+	assert (!(ndc1 < ndc2));
+	assert (ndc1 <= ndc2);
+	ndc1 = 42;
+	assert (!ndc1.isNull());
+	assert (ndc1.value() == 42);
+
 	Nullable<int> i;
 	Nullable<double> f;
 	Nullable<std::string> s;
