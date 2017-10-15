@@ -180,8 +180,6 @@ allprojects {
 subprojects {
 	apply plugin:	'c'
 	apply plugin:	'cpp'
-//	apply plugin:	'cpp-executable'
-//	apply plugin:	'cpp-library'
 	apply plugin:	'cppunit-test-suite'
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
@@ -434,8 +432,8 @@ subprojects {
 		components {
 			withType(NativeComponentSpec) {
 				targetPlatform "win32"
-//				targetPlatform "win64"
-//				targetPlatform "linux32"
+				targetPlatform "win64"
+				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
 
@@ -721,6 +719,22 @@ subprojects {
 	}
 	tasks.withType(RunTestExecutable) {
 		args test
+	}
+	task showCompilerOutput {
+	   doLast {
+	      println '\n-----------------------------------------------------\n'
+	      println 'Compiler output:'
+	      FileTree tree = fileTree('gradle').include('**/output.txt')
+	      // Iterate over the contents of a tree
+	      tree.each {File file ->
+	          println 'Content of file ' + file + ':\n'
+	          println file.text
+	          println '------\n'
+	      }
+	   }
+	}
+	tasks.withType(CppCompile) {
+		finalizedBy showCompilerOutput
 	}
 }
 
