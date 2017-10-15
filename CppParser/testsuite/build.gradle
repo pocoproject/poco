@@ -1,4 +1,4 @@
-import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
+import org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
 
 model {
 	components {
@@ -21,7 +21,7 @@ model {
 		}
 	}
 	testSuites {
-		CppParserTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
+		CppParserTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}
@@ -42,7 +42,7 @@ model {
 			if (toolChain in Gcc) {
 			}
 		}
-        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+        withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
         }
 	}

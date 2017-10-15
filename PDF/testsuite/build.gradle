@@ -1,4 +1,4 @@
-import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
+import org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
 
 model {
 	components {
@@ -34,12 +34,12 @@ model {
 		}
 	}
 	testSuites {
-		PDFTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
+		PDFTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}
     binaries {                                               
-		withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+		withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				if (buildType == buildTypes.debug) {

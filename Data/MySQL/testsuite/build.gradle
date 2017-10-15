@@ -1,4 +1,4 @@
-import org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
+import org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
 
 model {
 	components {
@@ -40,7 +40,7 @@ model {
 		}
 	}
 	testSuites {
-		MySQLTestSuite(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
+		MySQLTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
 		}
 	}
@@ -50,7 +50,7 @@ model {
 			cppCompiler.define 	"__LCC__"	
 			cppCompiler.define 	"WINVER=0x0600"
 		}
-        withType(org.pocoproject.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+        withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			if (toolChain in VisualCpp) {
 				if (buildType == buildTypes.debug) {
