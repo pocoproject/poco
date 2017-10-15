@@ -22,7 +22,7 @@ config.build
 config.make
 
 # CMake #
-########
+#########
 cmake_install.cmake
 cmake_uninstall.cmake
 CMakeFiles
@@ -32,13 +32,16 @@ CPackSourceConfig.cmake
 cmake_*
 
 # Gradle #
+##########
 .gradle
 gradle/
 
 # NuGet #
+#########
 *.nupkg
 
 # WiX #
+#######
 *.msi
 *.wixobj
 *.wixpdb
