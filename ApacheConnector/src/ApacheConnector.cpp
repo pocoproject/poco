@@ -149,7 +149,7 @@ void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 
 void ApacheConnector::log(const char* file, int line, int level, int status, const char *text)
 {
-	ap_log_error(file, line, level, 0, NULL, "%s", text);
+	ap_log_error(file, line, level, 0, NULL, 0, text);
 }
 
 
@@ -172,21 +172,21 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
 			return rv; 
 
-		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
 			&rec, 
 			r->connection->local_ip, 
 			r->connection->local_addr->port,
-			r->connection->remote_ip, 
-			r->connection->remote_addr->port));
+			r->connection->client_ip,
+			r->connection->client_addr->port));
 
-		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+		std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
 		
 		try
 		{
-			std::auto_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+			std::unique_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
 
 			if (pHandler.get())
 			{				
