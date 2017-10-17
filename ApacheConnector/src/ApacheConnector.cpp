@@ -149,7 +149,13 @@ void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 
 void ApacheConnector::log(const char* file, int line, int level, int status, const char *text)
 {
-	ap_log_error(file, line, level, 0, NULL, "%s", text);
+	// ap_log_error() has undergone significant changes in Apache 2.4.
+	// Validate Apache version for using a proper ap_log_error() version.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+		ap_log_error(file, line, level, 0, NULL, "%s", text);
+#else
+		ap_log_error(file, line, level, 0, NULL, 0, text);
+#endif
 }
 
 
@@ -170,23 +176,34 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 
 	    apr_status_t rv;
 		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
-			return rv; 
+			return rv;
 
-		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-			&rec, 
-			r->connection->local_ip, 
-			r->connection->local_addr->port,
-			r->connection->remote_ip, 
-			r->connection->remote_addr->port));
+		// The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
+		// Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+			std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+				&rec,
+				r->connection->local_ip,
+				r->connection->local_addr->port,
+				r->connection->remote_ip,
+				r->connection->remote_addr->port));
+#else
+			std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+				&rec,
+				r->connection->local_ip,
+				r->connection->local_addr->port,
+				r->connection->client_ip,
+				r->connection->client_addr->port));
+#endif
 
-		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+		std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
 		
 		try
 		{
-			std::auto_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+			std::unique_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
 
 			if (pHandler.get())
 			{				
