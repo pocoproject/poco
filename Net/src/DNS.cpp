@@ -1,8 +1,6 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#10 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  DNS

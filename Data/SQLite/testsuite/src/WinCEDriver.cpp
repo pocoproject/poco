@@ -1,8 +1,6 @@
 //
 // WinCEDriver.cpp
 //
-// $Id: //poco/1.3-WinCE/Net/testsuite/src/WinCEDriver.cpp#2 $
-//
 // Console-based test driver for Windows CE.
 //
 // Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.

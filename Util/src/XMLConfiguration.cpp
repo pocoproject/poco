@@ -1,8 +1,6 @@
 //
 // XMLConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/XMLConfiguration.cpp#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  XMLConfiguration
@@ -39,12 +37,14 @@ namespace Util {
 XMLConfiguration::XMLConfiguration():
 	_delim('.')
 {
+	loadEmpty("config");
 }
 
 
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {
+	loadEmpty("config");
 }
 
 
@@ -123,15 +123,21 @@ XMLConfiguration::~XMLConfiguration()
 }
 
 
-void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
+void XMLConfiguration::load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize)
 {
 	poco_check_ptr (pInputSource);
 	
-	Poco::XML::DOMParser parser;
+	Poco::XML::DOMParser parser(namePoolSize);
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
 	Poco::XML::AutoPtr<Poco::XML::Document> pDoc = parser.parse(pInputSource);
 	load(pDoc);
+}
+
+
+void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
+{
+	load(pInputSource, POCO_XML_NAMEPOOL_DEFAULT_SIZE);
 }
 
 

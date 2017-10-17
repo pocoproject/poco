@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="CppParser">
+      <UniqueIdentifier>{5e96a7fb-058a-4446-b7f7-f0b1e78d4e9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppParser\Header Files">
+      <UniqueIdentifier>{7cdceeb8-944a-4ec2-8679-11857de12c14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CppParser\Source Files">
+      <UniqueIdentifier>{e2e67513-76a7-4ffb-a741-1b5a4d5373e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{04b37544-d763-45e6-9b01-d7f833a98514}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{4846a906-d269-4504-b5ce-ffe6751237e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{25be8be6-c833-465d-a97f-f2ca5e361410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{4a3b344d-db0d-4279-b0a4-1f5133749cd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{fc844caa-c672-449a-8cf3-fad58c0193b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attributes">
+      <UniqueIdentifier>{f5ee004c-5814-4e28-889b-428232659882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attributes\Header Files">
+      <UniqueIdentifier>{de5e9095-3d09-43ae-85e1-f10c7677dd6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attributes\Source Files">
+      <UniqueIdentifier>{82eb6151-6da4-4a93-825d-ed6be5cc361b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CppParserTest.h">
+      <Filter>CppParser\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CppParserTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AttributesParserTest.h">
+      <Filter>Attributes\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AttributesTestSuite.h">
+      <Filter>Attributes\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CppParserTest.cpp">
+      <Filter>CppParser\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CppParserTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Driver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AttributesParserTest.cpp">
+      <Filter>Attributes\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AttributesTestSuite.cpp">
+      <Filter>Attributes\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

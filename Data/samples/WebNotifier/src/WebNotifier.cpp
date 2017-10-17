@@ -1,8 +1,6 @@
 //
 // WebNotifier.cpp
 //
-// $Id: //poco/Main/Data/samples/WebNotifier/src/WebNotifier.cpp#2 $
-//
 // This sample demonstrates a combination of Data and Net libraries by
 // creating a database, registering callbacks for insert/update events 
 // and sending database modifications to the web client through web socket.

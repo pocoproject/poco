@@ -1,8 +1,6 @@
 //
 // ZipLocalFileHeader.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipLocalFileHeader.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipLocalFileHeader
@@ -190,6 +188,8 @@ private:
 	Poco::UInt32   _crc32;
 	Poco::UInt32   _compressedSize;
 	Poco::UInt32   _uncompressedSize;
+	
+	friend class ZipStreamBuf;
 };
 
 

@@ -7,9 +7,9 @@ rem
 rem POCO C++ Libraries command-line build script 
 rem for MS Visual Studio 2008 to 2013
 rem
-rem $Id: //poco/1.4/dist/buildwin.cmd#2 $
+rem $Id$
 rem
-rem Copyright (c) 2006-2014 by Applied Informatics Software Engineering GmbH
+rem Copyright (c) 2006-2017 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
 rem
 rem Original version by Aleksandar Fabijanic.
@@ -18,7 +18,7 @@ rem
 rem Usage:
 rem ------
 rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-rem VS_VERSION:    90|100|110|120|140
+rem VS_VERSION:    90|100|110|120|140|150
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
 rem CONFIGURATION: release|debug|both
@@ -46,11 +46,14 @@ set LIB=%LIB%;%MYSQL_LIB%
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
-rem VS_VERSION {90 | 100 | 110 | 120 | 140}
+rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
-set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
-
+if %VS_VERSION%==vs150 (
+  set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
+) else (
+  set VS_VARSALL=..\..\VC\vcvarsall.bat
+)
 rem PLATFORM [Win32|x64|WinCE|WEC2013]
 set PLATFORM=%5
 if "%PLATFORM%"=="" (set PLATFORM=Win32)
@@ -62,39 +65,47 @@ if not "%PLATFORM%"=="WEC2013" goto usage)))
 if not defined VCINSTALLDIR (
   if %VS_VERSION%==vs90 (
     if %PLATFORM%==x64 (
-      call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+      call "%VS90COMNTOOLS%%VS_VARSALL%" amd64
     ) else (
-      call "%VS90COMNTOOLS%vsvars32.bat"
+      call "%VS90COMNTOOLS%%VS_VARSALL%" x86
     )
   ) else (
     if %VS_VERSION%==vs100 (
       if %PLATFORM%==x64 (
-        call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+        call "%VS100COMNTOOLS%%VS_VARSALL%" amd64
       ) else (
-        call "%VS100COMNTOOLS%vsvars32.bat"
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86
       )
     ) else (
       if %VS_VERSION%==vs110 (
         if %PLATFORM%==x64 (
-          call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+          call "%VS110COMNTOOLS%%VS_VARSALL%" amd64
         ) else (
-          call "%VS110COMNTOOLS%vsvars32.bat"
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86
         ) 
       ) else (
         if %VS_VERSION%==vs120 (
           if %PLATFORM%==x64 (
-            call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+            call "%VS120COMNTOOLS%%VS_VARSALL%" amd64
           ) else (
-            call "%VS120COMNTOOLS%vsvars32.bat
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86
           )     
         ) else (
           if %VS_VERSION%==vs140 (
             if %PLATFORM%==x64 (
-              call "%VS140COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+              call "%VS140COMNTOOLS%%VS_VARSALL%" amd64
             ) else (
-              call "%VS140COMNTOOLS%vsvars32.bat
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86
             )
-          )     
+          ) else (
+            if %VS_VERSION%==vs150 (
+              if %PLATFORM%==x64 (
+                call "%VS150COMNTOOLS%%VS_VARSALL%" amd64
+              ) else (
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86
+              )
+            )
+          )
         )
       ) 
     ) 
@@ -113,6 +124,7 @@ if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs150 (set VCPROJ_EXT=vcxproj)
 
 if "%8"=="" goto use_devenv
 set BUILD_TOOL=%8
@@ -123,6 +135,7 @@ if "%VS_VERSION%"=="vs100" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs120" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs140" (set BUILD_TOOL=msbuild)
+if "%VS_VERSION%"=="vs150" (set BUILD_TOOL=msbuild)
 :use_custom
 if not "%BUILD_TOOL%"=="msbuild" (set USEENV=/useenv)
 if "%BUILD_TOOL%"=="msbuild" (
@@ -138,6 +151,7 @@ if "%VS_VERSION%"=="vs100" (goto msbuildok)
 if "%VS_VERSION%"=="vs110" (goto msbuildok)
 if "%VS_VERSION%"=="vs120" (goto msbuildok)
 if "%VS_VERSION%"=="vs140" (goto msbuildok)
+if "%VS_VERSION%"=="vs150" (goto msbuildok)
 if "%BUILD_TOOL%"=="msbuild" (
   echo "Cannot use msbuild with Visual Studio 2008 or earlier."
   exit /b 2
@@ -181,6 +195,7 @@ set USEENV=
 if %VS_VERSION%==vs110 (set EXTRASW=/m /p:VisualStudioVersion=11.0)
 if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
+if %VS_VERSION%==vs150 (set EXTRASW=/m /p:VisualStudioVersion=15.0)
 )
 
 rem SAMPLES [samples|nosamples]
@@ -518,7 +533,7 @@ exit /b 1
 echo Usage:
 echo ------
 echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-echo VS_VERSION:    "90|100|110|120|140"
+echo VS_VERSION:    "90|100|110|120|140|150"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
 echo CONFIGURATION: "release|debug|both"

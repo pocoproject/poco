@@ -1,8 +1,6 @@
 //
 // Base32Decoder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Base32Decoder.cpp#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  Base32

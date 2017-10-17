@@ -1,8 +1,6 @@
 //
 // Row.cpp
 //
-// $Id: //poco/Main/Data/src/Row.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Row

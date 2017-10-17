@@ -1,9 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SessionImpl.h#2 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //
@@ -75,9 +73,11 @@ public:
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
+		/// Timeout value is in seconds.
 
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.
+		/// Timeout value is in seconds.
 
 	void begin();
 		/// Starts a transaction.
@@ -158,7 +158,7 @@ inline const std::string& SessionImpl::connectorName() const
 
 inline std::size_t SessionImpl::getConnectionTimeout()
 {
-	return static_cast<std::size_t>(_timeout);
+	return static_cast<std::size_t>(_timeout/1000);
 }
 
 

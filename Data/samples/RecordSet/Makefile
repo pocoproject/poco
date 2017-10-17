@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/RecordSet/Makefile#1 $
-#
 # Makefile for Poco Data RecordSet sample
 #
 

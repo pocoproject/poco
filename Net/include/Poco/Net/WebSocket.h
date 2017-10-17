@@ -1,8 +1,6 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#4 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocket
@@ -64,7 +62,7 @@ public:
 		FRAME_FLAG_FIN  = 0x80, /// FIN bit: final fragment of a multi-fragment message.
 		FRAME_FLAG_RSV1 = 0x40, /// Reserved for future use. Must be zero.
 		FRAME_FLAG_RSV2 = 0x20, /// Reserved for future use. Must be zero.
-		FRAME_FLAG_RSV3 = 0x10, /// Reserved for future use. Must be zero.
+		FRAME_FLAG_RSV3 = 0x10  /// Reserved for future use. Must be zero.
 	};
 
 	enum FrameOpcodes

@@ -1,8 +1,6 @@
 //
 // Parameter.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Parameter.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Parameter

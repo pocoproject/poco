@@ -1,8 +1,6 @@
 //
 // AbstractPreparator.cpp
 //
-// $Id: //poco/Main/Data/src/AbstractPreparator.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractPreparator

@@ -1,8 +1,6 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Exception.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -248,7 +246,10 @@ POCO_DECLARE_EXCEPTION(Foundation_API, CreateFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OpenFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, WriteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ReadFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, DirectoryNotEmptyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnknownURISchemeException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, TooManyURIRedirectsException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, URISyntaxException, SyntaxException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, ApplicationException, Exception)
 POCO_DECLARE_EXCEPTION(Foundation_API, BadCastException, RuntimeException)

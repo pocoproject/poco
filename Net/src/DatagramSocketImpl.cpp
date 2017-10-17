@@ -1,8 +1,6 @@
 //
 // DatagramSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/DatagramSocketImpl.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DatagramSocketImpl

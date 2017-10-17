@@ -1,8 +1,6 @@
 //
 // Process.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process.h#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

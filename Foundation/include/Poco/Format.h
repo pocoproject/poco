@@ -1,8 +1,6 @@
 //
 // Format.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Format.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Format

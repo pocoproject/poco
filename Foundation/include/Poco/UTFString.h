@@ -1,8 +1,6 @@
 //
 // UTFString.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UTFString.h#2 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UTFString
@@ -23,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Types.h"
 #include <string>
+#include <wchar.h>
 
 
 namespace Poco {

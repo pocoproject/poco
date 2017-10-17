@@ -1,8 +1,6 @@
 //
 // MultipartReader.cpp
 //
-// $Id: //poco/1.4/Net/src/MultipartReader.cpp#2 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MultipartReader
@@ -88,13 +86,13 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				{
 					if (ch == '\r')
 					{
-						ch = buf.sbumpc(); // '\n'
+						buf.sbumpc(); // '\n'
 					}
 					return 0;					
 				}
 				else if (ch == '-' && buf.sgetc() == '-')
 				{
-					ch = buf.sbumpc(); // '-'
+					buf.sbumpc(); // '-'
 					_lastPart = true;
 					return 0;
 				}
@@ -262,13 +260,15 @@ void MultipartReader::guessBoundary()
 	{
 		_istr.get();
 		ch = _istr.peek();
-		while (ch != eof && ch != '\r' && ch != '\n')
+		while (ch != eof && ch != '\r' && ch != '\n' && _boundary.size() < 128) // Note: should be no longer than 70 chars acc. to RFC 2046
 		{
 			_boundary += (char) _istr.get();
 			ch = _istr.peek();
 		}
+		if (ch != '\r' && ch != '\n')
+			throw MultipartException("Invalid boundary line found");
 		if (ch == '\r' || ch == '\n')
-			ch = _istr.get();
+			_istr.get();
 		if (_istr.peek() == '\n')
 			_istr.get();
 	}
@@ -281,25 +281,28 @@ void MultipartReader::parseHeader(MessageHeader& messageHeader)
 	messageHeader.clear();
 	messageHeader.read(_istr);
 	int ch = _istr.get();
-	if (ch == '\r' && _istr.peek() == '\n') ch = _istr.get();
+	if (ch == '\r' && _istr.peek() == '\n') _istr.get();
 }
 
 
 bool MultipartReader::readLine(std::string& line, std::string::size_type n)
 {
 	static const int eof = std::char_traits<char>::eof();
+	static const int maxLength = 1024;
 
 	line.clear();
 	int ch = _istr.peek();
-	while (ch != eof && ch != '\r' && ch != '\n')
+	int length = 0;
+	while (ch != eof && ch != '\r' && ch != '\n' && length < maxLength)
 	{
 		ch = (char) _istr.get();
 		if (line.length() < n) line += ch;
 		ch = _istr.peek();
+		length++;
 	}
 	if (ch != eof) _istr.get();
 	if (ch == '\r' && _istr.peek() == '\n') _istr.get();
-	return ch != eof;
+	return ch != eof && length < maxLength;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // URI.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/URI.h#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI
@@ -342,6 +340,7 @@ protected:
 
 	static const std::string RESERVED_PATH;
 	static const std::string RESERVED_QUERY;
+	static const std::string RESERVED_QUERY_PARAM;
 	static const std::string RESERVED_FRAGMENT;
 	static const std::string ILLEGAL;
 	

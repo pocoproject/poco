@@ -1,8 +1,6 @@
 //
 // Formatter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Formatter.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Formatter

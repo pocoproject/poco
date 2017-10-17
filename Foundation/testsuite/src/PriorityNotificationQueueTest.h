@@ -1,8 +1,6 @@
 //
 // PriorityNotificationQueueTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PriorityNotificationQueueTest.h#1 $
-//
 // Definition of the PriorityNotificationQueueTest class.
 //
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.

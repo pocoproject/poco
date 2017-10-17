@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/Binder.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Binder
 //
@@ -171,7 +169,7 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 	mt.hour = val.hour();
 	mt.minute = val.minute();
 	mt.second = val.second();
-	mt.second_part = val.millisecond();
+	mt.second_part = val.millisecond() * 1000 + val.microsecond();
 
 	mt.time_type  = MYSQL_TIMESTAMP_DATETIME;
 
@@ -193,7 +191,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 	mt.time_type = MYSQL_TIMESTAMP_DATE;
 
 	_dates.push_back(new MYSQL_TIME(mt));
-	
+
 	realBind(pos, MYSQL_TYPE_DATE, _dates.back(), sizeof(MYSQL_TIME));
 }
 
@@ -208,9 +206,9 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 	mt.second = val.second();
 
 	mt.time_type = MYSQL_TIMESTAMP_TIME;
-	
+
 	_dates.push_back(new MYSQL_TIME(mt));
-	
+
 	realBind(pos, MYSQL_TYPE_TIME, _dates.back(), sizeof(MYSQL_TIME));
 }
 

@@ -1,8 +1,6 @@
 //
 // VarIterator.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/VarIterator.h#1 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarIterator
@@ -139,11 +137,10 @@ inline bool VarIterator::operator != (const VarIterator& other) const
 
 namespace std
 {
-	using std::swap;
 	template<>
 	inline void swap<Poco::Dynamic::VarIterator>(Poco::Dynamic::VarIterator& s1, 
 		Poco::Dynamic::VarIterator& s2)
-		/// Full template specalization of std:::swap for VarIterator
+		/// Full template specialization of std:::swap for VarIterator
 	{
 		s1.swap(s2);
 	}

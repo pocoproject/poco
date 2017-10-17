@@ -1,9 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SessionImpl.cpp#5 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //
@@ -55,7 +53,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_isTransaction(false)
 {
 	open();
-	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
+	setConnectionTimeout(loginTimeout);
 	setProperty("handle", _pDB);
 	addFeature("autoCommit", 
 		&SessionImpl::autoCommit, 

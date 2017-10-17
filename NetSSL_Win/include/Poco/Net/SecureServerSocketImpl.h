@@ -1,8 +1,6 @@
 //
 // SecureServerSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/SecureServerSocketImpl.h#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLSockets
 // Module:  SecureServerSocketImpl

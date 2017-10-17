@@ -1,8 +1,6 @@
 //
 // HTTPRequestHandlerFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPRequestHandlerFactory.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPRequestHandlerFactory
@@ -49,9 +47,13 @@ public:
 		/// Destroys the HTTPRequestHandlerFactory.
 
 	virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) = 0;
-		/// Must be overridden by sublasses.
+		/// Must be overridden by subclasses.
 		///
 		/// Creates a new request handler for the given HTTP request.
+		///
+		/// The method should inspect the given HTTPServerRequest object (e.g., method
+		/// and URI) and create an appropriate HTTPRequestHandler object to handle the
+		/// request.
 
 protected:
 	Poco::BasicEvent<const bool> serverStopped;

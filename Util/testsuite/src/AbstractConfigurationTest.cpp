@@ -1,8 +1,6 @@
 //
 // AbstractConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/AbstractConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -89,6 +87,7 @@ void AbstractConfigurationTest::testGetInt()
 	assert (pConf->getInt("prop4.int1") == 42);
 	assert (pConf->getInt("prop4.int2") == -42);
 	assert (pConf->getInt("prop4.hex") == 0x1f);
+	assert (pConf->getUInt("prop4.hex") == 0x1f);
 	assert (pConf->getInt("ref2") == 42);
 	
 	try
@@ -114,6 +113,8 @@ void AbstractConfigurationTest::testGetInt64()
 	assert (pConf->getInt64("prop4.bigint1") == std::numeric_limits<Int64>::max());
 	assert (pConf->getInt64("prop4.bigint2") == std::numeric_limits<Int64>::min());
 	assert (pConf->getUInt64("prop4.biguint") == std::numeric_limits<UInt64>::max());
+	assert (pConf->getInt64("prop4.hex") == 0x1f);
+	assert (pConf->getUInt64("prop4.hex") == 0x1f);
 	assert (pConf->getInt64("ref2") == 42);
 
 	try

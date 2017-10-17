@@ -1,8 +1,6 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.4/Foundation/src/RegularExpression.cpp#1 $
-//
 // Library: Foundation
 // Package: RegExp
 // Module:  RegularExpression
@@ -43,14 +41,14 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 		throw RegularExpressionException(msg.str());
 	}
 	if (study)
-		_extra = pcre_study(_pcre, 0, &error);
+		_extra = pcre_study(reinterpret_cast<pcre*>(_pcre), 0, &error);
 }
 
 
 RegularExpression::~RegularExpression()
 {
-	if (_pcre)  pcre_free(_pcre);
-	if (_extra) pcre_free(_extra);
+	if (_pcre)  pcre_free(reinterpret_cast<pcre*>(_pcre));
+	if (_extra) pcre_free(reinterpret_cast<struct pcre_extra*>(_extra));
 }
 
 
@@ -59,7 +57,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	poco_assert (offset <= subject.length());
 
 	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		mtch.offset = std::string::npos;
@@ -93,7 +91,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	matches.clear();
 
 	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		return 0;
@@ -206,7 +204,7 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 	if (offset >= subject.length()) return std::string::npos;
 
 	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(_pcre, _extra, subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		return std::string::npos;

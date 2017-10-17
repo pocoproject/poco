@@ -1,8 +1,6 @@
 //
 // ScopedLock.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ScopedLock.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex

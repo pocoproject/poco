@@ -1,8 +1,6 @@
 //
 // DigestEngine.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DigestEngine.cpp#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  DigestEngine

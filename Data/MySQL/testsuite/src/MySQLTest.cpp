@@ -1,8 +1,6 @@
 //
 // MySQLTest.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/MySQLTest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -46,7 +44,7 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 // Parameters for barebone-test
 #define MYSQL_USER "root"
 #define MYSQL_PWD  "poco"
-#define MYSQL_HOST "localhost"
+#define MYSQL_HOST "127.0.0.1"
 #define MYSQL_PORT 3306
 #define MYSQL_DB   "pocotestdb"
 
@@ -58,7 +56,8 @@ std::string MySQLTest::_dbConnString = "host=" MYSQL_HOST
 	";db=" MYSQL_DB
 	";compress=true"
 	";auto-reconnect=true"
-	";secure-auth=true";
+	";secure-auth=true"
+	";protocol=tcp";
 
 
 MySQLTest::MySQLTest(const std::string& name):
@@ -87,7 +86,7 @@ void MySQLTest::connectNoDB()
 	std::string dbConnString = "host=" MYSQL_HOST
 		";user=" MYSQL_USER
 		";password=" MYSQL_PWD
-		";compress=true;auto-reconnect=true";
+		";compress=true;auto-reconnect=true;protocol=tcp";
 
 	try
 	{
@@ -718,7 +717,7 @@ void MySQLTest::recreatePersonBLOBTable()
 void MySQLTest::recreatePersonDateTimeTable()
 {
 	dropTable("Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME(6))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }

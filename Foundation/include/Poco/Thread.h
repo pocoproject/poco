@@ -1,8 +1,6 @@
 //
 // Thread.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread

@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/Extractor.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Extractor
 //
@@ -177,7 +175,7 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 	if (!realExtractFixed(pos, MYSQL_TYPE_DATETIME, &mt))
 		return false;
 
-	val.assign(mt.year, mt.month, mt.day, mt.hour, mt.minute, mt.second, mt.second_part, 0);
+	val.assign(mt.year, mt.month, mt.day, mt.hour, mt.minute, mt.second, mt.second_part / 1000, mt.second_part % 1000);
 	return true;
 }
 

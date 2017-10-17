@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/iPhoneSimulator-clang-libc++#1 $
-#
 # iPhoneSimulator-clang-libc++
 #
 # Build settings for iPhone Simulator, using Apple's iPhone SDK

@@ -1,8 +1,6 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.4/XML/src/SAXParser.cpp#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX

@@ -1,8 +1,6 @@
 //
 // TestCase.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestCase.cpp#1 $
-//
 
 
 #include <stdexcept>

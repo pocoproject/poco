@@ -1,8 +1,6 @@
 //
 // ProgressBar.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/ProgressBar.h#1 $
-//
 
 
 #ifndef ProgressBar_INCLUDED

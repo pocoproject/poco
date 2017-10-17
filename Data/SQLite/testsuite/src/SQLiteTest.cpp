@@ -1,8 +1,6 @@
 //
 // SQLiteTest.cpp
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.cpp#7 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -255,6 +253,9 @@ SQLiteTest::~SQLiteTest()
 void SQLiteTest::testBinding()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	assert (tmp.getConnectionTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
+	tmp.setConnectionTimeout(5);
+	assert (tmp.getConnectionTimeout() == 5);
 	assert (tmp.isConnected());
 	std::string tableName("Simpsons");
 	std::string lastName("Simpson");

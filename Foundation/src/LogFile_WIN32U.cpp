@@ -1,8 +1,6 @@
 //
 // LogFile_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LogFile_WIN32U.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LogFile
@@ -90,7 +88,7 @@ const std::string& LogFileImpl::pathImpl() const
 void LogFileImpl::createFile()
 {
 	std::wstring upath;
-	UnicodeConverter::toUTF16(_path, upath);
+	FileImpl::convertPath(_path, upath);
 	
 	_hFile = CreateFileW(upath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (_hFile == INVALID_HANDLE_VALUE) throw OpenFileException(_path);

@@ -1,8 +1,6 @@
 //
 // Column.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Column.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Column

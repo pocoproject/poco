@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/CppParser/testsuite/Makefile#1 $
-#
 # Makefile for Poco CppParser testsuite
 #
 

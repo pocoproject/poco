@@ -1,8 +1,6 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLWriter.cpp#5 $
-//
 // Library: XML
 // Package: XML
 // Module:  XMLWriter
@@ -710,7 +708,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 {
 	std::map<XMLString, std::set<XMLString> > usedNamespaces;
 	bool defaultNameSpaceUsed = false;
-	XMLString defaultNamespaceURI = _namespaces.getURI(std::string());
+	XMLString defaultNamespaceURI = _namespaces.getURI(XMLString());
 	XMLString local;
 	XMLString prefix;
 	XMLString elementNamespaceURI = namespaceURI;

@@ -1,8 +1,6 @@
 //
 // MemoryStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/MemoryStream.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  MemoryStream

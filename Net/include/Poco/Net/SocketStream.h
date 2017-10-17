@@ -1,8 +1,6 @@
 //
 // SocketStream.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketStream.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  SocketStream

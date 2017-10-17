@@ -1,8 +1,6 @@
 //
 // String.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/String.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  String
@@ -24,6 +22,7 @@
 #include "Poco/Ascii.h"
 #include <cstring>
 #include <algorithm>
+#include <stddef.h>
 
 
 namespace Poco {

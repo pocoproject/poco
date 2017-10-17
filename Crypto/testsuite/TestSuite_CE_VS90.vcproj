@@ -33,8 +33,8 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\openssl\VS_120\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
@@ -57,7 +57,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="CppUnitd.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="CppUnitd.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -106,8 +106,8 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\openssl\VS_120\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
@@ -130,7 +130,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="CppUnit.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="CppUnit.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -180,8 +180,8 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\openssl\VS_120\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="1"
@@ -204,7 +204,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="CppUnitmtd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32mtd.lib ssleay32mtd.lib Crypt32.lib"
+				AdditionalDependencies="CppUnitmtd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -256,8 +256,8 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\openssl\VS_120\include;..\..\Foundation\include"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
@@ -280,7 +280,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="CppUnitmt.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32mt.lib ssleay32mt.lib Crypt32.lib"
+				AdditionalDependencies="CppUnitmt.lib iphlpapi.lib ws2_32.lib iphlpapi.lib Crypt32.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -330,8 +330,8 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\openssl\VS_120\include;..\..\Foundation\include"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
@@ -354,7 +354,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -406,8 +406,8 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\Foundation\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;"
+				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\openssl\VS_120\include;..\..\Foundation\include"
+				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -430,7 +430,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="CppUnitmd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="CppUnitmd.lib iphlpapi.lib ws2_32.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -469,9 +469,13 @@
 				<File
 					RelativePath=".\src\CryptoTest.h"/>
 				<File
-					RelativePath=".\src\DigestEngineTest.cpp"/>
-				<File
 					RelativePath=".\src\DigestEngineTest.h"/>
+				<File
+					RelativePath=".\src\ECTest.h"/>
+				<File
+					RelativePath=".\src\EVPTest.h"/>
+				<File
+					RelativePath=".\src\PKCS12ContainerTest.h"/>
 				<File
 					RelativePath=".\src\RSATest.h"/>
 			</Filter>
@@ -479,6 +483,14 @@
 				Name="Source Files">
 				<File
 					RelativePath=".\src\CryptoTest.cpp"/>
+				<File
+					RelativePath=".\src\DigestEngineTest.cpp"/>
+				<File
+					RelativePath=".\src\ECTest.cpp"/>
+				<File
+					RelativePath=".\src\EVPTest.cpp"/>
+				<File
+					RelativePath=".\src\PKCS12ContainerTest.cpp"/>
 				<File
 					RelativePath=".\src\RSATest.cpp"/>
 			</Filter>

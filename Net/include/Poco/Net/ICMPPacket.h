@@ -1,8 +1,6 @@
 //
 // ICMPPacket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPPacket.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPPacket

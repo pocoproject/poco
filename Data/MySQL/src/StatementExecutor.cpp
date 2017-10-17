@@ -1,9 +1,7 @@
 //
 // StatementExecutor.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/StatementExecutor.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  StatementExecutor
 //

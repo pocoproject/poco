@@ -1,9 +1,11 @@
 # Contributing
 
 ---
-## Bug Reports and Feature requests
+## Bug Reports and Feature Requests
 ---
 If you think you've found a bug or would like to see a feature in one of the [upcoming releases](https://github.com/pocoproject/poco/milestones), file an [issue](https://github.com/pocoproject/poco/issues). Please make sure that your explanations are clear and coherent; do the homework of understanding the problem and searching for existing solutions before posting.
+
+Possible security issues or vulnerabilities can also be reported via email directly to the core team security AT pocoproject.org. The core team will respond to security issues within 24 hours.
 
 If you're in a hurry, the fastest way to have bugs fixed or features added are code contributions. Good code contributions, to be precise; if you want to contribute, read on ...
 
@@ -46,5 +48,11 @@ At this point, it's our turn; if you've done everything well, we may just thank 
 **Q:** How can I get write access to the Git repository?
 
 **A:** For simplicity purposes, we keep the direct write access to the main repository within a small group of core contributors. Since git forks , merges and pull requests are very easy and simple, this was not an obstacle so far. If you believe you really, really need write access to main repo, please contact the project maintainers at poco@pocoproject.org.
+
+---
+
+**Q:** Why does compilation or test run fail on MinGW, Cygwin, [your platform of choice here]?
+
+**A:** Because we have limited manpower/resources available and can't keep up with every minute detail of every platform. Core team makes sure reasonably recent versions of **Visual Studio**, **clang** and **gcc** build/tests pass on Windows, OSX and Linux; the rest is left to the contributors and other parties with interest in particular platforms. As its name says, POCO is very portable and typically it is a minor code fix or ifdef that is needed to iron a wrinkle out; please consider changing it yourself and send us pull request - that will make everyone happy. If you are inclined to do so, please consider "owning" a platform or build system. It is not much of a commitment - you will be expected to (**a**) keep things tidy (i.e building cleanly with tests passing) in regards to your area and (**b**) respond to user's inquiries thereof.
 
 ---

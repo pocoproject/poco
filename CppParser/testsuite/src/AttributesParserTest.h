@@ -1,8 +1,6 @@
 //
 // AttributesParserTest.h
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/AttributesParserTest.h#1 $
-//
 // Definition of the AttributesParserTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

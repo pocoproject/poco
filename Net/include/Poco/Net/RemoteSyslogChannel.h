@@ -1,8 +1,6 @@
 //
 // RemoteSyslogChannel.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/RemoteSyslogChannel.h#2 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogChannel
@@ -72,7 +70,7 @@ public:
 		SYSLOG_NTP      = (12<<3), /// ntp subsystem
 		SYSLOG_LOGAUDIT = (13<<3), /// log audit
 		SYSLOG_LOGALERT = (14<<3), /// log alert
-		SYSLOG_CLOCK    = (15<<3), /// clock deamon
+		SYSLOG_CLOCK    = (15<<3), /// clock daemon
 		SYSLOG_LOCAL0   = (16<<3), /// reserved for local use
 		SYSLOG_LOCAL1   = (17<<3), /// reserved for local use
 		SYSLOG_LOCAL2   = (18<<3), /// reserved for local use
