@@ -1,8 +1,6 @@
 //
 // Platform_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform_WIN32.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform
@@ -166,6 +164,12 @@
 #elif (_MSC_VER >= 1800) && (_MSC_VER < 1900) // Visual Studio 2013, MSVC++ 12.0
 	#define POCO_MSVS_VERSION 2013
 	#define POCO_MSVC_VERSION 120
+#elif (_MSC_VER >= 1900) && (_MSC_VER < 1910) // Visual Studio 2015, MSVC++ 14.0
+	#define POCO_MSVS_VERSION 2015
+	#define POCO_MSVC_VERSION 140
+#elif (_MSC_VER >= 1910) && (_MSC_VER < 2000) // Visual Studio 2017, MSVC++ 14.1
+	#define POCO_MSVS_VERSION 2017
+	#define POCO_MSVC_VERSION 141
 #endif
 
 

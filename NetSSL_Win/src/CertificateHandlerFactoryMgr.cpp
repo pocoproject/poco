@@ -1,8 +1,6 @@
 //
 // CertificateHandlerFactoryMgr.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/CertificateHandlerFactoryMgr.cpp#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  CertificateHandlerFactoryMgr

@@ -1,8 +1,6 @@
 //
 // TypeListTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TypeListTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -90,16 +88,16 @@ void TypeListTest::testTypeList()
 		TypeGetter<8, Type15>::HeadType,
 		TypeGetter<9, Type15>::HeadType> tuple;
 
-	static TypeLocator<Type15, Int8> pos0;
-	static TypeLocator<Type15, UInt8> pos1;
-	static TypeLocator<Type15, Int16> pos2;
-	static TypeLocator<Type15, UInt16> pos3;
-	static TypeLocator<Type15, Int32> pos4;
-	static TypeLocator<Type15, UInt32> pos5;
-	static TypeLocator<Type15, float> pos6;
-	static TypeLocator<Type15, double> pos7;
-	static TypeLocator<Type15, Int8> pos8;
-	static TypeLocator<Type15, std::string> posUnknown;
+	static POCO_UNUSED TypeLocator<Type15, Int8> pos0;
+	static POCO_UNUSED TypeLocator<Type15, UInt8> pos1;
+	static POCO_UNUSED TypeLocator<Type15, Int16> pos2;
+	static POCO_UNUSED TypeLocator<Type15, UInt16> pos3;
+	static POCO_UNUSED TypeLocator<Type15, Int32> pos4;
+	static POCO_UNUSED TypeLocator<Type15, UInt32> pos5;
+	static POCO_UNUSED TypeLocator<Type15, float> pos6;
+	static POCO_UNUSED TypeLocator<Type15, double> pos7;
+	static POCO_UNUSED TypeLocator<Type15, Int8> pos8;
+	static POCO_UNUSED TypeLocator<Type15, std::string> posUnknown;
 
 	assert (pos0.value == 0);
 	assert (pos1.value == 1);
@@ -157,9 +155,9 @@ void TypeListTest::testTypeList()
 	assert (typeid(TypeGetter<1, Type3>::HeadType) == typeid(Int16));
 	assert (typeid(TypeGetter<2, Type3>::HeadType) == typeid(Int32));
 
-	static TypeLocator<Type3, Int8> posNo1;
-	static TypeLocator<Type3, Int16> posNo2;
-	static TypeLocator<Type3, Int32> posNo3;
+	static POCO_UNUSED TypeLocator<Type3, Int8> posNo1;
+	static POCO_UNUSED TypeLocator<Type3, Int16> posNo2;
+	static POCO_UNUSED TypeLocator<Type3, Int32> posNo3;
 
 	assert (posNo1.value == 0);
 	assert (posNo2.value == 1);

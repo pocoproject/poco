@@ -1,8 +1,6 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#4 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MessageHeader

@@ -1,8 +1,6 @@
 //
 // Ascii.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Ascii.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Ascii

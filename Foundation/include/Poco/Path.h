@@ -1,8 +1,6 @@
 //
 // Path.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Path.h#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path

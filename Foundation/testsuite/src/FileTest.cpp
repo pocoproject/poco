@@ -1,8 +1,6 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -47,7 +45,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.canRead();
+		bool POCO_UNUSED flag = f.canRead();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -56,7 +54,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.canWrite();
+		bool POCO_UNUSED flag = f.canWrite();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -65,7 +63,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.isFile();
+		bool POCO_UNUSED flag = f.isFile();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -74,7 +72,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool flag = f.isDirectory();
+		bool POCO_UNUSED flag = f.isDirectory();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -83,7 +81,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		Timestamp ts = f.created();
+		Timestamp POCO_UNUSED ts = f.created();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -92,7 +90,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		Timestamp ts = f.getLastModified();
+		Timestamp POCO_UNUSED ts = f.getLastModified();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -111,7 +109,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		File::FileSize fs = f.getSize();
+		File::FileSize POCO_UNUSED fs = f.getSize();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -488,6 +486,30 @@ void FileTest::testRename()
 }
 
 
+void FileTest::testLongPath()
+{
+#if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(_WIN32_WCE)
+	Poco::Path p("longpathtest");
+	p.makeAbsolute();
+	std::string longpath(p.toString());
+	while (longpath.size() < MAX_PATH*4)
+	{
+		longpath.append("\\");
+		longpath.append(64, 'x');
+	}
+
+	Poco::File d(longpath);
+	d.createDirectories();
+
+	assert (d.exists());
+	assert (d.isDirectory());
+
+	Poco::File f(p.toString());
+	f.remove(true);	
+#endif
+}
+
+
 void FileTest::setUp()
 {
 	File f("testfile.dat");
@@ -531,6 +553,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCopyDirectory);
 	CppUnit_addTest(pSuite, FileTest, testRename);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
+	CppUnit_addTest(pSuite, FileTest, testLongPath);
 
 	return pSuite;
 }

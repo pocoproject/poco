@@ -1,8 +1,6 @@
 //
 // FoundationTestSuite.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FoundationTestSuite.cpp#3 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

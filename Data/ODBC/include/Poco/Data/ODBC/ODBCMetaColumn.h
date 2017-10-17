@@ -1,9 +1,7 @@
 //
 // ODBCMetaColumn.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCMetaColumn.h#3 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCMetaColumn
 //

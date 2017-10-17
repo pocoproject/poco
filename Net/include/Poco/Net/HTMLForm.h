@@ -1,8 +1,6 @@
 //
 // HTMLForm.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTMLForm.h#3 $
-//
 // Library: Net
 // Package: HTML
 // Module:  HTMLForm
@@ -154,12 +152,10 @@ public:
 		///    - the request's persistent connection state is left unchanged
 		///    - the content transfer encoding is set to chunked
 
-
 	std::streamsize calculateContentLength();
 		/// Calculate the content length for the form.
 		/// May be UNKNOWN_CONTENT_LENGTH if not possible
 		/// to calculate
-
 
 	void write(std::ostream& ostr, const std::string& boundary);
 		/// Writes the form data to the given output stream,
@@ -186,11 +182,19 @@ public:
 		/// Specify 0 for unlimited (not recommended).
 		///
 		/// The default limit is 100.
+		
+	void setValueLengthLimit(int limit);
+		/// Sets the maximum size for form field values
+		/// stored as strings.
+		
+	int getValueLengthLimit() const;
+		/// Returns the maximum size for form field values
+		/// stored as strings.
 
 	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
 	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
-
 	static const int         UNKNOWN_CONTENT_LENGTH;
+	
 protected:
 	void readUrl(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
@@ -203,7 +207,9 @@ private:
 
 	enum Limits
 	{
-		DFL_FIELD_LIMIT = 100
+		DFL_FIELD_LIMIT = 100,
+		MAX_NAME_LENGTH  = 1024,
+		DFL_MAX_VALUE_LENGTH = 256*1024
 	};
 
 	struct Part
@@ -215,6 +221,7 @@ private:
 	typedef std::vector<Part> PartVec;
 	
 	int         _fieldLimit;
+	int         _valueLengthLimit;
 	std::string _encoding;
 	std::string _boundary;
 	PartVec     _parts;
@@ -239,6 +246,12 @@ inline const std::string& HTMLForm::boundary() const
 inline int HTMLForm::getFieldLimit() const
 {
 	return _fieldLimit;
+}
+
+
+inline int HTMLForm::getValueLengthLimit() const
+{
+	return _valueLengthLimit;
 }
 
 

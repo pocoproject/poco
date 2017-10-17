@@ -1,8 +1,6 @@
 //
 // MetaColumn.cpp
 //
-// $Id: //poco/Main/Data/src/MetaColumn.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  MetaColumn
@@ -21,7 +19,12 @@ namespace Poco {
 namespace Data {
 
 
-MetaColumn::MetaColumn()
+MetaColumn::MetaColumn():
+	_length(),
+	_precision(),
+	_position(),
+	_type(),
+	_nullable()
 {
 }
 

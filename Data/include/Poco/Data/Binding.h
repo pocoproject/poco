@@ -1,8 +1,6 @@
 //
 // Binding.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Binding.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Binding

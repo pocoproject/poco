@@ -1,8 +1,6 @@
 //
 // Socket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/Socket.h#2 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  Socket
@@ -299,7 +297,7 @@ public:
 protected:
 	Socket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
-		/// The socket takes owership of the SocketImpl.
+		/// The socket takes ownership of the SocketImpl.
 
 	poco_socket_t sockfd() const;
 		/// Returns the socket descriptor for this socket.

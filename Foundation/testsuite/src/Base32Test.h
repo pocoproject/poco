@@ -1,8 +1,6 @@
 //
 // Base32Test.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/Base32Test.h#1 $
-//
 // Definition of the Base32Test class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

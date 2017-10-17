@@ -1,8 +1,6 @@
 //
 // TestCaller.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestCaller.h#1 $
-//
 
 
 #ifndef CppUnit_TestCaller_INCLUDED
@@ -81,7 +79,11 @@ protected:
 
 private:
 	TestMethod             _test;
+#if __cplusplus < 201103L
 	std::auto_ptr<Fixture> _fixture;
+#else
+	std::unique_ptr<Fixture> _fixture;
+#endif
 };
 
 

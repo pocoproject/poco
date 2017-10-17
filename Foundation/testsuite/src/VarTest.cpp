@@ -1,8 +1,6 @@
 //
 // VarTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -20,6 +18,7 @@
 #include "Poco/Dynamic/Pair.h"
 #include <map>
 #include <utility>
+
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
@@ -57,7 +56,7 @@ private:
 };
 
 
-VarTest::VarTest(const std::string& name): CppUnit::TestCase(name)
+VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -71,7 +70,7 @@ void VarTest::testInt8()
 {
 	Poco::Int8 src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(Poco::Int8));
 
 	std::string s1;
@@ -123,13 +122,13 @@ void VarTest::testInt8()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
-	
+
 	Int8 value = a1.extract<Int8>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -214,10 +213,10 @@ void VarTest::testInt16()
 
 	Int16 value = a1.extract<Int16>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int32 value2; value2 = a1.extract<Int32>();
+		Int32 POCO_UNUSED value2; value2 = a1.extract<Int32>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -247,7 +246,7 @@ void VarTest::testInt32()
 {
 	Poco::Int32 src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(Poco::Int32));
 
 	std::string s1;
@@ -299,13 +298,13 @@ void VarTest::testInt32()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
-	
+
 	Int32 value = a1.extract<Int32>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -335,7 +334,7 @@ void VarTest::testInt64()
 {
 	Poco::Int64 src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(Poco::Int64));
 
 	std::string s1;
@@ -390,10 +389,10 @@ void VarTest::testInt64()
 
 	Int64 value = a1.extract<Int64>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -478,10 +477,10 @@ void VarTest::testUInt8()
 
 	UInt8 value = a1.extract<UInt8>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -566,10 +565,10 @@ void VarTest::testUInt16()
 
 	UInt16 value = a1.extract<UInt16>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -654,10 +653,10 @@ void VarTest::testUInt32()
 
 	UInt32 value = a1.extract<UInt32>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -742,10 +741,10 @@ void VarTest::testUInt64()
 
 	UInt64 value = a1.extract<UInt64>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -775,7 +774,7 @@ void VarTest::testBool()
 {
 	bool src = true;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(bool));
 
 	std::string s1;
@@ -830,10 +829,10 @@ void VarTest::testBool()
 
 	bool value = a1.extract<bool>();
 	assert (value);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -846,7 +845,7 @@ void VarTest::testChar()
 {
 	char src = ' ';
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(char));
 
 	std::string s1;
@@ -901,10 +900,10 @@ void VarTest::testChar()
 
 	char value = a1.extract<char>();
 	assert (value == ' ');
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -916,11 +915,11 @@ void VarTest::testChar()
 void VarTest::testFloat()
 {
 	Var any("0");
-	float f = any;
+	float POCO_UNUSED f = any;
 
 	float src = 32.0f;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(float));
 
 	std::string s1;
@@ -975,10 +974,10 @@ void VarTest::testFloat()
 
 	float value = a1.extract<float>();
 	assert (value == 32.0f);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1008,11 +1007,11 @@ void VarTest::testDouble()
 {
 	double d = 0;
 	Var v(d);
-	float f = v;
+	float POCO_UNUSED f = v;
 
 	double src = 32.0;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(double));
 
 	std::string s1;
@@ -1067,17 +1066,17 @@ void VarTest::testDouble()
 
 	double value = a1.extract<double>();
 	assert (value == 32.0);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
 	{
 	}
 
-	
+
 	Var a3 = a1 + 1.0;
 	assert (a3 == 33.0);
 	a3 = a1 - 1.0;
@@ -1100,7 +1099,7 @@ void VarTest::testDouble()
 void VarTest::testString()
 {
 	Var a1("32");
-	
+
 	assert (a1.type() == typeid(std::string));
 
 	std::string s1;
@@ -1151,10 +1150,10 @@ void VarTest::testString()
 
 	const std::string& value = a1.extract<std::string>();
 	assert (value == "32");
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1185,7 +1184,7 @@ void VarTest::testLong()
 {
 	long src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(long));
 
 	std::string s1;
@@ -1237,13 +1236,13 @@ void VarTest::testLong()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
-	
+
 	long value = a1.extract<long>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1273,7 +1272,7 @@ void VarTest::testULong()
 {
 	unsigned long src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(unsigned long));
 
 	std::string s1;
@@ -1328,10 +1327,10 @@ void VarTest::testULong()
 
 	unsigned long value = a1.extract<unsigned long>();
 	assert (value == 32);
-	
+
 	try
 	{
-		Int16 value2; value2 = a1.extract<Int16>();
+		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1372,7 +1371,7 @@ void VarTest::testUDT()
 
 	try
 	{
-		float f = da1;
+		float POCO_UNUSED f = da1;
 		fail ("must fail");
 	}
 	catch (BadCastException&) { }
@@ -1606,26 +1605,26 @@ void VarTest::testArithmeticOperators()
 	assert (any3 == "123456789");
 	assert (("xyz" + any3) == "xyz123456789");
 
-	try	{ any3 = any1 - any2; fail ("must fail"); } 
+	try	{ any3 = any1 - any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try	{ any3 -= any2;	fail ("must fail");	} 
+	try	{ any3 -= any2;	fail ("must fail");	}
 	catch (InvalidArgumentException&){}
 
-	try	{ any3 = any1 * any2; fail ("must fail"); } 
+	try	{ any3 = any1 * any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try { any3 *= any2;	fail ("must fail");	} 
+	try { any3 *= any2;	fail ("must fail");	}
 	catch (InvalidArgumentException&){}
 
-	try { any3 = any1 / any2; fail ("must fail"); } 
+	try { any3 = any1 / any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try { any3 /= any2; fail ("must fail");	} 
+	try { any3 /= any2; fail ("must fail");	}
 	catch (InvalidArgumentException&){}
 
 	any1 = 10;
-	
+
 	assert (any1++ == 10);
 	assert (any1 == 11);
 	assert (++any1 == 12);
@@ -1636,16 +1635,16 @@ void VarTest::testArithmeticOperators()
 
 	any1 = 1.23;
 
-	try { ++any1; fail ("must fail"); } 
-	catch (InvalidArgumentException&){}
-	
-	try { any1++; fail ("must fail"); } 
+	try { ++any1; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try { --any1; fail ("must fail"); } 
+	try { any1++; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
-	
-	try { any1--; fail ("must fail"); } 
+
+	try { --any1; fail ("must fail"); }
+	catch (InvalidArgumentException&){}
+
+	try { any1--; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 }
 
@@ -1713,12 +1712,12 @@ void VarTest::testLimitsFloat()
 	{
 		double iMin = -1 * std::numeric_limits<float>::max();
 		Var da = iMin * 10;
-		try { float f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must fail"); }
 		catch (RangeException&) {}
 
 		double iMax = std::numeric_limits<float>::max();
 		da = iMax * 10;
-		try { float f; f = da; fail("must fail"); }
+		try { float POCO_UNUSED f; f = da; fail("must fail"); }
 		catch (RangeException&) {}
 	}
 }
@@ -1732,9 +1731,9 @@ void VarTest::testCtor()
 	Var a1(42);
 	Var a2(a1);
 	Var a3;
-	
+
 	a3 = a1;
-	
+
 	assert (a2 == 42);
 	assert (a3 == 42);
 }
@@ -1955,6 +1954,8 @@ void VarTest::testDynamicStructBasics()
 	aStruct.erase("First Name");
 	assert (aStruct.size() == 1);
 	assert (*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assert (aStruct.size() == 0);
 }
 
 
@@ -2156,7 +2157,7 @@ void VarTest::testArrayOfStructsToString()
 								"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
 								"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" } "
 								"] ] ]";
-	
+
 	assert (res == expected);
 	assert (a1.toString() == res);
 }
@@ -2202,11 +2203,11 @@ void VarTest::testJSONDeserializeString()
 	char cc = b2.convert<char>();
 	assert (cc == 'c');
 
-	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\" \n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 
-	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\"\n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
@@ -2372,27 +2373,64 @@ void VarTest::testJSONDeserializeStruct()
 
 	std::string sStr = Var::toString(aStr);
 	Var a = Var::parse(sStr);
-	assert (aStr["i8"] == i8);
-	assert (aStr["u16"] == u16);
-	assert (aStr["i32"] == i32);
-	assert (aStr["u64"] == u64);
-	assert (aStr["b"] == b);
-	assert (aStr["f"] == f);
-	assert (aStr["d"] == d);
-	assert (aStr["s"] == s);
-	assert (aStr["c"] == c);
+	assert (a["i8"] == i8);
+	assert (a["u16"] == u16);
+	assert (a["i32"] == i32);
+	assert (a["u64"] == u64);
+	assert (a["b"] == b);
+	assert (a["f"] == f);
+	assert (a["d"] == d);
+	assert (a["s"] == s);
+	assert (a["c"] == c);
+}
+
+
+void VarTest::testJSONRoundtripStruct()
+{
+	Poco::Int64 i64(-1234567890);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	double d = 3.1415;
+	std::string s("test string");
+	DynamicStruct aStr;
+	aStr["i64"] = i64;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["d"] = d;
+	aStr["s"] = s;
+
+	std::string sStr = Var::toString(aStr);
+	Var a = Var::parse(sStr);
+	assert (a["i64"].isInteger());
+	assert (!a["u64"].isSigned());
+	assert (a["b"].isBoolean());
+	assert (a["d"].isNumeric());
+	assert (a["s"].isString());
+
+	std::string serialized = Var::toString(a);
+	assert (sStr == serialized);
 }
 
 
 void VarTest::testDate()
 {
 	Poco::DateTime dtNow(2007, 3, 13, 8, 12, 15);
-	
+
 	Poco::Timestamp tsNow = dtNow.timestamp();
 	Poco::LocalDateTime ldtNow(dtNow.timestamp());
 	Var dt(dtNow);
+	assert(dt.isDate());
+	assert(dt.isTime());
+	assert(dt.isDateTime());
 	Var ts(tsNow);
+	assert(ts.isDate());
+	assert(ts.isTime());
+	assert(ts.isDateTime());
 	Var ldt(ldtNow);
+	assert(ldt.isDate());
+	assert(ldt.isTime());
+	assert(ldt.isDateTime());
 	Var dtStr(dt.convert<std::string>());
 	Var tsStr(ts.convert<std::string>());
 	Var ldtStr(ldt.convert<std::string>());
@@ -2415,7 +2453,7 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 {
 	try
 	{
-		Var val1 = a1[n]; 
+		Var val1 = a1[n];
 		fail("bad cast - must throw");
 		val1 = 0; // silence the compiler
 	}
@@ -2429,7 +2467,7 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 	try
 	{
 		const Var& c1 = a1;
-		const Var& cval1 = c1[n]; 
+		const Var& cval1 = c1[n];
 		fail("bad const cast - must throw");
 		assert (cval1 == c1); // silence the compiler
 	}
@@ -2477,11 +2515,6 @@ void VarTest::testEmpty()
 	assert (da == da);
 	assert (!(da != da));
 
-	assert (da != Var(1));
-	assert (!(da == Var(1)));
-	assert (Var(1) != da);
-	assert (!(Var(1) == da));
-
 	assert (da != "");
 	assert ("" != da);
 	assert (!(da == ""));
@@ -2506,13 +2539,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int i = da;
+		int POCO_UNUSED i = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int i = da.extract<int>();
+		int POCO_UNUSED i = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }
@@ -2637,6 +2670,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeArray);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
+	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);

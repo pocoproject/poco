@@ -1,9 +1,7 @@
 //
 // Unicode.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Unicode.h#4 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Unicode
 //

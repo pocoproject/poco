@@ -1,8 +1,6 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/IPAddressTest.cpp#2 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -85,6 +83,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia6(32, IPAddress::IPv6);
 	assert (ia6.family() == IPAddress::IPv6);
 	assert (ia6.toString() == "ffff:ffff::");
+
+	IPAddress ia7("::");
+	assert (ia7.family() == IPAddress::IPv6);
+	assert (ia7.toString() == "::");
 #endif
 }
 

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: Makefile 580 2008-06-01 20:56:01Z ryppka $
-#
 # Makefile for Poco LogRotation
 #
 

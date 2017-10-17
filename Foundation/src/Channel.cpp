@@ -1,8 +1,6 @@
 //
 // Channel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Channel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Channel

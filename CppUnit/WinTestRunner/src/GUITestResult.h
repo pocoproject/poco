@@ -1,8 +1,6 @@
 //
 // GUITestResult.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
-//
 
 
 #ifndef GuiTestResult_INCLUDED

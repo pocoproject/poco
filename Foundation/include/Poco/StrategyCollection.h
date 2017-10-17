@@ -1,8 +1,6 @@
 //
 // StrategyCollection.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/StrategyCollection.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  StrategyCollection

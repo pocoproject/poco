@@ -1,8 +1,6 @@
 //
 // DateTimeFormatter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DateTimeFormatter.h#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTimeFormatter

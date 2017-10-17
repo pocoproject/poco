@@ -1,8 +1,6 @@
 //
 // HTTPDigestCredentials.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPDigestCredentials.h#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:	HTTPDigestCredentials

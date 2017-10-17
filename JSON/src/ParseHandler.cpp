@@ -16,6 +16,7 @@
 
 #include "Poco/JSON/ParseHandler.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/JSON/JSONException.h"
 
 
 using Poco::Dynamic::Var;
@@ -47,8 +48,7 @@ void ParseHandler::reset()
 void ParseHandler::startObject()
 {
 	Object::Ptr newObj = new Object(_preserveObjectOrder);
-
-	if ( _stack.empty() ) // The first object
+	if (_stack.empty()) // The first object
 	{
 		_result = newObj;
 	}
@@ -56,12 +56,12 @@ void ParseHandler::startObject()
 	{
 		Var parent = _stack.top();
 
-		if ( parent.type() == typeid(Array::Ptr) )
+		if (parent.type() == typeid(Array::Ptr))
 		{
 			Array::Ptr arr = parent.extract<Array::Ptr>();
 			arr->add(newObj);
 		}
-		else if ( parent.type() == typeid(Object::Ptr) )
+		else if (parent.type() == typeid(Object::Ptr))
 		{
 			poco_assert_dbg(!_key.empty());
 			Object::Ptr obj = parent.extract<Object::Ptr>();
@@ -84,7 +84,7 @@ void ParseHandler::startArray()
 {
 	Array::Ptr newArr = new Array();
 
-	if ( _stack.empty() ) // The first array
+	if (_stack.empty()) // The first array
 	{
 		_result = newArr;
 	}
@@ -92,12 +92,12 @@ void ParseHandler::startArray()
 	{
 		Var parent = _stack.top();
 
-		if ( parent.type() == typeid(Array::Ptr) )
+		if (parent.type() == typeid(Array::Ptr))
 		{
 			Array::Ptr arr = parent.extract<Array::Ptr>();
 			arr->add(newArr);
 		}
-		else if ( parent.type() == typeid(Object::Ptr) )
+		else if (parent.type() == typeid(Object::Ptr))
 		{
 			poco_assert_dbg(!_key.empty());
 			Object::Ptr obj = parent.extract<Object::Ptr>();
@@ -124,19 +124,25 @@ void ParseHandler::key(const std::string& k)
 
 void ParseHandler::setValue(const Var& value)
 {
-	Var parent = _stack.top();
+	if (_stack.size())
+	{
+		Var parent = _stack.top();
 
-	if ( parent.type() == typeid(Array::Ptr) )
-	{
-		Array::Ptr arr = parent.extract<Array::Ptr>();
-		arr->add(value);
+		if (parent.type() == typeid(Array::Ptr))
+		{
+			Array::Ptr arr = parent.extract<Array::Ptr>();
+			arr->add(value);
+		}
+		else if (parent.type() == typeid(Object::Ptr))
+		{
+			Object::Ptr obj = parent.extract<Object::Ptr>();
+			obj->set(_key, value);
+			_key.clear();
+		}
 	}
-	else if ( parent.type() == typeid(Object::Ptr) )
+	else
 	{
-		poco_assert_dbg(!_key.empty());
-		Object::Ptr obj = parent.extract<Object::Ptr>();
-		obj->set(_key, value);
-		_key.clear();
+		throw JSONException("Attempt to set value on an empty stack");
 	}
 }
 

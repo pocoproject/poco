@@ -1,8 +1,6 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileStream_WIN32.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FileStream
@@ -68,7 +66,7 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 	
 #if defined (POCO_WIN32_UTF8)
 	std::wstring utf16Path;
-	UnicodeConverter::toUTF16(path, utf16Path);
+	FileImpl::convertPath(path, utf16Path);
 	_handle = CreateFileW(utf16Path.c_str(), access, shareMode, NULL, creationDisp, flags, NULL);
 #else
 	_handle = CreateFileA(path.c_str(), access, shareMode, NULL, creationDisp, flags, NULL);

@@ -1,8 +1,6 @@
 //
 // WebSocketTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/WebSocketTestSuite.h#1 $
-//
 // Definition of the WebSocketTestSuite class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.

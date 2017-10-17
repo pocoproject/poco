@@ -1,8 +1,6 @@
 //
 // SAXParserTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/SAXParserTest.h#1 $
-//
 // Definition of the SAXParserTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

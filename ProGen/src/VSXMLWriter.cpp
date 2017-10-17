@@ -1,8 +1,6 @@
 //
 // VSXMLWriter.cpp
 //
-// $Id: //poco/1.4/ProGen/src/VSXMLWriter.cpp#1 $
-//
 // Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

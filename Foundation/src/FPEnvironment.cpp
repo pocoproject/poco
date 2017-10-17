@@ -1,8 +1,6 @@
 //
 // FPEnvironment.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FPEnvironment.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -16,6 +14,7 @@
 
 // pull in platform identification macros needed below
 #include "Poco/Platform.h"
+#include "Poco/FPEnvironment.h"
 
 
 #if defined(POCO_NO_FPENVIRONMENT)
@@ -24,6 +23,8 @@
 #include "FPEnvironment_DEC.cpp"
 #elif defined(sun) || defined(__sun)
 #include "FPEnvironment_SUN.cpp"
+#elif defined(__QNX__)
+#include "FPEnvironment_QNX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "FPEnvironment_C99.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
@@ -31,11 +32,6 @@
 #else
 #include "FPEnvironment_DUMMY.cpp"
 #endif
-
-
-// header file must be included after platform-specific part
-// due to _XOPEN_SOURCE conflict on Tru64 (see FPEnvironment_DEC.cpp)
-#include "Poco/FPEnvironment.h"
 
 
 namespace Poco {

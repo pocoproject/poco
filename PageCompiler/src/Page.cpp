@@ -1,8 +1,6 @@
 //
 // Page.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/Page.cpp#2 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

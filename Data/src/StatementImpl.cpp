@@ -1,8 +1,6 @@
 //
 // StatementImpl.cpp
 //
-// $Id: //poco/Main/Data/src/StatementImpl.cpp#20 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  StatementImpl

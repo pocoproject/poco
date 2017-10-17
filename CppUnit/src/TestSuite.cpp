@@ -1,8 +1,6 @@
 //
 // TestSuite.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestSuite.cpp#1 $
-//
 
 
 #include "CppUnit/TestSuite.h"

@@ -1,10 +1,8 @@
 //
 // Transaction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Transaction.h#2 $
-//
 // Library: Data
-// Package: Core
+// Package: DataCore
 // Module:  Transaction
 //
 // Definition of the Transaction class.

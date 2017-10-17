@@ -1,8 +1,6 @@
 //
 // Nullable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Nullable.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Nullable
@@ -63,28 +61,32 @@ public:
 	Nullable(): 
 		/// Creates an empty Nullable.
 		_value(),
-		_isNull(true)
+		_isNull(true),
+		_null()
 	{
 	}
 
 	Nullable(const NullType&): 
 		/// Creates an empty Nullable.
 		_value(),
-		_isNull(true)
+		_isNull(true),
+		_null()
 	{
 	}
 
 	Nullable(const C& value): 
 		/// Creates a Nullable with the given value.
 		_value(value), 
-		_isNull(false)
+		_isNull(false),
+		_null()
 	{
 	}
 	
 	Nullable(const Nullable& other):
 		/// Creates a Nullable by copying another one.
 		_value(other._value),
-		_isNull(other._isNull)
+		_isNull(other._isNull),
+		_null()
 	{
 	}
 

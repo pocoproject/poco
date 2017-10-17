@@ -1,8 +1,6 @@
 //
 // NamedMutex_VMS.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedMutex_VMS.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex

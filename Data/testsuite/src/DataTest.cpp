@@ -1,8 +1,6 @@
 //
 // DataTest.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTest.cpp#12 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -944,7 +942,7 @@ void DataTest::testRow()
 	row3.append("field4", 4);
 
 	assert (row3 == row);
-	assert (!(row < row3 | row3 < row));
+	assert (!(row < row3 || row3 < row));
 
 	Row row4(row3.names());
 	try

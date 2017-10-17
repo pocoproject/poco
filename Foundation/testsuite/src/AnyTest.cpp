@@ -1,8 +1,6 @@
 //
 // AnyTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/AnyTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -229,7 +227,7 @@ void AnyTest::testInt()
 	std::string* s = AnyCast<std::string>(&a);
 	assert (s == NULL);
 
-	int tmp = AnyCast<int>(a);
+	int POCO_UNUSED tmp = AnyCast<int>(a);
 	const Any c = a;
 	tmp = AnyCast<int>(a);
 }

@@ -1,8 +1,6 @@
 //
 // ObjectPool.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ObjectPool.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ObjectPool
@@ -244,18 +242,18 @@ public:
 			_factory.deactivateObject(pObject);
 			if (_pool.size() < _capacity)
 			{
-				_pool.push_back(pObject);
-			}
-			else
-			{
-				_factory.destroyObject(pObject);
-				_size--;
+				try
+				{
+					_pool.push_back(pObject);
+					return;
+				}
+				catch (...)
+				{
+				}
 			}
 		}
-		else
-		{
-			_factory.destroyObject(pObject);
-		}
+		_factory.destroyObject(pObject);
+		_size--;
 	}
 
 	std::size_t capacity() const

@@ -1,8 +1,6 @@
 //
 // LoggingRegistryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LoggingRegistryTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -128,7 +126,7 @@ void LoggingRegistryTest::testUnregister()
 	
 	try
 	{
-		Channel* pC = reg.channelForName("c1");
+		Channel* POCO_UNUSED pC = reg.channelForName("c1");
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)
@@ -137,7 +135,7 @@ void LoggingRegistryTest::testUnregister()
 
 	try
 	{
-		Formatter* pF = reg.formatterForName("f2");
+		Formatter* POCO_UNUSED pF = reg.formatterForName("f2");
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

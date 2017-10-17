@@ -1,8 +1,6 @@
 //
 // DateTime.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DateTime.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTime
@@ -103,7 +101,7 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 59.
+		///   * second is from 0 to 60 (allowing leap seconds).
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
@@ -137,7 +135,7 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 59.
+		///   * second is from 0 to 60 (allowing leap seconds).
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 

@@ -1,8 +1,6 @@
 //
 // ApacheCodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/ApacheCodeWriter.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

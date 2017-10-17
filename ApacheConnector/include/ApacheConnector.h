@@ -1,8 +1,6 @@
 //
 // ApacheConnector.h
 //
-// $Id: //poco/1.4/ApacheConnector/include/ApacheConnector.h#2 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

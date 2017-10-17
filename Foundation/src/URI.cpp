@@ -1,8 +1,6 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#5 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI
@@ -25,10 +23,11 @@
 namespace Poco {
 
 
-const std::string URI::RESERVED_PATH     = "?#";
-const std::string URI::RESERVED_QUERY    = "?#/";
-const std::string URI::RESERVED_FRAGMENT = "";
-const std::string URI::ILLEGAL           = "%<>{}|\\\"^`";
+const std::string URI::RESERVED_PATH        = "?#";
+const std::string URI::RESERVED_QUERY       = "?#/:;+@";
+const std::string URI::RESERVED_QUERY_PARAM = "?#/:;+@&=";
+const std::string URI::RESERVED_FRAGMENT    = "";
+const std::string URI::ILLEGAL              = "%<>{}|\\\"^`!*'()$,[]";
 
 
 URI::URI():
@@ -333,12 +332,10 @@ void URI::setQuery(const std::string& query)
 
 void URI::addQueryParameter(const std::string& param, const std::string& val)
 {
-	std::string reserved(RESERVED_QUERY);
-	reserved += "=&";
 	if (!_query.empty()) _query += '&';
-	encode(param, reserved, _query);
+	encode(param, RESERVED_QUERY_PARAM, _query);
 	_query += '=';
-	encode(val, reserved, _query);
+	encode(val, RESERVED_QUERY_PARAM, _query);
 }
 
 
@@ -660,9 +657,9 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 		if (inQuery && plusAsSpace && c == '+') c = ' ';
 		else if (c == '%')
 		{
-			if (it == end) throw SyntaxException("URI encoding: no hex digit following percent sign", str);
+			if (it == end) throw URISyntaxException("URI encoding: no hex digit following percent sign", str);
 			char hi = *it++;
-			if (it == end) throw SyntaxException("URI encoding: two hex digits must follow percent sign", str);
+			if (it == end) throw URISyntaxException("URI encoding: two hex digits must follow percent sign", str);
 			char lo = *it++;
 			if (hi >= '0' && hi <= '9')
 				c = hi - '0';
@@ -670,7 +667,7 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 				c = hi - 'A' + 10;
 			else if (hi >= 'a' && hi <= 'f')
 				c = hi - 'a' + 10;
-			else throw SyntaxException("URI encoding: not a hex digit");
+			else throw URISyntaxException("URI encoding: not a hex digit");
 			c *= 16;
 			if (lo >= '0' && lo <= '9')
 				c += lo - '0';
@@ -678,7 +675,7 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 				c += lo - 'A' + 10;
 			else if (lo >= 'a' && lo <= 'f')
 				c += lo - 'a' + 10;
-			else throw SyntaxException("URI encoding: not a hex digit");
+			else throw URISyntaxException("URI encoding: not a hex digit");
 		}
 		decodedStr += c;
 	}
@@ -699,13 +696,13 @@ unsigned short URI::getWellKnownPort() const
 		return 22;
 	else if (_scheme == "telnet")
 		return 23;
-	else if (_scheme == "http")
+	else if (_scheme == "http" || _scheme == "ws")
 		return 80;
 	else if (_scheme == "nntp")
 		return 119;
 	else if (_scheme == "ldap")
 		return 389;
-	else if (_scheme == "https")
+	else if (_scheme == "https" || _scheme == "wss")
 		return 443;
 	else if (_scheme == "rtsp")
 		return 554;
@@ -732,7 +729,7 @@ void URI::parse(const std::string& uri)
 		if (it != end && *it == ':')
 		{
 			++it;
-			if (it == end) throw SyntaxException("URI scheme must be followed by authority or path", uri);
+			if (it == end) throw URISyntaxException("URI scheme must be followed by authority or path", uri);
 			setScheme(scheme);
 			if (*it == '/')
 			{
@@ -786,7 +783,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 		// IPv6 address
 		++it;
 		while (it != end && *it != ']') host += *it++;
-		if (it == end) throw SyntaxException("unterminated IPv6 address");
+		if (it == end) throw URISyntaxException("unterminated IPv6 address");
 		++it;
 	}
 	else
@@ -804,7 +801,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 			if (NumberParser::tryParse(port, nport) && nport > 0 && nport < 65536)
 				_port = (unsigned short) nport;
 			else
-				throw SyntaxException("bad or invalid port number", port);
+				throw URISyntaxException("bad or invalid port number", port);
 		}
 		else _port = getWellKnownPort();
 	}

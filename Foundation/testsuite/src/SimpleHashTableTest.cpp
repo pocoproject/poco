@@ -1,8 +1,6 @@
 //
 // SimpleHashTableTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SimpleHashTableTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -104,9 +102,9 @@ void SimpleHashTableTest::testSize()
 {
 	SimpleHashTable<std::string, int> hashTable(13);
 	assert (hashTable.size() == 0);
-	Poco::UInt32 h1 = hashTable.insert("1", 1);
+	Poco::UInt32 POCO_UNUSED h1 = hashTable.insert("1", 1);
 	assert (hashTable.size() == 1);
-	Poco::UInt32 h2 = hashTable.update("2", 2);
+	Poco::UInt32 POCO_UNUSED h2 = hashTable.update("2", 2);
 	assert (hashTable.size() == 2);
 	hashTable.clear();
 	assert (hashTable.size() == 0);

@@ -1,8 +1,6 @@
 //
 // DynamicTestSuite.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/DynamicTestSuite.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

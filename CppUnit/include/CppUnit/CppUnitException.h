@@ -1,8 +1,6 @@
 //
 // CppUnitException.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/CppUnitException.h#1 $
-//
 
 
 #ifndef CppUnit_CppUnitException_INCLUDED

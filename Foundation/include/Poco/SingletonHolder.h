@@ -1,8 +1,6 @@
 //
 // SingletonHolder.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SingletonHolder.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  SingletonHolder
@@ -57,6 +55,14 @@ public:
 		FastMutex::ScopedLock lock(_m);
 		if (!_pS) _pS = new S;
 		return _pS;
+	}
+	
+	void reset()
+		/// Deletes the singleton object.
+	{
+		FastMutex::ScopedLock lock(_m);
+		delete _pS;
+		_pS = 0;
 	}
 	
 private:
