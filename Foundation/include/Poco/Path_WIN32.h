@@ -7,7 +7,7 @@
 //
 // Definition of the PathImpl class for WIN32.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -39,6 +39,11 @@ public:
 	static std::string systemImpl();
 	static std::string expandImpl(const std::string& path);
 	static void listRootsImpl(std::vector<std::string>& roots);
+
+	enum
+	{
+		MAX_PATH_LEN = 32767
+	};
 };
 
 

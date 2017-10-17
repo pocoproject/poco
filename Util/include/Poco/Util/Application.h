@@ -82,8 +82,7 @@ class Util_API Application: public Subsystem
 	/// If loadConfiguration() has never been called, application.configDir will be equal to application.dir.
 	///
 	/// The POCO_APP_MAIN macro can be used to implement main(argc, argv).
-	/// If POCO has been built with POCO_WIN32_UTF8, POCO_APP_MAIN supports
-	/// Unicode command line arguments.
+	/// POCO_APP_MAIN supports Unicode command line arguments.
 {
 public:
 	typedef std::vector<std::string> ArgVec;
@@ -140,7 +139,7 @@ public:
 		/// Note that as of release 1.3.7, init() no longer
 		/// calls initialize(). This is now called from run().
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 	void init(int argc, wchar_t* argv[]);
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
@@ -481,7 +480,7 @@ inline Poco::Timespan Application::uptime() const
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
 	#define POCO_APP_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)		\
 	{										\

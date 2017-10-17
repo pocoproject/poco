@@ -17,14 +17,12 @@
 #include "Poco/Environment.h"
 #include <iostream>
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Poco/Path_WINCE.h"
 #else
-#include "Poco/Path_WIN32U.h"
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Path_WIN32.h"
+#endif
 #endif
 
 using Poco::Path;

@@ -34,7 +34,8 @@ protected:
 	void waitImpl();
 	
 private:
-	std::string _name;
+	std::string  _name;
+	std::wstring _uname;
 	HANDLE      _event;	
 };
 
