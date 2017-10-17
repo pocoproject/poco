@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-[submodule "gradle"]
-	path = gradle
-	url = git://github.com/Kampbell/gradle.git
-=======
 [submodule "openssl"]
 	path = openssl
 	url = https://github.com/pocoproject/openssl
->>>>>>> refs/remotes/pocoproject/develop
