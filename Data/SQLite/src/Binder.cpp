@@ -113,7 +113,7 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir, const Whe
 
 void Binder::bind(std::size_t pos, const NullData&, Direction, const std::type_info& bindType)
 {
-	sqlite3_bind_null(_pStmt, pos);
+	sqlite3_bind_null(_pStmt, static_cast<int>(pos));
 }
 
 

@@ -65,12 +65,12 @@ namespace
 			/// in its entirety, including attachments.
 		{
 		}
-		
+
 		~MultiPartHandler()
 			/// Destroys string part handler.
 		{
 		}
-		
+
 		void handlePart(const MessageHeader& header, std::istream& stream)
 			/// Handles a part. If message pointer was provided at construction time, 
 			/// the message pointed to will be properly populated so it could be written
@@ -92,7 +92,7 @@ namespace
 						cte = MailMessage::ENCODING_BASE64;
 				}
 
-				std::string contentType = header.get(MailMessage::HEADER_CONTENT_TYPE, "");
+				std::string contentType = header.get(MailMessage::HEADER_CONTENT_TYPE, "text/plain; charset=us-ascii");
 				std::string contentDisp = header.get(MailMessage::HEADER_CONTENT_DISPOSITION, "");
 				std::string filename;
 				if (!contentDisp.empty())
@@ -110,8 +110,8 @@ namespace
 					{
 						if (it->second == "inline") 
 							_pMsg->addContent(pPS, cte);
-						else 
-							_pMsg->addAttachment("", pPS, cte);
+						else
+							_pMsg->addAttachment(getPartName(header), pPS, cte);
 						added = true;
 					}
 					
@@ -134,13 +134,21 @@ namespace
 			StringTokenizer st(header, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 			StringTokenizer::Iterator it = st.begin();
 			StringTokenizer::Iterator end = st.end();
-			for (; it != end; ++it) { if (*it == param) break; }
+			for (; it != end; ++it) { if (icompare(*it, param) == 0) break; }
 			if (it != end)
 			{
 				++it;
 				if (it == end) return "";
 				return *it;
 			}
+			return "";
+		}
+
+		std::string getPartName(const MessageHeader& header)
+		{
+			std::string ct = MailMessage::HEADER_CONTENT_TYPE;
+			if (header.has(ct))
+				return getParamFromHeader(header[ct], "name");
 			return "";
 		}
 
@@ -216,7 +224,7 @@ MailMessage::~MailMessage()
 	}
 }
 
-	
+
 void MailMessage::addRecipient(const MailRecipient& recipient)
 {
 	_recipients.push_back(recipient);
@@ -272,13 +280,13 @@ void MailMessage::setContentType(const std::string& mediaType)
 	set(HEADER_CONTENT_TYPE, mediaType);
 }
 
-	
+
 void MailMessage::setContentType(const MediaType& mediaType)
 {
 	setContentType(mediaType.toString());
 }
 
-	
+
 const std::string& MailMessage::getContentType() const
 {
 	if (has(HEADER_CONTENT_TYPE))
@@ -293,7 +301,7 @@ void MailMessage::setDate(const Poco::Timestamp& dateTime)
 	set(HEADER_DATE, DateTimeFormatter::format(dateTime, DateTimeFormat::RFC1123_FORMAT));
 }
 
-	
+
 Poco::Timestamp MailMessage::getDate() const
 {
 	const std::string& dateTime = get(HEADER_DATE);
@@ -301,7 +309,7 @@ Poco::Timestamp MailMessage::getDate() const
 	return DateTimeParser::parse(dateTime, tzd).timestamp();
 }
 
-	
+
 bool MailMessage::isMultipart() const
 {
 	MediaType mediaType = getContentType();
@@ -328,7 +336,7 @@ void MailMessage::addContent(PartSource* pSource, ContentTransferEncoding encodi
 	addPart("", pSource, CONTENT_INLINE, encoding);
 }
 
-	
+
 void MailMessage::addAttachment(const std::string& name, PartSource* pSource, ContentTransferEncoding encoding)
 {
 	addPart(name, pSource, CONTENT_ATTACHMENT, encoding);
@@ -473,9 +481,11 @@ void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTr
 void MailMessage::readHeader(std::istream& istr)
 {
 	clear();
-	MessageHeader::read(istr);
+	MessageHeader::RecipientList recipients;
+	MessageHeader::read(istr, &recipients);
 	istr.get(); // \r
 	if ('\n' == istr.peek()) istr.get(); // \n
+	for (const auto& r : recipients) addRecipient(r);
 }
 
 
@@ -495,36 +505,36 @@ void MailMessage::readMultipart(std::istream& istr, PartHandler& handler)
 
 void MailMessage::readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler)
 {
-    std::string encoding;
-    if (header.has(HEADER_CONTENT_TRANSFER_ENCODING))
-    {
-        encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
-        // get rid of a parameter if one is set
-        std::string::size_type pos = encoding.find(';');
-        if (pos != std::string::npos)
-            encoding.resize(pos);
-    }
-    if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
-    {
-        QuotedPrintableDecoder decoder(istr);
-        handlePart(decoder, header, handler);
-        _encoding = ENCODING_QUOTED_PRINTABLE;
-    }
-    else if (icompare(encoding, CTE_BASE64) == 0)
-    {
-        Base64Decoder decoder(istr);
-        handlePart(decoder, header, handler);
-        _encoding = ENCODING_BASE64;
-    }
-    else
-    {
-        if (icompare(encoding, CTE_7BIT) == 0)
-            _encoding = ENCODING_7BIT;
-        else if (icompare(encoding, CTE_8BIT) == 0)
-            _encoding = ENCODING_8BIT;
+	std::string encoding;
+	if (header.has(HEADER_CONTENT_TRANSFER_ENCODING))
+	{
+		encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
+		// get rid of a parameter if one is set
+		std::string::size_type pos = encoding.find(';');
+		if (pos != std::string::npos)
+		    encoding.resize(pos);
+	}
+	if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
+	{
+		QuotedPrintableDecoder decoder(istr);
+		handlePart(decoder, header, handler);
+		_encoding = ENCODING_QUOTED_PRINTABLE;
+	}
+	else if (icompare(encoding, CTE_BASE64) == 0)
+	{
+		Base64Decoder decoder(istr);
+		handlePart(decoder, header, handler);
+		_encoding = ENCODING_BASE64;
+	}
+	else
+	{
+		if (icompare(encoding, CTE_7BIT) == 0)
+			_encoding = ENCODING_7BIT;
+		else if (icompare(encoding, CTE_8BIT) == 0)
+			_encoding = ENCODING_8BIT;
 
-        handlePart(istr, header, handler);
-    }
+		handlePart(istr, header, handler);
+	}
 }
 
 

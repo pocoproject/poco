@@ -115,7 +115,6 @@ ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 
 void SybaseODBC::testBareboneODBC()
 {
-	if (!&session()) fail("Test not available.");
 }
 
 
@@ -553,8 +552,6 @@ void SybaseODBC::testStoredProcedureAny()
 
 void SybaseODBC::testTransaction()
 {
-	if (!&session())fail("Test not available.");
-
 	for (int i = 0; i < 8;)
 	{
 		doPersonTable(" UNIQUE ");

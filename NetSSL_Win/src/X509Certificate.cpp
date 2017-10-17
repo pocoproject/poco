@@ -233,7 +233,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
 #endif
 			Poco::Buffer<char> buffer(256);
-			DWORD bufferSize = buffer.sizeBytes();
+			DWORD bufferSize = static_cast<DWORD>(buffer.sizeBytes());
 			BOOL rc = CryptDecodeObjectEx(
 					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
 					pExt->pszObjId,

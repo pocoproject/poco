@@ -6,9 +6,13 @@
 
 include $(POCO_BASE)/build/rules/global
 
+include $(POCO_BASE)/build/script/openssl_ver
+
 SYSLIBS += -lssl -lcrypto
 
-objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl CryptoStream CryptoTransform \
+objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \
+	CryptoException CryptoStream CryptoTransform ECDSADigestEngine \
+	ECKey ECKeyImpl EVPPKey KeyPair KeyPairImpl PKCS12Container \
 	RSACipherImpl RSAKey RSAKeyImpl RSADigestEngine DigestEngine \
 	X509Certificate OpenSSLInitializer
 

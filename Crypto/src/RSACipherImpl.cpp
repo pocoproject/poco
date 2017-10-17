@@ -70,13 +70,12 @@ namespace
 		std::size_t blockSize() const;
 		std::size_t maxDataSize() const;
 
-		std::streamsize transform(
-			const unsigned char* input,
-			std::streamsize		 inputLength,
-			unsigned char*		 output,
-			std::streamsize		 outputLength);
+		std::streamsize transform(const unsigned char* input,
+			std::streamsize inputLength,
+			unsigned char* output,
+			std::streamsize outputLength);
 		
-		std::streamsize finalize(unsigned char*	output, std::streamsize length);
+		std::streamsize finalize(unsigned char* output, std::streamsize length);
 
 	private:
 		const RSA*      _pRSA;
@@ -127,11 +126,8 @@ namespace
 	}
 
 
-	std::streamsize RSAEncryptImpl::transform(
-		const unsigned char* input,
-		std::streamsize		 inputLength,
-		unsigned char*		 output,
-		std::streamsize		 outputLength)
+	std::streamsize RSAEncryptImpl::transform(const unsigned char* input, std::streamsize inputLength,
+		unsigned char* output, std::streamsize outputLength)
 	{
 		// always fill up the buffer before writing!
 		std::streamsize maxSize = static_cast<std::streamsize>(maxDataSize());
@@ -147,7 +143,8 @@ namespace
 			if (missing == 0)
 			{
 				poco_assert (outputLength >= rsaSize);
-				int n = RSA_public_encrypt(static_cast<int>(maxSize), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+				int n = RSA_public_encrypt(static_cast<int>(maxSize), _pBuf, output,
+					const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 				if (n == -1)
 					throwError();
 				rc += n;
@@ -158,9 +155,7 @@ namespace
 			}
 			else
 			{
-				if (missing > inputLength)
-					missing = inputLength;
-
+				if (missing > inputLength) missing = inputLength;
 				std::memcpy(_pBuf + _pos, input, static_cast<std::size_t>(missing));
 				input += missing;
 				_pos += missing;
@@ -178,7 +173,8 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			rc = RSA_public_encrypt(static_cast<int>(_pos), _pBuf, output, const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
+			rc = RSA_public_encrypt(static_cast<int>(_pos), _pBuf, output,
+				const_cast<RSA*>(_pRSA), mapPaddingMode(_paddingMode));
 			if (rc == -1) throwError();
 		}
 		return rc;
@@ -193,14 +189,12 @@ namespace
 		
 		std::size_t blockSize() const;
 
-		std::streamsize transform(
-			const unsigned char* input,
-			std::streamsize		 inputLength,
-			unsigned char*		 output,
-			std::streamsize		 outputLength);
+		std::streamsize transform(const unsigned char* input,
+			std::streamsize inputLength,
+			unsigned char* output,
+			std::streamsize outputLength);
 		
-		std::streamsize finalize(
-			unsigned char*	output,
+		std::streamsize finalize(unsigned char*	output,
 			std::streamsize length);
 
 	private:

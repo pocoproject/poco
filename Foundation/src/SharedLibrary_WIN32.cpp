@@ -13,6 +13,7 @@
 
 
 #include "Poco/SharedLibrary_WIN32.h"
+#include "Poco/UnicodeConverter.h"
 #include "Poco/Path.h"
 #include "Poco/UnWindows.h"
 
@@ -40,9 +41,13 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 
 	if (_handle) throw LibraryAlreadyLoadedException(_path);
 	DWORD flags(0);
+#if !defined(_WIN32_WCE)
 	Path p(path);
 	if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
-	_handle = LoadLibraryExA(path.c_str(), 0, flags);
+#endif
+	std::wstring upath;
+	UnicodeConverter::toUTF16(path, upath);
+	_handle = LoadLibraryExW(upath.c_str(), 0, flags);
 	if (!_handle) throw LibraryLoadException(path);
 	_path = path;
 }
@@ -73,7 +78,13 @@ void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 
 	if (_handle)
 	{
+#if defined(_WIN32_WCE)
+		std::wstring uname;
+		UnicodeConverter::toUTF16(name, uname);
+		return (void*) GetProcAddressW((HMODULE) _handle, uname.c_str());
+#else
 		return (void*) GetProcAddress((HMODULE) _handle, name.c_str());
+#endif
 	}
 	else return 0;
 }

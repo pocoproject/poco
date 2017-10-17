@@ -33,8 +33,7 @@ class Foundation_API WindowsConsoleChannel: public Channel
 	/// Only the message's text is written, followed
 	/// by a newline.
 	///
-	/// If POCO has been compiled with POCO_WIN32_UTF8,
-	/// log messages are assumed to be UTF-8 encoded, and
+	/// Log messages are assumed to be UTF-8 encoded, and
 	/// are converted to UTF-16 prior to writing them to the
 	/// console. This is the main difference to the ConsoleChannel
 	/// class, which cannot handle UTF-8 encoded messages on Windows.
@@ -67,8 +66,7 @@ class Foundation_API WindowsColorConsoleChannel: public Channel
 	/// Only the message's text is written, followed
 	/// by a newline.
 	///
-	/// If POCO has been compiled with POCO_WIN32_UTF8,
-	/// log messages are assumed to be UTF-8 encoded, and
+	/// Log messages are assumed to be UTF-8 encoded, and
 	/// are converted to UTF-16 prior to writing them to the
 	/// console. This is the main difference to the ConsoleChannel
 	/// class, which cannot handle UTF-8 encoded messages on Windows.

@@ -83,6 +83,9 @@ if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
 if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
+if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
+if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64))
+
 rem SAMPLES [samples|nosamples]
 set SAMPLES=%4
 if "%SAMPLES%"=="" (set SAMPLES=samples)
@@ -145,7 +148,7 @@ if not defined VSINSTALLDIR (
   echo Error: No Visual C++ environment found.
   echo Please run this script from a Visual Studio Command Prompt
   echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
-  goto :EOF
+  goto :buildfailed
 )
 
 set VCPROJ_EXT=vcproj
@@ -232,7 +235,6 @@ if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
 if %VS_VERSION%==vs150 (set EXTRASW=/m /p:VisualStudioVersion=15.0)
 )
-
 
 set DEBUG_SHARED=0
 set RELEASE_SHARED=0

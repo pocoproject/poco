@@ -232,7 +232,8 @@ void POP3ClientSession::retrieveHeader(int id, MessageHeader& header)
 	if (!isPositive(response)) throw POP3Exception("Cannot retrieve header", response);
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
-	header.read(mis);
+	MessageHeader::RecipientList recipients;
+	header.read(mis, &recipients);
 	// skip stuff following header
 	mis.get(); // \r
 	mis.get(); // \n

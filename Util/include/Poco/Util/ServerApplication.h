@@ -60,8 +60,7 @@ class Util_API ServerApplication: public Application
 	///   }
 	///
 	/// The POCO_SERVER_MAIN macro can be used to implement main(argc, argv).
-	/// If POCO has been built with POCO_WIN32_UTF8, POCO_SERVER_MAIN supports
-	/// Unicode command line arguments.
+	/// POCO_SERVER_MAIN supports Unicode command line arguments.
 	///
 	/// On Windows platforms, an application built on top of the
 	/// ServerApplication class can be run both from the command line
@@ -144,7 +143,7 @@ public:
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 	int run(int argc, wchar_t** argv);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
@@ -198,10 +197,8 @@ private:
 	};
 	static BOOL __stdcall ConsoleCtrlHandler(DWORD ctrlType);
 	static DWORD __stdcall ServiceControlHandler(DWORD control, DWORD event_type, LPVOID event_data, LPVOID context);
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
-#else
-	static void __stdcall ServiceMain(DWORD argc, LPTSTR* argv);
 #endif
 
 	bool hasConsole();
@@ -235,7 +232,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32) && !defined(__MINGW32__)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\

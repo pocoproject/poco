@@ -563,7 +563,6 @@ void MySQLTest::testTupleVector()
 	_pExecutor->tupleVector();
 }
 
-#if __cplusplus >= 201103L
 
 void MySQLTest::testStdTuple()
 {
@@ -582,7 +581,6 @@ void MySQLTest::testStdTupleVector()
 	_pExecutor->stdTupleVector();
 }
 
-#endif // __cplusplus >= 201103L
 
 void MySQLTest::testInternalExtraction()
 {
@@ -739,6 +737,7 @@ void MySQLTest::testTupleWithNullable()
 
 	*_pSession << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now;
 
+	assert (result.size() == 6);
 	assert(result[0].get<1>() == std::string("Address"));
 	assert(result[0].get<2>() == 10);
 
@@ -796,7 +795,7 @@ void MySQLTest::recreatePersonLongTextTable()
 void MySQLTest::recreatePersonDateTimeTable()
 {
 	dropTable("Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME(6))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -894,7 +893,7 @@ void MySQLTest::recreateAnyTable()
 	dropTable("Anys");
 	try {
 		*_pSession << "CREATE TABLE Anys (int_8 TINYINT, int_16 SMALLINT, int_32 MEDIUMINT, int_64 BIGINT, flt FLOAT, dbl DOUBLE, "
-									"str0 VARCHAR(255), str1 TEXT, date0 DATE, time0 TIME, date_time0 DATETIME, empty INTEGER)", now;
+									"str0 VARCHAR(255), str1 TEXT, date0 DATE, time0 TIME, date_time0 DATETIME(6), empty INTEGER)", now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateAnyTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateAnyTable()"); }
@@ -1006,10 +1005,8 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testDynamicAny);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
-#if __cplusplus >= 201103L
 	CppUnit_addTest(pSuite, MySQLTest, testStdTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testStdTupleVector);
-#endif
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);

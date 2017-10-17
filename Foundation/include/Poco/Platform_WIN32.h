@@ -55,20 +55,12 @@
 #elif (_MSC_VER >= 1800) && (_MSC_VER < 1900) // Visual Studio 2013, MSVC++ 12.0
 	#define POCO_MSVS_VERSION 2013
 	#define POCO_MSVC_VERSION 120
-#elif (_MSC_VER >= 1900) && (_MSC_VER < 2000) // Visual Studio 2015, MSVC++ 14.0
+#elif (_MSC_VER >= 1900) && (_MSC_VER < 1910) // Visual Studio 2015, MSVC++ 14.0
 	#define POCO_MSVS_VERSION 2015
 	#define POCO_MSVC_VERSION 140
-#endif
-
-
-// Unicode Support
-#if defined(UNICODE) && !defined(POCO_WIN32_UTF8)
-	#define POCO_WIN32_UTF8
-#endif
-
-
-#if !defined(POCO_WIN32_UTF8)
-	#pragma message("Compiling POCO on Windows without #define POCO_WIN32_UTF8 is deprecated.")
+#elif (_MSC_VER >= 1910) && (_MSC_VER < 2000) // Visual Studio 2017, MSVC++ 14.1
+	#define POCO_MSVS_VERSION 2017
+	#define POCO_MSVC_VERSION 141
 #endif
 
 
@@ -87,9 +79,18 @@
 #endif
 
 
-// Enable C++11 support for VS 2014 and newer
-#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(POCO_ENABLE_CPP11)
-	#define POCO_ENABLE_CPP11
+//
+// C++11/14 support
+//
+
+// Versions earlier than VS 2015 not supported
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+	#error "_MSC_VER >= 1900 (VS 2015) required"
+#endif
+
+
+#if !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
 #endif
 
 

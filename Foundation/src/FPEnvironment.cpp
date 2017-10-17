@@ -14,6 +14,7 @@
 
 // pull in platform identification macros needed below
 #include "Poco/Platform.h"
+#include "Poco/FPEnvironment.h"
 
 
 #if defined(POCO_NO_FPENVIRONMENT)
@@ -31,11 +32,6 @@
 #else
 #include "FPEnvironment_DUMMY.cpp"
 #endif
-
-
-// header file must be included after platform-specific part
-// due to _XOPEN_SOURCE conflict on Tru64 (see FPEnvironment_DEC.cpp)
-#include "Poco/FPEnvironment.h"
 
 
 namespace Poco {

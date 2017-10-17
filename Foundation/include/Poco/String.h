@@ -538,7 +538,7 @@ Foundation_API std::string& replaceInPlace(std::string& str, const std::string::
 Foundation_API std::string& removeInPlace(std::string& str, const std::string::value_type ch, std::string::size_type start = 0);
 
 
-#endif	
+#endif
 
 
 template <class S>

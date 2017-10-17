@@ -33,6 +33,7 @@ public:
 	void testAtomicCounter();
 	void testNullable();
 	void testAscii();
+	void testChecksum64();
 
 	void setUp();
 	void tearDown();

@@ -386,7 +386,6 @@ void ThreadTest::testThreadFunctor()
 
 	assert (!thread.isRunning());
 
-#if __cplusplus >= 201103L
 
 	Thread thread2;
 
@@ -402,7 +401,6 @@ void ThreadTest::testThreadFunctor()
 
 	assert (!thread2.isRunning());
 
-#endif
 }
 
 
@@ -424,11 +422,7 @@ void ThreadTest::testThreadStackSize()
 	thread.setStackSize(stackSize);
 
 #if !defined(POCO_OS_FAMILY_BSD) // on BSD family, stack size is rounded
-#ifdef PTHREAD_STACK_MIN
-	assert (PTHREAD_STACK_MIN == thread.getStackSize());
-#else
 	assert (stackSize >= thread.getStackSize());
-#endif
 #endif
 
 	tmp = MyRunnable::_staticVar;

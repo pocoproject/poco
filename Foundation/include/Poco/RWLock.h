@@ -22,7 +22,14 @@
 #include "Poco/Exception.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+// TODO: std::shared_timed_mutex has separate read and write unlock
+
+//#define POCO_CXX11_RWLOCK_FINISHED
+
+
+#if defined(POCO_CXX11_RWLOCK_FINISHED) && defined(POCO_ENABLE_CPP14)
+#include "Poco/RWLock_STD.h"
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Poco/RWLock_WINCE.h"
 #else

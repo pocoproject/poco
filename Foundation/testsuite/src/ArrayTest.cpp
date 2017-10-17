@@ -35,7 +35,7 @@ void ArrayTest::testConstruction()
 
 	// fundamental type
 	typedef Poco::Array<float,6> FloatArray;
-	FloatArray a = { { 42.f } };
+	FloatArray a = { 42.f };
 
 	for (unsigned i=1; i<a.size(); ++i) {
 		a[i] = a[i-1]+1.f;
@@ -73,7 +73,7 @@ void ArrayTest::testOperations()
 {
 	const int SIZE = 6;
 	typedef Poco::Array<int,SIZE> Array;
-	Array a = { { 1 } };
+	Array a = { 1 };
 
 	// use some common STL container operations
 	assert(a.size() == SIZE);

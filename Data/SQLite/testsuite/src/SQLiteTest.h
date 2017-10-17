@@ -105,6 +105,8 @@ public:
 	void testNullable();
 	void testNulls();
 	void testRowIterator();
+	void testRowIteratorLimit();
+	void testFilter();
 	void testAsync();
 
 	void testAny();

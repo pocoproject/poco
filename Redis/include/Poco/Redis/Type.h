@@ -201,7 +201,7 @@ struct RedisTypeTraits<BulkString>
 		{
 			std::string s = value.value();
 			return marker
-				+ NumberFormatter::format(s.length())
+				+ NumberFormatter::format(static_cast<Poco::UInt64>(s.length()))
 				+ LineEnding::NEWLINE_CRLF
 				+ s
 				+ LineEnding::NEWLINE_CRLF;

@@ -591,6 +591,23 @@ void StringTest::testStringToFloat()
 			assertEqualDelta(12.34, result, 0.01);
 		}
 	}
+
+	assert (std::isnan(strToFloat("nan")));
+	assert (std::isnan(strToFloat("xNaNy")));
+	assert (!std::isnan(strToFloat("inf")));
+	assert (!std::isnan(strToFloat("-inf")));
+	assert (std::isnan(strToFloat("infinity")));
+	assert (!std::isnan(strToFloat("infinity", "infinity")));
+	assert (!std::isnan(strToFloat("-infinity", "infinity")));
+	assert (std::isnan(strToFloat("Inf")));
+	assert (!std::isnan(strToFloat("Inf", "Inf")));
+
+	assert (std::isinf(strToFloat("inf")));
+	assert (std::isinf(strToFloat("-inf")));
+	assert (std::isinf(strToFloat("infinity", "infinity")));
+	assert (std::isinf(strToFloat("-infinity", "infinity")));
+	assert (!std::isinf(strToFloat("Inf")));
+	assert (std::isinf(strToFloat("Inf", "Inf")));
 }
 
 
@@ -732,6 +749,23 @@ void StringTest::testStringToDouble()
 			assertEqualDelta(12.34, result, 0.01);
 		}
 	}
+
+	assert (std::isnan(strToDouble("nan")));
+	assert (std::isnan(strToDouble("xNaNy")));
+	assert (!std::isnan(strToDouble("inf")));
+	assert (!std::isnan(strToDouble("-inf")));
+	assert (std::isnan(strToDouble("infinity")));
+	assert (!std::isnan(strToDouble("infinity", "infinity")));
+	assert (!std::isnan(strToDouble("-infinity", "infinity")));
+	assert (std::isnan(strToDouble("Inf")));
+	assert (!std::isnan(strToDouble("Inf", "Inf")));
+
+	assert (std::isinf(strToDouble("inf")));
+	assert (std::isinf(strToDouble("-inf")));
+	assert (std::isinf(strToDouble("infinity", "infinity")));
+	assert (std::isinf(strToDouble("-infinity", "infinity")));
+	assert (!std::isinf(strToDouble("Inf")));
+	assert (std::isinf(strToDouble("Inf", "Inf")));
 }
 
 

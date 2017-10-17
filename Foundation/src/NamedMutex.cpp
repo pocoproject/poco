@@ -15,9 +15,7 @@
 #include "Poco/NamedMutex.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
-#include "NamedMutex_WIN32U.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "NamedMutex_WIN32.cpp"
 #elif defined(POCO_ANDROID)
 #include "NamedMutex_Android.cpp"

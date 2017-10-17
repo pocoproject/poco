@@ -54,7 +54,7 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_isTransaction(false)
 {
 	open();
-	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
+	setConnectionTimeout(loginTimeout);
 	setProperty("handle", _pDB);
 	addFeature("autoCommit", 
 		&SessionImpl::autoCommit, 
@@ -183,7 +183,7 @@ void SessionImpl::open(const std::string& connect)
 	{
 		ActiveConnector connector(connectionString(), &_pDB);
 		ActiveResult<int> result = connector.connect();
-		if (!result.tryWait(getLoginTimeout() * 1000))
+		if (!result.tryWait(static_cast<long>(getLoginTimeout()) * 1000))
 			throw ConnectionFailedException("Timed out.");
 
 		int rc = result.data();
@@ -244,7 +244,7 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
 	if(timeout <= std::numeric_limits<int>::max()/1000)
 	{
-		int tout = 1000 * timeout;
+		int tout = 1000 * static_cast<int>(timeout);
 		int rc = sqlite3_busy_timeout(_pDB, tout);
 		if (rc != 0) Utility::throwException(rc);
 		_timeout = tout;

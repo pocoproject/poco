@@ -31,7 +31,11 @@ static void getProp(const TypeInfo& dataTypes, SQLSMALLINT sqlType, size_t& val)
 	Poco::DynamicAny r;
 	if (dataTypes.tryGetInfo(sqlType, NM, r))
 	{
+#ifndef POCO_LONG_IS_64_BIT
 		long sz = r.convert<long>();
+#else
+		Poco::Int64 sz = r.convert<Poco::Int64>();
+#endif
 		// Postgres driver returns SQL_NO_TOTAL(-4) in some cases
 		if (sz >= 0)
 			val = static_cast<size_t>(sz);
@@ -181,6 +185,10 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 	{
 		getColumnOrParameterSize(pos, size);
 		char* pChar = (char*) std::calloc(size, sizeof(char));
+
+		if (isInOutBound(dir))
+			std::strcpy(pChar,val.c_str());
+
 		pVal = (SQLPOINTER) pChar;
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
@@ -236,6 +244,8 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 		getColumnOrParameterSize(pos, size);
 		CharT* pChar = (CharT*)std::calloc(size, sizeof(CharT));
 		pVal = (SQLPOINTER)pChar;
+		if (isInOutBound(dir))
+			std::copy(val.begin(), val.end(), pChar);
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_utf16Strings.insert(UTF16StringMap::value_type(pChar, const_cast<UTF16String*>(&val)));
 	}
