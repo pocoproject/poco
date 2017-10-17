@@ -28,6 +28,7 @@
 #include <openssl/pem.h>
 #include <sstream>
 #include <typeinfo>
+#include <string>
 
 
 namespace Poco {

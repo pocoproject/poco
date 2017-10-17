@@ -22,6 +22,7 @@
 #include "Poco/Ascii.h"
 #include <cstring>
 #include <algorithm>
+#include <stddef.h>
 
 
 namespace Poco {
@@ -644,7 +645,7 @@ struct i_char_traits : public std::char_traits<charT>
 		return Ascii::toLower(c1) < Ascii::toLower(c2);
 	}
 
-	static int compare(const charT* s1, const charT* s2, std::size_t n)
+	static int compare(const charT* s1, const charT* s2, size_t n)
 	{
 		for (int i = 0; i < n && s1 && s2; ++i, ++s1, ++s2)
 		{

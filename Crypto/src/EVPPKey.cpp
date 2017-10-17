@@ -17,6 +17,7 @@
 #include "Poco/Crypto/ECKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/NumberFormatter.h"
+#include <string.h>
 
 
 namespace Poco {

@@ -30,6 +30,8 @@
 #include <limits>
 #include <cmath>
 #include <cctype>
+#include <ctype.h>
+#include <stddef.h>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
@@ -85,7 +87,7 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	/// the return value is false with the result value undetermined.
 {
 	if (!pStr) return false;
-	while (std::isspace(*pStr)) ++pStr;
+	while (isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
 	short sign = 1;
 	if ((base == 10) && (*pStr == '-'))
@@ -317,7 +319,7 @@ bool intToStr(T value,
 
 	size = ptr - result;
 	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= std::size_t(width)));
+	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
 	*ptr-- = '\0';
 
 	char* ptrr = result;
@@ -392,7 +394,7 @@ bool uIntToStr(T value,
 	
 	size = ptr - result;
 	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= std::size_t(width)));
+	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
 	*ptr-- = '\0';
 	
 	char* ptrr = result;

@@ -20,6 +20,8 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Ascii.h"
 #include <algorithm>
+#include <stdlib.h>
+#include <string.h>
 
 
 namespace Poco {

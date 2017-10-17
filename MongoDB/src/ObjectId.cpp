@@ -17,6 +17,7 @@
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/Format.h"
 #include <cstring>
+#include <string.h>
 
 
 namespace Poco {
@@ -25,7 +26,7 @@ namespace MongoDB {
 
 ObjectId::ObjectId()
 {
-	std::memset(_id, 0, sizeof(_id));
+	memset(_id, 0, sizeof(_id));
 }
 
 
@@ -44,7 +45,7 @@ ObjectId::ObjectId(const std::string& id)
 
 ObjectId::ObjectId(const ObjectId& copy)
 {
-	std::memcpy(_id, copy._id, sizeof(_id));
+	memcpy(_id, copy._id, sizeof(_id));
 }
 
 
