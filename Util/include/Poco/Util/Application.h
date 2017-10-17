@@ -139,7 +139,7 @@ public:
 		/// Note that as of release 1.3.7, init() no longer
 		/// calls initialize(). This is now called from run().
 
-#if !defined(POCO_NO_WSTRING)
+#if defined (POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
 	void init(int argc, wchar_t* argv[]);
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,

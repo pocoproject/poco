@@ -134,7 +134,7 @@ void Application::init(int argc, char* pArgv[])
 }
 
 
-#if !defined(POCO_NO_WSTRING)
+#if defined (POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
 void Application::init(int argc, wchar_t* argv[])
 {
 	std::vector<std::string> args;
