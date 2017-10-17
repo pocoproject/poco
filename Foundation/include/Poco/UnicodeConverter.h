@@ -20,7 +20,7 @@
 
 #include "Poco/Foundation.h"
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 
 #include "Poco/UTFString.h"
 

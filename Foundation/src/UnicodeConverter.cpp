@@ -21,7 +21,7 @@
 #include <cstring>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 
 
 namespace Poco {
