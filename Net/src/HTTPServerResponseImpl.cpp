@@ -151,6 +151,24 @@ void HTTPServerResponseImpl::sendBuffer(const void* pBuffer, std::size_t length)
 }
 
 
+std::ostream& HTTPServerResponseImpl::sendRaw()
+{
+	poco_assert (!_pStream);
+
+	setChunkedTransferEncoding(false);
+	
+	_pStream = new HTTPHeaderOutputStream(_session);
+	write(*_pStream);
+	return *_pStream;
+}
+
+
+int HTTPServerResponseImpl::writeBytes(const char* buffer, std::streamsize length)
+{
+	return _session.write(buffer, length);
+}
+
+
 void HTTPServerResponseImpl::redirect(const std::string& uri, HTTPStatus status)
 {
 	poco_assert (!_pStream);
