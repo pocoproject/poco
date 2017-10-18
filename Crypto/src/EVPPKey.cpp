@@ -309,9 +309,9 @@ int EVPPKey::passCB(char* buf, int size, int, void* pass)
 {
 	if (pass)
 	{
-		int len = (int)strlen((char*)pass);
+		int len = (int)std::strlen((char*)pass);
 		if(len > size) len = size;
-		memcpy(buf, pass, len);
+		std::memcpy(buf, pass, len);
 		return len;
 	}
 	return 0;
