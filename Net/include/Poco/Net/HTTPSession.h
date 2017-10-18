@@ -249,6 +249,7 @@ private:
 	friend class HTTPFixedLengthStreamBuf;
 	friend class HTTPChunkedStreamBuf;
 	friend class HTTPServerRequestImpl;
+	friend class HTTPServerResponseImpl;
 };
 
 
