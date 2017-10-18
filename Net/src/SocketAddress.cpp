@@ -19,18 +19,24 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 #include <algorithm>
 #include <cstring>
 
 
 using Poco::RefCountedObject;
 using Poco::NumberParser;
-using Poco::NumberFormatter;
 using Poco::UInt16;
 using Poco::InvalidArgumentException;
 using Poco::Net::Impl::SocketAddressImpl;
 using Poco::Net::Impl::IPv4SocketAddressImpl;
+#ifdef POCO_HAVE_IPv6
 using Poco::Net::Impl::IPv6SocketAddressImpl;
+#endif
+#ifdef POCO_OS_FAMILY_UNIX
+using Poco::Net::Impl::LocalSocketAddressImpl;
+#endif
 
 
 namespace Poco {
@@ -49,6 +55,15 @@ struct AFLT
 //
 // SocketAddress
 //
+
+
+const SocketAddress::Family SocketAddress::IPv4;
+#if defined(POCO_HAVE_IPv6)
+const SocketAddress::Family SocketAddress::IPv6;
+#endif
+#if defined(POCO_OS_FAMILY_UNIX)
+const SocketAddress::Family SocketAddress::UNIX_LOCAL;
+#endif
 
 
 SocketAddress::SocketAddress()
@@ -81,53 +96,46 @@ SocketAddress::SocketAddress(const std::string& hostAddress, const std::string& 
 }
 
 
+SocketAddress::SocketAddress(Family family, const std::string& addr)
+{
+	init(family, addr);
+}
+
+
 SocketAddress::SocketAddress(const std::string& hostAndPort)
 {
-	poco_assert (!hostAndPort.empty());
-
-	std::string host;
-	std::string port;
-	std::string::const_iterator it  = hostAndPort.begin();
-	std::string::const_iterator end = hostAndPort.end();
-	if (*it == '[')
-	{
-		++it;
-		while (it != end && *it != ']') host += *it++;
-		if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
-		++it;
-	}
-	else
-	{
-		while (it != end && *it != ':') host += *it++;
-	}
-	if (it != end && *it == ':')
-	{
-		++it;
-		while (it != end) port += *it++;
-	}
-	else throw InvalidArgumentException("Missing port number");
-	init(host, resolveService(port));
+	init(hostAndPort);
 }
 
 
 SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 {
-	if (socketAddress.family() == IPAddress::IPv4)
+	if (socketAddress.family() == IPv4)
 		newIPv4(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
-	else
+#if defined(POCO_HAVE_IPv6)
+	else if (socketAddress.family() == IPv6)
 		newIPv6(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
+#endif
+#if defined(POCO_OS_FAMILY_UNIX)
+	else if (socketAddress.family() == UNIX_LOCAL)
+		newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
+#endif
 }
 
 
 SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
 {
-	if (length == sizeof(struct sockaddr_in))
+	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
 		newIPv4(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
 #if defined(POCO_HAVE_IPv6)
-	else if (length == sizeof(struct sockaddr_in6))
+	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
 		newIPv6(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
-	else throw Poco::InvalidArgumentException("Invalid address length passed to SocketAddress()");
+#if defined(POCO_OS_FAMILY_UNIX)
+	else if (length > 0 && length <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
+		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr));
+#endif
+	else throw Poco::InvalidArgumentException("Invalid address length or family passed to SocketAddress()");
 }
 
 
@@ -141,6 +149,9 @@ bool SocketAddress::operator < (const SocketAddress& socketAddress) const
 {
 	if (family() < socketAddress.family()) return true;
 	if (family() > socketAddress.family()) return false;
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (family() == UNIX_LOCAL) return toString() < socketAddress.toString();
+#endif
 	if (host() < socketAddress.host()) return true;
 	if (host() > socketAddress.host()) return false;
 	return (port() < socketAddress.port());
@@ -152,10 +163,16 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 	if (&socketAddress != this)
 	{
 		destruct();
-		if (socketAddress.family() == IPAddress::IPv4)
+		if (socketAddress.family() == IPv4)
 			newIPv4(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
-		else
+#if defined(POCO_HAVE_IPv6)			
+		else if (socketAddress.family() == IPv6)
 			newIPv6(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
+#endif
+#if defined(POCO_OS_FAMILY_UNIX)
+		else if (socketAddress.family() == UNIX_LOCAL)
+			newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
+#endif
 	}
 	return *this;
 }
@@ -191,19 +208,15 @@ int SocketAddress::af() const
 }
 
 
+SocketAddress::Family SocketAddress::family() const
+{
+	return static_cast<Family>(pImpl()->family());
+}
+
+
 std::string SocketAddress::toString() const
 {
-	std::string result;
-#if defined(POCO_HAVE_IPv6)
-	if (host().family() == IPAddress::IPv6)
-		result.append("[");
-	result.append(host().toString());
-	if (host().family() == IPAddress::IPv6)
-		result.append("]");
-#endif
-	result.append(":");
-	NumberFormatter::append(result, port());
-	return result;
+	return pImpl()->toString();
 }
 
 
@@ -243,6 +256,51 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 }
 
 
+void SocketAddress::init(Family fam, const std::string& address)
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (fam == UNIX_LOCAL)
+	{
+		newLocal(address);
+	}
+	else
+#endif
+	{
+		init(address);
+		if (fam != family()) throw Poco::InvalidArgumentException("address does not fit family");
+	}
+}
+
+
+void SocketAddress::init(const std::string& hostAndPort)
+{
+	poco_assert (!hostAndPort.empty());
+
+	std::string host;
+	std::string port;
+	std::string::const_iterator it  = hostAndPort.begin();
+	std::string::const_iterator end = hostAndPort.end();
+	if (*it == '[')
+	{
+		++it;
+		while (it != end && *it != ']') host += *it++;
+		if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
+		++it;
+	}
+	else
+	{
+		while (it != end && *it != ':') host += *it++;
+	}
+	if (it != end && *it == ':')
+	{
+		++it;
+		while (it != end) port += *it++;
+	}
+	else throw InvalidArgumentException("Missing port number");
+	init(host, resolveService(port));
+}
+
+
 Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 {
 	unsigned port;
@@ -266,3 +324,29 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 
 
 } } // namespace Poco::Net
+
+
+Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value)
+{
+	writer << value.host();
+	writer << value.port();
+	return writer;
+}
+
+
+Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::SocketAddress& value)
+{
+	Poco::Net::IPAddress host;
+	reader >> host;
+	Poco::UInt16 port;
+	reader >> port;
+	value = Poco::Net::SocketAddress(host, port);
+	return reader;
+}
+
+
+std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& address)
+{
+	ostr << address.toString();
+	return ostr;
+}

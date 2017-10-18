@@ -40,6 +40,7 @@ public:
 	void testSelect();
 	void testSelect2();
 	void testSelect3();
+	void testEchoUnixLocal();
 
 	void setUp();
 	void tearDown();

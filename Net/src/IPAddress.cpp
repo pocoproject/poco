@@ -33,11 +33,19 @@ using Poco::UInt16;
 using Poco::UInt32;
 using Poco::Net::Impl::IPAddressImpl;
 using Poco::Net::Impl::IPv4AddressImpl;
+#if defined(POCO_HAVE_IPv6)
 using Poco::Net::Impl::IPv6AddressImpl;
+#endif
 
 
 namespace Poco {
 namespace Net {
+
+
+const IPAddress::Family IPAddress::IPv4;
+#if defined(POCO_HAVE_IPv6)
+const IPAddress::Family IPAddress::IPv6;
+#endif
 
 
 IPAddress::IPAddress()
@@ -50,8 +58,10 @@ IPAddress::IPAddress(const IPAddress& addr)
 {
 	if (addr.family() == IPv4)
 		newIPv4(addr.addr());
+#if defined(POCO_HAVE_IPv6)
 	else
 		newIPv6(addr.addr(), addr.scope());
+#endif
 }
 
 
@@ -63,8 +73,7 @@ IPAddress::IPAddress(Family family)
 	else if (family == IPv6)
 		newIPv6();
 #endif
-	else
-		throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
+	else throw Poco::InvalidArgumentException("Invalid or unsupported address family passed to IPAddress()");
 }
 
 
@@ -219,8 +228,12 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		destruct();
 		if (addr.family() == IPAddress::IPv4)
 			newIPv4(addr.addr());
-		else
+#if defined(POCO_HAVE_IPv6)
+		else if (addr.family() == IPAddress::IPv6)
 			newIPv6(addr.addr(), addr.scope());
+#endif
+		else 
+			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
 	}
 	return *this;
 }
@@ -228,7 +241,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 
 IPAddress::Family IPAddress::family() const
 {
-	return static_cast<IPAddress::Family>(pImpl()->family());
+	return pImpl()->family();
 }
 
 

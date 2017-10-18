@@ -40,8 +40,8 @@ class Net_API MulticastSocket: public DatagramSocket
 public:
 	MulticastSocket();
 		/// Creates the multicast socket.
-		
-	explicit MulticastSocket(IPAddress::Family family);
+
+	explicit MulticastSocket(SocketAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
 		/// The socket will be created for the

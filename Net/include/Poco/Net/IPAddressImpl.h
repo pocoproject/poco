@@ -37,14 +37,7 @@ class IPAddressImpl
 #endif
 {
 public:
-	enum Family
-		/// Possible address families for IP addresses.
-	{
-		IPv4
-#ifdef POCO_HAVE_IPv6
-		,IPv6
-#endif
-	};
+	typedef AddressFamily::Family Family;
 	
 	virtual ~IPAddressImpl();
 
@@ -129,6 +122,9 @@ private:
 };
 
 
+#if defined(POCO_HAVE_IPv6)
+
+
 //
 // IPv6AddressImpl
 //
@@ -177,6 +173,9 @@ private:
 	struct in6_addr _addr;
 	unsigned int    _scope;
 };
+
+
+#endif // POCO_HAVE_IPv6
 
 
 } } } // namespace Poco::Net::Impl

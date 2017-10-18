@@ -192,7 +192,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	_pResponseStream = 0;
 
 	bool keepAlive = getKeepAlive();
-	if ((connected() && !keepAlive) || mustReconnect())
+	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
 	{
 		close();
 		_mustReconnect = false;
@@ -203,7 +203,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 			reconnect();
 		if (!keepAlive)
 			request.setKeepAlive(false);
-		if (!request.has(HTTPRequest::HOST))
+		if (!request.has(HTTPRequest::HOST) && !_host.empty())
 			request.setHost(_host, _port);
 		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
