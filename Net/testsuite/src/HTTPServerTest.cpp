@@ -25,6 +25,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Thread.h"
+#include "Poco/AutoPtr.h"
 #include <sstream>
 
 
@@ -45,6 +46,7 @@ using Poco::Net::StreamSocket;
 using Poco::Net::SocketAddress;
 using Poco::StreamCopier;
 using Poco::Thread;
+using Poco::AutoPtr;
 
 
 namespace
@@ -529,7 +531,7 @@ void HTTPServerTest::testBufferAsync()
 	pParams->setKeepAlive(false);
 
 	ServerSocket ss(0);
-	HTTPServerAsyncConnection* pConn = new HTTPServerAsyncConnection(ss, pParams, new RequestHandlerFactory);
+	AutoPtr<HTTPServerAsyncConnection> pConn = new HTTPServerAsyncConnection(ss, pParams, new RequestHandlerFactory);
 	Thread server;
 	server.start(*pConn);
 	HTTPClientSession cs("127.0.0.1", ss.address().port());
