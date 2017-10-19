@@ -185,13 +185,14 @@ protected:
 	static const std::string& tr(const std::string& id);
 	static void loadStrings(const std::string& language);
 	static void loadString(const std::string& id, const std::string& def, const std::string& language);
-	static std::string projectURI(const std::string& id);
 
 	static Poco::Logger& logger();
 	
 	static const std::string RFC_URI;
-	static const std::string GITHUB_POCO_URI;
-	
+	static const std::string nbsp;
+	static const std::string copy;
+	static const std::string mdash;
+
 private:	
 	bool _prettifyCode;
 	bool _noFrames;
