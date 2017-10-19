@@ -20,8 +20,11 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerAsyncConnection.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Thread.h"
 #include <sstream>
 
 
@@ -35,9 +38,13 @@ using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerResponse;
+using Poco::Net::HTTPServerAsyncConnection;
 using Poco::Net::HTTPMessage;
 using Poco::Net::ServerSocket;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketAddress;
 using Poco::StreamCopier;
+using Poco::Thread;
 
 
 namespace
@@ -516,6 +523,31 @@ void HTTPServerTest::testBuffer()
 }
 
 
+void HTTPServerTest::testBufferAsync()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+
+	ServerSocket ss(0);
+	HTTPServerAsyncConnection* pConn = new HTTPServerAsyncConnection(ss, pParams, new RequestHandlerFactory);
+	Thread server;
+	server.start(*pConn);
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	cs.setKeepAlive(true);
+	HTTPRequest request("GET", "/buffer");
+	cs.sendRequest(request);
+	while (!pConn->isRunning()) Thread::sleep(10);
+
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assert(response.getStatus() == HTTPResponse::HTTP_OK);
+	assert(rbody == "xxxxxxxxxx");
+	pConn->stop();
+	server.join();
+}
+
+
 void HTTPServerTest::setUp()
 {
 }
@@ -544,6 +576,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testAuth);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNotImpl);
 	CppUnit_addTest(pSuite, HTTPServerTest, testBuffer);
+	CppUnit_addTest(pSuite, HTTPServerTest, testBufferAsync);
 
 	return pSuite;
 }

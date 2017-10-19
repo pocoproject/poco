@@ -69,6 +69,7 @@ private:
 	
 	friend class HTTPServer;
 	friend class HTTPServerConnection;
+	friend class HTTPServerAsyncConnection;
 };
 
 

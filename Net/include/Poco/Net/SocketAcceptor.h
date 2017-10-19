@@ -70,14 +70,16 @@ class SocketAcceptor
 public:
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
-		_pReactor(0)
+		_pReactor(0),
+		_pHandler(0)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 	{
 	}
 
 	SocketAcceptor(ServerSocket& socket, SocketReactor& reactor):
 		_socket(socket),
-		_pReactor(&reactor)
+		_pReactor(&reactor),
+		_pHandler(0)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 		/// The SocketAcceptor registers itself with the given SocketReactor.
 	{
@@ -156,13 +158,17 @@ public:
 		createServiceHandler(sock);
 	}
 	
+	ServiceHandler* serviceHandler()
+	{
+		return _pHandler;
+	}
 protected:
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
 		/// Subclasses can override this method.
 	{
-		return new ServiceHandler(socket, *_pReactor);
+		return _pHandler = new ServiceHandler(socket, *_pReactor);
 	}
 
 	SocketReactor* reactor()
@@ -187,6 +193,7 @@ private:
 	
 	ServerSocket   _socket;
 	SocketReactor* _pReactor;
+	ServiceHandler* _pHandler;
 };
 
 

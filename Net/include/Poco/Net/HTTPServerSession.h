@@ -39,34 +39,39 @@ public:
 	HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams);
 		/// Creates the HTTPServerSession.
 
+	HTTPServerSession();
+	/// Creates the HTTPServerSession.
+
 	virtual ~HTTPServerSession();
 		/// Destroys the HTTPServerSession.
 				
-	bool hasMoreRequests();
+	virtual bool hasMoreRequests() = 0;
 		/// Returns true if there are requests available.
 	
-	bool canKeepAlive() const;
+	virtual bool canKeepAlive() const = 0;
 		/// Returns true if the session can be kept alive.
-	
-	SocketAddress clientAddress();
-		/// Returns the client's address.
-		
-	SocketAddress serverAddress();
-		/// Returns the server's address.
-		
-private:
-	bool           _firstRequest;
-	Poco::Timespan _keepAliveTimeout;
-	int            _maxKeepAliveRequests;
-};
 
+	virtual SocketAddress clientAddress();
+	/// Returns the client's address.
+
+	virtual SocketAddress serverAddress();
+	/// Returns the server's address.
+};
 
 //
 // inlines
 //
-inline bool HTTPServerSession::canKeepAlive() const
+
+
+inline SocketAddress HTTPServerSession::clientAddress()
 {
-	return _maxKeepAliveRequests != 0;
+	return socket().peerAddress();
+}
+
+
+inline SocketAddress HTTPServerSession::serverAddress()
+{
+	return socket().address();
 }
 
 

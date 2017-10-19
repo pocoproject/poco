@@ -25,7 +25,7 @@ namespace Poco {
 namespace Net {
 
 
-HTTPSession::HTTPSession():
+HTTPSession::HTTPSession(bool extBuf):
 	_pBuffer(0),
 	_pCurrent(0),
 	_pEnd(0),
@@ -33,7 +33,11 @@ HTTPSession::HTTPSession():
 	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
 	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
 	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
-	_pException(0)
+	_pException(0),
+	_pExtBufIn(extBuf ? new IOBuffer : 0),
+	_pExtBufOut(extBuf ? new IOBuffer : 0),
+	_hasInData(false),
+	_hasOutData(false)
 {
 }
 
@@ -47,7 +51,11 @@ HTTPSession::HTTPSession(const StreamSocket& socket):
 	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
 	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
 	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
-	_pException(0)
+	_pException(0),
+	_pExtBufIn(0),
+	_pExtBufOut(0),
+	_hasInData(false),
+	_hasOutData(false)
 {
 }
 
@@ -61,7 +69,11 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
 	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
 	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
-	_pException(0)
+	_pException(0),
+	_pExtBufIn(0),
+	_pExtBufOut(0),
+	_hasInData(false),
+	_hasOutData(false)
 {
 }
 
@@ -71,6 +83,8 @@ HTTPSession::~HTTPSession()
 	try
 	{
 		if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
+		delete _pExtBufIn;
+		delete _pExtBufOut;
 	}
 	catch (...)
 	{
@@ -148,7 +162,16 @@ int HTTPSession::write(const char* buffer, std::streamsize length)
 {
 	try
 	{
-		return _socket.sendBytes(buffer, (int) length);
+		if (!_pExtBufOut)
+			return _socket.sendBytes(buffer, (int) length);
+		else
+		{
+			Poco::Mutex::ScopedLock l(_outMutex);
+			std::size_t len = _pExtBufOut->size();
+			_pExtBufOut->append(buffer, length);
+			_hasOutData = (_pExtBufOut->find("\r\n\r\n") != _pExtBufOut->npos);
+			return static_cast<int>(length);
+		}
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -158,17 +181,60 @@ int HTTPSession::write(const char* buffer, std::streamsize length)
 }
 
 
+int HTTPSession::getSend(IOBuffer& buf)
+{
+	Poco::Mutex::ScopedLock l(_outMutex);
+	if (_hasOutData)
+	{
+		buf = std::move(*_pExtBufOut);
+		_hasOutData = false;
+		_pExtBufOut->clear();
+	}
+	return buf.size();
+}
+
+
 int HTTPSession::receive(char* buffer, int length)
 {
 	try
 	{
-		return _socket.receiveBytes(buffer, length);
+		if (!_pExtBufIn)
+			return _socket.receiveBytes(buffer, length);
+		else
+		{
+			Poco::Mutex::ScopedLock l(_inMutex);
+			int len = 0;
+			if (_hasInData)
+			{
+				std::string::size_type pos = _pExtBufIn->find("\r\n\r\n");
+				std::string::size_type nPos = _pExtBufIn->npos;
+				while (pos != nPos && len < length)
+				{
+					int cpLen = _pExtBufIn->size() > length - len ? length - len : static_cast<int>(_pExtBufIn->size());
+					std::memcpy(buffer + len, _pExtBufIn->data() + len, cpLen);
+					_pExtBufIn->erase(0, cpLen);
+					len += cpLen;
+					pos = _pExtBufIn->find("\r\n\r\n");
+				}
+				_hasInData = false;
+			}
+			return len;
+		}
 	}
 	catch (Poco::Exception& exc)
 	{
 		setException(exc);
 		throw;
 	}
+}
+
+
+int HTTPSession::setReceive(char* buffer, int length)
+{
+	Poco::Mutex::ScopedLock l(_inMutex);
+	_pExtBufIn->append(buffer, length);
+	_hasInData = (_pExtBufIn->find("\r\n\r\n") != _pExtBufIn->npos);
+	return length;
 }
 
 
@@ -186,16 +252,21 @@ void HTTPSession::refill()
 
 bool HTTPSession::connected() const
 {
-	return _socket.impl()->initialized();
+	if (!_pExtBufIn)
+		return _socket.impl()->initialized();
+	else return true;
 }
 
 
 void HTTPSession::connect(const SocketAddress& address)
 {
-	_socket.connect(address, _connectionTimeout);
-	_socket.setReceiveTimeout(_receiveTimeout);
-	_socket.setSendTimeout(_sendTimeout);
-	_socket.setNoDelay(true);
+	if (!_pExtBufIn)
+	{
+		_socket.connect(address, _connectionTimeout);
+		_socket.setReceiveTimeout(_receiveTimeout);
+		_socket.setSendTimeout(_sendTimeout);
+		_socket.setNoDelay(true);
+	}
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.
 	_pCurrent = _pEnd = _pBuffer;
@@ -204,14 +275,17 @@ void HTTPSession::connect(const SocketAddress& address)
 
 void HTTPSession::abort()
 {
-	_socket.shutdown();
-	close();
+	if (!_pExtBufIn)
+	{
+		_socket.shutdown();
+		close();
+	}
 }
 
 
 void HTTPSession::close()
 {
-	_socket.close();
+	if (!_pExtBufIn) _socket.close();
 }
 
 
@@ -231,16 +305,20 @@ void HTTPSession::clearException()
 
 StreamSocket HTTPSession::detachSocket()
 {
-	StreamSocket oldSocket(_socket);
-	StreamSocket newSocket;
-	_socket = newSocket;
-	return oldSocket;
+	if (!_pExtBufIn)
+	{
+		StreamSocket oldSocket(_socket);
+		StreamSocket newSocket;
+		_socket = newSocket;
+		return oldSocket;
+	}
+	else return StreamSocket();
 }
 
 
 void HTTPSession::attachSocket(const StreamSocket& socket)
 {
-	_socket = socket;
+	if (!_pExtBufIn) _socket = socket;
 }
 
 

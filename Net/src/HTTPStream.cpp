@@ -43,7 +43,7 @@ void HTTPStreamBuf::close()
 	if (_mode & std::ios::out)
 	{
 		sync();
-		_session.socket().shutdownSend();
+		_session.shutdownSend();
 	}
 }
 

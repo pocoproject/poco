@@ -110,10 +110,15 @@ void SocketReactor::run()
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
+				//if (readable.size())
+					//std::cout << "readable=" << readable.size() << ", writable=" << writable.size() << std::endl;
 				onBusy();
-
 				for (Socket::SocketList::iterator it = readable.begin(); it != readable.end(); ++it)
+				{
+					//std::cout << "dispatch before" << readable.size() << std::endl;
 					dispatch(*it, _pReadableNotification);
+					//std::cout << "dispatch after" << readable.size() << std::endl;
+				}
 				for (Socket::SocketList::iterator it = writable.begin(); it != writable.end(); ++it)
 					dispatch(*it, _pWritableNotification);
 				for (Socket::SocketList::iterator it = except.begin(); it != except.end(); ++it)

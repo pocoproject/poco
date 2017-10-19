@@ -38,6 +38,7 @@ public:
 	void testAuth();
 	void testNotImpl();
 	void testBuffer();
+	void testBufferAsync();
 
 	void setUp();
 	void tearDown();

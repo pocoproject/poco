@@ -13,7 +13,7 @@
 
 
 #include "Poco/Net/HTTPServerConnection.h"
-#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPServerSyncSession.h"
 #include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPServerResponseImpl.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -57,7 +57,7 @@ HTTPServerConnection::~HTTPServerConnection()
 void HTTPServerConnection::run()
 {
 	std::string server = _pParams->getSoftwareVersion();
-	HTTPServerSession session(socket(), _pParams);
+	HTTPServerSyncSession session(socket(), _pParams);
 	while (!_stopped && session.hasMoreRequests())
 	{
 		try

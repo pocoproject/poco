@@ -1,9 +1,9 @@
 //
-// HTTPServerSession.cpp
+// HTTPServerSyncSession.cpp
 //
 // Library: Net
 // Package: HTTPServer
-// Module:  HTTPServerSession
+// Module:  HTTPServerSyncSession
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -12,37 +12,40 @@
 //
 
 
-#include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/HTTPServerSyncSession.h"
 
 
 namespace Poco {
 namespace Net {
 
 
-HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams):
-	HTTPSession(socket, pParams->getKeepAlive())/*,
+HTTPServerSyncSession::HTTPServerSyncSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams):
+	HTTPServerSession(socket, pParams),
 	_firstRequest(true),
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
-	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())*/
+	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())
 {
+	setTimeout(pParams->getTimeout());
+	this->socket().setReceiveTimeout(pParams->getTimeout());
 }
 
 
-HTTPServerSession::HTTPServerSession() :
-	HTTPSession(true)/*
+HTTPServerSyncSession::HTTPServerSyncSession(HTTPServerParams::Ptr pParams) :
 	_firstRequest(true),
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
-	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())*/
+	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())
+{
+	setTimeout(pParams->getTimeout());
+	this->socket().setReceiveTimeout(pParams->getTimeout());
+}
+
+
+HTTPServerSyncSession::~HTTPServerSyncSession()
 {
 }
 
 
-HTTPServerSession::~HTTPServerSession()
-{
-}
-
-/*
-bool HTTPServerSession::hasMoreRequests()
+bool HTTPServerSyncSession::hasMoreRequests()
 {
 	if (!socket().impl()->initialized()) return false;
 
@@ -61,14 +64,14 @@ bool HTTPServerSession::hasMoreRequests()
 	else return false;
 }
 
-
-SocketAddress HTTPServerSession::clientAddress()
+/*
+SocketAddress HTTPServerSyncSession::clientAddress()
 {
 	return socket().peerAddress();
 }
 
 
-SocketAddress HTTPServerSession::serverAddress()
+SocketAddress HTTPServerSyncSession::serverAddress()
 {
 	return socket().address();
 }

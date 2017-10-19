@@ -110,9 +110,11 @@ public:
 		/// This is usually used together with detachSocket() to
 		/// obtain any data already read from the socket, but not
 		/// yet processed.
+	bool hasInData() const { return _hasInData; }
+	bool hasOutData() const { return _hasOutData; }
 
 protected:
-	HTTPSession();
+	HTTPSession(bool extBuf = false);
 		/// Creates a HTTP session using an
 		/// unconnected stream socket.
 
@@ -152,6 +154,10 @@ protected:
 	virtual int write(const char* buffer, std::streamsize length);
 		/// Writes data to the socket.
 
+	typedef std::string/*std::vector<char>*/ IOBuffer;
+	int setReceive(char* buffer, int length);
+	int getSend(IOBuffer& buf);
+
 	int receive(char* buffer, int length);
 		/// Reads up to length bytes.
 		
@@ -164,7 +170,12 @@ protected:
 	virtual void connect(const SocketAddress& address);
 		/// Connects the underlying socket to the given address
 		/// and sets the socket's receive timeout.	
-		
+
+	void shutdownSend()
+	{
+		_socket.shutdownSend();
+	}
+
 	void attachSocket(const StreamSocket& socket);
 		/// Attaches a socket to the session, replacing the
 		/// previously attached socket.
@@ -198,11 +209,18 @@ private:
 	Poco::Timespan   _sendTimeout;
 	Poco::Exception* _pException;
 	Poco::Any        _data;
-	
+	IOBuffer*        _pExtBufIn;
+	IOBuffer*        _pExtBufOut;
+	Poco::Mutex      _inMutex;
+	Poco::Mutex      _outMutex;
+	bool             _hasInData = false;
+	bool             _hasOutData = false;
+
 	friend class HTTPStreamBuf;
 	friend class HTTPHeaderStreamBuf;
 	friend class HTTPFixedLengthStreamBuf;
 	friend class HTTPChunkedStreamBuf;
+	friend class HTTPServiceHandler;
 };
 
 
