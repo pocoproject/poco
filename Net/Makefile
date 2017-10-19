@@ -12,13 +12,13 @@ objects = \
 	Net DNS HTTPResponse HostEntry Socket \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
 	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
-	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
+	DatagramSocketImpl FilePartSource HTTPServerConnection HTTPServerAsyncConnection MessageHeader \
 	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
 	HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \
 	HTTPFixedLengthStream HTTPServerRequest HTTPServerRequestImpl MultipartWriter StreamSocketImpl \
 	HTTPHeaderStream HTTPServerResponse HTTPServerResponseImpl NameValueCollection TCPServer \
-	HTTPMessage HTTPServerSession NetException TCPServerConnection HTTPBufferAllocator \
-	HTTPAuthenticationParams HTTPCredentials HTTPDigestCredentials \
+	HTTPMessage HTTPServerSession HTTPServerSyncSession HTTPServerAsyncSession NetException \
+	TCPServerConnection HTTPBufferAllocator HTTPAuthenticationParams HTTPCredentials HTTPDigestCredentials \
 	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface  \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
