@@ -66,7 +66,7 @@ void MessageHeader::write(std::ostream& ostr) const
 
 void MessageHeader::read(std::istream& istr)
 {
-	return read(istr, 0);
+	read(istr, 0);
 }
 
 
