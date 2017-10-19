@@ -64,6 +64,12 @@ void MessageHeader::write(std::ostream& ostr) const
 }
 
 
+void MessageHeader::read(std::istream& istr)
+{
+	return read(istr, 0);
+}
+
+
 void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
 {
 	static const int eof = std::char_traits<char>::eof();
@@ -103,7 +109,7 @@ void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
 		}
 		Poco::trimRightInPlace(value);
 		add(name, decodeWord(value));
-		getRecipients(name, value, pRecipients);
+		if (pRecipients) getRecipients(name, value, pRecipients);
 		++fields;
 
 	}
