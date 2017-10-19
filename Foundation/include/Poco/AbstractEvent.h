@@ -233,7 +233,6 @@ public:
 		/// to the caller.
 	{
 		Poco::ScopedLockWithUnlock<TMutex> lock(_mutex);
-
 		if (!_enabled) return;
 
 		// thread-safeness:
@@ -244,7 +243,9 @@ public:
 		strategy.notify(pSender, args);
 	}
 
-	bool hasDelegates() const {
+	bool hasDelegates() const
+		/// Returns true if there are registered delegates.
+	{
 		return !empty();
 	}
 
@@ -293,6 +294,7 @@ public:
 	}
 
 	bool isEnabled() const
+		/// Returns true if event is enabled.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		return _enabled;

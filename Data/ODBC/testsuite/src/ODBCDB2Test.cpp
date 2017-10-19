@@ -110,8 +110,6 @@ ODBCDB2Test::~ODBCDB2Test()
 
 void ODBCDB2Test::testBareboneODBC()
 {
-	if (! &session()) fail ("Test not available.");
-
 	std::string tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
@@ -140,8 +138,6 @@ void ODBCDB2Test::testBareboneODBC()
 
 void ODBCDB2Test::testBLOB()
 {
-	if (! &session()) fail ("Test not available.");
-	
 	const std::size_t maxFldSize = 1000000;
 	session().setProperty("maxFieldSize", Poco::Any(maxFldSize-1));
 	recreatePersonBLOBTable();
@@ -177,8 +173,6 @@ void ODBCDB2Test::testBLOB()
 
 void ODBCDB2Test::testFilter()
 {
-	if (! &session()) fail ("Test not available.");
-
 	for (int i = 0; i < 8;)
 	{
 		recreateVectorsTable();
@@ -192,8 +186,6 @@ void ODBCDB2Test::testFilter()
 
 void ODBCDB2Test::testStoredProcedure()
 {
-	if (! &session()) fail ("Test not available.");
-
 	const std::string nm = ExecUtil::stored_proc();
 
 	dropObject("PROCEDURE", nm + "(INTEGER)");
@@ -266,8 +258,6 @@ void ODBCDB2Test::testStoredProcedure()
 
 void ODBCDB2Test::testStoredProcedureAny()
 {
-	if (! &session()) fail ("Test not available.");
-
 	const std::string nm = ExecUtil::stored_proc();
 
 	dropObject("PROCEDURE", nm + "(INTEGER)");
@@ -306,8 +296,6 @@ void ODBCDB2Test::testStoredProcedureAny()
 
 void ODBCDB2Test::testStoredProcedureDynamicAny()
 {
-	if (! &session()) fail ("Test not available.");
-
 	const std::string nm = ExecUtil::stored_proc();
 
 	dropObject("PROCEDURE", nm + "(INTEGER)");
@@ -346,7 +334,6 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 void ODBCDB2Test::testStoredFunction()
 {
 	const std::string nm = ExecUtil::stored_func();
-	if (! &session()) fail ("Test not available.");
 
 	dropObject("PROCEDURE", nm + "()");
 	dropObject("PROCEDURE", nm + "(INTEGER)");

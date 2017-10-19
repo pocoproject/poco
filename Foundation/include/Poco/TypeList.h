@@ -32,7 +32,7 @@ namespace Poco {
 template <class Head, class Tail> 
 struct TypeList;
 
-	
+
 struct NullTypeList
 {
 	enum
@@ -116,7 +116,7 @@ struct TypeList
 		std::swap(head, tl.head);
 		std::swap(tail, tl.tail);
 	}
-	
+
 	HeadType head;
 	TailType tail;
 };

@@ -349,8 +349,7 @@ public:
 		/// Otherwise false is returned and the path argument remains unchanged.
 		
 	static std::string transcode(const std::string& path);
-		/// On Windows, if POCO has been compiled with Windows UTF-8 support 
-		/// (POCO_WIN32_UTF8), this function converts a string (usually containing a path) 
+		/// On Windows, this function converts a string (usually containing a path) 
 		/// encoded in UTF-8 into a string encoded in the current Windows code page.
 		/// 
 		/// This function should be used for every string passed as a file name to

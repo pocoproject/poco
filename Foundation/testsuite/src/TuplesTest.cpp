@@ -13,6 +13,7 @@
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/Void.h"
+#include "Poco/Nullable.h"
 #include <algorithm>
 #include <map>
 
@@ -30,6 +31,7 @@ using Poco::TypeOneReplacer;
 using Poco::TypeAllReplacer;
 using Poco::Tuple;
 using Poco::Void;
+using Poco::Nullable;
 using Poco::Int8;
 using Poco::UInt8;
 using Poco::Int16;
@@ -42,6 +44,44 @@ using Poco::Int16;
 using Poco::UInt16;
 using Poco::Int32;
 using Poco::UInt32;
+
+
+namespace {
+
+	class NonDefaultConstructible
+	{
+	public:
+		NonDefaultConstructible(int val):_val(val)
+		{
+		}
+
+		NonDefaultConstructible operator=(int val)
+		{
+			_val = val;
+		}
+
+		bool operator==(const NonDefaultConstructible &other) const
+		{
+			return (_val == other._val);
+		}
+
+		bool operator<(const NonDefaultConstructible &other) const
+		{
+			return (_val < other._val);
+		}
+
+		int value() const
+		{
+			return _val;
+		}
+
+	private:
+		NonDefaultConstructible();
+
+		int _val;
+	};
+
+}
 
 
 TuplesTest::TuplesTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -533,6 +573,16 @@ void TuplesTest::testTupleOrder()
 }
 
 
+void TuplesTest::testTupleNullable()
+{
+	typedef Poco::Tuple<Nullable<Poco::Int32>, Nullable<std::string> , Nullable<NonDefaultConstructible>> Info;
+	Info info(0, std::string("Address"), Nullable<NonDefaultConstructible>(10));
+	assert (info.get<0>() == 0);
+	assert (info.get<1>() == "Address");
+	assert (info.get<2>() == NonDefaultConstructible(10));
+}
+
+
 void TuplesTest::testMemOverhead()
 {
 	Tuple<short> smallOne(0);
@@ -579,6 +629,7 @@ CppUnit::Test* TuplesTest::suite()
 	CppUnit_addTest(pSuite, TuplesTest, testTuple19);
 	CppUnit_addTest(pSuite, TuplesTest, testTuple20);
 	CppUnit_addTest(pSuite, TuplesTest, testTupleOrder);
+	CppUnit_addTest(pSuite, TuplesTest, testTupleNullable);
 	CppUnit_addTest(pSuite, TuplesTest, testMemOverhead);
 
 	return pSuite;

@@ -132,8 +132,12 @@ void FTPClientSession::open(const std::string& host,
 	}
 	else
 	{
-		_pControlSocket = new DialogSocket(SocketAddress(_host, _port));
-		_pControlSocket->setReceiveTimeout(_timeout);
+		if (!_pControlSocket)
+		{
+			_pControlSocket = new DialogSocket(SocketAddress(_host, _port));
+			_pControlSocket->setReceiveTimeout(_timeout);
+		}
+		receiveServerReadyReply();
 	}
 }
 
@@ -182,20 +186,24 @@ void FTPClientSession::logout()
 	{
 		try { endTransfer(); }
 		catch (...) { }
-		std::string response;
-		sendCommand("QUIT", response);
 		_isLoggedIn = false;
+		std::string response;		
+		sendCommand("QUIT", response);		
 	}
 }
 
 
 void FTPClientSession::close()
 {
-	logout();
-	_pControlSocket->close();
-	delete _pControlSocket;
-	_pControlSocket = 0;
+	try { logout(); }
+	catch(...){ }
 	_serverReady = false;
+	if (_pControlSocket)
+	{
+		_pControlSocket->close();
+		delete _pControlSocket;
+		_pControlSocket = 0;
+	}
 }
 
 

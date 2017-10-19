@@ -99,6 +99,9 @@ BinaryWriter& BinaryWriter::operator << (unsigned int value)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+
+
 BinaryWriter& BinaryWriter::operator << (long value)
 {
 #if defined(POCO_LONG_IS_64_BIT)
@@ -119,6 +122,9 @@ BinaryWriter& BinaryWriter::operator << (unsigned long value)
 }
 
 
+#endif // POCO_LONG_IS_64_BIT
+
+
 BinaryWriter& BinaryWriter::operator << (float value)
 {
 	return write(value, _flipBytes);
@@ -131,8 +137,6 @@ BinaryWriter& BinaryWriter::operator << (double value)
 }
 
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
 
 BinaryWriter& BinaryWriter::operator << (Int64 value)
 {
@@ -144,9 +148,6 @@ BinaryWriter& BinaryWriter::operator << (UInt64 value)
 {
 	return write(value, _flipBytes);
 }
-
-
-#endif
 
 
 BinaryWriter& BinaryWriter::operator << (const std::string& value)

@@ -45,7 +45,7 @@ public:
 private:
 	HANDLE _hProcess;
 	UInt32 _pid;
-	
+
 	ProcessHandleImpl(const ProcessHandleImpl&);
 	ProcessHandleImpl& operator = (const ProcessHandleImpl&);
 };

@@ -16,7 +16,11 @@
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NamedEvent.h"
+#include "Poco/UnicodeConverter.h"
 #include "Poco/Pipe.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/String.h"
 
 
 namespace Poco {
@@ -151,7 +155,7 @@ static std::string escapeArg(const std::string& arg)
 		}
 		quotedArg.push_back('"');
 		return quotedArg;
-	} 
+	}
 	else
 	{
 		return arg;
@@ -168,9 +172,25 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		commandLine.append(escapeArg(*it));
 	}
 
-	STARTUPINFOA startupInfo;
-	GetStartupInfoA(&startupInfo); // take defaults from current process
-	startupInfo.cb = sizeof(STARTUPINFOA);
+	std::wstring ucommandLine;
+	UnicodeConverter::toUTF16(commandLine, ucommandLine);
+
+	const wchar_t* applicationName = 0;
+	std::wstring uapplicationName;
+	if (command.size() > MAX_PATH)
+	{
+		Poco::Path p(command);
+		if (p.isAbsolute())
+		{
+			UnicodeConverter::toUTF16(command, uapplicationName);
+			if (p.getExtension().empty()) uapplicationName += L".EXE";
+			applicationName = uapplicationName.c_str();
+		}
+	}
+
+	STARTUPINFOW startupInfo;
+	GetStartupInfoW(&startupInfo); // take defaults from current process
+	startupInfo.cb = sizeof(STARTUPINFOW);
 	startupInfo.lpReserved = NULL;
 	startupInfo.lpDesktop = NULL;
 	startupInfo.lpTitle = NULL;
@@ -185,12 +205,12 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		DuplicateHandle(hProc, inPipe->readHandle(), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
 		inPipe->close(Pipe::CLOSE_READ);
-	} 
+	}
 	else if (GetStdHandle(STD_INPUT_HANDLE))
 	{
 		DuplicateHandle(hProc, GetStdHandle(STD_INPUT_HANDLE), hProc, &startupInfo.hStdInput, 0, TRUE, DUPLICATE_SAME_ACCESS);
 		mustInheritHandles = true;
-	} 
+	}
 	else
 	{
 		startupInfo.hStdInput = 0;
@@ -232,7 +252,9 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		startupInfo.dwFlags |= STARTF_USESTDHANDLES;
 	}
 
-	const char* workingDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
+	std::wstring uinitialDirectory;
+	UnicodeConverter::toUTF16(initialDirectory, uinitialDirectory);
+	const wchar_t* workingDirectory = uinitialDirectory.empty() ? 0 : uinitialDirectory.c_str();
 
 	const char* pEnv = 0;
 	std::vector<char> envChars;
@@ -244,9 +266,9 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
-	BOOL rc = CreateProcessA(
-		NULL,
-		const_cast<char*>(commandLine.c_str()),
+	BOOL rc = CreateProcessW(
+		applicationName,
+		const_cast<wchar_t*>(ucommandLine.c_str()),
 		NULL, // processAttributes
 		NULL, // threadAttributes
 		mustInheritHandles,

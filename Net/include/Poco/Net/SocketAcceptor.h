@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"

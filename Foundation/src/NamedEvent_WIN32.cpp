@@ -16,6 +16,7 @@
 #include "Poco/Error.h"
 #include "Poco/Exception.h"
 #include "Poco/Format.h"
+#include "Poco/UnicodeConverter.h"
 
 
 namespace Poco {
@@ -24,10 +25,11 @@ namespace Poco {
 NamedEventImpl::NamedEventImpl(const std::string& name):
 	_name(name)
 {
-	_event = CreateEventA(NULL, FALSE, FALSE, _name.c_str());
+	UnicodeConverter::toUTF16(_name, _uname);
+	_event = CreateEventW(NULL, FALSE, FALSE, _uname.c_str());
 	if (!_event)
 	{
-		DWORD dwRetVal = GetLastError();
+		DWORD dwRetVal = GetLastError(); 
 		throw SystemException(format("cannot create named event %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
 	}
 }

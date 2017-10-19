@@ -21,12 +21,14 @@ namespace Data {
 namespace MySQL {
 
 
-MySQLException::MySQLException(const std::string& msg) : Poco::Data::DataException(std::string("[MySQL]: ") + msg)
+MySQLException::MySQLException(const std::string& msg, int errCode) :
+	Poco::Data::DataException(std::string("[MySQL]: ") + msg, errCode)
 {
 }
 
 
-MySQLException::MySQLException(const MySQLException& exc) : Poco::Data::DataException(exc)
+MySQLException::MySQLException(const MySQLException& exc) :
+	Poco::Data::DataException(exc)
 {
 }
 
@@ -48,7 +50,8 @@ ConnectionException::ConnectionException(const std::string& msg) : MySQLExceptio
 }
 
 
-ConnectionException::ConnectionException(const std::string& text, MYSQL* h) : MySQLException(compose(text, h))
+ConnectionException::ConnectionException(const std::string& text, MYSQL* h) :
+	MySQLException(compose(text, h), mysql_errno(h))
 {
 }
 
@@ -101,7 +104,8 @@ StatementException::StatementException(const std::string& msg) : MySQLException(
 }
 
 
-StatementException::StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt) : MySQLException(compose(text, h, stmt))
+StatementException::StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt) :
+	MySQLException(compose(text, h, stmt), mysql_stmt_errno(h))
 {
 }
 
@@ -128,7 +132,7 @@ std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, 
 
 	if (stmt.length() > 0)
 	{
-		str += "\t[statemnt]: ";
+		str += "\t[statement]: ";
 		str += stmt;
 	}
 

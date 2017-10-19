@@ -24,14 +24,12 @@
 #include "Environment_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Environment_WINCE.cpp"
 #else
-#include "Environment_WIN32U.cpp"
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Environment_WIN32.cpp"
+#endif
 #endif
 
 

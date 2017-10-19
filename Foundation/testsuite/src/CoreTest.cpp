@@ -23,6 +23,7 @@
 #include "Poco/Ascii.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
+#include "Poco/Checksum.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
@@ -43,6 +44,7 @@ using Poco::BasicEvent;
 using Poco::delegate;
 using Poco::NullType;
 using Poco::InvalidAccessException;
+using Poco::Checksum;
 
 
 namespace
@@ -68,6 +70,38 @@ namespace
 		
 	private:
 		AtomicCounter& _counter;
+	};
+
+	class NonDefaultConstructible
+	{
+	public:
+		NonDefaultConstructible(int val) : _val(val)
+		{
+		}
+
+		NonDefaultConstructible operator=(int val)
+		{
+			_val = val;
+		}
+
+		bool operator == (const NonDefaultConstructible& other) const
+		{
+			return (_val == other._val);
+		}
+
+		bool operator < (const NonDefaultConstructible& other) const
+		{
+			return (_val < other._val);
+		}
+
+		int value() const
+		{
+			return _val;
+		}
+
+	private:
+		NonDefaultConstructible();
+		int _val;
 	};
 }
 
@@ -360,6 +394,21 @@ void CoreTest::testAtomicCounter()
 
 void CoreTest::testNullable()
 {
+	Nullable<NonDefaultConstructible> ndc1;
+	Nullable<NonDefaultConstructible> ndc2;
+	assert (ndc1.isNull());
+	assert (ndc2.isNull());
+	assert (ndc1 == ndc2);
+	assert (!(ndc1 != ndc2));
+	assert (!(ndc1 > ndc2));
+	bool ge = (ndc1 >= ndc2);
+	assert (ndc1 >= ndc2);
+	assert (!(ndc1 < ndc2));
+	assert (ndc1 <= ndc2);
+	ndc1 = 42;
+	assert (!ndc1.isNull());
+	assert (ndc1.value() == 42);
+
 	Nullable<int> i;
 	Nullable<double> f;
 	Nullable<std::string> s;
@@ -532,6 +581,58 @@ void CoreTest::testAscii()
 
 
 
+void CoreTest::testChecksum64()
+{
+	Poco::Checksum checksum64_0(Checksum::TYPE_CRC64);
+	Poco::Checksum checksum64_1(Checksum::TYPE_CRC64);
+	Poco::UInt64 crc64_0 = 0;
+	Poco::UInt64 crc64_1 = 0;
+	Poco::UInt64 crc64_2 = 0;
+	Poco::UInt64 crc64_3 = 0;
+	Poco::UInt64 crc64_4 = 0;
+	Poco::UInt64 crc64_5 = 0;
+	Poco::UInt64 crc64_6 = 0;
+	Poco::UInt64 crc64_7 = 0;
+	std::string str = "Hello world!!!";
+	const char c_str[] = "Hello People!!!";
+	const char c_str1[] = "Hello world!!!";
+	const char c_str2[] = "b";
+	const char c_str3[] = "c";
+	char ch = 'c';
+
+	checksum64_0.update(str);
+	crc64_0 = checksum64_0.checksum();               // crc64 of "Hello world!!!"
+	checksum64_0.update(c_str, (int)strlen(c_str));
+	crc64_1 = checksum64_0.checksum();               // crc64 of "Hello People!!!"
+	assert(crc64_0 != crc64_1);
+
+	checksum64_0.update(ch);
+	crc64_2 = checksum64_0.checksum();               // crc64 of 'c'
+	assert(crc64_0 != crc64_2);
+
+	assert(crc64_1 != crc64_2);
+
+	checksum64_0.update(c_str1);
+	crc64_3 = checksum64_0.checksum();               // crc64 of "Hello world!!!"
+	assert(crc64_0 == crc64_3);
+
+	str = "c";
+	checksum64_0.update(str);
+	crc64_4 = checksum64_0.checksum();              // crc64 of "c", fetching from checksum64_0 object
+	checksum64_1.update(ch);
+	crc64_5 = checksum64_1.checksum();              // crc64 of 'c', fetching from checksum64_1 object
+	assert(crc64_4 == crc64_5);
+
+	checksum64_0.update(c_str2, (int)strlen(c_str2));
+	crc64_6 = checksum64_0.checksum();              // crc64 of "b", fetching from checksum64_0 object
+	assert(crc64_5 != crc64_6);
+
+	checksum64_0.update(c_str3, (int)strlen(c_str3));
+	crc64_7 = checksum64_0.checksum();              // crc64 of "c", fetching from checksum64_0 object
+	assert(crc64_5 == crc64_7);
+}
+
+
 void CoreTest::setUp()
 {
 	_readableToNot = 0;
@@ -558,6 +659,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
+	CppUnit_addTest(pSuite, CoreTest, testChecksum64);
 
 	return pSuite;
 }

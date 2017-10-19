@@ -6,6 +6,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
+include $(POCO_BASE)/build/script/openssl_ver
+
 SYSLIBS += -lssl -lcrypto
 
 objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \

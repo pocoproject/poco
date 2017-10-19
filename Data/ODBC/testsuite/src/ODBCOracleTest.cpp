@@ -355,6 +355,20 @@ void ODBCOracleTest::testStoredProcedureAny()
 	}
 }
 
+void ODBCOracleTest::testStoredProcedureAnyString()
+{
+	Any sInOut = std::string("Hello");
+
+	*_pSession << "CREATE OR REPLACE "
+		"PROCEDURE storedProcedure(inParam IN OUT VARCHAR2) IS "
+		" BEGIN inParam := inParam||' world!'; "
+		"END storedProcedure;" , now;
+
+	*_pSession << "{call storedProcedure(?)}", io(sInOut), now;
+	assert("Hello world!" == AnyCast<std::string>(sInOut));
+	*_pSession << "DROP PROCEDURE storedProcedure;", now;
+}
+
 
 void ODBCOracleTest::testStoredProcedureDynamicAny()
 {
@@ -933,6 +947,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAny);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureAnyString);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredProcedureDynamicAny);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStoredFunction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testCursorStoredFunction);

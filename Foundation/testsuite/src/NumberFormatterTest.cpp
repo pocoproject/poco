@@ -39,26 +39,26 @@ void NumberFormatterTest::testFormat()
 	assert (NumberFormatter::format((unsigned) 123) == "123");
 	assert (NumberFormatter::format((unsigned) 123, 5) == "  123");
 	assert (NumberFormatter::format0((unsigned) 123, 5) == "00123");
-	
+
+#ifndef POCO_LONG_IS_64_BIT
 	assert (NumberFormatter::format((long) 123) == "123");
 	assert (NumberFormatter::format((long) -123) == "-123");
 	assert (NumberFormatter::format((long) -123, 5) == " -123");
 
 	assert (NumberFormatter::format((unsigned long) 123) == "123");
-	assert (NumberFormatter::format((unsigned long) 123, 5) == "  123");	
+	assert (NumberFormatter::format((unsigned long) 123, 5) == "  123");
+#endif // POCO_LONG_IS_64_BIT
 
 	assert (NumberFormatter::format(123) == "123");
 	assert (NumberFormatter::format(-123) == "-123");
 	assert (NumberFormatter::format(-123, 5) == " -123");
 
-#if defined(POCO_HAVE_INT64)
 	assert (NumberFormatter::format((Int64) 123) == "123");
 	assert (NumberFormatter::format((Int64) -123) == "-123");
 	assert (NumberFormatter::format((Int64) -123, 5) == " -123");
 
 	assert (NumberFormatter::format((UInt64) 123) == "123");
-	assert (NumberFormatter::format((UInt64) 123, 5) == "  123");	
-#endif
+	assert (NumberFormatter::format((UInt64) 123, 5) == "  123");
 
 	if (sizeof(void*) == 4)
 	{
@@ -75,15 +75,14 @@ void NumberFormatterTest::testFormat0()
 {
 	assert (NumberFormatter::format0(123, 5) == "00123");
 	assert (NumberFormatter::format0(-123, 5) == "-0123");
+#ifndef POCO_LONG_IS_64_BIT
 	assert (NumberFormatter::format0((long) 123, 5) == "00123");
 	assert (NumberFormatter::format0((long) -123, 5) == "-0123");
 	assert (NumberFormatter::format0((unsigned long) 123, 5) == "00123");
-
-#if defined(POCO_HAVE_INT64)
+#endif // POCO_LONG_IS_64_BIT
 	assert (NumberFormatter::format0((Int64) 123, 5) == "00123");
 	assert (NumberFormatter::format0((Int64) -123, 5) == "-0123");
 	assert (NumberFormatter::format0((UInt64) 123, 5) == "00123");
-#endif
 }
 
 
@@ -109,7 +108,7 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((unsigned) 0xab) == "AB");
 	assert (NumberFormatter::formatHex((unsigned) 0x12, 4) == "0012");
 	assert (NumberFormatter::formatHex((unsigned) 0xab, 4) == "00AB");
-
+#ifndef POCO_LONG_IS_64_BIT
 	assert (NumberFormatter::formatHex((long) 0x12) == "12");
 	assert (NumberFormatter::formatHex((long) 0xab) == "AB");
 	assert (NumberFormatter::formatHex((long) 0x12, 4) == "0012");
@@ -119,8 +118,7 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((unsigned long) 0xab) == "AB");
 	assert (NumberFormatter::formatHex((unsigned long) 0x12, 4) == "0012");
 	assert (NumberFormatter::formatHex((unsigned long) 0xab, 4) == "00AB");
-
-#if defined(POCO_HAVE_INT64)
+#endif // POCO_LONG_IS_64_BIT
 	assert (NumberFormatter::formatHex((Int64) 0x12) == "12");
 	assert (NumberFormatter::formatHex((Int64) 0xab) == "AB");
 	assert (NumberFormatter::formatHex((Int64) 0x12, 4) == "0012");
@@ -130,7 +128,6 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((UInt64) 0xab) == "AB");
 	assert (NumberFormatter::formatHex((UInt64) 0x12, 4) == "0012");
 	assert (NumberFormatter::formatHex((UInt64) 0xab, 4) == "00AB");
-#endif
 
 	assert (NumberFormatter::formatHex(0x12, true) == "0x12");
 	assert (NumberFormatter::formatHex(0xab, true) == "0xAB");
@@ -146,6 +143,8 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((unsigned) 0x12, 6, true) == "0x0012");
 	assert (NumberFormatter::formatHex((unsigned) 0xab, 6, true) == "0x00AB");
 
+#ifndef POCO_LONG_IS_64_BIT
+
 	assert (NumberFormatter::formatHex((long) 0x12, true) == "0x12");
 	assert (NumberFormatter::formatHex((long) 0xab, true) == "0xAB");
 	assert (NumberFormatter::formatHex((long) 0x12, 4, true) == "0x12");
@@ -160,7 +159,8 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((unsigned long) 0x12, 6, true) == "0x0012");
 	assert (NumberFormatter::formatHex((unsigned long) 0xab, 6, true) == "0x00AB");
 
-#if defined(POCO_HAVE_INT64)
+#endif // POCO_LONG_IS_64_BIT
+
 	assert (NumberFormatter::formatHex((Int64) 0x12, true) == "0x12");
 	assert (NumberFormatter::formatHex((Int64) 0xab, true) == "0xAB");
 	assert (NumberFormatter::formatHex((Int64) 0x12, 4, true) == "0x12");
@@ -174,7 +174,7 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((UInt64) 0xab, 4, true) == "0xAB");
 	assert (NumberFormatter::formatHex((UInt64) 0x12, 6, true) == "0x0012");
 	assert (NumberFormatter::formatHex((UInt64) 0xab, 6, true) == "0x00AB");
-#endif
+
 }
 
 
@@ -276,6 +276,34 @@ void NumberFormatterTest::testAppend()
 }
 
 
+void NumberFormatterTest::testInfNaN()
+{
+	if (std::numeric_limits<double>::has_quiet_NaN)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<double>::quiet_NaN()) == "nan");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<double>::quiet_NaN()) == "nan");
+	}
+
+	if (std::numeric_limits<double>::has_infinity)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<double>::infinity()) == "inf");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<double>::infinity()) == "-inf");
+	}
+
+	if (std::numeric_limits<float>::has_quiet_NaN)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<float>::quiet_NaN()) == "nan");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<float>::quiet_NaN()) == "nan");
+	}
+
+	if (std::numeric_limits<float>::has_infinity)
+	{
+		assert (Poco::NumberFormatter::format(std::numeric_limits<float>::infinity()) == "inf");
+		assert (Poco::NumberFormatter::format(-std::numeric_limits<float>::infinity()) == "-inf");
+	}
+}
+
+
 void NumberFormatterTest::setUp()
 {
 }
@@ -296,6 +324,7 @@ CppUnit::Test* NumberFormatterTest::suite()
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatHex);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testFormatFloat);
 	CppUnit_addTest(pSuite, NumberFormatterTest, testAppend);
+	CppUnit_addTest(pSuite, NumberFormatterTest, testInfNaN);
 
 	return pSuite;
 }

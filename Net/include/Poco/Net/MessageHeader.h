@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/MailRecipient.h"
 #include <ostream>
 #include <istream>
 #include <vector>
@@ -49,6 +50,8 @@ class Net_API MessageHeader: public NameValueCollection
 	/// adding them. The default limit is 100.
 {
 public:
+	typedef std::vector<MailRecipient> RecipientList;
+
 	MessageHeader();
 		/// Creates the MessageHeader.
 
@@ -70,7 +73,7 @@ public:
 		/// delimited by a carriage return and a linefeed 
 		/// character. See RFC 2822 for details.
 		
-	virtual void read(std::istream& istr);
+	virtual void read(std::istream& istr, RecipientList* pRecipients = 0);
 		/// Reads the message header from the given input stream.
 		///
 		/// See write() for the expected format.
@@ -82,7 +85,7 @@ public:
 		/// the stream.
 		///
 		/// Some basic sanity checking of the input stream is
-		/// performed.
+		/// performed and the supplied recipient list is populated.
 		///
 		/// Throws a MessageException if the input stream is
 		/// malformed.
@@ -144,13 +147,17 @@ public:
 		/// Checks if the value must be quoted. If so, the value is
 		/// appended to result, enclosed in double-quotes.
 		/// Otherwise, the value is appended to result as-is.
-		
+
 	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
 	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
-	        /// Decode RFC2047 string.
+		/// Decode RFC2047 string.
 
-		
+
 private:
+	static void getRecipients(const std::string& name, const std::string& value, RecipientList* pRecipients);
+		/// Returns the list of email recipients if pRecipients is not null and To, CC or BCC headers are
+		/// found. Otherwise, does nothing.
+
 	enum Limits
 		/// Limits for basic sanity checks when reading a header
 	{

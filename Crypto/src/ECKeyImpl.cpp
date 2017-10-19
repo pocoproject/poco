@@ -184,7 +184,7 @@ std::string ECKeyImpl::getCurveName(int nid)
 	std::string curveName;
 	size_t len = EC_get_builtin_curves(NULL, 0);
 	EC_builtin_curve* pCurves =
-		(EC_builtin_curve*) OPENSSL_malloc(sizeof(EC_builtin_curve) * len);
+		(EC_builtin_curve*) OPENSSL_malloc(static_cast<int>(sizeof(EC_builtin_curve) * len));
 	if (!pCurves) return curveName;
 
 	if (!EC_get_builtin_curves(pCurves, len))
@@ -194,13 +194,63 @@ std::string ECKeyImpl::getCurveName(int nid)
 	}
 
 	if (-1 == nid) nid = pCurves[0].nid;
-	int bufLen = 128;
+	const int bufLen = 128;
 	char buf[bufLen];
 	std::memset(buf, 0, bufLen);
 	OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(nid), 0);
 	curveName = buf;
 	OPENSSL_free(pCurves);
 	return curveName;
+}
+
+
+int ECKeyImpl::getCurveNID(std::string& name)
+{
+	std::string curveName;
+	size_t len = EC_get_builtin_curves(NULL, 0);
+	EC_builtin_curve* pCurves =
+		(EC_builtin_curve*)OPENSSL_malloc(static_cast<int>(sizeof(EC_builtin_curve) * len));
+	if (!pCurves) return -1;
+
+	if (!EC_get_builtin_curves(pCurves, len))
+	{
+		OPENSSL_free(pCurves);
+		return -1;
+	}
+
+	int nid = -1;
+	const int bufLen = 128;
+	char buf[bufLen];
+	if (name.empty())
+	{
+		std::memset(buf, 0, bufLen);
+		OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(nid), 0);
+		name = buf;
+		nid = pCurves[0].nid;
+	}
+	else
+	{
+		for (int i = 0; i < len; ++i)
+		{
+			std::memset(buf, 0, bufLen);
+			OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(pCurves[i].nid), 0);
+			if (strncmp(name.c_str(), buf, name.size() > bufLen ? bufLen : name.size()) == 0)
+			{
+				nid = pCurves[i].nid;
+				break;
+			}
+		}
+	}
+
+	OPENSSL_free(pCurves);
+	return nid;
+}
+
+
+bool ECKeyImpl::hasCurve(const std::string& name)
+{
+	std::string tmp(name);
+	return (-1 != getCurveNID(tmp));
 }
 
 

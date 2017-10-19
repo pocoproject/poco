@@ -293,4 +293,14 @@ Session Statement::session()
 }
 
 
+void Statement::setTotalRowCount(const std::string& sql)
+{
+	std::size_t count;
+	session() << sql,
+		Poco::Data::Keywords::into(count),
+		Poco::Data::Keywords::now;
+	_pImpl->setTotalRowCount(count);
+}
+
+
 } } // namespace Poco::Data

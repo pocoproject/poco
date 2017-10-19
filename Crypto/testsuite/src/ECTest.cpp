@@ -33,6 +33,15 @@ ECTest::~ECTest()
 }
 
 
+void ECTest::testCurveNIDName()
+{
+	std::string curveName = ECKey::getCurveName();
+	assert (!curveName.empty());
+	assert (ECKey::getCurveNID(curveName) != -1);
+	assert (ECKey::hasCurve(curveName));
+}
+
+
 void ECTest::testECNewKeys()
 {
 	try
@@ -191,6 +200,7 @@ CppUnit::Test* ECTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ECTest");
 
+	CppUnit_addTest(pSuite, ECTest, testCurveNIDName);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeys);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeysNoPassphrase);
 	CppUnit_addTest(pSuite, ECTest, testECDSASignSha256);

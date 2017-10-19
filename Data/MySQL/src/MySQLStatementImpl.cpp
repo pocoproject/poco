@@ -80,11 +80,11 @@ bool MySQLStatementImpl::hasNext()
 	return false;
 }
 
-	
+
 std::size_t MySQLStatementImpl::next()
 {
 	if (!hasNext())
-		throw StatementException("No data received");	
+		throw StatementException("No data received");
 
 	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();

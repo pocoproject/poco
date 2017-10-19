@@ -27,8 +27,6 @@
 #include "Poco/SharedLibrary_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/SharedLibrary_UNIX.h"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
-#include "Poco/SharedLibrary_WIN32U.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/SharedLibrary_WIN32.h"
 #elif defined(POCO_OS_FAMILY_VMS)

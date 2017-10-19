@@ -23,14 +23,12 @@
 #include <vector>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "File_WINCE.h"
 #else
-#include "Poco/File_WIN32U.h"
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/File_WIN32.h"
+#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/File_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -53,13 +51,12 @@ class Foundation_API File: private FileImpl
 	/// platform-specific limitations regarding maximum length
 	/// of the entire path and its components apply.
 	///
-	/// On Windows, if compiled with UTF-8 support (POCO_WIN32_UTF8) 
-	/// the implementation tries to work around the rather low
-	/// 260 characters MAX_PATH limit by adding the "\\?\" prefix if
+	/// On Windows, the implementation tries to work around the rather
+	/// low 260 characters MAX_PATH limit by adding the "\\?\" prefix if
 	/// a path is absolute and exceeds MAX_PATH characters in length.
-	/// Note that various limitations regarding usage of the "\\?\" 
+	/// Note that various limitations regarding usage of the "\\?\"
 	/// prefix apply in that case, e.g. the path must
-	/// not contain relative components ("." and "..") and must not 
+	/// not contain relative components ("." and "..") and must not
 	/// use the forward slash ("/") as directory separator.
 {
 public:

@@ -41,9 +41,7 @@
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 using Poco::NumberFormatter;
@@ -169,20 +167,16 @@ DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, 
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
-#else
-void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 #endif
 {
 	ServerApplication& app = static_cast<ServerApplication&>(Application::instance());
 
 	app.config().setBool("application.runAsService", true);
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 	_serviceStatusHandle = RegisterServiceCtrlHandlerExW(L"", ServiceControlHandler, &app);
-#else
-	_serviceStatusHandle = RegisterServiceCtrlHandlerExA("", ServiceControlHandler, &app);
 #endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
@@ -198,7 +192,7 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 
 	try
 	{
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 		std::vector<std::string> args;
 		for (DWORD i = 0; i < argc; ++i)
 		{
@@ -207,8 +201,6 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 			args.push_back(arg);
 		}
 		app.init(args);
-#else
-		app.init(argc, argv);
 #endif
 		_serviceStatus.dwCurrentState = SERVICE_RUNNING; 
 		SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
@@ -313,7 +305,7 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	if (!hasConsole() && isService())
@@ -353,20 +345,13 @@ int ServerApplication::run(int argc, wchar_t** argv)
 
 bool ServerApplication::isService()
 {
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
 	svcDispatchTable[0].lpServiceName = L"";
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
 	svcDispatchTable[1].lpServiceProc = NULL; 
 	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0; 
-#else
-	SERVICE_TABLE_ENTRY svcDispatchTable[2];
-	svcDispatchTable[0].lpServiceName = "";
-	svcDispatchTable[0].lpServiceProc = ServiceMain;
-	svcDispatchTable[1].lpServiceName = NULL;
-	svcDispatchTable[1].lpServiceProc = NULL; 
-	return StartServiceCtrlDispatcherA(svcDispatchTable) != 0; 
 #endif
 }
 
@@ -519,7 +504,7 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	try

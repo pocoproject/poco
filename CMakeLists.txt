@@ -6,6 +6,7 @@
 # ENABLE_{COMPONENT}
 # ENABLE_TESTS
 # ENABLE_SAMPLES
+# DISABLE_INTERNAL_OPENSSL
 
 cmake_minimum_required(VERSION 3.2.0)
 
@@ -33,6 +34,7 @@ set(CMAKE_C_STANDARD 99)
 # top of the build tree rather than in hard-to-find leaf
 # directories. This simplifies manual testing and the use of the build
 # tree rather than installed Boost libraries.
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # Windows DLLs are "runtime" for CMake. Output them to "bin" like the Visual Studio projects do.
@@ -45,30 +47,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
-option(DISABLE_CPP11 "Disable C++11 if available" OFF)
 option(DISABLE_CPP14 "Disable C++14 if available" OFF)
 
-if (DISABLE_CPP11 OR DISABLE_CPP14)
-    add_definitions(-DPOCO_DISABLE_CPP11)
-
-    if (DISABLE_CPP14)
-        add_definitions(-DPOCO_DISABLE_CPP14)
-    endif()
+if (DISABLE_CPP14)
+    add_definitions(-DPOCO_DISABLE_CPP14)
 else()
-    # C++11/14 compiler flags
-    include(CXX11)
-    check_for_cxx11_compiler(CXX11_COMPILER)
+  # C++14 compiler flags
+  include(CXX1x)
+  check_for_cxx14_compiler(CXX14_COMPILER)
 
-    # If a C++11 compiler is available, then set the appropriate flags
-    if(CXX11_COMPILER)
-        enable_cxx11()
-        check_for_cxx14_compiler(CXX14_COMPILER)
-
-        # If a C++14 compiler is available, then set the appropriate flags
-        if(CXX14_COMPILER)
-            enable_cxx14()
-        endif()
-    endif()
+  # If a C++14 compiler is available, then set the appropriate flags
+  if(CXX14_COMPILER)
+    enable_cxx14()
+  endif()
 endif()
 
 if(NOT MSVC_IDE)
@@ -82,18 +73,45 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
 endif()
 
-# Include some common macros to simpilfy the Poco CMake files
+# Include some common macros to simpilfy Poco CMake files
 include(PocoMacros)
 
 # Allow enabling and disabling components
-option(ENABLE_CPPUNIT "Enable the CppUnit" ON)
-option(ENABLE_XML "Enable the XML" ON)
-option(ENABLE_JSON "Enable the JSON" ON)
+option(ENABLE_CPPUNIT "Enable CppUnit" ON)
+option(ENABLE_XML "Enable XML" ON)
+option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
-find_package(OpenSSL QUIET)
+
+# allow disabling of internally built OpenSSL# (see below for details)
+# if POCO pre-built OpenSSL directory is found, and DISABLE_INTERNAL_OPENSSL=OFF,
+# the internal OpenSSL build will be used
+option(DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
+set(USING_INTERNAL_OPENSSL false)
+
+if(MSVC)
+  if((EXISTS "${PROJECT_SOURCE_DIR}\\openssl\\VS_120\\") AND NOT DISABLE_INTERNAL_OPENSSL)
+    set(USING_INTERNAL_OPENSSL true)
+    ## windows xcopy does not tolerate forward-slash, must change this
+    STRING(REGEX REPLACE "/" "\\\\" PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}\\openssl\\VS_120\\")
+  endif()
+endif(MSVC)
+
+set(OPENSSL_FOUND false)
+if(USING_INTERNAL_OPENSSL)
+  message(STATUS "Using OpenSSL from ${OPENSSL_ROOT_DIR}")
+  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}include\\")
+  set(OPENSSL_FOUND true)
+else()
+  find_package(OpenSSL QUIET)
+  if(OPENSSL_FOUND)
+    add_definitions( -DPOCO_EXTERNAL_OPENSSL)
+    message(STATUS "Using OpenSSL from ${OPENSSL_ROOT_DIR}")
+  endif()
+endif()
 if(OPENSSL_FOUND)
     option(ENABLE_NETSSL "Enable NetSSL" ON)
     option(ENABLE_CRYPTO "Enable Crypto" ON)
@@ -120,8 +138,6 @@ option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 option(ENABLE_REDIS "Enable Redis" ON)
 
-option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
-
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
@@ -144,14 +160,13 @@ endif()
 
 # Uncomment from next two lines to force static or dynamic library, default is autodetection
 if(POCO_STATIC)
-    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
+    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
     set(LIB_MODE STATIC)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building static libraries")
     endif()
 else(POCO_STATIC)
     set(LIB_MODE SHARED)
-    set(LIB_MODE_DEFINITIONS -DPOCO_NO_AUTOMATIC_LIBS)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building dynamic libraries")
     endif()
@@ -232,25 +247,23 @@ if(WIN32 AND ENABLE_NETSSL_WIN)
 endif(WIN32 AND ENABLE_NETSSL_WIN)
 
 if(ENABLE_NETSSL OR ENABLE_CRYPTO)
+  if(NOT OPENSSL_FOUND)
     find_package(OpenSSL REQUIRED)
-    if(OPENSSL_FOUND)
-        if(MSVC)
-            option(OPENSSL_IS_STATIC
-              "Set to OFF|ON (default is OFF) if OpenSSL has beenbuild as static libraries" OFF)
-            if(OPENSSL_IS_STATIC)
-                list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32)
-            endif()
-        endif()
-        include_directories("${OPENSSL_INCLUDE_DIR}")
-        if(ENABLE_NETSSL)
-        add_subdirectory(NetSSL_OpenSSL)
-        list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
-        endif()
-        if(ENABLE_CRYPTO)
-        add_subdirectory(Crypto)
-        list(APPEND Poco_COMPONENTS "Crypto")
-        endif()
-    endif(OPENSSL_FOUND)
+  endif()
+  if(OPENSSL_FOUND)
+    if(MSVC)
+        list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32)
+    endif()
+    include_directories("${OPENSSL_INCLUDE_DIR}")
+    if(ENABLE_NETSSL)
+      add_subdirectory(NetSSL_OpenSSL)
+      list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
+    endif()
+    if(ENABLE_CRYPTO)
+      add_subdirectory(Crypto)
+      list(APPEND Poco_COMPONENTS "Crypto")
+    endif()
+  endif(OPENSSL_FOUND)
 endif(ENABLE_NETSSL OR ENABLE_CRYPTO)
 
 if(ENABLE_DATA)

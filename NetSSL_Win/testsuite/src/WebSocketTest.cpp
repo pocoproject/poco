@@ -49,12 +49,12 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				std::auto_ptr<char> pBuffer(new char[_bufSize]);
+				std::unique_ptr<char> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					n = ws.receiveFrame(pBuffer.get(), static_cast<int>(_bufSize), flags);
 					if (n == 0)
 						break;
 					ws.sendFrame(pBuffer.get(), n, flags);

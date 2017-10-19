@@ -32,6 +32,7 @@ public:
 	void testReadWriteMultiPart();
 	void testReadWriteMultiPartStore();
 	void testReadDefaultTransferEncoding();
+	void testReadDefaultContentType();
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();

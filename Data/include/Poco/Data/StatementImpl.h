@@ -95,6 +95,8 @@ public:
 
 	static const int USE_CURRENT_DATA_SET = -1;
 
+	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
+
 	StatementImpl(SessionImpl& rSession);
 		/// Creates the StatementImpl.
 
@@ -229,12 +231,27 @@ protected:
 		/// Returns the number of columns that the extractors handle.
 
 	std::size_t rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
-		/// Returns the number of rows extracted for current data set.
+		/// Returns the number of rows extracted for the data set.
 		/// Default value (USE_CURRENT_DATA_SET) indicates current data set (if any).
 
 	std::size_t subTotalRowCount(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
+
+	std::size_t totalRowCount() const;
+		//@ deprecated
+		/// Replaced with subTotalRowCount() and getTotalRowCount().
+
+	std::size_t getTotalRowCount() const;
+		/// Returns the total number of rows.
+		/// The number of rows reported is independent of filtering.
+		/// If the total row count has not been set externally
+		/// (either implicitly or explicitly through SQL), the value
+		/// returned shall only be accurate if the statement limit
+		/// is less than or equal to the total row count.
+
+	void setTotalRowCount(std::size_t totalRowCount);
+		/// Explicitly sets the total row count.
 
 	void makeExtractors(std::size_t count);
 		/// Determines the type of the internal extraction container and
@@ -437,7 +454,7 @@ private:
 	void formatSQL(std::vector<Any>& arguments);
 		/// Formats the SQL string by filling in placeholders with values from supplied vector.
 
-	void assignSubTotal(bool reset, size_t firstDs);
+	void assignSubTotal(bool reset);
 
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
@@ -454,10 +471,10 @@ private:
 	AbstractBindingVec       _bindings;
 	AbstractExtractionVecVec _extractors;
 	std::size_t              _curDataSet;
-	std::size_t              _pendingDSNo;
 	BulkType                 _bulkBinding;
 	BulkType                 _bulkExtraction;
 	CountVec                 _subTotalRowCount;
+	std::size_t              _totalRowCount;
 
 	friend class Statement; 
 	friend class RecordSet;
@@ -529,6 +546,27 @@ inline void StatementImpl::setStorage(Storage storage)
 inline StatementImpl::Storage StatementImpl::getStorage() const
 {
 	return _storage;
+}
+
+
+inline std::size_t StatementImpl::getTotalRowCount() const
+{
+	if (UNKNOWN_TOTAL_ROW_COUNT == _totalRowCount)
+		return subTotalRowCount();
+	else
+		return _totalRowCount;
+}
+
+
+inline std::size_t StatementImpl::totalRowCount() const
+{
+	return getTotalRowCount();
+}
+
+
+inline void StatementImpl::setTotalRowCount(std::size_t count)
+{
+	_totalRowCount = count;
 }
 
 
@@ -643,7 +681,6 @@ inline bool StatementImpl::hasMoreDataSets() const
 inline void StatementImpl::firstDataSet()
 {
 	_curDataSet = 0;
-	_pendingDSNo = 0;
 }
 
 

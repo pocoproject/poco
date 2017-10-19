@@ -75,8 +75,7 @@ public:
 
 	using Statement::isNull;
 	using Statement::subTotalRowCount;
-
-	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
+	using Statement::totalRowCount;
 
 	explicit RecordSet(const Statement& rStatement,
 		RowFormatter::Ptr pRowFormatter = 0);
@@ -97,8 +96,7 @@ public:
 		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-		_pEnd(new RowIterator(this, true)),
-		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+		_pEnd(new RowIterator(this, true))
 		/// Creates the RecordSet.
 	{
 		setRowFormatter(Keywords::format(rowFormatter));
@@ -128,27 +126,6 @@ public:
 		/// Returns the number of rows extracted during the last statement
 		/// execution.
 		/// The number of rows reported is independent of filtering.
-
-	std::size_t totalRowCount() const;
-		//@ deprecated
-		/// Replaced with subTotalRowCount() and getTotalRowCount().
-
-	std::size_t getTotalRowCount() const;
-		/// Returns the total number of rows in the RecordSet.
-		/// The number of rows reported is independent of filtering.
-		/// If the total row count has not been set externally 
-		/// (either explicitly or implicitly through SQL), the value
-		/// returned shall only be accurate if the statement limit
-		/// is less or equal to the total row count.
-
-	void setTotalRowCount(std::size_t totalRowCount);
-		/// Explicitly sets the total row count.
-
-	void setTotalRowCount(const std::string& sql);
-		/// Implicitly sets the total row count.
-		/// The supplied sql must return exactly one column
-		/// and one row. The returned value must be an unsigned
-		/// integer. The value is set as the total number of rows.
 
 	std::size_t columnCount() const;
 		/// Returns the number of columns in the recordset.
@@ -495,7 +472,6 @@ private:
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
 	Poco::AutoPtr<RowFilter> _pFilter;
-	std::size_t  _totalRowCount;
 
 	friend class RowIterator;
 	friend class RowFilter;
@@ -510,27 +486,6 @@ private:
 inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
 {
 	return rs.copy(os);
-}
-
-
-inline std::size_t RecordSet::getTotalRowCount() const
-{
-	if (UNKNOWN_TOTAL_ROW_COUNT == _totalRowCount)
-		return subTotalRowCount();
-	else
-		return _totalRowCount;
-}
-
-
-inline std::size_t RecordSet::totalRowCount() const
-{
-	return getTotalRowCount();
-}
-
-
-inline void RecordSet::setTotalRowCount(std::size_t count)
-{
-	_totalRowCount = count;
 }
 
 

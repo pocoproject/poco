@@ -435,7 +435,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		}
 		else
 		{
-			rc = overflowSize;
+			rc = static_cast<int>(overflowSize);
 			std::memcpy(buffer, _overflowBuffer.begin(), rc);
 			_overflowBuffer.resize(0);
 		}
@@ -1283,7 +1283,7 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 			BOOL ok = CertVerifyRevocation(
 					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 					CERT_CONTEXT_REVOCATION_TYPE,
-					certs.size(),
+					static_cast<DWORD>(certs.size()),
 					(void**) &certs[0],
 					CERT_VERIFY_REV_CHAIN_FLAG,
 					NULL,
@@ -1390,7 +1390,7 @@ void SecureSocketImpl::serverVerifyCertificate()
 		BOOL ok = CertVerifyRevocation(
 						X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 						CERT_CONTEXT_REVOCATION_TYPE,
-						certs.size(),
+						static_cast<DWORD>(certs.size()),
 						(void**) &certs[0],
 						CERT_VERIFY_REV_CHAIN_FLAG,
 						NULL,

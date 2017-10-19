@@ -25,6 +25,7 @@ public:
 	ECTest(const std::string& name);
 	~ECTest();
 
+	void testCurveNIDName();
 	void testECNewKeys();
 	void testECNewKeysNoPassphrase();
 	void testECDSASignSha256();

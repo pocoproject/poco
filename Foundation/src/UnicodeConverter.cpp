@@ -21,6 +21,9 @@
 #include <cstring>
 
 
+#if !defined(POCO_NO_WSTRING)
+
+
 namespace Poco {
 
 
@@ -159,3 +162,6 @@ void UnicodeConverter::convert(const UTF32Char* utf32String, std::string& utf8St
 
 
 } // namespace Poco
+
+
+#endif // POCO_OS_FAMILY_WINDOWS && !POCO_NO_WSTRING

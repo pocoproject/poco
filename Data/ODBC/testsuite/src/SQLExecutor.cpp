@@ -4198,12 +4198,12 @@ void SQLExecutor::insertStatReuse()
 		Nullable<int> age(0);
 		stat << "INSERT INTO " << ExecUtil::person() << "(LastName, FirstName, Address, Age) VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age);
 		stat.insertHint();
-		for (size_t i = 1; i < 5; ++i)
+		for (int i = 1; i < 5; ++i)
 		{
 			lastName = Var("Last Name " + NumberFormatter::format(i));
 			firstName = "First Name " + NumberFormatter::format(i);
 			address = "Address" + NumberFormatter::format(i);
-			age = 10 + static_cast<int>(i);
+			age = 10 + i;
 			stat.execute();
 		}
 		std::vector<int> rowCnt;
