@@ -42,10 +42,13 @@ namespace Poco {
 	{ int i = 0; while (i < n && it != end && Ascii::isDigit(*it)) { var = var*10 + ((*it++) - '0'); i++; } while (i++ < n) var *= 10; }
 
 
-void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
+void DateTimeParser::parse(const std::string& fmt,
+	const std::string& str,
+	DateTime& dateTime,
+	int& timeZoneDifferential)
 {
-	if (fmt.empty() || str.empty())
-		throw SyntaxException("Empty string.");
+	if (fmt.empty() || str.empty() || (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str)))
+		throw SyntaxException("Invalid DateTimeString:" + str);
 
 	int year   = 0;
 	int month  = 0;
@@ -184,8 +187,11 @@ DateTime DateTimeParser::parse(const std::string& fmt, const std::string& str, i
 	return result;
 }
 
-	
-bool DateTimeParser::tryParse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
+
+bool DateTimeParser::tryParse(const std::string& fmt,
+	const std::string& str,
+	DateTime& dateTime,
+	int& timeZoneDifferential)
 {
 	try
 	{

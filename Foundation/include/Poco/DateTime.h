@@ -280,6 +280,21 @@ private:
 //
 // inlines
 //
+
+
+inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
+{
+	double utcDays = double(utcTime)/864000000000.0;
+	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
+}
+
+
+inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
+{
+	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
+}
+
+
 inline Timestamp DateTime::timestamp() const
 {
 	return Timestamp::fromUtcTime(_utcTime);
