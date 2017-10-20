@@ -63,7 +63,7 @@ public:
 		/// Receives data from the socket.
 		/// Stores the address of the sender in address.
 		///
-		/// Returns the time elapsed since the originating 
+		/// Returns the time elapsed since the originating
 		/// request was sent.
 
 	int dataSize() const;

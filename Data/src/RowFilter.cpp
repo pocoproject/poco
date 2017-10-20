@@ -215,7 +215,7 @@ RecordSet& RowFilter::recordSet() const
 			_pRecordSet = pParent->_pRecordSet;
 	}
 	poco_check_ptr (_pRecordSet);
-	return *_pRecordSet; 
+	return *_pRecordSet;
 }
 
 

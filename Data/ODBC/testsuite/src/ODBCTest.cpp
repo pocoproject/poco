@@ -51,7 +51,7 @@ using Poco::NotFoundException;
 
 
 ODBCTest::Drivers ODBCTest::_drivers;
-const bool        ODBCTest::_bindValues[8] = 
+const bool        ODBCTest::_bindValues[8] =
 	{true, true, true, false, false, true, false, false};
 
 
@@ -61,7 +61,7 @@ ODBCTest::ODBCTest(const std::string& name,
 	std::string& rDSN,
 	std::string& rUID,
 	std::string& rPwd,
-	std::string& rConnectString): 
+	std::string& rConnectString):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
 	_pExecutor(pExecutor),
@@ -1316,13 +1316,13 @@ bool ODBCTest::canConnect(const std::string& driver,
 	{
 		if (((itDrv->first).find(driver) != std::string::npos))
 		{
-			std::cout << "Driver found: " << itDrv->first 
+			std::cout << "Driver found: " << itDrv->first
 				<< " (" << itDrv->second << ')' << std::endl;
 			break;
 		}
 	}
 
-	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/')) 
+	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/'))
 	{
 		dsn = "";
 		uid = "";

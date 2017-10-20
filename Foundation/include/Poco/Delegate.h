@@ -28,14 +28,14 @@
 namespace Poco {
 
 
-template <class TObj, class TArgs, bool withSender = true> 
+template <class TObj, class TArgs, bool withSender = true>
 class Delegate: public AbstractDelegate<TArgs>
 {
 public:
 	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -99,14 +99,14 @@ private:
 };
 
 
-template <class TObj, class TArgs> 
+template <class TObj, class TArgs>
 class Delegate<TObj, TArgs, false>: public AbstractDelegate<TArgs>
 {
 public:
 	typedef void (TObj::*NotifyMethod)(TArgs&);
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -240,14 +240,14 @@ inline FunctionDelegate<TArgs, false> delegate(void (*NotifyMethod)(TArgs&))
 }
 
 
-template <class TObj> 
+template <class TObj>
 class Delegate<TObj,void,true>: public AbstractDelegate<void>
 {
 public:
 	typedef void (TObj::*NotifyMethod)(const void*);
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -311,14 +311,14 @@ private:
 };
 
 
-template <class TObj> 
+template <class TObj>
 class Delegate<TObj, void, false>: public AbstractDelegate<void>
 {
 public:
 	typedef void (TObj::*NotifyMethod)();
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}

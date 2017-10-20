@@ -85,7 +85,7 @@ FTPClientSession::~FTPClientSession()
 	{
 		close();
 	}
-	catch (...) 
+	catch (...)
 	{
 	}
 }
@@ -169,7 +169,7 @@ void FTPClientSession::login(const std::string& username, const std::string& pas
 	status = sendCommand("USER", username, response);
 	if (isPositiveIntermediate(status))
 		status = sendCommand("PASS", password, response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException("Login denied", response, status);
 
 	setFileType(_fileType);
@@ -266,10 +266,10 @@ void FTPClientSession::rename(const std::string& oldName, const std::string& new
 {
 	std::string response;
 	int status = sendCommand("RNFR", oldName, response);
-	if (!isPositiveIntermediate(status)) 
+	if (!isPositiveIntermediate(status))
 		throw FTPException(std::string("Cannot rename ") + oldName, response, status);
 	status = sendCommand("RNTO", newName, response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException(std::string("Cannot rename to ") + newName, response, status);
 }
 
@@ -278,7 +278,7 @@ void FTPClientSession::remove(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("DELE", path, response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException(std::string("Cannot remove " + path), response, status);
 }
 
@@ -287,7 +287,7 @@ void FTPClientSession::createDirectory(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("MKD", path, response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException(std::string("Cannot create directory ") + path, response, status);
 }
 
@@ -296,7 +296,7 @@ void FTPClientSession::removeDirectory(const std::string& path)
 {
 	std::string response;
 	int status = sendCommand("RMD", path, response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException(std::string("Cannot remove directory ") + path, response, status);
 }
 
@@ -366,7 +366,7 @@ void FTPClientSession::abort()
 	int status = sendCommand("ABOR", response);
 	if (status == 426)
 		status = _pControlSocket->receiveStatusMessage(response);
-	if (status != 226) 
+	if (status != 226)
 		throw FTPException("Cannot abort transfer", response, status);
 }
 
@@ -432,7 +432,7 @@ StreamSocket FTPClientSession::activeDataConnection(const std::string& command, 
 	sendPortCommand(server.address());
 	std::string response;
 	int status = sendCommand(command, arg, response);
-	if (!isPositivePreliminary(status)) 
+	if (!isPositivePreliminary(status))
 		throw FTPException(command + " command failed", response, status);
 	if (server.poll(_timeout, Socket::SELECT_READ))
 		return server.acceptConnection();
@@ -447,7 +447,7 @@ StreamSocket FTPClientSession::passiveDataConnection(const std::string& command,
 	StreamSocket sock(sa);
 	std::string response;
 	int status = sendCommand(command, arg, response);
-	if (!isPositivePreliminary(status)) 
+	if (!isPositivePreliminary(status))
 		throw FTPException(command + " command failed", response, status);
 	return sock;
 }
@@ -515,7 +515,7 @@ void FTPClientSession::sendPORT(const SocketAddress& addr)
 	arg += NumberFormatter::format(port % 256);
 	std::string response;
 	int status = sendCommand("PORT", arg, response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException("PORT command failed", response, status);
 }
 
@@ -541,7 +541,7 @@ void FTPClientSession::sendPASV(SocketAddress& addr)
 {
 	std::string response;
 	int status = sendCommand("PASV", response);
-	if (!isPositiveCompletion(status)) 
+	if (!isPositiveCompletion(status))
 		throw FTPException("PASV command failed", response, status);
 	parseAddress(response, addr);
 }
@@ -595,7 +595,7 @@ void FTPClientSession::endTransfer()
 		_pDataStream = 0;
 		std::string response;
 		int status = _pControlSocket->receiveStatusMessage(response);
-		if (!isPositiveCompletion(status)) 
+		if (!isPositiveCompletion(status))
 			throw FTPException("Data transfer failed", response, status);
 	}
 }

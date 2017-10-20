@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -45,7 +45,7 @@
 *   The call rewind(stream) shall be equivalent to:
 *   (void) fseek(stream, 0L, SEEK_SET)
 *
-*   Internally, rewind() function uses SetFilePointer call from 
+*   Internally, rewind() function uses SetFilePointer call from
 *   Windows CE API.
 *
 *   Windows CE specific:
@@ -55,7 +55,7 @@
 * Return:
 *
 *   No return value.
-*       
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition
@@ -70,7 +70,7 @@ void wceex_rewind(FILE * fp)
      * So, that's why dirty asserts are used to get informed about potential problems.
      */
     ret = fseek(fp, 0L, SEEK_SET);
-    
+
     assert(0 == ret);
     assert(0 == ferror(fp));
     assert(!feof(fp));

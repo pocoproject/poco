@@ -45,10 +45,10 @@ public:
 		/// Destroys the ODBCMetaColumn.
 
 	std::size_t dataLength() const;
-		/// A numeric value that is either the maximum or actual character length of a character 
-		/// string or binary data type. It is the maximum character length for a fixed-length data type, 
-		/// or the actual character length for a variable-length data type. Its value always excludes the 
-		/// null-termination byte that ends the character string. 
+		/// A numeric value that is either the maximum or actual character length of a character
+		/// string or binary data type. It is the maximum character length for a fixed-length data type,
+		/// or the actual character length for a variable-length data type. Its value always excludes the
+		/// null-termination byte that ends the character string.
 		/// This information is returned from the SQL_DESC_LENGTH record field of the IRD.
 
 private:

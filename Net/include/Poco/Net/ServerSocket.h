@@ -97,7 +97,7 @@ public:
 		/// Binds a local port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -106,7 +106,7 @@ public:
 		/// Binds a local port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -155,7 +155,7 @@ public:
 		/// Binds a local IPv6 port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -171,7 +171,7 @@ public:
 		/// Binds a local IPv6 port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.

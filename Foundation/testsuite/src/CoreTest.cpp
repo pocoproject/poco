@@ -214,7 +214,7 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
-#if !defined(_WIN32_WCE) 
+#if !defined(_WIN32_WCE)
 	Environment::set("FOO", "BAR");
 	assert (Environment::has("FOO"));
 	assert (Environment::get("FOO") == "BAR");

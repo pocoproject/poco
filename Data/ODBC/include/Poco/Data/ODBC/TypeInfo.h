@@ -124,8 +124,8 @@ private:
 	void fillCTypes();
 	void fillSQLTypes();
 
-	DataTypeMap _cDataTypes; 
-	DataTypeMap _sqlDataTypes; 
+	DataTypeMap _cDataTypes;
+	DataTypeMap _sqlDataTypes;
 	TypeInfoVec _typeInfo;
 	CppTypeInfoMap _cppDataTypes;
 	SQLHDBC*    _pHDBC;

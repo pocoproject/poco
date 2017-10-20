@@ -34,8 +34,8 @@ class Foundation_API Glob
 	/// as known from Unix shells.
 	///
 	/// In the pattern string, '*' matches any sequence of characters,
-	/// '?' matches any single character, [SET] matches any single character 
-	/// in the specified set, [!SET] matches any character not in the  
+	/// '?' matches any single character, [SET] matches any single character
+	/// in the specified set, [!SET] matches any character not in the
 	/// specified set.
 	///
 	/// A set is composed of characters or ranges; a range looks like
@@ -63,7 +63,7 @@ public:
 		/// Creates the Glob, using the given pattern. The pattern
 		/// must not be an empty string.
 		///
-		/// If the GLOB_DOT_SPECIAL option is specified, '*' and '?' do 
+		/// If the GLOB_DOT_SPECIAL option is specified, '*' and '?' do
 		/// not match '.' at the beginning of a matched subject. This is useful for
 		/// making dot-files invisible in good old Unix-style.
 

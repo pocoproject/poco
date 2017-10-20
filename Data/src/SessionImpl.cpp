@@ -20,7 +20,7 @@ namespace Poco {
 namespace Data {
 
 
-SessionImpl::SessionImpl(const std::string& rConnectionString, std::size_t timeout): 
+SessionImpl::SessionImpl(const std::string& rConnectionString, std::size_t timeout):
 	_connectionString(rConnectionString),
 	_loginTimeout(timeout)
 {

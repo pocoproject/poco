@@ -37,7 +37,7 @@ public:
 	~SQLExecutor();
 
 	void bareboneMySQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString);
-		/// This function uses "bare bone" MySQL API calls (i.e. calls are not 
+		/// This function uses "bare bone" MySQL API calls (i.e. calls are not
 		/// "wrapped" in PocoData framework structures).
 		/// The purpose of the function is to verify that driver behaves
 		/// correctly. If this test passes, subsequent tests failures are likely ours.

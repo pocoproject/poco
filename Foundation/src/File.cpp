@@ -273,7 +273,7 @@ void File::remove(bool recursive)
 			it->remove(true);
 		}
 
-		// Note: On Windows, removing a directory may not succeed at first 
+		// Note: On Windows, removing a directory may not succeed at first
 		// try because deleting files is not a synchronous operation. Files
 		// are merely marked as deleted, and actually removed at a later time.
 		//
@@ -285,7 +285,7 @@ void File::remove(bool recursive)
 		int retry = 8;
 		long sleep = 10;
 		while (retry > 0)
-		{ 
+		{
 			try
 			{
 				removeImpl();

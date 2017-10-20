@@ -36,7 +36,7 @@ ThreadPoolTest::~ThreadPoolTest()
 void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 {
 	int cpu = -1;
-	if (affinityPolicy == static_cast<int>(ThreadPool::TAP_CUSTOM)) 
+	if (affinityPolicy == static_cast<int>(ThreadPool::TAP_CUSTOM))
 	{
 		cpu = 0;
 	}

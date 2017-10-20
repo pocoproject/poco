@@ -71,7 +71,7 @@ public:
 		/// be set as the token's value.
 
 	virtual void finish(std::istream& istr);
-		/// Builds the token by reading and appending 
+		/// Builds the token by reading and appending
 		/// the remaining characters from istr.
 		
 	virtual Class tokenClass() const;

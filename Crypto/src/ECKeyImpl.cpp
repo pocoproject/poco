@@ -77,8 +77,8 @@ ECKeyImpl::ECKeyImpl(int curve):
 }
 
 
-ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile, 
-	const std::string& privateKeyFile, 
+ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
 	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(0)
 {
 	if (EVPPKey::loadKey(&_pEC, PEM_read_PrivateKey, EVP_PKEY_get1_EC_KEY, privateKeyFile, privateKeyPassphrase))

@@ -112,7 +112,7 @@ private:
 class PocoDocApp: public Application
 {
 public:
-	PocoDocApp(): 
+	PocoDocApp():
 		_helpRequested(false),
 		_writeEclipseTOC(false)
 	{

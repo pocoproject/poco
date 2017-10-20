@@ -21,8 +21,8 @@ namespace Poco {
 
 
 MutexImpl::MutexImpl(MutexTypeImpl type)
-	: _mutex(type == MUTEX_RECURSIVE_IMPL ? 
-		std::unique_ptr<MutexImpl_BaseMutex>(new MutexImpl_MutexI<std::recursive_timed_mutex>()) : 
+	: _mutex(type == MUTEX_RECURSIVE_IMPL ?
+		std::unique_ptr<MutexImpl_BaseMutex>(new MutexImpl_MutexI<std::recursive_timed_mutex>()) :
 		std::unique_ptr<MutexImpl_BaseMutex>(new MutexImpl_MutexI<std::timed_mutex>()))
 {
 }

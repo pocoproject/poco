@@ -28,9 +28,9 @@ namespace XML {
 
 
 class XML_API AttributesImpl: public Attributes
-	/// This class provides a default implementation of the SAX2 Attributes interface, 
+	/// This class provides a default implementation of the SAX2 Attributes interface,
 	/// with the addition of manipulators so that the list can be modified or reused.
-	/// 
+	///
 	/// There are two typical uses of this class:
 	///     1. to take a persistent snapshot of an Attributes object in a startElement event; or
 	///     2. to construct or modify an Attributes object in a SAX2 driver or filter.

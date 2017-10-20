@@ -35,7 +35,7 @@ class HTMLForm;
 class Net_API OAuth10Credentials
 	/// This class implements OAuth 1.0A authentication for HTTP requests,
 	/// according to RFC 5849.
-	/// 
+	///
 	/// Only PLAINTEXT and HMAC-SHA1 signature methods are
 	/// supported. The RSA-SHA1 signature method is not supported.
 	///
@@ -70,9 +70,9 @@ class Net_API OAuth10Credentials
 	///   7. The response will contain the request token and request token secret.
 	///      These can be extracted from the response body using a HTMLForm object.
 	///
-	/// Requesting the access token and secret (temporary credentials) from the server 
-	/// is analogous to signing a client request using consumer key, consumer secret, 
-	/// request token and request token secret. 
+	/// Requesting the access token and secret (temporary credentials) from the server
+	/// is analogous to signing a client request using consumer key, consumer secret,
+	/// request token and request token secret.
 	/// The server response will contain the access token and access token secret,
 	/// which can again be extracted from the response body using a HTMLForm object.
 	///
@@ -82,7 +82,7 @@ class Net_API OAuth10Credentials
 	///      HTTPRequest object. This will extract the consumer key and token (if
 	///      provided).
 	///   2. Provide the consumer secret and token secret (if required) matching the
-	///      consumer key and token to the OAuth10Credentials object using the 
+	///      consumer key and token to the OAuth10Credentials object using the
 	///      setter methods.
 	///   3. Create an URI object containing the full request URI.
 	///   4. Call verify() to verify the signature.
@@ -107,7 +107,7 @@ public:
 		/// The token and tokenSecret will be left empty.
 
 	OAuth10Credentials(const std::string& consumerKey, const std::string& consumerSecret, const std::string& token, const std::string& tokenSecret);
-		/// Creates an OAuth10Credentials object with the given consumer key and 
+		/// Creates an OAuth10Credentials object with the given consumer key and
 		/// consumer secret, as well as token and token secret.
 
 	explicit OAuth10Credentials(const HTTPRequest& request);
@@ -166,7 +166,7 @@ public:
 		/// the given signature method.
 
 	bool verify(const HTTPRequest& request, const Poco::URI& uri);
-		/// Verifies the signature of the given request. 
+		/// Verifies the signature of the given request.
 		///
 		/// The consumer key, consumer secret, token and token secret must have been set.
 		///
@@ -176,7 +176,7 @@ public:
 		/// credentials, or in case of an unsupported OAuth version or signature method.
 		
 	bool verify(const HTTPRequest& request, const Poco::URI& uri, const Poco::Net::HTMLForm& params);
-		/// Verifies the signature of the given request. 
+		/// Verifies the signature of the given request.
 		///
 		/// The consumer key, consumer secret, token and token secret must have been set.
 		///

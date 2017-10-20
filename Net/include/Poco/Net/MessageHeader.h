@@ -36,7 +36,7 @@ class Net_API MessageHeader: public NameValueCollection
 	///
 	/// The name is case-insensitive.
 	///
-	/// There can be more than one name-value pair with the 
+	/// There can be more than one name-value pair with the
 	/// same name.
 	///
 	/// MessageHeader supports writing and reading the
@@ -70,7 +70,7 @@ public:
 		///
 		/// The format is one name-value pair per line, with
 		/// name and value separated by a colon and lines
-		/// delimited by a carriage return and a linefeed 
+		/// delimited by a carriage return and a linefeed
 		/// character. See RFC 2822 for details.
 
 	virtual void read(std::istream& istr);
@@ -120,7 +120,7 @@ public:
 		/// Splits the given string into separate elements. Elements are expected
 		/// to be separated by commas.
 		///
-		/// For example, the string 
+		/// For example, the string
 		///   text/plain; q=0.5, text/html, text/x-dvi; q=0.8
 		/// is split into the elements
 		///   text/plain; q=0.5

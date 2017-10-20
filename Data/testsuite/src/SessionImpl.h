@@ -45,7 +45,7 @@ public:
 		/// Closes the session.
 
 	bool isConnected();
-		/// Returns true if session is connected to the database, 
+		/// Returns true if session is connected to the database,
 		/// false otherwise.
 
 	void setConnectionTimeout(std::size_t timeout);

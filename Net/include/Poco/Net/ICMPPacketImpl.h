@@ -60,12 +60,12 @@ public:
 	virtual struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const = 0;
 		/// Returns current epoch time if either argument is equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
-		/// 
+		///
 		/// Supplied buffer includes IP header, ICMP header and data.
 		/// Must be overriden.
 
 	virtual bool validReplyID(unsigned char* buffer, int length) const = 0;
-		/// Returns true if the extracted id is recognized 
+		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
 		///	
 		/// Supplied buffer includes IP header, ICMP header and data.

@@ -31,7 +31,7 @@ namespace
 }
 
 
-Base64DecoderBuf::Base64DecoderBuf(std::istream& istr): 
+Base64DecoderBuf::Base64DecoderBuf(std::istream& istr):
 	_groupLength(0),
 	_groupIndex(0),
 	_buf(*istr.rdbuf())
@@ -60,7 +60,7 @@ Base64DecoderBuf::~Base64DecoderBuf()
 
 int Base64DecoderBuf::readFromDevice()
 {
-	if (_groupIndex < _groupLength) 
+	if (_groupIndex < _groupLength)
 	{
 		return _group[_groupIndex++];
 	}
@@ -87,7 +87,7 @@ int Base64DecoderBuf::readFromDevice()
 
 		if (buffer[2] == '=')
 			_groupLength = 1;
-		else if (buffer[3] == '=') 
+		else if (buffer[3] == '=')
 			_groupLength = 2;
 		else
 			_groupLength = 3;

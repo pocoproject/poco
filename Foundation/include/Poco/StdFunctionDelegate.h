@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <class TArgs, bool hasSender = true, bool senderIsConst = true> 
+template <class TArgs, bool hasSender = true, bool senderIsConst = true>
 class StdFunctionDelegate: public Poco::AbstractDelegate<TArgs>
     /// Wraps a std::function or lambda
     /// for use as a Delegate.

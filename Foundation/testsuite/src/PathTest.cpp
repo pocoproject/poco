@@ -1549,7 +1549,7 @@ void PathTest::testExpand()
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string s = Path::expand("~/.profile");
 	assert (s == Path::expand("$HOME/.profile"));
-	assert (s == Environment::get("HOME") + "/.profile" || 
+	assert (s == Environment::get("HOME") + "/.profile" ||
 	        s == Environment::get("HOME") + "//.profile");
 	Path p(s);
 	s = Path::expand("$HOME/.profile");

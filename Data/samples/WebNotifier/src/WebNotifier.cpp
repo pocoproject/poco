@@ -2,14 +2,14 @@
 // WebNotifier.cpp
 //
 // This sample demonstrates a combination of Data and Net libraries by
-// creating a database, registering callbacks for insert/update events 
+// creating a database, registering callbacks for insert/update events
 // and sending database modifications to the web client through web socket.
 // Since callbacks are only registered for session, in order to see the
 // effects, database updates should be done through the shell provided by
-// this example. 
-// 
+// this example.
+//
 // This is only a demo. For production-grade a better web socket management
-// facility as well as persisting notification functionality (e.g. via 
+// facility as well as persisting notification functionality (e.g. via
 // triggers and external functions) should be used.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

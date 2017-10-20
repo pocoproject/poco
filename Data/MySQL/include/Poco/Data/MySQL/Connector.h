@@ -24,7 +24,7 @@
 
 
 // Note: to avoid static (de)initialization problems,
-// during connector automatic (un)registration, it is 
+// during connector automatic (un)registration, it is
 // best to have this as a macro.
 #define POCO_DATA_MYSQL_CONNECTOR_NAME "mysql"
 
@@ -67,14 +67,14 @@ public:
 } } } // namespace Poco::Data::MySQL
 
 
-// 
+//
 // Automatic Connector registration
-// 
+//
 
 struct MySQL_API MySQLConnectorRegistrator
 	/// Connector registering class.
 	/// A global instance of this class is instantiated
-	/// with sole purpose to automatically register the 
+	/// with sole purpose to automatically register the
 	/// MySQL connector with central Poco Data registry.
 {
 	MySQLConnectorRegistrator()
@@ -120,9 +120,9 @@ struct MySQL_API MySQLConnectorRegistrator
 	POCO_DATA_MYSQL_FORCE_SYMBOL(pocoMySQLConnectorRegistrator)
 #endif // POCO_NO_AUTOMATIC_LIB_INIT
 
-// 
+//
 // End automatic Connector registration
-// 
+//
 
 
 #endif // Data_MySQL_Connector_INCLUDED

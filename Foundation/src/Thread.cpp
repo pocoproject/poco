@@ -75,18 +75,18 @@ private:
 } // namespace
 
 
-Thread::Thread(): 
-	_id(uniqueId()), 
-	_name(makeName()), 
+Thread::Thread():
+	_id(uniqueId()),
+	_name(makeName()),
 	_pTLS(0),
 	_event()
 {
 }
 
 
-Thread::Thread(const std::string& rName): 
-	_id(uniqueId()), 
-	_name(rName), 
+Thread::Thread(const std::string& rName):
+	_id(uniqueId()),
+	_name(rName),
 	_pTLS(0),
 	_event()
 {

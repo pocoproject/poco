@@ -30,14 +30,14 @@ namespace XML {
 const XMLString AbstractContainerNode::WILDCARD(toXMLString("*"));
 
 
-AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument): 
+AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument):
 	AbstractNode(pOwnerDocument),
 	_pFirstChild(0)
 {
 }
 
 
-AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument, const AbstractContainerNode& node): 
+AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument, const AbstractContainerNode& node):
 	AbstractNode(pOwnerDocument, node),
 	_pFirstChild(0)
 {
@@ -312,7 +312,7 @@ bool AbstractContainerNode::hasAttributes() const
 Node* AbstractContainerNode::getNodeByPath(const XMLString& path) const
 {
 	XMLString::const_iterator it = path.begin();
-	if (it != path.end() && *it == '/') 
+	if (it != path.end() && *it == '/')
 	{
 		++it;
 		if (it != path.end() && *it == '/')
@@ -340,7 +340,7 @@ Node* AbstractContainerNode::getNodeByPath(const XMLString& path) const
 Node* AbstractContainerNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
 {
 	XMLString::const_iterator it = path.begin();
-	if (it != path.end() && *it == '/') 
+	if (it != path.end() && *it == '/')
 	{
 		++it;
 		if (it != path.end() && *it == '/')

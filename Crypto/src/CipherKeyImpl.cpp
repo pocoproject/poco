@@ -26,7 +26,7 @@ namespace Crypto {
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
-	const std::string& passphrase, 
+	const std::string& passphrase,
 	const std::string& salt,
 	int iterationCount,
 	const std::string& digest): _pCipher(0),
@@ -54,8 +54,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 }
 
 
-CipherKeyImpl::CipherKeyImpl(const std::string& name, 
-	const ByteVec& key, 
+CipherKeyImpl::CipherKeyImpl(const std::string& name,
+	const ByteVec& key,
 	const ByteVec& iv): _pCipher(0),
 		_pDigest(0),
 		_name(name),

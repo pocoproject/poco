@@ -36,25 +36,25 @@ namespace Data {
 class Data_API SQLChannel: public Poco::Channel
 	/// This Channel implements logging to a SQL database.
 	/// The channel is dependent on the schema. The DDL for
-	/// table creation (subject to target DDL dialect dependent 
+	/// table creation (subject to target DDL dialect dependent
 	/// modifications) is:
 	///
-	/// "CREATE TABLE T_POCO_LOG (Source VARCHAR, 
-	///		Name VARCHAR, 
-	///		ProcessId INTEGER, 
-	///		Thread VARCHAR, 
-	///		ThreadId INTEGER, 
-	///		Priority INTEGER, 
-	///		Text VARCHAR, 
+	/// "CREATE TABLE T_POCO_LOG (Source VARCHAR,
+	///		Name VARCHAR,
+	///		ProcessId INTEGER,
+	///		Thread VARCHAR,
+	///		ThreadId INTEGER,
+	///		Priority INTEGER,
+	///		Text VARCHAR,
 	///		DateTime DATE)"
 	///
-	/// The table name is configurable through "table" property. 
-	/// Other than DateTime filed name used for optional time-based archiving purposes, currently the 
+	/// The table name is configurable through "table" property.
+	/// Other than DateTime filed name used for optional time-based archiving purposes, currently the
 	/// field names are not mandated. However, it is recommended to use names as specified above.
-	/// 
-	/// To provide as non-intrusive operation as possible, the log entries are cached and 
-	/// inserted into the target database asynchronously by default . The blocking, however, will occur 
-	/// before the next entry insertion with default timeout of 1 second. The default settings can be 
+	///
+	/// To provide as non-intrusive operation as possible, the log entries are cached and
+	/// inserted into the target database asynchronously by default . The blocking, however, will occur
+	/// before the next entry insertion with default timeout of 1 second. The default settings can be
 	/// overriden (see async, timeout and throw properties for details).
 	/// If throw property is false, insertion timeouts are ignored, otherwise a TimeoutException is thrown.
 	/// To force insertion of every entry, set timeout to 0. This setting, however, introduces
@@ -64,7 +64,7 @@ public:
 	SQLChannel();
 		/// Creates SQLChannel.
 
-	SQLChannel(const std::string& connector, 
+	SQLChannel(const std::string& connector,
 		const std::string& connect,
 		const std::string& name = "-");
 		/// Creates a SQLChannel with the given connector, connect string, timeout, table and name.
@@ -105,7 +105,7 @@ public:
 		///     * async:     Indicates asynchronous execution. When executing asynchronously,
 		///                  messages are sent to the target using asynchronous execution.
 		///                  However, prior to the next message being processed and sent to
-		///                  the target, the previous operation must have been either completed 
+		///                  the target, the previous operation must have been either completed
 		///                  or timed out (see timeout and throw properties for details on
 		///                  how abnormal conditions are handled).
 		///
@@ -195,7 +195,7 @@ private:
 
 inline std::size_t SQLChannel::wait()
 {
-	if (_async && _pLogStatement) 
+	if (_async && _pLogStatement)
 		return _pLogStatement->wait(_timeout);
 	
 	return 0;

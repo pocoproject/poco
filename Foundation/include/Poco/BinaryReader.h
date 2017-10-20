@@ -183,7 +183,7 @@ private:
 	}
 
 	std::istream&  _istr;
-	bool           _flipBytes; 
+	bool           _flipBytes;
 	TextConverter* _pTextConverter;
 };
 

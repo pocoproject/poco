@@ -123,9 +123,9 @@ public:
 		/// page size multiple.
 
 	void setAffinity(int cpu);
-		/// Binds the thread to run only on the CPU core with the 
+		/// Binds the thread to run only on the CPU core with the
 		/// given index.
-		/// 
+		///
 		/// Does nothing if the system does not support CPU affinity for
 		/// threads.
 

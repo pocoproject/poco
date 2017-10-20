@@ -78,7 +78,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		Path path;
 		if (path.tryParse(pathOrURI, Path::PATH_GUESS))
 			return openFile(path);
-		else 
+		else
 			throw;
 	}
 }

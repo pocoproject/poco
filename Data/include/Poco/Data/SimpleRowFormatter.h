@@ -107,7 +107,7 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1, 
+	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1,
 		Poco::Data::SimpleRowFormatter& s2)
 		/// Full template specialization of std:::swap for SimpleRowFormatter
 	{

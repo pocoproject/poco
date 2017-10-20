@@ -58,7 +58,7 @@ public:
 
 	void set();
 		/// Signals the event. If autoReset is true,
-		/// only one thread waiting for the event 
+		/// only one thread waiting for the event
 		/// can resume execution.
 		/// If autoReset is false, all waiting threads
 		/// can resume execution.

@@ -66,11 +66,11 @@ public:
 	std::string& toString(int index, std::string& str) const
 		/// Generates the string for the diagnostic record.
 	{
-		if ((index < 0) || (index > (count() - 1))) 
+		if ((index < 0) || (index > (count() - 1)))
 			return str;
 
 		std::string s;
-		Poco::format(s, 
+		Poco::format(s,
 			"===========================\n"
 			"ODBC Diagnostic record #%d:\n"
 			"===========================\n"
@@ -90,7 +90,7 @@ public:
 	{
 		std::string str;
 
-		Poco::format(str, 
+		Poco::format(str,
 			"Connection:%s\nServer:%s\n",
 			_diagnostics.connectionName(),
 			_diagnostics.serverName());

@@ -41,7 +41,7 @@ template <class H, SQLSMALLINT handleType>
 class HandleException: public ODBCException
 {
 public:
-	HandleException(const H& handle, int code = 0) : 
+	HandleException(const H& handle, int code = 0) :
 		ODBCException(code),
 		_error(handle)
 		/// Creates HandleException
@@ -49,29 +49,29 @@ public:
 		message(_error.toString());
 	}
 
-	HandleException(const H& handle, const std::string& msg): 
-		ODBCException(msg), 
+	HandleException(const H& handle, const std::string& msg):
+		ODBCException(msg),
 		_error(handle)
 		/// Creates HandleException
 	{
 		extendedMessage(_error.toString());
 	}
 
-	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
-		ODBCException(msg, arg), 
+	HandleException(const H& handle, const std::string& msg, const std::string& arg):
+		ODBCException(msg, arg),
 		_error(handle)
 		/// Creates HandleException
 	{
 	}
 
-	HandleException(const H& handle, const std::string& msg, const Poco::Exception& exc): 
+	HandleException(const H& handle, const std::string& msg, const Poco::Exception& exc):
 		ODBCException(msg, exc),
 		_error(handle)
 		/// Creates HandleException
 	{
 	}
 
-	HandleException(const HandleException& exc): 
+	HandleException(const HandleException& exc):
 		ODBCException(exc),
 		_error(exc._error)
 		/// Creates HandleException

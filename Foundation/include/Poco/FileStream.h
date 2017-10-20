@@ -54,7 +54,7 @@ public:
 	void open(const std::string& path, std::ios::openmode mode);
 		/// Opens the file specified by path, using the given mode.
 		///
-		/// Throws a FileException (or a similar exception) if the file 
+		/// Throws a FileException (or a similar exception) if the file
 		/// does not exist or is not accessible for other reasons and
 		/// a new file cannot be created.
 
@@ -94,7 +94,7 @@ public:
 		/// The std::ios::in flag is always set, regardless of the actual
 		/// value specified for mode.
 		///
-		/// Throws a FileNotFoundException (or a similar exception) if the file 
+		/// Throws a FileNotFoundException (or a similar exception) if the file
 		/// does not exist or is not accessible for other reasons.
 
 	~FileInputStream();
@@ -119,10 +119,10 @@ public:
 		/// Creates the FileOutputStream for the file given by path, using
 		/// the given mode.
 		///
-		/// The std::ios::out is always set, regardless of the actual 
+		/// The std::ios::out is always set, regardless of the actual
 		/// value specified for mode.
 		///
-		/// Throws a FileException (or a similar exception) if the file 
+		/// Throws a FileException (or a similar exception) if the file
 		/// does not exist or is not accessible for other reasons and
 		/// a new file cannot be created.
 
@@ -141,7 +141,7 @@ class Foundation_API FileStream: public FileIOS, public std::iostream
 	/// Use an InputLineEndingConverter or OutputLineEndingConverter
 	/// if you require CR-LF translation.
 	///
-	/// A seek (seekg() or seekp()) operation will always set the 
+	/// A seek (seekg() or seekp()) operation will always set the
 	/// read position and the write position simultaneously to the
 	/// same value.
 {

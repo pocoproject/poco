@@ -80,7 +80,7 @@ public:
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -91,7 +91,7 @@ public:
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.

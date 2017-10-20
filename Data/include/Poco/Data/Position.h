@@ -52,8 +52,8 @@ private:
 /// inlines
 ///
 inline Position::Type Position::value() const
-{ 
-	return _value; 
+{
+	return _value;
 }
 
 

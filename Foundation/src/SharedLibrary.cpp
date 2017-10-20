@@ -111,7 +111,7 @@ std::string SharedLibrary::suffix()
 	return suffixImpl();
 }
 
-std::string SharedLibrary::getOSName(const std::string& name) 
+std::string SharedLibrary::getOSName(const std::string& name)
 {
 	return prefix() + name + suffix();
 }

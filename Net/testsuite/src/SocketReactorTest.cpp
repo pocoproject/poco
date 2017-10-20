@@ -143,7 +143,7 @@ namespace
 		{
 			pNf->release();
 			_timeout = true;
-			if (_closeOnTimeout) 
+			if (_closeOnTimeout)
 			{
 				_reactor.stop();
 				delete this;

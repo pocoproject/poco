@@ -40,18 +40,18 @@ class NetworkInterfaceImpl;
 
 class Net_API NetworkInterface
 	/// This class represents a network interface.
-	/// 
+	///
 	/// NetworkInterface is used with MulticastSocket to specify
 	/// multicast interfaces for sending and receiving multicast
 	/// messages.
-	/// 
+	///
 	/// The class also provides static member functions for
 	/// enumerating or searching network interfaces and their
 	/// respective configuration values.
 	///
 	/// On Windows, detection capabilities vary depending on the
 	/// OS version/service pack. Although the best effort is made
-	/// not to attempt access to non-existent features through a 
+	/// not to attempt access to non-existent features through a
 	/// combination of compile/runtime checks, when running binaries
 	/// compiled on a newer version of the OS on an older one
 	/// problems may occur; if possible, it is best to run
@@ -140,7 +140,7 @@ public:
 		///
 		/// On Windows platforms, this is currently the network adapter
 		/// name. This may change to the "friendly name" of the network
-		/// connection in a future version, however. 
+		/// connection in a future version, however.
 		///
 		/// On other platforms this is the same as name().
 
@@ -148,7 +148,7 @@ public:
 		/// Returns the interface adapter name.
 		///
 		/// On Windows platforms, this is the network adapter LUID.
-		/// The adapter name is used by some Windows Net APIs like DHCP. 
+		/// The adapter name is used by some Windows Net APIs like DHCP.
 		///
 		/// On other platforms this is the same as name().
 
@@ -221,7 +221,7 @@ public:
 
 	static NetworkInterface forName(const std::string& name, bool requireIPv6 = false);
 		/// Returns the NetworkInterface for the given name.
-		/// 
+		///
 		/// If requireIPv6 is false, an IPv4 interface is returned.
 		/// Otherwise, an IPv6 interface is returned.
 		///
@@ -230,9 +230,9 @@ public:
 
 	static NetworkInterface forName(const std::string& name, IPVersion ipVersion);
 		/// Returns the NetworkInterface for the given name.
-		/// 
+		///
 		/// The ipVersion argument can be used to specify whether
-		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required, 
+		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required,
 		/// or whether the caller does not care (IPv4_OR_IPv6).
 		///
 		/// Throws an InterfaceNotFoundException if an interface
@@ -277,7 +277,7 @@ public:
 		/// Otherwise, both interfaces being up and down are returned.
 		///
 		/// If there are multiple addresses bound to one interface,
-		/// they are contained within the NetworkInterface (second) 
+		/// they are contained within the NetworkInterface (second)
 		/// member of the pair.
 
 protected:

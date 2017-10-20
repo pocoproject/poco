@@ -22,7 +22,7 @@ target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE 
+    PRIVATE
     	${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})

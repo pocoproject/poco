@@ -25,7 +25,7 @@ output=""
 lineEndConv=""
 licensingDep=""
 
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-i" ] ; then
 		shift
@@ -239,7 +239,7 @@ endif
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
-poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples) 
+poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
@@ -319,14 +319,14 @@ do
 			dependencies="$dependencies ${dep}-libexec"
 		done
 	fi
-	cat >>${target}/Makefile <<ENDOFSCRIPT 
+	cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-libexec: $dependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}
 ENDOFSCRIPT
 
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-tests: ${comp}-libexec cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
@@ -343,7 +343,7 @@ ENDOFSCRIPT
 				sdependencies="$sdependencies ${dep}-libexec"
 			done
 		fi
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	
 ${comp}-samples: ${comp}-libexec $sdependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples
@@ -357,13 +357,13 @@ ${comp}-clean:
 ENDOFSCRIPT
 
 	if [ -f "${POCO_BASE}/${comp}/testsuite/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite clean
 ENDOFSCRIPT
 	fi
 
 	if [ -f "${POCO_BASE}/${comp}/samples/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples clean
 ENDOFSCRIPT
 	fi

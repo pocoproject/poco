@@ -136,7 +136,7 @@ void CompressTest::testSetZipComment()
 }
 
 
-void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size) 
+void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size)
 {
 	std::ofstream out(path.c_str(), std::ios::binary | std::ios::trunc);
 	assert( ! out.fail() );
@@ -163,21 +163,21 @@ void CompressTest::testZip64()
 	files["data2.bin"] = static_cast<Poco::UInt64>(KB)*16;
 	files["data3.bin"] = static_cast<Poco::UInt64>(KB)*4096-1;
 	
-	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
+	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
 	{
 		std::cout << '\t' << "createDataFile(" << it->first << ", " << it->second << ");" << std::endl;
 		createDataFile(it->first, it->second);
 	}
 	std::ofstream out("zip64.zip", std::ios::binary | std::ios::trunc);
 	Compress c(out, true, true);
-	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
+	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
 	{
 		const std::string& path = it->first;
 		std::cout << '\t' << "addFile(" << path <<  ");" << std::endl;
 		c.addFile(path, path, ZipCommon::CM_STORE);
 	}
 	ZipArchive a(c.close());
-	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++) 
+	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
 	{
 		const std::string& path = it->first;
 		Poco::UInt64 size = it->second;

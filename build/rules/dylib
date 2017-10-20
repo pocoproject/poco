@@ -10,7 +10,7 @@
 SHL_EXT = $(SHAREDLIBLINKEXT)
 
 # Some systems (e.g. Mac OS X) make a difference between
-# shared libraries (as used by the linker/loader) and 
+# shared libraries (as used by the linker/loader) and
 # dynamic libraries, as used for dynamically loadable modules.
 # If no specific instructions for making dynamic libraries
 # are given, use the instructions for making shared libraries.

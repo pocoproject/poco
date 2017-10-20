@@ -20,7 +20,7 @@
 namespace Poco {
 
 
-LogFileImpl::LogFileImpl(const std::string& path): 
+LogFileImpl::LogFileImpl(const std::string& path):
 	_path(path),
 	_str(_path, std::ios::app),
 	_size((UInt64) _str.tellp())

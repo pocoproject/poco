@@ -30,9 +30,9 @@ namespace Util {
 
 
 class Util_API Timer: protected Poco::Runnable
-	/// A Timer allows to schedule tasks (TimerTask objects) for future execution 
-	/// in a background thread. Tasks may be scheduled for one-time execution, 
-	/// or for repeated execution at regular intervals. 
+	/// A Timer allows to schedule tasks (TimerTask objects) for future execution
+	/// in a background thread. Tasks may be scheduled for one-time execution,
+	/// or for repeated execution at regular intervals.
 	///
 	/// The Timer object creates a thread that executes all scheduled tasks
 	/// sequentially. Therefore, tasks should complete their work as quickly
@@ -121,7 +121,7 @@ public:
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed after the given delay.
-		/// Subsequently, the task is executed periodically 
+		/// Subsequently, the task is executed periodically
 		/// every number of milliseconds specified by interval.
 		///
 		/// If task execution takes longer than the given interval,
@@ -131,7 +131,7 @@ public:
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed at the given time.
-		/// Subsequently, the task is executed periodically 
+		/// Subsequently, the task is executed periodically
 		/// every number of milliseconds specified by interval.
 		///
 		/// If task execution takes longer than the given interval,
@@ -148,7 +148,7 @@ public:
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed at the given time.
-		/// Subsequently, the task is executed periodically 
+		/// Subsequently, the task is executed periodically
 		/// every number of milliseconds specified by interval.
 		///
 		/// If task execution takes longer than the given interval,

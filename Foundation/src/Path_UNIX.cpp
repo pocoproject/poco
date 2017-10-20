@@ -82,7 +82,7 @@ std::string PathImpl::configHomeImpl()
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/') 
+	if (n > 0 && path[n - 1] == '/')
 		path.append("Library/Preferences/");
 	return path;
 #else
@@ -109,7 +109,7 @@ std::string PathImpl::dataHomeImpl()
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/') 
+	if (n > 0 && path[n - 1] == '/')
 		path.append("Library/Application Support/");
 	return path;
 #else
@@ -136,7 +136,7 @@ std::string PathImpl::cacheHomeImpl()
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/') 
+	if (n > 0 && path[n - 1] == '/')
 		path.append("Library/Caches/");
 	return path;
 #else

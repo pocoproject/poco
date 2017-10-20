@@ -26,33 +26,33 @@ namespace Poco {
 namespace Net {
 
 
-SecureStreamSocket::SecureStreamSocket(): 
+SecureStreamSocket::SecureStreamSocket():
 	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
 }
 
 
-SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext): 
+SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 }
 
 
-SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext, Session::Ptr pSession): 
+SecureStreamSocket::SecureStreamSocket(Context::Ptr pContext, Session::Ptr pSession):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	useSession(pSession);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address):
 	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
 	connect(address);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName):
 	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
@@ -60,14 +60,14 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	connect(address);
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	useSession(pSession);
@@ -75,7 +75,7 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Pt
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
@@ -83,7 +83,7 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession): 
+SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
@@ -92,7 +92,7 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::
 }
 
 
-SecureStreamSocket::SecureStreamSocket(const Socket& socket): 
+SecureStreamSocket::SecureStreamSocket(const Socket& socket):
 	StreamSocket(socket)
 {
 	if (!dynamic_cast<SecureStreamSocketImpl*>(impl()))
@@ -100,7 +100,7 @@ SecureStreamSocket::SecureStreamSocket(const Socket& socket):
 }
 
 
-SecureStreamSocket::SecureStreamSocket(SocketImpl* pImpl): 
+SecureStreamSocket::SecureStreamSocket(SocketImpl* pImpl):
 	StreamSocket(pImpl)
 {
 	if (!dynamic_cast<SecureStreamSocketImpl*>(impl()))
