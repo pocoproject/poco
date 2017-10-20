@@ -75,8 +75,8 @@ Path::Path(const char* path, Style style)
 }
 
 
-Path::Path(const Path& path): 
-	_node(path._node), 
+Path::Path(const Path& path):
+	_node(path._node),
 	_device(path._device),
 	_name(path._name),
 	_version(path._version),
@@ -87,7 +87,7 @@ Path::Path(const Path& path):
 
 
 Path::Path(const Path& rParent, const std::string& fileName):
-	_node(rParent._node), 
+	_node(rParent._node),
 	_device(rParent._device),
 	_name(rParent._name),
 	_version(rParent._version),
@@ -101,7 +101,7 @@ Path::Path(const Path& rParent, const std::string& fileName):
 
 
 Path::Path(const Path& rParent, const char* fileName):
-	_node(rParent._node), 
+	_node(rParent._node),
 	_device(rParent._device),
 	_name(rParent._name),
 	_version(rParent._version),
@@ -114,7 +114,7 @@ Path::Path(const Path& rParent, const char* fileName):
 
 
 Path::Path(const Path& rParent, const Path& relative):
-	_node(rParent._node), 
+	_node(rParent._node),
 	_device(rParent._device),
 	_name(rParent._name),
 	_version(rParent._version),
@@ -712,7 +712,7 @@ void Path::parseUnix(const std::string& path)
 
 	if (it != end)
 	{
-		if (*it == '/') 
+		if (*it == '/')
 		{
 			_absolute = true; ++it;
 		}
@@ -868,7 +868,7 @@ void Path::parseVMS(const std::string& path)
 								{
 									if (_dirs.empty() || _dirs.back() == "..")
 										_dirs.push_back("..");
-									else 
+									else
 										_dirs.pop_back();
 								}
 								else _dirs.push_back(name);
@@ -939,7 +939,7 @@ void Path::parseGuess(const std::string& path)
 			case '\\': hasBackslash = true; break;
 			case '/':  hasSlash = true; break;
 			case '[':  hasOpenBracket = true;
-			case ']':  hasClosBracket = hasOpenBracket; 
+			case ']':  hasClosBracket = hasOpenBracket;
 			case ';':  semiIt = it; break;
 			}
 		}

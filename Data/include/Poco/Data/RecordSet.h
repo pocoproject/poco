@@ -44,7 +44,7 @@ class RowFilter;
 class Data_API RecordSet: private Statement
 	/// RecordSet provides access to data returned from a query.
 	/// Data access indices (row and column) are 0-based, as usual in C++.
-	/// 
+	///
 	/// Recordset provides navigation methods to iterate through the
 	/// recordset, retrieval methods to extract data, and methods
 	/// to get metadata (type, etc.) about columns.
@@ -64,7 +64,7 @@ class Data_API RecordSet: private Statement
 	/// The third (optional) argument passed to the Recordset constructor is a RowFormatter
 	/// implementation. The formatter is used in conjunction with << operator for recordset
 	/// data formatting.
-	/// 
+	///
 	/// The number of rows in the RecordSet can be limited by specifying
 	/// a limit for the Statement.
 {
@@ -81,18 +81,18 @@ public:
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		const RowFormatter& rowFormatter);
 		/// Creates the RecordSet.
 
 	template <class RF>
-	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter): 
+	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter):
 		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -353,11 +353,11 @@ public:
 	void formatNames() const;
 		/// Formats names using the current RowFormatter.
 
-	std::ostream& copyValues(std::ostream& os, 
-		std::size_t offset = 0, 
+	std::ostream& copyValues(std::ostream& os,
+		std::size_t offset = 0,
 		std::size_t length = RowIterator::POSITION_END) const;
 		/// Copies the data values to the supplied output stream.
-		/// The data set to be copied is starting at the specified offset 
+		/// The data set to be copied is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -366,7 +366,7 @@ public:
 
 	void formatValues(std::size_t offset, std::size_t length) const;
 		/// Formats values using the current RowFormatter.
-		/// The data set to be formatted is starting at the specified offset 
+		/// The data set to be formatted is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -443,7 +443,7 @@ private:
 		{
 			return pExtraction->column();
 		}
-		else 
+		else
 		{
 			throw Poco::BadCastException(Poco::format("RecordSet::columnImpl(%z) type cast failed!\nTarget type:\t%s"
 				"\nTarget container type:\t%s\nSource container type:\t%s\nSource abstraction type:\t%s",

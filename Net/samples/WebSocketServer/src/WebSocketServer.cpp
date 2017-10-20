@@ -147,7 +147,7 @@ public:
 	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
 	{
 		Application& app = Application::instance();
-		app.logger().information("Request from " 
+		app.logger().information("Request from "
 			+ request.clientAddress().toString()
 			+ ": "
 			+ request.getMethod()

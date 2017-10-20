@@ -48,7 +48,7 @@ private:
 //
 inline void RWLockImpl::readLockImpl()
 {
-	if (pthread_mutex_lock(&_mutex)) 
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot lock reader/writer lock");
 }
 
@@ -67,7 +67,7 @@ inline bool RWLockImpl::tryReadLockImpl()
 
 inline void RWLockImpl::writeLockImpl()
 {
-	if (pthread_mutex_lock(&_mutex)) 
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot lock reader/writer lock");
 }
 

@@ -34,7 +34,7 @@ class Foundation_API DateTime
 	/// UTC, Julian day and Gregorian calendar dates.
 	///
 	/// The date and time stored in a DateTime is always in UTC
-	/// (Coordinated Universal Time) and thus independent of the 
+	/// (Coordinated Universal Time) and thus independent of the
 	/// timezone in effect on the system.
 	///
 	/// Conversion calculations are based on algorithms
@@ -42,7 +42,7 @@ class Foundation_API DateTime
 	/// http://vsg.cape.com/~pbaum/date/date0.htm
 	///
 	/// Internally, this class stores a date/time in two
-	/// forms (UTC and broken down) for performance reasons. Only use 
+	/// forms (UTC and broken down) for performance reasons. Only use
 	/// this class for conversions between date/time representations.
 	/// Use the Timestamp class for everything else.
 	///
@@ -153,9 +153,9 @@ public:
 	int week(int firstDayOfWeek = MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
-		/// The returned week number will be from 0 to 53. Week number 1 is the week 
+		/// The returned week number will be from 0 to 53. Week number 1 is the week
 		/// containing January 4. This is in accordance to ISO 8601.
-		/// 
+		///
 		/// The following example assumes that firstDayOfWeek is MONDAY. For 2005, which started
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).

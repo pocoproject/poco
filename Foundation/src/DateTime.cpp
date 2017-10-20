@@ -244,7 +244,7 @@ int DateTime::week(int firstDayOfWeek) const
 	while (DateTime(_year, 1, baseDay).dayOfWeek() != firstDayOfWeek) ++baseDay;
 
 	int doy  = dayOfYear();
-	int offs = baseDay <= 4 ? 0 : 1; 
+	int offs = baseDay <= 4 ? 0 : 1;
 	if (doy < baseDay)
 		return offs;
 	else
@@ -310,7 +310,7 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 {
 	// lookup table for (153*month - 457)/5 - note that 3 <= month <= 14.
 	static int lookup[] = {-91, -60, -30, 0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337};
- 
+
 	// day to double
 	double dday = double(day) + ((double((hour*60 + minute)*60 + second)*1000 + millisecond)*1000 + microsecond)/86400000000.0;
 	if (month < 3)

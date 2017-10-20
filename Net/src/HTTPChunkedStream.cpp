@@ -81,7 +81,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (n > 0) _chunk -= n;
 		return n;
 	}
-	else 
+	else
 	{
 		int ch = _session.get();
 		while (ch != eof && ch != '\n') ch = _session.get();

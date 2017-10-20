@@ -24,19 +24,19 @@ namespace Poco {
 namespace Net {
 
 
-RawSocket::RawSocket(): 
+RawSocket::RawSocket():
 	Socket(new RawSocketImpl)
 {
 }
 
 
-RawSocket::RawSocket(SocketAddress::Family family, int proto): 
+RawSocket::RawSocket(SocketAddress::Family family, int proto):
 	Socket(new RawSocketImpl(family, proto))
 {
 }
 
 
-RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress): 
+RawSocket::RawSocket(const SocketAddress& address, bool reuseAddress):
 	Socket(new RawSocketImpl(address.family()))
 {
 	bind(address, reuseAddress);

@@ -266,7 +266,7 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) return;
 
-	SessionList::iterator it = _idleSessions.begin(); 
+	SessionList::iterator it = _idleSessions.begin();
 	while (_nSessions > _minSessions && it != _idleSessions.end())
 	{
 		if ((*it)->idle() > _idleTime || !(*it)->session()->isConnected())
@@ -294,7 +294,7 @@ void SessionPool::shutdown()
 
 void SessionPool::closeAll(SessionList& sessionList)
 {
-	SessionList::iterator it = sessionList.begin(); 
+	SessionList::iterator it = sessionList.begin();
 	for (; it != sessionList.end();)
 	{
 		try	{ (*it)->session()->close(); }

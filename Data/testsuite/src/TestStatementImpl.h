@@ -42,7 +42,7 @@ public:
 
 protected:
 	std::size_t columnsReturned() const;
-		/// Returns number of columns returned by query. 
+		/// Returns number of columns returned by query.
 	
 	int affectedRowCount() const;
 		/// Returns the number of affected rows.
@@ -80,7 +80,7 @@ private:
 	Poco::SharedPtr<Binder>     _ptrBinder;
 	Poco::SharedPtr<Extractor>  _ptrExtractor;
 	Poco::SharedPtr<Preparator> _ptrPreparation;
-	bool                        _compiled; 
+	bool                        _compiled;
 };
 
 

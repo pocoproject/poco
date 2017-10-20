@@ -57,25 +57,25 @@ bool Foundation_API isJSONString(const Var& any);
 
 
 void Foundation_API appendJSONKey(std::string& val, const Var& any);
-	/// Converts the any to a JSON key (i.e. wraps it into double quotes 
+	/// Converts the any to a JSON key (i.e. wraps it into double quotes
 	/// regardless of the underlying type) and appends it to val.
 
 
 void Foundation_API appendJSONString(std::string& val, const Var& any);
-	/// Converts the any to a JSON string (i.e. wraps it into double quotes) 
+	/// Converts the any to a JSON string (i.e. wraps it into double quotes)
 	/// regardless of the underlying type) and appends it to val.
 
 
 void Foundation_API appendJSONValue(std::string& val, const Var& any);
-	/// Converts the any to a JSON value (if underlying type qualifies 
-	/// as string - see isJSONString() - , it is wrapped into double quotes) 
+	/// Converts the any to a JSON value (if underlying type qualifies
+	/// as string - see isJSONString() - , it is wrapped into double quotes)
 	/// and appends it to val
 
 
 template <typename C>
 void containerToJSON(C& cont, std::string& val)
 {
-	// Serialize in JSON format. Note: although this is a vector<T>, the code only 
+	// Serialize in JSON format. Note: although this is a vector<T>, the code only
 	// supports vector<Var>. Total specialization is not possible
 	// because of the cyclic dependency between Var and VarHolder
 
@@ -101,11 +101,11 @@ void containerToJSON(C& cont, std::string& val)
 
 
 class Foundation_API VarHolder
-	/// Interface for a data holder used by the Var class. 
+	/// Interface for a data holder used by the Var class.
 	/// Provides methods to convert between data types.
 	/// Only data types for which VarHolder specialization exists are supported.
-	/// 
-	/// Provided are specializations for all C++ built-in types with addition of 
+	///
+	/// Provided are specializations for all C++ built-in types with addition of
 	/// std::string, Poco::UTF16String, DateTime, LocalDateTime, Timestamp, std::vector<Var> and DynamicStruct.
 	///
 	/// Additional types can be supported by adding specializations. When implementing specializations,
@@ -125,7 +125,7 @@ public:
 	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = 0) const = 0;
 		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
-		/// If small object optimization is enabled (i.e. if 
+		/// If small object optimization is enabled (i.e. if
 		/// POCO_NO_SOO is not defined), VarHolder will be
 		/// instantiated in-place if it's size is smaller
 		/// than POCO_SMALL_OBJECT_SIZE.
@@ -274,9 +274,9 @@ protected:
 	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
 		/// Instantiates value holder wrapper. If size of the wrapper is
 		/// larger than POCO_SMALL_OBJECT_SIZE, holder is instantiated on
-		/// the heap, otherwise it is instantiated in-place (in the 
+		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
-		/// 
+		///
 		/// Called from clone() member function of the implementation when
 		/// small object optimization is enabled.
 	{
@@ -304,7 +304,7 @@ protected:
 	void convertToSmaller(const F& from, T& to) const
 		/// This function is meant to convert signed numeric values from
 		/// larger to smaller type. It checks the upper and lower bound and
-		/// if from value is within limits of type T (i.e. check calls do not throw), 
+		/// if from value is within limits of type T (i.e. check calls do not throw),
 		/// it is converted.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -314,13 +314,13 @@ protected:
 
 		if (std::numeric_limits<F>::is_integer)
 		{
-			checkUpperLimit<F,T>(from); 
+			checkUpperLimit<F,T>(from);
 			checkLowerLimit<F,T>(from);
 		}
 		else
 		{
-			checkUpperLimitFloat<F,T>(from); 
-			checkLowerLimitFloat<F,T>(from); 
+			checkUpperLimitFloat<F,T>(from);
+			checkLowerLimitFloat<F,T>(from);
 		}
 		
 		to = static_cast<T>(from);
@@ -339,7 +339,7 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (!std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -357,7 +357,7 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -376,7 +376,7 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimitFloat<F,T>(from); 
+		checkUpperLimitFloat<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -440,14 +440,14 @@ private:
 	template <typename F, typename T>
 	void checkLowerLimitFloat(const F& from) const
 	{
-		if (from < -std::numeric_limits<T>::max()) 
+		if (from < -std::numeric_limits<T>::max())
 			throw RangeException("Value too small.");
 	}
 
 	template <typename F, typename T>
 	void checkLowerLimit(const F& from) const
 	{
-		if (from < std::numeric_limits<T>::min()) 
+		if (from < std::numeric_limits<T>::min())
 			throw RangeException("Value too small.");
 	}
 };
@@ -662,7 +662,7 @@ inline std::size_t VarHolder::size() const
 
 template <typename T>
 class VarHolderImpl: public VarHolder
-	/// Template based implementation of a VarHolder. 
+	/// Template based implementation of a VarHolder.
 	/// This class provides type storage for user-defined types
 	/// that do not have VarHolderImpl specialization.
 	///
@@ -2055,7 +2055,7 @@ public:
 
 	void convert(bool& val) const
 	{
-		val = !(_val <= std::numeric_limits<float>::min() && 
+		val = !(_val <= std::numeric_limits<float>::min() &&
 			_val >= -1 * std::numeric_limits<float>::min());
 	}
 
@@ -2194,7 +2194,7 @@ public:
 
 	void convert(bool& val) const
 	{
-		val = !(_val <= std::numeric_limits<double>::min() && 
+		val = !(_val <= std::numeric_limits<double>::min() &&
 			_val >= -1 * std::numeric_limits<double>::min());
 	}
 

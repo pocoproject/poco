@@ -103,7 +103,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 		time.LowPart = ftUser.dwLowDateTime;
 		time.HighPart = ftUser.dwHighDateTime;
 		userTime = long(time.QuadPart / 10000000L);
-	} 
+	}
 	else
 	{
 		userTime = kernelTime = -1;
@@ -141,12 +141,12 @@ static std::string escapeArg(const std::string& arg)
 			{
 				quotedArg.append(2 * backslashCount, '\\');
 				break;
-			} 
+			}
 			else if ('"' == *it)
 			{
 				quotedArg.append(2 * backslashCount + 1, '\\');
 				quotedArg.push_back('"');
-			} 
+			}
 			else
 			{
 				quotedArg.append(backslashCount, '\\');
@@ -285,7 +285,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	{
 		CloseHandle(processInfo.hThread);
 		return new ProcessHandleImpl(processInfo.hProcess, processInfo.dwProcessId);
-	} 
+	}
 	else throw SystemException("Cannot launch process", command);
 }
 
@@ -314,7 +314,7 @@ void ProcessImpl::killImpl(PIDImpl pid)
 			throw SystemException("cannot kill process");
 		}
 		CloseHandle(hProc);
-	} 
+	}
 	else
 	{
 		switch (GetLastError())

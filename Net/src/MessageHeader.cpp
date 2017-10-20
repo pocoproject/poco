@@ -319,7 +319,7 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 }
 
 
-void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to) 
+void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to)
 {
 	std::string tempout;
 	StringTokenizer tokens(ins, "?");
@@ -330,18 +330,18 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 
 	std::istringstream istr(text);
 
-	if (encoding == "B") 
+	if (encoding == "B")
 	{
 		// Base64 encoding.
 		Base64Decoder decoder(istr);
 		for (char c; decoder.get(c); tempout += c) {}
 	}
-	else if (encoding == "Q") 
+	else if (encoding == "Q")
 	{
 		// Quoted encoding.
-		for (char c; istr.get(c);) 
+		for (char c; istr.get(c);)
 		{
-			if (c == '_') 
+			if (c == '_')
 			{
 				//RFC 2047  _ is a space.
 				tempout += " ";
@@ -349,11 +349,11 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 			}
 
 			// FIXME: check that we have enought chars-
-			if (c == '=') 
+			if (c == '=')
 			{
 				// The next two chars are hex representation of the complete byte.
 				std::string hex;
-				for (int i = 0; i < 2; i++) 
+				for (int i = 0; i < 2; i++)
 				{
 					istr.get(c);
 					hex += c;
@@ -365,7 +365,7 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 			tempout += c;
 		}
 	}
-	else 
+	else
 	{
 		// Wrong encoding
 		outs = ins;
@@ -373,22 +373,22 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 	}
 
 	// convert to the right charset.
-	if (charset != charset_to) 
+	if (charset != charset_to)
 	{
-		try 
+		try
 		{
 			TextEncoding& enc = TextEncoding::byName(charset);
 			TextEncoding& dec = TextEncoding::byName(charset_to);
 			TextConverter converter(enc, dec);
 			converter.convert(tempout, outs);
 		}
-		catch (...) 
+		catch (...)
 		{
 			// FIXME: Unsuported encoding...
 			outs = tempout;
 		}
 	}
-	else 
+	else
 	{
 		// Not conversion necessary.
 		outs = tempout;

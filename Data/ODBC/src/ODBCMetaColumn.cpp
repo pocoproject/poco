@@ -43,14 +43,14 @@ void ODBCMetaColumn::getDescription()
 	_columnDesc.decimalDigits = 0;
 	_columnDesc.isNullable = 0;
 
-	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt, 
+	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt,
 		(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
-		_columnDesc.name, 
+		_columnDesc.name,
 		NAME_BUFFER_LENGTH,
-		&_columnDesc.nameBufferLength, 
+		&_columnDesc.nameBufferLength,
 		&_columnDesc.dataType,
-		&_columnDesc.size, 
-		&_columnDesc.decimalDigits, 
+		&_columnDesc.size,
+		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
 		throw StatementException(_rStmt);

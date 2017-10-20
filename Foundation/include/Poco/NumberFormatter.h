@@ -61,7 +61,7 @@ public:
 
 	static std::string formatHex(int value, bool prefix = false);
 		/// Formats an int value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
@@ -69,7 +69,7 @@ public:
 		/// Formats a int value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
@@ -88,14 +88,14 @@ public:
 
 	static std::string formatHex(unsigned value, bool prefix = false);
 		/// Formats an unsigned int value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
 	static std::string formatHex(unsigned value, int width, bool prefix = false);
 		/// Formats a int value in hexadecimal notation,
 		/// right justified and zero-padded in
 		/// a field having at least the specified width.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
 #ifndef POCO_LONG_IS_64_BIT
@@ -115,7 +115,7 @@ public:
 
 	static std::string formatHex(long value, bool prefix = false);
 		/// Formats an unsigned long value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
@@ -123,7 +123,7 @@ public:
 		/// Formats an unsigned long value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
@@ -142,14 +142,14 @@ public:
 
 	static std::string formatHex(unsigned long value, bool prefix = false);
 		/// Formats an unsigned long value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
 	static std::string formatHex(unsigned long value, int width, bool prefix = false);
 		/// Formats an unsigned long value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
 #endif // POCO_LONG_IS_64_BIT
@@ -168,7 +168,7 @@ public:
 
 	static std::string formatHex(Int64 value, bool prefix = false);
 		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 		/// The value is treated as unsigned.
 
@@ -193,7 +193,7 @@ public:
 
 	static std::string formatHex(UInt64 value, bool prefix = false);
 		/// Formats a 64-bit integer value in hexadecimal notation.
-		/// If prefix is true, "0x" prefix is prepended to the 
+		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
 	static std::string formatHex(UInt64 value, int width, bool prefix = false);

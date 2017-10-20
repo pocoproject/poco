@@ -59,7 +59,7 @@ std::string          ODBCMySQLTest::_connectString = "DRIVER={" MYSQL_ODBC_DRIVE
 	"PWD=" MYSQL_PWD ";";
 
 
-ODBCMySQLTest::ODBCMySQLTest(const std::string& name): 
+ODBCMySQLTest::ODBCMySQLTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 	_pExecutor->execute("SET @@global.sql_mode= '';"); // disable strict mode
@@ -128,7 +128,7 @@ void ODBCMySQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -180,10 +180,10 @@ void ODBCMySQLTest::testNull()
 
 void ODBCMySQLTest::testStoredProcedure()
 {
-	//MySQL is currently buggy in this area: 
+	//MySQL is currently buggy in this area:
 	// http://bugs.mysql.com/bug.php?id=17898
 	// http://bugs.mysql.com/bug.php?id=27632
-	// Additionally, the standard ODBC stored procedure call syntax 
+	// Additionally, the standard ODBC stored procedure call syntax
 	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
 	// See http://bugs.mysql.com/bug.php?id=26535
 	// Poco::Data support for MySQL ODBC is postponed until the above
@@ -193,10 +193,10 @@ void ODBCMySQLTest::testStoredProcedure()
 
 void ODBCMySQLTest::testStoredFunction()
 {
-	//MySQL is currently buggy in this area: 
+	//MySQL is currently buggy in this area:
 	// http://bugs.mysql.com/bug.php?id=17898
 	// http://bugs.mysql.com/bug.php?id=27632
-	// Additionally, the standard ODBC stored procedure call syntax 
+	// Additionally, the standard ODBC stored procedure call syntax
 	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
 	// See http://bugs.mysql.com/bug.php?id=26535
 	// Poco::Data support for MySQL ODBC is postponed until the above
@@ -388,19 +388,19 @@ void ODBCMySQLTest::recreateLogTable()
 	dropObject("TABLE", ExecUtil::pocolog());;
 	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(100),"
 			"Name VARCHAR(100),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(100), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(100),"
-			"DateTime DATETIME)"; 
+			"DateTime DATETIME)";
 
-		session() << sql, ExecUtil::pocolog(), now; 
+		session() << sql, ExecUtil::pocolog(), now;
 		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }

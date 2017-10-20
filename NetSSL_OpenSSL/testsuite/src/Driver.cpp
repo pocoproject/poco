@@ -62,9 +62,9 @@ protected:
 		configPath.pushDirectory("testsuite");
 		configPath.setFileName("TestSuite.xml");
 
-		loadConfiguration(configPath.toString()); 
+		loadConfiguration(configPath.toString());
 #else
-		loadConfiguration(); 
+		loadConfiguration();
 #endif
 		Poco::Util::Application::initialize(self);
 	}

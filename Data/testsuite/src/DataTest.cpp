@@ -120,13 +120,13 @@ void DataTest::testSession()
 
 	try
 	{
-		stmt.execute(); 
+		stmt.execute();
 		fail ("must fail");
 	} catch (NotConnectedException&) { }
 
 	try
 	{
-		sess << "SELECT * FROM Strings", now; 
+		sess << "SELECT * FROM Strings", now;
 		fail ("must fail");
 	} catch (NotConnectedException&) { }
 
@@ -134,14 +134,14 @@ void DataTest::testSession()
 	assert (sess.getFeature("connected"));
 	assert (sess.isConnected());
 	
-	sess << "SELECT * FROM Strings", now; 
+	sess << "SELECT * FROM Strings", now;
 	stmt.execute();
 
 	sess.reconnect();
 	assert (sess.getFeature("connected"));
 	assert (sess.isConnected());
 
-	sess << "SELECT * FROM Strings", now; 
+	sess << "SELECT * FROM Strings", now;
 	stmt.execute();
 }
 
@@ -150,7 +150,7 @@ void DataTest::testStatementFormatting()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
 
-	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'", 
+	Statement stmt = (sess << "SELECT %s%c%s,%d,%u,%f,%s FROM Person WHERE Name LIKE 'Simp%%'",
 		"'",'a',"'",-1, 1u, 1.5, "42", now);
 	
 	assert ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
@@ -1178,7 +1178,7 @@ void DataTest::testSimpleRowFormatter()
 	std::string line(std::string::size_type(sz * 5 + sp * 4), '-');
 	std::string spacer(static_cast<std::size_t>(sp), ' ');
 	std::ostringstream os;
-	os << std::left 
+	os << std::left
 		<< std::setw(sz) << "field0"
 		<< spacer
 		<< std::setw(sz) << "field1"
@@ -1187,12 +1187,12 @@ void DataTest::testSimpleRowFormatter()
 		<< spacer
 		<< std::setw(sz) << "field3"
 		<< spacer
-		<< std::setw(sz) << "field4" << std::endl 
+		<< std::setw(sz) << "field4" << std::endl
 		<< line << std::endl;
 	assert (row1.namesToString() == os.str());
 
 	os.str("");
-	os << std::right 
+	os << std::right
 		<< std::setw(sz) << "0"
 		<< spacer
 		<< std::setw(sz) << "1"
@@ -1307,7 +1307,7 @@ void DataTest::testDateAndTime()
 		assert (t1 < t); assert (t1 != t);
 	}
 
-	if (t.hour() < 23) 
+	if (t.hour() < 23)
 	{
 		t1.assign(t.hour() + 1, t.minute(), t.second());
 		assert (t1 > t); assert (t1 != t);

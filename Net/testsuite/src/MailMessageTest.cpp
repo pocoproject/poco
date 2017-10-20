@@ -122,7 +122,7 @@ void MailMessageTest::testWriteQP()
 	message.write(str);
 	std::string s = str.str();
 
-	assert (s == 
+	assert (s ==
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
 		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
@@ -158,7 +158,7 @@ void MailMessageTest::testWrite8Bit()
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
-	assert (s == 
+	assert (s ==
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
 		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
@@ -190,7 +190,7 @@ void MailMessageTest::testWriteBase64()
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
-	assert (s == 
+	assert (s ==
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
 		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
@@ -230,7 +230,7 @@ void MailMessageTest::testWriteManyRecipients()
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
-	assert (s == 
+	assert (s ==
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
 		"Content-Type: text/plain\r\n"
 		"Subject: Test Message\r\n"
@@ -340,7 +340,7 @@ void MailMessageTest::testReadQP()
 	
 	assert (message.getSender() == "poco@appinf.com");
 	assert (message.getContentType() == "text/plain");
-	assert (message.getContent() == 
+	assert (message.getContent() ==
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 		"To test the quoted-printable encoding, we'll put an extra long line here. This should be enough.\r\n"
@@ -415,7 +415,7 @@ void MailMessageTest::testRead8Bit()
 	
 	assert (message.getSender() == "poco@appinf.com");
 	assert (message.getContentType() == "text/plain");
-	assert (message.getContent() == 
+	assert (message.getContent() ==
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 	);

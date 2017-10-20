@@ -27,10 +27,10 @@ namespace Poco {
 
 template <class C>
 class AutoReleasePool
-	/// An AutoReleasePool implements simple garbage collection for 
+	/// An AutoReleasePool implements simple garbage collection for
 	/// reference-counted objects.
-	/// It temporarily takes ownership of reference-counted objects that 
-	/// nobody else wants to take ownership of and releases them 
+	/// It temporarily takes ownership of reference-counted objects that
+	/// nobody else wants to take ownership of and releases them
 	/// at a later, appropriate point in time.
 	///
 	/// Note: The correct way to add an object hold by an AutoPtr<> to

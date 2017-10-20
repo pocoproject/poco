@@ -87,8 +87,8 @@ void OpenSSLInitializer::initialize()
 // https://sourceforge.net/p/poco/bugs/110/
 //
 // From http://www.openssl.org/docs/crypto/threads.html :
-// "If the application does not register such a callback using CRYPTO_THREADID_set_callback(), 
-//  then a default implementation is used - on Windows and BeOS this uses the system's 
+// "If the application does not register such a callback using CRYPTO_THREADID_set_callback(),
+//  then a default implementation is used - on Windows and BeOS this uses the system's
 //  default thread identifying APIs"
 #ifndef OPENSSL_NO_DEPRECATED
 			CRYPTO_set_id_callback(&OpenSSLInitializer::id);

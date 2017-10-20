@@ -205,7 +205,7 @@ void PrintHandler::comma()
 void PrintHandler::arrayValue()
 {
 	if (!_objStart) comma();
-	if (array()) 
+	if (array())
 	{
 		_out << _tab;
 	}

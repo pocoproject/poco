@@ -27,7 +27,7 @@ WhitespaceFilter::WhitespaceFilter():
 }
 
 	
-WhitespaceFilter::WhitespaceFilter(XMLReader* pReader): 
+WhitespaceFilter::WhitespaceFilter(XMLReader* pReader):
 	XMLFilterImpl(pReader),
 	_pLexicalHandler(0),
 	_filter(true)

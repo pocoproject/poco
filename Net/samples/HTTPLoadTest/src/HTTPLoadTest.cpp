@@ -62,11 +62,11 @@ class HTTPClient : public Runnable
 {
 public:
 	HTTPClient(const URI& uri, int repetitions, bool cookies=false, bool verbose=false):
-	  _uri(uri), 
-	  _verbose(verbose), 
-	  _cookies(cookies), 
-	  _repetitions(repetitions), 
-	  _usec(0), 
+	  _uri(uri),
+	  _verbose(verbose),
+	  _cookies(cookies),
+	  _repetitions(repetitions),
+	  _usec(0),
 	  _success(0)
 	{
 		_gRepetitions += _repetitions;
@@ -116,8 +116,8 @@ public:
 				if (_verbose)
 				{
 					FastMutex::ScopedLock lock(_mutex);
-					std::cout 
-					<< _uri.toString() << ' ' << res.getStatus() << ' ' << res.getReason() 
+					std::cout
+					<< _uri.toString() << ' ' << res.getStatus() << ' ' << res.getReason()
 					<< ' ' << usec/1000.0 << "ms" << std::endl;
 				}
 
@@ -183,10 +183,10 @@ void HTTPClient::printStats(std::string uri, int repetitions, int success, Poco:
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	std::cout << std::endl << "--------------" << std::endl 
-		<< "Statistics for " << uri << std::endl << "--------------" 
+	std::cout << std::endl << "--------------" << std::endl
+		<< "Statistics for " << uri << std::endl << "--------------"
 		<< std::endl
-		<< repetitions << " attempts, " << success << " successful (" 
+		<< repetitions << " attempts, " << success << " successful ("
 		<<  ((float) success / (float) repetitions) * 100.0 << "%)" << std::endl
 		<< "Avg response time: " << ((float) usec / (float) repetitions) / 1000.0 << "ms, " << std::endl
 		<< "Avg requests/second handled: " << ((float) success  /((float) usec / 1000000.0)) << std::endl
@@ -201,11 +201,11 @@ class HTTPLoadTest: public Application
 	/// more information.
 {
 public:
-	HTTPLoadTest(): 
-		_helpRequested(false), 
-		_verbose(false), 
+	HTTPLoadTest():
+		_helpRequested(false),
+		_verbose(false),
 		_cookies(false),
-		_repetitions(1), 
+		_repetitions(1),
 		_threads(1)
 	{
 	}

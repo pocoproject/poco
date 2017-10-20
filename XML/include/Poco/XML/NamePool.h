@@ -43,7 +43,7 @@ public:
 	NamePool(unsigned long size = POCO_XML_NAMEPOOL_DEFAULT_SIZE);
 		/// Creates a name pool with room for up to size strings.
 		///
-		/// The given size should be a suitable prime number, 
+		/// The given size should be a suitable prime number,
 		/// e.g. 251, 509, 1021 or 4093.
 	
 	const Name& insert(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);	

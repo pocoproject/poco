@@ -59,7 +59,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _handle != 0; 
+	return _handle != 0;
 }
 
 

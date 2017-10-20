@@ -27,7 +27,7 @@ inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::wstring& target
 	/// Utility function for conversion from UTF-8 to UTF-16
 {
 	int len = length;
-	if (SQL_NTS == len) 
+	if (SQL_NTS == len)
 		len = (int) std::strlen((const char *) pSQLChar);
 
 	UnicodeConverter::toUTF16((const char *) pSQLChar, len, target);

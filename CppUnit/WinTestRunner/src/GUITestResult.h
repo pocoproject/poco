@@ -56,7 +56,7 @@ private:
 
 
 // Construct with lightweight synchronization
-inline GUITestResult::GUITestResult(TestRunnerDlg* runner): _runner(runner) 
+inline GUITestResult::GUITestResult(TestRunnerDlg* runner): _runner(runner)
 {
 	setSynchronizationObject(new LightweightSynchronizationObject());
 }
@@ -71,7 +71,7 @@ inline GUITestResult::~GUITestResult()
 // Override without protection to prevent deadlock
 inline void GUITestResult::stop()
 {
-	_stop = true; 
+	_stop = true;
 }
 
 

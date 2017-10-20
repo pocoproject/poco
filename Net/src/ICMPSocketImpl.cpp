@@ -96,9 +96,9 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 	catch (Exception&)
 	{
 		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize);
-		if (!err.empty()) 
+		if (!err.empty())
 			throw ICMPException(err);
-		else 
+		else
 			throw;
 	}
 

@@ -37,7 +37,7 @@ XMLConfigurationTest::~XMLConfigurationTest()
 
 void XMLConfigurationTest::testLoad()
 {
-	static const std::string xmlFile = 
+	static const std::string xmlFile =
 		"<config>"
 		"	<prop1>value1</prop1>"
 		"	<prop2>value2</prop2>"
@@ -226,7 +226,7 @@ void XMLConfigurationTest::testLoadAppendSave()
 
 void XMLConfigurationTest::testOtherDelimiter()
 {
-	static const std::string xmlFile = 
+	static const std::string xmlFile =
 		"<config>"
 		"	<prop1>value1</prop1>"
 		"	<prop2>value2</prop2>"

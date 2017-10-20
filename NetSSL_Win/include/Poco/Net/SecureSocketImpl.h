@@ -70,7 +70,7 @@ public:
 		/// The client socket's address is returned in clientAddr.
 	
 	void connect(const SocketAddress& address, bool performHandshake);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
@@ -78,11 +78,11 @@ public:
 		/// packets are restricted to the specified address.
 
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake);
-		/// Initializes the socket, sets the socket timeout and 
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
 
 	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 	
@@ -304,7 +304,7 @@ inline PCCERT_CONTEXT SecureSocketImpl::peerCertificate() const
 }
 
 
-inline int SecureSocketImpl::lastError() 
+inline int SecureSocketImpl::lastError()
 {
 	return SocketImpl::lastError();
 }

@@ -42,9 +42,9 @@ class Locator;
 class XML_API XMLWriter: public ContentHandler, public LexicalHandler, public DTDHandler
 	/// This class serializes SAX2 ContentHandler, LexicalHandler and
 	/// DTDHandler events back into a stream.
-	/// 
+	///
 	/// Various consistency checks are performed on the written data
-	/// (i.e. there must be exactly one root element and every startElement() 
+	/// (i.e. there must be exactly one root element and every startElement()
 	/// must have a matching endElement()).
 	///
 	/// The XMLWriter supports optional pretty-printing of the serialized XML.
@@ -52,7 +52,7 @@ class XML_API XMLWriter: public ContentHandler, public LexicalHandler, public DT
 	/// information set of the document being written, since in
 	/// XML all whitespace is potentially relevant to an application.
 	///
-	/// The writer contains extensive support for XML Namespaces, so that a client  
+	/// The writer contains extensive support for XML Namespaces, so that a client
 	/// application does not have to keep track of prefixes and supply xmlns attributes.
 	///
 	/// If the client does not provide namespace prefixes (either by specifying them
@@ -66,23 +66,23 @@ public:
 		CANONICAL               = 0x00,
 			/// Do not write an XML declaration (default).
 
-		CANONICAL_XML           = 0x01, 
-			/// Enables basic support for Canonical XML: 
+		CANONICAL_XML           = 0x01,
+			/// Enables basic support for Canonical XML:
 			///   - do not write an XML declaration
 			///   - do not use special empty element syntax
 			///   - set the New Line character to NEWLINE_LF
-			///   - write namespace declarations and attributes 
+			///   - write namespace declarations and attributes
 			///     in canonical order
 			///   - use default namespace as much as possible
 
-		WRITE_XML_DECLARATION   = 0x02, 
+		WRITE_XML_DECLARATION   = 0x02,
 			/// Write an XML declaration.
 
-		PRETTY_PRINT            = 0x04, 
+		PRETTY_PRINT            = 0x04,
 			/// Pretty-print XML markup.
 
 		PRETTY_PRINT_ATTRIBUTES = 0x08
-			/// Write each attribute on a separate line. 
+			/// Write each attribute on a separate line.
 			/// PRETTY_PRINT must be specified as well.
 	};
 
@@ -186,7 +186,7 @@ public:
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
 		///
-		/// The characters must be encoded in UTF-8 (if XMLChar is char) or 
+		/// The characters must be encoded in UTF-8 (if XMLChar is char) or
 		/// UTF-16 (if XMLChar is wchar_t).
 
 	void characters(const XMLString& str);
@@ -194,7 +194,7 @@ public:
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
 		///
-		/// The characters must be encoded in UTF-8 (if XMLChar is char) or 
+		/// The characters must be encoded in UTF-8 (if XMLChar is char) or
 		/// UTF-16 (if XMLChar is wchar_t).
 
 	void rawCharacters(const XMLString& str);
@@ -202,7 +202,7 @@ public:
 		/// The caller is responsible for escaping characters as
 		/// necessary to produce valid XML.
 		///
-		/// The characters must be encoded in UTF-8 (if XMLChar is char) or 
+		/// The characters must be encoded in UTF-8 (if XMLChar is char) or
 		/// UTF-16 (if XMLChar is wchar_t).
 
 	void ignorableWhitespace(const XMLChar ch[], int start, int length);
@@ -222,7 +222,7 @@ public:
 	void skippedEntity(const XMLString& name);
 		/// Does nothing.
 
-	void dataElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& data, 
+	void dataElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& data,
 	                         const XMLString& attr1 = XMLString(), const XMLString& value1 = XMLString(),
 							 const XMLString& attr2 = XMLString(), const XMLString& value2 = XMLString(),
 							 const XMLString& attr3 = XMLString(), const XMLString& value3 = XMLString());
@@ -273,7 +273,7 @@ public:
 	int depth() const;
 		/// Return the number of nested XML elements.
 		///
-		/// Will be -1 if no document or fragment has been started, 
+		/// Will be -1 if no document or fragment has been started,
 		/// 0 if the document or fragment has been started,
 		/// 1 if the document element has been written and
 		/// > 1 for every element nested within the document element.

@@ -23,7 +23,7 @@
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	#define I64_FMT "I64"
-#elif defined(__APPLE__) 
+#elif defined(__APPLE__)
 	#define I64_FMT "q"
 #else
 	#define I64_FMT "ll"

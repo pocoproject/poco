@@ -20,10 +20,10 @@ namespace MySQL {
 
 
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
-	Poco::Data::StatementImpl(h), 
-	_stmt(h.handle()), 
+	Poco::Data::StatementImpl(h),
+	_stmt(h.handle()),
 	_pBinder(new Binder),
-	_pExtractor(new Extractor(_stmt, _metadata)), 
+	_pExtractor(new Extractor(_stmt, _metadata)),
 	_hasNext(NEXT_DONTKNOW)
 {
 }

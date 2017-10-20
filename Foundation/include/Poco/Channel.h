@@ -43,7 +43,7 @@ public:
 		/// the reference count to one.
 
 	virtual void open();
-		/// Does whatever is necessary to open the channel. 
+		/// Does whatever is necessary to open the channel.
 		/// The default implementation does nothing.
 		
 	virtual void close();

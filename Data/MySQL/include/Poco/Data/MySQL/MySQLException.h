@@ -32,7 +32,7 @@ namespace Data {
 namespace MySQL {
 
 // End-user include this file and use in code ConnectionException/StatementException
-// So it need not know 
+// So it need not know
 
 class MySQL_API MySQLException: public Poco::Data::DataException
 	/// Base class for all MySQL exceptions

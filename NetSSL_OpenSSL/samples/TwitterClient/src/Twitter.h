@@ -23,7 +23,7 @@
 class Twitter
 	/// A simple implementation of a Twitter API client
 	/// (see <http://dev.twitter.com> for more information).
-	/// 
+	///
 	/// Currently, only the update message is supported.
 {
 public:

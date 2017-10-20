@@ -41,7 +41,7 @@ void PBKDF2EngineTest::testPBKDF2a()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 1, 20);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "0c60c80f961f0e71f3a9b524af6012062fe037a6"); 
+	assert (dk == "0c60c80f961f0e71f3a9b524af6012062fe037a6");
 }
 
 

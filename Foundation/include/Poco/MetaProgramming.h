@@ -38,7 +38,7 @@ struct IsReference
 template <typename T>
 struct IsReference<T&>
 {
-	enum 
+	enum
 	{
 		VALUE = 1
 	};
@@ -48,7 +48,7 @@ struct IsReference<T&>
 template <typename T>
 struct IsReference<const T&>
 {
-	enum 
+	enum
 	{
 		VALUE = 1
 	};
@@ -69,7 +69,7 @@ struct IsConst
 template <typename T>
 struct IsConst<const T&>
 {
-	enum 
+	enum
 	{
 		VALUE = 1
 	};
@@ -79,7 +79,7 @@ struct IsConst<const T&>
 template <typename T>
 struct IsConst<const T>
 {
-	enum 
+	enum
 	{
 		VALUE = 1
 	};

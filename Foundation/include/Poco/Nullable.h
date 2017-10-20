@@ -307,7 +307,7 @@ inline void swap(Nullable<C>& n1, Nullable<C>& n2)
 
 
 template <typename C>
-std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj) 
+std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj)
 {
 	if (!obj.isNull()) out << obj.value();
 	return out;

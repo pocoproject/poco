@@ -23,7 +23,7 @@
 
 
 // Note: to avoid static (de)initialization problems,
-// during connector automatic (un)registration, it is 
+// during connector automatic (un)registration, it is
 // best to have this as a macro.
 #define POCO_DATA_ODBC_CONNECTOR_NAME "odbc"
 
@@ -75,14 +75,14 @@ inline const std::string& Connector::name() const
 } } } // namespace Poco::Data::ODBC
 
 
-// 
+//
 // Automatic Connector registration
-// 
+//
 
 struct ODBC_API ODBCConnectorRegistrator
 	/// Connector registering class.
 	/// A global instance of this class is instantiated
-	/// with sole purpose to automatically register the 
+	/// with sole purpose to automatically register the
 	/// ODBC connector with central Poco Data registry.
 {
 	ODBCConnectorRegistrator()
@@ -128,9 +128,9 @@ struct ODBC_API ODBCConnectorRegistrator
 	POCO_DATA_ODBC_FORCE_SYMBOL(pocoODBCConnectorRegistrator)
 #endif // POCO_NO_AUTOMATIC_LIB_INIT
 
-// 
+//
 // End automatic Connector registration
-// 
+//
 
 
 #endif // Data_ODBC_Connector_INCLUDED

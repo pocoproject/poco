@@ -32,7 +32,7 @@ class ArchiveCompressor;
 
 
 class Foundation_API ArchiveStrategy
-	/// The ArchiveStrategy is used by FileChannel 
+	/// The ArchiveStrategy is used by FileChannel
 	/// to rename a rotated log file for archiving.
 	///
 	/// Archived files can be automatically compressed,

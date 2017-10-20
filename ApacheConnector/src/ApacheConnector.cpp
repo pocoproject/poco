@@ -175,7 +175,7 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 			return DECLINED;
 
 	    apr_status_t rv;
-		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
+		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK)))
 			return rv;
 
 		// The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
@@ -274,25 +274,25 @@ extern "C" const char* ApacheConnector_config(cmd_parms *cmd, void *in_dconf, co
 }
 
 
-extern "C" const command_rec ApacheConnector_cmds[] = 
+extern "C" const command_rec ApacheConnector_cmds[] =
 {
     AP_INIT_RAW_ARGS(
-		"AddPocoRequestHandler", 
-		reinterpret_cast<cmd_func>(ApacheConnector_uris), 
+		"AddPocoRequestHandler",
+		reinterpret_cast<cmd_func>(ApacheConnector_uris),
 		NULL,
-		RSRC_CONF, 
+		RSRC_CONF,
 		"POCO RequestHandlerFactory class name followed by shared library path followed by a list of ' ' separated URIs that must be handled by this module."),
     AP_INIT_RAW_ARGS(
-		"AddPocoConfig", 
-		reinterpret_cast<cmd_func>(ApacheConnector_config), 
+		"AddPocoConfig",
+		reinterpret_cast<cmd_func>(ApacheConnector_config),
 		NULL,
-		RSRC_CONF, 
+		RSRC_CONF,
 		"Path of the POCO configuration file."),
     { NULL }
 };
 
 
-module AP_MODULE_DECLARE_DATA poco_module = 
+module AP_MODULE_DECLARE_DATA poco_module =
 {
 	STANDARD20_MODULE_STUFF,
 	NULL,

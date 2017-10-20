@@ -49,7 +49,7 @@ namespace
 	class TestTask: public Task
 	{
 	public:
-		TestTask(): 
+		TestTask():
 			Task("TestTask"),
 			_fail(false)
 		{
@@ -181,7 +181,7 @@ namespace
 	class CustomNotificationTask: public Task
 	{
 	public:
-		CustomNotificationTask(const T& t): 
+		CustomNotificationTask(const T& t):
 			Task("CustomNotificationTask"),
 			_custom(t)
 		{

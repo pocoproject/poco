@@ -23,7 +23,7 @@
 
 
 // Note: to avoid static (de)initialization problems,
-// during connector automatic (un)registration, it is 
+// during connector automatic (un)registration, it is
 // best to have this as a macro.
 #define POCO_DATA_SQLITE_CONNECTOR_NAME "sqlite"
 
@@ -83,14 +83,14 @@ inline const std::string& Connector::name() const
 } } } // namespace Poco::Data::SQLite
 
 
-// 
+//
 // Automatic Connector registration
-// 
+//
 
 struct SQLite_API SQLiteConnectorRegistrator
 	/// Connector registering class.
 	/// A global instance of this class is instantiated
-	/// with sole purpose to automatically register the 
+	/// with sole purpose to automatically register the
 	/// SQLite connector with central Poco Data registry.
 {
 	SQLiteConnectorRegistrator()
@@ -136,8 +136,8 @@ struct SQLite_API SQLiteConnectorRegistrator
 	POCO_DATA_SQLITE_FORCE_SYMBOL(pocoSQLiteConnectorRegistrator)
 #endif // POCO_NO_AUTOMATIC_LIB_INIT
 
-// 
+//
 // End automatic Connector registration
-// 
+//
 
 #endif // Data_SQLite_Connector_INCLUDED

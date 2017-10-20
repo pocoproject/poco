@@ -133,9 +133,9 @@ public:
 		/// The certificate is available after the first request has been sent.
 		
 	Session::Ptr sslSession();
-		/// Returns the SSL Session object for the current 
+		/// Returns the SSL Session object for the current
 		/// connection, if session caching has been enabled for
-		/// the HTTPSClientSession's Context. A null pointer is 
+		/// the HTTPSClientSession's Context. A null pointer is
 		/// returned otherwise.
 		///
 		/// The Session object can be obtained after the first request has
