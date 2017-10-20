@@ -1079,6 +1079,7 @@
     <ClInclude Include="include\Poco\LogStream.h" />
     <ClInclude Include="include\Poco\LRUCache.h" />
     <ClInclude Include="include\Poco\LRUStrategy.h" />
+    <ClInclude Include="include\Poco\MakeUnique.h" />
     <ClInclude Include="include\Poco\Manifest.h" />
     <ClInclude Include="include\Poco\MD4Engine.h" />
     <ClInclude Include="include\Poco\MD5Engine.h" />
