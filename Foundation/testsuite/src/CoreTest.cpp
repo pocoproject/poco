@@ -79,9 +79,10 @@ namespace
 		{
 		}
 
-		NonDefaultConstructible operator=(int val)
+		NonDefaultConstructible& operator=(int val)
 		{
 			_val = val;
+			return *this;
 		}
 
 		bool operator == (const NonDefaultConstructible& other) const
