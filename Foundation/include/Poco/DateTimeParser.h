@@ -53,6 +53,8 @@ class Foundation_API DateTimeParser
 	/// If more strict format validation of date/time strings is required, a regular
 	/// expression could be used for initial validation, before passing the string
 	/// to DateTimeParser.
+	/// TODO: Correct description
+
 {
 public:
 	static void parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential);

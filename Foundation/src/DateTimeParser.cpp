@@ -44,8 +44,8 @@ namespace Poco {
 
 void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
 {
-	if (fmt.empty() || str.empty())
-		throw SyntaxException("Empty string.");
+	if (fmt.empty() || str.empty() || (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str)))
+		throw SyntaxException("Invalid DateTimeString:" + str);
 
 	int year   = 0;
 	int month  = 0;

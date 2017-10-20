@@ -64,7 +64,7 @@ namespace
 namespace Poco {
 
 
-RegularExpression::RegularExpression(const std::string& pattern, int options, bool /*study*/): _pcre(0)
+RegularExpression::RegularExpression(const std::string& pattern, int options, bool /*study*/): _pcre(nullptr)
 {
 	int errorCode;
 	PCRE2_SIZE errorOffset;
