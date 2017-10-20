@@ -113,7 +113,6 @@ public:
 		///   2005-01-01 12:00:00
 
 	static const std::string SORTABLE_REGEX;
-	// ^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)$
 
 	// names used by formatter and parser
 	static const std::string WEEKDAY_NAMES[7];
