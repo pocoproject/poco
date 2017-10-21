@@ -58,6 +58,23 @@ void ODBCMetaColumn::getDescription()
 }
 
 
+bool ODBCMetaColumn::isUnsigned() const
+{
+	SQLLEN val = 0;
+	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
+		(SQLUSMALLINT)position() + 1, // ODBC columns are 1-based
+		SQL_DESC_UNSIGNED,
+		0,
+		0,
+		0,
+		&val)))
+	{
+		throw StatementException(_rStmt);
+	}
+	return (val == SQL_TRUE);
+}
+
+
 void ODBCMetaColumn::init()
 {
 	getDescription();
@@ -94,23 +111,27 @@ void ODBCMetaColumn::init()
 	case SQL_WVARCHAR:
 	case SQL_WLONGVARCHAR:
 		setType(MetaColumn::FDT_WSTRING); break;
-	
+
 	case SQL_TINYINT:
-		setType(MetaColumn::FDT_INT8); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT8 : MetaColumn::FDT_INT8);
+		break;
+
 	case SQL_SMALLINT:
-		setType(MetaColumn::FDT_INT16); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT16 : MetaColumn::FDT_INT16);
+		break;
+
 	case SQL_INTEGER:
-		setType(MetaColumn::FDT_INT32); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT32 : MetaColumn::FDT_INT32);
+		break;
+
 	case SQL_BIGINT:
-		setType(MetaColumn::FDT_INT64); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT64 : MetaColumn::FDT_INT64);
+		break;
+
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
 		setType(MetaColumn::FDT_DOUBLE); break;
-	
+
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
 		if (0 == _columnDesc.decimalDigits)
