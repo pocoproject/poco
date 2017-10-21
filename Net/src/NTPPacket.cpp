@@ -67,7 +67,7 @@ NTPPacket::NTPPacket() :
 	_transmitTimestamp(0)
 {
 	Poco::Timestamp ts;
-	_originateTimestamp = ts.utcTime();
+	_originateTimestamp = ts.utcTime() - 2874597888;
 }
 
 
