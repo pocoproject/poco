@@ -150,7 +150,7 @@ matrix:
         - export CC="clang-5.0"
         - export CXX="clang++-5.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything  && make -s -j2 && ./travis/Linux/runtests.sh
+        - ./configure --config=Linux-clang --everything --omit=PDF  && make -s -j2 && ./travis/Linux/runtests.sh
 
     #- env:    TEST_NAME="clang 3.5.0 (make) unbundled"
     #  ======================================= compiler error on generating debug info for auto return
