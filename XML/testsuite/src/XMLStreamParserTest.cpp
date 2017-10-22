@@ -48,7 +48,7 @@ void XMLStreamParserTest::testParser()
 		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == "X");
 		p.next();
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -63,7 +63,7 @@ void XMLStreamParserTest::testParser()
 		is.setstate(std::ios_base::badbit);
 		p.next();
 		assert(false);
-	} 
+	}
 	catch (const std::ios_base::failure&)
 	{
 	}
@@ -83,7 +83,7 @@ void XMLStreamParserTest::testParser()
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -95,7 +95,7 @@ void XMLStreamParserTest::testParser()
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root1");
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -184,7 +184,7 @@ void XMLStreamParserTest::testParser()
 		assert(p.attribute("a") == "a");
 		p.nextExpect(XMLStreamParser::EV_END_ELEMENT);
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -197,7 +197,7 @@ void XMLStreamParserTest::testParser()
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
 		p.attribute<int>("a");
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -275,7 +275,7 @@ void XMLStreamParserTest::testParser()
 		p.content(Content::Empty);
 		p.next();
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -304,7 +304,7 @@ void XMLStreamParserTest::testParser()
 		assert(p.next() == XMLStreamParser::EV_CHARACTERS && p.value() == " ? ");
 		p.next();
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -337,7 +337,7 @@ void XMLStreamParserTest::testParser()
 		p.content(Content::Simple);
 		p.next();
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;
@@ -389,7 +389,7 @@ void XMLStreamParserTest::testParser()
 		assert(p.next() == XMLStreamParser::EV_END_ELEMENT);
 		p.next();
 		assert(false);
-	} 
+	}
 	catch (const Poco::Exception&)
 	{
 		// cerr << e.what () << endl;

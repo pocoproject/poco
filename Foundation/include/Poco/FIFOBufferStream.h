@@ -60,7 +60,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};

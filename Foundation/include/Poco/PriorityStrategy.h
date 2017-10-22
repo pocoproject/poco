@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class PriorityStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// NotificationStrategy for PriorityEvent.
 	///

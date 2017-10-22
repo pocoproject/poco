@@ -55,17 +55,18 @@ namespace {
 		{
 		}
 
-		NonDefaultConstructible operator=(int val)
+		NonDefaultConstructible& operator=(int val)
 		{
 			_val = val;
+			return *this;
 		}
 
-		bool operator==(const NonDefaultConstructible &other) const
+		bool operator==(const NonDefaultConstructible& other) const
 		{
 			return (_val == other._val);
 		}
 
-		bool operator<(const NonDefaultConstructible &other) const
+		bool operator<(const NonDefaultConstructible& other) const
 		{
 			return (_val < other._val);
 		}
@@ -268,7 +269,7 @@ void TuplesTest::testTuple6()
 {
 	Tuple<std::string, int, bool, float, char, long> aTuple;
 	assert (aTuple.length == 6);
-	Tuple<std::string, int, bool, float, char, long> 
+	Tuple<std::string, int, bool, float, char, long>
 		aTuple2("1", 1, true, 3.14f, 'c', 999);
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -282,7 +283,7 @@ void TuplesTest::testTuple7()
 {
 	Tuple<std::string, int, bool, float, char, long, double> aTuple;
 	assert (aTuple.length == 7);
-	Tuple<std::string, int, bool, float, char, long, double> 
+	Tuple<std::string, int, bool, float, char, long, double>
 		aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14);
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -296,7 +297,7 @@ void TuplesTest::testTuple8()
 {
 	Tuple<std::string, int, bool, float, char, long, double, short> aTuple;
 	assert (aTuple.length == 8);
-	Tuple<std::string, int, bool, float, char, long, double, short> 
+	Tuple<std::string, int, bool, float, char, long, double, short>
 		aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700);
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -309,7 +310,7 @@ void TuplesTest::testTuple9()
 {
 	Tuple<std::string, int, bool, float, char, long, double, short, std::string> aTuple;
 	assert (aTuple.length == 9);
-	Tuple<std::string, int, bool, float, char, long, double, short, std::string> 
+	Tuple<std::string, int, bool, float, char, long, double, short, std::string>
 		aTuple2("1", 1, true, 3.14f, 'c', 999, 33.14, 32700, "2");
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -336,7 +337,7 @@ void TuplesTest::testTuple10()
 
 void TuplesTest::testTuple11()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string> TupleType;
 
 	TupleType aTuple;
@@ -352,7 +353,7 @@ void TuplesTest::testTuple11()
 
 void TuplesTest::testTuple12()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int> TupleType;
 
 	TupleType aTuple;
@@ -368,7 +369,7 @@ void TuplesTest::testTuple12()
 
 void TuplesTest::testTuple13()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool> TupleType;
 
 	TupleType aTuple;
@@ -384,7 +385,7 @@ void TuplesTest::testTuple13()
 
 void TuplesTest::testTuple14()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float> TupleType;
 
 	TupleType aTuple;
@@ -400,7 +401,7 @@ void TuplesTest::testTuple14()
 
 void TuplesTest::testTuple15()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char> TupleType;
 
 	TupleType aTuple;
@@ -416,7 +417,7 @@ void TuplesTest::testTuple15()
 
 void TuplesTest::testTuple16()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long> TupleType;
 
 	TupleType aTuple;
@@ -432,7 +433,7 @@ void TuplesTest::testTuple16()
 
 void TuplesTest::testTuple17()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double> TupleType;
 
 	TupleType aTuple;
@@ -448,7 +449,7 @@ void TuplesTest::testTuple17()
 
 void TuplesTest::testTuple18()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short> TupleType;
 
 	TupleType aTuple;
@@ -464,7 +465,7 @@ void TuplesTest::testTuple18()
 
 void TuplesTest::testTuple19()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short, std::string> TupleType;
 
 	TupleType aTuple;
@@ -480,7 +481,7 @@ void TuplesTest::testTuple19()
 
 void TuplesTest::testTuple20()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short, std::string, int> TupleType;
 
 	TupleType aTuple;
@@ -497,7 +498,7 @@ void TuplesTest::testTuple20()
 
 void TuplesTest::testTupleOrder()
 {
-	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int, 
+	typedef Tuple<std::string, int, bool, float, char, long, double, short, std::string, int,
 		std::string, int, bool, float, char, long, double, short, std::string, int> TupleType;
 
 	TupleType aTuple;

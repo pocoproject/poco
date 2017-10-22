@@ -101,8 +101,8 @@ public:
 		/// passed to the command on the command line.
 
 	static ProcessHandle launch(
-		const std::string& command, 
-		const Args& args, 
+		const std::string& command,
+		const Args& args,
 		const std::string& initialDirectory);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
@@ -110,10 +110,10 @@ public:
 		/// The process starts executing in the specified initial directory.
 
 	static ProcessHandle launch(
-		const std::string& command, 
-		const Args& args, 
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		const std::string& command,
+		const Args& args,
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
@@ -142,11 +142,11 @@ public:
 		///     int rc = ph.wait();
 
 	static ProcessHandle launch(
-		const std::string& command, 
-		const Args& args, 
+		const std::string& command,
+		const Args& args,
 		const std::string& initialDirectory,
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
@@ -176,10 +176,10 @@ public:
 		///     int rc = ph.wait();
 		
 	static ProcessHandle launch(
-		const std::string& command, 
-		const Args& args, 
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		const std::string& command,
+		const Args& args,
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe,
 		const Env& env);
 		/// Creates a new process for the given command and returns
@@ -193,11 +193,11 @@ public:
 		/// The launched process is given the specified environment variables.
 
 	static ProcessHandle launch(
-		const std::string& command, 
-		const Args& args, 
+		const std::string& command,
+		const Args& args,
 		const std::string& initialDirectory,
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe,
 		const Env& env);
 		/// Creates a new process for the given command and returns
@@ -238,7 +238,7 @@ public:
 		/// process and thus work with arbitrary processes.
 		///
 		/// On other platforms, a global event flag
-		/// will be set. Setting the flag will cause 
+		/// will be set. Setting the flag will cause
 		/// Util::ServerApplication::waitForTerminationRequest() to
 		/// return. Therefore this will only work with applications
 		/// based on Util::ServerApplication.

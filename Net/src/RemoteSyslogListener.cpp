@@ -494,7 +494,7 @@ void RemoteSyslogListener::setProperty(const std::string& name, const std::strin
 		else
 			throw Poco::InvalidArgumentException("Invalid number of threads", value);
 	}
-	else 
+	else
 	{
 		SplitterChannel::setProperty(name, value);
 	}

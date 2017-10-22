@@ -40,7 +40,7 @@ class Crypto_API ECDSADigestEngine: public Poco::DigestEngine
 	/// signed. Then, the hash value is encrypted, using
 	/// the ECDSA private key.
 	///
-	/// To verify a signature, pass it to the verify() 
+	/// To verify a signature, pass it to the verify()
 	/// member function. It will decrypt the signature
 	/// using the ECDSA public key and compare the resulting
 	/// hash with the actual hash of the data.
@@ -66,9 +66,9 @@ public:
 		/// digest can be computed.
 		
 	const DigestEngine::Digest& digest();
-		/// Finishes the computation of the digest 
+		/// Finishes the computation of the digest
 		/// (the first time it's called) and
-		/// returns the message digest. 
+		/// returns the message digest.
 		///
 		/// Can be called multiple times.
 

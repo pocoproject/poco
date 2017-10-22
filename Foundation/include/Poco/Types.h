@@ -124,7 +124,7 @@ typedef std::uint64_t UInt64;
 		typedef UInt32 UIntPtr;
 	#endif
 
-#elif defined(__IBMCPP__) 
+#elif defined(__IBMCPP__)
 	//
 	// IBM XL C++
 	//
@@ -139,7 +139,7 @@ typedef std::uint64_t UInt64;
 		typedef UInt32 UIntPtr;
 	#endif
 
-#elif defined(__sgi) 
+#elif defined(__sgi)
 	//
 	// MIPSpro C++
 	//

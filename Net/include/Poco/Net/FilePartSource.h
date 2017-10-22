@@ -47,7 +47,7 @@ public:
 
 	FilePartSource(const std::string& path, const std::string& filename, const std::string& mediaType);
 		/// Creates the FilePartSource for the given
-		/// path and MIME type. The given filename is 
+		/// path and MIME type. The given filename is
 		/// used as part filename (see filename()) only.
 		///
 		/// Throws an OpenFileException if the file cannot be opened.

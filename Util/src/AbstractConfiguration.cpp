@@ -33,7 +33,7 @@ namespace Poco {
 namespace Util {
 
 
-AbstractConfiguration::AbstractConfiguration(): 
+AbstractConfiguration::AbstractConfiguration():
 	_depth(0),
 	_eventsEnabled(true)
 {
@@ -510,7 +510,7 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 		return false;
 	else if (icompare(value, "off") == 0)
 		return false;
-	else 
+	else
 		throw SyntaxException("Cannot convert to boolean", value);
 }
 

@@ -31,7 +31,7 @@ protected:
 	enum Flags
 	{
 		SHLIB_GLOBAL_IMPL = 1,
-		SHLIB_LOCAL_IMPL  = 2  
+		SHLIB_LOCAL_IMPL  = 2
 	};
 
 	SharedLibraryImpl();

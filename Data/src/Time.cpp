@@ -52,13 +52,13 @@ Time::~Time()
 
 void Time::assign(int timeHour, int timeMinute, int timeSecond)
 {
-	if (timeHour < 0 || timeHour > 23) 
+	if (timeHour < 0 || timeHour > 23)
 		throw InvalidArgumentException("Hour must be between 0 and 23.");
 
-	if (timeMinute < 0 || timeMinute > 59) 
+	if (timeMinute < 0 || timeMinute > 59)
 		throw InvalidArgumentException("Minute must be between 0 and 59.");
 
-	if (timeSecond < 0 || timeSecond > 59) 
+	if (timeSecond < 0 || timeSecond > 59)
 		throw InvalidArgumentException("Second must be between 0 and 59.");
 
 	_hour = timeHour;
@@ -77,7 +77,7 @@ bool Time::operator < (const Time& time) const
 	{
 		int timeMinute = time.minute();
 		if (_minute < timeMinute) return true;
-		else 
+		else
 		if (_minute > timeMinute) return false;
 		else // minutes equal
 		if (_second < time.second()) return true;
@@ -94,7 +94,7 @@ Time& Time::operator = (const Var& var)
 // TODO: determine the version able to handle it properly
 	*this = var.extract<Time>();
 #else
-	*this = var.operator Time(); 
+	*this = var.operator Time();
 #endif
 	return *this;
 }

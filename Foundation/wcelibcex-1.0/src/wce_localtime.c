@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -100,7 +100,7 @@ struct tm * wceex_localtime(const time_t *timer)
 
     long tzoffset;
     TIME_ZONE_INFORMATION tzi;
-    
+
     // Retrive timezone offset in seconds
     tzoffset = 0;
 	if (GetTimeZoneInformation(&tzi) != 0xFFFFFFFF)
@@ -111,7 +111,7 @@ struct tm * wceex_localtime(const time_t *timer)
 			tzoffset += (tzi.StandardBias * 60);
         }
 	}
-    
+
     tzoffset *= -1;
     tmp = __wceex_offtime(timer, tzoffset);
 
@@ -123,7 +123,7 @@ struct tm * wceex_localtime(const time_t *timer)
 *
 * Description:
 *   This function is similar to localtime, except that the broken-down
-*   time is expressed as Coordinated Universal Time (UTC) 
+*   time is expressed as Coordinated Universal Time (UTC)
 *   rather than relative to a local time zone.
 *
 *******************************************************************************/
@@ -171,7 +171,7 @@ struct tm * __wceex_offtime(const time_t *timer, long tzoffset)
         rem += SECS_PER_DAY;
         --days;
     }
-    
+
     while (rem >= SECS_PER_DAY)
     {
         rem -= SECS_PER_DAY;
@@ -183,12 +183,12 @@ struct tm * __wceex_offtime(const time_t *timer, long tzoffset)
     tmp->tm_min = (int) (rem / SECS_PER_MIN);
     tmp->tm_sec = (int) (rem % SECS_PER_MIN);
     tmp->tm_wday = (int) ((EPOCH_WDAY + days) % DAYS_PER_WEEK);
-    
+
     if (tmp->tm_wday < 0)
         tmp->tm_wday += DAYS_PER_WEEK;
-    
+
     y = EPOCH_YEAR;
-    
+
     if (days >= 0)
     {
         for ( ; ; )

@@ -101,7 +101,7 @@ void ListMapTest::testInsertOrder()
 	assert (it != lm.end() && it->first == "bar" && it->second == 43);
 	
 	++it;
-	assert (it == lm.end());	 
+	assert (it == lm.end());	
 }
 
 

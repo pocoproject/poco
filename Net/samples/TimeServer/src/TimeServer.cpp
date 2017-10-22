@@ -48,7 +48,7 @@ class TimeServerConnection: public TCPServerConnection
 	/// A string with the current date and time is sent back to the client.
 {
 public:
-	TimeServerConnection(const StreamSocket& s, const std::string& format): 
+	TimeServerConnection(const StreamSocket& s, const std::string& format):
 		TCPServerConnection(s),
 		_format(format)
 	{

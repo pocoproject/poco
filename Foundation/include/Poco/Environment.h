@@ -102,7 +102,7 @@ public:
 		///    - Bx mark beta releases.
 
 	static Poco::Int32 os();
-		/// Return the operating system as defined 
+		/// Return the operating system as defined
 		/// in the include Foundation/Platform.h (POCO_OS)
 
 	static Poco::Int32 cpu();

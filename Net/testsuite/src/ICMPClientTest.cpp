@@ -35,7 +35,7 @@ using Poco::AutoPtr;
 Poco::FastMutex ICMPClientTest::_mutex;
 
 
-ICMPClientTest::ICMPClientTest(const std::string& name): 
+ICMPClientTest::ICMPClientTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
 }
@@ -122,8 +122,8 @@ void ICMPClientTest::onBegin(const void* pSender, ICMPEventArgs& args)
 {
 	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
-	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " 
-		<< args.dataSize() << " bytes of data:" 
+	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with "
+		<< args.dataSize() << " bytes of data:"
 		<< std::endl << "-------------------------------------------------------" << std::endl;
 	std::cout << os.str() << std::endl;
 }
@@ -134,7 +134,7 @@ void ICMPClientTest::onReply(const void* pSender, ICMPEventArgs& args)
 	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << "Reply from " << args.hostAddress()
-		<< " bytes=" << args.dataSize() 
+		<< " bytes=" << args.dataSize()
 		<< " time=" << args.replyTime() << "ms"
 		<< " TTL=" << args.ttl();
 	std::cout << os.str() << std::endl;
@@ -159,8 +159,8 @@ void ICMPClientTest::onEnd(const void* pSender, ICMPEventArgs& args)
 		<< std::endl << "Packets: Sent=" << args.sent() << ", Received=" << received
 		<< " Lost=" << args.repetitions() - received << " (" << 100.0 - args.percent() << "% loss),"
 		<< std::endl << "Approximate round trip times in milliseconds: " << std::endl
-		<< "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()  
-		<< "ms, Average=" << args.avgRTT() << "ms" 
+		<< "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()
+		<< "ms, Average=" << args.avgRTT() << "ms"
 		<< std::endl << "-----------------------------------------------" << std::endl;
 	std::cout << os.str() << std::endl;
 }

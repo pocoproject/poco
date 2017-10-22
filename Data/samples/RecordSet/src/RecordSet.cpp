@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 	select << "SELECT * FROM Person";
 	select.execute();
 
-	// create a RecordSet 
+	// create a RecordSet
 	RecordSet rs(select);
 	std::size_t cols = rs.columnCount();
 	// print all column names

@@ -145,7 +145,7 @@ CppUnit::Test* SharedLibraryTest::suite()
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary1);
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary2);
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary3);
-#endif 
+#endif
 
 	return pSuite;
 }

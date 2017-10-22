@@ -76,13 +76,13 @@ public:
 		/// false if another thread currently holds a write lock.
 
 	void writeLock();
-		/// Acquires a write lock. If one or more other threads currently hold 
+		/// Acquires a write lock. If one or more other threads currently hold
 		/// locks, waits until all locks are released. The results are undefined
 		/// if the same thread already holds a read or write lock
 
 	bool tryWriteLock();
 		/// Tries to acquire a write lock. Immediately returns true if successful,
-		/// or false if one or more other threads currently hold 
+		/// or false if one or more other threads currently hold
 		/// locks. The result is undefined if the same thread already
 		/// holds a read or write lock.
 

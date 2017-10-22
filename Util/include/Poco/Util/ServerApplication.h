@@ -81,7 +81,7 @@ class Util_API ServerApplication: public Application
 	///
 	/// An application can determine whether it is running as a service by checking
 	/// for the "application.runAsService" configuration property.
-	/// 
+	///
 	///     if (config().getBool("application.runAsService", false))
 	///     {
 	///         // do service specific things
@@ -103,7 +103,7 @@ class Util_API ServerApplication: public Application
 	/// command line option. A daemon, when launched, immediately
 	/// forks off a background process that does the actual work. After launching
 	/// the background process, the foreground process exits.
-	/// 
+	///
 	/// After the initialization is complete, but before entering the main() method,
 	/// the current working directory for the daemon process is changed to the root
 	/// directory ("/"), as it is common practice for daemon processes. Therefore, be
@@ -119,8 +119,8 @@ class Util_API ServerApplication: public Application
 	///     }
 	///
 	/// When running as a daemon, specifying the --pidfile option (e.g.,
-	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of 
-	/// the daemon in a file. The PID file will be removed when the daemon process 
+	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of
+	/// the daemon in a file. The PID file will be removed when the daemon process
 	/// terminates (but not, if it crashes).
 {
 public:
@@ -154,7 +154,7 @@ public:
 
 	static void terminate();
 		/// Sends a friendly termination request to the application.
-		/// If the application's main thread is waiting in 
+		/// If the application's main thread is waiting in
 		/// waitForTerminationRequest(), this method will return
 		/// and the application can shut down.
 		
@@ -218,8 +218,8 @@ private:
 	std::string _startup;
 
 	static Poco::Event           _terminated;
-	static SERVICE_STATUS        _serviceStatus; 
-	static SERVICE_STATUS_HANDLE _serviceStatusHandle; 
+	static SERVICE_STATUS        _serviceStatus;
+	static SERVICE_STATUS_HANDLE _serviceStatusHandle;
 #endif // _WIN32_WCE
 	static Poco::NamedEvent      _terminate;
 #endif

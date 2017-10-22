@@ -214,7 +214,7 @@ void HTTPCookie::setSecure(bool secure)
 }
 
 
-void HTTPCookie::setMaxAge(int maxAge) 
+void HTTPCookie::setMaxAge(int maxAge)
 {
 	_maxAge = maxAge;
 }

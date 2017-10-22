@@ -30,8 +30,8 @@ class Foundation_API Base32DecoderBuf: public UnbufferedStreamBuf
 	/// This streambuf base32-decodes all data read
 	/// from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
@@ -82,8 +82,8 @@ class Foundation_API Base32Decoder: public Base32DecoderIOS, public std::istream
 	/// This istream base32-decodes all data
 	/// read from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.

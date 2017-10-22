@@ -284,7 +284,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		else if (addr.family() == IPAddress::IPv6)
 			newIPv6(addr.addr(), addr.scope());
 #endif
-		else 
+		else
 			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
 	}
 	return *this;

@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// Default notification strategy.
 	///

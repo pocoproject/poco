@@ -34,7 +34,7 @@ MetaColumn::MetaColumn(std::size_t columnPosition,
 	ColumnDataType columnType,
 	std::size_t columnLength,
 	std::size_t columnPrecision,
-	bool nullable): 
+	bool nullable):
 	_name(rName),
 	_length(columnLength),
 	_precision(columnPrecision),

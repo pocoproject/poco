@@ -75,7 +75,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	char** argv = new char*[args.size() + 2];
 	int i = 0;
 	argv[i++] = const_cast<char*>(command.c_str());
-	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 		argv[i++] = const_cast<char*>(it->c_str());
 	argv[i] = NULL;
 	try
@@ -101,7 +101,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			if (execvp(command.c_str(), argv) == -1)
 				throw SystemException("Cannot execute command", command);
 		}
-		else 
+		else
 		{
 			delete [] argv;
 			return new ProcessHandleImpl(pid);
@@ -138,13 +138,13 @@ void ProcessImpl::killImpl(PIDImpl pid)
 }
 
 
-bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
+bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid) 
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }

@@ -96,7 +96,7 @@ void FPETest::testFlags()
 #if !defined(POCO_NO_FPENVIRONMENT)	
 	assert (FPE::isFlag(FPE::FP_DIVIDE_BY_ZERO));
 #endif
-	assert (FPE::isInfinite(c)); 
+	assert (FPE::isInfinite(c));
 
 	FPE::clearFlags();
 	a = 1.23456789e210;

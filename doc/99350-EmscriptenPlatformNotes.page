@@ -41,7 +41,7 @@ There are 2 configuration files for emscripten:
 - emscripten: compile to asm.js (pure javascript)
 - emscripten-wasm: compile to WebAssembly
 
-The <*emscripten*> build configuration (located in <*$POCO_BASE/build/config/emscripten*>) 
+The <*emscripten*> build configuration (located in <*$POCO_BASE/build/config/emscripten*>)
 is used to cross-build for Emscripten from a Linux or Mac OS X host.
 
 To build the POCO C++ Libraries on a Linux or Mac OS X host:

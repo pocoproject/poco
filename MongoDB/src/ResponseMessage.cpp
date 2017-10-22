@@ -23,10 +23,10 @@ namespace MongoDB {
 
 
 ResponseMessage::ResponseMessage():
-	Message(MessageHeader::OP_REPLY), 
-	_responseFlags(0), 
-	_cursorID(0), 
-	_startingFrom(0), 
+	Message(MessageHeader::OP_REPLY),
+	_responseFlags(0),
+	_cursorID(0),
+	_startingFrom(0),
 	_numberReturned(0)
 {
 }

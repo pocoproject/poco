@@ -1205,7 +1205,7 @@ HPDF_Page_GetCurrentTextPos (HPDF_Page  page)
         if (attr->gmode & HPDF_GMODE_TEXT_OBJECT)
             pos = attr->text_pos;
     }
-    
+
     return pos;
 }
 

@@ -29,7 +29,7 @@ using Poco::Util::OptionCallback;
 class ProcessKillerApp: public Application
 {
 public:
-	ProcessKillerApp(): 
+	ProcessKillerApp():
 		_helpRequested(false),
 		_friendly(false)
 	{

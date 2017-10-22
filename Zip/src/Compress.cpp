@@ -154,22 +154,22 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	hdr.setStartPos(localHeaderOffset); // This resets EndPos now that compressed Size is known
 	_offset = hdr.getEndPos();
 	//write optional block afterwards
-	if (hdr.searchCRCAndSizesAfterData()) 
+	if (hdr.searchCRCAndSizesAfterData())
 	{
-		if (hdr.needsZip64()) 
+		if (hdr.needsZip64())
 		{
 			ZipDataInfo64 info(in, false);
 			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
 			_offset += ZipDataInfo::getFullHeaderSize();
-		} 
-		else 
+		}
+		else
 		{
 			ZipDataInfo info(in, false);
 			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
 			_offset += ZipDataInfo::getFullHeaderSize();
 		}
-	} 
-	else 
+	}
+	else
 	{
 		if (hdr.hasExtraField())	 // Update sizes in header extension.
 			hdr.setZip64Data();
@@ -337,7 +337,7 @@ ZipArchive Compress::close()
 	
 	Poco::UInt64 numEntries64 = _infos.size();
 	needZip64 = needZip64  || _offset >= ZipCommon::ZIP64_MAGIC;
-	if (needZip64) 
+	if (needZip64)
 	{
 		ZipArchiveInfo64 central;
 		central.setCentralDirectorySize(centralDirSize64);

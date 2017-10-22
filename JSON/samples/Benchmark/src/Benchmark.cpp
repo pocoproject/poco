@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 		else
 		{
 			std::cout << filePath.toString() << " doesn't exist!" << std::endl;
-			return 1; 
+			return 1;
 		}
 	}
 

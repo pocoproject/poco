@@ -31,7 +31,7 @@ class NDCScope;
 
 class Foundation_API NestedDiagnosticContext
 	/// This class implements a Nested Diagnostic Context (NDC),
-	/// as described in Neil Harrison's article "Patterns for Logging 
+	/// as described in Neil Harrison's article "Patterns for Logging
 	/// Diagnostic Messages" in "Pattern Languages of Program Design 3"
 	/// (Addison-Wesley).
 	///
@@ -69,7 +69,7 @@ public:
 		/// Pushes a context (without line number and filename) onto the stack.
 		
 	void push(const std::string& info, int line, const char* filename);
-		/// Pushes a context (including line number and filename) 
+		/// Pushes a context (including line number and filename)
 		/// onto the stack. Filename must be a static string, such as the
 		/// one produced by the __FILE__ preprocessor macro.
 

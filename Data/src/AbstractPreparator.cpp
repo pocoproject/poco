@@ -19,7 +19,7 @@ namespace Poco {
 namespace Data {
 
 
-AbstractPreparator::AbstractPreparator(Poco::UInt32 length): 
+AbstractPreparator::AbstractPreparator(Poco::UInt32 length):
 	_length(length),
 	_bulk(false)
 {

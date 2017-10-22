@@ -81,7 +81,7 @@ void NetSSL_API initializeSSL();
 	/// libraries, by calling Poco::Crypto::OpenSSLInitializer::initialize().
 	///
 	/// Should be called before using any class from the NetSSL library.
-	/// The NetSSL will be initialized automatically, through 
+	/// The NetSSL will be initialized automatically, through
 	/// Poco::Crypto::OpenSSLInitializer instances or similar mechanisms
 	/// when creating Context or SSLManager instances.
 	/// However, it is recommended to call initializeSSL()
@@ -93,7 +93,7 @@ void NetSSL_API initializeSSL();
 	
 
 void NetSSL_API uninitializeSSL();
-	/// Uninitializes the NetSSL library by calling 
+	/// Uninitializes the NetSSL library by calling
 	/// Poco::Crypto::OpenSSLInitializer::uninitialize() and
 	/// shutting down the SSLManager.
 

@@ -25,7 +25,7 @@ SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 # em++ strips by default, there is no default strip command
 STRIP   = /bin/true
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp

@@ -25,8 +25,8 @@ namespace Data {
 namespace ODBC {
 
 
-Preparator::Preparator(const StatementHandle& rStmt, 
-	const std::string& statement, 
+Preparator::Preparator(const StatementHandle& rStmt,
+	const std::string& statement,
 	std::size_t maxFieldSize,
 	DataExtraction dataExtraction,
 	bool isPostgres) :
@@ -50,7 +50,7 @@ Preparator::Preparator(const StatementHandle& rStmt,
 }
 
 
-Preparator::Preparator(const Preparator& other): 
+Preparator::Preparator(const Preparator& other):
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
 	_dataExtraction(other._dataExtraction)
@@ -162,7 +162,7 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 	std::size_t sz = 0;
 	std::size_t maxsz = getMaxFieldSize();
 
-	try 
+	try
 	{
 		ODBCMetaColumn mc(_rStmt, pos);
 		sz = mc.length();
@@ -205,11 +205,11 @@ void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::s
 	_lenLengths[pos].resize(length);
 	_varLengthArrays.insert(IndexMap::value_type(pos, DT_BOOL_ARRAY));
 
-	if (Utility::isError(SQLBindCol(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		valueType, 
-		(SQLPOINTER) pArray, 
-		(SQLINTEGER) sizeof(bool), 
+	if (Utility::isError(SQLBindCol(_rStmt,
+		(SQLUSMALLINT) pos + 1,
+		valueType,
+		(SQLPOINTER) pArray,
+		(SQLINTEGER) sizeof(bool),
 		&_lenLengths[pos][0])))
 	{
 		throw StatementException(_rStmt, "SQLBindCol()");

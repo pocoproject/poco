@@ -30,8 +30,8 @@ const std::string ArchiveStrategy::DEFAULT_ARCHIVE_DESTINATION = "T_POCO_LOG_ARC
 
 
 ArchiveStrategy::ArchiveStrategy(const std::string& connector,
-	const std::string& connect, 
-	const std::string& source, 
+	const std::string& connect,
+	const std::string& source,
 	const std::string& destination):
 	_connector(connector),
 	_connect(connect),
@@ -61,9 +61,9 @@ void ArchiveStrategy::open()
 //
 
 
-ArchiveByAgeStrategy::ArchiveByAgeStrategy(const std::string& connector, 
-	const std::string& connect, 
-	const std::string& sourceTable, 
+ArchiveByAgeStrategy::ArchiveByAgeStrategy(const std::string& connector,
+	const std::string& connect,
+	const std::string& sourceTable,
 	const std::string& destinationTable):
 	ArchiveStrategy(connector, connect, sourceTable, destinationTable)
 {

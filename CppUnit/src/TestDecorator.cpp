@@ -29,7 +29,7 @@ int TestDecorator::countTestCases()
 void TestDecorator::run(TestResult* result)
 {
 	_test->run(result);
-} 
+}
 
 
 std::string TestDecorator::toString()

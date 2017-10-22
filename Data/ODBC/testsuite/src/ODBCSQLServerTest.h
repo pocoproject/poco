@@ -25,7 +25,7 @@
 class ODBCSQLServerTest: public ODBCTest
 	/// SQLServer ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver				|	DB								| OS
 	/// --------------------+-----------------------------------+------------------------------------------
 	/// 2000.86.1830.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1

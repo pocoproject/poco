@@ -85,12 +85,12 @@ public:
 		/// available for this TCPServerDispatcher.	
 		
 	void setThreadPriority(Poco::Thread::Priority prio);
-		/// Sets the priority of TCP server threads 
+		/// Sets the priority of TCP server threads
 		/// created by TCPServer.
 		
 	Poco::Thread::Priority getThreadPriority() const;
 		/// Returns the priority of TCP server threads
-		/// created by TCPServer. 
+		/// created by TCPServer.
 
 protected:
 	virtual ~TCPServerParams();

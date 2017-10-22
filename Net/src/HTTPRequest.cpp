@@ -110,7 +110,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	else
 	{
 		value.append(host);
-	}    
+	}
 
 	if (port != 80 && port != 443)
 	{

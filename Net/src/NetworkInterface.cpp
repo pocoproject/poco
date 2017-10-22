@@ -795,9 +795,9 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	if (requireIPv6) 
+	if (requireIPv6)
 		return forName(name, IPv6_ONLY);
-	else 
+	else
 		return forName(name, IPv4_OR_IPv6);
 }
 
@@ -1063,7 +1063,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
-	} 
+	}
 	while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
 
 	poco_assert (NO_ERROR == dwRetVal);
@@ -1236,7 +1236,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					{
 						ifIt->second.addAddress(address);
 					}
-				} 
+				}
 				break;
 #if defined(POCO_HAVE_IPv6)
 				case AF_INET6:
