@@ -69,16 +69,18 @@ matrix:
         - export CC="gcc-4.9"
         - export CXX="g++-4.9"
         - $CXX --version
-        - ./configure --everything --omit=PDF && make -s -j2 && ./travis/Linux/runtests.sh
-    
+        - ./configure --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - make -s -j2 && ./travis/Linux/runtests.sh
+
     - env:    TEST_NAME="gcc 5.4 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
-        - ./configure --everything --omit=PDF && make -s -j2 && ./travis/Linux/runtests.sh
-    
+        - ./configure --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - make -s -j2 && ./travis/Linux/runtests.sh
+
     #- env:    TEST_NAME="gcc 5.4 (make) unbundled"
     #  ======================================= unit tests fail ures due to unbundled pcre
     # There was 1 error:
@@ -130,7 +132,8 @@ matrix:
         - export CXX="clang++"
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL && make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
+        - ./configure --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL && source config.make && cat build/config/$POCO_CONFIG 
+        - make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="clang 4.0 (make) bundled"
       compiler: clang
@@ -140,8 +143,9 @@ matrix:
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything --omit=PDF  && make -s -j2 && ./travis/Linux/runtests.sh
-    
+        - ./configure --config=Linux-clang --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - make -s -j2 && ./travis/Linux/runtests.sh
+
     - env:    TEST_NAME="clang 5.0 (make) bundled"
       compiler: clang
       script:
@@ -150,7 +154,8 @@ matrix:
         - export CC="clang-5.0"
         - export CXX="clang++-5.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything --omit=PDF  && make -s -j2 && ./travis/Linux/runtests.sh
+        - ./configure --config=Linux-clang --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - make -s -j2 && ./travis/Linux/runtests.sh
 
     #- env:    TEST_NAME="clang 3.5.0 (make) unbundled"
     #  ======================================= compiler error on generating debug info for auto return
