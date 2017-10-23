@@ -58,7 +58,7 @@
 			#pragma comment(lib, "libcrypto.lib")
 			#pragma comment(lib, "libssl.lib")
 		#endif // POCO_EXTERNAL_OPENSSL
-		#if !defined(Crypto_EXPORTS)
+		#if !defined(NetSSL_EXPORTS)
 			#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
 		#endif
 	#endif // POCO_NO_AUTOMATIC_LIBS
