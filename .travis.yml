@@ -69,7 +69,7 @@ matrix:
         - export CC="gcc-4.9"
         - export CXX="g++-4.9"
         - $CXX --version
-        - ./configure --everything && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    TEST_NAME="gcc 5.4 (make) bundled"
@@ -78,7 +78,7 @@ matrix:
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
-        - ./configure --everything && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     #- env:    TEST_NAME="gcc 5.4 (make) unbundled"
@@ -110,8 +110,8 @@ matrix:
     #    - export CC="gcc-5"
     #    - export CXX="g++-5"
     #    - $CXX --version
-    #    - ./configure --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-
+    #    - ./configure --everything --omit=PDF --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    
     - env:    TEST_NAME="gcc 4.9 (CMake)"
       compiler: gcc
       script:
@@ -121,8 +121,8 @@ matrix:
         - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
-
+        - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
+ 
 
     - env:    TEST_NAME="clang (make) bundled"
       os: osx
@@ -132,7 +132,7 @@ matrix:
         - export CXX="clang++"
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL && source config.make && cat build/config/$POCO_CONFIG 
         - make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
     - env:    TEST_NAME="clang 4.0 (make) bundled"
@@ -143,7 +143,7 @@ matrix:
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --config=Linux-clang --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    TEST_NAME="clang 5.0 (make) bundled"
@@ -154,7 +154,7 @@ matrix:
         - export CC="clang-5.0"
         - export CXX="clang++-5.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --config=Linux-clang --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     #- env:    TEST_NAME="clang 3.5.0 (make) unbundled"
@@ -168,22 +168,22 @@ matrix:
     #    - export CC="clang"
     #    - export CXX="clang++"
     #    - $CXX --version
-    #    - ./configure --config=Linux-clang --everything --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-
+    #    - ./configure --config=Linux-clang --everything --omit=PDF --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
+    
     #- env:    TEST_NAME="arm-linux-gnueabi-g++ (make)"
     #  compiler: gcc
     #  script:
     #    - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf
     #    - arm-linux-gnueabi-g++ --version
     #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
-    #    - ./configure --omit=Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+    #    - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     #- env:    TEST_NAME="clang (CMake)"
     #  compiler: clang
     #  script:
     #    - source ./travis/ignored.sh
     #    - export POCO_BASE=`pwd`
-    #    - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
+    #    - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
     #- env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
     #  ======================================= "arm-linux-gnueabi-g++: version 4.7.0: non compliant to c++11
@@ -195,8 +195,8 @@ matrix:
     #    - $CXX --version
     #    - source ./travis/ignored.sh
     #    - export POCO_BASE=`pwd`
-    #    - mkdir cmake-build
-    #    - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
+    #    - mkdir cmake-build 
+    #    - cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       compiler: gcc
@@ -208,7 +208,7 @@ matrix:
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
         - mkdir cmake-build
-        - cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
+        - cd cmake-build && cmake -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
 
     # QA jobs for code analytics and metrics
