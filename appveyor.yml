@@ -68,11 +68,7 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
 
   matrix:
-    - builder: cmake
-      vsver: 140
-
-    - builder: cmake
-      vsver: 150
+    - builder: cygwin
 
     - builder: msbuild
       vsver: 140
@@ -102,7 +98,12 @@ environment:
 #      vsver: 150
 #      linkmode: static_mt
 
-    - builder: cygwin
+    - builder: cmake
+      vsver: 140
+
+    - builder: cmake
+      vsver: 150
+
 
 matrix:
   fast_finish: true
@@ -401,7 +402,7 @@ build_script:
       if ($env:builder -eq "cygwin")
       {
           $LastExitCode=0;
-          $cmd='bash.exe configure --everything';iex "& $cmd"
+          $cmd='bash.exe configure --everything --omit=PDF';iex "& $cmd"
           if ($LastExitCode -ne 0) {
             throw "$cmd failed with exit code $LastExitCode."
           }
@@ -448,6 +449,7 @@ build_script:
         {
             $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
         }
+        $defs+=" -DENABLE_PDF=OFF";
         $defs+=" -DENABLE_NETSSL=ON";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
         $defs+=" -DENABLE_DATA_MYSQL=OFF";

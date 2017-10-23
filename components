@@ -16,7 +16,6 @@ Data/PostgreSQL
 Zip
 PageCompiler
 PageCompiler/File2Page
-PDF
 CppParser
 MongoDB
 Redis
