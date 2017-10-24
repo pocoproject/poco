@@ -24,6 +24,7 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_
 set(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
 set(PROJECT_VERSION ${COMPLETE_VERSION})
+set(CMAKE_C_STANDARD 99)
 
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
@@ -42,6 +43,33 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
+
+option(DISABLE_CPP11 "Disable C++11 if available" OFF)
+option(DISABLE_CPP14 "Disable C++14 if available" OFF)
+
+if (DISABLE_CPP11 OR DISABLE_CPP14)
+    add_definitions(-DPOCO_DISABLE_CPP11)
+
+    if (DISABLE_CPP14)
+        add_definitions(-DPOCO_DISABLE_CPP14)
+    endif()
+else()
+    # C++11/14 compiler flags
+    include(CXX1x)
+    check_for_cxx11_compiler(CXX11_COMPILER)
+
+    # If a C++11 compiler is available, then set the appropriate flags
+    if(CXX11_COMPILER)
+        enable_cxx11()
+        check_for_cxx14_compiler(CXX14_COMPILER)
+
+        # If a C++14 compiler is available, then set the appropriate flags
+        if(CXX14_COMPILER)
+            enable_cxx14()
+        endif()
+    endif()
+endif()
+
 
 if(NOT MSVC_IDE)
   if(NOT CMAKE_BUILD_TYPE)
