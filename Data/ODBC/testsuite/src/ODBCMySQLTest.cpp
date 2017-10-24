@@ -38,7 +38,7 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.2 Driver"
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.3 Unicode Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
@@ -52,6 +52,7 @@ std::string          ODBCMySQLTest::_driver = MYSQL_ODBC_DRIVER;
 std::string          ODBCMySQLTest::_dsn = MYSQL_DSN;
 std::string          ODBCMySQLTest::_uid = MYSQL_UID;
 std::string          ODBCMySQLTest::_pwd = MYSQL_PWD;
+std::string          ODBCMySQLTest::_db = MYSQL_DB;
 std::string          ODBCMySQLTest::_connectString = "DRIVER={" MYSQL_ODBC_DRIVER "};"
 	"DATABASE=" MYSQL_DB ";"
 	"SERVER=" MYSQL_SERVER ";"
@@ -162,7 +163,7 @@ void ODBCMySQLTest::testNull()
 		recreateNullsTable("NOT NULL");
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HYT00");
+		_pExecutor->notNulls("HY000");
 		i += 2;
 	}
 
@@ -320,10 +321,19 @@ void ODBCMySQLTest::recreateStringsTable()
 
 void ODBCMySQLTest::recreateFloatsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::floats());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::floats() << " (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+}
+
+
+void ODBCMySQLTest::recreateDoublesTable()
+{
+	dropObject("TABLE", ExecUtil::doubles());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::doubles() << " (str DOUBLE)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreateFloatsTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreateFloatsTable()"); }
 }
 
 
@@ -410,7 +420,7 @@ void ODBCMySQLTest::recreateLogTable()
 
 CppUnit::Test* ODBCMySQLTest::suite()
 {
-	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
+	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
 

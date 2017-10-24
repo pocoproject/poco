@@ -910,7 +910,7 @@ void ODBCTest::testDouble()
 
 	for (int i = 0; i < 8;)
 	{
-		recreateFloatsTable();
+		recreateDoublesTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->doubles();

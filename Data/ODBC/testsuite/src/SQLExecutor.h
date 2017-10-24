@@ -82,6 +82,16 @@ struct ExecUtil
 		return mangleTable("Person");
 	}
 
+	static std::string floats()
+	{
+		return mangleTable("Floats");
+	}
+
+	static std::string doubles()
+	{
+		return mangleTable("Doubles");
+	}
+
 	static std::string strings()
 	{
 		return mangleTable("Strings");

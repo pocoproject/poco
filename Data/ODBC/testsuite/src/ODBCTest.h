@@ -169,6 +169,7 @@ protected:
 	virtual void recreateStringsTable();
 	virtual void recreateIntsTable();
 	virtual void recreateFloatsTable();
+	virtual void recreateDoublesTable();
 	virtual void recreateTuplesTable();
 	virtual void recreateVectorsTable();
 	virtual void recreateAnysTable();
@@ -323,6 +324,12 @@ inline void ODBCTest::recreateIntsTable()
 
 
 inline void ODBCTest::recreateFloatsTable()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateFloatsTable()");
+}
+
+
+inline void ODBCTest::recreateDoublesTable()
 {
 	throw Poco::NotImplementedException("ODBCTest::recreateFloatsTable()");
 }

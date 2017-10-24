@@ -58,19 +58,21 @@ private:
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
+	void recreateDoublesTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateAnysTable();
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
 	void recreateLogTable();
-
+	void testInternalBulkExtraction() { std::cout << " disabled" << std::endl; }
 	static ODBCTest::SessionPtr  _pSession;
 	static ODBCTest::ExecPtr     _pExecutor;
 	static std::string _driver;
 	static std::string _dsn;
 	static std::string _uid;
 	static std::string _pwd;
+	static std::string _db;
 	static std::string _connectString;
 };
 

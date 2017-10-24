@@ -113,7 +113,7 @@ std::string idGen()
 	{
 		Poco::Checksum crc;
 		crc.update(host);
-		host = Poco::format("%s%X", host.substr(0, 4), crc.checksum());
+		host = Poco::format("%s%LX", host.substr(0, 4), crc.checksum());
 	}
 	std::replace(host.begin(), host.end(), '.', '_');
 	std::replace(host.begin(), host.end(), '-', '_');
@@ -447,7 +447,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			sixth.day = 18;
 			sixth.hour = 5;
 			sixth.minute = 34;
-			sixth.second = 59;
+			sixth.second = 58;
 			// Fraction support is limited to milliseconds due to MS SQL Server limitation
 			// see http://support.microsoft.com/kb/263872
 			sixth.fraction = 997000000;
@@ -738,9 +738,15 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			{
 				assert (5 == sixth.hour);
 				assert (34 == sixth.minute);
-				assert (59 == sixth.second);
-				if (sixth.fraction)//MySQL does not support fraction
-					assert (997000000 == sixth.fraction);
+				if (sixth.fraction) // MySQL rounds fraction
+				{
+					assert(58 == sixth.second);
+					assert(997000000 == sixth.fraction);
+				}
+				else
+				{
+					assert(59 == sixth.second);
+				}
 			}
 
 			rc = SQLCloseCursor(hstmt);
@@ -1540,17 +1546,17 @@ void SQLExecutor::floats()
 	float data = 1.5f;
 	float ret = 0.0f;
 
-	try { session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data), now; }
+	try { session() << "INSERT INTO " << ExecUtil::floats() << " VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	int count = 0;
-	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::floats(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 1);
 
-	try { session() << "SELECT str FROM " << ExecUtil::strings(), into(ret), now; }
+	try { session() << "SELECT str FROM " << ExecUtil::floats(), into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (ret == data);
@@ -1559,21 +1565,21 @@ void SQLExecutor::floats()
 
 void SQLExecutor::doubles()
 {
-	std::string funct = "floats()";
+	std::string funct = "doubles()";
 	double data = 1.5;
 	double ret = 0.0;
 
-	try { session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(data), now; }
+	try { session() << "INSERT INTO " << ExecUtil::doubles() << " VALUES (?)", use(data), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	int count = 0;
-	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::doubles(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == 1);
 
-	try { session() << "SELECT str FROM " << ExecUtil::strings(), into(ret), now; }
+	try { session() << "SELECT str FROM " << ExecUtil::doubles(), into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (ret == data);
