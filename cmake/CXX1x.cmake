@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Determines whether or not the compiler supports C++11
+# Determines whether the compiler supports C++11
 macro(check_for_cxx11_compiler _VAR)
     message(STATUS "Checking for C++11 compiler")
     set(${_VAR})
@@ -37,9 +37,10 @@ endmacro()
 macro(enable_cxx11)
     set (CMAKE_CXX_STANDARD 11)
     set (CMAKE_CXX_STANDARD_REQUIRED ON)
+    add_definitions(-DPOCO_ENABLE_CPP11)
 endmacro()
 
-# Determines whether or not the compiler supports C++11
+# Determines whether the compiler supports C++14
 macro(check_for_cxx14_compiler _VAR)
     message(STATUS "Checking for C++14 compiler")
     set(${_VAR})
@@ -58,4 +59,5 @@ endmacro()
 macro(enable_cxx14)
     set (CMAKE_CXX_STANDARD 14)
     set (CMAKE_CXX_STANDARD_REQUIRED ON)
+    add_definitions(-DPOCO_ENABLE_CPP14)
 endmacro()
