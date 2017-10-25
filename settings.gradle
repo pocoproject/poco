@@ -1,0 +1,71 @@
+def os = org.gradle.internal.os.OperatingSystem.current()
+rootProject.name = 'Poco'
+
+include ':CppUnit'
+include ':Foundation'
+include ':XML'
+include ':JSON'
+include ':Util'
+include ':Net'
+include ':Crypto'
+include ':NetSSL_OpenSSL'
+if (os.windows) {
+	include ':NetSSL_Win'
+}
+include ':Data'
+if (os.windows) {
+	include ':Data:ODBC'
+	include ':Data:SQLite'
+	include ':Data:MySQL'
+	include ':Data:PostgreSQL'
+}
+include ':Zip'
+include ':PageCompiler'
+include ':PageCompiler:File2Page'
+include ':PDF'
+include ':CppParser'
+include ':MongoDB'
+include ':Redis'
+include ':PocoDoc'
+include ':ProGen'
+
+include ':Foundation:testsuite'
+include ':XML:testsuite'
+include ':JSON:testsuite'
+include ':Util:testsuite'
+include ':Net:testsuite'
+include ':Crypto:testsuite'
+include ':NetSSL_OpenSSL:testsuite'
+if (os.windows) {
+	include ':NetSSL_Win:testsuite'
+}
+include ':Data:testsuite'
+if (os.windows) {
+	include ':Data:ODBC:testsuite'
+	include ':Data:SQLite:testsuite'
+	include ':Data:MySQL:testsuite'
+	include ':Data:PostgreSQL:testsuite'
+}
+//include ':MongoDB:testsuite'
+include ':Redis:testsuite'
+include ':CppParser:testsuite'
+include ':Zip:testsuite'
+
+include ':Foundation:samples'
+if (os.windows) {
+	include ':Data:samples'
+}
+include ':NetSSL_OpenSSL:samples'
+if (os.windows) {
+	include ':NetSSL_Win:samples'
+}
+include ':JSON:samples'
+include ':MongoDB:samples'
+include ':Net:samples'
+include ':PageCompiler:samples'
+include ':PDF:samples'
+include ':Util:samples'
+include ':XML:samples'
+include ':SevenZip:samples'
+include ':Zip:samples'
+

@@ -1,0 +1,28 @@
+model {
+	components {
+		ProGen(NativeLibrarySpec) {
+			sources {
+				cpp {
+					source {
+						srcDir 'src'
+						include '**/*.cpp'
+					}
+					exportedHeaders {
+						srcDir 'include'
+					}
+					lib project: ':XML', library: 'XML'
+					lib project: ':Util', library: 'Util'
+					lib project: ':Foundation', library: 'Foundation'
+				}
+			}
+		}
+	}
+	binaries {
+		withType(SharedLibraryBinarySpec) {
+			if (toolChain in VisualCpp) {
+				 cppCompiler.define "ProGen_EXPORTS"
+			}
+		}
+	}
+}
+
