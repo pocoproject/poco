@@ -247,7 +247,7 @@ subprojects {
 						}
 					}
 				}
-				def opensslHome = new File(rootDir, "openssl/VS-120")
+				def opensslHome = new File(rootDir, "openssl/VS_120")
 				def opensslBrewHome = new File('/usr/local/opt/openssl')
 				def opensslLinuxHome = new File('/usr/lib/x86_64-linux-gnu')
 				crypto {
