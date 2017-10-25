@@ -20,7 +20,7 @@
         </dependencies>
     </metadata>
     <files>
-		<file src='distrib\Windows\NuGet\Pocoproject.Poco.vs140.targets'			target='build\native'/>
+		<file src='packaging\Windows\NuGet\Pocoproject.Poco.vs140.targets'			target='build\native'/>
         <file src='bin\*' 							target='build\native\bin'  	exclude='bin\PocoCppParser*'/>
         <file src='lib\*' 							target='build\native\lib'  	exclude='lib\PocoCppParser*'/>
         <file src='bin64\*' 						target='build\native\bin64'	exclude='bin64\PocoCppParser*'/>
