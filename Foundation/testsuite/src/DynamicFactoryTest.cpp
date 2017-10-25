@@ -65,10 +65,15 @@ void DynamicFactoryTest::testDynamicFactory()
 	assert (dynFactory.isClass("B"));
 	
 	assert (!dynFactory.isClass("C"));
-	
+
+#ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<A> a(dynamic_cast<A*>(dynFactory.createInstance("A")));
 	std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
-	
+#else
+	std::unique_ptr<A> a(dynamic_cast<A*>(dynFactory.createInstance("A")));
+	std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
+#endif // POCO_ENABLE_CPP11
+
 	assertNotNull(a.get());
 	assertNotNull(b.get());
 	
@@ -87,7 +92,11 @@ void DynamicFactoryTest::testDynamicFactory()
 	
 	try
 	{
+#ifndef POCO_ENABLE_CPP11
 		std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
+#else
+		std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
+#endif // POCO_ENABLE_CPP11
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

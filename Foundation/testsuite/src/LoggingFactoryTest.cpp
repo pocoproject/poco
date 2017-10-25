@@ -111,8 +111,12 @@ void LoggingFactoryTest::testBuiltins()
 
 void LoggingFactoryTest::testCustom()
 {
+#ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<LoggingFactory> fact(new LoggingFactory);
-	
+#else
+	std::unique_ptr<LoggingFactory> fact(new LoggingFactory);
+#endif // POCO_ENABLE_CPP11
+
 	fact->registerChannelClass("CustomChannel", new Instantiator<CustomChannel, Channel>);
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 

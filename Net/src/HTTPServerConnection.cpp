@@ -76,7 +76,7 @@ void HTTPServerConnection::run()
 					response.set("Server", server);
 				try
 				{
-#if __cplusplus < 201103L
+#ifndef POCO_ENABLE_CPP11
 					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
 #else
 					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));

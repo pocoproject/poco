@@ -170,8 +170,9 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 
 	    apr_status_t rv;
 		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
-			return rv; 
+			return rv;
 
+#ifndef POCO_ENABLE_CPP11
 		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
 			&rec, 
 			r->connection->local_ip, 
@@ -180,13 +181,28 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 			r->connection->remote_addr->port));
 
 		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+#else
+		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+			&rec,
+			r->connection->local_ip,
+			r->connection->local_addr->port,
+			r->connection->remote_ip,
+			r->connection->remote_addr->port));
+
+		std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+#endif // POCO_ENABLE_CPP11
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
 		
 		try
 		{
+
+#ifndef POCO_ENABLE_CPP11
 			std::auto_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+#else
+			std::unique_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+#endif // POCO_ENABLE_CPP11
 
 			if (pHandler.get())
 			{				

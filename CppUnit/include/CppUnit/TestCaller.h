@@ -79,11 +79,11 @@ protected:
 
 private:
 	TestMethod             _test;
-#if __cplusplus < 201103L
+#ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<Fixture> _fixture;
 #else
 	std::unique_ptr<Fixture> _fixture;
-#endif
+#endif // POCO_ENABLE_CPP11
 };
 
 
