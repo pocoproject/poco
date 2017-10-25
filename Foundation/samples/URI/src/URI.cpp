@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 	          << "Path:      " << uri1.getPath() << std::endl
 	          << "Query:     " << uri1.getQuery() << std::endl
 	          << "Fragment:  " << uri1.getFragment() << std::endl;
-	          
+	
 	URI uri2;
 	uri2.setScheme("https");
 	uri2.setAuthority("www.appinf.com");

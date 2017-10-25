@@ -23,7 +23,7 @@ RANLIB  = ${CROSS_COMPILE}ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = ${CROSS_COMPILE}strip
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -38,7 +38,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare -stdlib=libstdc++ -ftemplate-depth=340
@@ -55,7 +55,7 @@ SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
 DEBUGOPT_CC     = -D_DEBUG
 DEBUGOPT_CXX    = -D_DEBUG
-DEBUGOPT_LINK   = 
+DEBUGOPT_LINK   =
 RELEASEOPT_CC   = -O2 -DNDEBUG
 RELEASEOPT_CXX  = -O2 -DNDEBUG
 RELEASEOPT_LINK = -O2

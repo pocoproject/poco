@@ -24,7 +24,7 @@
 class MySQLTest: public CppUnit::TestCase
 	/// MySQL test class
 	/// Tested:
-	/// 
+	///
 	/// Driver          |            DB             | OS
 	/// ----------------+---------------------------+------------------------------------------
 	/// 03.51.12.00     | MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1

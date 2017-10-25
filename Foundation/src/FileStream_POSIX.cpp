@@ -123,7 +123,7 @@ bool FileStreamBuf::close()
 
 std::streampos FileStreamBuf::seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode)
 {
-	if (_fd == -1 || !(getMode() & mode)) 
+	if (_fd == -1 || !(getMode() & mode))
 		return -1;
 
 	if (getMode() & std::ios::out)
@@ -154,7 +154,7 @@ std::streampos FileStreamBuf::seekoff(std::streamoff off, std::ios::seekdir dir,
 
 std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mode)
 {
-	if (_fd == -1 || !(getMode() & mode)) 
+	if (_fd == -1 || !(getMode() & mode))
 		return -1;
 
 	if (getMode() & std::ios::out)

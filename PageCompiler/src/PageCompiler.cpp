@@ -54,7 +54,7 @@ using Poco::OutputLineEndingConverter;
 class CompilerApp: public Application
 {
 public:
-	CompilerApp(): 
+	CompilerApp():
 		_helpRequested(false),
 		_generateOSPCode(false),
 		_generateApacheCode(false),
@@ -80,7 +80,7 @@ protected:
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHelp)));
 
 		options.addOption(
-			Option("define", "D", 
+			Option("define", "D",
 				"Define a configuration property. A configuration property "
 				"defined with this option can be referenced in the input "
 				"page file, using the following syntax: ${<name>}.")

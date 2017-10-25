@@ -110,7 +110,7 @@ class FormRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	FormRequestHandler() 
+	FormRequestHandler()
 	{
 	}
 	

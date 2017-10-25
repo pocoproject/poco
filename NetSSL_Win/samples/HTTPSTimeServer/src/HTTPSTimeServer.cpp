@@ -63,7 +63,7 @@ class TimeRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	TimeRequestHandler(const std::string& format): 
+	TimeRequestHandler(const std::string& format):
 		_format(format)
 	{
 	}

@@ -31,7 +31,7 @@ Keywords (use, into, limit, etc) now reside in Poco::Data::Keywords namespace.
 !!Incompatible Changes and Possible Transition Issues
 
 Internally, (Abstract)Binder, Extracion nas (where applicable) Preparator are garbage collected.
-While old way of passing pointers to TypeHandler may still work, it is strongly recommended 
+While old way of passing pointers to TypeHandler may still work, it is strongly recommended
 to pass SharedPtr to handler functions, e.g. :
 
   template <>

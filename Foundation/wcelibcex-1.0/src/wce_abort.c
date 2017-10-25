@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -42,13 +42,13 @@
 * Description:
 *
 *   The abort() function shall cause abnormal process termination to occur.
-*   Internally, mkdir() function wraps TerminateProcess call from 
+*   Internally, mkdir() function wraps TerminateProcess call from
 *   Windows CE API.
 *
 * Return:
 *
 *   The abort() function shall not return.*
-*       
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition

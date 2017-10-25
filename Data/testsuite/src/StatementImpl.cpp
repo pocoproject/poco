@@ -70,7 +70,7 @@ void StatementImpl::next()
 {
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
-	std::size_t pos = 0; 
+	std::size_t pos = 0;
 	for (; it != itEnd; ++it)
 	{
 		(*it)->extract(pos);

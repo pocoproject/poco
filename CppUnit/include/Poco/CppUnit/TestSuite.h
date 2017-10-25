@@ -79,7 +79,7 @@ inline void TestSuite::addTest(Test* test)
 // Returns a std::string representation of the test suite.
 inline std::string TestSuite::toString()
 {
-	return "suite " + _name; 
+	return "suite " + _name;
 }
 
 

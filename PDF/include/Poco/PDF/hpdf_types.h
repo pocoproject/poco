@@ -430,7 +430,7 @@ typedef enum _HPDF_TransitionStyle {
     HPDF_TS_GLITTER_TOP_LEFT_TO_BOTTOM_RIGHT,
     HPDF_TS_REPLACE,
     HPDF_TS_EOF
-} HPDF_TransitionStyle; 
+} HPDF_TransitionStyle;
 
 /*----------------------------------------------------------------------------*/
 

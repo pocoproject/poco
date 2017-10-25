@@ -77,11 +77,11 @@ public:
 
 	MailMessage(PartStoreFactory* pStoreFactory = 0);
 		/// Creates an empty MailMessage.
-		/// 
-		/// If pStoreFactory is not null, message attachments will be 
+		///
+		/// If pStoreFactory is not null, message attachments will be
 		/// handled by the object created by the factory. Most
-		/// common reason is to temporarily save attachments to 
-		/// the file system in order to avoid potential memory 
+		/// common reason is to temporarily save attachments to
+		/// the file system in order to avoid potential memory
 		/// exhaustion when attachment files are very large.
 
 	virtual ~MailMessage();
@@ -135,7 +135,7 @@ public:
 		/// message.
 		///
 		/// Note that single CR or LF characters as line delimiters must
-		/// not be used. Content lines always should be terminated with a 
+		/// not be used. Content lines always should be terminated with a
 		/// proper CRLF sequence.
 	
 	const std::string& getContent() const;
@@ -166,7 +166,7 @@ public:
 	void addPart(const std::string& name,
 		PartSource* pSource,
 		ContentDisposition disposition,
-		ContentTransferEncoding encoding); 
+		ContentTransferEncoding encoding);
 		/// Adds a part/attachment to the mail message.
 		///
 		/// The MailMessage takes ownership of the PartSource and deletes it
@@ -177,7 +177,7 @@ public:
 		///
 		/// The part name, and the filename specified in the part source
 		/// must not contain any non-ASCII characters.
-		/// To include non-ASCII characters in the part name or filename, 
+		/// To include non-ASCII characters in the part name or filename,
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	void addContent(PartSource* pSource,
@@ -187,7 +187,7 @@ public:
 		///
 		/// The part name, and the filename specified in the part source
 		/// must not contain any non-ASCII characters.
-		/// To include non-ASCII characters in the part name or filename, 
+		/// To include non-ASCII characters in the part name or filename,
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	void addAttachment(const std::string& name,
@@ -198,17 +198,17 @@ public:
 		///
 		/// The part name, and the filename specified in the part source
 		/// must not contain any non-ASCII characters.
-		/// To include non-ASCII characters in the part name or filename, 
+		/// To include non-ASCII characters in the part name or filename,
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	PartSource* createPartStore(const std::string& content,
 		const std::string& mediaType,
 		const std::string& filename = "");
-		/// Returns either default StringPartSource part store or, 
+		/// Returns either default StringPartSource part store or,
 		/// if the part store factory was provided during construction,
 		/// the one created by PartStoreFactory.
-		/// Returned part store is allocated on the heap; it is caller's 
-		/// responsibility to delete it after use. Typical use is handler 
+		/// Returned part store is allocated on the heap; it is caller's
+		/// responsibility to delete it after use. Typical use is handler
 		/// passing it back to MailMessage, which takes care of the cleanup.
 
 	const PartVec& parts() const;
@@ -232,13 +232,13 @@ public:
 		/// Writes the mail message to the given output stream.
 
 	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
-		/// If the given string contains non-ASCII characters, 
+		/// If the given string contains non-ASCII characters,
 		/// encodes the given string using RFC 2047 "Q" word encoding.
-		/// 
+		///
 		/// The given text must already be encoded in the character set
 		/// given in charset (default is UTF-8).
 		///
-		/// Returns the encoded string, or the original string if it 
+		/// Returns the encoded string, or the original string if it
 		/// consists only of ASCII characters.
 
 	static const std::string HEADER_SUBJECT;

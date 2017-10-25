@@ -34,7 +34,7 @@ namespace MongoDB {
 class MongoDB_API Connection
 	/// Represents a connection to a MongoDB server
 	/// using the MongoDB wire protocol.
-	/// 
+	///
 	/// See https://docs.mongodb.com/manual/reference/mongodb-wire-protocol/
 	/// for more information on the wire protocol.
 {
@@ -68,7 +68,7 @@ public:
 		/// Returns the address of the MongoDB server.
 
 	void connect(const std::string& hostAndPort);
-		/// Connects to the given MongoDB server. 
+		/// Connects to the given MongoDB server.
 		///
 		/// The host and port must be separated with a colon.
 
@@ -86,12 +86,12 @@ public:
 
 	void sendRequest(RequestMessage& request);
 		/// Sends a request to the MongoDB server.
-		/// 
+		///
 		/// Used for one-way requests without a response.
 
 	void sendRequest(RequestMessage& request, ResponseMessage& response);
 		/// Sends a request to the MongoDB server and receives the response.
-		/// 
+		///
 		/// Use this when a response is expected: only a "query" or "getmore"
 		/// request will return a response.
 

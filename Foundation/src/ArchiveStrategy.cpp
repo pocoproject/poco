@@ -83,7 +83,7 @@ protected:
 //
 
 
-ArchiveStrategy::ArchiveStrategy(): 
+ArchiveStrategy::ArchiveStrategy():
 	_compress(false),
 	_pCompressor(0)
 {

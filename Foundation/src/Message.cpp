@@ -24,44 +24,44 @@
 namespace Poco {
 
 
-Message::Message(): 
-	_prio(PRIO_FATAL), 
-	_tid(0), 
-	_ostid(0), 
-	_pid(0),
-	_file(0),
-	_line(0),
-	_pMap(0) 
-{
-	init();
-}
-
-
-Message::Message(const std::string& source, const std::string& text, Priority prio): 
-	_source(source), 
-	_text(text), 
-	_prio(prio), 
+Message::Message():
+	_prio(PRIO_FATAL),
 	_tid(0),
 	_ostid(0),
 	_pid(0),
 	_file(0),
 	_line(0),
-	_pMap(0) 
+	_pMap(0)
+{
+	init();
+}
+
+
+Message::Message(const std::string& source, const std::string& text, Priority prio):
+	_source(source),
+	_text(text),
+	_prio(prio),
+	_tid(0),
+	_ostid(0),
+	_pid(0),
+	_file(0),
+	_line(0),
+	_pMap(0)
 {
 	init();
 }
 
 
 Message::Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line):
-	_source(source), 
-	_text(text), 
-	_prio(prio), 
+	_source(source),
+	_text(text),
+	_prio(prio),
 	_tid(0),
 	_ostid(0),
 	_pid(0),
 	_file(file),
 	_line(line),
-	_pMap(0) 
+	_pMap(0)
 {
 	init();
 }

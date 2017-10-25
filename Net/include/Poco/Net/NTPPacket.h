@@ -27,7 +27,7 @@ namespace Net {
 
 
 class Net_API NTPPacket
-	/// This class is the NTP packet abstraction. 
+	/// This class is the NTP packet abstraction.
 {
 public:
 	NTPPacket();

@@ -30,8 +30,8 @@ namespace Poco {
 
 
 class Foundation_API Condition
-	/// A Condition is a synchronization object used to block a thread 
-	/// until a particular condition is met. 
+	/// A Condition is a synchronization object used to block a thread
+	/// until a particular condition is met.
 	/// A Condition object is always used in conjunction with
 	/// a Mutex (or FastMutex) object.
 	///
@@ -52,7 +52,7 @@ public:
 		/// Unlocks the mutex (which must be locked upon calling
 		/// wait()) and waits until the Condition is signalled.
 		///
-		/// The given mutex will be locked again upon 
+		/// The given mutex will be locked again upon
 		/// leaving the function, even in case of an exception.
 	{
 		ScopedUnlock<Mtx> unlock(mutex, false);
@@ -70,7 +70,7 @@ public:
 		/// Unlocks the mutex (which must be locked upon calling
 		/// wait()) and waits for the given time until the Condition is signalled.
 		///
-		/// The given mutex will be locked again upon successfully leaving the 
+		/// The given mutex will be locked again upon successfully leaving the
 		/// function, even in case of an exception.
 		///
 		/// Throws a TimeoutException if the Condition is not signalled
@@ -85,7 +85,7 @@ public:
 		/// Unlocks the mutex (which must be locked upon calling
 		/// tryWait()) and waits for the given time until the Condition is signalled.
 		///
-		/// The given mutex will be locked again upon leaving the 
+		/// The given mutex will be locked again upon leaving the
 		/// function, even in case of an exception.
 		///
 		/// Returns true if the Condition has been signalled

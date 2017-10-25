@@ -93,7 +93,7 @@ void WinService::registerService(const std::string& path, const std::string& dis
 	_svcHandle = CreateServiceW(
 		_scmHandle,
 		uname.c_str(),
-		udisplayName.c_str(), 
+		udisplayName.c_str(),
 		SERVICE_ALL_ACCESS,
 		SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START,

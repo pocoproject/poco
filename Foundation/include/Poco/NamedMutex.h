@@ -37,7 +37,7 @@ namespace Poco {
 
 
 class Foundation_API NamedMutex: private NamedMutexImpl
-	/// A NamedMutex (mutual exclusion) is a global synchronization 
+	/// A NamedMutex (mutual exclusion) is a global synchronization
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multi process) scenario.
 	/// Using the ScopedLock class is the preferred way to automatically

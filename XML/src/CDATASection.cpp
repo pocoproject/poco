@@ -24,13 +24,13 @@ namespace XML {
 const XMLString CDATASection::NODE_NAME = toXMLString("#cdata-section");
 
 
-CDATASection::CDATASection(Document* pOwnerDocument, const XMLString& data): 
+CDATASection::CDATASection(Document* pOwnerDocument, const XMLString& data):
 	Text(pOwnerDocument, data)
 {
 }
 
 
-CDATASection::CDATASection(Document* pOwnerDocument, const CDATASection& sec): 
+CDATASection::CDATASection(Document* pOwnerDocument, const CDATASection& sec):
 	Text(pOwnerDocument, sec)
 {
 }

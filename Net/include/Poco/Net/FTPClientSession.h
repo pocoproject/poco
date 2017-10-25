@@ -144,7 +144,7 @@ public:
 	void setWorkingDirectory(const std::string& path);
 		/// Changes the current working directory on the server.
 		///
-		/// Sends a CWD command with the given path as argument to the 
+		/// Sends a CWD command with the given path as argument to the
 		/// server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
@@ -276,7 +276,7 @@ public:
 		/// for transferring the data is created.
 		
 	void endList();
-		/// Must be called to complete a directory listing download 
+		/// Must be called to complete a directory listing download
 		/// initiated with beginList().
 
 	void abort();

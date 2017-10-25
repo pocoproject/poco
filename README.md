@@ -25,7 +25,7 @@ POrtable COmponents C++ Libraries are:
 To start using POCO, see the [Guided Tour](https://pocoproject.org/docs/00100-GuidedTour.html) and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) documents.
 
 ----
-POCO has an active user and contributing community, please visit our [web site](https://pocoproject.org), [forum](https://pocoproject.org/forum) and [blog](https://pocoproject.org/blog). 
+POCO has an active user and contributing community, please visit our [web site](https://pocoproject.org), [forum](https://pocoproject.org/forum) and [blog](https://pocoproject.org/blog).
 Answers to POCO-related questions can also be found on [Stack Overflow](https://stackoverflow.com/questions/tagged/poco-libraries).
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for submitting contributions, bugs reports, feature requests or security issues.

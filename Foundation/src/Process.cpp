@@ -16,12 +16,12 @@
 #include "Poco/Environment.h"
 
 
-namespace 
+namespace
 {
 	std::vector<char> getEnvironmentVariablesBuffer(const Poco::Process::Env& env)
-	{   
+	{
 		std::vector<char> envbuf;
-		std::size_t pos = 0; 
+		std::size_t pos = 0;
 		
 		for (Poco::Process::Env::const_iterator it = env.begin(); it != env.end(); ++it)
 		{
@@ -38,7 +38,7 @@ namespace
 			envbuf[pos] = '\0';
 			++pos;
 		}
-	 
+	
 		envbuf.resize(pos + 1);
 		envbuf[pos] = '\0';
 	

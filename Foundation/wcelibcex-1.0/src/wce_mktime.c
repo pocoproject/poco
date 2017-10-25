@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -47,7 +47,7 @@ time_t wceex_mktime(struct tm *tmbuff)
 {
     time_t offset;
     TIME_ZONE_INFORMATION tzi;
-    
+
     offset = 0;
 
     // Retrive timezone offset in seconds
@@ -76,7 +76,7 @@ time_t wceex_mktime(struct tm *tmbuff)
 *
 * Return:
 *   Value of time if success, otherwise (time_t)-1 is returned.
-*       
+*
 *******************************************************************************/
 time_t wceex_gmmktime(struct tm *tmbuff)
 {
@@ -127,7 +127,7 @@ static time_t __wceex_mktime_internal(struct tm *tmbuff, time_t _loctime_offset)
         doy += MONTHDAYS[i];
     }
     tres += doy;
-    
+
     /* Day of year */
     tmbuff->tm_yday = doy + tmbuff->tm_mday;
 
@@ -135,7 +135,7 @@ static time_t __wceex_mktime_internal(struct tm *tmbuff, time_t _loctime_offset)
     {
         tres++;
     }
-    
+
     /* Add days of current month and convert to total to hours. */
     tres = 24 * (tres + tmbuff->tm_mday - 1) + tmbuff->tm_hour;
 
@@ -144,11 +144,11 @@ static time_t __wceex_mktime_internal(struct tm *tmbuff, time_t _loctime_offset)
 
     /* Add seconds part and convert total to seconds. */
     tres = 60 * tres + tmbuff->tm_sec;
-    
+
     /* For offset > 0 adjust time value for timezone
     given as local to UTC time difference in seconds). */
     tres += _loctime_offset;
-    
+
     return tres;
 }
 

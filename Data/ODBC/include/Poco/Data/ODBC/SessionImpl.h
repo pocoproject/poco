@@ -53,15 +53,15 @@ public:
 
 	SessionImpl(const std::string& connect,
 		std::size_t loginTimeout,
-		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
 		/// Throws NotConnectedException if connection was not successful.
 
 	//@ deprecated
-	SessionImpl(const std::string& connect, 
-		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+	SessionImpl(const std::string& connect,
+		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
 		bool autoExtract = true);

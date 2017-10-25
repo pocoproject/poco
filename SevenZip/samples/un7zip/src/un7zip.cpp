@@ -36,7 +36,7 @@ using Poco::Util::OptionCallback;
 class Un7zipApp: public Application
 {
 public:
-	Un7zipApp(): 
+	Un7zipApp():
 		_helpRequested(false),
 		_list(false),
 		_extract(false)
@@ -146,13 +146,13 @@ protected:
 			{
 				for (Poco::SevenZip::Archive::ConstIterator it = archive.begin(); it != archive.end(); ++it)
 				{
-					std::cout 
-						<< (it->isFile() ? '-' : 'd') 
+					std::cout
+						<< (it->isFile() ? '-' : 'd')
 						<< " "
 						<< Poco::DateTimeFormatter::format(it->lastModified(), Poco::DateTimeFormat::SORTABLE_FORMAT)
-						<< " " 
+						<< " "
 						<< std::setw(12) << it->size()
-						<< " " 
+						<< " "
 						<< it->path()
 						<< std::endl;
 				}

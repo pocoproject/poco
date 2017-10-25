@@ -25,7 +25,7 @@
 
 #include "XMLStreamParserException.h"
 #include <string>
-#include <cstddef> 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 

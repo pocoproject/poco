@@ -26,7 +26,7 @@ namespace Data {
 const std::size_t RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd): 
+RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):
 	_pRecordSet(pRecordSet),
 	_position(positionEnd ? POSITION_END : 0)
 {

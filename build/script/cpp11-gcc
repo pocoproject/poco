@@ -8,13 +8,13 @@
 # __GNUC__
 # __GNUC_MINOR__
 # __GNUC_PATCHLEVEL__
-# These macros are defined by all GNU compilers that use the C preprocessor: C, C++, Objective-C and Fortran. 
-# Their values are the major version, minor version, and patch level of the compiler, as integer constants. 
+# These macros are defined by all GNU compilers that use the C preprocessor: C, C++, Objective-C and Fortran.
+# Their values are the major version, minor version, and patch level of the compiler, as integer constants.
 # For example, GCC 3.2.1 will define __GNUC__ to 3, __GNUC_MINOR__ to 2, and __GNUC_PATCHLEVEL__ to 1. i
-# These macros are also defined if you invoke the preprocessor directly. 
+# These macros are also defined if you invoke the preprocessor directly.
 #
 # __VERSION__
-# This macro expands to a string constant which describes the version of the compiler in use. 
+# This macro expands to a string constant which describes the version of the compiler in use.
 # You should not rely on its contents having any particular form, but it can be counted on to contain
 # at least the release number.
 #

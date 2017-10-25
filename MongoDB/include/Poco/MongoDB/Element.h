@@ -250,7 +250,7 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 }
 
 
-struct BSONTimestamp 
+struct BSONTimestamp
 {
 	Poco::Timestamp ts;
 	Poco::Int32 inc;
@@ -317,7 +317,7 @@ class ConcreteElement: public Element
 {
 public:
 	ConcreteElement(const std::string& name, const T& init):
-		Element(name), 
+		Element(name),
 		_value(init)
 	{
 	}

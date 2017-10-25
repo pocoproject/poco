@@ -71,7 +71,7 @@ public:
 	{
 	}
 
-	bool isValid() const 
+	bool isValid() const
 	{
 		return _valid;
 	}
@@ -160,7 +160,7 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 	{
 		std::string mediaType;
 		NameValueCollection params;
-		MessageHeader::splitParameters(request.getContentType(), mediaType, params); 
+		MessageHeader::splitParameters(request.getContentType(), mediaType, params);
 		_encoding = mediaType;
 		if (_encoding == ENCODING_MULTIPART)
 		{

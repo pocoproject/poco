@@ -314,7 +314,7 @@ public:
 		/// Logs the given message, followed by the data in buffer.
 		///
 		/// The data in buffer is written in canonical hex+ASCII form:
-		/// Offset (4 bytes) in hexadecimal, followed by sixteen 
+		/// Offset (4 bytes) in hexadecimal, followed by sixteen
 		/// space-separated, two column, hexadecimal bytes,
 		/// followed by the same sixteen bytes as ASCII characters.
 		/// For bytes outside the range 32 .. 127, a dot is printed.

@@ -4,10 +4,10 @@
 # LLVM
 # deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty main
 # deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty main
-# 4.0 
+# 4.0
 deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty-4.0 main
 deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-4.0 main
-# 5.0 
+# 5.0
 deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty-5.0 main
 deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-5.0 main
 

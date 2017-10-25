@@ -45,7 +45,7 @@ class Foundation_API DirectoryWatcher: protected Runnable
 	///
 	/// A thread will be created that watches the specified
 	/// directory for changes. Events are reported in the context
-	/// of this thread. 
+	/// of this thread.
 	///
 	/// Note that changes to files in subdirectories of the watched
 	/// directory are not reported. Separate DirectoryWatcher objects

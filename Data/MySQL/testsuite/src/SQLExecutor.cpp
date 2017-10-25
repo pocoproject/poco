@@ -152,7 +152,7 @@ private:
 } } // namespace Poco::Data
 
 
-SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession): 
+SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
 	_pSession(pSession)
 {
@@ -179,14 +179,14 @@ void SQLExecutor::bareboneMySQLTest(const std::string& host, const std::string& 
 	mysql_real_query(hsession, sql.c_str(), static_cast<unsigned long>(sql.length()));
 	
 	sql = tableCreateString;
-	int rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length())); 
+	int rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length()));
 	poco_assert (rc == 0);
 
 	rc = mysql_stmt_execute(hstmt);
 	poco_assert (rc == 0);
 
 	sql = "INSERT INTO Test VALUES (?,?,?,?,?)";
-	rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length())); 
+	rc = mysql_stmt_prepare(hstmt, sql.c_str(), static_cast<unsigned long>(sql.length()));
 	poco_assert (rc == 0);
 
 	std::string str[3] = { "111", "222", "333" };
@@ -289,10 +289,10 @@ void SQLExecutor::simpleAccess()
 	std::string result;
 
 	count = 0;
-	try 
-	{ 
+	try
+	{
 		Statement stmt(*_pSession);
-		stmt << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age);//, now;  
+		stmt << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(age);//, now;
 		stmt.execute();
 	}
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -1132,7 +1132,7 @@ void SQLExecutor::selectIntoSingleStep()
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	poco_assert (count == 2);
 	Person result;
-	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1)); 
+	Statement stmt = (*_pSession << "SELECT * FROM Person", into(result), limit(1));
 	stmt.execute();
 	poco_assert (result == p1);
 	poco_assert (!stmt.done());
@@ -1595,7 +1595,7 @@ void SQLExecutor::tupleVector()
 	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
 	std::string funct = "tupleVector()";
 	TupleType t(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
-	Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> 
+	Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int>
 		t10(10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29);
 	TupleType t100(100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119);
 	std::vector<TupleType> v;
@@ -1683,8 +1683,8 @@ void SQLExecutor::internalExtraction()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
-	try 
-	{ 
+	try
+	{
 		Statement stmt = (*_pSession << "SELECT * FROM Vectors", now);
 		RecordSet rset(stmt);
 
@@ -1788,9 +1788,9 @@ void SQLExecutor::doNull()
 {
 	std::string funct = "null()";
 	
-	*_pSession << "INSERT INTO Vectors VALUES (?, ?, ?)", 
-						use(Poco::Data::Keywords::null), 
-						use(Poco::Data::Keywords::null), 
+	*_pSession << "INSERT INTO Vectors VALUES (?, ?, ?)",
+						use(Poco::Data::Keywords::null),
+						use(Poco::Data::Keywords::null),
 						use(Poco::Data::Keywords::null), now;
 
 	int count = 0;
@@ -1823,12 +1823,12 @@ void SQLExecutor::doNull()
 
 
 void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
-{ 
+{
 	if (session.hasTransactionIsolation(ti))
 	{
 		std::string funct = "setTransactionIsolation()";
 
-		try 
+		try
 		{
 			Transaction t(session, false);
 			t.setIsolation(ti);
@@ -2129,9 +2129,9 @@ void SQLExecutor::reconnect()
 	poco_assert (_pSession->isConnected());
 	_pSession->close();
 	poco_assert (!_pSession->isConnected());
-	try 
+	try
 	{
-		(*_pSession) << "SELECT LastName FROM Person", into(result), now;  
+		(*_pSession) << "SELECT LastName FROM Person", into(result), now;
 		fail ("must fail");
 	}
 	catch(NotConnectedException&){ }

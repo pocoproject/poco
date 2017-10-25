@@ -91,7 +91,7 @@ void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 	{
 		unsigned sig = sigarr.chf$is_sig_name;
 		unsigned act = LIB$_ACTIMAGE;
-		if (lib$match_cond(&sig, &act)) 
+		if (lib$match_cond(&sig, &act))
 			throw LibraryLoadException(_path);
 	}
 	return (void*) value;

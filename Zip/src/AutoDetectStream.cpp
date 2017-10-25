@@ -82,7 +82,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	std::streamsize offset = 0;
 	static std::istream::int_type eof = std::istream::traits_type::eof();
 	while (_pIstr->good() && !_pIstr->eof() && (offset + 4) < length)
-	{ 
+	{
 		std::istream::int_type c = _pIstr->get();
 		if (c != eof)
 		{
@@ -178,7 +178,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 					buffer[offset++] = ZipDataInfo::HEADER[1];
 					buffer[offset++] = ZipDataInfo::HEADER[2];
 					buffer[offset++] = c;
-					_matchCnt = 0; 
+					_matchCnt = 0;
 				}
 			}
 		}

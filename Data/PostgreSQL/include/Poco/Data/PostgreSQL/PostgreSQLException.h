@@ -28,7 +28,7 @@ namespace Data {
 namespace PostgreSQL {
 
 // End-user include this file and use in code ConnectionException/StatementException
-// So it need not know 
+// So it need not know
 
 class PostgreSQL_API PostgreSQLException: public Poco::Data::DataException
 	/// Base class for all PostgreSQL exceptions

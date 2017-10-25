@@ -250,7 +250,7 @@ void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& loc
 
 void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
-	if (_depth == 0 && !_inFragment && _elementCount > 1) 
+	if (_depth == 0 && !_inFragment && _elementCount > 1)
 		throw XMLException("Not well-formed. Second root element found", nameToString(localName, qname));
 	
 	if (_unclosedStartTag) closeStartTag();
@@ -744,7 +744,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		for (std::set<XMLString>::const_iterator itURI = namespaceURIs.begin(); itURI != namespaceURIs.end(); ++itURI)
 		{
 			XMLString prefix = it->first;
-			if (prefix.empty()) 
+			if (prefix.empty())
 				prefix = _namespaces.getPrefix(*itURI);
 			if (prefix.empty() && !_namespaces.isMapped(*itURI))
 			{
@@ -761,7 +761,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 
 			}
 			const XMLString& uri = _namespaces.getURI(prefix);
-			if ((uri.empty() || uri != *itURI) && !itURI->empty()) 
+			if ((uri.empty() || uri != *itURI) && !itURI->empty())
 			{
 				_namespaces.declarePrefix(prefix, *itURI);
 			}
@@ -926,7 +926,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -965,7 +965,7 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -1005,8 +1005,8 @@ void XMLWriter::writeName(const XMLString& prefix, const XMLString& localName)
 	}
 	else
 	{
-		writeXML(prefix); 
-		writeMarkup(MARKUP_COLON); 
+		writeXML(prefix);
+		writeMarkup(MARKUP_COLON);
 		writeXML(localName);
 	}
 }

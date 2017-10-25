@@ -33,7 +33,7 @@ Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const 
 }
 
 
-Element::Element(Document* pOwnerDocument, const Element& element): 
+Element::Element(Document* pOwnerDocument, const Element& element):
 	AbstractContainerNode(pOwnerDocument, element),
 	_name(pOwnerDocument->namePool().insert(element._name)),
 	_pFirstAttr(0)
@@ -129,7 +129,7 @@ Attr* Element::removeAttributeNode(Attr* oldAttr)
 {
 	poco_check_ptr (oldAttr);
 
-	if (_pOwner->events()) 
+	if (_pOwner->events())
 		dispatchAttrModified(oldAttr, MutationEvent::REMOVAL, oldAttr->getValue(), EMPTY_STRING);
 
 	if (oldAttr != _pFirstAttr)

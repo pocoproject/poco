@@ -26,19 +26,19 @@ namespace Poco {
 
 
 template <
-	class TKey, 
+	class TKey,
 	class TValue,
-	class TMutex = FastMutex, 
+	class TMutex = FastMutex,
 	class TEventMutex = FastMutex
-> 
+>
 class UniqueExpireCache: public AbstractCache<TKey, TValue, UniqueExpireStrategy<TKey, TValue>, TMutex, TEventMutex>
 	/// An UniqueExpireCache caches entries for a given time amount. In contrast
-	/// to ExpireCache which only allows to set a per cache expiration value, it allows to define 
+	/// to ExpireCache which only allows to set a per cache expiration value, it allows to define
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
-	///    
+	///
 	///    const Poco::Timestamp& getExpiration() const;
-	///    
+	///
 	/// which returns the absolute timepoint when the entry will be invalidated.
 	/// Accessing an object will NOT update this absolute expire timepoint.
 	/// You can use the Poco::ExpirationDecorator to add the getExpiration
@@ -47,7 +47,7 @@ class UniqueExpireCache: public AbstractCache<TKey, TValue, UniqueExpireStrategy
 	/// Be careful when using an UniqueExpireCache. A cache is often used
 	/// like cache.has(x) followed by cache.get x). Note that it could happen
 	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
-	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
+	/// the entry gets invalid, thus leading to an empty SharedPtr being returned
 	/// when "get" is invoked.
 {
 public:

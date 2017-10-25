@@ -77,7 +77,7 @@ unsigned long AttrMap::length() const
 {
 	unsigned long result = 0;
 	AbstractNode* pAttr = _pElement->_pFirstAttr;
-	while (pAttr) 
+	while (pAttr)
 	{
 		pAttr = static_cast<AbstractNode*>(pAttr->nextSibling());
 		++result;

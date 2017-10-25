@@ -58,23 +58,23 @@ public:
 		/// The client socket's address is returned in clientAddr.
 	
 	void connect(const SocketAddress& address, bool performHandshake);
-		/// Initializes the socket and establishes a secure connection to 
+		/// Initializes the socket and establishes a secure connection to
 		/// the TCP server at the given address.
 		///
-		/// If performHandshake is true, the SSL handshake is performed immediately 
+		/// If performHandshake is true, the SSL handshake is performed immediately
 		/// after establishing the connection. Otherwise, the handshake is performed
 		/// the first time sendBytes(), receiveBytes() or completeHandshake() is called.
 
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake);
-		/// Initializes the socket, sets the socket timeout and 
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a secure connection to the TCP server at the given address.
 		///
-		/// If performHandshake is true, the SSL handshake is performed immediately 
+		/// If performHandshake is true, the SSL handshake is performed immediately
 		/// after establishing the connection. Otherwise, the handshake is performed
 		/// the first time sendBytes(), receiveBytes() or completeHandshake() is called.
 
 	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a secure connection to 
+		/// Initializes the socket and establishes a secure connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
@@ -133,7 +133,7 @@ public:
 		///
 		/// If the SSL connection was the result of an accept(),
 		/// the server-side handshake is completed, otherwise
-		/// a client-side handshake is performed. 
+		/// a client-side handshake is performed.
 		
 	poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
@@ -185,21 +185,21 @@ protected:
 		/// Performs a server-side SSL handshake and certificate verification.
 
 	void connectSSL(bool performHandshake);
-		/// Performs a client-side SSL handshake and establishes a secure 
+		/// Performs a client-side SSL handshake and establishes a secure
 		/// connection over an already existing TCP connection.
 	
 	long verifyPeerCertificateImpl(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation.
 		
 	static bool isLocalHost(const std::string& hostName);
-		/// Returns true iff the given host name is the local host 
+		/// Returns true iff the given host name is the local host
 		/// (either "localhost" or "127.0.0.1").
 
 	bool mustRetry(int rc);
 		/// Returns true if the last operation should be retried,
 		/// otherwise false.
 		///
-		/// In case of an SSL_ERROR_WANT_READ error, and if the socket is 
+		/// In case of an SSL_ERROR_WANT_READ error, and if the socket is
 		/// blocking, waits for the underlying socket to become readable.
 		///
 		/// In case of an SSL_ERROR_WANT_WRITE error, and if the socket is
@@ -213,7 +213,7 @@ protected:
 		/// Handles an SSL error by throwing an appropriate exception.
 
 	void reset();
-		/// Prepares the socket for re-use. 
+		/// Prepares the socket for re-use.
 		///
 		/// After closing and resetting a socket, the socket can
 		/// be used for a new connection.

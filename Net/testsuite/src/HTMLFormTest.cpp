@@ -115,7 +115,7 @@ void HTMLFormTest::testWriteMultipart()
 	std::ostringstream ostr;
 	form.write(ostr, "MIME_boundary_0123456789");
 	std::string s = ostr.str();
-	assert (s == 
+	assert (s ==
 		"--MIME_boundary_0123456789\r\n"
 		"Content-Disposition: form-data; name=\"field1\"\r\n"
 		"\r\n"

@@ -46,7 +46,7 @@ void NamedTuplesTest::testNamedTuple1()
 {
 	typedef NamedTuple<std::string> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 
@@ -81,19 +81,19 @@ void NamedTuplesTest::testNamedTuple2()
 {
 	typedef NamedTuple<std::string, int> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
-	assert (aTuple["B"] == 0); 
+	assert (aTuple["B"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 2);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -104,7 +104,7 @@ void NamedTuplesTest::testNamedTuple2()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3.length == 2);
 
 	assert (aTuple.getName(0) == "string1");
@@ -118,25 +118,25 @@ void NamedTuplesTest::testNamedTuple2()
 
 void NamedTuplesTest::testNamedTuple3()
 {
-	typedef NamedTuple<std::string, 
-		int, 
+	typedef NamedTuple<std::string,
+		int,
 		bool> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
-	assert (aTuple["C"] == false); 
+	assert (aTuple["C"] == false);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 3);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 
 	assert (aTuple != aTuple2);
@@ -148,7 +148,7 @@ void NamedTuplesTest::testNamedTuple3()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3.length == 3);
 
@@ -163,27 +163,27 @@ void NamedTuplesTest::testNamedTuple3()
 
 void NamedTuplesTest::testNamedTuple4()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
 		float> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
-	assert (aTuple["C"] == false); 
+	assert (aTuple["C"] == false);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 4);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 
@@ -196,7 +196,7 @@ void NamedTuplesTest::testNamedTuple4()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3.length == 4);
 
@@ -211,30 +211,30 @@ void NamedTuplesTest::testNamedTuple4()
 
 void NamedTuplesTest::testNamedTuple5()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
 		char> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 5);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c');
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
@@ -248,7 +248,7 @@ void NamedTuplesTest::testNamedTuple5()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3.length == 5);
@@ -264,37 +264,37 @@ void NamedTuplesTest::testNamedTuple5()
 
 void NamedTuplesTest::testNamedTuple6()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
+		char,
 		long> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 6);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -305,7 +305,7 @@ void NamedTuplesTest::testNamedTuple6()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
@@ -322,27 +322,27 @@ void NamedTuplesTest::testNamedTuple6()
 
 void NamedTuplesTest::testNamedTuple7()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
 		double> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 7);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
@@ -350,11 +350,11 @@ void NamedTuplesTest::testNamedTuple7()
 		"long1", 999,
 		"double1", 1.5);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 
 	assert (aTuple != aTuple2);
@@ -366,7 +366,7 @@ void NamedTuplesTest::testNamedTuple7()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
@@ -383,21 +383,21 @@ void NamedTuplesTest::testNamedTuple7()
 
 void NamedTuplesTest::testNamedTuple8()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
 		short> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 
@@ -405,7 +405,7 @@ void NamedTuplesTest::testNamedTuple8()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 8);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
@@ -414,11 +414,11 @@ void NamedTuplesTest::testNamedTuple8()
 		"double1", 1.5,
 		"short1", 32700);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 
@@ -431,11 +431,11 @@ void NamedTuplesTest::testNamedTuple8()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3.length == 8);
 
 	assert (aTuple.getName(0) == "string1");
@@ -450,22 +450,22 @@ void NamedTuplesTest::testNamedTuple8()
 
 void NamedTuplesTest::testNamedTuple9()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
 		std::string> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
@@ -474,21 +474,21 @@ void NamedTuplesTest::testNamedTuple9()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 9);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2");
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
@@ -502,11 +502,11 @@ void NamedTuplesTest::testNamedTuple9()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3.length == 9);
 
@@ -521,52 +521,52 @@ void NamedTuplesTest::testNamedTuple9()
 
 void NamedTuplesTest::testNamedTuple10()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
 		int> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 10);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2 );
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -577,11 +577,11 @@ void NamedTuplesTest::testNamedTuple10()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3.length == 10);
@@ -597,55 +597,55 @@ void NamedTuplesTest::testNamedTuple10()
 
 void NamedTuplesTest::testNamedTuple11()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
 		int,
 		std::string> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 11);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
 		"string3", "3");
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
 
 	assert (aTuple != aTuple2);
@@ -657,11 +657,11 @@ void NamedTuplesTest::testNamedTuple11()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
@@ -678,29 +678,29 @@ void NamedTuplesTest::testNamedTuple11()
 
 void NamedTuplesTest::testNamedTuple12()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
 		int> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 
@@ -708,30 +708,30 @@ void NamedTuplesTest::testNamedTuple12()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 12);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
+		"string3", "3",
 		"int3", 3);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 
 	assert (aTuple != aTuple2);
 	aTuple = aTuple2;
@@ -742,11 +742,11 @@ void NamedTuplesTest::testNamedTuple12()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
@@ -763,30 +763,30 @@ void NamedTuplesTest::testNamedTuple12()
 
 void NamedTuplesTest::testNamedTuple13()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
 		bool> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
@@ -795,31 +795,31 @@ void NamedTuplesTest::testNamedTuple13()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 13);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 
 	assert (aTuple != aTuple2);
@@ -831,11 +831,11 @@ void NamedTuplesTest::testNamedTuple13()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
@@ -852,31 +852,31 @@ void NamedTuplesTest::testNamedTuple13()
 
 void NamedTuplesTest::testNamedTuple14()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
 		float> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
@@ -885,32 +885,32 @@ void NamedTuplesTest::testNamedTuple14()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 14);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 
@@ -923,15 +923,15 @@ void NamedTuplesTest::testNamedTuple14()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3.length == 14);
 
 	assert (aTuple.getName(0) == "string1");
@@ -945,32 +945,32 @@ void NamedTuplesTest::testNamedTuple14()
 
 void NamedTuplesTest::testNamedTuple15()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
-		float, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
+		float,
 		char> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
@@ -979,33 +979,33 @@ void NamedTuplesTest::testNamedTuple15()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 15);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5,
 		"char2", 'c');
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["char2"] == 'c');
@@ -1019,15 +1019,15 @@ void NamedTuplesTest::testNamedTuple15()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3["bool2"] == false);
 	assert (aTuple3.length == 15);
 
@@ -1042,74 +1042,74 @@ void NamedTuplesTest::testNamedTuple15()
 
 void NamedTuplesTest::testNamedTuple16()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
+		float,
+		char,
 		long> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
-	assert (aTuple["O"] == 0); 
+	assert (aTuple["O"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 16);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5,
 		"char2", 'c',
 		"long2", 999);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["char2"] == 'c');
-	assert (aTuple2["long2"] == 999); 
+	assert (aTuple2["long2"] == 999);
 	assert (aTuple2.length == 16);
 
 	assert (aTuple != aTuple2);
@@ -1121,17 +1121,17 @@ void NamedTuplesTest::testNamedTuple16()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3["bool2"] == false);
-	assert (aTuple3["char2"] == 0); 
+	assert (aTuple3["char2"] == 0);
 	assert (aTuple3.length == 16);
 
 	assert (aTuple.getName(0) == "string1");
@@ -1145,77 +1145,77 @@ void NamedTuplesTest::testNamedTuple16()
 
 void NamedTuplesTest::testNamedTuple17()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
 		double> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
-	assert (aTuple["O"] == 0); 
+	assert (aTuple["O"] == 0);
 	assert (aTuple["P"] == 0);
 
 	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 17);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5,
 		"char2", 'c',
 		"long2", 999,
 		"double2", 2.5);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["char2"] == 'c');
-	assert (aTuple2["long2"] == 999); 
+	assert (aTuple2["long2"] == 999);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2.length == 17);
 
@@ -1228,18 +1228,18 @@ void NamedTuplesTest::testNamedTuple17()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3["bool2"] == false);
 	assert (aTuple3["char2"] == 0);
-	assert (aTuple3["long2"] == 0); 
+	assert (aTuple3["long2"] == 0);
 	assert (aTuple3.length == 17);
 
 	assert (aTuple.getName(0) == "string1");
@@ -1253,39 +1253,39 @@ void NamedTuplesTest::testNamedTuple17()
 
 void NamedTuplesTest::testNamedTuple18()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
 		short> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
-	assert (aTuple["O"] == 0); 
+	assert (aTuple["O"] == 0);
 	assert (aTuple["P"] == 0);
 	assert (aTuple["R"] == 0);
 
@@ -1293,18 +1293,18 @@ void NamedTuplesTest::testNamedTuple18()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 18);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5,
 		"char2", 'c',
@@ -1312,21 +1312,21 @@ void NamedTuplesTest::testNamedTuple18()
 		"double2", 2.5,
 		"short2", 32700);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["char2"] == 'c');
-	assert (aTuple2["long2"] == 999); 
+	assert (aTuple2["long2"] == 999);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["short2"] == 32700);
 	assert (aTuple2.length == 18);
@@ -1340,19 +1340,19 @@ void NamedTuplesTest::testNamedTuple18()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3["bool2"] == false);
 	assert (aTuple3["char2"] == 0);
 	assert (aTuple3["long2"] == 0);
-	assert (aTuple3["short2"] == 0); 
+	assert (aTuple3["short2"] == 0);
 	assert (aTuple3.length == 18);
 
 	assert (aTuple.getName(0) == "string1");
@@ -1366,40 +1366,40 @@ void NamedTuplesTest::testNamedTuple18()
 
 void NamedTuplesTest::testNamedTuple19()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
 		std::string> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
-	assert (aTuple["O"] == 0); 
+	assert (aTuple["O"] == 0);
 	assert (aTuple["P"] == 0);
 	assert (aTuple["R"] == 0);
 	assert (aTuple["S"] == "");
@@ -1408,41 +1408,41 @@ void NamedTuplesTest::testNamedTuple19()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 19);
 	
-	TupleType aTuple2("string1", "1", 
+	TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5,
 		"char2", 'c',
 		"long2", 999,
 		"double2", 2.5,
-		"short2", 32700, 
+		"short2", 32700,
 		"string4", "4");
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["char2"] == 'c');
-	assert (aTuple2["long2"] == 999); 
+	assert (aTuple2["long2"] == 999);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["short2"] == 32700);
 	assert (aTuple2["string4"] == "4");
@@ -1457,19 +1457,19 @@ void NamedTuplesTest::testNamedTuple19()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3["bool2"] == false);
 	assert (aTuple3["char2"] == 0);
 	assert (aTuple3["long2"] == 0);
-	assert (aTuple3["short2"] == 0); 
+	assert (aTuple3["short2"] == 0);
 	assert (aTuple3["string4"] == "");
 	assert (aTuple3.length == 19);
 
@@ -1484,41 +1484,41 @@ void NamedTuplesTest::testNamedTuple19()
 
 void NamedTuplesTest::testNamedTuple20()
 {
-	typedef NamedTuple<std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+	typedef NamedTuple<std::string,
 		int,
-		std::string, 
-		int, 
-		bool, 
-		float, 
-		char, 
-		long, 
-		double, 
-		short, 
-		std::string, 
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
+		int,
+		std::string,
+		int,
+		bool,
+		float,
+		char,
+		long,
+		double,
+		short,
+		std::string,
 		int> TupleType;
 
-	TupleType aTuple; 
+	TupleType aTuple;
 
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false);
-	assert (aTuple["E"] == 0); 
+	assert (aTuple["E"] == 0);
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
-	assert (aTuple["J"] == 0); 
+	assert (aTuple["J"] == 0);
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
-	assert (aTuple["O"] == 0); 
+	assert (aTuple["O"] == 0);
 	assert (aTuple["P"] == 0);
 	assert (aTuple["R"] == 0);
 	assert (aTuple["S"] == "");
@@ -1527,46 +1527,46 @@ void NamedTuplesTest::testNamedTuple20()
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 20);
 	
-   TupleType aTuple2("string1", "1", 
+   TupleType aTuple2("string1", "1",
 		"int1", 1,
 		"bool1", true,
 		"float1", 1.5f,
 		"char1", 'c',
 		"long1", 999,
 		"double1", 1.5,
-		"short1", 32700, 
+		"short1", 32700,
 		"string2", "2",
 		"int2", 2,
-		"string3", "3", 
-		"int3", 3, 
+		"string3", "3",
+		"int3", 3,
 		"bool2", true,
 		"float2", 2.5,
 		"char2", 'c',
 		"long2", 999,
 		"double2", 2.5,
-		"short2", 32700, 
+		"short2", 32700,
 		"string4", "4",
 		"int4", 4);
 	assert (aTuple2["string1"] == "1");
-	assert (aTuple2["int1"] == 1); 
+	assert (aTuple2["int1"] == 1);
 	assert (aTuple2["bool1"] == true);
 	assert (aTuple2["float1"] == 1.5);
 	assert (aTuple2["char1"] == 'c');
-	assert (aTuple2["long1"] == 999); 
+	assert (aTuple2["long1"] == 999);
 	assert (aTuple2["double1"] == 1.5);
 	assert (aTuple2["short1"] == 32700);
 	assert (aTuple2["string2"] == "2");
-	assert (aTuple2["int2"] == 2); 
+	assert (aTuple2["int2"] == 2);
 	assert (aTuple2["string3"] == "3");
-	assert (aTuple2["int3"] == 3); 
+	assert (aTuple2["int3"] == 3);
 	assert (aTuple2["bool2"] == true);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["char2"] == 'c');
-	assert (aTuple2["long2"] == 999); 
+	assert (aTuple2["long2"] == 999);
 	assert (aTuple2["float2"] == 2.5);
 	assert (aTuple2["short2"] == 32700);
 	assert (aTuple2["string4"] == "4");
-	assert (aTuple2["int4"] == 4); 
+	assert (aTuple2["int4"] == 4);
 	assert (aTuple2.length == 20);
 
 	assert (aTuple != aTuple2);
@@ -1578,19 +1578,19 @@ void NamedTuplesTest::testNamedTuple20()
 	TupleType aTuple3(aTuple2.names());
 	assert (aTuple3.names() == aTuple2.names());
 	assert (aTuple3["string1"] == "");
-	assert (aTuple3["int1"] == 0); 
+	assert (aTuple3["int1"] == 0);
 	assert (aTuple3["bool1"] == false);
 	assert (aTuple3["char1"] == 0);
 	assert (aTuple3["long1"] == 0);
-	assert (aTuple3["short1"] == 0); 
+	assert (aTuple3["short1"] == 0);
 	assert (aTuple3["string2"] == "");
 	assert (aTuple3["int2"] == 0);
 	assert (aTuple3["string3"] == "");
-	assert (aTuple3["int3"] == 0); 
+	assert (aTuple3["int3"] == 0);
 	assert (aTuple3["bool2"] == false);
 	assert (aTuple3["char2"] == 0);
 	assert (aTuple3["long2"] == 0);
-	assert (aTuple3["short2"] == 0); 
+	assert (aTuple3["short2"] == 0);
 	assert (aTuple3["string4"] == "");
 	assert (aTuple3["int4"] == 0);
 	assert (aTuple3.length == 20);

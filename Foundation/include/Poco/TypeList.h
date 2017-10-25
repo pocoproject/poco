@@ -29,7 +29,7 @@
 namespace Poco {
 
 
-template <class Head, class Tail> 
+template <class Head, class Tail>
 struct TypeList;
 
 
@@ -57,7 +57,7 @@ struct NullTypeList
 };
 
 
-template <class Head, class Tail> 
+template <class Head, class Tail>
 struct TypeList
 	/// Compile Time List of Types
 {
@@ -122,26 +122,26 @@ struct TypeList
 };
 
 
-template <typename T0  = NullTypeList, 
-	typename T1  = NullTypeList, 
+template <typename T0  = NullTypeList,
+	typename T1  = NullTypeList,
 	typename T2  = NullTypeList,
-	typename T3  = NullTypeList, 
-	typename T4  = NullTypeList, 
+	typename T3  = NullTypeList,
+	typename T4  = NullTypeList,
 	typename T5  = NullTypeList,
-	typename T6  = NullTypeList, 
-	typename T7  = NullTypeList, 
+	typename T6  = NullTypeList,
+	typename T7  = NullTypeList,
 	typename T8  = NullTypeList,
-	typename T9  = NullTypeList, 
-	typename T10 = NullTypeList, 
+	typename T9  = NullTypeList,
+	typename T10 = NullTypeList,
 	typename T11 = NullTypeList,
-	typename T12 = NullTypeList, 
-	typename T13 = NullTypeList, 
+	typename T12 = NullTypeList,
+	typename T13 = NullTypeList,
 	typename T14 = NullTypeList,
-	typename T15 = NullTypeList, 
-	typename T16 = NullTypeList, 
+	typename T15 = NullTypeList,
+	typename T16 = NullTypeList,
 	typename T17 = NullTypeList,
 	typename T18 = NullTypeList,
-	typename T19 = NullTypeList> 
+	typename T19 = NullTypeList>
 struct TypeListType
 	/// TypeListType takes 1 - 20 typename arguments.
 	/// Usage:
@@ -165,7 +165,7 @@ struct TypeListType<>
 };
 
 
-template <int n> 
+template <int n>
 struct Getter
 {
 	template <class Ret, class Head, class Tail>
@@ -182,7 +182,7 @@ struct Getter
 };
 
 
-template <> 
+template <>
 struct Getter<0>
 {
 	template <class Ret, class Head, class Tail>
@@ -199,11 +199,11 @@ struct Getter<0>
 };
 
 
-template <int N, class Head> 
+template <int N, class Head>
 struct TypeGetter;
 
 
-template <int N, class Head, class Tail> 
+template <int N, class Head, class Tail>
 struct TypeGetter<N, TypeList<Head, Tail> >
 {
 	typedef typename TypeGetter<N-1, Tail>::HeadType HeadType;
@@ -211,7 +211,7 @@ struct TypeGetter<N, TypeList<Head, Tail> >
 };
 
 
-template <class Head, class Tail> 
+template <class Head, class Tail>
 struct TypeGetter<0, TypeList<Head, Tail> >
 {
 	typedef typename TypeList<Head, Tail>::HeadType HeadType;
@@ -256,7 +256,7 @@ public:
 };
 
 
-template <class Head, class T> 
+template <class Head, class T>
 struct TypeAppender;
 	/// TypeAppender appends T (type or a TypeList) to Head.
 	///
@@ -300,7 +300,7 @@ struct TypeAppender<TypeList<Head, Tail>, T>
 };
 
 
-template <class Head, class T> 
+template <class Head, class T>
 struct TypeOneEraser;
 	/// TypeOneEraser erases the first occurrence of the type T in Head.
 	/// Usage:
@@ -332,7 +332,7 @@ struct TypeOneEraser<TypeList<Head, Tail>, T>
 };
 
 
-template <class Head, class T> 
+template <class Head, class T>
 struct TypeAllEraser;
 	/// TypeAllEraser erases all the occurrences of the type T in Head.
 	/// Usage:
@@ -364,7 +364,7 @@ struct TypeAllEraser<TypeList<Head, Tail>, T>
 };
 
 
-template <class Head> 
+template <class Head>
 struct TypeDuplicateEraser;
 	/// TypeDuplicateEraser erases all but the first occurrence of the type T in Head.
 	/// Usage:
@@ -375,7 +375,7 @@ struct TypeDuplicateEraser;
 	///
 
 
-template <> 
+template <>
 struct TypeDuplicateEraser<NullTypeList>
 {
 	typedef NullTypeList HeadType;
@@ -395,7 +395,7 @@ public:
 
 template <class Head, class T, class R>
 struct TypeOneReplacer;
-	/// TypeOneReplacer replaces the first occurrence 
+	/// TypeOneReplacer replaces the first occurrence
 	/// of the type T in Head with type R.
 	/// Usage:
 	///
@@ -428,7 +428,7 @@ struct TypeOneReplacer<TypeList<Head, Tail>, T, R>
 
 template <class Head, class T, class R>
 struct TypeAllReplacer;
-	/// TypeAllReplacer replaces all the occurrences 
+	/// TypeAllReplacer replaces all the occurrences
 	/// of the type T in Head with type R.
 	/// Usage:
 	///

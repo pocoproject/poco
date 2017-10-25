@@ -66,7 +66,7 @@ private:
 	HOW_TO_DISPLAY	_howToDisplay;   // Indicates how to display this field
 	int				_displaySize;// Field size in characters for connect dialog
 };
-  
+
 typedef std::map<std::string, SessionParameters> SessionParametersMap;
 
 
