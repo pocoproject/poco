@@ -30,7 +30,7 @@ class Foundation_API UTF32Encoding: public TextEncoding
 	///
 	/// When converting from UTF-32 to Unicode, surrogates are
 	/// reported as they are - in other words, surrogate pairs
-	/// are not combined into one Unicode character. 
+	/// are not combined into one Unicode character.
 {
 public:
 	enum ByteOrderType

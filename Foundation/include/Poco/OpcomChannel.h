@@ -42,8 +42,8 @@ public:
 		/// Logs the given message using the OpenVMS OPCOM service.
 		
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets the property with the given name. 
-		/// 
+		/// Sets the property with the given name.
+		///
 		/// The only supported property is "target", which must
 		/// be set to one of the following values:
 		///
@@ -56,7 +56,7 @@ public:
 		///   * NTWORK:   Network operator
 		///   * TAPES:    Tapes operator
 		///   * PRINT:    Printer operator
-		///   * OPER1 .. 
+		///   * OPER1 ..
 		///   * OPER12:   System-manager-defined operator functions
 
 	std::string getProperty(const std::string& name) const;

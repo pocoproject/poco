@@ -33,7 +33,7 @@ class Net_API PartSource
 {
 public:
 	virtual std::istream& stream() = 0;
-		/// Returns an input stream for reading the 
+		/// Returns an input stream for reading the
 		/// part data.
 		///
 		/// Subclasses must override this method.

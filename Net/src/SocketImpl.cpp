@@ -65,7 +65,7 @@ bool checkIsBrokenTimeout()
 
 SocketImpl::SocketImpl():
 	_sockfd(POCO_INVALID_SOCKET),
-	_blocking(true), 
+	_blocking(true),
 	_isBrokenTimeout(checkIsBrokenTimeout())
 {
 }
@@ -124,7 +124,7 @@ void SocketImpl::connect(const SocketAddress& address)
 #endif
 	}
 	while (rc != 0 && lastError() == POCO_EINTR);
-	if (rc != 0) 
+	if (rc != 0)
 	{
 		int err = lastError();
 		error(err, address.toString());
@@ -332,7 +332,7 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 		rc = ::recv(_sockfd, reinterpret_cast<char*>(buffer), length, flags);
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
-	if (rc < 0) 
+	if (rc < 0)
 	{
 		int err = lastError();
 		if (err == POCO_EAGAIN && !_blocking)
@@ -478,7 +478,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 
 	::close(epollfd);
 	if (rc < 0) error();
-	return rc > 0; 
+	return rc > 0;
 
 #elif defined(POCO_HAVE_FD_POLL)
 
@@ -508,7 +508,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
-	return rc > 0; 
+	return rc > 0;
 
 #else
 
@@ -552,7 +552,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 	while (rc < 0 && errorCode == POCO_EINTR);
 	if (rc < 0) error(errorCode);
-	return rc > 0; 
+	return rc > 0;
 
 #endif // POCO_HAVE_FD_EPOLL
 }
@@ -656,7 +656,7 @@ SocketAddress SocketImpl::address()
 	int rc = ::getsockname(_sockfd, pSA, &saLen);
 	if (rc == 0)
 		return SocketAddress(pSA, saLen);
-	else 
+	else
 		error();
 	return SocketAddress();
 }
@@ -672,7 +672,7 @@ SocketAddress SocketImpl::peerAddress()
 	int rc = ::getpeername(_sockfd, pSA, &saLen);
 	if (rc == 0)
 		return SocketAddress(pSA, saLen);
-	else 
+	else
 		error();
 	return SocketAddress();
 }
@@ -987,7 +987,7 @@ int SocketImpl::fcntl(poco_fcntl_request_t request, long arg)
 	return rc;
 }
 #endif
- 
+
 
 void SocketImpl::reset(poco_socket_t aSocket)
 {

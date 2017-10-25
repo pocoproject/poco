@@ -39,7 +39,7 @@ namespace ODBC {
 void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
 {
 	int len = length;
-	if (SQL_NTS == len) 
+	if (SQL_NTS == len)
 		len = (int) std::strlen((const char *) pSQLChar);
 
 	UTF8Encoding utf8Encoding;
@@ -135,7 +135,7 @@ SQLRETURN SQLConnect(SQLHDBC hdbc,
 	std::string sqlPWD;
 	makeUTF16(szAuthStr, cbAuthStr, sqlPWD);
 	
-	return SQLConnectW(hdbc, 
+	return SQLConnectW(hdbc,
 		(SQLWCHAR*) sqlDSN.c_str(), cbDSN,
 		(SQLWCHAR*) sqlUID.c_str(), cbUID,
 		(SQLWCHAR*) sqlPWD.c_str(), cbAuthStr);
@@ -232,9 +232,9 @@ SQLRETURN SQLGetCursorName(SQLHSTMT hstmt,
 
 
 SQLRETURN SQLSetDescField(SQLHDESC hdesc,
-	SQLSMALLINT iRecord, 
+	SQLSMALLINT iRecord,
 	SQLSMALLINT iField,
-	SQLPOINTER  rgbValue, 
+	SQLPOINTER  rgbValue,
 	SQLINTEGER  cbValueMax)
 {
 	if (isString(rgbValue, cbValueMax))
@@ -243,16 +243,16 @@ SQLRETURN SQLSetDescField(SQLHDESC hdesc,
 		makeUTF16((SQLCHAR*) rgbValue, cbValueMax, str);
 
 		return SQLSetDescFieldW(hdesc,
-			iRecord, 
+			iRecord,
 			iField,
-			(SQLPOINTER) str.c_str(), 
+			(SQLPOINTER) str.c_str(),
 			(SQLINTEGER) str.size() * sizeof(SQLWCHAR));
 	}
 
 	return SQLSetDescFieldW(hdesc,
-		iRecord, 
+		iRecord,
 		iField,
-		rgbValue, 
+		rgbValue,
 		cbValueMax);
 }
 
@@ -297,7 +297,7 @@ SQLRETURN SQLGetDescRec(SQLHDESC hdesc,
 	SQLSMALLINT* pfType,
 	SQLSMALLINT* pfSubType,
 	SQLLEN*      pLength,
-	SQLSMALLINT* pPrecision, 
+	SQLSMALLINT* pPrecision,
 	SQLSMALLINT* pScale,
 	SQLSMALLINT* pNullable)
 {
@@ -392,7 +392,7 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 
 		return SQLSetConnectAttrW(hdbc,
 			fAttribute,
-			(SQLWCHAR*) str.c_str(), 
+			(SQLWCHAR*) str.c_str(),
 			(SQLINTEGER) str.size() * sizeof(SQLWCHAR));
 	}
 
@@ -591,7 +591,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 	SQLUSMALLINT fDriverCompletion)
 {
 	SQLSMALLINT len = cbConnStrIn;
-	if (SQL_NTS == len) 
+	if (SQL_NTS == len)
 		len = (SQLSMALLINT) std::strlen((const char*) szConnStrIn) + 1;
 
 	std::string connStrIn;

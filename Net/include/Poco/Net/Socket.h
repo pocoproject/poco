@@ -89,7 +89,7 @@ public:
 		/// Closes the socket.
 
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
-		/// Determines the status of one or more sockets, 
+		/// Determines the status of one or more sockets,
 		/// using a call to select().
 		///
 		/// ReadList contains the list of sockets which should be
@@ -103,7 +103,7 @@ public:
 		///
 		/// Returns the number of sockets ready.
 		///
-		/// After return, 
+		/// After return,
 		///   * readList contains those sockets ready for reading,
 		///   * writeList contains those sockets ready for writing,
 		///   * exceptList contains those sockets with a pending error.
@@ -119,9 +119,9 @@ public:
 		/// of all sockets in all list.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
-		/// Determines the status of the socket, using a 
+		/// Determines the status of the socket, using a
 		/// call to poll() or select().
-		/// 
+		///
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
 		///
@@ -196,23 +196,23 @@ public:
 		/// to the given time value.
 
 	void getOption(int level, int option, int& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, unsigned& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, unsigned char& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, Poco::Timespan& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 	
 	void getOption(int level, int option, IPAddress& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void setLinger(bool on, int seconds);
@@ -262,7 +262,7 @@ public:
 
 	bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of 
+		/// This method will only work if the blocking modes of
 		/// the socket are changed via the setBlocking method!
 
 	SocketAddress address() const;

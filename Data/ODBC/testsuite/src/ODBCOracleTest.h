@@ -21,7 +21,7 @@
 class ODBCOracleTest: public ODBCTest
 	/// Oracle ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB							| OS
 	/// ------------+-------------------------------+------------------------------------------
 	///	10.02.00.01	| Oracle9i Release 9.2.0.4.0	| MS Windows XP Professional x64 v.2003/SP1

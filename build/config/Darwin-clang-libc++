@@ -6,7 +6,7 @@
 # Build settings for Mac OS X 10.9 (clang, libc++, x86_64)
 # The build settings defined in this file are compatible
 # with XCode C++ projects.
-# 
+#
 # NOTE: This build configuration will build 64-bit binaries.
 # Use the Darwin32-clang-libc++ build configuration to build 32-bit binaries.
 #
@@ -18,7 +18,7 @@ LINKMODE ?= SHARED
 
 POCO_TARGET_OSARCH ?= x86_64
 POCO_HOST_OSARCH   := $(POCO_TARGET_OSARCH)
-ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH) 
+ARCHFLAGS          ?= -arch $(POCO_TARGET_OSARCH)
 OSFLAGS            ?= -mmacosx-version-min=10.9
 
 OPENSSL_DIR        ?= /usr/local/opt/openssl
@@ -36,9 +36,9 @@ LINK    = $(CXX) -bind_at_load
 LIB     = libtool -static -o
 RANLIB  = ranlib
 SHLIB   = $(CXX) -dynamiclib -Wl,-install_name,$(POCO_LIB_INSTALLDIR)/$(notdir \$@) -o $@
-DYLIB   = $(CXX) -dynamic -bundle $(RORELOCS) -Wl,-bind_at_load -o $@ 
+DYLIB   = $(CXX) -dynamic -bundle $(RORELOCS) -Wl,-bind_at_load -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = 
+STRIP   =
 DEP     = $(POCO_BASE)/build/script/makedepend.clang
 SHELL   = sh
 RM      = rm -rf
@@ -62,11 +62,11 @@ DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =
-SHAREDOPT_CC    = -fPIC 
+SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
-SHAREDOPT_LINK  = 
+SHAREDOPT_LINK  =
 DEBUGOPT_CC     = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL)
-DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL) 
+DEBUGOPT_CXX    = -O0 -g -gdwarf-2 -fasm-blocks -D_DEBUG=$(DEBUGLEVEL)
 DEBUGOPT_LINK   =
 RELEASEOPT_CC   = -DNDEBUG -Os -fasm-blocks
 RELEASEOPT_CXX  = -DNDEBUG -O2 -fasm-blocks
@@ -80,4 +80,4 @@ SYSFLAGS = -DPOCO_HAVE_IPv6 -DPOCO_NO_STAT64 -I$(OPENSSL_DIR)/include
 #
 # System Specific Libraries
 #
-SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl 
+SYSLIBS  = -L$(OPENSSL_DIR)/lib -ldl

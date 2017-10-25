@@ -42,7 +42,7 @@ DirectoryIterator::DirectoryIterator(const std::string& pathString): _path(pathS
 
 DirectoryIterator::DirectoryIterator(const DirectoryIterator& iterator): _path(iterator._path), _pImpl(iterator._pImpl)
 {
-	if (_pImpl) 
+	if (_pImpl)
 	{
 		_pImpl->duplicate();
 		_file = _path;
@@ -76,7 +76,7 @@ DirectoryIterator& DirectoryIterator::operator = (const DirectoryIterator& it)
 {
 	if (_pImpl) _pImpl->release();
 	_pImpl = it._pImpl;
-	if (_pImpl) 
+	if (_pImpl)
 	{
 		_pImpl->duplicate();
 		_path = it._path;

@@ -65,12 +65,12 @@ public:
 
 	static bool hasSomeProperties(int ch, int properties);
 		/// Returns true if the given character is
-		/// within the ASCII range and has at least one of 
+		/// within the ASCII range and has at least one of
 		/// the given properties.
 
 	static bool hasProperties(int ch, int properties);
 		/// Returns true if the given character is
-		/// within the ASCII range and has all of 
+		/// within the ASCII range and has all of
 		/// the given properties.
 
 	static bool isAscii(int ch);
@@ -123,7 +123,7 @@ private:
 //
 inline int Ascii::properties(int ch)
 {
-	if (isAscii(ch)) 
+	if (isAscii(ch))
 		return CHARACTER_PROPERTIES[ch];
 	else
 		return 0;

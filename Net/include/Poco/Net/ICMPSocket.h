@@ -31,7 +31,7 @@ class Net_API ICMPSocket: public Socket
 	/// ICMP client socket.
 {
 public:
-	ICMPSocket(SocketAddress::Family family, int dataSize = 48, int ttl = 128, int timeout = 500000);
+	ICMPSocket(SocketAddress::Family family, int dataSize = 48, int ttl = 128, int timeout = 5000000);
 		/// Creates an unconnected ICMP socket.
 		///
 		/// The socket will be created for the
@@ -63,7 +63,7 @@ public:
 		/// Receives data from the socket.
 		/// Stores the address of the sender in address.
 		///
-		/// Returns the time elapsed since the originating 
+		/// Returns the time elapsed since the originating
 		/// request was sent.
 
 	int dataSize() const;

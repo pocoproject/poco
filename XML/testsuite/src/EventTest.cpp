@@ -171,7 +171,7 @@ void EventTest::testInsert()
 	
 	const XMLString& log = TestEventListener::log();
 
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeInserted:CAPTURING_PHASE:root:#document:B:-:MODIFICATION:#document:::\n"
 		"rootCap:DOMNodeInserted:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
 		"root:DOMNodeInserted:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
@@ -188,7 +188,7 @@ void EventTest::testInsert()
 	AutoPtr<Text> pText = pDoc->createTextNode("text");
 	pRoot->appendChild(pText);
 
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeInserted:CAPTURING_PHASE:#text:#document:B:-:MODIFICATION:root:::\n"
 		"rootCap:DOMNodeInserted:CAPTURING_PHASE:#text:root:B:-:MODIFICATION:root:::\n"
 		"root:DOMNodeInserted:BUBBLING_PHASE:#text:root:B:-:MODIFICATION:root:::\n"
@@ -237,7 +237,7 @@ void EventTest::testInsertSubtree()
 	pDoc->appendChild(pRoot);
 
 	const XMLString& log = TestEventListener::log();
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeInserted:CAPTURING_PHASE:root:#document:B:-:MODIFICATION:#document:::\n"
 		"rootCap:DOMNodeInserted:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
 		"root:DOMNodeInserted:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
@@ -289,7 +289,7 @@ void EventTest::testRemove()
 	pRoot->removeChild(pText);
 
 	const XMLString& log = TestEventListener::log();
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeRemoved:CAPTURING_PHASE:#text:#document:B:-:MODIFICATION:root:::\n"
 		"rootCap:DOMNodeRemoved:CAPTURING_PHASE:#text:root:B:-:MODIFICATION:root:::\n"
 		"root:DOMNodeRemoved:BUBBLING_PHASE:#text:root:B:-:MODIFICATION:root:::\n"
@@ -340,7 +340,7 @@ void EventTest::testRemoveSubtree()
 	pDoc->removeChild(pRoot);
 
 	const XMLString& log = TestEventListener::log();	
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeRemoved:CAPTURING_PHASE:root:#document:B:-:MODIFICATION:#document:::\n"
 		"rootCap:DOMNodeRemoved:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
 		"root:DOMNodeRemoved:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
@@ -383,7 +383,7 @@ void EventTest::testCharacterData()
 	pText->setData("modified");
 
 	const XMLString& log = TestEventListener::log();	
-	assert (log == 
+	assert (log ==
 		"docCap:DOMCharacterDataModified:CAPTURING_PHASE:#text:#document:B:-:MODIFICATION:::text:modified\n"
 		"rootCap:DOMCharacterDataModified:CAPTURING_PHASE:#text:root:B:-:MODIFICATION:::text:modified\n"
 		"textCap:DOMCharacterDataModified:AT_TARGET:#text:#text:B:-:MODIFICATION:::text:modified\n"
@@ -481,7 +481,7 @@ void EventTest::testAddRemoveInEvent()
 	pDoc->appendChild(pRoot);
 	
 	const XMLString& log = TestEventListener::log();
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeInserted:CAPTURING_PHASE:root:#document:B:-:MODIFICATION:#document:::\n"
 		"rootCap:DOMNodeInserted:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
 		"root:DOMNodeInserted:AT_TARGET:root:root:B:-:MODIFICATION:#document:::\n"
@@ -498,7 +498,7 @@ void EventTest::testAddRemoveInEvent()
 	AutoPtr<Text> pText = pDoc->createTextNode("text");
 	pRoot->appendChild(pText);
 
-	assert (log == 
+	assert (log ==
 		"docCap:DOMNodeInserted:CAPTURING_PHASE:#text:#document:B:-:MODIFICATION:root:::\n"
 		"rootCap:DOMNodeInserted:CAPTURING_PHASE:#text:root:B:-:MODIFICATION:root:::\n"
 		"root:DOMNodeInserted:BUBBLING_PHASE:#text:root:B:-:MODIFICATION:root:::\n"

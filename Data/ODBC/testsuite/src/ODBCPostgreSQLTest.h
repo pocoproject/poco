@@ -25,15 +25,15 @@
 class ODBCPostgreSQLTest: public ODBCTest
 	/// PostgreSQL ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		   |	DB                | OS                                        | Driver Manager     |Notes
 	/// ---------------+----------------------+-------------------------------------------+--------------------+--------------------------
 	///	07.03.02.60	   | PostgreSQL 7.4.6     | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       | BLOB fails (missing 'lo')
 	/// 08.01.02.00    | PostgreSQL 8.1.5-1   | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       |
 	/// 1:08.01.0200-2 | PostgreSQL 8.1.5-1   | Ubuntu 7.04 (2.6.20-15-generic #2 SMP)    | unixODBC 2.2.11.-13|
-	/// Mammoth ODBCng |                      |                                           |                    | 
+	/// Mammoth ODBCng |                      |                                           |                    |
 	/// (0.99.00.122)  | PostgreSQL 8.1.5-1   | MS Windows XP Professional x64 v.2003/SP1 | 3.526.3959.0       |
-	/// 
+	///
 {
 public:
 	ODBCPostgreSQLTest(const std::string& name);
@@ -71,8 +71,8 @@ private:
 
 	void configurePLPgSQL();
 		/// Configures PL/pgSQL in the database. A reasonable defaults
-		/// for the interpreter location on WIN32 and POSIX platforms are 
-		/// supplied (see installDir member variable). 
+		/// for the interpreter location on WIN32 and POSIX platforms are
+		/// supplied (see installDir member variable).
 		/// If these do not work, user must determine the proper location,
 		/// modify the function and recompile.
 		/// Alternative is direct database configuration for PL/pgSQL usage.

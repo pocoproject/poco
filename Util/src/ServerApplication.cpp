@@ -57,8 +57,8 @@ namespace Util {
 Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
 #if !defined(_WIN32_WCE)
 Poco::Event           ServerApplication::_terminated;
-SERVICE_STATUS        ServerApplication::_serviceStatus; 
-SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
+SERVICE_STATUS        ServerApplication::_serviceStatus;
+SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0;
 #endif
 #endif
 #if defined(POCO_VXWORKS) || defined(POCO_ANDROID) || defined(__NACL__) ||  defined(__EMSCRIPTEN__)
@@ -116,15 +116,15 @@ void ServerApplication::terminate()
 //
 BOOL ServerApplication::ConsoleCtrlHandler(DWORD ctrlType)
 {
-	switch (ctrlType) 
-	{ 
-	case CTRL_C_EVENT: 
-	case CTRL_CLOSE_EVENT: 
+	switch (ctrlType)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
 	case CTRL_BREAK_EVENT:
 		terminate();
 		return _terminated.tryWait(10000) ? TRUE : FALSE;
-	default: 
-		return FALSE; 
+	default:
+		return FALSE;
 	}
 }
 
@@ -146,14 +146,14 @@ DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, 
 	DWORD result = NO_ERROR;
 	ServerApplication* pThis = reinterpret_cast<ServerApplication*>(context);
 
-	switch (control) 
-	{ 
+	switch (control)
+	{
 	case SERVICE_CONTROL_STOP:
 	case SERVICE_CONTROL_SHUTDOWN:
 		terminate();
 		_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 		break;
-	case SERVICE_CONTROL_INTERROGATE: 
+	case SERVICE_CONTROL_INTERROGATE:
 		break;
 	case SERVICE_CONTROL_DEVICEEVENT:
 		if (pThis)
@@ -161,7 +161,7 @@ DWORD ServerApplication::ServiceControlHandler(DWORD control, DWORD event_type, 
 			result = pThis->handleDeviceEvent(event_type, event_data);
 		}
 		break;
-	} 
+	}
 	SetServiceStatus(_serviceStatusHandle,  &_serviceStatus);
 	return result;
 }
@@ -181,13 +181,13 @@ void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
 
-	_serviceStatus.dwServiceType             = SERVICE_WIN32; 
-	_serviceStatus.dwCurrentState            = SERVICE_START_PENDING; 
+	_serviceStatus.dwServiceType             = SERVICE_WIN32;
+	_serviceStatus.dwCurrentState            = SERVICE_START_PENDING;
 	_serviceStatus.dwControlsAccepted        = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
-	_serviceStatus.dwWin32ExitCode           = 0; 
-	_serviceStatus.dwServiceSpecificExitCode = 0; 
-	_serviceStatus.dwCheckPoint              = 0; 
-	_serviceStatus.dwWaitHint                = 0; 
+	_serviceStatus.dwWin32ExitCode           = 0;
+	_serviceStatus.dwServiceSpecificExitCode = 0;
+	_serviceStatus.dwCheckPoint              = 0;
+	_serviceStatus.dwWaitHint                = 0;
 	SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 
 	try
@@ -202,23 +202,23 @@ void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
 		}
 		app.init(args);
 #endif
-		_serviceStatus.dwCurrentState = SERVICE_RUNNING; 
+		_serviceStatus.dwCurrentState = SERVICE_RUNNING;
 		SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 		int rc = app.run();
 		_serviceStatus.dwWin32ExitCode           = rc ? ERROR_SERVICE_SPECIFIC_ERROR : 0;
-		_serviceStatus.dwServiceSpecificExitCode = rc; 
+		_serviceStatus.dwServiceSpecificExitCode = rc;
 	}
 	catch (Exception& exc)
 	{
 		app.logger().log(exc);
 		_serviceStatus.dwWin32ExitCode           = ERROR_SERVICE_SPECIFIC_ERROR;
-		_serviceStatus.dwServiceSpecificExitCode = EXIT_CONFIG; 
+		_serviceStatus.dwServiceSpecificExitCode = EXIT_CONFIG;
 	}
 	catch (...)
 	{
 		app.logger().error("fatal error - aborting");
 		_serviceStatus.dwWin32ExitCode           = ERROR_SERVICE_SPECIFIC_ERROR;
-		_serviceStatus.dwServiceSpecificExitCode = EXIT_SOFTWARE; 
+		_serviceStatus.dwServiceSpecificExitCode = EXIT_SOFTWARE;
 	}
 	_serviceStatus.dwCurrentState = SERVICE_STOPPED;
 	SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
@@ -239,7 +239,7 @@ int ServerApplication::run(int argc, char** argv)
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		int rc = EXIT_OK;
 		try
@@ -275,7 +275,7 @@ int ServerApplication::run(const std::vector<std::string>& args)
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		int rc = EXIT_OK;
 		try
@@ -312,7 +312,7 @@ int ServerApplication::run(int argc, wchar_t** argv)
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		int rc = EXIT_OK;
 		try
@@ -350,8 +350,8 @@ bool ServerApplication::isService()
 	svcDispatchTable[0].lpServiceName = L"";
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
-	svcDispatchTable[1].lpServiceProc = NULL; 
-	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0; 
+	svcDispatchTable[1].lpServiceProc = NULL;
+	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0;
 #endif
 }
 
@@ -730,7 +730,7 @@ void ServerApplication::handleUMask(const std::string& rName, const std::string&
 	for (std::string::const_iterator it = rValue.begin(); it != rValue.end(); ++it)
 	{
 		mask *= 8;
-		if (*it >= '0' && *it <= '7') 
+		if (*it >= '0' && *it <= '7')
 			mask += *it - '0';
 		else
 			throw Poco::InvalidArgumentException("umask contains non-octal characters", rValue);
@@ -772,7 +772,7 @@ void ServerApplication::waitForTerminationRequest()
 	handler.sa_flags   = 0;
 	sigemptyset(&handler.sa_mask);
 	sigaction(SIGINT, &handler, NULL);
-	sigaction(SIGQUIT, &handler, NULL);                                       
+	sigaction(SIGQUIT, &handler, NULL);
 
 	long ctrlY = LIB$M_CLI_CTRLY;
 	unsigned short ioChan;

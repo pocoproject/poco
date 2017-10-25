@@ -22,7 +22,7 @@
 
 #if defined(__APPLE__)
 // OS X 10.7 deprecates some OpenSSL functions
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 
@@ -33,20 +33,20 @@ enum RSAPaddingMode
 	/// The padding mode used for RSA public key encryption.
 {
 	RSA_PADDING_PKCS1,
-		/// PKCS #1 v1.5 padding. This currently is the most widely used mode. 
+		/// PKCS #1 v1.5 padding. This currently is the most widely used mode.
 		
 	RSA_PADDING_PKCS1_OAEP,
-		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty 
+		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty
 		/// encoding parameter. This mode is recommended for all new applications.
 		
 	RSA_PADDING_SSLV23,
-		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes 
-		/// that the server is SSL3 capable. 
+		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes
+		/// that the server is SSL3 capable.
 		
 	RSA_PADDING_NONE
-		/// Raw RSA encryption. This mode should only be used to implement cryptographically 
-		/// sound padding modes in the application code. Encrypting user data directly with RSA 
-		/// is insecure. 
+		/// Raw RSA encryption. This mode should only be used to implement cryptographically
+		/// sound padding modes in the application code. Encrypting user data directly with RSA
+		/// is insecure.
 };
 
 
@@ -108,7 +108,7 @@ void Crypto_API initializeCrypto();
 	/// libraries, by calling OpenSSLInitializer::initialize().
 	///
 	/// Should be called before using any class from the Crypto library.
-	/// The Crypto library will be initialized automatically, through  
+	/// The Crypto library will be initialized automatically, through
 	/// OpenSSLInitializer instances held by various Crypto classes
 	/// (Cipher, CipherKey, RSAKey, X509Certificate).
 	/// However, it is recommended to call initializeCrypto()
@@ -120,7 +120,7 @@ void Crypto_API initializeCrypto();
 	
 
 void Crypto_API uninitializeCrypto();
-	/// Uninitializes the Crypto library by calling 
+	/// Uninitializes the Crypto library by calling
 	/// OpenSSLInitializer::uninitialize().
 
 

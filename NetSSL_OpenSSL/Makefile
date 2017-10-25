@@ -20,6 +20,6 @@ objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHa
 
 target         = PocoNetSSL
 target_version = $(LIBVERSION)
-target_libs    = PocoNet PocoCrypto PocoUtil PocoFoundation 
+target_libs    = PocoNet PocoCrypto PocoUtil PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

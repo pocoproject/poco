@@ -140,7 +140,7 @@ public:
 	}
 
 	void loadLibrary(const std::string& path, const std::string& manifest)
-		/// Loads a library from the given path, using the given manifest. 
+		/// Loads a library from the given path, using the given manifest.
 		/// Does nothing if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
 		/// cannot be loaded or does not have a Manifest.
@@ -210,7 +210,7 @@ public:
 	}
 		
 	void unloadLibrary(const std::string& path)
-		/// Unloads the given library. 
+		/// Unloads the given library.
 		/// Be extremely cautious when unloading shared libraries.
 		/// If objects from the library are still referenced somewhere,
 		/// a total crash is very likely.

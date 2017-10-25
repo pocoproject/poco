@@ -29,7 +29,7 @@ namespace MongoDB {
 
 
 class MongoDB_API MessageHeader
-	/// Represents the message header which is always prepended to a 
+	/// Represents the message header which is always prepended to a
 	/// MongoDB request or response message.
 {
 public:
@@ -72,7 +72,7 @@ public:
 		/// Sets the request ID of the current message.
 
 	Int32 responseTo() const;
-		/// Returns the request id from the original request. 
+		/// Returns the request id from the original request.
 
 private:
 	void setMessageLength(Int32 length);

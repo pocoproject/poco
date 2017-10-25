@@ -294,7 +294,7 @@ void TCPServerTest::testReuseSession()
 	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
 	
 	Context::Ptr pServerContext = new Context(
-		Context::SERVER_USE, 
+		Context::SERVER_USE,
 		Application::instance().config().getString("openSSL.server.privateKeyFile"),
 		Application::instance().config().getString("openSSL.server.privateKeyFile"),
 		Application::instance().config().getString("openSSL.server.caConfig"),
@@ -316,7 +316,7 @@ void TCPServerTest::testReuseSession()
 	assert (srv.totalConnections() == 0);
 	
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.caConfig"),

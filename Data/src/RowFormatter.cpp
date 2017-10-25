@@ -24,7 +24,7 @@ namespace Data {
 RowFormatter::RowFormatter(const std::string& rPrefix,
 	const std::string& rPostfix,
 	Mode mode):
-	_prefix(rPrefix), 
+	_prefix(rPrefix),
 	_postfix(rPostfix),
 	_mode(mode),
 	_totalRowCount(0)

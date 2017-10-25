@@ -36,7 +36,7 @@ namespace Poco {
 
 
 class Foundation_API NamedEvent: public NamedEventImpl
-	/// An NamedEvent is a global synchronization object 
+	/// An NamedEvent is a global synchronization object
 	/// that allows one process or thread to signal an
 	/// other process or thread that a certain event
 	/// has happened.
@@ -61,8 +61,8 @@ public:
 		/// Destroys the event.
 
 	void set();
-		/// Signals the event. 
-		/// The one thread or process waiting for the event 
+		/// Signals the event.
+		/// The one thread or process waiting for the event
 		/// can resume execution.
 
 	void wait();

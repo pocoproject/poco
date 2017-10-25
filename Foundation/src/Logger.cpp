@@ -73,7 +73,7 @@ void Logger::setProperty(const std::string& rName, const std::string& rValue)
 		setChannel(LoggingRegistry::defaultRegistry().channelForName(rValue));
 	else if (rName == "level")
 		setLevel(rValue);
-	else 
+	else
 		Channel::setProperty(rName, rValue);
 }
 
@@ -119,7 +119,7 @@ void Logger::setLevel(const std::string& name, int level)
 		std::string::size_type len = name.length();
 		for (LoggerMap::iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
 		{
-			if (len == 0 || 
+			if (len == 0 ||
 				(it->first.compare(0, len, name) == 0 && (it->first.length() == len || it->first[len] == '.')))
 			{
 				it->second->setLevel(level);

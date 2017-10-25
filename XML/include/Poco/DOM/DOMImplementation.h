@@ -47,13 +47,13 @@ public:
 	bool hasFeature(const XMLString& feature, const XMLString& version) const;
 		/// Tests if the DOM implementation implements a specific feature.
 		///
-		/// The only supported features are "XML", version "1.0" and "Core", 
+		/// The only supported features are "XML", version "1.0" and "Core",
 		/// "Events", "MutationEvents" and "Traversal", version "2.0".
 	
 	// DOM Level 2
 	DocumentType* createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const;
-		/// Creates an empty DocumentType node. Entity declarations and notations 
-		/// are not made available. Entity reference expansions and default attribute 
+		/// Creates an empty DocumentType node. Entity declarations and notations
+		/// are not made available. Entity reference expansions and default attribute
 		/// additions do not occur.
 
 	Document* createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType* doctype) const;

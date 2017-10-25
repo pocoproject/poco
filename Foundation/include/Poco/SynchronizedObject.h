@@ -55,8 +55,8 @@ public:
 		/// other threads.
 		
 	void notify() const;
-		/// Signals the object. 
-		/// Exactly only one thread waiting for the object 
+		/// Signals the object.
+		/// Exactly only one thread waiting for the object
 		/// can resume execution.
 
 	void wait() const;

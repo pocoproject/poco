@@ -43,7 +43,7 @@ class Net_API HTTPCredentials
 	/// First, create a HTTPCredentials object containing
 	/// the username and password.
 	///     Poco::Net::HTTPCredentials creds("user", "s3cr3t");
-	/// 
+	///
 	/// Second, send the HTTP request with Poco::Net::HTTPClientSession.
 	///     Poco::Net::HTTPClientSession session("pocoproject.org");
 	///     Poco::Net::HTTPRequest request(HTTPRequest::HTTP_GET, "/index.html", HTTPMessage::HTTP_1_1);
@@ -51,7 +51,7 @@ class Net_API HTTPCredentials
 	///     Poco::Net::HTTPResponse;
 	///     std::istream& istr = session.receiveResponse(response);
 	///
-	/// If the server responds with a 401 status, authenticate the 
+	/// If the server responds with a 401 status, authenticate the
 	/// request and resend it:
 	///     if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
 	///     {

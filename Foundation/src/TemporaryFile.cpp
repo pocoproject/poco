@@ -70,15 +70,15 @@ private:
 };
 
 
-TemporaryFile::TemporaryFile(): 
-	File(tempName()), 
+TemporaryFile::TemporaryFile():
+	File(tempName()),
 	_keep(false)
 {
 }
 
 
-TemporaryFile::TemporaryFile(const std::string& tempDir): 
-	File(tempName(tempDir)), 
+TemporaryFile::TemporaryFile(const std::string& tempDir):
+	File(tempName(tempDir)),
 	_keep(false)
 {
 }
@@ -120,7 +120,7 @@ void TemporaryFile::keepUntilExit()
 }
 
 
-namespace 
+namespace
 {
 	static TempFileCollector fc;
 }

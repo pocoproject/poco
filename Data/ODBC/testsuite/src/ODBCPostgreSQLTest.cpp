@@ -143,7 +143,7 @@ std::string ODBCPostgreSQLTest::_connectString =
 	"ReadOnly=0;";
 
 
-ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name): 
+ODBCPostgreSQLTest::ODBCPostgreSQLTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -208,7 +208,7 @@ void ODBCPostgreSQLTest::testBLOB()
 		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -237,7 +237,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		session().setFeature("autoExtract", bindValue(k+1));
 
 		dropObject("FUNCTION", nm + "()");
-		try 
+		try
 		{
 			session() << "CREATE FUNCTION " << nm << "() RETURNS INTEGER AS '"
 				"BEGIN "
@@ -253,7 +253,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		assert(-1 == i);
 		dropObject("FUNCTION", nm + "(INTEGER)");
 
-		try 
+		try
 		{
 			session() << "CREATE FUNCTION " << nm << "(INTEGER) RETURNS INTEGER AS '"
 				"BEGIN "
@@ -271,7 +271,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		dropObject("FUNCTION", nm + "(INTEGER)");
 
 		dropObject("FUNCTION", nm + "(TIMESTAMP)");
-		try 
+		try
 		{
 			session() << "CREATE FUNCTION " << nm << "(TIMESTAMP) RETURNS TIMESTAMP AS '"
 				"BEGIN "
@@ -289,13 +289,13 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		dropObject("FUNCTION", nm + "(TIMESTAMP)");
 
 		dropObject("FUNCTION", nm + "(TEXT, TEXT)");
-		try 
+		try
 		{
 			session() << "CREATE FUNCTION " << nm << "(TEXT,TEXT) RETURNS TEXT AS '"
 				"BEGIN "
 				" RETURN $1 || '', '' || $2 || ''!'';"
 				"END;'"
-				"LANGUAGE 'plpgsql'" , now; 
+				"LANGUAGE 'plpgsql'" , now;
 		}
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
@@ -303,9 +303,9 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		std::string param1 = "Hello";
 		std::string param2 = "world";
 		std::string ret;
-		try 
+		try
 		{
-			session() << "{? = call " << nm << "(?,?)}", out(ret), in(param1), in(param2), now; 
+			session() << "{? = call " << nm << "(?,?)}", out(ret), in(param1), in(param2), now;
 		}
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
@@ -388,9 +388,9 @@ void ODBCPostgreSQLTest::configurePLPgSQL()
 			"HANDLER plpgsql_call_handler "
 			"LANCOMPILER 'PL/pgSQL'", now;
 
-	}catch(StatementException& ex) 
-	{  
-		if (7 != ex.diagnostics().nativeError(0)) 
+	}catch(StatementException& ex)
+	{
+		if (7 != ex.diagnostics().nativeError(0))
 			throw;
 	}
 
@@ -559,15 +559,15 @@ void ODBCPostgreSQLTest::recreateBoolTable()
 void ODBCPostgreSQLTest::recreateMiscTable()
 {
 	dropObject("TABLE", ExecUtil::misctest());
-	try 
-	{ 
+	try
+	{
 		// Mammoth does not bind columns properly
 		session() << "CREATE TABLE "<< ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second BYTEA,"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
-			"Fifth TIMESTAMP)", now; 
+			"Fifth TIMESTAMP)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -578,20 +578,20 @@ void ODBCPostgreSQLTest::recreateLogTable()
 	dropObject("TABLE", ExecUtil::pocolog());;
 	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR,"
 			"Name VARCHAR,"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR, "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR,"
-			"DateTime TIMESTAMP)"; 
+			"DateTime TIMESTAMP)";
 
-		session() << sql, ExecUtil::pocolog(), now; 
-		session() << sql, ExecUtil::pocolog_a(), now; 
+		session() << sql, ExecUtil::pocolog(), now;
+		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }

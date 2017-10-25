@@ -159,7 +159,7 @@ void SQLiteStatementImpl::bindImpl()
 
 	int paramCount = sqlite3_bind_parameter_count(_pStmt);
 	BindIt bindEnd = bindings().end();
-	if (0 == paramCount || bindEnd == _bindBegin) 
+	if (0 == paramCount || bindEnd == _bindBegin)
 	{
 		_canBind = false;
 		return;

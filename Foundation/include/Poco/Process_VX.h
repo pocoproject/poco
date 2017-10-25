@@ -57,11 +57,11 @@ public:
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static ProcessHandleImpl* launchImpl(
-		const std::string& command, 
-		const ArgsImpl& args, 
+		const std::string& command,
+		const ArgsImpl& args,
 		const std::string& initialDirectory,
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe,
 		const EnvImpl& env);
 	static void killImpl(ProcessHandleImpl& handle);

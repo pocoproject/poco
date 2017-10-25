@@ -46,7 +46,7 @@ inline void Test::run(TestResult *result)
 // Counts the number of test cases that will be run by this test.
 inline int Test::countTestCases()
 {
-	return 0; 
+	return 0;
 }
 
 

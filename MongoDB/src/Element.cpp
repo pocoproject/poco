@@ -26,7 +26,7 @@ Element::Element(const std::string& name) : _name(name)
 }
 
 
-Element::~Element() 
+Element::~Element()
 {
 }
 

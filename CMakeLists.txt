@@ -337,7 +337,7 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 include(CPack)
 
 #############################################################
-# cmake config files 
+# cmake config files
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(

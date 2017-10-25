@@ -21,7 +21,7 @@ class Page;
 
 class CodeWriter
 	/// This class implements the code generator for
-	/// generating C++ header and implementation files 
+	/// generating C++ header and implementation files
 	/// from C++ Server Pages.
 {
 public:

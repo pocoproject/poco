@@ -40,7 +40,7 @@ class Net_API MultipartWriter
 	/// a MultipartWriter object.
 	/// Then, for each part, call nextPart() and
 	/// write the content to the output stream.
-	/// Repeat for all parts. 
+	/// Repeat for all parts.
 	/// After the last part has been written,
 	/// call close() to finish the multipart message.
 {

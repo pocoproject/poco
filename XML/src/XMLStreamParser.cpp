@@ -31,8 +31,8 @@ namespace XML {
 
 struct StreamExceptionController
 {
-	StreamExceptionController(std::istream& is): 
-		_istr(is), 
+	StreamExceptionController(std::istream& is):
+		_istr(is),
 		_oldState(_istr.exceptions())
 	{
 		_istr.exceptions(_oldState & ~std::istream::failbit);
@@ -88,8 +88,8 @@ std::ostream& operator << (std::ostream& os, XMLStreamParser::EventType e)
 
 
 XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, FeatureType f):
-	_size(0), 
-	_inputName(iname), 
+	_size(0),
+	_inputName(iname),
 	_feature(f)
 {
 	_data.is = &is;
@@ -98,8 +98,8 @@ XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, Fea
 
 
 XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::string& iname, FeatureType f):
-	_size(size), 
-	_inputName(iname), 
+	_size(size),
+	_inputName(iname),
 	_feature(f)
 {
 	poco_assert(data != 0 && size != 0);

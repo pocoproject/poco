@@ -93,7 +93,7 @@ void DOMWriter::writeNode(const std::string& systemId, const Node* pNode)
 	Poco::FileOutputStream ostr(systemId);
 	if (ostr.good())
 		writeNode(ostr, pNode);
-	else 
+	else
 		throw Poco::CreateFileException(systemId);
 }
 

@@ -229,7 +229,7 @@ void FileImpl::setWriteableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -241,7 +241,7 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode_t wmask = S_IWUSR | S_IWGRP | S_IWOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -279,7 +279,7 @@ void FileImpl::renameToImpl(const std::string& path)
 	{
 		switch (res & 0x0FFFFFFF)
 		{
-		case RMS$_FNF: 
+		case RMS$_FNF:
 			throw FileNotFoundException(_path);
 		case RMS$_DEV:
 		case RMS$_DNF:
@@ -342,7 +342,7 @@ bool FileImpl::createDirectoryImpl()
 		return false;
 	Path p(_path);
 	p.makeDirectory();
-	if (mkdir(p.toString().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) 
+	if (mkdir(p.toString().c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }

@@ -94,7 +94,7 @@ void ZipUtil::sync(std::istream& in)
 {
 	enum
 	{
-		PREFIX = 2, 
+		PREFIX = 2,
 		BUFFER_SIZE = 1024
 	};
 	char temp[BUFFER_SIZE];
@@ -102,7 +102,7 @@ void ZipUtil::sync(std::istream& in)
 	std::size_t tempPos = PREFIX;
 
 	while (in.good() && !in.eof())
-	{ 
+	{
 		// all zip headers start withe same 2byte prefix
 		if (std::memcmp(ZipLocalFileHeader::HEADER, &temp[tempPos - PREFIX], PREFIX) == 0)
 		{
@@ -110,8 +110,8 @@ void ZipUtil::sync(std::istream& in)
 			// read the next 2 bytes
 			in.read(temp+tempPos, PREFIX);
 			tempPos += PREFIX;
-			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 || 
-				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 || 
+			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
+				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipFileInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipDataInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0)
 			{

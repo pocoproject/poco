@@ -2,7 +2,7 @@ set(TESTUNIT "${LIBNAME}-testrunner")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-file(GLOB SRCS_G_REMOVE 
+file(GLOB SRCS_G_REMOVE
     src/TestApp.cpp
     src/TestApp_WINCE.cpp
     src/TestLibrary.cpp
