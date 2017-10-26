@@ -34,7 +34,6 @@ model {
 	binaries {
 		all {
 			if (toolChain in VisualCpp) {
-				cCompiler.args "/TP"
 		   }
 		}
 		withType(SharedLibraryBinarySpec) {
