@@ -28,8 +28,7 @@ namespace ODBC {
 Preparator::Preparator(const StatementHandle& rStmt,
 	const std::string& statement,
 	std::size_t maxFieldSize,
-	DataExtraction dataExtraction,
-	bool isPostgres) :
+	DataExtraction dataExtraction) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
 	_dataExtraction(dataExtraction)
@@ -38,9 +37,8 @@ Preparator::Preparator(const StatementHandle& rStmt,
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
 	// PostgreSQL error swallowing workaround:
-	// Postgres may execute a statement with sintax error fine,
-	// but would return error once num of columns requested!
-	if (isPostgres)
+	// Postgres may execute a statement with syntax error fine,
+	// but will return error later
 	{
 		SQLSMALLINT t = 0;
 		SQLRETURN r = SQLNumResultCols(rStmt, &t);

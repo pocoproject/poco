@@ -3015,7 +3015,8 @@ void SQLExecutor::notNulls(const std::string& sqlState)
 	{
 		session() << "INSERT INTO "<< ExecUtil::nulltest() << " (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now;
 		fail ("must fail");
-	}catch (StatementException& se)
+	}
+	catch (StatementException& se)
 	{
 		//double check if we're failing for the right reason
 		//default sqlState value is "23502"; some drivers report "HY???" codes

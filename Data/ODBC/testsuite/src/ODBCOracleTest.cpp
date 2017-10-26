@@ -41,7 +41,7 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in OraClient12Home1_32bit"//XE"
+#define ORACLE_ODBC_DRIVER "Oracle in OraDB12Home1"//XE"
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
@@ -775,10 +775,19 @@ void ODBCOracleTest::recreateStringsTable()
 
 void ODBCOracleTest::recreateFloatsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { *_pSession << "CREATE TABLE " << ExecUtil::strings() <<" (str NUMBER)", now; }
+	dropObject("TABLE", ExecUtil::floats());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::floats() <<" (str NUMBER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+}
+
+
+void ODBCOracleTest::recreateDoublesTable()
+{
+	dropObject("TABLE", ExecUtil::doubles());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::doubles() << " (str NUMBER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreateFloatsTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreateFloatsTable()"); }
 }
 
 
@@ -815,10 +824,13 @@ void ODBCOracleTest::recreateAnysTable()
 void ODBCOracleTest::recreateNullsTable(const std::string& notNull)
 {
 	dropObject("TABLE", ExecUtil::nulltest());
-	try { *_pSession << format("CREATE TABLE %s (i INTEGER %s, r NUMBER %s, v VARCHAR(30) %s)",ExecUtil::nulltest(),
+	try
+	{
+		*_pSession << format("CREATE TABLE %s (i INTEGER %s, r NUMBER %s, v VARCHAR(30) %s)", ExecUtil::nulltest(),
 		notNull,
 		notNull,
-		notNull), now; }
+		notNull), now;
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
 }
