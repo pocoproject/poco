@@ -211,6 +211,7 @@ public:
 	void autoPtrComplexTypeVector();
 	void insertVector();
 	void insertEmptyVector();
+	void bigStringVector();
 
 	void simpleAccessList();
 	void complexTypeList();

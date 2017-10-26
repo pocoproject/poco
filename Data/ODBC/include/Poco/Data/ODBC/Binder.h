@@ -959,7 +959,8 @@ private:
 	void getColSizeAndPrecision(std::size_t pos,
 		SQLSMALLINT cDataType,
 		SQLINTEGER& colSize,
-		SQLSMALLINT& decDigits);
+		SQLSMALLINT& decDigits,
+		std::size_t actualSize = 0);
 		/// Used to retrieve column size and precision.
 		/// Not all drivers cooperate with this inquiry under all circumstances
 		/// This function runs for query and stored procedure parameters (in and
@@ -967,6 +968,8 @@ private:
 		/// information to start with. For that reason, after all the attempts
 		/// to discover the required values are unsuccessfully exhausted, the values
 		/// are both set to zero and no exception is thrown.
+		/// However, if the colSize is succesfully retrieved and it is greater than
+		/// session-wide maximum allowed field size, LengthExceededException is thrown.
 
 	void setParamSetSize(std::size_t length);
 		/// Sets the parameter set size. Used for column-wise binding.
@@ -990,12 +993,15 @@ private:
 		/// optimization, looking for the maximum length within supplied data container and
 		/// uses the smaller of maximum found and maximum predefined data length.
 	{
+		typedef typename T::value_type ContainedValType;
+		typedef typename ContainedValType::value_type BaseValType;
+		std::size_t typeSize = sizeof(BaseValType);
 		std::size_t maxSize = 0;
 		typename T::const_iterator it = val.begin();
 		typename T::const_iterator end = val.end();
 		for (; it != end; ++it)
 		{
-			std::size_t sz = it->size() * sizeof(T);
+			std::size_t sz = it->size() * typeSize;
 			if (sz > _maxFieldSize)
 				throw LengthExceededException();
 
@@ -1036,7 +1042,7 @@ private:
 	const TypeInfo*  _pTypeInfo;
 	SQLINTEGER       _paramSetSize;
 	std::size_t      _maxFieldSize;
-	AnyPtrVecVec      _containers;
+	AnyPtrVecVec     _containers;
 	std::size_t      _maxCharColLength;
 	std::size_t      _maxWCharColLength;
 	std::size_t      _maxVarBinColSize;

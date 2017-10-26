@@ -233,6 +233,21 @@ void ODBCTest::testInsertEmptyVector()
 }
 
 
+void ODBCTest::testBigStringVector()
+{
+	if (!_pSession) fail("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i + 1));
+		_pExecutor->bigStringVector();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testSimpleAccessList()
 {
 	if (!_pSession) fail ("Test not available.");

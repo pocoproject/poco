@@ -180,6 +180,9 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 {
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits, val.size());
 
 	if (isOutBound(dir))
 	{
@@ -204,9 +207,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const 
 	SQLLEN* pLenIn = new SQLLEN;
 	if (isOutBound(dir) && nullCb.defined())
 		_nullCbMap.insert(NullCbMap::value_type( pLenIn, nullCb) );
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
+
 	*pLenIn = SQL_NTS;
 
 	if (PB_AT_EXEC == _paramBinding)
@@ -238,6 +239,9 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits, val.size() * sizeof(CharT));
 	
 	if (isOutBound(dir))
 	{
@@ -261,9 +265,6 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir, const 
 	if (isOutBound(dir) && nullCb.defined())
 		_nullCbMap.insert(NullCbMap::value_type(pLenIn, nullCb));
 
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);
 	*pLenIn = SQL_NTS;
 
 	if (PB_AT_EXEC == _paramBinding)
@@ -407,8 +408,12 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir, const std
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 
-	const SQLSMALLINT colType = (bindType == typeid(void) || bindType == typeid(NullData) || bindType == typeid(NullType)) ?
-														_pTypeInfo->nullDataType(val) : _pTypeInfo->tryTypeidToCType(bindType, SQL_C_TINYINT);
+	const SQLSMALLINT colType = (bindType == typeid(void)     ||
+								 bindType == typeid(NullData) ||
+								 bindType == typeid(NullType)) ?
+								_pTypeInfo->nullDataType(val)  :
+								_pTypeInfo->tryTypeidToCType(bindType, SQL_C_TINYINT);
+
 	getColSizeAndPrecision(pos, colType, colSize, decDigits);
 
 	if (Utility::isError(SQLBindParameter(_rStmt,
@@ -555,8 +560,11 @@ void Binder::reset()
 void Binder::getColSizeAndPrecision(std::size_t pos,
 	SQLSMALLINT cDataType,
 	SQLINTEGER& colSize,
-	SQLSMALLINT& decDigits)
+	SQLSMALLINT& decDigits,
+	std::size_t actualSize)
 {
+	colSize = 0;
+	decDigits = 0;
 	// Not all drivers are equally willing to cooperate in this matter.
 	// Hence the funky flow control.
 
@@ -565,6 +573,11 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		DynamicAny tmp;
 		bool found = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
 		if (found) colSize = tmp;
+		if (actualSize > colSize)
+		{
+			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
+				pos, actualSize, static_cast<long>(colSize)));
+		}
 		found = _pTypeInfo->tryGetInfo(cDataType, "MINIMUM_SCALE", tmp);
 		if (found)
 		{
@@ -599,7 +612,15 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 	// we may have no success, so use zeros and hope for the best
 	// (most drivers do not require these most of the times anyway)
-	colSize = _parameters[pos].colSize;
+	if (0 == colSize)
+	{
+		colSize = _parameters[pos].colSize;
+		if (actualSize > colSize)
+		{
+			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
+				pos, actualSize, static_cast<long>(colSize)));
+		}
+	}
 	decDigits = _parameters[pos].decDigits;
 }
 

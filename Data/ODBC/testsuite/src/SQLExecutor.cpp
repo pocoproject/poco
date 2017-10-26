@@ -63,6 +63,7 @@ using Poco::Data::RowIterator;
 using Poco::Data::SQLChannel;
 using Poco::Data::LimitException;
 using Poco::Data::BindingException;
+using Poco::Data::LengthExceededException;
 using Poco::Data::CLOB;
 using Poco::Data::Date;
 using Poco::Data::Time;
@@ -1252,6 +1253,47 @@ void SQLExecutor::insertEmptyVector()
 	catch (Poco::Exception&)
 	{
 	}
+}
+
+
+void SQLExecutor::bigStringVector()
+{
+	std::string funct = "bigStringVector()";
+	std::vector<std::string> str;
+	str.push_back(std::string(10000, 'a'));
+
+	{
+		Statement stmt((session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(str)));
+		try { stmt.execute(); fail("must throw"); }
+		catch (LengthExceededException&) { }
+	}
+
+	str.clear();
+	str.push_back(std::string(30, 'a'));
+	str.push_back(std::string(30, 'b'));
+	str.push_back(std::string(30, 'c'));
+	str.push_back(std::string(30, 'd'));
+	int count = 100;
+	{
+		Statement stmt((session() << "INSERT INTO " << ExecUtil::strings() << " VALUES (?)", use(str)));
+		try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+		catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail(funct); }
+		catch (StatementException& se) { std::cout << se.toString() << std::endl; fail(funct); }
+		assert(count == 0);
+
+		try { stmt.execute(); }
+		catch (StatementException& se) { std::cout << se.toString() << std::endl; fail(funct); }
+
+		try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+		catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail(funct); }
+		catch (StatementException& se) { std::cout << se.toString() << std::endl; fail(funct); }
+		assert(count == 4);
+	}
+	count = 0;
+	try { session() << "SELECT COUNT(*) FROM " << ExecUtil::strings(), into(count), now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail(funct); }
+	assert(count == 4);
 }
 
 

@@ -58,6 +58,7 @@ public:
 	virtual void testAutoPtrComplexTypeVector();
 	virtual void testInsertVector();
 	virtual void testInsertEmptyVector();
+	virtual void testBigStringVector();
 
 	virtual void testSimpleAccessList();
 	virtual void testComplexTypeList();

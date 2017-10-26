@@ -910,6 +910,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertList);

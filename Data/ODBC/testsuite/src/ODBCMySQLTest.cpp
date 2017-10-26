@@ -439,6 +439,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertList);
