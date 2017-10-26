@@ -45,11 +45,7 @@ IMPLIBLINKEXT    = .dll.a
 #
 CFLAGS          =
 CFLAGS32        =
-<<<<<<< HEAD
 CFLAGS64        = 
-=======
-CFLAGS64        =
->>>>>>> refs/remotes/pocoproject/develop
 CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT
 CXXFLAGS32      = -Wa,-mbig-obj
 CXXFLAGS64      = -Wa,-mbig-obj
