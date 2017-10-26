@@ -65,6 +65,38 @@ IPv4SocketAddressImpl::IPv4SocketAddressImpl(const void* addr, UInt16 port)
 }
 
 
+#ifdef __clang__
+inline IPAddress IPv4SocketAddressImpl::host() const
+{
+	return IPAddress(&_addr.sin_addr, sizeof(_addr.sin_addr));
+}
+
+
+inline UInt16 IPv4SocketAddressImpl::port() const
+{
+	return _addr.sin_port;
+}
+
+
+inline poco_socklen_t IPv4SocketAddressImpl::length() const
+{
+	return sizeof(_addr);
+}
+
+
+inline const struct sockaddr* IPv4SocketAddressImpl::addr() const
+{
+	return reinterpret_cast<const struct sockaddr*>(&_addr);
+}
+
+
+inline int IPv4SocketAddressImpl::af() const
+{
+	return _addr.sin_family;
+}
+#endif //__clang__
+
+
 #if defined(POCO_HAVE_IPv6)
 
 
@@ -98,6 +130,38 @@ IPv6SocketAddressImpl::IPv6SocketAddressImpl(const void* addr, UInt16 port, UInt
 	_addr.sin6_port = port;
 	_addr.sin6_scope_id = scope;
 }
+
+
+#ifdef __clang__
+inline IPAddress IPv6SocketAddressImpl::host() const
+{
+	return IPAddress(&_addr.sin6_addr, sizeof(_addr.sin6_addr), _addr.sin6_scope_id);
+}
+
+
+inline UInt16 IPv6SocketAddressImpl::port() const
+{
+	return _addr.sin6_port;
+}
+
+
+inline poco_socklen_t IPv6SocketAddressImpl::length() const
+{
+	return sizeof(_addr);
+}
+
+
+inline const struct sockaddr* IPv6SocketAddressImpl::addr() const
+{
+	return reinterpret_cast<const struct sockaddr*>(&_addr);
+}
+
+
+inline int IPv6SocketAddressImpl::af() const
+{
+	return _addr.sin6_family;
+}
+#endif //__clang__
 
 
 #endif // POCO_HAVE_IPv6

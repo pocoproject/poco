@@ -77,6 +77,7 @@ private:
 // inlines
 //
 
+#ifndef __clang__
 inline IPAddress IPv4SocketAddressImpl::host() const
 {
 	return IPAddress(&_addr.sin_addr, sizeof(_addr.sin_addr));
@@ -105,6 +106,7 @@ inline int IPv4SocketAddressImpl::af() const
 {
 	return _addr.sin_family;
 }
+#endif //__clang__
 
 
 #if defined(POCO_HAVE_IPv6)
@@ -131,6 +133,7 @@ private:
 // inlines
 //
 
+#ifndef __clang__
 inline IPAddress IPv6SocketAddressImpl::host() const
 {
 	return IPAddress(&_addr.sin6_addr, sizeof(_addr.sin6_addr), _addr.sin6_scope_id);
@@ -159,6 +162,7 @@ inline int IPv6SocketAddressImpl::af() const
 {
 	return _addr.sin6_family;
 }
+#endif //__clang__
 
 
 #endif //POCO_HAVE_IPv6
