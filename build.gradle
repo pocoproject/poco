@@ -485,11 +485,9 @@ subprojects {
 									binary.staticLibraryFile.parentFile.mkdirs()
 								}
 							}
-/*
 						} else
 						if (it instanceof SemiStaticLibraryBinarySpec) {
 							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(semiStaticLibraryFile))), targetPlatform)
-*/
 						} else
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
@@ -525,7 +523,6 @@ subprojects {
 								}
 							}
 						} else
-/*
 						if (it instanceof SemiStaticLibraryBinarySpec) {
 							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(semiStaticLibraryFile)), targetPlatform)
 							def binary = it
@@ -535,7 +532,6 @@ subprojects {
 								}
 							}
 						} else
-*/
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(executable.file, targetPlatform)
 						} else {
@@ -685,7 +681,6 @@ subprojects {
 				if (toolChain in Gcc) {
 				}
 			}
-/*
 			withType(SemiStaticLibraryBinarySpec) {
 				if (toolChain in VisualCpp) {
 					cCompiler.define   '_LIB'
@@ -708,7 +703,6 @@ subprojects {
 				if (toolChain in Gcc) {
 				}
 			}
-*/
 			withType(NativeExecutableBinarySpec) {
 				if (toolChain in VisualCpp) {
 					if (buildType == buildTypes.debug) {
