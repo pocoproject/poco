@@ -1031,7 +1031,6 @@
                             <File Id="DIRECTORYITERATOR_UNIX.H" Name="DirectoryIterator_UNIX.h" Source="$(var.POCO)\Foundation\include\Poco\DirectoryIterator_UNIX.h" />
                             <File Id="DIRECTORYITERATOR_VMS.H" Name="DirectoryIterator_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\DirectoryIterator_VMS.h" />
                             <File Id="DIRECTORYITERATOR_WIN32.H" Name="DirectoryIterator_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\DirectoryIterator_WIN32.h" />
-                            <File Id="DIRECTORYITERATOR_WIN32U.H" Name="DirectoryIterator_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\DirectoryIterator_WIN32U.h" />
                             <File Id="DIRECTORYWATCHER.H" Name="DirectoryWatcher.h" Source="$(var.POCO)\Foundation\include\Poco\DirectoryWatcher.h" />
                             <File Id="DYNAMICANY.H" Name="DynamicAny.h" Source="$(var.POCO)\Foundation\include\Poco\DynamicAny.h" />
                             <File Id="DYNAMICANYHOLDER.H" Name="DynamicAnyHolder.h" Source="$(var.POCO)\Foundation\include\Poco\DynamicAnyHolder.h" />
@@ -1042,16 +1041,12 @@
                             <File Id="ENVIRONMENT_VMS.H" Name="Environment_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_VMS.h" />
                             <File Id="ENVIRONMENT_VX.H" Name="Environment_VX.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_VX.h" />
                             <File Id="ENVIRONMENT_WIN32.H" Name="Environment_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_WIN32.h" />
-                            <File Id="ENVIRONMENT_WIN32U.H" Name="Environment_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_WIN32U.h" />
                             <File Id="ENVIRONMENT_WINCE.H" Name="Environment_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_WINCE.h" />
                             <File Id="ERROR.H" Name="Error.h" Source="$(var.POCO)\Foundation\include\Poco\Error.h" />
                             <File Id="ERRORHANDLER.H" Name="ErrorHandler.h" Source="$(var.POCO)\Foundation\include\Poco\ErrorHandler.h" />
                             <File Id="EVENT.H" Name="Event.h" Source="$(var.POCO)\Foundation\include\Poco\Event.h" />
                             <File Id="EVENTARGS.H" Name="EventArgs.h" Source="$(var.POCO)\Foundation\include\Poco\EventArgs.h" />
                             <File Id="EVENTLOGCHANNEL.H" Name="EventLogChannel.h" Source="$(var.POCO)\Foundation\include\Poco\EventLogChannel.h" />
-                            <File Id="EVENT_POSIX.H" Name="Event_POSIX.h" Source="$(var.POCO)\Foundation\include\Poco\Event_POSIX.h" />
-                            <File Id="EVENT_VX.H" Name="Event_VX.h" Source="$(var.POCO)\Foundation\include\Poco\Event_VX.h" />
-                            <File Id="EVENT_WIN32.H" Name="Event_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Event_WIN32.h" />
                             <File Id="EXCEPTION.H" Name="Exception.h" Source="$(var.POCO)\Foundation\include\Poco\Exception.h" />
                             <File Id="EXPIRATIONDECORATOR.H" Name="ExpirationDecorator.h" Source="$(var.POCO)\Foundation\include\Poco\ExpirationDecorator.h" />
                             <File Id="EXPIRE.H" Name="Expire.h" Source="$(var.POCO)\Foundation\include\Poco\Expire.h" />
@@ -1072,7 +1067,6 @@
                             <File Id="FILE_VMS.H" Name="File_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\File_VMS.h" />
                             <File Id="FILE_VX.H" Name="File_VX.h" Source="$(var.POCO)\Foundation\include\Poco\File_VX.h" />
                             <File Id="FILE_WIN32.H" Name="File_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\File_WIN32.h" />
-                            <File Id="FILE_WIN32U.H" Name="File_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\File_WIN32U.h" />
                             <File Id="FILE_WINCE.H" Name="File_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\File_WINCE.h" />
                             <File Id="FORMAT.H" Name="Format.h" Source="$(var.POCO)\Foundation\include\Poco\Format.h" />
                             <File Id="FORMATTER.H" Name="Formatter.h" Source="$(var.POCO)\Foundation\include\Poco\Formatter.h" />
@@ -1110,7 +1104,6 @@
                             <File Id="LOGFILE_STD.H" Name="LogFile_STD.h" Source="$(var.POCO)\Foundation\include\Poco\LogFile_STD.h" />
                             <File Id="LOGFILE_VMS.H" Name="LogFile_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\LogFile_VMS.h" />
                             <File Id="LOGFILE_WIN32.H" Name="LogFile_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\LogFile_WIN32.h" />
-                            <File Id="LOGFILE_WIN32U.H" Name="LogFile_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\LogFile_WIN32U.h" />
                             <File Id="LOGGER.H" Name="Logger.h" Source="$(var.POCO)\Foundation\include\Poco\Logger.h" />
                             <File Id="LOGGINGFACTORY.H" Name="LoggingFactory.h" Source="$(var.POCO)\Foundation\include\Poco\LoggingFactory.h" />
                             <File Id="LOGGINGREGISTRY.H" Name="LoggingRegistry.h" Source="$(var.POCO)\Foundation\include\Poco\LoggingRegistry.h" />
@@ -1127,21 +1120,16 @@
                             <File Id="METAPROGRAMMING.H" Name="MetaProgramming.h" Source="$(var.POCO)\Foundation\include\Poco\MetaProgramming.h" />
                             <File Id="MUTEX.H" Name="Mutex.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex.h" />
                             <File Id="MUTEX_POSIX.H" Name="Mutex_POSIX.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex_POSIX.h" />
-                            <File Id="MUTEX_VX.H" Name="Mutex_VX.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex_VX.h" />
-                            <File Id="MUTEX_WIN32.H" Name="Mutex_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex_WIN32.h" />
-                            <File Id="MUTEX_WINCE.H" Name="Mutex_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex_WINCE.h" />
                             <File Id="NAMEDEVENT.H" Name="NamedEvent.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent.h" />
                             <File Id="NAMEDEVENT_ANDROID.H" Name="NamedEvent_Android.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_Android.h" />
                             <File Id="NAMEDEVENT_UNIX.H" Name="NamedEvent_UNIX.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_UNIX.h" />
                             <File Id="NAMEDEVENT_VMS.H" Name="NamedEvent_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_VMS.h" />
                             <File Id="NAMEDEVENT_WIN32.H" Name="NamedEvent_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_WIN32.h" />
-                            <File Id="NAMEDEVENT_WIN32U.H" Name="NamedEvent_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_WIN32U.h" />
                             <File Id="NAMEDMUTEX.H" Name="NamedMutex.h" Source="$(var.POCO)\Foundation\include\Poco\NamedMutex.h" />
                             <File Id="NAMEDMUTEX_ANDROID.H" Name="NamedMutex_Android.h" Source="$(var.POCO)\Foundation\include\Poco\NamedMutex_Android.h" />
                             <File Id="NAMEDMUTEX_UNIX.H" Name="NamedMutex_UNIX.h" Source="$(var.POCO)\Foundation\include\Poco\NamedMutex_UNIX.h" />
                             <File Id="NAMEDMUTEX_VMS.H" Name="NamedMutex_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\NamedMutex_VMS.h" />
                             <File Id="NAMEDMUTEX_WIN32.H" Name="NamedMutex_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\NamedMutex_WIN32.h" />
-                            <File Id="NAMEDMUTEX_WIN32U.H" Name="NamedMutex_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\NamedMutex_WIN32U.h" />
                             <File Id="NAMEDTUPLE.H" Name="NamedTuple.h" Source="$(var.POCO)\Foundation\include\Poco\NamedTuple.h" />
                             <File Id="NESTEDDIAGNOSTICCONTEXT.H" Name="NestedDiagnosticContext.h" Source="$(var.POCO)\Foundation\include\Poco\NestedDiagnosticContext.h" />
                             <File Id="NOBSERVER.H" Name="NObserver.h" Source="$(var.POCO)\Foundation\include\Poco\NObserver.h" />
@@ -1163,7 +1151,6 @@
                             <File Id="PATH_UNIX.H" Name="Path_UNIX.h" Source="$(var.POCO)\Foundation\include\Poco\Path_UNIX.h" />
                             <File Id="PATH_VMS.H" Name="Path_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\Path_VMS.h" />
                             <File Id="PATH_WIN32.H" Name="Path_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Path_WIN32.h" />
-                            <File Id="PATH_WIN32U.H" Name="Path_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\Path_WIN32U.h" />
                             <File Id="PATH_WINCE.H" Name="Path_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Path_WINCE.h" />
                             <File Id="PATTERNFORMATTER.H" Name="PatternFormatter.h" Source="$(var.POCO)\Foundation\include\Poco\PatternFormatter.h" />
                             <File Id="PBKDF2ENGINE.H" Name="PBKDF2Engine.h" Source="$(var.POCO)\Foundation\include\Poco\PBKDF2Engine.h" />
@@ -1189,7 +1176,6 @@
                             <File Id="PROCESS_VMS.H" Name="Process_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\Process_VMS.h" />
                             <File Id="PROCESS_VX.H" Name="Process_VX.h" Source="$(var.POCO)\Foundation\include\Poco\Process_VX.h" />
                             <File Id="PROCESS_WIN32.H" Name="Process_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Process_WIN32.h" />
-                            <File Id="PROCESS_WIN32U.H" Name="Process_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\Process_WIN32U.h" />
                             <File Id="PROCESS_WINCE.H" Name="Process_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Process_WINCE.h" />
                             <File Id="PURGESTRATEGY.H" Name="PurgeStrategy.h" Source="$(var.POCO)\Foundation\include\Poco\PurgeStrategy.h" />
                             <File Id="RANDOM.H" Name="Random.h" Source="$(var.POCO)\Foundation\include\Poco\Random.h" />
@@ -1210,9 +1196,6 @@
                             <File Id="SCOPEDLOCK.H" Name="ScopedLock.h" Source="$(var.POCO)\Foundation\include\Poco\ScopedLock.h" />
                             <File Id="SCOPEDUNLOCK.H" Name="ScopedUnlock.h" Source="$(var.POCO)\Foundation\include\Poco\ScopedUnlock.h" />
                             <File Id="SEMAPHORE.H" Name="Semaphore.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore.h" />
-                            <File Id="SEMAPHORE_POSIX.H" Name="Semaphore_POSIX.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore_POSIX.h" />
-                            <File Id="SEMAPHORE_VX.H" Name="Semaphore_VX.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore_VX.h" />
-                            <File Id="SEMAPHORE_WIN32.H" Name="Semaphore_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore_WIN32.h" />
                             <File Id="SHA1ENGINE.H" Name="SHA1Engine.h" Source="$(var.POCO)\Foundation\include\Poco\SHA1Engine.h" />
                             <File Id="SHAREDLIBRARY.H" Name="SharedLibrary.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary.h" />
                             <File Id="SHAREDLIBRARY_HPUX.H" Name="SharedLibrary_HPUX.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary_HPUX.h" />
@@ -1220,7 +1203,6 @@
                             <File Id="SHAREDLIBRARY_VMS.H" Name="SharedLibrary_VMS.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary_VMS.h" />
                             <File Id="SHAREDLIBRARY_VX.H" Name="SharedLibrary_VX.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary_VX.h" />
                             <File Id="SHAREDLIBRARY_WIN32.H" Name="SharedLibrary_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary_WIN32.h" />
-                            <File Id="SHAREDLIBRARY_WIN32U.H" Name="SharedLibrary_WIN32U.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary_WIN32U.h" />
                             <File Id="SHAREDMEMORY.H" Name="SharedMemory.h" Source="$(var.POCO)\Foundation\include\Poco\SharedMemory.h" />
                             <File Id="SHAREDMEMORY_DUMMY.H" Name="SharedMemory_DUMMY.h" Source="$(var.POCO)\Foundation\include\Poco\SharedMemory_DUMMY.h" />
                             <File Id="SHAREDMEMORY_POSIX.H" Name="SharedMemory_POSIX.h" Source="$(var.POCO)\Foundation\include\Poco\SharedMemory_POSIX.h" />
@@ -1256,10 +1238,6 @@
                             <File Id="THREADLOCAL.H" Name="ThreadLocal.h" Source="$(var.POCO)\Foundation\include\Poco\ThreadLocal.h" />
                             <File Id="THREADPOOL.H" Name="ThreadPool.h" Source="$(var.POCO)\Foundation\include\Poco\ThreadPool.h" />
                             <File Id="THREADTARGET.H" Name="ThreadTarget.h" Source="$(var.POCO)\Foundation\include\Poco\ThreadTarget.h" />
-                            <File Id="THREAD_POSIX.H" Name="Thread_POSIX.h" Source="$(var.POCO)\Foundation\include\Poco\Thread_POSIX.h" />
-                            <File Id="THREAD_VX.H" Name="Thread_VX.h" Source="$(var.POCO)\Foundation\include\Poco\Thread_VX.h" />
-                            <File Id="THREAD_WIN32.H" Name="Thread_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Thread_WIN32.h" />
-                            <File Id="THREAD_WINCE.H" Name="Thread_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Thread_WINCE.h" />
                             <File Id="TIMEDNOTIFICATIONQUEUE.H" Name="TimedNotificationQueue.h" Source="$(var.POCO)\Foundation\include\Poco\TimedNotificationQueue.h" />
                             <File Id="TIMER.H" Name="Timer.h" Source="$(var.POCO)\Foundation\include\Poco\Timer.h" />
                             <File Id="TIMESPAN.H" Name="Timespan.h" Source="$(var.POCO)\Foundation\include\Poco\Timespan.h" />
@@ -2287,7 +2265,6 @@
                         <File Id="POCO.JSON.OBJECT.HTML" Name="Poco.JSON.Object.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.Object.html" />
                         <File Id="POCO.JSON.PARSEHANDLER.HTML" Name="Poco.JSON.ParseHandler.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.ParseHandler.html" />
                         <File Id="POCO.JSON.PARSER.HTML" Name="Poco.JSON.Parser.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.Parser.html" />
-                        <File Id="POCO.JSON.PARSER.SOURCE.HTML" Name="Poco.JSON.Parser.Source.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.Parser.Source.html" />
                         <File Id="POCO.JSON.PRINTHANDLER.HTML" Name="Poco.JSON.PrintHandler.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.PrintHandler.html" />
                         <File Id="POCO.JSON.QUERY.HTML" Name="Poco.JSON.Query.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.Query.html" />
                         <File Id="POCO.JSON.TEMPLATE.HTML" Name="Poco.JSON.Template.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.JSON.Template.html" />
