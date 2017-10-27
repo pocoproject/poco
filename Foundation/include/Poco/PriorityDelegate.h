@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <class TObj, class TArgs, bool useSender = true> 
+template <class TObj, class TArgs, bool useSender = true>
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -70,7 +70,7 @@ public:
 		if (_receiverObject)
 		{
 			(_receiverObject->*_receiverMethod)(sender, arguments);
-			return true; 
+			return true;
 		}
 		else return false;
 	}
@@ -102,7 +102,7 @@ private:
 };
 
 
-template <class TObj, class TArgs> 
+template <class TObj, class TArgs>
 class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:

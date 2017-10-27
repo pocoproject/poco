@@ -150,8 +150,8 @@ protected:
 		{
 			std::cout << " in "
 			          << _pLocator->getSystemId()
-			          << ", line " << _pLocator->getLineNumber() 
-			          << ", col " << _pLocator->getColumnNumber() 
+			          << ", line " << _pLocator->getLineNumber()
+			          << ", col " << _pLocator->getColumnNumber()
 			          << std::endl;
 		}
 	}

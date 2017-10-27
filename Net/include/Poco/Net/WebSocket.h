@@ -75,7 +75,7 @@ public:
 		FRAME_OP_CLOSE   = 0x08, /// Close connection.
 		FRAME_OP_PING    = 0x09, /// Ping frame.
 		FRAME_OP_PONG    = 0x0a, /// Pong frame.
-		FRAME_OP_BITMASK = 0x0f, /// Bit mask for opcodes. 
+		FRAME_OP_BITMASK = 0x0f, /// Bit mask for opcodes.
 		FRAME_OP_SETRAW  = 0x100 /// Set raw flags (for use with sendBytes() and FRAME_OP_CONT).
 	};
 	
@@ -131,7 +131,7 @@ public:
 	WebSocket(HTTPServerRequest& request, HTTPServerResponse& response);
 		/// Creates a server-side WebSocket from within a
 		/// HTTPRequestHandler.
-		/// 
+		///
 		/// First verifies that the request is a valid WebSocket upgrade
 		/// request. If so, completes the handshake by sending
 		/// a proper 101 response.
@@ -141,7 +141,7 @@ public:
 		
 	WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response);
 		/// Creates a client-side WebSocket, using the given
-		/// HTTPClientSession and HTTPRequest for the initial handshake 
+		/// HTTPClientSession and HTTPRequest for the initial handshake
 		/// (HTTP Upgrade request).
 		///
 		/// Additional HTTP headers for the initial handshake request
@@ -153,7 +153,7 @@ public:
 
 	WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response, HTTPCredentials& credentials);
 		/// Creates a client-side WebSocket, using the given
-		/// HTTPClientSession and HTTPRequest for the initial handshake 
+		/// HTTPClientSession and HTTPRequest for the initial handshake
 		/// (HTTP Upgrade request).
 		///
 		/// The given credentials are used for authentication
@@ -192,7 +192,7 @@ public:
 	int sendFrame(const void* buffer, int length, int flags = FRAME_TEXT);
 		/// Sends the contents of the given buffer through
 		/// the socket as a single frame.
-		/// 
+		///
 		/// Values from the FrameFlags, FrameOpcodes and SendFlags enumerations
 		/// can be specified in flags.
 		///
@@ -206,10 +206,10 @@ public:
 		/// Receives a frame from the socket and stores it
 		/// in buffer. Up to length bytes are received. If
 		/// the frame's payload is larger, a WebSocketException
-		/// is thrown and the WebSocket connection must be 
+		/// is thrown and the WebSocket connection must be
 		/// terminated.
 		///
-		/// Returns the number of bytes received. 
+		/// Returns the number of bytes received.
 		/// A return value of 0 means that the peer has
 		/// shut down or closed the connection.
 		///

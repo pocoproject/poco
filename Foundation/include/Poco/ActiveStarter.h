@@ -28,7 +28,7 @@ namespace Poco {
 
 template <class OwnerType>
 class ActiveStarter
-	/// The default implementation of the StarterType 
+	/// The default implementation of the StarterType
 	/// policy for ActiveMethod. It starts the method
 	/// in its own thread, obtained from the default
 	/// thread pool.

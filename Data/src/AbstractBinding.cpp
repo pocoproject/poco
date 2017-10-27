@@ -19,9 +19,9 @@ namespace Poco {
 namespace Data {
 
 
-AbstractBinding::AbstractBinding(const std::string& rName, 
-	Direction direction, 
-	Poco::UInt32 bindingBulkSize): 
+AbstractBinding::AbstractBinding(const std::string& rName,
+	Direction direction,
+	Poco::UInt32 bindingBulkSize):
 	_pBinder(0),
 	_name(rName),
 	_direction(direction),

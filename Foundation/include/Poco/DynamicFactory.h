@@ -42,7 +42,7 @@ public:
 	}
 
 	~DynamicFactory()
-		/// Destroys the DynamicFactory and deletes the instantiators for 
+		/// Destroys the DynamicFactory and deletes the instantiators for
 		/// all registered classes.
 	{
 		for (typename FactoryMap::iterator it = _map.begin(); it != _map.end(); ++it)
@@ -65,7 +65,7 @@ public:
 			throw NotFoundException(className);
 	}
 
-	template <class C> 
+	template <class C>
 	void registerClass(const std::string& className)
 		/// Registers the instantiator for the given class with the DynamicFactory.
 		/// The DynamicFactory takes ownership of the instantiator and deletes

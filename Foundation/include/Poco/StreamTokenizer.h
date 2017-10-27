@@ -66,7 +66,7 @@ public:
 	const Token* next();
 		/// Extracts the next token from the input stream.
 		/// Returns a pointer to an EOFToken if there are
-		/// no more characters to read. 
+		/// no more characters to read.
 		/// Returns a pointer to an InvalidToken if an
 		/// invalid character is encountered.
 		/// If a token is marked as ignorable, it will not

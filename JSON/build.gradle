@@ -16,6 +16,7 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Foundation', library: 'Foundation'
 				}
 				cpp {
 					source {
@@ -31,6 +32,10 @@ model {
 		}
 	}
 	binaries {
+		all {
+			if (toolChain in VisualCpp) {
+		   }
+		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "JSON_EXPORTS"

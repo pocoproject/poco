@@ -37,7 +37,7 @@
 #include <vector>
 #include <string>
 #include <iosfwd>
-#include <cstddef> 
+#include <cstddef>
 
 
 namespace Poco {
@@ -75,10 +75,10 @@ class XML_API XMLStreamParser
 	///         switch (e)
 	///         {
 	///         case XMLStreamParser::EV_START_ELEMENT:
-	///             cerr << p.line () << ':' << p.column () << ": start " << p.name () << endl; 
+	///             cerr << p.line () << ':' << p.column () << ": start " << p.name () << endl;
 	///             break;
 	///         case XMLStreamParser::EV_END_ELEMENT:
-	///             cerr << p.line () << ':' << p.column () << ": end " << p.name () << endl; 
+	///             cerr << p.line () << ':' << p.column () << ": end " << p.name () << endl;
 	///             break;
 	///         case XMLStreamParser::EV_START_ATTRIBUTE:
 	///             ...

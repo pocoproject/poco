@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
-	Person person = 
+	Person person =
 	{
 		"Bart Simpson",
 		"Springfield",
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 		std::cout << person.name << "\t"
 			<< person.address << "\t"
 			<< person.age << "\t"
-			<< DateTimeFormatter::format(person.birthday, "%b %d %Y") 
+			<< DateTimeFormatter::format(person.birthday, "%b %d %Y")
 		<< std::endl;
 	}
 	
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
 		std::cout << it->name << "\t"
 			<< it->address << "\t"
 			<< it->age << "\t"
-			<< DateTimeFormatter::format(it->birthday, "%b %d %Y") 
+			<< DateTimeFormatter::format(it->birthday, "%b %d %Y")
 		<< std::endl;
 	}
 	

@@ -66,7 +66,7 @@ public:
 		OP_BITAND_ASSIGN,   // &=
 		OP_AND,             // &&
 		OP_BITOR,           // |
-		OP_BITOR_ASSIGN,    // |= 
+		OP_BITOR_ASSIGN,    // |=
 		OP_OR,              // ||
 		OP_XOR,             // ^
 		OP_XOR_ASSIGN,      // ^=

@@ -29,13 +29,13 @@ class ValidArgs
 {
 public:
 	ValidArgs(const TKey& key):
-		_key(key), 
+		_key(key),
 		_isValid(true)
 	{
 	}
 
-	ValidArgs(const ValidArgs& args): 
-		_key(args._key), 
+	ValidArgs(const ValidArgs& args):
+		_key(args._key),
 		_isValid(args._isValid)
 	{
 	}

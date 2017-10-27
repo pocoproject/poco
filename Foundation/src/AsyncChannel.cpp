@@ -46,8 +46,8 @@ private:
 };
 
 
-AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio): 
-	_pChannel(pChannel), 
+AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio):
+	_pChannel(pChannel),
 	_thread("AsyncChannel")
 {
 	if (_pChannel) _pChannel->duplicate();
@@ -100,9 +100,9 @@ void AsyncChannel::close()
 	{
 		while (!_queue.empty()) Thread::sleep(100);
 		
-		do 
+		do
 		{
-			_queue.wakeUpAll(); 
+			_queue.wakeUpAll();
 		}
 		while (!_thread.tryJoin(100));
 	}

@@ -22,10 +22,10 @@ namespace Poco {
 namespace MongoDB {
 
 
-MessageHeader::MessageHeader(OpCode opCode): 
-	_messageLength(0), 
-	_requestID(0), 
-	_responseTo(0), 
+MessageHeader::MessageHeader(OpCode opCode):
+	_messageLength(0),
+	_requestID(0),
+	_responseTo(0),
 	_opCode(opCode)
 {
 }

@@ -28,16 +28,16 @@ namespace Poco {
 
 
 class Foundation_API Semaphore
-	/// A Semaphore is a synchronization object with the following 
+	/// A Semaphore is a synchronization object with the following
 	/// characteristics:
 	/// A semaphore has a value that is constrained to be a non-negative
-	/// integer and two atomic operations. The allowable operations are V 
-	/// (here called set()) and P (here called wait()). A V (set()) operation 
-	/// increases the value of the semaphore by one. 
-	/// A P (wait()) operation decreases the value of the semaphore by one, 
-	/// provided that can be done without violating the constraint that the 
-	/// value be non-negative. A P (wait()) operation that is initiated when 
-	/// the value of the semaphore is 0 suspends the calling thread. 
+	/// integer and two atomic operations. The allowable operations are V
+	/// (here called set()) and P (here called wait()). A V (set()) operation
+	/// increases the value of the semaphore by one.
+	/// A P (wait()) operation decreases the value of the semaphore by one,
+	/// provided that can be done without violating the constraint that the
+	/// value be non-negative. A P (wait()) operation that is initiated when
+	/// the value of the semaphore is 0 suspends the calling thread.
 	/// The calling thread may continue when the value becomes positive again.
 {
 public:
@@ -66,7 +66,7 @@ public:
 	void wait();
 		/// Waits for the semaphore to become signalled.
 		/// To become signalled, a semaphore's value must
-		/// be greater than zero. 
+		/// be greater than zero.
 		/// Decrements the semaphore's value by one.
 
 	void wait(long milliseconds);

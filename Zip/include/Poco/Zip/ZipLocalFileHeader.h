@@ -251,13 +251,13 @@ inline void ZipLocalFileHeader::getRequiredVersion(int& major, int& minor)
 }
 
 
-inline bool ZipLocalFileHeader::needsZip64() const 
+inline bool ZipLocalFileHeader::needsZip64() const
 {
 	return _forceZip64 || _startPos >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
 }
 
 
-inline void ZipLocalFileHeader::setZip64Data() 
+inline void ZipLocalFileHeader::setZip64Data()
 {
 	setRequiredVersion(4, 5);
 	char data[FULLEXTRA_DATA_SIZE];
@@ -354,7 +354,7 @@ inline void ZipLocalFileHeader::setCompressionLevel(ZipCommon::CompressionLevel 
 {
 	// bit 1 and 2 indicate the level
 	Poco::UInt16 val = static_cast<Poco::UInt16>(cl);
-	val <<= 1; 
+	val <<= 1;
 	Poco::UInt16 mask = 0xfff9;
 	_rawHeader[GENERAL_PURPOSE_POS] = ((_rawHeader[GENERAL_PURPOSE_POS] & mask) | val);
 }

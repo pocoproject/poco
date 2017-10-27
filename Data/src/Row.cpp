@@ -29,7 +29,7 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 }
 
 
-Row::Row(): 
+Row::Row():
 	_pNames(0),
 	_pSortMap(new SortMap),
 	_pFormatter(new SimpleRowFormatter)
@@ -63,9 +63,9 @@ void Row::init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter)
 	if (sz)
 	{
 		_values.resize(sz);
-		// Row sortability in the strict weak ordering sense is 
+		// Row sortability in the strict weak ordering sense is
 		// an invariant, hence we must start with a zero here.
-		// If null value is later retrieved from DB, the 
+		// If null value is later retrieved from DB, the
 		// Var::empty() call should be used to empty
 		// the corresponding Row value.
 		_values[0] = 0;
@@ -128,7 +128,7 @@ void Row::addSortField(std::size_t pos)
 	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)
 	{
-		if (it->get<0>() == pos) return; 
+		if (it->get<0>() == pos) return;
 	}
 
 	ComparisonType ct;
@@ -308,16 +308,16 @@ bool Row::operator < (const Row& other) const
 			return false;
 
 		case COMPARE_AS_INTEGER:
-			if (_values[it->get<0>()].convert<Poco::Int64>() < 
+			if (_values[it->get<0>()].convert<Poco::Int64>() <
 				other._values[it->get<0>()].convert<Poco::Int64>())
 				return true;
-			else if (_values[it->get<0>()].convert<Poco::Int64>() != 
+			else if (_values[it->get<0>()].convert<Poco::Int64>() !=
 				other._values[it->get<0>()].convert<Poco::Int64>())
 				return false;
 			break;
 
 		case COMPARE_AS_FLOAT:
-			if (_values[it->get<0>()].convert<double>() < 
+			if (_values[it->get<0>()].convert<double>() <
 				other._values[it->get<0>()].convert<double>())
 				return true;
 			else if (_values[it->get<0>()].convert<double>() !=
@@ -326,7 +326,7 @@ bool Row::operator < (const Row& other) const
 			break;
 
 		case COMPARE_AS_STRING:
-			if (_values[it->get<0>()].convert<std::string>() < 
+			if (_values[it->get<0>()].convert<std::string>() <
 				other._values[it->get<0>()].convert<std::string>())
 				return true;
 			else if (_values[it->get<0>()].convert<std::string>() !=
@@ -347,7 +347,7 @@ void Row::setFormatter(const RowFormatter::Ptr& pFormatter)
 {
 	if (pFormatter.get())
 		_pFormatter = pFormatter;
-	else 
+	else
 		_pFormatter = new SimpleRowFormatter;
 }
 
@@ -356,7 +356,7 @@ void Row::setSortMap(const SortMapPtr& pSortMap)
 {
 	if (pSortMap.get())
 		_pSortMap = pSortMap;
-	else 
+	else
 		_pSortMap = new SortMap;
 }
 

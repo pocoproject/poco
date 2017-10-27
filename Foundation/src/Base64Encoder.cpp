@@ -26,12 +26,12 @@ const unsigned char Base64EncoderBuf::OUT_ENCODING[64] =
 	'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
 	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
 	'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-	'w', 'x', 'y', 'z', '0', '1', '2', '3', 
+	'w', 'x', 'y', 'z', '0', '1', '2', '3',
 	'4', '5', '6', '7', '8', '9', '+', '/'
 };
 
 
-Base64EncoderBuf::Base64EncoderBuf(std::ostream& ostr): 
+Base64EncoderBuf::Base64EncoderBuf(std::ostream& ostr):
 	_groupLength(0),
 	_pos(0),
 	_lineLength(72),
@@ -81,7 +81,7 @@ int Base64EncoderBuf::writeToDevice(char c)
 		idx = _group[2] & 0x3F;
 		if (_buf.sputc(OUT_ENCODING[idx]) == eof) return eof;
 		_pos += 4;
-		if (_lineLength > 0 && _pos >= _lineLength) 
+		if (_lineLength > 0 && _pos >= _lineLength)
 		{
 			if (_buf.sputc('\r') == eof) return eof;
 			if (_buf.sputc('\n') == eof) return eof;

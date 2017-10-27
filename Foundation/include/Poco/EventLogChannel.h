@@ -62,7 +62,7 @@ public:
 		/// appropriate values for Event Log type and category.
 		
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets or changes a configuration property. 
+		/// Sets or changes a configuration property.
 		///
 		/// The following properties are supported:
 		///

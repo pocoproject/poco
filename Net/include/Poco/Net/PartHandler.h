@@ -32,8 +32,8 @@ class MessageHeader;
 class Net_API PartHandler
 	/// The base class for all part or attachment handlers.
 	///
-	/// Part handlers are used for handling email parts and 
-	/// attachments in MIME multipart messages, as well as file 
+	/// Part handlers are used for handling email parts and
+	/// attachments in MIME multipart messages, as well as file
 	/// uploads via HTML forms.
 	///
 	/// Subclasses must override handlePart().

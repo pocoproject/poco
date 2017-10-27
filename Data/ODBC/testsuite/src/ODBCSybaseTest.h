@@ -62,7 +62,7 @@ private:
 	void testTransaction();
 
 	virtual std::string str2NumExpr(const std::string& num, unsigned len, unsigned dec)
-	{ 
+	{
 		std::string res;
 		Poco::format(res, " CONVERT(NUMERIC(%u, %u), '%s') ", len, dec, num);
 		return res;

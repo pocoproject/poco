@@ -47,11 +47,11 @@ public:
 		/// Returns the SQL data type.
 
 	std::size_t columnSize() const;
-		/// Returns the the size of the column or expression of the corresponding 
+		/// Returns the the size of the column or expression of the corresponding
 		/// parameter marker as defined by the data source.
 
 	std::size_t decimalDigits() const;
-		/// Returns the number of decimal digits of the column or expression 
+		/// Returns the number of decimal digits of the column or expression
 		/// of the corresponding parameter as defined by the data source.
 
 	bool isNullable() const;

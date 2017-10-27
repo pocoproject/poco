@@ -60,7 +60,7 @@ using Poco::NotFoundException;
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
 
-#define SYBASE_DSN "" 
+#define SYBASE_DSN ""
 #define SYBASE_UID ""
 #define SYBASE_PWD ""
 #define SYBASE_DB "mstk"
@@ -364,7 +364,7 @@ void SybaseODBC::testStoredProcedure()
 				"select @os = @ins;"
 				"select @od = null;"
 				"select @dtm = null;"
-					" end" 
+					" end"
 				, now;
 			session() << "{ call " << nm << "(?, ?, ?, ?, ?) }", in(ins), out(oi), out(os), out(od), out(odtm), now;
 			dropObject("procedure", nm);

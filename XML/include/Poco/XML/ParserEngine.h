@@ -47,11 +47,11 @@ class ContextLocator;
 
 
 class XML_API ParserEngine: public Locator
-	/// This class provides an object-oriented, stream-based, 
+	/// This class provides an object-oriented, stream-based,
 	/// low-level interface to the XML Parser Toolkit (expat).
 	/// It is strongly recommended, that you use the
 	/// SAX parser classes (which are based on this
-	/// class) instead of this class, since they provide 
+	/// class) instead of this class, since they provide
 	/// a standardized, higher-level interface to the parser.
 {
 public:
@@ -86,7 +86,7 @@ public:
 
 	void setExpandInternalEntities(bool flag = true);
 		/// Enables/disables expansion of internal entities (enabled by
-		/// default). If entity expansion is disabled, internal entities 
+		/// default). If entity expansion is disabled, internal entities
 		/// are reported via the default handler.
 		/// Must be set before parsing begins, otherwise it will be
 		/// ignored.
@@ -147,7 +147,7 @@ public:
 		/// Enable or disable partial reads from the input source.
 		///
 		/// This is useful for parsing XML from a socket stream for
-		/// a protocol like XMPP, where basically single elements 
+		/// a protocol like XMPP, where basically single elements
 		/// are read one at a time from the input source's stream, and
 		/// following elements depend upon responses sent back to
 		/// the peer.
@@ -180,7 +180,7 @@ public:
 		/// Return the line number where the current document event ends.
 
 	int getColumnNumber() const;
-		/// Return the column number where the current document event ends. 
+		/// Return the column number where the current document event ends.
 
 protected:
 	void init();
@@ -240,7 +240,7 @@ protected:
 	static void handleEndNamespaceDecl(void* userData, const XML_Char* prefix);
 	static void handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset);
 	static void handleEndDoctypeDecl(void* userData);
-	static void handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength, 
+	static void handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength,
 	                             const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName);
 	static void handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId);
 	static void handleInternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* replacementText, int replacementTextLength);
@@ -255,7 +255,7 @@ private:
 	
 	XML_Parser _parser;
 	char*      _pBuffer;
-	bool       _encodingSpecified; 
+	bool       _encodingSpecified;
 	XMLString  _encoding;
 	bool       _expandInternalEntities;
 	bool       _externalGeneralEntities;

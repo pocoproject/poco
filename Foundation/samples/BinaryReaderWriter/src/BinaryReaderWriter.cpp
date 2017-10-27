@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	       << 42
 	       << 3.14159265
 	       << "foo bar";
-	       
+	
 	bool   b;
 	char   c;
 	int    i;
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	       >> i
 	       >> d
 	       >> s;
-	       
+	
 	std::cout << b << std::endl
 	          << c << std::endl
 	          << i << std::endl

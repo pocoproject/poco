@@ -31,17 +31,17 @@ class NameValueCollection;
 class Net_API HTTPCookie
 	/// This class represents a HTTP Cookie.
 	///
-	/// A cookie is a small amount of information sent by a Web 
-	/// server to a Web browser, saved by the browser, and later sent back 
-	/// to the server. A cookie's value can uniquely identify a client, so 
+	/// A cookie is a small amount of information sent by a Web
+	/// server to a Web browser, saved by the browser, and later sent back
+	/// to the server. A cookie's value can uniquely identify a client, so
 	/// cookies are commonly used for session management.
 	///
-	/// A cookie has a name, a single value, and optional attributes such 
-	/// as a comment, path and domain qualifiers, a maximum age, and a 
+	/// A cookie has a name, a single value, and optional attributes such
+	/// as a comment, path and domain qualifiers, a maximum age, and a
 	/// version number.
 	///
-	/// This class supports both the Version 0 (by Netscape) and Version 1 
-	/// (by RFC 2109) cookie specifications. By default, cookies are created 
+	/// This class supports both the Version 0 (by Netscape) and Version 1
+	/// (by RFC 2109) cookie specifications. By default, cookies are created
 	/// using Version 0 to ensure the best interoperability.
 {
 public:
@@ -139,7 +139,7 @@ public:
 		/// Sets the maximum age in seconds for
 		/// the cookie.
 		///
-		/// A value of -1 (default) causes the cookie 
+		/// A value of -1 (default) causes the cookie
 		/// to become a session cookie, which will
 		/// be deleted when the browser window
 		/// is closed.
@@ -162,7 +162,7 @@ public:
 		/// suitable for use in a Set-Cookie header.
 		
 	static std::string escape(const std::string& str);
-		/// Escapes the given string by replacing all 
+		/// Escapes the given string by replacing all
 		/// non-alphanumeric characters with escape
 		/// sequences in the form %xx, where xx is the
 		/// hexadecimal character code.

@@ -29,7 +29,7 @@ class CppUnit_API RepeatedTest: public TestDecorator
 	REFERENCEOBJECT (RepeatedTest)
 
 public:
-	RepeatedTest(Test* test, int timesRepeat): TestDecorator (test), _timesRepeat (timesRepeat) 
+	RepeatedTest(Test* test, int timesRepeat): TestDecorator (test), _timesRepeat (timesRepeat)
 	{
 	}
 
@@ -59,7 +59,7 @@ inline std::string RepeatedTest::toString()
 // Runs a repeated test
 inline void RepeatedTest::run(TestResult *result)
 {
-	for (int n = 0; n < _timesRepeat; n++) 
+	for (int n = 0; n < _timesRepeat; n++)
 	{
 		if (result->shouldStop())
 			break;

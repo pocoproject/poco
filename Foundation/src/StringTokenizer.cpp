@@ -31,7 +31,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 
 	for (; it != itEnd; ++it)
 	{
-		if (separators.find(*it) != std::string::npos) 
+		if (separators.find(*it) != std::string::npos)
 		{
 			if (doTrim) trim(token);
 			if (!token.empty() || !ignoreEmpty) _tokens.push_back(token);
@@ -50,7 +50,7 @@ StringTokenizer::StringTokenizer(const std::string& str, const std::string& sepa
 		if (doTrim) trim(token);
 		if (!token.empty() || !ignoreEmpty) _tokens.push_back(token);
 	}
-	else if (lastToken) 
+	else if (lastToken)
 	{
 		_tokens.push_back(std::string());
 	}

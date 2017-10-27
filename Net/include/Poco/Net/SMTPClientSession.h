@@ -51,7 +51,7 @@ public:
 		AUTH_CRAM_SHA1,
 		AUTH_LOGIN,
 		AUTH_PLAIN,
-		AUTH_XOAUTH2 
+		AUTH_XOAUTH2
 	};
 
 	explicit SMTPClientSession(const StreamSocket& socket);

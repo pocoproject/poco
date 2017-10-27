@@ -103,14 +103,14 @@ public:
 		/// Throws an IOException in case of any other error.
 		
 	static IPAddress resolveOne(const std::string& address);
-		/// Convenience method that calls resolve(address) and returns 
+		/// Convenience method that calls resolve(address) and returns
 		/// the first address from the HostInfo.
 
 	static HostEntry thisHost();
 		/// Returns a HostEntry object containing the DNS information
 		/// for this host.
 		///
-		/// Throws a HostNotFoundException if DNS information 
+		/// Throws a HostNotFoundException if DNS information
 		/// for this host cannot be found.
 		///
 		/// Throws a NoAddressFoundException if no address can be

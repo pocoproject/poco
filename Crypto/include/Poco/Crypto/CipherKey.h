@@ -38,7 +38,7 @@ class Crypto_API CipherKey
 	/// file.
 	///
 	/// To create a key using a human-readable password
-	/// string, use the following code. We create a AES Cipher and 
+	/// string, use the following code. We create a AES Cipher and
 	/// use a salt value to make the key more robust:
 	///
 	///     std::string password = "secret";
@@ -68,22 +68,22 @@ public:
 			/// an iteration count of at least 1000.
 	};
 
-	CipherKey(const std::string& name, 
-		const std::string& passphrase, 
+	CipherKey(const std::string& name,
+		const std::string& passphrase,
 		const std::string& salt = "",
 		int iterationCount = DEFAULT_ITERATION_COUNT,
 		const std::string& digest = "md5");
 		/// Creates a new CipherKeyImpl object using the given
 		/// cipher name, passphrase, salt value, iteration count and digest.
 
-	CipherKey(const std::string& name, 
-		const ByteVec& key, 
+	CipherKey(const std::string& name,
+		const ByteVec& key,
 		const ByteVec& iv);
 		/// Creates a new CipherKeyImpl object using the given cipher
 		/// name, key and initialization vector.
 
 	CipherKey(const std::string& name);
-		/// Creates a new CipherKeyImpl object. Autoinitializes key and 
+		/// Creates a new CipherKeyImpl object. Autoinitializes key and
 		/// initialization vector.
 
 	~CipherKey();

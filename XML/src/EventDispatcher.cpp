@@ -17,7 +17,7 @@
 #include "Poco/DOM/EventListener.h"
 
 
-namespace 
+namespace
 {
 	class DispatchGuard
 	{

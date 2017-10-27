@@ -29,7 +29,7 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A buffer class that allocates a buffer of a given type and size 
+	/// A buffer class that allocates a buffer of a given type and size
 	/// in the constructor and deallocates the buffer in the destructor.
 	///
 	/// This class is useful everywhere where a temporary buffer
@@ -57,8 +57,8 @@ public:
 		/// Creates the Buffer. Length argument specifies the length
 		/// of the supplied memory pointed to by pMem in the number
 		/// of elements of type T. Supplied pointer is considered
-		/// blank and not owned by Buffer, so in this case Buffer 
-		/// only acts as a wrapper around externally supplied 
+		/// blank and not owned by Buffer, so in this case Buffer
+		/// only acts as a wrapper around externally supplied
 		/// (and lifetime-managed) memory.
 	{
 	}
@@ -150,8 +150,8 @@ public:
 		/// new buffer. The new capacity can be larger or smaller than
 		/// the current one; if it is smaller, capacity will remain intact.
 		/// Size will always be set to the new capacity.
-		///  
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
@@ -176,11 +176,11 @@ public:
 		/// Sets the buffer capacity. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
-		/// the current one; size will be set to the new capacity only if 
+		/// the current one; size will be set to the new capacity only if
 		/// new capacity is smaller than the current size, otherwise it will
 		/// remain intact.
-		/// 
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{

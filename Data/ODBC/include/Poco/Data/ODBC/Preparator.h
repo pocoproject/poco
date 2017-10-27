@@ -49,13 +49,13 @@ namespace ODBC {
 
 
 class ODBC_API Preparator : public AbstractPreparator
-	/// Class used for database preparation where we first have to register all data types 
-	/// with respective memory output locations before extracting data. 
+	/// Class used for database preparation where we first have to register all data types
+	/// with respective memory output locations before extracting data.
 	/// Extraction works in two-phases: first prepare is called once, then extract n-times.
-	/// In ODBC, SQLBindCol/SQLFetch is the preferred method of data retrieval (SQLGetData is available, 
-	/// however with numerous driver implementation dependent limitations and inferior performance). 
-	/// In order to fit this functionality into Poco DataConnectors framework, every ODBC SQL statement 
-	/// instantiates its own Preparator object. 
+	/// In ODBC, SQLBindCol/SQLFetch is the preferred method of data retrieval (SQLGetData is available,
+	/// however with numerous driver implementation dependent limitations and inferior performance).
+	/// In order to fit this functionality into Poco DataConnectors framework, every ODBC SQL statement
+	/// instantiates its own Preparator object.
 	/// This is done once per statement execution (from StatementImpl::bindImpl()).
 	///
 	/// Preparator object is used to :
@@ -69,7 +69,7 @@ class ODBC_API Preparator : public AbstractPreparator
 	/// - Value datatypes in this interface prepare() calls serve only for the purpose of type distinction.
 	/// - Preparator keeps its own std::vector<Any> buffer for fetched data to be later retrieved by Extractor.
 	/// - prepare() methods should not be called when extraction mode is DE_MANUAL
-	/// 
+	///
 {
 public:
 	typedef std::vector<char*> CharArray;
@@ -96,8 +96,8 @@ public:
 		DT_DATETIME
 	};
 
-	Preparator(const StatementHandle& rStmt, 
-		const std::string& statement, 
+	Preparator(const StatementHandle& rStmt,
+		const std::string& statement,
 		std::size_t maxFieldSize,
 		DataExtraction dataExtraction,
 		bool isPostgres
@@ -397,12 +397,12 @@ public:
 
 	std::size_t maxDataSize(std::size_t pos) const;
 		/// Returns max supported size for column at position pos.
-		/// Returned length for variable length fields is the one 
+		/// Returned length for variable length fields is the one
 		/// supported by this implementation, not the underlying DB.
 
 	std::size_t actualDataSize(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) const;
-		/// Returns the returned length for the column and row specified. 
-		/// This is usually equal to the column size, except for 
+		/// Returns the returned length for the column and row specified.
+		/// This is usually equal to the column size, except for
 		/// variable length fields (BLOB and variable length strings).
 		/// For null values, the return value is -1 (SQL_NO_DATA)
 
@@ -437,7 +437,7 @@ private:
 				if (pVal)
 					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, pVal->size());
 				else
-					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT); 
+					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT);
 
 			case MetaColumn::FDT_UINT8:
 				if (pVal)
@@ -550,7 +550,7 @@ private:
 				else
 					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP);
 
-			default: 
+			default:
 				throw DataFormatException("Unsupported data type.");
 		}
 	}
@@ -569,11 +569,11 @@ private:
 		_values[pos] = Poco::Any(T());
 
 		T* pVal = AnyCast<T>(&_values[pos]);
-		if (Utility::isError(SQLBindCol(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			valueType, 
-			(SQLPOINTER) pVal,  
-			(SQLINTEGER) dataSize, 
+		if (Utility::isError(SQLBindCol(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			valueType,
+			(SQLPOINTER) pVal,
+			(SQLINTEGER) dataSize,
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
@@ -598,11 +598,11 @@ private:
 		std::vector<T>& cache = RefAnyCast<std::vector<T> >(_values[pos]);
 		cache.resize(length);
 
-		if (Utility::isError(SQLBindCol(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			valueType, 
-			(SQLPOINTER) &cache[0], 
-			(SQLINTEGER) dataSize, 
+		if (Utility::isError(SQLBindCol(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			valueType,
+			(SQLPOINTER) &cache[0],
+			(SQLINTEGER) dataSize,
 			&_lenLengths[pos][0])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
@@ -616,18 +616,18 @@ private:
 		poco_assert (DE_BOUND == _dataExtraction);
 		poco_assert (pos < _values.size());
 
-		T* pCache = new T[size]; 
+		T* pCache = new T[size];
 		std::memset(pCache, 0, size);
 
 		_values[pos] = Any(pCache);
 		_lengths[pos] = (SQLLEN) size;
 		_varLengthArrays.insert(IndexMap::value_type(pos, dt));
 
-		if (Utility::isError(SQLBindCol(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			valueType, 
-			(SQLPOINTER) pCache, 
-			(SQLINTEGER) size*sizeof(T), 
+		if (Utility::isError(SQLBindCol(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			valueType,
+			(SQLPOINTER) pCache,
+			(SQLINTEGER) size*sizeof(T),
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");
@@ -650,11 +650,11 @@ private:
 		_lenLengths[pos].resize(length);
 		_varLengthArrays.insert(IndexMap::value_type(pos, DT));
 
-		if (Utility::isError(SQLBindCol(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			valueType, 
-			(SQLPOINTER) pArray, 
-			(SQLINTEGER) size, 
+		if (Utility::isError(SQLBindCol(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			valueType,
+			(SQLPOINTER) pArray,
+			(SQLINTEGER) size,
 			&_lenLengths[pos][0])))
 		{
 			throw StatementException(_rStmt, "SQLBindCol()");

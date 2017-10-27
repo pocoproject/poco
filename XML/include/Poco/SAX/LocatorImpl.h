@@ -33,15 +33,15 @@ class XML_API LocatorImpl: public Locator
 public:
 	LocatorImpl();
 		/// Zero-argument constructor.
-		/// 
-		/// This will not normally be useful, since the main purpose of this class is 
+		///
+		/// This will not normally be useful, since the main purpose of this class is
 		/// to make a snapshot of an existing Locator.
 		
 	LocatorImpl(const Locator& loc);
 		/// Copy constructor.
-		/// 
-		/// Create a persistent copy of the current state of a locator. When the original 
-		/// locator changes, this copy will still keep the original values (and it can be 
+		///
+		/// Create a persistent copy of the current state of a locator. When the original
+		/// locator changes, this copy will still keep the original values (and it can be
 		/// used outside the scope of DocumentHandler methods).
 
 	~LocatorImpl();
