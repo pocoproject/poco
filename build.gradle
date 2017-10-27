@@ -726,7 +726,6 @@ subprojects {
 	}
 	task showCompilerOutput {
 	   doLast {
-	      println '\n-----------------------------------------------------\n'
 	      FileTree tree = fileTree('gradle').include('**/output.txt')
 	      // Iterate over the contents of a tree
 	      tree.each {File file ->
@@ -741,7 +740,10 @@ subprojects {
 	}
 */
 }
-
+task pocoTasks() {
+		def Set<Task> tts = project.getTasksByName('poco', true)
+		setDependsOn(tts)
+}
 task PocoDocIni {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
@@ -799,9 +801,8 @@ task zipDoc(type: Zip) {
 
 def candle(VSYEAR, VERSION, target, os) {
 	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
-//			dependsOn ':poco'
-		dependsOn 'assemble'
-//		dependsOn ':pocoDoc'
+		dependsOn 'pocoTasks'
+		dependsOn ':pocoDoc'
 		executable "${WiXHome}/bin/Candle.exe"
 		workingDir "packaging/Windows/WiX"
 		args "-arch", "${target}"
@@ -851,7 +852,7 @@ task wix() {
 	});
 }
 task nuget(type: Exec) {
-	dependsOn ':assemble'
+	dependsOn 'pocoTasks'
 	executable "${NuGetHome}/NuGet.exe"
 	workingDir "packaging/Windows/NuGet"
 	args "pack"
@@ -877,14 +878,22 @@ task packaging() {
 	}
 }
 task all() {
-doLast {
-        def files =  fileTree("src").filter { it.isFile() }.files.name;
-        println files;
-        println "------------------------------------"
-        println project.tasks.matching { Task task -> !task.name.empty }
-        println "------------------------------------"
-        def c = subprojects.tasks.findAll { it.findByName(":poco") }
-		println c
+//doLast {
+//        def files =  fileTree("src").filter { it.isFile() }.files.name;
+//        println files;
+//        println "------------------------------------"
+//        println project.tasks.matching { Task task -> task.name.contains("assemble") }
+//        println "------------------------------------"
+//		def Set<Project> projects = project.subprojects
+//		println projects
+//        println "------------------------------------"
+//		def Set<Task> tts = project.getTasksByName('poco', true)
+//		println tts
+//		setDependsOn(tts)
+//		println project.subprojects.tasks.matching { Task task -> task.name.contains("poco") }
+//        println "------------------------------------"
+//        def c = subprojects.tasks.findAll { it.findByName(":poco") }
+//		println c
 
 //        CppCompile task = tasks.getByPath(':compileHelloSharedLibraryHelloCpp');
 //        println task;
@@ -893,7 +902,7 @@ doLast {
         incs.each { dir -> fileTree(dir).files.each { file -> inputs.files(file) }};
         inputs.files.each { file -> println file.path }
 */
-}
+//}
 }
 	def get() {
 		def foo = subprojects.tasks.findAll { it.name.contains('poco') }
