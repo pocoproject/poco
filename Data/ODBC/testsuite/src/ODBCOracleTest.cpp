@@ -176,11 +176,7 @@ void ODBCOracleTest::testInternalExtraction()
 		recreateVectorsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-#ifdef POCO_64_BIT
-		_pExecutor->internalExtraction<double>(0.);
-#else
-		_pExecutor->internalExtraction(0);
-#endif
+		_pExecutor->internalExtraction();
 		i += 2;
 	}
 }
@@ -358,6 +354,8 @@ void ODBCOracleTest::testStoredProcedureAny()
 void ODBCOracleTest::testStoredProcedureAnyString()
 {
 	Any sInOut = std::string("Hello");
+	//strings only work with auto-binding
+	session().setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "
 		"PROCEDURE storedProcedure(inParam IN OUT VARCHAR2) IS "
@@ -715,6 +713,15 @@ void ODBCOracleTest::recreatePersonTable()
 	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR2(30), FirstName VARCHAR2(30), Address VARCHAR2(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
+}
+
+
+void ODBCOracleTest::recreatePersonUnicodeTable()
+{
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName NVARCHAR2(30), FirstName NVARCHAR2(30), Address NVARCHAR2(30), Age INTEGER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreatePersonUnicodeTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreatePersonUnicodeTable()"); }
 }
 
 

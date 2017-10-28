@@ -2777,6 +2777,146 @@ void SQLExecutor::tupleVector()
 }
 
 
+void SQLExecutor::internalExtraction()
+{
+	typedef int IntType;
+	using Poco::Data::RecordSet;
+	using Poco::Data::Column;
+	using Poco::Data::Statement;
+	using Poco::UTF16String;
+	using Poco::Tuple;
+	using Poco::BadCastException;
+	using Poco::RangeException;
+	using Poco::Data::ODBC::ConnectionException;
+	using Poco::Data::ODBC::StatementException;
+	using namespace Poco::Data::Keywords;
+
+	std::string funct = "internalExtraction()";
+	std::vector<Poco::Tuple<int, double, std::string> > v;
+	v.push_back(Poco::Tuple<int, double, std::string>(1, 1.5, "3"));
+	v.push_back(Poco::Tuple<int, double, std::string>(2, 2.5, "4"));
+	v.push_back(Poco::Tuple<int, double, std::string>(3, 3.5, "5"));
+	v.push_back(Poco::Tuple<int, double, std::string>(4, 4.5, "6"));
+
+	try { session() << "INSERT INTO " << ExecUtil::vectors() << " VALUES (?,?,?)", use(v), now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail(funct); }
+
+	try
+	{
+		Statement stmt = (session() << "SELECT * FROM " << ExecUtil::vectors(), now);
+		RecordSet rset(stmt);
+
+		assert(3 == rset.columnCount());
+		assert(4 == rset.rowCount());
+
+		int curVal = 3;
+		do
+		{
+			assert(rset["str0"] == curVal);
+			++curVal;
+		} while (rset.moveNext());
+
+		rset.moveFirst();
+		assert(rset["str0"] == "3");
+		rset.moveLast();
+		assert(rset["str0"] == "6");
+
+		RecordSet rset2(rset);
+		assert(3 == rset2.columnCount());
+		assert(4 == rset2.rowCount());
+
+		IntType i;
+		try {
+			i = rset.value<IntType>(0, 0);
+			assert(1 == i);
+		}
+		catch (Poco::BadCastException& ex)
+		{
+			std::cout << ex.displayText() << std::endl;
+		}
+		std::string s = rset.value(0, 0).convert<std::string>();
+		assert("1" == s);
+
+		IntType a = rset.value<IntType>(0, 2);
+		assert(3 == a);
+
+		try
+		{
+			double d = rset.value<double>(1, 1);
+			assert(2.5 == d);
+		}
+		catch (BadCastException&)
+		{
+			float f = rset.value<float>(1, 1);
+			assert(2.5 == f);
+		}
+
+		try
+		{
+			s = rset.value<std::string>(2, 2);
+		}
+		catch (BadCastException&)
+		{
+			UTF16String us = rset.value<Poco::UTF16String>(2, 2);
+			Poco::UnicodeConverter::convert(us, s);
+		}
+		assert("5" == s);
+
+		i = rset.value("str0", 2);
+		assert(5 == i);
+
+		const Column<std::deque<IntType> >& col = rset.column<std::deque<IntType> >(0);
+		typename Column<std::deque<IntType> >::Iterator it = col.begin();
+		typename Column<std::deque<IntType> >::Iterator end = col.end();
+		for (int i = 1; it != end; ++it, ++i)
+			assert(*it == i);
+
+		rset = (session() << "SELECT COUNT(*) AS cnt FROM " << ExecUtil::vectors(), now);
+
+		//various results for COUNT(*) are received from different drivers
+		try
+		{
+			//this is what most drivers will return
+			int i = rset.value<int>(0, 0);
+			assert(4 == i);
+		}
+		catch (BadCastException&)
+		{
+			try
+			{
+				//this is for Oracle
+				double i = rset.value<double>(0, 0);
+				assert(4 == int(i));
+			}
+			catch (BadCastException&)
+			{
+				//this is for PostgreSQL
+				Poco::Int64 big = rset.value<Poco::Int64>(0, 0);
+				assert(4 == big);
+			}
+		}
+
+		s = rset.value("cnt", 0).convert<std::string>();
+		assert("4" == s);
+
+		try { rset.column<std::deque<IntType> >(100); fail("must fail"); }
+		catch (RangeException&) {}
+
+		try { rset.value<std::string>(0, 0); fail("must fail"); }
+		catch (BadCastException&) {}
+
+		stmt = (session() << "DELETE FROM " << ExecUtil::vectors(), now);
+		rset = stmt;
+
+		try { rset.column<std::deque<IntType> >(0); fail("must fail"); }
+		catch (RangeException&) {}
+	}
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail(funct); }
+}
+
+
 void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
 {
 	std::string funct = "filter()";
@@ -3805,7 +3945,6 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
 	setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
 	setTransactionIsolation(session(), Session::TRANSACTION_SERIALIZABLE);
-
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 
 	session().begin();
@@ -3840,8 +3979,6 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (session().isTransaction());
 
-	//TODO: this looks to be wrong - if a DB is fast it'd manage to execute this before another session commit is done
-	// so assert below WILL fail
 	Statement stmt1 = (local << "SELECT COUNT(*) FROM " << ExecUtil::person(), into(locCount), async, now);
 
 	session().commit();
@@ -3964,7 +4101,7 @@ void SQLExecutor::transaction(const std::string& connect)
 	assert (0 == count);
 	try
 	{
-		stmt1.wait(5000);
+		stmt1.wait();
 		if (local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
 			assert (0 == locCount);
 	} catch (TimeoutException&)

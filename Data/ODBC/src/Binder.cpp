@@ -573,7 +573,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		DynamicAny tmp;
 		bool found = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
 		if (found) colSize = tmp;
-		if (actualSize > colSize)
+		if (colSize && actualSize > colSize)
 		{
 			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
 				pos, actualSize, static_cast<long>(colSize)));

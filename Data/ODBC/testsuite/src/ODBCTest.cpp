@@ -973,7 +973,7 @@ void ODBCTest::testInternalExtraction()
 		recreateVectorsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->internalExtraction(0);
+		_pExecutor->internalExtraction();
 		i += 2;
 	}
 }
@@ -998,12 +998,14 @@ void ODBCTest::testInternalBulkExtraction()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreatePersonTable();
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
+
 #ifdef POCO_ODBC_UNICODE
+	recreatePersonUnicodeTable();
 	_pExecutor->internalBulkExtractionUTF16();
 #else
+	recreatePersonTable();
 	_pExecutor->internalBulkExtraction();
 #endif
 }

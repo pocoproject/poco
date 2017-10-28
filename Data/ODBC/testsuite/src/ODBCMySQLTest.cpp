@@ -265,6 +265,16 @@ void ODBCMySQLTest::recreatePersonTable()
 }
 
 
+void ODBCMySQLTest::recreatePersonUnicodeTable()
+{
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() <<
+		" (LastName VARCHAR(30) CHARACTER SET utf16, FirstName VARCHAR(30) CHARACTER SET utf16, Address VARCHAR(30) CHARACTER SET utf16, Age INTEGER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreatePersonTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreatePersonTable()"); }
+}
+
+
 void ODBCMySQLTest::recreatePersonBLOBTable()
 {
   dropObject("TABLE", ExecUtil::person());
@@ -352,7 +362,7 @@ void ODBCMySQLTest::recreateTuplesTable()
 void ODBCMySQLTest::recreateVectorsTable()
 {
 	dropObject("TABLE", ExecUtil::vectors() );
-	try { *_pSession << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	try{ *_pSession << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -360,8 +370,15 @@ void ODBCMySQLTest::recreateVectorsTable()
 
 void ODBCMySQLTest::recreateAnysTable()
 {
-	dropObject("TABLE", ExecUtil::anys() );
-	try { *_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::anys());
+	try
+	{
+#ifdef POCO_ODBC_UNICODE
+		*_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30) CHARACTER SET utf16)", now;
+#else
+		*_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now;
+#endif
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -456,7 +473,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
@@ -498,7 +515,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
-		//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransaction);

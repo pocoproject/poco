@@ -139,7 +139,8 @@ std::size_t Preparator::columns() const
 void Preparator::resize() const
 {
 	SQLSMALLINT nCol = 0;
-	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 0 != nCol)
+	int rc = SQLNumResultCols(_rStmt, &nCol);
+	if (!Utility::isError(rc) && (0 != nCol))
 	{
 		_values.resize(nCol, 0);
 		_lengths.resize(nCol, 0);

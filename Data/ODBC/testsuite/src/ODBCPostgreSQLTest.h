@@ -53,6 +53,7 @@ private:
 	void dropObject(const std::string& type, const std::string& name);
 	void recreateNullableTable();
 	void recreatePersonTable();
+	void recreatePersonUnicodeTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
@@ -60,6 +61,7 @@ private:
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
+	void recreateDoublesTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateAnysTable();

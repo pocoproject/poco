@@ -51,6 +51,7 @@ private:
 	void dropObject(const std::string& type, const std::string& name);
 	void recreateNullableTable();
 	void recreatePersonTable();
+	void recreatePersonUnicodeTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
@@ -65,7 +66,7 @@ private:
 	void recreateNullsTable(const std::string& notNull = "");
 	void recreateMiscTable();
 	void recreateLogTable();
-	void testInternalBulkExtraction() { std::cout << " disabled" << std::endl; }
+	//void testInternalBulkExtraction() { std::cout << " disabled" << std::endl; }
 	static ODBCTest::SessionPtr  _pSession;
 	static ODBCTest::ExecPtr     _pExecutor;
 	static std::string _driver;

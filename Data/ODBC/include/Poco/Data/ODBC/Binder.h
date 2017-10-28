@@ -647,15 +647,15 @@ private:
 
 		setParamSetSize(val.size());
 
-		SQLINTEGER size = 0;
-		getColumnOrParameterSize(pos, size);
-		poco_assert(size > 0);
+		SQLINTEGER fieldSize = 0;
+		getColumnOrParameterSize(pos, fieldSize);
+		poco_assert(fieldSize > 0);
 
-		if (size == _maxFieldSize)
+		if (fieldSize == _maxFieldSize)
 		{
-			getMinValueSize(val, size);
+			getMinValueSize(val, fieldSize);
 			// accommodate for terminating zero
-			if (size != _maxFieldSize) size += sizeof(UTF16Char);
+			if (fieldSize != _maxFieldSize) fieldSize += sizeof(UTF16Char);
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
@@ -667,30 +667,31 @@ private:
 		if (_utf16CharPtrs.size() <= pos)
 			_utf16CharPtrs.resize(pos + 1, 0);
 
-		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * size, sizeof(UTF16Char));
+		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * fieldSize, sizeof(UTF16Char));
 
 		std::size_t strSize;
 		std::size_t offset = 0;
+		char* pBuf = (char*)_utf16CharPtrs[pos];
 		typename C::const_iterator it = val.begin();
 		typename C::const_iterator end = val.end();
 		for (; it != end; ++it)
 		{
 			strSize = it->size() * sizeof(UTF16Char);
-			if (strSize > size)
-				throw LengthExceededException("SQLBindParameter(std::vector<UTF16String>)");
-			std::memcpy(_utf16CharPtrs[pos] + offset, it->data(), strSize);
-			offset += (size / sizeof(UTF16Char));
+			if (strSize > fieldSize - sizeof(UTF16Char))
+				throw LengthExceededException("Binder::bindImplContainerUTF16String");
+			std::memcpy(pBuf + offset, it->data(), strSize);
+			offset += fieldSize;
 		}
-		SQLSMALLINT sqlType = (isInBound(dir) && size < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
+		SQLSMALLINT sqlType = (isInBound(dir) && fieldSize < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT)pos + 1,
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
 			sqlType,
-			(SQLUINTEGER)size - 1,
+			(SQLUINTEGER)fieldSize,
 			0,
 			_utf16CharPtrs[pos],
-			(SQLINTEGER)size,
+			(SQLINTEGER)fieldSize,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<UTF16String>)");
