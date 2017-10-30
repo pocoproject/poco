@@ -24,7 +24,7 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs>
 class AbstractDelegate
 	/// Base class for Delegate and Expire.
 {
@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractDelegate() 
+	virtual ~AbstractDelegate()
 	{
 	}
 
@@ -64,7 +64,7 @@ public:
 };
 
 
-template <> 
+template <>
 class AbstractDelegate<void>
 	/// Base class for Delegate and Expire.
 {
@@ -77,7 +77,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractDelegate() 
+	virtual ~AbstractDelegate()
 	{
 	}
 

@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -52,12 +52,12 @@
 *   CLOCKS_PER_SEC is defined to be one million in <time.h>.
 *   If the processor time used is not available or its value cannot be represented,
 *   the function shall return the value ( clock_t)-1.
-* 
+*
 * Reference:
 *
 *   IEEE Std 1003.1-2001
 *   The GNU C Library Manual
-* 
+*
 *******************************************************************************/
 
 
@@ -67,9 +67,9 @@ clock_t wceex_clock()
     __int64 ticks;
     SYSTEMTIME stCurrent;
     FILETIME   ftCurrent;
-    
+
     GetSystemTime(&stCurrent);
-    
+
     if (SystemTimeToFileTime(&stCurrent, &ftCurrent))
     {
         ticks = *(__int64*)&ftCurrent;
@@ -81,7 +81,7 @@ clock_t wceex_clock()
          */
         ticks = -1;
     }
- 
+
    return (clock_t)ticks;
 }
- 
+

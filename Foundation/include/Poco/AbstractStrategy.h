@@ -27,9 +27,9 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
+template <class TKey, class TValue>
 class AbstractStrategy
-	/// An AbstractStrategy is the interface for all strategies. 
+	/// An AbstractStrategy is the interface for all strategies.
 {
 public:
 	AbstractStrategy()

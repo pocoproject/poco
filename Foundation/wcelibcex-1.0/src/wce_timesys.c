@@ -10,11 +10,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -48,8 +48,8 @@
 * Return:
 *
 *   This function shall return the specified time since the Epoch
-*   encoded as a value of type time_t. 
-*       
+*   encoded as a value of type time_t.
+*
 *******************************************************************************/
 time_t wceex_filetime_to_time(const FILETIME * pft)
 {
@@ -83,8 +83,8 @@ time_t wceex_filetime_to_time(const FILETIME * pft)
 * Return:
 *
 *   This function shall return the specified time since the Epoch
-*   encoded as a value of type time_t. 
-*       
+*   encoded as a value of type time_t.
+*
 *******************************************************************************/
 time_t wceex_local_to_time(const SYSTEMTIME *st)
 {
@@ -92,7 +92,7 @@ time_t wceex_local_to_time(const SYSTEMTIME *st)
     {
         return (time_t)-1;
     }
- 
+
     return wceex_local_to_time_r(st->wYear - TM_YEAR_BASE,
                                st->wMonth - 1,
                                st->wDay, st->wHour,
@@ -115,8 +115,8 @@ time_t wceex_local_to_time(const SYSTEMTIME *st)
 * Return:
 *
 *   This function shall return the specified time since the Epoch
-*   encoded as a value of type time_t. 
-*       
+*   encoded as a value of type time_t.
+*
 *******************************************************************************/
 time_t wceex_local_to_time_r(int year, int mon, int day, int hour, int min, int sec)
 {

@@ -165,7 +165,7 @@ void LocalDateTimeTest::testCalcs()
 	assert (dt1.week(DateTime::MONDAY) == 53);
 	
 	// Jan 1 is Mon
-	dt1.assign(2001, 1, 1);  
+	dt1.assign(2001, 1, 1);
 	assert (dt1.week() == 1);
 	dt1.assign(2001, 1, 7);
 	assert (dt1.week() == 1);

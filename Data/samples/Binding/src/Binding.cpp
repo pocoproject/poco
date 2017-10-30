@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
 	
 	// insert some rows
-	Person person = 
+	Person person =
 	{
 		"Bart Simpson",
 		"Springfield",

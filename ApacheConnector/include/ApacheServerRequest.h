@@ -25,10 +25,10 @@ class ApacheServerRequest: public Poco::Net::HTTPServerRequest
 {
 public:
 	ApacheServerRequest(
-		ApacheRequestRec* pApacheRequest, 
-		const char* serverName, 
-		int serverPort, 
-		const char* clientName, 
+		ApacheRequestRec* pApacheRequest,
+		const char* serverName,
+		int serverPort,
+		const char* clientName,
 		int clientPort);
 		/// Creates a new ApacheServerRequest.
 

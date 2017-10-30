@@ -358,7 +358,7 @@ URI::QueryParameters URI::getQueryParameters() const
 		std::string value;
 		while (it != end && *it != '=' && *it != '&')
 		{
-			if (*it == '+') 
+			if (*it == '+')
 				name += ' ';
 			else
 				name += *it;
@@ -369,7 +369,7 @@ URI::QueryParameters URI::getQueryParameters() const
 			++it;
 			while (it != end && *it != '&')
 			{
-				if (*it == '+') 
+				if (*it == '+')
 					value += ' ';
 				else
 					value += *it;
@@ -498,7 +498,7 @@ void URI::resolve(const URI& relativeURI)
 			}
 		}
 	}
-	_fragment = relativeURI._fragment;      
+	_fragment = relativeURI._fragment;
 }
 
 
@@ -626,10 +626,10 @@ void URI::encode(const std::string& str, const std::string& reserved, std::strin
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
 	{
 		char c = *it;
-		if ((c >= 'a' && c <= 'z') || 
-		    (c >= 'A' && c <= 'Z') || 
+		if ((c >= 'a' && c <= 'z') ||
+		    (c >= 'A' && c <= 'Z') ||
 		    (c >= '0' && c <= '9') ||
-		    c == '-' || c == '_' || 
+		    c == '-' || c == '_' ||
 		    c == '.' || c == '~')
 		{
 			encodedStr += c;
@@ -743,7 +743,7 @@ void URI::parse(const std::string& uri)
 			}
 			parsePathEtc(it, end);
 		}
-		else 
+		else
 		{
 			it = uri.begin();
 			parsePathEtc(it, end);
@@ -905,7 +905,7 @@ void URI::buildPath(const std::vector<std::string>& segments, bool leadingSlash,
 		else _path += '/';
 		_path.append(*it);
 	}
-	if (trailingSlash) 
+	if (trailingSlash)
 		_path += '/';
 }
 

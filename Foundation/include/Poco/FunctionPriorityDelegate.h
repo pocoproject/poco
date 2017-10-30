@@ -26,9 +26,9 @@
 namespace Poco {
 
 
-template <class TArgs, bool useSender = true, bool senderIsConst = true> 
+template <class TArgs, bool useSender = true, bool senderIsConst = true>
 class FunctionPriorityDelegate: public AbstractPriorityDelegate<TArgs>
-	/// Wraps a freestanding function or static member function 
+	/// Wraps a freestanding function or static member function
 	/// for use as a PriorityDelegate.
 {
 public:
@@ -97,7 +97,7 @@ private:
 };
 
 
-template <class TArgs> 
+template <class TArgs>
 class FunctionPriorityDelegate<TArgs, true, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -166,7 +166,7 @@ private:
 };
 
 
-template <class TArgs> 
+template <class TArgs>
 class FunctionPriorityDelegate<TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:

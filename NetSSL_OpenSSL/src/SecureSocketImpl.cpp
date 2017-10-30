@@ -45,7 +45,7 @@ namespace Poco {
 namespace Net {
 
 
-SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext): 
+SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
 	_pSSL(0),
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
@@ -150,7 +150,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
 	_pSSL = SSL_new(_pContext->sslContext());
-	if (!_pSSL) 
+	if (!_pSSL)
 	{
 		BIO_free(pBIO);
 		throw SSLException("Cannot create SSL object");
@@ -211,7 +211,7 @@ void SecureSocketImpl::listen(int backlog)
 void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
-	{        
+	{
         // Don't shut down the socket more than once.
         int shutdownState = SSL_get_shutdown(_pSSL);
         bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
@@ -221,7 +221,7 @@ void SecureSocketImpl::shutdown()
 			// call SSL_shutdown() a second time if the
 			// first call returns 0.
 			// Previously, this lead to problems with
-			// most web browsers, so we just called 
+			// most web browsers, so we just called
 			// SSL_shutdown() once.
 			// It seems that behavior has changed in newer
 			// OpenSSL and/or browser versions, and things
@@ -229,7 +229,7 @@ void SecureSocketImpl::shutdown()
 			int rc = SSL_shutdown(_pSSL);
 #if FIXME
 			#1605: try to do a proper SSL_shutdown()
-			This fix for the issue above breaks the 
+			This fix for the issue above breaks the
 			HTTPSClientSessionTest::testCachedSession() Unit test
 			if (rc == 0 && _pSocket->getBlocking())
 			{
@@ -280,7 +280,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		rc = SSL_write(_pSSL, buffer, length);
 	}
 	while (mustRetry(rc));
-	if (rc <= 0) 
+	if (rc <= 0)
 	{
 		rc = handleError(rc);
 		if (rc == 0) throw SSLConnectionUnexpectedlyClosedException();
@@ -308,7 +308,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		rc = SSL_read(_pSSL, buffer, length);
 	}
 	while (mustRetry(rc));
-	if (rc <= 0) 
+	if (rc <= 0)
 	{
 		return handleError(rc);
 	}
@@ -335,7 +335,7 @@ int SecureSocketImpl::completeHandshake()
 		rc = SSL_do_handshake(_pSSL);
 	}
 	while (mustRetry(rc));
-	if (rc <= 0) 
+	if (rc <= 0)
 	{
 		return handleError(rc);
 	}
@@ -457,7 +457,7 @@ int SecureSocketImpl::handleError(int rc)
 		return SecureStreamSocket::ERR_SSL_WANT_READ;
 	case SSL_ERROR_WANT_WRITE:
 		return SecureStreamSocket::ERR_SSL_WANT_WRITE;
-	case SSL_ERROR_WANT_CONNECT: 
+	case SSL_ERROR_WANT_CONNECT:
 	case SSL_ERROR_WANT_ACCEPT:
 	case SSL_ERROR_WANT_X509_LOOKUP:
 		// these should not occur

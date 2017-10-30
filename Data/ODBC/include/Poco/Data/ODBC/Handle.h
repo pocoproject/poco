@@ -39,14 +39,14 @@ class Handle
 /// ODBC handle class template
 {
 public:
-	Handle(const ConnectionHandle& rConnection): 
+	Handle(const ConnectionHandle& rConnection):
 		_rConnection(rConnection),
 		_handle(0)
 			/// Creates the Handle.
 	{
-		if (Utility::isError(SQLAllocHandle(handleType, 
-			_rConnection, 
-			&_handle))) 
+		if (Utility::isError(SQLAllocHandle(handleType,
+			_rConnection,
+			&_handle)))
 		{
 			throw ODBCException("Could not allocate statement handle.");
 		}
@@ -58,7 +58,7 @@ public:
 		try
 		{
 #if defined(_DEBUG)
-			SQLRETURN rc = 
+			SQLRETURN rc =
 #endif
 			SQLFreeHandle(handleType, _handle);
 			// N.B. Destructors should not throw, but neither do we want to

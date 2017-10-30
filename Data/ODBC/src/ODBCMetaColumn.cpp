@@ -21,14 +21,14 @@ namespace Data {
 namespace ODBC {
 
 
-	ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) :
+ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) :
 	MetaColumn(position),
 	_rStmt(rStmt)
 {
 	init();
 }
 
-	
+
 ODBCMetaColumn::~ODBCMetaColumn()
 {
 }
@@ -43,18 +43,35 @@ void ODBCMetaColumn::getDescription()
 	_columnDesc.decimalDigits = 0;
 	_columnDesc.isNullable = 0;
 
-	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt, 
+	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt,
 		(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
-		_columnDesc.name, 
+		_columnDesc.name,
 		NAME_BUFFER_LENGTH,
-		&_columnDesc.nameBufferLength, 
+		&_columnDesc.nameBufferLength,
 		&_columnDesc.dataType,
-		&_columnDesc.size, 
-		&_columnDesc.decimalDigits, 
+		&_columnDesc.size,
+		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
 		throw StatementException(_rStmt);
 	}
+}
+
+
+bool ODBCMetaColumn::isUnsigned() const
+{
+	SQLLEN val = 0;
+	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
+		(SQLUSMALLINT)position() + 1, // ODBC columns are 1-based
+		SQL_DESC_UNSIGNED,
+		0,
+		0,
+		0,
+		&val)))
+	{
+		throw StatementException(_rStmt);
+	}
+	return (val == SQL_TRUE);
 }
 
 
@@ -97,16 +114,20 @@ void ODBCMetaColumn::init()
 		setType(MetaColumn::FDT_WSTRING); break;
 
 	case SQL_TINYINT:
-		setType(MetaColumn::FDT_INT8); break;
+		setType(isUnsigned() ? MetaColumn::FDT_UINT8 : MetaColumn::FDT_INT8);
+		break;
 
 	case SQL_SMALLINT:
-		setType(MetaColumn::FDT_INT16); break;
+		setType(isUnsigned() ? MetaColumn::FDT_UINT16 : MetaColumn::FDT_INT16);
+		break;
 	
 	case SQL_INTEGER:
-		setType(MetaColumn::FDT_INT32); break;
+		setType(isUnsigned() ? MetaColumn::FDT_UINT32 : MetaColumn::FDT_INT32);
+		break;
 
 	case SQL_BIGINT:
-		setType(MetaColumn::FDT_INT64); break;
+		setType(isUnsigned() ? MetaColumn::FDT_UINT64 : MetaColumn::FDT_INT64);
+		break;
 
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
@@ -114,18 +135,11 @@ void ODBCMetaColumn::init()
 
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
-		if (0 == _columnDesc.decimalDigits)
-		{
-#ifdef POCO_64_BIT
-			setType(MetaColumn::FDT_INT64);
-#else
-			setType(MetaColumn::FDT_INT32);
-#endif
-		}
-		else
-		{
-			setType(MetaColumn::FDT_DOUBLE);
-		}
+		// Oracle has no INTEGER type - it's essentially NUMBER with 38 whole and
+		// 0 fractional digits. It also does not recognize SQL_BIGINT type,
+		// so the workaround here is to hardcode it to 32 bit integer
+		if (0 == _columnDesc.decimalDigits) setType(MetaColumn::FDT_INT32);
+		else setType(MetaColumn::FDT_DOUBLE);
 		break;
 
 	case SQL_REAL:

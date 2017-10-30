@@ -30,7 +30,7 @@ namespace Net {
 class NetSSL_API FTPPasswordProvider
 	/// The base class for all password providers.
 	/// An instance of a subclass of this class can be
-	/// registered with the FTPSStreamFactory to 
+	/// registered with the FTPSStreamFactory to
 	/// provide a password
 {
 public:

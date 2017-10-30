@@ -223,7 +223,7 @@ SessionImpl::isAutoCommit(const std::string&)
 	return _sessionHandle.isAutoCommit();
 }
 
-   
+
 void
 SessionImpl::setAsynchronousCommit(const std::string&,  bool aValue)
 {

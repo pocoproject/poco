@@ -67,7 +67,7 @@ public:
 	virtual void sendUrgent(unsigned char data);
 	virtual int available();
 	virtual bool secure() const;
-	virtual void setSendTimeout(const Poco::Timespan& timeout); 
+	virtual void setSendTimeout(const Poco::Timespan& timeout);
 	virtual Poco::Timespan getSendTimeout();
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
 	virtual Poco::Timespan getReceiveTimeout();

@@ -21,7 +21,7 @@ namespace Poco {
 namespace MongoDB {
 
 
-Binary::Binary(): 
+Binary::Binary():
 	_buffer(0),
 	_subtype(0)
 {
@@ -29,14 +29,14 @@ Binary::Binary():
 
 
 Binary::Binary(Poco::Int32 size, unsigned char subtype):
-	_buffer(size), 
+	_buffer(size),
 	_subtype(subtype)
 {
 }
 
 
 Binary::Binary(const UUID& uuid):
-	_buffer(128 / 8), 
+	_buffer(128 / 8),
 	_subtype(0x04)
 {
     unsigned char szUUID[16];
@@ -46,14 +46,14 @@ Binary::Binary(const UUID& uuid):
 
 
 
-Binary::Binary(const std::string& data, unsigned char subtype): 
+Binary::Binary(const std::string& data, unsigned char subtype):
 	_buffer(reinterpret_cast<const unsigned char*>(data.data()), data.size()),
 	_subtype(subtype)
 {
 }
 
 	
-Binary::Binary(const void* data, Poco::Int32 size, unsigned char subtype): 
+Binary::Binary(const void* data, Poco::Int32 size, unsigned char subtype):
 	_buffer(reinterpret_cast<const unsigned char*>(data), size),
 	_subtype(subtype)
 {

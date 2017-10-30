@@ -38,7 +38,7 @@ class Redis_API RedisType
 	/// element with different types in Array.
 {
 public:
-	enum Types 
+	enum Types
 	{
 		REDIS_INTEGER,       /// Redis Integer
 		REDIS_SIMPLE_STRING, /// Redis Simple String
@@ -134,9 +134,9 @@ struct RedisTypeTraits
 template<>
 struct RedisTypeTraits<Int64>
 {
-	enum 
+	enum
 	{
-		TypeId = RedisType::REDIS_INTEGER 
+		TypeId = RedisType::REDIS_INTEGER
 	};
 
 	static const char marker = ':';
@@ -157,9 +157,9 @@ struct RedisTypeTraits<Int64>
 template<>
 struct RedisTypeTraits<std::string>
 {
-	enum 
-	{ 
-		TypeId = RedisType::REDIS_SIMPLE_STRING 
+	enum
+	{
+		TypeId = RedisType::REDIS_SIMPLE_STRING
 	};
 
 	static const char marker = '+';
@@ -184,9 +184,9 @@ typedef Nullable<std::string> BulkString;
 template<>
 struct RedisTypeTraits<BulkString>
 {
-	enum 
-	{ 
-		TypeId = RedisType::REDIS_BULK_STRING 
+	enum
+	{
+		TypeId = RedisType::REDIS_BULK_STRING
 	};
 
 	static const char marker = '$';

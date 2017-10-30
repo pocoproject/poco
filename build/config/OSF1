@@ -14,13 +14,13 @@ LINKMODE ?= SHARED
 #
 CC      = cc
 CXX     = cxx
-LINK    = $(CXX) 
+LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -shared -o $@ -soname $(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = 
-DEP     = $(POCO_BASE)/build/script/makedepend.cxx 
+STRIP   =
+DEP     = $(POCO_BASE)/build/script/makedepend.cxx
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -36,14 +36,14 @@ SHAREDLIBLINKEXT = .so
 # Compiler and Linker Flags
 #
 CFLAGS          = -pthread
-CFLAGS32        = 
-CFLAGS64        = 
+CFLAGS32        =
+CFLAGS64        =
 CXXFLAGS        =  -model ansi -pthread -ansi_alias -std ansi -D__USE_STD_IOSTREAM -nousing_std -nopure_cname -ieee
-CXXFLAGS32      = 
-CXXFLAGS64      = 
+CXXFLAGS32      =
+CXXFLAGS64      =
 LINKFLAGS       = -pthread -model ansi -std ansi
-LINKFLAGS32     = 
-LINKFLAGS64     = 
+LINKFLAGS32     =
+LINKFLAGS64     =
 STATICOPT_CC    = -non_shared
 STATICOPT_CXX   = -non_shared
 STATICOPT_LINK  = -non_shared
@@ -55,7 +55,7 @@ DEBUGOPT_CXX    = -gall -D_DEBUG
 DEBUGOPT_LINK   = -gall
 RELEASEOPT_CC   = +O2 -DNDEBUG
 RELEASEOPT_CXX  = +O2 -DNDEBUG
-RELEASEOPT_LINK =  
+RELEASEOPT_LINK =
 
 #
 # System Specific Flags

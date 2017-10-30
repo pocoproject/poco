@@ -27,7 +27,7 @@ namespace Poco {
 namespace Net {
 
 
-QuotedPrintableDecoderBuf::QuotedPrintableDecoderBuf(std::istream& istr): 
+QuotedPrintableDecoderBuf::QuotedPrintableDecoderBuf(std::istream& istr):
 	_buf(*istr.rdbuf())
 {
 }
@@ -87,8 +87,8 @@ QuotedPrintableDecoderBuf* QuotedPrintableDecoderIOS::rdbuf()
 }
 
 
-QuotedPrintableDecoder::QuotedPrintableDecoder(std::istream& istr): 
-	QuotedPrintableDecoderIOS(istr), 
+QuotedPrintableDecoder::QuotedPrintableDecoder(std::istream& istr):
+	QuotedPrintableDecoderIOS(istr),
 	std::istream(&_buf)
 {
 }

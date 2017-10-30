@@ -28,7 +28,7 @@ namespace XML {
 
 
 class XML_API SAXParser: public XMLReader
-	/// This class provides a SAX2 (Simple API for XML) interface to expat, 
+	/// This class provides a SAX2 (Simple API for XML) interface to expat,
 	/// the XML parser toolkit.
 	/// The following SAX2 features and properties are supported:
 	///   * http://xml.org/sax/features/external-general-entities

@@ -22,7 +22,7 @@
 #include <openssl/pem.h>
 #ifdef _WIN32
 // fix for WIN32 header conflict
-#undef X509_NAME 
+#undef X509_NAME
 #endif
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
@@ -154,7 +154,7 @@ void X509Certificate::save(std::ostream& stream) const
 	if (!pBIO) throw Poco::IOException("Cannot create BIO for writing certificate");
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+		if (!PEM_write_bio_X509(pBIO, _pCert))
 			throw Poco::IOException("Failed to write certificate to stream");
 
 		char *pData;
@@ -182,7 +182,7 @@ void X509Certificate::save(const std::string& path) const
 	}
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+		if (!PEM_write_bio_X509(pBIO, _pCert))
 			throw Poco::WriteFileException("Failed to write certificate to file", path);
 	}
 	catch (...)
@@ -247,7 +247,7 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear(); 
+	domainNames.clear();
 	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
 	{
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
@@ -262,7 +262,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 		}
 		GENERAL_NAMES_free(names);
 	}
- 
+
 	cmnName = commonName();
 	if (!cmnName.empty() && domainNames.empty())
 	{

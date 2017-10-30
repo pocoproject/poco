@@ -42,7 +42,7 @@ protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -98,7 +98,7 @@ class Net_API MultipartReader
 public:
 	explicit MultipartReader(std::istream& istr);
 		/// Creates the MultipartReader and attaches it to the
-		/// given input stream. 
+		/// given input stream.
 		///
 		/// The boundary string is determined from the input
 		/// stream. The message must not contain a preamble

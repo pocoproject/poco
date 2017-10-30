@@ -62,13 +62,13 @@ public:
 
 	explicit X509Certificate(X509* pCert);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
+		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate.
 
 	X509Certificate(X509* pCert, bool shared);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
-		/// the certificate. If shared is true, the 
+		/// OpenSSL certificate. Ownership is taken of
+		/// the certificate. If shared is true, the
 		/// certificate's reference count is incremented.
 
 	X509Certificate(const X509Certificate& cert);
@@ -76,7 +76,7 @@ public:
 
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
- 
+
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.
 
@@ -91,7 +91,7 @@ public:
 		/// string in decimal encoding.
 
 	const std::string& issuerName() const;
-		/// Returns the certificate issuer's distinguished name. 
+		/// Returns the certificate issuer's distinguished name.
 		
 	std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given

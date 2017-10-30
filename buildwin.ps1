@@ -1,6 +1,6 @@
 #
 # POCO build script
-# 
+#
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
@@ -41,11 +41,11 @@ Param
   [Parameter()]
   [ValidateSet('Win32', 'x64', 'WinCE', 'WEC2013')]
   [string] $platform = 'x64',
-  
+
   [switch] $tests = $false,
   [switch] $samples = $false,
   [string] $omit,
-  
+
   [Parameter()]
   [ValidateSet('msbuild', 'devenv', 'vcexpress', 'wdexpress')]
   [string] $tool = 'msbuild',
@@ -68,7 +68,7 @@ function Add-Env-Var([string] $lib, [string] $var)
     $envvar = [Environment]::GetEnvironmentVariable($libvar, "Process")
     [Environment]::SetEnvironmentVariable($var, $envvar, "Process")
   }
-  
+
 }
 
 
@@ -91,14 +91,14 @@ function Set-Environment
     }
   }
 
-  if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;")) 
+  if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;"))
   { $Env:PATH = "$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;$Env:PATH" }
 
   if ($openssl_base -ne 'default_openssl')
   {
     if ($platform -eq 'x64') { $script:openssl_base = 'C:\OpenSSL-Win64' }
     else                     { $script:openssl_base = 'C:\OpenSSL-Win32' }
-  
+
     $Env:OPENSSL_DIR     = "$openssl_base"
     $Env:OPENSSL_INCLUDE = "$Env:OPENSSL_DIR\include"
     $Env:OPENSSL_LIB     = "$Env:OPENSSL_DIR\lib;$Env:OPENSSL_DIR\lib\VC"
@@ -169,7 +169,7 @@ function Process-Input
     Exit
   }
   else
-  { 
+  {
     Set-Environment
 
     Write-Host "Build configuration:"
@@ -197,7 +197,7 @@ function Process-Input
     {
       Write-Host "OpenSSL:       default (built-in)"
     }
-  
+
     if ($mysql_base -ne '')
     {
       Write-Host "MySQL:         $mysql_base"
@@ -214,7 +214,7 @@ function Build-MSBuild([string] $vsProject, [string] $vsTestAppProject, [string]
 {
   Write-Host "Build-MSBuild ==> $vsProject, $vsTestAppProject, $vsTestLibraryProject"
   [string]$flags = '/clp:NoSummary /nologo /v:minimal'
-  
+
   if ($linkmode -eq 'all')
   {
     $linkModeArr = 'shared', 'static_mt', 'static_md'
@@ -346,7 +346,7 @@ function Build-Devenv([string] $vsProject)
 
 function Build-samples
 {
-  process { 
+  process {
     $sampleName = $_.BaseName.split("_")[0]
     $sampleProjName = "$($poco_base)\$($componentDir)\samples\$($sampleName)\$($_)"
     if ($tool -eq 'devenv') { Build-Devenv $sampleProjName }
@@ -374,7 +374,7 @@ function Build
     $componentArr = $_.split('/')
     $componentName = $componentArr[$componentArr.Length - 1]
     $suffix = "_vs$vs_version"
-    
+
     $omitArray = @()
     $omit.Split(',;') | ForEach {
         $omitArray += "$_"
@@ -403,11 +403,11 @@ function Build
       if ($tool -eq 'devenv')      { Build-Devenv $vsProject }
       elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject }
       elseif ($tool -ne '')        { Write-Host "Build tool not supported: $tool" }
-      else 
+      else
       {
         Write-Host "Build tool not specified. Exiting."
         Exit
-      } 
+      }
 
       if ($tests)
       {

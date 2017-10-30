@@ -48,7 +48,7 @@ class Foundation_API FPEnvironment: private FPEnvironmentImpl
 	/// mode and floating-point flags).
 	/// The class also provides various static
 	/// methods to query certain properties
-	/// of a floating-point number. 
+	/// of a floating-point number.
 {
 public:
 	enum RoundingMode

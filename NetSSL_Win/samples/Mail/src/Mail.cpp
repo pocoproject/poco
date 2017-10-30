@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 	
 	try
 	{
-		// Note: we must create the passphrase handler prior Context 
+		// Note: we must create the passphrase handler prior Context
 		SharedPtr<InvalidCertificateHandler> pCert = new ConsoleCertificateHandler(false); // ask the user via console
 		Context::Ptr pContext = new Context(Context::CLIENT_USE, "");
 		SSLManager::instance().initializeClient(0, pCert, pContext);

@@ -20,10 +20,10 @@ CXX     = clang++$(CLANG_VERSION)
 LINK    = $(CXX)
 LIB     = ar -cr
 RANLIB  = ranlib
-SHLIB   = $(CXX) -shared -o $@ 
+SHLIB   = $(CXX) -shared -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   =
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -43,30 +43,30 @@ IMPLIBLINKEXT    = .dll.a
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
-CFLAGS64        = 
+CFLAGS64        =
 CXXFLAGS        = -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
-CXXFLAGS32      = 
-CXXFLAGS64      = 
+CXXFLAGS32      =
+CXXFLAGS64      =
 SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
-SHLIBFLAGS32    = 
-SHLIBFLAGS64    = 
+SHLIBFLAGS32    =
+SHLIBFLAGS64    =
 LINKFLAGS       =
 LINKFLAGS32     =
-LINKFLAGS64     = 
+LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
-SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = 
+SHAREDOPT_CC    =
+SHAREDOPT_CXX   =
+SHAREDOPT_LINK  =
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
 RELEASEOPT_CC   = -DNDEBUG
 RELEASEOPT_CXX  = -DNDEBUG
-RELEASEOPT_LINK = 
+RELEASEOPT_LINK =
 
 #
 # System Specific Flags
@@ -76,7 +76,7 @@ SYSFLAGS = -D_XOPEN_SOURCE=500 -D__BSD_VISIBLE
 #
 # System Specific Libraries
 #
-SYSLIBS  = 
+SYSLIBS  =
 
 #
 # C++11/14 detection

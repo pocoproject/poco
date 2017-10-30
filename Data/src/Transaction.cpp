@@ -44,19 +44,19 @@ Transaction::~Transaction()
 		{
 			try
 			{
-				if (_pLogger) 
+				if (_pLogger)
 					_pLogger->debug("Rolling back transaction.");
 
 				_rSession.rollback();
 			}
 			catch (Poco::Exception& exc)
 			{
-				if (_pLogger) 
+				if (_pLogger)
 					_pLogger->error("Error while rolling back database transaction: %s", exc.displayText());
 			}
 			catch (...)
 			{
-				if (_pLogger) 
+				if (_pLogger)
 					_pLogger->error("Error while rolling back database transaction.");
 			}
 		}
@@ -105,7 +105,7 @@ void Transaction::execute(const std::vector<std::string>& sql)
 
 void Transaction::commit()
 {
-	if (_pLogger) 
+	if (_pLogger)
 		_pLogger->debug("Committing transaction.");
 
 	_rSession.commit();
@@ -114,7 +114,7 @@ void Transaction::commit()
 	
 void Transaction::rollback()
 {
-	if (_pLogger) 
+	if (_pLogger)
 		_pLogger->debug("Rolling back transaction.");
 
 	_rSession.rollback();

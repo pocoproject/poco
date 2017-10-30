@@ -408,10 +408,10 @@ void SQLiteTest::testNullCharPointer()
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 
-	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
-		bind(lastName), 
-		bind("firstname"), 
-		bind("Address"), 
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
+		bind(lastName),
+		bind("firstname"),
+		bind("Address"),
 		bind(0), now;
 
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
@@ -425,8 +425,8 @@ void SQLiteTest::testNullCharPointer()
 	{
 		const char* pc = 0;
 		tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
-			bind("lastname"), 
-			bind("firstname"), 
+			bind("lastname"),
+			bind("firstname"),
 			bind("Address"), bind(pc), now;
 			fail ("must fail");
 	} catch (NullPointerException&)	{ }
@@ -463,10 +463,10 @@ void SQLiteTest::testInsertCharPointer()
 	pc = (const char*) std::calloc(9, sizeof(char));
 	poco_check_ptr (pc);
 	std::strncpy((char*) pc, "lastname", 8);
-	Statement stmt = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
-		bind(pc), 
-		bind("firstname"), 
-		bind("Address"), 
+	Statement stmt = (tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
+		bind(pc),
+		bind("firstname"),
+		bind("Address"),
 		bind(133132));
 	
 	std::free((void*) pc); pc = 0;
@@ -494,10 +494,10 @@ void SQLiteTest::testInsertCharPointer2()
 	tmp << "DROP TABLE IF EXISTS Person", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
 
-	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)", 
-		bind("lastname"), 
-		bind("firstname"), 
-		bind("Address"), 
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :age)",
+		bind("lastname"),
+		bind("firstname"),
+		bind("Address"),
 		bind(133132), now;
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
@@ -1140,7 +1140,7 @@ void SQLiteTest::testSelectIntoSingleStep()
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 2);
 	Person result;
-	Statement stmt = (tmp << "SELECT * FROM PERSON", into(result), limit(1)); 
+	Statement stmt = (tmp << "SELECT * FROM PERSON", into(result), limit(1));
 	stmt.execute();
 	assert (result == p1);
 	assert (!stmt.done());
@@ -2139,7 +2139,7 @@ void SQLiteTest::testPrimaryKeyConstraint()
 		}
 	}
 
-	ses.commit(); 
+	ses.commit();
 }
 
 
@@ -2299,7 +2299,7 @@ void SQLiteTest::testRowIterator()
 	std::ostringstream osLoop;
 	RecordSet::ConstIterator it = rset.begin();
 	RecordSet::ConstIterator end = rset.end();
-	for (int i = 1; it != end; ++it, ++i) 
+	for (int i = 1; it != end; ++it, ++i)
 	{
 		assert (it->get(0) == i);
 		osLoop << *it;
@@ -2583,7 +2583,7 @@ void SQLiteTest::testSQLChannel()
 		"Name VARCHAR,"
 		"ProcessId INTEGER,"
 		"Thread VARCHAR, "
-		"ThreadId INTEGER," 
+		"ThreadId INTEGER,"
 		"Priority INTEGER,"
 		"Text VARCHAR,"
 		"DateTime DATE)", now;
@@ -2593,7 +2593,7 @@ void SQLiteTest::testSQLChannel()
 		"Name VARCHAR,"
 		"ProcessId INTEGER,"
 		"Thread VARCHAR, "
-		"ThreadId INTEGER," 
+		"ThreadId INTEGER,"
 		"Priority INTEGER,"
 		"Text VARCHAR,"
 		"DateTime DATE)", now;
@@ -2657,7 +2657,7 @@ void SQLiteTest::testSQLLogger()
 		"Name VARCHAR,"
 		"ProcessId INTEGER,"
 		"Thread VARCHAR, "
-		"ThreadId INTEGER," 
+		"ThreadId INTEGER,"
 		"Priority INTEGER,"
 		"Text VARCHAR,"
 		"DateTime DATE)", now;
@@ -2728,7 +2728,7 @@ void SQLiteTest::testBindingCount()
 	tmp << "CREATE TABLE Ints (int0 INTEGER)", now;
 
 	int i = 42;
-	try	{ tmp << "INSERT INTO Ints VALUES (?)", now; } 
+	try	{ tmp << "INSERT INTO Ints VALUES (?)", now; }
 	catch (ParameterCountMismatchException&) { }
 	tmp << "INSERT INTO Ints VALUES (?)", use(i), now;
 
@@ -2814,9 +2814,9 @@ void SQLiteTest::testReconnect()
 	assert (session.isConnected());
 	session.close();
 	assert (!session.isConnected());
-	try 
+	try
 	{
-		session << "SELECT LastName FROM PERSON", into(result), now;  
+		session << "SELECT LastName FROM PERSON", into(result), now;
 		fail ("must fail");
 	}
 	catch(NotConnectedException&){ }
@@ -3205,7 +3205,7 @@ void SQLiteTest::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 	{
 		std::string funct = "setTransactionIsolation()";
 
-		try 
+		try
 		{
 			Transaction t(session, false);
 			t.setIsolation(ti);
@@ -3567,7 +3567,7 @@ void SQLiteTest::testFTS3()
 	assert(docid == 3);
 
 	std::vector<int> docids;
-	session << "SELECT docid FROM docs WHERE docs MATCH 'sqlite OR database' ORDER BY docid", 
+	session << "SELECT docid FROM docs WHERE docs MATCH 'sqlite OR database' ORDER BY docid",
 		into(docids), now;
 	assert(docids.size() == 3);
 	assert(docids[0] == 1);
@@ -3576,7 +3576,7 @@ void SQLiteTest::testFTS3()
 
 	std::string content;
 	docid = 0;
-	session << "SELECT docid, content FROM docs WHERE docs MATCH 'database NOT sqlite'", 
+	session << "SELECT docid, content FROM docs WHERE docs MATCH 'database NOT sqlite'",
 		into(docid), into(content), now;
 	assert(docid == 1);
 	assert(content == "a database is a software system");

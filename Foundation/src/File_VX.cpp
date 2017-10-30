@@ -240,7 +240,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0) 
+	if (fstat(sd, &st) != 0)
 	{
 		close(sd);
 		handleLastErrorImpl(_path);
@@ -259,7 +259,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		int n;
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n) 
+			if (write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -322,7 +322,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str()) != 0) 
+	if (mkdir(_path.c_str()) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }

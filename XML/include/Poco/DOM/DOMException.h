@@ -32,7 +32,7 @@ class XML_API DOMException: public XMLException
 	/// because data is lost, or because the implementation has become unstable).
 	/// In general, DOM methods return specific error values in ordinary processing
 	/// situations, such as out-of-bound errors when using NodeList.
-	/// 
+	///
 	/// Implementations should raise other exceptions under other circumstances.
 	/// For example, implementations should raise an implementation-dependent exception
 	/// if a null argument is passed when null was not expected.

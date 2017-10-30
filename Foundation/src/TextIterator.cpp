@@ -111,9 +111,9 @@ int TextIterator::operator * () const
 	while (-1 > n && (_end - it) >= -n - read)
 	{
 		while (read < -n && it != _end)
-		{ 
-			*p++ = *it++; 
-			read++; 
+		{
+			*p++ = *it++;
+			read++;
 		}
 		n = _pEncoding->queryConvert(buffer, read);
 	}
@@ -148,16 +148,16 @@ TextIterator& TextIterator::operator ++ ()
 	while (-1 > n && (_end - _it) >= -n - read)
 	{
 		while (read < -n && _it != _end)
-		{ 
-			*p++ = *_it++; 
-			read++; 
+		{
+			*p++ = *_it++;
+			read++;
 		}
 		n = _pEncoding->sequenceLength(buffer, read);
 	}
 	while (read < n && _it != _end)
-	{ 
-		_it++; 
-		read++; 
+	{
+		_it++;
+		read++;
 	}
 
 	return *this;

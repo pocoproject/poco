@@ -60,11 +60,11 @@ public:
 		/// the given cipher name, passphrase, salt value
 		/// and iteration count.
 
-	CipherKeyImpl(const std::string& name, 
-		const ByteVec& key, 
+	CipherKeyImpl(const std::string& name,
+		const ByteVec& key,
 		const ByteVec& iv
 	);
-		/// Creates a new CipherKeyImpl object, using the 
+		/// Creates a new CipherKeyImpl object, using the
 		/// given cipher name, key and initialization vector.
 
 	CipherKeyImpl(const std::string& name);

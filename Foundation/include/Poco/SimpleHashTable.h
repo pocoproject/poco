@@ -68,7 +68,7 @@ public:
 		_entries.reserve(ht._capacity);
 		for (typename HashTableVector::iterator it = ht._entries.begin(); it != ht._entries.end(); ++it)
 		{
-			if (*it) 
+			if (*it)
 				_entries.push_back(new HashEntry(*it));
 			else
 				_entries.push_back(0);

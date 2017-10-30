@@ -59,7 +59,7 @@ private:
 };
 
 
-NamePool::NamePool(unsigned long size): 
+NamePool::NamePool(unsigned long size):
 	_size(size),
 	_salt(0),
 	_rc(1)
@@ -98,7 +98,7 @@ const Name& NamePool::insert(const XMLString& qname, const XMLString& namespaceU
 	unsigned long i = 0;
 	unsigned long n = (hash(qname, namespaceURI, localName) ^ _salt) % _size;
 
-	while (!_pItems[n].set(qname, namespaceURI, localName) && i++ < _size) 
+	while (!_pItems[n].set(qname, namespaceURI, localName) && i++ < _size)
 		n = (n + 1) % _size;
 		
 	if (i > _size) throw Poco::PoolOverflowException("XML name pool");

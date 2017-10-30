@@ -34,6 +34,7 @@ public:
 	void testNullable();
 	void testAscii();
 	void testChecksum64();
+	void testMakeUnique();
 
 	void setUp();
 	void tearDown();

@@ -38,7 +38,7 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.2 Driver"
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.3 Unicode Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
@@ -52,6 +52,7 @@ std::string          ODBCMySQLTest::_driver = MYSQL_ODBC_DRIVER;
 std::string          ODBCMySQLTest::_dsn = MYSQL_DSN;
 std::string          ODBCMySQLTest::_uid = MYSQL_UID;
 std::string          ODBCMySQLTest::_pwd = MYSQL_PWD;
+std::string          ODBCMySQLTest::_db = MYSQL_DB;
 std::string          ODBCMySQLTest::_connectString = "DRIVER={" MYSQL_ODBC_DRIVER "};"
 	"DATABASE=" MYSQL_DB ";"
 	"SERVER=" MYSQL_SERVER ";"
@@ -59,7 +60,7 @@ std::string          ODBCMySQLTest::_connectString = "DRIVER={" MYSQL_ODBC_DRIVE
 	"PWD=" MYSQL_PWD ";";
 
 
-ODBCMySQLTest::ODBCMySQLTest(const std::string& name): 
+ODBCMySQLTest::ODBCMySQLTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 	_pExecutor->execute("SET @@global.sql_mode= '';"); // disable strict mode
@@ -128,7 +129,7 @@ void ODBCMySQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -162,7 +163,7 @@ void ODBCMySQLTest::testNull()
 		recreateNullsTable("NOT NULL");
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HYT00");
+		_pExecutor->notNulls("HY000");
 		i += 2;
 	}
 
@@ -180,10 +181,10 @@ void ODBCMySQLTest::testNull()
 
 void ODBCMySQLTest::testStoredProcedure()
 {
-	//MySQL is currently buggy in this area: 
+	//MySQL is currently buggy in this area:
 	// http://bugs.mysql.com/bug.php?id=17898
 	// http://bugs.mysql.com/bug.php?id=27632
-	// Additionally, the standard ODBC stored procedure call syntax 
+	// Additionally, the standard ODBC stored procedure call syntax
 	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
 	// See http://bugs.mysql.com/bug.php?id=26535
 	// Poco::Data support for MySQL ODBC is postponed until the above
@@ -193,10 +194,10 @@ void ODBCMySQLTest::testStoredProcedure()
 
 void ODBCMySQLTest::testStoredFunction()
 {
-	//MySQL is currently buggy in this area: 
+	//MySQL is currently buggy in this area:
 	// http://bugs.mysql.com/bug.php?id=17898
 	// http://bugs.mysql.com/bug.php?id=27632
-	// Additionally, the standard ODBC stored procedure call syntax 
+	// Additionally, the standard ODBC stored procedure call syntax
 	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
 	// See http://bugs.mysql.com/bug.php?id=26535
 	// Poco::Data support for MySQL ODBC is postponed until the above
@@ -264,6 +265,16 @@ void ODBCMySQLTest::recreatePersonTable()
 }
 
 
+void ODBCMySQLTest::recreatePersonUnicodeTable()
+{
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() <<
+		" (LastName VARCHAR(30) CHARACTER SET utf16, FirstName VARCHAR(30) CHARACTER SET utf16, Address VARCHAR(30) CHARACTER SET utf16, Age INTEGER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreatePersonTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreatePersonTable()"); }
+}
+
+
 void ODBCMySQLTest::recreatePersonBLOBTable()
 {
   dropObject("TABLE", ExecUtil::person());
@@ -320,10 +331,19 @@ void ODBCMySQLTest::recreateStringsTable()
 
 void ODBCMySQLTest::recreateFloatsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::floats());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::floats() << " (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+}
+
+
+void ODBCMySQLTest::recreateDoublesTable()
+{
+	dropObject("TABLE", ExecUtil::doubles());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::doubles() << " (str DOUBLE)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreateFloatsTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreateFloatsTable()"); }
 }
 
 
@@ -342,7 +362,7 @@ void ODBCMySQLTest::recreateTuplesTable()
 void ODBCMySQLTest::recreateVectorsTable()
 {
 	dropObject("TABLE", ExecUtil::vectors() );
-	try { *_pSession << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	try{ *_pSession << "CREATE TABLE " << ExecUtil::vectors() << " (i0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -350,8 +370,15 @@ void ODBCMySQLTest::recreateVectorsTable()
 
 void ODBCMySQLTest::recreateAnysTable()
 {
-	dropObject("TABLE", ExecUtil::anys() );
-	try { *_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::anys());
+	try
+	{
+#ifdef POCO_ODBC_UNICODE
+		*_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30) CHARACTER SET utf16)", now;
+#else
+		*_pSession << "CREATE TABLE " << ExecUtil::anys() << " (i0 INTEGER, flt0 DOUBLE, str0 VARCHAR(30))", now;
+#endif
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -388,19 +415,19 @@ void ODBCMySQLTest::recreateLogTable()
 	dropObject("TABLE", ExecUtil::pocolog());;
 	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(100),"
 			"Name VARCHAR(100),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(100), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(100),"
-			"DateTime DATETIME)"; 
+			"DateTime DATETIME)";
 
-		session() << sql, ExecUtil::pocolog(), now; 
+		session() << sql, ExecUtil::pocolog(), now;
 		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -410,7 +437,7 @@ void ODBCMySQLTest::recreateLogTable()
 
 CppUnit::Test* ODBCMySQLTest::suite()
 {
-	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
+	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
 
@@ -429,6 +456,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testInsertList);
@@ -445,7 +473,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);
@@ -487,7 +515,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
-		//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSessionTransaction);
