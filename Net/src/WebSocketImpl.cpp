@@ -212,7 +212,7 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 
 int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size() - _bufferOffset);
 	if (n > 0)
 	{
 		if (bytes < n) n = bytes;

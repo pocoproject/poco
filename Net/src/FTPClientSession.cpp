@@ -181,20 +181,24 @@ void FTPClientSession::logout()
 	{
 		try { endTransfer(); }
 		catch (...) { }
+		_isLoggedIn = false;
 		std::string response;
 		sendCommand("QUIT", response);
-		_isLoggedIn = false;
 	}
 }
 
 
 void FTPClientSession::close()
 {
-	logout();
-	_pControlSocket->close();
-	delete _pControlSocket;
-	_pControlSocket = 0;
+	try { logout(); }
+	catch (...) {}
 	_serverReady = false;
+	if (_pControlSocket)
+	{
+		_pControlSocket->close();
+		delete _pControlSocket;
+		_pControlSocket = 0;
+	}
 }
 
 

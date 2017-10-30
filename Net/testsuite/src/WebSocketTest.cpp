@@ -55,7 +55,7 @@ namespace
 				int n;
 				do
 				{
-					n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
+					n = ws.receiveFrame(buffer.begin(), static_cast<int>(buffer.size()), flags);
 					ws.sendFrame(buffer.begin(), n, flags);
 				}
 				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
