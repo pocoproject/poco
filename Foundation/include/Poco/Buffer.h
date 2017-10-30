@@ -257,6 +257,7 @@ public:
 		swap(_ptr, other._ptr);
 		swap(_capacity, other._capacity);
 		swap(_used, other._used);
+		swap(_ownMem, other._ownMem);
 	}
 
 	bool operator == (const Buffer& other) const
