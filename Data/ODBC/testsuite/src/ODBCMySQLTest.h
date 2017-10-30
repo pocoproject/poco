@@ -71,6 +71,7 @@ private:
 	static std::string _dsn;
 	static std::string _uid;
 	static std::string _pwd;
+	static std::string _db;
 	static std::string _connectString;
 };
 

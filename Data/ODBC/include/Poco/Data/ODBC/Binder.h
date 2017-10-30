@@ -640,6 +640,7 @@ private:
 
 		std::size_t strSize;
 		std::size_t offset = 0;
+		char* pBuf = (char*)_utf16CharPtrs[pos];
 		typename C::const_iterator it = val.begin();
 		typename C::const_iterator end = val.end();
 		for (; it != end; ++it)
@@ -647,8 +648,8 @@ private:
 			strSize = it->size() * sizeof(UTF16Char);
 			if (strSize > size)
 				throw LengthExceededException("SQLBindParameter(std::vector<UTF16String>)");
-			std::memcpy(_utf16CharPtrs[pos] + offset, it->data(), strSize);
-			offset += (size / sizeof(UTF16Char));
+			std::memcpy(pBuf + offset, it->data(), strSize);
+			offset += size;
 		}
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
@@ -934,7 +935,8 @@ private:
 	void getColSizeAndPrecision(std::size_t pos, 
 		SQLSMALLINT cDataType, 
 		SQLINTEGER& colSize, 
-		SQLSMALLINT& decDigits);
+		SQLSMALLINT& decDigits,
+		std::size_t actualSize = 0);
 		/// Used to retrieve column size and precision.
 		/// Not all drivers cooperate with this inquiry under all circumstances
 		/// This function runs for query and stored procedure parameters (in and 
@@ -942,6 +944,8 @@ private:
 		/// information to start with. For that reason, after all the attempts 
 		/// to discover the required values are unsuccesfully exhausted, the values 
 		/// are both set to zero and no exception is thrown.
+		/// However, if the colSize is succesfully retrieved and it is greater than
+		/// session-wide maximum allowed field size, LengthExceededException is thrown.
 
 	void setParamSetSize(std::size_t length);
 		/// Sets the parameter set size. Used for column-wise binding.
@@ -964,12 +968,15 @@ private:
 		/// optimization, looking for the maximum length within supplied data container and
 		/// uses the smaller of maximum found and maximum predefined data length.
 	{
+		typedef typename T::value_type ContainedValType;
+		typedef typename ContainedValType::value_type BaseValType;
+		std::size_t typeSize = sizeof(BaseValType);
 		std::size_t maxSize = 0;
 		typename T::const_iterator it = val.begin();
 		typename T::const_iterator end = val.end();
 		for (; it != end; ++it)
 		{
-			std::size_t sz = it->size() * sizeof(T);
+			std::size_t sz = it->size() * typeSize;
 			if (sz > _maxFieldSize)
 				throw LengthExceededException();
 

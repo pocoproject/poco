@@ -83,11 +83,14 @@ public:
 	~RowFilter();
 		/// Destroys the RowFilter.
 
-	void addFilter(const Ptr& pFilter, LogicOperator comparison);
+	void addFilter(Ptr pFilter, LogicOperator comparison);
 		/// Appends another filter to this one.
 
-	void removeFilter(const Ptr& pFilter);
+	void removeFilter(Ptr pFilter);
 		/// Removes filter from this filter.
+
+	bool has(Ptr pFilter) const;
+		/// Returns true if this filter is parent of pFilter;
 
 	template <typename T>
 	void add(const std::string& name, Comparison comparison, const T& value, LogicOperator op = OP_OR)
@@ -181,6 +184,12 @@ private:
 ///
 /// inlines
 ///
+
+
+inline bool RowFilter::has(Ptr pFilter) const
+{
+	return _filterMap.find(pFilter) != _filterMap.end();
+}
 
 
 inline bool RowFilter::isEmpty() const

@@ -451,7 +451,7 @@ int ODBCStatementImpl::affectedRowCount() const
 			_affectedRowCount = static_cast<std::size_t>(rows);
 	}
 
-	return _affectedRowCount;
+	return static_cast<int>(_affectedRowCount);
 }
 
 
