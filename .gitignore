@@ -16,6 +16,11 @@
 *.vsp
 *.psess
 
+# Gradle #
+##########
+.gradle/
+gradle/
+
 # Make #
 ########
 config.build
