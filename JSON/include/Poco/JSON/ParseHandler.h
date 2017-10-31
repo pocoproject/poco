@@ -1,8 +1,6 @@
 //
 // ParseHandler.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  ParseHandler

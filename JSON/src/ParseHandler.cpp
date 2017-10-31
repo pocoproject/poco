@@ -1,8 +1,6 @@
 //
 // ParseHandler.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  ParseHandler

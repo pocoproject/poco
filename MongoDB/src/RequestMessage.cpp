@@ -1,8 +1,6 @@
 //
 // RequestMessage.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  RequestMessage

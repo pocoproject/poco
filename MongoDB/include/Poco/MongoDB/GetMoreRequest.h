@@ -1,8 +1,6 @@
 //
 // GetMoreRequest.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  GetMoreRequest

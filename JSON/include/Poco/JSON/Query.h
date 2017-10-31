@@ -1,8 +1,6 @@
 //
 // Query.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Query

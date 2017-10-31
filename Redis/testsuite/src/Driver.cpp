@@ -1,8 +1,6 @@
 //
 // Driver.cpp
 //
-// $Id$
-//
 // Console-based test driver for Poco MongoDB.
 //
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.

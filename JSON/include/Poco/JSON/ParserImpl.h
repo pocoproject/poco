@@ -1,8 +1,6 @@
 //
 // Parser.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  ParserImpl

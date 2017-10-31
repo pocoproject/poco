@@ -1,8 +1,6 @@
 //
 // XMLStreamParserException.cpp
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  XMLStreamParserException

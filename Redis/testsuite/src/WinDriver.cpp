@@ -1,8 +1,6 @@
 //
 // WinDriver.cpp
 //
-// $Id$
-//
 // Windows test driver for Poco MongoDB.
 //
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
