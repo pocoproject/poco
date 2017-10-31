@@ -471,6 +471,8 @@
 				<File
 					RelativePath=".\src\NameTest.h"/>
 				<File
+					RelativePath=".\src\XMLStreamParserTest.h"/>
+				<File
 					RelativePath=".\src\XMLWriterTest.h"/>
 			</Filter>
 			<Filter
@@ -479,6 +481,8 @@
 					RelativePath=".\src\NamePoolTest.cpp"/>
 				<File
 					RelativePath=".\src\NameTest.cpp"/>
+				<File
+					RelativePath=".\src\XMLStreamParserTest.cpp"/>
 				<File
 					RelativePath=".\src\XMLWriterTest.cpp"/>
 			</Filter>

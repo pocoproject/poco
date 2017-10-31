@@ -273,13 +273,18 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\XML\Content.h"/>
     <ClInclude Include="include\Poco\XML\Name.h"/>
     <ClInclude Include="include\Poco\Xml\NamePool.h"/>
     <ClInclude Include="include\Poco\Xml\NamespaceStrategy.h"/>
     <ClInclude Include="include\Poco\Xml\ParserEngine.h"/>
+    <ClInclude Include="include\Poco\XML\QName.h"/>
+    <ClInclude Include="include\Poco\XML\ValueTraits.h"/>
     <ClInclude Include="include\Poco\Xml\XML.h"/>
     <ClInclude Include="include\Poco\Xml\XMLException.h"/>
     <ClInclude Include="include\Poco\Xml\XMLStream.h"/>
+    <ClInclude Include="include\Poco\XML\XMLStreamParser.h"/>
+    <ClInclude Include="include\Poco\XML\XMLStreamParserException.h"/>
     <ClInclude Include="include\Poco\Xml\XMLString.h"/>
     <ClInclude Include="include\Poco\Xml\XMLWriter.h"/>
     <ClInclude Include="include\Poco\SAX\Attributes.h"/>
@@ -362,7 +367,11 @@
     <ClCompile Include="src\NamePool.cpp"/>
     <ClCompile Include="src\NamespaceStrategy.cpp"/>
     <ClCompile Include="src\ParserEngine.cpp"/>
+    <ClCompile Include="src\QName.cpp"/>
+    <ClCompile Include="src\ValueTraits.cpp"/>
     <ClCompile Include="src\XMLException.cpp"/>
+    <ClCompile Include="src\XMLStreamParser.cpp"/>
+    <ClCompile Include="src\XMLStreamParserException.cpp"/>
     <ClCompile Include="src\XMLString.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>

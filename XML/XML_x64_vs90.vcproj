@@ -398,6 +398,8 @@
 			<Filter
 				Name="Header Files">
 				<File
+					RelativePath=".\include\Poco\XML\Content.h"/>
+				<File
 					RelativePath=".\include\Poco\XML\Name.h"/>
 				<File
 					RelativePath=".\include\Poco\Xml\NamePool.h"/>
@@ -406,11 +408,19 @@
 				<File
 					RelativePath=".\include\Poco\Xml\ParserEngine.h"/>
 				<File
+					RelativePath=".\include\Poco\XML\QName.h"/>
+				<File
+					RelativePath=".\include\Poco\XML\ValueTraits.h"/>
+				<File
 					RelativePath=".\include\Poco\Xml\XML.h"/>
 				<File
 					RelativePath=".\include\Poco\Xml\XMLException.h"/>
 				<File
 					RelativePath=".\include\Poco\Xml\XMLStream.h"/>
+				<File
+					RelativePath=".\include\Poco\XML\XMLStreamParser.h"/>
+				<File
+					RelativePath=".\include\Poco\XML\XMLStreamParserException.h"/>
 				<File
 					RelativePath=".\include\Poco\Xml\XMLString.h"/>
 				<File
@@ -427,7 +437,15 @@
 				<File
 					RelativePath=".\src\ParserEngine.cpp"/>
 				<File
+					RelativePath=".\src\QName.cpp"/>
+				<File
+					RelativePath=".\src\ValueTraits.cpp"/>
+				<File
 					RelativePath=".\src\XMLException.cpp"/>
+				<File
+					RelativePath=".\src\XMLStreamParser.cpp"/>
+				<File
+					RelativePath=".\src\XMLStreamParserException.cpp"/>
 				<File
 					RelativePath=".\src\XMLString.cpp">
 					<FileConfiguration
