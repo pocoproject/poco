@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Array

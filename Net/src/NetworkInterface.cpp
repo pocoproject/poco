@@ -242,7 +242,7 @@ void NetworkInterfaceImpl::setPhyParams()
 #if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
 	struct ifreq ifr;
 	std::strncpy(ifr.ifr_name, _name.c_str(), IFNAMSIZ);
-	DatagramSocket ds;
+	DatagramSocket ds(SocketAddress::IPv4);
 
 	ds.impl()->ioctl(SIOCGIFFLAGS, &ifr);
 	setFlags(ifr.ifr_flags);
@@ -796,16 +796,10 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	Map map = NetworkInterface::map(false, false);
-	Map::const_iterator it = map.begin();
-	Map::const_iterator end = map.end();
-
-	for (; it != end; ++it)
-	{
-		if (it->second.name() == name && ((requireIPv6 && it->second.supportsIPv6()) || !requireIPv6))
-			return it->second;
-	}
-	throw InterfaceNotFoundException(name);
+	if (requireIPv6) 
+		return forName(name, IPv6_ONLY);
+	else 
+		return forName(name, IPv4_OR_IPv6);
 }
 
 

@@ -143,7 +143,7 @@ const void* IPv4AddressImpl::addr() const
 
 IPAddressImpl::Family IPv4AddressImpl::family() const
 {
-	return IPAddressImpl::IPv4;
+	return AddressFamily::IPv4;
 }
 
 
@@ -500,7 +500,7 @@ const void* IPv6AddressImpl::addr() const
 
 IPAddressImpl::Family IPv6AddressImpl::family() const
 {
-	return IPAddressImpl::IPv6;
+	return AddressFamily::IPv6;
 }
 
 
@@ -535,6 +535,8 @@ unsigned IPv6AddressImpl::prefixLength() const
 	throw NotImplementedException("prefixLength() not implemented");
 #endif
 }
+
+
 Poco::UInt32 IPv6AddressImpl::scope() const
 {
 	return _scope;

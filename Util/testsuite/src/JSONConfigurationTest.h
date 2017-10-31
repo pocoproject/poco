@@ -1,8 +1,6 @@
 //
 // JSONConfigurationTest.h
 //
-// $Id$
-//
 // Definition of the JSONConfigurationTest class.
 //
 // Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.

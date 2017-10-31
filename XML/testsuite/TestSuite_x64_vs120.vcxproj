@@ -322,6 +322,7 @@
     <ClInclude Include="src\SAXTestSuite.h"/>
     <ClInclude Include="src\TextTest.h"/>
     <ClInclude Include="src\TreeWalkerTest.h"/>
+    <ClInclude Include="src\XMLStreamParserTest.h"/>
     <ClInclude Include="src\XMLTestSuite.h"/>
     <ClInclude Include="src\XMLWriterTest.h"/>
   </ItemGroup>
@@ -345,6 +346,7 @@
     <ClCompile Include="src\SAXTestSuite.cpp"/>
     <ClCompile Include="src\TextTest.cpp"/>
     <ClCompile Include="src\TreeWalkerTest.cpp"/>
+    <ClCompile Include="src\XMLStreamParserTest.cpp"/>
     <ClCompile Include="src\XMLTestSuite.cpp"/>
     <ClCompile Include="src\XMLWriterTest.cpp"/>
   </ItemGroup>

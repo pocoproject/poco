@@ -1,8 +1,6 @@
 //
 // JSONException.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  JSONException

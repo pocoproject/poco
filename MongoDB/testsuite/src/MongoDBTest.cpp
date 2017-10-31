@@ -1,8 +1,6 @@
 //
 // MongoDBTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

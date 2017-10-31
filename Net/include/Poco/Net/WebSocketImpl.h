@@ -19,6 +19,7 @@
 
 
 #include "Poco/Net/StreamSocketImpl.h"
+#include "Poco/Buffer.h"
 #include "Poco/Random.h"
 #include "Poco/Buffer.h"
 
@@ -45,12 +46,17 @@ public:
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
 		
+	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags);
+		/// Receives a WebSocket protocol frame.
+
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 	virtual void connect(const SocketAddress& address);
 	virtual void connect(const SocketAddress& address, const Poco::Timespan& timeout);
 	virtual void connectNB(const SocketAddress& address);
 	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
+	virtual void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
 	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+	virtual void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only);
 	virtual void listen(int backlog = 64);
 	virtual void close();
 	virtual void shutdownReceive();
@@ -80,6 +86,8 @@ protected:
 		MAX_HEADER_LENGTH = 14
 	};
 	
+	int receiveHeader(char mask[4], bool& useMask);
+	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
 	int receiveNBytes(void* buffer, int bytes);
 	int receiveSomeBytes(char* buffer, int bytes);
 	virtual ~WebSocketImpl();

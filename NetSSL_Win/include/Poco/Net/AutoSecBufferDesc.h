@@ -1,8 +1,6 @@
 //
 // AutoSecBufferDesc.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  AutoSecBufferDesc

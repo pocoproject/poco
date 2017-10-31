@@ -29,7 +29,7 @@ DatagramSocket::DatagramSocket(): Socket(new DatagramSocketImpl)
 }
 
 
-DatagramSocket::DatagramSocket(IPAddress::Family family): Socket(new DatagramSocketImpl(family))
+DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new DatagramSocketImpl(family))
 {
 }
 
@@ -78,6 +78,12 @@ void DatagramSocket::connect(const SocketAddress& address)
 void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
 	impl()->bind(address, reuseAddress);
+}
+
+
+void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
 }
 
 

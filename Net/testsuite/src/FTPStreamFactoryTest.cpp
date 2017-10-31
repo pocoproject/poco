@@ -75,7 +75,7 @@ void FTPStreamFactoryTest::testDownload()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	FTPStreamFactory sf;
@@ -116,7 +116,7 @@ void FTPStreamFactoryTest::testList()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/usr/guest/data;type=d");
 	FTPStreamFactory sf;
@@ -157,7 +157,7 @@ void FTPStreamFactoryTest::testUserInfo()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user:secret");
@@ -200,7 +200,7 @@ void FTPStreamFactoryTest::testPasswordProvider()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user");
@@ -231,7 +231,7 @@ void FTPStreamFactoryTest::testMissingPasswordProvider()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user");

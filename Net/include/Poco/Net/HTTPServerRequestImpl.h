@@ -57,10 +57,6 @@ public:
 		/// The stream is valid until the HTTPServerRequestImpl
 		/// object is destroyed.
 		
-	bool expectContinue() const;
-		/// Returns true if the client expects a
-		/// 100 Continue response.
-		
 	const SocketAddress& clientAddress() const;
 		/// Returns the client's address.
 
@@ -73,6 +69,12 @@ public:
 	HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response.
 		
+	bool secure() const;
+		/// Returns true if the request is using a secure
+		/// connection. Returns false if no secure connection
+		/// is used, or if it is not known whether a secure
+		/// connection is used.		
+		
 	StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
 		
@@ -83,9 +85,6 @@ public:
 	HTTPServerSession& session();
 		/// Returns the underlying HTTPServerSession.
 
-protected:
-	static const std::string EXPECT;
-	
 private:
 	HTTPServerResponseImpl&         _response;
 	HTTPServerSession&              _session;

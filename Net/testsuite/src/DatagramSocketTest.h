@@ -26,6 +26,7 @@ public:
 
 	void testEcho();
 	void testSendToReceiveFrom();
+	void testUnbound();
 	void testBroadcast();
 
 	void setUp();

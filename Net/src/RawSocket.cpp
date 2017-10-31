@@ -30,7 +30,7 @@ RawSocket::RawSocket():
 }
 
 
-RawSocket::RawSocket(IPAddress::Family family, int proto): 
+RawSocket::RawSocket(SocketAddress::Family family, int proto): 
 	Socket(new RawSocketImpl(family, proto))
 {
 }
@@ -81,6 +81,12 @@ void RawSocket::connect(const SocketAddress& address)
 void RawSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
 	impl()->bind(address, reuseAddress);
+}
+
+
+void RawSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
 }
 
 

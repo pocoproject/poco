@@ -1,8 +1,6 @@
 //
 // SevenZip.h
 //
-// $Id$
-//
 // Library: SevenZip
 // Package: SevenZip
 // Module:  SevenZip

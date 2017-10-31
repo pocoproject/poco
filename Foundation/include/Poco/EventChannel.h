@@ -1,8 +1,6 @@
 //
 // EventChannel.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Logging
 // Module:  EventChannel

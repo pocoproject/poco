@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#if defined(__cplusplus) && !defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(__cplusplus) && !(defined(_WIN32_WCE) || defined(_WIN32) || defined(_WIN64))
 extern "C" {
 #endif
 
@@ -43,7 +43,7 @@ size_t json_get_position(json_stream *json);
 size_t json_get_depth(json_stream *json);
 const char *json_get_error(json_stream *json);
 
-#if defined(__cplusplus) && !defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(__cplusplus) && !(defined(_WIN32_WCE) || defined(_WIN32) || defined(_WIN64))
 }
 #endif
 

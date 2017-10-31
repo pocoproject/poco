@@ -1,8 +1,6 @@
 //
 // SortedDirectoryIterator.cpp
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator
