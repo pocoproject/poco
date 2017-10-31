@@ -71,7 +71,7 @@ ifdef POCO_VERBOSE
 $(info OSARCH              = $(OSARCH))
 endif
 
-.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
+.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install uninstall
 
 # TESTS and SAMPLES are set in config.make
 poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
