@@ -37,21 +37,25 @@ class Foundation_API Base64DecoderBuf: public UnbufferedStreamBuf
 	/// its streambuf.
 {
 public:
-	Base64DecoderBuf(std::istream& istr);
+	Base64DecoderBuf(std::istream& istr, int options = 0);
 	~Base64DecoderBuf();
-	
+
 private:
 	int readFromDevice();
 	int readOne();
 
+	int             _options;
 	unsigned char   _group[3];
 	int             _groupLength;
 	int             _groupIndex;
 	std::streambuf& _buf;
-	
+	const unsigned char* _pInEncoding;
+
 	static unsigned char IN_ENCODING[256];
 	static bool          IN_ENCODING_INIT;
-	
+	static unsigned char IN_ENCODING_URL[256];
+	static bool          IN_ENCODING_URL_INIT;
+
 private:
 	Base64DecoderBuf(const Base64DecoderBuf&);
 	Base64DecoderBuf& operator = (const Base64DecoderBuf&);
@@ -65,13 +69,13 @@ class Foundation_API Base64DecoderIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	Base64DecoderIOS(std::istream& istr);
+	Base64DecoderIOS(std::istream& istr, int options = 0);
 	~Base64DecoderIOS();
 	Base64DecoderBuf* rdbuf();
 
 protected:
 	Base64DecoderBuf _buf;
-	
+
 private:
 	Base64DecoderIOS(const Base64DecoderIOS&);
 	Base64DecoderIOS& operator = (const Base64DecoderIOS&);
@@ -89,7 +93,7 @@ class Foundation_API Base64Decoder: public Base64DecoderIOS, public std::istream
 	/// its streambuf.
 {
 public:
-	Base64Decoder(std::istream& istr);
+	Base64Decoder(std::istream& istr, int options = 0);
 	~Base64Decoder();
 
 private:

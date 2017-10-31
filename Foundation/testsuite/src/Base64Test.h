@@ -25,7 +25,11 @@ public:
 	~Base64Test();
 
 	void testEncoder();
+	void testEncoderURL();
+	void testEncoderNoPadding();
 	void testDecoder();
+	void testDecoderURL();
+	void testDecoderNoPadding();
 	void testEncodeDecode();
 
 	void setUp();
