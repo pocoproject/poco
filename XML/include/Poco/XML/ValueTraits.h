@@ -1,8 +1,6 @@
 //
 // ValueTraits.h
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  ValueTraits
