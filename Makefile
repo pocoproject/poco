@@ -102,11 +102,21 @@ install: libexecs
 		fi ; \
 	done
 ifeq ($(OSNAME), Cygwin)
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/bin \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "cygPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/bin \;
 endif
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
-	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*"    -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
+	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+
+uninstall:
+	[ -d $(INSTALLDIR)/include/Poco ] && rm -rf $(INSTALLDIR)/include/Poco || echo "No installed Poco headers found";
+	[ -d $(INSTALLDIR)/include/CppUnit ] && rm -rf $(INSTALLDIR)/include/CppUnit || echo "No installed CppUnit headers found";
+ifeq ($(OSNAME), Cygwin)
+	find $(INSTALLDIR)/bin -name "cygPoco*" -type f -exec rm -f  {} \;
+	find $(INSTALLDIR)/bin -name "cygPoco*" -type l -exec rm -f {} \;
+endif
+	find $(INSTALLDIR)/lib -name "libPoco*" -type f -exec rm -f  {} \;
+	find $(INSTALLDIR)/lib -name "libPoco*" -type l -exec rm -f {} \;
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec
