@@ -1,8 +1,6 @@
 //
 // Object.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Object

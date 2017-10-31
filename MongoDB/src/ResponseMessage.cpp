@@ -1,8 +1,6 @@
 //
 // ResponseMessage.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  ResponseMessage

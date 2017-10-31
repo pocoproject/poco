@@ -1,8 +1,6 @@
 //
 // X509Certificate.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: Certificate
 // Module:  X509Certificate

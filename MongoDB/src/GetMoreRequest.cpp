@@ -1,8 +1,6 @@
 //
 // GetMoreRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  GetMoreRequest

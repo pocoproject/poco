@@ -1,8 +1,6 @@
 //
 // Binary.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Binary

@@ -1,8 +1,6 @@
 //
 // Document.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Document
