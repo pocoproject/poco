@@ -71,7 +71,7 @@ ifdef POCO_VERBOSE
 $(info OSARCH              = $(OSARCH))
 endif
 
-.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
+.PHONY: poco all libexecs cppunit tests samples cleans clean distclean install uninstall
 
 # TESTS and SAMPLES are set in config.make
 poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples) 
@@ -104,6 +104,16 @@ ifeq ($(OSNAME), CYGWIN)
 endif
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type f -exec cp -f  {} $(INSTALLDIR)/lib \;
 	find $(POCO_BUILD)/lib/$(OSNAME)/$(OSARCH) -name "libPoco*" -type l -exec cp -Rf {} $(INSTALLDIR)/lib \;
+
+uninstall:
+	[ -d $(INSTALLDIR)/include/Poco ] && rm -rf $(INSTALLDIR)/include/Poco || echo "No installed Poco headers found";
+	[ -d $(INSTALLDIR)/include/CppUnit ] && rm -rf $(INSTALLDIR)/include/CppUnit || echo "No installed CppUnit headers found";
+ifeq ($(OSNAME), Cygwin)
+	find $(INSTALLDIR)/bin -name "cygPoco*" -type f -exec rm -f  {} \;
+	find $(INSTALLDIR)/bin -name "cygPoco*" -type l -exec rm -f {} \;
+endif
+	find $(INSTALLDIR)/lib -name "libPoco*" -type f -exec rm -f  {} \;
+	find $(INSTALLDIR)/lib -name "libPoco*" -type l -exec rm -f {} \;
 
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec MongoDB-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec PDF-libexec
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests MongoDB-tests Zip-tests CppParser-tests PDF-tests
