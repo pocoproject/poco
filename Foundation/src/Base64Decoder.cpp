@@ -33,12 +33,13 @@ namespace
 }
 
 
-Base64DecoderBuf::Base64DecoderBuf(std::istream& istr, int options):
+Base64DecoderBuf::Base64DecoderBuf(std::istream& istr, int options, std::istream* pStr):
 	_options(options),
 	_groupLength(0),
 	_groupIndex(0),
 	_buf(*istr.rdbuf()),
-	_pInEncoding((options & BASE64_URL_ENCODING) ? IN_ENCODING_URL : IN_ENCODING)
+	_pInEncoding((options & BASE64_URL_ENCODING) ? IN_ENCODING_URL : IN_ENCODING),
+	_istr(*pStr)
 {
 	FastMutex::ScopedLock lock(mutex);
 	if (options & BASE64_URL_ENCODING)
@@ -81,6 +82,13 @@ Base64DecoderBuf::~Base64DecoderBuf()
 }
 
 
+void Base64DecoderBuf::error(std::ios_base::iostate state)
+{
+	_istr.setstate(state);
+	throw DataFormatException();
+}
+
+
 int Base64DecoderBuf::readFromDevice()
 {
 	if (_groupIndex < _groupLength)
@@ -93,31 +101,32 @@ int Base64DecoderBuf::readFromDevice()
 		int c;
 		if ((c = readOne()) == -1) return -1;
 		buffer[0] = (unsigned char) c;
-		if (_pInEncoding[buffer[0]] == 0xFF) throw DataFormatException();
+		if (_pInEncoding[buffer[0]] == 0xFF) error();
+
 		if ((c = readOne()) == -1) return -1;
 		buffer[1] = (unsigned char) c;
-		if (_pInEncoding[buffer[1]] == 0xFF) throw DataFormatException();
+		if (_pInEncoding[buffer[1]] == 0xFF) error();
 		if (_options & BASE64_NO_PADDING)
 		{
 			if ((c = readOne()) != -1)
 				buffer[2] = c;
 			else
 				buffer[2] = '=';
-			if (_pInEncoding[buffer[2]] == 0xFF) throw DataFormatException();
+			if (_pInEncoding[buffer[2]] == 0xFF) error();
 			if ((c = readOne()) != -1)
 				buffer[3] = c;
 			else
 				buffer[3] = '=';
-			if (_pInEncoding[buffer[3]] == 0xFF) throw DataFormatException();
+			if (_pInEncoding[buffer[3]] == 0xFF) error();
 		}
 		else
 		{
-			if ((c = readOne()) == -1) throw DataFormatException();
+			if ((c = readOne()) == -1) error();
 			buffer[2] = c;
-			if (_pInEncoding[buffer[2]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) throw DataFormatException();
+			if (_pInEncoding[buffer[2]] == 0xFF) error();
+			if ((c = readOne()) == -1) error();
 			buffer[3] = c;
-			if (_pInEncoding[buffer[3]] == 0xFF) throw DataFormatException();
+			if (_pInEncoding[buffer[3]] == 0xFF) error();
 		}
 
 		_group[0] = (_pInEncoding[buffer[0]] << 2) | (_pInEncoding[buffer[1]] >> 4);
@@ -148,7 +157,7 @@ int Base64DecoderBuf::readOne()
 }
 
 
-Base64DecoderIOS::Base64DecoderIOS(std::istream& istr, int options): _buf(istr, options)
+Base64DecoderIOS::Base64DecoderIOS(std::istream& istr, int options, std::istream* pStr): _buf(istr, options, pStr)
 {
 	poco_ios_init(&_buf);
 }
@@ -165,7 +174,7 @@ Base64DecoderBuf* Base64DecoderIOS::rdbuf()
 }
 
 
-Base64Decoder::Base64Decoder(std::istream& istr, int options): Base64DecoderIOS(istr, options), std::istream(&_buf)
+Base64Decoder::Base64Decoder(std::istream& istr, int options): Base64DecoderIOS(istr, options, this), std::istream(&_buf)
 {
 }
 

@@ -243,7 +243,13 @@ void Base64Test::testDecoderURL()
 		std::istringstream istr("QUJ\r\nDRE\r\nVG");
 		Base64Decoder decoder(istr, Poco::BASE64_URL_ENCODING);
 		std::string s;
-		decoder >> s;
+		try
+		{
+			decoder >> s;
+			fail("must fail");
+		}
+		catch (DataFormatException&) {}
+		assert (decoder.fail());
 		assert (decoder.bad());
 	}
 	{
