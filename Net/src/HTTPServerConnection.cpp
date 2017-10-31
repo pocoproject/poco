@@ -83,7 +83,7 @@ void HTTPServerConnection::run()
 #endif
 					if (pHandler.get())
 					{
-						if (request.expectContinue())
+						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
 							response.sendContinue();
 					
 						pHandler->handleRequest(request, response);

@@ -37,6 +37,8 @@ public:
 	void testProxy();
 	void testProxyAuth();
 	void testBypassProxy();
+	void testExpectContinue();
+	void testExpectContinueFail();
 
 	void setUp();
 	void tearDown();

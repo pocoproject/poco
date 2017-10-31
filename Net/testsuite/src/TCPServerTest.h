@@ -28,6 +28,7 @@ public:
 	void testTwoConnections();
 	void testMultiConnections();
 	void testThreadCapacity();
+	void testFilter();
 
 	void setUp();
 	void tearDown();
