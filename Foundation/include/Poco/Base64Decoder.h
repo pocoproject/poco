@@ -37,7 +37,7 @@ class Foundation_API Base64DecoderBuf: public UnbufferedStreamBuf
 	/// its streambuf.
 {
 public:
-	Base64DecoderBuf(std::istream& istr, int options = 0);
+	Base64DecoderBuf(std::istream& istr, int options = 0, std::istream* pStr = 0);
 	~Base64DecoderBuf();
 
 private:
@@ -59,6 +59,9 @@ private:
 private:
 	Base64DecoderBuf(const Base64DecoderBuf&);
 	Base64DecoderBuf& operator = (const Base64DecoderBuf&);
+
+	void error(std::ios_base::iostate state = std::ios_base::failbit | std::ios_base::badbit);
+	std::istream& _istr;
 };
 
 
@@ -69,7 +72,7 @@ class Foundation_API Base64DecoderIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	Base64DecoderIOS(std::istream& istr, int options = 0);
+	Base64DecoderIOS(std::istream& istr, int options = 0, std::istream* pStr = 0);
 	~Base64DecoderIOS();
 	Base64DecoderBuf* rdbuf();
 

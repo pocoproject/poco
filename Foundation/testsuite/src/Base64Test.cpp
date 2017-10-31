@@ -222,8 +222,8 @@ void Base64Test::testDecoderURL()
 		assert (decoder.good() && decoder.get() == -1);
 	}
 	{
-		std::istringstream istr("AAECAw==", Poco::BASE64_URL_ENCODING);
-		Base64Decoder decoder(istr);
+		std::istringstream istr("AAECAw==");
+		Base64Decoder decoder(istr, Poco::BASE64_URL_ENCODING);
 		assert (decoder.good() && decoder.get() == 0);
 		assert (decoder.good() && decoder.get() == 1);
 		assert (decoder.good() && decoder.get() == 2);
@@ -231,8 +231,8 @@ void Base64Test::testDecoderURL()
 		assert (decoder.good() && decoder.get() == -1);
 	}
 	{
-		std::istringstream istr("QUJDREVG", Poco::BASE64_URL_ENCODING);
-		Base64Decoder decoder(istr);
+		std::istringstream istr("QUJDREVG");
+		Base64Decoder decoder(istr, Poco::BASE64_URL_ENCODING);
 		std::string s;
 		decoder >> s;
 		assert (s == "ABCDEF");
@@ -243,7 +243,13 @@ void Base64Test::testDecoderURL()
 		std::istringstream istr("QUJ\r\nDRE\r\nVG");
 		Base64Decoder decoder(istr, Poco::BASE64_URL_ENCODING);
 		std::string s;
-		decoder >> s;
+		try
+		{
+			decoder >> s;
+			fail("must fail");
+		}
+		catch (DataFormatException&) {}
+		assert (decoder.fail());
 		assert (decoder.bad());
 	}
 	{
