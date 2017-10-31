@@ -86,7 +86,7 @@ void TCPServerDispatcher::duplicate()
 
 void TCPServerDispatcher::release()
 {
-	if (_rc == 0) delete this;
+	if (--_rc == 0) delete this;
 }
 
 
