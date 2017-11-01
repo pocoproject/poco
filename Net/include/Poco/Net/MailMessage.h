@@ -84,6 +84,12 @@ public:
 		/// the file system in order to avoid potential memory
 		/// exhaustion when attachment files are very large.
 
+	MailMessage(MailMessage&&);
+		/// Move constructor.
+
+	MailMessage& operator = (MailMessage&&);
+		/// Move assignment.
+
 	virtual ~MailMessage();
 		/// Destroys the MailMessage.
 
@@ -241,6 +247,12 @@ public:
 		/// Returns the encoded string, or the original string if it
 		/// consists only of ASCII characters.
 
+	static MailMessage decodeWords(const MailMessage& msg);
+		/// Decodes a MailMessage
+
+	static std::string decodeWord(const std::string& encodedWord);
+		/// Decodes an encoded-word.
+
 	static const std::string HEADER_SUBJECT;
 	static const std::string HEADER_FROM;
 	static const std::string HEADER_TO;
@@ -274,6 +286,7 @@ protected:
 	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
+	static std::string decodeWord(const std::string& charset, const std::string& encoding, const std::string& text);
 
 private:
 	MailMessage(const MailMessage&);

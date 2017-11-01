@@ -29,6 +29,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
+#include "Poco/Format.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
@@ -213,6 +214,38 @@ MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 	Poco::Timestamp now;
 	setDate(now);
 	setContentType("text/plain");
+}
+
+
+MailMessage::MailMessage(MailMessage&& other):
+	_recipients(std::move(other._recipients)),
+	_content(std::move(other._content)),
+	_encoding(other._encoding),
+	_boundary(std::move(other._boundary)),
+	_pStoreFactory(other._pStoreFactory)
+{
+	other._recipients.clear();
+	other._content.clear();
+	other._boundary.clear();
+	other._pStoreFactory = 0;
+}
+
+
+MailMessage& MailMessage::operator = (MailMessage&& other)
+{
+	if (&other != this)
+	{
+		_recipients = std::move(other._recipients);
+		other._recipients.clear();
+		_content = std::move(other._content);
+		other._content.clear();
+		_encoding = other._encoding;
+		_boundary = std::move(other._boundary);
+		other._boundary.clear();
+		_pStoreFactory = other._pStoreFactory;
+		other._pStoreFactory = 0;
+	}
+	return *this;
 }
 
 
@@ -692,6 +725,64 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 		encodedText += "?=";
 	}	
 	return encodedText;
+}
+
+
+MailMessage MailMessage::decodeWords(const MailMessage& msg)
+{
+	MailMessage decodedMsg;
+	for (const auto& item : msg)
+	{
+		decodedMsg.set(item.first, decodeWord(item.second));
+	}
+
+	return std::move(decodedMsg);
+}
+
+
+std::string MailMessage::decodeWord(const std::string& encodedWord)
+{
+	std::string decoded;
+	std::string::size_type pos1 = encodedWord.find("=?"); // beginning of encodedWord-word
+	if (pos1 != encodedWord.npos)
+	{
+		std::string::size_type pos2 = encodedWord.find("?="); // end of encodedWord-word
+		if (pos2 != encodedWord.npos)
+		{
+			while ((pos1 != encodedWord.npos) && (pos2 != encodedWord.npos))
+			{
+				StringTokenizer st(encodedWord.substr(pos1, pos2 - pos1), "?");
+				if (st.count() == 3)
+				{
+					std::string charset = st[0];
+					std::string encoding = st[1];
+					std::string encodedText = st[2];
+					if (encodedText.find_first_of(" ?") != encodedText.npos)
+					{
+						throw InvalidArgumentException("MailMessage::decodeWord: "
+							"forbidden characters found in encodedWord-word");
+					}
+					decodeWord(charset, encoding, encodedText);
+				}
+				else
+				{
+					throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: "
+						"invalid number of entries in encodedWord-word (expected 3, found %z)", st.count()));
+				}
+			}
+		}
+		else throw InvalidArgumentException("MailMessage::decodeWord: end of encodedWord-word not found");
+	}
+	else decoded = encodedWord;
+	return decoded;
+}
+
+
+std::string MailMessage::decodeWord(const std::string& charset,
+	const std::string& encoding, const std::string& text)
+{
+	std::string decoded;
+	return decoded;
 }
 
 
