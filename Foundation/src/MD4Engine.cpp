@@ -71,7 +71,7 @@ void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 	partLen = 64 - index;
 
 	/* Transform as many times as possible. */
-	if (inputLen >= partLen) 
+	if (inputLen >= partLen)
 	{
 		std::memcpy(&_context.buffer[index], input, partLen);
 		transform(_context.state, _context.buffer);
@@ -107,7 +107,7 @@ void MD4Engine::reset()
 
 const DigestEngine::Digest& MD4Engine::digest()
 {
-	static const unsigned char PADDING[64] = 
+	static const unsigned char PADDING[64] =
 	{
 		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

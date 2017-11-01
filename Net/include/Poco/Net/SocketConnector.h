@@ -42,7 +42,7 @@ class SocketConnector
 	/// The Acceptor-Connector design pattern decouples connection
 	/// establishment and service initialization in a distributed system
 	/// from the processing performed once a service is initialized.
-	/// This decoupling is achieved with three components: Acceptors, 
+	/// This decoupling is achieved with three components: Acceptors,
 	/// Connectors and Service Handlers.
 	/// The Connector actively establishes a connection with a remote
 	/// server socket (usually managed by an Acceptor) and initializes
@@ -50,10 +50,10 @@ class SocketConnector
 	///
 	/// The SocketConnector sets up a StreamSocket, initiates a non-blocking
 	/// connect operation and registers itself for ReadableNotification, WritableNotification
-	/// and ErrorNotification. ReadableNotification or WritableNotification denote the successful 
+	/// and ErrorNotification. ReadableNotification or WritableNotification denote the successful
 	/// establishment of the connection.
 	///
-	/// When the StreamSocket becomes readable or writeable, the SocketConnector 
+	/// When the StreamSocket becomes readable or writeable, the SocketConnector
 	/// creates a ServiceHandler to service the connection and unregisters
 	/// itself.
 	///
@@ -84,7 +84,7 @@ public:
 		/// Creates a SocketConnector, using the given ServerSocket.
 		///
 		/// If doRegister is true, the SocketConnector registers itself with the given SocketReactor.
-		/// For implementations with overriden registerConnector(), doRegister should be false, and 
+		/// For implementations with overriden registerConnector(), doRegister should be false, and
 		/// registerConnector() called explicitly from the implementation.
 	{
 		_socket.connectNB(address);
@@ -137,7 +137,7 @@ public:
 	void onReadable(ReadableNotification* pNotification)
 	{
 		pNotification->release();
-		int err = _socket.impl()->socketError(); 
+		int err = _socket.impl()->socketError();
 		if (err)
 		{
 			onError(err);

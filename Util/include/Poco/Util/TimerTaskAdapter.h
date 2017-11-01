@@ -30,13 +30,13 @@ template <class C>
 class TimerTaskAdapter: public TimerTask
 	/// This class template simplifies the implementation
 	/// of TimerTask objects by allowing a member function
-	/// of an object to be called as task. 
+	/// of an object to be called as task.
 {
 public:
 	typedef void (C::*Callback)(TimerTask&);
 	
 	TimerTaskAdapter(C& object, Callback method): _pObject(&object), _method(method)
-		/// Creates the TimerTaskAdapter, using the given 
+		/// Creates the TimerTaskAdapter, using the given
 		/// object and its member function as task target.
 		///
 		/// The member function must accept one argument,

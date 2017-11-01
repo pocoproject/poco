@@ -57,7 +57,7 @@ public:
 	virtual void save(const std::string& publicKeyPairFile,
 		const std::string& privateKeyPairFile = "",
 		const std::string& privateKeyPairPassphrase = "") const;
-		/// Exports the public and private keys to the given files. 
+		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.

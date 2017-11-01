@@ -302,7 +302,7 @@ Binder::updateBindVectorToCurrentValues()
 
 ///////////////////
 //
-// Private 
+// Private
 //
 ///////////////////
 
@@ -326,7 +326,7 @@ void Binder::realBind(std::size_t aPosition, Poco::Data::MetaColumn::ColumnDataT
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -338,13 +338,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction 
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -356,13 +356,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -374,13 +374,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -392,13 +392,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Directio
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -410,13 +410,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -428,13 +428,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Directio
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -446,13 +446,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -464,13 +464,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Directio
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -482,13 +482,13 @@ void Binder::bind(std::size_t pos, const std::deque<bool>& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<bool>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<bool>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<float>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -500,13 +500,13 @@ void Binder::bind(std::size_t pos, const std::deque<float>& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<float>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<float>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<double>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<double>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -518,13 +518,13 @@ void Binder::bind(std::size_t pos, const std::deque<double>& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<double>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<double>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<char>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -536,13 +536,13 @@ void Binder::bind(std::size_t pos, const std::deque<char>& val, Direction dir)
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<char>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<char>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Data::BLOB>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Data::BLOB>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -554,13 +554,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Data::BLOB>& val, Dire
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Data::BLOB>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Data::BLOB>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Data::CLOB>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Data::CLOB>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -572,13 +572,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Data::CLOB>& val, Dire
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Data::CLOB>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Data::CLOB>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::DateTime>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::DateTime>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -590,13 +590,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::DateTime>& val, Direct
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::DateTime>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::DateTime>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Data::Date>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Data::Date>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -608,13 +608,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Data::Date>& val, Dire
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Data::Date>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Data::Date>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Data::Time>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Data::Time>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -626,13 +626,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Data::Time>& val, Dire
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Data::Time>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Data::Time>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<Poco::Data::NullData>& val, Direction dir, const std::type_info&) 
+void Binder::bind(std::size_t pos, const std::vector<Poco::Data::NullData>& val, Direction dir, const std::type_info&)
 {
 	throw NotImplementedException();
 }
@@ -644,13 +644,13 @@ void Binder::bind(std::size_t pos, const std::deque<Poco::Data::NullData>& val, 
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<Poco::Data::NullData>& val, Direction dir, const std::type_info&) 
+void Binder::bind(std::size_t pos, const std::list<Poco::Data::NullData>& val, Direction dir, const std::type_info&)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
 {
 	throw NotImplementedException();
 }
@@ -662,7 +662,7 @@ void Binder::bind(std::size_t pos, const std::deque<std::string>& val, Direction
 }
 
 
-void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir) 
+void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir)
 {
 	throw NotImplementedException();
 }

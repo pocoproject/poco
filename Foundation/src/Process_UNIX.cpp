@@ -143,7 +143,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		char** argv = new char*[args.size() + 2];
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
-		for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+		for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 			argv[i++] = const_cast<char*>(it->c_str());
 		argv[i] = NULL;
 		struct inheritance inherit;
@@ -174,7 +174,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	
 		int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
 		delete [] argv;
-		if (pid == -1) 
+		if (pid == -1)
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
@@ -201,7 +201,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	std::vector<char*> argv(args.size() + 2);
 	int i = 0;
 	argv[i++] = const_cast<char*>(command.c_str());
-	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it)
 	{
 		argv[i++] = const_cast<char*>(it->c_str());
 	}
@@ -293,13 +293,13 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid)  
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0) 
+	if (kill(pid, 0) == 0)
 	{
 		return true;
-	} 
-	else 
+	}
+	else
 	{
 		return false;
 	}

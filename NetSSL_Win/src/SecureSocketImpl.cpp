@@ -1,8 +1,6 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLSockets
 // Module:  SecureSocketImpl
@@ -380,7 +378,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		int sent = sendRawBytes(_sendBuffer.begin(), outBufferLen, flags);
 		if (_pSocket->getBlocking() && sent == -1)
 		{
-			if (dataSent == 0) 
+			if (dataSent == 0)
 				return -1;
 			else
 				return dataSent;
@@ -457,7 +455,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 					
 				if (numBytes == -1)
 					return -1;
-				else if (numBytes == 0) 
+				else if (numBytes == 0)
 					break;
 				else
 					_recvBufferOffset += numBytes;
@@ -486,7 +484,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 			{
 				// bytesDecoded contains everything including overflow data
 				rc = bytesDecoded;
-				if (rc > length) 
+				if (rc > length)
 					rc = length;
 				return rc;
 			}
@@ -606,7 +604,7 @@ SECURITY_STATUS SecureSocketImpl::decodeBufferFull(BYTE* pBuffer, DWORD bufSize,
 				overflowBuffer.resize(bufSize);
 				if (outLength > 0)
 				{
-					// make pOutBuffer full 
+					// make pOutBuffer full
 					std::memcpy(pOutBuffer, pDataBuffer->pvBuffer, outLength);
 					// no longer valid to write to pOutBuffer
 					pOutBuffer = 0;
@@ -645,7 +643,7 @@ SECURITY_STATUS SecureSocketImpl::decodeBufferFull(BYTE* pBuffer, DWORD bufSize,
 			}
 		}
 
-		if (securityStatus == SEC_I_RENEGOTIATE) 
+		if (securityStatus == SEC_I_RENEGOTIATE)
 		{
 			_needData = false;
 			securityStatus = performClientHandshakeLoop();
@@ -735,7 +733,7 @@ void SecureSocketImpl::clientConnectVerify()
 	try
 	{
 		SECURITY_STATUS securityStatus = _securityFunctions.QueryContextAttributesW(&_hContext, SECPKG_ATTR_REMOTE_CERT_CONTEXT, (PVOID) &_pPeerCertificate);
-		if (securityStatus != SEC_E_OK) 
+		if (securityStatus != SEC_E_OK)
 			throw SSLException("Failed to obtain peer certificate", Utility::formatError(securityStatus));
 
 		clientVerifyCertificate(_peerHostName);
@@ -793,7 +791,7 @@ void SecureSocketImpl::performInitialClientHandshake()
 						0,
 						0,
 						0,
-						&_hContext, 
+						&_hContext,
 						&_outSecBuffer,
 						&contextAttributes,
 						&ts);
@@ -817,14 +815,14 @@ void SecureSocketImpl::performInitialClientHandshake()
 
 	if (_securityStatus == SEC_E_OK)
 	{
-		// The security context was successfully initialized. 
-		// There is no need for another InitializeSecurityContext (Schannel) call. 
+		// The security context was successfully initialized.
+		// There is no need for another InitializeSecurityContext (Schannel) call.
 		_state = ST_DONE;
 		return;
 	}
 
 	//SEC_I_CONTINUE_NEEDED was returned:
-	// Wait for a return token. The returned token is then passed in 
+	// Wait for a return token. The returned token is then passed in
 	// another call to InitializeSecurityContext (Schannel). The output token can be empty.
 
 	_extraSecBuffer.pvBuffer = 0;
@@ -914,7 +912,7 @@ void SecureSocketImpl::performClientHandshakeLoopError()
 
 void SecureSocketImpl::performClientHandshakeSendOutBuffer()
 {
-	if (_outSecBuffer[0].cbBuffer && _outSecBuffer[0].pvBuffer) 
+	if (_outSecBuffer[0].cbBuffer && _outSecBuffer[0].pvBuffer)
 	{
 		int numBytes = sendRawBytes(static_cast<const void*>(_outSecBuffer[0].pvBuffer), _outSecBuffer[0].cbBuffer);
 		if (numBytes != _outSecBuffer[0].cbBuffer)
@@ -1048,7 +1046,7 @@ void SecureSocketImpl::performServerHandshake()
 	serverHandshakeLoop(&_hContext, &_hCreds, _clientAuthRequired, true, true);
 
 	SECURITY_STATUS securityStatus;
-	if (_clientAuthRequired) 
+	if (_clientAuthRequired)
 	{
 		poco_assert_dbg (!_pPeerCertificate);
 		securityStatus = _securityFunctions.QueryContextAttributesW(&_hContext, SECPKG_ATTR_REMOTE_CERT_CONTEXT, &_pPeerCertificate);
@@ -1086,7 +1084,7 @@ bool SecureSocketImpl::serverHandshakeLoop(PCtxtHandle phContext, PCredHandle ph
 
 	while (securityStatus == SEC_I_CONTINUE_NEEDED || securityStatus == SEC_E_INCOMPLETE_MESSAGE || securityStatus == SEC_I_INCOMPLETE_CREDENTIALS)
 	{
-		if (securityStatus == SEC_E_INCOMPLETE_MESSAGE) 
+		if (securityStatus == SEC_E_INCOMPLETE_MESSAGE)
 		{
 			if (doRead)
 			{
@@ -1096,7 +1094,7 @@ bool SecureSocketImpl::serverHandshakeLoop(PCtxtHandle phContext, PCredHandle ph
 					throw SSLException("Failed to receive data in handshake");
 				else
 					_recvBufferOffset += n;
-			} 
+			}
 			else doRead = true;
 		}
 
@@ -1134,8 +1132,8 @@ bool SecureSocketImpl::serverHandshakeLoop(PCtxtHandle phContext, PCredHandle ph
 			{
 				std::memmove(_recvBuffer.begin(), _recvBuffer.begin() + (_recvBufferOffset - inBuffer[1].cbBuffer), inBuffer[1].cbBuffer);
 				_recvBufferOffset = inBuffer[1].cbBuffer;
-			} 
-			else 
+			}
+			else
 			{
 				_recvBufferOffset = 0;
 			}
@@ -1153,7 +1151,7 @@ bool SecureSocketImpl::serverHandshakeLoop(PCtxtHandle phContext, PCredHandle ph
 				std::memmove(_recvBuffer.begin(), _recvBuffer.begin() + (_recvBufferOffset - inBuffer[1].cbBuffer), inBuffer[1].cbBuffer);
 				_recvBufferOffset = inBuffer[1].cbBuffer;
 			}
-			else 
+			else
 			{
 				_recvBufferOffset = 0;
 			}
@@ -1206,7 +1204,7 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 		throw SSLException("Cannot get certificate chain", GetLastError());
 	}
 
-	HTTPSPolicyCallbackData polHttps; 
+	HTTPSPolicyCallbackData polHttps;
 	std::memset(&polHttps, 0, sizeof(HTTPSPolicyCallbackData));
 	polHttps.cbStruct = sizeof(HTTPSPolicyCallbackData);
 	polHttps.dwAuthType = AUTHTYPE_SERVER;
@@ -1332,7 +1330,7 @@ void SecureSocketImpl::serverVerifyCertificate()
 							&chainPara,
 							CERT_CHAIN_REVOCATION_CHECK_CHAIN,
 							NULL,
-							&pChainContext)) 
+							&pChainContext))
 	{
 		throw SSLException("Cannot get certificate chain", GetLastError());
 	}
@@ -1353,30 +1351,30 @@ void SecureSocketImpl::serverVerifyCertificate()
 	std::memset(&policyStatus, 0, sizeof(policyStatus));
 	policyStatus.cbSize = sizeof(policyStatus);
 
-	if (!CertVerifyCertificateChainPolicy(CERT_CHAIN_POLICY_SSL, pChainContext, &policyPara, &policyStatus)) 
+	if (!CertVerifyCertificateChainPolicy(CERT_CHAIN_POLICY_SSL, pChainContext, &policyPara, &policyStatus))
 	{
 		VerificationErrorArgs args(cert, 0, GetLastError(), "Failed to verify certificate chain");
 		SSLManager::instance().ServerVerificationError(this, args);
 		CertFreeCertificateChain(pChainContext);
-		if (!args.getIgnoreError()) 
+		if (!args.getIgnoreError())
 			throw SSLException("Cannot verify certificate chain");
 		else
 			return;
 	}
-	else if (policyStatus.dwError) 
+	else if (policyStatus.dwError)
 	{
 		VerificationErrorArgs args(cert, policyStatus.lElementIndex, status, Utility::formatError(policyStatus.dwError));
 		SSLManager::instance().ServerVerificationError(this, args);
 		CertFreeCertificateChain(pChainContext);
 		if (!args.getIgnoreError())
 			throw SSLException("Failed to verify certificate chain");
-		else 
+		else
 			return;
 	}
 
 #if !defined(_WIN32_WCE)
 	// perform revocation checking
-	for (DWORD i = 0; i < pChainContext->cChain; i++) 
+	for (DWORD i = 0; i < pChainContext->cChain; i++)
 	{
 		std::vector<PCCERT_CONTEXT> certs;
 		for (DWORD k = 0; k < pChainContext->rgpChain[i]->cElement; k++)
@@ -1407,7 +1405,7 @@ void SecureSocketImpl::serverVerifyCertificate()
 		}
 	}
 #endif
-	if (pChainContext) 
+	if (pChainContext)
 	{
 		CertFreeCertificateChain(pChainContext);
 	}
@@ -1477,9 +1475,9 @@ LONG SecureSocketImpl::serverDisconnect(PCredHandle phCreds, CtxtHandle* phConte
 	if (FAILED(status)) return status;
 
 	DWORD sspiFlags = ASC_REQ_SEQUENCE_DETECT
-	                | ASC_REQ_REPLAY_DETECT 
-	                | ASC_REQ_CONFIDENTIALITY 
-	                | ASC_REQ_EXTENDED_ERROR 
+	                | ASC_REQ_REPLAY_DETECT
+	                | ASC_REQ_CONFIDENTIALITY
+	                | ASC_REQ_EXTENDED_ERROR
 	                | ASC_REQ_ALLOCATE_MEMORY
 	                | ASC_REQ_STREAM;
 

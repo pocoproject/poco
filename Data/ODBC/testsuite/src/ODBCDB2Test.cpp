@@ -45,8 +45,8 @@ using Poco::NotFoundException;
 
 static std::string db2Driver()
 {
-	return Poco::Environment::get("POCO_TEST_DB2_DRIVER", 
-#if defined(POCO_OS_FAMILY_WINDOWS) 
+	return Poco::Environment::get("POCO_TEST_DB2_DRIVER",
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	"IBM DB2 ODBC DRIVER - DB2COPY1"
 #else
 	"libdb2o.so"
@@ -97,7 +97,7 @@ std::string          ODBCDB2Test::_connectString = "Driver=" + db2Driver() + ";"
 	;
 
 
-ODBCDB2Test::ODBCDB2Test(const std::string& name): 
+ODBCDB2Test::ODBCDB2Test(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -147,7 +147,7 @@ void ODBCDB2Test::testBLOB()
 		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -236,7 +236,7 @@ void ODBCDB2Test::testStoredProcedure()
 			" SET outParam = inParam; "
 			"END" , now;
 
-		std::string inParam = 
+		std::string inParam =
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
@@ -426,7 +426,7 @@ void ODBCDB2Test::testStoredFunction()
 		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(4 == j);
-		assert(j == result); 
+		assert(j == result);
 
 		session() << "CREATE PROCEDURE " << nm << "(INOUT param1 INTEGER, INOUT param2 INTEGER) "
 			"BEGIN "
@@ -443,7 +443,7 @@ void ODBCDB2Test::testStoredFunction()
 		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
-		assert(3 == result); 
+		assert(3 == result);
 
 		Tuple<int, int> params(1, 2);
 		assert(1 == params.get<0>());
@@ -453,7 +453,7 @@ void ODBCDB2Test::testStoredFunction()
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
-		assert(3 == result); 
+		assert(3 == result);
 
 		session().setFeature("autoBind", true);
 
@@ -480,7 +480,7 @@ void ODBCDB2Test::testXMLColumn()
 {
 	const std::string tbl = ExecUtil::mangleTable("xmlColumn");
 	dropObject("TABLE", tbl);
-	try { 
+	try {
 		const std::string xmlStr = "<a> xml text </a>";
 		Poco::UTF16String uStr;
 		for (unsigned c = 0x400; c < 0x409; ++c) uStr.append(3, Poco::UTF16Char(c) );
@@ -541,7 +541,7 @@ void ODBCDB2Test::dropObject(const std::string& type, const std::string& name)
 		const StatementDiagnostics::FieldVec& flds = ex.diagnostics().fields();
 		StatementDiagnostics::Iterator it = flds.begin();
 		for (; it != flds.end(); ++it)
-		{ 
+		{
             		//(table does not exist)        // procedure not found
             		if (-204 == it->_nativeError || (-458 == it->_nativeError) )
 			{
@@ -639,7 +639,7 @@ void ODBCDB2Test::recreateFloatsTable()
 void ODBCDB2Test::recreateTuplesTable()
 {
 	dropObject("TABLE", ExecUtil::tuples());
-	try { session() << "CREATE TABLE " << ExecUtil::tuples() << 
+	try { session() << "CREATE TABLE " << ExecUtil::tuples() <<
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -681,14 +681,14 @@ void ODBCDB2Test::recreateNullsTable(const std::string& notNull)
 void ODBCDB2Test::recreateMiscTable()
 {
 	dropObject("TABLE", ExecUtil::misctest());
-	try 
-	{ 
+	try
+	{
 		session() << "CREATE TABLE " << ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second BLOB,"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
-			"Fifth TIMESTAMP)", now; 
+			"Fifth TIMESTAMP)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -699,19 +699,19 @@ void ODBCDB2Test::recreateLogTable()
 	dropObject("TABLE", ExecUtil::pocolog());;
 	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(100),"
 			"Name VARCHAR(100),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(100), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(100),"
-			"DateTime TIMESTAMP)"; 
+			"DateTime TIMESTAMP)";
 
-		session() << sql, ExecUtil::pocolog(), now; 
+		session() << sql, ExecUtil::pocolog(), now;
 		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -740,6 +740,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertList);

@@ -30,7 +30,7 @@ const std::string EventLogChannel::PROP_LOGHOST = "loghost";
 const std::string EventLogChannel::PROP_LOGFILE = "logfile";
 
 
-EventLogChannel::EventLogChannel(): 
+EventLogChannel::EventLogChannel():
 	_logFile("Application"),
 	_h(0)
 {
@@ -48,16 +48,16 @@ EventLogChannel::EventLogChannel():
 }
 
 
-EventLogChannel::EventLogChannel(const std::string& name): 
-	_name(name), 
+EventLogChannel::EventLogChannel(const std::string& name):
+	_name(name),
 	_logFile("Application"),
 	_h(0)
 {
 }
 
 
-EventLogChannel::EventLogChannel(const std::string& name, const std::string& host): 
-	_name(name), 
+EventLogChannel::EventLogChannel(const std::string& name, const std::string& host):
+	_name(name),
 	_host(host),
 	_logFile("Application"),
 	_h(0)
@@ -103,7 +103,7 @@ void EventLogChannel::log(const Message& msg)
 	std::wstring utext;
 	UnicodeConverter::toUTF16(msg.getText(), utext);
 	const wchar_t* pMsg = utext.c_str();
-	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL); 
+	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL);
 }
 
 

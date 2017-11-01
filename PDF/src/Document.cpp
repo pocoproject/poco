@@ -30,7 +30,7 @@ namespace PDF {
 Document::Document(const std::string fileName,
 	Poco::UInt32 pageCount,
 	Page::Size pageSize,
-	Page::Orientation orientation): 
+	Page::Orientation orientation):
 	_pdf(HPDF_New(HPDF_Error_Handler, 0)),
 	_fileName(fileName),
 	_pRawData(0),
@@ -44,7 +44,7 @@ Document::Document(const std::string fileName,
 
 Document::Document(Poco::UInt32 pageCount,
 	Page::Size pageSize,
-	Page::Orientation orientation): 
+	Page::Orientation orientation):
 	_pdf(HPDF_New(HPDF_Error_Handler, 0)),
 	_pRawData(0),
 	_size(0)
@@ -136,7 +136,7 @@ const Page& Document::getCurrentPage()
 const Font& Document::loadFont(const std::string& name, const std::string& encoding)
 {
 	Font font(&_pdf, HPDF_GetFont(_pdf, name.c_str(), encoding.empty() ? 0 : encoding.c_str()));
-	std::pair<FontContainer::iterator, bool> ret = 
+	std::pair<FontContainer::iterator, bool> ret =
 		_fonts.insert(FontContainer::value_type(name, font));
 
 	if (ret.second) return ret.first->second;
@@ -170,9 +170,9 @@ std::string Document::loadTTFont(const std::string& fileName, bool embedding, in
 	}
 	else if (index >= 0)
 	{
-		return HPDF_LoadTTFontFromFile2(_pdf, 
-			fileName.c_str(), 
-			static_cast<HPDF_UINT>(index), 
+		return HPDF_LoadTTFontFromFile2(_pdf,
+			fileName.c_str(),
+			static_cast<HPDF_UINT>(index),
 			embedding ? HPDF_TRUE : HPDF_FALSE);
 	}
 	else
@@ -200,7 +200,7 @@ const Image& Document::loadPNGImageImpl(const std::string& fileName, bool doLoad
 		if (it.second) return it.first->second;
 		else throw IllegalStateException("Could not insert image.");
 	}
-	else 
+	else
 		throw NotFoundException("File not found: " + fileName);
 }
 
@@ -217,7 +217,7 @@ const Image& Document::loadJPEGImage(const std::string& fileName)
 		if (it.second) return it.first->second;
 		else throw IllegalStateException("Could not insert image.");
 	}
-	else 
+	else
 		throw NotFoundException("File not found: " + fileName);
 }
 
@@ -239,7 +239,7 @@ const Encoder& Document::loadEncoder(const std::string& name)
 	if (_encoders.end() == it) return it->second;
 
 	Encoder enc(&_pdf, HPDF_GetEncoder(_pdf, name.c_str()), name);
-	std::pair<EncoderContainer::iterator, bool> ret = 
+	std::pair<EncoderContainer::iterator, bool> ret =
 		_encoders.insert(EncoderContainer::value_type(name, enc));
 
 	if (ret.second) return ret.first->second;

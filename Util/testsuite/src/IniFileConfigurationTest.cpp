@@ -37,7 +37,7 @@ IniFileConfigurationTest::~IniFileConfigurationTest()
 
 void IniFileConfigurationTest::testLoad()
 {
-	static const std::string iniFile = 
+	static const std::string iniFile =
 		"; comment\n"
 		"  ; comment  \n"
 		"prop1=value1\n"

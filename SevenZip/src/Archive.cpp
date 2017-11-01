@@ -1,8 +1,6 @@
 //
 // Archive.cpp
 //
-// $Id$
-//
 // Library: SevenZip
 // Package: Archive
 // Module:  Archive
@@ -102,10 +100,10 @@ public:
 			std::size_t offset = 0;
 			std::size_t extractedSize = 0;
 			int err = SzArEx_Extract(
-				&_db, 
-				&_lookStream.s, 
-				entry.index(), 
-				&blockIndex, 
+				&_db,
+				&_lookStream.s,
+				entry.index(),
+				&blockIndex,
 				&pOutBuffer,
 				&outBufferSize,
 				&offset,
@@ -182,7 +180,7 @@ protected:
 		{
 			loadEntries();
 		}
-		else 
+		else
 		{
 			handleError(err);
 		}

@@ -29,7 +29,7 @@ endif
 LINK    = $(CXX)
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -45,23 +45,23 @@ SHAREDLIBLINKEXT = .so
 # Compiler and Linker Flags
 #
 CFLAGS          = -std=c99
-CFLAGS32        = 
-CFLAGS64        = 
+CFLAGS32        =
+CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare
-CXXFLAGS32      = 
-CXXFLAGS64      = 
-SHLIBFLAGS      = 
-SHLIBFLAGS32    = 
-SHLIBFLAGS64    = 
-LIBFLAGS        = 
+CXXFLAGS32      =
+CXXFLAGS64      =
+SHLIBFLAGS      =
+SHLIBFLAGS32    =
+SHLIBFLAGS64    =
+LIBFLAGS        =
 LIBFLAGS32      =
 LIBFLAGS64      =
 LINKFLAGS       =
-LINKFLAGS32     = 
-LINKFLAGS64     = 
+LINKFLAGS32     =
+LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
-STATICOPT_LINK  = 
+STATICOPT_LINK  =
 SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)

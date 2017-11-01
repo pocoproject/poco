@@ -206,12 +206,12 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 	{
 		_localTime = (value == "local");
 	}
-	else if (name == PROP_PRIORITY_NAMES) 
+	else if (name == PROP_PRIORITY_NAMES)
 	{
 		_priorityNames = value;
 		parsePriorityNames();
 	}
-	else 
+	else
 	{
 		Formatter::setProperty(name, value);
 	}
@@ -233,7 +233,7 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 
 namespace
 {
-	static std::string priorities[] = 
+	static std::string priorities[] =
 	{
 		"",
 		"Fatal",

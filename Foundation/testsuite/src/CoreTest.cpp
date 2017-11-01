@@ -24,6 +24,7 @@
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
 #include "Poco/Checksum.h"
+#include "Poco/MakeUnique.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
@@ -45,6 +46,7 @@ using Poco::delegate;
 using Poco::NullType;
 using Poco::InvalidAccessException;
 using Poco::Checksum;
+using Poco::makeUnique;
 
 
 namespace
@@ -79,9 +81,10 @@ namespace
 		{
 		}
 
-		NonDefaultConstructible operator=(int val)
+		NonDefaultConstructible& operator=(int val)
 		{
 			_val = val;
+			return *this;
 		}
 
 		bool operator == (const NonDefaultConstructible& other) const
@@ -213,7 +216,7 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
-#if !defined(_WIN32_WCE) 
+#if !defined(_WIN32_WCE)
 	Environment::set("FOO", "BAR");
 	assert (Environment::has("FOO"));
 	assert (Environment::get("FOO") == "BAR");
@@ -345,6 +348,11 @@ void CoreTest::testBuffer()
 	k.append('d');
 	assert (k.size() == 15);
 	assert ( !std::memcmp(k.begin(), "hellohelloworld", k.size()) );
+
+	char my[16];
+	Poco::Buffer<char> buffer(16);
+	Poco::Buffer<char> wrapper(my, sizeof(my));
+	buffer.swap(wrapper);
 }
 
 
@@ -580,7 +588,6 @@ void CoreTest::testAscii()
 }
 
 
-
 void CoreTest::testChecksum64()
 {
 	Poco::Checksum checksum64_0(Checksum::TYPE_CRC64);
@@ -633,6 +640,21 @@ void CoreTest::testChecksum64()
 }
 
 
+void CoreTest::testMakeUnique()
+{
+	assert (*makeUnique<int>() == 0);
+	assert (*makeUnique<int>(1729) == 1729);
+	assert (*makeUnique<std::string>() == "");
+	assert (*makeUnique<std::string>("meow") == "meow");
+	assert (*makeUnique<std::string>(6, 'z') == "zzzzzz");
+
+	auto up = makeUnique<int[]>(5);
+
+	for (int i = 0; i < 5; ++i) up[i] = i;
+	for (int i = 0; i < 5; ++i) assert (up[i] == i);
+}
+
+
 void CoreTest::setUp()
 {
 	_readableToNot = 0;
@@ -660,6 +682,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
 	CppUnit_addTest(pSuite, CoreTest, testChecksum64);
+	CppUnit_addTest(pSuite, CoreTest, testMakeUnique);
 
 	return pSuite;
 }

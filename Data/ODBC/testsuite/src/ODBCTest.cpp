@@ -51,7 +51,7 @@ using Poco::NotFoundException;
 
 
 ODBCTest::Drivers ODBCTest::_drivers;
-const bool        ODBCTest::_bindValues[8] = 
+const bool        ODBCTest::_bindValues[8] =
 	{true, true, true, false, false, true, false, false};
 
 
@@ -61,7 +61,7 @@ ODBCTest::ODBCTest(const std::string& name,
 	std::string& rDSN,
 	std::string& rUID,
 	std::string& rPwd,
-	std::string& rConnectString): 
+	std::string& rConnectString):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
 	_pExecutor(pExecutor),
@@ -230,6 +230,21 @@ void ODBCTest::testInsertEmptyVector()
 		_pExecutor->insertEmptyVector();
 		i += 2;
 	}	
+}
+
+
+void ODBCTest::testBigStringVector()
+{
+	if (!_pSession) fail("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateStringsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i + 1));
+		_pExecutor->bigStringVector();
+		i += 2;
+	}
 }
 
 
@@ -910,7 +925,7 @@ void ODBCTest::testDouble()
 
 	for (int i = 0; i < 8;)
 	{
-		recreateFloatsTable();
+		recreateDoublesTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
 		_pExecutor->doubles();
@@ -958,7 +973,7 @@ void ODBCTest::testInternalExtraction()
 		recreateVectorsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->internalExtraction(0);
+		_pExecutor->internalExtraction();
 		i += 2;
 	}
 }
@@ -983,12 +998,14 @@ void ODBCTest::testInternalBulkExtraction()
 {
 	if (!_pSession) fail ("Test not available.");
 
-	recreatePersonTable();
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
+
 #ifdef POCO_ODBC_UNICODE
+	recreatePersonUnicodeTable();
 	_pExecutor->internalBulkExtractionUTF16();
 #else
+	recreatePersonTable();
 	_pExecutor->internalBulkExtraction();
 #endif
 }
@@ -1316,13 +1333,13 @@ bool ODBCTest::canConnect(const std::string& driver,
 	{
 		if (((itDrv->first).find(driver) != std::string::npos))
 		{
-			std::cout << "Driver found: " << itDrv->first 
+			std::cout << "Driver found: " << itDrv->first
 				<< " (" << itDrv->second << ')' << std::endl;
 			break;
 		}
 	}
 
-	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/')) 
+	if ((_drivers.end() == itDrv) && (driver.length() != 0) && (driver[0] != '/'))
 	{
 		dsn = "";
 		uid = "";

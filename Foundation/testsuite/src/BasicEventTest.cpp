@@ -419,7 +419,7 @@ void BasicEventTest::setUp()
 {
 	_count = 0;
 	// must clear events, otherwise repeating test executions will fail
-	// because tests are only created once, only setup is called before 
+	// because tests are only created once, only setup is called before
 	// each test run
 	Void.clear();
 	Simple.clear();

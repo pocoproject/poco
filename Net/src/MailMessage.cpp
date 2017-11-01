@@ -52,7 +52,7 @@ namespace Net {
 namespace
 {
 	class MultiPartHandler: public PartHandler
-		/// This is a default part handler for multipart messages, used when there 
+		/// This is a default part handler for multipart messages, used when there
 		/// is no external handler provided to he MailMessage. This handler
 		/// will handle all types of message parts, including attachments.
 	{
@@ -72,7 +72,7 @@ namespace
 		}
 
 		void handlePart(const MessageHeader& header, std::istream& stream)
-			/// Handles a part. If message pointer was provided at construction time, 
+			/// Handles a part. If message pointer was provided at construction time,
 			/// the message pointed to will be properly populated so it could be written
 			/// back out at a later point in time.
 		{
@@ -97,7 +97,7 @@ namespace
 				std::string filename;
 				if (!contentDisp.empty())
 					filename = getParamFromHeader(contentDisp, "filename");
-				if (filename.empty()) 
+				if (filename.empty())
 					filename = getParamFromHeader(contentType, "name");
 				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
 				poco_check_ptr (pPS);
@@ -108,7 +108,7 @@ namespace
 				{
 					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
 					{
-						if (it->second == "inline") 
+						if (it->second == "inline")
 							_pMsg->addContent(pPS, cte);
 						else
 							_pMsg->addAttachment(getPartName(header), pPS, cte);
@@ -206,7 +206,7 @@ const std::string MailMessage::CTE_QUOTED_PRINTABLE("quoted-printable");
 const std::string MailMessage::CTE_BASE64("base64");
 
 
-MailMessage::MailMessage(PartStoreFactory* pStoreFactory): 
+MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 	_encoding(),
 	_pStoreFactory(pStoreFactory)
 {

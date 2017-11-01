@@ -1,8 +1,6 @@
 //
 // MongoDBTest.h
 //
-// $Id$
-//
 // Definition of the MongoDBTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

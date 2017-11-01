@@ -1,8 +1,6 @@
 //
 // RequestMessage.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  RequestMessage
@@ -23,7 +21,7 @@ namespace Poco {
 namespace MongoDB {
 
 
-RequestMessage::RequestMessage(MessageHeader::OpCode opcode): 
+RequestMessage::RequestMessage(MessageHeader::OpCode opcode):
 	Message(opcode)
 {
 }

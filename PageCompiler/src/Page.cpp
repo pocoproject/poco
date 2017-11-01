@@ -29,7 +29,7 @@ bool Page::getBool(const std::string& property, bool deflt) const
 	{
 		const std::string& value = get(property);
 		return Poco::icompare(value, "true") == 0
-		    || Poco::icompare(value, "yes") == 0 
+		    || Poco::icompare(value, "yes") == 0
 		    || Poco::icompare(value, "on") == 0;
 	}
 	else return deflt;

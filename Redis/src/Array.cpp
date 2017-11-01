@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Array
@@ -28,7 +26,7 @@ Array::Array()
 }
 
 
-Array::Array(const Array& copy): 
+Array::Array(const Array& copy):
 	_elements(copy._elements)
 {
 }

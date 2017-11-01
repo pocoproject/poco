@@ -1,8 +1,6 @@
 //
 // Object.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Object
@@ -40,21 +38,21 @@ namespace JSON {
 
 class JSON_API Object
 	/// Represents a JSON object. Object provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to 
+	/// based on shared pointers and optimized for performance. It is possible to
 	/// convert Object to DynamicStruct. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
-	/// 
+	///
 	///    std::string json = "{ \"test\" : { \"property\" : \"value\" } }";
 	///    Parser parser;
 	///    Var result = parser.parse(json);
-	/// 
+	///
 	///    // use pointers to avoid copying
 	///    Object::Ptr object = result.extract<Object::Ptr>();
 	///    Var test = object->get("test"); // holds { "property" : "value" }
 	///    Object::Ptr subObject = test.extract<Object::Ptr>();
 	///    test = subObject->get("property");
 	///    std::string val = test.toString(); // val holds "value"
-	/// 
+	///
 	///    // copy/convert to Poco::DynamicStruct
 	///    Poco::DynamicStruct ds = *object;
 	///    val = ds["test"]["property"]; // val holds "value"
@@ -70,7 +68,7 @@ public:
 	explicit Object(bool preserveInsertionOrder = false);
 		/// Creates an empty Object.
 		///
-		/// If preserveInsertionOrder, object will preserve the items insertion 
+		/// If preserveInsertionOrder, object will preserve the items insertion
 		/// order. Otherwise, items will be sorted by keys.
 
 	Object(const Object& copy);
@@ -141,7 +139,7 @@ public:
 	Poco::Nullable<T> getNullableValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
-		/// 
+		///
 		/// The convert<T> method of Var is called
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
@@ -203,9 +201,9 @@ public:
 		/// Sets a new value.
 
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
-		/// Prints the object to out stream. 
+		/// Prints the object to out stream.
 		///
-		/// When indent is 0, the object will be printed on a single 
+		/// When indent is 0, the object will be printed on a single
 		/// line without indentation.
 
 	void remove(const std::string& key);

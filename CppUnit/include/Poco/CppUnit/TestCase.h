@@ -131,7 +131,7 @@ protected:
                       long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
                       const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	void assertEquals(const std::string& expected, 
+	void assertEquals(const std::string& expected,
 	                  const std::string& actual,
 	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
@@ -151,7 +151,7 @@ protected:
 	                   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	void assertNull(const void* pointer,  
+	void assertNull(const void* pointer,
 	                const std::string& pointerExpression = "",
 	                long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 	                const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
@@ -185,14 +185,14 @@ inline TestCase::~TestCase()
 // Returns a count of all the tests executed
 inline int TestCase::countTestCases()
 {
-	return 1; 
+	return 1;
 }
 
 
 // Returns the name of the test case
 inline const std::string& TestCase::name() const
 {
-	return _name; 
+	return _name;
 }
 
 
@@ -211,8 +211,8 @@ inline void TestCase::tearDown()
 // Returns the name of the test case instance
 inline std::string TestCase::toString()
 {
-	const std::type_info& thisClass = typeid(*this); 
-	return std::string(thisClass.name()) + "." + name(); 
+	const std::type_info& thisClass = typeid(*this);
+	return std::string(thisClass.name()) + "." + name();
 }
 
 

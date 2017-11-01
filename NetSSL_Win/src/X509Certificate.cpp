@@ -1,8 +1,6 @@
 //
 // X509Certificate.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: Certificate
 // Module:  X509Certificate
@@ -221,7 +219,7 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear(); 
+	domainNames.clear();
 	cmnName = commonName();
 	PCERT_EXTENSION pExt = _pCert->pCertInfo->rgExtension;
 	for (int i = 0; i < _pCert->pCertInfo->cExtension; i++, pExt++)
@@ -235,7 +233,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			Poco::Buffer<char> buffer(256);
 			DWORD bufferSize = static_cast<DWORD>(buffer.sizeBytes());
 			BOOL rc = CryptDecodeObjectEx(
-					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 					pExt->pszObjId,
 					pExt->Value.pbData,
 					pExt->Value.cbData,
@@ -247,7 +245,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			{
 				buffer.resize(bufferSize);
 				rc = CryptDecodeObjectEx(
-					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 					pExt->pszObjId,
 					pExt->Value.pbData,
 					pExt->Value.cbData,
@@ -385,7 +383,7 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	cert_rdn.rgRDNAttr = &cert_rdn_attr;
 
 	_pCert = CertFindCertificateInStore(hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
-	if (!_pCert) 
+	if (!_pCert)
 	{
 		CertCloseStore(hCertStore, 0);
 		throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", certName, certStoreName));
@@ -447,7 +445,7 @@ void X509Certificate::importPEMCertificate(const char* pBuffer, std::size_t size
 	char* derEnd = derBegin;
 
 	int ch = dec.get();
-	while (ch != -1) 
+	while (ch != -1)
 	{
 		*derEnd++ = static_cast<char>(ch);
 		ch = dec.get();

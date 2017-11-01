@@ -37,7 +37,7 @@ class XML_API NodeAppender
 	/// In the DOM, child nodes are usually appended to a parent
 	/// node using the appendChild() method. For nodes containing
 	/// more than a few children, this method can be quite slow,
-	/// due to the way it's implemented, and because of the 
+	/// due to the way it's implemented, and because of the
 	/// requirements of the DOM specification.
 	///
 	/// While the NodeAppender is being used on an Element, no

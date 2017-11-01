@@ -84,7 +84,7 @@ void MailStreamTest::testMailOutputStream()
 	mos << msg;
 	mos.close();
 	std::string s(ostr.str());
-	assert (s == 
+	assert (s ==
 		"From: john.doe@no.domain\r\n"
 		"To: jane.doe@no.domain\r\n"
 		"Subject: test\r\n"

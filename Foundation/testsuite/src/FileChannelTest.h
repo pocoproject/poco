@@ -21,7 +21,7 @@
 class FileChannelTest: public CppUnit::TestCase
 {
 public:
-	enum TimeRotation 
+	enum TimeRotation
 	{
 		DAY_HOUR_MIN = 0,
 		HOUR_MIN,

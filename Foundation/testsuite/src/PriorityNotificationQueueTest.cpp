@@ -25,7 +25,7 @@ using Poco::Thread;
 using Poco::RunnableAdapter;
 
 
-namespace 
+namespace
 {
 	class QTestNotification: public Notification
 	{

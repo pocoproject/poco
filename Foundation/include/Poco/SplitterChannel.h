@@ -43,7 +43,7 @@ public:
 
 	void log(const Message& msg);
 		/// Sends the given Message to all
-		/// attaches channels. 
+		/// attaches channels.
 
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.

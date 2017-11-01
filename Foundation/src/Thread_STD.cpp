@@ -75,7 +75,7 @@ void ThreadImpl::joinImpl()
 	try
 	{
 		_pData->thread->join();
-	} 
+	}
 	catch (std::system_error &e) {
 		throw SystemException(Poco::format("cannot join thread: %s", std::string(e.what())));
 	}

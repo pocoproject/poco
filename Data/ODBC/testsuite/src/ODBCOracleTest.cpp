@@ -41,7 +41,7 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in OraClient12Home1_32bit"//XE"
+#define ORACLE_ODBC_DRIVER "Oracle in OraDB12Home1"//XE"
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
@@ -81,7 +81,7 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"APA=T;" // thread safety (T/F), default T
 	"DBA=W;"; // write access (R/W)
 
-const std::string ODBCOracleTest::MULTI_INSERT = 
+const std::string ODBCOracleTest::MULTI_INSERT =
 	"BEGIN "
 	"INSERT INTO " + ExecUtil::test_tbl() + " VALUES ('1', 2, 3.5);"
 	"INSERT INTO " + ExecUtil::test_tbl() + " VALUES ('2', 3, 4.5);"
@@ -94,7 +94,7 @@ const std::string ODBCOracleTest::MULTI_SELECT =
 	"{CALL multiResultsProcedure()}";
 
 
-ODBCOracleTest::ODBCOracleTest(const std::string& name): 
+ODBCOracleTest::ODBCOracleTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -120,7 +120,7 @@ void ODBCOracleTest::testBarebone()
 	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL);
 	_pExecutor->bareboneODBCTest(_connectString, tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 
-	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() + 
+	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third NUMBER)";
@@ -139,27 +139,27 @@ void ODBCOracleTest::testBarebone()
 			"OPEN ret5 FOR SELECT * FROM " + ExecUtil::test_tbl() + " WHERE First = '5';"
 			"END multiResultsProcedure;" , now;
 
-	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
-		tableCreateString, 
-		SQLExecutor::PB_IMMEDIATE, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString,
+		tableCreateString,
+		SQLExecutor::PB_IMMEDIATE,
 		SQLExecutor::DE_MANUAL,
 		MULTI_INSERT,
 		MULTI_SELECT);
-	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
-		tableCreateString, 
-		SQLExecutor::PB_IMMEDIATE, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString,
+		tableCreateString,
+		SQLExecutor::PB_IMMEDIATE,
 		SQLExecutor::DE_BOUND,
 		MULTI_INSERT,
 		MULTI_SELECT);
-	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
-		tableCreateString, 
-		SQLExecutor::PB_AT_EXEC, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString,
+		tableCreateString,
+		SQLExecutor::PB_AT_EXEC,
 		SQLExecutor::DE_MANUAL,
 		MULTI_INSERT,
 		MULTI_SELECT);
-	_pExecutor->bareboneODBCMultiResultTest(_connectString, 
-		tableCreateString, 
-		SQLExecutor::PB_AT_EXEC, 
+	_pExecutor->bareboneODBCMultiResultTest(_connectString,
+		tableCreateString,
+		SQLExecutor::PB_AT_EXEC,
 		SQLExecutor::DE_BOUND,
 		MULTI_INSERT,
 		MULTI_SELECT);
@@ -176,11 +176,7 @@ void ODBCOracleTest::testInternalExtraction()
 		recreateVectorsTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-#ifdef POCO_64_BIT
-		_pExecutor->internalExtraction<double>(0.);
-#else
-		_pExecutor->internalExtraction(0);
-#endif
+		_pExecutor->internalExtraction();
 		i += 2;
 	}
 }
@@ -197,7 +193,7 @@ void ODBCOracleTest::testBLOB()
 		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&) 
+	catch (DataException&)
 	{
 		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -305,7 +301,7 @@ void ODBCOracleTest::testStoredProcedure()
 		" BEGIN outParam := inParam; "
 		"END storedProcedure;" , now;
 
-	std::string inParam = 
+	std::string inParam =
 		"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 		"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 		"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
@@ -358,6 +354,8 @@ void ODBCOracleTest::testStoredProcedureAny()
 void ODBCOracleTest::testStoredProcedureAnyString()
 {
 	Any sInOut = std::string("Hello");
+	//strings only work with auto-binding
+	session().setFeature("autoBind", true);
 
 	*_pSession << "CREATE OR REPLACE "
 		"PROCEDURE storedProcedure(inParam IN OUT VARCHAR2) IS "
@@ -423,8 +421,8 @@ void ODBCOracleTest::testCursorStoredProcedure()
 			" BEGIN "
 			" OPEN ret FOR "
 			" SELECT * "
-			" FROM " << ExecUtil::person() << 
-			" WHERE Age < ageLimit " 
+			" FROM " << ExecUtil::person() <<
+			" WHERE Age < ageLimit "
 			" ORDER BY Age DESC; "
 			" END storedCursorProcedure;" , now;
 
@@ -493,7 +491,7 @@ void ODBCOracleTest::testStoredFunction()
 		result = 0;
 		*_pSession << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
 		assert(4 == j);
-		assert(j == result); 
+		assert(j == result);
 		dropObject("FUNCTION", "storedFunction");
 
 		*_pSession << "CREATE OR REPLACE "
@@ -508,7 +506,7 @@ void ODBCOracleTest::testStoredFunction()
 		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
-		assert(3 == result); 
+		assert(3 == result);
 		
 		Tuple<int, int> params(1, 2);
 		assert(1 == params.get<0>());
@@ -517,7 +515,7 @@ void ODBCOracleTest::testStoredFunction()
 		*_pSession << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
-		assert(3 == result); 
+		assert(3 == result);
 		dropObject("FUNCTION", "storedFunction");
 		
 		k += 2;
@@ -563,7 +561,7 @@ void ODBCOracleTest::testCursorStoredFunction()
 			" OPEN ret FOR "
 			" SELECT * "
 			" FROM " << ExecUtil::person() <<
-			" WHERE Age < ageLimit " 
+			" WHERE Age < ageLimit "
 			" ORDER BY Age DESC; "
 			" RETURN ret; "
 			" END storedCursorFunction;" , now;
@@ -718,6 +716,15 @@ void ODBCOracleTest::recreatePersonTable()
 }
 
 
+void ODBCOracleTest::recreatePersonUnicodeTable()
+{
+	dropObject("TABLE", ExecUtil::person());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName NVARCHAR2(30), FirstName NVARCHAR2(30), Address NVARCHAR2(30), Age INTEGER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreatePersonUnicodeTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreatePersonUnicodeTable()"); }
+}
+
+
 void ODBCOracleTest::recreatePersonTupleTable()
 {
 	dropObject("TABLE", ExecUtil::person());
@@ -775,10 +782,19 @@ void ODBCOracleTest::recreateStringsTable()
 
 void ODBCOracleTest::recreateFloatsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { *_pSession << "CREATE TABLE " << ExecUtil::strings() <<" (str NUMBER)", now; }
+	dropObject("TABLE", ExecUtil::floats());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::floats() <<" (str NUMBER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
+}
+
+
+void ODBCOracleTest::recreateDoublesTable()
+{
+	dropObject("TABLE", ExecUtil::doubles());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::doubles() << " (str NUMBER)", now; }
+	catch (ConnectionException& ce) { std::cout << ce.toString() << std::endl; fail("recreateFloatsTable()"); }
+	catch (StatementException& se) { std::cout << se.toString() << std::endl; fail("recreateFloatsTable()"); }
 }
 
 
@@ -815,10 +831,13 @@ void ODBCOracleTest::recreateAnysTable()
 void ODBCOracleTest::recreateNullsTable(const std::string& notNull)
 {
 	dropObject("TABLE", ExecUtil::nulltest());
-	try { *_pSession << format("CREATE TABLE %s (i INTEGER %s, r NUMBER %s, v VARCHAR(30) %s)",ExecUtil::nulltest(),
+	try
+	{
+		*_pSession << format("CREATE TABLE %s (i INTEGER %s, r NUMBER %s, v VARCHAR(30) %s)", ExecUtil::nulltest(),
 		notNull,
 		notNull,
-		notNull), now; }
+		notNull), now;
+	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateNullsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateNullsTable()"); }
 }
@@ -827,14 +846,14 @@ void ODBCOracleTest::recreateNullsTable(const std::string& notNull)
 void ODBCOracleTest::recreateMiscTable()
 {
 	dropObject("TABLE", ExecUtil::misctest());
-	try 
-	{ 
+	try
+	{
 		session() << "CREATE TABLE " << ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second BLOB,"
 			"Third INTEGER,"
 			"Fourth NUMBER,"
-			"Fifth TIMESTAMP)", now; 
+			"Fifth TIMESTAMP)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -845,20 +864,20 @@ void ODBCOracleTest::recreateLogTable()
 	dropObject("TABLE", ExecUtil::pocolog());;
 	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(100),"
 			"Name VARCHAR(100),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(100), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(100),"
-			"DateTime TIMESTAMP)"; 
+			"DateTime TIMESTAMP)";
 
-		session() << sql, ExecUtil::pocolog(), now; 
-		session() << sql, ExecUtil::pocolog_a(), now; 
+		session() << sql, ExecUtil::pocolog(), now;
+		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -898,6 +917,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testInsertList);

@@ -122,7 +122,7 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 			else if (fileEntry.getCompressionLevel() == ZipCommon::CL_MAXIMUM)
 				level = Z_BEST_COMPRESSION;
 			// ignore the zlib init string which is of size 2 and also ignore the 4 byte adler32 value at the end of the stream!
-			_ptrOHelper = new PartialOutputStream(*_pOstr, 2, 4, false); 
+			_ptrOHelper = new PartialOutputStream(*_pOstr, 2, 4, false);
 			_ptrOBuf = new Poco::DeflatingOutputStream(*_ptrOHelper, DeflatingStreamBuf::STREAM_ZLIB, level);
 		}
 		else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
@@ -221,7 +221,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 		_pHeader->setCRC(_crc32.checksum());
 		_pHeader->setUncompressedSize(_bytesWritten);
 		_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
-		if (_bytesWritten == 0) 
+		if (_bytesWritten == 0)
 		{
 			poco_assert (_ptrOHelper->bytesWritten() == 0);
 			// Empty files must use CM_STORE, otherwise unzipping will fail
@@ -232,7 +232,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 
 		if (_pHeader->searchCRCAndSizesAfterData())
 		{
-            if (_pHeader->needsZip64()) 
+            if (_pHeader->needsZip64())
             {
 			    ZipDataInfo64 info;
 			    info.setCRC32(_crc32.checksum());
@@ -240,8 +240,8 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 			    info.setCompressedSize(_ptrOHelper->bytesWritten());
                 extraDataSize = info.getFullHeaderSize();
 			    _pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(extraDataSize));
-            } 
-            else 
+            }
+            else
             {
  			    ZipDataInfo info;
 			    info.setCRC32(_crc32.checksum());

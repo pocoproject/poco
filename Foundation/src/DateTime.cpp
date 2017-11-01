@@ -23,19 +23,6 @@
 namespace Poco {
 
 
-inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
-{
-	double utcDays = double(utcTime)/864000000000.0;
-	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
-}
-
-
-inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
-{
-	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
-}
-
-
 DateTime::DateTime()
 {
 	Timestamp now;
@@ -52,7 +39,7 @@ DateTime::DateTime(const Timestamp& rTimestamp):
 	computeDaytime();
 }
 
-	
+
 DateTime::DateTime(int otherYear, int otherMonth, int otherDay, int otherHour, int otherMinute, int otherSecond, int otherMillisecond, int otherMicrosecond):
 	_year(otherYear),
 	_month(otherMonth),
@@ -63,13 +50,15 @@ DateTime::DateTime(int otherYear, int otherMonth, int otherDay, int otherHour, i
 	_millisecond(otherMillisecond),
 	_microsecond(otherMicrosecond)
 {
-	if(isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
+	if (isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
 	{
-		_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) + 10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS + _millisecond*Timespan::MILLISECONDS + _microsecond);
+		_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) +
+			10 * (_hour * Timespan::HOURS + _minute * Timespan::MINUTES + _second * Timespan::SECONDS +
+				_millisecond * Timespan::MILLISECONDS + _microsecond);
 	}
 	else
 	{
-		throw Poco::InvalidArgumentException(Poco::format("Date time is %d-%d-%dT%d:%d:%d:%d:%d\n"
+		throw Poco::InvalidArgumentException(Poco::format("Date time is %d-%d-%dT%d:%d:%d.%d.%d\n"
 			"Valid values:\n"
 			"0 <= year <= 9999\n"
 			"1 <= month <= 12\n"
@@ -255,7 +244,7 @@ int DateTime::week(int firstDayOfWeek) const
 	while (DateTime(_year, 1, baseDay).dayOfWeek() != firstDayOfWeek) ++baseDay;
 
 	int doy  = dayOfYear();
-	int offs = baseDay <= 4 ? 0 : 1; 
+	int offs = baseDay <= 4 ? 0 : 1;
 	if (doy < baseDay)
 		return offs;
 	else
@@ -321,7 +310,7 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 {
 	// lookup table for (153*month - 457)/5 - note that 3 <= month <= 14.
 	static int lookup[] = {-91, -60, -30, 0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337};
- 
+
 	// day to double
 	double dday = double(day) + ((double((hour*60 + minute)*60 + second)*1000 + millisecond)*1000 + microsecond)/86400000000.0;
 	if (month < 3)

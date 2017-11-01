@@ -1,8 +1,6 @@
 //
 // PrintHandler.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  PrintHandler
@@ -205,7 +203,7 @@ void PrintHandler::comma()
 void PrintHandler::arrayValue()
 {
 	if (!_objStart) comma();
-	if (array()) 
+	if (array())
 	{
 		_out << _tab;
 	}

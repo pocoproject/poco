@@ -22,8 +22,8 @@
 namespace Poco {
 
 
-UUID::UUID(): 
-	_timeLow(0), 
+UUID::UUID():
+	_timeLow(0),
 	_timeMid(0),
 	_timeHiAndVersion(0),
 	_clockSeq(0)
@@ -33,7 +33,7 @@ UUID::UUID():
 
 
 UUID::UUID(const UUID& uuid):
-	_timeLow(uuid._timeLow), 
+	_timeLow(uuid._timeLow),
 	_timeMid(uuid._timeMid),
 	_timeHiAndVersion(uuid._timeHiAndVersion),
 	_clockSeq(uuid._clockSeq)
@@ -267,7 +267,7 @@ int UUID::compare(const UUID& uuid) const
 	if (_clockSeq != uuid._clockSeq) return _clockSeq < uuid._clockSeq ? -1 : 1;
 	for (int i = 0; i < sizeof(_node); ++i)
 	{
-		if (_node[i] < uuid._node[i]) 
+		if (_node[i] < uuid._node[i])
 			return -1;
 		else if (_node[i] > uuid._node[i])
 			return 1;	
@@ -276,7 +276,7 @@ int UUID::compare(const UUID& uuid) const
 }
 
 
-void UUID::appendHex(std::string& str, UInt8 n) 
+void UUID::appendHex(std::string& str, UInt8 n)
 {
 	static const char* digits = "0123456789abcdef";
 	str += digits[(n >> 4) & 0xF];

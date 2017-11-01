@@ -72,7 +72,7 @@ public:
 		/// Throws a NotFoundException if the token is not found.
 
 	std::size_t replace(const std::string& oldToken, const std::string& newToken, std::string::size_type pos = 0);
-		/// Starting at position pos, replaces all subsequent tokens having value 
+		/// Starting at position pos, replaces all subsequent tokens having value
 		/// equal to oldToken with newToken.
 		/// Returns the number of modified tokens.
 		

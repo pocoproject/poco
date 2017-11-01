@@ -47,7 +47,7 @@ class Path;
 class Foundation_API File: private FileImpl
 	/// The File class provides methods for working with a file.
 	///
-	/// Regarding paths passed to the various methods, note that 
+	/// Regarding paths passed to the various methods, note that
 	/// platform-specific limitations regarding maximum length
 	/// of the entire path and its components apply.
 	///
@@ -176,13 +176,13 @@ public:
 		/// Does nothing on Windows and OpenVMS.	
 		
 	void copyTo(const std::string& path) const;
-		/// Copies the file (or directory) to the given path. 
+		/// Copies the file (or directory) to the given path.
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
 
 	void moveTo(const std::string& path);
-		/// Copies the file (or directory) to the given path and 
+		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
 		
 	void renameTo(const std::string& path);

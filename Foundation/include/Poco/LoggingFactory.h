@@ -66,13 +66,13 @@ public:
 	Channel* createChannel(const std::string& className) const;
 		/// Creates a new Channel instance from specified class.
 		///
-		/// Throws a NotFoundException if the specified channel class 
+		/// Throws a NotFoundException if the specified channel class
 		/// has not been registered.
 		
 	Formatter* createFormatter(const std::string& className) const;
 		/// Creates a new Formatter instance from specified class.
 		///
-		/// Throws a NotFoundException if the specified formatter class 
+		/// Throws a NotFoundException if the specified formatter class
 		/// has not been registered.
 
 	static LoggingFactory& defaultFactory();

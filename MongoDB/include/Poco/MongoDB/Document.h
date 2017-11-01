@@ -1,8 +1,6 @@
 //
 // Document.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Document
@@ -35,7 +33,7 @@ namespace MongoDB {
 class ElementFindByName
 {
 public:
-	ElementFindByName(const std::string& name): 
+	ElementFindByName(const std::string& name):
 		_name(name)
 	{
 	}

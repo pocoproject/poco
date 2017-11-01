@@ -1,8 +1,6 @@
 //
 // Parser.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Parser
@@ -37,9 +35,9 @@ namespace JSON {
 
 class JSON_API Parser: private ParserImpl
 	/// A parser for reading RFC 4627 compliant JSON from strings or streams.
-	/// 
+	///
 	/// Simple usage example:
-	/// 
+	///
 	///    std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
 	///    Parser parser;
 	///    Var result = parser.parse(json);
@@ -56,7 +54,7 @@ class JSON_API Parser: private ParserImpl
 	/// containing a Poco::SharedPtr to an Object or Array instance.
 	///
 	/// Example:
-	/// 
+	///
 	///    std::string json = "{ \"name\" : \"Franky\", \"children\" : [ \"Jonas\", \"Ellen\" ] }";
 	///    Parser parser;
 	///    Var result = parser.parse(json);
@@ -85,7 +83,7 @@ public:
 		/// By default, comments are not allowed.
 		
 	void setAllowNullByte(bool nullByte);
-		/// Allow or disallow null byte in strings. 
+		/// Allow or disallow null byte in strings.
 		///
 		/// By default, null byte is allowed.
 

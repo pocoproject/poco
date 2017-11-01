@@ -1,8 +1,6 @@
 //
 // Template.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Template
@@ -46,19 +44,19 @@ class JSON_API Template
 	/// conditional output, etc.
 	///
 	/// All text is send to the outputstream. A command is placed
-	/// between 
+	/// between
 	///     <?
-	/// and 
+	/// and
 	///     ?>
 	/// ----
 	///
 	/// These are the available commands:
-	/// 
+	///
 	///     <? echo query ?>
 	/// ----
 	/// The result of the query is send to the output stream
 	/// This command can also be written as <?= query ?>
-	/// 
+	///
 	///     <? if query ?> <? else ?> <? endif ?>
 	/// ----
 	/// When the result of query is true, all the text between
@@ -72,7 +70,7 @@ class JSON_API Template
 	/// ----
 	/// This can be used to check the existence of the value.
 	/// Use this for example when a zero value is ok (which returns false for <? if ?>.
-	/// 
+	///
 	///     <? for variable query ?> <? endfor ?>
 	/// ----
 	/// The result of the query must be an array. For each element

@@ -226,7 +226,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	for (SocketList::iterator it = writeList.begin(); it != writeList.end(); ++it)
 	{
 		SocketList::iterator pos = std::find(begR, endR, *it);
-		if (pos != endR) 
+		if (pos != endR)
 		{
 			pPollArr[pos-begR].events |= POLLOUT;
 			--nfd;
@@ -384,7 +384,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 	}
 	std::swap(exceptList, readyExceptList);	
-	return rc; 
+	return rc;
 
 #endif // POCO_HAVE_FD_EPOLL
 }

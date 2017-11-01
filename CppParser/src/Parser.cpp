@@ -628,7 +628,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 	expectOperator(pNext, OperatorToken::OP_CLOSPARENT, ")");
 	pNext = next();
 	while (pNext->is(Poco::Token::IDENTIFIER_TOKEN) || pNext->is(Poco::Token::KEYWORD_TOKEN))
-	{ 
+	{
 		if (isKeyword(pNext, IdentifierToken::KW_CONST))
 		{
 			if (pFunc) pFunc->makeConst();
@@ -636,7 +636,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 		}
 		if (isKeyword(pNext, IdentifierToken::KW_THROW))
 		{
-			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) && 
+			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) &&
 				   !isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
 				pNext = next();
 		}

@@ -10,11 +10,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -48,7 +48,7 @@
 *
 *******************************************************************************/
 
-void wceex_splitpath( const char *path, 
+void wceex_splitpath( const char *path,
                       char *drive, char *dir, char *name, char *ext )
 {
     char *slash, *bslash;
@@ -107,7 +107,7 @@ void wceex_splitpath( const char *path,
 *
 *******************************************************************************/
 
-void wceex_wsplitpath( const wchar_t *path, 
+void wceex_wsplitpath( const wchar_t *path,
                        wchar_t *drive, wchar_t *dir, wchar_t *name, wchar_t *ext )
 {
     wchar_t *slash, *bslash;
@@ -306,7 +306,7 @@ void wceex_wmakepath( wchar_t *path,
 *
 *******************************************************************************/
 
-DWORD wceex_GetFullPathNameW( LPCWSTR lpFileName, DWORD nBufferLength, 
+DWORD wceex_GetFullPathNameW( LPCWSTR lpFileName, DWORD nBufferLength,
                               LPWSTR lpBuffer, LPWSTR *lpFilePart )
 {
     int up = 0, down = 0;
@@ -462,8 +462,8 @@ char* wceex_fullpath( char *absPath, const char *relPath, size_t maxLength )
         *absPath = 0;
         return NULL;
     }
-    wret = wceex_wfullpath( wabsPath, wrelPath, maxLength ); 
-    if( wret && !WideCharToMultiByte( CP_ACP, 0, wabsPath, -1, absPath, 
+    wret = wceex_wfullpath( wabsPath, wrelPath, maxLength );
+    if( wret && !WideCharToMultiByte( CP_ACP, 0, wabsPath, -1, absPath,
                                       maxLength, NULL, NULL ) )
     {
         errno = GetLastError();
