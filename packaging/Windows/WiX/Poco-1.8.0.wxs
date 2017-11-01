@@ -945,26 +945,6 @@
                     <?endif ?>
                 </Directory>
                 <Directory Id="inc" Name="inc">
-                    <Directory Id="CPPUNIT" Name="PocoCppUnit">
-                        <Component Win64="$(var.Win64)" Id="PocoCppUnit.inc" DiskId="1" Guid="5017FEC1-DCF7-4454-AA28-C8678509E585">
-                            <File Id="CPPUNIT.H" Name="CppUnit.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\CppUnit.h" />
-                            <File Id="CPPUNITEXCEPTION.H" Name="CppUnitException.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\CppUnitException.h" />
-                            <File Id="ESTRING.H" Name="estring.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\estring.h" />
-                            <File Id="GUARDS.H" Name="Guards.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\Guards.h" />
-                            <File Id="ORTHODOX.H" Name="Orthodox.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\Orthodox.h" />
-                            <File Id="REPEATEDTEST.H" Name="RepeatedTest.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\RepeatedTest.h" />
-                            <File Id="TEST.H" Name="Test.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\Test.h" />
-                            <File Id="TESTCALLER.H" Name="TestCaller.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestCaller.h" />
-                            <File Id="TESTCASE.H" Name="TestCase.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestCase.h" />
-                            <File Id="TESTDECORATOR.H" Name="TestDecorator.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestDecorator.h" />
-                            <File Id="TESTFAILURE.H" Name="TestFailure.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestFailure.h" />
-                            <File Id="TESTRESULT.H" Name="TestResult.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestResult.h" />
-                            <File Id="TESTRUNNER.H" Name="TestRunner.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestRunner.h" />
-                            <File Id="TESTSETUP.H" Name="TestSetup.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestSetup.h" />
-                            <File Id="TESTSUITE.H" Name="TestSuite.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TestSuite.h" />
-                            <File Id="TEXTTESTRESULT.H" Name="TextTestResult.h" Source="$(var.POCO)\CppUnit\include\Poco\CppUnit\TextTestResult.h" />
-                        </Component>
-                    </Directory>
                     <Directory Id="POCO" Name="Poco">
                         <Component Win64="$(var.Win64)" Id="Poco.inc" DiskId="1" Guid="2446CCCB-43D3-49D6-B55E-840F2053B301">
                             <File Id="ABSTRACTCACHE.H" Name="AbstractCache.h" Source="$(var.POCO)\Foundation\include\Poco\AbstractCache.h" />
@@ -3310,7 +3290,6 @@
             </Feature>
             <Feature Id="Development" Level="1" Title="Development" Description="Development files" TypicalDefault="advertise" Display="expand">
                 <Feature Id="Includes" Level="1" Description="Includes" Title="Includes" InstallDefault="followParent">
-                    <ComponentRef Id="PocoCppUnit.inc" />
                     <ComponentRef Id="Poco.inc" />
                     <ComponentRef Id="Poco.Dynamic.inc" />
                     <ComponentRef Id="Poco.CppParser.inc" />
