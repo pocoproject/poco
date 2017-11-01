@@ -175,7 +175,7 @@ void HTTPServerAsyncConnection::run()
 		try
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
-			if (!_stopped && _session.hasInData() || _session.hasOutData())
+			if (!_stopped && (_session.hasInData() || _session.hasOutData()))
 			{
 				HTTPServerResponseImpl response(_session);
 				HTTPServerRequestImpl request(response, _session, _pParams);
