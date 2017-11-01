@@ -30,7 +30,6 @@
 		<file src='Data\MySQL\include\**' 			target='build\native\inc' />
 		<file src='Data\ODBC\include\**' 			target='build\native\inc' />
 		<file src='Data\SQLite\include\**' 			target='build\native\inc' />
-		<file src='Data\PostgreSQL\include\**' 		target='build\native\inc' />
 		<file src='Foundation\include\**' 			target='build\native\inc' />
 		<file src='JSON\include\**' 				target='build\native\inc' />
 		<file src='MongoDB\include\**' 				target='build\native\inc' />
@@ -38,7 +37,6 @@
 		<file src='NetSSL_OpenSSL\include\**' 		target='build\native\inc' />
 		<file src='NetSSL_Win\include\**' 			target='build\native\inc' />
 		<file src='PDF\include\**' 					target='build\native\inc' />
-		<file src='Redis\include\**' 				target='build\native\inc' />
 		<file src='Util\include\**' 				target='build\native\inc' />
 		<file src='XML\include\**' 					target='build\native\inc' />
 		<file src='Zip\include\**' 					target='build\native\inc' />
