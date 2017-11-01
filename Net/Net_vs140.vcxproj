@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
+    <_ProjectFileVersion>14.0.25420.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoNetd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetmtd</TargetName>
@@ -352,6 +352,7 @@
     <ClInclude Include="include\Poco\Net\PartHandler.h"/>
     <ClInclude Include="include\Poco\Net\PartSource.h"/>
     <ClInclude Include="include\Poco\Net\PartStore.h"/>
+    <ClInclude Include="include\Poco\Net\PollSet.h"/>
     <ClInclude Include="include\Poco\Net\POP3ClientSession.h"/>
     <ClInclude Include="include\Poco\Net\QuotedPrintableDecoder.h"/>
     <ClInclude Include="include\Poco\Net\QuotedPrintableEncoder.h"/>
@@ -456,6 +457,7 @@
     <ClCompile Include="src\PartHandler.cpp"/>
     <ClCompile Include="src\PartSource.cpp"/>
     <ClCompile Include="src\PartStore.cpp"/>
+    <ClCompile Include="src\PollSet.cpp"/>
     <ClCompile Include="src\POP3ClientSession.cpp"/>
     <ClCompile Include="src\QuotedPrintableDecoder.cpp"/>
     <ClCompile Include="src\QuotedPrintableEncoder.cpp"/>

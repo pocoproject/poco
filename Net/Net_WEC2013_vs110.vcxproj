@@ -273,6 +273,7 @@
     <ClInclude Include="include\Poco\Net\DatagramSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\DialogSocket.h"/>
     <ClInclude Include="include\Poco\Net\MulticastSocket.h"/>
+    <ClInclude Include="include\Poco\Net\PollSet.h"/>
     <ClInclude Include="include\Poco\Net\RawSocket.h"/>
     <ClInclude Include="include\Poco\Net\RawSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\ServerSocket.h"/>
@@ -379,6 +380,7 @@
     <ClCompile Include="src\DatagramSocketImpl.cpp"/>
     <ClCompile Include="src\DialogSocket.cpp"/>
     <ClCompile Include="src\MulticastSocket.cpp"/>
+    <ClCompile Include="src\PollSet.cpp"/>
     <ClCompile Include="src\RawSocket.cpp"/>
     <ClCompile Include="src\RawSocketImpl.cpp"/>
     <ClCompile Include="src\ServerSocket.cpp"/>

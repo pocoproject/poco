@@ -453,6 +453,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\MulticastSocket.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\PollSet.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\RawSocket.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\RawSocketImpl.h"/>
@@ -481,6 +483,8 @@
 					RelativePath=".\src\DialogSocket.cpp"/>
 				<File
 					RelativePath=".\src\MulticastSocket.cpp"/>
+				<File
+					RelativePath=".\src\PollSet.cpp"/>
 				<File
 					RelativePath=".\src\RawSocket.cpp"/>
 				<File

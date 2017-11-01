@@ -348,6 +348,7 @@
     <ClInclude Include="src\OAuth10CredentialsTest.h"/>
     <ClInclude Include="src\OAuth20CredentialsTest.h"/>
     <ClInclude Include="src\OAuthTestSuite.h"/>
+    <ClInclude Include="src\PollSetTest.h"/>
     <ClInclude Include="src\POP3ClientSessionTest.h"/>
     <ClInclude Include="src\QuotedPrintableTest.h"/>
     <ClInclude Include="src\RawSocketTest.h"/>
@@ -411,6 +412,7 @@
     <ClCompile Include="src\OAuth10CredentialsTest.cpp"/>
     <ClCompile Include="src\OAuth20CredentialsTest.cpp"/>
     <ClCompile Include="src\OAuthTestSuite.cpp"/>
+    <ClCompile Include="src\PollSetTest.cpp"/>
     <ClCompile Include="src\POP3ClientSessionTest.cpp"/>
     <ClCompile Include="src\QuotedPrintableTest.cpp"/>
     <ClCompile Include="src\RawSocketTest.cpp"/>

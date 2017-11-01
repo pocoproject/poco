@@ -319,6 +319,7 @@
     <ClInclude Include="src\EchoServer.h"/>
     <ClInclude Include="src\MulticastEchoServer.h"/>
     <ClInclude Include="src\MulticastSocketTest.h"/>
+    <ClInclude Include="src\PollSetTest.h"/>
     <ClInclude Include="src\RawSocketTest.h"/>
     <ClInclude Include="src\SocketsTestSuite.h"/>
     <ClInclude Include="src\SocketStreamTest.h"/>
@@ -382,6 +383,7 @@
     <ClCompile Include="src\EchoServer.cpp"/>
     <ClCompile Include="src\MulticastEchoServer.cpp"/>
     <ClCompile Include="src\MulticastSocketTest.cpp"/>
+    <ClCompile Include="src\PollSetTest.cpp"/>
     <ClCompile Include="src\RawSocketTest.cpp"/>
     <ClCompile Include="src\SocketsTestSuite.cpp"/>
     <ClCompile Include="src\SocketStreamTest.cpp"/>
