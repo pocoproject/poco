@@ -21,6 +21,16 @@
 .gradle/
 gradle/
 
+# NuGet #
+#########
+*.nupkg
+
+# WiX #
+#######
+*.msi
+*.wixobj
+*.wixpdb
+
 # Make #
 ########
 config.build
