@@ -23,7 +23,7 @@ namespace Zip {
 bool ZipCommon::isValidPath(const std::string& path)
 {
 
-	if (!Path(path).isRelative())
+	if (!Path(path).isRelative() || !Path(path, Path::PATH_WINDOWS).isRelative())
 		return false;
 	if (path == "..")
 		return false;
