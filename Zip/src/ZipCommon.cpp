@@ -22,9 +22,16 @@ namespace Zip {
 
 bool ZipCommon::isValidPath(const std::string& path)
 {
-
-	if (!Path(path).isRelative() || !Path(path, Path::PATH_WINDOWS).isRelative())
+	try
+	{
+		if (Path(path, Path::PATH_UNIX).isAbsolute() || Path(path, Path::PATH_WINDOWS).isAbsolute())
+			return false;
+	}
+	catch (...)
+	{
 		return false;
+	}
+
 	if (path == "..")
 		return false;
 	if ((path.size() >= 3) && path.compare(0, 3, "../") == 0)
@@ -41,8 +48,7 @@ bool ZipCommon::isValidPath(const std::string& path)
 		return false;
 	if ((path.size() >= 2) && path.compare(0, 2, "~/") == 0)
 		return false;
-	if (path.size() > 0 && (path[0] == '/' || path[0] == '\\'))
-		return false;
+
 	return true;
 }
 
