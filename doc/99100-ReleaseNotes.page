@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.7.9p1
+
+!!Summary of Changes
+
+  - fixed GH# 1968: Zip Decompress Parent Path Injection
+
+
 !!!Release 1.7.9
 
 !!Summary of Changes
