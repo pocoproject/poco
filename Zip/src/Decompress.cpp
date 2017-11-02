@@ -80,7 +80,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		{
 			std::string dirName = hdr.getFileName();
 			if (!ZipCommon::isValidPath(dirName))
-				throw ZipException("Illegal entry name " + dirName);
+				throw ZipException("Illegal entry name", dirName);
 			Poco::Path dir(_outDir, dirName);
 			dir.makeDirectory();
 			Poco::File aFile(dir);
@@ -100,7 +100,7 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		}
 
 		if (!ZipCommon::isValidPath(fileName))
-			throw ZipException("Illegal entry name " + fileName);
+			throw ZipException("Illegal entry name", fileName);
 
 		Poco::Path file(fileName);
 		file.makeFile();
