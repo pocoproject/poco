@@ -18,8 +18,8 @@
 				CppUnitException.h,
 				Constants.h,
 				inffast.h,
-				${PocoBuild}/PDF/include/*.h,
-				${PocoBuild}/CppParser/include/*.h
+				PDF/include/*.h,
+				CppParser/include/*.h
 			</exclude>
 		</files>
 		<pages>
