@@ -138,9 +138,7 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length)
-#ifndef POCO_HAVE_ALIGNMENT
 	: _pImpl(0)
-#endif
 {
 	if (length == sizeof(struct in_addr))
 		newIPv4(addr);
@@ -188,9 +186,7 @@ IPAddress::IPAddress(unsigned prefix, Family family)
 
 #if defined(_WIN32)
 IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
-#ifndef POCO_HAVE_ALIGNMENT
 	: _pImpl(0)
-#endif
 {
 	ADDRESS_FAMILY family = socket_address.lpSockaddr->sa_family;
 	if (family == AF_INET)
@@ -221,7 +217,6 @@ IPAddress::IPAddress(const struct sockaddr& sockaddr)
 
 IPAddress::~IPAddress()
 {
-	destruct();
 }
 
 
@@ -229,7 +224,6 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 {
 	if (&addr != this)
 	{
-		destruct();
 		if (addr.family() == IPAddress::IPv4)
 			newIPv4(addr.addr());
 #if defined(POCO_HAVE_IPv6)
