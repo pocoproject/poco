@@ -107,7 +107,6 @@ cp ${POCO_BASE}/CMakeLists.txt ${target}
 mkdir -p ${target}/build/config
 mkdir -p ${target}/build/rules
 mkdir -p ${target}/build/script
-mkdir -p ${target}/build/vms
 mkdir -p ${target}/build/vxconfig
 
 cp ${POCO_BASE}/build/config/* ${target}/build/config
@@ -145,9 +144,9 @@ cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.vcxproj.user ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vmsbuild ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.vxbuild ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/CMakeLists.txt ${target}/CppUnit >/dev/null 2>&1
 
 cp ${POCO_BASE}/CppUnit/WinTestRunner/include/WinTestRunner/* ${target}/CppUnit/WinTestRunner/include/WinTestRunner >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/WinTestRunner/src/* ${target}/CppUnit/WinTestRunner/src >/dev/null 2>&1
@@ -158,6 +157,7 @@ cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj ${target}/CppUnit/WinTestRunner 
 cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.filters ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.user ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/WinTestRunner/*.progen ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/CMakeLists.txt ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 
 
 #
