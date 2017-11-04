@@ -824,7 +824,7 @@ std::string MailMessage::decodeWord(const std::string& charset,
 	TextEncoding* fromEnc = registry.find(charset);
 	TextEncoding* toEnc = registry.find(toCharset);
 
-	std::string tmpStr, decoded;
+	std::string decoded;
 	switch (encoding)
 	{
 	case 'B': case 'b':
@@ -836,13 +836,7 @@ std::string MailMessage::decodeWord(const std::string& charset,
 		std::vector<unsigned char> wideCharSeq;
 		for (const auto& c : text)
 		{
-			/*if (!Ascii::isPrintable(c) || Ascii::isSpace(c) || c == '?')
-			{
-				throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: "
-					"invalid character found in encoded-word: %X", (unsigned)c));
-			}*/
-
-			if      (c == '_') tmpStr.append(1, ' ');
+			if      (c == '_') decoded.append(1, ' ');
 			else if (c == '=') isWide = true;
 			else if (isWide)
 			{
@@ -858,7 +852,7 @@ std::string MailMessage::decodeWord(const std::string& charset,
 						auto end = wideCharSeq.end();
 						for (; it != end; ++it)
 						{
-							tmpStr.append(1, static_cast<char>(*it));
+							decoded.append(1, static_cast<char>(*it));
 						}
 						wideChar.clear();
 						wideCharSeq.clear();
@@ -866,16 +860,21 @@ std::string MailMessage::decodeWord(const std::string& charset,
 					}
 				}
 			}
-			else tmpStr.append(1, c);
+			else decoded.append(1, c);
 		}
 		break;
 	}
 	default:
 		throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: Unknown encoding: %c", encoding));
 	}
-	TextConverter converter(*fromEnc, *toEnc);
-	converter.convert(tmpStr, decoded);
-	return decoded;
+	if (charset != toCharset)
+	{
+		TextConverter converter(*fromEnc, *toEnc);
+		std::string converted;
+		converter.convert(decoded, converted);
+		return std::move(converted);
+	}
+	return std::move(decoded);
 }
 
 
