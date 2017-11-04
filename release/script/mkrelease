@@ -27,7 +27,7 @@ output=""
 lineEndConv=""
 licensingDep=""
 
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-i" ] ; then
 		shift
@@ -109,7 +109,6 @@ cp ${POCO_BASE}/CMakeLists.txt ${target}
 mkdir -p ${target}/build/config
 mkdir -p ${target}/build/rules
 mkdir -p ${target}/build/script
-mkdir -p ${target}/build/vms
 mkdir -p ${target}/build/vxconfig
 
 cp ${POCO_BASE}/build/config/* ${target}/build/config
@@ -151,9 +150,9 @@ cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.vcxproj.user ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vmsbuild ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.vxbuild ${target}/CppUnit >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/CMakeLists.txt ${target}/CppUnit >/dev/null 2>&1
 
 cp ${POCO_BASE}/CppUnit/WinTestRunner/include/WinTestRunner/* ${target}/CppUnit/WinTestRunner/include/WinTestRunner >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/WinTestRunner/src/* ${target}/CppUnit/WinTestRunner/src >/dev/null 2>&1
@@ -164,6 +163,7 @@ cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj ${target}/CppUnit/WinTestRunner 
 cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.filters ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/WinTestRunner/*.vcxproj.user ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 cp ${POCO_BASE}/CppUnit/WinTestRunner/*.progen ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/WinTestRunner/CMakeLists.txt ${target}/CppUnit/WinTestRunner >/dev/null 2>&1
 
 
 #
@@ -279,7 +279,7 @@ endif
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
-poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples) 
+poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
@@ -290,7 +290,7 @@ echo "COMPONENTS = $comps" >>${target}/Makefile
 cat >>${target}/Makefile <<'ENDOFSCRIPT'
 
 cppunit:
-	$(MAKE) -C $(POCO_BASE)/CppUnit 
+	$(MAKE) -C $(POCO_BASE)/CppUnit
 
 CppUnit-clean:
 	$(MAKE) -C $(POCO_BASE)/CppUnit clean
@@ -362,20 +362,20 @@ do
 			dependencies="$dependencies ${dep}-libexec"
 		done
 	fi
-	cat >>${target}/Makefile <<ENDOFSCRIPT 
+	cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-libexec: $dependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}
 ENDOFSCRIPT
 
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-tests: ${comp}-libexec cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
 ENDOFSCRIPT
 	fi
-	
+
 	if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
 		sdependencies=""
 		if [ -f "${POCO_BASE}/${comp}/samples/dependencies" ] ; then
@@ -386,8 +386,8 @@ ENDOFSCRIPT
 				sdependencies="$sdependencies ${dep}-libexec"
 			done
 		fi
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
-	
+		cat >>${target}/Makefile <<ENDOFSCRIPT
+
 ${comp}-samples: ${comp}-libexec $sdependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples
 ENDOFSCRIPT
@@ -400,13 +400,13 @@ ${comp}-clean:
 ENDOFSCRIPT
 
 	if [ -f "${POCO_BASE}/${comp}/testsuite/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite clean
 ENDOFSCRIPT
 	fi
 
 	if [ -f "${POCO_BASE}/${comp}/samples/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples clean
 ENDOFSCRIPT
 	fi
@@ -533,13 +533,13 @@ fi
 if [ "$output" = "" ] ; then
 	cd releases
 	find ${target}/ -print | sed "s:^${target}/*::" >${target}/MANIFEST
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	gzip poco-${version}.tar
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	bzip2 poco-${version}.tar
-	
+
 	if [ -x /usr/bin/zip ] ; then
 		/usr/bin/zip -r -q poco-${version}.zip poco-${version}
 	fi
