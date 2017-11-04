@@ -20,12 +20,15 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/String.h"
+#include "Poco/RWLock.h"
+#include <map>
 
 
 namespace Poco {
 
 
-class TextEncodingManager;
+class Foundation_API TextEncodingRegistry;
 
 
 class Foundation_API TextEncoding
@@ -170,10 +173,44 @@ public:
 
 	static const std::string GLOBAL;
 		/// Name of the global TextEncoding, which is the empty string.
-		
+
+	static const TextEncodingRegistry& registry();
+		/// Returns the TextEncodingRegistry.
+
 protected:
-	static TextEncodingManager& manager();
-		/// Returns the TextEncodingManager.
+	static TextEncodingRegistry* registry(int);
+		/// Returns the TextEncodingRegistry.
+};
+
+
+class Foundation_API TextEncodingRegistry
+{
+public:
+	TextEncodingRegistry();
+
+	~TextEncodingRegistry();
+
+	bool has(const std::string& name) const;
+		// Returns true if requested encoding is found.
+		// it will eturn true for both canonical and
+		// alternative encoding name.
+
+	void add(TextEncoding::Ptr pEncoding);
+
+	void add(TextEncoding::Ptr pEncoding, const std::string& name);
+
+	void remove(const std::string& name);
+
+	TextEncoding::Ptr find(const std::string& name) const;
+
+private:
+	TextEncodingRegistry(const TextEncodingRegistry&);
+	TextEncodingRegistry& operator = (const TextEncodingRegistry&);
+
+	typedef std::map<std::string, TextEncoding::Ptr, CILess> EncodingMap;
+
+	EncodingMap    _encodings;
+	mutable RWLock _lock;
 };
 
 

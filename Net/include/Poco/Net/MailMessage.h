@@ -250,7 +250,7 @@ public:
 	static MailMessage decodeWords(const MailMessage& msg);
 		/// Decodes a MailMessage
 
-	static std::string decodeWord(const std::string& encodedWord);
+	static std::string decodeWord(const std::string& encodedWord, std::string toCharset = "");
 		/// Decodes an encoded-word.
 
 	static const std::string HEADER_SUBJECT;
@@ -286,7 +286,10 @@ protected:
 	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
-	static std::string decodeWord(const std::string& charset, const std::string& encoding, const std::string& text);
+	static std::string decodeWord(const std::string& charset, char encoding,
+		const std::string& text, const std::string& toCharset);
+	static void getEncWordLimits(const std::string& encodedWord,
+		std::string::size_type& pos1, std::string::size_type& pos2);
 
 private:
 	MailMessage(const MailMessage&);

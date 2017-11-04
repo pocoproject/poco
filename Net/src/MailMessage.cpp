@@ -33,6 +33,10 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/TextConverter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Ascii.h"
 #include <sstream>
 
 
@@ -43,6 +47,11 @@ using Poco::DateTimeFormat;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeParser;
 using Poco::StringTokenizer;
+using Poco::TextEncoding;
+using Poco::TextEncodingRegistry;
+using Poco::TextConverter;
+using Poco::NumberParser;
+using Poco::Ascii;
 using Poco::icompare;
 
 
@@ -740,48 +749,132 @@ MailMessage MailMessage::decodeWords(const MailMessage& msg)
 }
 
 
-std::string MailMessage::decodeWord(const std::string& encodedWord)
+std::string MailMessage::decodeWord(const std::string& encodedWord, std::string toCharset)
 {
+	std::string errMsg;
+	const std::size_t notFound = std::string::npos;
 	std::string decoded;
-	std::string::size_type pos1 = encodedWord.find("=?"); // beginning of encodedWord-word
-	if (pos1 != encodedWord.npos)
+	std::string::size_type pos1, pos2;
+	getEncWordLimits(encodedWord, pos1, pos2);
+	while ((pos1 != notFound) && (pos2 != notFound) && pos2 > pos1 + 2)
 	{
-		std::string::size_type pos2 = encodedWord.find("?="); // end of encodedWord-word
-		if (pos2 != encodedWord.npos)
+		pos1 += 2;
+		StringTokenizer st(encodedWord.substr(pos1, pos2 - pos1), "?");
+		if (st.count() == 3)
 		{
-			while ((pos1 != encodedWord.npos) && (pos2 != encodedWord.npos))
+			std::string charset = st[0];
+			if (toCharset.empty()) toCharset = charset;
+			if (st[1].size() > 1)
 			{
-				StringTokenizer st(encodedWord.substr(pos1, pos2 - pos1), "?");
-				if (st.count() == 3)
-				{
-					std::string charset = st[0];
-					std::string encoding = st[1];
-					std::string encodedText = st[2];
-					if (encodedText.find_first_of(" ?") != encodedText.npos)
-					{
-						throw InvalidArgumentException("MailMessage::decodeWord: "
-							"forbidden characters found in encodedWord-word");
-					}
-					decodeWord(charset, encoding, encodedText);
-				}
-				else
-				{
-					throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: "
-						"invalid number of entries in encodedWord-word (expected 3, found %z)", st.count()));
-				}
+				throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: "
+					"invalid encoding %s", st[1]));
 			}
+			char encoding = st[1][0];
+			std::string encodedText = st[2];
+			if (encodedText.find_first_of(" ?") != notFound)
+			{
+				throw InvalidArgumentException("MailMessage::decodeWord: "
+					"forbidden characters found in encoded-word");
+			}
+			decoded.append(decodeWord(charset, encoding, encodedText, toCharset));
+			pos1 = pos2 + 2;
+			pos1 = encodedWord.find("=?", pos1);
+			if (pos1 != notFound) pos2 = encodedWord.find("?=", pos1);
 		}
-		else throw InvalidArgumentException("MailMessage::decodeWord: end of encodedWord-word not found");
+		else
+		{
+			throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: "
+				"invalid number of entries in encoded-word (expected 3, found %z)", st.count()));
+		}
 	}
-	else decoded = encodedWord;
 	return decoded;
 }
 
 
-std::string MailMessage::decodeWord(const std::string& charset,
-	const std::string& encoding, const std::string& text)
+void MailMessage::getEncWordLimits(const std::string& encodedWord, std::string::size_type& pos1, std::string::size_type& pos2)
 {
-	std::string decoded;
+	const std::size_t notFound = std::string::npos;
+	pos1 = encodedWord.find("=?"); // beginning of encoded-word
+	if (pos1 != notFound)
+	{
+		// must look for all '?' occurences because of a case like this:
+		//   =?ISO-8859-1?q?=C4?=
+		// where end would be prematurely found if we search for ?= only
+		pos2 = encodedWord.find('?', pos1 + 2); // first '?'
+		if (pos2 == notFound)  goto err;
+		pos2 = encodedWord.find('?', pos2 + 1); // second '?'
+		if (pos2 == notFound) goto err;
+		pos2 = encodedWord.find("?=", pos2 + 1); // end of encoded-word
+	}
+	return;
+err:
+	throw InvalidArgumentException("MailMessage::encodedWordLimits: invalid encoded word");
+}
+
+
+std::string MailMessage::decodeWord(const std::string& charset,
+	char encoding, const std::string& text, const std::string& toCharset)
+{
+	const TextEncodingRegistry& registry = TextEncoding::registry();
+	if (!registry.has(charset) || !registry.has(toCharset))
+	{
+		throw NotImplementedException(Poco::format("MailMessage::decodeWord: "
+			"charset not supported: %s", charset));
+	}
+	TextEncoding* fromEnc = registry.find(charset);
+	TextEncoding* toEnc = registry.find(toCharset);
+
+	std::string tmpStr, decoded;
+	switch (encoding)
+	{
+	case 'B': case 'b':
+		break;
+	case 'Q': case 'q':
+	{
+		bool isWide = false;
+		std::vector<char> wideChar;
+		std::vector<unsigned char> wideCharSeq;
+		for (const auto& c : text)
+		{
+			/*if (!Ascii::isPrintable(c) || Ascii::isSpace(c) || c == '?')
+			{
+				throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: "
+					"invalid character found in encoded-word: %X", (unsigned)c));
+			}*/
+
+			if      (c == '_') tmpStr.append(1, ' ');
+			else if (c == '=') isWide = true;
+			else if (isWide)
+			{
+				wideChar.push_back(c);
+				if (wideChar.size() % 2 == 0)
+				{
+					std::string wcStr(&wideChar[0], wideChar.size());
+					unsigned char chr = NumberParser::parseHex(wcStr);
+					wideCharSeq.push_back(chr);
+					if (fromEnc->sequenceLength(&wideCharSeq[0], static_cast<int>(wideCharSeq.size())) > 0)
+					{
+						auto it = wideCharSeq.begin();
+						auto end = wideCharSeq.end();
+						for (; it != end; ++it)
+						{
+							tmpStr.append(1, static_cast<char>(*it));
+						}
+						wideChar.clear();
+						wideCharSeq.clear();
+						isWide = false;
+					}
+				}
+			}
+			else tmpStr.append(1, c);
+		}
+		break;
+	}
+	default:
+		throw InvalidArgumentException(Poco::format("MailMessage::decodeWord: Unknown encoding: %c", encoding));
+	}
+	TextConverter converter(*fromEnc, *toEnc);
+	converter.convert(tmpStr, decoded);
 	return decoded;
 }
 
