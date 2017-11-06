@@ -25,17 +25,25 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
 )
 
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
-add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
-set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # The SharedLibaryTest has to look for shared libraries in the working directory
+if(ANDROID)
+    add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
+           COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;TestApp" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/${TESTUNIT} -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
+else()
+    add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
+    set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # The SharedLibaryTest has to look for shared libraries in the working directory
+    # The test is run in the runtime directory. So the test data is copied there too
+    add_custom_command(TARGET ${TESTUNIT} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data )
+endif()
 
 target_link_libraries( ${TESTUNIT} PocoFoundation CppUnit )
-if(UNIX)
+if(UNIX AND NOT ANDROID)
     target_link_libraries( ${TESTUNIT} pthread)
-endif(UNIX)
+endif(UNIX AND NOT ANDROID)
 
-# The test is run in the runtime directory. So the test data is copied there too
-add_custom_command(TARGET ${TESTUNIT} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data )
+if(ENABLE_LONG_RUNNING_TESTS)
+  target_compile_definitions( ${TESTUNIT} PRIVATE ENABLE_LONG_RUNNING_TESTS)
+endif(ENABLE_LONG_RUNNING_TESTS)
 
 # TestApp
 if(WINCE)
