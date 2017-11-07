@@ -21,9 +21,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/IPAddress.h"
-#ifndef POCO_HAVE_ALIGNMENT
 #include "Poco/RefCountedObject.h"
-#endif
 
 
 namespace Poco {
@@ -31,10 +29,7 @@ namespace Net {
 namespace Impl {
 
 
-class Net_API SocketAddressImpl
-#ifndef POCO_HAVE_ALIGNMENT
-	: public Poco::RefCountedObject
-#endif
+class Net_API SocketAddressImpl : public Poco::RefCountedObject
 {
 public:
 	typedef AddressFamily::Family Family;
