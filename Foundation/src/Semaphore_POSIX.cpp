@@ -24,12 +24,12 @@
 
 //
 // Note: pthread_cond_timedwait() with CLOCK_MONOTONIC is supported
-// on Linux and QNX, as well as on Android >= 5.0. On Android < 5.0,
-// HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC is defined to indicate
-// availability of non-standard pthread_cond_timedwait_monotonic().
+// on Linux and QNX, as well as on Android >= 5.0 (API level 21).
+// On Android < 5.0, HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC is defined
+// to indicate availability of non-standard pthread_cond_timedwait_monotonic().
 //
 #ifndef POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT
-	#if (defined(__linux__) || defined(__QNX__)) && !(defined(__ANDROID__) && defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC))
+	#if (defined(__linux__) || defined(__QNX__)) && !(defined(__ANDROID__) && (defined(HAVE_PTHREAD_COND_TIMEDWAIT_MONOTONIC) || __ANDROID_API__ <= 21))
 		#define POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT 1
 	#endif
 #endif
