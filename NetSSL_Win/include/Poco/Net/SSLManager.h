@@ -1,8 +1,6 @@
 //
 // SSLManager.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager

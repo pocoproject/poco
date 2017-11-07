@@ -14,7 +14,7 @@ namespace CppUnit {
 
 
 TestRunner::TestRunner():
-	_ostr(std::clog)
+	_ostr(std::cout)
 {
 }
 

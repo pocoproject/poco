@@ -55,13 +55,13 @@ WebSocketImpl::~WebSocketImpl()
 	}
 }
 
-	
+
 int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	Poco::Buffer<char> frame(length + MAX_HEADER_LENGTH);
 	Poco::MemoryOutputStream ostr(frame.begin(), frame.size());
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
-	
+
 	if (flags == 0) flags = WebSocket::FRAME_BINARY;
 	flags &= 0xff;
 	writer << static_cast<Poco::UInt8>(flags);
@@ -105,7 +105,7 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	return length;
 }
 
-	
+
 int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 {
 	char header[MAX_HEADER_LENGTH];
@@ -318,7 +318,7 @@ void WebSocketImpl::shutdownSend()
 	_pStreamSocketImpl->shutdownSend();
 }
 
-	
+
 void WebSocketImpl::shutdown()
 {
 	_pStreamSocketImpl->shutdown();
@@ -375,8 +375,12 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 
 int WebSocketImpl::available()
 {
-	return _pStreamSocketImpl->available();
+	int n = _buffer.size() - _bufferOffset;
+	if (n > 0)
+		return n + _pStreamSocketImpl->available();
+	else
+		return _pStreamSocketImpl->available();
 }
 
-	
+
 } } // namespace Poco::Net

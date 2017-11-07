@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIteratorStategies.cpp
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator

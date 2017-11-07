@@ -1,8 +1,6 @@
 //
 // Template.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Template

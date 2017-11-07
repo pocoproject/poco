@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIterator.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator

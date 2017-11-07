@@ -1,8 +1,6 @@
 //
 // RedisStream.cpp
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  RedisStream

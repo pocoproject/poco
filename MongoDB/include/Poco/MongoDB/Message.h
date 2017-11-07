@@ -1,8 +1,6 @@
 //
 // Message.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Message
