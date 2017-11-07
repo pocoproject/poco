@@ -168,7 +168,6 @@ SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t len
 
 SocketAddress::~SocketAddress()
 {
-	destruct();
 }
 
 
@@ -189,7 +188,6 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 {
 	if (&socketAddress != this)
 	{
-		destruct();
 		if (socketAddress.family() == IPv4)
 			newIPv4(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
 #if defined(POCO_HAVE_IPv6)
