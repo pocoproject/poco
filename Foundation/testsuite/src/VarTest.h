@@ -40,6 +40,8 @@ public:
 	void testDouble();
 	void testLong();
 	void testULong();
+	void testLongLong();
+	void testULongLong();
 	void testString();
 	void testUDT();
 	void testConversionOperator();
