@@ -28,24 +28,38 @@ namespace Poco {
 template<>
 class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 	/// PoolableObjectFactory specialisation for Connection. New connections
-	/// are created with the given address.
+	/// are created with the given address or URI.
+	///
+	/// If a Connection::SocketFactory is given, it must live for the entire
+	/// lifetime of the PoolableObjectFactory.
 {
 public:
 	PoolableObjectFactory(Net::SocketAddress& address):
-		_address(address)
+		_address(address),
+		_pSocketFactory(0)
 	{
 	}
 
 	PoolableObjectFactory(const std::string& address):
-		_address(address)
+		_address(address),
+		_pSocketFactory(0)
+	{
+	}
+
+	PoolableObjectFactory(const std::string& uri, MongoDB::Connection::SocketFactory& socketFactory):
+		_uri(uri),
+		_pSocketFactory(&socketFactory)
 	{
 	}
 
 	MongoDB::Connection::Ptr createObject()
 	{
-		return new MongoDB::Connection(_address);
+		if (_pSocketFactory)
+			return new MongoDB::Connection(_uri, *_pSocketFactory);
+		else
+			return new MongoDB::Connection(_address);
 	}
-	
+
 	bool validateObject(MongoDB::Connection::Ptr pObject)
 	{
 		return true;
@@ -65,6 +79,8 @@ public:
 
 private:
 	Net::SocketAddress _address;
+	std::string _uri;
+	MongoDB::Connection::SocketFactory* _pSocketFactory;
 };
 
 

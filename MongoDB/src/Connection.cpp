@@ -152,35 +152,38 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	std::string host = theURI.getHost();
 	Poco::UInt16 port = theURI.getPort();
 	if (port == 0) port = 27017;
+
 	std::string databaseName = theURI.getPath();
+	if (!databaseName.empty() && databaseName[0] == '/') databaseName.erase(0, 1);
 	if (databaseName.empty()) databaseName = "admin";
-	bool secure = false;
+
+	bool ssl = false;
 	Poco::Timespan connectTimeout;
 	Poco::Timespan socketTimeout;
-	std::string authMethod = Database::AUTH_SCRAM_SHA1;
+	std::string authMechanism = Database::AUTH_SCRAM_SHA1;
 
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
 	for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
 	{
 		if (it->first == "ssl")
 		{
-			secure = (it->second == "true");
+			ssl = (it->second == "true");
 		}
 		else if (it->first == "connectTimeoutMS")
 		{
-			connectTimeout = 1000*Poco::NumberParser::parse(it->second);
+			connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
 		}
 		else if (it->first == "socketTimeoutMS")
 		{
-			socketTimeout = 1000*Poco::NumberParser::parse(it->second);
+			socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
 		}
 		else if (it->first == "authMechanism")
 		{
-			authMethod = it->second;
+			authMechanism = it->second;
 		}
 	}
 
-	connect(socketFactory.createSocket(host, port, connectTimeout, secure));
+	connect(socketFactory.createSocket(host, port, connectTimeout, ssl));
 
 	if (socketTimeout > 0)
 	{
@@ -201,7 +204,7 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 		else username = userInfo;
 
 		Database database(databaseName);
-		if (!database.authenticate(*this, username, password, authMethod))
+		if (!database.authenticate(*this, username, password, authMechanism))
 			throw Poco::NoPermissionException(Poco::format("Access to MongoDB database %s denied for user %s", databaseName, username));
 	}
 }
