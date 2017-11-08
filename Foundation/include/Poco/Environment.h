@@ -100,6 +100,24 @@ public:
 		///    - Dx mark development releases,
 		///    - Ax mark alpha releases, and
 		///    - Bx mark beta releases.
+
+	static Poco::Int32 os();
+		/// Return the operating system as defined
+		/// in the include Foundation/Platform.h (POCO_OS)
+
+	static Poco::Int32 cpu();
+		/// Return the underlying cpu that runs this operating system
+		/// as defined in Foundation/Platform (POCO_ARCH)
+
+	static bool osFamilyUnix();
+		/// Return true if the operating system belongs to the Linux family
+
+	static bool osFamilyWindows();
+		/// Return true if the operating system belongs to the Windows family
+
+	static bool osFamilyVms();
+		/// Return true if the operating system belongs to the VMS family
+
 };
 
 

@@ -60,6 +60,7 @@ using Poco::Util::OptionCallback;
 using Poco::Util::HelpFormatter;
 using Poco::Util::AbstractConfiguration;
 
+static std::string osName = Environment::osName();
 
 class Preprocessor
 {
@@ -219,11 +220,16 @@ protected:
 	{
 		Path pp(file);
 		pp.setExtension("i");
+		std::string comp = "PocoDoc.compiler";
+		if (Environment::osFamilyWindows())
+			comp += ".windows";
+		else
+			comp += ".unix";
+		std::string exec = config().getString(comp + ".exec");
+		std::string opts = config().getString(comp + ".options");
+		std::string path = config().getString(comp + ".path", "");
+		bool usePipe = config().getBool(comp + ".usePipe", false);
 
-		std::string exec = config().getString("PocoDoc.compiler.exec");
-		std::string opts = config().getString("PocoDoc.compiler.options");
-		std::string path = config().getString("PocoDoc.compiler.path", "");
-		bool usePipe = config().getBool("PocoDoc.compiler.usePipe", false);
 		std::string popts;
 		for (std::string::const_iterator it = opts.begin(); it != opts.end(); ++it)
 		{

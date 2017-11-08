@@ -24,14 +24,12 @@
 #include "Environment_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Environment_WINCE.cpp"
 #else
-#include "Environment_WIN32U.cpp"
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Environment_WIN32.cpp"
+#endif
 #endif
 
 
@@ -128,5 +126,41 @@ Poco::UInt32 Environment::libraryVersion()
 	return POCO_VERSION;
 }
 
+Poco::Int32 Environment::os()
+{
+	return POCO_OS;
+}
+
+Poco::Int32 Environment::cpu()
+{
+	return POCO_ARCH;
+}
+
+bool Environment::osFamilyUnix()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool Environment::osFamilyWindows()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool Environment::osFamilyVms()
+{
+#if defined(POCO_OS_FAMILY_VMS)
+	return true;
+#else
+	return false;
+#endif
+}
 
 } // namespace Poco
