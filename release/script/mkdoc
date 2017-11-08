@@ -20,9 +20,11 @@ fi
 osname=`uname -s | tr ' ' '_'`
 osarch=`uname -m | tr ' ' '_'`
 
-if [ ${osname:0:6} = "CYGWIN" ] ; then
-	osname="CYGWIN"
-fi
+case `uname` in
+  CYGWIN*) osname="CYGWIN"
+            ;;
+esac
+
 
 if [ $osname = "Darwin" ] ; then
 	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`

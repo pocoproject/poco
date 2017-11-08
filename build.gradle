@@ -768,18 +768,18 @@ task pocoDoc(type: Exec) {
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
 		executable "PocoDoc/bin/PocoDoc.exe"
-		args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "/config=$rootDir/PocoDoc/cfg/mkdoc.xml"
 		args "/config=$rootDir/PocoDoc/PocoDoc.ini"
 	} 
 	if (os.linux) {
 		environment "LD_LIBRARY_PATH", "$rootDir/lib64:$LD_LIBRARY_PATH"
 		executable "PocoDoc/bin64/PocoDoc"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 //	inputs.files(tasks.getByPath(':production').outputs.files)
@@ -802,7 +802,7 @@ task zipDoc(type: Zip) {
 def candle(VSYEAR, VERSION, target, os) {
 	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
 		dependsOn ':pocos'
-		dependsOn ':pocoDoc'
+		//dependsOn ':pocoDoc'
 		executable "${WiXHome}/bin/Candle.exe"
 		workingDir "packaging/Windows/WiX"
 		args "-arch", "${target}"
