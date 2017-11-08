@@ -107,11 +107,9 @@ cp ${POCO_BASE}/CMakeLists.txt ${target}
 mkdir -p ${target}/build/config
 mkdir -p ${target}/build/rules
 mkdir -p ${target}/build/script
-mkdir -p ${target}/build/vxconfig
 
 cp ${POCO_BASE}/build/config/* ${target}/build/config
 cp ${POCO_BASE}/build/rules/* ${target}/build/rules
-cp ${POCO_BASE}/build/vxconfig/* ${target}/build/vxconfig
 cp ${POCO_BASE}/build/script/* ${target}/build/script
 cp ${POCO_BASE}/buildwin.cmd ${target}
 cp ${POCO_BASE}/configure ${target}
