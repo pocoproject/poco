@@ -100,7 +100,10 @@ public:
 	{
 		try
 		{
-			_pool.returnObject(_connection);
+			if (_connection)
+			{
+				_pool.returnObject(_connection);
+			}
 		}
 		catch (...)
 		{

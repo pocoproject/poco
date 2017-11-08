@@ -243,7 +243,7 @@ void MongoDBTest::testCursorRequest()
 	Poco::MongoDB::ResponseMessage& response = cursor.next(*_mongo);
 	while(1)
 	{
-		n += response.documents().size();
+		n += static_cast<int>(response.documents().size());
 		if ( response.cursorID() == 0 )
 			break;
 		response = cursor.next(*_mongo);
