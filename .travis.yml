@@ -87,9 +87,9 @@ matrix:
 
     # build documentation and release
     - env:    TEST_NAME="documentation & release"
-      compiler: gcc
+      os: osx
+      compiler: clang
       script:
-        - $CXX --version
         - . env.sh && mkdoc all && mkrel all
         - find releases/poco*-all
         - find releases/poco*-all-doc
