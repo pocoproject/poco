@@ -18,9 +18,6 @@ services:
   - postgresql
   - mysql
 
-dist: trusty
-sudo: enabled
-
 addons:
   postgresql: "9.4"
 
