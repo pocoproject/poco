@@ -39,6 +39,7 @@ public:
 	void testObjectID();
 	void testCommand();
 	void testUUID();
+	void testConnectURI();
 	void setUp();
 	void tearDown();
 
