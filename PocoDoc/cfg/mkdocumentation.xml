@@ -13,9 +13,7 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
-				XMLStreamParser.h,
-				CppUnitException.h,
-				RepeatedTest.h,
+				${PocoBuild}/Util/include/Poco/Util/Units.h
 			</exclude>
 		</files>
 		<pages>
@@ -31,23 +29,15 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\cl.exe</exec>
+			<exec>g++</exec>
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
 				-I/usr/include/mysql,
-				-I/usr/include/postgresql,
-				/I${PocoBase}/openssl/include
-				/IC:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include,
-				/IC:\Program Files (x86)\Windows Kits\8.1\Include\shared,
-				/IC:\Program Files (x86)\Windows Kits\8.1\Include\um,
-				/IC:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt,
-				/nologo,
 				-D_DEBUG,
 				-E,
 				-C,
 				-DPOCO_NO_GCC_API_ATTRIBUTE
-				-DPOCO_NO_WINDOWS_H
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>
@@ -104,7 +94,7 @@
 		<loggers>
 			<root>
 				<channel>c1</channel>
-				<level>information</level>
+				<level>warning</level>
 			</root>
 		</loggers>
 		<channels>
