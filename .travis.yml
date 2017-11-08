@@ -91,6 +91,8 @@ matrix:
       script:
         - $CXX --version
         - . env.sh && mkdoc all && mkrel all
+        - find releases/poco*-all
+        - find releases/poco*-all-doc
         
     # QA jobs for code analytics and metrics
     # static code analysis with cppcheck (we can add --enable=all later)
