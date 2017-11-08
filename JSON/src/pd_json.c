@@ -8,6 +8,10 @@
 #include <errno.h>
 #include "pd_json.h"
 
+#if defined(_MSC_VER)
+#define strerror_r(err, buf, len) strerror_s(buf, len, err)
+#endif
+
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
 
 #define json_error(json, format, ...)                             \
@@ -32,6 +36,15 @@
 
 #endif // POCO_MSVS_VERSION
 
+#if defined(_GNU_SOURCE) || defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE < 200112L)
+	#define json_error_s(json, err) char errbuf[1024] = { 0 }; \
+		json_error(json, "%s", strerror_r(err, errbuf, sizeof(errbuf)));
+#else
+	#define json_error_s(json, err) char errbuf[1024] = { 0 }; \
+		strerror_r(err, errbuf, sizeof(errbuf));               \
+		json_error(json, "%s", errbuf);
+#endif
+
 #define STACK_INC 4
 
 static enum json_type
@@ -44,7 +57,7 @@ push(json_stream *json, enum json_type type)
         stack = (struct json_stack *) json->alloc.realloc(json->stack,
                 (json->stack_size + STACK_INC) * sizeof(*json->stack));
         if (stack == NULL) {
-            json_error(json, "%s", strerror(errno));
+            json_error_s(json, errno);
             return JSON_ERROR;
         }
 
@@ -141,7 +154,7 @@ static int pushchar(json_stream *json, int c)
         size_t size = json->data.string_size * 2;
         char *buffer = (char*) json->alloc.realloc(json->data.string, size);
         if (buffer == NULL) {
-            json_error(json, "%s", strerror(errno));
+            json_error_s(json, errno);
             return -1;
         } else {
             json->data.string_size = size;
@@ -159,7 +172,7 @@ static int init_string(json_stream *json)
         json->data.string_size = 1024;
         json->data.string = (char*) json->alloc.malloc(json->data.string_size);
         if (json->data.string == NULL) {
-            json_error(json, "%s", strerror(errno));
+            json_error_s(json, errno);
             return -1;
         }
     }
