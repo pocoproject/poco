@@ -14,6 +14,16 @@ before_install:
 
 services:
   - mongodb
+  - redis-server
+  - postgresql
+  - mysql
+
+dist: trusty
+sudo: enabled
+
+addons:
+  postgresql: "9.4"
+
   
 notifications:
   slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
