@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 #
 # mkdoc
 #
@@ -12,6 +12,11 @@
 # usage: mkdoc [-l <perforce-label>] [<specfile>]
 #
 
+if [ "$POCO_BASE" = "" ] ; then
+  echo "Error: POCO_BASE not set."
+  exit 1
+fi
+
 osname=`uname -s | tr ' ' '_'`
 osarch=`uname -m | tr ' ' '_'`
 
@@ -19,14 +24,14 @@ if [ ${osname:0:6} = "CYGWIN" ] ; then
 	osname="CYGWIN"
 fi
 
-if [ "$POCO_BASE" = "" ] ; then
-  echo "Error: POCO_BASE not set."
-  exit 1
+if [ $osname = "Darwin" ] ; then
+	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
+	osarch=`basename $archpath`
 fi
 
 spec=""
 docConfig=$POCO_BASE/PocoDoc/cfg/mkdoc-poco.xml
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-C" ] ; then
 		shift
@@ -88,17 +93,12 @@ cd $tools
 make -s -j8 
 
 if [ $osname = "CYGWIN" ] ; then
-    find $tools -type f -name "*.$libversion.dll" > $TMP/dlls
+    find $tools -type f -name "cyg*$libversion.dll" > $TMP/dlls
     rebase -O -T $TMP/dlls
     rm $TMP/dlls
 fi
 
 cd $POCO_BASE
-
-if [ $osname = "Darwin" ] ; then
-	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
-	osarch=`basename $archpath`
-fi
 
 if [ $osname = "CYGWIN" ] ; then
 #   Poco dlls must be on PATH for Cygwin
