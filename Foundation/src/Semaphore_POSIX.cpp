@@ -120,12 +120,7 @@ bool SemaphoreImpl::waitImpl(long milliseconds)
 	int rc = 0;
 	struct timespec abstime;
 
-#if defined(__VMS)
-	struct timespec delta;
-	delta.tv_sec  = milliseconds / 1000;
-	delta.tv_nsec = (milliseconds % 1000)*1000000;
-	pthread_get_expiration_np(&delta, &abstime);
-#elif defined(POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT)
+#if defined(POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT)
 	clock_gettime(CLOCK_MONOTONIC, &abstime);
 	abstime.tv_sec  += milliseconds / 1000;
 	abstime.tv_nsec += (milliseconds % 1000)*1000000;

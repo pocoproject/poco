@@ -23,8 +23,6 @@
 #include "NamedEvent_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedEvent_UNIX.cpp"
-#else
-#include "NamedEvent_VMS.cpp"
 #endif
 
 
