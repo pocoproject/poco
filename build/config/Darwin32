@@ -1,6 +1,4 @@
 #
-# $Id$
-#
 # Darwin32
 #
 # Build settings for Mac OS X 10.9 (clang, libc++, i386)

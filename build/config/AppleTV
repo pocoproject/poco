@@ -1,6 +1,4 @@
 #
-# $Id$
-#
 # AppleTV
 #
 # Build settings for tvOS 9.0 and newer
@@ -65,7 +63,7 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(OSFLAGS)
+CFLAGS          = $(OSFLAGS) -std=gnu99
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = $(OSFLAGS) -std=c++11 -stdlib=libc++ -Wall -Wno-sign-compare 
