@@ -13,6 +13,7 @@ AAAIntroduction
     to support connection filtering and IP blacklisting (GH #1485)
   - Added Redis library (GH #1383)
   - Added Zip64 support to Zip library (GH #1356)
+  - Upgraded bundled SQLite to 3.21.0
   - Removed OpenVMS support (GH #1988)
   - fixed GH #271: NamedMutex_UNIX.cpp must remove semid
   - fixed GH #739: Add Poco::Net::WebSocket::receiveFrame() that appends to a Poco::Buffer<char>
