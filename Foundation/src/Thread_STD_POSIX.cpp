@@ -129,7 +129,7 @@ int ThreadImpl::getMinOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MIN)
 	return POCO_THREAD_PRIORITY_MIN;
-#elif defined(__VMS) || defined(__digital__)
+#elif defined(__digital__)
 	return PRI_OTHER_MIN;
 #else
 	return sched_get_priority_min(policy);
@@ -141,7 +141,7 @@ int ThreadImpl::getMaxOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MAX)
 	return POCO_THREAD_PRIORITY_MAX;
-#elif defined(__VMS) || defined(__digital__)
+#elif defined(__digital__)
 	return PRI_OTHER_MAX;
 #else
 	return sched_get_priority_max(policy);

@@ -58,7 +58,7 @@ public:
 		GLOB_CASELESS        = 0x04, /// ignore case when comparing characters
 		GLOB_DIRS_ONLY       = 0x80  /// only glob for directories (for internal use only)
 	};
-	
+
 	Glob(const std::string& pattern, int options = 0);
 		/// Creates the Glob, using the given pattern. The pattern
 		/// must not be an empty string.
@@ -69,16 +69,16 @@ public:
 
 	~Glob();
 		/// Destroys the Glob.
-		
+
 	bool match(const std::string& subject);
 		/// Matches the given subject against the glob pattern.
 		/// Returns true if the subject matches the pattern, false
 		/// otherwise.
-		
+
 	static void glob(const std::string& pathPattern, std::set<std::string>& files, int options = 0);
 		/// Creates a set of files that match the given pathPattern.
 		///
-		/// The path may be give in either Unix, Windows or VMS syntax and
+		/// The path may be give in either Unix or Windows syntax and
 		/// is automatically expanded by calling Path::expand().
 		///
 		/// The pattern may contain wildcard expressions even in intermediate
@@ -93,7 +93,7 @@ public:
 	static void glob(const char* pathPattern, std::set<std::string>& files, int options = 0);
 		/// Creates a set of files that match the given pathPattern.
 		///
-		/// The path may be give in either Unix, Windows or VMS syntax and
+		/// The path may be give in either Unix or Windows syntax and
 		/// is automatically expanded by calling Path::expand().
 		///
 		/// The pattern may contain wildcard expressions even in intermediate
@@ -135,7 +135,7 @@ protected:
 	bool matchSet(TextIterator& itp, const TextIterator& endp, int c);
 	static void collect(const Path& pathPattern, const Path& base, const Path& current, const std::string& pattern, std::set<std::string>& files, int options);
 	static bool isDirectory(const Path& path, bool followSymlink);
-	
+
 private:
 	std::string _pattern;
 	int         _options;
