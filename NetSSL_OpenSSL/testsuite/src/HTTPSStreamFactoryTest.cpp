@@ -45,7 +45,7 @@ void HTTPSStreamFactoryTest::testNoRedirect()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory;
-	URI uri("https://localhost/large");
+	URI uri("https://127.0.0.1/large");
 	uri.setPort(server.port());
 #ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<std::istream> pStr(factory.open(uri));
@@ -62,7 +62,7 @@ void HTTPSStreamFactoryTest::testEmptyPath()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory;
-	URI uri("https://localhost");
+	URI uri("https://127.0.0.1");
 	uri.setPort(server.port());
 #ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<std::istream> pStr(factory.open(uri));
@@ -79,7 +79,7 @@ void HTTPSStreamFactoryTest::testRedirect()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory;
-	URI uri("https://localhost/redirect");
+	URI uri("https://127.0.0.1/redirect");
 	uri.setPort(server.port());
 #ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<std::istream> pStr(factory.open(uri));
@@ -96,7 +96,7 @@ void HTTPSStreamFactoryTest::testProxy()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory(
-		Application::instance().config().getString("testsuite.proxy.host"), 
+		Application::instance().config().getString("testsuite.proxy.host"),
 		Application::instance().config().getInt("testsuite.proxy.port")
 	);
 	URI uri("https://secure.appinf.com/public/poco/NetSSL.txt");
@@ -115,7 +115,7 @@ void HTTPSStreamFactoryTest::testError()
 {
 	HTTPSTestServer server;
 	HTTPSStreamFactory factory;
-	URI uri("https://localhost/notfound");
+	URI uri("https://127.0.0.1/notfound");
 	uri.setPort(server.port());
 	try
 	{

@@ -50,7 +50,7 @@ namespace
 		EchoConnection(const StreamSocket& s): TCPServerConnection(s)
 		{
 		}
-		
+
 		void run()
 		{
 			StreamSocket& ss = socket();
@@ -92,8 +92,8 @@ void TCPServerTest::testOneConnection()
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
-	
-	SocketAddress sa("localhost", svs.address().port());
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -120,8 +120,8 @@ void TCPServerTest::testTwoConnections()
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
-	
-	SocketAddress sa("localhost", svs.address().port());
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	std::string data("hello, world");
@@ -136,7 +136,7 @@ void TCPServerTest::testTwoConnections()
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
 	assert (n > 0);
 	assert (std::string(buffer, n) == data);
-	
+
 	assert (srv.currentConnections() == 2);
 	assert (srv.currentThreads() == 2);
 	assert (srv.queuedConnections() == 0);
@@ -167,8 +167,8 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
-	
-	SocketAddress sa("localhost", svs.address().port());
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	SecureStreamSocket ss3(sa);
@@ -195,12 +195,12 @@ void TCPServerTest::testMultiConnections()
 	n = ss4.receiveBytes(buffer, sizeof(buffer));
 	assert (n > 0);
 	assert (std::string(buffer, n) == data);
-	
+
 	assert (srv.currentConnections() == 4);
 	assert (srv.currentThreads() == 4);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 4);
-	
+
 	SecureStreamSocket ss5;
 	ss5.setLazyHandshake();
 	ss5.connect(sa);
@@ -211,7 +211,7 @@ void TCPServerTest::testMultiConnections()
 	ss6.connect(sa);
 	Thread::sleep(200);
 	assert (srv.queuedConnections() == 2);
-	
+
 	ss1.close();
 	Thread::sleep(300);
 	assert (srv.currentConnections() == 4);
@@ -225,7 +225,7 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.currentThreads() == 4);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 6);
-	
+
 	ss3.close();
 	Thread::sleep(300);
 	assert (srv.currentConnections() == 3);
@@ -256,8 +256,8 @@ void TCPServerTest::testReuseSocket()
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
-	
-	SocketAddress sa("localhost", svs.address().port());
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -292,21 +292,21 @@ void TCPServerTest::testReuseSession()
 	// ensure OpenSSL machinery is fully setup
 	Context::Ptr pDefaultServerContext = SSLManager::instance().defaultServerContext();
 	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
-	
+
 	Context::Ptr pServerContext = new Context(
-		Context::SERVER_USE, 
+		Context::SERVER_USE,
 		Application::instance().config().getString("openSSL.server.privateKeyFile"),
 		Application::instance().config().getString("openSSL.server.privateKeyFile"),
 		Application::instance().config().getString("openSSL.server.caConfig"),
 		Context::VERIFY_NONE,
 		9,
 		true,
-		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");	
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 	pServerContext->enableSessionCache(true, "TestSuite");
 	pServerContext->setSessionTimeout(10);
 	pServerContext->setSessionCacheSize(1000);
 	pServerContext->disableStatelessSessionResumption();
-	
+
 	SecureServerSocket svs(0, 64, pServerContext);
 	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
 	srv.start();
@@ -314,9 +314,9 @@ void TCPServerTest::testReuseSession()
 	assert (srv.currentThreads() == 0);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
-	
+
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.caConfig"),
@@ -325,8 +325,8 @@ void TCPServerTest::testReuseSession()
 		true,
 		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 	pClientContext->enableSessionCache(true);
-	
-	SocketAddress sa("localhost", svs.address().port());
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa, pClientContext);
 	assert (!ss1.sessionWasReused());
 	std::string data("hello, world");
@@ -339,9 +339,9 @@ void TCPServerTest::testReuseSession()
 	assert (srv.currentThreads() == 1);
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 1);
-	
+
 	Session::Ptr pSession = ss1.currentSession();
-	
+
 	ss1.close();
 	Thread::sleep(300);
 	assert (srv.currentConnections() == 0);
@@ -363,7 +363,7 @@ void TCPServerTest::testReuseSession()
 
 	Thread::sleep(15000); // wait for session to expire
 	pServerContext->flushSessionCache();
-	
+
 	ss1.useSession(pSession);
 	ss1.connect(sa);
 	assert (!ss1.sessionWasReused());
