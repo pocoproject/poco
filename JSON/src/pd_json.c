@@ -36,14 +36,12 @@
 
 #endif // POCO_MSVS_VERSION
 
-#if defined(_GNU_SOURCE) || defined(_POSIX_C_SOURCE) && (_POSIX_C_SOURCE < 200112L)
-	#define json_error_s(json, err) char errbuf[1024] = { 0 }; \
-		json_error(json, "%s", strerror_r(err, errbuf, sizeof(errbuf)));
-#else
-	#define json_error_s(json, err) char errbuf[1024] = { 0 }; \
-		strerror_r(err, errbuf, sizeof(errbuf));               \
-		json_error(json, "%s", errbuf);
-#endif
+static void json_error_s(json_stream *json, int err)
+{
+    char errbuf[1024] = {0};
+    strerror_r(err, errbuf, sizeof(errbuf));
+    json_error(json, "%s", errbuf);
+}
 
 #define STACK_INC 4
 
