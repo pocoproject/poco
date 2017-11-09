@@ -18,9 +18,7 @@
 #include <cstdio> // sprintf()
 
 
-#if defined(POCO_OS_FAMILY_VMS)
-#include "Environment_VMS.cpp"
-#elif defined(POCO_VXWORKS)
+#if defined(POCO_VXWORKS)
 #include "Environment_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"

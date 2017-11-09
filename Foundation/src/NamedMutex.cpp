@@ -23,8 +23,6 @@
 #include "NamedMutex_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedMutex_UNIX.cpp"
-#else
-#include "NamedMutex_VMS.cpp"
 #endif
 
 

@@ -531,45 +531,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\Environment_VMS.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\Environment_WIN32.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
@@ -945,8 +906,6 @@
 				<File
 					RelativePath=".\include\Poco\Environment_UNIX.h"/>
 				<File
-					RelativePath=".\include\Poco\Environment_VMS.h"/>
-				<File
 					RelativePath=".\include\Poco\Environment_WIN32.h"/>
 				<File
 					RelativePath=".\include\Poco\Environment_WIN32U.h"/>
@@ -1000,8 +959,6 @@
 					RelativePath=".\include\Poco\Platform.h"/>
 				<File
 					RelativePath=".\include\Poco\Platform_POSIX.h"/>
-				<File
-					RelativePath=".\include\Poco\Platform_VMS.h"/>
 				<File
 					RelativePath=".\include\Poco\Platform_WIN32.h"/>
 				<File
@@ -1914,45 +1871,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\SharedLibrary_VMS.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\SharedLibrary_WIN32.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
@@ -2047,8 +1965,6 @@
 					RelativePath=".\include\Poco\SharedLibrary_HPUX.h"/>
 				<File
 					RelativePath=".\include\Poco\SharedLibrary_UNIX.h"/>
-				<File
-					RelativePath=".\include\Poco\SharedLibrary_VMS.h"/>
 				<File
 					RelativePath=".\include\Poco\SharedLibrary_WIN32.h"/>
 				<File
@@ -2190,45 +2106,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\LogFile_VMS.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\LogFile_WIN32.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
@@ -2319,45 +2196,6 @@
 				<File
 					RelativePath=".\src\NullChannel.cpp"/>
 				<File
-					RelativePath=".\src\OpcomChannel.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\PatternFormatter.cpp"/>
 				<File
 					RelativePath=".\src\PurgeStrategy.cpp"/>
@@ -2438,8 +2276,6 @@
 				<File
 					RelativePath=".\include\Poco\LogFile_STD.h"/>
 				<File
-					RelativePath=".\include\Poco\LogFile_VMS.h"/>
-				<File
 					RelativePath=".\include\Poco\LogFile_WIN32.h"/>
 				<File
 					RelativePath=".\include\Poco\LogFile_WIN32U.h"/>
@@ -2455,8 +2291,6 @@
 					RelativePath=".\include\Poco\Message.h"/>
 				<File
 					RelativePath=".\include\Poco\NullChannel.h"/>
-				<File
-					RelativePath=".\include\Poco\OpcomChannel.h"/>
 				<File
 					RelativePath=".\include\Poco\PatternFormatter.h"/>
 				<File
@@ -2575,45 +2409,6 @@
 					RelativePath=".\src\DirectoryIterator.cpp"/>
 				<File
 					RelativePath=".\src\DirectoryIterator_UNIX.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\src\DirectoryIterator_VMS.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true">
@@ -2773,45 +2568,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\File_VMS.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\File_WIN32.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
@@ -2895,45 +2651,6 @@
 					RelativePath=".\src\Path.cpp"/>
 				<File
 					RelativePath=".\src\Path_UNIX.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\src\Path_VMS.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true">
@@ -3059,8 +2776,6 @@
 				<File
 					RelativePath=".\include\Poco\DirectoryIterator_UNIX.h"/>
 				<File
-					RelativePath=".\include\Poco\DirectoryIterator_VMS.h"/>
-				<File
 					RelativePath=".\include\Poco\DirectoryIterator_WIN32.h"/>
 				<File
 					RelativePath=".\include\Poco\DirectoryIterator_WIN32U.h"/>
@@ -3071,8 +2786,6 @@
 				<File
 					RelativePath=".\include\Poco\File_UNIX.h"/>
 				<File
-					RelativePath=".\include\Poco\File_VMS.h"/>
-				<File
 					RelativePath=".\include\Poco\File_WIN32.h"/>
 				<File
 					RelativePath=".\include\Poco\File_WIN32U.h"/>
@@ -3082,8 +2795,6 @@
 					RelativePath=".\include\Poco\Path.h"/>
 				<File
 					RelativePath=".\include\Poco\Path_UNIX.h"/>
-				<File
-					RelativePath=".\include\Poco\Path_VMS.h"/>
 				<File
 					RelativePath=".\include\Poco\Path_WIN32.h"/>
 				<File
@@ -3100,45 +2811,6 @@
 					RelativePath=".\src\NamedEvent.cpp"/>
 				<File
 					RelativePath=".\src\NamedEvent_UNIX.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\src\NamedEvent_VMS.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true">
@@ -3258,45 +2930,6 @@
 					RelativePath=".\src\NamedMutex.cpp"/>
 				<File
 					RelativePath=".\src\NamedMutex_UNIX.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\src\NamedMutex_VMS.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
 						ExcludedFromBuild="true">
@@ -3577,45 +3210,6 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath=".\src\Process_VMS.cpp">
-					<FileConfiguration
-						Name="debug_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_shared|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_mt|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="debug_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="release_static_md|Digi JumpStart (ARMV4I)"
-						ExcludedFromBuild="true">
-						<Tool
-							Name="VCCLCompilerTool"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath=".\src\Process_WIN32.cpp">
 					<FileConfiguration
 						Name="debug_shared|Digi JumpStart (ARMV4I)"
@@ -3820,8 +3414,6 @@
 				<File
 					RelativePath=".\include\Poco\NamedEvent_UNIX.h"/>
 				<File
-					RelativePath=".\include\Poco\NamedEvent_VMS.h"/>
-				<File
 					RelativePath=".\include\Poco\NamedEvent_WIN32.h"/>
 				<File
 					RelativePath=".\include\Poco\NamedEvent_WIN32U.h"/>
@@ -3829,8 +3421,6 @@
 					RelativePath=".\include\Poco\NamedMutex.h"/>
 				<File
 					RelativePath=".\include\Poco\NamedMutex_UNIX.h"/>
-				<File
-					RelativePath=".\include\Poco\NamedMutex_VMS.h"/>
 				<File
 					RelativePath=".\include\Poco\NamedMutex_WIN32.h"/>
 				<File
@@ -3851,8 +3441,6 @@
 					RelativePath=".\include\Poco\Process.h"/>
 				<File
 					RelativePath=".\include\Poco\Process_UNIX.h"/>
-				<File
-					RelativePath=".\include\Poco\Process_VMS.h"/>
 				<File
 					RelativePath=".\include\Poco\Process_WIN32.h"/>
 				<File

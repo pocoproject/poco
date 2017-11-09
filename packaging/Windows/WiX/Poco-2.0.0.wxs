@@ -40,7 +40,7 @@
 
         <!-- Default to per-machine installation -->
         <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
-        <!-- 
+        <!--
 	To disable per-user installation scope, uncomment this section
 	<WixVariable Id='WixUISupportPerUser' Value='0' />
 	-->
@@ -51,10 +51,10 @@
 	-->
         <WixVariable Id="WixUILicenseRtf" Value="../../Boost License.rtf" Overridable="no" />
         <WixVariable Id="WixUIDialogBmp" Value="Poco 312x312.jpg" />
-        <!-- 
-		Set default destination folder (full path) unless it comes from registry 
+        <!--
+		Set default destination folder (full path) unless it comes from registry
 		SetDirectory schedules the action prior to WixSetDefaultPerMachiGneFolder;
-		code updated for manually scheduled elements to schedule between 
+		code updated for manually scheduled elements to schedule between
 		WixSetDefaultPerMachineFolder and WixSetPerMachineFolder.
 		-->
         <SetDirectory Id="APPLICATIONFOLDER" Value="[$(var.PlatformProgramFilesFolder)][ApplicationFolderName]">APPLICATIONFOLDER=""</SetDirectory>
@@ -1145,7 +1145,6 @@
                             <File Id="NUMERICSTRING.H" Name="NumericString.h" Source="$(var.POCO)\Foundation\include\Poco\NumericString.h" />
                             <File Id="OBJECTPOOL.H" Name="ObjectPool.h" Source="$(var.POCO)\Foundation\include\Poco\ObjectPool.h" />
                             <File Id="OBSERVER.H" Name="Observer.h" Source="$(var.POCO)\Foundation\include\Poco\Observer.h" />
-                            <File Id="OPCOMCHANNEL.H" Name="OpcomChannel.h" Source="$(var.POCO)\Foundation\include\Poco\OpcomChannel.h" />
                             <File Id="OPTIONAL.H" Name="Optional.h" Source="$(var.POCO)\Foundation\include\Poco\Optional.h" />
                             <File Id="PATH.H" Name="Path.h" Source="$(var.POCO)\Foundation\include\Poco\Path.h" />
                             <File Id="PATH_UNIX.H" Name="Path_UNIX.h" Source="$(var.POCO)\Foundation\include\Poco\Path_UNIX.h" />
@@ -2957,7 +2956,6 @@
                         <File Id="POCO.NUMBERPARSER.HTML" Name="Poco.NumberParser.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.NumberParser.html" />
                         <File Id="POCO.OBJECTPOOL.HTML" Name="Poco.ObjectPool.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.ObjectPool.html" />
                         <File Id="POCO.OBSERVER.HTML" Name="Poco.Observer.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.Observer.html" />
-                        <File Id="POCO.OPCOMCHANNEL.HTML" Name="Poco.OpcomChannel.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.OpcomChannel.html" />
                         <File Id="POCO.OPENFILEEXCEPTION.HTML" Name="Poco.OpenFileException.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.OpenFileException.html" />
                         <File Id="POCO.OPTIONAL.HTML" Name="Poco.Optional.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.Optional.html" />
                         <File Id="POCO.OUTOFMEMORYEXCEPTION.HTML" Name="Poco.OutOfMemoryException.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.OutOfMemoryException.html" />

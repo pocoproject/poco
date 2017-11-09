@@ -35,8 +35,6 @@
 #include "Poco/File_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/File_UNIX.h"
-#else
-#include "Poco/File_VMS.h"
 #endif
 
 
@@ -49,17 +47,17 @@ class Path;
 class Foundation_API File: private FileImpl
 	/// The File class provides methods for working with a file.
 	///
-	/// Regarding paths passed to the various methods, note that 
+	/// Regarding paths passed to the various methods, note that
 	/// platform-specific limitations regarding maximum length
 	/// of the entire path and its components apply.
 	///
-	/// On Windows, if compiled with UTF-8 support (POCO_WIN32_UTF8) 
+	/// On Windows, if compiled with UTF-8 support (POCO_WIN32_UTF8)
 	/// the implementation tries to work around the rather low
 	/// 260 characters MAX_PATH limit by adding the "\\?\" prefix if
 	/// a path is absolute and exceeds MAX_PATH characters in length.
-	/// Note that various limitations regarding usage of the "\\?\" 
+	/// Note that various limitations regarding usage of the "\\?\"
 	/// prefix apply in that case, e.g. the path must
-	/// not contain relative components ("." and "..") and must not 
+	/// not contain relative components ("." and "..") and must not
 	/// use the forward slash ("/") as directory separator.
 {
 public:
@@ -70,19 +68,19 @@ public:
 
 	File(const std::string& path);
 		/// Creates the file.
-		
+
 	File(const char* path);
 		/// Creates the file.
 
 	File(const Path& path);
 		/// Creates the file.
-		
+
 	File(const File& file);
 		/// Copy constructor.
 
 	virtual ~File();
 		/// Destroys the file.
-	
+
 	File& operator = (const File& file);
 		/// Assignment operator.
 
@@ -94,39 +92,39 @@ public:
 
 	File& operator = (const Path& path);
 		/// Assignment operator.
-		
+
 	void swap(File& file);
 		/// Swaps the file with another one.
 
 	const std::string& path() const;
 		/// Returns the path.
-	
+
 	bool exists() const;
 		/// Returns true iff the file exists.
-		
+
 	bool canRead() const;
 		/// Returns true iff the file is readable.
-		
+
 	bool canWrite() const;
 		/// Returns true iff the file is writeable.
 
 	bool canExecute() const;
 		/// Returns true iff the file is executable.
 		///
-		/// On Windows and OpenVMS, the file must have
+		/// On Windows, the file must have
 		/// the extension ".EXE" to be executable.
 		/// On Unix platforms, the executable permission
 		/// bit must be set.
 
 	bool isFile() const;
 		/// Returns true iff the file is a regular file.
-		
+
 	bool isLink() const;
 		/// Returns true iff the file is a symbolic link.
-		
+
 	bool isDirectory() const;
 		/// Returns true iff the file is a directory.
-		
+
 	bool isDevice() const;
 		/// Returns true iff the file is a device.
 
@@ -150,67 +148,67 @@ public:
 
 	Timestamp getLastModified() const;
 		/// Returns the modification date of the file.
-		
+
 	File& setLastModified(const Timestamp& ts);
 		/// Sets the modification date of the file.
-		
+
 	FileSize getSize() const;
 		/// Returns the size of the file in bytes.
-		
+
 	File& setSize(FileSize size);
 		/// Sets the size of the file in bytes. Can be used
 		/// to truncate a file.
-		
+
 	File& setWriteable(bool flag = true);
 		/// Makes the file writeable (if flag is true), or
 		/// non-writeable (if flag is false) by setting the
 		/// file's flags in the filesystem accordingly.
-		
+
 	File& setReadOnly(bool flag = true);
 		/// Makes the file non-writeable (if flag is true), or
 		/// writeable (if flag is false) by setting the
 		/// file's flags in the filesystem accordingly.
-		
+
 	File& setExecutable(bool flag = true);
 		/// Makes the file executable (if flag is true), or
 		/// non-executable (if flag is false) by setting
 		/// the file's permission bits accordingly.
 		///
-		/// Does nothing on Windows and OpenVMS.	
-		
+		/// Does nothing on Windows.
+
 	void copyTo(const std::string& path) const;
-		/// Copies the file (or directory) to the given path. 
+		/// Copies the file (or directory) to the given path.
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
 
 	void moveTo(const std::string& path);
-		/// Copies the file (or directory) to the given path and 
+		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
-		
+
 	void renameTo(const std::string& path);
 		/// Renames the file to the new name.
-		
+
 	void remove(bool recursive = false);
 		/// Deletes the file. If recursive is true and the
 		/// file is a directory, recursively deletes all
 		/// files in the directory.
-	
+
 	bool createFile();
 		/// Creates a new, empty file in an atomic operation.
 		/// Returns true if the file has been created and false
 		/// if the file already exists. Throws an exception if
 		/// an error occurs.
-	
+
 	bool createDirectory();
 		/// Creates a directory. Returns true if the directory
 		/// has been created and false if it already exists.
 		/// Throws an exception if an error occurs.
-	
+
 	void createDirectories();
 		/// Creates a directory (and all parent directories
 		/// if necessary).
-		
+
 	void list(std::vector<std::string>& files) const;
 		/// Fills the vector with the names of all
 		/// files in the directory.
@@ -225,7 +223,7 @@ public:
 	bool operator <= (const File& file) const;
 	bool operator >  (const File& file) const;
 	bool operator >= (const File& file) const;
-	
+
 	static void handleLastError(const std::string& path);
 		/// For internal use only. Throws an appropriate
 		/// exception for the last file-related error.

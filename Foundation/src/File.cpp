@@ -29,8 +29,6 @@
 #include "File_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "File_UNIX.cpp"
-#else
-#include "File_VMS.cpp"
 #endif
 #include "Poco/Thread.h"
 
@@ -108,13 +106,13 @@ bool File::exists() const
 	return existsImpl();
 }
 
-	
+
 bool File::canRead() const
 {
 	return canReadImpl();
 }
 
-	
+
 bool File::canWrite() const
 {
 	return canWriteImpl();
@@ -132,7 +130,7 @@ bool File::isFile() const
 	return isFileImpl();
 }
 
-	
+
 bool File::isDirectory() const
 {
 	return isDirectoryImpl();
@@ -162,33 +160,33 @@ Timestamp File::created() const
 	return createdImpl();
 }
 
-	
+
 Timestamp File::getLastModified() const
 {
 	return getLastModifiedImpl();
 }
 
-	
+
 File& File::setLastModified(const Timestamp& ts)
 {
 	setLastModifiedImpl(ts);
 	return *this;
 }
 
-	
+
 File::FileSize File::getSize() const
 {
 	return getSizeImpl();
 }
 
-	
+
 File& File::setSize(FileSizeImpl size)
 {
 	setSizeImpl(size);
 	return *this;
 }
 
-	
+
 File& File::setWriteable(bool flag)
 {
 	setWriteableImpl(flag);
@@ -209,7 +207,7 @@ File& File::setExecutable(bool flag)
 	return *this;
 }
 
-	
+
 void File::copyTo(const std::string& path) const
 {
 	Path src(getPathImpl());
@@ -250,14 +248,14 @@ void File::moveTo(const std::string& path)
 	setPathImpl(path);
 }
 
-	
+
 void File::renameTo(const std::string& path)
 {
 	renameToImpl(path);
 	setPathImpl(path);
 }
 
-	
+
 void File::remove(bool recursive)
 {
 	if (recursive && !isLink() && isDirectory())
@@ -269,7 +267,7 @@ void File::remove(bool recursive)
 			it->remove(true);
 		}
 
-		// Note: On Windows, removing a directory may not succeed at first 
+		// Note: On Windows, removing a directory may not succeed at first
 		// try because deleting files is not a synchronous operation. Files
 		// are merely marked as deleted, and actually removed at a later time.
 		//
@@ -281,7 +279,7 @@ void File::remove(bool recursive)
 		int retry = 8;
 		long sleep = 10;
 		while (retry > 0)
-		{ 
+		{
 			try
 			{
 				removeImpl();

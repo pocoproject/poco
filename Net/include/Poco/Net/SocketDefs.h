@@ -127,7 +127,7 @@
 	#define POCO_TRY_AGAIN       TRY_AGAIN
 	#define POCO_NO_RECOVERY     NO_RECOVERY
 	#define POCO_NO_DATA         NO_DATA
-#elif defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_VMS)
+#elif defined(POCO_OS_FAMILY_UNIX)
 	#include <unistd.h>
 	#include <errno.h>
 	#include <sys/types.h>
@@ -138,11 +138,7 @@
 		#include <sys/select.h>
 	#endif
 	#include <sys/ioctl.h>
-	#if defined(POCO_OS_FAMILY_VMS)
-		#include <inet.h>
-	#else
-		#include <arpa/inet.h>
-	#endif
+	#include <arpa/inet.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
 	#include <netdb.h>

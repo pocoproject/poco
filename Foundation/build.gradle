@@ -54,7 +54,6 @@ model {
 						exclude 'EventLogChannel.cpp'
 						exclude 'UnWindows.cpp'
 						exclude 'WindowsConsoleChannel.cpp'
-						exclude 'OpcomChannel.cpp'
 						exclude 'AndroidLogChannel.cpp'
 						exclude 'SyslogChannel.cpp'
 
