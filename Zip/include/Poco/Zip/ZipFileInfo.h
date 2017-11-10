@@ -213,7 +213,6 @@ private:
 };
 
 
-
 inline Poco::UInt32 ZipFileInfo::getCRCFromHeader() const
 {
 	return ZipUtil::get32BitValue(_rawInfo, CRC32_POS);

@@ -31,7 +31,8 @@ objects = \
 	NTPClient NTPEventArgs NTPPacket \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	WebSocket WebSocketImpl \
-	OAuth10Credentials OAuth20Credentials
+	OAuth10Credentials OAuth20Credentials \
+	PollSet
 
 target         = PocoNet
 target_version = $(LIBVERSION)

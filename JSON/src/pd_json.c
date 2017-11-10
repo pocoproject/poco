@@ -17,6 +17,17 @@
 
 #define STACK_INC 4
 
+#if defined(_MSC_VER)
+#define strerror_r(err, buf, len) strerror_s(buf, len, err)
+#endif
+
+static void json_error_s(json_stream *json, int err)
+{
+    char errbuf[1024] = {0};
+    strerror_r(err, errbuf, sizeof(errbuf));
+    json_error(json, "%s", errbuf);
+}
+
 static enum json_type
 push(json_stream *json, enum json_type type)
 {
@@ -27,7 +38,7 @@ push(json_stream *json, enum json_type type)
         stack = json->alloc.realloc(json->stack,
                 (json->stack_size + STACK_INC) * sizeof(*json->stack));
         if (stack == NULL) {
-            json_error(json, "%s", strerror(errno));
+            json_error_s(json, errno);
             return JSON_ERROR;
         }
 
@@ -124,7 +135,7 @@ static int pushchar(json_stream *json, int c)
         size_t size = json->data.string_size * 2;
         char *buffer = json->alloc.realloc(json->data.string, size);
         if (buffer == NULL) {
-            json_error(json, "%s", strerror(errno));
+            json_error_s(json, errno);
             return -1;
         } else {
             json->data.string_size = size;
@@ -142,7 +153,7 @@ static int init_string(json_stream *json)
         json->data.string_size = 1024;
         json->data.string = json->alloc.malloc(json->data.string_size);
         if (json->data.string == NULL) {
-            json_error(json, "%s", strerror(errno));
+            json_error_s(json, errno);
             return -1;
         }
     }

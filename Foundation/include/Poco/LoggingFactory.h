@@ -37,7 +37,6 @@ class Foundation_API LoggingFactory
 	///   - FileChannel
 	///   - FormattingChannel
 	///   - NullChannel
-	///   - OpcomChannel (OpenVMS only)
 	///   - SplitterChannel
 	///   - SyslogChannel (Unix platforms only)
 	///
@@ -56,10 +55,10 @@ public:
 
 	~LoggingFactory();
 		/// Destroys the LoggingFactory.
-		
+
 	void registerChannelClass(const std::string& className, ChannelInstantiator* pFactory);
 		/// Registers a channel class with the LoggingFactory.
-		
+
 	void registerFormatterClass(const std::string& className, FormatterFactory* pFactory);
 		/// Registers a formatter class with the LoggingFactory.
 
@@ -68,7 +67,7 @@ public:
 		///
 		/// Throws a NotFoundException if the specified channel class
 		/// has not been registered.
-		
+
 	Formatter* createFormatter(const std::string& className) const;
 		/// Creates a new Formatter instance from specified class.
 		///
@@ -81,7 +80,7 @@ public:
 
 private:
 	void registerBuiltins();
-	
+
 	DynamicFactory<Channel>   _channelFactory;
 	DynamicFactory<Formatter> _formatterFactory;
 };
