@@ -25,12 +25,6 @@ case `uname` in
             ;;
 esac
 
-
-if [ $osname = "Darwin" ] ; then
-	archpath=`dirname stage/tools/PocoDoc/bin/Darwin/*/PocoDoc`
-	osarch=`basename $archpath`
-fi
-
 spec=""
 docConfig=$POCO_BASE/PocoDoc/cfg/mkdoc-poco.xml
 while [ "$1" != "" ] ;
@@ -92,7 +86,7 @@ mkrelease -o $tools $version CppParser PocoDoc
 
 cd $tools
 ./configure --no-tests --no-samples --no-prefix
-make -s -j8 
+make -s -j8
 
 if [ $osname = "CYGWIN" ] ; then
     find $tools -type f -name "cyg*$libversion.dll" > $TMP/dlls
@@ -106,7 +100,6 @@ if [ $osname = "CYGWIN" ] ; then
 #   Poco dlls must be on PATH for Cygwin
     export PATH=$tools/lib/$osname/$osarch:$PATH
 fi
-
 
 export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
 echo PATH=$PATH

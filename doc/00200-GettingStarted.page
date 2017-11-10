@@ -126,7 +126,7 @@ OpenSSL yourself -- a binary distribution is fine.
 On macOS, it's recommended to install OpenSSL via Homebrew.
 
     $ brew install openssl
----
+----
 
 
 <*Windows*>
@@ -138,14 +138,13 @@ On Windows, there are three options:
   - Use a third-party pre-built OpenSSL
 
 
-POCO pre-built OpenSSL binaries
+<*POCO pre-built OpenSSL binaries*>
 
-OpenSSL binaries (version 1.1.0) built with VS 2013 are available for download at:
-
-https://github.com/pocoproject/openssl/tree/master/VS_120
+OpenSSL binaries (version 1.1.0) built with Visual Studio 2013 are available for
+[[https://github.com/pocoproject/openssl/tree/master/VS_120 download]].
 
 In case you are using pre-built binaries, please make sure to copy the
-entire directory to C:\%POCO_BASE%\openssl\
+entire directory to <*C:\%POCO_BASE%\openssl\*>.
 
 Or, %POCO_BASE%\openssl directory can be deleted and openssl
 repository cloned:
@@ -154,20 +153,17 @@ repository cloned:
   $ rmdir /s /q openssl
   $ git clone https://github.com/pocoproject/openssl
 
-All libraries are located in their proper folders (eg. win64/bin/debug/),
-and all are named identically (libcrypto and libssl).
+All libraries are located in their proper folders (eg. <*win64/bin/debug/*>),
+and all are named identically (<*libcrypto*> and <*libssl*>).
 
 
-Build OpenSSL using scripts from POCO distribution package
+<*Build OpenSSL using scripts from POCO distribution package*>
 
 Alternatively, if you choose to build your own OpenSSL, POCO C++ Libraries
 distribution package comes with scripts to build OpenSSL on Windows operating
-system.
+system. This requires Windows PowerShell.
 
-Prerequisites
-  - Powershell
-
-Usage
+Usage:
 
     C:\%POCO_BASE%\openssl\build.ps1 [-openssl_release 1.0.0 | 1.1.0]
                                      [-vs_version 150 | 140 | 120 | 110 | 100 | 90]
@@ -176,21 +172,19 @@ Usage
                                      [-library    shared | static]
 ----
 
-Example
-
-Building OpenSSL 1.1.0, DLL release build for x64 with VS 2013:
+Example: Building OpenSSL 1.1.0, DLL release build for x64 with Visual Studio 2013:
 
     C:\%POCO_BASE%\openssl\build.ps1 -openssl_release 1.1.0 -vs_version 120 -config release -platform x64 -library shared
 ----
 
 The above command will download all the necessary packages (perl, nasm, etc)
-and buil OpenSSL in C:\%POCO_BASE%\openssl\VS_120 directory; the built OpenSSL
-binaries can be linked from EXEs and DLLs built with VS 2008-2017.
+and buil OpenSSL in <*C:\%POCO_BASE%\openssl\VS_120*> directory; the built OpenSSL
+binaries can be linked from EXEs and DLLs built with Visual Studio 2008 to 2017.
 
 Pre-generated POCO Visual Studio projects are configured to use headers and
-libraries from VS_120 directory.
+libraries from <*VS_120*> directory.
 
-Use a third-party pre-built OpenSSL
+<*Use a third-party pre-built OpenSSL*>
 
 Yet another way to install OpenSSL on Windows is to use a binary
 (prebuild) release, for example the one from Shining Light
@@ -203,11 +197,11 @@ have to edit the project settings if the names of the OpenSSL libraries
 from your build differ from the names used in the project files.
 
 NOTE: To disable internal automatic linking of supplied binaries in pre-generated
-POCO VS projects, define POCO_EXTERNAL_OPENSSL in your build environment.
+POCO Visual Studio projects, define <[POCO_EXTERNAL_OPENSSL]> in your build environment.
 Alternatively, you can either rename your binaries, or edit the
-%POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h file if the names of the
+<*%POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h*> file if the names of the
 OpenSSL libraries from your build differ from the names used thereof
-(look for "#pragma comment" lines in Crypto.h).
+(look for "#pragma comment" lines in <*Crypto.h*>).
 
 
 !ODBC

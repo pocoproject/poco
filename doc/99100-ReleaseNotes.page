@@ -60,7 +60,7 @@ AAAIntroduction
     ([[https://github.com/pocoproject/openssl/archive/develop.zip Zip archive]]).
     You can also provide your own build of OpenSSL, by specifying the appropriate
     header and library search paths in the Visual Studio project files. Through the
-    <*Poco/Crypto/Crypto.h> and <*Poco/Net/NetSSL.h*> headers, the <*libcrypto.lib*>
+    <*Poco/Crypto/Crypto.h*> and <*Poco/Net/NetSSL.h*> headers, the <*libcrypto.lib*>
     and <*libssl.lib*> libraries will be automatically linked. If you don't want this,
     build Crypto and NetSSL_OpenSSL with the <[POCO_EXTERNAL_OPENSSL]> macro defined.
 
