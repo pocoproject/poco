@@ -49,6 +49,21 @@ AAAIntroduction
   - fixed GH #1950: Net Exception: Address family not supported with clang
   - fixed GH #1964: Buffer<> swap miss ownMem
 
+!!Incompatible Changes and Possible Transition Issues
+
+  - Crypto and NetSSL on Windows: The included Visual Studio project files now expect the
+    OpenSSL headers and libraries to be in the "openssl" directory in the POCO root
+    directory, alongside the Foundation, XML, Net directories. The GitHub repository
+    contains the <*openssl*> submodule, which has the required files. The release
+    source packages do not contain these files. They are available from the
+    [[https://github.com/pocoproject/openssl pocoproject/openssl]] repository
+    ([[https://github.com/pocoproject/openssl/archive/develop.zip Zip archive]]).
+    You can also provide your own build of OpenSSL, by specifying the appropriate
+    header and library search paths in the Visual Studio project files. Through the
+    <*Poco/Crypto/Crypto.h> and <*Poco/Net/NetSSL.h*> headers, the <*libcrypto.lib*>
+    and <*libssl.lib*> libraries will be automatically linked. If you don't want this,
+    build Crypto and NetSSL_OpenSSL with the <[POCO_EXTERNAL_OPENSSL]> macro defined.
+
 
 !!!Release 1.7.9p2
 
