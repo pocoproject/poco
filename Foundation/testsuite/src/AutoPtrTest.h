@@ -1,8 +1,6 @@
 //
 // AutoPtrTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/AutoPtrTest.h#1 $
-//
 // Definition of the AutoPtrTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

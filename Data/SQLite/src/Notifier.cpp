@@ -1,8 +1,6 @@
 //
 // Notifier.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Notifier.cpp#5 $
-//
 // Library: Data/SQLite
 // Package: SQLite
 // Module:  Notifier

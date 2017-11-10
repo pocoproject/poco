@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/iPhone#2 $
-#
 # iPhone
 #
 # Build settings for iPhone OS, using Apple's iPhone SDK
@@ -65,7 +63,7 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(OSFLAGS)
+CFLAGS          = $(OSFLAGS) -std=gnu99
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = $(OSFLAGS) -std=gnu++11 -stdlib=libc++ -Wall -Wno-sign-compare 

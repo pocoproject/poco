@@ -1,8 +1,6 @@
 //
 // FPEnvironment_QNX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FPEnvironment_QNX.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment

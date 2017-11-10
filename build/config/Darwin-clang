@@ -1,6 +1,4 @@
 #
-# $Id$
-#
 # Darwin-clang
 #
 # Build settings for Mac OS X 10.7 (clang, libstdc++, x86_64)
@@ -52,7 +50,7 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(ARCHFLAGS) $(OSFLAGS)
+CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) -std=c99
 CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++03 -stdlib=libstdc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
 LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++
 SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++

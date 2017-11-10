@@ -1,8 +1,6 @@
 //
 // Alignment.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/Alignment.h#2 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Alignment

@@ -1,8 +1,6 @@
 //
 // JSONTest.h
 //
-// $Id: //poco/1.4/JSON/testsuite/src/JSONTest.h#1 $
-//
 // Definition of the JSONTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -75,10 +73,11 @@ public:
 	void testInvalidJanssonFiles();
 	void testTemplate();
 	void testItunes();
-	void testUnicode(); 
+	void testUnicode();
 	void testInvalidUnicodeJanssonFiles();
 	void testSmallBuffer();
-
+	void testEscape0();
+	void testEscapeUnicode();
 	void setUp();
 	void tearDown();
 

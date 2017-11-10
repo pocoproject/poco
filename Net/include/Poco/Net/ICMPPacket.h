@@ -1,8 +1,6 @@
 //
 // ICMPPacket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPPacket.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPPacket
@@ -33,7 +31,7 @@ class Net_API ICMPPacket
 	/// This class is the ICMP packet abstraction. 
 {
 public:
-	ICMPPacket(IPAddress::Family family, int dataSize = 48);
+	ICMPPacket(SocketAddress::Family family, int dataSize = 48);
 		/// Creates an ICMPPacket of specified family.
 
 	~ICMPPacket();

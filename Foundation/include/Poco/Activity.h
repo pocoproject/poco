@@ -1,8 +1,6 @@
 //
 // Activity.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Activity.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects

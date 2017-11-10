@@ -1,8 +1,6 @@
 //
 // NamedEvent.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedEvent.cpp#2 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent
@@ -25,8 +23,6 @@
 #include "NamedEvent_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedEvent_UNIX.cpp"
-#else
-#include "NamedEvent_VMS.cpp"
 #endif
 
 

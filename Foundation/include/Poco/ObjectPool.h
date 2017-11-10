@@ -1,8 +1,6 @@
 //
 // ObjectPool.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ObjectPool.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ObjectPool
@@ -22,6 +20,7 @@
 
 #include "Poco/Poco.h"
 #include "Poco/Mutex.h"
+#include "Poco/Condition.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
@@ -40,7 +39,7 @@ class PoolableObjectFactory
 	/// a policy class to change the behavior of the ObjectPool when
 	/// creating new objects, returning used objects back to the pool
 	/// and destroying objects, when the pool itself is destroyed or
-	/// shrinked.
+	/// shrunk.
 {
 public:
 	P createObject()
@@ -56,7 +55,7 @@ public:
 		/// Returns true if the object is valid,
 		/// false otherwise.
 		///
-		/// To maintain the integrity of the pool, this method 
+		/// To maintain the integrity of the pool, this method
 		/// must not throw an exception.
 	{
 		return true;
@@ -74,7 +73,7 @@ public:
 		/// pool and the object is still valid (a prior call
 		/// to validateObject() returned true).
 		///
-		/// To maintain the integrity of the pool, this method 
+		/// To maintain the integrity of the pool, this method
 		/// must not throw an exception.
 	{
 	}
@@ -82,7 +81,7 @@ public:
 	void destroyObject(P pObject)
 		/// Destroy an object.
 		///
-		/// To maintain the integrity of the pool, this method 
+		/// To maintain the integrity of the pool, this method
 		/// must not throw an exception.
 	{
 		delete pObject;
@@ -154,14 +153,14 @@ class ObjectPool
 	///
 	/// When an object is requested from the pool:
 	///   - If an object is available from the pool, an object from the pool is
-	///     removed from the pool, activated (using the factory) and returned. 
-	///   - Otherwise, if the peak capacity of the pool has not yet been reached, 
-	///     a new object is created and activated, using the object factory, and returned. 
-	///   - If the peak capacity has already been reached, null is returned.
+	///     removed from the pool, activated (using the factory) and returned.
+	///   - Otherwise, if the peak capacity of the pool has not yet been reached,
+	///     a new object is created and activated, using the object factory, and returned.
+	///   - If the peak capacity has already been reached, null is returned after timeout.
 	///
 	/// When an object is returned to the pool:
 	///   - If the object is valid (checked by calling validateObject()
-	///     from the object factory), the object is deactivated. If the 
+	///     from the object factory), the object is deactivated. If the
 	///     number of objects in the pool is below the capacity,
 	///     the object is added to the pool. Otherwise it is destroyed.
 	///   - If the object is not valid, it is destroyed immediately.
@@ -207,33 +206,47 @@ public:
 		}
 	}
 		
-	P borrowObject()
+	P borrowObject(long timeoutMilliseconds = 0)
 		/// Obtains an object from the pool, or creates a new object if
 		/// possible.
 		///
-		/// Returns null if no object is available.
+		/// Returns null if no object is available after timeout.
 		///
 		/// If activating the object fails, the object is destroyed and
 		/// the exception is passed on to the caller.
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		
+
 		if (!_pool.empty())
 		{
 			P pObject = _pool.back();
 			_pool.pop_back();
 			return activateObject(pObject);
 		}
-		else if (_size < _peakCapacity)
+
+		if (_size >= _peakCapacity)
 		{
-			P pObject = _factory.createObject();
-			activateObject(pObject);
-			_size++;
-			return pObject;
+			if (timeoutMilliseconds == 0)
+			{
+				return 0;
+			}
+			while (_size >= _peakCapacity)
+			{
+				if ( !_availableCondition.tryWait(_mutex, timeoutMilliseconds))
+				{
+					// timeout
+					return 0;
+				}
+			}
 		}
-		else return 0;
+
+		// _size < _peakCapacity
+		P pObject = _factory.createObject();
+		activateObject(pObject);
+		_size++;
+		return pObject;
 	}
-		
+
 	void returnObject(P pObject)
 		/// Returns an object to the pool.
 	{
@@ -256,6 +269,7 @@ public:
 		}
 		_factory.destroyObject(pObject);
 		_size--;
+		_availableCondition.signal();
 	}
 
 	std::size_t capacity() const
@@ -308,6 +322,7 @@ private:
 	std::size_t _size;
 	std::vector<P> _pool;
 	mutable Poco::FastMutex _mutex;
+	Poco::Condition _availableCondition;
 };
 
 

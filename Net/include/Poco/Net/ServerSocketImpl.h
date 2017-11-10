@@ -1,8 +1,6 @@
 //
 // ServerSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ServerSocketImpl.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  ServerSocketImpl

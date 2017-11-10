@@ -1,8 +1,6 @@
 //
 // FIFOBuffer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOBuffer.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FIFOBuffer

@@ -2,17 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{a35e024a-fce4-4c8f-a0c3-532dbe761b14}</UniqueIdentifier>
+      <UniqueIdentifier>{e2e51999-1855-4980-99bd-6859cc12eeb4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{b22b7691-e973-42aa-ac42-fdeb99ecd46d}</UniqueIdentifier>
+      <UniqueIdentifier>{1f145d26-cb6a-4e88-8838-47713f535ee0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ParseHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Handler.cpp">
@@ -24,7 +21,16 @@
     <ClCompile Include="src\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ParseHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParserImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pd_json.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PrintHandler.cpp">
@@ -59,10 +65,19 @@
     <ClInclude Include="include\Poco\JSON\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\JSON\ParseHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\JSON\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\JSON\ParseHandler.h">
+    <ClInclude Include="include\Poco\JSON\ParserImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pd_json.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pd_json_private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\JSON\PrintHandler.h">

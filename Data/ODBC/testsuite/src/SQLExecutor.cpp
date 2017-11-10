@@ -1,8 +1,6 @@
 //
 // SQLExecutor.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/SQLExecutor.cpp#14 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -404,7 +402,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			sixth.day = 18;
 			sixth.hour = 5;
 			sixth.minute = 34;
-			sixth.second = 59;
+			sixth.second = 58;
 			// Fraction support is limited to milliseconds due to MS SQL Server limitation
 			// see http://support.microsoft.com/kb/263872
 			sixth.fraction = 997000000;
@@ -695,9 +693,15 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			{
 				assert (5 == sixth.hour);
 				assert (34 == sixth.minute);
-				assert (59 == sixth.second);
-				if (sixth.fraction)//MySQL does not support fraction
-					assert (997000000 == sixth.fraction);
+				if (sixth.fraction) // MySQL rounds fraction
+				{
+					assert(58 == sixth.second);
+					assert(997000000 == sixth.fraction);
+				}
+				else
+				{
+					assert(59 == sixth.second);
+				}
 			}
 
 			rc = SQLCloseCursor(hstmt);

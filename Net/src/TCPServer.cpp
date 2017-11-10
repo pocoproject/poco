@@ -1,8 +1,6 @@
 //
 // TCPServer.cpp
 //
-// $Id: //poco/1.4/Net/src/TCPServer.cpp#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServer
@@ -28,6 +26,21 @@ using Poco::ErrorHandler;
 
 namespace Poco {
 namespace Net {
+
+
+//
+// TCPServerConnectionFilter
+//
+
+
+TCPServerConnectionFilter::~TCPServerConnectionFilter()
+{
+}
+
+
+//
+// TCPServer
+//
 
 
 TCPServer::TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber, TCPServerParams::Ptr pParams):
@@ -122,9 +135,18 @@ void TCPServer::run()
 				try
 				{
 					StreamSocket ss = _socket.acceptConnection();
-					// enabe nodelay per default: OSX really needs that
-					ss.setNoDelay(true);
-					_pDispatcher->enqueue(ss);
+					
+					if (!_pConnectionFilter || _pConnectionFilter->accept(ss))
+					{
+						// enable nodelay per default: OSX really needs that
+#if defined(POCO_OS_FAMILY_UNIX)
+						if (ss.address().family() != AddressFamily::UNIX_LOCAL)
+#endif
+						{
+							ss.setNoDelay(true);
+						}
+						_pDispatcher->enqueue(ss);
+					}
 				}
 				catch (Poco::Exception& exc)
 				{
@@ -190,6 +212,14 @@ int TCPServer::queuedConnections() const
 int TCPServer::refusedConnections() const
 {
 	return _pDispatcher->refusedConnections();
+}
+
+
+void TCPServer::setConnectionFilter(const TCPServerConnectionFilter::Ptr& pConnectionFilter)
+{
+	poco_assert (_stopped);
+
+	_pConnectionFilter = pConnectionFilter;
 }
 
 

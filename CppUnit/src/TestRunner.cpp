@@ -1,8 +1,6 @@
 //
 // TestRunner.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestRunner.cpp#1 $
-//
 
 
 #include "CppUnit/TestRunner.h"

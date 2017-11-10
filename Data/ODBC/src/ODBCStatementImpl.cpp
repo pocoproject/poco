@@ -1,8 +1,6 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
-//
 // Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl
@@ -453,7 +451,7 @@ int ODBCStatementImpl::affectedRowCount() const
 			_affectedRowCount = static_cast<std::size_t>(rows);
 	}
 
-	return _affectedRowCount;
+	return static_cast<int>(_affectedRowCount);
 }
 
 

@@ -1,8 +1,6 @@
 //
 // MD5EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MD5EngineTest.h#1 $
-//
 // Definition of the MD5EngineTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -27,6 +25,7 @@ public:
 	~MD5EngineTest();
 
 	void testMD5();
+	void testConstantTimeEquals();
 
 	void setUp();
 	void tearDown();

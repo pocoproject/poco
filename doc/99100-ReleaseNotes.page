@@ -1,6 +1,70 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.8.0
+
+!!Summary of Changes
+
+  - Poco::Base64Encoder: add support for base64url encoding (GH #1967)
+  - Add Poco::Net::PollSet class to Net library (GH #1763)
+  - The Net library now supports Unix Domain Sockets, where available.
+  - Added stream parser (Poco::XML::XMLStreamParser) to XML library (GH #1697)
+  - Added Poco::Net::TCPServerConnectionFilter and Poco::Net::TCPServer::setConnectionFilter()
+    to support connection filtering and IP blacklisting (GH #1485)
+  - Added Redis library (GH #1383)
+  - Added Zip64 support to Zip library (GH #1356)
+  - Upgraded bundled SQLite to 3.21.0
+  - Removed OpenVMS support (GH #1988)
+  - fixed GH #271: NamedMutex_UNIX.cpp must remove semid
+  - fixed GH #739: Add Poco::Net::WebSocket::receiveFrame() that appends to a Poco::Buffer<char>
+  - fixed GH #749: NTP Packet impl not according to RFC958
+  - fixed GH #896: Sample "TwitterClient" of NetSSL_OpenSSL can't be build
+  - fixed GH #1172: Poco::Data default storage should be std::vector
+  - fixed GH #1337: Poco::HTMLForm throws exception HTMLFormException("Form must be prepared")
+    even after form is prepared.
+  - fixed GH #1373: SessionImpl::close() does not check return code of close handle specific function
+  - fixed GH #1425: Workaround bug in SolarisStudio 12.4 on RVO-ed objects.
+  - fixed GH #1614: Problematic license for JSON component: the previously used JSON.org parser
+    has been replaced with pdjson
+  - fixed GH #1659: wrong field size calculation in ODBC code
+  - fixed GH #1683: Poco::Data ODBC impl doesn't bind to unsigned numeric types properly
+  - fixed GH #1705: MongoDB: support URI in Connection
+  - fixed GH #1708: "SocketReactor::addEventHandler" and "SocketReactor::removeEventHandler"
+    must protect the access to "NotifierPtr pNotifier"
+  - fixed GH #1729: getConnectionTimeout of SQLite DB wrapper returns wrong value
+    (in milliseconds, should be in seconds)
+  - fixed GH #1739: OpenSSLInitializer isn't threadsafe
+  - fixed GH #1750: double_conversion in NumericString is in conflict with Qt5 Core
+  - fixed GH #1804 and GH #1805: Integer Overflow or Wraparound
+  - fixed GH #1828: DeflatingStreamBuf::sync() should also flush underlying stream.
+  - fixed GH #1880: FTPClientSession::close() error
+  - fixed GH #1897: DateTime wrong binding/extraction for MySQL database
+  - fixed GH #1905: Compiling Foundation library with POCO_NO_FPENVIRONMENT in Config.h fails
+  - fixed GH #1906: Race condition in ThreadPool
+  - fixed GH #1913: Message Doesn't Support 64-bit Thread IDs
+  - fixed GH #1921: ICMPSocket does not check reply address
+  - fixed GH #1926: Exception when using SortedDirectoryIterator
+  - fixed GH #1934: Poco::File::setExecutable() on POSIX should set executable bit for group and
+    other if corresponding readable bit is set
+  - fixed GH #1950: Net Exception: Address family not supported with clang
+  - fixed GH #1964: Buffer<> swap miss ownMem
+
+!!Incompatible Changes and Possible Transition Issues
+
+  - Crypto and NetSSL on Windows: The included Visual Studio project files now expect the
+    OpenSSL headers and libraries to be in the "openssl" directory in the POCO root
+    directory, alongside the Foundation, XML, Net directories. The GitHub repository
+    contains the <*openssl*> submodule, which has the required files. The release
+    source packages do not contain these files. They are available from the
+    [[https://github.com/pocoproject/openssl pocoproject/openssl]] repository
+    ([[https://github.com/pocoproject/openssl/archive/develop.zip Zip archive]]).
+    You can also provide your own build of OpenSSL, by specifying the appropriate
+    header and library search paths in the Visual Studio project files. Through the
+    <*Poco/Crypto/Crypto.h*> and <*Poco/Net/NetSSL.h*> headers, the <*libcrypto.lib*>
+    and <*libssl.lib*> libraries will be automatically linked. If you don't want this,
+    build Crypto and NetSSL_OpenSSL with the <[POCO_EXTERNAL_OPENSSL]> macro defined.
+
+
 !!!Release 1.7.9p2
 
 !!Summary of Changes
@@ -17,8 +81,6 @@ AAAIntroduction
 
 !!!Release 1.7.9
 
-!!Summary of Changes
-
   - fixed GH #1813: xmlparse.cpp doesn't compile in WinCE (poco 1.7.8p3)
   - fixed GH #1826: XPath query error
   - fixed GH #1834: Visual Studio 2008 cannot find stdint.h
@@ -29,8 +91,8 @@ AAAIntroduction
   - Poco::Util::LayeredConfiguration: added support for labelling configurations and
     finding them by their label
   - upgraded bundled SQLite to 3.20.1
-  - PageCompiler: support <[@ include file="<path>"]> syntax for includes, in addition
-    to <[@ include page="<path>"]>
+  - PageCompiler: support <%@ include file="<path>" %> syntax for includes, in addition
+    to <%@ include page="<path>" %>
   - PageCompiler: optimize generated request handler code by removing useless
     statements, e.g. writing empty strings.
   - added POCO_DEPRECATED macro which will be used in the future to deprecate
@@ -42,8 +104,6 @@ AAAIntroduction
 
 
 !!!Release 1.7.8p3
-
-!!Summary of Changes
 
   - fixed GH #1760: Upgrade bundled expat to 2.2.1 which fixes some vulnerabilities:
     http://seclists.org/oss-sec/2017/q2/499

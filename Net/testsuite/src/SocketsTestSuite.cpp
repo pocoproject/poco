@@ -1,8 +1,6 @@
 //
 // SocketsTestSuite.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketsTestSuite.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -17,6 +15,7 @@
 #include "MulticastSocketTest.h"
 #include "DialogSocketTest.h"
 #include "RawSocketTest.h"
+#include "PollSetTest.h"
 
 
 CppUnit::Test* SocketsTestSuite::suite()
@@ -31,5 +30,6 @@ CppUnit::Test* SocketsTestSuite::suite()
 #ifdef POCO_NET_HAS_INTERFACE
 	pSuite->addTest(MulticastSocketTest::suite());
 #endif
+	pSuite->addTest(PollSetTest::suite());
 	return pSuite;
 }

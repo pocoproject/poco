@@ -1,8 +1,6 @@
 //
 // HTTPClientSessionTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPClientSessionTest.h#1 $
-//
 // Definition of the HTTPClientSessionTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -39,6 +37,8 @@ public:
 	void testProxy();
 	void testProxyAuth();
 	void testBypassProxy();
+	void testExpectContinue();
+	void testExpectContinueFail();
 
 	void setUp();
 	void tearDown();

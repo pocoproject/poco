@@ -1,8 +1,6 @@
 //
 // DatagramSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/DatagramSocket.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DatagramSocket
@@ -34,9 +32,16 @@ class Net_API DatagramSocket: public Socket
 {
 public:
 	DatagramSocket();
-		/// Creates an unconnected IPv4 datagram socket.
+		/// Creates an unconnected, unbound datagram socket.
+		///
+		/// Before the datagram socket can be used, bind(),
+		/// bind6() or connect() must be called.
+		///
+		/// Notice: The behavior of this constructor has changed
+		/// in release 2.0. Previously, the constructor created
+		/// an unbound IPv4 datagram socket.
 
-	explicit DatagramSocket(IPAddress::Family family);
+	explicit DatagramSocket(SocketAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
 		/// The socket will be created for the
@@ -78,6 +83,20 @@ public:
 		/// socket. 
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// Calls to connect cannot() come before calls to bind().
+
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket. 
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 		///
 		/// Calls to connect cannot() come before calls to bind().

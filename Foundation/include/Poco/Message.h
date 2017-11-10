@@ -1,8 +1,6 @@
 //
 // Message.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Message.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Message
@@ -195,7 +193,7 @@ private:
 	std::string _text;
 	Priority    _prio;
 	Timestamp   _time;
-	int         _tid;
+	long        _tid;
 	std::string _thread;
 	long        _pid;
 	const char* _file;

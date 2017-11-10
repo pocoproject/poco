@@ -1,8 +1,6 @@
 //
 // SecureSocketImpl.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLSockets
 // Module:  SecureSocketImpl

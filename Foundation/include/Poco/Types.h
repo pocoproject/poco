@@ -1,8 +1,6 @@
 //
 // Types.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Types.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Types
@@ -89,21 +87,10 @@ namespace Poco {
 	typedef unsigned int           UInt32;
 	typedef signed __int64         Int64;
 	typedef unsigned __int64       UInt64;
-	#if defined(__VMS)
-		#if defined(__32BITS)
-			typedef signed long    IntPtr;
-			typedef unsigned long  UIntPtr;
-		#else
-			typedef Int64          IntPtr;
-			typedef UInt64         UIntPtr;
-			#define POCO_PTR_IS_64_BIT 1
-		#endif
-	#else
-		typedef signed long        IntPtr;
-		typedef unsigned long      UIntPtr;
-		#define POCO_PTR_IS_64_BIT 1
-		#define POCO_LONG_IS_64_BIT 1
-	#endif
+	typedef signed long        IntPtr;
+	typedef unsigned long      UIntPtr;
+	#define POCO_PTR_IS_64_BIT 1
+	#define POCO_LONG_IS_64_BIT 1
 	#define POCO_HAVE_INT64 1
 #elif defined(__HP_aCC)
 	//
@@ -149,7 +136,7 @@ namespace Poco {
 		typedef unsigned long long UInt64;
 	#endif
 	#define POCO_HAVE_INT64 1
-#elif defined(__IBMCPP__) 
+#elif defined(__IBMCPP__)
 	//
 	// IBM XL C++
 	//
@@ -171,7 +158,7 @@ namespace Poco {
 		typedef unsigned long long UInt64;
 	#endif
 	#define POCO_HAVE_INT64 1
-#elif defined(__sgi) 
+#elif defined(__sgi)
 	//
 	// MIPSpro C++
 	//

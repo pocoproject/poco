@@ -1,8 +1,6 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timestamp.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timestamp
@@ -116,18 +114,18 @@ public:
 	void systemTime(SYSTEMTIME* pST)
 	{
 		std::memset(pST, 0, sizeof(SYSTEMTIME));
-		
+
 		WORD tick = GetTickCount() % 1000;
 		GetSystemTime(pST);
 		WORD ms = (tick >= _offset) ? (tick - _offset) : (1000 - (_offset - tick));
-		pST->wMilliseconds = ms;	
+		pST->wMilliseconds = ms;
 	}
 
 	void systemTimeAsFileTime(FILETIME* pFT)
 	{
 		SYSTEMTIME st;
 		systemTime(&st);
-		SystemTimeToFileTime(&st, pFT);	
+		SystemTimeToFileTime(&st, pFT);
 	}
 
 private:
@@ -140,7 +138,7 @@ static TickOffset offset;
 
 void GetSystemTimeAsFileTimeWithMillisecondResolution(FILETIME* pFT)
 {
-	offset.systemTimeAsFileTime(pFT);	
+	offset.systemTimeAsFileTime(pFT);
 }
 
 
@@ -248,7 +246,7 @@ void Timestamp::update()
 	if (gettimeofday(&tv, NULL))
 		throw SystemException("cannot get time of day");
 	_ts = TimeVal(tv.tv_sec)*resolution() + tv.tv_usec;
-	
+
 #endif
 }
 
@@ -285,7 +283,7 @@ Timestamp Timestamp::fromFileTimeNP(UInt32 fileTimeLow, UInt32 fileTimeHigh)
 	ULARGE_INTEGER epoch; // UNIX epoch (1970-01-01 00:00:00) expressed in Windows NT FILETIME
 	epoch.LowPart  = 0xD53E8000;
 	epoch.HighPart = 0x019DB1DE;
-	
+
 	ULARGE_INTEGER ts;
 	ts.LowPart  = fileTimeLow;
 	ts.HighPart = fileTimeHigh;

@@ -1,8 +1,6 @@
 //
 // ICMPSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPSocket.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocket
@@ -33,7 +31,7 @@ class Net_API ICMPSocket: public Socket
 	/// ICMP client socket.
 {
 public:
-	ICMPSocket(IPAddress::Family family, int dataSize = 48, int ttl = 128, int timeout = 500000);
+	ICMPSocket(SocketAddress::Family family, int dataSize = 48, int ttl = 128, int timeout = 5000000);
 		/// Creates an unconnected ICMP socket.
 		///
 		/// The socket will be created for the

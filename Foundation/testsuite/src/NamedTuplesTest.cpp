@@ -1,8 +1,6 @@
 //
 // NamedTuplesTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedTuplesTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -52,7 +50,7 @@ void NamedTuplesTest::testNamedTuple1()
 
 	assert (aTuple["A"] == "");
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 1);
 	
@@ -88,7 +86,7 @@ void NamedTuplesTest::testNamedTuple2()
 	assert (aTuple["A"] == "");
 	assert (aTuple["B"] == 0); 
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 2);
 	
@@ -130,7 +128,7 @@ void NamedTuplesTest::testNamedTuple3()
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false); 
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 3);
 	
@@ -176,7 +174,7 @@ void NamedTuplesTest::testNamedTuple4()
 	assert (aTuple["B"] == 0);
 	assert (aTuple["C"] == false); 
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 4);
 	
@@ -226,7 +224,7 @@ void NamedTuplesTest::testNamedTuple5()
 	assert (aTuple["C"] == false);
 	assert (aTuple["E"] == 0); 
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 5);
 	
@@ -281,7 +279,7 @@ void NamedTuplesTest::testNamedTuple6()
 	assert (aTuple["E"] == 0); 
 	assert (aTuple["F"] == 0);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 6);
 	
@@ -340,7 +338,7 @@ void NamedTuplesTest::testNamedTuple7()
 	assert (aTuple["E"] == 0); 
 	assert (aTuple["F"] == 0);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 7);
 	
@@ -403,7 +401,7 @@ void NamedTuplesTest::testNamedTuple8()
 	assert (aTuple["F"] == 0);
 	assert (aTuple["H"] == 0);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 8);
 	
@@ -472,7 +470,7 @@ void NamedTuplesTest::testNamedTuple9()
 	assert (aTuple["H"] == 0);
 	assert (aTuple["I"] == "");
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 9);
 	
@@ -545,7 +543,7 @@ void NamedTuplesTest::testNamedTuple10()
 	assert (aTuple["I"] == "");
 	assert (aTuple["J"] == 0); 
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 10);
 	
@@ -623,7 +621,7 @@ void NamedTuplesTest::testNamedTuple11()
 	assert (aTuple["J"] == 0); 
 	assert (aTuple["K"] == "");
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 11);
 	
@@ -706,7 +704,7 @@ void NamedTuplesTest::testNamedTuple12()
 	assert (aTuple["K"] == "");
 	assert (aTuple["L"] == 0);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 12);
 	
@@ -793,7 +791,7 @@ void NamedTuplesTest::testNamedTuple13()
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 13);
 	
@@ -883,7 +881,7 @@ void NamedTuplesTest::testNamedTuple14()
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 14);
 	
@@ -977,7 +975,7 @@ void NamedTuplesTest::testNamedTuple15()
 	assert (aTuple["L"] == 0);
 	assert (aTuple["M"] == false);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 15);
 	
@@ -1076,7 +1074,7 @@ void NamedTuplesTest::testNamedTuple16()
 	assert (aTuple["M"] == false);
 	assert (aTuple["O"] == 0); 
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 16);
 	
@@ -1181,7 +1179,7 @@ void NamedTuplesTest::testNamedTuple17()
 	assert (aTuple["O"] == 0); 
 	assert (aTuple["P"] == 0);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 17);
 	
@@ -1291,7 +1289,7 @@ void NamedTuplesTest::testNamedTuple18()
 	assert (aTuple["P"] == 0);
 	assert (aTuple["R"] == 0);
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 18);
 	
@@ -1406,7 +1404,7 @@ void NamedTuplesTest::testNamedTuple19()
 	assert (aTuple["R"] == 0);
 	assert (aTuple["S"] == "");
 
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 19);
 	
@@ -1525,7 +1523,7 @@ void NamedTuplesTest::testNamedTuple20()
 	assert (aTuple["R"] == 0);
 	assert (aTuple["S"] == "");
 	assert (aTuple["T"] == 0);
-	try { int xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
+	try { int POCO_UNUSED xyz; xyz = aTuple["XYZ"]; fail ("must fail"); }
 	catch (NotFoundException&) { }
 	assert (aTuple.length == 20);
 	

@@ -1,8 +1,6 @@
 //
 // Connector.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Connector.h#2 $
-//
 // Library: Data/SQLite
 // Package: SQLite
 // Module:  Connector

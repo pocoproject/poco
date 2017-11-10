@@ -1,8 +1,6 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#5 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -43,7 +41,7 @@ namespace
 		{
 			sigset_t sset;
 			sigemptyset(&sset);
-			sigaddset(&sset, SIGPIPE); 
+			sigaddset(&sset, SIGPIPE);
 			pthread_sigmask(SIG_BLOCK, &sset, 0);
 		}
 		~SignalBlocker()
@@ -143,7 +141,7 @@ int ThreadImpl::getMinOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MIN)
 	return POCO_THREAD_PRIORITY_MIN;
-#elif defined(__VMS) || defined(__digital__)
+#elif defined(__digital__)
 	return PRI_OTHER_MIN;
 #else
 	return sched_get_priority_min(policy);
@@ -155,7 +153,7 @@ int ThreadImpl::getMaxOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MAX)
 	return POCO_THREAD_PRIORITY_MAX;
-#elif defined(__VMS) || defined(__digital__)
+#elif defined(__digital__)
 	return PRI_OTHER_MAX;
 #else
 	return sched_get_priority_max(policy);
@@ -272,11 +270,11 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 void ThreadImpl::sleepImpl(long milliseconds)
 {
-#if defined(__VMS) || defined(__digital__)
+#if defined(__digital__)
 		// This is specific to DECThreads
 		struct timespec interval;
 		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000; 
+		interval.tv_nsec = (milliseconds % 1000)*1000000;
 		pthread_delay_np(&interval);
 #elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
@@ -300,7 +298,7 @@ void ThreadImpl::sleepImpl(long milliseconds)
 	}
 	while (remainingTime > 0 && rc < 0 && errno == EINTR);
 	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
-#else 
+#else
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
 	int rc;
 	do
@@ -335,7 +333,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigemptyset(&sset);
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
-	sigaddset(&sset, SIGPIPE); 
+	sigaddset(&sset, SIGPIPE);
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 

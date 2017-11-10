@@ -1,8 +1,6 @@
 //
 // Parser.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Parser.h#1 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  Parser

@@ -1,8 +1,6 @@
 //
 // MD5EngineTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MD5EngineTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -50,13 +48,24 @@ void MD5EngineTest::testMD5()
 
 	engine.update("abcdefghijklmnopqrstuvwxyz");
 	assert (DigestEngine::digestToHex(engine.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
-	
+
 	engine.update("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	engine.update("abcdefghijklmnopqrstuvwxyz0123456789");
 	assert (DigestEngine::digestToHex(engine.digest()) == "d174ab98d277d9f5a5611c2c9f419d9f");
 
 	engine.update("12345678901234567890123456789012345678901234567890123456789012345678901234567890");
 	assert (DigestEngine::digestToHex(engine.digest()) == "57edf4a22be3c955ac49da2e2107b67a");
+}
+
+
+void MD5EngineTest::testConstantTimeEquals()
+{
+	DigestEngine::Digest d1 = DigestEngine::digestFromHex("d41d8cd98f00b204e9800998ecf8427e");
+	DigestEngine::Digest d2 = DigestEngine::digestFromHex("d41d8cd98f00b204e9800998ecf8427e");
+	DigestEngine::Digest d3 = DigestEngine::digestFromHex("0cc175b9c0f1b6a831c399e269772661");
+
+	assert (DigestEngine::constantTimeEquals(d1, d2));
+	assert (!DigestEngine::constantTimeEquals(d1, d3));
 }
 
 
@@ -75,6 +84,7 @@ CppUnit::Test* MD5EngineTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MD5EngineTest");
 
 	CppUnit_addTest(pSuite, MD5EngineTest, testMD5);
+	CppUnit_addTest(pSuite, MD5EngineTest, testConstantTimeEquals);
 
 	return pSuite;
 }

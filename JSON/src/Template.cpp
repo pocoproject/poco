@@ -1,8 +1,6 @@
 //
 // Template.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Template

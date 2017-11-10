@@ -1,8 +1,6 @@
 //
 // WebSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocket.cpp#8 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocket
@@ -21,7 +19,6 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Buffer.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/NullStream.h"
 #include "Poco/BinaryWriter.h"
@@ -115,6 +112,14 @@ int WebSocket::receiveFrame(void* buffer, int length, int& flags)
 }
 
 	
+int WebSocket::receiveFrame(Poco::Buffer<char>& buffer, int& flags)
+{
+	int n = static_cast<WebSocketImpl*>(impl())->receiveBytes(buffer, 0);
+	flags = static_cast<WebSocketImpl*>(impl())->frameFlags();
+	return n;
+}
+
+
 WebSocket::Mode WebSocket::mode() const
 {
 	return static_cast<WebSocketImpl*>(impl())->mustMaskPayload() ? WS_CLIENT : WS_SERVER;

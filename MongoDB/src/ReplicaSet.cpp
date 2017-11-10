@@ -1,8 +1,6 @@
 //
 // ReplicaSet.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  ReplicaSet

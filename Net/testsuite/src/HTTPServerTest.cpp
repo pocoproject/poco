@@ -1,8 +1,6 @@
 //
 // HTTPServerTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPServerTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -146,7 +144,7 @@ void HTTPServerTest::testIdentityRequest()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentLength((int) body.length());
@@ -169,7 +167,7 @@ void HTTPServerTest::testPutIdentityRequest()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("PUT", "/echoBody");
 	request.setContentLength((int) body.length());
@@ -192,7 +190,7 @@ void HTTPServerTest::testChunkedRequest()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentType("text/plain");
@@ -216,7 +214,7 @@ void HTTPServerTest::testClosedRequest()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentType("text/plain");
@@ -236,7 +234,7 @@ void HTTPServerTest::testIdentityRequestKeepAlive()
 	HTTPServer srv(new RequestHandlerFactory, 8008);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", srv.socket().address().port());
+	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -267,7 +265,7 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 	HTTPServer srv(new RequestHandlerFactory, 8009);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", srv.socket().address().port());
+	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -299,7 +297,7 @@ void HTTPServerTest::testClosedRequestKeepAlive()
 	HTTPServer srv(new RequestHandlerFactory, 8010);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", srv.socket().address().port());
+	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentType("text/plain");
@@ -324,7 +322,7 @@ void HTTPServerTest::testMaxKeepAlive()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
 	request.setContentType("text/plain");
@@ -380,7 +378,7 @@ void HTTPServerTest::testKeepAliveTimeout()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	cs.setKeepAliveTimeout(Poco::Timespan(2, 0));
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -424,7 +422,7 @@ void HTTPServerTest::test100Continue()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
 	request.setContentLength((int) body.length());
@@ -448,7 +446,7 @@ void HTTPServerTest::testRedirect()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/redirect");
 	cs.sendRequest(request);
 	HTTPResponse response;
@@ -468,7 +466,7 @@ void HTTPServerTest::testAuth()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/auth");
 	cs.sendRequest(request);
 	HTTPResponse response;
@@ -488,7 +486,7 @@ void HTTPServerTest::testNotImpl()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/notImpl");
 	cs.sendRequest(request);
 	HTTPResponse response;
@@ -507,7 +505,7 @@ void HTTPServerTest::testBuffer()
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
 	
-	HTTPClientSession cs("localhost", svs.address().port());
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/buffer");
 	cs.sendRequest(request);
 	HTTPResponse response;

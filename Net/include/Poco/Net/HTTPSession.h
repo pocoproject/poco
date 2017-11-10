@@ -1,8 +1,6 @@
 //
 // HTTPSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPSession.h#2 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPSession
@@ -57,6 +55,9 @@ public:
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for the HTTP session.
 		
+	void setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout);
+		/// Sets different timeouts for the HTTP session.
+
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for the HTTP session.
 
@@ -180,7 +181,8 @@ protected:
 private:
 	enum
 	{
-		HTTP_DEFAULT_TIMEOUT = 60000000
+		HTTP_DEFAULT_TIMEOUT = 60000000,
+		HTTP_DEFAULT_CONNECTION_TIMEOUT = 30000000
 	};
 	
 	HTTPSession(const HTTPSession&);
@@ -191,7 +193,9 @@ private:
 	char*            _pCurrent;
 	char*            _pEnd;
 	bool             _keepAlive;
-	Poco::Timespan   _timeout;
+	Poco::Timespan   _connectionTimeout;
+	Poco::Timespan   _receiveTimeout;
+	Poco::Timespan   _sendTimeout;
 	Poco::Exception* _pException;
 	Poco::Any        _data;
 	
@@ -213,7 +217,7 @@ inline bool HTTPSession::getKeepAlive() const
 
 inline Poco::Timespan HTTPSession::getTimeout() const
 {
-	return _timeout;
+	return _receiveTimeout;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // PrintHandler.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  PrintHandler
@@ -119,9 +117,9 @@ void PrintHandler::endArray()
 void PrintHandler::key(const std::string& k)
 {
 	if (!_objStart) comma();
-
-	_objStart = true;
-
+	
+	_objStart = true;	
+		
 	_out << _tab;
 	Stringifier::formatString(k, _out);
 	if (!printFlat()) _out << ' ';
@@ -134,7 +132,6 @@ void PrintHandler::null()
 {
 	arrayValue();
 	_out << "null";
-
 	_objStart = false;
 }
 
@@ -179,7 +176,6 @@ void PrintHandler::value(const std::string& value)
 	Stringifier::formatString(value, _out);
 	_objStart = false;
 }
-
 
 
 void PrintHandler::value(double d)

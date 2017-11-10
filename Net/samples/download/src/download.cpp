@@ -1,8 +1,6 @@
 //
 // download.cpp
 //
-// $Id: //poco/1.4/Net/samples/download/src/download.cpp#1 $
-//
 // This sample demonstrates the URIStreamOpener class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -49,7 +47,11 @@ int main(int argc, char** argv)
 	try
 	{
 		URI uri(argv[1]);
+#ifndef POCO_ENABLE_CPP11
 		std::auto_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
+#else
+		std::unique_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
+#endif // POCO_ENABLE_CPP11
 		StreamCopier::copyStream(*pStr.get(), std::cout);
 	}
 	catch (Exception& exc)

@@ -1,8 +1,6 @@
 //
 // Mutex_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex_POSIX.cpp#4 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
@@ -60,7 +58,7 @@ MutexImpl::MutexImpl()
 	pthread_mutexattr_init(&attr);
 #if defined(PTHREAD_MUTEX_RECURSIVE_NP)
 	pthread_mutexattr_settype_np(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
-#elif !defined(POCO_VXWORKS) 
+#elif !defined(POCO_VXWORKS)
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 #endif
 	if (pthread_mutex_init(&_mutex, &attr))
@@ -150,7 +148,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 		ts.tv_sec = 0;
 		ts.tv_nsec = sleepMillis*1000000;
 		nanosleep(&ts, NULL);
-		
+
 #else
 		struct timeval tv;
 		tv.tv_sec  = 0;

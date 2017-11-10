@@ -1,0 +1,6 @@
+[submodule "openssl"]
+	path = openssl
+	url = https://github.com/pocoproject/openssl
+[submodule "gradle"]
+	path = gradle
+	url = https://github.com/pocoproject/gradle

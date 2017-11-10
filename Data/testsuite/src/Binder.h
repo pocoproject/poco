@@ -1,8 +1,6 @@
 //
 // Binder.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Binder.h#4 $
-//
 // Definition of the Binder class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

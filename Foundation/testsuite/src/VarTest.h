@@ -1,8 +1,6 @@
 //
 // VarTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.h#2 $
-//
 // Tests for Any types
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -42,6 +40,8 @@ public:
 	void testDouble();
 	void testLong();
 	void testULong();
+	void testLongLong();
+	void testULongLong();
 	void testString();
 	void testUDT();
 	void testConversionOperator();
@@ -67,6 +67,7 @@ public:
 	void testJSONDeserializePrimitives();
 	void testJSONDeserializeArray();
 	void testJSONDeserializeStruct();
+	void testJSONRoundtripStruct(); 
 	void testJSONDeserializeComplex();
 	void testDate();
 	void testEmpty();
@@ -98,12 +99,12 @@ private:
 	{
 		TL iMin = std::numeric_limits<TS>::min();
 		Poco::Dynamic::Var da = iMin - 1;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 
 		TL iMax = std::numeric_limits<TS>::max();
 		da = iMax + 1;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
 
@@ -116,13 +117,13 @@ private:
 		{
 			TL iMin = static_cast<TL>(std::numeric_limits<TS>::min());
 			da = iMin * 10;
-			try { TS i; i = da.convert<TS>(); fail("must fail"); }
+			try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 			catch (Poco::RangeException&) {}
 		}
 
 		TL iMax = static_cast<TL>(std::numeric_limits<TS>::max());
 		da = iMax * 10;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
 
@@ -133,9 +134,17 @@ private:
 		assert (!std::numeric_limits<TU>::is_signed);
 
 		TS iMin = std::numeric_limits<TS>::min();
-		Poco::Dynamic::Var da = iMin;
-		try { TU i; i = da.convert<TU>(); fail("must fail"); }
+		Poco::Dynamic::Var dMin = iMin;
+		try { TU POCO_UNUSED i; i = dMin.convert<TU>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
+
+		if(sizeof(TS) == sizeof(TU))
+		{
+			TU iMax = std::numeric_limits<TU>::max();
+			Poco::Dynamic::Var dMax = iMax;
+			try { TS POCO_UNUSED i; i = dMax.convert<TS>(); fail("must fail"); }
+			catch (Poco::RangeException&) {}
+		}
 	}
 
 	template<typename TL, typename TS>
@@ -143,7 +152,7 @@ private:
 	{
 		TL iMax = std::numeric_limits<TS>::max();
 		Poco::Dynamic::Var da = iMax + 1;
-		try { TS i; i = da.convert<TS>(); fail("must fail"); }
+		try { TS POCO_UNUSED i; i = da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}
 

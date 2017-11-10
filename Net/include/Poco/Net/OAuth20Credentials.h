@@ -1,8 +1,6 @@
 //
 // OAuth20Credentials.h
 //
-// $Id$
-//
 // Library: Net
 // Package: OAuth
 // Module:	OAuth20Credentials

@@ -1,8 +1,6 @@
 //
 // ZipFileInfo.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipFileInfo.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipFileInfo
@@ -33,6 +31,7 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	_crc32(0),
 	_compressedSize(0),
 	_uncompressedSize(0),
+	_localHeaderOffset(0),
 	_fileName(),
 	_lastModifiedAt(),
 	_extraField()
@@ -65,6 +64,7 @@ ZipFileInfo::ZipFileInfo(std::istream& in, bool assumeHeaderRead):
 	_crc32(0),
 	_compressedSize(0),
 	_uncompressedSize(0),
+	_localHeaderOffset(0),
 	_fileName(),
 	_lastModifiedAt(),
 	_extraField()
@@ -100,6 +100,7 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	_crc32 = getCRCFromHeader();
 	_compressedSize = getCompressedSizeFromHeader();
 	_uncompressedSize = getUncompressedSizeFromHeader();
+	_localHeaderOffset = getOffsetFromHeader();
 	parseDateTime();
 	Poco::UInt16 len = getFileNameLength();
 	if (len > 0)
@@ -116,6 +117,40 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 			Poco::Buffer<char> xtra(len);
 			inp.read(xtra.begin(), len);
 			_extraField = std::string(xtra.begin(), len);
+			char* ptr = xtra.begin();
+			while (ptr <= xtra.begin() + len - 4)
+			{
+				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
+				ptr += 2;
+				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0);
+				ptr += 2;
+				if (id == ZipCommon::ZIP64_EXTRA_ID)
+				{
+					poco_assert(size >= 8);
+					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					{
+						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
+						ptr += 8;
+					}
+					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					{
+						setCompressedSize(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
+						ptr += 8;
+					}
+					if (size >= 8 && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC)
+					{
+						setOffset(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
+						ptr += 8;
+					}
+				}
+				else
+				{
+					ptr += size;
+				}
+			}
 		}
 	}
 	len = getFileCommentLength();

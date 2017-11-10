@@ -1,8 +1,6 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/MulticastSocket.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  MulticastSocket
@@ -53,8 +51,12 @@ MulticastSocket::MulticastSocket()
 }
 
 
-MulticastSocket::MulticastSocket(IPAddress::Family family): DatagramSocket(family)
+MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(family)
 {
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (family == SocketAddress::UNIX_LOCAL)
+		throw Poco::InvalidArgumentException("Cannot create a MulticastSocket with UNIX_LOCAL socket");
+#endif
 }
 
 
@@ -82,18 +84,17 @@ MulticastSocket& MulticastSocket::operator = (const Socket& socket)
 
 void MulticastSocket::setInterface(const NetworkInterface& interfc)
 {
-	if (address().family() == IPAddress::IPv4)
+	if (address().family() == SocketAddress::IPv4)
 	{
 		impl()->setOption(IPPROTO_IP, IP_MULTICAST_IF, interfc.firstAddress(IPAddress::IPv4));
 	}
 #if defined(POCO_HAVE_IPv6)
-	else if (address().family() == IPAddress::IPv6)
+	else if (address().family() == SocketAddress::IPv6)
 	{
 		impl()->setOption(IPPROTO_IPV6, IPV6_MULTICAST_IF, interfc.index());
 	}
 #endif
-	else
-		throw UnsupportedFamilyException("Unknown or unsupported socket family.");
+	else throw UnsupportedFamilyException("Unknown or unsupported socket family.");
 }
 
 	

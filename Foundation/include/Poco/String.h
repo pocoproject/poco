@@ -1,8 +1,6 @@
 //
 // String.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/String.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  String
@@ -36,7 +34,7 @@ S trimLeft(const S& str)
 {
 	typename S::const_iterator it  = str.begin();
 	typename S::const_iterator end = str.end();
-	
+
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	return S(it, end);
 }
@@ -48,7 +46,7 @@ S& trimLeftInPlace(S& str)
 {
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
-	
+
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	str.erase(str.begin(), it);
 	return str;
@@ -61,7 +59,7 @@ S trimRight(const S& str)
 	/// whitespace removed.
 {
 	int pos = int(str.size()) - 1;
-		
+
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	return S(str, 0, pos + 1);
 }
@@ -72,7 +70,7 @@ S& trimRightInPlace(S& str)
 	/// Removes all trailing whitespace in str.
 {
 	int pos = int(str.size()) - 1;
-		
+
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	str.resize(pos + 1);
 
@@ -87,7 +85,7 @@ S trim(const S& str)
 {
 	int first = 0;
 	int last  = int(str.size()) - 1;
-	
+
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
 
@@ -101,7 +99,7 @@ S& trimInPlace(S& str)
 {
 	int first = 0;
 	int last  = int(str.size()) - 1;
-	
+
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
 
@@ -170,16 +168,16 @@ S& toLowerInPlace(S& str)
 template <class S, class It>
 int icompare(
 	const S& str,
-	typename S::size_type pos, 
+	typename S::size_type pos,
 	typename S::size_type n,
-	It it2, 
+	It it2,
 	It end2)
 	/// Case-insensitive string comparison
 {
 	typename S::size_type sz = str.size();
 	if (pos > sz) pos = sz;
 	if (pos + n > sz) n = sz - pos;
-	It it1  = str.begin() + pos; 
+	It it1  = str.begin() + pos;
 	It end1 = str.begin() + pos + n;
 	while (it1 != end1 && it2 != end2)
 	{
@@ -217,7 +215,7 @@ int icompare(const S& str1, const S& str2)
 			return 1;
 		++it1; ++it2;
 	}
-	
+
 	if (it1 == end1)
 		return it2 == end2 ? 0 : -1;
 	else
@@ -250,9 +248,9 @@ int icompare(const S& str1, typename S::size_type pos, typename S::size_type n, 
 
 template <class S>
 int icompare(
-	const S& str1, 
-	typename S::size_type pos1, 
-	typename S::size_type n1, 
+	const S& str1,
+	typename S::size_type pos1,
+	typename S::size_type n1,
 	const S& str2,
 	typename S::size_type pos2,
 	typename S::size_type n2)
@@ -266,9 +264,9 @@ int icompare(
 
 template <class S>
 int icompare(
-	const S& str1, 
-	typename S::size_type pos1, 
-	typename S::size_type n, 
+	const S& str1,
+	typename S::size_type pos1,
+	typename S::size_type n,
 	const S& str2,
 	typename S::size_type pos2)
 {
@@ -290,7 +288,7 @@ int icompare(
 	typename S::size_type sz = str.size();
 	if (pos > sz) pos = sz;
 	if (pos + n > sz) n = sz - pos;
-	typename S::const_iterator it  = str.begin() + pos; 
+	typename S::const_iterator it  = str.begin() + pos;
 	typename S::const_iterator end = str.begin() + pos + n;
 	while (it != end && *ptr)
 	{
@@ -302,7 +300,7 @@ int icompare(
 			return 1;
 		++it; ++ptr;
 	}
-	
+
 	if (it == end)
 		return *ptr == 0 ? 0 : -1;
 	else
@@ -353,7 +351,7 @@ S translate(const S& str, const S& from, const S& to)
 	/// from replaced by the corresponding (by position)
 	/// characters in to. If there is no corresponding
 	/// character in to, the character is removed from
-	/// the copy. 
+	/// the copy.
 {
 	S result;
 	result.reserve(str.size());
@@ -388,7 +386,7 @@ S translate(const S& str, const typename S::value_type* from, const typename S::
 
 template <class S>
 S& translateInPlace(S& str, const S& from, const S& to)
-	/// Replaces in str all occurences of characters in from
+	/// Replaces in str all occurrences of characters in from
 	/// with the corresponding (by position) characters in to.
 	/// If there is no corresponding character, the character
 	/// is removed.
@@ -404,7 +402,13 @@ S translateInPlace(S& str, const typename S::value_type* from, const typename S:
 	poco_check_ptr (from);
 	poco_check_ptr (to);
 	str = translate(str, S(from), S(to));
+#if defined(__SUNPRO_CC)
+// Fix around the RVO bug in SunStudio 12.4
+	S ret(str);
+	return ret;
+#else
 	return str;
+#endif
 }
 
 
@@ -415,7 +419,7 @@ template <class S>
 S& replaceInPlace(S& str, const S& from, const S& to, typename S::size_type start = 0)
 {
 	poco_assert (from.size() > 0);
-	
+
 	S result;
 	typename S::size_type pos = 0;
 	result.append(str, 0, start);
@@ -491,7 +495,7 @@ S& removeInPlace(S& str, const typename S::value_type ch, typename S::size_type 
 
 template <class S>
 S replace(const S& str, const S& from, const S& to, typename S::size_type start = 0)
-	/// Replace all occurences of from (which must not be the empty string)
+	/// Replace all occurrences of from (which must not be the empty string)
 	/// in str with to, starting at position start.
 {
 	S result(str);
@@ -540,7 +544,7 @@ Foundation_API std::string& replaceInPlace(std::string& str, const std::string::
 Foundation_API std::string& removeInPlace(std::string& str, const std::string::value_type ch, std::string::size_type start = 0);
 
 
-#endif	
+#endif
 
 
 template <class S>
@@ -646,7 +650,7 @@ struct i_char_traits : public std::char_traits<charT>
 		return Ascii::toLower(c1) < Ascii::toLower(c2);
 	}
 
-	static int compare(const charT* s1, const charT* s2, size_t n)
+	static int compare(const charT* s1, const charT* s2, std::size_t n)
 	{
 		for (int i = 0; i < n && s1 && s2; ++i, ++s1, ++s2)
 		{
@@ -676,7 +680,7 @@ std::size_t isubstr(const T& str, const T& sought)
 	/// without regards to case.
 {
 	typename T::const_iterator it = std::search(str.begin(), str.end(),
-		sought.begin(), sought.end(), 
+		sought.begin(), sought.end(),
 		i_char_traits<typename T::value_type>::eq);
 
 	if (it != str.end()) return it - str.begin();

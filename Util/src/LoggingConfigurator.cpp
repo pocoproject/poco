@@ -1,8 +1,6 @@
 //
 // LoggingConfigurator.cpp
 //
-// $Id: //poco/1.4/Util/src/LoggingConfigurator.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  LoggingConfigurator

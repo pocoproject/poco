@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/XML/testsuite/Makefile#1 $
-#
 # Makefile for Poco XML testsuite
 #
 
@@ -12,7 +10,8 @@ objects = AttributesImplTest ChildNodesTest DOMTestSuite DocumentTest \
 	DocumentTypeTest Driver ElementTest EventTest NamePoolTest NameTest \
 	NamespaceSupportTest NodeIteratorTest NodeTest ParserWriterTest \
 	SAXParserTest SAXTestSuite TextTest TreeWalkerTest \
-	XMLTestSuite XMLWriterTest NodeAppenderTest
+	XMLTestSuite XMLWriterTest NodeAppenderTest \
+	XMLStreamParserTest
 
 target         = testrunner
 target_version = 1

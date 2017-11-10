@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/WebNotifier/Makefile#1 $
-#
 # Makefile for Poco Data WebNotifier sample
 #
 

@@ -1,8 +1,6 @@
 //
 // Thread_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_POSIX.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -44,7 +42,7 @@ namespace Poco {
 
 class Foundation_API ThreadImpl
 {
-public:	
+public:
 	typedef pthread_t TIDImpl;
 	typedef void (*Callable)(void*);
 
@@ -56,7 +54,7 @@ public:
 		PRIO_HIGH_IMPL,
 		PRIO_HIGHEST_IMPL
 	};
-	
+
 	enum Policy
 	{
 		POLICY_DEFAULT_IMPL = SCHED_OTHER
@@ -109,7 +107,7 @@ private:
 		{
 			pthread_setspecific(_key, pThread);
 		}
-	
+
 	private:
 		pthread_key_t _key;
 	};

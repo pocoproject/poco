@@ -1,6 +1,4 @@
 #
-# $Id $
-#
 # Yocto
 #
 # Make settings for Linux/GCC ARM
@@ -41,7 +39,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          = -std=c99
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare

@@ -1,8 +1,6 @@
 //
 // CipherKey.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKey.h#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKey
@@ -63,7 +61,8 @@ public:
 	CipherKey(const std::string& name, 
 		const std::string& passphrase, 
 		const std::string& salt = "",
-		int iterationCount = DEFAULT_ITERATION_COUNT);
+		int iterationCount = DEFAULT_ITERATION_COUNT,
+		const std::string& digest = "md5");
 		/// Creates a new CipherKeyImpl object using the given
 		/// cipher name, passphrase, salt value and iteration count.
 

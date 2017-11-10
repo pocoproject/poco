@@ -1,8 +1,6 @@
 //
 // PartialStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/PartialStream.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  PartialStream
@@ -76,7 +74,7 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		std::streamsize tmp = (_prefix.size() > length)? length: static_cast<std::streamsize>(_prefix.size());
 		std::memcpy(buffer, _prefix.c_str(), tmp);
 		_prefix = _prefix.substr(tmp);
-		return tmp;
+		return static_cast<int>(tmp);
 	}
 
 	if (_numBytes == 0)
@@ -86,7 +84,7 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			std::streamsize tmp = (_postfix.size() > length)? length: static_cast<std::streamsize>(_postfix.size());
 			std::memcpy(buffer, _postfix.c_str(), tmp);
 			_postfix = _postfix.substr(tmp);
-			return tmp;
+			return static_cast<int>(tmp);
 		}
 		else
 			return -1;
@@ -101,7 +99,7 @@ int PartialStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	_pIstr->read(buffer, length);
 	std::streamsize bytesRead = _pIstr->gcount();
 	_numBytes -= bytesRead;
-	return bytesRead;
+	return static_cast<int>(bytesRead);
 
 }
 
@@ -123,7 +121,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 		{
 			_ignoreStart -= length;
 			// fake return values
-			return length;
+			return static_cast<int>(length);
 		}
 		else
 		{
@@ -138,10 +136,10 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 			cnt += static_cast<std::streamsize>(_ignoreStart);
 			_ignoreStart = 0;
 			poco_assert (cnt < length);
-			_bufferOffset = length - cnt;
+			_bufferOffset = static_cast<Poco::UInt32>(length - cnt);
 			std::memcpy(_buffer.begin(), buffer + cnt, _bufferOffset);
 
-			return length;
+			return static_cast<int>(length);
 		}
 	}
 	if (_buffer.size() > 0)
@@ -150,7 +148,8 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 		// thus first fill the buffer with the last n bytes of the msg
 
 		// how much of the already cached data do we need to write?
-		Poco::Int32 cache = _bufferOffset + length - _buffer.size();
+		Poco::Int32 cache = static_cast<Poco::Int32>(_bufferOffset +
+			static_cast<Poco::Int32>(length) - static_cast<Poco::Int32>(_buffer.size()));
 		if (cache > 0)
 		{
 			if (cache > _bufferOffset)
@@ -186,7 +185,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	}
 
 	if (_pOstr->good())
-		return length;
+		return static_cast<int>(length);
 
 	throw Poco::IOException("Failed to write to output stream");
 }
@@ -194,7 +193,7 @@ int PartialStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 
 void PartialStreamBuf::close()
 {
-	// DONT write data from _buffer!
+	// DON'T write data from _buffer!
 }
 
 
@@ -221,8 +220,8 @@ PartialStreamBuf* PartialIOS::rdbuf()
 }
 
 
-PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, bool initStream, const std::string& pre, const std::string& post): 
-	PartialIOS(istr, start, end, pre, post, initStream), 
+PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, bool initStream, const std::string& pre, const std::string& post):
+	PartialIOS(istr, start, end, pre, post, initStream),
 	std::istream(&_buf)
 {
 }
@@ -234,7 +233,7 @@ PartialInputStream::~PartialInputStream()
 
 
 PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream):
-	PartialIOS(ostr, start, end, initStream), 
+	PartialIOS(ostr, start, end, initStream),
 	std::ostream(&_buf)
 {
 }

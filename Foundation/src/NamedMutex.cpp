@@ -1,8 +1,6 @@
 //
 // NamedMutex.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedMutex.cpp#2 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex
@@ -25,8 +23,6 @@
 #include "NamedMutex_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedMutex_UNIX.cpp"
-#else
-#include "NamedMutex_VMS.cpp"
 #endif
 
 

@@ -1,8 +1,6 @@
 //
 // SocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,6 +21,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/FIFOBuffer.h"
 #include "Poco/Delegate.h"
+#include "Poco/File.h"
 #include <iostream>
 
 
@@ -54,7 +53,7 @@ void SocketTest::testEcho()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);
 	assert (n == 5);
 	char buffer[256];
@@ -69,7 +68,7 @@ void SocketTest::testPoll()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	Stopwatch sw;
 	sw.start();
 	Timespan timeout(1000000);
@@ -94,7 +93,7 @@ void SocketTest::testAvailable()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	Timespan timeout(1000000);
 	ss.sendBytes("hello", 5);
 	char buffer[256];
@@ -134,7 +133,7 @@ void SocketTest::testFIFOBuffer()
 
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendBytes(f);
 	assert (n == 5);
 	assert(1 == _notToReadable);
@@ -171,7 +170,7 @@ void SocketTest::testConnect()
 	serv.listen();
 	StreamSocket ss;
 	Timespan timeout(250000);
-	ss.connect(SocketAddress("localhost", serv.address().port()), timeout);
+	ss.connect(SocketAddress("127.0.0.1", serv.address().port()), timeout);
 }
 
 
@@ -186,7 +185,7 @@ void SocketTest::testConnectRefused()
 	Timespan timeout(250000);
 	try
 	{
-		ss.connect(SocketAddress("localhost", port));
+		ss.connect(SocketAddress("127.0.0.1", port));
 		fail("connection refused - must throw");
 	}
 	catch (ConnectionRefusedException&)
@@ -206,7 +205,7 @@ void SocketTest::testConnectRefusedNB()
 	Timespan timeout(2, 0);
 	try
 	{
-		ss.connect(SocketAddress("localhost", port), timeout);
+		ss.connect(SocketAddress("127.0.0.1", port), timeout);
 		fail("connection refused - must throw");
 	}
 	catch (TimeoutException&)
@@ -222,7 +221,7 @@ void SocketTest::testNonBlocking()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	ss.setBlocking(false);
 
 	Timespan timeout(1000000);
@@ -246,7 +245,7 @@ void SocketTest::testAddress()
 	serv.bind(SocketAddress());
 	serv.listen();
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", serv.address().port()));
+	ss.connect(SocketAddress("127.0.0.1", serv.address().port()));
 	StreamSocket css = serv.acceptConnection();
 	assert (css.peerAddress().host() == ss.address().host());
 	assert (css.peerAddress().port() == ss.address().port());
@@ -308,7 +307,7 @@ void SocketTest::testTimeout()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	
 	Timespan timeout0 = ss.getReceiveTimeout();
 	Timespan timeout(250000);
@@ -346,7 +345,7 @@ void SocketTest::testTimeout()
 void SocketTest::testBufferSize()
 {
 	EchoServer echoServer;
-	SocketAddress sa("localhost", 1234);
+	SocketAddress sa("127.0.0.1", 1234);
 	StreamSocket ss(sa.family());
 	
 	int osz = ss.getSendBufferSize();
@@ -370,7 +369,7 @@ void SocketTest::testOptions()
 {
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
 	ss.setLinger(true, 20);
 	bool f;
@@ -404,7 +403,7 @@ void SocketTest::testSelect()
 
 	EchoServer echoServer;
 	StreamSocket ss;
-	ss.connect(SocketAddress("localhost", echoServer.port()));
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
@@ -441,8 +440,8 @@ void SocketTest::testSelect2()
 
 	EchoServer echoServer1;
 	EchoServer echoServer2;
-	StreamSocket ss1(SocketAddress("localhost", echoServer1.port()));
-	StreamSocket ss2(SocketAddress("localhost", echoServer2.port()));
+	StreamSocket ss1(SocketAddress("127.0.0.1", echoServer1.port()));
+	StreamSocket ss2(SocketAddress("127.0.0.1", echoServer2.port()));
 	
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
@@ -501,6 +500,28 @@ void SocketTest::testSelect3()
 }
 
 
+void SocketTest::testEchoUnixLocal()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	Poco::File socketFile("/tmp/SocketTest.sock");
+	if (socketFile.exists()) socketFile.remove();
+	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, socketFile.path());
+	EchoServer echoServer(localAddr);
+	StreamSocket ss(SocketAddress::UNIX_LOCAL);
+	ss.connect(localAddr);
+	int n = ss.sendBytes("hello", 5);
+	assert (n == 5);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assert (n == 5);
+	assert (std::string(buffer, n) == "hello");
+	ss.close();
+	socketFile.remove();
+#endif
+}
+
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -549,6 +570,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
+	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 
 	return pSuite;
 }

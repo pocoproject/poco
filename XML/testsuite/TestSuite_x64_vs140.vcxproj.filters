@@ -2,46 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="XML">
-      <UniqueIdentifier>{60dbb005-8f69-4d51-ae54-d58f4f3594e6}</UniqueIdentifier>
+      <UniqueIdentifier>{e94299e2-84fd-4191-923e-bbb0f4487832}</UniqueIdentifier>
     </Filter>
     <Filter Include="XML\Header Files">
-      <UniqueIdentifier>{988de582-2d1d-4913-a158-a8c922e872ad}</UniqueIdentifier>
+      <UniqueIdentifier>{b9b89cab-bc8b-4d3c-97e9-c9ecfda67b52}</UniqueIdentifier>
     </Filter>
     <Filter Include="XML\Source Files">
-      <UniqueIdentifier>{efc5ad7d-52e8-4265-bca1-ff223b5de3ad}</UniqueIdentifier>
+      <UniqueIdentifier>{72674a45-e910-42b7-8aaf-46a53e70ec81}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX">
-      <UniqueIdentifier>{dd88cb60-d80a-4b5f-98d9-b284dca05443}</UniqueIdentifier>
+      <UniqueIdentifier>{30ede1a5-58ae-4f71-9b26-976515e4135a}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX\Header Files">
-      <UniqueIdentifier>{d0dbad2c-e5f5-4438-b3d7-ea5c09380c45}</UniqueIdentifier>
+      <UniqueIdentifier>{c1b1855d-be24-4287-aa59-5cc692bb5ebf}</UniqueIdentifier>
     </Filter>
     <Filter Include="SAX\Source Files">
-      <UniqueIdentifier>{3f608d51-474d-4781-ac2e-73f5828ec3c6}</UniqueIdentifier>
+      <UniqueIdentifier>{b600164b-0fcc-46fa-bfee-3094acdac58f}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM">
-      <UniqueIdentifier>{b9ef1ab1-3843-4ae5-80ce-472beea94da0}</UniqueIdentifier>
+      <UniqueIdentifier>{5c6dd64c-8637-476e-8aa4-214dfd801850}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM\Header Files">
-      <UniqueIdentifier>{7a88f4d9-b3de-40e4-aae5-4900bed90d1e}</UniqueIdentifier>
+      <UniqueIdentifier>{af904f51-e73f-4619-ab70-250887cc5eb6}</UniqueIdentifier>
     </Filter>
     <Filter Include="DOM\Source Files">
-      <UniqueIdentifier>{4ccf3c57-5151-4654-bf02-024056444c23}</UniqueIdentifier>
+      <UniqueIdentifier>{7b6a5608-ee02-440b-a428-b7bfb57f9351}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{c81746a0-c2c5-4ba6-a80e-bdeefade4575}</UniqueIdentifier>
+      <UniqueIdentifier>{79ac3d39-7a72-433f-b0e9-4bc4311eddb9}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{0587cc94-3e7e-449c-8f88-92bc1eba6ff5}</UniqueIdentifier>
+      <UniqueIdentifier>{36e0266b-8cb8-490c-8521-b98f7fa51427}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{39a97bd5-8292-4cc3-ae31-2508738679d9}</UniqueIdentifier>
+      <UniqueIdentifier>{973334df-e212-4ccb-b3d4-fd7e80c09546}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{0f41dff5-954a-4d6a-993c-6d20e443eff5}</UniqueIdentifier>
+      <UniqueIdentifier>{e48fa639-bca2-4fb2-8a04-0c81ef064a7c}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{435d5fac-f2c8-43d1-a5f7-9528b1312b5b}</UniqueIdentifier>
+      <UniqueIdentifier>{b576f820-8449-4182-b3ae-c00850b27d4f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +49,9 @@
       <Filter>XML\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\NameTest.h">
+      <Filter>XML\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLStreamParserTest.h">
       <Filter>XML\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\XMLWriterTest.h">
@@ -111,6 +114,9 @@
       <Filter>XML\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\NameTest.cpp">
+      <Filter>XML\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLStreamParserTest.cpp">
       <Filter>XML\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\XMLWriterTest.cpp">

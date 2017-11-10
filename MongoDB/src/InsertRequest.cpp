@@ -1,8 +1,6 @@
 //
 // InsertRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  InsertRequest

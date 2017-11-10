@@ -1,8 +1,6 @@
 //
 // RawSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/RawSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -45,7 +43,7 @@ RawSocketTest::~RawSocketTest()
 
 void RawSocketTest::testEchoIPv4()
 {
-	SocketAddress sa("localhost", 0);
+	SocketAddress sa("127.0.0.1", 0);
 	RawSocket rs(IPAddress::IPv4);
 	rs.connect(sa);
 
@@ -70,7 +68,7 @@ void RawSocketTest::testSendToReceiveFromIPv4()
 {
 	RawSocket rs(IPAddress::IPv4);
 	
-	int n = rs.sendTo("hello", 5, SocketAddress("localhost", 0));
+	int n = rs.sendTo("hello", 5, SocketAddress("127.0.0.1", 0));
 	assert (n == 5);
 
 	char buffer[256] = "";

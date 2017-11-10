@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/rules/global#1 $
-#
 # global
 #
 # Global build configuration
@@ -306,12 +304,12 @@ OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared$(OSARCH_POSTFIX)
 #
 # Build Include directory List
 #
-INCLUDE = $(foreach p,$(POCO_ADD_INCLUDE),-I$(p)) -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR))
+INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(foreach p,$(POCO_ADD_INCLUDE),-I$(p))
 
 #
 # Build Library Directory List
 #
-LIBRARY = $(foreach p,$(POCO_ADD_LIBRARY),-L$(p)) -L$(LIBPATH) $(POCO_LIBRARY)
+LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(foreach p,$(POCO_ADD_LIBRARY),-L$(p))
 
 #
 # Strip Command definition

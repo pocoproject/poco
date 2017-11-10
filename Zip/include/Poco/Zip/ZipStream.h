@@ -1,8 +1,6 @@
 //
 // ZipStream.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipStream.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipStream
@@ -50,7 +48,7 @@ public:
 	virtual ~ZipStreamBuf();
 		/// Destroys the ZipStreamBuf.
 
-	void close();
+	void close(Poco::UInt64& extraDataSize);
 		/// Informs a writing outputstream that writing is done for this stream
 
 	bool crcValid() const;
@@ -79,7 +77,7 @@ private:
 	Poco::UInt32   _expectedCrc32;
 	bool           _checkCRC;
 		/// Note: we do not check crc if we decompress a streaming zip file and the crc is stored in the directory header
-	Poco::UInt32   _bytesWritten;
+	Poco::UInt64   _bytesWritten;
 	ZipLocalFileHeader* _pHeader;
 };
 
@@ -140,7 +138,7 @@ public:
 	~ZipOutputStream();
 		/// Destroys the ZipOutputStream.
 
-	void close();
+	void close(Poco::UInt64& extraDataSize);
 		/// Must be called for ZipOutputStreams!
 };
 

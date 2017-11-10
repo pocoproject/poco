@@ -16,6 +16,21 @@
 *.vsp
 *.psess
 
+# Gradle #
+##########
+.gradle/
+gradle/
+
+# NuGet #
+#########
+*.nupkg
+
+# WiX #
+#######
+*.msi
+*.wixobj
+*.wixpdb
+
 # Make #
 ########
 config.build
@@ -89,6 +104,8 @@ Thumbs.db
 *.tlog
 *.lastbuildstate
 *.unsuccessfulbuild
+*.opendb
+.vs/
 release_shared/
 debug_shared/
 release_static/

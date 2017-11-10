@@ -1,8 +1,6 @@
 //
 // VarHolder.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/VarHolder.h#3 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarHolder
@@ -92,7 +90,6 @@ void containerToJSON(C& cont, std::string& val)
 	}
 	for (; it != itEnd; ++it)
 	{
-		
 		val.append(", ");
 		appendJSONValue(val, *it);
 	}
@@ -139,47 +136,47 @@ public:
 
 	virtual void convert(Int8& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(Int16& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(Int32& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(Int64& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(UInt8& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(UInt16& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(UInt32& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(UInt64& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(DateTime& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(LocalDateTime& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(Timestamp& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 #ifndef POCO_LONG_IS_64_BIT
 
@@ -189,70 +186,92 @@ public:
 	void convert(unsigned long& val) const;
 		/// Calls convert(UInt32).
 
+#else
+
+	virtual void convert(long long& val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
+	virtual void convert(unsigned long long & val) const;
+		/// Throws BadCastException. Must be overriden in a type
+		/// specialization in order to suport the conversion.
+
 #endif
 
 	virtual void convert(bool& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(float& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(double& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(char& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(std::string& val) const;
 		/// Throws BadCastException. Must be overriden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(Poco::UTF16String& val) const;
 	/// Throws BadCastException. Must be overriden in a type
-	/// specialization in order to suport the conversion.
+	/// specialization in order to support the conversion.
 
 	virtual bool isArray() const;
 		/// Returns true.
 
 	virtual bool isVector() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isList() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isDeque() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isStruct() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isInteger() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isSigned() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isNumeric() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isBoolean() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
 
 	virtual bool isString() const;
 		/// Returns false. Must be properly overriden in a type
-		/// specialization in order to suport the diagnostic.
+		/// specialization in order to support the diagnostic.
+
+	virtual bool isDate() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to support the diagnostic.
+
+	virtual bool isTime() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to support the diagnostic.
+
+	virtual bool isDateTime() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to support the diagnostic.
 
 	virtual std::size_t size() const;
 		/// Returns 1 iff Var is not empty or this function overriden.
@@ -269,7 +288,7 @@ protected:
 		/// pre-allocated buffer inside the holder).
 		/// 
 		/// Called from clone() member function of the implementation when
-		/// smal object optimization is enabled.
+		/// small object optimization is enabled.
 	{
 #ifdef POCO_NO_SOO
 		(void)pVarHolder;
@@ -320,8 +339,8 @@ protected:
 	template <typename F, typename T>
 	void convertToSmallerUnsigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types,
-		/// from larger to smaller type. Since lower limit is always 0 for unigned types, 
-		/// only the upper limit is checked, thus saving some cycles compared to the signed 
+		/// from larger to smaller type. Since lower limit is always 0 for unsigned types,
+		/// only the upper limit is checked, thus saving some cycles compared to the signed
 		/// version of the function. If the value to be converted is smaller than
 		/// the maximum value for the target type, the conversion is performed.
 	{
@@ -337,8 +356,8 @@ protected:
 	template <typename F, typename T>
 	void convertSignedToUnsigned(const F& from, T& to) const
 		/// This function is meant for converting signed integral data types to
-		/// unsigned data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// unsigned data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -355,9 +374,9 @@ protected:
 	template <typename F, typename T>
 	void convertSignedFloatToUnsigned(const F& from, T& to) const
 		/// This function is meant for converting floating point data types to
-		/// unsigned integral data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
-		/// If uper limit is within the target data type limits, the conversion is performed.
+		/// unsigned integral data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
+		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);
@@ -374,16 +393,16 @@ protected:
 	template <typename F, typename T>
 	void convertUnsignedToSigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types to
-		/// unsigned data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
-		/// If upper limit is within the target data type limits, the converiosn is performed.
+		/// signed integral data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
+		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
 		poco_static_assert (std::numeric_limits<T>::is_specialized);
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -397,7 +416,7 @@ private:
 			throw RangeException("Value too large.");
 		}
 		else
-		if (static_cast<T>(from) > std::numeric_limits<T>::max()) 
+		if (from > std::numeric_limits<T>::max())
 		{
 			throw RangeException("Value too large.");
 		}
@@ -513,6 +532,19 @@ inline void VarHolder::convert(unsigned long& val) const
 	val = tmp;
 }
 
+#else
+
+inline void VarHolder::convert(long long& /*val*/) const
+{
+	throw BadCastException("Can not convert to long long");
+}
+
+
+inline void VarHolder::convert(unsigned long long& /*val*/) const
+{
+	throw BadCastException("Can not convert to unsigned long long");
+}
+
 #endif
 
 inline void VarHolder::convert(bool& /*val*/) const
@@ -605,6 +637,24 @@ inline bool VarHolder::isBoolean() const
 
 
 inline bool VarHolder::isString() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isDate() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isTime() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isDateTime() const
 {
 	return false;
 }
@@ -725,6 +775,20 @@ public:
 	{
 		convertSignedToUnsigned(_val, val);
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val;
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -868,6 +932,20 @@ public:
 		convertSignedToUnsigned(_val, val);
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val;
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+#endif
+
 	void convert(bool& val) const
 	{
 		val = (_val != 0);
@@ -1008,6 +1086,20 @@ public:
 		convertSignedToUnsigned(_val, val);
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val;
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+#endif
+
 	void convert(bool& val) const
 	{
 		val = (_val != 0);
@@ -1145,6 +1237,20 @@ public:
 	{
 		convertSignedToUnsigned(_val, val);
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val;
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -1299,6 +1405,20 @@ public:
 		val = _val;
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = static_cast<long long>(_val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val;
+	}
+
+#endif
+
 	void convert(bool& val) const
 	{
 		val = (_val != 0);
@@ -1436,6 +1556,20 @@ public:
 	{
 		val = _val;
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = static_cast<long long>(_val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val;
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -1575,6 +1709,20 @@ public:
 		val = _val;
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val;
+	}
+
+#endif
+
 	void convert(bool& val) const
 	{
 		val = (_val != 0);
@@ -1712,6 +1860,20 @@ public:
 	{
 		val = _val;
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val;
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -1872,6 +2034,20 @@ public:
 		val = static_cast<UInt64>(_val ? 1 : 0);
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = static_cast<long long>(_val ? 1 : 0);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = static_cast<unsigned long long>(_val ? 1 : 0);
+	}
+
+#endif
+
 	void convert(bool& val) const
 	{
 		val = _val;
@@ -2007,6 +2183,20 @@ public:
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		convertToSmaller(_val, val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedFloatToUnsigned(_val, val);
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -2146,6 +2336,20 @@ public:
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		convertToSmaller(_val, val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedFloatToUnsigned(_val, val);
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -2292,6 +2496,20 @@ public:
 		val = static_cast<UInt8>(_val);
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = static_cast<long long>(_val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = static_cast<unsigned long long>(_val);
+	}
+
+#endif
+
 	void convert(bool& val) const
 	{
 		val = (_val != '\0');
@@ -2435,6 +2653,20 @@ public:
 	{
 		val = NumberParser::parseUnsigned64(_val);
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = NumberParser::parse64(_val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = NumberParser::parseUnsigned64(_val);
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -2613,6 +2845,20 @@ public:
 	{
 		val = NumberParser::parseUnsigned64(toStdString());
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = NumberParser::parse64(toStdString());
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = NumberParser::parseUnsigned64(toStdString());
+	}
+
+#endif
 
 	void convert(bool& val) const
 	{
@@ -3016,6 +3262,305 @@ private:
 };
 
 
+#else // if defined (POCO_LONG_IS_64_BIT)
+
+
+template <>
+class VarHolderImpl<long long>: public VarHolder
+{
+public:
+	VarHolderImpl(long long val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+
+	const std::type_info& type() const
+	{
+		return typeid(long long);
+	}
+
+	void convert(Int8& val) const
+	{
+		convertToSmaller(_val, val);
+	}
+
+	void convert(Int16& val) const
+	{
+		convertToSmaller(_val, val);
+	}
+
+	void convert(Int32& val) const
+	{
+		convertToSmaller(_val, val);
+	}
+
+	void convert(Int64& val) const
+	{
+		val = static_cast<Int64>(_val);
+	}
+
+	void convert(UInt8& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+	void convert(UInt16& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+	void convert(UInt32& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+	void convert(UInt64& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+	void convert(long long& val) const
+	{
+		val = _val;
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		convertSignedToUnsigned(_val, val);
+	}
+
+	void convert(bool& val) const
+	{
+		val = (_val != 0);
+	}
+
+	void convert(float& val) const
+	{
+		val = static_cast<float>(_val);
+	}
+
+	void convert(double& val) const
+	{
+		val = static_cast<double>(_val);
+	}
+
+	void convert(char& val) const
+	{
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
+	}
+
+	void convert(std::string& val) const
+	{
+		val = NumberFormatter::format(_val);
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+
+	const long long& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<long long>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<long long>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<long long>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	VarHolderImpl();
+	VarHolderImpl(const VarHolderImpl&);
+	VarHolderImpl& operator = (const VarHolderImpl&);
+
+	long long _val;
+};
+
+
+template <>
+class VarHolderImpl<unsigned long long>: public VarHolder
+{
+public:
+	VarHolderImpl(unsigned long long val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+
+	const std::type_info& type() const
+	{
+		return typeid(unsigned long long);
+	}
+
+	void convert(Int8& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(Int16& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(Int32& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(Int64& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(UInt8& val) const
+	{
+		convertToSmallerUnsigned(_val, val);
+	}
+
+	void convert(UInt16& val) const
+	{
+		convertToSmallerUnsigned(_val, val);
+	}
+
+	void convert(UInt32& val) const
+	{
+		convertToSmallerUnsigned(_val, val);
+	}
+
+	void convert(UInt64& val) const
+	{
+		val = static_cast<UInt64>(_val);
+	}
+
+	void convert(long long& val) const
+	{
+		convertUnsignedToSigned(_val, val);
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val;
+	}
+
+	void convert(bool& val) const
+	{
+		val = (_val != 0);
+	}
+
+	void convert(float& val) const
+	{
+		val = static_cast<float>(_val);
+	}
+
+	void convert(double& val) const
+	{
+		val = static_cast<double>(_val);
+	}
+
+	void convert(char& val) const
+	{
+		UInt8 tmp;
+		convert(tmp);
+		val = static_cast<char>(tmp);
+	}
+
+	void convert(std::string& val) const
+	{
+		val = NumberFormatter::format(_val);
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+
+	const unsigned long long& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return std::numeric_limits<unsigned long long>::is_integer;
+	}
+
+	bool isSigned() const
+	{
+		return std::numeric_limits<unsigned long long>::is_signed;
+	}
+
+	bool isNumeric() const
+	{
+		return std::numeric_limits<unsigned long long>::is_specialized;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+private:
+	VarHolderImpl();
+	VarHolderImpl(const VarHolderImpl&);
+	VarHolderImpl& operator = (const VarHolderImpl&);
+
+	unsigned long long _val;
+};
+
+
 #endif // 64bit
 
 
@@ -3266,6 +3811,20 @@ public:
 		val = _val.timestamp().epochMicroseconds();
 	}
 
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+#endif
+
 	void convert(std::string& val) const
 	{
 		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
@@ -3331,6 +3890,21 @@ public:
 		return false;
 	}
 
+	bool isDate() const
+	{
+		return true;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return true;
+	}
+
 private:
 	VarHolderImpl();
 	VarHolderImpl(const VarHolderImpl&);
@@ -3366,6 +3940,20 @@ public:
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val.timestamp().epochMicroseconds();
+	}
+
+#endif
 
 	void convert(std::string& val) const
 	{
@@ -3432,6 +4020,21 @@ public:
 		return false;
 	}
 
+	bool isDate() const
+	{
+		return true;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return true;
+	}
+
 private:
 	VarHolderImpl();
 	VarHolderImpl(const VarHolderImpl&);
@@ -3467,6 +4070,20 @@ public:
 	{
 		val = _val.epochMicroseconds();
 	}
+
+#ifdef POCO_LONG_IS_64_BIT
+
+	void convert(long long& val) const
+	{
+		val = _val.epochMicroseconds();
+	}
+
+	void convert(unsigned long long& val) const
+	{
+		val = _val.epochMicroseconds();
+	}
+
+#endif
 
 	void convert(std::string& val) const
 	{
@@ -3531,6 +4148,21 @@ public:
 	bool isString() const
 	{
 		return false;
+	}
+
+	bool isDate() const
+	{
+		return true;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return true;
 	}
 
 private:

@@ -1,8 +1,6 @@
 //
 // VerificationErrorArgs.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/VerificationErrorArgs.h#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  VerificationErrorArgs

@@ -1,8 +1,6 @@
 //
 // ICMPClientTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/ICMPClientTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -48,9 +46,9 @@ ICMPClientTest::~ICMPClientTest()
 
 void ICMPClientTest::testPing()
 {
-	assert(ICMPClient::pingIPv4("localhost") > 0);
+	assert(ICMPClient::pingIPv4("127.0.0.1") > 0);
 
-	assert(_icmpClient.ping("localhost") > 0);
+	assert(_icmpClient.ping("127.0.0.1") > 0);
 	assert(_icmpClient.ping("www.appinf.com", 4) > 0);
 
 	// warning: may fail depending on the existence of the addresses at test site

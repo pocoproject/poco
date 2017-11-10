@@ -1,8 +1,6 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.4/Net/src/MailMessage.cpp#2 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailMessage

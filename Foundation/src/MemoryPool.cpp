@@ -1,8 +1,6 @@
 //
 // MemoryPool.cpp
 //
-// $Id: //poco/1.4/Foundation/src/MemoryPool.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  MemoryPool

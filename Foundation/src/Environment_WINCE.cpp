@@ -1,8 +1,6 @@
 //
 // Environment_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_WINCE.cpp#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment

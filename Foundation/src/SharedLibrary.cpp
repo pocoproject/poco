@@ -1,8 +1,6 @@
 //
 // SharedLibrary.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary.cpp#3 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -28,8 +26,6 @@
 #include "SharedLibrary_WIN32U.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "SharedLibrary_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_VMS)
-#include "SharedLibrary_VMS.cpp"
 #endif
 
 

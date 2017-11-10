@@ -1,8 +1,6 @@
 //
 // RSAKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSAKeyImpl.h#3 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSAKeyImpl
@@ -21,6 +19,8 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/KeyPairImpl.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -40,17 +40,24 @@ namespace Crypto {
 
 
 class X509Certificate;
+class PKCS12Container;
 
 
-class RSAKeyImpl: public Poco::RefCountedObject
+class RSAKeyImpl: public KeyPairImpl
 	/// class RSAKeyImpl
 {
 public:
 	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
 	typedef std::vector<unsigned char> ByteVec;
 
-	explicit RSAKeyImpl(const X509Certificate& cert);
+	RSAKeyImpl(const EVPPKey& key);
+		/// Constructs ECKeyImpl by extracting the EC key.
+
+	RSAKeyImpl(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
+
+	RSAKeyImpl(const PKCS12Container& cert);
+		/// Extracts the EC private key from the given certificate.
 
 	RSAKeyImpl(int keyLength, unsigned long exponent);
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.
@@ -87,26 +94,29 @@ public:
 	ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
-	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
+	void save(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private keys to the given files. 
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	void save(std::ostream* pPublicKeyStream,
+		std::ostream* pPrivateKeyStream = 0,
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
 private:
-	void freeRSA();
+	RSAKeyImpl();
 
+	void freeRSA();
 	static ByteVec convertToByteVec(const BIGNUM* bn);
 
-private:
 	RSA* _pRSA;
-	OpenSSLInitializer _openSSLInitializer;
 };
 
 

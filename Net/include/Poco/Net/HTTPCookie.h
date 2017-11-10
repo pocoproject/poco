@@ -1,8 +1,6 @@
 //
 // HTTPCookie.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPCookie.h#2 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPCookie

@@ -1,8 +1,6 @@
 //
 // MessageHeader.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MessageHeader.h#3 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MessageHeader
@@ -146,6 +144,11 @@ public:
 		/// Checks if the value must be quoted. If so, the value is
 		/// appended to result, enclosed in double-quotes.
 		/// Otherwise, the value is appended to result as-is.
+		
+	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
+	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	        /// Decode RFC2047 string.
+
 		
 private:
 	enum Limits

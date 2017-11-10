@@ -1,8 +1,6 @@
 //
 // LogFile.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LogFile.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LogFile
@@ -21,8 +19,6 @@
 #include "LogFile_WIN32U.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "LogFile_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_VMS)
-#include "LogFile_VMS.cpp"
 #else
 #include "LogFile_STD.cpp"
 #endif

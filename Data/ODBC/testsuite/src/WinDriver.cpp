@@ -1,8 +1,6 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/WinDriver.cpp#2 $
-//
 // Windows test driver for Poco ODBC.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

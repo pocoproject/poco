@@ -1,8 +1,6 @@
 //
 // ZipCommon.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipCommon.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipCommon

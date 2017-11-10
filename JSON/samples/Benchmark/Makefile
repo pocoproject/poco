@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id$
-#
 # Makefile for Poco JSON Benchmark
 #
 

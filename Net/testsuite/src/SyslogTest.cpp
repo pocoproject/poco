@@ -1,8 +1,6 @@
 //
 // SyslogTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/SyslogTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -125,7 +123,7 @@ SyslogTest::~SyslogTest()
 void SyslogTest::testListener()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "localhost:51400");
+	channel->setProperty("loghost", "127.0.0.1:51400");
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
@@ -150,7 +148,7 @@ void SyslogTest::testListener()
 void SyslogTest::testChannelOpenClose()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "localhost:51400");
+	channel->setProperty("loghost", "127.0.0.1:51400");
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
@@ -189,7 +187,7 @@ void SyslogTest::testChannelOpenClose()
 void SyslogTest::testOldBSD()
 {
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "localhost:51400");
+	channel->setProperty("loghost", "127.0.0.1:51400");
 	channel->setProperty("format", "bsd");
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);

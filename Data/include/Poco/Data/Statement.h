@@ -1,8 +1,6 @@
 //
 // Statement.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Statement.h#18 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Statement
@@ -46,23 +44,23 @@ class Limit;
 
 
 class Data_API Statement
-	/// A Statement is used to execute SQL statements. 
+	/// A Statement is used to execute SQL statements.
 	/// It does not contain code of its own.
 	/// Its main purpose is to forward calls to the concrete StatementImpl stored inside.
 	/// Statement execution can be synchronous or asynchronous.
 	/// Synchronous ececution is achieved through execute() call, while asynchronous is
 	/// achieved through executeAsync() method call.
-	/// An asynchronously executing statement should not be copied during the execution. 
+	/// An asynchronously executing statement should not be copied during the execution.
 	///
 	/// Note:
 	///
 	/// Once set as asynchronous through 'async' manipulator, statement remains
 	/// asynchronous for all subsequent execution calls, both execute() and executeAsync().
-	/// However, calling executAsync() on a synchronous statement shall execute 
+	/// However, calling executAsync() on a synchronous statement shall execute
 	/// asynchronously but without altering the underlying statement's synchronous nature.
 	///
 	/// Once asynchronous, a statement can be reverted back to synchronous state in two ways:
-	/// 
+	///
 	///   1) By calling setAsync(false)
 	///   2) By means of 'sync' or 'reset' manipulators
 	///
@@ -103,7 +101,7 @@ public:
 		///     stmt << "SELECT * FROM Table", ...
 		///
 		/// is equivalent to:
-		/// 
+		///
 		///     Statement stmt(sess << "SELECT * FROM Table", ...);
 		///
 		/// but in some cases better readable.
@@ -112,9 +110,9 @@ public:
 		/// Destroys the Statement.
 
 	Statement(const Statement& stmt);
-		/// Copy constructor. 
+		/// Copy constructor.
 		/// If the statement has been executed asynchronously and has not been
-		/// synchronized prior to copy operation (i.e. is copied while executing), 
+		/// synchronized prior to copy operation (i.e. is copied while executing),
 		/// this constructor shall synchronize it.
 
 	Statement& operator = (const Statement& stmt);
@@ -123,7 +121,7 @@ public:
 	void swap(Statement& other);
 		/// Swaps the statement with another one.
 
-	template <typename T> 
+	template <typename T>
 	Statement& operator << (const T& t)
 		/// Concatenates data with the SQL statement string.
 	{
@@ -157,8 +155,19 @@ public:
 		return *this;
 	}
 
+	template <typename C>
+	Statement& bind(const C& value)
+		/// Adds a binding to the Statement. This can be used to implement
+		/// generic binding mechanisms and is a nicer syntax for:
+		///
+		///     statement , bind(value);
+	{
+		(*this) , Keywords::bind(value);
+		return *this;
+	}
+
 	Statement& operator , (AbstractExtraction::Ptr extract);
-		/// Registers objects used for extracting data with the Statement by 
+		/// Registers objects used for extracting data with the Statement by
 		/// calling addExtract().
 
 	Statement& operator , (AbstractExtractionVec& extVec);
@@ -194,19 +203,19 @@ public:
 		/// Registers a single extraction with the statement.
 
 	Statement& operator , (const Bulk& bulk);
-		/// Sets the bulk execution mode (both binding and extraction) for this 
-		/// statement.Statement must not have any extractors or binders set at the 
-		/// time when this operator is applied. 
-		/// Failure to adhere to the above constraint shall result in 
+		/// Sets the bulk execution mode (both binding and extraction) for this
+		/// statement.Statement must not have any extractors or binders set at the
+		/// time when this operator is applied.
+		/// Failure to adhere to the above constraint shall result in
 		/// InvalidAccessException.
 
 	Statement& operator , (BulkFnType);
-		/// Sets the bulk execution mode (both binding and extraction) for this 
-		/// statement.Statement must not have any extractors or binders set at the 
-		/// time when this operator is applied. 
+		/// Sets the bulk execution mode (both binding and extraction) for this
+		/// statement.Statement must not have any extractors or binders set at the
+		/// time when this operator is applied.
 		/// Additionally, this function requires limit to be set in order to
 		/// determine the bulk size.
-		/// Failure to adhere to the above constraints shall result in 
+		/// Failure to adhere to the above constraints shall result in
 		/// InvalidAccessException.
 
 	Statement& operator , (const Limit& extrLimit);
@@ -275,29 +284,29 @@ public:
 		/// Creates a string from the accumulated SQL statement.
 
 	std::size_t execute(bool reset = true);
-		/// Executes the statement synchronously or asynchronously. 
+		/// Executes the statement synchronously or asynchronously.
 		/// Stops when either a limit is hit or the whole statement was executed.
 		/// Returns the number of rows extracted from the database (for statements
 		/// returning data) or number of rows affected (for all other statements).
 		/// If reset is true (default), associated storage is reset and reused.
 		/// Otherwise, the results from this execution step are appended.
 		/// Reset argument has no meaning for unlimited statements that return all rows.
-		/// If isAsync() returns  true, the statement is executed asynchronously 
+		/// If isAsync() returns  true, the statement is executed asynchronously
 		/// and the return value from this function is zero.
-		/// The result of execution (i.e. number of returned or affected rows) can be 
+		/// The result of execution (i.e. number of returned or affected rows) can be
 		/// obtained by calling wait() on the statement at a later point in time.
 
 	const Result& executeAsync(bool reset = true);
-		/// Executes the statement asynchronously. 
+		/// Executes the statement asynchronously.
 		/// Stops when either a limit is hit or the whole statement was executed.
-		/// Returns immediately. Calling wait() (on either the result returned from this 
-		/// call or the statement itself) returns the number of rows extracted or number 
+		/// Returns immediately. Calling wait() (on either the result returned from this
+		/// call or the statement itself) returns the number of rows extracted or number
 		/// of rows affected by the statement execution.
 		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 
 	void setAsync(bool async = true);
-		/// Sets the asynchronous flag. If this flag is true, executeAsync() is called 
+		/// Sets the asynchronous flag. If this flag is true, executeAsync() is called
 		/// from the now() manipulator. This setting does not affect the statement's
 		/// capability to be executed synchronously by directly calling execute().
 
@@ -306,8 +315,8 @@ public:
 
 	std::size_t wait(long milliseconds = WAIT_FOREVER);
 		/// Waits for the execution completion for asynchronous statements or
-		/// returns immediately for synchronous ones. The return value for 
-		/// asynchronous statement is the execution result (i.e. number of 
+		/// returns immediately for synchronous ones. The return value for
+		/// asynchronous statement is the execution result (i.e. number of
 		/// rows retrieved). For synchronous statements, the return value is zero.
 
 	bool initialized();
@@ -801,7 +810,7 @@ inline void swap(Statement& s1, Statement& s2)
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, 
+	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1,
 		Poco::Data::Statement& s2)
 		/// Full template specalization of std:::swap for Statement
 	{

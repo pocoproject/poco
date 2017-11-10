@@ -1,8 +1,6 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/Binder.h#1 $
-//
 // Library: Data/MySQL
 // Package: MySQL
 // Module:  Binder

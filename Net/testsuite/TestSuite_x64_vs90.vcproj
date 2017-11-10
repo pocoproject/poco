@@ -510,6 +510,8 @@
 				<File
 					RelativePath=".\src\MulticastSocketTest.h"/>
 				<File
+					RelativePath=".\src\PollSetTest.h"/>
+				<File
 					RelativePath=".\src\RawSocketTest.h"/>
 				<File
 					RelativePath=".\src\SocketsTestSuite.h"/>
@@ -534,6 +536,8 @@
 					RelativePath=".\src\MulticastEchoServer.cpp"/>
 				<File
 					RelativePath=".\src\MulticastSocketTest.cpp"/>
+				<File
+					RelativePath=".\src\PollSetTest.cpp"/>
 				<File
 					RelativePath=".\src\RawSocketTest.cpp"/>
 				<File

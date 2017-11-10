@@ -1,8 +1,6 @@
 //
 // BufferedStreamBuf.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BufferedStreamBuf.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamBuf
@@ -62,7 +60,7 @@ public:
 		_mode(mode)
 	{
 		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);
-		this->setp(_pBuffer, _pBuffer + (_bufsize - 1));
+		this->setp(_pBuffer, _pBuffer + _bufsize);
 	}
 
 	~BasicBufferedStreamBuf()
@@ -74,12 +72,12 @@ public:
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
+		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 		if (c != char_traits::eof()) 
 		{
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
 		}
-		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 
 		return c;
 	}

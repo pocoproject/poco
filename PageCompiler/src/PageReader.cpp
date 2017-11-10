@@ -1,8 +1,6 @@
 //
 // PageReader.cpp
 //
-// $Id: //poco/1.7/PageCompiler/src/PageReader.cpp#3 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

@@ -1,8 +1,6 @@
 //
 // ICMPSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPSocketImpl.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocketImpl
@@ -34,7 +32,7 @@ class Net_API ICMPSocketImpl: public RawSocketImpl
 	/// This class implements an ICMP socket.
 {
 public:
-	ICMPSocketImpl(IPAddress::Family family, int dataSize, int ttl, int timeout);
+	ICMPSocketImpl(SocketAddress::Family family, int dataSize, int ttl, int timeout);
 		/// Creates an unconnected ICMP socket.
 		///
 		/// The socket will be created for the given address family.

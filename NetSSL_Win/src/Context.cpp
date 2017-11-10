@@ -1,8 +1,6 @@
 //
 // Context.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  Context

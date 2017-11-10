@@ -1,8 +1,6 @@
 //
 // JSONTestSuite.h
 //
-// $Id$
-//
 // Definition of the JSONTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

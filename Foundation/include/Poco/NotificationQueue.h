@@ -1,8 +1,6 @@
 //
 // NotificationQueue.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NotificationQueue.h#1 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationQueue

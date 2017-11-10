@@ -1,8 +1,6 @@
 //
 // SignalHandler.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SignalHandler.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  SignalHandler

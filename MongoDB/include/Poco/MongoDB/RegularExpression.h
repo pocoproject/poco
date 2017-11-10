@@ -1,8 +1,6 @@
 //
 // RegularExpression.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  RegularExpression

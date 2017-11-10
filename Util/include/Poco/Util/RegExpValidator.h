@@ -1,8 +1,6 @@
 //
 // RegExpValidator.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/RegExpValidator.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  RegExpValidator

@@ -1,8 +1,6 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketReactor.cpp#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketReactor
@@ -104,7 +102,7 @@ void SocketReactor::run()
 			if (nSockets == 0)
 			{
 				onIdle();
-				Thread::trySleep(_timeout.totalMilliseconds());
+				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{

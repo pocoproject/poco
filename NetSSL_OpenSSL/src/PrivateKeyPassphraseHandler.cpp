@@ -1,8 +1,6 @@
 //
 // PrivateKeyPassphraseHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/PrivateKeyPassphraseHandler.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  PrivateKeyPassphraseHandler

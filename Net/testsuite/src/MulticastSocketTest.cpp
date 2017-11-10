@@ -1,8 +1,6 @@
 //
 // MulticastSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MulticastSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -50,7 +48,7 @@ MulticastSocketTest::~MulticastSocketTest()
 void MulticastSocketTest::testMulticast()
 {
 	MulticastEchoServer echoServer;
-	MulticastSocket ms;
+	MulticastSocket ms(SocketAddress::IPv4);
 	int n = ms.sendTo("hello", 5, echoServer.group());
 	assert (n == 5);
 	char buffer[256];

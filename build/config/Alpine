@@ -1,6 +1,4 @@
 #
-# $Id$
-#
 # Alpine
 #
 # Make settings for Alpine Linux (musl; no <linux/if_packet.h> header)

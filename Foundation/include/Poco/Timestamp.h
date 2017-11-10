@@ -1,8 +1,6 @@
 //
 // Timestamp.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timestamp.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timestamp

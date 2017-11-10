@@ -1,8 +1,6 @@
 //
 // Config.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Config.h#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Foundation
@@ -170,6 +168,11 @@
 // even if the _DEBUG variable is not set.
 // This allows the use of these macros in a release version.
 // #define POCO_LOG_DEBUG
+
+
+// Uncomment to disable the use of bundled OpenSSL binaries
+// (Windows only)
+// #define POCO_EXTERNAL_OPENSSL
 
 
 // Define to prevent changing the suffix for shared libraries

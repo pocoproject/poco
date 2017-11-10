@@ -1,8 +1,6 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#3 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -362,6 +360,23 @@ void MessageHeaderTest::testFieldLimit()
 }
 
 
+void MessageHeaderTest::testDecodeWord()
+{
+	std::string coded("this is pure ASCII");
+	std::string decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == coded);
+
+	coded = "(=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)";
+	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == "(a b)");
+
+	coded = "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye";
+	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assert(decoded == "Hello Francis, good bye");
+}
+
+
+
 void MessageHeaderTest::setUp()
 {
 }
@@ -392,6 +407,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
 
 	return pSuite;
 }

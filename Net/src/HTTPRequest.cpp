@@ -1,8 +1,6 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPRequest
@@ -43,6 +41,7 @@ const std::string HTTPRequest::COOKIE              = "Cookie";
 const std::string HTTPRequest::AUTHORIZATION       = "Authorization";
 const std::string HTTPRequest::PROXY_AUTHORIZATION = "Proxy-Authorization";
 const std::string HTTPRequest::UPGRADE             = "Upgrade";
+const std::string HTTPRequest::EXPECT              = "Expect";
 
 
 HTTPRequest::HTTPRequest():
@@ -256,6 +255,22 @@ void HTTPRequest::setCredentials(const std::string& header, const std::string& s
 	auth.append(" ");
 	auth.append(authInfo);
 	set(header, auth);
+}
+
+
+bool HTTPRequest::getExpectContinue() const
+{
+	const std::string& expect = get(EXPECT, EMPTY);
+	return !expect.empty() && icompare(expect, "100-continue") == 0;
+}
+
+
+void HTTPRequest::setExpectContinue(bool expectContinue)
+{
+	if (expectContinue)
+		set(EXPECT, "100-continue");
+	else
+		erase(EXPECT);
 }
 
 

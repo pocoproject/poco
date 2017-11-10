@@ -19,7 +19,8 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -31,7 +32,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -56,7 +57,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin64\PocoCrypto64d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -89,7 +90,8 @@
 			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\release\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -105,7 +107,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -128,7 +130,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib libeay32.lib ssleay32.lib"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin64\PocoCrypto64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -163,7 +165,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\VS_120\win64\lib\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\lib\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -175,7 +178,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -221,7 +224,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\VS_120\win64\lib\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -237,7 +241,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -280,7 +284,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -292,7 +297,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -338,7 +343,8 @@
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\release\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -354,7 +360,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -460,10 +466,14 @@
 			<Filter
 				Name="Header Files">
 				<File
+					RelativePath=".\include\Poco\Crypto\PKCS12Container.h"/>
+				<File
 					RelativePath=".\include\Poco\Crypto\X509Certificate.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
+				<File
+					RelativePath=".\src\PKCS12Container.cpp"/>
 				<File
 					RelativePath=".\src\X509Certificate.cpp"/>
 			</Filter>
@@ -475,10 +485,26 @@
 				<File
 					RelativePath=".\include\Poco\Crypto\Crypto.h"/>
 				<File
+					RelativePath=".\include\Poco\Crypto\CryptoException.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\EVPPKey.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\KeyPair.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\KeyPairImpl.h"/>
+				<File
 					RelativePath=".\include\Poco\Crypto\OpenSSLInitializer.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
+				<File
+					RelativePath=".\src\CryptoException.cpp"/>
+				<File
+					RelativePath=".\src\EVPPKey.cpp"/>
+				<File
+					RelativePath=".\src\KeyPair.cpp"/>
+				<File
+					RelativePath=".\src\KeyPairImpl.cpp"/>
 				<File
 					RelativePath=".\src\OpenSSLInitializer.cpp"/>
 			</Filter>
@@ -496,15 +522,38 @@
 					RelativePath=".\src\DigestEngine.cpp"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="EC">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Crypto\ECDSADigestEngine.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\ECKey.h"/>
+				<File
+					RelativePath=".\include\Poco\Crypto\ECKeyImpl.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\ECDSADigestEngine.cpp"/>
+				<File
+					RelativePath=".\src\ECKey.cpp"/>
+				<File
+					RelativePath=".\src\ECKeyImpl.cpp"/>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|x64">
+				Name="debug_shared|x64"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|x64">
+				Name="release_shared|x64"
+				ExcludedFromBuild="true">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

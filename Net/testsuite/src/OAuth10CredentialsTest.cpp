@@ -1,8 +1,6 @@
 //
 // OAuth10CredentialsTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

@@ -1,8 +1,6 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -17,6 +15,7 @@
 #include "Poco/File_UNIX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -208,7 +207,7 @@ Timestamp FileImpl::createdImpl() const
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_ctime);
-#endif 
+#endif
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -267,7 +266,7 @@ void FileImpl::setWriteableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -279,7 +278,7 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode_t wmask = S_IWUSR | S_IWGRP | S_IWOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -289,19 +288,23 @@ void FileImpl::setExecutableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
 	{
 		mode = st.st_mode | S_IXUSR;
+		if (st.st_mode & S_IRGRP)
+			mode |= S_IXGRP;
+		if (st.st_mode & S_IROTH)
+			mode |= S_IXOTH;
 	}
 	else
 	{
 		mode_t wmask = S_IXUSR | S_IXGRP | S_IXOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -314,7 +317,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0) 
+	if (fstat(sd, &st) != 0)
 	{
 		close(sd);
 		handleLastErrorImpl(_path);
@@ -333,7 +336,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		int n;
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n) 
+			if (write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -346,7 +349,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		throw;
 	}
 	close(sd);
-	if (fsync(dd) != 0) 
+	if (fsync(dd) != 0)
 	{
 		close(dd);
 		handleLastErrorImpl(path);
@@ -381,7 +384,7 @@ void FileImpl::removeImpl()
 bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
-	
+
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
@@ -402,7 +405,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
+	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }
@@ -442,7 +445,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path, errno);
 	default:
-		throw FileException(std::strerror(errno), path, errno);
+		throw FileException(Error::getMessage(errno), path, errno);
 	}
 }
 

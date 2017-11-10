@@ -1,8 +1,6 @@
 //
 // DateTimeTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -645,21 +643,21 @@ void DateTimeTest::testSetYearDay()
 	const int num_data = sizeof data / sizeof *data;
 	for (int di = 0; di < num_data; ++di) 
 	{
-		const int line	  = data[di].d_lineNum;
-		const int year	  = data[di].d_year;
-		const unsigned int day = data[di].d_day;
+		const int POCO_UNUSED line = data[di].d_lineNum;
+		const int year = data[di].d_year;
+		const unsigned int POCO_UNUSED day = data[di].d_day;
 
 		const int exp_month = data[di].d_expMonth;
 		const unsigned int exp_day   = data[di].d_expDay;
 		const DateTime r(year, exp_month, exp_day);
 		DateTime x;
-		const DateTime& X = x;
+		const DateTime& POCO_UNUSED X = x;
 
 #if 0
 		// TODO - need to be able to assign a day number in the year
 		// but POCO is not able to do this.
 
-		x.assign(year, day);				
+		x.assign(year, day);
 
 		// TODO - need to be able to assert with the loop counter
 		// but cppUnit is not able to do this.
@@ -698,16 +696,16 @@ void DateTimeTest::testSetYearDay()
 	const int num_data2 = sizeof data2 / sizeof *data2;
 	for (int di = 0; di < num_data2; ++di) 
 	{
-		const int line  = data2[di].d_lineNum;
-		const int year  = data2[di].d_year;
-		const int day   = data2[di].d_day;
+		const int POCO_UNUSED line  = data2[di].d_lineNum;
+		const int POCO_UNUSED year  = data2[di].d_year;
+		const int POCO_UNUSED day   = data2[di].d_day;
 		const int exp   = data2[di].d_exp;
-		DateTime x;  
-		const DateTime& X = x;
+		DateTime x;
+		const DateTime& POCO_UNUSED X = x;
 		if (1 == exp)
 		{
 			DateTime r;
-			const DateTime& r2 = r;
+			const POCO_UNUSED DateTime& r2 = r;
 #if 0
 			r.set(year, day);
 #endif

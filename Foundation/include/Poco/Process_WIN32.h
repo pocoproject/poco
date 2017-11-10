@@ -1,8 +1,6 @@
 //
 // Process_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process_WIN32.h#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process

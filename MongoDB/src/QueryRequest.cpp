@@ -1,8 +1,6 @@
 //
 // QueryRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  QueryRequest

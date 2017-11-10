@@ -1,8 +1,6 @@
 //
 // ParserEngine.cpp
 //
-// $Id: //poco/1.4/XML/src/ParserEngine.cpp#2 $
-//
 // Library: XML
 // Package: XML
 // Module:  ParserEngine
@@ -248,7 +246,7 @@ void ParserEngine::parse(const char* pBuffer, std::size_t size)
 	std::size_t processed = 0;
 	while (processed < size)
 	{
-		const int bufferSize = processed + PARSE_BUFFER_SIZE < size ? PARSE_BUFFER_SIZE : size - processed;
+		const int bufferSize = processed + PARSE_BUFFER_SIZE < size ? PARSE_BUFFER_SIZE : static_cast<int>(size - processed);
 		if (!XML_Parse(_parser, pBuffer + processed, bufferSize, 0))
 			handleError(XML_GetErrorCode(_parser));
 		processed += bufferSize;

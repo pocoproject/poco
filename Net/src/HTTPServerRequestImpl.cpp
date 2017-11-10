@@ -1,8 +1,6 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerRequestImpl.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerRequestImpl
@@ -22,6 +20,7 @@
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/String.h"
 
 
@@ -30,9 +29,6 @@ using Poco::icompare;
 
 namespace Poco {
 namespace Net {
-
-
-const std::string HTTPServerRequestImpl::EXPECT("Expect");
 
 
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams):
@@ -71,6 +67,12 @@ HTTPServerRequestImpl::~HTTPServerRequestImpl()
 }
 
 
+bool HTTPServerRequestImpl::secure() const
+{
+	return _session.socket().secure();
+}
+
+
 StreamSocket& HTTPServerRequestImpl::socket()
 {
 	return _session.socket();
@@ -80,13 +82,6 @@ StreamSocket& HTTPServerRequestImpl::socket()
 StreamSocket HTTPServerRequestImpl::detachSocket()
 {
 	return _session.detachSocket();
-}
-
-
-bool HTTPServerRequestImpl::expectContinue() const
-{
-	const std::string& expect = get(EXPECT, EMPTY);
-	return !expect.empty() && icompare(expect, "100-continue") == 0;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // UTFString.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UTFString.h#2 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UTFString
@@ -52,7 +50,7 @@ struct UTF16CharTraits
 		return c1 < c2;
 	}
 
-	static int compare(const char_type* s1, const char_type* s2, size_t n)
+	static int compare(const char_type* s1, const char_type* s2, std::size_t n)
 	{
 		for (; n; --n, ++s1, ++s2)
 		{
@@ -64,15 +62,15 @@ struct UTF16CharTraits
 		return 0;
 	}
 
-	static size_t length(const char_type* s)
+	static std::size_t length(const char_type* s)
 	{
-		size_t len = 0;
+		std::size_t len = 0;
 		for (; !eq(*s, char_type(0)); ++s)
 			++len;
 		return len;
 	}
 
-	static const char_type* find(const char_type* s, size_t n, const char_type& a)
+	static const char_type* find(const char_type* s, std::size_t n, const char_type& a)
 	{
 		for (; n; --n)
 		{
@@ -83,7 +81,7 @@ struct UTF16CharTraits
 		return 0;
 	}
 
-	static char_type* move(char_type* s1, const char_type* s2, size_t n)
+	static char_type* move(char_type* s1, const char_type* s2, std::size_t n)
 	{
 		char_type* r = s1;
 		if (s1 < s2)
@@ -101,7 +99,7 @@ struct UTF16CharTraits
 		return r;
 	}
 
-	static char_type* copy(char_type* s1, const char_type* s2, size_t n)
+	static char_type* copy(char_type* s1, const char_type* s2, std::size_t n)
 	{
 		poco_assert(s2 < s1 || s2 >= s1 + n);
 		char_type* r = s1;
@@ -110,7 +108,7 @@ struct UTF16CharTraits
 		return r;
 	}
 
-	static char_type* assign(char_type* s, size_t n, char_type a)
+	static char_type* assign(char_type* s, std::size_t n, char_type a)
 	{
 		char_type* r = s;
 		for (; n; --n, ++s)
@@ -169,7 +167,7 @@ struct UTF32CharTraits
 		return c1 < c2;
 	}
 
-	static int compare(const char_type* s1, const char_type* s2, size_t n)
+	static int compare(const char_type* s1, const char_type* s2, std::size_t n)
 	{
 		for (; n; --n, ++s1, ++s2)
 		{
@@ -181,15 +179,15 @@ struct UTF32CharTraits
 		return 0;
 	}
 
-	static size_t length(const char_type* s)
+	static std::size_t length(const char_type* s)
 	{
-		size_t len = 0;
+		std::size_t len = 0;
 		for (; !eq(*s, char_type(0)); ++s)
 			++len;
 		return len;
 	}
 
-	static const char_type* find(const char_type* s, size_t n, const char_type& a)
+	static const char_type* find(const char_type* s, std::size_t n, const char_type& a)
 	{
 		for (; n; --n)
 		{
@@ -200,7 +198,7 @@ struct UTF32CharTraits
 		return 0;
 	}
 
-	static char_type* move(char_type* s1, const char_type* s2, size_t n)
+	static char_type* move(char_type* s1, const char_type* s2, std::size_t n)
 	{
 		char_type* r = s1;
 		if (s1 < s2)
@@ -218,7 +216,7 @@ struct UTF32CharTraits
 		return r;
 	}
 
-	static char_type* copy(char_type* s1, const char_type* s2, size_t n)
+	static char_type* copy(char_type* s1, const char_type* s2, std::size_t n)
 	{
 		poco_assert(s2 < s1 || s2 >= s1 + n);
 		char_type* r = s1;
@@ -227,7 +225,7 @@ struct UTF32CharTraits
 		return r;
 	}
 
-	static char_type* assign(char_type* s, size_t n, char_type a)
+	static char_type* assign(char_type* s, std::size_t n, char_type a)
 	{
 		char_type* r = s;
 		for (; n; --n, ++s)

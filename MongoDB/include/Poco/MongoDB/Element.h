@@ -1,8 +1,6 @@
 //
 // Element.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Element

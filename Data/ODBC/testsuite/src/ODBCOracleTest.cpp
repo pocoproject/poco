@@ -1,8 +1,6 @@
 //
 // ODBCOracleTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCOracleTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -43,11 +41,11 @@ using Poco::DynamicAny;
 using Poco::DateTime;
 
 
-#define ORACLE_ODBC_DRIVER "Oracle in XE"
+#define ORACLE_ODBC_DRIVER "Oracle in OraDB12Home1"
 #define ORACLE_DSN "PocoDataOracleTest"
 #define ORACLE_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define ORACLE_PORT "1521"
-#define ORACLE_SID "XE"
+#define ORACLE_SID "ORCL"
 #define ORACLE_UID "poco"
 #define ORACLE_PWD "poco"
 

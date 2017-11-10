@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoJSON64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoJSONmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoJSONmtd</TargetName>
@@ -276,11 +276,26 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.cpp"/>
-    <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Handler.cpp"/>
     <ClCompile Include="src\JSONException.cpp"/>
     <ClCompile Include="src\Object.cpp"/>
+    <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Parser.cpp"/>
+    <ClCompile Include="src\ParserImpl.cpp"/>
+    <ClCompile Include="src\pd_json.c">
+      <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ForceConformanceInForLoopScope>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">CompileAsCpp</CompileAs>
+      <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ForceConformanceInForLoopScope>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">CompileAsCpp</CompileAs>
+      <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ForceConformanceInForLoopScope>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">CompileAsCpp</CompileAs>
+      <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">true</ForceConformanceInForLoopScope>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">CompileAsCpp</CompileAs>
+      <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ForceConformanceInForLoopScope>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">CompileAsCpp</CompileAs>
+      <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ForceConformanceInForLoopScope>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="src\PrintHandler.cpp"/>
     <ClCompile Include="src\Query.cpp"/>
     <ClCompile Include="src\Stringifier.cpp"/>
@@ -293,8 +308,11 @@
     <ClInclude Include="include\Poco\JSON\JSON.h"/>
     <ClInclude Include="include\Poco\JSON\JSONException.h"/>
     <ClInclude Include="include\Poco\JSON\Object.h"/>
-    <ClInclude Include="include\Poco\JSON\Parser.h"/>
     <ClInclude Include="include\Poco\JSON\ParseHandler.h"/>
+    <ClInclude Include="include\Poco\JSON\Parser.h"/>
+    <ClInclude Include="include\Poco\JSON\ParserImpl.h"/>
+    <ClInclude Include="include\pd_json.h"/>
+    <ClInclude Include="include\pd_json_private.h"/>
     <ClInclude Include="include\Poco\JSON\PrintHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Query.h"/>
     <ClInclude Include="include\Poco\JSON\Stringifier.h"/>

@@ -1,8 +1,6 @@
 //
 // FilePartSource.cpp
 //
-// $Id: //poco/1.4/Net/src/FilePartSource.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  FilePartSource
@@ -82,7 +80,7 @@ const std::string& FilePartSource::filename() const
 std::streamsize FilePartSource::getContentLength() const
 {
 	Poco::File p(_path);
-	return p.getSize();
+	return static_cast<std::streamsize>(p.getSize());
 }
 
 

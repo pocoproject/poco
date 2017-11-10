@@ -1,8 +1,6 @@
 //
 // ZipException.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipException.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipException

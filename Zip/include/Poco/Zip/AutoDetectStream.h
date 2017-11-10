@@ -1,8 +1,6 @@
 //
 // AutoDetectStream.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/AutoDetectStream.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  AutoDetectStream
@@ -34,7 +32,7 @@ class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
 	/// Data Descriptor signature.
 {
 public:
-	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
+	AutoDetectStreamBuf(std::istream& in, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
 		/// Creates the AutoDetectStream. 
 		
 	~AutoDetectStreamBuf();
@@ -57,7 +55,8 @@ private:
 	std::string     _postfix;
 	bool            _reposition;
 	Poco::UInt32    _start;
-	std::streamsize _length;
+	bool            _needsZip64;
+	Poco::UInt64    _length;
 };
 
 
@@ -68,7 +67,7 @@ class Zip_API AutoDetectIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	AutoDetectIOS(std::istream& istr, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start);
+	AutoDetectIOS(std::istream& istr, const std::string& prefix, const std::string& postfix, bool reposition, Poco::UInt32 start, bool needsZip64);
 		/// Creates the basic stream and connects it
 		/// to the given input stream.
 
@@ -88,7 +87,7 @@ class Zip_API AutoDetectInputStream: public AutoDetectIOS, public std::istream
 	/// Data Descriptor signature.
 {
 public:
-	AutoDetectInputStream(std::istream& istr, const std::string& prefix = std::string(), const std::string& postfix = std::string(), bool reposition = false, Poco::UInt32 start = 0);
+	AutoDetectInputStream(std::istream& istr, const std::string& prefix = std::string(), const std::string& postfix = std::string(), bool reposition = false, Poco::UInt32 start = 0, bool needsZip64 = false);
 		/// Creates the AutoDetectInputStream and connects it to the underlying stream.
 
 	~AutoDetectInputStream();

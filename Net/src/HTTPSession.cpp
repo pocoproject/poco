@@ -1,8 +1,6 @@
 //
 // HTTPSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSession.cpp#2 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPSession
@@ -32,7 +30,9 @@ HTTPSession::HTTPSession():
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(false),
-	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
+	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
+	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
 	_pException(0)
 {
 }
@@ -44,7 +44,9 @@ HTTPSession::HTTPSession(const StreamSocket& socket):
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(false),
-	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
+	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
+	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
 	_pException(0)
 {
 }
@@ -56,7 +58,9 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 	_pCurrent(0),
 	_pEnd(0),
 	_keepAlive(keepAlive),
-	_timeout(HTTP_DEFAULT_TIMEOUT),
+	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
+	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
+	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
 	_pException(0)
 {
 }
@@ -91,7 +95,15 @@ void HTTPSession::setKeepAlive(bool keepAlive)
 
 void HTTPSession::setTimeout(const Poco::Timespan& timeout)
 {
-	_timeout = timeout;
+	setTimeout(timeout, timeout, timeout);
+}
+
+
+void HTTPSession::setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout)
+{
+	 _connectionTimeout = connectionTimeout;
+	 _sendTimeout = sendTimeout;
+	 _receiveTimeout = receiveTimeout;
 }
 
 
@@ -181,8 +193,9 @@ bool HTTPSession::connected() const
 
 void HTTPSession::connect(const SocketAddress& address)
 {
-	_socket.connect(address, _timeout);
-	_socket.setReceiveTimeout(_timeout);
+	_socket.connect(address, _connectionTimeout);
+	_socket.setReceiveTimeout(_receiveTimeout);
+	_socket.setSendTimeout(_sendTimeout);
 	_socket.setNoDelay(true);
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.

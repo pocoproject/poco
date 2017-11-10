@@ -1,8 +1,6 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.7/PageCompiler/src/PageCompiler.cpp#5 $
-//
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -285,7 +283,7 @@ protected:
 			p.setBaseName(clazz);
 		}
 
-#if __cplusplus < 201103L
+#ifndef POCO_ENABLE_CPP11
 		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
 #else
 		std::unique_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));

@@ -9,19 +9,20 @@ a large number of useful utility classes, such various stream buffer and stream
 classes, URI handling, and many more.
 The XML library contains an XML parser with SAX2 and DOM interfaces,
 as well as an XMLWriter.
-The Util library contains classes for working with configuration files and 
+The Util library contains classes for working with configuration files and
 command line arguments, as well as various utility classes.
 The Net library contains network classes (sockets, HTTP client/server, etc.).
 All libraries come with a test suite and a number of sample programs.
 
 The basic directory layout is as follows:
 
-build/                     the build system for Unix/OpenVMS and additional utility scripts
+build/                     the build system for Unix and additional utility scripts
     config/                build configurations for various Unix platforms
     rules/                 common build rules for all platforms
     scripts/               build and utility scripts
-    vms/                   OpenVMS build system scripts
     vxconfig/              VxWorks build configurations
+
+cmake/                     Support files for CMake
 
 bin/                       all executables (dynamic link libraries on Windows)
 bin64/                     all 64-bit executables (and DLLs)
@@ -88,49 +89,78 @@ The following libraries require third-party software (header files and
 libraries) being installed to build properly:
 
 - NetSSL_OpenSSL and Crypt require OpenSSL.
-- Data/ODBC requires ODBC 
+- Data/ODBC requires ODBC
   (Microsoft ODBC on Windows, unixODBC or iODBC on Unix/Linux)
 - Data/MySQL requires the MySQL client.
 
-Most Unix/Linux systems already have OpenSSL preinstalled. If your system 
-does not have OpenSSL, please get it from http://www.openssl.org or 
-another source. You do not have to build OpenSSL yourself - a binary 
+Most Unix/Linux systems already have OpenSSL preinstalled. If your system
+does not have OpenSSL, please get it from http://www.openssl.org or
+another source. You do not have to build OpenSSL yourself - a binary
 distribution is fine (e.g., apt-get install openssl libssl-dev).
+On macOS, install OpenSSL via Homebrew (brew install openssl).
 
-The easiest way to install OpenSSL on Windows is to use a binary 
-(prebuild) release, for example the one from Shining Light 
-Productions that comes with a Windows installer
-(http://www.slproweb.com/products/Win32OpenSSL.html). 
-Depending on where you have installed the OpenSSL libraries, 
-you might have to edit the build script (buildwin.cmd), or add the 
+The easiest way to install OpenSSL on Windows is to get the pre-built
+libraries from the pocoproject/openssl Git repository at
+<https://github.com/pocoproject/openssl>. This repository is included
+as a submodule in the poco GitHub repository, but not in the release
+source code packages. You can also provide your own OpenSSL build by
+editing the Visual Studio project files.
+
+Depending on where you have installed the OpenSSL libraries,
+you might have to edit the build script (buildwin.cmd), or add the
 necessary paths to the INCLUDE and LIB environment variables.
 
-The Data library requires ODBC support on your system if you want 
-to build the ODBC connector (which is the default). On Windows 
-platforms, ODBC should be readily available if you have the 
-Windows SDK. On Unix/Linux platforms, you can use iODBC 
-(preinstalled on Mac OS X) or unixODBC. For the MySQL connector, 
+Through the Poco/Crypto/Crypto.h and Poco/Net/NetSSL.h header files,
+Visual C++ will automatically link the libcrypto.lib and libssl.lib
+libraries. If your OpenSSL libraries are named differently, compile
+with the macro POCO_EXTERNAL_OPENSSL defined and edit the project
+files accordingly.
+
+The Data library requires ODBC support on your system if you want
+to build the ODBC connector (which is the default). On Windows
+platforms, ODBC should be readily available if you have the
+Windows SDK. On Unix/Linux platforms, you can use iODBC
+(preinstalled on macOS X) or unixODBC. For the MySQL connector,
 the MySQL client libraries and header files are required.
 
-The Data/ODBC and Data/MySQL Makefiles will search for the ODBC 
-and MySQL headers and libraries in various places. Nevertheless, 
-the Makefiles may not be able to find the headers and libraries. 
-In this case, please edit the Makefile in Data/ODBC and/or Data/MySQL 
+The Data/ODBC and Data/MySQL Makefiles will search for the ODBC
+and MySQL headers and libraries in various places. Nevertheless,
+the Makefiles may not be able to find the headers and libraries.
+In this case, please edit the Makefile in Data/ODBC and/or Data/MySQL
 accordingly.
+
+
+BUILDING WITH CMAKE
+===================
+
+The POCO C++ Libraries support CMake as a build system on Linux, macOS and Windows.
+To build the POCO C++ Libraries with CMake:
+
+1. create a cmake-build directory (e.g. in the POCO root directory):
+
+$ mkdir cmake-build
+
+2. and run CMake from there:
+
+$ cd cmake-build
+$ cmake ..
+$ make -s -j (or build the generated Visual Studio solution on Windows)
+
+If you cannot or do not want to build with CMake, there are other options,
+described in the following.
 
 
 BUILDING ON WINDOWS
 ===================
 
-Microsoft Visual Studio 7.1 (2003), 8.0 (2005), 9.0 (2008) or 10.0 (2010) is required to 
-build the POCO C++ Libraries on Windows platforms. Solution and project files for all 
-versions are included. For Visual Studio 2008 and 2010, 64-bit (x64) builds are
-supported as well.
+Microsoft Visual Studio 2008 or newer is required to build the POCO C++ Libraries on
+Windows platforms. Solution and project files for all versions from 2008 to 2017 are included.
+64-bit (x64) builds are supported as well.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
-Visual Studio .NET 2003 (or 2005/2008/2010) Command Prompt and cd to the directory where you 
+Visual Studio Command Prompt and cd to the directory where you
 have extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
-and pass as argument the version of visual studio (71, 80, 90 or 100). You can customize
+and pass as argument the version of visual studio (90, 100, 110, etc.). You can customize
 what is being built by buildwin.cmd by passing appropriate command line arguments to
 it. Call buildwin.cmd without arguments to see what is available.
 
@@ -142,7 +172,7 @@ to other libraries. Since the build script does not know where to find the neces
 header files and import libraries, you have to either add the header file paths to
 the INCLUDE environment variable and the library path to the LIB environment variable,
 or you'll have to edit the buildwin.cmd script, where these environment variables can
-be set as well. 
+be set as well.
 
 In order to run the test suite and the samples, the top-most bin directory containing
 the shared libraries must be in the PATH environment variable.
@@ -154,21 +184,23 @@ message compiler may fail when building the Foundation library.
 
 BUILDING FOR WINDOWS CE
 
-Building for Windows CE is supported with Microsoft Visual Studio 2008.
-Unless you have the Digi JumpStart Windows CE 6.0 SDK installed, you'll
-have to modify the included Visual Studio project and solution files.
+Building for Windows CE 6.0 and Windows Embedded Compact 2013 is supported with
+Microsoft Visual Studio 2008 (CE 6.0), and Visual Studio 2012/2013 (WEC 2013), respectively.
+For CE 6.0, unless you have the Digi JumpStart Windows CE 6.0 SDK installed, you'll
+have to modify the included Visual Studio project and solution files. Same applies
+to the WEC2013 projects, which are based on the AM335X SDK.
 Please see the SDK Reference Documentation (http://pocoproject.org/documentation)
 for instructions.
 
 
-BUILDING ON UNIX/LINUX/MAC OS X
-===============================
+BUILDING ON UNIX/LINUX/macOS
+============================
 
 For building on Unix platforms, the POCO C++ Libraries come with their own
-build system. The build system is based on GNU Make 3.80 (or newer), with the help 
-from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on 
-your machine, you will need to download it from 
-http://directory.fsf.org/devel/build/make.html>, 
+build system. The build system is based on GNU Make 3.80 (or newer), with the help
+from a few shell scripts. If you do not have GNU Make 3.80 (or later) installed on
+your machine, you will need to download it from
+http://directory.fsf.org/devel/build/make.html>,
 build and install it prior to building the POCO C++ Libraries.
 
 You can check the version of GNU Make installed on your system with
@@ -207,16 +239,9 @@ on your system. To do this, use the --omit argument to configure:
 > ./configure --omit=Data/ODBC,Data/MySQL
 
 
-To build on Mac OS X 10.3 with GCC 3, do the following:
-(NOTE: This only affects 10.3; for 10.4/10.5 see above)
-
-> ./configure --config=Darwin7
-> make -s
-
-
 IMPORTANT: Make sure that the path to the build directory does not
-contain symbolic links. Furthermore, on Mac OS X (or other systems
-with case insensitive filesystems), make sure that the characters in 
+contain symbolic links. Furthermore, on macOS (or other systems
+with case insensitive filesystems), make sure that the characters in
 the path have the correct case. Otherwise you'll get an error saying
 "Current working directory not under $PROJECT_BASE.".
 
@@ -252,43 +277,8 @@ more information. The Reference Documentation can be found online
 at <http://pocoproject.org/docs/>.
 
 
-BUILDING ON OPENVMS
-===================
-
-OpenVMS is no longer supported in recent versions of POCO, due to both a
-lack of interest and a lack of contributors. The following
-instructions are here for historical reasons.
-
-The POCO C++ Libraries come with their own build system for OpenVMS, implemented
-by a bunch of DCL scripts. The scripts can be found in the build/vms directory.
-
-To build the POCO C++ Libraries on OpenVMS, follow the following steps.
-
-1) Download the .zip distribution of the POCO C++ Libraries
-
-2) Unzip the archive
-   $ unzip -aa poco-0_91_4.zip
-
-3) Change the directory
-   $ set def [.poco-0_01_4]
-
-4) Create a lib directory
-   $ create/dir [.lib]
-
-5) Run the buildvms.com script
-   $ @buildvms
-
-This will build the debug versions of the libraries. To build the release
-versions, use
-   $ @buildvms -release
-
-
 MORE INFORMATION
 ================
 
 For more information, see the POCO C++ Libraries website
 at <http://pocoproject.org>.
-
-
---
-$Id: //poco/1.4/dist/README#4 $

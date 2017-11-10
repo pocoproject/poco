@@ -1,8 +1,6 @@
 //
 // ThreadPool.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ThreadPool.cpp#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ThreadPool
@@ -194,10 +192,11 @@ void PooledThread::run()
 		_mutex.lock();
 		if (_pTarget) // a NULL target means kill yourself
 		{
+			Runnable* pTarget = _pTarget;
 			_mutex.unlock();
 			try
 			{
-				_pTarget->run();
+				pTarget->run();
 			}
 			catch (Exception& exc)
 			{

@@ -1,8 +1,6 @@
 //
 // NamedMutex_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedMutex_UNIX.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex
@@ -48,6 +46,7 @@ private:
 	sem_t* _sem;
 #else
 	int _semid;  // semaphore id
+	bool _owned;
 #endif
 };
 

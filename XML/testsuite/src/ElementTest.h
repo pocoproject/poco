@@ -1,8 +1,6 @@
 //
 // ElementTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/ElementTest.h#1 $
-//
 // Definition of the ElementTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

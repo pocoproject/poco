@@ -1,8 +1,6 @@
 //
 // main.cpp
 //
-// $Id$
-//
 // This sample shows SQL to mongo Shell to C++ examples.
 //
 // Copyright (c) 2013, Applied Informatics Software Engineering GmbH.

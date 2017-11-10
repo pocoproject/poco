@@ -1,8 +1,6 @@
 //
 // NTPClient.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NTPClient.h#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPClient
@@ -36,7 +34,7 @@ class Net_API NTPClient
 public:
 	mutable Poco::BasicEvent<NTPEventArgs> response;
 
-	explicit NTPClient(IPAddress::Family family, int timeout = 3000000);
+	explicit NTPClient(SocketAddress::Family family, int timeout = 3000000);
 		/// Creates an NTP client.
 
 	~NTPClient();
@@ -55,7 +53,7 @@ public:
 		/// Returns the number of valid replies.
 
 private:
-	mutable IPAddress::Family _family;
+	mutable SocketAddress::Family _family;
 	int _timeout;
 };
 

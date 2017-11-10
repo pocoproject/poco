@@ -1,8 +1,6 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#4 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocket
@@ -23,6 +21,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/HTTPCredentials.h"
+#include "Poco/Buffer.h"
 
 
 namespace Poco {
@@ -221,6 +220,21 @@ public:
 		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
 		/// is stored in flags.
 		
+	int receiveFrame(Poco::Buffer<char>& buffer, int& flags);
+		/// Receives a frame from the socket and stores it
+		/// after any previous content in buffer.
+		///
+		/// Returns the number of bytes received.
+		/// A return value of 0 means that the peer has
+		/// shut down or closed the connection.
+		///
+		/// Throws a TimeoutException if a receive timeout has
+		/// been set and nothing is received within that interval.
+		/// Throws a NetException (or a subclass) in case of other errors.
+		///
+		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
+		/// is stored in flags.
+
 	Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side
 		/// WebSocket, or WS_CLIENT otherwise.

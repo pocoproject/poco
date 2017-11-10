@@ -1,8 +1,6 @@
 //
 // Array.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Array

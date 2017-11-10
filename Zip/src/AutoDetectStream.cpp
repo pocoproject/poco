@@ -1,8 +1,6 @@
 //
 // AutoDetectStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/AutoDetectStream.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  AutoDetectStream
@@ -27,7 +25,7 @@ namespace Poco {
 namespace Zip {
 
 
-AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start):
+AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&in),
 	_eofDetected(false),
@@ -36,6 +34,7 @@ AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pr
 	_postfix(post),
 	_reposition(reposition),
 	_start(start),
+	_needsZip64(needsZip64),
 	_length(0)
 {
 }
@@ -63,7 +62,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		std::streamsize n = (_prefix.size() > length) ? length : static_cast<std::streamsize>(_prefix.size());
 		std::memcpy(buffer, _prefix.data(), n);
 		_prefix.erase(0, n);
-		return n;
+		return static_cast<int>(n);
 	}
 
 	if (_eofDetected)
@@ -73,7 +72,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			std::streamsize n = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
 			std::memcpy(buffer, _postfix.data(), n);
 			_postfix.erase(0, n);
-			return n;
+			return static_cast<int>(n);
 		}
 		else return -1;
 	}
@@ -83,7 +82,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	std::streamsize offset = 0;
 	static std::istream::int_type eof = std::istream::traits_type::eof();
 	while (_pIstr->good() && !_pIstr->eof() && (offset + 4) < length)
-	{ 
+	{
 		std::istream::int_type c = _pIstr->get();
 		if (c != eof)
 		{
@@ -114,37 +113,64 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			{
 				if (ZipDataInfo::HEADER[3] == c)
 				{
-					ZipDataInfo dataInfo(*_pIstr, true);
-					if (!_pIstr->good()) throw Poco::IOException("Failed to read data descriptor");
-
-					if (dataInfo.getCompressedSize() == _length + offset)
+					std::streamsize dataInfoSize = 0;
+					if (_needsZip64)
 					{
-						_pIstr->seekg(-static_cast<int>(dataInfo.getFullHeaderSize()), std::ios::cur);
-						if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+						ZipDataInfo64 dataInfo(*_pIstr, true);
+						if (!_pIstr->good()) throw Poco::IOException("Failed to read data descriptor");
 
-						_eofDetected = true;
-						_length += offset;
-						
-						if (offset == 0 && !_postfix.empty())
+						dataInfoSize = dataInfo.getFullHeaderSize();
+						if (dataInfo.getCompressedSize() == _length + offset)
 						{
-							offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
-							std::memcpy(buffer, _postfix.data(), offset);
-							_postfix.erase(0, offset);
-						}
+							_pIstr->seekg(-static_cast<int>(dataInfoSize), std::ios::cur);
+							if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+
+							_eofDetected = true;
+							_length += offset;
 						
-						return offset;
+							if (offset == 0 && !_postfix.empty())
+							{
+								offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
+								std::memcpy(buffer, _postfix.data(), offset);
+								_postfix.erase(0, offset);
+							}
+						
+							return static_cast<int>(offset);
+						}
 					}
 					else
 					{
-						_pIstr->seekg(-static_cast<int>(dataInfo.getFullHeaderSize() - 4), std::ios::cur);
-						if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+						ZipDataInfo dataInfo(*_pIstr, true);
+						if (!_pIstr->good()) throw Poco::IOException("Failed to read data descriptor");
 
-						buffer[offset++] = ZipDataInfo::HEADER[0];
-						buffer[offset++] = ZipDataInfo::HEADER[1];
-						buffer[offset++] = ZipDataInfo::HEADER[2];
-						buffer[offset++] = ZipDataInfo::HEADER[3];
-						_matchCnt = 0;
+						dataInfoSize = dataInfo.getFullHeaderSize();
+						if (dataInfo.getCompressedSize() == _length + offset)
+						{
+							_pIstr->seekg(-static_cast<int>(dataInfoSize), std::ios::cur);
+							if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+
+							_eofDetected = true;
+							_length += offset;
+						
+							if (offset == 0 && !_postfix.empty())
+							{
+								offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
+								std::memcpy(buffer, _postfix.data(), offset);
+								_postfix.erase(0, offset);
+							}
+						
+							return static_cast<int>(offset);
+						}
 					}
+
+					_pIstr->seekg(-static_cast<int>(dataInfoSize - 4), std::ios::cur);
+					if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
+
+					buffer[offset++] = ZipDataInfo::HEADER[0];
+					buffer[offset++] = ZipDataInfo::HEADER[1];
+					buffer[offset++] = ZipDataInfo::HEADER[2];
+					buffer[offset++] = ZipDataInfo::HEADER[3];
+					_matchCnt = 0;
 				}
 				else
 				{
@@ -152,14 +178,14 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 					buffer[offset++] = ZipDataInfo::HEADER[1];
 					buffer[offset++] = ZipDataInfo::HEADER[2];
 					buffer[offset++] = c;
-					_matchCnt = 0; 
+					_matchCnt = 0;
 				}
 			}
 		}
 	}
 
 	_length += offset;
-	return offset;
+	return static_cast<int>(offset);
 
 }
 
@@ -170,8 +196,8 @@ int AutoDetectStreamBuf::writeToDevice(const char* buffer, std::streamsize lengt
 }
 
 
-AutoDetectIOS::AutoDetectIOS(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start):
-	_buf(istr, pre, post, reposition, start)
+AutoDetectIOS::AutoDetectIOS(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
+	_buf(istr, pre, post, reposition, start, needsZip64)
 {
 	poco_ios_init(&_buf);
 }
@@ -188,8 +214,8 @@ AutoDetectStreamBuf* AutoDetectIOS::rdbuf()
 }
 
 
-AutoDetectInputStream::AutoDetectInputStream(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start):
-	AutoDetectIOS(istr, pre, post, reposition, start),
+AutoDetectInputStream::AutoDetectInputStream(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
+	AutoDetectIOS(istr, pre, post, reposition, start, needsZip64),
 	std::istream(&_buf)
 {
 }

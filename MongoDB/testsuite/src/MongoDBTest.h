@@ -1,8 +1,6 @@
 //
 // MongoDBTest.h
 //
-// $Id$
-//
 // Definition of the MongoDBTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -41,6 +39,7 @@ public:
 	void testObjectID();
 	void testCommand();
 	void testUUID();
+	void testConnectURI();
 	void setUp();
 	void tearDown();
 

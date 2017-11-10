@@ -1,8 +1,6 @@
 //
 // ReplicaSet.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  ReplicaSet
@@ -54,7 +52,7 @@ private:
 };
 
 
-#endif // MongoDB_ReplicaSet_INCLUDED
-
-
 } } // namespace Poco::MongoDB
+
+
+#endif // MongoDB_ReplicaSet_INCLUDED

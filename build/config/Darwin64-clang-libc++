@@ -1,6 +1,4 @@
 #
-# $Id$
-#
 # Darwin64-clang-libc++
 #
 # Build settings for Mac OS X 10.9 (clang, libc++, x86_64)

@@ -1,8 +1,6 @@
 //
 // HTTPResponseTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPResponseTest.cpp#2 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -170,7 +168,7 @@ void HTTPResponseTest::testCookies()
 	assert (cookie1.getPath() == cookies[0].getPath());
 	assert (cookie1.getSecure() == cookies[0].getSecure());
 	assert (cookie1.getMaxAge() == cookies[0].getMaxAge());
-	
+
 	HTTPCookie cookie2("cookie2", "value2");
 	cookie2.setVersion(1);
 	cookie2.setMaxAge(42);
@@ -191,7 +189,7 @@ void HTTPResponseTest::testCookies()
 	assert (cookie2.getPath() == cookie2a.getPath());
 	assert (cookie2.getSecure() == cookie2a.getSecure());
 	assert (cookie2.getMaxAge() == cookie2a.getMaxAge());
-	
+
 	HTTPResponse response2;
 	response2.add("Set-Cookie", "name1=value1");
 	response2.add("Set-cookie", "name2=value2");

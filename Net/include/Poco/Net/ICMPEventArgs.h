@@ -1,8 +1,6 @@
 //
 // ICMPEventArgs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPEventArgs.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPEventArgs

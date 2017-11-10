@@ -1,8 +1,6 @@
 //
 // NumberFormatterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NumberFormatterTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -60,6 +58,14 @@ void NumberFormatterTest::testFormat()
 
 	assert (NumberFormatter::format((UInt64) 123) == "123");
 	assert (NumberFormatter::format((UInt64) 123, 5) == "  123");	
+#if defined(POCO_LONG_IS_64_BIT)
+	assert (NumberFormatter::format((long long) 123) == "123");
+	assert (NumberFormatter::format((long long) -123) == "-123");
+	assert (NumberFormatter::format((long long) -123, 5) == " -123");
+
+	assert (NumberFormatter::format((unsigned long long) 123) == "123");
+	assert (NumberFormatter::format((unsigned long long) 123, 5) == "  123");
+#endif
 #endif
 
 	if (sizeof(void*) == 4)
@@ -85,6 +91,11 @@ void NumberFormatterTest::testFormat0()
 	assert (NumberFormatter::format0((Int64) 123, 5) == "00123");
 	assert (NumberFormatter::format0((Int64) -123, 5) == "-0123");
 	assert (NumberFormatter::format0((UInt64) 123, 5) == "00123");
+#if defined(POCO_LONG_IS_64_BIT)
+	assert (NumberFormatter::format0((long long) 123, 5) == "00123");
+	assert (NumberFormatter::format0((long long) -123, 5) == "-0123");
+	assert (NumberFormatter::format0((unsigned long long) 123, 5) == "00123");
+#endif
 #endif
 }
 
@@ -132,6 +143,17 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((UInt64) 0xab) == "AB");
 	assert (NumberFormatter::formatHex((UInt64) 0x12, 4) == "0012");
 	assert (NumberFormatter::formatHex((UInt64) 0xab, 4) == "00AB");
+#if defined(POCO_LONG_IS_64_BIT)
+	assert (NumberFormatter::formatHex((long long) 0x12) == "12");
+	assert (NumberFormatter::formatHex((long long) 0xab) == "AB");
+	assert (NumberFormatter::formatHex((long long) 0x12, 4) == "0012");
+	assert (NumberFormatter::formatHex((long long) 0xab, 4) == "00AB");
+
+	assert (NumberFormatter::formatHex((unsigned long long) 0x12) == "12");
+	assert (NumberFormatter::formatHex((unsigned long long) 0xab) == "AB");
+	assert (NumberFormatter::formatHex((unsigned long long) 0x12, 4) == "0012");
+	assert (NumberFormatter::formatHex((unsigned long long) 0xab, 4) == "00AB");
+#endif
 #endif
 
 	assert (NumberFormatter::formatHex(0x12, true) == "0x12");
@@ -176,6 +198,21 @@ void NumberFormatterTest::testFormatHex()
 	assert (NumberFormatter::formatHex((UInt64) 0xab, 4, true) == "0xAB");
 	assert (NumberFormatter::formatHex((UInt64) 0x12, 6, true) == "0x0012");
 	assert (NumberFormatter::formatHex((UInt64) 0xab, 6, true) == "0x00AB");
+#if defined(POCO_LONG_IS_64_BIT)
+	assert (NumberFormatter::formatHex((long long) 0x12, true) == "0x12");
+	assert (NumberFormatter::formatHex((long long) 0xab, true) == "0xAB");
+	assert (NumberFormatter::formatHex((long long) 0x12, 4, true) == "0x12");
+	assert (NumberFormatter::formatHex((long long) 0xab, 4, true) == "0xAB");
+	assert (NumberFormatter::formatHex((long long) 0x12, 6, true) == "0x0012");
+	assert (NumberFormatter::formatHex((long long) 0xab, 6, true) == "0x00AB");
+
+	assert (NumberFormatter::formatHex((unsigned long long) 0x12, true) == "0x12");
+	assert (NumberFormatter::formatHex((unsigned long long) 0xab, true) == "0xAB");
+	assert (NumberFormatter::formatHex((unsigned long long) 0x12, 4, true) == "0x12");
+	assert (NumberFormatter::formatHex((unsigned long long) 0xab, 4, true) == "0xAB");
+	assert (NumberFormatter::formatHex((unsigned long long) 0x12, 6, true) == "0x0012");
+	assert (NumberFormatter::formatHex((unsigned long long) 0xab, 6, true) == "0x00AB");
+#endif
 #endif
 }
 

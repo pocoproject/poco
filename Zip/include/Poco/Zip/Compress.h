@@ -1,8 +1,6 @@
 //
 // Compress.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/Compress.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  Compress
@@ -38,9 +36,11 @@ class Zip_API Compress
 public:
 	Poco::FIFOEvent<const ZipLocalFileHeader> EDone;
 
-	Compress(std::ostream& out, bool seekableOut);
+	Compress(std::ostream& out, bool seekableOut, bool forceZip64 = false);
 		/// seekableOut determines how we write the zip, setting it to true is recommended for local files (smaller zip file),
 		/// if you are compressing directly to a network, you MUST set it to false
+		/// If forceZip64 is set true then the file header is allocated with zip64 extension so that it can be updated after the file data is written
+		/// if seekableOut is true in case the compressed or uncompressed size exceeds 32 bits.
 
 	~Compress();
 
@@ -106,14 +106,16 @@ private:
 		/// copys an already compressed ZipEntry from in
 
 private:
-	std::set<std::string>      _storeExtensions;
-	std::ostream&              _out;
-	bool                       _seekableOut;
-	ZipArchive::FileHeaders    _files;
-	ZipArchive::FileInfos      _infos;
-	ZipArchive::DirectoryInfos _dirs;
-	Poco::UInt32               _offset;
-    std::string                _comment;
+	std::set<std::string>        _storeExtensions;
+	std::ostream&                _out;
+	bool                         _seekableOut;
+	bool						 _forceZip64;
+	ZipArchive::FileHeaders      _files;
+	ZipArchive::FileInfos        _infos;
+	ZipArchive::DirectoryInfos   _dirs;
+	ZipArchive::DirectoryInfos64 _dirs64;
+	Poco::UInt64				 _offset;
+    std::string                  _comment;
 
 	friend class Keep;
 	friend class Rename;
@@ -123,6 +125,8 @@ private:
 //
 // inlines
 //
+
+
 inline void Compress::setZipComment(const std::string& comment)
 {
 	_comment = comment;

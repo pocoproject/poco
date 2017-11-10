@@ -1,8 +1,6 @@
 //
 // ServerSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/ServerSocket.cpp#2 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  ServerSocket
@@ -80,11 +78,25 @@ void ServerSocket::bind(const SocketAddress& address, bool reuseAddress)
 }
 
 
+void ServerSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	impl()->bind(address, reuseAddress, reusePort);
+}
+
+
 void ServerSocket::bind(Poco::UInt16 port, bool reuseAddress)
 {
 	IPAddress wildcardAddr;
 	SocketAddress address(wildcardAddr, port);
 	impl()->bind(address, reuseAddress);
+}
+
+
+void ServerSocket::bind(Poco::UInt16 port, bool reuseAddress, bool reusePort)
+{
+	IPAddress wildcardAddr;
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind(address, reuseAddress, reusePort);
 }
 
 
@@ -94,11 +106,33 @@ void ServerSocket::bind6(const SocketAddress& address, bool reuseAddress, bool i
 }
 
 
+void ServerSocket::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	impl()->bind6(address, reuseAddress, reusePort, ipV6Only);
+}
+
+
 void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only)
 {
+#if defined(POCO_HAVE_IPv6)
 	IPAddress wildcardAddr(IPAddress::IPv6);
 	SocketAddress address(wildcardAddr, port);
 	impl()->bind6(address, reuseAddress, ipV6Only);
+#else
+	throw Poco::NotImplementedException("No IPv6 support available");
+#endif // POCO_HAVE_IPv6
+}
+
+	
+void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+#if defined(POCO_HAVE_IPv6)
+	IPAddress wildcardAddr(IPAddress::IPv6);
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind6(address, reuseAddress, reusePort, ipV6Only);
+#else
+	throw Poco::NotImplementedException("No IPv6 support available");
+#endif // POCO_HAVE_IPv6
 }
 
 	

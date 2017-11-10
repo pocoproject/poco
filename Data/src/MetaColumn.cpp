@@ -1,8 +1,6 @@
 //
 // MetaColumn.cpp
 //
-// $Id: //poco/Main/Data/src/MetaColumn.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  MetaColumn

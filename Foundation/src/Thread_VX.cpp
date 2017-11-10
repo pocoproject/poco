@@ -1,8 +1,6 @@
 //
 // Thread_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_VX.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread

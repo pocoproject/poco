@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/Linux#2 $
-#
 # Linux
 #
 # Make settings for Linux 2.6/gcc 3.3
@@ -38,7 +36,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          = -std=c99
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare
