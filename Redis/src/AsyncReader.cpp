@@ -1,8 +1,6 @@
 //
 // AsyncReader.cpp
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  AsyncReader

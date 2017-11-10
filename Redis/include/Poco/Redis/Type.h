@@ -1,8 +1,6 @@
 //
 // Type.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Type

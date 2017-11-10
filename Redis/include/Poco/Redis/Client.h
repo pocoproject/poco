@@ -1,8 +1,6 @@
 //
 // Client.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Client

@@ -2,8 +2,6 @@
 #
 # configure
 #
-# $Id$
-#
 # Configuration script for POCO.
 #
 # Invoke configure --help for help.
@@ -11,7 +9,7 @@
 
 showhelp()
 {
-cat << ENDHELP 
+cat << ENDHELP
 usage: configure {options}
 Configure the POCO C++ Libraries.
 
@@ -28,7 +26,7 @@ Options:
   --prefix=<install_prefix>
     Use the given install directory for make install.
     Default is /usr/local.
-    
+
   --no-prefix
     Do not use /usr/local as default install directory and do not
     define POCO_PREFIX.
@@ -43,13 +41,13 @@ Options:
 
   --no-samples
     Do not build samples.
-    
+
   --minimal
     Build only Foundation, XML, JSON, Util and Net.
-    
+
   --typical (default)
     Build only Foundation, XML, JSON, Util, Net, Crypto, NetSSL, Data/SQLite and Zip.
-    
+
   --everything
     Build everything.
 
@@ -85,8 +83,8 @@ Options:
     Valid values are:
 		- 0 single-thread, no thread safety
 		- 1 serial access, highest thread safety
-		- 2 multi-threaded, without session sharing support  
-	
+		- 2 multi-threaded, without session sharing support
+
 
   --omit=<component>{,<component>}
     Do not build the specified component(s).
@@ -158,7 +156,7 @@ while [ $# -ge 1 ]; do
 
 	--prefix=*)
 		prefix="`echo ${1} | awk '{print substr($0,10)}'`" ;;
-		
+
 	--no-prefix)
 		noprefix=1 ;;
 
@@ -206,7 +204,7 @@ while [ $# -ge 1 ]; do
 
 	--sqlite-thread-safe=*)
 		flags="$flags -DSQLITE_THREADSAFE=`echo ${1} | awk '{print substr($0,22)}'`" ;;
-		
+
 	--sqlite-fts)
 		flags="$flags -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS" ;;
 
@@ -217,13 +215,13 @@ while [ $# -ge 1 ]; do
  		flags="$flags -DPOCO_UNBUNDLED"
  		unbundled=1
 		;;
-		
+
 	--minimal)
 	  	omit=$omitMinimal ;;
-	  	
+
 	--typical)
 		omit=$omitTypical ;;
-		
+
 	--everything)
 		omit="" ;;
 

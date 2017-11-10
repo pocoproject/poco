@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id$
-#
 # A script for running the POCO testsuites.
 #
 # usage: runtests [component [test] ]
@@ -12,7 +10,7 @@
 #
 # Cygwin specific setup.
 # ----------------------
-# On Cygwin, Unix IPC are provided by a separate process daemon 
+# On Cygwin, Unix IPC are provided by a separate process daemon
 # named cygserver, which should be started once before running any
 # test from Foundation.
 # 1/ Open a separate Cygwin terminal with Administrator privilege
@@ -52,7 +50,7 @@ if [ "$OSNAME" = "" ] ; then
 	OSNAME=`uname`
         case $OSNAME in
         CYGWIN*)
-                OSNAME=CYGWIN 
+                OSNAME=CYGWIN
                 TESTRUNNER=$TESTRUNNER.exe
                 PATH=$POCO_BUILD/lib/$OSNAME/$OSARCH:$PATH
                 ;;
@@ -82,9 +80,9 @@ do
 			if [ -x "$POCO_BUILD/$comp/testsuite/$BINDIR/$TESTRUNNER" ] ; then
 				echo ""
 				echo ""
-				echo "****************************************" 
-				echo "*** $OSNAME $OSARCH $comp"                                
-				echo "****************************************" 
+				echo "****************************************"
+				echo "*** $OSNAME $OSARCH $comp"
+				echo "****************************************"
 				echo ""
 
 				runs=`expr $runs + 1`

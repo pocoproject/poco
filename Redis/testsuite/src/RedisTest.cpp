@@ -1,8 +1,6 @@
 //
 // RedisTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

@@ -1,8 +1,6 @@
 //
 // PKCS12Container.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/PKCS12Container.h#2 $
-//
 // Library: Crypto
 // Package: Certificate
 // Module:  PKCS12Container
