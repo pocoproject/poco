@@ -80,7 +80,7 @@ const std::string& FilePartSource::filename() const
 std::streamsize FilePartSource::getContentLength() const
 {
 	Poco::File p(_path);
-	return p.getSize();
+	return static_cast<std::streamsize>(p.getSize());
 }
 
 
