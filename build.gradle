@@ -724,21 +724,6 @@ subprojects {
 	tasks.withType(RunTestExecutable) {
 		args test
 	}
-	task showCompilerOutput {
-	   doLast {
-	      FileTree tree = fileTree('gradle').include('**/output.txt')
-	      // Iterate over the contents of a tree
-	      tree.each {File file ->
-	          println 'Content of file ' + file + ':\n'
-	          println file.text
-	      }
-	   }
-	}
-/*
-  	tasks.withType(CppCompile) {
-		finalizedBy showCompilerOutput
-	}
-*/
 }
 task pocos() {
 		def Set<Task> tts = project.getTasksByName('poco', true)
@@ -802,7 +787,7 @@ task zipDoc(type: Zip) {
 def candle(VSYEAR, VERSION, target, os) {
 	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
 		dependsOn ':pocos'
-		//dependsOn ':pocoDoc'
+		dependsOn ':pocoDoc'
 		executable "${WiXHome}/bin/Candle.exe"
 		workingDir "packaging/Windows/WiX"
 		args "-arch", "${target}"
