@@ -89,6 +89,7 @@ include(PocoMacros)
 option(ENABLE_XML "Enable the XML" ON)
 option(ENABLE_JSON "Enable the JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
+option(ENABLE_REDIS "Enable Redis" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
@@ -173,6 +174,10 @@ endif()
 if(ENABLE_MONGODB)
 add_subdirectory(MongoDB)
 list(APPEND Poco_COMPONENTS "MongoDB")
+endif()
+if(ENABLE_REDIS)
+add_subdirectory(Redis)
+list(APPEND Poco_COMPONENTS "Redis")
 endif()
 if(ENABLE_PDF)
 add_subdirectory(PDF)
@@ -276,7 +281,7 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 include(CPack)
 
 #############################################################
-# cmake config files 
+# cmake config files
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
