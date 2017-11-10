@@ -22,6 +22,8 @@ build/                     the build system for Unix and additional utility scri
     scripts/               build and utility scripts
     vxconfig/              VxWorks build configurations
 
+cmake/                     Support files for CMake
+
 bin/                       all executables (dynamic link libraries on Windows)
 bin64/                     all 64-bit executables (and DLLs)
 
@@ -95,6 +97,7 @@ Most Unix/Linux systems already have OpenSSL preinstalled. If your system
 does not have OpenSSL, please get it from http://www.openssl.org or
 another source. You do not have to build OpenSSL yourself - a binary
 distribution is fine (e.g., apt-get install openssl libssl-dev).
+On macOS, install OpenSSL via Homebrew (brew install openssl).
 
 The easiest way to install OpenSSL on Windows is to get the pre-built
 libraries from the pocoproject/openssl Git repository at
@@ -125,6 +128,26 @@ and MySQL headers and libraries in various places. Nevertheless,
 the Makefiles may not be able to find the headers and libraries.
 In this case, please edit the Makefile in Data/ODBC and/or Data/MySQL
 accordingly.
+
+
+BUILDING WITH CMAKE
+===================
+
+The POCO C++ Libraries support CMake as a build system on Linux, macOS and Windows.
+To build the POCO C++ Libraries with CMake:
+
+1. create a cmake-build directory (e.g. in the POCO root directory):
+
+$ mkdir cmake-build
+
+2. and run CMake from there:
+
+$ cd cmake-build
+$ cmake ..
+$ make -s -j (or build the generated Visual Studio solution on Windows)
+
+If you cannot or do not want to build with CMake, there are other options,
+described in the following.
 
 
 BUILDING ON WINDOWS
@@ -244,23 +267,6 @@ some Data connectors, unless you have the necessary third party components
 available:
 
 > ./configure --omit=NetSSL_OpenSSL,Crypto,Data/ODBC,Data/MySQL
-
-
-BUILDING WITH CMAKE
-===================
-
-The POCO C++ Libraries support CMake as a build system on Linux, macOS and Windows.
-To build the POCO C++ Libraries with CMake:
-
-1. create a cmake-build directory (e.g. in the POCO root directory):
-
-$ mkdir cmake-build
-
-2. and run CMake from there:
-
-$ cd cmake-build
-$ cmake ..
-$ make -s -j (or build the generated Visual Studio solution on Windows)
 
 
 BUILDING FOR VXWORKS
