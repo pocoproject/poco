@@ -1,4 +1,7 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE package  [
+<!ENTITY CHANGELOG SYSTEM "..\..\..\CHANGELOG">
+]>
 <package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
     <metadata>
         <id>Pocoproject.Poco.vs140</id>
@@ -12,6 +15,9 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.</description>
         <releaseNotes>
+        	<![CDATA[
+        		&CHANGELOG;
+        	]]>
 		</releaseNotes>
         <copyright>Copyright 2017</copyright>
         <tags>string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml</tags>
