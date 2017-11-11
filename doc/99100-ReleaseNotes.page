@@ -1,6 +1,15 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.8.0.1
+
+!!Summary of Changes
+
+  - Reverted change for GH #1828; DeflatingStreamBuf::sync() no longer flushes
+    underlying stream as this causes corruption for some Zip files.
+  - PocoDoc: fix for handling compiler configuration for Gradle builds.
+
+
 !!!Release 1.8.0
 
 !!Summary of Changes

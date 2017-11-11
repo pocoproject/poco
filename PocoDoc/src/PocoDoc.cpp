@@ -227,8 +227,8 @@ protected:
 		else
 			platformComp += ".unix";
 
-		std::string exec = config().getString(platformComp + ".exec", config().getString(comp + ".exec"));
-		std::string opts = config().getString(platformComp + ".options", config().getString(comp + ".options"));
+		std::string exec = config().getString(platformComp + ".exec", config().getString(comp + ".exec", ""));
+		std::string opts = config().getString(platformComp + ".options", config().getString(comp + ".options", ""));
 		std::string path = config().getString(platformComp + ".path", config().getString(comp + ".path", ""));
 		bool usePipe = config().getBool(platformComp + ".usePipe", config().getBool(comp + ".usePipe", false));
 

@@ -753,24 +753,24 @@ task pocoDoc(type: Exec) {
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
 		executable "PocoDoc/bin/PocoDoc.exe"
-		args "/config=$rootDir/PocoDoc/cfg/mkdoc.xml"
+		args "/config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "/config=$rootDir/PocoDoc/PocoDoc.ini"
 	} 
 	if (os.linux) {
 		environment "LD_LIBRARY_PATH", "$rootDir/lib64:$LD_LIBRARY_PATH"
 		executable "PocoDoc/bin64/PocoDoc"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc.xml"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc.xml"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 //	inputs.files(tasks.getByPath(':production').outputs.files)
-//	inputs.files(executable)
+	inputs.files(executable)
 	inputs.files(fileTree("doc").filter { it.isFile() })
-	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-poco.xml"))
+	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"))
 	outputs.files(new File("releases/$version-all-doc/index.html"))
 }
 task zipDoc(type: Zip) {
