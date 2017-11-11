@@ -227,21 +227,10 @@ protected:
 		else
 			platformComp += ".unix";
 
-		std::string exec;
-		std::string opts;
-		std::string path;
-		bool usePipe;
-		try {
-			exec = config().getString(comp + ".exec");
-			opts = config().getString(comp + ".options");
-			path = config().getString(comp + ".path", "");
-			usePipe = config().getBool(comp + ".usePipe", false);
-		} catch (Poco::NotFoundException&) {
-			exec = config().getString(platformComp + ".exec");
-			opts = config().getString(platformComp + ".options");
-			path = config().getString(platformComp + ".path", "");
-			usePipe = config().getBool(platformComp + ".usePipe", false);
-		}
+		std::string exec = config().getString(platformComp + ".exec", config().getString(comp + ".exec", ""));
+		std::string opts = config().getString(platformComp + ".options", config().getString(comp + ".options", ""));
+		std::string path = config().getString(platformComp + ".path", config().getString(comp + ".path", ""));
+		bool usePipe = config().getBool(platformComp + ".usePipe", config().getBool(comp + ".usePipe", false));
 
 		std::string popts;
 		for (std::string::const_iterator it = opts.begin(); it != opts.end(); ++it)
