@@ -196,7 +196,9 @@ int DeflatingStreamBuf::sync()
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
 		}
-		_pOstr->flush();
+		// NOTE: This breaks the Zip library and causes corruption in some files.
+		// See GH #1828
+		// _pOstr->flush();
 	}
 	return 0;
 }
