@@ -39,6 +39,7 @@ public:
 	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testEncodeWord();
+	void testDecodeWord();
 
 	void setUp();
 	void tearDown();

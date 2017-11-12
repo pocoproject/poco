@@ -84,6 +84,12 @@ public:
 		/// the file system in order to avoid potential memory
 		/// exhaustion when attachment files are very large.
 
+	MailMessage(MailMessage&&);
+		/// Move constructor.
+
+	MailMessage& operator = (MailMessage&&);
+		/// Move assignment.
+
 	virtual ~MailMessage();
 		/// Destroys the MailMessage.
 
@@ -231,15 +237,24 @@ public:
 	void write(std::ostream& ostr) const;
 		/// Writes the mail message to the given output stream.
 
-	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8", char encoding = 'q');
 		/// If the given string contains non-ASCII characters,
-		/// encodes the given string using RFC 2047 "Q" word encoding.
+		/// encodes the given string using RFC 2047 'Q' or 'B' word encoding.
 		///
 		/// The given text must already be encoded in the character set
 		/// given in charset (default is UTF-8).
 		///
 		/// Returns the encoded string, or the original string if it
 		/// consists only of ASCII characters.
+
+	static std::string decodeWord(const std::string& encodedWord, std::string toCharset = "");
+		/// Decodes a string containing encoded-word's according to the rules specified in
+		/// RFC 2047 and returns the decoded string. Both Q and B encodings are supported.
+		///
+		/// If toCharset is not provided, no decoded string conversion is performed (ie.
+		/// string is simply decoded to the charset specified in encodedWord string)
+		/// If toCharset is provided, returned string is converted to the specified
+		/// charset. For a list of supported encodings, see Poco:TextEncodingRegistry.
 
 	static const std::string HEADER_SUBJECT;
 	static const std::string HEADER_FROM;
@@ -274,6 +289,12 @@ protected:
 	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
+	static std::string decodeWord(const std::string& charset, char encoding,
+		const std::string& text, const std::string& toCharset);
+	static void getEncWordLimits(const std::string& encodedWord,
+		std::string::size_type& pos1, std::string::size_type& pos2, bool isComment);
+	static void advanceToEncoded(const std::string& encoded, std::string& decoded,
+		std::string::size_type& pos1, bool& isComment);
 
 private:
 	MailMessage(const MailMessage&);

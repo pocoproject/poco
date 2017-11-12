@@ -290,7 +290,7 @@ public:
 		{
 			Poco::Timestamp start;
 #ifdef _WIN32
-			rc = WSAPoll(&_pollfds[0], _pollfds.size(), static_cast<INT>(timeout.totalMilliseconds()));
+			rc = WSAPoll(&_pollfds[0], static_cast<ULONG>(_pollfds.size()), static_cast<INT>(timeout.totalMilliseconds()));
 #else
 			rc = ::poll(&_pollfds[0], _pollfds.size(), timeout.totalMilliseconds());
 #endif

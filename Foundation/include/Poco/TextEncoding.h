@@ -20,12 +20,15 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/String.h"
+#include "Poco/RWLock.h"
+#include <map>
 
 
 namespace Poco {
 
 
-class TextEncodingManager;
+class Foundation_API TextEncodingRegistry;
 
 
 class Foundation_API TextEncoding
@@ -170,10 +173,55 @@ public:
 
 	static const std::string GLOBAL;
 		/// Name of the global TextEncoding, which is the empty string.
-		
+
+	static const TextEncodingRegistry& registry();
+		/// Returns the TextEncodingRegistry.
+
 protected:
-	static TextEncodingManager& manager();
-		/// Returns the TextEncodingManager.
+	static TextEncodingRegistry* registry(int);
+		/// Returns the TextEncodingRegistry.
+};
+
+
+class Foundation_API TextEncodingRegistry
+	/// This class serves as the main registry for all
+	/// supported TextEncoding's.
+{
+public:
+	TextEncodingRegistry();
+		/// Constructs TextEncodingRegistry
+
+	~TextEncodingRegistry();
+		/// Destroys TextEncodingRegistry
+
+	bool has(const std::string& name) const;
+		// Returns true if requested encoding is found.
+		// it will eturn true for both canonical and
+		// alternative encoding name.
+
+	void add(TextEncoding::Ptr pEncoding);
+		/// Adds encoding to the registry under its canonnical name.
+
+	void add(TextEncoding::Ptr pEncoding, const std::string& name);
+		/// Adds encoding to the registry under the specified name.
+
+	void remove(const std::string& name);
+		/// Removes the specified encoding from the registry.
+
+	TextEncoding::Ptr find(const std::string& name) const;
+		/// Returns Ptr to the enconding registerd under the speciied
+		/// name or having the name as an alias.
+		///
+		/// If encoding is not found, the returned Ptr points to nothing.
+
+private:
+	TextEncodingRegistry(const TextEncodingRegistry&);
+	TextEncodingRegistry& operator = (const TextEncodingRegistry&);
+
+	typedef std::map<std::string, TextEncoding::Ptr, CILess> EncodingMap;
+
+	EncodingMap    _encodings;
+	mutable RWLock _lock;
 };
 
 
