@@ -35,6 +35,7 @@ cmake_*
 ##########
 .gradle/
 gradle/
+coverage/
 
 # NuGet #
 #########
