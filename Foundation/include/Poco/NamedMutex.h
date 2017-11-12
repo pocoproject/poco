@@ -28,8 +28,6 @@
 #include "Poco/NamedMutex_Android.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/NamedMutex_UNIX.h"
-#else
-#include "Poco/NamedMutex_VMS.h"
 #endif
 
 
@@ -56,10 +54,10 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 {
 public:
 	typedef Poco::ScopedLock<NamedMutex> ScopedLock;
-	
+
 	NamedMutex(const std::string& name);
 		/// creates the Mutex.
-		
+
 	~NamedMutex();
 		/// destroys the Mutex.
 
@@ -75,7 +73,7 @@ public:
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
 		/// other threads.
-	
+
 private:
 	NamedMutex();
 	NamedMutex(const NamedMutex&);
