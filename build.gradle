@@ -12,7 +12,9 @@ dependencies {
 	classpath group: 'org.pocoproject', name: 'windows-message-compiler', version:'1.0.0'
 }
 */
-
+plugins {
+  id 'net.saliman.cobertura' version '2.5.1'
+}
 apply plugin: 'base' 
 
 def os = org.gradle.internal.os.OperatingSystem.current()
@@ -181,7 +183,7 @@ class SliceTasksPlugin extends RuleSource {
 
 allprojects {
 
-	buildDir = new File("root")	            // DO NOT REMOVE OR CHANGE to 'build'
+	buildDir = new File('root')	            // DO NOT REMOVE OR CHANGE to 'build'
 	file('bin').mkdirs()
 	file('bin64').mkdirs()
 	file('lib').mkdirs()
@@ -739,24 +741,13 @@ subprojects {
 	tasks.withType(RunTestExecutable) {
 		args test
 	}
-	task showCompilerOutput {
-	   doLast {
-	      FileTree tree = fileTree('gradle').include('**/output.txt')
-	      // Iterate over the contents of a tree
-	      tree.each {File file ->
-	          println 'Content of file ' + file + ':\n'
-	          println file.text
-	      }
-	   }
-	}
-/*
-  	tasks.withType(CppCompile) {
-		finalizedBy showCompilerOutput
-	}
-*/
 }
 task pocos() {
 		def Set<Task> tts = project.getTasksByName('poco', true)
+		setDependsOn(tts)
+}
+task tests() {
+		def Set<Task> tts = project.getTasksByName('testsuite', true)
 		setDependsOn(tts)
 }
 task PocoDocIni {
@@ -783,24 +774,24 @@ task pocoDoc(type: Exec) {
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
 		executable "PocoDoc/bin/PocoDoc.exe"
-		args "/config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "/config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "/config=$rootDir/PocoDoc/PocoDoc.ini"
 	} 
 	if (os.linux) {
 		environment "LD_LIBRARY_PATH", "$rootDir/lib64:$LD_LIBRARY_PATH"
 		executable "PocoDoc/bin64/PocoDoc"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc-poco.xml"
+		args "-config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 //	inputs.files(tasks.getByPath(':production').outputs.files)
 //	inputs.files(executable)
 	inputs.files(fileTree("doc").filter { it.isFile() })
-	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-poco.xml"))
+	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"))
 	outputs.files(new File("releases/$version-all-doc/index.html"))
 }
 task zipDoc(type: Zip) {
@@ -829,7 +820,7 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 		args "Poco-${VERSION}.wxs"
 		inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
-//			inputs.files(tasks.getByPath(':poco').outputs.files)
+		inputs.files(project.getTasksByName('poco', true).outputs.files)
 		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
@@ -867,17 +858,18 @@ task wix() {
 	});
 }
 task nuget(type: Exec) {
+	String nugetVersion = version.replace('p', '-')
 	dependsOn ':pocos'
 	executable "${NuGetHome}/NuGet.exe"
 	workingDir "packaging/Windows/NuGet"
 	args "pack"
 	args "-BasePath", "$rootDir"
-	args "-Version", version
+	args "-Version", nugetVersion
 	args "-Symbols"
 	args "-NonInteractive"
 	args "Pocoproject.Poco.vs140.nuspec"
 	inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
-//	inputs.files(tasks.getByPath(':poco').outputs.files)
+	inputs.files(project.getTasksByName('poco', true).outputs.files)
 	outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
 	onlyIf(new Spec<Exec>() {
 		boolean isSatisfiedBy(Exec task) {
@@ -892,44 +884,57 @@ task packaging() {
 		dependsOn wix
 	}
 }
-task exclude() {
-		def Set<Task> tts = project.getTasksByName("CppParser", true)
-		println tts
-		def Map<Project,Set<Task>> 	ats = getAllTasks(true)
-		println ats
+def cover(os, Module) {
+	return tasks.create("cover-${Module}", Exec) {
+		dependsOn tests
+		environment "Path", "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$Path"
+		environment "POCO_BASE", "$rootDir"
+		executable "${OpenCppCoverageHome}/OpenCppCoverage.exe"
+		workingDir "coverage/${Module}"
+		file(workingDir).mkdirs()
+		args "-q"
+		args "$rootDir/${Module}/testsuite/gradle/exe/${Module}TestSuite/win32/debug/${Module}TestSuite.exe"
+		args "--modules", "Poco*d.dll"
+		args "--export_type", "cobertura"
+		args "--continue_after_cpp_exception"
+		args "--"
+		args "-all"
+		onlyIf(new Spec<Exec>() {
+			boolean isSatisfiedBy(Exec task) {
+				   return os.windows;
+			}
+		});
+	}
+}
+def report(os, Module) {
+	return tasks.create("report-${Module}", Exec) {
+		dependsOn cover(os, Module)
+		executable "${ReportGeneratorHome}/ReportGenerator.exe"
+		args "\"-reports:coverage/${Module}/${Module}TestSuiteCoverage.xml\""
+		args "\"-targetdir:coverage/${Module}\""
+	//	args "\"-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include\""
+		onlyIf(new Spec<Exec>() {
+			boolean isSatisfiedBy(Exec task) {
+				   return os.windows;
+			}
+		});
+	}
+}
+task coverage() {
+	def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
+	println tasksSet;
+	tasksSet.each { task -> println task.project.parent.name }
+	tasksSet.each { task -> dependsOn report(os, task.project.parent.name) }
+	//dependsOn report(os, 'Crypto')
 }
 
 task all() {
-//doLast {
-//        def files =  fileTree("src").filter { it.isFile() }.files.name;
-//        println files;
-//        println "------------------------------------"
-//        println project.tasks.matching { Task task -> task.name.contains("assemble") }
-//        println "------------------------------------"
-//		def Set<Project> projects = project.subprojects
-//		println projects
-//        println "------------------------------------"
-//		def Set<Task> tts = project.getTasksByName('poco', true)
-//		println tts
-//		setDependsOn(tts)
-//		println project.subprojects.tasks.matching { Task task -> task.name.contains("poco") }
-//        println "------------------------------------"
-//        def c = subprojects.tasks.findAll { it.findByName(":poco") }
-//		println c
-
-//        CppCompile task = tasks.getByPath(':compileHelloSharedLibraryHelloCpp');
-//        println task;
 /*
         FileCollection incs = task.includes;
         incs.each { dir -> fileTree(dir).files.each { file -> inputs.files(file) }};
         inputs.files.each { file -> println file.path }
 */
-//}
 }
-	def get() {
-		def foo = subprojects.tasks.findAll { it.name.contains('poco') }
-		return foo
-	}
 task includes() {
 	doLast {
 		TaskContainer tc;
@@ -938,8 +943,6 @@ task includes() {
 //		td.values.each { task -> println task }
 		def ts = subprojects.tasks //.matching { task -> task.name.contains("poco") }
 //		println ts.each { it.matching { task -> task.name.contains("poco") } }
-		def foo = binaries.findAll { it.buildable }
-		println foo
 /*
 		def compileTasks = tasks.withType(CppCompile).matching { Task task -> 
 				String path = task.path;
