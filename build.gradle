@@ -903,6 +903,25 @@ def cover(os, Module) {
 		environment "POCO_BASE", "$rootDir"
 //		println "POCO_BASE=" + environment.POCO_BASE
 
+		String CPPUNIT_IGNORE = "";
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testBigPing';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
+
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunch';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
+		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
+		environment "CPPUNIT_IGNORE", "$CPPUNIT_IGNORE"
+
 		workingDir "coverage/${Module}"
 		file(workingDir).mkdirs()
 
@@ -915,6 +934,8 @@ def cover(os, Module) {
 		args "--"
 		args "-all"
 
+		outputs.files(new File(workingDir,"${Module}TestSuite.xml"))
+		
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
 				   return os.windows;
@@ -930,6 +951,9 @@ def report(os, Module) {
 		args "\"-reports:coverage/${Module}/${Module}TestSuiteCoverage.xml\""
 		args "\"-targetdir:coverage/${Module}\""
 	//	args "\"-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include\""
+
+		File targetDir = new File("coverage/${Module}")
+		inputs.files(new File(targetDir,"${Module}TestSuite.xml"))
 
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
