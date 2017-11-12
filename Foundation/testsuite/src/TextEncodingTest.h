@@ -25,6 +25,7 @@ public:
 	~TextEncodingTest();
 
 	void testTextEncoding();
+	void testTextEncodingManager();
 
 	void setUp();
 	void tearDown();
