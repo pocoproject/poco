@@ -809,8 +809,9 @@ def candle(VSYEAR, VERSION, target, os) {
 	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
 		dependsOn ':pocos'
 		dependsOn ':pocoDoc'
-		executable "${WiXHome}/bin/Candle.exe"
 		workingDir "packaging/Windows/WiX"
+
+		executable "${WiXHome}/bin/Candle.exe"
 		args "-arch", "${target}"
 		args "-dVSYEAR=${VSYEAR}"
 		args "-dVERSION=${VERSION}"
@@ -819,9 +820,11 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 		args "Poco-${VERSION}.wxs"
+
 		inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
 		inputs.files(project.getTasksByName('poco', true).outputs.files)
 		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
 				   return os.windows;
@@ -832,15 +835,18 @@ def candle(VSYEAR, VERSION, target, os) {
 def light(VSYEAR, VERSION, target, os) {
 	return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
 		dependsOn candle(VSYEAR, VERSION, target, os)
-		executable "${WiXHome}/bin/Light.exe"
 		workingDir "packaging/Windows/WiX"
+
+		executable "${WiXHome}/bin/Light.exe"
 		args "-cultures:null"
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 		args "-out"
 		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
 		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+
 		inputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
 		outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
+
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
 				   return os.windows;
@@ -860,17 +866,20 @@ task wix() {
 task nuget(type: Exec) {
 	String nugetVersion = version.replace('p', '-')
 	dependsOn ':pocos'
-	executable "${NuGetHome}/NuGet.exe"
 	workingDir "packaging/Windows/NuGet"
+
+	executable "${NuGetHome}/NuGet.exe"
 	args "pack"
 	args "-BasePath", "$rootDir"
 	args "-Version", nugetVersion
 	args "-Symbols"
 	args "-NonInteractive"
 	args "Pocoproject.Poco.vs140.nuspec"
+
 	inputs.files(new File(workingDir, "Pocoproject.Poco.vs140.nuspec"))
 	inputs.files(project.getTasksByName('poco', true).outputs.files)
 	outputs.files(new File(workingDir,"Pocoproject.Poco.vs140.${version}.nupkg"))
+
 	onlyIf(new Spec<Exec>() {
 		boolean isSatisfiedBy(Exec task) {
 			   return os.windows;
@@ -887,11 +896,17 @@ task packaging() {
 def cover(os, Module) {
 	return tasks.create("cover-${Module}", Exec) {
 		dependsOn tests
-		environment "Path", "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$Path"
+		String PATH = System.getenv("PATH")
+		environment "Path", "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$PATH"
+//		println environment.Path
+
 		environment "POCO_BASE", "$rootDir"
-		executable "${OpenCppCoverageHome}/OpenCppCoverage.exe"
+//		println "POCO_BASE=" + environment.POCO_BASE
+
 		workingDir "coverage/${Module}"
 		file(workingDir).mkdirs()
+
+		executable "${OpenCppCoverageHome}/OpenCppCoverage.exe"
 		args "-q"
 		args "$rootDir/${Module}/testsuite/gradle/exe/${Module}TestSuite/win32/debug/${Module}TestSuite.exe"
 		args "--modules", "Poco*d.dll"
@@ -899,6 +914,7 @@ def cover(os, Module) {
 		args "--continue_after_cpp_exception"
 		args "--"
 		args "-all"
+
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
 				   return os.windows;
@@ -909,10 +925,12 @@ def cover(os, Module) {
 def report(os, Module) {
 	return tasks.create("report-${Module}", Exec) {
 		dependsOn cover(os, Module)
+		
 		executable "${ReportGeneratorHome}/ReportGenerator.exe"
 		args "\"-reports:coverage/${Module}/${Module}TestSuiteCoverage.xml\""
 		args "\"-targetdir:coverage/${Module}\""
 	//	args "\"-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include\""
+
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
 				   return os.windows;
