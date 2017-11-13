@@ -161,6 +161,20 @@ void SharedPtrTest::testSharedPtr()
 	std::shared_ptr<TestObject> stdp2 = ptr5;
 
 	assert (stdp == stdp2);
+
+	std::shared_ptr<TestObject> stdp3(std::make_shared<TestObject>(""));
+	TestObject* rptr = stdp3.get();
+	Poco::SharedPtr<TestObject> ptr6(std::move(stdp3));
+
+	assert (!stdp3);
+	assert (ptr6.get() == rptr);
+
+	std::shared_ptr<TestObject> stdp4(std::make_shared<TestObject>(""));
+	rptr = stdp4.get();
+	ptr6 = std::move(stdp4);
+
+	assert (!stdp4);
+	assert (ptr6.get() == rptr);
 }
 
 

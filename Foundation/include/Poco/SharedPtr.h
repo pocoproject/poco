@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include <memory>
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco {
@@ -71,6 +72,11 @@ public:
 	{
 	}
 
+	SharedPtr(std::shared_ptr<C>&& ptr):
+		_ptr(std::move(ptr))
+	{
+	}
+
 	~SharedPtr()
 	{
 	}
@@ -116,6 +122,18 @@ public:
 	SharedPtr& operator = (const SharedPtr<Other>& ptr)
 	{
 		return assign<Other>(ptr);
+	}
+
+	SharedPtr& operator = (SharedPtr&& ptr)
+	{
+		_ptr = std::move(ptr._ptr);
+		return *this;
+	}
+
+	SharedPtr& operator = (std::shared_ptr<C>&& ptr)
+	{
+		_ptr = std::move(ptr);
+		return *this;
 	}
 
 	void swap(SharedPtr& ptr)
