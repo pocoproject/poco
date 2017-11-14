@@ -1,8 +1,6 @@
 //
 // SMTPChannel.cpp
 //
-// $Id: //poco/svn/Net/src/SMTPChannel.cpp#2 $
-//
 // Library: Net
 // Package: Logging
 // Module:  SMTPChannel
@@ -69,7 +67,14 @@ SMTPChannel::SMTPChannel(const std::string& mailhost, const std::string& sender,
 
 SMTPChannel::~SMTPChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -106,7 +111,7 @@ void SMTPChannel::log(const Message& msg)
 			content	<< "Timestamp: " << DateTimeFormatter::format(msg.getTime(), DateTimeFormat::RFC822_FORMAT) << "\r\n";
 
 		content	<< "Priority: " << NumberFormatter::format(msg.getPriority()) << "\r\n"
-			<< "Process ID: " << NumberFormatter::format(msg.getPid()) << "\r\n"
+			<< "Process ID: " << msg.getPid() << "\r\n"
 			<< "Thread: " << msg.getThread() << " (ID: " << msg.getTid() << ")\r\n"
 			<< "Message text: " << msg.getText() << "\r\n\r\n";
 
@@ -127,7 +132,7 @@ void SMTPChannel::log(const Message& msg)
 					fis.seekg(std::ios::beg);
 					fis.read(pMem, size);
 					message.addAttachment(_attachment,
-						new StringPartSource(std::string(pMem, static_cast<SST>(size)), 
+						new StringPartSource(std::string(pMem, static_cast<SST>(size)),
 							_type,
 							_attachment));
 
@@ -141,54 +146,54 @@ void SMTPChannel::log(const Message& msg)
 		session.login();
 		session.sendMessage(message);
 		session.close();
-	} 
-	catch (Exception&) 
-	{ 
-		if (_throw) throw; 
+	}
+	catch (Exception&)
+	{
+		if (_throw) throw;
 	}
 }
 
 	
 void SMTPChannel::setProperty(const std::string& name, const std::string& value)
 {
-	if (name == PROP_MAILHOST) 
+	if (name == PROP_MAILHOST)
 		_mailHost = value;
-	else if (name == PROP_SENDER) 
+	else if (name == PROP_SENDER)
 		_sender = value;
-	else if (name == PROP_RECIPIENT) 
+	else if (name == PROP_RECIPIENT)
 		_recipient = value;
-	else if (name == PROP_LOCAL) 
+	else if (name == PROP_LOCAL)
 		_local = isTrue(value);
-	else if (name == PROP_ATTACHMENT) 
+	else if (name == PROP_ATTACHMENT)
 		_attachment = value;
-	else if (name == PROP_TYPE) 
+	else if (name == PROP_TYPE)
 		_type = value;
-	else if (name == PROP_DELETE) 
+	else if (name == PROP_DELETE)
 		_delete = isTrue(value);
-	else if (name == PROP_THROW) 
+	else if (name == PROP_THROW)
 		_throw = isTrue(value);
-	else 
+	else
 		Channel::setProperty(name, value);
 }
 
 	
 std::string SMTPChannel::getProperty(const std::string& name) const
 {
-	if (name == PROP_MAILHOST) 
+	if (name == PROP_MAILHOST)
 		return _mailHost;
-	else if (name == PROP_SENDER) 
+	else if (name == PROP_SENDER)
 		return _sender;
-	else if (name == PROP_RECIPIENT) 
+	else if (name == PROP_RECIPIENT)
 		return _recipient;
-	else if (name == PROP_LOCAL) 
+	else if (name == PROP_LOCAL)
 		return _local ? "true" : "false";
-	else if (name == PROP_ATTACHMENT) 
+	else if (name == PROP_ATTACHMENT)
 		return _attachment;
-	else if (name == PROP_TYPE) 
+	else if (name == PROP_TYPE)
 		return _type;
-	else if (name == PROP_DELETE) 
+	else if (name == PROP_DELETE)
 		return _delete ? "true" : "false";
-	else if (name == PROP_THROW) 
+	else if (name == PROP_THROW)
 		return _throw ? "true" : "false";
 	else
 		return Channel::getProperty(name);
@@ -197,7 +202,7 @@ std::string SMTPChannel::getProperty(const std::string& name) const
 
 void SMTPChannel::registerChannel()
 {
-	Poco::LoggingFactory::defaultFactory().registerChannelClass("SMTPChannel", 
+	Poco::LoggingFactory::defaultFactory().registerChannelClass("SMTPChannel",
 		new Poco::Instantiator<SMTPChannel, Poco::Channel>);
 }
 

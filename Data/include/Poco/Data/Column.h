@@ -1,8 +1,6 @@
 //
 // Column.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Column.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Column
@@ -36,7 +34,7 @@ namespace Data {
 template <class C>
 class Column
 	/// Column class is column data container.
-	/// Data (a pointer to underlying STL container) is assigned to the class 
+	/// Data (a pointer to underlying STL container) is assigned to the class
 	/// at construction time. Construction with null pointer is not allowed.
 	/// This class owns the data assigned to it and deletes the storage on destruction.
 {
@@ -48,7 +46,7 @@ public:
 	typedef typename C::size_type              Size;
 	typedef typename C::value_type             Type;
 
-	Column(const MetaColumn& metaColumn, Container* pData): 
+	Column(const MetaColumn& metaColumn, Container* pData):
 		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
@@ -57,8 +55,8 @@ public:
 			throw NullPointerException("Container pointer must point to valid storage.");
 	}
 
-	Column(const Column& col): 
-		_metaColumn(col._metaColumn), 
+	Column(const Column& col):
+		_metaColumn(col._metaColumn),
 		_pData(col._pData)
 		/// Creates the Column.
 	{
@@ -99,8 +97,8 @@ public:
 			return _pData->at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -176,13 +174,13 @@ private:
 template <>
 class Column<std::vector<bool> >
 	/// The std::vector<bool> specialization for the Column class.
-	/// 
+	///
 	/// This specialization is necessary due to the nature of std::vector<bool>.
-	/// For details, see the standard library implementation of vector<bool> 
+	/// For details, see the standard library implementation of vector<bool>
 	/// or
 	/// S. Meyers: "Effective STL" (Copyright Addison-Wesley 2001),
 	/// Item 18: "Avoid using vector<bool>."
-	/// 
+	///
 	/// The workaround employed here is using deque<bool> as an
 	/// internal "companion" container kept in sync with the vector<bool>
 	/// column data.
@@ -194,8 +192,8 @@ public:
 	typedef Container::const_reverse_iterator RIterator;
 	typedef Container::size_type              Size;
 
-	Column(const MetaColumn& metaColumn, Container* pData): 
-		_metaColumn(metaColumn), 
+	Column(const MetaColumn& metaColumn, Container* pData):
+		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -203,8 +201,8 @@ public:
 		_deque.assign(_pData->begin(), _pData->end());
 	}
 
-	Column(const Column& col): 
-		_metaColumn(col._metaColumn), 
+	Column(const Column& col):
+		_metaColumn(col._metaColumn),
 		_pData(col._pData)
 		/// Creates the Column.
 	{
@@ -250,8 +248,8 @@ public:
 			return _deque.at(row) = _pData->at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -337,8 +335,8 @@ public:
 	typedef typename Container::const_reverse_iterator RIterator;
 	typedef typename Container::size_type              Size;
 
-	Column(const MetaColumn& metaColumn, std::list<T>* pData): 
-		_metaColumn(metaColumn), 
+	Column(const MetaColumn& metaColumn, std::list<T>* pData):
+		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
 	{
@@ -382,7 +380,7 @@ public:
 	const T& value(std::size_t row) const
 		/// Returns the field value in specified row.
 		/// This is the std::list specialization and std::list
-		/// is not the optimal solution for cases where random 
+		/// is not the optimal solution for cases where random
 		/// access is needed.
 		/// However, to allow for compatibility with other
 		/// containers, this functionality is provided here.
@@ -393,20 +391,20 @@ public:
 		if (row <= (std::size_t) (_pData->size() / 2))
 		{
 			Iterator it = _pData->begin();
-			Iterator end = _pData->end();
-			for (int i = 0; it != end; ++it, ++i)
+			Iterator itEnd = _pData->end();
+			for (int i = 0; it != itEnd; ++it, ++i)
 				if (i == row) return *it;
 		}
 		else
 		{
 			row = _pData->size() - row;
 			RIterator it = _pData->rbegin();
-			RIterator end = _pData->rend();
-			for (int i = 1; it != end; ++it, ++i)
+			RIterator itEnd = _pData->rend();
+			for (int i = 1; it != itEnd; ++it, ++i)
 				if (i == row) return *it;
 		}
 
-		throw RangeException("Invalid row number."); 
+		throw RangeException("Invalid row number.");
 	}
 
 	const T& operator [] (std::size_t row) const

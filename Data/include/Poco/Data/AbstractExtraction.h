@@ -1,8 +1,6 @@
 //
 // AbstractExtraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractExtraction.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractExtraction
@@ -49,9 +47,9 @@ public:
 	typedef SharedPtr<AbstractExtractor>  ExtractorPtr;
 	typedef SharedPtr<AbstractPreparator> PreparatorPtr;
 
-	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
+	AbstractExtraction(const std::string& type, Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
 		Poco::UInt32 position = 0, bool bulk = false);
-		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu) 
+		/// Creates the AbstractExtraction. A limit value equal to EXTRACT_UNLIMITED (0xffffffffu)
 		/// means that we extract as much data as possible during one execute.
 		/// Otherwise the limit value is used to partition data extracting to a limited amount of rows.
 
@@ -76,7 +74,7 @@ public:
 	virtual std::size_t numOfRowsHandled() const = 0;
 		/// Returns the number of rows that the extraction handles.
 		///
-		/// The trivial case will be one single row but 
+		/// The trivial case will be one single row but
 		/// for collection data types (ie vector) it can be larger.
 
 	virtual std::size_t numOfRowsAllowed() const = 0;
@@ -104,8 +102,8 @@ public:
 		/// Gets the limit.
 
 	virtual bool isNull(std::size_t row) const;
-		/// In implementations, this function returns true if value at row is null, 
-		/// false otherwise. 
+		/// In implementations, this function returns true if value at row is null,
+		/// false otherwise.
 		/// Normal behavior is to replace nulls with default values.
 		/// However, extraction implementations may remember the underlying database
 		/// null values and be able to later provide information about them.
@@ -140,18 +138,23 @@ public:
 	bool isValueNull(const std::string& str, bool deflt);
 		/// Overload for const reference to std::string.
 		///
-		/// Returns true when folowing conditions are met:
+		/// Returns true when following conditions are met:
 		///
-		/// - string is empty 
+		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
 
 	bool isValueNull(const Poco::UTF16String& str, bool deflt);
 		/// Overload for const reference to UTF16String.
 		///
-		/// Returns true when folowing conditions are met:
+		/// Returns true when following conditions are met:
 		///
-		/// - string is empty 
+		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
+
+	const std::string& type() const
+	{
+		return _type;
+	}
 
 private:
 	template <typename S>
@@ -165,6 +168,7 @@ private:
 		return deflt;
 	}
 
+	std::string _type;
 	ExtractorPtr _pExtractor;
 	Poco::UInt32 _limit;
 	Poco::UInt32 _position;
@@ -176,11 +180,6 @@ private:
 
 typedef std::vector<AbstractExtraction::Ptr> AbstractExtractionVec;
 typedef std::vector<AbstractExtractionVec>   AbstractExtractionVecVec;
-typedef std::deque<AbstractExtraction::Ptr>  AbstractExtractionDeq;
-typedef std::vector<AbstractExtractionDeq>   AbstractExtractionDeqVec;
-typedef std::list<AbstractExtraction::Ptr>   AbstractExtractionLst;
-typedef std::vector<AbstractExtractionLst>   AbstractExtractionLstVec;
-
 
 //
 // inlines

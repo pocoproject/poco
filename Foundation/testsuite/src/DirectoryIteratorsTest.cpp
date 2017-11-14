@@ -1,8 +1,6 @@
 //
 // DirectoryIteratorsTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryIteratorsTest.cpp#1 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "DirectoryIteratorsTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DirectoryIterator.h"
 #include "Poco/SortedDirectoryIterator.h"
 #include "Poco/RecursiveDirectoryIterator.h"
@@ -30,6 +28,7 @@ using namespace Poco;
 
 
 #if defined(POCO_OS_FAMILY_UNIX)
+
 static void setReadable(const std::string& path, bool flag)
 {
 	poco_assert(!path.empty());
@@ -51,14 +50,17 @@ static void setReadable(const std::string& path, bool flag)
 	}
 	if (chmod(path.c_str(), mode) != 0)
 	{
-		throw FileException("chmod error", path, errno);
+		throw FileException("chmod", path, errno);
 	}
 }
+
 #else
+
 static void setReadable(const std::string& path, bool flag)
 {
 	poco_assert(!path.empty());
 }
+
 #endif
 
 
@@ -160,7 +162,7 @@ void DirectoryIteratorsTest::testSimpleRecursiveDirectoryIteratorOnError()
 {
 	Path p = path();
 	SimpleRecursiveDirectoryIterator dirIterator(p);
-	dirIterator.setOnError(TraverseErrorCallback<DirectoryIteratorsTest>(*this, &DirectoryIteratorsTest::onError));
+	dirIterator.onError(*this, &DirectoryIteratorsTest::onError);
 	SimpleRecursiveDirectoryIterator end;
 	std::vector<std::string> result;
 	std::string file;
@@ -178,12 +180,13 @@ void DirectoryIteratorsTest::testSimpleRecursiveDirectoryIteratorOnError()
 		result.push_back(file);
 	}
 
+#if defined(POCO_OS_FAMILY_UNIX)
+	assert(_onErrorPath.size() > 0);
 	if (second.separator() != *_onErrorPath.rbegin())
 		_onErrorPath += second.separator();
 	if (second.separator() != *errorPath.rbegin())
 		errorPath += second.separator();
 
-#if defined(POCO_OS_FAMILY_UNIX)
 	assertEquals(_onErrorPath, errorPath);
 	assertEquals(14, (long) result.size());
 #else
@@ -215,7 +218,7 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIteratorOnError(
 {
 	Path p = path();
 	SiblingsFirstRecursiveDirectoryIterator dirIterator(p);
-	dirIterator.setOnError(TraverseErrorCallback<DirectoryIteratorsTest>(*this, &DirectoryIteratorsTest::onError));
+	dirIterator.onError(*this, &DirectoryIteratorsTest::onError);
 	SimpleRecursiveDirectoryIterator end;
 	std::vector<std::string> result;
 	std::string file;
@@ -232,12 +235,13 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIteratorOnError(
 		result.push_back(file);
 	}
 
+#if defined(POCO_OS_FAMILY_UNIX)
+	assert(_onErrorPath.size() > 0);
 	if (first.separator() != *_onErrorPath.rbegin())
 		_onErrorPath += first.separator();
 	if (first.separator() != *errorPath.rbegin())
 		errorPath += first.separator();
 
-#if defined(POCO_OS_FAMILY_UNIX)
 	assertEquals(_onErrorPath, errorPath);
 	assertEquals(7, (long) result.size());
 #else
@@ -302,7 +306,7 @@ void DirectoryIteratorsTest::createSubdir(Path& p)
 }
 
 
-void DirectoryIteratorsTest::onError(const std::string& path)
+void DirectoryIteratorsTest::onError(const void* pSender, const std::string& path)
 {
 	_onErrorPath = path;
 }

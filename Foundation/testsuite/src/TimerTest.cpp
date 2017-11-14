@@ -1,8 +1,6 @@
 //
 // TimerTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "TimerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Thread.h"
 #include "Poco/Stopwatch.h"
 
@@ -23,7 +21,7 @@ using Poco::Thread;
 using Poco::Stopwatch;
 
 
-TimerTest::TimerTest(const std::string& name): CppUnit::TestCase(name)
+TimerTest::TimerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

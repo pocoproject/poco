@@ -1,14 +1,12 @@
 //
 // TestRunner.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestRunner.cpp#1 $
-//
 
 
-#include "CppUnit/TestRunner.h"
-#include "CppUnit/Test.h"
-#include "CppUnit/TestSuite.h"
-#include "CppUnit/TextTestResult.h"
+#include "Poco/CppUnit/TestRunner.h"
+#include "Poco/CppUnit/Test.h"
+#include "Poco/CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TextTestResult.h"
 #include <iostream>
 
 
@@ -36,7 +34,7 @@ TestRunner::~TestRunner()
 
 void TestRunner::printBanner()
 {
-    _ostr 
+    _ostr
 		<< "Usage: driver [-all] [-print] [-wait] [name] ..." << std::endl
 		<< "       where name is the name of a test case class" << std::endl;
 }
@@ -51,10 +49,10 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	bool wait    = false;
 	bool printed = false;
 
-	for (int i = 1; i < args.size(); i++) 
+	for (int i = 1; i < args.size(); i++)
 	{
 		const std::string& arg = args[i];
-		if (arg == "-wait") 
+		if (arg == "-wait")
 		{
 			wait = true;
 			continue;
@@ -66,7 +64,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		}
 		else if (arg == "-print")
 		{
-			for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it) 
+			for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it)
 			{
 				print(it->first, it->second, 0);
 			}
@@ -85,7 +83,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 
 			Test* testToRun = 0;
-			for (Mappings::iterator it = _mappings.begin(); !testToRun && it != _mappings.end(); ++it) 
+			for (Mappings::iterator it = _mappings.begin(); !testToRun && it != _mappings.end(); ++it)
 			{
 				testToRun = find(testCase, it->second, it->first);
 			}
@@ -95,7 +93,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 			numberOfTests++;
 
-			if (!testToRun) 
+			if (!testToRun)
 			{
 				_ostr << "Test " << testCase << " not found." << std::endl;
 				return false;
@@ -105,20 +103,20 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 	if (all)
 	{
-		for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it) 
+		for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it)
 		{
 			if (!run(it->second)) success = false;
 			numberOfTests++;
 		}
 	}
 	
-	if (numberOfTests == 0 && !printed) 
+	if (numberOfTests == 0 && !printed)
 	{
 		printBanner();
 		return false;
 	}
 
-	if (wait) 
+	if (wait)
 	{
 		_ostr << "<RETURN> to continue" << std::endl;
 		std::cin.get();

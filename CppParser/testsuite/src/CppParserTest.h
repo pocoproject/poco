@@ -1,8 +1,6 @@
 //
 // CppParserTest.h
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/CppParserTest.h#2 $
-//
 // Definition of the CppParserTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/CppParser/CppParser.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class CppParserTest: public CppUnit::TestCase

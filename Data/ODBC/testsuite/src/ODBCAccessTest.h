@@ -1,8 +1,6 @@
 //
 // ODBCAccessTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCAccessTest.h#4 $
-//
 // Definition of the ODBCAccessTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -20,14 +18,14 @@
 #include "Poco/Data/Session.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 
 
 class ODBCAccessTest: public CppUnit::TestCase
 	/// MS Access ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB		| OS
 	/// ------------+-----------+------------------------------------------
 	///	4.00.6305.00| Jet 4.0	| MS Windows XP Professional x64 v.2003/SP1

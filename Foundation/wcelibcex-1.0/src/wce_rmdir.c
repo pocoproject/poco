@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -45,7 +45,7 @@
 *
 *   The rmdir() function shall remove a directory whose name is given by path.
 *   The directory shall be removed only if it is an empty directory.
-*   Internally, mkdir() function wraps RemoveDirectory call from 
+*   Internally, mkdir() function wraps RemoveDirectory call from
 *   Windows CE API.
 *
 * Return:
@@ -55,7 +55,7 @@
 *   shall not be changed.
 *
 *   XXX - mloskot - errno is not set - todo.
-*       
+*
 * Reference:
 *
 *   IEEE 1003.1, 2004 Edition
@@ -63,7 +63,7 @@
 *******************************************************************************/
 int wceex_rmdir(const char *filename)
 {
-    int res;    
+    int res;
     size_t len;
     wchar_t *widestr;
 

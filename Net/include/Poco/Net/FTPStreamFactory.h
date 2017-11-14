@@ -1,8 +1,6 @@
 //
 // FTPStreamFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/FTPStreamFactory.h#1 $
-//
 // Library: Net
 // Package: FTP
 // Module:  FTPStreamFactory
@@ -32,7 +30,7 @@ namespace Net {
 class Net_API FTPPasswordProvider
 	/// The base class for all password providers.
 	/// An instance of a subclass of this class can be
-	/// registered with the FTPStreamFactory to 
+	/// registered with the FTPStreamFactory to
 	/// provide a password
 {
 public:

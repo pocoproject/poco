@@ -1,8 +1,6 @@
 //
 // FileTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "FileTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/Path.h"
@@ -21,7 +19,6 @@
 #include <fstream>
 #include <set>
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::File;
 using Poco::TemporaryFile;
@@ -31,7 +28,7 @@ using Poco::Timestamp;
 using Poco::Thread;
 
 
-FileTest::FileTest(const std::string& name): CppUnit::TestCase(name)
+FileTest::FileTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -45,7 +42,7 @@ void FileTest::testFileAttributes1()
 {
 	File f("testfile.dat");
 	assert (!f.exists());
-	
+
 	try
 	{
 		bool flag = f.canRead();
@@ -181,6 +178,33 @@ void FileTest::testFileAttributes1()
 	catch (Exception&)
 	{
 	}
+
+	try
+	{
+		f.totalSpace();
+		failmsg("file does not exist - must throw exception");
+	}
+	catch (Exception&)
+	{
+	}
+
+	try
+	{
+		f.usableSpace();
+		failmsg("file does not exist - must throw exception");
+	}
+	catch (Exception&)
+	{
+	}
+
+	try
+	{
+		f.freeSpace();
+		failmsg("file does not exist - must throw exception");
+	}
+	catch (Exception&)
+	{
+	}
 }
 
 
@@ -201,7 +225,7 @@ void FileTest::testFileAttributes2()
 	bool created = f.createFile();
 	Timestamp ts;
 	assert (created);
-	
+
 	assert (f.exists());
 	assert (f.canRead());
 	assert (f.canWrite());
@@ -211,15 +235,15 @@ void FileTest::testFileAttributes2()
 	Timestamp tsm = f.getLastModified();
 	assert (tsc - ts >= -2000000 && tsc - ts <= 2000000);
 	assert (tsm - ts >= -2000000 && tsm - ts <= 2000000);
-	
+
 	f.setWriteable(false);
 	assert (!f.canWrite());
 	assert (f.canRead());
 
-	f.setReadOnly(false);	
+	f.setReadOnly(false);
 	assert (f.canWrite());
 	assert (f.canRead());
-	
+
 	ts = Timestamp::fromEpochTime(1000000);
 	f.setLastModified(ts);
 	assert (f.getLastModified() == ts);
@@ -229,7 +253,11 @@ void FileTest::testFileAttributes2()
 void FileTest::testFileAttributes3()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	File f("/dev/console");
+#if POCO_OS==POCO_OS_CYGWIN
+	File f("/dev/tty");
+#else
+	File f("/dev/null");
+#endif
 #elif defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	File f("CON");
 #endif
@@ -247,7 +275,7 @@ void FileTest::testCompare()
 	File f1("abc.txt");
 	File f2("def.txt");
 	File f3("abc.txt");
-	
+
 	assert (f1 == f3);
 	assert (!(f1 == f2));
 	assert (f1 != f2);
@@ -261,7 +289,7 @@ void FileTest::testCompare()
 	assert (f2 >= f1);
 	assert (!(f1 > f2));
 	assert (!(f1 >= f2));
-	
+
 	assert (f1 <= f3);
 	assert (f1 >= f3);
 }
@@ -314,6 +342,15 @@ void FileTest::testSize()
 }
 
 
+void FileTest::testSpace()
+{
+	File f(Path::home());
+	assert(f.totalSpace() > 0);
+	assert(f.usableSpace() > 0);
+	assert(f.freeSpace() > 0);
+}
+
+
 void FileTest::testDirectory()
 {
 	File d("testdir");
@@ -325,7 +362,7 @@ void FileTest::testDirectory()
 	{
 	}
 	TemporaryFile::registerForDeletion("testdir");
-	
+
 	bool created = d.createDirectory();
 	assert (created);
 	assert (d.isDirectory());
@@ -333,23 +370,23 @@ void FileTest::testDirectory()
 	std::vector<std::string> files;
 	d.list(files);
 	assert (files.empty());
-	
+
 	File f = Path("testdir/file1", Path::PATH_UNIX);
 	f.createFile();
 	f = Path("testdir/file2", Path::PATH_UNIX);
 	f.createFile();
 	f = Path("testdir/file3", Path::PATH_UNIX);
 	f.createFile();
-	
+
 	d.list(files);
 	assert (files.size() == 3);
-	
+
 	std::set<std::string> fs;
 	fs.insert(files.begin(), files.end());
 	assert (fs.find("file1") != fs.end());
 	assert (fs.find("file2") != fs.end());
 	assert (fs.find("file3") != fs.end());
-	
+
 	File dd(Path("testdir/testdir2/testdir3", Path::PATH_UNIX));
 	dd.createDirectories();
 	assert (dd.exists());
@@ -359,7 +396,7 @@ void FileTest::testDirectory()
 	ddd.createDirectories();
 	assert (ddd.exists());
 	assert (ddd.isDirectory());
-	
+
 	d.remove(true);
 }
 
@@ -372,9 +409,11 @@ void FileTest::testCopy()
 
 	File f1("testfile.dat");
 	TemporaryFile f2;
-	f1.copyTo(f2.path());
+	f1.setReadOnly().copyTo(f2.path());
 	assert (f2.exists());
+	assert (!f2.canWrite());
 	assert (f1.getSize() == f2.getSize());
+	f1.setWriteable().remove();
 }
 
 
@@ -422,9 +461,9 @@ void FileTest::testCopyDirectory()
 	std::ofstream ostr3(pf3.toString().c_str());
 	ostr3 << "Hello, world!" << std::endl;
 	ostr3.close();
-	
+
 	File fd3("testdir2");
-	
+
 	try
 	{
 		fd3.remove(true);
@@ -432,19 +471,19 @@ void FileTest::testCopyDirectory()
 	catch (...)
 	{
 	}
-	
+
 	fd1.copyTo("testdir2");
-	
+
 	Path pd1t("testdir2");
 	File fd1t(pd1t);
 	assert (fd1t.exists());
 	assert (fd1t.isDirectory());
-	
+
 	Path pd2t(pd1t, "subdir");
 	File fd2t(pd2t);
 	assert (fd2t.exists());
 	assert (fd2t.isDirectory());
-	
+
 	Path pf1t(pd1t, "testfile1.dat");
 	File ff1t(pf1t);
 	assert (ff1t.exists());
@@ -459,7 +498,7 @@ void FileTest::testCopyDirectory()
 	File ff3t(pf3t);
 	assert (ff3t.exists());
 	assert (ff3t.isFile());
-	
+
 	fd1.remove(true);
 	fd3.remove(true);
 }
@@ -478,8 +517,32 @@ void FileTest::testRename()
 	assert (f2.exists());
 	assert (f1.exists());
 	assert (f1 == f2);
-	
+
 	f2.remove();
+}
+
+
+void FileTest::testLongPath()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+	Poco::Path p("longpathtest");
+	p.makeAbsolute();
+	std::string longpath(p.toString());
+	while (longpath.size() < MAX_PATH*4)
+	{
+		longpath.append("\\");
+		longpath.append(64, 'x');
+	}
+
+	Poco::File d(longpath);
+	d.createDirectories();
+
+	assert (d.exists());
+	assert (d.isDirectory());
+
+	Poco::File f(p.toString());
+	f.remove(true);	
+#endif
 }
 
 
@@ -520,12 +583,14 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCompare);
 	CppUnit_addTest(pSuite, FileTest, testSwap);
 	CppUnit_addTest(pSuite, FileTest, testSize);
+	CppUnit_addTest(pSuite, FileTest, testSpace);
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testMove);
 	CppUnit_addTest(pSuite, FileTest, testCopyDirectory);
 	CppUnit_addTest(pSuite, FileTest, testRename);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
+	CppUnit_addTest(pSuite, FileTest, testLongPath);
 
 	return pSuite;
 }

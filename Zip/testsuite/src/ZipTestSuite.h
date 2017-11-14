@@ -1,8 +1,6 @@
 //
 // ZipTestSuite.h
 //
-// $Id: //poco/1.4/Zip/testsuite/src/ZipTestSuite.h#1 $
-//
 // Definition of the ZipTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define ZipTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class ZipTestSuite

@@ -1,8 +1,6 @@
 //
 // TimerTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimerTest.h#1 $
-//
 // Definition of the TimerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/Timer.h"
 #include "Poco/Event.h"
 

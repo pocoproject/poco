@@ -1,8 +1,6 @@
 //
 // ListMap.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ListMap.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  ListMap
@@ -37,7 +35,7 @@ class ListMap
 	/// ordering of elements is not desirable. Naturally, this container will
 	/// have inferior data retrieval performance and it is not recommended for
 	/// use with large datasets. The main purpose within POCO is for Internet
-	/// messages (email message, http headers etc), to prevent autmomatic 
+	/// messages (email message, http headers etc), to prevent automatic
 	/// header entry reordering.
 {
 public:
@@ -103,7 +101,7 @@ public:
 	}
 	
 	ConstIterator find(const KeyType& key) const
-		/// Finds the first occurence of the key and
+		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
 		/// or iterator pointing to the end if entry is
 		/// not found.
@@ -118,7 +116,7 @@ public:
 	}
 
 	Iterator find(const KeyType& key)
-		/// Finds the first occurence of the key and
+		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
 		/// or iterator pointing to the end if entry is
 		/// not found.
@@ -133,26 +131,15 @@ public:
 	}
 
 	Iterator insert(const ValueType& val)
-		/// Inserts the value into the map. If one or more values 
-		/// already exist, new value is inserted at the end of the 
+		/// Inserts the value into the map. If one or more values
+		/// already exist, new value is inserted at the end of the
 		/// block. Thus, all the equal value entries are located
 		/// sequentially at all times.
-		/// Returns iterator pointing to the newly inserted value 
+		/// Returns iterator pointing to the newly inserted value
 	{
 		Iterator it = find(val.first);
-
-		if (it == _list.end())
-		{
-			_list.push_back(val);
-			it = _list.end();
-			--it;
-		}
-		else
-		{
-			_list.insert(it, 1, val);
-		}
-
-		return it;
+		while (it != _list.end() && isEqual(it->first, val.first)) ++it;
+		return _list.insert(it, val);
 	}
 	
 	void erase(Iterator it)

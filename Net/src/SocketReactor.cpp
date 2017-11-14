@@ -1,8 +1,6 @@
 //
 // SocketReactor.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketReactor.cpp#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketReactor
@@ -20,7 +18,9 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-
+#ifdef max
+#undef max
+#endif
 
 using Poco::FastMutex;
 using Poco::Exception;
@@ -39,7 +39,8 @@ SocketReactor::SocketReactor():
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pIdleNotification(new IdleNotification(this)),
-	_pShutdownNotification(new ShutdownNotification(this))
+	_pShutdownNotification(new ShutdownNotification(this)),
+	_pThread(0)
 {
 }
 
@@ -52,7 +53,8 @@ SocketReactor::SocketReactor(const Poco::Timespan& timeout):
 	_pErrorNotification(new ErrorNotification(this)),
 	_pTimeoutNotification(new TimeoutNotification(this)),
 	_pIdleNotification(new IdleNotification(this)),
-	_pShutdownNotification(new ShutdownNotification(this))
+	_pShutdownNotification(new ShutdownNotification(this)),
+	_pThread(0)
 {
 }
 
@@ -64,6 +66,8 @@ SocketReactor::~SocketReactor()
 
 void SocketReactor::run()
 {
+	_pThread = Thread::current();
+
 	Socket::SocketList readable;
 	Socket::SocketList writable;
 	Socket::SocketList except;
@@ -100,6 +104,9 @@ void SocketReactor::run()
 			if (nSockets == 0)
 			{
 				onIdle();
+				Timespan::TimeDiff ms = _timeout.totalMilliseconds();
+				poco_assert_dbg(ms <= std::numeric_limits<long>::max());
+				Thread::trySleep(static_cast<long>(ms));
 			}
 			else if (Socket::select(readable, writable, except, _timeout))
 			{
@@ -130,10 +137,16 @@ void SocketReactor::run()
 	onShutdown();
 }
 
-	
+
 void SocketReactor::stop()
 {
 	_stop = true;
+}
+
+
+void SocketReactor::wakeUp()
+{
+	if (_pThread) _pThread->wakeUp();
 }
 
 
@@ -142,7 +155,7 @@ void SocketReactor::setTimeout(const Poco::Timespan& timeout)
 	_timeout = timeout;
 }
 
-	
+
 const Poco::Timespan& SocketReactor::getTimeout() const
 {
 	return _timeout;
@@ -162,9 +175,10 @@ void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractOb
 			_handlers[socket] = pNotifier;
 		}
 		else pNotifier = it->second;
-	}
-	if (!pNotifier->hasObserver(observer))
-		pNotifier->addObserver(this, observer);
+
+		if (!pNotifier->hasObserver(observer))
+			pNotifier->addObserver(this, observer);
+	}	
 }
 
 
@@ -201,12 +215,12 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 				_handlers.erase(it);
 			}
 		}
-	}
-	if (pNotifier && pNotifier->hasObserver(observer))
-	{
-		pNotifier->removeObserver(this, observer);
-	}
 
+		if (pNotifier && pNotifier->hasObserver(observer))
+		{
+			pNotifier->removeObserver(this, observer);
+		}
+	}
 }
 
 

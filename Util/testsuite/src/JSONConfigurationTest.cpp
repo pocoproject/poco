@@ -1,8 +1,6 @@
 //
 // JSONConfigurationTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "JSONConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/JSONConfiguration.h"
 #include "Poco/JSON/JSONException.h"
 

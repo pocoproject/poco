@@ -1,8 +1,6 @@
 //
 // CoreTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/CoreTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "CoreTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
@@ -25,13 +23,14 @@
 #include "Poco/Ascii.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
+#include "Poco/Checksum.h"
+#include "Poco/MakeUnique.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <cstring>
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::Bugcheck;
 using Poco::Exception;
@@ -39,8 +38,6 @@ using Poco::Environment;
 using Poco::Thread;
 using Poco::Runnable;
 using Poco::Buffer;
-using Poco::BasicFIFOBuffer;
-using Poco::FIFOBuffer;
 using Poco::AtomicCounter;
 using Poco::Nullable;
 using Poco::Ascii;
@@ -48,6 +45,8 @@ using Poco::BasicEvent;
 using Poco::delegate;
 using Poco::NullType;
 using Poco::InvalidAccessException;
+using Poco::Checksum;
+using Poco::makeUnique;
 
 
 namespace
@@ -73,6 +72,39 @@ namespace
 		
 	private:
 		AtomicCounter& _counter;
+	};
+
+	class NonDefaultConstructible
+	{
+	public:
+		NonDefaultConstructible(int val) : _val(val)
+		{
+		}
+
+		NonDefaultConstructible& operator=(int val)
+		{
+			_val = val;
+			return *this;
+		}
+
+		bool operator == (const NonDefaultConstructible& other) const
+		{
+			return (_val == other._val);
+		}
+
+		bool operator < (const NonDefaultConstructible& other) const
+		{
+			return (_val < other._val);
+		}
+
+		int value() const
+		{
+			return _val;
+		}
+
+	private:
+		NonDefaultConstructible();
+		int _val;
 	};
 }
 
@@ -115,7 +147,7 @@ struct Large
 #define ENABLE_BUGCHECK_TEST 0
 
 
-CoreTest::CoreTest(const std::string& name): CppUnit::TestCase(name)
+CoreTest::CoreTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -184,7 +216,7 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
-#if !defined(_WIN32_WCE) 
+#if !defined(_WIN32_WCE)
 	Environment::set("FOO", "BAR");
 	assert (Environment::has("FOO"));
 	assert (Environment::get("FOO") == "BAR");
@@ -197,7 +229,7 @@ void CoreTest::testEnvironment()
 	catch (Exception&)
 	{
 	}
-	
+	std::cout << std::endl;
 	std::cout << "OS Name:         " << Environment::osName() << std::endl;
 	std::cout << "OS Display Name: " << Environment::osDisplayName() << std::endl;
 	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;
@@ -316,545 +348,20 @@ void CoreTest::testBuffer()
 	k.append('d');
 	assert (k.size() == 15);
 	assert ( !std::memcmp(k.begin(), "hellohelloworld", k.size()) );
+
+	char my[16];
+	Poco::Buffer<char> buffer(16);
+	Poco::Buffer<char> wrapper(my, sizeof(my));
+	buffer.swap(wrapper);
 }
 
 
-void CoreTest::testFIFOBufferEOFAndError()
-{
-	typedef FIFOBuffer::Type T;
-
-	FIFOBuffer f(20, true);
-	
-	assert (f.isEmpty());
-	assert (!f.isFull());
-
-	Buffer<T> b(10);
-	std::vector<T> v;
-
-	f.readable += delegate(this, &CoreTest::onReadable);
-	f.writable += delegate(this, &CoreTest::onWritable);
-
-	for (T c = '0'; c < '0' +  10; ++c)
-		v.push_back(c);
-
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
-	assert(0 == _notToReadable);
-	assert(0 == _readableToNot);
-	assert (10 == f.write(b));
-	assert(1 == _notToReadable);
-	assert(0 == _readableToNot);
-	assert (20 == f.size());
-	assert (10 == f.used());
-	assert (!f.isEmpty());
-	f.setEOF();
-	assert(0 == _notToWritable);
-	assert(1 == _writableToNot);
-	assert (f.hasEOF());
-	assert (!f.isEOF());
-	assert(1 == _notToReadable);
-	assert(0 == _readableToNot);
-	assert (20 == f.size());
-	assert (10 == f.used());
-	assert (0 == f.write(b));
-	assert (!f.isEmpty());
-	assert (5 == f.read(b, 5));
-	assert(1 == _notToReadable);
-	assert(0 == _readableToNot);
-	assert (f.hasEOF());
-	assert (!f.isEOF());
-	assert (5 == f.read(b, 5));
-	assert(1 == _notToReadable);
-	assert(1 == _readableToNot);
-	assert (f.hasEOF());
-	assert (f.isEOF());
-	assert(0 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	f.setEOF(false);
-	assert (!f.hasEOF());
-	assert (!f.isEOF());
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-	assert(1 == _notToReadable);
-	assert(1 == _readableToNot);
-
-	assert (5 == f.write(b));
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-	assert(2 == _notToReadable);
-	assert(1 == _readableToNot);
-	assert (20 == f.size());
-	assert (5 == f.used());
-	f.setError();
-	assert (0 == f.write(b));
-	
-	try
-	{
-		f.copy(b.begin(), 5);
-		fail ("must throw InvalidAccessException");
-	}
-	catch (InvalidAccessException&) { }
-
-	try
-	{
-		f.advance(5);
-		fail ("must throw InvalidAccessException");
-	}
-	catch (InvalidAccessException&) { }
-	
-	assert(1 == _notToWritable);
-	assert(2 == _writableToNot);
-	assert(2 == _notToReadable);
-	assert(2 == _readableToNot);
-	assert (20 == f.size());
-	assert (0 == f.used());
-	f.setError(false);
-	assert(2 == _notToWritable);
-	assert(2 == _writableToNot);
-	assert(2 == _notToReadable);
-	assert(2 == _readableToNot);
-	assert (20 == f.size());
-	assert (0 == f.used());
-	assert (5 == f.write(b));
-	assert(2 == _notToWritable);
-	assert(2 == _writableToNot);
-	assert(3 == _notToReadable);
-	assert(2 == _readableToNot);
-	assert (20 == f.size());
-	assert (5 == f.used());
-}
-
-
-void CoreTest::testFIFOBufferChar()
-{
-	typedef FIFOBuffer::Type T;
-
-	FIFOBuffer f(20, true);
-	
-	assert (f.isEmpty());
-	assert (!f.isFull());
-
-	Buffer<T> b(10);
-	std::vector<T> v;
-
-	f.readable += delegate(this, &CoreTest::onReadable);
-	f.writable += delegate(this, &CoreTest::onWritable);
-
-	for (T c = '0'; c < '0' +  10; ++c)
-		v.push_back(c);
-
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
-	assert(0 == _notToReadable);
-	assert(0 == _readableToNot);
-	f.write(b);
-	assert(1 == _notToReadable);
-	assert(0 == _readableToNot);
-	assert (20 == f.size());
-	assert (10 == f.used());
-	assert (!f.isEmpty());
-	assert ('0' == f[0]);
-	assert ('1' == f[1]);
-	assert ('2' == f[2]);
-	assert ('3' == f[3]);
-	assert ('4' == f[4]);
-	assert ('5' == f[5]);
-	assert ('6' == f[6]);
-	assert ('7' == f[7]);
-	assert ('8' == f[8]);
-	assert ('9' == f[9]);
-
-	b.resize(5);
-	f.read(b, b.size());
-	assert (20 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert ('5' == f[0]);
-	assert ('6' == f[1]);
-	assert ('7' == f[2]);
-	assert ('8' == f[3]);
-	assert ('9' == f[4]);
-	try { T i = f[10]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	v.clear();
-	for (T c = 'a'; c < 'a' + 10; ++c)
-		v.push_back(c);
-
-	b.resize(10);
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
-	f.write(b);
-	assert (20 == f.size());
-	assert (15 == f.used());
-	assert (!f.isEmpty());
-	assert ('5' == f[0]);
-	assert ('6' == f[1]);
-	assert ('7' == f[2]);
-	assert ('8' == f[3]);
-	assert ('9' == f[4]);
-	assert ('a' == f[5]);
-	assert ('b' == f[6]);
-	assert ('c' == f[7]);
-	assert ('d' == f[8]);
-	assert ('e' == f[9]);
-	assert ('f' == f[10]);
-	assert ('g' == f[11]);
-	assert ('h' == f[12]);
-	assert ('i' == f[13]);
-	assert ('j' == f[14]);
-	try { T i = f[15]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	f.read(b, 10);
-	assert (20 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert ('f' == f[0]);
-	assert ('g' == f[1]);
-	assert ('h' == f[2]);
-	assert ('i' == f[3]);
-	assert ('j' == f[4]);
-	try { T i = f[5]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	assert(1 == _notToReadable);
-	assert(0 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-	f.read(b, 6);
-	assert(1 == _notToReadable);
-	assert(1 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-
-	assert (5 == b.size());
-	assert (20 == f.size());
-	assert (0 == f.used());
-	try { T i = f[0]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-	assert (f.isEmpty());
-
-	assert(1 == _notToReadable);
-	assert(1 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-	assert (5 == f.write(b));
-	assert(2 == _notToReadable);
-	assert(1 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-
-	assert (20 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert ('f' == f[0]);
-	assert ('g' == f[1]);
-	assert ('h' == f[2]);
-	assert ('i' == f[3]);
-	assert ('j' == f[4]);
-
-	f.resize(10);
-	assert (10 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert ('f' == f[0]);
-	assert ('g' == f[1]);
-	assert ('h' == f[2]);
-	assert ('i' == f[3]);
-	assert ('j' == f[4]);
-
-	assert(2 == _notToReadable);
-	assert(1 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-	f.resize(3, false);
-	assert(2 == _notToReadable);
-	assert(2 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-	assert (3 == f.size());
-	assert (0 == f.used());
-	assert (f.isEmpty());
-
-	b.resize(3);
-	b[0] = 'x';
-	b[1] = 'y';
-	b[2] = 'z';
-	f.resize(3);
-
-	assert(2 == _notToReadable);
-	assert(2 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(0 == _writableToNot);
-	f.write(b);
-	assert(3 == _notToReadable);
-	assert(2 == _readableToNot);
-	assert(0 == _notToWritable);
-	assert(1 == _writableToNot);
-	assert (f.isFull());
-
-	f.read(b);
-	assert(3 == _notToReadable);
-	assert(3 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-	assert (f.isEmpty());
-
-	f.resize(10);
-	assert (10 == f.size());
-	assert (0 == f.used());
-	assert (10 == f.available());
-	assert (f.isEmpty());
-
-	assert(3 == _notToReadable);
-	assert(3 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-	f.write(b);
-	assert(4 == _notToReadable);
-	assert(3 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	assert (10 == f.size());
-	assert (3 == f.used());
-	assert (7 == f.available());
-	assert (!f.isEmpty());
-
-	f.drain(1);
-	assert(4 == _notToReadable);
-	assert(3 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	assert (10 == f.size());
-	assert (2 == f.used());
-	assert (8 == f.available());
-	assert (!f.isEmpty());
-
-	f.drain(2);
-	assert(4 == _notToReadable);
-	assert(4 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	assert (10 == f.size());
-	assert (0 == f.used());
-	assert (10 == f.available());
-	assert (f.isEmpty());
-
-	f.write(b);
-	assert(5 == _notToReadable);
-	assert(4 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	assert (10 == f.size());
-	assert (3 == f.used());
-	assert (7 == f.available());
-	assert (!f.isEmpty());
-
-	f.drain();
-	assert(5 == _notToReadable);
-	assert(5 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-	assert (10 == f.size());
-	assert (0 == f.used());
-	assert (10 == f.available());
-	assert (f.isEmpty());
-
-	f.write(b, 2);
-	assert (10 == f.size());
-	assert (2 == f.used());
-	assert (8 == f.available());
-	assert (!f.isEmpty());
-
-	assert(6 == _notToReadable);
-	assert(5 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	f.drain();
-	assert(6 == _notToReadable);
-	assert(6 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	assert (3 == f.write(b, 10));
-	assert (10 == f.size());
-	assert (3 == f.used());
-	assert (7 == f.available());
-	assert (!f.isEmpty());
-
-	assert(7 == _notToReadable);
-	assert(6 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	const char arr[3] = {'4', '5', '6' };
-	try
-	{
-		f.copy(&arr[0], 8);
-	} catch (InvalidAccessException&) { }
-
-	f.copy(&arr[0], 3);
-	assert(7 == _notToReadable);
-	assert(6 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(1 == _writableToNot);
-
-	assert (10 == f.size());
-	assert (6 == f.used());
-	assert (4 == f.available());
-
-	const char d[4] = {'7', '8', '9', '0' };
-	f.copy(&arr[0], 4);
-	assert(7 == _notToReadable);
-	assert(6 == _readableToNot);
-	assert(1 == _notToWritable);
-	assert(2 == _writableToNot);
-	assert (f.isFull());
-
-	assert (10 == f.size());
-	assert (10 == f.used());
-	assert (0 == f.available());
-
-	try
-	{
-		f.copy(&arr[0], 1);
-	} catch (InvalidAccessException&) { }
-
-	f.drain(1);
-	assert(7 == _notToReadable);
-	assert(6 == _readableToNot);
-	assert(2 == _notToWritable);
-	assert(2 == _writableToNot);
-
-	f.readable -= delegate(this, &CoreTest::onReadable);
-	f.writable -= delegate(this, &CoreTest::onReadable);
-}
-
-
-void CoreTest::testFIFOBufferInt()
-{
-	typedef char T;
-
-	BasicFIFOBuffer<T> f(20);
-	Buffer<T> b(10);
-	std::vector<T> v;
-
-	for (T c = 0; c < 10; ++c)
-		v.push_back(c);
-
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
-	f.write(b);
-	assert (20 == f.size());
-	assert (10 == f.used());
-	assert (!f.isEmpty());
-	assert (0 == f[0]);
-	assert (1 == f[1]);
-	assert (2 == f[2]);
-	assert (3 == f[3]);
-	assert (4 == f[4]);
-	assert (5 == f[5]);
-	assert (6 == f[6]);
-	assert (7 == f[7]);
-	assert (8 == f[8]);
-	assert (9 == f[9]);
-
-	b.resize(5);
-	f.read(b, b.size());
-	assert (20 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert (5 == f[0]);
-	assert (6 == f[1]);
-	assert (7 == f[2]);
-	assert (8 == f[3]);
-	assert (9 == f[4]);
-	try { T i = f[10]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	v.clear();
-	for (T c = 10; c < 20; ++c)
-		v.push_back(c);
-
-	b.resize(10);
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
-	f.write(b);
-	assert (20 == f.size());
-	assert (15 == f.used());
-	assert (!f.isEmpty());
-	assert (5 == f[0]);
-	assert (6 == f[1]);
-	assert (7 == f[2]);
-	assert (8 == f[3]);
-	assert (9 == f[4]);
-	assert (10 == f[5]);
-	assert (11 == f[6]);
-	assert (12 == f[7]);
-	assert (13 == f[8]);
-	assert (14 == f[9]);
-	assert (15 == f[10]);
-	assert (16 == f[11]);
-	assert (17 == f[12]);
-	assert (18 == f[13]);
-	assert (19 == f[14]);
-	try { T i = f[15]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	f.read(b, 10);
-	assert (20 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert (15 == f[0]);
-	assert (16 == f[1]);
-	assert (17 == f[2]);
-	assert (18 == f[3]);
-	assert (19 == f[4]);
-	try { T i = f[5]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	f.read(b, 6);
-	assert (5 == b.size());
-	assert (20 == f.size());
-	assert (0 == f.used());
-	try { T i = f[0]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
-
-	assert (f.isEmpty());
-
-	assert (5 == f.write(b));
-	assert (20 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert (15 == f[0]);
-	assert (16 == f[1]);
-	assert (17 == f[2]);
-	assert (18 == f[3]);
-	assert (19 == f[4]);
-
-	f.resize(10);
-	assert (10 == f.size());
-	assert (5 == f.used());
-	assert (!f.isEmpty());
-	assert (15 == f[0]);
-	assert (16 == f[1]);
-	assert (17 == f[2]);
-	assert (18 == f[3]);
-	assert (19 == f[4]);
-
-	f.resize(3, false);
-	assert (3 == f.size());
-	assert (0 == f.used());
-	assert (f.isEmpty());
-}
 
 
 void CoreTest::testAtomicCounter()
 {
-	AtomicCounter ac;
-	
+	AtomicCounter ac(0);
+
 	assert (ac.value() == 0);
 	assert (ac++ == 0);
 	assert (ac-- == 1);
@@ -895,6 +402,21 @@ void CoreTest::testAtomicCounter()
 
 void CoreTest::testNullable()
 {
+	Nullable<NonDefaultConstructible> ndc1;
+	Nullable<NonDefaultConstructible> ndc2;
+	assert (ndc1.isNull());
+	assert (ndc2.isNull());
+	assert (ndc1 == ndc2);
+	assert (!(ndc1 != ndc2));
+	assert (!(ndc1 > ndc2));
+	bool ge = (ndc1 >= ndc2);
+	assert (ndc1 >= ndc2);
+	assert (!(ndc1 < ndc2));
+	assert (ndc1 <= ndc2);
+	ndc1 = 42;
+	assert (!ndc1.isNull());
+	assert (ndc1.value() == 42);
+
 	Nullable<int> i;
 	Nullable<double> f;
 	Nullable<std::string> s;
@@ -1066,17 +588,70 @@ void CoreTest::testAscii()
 }
 
 
-void CoreTest::onReadable(bool& b)
+void CoreTest::testChecksum64()
 {
-	if (b) ++_notToReadable;
-	else ++_readableToNot;
-};
+	Poco::Checksum checksum64_0(Checksum::TYPE_CRC64);
+	Poco::Checksum checksum64_1(Checksum::TYPE_CRC64);
+	Poco::UInt64 crc64_0 = 0;
+	Poco::UInt64 crc64_1 = 0;
+	Poco::UInt64 crc64_2 = 0;
+	Poco::UInt64 crc64_3 = 0;
+	Poco::UInt64 crc64_4 = 0;
+	Poco::UInt64 crc64_5 = 0;
+	Poco::UInt64 crc64_6 = 0;
+	Poco::UInt64 crc64_7 = 0;
+	std::string str = "Hello world!!!";
+	const char c_str[] = "Hello People!!!";
+	const char c_str1[] = "Hello world!!!";
+	const char c_str2[] = "b";
+	const char c_str3[] = "c";
+	char ch = 'c';
+
+	checksum64_0.update(str);
+	crc64_0 = checksum64_0.checksum();               // crc64 of "Hello world!!!"
+	checksum64_0.update(c_str, (int)strlen(c_str));
+	crc64_1 = checksum64_0.checksum();               // crc64 of "Hello People!!!"
+	assert(crc64_0 != crc64_1);
+
+	checksum64_0.update(ch);
+	crc64_2 = checksum64_0.checksum();               // crc64 of 'c'
+	assert(crc64_0 != crc64_2);
+
+	assert(crc64_1 != crc64_2);
+
+	checksum64_0.update(c_str1);
+	crc64_3 = checksum64_0.checksum();               // crc64 of "Hello world!!!"
+	assert(crc64_0 == crc64_3);
+
+	str = "c";
+	checksum64_0.update(str);
+	crc64_4 = checksum64_0.checksum();              // crc64 of "c", fetching from checksum64_0 object
+	checksum64_1.update(ch);
+	crc64_5 = checksum64_1.checksum();              // crc64 of 'c', fetching from checksum64_1 object
+	assert(crc64_4 == crc64_5);
+
+	checksum64_0.update(c_str2, (int)strlen(c_str2));
+	crc64_6 = checksum64_0.checksum();              // crc64 of "b", fetching from checksum64_0 object
+	assert(crc64_5 != crc64_6);
+
+	checksum64_0.update(c_str3, (int)strlen(c_str3));
+	crc64_7 = checksum64_0.checksum();              // crc64 of "c", fetching from checksum64_0 object
+	assert(crc64_5 == crc64_7);
+}
 
 
-void CoreTest::onWritable(bool& b)
+void CoreTest::testMakeUnique()
 {
-	if (b) ++_notToWritable;
-	else ++_writableToNot;
+	assert (*makeUnique<int>() == 0);
+	assert (*makeUnique<int>(1729) == 1729);
+	assert (*makeUnique<std::string>() == "");
+	assert (*makeUnique<std::string>("meow") == "meow");
+	assert (*makeUnique<std::string>(6, 'z') == "zzzzzz");
+
+	auto up = makeUnique<int[]>(5);
+
+	for (int i = 0; i < 5; ++i) up[i] = i;
+	for (int i = 0; i < 5; ++i) assert (up[i] == i);
 }
 
 
@@ -1103,12 +678,11 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
-	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
-	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
-	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferEOFAndError);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
+	CppUnit_addTest(pSuite, CoreTest, testChecksum64);
+	CppUnit_addTest(pSuite, CoreTest, testMakeUnique);
 
 	return pSuite;
 }

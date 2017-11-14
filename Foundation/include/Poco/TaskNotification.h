@@ -1,8 +1,6 @@
 //
 // TaskNotification.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/TaskNotification.h#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -102,7 +100,7 @@ private:
 
 class Foundation_API TaskProgressNotification: public TaskNotification
 	/// This notification is posted by the TaskManager for
-	/// every task that has failed with an exception.
+	/// a task when its progress changes.
 {
 public:
 	TaskProgressNotification(Task* pTask, float progress);
@@ -122,13 +120,13 @@ class TaskCustomNotification: public TaskNotification
 	/// This is a template for "custom" notification.
 	/// Unlike other notifications, this notification
 	/// is instantiated and posted by the task itself.
-	/// The purpose is to provide generic notifiation
+	/// The purpose is to provide generic notification
 	/// mechanism between the task and its observer(s).
 {
 public:
-	TaskCustomNotification(Task* pTask, const C& custom):
+	TaskCustomNotification(Task* pTask, const C& rCustom):
 		TaskNotification(pTask),
-		_custom(custom)
+		_custom(rCustom)
 	{
 	}
 

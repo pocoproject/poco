@@ -1,8 +1,6 @@
 //
 // NumberParserTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NumberParserTest.h#1 $
-//
 // Definition of the NumberParserTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
 #undef max
@@ -58,7 +56,6 @@ private:
 		return Poco::NumberParser::parse(s) == n;
 	}
 
-#if defined(POCO_HAVE_INT64)
 	template <class T> bool testUpperLimit64()
 	{
 		T n = std::numeric_limits<T>::max();
@@ -75,7 +72,6 @@ private:
 		std::string s = Poco::NumberFormatter::format(n);
 		return Poco::NumberParser::parse64(s) == n;
 	}
-#endif
 };
 
 

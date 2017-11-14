@@ -1,8 +1,6 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryConfiguration.cpp#3 $
-//
 // Library: Util
 // Package: Windows
 // Module:  WinRegistryConfiguration
@@ -12,9 +10,6 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-
-
-#if !defined(_WIN32_WCE)
 
 
 #include "Poco/Util/WinRegistryConfiguration.h"
@@ -62,6 +57,12 @@ bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value
 		case WinRegistryKey::REGT_STRING_EXPAND:
 			value = aKey.getStringExpand(keyName);
 			break;
+		case WinRegistryKey::REGT_BINARY:
+			{
+				std::vector<char> tmp = aKey.getBinary(keyName);
+				value.assign(tmp.begin(), tmp.end());
+			}
+			break;
 		case WinRegistryKey::REGT_DWORD:
 			value = Poco::NumberFormatter::format(aKey.getInt(keyName));
 			break;
@@ -94,12 +95,19 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 	if (fullPath.empty())
 	{
 		// return all root level keys
+#if defined(_WIN32_WCE)
+		range.push_back("HKEY_CLASSES_ROOT");
+		range.push_back("HKEY_CURRENT_USER");
+		range.push_back("HKEY_LOCAL_MACHINE");
+		range.push_back("HKEY_USERS");
+#else
 		range.push_back("HKEY_CLASSES_ROOT");
 		range.push_back("HKEY_CURRENT_CONFIG");
 		range.push_back("HKEY_CURRENT_USER");
 		range.push_back("HKEY_LOCAL_MACHINE");
 		range.push_back("HKEY_PERFORMANCE_DATA");
 		range.push_back("HKEY_USERS");
+#endif
 	}
 	else
 	{
@@ -134,6 +142,3 @@ std::string WinRegistryConfiguration::convertToRegFormat(const std::string& key,
 
 
 } } // namespace Poco::Util
-
-
-#endif // !defined(_WIN32_WCE)

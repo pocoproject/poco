@@ -1,8 +1,6 @@
 //
 // JSONTestSuite.h
 //
-// $Id$
-//
 // Definition of the JSONTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define JSONTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class JSONTestSuite

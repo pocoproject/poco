@@ -1,8 +1,6 @@
 //
 // NamePoolTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NamePoolTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NamePoolTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/XML/NamePool.h"
 #include "Poco/XML/Name.h"
 #include "Poco/DOM/AutoPtr.h"

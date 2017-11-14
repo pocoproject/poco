@@ -1,8 +1,6 @@
 //
 // StreamConverter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/StreamConverter.cpp#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  StreamConverter
@@ -113,10 +111,10 @@ int StreamConverterBuf::writeToDevice(char c)
 				++_errors;
 				return -1;
 			}
-			int n = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
-			if (n == 0) n = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
-			poco_assert_dbg (n <= sizeof(_buffer));
-			_pOstr->write((char*) _buffer, n);
+			int number = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
+			if (number == 0) number = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
+			poco_assert_dbg (number <= sizeof(_buffer));
+			_pOstr->write((char*) _buffer, number);
 			_sequenceLength = 0;
 			_pos = 0;
 		}
@@ -136,14 +134,14 @@ int StreamConverterBuf::errors() const
 }
 
 
-StreamConverterIOS::StreamConverterIOS(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar): 
+StreamConverterIOS::StreamConverterIOS(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	_buf(istr, inEncoding, outEncoding, defaultChar)
 {
 	poco_ios_init(&_buf);
 }
 
 
-StreamConverterIOS::StreamConverterIOS(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar): 
+StreamConverterIOS::StreamConverterIOS(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	_buf(ostr, inEncoding, outEncoding, defaultChar)
 {
 	poco_ios_init(&_buf);
@@ -167,7 +165,7 @@ int StreamConverterIOS::errors() const
 }
 
 
-InputStreamConverter::InputStreamConverter(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar): 
+InputStreamConverter::InputStreamConverter(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	StreamConverterIOS(istr, inEncoding, outEncoding, defaultChar),
 	std::istream(&_buf)
 {
@@ -179,7 +177,7 @@ InputStreamConverter::~InputStreamConverter()
 }
 
 
-OutputStreamConverter::OutputStreamConverter(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar): 
+OutputStreamConverter::OutputStreamConverter(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	StreamConverterIOS(ostr, inEncoding, outEncoding, defaultChar),
 	std::ostream(&_buf)
 {

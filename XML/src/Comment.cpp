@@ -1,8 +1,6 @@
 //
 // Comment.cpp
 //
-// $Id: //poco/1.4/XML/src/Comment.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -24,13 +22,13 @@ namespace XML {
 const XMLString Comment::NODE_NAME = toXMLString("#comment");
 
 
-Comment::Comment(Document* pOwnerDocument, const XMLString& data): 
+Comment::Comment(Document* pOwnerDocument, const XMLString& data):
 	CharacterData(pOwnerDocument, data)
 {
 }
 
 
-Comment::Comment(Document* pOwnerDocument, const Comment& comment): 
+Comment::Comment(Document* pOwnerDocument, const Comment& comment):
 	CharacterData(pOwnerDocument, comment)
 {
 }

@@ -1,8 +1,6 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerConnection
@@ -45,7 +43,14 @@ HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServe
 
 HTTPServerConnection::~HTTPServerConnection()
 {
-	_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
+	try
+	{
+		_pFactory->serverStopped -= Poco::delegate(this, &HTTPServerConnection::onServerStopped);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -71,10 +76,10 @@ void HTTPServerConnection::run()
 					response.set("Server", server);
 				try
 				{
-					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
 					if (pHandler.get())
 					{
-						if (request.expectContinue())
+						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
 							response.sendContinue();
 					
 						pHandler->handleRequest(request, response);
@@ -105,6 +110,14 @@ void HTTPServerConnection::run()
 		catch (MessageException&)
 		{
 			sendErrorResponse(session, HTTPResponse::HTTP_BAD_REQUEST);
+		}
+		catch (Poco::Exception&)
+		{
+			if (session.networkException())
+			{
+				session.networkException()->rethrow();
+			}
+			else throw;
 		}
 	}
 }

@@ -1,10 +1,8 @@
 //
 // Preparator.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Preparator.cpp#5 $
-//
-// Library: Data
-// Package: DataCore
+// Library: Data/ODBC
+// Package: ODBC
 // Module:  Preparator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -27,10 +25,10 @@ namespace Data {
 namespace ODBC {
 
 
-Preparator::Preparator(const StatementHandle& rStmt, 
-	const std::string& statement, 
+Preparator::Preparator(const StatementHandle& rStmt,
+	const std::string& statement,
 	std::size_t maxFieldSize,
-	DataExtraction dataExtraction): 
+	DataExtraction dataExtraction) :
 	_rStmt(rStmt),
 	_maxFieldSize(maxFieldSize),
 	_dataExtraction(dataExtraction)
@@ -38,10 +36,19 @@ Preparator::Preparator(const StatementHandle& rStmt,
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
 		throw StatementException(_rStmt);
+	// PostgreSQL error swallowing workaround:
+	// Postgres may execute a statement with syntax error fine,
+	// but will return error later
+	{
+		SQLSMALLINT t = 0;
+		SQLRETURN r = SQLNumResultCols(rStmt, &t);
+		if (r != SQL_NO_DATA && Utility::isError(r))
+			throw StatementException(rStmt, "Failed to get number of columns");
+	}
 }
 
 
-Preparator::Preparator(const Preparator& other): 
+Preparator::Preparator(const Preparator& other):
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
 	_dataExtraction(other._dataExtraction)
@@ -52,7 +59,14 @@ Preparator::Preparator(const Preparator& other):
 
 Preparator::~Preparator()
 {
-	freeMemory();
+	try
+	{
+		freeMemory();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -73,7 +87,7 @@ void Preparator::freeMemory() const
 				break;
 
 			case DT_WCHAR:
-				deleteCachedArray<UTF16String>(it->first);
+				deleteCachedArray<UTF16String::value_type>(it->first);
 				break;
 
 			case DT_UCHAR:
@@ -125,7 +139,8 @@ std::size_t Preparator::columns() const
 void Preparator::resize() const
 {
 	SQLSMALLINT nCol = 0;
-	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 0 != nCol)
+	int rc = SQLNumResultCols(_rStmt, &nCol);
+	if (!Utility::isError(rc) && (0 != nCol))
 	{
 		_values.resize(nCol, 0);
 		_lengths.resize(nCol, 0);
@@ -146,13 +161,14 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 	std::size_t sz = 0;
 	std::size_t maxsz = getMaxFieldSize();
 
-	try 
+	try
 	{
 		ODBCMetaColumn mc(_rStmt, pos);
 		sz = mc.length();
 
-		// accomodate for terminating zero (non-bulk only!)
-		if (!isBulk() && ODBCMetaColumn::FDT_STRING == mc.type()) ++sz;
+		// accommodate for terminating zero (non-bulk only!)
+		MetaColumn::ColumnDataType type = mc.type();
+		if (!isBulk() && ((ODBCMetaColumn::FDT_WSTRING == type) || (ODBCMetaColumn::FDT_STRING == type))) ++sz;
 	}
 	catch (StatementException&) { }
 
@@ -188,11 +204,11 @@ void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::s
 	_lenLengths[pos].resize(length);
 	_varLengthArrays.insert(IndexMap::value_type(pos, DT_BOOL_ARRAY));
 
-	if (Utility::isError(SQLBindCol(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
-		valueType, 
-		(SQLPOINTER) pArray, 
-		(SQLINTEGER) sizeof(bool), 
+	if (Utility::isError(SQLBindCol(_rStmt,
+		(SQLUSMALLINT) pos + 1,
+		valueType,
+		(SQLPOINTER) pArray,
+		(SQLINTEGER) sizeof(bool),
 		&_lenLengths[pos][0])))
 	{
 		throw StatementException(_rStmt, "SQLBindCol()");

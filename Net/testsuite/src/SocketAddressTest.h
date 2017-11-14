@@ -1,8 +1,6 @@
 //
 // SocketAddressTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketAddressTest.h#1 $
-//
 // Definition of the SocketAddressTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class SocketAddressTest: public CppUnit::TestCase
@@ -29,6 +27,7 @@ public:
 	void testSocketAddress();
 	void testSocketRelationals();
 	void testSocketAddress6();
+	void testSocketAddressUnixLocal();
 
 	void setUp();
 	void tearDown();

@@ -1,8 +1,6 @@
 //
 // NumericString.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NumericString.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  NumericString
@@ -31,9 +29,11 @@
 #endif
 #include <limits>
 #include <cmath>
+#include <cctype>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
+
 
 // binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
 #define POCO_MAX_INT_STRING_LEN 65
@@ -81,13 +81,13 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
 	/// it is silently skipped but not verified for correct positioning.
-	/// Function returns true if succesful. If parsing was unsuccesful,
+	/// Function returns true if successful. If parsing was unsuccessful,
 	/// the return value is false with the result value undetermined.
 {
 	if (!pStr) return false;
-	while (isspace(*pStr)) ++pStr;
+	while (std::isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
-	char sign = 1;
+	short sign = 1;
 	if ((base == 10) && (*pStr == '-'))
 	{
 		// Unsigned types can't be negative so abort parsing
@@ -107,10 +107,7 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	{
 		switch (*pStr)
 		{
-		case 'x': case 'X': 
-			if (base != 0x10) return false;
-
-		case '0': 
+		case '0':
 			if (state < STATE_SIGNIFICANT_DIGITS) break;
 
 		case '1': case '2': case '3': case '4':
@@ -142,18 +139,11 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
 			if (base != 0x10) return false;
-
 			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
 			if (result > limitCheck) return false;
 			result = result * base + (10 + *pStr - 'A');
 
 			break;
-
-		case 'U':
-		case 'u':
-		case 'L':
-		case 'l':
-			goto done;
 
 		case '.':
 			if ((base == 10) && (thSep == '.')) break;
@@ -165,19 +155,13 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 
 		case ' ':
 			if ((base == 10) && (thSep == ' ')) break;
-		case '\t':
-		case '\n':
-		case '\v':
-		case '\f':
-		case '\r':
-			goto done;
+			// fallthrough
 
 		default:
 			return false;
 		}
 	}
 
-done:
 	if ((sign < 0) && (base == 10)) result *= sign;
 
 	return true;
@@ -284,7 +268,7 @@ bool intToStr(T value,
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
 	/// paddings are prepended to the formatted result with minus sign or base prefix included
-	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal, 
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
 {
@@ -457,15 +441,24 @@ bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix 
 // http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
 //
 
+
 Foundation_API void floatToStr(char* buffer,
 	int bufferSize,
 	float value,
-	int lowDec = -std::numeric_limits<double>::digits10,
-	int highDec = std::numeric_limits<double>::digits10);
+	int lowDec = -std::numeric_limits<float>::digits10,
+	int highDec = std::numeric_limits<float>::digits10);
 	/// Converts a float value to string. Converted string must be shorter than bufferSize.
 	/// Conversion is done by computing the shortest string of digits that correctly represents
 	/// the input number. Depending on lowDec and highDec values, the function returns
 	/// decimal or exponential representation.
+
+Foundation_API void floatToFixedStr(char* buffer,
+	int bufferSize,
+	float value,
+	int precision);
+	/// Converts a float value to string. Converted string must be shorter than bufferSize.
+	/// Computes a decimal representation with a fixed number of digits after the
+  	/// decimal point.
 
 
 Foundation_API std::string& floatToStr(std::string& str,
@@ -476,8 +469,19 @@ Foundation_API std::string& floatToStr(std::string& str,
 	char decSep = 0);
 	/// Converts a float value, assigns it to the supplied string and returns the reference.
 	/// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument)
 	/// and width (total length of formatted string).
+
+
+Foundation_API std::string& floatToFixedStr(std::string& str,
+	float value,
+	int precision,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a float value, assigns it to the supplied string and returns the reference.
+	/// This function calls floatToFixedStr(char*, int, float, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
 Foundation_API void doubleToStr(char* buffer,
@@ -491,6 +495,15 @@ Foundation_API void doubleToStr(char* buffer,
 	/// decimal or exponential representation.
 
 
+Foundation_API void doubleToFixedStr(char* buffer,
+	int bufferSize,
+	double value,
+	int precision);
+	/// Converts a double value to string. Converted string must be shorter than bufferSize.
+	/// Computes a decimal representation with a fixed number of digits after the
+  	/// decimal point.
+
+
 Foundation_API std::string& doubleToStr(std::string& str,
 	double value,
 	int precision = -1,
@@ -498,40 +511,53 @@ Foundation_API std::string& doubleToStr(std::string& str,
 	char thSep = 0,
 	char decSep = 0);
 	/// Converts a double value, assigns it to the supplied string and returns the reference.
-	/// This function calls doubleToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// This function calls doubleToStr(char*, int, double, int, int) and formats the result according to
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument)
 	/// and width (total length of formatted string).
 
 
-Foundation_API float strToFloat(const char* str);
+Foundation_API std::string& doubleToFixedStr(std::string& str,
+	double value,
+	int precision = -1,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a double value, assigns it to the supplied string and returns the reference.
+	/// This function calls doubleToFixedStr(char*, int, double, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API float strToFloat(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// Function uses double_convesrion::DoubleToStringConverter to do the conversion.
 
 
-Foundation_API bool strToFloat(const std::string&, float& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToFloat(const std::string&, float& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
-	/// 
-	/// Returns true if succesful, false otherwise.
+	///
+	/// Returns true if successful, false otherwise.
 
 
-Foundation_API double strToDouble(const char* str);
+Foundation_API double strToDouble(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 
 
-Foundation_API bool strToDouble(const std::string& str, double& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToDouble(const std::string& str, double& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
-	/// 
-	/// Returns true if succesful, false otherwise.
-
-//
-// end double-conversion functions declarations
-//
+	///
+	/// Returns true if successful, false otherwise.
 
 
 } // namespace Poco

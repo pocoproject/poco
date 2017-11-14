@@ -1,8 +1,6 @@
 //
 // FilesystemTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FilesystemTestSuite.h#1 $
-//
 // Definition of the FilesystemTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define FilesystemTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class FilesystemTestSuite

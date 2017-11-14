@@ -1,8 +1,6 @@
 //
 // Function.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Function.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Function

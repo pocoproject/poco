@@ -1,7 +1,5 @@
 //
-// Path_WIN32U.cpp
-//
-// $Id: //poco/1.4/Foundation/src/Path_WINCE.cpp#1 $
+// Path_WIN32.cpp
 //
 // Library: Foundation
 // Package: Filesystem
@@ -35,6 +33,30 @@ std::string PathImpl::currentImpl()
 std::string PathImpl::homeImpl()
 {
 	return("\\");
+}
+
+
+std::string PathImpl::configHomeImpl()
+{
+  return homeImpl();
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+  return homeImpl();
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+  return homeImpl();
+}
+
+
+std::string PathImpl::configImpl()
+{
+  return("\\");
 }
 
 
@@ -111,7 +133,7 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 					roots.push_back(root);
 				}
 			}
-		} 
+		}
 		while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}

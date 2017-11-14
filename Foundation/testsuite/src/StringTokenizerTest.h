@@ -1,8 +1,6 @@
 //
 // StringTokenizerTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/StringTokenizerTest.h#2 $
-//
 // Definition of the StringTokenizerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -15,7 +13,7 @@
 #define StringTokenizerTest_INCLUDED
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 class StringTokenizerTest: public CppUnit::TestCase
 {

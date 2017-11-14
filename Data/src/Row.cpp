@@ -1,8 +1,6 @@
 //
 // Row.cpp
 //
-// $Id: //poco/Main/Data/src/Row.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Row
@@ -31,7 +29,7 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 }
 
 
-Row::Row(): 
+Row::Row():
 	_pNames(0),
 	_pSortMap(new SortMap),
 	_pFormatter(new SimpleRowFormatter)
@@ -65,9 +63,9 @@ void Row::init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter)
 	if (sz)
 	{
 		_values.resize(sz);
-		// Row sortability in the strict weak ordering sense is 
+		// Row sortability in the strict weak ordering sense is
 		// an invariant, hence we must start with a zero here.
-		// If null value is later retrieved from DB, the 
+		// If null value is later retrieved from DB, the
 		// Var::empty() call should be used to empty
 		// the corresponding Row value.
 		_values[0] = 0;
@@ -86,14 +84,28 @@ Poco::Dynamic::Var& Row::get(std::size_t col)
 	try
 	{
 		return _values.at(col);
-	}catch (std::out_of_range& re)
+	}
+	catch (std::out_of_range& re)
 	{
 		throw RangeException(re.what());
 	}
 }
 
 
-std::size_t Row::getPosition(const std::string& name)
+const Poco::Dynamic::Var& Row::get(std::size_t col) const
+{
+	try
+	{
+		return _values.at(col);
+	}
+	catch (std::out_of_range& re)
+	{
+		throw RangeException(re.what());
+	}
+}
+
+
+std::size_t Row::getPosition(const std::string& name) const
 {
 	if (!_pNames)
 		throw NullPointerException();
@@ -108,33 +120,15 @@ std::size_t Row::getPosition(const std::string& name)
 }
 
 
-void Row::checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val)
-{
-	bool empty = true;
-	SortMap::const_iterator it = _pSortMap->begin();
-	SortMap::const_iterator end = _pSortMap->end();
-	for (std::size_t cnt = 0; it != end; ++it, ++cnt)
-	{
-		if (cnt != pos)
-			empty = empty && _values[it->get<0>()].isEmpty();
-	}
-
-	if (empty && val.isEmpty())
-		throw IllegalStateException("All values are empty.");
-}
-
-
 void Row::addSortField(std::size_t pos)
 {
 	poco_assert (pos <= _values.size());
-
-	checkEmpty(std::numeric_limits<std::size_t>::max(), _values[pos]);
 
 	SortMap::iterator it = _pSortMap->begin();
 	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)
 	{
-		if (it->get<0>() == pos) return; 
+		if (it->get<0>() == pos) return;
 	}
 
 	ComparisonType ct;
@@ -176,8 +170,6 @@ void Row::addSortField(const std::string& name)
 
 void Row::removeSortField(std::size_t pos)
 {
-	checkEmpty(pos, Poco::Dynamic::Var());
-
 	SortMap::iterator it = _pSortMap->begin();
 	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)
@@ -316,16 +308,16 @@ bool Row::operator < (const Row& other) const
 			return false;
 
 		case COMPARE_AS_INTEGER:
-			if (_values[it->get<0>()].convert<Poco::Int64>() < 
+			if (_values[it->get<0>()].convert<Poco::Int64>() <
 				other._values[it->get<0>()].convert<Poco::Int64>())
 				return true;
-			else if (_values[it->get<0>()].convert<Poco::Int64>() != 
+			else if (_values[it->get<0>()].convert<Poco::Int64>() !=
 				other._values[it->get<0>()].convert<Poco::Int64>())
 				return false;
 			break;
 
 		case COMPARE_AS_FLOAT:
-			if (_values[it->get<0>()].convert<double>() < 
+			if (_values[it->get<0>()].convert<double>() <
 				other._values[it->get<0>()].convert<double>())
 				return true;
 			else if (_values[it->get<0>()].convert<double>() !=
@@ -334,7 +326,7 @@ bool Row::operator < (const Row& other) const
 			break;
 
 		case COMPARE_AS_STRING:
-			if (_values[it->get<0>()].convert<std::string>() < 
+			if (_values[it->get<0>()].convert<std::string>() <
 				other._values[it->get<0>()].convert<std::string>())
 				return true;
 			else if (_values[it->get<0>()].convert<std::string>() !=
@@ -355,7 +347,7 @@ void Row::setFormatter(const RowFormatter::Ptr& pFormatter)
 {
 	if (pFormatter.get())
 		_pFormatter = pFormatter;
-	else 
+	else
 		_pFormatter = new SimpleRowFormatter;
 }
 
@@ -364,7 +356,7 @@ void Row::setSortMap(const SortMapPtr& pSortMap)
 {
 	if (pSortMap.get())
 		_pSortMap = pSortMap;
-	else 
+	else
 		_pSortMap = new SortMap;
 }
 

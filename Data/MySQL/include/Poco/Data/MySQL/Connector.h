@@ -1,9 +1,7 @@
 //
 // Connector.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/Connector.h#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Connector
 //
@@ -22,10 +20,11 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Connector.h"
+#include "Poco/Mutex.h"
 
 
 // Note: to avoid static (de)initialization problems,
-// during connector automatic (un)registration, it is 
+// during connector automatic (un)registration, it is
 // best to have this as a macro.
 #define POCO_DATA_MYSQL_CONNECTOR_NAME "mysql"
 
@@ -60,20 +59,22 @@ public:
 
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+
+	static Poco::FastMutex _mutex;
 };
 
 
 } } } // namespace Poco::Data::MySQL
 
 
-// 
+//
 // Automatic Connector registration
-// 
+//
 
 struct MySQL_API MySQLConnectorRegistrator
 	/// Connector registering class.
 	/// A global instance of this class is instantiated
-	/// with sole purpose to automatically register the 
+	/// with sole purpose to automatically register the
 	/// MySQL connector with central Poco Data registry.
 {
 	MySQLConnectorRegistrator()
@@ -85,7 +86,14 @@ struct MySQL_API MySQLConnectorRegistrator
 	~MySQLConnectorRegistrator()
 		/// Calls Poco::Data::MySQL::unregisterConnector();
 	{
-		Poco::Data::MySQL::Connector::unregisterConnector();
+		try
+		{
+			Poco::Data::MySQL::Connector::unregisterConnector();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 
@@ -112,9 +120,9 @@ struct MySQL_API MySQLConnectorRegistrator
 	POCO_DATA_MYSQL_FORCE_SYMBOL(pocoMySQLConnectorRegistrator)
 #endif // POCO_NO_AUTOMATIC_LIB_INIT
 
-// 
+//
 // End automatic Connector registration
-// 
+//
 
 
 #endif // Data_MySQL_Connector_INCLUDED

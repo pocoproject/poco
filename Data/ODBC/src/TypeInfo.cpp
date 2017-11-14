@@ -1,9 +1,7 @@
 //
 // TypeInfo.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/TypeInfo.cpp#1 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  TypeInfo
 //
@@ -16,6 +14,7 @@
 
 #include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <iostream>
@@ -30,6 +29,17 @@ TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
 	fillCTypes();
 	fillSQLTypes();
 	if (_pHDBC) fillTypeInfo(*_pHDBC);
+
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(std::string), SQL_C_CHAR));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(std::wstring), SQL_C_WCHAR));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Poco::UTF16String), SQL_C_WCHAR));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Date), SQL_TYPE_DATE));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Time), SQL_TYPE_TIME));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(DateTime), SQL_TYPE_TIMESTAMP));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(BLOB), SQL_BINARY));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(float), SQL_REAL));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(double), SQL_DOUBLE));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(bool), SQL_BIT));
 }
 
 
@@ -102,7 +112,7 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 		if (!SQL_SUCCEEDED(rc))
 			throw StatementException(hstmt, "SQLGetData()");
 
-		rc = SQLGetTypeInfo(hstmt, SQL_ALL_TYPES);
+		rc = Poco::Data::ODBC::SQLGetTypeInfo(hstmt, SQL_ALL_TYPES);
 		if (SQL_SUCCEEDED(rc))
 		{
 			while (SQLFetch(hstmt) != SQL_NO_DATA_FOUND)
@@ -144,10 +154,10 @@ void TypeInfo::fillTypeInfo(SQLHDBC pHDBC)
 				ti.set<4>(literalSuffix);
 				rc = SQLGetData(hstmt, 6, SQL_C_CHAR, createParams, sizeof(createParams), &ind);
 				ti.set<5>(createParams);
-				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), &ind); 
-				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), &ind); 
-				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), &ind); 
-				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), &ind); 
+				rc = SQLGetData(hstmt, 7, SQL_C_SSHORT, &ti.get<6>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 8, SQL_C_SSHORT, &ti.get<7>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 9, SQL_C_SSHORT, &ti.get<8>(), sizeof(SQLSMALLINT), &ind);
+				rc = SQLGetData(hstmt, 10, SQL_C_SSHORT, &ti.get<9>(), sizeof(SQLSMALLINT), &ind);
 				rc = SQLGetData(hstmt, 11, SQL_C_SSHORT, &ti.get<10>(), sizeof(SQLSMALLINT), &ind);
 				rc = SQLGetData(hstmt, 12, SQL_C_SSHORT, &ti.get<11>(), sizeof(SQLSMALLINT), &ind);
 				rc = SQLGetData(hstmt, 13, SQL_C_CHAR, localTypeName, sizeof(localTypeName), &ind);
@@ -241,27 +251,66 @@ void TypeInfo::print(std::ostream& ostr)
 
 	for (; it != end; ++it)
 	{
-		ostr << it->get<0>() << "\t" 
-			<< it->get<1>() << "\t" 
-			<< it->get<2>() << "\t" 
-			<< it->get<3>() << "\t" 
-			<< it->get<4>() << "\t" 
-			<< it->get<5>() << "\t" 
-			<< it->get<6>() << "\t" 
-			<< it->get<7>() << "\t" 
-			<< it->get<8>() << "\t" 
-			<< it->get<9>() << "\t" 
-			<< it->get<10>() << "\t" 
-			<< it->get<11>() << "\t" 
-			<< it->get<12>() << "\t" 
-			<< it->get<13>() << "\t" 
+		ostr << it->get<0>() << "\t"
+			<< it->get<1>() << "\t"
+			<< it->get<2>() << "\t"
+			<< it->get<3>() << "\t"
+			<< it->get<4>() << "\t"
+			<< it->get<5>() << "\t"
+			<< it->get<6>() << "\t"
+			<< it->get<7>() << "\t"
+			<< it->get<8>() << "\t"
+			<< it->get<9>() << "\t"
+			<< it->get<10>() << "\t"
+			<< it->get<11>() << "\t"
+			<< it->get<12>() << "\t"
+			<< it->get<13>() << "\t"
 			<< it->get<14>() << "\t"
-			<< it->get<15>() << "\t" 
-			<< it->get<16>() << "\t" 
-			<< it->get<17>() << "\t" 
+			<< it->get<15>() << "\t"
+			<< it->get<16>() << "\t"
+			<< it->get<17>() << "\t"
 			<< it->get<18>() << std::endl;
 	}
 }
 
+
+SQLSMALLINT TypeInfo::tryTypeidToCType(const std::type_info& ti, SQLSMALLINT defaultVal) const
+{
+	CppTypeInfoMap::const_iterator res = _cppDataTypes.find(&ti);
+	if (res == _cppDataTypes.end())
+		return defaultVal;
+	return res->second;
+}
+
+
+SQLSMALLINT TypeInfo::nullDataType(const NullData val) const
+{
+	switch (val)
+	{
+	case NULL_GENERIC:
+	case DATA_NULL_INTEGER:
+		return SQL_C_TINYINT;
+
+	case DATA_NULL_STRING:
+		return SQL_C_CHAR;
+
+	case DATA_NULL_DATE:
+		return SQL_C_TYPE_DATE;
+
+	case DATA_NULL_TIME:
+		return SQL_C_TYPE_TIME;
+	
+	case DATA_NULL_DATETIME:
+		return SQL_C_TYPE_TIMESTAMP;
+
+	case DATA_NULL_BLOB:
+		return SQL_C_BINARY;
+
+	case DATA_NULL_FLOAT:
+		return SQL_C_FLOAT;
+	}
+
+	return SQL_C_TINYINT;
+}
 
 } } } // namespace Poco::Data::ODBC

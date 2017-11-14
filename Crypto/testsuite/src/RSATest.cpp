@@ -1,8 +1,6 @@
 //
 // RSATest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/RSATest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,12 +9,13 @@
 
 
 #include "RSATest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/RSADigestEngine.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include <iostream>
 #include <sstream>
 
 
@@ -85,7 +84,7 @@ RSATest::~RSATest()
 }
 
 
-void RSATest::testNewKeys()
+void RSATest::testRSANewKeys()
 {
 	RSAKey key(RSAKey::KL_1024, RSAKey::EXP_SMALL);
 	std::ostringstream strPub;
@@ -108,7 +107,30 @@ void RSATest::testNewKeys()
 }
 
 
-void RSATest::testSign()
+void RSATest::testRSANewKeysNoPassphrase()
+{
+	RSAKey key(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	std::ostringstream strPub;
+	std::ostringstream strPriv;
+	key.save(&strPub, &strPriv);
+	std::string pubKey = strPub.str();
+	std::string privKey = strPriv.str();
+
+	// now do the round trip
+	std::istringstream iPub(pubKey);
+	std::istringstream iPriv(privKey);
+	RSAKey key2(&iPub, &iPriv);
+
+	std::istringstream iPriv2(privKey);
+	RSAKey key3(0, &iPriv2);
+	std::ostringstream strPub3;
+	key3.save(&strPub3);
+	std::string pubFromPrivate = strPub3.str();
+	assert (pubFromPrivate == pubKey);
+}
+
+
+void RSATest::testRSASign()
 {
 	std::string msg("Test this sign message");
 	RSAKey key(RSAKey::KL_2048, RSAKey::EXP_LARGE);
@@ -123,17 +145,17 @@ void RSATest::testSign()
 	std::string pubKey = strPub.str();
 	std::istringstream iPub(pubKey);
 	RSAKey keyPub(&iPub);
-	RSADigestEngine eng2(key);
+	RSADigestEngine eng2(keyPub);
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	assert (eng2.verify(sig));
 }
 
 
-void RSATest::testSignSha256()
+void RSATest::testRSASignSha256()
 {
 	std::string msg("Test this sign message");
 	RSAKey key(RSAKey::KL_2048, RSAKey::EXP_LARGE);
-	RSADigestEngine eng(key,"SHA256");
+	RSADigestEngine eng(key, "SHA256");
 	eng.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	const Poco::DigestEngine::Digest& sig = eng.signature();
 	std::string hexDig = Poco::DigestEngine::digestToHex(sig);
@@ -144,13 +166,13 @@ void RSATest::testSignSha256()
 	std::string pubKey = strPub.str();
 	std::istringstream iPub(pubKey);
 	RSAKey keyPub(&iPub);
-	RSADigestEngine eng2(key,"SHA256");
+	RSADigestEngine eng2(keyPub, "SHA256");
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
 	assert (eng2.verify(sig));
 }
 
 
-void RSATest::testSignManipulated()
+void RSATest::testRSASignManipulated()
 {
 	std::string msg("Test this sign message");
 	std::string msgManip("Test that sign message");
@@ -166,7 +188,7 @@ void RSATest::testSignManipulated()
 	std::string pubKey = strPub.str();
 	std::istringstream iPub(pubKey);
 	RSAKey keyPub(&iPub);
-	RSADigestEngine eng2(key);
+	RSADigestEngine eng2(keyPub);
 	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
 	assert (!eng2.verify(sig));
 }
@@ -212,7 +234,7 @@ void RSATest::testRSACipherLarge()
 }
 
 
-void RSATest::testCertificate()
+void RSATest::testRSACertificate()
 {
 	std::istringstream str(anyPem);
 	X509Certificate cert(str);
@@ -243,13 +265,14 @@ CppUnit::Test* RSATest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RSATest");
 
-	CppUnit_addTest(pSuite, RSATest, testNewKeys);
-	CppUnit_addTest(pSuite, RSATest, testSign);
-	CppUnit_addTest(pSuite, RSATest, testSignSha256);
-	CppUnit_addTest(pSuite, RSATest, testSignManipulated);
+	CppUnit_addTest(pSuite, RSATest, testRSANewKeys);
+	CppUnit_addTest(pSuite, RSATest, testRSANewKeysNoPassphrase);
+	CppUnit_addTest(pSuite, RSATest, testRSASign);
+	CppUnit_addTest(pSuite, RSATest, testRSASignSha256);
+	CppUnit_addTest(pSuite, RSATest, testRSASignManipulated);
 	CppUnit_addTest(pSuite, RSATest, testRSACipher);
 	CppUnit_addTest(pSuite, RSATest, testRSACipherLarge);
-	CppUnit_addTest(pSuite, RSATest, testCertificate);
+	CppUnit_addTest(pSuite, RSATest, testRSACertificate);
 
 	return pSuite;
 }

@@ -1,8 +1,6 @@
 //
 // FPEnvironment_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -24,6 +22,31 @@
 #include <float.h>
 #include <math.h>
 
+#ifndef _SW_INEXACT
+#	define _SW_INEXACT 0x00000001 // inexact (precision)
+#endif
+#ifndef _SW_UNDERFLOW
+#	define _SW_UNDERFLOW 0x00000002 // underflow
+#endif
+#ifndef _SW_OVERFLOW
+#	define _SW_OVERFLOW 0x00000004 // overflow
+#endif
+#ifndef _SW_ZERODIVIDE
+#	define _SW_ZERODIVIDE 0x00000008 // zero divide
+#endif
+#ifndef _SW_INVALID
+#	define _SW_INVALID 0x00000010 // invalid
+#endif
+#ifndef _SW_DENORMAL
+#	define _SW_DENORMAL 0x00080000 // denormal status bit
+#endif
+
+#ifdef __MINGW32__
+    #define _RC_CHOP 0x00000300
+    #define _RC_UP 0x00000200
+    #define _RC_DOWN 0x00000100
+    #define _RC_NEAR 0x00000000
+#endif
 
 namespace Poco {
 
@@ -33,24 +56,24 @@ class Foundation_API FPEnvironmentImpl
 protected:
 	enum RoundingModeImpl
 	{
-		FP_ROUND_DOWNWARD_IMPL   = RC_DOWN,
-		FP_ROUND_UPWARD_IMPL     = RC_UP,
-		FP_ROUND_TONEAREST_IMPL  = RC_NEAR,
-		FP_ROUND_TOWARDZERO_IMPL = RC_CHOP
+		FP_ROUND_DOWNWARD_IMPL   = _RC_DOWN,
+		FP_ROUND_UPWARD_IMPL     = _RC_UP,
+		FP_ROUND_TONEAREST_IMPL  = _RC_NEAR,
+		FP_ROUND_TOWARDZERO_IMPL = _RC_CHOP
 	};
 	enum FlagImpl
 	{
-		FP_DIVIDE_BY_ZERO_IMPL = SW_ZERODIVIDE,
-		FP_INEXACT_IMPL        = SW_INEXACT,
-		FP_OVERFLOW_IMPL       = SW_OVERFLOW,
-		FP_UNDERFLOW_IMPL      = SW_UNDERFLOW,
-		FP_INVALID_IMPL        = SW_INVALID
+		FP_DIVIDE_BY_ZERO_IMPL = _SW_ZERODIVIDE,
+		FP_INEXACT_IMPL        = _SW_INEXACT,
+		FP_OVERFLOW_IMPL       = _SW_OVERFLOW,
+		FP_UNDERFLOW_IMPL      = _SW_UNDERFLOW,
+		FP_INVALID_IMPL        = _SW_INVALID
 	};
 	FPEnvironmentImpl();
 	FPEnvironmentImpl(const FPEnvironmentImpl& env);
 	~FPEnvironmentImpl();
 	FPEnvironmentImpl& operator = (const FPEnvironmentImpl& env);
-	void keepCurrentImpl();		
+	void keepCurrentImpl();
 	static void clearFlagsImpl();
 	static bool isFlagImpl(FlagImpl flag);	
 	static void setRoundingModeImpl(RoundingModeImpl mode);
@@ -75,49 +98,81 @@ private:
 //
 inline bool FPEnvironmentImpl::isInfiniteImpl(float value)
 {
+#ifdef __MINGW32__
+        return isfinite(value) == 0;
+#else
 	return _finite(value) == 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(double value)
 {
-	return _finite(value) == 0;
+#ifdef __MINGW32__
+        return isfinite(value) == 0;
+#else
+        return _finite(value) == 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 {
-	return _finite(value) == 0;
+#ifdef __MINGW32__
+        return isfinite(value) == 0;
+#else
+        return _finite(value) == 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isNaNImpl(float value)
 {
-	return _isnan(value) != 0;
+#ifdef __MINGW32__
+        return isnan(value) != 0;
+#else
+        return _isnan(value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isNaNImpl(double value)
 {
-	return _isnan(value) != 0;
+#ifdef __MINGW32__
+        return isnan(value) != 0;
+#else
+        return _isnan(value) != 0;
+#endif
 }
 
 
 inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 {
-	return _isnan(value) != 0;
+#ifdef __MINGW32__
+        return isnan(value) != 0;
+#else
+        return _isnan(value) != 0;
+#endif
 }
 
 
 inline float FPEnvironmentImpl::copySignImpl(float target, float source)
 {
-	return float(_copysign(target, source));
+#ifdef __MINGW32__
+        return float(copysign(target, source));
+#else
+        return float(_copysign(target, source));
+#endif
 }
 
 
 inline double FPEnvironmentImpl::copySignImpl(double target, double source)
 {
-	return _copysign(target, source);
+#ifdef __MINGW32__
+        return copysign(target, source);
+#else
+        return _copysign(target, source);
+#endif
 }
 
 

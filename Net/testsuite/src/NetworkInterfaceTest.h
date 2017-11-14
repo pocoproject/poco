@@ -1,8 +1,6 @@
 //
 // NetworkInterfaceTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetworkInterfaceTest.h#1 $
-//
 // Definition of the NetworkInterfaceTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -22,7 +20,7 @@
 #ifdef POCO_NET_HAS_INTERFACE
 
 
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class NetworkInterfaceTest: public CppUnit::TestCase

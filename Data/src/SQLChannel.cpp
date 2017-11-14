@@ -1,9 +1,7 @@
 //
 // SQLChannel.cpp
 //
-// $Id: //poco/Main/Data/src/SQLChannel.cpp#3 $
-//
-// Library: Net
+// Library: Data
 // Package: Logging
 // Module:  SQLChannel
 //
@@ -47,12 +45,15 @@ SQLChannel::SQLChannel():
 	_table("T_POCO_LOG"),
 	_timeout(1000),
 	_throw(true),
-	_async(true)
+	_async(true),
+	_pid(),
+	_tid(),
+	_priority()
 {
 }
 
 
-SQLChannel::SQLChannel(const std::string& connector, 
+SQLChannel::SQLChannel(const std::string& connector,
 	const std::string& connect,
 	const std::string& name):
 	_connector(connector),
@@ -61,7 +62,10 @@ SQLChannel::SQLChannel(const std::string& connector,
 	_table("T_POCO_LOG"),
 	_timeout(1000),
 	_throw(true),
-	_async(true)
+	_async(true),
+	_pid(),
+	_tid(),
+	_priority()
 {
 	open();
 }
@@ -69,7 +73,14 @@ SQLChannel::SQLChannel(const std::string& connector,
 
 SQLChannel::~SQLChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -99,9 +110,9 @@ void SQLChannel::log(const Message& msg)
 void SQLChannel::logAsync(const Message& msg)
 {
 	poco_check_ptr (_pLogStatement);
-	if (0 == wait() && !_pLogStatement->done() && !_pLogStatement->initialized()) 
+	if (0 == wait() && !_pLogStatement->done() && !_pLogStatement->initialized())
 	{
-		if (_throw) 
+		if (_throw)
 			throw TimeoutException("Timed out waiting for previous statement completion");
 		else return;
 	}
@@ -277,7 +288,7 @@ void SQLChannel::initLogStatement()
 
 void SQLChannel::registerChannel()
 {
-	Poco::LoggingFactory::defaultFactory().registerChannelClass("SQLChannel", 
+	Poco::LoggingFactory::defaultFactory().registerChannelClass("SQLChannel",
 		new Poco::Instantiator<SQLChannel, Poco::Channel>);
 }
 

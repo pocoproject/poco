@@ -1,8 +1,6 @@
 //
 // FIFOEventTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FIFOEventTest.h#1 $
-//
 // Definition of the FIFOEventTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/FIFOEvent.h"
 #include "Poco/EventArgs.h"
 
@@ -65,7 +63,7 @@ protected:
 
 	int getCount() const;
 private:
-	int		_count;
+	int _count;
 };
 
 

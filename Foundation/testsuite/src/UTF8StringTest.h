@@ -1,8 +1,6 @@
 //
 // UTF8StringTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UTF8StringTest.h#1 $
-//
 // Definition of the UTF8StringTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class UTF8StringTest: public CppUnit::TestCase

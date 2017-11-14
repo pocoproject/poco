@@ -1,8 +1,6 @@
 //
 // TimespanTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimespanTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,15 +9,15 @@
 
 
 #include "TimespanTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Timespan.h"
 
 
 using Poco::Timespan;
 
 
-TimespanTest::TimespanTest(const std::string& name): CppUnit::TestCase(name)
+TimespanTest::TimespanTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

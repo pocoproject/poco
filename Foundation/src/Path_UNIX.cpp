@@ -1,8 +1,6 @@
 //
 // Path_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Path_UNIX.cpp#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path
@@ -67,10 +65,92 @@ std::string PathImpl::homeImpl()
 		if (pwd)
 			path = pwd->pw_dir;
 		else
-			path = EnvironmentImpl::getImpl("HOME");
+			if (EnvironmentImpl::hasImpl("HOME"))
+				path = EnvironmentImpl::getImpl("HOME");
 	}
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] != '/') path.append("/");
+	return path;
+#endif
+}
+
+
+std::string PathImpl::configHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append("Library/Preferences/");
+	return path;
+#else
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CONFIG_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CONFIG_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".config/");
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append("Library/Application Support/");
+	return path;
+#else
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_DATA_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_DATA_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".local/share/");
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::tempImpl();
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append("Library/Caches/");
+	return path;
+#else
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CACHE_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CACHE_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".cache/");
+
 	return path;
 #endif
 }
@@ -90,6 +170,19 @@ std::string PathImpl::tempImpl()
 	{
 		path = "/tmp/";
 	}
+	return path;
+}
+
+
+std::string PathImpl::configImpl()
+{
+	std::string path;
+	
+#if POCO_OS == POCO_OS_MAC_OS_X
+	  path = "/Library/Preferences/";
+#else
+	  path = "/etc/";
+#endif
 	return path;
 }
 
@@ -114,13 +207,33 @@ std::string PathImpl::expandImpl(const std::string& path)
 		++it;
 		if (it != end && *it == '/')
 		{
-			result += homeImpl(); ++it;
+			const char* homeEnv = getenv("HOME");
+			if (homeEnv)
+			{
+				result += homeEnv;
+				std::string::size_type resultSize = result.size();
+				if (resultSize > 0 && result[resultSize - 1] != '/')
+					result.append("/");
+			}
+			else
+			{
+				result += homeImpl();
+			}
+			++it;
 		}
 		else result += '~';
 	}
 	while (it != end)
 	{
-		if (*it == '$')
+		if (*it == '\\')
+		{
+			++it;
+			if (*it == '$')
+			{
+				result += *it++;
+			}
+		}
+		else if (*it == '$')
 		{
 			std::string var;
 			++it;

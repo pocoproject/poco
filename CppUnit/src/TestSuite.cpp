@@ -1,12 +1,10 @@
 //
 // TestSuite.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestSuite.cpp#1 $
-//
 
 
-#include "CppUnit/TestSuite.h"
-#include "CppUnit/TestResult.h"
+#include "Poco/CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestResult.h"
 
 
 namespace CppUnit {
@@ -23,7 +21,7 @@ void TestSuite::deleteContents()
 // Runs the tests and collects their result in a TestResult.
 void TestSuite::run(TestResult *result)
 {
-	for (std::vector<Test*>::iterator it = _tests.begin(); it != _tests.end(); ++it) 
+	for (std::vector<Test*>::iterator it = _tests.begin(); it != _tests.end(); ++it)
 	{
 		if (result->shouldStop ())
 			break;

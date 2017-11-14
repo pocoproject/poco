@@ -1,8 +1,6 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/Main/Data/include/Poco/ArchiveStrategy.h#1 $
-//
 // Library: Data
 // Package: Logging
 // Module:  ArchiveStrategy
@@ -38,9 +36,9 @@ class Data_API ArchiveStrategy
 public:
 	static const std::string DEFAULT_ARCHIVE_DESTINATION;
 
-	ArchiveStrategy(const std::string& connector, 
-		const std::string& connect, 
-		const std::string& source, 
+	ArchiveStrategy(const std::string& connector,
+		const std::string& connect,
+		const std::string& source,
 		const std::string& destination = DEFAULT_ARCHIVE_DESTINATION);
 		/// Creates archive strategy.
 
@@ -179,9 +177,9 @@ class Data_API ArchiveByAgeStrategy: public ArchiveStrategy
 	/// Archives rows scheduled for archiving.
 {
 public:
-	ArchiveByAgeStrategy(const std::string& connector, 
-		const std::string& connect, 
-		const std::string& sourceTable, 
+	ArchiveByAgeStrategy(const std::string& connector,
+		const std::string& connect,
+		const std::string& sourceTable,
 		const std::string& destinationTable = DEFAULT_ARCHIVE_DESTINATION);
 	
 	~ArchiveByAgeStrategy();

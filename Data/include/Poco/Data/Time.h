@@ -1,8 +1,6 @@
 //
 // Time.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Time.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Time
@@ -217,6 +215,21 @@ public:
 	const Poco::Data::Time& value() const
 	{
 		return _val;
+	}
+
+	bool isDate() const
+	{
+		return false;
+	}
+
+	bool isTime() const
+	{
+		return true;
+	}
+
+	bool isDateTime() const
+	{
+		return false;
 	}
 
 private:

@@ -1,8 +1,6 @@
 //
 // FIFOBufferStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FIFOBufferStreamTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "FIFOBufferStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/FIFOBuffer.h"
 #include "Poco/FIFOBufferStream.h"
 #include "Poco/Delegate.h"
@@ -23,7 +21,7 @@ using Poco::FIFOBufferStream;
 using Poco::delegate;
 
 
-FIFOBufferStreamTest::FIFOBufferStreamTest(const std::string& name): CppUnit::TestCase(name)
+FIFOBufferStreamTest::FIFOBufferStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

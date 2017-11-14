@@ -1,8 +1,6 @@
 //
 // TreeWalkerTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/TreeWalkerTest.h#1 $
-//
 // Definition of the TreeWalkerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/XML/XML.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class TreeWalkerTest: public CppUnit::TestCase

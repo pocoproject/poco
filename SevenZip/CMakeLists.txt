@@ -1,4 +1,5 @@
-set(LIBNAME "PocoSevenZip")
+set(LIBNAME "SevenZip")
+set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
@@ -49,31 +50,32 @@ POCO_SOURCES( SRCS 7z
 #    src/XzIn.c
 )
 
-include_directories( include )
-
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
-set_target_properties( ${LIBNAME}
+add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    DEFINE_SYMBOL SevenZip_EXPORTS)
-target_link_libraries( ${LIBNAME} PocoUtil PocoXML PocoFoundation)
-
-install(
-    DIRECTORY include/Poco
-    DESTINATION include
-    PATTERN ".svn" EXCLUDE
+    OUTPUT_NAME ${POCO_LIBNAME}
+    DEFINE_SYMBOL SevenZip_EXPORTS
     )
 
-install(
-    TARGETS ${LIBNAME}
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-    RUNTIME DESTINATION bin
+target_link_libraries( "${LIBNAME}" Util XML Foundation)
+target_include_directories( "${LIBNAME}"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+
+POCO_INSTALL("${LIBNAME}")
+POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if (ENABLE_TESTS)
-  add_subdirectory(samples)
-  # TODO: Add tests
-  #add_subdirectory(testsuite)
+    # TODO: Add tests
+    #add_subdirectory(testsuite)
+endif ()
+if (ENABLE_SAMPLES)
+    add_subdirectory(samples)
 endif ()
 

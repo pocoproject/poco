@@ -1,8 +1,6 @@
 //
 // TimerTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/TimerTest.h#1 $
-//
 // Definition of the TimerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/Util/TimerTask.h"
 #include "Poco/Event.h"
 
@@ -28,13 +26,17 @@ public:
 	TimerTest(const std::string& name);
 	~TimerTest();
 
-	void testSchedule();
+	void testScheduleTimestamp();
+	void testScheduleClock();
 	void testScheduleInterval();
 	void testScheduleAtFixedRate();
+	void testScheduleIntervalTimestamp();
+	void testScheduleIntervalClock();
+	void testCancel();
 
 	void setUp();
 	void tearDown();
-	
+
 	void onTimer(Poco::Util::TimerTask& task);
 
 	static CppUnit::Test* suite();

@@ -1,8 +1,6 @@
 //
 // SharedLibrary.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedLibrary.h#3 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -29,12 +27,8 @@
 #include "Poco/SharedLibrary_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/SharedLibrary_UNIX.h"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
-#include "Poco/SharedLibrary_WIN32U.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/SharedLibrary_WIN32.h"
-#elif defined(POCO_OS_FAMILY_VMS)
-#include "Poco/SharedLibrary_VMS.h"
 #endif
 
 
@@ -42,7 +36,7 @@ namespace Poco {
 
 
 class Foundation_API SharedLibrary: private SharedLibraryImpl
-	/// The SharedLibrary class dynamically 
+	/// The SharedLibrary class dynamically
 	/// loads shared libraries at run-time.
 {
 public:
@@ -54,7 +48,7 @@ public:
 			///
 			/// This flag is ignored on platforms that do not use dlopen().
 
-		SHLIB_LOCAL  = 2  
+		SHLIB_LOCAL  = 2
 			/// On platforms that use dlopen(), use RTLD_LOCAL instead of RTLD_GLOBAL.
 			///
 			/// Note that if this flag is specified, RTTI (including dynamic_cast and throw) will
@@ -63,17 +57,17 @@ public:
 			///
 			/// This flag is ignored on platforms that do not use dlopen().
 	};
-	
+
 	SharedLibrary();
 		/// Creates a SharedLibrary object.
-		
+
 	SharedLibrary(const std::string& path);
 		/// Creates a SharedLibrary object and loads a library
 		/// from the given path.
 
 	SharedLibrary(const std::string& path, int flags);
 		/// Creates a SharedLibrary object and loads a library
-		/// from the given path, using the given flags. 
+		/// from the given path, using the given flags.
 		/// See the Flags enumeration for valid values.
 
 	virtual ~SharedLibrary();
@@ -112,18 +106,29 @@ public:
 		/// is the entry point of the function.
 		/// Throws a NotFoundException if the symbol
 		/// does not exist.
-		
+
 	const std::string& getPath() const;
 		/// Returns the path of the library, as
-		/// specified in a call to load() or the 
+		/// specified in a call to load() or the
 		/// constructor.
-		
+
+	static std::string prefix();
+		/// Returns the platform-specific filename prefix
+		/// for shared libraries.
+		/// Most platforms would return "lib" as prefix, while
+	    /// on Cygwin, the "cyg" prefix will be returned.
+
 	static std::string suffix();
 		/// Returns the platform-specific filename suffix
 		/// for shared libraries (including the period).
 		/// In debug mode, the suffix also includes a
 		/// "d" to specify the debug version of a library.
-		
+
+	static std::string getOSName(const std::string& name);
+		/// Returns the platform-specific filename
+		/// for shared libraries by prefixing and suffixing name
+		/// with prefix() and suffix()
+
 private:
 	SharedLibrary(const SharedLibrary&);
 	SharedLibrary& operator = (const SharedLibrary&);

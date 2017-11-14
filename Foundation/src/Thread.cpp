@@ -1,8 +1,6 @@
 //
 // Thread.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread.cpp#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -20,38 +18,77 @@
 #include "Poco/ThreadLocal.h"
 #include "Poco/AtomicCounter.h"
 #include <sstream>
-
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Thread_WINCE.cpp"
-#else
-#include "Thread_WIN32.cpp"
-#endif
-#elif defined(POCO_VXWORKS)
-#include "Thread_VX.cpp"
-#else
-#include "Thread_POSIX.cpp"
-#endif
+#include "Thread_STD.cpp"
 
 
 namespace Poco {
 
 
-Thread::Thread(): 
-	_id(uniqueId()), 
-	_name(makeName()), 
+namespace {
+
+class RunnableHolder: public Runnable
+{
+public:
+	RunnableHolder(Runnable& target):
+		_target(target)
+	{
+	}
+
+	~RunnableHolder()
+	{
+	}
+
+	void run()
+	{
+		_target.run();
+	}
+
+private:
+	Runnable& _target;
+};
+
+
+class CallableHolder: public Runnable
+{
+public:
+	CallableHolder(Thread::Callable callable, void* pData):
+		_callable(callable),
+		_pData(pData)
+	{
+	}
+
+	~CallableHolder()
+	{
+	}
+
+	void run()
+	{
+		_callable(_pData);
+	}
+
+private:
+	Thread::Callable _callable;
+	void* _pData;
+};
+
+
+} // namespace
+
+
+Thread::Thread():
+	_id(uniqueId()),
+	_name(makeName()),
 	_pTLS(0),
-	_event(true)
+	_event()
 {
 }
 
 
-Thread::Thread(const std::string& name): 
-	_id(uniqueId()), 
-	_name(name), 
+Thread::Thread(const std::string& rName):
+	_id(uniqueId()),
+	_name(rName),
 	_pTLS(0),
-	_event(true)
+	_event()
 {
 }
 
@@ -76,13 +113,13 @@ Thread::Priority Thread::getPriority() const
 
 void Thread::start(Runnable& target)
 {
-	startImpl(target);
+	startImpl(new RunnableHolder(target));
 }
 
 
 void Thread::start(Callable target, void* pData)
 {
-	startImpl(target, pData);
+	startImpl(new CallableHolder(target, pData));
 }
 
 
@@ -139,9 +176,9 @@ void Thread::clearTLS()
 
 std::string Thread::makeName()
 {
-	std::ostringstream name;
-	name << '#' << _id;
-	return name.str();
+	std::ostringstream threadName;
+	threadName << '#' << _id;
+	return threadName.str();
 }
 
 
@@ -152,11 +189,11 @@ int Thread::uniqueId()
 }
 
 
-void Thread::setName(const std::string& name)
+void Thread::setName(const std::string& rName)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	_name = name;
+	_name = rName;
 }
 
 

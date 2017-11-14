@@ -1,11 +1,9 @@
 //
 // Unicode.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Unicode_WIN32.h#4 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
-// Module:  Unicode_WIN32
+// Module:  Unicode
 //
 // Definition of Unicode_WIN32.
 //
@@ -29,7 +27,7 @@ inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::wstring& target
 	/// Utility function for conversion from UTF-8 to UTF-16
 {
 	int len = length;
-	if (SQL_NTS == len) 
+	if (SQL_NTS == len)
 		len = (int) std::strlen((const char *) pSQLChar);
 
 	UnicodeConverter::toUTF16((const char *) pSQLChar, len, target);

@@ -1,8 +1,6 @@
 //
 // UniqueExpireCacheTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UniqueExpireCacheTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "UniqueExpireCacheTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/UniqueExpireCache.h"
 #include "Poco/UniqueAccessExpireCache.h"
@@ -47,7 +45,7 @@ typedef AccessExpirationDecorator<int> DIntVal;
 #define DURWAIT  300
 
 
-UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& name): CppUnit::TestCase(name)
+UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -164,7 +162,7 @@ void UniqueExpireCacheTest::testExpireN()
 	assert (aCache.has(3));
 	tmp = aCache.get(1);
 	SharedPtr<IntVal> tmp2 = aCache.get(3);
-	assert (tmp->value == 2); 
+	assert (tmp->value == 2);
 	assert (tmp2->value == 4);
 
 	Thread::sleep(DURHALFSLEEP+25); //3|1

@@ -1,8 +1,6 @@
 //
 // NetTestSuite.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetTestSuite.cpp#2 $
-//
 // Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -25,6 +23,7 @@
 #include "ICMPClientTestSuite.h"
 #include "NTPClientTestSuite.h"
 #include "WebSocketTestSuite.h"
+#include "OAuthTestSuite.h"
 #include "SyslogTest.h"
 
 
@@ -46,6 +45,7 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(ICMPClientTestSuite::suite());
 	pSuite->addTest(NTPClientTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
+	pSuite->addTest(OAuthTestSuite::suite());
 	pSuite->addTest(SyslogTest::suite());
 
 	return pSuite;

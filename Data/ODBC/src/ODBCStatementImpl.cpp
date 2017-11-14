@@ -1,9 +1,7 @@
 //
 // ODBCStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCStatementImpl.cpp#8 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCStatementImpl
 //
@@ -46,7 +44,8 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_nextResponse(0),
 	_prepared(false),
 	_affectedRowCount(0),
-	_canCompile(true)
+	_canCompile(true),
+	_insertHint(false)
 {
 	int queryTimeout = rSession.queryTimeout();
 	if (queryTimeout >= 0)
@@ -57,6 +56,14 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 			(SQLPOINTER) uqt,
 			0);
 	}
+	SQLSMALLINT t;
+	SQLRETURN r = Poco::Data::ODBC::SQLGetInfo(_rConnection, SQL_DRIVER_NAME, NULL, 0, &t);
+	if (!Utility::isError(r) && t > 0)
+	{
+		std::string serverString;
+		serverString.resize(static_cast<std::size_t>(t) + 2);
+		r = Poco::Data::ODBC::SQLGetInfo(_rConnection, SQL_DRIVER_NAME, &serverString[0], SQLSMALLINT((serverString.length() - 1) * sizeof(serverString[0])), &t);
+	}
 }
 
 
@@ -64,11 +71,11 @@ ODBCStatementImpl::~ODBCStatementImpl()
 {
 	ColumnPtrVecVec::iterator it = _columnPtrs.begin();
 	ColumnPtrVecVec::iterator end = _columnPtrs.end();
-	for(; it != end; ++it)
+	for (; it != end; ++it)
 	{
 		ColumnPtrVec::iterator itC = it->begin();
 		ColumnPtrVec::iterator endC = it->end();
-		for(; itC != endC; ++itC) delete *itC;
+		for (; itC != endC; ++itC) delete *itC;
 	}
 }
 
@@ -85,7 +92,7 @@ void ODBCStatementImpl::compileImpl()
 
 	addPreparator();
 
-	Binder::ParameterBinding bind = session().getFeature("autoBind") ? 
+	Binder::ParameterBinding bind = session().getFeature("autoBind") ?
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
 
 	TypeInfo* pDT = 0;
@@ -93,27 +100,31 @@ void ODBCStatementImpl::compileImpl()
 	{
 		Poco::Any dti = session().getProperty("dataTypeInfo");
 		pDT = AnyCast<TypeInfo*>(dti);
-	}catch (NotSupportedException&) { }
+	}
+	catch (NotSupportedException&)
+	{
+	}
 
-	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 	
-	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT);
+	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, _insertHint);
 	
 	makeInternalExtractors();
 	doPrepare();
 
-	 _canCompile = false;
+	_canCompile = false;
 }
 
 
 void ODBCStatementImpl::makeInternalExtractors()
 {
-	if (hasData() && !extractions().size()) 
+	if (hasData() && !extractions().size())
 	{
 		try
 		{
-			fillColumns();
-		} catch (DataFormatException&)
+			fillColumns(currentDataSet());
+		}
+		catch (DataFormatException&)
 		{
 			if (isStoredProcedure()) return;
 			throw;
@@ -125,25 +136,34 @@ void ODBCStatementImpl::makeInternalExtractors()
 }
 
 
-void ODBCStatementImpl::addPreparator()
+bool ODBCStatementImpl::addPreparator(bool addAlways)
 {
+	Preparator* prep = 0;
 	if (0 == _preparations.size())
 	{
 		std::string statement(toString());
 		if (statement.empty())
 			throw ODBCException("Empty statements are illegal");
 
-		Preparator::DataExtraction ext = session().getFeature("autoExtract") ? 
+		Preparator::DataExtraction ext = session().getFeature("autoExtract") ?
 			Preparator::DE_BOUND : Preparator::DE_MANUAL;
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		_preparations.push_back(new Preparator(_stmt, statement, maxFieldSize, ext));
+		prep = new Preparator(_stmt, statement, maxFieldSize, ext);
 	}
 	else
-		_preparations.push_back(new Preparator(*_preparations[0]));
+		prep = new Preparator(*_preparations[0]);
+	if (addAlways || prep->columns() > 0)
+	{
+		_preparations.push_back(prep);
+		_extractors.push_back(new Extractor(_stmt, _preparations.back()));
 
-	_extractors.push_back(new Extractor(_stmt, _preparations.back()));
+		return true;
+	}
+
+	delete prep;
+	return false;
 }
 
 
@@ -161,7 +181,7 @@ void ODBCStatementImpl::doPrepare()
 		if (it != itEnd && (*it)->isBulk())
 		{
 			std::size_t limit = getExtractionLimit();
-			if (limit == Limit::LIMIT_UNLIMITED) 
+			if (limit == Limit::LIMIT_UNLIMITED)
 				throw InvalidArgumentException("Bulk operation not allowed without limit.");
 			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
@@ -214,7 +234,6 @@ void ODBCStatementImpl::doBind()
 void ODBCStatementImpl::bindImpl()
 {
 	doBind();
-
 	SQLRETURN rc = SQLExecute(_stmt);
 
 	if (SQL_NEED_DATA == rc) putData();
@@ -236,13 +255,13 @@ void ODBCStatementImpl::putData()
 		{
 			dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
 
-			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
+			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize)))
 				throw StatementException(_stmt, "SQLPutData()");
 		}
 		else // if pParam is null pointer, do a dummy call
 		{
 			char dummy = 0;
-			if (Utility::isError(SQLPutData(_stmt, &dummy, 0))) 
+			if (Utility::isError(SQLPutData(_stmt, &dummy, 0)))
 				throw StatementException(_stmt, "SQLPutData()");
 		}
 	}
@@ -279,6 +298,23 @@ void ODBCStatementImpl::clear()
 	}
 }
 
+bool ODBCStatementImpl::nextResultSet()
+{
+	SQLRETURN ret = SQLMoreResults(_stmt);
+
+	if (SQL_NO_DATA == ret)
+		return false;
+
+	if (Utility::isError(ret))
+		throw StatementException(_stmt, "SQLMoreResults()");
+
+	// need to remove old bindings, as Sybase doesn't like old ones
+	if (Utility::isError(SQLFreeStmt(_stmt, SQL_UNBIND)))
+		throw StatementException(_stmt, "SQLFreeStmt(SQL_UNBIND)");
+
+	return true;
+}
+
 
 bool ODBCStatementImpl::hasNext()
 {
@@ -296,16 +332,32 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-			if (hasMoreDataSets()) activateNextDataSet();
-			else return false;
-
-			if (SQL_NO_DATA == SQLMoreResults(_stmt))
-				return false;
-
-			addPreparator();
-			doPrepare();
-			fixupExtraction();
-			makeStep();
+			// have a loop here, as there could be one or more empty results
+			do
+			{
+				if (hasMoreDataSets())
+				{
+					activateNextDataSet();
+					if (!nextResultSet())
+						return false;
+					addPreparator();
+				}
+				else
+				{
+					if (nextResultSet())
+					{
+						if (!addPreparator(false)) // skip the result set if it has no columns
+							continue;
+						fillColumns(currentDataSet() + 1);
+						makeExtractors(_preparations.back()->columns(), static_cast<Position::Type>(currentDataSet() + 1));
+						activateNextDataSet();
+					}
+					else return false;
+				}
+				doPrepare();
+				fixupExtraction();
+				makeStep();
+			} while (!nextRowReady());
 		}
 		else if (Utility::isError(_nextResponse))
 			checkError(_nextResponse, "SQLFetch()");
@@ -380,7 +432,7 @@ std::string ODBCStatementImpl::nativeSQL()
 			delete [] pNative;
 			throw ConnectionException(_rConnection, "SQLNativeSql()");
 		}
-		++retlen;//accomodate for terminating '\0'
+		++retlen;//accommodate for terminating '\0'
 	}while (retlen > length);
 
 	std::string sql(pNative);
@@ -396,8 +448,8 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 	if (Utility::isError(rc))
 	{
 		std::ostringstream os;
-		os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
-		os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
+		os << std::endl << "Requested SQL statement: " << toString() << std::endl;
+		os << "Native SQL statement: " << nativeSQL() << std::endl;
 		std::string str(msg); str += os.str();
 		
 		throw StatementException(_stmt, str);
@@ -405,51 +457,57 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 }
 
 
-void ODBCStatementImpl::fillColumns()
+void ODBCStatementImpl::fillColumns(size_t dataSetPos)
 {
-	std::size_t colCount = columnsReturned();
-	std::size_t curDataSet = currentDataSet();
-	if (curDataSet >= _columnPtrs.size())
-		_columnPtrs.resize(curDataSet + 1);
+	poco_assert_dbg(dataSetPos < _preparations.size());
+	poco_assert_dbg(_preparations[dataSetPos]);
+	std::size_t colCount = static_cast<std::size_t>(_preparations[dataSetPos]->columns());
+	if (dataSetPos >= _columnPtrs.size())
+		_columnPtrs.resize(dataSetPos + 1);
 
 	for (int i = 0; i < colCount; ++i)
-		_columnPtrs[curDataSet].push_back(new ODBCMetaColumn(_stmt, i));
+		_columnPtrs[dataSetPos].push_back(new ODBCMetaColumn(_stmt, i));
 }
 
 
-bool ODBCStatementImpl::isStoredProcedure() const 	 
-{ 	 
-	std::string str = toString(); 	 
-	if (trimInPlace(str).size() < 2) return false; 	 
+bool ODBCStatementImpl::isStoredProcedure() const 	
+{ 	
+	std::string str = toString(); 	
+	if (trimInPlace(str).size() < 2) return false; 	
 
-	return ('{' == str[0] && '}' == str[str.size()-1]); 	 
+	return ('{' == str[0] && '}' == str[str.size()-1]); 	
 }
 
 
-const MetaColumn& ODBCStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& ODBCStatementImpl::metaColumn(std::size_t pos, size_t dataSet) const
 {
-	std::size_t curDataSet = currentDataSet();
-	poco_assert_dbg (curDataSet < _columnPtrs.size());
+	poco_assert_dbg(dataSet < _columnPtrs.size());
 
-	std::size_t sz = _columnPtrs[curDataSet].size();
+	std::size_t sz = _columnPtrs[dataSet].size();
 
 	if (0 == sz || pos > sz - 1)
 		throw InvalidAccessException(format("Invalid column number: %u", pos));
 
-	return *_columnPtrs[curDataSet][pos];
+	return *_columnPtrs[dataSet][pos];
 }
 
 
-std::size_t ODBCStatementImpl::affectedRowCount() const
+int ODBCStatementImpl::affectedRowCount() const
 {
 	if (0 == _affectedRowCount)
 	{
-		SQLLEN rows;
+		SQLLEN rows = 0;
 		if (!Utility::isError(SQLRowCount(_stmt, &rows)))
 			_affectedRowCount = static_cast<std::size_t>(rows);
 	}
 
-	return _affectedRowCount;
+	return static_cast<int>(_affectedRowCount);
+}
+
+
+void ODBCStatementImpl::insertHint()
+{
+	_insertHint = true;
 }
 
 

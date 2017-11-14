@@ -1,8 +1,6 @@
 //
 // NotificationQueueTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NotificationQueueTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NotificationQueueTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NotificationQueue.h"
 #include "Poco/Notification.h"
 #include "Poco/Thread.h"
@@ -49,7 +47,7 @@ namespace
 }
 
 
-NotificationQueueTest::NotificationQueueTest(const std::string& name): CppUnit::TestCase(name)
+NotificationQueueTest::NotificationQueueTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -190,6 +188,29 @@ void NotificationQueueTest::testDefaultQueue()
 }
 
 
+void NotificationQueueTest::testQueueRemove()
+{
+	NotificationQueue queue;
+	Notification::Ptr frontNotification = new QTestNotification("front");
+	Notification::Ptr middleNotification = new QTestNotification("middle");
+	Notification::Ptr backNotification = new QTestNotification("back");
+	queue.enqueueNotification(frontNotification);
+	queue.enqueueNotification(new QTestNotification("dummy"));
+	queue.enqueueNotification(middleNotification);
+	queue.enqueueNotification(new QTestNotification("dummy"));
+	queue.enqueueNotification(backNotification);
+	assert (queue.size() == 5);
+	assert (queue.remove(frontNotification));
+	assert (queue.size() == 4);
+	assert (queue.remove(middleNotification));
+	assert (queue.size() == 3);
+	assert (queue.remove(backNotification));
+	assert (queue.size() == 2);
+	assert (!queue.remove(backNotification));
+	assert (queue.size() == 2);
+}
+
+
 void NotificationQueueTest::setUp()
 {
 	_handled.clear();
@@ -227,6 +248,7 @@ CppUnit::Test* NotificationQueueTest::suite()
 	CppUnit_addTest(pSuite, NotificationQueueTest, testWaitDequeue);
 	CppUnit_addTest(pSuite, NotificationQueueTest, testThreads);
 	CppUnit_addTest(pSuite, NotificationQueueTest, testDefaultQueue);
+	CppUnit_addTest(pSuite, NotificationQueueTest, testQueueRemove);
 
 	return pSuite;
 }

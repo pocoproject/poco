@@ -1,8 +1,6 @@
 //
 // AttributesImpl.cpp
 //
-// $Id: //poco/1.4/XML/src/AttributesImpl.cpp#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX
@@ -261,7 +259,7 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& qname) const
 {
 	for (AttributeVec::const_iterator it = _attributes.begin(); it != _attributes.end(); ++it)
 	{
-		if (it->qname == qname) 
+		if (it->qname == qname)
 			return const_cast<Attribute*>(&(*it));
 	}
 	return 0;
@@ -272,7 +270,7 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& namespaceURI, c
 {
 	for (AttributeVec::const_iterator it = _attributes.begin(); it != _attributes.end(); ++it)
 	{
-		if (it->namespaceURI == namespaceURI && it->localName == localName) 
+		if (it->namespaceURI == namespaceURI && it->localName == localName)
 			return const_cast<Attribute*>(&(*it));
 	}
 	return 0;

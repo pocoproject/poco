@@ -1,8 +1,6 @@
 //
 // CipherImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherImpl.h#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherImpl
@@ -45,10 +43,10 @@ public:
 		/// Returns the name of the cipher.
 
 	CryptoTransform* createEncryptor();
-		/// Creates an encrytor object.
+		/// Creates an encryptor object.
 
 	CryptoTransform* createDecryptor();
-		/// Creates a decrytor object.
+		/// Creates a decryptor object.
 
 private:
 	CipherKey _key;

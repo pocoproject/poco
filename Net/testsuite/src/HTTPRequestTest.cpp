@@ -1,8 +1,6 @@
 //
 // HTTPRequestTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPRequestTest.cpp#4 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "HTTPRequestTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
 #include <sstream>

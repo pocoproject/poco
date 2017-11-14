@@ -1,8 +1,6 @@
 //
 // SimpleFileChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SimpleFileChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  SimpleFileChannel
@@ -42,15 +40,15 @@ class Foundation_API SimpleFileChannel: public Channel
 	/// by a newline.
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is in the text. 
+	/// appropriate Formatter to control what is in the text.
 	///
 	/// Log file rotation based on log file size is supported.
 	///
-	/// If rotation is enabled, the SimpleFileChannel will 
+	/// If rotation is enabled, the SimpleFileChannel will
 	/// alternate between two log files. If the size of
 	/// the primary log file exceeds a specified limit,
 	/// the secondary log file will be used, and vice
-	/// versa. 
+	/// versa.
 	///
 	/// Log rotation is configured with the "rotation"
 	/// property, which supports the following values:
@@ -75,7 +73,7 @@ class Foundation_API SimpleFileChannel: public Channel
 	//  or whether it's allowed to stay in the system's file buffer for some time.
 	/// Valid values are:
 	///
-	///   * true:   Every essages is immediately flushed to the log file (default).
+	///   * true:   Every message is immediately flushed to the log file (default).
 	///   * false:  Messages are not immediately flushed to the log file.
 	///
 {
@@ -96,12 +94,12 @@ public:
 		/// Logs the given message to the file.
 		
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets the property with the given name. 
-		/// 
+		/// Sets the property with the given name.
+		///
 		/// The following properties are supported:
 		///   * path:          The primary log file's path.
 		///   * secondaryPath: The secondary log file's path.
-		///   * rotation:      The log file's rotation mode. See the 
+		///   * rotation:      The log file's rotation mode. See the
 		///                    SimpleFileChannel class for details.
 		///   * flush:         Specifies whether messages are immediately
 		///                    flushed to the log file. See the SimpleFileChannel

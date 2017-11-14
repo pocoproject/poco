@@ -1,8 +1,6 @@
 //
 // ActiveMethodTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActiveMethodTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ActiveMethodTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
@@ -92,7 +90,7 @@ namespace
 }
 
 
-ActiveMethodTest::ActiveMethodTest(const std::string& name): CppUnit::TestCase(name)
+ActiveMethodTest::ActiveMethodTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -33,7 +33,7 @@
 * Reference:
 *
 *   IEEE Standard and an Open Group Technical Standard 1003.1, 2004 Edition
-* 
+*
 *******************************************************************************/
 
 int wceex_gettimeofday(struct timeval *tp, struct timezone *tzp)
@@ -59,7 +59,7 @@ int wceex_gettimeofday(struct timeval *tp, struct timezone *tzp)
     }
 
     if (NULL != tzp)
-    {   
+    {
         GetTimeZoneInformation(&tzi);
 
         tzp->tz_minuteswest = tzi.Bias;

@@ -1,8 +1,6 @@
 //
 // TextEncodingTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TextEncodingTest.h#1 $
-//
 // Definition of the TextEncodingTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class TextEncodingTest: public CppUnit::TestCase
@@ -27,6 +25,7 @@ public:
 	~TextEncodingTest();
 
 	void testTextEncoding();
+	void testTextEncodingManager();
 
 	void setUp();
 	void tearDown();

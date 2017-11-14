@@ -1,8 +1,6 @@
 //
 // HTTPHeaderStream.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPHeaderStream.cpp#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPHeaderStream
@@ -127,7 +125,14 @@ void* HTTPHeaderInputStream::operator new(std::size_t size)
 
 void HTTPHeaderInputStream::operator delete(void* ptr)
 {
-	_pool.release(ptr);
+	try
+	{
+		_pool.release(ptr);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -159,7 +164,14 @@ void* HTTPHeaderOutputStream::operator new(std::size_t size)
 
 void HTTPHeaderOutputStream::operator delete(void* ptr)
 {
-	_pool.release(ptr);
+	try
+	{
+		_pool.release(ptr);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

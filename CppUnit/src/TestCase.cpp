@@ -1,15 +1,13 @@
 //
 // TestCase.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestCase.cpp#1 $
-//
 
 
 #include <stdexcept>
 #include <math.h>
-#include "CppUnit/TestCase.h"
-#include "CppUnit/TestResult.h"
-#include "CppUnit/estring.h"
+#include "Poco/CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestResult.h"
+#include "Poco/CppUnit/estring.h"
 #include <typeinfo>
 #include <iostream>
 
@@ -113,11 +111,11 @@ void TestCase::run(TestResult *result)
 	result->startTest(this);
 
 	setUp();
-	try 
+	try
 	{
 		runTest();
 	}
-	catch (CppUnitException& e) 
+	catch (CppUnitException& e)
 	{
 		CppUnitException* copy = new CppUnitException(e);
 		result->addFailure(this, copy);

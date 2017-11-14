@@ -1,8 +1,6 @@
 //
 // Struct.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Struct.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Struct
@@ -62,8 +60,8 @@ public:
 		typedef typename std::map<K, T>::const_iterator MapConstIterator;
 
 		MapConstIterator it = val.begin();
-		MapConstIterator end = val.end();
-		for (; it != end; ++it) _data.insert(ValueType(it->first, Var(it->second)));
+		MapConstIterator itEnd = val.end();
+		for (; it != itEnd; ++it) _data.insert(ValueType(it->first, Var(it->second)));
 	}
 
 	virtual ~Struct()
@@ -171,6 +169,12 @@ public:
 		return _data.empty();
 	}
 
+	inline void clear()
+		/// Clears the Struct contents
+	{
+		_data.clear();
+	}
+
 	SizeType size() const
 		/// Returns the number of members the Struct contains
 	{
@@ -190,7 +194,7 @@ public:
 	std::string toString()
 	{
 		std::string str;
-		Var(*this).convert<std::string>(str);
+		Var(*this).template convert<std::string>(str);
 		return str;
 	}
 

@@ -1,8 +1,6 @@
 //
 // CryptoTest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.cpp#2 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,14 +9,16 @@
 
 
 #include "CryptoTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/HexBinaryEncoder.h"
 #include <sstream>
 
 
@@ -73,7 +73,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -81,7 +81,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -89,7 +89,7 @@ void CryptoTest::testEncryptDecrypt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 }
 
@@ -104,7 +104,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_NONE);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -112,7 +112,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -120,10 +120,41 @@ void CryptoTest::testEncryptDecryptWithSalt()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher2->decryptString(out, Cipher::ENC_BINHEX);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 }
 
+void CryptoTest::testEncryptDecryptWithSaltSha1()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(
+		CipherKey("aes256", "simplepwd", "Too much salt", 2000, "sha1"));
+	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(
+		CipherKey("aes256", "simplepwd", "Too much salt", 2000, "sha1"));
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
+		std::string result = pCipher2->decryptString(out, Cipher::ENC_NONE);
+		assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
+		std::string result = pCipher2->decryptString(out, Cipher::ENC_BASE64);
+		assert (in == result);
+	}
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::string in(n, 'x');
+		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
+		std::string result = pCipher2->decryptString(out, Cipher::ENC_BINHEX);
+		assert (in == result);
+	}
+}
 
 void CryptoTest::testEncryptDecryptDESECB()
 {
@@ -134,7 +165,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_NONE);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_NONE);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -142,7 +173,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BASE64);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BASE64);
-		poco_assert (in == result);
+		assert (in == result);
 	}
 
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
@@ -150,8 +181,69 @@ void CryptoTest::testEncryptDecryptDESECB()
 		std::string in(n, 'x');
 		std::string out = pCipher->encryptString(in, Cipher::ENC_BINHEX);
 		std::string result = pCipher->decryptString(out, Cipher::ENC_BINHEX);
-		poco_assert (in == result);
+		assert (in == result);
 	}
+}
+
+
+void CryptoTest::testPassword()
+{
+	CipherKey key("aes256", "password", "salt");
+	
+	std::ostringstream keyStream;
+	Poco::Base64Encoder base64KeyEnc(keyStream);
+	base64KeyEnc.write(reinterpret_cast<const char*>(&key.getKey()[0]), key.keySize());
+	base64KeyEnc.close();
+	std::string base64Key = keyStream.str();
+	assert (base64Key == "hIzxBt58GDd7/6mRp88bewKk42lM4QwaF78ek0FkVoA=");
+}
+
+void CryptoTest::testPasswordSha1()
+{
+	// the test uses 1 iteration, as the openssl executable does not allow to set a custom number
+	// of iterations
+	CipherKey key("aes256", "password", "saltsalt", 1, "sha1");
+
+	std::ostringstream keyStream;
+	Poco::HexBinaryEncoder hexKeyEnc(keyStream);
+	hexKeyEnc.write(reinterpret_cast<const char*>(&key.getKey()[0]), key.keySize());
+	hexKeyEnc.close();
+	std::string hexKey = keyStream.str();
+
+	std::ostringstream ivStream;
+	Poco::HexBinaryEncoder hexIvEnc(ivStream);
+	hexIvEnc.write(reinterpret_cast<const char*>(&key.getIV()[0]), key.ivSize());
+	hexIvEnc.close();
+	std::string hexIv = ivStream.str();
+
+	// got Hex value for key and iv using:
+	// openssl enc -e -a -md sha1 -aes256 -k password -S 73616c7473616c74 -P
+	// (where "salt" == 73616c74 in Hex, doubled for an 8 bytes salt, openssl padds the salt with 0
+	// whereas Poco's implementation padds with the existing bytes using a modulo operation)
+	assert (hexIv == "c96049b0edc0b67af61ecc43d3de8898");
+	assert (hexKey == "cab86dd6261710891e8cb56ee3625691a75df344f0bff4c12cf3596fc00b39c7");
+}
+
+
+void CryptoTest::testEncryptInterop()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "password", "salt"));
+
+	const std::string plainText  = "This is a secret message.";
+	const std::string expectedCipherText = "9HITTPaU3A/LaZzldbdnRZ109DKlshouKren/n8BsHc=";
+	std::string cipherText = pCipher->encryptString(plainText, Cipher::ENC_BASE64);
+	assert (cipherText == expectedCipherText);
+}
+
+
+void CryptoTest::testDecryptInterop()
+{
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "password", "salt"));
+
+	const std::string expectedPlainText  = "This is a secret message.";
+	const std::string cipherText = "9HITTPaU3A/LaZzldbdnRZ109DKlshouKren/n8BsHc=";
+	std::string plainText = pCipher->decryptString(cipherText, Cipher::ENC_BASE64);
+	assert (plainText == expectedPlainText);
 }
 
 
@@ -189,7 +281,7 @@ void CryptoTest::testCertificate()
 {
 	std::istringstream certStream(APPINF_PEM);
 	X509Certificate cert(certStream);
-	
+
 	std::string subjectName(cert.subjectName());
 	std::string issuerName(cert.issuerName());
 	std::string commonName(cert.commonName());
@@ -198,7 +290,9 @@ void CryptoTest::testCertificate()
 	std::string stateOrProvince(cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE));
 	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
 	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
-	
+	std::string emailAddress(cert.subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS));
+	std::string serialNumber(cert.subjectName(X509Certificate::NID_SERIAL_NUMBER));
+
 	assert (subjectName == "/CN=appinf.com/O=Applied Informatics Software Engineering GmbH/OU=Development/ST=Carinthia/C=AT/L=St. Jakob im Rosental/emailAddress=guenter.obiltschnig@appinf.com");
 	assert (issuerName == subjectName);
 	assert (commonName == "appinf.com");
@@ -207,8 +301,16 @@ void CryptoTest::testCertificate()
 	assert (stateOrProvince == "Carinthia");
 	assert (organizationName == "Applied Informatics Software Engineering GmbH");
 	assert (organizationUnitName == "Development");
-	
-	assert (cert.issuedBy(cert));
+	assert (emailAddress == "guenter.obiltschnig@appinf.com");
+	assert (serialNumber == "");
+
+	// fails with recent OpenSSL versions:
+	// assert (cert.issuedBy(cert));
+
+	std::istringstream otherCertStream(APPINF_PEM);
+	X509Certificate otherCert(otherCertStream);
+
+	assert (cert.equals(otherCert));
 }
 
 
@@ -228,7 +330,12 @@ CppUnit::Test* CryptoTest::suite()
 
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecrypt);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSalt);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSaltSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptDESECB);
+	CppUnit_addTest(pSuite, CryptoTest, testPassword);
+	CppUnit_addTest(pSuite, CryptoTest, testPasswordSha1);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptInterop);
+	CppUnit_addTest(pSuite, CryptoTest, testDecryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 

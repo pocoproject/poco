@@ -1,8 +1,6 @@
 //
 // ODBCSQLServerTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCSQLServerTest.h#4 $
-//
 // Definition of the ODBCSQLServerTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -27,7 +25,7 @@
 class ODBCSQLServerTest: public ODBCTest
 	/// SQLServer ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver				|	DB								| OS
 	/// --------------------+-----------------------------------+------------------------------------------
 	/// 2000.86.1830.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1

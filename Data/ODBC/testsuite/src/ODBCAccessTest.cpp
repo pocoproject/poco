@@ -1,8 +1,6 @@
 //
 // ODBCAccessTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCAccessTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ODBCAccessTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
@@ -42,7 +40,7 @@ std::string ODBCAccessTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 
 
-ODBCAccessTest::ODBCAccessTest(const std::string& name): 
+ODBCAccessTest::ODBCAccessTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
 	Poco::Data::ODBC::Connector::registerConnector();
@@ -114,8 +112,8 @@ void ODBCAccessTest::dropTable(const std::string& tableName)
 
 void ODBCAccessTest::recreatePersonTable()
 {
-	dropTable("Person");
-	*_pSession << "CREATE TABLE Person (LastName TEXT(30), FirstName TEXT(30), Address TEXT(30), Age INTEGER)", now;
+	dropTable(ExecUtil::person());
+	*_pSession << "CREATE TABLE " << ExecUtil::person() << " (LastName TEXT(30), FirstName TEXT(30), Address TEXT(30), Age INTEGER)", now;
 }
 
 
@@ -126,13 +124,13 @@ bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& ds
 	{
 		if (((itDrv->first).find(driver) != std::string::npos))
 		{
-			std::cout << "Driver found: " << itDrv->first 
+			std::cout << "Driver found: " << itDrv->first
 				<< " (" << itDrv->second << ')' << std::endl;
 			break;
 		}
 	}
 
-	if (_drivers.end() == itDrv) 
+	if (_drivers.end() == itDrv)
 	{
 		std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
@@ -145,7 +143,7 @@ bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& ds
 	{
 		if (itDSN->first == dsn && itDSN->second == driver)
 		{
-			std::cout << "DSN found: " << itDSN->first 
+			std::cout << "DSN found: " << itDSN->first
 				<< " (" << itDSN->second << ')' << std::endl;
 			format(_dbConnString, "DSN=%s", dsn);
 			return true;
@@ -176,7 +174,7 @@ void ODBCAccessTest::setUp()
 
 void ODBCAccessTest::tearDown()
 {
-	dropTable("Person");
+	dropTable(ExecUtil::person());
 }
 
 
@@ -195,7 +193,7 @@ bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 		return false;
 	}
 
-	//N.B. Access driver does not suport check for connection.
+	//N.B. Access driver does not support check for connection.
 	std::cout << "*** Connected to [" << driver << "] test database." << std::endl;
 
 	return true;

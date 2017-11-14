@@ -1,8 +1,6 @@
 //
 // HTTPCookieTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPCookieTest.h#2 $
-//
 // Definition of the HTTPCookieTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -18,7 +16,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/DateTime.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class HTTPCookieTest: public CppUnit::TestCase

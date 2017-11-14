@@ -1,9 +1,7 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Extractor.cpp#5 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Extractor
 //
@@ -230,7 +228,7 @@ bool Extractor::isNull(std::size_t pos, std::size_t)
 	if (!_nulls[pos].first)
 	{
 		_nulls[pos].first = true;
-		_nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, pos));
+		_nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, static_cast<int>(pos)));
 	}
 	
 	return _nulls[pos].second;

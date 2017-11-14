@@ -1,8 +1,6 @@
 //
 // ODBCTestSuite.h
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/MySQLTestSuite.h#1 $
-//
 // Definition of the ODBCTestSuite class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define MySQLTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 class MySQLTestSuite
 {

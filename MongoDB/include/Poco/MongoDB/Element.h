@@ -1,8 +1,6 @@
 //
 // Element.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Element
@@ -27,13 +25,14 @@
 #include "Poco/Nullable.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/UTF8String.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <set>
+#include <list>
 
 
 namespace Poco {
@@ -41,19 +40,19 @@ namespace MongoDB {
 
 
 class MongoDB_API Element
-	/// Represents an element of a Document or an Array
+	/// Represents an Element of a Document or an Array.
 {
 public:
 	typedef Poco::SharedPtr<Element> Ptr;
 
-	Element(const std::string& name);
-		/// Constructor
+	explicit Element(const std::string& name);
+		/// Creates the Element with the given name.
 
 	virtual ~Element();
 		/// Destructor
 
-	std::string name() const;
-		/// Returns the name of the element
+	const std::string& name() const;
+		/// Returns the name of the element.
 
 	virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
@@ -70,26 +69,19 @@ private:
 };
 
 
-inline std::string Element::name() const
+//
+// inlines
+//
+inline const std::string& Element::name() const
 {
 	return _name;
 }
 
 
-class ElementComparator
-{
-public:
-	bool operator()(const Element::Ptr& s1, const Element::Ptr& s2)
-	{
-		return s1->name() < s2->name();
-	}
-};
+typedef std::list<Element::Ptr> ElementSet;
 
 
-typedef std::set<Element::Ptr, ElementComparator> ElementSet;
-
-
-template<typename T> 
+template<typename T>
 struct ElementTraits
 {
 };
@@ -119,51 +111,11 @@ struct ElementTraits<std::string>
 
 	static std::string toString(const std::string& value, int indent = 0)
 	{
-		std::ostringstream oss;
-
-		oss << '"';
-
-		for(std::string::const_iterator it = value.begin(); it != value.end(); ++it)
-		{
-			switch (*it)
-			{
-			case '"':
-				oss << "\\\"";
-				break;
-			case '\\':
-				oss << "\\\\";
-				break;
-			case '\b':
-				oss << "\\b";
-				break;
-			case '\f':
-				oss << "\\f";
-				break;
-			case '\n':
-				oss << "\\n";
-				break;
-			case '\r':
-				oss << "\\r";
-				break;
-			case '\t':
-				oss << "\\t";
-				break;
-			default:
-				{
-					if ( *it > 0 && *it <= 0x1F )
-					{
-						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
-					}
-					else
-					{
-						oss << *it;
-					}
-					break;
-				}
-			}
-		}
-		oss << '"';
-		return oss.str();
+		std::string result;
+		result.append(1, '"');
+		result.append(UTF8::escape(value));
+		result.append(1, '"');
+		return result;
 	}
 };
 
@@ -241,7 +193,11 @@ struct ElementTraits<Timestamp>
 
 	static std::string toString(const Timestamp& value, int indent = 0)
 	{
-		return DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z");
+		std::string result;
+		result.append(1, '"');
+		result.append(DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z"));
+		result.append(1, '"');
+		return result;
 	}
 };
 
@@ -292,6 +248,54 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 }
 
 
+struct BSONTimestamp
+{
+	Poco::Timestamp ts;
+	Poco::Int32 inc;
+};
+
+
+// BSON Timestamp
+// spec: int64
+template<>
+struct ElementTraits<BSONTimestamp>
+{
+	enum { TypeId = 0x11 };
+
+	static std::string toString(const BSONTimestamp& value, int indent = 0)
+	{
+		std::string result;
+		result.append(1, '"');
+		result.append(DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z"));
+		result.append(1, ' ');
+		result.append(NumberFormatter::format(value.inc));
+		result.append(1, '"');
+		return result;
+	}
+};
+
+
+template<>
+inline void BSONReader::read<BSONTimestamp>(BSONTimestamp& to)
+{
+	Poco::Int64 value;
+	_reader >> value;
+	to.inc = value & 0xffffffff;
+	value >>= 32;
+	to.ts = Timestamp::fromEpochTime(static_cast<std::time_t>(value));
+}
+
+
+template<>
+inline void BSONWriter::write<BSONTimestamp>(BSONTimestamp& from)
+{
+	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
+	value <<= 32;
+	value += from.inc;
+	_writer << value;
+}
+
+
 // BSON 64-bit integer
 // spec: int64
 template<>
@@ -307,10 +311,12 @@ struct ElementTraits<Int64>
 
 
 template<typename T>
-class ConcreteElement : public Element
+class ConcreteElement: public Element
 {
 public:
-	ConcreteElement(const std::string& name, const T& init) : Element(name), _value(init)
+	ConcreteElement(const std::string& name, const T& init):
+		Element(name),
+		_value(init)
 	{
 	}
 
@@ -318,7 +324,7 @@ public:
 	{
 	}
 
-	
+
 	T value() const
 	{
 		return _value;
@@ -330,7 +336,7 @@ public:
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
-	
+
 	int type() const
 	{
 		return ElementTraits<T>::TypeId;
@@ -354,4 +360,4 @@ private:
 } } // namespace Poco::MongoDB
 
 
-#endif //  MongoDB_Element_INCLUDED
+#endif // MongoDB_Element_INCLUDED

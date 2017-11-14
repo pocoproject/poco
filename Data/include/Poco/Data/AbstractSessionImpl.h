@@ -1,8 +1,6 @@
 //
 // AbstractSessionImpl.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractSessionImpl.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractSessionImpl
@@ -52,33 +50,33 @@ public:
 	typedef Poco::Any (C::*PropertyGetter)(const std::string&);
 		/// The getter method for a property.
 
-	AbstractSessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
+	AbstractSessionImpl(const std::string& rConnectionString,
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(rConnectionString, timeout),
 			_storage(std::string("deque")),
 			_bulk(false),
 			_emptyStringIsNull(false),
 			_forceEmptyString(false)
 		/// Creates the AbstractSessionImpl.
-		/// 
-		/// Adds "storage" property and sets the default internal storage container 
+		///
+		/// Adds "storage" property and sets the default internal storage container
 		/// type to std::deque.
-		/// The storage is created by statements automatically whenever a query 
+		/// The storage is created by statements automatically whenever a query
 		/// returning results is executed but external storage is provided by the user.
 		/// Storage type can be reconfigured at runtime both globally (for the
-		/// duration of the session) and locally (for a single statement execution only). 
+		/// duration of the session) and locally (for a single statement execution only).
 		/// See StatementImpl for details on how this property is used at runtime.
-		/// 
+		///
 		/// Adds "handle" property which, if set by the back end, returns native handle
 		/// for the back end DB.
-		/// 
+		///
 		/// Adds "bulk" feature and sets it to false.
 		/// Bulk feature determines whether the session is capable of bulk operations.
-		/// Connectors that are capable of it must set this feature prior to attempting 
+		/// Connectors that are capable of it must set this feature prior to attempting
 		/// bulk operations.
 		///
 		/// Adds "emptyStringIsNull" feature and sets it to false. This feature should be
 		/// set to true in order to modify the behavior of the databases that distinguish
-		/// between zero-length character strings as nulls. Setting this feature to true 
+		/// between zero-length character strings as nulls. Setting this feature to true
 		/// shall disregard any difference between empty character strings and nulls,
 		/// causing the framework to treat them the same (i.e. behave like Oracle).		
 		///
@@ -91,23 +89,23 @@ public:
 		/// resulting in default underlying database behavior.
 		///
 	{
-		addProperty("storage", 
-			&AbstractSessionImpl<C>::setStorage, 
+		addProperty("storage",
+			&AbstractSessionImpl<C>::setStorage,
 			&AbstractSessionImpl<C>::getStorage);
 
-		addProperty("handle", 
+		addProperty("handle",
 			&AbstractSessionImpl<C>::setHandle,
 			&AbstractSessionImpl<C>::getHandle);
 
-		addFeature("bulk", 
-			&AbstractSessionImpl<C>::setBulk, 
+		addFeature("bulk",
+			&AbstractSessionImpl<C>::setBulk,
 			&AbstractSessionImpl<C>::getBulk);
 
-		addFeature("emptyStringIsNull", 
+		addFeature("emptyStringIsNull",
 			&AbstractSessionImpl<C>::setEmptyStringIsNull,
 			&AbstractSessionImpl<C>::getEmptyStringIsNull);
 
-		addFeature("forceEmptyString", 
+		addFeature("forceEmptyString",
 			&AbstractSessionImpl<C>::setForceEmptyString,
 			&AbstractSessionImpl<C>::getForceEmptyString);
 	}
@@ -196,13 +194,13 @@ public:
 	}
 
 	void setHandle(const std::string& name, const Poco::Any& handle)
-		/// Sets the native session handle. 
+		/// Sets the native session handle.
 	{
 		_handle = handle;
 	}
 		
 	Poco::Any getHandle(const std::string& name="")
-		/// Returns the native session handle. 
+		/// Returns the native session handle.
 	{
 		return _handle;
 	}

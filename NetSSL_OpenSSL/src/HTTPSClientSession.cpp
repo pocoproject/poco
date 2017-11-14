@@ -1,8 +1,6 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#3 $
-//
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSClientSession
@@ -64,8 +62,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	SecureStreamSocket sss(socket());
-	sss.setPeerHostName(host);
 }
 
 
@@ -90,8 +86,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	SecureStreamSocket sss(socket());
-	sss.setPeerHostName(host);
 }
 
 
@@ -102,8 +96,6 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	SecureStreamSocket sss(socket());
-	sss.setPeerHostName(host);
 }
 
 
@@ -145,9 +137,13 @@ void HTTPSClientSession::proxyAuthenticate(HTTPRequest& request)
 
 void HTTPSClientSession::connect(const SocketAddress& address)
 {
-	if (getProxyHost().empty())
+	if (getProxyHost().empty() || bypassProxy())
 	{
 		SecureStreamSocket sss(socket());
+		if (sss.getPeerHostName().empty())
+		{
+			sss.setPeerHostName(getHost());
+		}
 		if (_pContext->sessionCacheEnabled())
 		{
 			sss.useSession(_pSession);
@@ -176,7 +172,8 @@ int HTTPSClientSession::read(char* buffer, std::streamsize length)
 	try
 	{
 		return HTTPSession::read(buffer, length);
-	} catch(SSLConnectionUnexpectedlyClosedException&)
+	}
+	catch(SSLConnectionUnexpectedlyClosedException&)
 	{
 		return 0;
 	}

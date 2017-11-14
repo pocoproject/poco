@@ -1,8 +1,6 @@
 //
 // WebSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/WebSocket.h#4 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocket
@@ -23,6 +21,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/HTTPCredentials.h"
+#include "Poco/Buffer.h"
 
 
 namespace Poco {
@@ -64,7 +63,7 @@ public:
 		FRAME_FLAG_FIN  = 0x80, /// FIN bit: final fragment of a multi-fragment message.
 		FRAME_FLAG_RSV1 = 0x40, /// Reserved for future use. Must be zero.
 		FRAME_FLAG_RSV2 = 0x20, /// Reserved for future use. Must be zero.
-		FRAME_FLAG_RSV3 = 0x10, /// Reserved for future use. Must be zero.
+		FRAME_FLAG_RSV3 = 0x10  /// Reserved for future use. Must be zero.
 	};
 
 	enum FrameOpcodes
@@ -76,7 +75,8 @@ public:
 		FRAME_OP_CLOSE   = 0x08, /// Close connection.
 		FRAME_OP_PING    = 0x09, /// Ping frame.
 		FRAME_OP_PONG    = 0x0a, /// Pong frame.
-		FRAME_OP_BITMASK = 0x0f  /// Bit mask for opcodes. 
+		FRAME_OP_BITMASK = 0x0f, /// Bit mask for opcodes.
+		FRAME_OP_SETRAW  = 0x100 /// Set raw flags (for use with sendBytes() and FRAME_OP_CONT).
 	};
 	
 	enum SendFlags
@@ -131,7 +131,7 @@ public:
 	WebSocket(HTTPServerRequest& request, HTTPServerResponse& response);
 		/// Creates a server-side WebSocket from within a
 		/// HTTPRequestHandler.
-		/// 
+		///
 		/// First verifies that the request is a valid WebSocket upgrade
 		/// request. If so, completes the handshake by sending
 		/// a proper 101 response.
@@ -141,7 +141,7 @@ public:
 		
 	WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response);
 		/// Creates a client-side WebSocket, using the given
-		/// HTTPClientSession and HTTPRequest for the initial handshake 
+		/// HTTPClientSession and HTTPRequest for the initial handshake
 		/// (HTTP Upgrade request).
 		///
 		/// Additional HTTP headers for the initial handshake request
@@ -153,7 +153,7 @@ public:
 
 	WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response, HTTPCredentials& credentials);
 		/// Creates a client-side WebSocket, using the given
-		/// HTTPClientSession and HTTPRequest for the initial handshake 
+		/// HTTPClientSession and HTTPRequest for the initial handshake
 		/// (HTTP Upgrade request).
 		///
 		/// The given credentials are used for authentication
@@ -192,7 +192,7 @@ public:
 	int sendFrame(const void* buffer, int length, int flags = FRAME_TEXT);
 		/// Sends the contents of the given buffer through
 		/// the socket as a single frame.
-		/// 
+		///
 		/// Values from the FrameFlags, FrameOpcodes and SendFlags enumerations
 		/// can be specified in flags.
 		///
@@ -206,10 +206,10 @@ public:
 		/// Receives a frame from the socket and stores it
 		/// in buffer. Up to length bytes are received. If
 		/// the frame's payload is larger, a WebSocketException
-		/// is thrown and the WebSocket connection must be 
+		/// is thrown and the WebSocket connection must be
 		/// terminated.
 		///
-		/// Returns the number of bytes received. 
+		/// Returns the number of bytes received.
 		/// A return value of 0 means that the peer has
 		/// shut down or closed the connection.
 		///
@@ -220,6 +220,21 @@ public:
 		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
 		/// is stored in flags.
 		
+	int receiveFrame(Poco::Buffer<char>& buffer, int& flags);
+		/// Receives a frame from the socket and stores it
+		/// after any previous content in buffer.
+		///
+		/// Returns the number of bytes received.
+		/// A return value of 0 means that the peer has
+		/// shut down or closed the connection.
+		///
+		/// Throws a TimeoutException if a receive timeout has
+		/// been set and nothing is received within that interval.
+		/// Throws a NetException (or a subclass) in case of other errors.
+		///
+		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
+		/// is stored in flags.
+
 	Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side
 		/// WebSocket, or WS_CLIENT otherwise.

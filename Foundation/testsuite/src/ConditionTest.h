@@ -1,8 +1,6 @@
 //
 // ConditionTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ConditionTest.h#1 $
-//
 // Definition of the ConditionTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ConditionTest: public CppUnit::TestCase

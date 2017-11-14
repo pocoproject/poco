@@ -1,8 +1,6 @@
 //
 // FTPClientSession.h
 //
-// $Id: //poco/svn/Net/include/Poco/Net/FTPClientSession.h#2 $
-//
 // Library: Net
 // Package: FTP
 // Module:  FTPClientSession
@@ -101,14 +99,14 @@ public:
 	bool getPassive() const;
 		/// Returns true iff passive mode is enabled for this connection.
 		
-	void open(const std::string& host,
+	virtual void open(const std::string& host,
 		Poco::UInt16 port,
 		const std::string& username = "",
 		const std::string& password = "");
 		/// Opens the FTP connection to the given host and port.
 		/// If username is supplied, login is attempted.
 
-	void login(const std::string& username, const std::string& password);
+	virtual void login(const std::string& username, const std::string& password);
 		/// Authenticates the user against the FTP server. Must be
 		/// called before any other commands (except QUIT) can be sent.
 		///
@@ -134,7 +132,7 @@ public:
 	void setFileType(FileType type);
 		/// Sets the file type for transferring files.
 		///
-		/// Sends a TYPE command with a corresponsing argument to the
+		/// Sends a TYPE command with a corresponding argument to the
 		/// server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
@@ -146,7 +144,7 @@ public:
 	void setWorkingDirectory(const std::string& path);
 		/// Changes the current working directory on the server.
 		///
-		/// Sends a CWD command with the given path as argument to the 
+		/// Sends a CWD command with the given path as argument to the
 		/// server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
@@ -160,7 +158,7 @@ public:
 		
 	void cdup();
 		/// Moves one directory up from the current working directory
-		/// on teh server.
+		/// on the server.
 		///
 		/// Sends a CDUP command to the server.
 		///
@@ -227,7 +225,7 @@ public:
 	std::ostream& beginUpload(const std::string& path);
 		/// Starts uploading the file with the given name.
 		/// After all data has been written to the returned stream,
-		/// endUpload() must be called to finish the download.
+		/// endUpload() must be called to finish the upload.
 		///
 		/// A stream for reading the file's content is returned.
 		/// The stream is valid until endUpload() is called.
@@ -258,7 +256,7 @@ public:
 		/// The stream is valid until endList() is called.
 		///
 		/// Optionally, a path to a directory or file can be specified.
-		/// According to the FTP prototol, if a path to a filename is
+		/// According to the FTP protocol, if a path to a filename is
 		/// given, only information for the specific file is returned.
 		/// If a path to a directory is given, a listing of that directory
 		/// is returned. If no path is given, a listing of the current
@@ -278,7 +276,7 @@ public:
 		/// for transferring the data is created.
 		
 	void endList();
-		/// Must be called to complete a directory listing download 
+		/// Must be called to complete a directory listing download
 		/// initiated with beginList().
 
 	void abort();
@@ -304,7 +302,13 @@ public:
 	bool isLoggedIn() const;
 		/// Returns true if the session is logged in.
 
+	bool isSecure() const;
+		/// Returns true if the session is FTPS.
+
 protected:
+	virtual void receiveServerReadyReply();
+		/// Function that read server welcome message after connetion
+
 	enum StatusClass
 	{
 		FTP_POSITIVE_PRELIMINARY  = 1,
@@ -324,7 +328,7 @@ protected:
 	static bool isTransientNegative(int status);
 	static bool isPermanentNegative(int status);
 	std::string extractPath(const std::string& response);
-	StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
+	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket activeDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket passiveDataConnection(const std::string& command, const std::string& arg);
 	void sendPortCommand(const SocketAddress& addr);
@@ -336,21 +340,21 @@ protected:
 	void parseAddress(const std::string& str, SocketAddress& addr);
 	void parseExtAddress(const std::string& str, SocketAddress& addr);
 	void endTransfer();
-	
+
+	DialogSocket*  _pControlSocket = nullptr;
+	SocketStream*  _pDataStream = nullptr;
+
 private:
 	FTPClientSession(const FTPClientSession&);
-	FTPClientSession& operator = (const FTPClientSession&);
-		
+	
 	std::string    _host;
-	Poco::UInt16   _port;
-	DialogSocket*  _pControlSocket;
-	SocketStream*  _pDataStream;
-	bool	   _passiveMode;
-	FileType       _fileType;
-	bool	   _supports1738;
-	bool	   _serverReady;
-	bool	   _isLoggedIn;
-	Poco::Timespan _timeout;
+	Poco::UInt16   _port = 0;
+	bool	   _passiveMode = true;
+	FileType       _fileType = TYPE_BINARY;
+	bool	   _supports1738 = true;
+	bool	   _serverReady = false;
+	bool	   _isLoggedIn = false;
+	Poco::Timespan _timeout = DEFAULT_TIMEOUT;
 };
 
 
@@ -398,6 +402,10 @@ inline bool FTPClientSession::isLoggedIn() const
 	return _isLoggedIn;
 }
 
+inline bool FTPClientSession::isSecure() const
+{
+	return false;
+}
 
 } } // namespace Poco::Net
 

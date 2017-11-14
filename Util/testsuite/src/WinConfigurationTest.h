@@ -1,8 +1,6 @@
 //
 // WinConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/WinConfigurationTest.h#1 $
-//
 // Definition of the WinConfigurationTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class WinConfigurationTest: public CppUnit::TestCase

@@ -1,8 +1,6 @@
 //
 // LogStreamTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LogStreamTest.h#1 $
-//
 // Definition of the LogStreamTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class LogStreamTest: public CppUnit::TestCase

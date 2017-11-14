@@ -1,8 +1,6 @@
 //
 // RandomStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/RandomStreamTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "RandomStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/RandomStream.h"
 #include <vector>
 #include <cmath>
@@ -21,7 +19,7 @@
 using Poco::RandomInputStream;
 
 
-RandomStreamTest::RandomStreamTest(const std::string& name): CppUnit::TestCase(name)
+RandomStreamTest::RandomStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

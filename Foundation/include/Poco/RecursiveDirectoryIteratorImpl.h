@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIteratorImpl.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -22,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DirectoryIteratorStrategy.h"
+#include "Poco/Delegate.h"
 #include <stack>
 #include <functional>
 
@@ -79,10 +78,10 @@ public:
 		return _current;
 	}
 
-        RecursiveDirectoryIteratorImpl& setOnError(const AbstractTraverseErrorCallback& cb)
+	template <typename T>
+	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
 	{
-		_traverseStrategy.setOnError(cb);
-		return *this;
+		_traverseStrategy.traverseError += delegate(&obj, pCB);
 	}
 
 	const std::string& next()

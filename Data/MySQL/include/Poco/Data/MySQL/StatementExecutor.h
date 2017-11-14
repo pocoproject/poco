@@ -1,9 +1,7 @@
 //
 // StatementExecutor.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/StatementExecutor.h#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  StatementExecutor
 //
@@ -64,7 +62,7 @@ public:
 	bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
 		/// Fetches the column.
 
-	std::size_t getAffectedRowCount() const;
+	int getAffectedRowCount() const;
 		
 	operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
@@ -78,7 +76,7 @@ private:
 	MYSQL*      _pSessionHandle;
 	MYSQL_STMT* _pHandle;
 	int         _state;
-	std::size_t _affectedRowCount;
+	int         _affectedRowCount;
 	std::string _query;
 };
 

@@ -1,8 +1,6 @@
 //
 // NotificationCenterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NotificationCenterTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NotificationCenterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Observer.h"
 #include "Poco/NObserver.h"
@@ -31,7 +29,7 @@ class TestNotification: public Notification
 };
 
 
-NotificationCenterTest::NotificationCenterTest(const std::string& name): CppUnit::TestCase(name)
+NotificationCenterTest::NotificationCenterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

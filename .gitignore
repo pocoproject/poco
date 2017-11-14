@@ -13,6 +13,8 @@
 *.la
 *.a
 *.d
+*.vsp
+*.psess
 
 # Make #
 ########
@@ -27,6 +29,7 @@ CMakeFiles
 CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
+cmake_*
 
 # Packages #
 ############
@@ -74,6 +77,7 @@ Thumbs.db
 *.suo
 *.sdf
 *.opensdf
+*.opendb
 *.tlb
 *.tlh
 *.ilk
@@ -99,6 +103,9 @@ bin64/
 lib/
 lib64/
 pocomsg.h
+*/testsuite/bin/*
+Util/testsuite/TestConfiguration/
+.vs/
 
 # Eclipse generated files #
 ######################
@@ -110,3 +117,38 @@ cmake-build/
 # Temporary files #
 ###################
 *.bak
+CodeGeneration
+RemotingNG
+XSD
+stage/
+releases/
+Zip/testsuite/data*.bin
+Foundation/testsuite/globtest/
+TestConfiguration/
+
+# openssl binaries #
+####################
+openssl/packages/
+
+!openssl/Ionic/zip-v1.9/Release/*.dll
+!openssl/Ionic/zlib-v1.9/Release/*.dll
+
+!openssl/win32/bin/debug/*.dll
+!openssl/win32/bin/debug/*.lib
+!openssl/win32/bin/release/*.dll
+!openssl/win32/bin/release/*.lib
+
+!openssl/win64/bin/debug/*.dll
+!openssl/win64/bin/debug/*.lib
+!openssl/win64/bin/release/*.dll
+!openssl/win64/bin/release/*.lib
+
+!openssl/win32/lib/debug/*.lib
+!openssl/win32/lib/debug/*.pdb
+!openssl/win32/lib/release/*.lib
+
+!openssl/win64/lib/debug/*.lib
+!openssl/win64/lib/debug/*.pdb
+!openssl/win64/lib/release/*.lib
+
+/Debug

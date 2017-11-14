@@ -1,8 +1,6 @@
 //
 // HexBinaryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/HexBinaryTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "HexBinaryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/HexBinaryEncoder.h"
 #include "Poco/HexBinaryDecoder.h"
 #include "Poco/Exception.h"
@@ -24,7 +22,7 @@ using Poco::HexBinaryDecoder;
 using Poco::DataFormatException;
 
 
-HexBinaryTest::HexBinaryTest(const std::string& name): CppUnit::TestCase(name)
+HexBinaryTest::HexBinaryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

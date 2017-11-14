@@ -1,8 +1,6 @@
 //
 // SplitterChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SplitterChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  SplitterChannel
@@ -45,7 +43,7 @@ public:
 
 	void log(const Message& msg);
 		/// Sends the given Message to all
-		/// attaches channels. 
+		/// attaches channels.
 
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.

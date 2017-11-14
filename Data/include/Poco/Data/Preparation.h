@@ -1,8 +1,6 @@
 //
 // Preparation.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Preparation.h#8 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Preparation
@@ -36,9 +34,9 @@ class Preparation: public AbstractPreparation
 	/// Class for calling the appropriate AbstractPreparator method.
 {
 public:
-	Preparation(AbstractPreparator::Ptr& pPreparator, std::size_t pos, T& val): 
-		AbstractPreparation(pPreparator), 
-		_pos(pos), 
+	Preparation(AbstractPreparator::Ptr& pPreparator, std::size_t pos, T& val):
+		AbstractPreparation(pPreparator),
+		_pos(pos),
 		_val(val)
 		/// Creates the Preparation.
 	{
@@ -68,9 +66,9 @@ class Preparation<std::vector<T> >: public AbstractPreparation
 	/// the whole vector preparation, rather than only individual contained values.
 {
 public:
-	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::vector<T>& val = std::vector<T>()): 
-		AbstractPreparation(pPreparator), 
-		_pos(pos), 
+	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::vector<T>& val = std::vector<T>()):
+		AbstractPreparation(pPreparator),
+		_pos(pos),
 		_val(val)
 		/// Creates the Preparation.
 	{
@@ -100,9 +98,9 @@ class Preparation<std::deque<T> >: public AbstractPreparation
 	/// the whole deque preparation, rather than only individual contained values.
 {
 public:
-	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::deque<T>& val = std::deque<T>()): 
-		AbstractPreparation(pPreparator), 
-		_pos(pos), 
+	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::deque<T>& val = std::deque<T>()):
+		AbstractPreparation(pPreparator),
+		_pos(pos),
 		_val(val)
 		/// Creates the Preparation.
 	{
@@ -132,9 +130,9 @@ class Preparation<std::list<T> >: public AbstractPreparation
 	/// the whole list preparation, rather than only individual contained values.
 {
 public:
-	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::list<T>& val = std::list<T>()): 
-		AbstractPreparation(pPreparator), 
-		_pos(pos), 
+	Preparation(AbstractPreparator::Ptr pPreparator, std::size_t pos, std::list<T>& val = std::list<T>()):
+		AbstractPreparation(pPreparator),
+		_pos(pos),
 		_val(val)
 		/// Creates the Preparation.
 	{

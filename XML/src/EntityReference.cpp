@@ -1,8 +1,6 @@
 //
 // EntityReference.cpp
 //
-// $Id: //poco/1.4/XML/src/EntityReference.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -21,14 +19,14 @@ namespace Poco {
 namespace XML {
 
 
-EntityReference::EntityReference(Document* pOwnerDocument, const XMLString& name): 
+EntityReference::EntityReference(Document* pOwnerDocument, const XMLString& name):
 	AbstractNode(pOwnerDocument),
 	_name(name)
 {
 }
 
 
-EntityReference::EntityReference(Document* pOwnerDocument, const EntityReference& ref): 
+EntityReference::EntityReference(Document* pOwnerDocument, const EntityReference& ref):
 	AbstractNode(pOwnerDocument, ref),
 	_name(ref._name)
 {

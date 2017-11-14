@@ -1,8 +1,6 @@
 //
 // ListMapTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ListMapTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,18 +9,17 @@
 
 
 #include "ListMapTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/ListMap.h"
 #include "Poco/Exception.h"
 #include <map>
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::ListMap;
 
 
-ListMapTest::ListMapTest(const std::string& name): CppUnit::TestCase(name)
+ListMapTest::ListMapTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -70,6 +67,41 @@ void ListMapTest::testInsert()
 		assert (res->first == i);
 		assert (res->second == 0);
 	}		
+}
+
+
+void ListMapTest::testInsertOrder()
+{
+	const int N = 1000;
+
+	typedef ListMap<std::string, int> StrToIntMap;
+	StrToIntMap lm;
+
+	lm.insert(StrToIntMap::ValueType("foo", 42));
+	lm.insert(StrToIntMap::ValueType("bar", 43));
+	
+	StrToIntMap::Iterator it = lm.begin();
+	assert (it != lm.end() && it->first == "foo" && it->second == 42);
+	
+	++it;
+	assert (it != lm.end() && it->first == "bar" && it->second == 43);
+	
+	++it;
+	assert (it == lm.end());
+
+	lm.insert(StrToIntMap::ValueType("foo", 44));
+
+ 	it = lm.begin();
+	assert (it != lm.end() && it->first == "foo" && it->second == 42);
+	
+	++it;
+	assert (it != lm.end() && it->first == "foo" && it->second == 44);
+
+	++it;
+	assert (it != lm.end() && it->first == "bar" && it->second == 43);
+	
+	++it;
+	assert (it == lm.end());	
 }
 
 
@@ -240,6 +272,7 @@ CppUnit::Test* ListMapTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ListMapTest");
 
 	CppUnit_addTest(pSuite, ListMapTest, testInsert);
+	CppUnit_addTest(pSuite, ListMapTest, testInsertOrder);
 	CppUnit_addTest(pSuite, ListMapTest, testErase);
 	CppUnit_addTest(pSuite, ListMapTest, testIterator);
 	CppUnit_addTest(pSuite, ListMapTest, testConstIterator);

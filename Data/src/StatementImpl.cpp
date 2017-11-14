@@ -1,8 +1,6 @@
 //
 // StatementImpl.cpp
 //
-// $Id: //poco/Main/Data/src/StatementImpl.cpp#20 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  StatementImpl
@@ -44,6 +42,9 @@ const std::string StatementImpl::DEQUE = "deque";
 const std::string StatementImpl::UNKNOWN = "unknown";
 
 
+const std::size_t StatementImpl::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
+
+
 StatementImpl::StatementImpl(SessionImpl& rSession):
 	_state(ST_INITIALIZED),
 	_extrLimit(upperLimit(Limit::LIMIT_UNLIMITED, false)),
@@ -53,7 +54,8 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_ostr(),
 	_curDataSet(0),
 	_bulkBinding(BULK_UNDEFINED),
-	_bulkExtraction(BULK_UNDEFINED)
+	_bulkExtraction(BULK_UNDEFINED),
+	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 {
 	if (!_rSession.isConnected())
 		throw NotConnectedException(_rSession.connectionString());
@@ -69,9 +71,9 @@ StatementImpl::~StatementImpl()
 }
 
 
-std::size_t StatementImpl::execute(const bool& reset)
+std::size_t StatementImpl::execute(const bool& rReset)
 {
-	if (reset) resetExtraction();
+	if (rReset) resetExtraction();
 
 	if (!_rSession.isConnected())
 	{
@@ -87,9 +89,15 @@ std::size_t StatementImpl::execute(const bool& reset)
 	{
 		compile();
 		if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
+		{
 			lim += executeWithoutLimit();
+			assignSubTotal(true);
+		}
 		else
+		{
 			lim += executeWithLimit();
+			assignSubTotal(false);
+		}
 	} while (canCompile());
 
 	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
@@ -98,26 +106,24 @@ std::size_t StatementImpl::execute(const bool& reset)
 	if (lim < _lowerLimit)
 		throw LimitException("Did not receive enough data.");
 
-	assignSubTotal(reset);
-
 	return lim;
 }
 
 
-void StatementImpl::assignSubTotal(bool reset)
+void StatementImpl::assignSubTotal(bool doReset)
 {
 	if (_extractors.size() == _subTotalRowCount.size())
 	{
-		CountVec::iterator it  = _subTotalRowCount.begin();
+		CountVec::iterator it = _subTotalRowCount.begin();
 		CountVec::iterator end = _subTotalRowCount.end();
-		for (int counter = 0; it != end; ++it, ++counter)
+		for (size_t counter = 0; it != end; ++it, ++counter)
 		{
 			if (_extractors[counter].size())
 			{
-				if (reset)
-					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
-				else
+				if (doReset)
 					*it = CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
+				else
+					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
 			}
 		}
 	}
@@ -133,18 +139,25 @@ std::size_t StatementImpl::executeWithLimit()
 	do
 	{
 		bind();
-		while (count < limit && hasNext()) 
+		while (count < limit && hasNext())
 			count += next();
 	} while (count < limit && canBind());
 
-	if (!canBind() && (!hasNext() || limit == 0)) 
+	if (!canBind() && (!hasNext() || limit == 0))
 		_state = ST_DONE;
-	else if (hasNext() && limit == count && _extrLimit.isHardLimit())
+	else if (limit == count && _extrLimit.isHardLimit() && hasNext())
 		throw LimitException("HardLimit reached (retrieved more data than requested).");
-	else 
+	else
 		_state = ST_PAUSED;
 
-	return count ? count : affectedRowCount();
+	int affectedRows = affectedRowCount();
+	if (count == 0)
+	{
+		if (affectedRows > 0)
+			return affectedRows;
+	}
+
+	return count;
 }
 
 
@@ -159,14 +172,21 @@ std::size_t StatementImpl::executeWithoutLimit()
 		while (hasNext()) count += next();
 	} while (canBind());
 
-	return count ? count : affectedRowCount();
+	int affectedRows = affectedRowCount();
+	if (count == 0)
+	{
+		if (affectedRows > 0)
+			return affectedRows;
+	}
+
+	return count;
 }
 
 
 void StatementImpl::compile()
 {
-	if (_state == ST_INITIALIZED || 
-		_state == ST_RESET || 
+	if (_state == ST_INITIALIZED ||
+		_state == ST_RESET ||
 		_state == ST_BOUND)
 	{
 		compileImpl();
@@ -232,10 +252,6 @@ void StatementImpl::setBulkExtraction(const Bulk& b)
 
 void StatementImpl::fixupExtraction()
 {
-	CountVec::iterator sIt  = _subTotalRowCount.begin();
-	CountVec::iterator sEnd = _subTotalRowCount.end();
-	for (; sIt != sEnd; ++sIt) *sIt = 0;
-
 	if (_curDataSet >= _columnsExtracted.size())
 	{
 		_columnsExtracted.resize(_curDataSet + 1, 0);
@@ -286,7 +302,7 @@ void StatementImpl::setStorage(const std::string& storage)
 	if (0 == icompare(DEQUE, storage))
 		_storage = STORAGE_DEQUE_IMPL;
 	else if (0 == icompare(VECTOR, storage))
-		_storage = STORAGE_VECTOR_IMPL; 
+		_storage = STORAGE_VECTOR_IMPL;
 	else if (0 == icompare(LIST, storage))
 		_storage = STORAGE_LIST_IMPL;
 	else if (0 == icompare(UNKNOWN, storage))
@@ -298,45 +314,53 @@ void StatementImpl::setStorage(const std::string& storage)
 
 void StatementImpl::makeExtractors(std::size_t count)
 {
+	// type cast is needed when size_t is 64 bit
+	makeExtractors(count, static_cast<Position::Type>(currentDataSet()));
+}
+
+void StatementImpl::makeExtractors(std::size_t count, const Position& position)
+{
 	for (int i = 0; i < count; ++i)
 	{
-		const MetaColumn& mc = metaColumn(i);
+		const MetaColumn& mc = metaColumn(i, position.value());
 		switch (mc.type())
 		{
 			case MetaColumn::FDT_BOOL:
-				addInternalExtract<bool>(mc); break;
-			case MetaColumn::FDT_INT8:  
-				addInternalExtract<Int8>(mc); break;
-			case MetaColumn::FDT_UINT8:  
-				addInternalExtract<UInt8>(mc); break;
-			case MetaColumn::FDT_INT16:  
-				addInternalExtract<Int16>(mc); break;
-			case MetaColumn::FDT_UINT16: 
-				addInternalExtract<UInt16>(mc); break;
-			case MetaColumn::FDT_INT32:  
-				addInternalExtract<Int32>(mc); break;
-			case MetaColumn::FDT_UINT32: 
-				addInternalExtract<UInt32>(mc); break;
-			case MetaColumn::FDT_INT64:  
-				addInternalExtract<Int64>(mc); break;
-			case MetaColumn::FDT_UINT64: 
-				addInternalExtract<UInt64>(mc); break;
-			case MetaColumn::FDT_FLOAT:  
-				addInternalExtract<float>(mc); break;
-			case MetaColumn::FDT_DOUBLE: 
-				addInternalExtract<double>(mc); break;
-			case MetaColumn::FDT_STRING: 
-				addInternalExtract<std::string>(mc); break;
+				addInternalExtract<bool>(mc, position.value()); break;
+			case MetaColumn::FDT_INT8:
+				addInternalExtract<Int8>(mc, position.value()); break;
+			case MetaColumn::FDT_UINT8:
+				addInternalExtract<UInt8>(mc, position.value()); break;
+			case MetaColumn::FDT_INT16:
+				addInternalExtract<Int16>(mc, position.value()); break;
+			case MetaColumn::FDT_UINT16:
+				addInternalExtract<UInt16>(mc, position.value()); break;
+			case MetaColumn::FDT_INT32:
+				addInternalExtract<Int32>(mc, position.value()); break;
+			case MetaColumn::FDT_UINT32:
+				addInternalExtract<UInt32>(mc, position.value()); break;
+			case MetaColumn::FDT_INT64:
+				addInternalExtract<Int64>(mc, position.value()); break;
+			case MetaColumn::FDT_UINT64:
+				addInternalExtract<UInt64>(mc, position.value()); break;
+			case MetaColumn::FDT_FLOAT:
+				addInternalExtract<float>(mc, position.value()); break;
+			case MetaColumn::FDT_DOUBLE:
+				addInternalExtract<double>(mc, position.value()); break;
+			case MetaColumn::FDT_STRING:
+				addInternalExtract<std::string>(mc, position.value()); break;
 			case MetaColumn::FDT_WSTRING:
-				addInternalExtract<Poco::UTF16String>(mc); break;
-			case MetaColumn::FDT_BLOB:   
-				addInternalExtract<BLOB>(mc); break;
+				addInternalExtract<Poco::UTF16String>(mc, position.value()); break;
+			case MetaColumn::FDT_BLOB:
+				addInternalExtract<BLOB>(mc, position.value()); break;
+			case MetaColumn::FDT_CLOB:
+				addInternalExtract<CLOB>(mc, position.value()); break;
 			case MetaColumn::FDT_DATE:
-				addInternalExtract<Date>(mc); break;
+				addInternalExtract<Date>(mc, position.value()); break;
 			case MetaColumn::FDT_TIME:
-				addInternalExtract<Time>(mc); break;
+				addInternalExtract<Time>(mc, position.value()); break;
 			case MetaColumn::FDT_TIMESTAMP:
-				addInternalExtract<DateTime>(mc); break;
+				addInternalExtract<DateTime>(mc, position.value()); break;
 			default:
 				throw Poco::InvalidArgumentException("Data type not supported.");
 		}
@@ -349,7 +373,7 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	std::size_t cols = columnsReturned();
 	for (std::size_t i = 0; i < cols; ++i)
 	{
-		const MetaColumn& column = metaColumn(i);
+		const MetaColumn& column = metaColumn(i, currentDataSet());
 		if (0 == icompare(column.name(), name)) return column;
 	}
 
@@ -359,8 +383,7 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 
 std::size_t StatementImpl::activateNextDataSet()
 {
-	if (_curDataSet + 1 < dataSetCount())
-		return ++_curDataSet;
+	if (_curDataSet + 1 < dataSetCount()) return ++_curDataSet;
 	else
 		throw NoDataException("End of data sets reached.");
 }
@@ -368,8 +391,7 @@ std::size_t StatementImpl::activateNextDataSet()
 
 std::size_t StatementImpl::activatePreviousDataSet()
 {
-	if (_curDataSet > 0)
-		return --_curDataSet;
+	if (_curDataSet > 0) return --_curDataSet;
 	else
 		throw NoDataException("Beginning of data sets reached.");
 }
@@ -379,7 +401,7 @@ void StatementImpl::addExtract(AbstractExtraction::Ptr pExtraction)
 {
 	poco_check_ptr (pExtraction);
 	std::size_t pos = pExtraction->position();
-	if (pos >= _extractors.size()) 
+	if (pos >= _extractors.size())
 		_extractors.resize(pos + 1);
 
 	pExtraction->setEmptyStringIsNull(
@@ -399,7 +421,7 @@ void StatementImpl::removeBind(const std::string& name)
 	AbstractBindingVec::iterator it = _bindings.begin();
 	for (; it != _bindings.end();)
 	{
-		if ((*it)->name() == name) 
+		if ((*it)->name() == name)
 		{
 			it = _bindings.erase(it);
 			found = true;
@@ -434,7 +456,7 @@ std::size_t StatementImpl::rowsExtracted(int dataSet) const
 		if (_extractors[dataSet].size() > 0)
 			return _extractors[dataSet][0]->numOfRowsHandled();
 	}
-	
+
 	return 0;
 }
 
@@ -460,5 +482,9 @@ void StatementImpl::formatSQL(std::vector<Any>& arguments)
 	_ostr << sql;
 }
 
+
+void StatementImpl::insertHint()
+{
+}
 
 } } // namespace Poco::Data

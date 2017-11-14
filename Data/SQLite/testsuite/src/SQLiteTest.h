@@ -1,8 +1,6 @@
 //
 // SQLiteTest.h
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/SQLiteTest.h#4 $
-//
 // Definition of the SQLiteTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Data/SQLite/SQLite.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 namespace Poco {
@@ -35,6 +33,7 @@ public:
 	~SQLiteTest();
 
 	void testBinding();
+	void testZeroRows();
 	void testSimpleAccess();
 	void testInMemory();
 	void testNullCharPointer();
@@ -106,6 +105,8 @@ public:
 	void testNullable();
 	void testNulls();
 	void testRowIterator();
+	void testRowIteratorLimit();
+	void testFilter();
 	void testAsync();
 
 	void testAny();
@@ -134,6 +135,10 @@ public:
 
 	void testFTS3();
 
+	void testJSONRowFormatter();
+
+	void testIncrementVacuum();
+
 	void setUp();
 	void tearDown();
 
@@ -151,6 +156,7 @@ public:
 
 private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
+	void checkJSON(const std::string& sql, const std::string& json, int mode = 0);
 
 	static int _insertCounter;
 	static int _updateCounter;

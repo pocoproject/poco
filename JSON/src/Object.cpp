@@ -1,8 +1,6 @@
 //
 // Object.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Object
@@ -26,21 +24,71 @@ namespace Poco {
 namespace JSON {
 
 
-Object::Object(bool preserveInsertionOrder): _preserveInsOrder(preserveInsertionOrder)
+Object::Object(bool preserveInsOrder):
+	_preserveInsOrder(preserveInsOrder),
+	_modified(false)
 {
 }
 
 
 Object::Object(const Object& copy) : _values(copy._values),
-	_keys(copy._keys),
 	_preserveInsOrder(copy._preserveInsOrder),
-	_pStruct(0)
+	_pStruct(!copy._modified ? copy._pStruct : 0),
+	_modified(copy._modified)
+{
+	if (_preserveInsOrder)
+	{
+		// need to update pointers in _keys to point to copied _values
+		for (KeyPtrList::const_iterator it = copy._keys.begin(); it != copy._keys.end(); ++it)
+		{
+			ValueMap::const_iterator itv = _values.find(**it);
+			poco_assert (itv != _values.end());
+			_keys.push_back(&itv->first);
+		}
+	}
+}
+
+
+Object::Object(Object&& other) :
+	_values(std::move(other._values)),
+	_keys(std::move(other._keys)),
+	_preserveInsOrder(other._preserveInsOrder),
+	_pStruct(!other._modified ? other._pStruct : 0),
+	_modified(other._modified)
 {
 }
 
 
 Object::~Object()
 {
+}
+
+
+Object &Object::operator= (const Object &other)
+{
+	if (&other != this)
+	{
+		_values = other._values;
+		_keys = other._keys;
+		_preserveInsOrder = other._preserveInsOrder;
+		_pStruct = !other._modified ? other._pStruct : 0;
+		_modified = other._modified;
+	}
+	return *this;
+}
+
+
+Object &Object::operator= (Object &&other)
+{
+	if (&other != this)
+	{
+		_values = std::move(other._values);
+		_keys = std::move(other._keys);
+		_preserveInsOrder = other._preserveInsOrder;
+		_pStruct = !other._modified ? other._pStruct : 0;
+		_modified = other._modified;
+	}
+	return *this;
 }
 
 
@@ -83,7 +131,7 @@ Object::Ptr Object::getObject(const std::string& key) const
 void Object::getNames(std::vector<std::string>& names) const
 {
 	names.clear();
-	for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+	for (ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
 	{
 		names.push_back(it->first);
 	}
@@ -94,7 +142,7 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
 	if (step < 0) step = indent;
 
-	if(!_preserveInsOrder)
+	if (!_preserveInsOrder)
 		doStringify(_values, out, indent, step);
 	else
 		doStringify(_keys, out, indent, step);
@@ -107,16 +155,17 @@ const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
 	ValueMap::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		if (&it->second == *iter) return it->first;
+		if (it->first == **iter) return it->first;
 	}
 
-	throw NotFoundException((*iter)->convert<std::string>());
+	throw NotFoundException(**iter);
 }
 
 
 void Object::set(const std::string& key, const Dynamic::Var& value)
 {
-	_values[key] = value;
+	std::pair<ValueMap::iterator, bool> ret = _values.insert(ValueMap::value_type(key, value));
+	if (!ret.second) ret.first->second = value;
 	if (_preserveInsOrder)
 	{
 		KeyPtrList::iterator it = _keys.begin();
@@ -125,8 +174,9 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 		{
 			if (key == **it) return;
 		}
-		_keys.push_back(&_values[key]);
+		_keys.push_back(&ret.first->first);
 	}
+	_modified = true;
 }
 
 
@@ -158,13 +208,26 @@ Poco::DynamicStruct Object::makeStruct(const Object::Ptr& obj)
 }
 
 
-Object::operator const Poco::DynamicStruct& () const
+void Object::resetDynStruct() const
 {
 	if (!_pStruct)
+		_pStruct = new Poco::DynamicStruct;
+	else
+		_pStruct->clear();
+}
+
+
+Object::operator const Poco::DynamicStruct& () const
+{
+	if (!_values.size())
+	{
+		resetDynStruct();
+	}
+	else if (_modified)
 	{
 		ValueMap::const_iterator it = _values.begin();
 		ValueMap::const_iterator end = _values.end();
-		_pStruct = new Poco::DynamicStruct;
+		resetDynStruct();
 		for (; it != end; ++it)
 		{
 			if (isObject(it))
@@ -191,6 +254,7 @@ void Object::clear()
 	_values.clear();
 	_keys.clear();
 	_pStruct = 0;
+	_modified = true;
 }
 
 

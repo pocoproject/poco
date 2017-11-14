@@ -1,8 +1,6 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -17,16 +15,39 @@
 #include "Poco/File_UNIX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#if defined(POCO_OS_FAMILY_BSD)
+#include <sys/param.h>
+#include <sys/mount.h>
+#elif (POCO_OS == POCO_OS_SOLARIS)
+#include <sys/statvfs.h>
+#else
+#include <sys/statfs.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <utime.h>
 #include <cstring>
 
+#if (POCO_OS == POCO_OS_SOLARIS)
+#define STATFSFN statvfs
+#define STATFSSTRUCT statvfs
+#else
+#define STATFSFN statfs
+#define STATFSSTRUCT statfs
+#endif
+
+namespace{
+// Convert timespec structures (seconds and remaining nano secs) to TimeVal (microseconds)
+Poco::Timestamp::TimeVal timespec2Microsecs(const struct timespec &ts) {
+	return ts.tv_sec * 1000000L + ts.tv_nsec / 1000L;
+}
+} // namespace
 
 namespace Poco {
 
@@ -195,20 +216,34 @@ bool FileImpl::isHiddenImpl() const
 Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
-
+// first, platforms with birthtime attributes
 #if defined(__APPLE__) && defined(st_birthtime) && !defined(POCO_NO_STAT64) // st_birthtime is available only on 10.5
+	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
-		return Timestamp::fromEpochTime(st.st_birthtime);
+		return Timestamp(timespec2Microsecs(st.st_birthtimespec));
+#elif defined(__FreeBSD__) && defined(st_birthtime)
+	// a macro st_birthtime makes sure there is a st_birthtimespec (nano sec precision)
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return Timestamp(timespec2Microsecs(st.st_birthtimespec));
 #elif defined(__FreeBSD__)
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);
+// then platforms with POSIX 2008-09 compatibility (nanosec precision)
+// (linux 2.6 and later)
+#elif (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L) \
+	|| (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700)
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return Timestamp(timespec2Microsecs(st.st_ctim));
+// finally try just stat with status change with precision to the second.
 #else
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_ctime);
-#endif 
+#endif
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -220,8 +255,17 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (stat(_path.c_str(), &st) == 0) {
+#if (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L) \
+	|| (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700) \
+	|| defined(_BSD_SOURCE) || defined(_SVID_SOURCE)
+		return Timestamp(timespec2Microsecs(st.st_mtim));
+#elif defined(__APPLE__)
+		return Timestamp(timespec2Microsecs(st.st_mtimespec));
+#else
 		return Timestamp::fromEpochTime(st.st_mtime);
+#endif
+	}
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -232,10 +276,11 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 {
 	poco_assert (!_path.empty());
 
-	struct utimbuf tb;
-	tb.actime  = ts.epochTime();
-	tb.modtime = ts.epochTime();
-	if (utime(_path.c_str(), &tb) != 0)
+	struct timeval tb[2];
+	tb[0].tv_sec  = ts.epochMicroseconds() / 1000000;
+	tb[0].tv_usec  = ts.epochMicroseconds() % 1000000;
+	tb[1] = tb[0];
+	if (utimes(_path.c_str(), tb) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -267,7 +312,7 @@ void FileImpl::setWriteableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -279,7 +324,7 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode_t wmask = S_IWUSR | S_IWGRP | S_IWOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -289,19 +334,23 @@ void FileImpl::setExecutableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
 	{
 		mode = st.st_mode | S_IXUSR;
+		if (st.st_mode & S_IRGRP)
+			mode |= S_IXGRP;
+		if (st.st_mode & S_IROTH)
+			mode |= S_IXOTH;
 	}
 	else
 	{
 		mode_t wmask = S_IXUSR | S_IXGRP | S_IXOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -314,7 +363,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0) 
+	if (fstat(sd, &st) != 0)
 	{
 		close(sd);
 		handleLastErrorImpl(_path);
@@ -333,7 +382,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		int n;
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n) 
+			if (write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -346,7 +395,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		throw;
 	}
 	close(sd);
-	if (fsync(dd) != 0) 
+	if (fsync(dd) != 0)
 	{
 		close(dd);
 		handleLastErrorImpl(path);
@@ -381,7 +430,7 @@ void FileImpl::removeImpl()
 bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
-	
+
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
@@ -402,9 +451,45 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
+	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 		handleLastErrorImpl(_path);
 	return true;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
 }
 
 
@@ -434,7 +519,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw FileException("disk quota exceeded", path, errno);
 #if !defined(_AIX)
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path, errno);
+		throw DirectoryNotEmptyException(path, errno);
 #endif
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path, errno);
@@ -442,7 +527,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path, errno);
 	default:
-		throw FileException(std::strerror(errno), path, errno);
+		throw FileException(Error::getMessage(errno), path, errno);
 	}
 }
 

@@ -1,8 +1,6 @@
 //
 // DirectoryWatcherTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryWatcherTest.cpp#1 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -16,8 +14,8 @@
 #ifndef POCO_NO_INOTIFY
 
 
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Delegate.h"
 #include "Poco/FileStream.h"
@@ -26,8 +24,8 @@
 using Poco::DirectoryWatcher;
 
 
-DirectoryWatcherTest::DirectoryWatcherTest(const std::string& name): 
-	CppUnit::TestCase(name),
+DirectoryWatcherTest::DirectoryWatcherTest(const std::string& rName):
+	CppUnit::TestCase(rName),
 	_error(false)
 {
 }

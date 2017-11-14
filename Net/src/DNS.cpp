@@ -1,8 +1,6 @@
 //
 // DNS.cpp
 //
-// $Id: //poco/1.4/Net/src/DNS.cpp#10 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  DNS
@@ -42,7 +40,7 @@ static Poco::RWLock resolverLock;
 #endif
 
 
-HostEntry DNS::hostByName(const std::string& hostname, unsigned 
+HostEntry DNS::hostByName(const std::string& hostname, unsigned
 #ifdef POCO_HAVE_ADDRINFO
 						  hintFlags
 #endif
@@ -57,7 +55,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_flags = hintFlags;
-	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI); 
+	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI);
 	if (rc == 0)
 	{
 		HostEntry result(pAI);
@@ -86,7 +84,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 }
 
 
-HostEntry DNS::hostByAddress(const IPAddress& address, unsigned 
+HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 #ifdef POCO_HAVE_ADDRINFO
 							 hintFlags
 #endif
@@ -99,7 +97,7 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 #if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
 	static char fqname[1024];
-	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD); 
+	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD);
 	if (rc == 0)
 	{
 		struct addrinfo* pAI;

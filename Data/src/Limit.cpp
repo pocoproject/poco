@@ -1,8 +1,6 @@
 //
 // Limit.cpp
 //
-// $Id: //poco/Main/Data/src/Limit.cpp#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Limit
@@ -21,10 +19,10 @@ namespace Poco {
 namespace Data {
 
 
-Limit::Limit(SizeT value, bool hardLimit, bool isLowerLimit) :
-	_value(value),
+Limit::Limit(SizeT limitValue, bool hardLimit, bool lowerLimit) :
+	_value(limitValue),
 	_hardLimit(hardLimit),
-	_isLowerLimit(isLowerLimit)
+	_isLowerLimit(lowerLimit)
 {
 }
 

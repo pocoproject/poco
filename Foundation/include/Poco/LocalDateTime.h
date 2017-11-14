@@ -1,8 +1,6 @@
 //
 // LocalDateTime.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LocalDateTime.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  LocalDateTime
@@ -29,17 +27,17 @@ namespace Poco {
 
 class Foundation_API LocalDateTime
 	/// This class represents an instant in local time
-	/// (as opposed to UTC), expressed in years, months, days, 
-	/// hours, minutes, seconds and milliseconds based on the 
+	/// (as opposed to UTC), expressed in years, months, days,
+	/// hours, minutes, seconds and milliseconds based on the
 	/// Gregorian calendar.
 	///
-	/// In addition to the date and time, the class also 
+	/// In addition to the date and time, the class also
 	/// maintains a time zone differential, which denotes
 	/// the difference in seconds from UTC to local time,
 	/// i.e. UTC = local time - time zone differential.
 	///
 	/// Although LocalDateTime supports relational and arithmetic
-	/// operators, all date/time comparisons and date/time arithmetics
+	/// operators, all date/time comparisons and date/time arithmetic
 	/// should be done in UTC, using the DateTime or Timestamp
 	/// class for better performance. The relational operators
 	/// normalize the dates/times involved to UTC before carrying out
@@ -55,7 +53,7 @@ class Foundation_API LocalDateTime
 {
 public:
 	LocalDateTime();
-		/// Creates a LocalDateTime with the current date/time 
+		/// Creates a LocalDateTime with the current date/time
 		/// for the current time zone.
 
 	LocalDateTime(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
@@ -96,7 +94,7 @@ public:
 	//@ deprecated
 	LocalDateTime(int tzd, const DateTime& dateTime, bool adjust);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
-		/// using the given time zone differential. If adjust is true, 
+		/// using the given time zone differential. If adjust is true,
 		/// adjusts dateTime for the given time zone differential.
 
 	LocalDateTime(double julianDay);
@@ -164,18 +162,18 @@ public:
 	int week(int firstDayOfWeek = DateTime::MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
-		/// The returned week number will be from 0 to 53. Week number 1 is the week 
+		/// The returned week number will be from 0 to 53. Week number 1 is the week
 		/// containing January 4. This is in accordance to ISO 8601.
-		/// 
+		///
 		/// The following example assumes that firstDayOfWeek is MONDAY. For 2005, which started
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
 		///
-		/// For 2007, which starts on a Monday, week 1 will be the week startung on Monday, January 1.
+		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
 	
 	int day() const;
-		/// Returns the day witin the month (1 to 31).
+		/// Returns the day within the month (1 to 31).
 		
 	int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
@@ -210,7 +208,7 @@ public:
 		/// Returns the microsecond (0 to 999)
 	
 	double julianDay() const;
-		/// Returns the julian day for the date.
+		/// Returns the Julian day for the date.
 
 	int tzd() const;
 		/// Returns the time zone differential.

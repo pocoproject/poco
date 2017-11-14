@@ -1,8 +1,6 @@
 //
 // ActiveMethodTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActiveMethodTest.h#1 $
-//
 // Definition of the ActiveMethodTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ActiveMethodTest: public CppUnit::TestCase

@@ -1,8 +1,6 @@
 //
 // DocumentType.cpp
 //
-// $Id: //poco/1.4/XML/src/DocumentType.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -24,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId): 
+DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
 	AbstractContainerNode(pOwner),
 	_name(name),
 	_publicId(publicId),
@@ -33,7 +31,7 @@ DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLStr
 }
 
 
-DocumentType::DocumentType(Document* pOwner, const DocumentType& doctype): 
+DocumentType::DocumentType(Document* pOwner, const DocumentType& doctype):
 	AbstractContainerNode(pOwner, doctype),
 	_name(doctype._name),
 	_publicId(doctype._publicId),

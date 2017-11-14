@@ -1,8 +1,6 @@
 //
 // Page.cpp
 //
-// $Id: //poco/Main/PDF/src/Page.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Page
@@ -28,7 +26,7 @@ namespace PDF {
 Page::Page(HPDF_Doc* pPDF,
 	const HPDF_Page& page,
 	Size pageSize,
-	Orientation orientation): 
+	Orientation orientation):
 	_pPDF(pPDF),
 	_page(page),
 	_size(pageSize),
@@ -38,7 +36,7 @@ Page::Page(HPDF_Doc* pPDF,
 }
 
 
-Page::Page(const Page& other): 
+Page::Page(const Page& other):
 	_pPDF(other._pPDF),
 	_page(other._page),
 	_size(other._size),
@@ -111,11 +109,11 @@ void Page::setRotation(int angle)
 const Destination& Page::createDestination(const std::string& name)
 {
 	DestinationContainer::iterator it = _destinations.find(name);
-	if (_destinations.end() != it) 
+	if (_destinations.end() != it)
 		throw InvalidArgumentException("Destination already exists.");
 
 	Destination dest(_pPDF, HPDF_Page_CreateDestination(_page), name);
-	std::pair<DestinationContainer::iterator, bool> ret = 
+	std::pair<DestinationContainer::iterator, bool> ret =
 		_destinations.insert(DestinationContainer::value_type(name, dest));
 
 	if (ret.second) return ret.first->second;
@@ -124,20 +122,20 @@ const Destination& Page::createDestination(const std::string& name)
 }
 
 
-const TextAnnotation& Page::createTextAnnotation(const std::string& name, 
+const TextAnnotation& Page::createTextAnnotation(const std::string& name,
 	const Rectangle& rect,
 	const std::string& text,
 	const Encoder& encoder)
 {
 	TextAnnotationContainer::iterator it = _textAnnotations.find(name);
-	if (_textAnnotations.end() != it) 
+	if (_textAnnotations.end() != it)
 		throw InvalidArgumentException("Annotation already exists.");
 
 	TextAnnotation ann(_pPDF,
 		HPDF_Page_CreateTextAnnot(_page, rect, text.c_str(), encoder),
 		name);
 
-	std::pair<TextAnnotationContainer::iterator, bool> ret = 
+	std::pair<TextAnnotationContainer::iterator, bool> ret =
 		_textAnnotations.insert(TextAnnotationContainer::value_type(name, ann));
 
 	if (ret.second) return ret.first->second;
@@ -146,18 +144,18 @@ const TextAnnotation& Page::createTextAnnotation(const std::string& name,
 }
 
 
-const LinkAnnotation& Page::createLinkAnnotation(const std::string& name, 
+const LinkAnnotation& Page::createLinkAnnotation(const std::string& name,
 	const Rectangle& rect,
 	const Destination& dest)
 {
 	LinkAnnotationContainer::iterator it = _linkAnnotations.find(name);
-	if (_linkAnnotations.end() != it) 
+	if (_linkAnnotations.end() != it)
 		throw InvalidArgumentException("Annotation already exists.");
 
 	LinkAnnotation ann(_pPDF,
 		HPDF_Page_CreateLinkAnnot(_page, rect, dest),
 		name);
-	std::pair<LinkAnnotationContainer::iterator, bool> ret = 
+	std::pair<LinkAnnotationContainer::iterator, bool> ret =
 		_linkAnnotations.insert(LinkAnnotationContainer::value_type(name, ann));
 
 	if (ret.second) return ret.first->second;
@@ -166,18 +164,18 @@ const LinkAnnotation& Page::createLinkAnnotation(const std::string& name,
 }
 
 
-const LinkAnnotation& Page::createURILinkAnnotation(const std::string& name, 
+const LinkAnnotation& Page::createURILinkAnnotation(const std::string& name,
 	const Rectangle& rect,
 	const std::string& uri)
 {
 	LinkAnnotationContainer::iterator it = _linkAnnotations.find(name);
-	if (_linkAnnotations.end() != it) 
+	if (_linkAnnotations.end() != it)
 		throw InvalidArgumentException("Annotation already exists.");
 
 	LinkAnnotation ann(_pPDF,
 		HPDF_Page_CreateURILinkAnnot(_page, rect, uri.c_str()),
 		name);
-	std::pair<LinkAnnotationContainer::iterator, bool> ret = 
+	std::pair<LinkAnnotationContainer::iterator, bool> ret =
 		_linkAnnotations.insert(LinkAnnotationContainer::value_type(name, ann));
 
 	if (ret.second) return ret.first->second;

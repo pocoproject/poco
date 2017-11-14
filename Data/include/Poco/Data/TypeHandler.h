@@ -1,8 +1,6 @@
 //
 // TypeHandler.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/TypeHandler.h#13 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  TypeHandler
@@ -30,13 +28,14 @@
 #include "Poco/SharedPtr.h"
 #include <cstddef>
 
+#include <tuple>
 
 namespace Poco {
 namespace Data {
 
 
 class AbstractTypeHandler
-	/// Parent class for type handlers. 
+	/// Parent class for type handlers.
 	/// The reason for this class is to prevent instantiations of type handlers.
 	/// For documentation on type handlers, see TypeHandler class.
 {
@@ -61,7 +60,7 @@ class TypeHandler: public AbstractTypeHandler
 	///		int		 _age;
 	///	public:
 	///		const std::string& getLastName();
-	///		[...] // other set/get methods (returning const reference), a default constructor, 
+	///		[...] // other set/get methods (returning const reference), a default constructor,
 	///		[...] // optional < operator (for set, multiset) or function operator (for map, multimap)
 	///	};
 	///
@@ -97,7 +96,7 @@ class TypeHandler: public AbstractTypeHandler
 	///	
 	///		static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor::Ptr pExt)
 	///		{
-	///			// defVal is the default person we should use if we encunter NULL entries, so we take the individual fields
+	///			// defVal is the default person we should use if we encounter NULL entries, so we take the individual fields
 	///			// as defaults. You can do more complex checking, ie return defVal if only one single entry of the fields is null etc...
 	///			poco_assert_dbg (!pExt.isNull());
 	///			std::string lastName;
@@ -251,52 +250,70 @@ private:
 };
 
 template <typename T>
-class TypeHandler<Nullable<T> > 
+class TypeHandler<Nullable<T> >
 	/// Specialization of type handler for Nullable.
 {
+	class NullHandler : public AbstractBinder::WhenNullCb
+	{
+	public:
+		explicit NullHandler(const Nullable<T>& obj)
+		{
+			_data = &const_cast<Nullable<T>&>(obj);
+			_func = handle;
+		}
+	private:
+		static void handle(void* ptr)
+		{
+			reinterpret_cast<Nullable<T>*>(ptr)->clear();
+		}
+	};
+
 public:
 
-	static void bind(std::size_t pos, const Nullable<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir) 
+	static void bind(std::size_t pos, const Nullable<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		poco_assert_dbg (!pBinder.isNull());
-		if (obj.isNull()) 
+		if (obj.isNull())
 		{
-			pBinder->bind(pos++, Poco::Data::Keywords::null, dir);
+			pBinder->bind(pos++, NullValue::nullCode<T>(), dir, typeid(T));
 		}
-		else 
+		else
 		{
-			pBinder->bind(pos++, obj.value(), dir);
+			if (AbstractBinder::isOutBound(dir))
+				pBinder->bind(pos++, obj.value(), dir, NullHandler(obj));
+			else
+				pBinder->bind(pos++, obj.value(), dir);
 		}
 	}
 	
-	static void prepare(std::size_t pos, const Nullable<T>& obj, AbstractPreparator::Ptr pPreparator) 
+	static void prepare(std::size_t pos, const Nullable<T>& obj, AbstractPreparator::Ptr pPreparator)
 	{
 		poco_assert_dbg (!pPreparator.isNull());
-		if (obj.isNull()) 
+		if (obj.isNull())
 		{
-			pPreparator->prepare(pos++, Poco::Data::Keywords::null);
+			pPreparator->prepare(pos++, NullValue::nullCode<T>());
 		}
-		else 
+		else
 		{
 			pPreparator->prepare(pos++, obj.value());
 		}
 	}
 
-	static std::size_t size() 
+	static std::size_t size()
 	{
 		return 1u;
 	}
 
-	static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor::Ptr pExt) 
+	static void extract(std::size_t pos, Nullable<T>& obj, const Nullable<T>& , AbstractExtractor::Ptr pExt)
 	{
 		poco_assert_dbg (!pExt.isNull());
 		T val;
 	
-		if (pExt->extract(pos++, val)) 
+		if (pExt->extract(pos++, val))
 		{
 			obj = val;
 		}
-		else 
+		else
 		{
 			obj.clear();
 		}
@@ -345,25 +362,25 @@ void tupleExtract(std::size_t& pos, TupleType tuple, DefValType defVal, Abstract
 }
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
-	class T13, 
-	class T14, 
-	class T15, 
-	class T16, 
-	class T17, 
-	class T18, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
+	class T16,
+	class T17,
+	class T18,
 	class T19>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >
 {
@@ -476,24 +493,24 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
-	class T13, 
-	class T14, 
-	class T15, 
-	class T16, 
-	class T17, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
+	class T16,
+	class T17,
 	class T18>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >
 {
@@ -602,23 +619,23 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
-	class T13, 
-	class T14, 
-	class T15, 
-	class T16, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
+	class T16,
 	class T17>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >
 {
@@ -723,22 +740,22 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
-	class T13, 
-	class T14, 
-	class T15, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
+	class T15,
 	class T16>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >
 {
@@ -839,21 +856,21 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
-	class T13, 
-	class T14, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
+	class T14,
 	class T15>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >
 {
@@ -950,20 +967,20 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
-	class T13, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
+	class T13,
 	class T14>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >
 {
@@ -1056,19 +1073,19 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
-	class T12, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
+	class T12,
 	class T13>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >
 {
@@ -1157,18 +1174,18 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
-	class T11, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
+	class T11,
 	class T12>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >
 {
@@ -1253,17 +1270,17 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
-	class T10, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
+	class T10,
 	class T11>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >
 {
@@ -1344,16 +1361,16 @@ private:
 };
 
 
-template <class T0, 
-	class T1, 
-	class T2, 
-	class T3, 
-	class T4, 
-	class T5, 
-	class T6, 
-	class T7, 
-	class T8, 
-	class T9, 
+template <class T0,
+	class T1,
+	class T2,
+	class T3,
+	class T4,
+	class T5,
+	class T6,
+	class T7,
+	class T8,
+	class T9,
 	class T10>
 class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >
 {
@@ -1958,7 +1975,7 @@ public:
 		return TypeHandler<T0>::size();
 	}
 
-	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal, 
+	static void extract(std::size_t pos, TupleRef tuple, TupleConstRef defVal,
 		AbstractExtractor::Ptr pExt)
 	{
 		poco_assert_dbg (!pExt.isNull());
@@ -2015,7 +2032,7 @@ public:
 	static void bind(std::size_t pos, const Poco::AutoPtr<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		// *obj will trigger a nullpointer exception if empty: this is on purpose
-		TypeHandler<T>::bind(pos, *obj, pBinder, dir); 
+		TypeHandler<T>::bind(pos, *obj, pBinder, dir);
 	}
 
 	static std::size_t size()
@@ -2055,7 +2072,7 @@ public:
 	static void bind(std::size_t pos, const Poco::SharedPtr<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		// *obj will trigger a nullpointer exception if empty
-		TypeHandler<T>::bind(pos, *obj, pBinder, dir); 
+		TypeHandler<T>::bind(pos, *obj, pBinder, dir);
 	}
 
 	static std::size_t size()
@@ -2083,6 +2100,129 @@ public:
 private:
 	TypeHandler(const TypeHandler&);
 	TypeHandler& operator = (const TypeHandler&);
+};
+
+
+
+template<std::size_t N>
+struct TupleBind
+/// Helper for specialization of type handler for std::tuple
+{
+	template<typename... T>
+	static typename std::enable_if<N < sizeof...(T)>::type
+	bind(std::size_t& pos, const std::tuple<T...>& t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+	{
+		using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+		TypeHandler<Type>::bind(pos, std::get<N>(t), pBinder, dir);
+		pos += TypeHandler<Type>::size();
+		TupleBind<N+1>::bind(pos, t, pBinder, dir);
+	}
+
+	template<typename... T>
+	static typename std::enable_if<!(N < sizeof...(T))>::type
+	bind(std::size_t& pos, const std::tuple<T...>& t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+	{}
+};
+
+
+template<std::size_t N>
+struct TupleSize
+/// Helper for specialization of type handler for std::tuple
+{
+	template<typename... T>
+	static typename std::enable_if<N < sizeof...(T)>::type
+	size(std::size_t& sz)
+	{
+		using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+		sz += TypeHandler<Type>::size();
+		TupleSize<N+1>::size(sz);
+	}
+
+	template<typename... T>
+	static typename std::enable_if<!(N < sizeof...(T))>::type
+	size(std::size_t& sz)
+	{}
+};
+
+
+template<std::size_t N>
+struct TupleExtract
+/// Helper for specialization of type handler for std::tuple
+{
+	template<typename... T>
+	static typename std::enable_if<N < sizeof...(T)>::type
+	extract(std::size_t& pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
+	{
+		using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+		TypeHandler<Type>::extract(pos, std::get<N>(t), std::get<N>(defVal), pExt);
+		pos += TypeHandler<Type>::size();
+		TupleExtract<N+1>::extract(pos, t, defVal, pExt);
+	}
+
+	template<typename... T>
+	static typename std::enable_if<!(N < sizeof...(T))>::type
+	extract(std::size_t& pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
+	{}
+};
+
+
+template<std::size_t N>
+struct TuplePrepare
+/// Helper for specialization of type handler for std::tuple
+{
+	template<typename... T>
+	static typename std::enable_if<N < sizeof...(T)>::type
+	prepare(std::size_t& pos, const std::tuple<T...>& t, AbstractPreparator::Ptr pPreparator)
+	{
+		using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+		TypeHandler<Type>::prepare(pos, std::get<N>(t), pPreparator);
+		pos += TypeHandler<Type>::size();
+		TuplePrepare<N+1>::prepare(pos, t, pPreparator);
+	}
+
+	template<typename... T>
+	static typename std::enable_if<!(N < sizeof...(T))>::type
+	prepare(std::size_t& pos, const std::tuple<T...>& t, AbstractPreparator::Ptr pPreparator)
+	{}
+};
+
+
+
+template <typename...T>
+class TypeHandler<std::tuple<T...>>
+/// Specialization of type handler for std::tuple
+{
+public:
+	static void bind(std::size_t pos, const std::tuple<T...> & t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+	{
+		poco_assert_dbg (!pBinder.isNull());
+		TupleBind<0>::bind(pos, t, pBinder, dir);
+	}
+
+	static std::size_t size()
+	{
+		std::size_t sz = 0;
+		TupleSize<0>::size(sz);
+		return sz;
+	}
+
+	static void extract(std::size_t pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
+	{
+		poco_assert_dbg (!pExt.isNull());
+		TupleExtract<0>::extract(pos, t, defVal, pExt);
+	}
+
+	static void prepare(std::size_t pos, const std::tuple<T...> & t, AbstractPreparator::Ptr pPrepare)
+	{
+		poco_assert_dbg (!pPrepare.isNull());
+		TuplePrepare<0>::prepare(pos, t, pPrepare);
+	}
+
+private:
+	TypeHandler();
+	~TypeHandler();
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator=(const TypeHandler&);
 };
 
 

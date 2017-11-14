@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/CygLinux#2 $
-#
 # Linux
 #
 # Make settings for Linux 2.6/gcc 3.3
@@ -26,7 +24,7 @@ RANLIB  = $(TOOL)ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = $(TOOL)strip
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -41,7 +39,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -Wall -Wno-sign-compare

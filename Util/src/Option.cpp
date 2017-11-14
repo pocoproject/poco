@@ -1,8 +1,6 @@
 //
 // Option.cpp
 //
-// $Id: //poco/1.4/Util/src/Option.cpp#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  Option
@@ -29,9 +27,9 @@ namespace Poco {
 namespace Util {
 
 
-Option::Option(): 
-	_required(false), 
-	_repeatable(false), 
+Option::Option():
+	_required(false),
+	_repeatable(false),
 	_argRequired(false),
 	_pValidator(0),
 	_pCallback(0),
@@ -173,10 +171,10 @@ Option& Option::repeatable(bool flag)
 }
 
 	
-Option& Option::argument(const std::string& name, bool required)
+Option& Option::argument(const std::string& name, bool isRequired)
 {
 	_argName     = name;
-	_argRequired = required;
+	_argRequired = isRequired;
 	return *this;
 }
 
@@ -229,7 +227,7 @@ Option& Option::validator(Validator* pValidator)
 
 bool Option::matchesShort(const std::string& option) const
 {
-	return option.length() > 0 
+	return option.length() > 0
 		&& !_shortName.empty() && option.compare(0, _shortName.length(), _shortName) == 0;
 }
 
@@ -247,7 +245,7 @@ bool Option::matchesPartial(const std::string& option) const
 {
 	std::string::size_type pos = option.find_first_of(":=");
 	std::string::size_type len = pos == std::string::npos ? option.length() : pos;
-	return option.length() > 0 
+	return option.length() > 0
 		&& icompare(option, 0, len, _fullName, 0, len) == 0;
 }
 

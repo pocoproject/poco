@@ -1,8 +1,6 @@
 //
 // NTPPacket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NTPPacket.h#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPPacket
@@ -29,7 +27,7 @@ namespace Net {
 
 
 class Net_API NTPPacket
-	/// This class is the NTP packet abstraction. 
+	/// This class is the NTP packet abstraction.
 {
 public:
 	NTPPacket();

@@ -1,8 +1,6 @@
 //
 // Bugcheck.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Bugcheck.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Bugcheck
@@ -23,10 +21,18 @@
 namespace Poco {
 
 
-void Bugcheck::assertion(const char* cond, const char* file, int line)
+void Bugcheck::assertion(const char* cond, const char* file, int line, const char* text)
 {
-	Debugger::enter(std::string("Assertion violation: ") + cond, file, line);
-	throw AssertionViolationException(what(cond, file, line));
+	std::string message("Assertion violation: ");
+	message += cond;
+	if (text)
+	{
+		message += " (";
+		message += text;
+		message += ")";
+	}
+	Debugger::enter(message, file, line);
+	throw AssertionViolationException(what(cond, file, line, text));
 }
 
 
@@ -57,6 +63,37 @@ void Bugcheck::bugcheck(const char* msg, const char* file, int line)
 }
 
 
+void Bugcheck::unexpected(const char* file, int line)
+{
+#ifdef _DEBUG
+	try
+	{
+		std::string msg("Unexpected exception in noexcept function or destructor: ");
+		try
+		{
+			throw;
+		}
+		catch (Poco::Exception& exc)
+		{
+			msg += exc.displayText();
+		}
+		catch (std::exception& exc)
+		{
+			msg += exc.what();
+		}
+		catch (...)
+		{
+			msg += "unknown exception";
+		}
+		Debugger::enter(msg, file, line);
+	}
+	catch (...)
+	{
+	}
+#endif	
+}
+
+
 void Bugcheck::debugger(const char* file, int line)
 {
 	Debugger::enter(file, line);
@@ -69,15 +106,14 @@ void Bugcheck::debugger(const char* msg, const char* file, int line)
 }
 
 
-std::string Bugcheck::what(const char* msg, const char* file, int line)
+std::string Bugcheck::what(const char* msg, const char* file, int line, const char* text)
 {
 	std::ostringstream str;
 	if (msg) str << msg << " ";
+   if (text != NULL) str << "(" << text << ") ";
 	str << "in file \"" << file << "\", line " << line;
 	return str.str();
 }
-
-
 
 
 } // namespace Poco

@@ -1,8 +1,6 @@
 //
 // NamedNodeMap.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/NamedNodeMap.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -43,7 +41,7 @@ class XML_API NamedNodeMap: public DOMObject
 	///
 	/// NamedNodeMap objects in the DOM are live.
 	///
-	/// A NamedNodeMap returned from a method must be released with a call to 
+	/// A NamedNodeMap returned from a method must be released with a call to
 	/// release() when no longer needed.
 {
 public:
@@ -78,7 +76,7 @@ public:
 
 	virtual Node* setNamedItemNS(Node* arg) = 0;
 		/// Adds a node using its nodeName attribute.
-		/// If a node with that namespace URI and that local name is already 
+		/// If a node with that namespace URI and that local name is already
 		/// present in this map, it is replaced by the new one.
 
 	virtual Node* removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) = 0;

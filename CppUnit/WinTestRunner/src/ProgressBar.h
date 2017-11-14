@@ -1,15 +1,13 @@
 //
 // ProgressBar.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/ProgressBar.h#1 $
-//
 
 
 #ifndef ProgressBar_INCLUDED
 #define ProgressBar_INCLUDED
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <afxwin.h>
 
 
@@ -46,12 +44,12 @@ protected:
 
 
 // Construct a ProgressBar
-inline ProgressBar::ProgressBar(CWnd* baseWindow, CRect& bounds): 
-	_baseWindow(baseWindow), 
-	_bounds(bounds), 
+inline ProgressBar::ProgressBar(CWnd* baseWindow, CRect& bounds):
+	_baseWindow(baseWindow),
+	_bounds(bounds),
 	_error(false),
-	_total(0), 
-	_progress(0), 
+	_total(0),
+	_progress(0),
 	_progressX(0)
 {
     WINDOWINFO wi;

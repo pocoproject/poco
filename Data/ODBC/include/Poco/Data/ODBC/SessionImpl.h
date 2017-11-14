@@ -1,9 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/SessionImpl.h#4 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  SessionImpl
 //
@@ -55,15 +53,15 @@ public:
 
 	SessionImpl(const std::string& connect,
 		std::size_t loginTimeout,
-		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
-		/// Throws NotConnectedException if connection was not succesful.
+		/// Throws NotConnectedException if connection was not successful.
 
 	//@ deprecated
-	SessionImpl(const std::string& connect, 
-		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+	SessionImpl(const std::string& connect,
+		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
 		bool autoExtract = true);
@@ -80,6 +78,7 @@ public:
 
 	void close();
 		/// Closes the connection
+		/// Throws ODBCException if close was not successful.
 
 	bool isConnected();
 		/// Returns true if session is connected
@@ -170,6 +169,8 @@ public:
 private:
 	void setDataTypeInfo(const std::string& rName, const Poco::Any& rValue);
 		/// No-op. Throws InvalidAccessException.
+
+	void init();
 
 	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 

@@ -1,8 +1,6 @@
 //
 // TypeListTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TypeListTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,17 +9,18 @@
 
 
 #include "TypeListTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/TypeList.h"
 #include "Poco/Void.h"
 #include <iostream>
 
-GCC_DIAG_OFF(unused-but-set-variable)
+
 #if defined(_MSC_VER)
 #	pragma warning(disable:4800) // forcing value to bool 'true' or 'false' on MSVC 71
 #endif
+
 
 using Poco::TypeList;
 using Poco::Tuple;
@@ -50,7 +49,7 @@ using Poco::UInt32;
 using Poco::Void;
 
 
-TypeListTest::TypeListTest(const std::string& name): CppUnit::TestCase(name)
+TypeListTest::TypeListTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -1,9 +1,7 @@
 //
 // MySQLException.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/MySQLException.h#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLException
 //
@@ -34,14 +32,14 @@ namespace Data {
 namespace MySQL {
 
 // End-user include this file and use in code ConnectionException/StatementException
-// So it need not know 
+// So it need not know
 
 class MySQL_API MySQLException: public Poco::Data::DataException
 	/// Base class for all MySQL exceptions
 {
 public:
 
-	MySQLException(const std::string& msg);
+	MySQLException(const std::string& msg, int errCode = 0);
 		/// Creates MySQLException.
 
 	MySQLException(const MySQLException& exc);
@@ -93,7 +91,7 @@ private:
 
 
 class TransactionException : public ConnectionException
-	/// TrabsactionException
+	/// TransactionException
 {
 public:
 

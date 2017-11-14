@@ -1,8 +1,6 @@
 //
 // DialogSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/DialogSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "DialogSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "EchoServer.h"
 #include "Poco/Net/DialogSocket.h"
 #include "Poco/Net/SocketAddress.h"
@@ -37,7 +35,7 @@ void DialogSocketTest::testDialogSocket()
 {
 	EchoServer echoServer;
 	DialogSocket ds;
-	ds.connect(SocketAddress("localhost", echoServer.port()));
+	ds.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
 	ds.sendMessage("Hello, world!");
 	std::string str;

@@ -1,8 +1,6 @@
 //
 // RowIterator.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RowIterator.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowIterator
@@ -77,11 +75,11 @@ public:
 		/// Advances by one position and returns current position.
 
 	RowIterator operator ++ (int) const;
-		/// Advances by one position and returns copy of the iterator with 
+		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
 	const RowIterator& operator -- () const;
-		/// Goes back by one position and returns copy of the iterator with 
+		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
 	RowIterator operator -- (int) const;
@@ -101,15 +99,15 @@ private:
 	RowIterator();
 
 	void increment() const;
-		/// Increments the iterator position by one. 
+		/// Increments the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void decrement() const;
-		/// Decrements the iterator position by one. 
+		/// Decrements the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void setPosition(std::size_t pos) const;
-		/// Sets the iterator position. 
+		/// Sets the iterator position.
 		/// Throws RangeException if position is out of range.
 
 	RecordSet*          _pRecordSet;
@@ -140,9 +138,9 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, 
+	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1,
 		Poco::Data::RowIterator& s2)
-		/// Full template specalization of std:::swap for RowIterator
+		/// Full template specialization of std:::swap for RowIterator
 	{
 		s1.swap(s2);
 	}

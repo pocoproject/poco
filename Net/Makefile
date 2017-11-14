@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/Makefile#3 $
-#
 # Makefile for Poco Net
 #
 
@@ -32,7 +30,9 @@ objects = \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
-	WebSocket WebSocketImpl
+	WebSocket WebSocketImpl \
+	OAuth10Credentials OAuth20Credentials \
+	PollSet
 
 target         = PocoNet
 target_version = $(LIBVERSION)

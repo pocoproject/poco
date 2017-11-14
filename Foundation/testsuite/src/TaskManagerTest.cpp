@@ -1,8 +1,6 @@
 //
 // TaskManagerTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TaskManagerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "TaskManagerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/TaskManager.h"
 #include "Poco/Task.h"
@@ -51,7 +49,7 @@ namespace
 	class TestTask: public Task
 	{
 	public:
-		TestTask(): 
+		TestTask():
 			Task("TestTask"),
 			_fail(false)
 		{
@@ -98,6 +96,21 @@ namespace
 		}
 	};
 	
+	class IncludingTask: public Task
+	{
+	public:
+		IncludingTask(): Task("IncludingTask")
+		{
+		}
+
+		void runTask()
+		{
+			setProgress(0.5);
+			getOwner()->startSync(new SimpleTask);
+			setProgress(1.0);
+		}
+	};
+
 	class TaskObserver
 	{
 	public:
@@ -183,7 +196,7 @@ namespace
 	class CustomNotificationTask: public Task
 	{
 	public:
-		CustomNotificationTask(const T& t): 
+		CustomNotificationTask(const T& t):
 			Task("CustomNotificationTask"),
 			_custom(t)
 		{
@@ -231,10 +244,51 @@ namespace
 	private:
 		C _custom;
 	};
+
+	class SimpleTaskQueue
+	{
+	public:
+		SimpleTaskQueue(TaskManager& tm): _tm(tm)
+		{
+			_tm.addObserver(Observer<SimpleTaskQueue, TaskFinishedNotification>(*this, &SimpleTaskQueue::taskFinished));
+		}
+
+		void enqueue(Task* pTask)
+		{
+			_tasks.push_back(pTask);
+		}
+
+		void startQueue()
+		{
+			if (_tm.count() == 0 && _tasks.size())
+			{
+				Task* pTask = _tasks.back();
+				// not thread-safe
+				_tasks.pop_back();
+				_tm.start(pTask);
+			}
+		}
+
+		void taskFinished(TaskFinishedNotification* pNf)
+		{
+			if (_tasks.size())
+			{
+				Task* pTask = _tasks.back();
+				// not thread-safe
+				_tasks.pop_back();
+				_tm.startSync(pTask);
+			}
+			pNf->release();
+		}
+
+	private:
+		std::vector<Task*> _tasks;
+		TaskManager& _tm;
+	};
 }
 
 
-TaskManagerTest::TaskManagerTest(const std::string& name): CppUnit::TestCase(name)
+TaskManagerTest::TaskManagerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -246,7 +300,7 @@ TaskManagerTest::~TaskManagerTest()
 
 void TaskManagerTest::testFinish()
 {
-	TaskManager tm;
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 	TaskObserver to;
 	tm.addObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
 	tm.addObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
@@ -281,7 +335,7 @@ void TaskManagerTest::testFinish()
 
 void TaskManagerTest::testCancel()
 {
-	TaskManager tm;
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 	TaskObserver to;
 	tm.addObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
 	tm.addObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
@@ -315,7 +369,7 @@ void TaskManagerTest::testCancel()
 
 void TaskManagerTest::testError()
 {
-	TaskManager tm;
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 	TaskObserver to;
 	tm.addObserver(Observer<TaskObserver, TaskStartedNotification>(to, &TaskObserver::taskStarted));
 	tm.addObserver(Observer<TaskObserver, TaskCancelledNotification>(to, &TaskObserver::taskCancelled));
@@ -348,7 +402,7 @@ void TaskManagerTest::testError()
 
 void TaskManagerTest::testCustom()
 {
-	TaskManager tm;
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 	
 	CustomTaskObserver<int> ti(0);
 	tm.addObserver(
@@ -431,7 +485,7 @@ void TaskManagerTest::testCustom()
 
 void TaskManagerTest::testMultiTasks()
 {
-	TaskManager tm;
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 	tm.start(new SimpleTask);
 	tm.start(new SimpleTask);
 	tm.start(new SimpleTask);
@@ -445,9 +499,66 @@ void TaskManagerTest::testMultiTasks()
 }
 
 
+void TaskManagerTest::testTaskInclusion()
+{
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+	IncludingTask* pTask = new IncludingTask;
+
+	pTask->duplicate();
+
+	tm.start(pTask);
+	// wait for the included task to be started
+	while (pTask->progress() < 0.5)
+	{
+		Thread::sleep(100);
+	}
+	Thread::sleep(100);
+	assert (tm.count() == 2);
+
+	tm.cancelAll();
+	while (tm.count() > 0) Thread::sleep(100);
+	assert (tm.count() == 0);
+}
+
+
+void TaskManagerTest::testTaskQueue()
+{
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+	SimpleTaskQueue tq(tm);
+
+	Task* pT1 = new SimpleTask;
+	Task* pT2 = new SimpleTask;
+	Task* pT3 = new SimpleTask;
+	tq.enqueue(pT1);
+	tq.enqueue(pT2);
+	tq.startQueue();
+
+	assert (tm.count() == 1);
+	Thread::sleep(500);
+	assert (pT1->state() == Task::TASK_RUNNING);
+	assert (pT2->state() == Task::TASK_IDLE);
+
+	tq.enqueue(pT3);
+	pT1->cancel();
+	Thread::sleep(500);
+	assert (tm.count() == 1);
+	assert (pT2->state() == Task::TASK_RUNNING);
+	assert (pT3->state() == Task::TASK_IDLE);
+
+	pT2->cancel();
+	Thread::sleep(500);
+	assert (tm.count() == 1);
+	assert (pT3->state() == Task::TASK_RUNNING);
+
+	tm.cancelAll();
+	while (tm.count() > 0) Thread::sleep(100);
+	assert (tm.count() == 0);
+}
+
+
 void TaskManagerTest::testCustomThreadPool()
 {
-	ThreadPool  tp(2, 5, 120);
+	ThreadPool  tp(2, 5, 120, POCO_THREAD_STACK_SIZE, ThreadPool::TAP_UNIFORM_DISTRIBUTION);
 	TaskManager tm(tp);
 
 	// fill up the thread pool

@@ -1,8 +1,6 @@
 //
 // VarTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "VarTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Bugcheck.h"
@@ -22,7 +20,7 @@
 #include <utility>
 
 
-GCC_DIAG_OFF(unused-variable)
+
 #if defined(_MSC_VER) && _MSC_VER < 1400
 	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
 #endif
@@ -58,7 +56,7 @@ private:
 };
 
 
-VarTest::VarTest(const std::string& name): CppUnit::TestCase(name)
+VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -72,7 +70,7 @@ void VarTest::testInt8()
 {
 	Poco::Int8 src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(Poco::Int8));
 
 	std::string s1;
@@ -101,8 +99,8 @@ void VarTest::testInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -124,17 +122,27 @@ void VarTest::testInt8()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
-	
+
 	Int8 value = a1.extract<Int8>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
-	catch (Poco::BadCastException&)
+	catch (Poco::BadCastException&) { }
+
+	try
 	{
+		Poco::UInt8 usrc = 200;
+		a1 = usrc;
+		src = a1;
+		fail("out of range - must throw");
+	}
+	catch (Poco::RangeException&)
+	{
+		a1 = src;
 	}
 
 	Var a3 = a1 + 1;
@@ -189,8 +197,9 @@ void VarTest::testInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -215,7 +224,7 @@ void VarTest::testInt16()
 
 	Int16 value = a1.extract<Int16>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int32 value2; value2 = a1.extract<Int32>();
@@ -248,7 +257,7 @@ void VarTest::testInt32()
 {
 	Poco::Int32 src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(Poco::Int32));
 
 	std::string s1;
@@ -277,8 +286,9 @@ void VarTest::testInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -300,10 +310,10 @@ void VarTest::testInt32()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
-	
+
 	Int32 value = a1.extract<Int32>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -336,7 +346,7 @@ void VarTest::testInt64()
 {
 	Poco::Int64 src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(Poco::Int64));
 
 	std::string s1;
@@ -365,8 +375,9 @@ void VarTest::testInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -391,7 +402,7 @@ void VarTest::testInt64()
 
 	Int64 value = a1.extract<Int64>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -453,8 +464,9 @@ void VarTest::testUInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -479,7 +491,7 @@ void VarTest::testUInt8()
 
 	UInt8 value = a1.extract<UInt8>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -541,8 +553,8 @@ void VarTest::testUInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -567,7 +579,7 @@ void VarTest::testUInt16()
 
 	UInt16 value = a1.extract<UInt16>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -629,8 +641,8 @@ void VarTest::testUInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -655,7 +667,7 @@ void VarTest::testUInt32()
 
 	UInt32 value = a1.extract<UInt32>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -717,8 +729,8 @@ void VarTest::testUInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -743,7 +755,7 @@ void VarTest::testUInt64()
 
 	UInt64 value = a1.extract<UInt64>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -776,7 +788,7 @@ void VarTest::testBool()
 {
 	bool src = true;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(bool));
 
 	std::string s1;
@@ -805,8 +817,8 @@ void VarTest::testBool()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 1);
@@ -831,7 +843,7 @@ void VarTest::testBool()
 
 	bool value = a1.extract<bool>();
 	assert (value);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -847,7 +859,7 @@ void VarTest::testChar()
 {
 	char src = ' ';
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(char));
 
 	std::string s1;
@@ -876,8 +888,8 @@ void VarTest::testChar()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -902,7 +914,7 @@ void VarTest::testChar()
 
 	char value = a1.extract<char>();
 	assert (value == ' ');
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -921,7 +933,7 @@ void VarTest::testFloat()
 
 	float src = 32.0f;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(float));
 
 	std::string s1;
@@ -950,8 +962,8 @@ void VarTest::testFloat()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -976,7 +988,7 @@ void VarTest::testFloat()
 
 	float value = a1.extract<float>();
 	assert (value == 32.0f);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -1013,7 +1025,7 @@ void VarTest::testDouble()
 
 	double src = 32.0;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(double));
 
 	std::string s1;
@@ -1042,8 +1054,8 @@ void VarTest::testDouble()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1068,7 +1080,7 @@ void VarTest::testDouble()
 
 	double value = a1.extract<double>();
 	assert (value == 32.0);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -1078,7 +1090,7 @@ void VarTest::testDouble()
 	{
 	}
 
-	
+
 	Var a3 = a1 + 1.0;
 	assert (a3 == 33.0);
 	a3 = a1 - 1.0;
@@ -1101,7 +1113,7 @@ void VarTest::testDouble()
 void VarTest::testString()
 {
 	Var a1("32");
-	
+
 	assert (a1.type() == typeid(std::string));
 
 	std::string s1;
@@ -1130,8 +1142,8 @@ void VarTest::testString()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1152,7 +1164,7 @@ void VarTest::testString()
 
 	const std::string& value = a1.extract<std::string>();
 	assert (value == "32");
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -1184,9 +1196,10 @@ void VarTest::testString()
 
 void VarTest::testLong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	long src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(long));
 
 	std::string s1;
@@ -1238,10 +1251,10 @@ void VarTest::testLong()
 	std::string t2;
 	a2.convert(t2);
 	assert (s1 == t2);
-	
+
 	long value = a1.extract<long>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -1267,14 +1280,16 @@ void VarTest::testLong()
 	assert (a3 == 32);
 	a3 *= 2;
 	assert (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
 void VarTest::testULong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	unsigned long src = 32;
 	Var a1 = src;
-	
+
 	assert (a1.type() == typeid(unsigned long));
 
 	std::string s1;
@@ -1329,7 +1344,7 @@ void VarTest::testULong()
 
 	unsigned long value = a1.extract<unsigned long>();
 	assert (value == 32);
-	
+
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
@@ -1355,6 +1370,7 @@ void VarTest::testULong()
 	assert (a3 == 32);
 	a3 *= 2;
 	assert (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
@@ -1438,6 +1454,8 @@ void VarTest::testComparisonOperators()
 	assert (any1 >= 0);
 	assert (0 <= any1);
 
+#if !defined(POCO_LONG_IS_64_BIT)
+
 	any1 = 1L;
 	assert (any1 == any2);
 	assert (any1 == 1L);
@@ -1460,6 +1478,8 @@ void VarTest::testComparisonOperators()
 	assert (1L <= any1);
 	assert (any1 >= 0);
 	assert (0 <= any1);
+
+#endif // !defined(POCO_LONG_IS_64_BIT)
 
 	any1 = 0x31;
 	assert (any1 == '1');
@@ -1607,26 +1627,26 @@ void VarTest::testArithmeticOperators()
 	assert (any3 == "123456789");
 	assert (("xyz" + any3) == "xyz123456789");
 
-	try	{ any3 = any1 - any2; fail ("must fail"); } 
+	try	{ any3 = any1 - any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try	{ any3 -= any2;	fail ("must fail");	} 
+	try	{ any3 -= any2;	fail ("must fail");	}
 	catch (InvalidArgumentException&){}
 
-	try	{ any3 = any1 * any2; fail ("must fail"); } 
+	try	{ any3 = any1 * any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try { any3 *= any2;	fail ("must fail");	} 
+	try { any3 *= any2;	fail ("must fail");	}
 	catch (InvalidArgumentException&){}
 
-	try { any3 = any1 / any2; fail ("must fail"); } 
+	try { any3 = any1 / any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try { any3 /= any2; fail ("must fail");	} 
+	try { any3 /= any2; fail ("must fail");	}
 	catch (InvalidArgumentException&){}
 
 	any1 = 10;
-	
+
 	assert (any1++ == 10);
 	assert (any1 == 11);
 	assert (++any1 == 12);
@@ -1637,16 +1657,16 @@ void VarTest::testArithmeticOperators()
 
 	any1 = 1.23;
 
-	try { ++any1; fail ("must fail"); } 
-	catch (InvalidArgumentException&){}
-	
-	try { any1++; fail ("must fail"); } 
+	try { ++any1; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 
-	try { --any1; fail ("must fail"); } 
+	try { any1++; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
-	
-	try { any1--; fail ("must fail"); } 
+
+	try { --any1; fail ("must fail"); }
+	catch (InvalidArgumentException&){}
+
+	try { any1--; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
 }
 
@@ -1733,9 +1753,9 @@ void VarTest::testCtor()
 	Var a1(42);
 	Var a2(a1);
 	Var a3;
-	
+
 	a3 = a1;
-	
+
 	assert (a2 == 42);
 	assert (a3 == 42);
 }
@@ -1817,8 +1837,8 @@ void VarTest::testIsArray()
 	double s11(13.555);
 	bool s12(true);
 	char s13('c');
-	long s14(232323);
-	unsigned long s15(21233232u);
+	Int64 s14(232323);
+	UInt64 s15(21233232u);
 	std::vector<Var> s16;
 	DynamicStruct s17;
 
@@ -1956,6 +1976,8 @@ void VarTest::testDynamicStructBasics()
 	aStruct.erase("First Name");
 	assert (aStruct.size() == 1);
 	assert (*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assert (aStruct.size() == 0);
 }
 
 
@@ -2089,6 +2111,20 @@ void VarTest::testArrayToString()
 }
 
 
+void VarTest::testArrayToStringEscape()
+{
+	std::string s1("\"quoted string\"");
+	Poco::Int8 s2(23);
+	std::vector<Var> s16;
+	s16.push_back(s1);
+	s16.push_back(s2);
+	Var a1(s16);
+	std::string res = a1.convert<std::string>();
+	std::string expected("[ \"\\\"quoted string\\\"\", 23 ]");
+	assert (res == expected);
+}
+
+
 void VarTest::testStructToString()
 {
 	DynamicStruct aStruct;
@@ -2098,6 +2134,18 @@ void VarTest::testStructToString()
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
 	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
+	assert (res == expected);
+	assert (aStruct.toString() == res);
+}
+
+
+void VarTest::testStructToStringEscape()
+{
+	DynamicStruct aStruct;
+	aStruct["Value"] = "Value with \" and \n";
+	Var a1(aStruct);
+	std::string res = a1.convert<std::string>();
+	std::string expected = "{ \"Value\" : \"Value with \\\" and \\n\" }";
 	assert (res == expected);
 	assert (aStruct.toString() == res);
 }
@@ -2131,7 +2179,7 @@ void VarTest::testArrayOfStructsToString()
 								"{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }, "
 								"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" } "
 								"] ] ]";
-	
+
 	assert (res == expected);
 	assert (a1.toString() == res);
 }
@@ -2177,11 +2225,11 @@ void VarTest::testJSONDeserializeString()
 	char cc = b2.convert<char>();
 	assert (cc == 'c');
 
-	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\" \n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 
-	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\"\n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
@@ -2347,27 +2395,64 @@ void VarTest::testJSONDeserializeStruct()
 
 	std::string sStr = Var::toString(aStr);
 	Var a = Var::parse(sStr);
-	assert (aStr["i8"] == i8);
-	assert (aStr["u16"] == u16);
-	assert (aStr["i32"] == i32);
-	assert (aStr["u64"] == u64);
-	assert (aStr["b"] == b);
-	assert (aStr["f"] == f);
-	assert (aStr["d"] == d);
-	assert (aStr["s"] == s);
-	assert (aStr["c"] == c);
+	assert (a["i8"] == i8);
+	assert (a["u16"] == u16);
+	assert (a["i32"] == i32);
+	assert (a["u64"] == u64);
+	assert (a["b"] == b);
+	assert (a["f"] == f);
+	assert (a["d"] == d);
+	assert (a["s"] == s);
+	assert (a["c"] == c);
+}
+
+
+void VarTest::testJSONRoundtripStruct()
+{
+	Poco::Int64 i64(-1234567890);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	double d = 3.1415;
+	std::string s("test string");
+	DynamicStruct aStr;
+	aStr["i64"] = i64;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["d"] = d;
+	aStr["s"] = s;
+
+	std::string sStr = Var::toString(aStr);
+	Var a = Var::parse(sStr);
+	assert (a["i64"].isInteger());
+	assert (!a["u64"].isSigned());
+	assert (a["b"].isBoolean());
+	assert (a["d"].isNumeric());
+	assert (a["s"].isString());
+
+	std::string serialized = Var::toString(a);
+	assert (sStr == serialized);
 }
 
 
 void VarTest::testDate()
 {
 	Poco::DateTime dtNow(2007, 3, 13, 8, 12, 15);
-	
+
 	Poco::Timestamp tsNow = dtNow.timestamp();
 	Poco::LocalDateTime ldtNow(dtNow.timestamp());
 	Var dt(dtNow);
+	assert(dt.isDate());
+	assert(dt.isTime());
+	assert(dt.isDateTime());
 	Var ts(tsNow);
+	assert(ts.isDate());
+	assert(ts.isTime());
+	assert(ts.isDateTime());
 	Var ldt(ldtNow);
+	assert(ldt.isDate());
+	assert(ldt.isTime());
+	assert(ldt.isDateTime());
 	Var dtStr(dt.convert<std::string>());
 	Var tsStr(ts.convert<std::string>());
 	Var ldtStr(ldt.convert<std::string>());
@@ -2390,7 +2475,7 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 {
 	try
 	{
-		Var val1 = a1[n]; 
+		Var val1 = a1[n];
 		fail("bad cast - must throw");
 		val1 = 0; // silence the compiler
 	}
@@ -2404,7 +2489,7 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 	try
 	{
 		const Var& c1 = a1;
-		const Var& cval1 = c1[n]; 
+		const Var& cval1 = c1[n];
 		fail("bad const cast - must throw");
 		assert (cval1 == c1); // silence the compiler
 	}
@@ -2429,6 +2514,11 @@ void VarTest::testEmpty()
 	assert (!da.isString());
 	assert (da == da);
 	assert (!(da != da));
+
+	assert (da != Var(1));
+	assert (!(da == Var(1)));
+	assert (Var(1) != da);
+	assert (!(Var(1) == da));
 
 	da = "123";
 	int i = da.convert<int>();
@@ -2462,7 +2552,7 @@ void VarTest::testEmpty()
 	testEmptyComparisons<Poco::Int32>();
 	testEmptyComparisons<Poco::UInt64>();
 	testEmptyComparisons<Poco::Int64>();
-#ifdef POCO_LONG_IS_64_BIT
+#ifndef POCO_LONG_IS_64_BIT
 	testEmptyComparisons<unsigned long>();
 	testEmptyComparisons<long>();
 #endif
@@ -2592,7 +2682,9 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
+	CppUnit_addTest(pSuite, VarTest, testArrayToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);
+	CppUnit_addTest(pSuite, VarTest, testStructToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testArrayOfStructsToString);
 	CppUnit_addTest(pSuite, VarTest, testStructWithArraysToString);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeString);
@@ -2600,6 +2692,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeArray);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
+	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);

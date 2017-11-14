@@ -1,8 +1,6 @@
 //
 // Mutex.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
@@ -24,41 +22,37 @@
 #include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
 
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Mutex_WINCE.h"
-#else
-#include "Poco/Mutex_WIN32.h"
-#endif
-#elif defined(POCO_VXWORKS)
-#include "Poco/Mutex_VX.h"
-#else
+#if (POCO_OS == POCO_OS_CYGWIN || defined(POCO_ANDROID))
 #include "Poco/Mutex_POSIX.h"
+#else
+#include "Poco/Mutex_STD.h"
 #endif
-
 
 namespace Poco {
 
 
 class Foundation_API Mutex: private MutexImpl
-	/// A Mutex (mutual exclusion) is a synchronization 
+	/// A Mutex (mutual exclusion) is a synchronization
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multithreaded) scenario.
-	/// Mutexes are recursive, that is, the same mutex can be 
-	/// locked multiple times by the same thread (but, of course,
-	/// not by other threads).
 	/// Using the ScopedLock class is the preferred way to automatically
 	/// lock and unlock a mutex.
 {
 public:
+	enum MutexType
+		/// The type of a mutex.
+	{
+		MUTEX_RECURSIVE = MUTEX_RECURSIVE_IMPL,      /// A recursive mutex
+		MUTEX_NONRECURSIVE = MUTEX_NONRECURSIVE_IMPL /// A non-recursive mutex
+	};
+
 	typedef Poco::ScopedLock<Mutex> ScopedLock;
 	
-	Mutex();
-		/// creates the Mutex.
+	explicit Mutex(MutexType type = MUTEX_RECURSIVE);
+		/// Creates the Mutex.
 		
 	~Mutex();
-		/// destroys the Mutex.
+		/// Destroys the Mutex.
 
 	void lock();
 		/// Locks the mutex. Blocks if the mutex
@@ -69,7 +63,7 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -83,7 +77,7 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -99,10 +93,11 @@ private:
 
 class Foundation_API FastMutex: private FastMutexImpl
 	/// A FastMutex (mutual exclusion) is similar to a Mutex.
-	/// Unlike a Mutex, however, a FastMutex is not recursive,
-	/// which means that a deadlock will occur if the same
-	/// thread tries to lock a mutex it has already locked again.
-	/// Locking a FastMutex is faster than locking a recursive Mutex.
+	/// Locking a FastMutex is guaranteed to be at least as
+	/// fast as locking a Mutex.  However, a FastMutex is not
+	/// guaranteed to be either recursive or non-recursive.
+	/// It is best suited to thread safe components like pools,
+	/// caches and queues where locking is internal to the component.
 	/// Using the ScopedLock class is the preferred way to automatically
 	/// lock and unlock a mutex.
 {
@@ -124,7 +119,7 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -138,7 +133,7 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 

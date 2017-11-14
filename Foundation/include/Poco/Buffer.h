@@ -1,8 +1,6 @@
 //
 // Buffer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Buffer.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Buffer
@@ -31,23 +29,27 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A buffer class that allocates a buffer of a given type and size 
+	/// A buffer class that allocates a buffer of a given type and size
 	/// in the constructor and deallocates the buffer in the destructor.
 	///
 	/// This class is useful everywhere where a temporary buffer
 	/// is needed.
 {
 public:
-	Buffer(std::size_t capacity):
-		_capacity(capacity),
-		_used(capacity),
-		_ptr(new T[capacity]),
+	Buffer(std::size_t length):
+		_capacity(length),
+		_used(length),
+		_ptr(0),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
+		if (length > 0)
+		{
+			_ptr = new T[length];
+		}
 	}
 
-	explicit Buffer(T* pMem, std::size_t length):
+	Buffer(T* pMem, std::size_t length):
 		_capacity(length),
 		_used(length),
 		_ptr(pMem),
@@ -55,44 +57,82 @@ public:
 		/// Creates the Buffer. Length argument specifies the length
 		/// of the supplied memory pointed to by pMem in the number
 		/// of elements of type T. Supplied pointer is considered
-		/// blank and not owned by Buffer, so in this case Buffer 
-		/// only acts as a wrapper around externally supplied 
+		/// blank and not owned by Buffer, so in this case Buffer
+		/// only acts as a wrapper around externally supplied
 		/// (and lifetime-managed) memory.
 	{
 	}
 
-	explicit Buffer(const T* pMem, std::size_t length):
+	Buffer(const T* pMem, std::size_t length):
 		_capacity(length),
 		_used(length),
-		_ptr(new T[length]),
+		_ptr(0),
 		_ownMem(true)
 		/// Creates and allocates the Buffer; copies the contents of
 		/// the supplied memory into the buffer. Length argument specifies
 		/// the length of the supplied memory pointed to by pMem in the
 		/// number of elements of type T.
 	{
-		if (_used)
+		if (_capacity > 0)
+		{
+			_ptr = new T[_capacity];
 			std::memcpy(_ptr, pMem, _used * sizeof(T));
+		}
 	}
 
 	Buffer(const Buffer& other):
 		/// Copy constructor.
 		_capacity(other._used),
 		_used(other._used),
-		_ptr(new T[other._used]),
+		_ptr(0),
 		_ownMem(true)
 	{
 		if (_used)
+		{
+			_ptr = new T[_used];
 			std::memcpy(_ptr, other._ptr, _used * sizeof(T));
+		}
 	}
 
-	Buffer& operator =(const Buffer& other)
+	Buffer& operator = (const Buffer& other)
 		/// Assignment operator.
 	{
 		if (this != &other)
 		{
 			Buffer tmp(other);
 			swap(tmp);
+		}
+
+		return *this;
+	}
+
+	Buffer(Buffer&& other) :
+		/// Copy constructor.
+		_capacity(other._capacity),
+		_used(other._used),
+		_ptr(other._ptr),
+		_ownMem(other._ownMem)
+	{
+		other._capacity = 0;
+		other._used = 0;
+		other._ownMem = false;
+		other._ptr = nullptr;
+	}
+
+	Buffer& operator =(Buffer&& other)
+		/// Assignment operator.
+	{
+		if (this != &other)
+		{
+			_capacity = other._capacity;
+			_used = other._used;
+			_ptr = other._ptr;
+			_ownMem = other._ownMem;
+
+			other._capacity = 0;
+			other._used = 0;
+			other._ownMem = false;
+			other._ptr = nullptr;
 		}
 
 		return *this;
@@ -110,20 +150,20 @@ public:
 		/// new buffer. The new capacity can be larger or smaller than
 		/// the current one; if it is smaller, capacity will remain intact.
 		/// Size will always be set to the new capacity.
-		///  
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
-		if (!_ownMem)
-			throw Poco::InvalidAccessException("Cannot resize buffer which does not own its storage.");
+		if (!_ownMem) throw Poco::InvalidAccessException("Cannot resize buffer which does not own its storage.");
 
 		if (newCapacity > _capacity)
 		{
 			T* ptr = new T[newCapacity];
 			if (preserveContent)
+			{
 				std::memcpy(ptr, _ptr, _used * sizeof(T));
-
+			}
 			delete [] _ptr;
 			_ptr = ptr;
 			_capacity = newCapacity;
@@ -136,26 +176,28 @@ public:
 		/// Sets the buffer capacity. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
-		/// the current one; size will be set to the new capacity only if 
+		/// the current one; size will be set to the new capacity only if
 		/// new capacity is smaller than the current size, otherwise it will
 		/// remain intact.
-		/// 
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
-		if (!_ownMem)
-			throw Poco::InvalidAccessException("Cannot resize buffer which does not own its storage.");
+		if (!_ownMem) throw Poco::InvalidAccessException("Cannot resize buffer which does not own its storage.");
 
 		if (newCapacity != _capacity)
 		{
-			T* ptr = new T[newCapacity];
-			if (preserveContent)
+			T* ptr = 0;
+			if (newCapacity > 0)
 			{
-				std::size_t newSz = _used < newCapacity ? _used : newCapacity;
-				std::memcpy(ptr, _ptr, newSz * sizeof(T));
+				ptr = new T[newCapacity];
+				if (preserveContent)
+				{
+					std::size_t newSz = _used < newCapacity ? _used : newCapacity;
+					std::memcpy(ptr, _ptr, newSz * sizeof(T));
+				}
 			}
-
 			delete [] _ptr;
 			_ptr = ptr;
 			_capacity = newCapacity;
@@ -215,9 +257,10 @@ public:
 		swap(_ptr, other._ptr);
 		swap(_capacity, other._capacity);
 		swap(_used, other._used);
+		swap(_ownMem, other._ownMem);
 	}
 
-	bool operator ==(const Buffer& other) const
+	bool operator == (const Buffer& other) const
 		/// Compare operator.
 	{
 		if (this != &other)
@@ -235,14 +278,14 @@ public:
 		return true;
 	}
 
-	bool operator !=(const Buffer& other) const
+	bool operator != (const Buffer& other) const
 		/// Compare operator.
 	{
 		return !(*this == other);
 	}
 
 	void clear()
-		/// Sets the contents of the bufer to zero.
+		/// Sets the contents of the buffer to zero.
 	{
 		std::memset(_ptr, 0, _used * sizeof(T));
 	}

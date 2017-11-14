@@ -1,8 +1,6 @@
 //
 // MailStream.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MailStream.h#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailStream
@@ -31,7 +29,7 @@ namespace Net {
 
 
 class Net_API MailStreamBuf: public Poco::UnbufferedStreamBuf
-	/// The sole purpose of this stream buffer is to replace 
+	/// The sole purpose of this stream buffer is to replace
 	/// a "\r\n.\r\n" character sequence with a "\r\n..\r\n" sequence for
 	/// output streams and vice-versa for input streams.
 	///
@@ -84,7 +82,7 @@ private:
 class Net_API MailIOS: public virtual std::ios
 	/// The base class for MailInputStream and MailOutputStream.
 	///
-	/// This class provides common methods and is also needed to ensure 
+	/// This class provides common methods and is also needed to ensure
 	/// the correct initialization order of the stream buffer and base classes.
 {
 public:
@@ -113,8 +111,8 @@ protected:
 
 class Net_API MailInputStream: public MailIOS, public std::istream
 	/// This class is used for reading E-Mail messages from a
-	/// POP3 server. All occurences of "\r\n..\r\n" are replaced with
-	/// "\r\n.\r\n". The first occurence of "\r\n.\r\n" denotes the end
+	/// POP3 server. All occurrences of "\r\n..\r\n" are replaced with
+	/// "\r\n.\r\n". The first occurrence of "\r\n.\r\n" denotes the end
 	/// of the stream.
 {
 public:
@@ -129,7 +127,7 @@ public:
 
 class Net_API MailOutputStream: public MailIOS, public std::ostream
 	/// This class is used for writing E-Mail messages to a
-	/// SMTP server. All occurences of "\r\n.\r\n" are replaced with
+	/// SMTP server. All occurrences of "\r\n.\r\n" are replaced with
 	/// "\r\n..\r\n".
 {
 public:

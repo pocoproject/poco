@@ -1,8 +1,6 @@
 //
 // SocketStreamTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketStreamTest.h#1 $
-//
 // Definition of the SocketStreamTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class SocketStreamTest: public CppUnit::TestCase

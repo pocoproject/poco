@@ -1,8 +1,6 @@
 //
 // Binding.cpp
 //
-// $Id: //poco/Main/Data/samples/TypeHandler/src/TypeHandler.cpp#3 $
-//
 // This sample demonstrates the Data library.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -49,7 +47,7 @@ class TypeHandler<Person>
 public:
 	static std::size_t size()
 	{
-		return 3;
+		return 4;
 	}
 	
 	static void bind(std::size_t pos, const Person& person, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
@@ -93,7 +91,7 @@ int main(int argc, char** argv)
 	session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
 	
 	// insert some rows
-	Person person = 
+	Person person =
 	{
 		"Bart Simpson",
 		"Springfield",
@@ -126,7 +124,7 @@ int main(int argc, char** argv)
 		std::cout << person.name << "\t"
 			<< person.address << "\t"
 			<< person.age << "\t"
-			<< DateTimeFormatter::format(person.birthday, "%b %d %Y") 
+			<< DateTimeFormatter::format(person.birthday, "%b %d %Y")
 		<< std::endl;
 	}
 	
@@ -141,7 +139,7 @@ int main(int argc, char** argv)
 		std::cout << it->name << "\t"
 			<< it->address << "\t"
 			<< it->age << "\t"
-			<< DateTimeFormatter::format(it->birthday, "%b %d %Y") 
+			<< DateTimeFormatter::format(it->birthday, "%b %d %Y")
 		<< std::endl;
 	}
 	

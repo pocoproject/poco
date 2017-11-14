@@ -1,8 +1,6 @@
 //
 // LRUCacheTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LRUCacheTest.h#6 $
-//
 // Tests for LRUCache
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/KeyValueArgs.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class LRUCacheTest: public CppUnit::TestCase

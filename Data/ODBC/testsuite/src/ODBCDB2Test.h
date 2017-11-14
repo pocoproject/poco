@@ -1,8 +1,6 @@
 //
 // ODBCDB2Test.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCDB2Test.h#4 $
-//
 // Definition of the ODBCDB2Test class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -23,7 +21,7 @@
 class ODBCDB2Test: public ODBCTest
 	/// IBM DB2 UDB ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB				| OS
 	/// ------------+-------------------+------------------------------------------
 	///	9.01.00.356 | DB2 Express-C 9.1	| MS Windows XP Professional x64 v.2003/SP1
@@ -41,6 +39,7 @@ public:
 	void testStoredProcedureAny();
 	void testStoredProcedureDynamicAny();
 	void testStoredFunction();
+	void testXMLColumn();
 
 	static CppUnit::Test* suite();
 
@@ -62,13 +61,13 @@ private:
 	void recreateMiscTable();
 	void recreateLogTable();
 
-	static ODBCTest::SessionPtr  _pSession;
-	static ODBCTest::ExecPtr     _pExecutor;
-	static std::string _driver;
-	static std::string _dsn;
-	static std::string _uid;
-	static std::string _pwd;
-	static std::string _connectString;
+	static ODBCTest::SessionPtr _pSession;
+	static ODBCTest::ExecPtr    _pExecutor;
+	static std::string          _driver;
+	static std::string          _dsn;
+	static std::string          _uid;
+	static std::string          _pwd;
+	static std::string          _connectString;
 };
 
 

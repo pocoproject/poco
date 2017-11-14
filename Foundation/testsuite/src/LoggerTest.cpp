@@ -1,8 +1,6 @@
 //
 // LoggerTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LoggerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "LoggerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Logger.h"
 #include "Poco/AutoPtr.h"
 #include "TestChannel.h"
@@ -24,7 +22,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 
 
-LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
+LoggerTest::LoggerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -142,6 +140,28 @@ void LoggerTest::testLogger()
 	pChannel->list().clear();
 	root.fatal("fatal");
 	assert (pChannel->list().begin()->getPriority() == Message::PRIO_FATAL);
+	
+	root.setLevel("1");
+	assert (root.getLevel() == Message::PRIO_FATAL);
+	root.setLevel("8");
+	assert (root.getLevel() == Message::PRIO_TRACE);
+	try
+	{
+		root.setLevel("0");
+		assert(0);
+	}
+	catch(Poco::InvalidArgumentException&)
+	{
+	}
+	try
+	{
+		root.setLevel("9");
+		assert(0);
+	}
+	catch(Poco::InvalidArgumentException&)
+	{
+	}
+
 }
 
 
@@ -199,6 +219,33 @@ void LoggerTest::testFormatAny()
 
 	root.error("%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6);
 	assert (pChannel->getLastMessage().getText() == "123456");
+
+	root.error("%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7);
+	assert(pChannel->getLastMessage().getText() == "1234567");
+
+	root.error("%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8);
+	assert(pChannel->getLastMessage().getText() == "12345678");
+
+	root.error("%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9);
+	assert(pChannel->getLastMessage().getText() == "123456789");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+	assert(pChannel->getLastMessage().getText() == "12345678910");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+	assert(pChannel->getLastMessage().getText() == "1234567891011");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+	assert(pChannel->getLastMessage().getText() == "123456789101112");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+	assert(pChannel->getLastMessage().getText() == "12345678910111213");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+	assert(pChannel->getLastMessage().getText() == "1234567891011121314");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+	assert(pChannel->getLastMessage().getText() == "123456789101112131415");
 }
 
 

@@ -1,8 +1,6 @@
 //
 // NodeAppenderTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NodeAppenderTest.cpp#1 $
-//
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NodeAppenderTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/NodeAppender.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Document.h"

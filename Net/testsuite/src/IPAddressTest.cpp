@@ -1,8 +1,6 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/IPAddressTest.cpp#2 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "IPAddressTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/NetException.h"
 
@@ -58,6 +56,10 @@ void IPAddressTest::testStringConv()
 void IPAddressTest::testStringConv6()
 {
 #ifdef POCO_HAVE_IPv6
+	IPAddress ia0("::1");
+	assert (ia0.family() == IPAddress::IPv6);
+	assert (ia0.toString() == "::1");
+
 	IPAddress ia1("1080:0:0:0:8:600:200a:425c");
 	assert (ia1.family() == IPAddress::IPv6);
 	assert (ia1.toString() == "1080::8:600:200a:425c");
@@ -81,6 +83,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia6(32, IPAddress::IPv6);
 	assert (ia6.family() == IPAddress::IPv6);
 	assert (ia6.toString() == "ffff:ffff::");
+
+	IPAddress ia7("::");
+	assert (ia7.family() == IPAddress::IPv6);
+	assert (ia7.toString() == "::");
 #endif
 }
 
@@ -431,7 +437,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip1.isSiteLocal());
 	assert (ip1.isWellKnownMC());
 	assert (!ip1.isNodeLocalMC());
-	assert (ip1.isLinkLocalMC()); 
+	assert (ip1.isLinkLocalMC());
 	assert (!ip1.isSiteLocalMC());
 	assert (!ip1.isOrgLocalMC());
 	assert (!ip1.isGlobalMC());
@@ -449,7 +455,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip2.isLinkLocalMC());
 	assert (!ip2.isSiteLocalMC());
 	assert (!ip2.isOrgLocalMC());
-	assert (!ip2.isGlobalMC()); 
+	assert (!ip2.isGlobalMC());
 
 	IPAddress ip3("ff05:0:0:0:0:0:0:FB"); // site local unicast
 	assert (!ip3.isWildcard());
@@ -491,7 +497,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip5.isSiteLocal());
 	assert (!ip5.isWellKnownMC());
 	assert (!ip5.isNodeLocalMC());
-	assert (!ip5.isLinkLocalMC()); 
+	assert (!ip5.isLinkLocalMC());
 	assert (!ip5.isSiteLocalMC());
 	assert (!ip5.isOrgLocalMC());
 	assert (ip5.isGlobalMC());

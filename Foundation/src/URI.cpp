@@ -1,8 +1,6 @@
 //
 // URI.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URI.cpp#5 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI
@@ -19,15 +17,17 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
 
 
-const std::string URI::RESERVED_PATH     = "?#";
-const std::string URI::RESERVED_QUERY    = "#";
-const std::string URI::RESERVED_FRAGMENT = "";
-const std::string URI::ILLEGAL           = "%<>{}|\\\"^`";
+const std::string URI::RESERVED_PATH        = "?#";
+const std::string URI::RESERVED_QUERY       = "?#/:;+@";
+const std::string URI::RESERVED_QUERY_PARAM = "?#/:;+@&=";
+const std::string URI::RESERVED_FRAGMENT    = "";
+const std::string URI::ILLEGAL              = "%<>{}|\\\"^`!*'()$,[]";
 
 
 URI::URI():
@@ -122,6 +122,16 @@ URI::URI(const URI& baseURI, const std::string& relativeURI):
 	_fragment(baseURI._fragment)
 {
 	resolve(relativeURI);
+}
+
+
+URI::URI(const Path& path):
+	_scheme("file"),
+	_port(0)
+{
+	Path absolutePath(path);
+	absolutePath.makeAbsolute();
+	_path = absolutePath.toString(Path::PATH_UNIX);
 }
 
 
@@ -322,12 +332,10 @@ void URI::setQuery(const std::string& query)
 
 void URI::addQueryParameter(const std::string& param, const std::string& val)
 {
-	std::string reserved(RESERVED_QUERY);
-	reserved += "=&";
-	if (!_query.empty()) _query.append(1, '&');
-	encode(param, reserved, _query);
-	_query.append(1, '=');
-	encode(val, reserved, _query);
+	if (!_query.empty()) _query += '&';
+	encode(param, RESERVED_QUERY_PARAM, _query);
+	_query += '=';
+	encode(val, RESERVED_QUERY_PARAM, _query);
 }
 
 
@@ -336,6 +344,56 @@ std::string URI::getQuery() const
 	std::string query;
 	decode(_query, query);
 	return query;
+}
+
+
+URI::QueryParameters URI::getQueryParameters() const
+{
+	QueryParameters result;
+	std::string::const_iterator it(_query.begin());
+	std::string::const_iterator end(_query.end());
+	while (it != end)
+	{
+		std::string name;
+		std::string value;
+		while (it != end && *it != '=' && *it != '&')
+		{
+			if (*it == '+')
+				name += ' ';
+			else
+				name += *it;
+			++it;
+		}
+		if (it != end && *it == '=')
+		{
+			++it;
+			while (it != end && *it != '&')
+			{
+				if (*it == '+')
+					value += ' ';
+				else
+					value += *it;
+				++it;
+			}
+		}
+		std::string decodedName;
+		std::string decodedValue;
+		URI::decode(name, decodedName);
+		URI::decode(value, decodedValue);
+		result.push_back(std::make_pair(decodedName, decodedValue));
+		if (it != end && *it == '&') ++it;	
+	}
+	return result;
+}
+
+
+void URI::setQueryParameters(const QueryParameters& params)
+{
+	_query.clear();
+	for (QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
+	{
+		addQueryParameter(it->first, it->second);
+	}
 }
 
 
@@ -440,7 +498,7 @@ void URI::resolve(const URI& relativeURI)
 			}
 		}
 	}
-	_fragment = relativeURI._fragment;      
+	_fragment = relativeURI._fragment;
 }
 
 
@@ -568,10 +626,10 @@ void URI::encode(const std::string& str, const std::string& reserved, std::strin
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
 	{
 		char c = *it;
-		if ((c >= 'a' && c <= 'z') || 
-		    (c >= 'A' && c <= 'Z') || 
+		if ((c >= 'a' && c <= 'z') ||
+		    (c >= 'A' && c <= 'Z') ||
 		    (c >= '0' && c <= '9') ||
-		    c == '-' || c == '_' || 
+		    c == '-' || c == '_' ||
 		    c == '.' || c == '~')
 		{
 			encodedStr += c;
@@ -599,9 +657,9 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 		if (inQuery && plusAsSpace && c == '+') c = ' ';
 		else if (c == '%')
 		{
-			if (it == end) throw SyntaxException("URI encoding: no hex digit following percent sign", str);
+			if (it == end) throw URISyntaxException("URI encoding: no hex digit following percent sign", str);
 			char hi = *it++;
-			if (it == end) throw SyntaxException("URI encoding: two hex digits must follow percent sign", str);
+			if (it == end) throw URISyntaxException("URI encoding: two hex digits must follow percent sign", str);
 			char lo = *it++;
 			if (hi >= '0' && hi <= '9')
 				c = hi - '0';
@@ -609,7 +667,7 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 				c = hi - 'A' + 10;
 			else if (hi >= 'a' && hi <= 'f')
 				c = hi - 'a' + 10;
-			else throw SyntaxException("URI encoding: not a hex digit");
+			else throw URISyntaxException("URI encoding: not a hex digit");
 			c *= 16;
 			if (lo >= '0' && lo <= '9')
 				c += lo - '0';
@@ -617,7 +675,7 @@ void URI::decode(const std::string& str, std::string& decodedStr, bool plusAsSpa
 				c += lo - 'A' + 10;
 			else if (lo >= 'a' && lo <= 'f')
 				c += lo - 'a' + 10;
-			else throw SyntaxException("URI encoding: not a hex digit");
+			else throw URISyntaxException("URI encoding: not a hex digit");
 		}
 		decodedStr += c;
 	}
@@ -638,13 +696,13 @@ unsigned short URI::getWellKnownPort() const
 		return 22;
 	else if (_scheme == "telnet")
 		return 23;
-	else if (_scheme == "http")
+	else if (_scheme == "http" || _scheme == "ws")
 		return 80;
 	else if (_scheme == "nntp")
 		return 119;
 	else if (_scheme == "ldap")
 		return 389;
-	else if (_scheme == "https")
+	else if (_scheme == "https" || _scheme == "wss")
 		return 443;
 	else if (_scheme == "rtsp")
 		return 554;
@@ -671,7 +729,7 @@ void URI::parse(const std::string& uri)
 		if (it != end && *it == ':')
 		{
 			++it;
-			if (it == end) throw SyntaxException("URI scheme must be followed by authority or path", uri);
+			if (it == end) throw URISyntaxException("URI scheme must be followed by authority or path", uri);
 			setScheme(scheme);
 			if (*it == '/')
 			{
@@ -685,7 +743,7 @@ void URI::parse(const std::string& uri)
 			}
 			parsePathEtc(it, end);
 		}
-		else 
+		else
 		{
 			it = uri.begin();
 			parsePathEtc(it, end);
@@ -725,7 +783,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 		// IPv6 address
 		++it;
 		while (it != end && *it != ']') host += *it++;
-		if (it == end) throw SyntaxException("unterminated IPv6 address");
+		if (it == end) throw URISyntaxException("unterminated IPv6 address");
 		++it;
 	}
 	else
@@ -743,7 +801,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 			if (NumberParser::tryParse(port, nport) && nport > 0 && nport < 65536)
 				_port = (unsigned short) nport;
 			else
-				throw SyntaxException("bad or invalid port number", port);
+				throw URISyntaxException("bad or invalid port number", port);
 		}
 		else _port = getWellKnownPort();
 	}
@@ -847,7 +905,7 @@ void URI::buildPath(const std::vector<std::string>& segments, bool leadingSlash,
 		else _path += '/';
 		_path.append(*it);
 	}
-	if (trailingSlash) 
+	if (trailingSlash)
 		_path += '/';
 }
 

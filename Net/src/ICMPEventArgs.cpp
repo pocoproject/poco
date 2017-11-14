@@ -1,8 +1,6 @@
 //
 // ICMPEventArgs.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPEventArgs.cpp#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPEventArgs
@@ -33,11 +31,11 @@ namespace Net {
 
 
 ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
-	_address(address), 
+	_address(address),
 	_sent(0),
-	_dataSize(dataSize), 
-	_ttl(ttl), 
-	_rtt(repetitions, 0), 
+	_dataSize(dataSize),
+	_ttl(ttl),
+	_rtt(repetitions, 0),
 	_errors(repetitions)
 {
 }
@@ -54,10 +52,10 @@ std::string ICMPEventArgs::hostName() const
 	{
 		return DNS::resolve(_address.host().toString()).name();
 	}
-	catch (HostNotFoundException&) 
+	catch (HostNotFoundException&)
 	{
 	}
-	catch (NoAddressFoundException&) 
+	catch (NoAddressFoundException&)
 	{
 	}
 	catch (DNSException&)
@@ -103,7 +101,7 @@ int ICMPEventArgs::received() const
 {
 	int received = 0;
 
-	for (int i = 0; i < _rtt.size(); ++i) 
+	for (int i = 0; i < _rtt.size(); ++i)
 	{
 		if (_rtt[i]) ++received;
 	}
@@ -113,7 +111,7 @@ int ICMPEventArgs::received() const
 
 void ICMPEventArgs::setError(int index, const std::string& text)
 {
-	if (index >= _errors.size()) 
+	if (index >= _errors.size())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	_errors[index] = text;
@@ -122,7 +120,7 @@ void ICMPEventArgs::setError(int index, const std::string& text)
 
 const std::string& ICMPEventArgs::error(int index) const
 {
-	if (0 == _errors.size()) 
+	if (0 == _errors.size())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	if (-1 == index) index = _sent - 1;
@@ -133,7 +131,7 @@ const std::string& ICMPEventArgs::error(int index) const
 
 void ICMPEventArgs::setReplyTime(int index, int time)
 {
-	if (index >= _rtt.size()) 
+	if (index >= _rtt.size())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 	if (0 == time) time = 1;
 	_rtt[index] = time;
@@ -142,7 +140,7 @@ void ICMPEventArgs::setReplyTime(int index, int time)
 
 int ICMPEventArgs::replyTime(int index) const
 {
-	if (0 == _rtt.size()) 
+	if (0 == _rtt.size())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 
 	if (-1 == index) index = _sent - 1;

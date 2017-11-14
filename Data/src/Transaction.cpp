@@ -1,8 +1,6 @@
 //
 // Transaction.cpp
 //
-// $Id: //poco/Main/Data/src/Transaction.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Transaction
@@ -40,20 +38,32 @@ Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 	
 Transaction::~Transaction()
 {
-	if (_rSession.isTransaction())
+	try
 	{
-		try
+		if (_rSession.isTransaction())
 		{
-			if (_pLogger) 
-				_pLogger->debug("Rolling back transaction.");
+			try
+			{
+				if (_pLogger)
+					_pLogger->debug("Rolling back transaction.");
 
-			_rSession.rollback();
+				_rSession.rollback();
+			}
+			catch (Poco::Exception& exc)
+			{
+				if (_pLogger)
+					_pLogger->error("Error while rolling back database transaction: %s", exc.displayText());
+			}
+			catch (...)
+			{
+				if (_pLogger)
+					_pLogger->error("Error while rolling back database transaction.");
+			}
 		}
-		catch (...)
-		{
-			if (_pLogger) 
-				_pLogger->error("Error while rolling back database transaction.");
-		}
+	}
+	catch (...)
+	{
+		poco_unexpected();
 	}
 }
 
@@ -86,7 +96,7 @@ void Transaction::execute(const std::vector<std::string>& sql)
 	}
 	catch (Exception& ex)
 	{
-		if (_pLogger) _pLogger->error(ex.displayText());
+		if (_pLogger) _pLogger->log(ex);
 	}
 
 	rollback();
@@ -95,7 +105,7 @@ void Transaction::execute(const std::vector<std::string>& sql)
 
 void Transaction::commit()
 {
-	if (_pLogger) 
+	if (_pLogger)
 		_pLogger->debug("Committing transaction.");
 
 	_rSession.commit();
@@ -104,7 +114,7 @@ void Transaction::commit()
 	
 void Transaction::rollback()
 {
-	if (_pLogger) 
+	if (_pLogger)
 		_pLogger->debug("Rolling back transaction.");
 
 	_rSession.rollback();

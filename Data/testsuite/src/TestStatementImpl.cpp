@@ -1,8 +1,6 @@
 //
 // TestStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/TestStatementImpl.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -72,7 +70,7 @@ std::size_t TestStatementImpl::columnsReturned() const
 }
 
 
-const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos, std::size_t /*rsPos*/) const
 {
 	static MetaColumn c(pos, "", MetaColumn::FDT_BOOL, 0);
 	return c;
@@ -89,7 +87,7 @@ std::size_t TestStatementImpl::next()
 {
 	Poco::Data::AbstractExtractionVec::iterator it    = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
-	std::size_t pos = 0; 
+	std::size_t pos = 0;
 	for (; it != itEnd; ++it)
 	{
 		(*it)->extract(pos);

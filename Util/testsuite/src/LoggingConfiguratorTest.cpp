@@ -1,8 +1,6 @@
 //
 // LoggingConfiguratorTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/LoggingConfiguratorTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "LoggingConfiguratorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/LoggingConfigurator.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/LoggingRegistry.h"
@@ -115,7 +113,7 @@ void LoggingConfiguratorTest::testConfigurator()
 
 void LoggingConfiguratorTest::testBadConfiguration1()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
 	
 	static const std::string config =
@@ -158,7 +156,7 @@ void LoggingConfiguratorTest::testBadConfiguration1()
 
 void LoggingConfiguratorTest::testBadConfiguration2()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
 	
 	static const std::string config =
@@ -201,7 +199,7 @@ void LoggingConfiguratorTest::testBadConfiguration2()
 
 void LoggingConfiguratorTest::testBadConfiguration3()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
 	
 	static const std::string config =
@@ -244,7 +242,7 @@ void LoggingConfiguratorTest::testBadConfiguration3()
 
 void LoggingConfiguratorTest::testBadConfiguration4()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
 	
 	static const std::string config =

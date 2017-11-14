@@ -1,8 +1,6 @@
 //
 // Pair.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Pair.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Pair
@@ -98,7 +96,7 @@ public:
 	std::string toString()
 	{
 		std::string str;
-		Var(*this).convert<std::string>(str);
+		Var(*this).template convert<std::string>(str);
 		return str;
 	}
 

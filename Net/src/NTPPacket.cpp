@@ -1,8 +1,6 @@
 //
 // NTPPacket.cpp
 //
-// $Id: //poco/1.4/Net/src/NTPPacket.cpp#2 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPPacket
@@ -23,8 +21,14 @@
 namespace Poco {
 namespace Net {
 
-#pragma pack(push,1)
-typedef struct _NTPPacketData {
+
+#if !defined(POCO_COMPILER_SUN)
+#pragma pack(push, 1)
+#else
+#pragma pack(1)
+#endif
+struct NTPPacketData
+{
 	Poco::Int8 mode:3;
 	Poco::Int8 vn:3;
 	Poco::Int8 li:2;
@@ -38,8 +42,12 @@ typedef struct _NTPPacketData {
 	Poco::Int64 ots;
 	Poco::Int64 vts;
 	Poco::Int64 tts;
-} NTPPacketData;
+};
+#if !defined(POCO_COMPILER_SUN)
 #pragma pack(pop)
+#else
+#pragma pack()
+#endif
 
 
 NTPPacket::NTPPacket() :
@@ -47,7 +55,6 @@ NTPPacket::NTPPacket() :
 	_leapIndicator(3),
 	_version(4),
 	_mode(3),
-
 	_stratum(0),
 	_pool(6),
 	_precision(-18),
@@ -59,7 +66,7 @@ NTPPacket::NTPPacket() :
 	_transmitTimestamp(0)
 {
 	Poco::Timestamp ts;
-	_originateTimestamp = ts.utcTime();
+	_originateTimestamp = ts.utcTime() - 2874597888;
 }
 
 

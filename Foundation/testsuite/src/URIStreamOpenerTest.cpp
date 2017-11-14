@@ -1,8 +1,6 @@
 //
 // URIStreamOpenerTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/URIStreamOpenerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "URIStreamOpenerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/URIStreamOpener.h"
 #include "Poco/URIStreamFactory.h"
 #include "Poco/URI.h"
@@ -46,7 +44,7 @@ namespace
 }
 
 
-URIStreamOpenerTest::URIStreamOpenerTest(const std::string& name): CppUnit::TestCase(name)
+URIStreamOpenerTest::URIStreamOpenerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

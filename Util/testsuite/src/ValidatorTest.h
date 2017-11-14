@@ -1,8 +1,6 @@
 //
 // ValidatorTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/ValidatorTest.h#1 $
-//
 // Definition of the ValidatorTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ValidatorTest: public CppUnit::TestCase

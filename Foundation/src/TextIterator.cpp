@@ -1,8 +1,6 @@
 //
 // TextIterator.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TextIterator.cpp#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  TextIterator
@@ -36,10 +34,10 @@ TextIterator::TextIterator(const std::string& str, const TextEncoding& encoding)
 }
 
 
-TextIterator::TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& end, const TextEncoding& encoding):
+TextIterator::TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& rEnd, const TextEncoding& encoding):
 	_pEncoding(&encoding),
 	_it(begin),
-	_end(end)
+	_end(rEnd)
 {
 }
 
@@ -52,10 +50,10 @@ TextIterator::TextIterator(const std::string& str):
 }
 
 
-TextIterator::TextIterator(const std::string::const_iterator& end):
+TextIterator::TextIterator(const std::string::const_iterator& rEnd):
 	_pEncoding(0),
-	_it(end),
-	_end(end)
+	_it(rEnd),
+	_end(rEnd)
 {
 }
 
@@ -113,9 +111,9 @@ int TextIterator::operator * () const
 	while (-1 > n && (_end - it) >= -n - read)
 	{
 		while (read < -n && it != _end)
-		{ 
-			*p++ = *it++; 
-			read++; 
+		{
+			*p++ = *it++;
+			read++;
 		}
 		n = _pEncoding->queryConvert(buffer, read);
 	}
@@ -150,16 +148,16 @@ TextIterator& TextIterator::operator ++ ()
 	while (-1 > n && (_end - _it) >= -n - read)
 	{
 		while (read < -n && _it != _end)
-		{ 
-			*p++ = *_it++; 
-			read++; 
+		{
+			*p++ = *_it++;
+			read++;
 		}
 		n = _pEncoding->sequenceLength(buffer, read);
 	}
 	while (read < n && _it != _end)
-	{ 
-		_it++; 
-		read++; 
+	{
+		_it++;
+		read++;
 	}
 
 	return *this;

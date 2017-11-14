@@ -1,8 +1,6 @@
 //
 // Logger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Logger.cpp#4 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Logger
@@ -19,6 +17,7 @@
 #include "Poco/LoggingRegistry.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 #include "Poco/String.h"
 
 
@@ -30,7 +29,7 @@ Mutex Logger::_mapMtx;
 const std::string Logger::ROOT;
 
 
-Logger::Logger(const std::string& name, Channel* pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
+Logger::Logger(const std::string& rName, Channel* pChannel, int level): _name(rName), _pChannel(pChannel), _level(level)
 {
 	if (pChannel) pChannel->duplicate();
 }
@@ -68,14 +67,14 @@ void Logger::setLevel(const std::string& level)
 }
 
 
-void Logger::setProperty(const std::string& name, const std::string& value)
+void Logger::setProperty(const std::string& rName, const std::string& rValue)
 {
-	if (name == "channel")
-		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
-	else if (name == "level")
-		setLevel(value);
-	else 
-		Channel::setProperty(name, value);
+	if (rName == "channel")
+		setChannel(LoggingRegistry::defaultRegistry().channelForName(rValue));
+	else if (rName == "level")
+		setLevel(rValue);
+	else
+		Channel::setProperty(rName, rValue);
 }
 
 
@@ -120,7 +119,7 @@ void Logger::setLevel(const std::string& name, int level)
 		std::string::size_type len = name.length();
 		for (LoggerMap::iterator it = _pLoggerMap->begin(); it != _pLoggerMap->end(); ++it)
 		{
-			if (len == 0 || 
+			if (len == 0 ||
 				(it->first.compare(0, len, name) == 0 && (it->first.length() == len || it->first[len] == '.')))
 			{
 				it->second->setLevel(level);
@@ -432,7 +431,18 @@ int Logger::parseLevel(const std::string& level)
 	else if (icompare(level, "trace") == 0)
 		return Message::PRIO_TRACE;
 	else
-		throw InvalidArgumentException("Not a valid log level", level);
+	{
+		int numLevel;
+		if (Poco::NumberParser::tryParse(level, numLevel))
+		{
+			if (numLevel > 0 && numLevel < 9)
+				return numLevel;
+			else
+				throw InvalidArgumentException("Log level out of range ", level);
+		}
+		else
+			throw InvalidArgumentException("Not a valid log level", level);
+	}
 }
 
 
@@ -444,7 +454,14 @@ public:
 	}
 	~AutoLoggerShutdown()
 	{
-		Logger::shutdown();
+		try
+		{
+			Logger::shutdown();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 };
 

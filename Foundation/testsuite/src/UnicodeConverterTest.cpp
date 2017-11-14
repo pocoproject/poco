@@ -1,8 +1,6 @@
 //
 // UnicodeConverterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UnicodeConverterTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -15,19 +13,12 @@
 
 #include "Poco/UnicodeConverter.h"
 #include "UnicodeConverterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/UTFString.h"
 
 
-using Poco::UnicodeConverter;
-using Poco::UTF16Char;
-using Poco::UTF16String;
-using Poco::UTF32Char;
-using Poco::UTF32String;
-
-
-UnicodeConverterTest::UnicodeConverterTest(const std::string& name): CppUnit::TestCase(name)
+UnicodeConverterTest::UnicodeConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -39,14 +30,13 @@ UnicodeConverterTest::~UnicodeConverterTest()
 
 void UnicodeConverterTest::testUTF16()
 {
-	
-	runTests<UTF16String>();
+	runTests<Poco::UTF16String>();
 }
 
 
 void UnicodeConverterTest::testUTF32()
 {
-	runTests<UTF32String>();
+	runTests<Poco::UTF32String>();
 }
 
 

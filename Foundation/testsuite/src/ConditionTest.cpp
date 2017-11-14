@@ -1,8 +1,6 @@
 //
 // ConditionTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ConditionTest.cpp#1 $
-//
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ConditionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Condition.h"
@@ -92,7 +90,7 @@ namespace
 }
 
 
-ConditionTest::ConditionTest(const std::string& name): CppUnit::TestCase(name)
+ConditionTest::ConditionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

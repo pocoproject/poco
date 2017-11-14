@@ -1,8 +1,6 @@
 //
 // MapConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/MapConfiguration.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  MapConfiguration
@@ -35,6 +33,9 @@ class Util_API MapConfiguration: public AbstractConfiguration
 public:
 	MapConfiguration();
 		/// Creates an empty MapConfiguration.
+
+	void copyTo(AbstractConfiguration& config);
+		/// Copies all configuration properties to the given configuration.
 
 	void clear();
 		/// Clears the configuration.

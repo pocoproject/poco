@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIteratorStategies.cpp
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -23,18 +21,9 @@ namespace Poco {
 //
 // TraverseBase
 //
-TraverseBase::TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-	: _depthDeterminer(depthDeterminer), 
-	  _maxDepth(maxDepth), 
-	  _pCallback(0)
+TraverseBase::TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth): _depthDeterminer(depthDeterminer), 
+	_maxDepth(maxDepth)
 {
-}
-
-
-TraverseBase& TraverseBase::setOnError(const AbstractTraverseErrorCallback& cb)
-{
-	_pCallback = cb.clone();
-	return *this;
 }
 
 
@@ -57,20 +46,11 @@ bool TraverseBase::isDirectory(Poco::File& file)
 }
 
 
-void TraverseBase::invokeOnError(const std::string& path) const
-{
-	if (_pCallback)
-	{
-		_pCallback->invoke(path);
-	}
-}
-
-
 //
 // ChildrenFirstTraverse
 //
-ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-	: TraverseBase(depthDeterminer, maxDepth)
+ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth):
+	TraverseBase(depthDeterminer, maxDepth)
 {
 }
 
@@ -80,10 +60,6 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	// pointer mustn't point to NULL and iteration mustn't be finished
 	poco_check_ptr(isFinished);
 	poco_assert(!(*isFinished));
-
-	std::stack<DirectoryIterator> it;
-
-	//_depthDeterminer(it);
 
 	// go deeper into not empty directory
 	// (if depth limit allows)
@@ -103,7 +79,7 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 		catch (...)
 		{
 			// Failed to iterate child dir.
-			invokeOnError(itStack->top()->path());
+			traverseError.notify(this, itStack->top()->path());
 		}
 	}
 
@@ -166,6 +142,7 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 		{
 			std::string dir = _dirsStack.top().front();
 			_dirsStack.top().pop();
+
 			try
 			{
 				DirectoryIterator child_it(dir);
@@ -181,7 +158,7 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 			catch (...)
 			{
 				// Failed to iterate child dir.
-				invokeOnError(dir);
+				traverseError.notify(this, dir);
 			}
 		}
 

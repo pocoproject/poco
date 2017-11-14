@@ -1,8 +1,6 @@
 //
 // RSAKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKeyImpl.cpp#3 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSAKeyImpl
@@ -16,6 +14,7 @@
 
 #include "Poco/Crypto/RSAKeyImpl.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/PKCS12Container.h"
 #include "Poco/FileStream.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -31,17 +30,40 @@ namespace Poco {
 namespace Crypto {
 
 
+RSAKeyImpl::RSAKeyImpl(const EVPPKey& key):
+	KeyPairImpl("rsa", KT_RSA_IMPL),
+	_pRSA(EVP_PKEY_get1_RSA(const_cast<EVP_PKEY*>((const EVP_PKEY*)key)))
+{
+	if (!_pRSA) throw OpenSSLException();
+}
+
+
 RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
+	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(0)
 {
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
-	_pRSA = EVP_PKEY_get1_RSA(pKey);
-	EVP_PKEY_free(pKey);
+	if (pKey)
+	{
+		_pRSA = EVP_PKEY_get1_RSA(pKey);
+		EVP_PKEY_free(pKey);
+	}
+	else
+		throw OpenSSLException("RSAKeyImpl(const X509Certificate&)");
 }
 
 
-RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
+RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pRSA(0)
+{
+	EVPPKey key = cont.getKey();
+	_pRSA = EVP_PKEY_get1_RSA(key);
+}
+
+
+RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent): KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(0)
 {
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
@@ -68,14 +90,13 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 }
 
 
-RSAKeyImpl::RSAKeyImpl(
-		const std::string& publicKeyFile, 
-		const std::string& privateKeyFile, 
-		const std::string& privateKeyPassphrase):
-	_pRSA(0)
+RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase): KeyPairImpl("rsa", KT_RSA_IMPL),
+		_pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
-	
+
 	_pRSA = RSA_new();
 	if (!publicKeyFile.empty())
 	{
@@ -88,7 +109,7 @@ RSAKeyImpl::RSAKeyImpl(
 			if (!pubKey)
 			{
 				int rc = BIO_reset(bio);
-				// BIO_reset() normally returns 1 for success and 0 or -1 for failure. 
+				// BIO_reset() normally returns 1 for success and 0 or -1 for failure.
 				// File BIOs are an exception, they return 0 for success and -1 for failure.
 				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
 				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
@@ -135,11 +156,13 @@ RSAKeyImpl::RSAKeyImpl(
 }
 
 
-RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase):
-	_pRSA(0)
+RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream,
+	std::istream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase): KeyPairImpl("rsa", KT_RSA_IMPL),
+		_pRSA(0)
 {
 	poco_assert_dbg(_pRSA == 0);
-	
+
 	_pRSA = RSA_new();
 	if (pPublicKeyStream)
 	{
@@ -151,7 +174,7 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 		if (!publicKey)
 		{
 			int rc = BIO_reset(bio);
-			// BIO_reset() normally returns 1 for success and 0 or -1 for failure. 
+			// BIO_reset() normally returns 1 for success and 0 or -1 for failure.
 			// File BIOs are an exception, they return 0 for success and -1 for failure.
 			if (rc != 1) throw Poco::FileException("Failed to load public key");
 			publicKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, 0, 0);
@@ -193,8 +216,7 @@ RSAKeyImpl::~RSAKeyImpl()
 
 void RSAKeyImpl::freeRSA()
 {
-	if (_pRSA)
-		RSA_free(_pRSA);
+	if (_pRSA) RSA_free(_pRSA);
 	_pRSA = 0;
 }
 
@@ -207,23 +229,49 @@ int RSAKeyImpl::size() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(n);
+#else
 	return convertToByteVec(_pRSA->n);
+#endif
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(e);
+#else
 	return convertToByteVec(_pRSA->e);
+#endif
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 {
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	const BIGNUM* n = 0;
+	const BIGNUM* e = 0;
+	const BIGNUM* d = 0;
+	RSA_get0_key(_pRSA, &n, &e, &d);
+	return convertToByteVec(d);
+#else
 	return convertToByteVec(_pRSA->d);
+#endif
 }
 
 
-void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
+void RSAKeyImpl::save(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase) const
 {
 	if (!publicKeyFile.empty())
 	{
@@ -256,10 +304,10 @@ void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& priva
 			{
 				int rc = 0;
 				if (privateKeyPassphrase.empty())
-					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(), 0, 0, 0, 0);
+					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, 0, 0, 0, 0, 0);
 				else
-					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(), 
-						reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())), 
+					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(),
+						reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())),
 						static_cast<int>(privateKeyPassphrase.length()), 0, 0);
 				if (!rc) throw Poco::FileException("Failed to write private key to file", privateKeyFile);
 			}
@@ -275,7 +323,9 @@ void RSAKeyImpl::save(const std::string& publicKeyFile, const std::string& priva
 }
 
 
-void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
+void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
+	std::ostream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase) const
 {
 	if (pPublicKeyStream)
 	{
@@ -298,12 +348,12 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyS
 		if (!bio) throw Poco::IOException("Cannot create BIO for writing public key");
 		int rc = 0;
 		if (privateKeyPassphrase.empty())
-			rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(), 0, 0, 0, 0);
+			rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, 0, 0, 0, 0, 0);
 		else
-			rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(), 
-				reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())), 
+			rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(),
+				reinterpret_cast<unsigned char*>(const_cast<char*>(privateKeyPassphrase.c_str())),
 				static_cast<int>(privateKeyPassphrase.length()), 0, 0);
-		if (!rc) 
+		if (!rc)
 		{
 			BIO_free(bio);
 			throw Poco::FileException("Failed to write private key to stream");

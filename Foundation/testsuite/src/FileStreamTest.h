@@ -1,8 +1,6 @@
 //
 // FileStreamTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileStreamTest.h#1 $
-//
 // Definition of the FileStreamTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class FileStreamTest: public CppUnit::TestCase

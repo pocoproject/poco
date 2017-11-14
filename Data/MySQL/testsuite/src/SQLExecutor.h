@@ -1,8 +1,6 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/SQLExecutor.h#1 $
-//
 // Definition of the SQLExecutor class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -38,8 +36,8 @@ public:
 	SQLExecutor(const std::string& name, Poco::Data::Session* _pSession);
 	~SQLExecutor();
 
-	void bareboneMySQLTest(const char* host, const char* user, const char* pwd, const char* db, int port, const char* tableCreateString);
-		/// This function uses "bare bone" MySQL API calls (i.e. calls are not 
+	void bareboneMySQLTest(const std::string& host, const std::string& user, const std::string& pwd, const std::string& db, const std::string& port, const char* tableCreateString);
+		/// This function uses "bare bone" MySQL API calls (i.e. calls are not
 		/// "wrapped" in PocoData framework structures).
 		/// The purpose of the function is to verify that driver behaves
 		/// correctly. If this test passes, subsequent tests failures are likely ours.
@@ -82,14 +80,20 @@ public:
 
 	void blob(unsigned int bigSize = ~0);
 	void blobStmt();
+	void longText();
 	void dateTime();
 	void date();
 	void time();
 	void unsignedInts();
 	void floats();
 	void doubles();
+	void any();
+	void dynamicAny();
 	void tuples();
 	void tupleVector();
+
+	void stdTuples();
+	void stdTupleVector();
 
 	void internalExtraction();
 	void doNull();

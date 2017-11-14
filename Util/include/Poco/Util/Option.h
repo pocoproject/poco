@@ -1,8 +1,6 @@
 //
 // Option.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Option.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  Option
@@ -60,7 +58,7 @@ class Util_API Option
 	///
 	/// Option instances are value objects.
 	///
-	/// Typcally, after construction, an Option object is immediately
+	/// Typically, after construction, an Option object is immediately
 	/// passed to an Options object.
 	///
 	/// An Option object can be created by chaining the constructor
@@ -129,7 +127,7 @@ public:
 		/// The configuration will automatically receive the option's argument.
 
 	Option& binding(const std::string& propertyName, AbstractConfiguration* pConfig);
-		/// Binds the option to the configuration property with the given name, 
+		/// Binds the option to the configuration property with the given name,
 		/// using the given AbstractConfiguration.
 		///
 		/// The configuration will automatically receive the option's argument.
@@ -227,7 +225,7 @@ public:
 		///
 		/// Throws a MissingArgumentException if a required argument
 		/// is missing. Throws an UnexpectedArgumentException if an
-		/// argument has been found, but none is expected. 
+		/// argument has been found, but none is expected.
 
 private:
 	std::string _shortName;

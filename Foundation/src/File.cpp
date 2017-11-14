@@ -1,8 +1,6 @@
 //
 // File.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File.cpp#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -19,21 +17,18 @@
 #include "Poco/DirectoryIterator.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "File_WINCE.cpp"
 #else
-#include "File_WIN32U.cpp"
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "File_WIN32.cpp"
+#endif
 #elif defined(POCO_VXWORKS)
 #include "File_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "File_UNIX.cpp"
-#else
-#include "File_VMS.cpp"
 #endif
+#include "Poco/Thread.h"
 
 
 namespace Poco {
@@ -44,17 +39,18 @@ File::File()
 }
 
 
-File::File(const std::string& path): FileImpl(path)
+File::File(const std::string& rPath): FileImpl(rPath)
+{
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
+}
+
+
+File::File(const char* pPath): FileImpl(std::string(pPath))
 {
 }
 
 
-File::File(const char* path): FileImpl(std::string(path))
-{
-}
-
-
-File::File(const Path& path): FileImpl(path.toString())
+File::File(const Path& rPath): FileImpl(rPath.toString())
 {
 }
 
@@ -76,24 +72,25 @@ File& File::operator = (const File& file)
 }
 
 
-File& File::operator = (const std::string& path)
+File& File::operator = (const std::string& rPath)
 {
-	setPathImpl(path);
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
+	setPathImpl(rPath);
 	return *this;
 }
 
 
-File& File::operator = (const char* path)
+File& File::operator = (const char* pPath)
 {
-	poco_check_ptr (path);
-	setPathImpl(path);
+	poco_check_ptr (pPath);
+	setPathImpl(pPath);
 	return *this;
 }
 
 
-File& File::operator = (const Path& path)
+File& File::operator = (const Path& rPath)
 {
-	setPathImpl(path.toString());
+	setPathImpl(rPath.toString());
 	return *this;
 }
 
@@ -109,13 +106,13 @@ bool File::exists() const
 	return existsImpl();
 }
 
-	
+
 bool File::canRead() const
 {
 	return canReadImpl();
 }
 
-	
+
 bool File::canWrite() const
 {
 	return canWriteImpl();
@@ -133,7 +130,7 @@ bool File::isFile() const
 	return isFileImpl();
 }
 
-	
+
 bool File::isDirectory() const
 {
 	return isDirectoryImpl();
@@ -163,33 +160,33 @@ Timestamp File::created() const
 	return createdImpl();
 }
 
-	
+
 Timestamp File::getLastModified() const
 {
 	return getLastModifiedImpl();
 }
 
-	
+
 File& File::setLastModified(const Timestamp& ts)
 {
 	setLastModifiedImpl(ts);
 	return *this;
 }
 
-	
+
 File::FileSize File::getSize() const
 {
 	return getSizeImpl();
 }
 
-	
+
 File& File::setSize(FileSizeImpl size)
 {
 	setSizeImpl(size);
 	return *this;
 }
 
-	
+
 File& File::setWriteable(bool flag)
 {
 	setWriteableImpl(flag);
@@ -210,12 +207,13 @@ File& File::setExecutable(bool flag)
 	return *this;
 }
 
-	
-void File::copyTo(const std::string& path) const
+
+void File::copyTo(const std::string& rPath) const
 {
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
 	Path src(getPathImpl());
-	Path dest(path);
-	File destFile(path);
+	Path dest(rPath);
+	File destFile(rPath);
 	if ((destFile.exists() && destFile.isDirectory()) || dest.isDirectory())
 	{
 		dest.makeDirectory();
@@ -228,9 +226,10 @@ void File::copyTo(const std::string& path) const
 }
 
 
-void File::copyDirectory(const std::string& path) const
+void File::copyDirectory(const std::string& rPath) const
 {
-	File target(path);
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
+	File target(rPath);
 	target.createDirectories();
 
 	Path src(getPathImpl());
@@ -239,26 +238,28 @@ void File::copyDirectory(const std::string& path) const
 	DirectoryIterator end;
 	for (; it != end; ++it)
 	{
-		it->copyTo(path);
+		it->copyTo(rPath);
 	}
 }
 
 
-void File::moveTo(const std::string& path)
+void File::moveTo(const std::string& rPath)
 {
-	copyTo(path);
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
+	copyTo(rPath);
 	remove(true);
-	setPathImpl(path);
+	setPathImpl(rPath);
 }
 
-	
-void File::renameTo(const std::string& path)
+
+void File::renameTo(const std::string& rPath)
 {
-	renameToImpl(path);
-	setPathImpl(path);
+	poco_assert(std::char_traits<char>::length(rPath.data()) == rPath.size());
+	renameToImpl(rPath);
+	setPathImpl(rPath);
 }
 
-	
+
 void File::remove(bool recursive)
 {
 	if (recursive && !isLink() && isDirectory())
@@ -269,8 +270,37 @@ void File::remove(bool recursive)
 		{
 			it->remove(true);
 		}
+
+		// Note: On Windows, removing a directory may not succeed at first
+		// try because deleting files is not a synchronous operation. Files
+		// are merely marked as deleted, and actually removed at a later time.
+		//
+		// An alternate strategy would be moving files to a different directory
+		// first (on the same drive, but outside the deleted tree), and marking
+		// them as hidden, before deleting them, but this could lead to other issues.
+		// So we simply retry after some time until we succeed, or give up.
+
+		int retry = 8;
+		long sleep = 10;
+		while (retry > 0)
+		{
+			try
+			{
+				removeImpl();
+				retry = 0;
+			}
+			catch (DirectoryNotEmptyException&)
+			{
+				if (--retry == 0) throw;
+				Poco::Thread::sleep(sleep);
+				sleep *= 2;
+			}
+		}
 	}
-	removeImpl();
+	else
+	{
+		removeImpl();
+	}
 }
 
 
@@ -298,7 +328,13 @@ void File::createDirectories()
 			File f(p);
 			f.createDirectories();
 		}
-		createDirectoryImpl();
+		try
+		{
+			createDirectoryImpl();
+		}
+		catch (FileExistsException&)
+		{
+		}
 	}
 }
 
@@ -313,6 +349,24 @@ void File::list(std::vector<std::string>& files) const
 		files.push_back(it.name());
 		++it;
 	}
+}
+
+
+File::FileSize File::totalSpace() const
+{
+	return totalSpaceImpl();
+}
+
+
+File::FileSize File::usableSpace() const
+{
+	return usableSpaceImpl();
+}
+
+
+File::FileSize File::freeSpace() const
+{
+	return freeSpaceImpl();
 }
 
 

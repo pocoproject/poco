@@ -1,8 +1,6 @@
 //
 // XMLConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/XMLConfiguration.cpp#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  XMLConfiguration
@@ -39,12 +37,14 @@ namespace Util {
 XMLConfiguration::XMLConfiguration():
 	_delim('.')
 {
+	loadEmpty("config");
 }
 
 
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {
+	loadEmpty("config");
 }
 
 
@@ -123,15 +123,21 @@ XMLConfiguration::~XMLConfiguration()
 }
 
 
-void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
+void XMLConfiguration::load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize)
 {
 	poco_check_ptr (pInputSource);
 	
-	Poco::XML::DOMParser parser;
+	Poco::XML::DOMParser parser(namePoolSize);
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
 	Poco::XML::AutoPtr<Poco::XML::Document> pDoc = parser.parse(pInputSource);
 	load(pDoc);
+}
+
+
+void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
+{
+	load(pInputSource, POCO_XML_NAMEPOOL_DEFAULT_SIZE);
 }
 
 
@@ -260,7 +266,7 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	using Poco::NumberFormatter;
 	
-	std::multiset<std::string> keys;
+	std::multiset<std::string> keySet;
 	const Poco::XML::Node* pNode = findNode(key);
 	if (pNode)
 	{
@@ -270,12 +276,12 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 			if (pChild->nodeType() == Poco::XML::Node::ELEMENT_NODE)
 			{
 				const std::string& nodeName = pChild->nodeName();
-				int n = (int) keys.count(nodeName);
+				int n = (int) keySet.count(nodeName);
 				if (n)
 					range.push_back(nodeName + "[" + NumberFormatter::format(n) + "]");
 				else
 					range.push_back(nodeName);
-				keys.insert(nodeName);
+				keySet.insert(nodeName);
 			}
 			pChild = pChild->nextSibling();
 		}

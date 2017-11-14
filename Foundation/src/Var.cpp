@@ -1,8 +1,6 @@
 //
 // Var.cpp
 //
-// $Id: //poco/svn/Foundation/src/Var.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Var
@@ -36,7 +34,7 @@ Var::Var()
 
 
 Var::Var(const char* pVal)
-#ifdef POCO_NO_SOO 
+#ifdef POCO_NO_SOO
 	: _pHolder(new VarHolderImpl<std::string>(pVal))
 {
 }
@@ -85,7 +83,7 @@ const Var Var::operator + (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return add<Poco::Int64>(other);
 		else
 			return add<Poco::UInt64>(other);
@@ -103,7 +101,7 @@ Var& Var::operator += (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = add<Poco::Int64>(other);
 		else
 			return *this = add<Poco::UInt64>(other);
@@ -121,7 +119,7 @@ const Var Var::operator - (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return subtract<Poco::Int64>(other);
 		else
 			return subtract<Poco::UInt64>(other);
@@ -137,7 +135,7 @@ Var& Var::operator -= (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = subtract<Poco::Int64>(other);
 		else
 			return *this = subtract<Poco::UInt64>(other);
@@ -153,7 +151,7 @@ const Var Var::operator * (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return multiply<Poco::Int64>(other);
 		else
 			return multiply<Poco::UInt64>(other);
@@ -169,7 +167,7 @@ Var& Var::operator *= (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = multiply<Poco::Int64>(other);
 		else
 			return *this = multiply<Poco::UInt64>(other);
@@ -185,7 +183,7 @@ const Var Var::operator / (const Var& other) const
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return divide<Poco::Int64>(other);
 		else
 			return divide<Poco::UInt64>(other);
@@ -201,7 +199,7 @@ Var& Var::operator /= (const Var& other)
 {
 	if (isInteger())
 	{
-		if(isSigned())
+		if (isSigned())
 			return *this = divide<Poco::Int64>(other);
 		else
 			return *this = divide<Poco::UInt64>(other);
@@ -255,7 +253,7 @@ const Var Var::operator -- (int)
 
 bool Var::operator == (const Var& other) const
 {
-	if (isEmpty() && !other.isEmpty()) return false;
+	if (isEmpty() != other.isEmpty()) return false;
 	if (isEmpty() && other.isEmpty()) return true;
 	return convert<std::string>() == other.convert<std::string>();
 }
@@ -339,6 +337,19 @@ void Var::empty()
 }
 
 
+void Var::clear()
+{
+#ifdef POCO_NO_SOO
+	delete _pHolder;
+	_pHolder = 0;
+#else
+	if (_placeholder.isLocal()) this->~Var();
+	else delete content();
+	_placeholder.erase();
+#endif
+}
+
+
 Var& Var::getAt(std::size_t n)
 {
 	if (isVector())
@@ -401,8 +412,66 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 			return parseObject(val, pos);
 		case '[':
 			return parseArray(val, pos);
+		case '"':
+			return parseJSONString(val, pos);
 		default:
-			return parseString(val, pos);
+			{
+				std::string str = parseString(val, pos);
+				if (str == "false")
+					return false;
+
+				if (str == "true")
+					return true;
+
+				bool isNumber = false;
+				bool isSigned = false;
+				int separators = 0;
+				int frac = 0;
+				int index = 0;
+				size_t size = str.size();
+				for (size_t i = 0; i < size ; ++i)
+				{
+					int ch = str[i];
+					if ((ch == '-' || ch == '+') && index == 0)
+					{
+						if (ch == '-')
+							isSigned = true;
+					}
+					else if (Ascii::isDigit(ch))
+					{
+						isNumber |= true;
+					}
+					else if (ch == '.' || ch == ',')
+					{
+						frac = ch;
+						++separators;
+						if (separators > 1)
+							return str;
+					}
+					else
+						return str;
+
+					++index;
+				}
+
+				if (frac && isNumber)
+				{
+					const double number = NumberParser::parseFloat(str, frac);
+					return Var(number);
+				}
+				else if (frac == 0 && isNumber && isSigned)
+				{
+					const Poco::Int64 number = NumberParser::parse64(str);
+					return number;
+				}
+				else if (frac == 0 && isNumber && !isSigned)
+				{
+					const Poco::UInt64 number = NumberParser::parseUnsigned64(str);
+					return number;
+				}
+
+				return str;
+			}
 		}
 	}
 	std::string empty;
@@ -412,7 +481,7 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 
 Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '{');
+	poco_assert_dbg (pos < val.size() && val[pos] == '{');
 	++pos;
 	skipWhiteSpace(val, pos);
 	DynamicStruct aStruct;
@@ -421,7 +490,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		std::string key = parseString(val, pos);
 		skipWhiteSpace(val, pos);
 		if (val[pos] != ':')
-			throw DataFormatException("Incorrect object, must contain: key : value pairs"); 
+			throw DataFormatException("Incorrect object, must contain: key : value pairs");
 		++pos; // skip past :
 		Var value = parse(val, pos);
 		aStruct.insert(key, value);
@@ -433,7 +502,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		}
 	}
 	if (val[pos] != '}')
-		throw DataFormatException("Unterminated object"); 
+		throw DataFormatException("Unterminated object");
 	++pos;
 	return aStruct;
 }
@@ -441,7 +510,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 
 Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '[');
+	poco_assert_dbg (pos < val.size() && val[pos] == '[');
 	++pos;
 	skipWhiteSpace(val, pos);
 	std::vector<Var> result;
@@ -456,7 +525,7 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 		}
 	}
 	if (val[pos] != ']')
-		throw DataFormatException("Unterminated array"); 
+		throw DataFormatException("Unterminated array");
 	++pos;
 	return result;
 }
@@ -464,48 +533,88 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 
 std::string Var::parseString(const std::string& val, std::string::size_type& pos)
 {
-	static const std::string STR_STOP("\"");
-	static const std::string OTHER_STOP("\n ,]}");
-
-	bool inString = false;
-	//skip optional ' "
+	poco_assert_dbg (pos < val.size());
 	if (val[pos] == '"')
 	{
-		inString = true;
-		++pos;
-	}
-	
-	std::string::size_type stop = std::string::npos;
-	if (inString)
-	{
-		stop = val.find_first_of(STR_STOP, pos);
-		if (stop == std::string::npos)
-			throw DataFormatException("Unterminated string");
+		return parseJSONString(val, pos);
 	}
 	else
 	{
-		// we stop at space, ',', ']' or '}' or end of string
-		stop = val.find_first_of(OTHER_STOP, pos);
-		if (stop == std::string::npos)
-			stop = val.size();
-
-		std::string::size_type safeCheck = val.find_first_of(STR_STOP, pos);
-		if (safeCheck != std::string::npos && safeCheck < stop)
-			throw DataFormatException("Misplaced string termination char found");
-
+		std::string result;
+		while (pos < val.size()
+			&& !Poco::Ascii::isSpace(val[pos])
+			&& val[pos] != ','
+			&& val[pos] != ']'
+			&& val[pos] != '}')
+		{
+			result += val[pos++];
+		}
+		return result;
 	}
+}
 
-	// stop now points to the last char to be not included
-	std::string result = val.substr(pos, stop - pos);
-	++stop; // point past '/"
-	pos = stop;
+
+std::string Var::parseJSONString(const std::string& val, std::string::size_type& pos)
+{
+	poco_assert_dbg (pos < val.size() && val[pos] == '"');
+	++pos;
+	std::string result;
+	bool done = false;
+	while (pos < val.size() && !done)
+	{
+		switch (val[pos])
+		{
+		case '"':
+			done = true;
+			++pos;
+			break;
+		case '\\':
+			if (pos < val.size())
+			{
+				++pos;
+				switch (val[pos])
+				{
+				case 'b':
+					result += '\b';
+					break;
+				case 'f':
+					result += '\f';
+					break;
+				case 'n':
+					result += '\n';
+					break;
+				case 'r':
+					result += '\r';
+					break;
+				case 't':
+					result += '\t';
+					break;
+				default:
+					result += val[pos];
+					break;
+				}
+				break;
+			}
+			else
+			{
+				result += val[pos];
+			}
+			++pos;
+			break;
+		default:
+			result += val[pos++];
+			break;
+		}
+	}
+	if (!done) throw Poco::DataFormatException("unterminated JSON string");
 	return result;
 }
 
 
 void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 {
-	while (std::isspace(val[pos]))
+	poco_assert_dbg (pos < val.size());
+	while (std::isspace(val[pos]) && pos < val.size())
 		++pos;
 }
 

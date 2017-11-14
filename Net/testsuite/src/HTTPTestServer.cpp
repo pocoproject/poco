@@ -1,8 +1,6 @@
 //
 // HTTPTestServer.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPTestServer.cpp#4 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -103,7 +101,7 @@ void HTTPTestServer::run()
 
 bool HTTPTestServer::requestComplete() const
 {
-	return ((_lastRequest.substr(0, 3) == "GET" || _lastRequest.substr(0, 4) == "HEAD") && 
+	return ((_lastRequest.substr(0, 3) == "GET" || _lastRequest.substr(0, 4) == "HEAD") &&
 	        (_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
 	        (_lastRequest.find("\r\n0\r\n") != std::string::npos);
 }
@@ -119,7 +117,7 @@ std::string HTTPTestServer::handleRequest() const
 		std::string body(SMALL_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
 		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: "); 
+		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n");
 		response.append("Connection: Close\r\n");
@@ -134,13 +132,44 @@ std::string HTTPTestServer::handleRequest() const
 		std::string body(LARGE_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
 		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: "); 
+		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n");
 		response.append("Connection: Close\r\n");
 		response.append("\r\n");
 		if (_lastRequest.substr(0, 3) == "GET")
 			response.append(body);
+	}
+	else if (_lastRequest.substr(0, 12) == "POST /expect")
+	{
+		std::string::size_type pos = _lastRequest.find("\r\n\r\n");
+		pos += 4;
+		std::string body = _lastRequest.substr(pos);
+		response.append("HTTP/1.1 100 Continue\r\n\r\n");
+		response.append("HTTP/1.1 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
+		if (_lastRequest.find("Content-Length") != std::string::npos)
+		{
+			response.append("Content-Length: ");
+			response.append(NumberFormatter::format((int) body.size()));
+			response.append("\r\n");
+		}
+		else if (_lastRequest.find("chunked") != std::string::npos)
+		{
+			response.append("Transfer-Encoding: chunked\r\n");
+		}
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+		response.append(body);
+	}
+	else if (_lastRequest.substr(0, 10) == "POST /fail")
+	{
+		std::string::size_type pos = _lastRequest.find("\r\n\r\n");
+		pos += 4;
+		std::string body = _lastRequest.substr(pos);
+		response.append("HTTP/1.1 400 Bad Request\r\n");
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
 	}
 	else if (_lastRequest.substr(0, 4) == "POST")
 	{
@@ -151,7 +180,7 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("Content-Type: text/plain\r\n");
 		if (_lastRequest.find("Content-Length") != std::string::npos)
 		{
-			response.append("Content-Length: "); 
+			response.append("Content-Length: ");
 			response.append(NumberFormatter::format((int) body.size()));
 			response.append("\r\n");
 		}
@@ -169,13 +198,13 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("HTTP/1.1 200 OK\r\n");
 		response.append("Connection: keep-alive\r\n");
 		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: "); 
+		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n\r\n");
 		response.append("HTTP/1.1 200 OK\r\n");
 		response.append("Connection: Keep-Alive\r\n");
 		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: "); 
+		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n\r\n");
 		response.append(body);
@@ -191,7 +220,7 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("HTTP/1.1 200 OK\r\n");
 		response.append("Connection: close\r\n");
 		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: "); 
+		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n\r\n");
 	}
@@ -212,7 +241,7 @@ std::string HTTPTestServer::handleRequest() const
 		std::string body(SMALL_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
 		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: "); 
+		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n");
 		response.append("Connection: Close\r\n");

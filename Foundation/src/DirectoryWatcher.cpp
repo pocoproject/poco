@@ -1,8 +1,6 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#4 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryWatcher
@@ -15,6 +13,9 @@
 
 
 #include "Poco/DirectoryWatcher.h"
+#ifdef POCO_OS_FAMILY_WINDOWS
+#include "Poco/UnWindows.h"
+#endif
 
 
 #ifndef POCO_NO_INOTIFY
@@ -26,9 +27,6 @@
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
 #include "Poco/Buffer.h"
-#if defined(POCO_WIN32_UTF8)
-	#include "Poco/UnicodeConverter.h"
-#endif
 #if POCO_OS == POCO_OS_LINUX
 	#include <sys/inotify.h>
 	#include <sys/select.h>
@@ -53,8 +51,8 @@ namespace Poco {
 class DirectoryWatcherStrategy
 {
 public:
-	DirectoryWatcherStrategy(DirectoryWatcher& owner):
-		_owner(owner)
+	DirectoryWatcherStrategy(DirectoryWatcher& ownerWatcher):
+		_owner(ownerWatcher)
 	{
 	}
 
@@ -105,7 +103,18 @@ protected:
 		DirectoryIterator end;
 		while (it != end)
 		{
-			entries[it.path().getFileName()] = ItemInfo(*it);
+			// DirectoryWatcher should not stop watching if it fails to get the info
+			// of a file, it should just ignore it.
+			try
+			{
+				entries[it.path().getFileName()] = ItemInfo(*it);
+			}
+			catch (Poco::FileNotFoundException&)
+			{
+				// The file is missing, remove it from the entries so it is treated as
+				// deleted.
+				entries.erase(it.path().getFileName());
+			}
 			++it;
 		}
 	}
@@ -184,13 +193,9 @@ public:
 			filter |= FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE;
 		
 		std::string path(owner().directory().path());
-#if defined(POCO_WIN32_UTF8)
 		std::wstring upath;
-		Poco::UnicodeConverter::toUTF16(path.c_str(), upath);
+		FileImpl::convertPath(path.c_str(), upath);
 		HANDLE hChange = FindFirstChangeNotificationW(upath.c_str(), FALSE, filter);
-#else
-		HANDLE hChange = FindFirstChangeNotificationA(path.c_str(), FALSE, filter);
-#endif
 
 		if (hChange == INVALID_HANDLE_VALUE)
 		{
@@ -263,8 +268,8 @@ private:
 class LinuxDirectoryWatcherStrategy: public DirectoryWatcherStrategy
 {
 public:
-	LinuxDirectoryWatcherStrategy(DirectoryWatcher& owner):
-		DirectoryWatcherStrategy(owner),
+	LinuxDirectoryWatcherStrategy(DirectoryWatcher& ownerWatcher):
+		DirectoryWatcherStrategy(ownerWatcher),
 		_fd(-1),
 		_stopped(false)
 	{
@@ -468,14 +473,14 @@ private:
 };
 
 
-#else
+#endif
 
 
 class PollingDirectoryWatcherStrategy: public DirectoryWatcherStrategy
 {
 public:
-	PollingDirectoryWatcherStrategy(DirectoryWatcher& owner):
-		DirectoryWatcherStrategy(owner)
+	PollingDirectoryWatcherStrategy(DirectoryWatcher& ownerWatcher):
+		DirectoryWatcherStrategy(ownerWatcher)
 	{
 	}
 	
@@ -518,22 +523,26 @@ private:
 };
 
 
-#endif
 
-
-DirectoryWatcher::DirectoryWatcher(const std::string& path, int eventMask, int scanInterval):
+DirectoryWatcher::DirectoryWatcher(const std::string& path, int otherEventMask, int otherScanInterval,
+	bool forceScan) :
 	_directory(path),
-	_eventMask(eventMask),
-	_scanInterval(scanInterval)
+	_eventMask(otherEventMask),
+	_eventsSuspended(0),
+	_scanInterval(otherScanInterval),
+	_forceScan(forceScan)
 {
 	init();
 }
 
 	
-DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, int scanInterval):
-	_directory(directory),
-	_eventMask(eventMask),
-	_scanInterval(scanInterval)
+DirectoryWatcher::DirectoryWatcher(const Poco::File& otherDirectory, int otherEventMask, int otherScanInterval,
+	bool forceScan) :
+	_directory(otherDirectory),
+	_eventMask(otherEventMask),
+	_eventsSuspended(0),
+	_scanInterval(otherScanInterval),
+	_forceScan(forceScan)
 {
 	init();
 }
@@ -541,8 +550,15 @@ DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, i
 
 DirectoryWatcher::~DirectoryWatcher()
 {
-	stop();
-	delete _pStrategy;
+	try
+	{
+		stop();
+		delete _pStrategy;
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 	
@@ -568,15 +584,23 @@ void DirectoryWatcher::init()
 	if (!_directory.isDirectory())
 		throw Poco::InvalidArgumentException("not a directory", _directory.path());
 
+	if (!_forceScan)
+	{
 #if POCO_OS == POCO_OS_WINDOWS_NT
-	_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
+		_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
 #elif POCO_OS == POCO_OS_LINUX
-	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
+		_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
 #elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
-	_pStrategy = new BSDDirectoryWatcherStrategy(*this);
+		_pStrategy = new BSDDirectoryWatcherStrategy(*this);
 #else
-	_pStrategy = new PollingDirectoryWatcherStrategy(*this);
+		_pStrategy = new PollingDirectoryWatcherStrategy(*this);
 #endif
+	}
+	else
+	{
+		_pStrategy = new PollingDirectoryWatcherStrategy(*this);
+	}
+
 	_thread.start(*this);
 }
 

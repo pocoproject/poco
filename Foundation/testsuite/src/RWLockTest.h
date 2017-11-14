@@ -1,8 +1,6 @@
 //
 // RWLockTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/RWLockTest.h#1 $
-//
 // Definition of the RWLockTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class RWLockTest: public CppUnit::TestCase

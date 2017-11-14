@@ -1,8 +1,6 @@
 //
 // Hash.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Hash.cpp#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  Hash

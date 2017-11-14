@@ -1,8 +1,6 @@
 //
 // CppParserTest.cpp
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/CppParserTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "CppParserTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/CppParser/Utility.h"
 #include "Poco/CppParser/Symbol.h"
 #include <iostream>

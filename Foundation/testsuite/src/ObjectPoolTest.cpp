@@ -1,8 +1,6 @@
 //
 // ObjectPoolTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ObjectPoolTest.cpp#1 $
-//
 // Copyright (c) 2010-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ObjectPoolTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/ObjectPool.h"
 #include "Poco/Exception.h"
 
@@ -20,7 +18,7 @@
 using Poco::ObjectPool;
 
 
-ObjectPoolTest::ObjectPoolTest(const std::string& name): CppUnit::TestCase(name)
+ObjectPoolTest::ObjectPoolTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

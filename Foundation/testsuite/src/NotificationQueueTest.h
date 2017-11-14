@@ -1,8 +1,6 @@
 //
 // NotificationQueueTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NotificationQueueTest.h#1 $
-//
 // Definition of the NotificationQueueTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/NotificationQueue.h"
 #include "Poco/Mutex.h"
 #include <set>
@@ -34,6 +32,7 @@ public:
 	void testWaitDequeue();
 	void testThreads();
 	void testDefaultQueue();
+	void testQueueRemove();
 
 	void setUp();
 	void tearDown();

@@ -1,8 +1,6 @@
 //
 // WebSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/WebSocketImpl.cpp#10 $
-//
 // Library: Net
 // Package: WebSocket
 // Module:  WebSocketImpl
@@ -17,43 +15,55 @@
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Buffer.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Format.h"
 #include <cstring>
-#include <iostream>
+
 
 namespace Poco {
 namespace Net {
 
 
-WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, bool mustMaskPayload):
+WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload):
 	StreamSocketImpl(pStreamSocketImpl->sockfd()),
 	_pStreamSocketImpl(pStreamSocketImpl),
+	_buffer(0),
+	_bufferOffset(0),
 	_frameFlags(0),
 	_mustMaskPayload(mustMaskPayload)
 {
 	poco_check_ptr(pStreamSocketImpl);
 	_pStreamSocketImpl->duplicate();
+	session.drainBuffer(_buffer);
 }
 
 
 WebSocketImpl::~WebSocketImpl()
 {
-	_pStreamSocketImpl->release();
-	reset();
+	try
+	{
+		_pStreamSocketImpl->release();
+		reset();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
-	
+
 int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	Poco::Buffer<char> frame(length + MAX_HEADER_LENGTH);
 	Poco::MemoryOutputStream ostr(frame.begin(), frame.size());
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
-	
+
 	if (flags == 0) flags = WebSocket::FRAME_BINARY;
+	flags &= 0xff;
 	writer << static_cast<Poco::UInt8>(flags);
 	Poco::UInt8 lengthByte(0);
 	if (_mustMaskPayload)
@@ -95,8 +105,8 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	return length;
 }
 
-	
-int WebSocketImpl::receiveBytes(void* buffer, int length, int)
+
+int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 {
 	char header[MAX_HEADER_LENGTH];
 	int n = receiveNBytes(header, 2);
@@ -106,90 +116,109 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 		return n;
 	}
 	poco_assert (n == 2);
-	Poco::UInt8 lengthByte = static_cast<Poco::UInt8>(header[1]);
-	int maskOffset = 0;
-	if (lengthByte & FRAME_FLAG_MASK) maskOffset += 4;
-	lengthByte &= 0x7f;
-	if (lengthByte > 0 || maskOffset > 0)
-	{
-		if (lengthByte + 2 + maskOffset < MAX_HEADER_LENGTH)
-		{
-			n = receiveNBytes(header + 2, lengthByte + maskOffset);
-		}
-		else
-		{
-			n = receiveNBytes(header + 2, MAX_HEADER_LENGTH - 2);
-		}
-		if (n <= 0) throw WebSocketException("Incomplete header received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
-		n += 2;
-	}
-	Poco::MemoryInputStream istr(header, n);
-	Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
-	Poco::UInt8 flags;
-	char mask[4];
-	reader >> flags >> lengthByte;
+	Poco::UInt8 flags = static_cast<Poco::UInt8>(header[0]);
 	_frameFlags = flags;
-	int payloadLength = 0;
-	int payloadOffset = 2;
-	if ((lengthByte & 0x7f) == 127)
+	Poco::UInt8 lengthByte = static_cast<Poco::UInt8>(header[1]);
+	useMask = ((lengthByte & FRAME_FLAG_MASK) != 0);
+	int payloadLength;
+	lengthByte &= 0x7f;
+	if (lengthByte == 127)
 	{
+		n = receiveNBytes(header + 2, 8);
+		if (n <= 0)
+		{
+			_frameFlags = 0;
+			return n;
+		}
+		Poco::MemoryInputStream istr(header + 2, 8);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt64 l;
 		reader >> l;
-		if (l > length) throw WebSocketException(Poco::format("Insufficient buffer for payload size %Lu", l), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = static_cast<int>(l);
-		payloadOffset += 8;
 	}
-	else if ((lengthByte & 0x7f) == 126)
+	else if (lengthByte == 126)
 	{
+		n = receiveNBytes(header + 2, 2);
+		if (n <= 0)
+		{
+			_frameFlags = 0;
+			return n;
+		}
+		Poco::MemoryInputStream istr(header + 2, 2);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt16 l;
 		reader >> l;
-		if (l > length) throw WebSocketException(Poco::format("Insufficient buffer for payload size %hu", l), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = static_cast<int>(l);
-		payloadOffset += 2;
 	}
 	else
 	{
-		Poco::UInt8 l = lengthByte & 0x7f;
-		if (l > length) throw WebSocketException(Poco::format("Insufficient buffer for payload size %u", unsigned(l)), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
-		payloadLength = static_cast<int>(l);
+		payloadLength = lengthByte;
 	}
-	if (lengthByte & FRAME_FLAG_MASK)
+
+	if (useMask)
 	{
-		reader.readRaw(mask, 4);
-		payloadOffset += 4;
+		n = receiveNBytes(mask, 4);
+		if (n <= 0)
+		{
+			_frameFlags = 0;
+			return n;
+		}
 	}
-	int received = 0;
-	if (payloadOffset < n)
+
+	return payloadLength;
+}
+
+
+int WebSocketImpl::receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask)
+{
+	int received = receiveNBytes(reinterpret_cast<char*>(buffer), payloadLength);
+	if (received <= 0) throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
+
+	if (useMask)
 	{
-		std::memcpy(buffer, header + payloadOffset, n - payloadOffset);
-		received = n - payloadOffset;
-	}
-	if (received < payloadLength)
-	{
-		n = receiveNBytes(reinterpret_cast<char*>(buffer) + received, payloadLength - received);
-		if (n <= 0) throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
-		received += n;
-	}
-	if (lengthByte & FRAME_FLAG_MASK)
-	{
-		char* p = reinterpret_cast<char*>(buffer);
 		for (int i = 0; i < received; i++)
 		{
-			p[i] ^= mask[i % 4];
+			buffer[i] ^= mask[i % 4];
 		}
 	}
 	return received;
 }
 
 
+int WebSocketImpl::receiveBytes(void* buffer, int length, int)
+{
+	char mask[4];
+	bool useMask;
+	int payloadLength = receiveHeader(mask, useMask);
+	if (payloadLength <= 0)
+		return payloadLength;
+	if (payloadLength > length)
+		throw WebSocketException(Poco::format("Insufficient buffer for payload size %hu", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+	return receivePayload(reinterpret_cast<char*>(buffer), payloadLength, mask, useMask);
+}
+
+
+int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int)
+{
+	char mask[4];
+	bool useMask;
+	int payloadLength = receiveHeader(mask, useMask);
+	if (payloadLength <= 0)
+		return payloadLength;
+	int oldSize = static_cast<int>(buffer.size());
+	buffer.resize(oldSize + payloadLength);
+	return receivePayload(buffer.begin() + oldSize, payloadLength, mask, useMask);
+}
+
+
 int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 {
-	int received = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer), bytes);
+	int received = receiveSomeBytes(reinterpret_cast<char*>(buffer), bytes);
 	if (received > 0)
 	{
 		while (received < bytes)
 		{
-			int n = _pStreamSocketImpl->receiveBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
+			int n = receiveSomeBytes(reinterpret_cast<char*>(buffer) + received, bytes - received);
 			if (n > 0)
 				received += n;
 			else
@@ -197,6 +226,23 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 		}
 	}
 	return received;
+}
+
+
+int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
+{
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
+	if (n > 0)
+	{
+		if (bytes < n) n = bytes;
+		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
+		_bufferOffset += n;
+		return n;
+	}
+	else
+	{
+		return _pStreamSocketImpl->receiveBytes(buffer, bytes);
+	}
 }
 
 
@@ -230,7 +276,19 @@ void WebSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 }
 
 
+void WebSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	throw Poco::InvalidAccessException("Cannot bind() a WebSocketImpl");
+}
+
+
 void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
+}
+
+
+void WebSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
 {
 	throw Poco::InvalidAccessException("Cannot bind6() a WebSocketImpl");
 }
@@ -260,7 +318,7 @@ void WebSocketImpl::shutdownSend()
 	_pStreamSocketImpl->shutdownSend();
 }
 
-	
+
 void WebSocketImpl::shutdown()
 {
 	_pStreamSocketImpl->shutdown();
@@ -314,5 +372,15 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 	return _pStreamSocketImpl->getReceiveTimeout();
 }
 
-	
+
+int WebSocketImpl::available()
+{
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
+	if (n > 0)
+		return n + _pStreamSocketImpl->available();
+	else
+		return _pStreamSocketImpl->available();
+}
+
+
 } } // namespace Poco::Net

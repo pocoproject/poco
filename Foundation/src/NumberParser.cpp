@@ -1,8 +1,6 @@
 //
 // NumberParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NumberParser.cpp#4 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  NumberParser
@@ -30,7 +28,7 @@
 	#define I64_FMT "l"
 #elif defined(_MSC_VER) || defined(__MINGW32__)
 	#define I64_FMT "I64"
-#elif defined(__APPLE__) 
+#elif defined(__APPLE__)
 	#define I64_FMT "q"
 #else
 	#define I64_FMT "ll"
@@ -84,7 +82,9 @@ unsigned NumberParser::parseHex(const std::string& s)
 
 bool NumberParser::tryParseHex(const std::string& s, unsigned& value)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_HEX);
+	int offset = 0;
+	if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) offset = 2;
+	return strToInt(s.c_str() + offset, value, NUM_BASE_HEX);
 }
 
 
@@ -151,7 +151,9 @@ UInt64 NumberParser::parseHex64(const std::string& s)
 
 bool NumberParser::tryParseHex64(const std::string& s, UInt64& value)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_HEX);
+	int offset = 0;
+	if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) offset = 2;
+	return strToInt(s.c_str() + offset, value, NUM_BASE_HEX);
 }
 
 

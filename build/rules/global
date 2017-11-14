@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/rules/global#1 $
-#
 # global
 #
 # Global build configuration
@@ -25,7 +23,7 @@ endif
 #
 # Include some optional make configuration
 #
-sinclude $(POCO_BASE)/config.make
+sinclude $(POCO_BASE)/config.build
 
 #
 # Check for PROJECT_BASE
@@ -34,6 +32,9 @@ ifndef PROJECT_BASE
 PROJECT_BASE = $(POCO_BASE)
 endif
 export PROJECT_BASE
+ifdef POCO_VERBOSE
+$(info PROJECT_BASE        = $(PROJECT_BASE))
+endif
 
 #
 # Check for POCO_BUILD
@@ -42,6 +43,9 @@ ifndef POCO_BUILD
 POCO_BUILD = $(PROJECT_BASE)
 endif
 export POCO_BUILD
+ifdef POCO_VERBOSE
+$(info POCO_BUILD          = $(POCO_BUILD))
+endif
 
 #
 # POCO_BASE/POCO_BUILD/cwd sanity checks
@@ -68,13 +72,23 @@ endif
 #
 POCO_HOST_OSNAME = $(shell uname)
 ifeq ($(findstring CYGWIN,$(POCO_HOST_OSNAME)),CYGWIN)
-POCO_HOST_OSNAME = CYGWIN
+ifeq ($(findstring x86_64,$(POCO_HOST_OSNAME)),x86_64)
+OSARCH_64BITS = 1
+endif
+POCO_HOST_OSNAME = Cygwin
 endif
 
 ifeq ($(findstring MINGW,$(POCO_HOST_OSNAME)),MINGW)
 POCO_HOST_OSNAME = MinGW
 endif
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSNAME    = $(POCO_HOST_OSNAME))
+endif
+
 POCO_HOST_OSARCH ?= $(subst /,-,$(shell uname -m | tr ' ' _))
+ifdef POCO_VERBOSE
+$(info POCO_HOST_OSARCH    = $(POCO_HOST_OSARCH))
+endif
 
 #
 # Begin Sun platforms
@@ -110,6 +124,9 @@ endif
 ifndef POCO_CONFIG
 POCO_CONFIG = $(POCO_HOST_OSNAME)
 endif
+ifdef POCO_VERBOSE
+$(info POCO_CONFIG         = $(POCO_CONFIG))
+endif
 
 #
 # Include System Specific Settings
@@ -124,11 +141,19 @@ OSNAME   := $(POCO_HOST_OSNAME)
 else
 OSNAME   := $(POCO_TARGET_OSNAME)
 endif
+ifdef POCO_VERBOSE
+$(info OSNAME              = $(OSNAME))
+endif
+
 ifndef POCO_TARGET_OSARCH
 OSARCH   := $(subst /,-,$(shell uname -m | tr ' ' _))
 else
 OSARCH   := $(POCO_TARGET_OSARCH)
 endif
+ifdef POCO_VERBOSE
+$(info OSARCH              = $(OSARCH))
+endif
+
 HOSTNAME := $(shell hostname)
 
 #
@@ -192,6 +217,14 @@ POCO_HOST_LIBDIR    = lib/$(POCO_HOST_OSNAME)/$(POCO_HOST_OSARCH)
 POCO_TARGET_LIBDIR  = $(LIBDIR)
 POCO_HOST_LIBPATH   = $(POCO_BUILD)/$(POCO_HOST_LIBDIR)
 POCO_TARGET_LIBPATH = $(LIBPATH)
+ifdef POCO_PREFIX
+POCO_LIB_INSTALLDIR = $(POCO_PREFIX)/lib
+else
+POCO_LIB_INSTALLDIR = $(LIBPATH)
+endif
+ifdef POCO_VERBOSE
+$(info POCO_LIB_INSTALLDIR = $(POCO_LIB_INSTALLDIR))
+endif
 
 ifeq ($(POCO_BASE),$(PROJECT_BASE))
 POCO_LIBRARY =
@@ -201,6 +234,17 @@ endif
 
 ifndef LIBPREFIX
 LIBPREFIX = lib
+endif
+
+ifeq ($(LIBPATH),$(POCO_BASE)/$(LIBDIR))
+LD_LIBRARY_PATH += $(LIBPATH)
+else
+LD_LIBRARY_PATH += $(LIBPATH):$(POCO_BASE)/$(LIBDIR)
+endif
+ifeq ($(POCO_HOST_OSNAME),Darwin)
+SET_LD_LIBRARY_PATH = DYLD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
+else
+SET_LD_LIBRARY_PATH = LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
 endif
 
 #
@@ -233,7 +277,7 @@ endif
 #
 # Compose compiler flags
 #
-COMMONFLAGS = -DPOCO_BUILD_HOST=$(HOSTNAME) $(POCO_FLAGS)
+COMMONFLAGS = -DPOCO_BUILD_HOST='"'$(HOSTNAME)'"' -DPOCO_TARGET_OSNAME='"'$(OSNAME)'"' -DPOCO_TARGET_OSARCH='"'$(OSARCH)'"' $(POCO_FLAGS)
 CFLAGS     += $(COMMONFLAGS) $(SYSFLAGS)
 CXXFLAGS   += $(COMMONFLAGS) $(SYSFLAGS)
 LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)
@@ -241,12 +285,14 @@ LINKFLAGS  += $(COMMONFLAGS) $(SYSFLAGS)
 ifeq ($(OSARCH_64BITS),1)
 CFLAGS     += $(CFLAGS64)
 CXXFLAGS   += $(CXXFLAGS64)
+LIBFLAGS   += $(LIBFLAGS64)
 SHLIBFLAGS += $(SHLIBFLAGS64)
 DYLIBFLAGS += $(DYLIBFLAGS64)
 LINKFLAGS  += $(LINKFLAGS64)
 else
 CFLAGS     += $(CFLAGS32)
 CXXFLAGS   += $(CXXFLAGS32)
+LIBFLAGS   += $(LIBFLAGS32)
 SHLIBFLAGS += $(SHLIBFLAGS32)
 DYLIBFLAGS += $(DYLIBFLAGS32)
 LINKFLAGS  += $(LINKFLAGS32)
@@ -255,10 +301,10 @@ endif
 #
 # Compose object file path
 #
-OBJPATH_RELEASE_STATIC = $(OBJPATH)/release_static$(OSARCH_POSTFIX)
-OBJPATH_DEBUG_STATIC   = $(OBJPATH)/debug_static$(OSARCH_POSTFIX)
-OBJPATH_RELEASE_SHARED = $(OBJPATH)/release_shared$(OSARCH_POSTFIX)
-OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared$(OSARCH_POSTFIX)
+OBJPATH_RELEASE_STATIC = $(OBJPATH)/release_static
+OBJPATH_DEBUG_STATIC   = $(OBJPATH)/debug_static
+OBJPATH_RELEASE_SHARED = $(OBJPATH)/release_shared
+OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared
 
 #
 # Build Include directory List
@@ -274,13 +320,15 @@ LIBRARY = $(foreach p,$(POCO_ADD_LIBRARY),-L$(p)) -L$(LIBPATH) $(POCO_LIBRARY)
 # Strip Command definition
 #
 ifeq ($(strip $(STRIP)),)
-STRIPCMD = 
+STRIPCMD =
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
 
 #
-# Make CC and CXX environment vars
+# Make CC, CXX and LINK environment vars
 #
 export CC
 export CXX
+export LINK
+

@@ -1,8 +1,6 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform
@@ -39,6 +37,8 @@
 #define POCO_OS_QNX           0x000b
 #define POCO_OS_VXWORKS       0x000c
 #define POCO_OS_CYGWIN        0x000d
+#define POCO_OS_NACL	      0x000e
+#define POCO_OS_EMSCRIPTEN    0x000f
 #define POCO_OS_UNKNOWN_UNIX  0x00ff
 #define POCO_OS_WINDOWS_NT    0x1001
 #define POCO_OS_WINDOWS_CE    0x1011
@@ -58,7 +58,13 @@
 #elif defined(__digital__) || defined(__osf__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_TRU64
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__) || defined(EMSCRIPTEN)
+#elif defined(__NACL__)
+	#define POCO_OS_FAMILY_UNIX 1
+	#define POCO_OS POCO_OS_NACL
+#elif defined(__EMSCRIPTEN__) || defined(EMSCRIPTEN)
+	#define POCO_OS_FAMILY_UNIX 1
+	#define POCO_OS POCO_OS_EMSCRIPTEN
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_LINUX
 #elif defined(__APPLE__) || defined(__TOS_MACOS__)
@@ -108,11 +114,6 @@
 #endif
 
 
-#ifndef POCO_OS_FAMILY_UNIX
-	#define GCC_DIAG_OFF(x)
-	#define GCC_DIAG_ON(x)
-#endif
-
 //
 // Hardware Architecture and Byte Order
 //
@@ -136,7 +137,7 @@
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 	#define POCO_ARCH POCO_ARCH_ALPHA
 	#define POCO_ARCH_LITTLE_ENDIAN 1
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || defined(EMSCRIPTEN)
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || defined(EMSCRIPTEN) || defined(__EMSCRIPTEN__)
 	#define POCO_ARCH POCO_ARCH_IA32
 	#define POCO_ARCH_LITTLE_ENDIAN 1
 #elif defined(_IA64) || defined(__IA64__) || defined(__ia64__) || defined(__ia64) || defined(_M_IA64)
@@ -151,14 +152,27 @@
 	#define POCO_ARCH_LITTLE_ENDIAN 1
 #elif defined(__mips__) || defined(__mips) || defined(__MIPS__) || defined(_M_MRX000)
 	#define POCO_ARCH POCO_ARCH_MIPS
-	#define POCO_ARCH_BIG_ENDIAN 1
+	#if defined(POCO_OS_FAMILY_WINDOWS)
+		// Is this OK? Supports windows only little endian??
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#elif defined(__MIPSEB__) || defined(_MIPSEB) || defined(__MIPSEB)
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#elif defined(__MIPSEL__) || defined(_MIPSEL) || defined(__MIPSEL)
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#else
+		#error "MIPS but neither MIPSEL nor MIPSEB?"
+	#endif
 #elif defined(__hppa) || defined(__hppa__)
 	#define POCO_ARCH POCO_ARCH_HPPA
 	#define POCO_ARCH_BIG_ENDIAN 1
 #elif defined(__PPC) || defined(__POWERPC__) || defined(__powerpc) || defined(__PPC__) || \
       defined(__powerpc__) || defined(__ppc__) || defined(__ppc) || defined(_ARCH_PPC) || defined(_M_PPC)
 	#define POCO_ARCH POCO_ARCH_PPC
-	#define POCO_ARCH_BIG_ENDIAN 1
+	#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+		#define POCO_ARCH_LITTLE_ENDIAN 1
+	#else
+		#define POCO_ARCH_BIG_ENDIAN 1
+	#endif
 #elif defined(_POWER) || defined(_ARCH_PWR) || defined(_ARCH_PWR2) || defined(_ARCH_PWR3) || \
       defined(_ARCH_PWR4) || defined(__THW_RS6000)
 	#define POCO_ARCH POCO_ARCH_POWER
@@ -173,7 +187,7 @@
 	#else
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
-#elif defined(__arm64__) || defined(__arm64) 
+#elif defined(__arm64__) || defined(__arm64)
 	#define POCO_ARCH POCO_ARCH_ARM64
 	#if defined(__ARMEB__)
 		#define POCO_ARCH_BIG_ENDIAN 1
@@ -215,6 +229,9 @@
 	#define POCO_COMPILER_MSVC
 #elif defined(__clang__)
 	#define POCO_COMPILER_CLANG
+	#if defined(__apple_build_version__)
+		#define POCO_COMPILER_APPLECLANG
+	#endif
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
 #elif defined (__MINGW32__) || defined (__MINGW64__)
@@ -233,13 +250,20 @@
 	#define POCO_COMPILER_CBUILDER
 #elif defined (__DMC__)
 	#define POCO_COMPILER_DMARS
-#elif defined (__HP_aCC)
-	#define POCO_COMPILER_HP_ACC
+#elif defined (__DECCXX)
+	#define POCO_COMPILER_COMPAC
 #elif (defined (__xlc__) || defined (__xlC__)) && defined(__IBMCPP__)
 	#define POCO_COMPILER_IBM_XLC // IBM XL C++
 #elif defined (__IBMCPP__) && defined(__COMPILER_VER__)
 	#define POCO_COMPILER_IBM_XLC_ZOS // IBM z/OS C++
 #endif
+
+
+#ifdef __GNUC__
+#define POCO_UNUSED __attribute__((unused))
+#else
+#define POCO_UNUSED
+#endif // __GNUC__
 
 
 #if !defined(POCO_ARCH)

@@ -1,8 +1,6 @@
 //
 // MemoryPoolTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MemoryPoolTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "MemoryPoolTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/MemoryPool.h"
 #include <vector>
 
@@ -20,7 +18,7 @@
 using Poco::MemoryPool;
 
 
-MemoryPoolTest::MemoryPoolTest(const std::string& name): CppUnit::TestCase(name)
+MemoryPoolTest::MemoryPoolTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

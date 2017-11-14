@@ -1,8 +1,6 @@
 //
 // TimezoneTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimezoneTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "TimezoneTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Timezone.h"
 #include <iostream>
 
@@ -20,7 +18,7 @@
 using Poco::Timezone;
 
 
-TimezoneTest::TimezoneTest(const std::string& name): CppUnit::TestCase(name)
+TimezoneTest::TimezoneTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -32,10 +30,10 @@ TimezoneTest::~TimezoneTest()
 
 void TimezoneTest::testTimezone()
 {
-	std::string name = Timezone::name();
+	std::string timezoneName = Timezone::name();
 	std::string stdName = Timezone::standardName();
 	std::string dstName = Timezone::dstName();
-	std::cout << "Timezone Names: " << name << ", " << stdName << ", " << dstName << std::endl;
+	std::cout << "Timezone Names: " << timezoneName << ", " << stdName << ", " << dstName << std::endl;
 	int utcOffset = Timezone::utcOffset();
 	std::cout << "UTC Offset: " << utcOffset << std::endl;
 	int dst = Timezone::dst();

@@ -1,8 +1,6 @@
 //
 // ICMPSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPSocket.cpp#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocket
@@ -26,16 +24,13 @@ namespace Poco {
 namespace Net {
 
 
-ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout): 
-	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout)),
-	_dataSize(dataSize), 
-	_ttl(ttl),
-	_timeout(timeout)
+ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout):
+	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout))
 {
 }
 
 
-ICMPSocket::ICMPSocket(const Socket& socket): 
+ICMPSocket::ICMPSocket(const Socket& socket):
 	Socket(socket)
 {
 	if (!dynamic_cast<ICMPSocketImpl*>(impl()))
@@ -43,7 +38,7 @@ ICMPSocket::ICMPSocket(const Socket& socket):
 }
 
 
-ICMPSocket::ICMPSocket(SocketImpl* pImpl): 
+ICMPSocket::ICMPSocket(SocketImpl* pImpl):
 	Socket(pImpl)
 {
 	if (!dynamic_cast<ICMPSocketImpl*>(impl()))
@@ -75,6 +70,30 @@ int ICMPSocket::sendTo(const SocketAddress& address, int flags)
 int ICMPSocket::receiveFrom(SocketAddress& address, int flags)
 {
 	return impl()->receiveFrom(0, 0, address, flags);
+}
+
+
+int ICMPSocket::dataSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->dataSize();
+}
+
+
+int ICMPSocket::packetSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->packetSize();
+}
+
+
+int ICMPSocket::ttl() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->ttl();
+}
+
+
+int ICMPSocket::timeout() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->timeout();
 }
 
 

@@ -1,8 +1,6 @@
 //
 // NodeIteratorTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/NodeIteratorTest.h#1 $
-//
 // Definition of the NodeIteratorTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/XML/XML.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class NodeIteratorTest: public CppUnit::TestCase

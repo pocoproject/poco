@@ -1,9 +1,7 @@
 //
 // Handle.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/Handle.h#2 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Handle
 //
@@ -41,14 +39,14 @@ class Handle
 /// ODBC handle class template
 {
 public:
-	Handle(const ConnectionHandle& rConnection): 
+	Handle(const ConnectionHandle& rConnection):
 		_rConnection(rConnection),
 		_handle(0)
 			/// Creates the Handle.
 	{
-		if (Utility::isError(SQLAllocHandle(handleType, 
-			_rConnection, 
-			&_handle))) 
+		if (Utility::isError(SQLAllocHandle(handleType,
+			_rConnection,
+			&_handle)))
 		{
 			throw ODBCException("Could not allocate statement handle.");
 		}
@@ -57,13 +55,20 @@ public:
 	~Handle()
 		/// Destroys the Handle.
 	{
+		try
+		{
 #if defined(_DEBUG)
-		SQLRETURN rc = 
+			SQLRETURN rc =
 #endif
-		SQLFreeHandle(handleType, _handle);
-		// N.B. Destructors should not throw, but neither do we want to
-		// leak resources. So, we throw here in debug mode if things go bad.
-		poco_assert_dbg (!Utility::isError(rc));
+			SQLFreeHandle(handleType, _handle);
+			// N.B. Destructors should not throw, but neither do we want to
+			// leak resources. So, we throw here in debug mode if things go bad.
+			poco_assert_dbg (!Utility::isError(rc));
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	operator const H& () const

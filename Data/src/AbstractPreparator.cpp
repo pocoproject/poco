@@ -1,8 +1,6 @@
 //
 // AbstractPreparator.cpp
 //
-// $Id: //poco/Main/Data/src/AbstractPreparator.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractPreparator
@@ -21,7 +19,7 @@ namespace Poco {
 namespace Data {
 
 
-AbstractPreparator::AbstractPreparator(Poco::UInt32 length): 
+AbstractPreparator::AbstractPreparator(Poco::UInt32 length):
 	_length(length),
 	_bulk(false)
 {

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/samples/Makefile#2 $
-#
 # Makefile for Poco Net Samples
 #
 
@@ -19,7 +17,6 @@ projects:
 	$(MAKE) -C EchoServer $(MAKECMDGOALS)
 	$(MAKE) -C Mail $(MAKECMDGOALS)
 	$(MAKE) -C Ping $(MAKECMDGOALS)
-	$(MAKE) -C TwitterClient $(MAKECMDGOALS)
 	$(MAKE) -C WebSocketServer $(MAKECMDGOALS)
 	$(MAKE) -C SMTPLogger $(MAKECMDGOALS)
 	$(MAKE) -C ifconfig $(MAKECMDGOALS)

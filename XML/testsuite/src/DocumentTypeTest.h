@@ -1,8 +1,6 @@
 //
 // DocumentTypeTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/DocumentTypeTest.h#1 $
-//
 // Definition of the DocumentTypeTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/XML/XML.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class DocumentTypeTest: public CppUnit::TestCase

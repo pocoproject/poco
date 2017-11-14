@@ -1,8 +1,6 @@
 //
 // FilesystemConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/FilesystemConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "FilesystemConfigurationTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/FilesystemConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/File.h"

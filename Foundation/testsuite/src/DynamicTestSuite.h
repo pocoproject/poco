@@ -1,8 +1,6 @@
 //
 // DynamicTestSuite.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/DynamicTestSuite.h#2 $
-//
 // Definition of the DynamicTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define DynamicTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class DynamicTestSuite

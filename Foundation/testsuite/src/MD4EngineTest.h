@@ -1,8 +1,6 @@
 //
 // MD4EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MD4EngineTest.h#1 $
-//
 // Definition of the MD4EngineTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class MD4EngineTest: public CppUnit::TestCase

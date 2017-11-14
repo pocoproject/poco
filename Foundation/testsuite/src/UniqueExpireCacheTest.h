@@ -1,8 +1,6 @@
 //
 // UniqueExpireCacheTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UniqueExpireCacheTest.h#1 $
-//
 // Tests for ExpireCache
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class UniqueExpireCacheTest: public CppUnit::TestCase

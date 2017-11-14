@@ -1,8 +1,6 @@
 //
 // ActiveDispatcherTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActiveDispatcherTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ActiveDispatcherTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/ActiveDispatcher.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/Thread.h"
@@ -90,7 +88,7 @@ namespace
 }
 
 
-ActiveDispatcherTest::ActiveDispatcherTest(const std::string& name): CppUnit::TestCase(name)
+ActiveDispatcherTest::ActiveDispatcherTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

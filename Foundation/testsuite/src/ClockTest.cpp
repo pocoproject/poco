@@ -1,8 +1,6 @@
 //
 // ClockTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ClockTest.cpp#1 $
-//
 // Copyright (c) 2013, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ClockTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Clock.h"
 #include "Poco/Thread.h"
 #include <iostream>
@@ -22,7 +20,7 @@ using Poco::Clock;
 using Poco::Thread;
 
 
-ClockTest::ClockTest(const std::string& name): CppUnit::TestCase(name)
+ClockTest::ClockTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

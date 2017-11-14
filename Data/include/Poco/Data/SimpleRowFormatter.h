@@ -1,8 +1,6 @@
 //
 // RowFormatter.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SimpleRowFormatter.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SimpleRowFormatter
@@ -32,13 +30,11 @@ class Data_API SimpleRowFormatter: public RowFormatter
 	/// A simple row formatting class.
 {
 public:
-	//typedef RowFormatter::NameVec    NameVec;
-	//typedef RowFormatter::NameVecPtr NameVecPtr;
-	//typedef RowFormatter::ValueVec   ValueVec;
 
 	static const int DEFAULT_COLUMN_WIDTH = 16;
+	static const int DEFAULT_SPACING = 1;
 
-	SimpleRowFormatter(std::streamsize columnWidth = DEFAULT_COLUMN_WIDTH);
+	SimpleRowFormatter(std::streamsize columnWidth = DEFAULT_COLUMN_WIDTH, std::streamsize spacing = DEFAULT_SPACING);
 		/// Creates the SimpleRowFormatter and sets the column width to specified value.
 
 	SimpleRowFormatter(const SimpleRowFormatter& other);
@@ -67,9 +63,13 @@ public:
 
 	std::streamsize getColumnWidth() const;
 		/// Returns the column width.
+		
+	std::streamsize getSpacing() const;
+		/// Returns the spacing.
 
 private:
 	std::streamsize _colWidth;
+	std::streamsize _spacing;
 	int             _rowCount;
 };
 
@@ -95,15 +95,21 @@ inline std::streamsize SimpleRowFormatter::getColumnWidth() const
 }
 
 
+inline std::streamsize SimpleRowFormatter::getSpacing() const
+{
+	return _spacing;
+}
+
+
 } } // namespace Poco::Data
 
 
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1, 
+	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1,
 		Poco::Data::SimpleRowFormatter& s2)
-		/// Full template specalization of std:::swap for SimpleRowFormatter
+		/// Full template specialization of std:::swap for SimpleRowFormatter
 	{
 		s1.swap(s2);
 	}

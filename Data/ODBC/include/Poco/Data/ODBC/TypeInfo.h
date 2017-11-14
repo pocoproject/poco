@@ -1,9 +1,7 @@
 //
 // TypeInfo.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/TypeInfo.h#1 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  TypeInfo
 //
@@ -23,8 +21,10 @@
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/NamedTuple.h"
 #include "Poco/DynamicAny.h"
+#include "Poco/Data/AbstractBinder.h"
 #include <vector>
 #include <map>
+#include <typeinfo>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -41,7 +41,7 @@ class ODBC_API TypeInfo
 	///
 	/// This class provides mapping between C and SQL datatypes as well
 	/// as datatypes supported by the underlying database. In order for database
-	/// types to be available, a valid conection handle must be supplied at either
+	/// types to be available, a valid connection handle must be supplied at either
 	/// object construction time, or at a later point in time, through call to
 	/// fillTypeInfo member function.
 	///
@@ -71,6 +71,17 @@ public:
 		SQLINTEGER,
 		SQLSMALLINT> TypeInfoTup;
 	typedef std::vector<TypeInfoTup> TypeInfoVec;
+	typedef const std::type_info* TypeInfoPtr;
+
+	struct TypeInfoComp : public std::binary_function<TypeInfoPtr, TypeInfoPtr, bool>
+	{	
+		bool operator()(const TypeInfoPtr& left, const TypeInfoPtr& right) const
+		{	// apply operator< to operands
+			return ( left->before( *right ) );
+		}
+	};
+
+	typedef std::map<TypeInfoPtr, SQLSMALLINT, TypeInfoComp> CppTypeInfoMap;
 
 	explicit TypeInfo(SQLHDBC* pHDBC=0);
 		/// Creates the TypeInfo.
@@ -102,13 +113,21 @@ public:
 		/// Prints all the types (as reported by the underlying database)
 		/// to the supplied output stream.
 
+	SQLSMALLINT tryTypeidToCType(const std::type_info& ti, SQLSMALLINT defaultVal = SQL_C_TINYINT) const;
+		/// try to find mapping of the given C++ typeid to the ODBC C-Type Code
+		/// will return the defaultVal if no match is found
+
+	SQLSMALLINT nullDataType(const NullData val) const;
+		/// Map the null value type to ODBC buffer type
+
 private:
 	void fillCTypes();
 	void fillSQLTypes();
 
-	DataTypeMap _cDataTypes; 
-	DataTypeMap _sqlDataTypes; 
+	DataTypeMap _cDataTypes;
+	DataTypeMap _sqlDataTypes;
 	TypeInfoVec _typeInfo;
+	CppTypeInfoMap _cppDataTypes;
 	SQLHDBC*    _pHDBC;
 };
 

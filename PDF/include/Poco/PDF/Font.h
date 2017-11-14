@@ -1,8 +1,6 @@
 //
 // Font.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Font.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Font
@@ -120,8 +118,8 @@ inline int Font::upperHeight() const
 
 inline TextWidth Font::textWidth(const std::string& text)
 {
-	return HPDF_Font_TextWidth(handle(), 
-		reinterpret_cast<const HPDF_BYTE*>(text.data()), 
+	return HPDF_Font_TextWidth(handle(),
+		reinterpret_cast<const HPDF_BYTE*>(text.data()),
 		static_cast<HPDF_UINT>(text.size()));
 }
 

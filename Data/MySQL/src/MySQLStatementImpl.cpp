@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/MySQLStatementImpl.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLStatementImpl
 //
@@ -22,10 +20,10 @@ namespace MySQL {
 
 
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
-	Poco::Data::StatementImpl(h), 
-	_stmt(h.handle()), 
+	Poco::Data::StatementImpl(h),
+	_stmt(h.handle()),
 	_pBinder(new Binder),
-	_pExtractor(new Extractor(_stmt, _metadata)), 
+	_pExtractor(new Extractor(_stmt, _metadata)),
 	_hasNext(NEXT_DONTKNOW)
 {
 }
@@ -42,14 +40,16 @@ std::size_t MySQLStatementImpl::columnsReturned() const
 }
 
 
-std::size_t MySQLStatementImpl::affectedRowCount() const
+int MySQLStatementImpl::affectedRowCount() const
 {
 	return _stmt.getAffectedRowCount();
 }
 
 	
-const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos) const
+const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos, std::size_t dataSet) const
 {
+	// mysql doesn't support multiple result sets
+	poco_assert_dbg(dataSet == 0);
 	return _metadata.metaColumn(pos);
 }
 
@@ -80,11 +80,11 @@ bool MySQLStatementImpl::hasNext()
 	return false;
 }
 
-	
+
 std::size_t MySQLStatementImpl::next()
 {
 	if (!hasNext())
-		throw StatementException("No data received");	
+		throw StatementException("No data received");
 
 	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();

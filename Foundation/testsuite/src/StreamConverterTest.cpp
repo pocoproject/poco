@@ -1,8 +1,6 @@
 //
 // StreamConverterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StreamConverterTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "StreamConverterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StreamConverter.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"
@@ -29,7 +27,7 @@ using Poco::ASCIIEncoding;
 using Poco::StreamCopier;
 
 
-StreamConverterTest::StreamConverterTest(const std::string& name): CppUnit::TestCase(name)
+StreamConverterTest::StreamConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

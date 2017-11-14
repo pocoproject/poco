@@ -1,8 +1,6 @@
 //
 // RowFormatter.cpp
 //
-// $Id: //poco/Main/Data/samples/RecordSet/src/RowFormatter.cpp#2 $
-//
 // This sample demonstrates the Data library recordset row formatting
 // and streaming capabilities.
 //
@@ -67,9 +65,9 @@ public:
 		ValueVec::const_iterator end = vals.end();
 		for (; it != end; ++it)
 		{
-			if (it->isNumeric()) 
+			if (it->isNumeric())
 				str << "\t\t<TD align=\"right\">";
-			else 
+			else
 				str << "\t\t<TD align=\"left\">";
 
 			str << it->convert<std::string>() << "</TD>" << std::endl;

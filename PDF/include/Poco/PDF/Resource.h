@@ -1,8 +1,6 @@
 //
 // Resource.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Resource.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Resource
@@ -35,7 +33,7 @@ class Resource
 public:
 	typedef R Type;
 
-	Resource(HPDF_Doc* pPDF, const R& resource, const std::string& name = ""): 
+	Resource(HPDF_Doc* pPDF, const R& resource, const std::string& name = ""):
 		_pPDF(pPDF),
 		_resource(resource),
 		_name(name)
@@ -43,7 +41,7 @@ public:
 	{
 	}
 
-	Resource(const Resource& other): 
+	Resource(const Resource& other):
 		_pPDF(other._pPDF),
 		_resource(other._resource),
 		_name(other._name)

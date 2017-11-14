@@ -1,8 +1,6 @@
 //
 // Expire.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Expire.h#3 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  Expire
@@ -30,12 +28,12 @@ namespace Poco {
 
 template <class TArgs>
 class Expire: public AbstractDelegate<TArgs>
-	/// Decorator for AbstractDelegate adding automatic 
+	/// Decorator for AbstractDelegate adding automatic
 	/// expiration of registrations to AbstractDelegate's.
 {
 public:
 	Expire(const AbstractDelegate<TArgs>& p, Timestamp::TimeDiff expireMillisecs):
-		_pDelegate(p.clone()), 
+		_pDelegate(p.clone()),
 		_expire(expireMillisecs*1000)
 	{
 	}
@@ -108,14 +106,15 @@ private:
 	Expire();
 };
 
+
 template <>
 class Expire<void>: public AbstractDelegate<void>
-	/// Decorator for AbstractDelegate adding automatic 
+	/// Decorator for AbstractDelegate adding automatic
 	/// expiration of registrations to AbstractDelegate's.
 {
 public:
 	Expire(const AbstractDelegate<void>& p, Timestamp::TimeDiff expireMillisecs):
-		_pDelegate(p.clone()), 
+		_pDelegate(p.clone()),
 		_expire(expireMillisecs*1000)
 	{
 	}
@@ -187,7 +186,6 @@ protected:
 private:
 	Expire();
 };
-
 
 
 } // namespace Poco

@@ -1,8 +1,6 @@
 //
 // SharedMemoryTest.h
 //
-// $Id: //poco/Main/template/test.h#7 $
-//
 // Definition of the SharedMemoryTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -18,7 +16,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Path.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class SharedMemoryTest: public CppUnit::TestCase
@@ -35,7 +33,7 @@ public:
 
 	static CppUnit::Test* suite();
 
-	static Poco::Path findDataFile(const std::string& afile);
+	static Poco::Path findDataFile(const std::string& directory, const std::string& file);
 
 private:
 };

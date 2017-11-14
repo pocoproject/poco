@@ -1,8 +1,6 @@
 //
 // Mutex.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Mutex.cpp#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
@@ -15,25 +13,17 @@
 
 
 #include "Poco/Mutex.h"
-
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Mutex_WINCE.cpp"
-#else
-#include "Mutex_WIN32.cpp"
-#endif
-#elif defined(POCO_VXWORKS)
-#include "Mutex_VX.cpp"
-#else
+#if (POCO_OS == POCO_OS_CYGWIN || defined(POCO_ANDROID))
 #include "Mutex_POSIX.cpp"
+#else
+#include "Mutex_STD.cpp"
 #endif
 
 
 namespace Poco {
 
 
-Mutex::Mutex()
+Mutex::Mutex(MutexType type): MutexImpl((MutexTypeImpl) type)
 {
 }
 

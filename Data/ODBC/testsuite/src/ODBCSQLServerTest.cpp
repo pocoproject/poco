@@ -1,8 +1,6 @@
 //
 // ODBCSQLServerTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCSQLServerTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,13 +9,14 @@
 
 
 #include "ODBCSQLServerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
 #include "Poco/Tuple.h"
+#include "Poco/UTFString.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
@@ -41,6 +40,7 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::DynamicAny;
 using Poco::DateTime;
+using Poco::UTF16String;
 
 
 // uncomment to force FreeTDS on Windows
@@ -108,7 +108,7 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	;
 
 
-ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
+ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -121,7 +121,7 @@ ODBCSQLServerTest::~ODBCSQLServerTest()
 
 void ODBCSQLServerTest::testBareboneODBC()
 {
-	std::string tableCreateString = "CREATE TABLE Test "
+	std::string tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second VARCHAR(30),"
 		"Third VARBINARY(30),"
@@ -129,16 +129,16 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
 
-	tableCreateString = "CREATE TABLE Test "
+	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
 		"(First VARCHAR(30),"
 		"Second INTEGER,"
 		"Third FLOAT)";
@@ -297,27 +297,47 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		k += 2;
 	}
-/*TODO - currently fails with following error:
 
-[Microsoft][ODBC SQL Server Driver][SQL Server]Invalid parameter 
-2 (''):  Data type 0x23 is a deprecated large object, or LOB, but is marked as output parameter.  
-Deprecated types are not supported as output parameters.  Use current large object types instead.
+	{
+		session().setFeature("autoBind", true);
+		session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam; "
+			"END;"
+			, now;
 
-	session().setFeature("autoBind", true);
-	session() << "CREATE PROCEDURE storedProcedure(@inParam VARCHAR(MAX), @outParam VARCHAR(MAX) OUTPUT) AS "
-		"BEGIN "
-		"SET @outParam = @inParam; "
-		"END;"
-	, now;
+		std::string inParam = "123";
+		std::string outParam;
+		try {
+			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+		}
+		catch(StatementException& ex) {
+			std::cout << ex.toString();
+		}
+		assert(outParam == inParam);
+		dropObject("PROCEDURE", "storedProcedure");
+	}
 
-	std::string inParam = "123";
-	std::string outParam;
-	try{
-	session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
-	}catch(StatementException& ex){std::cout << ex.toString();}
-	assert(outParam == inParam);
-	dropObject("PROCEDURE", "storedProcedure");
-	*/
+	{
+		session().setFeature("autoBind", true);
+		session() << "CREATE PROCEDURE storedProcedure(@inParam NVARCHAR(MAX), @outParam NVARCHAR(MAX) OUTPUT) AS "
+			"BEGIN "
+			"SET @outParam = @inParam; "
+			"END;"
+			, now;
+
+		UTF16String::value_type cs[] = { L'1', L'2', L'3', L'\0' };
+		UTF16String inParam(cs);
+		UTF16String outParam;
+		try {
+			session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
+		}
+		catch (StatementException& ex) {
+			std::cout << ex.toString();
+		}
+		assert(outParam == inParam);
+		dropObject("PROCEDURE", "storedProcedure");
+	}
 }
 
 
@@ -334,14 +354,14 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 		people.push_back(Person("Simpson", "Homer", "Springfield", 42));
 		people.push_back(Person("Simpson", "Bart", "Springfield", 12));
 		people.push_back(Person("Simpson", "Lisa", "Springfield", 10));
-		session() << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(people), now;
+		session() << "INSERT INTO " << ExecUtil::person() << " VALUES (?, ?, ?, ?)", use(people), now;
 
 		dropObject("PROCEDURE", "storedCursorProcedure");
 		session() << "CREATE PROCEDURE storedCursorProcedure(@ageLimit int) AS "
 			"BEGIN "
 			" SELECT * "
-			" FROM Person "
-			" WHERE Age < @ageLimit " 
+			" FROM " << ExecUtil::person() <<
+			" WHERE Age < @ageLimit "
 			" ORDER BY Age DESC; "
 			"END;"
 		, now;
@@ -362,7 +382,7 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 		assert (rs["Address"] == "Springfield");
 		assert (rs["Age"] == 12);
 
-		dropObject("TABLE", "Person");
+		dropObject("TABLE", ExecUtil::person());
 		dropObject("PROCEDURE", "storedCursorProcedure");
 
 		k += 2;
@@ -508,7 +528,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
-		assert(3 == result); 
+		assert(3 == result);
 
 		Tuple<int, int> params(1, 2);
 		assert(1 == params.get<0>());
@@ -517,7 +537,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
-		assert(3 == result); 
+		assert(3 == result);
 
 		dropObject("PROCEDURE", "storedFunction");
 
@@ -553,8 +573,8 @@ void ODBCSQLServerTest::dropObject(const std::string& type, const std::string& n
 
 void ODBCSQLServerTest::recreateNullableTable()
 {
-	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
+	dropObject("TABLE", ExecUtil::nullabletest());
+	try { *_pSession << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -562,8 +582,8 @@ void ODBCSQLServerTest::recreateNullableTable()
 
 void ODBCSQLServerTest::recreatePersonTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -571,8 +591,8 @@ void ODBCSQLServerTest::recreatePersonTable()
 
 void ODBCSQLServerTest::recreatePersonBLOBTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image VARBINARY(MAX))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -580,8 +600,8 @@ void ODBCSQLServerTest::recreatePersonBLOBTable()
 
 void ODBCSQLServerTest::recreatePersonDateTimeTable()
 {
-	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
+	dropObject("TABLE", ExecUtil::person());
+	try { session() << "CREATE TABLE " << ExecUtil::person() << " (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Born DATETIME)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }
@@ -589,8 +609,8 @@ void ODBCSQLServerTest::recreatePersonDateTimeTable()
 
 void ODBCSQLServerTest::recreateIntsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str INTEGER)", now; }
+	dropObject("TABLE", ExecUtil::ints());
+	try { session() << "CREATE TABLE " << ExecUtil::ints() <<" (str INTEGER)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateIntsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateIntsTable()"); }
 }
@@ -598,8 +618,8 @@ void ODBCSQLServerTest::recreateIntsTable()
 
 void ODBCSQLServerTest::recreateStringsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateStringsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateStringsTable()"); }
 }
@@ -607,8 +627,8 @@ void ODBCSQLServerTest::recreateStringsTable()
 
 void ODBCSQLServerTest::recreateFloatsTable()
 {
-	dropObject("TABLE", "Strings");
-	try { session() << "CREATE TABLE Strings (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::strings());
+	try { session() << "CREATE TABLE " << ExecUtil::strings() <<" (str FLOAT)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateFloatsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateFloatsTable()"); }
 }
@@ -616,8 +636,8 @@ void ODBCSQLServerTest::recreateFloatsTable()
 
 void ODBCSQLServerTest::recreateTuplesTable()
 {
-	dropObject("TABLE", "Tuples");
-	try { session() << "CREATE TABLE Tuples "
+	dropObject("TABLE", ExecUtil::tuples());
+	try { session() << "CREATE TABLE " <<  ExecUtil::tuples()  <<
 		"(int0 INTEGER, int1 INTEGER, int2 INTEGER, int3 INTEGER, int4 INTEGER, int5 INTEGER, int6 INTEGER, "
 		"int7 INTEGER, int8 INTEGER, int9 INTEGER, int10 INTEGER, int11 INTEGER, int12 INTEGER, int13 INTEGER,"
 		"int14 INTEGER, int15 INTEGER, int16 INTEGER, int17 INTEGER, int18 INTEGER, int19 INTEGER)", now; }
@@ -637,8 +657,8 @@ void ODBCSQLServerTest::recreateVectorTable()
 
 void ODBCSQLServerTest::recreateVectorsTable()
 {
-	dropObject("TABLE", "Vectors");
-	try { session() << "CREATE TABLE Vectors (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::vectors());
+	try { session() << "CREATE TABLE " << ExecUtil::vectors() << " (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateVectorsTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateVectorsTable()"); }
 }
@@ -646,8 +666,8 @@ void ODBCSQLServerTest::recreateVectorsTable()
 
 void ODBCSQLServerTest::recreateAnysTable()
 {
-	dropObject("TABLE", "Anys");
-	try { session() << "CREATE TABLE Anys (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
+	dropObject("TABLE", ExecUtil::anys() );
+	try { session() << "CREATE TABLE " << ExecUtil::anys() << " (int0 INTEGER, flt0 FLOAT, str0 VARCHAR(30))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateAnysTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateAnysTable()"); }
 }
@@ -655,8 +675,8 @@ void ODBCSQLServerTest::recreateAnysTable()
 
 void ODBCSQLServerTest::recreateNullsTable(const std::string& notNull)
 {
-	dropObject("TABLE", "NullTest");
-	try { session() << format("CREATE TABLE NullTest (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)",
+	dropObject("TABLE", ExecUtil::nulltest());
+	try { session() << format("CREATE TABLE %s (i INTEGER %s, r FLOAT %s, v VARCHAR(30) %s)", ExecUtil::nulltest(),
 		notNull,
 		notNull,
 		notNull), now; }
@@ -675,16 +695,16 @@ void ODBCSQLServerTest::recreateBoolTable()
 
 void ODBCSQLServerTest::recreateMiscTable()
 {
-	dropObject("TABLE", "MiscTest");
-	try 
-	{ 
-		session() << "CREATE TABLE MiscTest "
+	dropObject("TABLE", ExecUtil::misctest());
+	try
+	{
+		session() << "CREATE TABLE  "<< ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second VARBINARY(30),"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
 			"Fifth DATETIME,"
-			"Sixth BIT)", now; 
+			"Sixth BIT)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -692,23 +712,23 @@ void ODBCSQLServerTest::recreateMiscTable()
 
 void ODBCSQLServerTest::recreateLogTable()
 {
-	dropObject("TABLE", "T_POCO_LOG");
-	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
+	dropObject("TABLE", ExecUtil::pocolog());;
+	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(max),"
 			"Name VARCHAR(max),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(max), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(max),"
 			"DateTime DATETIME)";
 
-		session() << sql, "T_POCO_LOG", now; 
-		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+		session() << sql, ExecUtil::pocolog(), now;
+		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -737,6 +757,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLServerTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testZeroRows);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSyntaxError);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessVector);
@@ -745,6 +767,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertList);

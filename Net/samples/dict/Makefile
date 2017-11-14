@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/samples/dict/Makefile#1 $
-#
 # Makefile for Poco dict
 #
 
@@ -12,6 +10,6 @@ objects = dict
 
 target         = dict
 target_version = 1
-target_libs    = PocoUtil PocoNet PocoXML PocoFoundation
+target_libs    = PocoUtil PocoNet PocoXML PocoJSON PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

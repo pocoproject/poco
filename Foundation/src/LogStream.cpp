@@ -1,8 +1,6 @@
 //
 // LogStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LogStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LogStream
@@ -25,8 +23,8 @@ namespace Poco {
 //
 
 
-LogStreamBuf::LogStreamBuf(Logger& logger, Message::Priority priority):
-	_logger(logger),
+LogStreamBuf::LogStreamBuf(Logger& rLogger, Message::Priority priority):
+	_logger(rLogger),
 	_priority(priority)
 {
 }
@@ -47,9 +45,12 @@ int LogStreamBuf::writeToDevice(char c)
 {
 	if (c == '\n' || c == '\r')
 	{
-		Message msg(_logger.name(), _message, _priority);
-		_message.clear();
-		_logger.log(msg);
+		if (_message.find_first_not_of("\r\n") != std::string::npos)
+		{
+			Message msg(_logger.name(), _message, _priority);
+			_message.clear();
+			_logger.log(msg);
+		}
 	}
 	else _message += c;
 	return c;
@@ -84,15 +85,15 @@ LogStreamBuf* LogIOS::rdbuf()
 //
 
 
-LogStream::LogStream(Logger& logger, Message::Priority priority):
-	LogIOS(logger, priority),
+LogStream::LogStream(Logger& logger, Message::Priority messagePriority):
+	LogIOS(logger, messagePriority),
 	std::ostream(&_buf)
 {
 }
 
 
-LogStream::LogStream(const std::string& loggerName, Message::Priority priority):
-	LogIOS(Logger::get(loggerName), priority),
+LogStream::LogStream(const std::string& loggerName, Message::Priority messagePriority):
+	LogIOS(Logger::get(loggerName), messagePriority),
 	std::ostream(&_buf)
 {
 }
@@ -207,9 +208,9 @@ LogStream& LogStream::trace(const std::string& message)
 }
 
 
-LogStream& LogStream::priority(Message::Priority priority)
+LogStream& LogStream::priority(Message::Priority messagePriority)
 {
-	_buf.setPriority(priority);
+	_buf.setPriority(messagePriority);
 	return *this;
 }
 

@@ -1,8 +1,6 @@
 //
 // DirectoryWatcherTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryWatcherTest.h#1 $
-//
 // Definition of the DirectoryWatcherTest class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
@@ -24,7 +22,7 @@
 
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Path.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class DirectoryWatcherTest: public CppUnit::TestCase

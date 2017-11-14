@@ -1,8 +1,6 @@
 //
 // NetworkInterface.cpp
 //
-// $Id: //poco/1.4/Net/src/NetworkInterface.cpp#9 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  NetworkInterface
@@ -23,17 +21,20 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	#if defined(POCO_WIN32_UTF8)
-		#include "Poco/UnicodeConverter.h"
-	#endif
+	#include "Poco/Platform_WIN32_OSVER.h"
+	#include "Poco/UnicodeConverter.h"
 	#include "Poco/Error.h"
+	#include <wincrypt.h>
 	#include <iphlpapi.h>
 	#include <ipifcons.h>
 #endif
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 
@@ -43,7 +44,7 @@ using Poco::FastMutex;
 using Poco::format;
 
 
-std::ostream& operator<<(std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
+std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
 {
 	std::ios state(0);
 	state.copyfmt(os);
@@ -151,13 +152,20 @@ private:
 
 	NetworkInterface::MACAddress _macAddress;
 
-	friend NetworkInterface::Map NetworkInterface::map(bool, bool);
+	friend class NetworkInterface;
 };
 
 
 NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 	_index(index),
-	_mtu(0)
+	_broadcast(false),
+	_loopback(false),
+	_multicast(false),
+	_pointToPoint(false),
+	_up(false),
+	_running(false),
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 }
 
@@ -173,7 +181,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_pointToPoint(false),
 	_up(false),
 	_running(false),
-	_mtu(0)
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	_addressList.push_back(AddressTuple(address, IPAddress(), IPAddress()));
 	setPhyParams();
@@ -192,7 +201,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 	_pointToPoint(false),
 	_up(false),
 	_running(false),
-	_mtu(0)
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	setPhyParams();
 	if (pMACAddress) setMACAddress(*pMACAddress);
@@ -217,7 +227,8 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
 	_pointToPoint(false),
 	_up(false),
 	_running(false),
-	_mtu(0)
+	_mtu(0),
+	_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	_addressList.push_back(AddressTuple(address, subnetMask, broadcastAddress));
 	setPhyParams();
@@ -230,7 +241,7 @@ void NetworkInterfaceImpl::setPhyParams()
 #if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
 	struct ifreq ifr;
 	std::strncpy(ifr.ifr_name, _name.c_str(), IFNAMSIZ);
-	DatagramSocket ds;
+	DatagramSocket ds(SocketAddress::IPv4);
 
 	ds.impl()->ioctl(SIOCGIFFLAGS, &ifr);
 	setFlags(ifr.ifr_flags);
@@ -430,6 +441,7 @@ inline bool NetworkInterfaceImpl::up() const
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 
+
 void NetworkInterfaceImpl::setFlags(DWORD flags, DWORD iftype)
 {
 	_running = _up = false;
@@ -453,12 +465,15 @@ void NetworkInterfaceImpl::setFlags(DWORD flags, DWORD iftype)
 		_multicast = true;
 }
 
+
 void NetworkInterfaceImpl::setRunning(bool running)
 {
 	_running = running;
 }
 
+
 #else
+
 
 void NetworkInterfaceImpl::setFlags(short flags)
 {
@@ -471,6 +486,7 @@ void NetworkInterfaceImpl::setFlags(short flags)
 	_up = ((flags & IFF_UP) != 0);
 #endif
 }
+
 
 #endif
 
@@ -525,8 +541,6 @@ inline void NetworkInterfaceImpl::addAddress(const IPAddress& addr)
 
 inline void NetworkInterfaceImpl::setMACAddress(const NetworkInterface::MACAddress& addr)
 {
-
-
 	_macAddress = addr;
 }
 
@@ -534,8 +548,7 @@ inline void NetworkInterfaceImpl::setMACAddress(const NetworkInterface::MACAddre
 inline void NetworkInterfaceImpl::setMACAddress(const void *addr, std::size_t len)
 {
 	_macAddress.clear();
-	for (unsigned i = 0; i < len; ++i)
-		_macAddress.push_back(((unsigned char *)addr)[i]);
+	_macAddress.insert(_macAddress.end(), static_cast<const unsigned char*>(addr), static_cast<const unsigned char*>(addr) + len);
 }
 
 
@@ -719,10 +732,12 @@ unsigned NetworkInterface::mtu() const
 	return _pImpl->mtu();
 }
 
+
 NetworkInterface::Type NetworkInterface::type() const
 {
 	return _pImpl->type();
 }
+
 
 bool NetworkInterface::supportsIP() const
 {
@@ -760,7 +775,6 @@ bool NetworkInterface::isLoopback() const
 }
 
 
-
 bool NetworkInterface::isPointToPoint() const
 {
 	return _pImpl->pointToPoint();
@@ -781,16 +795,10 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	Map map = NetworkInterface::map(false, false);
-	Map::const_iterator it = map.begin();
-	Map::const_iterator end = map.end();
-
-	for (; it != end; ++it)
-	{
-		if (it->second.name() == name && ((requireIPv6 && it->second.supportsIPv6()) || !requireIPv6))
-			return it->second;
-	}
-	throw InterfaceNotFoundException(name);
+	if (requireIPv6)
+		return forName(name, IPv6_ONLY);
+	else
+		return forName(name, IPv4_OR_IPv6);
 }
 
 
@@ -868,18 +876,29 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		const List& ipList = it->second.addressList();
 		List::const_iterator ipIt = ipList.begin();
 		List::const_iterator ipEnd = ipList.end();
-		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
+		for (; ipIt != ipEnd; ++ipIt)
 		{
 			IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
 			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
 			NetworkInterface ni;
 			if (mask.isWildcard())
+			{
 				ni = NetworkInterface(name, displayName, adapterName, addr, index, &mac);
+			}
 			else
 			{
 				IPAddress broadcast = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
 				ni = NetworkInterface(name, displayName, adapterName, addr, mask, broadcast, index, &mac);
 			}
+
+			ni._pImpl->_broadcast    = it->second._pImpl->_broadcast;
+			ni._pImpl->_loopback     = it->second._pImpl->_loopback;
+			ni._pImpl->_multicast    = it->second._pImpl->_multicast;
+			ni._pImpl->_pointToPoint = it->second._pImpl->_pointToPoint;
+			ni._pImpl->_up           = it->second._pImpl->_up;
+			ni._pImpl->_running      = it->second._pImpl->_running;
+			ni._pImpl->_mtu          = it->second._pImpl->_mtu;
+			ni._pImpl->_type         = it->second._pImpl->_type;
 
 			list.push_back(ni);
 		}
@@ -975,11 +994,12 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 	}
 	else
 	{
+#if !defined(_WIN32_WCE)
 		std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
 		subKey += name;
 		std::string netmask;
 		HKEY hKey;
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 		std::wstring usubKey;
 		Poco::UnicodeConverter::toUTF16(subKey, usubKey);
 		if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, usubKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
@@ -995,23 +1015,12 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 			}
 		}
 		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
-#else
-		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-			return IPAddress();
-		char unetmask[16];
-		DWORD size = sizeof(unetmask);
-		if (RegQueryValueExA(hKey, "DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
-		{
-			if (RegQueryValueExA(hKey, "SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
-			{
-				RegCloseKey(hKey);
-				return IPAddress();
-			}
-		}
-		netmask = unetmask;
 #endif
 		RegCloseKey(hKey);
 		return IPAddress::parse(netmask);
+#else
+		return IPAddress();
+#endif // !defined(_WIN32_WCE)
 	}
 }
 
@@ -1054,7 +1063,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
-	} while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
+	}
+	while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
 
 	poco_assert (NO_ERROR == dwRetVal);
 	for (; pAddress; pAddress = pAddress->Next)
@@ -1069,12 +1079,24 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		ifIndex = pAddress->Ipv6IfIndex;
 	#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 		#if defined (IP_ADAPTER_IPV6_ENABLED) // Vista
-			if ((pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) &&
-				(osvi.dwMajorVersion >= 5) &&
-				(osvi.dwMinorVersion >= 1) &&
-				(osvi.dwBuildNumber >=1))
+			if(osvi.dwMajorVersion>=6)//vista
 			{
-				ifIndex = pAddress->Ipv6IfIndex;
+				if ((pAddress->Flags & IP_ADAPTER_IPV6_ENABLED) &&
+					(osvi.dwMajorVersion >= 5) &&
+					(osvi.dwMinorVersion >= 1) &&
+					(osvi.dwBuildNumber >=1))
+				{
+					ifIndex = pAddress->Ipv6IfIndex;
+				}
+			}
+			else
+			{
+				if ((osvi.dwMajorVersion >= 5) &&
+					(osvi.dwMinorVersion >= 1) &&
+					(osvi.dwBuildNumber >= 1))
+				{
+					ifIndex = pAddress->Ipv6IfIndex;
+				}
 			}
 		#else // !defined(IP_ADAPTER_IPV6_ENABLED)
 			if ((osvi.dwMajorVersion >= 5) &&
@@ -1088,7 +1110,14 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif // POCO_HAVE_IPv6
 
 #if defined (IP_ADAPTER_IPV4_ENABLED)
-		if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED)
+		if(osvi.dwMajorVersion>=6)
+		{//vista
+			if (pAddress->Flags & IP_ADAPTER_IPV4_ENABLED)
+			{
+				ifIndex = pAddress->IfIndex;
+			}
+		}
+		else
 		{
 			ifIndex = pAddress->IfIndex;
 		}
@@ -1100,17 +1129,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		std::string name;
 		std::string displayName;
 		std::string adapterName(pAddress->AdapterName);
-#ifdef POCO_WIN32_UTF8
 		Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, name);
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
-#else
-		char nameBuffer[1024];
-		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, nameBuffer, sizeof(nameBuffer), NULL, NULL);
-		if (rc) name = nameBuffer;
-		char displayNameBuffer[1024];
-		rc = WideCharToMultiByte(CP_ACP, 0, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
-		if (rc) displayName = displayNameBuffer;
-#endif
 
 		bool isUp = (pAddress->OperStatus == IfOperStatusUp);
 		bool isIP = (0 != pAddress->FirstUnicastAddress);
@@ -1153,41 +1173,52 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					bool hasBroadcast = (pAddress->IfType == IF_TYPE_ETHERNET_CSMACD) || (pAddress->IfType == IF_TYPE_SOFTWARE_LOOPBACK) || (pAddress->IfType == IF_TYPE_IEEE80211);
 					if (hasBroadcast)
 					{
-						// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); additionaly, on pre-Vista versions of
+						// On Windows, a valid broadcast address will be all 1's (== address | ~subnetMask); additionally, on pre-Vista versions of
 						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
-#if defined(_WIN32_WCE)
 						ULONG prefixLength = 0;
+#if defined(_WIN32_WCE)
+	#if _WIN32_WCE >= 0x0800
+						prefixLength = pUniAddr->OnLinkPrefixLength;
+						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
+	#else
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+	#endif
 						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
 						if (prefixLength == 0 && pAddress->FirstPrefix)
 							prefixLength = pAddress->FirstPrefix->PrefixLength;
 						poco_assert (prefixLength <= 32);
 						if (broadcastAddress.isWildcard())
 						{
-							IPAddress mask ((unsigned) prefixLength, IPAddress::IPv4);
+							IPAddress mask(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
 							IPAddress host(mask & address);
 							broadcastAddress = host | ~mask;
 						}
 #elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
-						UINT8 prefixLength = pUniAddr->OnLinkPrefixLength;
-						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
-	#else // _WIN32_WINNT < 0x0600
-						ULONG prefixLength = 0;
+						if (osvi.dwMajorVersion >= 6)
+						{
+							prefixLength = pUniAddr->OnLinkPrefixLength;
+							broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
+						}
+						else
+						{
+							broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+						}
+	#else
 						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
+	#endif
 						poco_assert (prefixLength <= 32);
 						if (broadcastAddress.isWildcard())
 						{
-							IPAddress mask ((unsigned) prefixLength, IPAddress::IPv4);
+							IPAddress mask(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
 							IPAddress host(mask & address);
 							broadcastAddress = host | ~mask;
 						}
-	#endif // _WIN32_WINNT >= 0x0600
 #endif // (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100)
 						if (prefixLength)
 						{
-							subnetMask = IPAddress(prefixLength, IPAddress::IPv4);
+							subnetMask = IPAddress(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
 						}
 						else // if all of the above fails, look up the subnet mask in the registry
 						{
@@ -1202,8 +1233,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 					}
 					else
+					{
 						ifIt->second.addAddress(address);
-				} break;
+					}
+				}
+				break;
 #if defined(POCO_HAVE_IPv6)
 				case AF_INET6:
 					ifIt->second.addAddress(address);
@@ -1295,6 +1329,7 @@ namespace Net {
 
 namespace {
 
+
 NetworkInterface::Type fromNative(u_char nativeType)
 {
 	switch (nativeType)
@@ -1315,6 +1350,7 @@ NetworkInterface::Type fromNative(u_char nativeType)
 	}
 }
 
+
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
 	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
@@ -1326,6 +1362,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
 	impl.setType(fromNative(sdl->sdl_type));
 }
+
 
 } // namespace
 
@@ -1454,7 +1491,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
+#ifndef POCO_NO_LINUX_IF_PACKET_H
 #include <linux/if_packet.h>
+#endif
 #include <net/if_arp.h>
 #include <iostream>
 
@@ -1463,6 +1502,7 @@ namespace Net {
 
 
 namespace {
+
 
 static NetworkInterface::Type fromNative(unsigned arphrd)
 {
@@ -1486,17 +1526,52 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
-	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
 	impl.setName(iface->ifa_name);
 	impl.setDisplayName(iface->ifa_name);
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
+#ifndef POCO_NO_LINUX_IF_PACKET_H
+	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
 	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
 	impl.setType(fromNative(sdl->sll_hatype));
+#else
+	std::string ifPath("/sys/class/net/");
+	ifPath += iface->ifa_name;
+
+	std::string addrPath(ifPath);
+	addrPath += "/address";
+	
+	std::ifstream addrStream(addrPath.c_str());
+	if (addrStream.good())
+	{
+		std::string addr;
+		std::getline(addrStream, addr);
+		Poco::StringTokenizer tok(addr, ":");
+		std::vector<unsigned char> mac;
+		for (Poco::StringTokenizer::Iterator it = tok.begin(); it != tok.end(); ++it)
+		{
+			mac.push_back(static_cast<unsigned char>(Poco::NumberParser::parseHex(*it)));
+		}
+		impl.setMACAddress(&mac[0], mac.size());
+		addrStream.close();
+	}
+	
+	std::string typePath(ifPath);
+	typePath += "/type";
+	std::ifstream typeStream(typePath.c_str());
+	if (typeStream.good())
+	{
+		int type;
+		typeStream >> type;
+		impl.setType(fromNative(type));
+		typeStream.close();
+	}
+#endif // POCO_NO_LINUX_IF_PACKET_H
 }
 
 #endif
+
 
 }
 
@@ -1526,6 +1601,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			unsigned family = iface->ifa_addr->sa_family;
 			switch (family)
 			{
+#ifndef POCO_NO_LINUX_IF_PACKET_H
 			case AF_PACKET:
 			{
 				struct sockaddr_ll* sll = (struct sockaddr_ll*)iface->ifa_addr;
@@ -1538,6 +1614,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 				break;
 			}
+#endif // POCO_NO_LINUX_IF_PACKET_H
 			case AF_INET:
 				ifIndex = if_nametoindex(iface->ifa_name);
 				ifIt = result.find(ifIndex);

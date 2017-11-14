@@ -1,8 +1,6 @@
 //
 // URI.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/URI.h#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI
@@ -22,14 +20,18 @@
 
 #include "Poco/Foundation.h"
 #include <vector>
+#include <utility>
 
 
 namespace Poco {
 
 
+class Path;
+
+
 class Foundation_API URI
 	/// A Uniform Resource Identifier, as specified in RFC 3986.
-	/// 
+	///
 	/// The URI class provides methods for building URIs from their
 	/// parts, as well as for splitting URIs into their parts.
 	/// Furthermore, the class provides methods for resolving
@@ -37,11 +39,20 @@ class Foundation_API URI
 	///
 	/// The class automatically performs a few normalizations on
 	/// all URIs and URI parts passed to it:
-	///   * scheme identifiers are converted to lower case.
-	///   * percent-encoded characters are decoded
+	///   * scheme identifiers are converted to lower case
+	///   * percent-encoded characters are decoded (except for the query string)
 	///   * optionally, dot segments are removed from paths (see normalize())
+	///
+	/// Note that dealing with query strings requires some precautions, as, internally,
+	/// query strings are stored in percent-encoded form, while all other parts of the URI
+	/// are stored in decoded form. While parsing query strings from properly encoded URLs
+	/// generally works, explicitly setting query strings with setQuery() or extracting
+	/// query strings with getQuery() may lead to ambiguities. See the descriptions of
+	/// setQuery(), setRawQuery(), getQuery() and getRawQuery() for more information.
 {
 public:
+	typedef std::vector<std::pair<std::string, std::string> > QueryParameters;
+
 	URI();
 		/// Creates an empty URI.
 
@@ -72,6 +83,12 @@ public:
 		/// Creates an URI from a base URI and a relative URI, according to
 		/// the algorithm in section 5.2 of RFC 3986.
 
+	explicit URI(const Path& path);
+		/// Creates a URI from a path.
+		///
+		/// The path will be made absolute, and a file:// URI
+		/// will be built from it.
+
 	~URI();
 		/// Destroys the URI.
 	
@@ -95,7 +112,7 @@ public:
 	std::string toString() const;
 		/// Returns a string representation of the URI.
 		///
-		/// Characters in the path, query and fragment parts will be 
+		/// Characters in the path, query and fragment parts will be
 		/// percent-encoded as necessary.
 	
 	const std::string& getScheme() const;
@@ -133,7 +150,7 @@ public:
 		
 	std::string getAuthority() const;
 		/// Returns the authority part (userInfo, host and port)
-		/// of the URI. 
+		/// of the URI.
 		///
 		/// If the port number is a well-known port
 		/// number for the given scheme (e.g., 80 for http), it
@@ -144,30 +161,63 @@ public:
 		/// the user-info, host, port components accordingly.
 		
 	const std::string& getPath() const;
-		/// Returns the path part of the URI.
+		/// Returns the decoded path part of the URI.
 		
 	void setPath(const std::string& path);
 		/// Sets the path part of the URI.
 	
 	std::string getQuery() const;
-		/// Returns the query part of the URI.
+		/// Returns the decoded query part of the URI.
+		///
+		/// Note that encoded ampersand characters ('&', "%26")
+		/// will be decoded, which could cause ambiguities if the query
+		/// string contains multiple parameters and a parameter name
+		/// or value contains an ampersand as well.
+		/// In such a case it's better to use getRawQuery() or
+		/// getQueryParameters().
 		
 	void setQuery(const std::string& query);	
 		/// Sets the query part of the URI.
+		///
+		/// The query string will be percent-encoded. If the query
+		/// already contains percent-encoded characters, these
+		/// will be double-encoded, which is probably not what's
+		/// intended by the caller. Furthermore, ampersand ('&')
+		/// characters in the query will not be encoded. This could
+		/// lead to ambiguity issues if the query string contains multiple
+		/// name-value parameters separated by ampersand, and if any
+		/// name or value also contains an ampersand. In such a
+		/// case, it's better to use setRawQuery() with a properly
+		/// percent-encoded query string, or use addQueryParameter()
+		/// or setQueryParameters(), which take care of appropriate
+		/// percent encoding of parameter names and values.
 
 	void addQueryParameter(const std::string& param, const std::string& val = "");
 		/// Adds "param=val" to the query; "param" may not be empty.
 		/// If val is empty, only '=' is appended to the parameter.
-		/// 
+		///
 		/// In addition to regular encoding, function also encodes '&' and '=',
 		/// if found in param or val.
 
 	const std::string& getRawQuery() const;
-		/// Returns the unencoded query part of the URI.
+		/// Returns the query string in raw form, which usually
+		/// means percent encoded.
 		
 	void setRawQuery(const std::string& query);	
 		/// Sets the query part of the URI.
+		///
+		/// The given query string must be properly percent-encoded.
 	
+	QueryParameters getQueryParameters() const;
+		/// Returns the decoded query string parameters as a vector
+		/// of name-value pairs.
+
+	void setQueryParameters(const QueryParameters& params);
+		/// Sets the query part of the URI from a vector
+		/// of query parameters.
+		///
+		/// Calls addQueryParameter() for each parameter name and value.
+
 	const std::string& getFragment() const;
 		/// Returns the fragment part of the URI.
 		
@@ -178,10 +228,10 @@ public:
 		/// Sets the path, query and fragment parts of the URI.
 		
 	std::string getPathEtc() const;
-		/// Returns the path, query and fragment parts of the URI.
+		/// Returns the encoded path, query and fragment parts of the URI.
 		
 	std::string getPathAndQuery() const;
-		/// Returns the path and query parts of the URI.	
+		/// Returns the encoded path and query parts of the URI.	
 		
 	void resolve(const std::string& relativeURI);
 		/// Resolves the given relative URI against the base URI.
@@ -221,8 +271,8 @@ public:
 	void normalize();
 		/// Normalizes the URI by removing all but leading . and .. segments from the path.
 		///
-		/// If the first path segment in a relative path contains a colon (:), 
-		/// such as in a Windows path containing a drive letter, a dot segment (./) 
+		/// If the first path segment in a relative path contains a colon (:),
+		/// such as in a Windows path containing a drive letter, a dot segment (./)
 		/// is prepended in accordance with section 3.3 of RFC 3986.
 	
 	void getPathSegments(std::vector<std::string>& segments);
@@ -237,6 +287,7 @@ public:
 		/// URI-decodes the given string by replacing percent-encoded
 		/// characters with the actual character. The decoded string
 		/// is appended to decodedStr.
+		///
 		/// When plusAsSpace is true, non-encoded plus signs in the query are decoded as spaces.
 		/// (http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1)
 
@@ -289,6 +340,7 @@ protected:
 
 	static const std::string RESERVED_PATH;
 	static const std::string RESERVED_QUERY;
+	static const std::string RESERVED_QUERY_PARAM;
 	static const std::string RESERVED_FRAGMENT;
 	static const std::string ILLEGAL;
 	

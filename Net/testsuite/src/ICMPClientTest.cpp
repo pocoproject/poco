@@ -1,8 +1,6 @@
 //
 // ICMPClientTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/ICMPClientTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ICMPClientTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/ICMPClient.h"
 #include "Poco/Net/ICMPEventArgs.h"
@@ -34,9 +32,11 @@ using Poco::Delegate;
 using Poco::AutoPtr;
 
 
-ICMPClientTest::ICMPClientTest(const std::string& name): 
-	CppUnit::TestCase(name),
-	_icmpClient(IPAddress::IPv4)
+Poco::FastMutex ICMPClientTest::_mutex;
+
+
+ICMPClientTest::ICMPClientTest(const std::string& name):
+	CppUnit::TestCase(name)
 {
 }
 
@@ -48,41 +48,82 @@ ICMPClientTest::~ICMPClientTest()
 
 void ICMPClientTest::testPing()
 {
-	assert(ICMPClient::pingIPv4("localhost") > 0);
+	assert(ICMPClient::pingIPv4("127.0.0.1") > 0);
 
-	assert(_icmpClient.ping("localhost") > 0);
-	assert(_icmpClient.ping("www.appinf.com", 4) > 0);
+	Poco::Net::ICMPClient icmpClient(IPAddress::IPv4);
+
+	registerDelegates(icmpClient);
+
+	assert(icmpClient.ping("127.0.0.1") > 0);
+	assert(icmpClient.ping("www.appinf.com", 4) > 0);
 
 	// warning: may fail depending on the existence of the addresses at test site
 	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
-	assert(0 == _icmpClient.ping("192.168.243.1"));
-	assert(0 == _icmpClient.ping("10.11.12.13"));
+	assert(0 == icmpClient.ping("192.168.243.1"));
+	assert(0 == icmpClient.ping("10.11.12.13"));
+
+	unregisterDelegates(icmpClient);
+	// wait for delegates to finish printing
+	Poco::FastMutex::ScopedLock l(_mutex);
+}
+
+
+void ICMPClientTest::testBigPing()
+{
+	assert(ICMPClient::pingIPv4("127.0.0.1", 1, 96) > 0);
+
+	Poco::Net::ICMPClient icmpClient(IPAddress::IPv4, 96);
+
+	registerDelegates(icmpClient);
+
+	assert(icmpClient.ping("127.0.0.1", 1) > 0);
+	assert(icmpClient.ping("www.appinf.com", 4) > 0);
+
+	// warning: may fail depending on the existence of the addresses at test site
+	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
+	assert(0 == icmpClient.ping("192.168.243.1"));
+	assert(0 == icmpClient.ping("10.11.12.13"));
+
+	unregisterDelegates(icmpClient);
+	// wait for delegates to finish printing
+	Poco::FastMutex::ScopedLock l(_mutex);
+}
+
+
+void ICMPClientTest::registerDelegates(const ICMPClient& icmpClient)
+{
+	icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
+	icmpClient.pingReply += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
+	icmpClient.pingError += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
+	icmpClient.pingEnd += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
+}
+
+
+void ICMPClientTest::unregisterDelegates(const ICMPClient& icmpClient)
+{
+	icmpClient.pingBegin -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
+	icmpClient.pingReply -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
+	icmpClient.pingError -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
+	icmpClient.pingEnd -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
 }
 
 
 void ICMPClientTest::setUp()
 {
-	_icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
-	_icmpClient.pingReply += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
-	_icmpClient.pingError += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
-	_icmpClient.pingEnd   += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
 }
 
 
 void ICMPClientTest::tearDown()
 {
-	_icmpClient.pingBegin -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
-	_icmpClient.pingReply -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
-	_icmpClient.pingError -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
-	_icmpClient.pingEnd   -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
 }
 
 
 void ICMPClientTest::onBegin(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
-	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " 
-		<< args.dataSize() << " bytes of data:" 
+	os << std::endl << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with "
+		<< args.dataSize() << " bytes of data:"
 		<< std::endl << "-------------------------------------------------------" << std::endl;
 	std::cout << os.str() << std::endl;
 }
@@ -90,9 +131,10 @@ void ICMPClientTest::onBegin(const void* pSender, ICMPEventArgs& args)
 
 void ICMPClientTest::onReply(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << "Reply from " << args.hostAddress()
-		<< " bytes=" << args.dataSize() 
+		<< " bytes=" << args.dataSize()
 		<< " time=" << args.replyTime() << "ms"
 		<< " TTL=" << args.ttl();
 	std::cout << os.str() << std::endl;
@@ -101,6 +143,7 @@ void ICMPClientTest::onReply(const void* pSender, ICMPEventArgs& args)
 
 void ICMPClientTest::onError(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	os << args.error();
 	std::cerr << os.str() << std::endl;
@@ -109,14 +152,15 @@ void ICMPClientTest::onError(const void* pSender, ICMPEventArgs& args)
 
 void ICMPClientTest::onEnd(const void* pSender, ICMPEventArgs& args)
 {
+	Poco::FastMutex::ScopedLock l(_mutex);
 	std::ostringstream os;
 	int received = args.received();
 	os << std::endl << "--- Ping statistics for " << args.hostAddress() << " ---"
 		<< std::endl << "Packets: Sent=" << args.sent() << ", Received=" << received
 		<< " Lost=" << args.repetitions() - received << " (" << 100.0 - args.percent() << "% loss),"
 		<< std::endl << "Approximate round trip times in milliseconds: " << std::endl
-		<< "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()  
-		<< "ms, Average=" << args.avgRTT() << "ms" 
+		<< "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()
+		<< "ms, Average=" << args.avgRTT() << "ms"
 		<< std::endl << "-----------------------------------------------" << std::endl;
 	std::cout << os.str() << std::endl;
 }
@@ -127,6 +171,7 @@ CppUnit::Test* ICMPClientTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ICMPClientTest");
 
 	CppUnit_addTest(pSuite, ICMPClientTest, testPing);
+	CppUnit_addTest(pSuite, ICMPClientTest, testBigPing);
 
 	return pSuite;
 }

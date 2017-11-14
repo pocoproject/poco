@@ -1,0 +1,63 @@
+POCO C++ Libraries Emscripten Platform Notes
+AAAIntroduction
+
+!!!Introduction
+
+
+POCO can be compiled to javascript/WebAssembly using the emscripten toolchain.
+Currently this is a work in progress.
+
+
+!!!Requirements
+
+!!Emscripten toolchain
+
+Install the emscripten toolchain following these instructions:
+http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html
+
+The version 1.37.10 was used for this initial work.
+
+You should then run the emsdk_env.sh script to load the paths and environment variables.
+
+!!Compiling the POCO C++ Libraries
+
+It is best to always compile as shared libraries, there are some incompatibilities with the
+".a" static library format. The generated files aren't "true" shared libraries, but
+the emscripten toolchain knows how to best handle them.
+
+!!!Restrictions
+
+For the most part, the Linux and Emscripten ports of the POCO C++ Libraries are very similar.
+However, there are a few restrictions.
+
+!!Poco::Thread
+
+At the time of this writing, the emscripten thread support is being tested, and it only may
+be working on the Firefox Nighly build. It is also not yet available for WebAssembly.
+
+!!!Build Notes
+
+There are 2 configuration files for emscripten:
+- emscripten: compile to asm.js (pure javascript)
+- emscripten-wasm: compile to WebAssembly
+
+The <*emscripten*> build configuration (located in <*$POCO_BASE/build/config/emscripten*>)
+is used to cross-build for Emscripten from a Linux or Mac OS X host.
+
+To build the POCO C++ Libraries on a Linux or Mac OS X host:
+
+    ./configure --config=emscripten
+    ./make -j4
+----
+
+To compile your own application, you must set the same compiler parameters as when you built POCO,
+for example, you must set the "-s USE_PTHREADS=1" on all your source files and link flags when
+using threads.
+
+!!Samples
+
+The samples executables are generated in .js format (with sibling .html file). To run, use emrun.
+
+    emrun executable.html
+----
+

@@ -1,8 +1,6 @@
 //
 // HTTPSStreamFactoryTest.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/HTTPSStreamFactoryTest.h#1 $
-//
 // Definition of the HTTPSStreamFactoryTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class HTTPSStreamFactoryTest: public CppUnit::TestCase

@@ -1,8 +1,6 @@
 //
 // Format.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Format.cpp#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Format
@@ -46,28 +44,44 @@ namespace
 	}
 
 
-	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
+	void parseWidth(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
 	{
 		int width = 0;
-		while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+		if (itFmt != endFmt && *itFmt == '*')
 		{
-			width = 10*width + *itFmt - '0';
 			++itFmt;
+			width = AnyCast<int>(*itVal++);
 		}
-		if (width != 0) str.width(width);
+		else
+		{
+			while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+			{
+				width = 10*width + *itFmt - '0';
+				++itFmt;
+			}
+		}
+		if (width > 0) str.width(width);
 	}
 	
 	
-	void parsePrec(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
+	void parsePrec(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
 	{
 		if (itFmt != endFmt && *itFmt == '.')
 		{
 			++itFmt;
 			int prec = 0;
-			while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+			if (itFmt != endFmt && *itFmt == '*')
 			{
-				prec = 10*prec + *itFmt - '0';
 				++itFmt;
+				prec = AnyCast<int>(*itVal++);
+			}
+			else
+			{
+				while (itFmt != endFmt && Ascii::isDigit(*itFmt))
+				{
+					prec = 10*prec + *itFmt - '0';
+					++itFmt;
+				}
 			}
 			if (prec >= 0) str.precision(prec);
 		}
@@ -82,7 +96,7 @@ namespace
 			{
 			case 'l':
 			case 'h':
-			case 'L': 
+			case 'L':
 			case '?': mod = *itFmt++; break;
 			}
 		}
@@ -155,8 +169,8 @@ namespace
 		try
 		{
 			parseFlags(str, itFmt, endFmt);
-			parseWidth(str, itFmt, endFmt);
-			parsePrec(str, itFmt, endFmt);
+			parseWidth(str, itFmt, endFmt, itVal);
+			parsePrec(str, itFmt, endFmt, itVal);
 			char mod = parseMod(itFmt, endFmt);
 			if (itFmt != endFmt)
 			{
@@ -209,7 +223,7 @@ namespace
 					str << RefAnyCast<std::string>(*itVal++);
 					break;
 				case 'z':
-					str << AnyCast<std::size_t>(*itVal++); 
+					str << AnyCast<std::size_t>(*itVal++);
 					break;
 				case 'I':
 				case 'D':
@@ -227,114 +241,16 @@ namespace
 }
 
 
-std::string format(const std::string& fmt, const Any& value)
-{
+std::string format(const std::string& fmt, const Any& value) {
 	std::string result;
 	format(result, fmt, value);
 	return result;
 }
 
 
-std::string format(const std::string& fmt, const Any& value1, const Any& value2)
+void format(std::string& result, const char *fmt, const std::vector<Any>& values)
 {
-	std::string result;
-	format(result, fmt, value1, value2);
-	return result;
-}
-
-
-std::string format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	std::string result;
-	format(result, fmt, value1, value2, value3);
-	return result;
-}
-
-
-std::string format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	std::string result;
-	format(result, fmt, value1, value2, value3, value4);
-	return result;
-}
-
-
-std::string format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	std::string result;
-	format(result, fmt, value1, value2, value3, value4, value5);
-	return result;
-}
-
-
-std::string format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	std::string result;
-	format(result, fmt, value1, value2, value3, value4, value5, value6);
-	return result;
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value)
-{
-	std::vector<Any> args;
-	args.push_back(value);
-	format(result, fmt, args);
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2)
-{
-	std::vector<Any> args;
-	args.push_back(value1);
-	args.push_back(value2);
-	format(result, fmt, args);
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	std::vector<Any> args;
-	args.push_back(value1);
-	args.push_back(value2);
-	args.push_back(value3);
-	format(result, fmt, args);
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	std::vector<Any> args;
-	args.push_back(value1);
-	args.push_back(value2);
-	args.push_back(value3);
-	args.push_back(value4);
-	format(result, fmt, args);
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	std::vector<Any> args;
-	args.push_back(value1);
-	args.push_back(value2);
-	args.push_back(value3);
-	args.push_back(value4);
-	args.push_back(value5);
-	format(result, fmt, args);
-}
-
-
-void format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	std::vector<Any> args;
-	args.push_back(value1);
-	args.push_back(value2);
-	args.push_back(value3);
-	args.push_back(value4);
-	args.push_back(value5);
-	args.push_back(value6);
-	format(result, fmt, args);
+	format(result, std::string(fmt), values);
 }
 
 
@@ -343,7 +259,7 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 	std::string::const_iterator itFmt  = fmt.begin();
 	std::string::const_iterator endFmt = fmt.end();
 	std::vector<Any>::const_iterator itVal  = values.begin();
-	std::vector<Any>::const_iterator endVal = values.end(); 
+	std::vector<Any>::const_iterator endVal = values.end();
 	while (itFmt != endFmt)
 	{
 		switch (*itFmt)

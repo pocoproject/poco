@@ -1,8 +1,6 @@
 //
 // MulticastSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MulticastSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -16,8 +14,8 @@
 #ifdef POCO_NET_HAS_INTERFACE
 
 
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "MulticastEchoServer.h"
 #include "Poco/Net/MulticastSocket.h"
 #include "Poco/Net/SocketAddress.h"
@@ -50,7 +48,7 @@ MulticastSocketTest::~MulticastSocketTest()
 void MulticastSocketTest::testMulticast()
 {
 	MulticastEchoServer echoServer;
-	MulticastSocket ms;
+	MulticastSocket ms(SocketAddress::IPv4);
 	int n = ms.sendTo("hello", 5, echoServer.group());
 	assert (n == 5);
 	char buffer[256];

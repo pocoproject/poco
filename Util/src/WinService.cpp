@@ -1,8 +1,6 @@
 //
 // WinService.cpp
 //
-// $Id: //poco/1.4/Util/src/WinService.cpp#4 $
-//
 // Library: Util
 // Package: Windows
 // Module:  WinService
@@ -21,9 +19,7 @@
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#if defined(POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 using Poco::Thread;
@@ -66,13 +62,9 @@ const std::string& WinService::name() const
 std::string WinService::displayName() const
 {
 	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
-#if defined(POCO_WIN32_UTF8)
 	std::wstring udispName(pSvcConfig->lpDisplayName);
 	std::string dispName;
 	Poco::UnicodeConverter::toUTF8(udispName, dispName);
-#else
-	std::string dispName(pSvcConfig->lpDisplayName);
-#endif
 	LocalFree(pSvcConfig);
 	return dispName;
 }
@@ -81,13 +73,9 @@ std::string WinService::displayName() const
 std::string WinService::path() const
 {
 	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
-#if defined(POCO_WIN32_UTF8)
 	std::wstring upath(pSvcConfig->lpBinaryPathName);
 	std::string path;
 	UnicodeConverter::toUTF8(upath, path);
-#else
-	std::string path(pSvcConfig->lpBinaryPathName);
-#endif
 	LocalFree(pSvcConfig);
 	return path;
 }
@@ -96,7 +84,6 @@ std::string WinService::path() const
 void WinService::registerService(const std::string& path, const std::string& displayName)
 {
 	close();
-#if defined(POCO_WIN32_UTF8)
 	std::wstring uname;
 	Poco::UnicodeConverter::toUTF16(_name, uname);
 	std::wstring udisplayName;
@@ -106,25 +93,13 @@ void WinService::registerService(const std::string& path, const std::string& dis
 	_svcHandle = CreateServiceW(
 		_scmHandle,
 		uname.c_str(),
-		udisplayName.c_str(), 
+		udisplayName.c_str(),
 		SERVICE_ALL_ACCESS,
 		SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START,
 		SERVICE_ERROR_NORMAL,
 		upath.c_str(),
 		NULL, NULL, NULL, NULL, NULL);
-#else
-	_svcHandle = CreateServiceA(
-		_scmHandle,
-		_name.c_str(),
-		displayName.c_str(), 
-		SERVICE_ALL_ACCESS,
-		SERVICE_WIN32_OWN_PROCESS,
-		SERVICE_DEMAND_START,
-		SERVICE_ERROR_NORMAL,
-		path.c_str(),
-		NULL, NULL, NULL, NULL, NULL);
-#endif
 	if (!_svcHandle)
 		throw SystemException("cannot register service", _name);
 }
@@ -215,7 +190,7 @@ void WinService::setStartup(WinService::Startup startup)
 	}
 }
 
-	
+
 WinService::Startup WinService::getStartup() const
 {
 	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
@@ -271,13 +246,9 @@ bool WinService::tryOpen() const
 {
 	if (!_svcHandle)
 	{
-#if defined(POCO_WIN32_UTF8)
 		std::wstring uname;
 		Poco::UnicodeConverter::toUTF16(_name, uname);
 		_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
-#else
-		_svcHandle = OpenServiceA(_scmHandle, _name.c_str(), SERVICE_ALL_ACCESS);
-#endif
 	}
 	return _svcHandle != 0;
 }
@@ -302,11 +273,7 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 	if (!pSvcConfig) throw OutOfMemoryException("cannot allocate service config buffer");
 	try
 	{
-#if defined(POCO_WIN32_UTF8)
 		while (!QueryServiceConfigW(_svcHandle, pSvcConfig, size, &bytesNeeded))
-#else
-		while (!QueryServiceConfigA(_svcHandle, pSvcConfig, size, &bytesNeeded))
-#endif
 		{
 			if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 			{

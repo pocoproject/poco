@@ -1,8 +1,6 @@
 //
 // BulkExtraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/BulkExtraction.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  BulkExtraction
@@ -46,22 +44,22 @@ public:
 	typedef BulkExtraction<ValType> Type;
 	typedef SharedPtr<Type>         Ptr;
 
-	BulkExtraction(C& result, Poco::UInt32 limit, const Position& pos = Position(0)): 
-		AbstractExtraction(limit, pos.value(), true),
-		_rResult(result), 
+	BulkExtraction(C& rResult, Poco::UInt32 limit, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(C).name(), limit, pos.value(), true),
+		_rResult(rResult),
 		_default()
 	{
-		if (static_cast<Poco::UInt32>(result.size()) != limit)
-			result.resize(limit);
+		if (static_cast<Poco::UInt32>(rResult.size()) != limit)
+			rResult.resize(limit);
 	}
 
-	BulkExtraction(C& result, const CValType& def, Poco::UInt32 limit, const Position& pos = Position(0)): 
-		AbstractExtraction(limit, pos.value(), true),
-		_rResult(result), 
+	BulkExtraction(C& rResult, const CValType& def, Poco::UInt32 limit, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(C).name(), limit, pos.value(), true),
+		_rResult(rResult),
 		_default(def)
 	{
-		if (static_cast<Poco::UInt32>(result.size()) != limit)
-			result.resize(limit);
+		if (static_cast<Poco::UInt32>(rResult.size()) != limit)
+			rResult.resize(limit);
 	}
 
 	virtual ~BulkExtraction()
@@ -88,9 +86,10 @@ public:
 		try
 		{
 			return _nulls.at(row);
-		}catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		}
+		catch (std::out_of_range& ex)
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -138,8 +137,8 @@ template <class C>
 class InternalBulkExtraction: public BulkExtraction<C>
 	/// Container Data Type specialization extension for extraction of values from a query result set.
 	///
-	/// This class is intended for PocoData internal use - it is used by StatementImpl 
-	/// to automaticaly create internal BulkExtraction in cases when statement returns data and no external storage
+	/// This class is intended for PocoData internal use - it is used by StatementImpl
+	/// to automatically create internal BulkExtraction in cases when statement returns data and no external storage
 	/// was supplied. It is later used by RecordSet to retrieve the fetched data after statement execution.
 	/// It takes ownership of the Column pointer supplied as constructor argument. Column object, in turn
 	/// owns the data container pointer.
@@ -153,11 +152,11 @@ public:
 	typedef InternalBulkExtraction<ValType> Type;
 	typedef SharedPtr<Type>                 Ptr;
 
-	explicit InternalBulkExtraction(C& result,
+	InternalBulkExtraction(C& rResult,
 		Column<C>* pColumn,
 		Poco::UInt32 limit,
-		const Position& pos = Position(0)): 
-		BulkExtraction<C>(result, CValType(), limit, pos), 
+		const Position& pos = Position(0)):
+		BulkExtraction<C>(rResult, CValType(), limit, pos),
 		_pColumn(pColumn)
 		/// Creates InternalBulkExtraction.
 	{
@@ -177,12 +176,12 @@ public:
 	const CValType& value(int index) const
 	{
 		try
-		{ 
-			return BulkExtraction<C>::result().at(index); 
+		{
+			return BulkExtraction<C>::result().at(index);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -208,7 +207,7 @@ private:
 namespace Keywords {
 
 
-template <typename T> 
+template <typename T>
 AbstractExtraction::Ptr into(std::vector<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
@@ -217,7 +216,7 @@ AbstractExtraction::Ptr into(std::vector<T>& t, const Bulk& bulk, const Position
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractExtraction::Ptr into(std::vector<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
@@ -228,7 +227,7 @@ AbstractExtraction::Ptr into(std::vector<T>& t, BulkFnType, const Position& pos 
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractExtraction::Ptr into(std::deque<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
@@ -237,7 +236,7 @@ AbstractExtraction::Ptr into(std::deque<T>& t, const Bulk& bulk, const Position&
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractExtraction::Ptr into(std::deque<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
@@ -248,7 +247,7 @@ AbstractExtraction::Ptr into(std::deque<T>& t, BulkFnType, const Position& pos =
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractExtraction::Ptr into(std::list<T>& t, const Bulk& bulk, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
@@ -257,7 +256,7 @@ AbstractExtraction::Ptr into(std::list<T>& t, const Bulk& bulk, const Position& 
 }
 
 
-template <typename T> 
+template <typename T>
 AbstractExtraction::Ptr into(std::list<T>& t, BulkFnType, const Position& pos = Position(0))
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.

@@ -1,8 +1,6 @@
 //
 // NamedMutexTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedMutexTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NamedMutexTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NamedMutex.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
@@ -77,7 +75,7 @@ namespace
 }
 
 
-NamedMutexTest::NamedMutexTest(const std::string& name): CppUnit::TestCase(name)
+NamedMutexTest::NamedMutexTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

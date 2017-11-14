@@ -1,8 +1,6 @@
 //
 // TestRunnerDlg.cpp
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/TestRunnerDlg.cpp#1 $
-//
 
 
 #include <afxwin.h>
@@ -13,7 +11,7 @@
 #include "ActiveTest.h"
 #include "GUITestResult.h"
 #include "ProgressBar.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "TestRunnerDlg.h"
 
 

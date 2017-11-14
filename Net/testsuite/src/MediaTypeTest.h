@@ -1,8 +1,6 @@
 //
 // MediaTypeTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/MediaTypeTest.h#2 $
-//
 // Definition of the MediaTypeTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class MediaTypeTest: public CppUnit::TestCase

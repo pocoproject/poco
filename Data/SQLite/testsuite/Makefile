@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/SQLite/testsuite/Makefile#1 $
-#
 # Makefile for Poco SQLite testsuite
 #
 
@@ -13,6 +11,6 @@ objects = SQLiteTestSuite Driver \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataSQLite PocoData PocoFoundation CppUnit
+target_libs    = PocoDataSQLite PocoData PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

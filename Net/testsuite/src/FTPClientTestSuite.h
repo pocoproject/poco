@@ -1,8 +1,6 @@
 //
 // FTPClientTestSuite.h
 //
-// $Id: //poco/svn/Net/testsuite/src/FTPClientTestSuite.h#2 $
-//
 // Definition of the FTPClientTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define FTPClientTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class FTPClientTestSuite

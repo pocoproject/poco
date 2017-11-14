@@ -1,8 +1,6 @@
 //
 // MD5Engine.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/MD5Engine.h#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  MD5Engine
@@ -18,7 +16,7 @@
 // MD5 (RFC 1321) algorithm:
 // Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 // rights reserved.
-// 
+//
 // License to copy and use this software is granted provided that it
 // is identified as the "RSA Data Security, Inc. MD5 Message-Digest
 // Algorithm" in all material mentioning or referencing this software
@@ -51,7 +49,7 @@ namespace Poco {
 
 
 class Foundation_API MD5Engine: public DigestEngine
-	/// This class implementes the MD5 message digest algorithm,
+	/// This class implements the MD5 message digest algorithm,
 	/// described in RFC 1321.
 {
 public:

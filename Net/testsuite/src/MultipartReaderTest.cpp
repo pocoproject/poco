@@ -1,8 +1,6 @@
 //
 // MultipartReaderTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MultipartReaderTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "MultipartReaderTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"

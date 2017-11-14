@@ -1,0 +1,40 @@
+#! /bin/sh
+#
+# cpp11-gcc
+#
+# Detect compatible GCC version and add c++11/14 flags
+#
+# From the online doc
+# __GNUC__
+# __GNUC_MINOR__
+# __GNUC_PATCHLEVEL__
+# These macros are defined by all GNU compilers that use the C preprocessor: C, C++, Objective-C and Fortran.
+# Their values are the major version, minor version, and patch level of the compiler, as integer constants.
+# For example, GCC 3.2.1 will define __GNUC__ to 3, __GNUC_MINOR__ to 2, and __GNUC_PATCHLEVEL__ to 1. i
+# These macros are also defined if you invoke the preprocessor directly.
+#
+# __VERSION__
+# This macro expands to a string constant which describes the version of the compiler in use.
+# You should not rely on its contents having any particular form, but it can be counted on to contain
+# at least the release number.
+#
+
+
+GNUMAJOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC__ | sed -e 's/^.* //g')
+GNUMINOR   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_MINOR__ | sed -e 's/^.* //g')
+GNUPATCH   := $(shell $(CXX) -E -dM - < /dev/null | grep __GNUC_PATCHLEVEL__ | sed -e 's/^.* //g')
+GCCVERSION := $(GNUMAJOR)$(GNUMINOR)$(GNUPATCH)
+
+
+#
+# GCC 4.8 (or 4.6?) doesn't accept -std=c++11, only -std=c++0x.
+#
+# C++14 needs GCC 4.9.2
+ifeq ($(shell test $(GCCVERSION) -ge 492 && echo 1), 1)
+	CXXFLAGS += -std=c++14
+# C++11 needs GCC 4.8.1
+else ifeq ($(shell test $(GCCVERSION) -ge 481 && echo 1), 1)
+	CXXFLAGS += -std=c++11
+else
+	CXXFLAGS += -std=c++03
+endif

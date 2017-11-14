@@ -1,8 +1,6 @@
 //
 // HTTPFixedLengthStream.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPFixedLengthStream.cpp#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPFixedLengthStream
@@ -130,7 +128,14 @@ void* HTTPFixedLengthInputStream::operator new(std::size_t size)
 
 void HTTPFixedLengthInputStream::operator delete(void* ptr)
 {
-	_pool.release(ptr);
+	try
+	{
+		_pool.release(ptr);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -162,7 +167,14 @@ void* HTTPFixedLengthOutputStream::operator new(std::size_t size)
 
 void HTTPFixedLengthOutputStream::operator delete(void* ptr)
 {
-	_pool.release(ptr);
+	try
+	{
+		_pool.release(ptr);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

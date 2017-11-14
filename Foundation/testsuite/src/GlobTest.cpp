@@ -1,8 +1,6 @@
 //
 // GlobTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/GlobTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "GlobTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Glob.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
@@ -24,7 +22,7 @@ using Poco::File;
 using Poco::Path;
 
 
-GlobTest::GlobTest(const std::string& name): CppUnit::TestCase(name)
+GlobTest::GlobTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

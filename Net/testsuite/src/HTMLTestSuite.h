@@ -1,8 +1,6 @@
 //
 // HTMLTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTMLTestSuite.h#1 $
-//
 // Definition of the HTMLTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define HTMLTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class HTMLTestSuite

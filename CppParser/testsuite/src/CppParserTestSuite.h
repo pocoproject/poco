@@ -1,8 +1,6 @@
 //
 // CppParserTestSuite.h
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/CppParserTestSuite.h#1 $
-//
 // Definition of the CppParserTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define CppParserTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class CppParserTestSuite

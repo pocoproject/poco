@@ -1,8 +1,6 @@
 //
 // TextBufferIteratorTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TextBufferIteratorTest.h#1 $
-//
 // Definition of the TextBufferIteratorTest class.
 //
 // Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class TextBufferIteratorTest: public CppUnit::TestCase

@@ -1,8 +1,6 @@
 //
 // TextEncodingTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TextEncodingTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "TextEncodingTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/TextEncoding.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/Latin2Encoding.h"
@@ -26,7 +24,7 @@
 using namespace Poco;
 
 
-TextEncodingTest::TextEncodingTest(const std::string& name): CppUnit::TestCase(name)
+TextEncodingTest::TextEncodingTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -38,6 +36,9 @@ TextEncodingTest::~TextEncodingTest()
 
 void TextEncodingTest::testTextEncoding()
 {
+	TextEncoding& ascii = TextEncoding::byName("ASCII");
+	assert(std::string("US-ASCII") == ascii.canonicalName());
+
 	TextEncoding& utf8 = TextEncoding::byName("utf8");
 	assert (std::string("UTF-8") == utf8.canonicalName());
 	
@@ -93,6 +94,44 @@ void TextEncodingTest::testTextEncoding()
 }
 
 
+void TextEncodingTest::testTextEncodingManager()
+{
+	TextEncodingRegistry registry;
+
+	assert(registry.has("us-ascii"));
+	assert(registry.has("US-ASCII"));
+	assert(registry.has("ascii"));
+	assert(registry.has("ASCII"));
+
+	assert(registry.has("utf-8"));
+	assert(registry.has("UTF-8"));
+
+	assert(registry.has("utf-16"));
+	assert(registry.has("UTF-16"));
+
+	assert(registry.has("utf-32"));
+	assert(registry.has("UTF-32"));
+
+	assert(registry.has("iso-8859-1"));
+	assert(registry.has("ISO-8859-1"));
+
+	assert(registry.has("iso-8859-2"));
+	assert(registry.has("ISO-8859-2"));
+
+	assert(registry.has("iso-8859-15"));
+	assert(registry.has("ISO-8859-15"));
+
+	assert(registry.has("windows-1250"));
+	assert(registry.has("WINDOWS-1250"));
+
+	assert(registry.has("windows-1251"));
+	assert(registry.has("WINDOWS-1251"));
+
+	assert(registry.has("windows-1252"));
+	assert(registry.has("WINDOWS-1252"));
+}
+
+
 void TextEncodingTest::setUp()
 {
 }
@@ -108,6 +147,7 @@ CppUnit::Test* TextEncodingTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TextEncodingTest");
 
 	CppUnit_addTest(pSuite, TextEncodingTest, testTextEncoding);
+	CppUnit_addTest(pSuite, TextEncodingTest, testTextEncodingManager);
 
 	return pSuite;
 }

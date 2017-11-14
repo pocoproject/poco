@@ -1,8 +1,6 @@
 //
 // Stringifier.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Stringifier
@@ -17,6 +15,7 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/JSONString.h"
 #include <iomanip>
 
 
@@ -27,35 +26,41 @@ namespace Poco {
 namespace JSON {
 
 
-void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, bool preserveInsertionOrder)
+void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step)
 {
 	if (step == -1) step = indent;
 
-	if ( any.type() == typeid(Object) )
+	if (any.type() == typeid(Object))
 	{
 		const Object& o = any.extract<Object>();
 		o.stringify(out, indent == 0 ? 0 : indent, step);
 	}
-	else if ( any.type() == typeid(Array) )
+	else if (any.type() == typeid(Array))
 	{
 		const Array& a = any.extract<Array>();
 		a.stringify(out, indent == 0 ? 0 : indent, step);
 	}
-	else if ( any.type() == typeid(Object::Ptr) )
+	else if (any.type() == typeid(Object::Ptr))
 	{
 		const Object::Ptr& o = any.extract<Object::Ptr>();
 		o->stringify(out, indent == 0 ? 0 : indent, step);
 	}
-	else if ( any.type() == typeid(Array::Ptr) )
+	else if (any.type() == typeid(Array::Ptr))
 	{
 		const Array::Ptr& a = any.extract<Array::Ptr>();
 		a->stringify(out, indent == 0 ? 0 : indent, step);
 	}
-	else if ( any.isEmpty() )
+	else if (any.isEmpty())
 	{
 		out << "null";
 	}
-	else if ( any.isString() )
+	else if (any.isNumeric() || any.isBoolean())
+	{
+		std::string value = any.convert<std::string>();
+		if (any.type() == typeid(char)) formatString(value, out);
+		else out << value;
+	}
+	else if (any.isString() || any.isDateTime() || any.isDate() || any.isTime())
 	{
 		std::string value = any.convert<std::string>();
 		formatString(value, out);
@@ -69,25 +74,8 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 
 void Stringifier::formatString(const std::string& value, std::ostream& out)
 {
-	out << '"';
-	for (std::string::const_iterator it = value.begin(),
-		 end = value.end(); it != end; ++it)
-	{
-		switch (*it)
-		{
-			case '\\': out << "\\\\"; break;
-			case '"': out << "\\\""; break;
-			case '/': out << "\\/"; break;
-			case '\b': out << "\\b"; break;
-			case '\f': out << "\\f"; break;
-			case '\n': out << "\\n"; break;
-			case '\r': out << "\\r"; break;
-			case '\t': out << "\\t"; break;
-			default: out << *it; break;
-		}
-	}
-	out << '"';
+	Poco::toJSON(value, out);
 }
 
 
-} }  // Namespace Poco::JSON
+} }  // namespace Poco::JSON

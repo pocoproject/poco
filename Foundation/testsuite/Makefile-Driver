@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/testsuite/Makefile-Driver#2 $
-#
 # Makefile for Poco Foundation testsuite
 #
 
@@ -23,8 +21,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
 	NotificationsTestSuite NullStreamTest NumberFormatterTest \
 	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
-	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest \
-	SemaphoreTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
+	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest SHA3EngineTest BLAKE2EngineTest \
+	SemaphoreTest MutexTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
 	SimpleFileChannelTest StopwatchTest \
 	StreamConverterTest StreamCopierTest StreamTokenizerTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \
@@ -39,14 +37,26 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
-	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest
+	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest \
+	DirectoryIteratorsTest FIFOBufferTestSuite FIFOBufferTest
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoFoundation CppUnit
+target_libs    = PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec
 
 ifdef POCO_UNBUNDLED
         SYSLIBS += -lz -lpcre
+endif
+
+COMMONFLAGS += -Wno-unused-variable
+
+ifeq ('g++',$(findstring 'g++','$(CXX)'))
+COMMONFLAGS += -Wno-unused-but-set-variable
+#$(error $(findstring g++,$(CXX)))
+endif
+
+ifeq ($(LINKMODE),SHARED)
+SHAREDOPT_LINK += -Wl,-rpath,$(BINPATH)
 endif

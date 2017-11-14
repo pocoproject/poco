@@ -1,8 +1,6 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPRequest
@@ -37,11 +35,13 @@ const std::string HTTPRequest::HTTP_OPTIONS        = "OPTIONS";
 const std::string HTTPRequest::HTTP_DELETE         = "DELETE";
 const std::string HTTPRequest::HTTP_TRACE          = "TRACE";
 const std::string HTTPRequest::HTTP_CONNECT        = "CONNECT";
+const std::string HTTPRequest::HTTP_PATCH          = "PATCH";
 const std::string HTTPRequest::HOST                = "Host";
 const std::string HTTPRequest::COOKIE              = "Cookie";
 const std::string HTTPRequest::AUTHORIZATION       = "Authorization";
 const std::string HTTPRequest::PROXY_AUTHORIZATION = "Proxy-Authorization";
 const std::string HTTPRequest::UPGRADE             = "Upgrade";
+const std::string HTTPRequest::EXPECT              = "Expect";
 
 
 HTTPRequest::HTTPRequest():
@@ -110,7 +110,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	else
 	{
 		value.append(host);
-	}    
+	}
 
 	if (port != 80 && port != 443)
 	{
@@ -209,6 +209,7 @@ void HTTPRequest::read(std::istream& istr)
 	uri.reserve(64);
 	version.reserve(16);
 	int ch = istr.get();
+	if (istr.bad()) throw NetException("Error reading HTTP request header");
 	if (ch == eof) throw NoMessageException();
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	if (ch == eof) throw MessageException("No HTTP request header");
@@ -256,6 +257,21 @@ void HTTPRequest::setCredentials(const std::string& header, const std::string& s
 	set(header, auth);
 }
 
+
+bool HTTPRequest::getExpectContinue() const
+{
+	const std::string& expect = get(EXPECT, EMPTY);
+	return !expect.empty() && icompare(expect, "100-continue") == 0;
+}
+
+
+void HTTPRequest::setExpectContinue(bool expectContinue)
+{
+	if (expectContinue)
+		set(EXPECT, "100-continue");
+	else
+		erase(EXPECT);
+}
 
 
 } } // namespace Poco::Net

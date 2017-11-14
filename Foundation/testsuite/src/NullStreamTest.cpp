@@ -1,8 +1,6 @@
 //
 // NullStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NullStreamTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NullStreamTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NullStream.h"
 
 
@@ -20,7 +18,7 @@ using Poco::NullInputStream;
 using Poco::NullOutputStream;
 
 
-NullStreamTest::NullStreamTest(const std::string& name): CppUnit::TestCase(name)
+NullStreamTest::NullStreamTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

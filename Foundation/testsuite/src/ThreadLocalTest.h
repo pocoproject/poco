@@ -1,8 +1,6 @@
 //
 // ThreadLocalTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ThreadLocalTest.h#1 $
-//
 // Definition of the ThreadLocalTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ThreadLocalTest: public CppUnit::TestCase

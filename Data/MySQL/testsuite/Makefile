@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.3/Data/MySQL/testsuite/Makefile#1 $
-#
 # Makefile for Poco MySQL testsuite
 #
 
@@ -17,6 +15,6 @@ objects = MySQLTestSuite Driver MySQLTest SQLExecutor
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataMySQL PocoData PocoFoundation CppUnit
+target_libs    = PocoDataMySQL PocoData PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

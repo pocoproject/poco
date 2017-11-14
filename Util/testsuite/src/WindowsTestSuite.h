@@ -1,8 +1,6 @@
 //
 // WindowsTestSuite.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/WindowsTestSuite.h#1 $
-//
 // Definition of the WindowsTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define WindowsTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class WindowsTestSuite

@@ -1,8 +1,6 @@
 //
 // RotateStrategy.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RotateStrategy.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel
@@ -47,7 +45,7 @@ RotateStrategy::~RotateStrategy()
 const std::string RotateByIntervalStrategy::ROTATE_TEXT("# Log file created/rotated ");
 
 
-RotateByIntervalStrategy::RotateByIntervalStrategy(const Timespan& span): 
+RotateByIntervalStrategy::RotateByIntervalStrategy(const Timespan& span):
 	_span(span),
 	_lastRotate(0)
 {

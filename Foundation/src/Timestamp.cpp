@@ -1,8 +1,6 @@
 //
 // Timestamp.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timestamp.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timestamp
@@ -17,25 +15,29 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
-#include <algorithm>
-#if defined(POCO_OS_FAMILY_UNIX)
-#include <time.h>
-#include <unistd.h>
-#if defined(POCO_VXWORKS)
-#include <timers.h>
-#else
-#include <sys/time.h>
-#include <sys/times.h>
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnWindows.h"
 #if defined(_WIN32_WCE)
 #include <cmath>
 #endif
 #endif
+#include <algorithm>
+#undef min
+#undef max
+#include <limits>
+#include <chrono>
 
 
-#if defined(_WIN32_WCE)
+#ifndef POCO_HAVE_CLOCK_GETTIME
+	#if (defined(_POSIX_TIMERS) && defined(CLOCK_REALTIME)) || defined(POCO_VXWORKS) || defined(__QNX__)
+		#ifndef __APPLE__ // See GitHub issue #1453 - not available before Mac OS 10.12/iOS 10
+			#define POCO_HAVE_CLOCK_GETTIME
+		#endif
+	#endif
+#endif
+
+
+#if defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)
 
 
 //
@@ -135,10 +137,14 @@ void GetSystemTimeAsFileTimeWithMillisecondResolution(FILETIME* pFT)
 } // namespace
 
 
-#endif // defined(_WIN32_WCE)
+#endif // defined(_WIN32_WCE) && defined(POCO_WINCE_TIMESTAMP_HACK)
 
 
 namespace Poco {
+
+
+const Timestamp::TimeVal Timestamp::TIMEVAL_MIN = std::numeric_limits<Timestamp::TimeVal>::min();
+const Timestamp::TimeVal Timestamp::TIMEVAL_MAX = std::numeric_limits<Timestamp::TimeVal>::max();
 
 
 Timestamp::Timestamp()
@@ -200,40 +206,8 @@ Timestamp Timestamp::fromUtcTime(UtcTimeVal val)
 
 void Timestamp::update()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS)
-
-	FILETIME ft;
-#if defined(_WIN32_WCE)
-	GetSystemTimeAsFileTimeWithMillisecondResolution(&ft);
-#else
-	GetSystemTimeAsFileTime(&ft);
-#endif
-
-	ULARGE_INTEGER epoch; // UNIX epoch (1970-01-01 00:00:00) expressed in Windows NT FILETIME
-	epoch.LowPart  = 0xD53E8000;
-	epoch.HighPart = 0x019DB1DE;
-
-	ULARGE_INTEGER ts;
-	ts.LowPart  = ft.dwLowDateTime;
-	ts.HighPart = ft.dwHighDateTime;
-	ts.QuadPart -= epoch.QuadPart;
-	_ts = ts.QuadPart/10;
-
-#elif defined(POCO_VXWORKS)
-
-	struct timespec ts;
-	if (clock_gettime(CLOCK_REALTIME, &ts))
-		throw SystemException("cannot get time of day");
-	_ts = TimeVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
-
-#else
-
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL))
-		throw SystemException("cannot get time of day");
-	_ts = TimeVal(tv.tv_sec)*resolution() + tv.tv_usec;
-	
-#endif
+	_ts = std::chrono::duration_cast<std::chrono::microseconds>
+		(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 

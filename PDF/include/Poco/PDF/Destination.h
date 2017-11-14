@@ -1,8 +1,6 @@
 //
 // Destination.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Destination.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Destination
@@ -42,7 +40,7 @@ public:
 		/// Sets the position and zoom for destination.
 
 	void fit();
-		/// Sets the appearance of the page to displaying entire page within the window. 
+		/// Sets the appearance of the page to displaying entire page within the window.
 
 	void fitHorizontal(float top);
 		/// Defines the appearance of a page to magnifying to fit the height of the
@@ -60,7 +58,7 @@ public:
 
 	void fitWindow();
 		/// Sets the appearance of the page to magnifying to fit  the bounding box of
-		/// the page within the window. 
+		/// the page within the window.
 
 	void fitWindowHorizontal(float top);
 		/// Defines the appearance of a page to magnifying to fit the width of the

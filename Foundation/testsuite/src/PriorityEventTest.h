@@ -1,8 +1,6 @@
 //
 // PriorityEventTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PriorityEventTest.h#1 $
-//
 // Definition of the PriorityEventTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/PriorityEvent.h"
 #include "Poco/EventArgs.h"
 

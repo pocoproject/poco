@@ -1,8 +1,6 @@
 //
 // Extraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Extraction.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Extraction
@@ -21,6 +19,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Types.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Preparation.h"
 #include "Poco/Data/TypeHandler.h"
@@ -39,6 +38,43 @@ namespace Poco {
 namespace Data {
 
 
+	template <typename CollTp, typename ElemTp = typename CollTp::value_type>
+	struct DefaultInitializer
+	{
+		static void appendElem(CollTp& coll, const ElemTp& defVal)
+		{
+			coll.push_back(defVal);
+		}
+	};
+
+	template <typename CollTp>
+	struct DefaultInitializer<CollTp, CLOB>
+	{
+		static void appendElem(CollTp& coll, const CLOB& defVal)
+		{
+			CLOB v(defVal.rawContent(), defVal.size());
+			coll.push_back(v);
+		}
+	};
+
+	template <typename CollTp>
+	struct DefaultInitializer<CollTp, BLOB>
+	{
+		static void appendElem(CollTp& coll, const BLOB& defVal)
+		{
+			BLOB v(defVal.rawContent(), defVal.size());
+			coll.push_back(v);
+		}
+	};
+
+	template <typename CollTp>
+	inline void appendElem(CollTp& coll, const typename CollTp::value_type& defVal)
+	{
+		DefaultInitializer<CollTp, typename CollTp::value_type>::appendElem(coll, defVal);
+	}
+
+
+
 template <class T>
 class Extraction: public AbstractExtraction
 	/// Concrete Data Type specific extraction of values from a query result set.
@@ -49,21 +85,23 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(T& result, const Position& pos = Position(0)):
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
-		_default(), 
-		_extracted(false)
+	Extraction(T& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(T).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
+		_default(),
+		_extracted(false),
+		_null(false)
 		/// Creates an Extraction object at specified position.
 		/// Uses an empty object T as default value.
 	{
 	}
 
-	Extraction(T& result, const T& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
-		_default(def), 
-		_extracted(false)
+	Extraction(T& rResult, const T& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(T).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
+		_default(def),
+		_extracted(false),
+		_null(false)
 		/// Creates an Extraction object at specified position.
 		/// Uses the provided def object as default value.
 	{
@@ -133,24 +171,23 @@ class Extraction<std::vector<T> >: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
-	
+
 	typedef std::vector<T>      ValType;
 	typedef SharedPtr<ValType>  ValPtr;
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::vector<T>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::vector<T>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::vector<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
-
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::vector<T>& result, const T& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::vector<T>& rResult, const T& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::vector<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -182,15 +219,15 @@ public:
 			return _nulls.at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
 	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
-		_rResult.push_back(_default);
+		appendElem(_rResult, _default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
@@ -230,17 +267,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::vector<bool>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::vector<bool>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::vector<bool>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::vector<bool>& result, const bool& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::vector<bool>& rResult, const bool& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::vector<bool>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -272,8 +309,8 @@ public:
 			return _nulls.at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -322,17 +359,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::list<T>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::list<T>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::list<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::list<T>& result, const T& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::list<T>& rResult, const T& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::list<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -364,15 +401,15 @@ public:
 			return _nulls.at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
 	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
-		_rResult.push_back(_default);
+		appendElem(_rResult, _default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
@@ -412,17 +449,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::deque<T>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::deque<T>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::deque<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::deque<T>& result, const T& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::deque<T>& rResult, const T& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::deque<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -454,15 +491,15 @@ public:
 			return _nulls.at(row);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
 	std::size_t extract(std::size_t pos)
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
-		_rResult.push_back(_default);
+		appendElem(_rResult, _default);
 		TypeHandler<T>::extract(pos, _rResult.back(), _default, pExt);
 		_nulls.push_back(isValueNull(_rResult.back(), pExt->isNull(pos)));
 		return 1u;
@@ -496,8 +533,8 @@ template <class C>
 class InternalExtraction: public Extraction<C>
 	/// Container Data Type specialization extension for extraction of values from a query result set.
 	///
-	/// This class is intended for PocoData internal use - it is used by StatementImpl 
-	/// to automaticaly create internal Extraction in cases when statement returns data and no external storage
+	/// This class is intended for PocoData internal use - it is used by StatementImpl
+	/// to automatically create internal Extraction in cases when statement returns data and no external storage
 	/// was supplied. It is later used by RecordSet to retrieve the fetched data after statement execution.
 	/// It takes ownership of the Column pointer supplied as constructor argument. Column object, in turn
 	/// owns the data container pointer.
@@ -511,8 +548,8 @@ public:
 	typedef SharedPtr<Type>        Ptr;
 
 
-	explicit InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)): 
-		Extraction<C>(result, ValType(), pos), 
+	InternalExtraction(C& rResult, Column<C>* pColumn, const Position& pos = Position(0)):
+		Extraction<C>(rResult, ValType(), pos),
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
 	{
@@ -533,12 +570,12 @@ public:
 	const ValType& value(int index) const
 	{
 		try
-		{ 
-			return Extraction<C>::result().at(index); 
+		{
+			return Extraction<C>::result().at(index);
 		}
 		catch (std::out_of_range& ex)
-		{ 
-			throw RangeException(ex.what()); 
+		{
+			throw RangeException(ex.what());
 		}
 	}
 
@@ -572,17 +609,17 @@ public:
 	typedef SharedPtr<Type>            Ptr;
 	typedef typename ValType::iterator Iterator;
 
-	Extraction(std::set<T>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::set<T>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::set<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::set<T>& result, const T& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::set<T>& rResult, const T& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::set<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -636,17 +673,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::multiset<T>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::multiset<T>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::multiset<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::multiset<T>& result, const T& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::multiset<T>& rResult, const T& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::multiset<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -700,17 +737,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::map<K, V>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::map<K, V>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::map<K, V>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::map<K, V>& result, const V& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::map<K, V>& rResult, const V& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::map<K, V>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -764,17 +801,17 @@ public:
 	typedef Extraction<ValType> Type;
 	typedef SharedPtr<Type>     Ptr;
 
-	Extraction(std::multimap<K, V>& result, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::multimap<K, V>& rResult, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::multimap<K, V>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default()
 	{
 		_rResult.clear();
 	}
 
-	Extraction(std::multimap<K, V>& result, const V& def, const Position& pos = Position(0)): 
-		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
-		_rResult(result), 
+	Extraction(std::multimap<K, V>& rResult, const V& def, const Position& pos = Position(0)):
+		AbstractExtraction(typeid(std::multimap<K, V>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		_rResult(rResult),
 		_default(def)
 	{
 		_rResult.clear();
@@ -821,7 +858,7 @@ private:
 namespace Keywords {
 
 
-template <typename T> 
+template <typename T>
 inline AbstractExtraction::Ptr into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
 {
@@ -829,7 +866,31 @@ inline AbstractExtraction::Ptr into(T& t)
 }
 
 
-template <typename T> 
+template <>
+inline AbstractExtraction::Ptr into(long& t)
+	/// Convenience function to allow for a more compact creation of an extraction object.
+{
+#ifndef POCO_LONG_IS_64_BIT
+	return new Extraction<long>(t);
+#else
+	return new Extraction<Poco::Int64>(reinterpret_cast<Poco::Int64&>(t));
+#endif
+}
+
+
+template <>
+inline AbstractExtraction::Ptr into(unsigned long& t)
+	/// Convenience function to allow for a more compact creation of an extraction object.
+{
+#ifndef POCO_LONG_IS_64_BIT
+	return new Extraction<unsigned long>(t);
+#else
+	return new Extraction<Poco::UInt64>(reinterpret_cast<Poco::UInt64&>(t));
+#endif
+}
+
+
+template <typename T>
 inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support.
@@ -838,9 +899,9 @@ inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 }
 
 
-template <typename T> 
+template <typename T>
 inline AbstractExtraction::Ptr into(T& t, const Position& pos, const T& def)
-	/// Convenience function to allow for a more compact creation of an extraction object 
+	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support and the given default
 {
 	return new Extraction<T>(t, def, pos);

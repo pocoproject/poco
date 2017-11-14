@@ -1,8 +1,6 @@
 //
 // HTTPClientTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPClientTestSuite.h#1 $
-//
 // Definition of the HTTPClientTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define HTTPClientTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class HTTPClientTestSuite

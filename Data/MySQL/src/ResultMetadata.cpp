@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/ResultMetadata.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  ResultMetadata
 //
@@ -88,7 +86,7 @@ namespace
 
 		switch (field.type)
 		{
-		case MYSQL_TYPE_TINY:     
+		case MYSQL_TYPE_TINY:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT8;
 			return Poco::Data::MetaColumn::FDT_INT8;
 
@@ -97,19 +95,19 @@ namespace
 			return Poco::Data::MetaColumn::FDT_INT16;
 
 		case MYSQL_TYPE_INT24:
-		case MYSQL_TYPE_LONG:     
+		case MYSQL_TYPE_LONG:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT32;
 			return Poco::Data::MetaColumn::FDT_INT32;
 
-		case MYSQL_TYPE_FLOAT:    
+		case MYSQL_TYPE_FLOAT:
 			return Poco::Data::MetaColumn::FDT_FLOAT;
 
 		case MYSQL_TYPE_DECIMAL:
 		case MYSQL_TYPE_NEWDECIMAL:
-		case MYSQL_TYPE_DOUBLE:   
+		case MYSQL_TYPE_DOUBLE:
 			return Poco::Data::MetaColumn::FDT_DOUBLE;
 
-		case MYSQL_TYPE_LONGLONG: 
+		case MYSQL_TYPE_LONGLONG:
 			if (unsig) return Poco::Data::MetaColumn::FDT_UINT64;
 			return Poco::Data::MetaColumn::FDT_INT64;
 			
@@ -172,8 +170,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	{for (std::size_t i = 0; i < count; i++)
 	{
 		std::size_t size = fieldSize(fields[i]);
-		std::size_t zero = 0;
-		if (size == ~zero) size = 0;
+		if (size == 0xFFFFFFFF) size = 0;
 
 		_columns.push_back(MetaColumn(
 			i,                               // position
@@ -229,12 +226,12 @@ std::size_t ResultMetadata::length(std::size_t pos) const
 	return _lengths[pos];
 }
 
-const unsigned char* ResultMetadata::rawData(std::size_t pos) const 
+const unsigned char* ResultMetadata::rawData(std::size_t pos) const
 {
 	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
 
-bool ResultMetadata::isNull(std::size_t pos) const 
+bool ResultMetadata::isNull(std::size_t pos) const
 {
 	return (_isNull[pos] != 0);
 }

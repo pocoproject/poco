@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/template/sample.make#4 $
-#
 # Makefile for Poco download
 #
 
@@ -19,6 +17,6 @@ objects = download
 
 target         = download
 target_version = 1
-target_libs    = PocoNetSSL PocoCrypto PocoNet PocoUtil PocoXML PocoFoundation
+target_libs    = PocoNetSSL PocoCrypto PocoNet PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

@@ -1,8 +1,6 @@
 //
 // HTTPMessage.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPMessage.h#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPMessage
@@ -113,7 +111,7 @@ public:
 	const std::string& getContentType() const;
 		/// Returns the content type for this message.
 		///
-		/// If no Content-Type header is present, 
+		/// If no Content-Type header is present,
 		/// returns UNKNOWN_CONTENT_TYPE.	
 
 	void setKeepAlive(bool keepAlive);

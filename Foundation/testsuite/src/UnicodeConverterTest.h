@@ -1,8 +1,6 @@
 //
 // UnicodeConverterTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UnicodeConverterTest.h#1 $
-//
 // Definition of the UnicodeConverterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UTFString.h"
 #include <cstring>
@@ -47,9 +45,9 @@ private:
 		// Convert from UTF-8 to wide
 		T wtext, wtext2, wtext3;
 		Poco::UnicodeConverter::convert(text, wtext);
-		if (sizeof(T) == 2)
+		if (sizeof(typename T::value_type) == 2)
 			assert(Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 8);
-		else if (sizeof(T) == 4)
+		else if (sizeof(typename T::value_type) == 4)
 			assert(Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 5);
 		Poco::UnicodeConverter::convert((const char*) supp, strlen((const char*) supp), wtext2);
 		Poco::UnicodeConverter::convert((const char*)supp, wtext3);

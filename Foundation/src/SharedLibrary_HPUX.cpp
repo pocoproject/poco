@@ -1,8 +1,6 @@
 //
 // SharedLibrary_HPUX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_HPUX.cpp#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -61,7 +59,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _handle != 0; 
+	return _handle != 0;
 }
 
 
@@ -83,9 +81,15 @@ const std::string& SharedLibraryImpl::getPathImpl() const
 }
 
 
+std::string SharedLibraryImpl::prefixImpl()
+{
+	return "lib";
+}
+
+
 std::string SharedLibraryImpl::suffixImpl()
 {
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 	return "d.sl";
 #else
 	return ".sl";

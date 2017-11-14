@@ -1,8 +1,6 @@
 //
 // Task.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Task.cpp#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -22,12 +20,12 @@
 namespace Poco {
 
 
-Task::Task(const std::string& name):
-	_name(name),
+Task::Task(const std::string& rName):
+	_name(rName),
 	_pOwner(0),
 	_progress(0),
 	_state(TASK_IDLE),
-	_cancelEvent(false)
+	_cancelEvent(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -91,13 +89,23 @@ bool Task::sleep(long milliseconds)
 }
 
 
-void Task::setProgress(float progress)
+bool Task::yield()
+{
+	Thread::yield();
+	return isCancelled();
+}
+
+
+void Task::setProgress(float taskProgress)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	_progress = progress;
-	if (_pOwner)
-		_pOwner->taskProgress(this, _progress);
+	if (_progress != taskProgress)
+	{
+		_progress = taskProgress;
+		if (_pOwner)
+			_pOwner->taskProgress(this, _progress);
+	}
 }
 
 
@@ -109,9 +117,9 @@ void Task::setOwner(TaskManager* pOwner)
 }
 
 
-void Task::setState(TaskState state)
+void Task::setState(TaskState taskState)
 {
-	_state = state;
+	_state = taskState;
 }
 
 

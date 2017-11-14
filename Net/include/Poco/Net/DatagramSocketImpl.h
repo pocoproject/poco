@@ -1,8 +1,6 @@
 //
 // DatagramSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/DatagramSocketImpl.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DatagramSocketImpl
@@ -33,13 +31,9 @@ class Net_API DatagramSocketImpl: public SocketImpl
 {
 public:
 	DatagramSocketImpl();
-		/// Creates a DatagramSocketImpl.
-		///
-		/// If the system supports IPv6, the socket will
-		/// be an IPv6 socket. Otherwise, it will be
-		/// an IPv4 socket.
+		/// Creates an unconnected, unbound datagram socket.
 
-	explicit DatagramSocketImpl(IPAddress::Family family);
+	explicit DatagramSocketImpl(SocketAddress::Family family);
 		/// Creates an unconnected datagram socket.
 		///
 		/// The socket will be created for the

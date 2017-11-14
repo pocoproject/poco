@@ -1,8 +1,6 @@
 //
 // LinearHashTableTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LinearHashTableTest.h#1 $
-//
 // Definition of the LinearHashTableTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class LinearHashTableTest: public CppUnit::TestCase

@@ -1,8 +1,6 @@
 //
 // ODBCOracleTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCOracleTest.h#4 $
-//
 // Definition of the ODBCOracleTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -23,7 +21,7 @@
 class ODBCOracleTest: public ODBCTest
 	/// Oracle ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB							| OS
 	/// ------------+-------------------------------+------------------------------------------
 	///	10.02.00.01	| Oracle9i Release 9.2.0.4.0	| MS Windows XP Professional x64 v.2003/SP1
@@ -36,6 +34,8 @@ public:
 
 	void testBareboneODBC();
 
+	void testInternalExtraction();
+
 	void testBLOB();
 
 	void testMultipleResults();
@@ -45,6 +45,7 @@ public:
 	void testStoredFunction();
 	void testCursorStoredFunction();
 	void testStoredProcedureAny();
+	void testStoredProcedureAnyString();
 	void testStoredProcedureDynamicAny();
 	void testAutoTransaction();
 
@@ -57,6 +58,7 @@ private:
 	void dropObject(const std::string& type, const std::string& name);
 	void recreateNullableTable();
 	void recreatePersonTable();
+	void recreatePersonUnicodeTable();
 	void recreatePersonTupleTable();
 	void recreatePersonBLOBTable();
 	void recreatePersonDateTable();
@@ -64,6 +66,7 @@ private:
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
+	void recreateDoublesTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateAnysTable();

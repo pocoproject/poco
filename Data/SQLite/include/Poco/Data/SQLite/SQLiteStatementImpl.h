@@ -1,9 +1,7 @@
 //
 // SQLiteStatementImpl.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLiteStatementImpl.h#4 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteStatementImpl
 //
@@ -28,8 +26,11 @@
 #include "Poco/SharedPtr.h"
 
 
-struct sqlite3;
-struct sqlite3_stmt;
+extern "C"
+{
+	typedef struct sqlite3 sqlite3;
+	typedef struct sqlite3_stmt sqlite3_stmt;
+}
 
 
 namespace Poco {
@@ -51,13 +52,13 @@ protected:
 	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 
-	std::size_t affectedRowCount() const;
+	int affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
-		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
+		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT.
 		/// Changes associated with creating and dropping tables are not counted.
 
-	const MetaColumn& metaColumn(std::size_t pos) const;
+	const MetaColumn& metaColumn(std::size_t pos, std::size_t dataSet) const;
 		/// Returns column meta data.
 
 	bool hasNext();
@@ -75,8 +76,8 @@ protected:
 
 	void compileImpl();
 		/// Compiles the statement, doesn't bind yet.
-		/// Returns true if the statement was succesfully compiled.
-		/// The way SQLite handles batches of statmeents is by compiling
+		/// Returns true if the statement was successfully compiled.
+		/// The way SQLite handles batches of statements is by compiling
 		/// one at a time and returning a pointer to the next one.
 		/// The remainder of the statement is kept in a string
 		/// buffer pointed to by _pLeftover member.
@@ -110,14 +111,14 @@ private:
 	BinderPtr        _pBinder;
 	ExtractorPtr     _pExtractor;
 	MetaColumnVecVec _columns;
-	std::size_t      _affectedRowCount;
+	int              _affectedRowCount;
 	StrPtr           _pLeftover;
 	BindIt           _bindBegin;
 	bool             _canBind;
 	bool             _isExtracted;
 	bool             _canCompile;
 
-	static const std::size_t POCO_SQLITE_INV_ROW_CNT;
+	static const int POCO_SQLITE_INV_ROW_CNT;
 };
 
 

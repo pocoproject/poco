@@ -1,8 +1,6 @@
 //
 // Tuple.cpp
 //
-// $Id: //poco/Main/Data/samples/Tuple/src/Tuple.cpp#1 $
-//
 // This sample demonstrates the Data library.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -58,8 +56,8 @@ int main(int argc, char** argv)
 	
 	for (People::const_iterator it = people.begin(); it != people.end(); ++it)
 	{
-		std::cout << "Name: " << it->get<0>() << 
-			", Address: " << it->get<1>() << 
+		std::cout << "Name: " << it->get<0>() <<
+			", Address: " << it->get<1>() <<
 			", Age: " << it->get<2>() <<std::endl;
 	}
 

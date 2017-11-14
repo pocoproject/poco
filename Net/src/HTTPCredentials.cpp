@@ -1,8 +1,6 @@
 //
 // HTTPCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCredentials.cpp#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:	HTTPCredentials
@@ -57,7 +55,7 @@ void HTTPCredentials::fromUserInfo(const std::string& userInfo)
 	extractCredentials(userInfo, username, password);
 	setUsername(username);
 	setPassword(password);
-	// TODO: Reset digest state?
+	_digest.reset();
 }
 
 
@@ -69,20 +67,20 @@ void HTTPCredentials::fromURI(const URI& uri)
 	extractCredentials(uri, username, password);
 	setUsername(username);
 	setPassword(password);
-	// TODO: Reset digest state?
+	_digest.reset();
 }
 
 
 void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& response)
 {
-	for (HTTPResponse::ConstIterator iter = response.find("WWW-Authenticate"); iter != response.end(); ++iter)
+	for (HTTPResponse::ConstIterator iter = response.find(HTTPAuthenticationParams::WWW_AUTHENTICATE); iter != response.end(); ++iter)
 	{
-		if (isBasicCredentials(iter->second)) 
+		if (isBasicCredentials(iter->second))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).authenticate(request);
 			return;
-		} 
-		else if (isDigestCredentials(iter->second)) 
+		}
+		else if (isDigestCredentials(iter->second))
 		{
 			_digest.authenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
 			return;
@@ -93,15 +91,15 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 
 void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 {
-	if (request.has(HTTPRequest::AUTHORIZATION)) 
+	if (request.has(HTTPRequest::AUTHORIZATION))
 	{
 		const std::string& authorization = request.get(HTTPRequest::AUTHORIZATION);
 
-		if (isBasicCredentials(authorization)) 
+		if (isBasicCredentials(authorization))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).authenticate(request);
-		} 
-		else if (isDigestCredentials(authorization)) 
+		}
+		else if (isDigestCredentials(authorization))
 		{
 			_digest.updateAuthInfo(request);
 		}
@@ -111,14 +109,14 @@ void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 
 void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse& response)
 {
-	for (HTTPResponse::ConstIterator iter = response.find("Proxy-Authenticate"); iter != response.end(); ++iter)
+	for (HTTPResponse::ConstIterator iter = response.find(HTTPAuthenticationParams::PROXY_AUTHENTICATE); iter != response.end(); ++iter)
 	{
-		if (isBasicCredentials(iter->second)) 
+		if (isBasicCredentials(iter->second))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).proxyAuthenticate(request);
 			return;
-		} 
-		else if (isDigestCredentials(iter->second)) 
+		}
+		else if (isDigestCredentials(iter->second))
 		{
 			_digest.proxyAuthenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
 			return;
@@ -129,15 +127,15 @@ void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse
 
 void HTTPCredentials::updateProxyAuthInfo(HTTPRequest& request)
 {
-	if (request.has(HTTPRequest::PROXY_AUTHORIZATION)) 
+	if (request.has(HTTPRequest::PROXY_AUTHORIZATION))
 	{
 		const std::string& authorization = request.get(HTTPRequest::PROXY_AUTHORIZATION);
 
-		if (isBasicCredentials(authorization)) 
+		if (isBasicCredentials(authorization))
 		{
 			HTTPBasicCredentials(_digest.getUsername(), _digest.getPassword()).proxyAuthenticate(request);
-		} 
-		else if (isDigestCredentials(authorization)) 
+		}
+		else if (isDigestCredentials(authorization))
 		{
 			_digest.updateProxyAuthInfo(request);
 		}
@@ -185,12 +183,12 @@ void HTTPCredentials::extractCredentials(const std::string& userInfo, std::strin
 {
 	const std::string::size_type p = userInfo.find(':');
 
-	if (p != std::string::npos) 
+	if (p != std::string::npos)
 	{
 		username.assign(userInfo, 0, p);
 		password.assign(userInfo, p + 1, std::string::npos);
-	} 
-	else 
+	}
+	else
 	{
 		username.assign(userInfo);
 		password.clear();
@@ -200,7 +198,7 @@ void HTTPCredentials::extractCredentials(const std::string& userInfo, std::strin
 
 void HTTPCredentials::extractCredentials(const Poco::URI& uri, std::string& username, std::string& password)
 {
-	if (!uri.getUserInfo().empty()) 
+	if (!uri.getUserInfo().empty())
 	{
 		extractCredentials(uri.getUserInfo(), username, password);
 	}

@@ -24,7 +24,6 @@ extern "C" {
 struct XML_ParserStruct;
 typedef struct XML_ParserStruct *XML_Parser;
 
-/* Should this be defined using stdbool.h when C99 is available? */
 typedef unsigned char XML_Bool;
 #define XML_TRUE   ((XML_Bool) 1)
 #define XML_FALSE  ((XML_Bool) 0)
@@ -95,7 +94,9 @@ enum XML_Error {
   /* Added in 2.0. */
   XML_ERROR_RESERVED_PREFIX_XML,
   XML_ERROR_RESERVED_PREFIX_XMLNS,
-  XML_ERROR_RESERVED_NAMESPACE_URI
+  XML_ERROR_RESERVED_NAMESPACE_URI,
+  /* Added in 2.2.1. */
+  XML_ERROR_INVALID_ARGUMENT
 };
 
 enum XML_Content_Type {
@@ -342,7 +343,7 @@ XML_SetEntityDeclHandler(XML_Parser parser,
                          XML_EntityDeclHandler handler);
 
 /* OBSOLETE -- OBSOLETE -- OBSOLETE
-   This handler has been superceded by the EntityDeclHandler above.
+   This handler has been superseded by the EntityDeclHandler above.
    It is provided here for backward compatibility.
 
    This is called for a declaration of an unparsed (NDATA) entity.
@@ -706,6 +707,7 @@ XML_UseParserAsHandlerArg(XML_Parser parser);
      be called, despite an external subset being parsed.
    Note: If XML_DTD is not defined when Expat is compiled, returns
      XML_ERROR_FEATURE_REQUIRES_XML_DTD.
+   Note: If parser == NULL, returns XML_ERROR_INVALID_ARGUMENT.
 */
 XMLPARSEAPI(enum XML_Error)
 XML_UseForeignDTD(XML_Parser parser, XML_Bool useDTD);
@@ -729,15 +731,16 @@ XML_GetBase(XML_Parser parser);
    to the XML_StartElementHandler that were specified in the start-tag
    rather than defaulted. Each attribute/value pair counts as 2; thus
    this correspondds to an index into the atts array passed to the
-   XML_StartElementHandler.
+   XML_StartElementHandler.  Returns -1 if parser == NULL.
 */
 XMLPARSEAPI(int)
 XML_GetSpecifiedAttributeCount(XML_Parser parser);
 
 /* Returns the index of the ID attribute passed in the last call to
-   XML_StartElementHandler, or -1 if there is no ID attribute.  Each
-   attribute/value pair counts as 2; thus this correspondds to an
-   index into the atts array passed to the XML_StartElementHandler.
+   XML_StartElementHandler, or -1 if there is no ID attribute or
+   parser == NULL.  Each attribute/value pair counts as 2; thus this
+   correspondds to an index into the atts array passed to the
+   XML_StartElementHandler.
 */
 XMLPARSEAPI(int)
 XML_GetIdAttributeIndex(XML_Parser parser);
@@ -788,20 +791,20 @@ XML_ParseBuffer(XML_Parser parser, int len, int isFinal);
    (resumable = 0) an already suspended parser. Some call-backs may
    still follow because they would otherwise get lost. Examples:
    - endElementHandler() for empty elements when stopped in
-     startElementHandler(), 
-   - endNameSpaceDeclHandler() when stopped in endElementHandler(), 
+     startElementHandler(),
+   - endNameSpaceDeclHandler() when stopped in endElementHandler(),
    and possibly others.
 
    Can be called from most handlers, including DTD related call-backs,
    except when parsing an external parameter entity and resumable != 0.
    Returns XML_STATUS_OK when successful, XML_STATUS_ERROR otherwise.
-   Possible error codes: 
+   Possible error codes:
    - XML_ERROR_SUSPENDED: when suspending an already suspended parser.
    - XML_ERROR_FINISHED: when the parser has already finished.
    - XML_ERROR_SUSPEND_PE: when suspending while parsing an external PE.
 
-   When resumable != 0 (true) then parsing is suspended, that is, 
-   XML_Parse() and XML_ParseBuffer() return XML_STATUS_SUSPENDED. 
+   When resumable != 0 (true) then parsing is suspended, that is,
+   XML_Parse() and XML_ParseBuffer() return XML_STATUS_SUSPENDED.
    Otherwise, parsing is aborted, that is, XML_Parse() and XML_ParseBuffer()
    return XML_STATUS_ERROR with error code XML_ERROR_ABORTED.
 
@@ -812,7 +815,7 @@ XML_ParseBuffer(XML_Parser parser, int len, int isFinal);
    the externalEntityRefHandler() to call XML_StopParser() on the parent
    parser (recursively), if one wants to stop parsing altogether.
 
-   When suspended, parsing can be resumed by calling XML_ResumeParser(). 
+   When suspended, parsing can be resumed by calling XML_ResumeParser().
 */
 XMLPARSEAPI(enum XML_Status)
 XML_StopParser(XML_Parser parser, XML_Bool resumable);
@@ -820,7 +823,7 @@ XML_StopParser(XML_Parser parser, XML_Bool resumable);
 /* Resumes parsing after it has been suspended with XML_StopParser().
    Must not be called from within a handler call-back. Returns same
    status codes as XML_Parse() or XML_ParseBuffer().
-   Additional error code XML_ERROR_NOT_SUSPENDED possible.   
+   Additional error code XML_ERROR_NOT_SUSPENDED possible.
 
    *Note*:
    This must be called on the most deeply nested child parser instance
@@ -901,6 +904,7 @@ enum XML_ParamEntityParsing {
    entities is requested; otherwise it will return non-zero.
    Note: If XML_SetParamEntityParsing is called after XML_Parse or
       XML_ParseBuffer, then it has no effect and will always return 0.
+   Note: If parser == NULL, the function will do nothing and return 0.
 */
 XMLPARSEAPI(int)
 XML_SetParamEntityParsing(XML_Parser parser,
@@ -910,6 +914,7 @@ XML_SetParamEntityParsing(XML_Parser parser,
    Helps in preventing DoS attacks based on predicting hash
    function behavior. This must be called before parsing is started.
    Returns 1 if successful, 0 when called after parsing has started.
+   Note: If parser == NULL, the function will do nothing and return 0.
 */
 XMLPARSEAPI(int)
 XML_SetHashSalt(XML_Parser parser,
@@ -930,12 +935,16 @@ XML_GetErrorCode(XML_Parser parser);
    be within the relevant markup.  When called outside of the callback
    functions, the position indicated will be just past the last parse
    event (regardless of whether there was an associated callback).
-   
+
    They may also be called after returning from a call to XML_Parse
    or XML_ParseBuffer.  If the return value is XML_STATUS_ERROR then
    the location is the location of the character at which the error
    was detected; otherwise the location is the location of the last
    parse event, as described above.
+
+   Note: XML_GetCurrentLineNumber and XML_GetCurrentColumnNumber
+   return 0 to indicate an error.
+   Note: XML_GetCurrentByteIndex returns -1 to indicate an error.
 */
 XMLPARSEAPI(XML_Size) XML_GetCurrentLineNumber(XML_Parser parser);
 XMLPARSEAPI(XML_Size) XML_GetCurrentColumnNumber(XML_Parser parser);
@@ -973,9 +982,12 @@ XML_FreeContentModel(XML_Parser parser, XML_Content *model);
 
 /* Exposing the memory handling functions used in Expat */
 XMLPARSEAPI(void *)
+XML_ATTR_MALLOC
+XML_ATTR_ALLOC_SIZE(2)
 XML_MemMalloc(XML_Parser parser, size_t size);
 
 XMLPARSEAPI(void *)
+XML_ATTR_ALLOC_SIZE(3)
 XML_MemRealloc(XML_Parser parser, void *ptr, size_t size);
 
 XMLPARSEAPI(void)
@@ -1031,14 +1043,12 @@ XMLPARSEAPI(const XML_Feature *)
 XML_GetFeatureList(void);
 
 
-/* Expat follows the GNU/Linux convention of odd number minor version for
-   beta/development releases and even number minor version for stable
-   releases. Micro is bumped with each release, and set to 0 with each
-   change to major or minor version.
+/* Expat follows the semantic versioning convention.
+   See http://semver.org.
 */
 #define XML_MAJOR_VERSION 2
-#define XML_MINOR_VERSION 1
-#define XML_MICRO_VERSION 0
+#define XML_MINOR_VERSION 2
+#define XML_MICRO_VERSION 3
 
 #ifdef __cplusplus
 }

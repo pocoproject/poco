@@ -1,8 +1,6 @@
 //
 // ICMPSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/ICMPSocketTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ICMPSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "UDPEchoServer.h"
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/SocketAddress.h"

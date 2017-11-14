@@ -1,8 +1,6 @@
 //
 // NamedMutex_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedMutex_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex
@@ -37,8 +35,9 @@ protected:
 	void unlockImpl();
 	
 private:
-	std::string _name;
-	HANDLE      _mutex;
+	std::string  _name;
+	std::wstring _uname;
+	HANDLE       _mutex;
 };
 
 

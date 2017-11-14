@@ -1,8 +1,6 @@
 //
 // CertificateHandlerFactoryMgr.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/CertificateHandlerFactoryMgr.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  CertificateHandlerFactoryMgr
@@ -53,7 +51,7 @@ public:
 		/// Returns NULL if for the given name a factory does not exist, otherwise the factory is returned
 
 	void removeFactory(const std::string& name);
-		/// Removes the factory from the manager. 
+		/// Removes the factory from the manager.
 
 private:
 	FactoriesMap _factories;

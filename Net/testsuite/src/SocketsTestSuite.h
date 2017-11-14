@@ -1,8 +1,6 @@
 //
 // SocketsTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketsTestSuite.h#1 $
-//
 // Definition of the SocketsTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define SocketsTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class SocketsTestSuite

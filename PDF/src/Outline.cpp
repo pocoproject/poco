@@ -1,8 +1,6 @@
 //
 // Outline.cpp
 //
-// $Id: //poco/Main/PDF/src/Outline.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Outline
@@ -22,7 +20,7 @@ namespace Poco {
 namespace PDF {
 
 
-Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name): 
+Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name):
 	Resource<HPDF_Outline>(pPDF, outline, name)
 {
 	open();

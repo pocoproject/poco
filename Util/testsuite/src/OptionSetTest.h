@@ -1,8 +1,6 @@
 //
 // OptionSetTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/OptionSetTest.h#1 $
-//
 // Definition of the OptionSetTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class OptionSetTest: public CppUnit::TestCase

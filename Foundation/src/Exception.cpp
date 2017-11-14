@@ -1,8 +1,6 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Exception.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -21,17 +19,17 @@
 namespace Poco {
 
 
-Exception::Exception(int code): _pNested(0), _code(code)
+Exception::Exception(int otherCode): _pNested(0), _code(otherCode)
 {
 }
 
 
-Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
 {
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, const std::string& arg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
 {
 	if (!arg.empty())
 	{
@@ -41,7 +39,7 @@ Exception::Exception(const std::string& msg, const std::string& arg, int code): 
 }
 
 
-Exception::Exception(const std::string& msg, const Exception& nested, int code): _msg(msg), _pNested(nested.clone()), _code(code)
+Exception::Exception(const std::string& msg, const Exception& nestedException, int otherCode): _msg(msg), _pNested(nestedException.clone()), _code(otherCode)
 {
 }
 
@@ -155,6 +153,13 @@ POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission
 POCO_IMPLEMENT_EXCEPTION(OutOfMemoryException, RuntimeException, "Out of memory")
 POCO_IMPLEMENT_EXCEPTION(DataException, RuntimeException, "Data error")
 
+POCO_IMPLEMENT_EXCEPTION(InterruptedException, RuntimeException, "Interrupted")
+POCO_IMPLEMENT_EXCEPTION(IndexOutOfBoundsException, RuntimeException, "Index out of bounds")
+POCO_IMPLEMENT_EXCEPTION(UnsupportedOperationException, RuntimeException, "Unsupported operation")
+POCO_IMPLEMENT_EXCEPTION(EmptyStackException, RuntimeException, "Empty stack")
+POCO_IMPLEMENT_EXCEPTION(StackOverflowException, RuntimeException, "Stack overflow")
+POCO_IMPLEMENT_EXCEPTION(ArithmeticException, RuntimeException, "Arithmetic error")
+
 POCO_IMPLEMENT_EXCEPTION(DataFormatException, DataException, "Bad data format")
 POCO_IMPLEMENT_EXCEPTION(SyntaxException, DataException, "Syntax error")
 POCO_IMPLEMENT_EXCEPTION(CircularReferenceException, DataException, "Circular reference")
@@ -171,10 +176,13 @@ POCO_IMPLEMENT_EXCEPTION(CreateFileException, FileException, "Cannot create file
 POCO_IMPLEMENT_EXCEPTION(OpenFileException, FileException, "Cannot open file")
 POCO_IMPLEMENT_EXCEPTION(WriteFileException, FileException, "Cannot write file")
 POCO_IMPLEMENT_EXCEPTION(ReadFileException, FileException, "Cannot read file")
+POCO_IMPLEMENT_EXCEPTION(DirectoryNotEmptyException, FileException, "Directory not empty")
 POCO_IMPLEMENT_EXCEPTION(UnknownURISchemeException, RuntimeException, "Unknown URI scheme")
-
+POCO_IMPLEMENT_EXCEPTION(TooManyURIRedirectsException, RuntimeException, "Too many URI redirects")
+POCO_IMPLEMENT_EXCEPTION(URISyntaxException, SyntaxException, "Bad URI syntax")
 
 POCO_IMPLEMENT_EXCEPTION(ApplicationException, Exception, "Application exception")
 POCO_IMPLEMENT_EXCEPTION(BadCastException, RuntimeException, "Bad cast exception")
+
 
 } // namespace Poco

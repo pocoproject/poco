@@ -1,8 +1,6 @@
 //
 // PrivateKeyPassphraseHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/PrivateKeyPassphraseHandler.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  PrivateKeyPassphraseHandler
@@ -34,7 +32,14 @@ PrivateKeyPassphraseHandler::PrivateKeyPassphraseHandler(bool onServerSide): _se
 
 PrivateKeyPassphraseHandler::~PrivateKeyPassphraseHandler()
 {
-	SSLManager::instance().PrivateKeyPassphraseRequired -= Delegate<PrivateKeyPassphraseHandler, std::string>(this, &PrivateKeyPassphraseHandler::onPrivateKeyRequested);
+	try
+	{
+		SSLManager::instance().PrivateKeyPassphraseRequired -= Delegate<PrivateKeyPassphraseHandler, std::string>(this, &PrivateKeyPassphraseHandler::onPrivateKeyRequested);
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

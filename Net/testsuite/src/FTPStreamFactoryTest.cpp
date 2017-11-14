@@ -1,8 +1,6 @@
 //
 // FTPStreamFactoryTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/FTPStreamFactoryTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "FTPStreamFactoryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/FTPStreamFactory.h"
 #include "Poco/Net/DialogSocket.h"
@@ -77,11 +75,11 @@ void FTPStreamFactoryTest::testDownload()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	FTPStreamFactory sf;
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
@@ -115,11 +113,11 @@ void FTPStreamFactoryTest::testList()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/usr/guest/data;type=d");
 	FTPStreamFactory sf;
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
@@ -152,18 +150,18 @@ void FTPStreamFactoryTest::testUserInfo()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user:secret");
 	FTPStreamFactory sf;
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
 	
 	pStr.reset();
-		
+
 	std::string s(dataStr.str());
 	assert (s == "line1\r\nline2\r\n");
 }
@@ -191,18 +189,18 @@ void FTPStreamFactoryTest::testPasswordProvider()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user");
 	FTPStreamFactory sf;
-	std::auto_ptr<std::istream> pStr(sf.open(uri));
+	std::unique_ptr<std::istream> pStr(sf.open(uri));
 
 	std::ostringstream dataStr;
 	StreamCopier::copyStream(*pStr.get(), dataStr);
-	
+
 	pStr.reset();
-		
+
 	std::string s(dataStr.str());
 	assert (s == "line1\r\nline2\r\n");
 }
@@ -218,7 +216,7 @@ void FTPStreamFactoryTest::testMissingPasswordProvider()
 
 	URI uri;
 	uri.setScheme("ftp");
-	uri.setHost("localhost");
+	uri.setHost("127.0.0.1");
 	uri.setPort(server.port());
 	uri.setPath("/test.txt;type=a");
 	uri.setUserInfo("user");
@@ -226,7 +224,7 @@ void FTPStreamFactoryTest::testMissingPasswordProvider()
 	try
 	{
 		FTPStreamFactory sf;
-		std::auto_ptr<std::istream> pStr(sf.open(uri));
+		std::unique_ptr<std::istream> pStr(sf.open(uri));
 		fail("no password provider - must throw");
 	}
 	catch (FTPException&)

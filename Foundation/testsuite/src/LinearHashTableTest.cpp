@@ -1,8 +1,6 @@
 //
 // LinearHashTableTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LinearHashTableTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "LinearHashTableTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/LinearHashTable.h"
 #include "Poco/HashTable.h"
 #include "Poco/Stopwatch.h"
@@ -28,7 +26,7 @@ using Poco::Stopwatch;
 using Poco::NumberFormatter;
 
 
-LinearHashTableTest::LinearHashTableTest(const std::string& name): CppUnit::TestCase(name)
+LinearHashTableTest::LinearHashTableTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

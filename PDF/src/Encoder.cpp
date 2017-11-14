@@ -1,8 +1,6 @@
 //
 // Encoder.cpp
 //
-// $Id: //poco/Main/PDF/src/Encoder.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Encoder
@@ -23,7 +21,7 @@ namespace PDF {
 
 Encoder::Encoder(HPDF_Doc* pPDF,
 	const HPDF_Encoder& encoder,
-	const std::string& name): 
+	const std::string& name):
 	Resource<HPDF_Encoder>(pPDF, encoder, name)
 {
 }

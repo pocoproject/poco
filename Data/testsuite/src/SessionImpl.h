@@ -1,8 +1,6 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionImpl.h#2 $
-//
 // Definition of the SessionImpl class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -47,7 +45,7 @@ public:
 		/// Closes the session.
 
 	bool isConnected();
-		/// Returns true if session is connected to the database, 
+		/// Returns true if session is connected to the database,
 		/// false otherwise.
 
 	void setConnectionTimeout(std::size_t timeout);

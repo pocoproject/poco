@@ -1,8 +1,6 @@
 //
 // SevenZip.h
 //
-// $Id$
-//
 // Library: SevenZip
 // Package: SevenZip
 // Module:  SevenZip
@@ -30,7 +28,7 @@
 // from a DLL simpler. All files within this DLL are compiled with the SevenZip_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// SevenZip_API functions as being imported from a DLL, wheras this DLL sees symbols
+// SevenZip_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)

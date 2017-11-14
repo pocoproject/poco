@@ -1,8 +1,6 @@
 //
 // RawSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/RawSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "RawSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/RawSocket.h"
 #include "Poco/Net/RawSocketImpl.h"
 #include "Poco/Net/SocketAddress.h"
@@ -45,7 +43,7 @@ RawSocketTest::~RawSocketTest()
 
 void RawSocketTest::testEchoIPv4()
 {
-	SocketAddress sa("localhost", 0);
+	SocketAddress sa("127.0.0.1", 0);
 	RawSocket rs(IPAddress::IPv4);
 	rs.connect(sa);
 
@@ -62,7 +60,7 @@ void RawSocketTest::testEchoIPv4()
 	assert (5 == (n - shift));
 	assert ("hello" == std::string((char*)ptr, 5));
 
-	rs.close(); 
+	rs.close();
 }
 
 
@@ -70,7 +68,7 @@ void RawSocketTest::testSendToReceiveFromIPv4()
 {
 	RawSocket rs(IPAddress::IPv4);
 	
-	int n = rs.sendTo("hello", 5, SocketAddress("localhost", 0));
+	int n = rs.sendTo("hello", 5, SocketAddress("127.0.0.1", 0));
 	assert (n == 5);
 
 	char buffer[256] = "";

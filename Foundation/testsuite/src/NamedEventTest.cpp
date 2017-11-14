@@ -1,8 +1,6 @@
 //
 // NamedEventTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedEventTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NamedEventTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/NamedEvent.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
@@ -51,7 +49,7 @@ namespace
 }
 
 
-NamedEventTest::NamedEventTest(const std::string& name): CppUnit::TestCase(name)
+NamedEventTest::NamedEventTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

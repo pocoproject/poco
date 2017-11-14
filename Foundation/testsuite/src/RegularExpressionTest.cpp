@@ -1,8 +1,6 @@
 //
 // RegularExpressionTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/RegularExpressionTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "RegularExpressionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/RegularExpression.h"
 #include "Poco/Exception.h"
 
@@ -21,7 +19,7 @@ using Poco::RegularExpression;
 using Poco::RegularExpressionException;
 
 
-RegularExpressionTest::RegularExpressionTest(const std::string& name): CppUnit::TestCase(name)
+RegularExpressionTest::RegularExpressionTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -42,11 +40,12 @@ void RegularExpressionTest::testIndex()
 
 void RegularExpressionTest::testMatch1()
 {
-	RegularExpression re("[0-9]+");
-	assert (re.match("123"));
+	RegularExpression re("([\\+-]?\\d{4}(?!\\d{2}\\b))((-?)((0[1-9]|1[0-2])(\\3([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))([T\\s]((([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([\\.,]\\d+(?!:))?)?(\\17[0-5]\\d([\\.,]\\d+)?)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?");//("[0-9]+");
+	assert (re.match("2005-01-08T12:30:00Z"));
+	/*assert (re.match("123"));
 	assert (!re.match("123cd"));
 	assert (!re.match("abcde"));
-	assert (re.match("ab123", 2));
+	assert (re.match("ab123", 2));*/
 }
 
 
@@ -264,6 +263,16 @@ void RegularExpressionTest::testError()
 	}
 }
 
+void RegularExpressionTest::testGroup()
+{
+	RegularExpression::MatchVec matches;
+	RegularExpression re("(?P<group1>[a-z]+) (?P<group2>[0-9]+)");
+	assert (re.match("abcd 1234", 0, matches) == 3);
+	assert (matches[0].name == "");
+	assert (matches[1].name == "group1");
+	assert (matches[2].name == "group2");
+}
+
 
 void RegularExpressionTest::setUp()
 {
@@ -294,6 +303,7 @@ CppUnit::Test* RegularExpressionTest::suite()
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst3);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst4);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testError);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testGroup);
 
 	return pSuite;
 }

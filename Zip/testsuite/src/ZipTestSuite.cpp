@@ -1,8 +1,6 @@
 //
 // ZipTestSuite.cpp
 //
-// $Id: //poco/1.4/Zip/testsuite/src/ZipTestSuite.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -20,9 +18,9 @@ CppUnit::Test* ZipTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTestSuite");
 
+	pSuite->addTest(CompressTest::suite());
 	pSuite->addTest(ZipTest::suite());
 	pSuite->addTest(PartialStreamTest::suite());
-	pSuite->addTest(CompressTest::suite());
 
 	return pSuite;
 }

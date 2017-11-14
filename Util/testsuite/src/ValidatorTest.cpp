@@ -1,8 +1,6 @@
 //
 // ValidatorTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/ValidatorTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ValidatorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/RegExpValidator.h"
 #include "Poco/Util/IntValidator.h"
 #include "Poco/Util/Option.h"

@@ -1,8 +1,6 @@
 //
 // HTMLForm.cpp
 //
-// $Id: //poco/1.4/Net/src/HTMLForm.cpp#4 $
-//
 // Library: Net
 // Package: HTML
 // Module:  HTMLForm
@@ -16,7 +14,6 @@
 
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/PartSource.h"
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
@@ -28,6 +25,7 @@
 #include "Poco/URI.h"
 #include "Poco/String.h"
 #include "Poco/CountingStream.h"
+#include "Poco/UTF8String.h"
 #include <sstream>
 
 
@@ -42,25 +40,55 @@ namespace Poco {
 namespace Net {
 
 
-const std::string HTMLForm::ENCODING_URL				= "application/x-www-form-urlencoded";
-const std::string HTMLForm::ENCODING_MULTIPART			= "multipart/form-data";
-const int         HTMLForm::UNKNOWN_CONTENT_LENGTH		= -1;
+HTMLForm::Part::Part(const std::string name, PartSource* pSource) :
+	_name(name), _pSource(pSource)
+{
+}
 
 
-class HTMLFormCountingOutputStream : public CountingOutputStream
+HTMLForm::Part::Part(Part&& other) : _name(std::move(other._name)), _pSource(other._pSource)
+{
+	other._pSource = 0;
+}
+
+
+HTMLForm::Part::~Part()
+{
+	delete _pSource;
+}
+
+
+const std::string HTMLForm::ENCODING_URL           = "application/x-www-form-urlencoded";
+const std::string HTMLForm::ENCODING_MULTIPART     = "multipart/form-data";
+const int         HTMLForm::UNKNOWN_CONTENT_LENGTH = -1;
+
+
+class HTMLFormCountingOutputStream: public CountingOutputStream
 {
 public:
-	HTMLFormCountingOutputStream() : _isvalid(true)  {}
+	HTMLFormCountingOutputStream():
+		_valid(true)
+	{
+	}
 
-	bool getIsValid() const { return _isvalid; }
-	void setIsValid(bool v) { _isvalid = v; }
+	bool isValid() const
+	{
+		return _valid;
+	}
+	
+	void setValid(bool v)
+	{
+		_valid = v;
+	}
+
 private:
-	bool _isvalid;
+	bool _valid;
 };
 
 
 HTMLForm::HTMLForm():
 	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
 	_encoding(ENCODING_URL)
 {
 }
@@ -68,27 +96,31 @@ HTMLForm::HTMLForm():
 	
 HTMLForm::HTMLForm(const std::string& encoding):
 	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
 	_encoding(encoding)
 {
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody, PartHandler& handler):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request, requestBody, handler);
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request, std::istream& requestBody):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request, requestBody);
 }
 
 
 HTMLForm::HTMLForm(const HTTPRequest& request):
-	_fieldLimit(DFL_FIELD_LIMIT)
+	_fieldLimit(DFL_FIELD_LIMIT),
+	_valueLengthLimit(DFL_MAX_VALUE_LENGTH)
 {
 	load(request);
 }
@@ -96,10 +128,6 @@ HTMLForm::HTMLForm(const HTTPRequest& request):
 	
 HTMLForm::~HTMLForm()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
-	{
-		delete it->pSource;
-	}
 }
 
 
@@ -112,11 +140,7 @@ void HTMLForm::setEncoding(const std::string& encoding)
 void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 {
 	poco_check_ptr (pSource);
-
-	Part part;
-	part.name    = name;
-	part.pSource = pSource;
-	_parts.push_back(part);
+	_parts.push_back(Part(name, pSource));
 }
 
 
@@ -136,7 +160,7 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 	{
 		std::string mediaType;
 		NameValueCollection params;
-		MessageHeader::splitParameters(request.getContentType(), mediaType, params); 
+		MessageHeader::splitParameters(request.getContentType(), mediaType, params);
 		_encoding = mediaType;
 		if (_encoding == ENCODING_MULTIPART)
 		{
@@ -218,6 +242,10 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
+		if (!request.getChunkedTransferEncoding())
+ 		{
+ 			request.setContentLength(calculateContentLength());
+ 		}
 	}
 	else
 	{
@@ -233,12 +261,12 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 
 std::streamsize HTMLForm::calculateContentLength()
 {
-	if (_boundary.empty())
+	if (_encoding == ENCODING_MULTIPART && _boundary.empty())
 		throw HTMLFormException("Form must be prepared");
 
 	HTMLFormCountingOutputStream c;
 	write(c);
-	if (c.getIsValid())
+	if (c.isValid())
 		return c.chars();
 	else
 		return UNKNOWN_CONTENT_LENGTH;
@@ -274,6 +302,7 @@ void HTMLForm::readUrl(std::istream& istr)
 
 	int fields = 0;
 	int ch = istr.get();
+	bool isFirst = true;
 	while (ch != eof)
 	{
 		if (_fieldLimit > 0 && fields == _fieldLimit)
@@ -283,7 +312,10 @@ void HTMLForm::readUrl(std::istream& istr)
 		while (ch != eof && ch != '=' && ch != '&')
 		{
 			if (ch == '+') ch = ' ';
-			name += (char) ch;
+			if (name.size() < MAX_NAME_LENGTH)
+				name += (char) ch;
+			else
+				throw HTMLFormException("Field name too long");
 			ch = istr.get();
 		}
 		if (ch == '=')
@@ -292,9 +324,17 @@ void HTMLForm::readUrl(std::istream& istr)
 			while (ch != eof && ch != '&')
 			{
 				if (ch == '+') ch = ' ';
-				value += (char) ch;
+				if (value.size() < _valueLengthLimit)
+					value += (char) ch;
+				else
+					throw HTMLFormException("Field value too long");
 				ch = istr.get();
 			}
+		}
+		// remove UTF-8 byte order mark from first name, if present
+		if (isFirst)
+		{
+			UTF8::removeBOM(name);
 		}
 		std::string decodedName;
 		std::string decodedValue;
@@ -303,6 +343,7 @@ void HTMLForm::readUrl(std::istream& istr)
 		add(decodedName, decodedValue);
 		++fields;
 		if (ch == '&') ch = istr.get();
+		isFirst = false;
 	}
 }
 
@@ -340,7 +381,10 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 			int ch = istr.get();
 			while (ch != eof)
 			{
-				value += (char) ch;
+				if (value.size() < _valueLengthLimit)
+					value += (char) ch;
+				else
+					throw HTMLFormException("Field value too long");
 				ch = istr.get();
 			}
 			add(name, value);
@@ -366,7 +410,7 @@ void HTMLForm::writeUrl(std::ostream& ostr)
 
 void HTMLForm::writeMultipart(std::ostream& ostr)
 {
-	HTMLFormCountingOutputStream *costr(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
+	HTMLFormCountingOutputStream* pCountingOutputStream(dynamic_cast<HTMLFormCountingOutputStream*>(&ostr));
 
 	MultipartWriter writer(ostr, _boundary);
 	for (NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
@@ -381,11 +425,11 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	}	
 	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
 	{
-		MessageHeader header(ita->pSource->headers());
+		MessageHeader header(ita->headers());
 		std::string disp("form-data; name=\"");
-		disp.append(ita->name);
+		disp.append(ita->name());
 		disp.append("\"");
-		std::string filename = ita->pSource->filename();
+		std::string filename = ita->filename();
 		if (!filename.empty())
 		{
 			disp.append("; filename=\"");
@@ -393,19 +437,21 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 			disp.append("\"");
 		}
 		header.set("Content-Disposition", disp);
-		header.set("Content-Type", ita->pSource->mediaType());
+		header.set("Content-Type", ita->mediaType());
 		writer.nextPart(header);
-		if (costr)
+		if (pCountingOutputStream)
 		{
 			// count only, don't move stream position
-			std::streamsize partlen = ita->pSource->getContentLength();
+			std::streamsize partlen = ita->source()->getContentLength();
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
-				costr->addChars(partlen);
+				pCountingOutputStream->addChars(static_cast<int>(partlen));
 			else
-				costr->setIsValid(false);
+				pCountingOutputStream->setValid(false);
 		}
 		else
-			StreamCopier::copyStream(ita->pSource->stream(), ostr);
+		{
+			StreamCopier::copyStream(ita->stream(), ostr);
+		}
 	}
 	writer.close();
 	_boundary = writer.boundary();
@@ -417,6 +463,14 @@ void HTMLForm::setFieldLimit(int limit)
 	poco_assert (limit >= 0);
 	
 	_fieldLimit = limit;
+}
+
+
+void HTMLForm::setValueLengthLimit(int limit)
+{
+	poco_assert (limit >= 0);
+	
+	_valueLengthLimit = limit;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // Name.cpp
 //
-// $Id: //poco/1.4/XML/src/Name.cpp#1 $
-//
 // Library: XML
 // Package: XML
 // Module:  Name
@@ -152,7 +150,7 @@ void Name::split(const XMLString& qname, XMLString& prefix, XMLString& localName
 XMLString Name::localName(const XMLString& qname)
 {
 	XMLString::size_type pos = qname.find(':');
-	if (pos != XMLString::npos) 
+	if (pos != XMLString::npos)
 		return XMLString(qname, pos + 1, qname.size() - pos - 1);
 	else
 		return qname;

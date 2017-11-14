@@ -1,8 +1,6 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerSession.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerSession
@@ -49,7 +47,7 @@ bool HTTPServerSession::hasMoreRequests()
 	}
 	else if (_maxKeepAliveRequests != 0 && getKeepAlive())
 	{
-		if (_maxKeepAliveRequests > 0) 
+		if (_maxKeepAliveRequests > 0)
 			--_maxKeepAliveRequests;
 		return buffered() > 0 || socket().poll(_keepAliveTimeout, Socket::SELECT_READ);
 	}

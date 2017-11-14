@@ -1,8 +1,6 @@
 //
 // AbstractDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AbstractDelegate.h#4 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  AbstractDelegate
@@ -26,7 +24,7 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs>
 class AbstractDelegate
 	/// Base class for Delegate and Expire.
 {
@@ -39,7 +37,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractDelegate() 
+	virtual ~AbstractDelegate()
 	{
 	}
 
@@ -65,7 +63,8 @@ public:
 	}
 };
 
-template <> 
+
+template <>
 class AbstractDelegate<void>
 	/// Base class for Delegate and Expire.
 {
@@ -78,7 +77,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractDelegate() 
+	virtual ~AbstractDelegate()
 	{
 	}
 
@@ -103,6 +102,7 @@ public:
 		return this;
 	}
 };
+
 
 } // namespace Poco
 

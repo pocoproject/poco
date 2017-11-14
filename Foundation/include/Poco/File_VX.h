@@ -1,8 +1,6 @@
 //
 // File_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/File_VX.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -58,6 +56,9 @@ protected:
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();
+	FileSizeImpl totalSpaceImpl() const;
+	FileSizeImpl usableSpaceImpl() const;
+	FileSizeImpl freeSpaceImpl() const;
 	static void handleLastErrorImpl(const std::string& path);
 	
 private:

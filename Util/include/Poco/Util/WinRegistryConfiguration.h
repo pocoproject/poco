@@ -1,8 +1,6 @@
 //
 // WinRegistryConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/WinRegistryConfiguration.h#2 $
-//
 // Library: Util
 // Package: Windows
 // Module:  WinRegistryConfiguration
@@ -23,6 +21,7 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/String.h"
+#include "Poco/UnWindows.h"
 
 
 namespace Poco {
@@ -38,11 +37,11 @@ class Util_API WinRegistryConfiguration: public AbstractConfiguration
 {
 public:
 	WinRegistryConfiguration(const std::string& rootPath, REGSAM extraSam = 0);
-		/// Creates the WinRegistryConfiguration. 
+		/// Creates the WinRegistryConfiguration.
 		/// The rootPath must start with one of the root key names
 		/// like HKEY_CLASSES_ROOT, e.g. HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services.
-		/// All further keys are relativ to the root path and can be
-		/// dot seperated, e.g. the path MyService.ServiceName will be converted to
+		/// All further keys are relative to the root path and can be
+		/// dot separated, e.g. the path MyService.ServiceName will be converted to
 		/// HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MyService\ServiceName.
         /// The extraSam parameter will be passed along to WinRegistryKey, to control
         /// registry virtualization for example.

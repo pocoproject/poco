@@ -1,8 +1,6 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/CodeWriter.cpp#3 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -263,11 +261,11 @@ void CodeWriter::writeHandler(std::ostream& ostr)
 	ostr << "void " << _class << "::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)\n";
 	ostr << "{\n";
 	writeResponse(ostr);
+	writeSession(ostr);
 	if (_page.has("page.precondition"))
 	{
 		ostr << "\tif (!(" << _page.get("page.precondition") << ")) return;\n\n";
 	}
-	writeSession(ostr);
 	writeForm(ostr);
 	ostr << _page.preHandler().str();
 	writeContent(ostr);
@@ -351,7 +349,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 	if (buffered)
 	{
 		ostr << "\tstd::stringstream responseStream;\n";
-		ostr << _page.handler().str();
+		ostr << cleanupHandler(_page.handler().str());
 		if (!chunked)
 		{
 			ostr << "\tresponse.setContentLength(static_cast<int>(responseStream.tellp()));\n";
@@ -363,13 +361,31 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		ostr << "\tstd::ostream& _responseStream = response.send();\n"
 		     << "\tPoco::DeflatingOutputStream _gzipStream(_responseStream, Poco::DeflatingStreamBuf::STREAM_GZIP, " << compressionLevel << ");\n"
 		     << "\tstd::ostream& responseStream = _compressResponse ? _gzipStream : _responseStream;\n";
-		ostr << _page.handler().str();
+		ostr << cleanupHandler(_page.handler().str());
 		ostr << "\tif (_compressResponse) _gzipStream.close();\n";
 	}
 	else
 	{
 		ostr << "\tstd::ostream& responseStream = response.send();\n";
-		ostr << _page.handler().str();
+		ostr << cleanupHandler(_page.handler().str());
 	}
+}
+
+
+std::string CodeWriter::cleanupHandler(std::string handler)
+{
+	static const std::string EMPTY_WRITE("\tresponseStream << \"\";\n");
+	static const std::string NEWLINE_WRITE("\tresponseStream << \"\\n\";\n");
+	static const std::string DOUBLE_NEWLINE_WRITE("\tresponseStream << \"\\n\";\n\tresponseStream << \"\\n\";\n");
+	static const std::string EMPTY;
+	
+	// remove empty writes
+	Poco::replaceInPlace(handler, EMPTY_WRITE, EMPTY);
+	// remove consecutive newlines
+	while (handler.find(DOUBLE_NEWLINE_WRITE) != std::string::npos)
+	{
+		Poco::replaceInPlace(handler, DOUBLE_NEWLINE_WRITE, NEWLINE_WRITE);
+	}
+	return handler;
 }
 

@@ -1,8 +1,6 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timer.cpp#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Timer
@@ -23,8 +21,8 @@
 namespace Poco {
 
 
-Timer::Timer(long startInterval, long periodicInterval): 
-	_startInterval(startInterval), 
+Timer::Timer(long startInterval, long periodicInterval):
+	_startInterval(startInterval),
 	_periodicInterval(periodicInterval),
 	_skipped(0),
 	_pCallback(0)
@@ -35,7 +33,14 @@ Timer::Timer(long startInterval, long periodicInterval):
 
 Timer::~Timer()
 {
-	stop();
+	try
+	{
+		stop();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -177,7 +182,7 @@ void Timer::run()
 		}
 		while (sleep < 0);
 
-		if (_wakeUp.tryWait(sleep > _periodicInterval ? _periodicInterval : sleep))
+		if (_wakeUp.tryWait(sleep))
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 			_nextInvocation.update();
@@ -201,6 +206,7 @@ void Timer::run()
 			{
 				Poco::ErrorHandler::handle();
 			}
+			Poco::FastMutex::ScopedLock lock(_mutex);
 			interval = _periodicInterval;
 		}
 		_nextInvocation += static_cast<Clock::ClockVal>(interval)*1000;

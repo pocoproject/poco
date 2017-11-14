@@ -1,8 +1,6 @@
 //
 // Session.cpp
 //
-// $Id: //poco/Main/Data/src/Session.cpp#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Session
@@ -33,11 +31,11 @@ Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
 }
 
 
-Session::Session(const std::string& connector,
+Session::Session(const std::string& rConnector,
 	const std::string& connectionString,
 	std::size_t timeout)
 {
-	Session newSession(SessionFactory::instance().create(connector, connectionString, timeout));
+	Session newSession(SessionFactory::instance().create(rConnector, connectionString, timeout));
 	swap(newSession);
 }
 

@@ -1,8 +1,6 @@
 //
 // Bulk.cpp
 //
-// $Id: //poco/Main/Data/src/Bulk.cpp#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Bulk
@@ -21,7 +19,7 @@ namespace Poco {
 namespace Data {
 
 
-Bulk::Bulk(const Limit& limit): _limit(limit.value(), false, false)
+Bulk::Bulk(const Limit& rLimit): _limit(rLimit.value(), false, false)
 {
 }
 

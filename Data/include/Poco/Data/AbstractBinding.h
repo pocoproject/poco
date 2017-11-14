@@ -1,8 +1,6 @@
 //
 // AbstractBinding.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractBinding.h#6 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractBinding
@@ -70,7 +68,7 @@ public:
 	virtual std::size_t numOfRowsHandled() const = 0;
 		/// Returns the number of rows that the binding handles.
 		///
-		/// The trivial case will be one single row but 
+		/// The trivial case will be one single row but
 		/// for collection data types it can be larger.
 
 	virtual bool canBind() const = 0;

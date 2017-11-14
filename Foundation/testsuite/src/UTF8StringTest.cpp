@@ -1,8 +1,6 @@
 //
 // UTF8StringTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UTF8StringTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,15 +9,15 @@
 
 
 #include "UTF8StringTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/UTF8String.h"
 
 
 using Poco::UTF8;
 
 
-UTF8StringTest::UTF8StringTest(const std::string& name): CppUnit::TestCase(name)
+UTF8StringTest::UTF8StringTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

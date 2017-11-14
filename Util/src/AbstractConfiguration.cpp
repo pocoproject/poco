@@ -1,8 +1,6 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/AbstractConfiguration.cpp#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  AbstractConfiguration
@@ -35,7 +33,7 @@ namespace Poco {
 namespace Util {
 
 
-AbstractConfiguration::AbstractConfiguration(): 
+AbstractConfiguration::AbstractConfiguration():
 	_depth(0),
 	_eventsEnabled(true)
 {
@@ -147,7 +145,7 @@ unsigned AbstractConfiguration::getUInt(const std::string& key) const
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::parseUnsigned(internalExpand(value));
+		return parseUInt(internalExpand(value));
 	else
 		throw NotFoundException(key);
 }
@@ -159,7 +157,7 @@ unsigned AbstractConfiguration::getUInt(const std::string& key, unsigned default
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::parseUnsigned(internalExpand(value));
+		return parseUInt(internalExpand(value));
 	else
 		return defaultValue;
 }
@@ -174,7 +172,7 @@ Int64 AbstractConfiguration::getInt64(const std::string& key) const
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::parse64(internalExpand(value));
+		return parseInt64(internalExpand(value));
 	else
 		throw NotFoundException(key);
 }
@@ -186,7 +184,7 @@ Int64 AbstractConfiguration::getInt64(const std::string& key, Int64 defaultValue
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::parse64(internalExpand(value));
+		return parseInt64(internalExpand(value));
 	else
 		return defaultValue;
 }
@@ -198,7 +196,7 @@ UInt64 AbstractConfiguration::getUInt64(const std::string& key) const
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::parseUnsigned64(internalExpand(value));
+		return parseUInt64(internalExpand(value));
 	else
 		throw NotFoundException(key);
 }
@@ -210,7 +208,7 @@ UInt64 AbstractConfiguration::getUInt64(const std::string& key, UInt64 defaultVa
 
 	std::string value;
 	if (getRaw(key, value))
-		return NumberParser::parseUnsigned64(internalExpand(value));
+		return parseUInt64(internalExpand(value));
 	else
 		return defaultValue;
 }
@@ -462,13 +460,13 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 int AbstractConfiguration::parseInt(const std::string& value)
 {
 	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
-		return NumberParser::parseHex(value);
+		return static_cast<int>(NumberParser::parseHex(value));
 	else
 		return NumberParser::parse(value);
 }
 
 
-int AbstractConfiguration::parseUInt(const std::string& value)
+unsigned AbstractConfiguration::parseUInt(const std::string& value)
 {
 	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
 		return NumberParser::parseHex(value);
@@ -480,7 +478,7 @@ int AbstractConfiguration::parseUInt(const std::string& value)
 Int64 AbstractConfiguration::parseInt64(const std::string& value)
 {
 	if ((value.compare(0, 2, "0x") == 0) || (value.compare(0, 2, "0X") == 0))
-		return NumberParser::parseHex64(value);
+		return static_cast<Int64>(NumberParser::parseHex64(value));
 	else
 		return NumberParser::parse64(value);
 }
@@ -512,7 +510,7 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 		return false;
 	else if (icompare(value, "off") == 0)
 		return false;
-	else 
+	else
 		throw SyntaxException("Cannot convert to boolean", value);
 }
 

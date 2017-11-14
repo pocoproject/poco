@@ -1,18 +1,16 @@
 //
 // ZipCommon.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipCommon.h#1 $
-//
 // Library: Zip
 // Package: Zip
-// Module:  ZipCommon
+// Module:	ZipCommon
 //
 // Definition of the ZipCommon class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// SPDX-License-Identifier:	BSL-1.0
+// SPDX-License-Identifier: BSL-1.0
 //
 
 
@@ -36,6 +34,10 @@ public:
 		HEADER_SIZE = 4
 	};
 
+	static const Poco::UInt16 ZIP64_EXTRA_ID	= 0x1;		  // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
+	static const Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
+	static const Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
+
 	enum CompressionMethod
 	{
 		CM_STORE   = 0,
@@ -49,20 +51,21 @@ public:
 		CM_DEFLATE = 8,
 		CM_ENHANCEDDEFLATE = 9,
 		CM_DATECOMPRIMPLODING = 10,
-		CM_UNUSED = 11
+		CM_UNUSED = 11,
+		CM_AUTO = 255 /// automatically select DM_DEFLATE or CM_STORE based on file type (extension)
 	};
 
 	enum CompressionLevel
 	{
-		CL_NORMAL    = 0,
-		CL_MAXIMUM   = 1,
-		CL_FAST      = 2,
+		CL_NORMAL	 = 0,
+		CL_MAXIMUM	 = 1,
+		CL_FAST		 = 2,
 		CL_SUPERFAST = 3
 	};
 
 	enum HostSystem
 	{
-		HS_FAT = 0,  // + PKZIPW 2.50 VFAT, NTFS
+		HS_FAT = 0,	 // + PKZIPW 2.50 VFAT, NTFS
 		HS_AMIGA = 1,
 		HS_VMS = 2,
 		HS_UNIX = 3,
@@ -89,7 +92,9 @@ public:
 		FT_ASCII = 1
 	};
 
-	static const std::string ILLEGAL_PATH;
+	static bool isValidPath(const std::string& path);
+		/// Checks whether the given path is valid (does
+		/// not contain ".." path segments).
 };
 
 

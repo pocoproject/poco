@@ -1,8 +1,6 @@
 #
 # ODBC.make
 #
-# $Id: //poco/1.4/Data/ODBC/ODBC.make#1 $
-#
 # Makefile fragment for finding ODBC library
 #
 
@@ -15,7 +13,7 @@ ifeq (0, $(shell test -d /usr/lib/$(OSARCH)-linux-gnu; echo $$?))
 POCO_ODBC_LIB = /usr/lib/$(OSARCH)-linux-gnu
 else ifeq (0, $(shell test -d /usr/lib64; echo $$?))
 POCO_ODBC_LIB = /usr/lib64
-else 
+else
 POCO_ODBC_LIB = /usr/lib
 endif
 endif
@@ -23,7 +21,11 @@ endif
 ifeq ($(LINKMODE),STATIC)
 LIBLINKEXT = .a
 else
+ifeq ($(OSNAME), Cygwin)
+LIBLINKEXT = $(IMPLIBLINKEXT)
+else
 LIBLINKEXT = $(SHAREDLIBLINKEXT)
+endif
 endif
 
 INCLUDE += -I$(POCO_ODBC_INCLUDE)
@@ -58,6 +60,6 @@ COMMONFLAGS += -DPOCO_IODBC -I/usr/include/iodbc
 COMMONFLAGS += -Wno-deprecated-declarations
 
 else
-$(error No ODBC library found. Please install unixODBC or iODBC or specify POCO_ODBC_LIB and try again)
+$(error No ODBC library found. Please install unixODBC or iODBC or specify POCO_ODBC_LIB or set the correct libodbc library path by using --odbc-lib as option to 'configure' script and try again)
 endif
 

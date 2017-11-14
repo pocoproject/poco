@@ -1,8 +1,6 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NotificationQueue.cpp#1 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationQueue
@@ -30,7 +28,14 @@ NotificationQueue::NotificationQueue()
 
 NotificationQueue::~NotificationQueue()
 {
-	clear();
+	try
+	{
+		clear();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -169,6 +174,19 @@ void NotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	_nfQueue.clear();	
+}
+
+
+bool NotificationQueue::remove(Notification::Ptr pNotification)
+{
+	FastMutex::ScopedLock lock(_mutex);
+	NfQueue::iterator it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
+	if (it == _nfQueue.end())
+	{
+		return false;
+	}
+	_nfQueue.erase(it);
+	return true;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // SystemConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/SystemConfiguration.h#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  SystemConfiguration
@@ -29,7 +27,7 @@ namespace Util {
 
 
 class Util_API SystemConfiguration: public AbstractConfiguration
-	/// This class implements a Configuration interface to 
+	/// This class implements a Configuration interface to
 	/// various system properties and environment variables.
 	///
 	/// The following properties are supported:
@@ -37,20 +35,24 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	///   - system.osVersion: the operating system version
 	///   - system.osArchitecture: the operating system architecture
 	///   - system.nodeName: the node (or host) name
-	///   - system.nodeId: system ID, based on the Ethernet address (format "xxxxxxxxxxxx") 
+	///   - system.nodeId: system ID, based on the Ethernet address (format "xxxxxxxxxxxx")
 	///     of the first Ethernet adapter found on the system.
 	///   - system.currentDir: the current working directory
 	///   - system.homeDir: the user's home directory
+	///   - system.configHomeDir: the base directory relative to which user specific configuration files should be stored
+	///   - system.cacheHomeDir: the base directory relative to which user specific non-essential data files should be stored
+	///   - system.dataHomeDir: the base directory relative to which user specific data files should be stored
 	///   - system.tempDir: the system's temporary directory
+	///   - system.configDir: the system's configuration directory
 	///   - system.dateTime: the current UTC date and time, formatted in ISO 8601 format.
 	///   - system.pid: the current process ID.
 	///   - system.env.<NAME>: the environment variable with the given <NAME>.
 	///
 	/// An attempt to set a system variable will result in an
 	/// InvalidAccessException being thrown.
-	/// 
-	/// Enumerating environment variables is not supported. 
-	/// An attempt to call keys("system.env") will return an empty range. 
+	///
+	/// Enumerating environment variables is not supported.
+	/// An attempt to call keys("system.env") will return an empty range.
 	///
 	/// Removing key is not supported. An attempt to remove a key results
 	/// in a NotImplementedException being thrown.
@@ -76,7 +78,11 @@ private:
 	static const std::string NODEID;
 	static const std::string CURRENTDIR;
 	static const std::string HOMEDIR;
+	static const std::string CONFIGHOMEDIR;
+	static const std::string CACHEHOMEDIR;
+	static const std::string DATAHOMEDIR;
 	static const std::string TEMPDIR;
+	static const std::string CONFIGDIR;
 	static const std::string DATETIME;
 #if !defined(POCO_VXWORKS)
 	static const std::string PID;

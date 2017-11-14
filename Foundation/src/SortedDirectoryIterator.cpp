@@ -1,8 +1,6 @@
 //
 // SortedDirectoryIterator.cpp
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator
@@ -26,8 +24,8 @@ SortedDirectoryIterator::SortedDirectoryIterator()
 }
 
 
-SortedDirectoryIterator::SortedDirectoryIterator(const std::string& path)
-	: DirectoryIterator(path), _is_finished(false)
+SortedDirectoryIterator::SortedDirectoryIterator(const std::string& rPath)
+	: DirectoryIterator(rPath), _is_finished(false)
 {
 	scan();
 	next();
@@ -50,8 +48,8 @@ SortedDirectoryIterator::SortedDirectoryIterator(const File& file)
 }
 
 
-SortedDirectoryIterator::SortedDirectoryIterator(const Path& path)
-	: DirectoryIterator(path), _is_finished(false)
+SortedDirectoryIterator::SortedDirectoryIterator(const Path& rPath)
+	: DirectoryIterator(rPath), _is_finished(false)
 {
 	scan();
 	next();
@@ -61,6 +59,7 @@ SortedDirectoryIterator::SortedDirectoryIterator(const Path& path)
 SortedDirectoryIterator::~SortedDirectoryIterator()
 {
 }
+
 
 SortedDirectoryIterator& SortedDirectoryIterator::operator ++()
 {
@@ -77,7 +76,13 @@ void SortedDirectoryIterator::scan()
 	DirectoryIterator end_it;
 	while (*this != end_it)
 	{
-		if ((*this)->isDirectory())
+		bool isDir = false;
+		try
+		{
+			isDir = (*this)->isDirectory();
+		}
+		catch (...) { }
+		if (isDir)
 			_directories.push_back(_path.toString());
 		else
 			_files.push_back(_path.toString());

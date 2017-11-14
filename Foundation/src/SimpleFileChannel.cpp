@@ -1,8 +1,6 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  SimpleFileChannel
@@ -32,7 +30,7 @@ const std::string SimpleFileChannel::PROP_ROTATION      = "rotation";
 const std::string SimpleFileChannel::PROP_FLUSH         = "flush";
 
 
-SimpleFileChannel::SimpleFileChannel(): 
+SimpleFileChannel::SimpleFileChannel():
 	_limit(0),
 	_flush(true),
 	_pFile(0)
@@ -40,9 +38,9 @@ SimpleFileChannel::SimpleFileChannel():
 }
 
 
-SimpleFileChannel::SimpleFileChannel(const std::string& path):
-	_path(path),
-	_secondaryPath(path + ".0"),
+SimpleFileChannel::SimpleFileChannel(const std::string& rPath):
+	_path(rPath),
+	_secondaryPath(rPath + ".0"),
 	_limit(0),
 	_flush(true),
 	_pFile(0)
@@ -52,7 +50,14 @@ SimpleFileChannel::SimpleFileChannel(const std::string& path):
 
 SimpleFileChannel::~SimpleFileChannel()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -66,12 +71,12 @@ void SimpleFileChannel::open()
 		File secondary(_secondaryPath);
 		Timestamp pt = primary.exists() ? primary.getLastModified() : 0;
 		Timestamp st = secondary.exists() ? secondary.getLastModified() : 0;
-		std::string path;
+		std::string pathString;
 		if (pt >= st)
-			path = _path;
+			pathString = _path;
 		else
-			path = _secondaryPath;
-		_pFile = new LogFile(path);
+			pathString = _secondaryPath;
+		_pFile = new LogFile(pathString);
 	}
 }
 

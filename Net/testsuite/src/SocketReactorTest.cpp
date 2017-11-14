@@ -1,8 +1,6 @@
 //
 // SocketReactorTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/SocketReactorTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "SocketReactorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/SocketConnector.h"
@@ -145,7 +143,7 @@ namespace
 		{
 			pNf->release();
 			_timeout = true;
-			if (_closeOnTimeout) 
+			if (_closeOnTimeout)
 			{
 				_reactor.stop();
 				delete this;
@@ -314,7 +312,7 @@ void SocketReactorTest::testSocketReactor()
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
 	SocketAcceptor<EchoServiceHandler> acceptor(ss, reactor);
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	ClientServiceHandler::setOnce(true);
 	ClientServiceHandler::resetData();
@@ -327,13 +325,33 @@ void SocketReactorTest::testSocketReactor()
 }
 
 
+void SocketReactorTest::testSetSocketReactor()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	SocketAcceptor<EchoServiceHandler> acceptor(ss);
+	acceptor.setReactor(reactor);
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	SocketConnector<ClientServiceHandler> connector(sa, reactor);
+	ClientServiceHandler::setOnce(true);
+	ClientServiceHandler::resetData();
+	reactor.run();
+	std::string data(ClientServiceHandler::data());
+	assert(data.size() == 1024);
+	assert(!ClientServiceHandler::readableError());
+	assert(!ClientServiceHandler::writableError());
+	assert(!ClientServiceHandler::timeoutError());
+}
+
+
 void SocketReactorTest::testParallelSocketReactor()
 {
 	SocketAddress ssa;
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
 	ParallelSocketAcceptor<EchoServiceHandler, SocketReactor> acceptor(ss, reactor);
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector1(sa, reactor);
 	SocketConnector<ClientServiceHandler> connector2(sa, reactor);
 	SocketConnector<ClientServiceHandler> connector3(sa, reactor);
@@ -370,7 +388,7 @@ void SocketReactorTest::testSocketConnectorTimeout()
 	SocketAddress ssa;
 	ServerSocket ss(ssa);
 	SocketReactor reactor;
-	SocketAddress sa("localhost", ss.address().port());
+	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	reactor.run();
 	assert (ClientServiceHandler::timeout());

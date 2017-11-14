@@ -1,8 +1,6 @@
 //
 // ClassLibrary.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ClassLibrary.h#1 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  ClassLoader
@@ -40,7 +38,7 @@ extern "C"
 	bool POCO_LIBRARY_API pocoBuildManifest(Poco::ManifestBase* pManifest);
 	void POCO_LIBRARY_API pocoInitializeLibrary();
 	void POCO_LIBRARY_API pocoUninitializeLibrary();
-} 
+}
 
 
 //
@@ -94,6 +92,10 @@ extern "C"	\
 
 #define POCO_EXPORT_CLASS(cls) \
     pManifest->insert(new Poco::MetaObject<cls, _Base>(#cls));
+
+
+#define POCO_EXPORT_INTERFACE(cls, itf) \
+    pManifest->insert(new Poco::MetaObject<cls, _Base>(itf));
 
 
 #define POCO_EXPORT_SINGLETON(cls) \

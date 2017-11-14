@@ -1,8 +1,6 @@
 //
 // OptionProcessorTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/OptionProcessorTest.h#2 $
-//
 // Definition of the OptionProcessorTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Util/Util.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class OptionProcessorTest: public CppUnit::TestCase

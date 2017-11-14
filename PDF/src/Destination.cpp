@@ -1,8 +1,6 @@
 //
 // Destination.cpp
 //
-// $Id: //poco/Main/PDF/src/Destination.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Destination
@@ -23,7 +21,7 @@ namespace PDF {
 
 Destination::Destination(HPDF_Doc* pPDF,
 	const HPDF_Destination& destination,
-	const std::string& name): 
+	const std::string& name):
 	Resource<HPDF_Destination>(pPDF, destination, name)
 {
 }

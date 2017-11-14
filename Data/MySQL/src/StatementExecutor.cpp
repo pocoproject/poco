@@ -1,9 +1,7 @@
 //
 // StatementExecutor.cpp
 //
-// $Id: //poco/1.3/Data/MySQL/src/StatementExecutor.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  StatementExecutor
 //
@@ -55,8 +53,17 @@ void StatementExecutor::prepare(const std::string& query)
 		return;
 	}
 	
-	if (mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length())) != 0)
-		throw StatementException("mysql_stmt_prepare error", _pHandle, query);
+	int rc = mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length()));
+	if (rc != 0)
+	{
+		// retry if connection lost
+		int err = mysql_errno(_pSessionHandle);
+		if (err == 2006 /* CR_SERVER_GONE_ERROR */ || err == 2013 /* CR_SERVER_LOST */)
+		{
+			rc = mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length()));
+		}
+	}
+	if (rc != 0) throw StatementException("mysql_stmt_prepare error", _pHandle, query);
 
 	_query = query;
 	_state = STMT_COMPILED;
@@ -112,7 +119,7 @@ bool StatementExecutor::fetch()
 	int res = mysql_stmt_fetch(_pHandle);
 
 	// we have specified zero buffers for BLOBs, so DATA_TRUNCATED is normal in this case
-	if ((res != 0) && (res != MYSQL_NO_DATA) && (res != MYSQL_DATA_TRUNCATED)) 
+	if ((res != 0) && (res != MYSQL_NO_DATA) && (res != MYSQL_DATA_TRUNCATED))
 		throw StatementException("mysql_stmt_fetch error", _pHandle, _query);
 
 	return (res == 0) || (res == MYSQL_DATA_TRUNCATED);
@@ -132,7 +139,7 @@ bool StatementExecutor::fetchColumn(std::size_t n, MYSQL_BIND *bind)
 	return (res == 0);
 }
 
-std::size_t StatementExecutor::getAffectedRowCount() const
+int StatementExecutor::getAffectedRowCount() const
 {
 	return _affectedRowCount;
 }

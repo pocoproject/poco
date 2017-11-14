@@ -1,8 +1,6 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ServerApplication.h#3 $
-//
 // Library: Util
 // Package: Application
 // Module:  ServerApplication
@@ -62,8 +60,7 @@ class Util_API ServerApplication: public Application
 	///   }
 	///
 	/// The POCO_SERVER_MAIN macro can be used to implement main(argc, argv).
-	/// If POCO has been built with POCO_WIN32_UTF8, POCO_SERVER_MAIN supports
-	/// Unicode command line arguments.
+	/// POCO_SERVER_MAIN supports Unicode command line arguments.
 	///
 	/// On Windows platforms, an application built on top of the
 	/// ServerApplication class can be run both from the command line
@@ -84,7 +81,7 @@ class Util_API ServerApplication: public Application
 	///
 	/// An application can determine whether it is running as a service by checking
 	/// for the "application.runAsService" configuration property.
-	/// 
+	///
 	///     if (config().getBool("application.runAsService", false))
 	///     {
 	///         // do service specific things
@@ -106,7 +103,7 @@ class Util_API ServerApplication: public Application
 	/// command line option. A daemon, when launched, immediately
 	/// forks off a background process that does the actual work. After launching
 	/// the background process, the foreground process exits.
-	/// 
+	///
 	/// After the initialization is complete, but before entering the main() method,
 	/// the current working directory for the daemon process is changed to the root
 	/// directory ("/"), as it is common practice for daemon processes. Therefore, be
@@ -122,8 +119,8 @@ class Util_API ServerApplication: public Application
 	///     }
 	///
 	/// When running as a daemon, specifying the --pidfile option (e.g.,
-	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of 
-	/// the daemon in a file. The PID file will be removed when the daemon process 
+	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of
+	/// the daemon in a file. The PID file will be removed when the daemon process
 	/// terminates (but not, if it crashes).
 {
 public:
@@ -146,7 +143,7 @@ public:
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 	int run(int argc, wchar_t** argv);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
@@ -157,15 +154,25 @@ public:
 
 	static void terminate();
 		/// Sends a friendly termination request to the application.
-		/// If the application's main thread is waiting in 
+		/// If the application's main thread is waiting in
 		/// waitForTerminationRequest(), this method will return
 		/// and the application can shut down.
 		
 protected:
 	int run();
-	void waitForTerminationRequest();
+	virtual void waitForTerminationRequest();
 #if !defined(_WIN32_WCE)
 	void defineOptions(OptionSet& options);
+#endif
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+	static HDEVNOTIFY registerServiceDeviceNotification(LPVOID filter, DWORD flags);
+		/// Registers the ServerApplication to receive SERVICE_CONTROL_DEVICEEVENT
+		/// events via handleDeviceEvent().
+
+	virtual DWORD handleDeviceEvent(DWORD event_type, LPVOID event_data);
+		/// Handles the SERVICE_CONTROL_DEVICEEVENT event. The default
+		/// implementation does nothing and returns ERROR_CALL_NOT_IMPLEMENTED.
 #endif
 
 private:
@@ -173,10 +180,11 @@ private:
 	static Poco::Event _terminate;
 #elif defined(POCO_OS_FAMILY_UNIX)
 	void handleDaemon(const std::string& name, const std::string& value);
+	void handleUMask(const std::string& name, const std::string& value);
 	void handlePidFile(const std::string& name, const std::string& value);
 	bool isDaemon(int argc, char** argv);
 	void beDaemon();
-#if defined(POCO_ANDROID)
+#if defined(POCO_ANDROID) || defined(__NACL__) || defined(__EMSCRIPTEN__)
 	static Poco::Event _terminate;
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
@@ -188,11 +196,9 @@ private:
 		SRV_UNREGISTER
 	};
 	static BOOL __stdcall ConsoleCtrlHandler(DWORD ctrlType);
-	static void __stdcall ServiceControlHandler(DWORD control);
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+	static DWORD __stdcall ServiceControlHandler(DWORD control, DWORD event_type, LPVOID event_data, LPVOID context);
+#if !defined(POCO_NO_WSTRING)
 	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
-#else
-	static void __stdcall ServiceMain(DWORD argc, LPTSTR* argv);
 #endif
 
 	bool hasConsole();
@@ -212,8 +218,8 @@ private:
 	std::string _startup;
 
 	static Poco::Event           _terminated;
-	static SERVICE_STATUS        _serviceStatus; 
-	static SERVICE_STATUS_HANDLE _serviceStatusHandle; 
+	static SERVICE_STATUS        _serviceStatus;
+	static SERVICE_STATUS_HANDLE _serviceStatusHandle;
 #endif // _WIN32_WCE
 	static Poco::NamedEvent      _terminate;
 #endif
@@ -226,7 +232,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32) && !defined(__MINGW32__)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\

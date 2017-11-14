@@ -1,9 +1,7 @@
 //
 // Binder.h
 //
-// $Id: //poco/1.4/Data/MySQL/include/Poco/Data/MySQL/Binder.h#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  Binder
 //
@@ -42,75 +40,75 @@ public:
 	virtual ~Binder();
 		/// Destroys the Binder.
 
-	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::Int8& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int8.
 
-	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::UInt8& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt8.
 
-	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::Int16& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int16.
 
-	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::UInt16& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt16.
 
-	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::Int32& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int32.
 
-	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::UInt32& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt32.
 
-	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an Int64.
 
-	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt64.
 
 #ifndef POCO_LONG_IS_64_BIT
 
-	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const long& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a long.
 
-	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an unsigned long.
 
 #endif // POCO_LONG_IS_64_BIT
 
-	virtual void bind(std::size_t pos, const bool& val, Direction dir);
+	virtual void bind(std::size_t pos, const bool& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a boolean.
 
-	virtual void bind(std::size_t pos, const float& val, Direction dir);
+	virtual void bind(std::size_t pos, const float& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a float.
 
-	virtual void bind(std::size_t pos, const double& val, Direction dir);
+	virtual void bind(std::size_t pos, const double& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a double.
 
-	virtual void bind(std::size_t pos, const char& val, Direction dir);
+	virtual void bind(std::size_t pos, const char& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a single character.
 
-	virtual void bind(std::size_t pos, const std::string& val, Direction dir);
+	virtual void bind(std::size_t pos, const std::string& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a string.
 
-	virtual void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a BLOB.
 
-	virtual void bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir);
+	virtual void bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a CLOB.
 
-	virtual void bind(std::size_t pos, const DateTime& val, Direction dir);
+	virtual void bind(std::size_t pos, const DateTime& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a DateTime.
 
-	virtual void bind(std::size_t pos, const Date& val, Direction dir);
+	virtual void bind(std::size_t pos, const Date& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a Date.
 
-	virtual void bind(std::size_t pos, const Time& val, Direction dir);
+	virtual void bind(std::size_t pos, const Time& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a Time.
 
-	virtual void bind(std::size_t pos, const NullData& val, Direction dir);
+	virtual void bind(std::size_t pos, const NullData& val, Direction dir, const std::type_info& bindType);
 		/// Binds a null.
 
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir = PD_IN);
 
@@ -138,25 +136,25 @@ public:
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::vector<bool>& val, Direction dir = PD_IN);
 
@@ -212,11 +210,11 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<Time>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir, const std::type_info& bindType);
 
-	virtual void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir, const std::type_info& bindType);
 
-	virtual void bind(std::size_t pos, const std::list<NullData>& val, Direction dir = PD_IN);
+	virtual void bind(std::size_t pos, const std::list<NullData>& val, Direction dir, const std::type_info& bindType);
 
 	virtual void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir = PD_IN);
 
@@ -237,8 +235,8 @@ private:
 	Binder(const Binder&);
 		/// Don't copy the binder
 
-	virtual void bind(std::size_t, const char* const&, Direction)
-		/// Binds a const char ptr. 
+	virtual void bind(std::size_t, const char* const&, Direction, const WhenNullCb& )
+		/// Binds a const char ptr.
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 	{

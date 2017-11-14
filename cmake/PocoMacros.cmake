@@ -16,15 +16,30 @@ if (WIN32)
     # be set up anyway
     get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
     get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
+    get_filename_component(kit81_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot81]" REALPATH)
+    get_filename_component(kit10_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot10]" REALPATH)
+    file(GLOB kit10_list ${kit10_dir}/bin/10.*)
     if (X64)
       set(sdk_bindir "${sdk_dir}/bin/x64")
       set(kit_bindir "${kit_dir}/bin/x64")
+      set(kit81_bindir "${kit81_dir}/bin/x64")
+      foreach (tmp_elem ${kit10_list})
+        if (IS_DIRECTORY ${tmp_elem})
+		  list(APPEND kit10_bindir "${tmp_elem}/x64")
+        endif()
+      endforeach()
     else (X64)
       set(sdk_bindir "${sdk_dir}/bin")
       set(kit_bindir "${kit_dir}/bin/x86")
+      set(kit81_bindir "${kit81_dir}/bin/x86")
+      foreach (tmp_elem ${kit10_list})
+        if (IS_DIRECTORY ${tmp_elem})
+		  list(APPEND kit10_bindir "${tmp_elem}/x86")
+        endif()
+      endforeach()
     endif (X64)
   endif ()
-  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}"
+  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}" ${kit10_bindir}
     DOC "path to message compiler")
   if (NOT CMAKE_MC_COMPILER)
     message(FATAL_ERROR "message compiler not found: required to build")
@@ -86,7 +101,7 @@ endif(WIN32)
 macro(POCO_SOURCES_PLAT out name platform)
     source_group("${name}\\Source Files" FILES ${ARGN})
     list(APPEND ${out} ${ARGN})
-    if(NOT ${platform})
+    if(NOT (${platform}))
         set_source_files_properties(${ARGN} PROPERTIES HEADER_FILE_ONLY TRUE)
     endif()
 endmacro()
@@ -181,4 +196,130 @@ macro(POCO_MESSAGES out name)
         list(APPEND ${out} ${ARGN})
 
     endif (WIN32)
+endmacro()
+
+
+#===============================================================================
+# Macros for Package generation
+#
+#  POCO_GENERATE_PACKAGE - Generates *Config.cmake
+#    Usage: POCO_GENERATE_PACKAGE(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: POCO_GENERATE_PACKAGE(Foundation)
+macro(POCO_GENERATE_PACKAGE target_name)
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+export(EXPORT "${target_name}Targets"
+  FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
+  NAMESPACE "${PROJECT_NAME}::"
+)
+configure_file("cmake/Poco${target_name}Config.cmake"
+  "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
+  @ONLY
+)
+
+set(ConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+
+install(
+    EXPORT "${target_name}Targets"
+    FILE "${PROJECT_NAME}${target_name}Targets.cmake"
+    NAMESPACE "${PROJECT_NAME}::"
+    DESTINATION "lib/cmake/${PROJECT_NAME}"
+    )
+
+install(
+    FILES
+        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
+        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+    DESTINATION "lib/cmake/${PROJECT_NAME}"
+    COMPONENT Devel
+    )
+
+endmacro()
+
+#===============================================================================
+# Macros for simplified installation
+#
+#  POCO_INSTALL - Install the given target
+#    Usage: POCO_INSTALL(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: POCO_INSTALL(Foundation)
+macro(POCO_INSTALL target_name)
+install(
+    DIRECTORY include/Poco
+    DESTINATION include
+    COMPONENT Devel
+    PATTERN ".svn" EXCLUDE
+    )
+
+install(
+    TARGETS "${target_name}" EXPORT "${target_name}Targets"
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+    )
+
+if (MSVC)
+# install the targets pdb
+  POCO_INSTALL_PDB(${target_name})
+endif()
+
+endmacro()
+
+#===============================================================================
+# Macros for simplified installation of package not following the Poco standard as CppUnit
+#
+#  SIMPLE_INSTALL - Install the given target
+#    Usage: SIMPLE_INSTALL(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. CppUnit
+#    Example: SIMPLE_INSTALL(Foundation)
+macro(SIMPLE_INSTALL target_name)
+install(
+    DIRECTORY include
+    DESTINATION include
+    COMPONENT Devel
+    PATTERN ".svn" EXCLUDE
+    )
+
+install(
+    TARGETS "${target_name}" EXPORT "${target_name}Targets"
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+    )
+
+if (MSVC)
+# install the targets pdb
+  POCO_INSTALL_PDB(${target_name})
+endif()
+
+endmacro()
+
+#  POCO_INSTALL_PDB - Install the given target's companion pdb file (if present)
+#    Usage: POCO_INSTALL_PDB(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: POCO_INSTALL_PDB(Foundation)
+#
+#    This is an internal macro meant only to be used by POCO_INSTALL.
+macro(POCO_INSTALL_PDB target_name)
+
+    get_property(type TARGET ${target_name} PROPERTY TYPE)
+    if ("${type}" STREQUAL "SHARED_LIBRARY" OR "${type}" STREQUAL "EXECUTABLE")
+        install(
+            FILES $<TARGET_PDB_FILE:${target_name}>
+            DESTINATION bin
+            COMPONENT Devel
+            OPTIONAL
+            )
+    endif()
 endmacro()

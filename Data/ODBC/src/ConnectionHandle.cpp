@@ -1,9 +1,7 @@
 //
 // ConnectionHandle.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ConnectionHandle.cpp#2 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ConnectionHandle
 //
@@ -24,14 +22,13 @@ namespace Data {
 namespace ODBC {
 
 
-ConnectionHandle::ConnectionHandle(EnvironmentHandle* pEnvironment): 
-	_pEnvironment(pEnvironment ? pEnvironment : new EnvironmentHandle),
-	_hdbc(SQL_NULL_HDBC), 
-	_ownsEnvironment(pEnvironment ? false : true)
+ConnectionHandle::ConnectionHandle(EnvironmentHandle* pEnvironment):
+	_environment(pEnvironment ? &pEnvironment->handle() : 0),
+	_hdbc(SQL_NULL_HDBC)
 {
-	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC, 
-		_pEnvironment->handle(), 
-		&_hdbc))) 
+	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC,
+		_environment.handle(),
+		&_hdbc)))
 	{
 		throw ODBCException("Could not allocate connection handle.");
 	}
@@ -40,12 +37,21 @@ ConnectionHandle::ConnectionHandle(EnvironmentHandle* pEnvironment):
 
 ConnectionHandle::~ConnectionHandle()
 {
-	SQLDisconnect(_hdbc);
-	SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
+	try
+	{
+		if (_hdbc != SQL_NULL_HDBC)
+		{
+			SQLDisconnect(_hdbc);
+			SQLRETURN rc = SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
+			_hdbc = SQL_NULL_HDBC;
 
-	if (_ownsEnvironment) delete _pEnvironment;
-
-	poco_assert (!Utility::isError(rc));
+			poco_assert(!Utility::isError(rc));
+		}
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 

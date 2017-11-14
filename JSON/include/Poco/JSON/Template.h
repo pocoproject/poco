@@ -1,8 +1,6 @@
 //
 // Template.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Template
@@ -14,6 +12,7 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
+
 
 #ifndef JSON_JSONTemplate_INCLUDED
 #define JSON_JSONTemplate_INCLUDED
@@ -42,22 +41,22 @@ class JSON_API Template
 	/// Template is a template engine which uses JSON as input
 	/// for generating output. There are commands for
 	/// looping over JSON arrays, include other templates,
-	/// conditional output, ...
+	/// conditional output, etc.
 	///
 	/// All text is send to the outputstream. A command is placed
-	/// between 
+	/// between
 	///     <?
-	/// and 
+	/// and
 	///     ?>
 	/// ----
 	///
 	/// These are the available commands:
-	/// 
+	///
 	///     <? echo query ?>
 	/// ----
 	/// The result of the query is send to the output stream
 	/// This command can also be written as <?= query ?>
-	/// 
+	///
 	///     <? if query ?> <? else ?> <? endif ?>
 	/// ----
 	/// When the result of query is true, all the text between
@@ -69,9 +68,9 @@ class JSON_API Template
 	///
 	///     <? ifexist query ?> <? else ?> <? endif ?>
 	/// ----
-	/// This can be used to check the existance of the value.
+	/// This can be used to check the existence of the value.
 	/// Use this for example when a zero value is ok (which returns false for <? if ?>.
-	/// 
+	///
 	///     <? for variable query ?> <? endfor ?>
 	/// ----
 	/// The result of the query must be an array. For each element
@@ -91,13 +90,13 @@ public:
 	typedef SharedPtr<Template> Ptr;
 
 	Template();
-		/// Constructor.
+		/// Creates a Template.
 
 	Template(const Path& templatePath);
-		/// Constructor. Creates a template from a file.
+		/// Creates a Template from the file with the given templatePath.
 
 	virtual ~Template();
-		/// Destructor.
+		/// Destroys the Template.
 
 	void parse();
 		/// Parse a template from a file.
@@ -106,7 +105,7 @@ public:
 		/// Parse a template from a string.
 
 	void parse(std::istream& in);
-		/// Parse a template from a input stream.
+		/// Parse a template from an input stream.
 
 	Timestamp parseTime() const;
 		/// Returns the time when the template was parsed.
@@ -130,6 +129,9 @@ private:
 };
 
 
+//
+// inlines
+//
 inline void Template::parse(const std::string& source)
 {
 	std::istringstream is(source);
@@ -143,7 +145,7 @@ inline Timestamp Template::parseTime() const
 }
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 #endif // JSON_JSONTemplate_INCLUDED

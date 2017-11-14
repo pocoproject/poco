@@ -1,8 +1,6 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionImpl.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SessionImpl
@@ -35,7 +33,7 @@ class StatementImpl;
 
 
 class Data_API SessionImpl: public Poco::RefCountedObject
-	/// Interface for Session functionality that subclasses must extend. 
+	/// Interface for Session functionality that subclasses must extend.
 	/// SessionImpl objects are noncopyable.
 {
 public:
@@ -63,11 +61,11 @@ public:
 
 	virtual void open(const std::string& connectionString = "") = 0;
 		/// Opens the session using the supplied string.
-		/// Can also be used with default empty string to reconnect 
+		/// Can also be used with default empty string to reconnect
 		/// a disconnected session.
-		/// If the connection is not established within requested timeout 
-		/// (specified in seconds), a ConnectionFailedException is thrown. 
-		/// Zero timout means indefinite
+		/// If the connection is not established within requested timeout
+		/// (specified in seconds), a ConnectionFailedException is thrown.
+		/// Zero timeout means indefinite
 
 	virtual void close() = 0;
 		/// Closes the connection.
@@ -170,7 +168,7 @@ public:
 protected:
 	void setConnectionString(const std::string& connectionString);
 		/// Sets the connection string. Should only be called on
-		/// disconnetced sessions. Throws InvalidAccessException when called on
+		/// disconnected sessions. Throws InvalidAccessException when called on
 		/// a connected session.
 
 private:

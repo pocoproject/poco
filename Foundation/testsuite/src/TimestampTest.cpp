@@ -1,8 +1,6 @@
 //
 // TimestampTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimestampTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "TimestampTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Thread.h"
 
@@ -21,7 +19,7 @@ using Poco::Timestamp;
 using Poco::Thread;
 
 
-TimestampTest::TimestampTest(const std::string& name): CppUnit::TestCase(name)
+TimestampTest::TimestampTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

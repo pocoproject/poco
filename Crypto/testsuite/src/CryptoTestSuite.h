@@ -1,8 +1,6 @@
 //
 // CryptoTestSuite.h
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTestSuite.h#1 $
-//
 // Definition of the CryptoTestSuite class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define CryptoTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class CryptoTestSuite

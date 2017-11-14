@@ -1,8 +1,6 @@
 //
 // HTTPSClientSessionTest.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/HTTPSClientSessionTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "HTTPSClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -38,6 +36,7 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
+#include <iostream>
 
 
 using namespace Poco::Net;
@@ -92,7 +91,7 @@ HTTPSClientSessionTest::~HTTPSClientSessionTest()
 void HTTPSClientSessionTest::testGetSmall()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -108,7 +107,7 @@ void HTTPSClientSessionTest::testGetSmall()
 void HTTPSClientSessionTest::testGetLarge()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -124,7 +123,7 @@ void HTTPSClientSessionTest::testGetLarge()
 void HTTPSClientSessionTest::testHead()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/large");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -139,7 +138,7 @@ void HTTPSClientSessionTest::testHead()
 void HTTPSClientSessionTest::testPostSmallIdentity()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body\r\n0\r\n");
 	request.setContentLength((int) body.length());
@@ -156,7 +155,7 @@ void HTTPSClientSessionTest::testPostSmallIdentity()
 void HTTPSClientSessionTest::testPostLargeIdentity()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(8000, 'x');
 	body.append("\r\n0\r\n");
@@ -174,7 +173,7 @@ void HTTPSClientSessionTest::testPostLargeIdentity()
 void HTTPSClientSessionTest::testPostSmallChunked()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body("this is a random request body");
 	request.setChunkedTransferEncoding(true);
@@ -192,7 +191,7 @@ void HTTPSClientSessionTest::testPostSmallChunked()
 void HTTPSClientSessionTest::testPostLargeChunked()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo");
 	std::string body(16000, 'x');
 	request.setChunkedTransferEncoding(true);
@@ -214,7 +213,7 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 	srv.start();
 	try
 	{
-		HTTPSClientSession s("localhost", srv.port());
+		HTTPSClientSession s("127.0.0.1", srv.port());
 		s.setKeepAlive(true);
 		for (int i = 0; i < 10; ++i)
 		{
@@ -243,7 +242,7 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 void HTTPSClientSessionTest::testKeepAlive()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	s.setKeepAlive(true);
 	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
 	s.sendRequest(request);
@@ -309,9 +308,9 @@ void HTTPSClientSessionTest::testProxy()
 	HTTPSTestServer srv;
 	HTTPSClientSession s("secure.appinf.com");
 	s.setProxy(
-		Application::instance().config().getString("testsuite.proxy.host"), 
+		Application::instance().config().getString("testsuite.proxy.host"),
 		Application::instance().config().getInt("testsuite.proxy.port")
-	);
+		);
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/public/poco/NetSSL.txt");
 	s.sendRequest(request);
 	X509Certificate cert = s.serverCertificate();
@@ -320,8 +319,8 @@ void HTTPSClientSessionTest::testProxy()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
-	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assert(str == "This is a test file for NetSSL.\n");
+	assert(cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 
@@ -332,7 +331,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
 	
 	Context::Ptr pServerContext = new Context(
-		Context::SERVER_USE, 
+		Context::SERVER_USE,
 		Application::instance().config().getString("openSSL.server.privateKeyFile"),
 		Application::instance().config().getString("openSSL.server.privateKeyFile"),
 		Application::instance().config().getString("openSSL.server.caConfig"),
@@ -348,7 +347,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	HTTPSTestServer srv(pServerContext);
 
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.privateKeyFile"),
 		Application::instance().config().getString("openSSL.client.caConfig"),
@@ -358,7 +357,7 @@ void HTTPSClientSessionTest::testCachedSession()
 		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 	pClientContext->enableSessionCache(true);
 
-	HTTPSClientSession s1("localhost", srv.port(), pClientContext);
+	HTTPSClientSession s1("127.0.0.1", srv.port(), pClientContext);
 	HTTPRequest request1(HTTPRequest::HTTP_GET, "/small");
 	s1.sendRequest(request1);
 	Session::Ptr pSession1 = s1.sslSession();
@@ -370,7 +369,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	StreamCopier::copyStream(rs1, ostr1);
 	assert (ostr1.str() == HTTPSTestServer::SMALL_BODY);
 
-	HTTPSClientSession s2("localhost", srv.port(), pClientContext, pSession1);
+	HTTPSClientSession s2("127.0.0.1", srv.port(), pClientContext, pSession1);
 	HTTPRequest request2(HTTPRequest::HTTP_GET, "/small");
 	s2.sendRequest(request2);
 	Session::Ptr pSession2 = s2.sslSession();
@@ -418,7 +417,7 @@ void HTTPSClientSessionTest::testCachedSession()
 void HTTPSClientSessionTest::testUnknownContentLength()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -434,7 +433,7 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 void HTTPSClientSessionTest::testServerAbort()
 {
 	HTTPSTestServer srv;
-	HTTPSClientSession s("localhost", srv.port());
+	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength/connection/abort");
 	s.sendRequest(request);
 	HTTPResponse response;
@@ -473,6 +472,11 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
+#ifdef FIXME
+	testProxy should use a public proxy server
+	http://www.publicproxyservers.com/proxy/list1.html
+	Really working public proxy servers - page 1 of 6.
+#endif
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);

@@ -1,8 +1,6 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SimpleHashTable.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  SimpleHashTable
@@ -38,7 +36,7 @@ template <class Key, class Value, class KeyHashFunction = HashFunction<Key> >
 class SimpleHashTable
 	/// A SimpleHashTable stores a key value pair that can be looked up via a hashed key.
 	///
-	/// In comparision to a HashTable, this class handles collisions by sequentially searching the next
+	/// In comparison to a HashTable, this class handles collisions by sequentially searching the next
 	/// free location. This also means that the maximum size of this table is limited, i.e. if the hash table
 	/// is full, it will throw an exception and that this class does not support remove operations.
 	/// On the plus side it is faster than the HashTable.
@@ -70,7 +68,7 @@ public:
 		_entries.reserve(ht._capacity);
 		for (typename HashTableVector::iterator it = ht._entries.begin(); it != ht._entries.end(); ++it)
 		{
-			if (*it) 
+			if (*it)
 				_entries.push_back(new HashEntry(*it));
 			else
 				_entries.push_back(0);
@@ -369,7 +367,7 @@ public:
 				UInt32 size = 1;
 				if (details)
 					detailedEntriesPerHash.push_back(size);
-	#ifdef DEBUG
+	#ifdef _DEBUG
 				totalSize += size;
 	#endif
 			}
@@ -380,8 +378,9 @@ public:
 					detailedEntriesPerHash.push_back(0);
 			}
 		}
+	#ifdef _DEBUG
 		poco_assert_dbg(totalSize == numberOfEntries);
-
+	#endif
 		return HashStatistic(_capacity, numberOfEntries, numZeroEntries, maxEntriesPerHash, detailedEntriesPerHash);
 	}
 

@@ -1,0 +1,623 @@
+version: build {branch}-{build}
+
+cache:
+  - C:\mysql-5.7.19-win32
+  - C:\ProgramData\chocolatey
+  - C:\OpenSSL-Win32
+  - C:\OpenSSL-Win64
+  - C:\Program Files (x86)\PostgreSQL\9.6
+
+
+branches:
+  except:
+    - /.*ravis.*/
+
+
+skip_commits:
+  message: /.*Merge.*/
+
+
+hosts:
+  localhost: 127.0.0.1
+  db.server.com: 127.0.0.2
+
+services:
+# mysql : server: localhost, port: 3306
+# mysql : user  : root, password: Password12!
+  - mysql
+
+# mongodb config  : C:\mongodb\mongod.cfg
+# mongodb database: C:\mongodb\data\db
+  - mongodb
+
+# Server name: localhost
+# Server port: 5432
+# postgres account password: Password12!
+  - postgresql
+
+
+image:
+  - Visual Studio 2017
+
+
+platform:
+  - Win32
+  - x64
+
+# -------------------------------------------------------------------------------------------
+# building debug configuration doubles the round time and isn't so useful.
+# tests are run only in release & shared.
+# -------------------------------------------------------------------------------------------
+configuration:
+  - release
+#  - debug
+# -------------------------------------------------------------------------------------------
+
+environment:
+  bundling:     bundled
+  MYSQL32URL:   http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.19-win32.zip
+  MYSQL32ZIP:   mysql-5.7.19-win32.zip
+  MYSQL32:      C:\mysql-5.7.19-win32
+  MYSQL64:      C:\Program Files\MySql\MySQL Server 5.7
+  POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.6
+  POSTGRES64:   C:\Program Files\PostgreSQL\9.6
+  OPENSSLURL:   https://slproweb.com/download
+  OPENSSL32EXE: Win32OpenSSL-1_1_0f.exe
+  OPENSSL64EXE: Win64OpenSSL-1_1_0f.exe
+  OPENSSL32:    C:\OpenSSL-Win32
+  OPENSSL64:    C:\OpenSSL-Win64
+
+  matrix:
+    - builder: msbuild
+      vsver: 140
+      linkmode: shared
+
+    - builder: msbuild
+      vsver: 150
+      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: static_mt
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: shared
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: static_md
+
+#    - builder: msbuild
+#      vsver: 150
+#      linkmode: static_mt
+
+    - builder: cmake
+      vsver: 140
+
+    - builder: cmake
+      vsver: 150
+
+
+matrix:
+  fast_finish: true
+
+install:
+  - git submodule update --init --recursive
+# -------------------------------------------------------------------------------------------
+# VS2017 setup. VS2017 does not provide VS150COMNTOOLS.
+# See https://blogs.msdn.microsoft.com/vcblog/2017/03/06/finding-the-visual-c-compiler-tools-in-visual-studio-2017/
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      Install-Module VSSetup -Scope CurrentUser -Force
+      $installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
+      $vs150comntools = $installationPath.psobject.properties.Value;
+      set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vs150comntools\Common7\Tools\"
+      Write-Host "`nVS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
+
+# -------------------------------------------------------------------------------------------
+  - if "%builder%"=="cygwin" (
+    if "%platform%"=="Win32" (
+    C:\cygwin\setup-x86.exe      -qnNdO -R C:/cygwin   -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup   -P libpq-devel -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel -P libcrypt-devel))
+
+  - if "%builder%"=="cygwin" (
+    if "%platform%"=="x64" (
+    C:\cygwin64\setup-x86_64.exe -qnNdO -R C:/cygwin64 -s http://cygwin.mirror.constant.com -l C:/cygwin64/var/cache/setup -P libpq-devel -P libpcre-devel -P openssl-devel -P libiodbc-devel -P libiodbc2 -P odbc-mysql -P odbc-pgsql -P odbc-sqlite3 -P libmysqlclient-devel -P libsqlite3-devel  -P libcrypt-devel))
+
+  - set POCO_BASE=%CD%
+  - set PATH=C:\ProgramData\chocolatey\bin;%PATH%
+  - ps: |
+      if ($env:builder -eq "cygwin")
+      {
+        if ($env:platform -eq "Win32")
+        {
+          $env:PATH = "C:\cygwin\bin;" + $env:PATH
+        }
+        if ($env:platform -eq "x64")
+        {
+          $env:PATH = "c:\cygwin64\bin;" + $env:PATH
+        }
+        g++ --version
+      }
+  - uname -a
+  - cat /proc/cpuinfo
+  - cat /proc/meminfo
+  - ps: |
+      if ($env:builder -eq "cmake")
+      {
+        if (Test-Path "$env:ChocolateyInstall\bin\jom.exe") {
+            echo "using jom from cache"
+        } else {
+            choco install jom
+        }
+      }
+#        if (Test-Path "$env:ChocolateyInstall\bin\cmake.exe") {
+#          echo "using cmake from cache"
+#        } else {
+#          choco install cmake
+#        }
+
+# -------------------------------------------------------------------------------------------
+#  chocolatey brokes jom, here's workaround
+#  see https://github.com/jcfr/qt-easy-build/commit/6366f4275562bdaf4f686838600f46894579c41e)
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      if ($env:builder -eq "cmake")
+      {
+        $env:PATH = $env:ChocolateyInstall + "\bin;" + $env:PATH
+        $env:PATH = $env:ChocolateyInstall + "\lib\jom\content;" + $env:PATH
+        $env:PATH = "C:\Program Files (x86)\cmake\bin;" + $env:PATH
+        $env:PATH = "C:\Program Files (x86)\ctest\bin;" + $env:PATH
+
+      }
+# -------------------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------------------
+# OpenSSL-Win32 & OpenSSL-Win64
+# Download & use OpenSSL from  Shining Light Productions for CMake
+# until CMake use implicitly the embedded openssl from the Poco repo. See issue #1093
+# -------------------------------------------------------------------------------------------
+  - ps: |
+       if ($env:builder -eq "cmake")
+       {
+         if ($env:platform -eq "Win32")
+         {
+             $openssl     = $env:OPENSSL32
+             $opensslexe  = $env:OPENSSL32EXE
+         }
+         if ($env:platform -eq "x64")
+         {
+             $openssl     = $env:OPENSSL64
+             $opensslexe  = $env:OPENSSL64EXE
+         }
+         $opensslurl  = $env:OPENSSLURL + "/" + $opensslexe
+
+         if (Test-Path $openssl) {
+           Write-Host "using $openssl from cache" -ForegroundColor Yellow
+         } else {
+           Write-Host "downloading $openssl" -ForegroundColor Cyan
+           Start-FileDownload $opensslurl
+           Write-Host "installing  $openssl" -ForegroundColor Green
+           Start-Process $opensslexe -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+         }
+       }
+# -------------------------------------------------------------------------------------------
+#  MySQL 32 bit is not available by default on AppVeyor
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      if ($env:platform -eq "Win32")
+      {
+        if (Test-Path $env:MYSQL32) {
+          Write-Host "using $env:MYSQL32 from cache" -ForegroundColor Yellow
+        }
+        else
+        {
+          Write-Host "downloading $env:MYSQL32" -ForegroundColor Cyan
+          Invoke-WebRequest $env:MYSQL32URL -OutFile $env:MYSQL32ZIP
+          Write-Host "installing $env:MYSQL32" -ForegroundColor Green
+          7z x -y $env:MYSQL32ZIP -oc:\
+        }
+      }
+# -------------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------------
+#  PostgreSQL 32 bit is not available by default on AppVeyor
+#  http://www.enterprisedb.com/products-services-training/pgdownload#windows
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      if ($env:platform -eq "Win32")
+      {
+        if (Test-Path $env:POSTGRES32) {
+          Write-Host "using $env:POSTGRES32 from cache" -ForegroundColor Yellow
+        }
+        else
+        {
+          Write-Host "Installing $env:POSTGRES32 ..." -ForegroundColor Cyan
+          Write-Host "Downloading..."
+          $exePath = "$($env:USERPROFILE)\postgresql-9.6.5-1-windows.exe"
+          (New-Object Net.WebClient).DownloadFile('http://get.enterprisedb.com/postgresql/postgresql-9.6.5-1-windows.exe', $exePath)
+          Write-Host "Installing..."
+          cmd /c start /wait $exePath --mode unattended --superpassword Password12!
+          del $exePath
+          Write-Host "Setting up services..."
+          Stop-Service postgresql-9.6
+          Set-Service -Name postgresql-9.6 -StartupType Manual
+          Write-Host "$env:POSTGRES32 installed" -ForegroundColor Green
+        }
+      }
+# -------------------------------------------------------------------------------------------
+
+
+before_build:
+  - set
+  - ps: |
+      if ($env:builder -eq "cmake")
+      {
+        if ($env:vsver -eq "110")
+        {
+          $vspath= convert-path $env:VS110COMNTOOLS\..\..\VC\bin; $yyyy='2010'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        if ($env:vsver -eq "120")
+        {
+          $vspath= convert-path $env:VS120COMNTOOLS\..\..\VC\bin;$yyyy='2013'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        if ($env:vsver -eq "140")
+        {
+          $vspath= convert-path $env:VS140COMNTOOLS\..\..\VC\bin; $yyyy='2015'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        if ($env:vsver -eq "150")
+        {
+          $vspath= convert-path $env:VS150COMNTOOLS\..\..\VC\bin; $yyyy='2017'
+          if($env:platform -eq 'Win32') { $vctool='';}
+          if($env:platform -eq 'x64')   { $vctool='x86_amd64';$vspath+='\'+$vctool }
+        }
+        pushd $vspath;
+        $tool= if($vctool -eq '') {'32'} else {$vctool}
+        cmd /c "vcvars$tool.bat&set" |
+        foreach {
+          if ($_ -match "=") {
+            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+          }
+        }
+        popd
+        write-host "`nVisual Studio $yyyy CLI variables set." -ForegroundColor Yellow
+      }
+
+# -------------------------------------------------------------------------------------------
+# MySQL
+#        & C:\cygwin\bin\ls -lR $env:MYSQL32
+#        & C:\cygwin\bin\ls -lR $env:MYSQL64
+# -------------------------------------------------------------------------------------------
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+          $env:INCLUDE = $env:MYSQL32 + "\include;" + $env:INCLUDE
+          $env:LIB     = $env:MYSQL32 + "\lib;" + $env:LIB
+          $env:PATH    = $env:MYSQL32 + "\bin;" + $env:PATH
+          if (Test-Path ($env:MYSQL32 + "\lib\libmysql.dll")) {
+            $from = $env:MYSQL32 + "\lib\libmysql.dll";
+            $to   = $env:MYSQL32 + "\bin\libmysql.dll"
+            copy $from $to
+          }
+        }
+        if ($env:platform -eq "x64")
+        {
+          $env:INCLUDE = $env:MYSQL64 + "\include;" + $env:INCLUDE
+          $env:LIB     = $env:MYSQL64 + "\lib;" + $env:LIB
+          $env:PATH    = $env:MYSQL64 + "\bin;" + $env:PATH
+          if (Test-Path ($env:MYSQL64 + "\lib\libmysql.dll")) {
+            $from = $env:MYSQL64 + "\lib\libmysql.dll";
+            $to   = $env:MYSQL64 + "\bin\libmysql.dll"
+            copy $from $to
+          }
+        }
+        $env:MYSQL_PWD="Password12!"
+        $cmd = 'mysql -e "create database pocotestdb;" --user=root';
+        iex "& $cmd"
+# -------------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------------
+# PostgreSQL
+# -------------------------------------------------------------------------------------------
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+            $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
+        }
+        if ($env:platform -eq "x64")
+        {
+            $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
+        }
+# -------------------------------------------------------------------------------------------
+
+after_build:
+  - ps: |
+      $line='-------------------------------------------------------------------------------------';
+      $find='C:\Cygwin\bin\find.exe';
+      $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec grep -n -H ";
+      $arg2=" {} ;"
+
+      $word='FIXME'
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr;
+      gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host;Write-Host;
+
+      $word='TODO'
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr;
+      gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host;Write-Host;
+
+      $word='HACK'
+      Write-Host -ForegroundColor Yellow $word;
+      Write-Host -ForegroundColor Yellow $line;
+      Start-Process -nnw -Wait -FilePath $find -Args "$arg1 $word $arg2" -RSO cout -RSE cerr;
+      gc cout; gc cerr;
+      Write-Host -ForegroundColor Yellow $line;
+      Write-Host;Write-Host;
+
+
+build_script:
+# -------------------------------------------------------------------------------------------
+# When building with cmake, it remains one exception reported below
+# Once this problem be fixed, a fix from Microsoft about mc.exe outputing informative
+# message on stderr: https://connect.microsoft.com/VisualStudio/Feedback/Details/2161572
+# the try/catch around the cmake builder can be removed
+#
+# [  1%] Generating pocomsg.h
+# cmake : MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# At line:16 char:3
+# +   cmake --build . --config $env:configuration
+# +   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#     + CategoryInfo          : NotSpecified: (MC: Compiling C.../src/pocomsg.mc:String) [], RemoteException
+#     + FullyQualifiedErrorId : NativeCommandError
+#
+# Command executed with exception: MC: Compiling C:/projects/poco/Foundation/src/pocomsg.mc
+# -------------------------------------------------------------------------------------------
+# Don't build Cygwin64 with std=c++14 until this issue be fixed https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77441
+# -------------------------------------------------------------------------------------------
+  - ps: |
+      if ($env:builder -eq "cygwin")
+      {
+          $LastExitCode=0;
+          $cmd='bash.exe configure --everything --omit=PDF';iex "& $cmd"
+          if ($LastExitCode -ne 0) {
+            throw "$cmd failed with exit code $LastExitCode."
+          }
+          $LastExitCode=0;
+          $cmd='make.exe -s';iex "& $cmd"
+          if ($LastExitCode -ne 0) {
+            throw "$cmd failed with exit code $LastExitCode."
+          }
+      }
+      if ($env:builder -eq "msbuild")
+      {
+        $logger='"C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
+        $verbosity='minimal';
+
+        $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
+        -EA Stop -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild env $verbosity $logger";
+        gc cout; gc cerr;
+        Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+      }
+
+      if ($env:builder -eq "cmake")
+      {
+        mkdir cmake-build | out-null;pushd cmake-build;
+        if ($env:platform -eq "Win32")
+        {
+            $openssl = $env:OPENSSL32
+        }
+        if ($env:platform -eq "x64")
+        {
+            $openssl = $env:OPENSSL64
+        }
+        if ($env:vsver -eq "140")
+        {
+            $generator = '"Visual Studio 14 2015"'
+        }
+        if ($env:vsver -eq "150")
+        {
+            $generator = '"Visual Studio 15 2017"'
+        }
+        $defs = "--config RelWithDebInfo"
+        $defs+=" -G" + $generator;
+        $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
+        if ($env:vsver -eq "150")
+        {
+            $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
+        }
+        $defs+=" -DENABLE_PDF=OFF";
+        $defs+=" -DENABLE_NETSSL=ON";
+        $defs+=" -DENABLE_NETSSL_WIN=ON";
+        $defs+=" -DENABLE_DATA_MYSQL=OFF";
+        $defs+=" -DENABLE_REDIS=OFF";
+        $defs+=" -DENABLE_SAMPLES=ON";
+        $defs+=" -DENABLE_TESTS=ON";
+        $defs+=" ..";
+        Write-Host -ForegroundColor Yellow cmake $defs
+        $process = Start-Process -PassThru -nnw -Wait -FilePath "cmake" -RSO cout -RSE cerr -Args $defs;
+        gc cout; gc cerr;
+        try {
+          $ErrorActionPreference = 'Continue';
+          Write-Host -ForegroundColor Yellow cmake `-`-build .
+          cmake `-`-build .
+        } catch {
+          Write-Warning "Oops: $_"
+        }
+        popd
+        Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+        $ErrorActionPreference = 'Stop';
+      }
+
+
+before_test:
+- ps: |
+      $line='-------------------------------------------------------------------------------------';
+      $CPPUNIT_IGNORE='';
+      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testBigPing';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
+      set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
+      Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
+      Write-Host -ForegroundColor Yellow $line;
+      foreach($t in $CPPUNIT_IGNORE.split(",")) { Write-Host -ForegroundColor Yellow $t.trim() }
+      Write-Host -ForegroundColor Yellow $line;
+
+
+after_test:
+
+
+test_script:
+  - ps: |
+      $runs=0;$fails=0;$failedTests='';$status=0;$tab="`t";
+      $line='-------------------------------------------------------------------------------------';
+      if ($env:configuration -eq "release")
+      {
+        if ($env:builder -eq "cygwin")
+        {
+          $LastExitCode=0;
+          if ($env:platform -eq "Win32")
+          {
+            $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
+          }
+          if ($env:platform -eq "x64")
+          {
+            $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
+          }
+          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
+          Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
+        }
+        if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
+        {
+          $suffix = '';
+          if ($env:platform -eq "Win32")
+          {
+            $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
+            $excluded   = @('Data', 'Data/ODBC', 'Redis', 'PDF')
+          }
+          if ($env:platform -eq "x64")
+          {
+            $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
+            $excluded   = @('Data', 'Data/ODBC', 'Redis', 'PDF')
+          }
+
+          Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;
+
+          $components = gc $env:poco_base\components;
+          Write-Host components;
+          Write-Host -ForegroundColor Yellow $line;
+          $components;
+          Write-Host -ForegroundColor Yellow $line;
+
+
+          Write-Host excluded;
+          Write-Host -ForegroundColor Yellow $line;
+          $excluded
+          Write-Host -ForegroundColor Yellow $line;
+
+          foreach ($component in $components) {
+            if ($excluded -notcontains $component) {
+              $path = "$env:poco_base\" + $component + "\testsuite\bin$suffix\TestSuite.exe";
+
+              if (Test-Path -Path $path) {
+                $runs += 1;
+                Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Running'
+
+                Write-Host -ForegroundColor Yellow $line;
+                Write-Host -ForegroundColor Yellow '|' $env:APPVEYOR_BUILD_VERSION $env:vs$vsver $env:Platform $env:Configuration $env:linkmode '|' $tab $tab $component;
+                Write-Host -ForegroundColor Yellow $line;
+
+                $started = Get-Date
+                $process = Start-Process -PassThru -nnw -Wait -FilePath "$path" -Args "-all" -RSO cout -RSE cerr;
+                $ended   = Get-Date
+                $millisec = ($ended - $started).totalmilliseconds
+
+                gc cout; gc cerr;
+
+                if ($process.ExitCode -gt 0) {
+                  $fails += 1;$failedTests += $component + ', ';
+                  Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Failed' -Duration $millisec
+                } else {
+                  Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Passed' -Duration $millisec
+                }
+              } else {
+                 Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome   'NotFound'
+              }
+            } else {
+              Add-AppveyorTest -Framework 'CppUnit' -Name $component -Outcome  'Skipped'
+            }
+          }
+        }
+        if ($env:builder -eq "cmake")
+        {
+          pushd cmake-build;
+          Write-Host -ForegroundColor Yellow $line;
+          ctest --config RelWithDebInfo -N
+          Write-Host -ForegroundColor Yellow $line;
+
+          Write-Host -ForegroundColor Yellow 'ctest -C Debug -VV -E Data*'
+          ctest -C Debug -VV -E Data*
+          popd
+        }
+        Write-Host $runs' runs, ' $fails' fails'
+        if ($fails -gt 0)
+        {
+            Write-Host 'Failed: ' $failedTests
+            $host.SetShouldExit($fails);
+        } else
+        {
+            $host.SetShouldExit(0);
+        }
+      }
+
+on_success:
+  - echo success
+
+on_failure:
+  - echo failure
+
+on_finish:
+  - echo finish
+
+notifications:
+  - provider: Email
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: false
+
+  - provider: Slack
+    incoming_webhook: https://hooks.slack.com/services/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
+    auth_token:
+      secure: Xsss/K3VV9wZI9Ffwvafa67kyohNA437xJ3WA9fVI4w=
+    channel: appveyor
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
+
+

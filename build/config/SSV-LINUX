@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/SSV-LINUX#2 $
-#
 # ARM-Linux
 #
 # Make settings for ARM Linux/gcc 2.95.3 (cross-compile, using STLport 4.6.2)

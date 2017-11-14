@@ -1,8 +1,6 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Exception.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -160,16 +158,16 @@ inline int Exception::code() const
 	POCO_DECLARE_EXCEPTION_CODE(API, CLS, BASE, 0)
 
 #define POCO_IMPLEMENT_EXCEPTION(CLS, BASE, NAME)													\
-	CLS::CLS(int code): BASE(code)																	\
+	CLS::CLS(int otherCode): BASE(otherCode)																	\
 	{																								\
 	}																								\
-	CLS::CLS(const std::string& msg, int code): BASE(msg, code)										\
+	CLS::CLS(const std::string& msg, int otherCode): BASE(msg, otherCode)										\
 	{																								\
 	}																								\
-	CLS::CLS(const std::string& msg, const std::string& arg, int code): BASE(msg, arg, code)		\
+	CLS::CLS(const std::string& msg, const std::string& arg, int otherCode): BASE(msg, arg, otherCode)		\
 	{																								\
 	}																								\
-	CLS::CLS(const std::string& msg, const Poco::Exception& exc, int code): BASE(msg, exc, code)	\
+	CLS::CLS(const std::string& msg, const Poco::Exception& exc, int otherCode): BASE(msg, exc, otherCode)	\
 	{																								\
 	}																								\
 	CLS::CLS(const CLS& exc): BASE(exc)																\
@@ -231,6 +229,12 @@ POCO_DECLARE_EXCEPTION(Foundation_API, PoolOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoPermissionException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OutOfMemoryException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DataException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, InterruptedException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, IndexOutOfBoundsException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, UnsupportedOperationException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, EmptyStackException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, StackOverflowException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ArithmeticException, RuntimeException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, DataFormatException, DataException)
 POCO_DECLARE_EXCEPTION(Foundation_API, SyntaxException, DataException)
@@ -248,7 +252,10 @@ POCO_DECLARE_EXCEPTION(Foundation_API, CreateFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OpenFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, WriteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ReadFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, DirectoryNotEmptyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnknownURISchemeException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, TooManyURIRedirectsException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, URISyntaxException, SyntaxException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, ApplicationException, Exception)
 POCO_DECLARE_EXCEPTION(Foundation_API, BadCastException, RuntimeException)

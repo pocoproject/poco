@@ -33,7 +33,8 @@
 
 #include <assert.h>
 #ifndef ASSERT
-#define ASSERT(condition)      (assert(condition))
+#define ASSERT(condition)         \
+    assert(condition);
 #endif
 #ifndef UNIMPLEMENTED
 #define UNIMPLEMENTED() (abort())
@@ -56,13 +57,16 @@
     defined(__ARMEL__) || defined(_M_ARM) || defined(__arm__) || defined(__arm64__) || \
     defined(__avr32__) || \
     defined(__hppa__) || defined(__ia64__) || \
-    defined(__mips__) || defined(__powerpc__) || \
+    defined(__mips__) || \
+    defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
     defined(__SH4__) || defined(__alpha__) || \
     defined(_MIPS_ARCH_MIPS32R2) || \
     defined(__AARCH64EL__) || \
-    defined(nios2) || defined(__nios2) || defined(__nios2__)
+    defined(nios2) || defined(__nios2) || defined(__nios2__) || defined(__EMSCRIPTEN__)
 #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+#elif defined(__mc68000__)
+#undef DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS
 #elif defined(_M_IX86) || defined(__i386__) || defined(__i386)
 #if defined(_WIN32)
 // Windows uses a 64bit wide floating point stack.
@@ -74,6 +78,11 @@
 #error Target architecture was not detected as supported by Double-Conversion.
 #endif
 
+#if defined(__GNUC__)
+#define DOUBLE_CONVERSION_UNUSED __attribute__((unused))
+#else
+#define DOUBLE_CONVERSION_UNUSED
+#endif
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 
@@ -158,8 +167,8 @@ template <typename T>
 class Vector {
  public:
   Vector() : start_(NULL), length_(0) {}
-  Vector(T* data, int length) : start_(data), length_(length) {
-    ASSERT(length == 0 || (length > 0 && data != NULL));
+  Vector(T* data, int size) : start_(data), length_(size) {
+    ASSERT(size == 0 || (size > 0 && data != NULL));
   }
 
   // Returns a vector using the same backing storage as this one,
@@ -201,8 +210,8 @@ class Vector {
 // buffer bounds on all operations in debug mode.
 class StringBuilder {
  public:
-  StringBuilder(char* buffer, int size)
-      : buffer_(buffer, size), position_(0) { }
+  StringBuilder(char* buffer, int length)
+      : buffer_(buffer, length), position_(0) { }
 
   ~StringBuilder() { if (!is_finalized()) Finalize(); }
 
@@ -299,7 +308,8 @@ template <class Dest, class Source>
 inline Dest BitCast(const Source& source) {
   // Compile time assertion: sizeof(Dest) == sizeof(Source)
   // A compile error here means your Dest and Source have different sizes.
-  typedef char VerifySizesAreEqual[sizeof(Dest) == sizeof(Source) ? 1 : -1];
+  DOUBLE_CONVERSION_UNUSED
+      typedef char VerifySizesAreEqual[sizeof(Dest) == sizeof(Source) ? 1 : -1];
 
   Dest dest;
   memmove(&dest, &source, sizeof(dest));

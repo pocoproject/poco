@@ -1,8 +1,6 @@
 //
 // TaskNotification.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TaskNotification.cpp#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -79,9 +77,9 @@ TaskFailedNotification::~TaskFailedNotification()
 }
 
 
-TaskProgressNotification::TaskProgressNotification(Task* pTask, float progress):
+TaskProgressNotification::TaskProgressNotification(Task* pTask, float taskProgress):
 	TaskNotification(pTask),
-	_progress(progress)
+	_progress(taskProgress)
 {
 }
 

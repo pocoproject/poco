@@ -1,8 +1,6 @@
 //
 // LoggingRegistryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LoggingRegistryTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,14 +9,13 @@
 
 
 #include "LoggingRegistryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/LoggingRegistry.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/AutoPtr.h"
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::LoggingRegistry;
 using Poco::Channel;
@@ -28,7 +25,7 @@ using Poco::PatternFormatter;
 using Poco::AutoPtr;
 
 
-LoggingRegistryTest::LoggingRegistryTest(const std::string& name): CppUnit::TestCase(name)
+LoggingRegistryTest::LoggingRegistryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

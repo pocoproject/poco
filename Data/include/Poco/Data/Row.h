@@ -1,8 +1,6 @@
 //
 // Row.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Row.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Row
@@ -43,12 +41,12 @@ class Data_API Row
 	/// Rows are sortable. The sortability is maintained at all times (i.e. there
 	/// is always at least one column specified as a sorting criteria) .
 	/// The default and minimal sorting criteria is the first field (position 0).
-	/// The default sorting criteria can be replaced with any other field by 
+	/// The default sorting criteria can be replaced with any other field by
 	/// calling replaceSortField() member function.
 	/// Additional fields can be added to sorting criteria, in which case the
 	/// field precedence corresponds to addition order (i.e. later added fields
 	/// have lower sorting precedence).
-	/// These features make Row suitable for use with standard sorted 
+	/// These features make Row suitable for use with standard sorted
 	/// containers and algorithms. The main constraint is that all the rows from
 	/// a set that is being sorted must have the same sorting criteria (i.e., the same
 	/// set of fields must be in sorting criteria in the same order). Since rows don't
@@ -75,7 +73,7 @@ public:
 	typedef std::vector<SortTuple>             SortMap;
 		/// The type for map holding fields used for sorting criteria.
 		/// Fields are added sequentially and have precedence that
-		/// corresponds to field adding sequence order (rather than field's 
+		/// corresponds to field adding sequence order (rather than field's
 		/// position in the row).
 		/// This requirement rules out use of std::map due to its sorted nature.
 	typedef SharedPtr<SortMap> SortMapPtr;
@@ -104,6 +102,15 @@ public:
 	Poco::Dynamic::Var& operator [] (const std::string& name);
 		/// Returns the reference to data value at named column location.
 
+	const Poco::Dynamic::Var& get(std::size_t col) const;
+	/// Returns the reference to data value at column location.
+
+	const Poco::Dynamic::Var& operator [] (std::size_t col) const;
+	/// Returns the reference to data value at column location.
+
+	const Poco::Dynamic::Var& operator [] (const std::string& name) const;
+	/// Returns the reference to data value at named column location.
+
 	template <typename T>
 	void append(const std::string& name, const T& val)
 		/// Appends the value to the row.
@@ -121,7 +128,8 @@ public:
 		try
 		{
 			_values.at(pos) = val;
-		}catch (std::out_of_range&)
+		}
+		catch (std::out_of_range&)
 		{
 			throw RangeException("Invalid column number.");
 		}
@@ -178,13 +186,13 @@ public:
 		/// Converts the column names to string.
 
 	void formatNames() const;
-		/// Fomats the column names.
+		/// Formats the column names.
 
 	const std::string& valuesToString() const;
-		/// Converts the row values to string and returns the formated string.
+		/// Converts the row values to string and returns the formatted string.
 
 	void formatValues() const;
-		/// Fomats the row values.
+		/// Formats the row values.
 
 	bool operator == (const Row& other) const;
 		/// Equality operator.
@@ -218,14 +226,10 @@ public:
 private:
 	void init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter);
 
-	void checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val);
-		/// Check if row contains only empty values and throws IllegalStateException
-		/// if that is the case.
-
 	ValueVec& values();
 		/// Returns the reference to values vector.
 
-	std::size_t getPosition(const std::string& name);
+	std::size_t getPosition(const std::string& name) const;
 	bool isEqualSize(const Row& other) const;
 	bool isEqualType(const Row& other) const;
 
@@ -282,6 +286,18 @@ inline Poco::Dynamic::Var& Row::operator [] (std::size_t col)
 
 
 inline Poco::Dynamic::Var& Row::operator [] (const std::string& name)
+{
+	return get(getPosition(name));
+}
+
+
+inline const Poco::Dynamic::Var& Row::operator [] (std::size_t col) const
+{
+	return get(col);
+}
+
+
+inline const Poco::Dynamic::Var& Row::operator [] (const std::string& name) const
 {
 	return get(getPosition(name));
 }

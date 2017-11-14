@@ -1,10 +1,8 @@
 //
 // SessionPoolContainer.cpp
 //
-// $Id: //poco/Main/Data/src/SessionPoolContainer.cpp#3 $
-//
 // Library: Data
-// Package: SessionPoolContainering
+// Package: SessionPooling
 // Module:  SessionPoolContainer
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -53,10 +51,10 @@ void SessionPoolContainer::add(SessionPool* pPool)
 }
 
 
-Session SessionPoolContainer::add(const std::string& sessionKey, 
+Session SessionPoolContainer::add(const std::string& sessionKey,
 	const std::string& connectionString,
-	int minSessions, 
-	int maxSessions, 
+	int minSessions,
+	int maxSessions,
 	int idleTime)
 {
 	std::string name = SessionPool::name(sessionKey, connectionString);
@@ -67,10 +65,10 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	// pool already exists, silently return a session from it
 	if (it != _sessionPools.end()) return it->second->get();
 
-	SessionPool* pSP = 
+	SessionPool* pSP =
 		new SessionPool(sessionKey, connectionString, minSessions, maxSessions, idleTime);
 
-	std::pair<SessionPoolMap::iterator, bool> ins = 
+	std::pair<SessionPoolMap::iterator, bool> ins =
 		_sessionPools.insert(SessionPoolMap::value_type(name, pSP));
 
 	return ins.first->second->get();
@@ -80,7 +78,7 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 bool SessionPoolContainer::isActive(const std::string& sessionKey,
 		const std::string& connectionString) const
 {
-	std::string name = connectionString.empty() ? 
+	std::string name = connectionString.empty() ?
 		sessionKey : SessionPool::name(sessionKey, connectionString);
 
 	SessionPoolMap::const_iterator it = _sessionPools.find(name);

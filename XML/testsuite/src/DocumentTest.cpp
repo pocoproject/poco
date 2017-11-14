@@ -1,8 +1,6 @@
 //
 // DocumentTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/DocumentTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "DocumentTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"

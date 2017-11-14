@@ -1,8 +1,6 @@
 //
 // NamedTuplesTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedTuplesTest.h#1 $
-//
 // Definition of the NamedTuplesTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class NamedTuplesTest: public CppUnit::TestCase

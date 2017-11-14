@@ -1,8 +1,6 @@
 //
 // Net.cpp
 //
-// $Id: //poco/1.4/Net/src/Net.cpp#10 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  NetCore
@@ -62,7 +60,14 @@ void Net_API uninitializeNetwork()
 		~NetworkInitializer()
 			/// Calls Poco::Net::uninitializeNetwork();
 		{
-			Poco::Net::uninitializeNetwork();
+			try
+			{
+				Poco::Net::uninitializeNetwork();
+			}
+			catch (...)
+			{
+				poco_unexpected();
+			}
 		}
 	};
 

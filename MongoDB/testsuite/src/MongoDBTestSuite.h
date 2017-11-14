@@ -1,8 +1,6 @@
 //
 // MongoDBTestSuite.h
 //
-// $Id$
-//
 // Definition of the MongoDBTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define MongoDBTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class MongoDBTestSuite

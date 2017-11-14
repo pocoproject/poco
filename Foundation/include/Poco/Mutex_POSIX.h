@@ -1,8 +1,6 @@
 //
 // Mutex_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex_POSIX.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
@@ -31,9 +29,15 @@ namespace Poco {
 
 class Foundation_API MutexImpl
 {
+public:
+	enum MutexTypeImpl
+	{
+		MUTEX_RECURSIVE_IMPL,
+		MUTEX_NONRECURSIVE_IMPL
+	};
+
 protected:
-	MutexImpl();
-	MutexImpl(bool fast);
+	explicit MutexImpl(MutexTypeImpl type);
 	~MutexImpl();
 	void lockImpl();
 	bool tryLockImpl();
@@ -58,7 +62,7 @@ protected:
 //
 inline void MutexImpl::lockImpl()
 {
-	if (pthread_mutex_lock(&_mutex)) 
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot lock mutex");
 }
 

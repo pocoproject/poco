@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Data/SQLite/Makefile#2 $
-#
 # Makefile for Poco SQLite
 #
 
@@ -12,7 +10,7 @@ COMMONFLAGS += -I$(POCO_BASE)/Data/SQLite/src
 
 SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS \
         -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE \
-        -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED
+        -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED -DSQLITE_OS_UNIX
 
 objects = Binder Extractor Notifier SessionImpl Connector \
         SQLiteException SQLiteStatementImpl Utility

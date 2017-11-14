@@ -1,8 +1,6 @@
 //
 // WinCEDriver.cpp
 //
-// $Id: //poco/1.4/Zip/testsuite/src/WinCEDriver.cpp#1 $
-//
 // Console-based test driver for Windows CE.
 //
 // Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.
@@ -12,7 +10,7 @@
 //
 
 
-#include "CppUnit/TestRunner.h"
+#include "Poco/CppUnit/TestRunner.h"
 #include "ZipTestSuite.h"
 #include <cstdlib>
 

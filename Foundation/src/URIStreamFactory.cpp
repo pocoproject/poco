@@ -1,8 +1,6 @@
 //
 // URIStreamFactory.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URIStreamFactory.cpp#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URIStreamFactory
@@ -31,8 +29,8 @@ URIStreamFactory::~URIStreamFactory()
 }
 
 
-URIRedirection::URIRedirection(const std::string& uri):
-	_uri(uri)
+URIRedirection::URIRedirection(const std::string& rUri):
+	_uri(rUri)
 {
 }
 

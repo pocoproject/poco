@@ -1,8 +1,6 @@
 //
 // NotificationQueue.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NotificationQueue.h#1 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationQueue
@@ -36,9 +34,9 @@ class NotificationCenter;
 class Foundation_API NotificationQueue
 	/// A NotificationQueue object provides a way to implement asynchronous
 	/// notifications. This is especially useful for sending notifications
-	/// from one thread to another, for example from a background thread to 
-	/// the main (user interface) thread. 
-	/// 
+	/// from one thread to another, for example from a background thread to
+	/// the main (user interface) thread.
+	///
 	/// The NotificationQueue can also be used to distribute work from
 	/// a controlling thread to one or more worker threads. Each worker thread
 	/// repeatedly calls waitDequeueNotification() and processes the
@@ -87,7 +85,7 @@ public:
 	Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
-		/// to be enqueued. 
+		/// to be enqueued.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
 		/// This method returns 0 (null) if wakeUpWaitingThreads()
@@ -125,8 +123,12 @@ public:
 	void clear();
 		/// Removes all notifications from the queue.
 		
+	bool remove(Notification::Ptr pNotification);
+		/// Removes a notification from the queue.
+		/// Returns true if remove succeeded, false otherwise
+
 	bool hasIdleThreads() const;	
-		/// Returns true if the queue has at least one thread waiting 
+		/// Returns true if the queue has at least one thread waiting
 		/// for a notification.
 		
 	static NotificationQueue& defaultQueue();

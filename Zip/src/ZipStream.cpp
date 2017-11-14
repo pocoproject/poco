@@ -1,8 +1,6 @@
 //
 // ZipStream.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipStream.cpp#4 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipStream
@@ -63,7 +61,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 		std::string crc(4, ' ');
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start);
+			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, static_cast<Poco::UInt32>(start), fileEntry.needsZip64());
 		}
 		else
 		{
@@ -75,7 +73,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 	{
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start);
+			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, static_cast<Poco::UInt32>(start), fileEntry.needsZip64());
 		}
 		else
 		{
@@ -124,7 +122,7 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 			else if (fileEntry.getCompressionLevel() == ZipCommon::CL_MAXIMUM)
 				level = Z_BEST_COMPRESSION;
 			// ignore the zlib init string which is of size 2 and also ignore the 4 byte adler32 value at the end of the stream!
-			_ptrOHelper = new PartialOutputStream(*_pOstr, 2, 4, false); 
+			_ptrOHelper = new PartialOutputStream(*_pOstr, 2, 4, false);
 			_ptrOBuf = new Poco::DeflatingOutputStream(*_ptrOHelper, DeflatingStreamBuf::STREAM_ZLIB, level);
 		}
 		else if (fileEntry.getCompressionMethod() == ZipCommon::CM_STORE)
@@ -135,6 +133,8 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 		else throw Poco::NotImplementedException("Unsupported compression method");
 
 		// now write the header to the ostr!
+        if (fileEntry.needsZip64())
+            fileEntry.setZip64Data();
 		std::string header = fileEntry.createHeader();
 		ostr.write(header.c_str(), static_cast<std::streamsize>(header.size()));
 	}
@@ -155,7 +155,7 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_ptrBuf) return 0; // directory entry
 	_ptrBuf->read(buffer, length);
-	int cnt = _ptrBuf->gcount();
+	int cnt = static_cast<int>(_ptrBuf->gcount());
 	if (cnt > 0)
 	{
 		_crc32.update(buffer, cnt);
@@ -174,9 +174,8 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				// now push back the header to the stream, so that the ZipLocalFileHeader can read it
 				Poco::Int32 size = static_cast<Poco::Int32>(nfo.getFullHeaderSize());
 				_expectedCrc32 = nfo.getCRC32();
-				const char* rawHeader = nfo.getRawHeader();
-				for (Poco::Int32 i = size-1; i >= 0; --i)
-					_pIstr->putback(rawHeader[i]);
+				_pIstr->seekg(-size, std::ios::cur);
+				if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 				if (!crcValid())
 					throw ZipException("CRC failure");
 			}
@@ -193,13 +192,14 @@ int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 		return 0;
 	_bytesWritten += length;
 	_ptrOBuf->write(buffer, length);
-	_crc32.update(buffer, length);
-	return length;
+	_crc32.update(buffer, static_cast<unsigned int>(length));
+	return static_cast<int>(length);
 }
 
 
-void ZipStreamBuf::close()
+void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 {
+	extraDataSize = 0;
 	if (_ptrOBuf && _pHeader)
 	{
 		_ptrOBuf->flush();
@@ -212,29 +212,55 @@ void ZipStreamBuf::close()
 			_ptrOHelper->close();
 		}
 		_ptrOBuf = 0;
-		poco_assert (*_pOstr);
+		if (!*_pOstr) throw Poco::IOException("Bad output stream");
+
 		// write an extra datablock if required
 		// or fix the crc entries
+		poco_check_ptr(_pHeader);
+		_pHeader->setCRC(_crc32.checksum());
+		_pHeader->setUncompressedSize(_bytesWritten);
+		_pHeader->setCompressedSize(_ptrOHelper->bytesWritten());
+		if (_bytesWritten == 0)
+		{
+			poco_assert (_ptrOHelper->bytesWritten() == 0);
+			// Empty files must use CM_STORE, otherwise unzipping will fail
+			_pHeader->setCompressionMethod(ZipCommon::CM_STORE);
+			_pHeader->setCompressionLevel(ZipCommon::CL_NORMAL);
+		}
+		_pHeader->setStartPos(_pHeader->getStartPos()); // This resets EndPos now that compressed Size is known
+
 		if (_pHeader->searchCRCAndSizesAfterData())
 		{
-			ZipDataInfo info;
-			info.setCRC32(_crc32.checksum());
-			info.setUncompressedSize(_bytesWritten);
-			info.setCompressedSize(static_cast<Poco::UInt32>(_ptrOHelper->bytesWritten()));
-			_pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
+            if (_pHeader->needsZip64())
+            {
+			    ZipDataInfo64 info;
+			    info.setCRC32(_crc32.checksum());
+			    info.setUncompressedSize(_bytesWritten);
+			    info.setCompressedSize(_ptrOHelper->bytesWritten());
+                extraDataSize = info.getFullHeaderSize();
+			    _pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(extraDataSize));
+            }
+            else
+            {
+ 			    ZipDataInfo info;
+			    info.setCRC32(_crc32.checksum());
+			    info.setUncompressedSize(static_cast<Poco::UInt32>(_bytesWritten));
+			    info.setCompressedSize(static_cast<Poco::UInt32>(_ptrOHelper->bytesWritten()));
+                extraDataSize = info.getFullHeaderSize();
+			    _pOstr->write(info.getRawHeader(), static_cast<std::streamsize>(extraDataSize));
+           }
 		}
 		else
 		{
-			poco_check_ptr (_pHeader);
-			_pHeader->setCRC(_crc32.checksum());
-			_pHeader->setUncompressedSize(_bytesWritten);
-			_pHeader->setCompressedSize(static_cast<Poco::UInt32>(_ptrOHelper->bytesWritten()));
 			_pOstr->seekp(_pHeader->getStartPos(), std::ios_base::beg);
-			poco_assert (*_pOstr);
+			if (!*_pOstr) throw Poco::IOException("Bad output stream");
+
+            if (_pHeader->hasExtraField())   // Update sizes in header extension.
+                _pHeader->setZip64Data();
 			std::string header = _pHeader->createHeader();
 			_pOstr->write(header.c_str(), static_cast<std::streamsize>(header.size()));
 			_pOstr->seekp(0, std::ios_base::end);
-			poco_assert (*_pOstr);
+			if (!*_pOstr) throw Poco::IOException("Bad output stream");
 		}
 		_pHeader = 0;
 	}
@@ -297,10 +323,10 @@ ZipOutputStream::~ZipOutputStream()
 }
 
 
-void ZipOutputStream::close()
+void ZipOutputStream::close(Poco::UInt64& extraDataSize)
 {
 	flush();
-	_buf.close();
+	_buf.close(extraDataSize);
 }
 
 

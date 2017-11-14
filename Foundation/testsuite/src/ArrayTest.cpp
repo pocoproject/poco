@@ -1,8 +1,6 @@
 //
 // ArrayTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/ArrayTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,14 +9,14 @@
 
 
 #include "ArrayTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Array.h"
 #include <vector>
 #include <algorithm>
 #include <functional>
 
-ArrayTest::ArrayTest(const std::string& name): CppUnit::TestCase(name)
+ArrayTest::ArrayTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -37,7 +35,7 @@ void ArrayTest::testConstruction()
 
 	// fundamental type
 	typedef Poco::Array<float,6> FloatArray;
-	FloatArray a = { { 42.f } };
+	FloatArray a = { 42.f };
 
 	for (unsigned i=1; i<a.size(); ++i) {
 		a[i] = a[i-1]+1.f;
@@ -75,7 +73,7 @@ void ArrayTest::testOperations()
 {
 	const int SIZE = 6;
 	typedef Poco::Array<int,SIZE> Array;
-	Array a = { { 1 } };
+	Array a = { 1 };
 
 	// use some common STL container operations
 	assert(a.size() == SIZE);
@@ -92,7 +90,7 @@ void ArrayTest::testOperations()
 	}
 
 	// swap
-	Array b; 
+	Array b;
 	b.assign(10);
 	for(int i=0; i<SIZE; i++){
 		assert(a[i] == 100);

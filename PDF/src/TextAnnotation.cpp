@@ -1,8 +1,6 @@
 //
 // TextAnnotation.cpp
 //
-// $Id: //poco/Main/PDF/src/TextAnnotation.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  TextAnnotation
@@ -24,7 +22,7 @@ namespace PDF {
 
 TextAnnotation::TextAnnotation(HPDF_Doc* pPDF,
 	const HPDF_Annotation& annotation,
-	const std::string& name): 
+	const std::string& name):
 	Resource<HPDF_Annotation>(pPDF, annotation, name)
 {
 	open();

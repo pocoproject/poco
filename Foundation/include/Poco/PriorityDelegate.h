@@ -1,8 +1,6 @@
 //
 // PriorityDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PriorityDelegate.h#5 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  PriorityDelegate
@@ -30,7 +28,7 @@
 namespace Poco {
 
 
-template <class TObj, class TArgs, bool useSender = true> 
+template <class TObj, class TArgs, bool useSender = true>
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -72,7 +70,7 @@ public:
 		if (_receiverObject)
 		{
 			(_receiverObject->*_receiverMethod)(sender, arguments);
-			return true; 
+			return true;
 		}
 		else return false;
 	}
@@ -104,7 +102,7 @@ private:
 };
 
 
-template <class TObj, class TArgs> 
+template <class TObj, class TArgs>
 class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
 {
 public:
@@ -251,6 +249,7 @@ private:
 	PriorityDelegate();
 };
 
+
 template <class TObj>
 class PriorityDelegate<TObj, void, false>: public AbstractPriorityDelegate<void>
 {
@@ -324,6 +323,7 @@ private:
 	PriorityDelegate();
 };
 
+
 template <class TObj, class TArgs>
 static PriorityDelegate<TObj, TArgs, true> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*, TArgs&), int prio)
 {
@@ -394,9 +394,6 @@ static FunctionPriorityDelegate<TArgs, false> priorityDelegate(void (*NotifyMeth
 }
 
 
-
-
-
 template <class TObj>
 static PriorityDelegate<TObj, void, true> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*), int prio)
 {
@@ -462,5 +459,6 @@ inline FunctionPriorityDelegate<void, false> priorityDelegate(void (*NotifyMetho
 
 
 } // namespace Poco
+
 
 #endif // Foundation_PriorityDelegate_INCLUDED

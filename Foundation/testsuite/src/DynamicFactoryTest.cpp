@@ -1,8 +1,6 @@
 //
 // DynamicFactoryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DynamicFactoryTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "DynamicFactoryTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/DynamicFactory.h"
 #include "Poco/Exception.h"
 #include <memory>
@@ -46,7 +44,7 @@ namespace
 }
 
 
-DynamicFactoryTest::DynamicFactoryTest(const std::string& name): CppUnit::TestCase(name)
+DynamicFactoryTest::DynamicFactoryTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -67,10 +65,10 @@ void DynamicFactoryTest::testDynamicFactory()
 	assert (dynFactory.isClass("B"));
 	
 	assert (!dynFactory.isClass("C"));
-	
-	std::auto_ptr<A> a(dynamic_cast<A*>(dynFactory.createInstance("A")));
-	std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
-	
+
+	std::unique_ptr<A> a(dynamic_cast<A*>(dynFactory.createInstance("A")));
+	std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
+
 	assertNotNull(a.get());
 	assertNotNull(b.get());
 	
@@ -89,7 +87,7 @@ void DynamicFactoryTest::testDynamicFactory()
 	
 	try
 	{
-		std::auto_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
+		std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

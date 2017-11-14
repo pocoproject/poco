@@ -1,9 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionImpl
 //
@@ -46,7 +44,7 @@ const std::string SessionImpl::MYSQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) : 
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
 	_handle(0),
 	_connected(false),
@@ -55,7 +53,6 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	addProperty("insertId", &SessionImpl::setInsertId, &SessionImpl::getInsertId);
 	setProperty("handle", static_cast<MYSQL*>(_handle));
 	open();
-	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 }
 
 
@@ -91,7 +88,7 @@ void SessionImpl::open(const std::string& connect)
 	options["character-set"] = "utf8";
 
 	const std::string& connString = connectionString();
-	for (std::string::const_iterator start = connString.begin();;) 
+	for (std::string::const_iterator start = connString.begin();;)
 	{
 		std::string::const_iterator finish = std::find(start, connString.end(), ';');
 		std::string::const_iterator middle = std::find(start, finish, '=');
@@ -104,7 +101,7 @@ void SessionImpl::open(const std::string& connect)
 		if ((finish == connString.end()) || (finish + 1 == connString.end())) break;
 
 		start = finish + 1;
-	} 
+	}
 
 	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
@@ -142,14 +139,14 @@ void SessionImpl::open(const std::string& connect)
 		_handle.options(MYSQL_SET_CHARSET_NAME, options["character-set"].c_str());
 
 	// Real connect
-	_handle.connect(options["host"].c_str(), 
-			options["user"].c_str(), 
-			options["password"].c_str(), 
-			db, 
+	_handle.connect(options["host"].c_str(),
+			options["user"].c_str(),
+			options["password"].c_str(),
+			db,
 			port);
 
-	addFeature("autoCommit", 
-		&SessionImpl::autoCommit, 
+	addFeature("autoCommit",
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
 	_connected = true;

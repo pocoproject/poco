@@ -1,8 +1,6 @@
 //
 // ODBCMySQLTest.h
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/ODBCMySQLTest.h#1 $
-//
 // Definition of the MySQLTest class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -19,14 +17,14 @@
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Session.h"
 #include "Poco/SharedPtr.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 
 
 class MySQLTest: public CppUnit::TestCase
 	/// MySQL test class
 	/// Tested:
-	/// 
+	///
 	/// Driver          |            DB             | OS
 	/// ----------------+---------------------------+------------------------------------------
 	/// 03.51.12.00     | MySQL 5.0.27-community-nt	| MS Windows XP Professional x64 v.2003/SP1
@@ -81,13 +79,20 @@ public:
 	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
+	void testLongText();
 
 	void testUnsignedInts();
 	void testFloat();
 	void testDouble();
 
+	void testAny();
+	void testDynamicAny();
+
 	void testTuple();
 	void testTupleVector();
+
+	void testStdTuple();
+	void testStdTupleVector();
 
 	void testInternalExtraction();
 
@@ -114,6 +119,7 @@ private:
 	void dropTable(const std::string& tableName);
 	void recreatePersonTable();
 	void recreatePersonBLOBTable();
+	void recreatePersonLongTextTable();
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
@@ -125,9 +131,15 @@ private:
 	void recreateVectorsTable();
 	void recreateNullableIntTable();
 	void recreateNullableStringTable();
+	void recreateAnyTable();
 
 	static void dbInfo(Poco::Data::Session& session);
 
+	static std::string getHost();
+	static std::string getPort();
+	static std::string getUser();
+	static std::string getPass();
+	static std::string getBase();
 	static std::string _dbConnString;
 	static Poco::SharedPtr<Poco::Data::Session> _pSession;
 	static Poco::SharedPtr<SQLExecutor> _pExecutor;

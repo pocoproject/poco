@@ -1,8 +1,6 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#11 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPClientSession
@@ -25,7 +23,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
-#include "Poco/Base64Encoder.h"
+#include "Poco/RegularExpression.h"
 #include <sstream>
 
 
@@ -37,13 +35,17 @@ namespace Poco {
 namespace Net {
 
 
+HTTPClientSession::ProxyConfig HTTPClientSession::_globalProxyConfig;
+
+
 HTTPClientSession::HTTPClientSession():
 	_port(HTTPSession::HTTP_PORT),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
-	_expectResponseBody(false)
+	_expectResponseBody(false),
+	_responseReceived(false)
 {
 }
 
@@ -51,23 +53,26 @@ HTTPClientSession::HTTPClientSession():
 HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
-	_expectResponseBody(false)
+	_expectResponseBody(false),
+	_responseReceived(false)
 {
+	setKeepAlive(true);
 }
 
 
 HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_host(address.host().toString()),
 	_port(address.port()),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
-	_expectResponseBody(false)
+	_expectResponseBody(false),
+	_responseReceived(false)
 {
 }
 
@@ -75,12 +80,40 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port):
 	_host(host),
 	_port(port),
-	_proxyPort(HTTPSession::HTTP_PORT),
+	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
 	_mustReconnect(false),
-	_expectResponseBody(false)
+	_expectResponseBody(false),
+	_responseReceived(false)
 {
+}
+
+
+HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig):
+	_host(host),
+	_port(port),
+	_proxyConfig(proxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false),
+	_responseReceived(false)
+{
+}
+
+
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig):
+	HTTPSession(socket),
+	_port(HTTPSession::HTTP_PORT),
+	_proxyConfig(proxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false),
+	_responseReceived(false)
+{
+	setKeepAlive(true);
 }
 
 
@@ -111,8 +144,8 @@ void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
 	if (!connected())
 	{
-		_proxyHost = host;
-		_proxyPort = port;
+		_proxyConfig.host = host;
+		_proxyConfig.port = port;
 	}
 	else throw IllegalStateException("Cannot set the proxy host and port for an already connected session");
 }
@@ -121,7 +154,7 @@ void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 void HTTPClientSession::setProxyHost(const std::string& host)
 {
 	if (!connected())
-		_proxyHost = host;
+		_proxyConfig.host = host;
 	else
 		throw IllegalStateException("Cannot set the proxy host for an already connected session");
 }
@@ -130,7 +163,7 @@ void HTTPClientSession::setProxyHost(const std::string& host)
 void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 {
 	if (!connected())
-		_proxyPort = port;
+		_proxyConfig.port = port;
 	else
 		throw IllegalStateException("Cannot set the proxy port number for an already connected session");
 }
@@ -138,23 +171,35 @@ void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 
 void HTTPClientSession::setProxyCredentials(const std::string& username, const std::string& password)
 {
-	_proxyUsername = username;
-	_proxyPassword = password;
+	_proxyConfig.username = username;
+	_proxyConfig.password = password;
 }
 
 
 void HTTPClientSession::setProxyUsername(const std::string& username)
 {
-	_proxyUsername = username;
+	_proxyConfig.username = username;
 }
-	
+
 
 void HTTPClientSession::setProxyPassword(const std::string& password)
 {
-	_proxyPassword = password;
+	_proxyConfig.password = password;
 }
 
-	
+
+void HTTPClientSession::setProxyConfig(const ProxyConfig& config)
+{
+	_proxyConfig = config;
+}
+
+
+void HTTPClientSession::setGlobalProxyConfig(const ProxyConfig& config)
+{
+	_globalProxyConfig = config;
+}
+
+
 void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 {
 	_keepAliveTimeout = timeout;
@@ -163,10 +208,12 @@ void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 
 std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
+	clearException();
 	_pResponseStream = 0;
+	_responseReceived = false;
 
 	bool keepAlive = getKeepAlive();
-	if ((connected() && !keepAlive) || mustReconnect())
+	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
 	{
 		close();
 		_mustReconnect = false;
@@ -177,15 +224,16 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 			reconnect();
 		if (!keepAlive)
 			request.setKeepAlive(false);
-		if (!request.has(HTTPRequest::HOST))
+		if (!request.has(HTTPRequest::HOST) && !_host.empty())
 			request.setHost(_host, _port);
-		if (!_proxyHost.empty())
+		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
 			request.setURI(proxyRequestPrefix() + request.getURI());
 			proxyAuthenticate(request);
 		}
 		_reconnect = keepAlive;
 		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+		const std::string& method = request.getMethod();
 		if (request.getChunkedTransferEncoding())
 		{
 			HTTPHeaderOutputStream hos(*this);
@@ -203,7 +251,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 #endif
 			request.write(*_pRequestStream);
 		}
-		else if ((request.getMethod() != HTTPRequest::HTTP_PUT && request.getMethod() != HTTPRequest::HTTP_POST) || request.has(HTTPRequest::UPGRADE))
+		else if ((method != HTTPRequest::HTTP_PUT && method != HTTPRequest::HTTP_POST && method != HTTPRequest::HTTP_PATCH) || request.has(HTTPRequest::UPGRADE))
 		{
 			Poco::CountingOutputStream cs;
 			request.write(cs);
@@ -214,7 +262,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		{
 			_pRequestStream = new HTTPOutputStream(*this);
 			request.write(*_pRequestStream);
-		}	
+		}
 		_lastRequest.update();
 		return *_pRequestStream;
 	}
@@ -229,30 +277,30 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 {
 	_pRequestStream = 0;
+	if (networkException()) networkException()->rethrow();
 
-	do
+	if (!_responseReceived)
 	{
-		response.clear();
-		HTTPHeaderInputStream his(*this);
-		try
+		do
 		{
-			response.read(his);
-		}
-		catch (MessageException&)
-		{
-			close();
-			if (networkException())
-				networkException()->rethrow();
-			else
+			response.clear();
+			HTTPHeaderInputStream his(*this);
+			try
+			{
+				response.read(his);
+			}
+			catch (Exception&)
+			{
+				close();
+				if (networkException())
+					networkException()->rethrow();
+				else
+					throw;
 				throw;
+			}
 		}
-		catch (Exception&)
-		{
-			close();
-			throw;
-		}
+		while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
 	}
-	while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
 
 	_mustReconnect = getKeepAlive() && !response.getKeepAlive();
 
@@ -268,8 +316,36 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 #endif
 	else
 		_pResponseStream = new HTTPInputStream(*this);
-		
+
 	return *_pResponseStream;
+}
+
+
+bool HTTPClientSession::peekResponse(HTTPResponse& response)
+{
+	poco_assert (!_responseReceived);
+
+	_pRequestStream->flush();
+
+	if (networkException()) networkException()->rethrow();
+
+	response.clear();
+	HTTPHeaderInputStream his(*this);
+	try
+	{
+		response.read(his);
+	}
+	catch (Exception&)
+	{
+		close();
+		if (networkException())
+			networkException()->rethrow();
+		else
+			throw;
+		throw;
+	}
+	_responseReceived = response.getStatus() != HTTPResponse::HTTP_CONTINUE;
+	return !_responseReceived;
 }
 
 
@@ -310,14 +386,14 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
-	if (_proxyHost.empty())
+	if (_proxyConfig.host.empty() || bypassProxy())
 	{
 		SocketAddress addr(_host, _port);
 		connect(addr);
 	}
 	else
 	{
-		SocketAddress addr(_proxyHost, _proxyPort);
+		SocketAddress addr(_proxyConfig.host, _proxyConfig.port);
 		connect(addr);
 	}
 }
@@ -352,9 +428,9 @@ void HTTPClientSession::proxyAuthenticate(HTTPRequest& request)
 
 void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
 {
-	if (!_proxyUsername.empty())
+	if (!_proxyConfig.username.empty())
 	{
-		HTTPBasicCredentials creds(_proxyUsername, _proxyPassword);
+		HTTPBasicCredentials creds(_proxyConfig.username, _proxyConfig.password);
 		creds.proxyAuthenticate(request);
 	}
 }
@@ -362,7 +438,8 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
 
 StreamSocket HTTPClientSession::proxyConnect()
 {
-	HTTPClientSession proxySession(getProxyHost(), getProxyPort());
+	ProxyConfig emptyProxyConfig;
+	HTTPClientSession proxySession(getProxyHost(), getProxyPort(), emptyProxyConfig);
 	proxySession.setTimeout(getTimeout());
 	std::string targetAddress(_host);
 	targetAddress.append(":");
@@ -385,6 +462,16 @@ void HTTPClientSession::proxyTunnel()
 {
 	StreamSocket ss = proxyConnect();
 	attachSocket(ss);
+}
+
+
+bool HTTPClientSession::bypassProxy() const
+{
+	if (!_proxyConfig.nonProxyHosts.empty())
+	{
+		return RegularExpression::match(_host, _proxyConfig.nonProxyHosts, RegularExpression::RE_CASELESS | RegularExpression::RE_ANCHORED);
+	}
+	else return false;
 }
 
 

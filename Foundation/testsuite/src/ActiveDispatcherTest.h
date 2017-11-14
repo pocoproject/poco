@@ -1,8 +1,6 @@
 //
 // ActiveDispatcherTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActiveDispatcherTest.h#1 $
-//
 // Definition of the ActiveDispatcherTest class.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -14,7 +12,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ActiveDispatcherTest: public CppUnit::TestCase

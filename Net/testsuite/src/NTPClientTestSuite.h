@@ -1,8 +1,6 @@
 //
 // NTPClientTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/NTPClientTestSuite.h#1 $
-//
 // Definition of the NTPClientTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define NTPClientTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class NTPClientTestSuite

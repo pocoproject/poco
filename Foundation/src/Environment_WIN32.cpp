@@ -1,13 +1,11 @@
 //
 // Environment_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_WIN32.cpp#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -16,9 +14,14 @@
 
 #include "Poco/Environment_WIN32.h"
 #include "Poco/Exception.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/Buffer.h"
 #include <sstream>
 #include <cstring>
 #include "Poco/UnWindows.h"
+#include <winsock2.h>
+#include <ws2ipdef.h>
+#include <wincrypt.h>
 #include <iphlpapi.h>
 
 
@@ -27,26 +30,34 @@ namespace Poco {
 
 std::string EnvironmentImpl::getImpl(const std::string& name)
 {
-	DWORD len = GetEnvironmentVariableA(name.c_str(), 0, 0);
+	std::wstring uname;
+	UnicodeConverter::toUTF16(name, uname);
+	DWORD len = GetEnvironmentVariableW(uname.c_str(), 0, 0);
 	if (len == 0) throw NotFoundException(name);
-	char* buffer = new char[len];
-	GetEnvironmentVariableA(name.c_str(), buffer, len);
-	std::string result(buffer);
-	delete [] buffer;
+	Buffer<wchar_t> buffer(len);
+	GetEnvironmentVariableW(uname.c_str(), buffer.begin(), len);
+	std::string result;
+	UnicodeConverter::toUTF8(buffer.begin(), len - 1, result);
 	return result;
 }
 
 
 bool EnvironmentImpl::hasImpl(const std::string& name)
 {
-	DWORD len = GetEnvironmentVariableA(name.c_str(), 0, 0);
+	std::wstring uname;
+	UnicodeConverter::toUTF16(name, uname);
+	DWORD len = GetEnvironmentVariableW(uname.c_str(), 0, 0);
 	return len > 0;
 }
 
 
 void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
-	if (SetEnvironmentVariableA(name.c_str(), value.c_str()) == 0)
+	std::wstring uname;
+	std::wstring uvalue;
+	UnicodeConverter::toUTF16(name, uname);
+	UnicodeConverter::toUTF16(value, uvalue);
+	if (SetEnvironmentVariableW(uname.c_str(), uvalue.c_str()) == 0)
 	{
 		std::string msg = "cannot set environment variable: ";
 		msg.append(name);
@@ -76,20 +87,28 @@ std::string EnvironmentImpl::osNameImpl()
 
 std::string EnvironmentImpl::osDisplayNameImpl()
 {
-	OSVERSIONINFO vi;
+	OSVERSIONINFOEX vi;	// OSVERSIONINFOEX is supported starting at Windows 2000
 	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx(&vi) == 0) throw SystemException("Cannot get OS version information");
-	switch(vi.dwMajorVersion)
+	if (GetVersionEx((OSVERSIONINFO*) &vi) == 0) throw SystemException("Cannot get OS version information");
+	switch (vi.dwMajorVersion)
 	{
+	case 10:
+		switch (vi.dwMinorVersion)
+		{
+		case 0:
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016";
+		}
 	case 6:
 		switch (vi.dwMinorVersion)
 		{
 		case 0:
-			return "Windows Vista/Server 2008";
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008";
 		case 1:
-			return "Windows 7/Server 2008 R2";
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2";
 		case 2:
-			return "Windows 8/Server 2012";
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012";
+		case 3:
+			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2";
 		default:
 			return "Unknown";
 		}
@@ -105,18 +124,6 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 		default:
 			return "Unknown";
 		}
-	case 4:
-		switch (vi.dwMinorVersion)
-		{
-		case 0:
-			return "Windows 95/Windows NT 4.0";
-		case 10:
-			return "Windows 98";
-		case 90:
-			return "Windows ME";
-		default:
-			return "Unknown";
-		}
 	default:
 		return "Unknown";
 	}
@@ -125,12 +132,14 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 
 std::string EnvironmentImpl::osVersionImpl()
 {
-	OSVERSIONINFO vi;
+	OSVERSIONINFOW vi;
 	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx(&vi) == 0) throw SystemException("Cannot get OS version information");
+	if (GetVersionExW(&vi) == 0) throw SystemException("Cannot get OS version information");
 	std::ostringstream str;
 	str << vi.dwMajorVersion << "." << vi.dwMinorVersion << " (Build " << (vi.dwBuildNumber & 0xFFFF);
-	if (vi.szCSDVersion[0]) str << ": " << vi.szCSDVersion;
+	std::string version;
+	UnicodeConverter::toUTF8(vi.szCSDVersion, version);
+	if (!version.empty()) str << ": " << version;
 	str << ")";
 	return str.str();
 }
@@ -168,10 +177,12 @@ std::string EnvironmentImpl::osArchitectureImpl()
 
 std::string EnvironmentImpl::nodeNameImpl()
 {
-	char name[MAX_COMPUTERNAME_LENGTH + 1];
-	DWORD size = sizeof(name);
-	if (GetComputerNameA(name, &size) == 0) throw SystemException("Cannot get computer name");
-	return std::string(name);
+	wchar_t name[MAX_COMPUTERNAME_LENGTH + 1];
+	DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
+	if (GetComputerNameW(name, &size) == 0) throw SystemException("Cannot get computer name");
+	std::string result;
+	UnicodeConverter::toUTF8(name, result);
+	return result;
 }
 
 
@@ -186,7 +197,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	// Make an initial call to GetAdaptersInfo to get
 	// the necessary size into len
 	DWORD rc = GetAdaptersInfo(pAdapterInfo, &len);
-	if (rc == ERROR_BUFFER_OVERFLOW) 
+	if (rc == ERROR_BUFFER_OVERFLOW)
 	{
 		delete [] reinterpret_cast<char*>(pAdapterInfo);
 		pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(new char[len]);
@@ -195,11 +206,11 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	{
 		return;
 	}
-	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR) 
+	if (GetAdaptersInfo(pAdapterInfo, &len) == NO_ERROR)
 	{
 		pAdapter = pAdapterInfo;
 		bool found = false;
-		while (pAdapter && !found) 
+		while (pAdapter && !found)
 		{
 			if (pAdapter->Type == MIB_IF_TYPE_ETHERNET && pAdapter->AddressLength == sizeof(id))
 			{

@@ -1,8 +1,6 @@
 //
 // POP3ClientSessionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/POP3ClientSessionTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,17 +9,19 @@
 
 
 #include "POP3ClientSessionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "DialogServer.h"
 #include "Poco/Net/POP3ClientSession.h"
 #include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/NetException.h"
 
 
 using Poco::Net::POP3ClientSession;
 using Poco::Net::MessageHeader;
 using Poco::Net::MailMessage;
+using Poco::Net::MailRecipient;
 using Poco::Net::POP3Exception;
 
 
@@ -42,7 +42,7 @@ void POP3ClientSessionTest::testLogin()
 	server.addResponse("+OK USER");
 	server.addResponse("+OK PASS");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	std::string cmd = server.popCommand();
 	assert (cmd == "USER user");
@@ -61,7 +61,7 @@ void POP3ClientSessionTest::testLoginFail()
 	server.addResponse("+OK USER");
 	server.addResponse("-ERR PASS");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	try
 	{
 		session.login("user", "secret");
@@ -82,7 +82,7 @@ void POP3ClientSessionTest::testMessageCount()
 	server.addResponse("+OK PASS");
 	server.addResponse("+OK 42 12345");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	int n = session.messageCount();
@@ -107,7 +107,7 @@ void POP3ClientSessionTest::testList()
 		".\r\n"
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	std::vector<POP3ClientSession::MessageInfo> infos;
@@ -146,7 +146,7 @@ void POP3ClientSessionTest::testRetrieveMessage()
 		".\r\n"
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	MailMessage message;
@@ -182,7 +182,7 @@ void POP3ClientSessionTest::testRetrieveHeader()
 		"."
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	MessageHeader header;
@@ -205,7 +205,7 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	server.addResponse(
 		"+OK Here comes the message\r\n"
 		"From: john.doe@no.where\r\n"
-		"To: jane.doe@no.where\r\n"
+		"To: \"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where\r\n"
 		"Subject: test\r\n"
 		"\r\n"
 		"."
@@ -213,7 +213,9 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	server.addResponse(
 		"+OK Here comes the message\r\n"
 		"From: john.doe@no.where\r\n"
-		"To: jane.doe@no.where\r\n"
+		"To: \"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where\r\n"
+		"CC: \"Homer Simpson\" <homer.simpson@no.where>, bart.simpson@no.where\r\n"
+		"BCC: lisa.simpson@no.where, Maggie Simpson <maggie.simpson@no.where>\r\n" // tolerate non-quoted real name
 		"Subject: test\r\n"
 		"\r\n"
 		"Hello Jane,\r\n"
@@ -225,7 +227,7 @@ void POP3ClientSessionTest::testRetrieveMessages()
 		"."
 	);
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	MessageHeader header;
@@ -233,13 +235,33 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	std::string cmd = server.popCommand();
 	assert (cmd == "TOP 1 0");
 	assert (header.get("From") == "john.doe@no.where");
-	assert (header.get("To") == "jane.doe@no.where");
+	assert (header.get("To") == "\"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where");
 	assert (header.get("Subject") == "test");
 
 	MailMessage message;
 	session.retrieveMessage(2, message);
 	cmd = server.popCommand();
 	assert (cmd == "RETR 2");
+	MailMessage::Recipients recipients = message.recipients();
+	assert (recipients.size() == 6);
+	assert (recipients[0].getAddress() == "jane.doe@no.where");
+	assert (recipients[0].getRealName() == "Jane Doe");
+	assert (recipients[0].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assert (recipients[1].getAddress() == "walter.foo@no.where");
+	assert (recipients[1].getRealName().empty());
+	assert (recipients[1].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assert (recipients[2].getAddress() == "homer.simpson@no.where");
+	assert (recipients[2].getRealName() == "Homer Simpson");
+	assert (recipients[2].getType() == MailRecipient::CC_RECIPIENT);
+	assert (recipients[3].getAddress() == "bart.simpson@no.where");
+	assert (recipients[3].getRealName().empty());
+	assert (recipients[3].getType() == MailRecipient::CC_RECIPIENT);
+	assert (recipients[4].getAddress() == "lisa.simpson@no.where");
+	assert (recipients[4].getRealName().empty());
+	assert (recipients[4].getType() == MailRecipient::BCC_RECIPIENT);
+	assert (recipients[5].getAddress() == "maggie.simpson@no.where");
+	assert (recipients[5].getRealName() == "Maggie Simpson");
+	assert (recipients[5].getType() == MailRecipient::BCC_RECIPIENT);
 
 	assert (message.getContent() ==
 		"Hello Jane,\r\n"
@@ -261,7 +283,7 @@ void POP3ClientSessionTest::testDeleteMessage()
 	server.addResponse("+OK PASS");
 	server.addResponse("+OK DELETED");
 	server.addResponse("+OK QUIT");
-	POP3ClientSession session("localhost", server.port());
+	POP3ClientSession session("127.0.0.1", server.port());
 	session.login("user", "secret");
 	server.clearCommands();
 	session.deleteMessage(42);

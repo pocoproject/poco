@@ -1,8 +1,6 @@
 //
 // Statement.cpp
 //
-// $Id: //poco/Main/Data/src/Statement.cpp#11 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Statement
@@ -37,10 +35,10 @@ Statement::Statement(StatementImpl::Ptr pImpl):
 }
 
 
-Statement::Statement(Session& session):
+Statement::Statement(Session& rSession):
 	_async(false)
 {
-	reset(session);
+	reset(rSession);
 }
 
 
@@ -81,21 +79,21 @@ void Statement::swap(Statement& other)
 }
 
 
-Statement& Statement::reset(Session& session)
+Statement& Statement::reset(Session& rSession)
 {
-	Statement stmt(session.createStatementImpl());
+	Statement stmt(rSession.createStatementImpl());
 	swap(stmt);
 	return *this;
 }
 
 
-std::size_t Statement::execute(bool reset)
+std::size_t Statement::execute(bool doReset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	bool isDone = done();
 	if (initialized() || paused() || isDone)
 	{
-		if (_arguments.size()) 
+		if (_arguments.size())
 		{
 			_pImpl->formatSQL(_arguments);
 			_arguments.clear();
@@ -104,34 +102,34 @@ std::size_t Statement::execute(bool reset)
 		if (!isAsync())
 		{
 			if (isDone) _pImpl->reset();
-			return _pImpl->execute(reset);
+			return _pImpl->execute(doReset);
 		}
 		else
 		{
 			doAsyncExec();
 			return 0;
 		}
-	} else
-		throw InvalidAccessException("Statement still executing.");
+	}
+	else throw InvalidAccessException("Statement still executing.");
 }
 
 
-const Statement::Result& Statement::executeAsync(bool reset)
+const Statement::Result& Statement::executeAsync(bool doReset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	if (initialized() || paused() || done())
-		return doAsyncExec(reset);
+		return doAsyncExec(doReset);
 	else
 		throw InvalidAccessException("Statement still executing.");
 }
 
 
-const Statement::Result& Statement::doAsyncExec(bool reset)
+const Statement::Result& Statement::doAsyncExec(bool doReset)
 {
 	if (done()) _pImpl->reset();
 	if (!_pAsyncExec)
 		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
-	_pResult = new Result((*_pAsyncExec)(reset));
+	_pResult = new Result((*_pAsyncExec)(doReset));
 	return *_pResult;
 }
 
@@ -254,7 +252,7 @@ Statement& Statement::operator , (const Bulk& bulk)
 	if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-	if (0 == _pImpl->extractions().size() && 
+	if (0 == _pImpl->extractions().size() &&
 		0 == _pImpl->bindings().size() &&
 		_pImpl->bulkExtractionAllowed() &&
 		_pImpl->bulkBindingAllowed())
@@ -272,8 +270,8 @@ Statement& Statement::operator , (const Bulk& bulk)
 Statement& Statement::operator , (BulkFnType)
 {
 	const Limit& limit(_pImpl->extractionLimit());
-	if (limit.isHardLimit() || 
-		limit.isLowerLimit() || 
+	if (limit.isHardLimit() ||
+		limit.isLowerLimit() ||
 		Limit::LIMIT_UNLIMITED == limit.value())
 	{
 		throw InvalidAccessException("Bulk is only allowed with limited extraction,"
@@ -290,8 +288,18 @@ Statement& Statement::operator , (BulkFnType)
 
 Session Statement::session()
 {
-	Poco::AutoPtr<SessionImpl> ps(&impl()->session(), true); 
+	Poco::AutoPtr<SessionImpl> ps(&impl()->session(), true);
 	return Session(ps);
+}
+
+
+void Statement::setTotalRowCount(const std::string& sql)
+{
+	std::size_t count;
+	session() << sql,
+		Poco::Data::Keywords::into(count),
+		Poco::Data::Keywords::now;
+	_pImpl->setTotalRowCount(count);
 }
 
 

@@ -1,8 +1,6 @@
 //
 // UUIDGeneratorTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UUIDGeneratorTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,10 +9,11 @@
 
 
 #include "UUIDGeneratorTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/UUID.h"
+#include "Poco/SHA1Engine.h"
 #include <set>
 
 
@@ -22,7 +21,7 @@ using Poco::UUIDGenerator;
 using Poco::UUID;
 
 
-UUIDGeneratorTest::UUIDGeneratorTest(const std::string& name): CppUnit::TestCase(name)
+UUIDGeneratorTest::UUIDGeneratorTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -84,6 +83,12 @@ void UUIDGeneratorTest::testNameBased()
 
 	UUID uuid6 = gen.createFromName(UUID::uri(), "http://www.appinf.com/uuid");
 	assert (uuid6 == uuid1);
+
+	Poco::SHA1Engine sha1;
+	UUID uuid7 = gen.createFromName(UUID::uri(), "http://www.appinf.com/uuid", sha1);
+	assert (uuid7.version() == UUID::UUID_NAME_BASED_SHA1);
+	assert (uuid7.variant() == 2);
+	assert (uuid7 != uuid1);
 }
 
 

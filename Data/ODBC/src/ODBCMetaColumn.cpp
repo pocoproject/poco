@@ -1,9 +1,7 @@
 //
 // ODBCMetaColumn.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/ODBCMetaColumn.cpp#5 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCMetaColumn
 //
@@ -23,14 +21,14 @@ namespace Data {
 namespace ODBC {
 
 
-ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) : 
+ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) :
 	MetaColumn(position),
 	_rStmt(rStmt)
 {
 	init();
 }
 
-	
+
 ODBCMetaColumn::~ODBCMetaColumn()
 {
 }
@@ -45,18 +43,35 @@ void ODBCMetaColumn::getDescription()
 	_columnDesc.decimalDigits = 0;
 	_columnDesc.isNullable = 0;
 
-	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt, 
+	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt,
 		(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
-		_columnDesc.name, 
+		_columnDesc.name,
 		NAME_BUFFER_LENGTH,
-		&_columnDesc.nameBufferLength, 
+		&_columnDesc.nameBufferLength,
 		&_columnDesc.dataType,
-		&_columnDesc.size, 
-		&_columnDesc.decimalDigits, 
+		&_columnDesc.size,
+		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
 		throw StatementException(_rStmt);
 	}
+}
+
+
+bool ODBCMetaColumn::isUnsigned() const
+{
+	SQLLEN val = 0;
+	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
+		(SQLUSMALLINT)position() + 1, // ODBC columns are 1-based
+		SQL_DESC_UNSIGNED,
+		0,
+		0,
+		0,
+		&val)))
+	{
+		throw StatementException(_rStmt);
+	}
+	return (val == SQL_TRUE);
 }
 
 
@@ -87,56 +102,68 @@ void ODBCMetaColumn::init()
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
+#ifdef SQL_GUID
+	case SQL_GUID:
+#endif
 		setType(MetaColumn::FDT_STRING); break;
 
 	case SQL_WCHAR:
 	case SQL_WVARCHAR:
 	case SQL_WLONGVARCHAR:
+	case -350:	// IBM DB2 CLOB, which long unicode string
 		setType(MetaColumn::FDT_WSTRING); break;
-	
+
 	case SQL_TINYINT:
-		setType(MetaColumn::FDT_INT8); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT8 : MetaColumn::FDT_INT8);
+		break;
+
 	case SQL_SMALLINT:
-		setType(MetaColumn::FDT_INT16); break;
+		setType(isUnsigned() ? MetaColumn::FDT_UINT16 : MetaColumn::FDT_INT16);
+		break;
 	
 	case SQL_INTEGER:
-		setType(MetaColumn::FDT_INT32); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT32 : MetaColumn::FDT_INT32);
+		break;
+
 	case SQL_BIGINT:
-		setType(MetaColumn::FDT_INT64); break;
-	
+		setType(isUnsigned() ? MetaColumn::FDT_UINT64 : MetaColumn::FDT_INT64);
+		break;
+
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
 		setType(MetaColumn::FDT_DOUBLE); break;
-	
+
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
-		if (0 == _columnDesc.decimalDigits)
-			setType(MetaColumn::FDT_INT32);
-		else
-			setType(MetaColumn::FDT_DOUBLE);
-		
+		// Oracle has no INTEGER type - it's essentially NUMBER with 38 whole and
+		// 0 fractional digits. It also does not recognize SQL_BIGINT type,
+		// so the workaround here is to hardcode it to 32 bit integer
+		if (0 == _columnDesc.decimalDigits) setType(MetaColumn::FDT_INT32);
+		else setType(MetaColumn::FDT_DOUBLE);
 		break;
-	
+
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
-	
+
 	case SQL_BINARY:
 	case SQL_VARBINARY:
 	case SQL_LONGVARBINARY:
 	case -98:// IBM DB2 non-standard type
+	case -370: // IBM DB2 XML, documentation advises to bind it as BLOB, not CLOB
 		setType(MetaColumn::FDT_BLOB); break;
-	
+
+	case -99: // IBM DB2 CLOB
+		setType(MetaColumn::FDT_CLOB); break;
+
 	case SQL_TYPE_DATE:
 		setType(MetaColumn::FDT_DATE); break;
 	
 	case SQL_TYPE_TIME:
 		setType(MetaColumn::FDT_TIME); break;
-	
+
 	case SQL_TYPE_TIMESTAMP:
 		setType(MetaColumn::FDT_TIMESTAMP); break;
-	
+
 	default:
 		throw DataFormatException("Unsupported data type.");
 	}

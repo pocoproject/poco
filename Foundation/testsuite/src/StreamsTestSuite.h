@@ -1,8 +1,6 @@
 //
 // StreamsTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StreamsTestSuite.h#1 $
-//
 // Definition of the StreamsTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define StreamsTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class StreamsTestSuite

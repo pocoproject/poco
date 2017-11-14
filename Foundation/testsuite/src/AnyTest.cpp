@@ -1,8 +1,6 @@
 //
 // AnyTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/AnyTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,17 +9,18 @@
 
 
 #include "AnyTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
 #include "Poco/Bugcheck.h"
 #include <vector>
 
-GCC_DIAG_OFF(unused-but-set-variable)
+
 #if defined(_MSC_VER) && _MSC_VER < 1400
 	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
 #endif
+
 
 using namespace Poco;
 
@@ -41,7 +40,7 @@ public:
 };
 
 
-AnyTest::AnyTest(const std::string& name): CppUnit::TestCase(name)
+AnyTest::AnyTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

@@ -1,8 +1,6 @@
 //
 // EventTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/EventTestSuite.h#1 $
-//
 // Definition of the EventTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define EventTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class EventTestSuite

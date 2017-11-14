@@ -1,8 +1,6 @@
 //
 // FileChannelTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileChannelTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "FileChannelTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/FileChannel.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -48,7 +46,7 @@ using Poco::DirectoryIterator;
 using Poco::InvalidArgumentException;
 
 
-FileChannelTest::FileChannelTest(const std::string& name): CppUnit::TestCase(name)
+FileChannelTest::FileChannelTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -518,6 +516,34 @@ void FileChannelTest::testPurgeCount()
 }
 
 
+void FileChannelTest::testWrongPurgeOption()
+{
+	std::string name = filename();
+	AutoPtr<FileChannel> pChannel = new FileChannel(name);
+	pChannel->setProperty(FileChannel::PROP_PURGEAGE, "5 seconds");
+
+	try
+	{
+		pChannel->setProperty(FileChannel::PROP_PURGEAGE, "peace");
+		fail("must fail");
+	} catch (InvalidArgumentException)
+	{
+		assert(pChannel->getProperty(FileChannel::PROP_PURGEAGE) == "5 seconds");
+	}
+
+	try
+	{
+		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, "peace");
+		fail("must fail");
+	} catch (InvalidArgumentException)
+	{
+		assert(pChannel->getProperty(FileChannel::PROP_PURGEAGE) == "5 seconds");
+	}
+
+	remove(name);
+}
+
+
 void FileChannelTest::setUp()
 {
 }
@@ -620,6 +646,7 @@ CppUnit::Test* FileChannelTest::suite()
 	CppUnit_addTest(pSuite, FileChannelTest, testCompress);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeAge);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeCount);
+	CppUnit_addTest(pSuite, FileChannelTest, testWrongPurgeOption);
 
 	return pSuite;
 }

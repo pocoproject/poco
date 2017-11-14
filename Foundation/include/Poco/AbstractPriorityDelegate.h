@@ -1,8 +1,6 @@
 //
 // AbstractPriorityDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AbstractPriorityDelegate.h#3 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  AbstractPriorityDelegate
@@ -27,7 +25,7 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs>
 class AbstractPriorityDelegate: public AbstractDelegate<TArgs>
 	/// Base class for PriorityDelegate and PriorityExpire.
 	///
@@ -45,7 +43,7 @@ public:
 	{
 	}
 
-	virtual ~AbstractPriorityDelegate() 
+	virtual ~AbstractPriorityDelegate()
 	{
 	}
 

@@ -1,8 +1,6 @@
 //
 // EventDispatcher.cpp
 //
-// $Id: //poco/1.4/XML/src/EventDispatcher.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMEvents
@@ -19,7 +17,7 @@
 #include "Poco/DOM/EventListener.h"
 
 
-namespace 
+namespace
 {
 	class DispatchGuard
 	{

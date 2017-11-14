@@ -1,8 +1,6 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  AsyncChannel
@@ -48,8 +46,8 @@ private:
 };
 
 
-AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio): 
-	_pChannel(pChannel), 
+AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio):
+	_pChannel(pChannel),
 	_thread("AsyncChannel")
 {
 	if (_pChannel) _pChannel->duplicate();
@@ -59,8 +57,15 @@ AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio):
 
 AsyncChannel::~AsyncChannel()
 {
-	close();
-	if (_pChannel) _pChannel->release();
+	try
+	{
+		close();
+		if (_pChannel) _pChannel->release();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -95,9 +100,9 @@ void AsyncChannel::close()
 	{
 		while (!_queue.empty()) Thread::sleep(100);
 		
-		do 
+		do
 		{
-			_queue.wakeUpAll(); 
+			_queue.wakeUpAll();
 		}
 		while (!_thread.tryJoin(100));
 	}

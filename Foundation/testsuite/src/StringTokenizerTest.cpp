@@ -1,8 +1,6 @@
 //
 // StringTokenizerTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/StringTokenizerTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,19 +9,18 @@
 #include <iostream>
 
 #include "StringTokenizerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Exception.h"
 
-GCC_DIAG_OFF(unused-variable)
 
 using Poco::StringTokenizer;
 using Poco::RangeException;
 using Poco::NotFoundException;
 
 
-StringTokenizerTest::StringTokenizerTest(const std::string& name): CppUnit::TestCase(name)
+StringTokenizerTest::StringTokenizerTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -327,6 +324,13 @@ void StringTokenizerTest::testStringTokenizer()
 		assert (st.find("2") == 1);
 		assert (st.find("3") == 2);
 	}
+	
+	{
+		Poco::StringTokenizer st(" 2- ","-", Poco::StringTokenizer::TOK_TRIM);
+		assert (st.count() == 2);
+		assert (st[0] == "2");
+		assert (st[1] == "");
+	}
 }
 
 
@@ -374,14 +378,14 @@ void StringTokenizerTest::testFind()
 
 	try
 	{
-		std::size_t p = st.find("4"); 
+		std::size_t p = st.find("4");
 		fail ("must fail");
 	}
 	catch (NotFoundException&) { }
 
 	try
 	{
-		std::string s = st[8]; 
+		std::string s = st[8];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }

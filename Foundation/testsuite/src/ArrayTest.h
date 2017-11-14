@@ -1,8 +1,6 @@
 //
 // ArrayTest.h
 //
-// $Id: //poco/svn/Foundation/testsuite/src/ArrayTest.h#2 $
-//
 // Definition of the ArrayTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class ArrayTest: public CppUnit::TestCase

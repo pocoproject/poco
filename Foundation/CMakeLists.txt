@@ -1,4 +1,5 @@
-set(LIBNAME "PocoFoundation")
+set(LIBNAME "Foundation")
+set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
@@ -9,21 +10,24 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 # Platform Specific
-POCO_SOURCES_AUTO_PLAT( SRCS OPENVMS src/OpcomChannel.cpp )
-POCO_HEADERS_AUTO( SRCS include/Poco/OpcomChannel.h )
-
 POCO_SOURCES_AUTO_PLAT( SRCS UNIX src/SyslogChannel.cpp )
 POCO_HEADERS_AUTO( SRCS include/Poco/SyslogChannel.h )
 
-POCO_SOURCES_AUTO_PLAT( SRCS WIN32
-    src/WindowsConsoleChannel.cpp
-    src/EventLogChannel.cpp
-    )
+POCO_SOURCES_AUTO_PLAT( SRCS ANDROID src/AndroidLogChannel.cpp )
+POCO_HEADERS_AUTO( SRCS include/Poco/AndroidLogChannel.h )
 
-POCO_HEADERS_AUTO( SRCS
-    include/Poco/WindowsConsoleChannel.h
-    include/Poco/EventLogChannel.h
-    )
+# For Windows CE we need to disable these
+if(WINCE)
+POCO_SOURCES_AUTO_PLAT( SRCS OFF
+	src/WindowsConsoleChannel.cpp
+	src/EventLogChannel.cpp
+	)
+else()
+POCO_SOURCES_AUTO_PLAT( SRCS WIN32
+	src/WindowsConsoleChannel.cpp
+	src/EventLogChannel.cpp
+	)
+endif()
 
 # Messages
 POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
@@ -31,90 +35,155 @@ POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
-    find_package(PCRE REQUIRED)
-    set(SYSLIBS ${SYSLIBS} ${PCRE_LIBRARIES})
-    include_directories(${PCRE_INCLUDE_DIRS})
+	find_package(PCRE REQUIRED)
+	set(SYSLIBS ${SYSLIBS} ${PCRE_LIBRARIES})
+	include_directories(${PCRE_INCLUDE_DIRS})
 
-    #HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
-    POCO_SOURCES( SRCS RegExp
-        src/pcre_ucd.c
-        src/pcre_tables.c
-    )
+	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
+	POCO_SOURCES( SRCS RegExp
+		src/pcre_ucd.c
+		src/pcre_tables.c
+	)
 
-    find_package(ZLIB REQUIRED)
-    set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-    include_directories(${ZLIB_INCLUDE_DIRS})
+	find_package(ZLIB REQUIRED)
+	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
+	include_directories(${ZLIB_INCLUDE_DIRS})
 else()
-    # pcre
-    POCO_SOURCES( SRCS pcre
-        src/pcre_chartables.c
-        src/pcre_compile.c
-        src/pcre_exec.c
-        src/pcre_fullinfo.c
-        src/pcre_globals.c
-        src/pcre_maketables.c
-        src/pcre_newline.c
-        src/pcre_ord2utf8.c
-        src/pcre_study.c
-        src/pcre_tables.c
-        src/pcre_try_flipped.c
-        src/pcre_ucd.c
-        src/pcre_valid_utf8.c
-        src/pcre_xclass.c
-    )
+	# pcre
+	POCO_SOURCES( SRCS pcre
+		src/pcre_config.c
+		src/pcre_byte_order.c
+		src/pcre_chartables.c
+		src/pcre_compile.c
+		src/pcre_exec.c
+		src/pcre_fullinfo.c
+		src/pcre_globals.c
+		src/pcre_maketables.c
+		src/pcre_newline.c
+		src/pcre_ord2utf8.c
+		src/pcre_study.c
+		src/pcre_tables.c
+		src/pcre_dfa_exec.c
+		src/pcre_get.c
+		src/pcre_jit_compile.c
+		src/pcre_refcount.c
+		src/pcre_string_utils.c
+		src/pcre_version.c
+		src/pcre_ucd.c
+		src/pcre_valid_utf8.c
+		src/pcre_xclass.c
+	)
 
-    # zlib
-    POCO_HEADERS( SRCS zlib
-        include/Poco/zconf.h
-        include/Poco/zlib.h
-        )
+	# zlib
+	POCO_HEADERS( SRCS zlib
+		include/Poco/zconf.h
+		include/Poco/zlib.h
+		)
 
-    POCO_SOURCES( SRCS zlib
-        src/adler32.c
-        src/compress.c
-        src/crc32.c
-        src/deflate.c
-        src/infback.c
-        src/inffast.c
-        src/inflate.c
-        src/inftrees.c
-        src/trees.c
-        src/zutil.c
-    )
+	POCO_SOURCES( SRCS zlib
+		src/adler32.c
+		src/compress.c
+		src/crc32.c
+		src/deflate.c
+		src/infback.c
+		src/inffast.c
+		src/inflate.c
+		src/inftrees.c
+		src/trees.c
+		src/zutil.c
+	)
 endif (POCO_UNBUNDLED)
 
-if(CMAKE_SYSTEM MATCHES "Windows")
-    add_definitions( -DPCRE_STATIC)
-    set(SYSLIBS ${SYSLIBS} iphlpapi)
-else (CMAKE_SYSTEM MATCHES "Windows")
-    add_definitions( -DPCRE_STATIC)
-endif(CMAKE_SYSTEM MATCHES "Windows")
-
-add_library( ${LIBNAME} ${LIB_MODE} ${SRCS}) 
-set_target_properties( ${LIBNAME} 
-    PROPERTIES
-    VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    DEFINE_SYMBOL Foundation_EXPORTS)
+if(WIN32)
+	set(SYSLIBS ${SYSLIBS} iphlpapi)
+endif(WIN32)
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-    set_target_properties( ${LIBNAME} PROPERTIES LINK_FLAGS "-library=stlport4")
+	set_target_properties( "${LIBNAME}" PROPERTIES LINK_FLAGS "-library=stlport4")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-target_link_libraries( ${LIBNAME} ${SYSLIBS})
 
-install(
-    DIRECTORY include/Poco
-    DESTINATION include
-    PATTERN ".svn" EXCLUDE
-    )
+if(ANDROID)
+	set(SYSLIBS ${SYSLIBS} log)
+endif(ANDROID)
 
-install(
-    TARGETS ${LIBNAME}
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    ARCHIVE DESTINATION lib${LIB_SUFFIX}
-    RUNTIME DESTINATION bin
-    )
+if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	set(SYSLIBS ${SYSLIBS} dl rt)
+endif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+
+# TODO: Why is this here?
+add_definitions( -DPCRE_STATIC)
+
+# For POSIX threads on Unix
+if(UNIX AND NOT APPLE)
+	# We still need pthreads on Unix
+	set(SYSLIBS ${SYSLIBS} ${CMAKE_THREAD_LIBS_INIT})
+	INCLUDE (CheckFunctionExists)
+	INCLUDE (CheckCXXSourceCompiles)
+	INCLUDE (CheckLibraryExists)
+	CHECK_LIBRARY_EXISTS(pthread pthread_setaffinity_np "pthread.h" HAVE_PTHREAD_SETAFFINITY_NP)
+	if(NOT HAVE_PTHREAD_SETAFFINITY_NP)
+        if(POCO_VERBOSE_MESSAGES)
+            message(STATUS "Platform has not PTHREAD_SETAFFINITY_NP")
+        endif()
+	else(HAVE_PTHREAD_SETAFFINITY_NP)
+		add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
+		CHECK_CXX_SOURCE_COMPILES("
+		#include <sched.h>
+		int main() {
+			cpu_set_t cpumask;
+			sched_setaffinity( 0, sizeof(cpumask), &cpumask );
+			return 0;
+		}" HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+
+		if(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+            if(POCO_VERBOSE_MESSAGES)
+                message(STATUS "Platform has THREE PARAM at PTHREAD_SETAFFINITY_NP")
+            endif()
+			add_definitions(-DHAVE_THREE_PARAM_SCHED_SETAFFINITY)
+		else(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+			CHECK_CXX_SOURCE_COMPILES("
+			#include <sched.h>
+			int main() {
+				cpu_set_t cpumask;
+				sched_setaffinity( 0, &cpumask );
+				return 0;
+			}" HAVE_TWO_PARAM_SCHED_SETAFFINITY)
+
+			if(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
+                if(POCO_VERBOSE_MESSAGES)
+                    message(STATUS "Platform has TWO PARAM at PTHREAD_SETAFFINITY_NP")
+                endif()
+				add_definitions(-DHAVE_TWO_PARAM_SCHED_SETAFFINITY)
+			endif(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
+
+		endif(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
+	endif(NOT HAVE_PTHREAD_SETAFFINITY_NP)
+endif(UNIX AND NOT APPLE)
+
+add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS})
+add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+set_target_properties( "${LIBNAME}"
+	PROPERTIES
+	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+	OUTPUT_NAME ${POCO_LIBNAME}
+	DEFINE_SYMBOL Foundation_EXPORTS
+	)
+
+target_link_libraries( "${LIBNAME}" ${SYSLIBS})
+target_include_directories( "${LIBNAME}"
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+	)
+target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+
+POCO_INSTALL("${LIBNAME}")
+POCO_GENERATE_PACKAGE("${LIBNAME}")
 
 if (ENABLE_TESTS)
-    add_subdirectory( samples )
-    add_subdirectory( testsuite )
+	add_subdirectory( testsuite )
+endif ()
+if (ENABLE_SAMPLES)
+	add_subdirectory( samples )
 endif ()
 

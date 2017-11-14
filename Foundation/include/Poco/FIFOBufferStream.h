@@ -1,8 +1,6 @@
 //
 // FIFOBufferStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOBufferStream.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FIFOBufferStream
@@ -42,10 +40,10 @@ public:
 	explicit FIFOBufferStreamBuf(FIFOBuffer& fifoBuffer);
 		/// Creates a FIFOBufferStreamBuf and assigns the given buffer to it.
 
-	explicit FIFOBufferStreamBuf(char* pBuffer, std::size_t length);
+	FIFOBufferStreamBuf(char* pBuffer, std::size_t length);
 		/// Creates a FIFOBufferStreamBuf and assigns the given buffer to it.
 
-	explicit FIFOBufferStreamBuf(const char* pBuffer, std::size_t length);
+	FIFOBufferStreamBuf(const char* pBuffer, std::size_t length);
 		/// Creates a FIFOBufferStreamBuf and assigns the given buffer to it.
 
 	explicit FIFOBufferStreamBuf(std::size_t length);
@@ -62,7 +60,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -83,10 +81,10 @@ public:
 	explicit FIFOIOS(FIFOBuffer& buffer);
 		/// Creates a FIFOIOS and assigns the given buffer to it.
 
-	explicit FIFOIOS(char* pBuffer, std::size_t length);
+	FIFOIOS(char* pBuffer, std::size_t length);
 		/// Creates a FIFOIOS and assigns the given buffer to it.
 
-	explicit FIFOIOS(const char* pBuffer, std::size_t length);
+	FIFOIOS(const char* pBuffer, std::size_t length);
 		/// Creates a FIFOIOS and assigns the given buffer to it.
 
 	explicit FIFOIOS(std::size_t length);
@@ -118,10 +116,10 @@ public:
 	explicit FIFOBufferStream(FIFOBuffer& buffer);
 		/// Creates the FIFOBufferStream with supplied buffer as initial value.
 
-	explicit FIFOBufferStream(char* pBuffer, std::size_t length);
+	FIFOBufferStream(char* pBuffer, std::size_t length);
 		/// Creates a FIFOBufferStream and assigns the given buffer to it.
 
-	explicit FIFOBufferStream(const char* pBuffer, std::size_t length);
+	FIFOBufferStream(const char* pBuffer, std::size_t length);
 		/// Creates a FIFOBufferStream and assigns the given buffer to it.
 
 	explicit FIFOBufferStream(std::size_t length);

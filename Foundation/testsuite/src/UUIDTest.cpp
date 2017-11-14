@@ -1,8 +1,6 @@
 //
 // UUIDTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UUIDTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,15 +9,16 @@
 
 
 #include "UUIDTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/UUID.h"
+#include "Poco/Exception.h"
 
 
 using Poco::UUID;
 
 
-UUIDTest::UUIDTest(const std::string& name): CppUnit::TestCase(name)
+UUIDTest::UUIDTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -39,6 +38,78 @@ void UUIDTest::testParse()
 
 	uuid.parse("6BA7B8109DAD11D180B400C04FD430C8");
 	assert (uuid.toString() == "6ba7b810-9dad-11d1-80b4-00c04fd430c8");	
+
+	try
+	{
+		uuid.parse("6xA7B8109DAD11D180B400C04FD430C8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6xa7b810-9dad-11d1-80b4-00c04fd430c8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b810-xdad-11d1-80b4-00c04fd430c8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b810-9dad-x1d1-80b4-00c04fd430c8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b810-9dad-11d1-x0b4-00c04fd430c8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b810-9dad-11d1-80b4-00x04fd430c8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b8109dad11d180b400c04fd430c81234");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b810-9dad-11d1-80b4-00c04fd430c81234");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
 }
 
 

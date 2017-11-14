@@ -1,8 +1,6 @@
 //
 // NameValueCollectionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/NameValueCollectionTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "NameValueCollectionTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Exception.h"
 

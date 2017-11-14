@@ -1,10 +1,8 @@
 //
 // SessionPoolContainer.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SessionPoolContainer.h#4 $
-//
 // Library: Data
-// Package: SessionPoolContainering
+// Package: SessionPooling
 // Module:  SessionPoolContainer
 //
 // Definition of the SessionPoolContainer class.
@@ -45,10 +43,10 @@ public:
 		/// Adds existing session pool to the container.
 		/// Throws SessionPoolExistsException if pool already exists.
 
-	Session add(const std::string& sessionKey, 
+	Session add(const std::string& sessionKey,
 		const std::string& connectionString,
-		int minSessions = 1, 
-		int maxSessions = 32, 
+		int minSessions = 1,
+		int maxSessions = 32,
 		int idleTime = 60);
 		/// Adds a new session pool to the container and returns a Session from
 		/// newly created pool. If pool already exists, request to add is silently
@@ -60,7 +58,7 @@ public:
 	bool isActive(const std::string& sessionKey,
 		const std::string& connectionString = "") const;
 		/// Returns true if the session is active (i.e. not shut down).
-		/// If connectionString is empty string, sessionKey must be a 
+		/// If connectionString is empty string, sessionKey must be a
 		/// fully qualified session name as registered with the pool
 		/// container.
 

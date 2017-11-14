@@ -1,8 +1,6 @@
 //
 // LRUStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LRUStrategy.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  LRUStrategy
@@ -46,7 +44,7 @@ public:
 	typedef typename KeyIndex::const_iterator ConstIndexIterator;
 
 public:
-	LRUStrategy(std::size_t size): 
+	LRUStrategy(std::size_t size):
 		_size(size)
 	{
 		if (_size < 1) throw InvalidArgumentException("size must be > 0");
@@ -119,7 +117,7 @@ public:
 		Iterator it = --_keys.end(); //--keys can never be invoked on an empty list due to the minSize==1 requirement of LRU
 		std::size_t i = 0;
 
-		while (i++ < diff) 
+		while (i++ < diff)
 		{
 			elemsToRemove.insert(*it);
 			if (it != _keys.begin())

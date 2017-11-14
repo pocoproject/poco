@@ -1,8 +1,6 @@
 //
 // TestCaller.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestCaller.h#1 $
-//
 
 
 #ifndef CppUnit_TestCaller_INCLUDED
@@ -56,8 +54,8 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& name, TestMethod test): 
-		TestCase(name), 
+	TestCaller(const std::string& name, TestMethod test):
+		TestCase(name),
 		_test(test),
 		_fixture(new Fixture(name))
 	{
@@ -80,8 +78,8 @@ protected:
 	}
 
 private:
-	TestMethod             _test;
-	std::auto_ptr<Fixture> _fixture;
+	TestMethod               _test;
+	std::unique_ptr<Fixture> _fixture;
 };
 
 

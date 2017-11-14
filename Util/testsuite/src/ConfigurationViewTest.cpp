@@ -1,8 +1,6 @@
 //
 // ConfigurationViewTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/ConfigurationViewTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "ConfigurationViewTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"

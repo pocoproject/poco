@@ -1,8 +1,6 @@
 //
 // WinTestRunner.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/include/WinTestRunner/WinTestRunner.h#1 $
-//
 // Application shell for CppUnit's TestRunner dialog.
 //
 
@@ -22,7 +20,7 @@
 #endif
 
 
-#include "CppUnit/CppUnit.h"
+#include "Poco/CppUnit/CppUnit.h"
 #include <vector>
 #include <afxwin.h>
 

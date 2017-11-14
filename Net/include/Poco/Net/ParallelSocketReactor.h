@@ -1,8 +1,6 @@
 //
 // ParallelSocketReactor.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ParallelSocketReactor.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  ParallelSocketReactor
@@ -63,8 +61,15 @@ public:
 	
 	~ParallelSocketReactor()
 	{
-		this->stop();
-		_thread.join();
+		try
+		{
+			this->stop();
+			_thread.join();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 	
 protected:

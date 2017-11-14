@@ -1,8 +1,6 @@
 //
 // DigestEngineTest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/DigestEngineTest.cpp#1 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "DigestEngineTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/DigestEngine.h"
 
 

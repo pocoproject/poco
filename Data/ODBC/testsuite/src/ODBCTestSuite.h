@@ -1,8 +1,6 @@
 //
 // ODBCTestSuite.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCTestSuite.h#4 $
-//
 // Definition of the ODBCTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define ODBCTestSuite_INCLUDED
 
 
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 class ODBCTestSuite

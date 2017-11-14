@@ -1,8 +1,6 @@
 //
 // Image.cpp
 //
-// $Id: //poco/Main/PDF/src/Image.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Image
@@ -21,7 +19,7 @@ namespace Poco {
 namespace PDF {
 
 
-Image::Image(HPDF_Doc* pPDF, const HPDF_Image& resource, const std::string& name): 
+Image::Image(HPDF_Doc* pPDF, const HPDF_Image& resource, const std::string& name):
 	Resource<HPDF_Image>(pPDF, resource, name)
 {
 }

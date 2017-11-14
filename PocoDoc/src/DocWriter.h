@@ -1,8 +1,6 @@
 //
 // DocWriter.h
 //
-// $Id: //poco/1.4/PocoDoc/src/DocWriter.h#1 $
-//
 // Definition of the DocWriter class.
 //
 // Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
@@ -108,10 +106,8 @@ protected:
 	void writeClass(const Poco::CppParser::Struct* pStruct);
 	void writeNameSpace(const Poco::CppParser::NameSpace* pNameSpace);
 	
-	void writeOverview();
-	void writeIndex();
-	void writeNameSpaceIndex(const Poco::CppParser::NameSpace* pNameSpace);
-	void writePackageIndex(const std::string& file, const std::string& library, const std::string& package);
+	void writeNavigation();
+	void writePackage(const std::string& file, const std::string& library, const std::string& package);
 
 	std::string pathFor(const std::string& file);
 	static std::string fileNameFor(const Poco::CppParser::Symbol* pNameSpace);
@@ -121,7 +117,8 @@ protected:
 	static std::string headerFor(const Poco::CppParser::Symbol* pSymbol);
 	static std::string titleFor(const Poco::CppParser::Symbol* pSymbol);
 
-	void writeHeader(std::ostream& ostr, const std::string& title);
+	void writeHeader(std::ostream& ostr, const std::string& title, const std::string& extraScript = "");
+	void writeNavigationFrame(std::ostream& ostr, const std::string& group, const std::string& item);
 	static void writeFooter(std::ostream& ostr);
 	void writeCopyright(std::ostream& ostr);
 	static void writeTitle(std::ostream& ostr, const std::string& category, const std::string& title);
@@ -129,6 +126,8 @@ protected:
 	static void writeSubTitle(std::ostream& ostr, const std::string& title);
 	static void beginBody(std::ostream& ostr);
 	static void endBody(std::ostream& ostr);
+	static void beginContent(std::ostream& ostr);
+	static void endContent(std::ostream& ostr);
 	void writeDescription(std::ostream& ostr, const std::string& text);
 	void writeDescriptionLine(std::ostream& ostr, const std::string& text, TextState& state);
 	void writeSummary(std::ostream& ostr, const std::string& text, const std::string& uri);
@@ -190,7 +189,10 @@ protected:
 	static Poco::Logger& logger();
 	
 	static const std::string RFC_URI;
-	
+	static const std::string nbsp;
+	static const std::string copy;
+	static const std::string mdash;
+
 private:	
 	bool _prettifyCode;
 	bool _noFrames;

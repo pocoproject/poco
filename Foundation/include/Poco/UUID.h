@@ -1,8 +1,6 @@
 //
 // UUID.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UUID.h#2 $
-//
 // Library: Foundation
 // Package: UUID
 // Module:  UUID
@@ -39,17 +37,19 @@ class Foundation_API UUID
 	/// as specified in Appendix A of the DCE 1.1 Remote Procedure
 	/// Call Specification (http://www.opengroup.org/onlinepubs/9629399/),
 	/// RFC 2518 (WebDAV), section 6.4.1 and the UUIDs and GUIDs internet
-	/// draft by Leach/Salz from February, 1998 
+	/// draft by Leach/Salz from February, 1998
 	/// (http://www.ics.uci.edu/~ejw/authoring/uuid-guid/draft-leach-uuids-guids-01.txt)
 	/// and also http://tools.ietf.org/html/draft-mealling-uuid-urn-05
 {
 public:
 	enum Version
 	{
-		UUID_TIME_BASED = 0x01,
-		UUID_DCE_UID    = 0x02,
-		UUID_NAME_BASED = 0x03,
-		UUID_RANDOM     = 0x04
+		UUID_TIME_BASED      = 0x01,
+		UUID_DCE_UID         = 0x02,
+		UUID_NAME_BASED      = 0x03,
+		UUID_RANDOM          = 0x04,
+		UUID_NAME_BASED_SHA1 = 0x05
+		
 	};
 
 	UUID();
@@ -79,7 +79,7 @@ public:
 	bool tryParse(const std::string& uuid);
 		/// Tries to interpret the given string as an UUID.
 		/// If the UUID is syntactically valid, assigns the
-		/// members and returns true. Otherwise leaves the 
+		/// members and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
 	std::string toString() const;
@@ -141,7 +141,7 @@ protected:
 	static void appendHex(std::string& str, UInt8 n);
 	static void appendHex(std::string& str, UInt16 n);
 	static void appendHex(std::string& str, UInt32 n);
-	static UInt8 nibble(char hex);
+	static Int16 nibble(char hex);
 	void fromNetwork();
 	void toNetwork();
 

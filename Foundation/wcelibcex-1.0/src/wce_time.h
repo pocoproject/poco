@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -93,8 +93,8 @@ struct timezone
 
 /* tm struct members conversion units */
 #define TM_YEAR_BASE    1900    /* tm_year base year */
-#define TM_MONTH_MIN    0       /* tm_mon = 0 - January */ 
-#define TM_MONTH_MAX    11      /* tm_mon = 11 - December */ 
+#define TM_MONTH_MIN    0       /* tm_mon = 0 - January */
+#define TM_MONTH_MAX    11      /* tm_mon = 11 - December */
 
 #define MIN_SEC         60                  /* seconds in a minute */
 #define HOUR_SEC        3600                /* seconds in an hour */
@@ -142,7 +142,7 @@ int wceex_gettimeofday(struct timeval *tp, struct timezone *tzp);
 /*******************************************************************************
     Internal functions prototypes.
 *******************************************************************************/
- 
+
 /* Internal function to get time value from tm struc. */
 extern time_t __wceex_mktime_utc(struct tm *tmbuff);
 

@@ -1,8 +1,6 @@
 //
 // Platform_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform_VX.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform
@@ -21,9 +19,9 @@
 #define Foundation_Platform_VX_INCLUDED
 
 
-#define POCO_NO_SYS_SELECT_H 
+#define POCO_NO_SYS_SELECT_H
 #define POCO_NO_FPENVIRONMENT
-#define POCO_NO_WSTRING 
+#define POCO_NO_WSTRING
 #define POCO_NO_SHAREDMEMORY
 #define POCO_NO_SYSLOGCHANNEL
 

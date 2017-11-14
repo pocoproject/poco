@@ -1,8 +1,6 @@
 //
 // HTTPSessionInstantiator.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSessionInstantiator.cpp#1 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPSessionInstantiator
@@ -41,8 +39,11 @@ HTTPClientSession* HTTPSessionInstantiator::createClientSession(const Poco::URI&
 {
 	poco_assert (uri.getScheme() == "http");
 	HTTPClientSession* pSession = new HTTPClientSession(uri.getHost(), uri.getPort());
-	pSession->setProxy(proxyHost(), proxyPort());
-	pSession->setProxyCredentials(proxyUsername(), proxyPassword());
+	if (!proxyHost().empty())
+	{
+		pSession->setProxy(proxyHost(), proxyPort());
+		pSession->setProxyCredentials(proxyUsername(), proxyPassword());
+	}
 	return pSession;
 }
 

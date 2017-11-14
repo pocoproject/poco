@@ -1,9 +1,7 @@
 //
 // SQLite.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/SQLite.h#3 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLite
 //
@@ -30,7 +28,7 @@
 // from a DLL simpler. All files within this DLL are compiled with the SQLite_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// SQLite_API functions as being imported from a DLL, wheras this DLL sees symbols
+// SQLite_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)

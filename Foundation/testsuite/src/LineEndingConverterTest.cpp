@@ -1,8 +1,6 @@
 //
 // LineEndingConverterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LineEndingConverterTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,8 +9,8 @@
 
 
 #include "LineEndingConverterTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/LineEndingConverter.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -24,7 +22,7 @@ using Poco::OutputLineEndingConverter;
 using Poco::StreamCopier;
 
 
-LineEndingConverterTest::LineEndingConverterTest(const std::string& name): CppUnit::TestCase(name)
+LineEndingConverterTest::LineEndingConverterTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

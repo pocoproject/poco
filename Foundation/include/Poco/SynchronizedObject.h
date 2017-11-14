@@ -1,8 +1,6 @@
 //
 // SynchronizedObject.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SynchronizedObject.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  SynchronizedObject
@@ -57,8 +55,8 @@ public:
 		/// other threads.
 		
 	void notify() const;
-		/// Signals the object. 
-		/// Exactly only one thread waiting for the object 
+		/// Signals the object.
+		/// Exactly only one thread waiting for the object
 		/// can resume execution.
 
 	void wait() const;

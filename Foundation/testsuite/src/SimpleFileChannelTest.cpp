@@ -1,8 +1,6 @@
 //
 // SimpleFileChannelTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SimpleFileChannelTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -19,8 +17,8 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/AutoPtr.h"
 #include "SimpleFileChannelTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 
 
 using Poco::SimpleFileChannel;
@@ -33,7 +31,7 @@ using Poco::DateTimeFormatter;
 using Poco::AutoPtr;
 
 
-SimpleFileChannelTest::SimpleFileChannelTest(const std::string& name): CppUnit::TestCase(name)
+SimpleFileChannelTest::SimpleFileChannelTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 

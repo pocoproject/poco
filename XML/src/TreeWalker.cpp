@@ -1,8 +1,6 @@
 //
 // TreeWalker.cpp
 //
-// $Id: //poco/1.4/XML/src/TreeWalker.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  TreeWalker
@@ -163,30 +161,30 @@ int TreeWalker::accept(Node* pNode) const
 	bool accept = false;
 	switch (pNode->nodeType())
 	{
-	case Node::ELEMENT_NODE: 
+	case Node::ELEMENT_NODE:
 		accept = (_whatToShow & NodeFilter::SHOW_ELEMENT) != 0; break;
 	case Node::ATTRIBUTE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break;
 	case Node::TEXT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break;
 	case Node::CDATA_SECTION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break;
 	case Node::ENTITY_REFERENCE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break;
 	case Node::ENTITY_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break;
 	case Node::PROCESSING_INSTRUCTION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break;
 	case Node::COMMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break;
 	case Node::DOCUMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break;
 	case Node::DOCUMENT_TYPE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break;
 	case Node::DOCUMENT_FRAGMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break;
 	case Node::NOTATION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break;
 	}
 	if (accept && _pFilter)
 		return _pFilter->acceptNode(pNode);

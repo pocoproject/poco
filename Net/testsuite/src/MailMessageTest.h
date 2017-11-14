@@ -1,8 +1,6 @@
 //
 // MailMessageTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/MailMessageTest.h#1 $
-//
 // Definition of the MailMessageTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -17,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 
 
 class MailMessageTest: public CppUnit::TestCase
@@ -34,11 +32,14 @@ public:
 	void testReadWriteMultiPart();
 	void testReadWriteMultiPartStore();
 	void testReadDefaultTransferEncoding();
+	void testReadDefaultContentType();
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();
+	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testEncodeWord();
+	void testDecodeWord();
 
 	void setUp();
 	void tearDown();

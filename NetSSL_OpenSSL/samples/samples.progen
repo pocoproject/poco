@@ -4,4 +4,5 @@ vc.solution.create = true
 vc.solution.include = \
 	download\\download;\
 	HTTPSTimeServer\\HTTPSTimeServer;\
-	Mail\\Mail
+	Mail\\Mail;\
+	TwitterClient\\TwitterClient

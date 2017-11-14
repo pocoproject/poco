@@ -1,8 +1,6 @@
 //
 // HTTPResponseTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPResponseTest.cpp#2 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -11,14 +9,13 @@
 
 
 #include "HTTPResponseTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/NetException.h"
 #include <sstream>
 
-GCC_DIAG_OFF(parentheses)
 
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
@@ -199,8 +196,8 @@ void HTTPResponseTest::testCookies()
 	cookies.clear();
 	response2.getCookies(cookies);
 	assert (cookies.size() == 2);
-	assert (cookies[0].getName() == "name1" && cookies[1].getName() == "name2" 
-	     || cookies[0].getName() == "name2" && cookies[1].getName() == "name1"); 
+	assert (cookies[0].getName() == "name1" && cookies[1].getName() == "name2"
+	     || cookies[0].getName() == "name2" && cookies[1].getName() == "name1");
 }
 
 

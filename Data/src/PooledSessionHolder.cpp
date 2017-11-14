@@ -1,8 +1,6 @@
 //
 // PooledSessionHolder.cpp
 //
-// $Id: //poco/Main/Data/src/PooledSessionHolder.cpp#1 $
-//
 // Library: Data
 // Package: SessionPooling
 // Module:  PooledSessionHolder
@@ -21,8 +19,8 @@ namespace Poco {
 namespace Data {
 
 
-PooledSessionHolder::PooledSessionHolder(SessionPool& owner, SessionImpl* pSessionImpl):
-	_owner(owner),
+PooledSessionHolder::PooledSessionHolder(SessionPool& rOwner, SessionImpl* pSessionImpl):
+	_owner(rOwner),
 	_pImpl(pSessionImpl, true)
 {
 }

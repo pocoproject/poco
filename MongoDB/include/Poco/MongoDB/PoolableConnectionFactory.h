@@ -1,8 +1,6 @@
 //
 // PoolableConnectionFactory.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  PoolableConnectionFactory
@@ -30,21 +28,35 @@ namespace Poco {
 template<>
 class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 	/// PoolableObjectFactory specialisation for Connection. New connections
-	/// are created with the given address.
+	/// are created with the given address or URI.
+	///
+	/// If a Connection::SocketFactory is given, it must live for the entire
+	/// lifetime of the PoolableObjectFactory.
 {
 public:
-	PoolableObjectFactory(Net::SocketAddress& address)
-		: _address(address)
+	PoolableObjectFactory(Net::SocketAddress& address):
+		_address(address),
+		_pSocketFactory(0)
 	{
 	}
 
-	PoolableObjectFactory(const std::string& address)
-		: _address(address)
+	PoolableObjectFactory(const std::string& address):
+		_address(address),
+		_pSocketFactory(0)
+	{
+	}
+
+	PoolableObjectFactory(const std::string& uri, MongoDB::Connection::SocketFactory& socketFactory):
+		_uri(uri),
+		_pSocketFactory(&socketFactory)
 	{
 	}
 
 	MongoDB::Connection::Ptr createObject()
 	{
+		if (_pSocketFactory)
+			return new MongoDB::Connection(_uri, *_pSocketFactory);
+		else
 		return new MongoDB::Connection(_address);
 	}
 	
@@ -67,6 +79,8 @@ public:
 
 private:
 	Net::SocketAddress _address;
+	std::string _uri;
+	MongoDB::Connection::SocketFactory* _pSocketFactory;
 };
 
 
@@ -84,7 +98,17 @@ public:
 
 	virtual ~PooledConnection()
 	{
-		_pool.returnObject(_connection);
+		try
+		{
+			if (_connection)
+			{
+				_pool.returnObject(_connection);
+			}
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	operator Connection::Ptr ()
@@ -92,14 +116,21 @@ public:
 		return _connection;
 	}
 
+	PooledConnection(const PooledConnection&) = delete;
+	PooledConnection& operator=(const PooledConnection&) = delete;
+
+	PooledConnection(PooledConnection&& other) = default;
+	PooledConnection& operator=(PooledConnection&&) = default;
+
+
 private:
+
 	Poco::ObjectPool<Connection, Connection::Ptr>& _pool;
 	Connection::Ptr _connection;
 };
 
 
-} // namespace MongoDB
-} // namespace Poco
+} } // namespace Poco::MongoDB
 
 
-#endif //MongoDB_PoolableConnectionFactory_INCLUDED
+#endif // MongoDB_PoolableConnectionFactory_INCLUDED
