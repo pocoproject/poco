@@ -222,8 +222,10 @@ namespace
 				case 's':
 					if (itVal->type() == typeid(std::string))
 						str << RefAnyCast<std::string>(*itVal++);
-					else
+					else if (itVal->type() == typeid(const char *))
 						str << AnyCast<const char *>(*itVal++);
+					else
+						str << AnyCast<char *>(*itVal++);
 					break;
 				case 'z':
 					str << AnyCast<std::size_t>(*itVal++);

@@ -415,6 +415,11 @@ void FormatTest::testString()
 
 	s = format("%s", foo.c_str());
 	assert (s == "foo");
+
+	char bar[] = "bar";
+	// s = format("%s", bar);	// compile error: array used as initializer
+	s = format("%s", +bar);
+	assert (s == "bar");
 }
 
 
