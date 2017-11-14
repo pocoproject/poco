@@ -742,14 +742,6 @@ subprojects {
 		args test
 	}
 }
-task pocos() {
-		def Set<Task> tts = project.getTasksByName('poco', true)
-		setDependsOn(tts)
-}
-task tests() {
-		def Set<Task> tts = project.getTasksByName('testsuite', true)
-		setDependsOn(tts)
-}
 task PocoDocIni {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
@@ -807,7 +799,8 @@ task zipDoc(type: Zip) {
 
 def candle(VSYEAR, VERSION, target, os) {
 	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
-		dependsOn ':pocos'
+		def Set<Task> pocos = project.getTasksByName('poco', true)
+		setDependsOn(pocos)
 		dependsOn ':pocoDoc'
 		workingDir "packaging/Windows/WiX"
 
@@ -865,7 +858,8 @@ task wix() {
 }
 task nuget(type: Exec) {
 	String nugetVersion = version.replace('p', '-')
-	dependsOn ':pocos'
+	def Set<Task> pocos = project.getTasksByName('poco', true)
+	setDependsOn(pocos)
 	workingDir "packaging/Windows/NuGet"
 
 	executable "${NuGetHome}/NuGet.exe"
@@ -893,12 +887,16 @@ task packaging() {
 		dependsOn wix
 	}
 }
-def cover(os, Module) {
+def cover(os, Directory, Module) {
 	return tasks.create("cover-${Module}", Exec) {
-		dependsOn tests
+		def Set<Task> tests = project.getTasksByName('testsuite', true)
+		setDependsOn(tests)
 		String PATH = System.getenv("PATH")
-		environment "Path", "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$PATH"
+		PATH = "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$PATH"
+		PATH = "$mysql32Home\\lib;$PATH"
+		PATH = "$postgres32Home\\lib;$PATH"
 //		println environment.Path
+		environment "Path", "$PATH"
 
 		environment "POCO_BASE", "$rootDir"
 //		println "POCO_BASE=" + environment.POCO_BASE
@@ -922,12 +920,12 @@ def cover(os, Module) {
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
 		environment "CPPUNIT_IGNORE", "$CPPUNIT_IGNORE"
 
-		workingDir "coverage/${Module}"
+		workingDir "coverage/${Directory}"
 		file(workingDir).mkdirs()
 
 		executable "${OpenCppCoverageHome}/OpenCppCoverage.exe"
 		args "-q"
-		args "$rootDir/${Module}/testsuite/gradle/exe/${Module}TestSuite/win32/debug/${Module}TestSuite.exe"
+		args "$rootDir/${Directory}/testsuite/gradle/exe/${Module}TestSuite/win32/debug/${Module}TestSuite.exe"
 		args "--modules", "Poco*d.dll"
 		args "--export_type", "cobertura"
 		args "--continue_after_cpp_exception"
@@ -943,20 +941,21 @@ def cover(os, Module) {
 		});
 	}
 }
-def report(os, Module) {
+def report(os, Directory, Module) {
 	return tasks.create("report-${Module}", Exec) {
-		dependsOn cover(os, Module)
+		dependsOn cover(os, Directory, Module)
 		
 		executable "${ReportGeneratorHome}/ReportGenerator.exe"
-		args "\"-reports:coverage/${Module}/${Module}TestSuiteCoverage.xml\""
-		args "\"-targetdir:coverage/${Module}\""
-	//	args "\"-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include\""
+		args "-verbosity:Error"
+		args "-reports:coverage/${Module}/${Module}TestSuiteCoverage.xml"
+		args "-targetdir:coverage/${Module}"
+	//	args "-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include"
 
 		File targetDir = new File("coverage/${Module}")
 		inputs.files(new File(targetDir,"${Module}TestSuite.xml"))
 
 		onlyIf(new Spec<Exec>() {
-			boolean isSatisfiedBy(Exec task) {
+			boolean isSatisfiedBy(Exec task) {s
 				   return os.windows;
 			}
 		});
@@ -964,10 +963,9 @@ def report(os, Module) {
 }
 task coverage() {
 	def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
-	println tasksSet;
-	tasksSet.each { task -> println task.project.parent.name }
-	tasksSet.each { task -> dependsOn report(os, task.project.parent.name) }
-	//dependsOn report(os, 'Crypto')
+	tasksSet.each { task -> println task.project.parent.path.replace(':','/').substring(1) }
+//	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
+	dependsOn report(os, 'Data/SQLite', 'SQLite')
 }
 
 task all() {
