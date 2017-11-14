@@ -214,19 +214,21 @@ subprojects {
 			debug
 		}
 
-/*
 		toolChains {
 			visualCpp(VisualCpp) {
 				// Specify the installDir if Visual Studio cannot be located
-				// installDir "C:/Apps/Microsoft Visual Studio 10.0"
+//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.11.25503/bin/HostX86/x64/cl.exe"
+				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017"
+//				installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
 			}
+/*
 			gcc(Gcc) {
 				// Uncomment to use a GCC install that is not in the PATH
 				// path "/usr/bin/gcc"
 			}
 			clang(Clang)
-		}
 */
+		}
 		platforms {
 			win32 {
 				operatingSystem "windows"
@@ -575,8 +577,6 @@ subprojects {
 				if (buildType == buildTypes.release) {
 					cCompiler.define 'NDEBUG'
 					cppCompiler.define 'NDEBUG'
-				} else {
-					throw new GradleException("Unknown buildType" + buildType)
 				}
 			
 				if (toolChain in Gcc) {
@@ -668,8 +668,6 @@ subprojects {
 					if (buildType == buildTypes.release) {
 						cCompiler.args "/MD"
 						cppCompiler.args "/MD"
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 				if (toolChain in Gcc) {
@@ -812,9 +810,9 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-dPlatform=${target}"
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-		args "Poco-${VERSION}.wxs"
+		args "Poco.wxs"
 
-		inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
+		inputs.files(new File(workingDir, "Poco.wxs"))
 		inputs.files(project.getTasksByName('poco', true).outputs.files)
 		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
 
@@ -964,8 +962,8 @@ def report(os, Directory, Module) {
 task coverage() {
 	def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
 	tasksSet.each { task -> println task.project.parent.path.replace(':','/').substring(1) }
-//	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
-	dependsOn report(os, 'Data/SQLite', 'SQLite')
+	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
+//	dependsOn report(os, 'Data/SQLite', 'SQLite')
 }
 
 task all() {
