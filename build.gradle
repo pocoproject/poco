@@ -797,7 +797,7 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-dPlatform=${target}"
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-		args "Poco-${VERSION}.wxs"
+		args "Poco.wxs"
 		inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
 //			inputs.files(tasks.getByPath(':poco').outputs.files)
 		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
@@ -862,56 +862,6 @@ task packaging() {
 		dependsOn wix
 	}
 }
-task all() {
-//doLast {
-//        def files =  fileTree("src").filter { it.isFile() }.files.name;
-//        println files;
-//        println "------------------------------------"
-//        println project.tasks.matching { Task task -> task.name.contains("assemble") }
-//        println "------------------------------------"
-//		def Set<Project> projects = project.subprojects
-//		println projects
-//        println "------------------------------------"
-//		def Set<Task> tts = project.getTasksByName('poco', true)
-//		println tts
-//		setDependsOn(tts)
-//		println project.subprojects.tasks.matching { Task task -> task.name.contains("poco") }
-//        println "------------------------------------"
-//        def c = subprojects.tasks.findAll { it.findByName(":poco") }
-//		println c
-
-//        CppCompile task = tasks.getByPath(':compileHelloSharedLibraryHelloCpp');
-//        println task;
-/*
-        FileCollection incs = task.includes;
-        incs.each { dir -> fileTree(dir).files.each { file -> inputs.files(file) }};
-        inputs.files.each { file -> println file.path }
-*/
-//}
-}
-	def get() {
-		def foo = subprojects.tasks.findAll { it.name.contains('poco') }
-		return foo
-	}
-task includes() {
-	doLast {
-		TaskContainer tc;
-//		Task t = tasks.getByPath(':poco');
-//		TaskDependency td = t.taskDependencies;
-//		td.values.each { task -> println task }
-		def ts = subprojects.tasks //.matching { task -> task.name.contains("poco") }
-//		println ts.each { it.matching { task -> task.name.contains("poco") } }
-		def foo = binaries.findAll { it.buildable }
-		println foo
-/*
-		def compileTasks = tasks.withType(CppCompile).matching { Task task -> 
-				String path = task.path;
-				String name = task.name;
-				name.contains("Shared") && name.contains("Release") && name.contains("Win32") && !path.contains("test") && !path.contains("sample")
-		}
-		println compileTasks
-*/
-	}
 }
 /*
     tasks { t ->
