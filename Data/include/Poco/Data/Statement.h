@@ -155,6 +155,17 @@ public:
 		return *this;
 	}
 
+	template <typename C>
+	Statement& bind(const C& value)
+		/// Adds a binding to the Statement. This can be used to implement
+		/// generic binding mechanisms and is a nicer syntax for:
+		///
+		///     statement , bind(value);
+	{
+		(*this) , Keywords::bind(value);
+		return *this;
+	}
+
 	Statement& operator , (AbstractExtraction::Ptr extract);
 		/// Registers objects used for extracting data with the Statement by
 		/// calling addExtract().

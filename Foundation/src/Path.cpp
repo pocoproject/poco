@@ -21,9 +21,7 @@
 #include <algorithm>
 
 
-#if defined(POCO_OS_FAMILY_VMS)
-#include "Path_VMS.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_OS_FAMILY_UNIX)
 #include "Path_UNIX.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
@@ -82,7 +80,7 @@ Path::Path(const Path& path):
 	_version(path._version),
 	_dirs(path._dirs),
 	_absolute(path._absolute)
-{	
+{
 }
 
 
@@ -107,7 +105,7 @@ Path::Path(const Path& rParent, const char* fileName):
 	_version(rParent._version),
 	_dirs(rParent._dirs),
 	_absolute(rParent._absolute)
-{	
+{
 	makeDirectory();
 	_name = fileName;
 }
@@ -120,7 +118,7 @@ Path::Path(const Path& rParent, const Path& relative):
 	_version(rParent._version),
 	_dirs(rParent._dirs),
 	_absolute(rParent._absolute)
-{	
+{
 	resolve(relative);
 }
 
@@ -129,13 +127,13 @@ Path::~Path()
 {
 }
 
-	
+
 Path& Path::operator = (const Path& path)
 {
 	return assign(path);
 }
 
-	
+
 Path& Path::operator = (const std::string& path)
 {
 	poco_assert(std::char_traits<char>::length(path.data()) == path.size());
@@ -178,9 +176,7 @@ Path& Path::assign(const Path& path)
 
 Path& Path::assign(const std::string& path)
 {
-#if defined(POCO_OS_FAMILY_VMS)
-	parseVMS(path);
-#elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	parseWindows(path);
 #else
 	parseUnix(path);
@@ -188,7 +184,7 @@ Path& Path::assign(const std::string& path)
 	return *this;
 }
 
-	
+
 Path& Path::assign(const std::string& path, Style style)
 {
 	switch (style)
@@ -223,16 +219,14 @@ Path& Path::assign(const char* path)
 
 std::string Path::toString() const
 {
-#if defined(POCO_OS_FAMILY_UNIX)
-	return buildUnix();
-#elif defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	return buildWindows();
 #else
-	return buildVMS();
+	return buildUnix();
 #endif
 }
 
-	
+
 std::string Path::toString(Style style) const
 {
 	switch (style)
@@ -305,11 +299,7 @@ Path& Path::parseDirectory(const std::string& path, Style style)
 
 Path& Path::makeDirectory()
 {
-#if defined(POCO_OS_FAMILY_VMS)
-	pushDirectory(getBaseName());
-#else
 	pushDirectory(_name);
-#endif
 	_name.clear();
 	_version.clear();
 	return *this;
@@ -322,9 +312,6 @@ Path& Path::makeFile()
 	{
 		_name = _dirs.back();
 		_dirs.pop_back();
-#if defined(POCO_OS_FAMILY_VMS)
-		setExtension("DIR");
-#endif
 	}
 	return *this;
 }
@@ -444,7 +431,7 @@ Path& Path::setNode(const std::string& node)
 	return *this;
 }
 
-	
+
 Path& Path::setDevice(const std::string& device)
 {
 	poco_assert(std::char_traits<char>::length(device.data()) == device.size());
@@ -453,44 +440,34 @@ Path& Path::setDevice(const std::string& device)
 	return *this;
 }
 
-	
+
 const std::string& Path::directory(int n) const
 {
 	poco_assert (0 <= n && n <= _dirs.size());
-	
+
 	if (n < _dirs.size())
 		return _dirs[n];
 	else
-		return _name;	
+		return _name;
 }
 
 
 const std::string& Path::operator [] (int n) const
 {
 	poco_assert (0 <= n && n <= _dirs.size());
-	
+
 	if (n < _dirs.size())
 		return _dirs[n];
 	else
-		return _name;	
+		return _name;
 }
 
-	
+
 Path& Path::pushDirectory(const std::string& dir)
 {
 	poco_assert(std::char_traits<char>::length(dir.data()) == dir.size());
 	if (!dir.empty() && dir != ".")
 	{
-#if defined(POCO_OS_FAMILY_VMS)
-		if (dir == ".." || dir == "-")
-		{
-			if (!_dirs.empty() && _dirs.back() != ".." && _dirs.back() != "-")
-				_dirs.pop_back();
-			else if (!_absolute)
-				_dirs.push_back(dir);
-		}
-		else _dirs.push_back(dir);
-#else
 		if (dir == "..")
 		{
 			if (!_dirs.empty() && _dirs.back() != "..")
@@ -499,16 +476,15 @@ Path& Path::pushDirectory(const std::string& dir)
 				_dirs.push_back(dir);
 		}
 		else _dirs.push_back(dir);
-#endif
 	}
 	return *this;
 }
 
-	
+
 Path& Path::popDirectory()
 {
 	poco_assert (!_dirs.empty());
-	
+
 	_dirs.pop_back();
 	return *this;
 }
@@ -517,13 +493,13 @@ Path& Path::popDirectory()
 Path& Path::popFrontDirectory()
 {
 	poco_assert (!_dirs.empty());
-	
+
 	StringVec::iterator it = _dirs.begin();
 	_dirs.erase(it);
 	return *this;
 }
 
-	
+
 Path& Path::setFileName(const std::string& name)
 {
 	poco_assert(std::char_traits<char>::length(name.data()) == name.size());
@@ -568,7 +544,7 @@ Path& Path::setExtension(const std::string& extension)
 	return *this;
 }
 
-			
+
 std::string Path::getExtension() const
 {
 	std::string::size_type pos = _name.rfind('.');
@@ -596,13 +572,13 @@ std::string Path::current()
 	return PathImpl::currentImpl();
 }
 
-	
+
 std::string Path::home()
 {
 	return PathImpl::homeImpl();
 }
 
-	
+
 std::string Path::configHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -612,7 +588,7 @@ std::string Path::configHome()
 #endif
 }
 
-	
+
 std::string Path::dataHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -622,7 +598,7 @@ std::string Path::dataHome()
 #endif
 }
 
-	
+
 std::string Path::cacheHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -632,13 +608,13 @@ std::string Path::cacheHome()
 #endif
 }
 
-	
+
 std::string Path::temp()
 {
 	return PathImpl::tempImpl();
 }
 
-	
+
 std::string Path::config()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -653,7 +629,7 @@ std::string Path::null()
 	return PathImpl::nullImpl();
 }
 
-	
+
 std::string Path::expand(const std::string& path)
 {
 	poco_assert(std::char_traits<char>::length(path.data()) == path.size());
@@ -842,7 +818,7 @@ void Path::parseVMS(const std::string& path)
 						}
 					}
 				}
-			}			
+			}
 			if (name.empty())
 			{
 				if (it != end && *it == '[')

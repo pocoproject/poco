@@ -1,8 +1,6 @@
 //
 // Database.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Database

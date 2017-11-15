@@ -1,8 +1,6 @@
 //
 // SortedDirectoryIterator.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator

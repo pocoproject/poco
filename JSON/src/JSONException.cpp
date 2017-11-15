@@ -1,8 +1,6 @@
 //
 // JSONException.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  JSONException

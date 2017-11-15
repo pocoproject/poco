@@ -1,8 +1,6 @@
 //
 // ReplicaSet.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  ReplicaSet
@@ -53,6 +51,8 @@ private:
 	std::vector<Net::SocketAddress> _addresses;
 };
 
+
 } } // namespace Poco::MongoDB
+
 
 #endif // MongoDB_ReplicaSet_INCLUDED

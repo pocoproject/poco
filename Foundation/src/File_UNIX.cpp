@@ -15,6 +15,7 @@
 #include "Poco/File_UNIX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -339,6 +340,10 @@ void FileImpl::setExecutableImpl(bool flag)
 	if (flag)
 	{
 		mode = st.st_mode | S_IXUSR;
+		if (st.st_mode & S_IRGRP)
+			mode |= S_IXGRP;
+		if (st.st_mode & S_IROTH)
+			mode |= S_IXOTH;
 	}
 	else
 	{
@@ -425,7 +430,7 @@ void FileImpl::removeImpl()
 bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
-	
+
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
@@ -522,7 +527,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path, errno);
 	default:
-		throw FileException(std::strerror(errno), path, errno);
+		throw FileException(Error::getMessage(errno), path, errno);
 	}
 }
 

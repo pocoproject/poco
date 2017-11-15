@@ -15,6 +15,7 @@
 #include "MulticastSocketTest.h"
 #include "DialogSocketTest.h"
 #include "RawSocketTest.h"
+#include "PollSetTest.h"
 
 
 CppUnit::Test* SocketsTestSuite::suite()
@@ -29,5 +30,6 @@ CppUnit::Test* SocketsTestSuite::suite()
 #ifdef POCO_NET_HAS_INTERFACE
 	pSuite->addTest(MulticastSocketTest::suite());
 #endif
+	pSuite->addTest(PollSetTest::suite());
 	return pSuite;
 }

@@ -176,23 +176,29 @@ int DeflatingStreamBuf::sync()
 	if (BufferedStreamBuf::sync())
 		return -1;
 
-	if (_pOstr && _zstr.next_out)
+	if (_pOstr)
 	{
-		int rc = deflate(&_zstr, Z_SYNC_FLUSH);
-		if (rc != Z_OK) throw IOException(zError(rc));
-		_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
-		if (!_pOstr->good()) throw IOException(zError(rc));
-		while (_zstr.avail_out == 0)
+		if (_zstr.next_out)
 		{
-			_zstr.next_out  = (unsigned char*) _buffer;
-			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
-			rc = deflate(&_zstr, Z_SYNC_FLUSH);
+			int rc = deflate(&_zstr, Z_SYNC_FLUSH);
 			if (rc != Z_OK) throw IOException(zError(rc));
 			_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
 			if (!_pOstr->good()) throw IOException(zError(rc));
-		};
-		_zstr.next_out  = (unsigned char*) _buffer;
-		_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+			while (_zstr.avail_out == 0)
+			{
+				_zstr.next_out  = (unsigned char*) _buffer;
+				_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+				rc = deflate(&_zstr, Z_SYNC_FLUSH);
+				if (rc != Z_OK) throw IOException(zError(rc));
+				_pOstr->write(_buffer, DEFLATE_BUFFER_SIZE - _zstr.avail_out);
+				if (!_pOstr->good()) throw IOException(zError(rc));
+			};
+			_zstr.next_out  = (unsigned char*) _buffer;
+			_zstr.avail_out = DEFLATE_BUFFER_SIZE;
+		}
+		// NOTE: This breaks the Zip library and causes corruption in some files.
+		// See GH #1828
+		// _pOstr->flush();
 	}
 	return 0;
 }

@@ -348,6 +348,11 @@ void CoreTest::testBuffer()
 	k.append('d');
 	assert (k.size() == 15);
 	assert ( !std::memcmp(k.begin(), "hellohelloworld", k.size()) );
+
+	char my[16];
+	Poco::Buffer<char> buffer(16);
+	Poco::Buffer<char> wrapper(my, sizeof(my));
+	buffer.swap(wrapper);
 }
 
 

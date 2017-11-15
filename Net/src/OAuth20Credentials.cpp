@@ -1,8 +1,6 @@
 //
 // OAuth20Credentials.cpp
 //
-// $Id$
-//
 // Library: Net
 // Package: OAuth
 // Module:	OAuth20Credentials
