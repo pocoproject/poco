@@ -137,7 +137,7 @@ public:
 
 	template <typename T>
 	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
-		/// Binds the option to the given method.
+		/// Binds the event to the given method.
 		///
 		/// The callback method will be called if the Traverse class fails
 		/// to read a directory. 
@@ -145,7 +145,7 @@ public:
 		/// Usage:
 		///     onError(*this, &MyClass::myCallback);
 	{
-		_pImpl->onError<T>(obj, pCB);
+		_pImpl->template onError<T>(obj, pCB);
 	}
 
 	MyType& operator = (const MyType& it)
