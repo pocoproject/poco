@@ -100,7 +100,7 @@ public:
 	template <class Other>
 	SharedPtr& assign(const SharedPtr<Other>& ptr)
 	{
-		if (ptr.get() != _ptr)
+		if (ptr.get() != _ptr.get())
 		{
 			SharedPtr tmp(ptr);
 			swap(tmp);
