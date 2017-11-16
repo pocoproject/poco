@@ -330,7 +330,7 @@ void EVPTest::testECEVPSaveLoadStream()
 			/*TODO: figure out why EVP_PKEY_cmp() fails for identical public keys
 			assert (key == key2);
 			assert (!(key != key2));*/
-			ECKey ecKeyNE("secp112r2");
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
@@ -386,7 +386,7 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 			/*TODO: figure out why EVP_PKEY_cmp() fails for identical public keys
 			assert (key == key2);
 			assert (!(key != key2));*/
-			ECKey ecKeyNE("secp112r2");
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
@@ -444,7 +444,7 @@ void EVPTest::testECEVPSaveLoadFile()
 			/*TODO: figure out why EVP_PKEY_cmp() fails for identical public keys
 			assert (key == key2);
 			assert (!(key != key2));*/
-			ECKey ecKeyNE("secp112r2");
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
