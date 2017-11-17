@@ -336,7 +336,7 @@ void EVPTest::testECEVPSaveLoadStream()
 			assert (strPubE.str() == pubKey);
 			assert (key == key2);
 			assert (!(key != key2));
-			ECKey ecKeyNE(curvename);
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
