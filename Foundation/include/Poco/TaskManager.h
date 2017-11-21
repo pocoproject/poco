@@ -68,6 +68,11 @@ public:
 		/// The TaskManager takes ownership of the Task object
 		/// and deletes it when it it finished.
 
+	void startSync(Task* pTask);
+		/// Starts the given task in the current thread.
+		/// The TaskManager takes ownership of the Task object
+		/// and deletes it when it it finished.
+
 	void cancelAll();
 		/// Requests cancellation of all tasks.
 		

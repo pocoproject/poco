@@ -375,7 +375,7 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 
 int WebSocketImpl::available()
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 		return n + _pStreamSocketImpl->available();
 	else

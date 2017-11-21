@@ -215,12 +215,13 @@ subprojects {
 		}
 
 		toolChains {
-			visualCpp(VisualCpp) {
+/*			visualCpp(VisualCpp) {
 				// Specify the installDir if Visual Studio cannot be located
 //				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.11.25503/bin/HostX86/x64/cl.exe"
-				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017"
+//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017"
 //				installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
 			}
+*/
 /*
 			gcc(Gcc) {
 				// Uncomment to use a GCC install that is not in the PATH
@@ -959,11 +960,14 @@ def report(os, Directory, Module) {
 		});
 	}
 }
+task.withTyppe(CppCompile) {
+	maxParallelForks = 2
+}
 task coverage() {
 	def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
 	tasksSet.each { task -> println task.project.parent.path.replace(':','/').substring(1) }
-	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
-//	dependsOn report(os, 'Data/SQLite', 'SQLite')
+//	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
+	dependsOn report(os, 'Data/SQLite', 'SQLite')
 }
 
 task all() {

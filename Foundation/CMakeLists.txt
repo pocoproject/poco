@@ -10,9 +10,6 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
 # Platform Specific
-POCO_SOURCES_AUTO_PLAT( SRCS OPENVMS src/OpcomChannel.cpp )
-POCO_HEADERS_AUTO( SRCS include/Poco/OpcomChannel.h )
-
 POCO_SOURCES_AUTO_PLAT( SRCS UNIX src/SyslogChannel.cpp )
 POCO_HEADERS_AUTO( SRCS include/Poco/SyslogChannel.h )
 
@@ -107,6 +104,10 @@ endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 if(ANDROID)
 	set(SYSLIBS ${SYSLIBS} log)
 endif(ANDROID)
+
+if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+	set(SYSLIBS ${SYSLIBS} dl rt)
+endif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 
 # TODO: Why is this here?
 add_definitions( -DPCRE_STATIC)

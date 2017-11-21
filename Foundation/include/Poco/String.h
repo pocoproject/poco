@@ -34,7 +34,7 @@ S trimLeft(const S& str)
 {
 	typename S::const_iterator it  = str.begin();
 	typename S::const_iterator end = str.end();
-	
+
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	return S(it, end);
 }
@@ -46,7 +46,7 @@ S& trimLeftInPlace(S& str)
 {
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
-	
+
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	str.erase(str.begin(), it);
 	return str;
@@ -59,7 +59,7 @@ S trimRight(const S& str)
 	/// whitespace removed.
 {
 	int pos = int(str.size()) - 1;
-		
+
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	return S(str, 0, pos + 1);
 }
@@ -70,7 +70,7 @@ S& trimRightInPlace(S& str)
 	/// Removes all trailing whitespace in str.
 {
 	int pos = int(str.size()) - 1;
-		
+
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	str.resize(pos + 1);
 
@@ -85,7 +85,7 @@ S trim(const S& str)
 {
 	int first = 0;
 	int last  = int(str.size()) - 1;
-	
+
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
 
@@ -99,7 +99,7 @@ S& trimInPlace(S& str)
 {
 	int first = 0;
 	int last  = int(str.size()) - 1;
-	
+
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
 
@@ -215,7 +215,7 @@ int icompare(const S& str1, const S& str2)
 			return 1;
 		++it1; ++it2;
 	}
-	
+
 	if (it1 == end1)
 		return it2 == end2 ? 0 : -1;
 	else
@@ -300,7 +300,7 @@ int icompare(
 			return 1;
 		++it; ++ptr;
 	}
-	
+
 	if (it == end)
 		return *ptr == 0 ? 0 : -1;
 	else
@@ -402,7 +402,13 @@ S translateInPlace(S& str, const typename S::value_type* from, const typename S:
 	poco_check_ptr (from);
 	poco_check_ptr (to);
 	str = translate(str, S(from), S(to));
+#if defined(__SUNPRO_CC)
+	// Fix around the RVO bug in SunStudio 12.4
+	S ret(str);
+	return ret;
+#else
 	return str;
+#endif
 }
 
 
@@ -413,7 +419,7 @@ template <class S>
 S& replaceInPlace(S& str, const S& from, const S& to, typename S::size_type start = 0)
 {
 	poco_assert (from.size() > 0);
-	
+
 	S result;
 	typename S::size_type pos = 0;
 	result.append(str, 0, start);
@@ -660,7 +666,7 @@ struct i_char_traits : public std::char_traits<charT>
 		return Ascii::toLower(c1) < Ascii::toLower(c2);
 	}
 
-	static int compare(const charT* s1, const charT* s2, size_t n)
+	static int compare(const charT* s1, const charT* s2, std::size_t n)
 	{
 		for (int i = 0; i < n && s1 && s2; ++i, ++s1, ++s2)
 		{

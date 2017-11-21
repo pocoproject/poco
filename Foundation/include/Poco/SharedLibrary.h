@@ -29,8 +29,6 @@
 #include "Poco/SharedLibrary_UNIX.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/SharedLibrary_WIN32.h"
-#elif defined(POCO_OS_FAMILY_VMS)
-#include "Poco/SharedLibrary_VMS.h"
 #endif
 
 
@@ -59,10 +57,10 @@ public:
 			///
 			/// This flag is ignored on platforms that do not use dlopen().
 	};
-	
+
 	SharedLibrary();
 		/// Creates a SharedLibrary object.
-		
+
 	SharedLibrary(const std::string& path);
 		/// Creates a SharedLibrary object and loads a library
 		/// from the given path.
@@ -108,24 +106,24 @@ public:
 		/// is the entry point of the function.
 		/// Throws a NotFoundException if the symbol
 		/// does not exist.
-		
+
 	const std::string& getPath() const;
 		/// Returns the path of the library, as
 		/// specified in a call to load() or the
 		/// constructor.
-		
+
 	static std::string prefix();
 		/// Returns the platform-specific filename prefix
 		/// for shared libraries.
 		/// Most platforms would return "lib" as prefix, while
 	    /// on Cygwin, the "cyg" prefix will be returned.
-		
+
 	static std::string suffix();
 		/// Returns the platform-specific filename suffix
 		/// for shared libraries (including the period).
 		/// In debug mode, the suffix also includes a
 		/// "d" to specify the debug version of a library.
-		
+
 	static std::string getOSName(const std::string& name);
 		/// Returns the platform-specific filename
 		/// for shared libraries by prefixing and suffixing name

@@ -367,7 +367,7 @@ void ServerApplication::registerService()
 {
 	std::string name = config().getString("application.baseName");
 	std::string path = config().getString("application.path");
-	
+
 	WinService service(name);
 	if (_displayName.empty())
 		service.registerService(path);
@@ -386,7 +386,7 @@ void ServerApplication::registerService()
 void ServerApplication::unregisterService()
 {
 	std::string name = config().getString("application.baseName");
-	
+
 	WinService service(name);
 	service.unregisterService();
 	logger().information("The service has been successfully unregistered.");
@@ -629,7 +629,7 @@ int ServerApplication::run(const std::vector<std::string>& args)
 			runAsDaemon = true;
 			break;
 		}
-	}		
+	}
 	if (runAsDaemon)
 	{
 		beDaemon();
@@ -672,10 +672,10 @@ void ServerApplication::beDaemon()
 		throw SystemException("cannot fork daemon process");
 	else if (pid != 0)
 		exit(0);
-	
+
 	setsid();
 	umask(027);
-	
+
 	// attach stdin, stdout, stderr to /dev/null
 	// instead of just closing them. This avoids
 	// issues with third party/legacy code writing
@@ -747,91 +747,6 @@ void ServerApplication::handlePidFile(const std::string& rName, const std::strin
 	else
 		throw Poco::CreateFileException("Cannot write PID to file", rValue);
 	Poco::TemporaryFile::registerForDeletion(rValue);
-}
-
-
-#elif defined(POCO_OS_FAMILY_VMS)
-
-
-//
-// VMS specific code
-//
-namespace
-{
-	static void handleSignal(int sig)
-	{
-		ServerApplication::terminate();
-	}
-}
-
-
-void ServerApplication::waitForTerminationRequest()
-{
-	struct sigaction handler;
-	handler.sa_handler = handleSignal;
-	handler.sa_flags   = 0;
-	sigemptyset(&handler.sa_mask);
-	sigaction(SIGINT, &handler, NULL);
-	sigaction(SIGQUIT, &handler, NULL);
-
-	long ctrlY = LIB$M_CLI_CTRLY;
-	unsigned short ioChan;
-	$DESCRIPTOR(ttDsc, "TT:");
-
-	lib$disable_ctrl(&ctrlY);
-	sys$assign(&ttDsc, &ioChan, 0, 0);
-	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLYAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
-	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLCAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
-
-	std::string evName("POCOTRM");
-	NumberFormatter::appendHex(evName, Poco::Process::id(), 8);
-	Poco::NamedEvent ev(evName);
-	try
-	{
-		ev.wait();
-    }
-	catch (...)
-	{
-		// CTRL-C will cause an exception to be raised
-	}
-	sys$dassgn(ioChan);
-	lib$enable_ctrl(&ctrlY);
-}
-
-
-int ServerApplication::run(int argc, char** argv)
-{
-	try
-	{
-		init(argc, argv);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-int ServerApplication::run(const std::vector<std::string>& args)
-{
-	try
-	{
-		init(args);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-void ServerApplication::defineOptions(OptionSet& options)
-{
-	Application::defineOptions(options);
 }
 
 

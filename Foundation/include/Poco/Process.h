@@ -31,8 +31,6 @@
 #include "Poco/Process_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/Process_UNIX.h"
-#else
-#include "Poco/Process_VMS.h"
 #endif
 
 
@@ -54,28 +52,28 @@ public:
 
 	ProcessHandle(const ProcessHandle& handle);
 		/// Creates a ProcessHandle by copying another one.
-		
+
 	~ProcessHandle();
 		/// Destroys the ProcessHandle.
-		
+
 	ProcessHandle& operator = (const ProcessHandle& handle);
 		/// Assigns another handle.
-		
+
 	PID id() const;
 		/// Returns the process ID.
-		
+
 	int wait() const;
 		/// Waits for the process to terminate
 		/// and returns the exit code of the process.
-		
+
 protected:
 	ProcessHandle(ProcessHandleImpl* pImpl);
-	
+
 private:
 	ProcessHandle();
 
 	ProcessHandleImpl* _pImpl;
-	
+
 	friend class Process;
 };
 
@@ -87,14 +85,14 @@ public:
 	typedef PIDImpl  PID;
 	typedef ArgsImpl Args;
 	typedef EnvImpl  Env;
-	
+
 	static PID id();
 		/// Returns the process ID of the current process.
-		
+
 	static void times(long& userTime, long& kernelTime);
 		/// Returns the number of seconds spent by the
 		/// current process in user and kernel mode.
-		
+
 	static ProcessHandle launch(const std::string& command, const Args& args);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
@@ -174,7 +172,7 @@ public:
 		///     PipeInputStream istr(outPipe);
 		///     ... // read output of ps from istr
 		///     int rc = ph.wait();
-		
+
 	static ProcessHandle launch(
 		const std::string& command,
 		const Args& args,
@@ -212,7 +210,7 @@ public:
 	static int wait(const ProcessHandle& handle);
 		/// Waits for the process specified by handle to terminate
 		/// and returns the exit code of the process.
-		
+
 	static bool isRunning(const ProcessHandle& handle);
 		/// check if the process specified by handle is running or not
 		///
@@ -221,7 +219,7 @@ public:
 
 	static bool isRunning(PID pid);
 		/// Check if the process specified by given pid is running or not.
-		
+
 	static void kill(ProcessHandle& handle);
 		/// Kills the process specified by handle.
 		///
@@ -230,7 +228,7 @@ public:
 
 	static void kill(PID pid);
 		/// Kills the process with the given pid.
-		
+
 	static void requestTermination(PID pid);
 		/// Requests termination of the process with the give PID.
 		///
@@ -253,7 +251,7 @@ inline Process::PID Process::id()
 	return ProcessImpl::idImpl();
 }
 
-	
+
 inline void Process::times(long& userTime, long& kernelTime)
 {
 	ProcessImpl::timesImpl(userTime, kernelTime);

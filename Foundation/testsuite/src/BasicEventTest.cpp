@@ -35,6 +35,7 @@ BasicEventTest::~BasicEventTest()
 {
 }
 
+
 void BasicEventTest::testNoDelegate()
 {
 	int tmp = 0;
@@ -113,9 +114,11 @@ void BasicEventTest::testNoDelegate()
 	Void -= delegate(BasicEventTest::onStaticVoid);
 }
 
+
 void BasicEventTest::testSingleDelegate()
 {
 	int tmp = 0;
+	std::string tmpStr;
 	EventArgs args;
 
 	assert (_count == 0);
@@ -131,7 +134,17 @@ void BasicEventTest::testSingleDelegate()
 	ConstSimple += delegate(this, &BasicEventTest::onConstSimple);
 	ConstSimple.notify(this, tmp);
 	assert (_count == 3);
-	
+
+	tmpStr = "str";
+	SimpleString += delegate(this, &BasicEventTest::onString);
+	SimpleString.notify(this, tmpStr);
+	assert(_str == "str");
+
+	tmpStr = "strConst";
+	ConstString += delegate(this, &BasicEventTest::onConstString);
+	ConstString.notify(this, tmpStr);
+	assert(_str == "strConst");
+
 	EventArgs* pArgs = &args;
 	Complex += delegate(this, &BasicEventTest::onComplex);
 	Complex.notify(this, pArgs);
@@ -154,6 +167,7 @@ void BasicEventTest::testSingleDelegate()
 	assert (_count == 8);
 	
 }
+
 
 void BasicEventTest::testDuplicateRegister()
 {
@@ -212,6 +226,7 @@ void BasicEventTest::testDuplicateUnregister()
 	assert (_count == 1);
 }
 
+
 void BasicEventTest::testDisabling()
 {
 	int tmp = 0;
@@ -233,6 +248,7 @@ void BasicEventTest::testDisabling()
 	Simple.notify(this, tmp);
 	assert (_count == 1);
 }
+
 
 void BasicEventTest::testExpire()
 {
@@ -258,6 +274,7 @@ void BasicEventTest::testExpire()
 	assert (_count == 4);
 }
 
+
 void BasicEventTest::testExpireReRegister()
 {
 	int tmp = 0;
@@ -280,6 +297,7 @@ void BasicEventTest::testExpireReRegister()
 	assert (_count == 3);
 }
 
+
 void BasicEventTest::testReturnParams()
 {
 	DummyDelegate o1;
@@ -289,6 +307,7 @@ void BasicEventTest::testReturnParams()
 	Simple.notify(this, tmp);
 	assert (tmp == 1);
 }
+
 
 void BasicEventTest::testOverwriteDelegate()
 {
@@ -300,6 +319,7 @@ void BasicEventTest::testOverwriteDelegate()
 	Simple.notify(this, tmp);
 	assert (tmp == 2);
 }
+
 
 void BasicEventTest::testAsyncNotify()
 {
@@ -338,10 +358,12 @@ void BasicEventTest::onStaticVoid(const void* pSender)
 	p->_count++;
 }
 
+
 void BasicEventTest::onVoid(const void* pSender)
 {
 	_count++;
 }
+
 
 void BasicEventTest::onSimpleNoSender(int& i)
 {
@@ -379,30 +401,48 @@ void BasicEventTest::onSimpleOther(const void* pSender, int& i)
 	_count+=100;
 }
 
+
 void BasicEventTest::onConstSimple(const void* pSender, const int& i)
 {
 	_count++;
 }
+
+
+void BasicEventTest::onString(const void* pSender, std::string& str)
+{
+	_str = str;
+}
+
+
+void BasicEventTest::onConstString(const void* pSender, const std::string& str)
+{
+	_str = str;
+}
+
 
 void BasicEventTest::onComplex(const void* pSender, Poco::EventArgs* & i)
 {
 	_count++;
 }
 
+
 void BasicEventTest::onComplex2(const void* pSender, Poco::EventArgs & i)
 {
 	_count++;
 }
+
 
 void BasicEventTest::onConstComplex(const void* pSender, const Poco::EventArgs*& i)
 {
 	_count++;
 }
 
+
 void BasicEventTest::onConst2Complex(const void* pSender, const Poco::EventArgs * const & i)
 {
 	_count++;
 }
+
 
 void BasicEventTest::onAsync(const void* pSender, int& i)
 {
@@ -410,10 +450,12 @@ void BasicEventTest::onAsync(const void* pSender, int& i)
 	_count += LARGEINC ;
 }
 
+
 int BasicEventTest::getCount() const
 {
 	return _count;
 }
+
 
 void BasicEventTest::setUp()
 {

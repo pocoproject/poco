@@ -650,21 +650,166 @@ void MailMessageTest::testEncodeWord()
 {
 	std::string plain("this is pure ASCII");
 	std::string encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
-	assert (encoded == plain);
-	
-	plain = "This text contains German Umlauts: \304\326";
+	assert(encoded == plain);
+
+	plain = "This text contains German Umlauts: \xC4\xD6";
 	encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
-	assert (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6?=");
-	
-	plain = "This text contains German Umlauts: \304\326. "
-	        "It is also a very long text. Longer than 75 "
-	        "characters. Long enough to become three lines "
-	        "after being word-encoded.";
+	assert(encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6?=");
+
+	plain = "This text contains German Umlauts: \xC4\xD6. "
+		"It is also a very long text. Longer than 75 "
+		"characters. Long enough to become three lines "
+		"after being word-encoded.";
 	encoded = MailMessage::encodeWord(plain, "ISO-8859-1");
-	assert (encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6=2E_It_?=\r\n"
-	                   " =?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
-	                   " =?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
-	                   " =?ISO-8859-1?q?d=2E?=");
+	assert(encoded == "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6=2E_It_?=\r\n"
+		" =?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
+		" =?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
+		" =?ISO-8859-1?q?d=2E?=");
+
+	plain = "If you can read this yo";
+	encoded = MailMessage::encodeWord(plain, "ISO-8859-1", 'B');
+	assert(encoded == "=?ISO-8859-1?B?SWYgeW91IGNhbiByZWFkIHRoaXMgeW8=?=");
+
+	plain = "u understand the example.";
+	encoded = MailMessage::encodeWord(plain, "ISO-8859-2", 'B');
+	assert(encoded == "=?ISO-8859-2?B?dSB1bmRlcnN0YW5kIHRoZSBleGFtcGxlLg==?=");
+
+	plain = "This text contains German Umlauts: \xC4\xD6. "
+		"It is also a very long text. Longer than 75 "
+		"characters. Long enough to become three lines "
+		"after being word-encoded.";
+	encoded = MailMessage::encodeWord(plain, "ISO-8859-1", 'B');
+	assert(encoded ==
+		"=?ISO-8859-1?B?VGhpcyB0ZXh0IGNvbnRhaW5zIEdlcm1hbiBVbWxhdXRzOiDE1i4gSQ==?=\r\n"
+		"=?ISO-8859-1?B?dCBpcyBhbHNvIGEgdmVyeSBsb25nIHRleHQuIExvbmdlciB0aGFuIA==?=\r\n"
+		"=?ISO-8859-1?B?NzUgY2hhcmFjdGVycy4gTG9uZyBlbm91Z2ggdG8gYmVjb21lIHRocg==?=\r\n"
+		"=?ISO-8859-1?B?ZWUgbGluZXMgYWZ0ZXIgYmVpbmcgd29yZC1lbmNvZGVkLg==?=");
+
+	std::string decoded = MailMessage::decodeWord(encoded);
+	assert (decoded == plain);
+}
+
+
+void MailMessageTest::testDecodeWord()
+{
+	std::string encoded = "=?ISO-8859-1?q?=C4=D6?=";
+	std::string decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "\xC4\xD6");
+
+	encoded = "=?ISO-8859-1?q?=C4=D6?=abc=?ISO-8859-1?q?=C4=D6?=";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "\xC4\xD6" "abc" "\xC4\xD6");
+
+	decoded = MailMessage::decodeWord(encoded, "UTF-8");
+	assert(decoded == "\xC3\x84\xC3\x96" "abc" "\xC3\x84\xC3\x96");
+
+	try
+	{
+		MailMessage::decodeWord("=?ISO-8859-1?q?=C4 =D6?=");
+		fail("must fail");
+	}
+	catch (Poco::InvalidArgumentException&) {}
+
+	try
+	{
+		MailMessage::decodeWord("=?ISO-8859-1?q?=C4?=D6?=\r\n");
+		fail("must fail");
+	}
+	catch (Poco::InvalidArgumentException&) {}
+
+	encoded = "=?ISO-8859-1?q?=C4=D6_It_?=\r\n=?ISO-8859-1?q?is?=";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "\xC4\xD6 It is");
+
+	encoded = "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6?=";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "This text contains German Umlauts: \xC4\xD6");
+
+	decoded = MailMessage::decodeWord(encoded, "UTF-8");
+	assert(decoded == "This text contains German Umlauts: \xC3\x84\xC3\x96");
+
+	encoded = "=?ISO-8859-1?q?This_text_contains_German_Umlauts=3A_=C4=D6=2E_It_?=\r\n"
+		"=?ISO-8859-1?q?is_also_a_very_long_text=2E_Longer_than_75_characters=2E_?=\r\n"
+		"=?ISO-8859-1?q?Long_enough_to_become_three_lines_after_being_word-encode?=\r\n"
+		"=?ISO-8859-1?q?d=2E?=";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "This text contains German Umlauts: \xC4\xD6. It "
+		"is also a very long text. Longer than 75 characters. "
+		"Long enough to become three lines after being word-encode"
+		"d.");
+
+	decoded = MailMessage::decodeWord(encoded, "UTF-8");
+	assert(decoded == "This text contains German Umlauts: \xC3\x84\xC3\x96. It "
+		"is also a very long text. Longer than 75 characters. "
+		"Long enough to become three lines after being word-encode"
+		"d.");
+
+	encoded = "=?ISO-8859-1?Q?=F8=E9?=";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "\xF8\xE9");
+
+	encoded = "From: =?US-ASCII?Q?Keith_Moore?= <moore@cs.utk.edu>\r\n"
+		"To: =?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>\r\n"
+		"CC: =?ISO-8859-1?Q?Andr=E9?= Pirard <PIRARD@vm1.ulg.ac.be>\r\n"
+		"Subject: =?ISO-8859-1?B?SWYgeW91IGNhbiByZWFkIHRoaXMgeW8=?=\r\n"
+		"=?ISO-8859-2?B?dSB1bmRlcnN0YW5kIHRoZSBleGFtcGxlLg==?=";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "From: Keith Moore <moore@cs.utk.edu>\r\n"
+		"To: Keld J\xF8rn Simonsen <keld@dkuug.dk>\r\n"
+		"CC: Andr\xE9 Pirard <PIRARD@vm1.ulg.ac.be>\r\n"
+		"Subject: If you can read this you understand the example.");
+
+	encoded = "From: =?ISO-8859-1?Q?Olle_J=E4rnefors?= <ojarnef@admin.kth.se>\r\n"
+		"To: ietf-822@dimacs.rutgers.edu, ojarnef@admin.kth.se\r\n"
+		"Subject: Time for ISO 10646?";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "From: Olle J\xE4rnefors <ojarnef@admin.kth.se>\r\n"
+		"To: ietf-822@dimacs.rutgers.edu, ojarnef@admin.kth.se\r\n"
+		"Subject: Time for ISO 10646?");
+
+	encoded = "To: Dave Crocker <dcrocker@mordor.stanford.edu>\r\n"
+		"Cc: ietf-822@dimacs.rutgers.edu, paf@comsol.se\r\n"
+		"From: =?ISO-8859-1?Q?Patrik_F=E4ltstr=F6m?= <paf@nada.kth.se>\r\n"
+		"Subject: Re: RFC-HDR care and feeding";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "To: Dave Crocker <dcrocker@mordor.stanford.edu>\r\n"
+		"Cc: ietf-822@dimacs.rutgers.edu, paf@comsol.se\r\n"
+		"From: Patrik F\xE4ltstr\xF6m <paf@nada.kth.se>\r\n"
+		"Subject: Re: RFC-HDR care and feeding");
+
+	// encoded chars cannot be broken between lines
+	try
+	{
+		encoded = "=?ISO-8859-1?Q?=?=\r\n=?ISO-8859-1?Q?AB?=";
+		decoded = MailMessage::decodeWord(encoded);
+		fail("must fail");
+	}
+	catch (Poco::InvalidArgumentException&) {}
+
+	// comments and spaces therein
+	encoded = "(=?ISO-8859-1?Q?a?=)";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "(a)");
+
+	encoded = "(=?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?=)";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "(a b c)");
+
+	encoded = "(=?ISO-8859-1?Q?a?=  =?ISO-8859-1?Q?b?=)";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "(ab)");
+
+	encoded = "(=?ISO-8859-1?Q?a?=\r\n\t=?ISO-8859-1?Q?b?=)";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "(ab)");
+
+	encoded = "(=?ISO-8859-1?Q?a_b?=)";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "(a b)");
+
+	encoded = "(=?ISO-8859-1?Q?a?= =?ISO-8859-2?Q?_b?=)";
+	decoded = MailMessage::decodeWord(encoded);
+	assert(decoded == "(a b)");
 }
 
 
@@ -697,6 +842,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
+	CppUnit_addTest(pSuite, MailMessageTest, testDecodeWord);
 
 	return pSuite;
 }
