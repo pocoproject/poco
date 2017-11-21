@@ -741,6 +741,9 @@ subprojects {
 		args test
 	}
 }
+tasks.withType(CppCompile) {
+	maxParallelForks = 2
+}
 task PocoDocIni {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
@@ -959,9 +962,6 @@ def report(os, Directory, Module) {
 			}
 		});
 	}
-}
-task.withTyppe(CppCompile) {
-	maxParallelForks = 2
 }
 task coverage() {
 	def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
