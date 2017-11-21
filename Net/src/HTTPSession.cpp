@@ -122,8 +122,7 @@ void HTTPSession::setTimeout(const Poco::Timespan& connectionTimeout, const Poco
 
 int HTTPSession::get()
 {
-	if (_pCurrent == _pEnd)
-		refill();
+	if (_pCurrent == _pEnd) refill();
 	
 	if (_pCurrent < _pEnd)
 		return *_pCurrent++;
@@ -134,8 +133,7 @@ int HTTPSession::get()
 	
 int HTTPSession::peek()
 {
-	if (_pCurrent == _pEnd)
-		refill();
+	if (_pCurrent == _pEnd) refill();
 
 	if (_pCurrent < _pEnd)
 		return *_pCurrent;

@@ -20,7 +20,6 @@ namespace Net {
 
 
 HTTPServerAsyncSession::HTTPServerAsyncSession(HTTPServerParams::Ptr pParams) :
-	//HTTPServerSession(true),
 	_firstRequest(true),
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
 	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())

@@ -470,6 +470,7 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Net\HTTPServerSyncSession.h">
       <Filter>HTTPServer\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Net\PollSet.h">
       <Filter>Sockets\Header Files</Filter>
     </ClInclude>
@@ -780,6 +781,7 @@
     </ClCompile>
     <ClCompile Include="src\HTTPServerSyncSession.cpp">
       <Filter>HTTPServer\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\PollSet.cpp">
       <Filter>Sockets\Source Files</Filter>
     </ClCompile>

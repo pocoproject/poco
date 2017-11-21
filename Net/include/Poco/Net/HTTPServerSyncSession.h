@@ -50,22 +50,7 @@ public:
 	
 	bool canKeepAlive() const;
 		/// Returns true if the session can be kept alive.
-	/*
-	SocketAddress clientAddress();
-		/// Returns the client's address.
-		
-	SocketAddress serverAddress();
-		/// Returns the server's address.
 
-	void setClientAddress(const SocketAddress& addr)
-	{
-		_clientAddress = addr;
-	}
-
-	void setServerAddress(const SocketAddress& addr)
-	{
-		_serverAddress = addr;
-	}*/
 private:
 	bool           _firstRequest;
 	Poco::Timespan _keepAliveTimeout;

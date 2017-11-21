@@ -64,17 +64,5 @@ bool HTTPServerSyncSession::hasMoreRequests()
 	else return false;
 }
 
-/*
-SocketAddress HTTPServerSyncSession::clientAddress()
-{
-	return socket().peerAddress();
-}
-
-
-SocketAddress HTTPServerSyncSession::serverAddress()
-{
-	return socket().address();
-}
-*/
 
 } } // namespace Poco::Net

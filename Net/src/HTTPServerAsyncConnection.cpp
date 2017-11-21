@@ -184,8 +184,7 @@ void HTTPServerAsyncConnection::run()
 				response.setDate(now);
 				response.setVersion(request.getVersion());
 				response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && _session.canKeepAlive());
-				if (!server.empty())
-					response.set("Server", server);
+				if (!server.empty()) response.set("Server", server);
 				try
 				{
 					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
