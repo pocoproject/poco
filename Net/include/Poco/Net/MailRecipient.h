@@ -43,9 +43,12 @@ public:
 
 	MailRecipient();
 		/// Creates an empty MailRecipient.
-		
+
 	MailRecipient(const MailRecipient& recipient);
 		/// Creates a MailRecipient by copying another one.
+
+	MailRecipient(MailRecipient&& recipient);
+		/// Creates a MailRecipient by moving another one.
 		
 	MailRecipient(RecipientType type, const std::string& address);
 		/// Creates a MailRecipient of the given type.
@@ -55,10 +58,13 @@ public:
 
 	~MailRecipient();
 		/// Destroys the MailRecipient.
-		
+
 	MailRecipient& operator = (const MailRecipient& recipient);
-		/// Assigns another recipient.
-		
+		/// Assigns another recipient by copying it.
+
+	MailRecipient& operator = (MailRecipient&& recipient);
+		/// Assigns another recipient by moving it.
+
 	void swap(MailRecipient& recipient);
 		/// Exchanges the content of two recipients.
 
