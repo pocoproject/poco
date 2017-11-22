@@ -219,7 +219,7 @@ public:
 		/// Loads type 1 font from file. Returns font name.
 
 	std::string loadTTFont(const std::string& fileName, bool embedding, int index = -1);
-		/// Loads type 1 font from file. Returns font name.
+		/// Loads true type font from file. Returns font name.
 		/// If the embedding parameter is true, the glyph data of the font is embedded, 
 		/// otherwise only the matrix data is included in PDF file.
 
@@ -252,6 +252,9 @@ public:
 
 	void addPageLabel(int pageNum, PageNumberStyle style, int firstPage, const std::string& prefix = "");
 		/// adds page labeling range for the document.
+
+	void useUTF8Encoding();
+		/// Enables use of UTF-8 encoding (default enabled).
 
 	void useJapaneseFonts();
 		/// Enables use of Japanese fonts.
@@ -304,7 +307,13 @@ public:
 
 	std::size_t pageCount() const;
 		/// Returns number of pages in the document.
+
 private:
+	HPDF_Doc& handle();
+
+	void init(Poco::UInt32 pageCount,
+		Page::Size pageSize, Page::Orientation orientation);
+
 	void reset(bool all = false);
 		/// Resets the current document. If all is true, the loaded
 		/// resources (e.g. fonts, encodings ...)are unloaded. Otherwise
@@ -321,6 +330,8 @@ private:
 	EncoderContainer _encoders;
 	OutlineContainer _outlines;
 	ImageContainer   _images;
+
+	friend class Page;
 };
 
 
@@ -360,8 +371,7 @@ inline Document::PageMode Document::getPageMode() const
 /*
 inline void openAction()
 {
-	HPDF_SetOpenAction(_pdf,
-                     HPDF_Destination   open_action);
+	HPDF_SetOpenAction(_pdf, HPDF_Destination open_action);
 }
 */
 
@@ -391,6 +401,12 @@ inline void Document::addPageLabel(int pageNum, PageNumberStyle style, int first
 		static_cast<HPDF_PageNumStyle>(style),
 		static_cast<HPDF_UINT>(firstPage),
 		prefix.c_str());
+}
+
+
+inline void Document::useUTF8Encoding()
+{
+	HPDF_UseUTFEncodings(_pdf);
 }
 
 
@@ -475,6 +491,12 @@ inline void Document::setPermission(Permission perm)
 inline std::size_t Document::pageCount() const
 {
 	return _pages.size();
+}
+
+
+inline HPDF_Doc& Document::handle()
+{
+	return _pdf;
 }
 
 

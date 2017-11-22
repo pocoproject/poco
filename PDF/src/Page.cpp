@@ -13,6 +13,7 @@
 
 
 #include "Poco/PDF/Page.h"
+#include "Poco/PDF/Document.h"
 #include "Poco/PDF/PDFException.h"
 #undef min
 #undef max
@@ -23,24 +24,25 @@ namespace Poco {
 namespace PDF {
 
 
-Page::Page(HPDF_Doc* pPDF,
+Page::Page(Document* pDocument,
 	const HPDF_Page& page,
 	Size pageSize,
-	Orientation orientation): 
-	_pPDF(pPDF),
-	_page(page),
-	_size(pageSize),
-	_orientation(orientation),
-	_pCurrentFont(0)
+	Orientation orientation):
+		_pDocument(pDocument),
+		_page(page),
+		_size(pageSize),
+		_orientation(orientation),
+		_pCurrentFont(0)
 {
 }
 
 
-Page::Page(const Page& other): 
-	_pPDF(other._pPDF),
+Page::Page(const Page& other):
+	_pDocument(other._pDocument),
 	_page(other._page),
 	_size(other._size),
-	_orientation(other._orientation)
+	_orientation(other._orientation),
+	_pCurrentFont(other._pCurrentFont ? new Font(*other._pCurrentFont) : (Font*)0)
 {
 }
 
@@ -58,14 +60,21 @@ Page& Page::operator = (const Page& page)
 }
 
 
+bool Page::operator == (const Page& other) const
+{
+	return &_pDocument->handle() == &other._pDocument->handle() && _page == other._page;
+}
+
+
 void Page::swap(Page& other)
 {
 	using std::swap;
-	
-	swap(_pPDF, other._pPDF);
+
+	swap(_pDocument, other._pDocument);
 	swap(_page, other._page);
 	swap(_size, other._size);
 	swap(_orientation, other._orientation);
+	swap(_pCurrentFont, other._pCurrentFont);
 }
 
 
@@ -97,6 +106,20 @@ float Page::textWidth(const std::string& text)
 }
 
 
+void Page::setFont(const std::string& name, float size, const std::string& encoding)
+{
+	Font font(&_pDocument->handle(), HPDF_GetFont(_pDocument->handle(), name.c_str(), encoding.empty() ? 0 : encoding.c_str()));
+	setFont(font, size);
+}
+
+
+const Font& Page::getFont() const
+{
+	delete _pCurrentFont;
+	return *(_pCurrentFont = new Font(&_pDocument->handle(), HPDF_Page_GetCurrentFont(_page)));
+}
+
+
 void Page::setRotation(int angle)
 {
 	if (0 != angle % 90 || angle > std::numeric_limits<HPDF_UINT16>::max())
@@ -112,7 +135,7 @@ const Destination& Page::createDestination(const std::string& name)
 	if (_destinations.end() != it) 
 		throw InvalidArgumentException("Destination already exists.");
 
-	Destination dest(_pPDF, HPDF_Page_CreateDestination(_page), name);
+	Destination dest(&_pDocument->handle(), HPDF_Page_CreateDestination(_page), name);
 	std::pair<DestinationContainer::iterator, bool> ret = 
 		_destinations.insert(DestinationContainer::value_type(name, dest));
 
@@ -131,7 +154,7 @@ const TextAnnotation& Page::createTextAnnotation(const std::string& name,
 	if (_textAnnotations.end() != it) 
 		throw InvalidArgumentException("Annotation already exists.");
 
-	TextAnnotation ann(_pPDF,
+	TextAnnotation ann(&_pDocument->handle(),
 		HPDF_Page_CreateTextAnnot(_page, rect, text.c_str(), encoder),
 		name);
 
@@ -152,7 +175,7 @@ const LinkAnnotation& Page::createLinkAnnotation(const std::string& name,
 	if (_linkAnnotations.end() != it) 
 		throw InvalidArgumentException("Annotation already exists.");
 
-	LinkAnnotation ann(_pPDF,
+	LinkAnnotation ann(&_pDocument->handle(),
 		HPDF_Page_CreateLinkAnnot(_page, rect, dest),
 		name);
 	std::pair<LinkAnnotationContainer::iterator, bool> ret = 
@@ -172,7 +195,7 @@ const LinkAnnotation& Page::createURILinkAnnotation(const std::string& name,
 	if (_linkAnnotations.end() != it) 
 		throw InvalidArgumentException("Annotation already exists.");
 
-	LinkAnnotation ann(_pPDF,
+	LinkAnnotation ann(&_pDocument->handle(),
 		HPDF_Page_CreateURILinkAnnot(_page, rect, uri.c_str()),
 		name);
 	std::pair<LinkAnnotationContainer::iterator, bool> ret = 

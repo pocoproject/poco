@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.4 >> -- hpdf_fontdef.h
+ * << Haru Free PDF Library >> -- hpdf_fontdef.h
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -300,7 +303,8 @@ typedef struct _HPDF_TTFontDefAttr_Rec {
     HPDF_TTF_OffsetTbl       offset_tbl;
     HPDF_TTF_CmapRange       cmap;
     HPDF_UINT16              fs_type;
-    HPDF_BYTE                panose[12];
+    HPDF_BYTE                sfamilyclass[2];
+    HPDF_BYTE                panose[10];
     HPDF_UINT32              code_page_range1;
     HPDF_UINT32              code_page_range2;
 
@@ -400,4 +404,3 @@ HPDF_CIDFontDef_ChangeStyle   (HPDF_FontDef    fontdef,
 #endif /* __cplusplus */
 
 #endif /* _HPDF_FONTDEF_H */
-

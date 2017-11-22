@@ -34,6 +34,9 @@ namespace Poco {
 namespace PDF {
 
 
+class Document;
+
+
 class PDF_API Page
 	/// A Page represents a PDF page object.
 {
@@ -74,9 +77,9 @@ public:
 	enum Orientation
 	{
 		ORIENTATION_PORTRAIT = HPDF_PAGE_PORTRAIT,
-			// Portrait orientation.  
+			// Portrait orientation.
 		ORIENTATION_LANDSCAPE = HPDF_PAGE_LANDSCAPE
-			// Landscape orientation. 
+			// Landscape orientation.
 	};
 
 	enum RenderMode
@@ -141,7 +144,7 @@ public:
 			/// Add spaces between the words to justify both left and right side.
 	};
 
-	Page(HPDF_Doc* pPDF,
+	Page(Document* pDocument,
 		const HPDF_Page& page,
 		Size pageSize = PAGE_SIZE_LETTER,
 		Orientation orientation = ORIENTATION_PORTRAIT);
@@ -197,6 +200,9 @@ public:
 		/// Angle must be multiple of 90.
 
 	void setFont(const Font& font, float size);
+		/// Sets the font.
+
+	void setFont(const std::string& fontName, float size, const std::string& encoding = "");
 		/// Sets the font.
 
 	float textWidth(const std::string& text);
@@ -511,7 +517,7 @@ public:
 private:
 	Page();
 
-	HPDF_Doc*                _pPDF;
+	Document*                _pDocument;
 	HPDF_Page                _page;
 	Size                     _size;
 	Orientation              _orientation;
@@ -530,12 +536,6 @@ private:
 inline Page::operator const Page::Type& () const
 {
 	return _page;
-}
-
-
-inline bool Page::operator == (const Page& other) const
-{
-	return _pPDF == other._pPDF && _page == other._page;
 }
 
 
@@ -792,13 +792,6 @@ inline void Page::moveTextNextLine(float x, float y)
 inline void Page::moveTextNextLine()
 {
 	HPDF_Page_MoveToNextLine(_page);
-}
-
-
-inline const Font& Page::getFont() const
-{
-	delete _pCurrentFont;
-	return *(_pCurrentFont = new Font(_pPDF, HPDF_Page_GetCurrentFont(_page)));
 }
 
 
