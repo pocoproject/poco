@@ -34,6 +34,12 @@ public:
 	static char* allocate(std::streamsize size);
 	static void deallocate(char* ptr, std::streamsize size);
 
+	static void clearPool()
+		// Clear static pool.
+	{ 
+		_pool.clear();
+	}
+
 	enum
 	{
 		BUFFER_SIZE = 4096

@@ -76,6 +76,12 @@ public:
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
+
+	static void clearPool()
+		// Clear static pool.
+	{ 
+		_pool.clear();
+	}
 	
 private:
 	static Poco::MemoryPool _pool;
@@ -91,6 +97,12 @@ public:
 
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
+
+	static void clearPool()
+		// Clear static pool.
+	{ 
+		_pool.clear();
+	}
 	
 private:
 	static Poco::MemoryPool _pool;
