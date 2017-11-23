@@ -155,7 +155,7 @@ const Font& Document::font(const std::string& name, const std::string& encoding)
 {
 	FontContainer::iterator it = _fonts.find(name);
 	if (_fonts.end() != it) return it->second;
-		
+
 	return loadFont(name, encoding);
 }
 
@@ -166,20 +166,20 @@ std::string Document::loadType1Font(const std::string& afmFileName, const std::s
 }
 
 
-std::string Document::loadTTFont(const std::string& fileName, bool embedding, int index)
+std::string Document::loadTTFont(const std::string& fileName, bool embed, int index)
 {
 	if (-1 == index)
 	{
 		return HPDF_LoadTTFontFromFile(_pdf,
 			fileName.c_str(),
-			embedding ? HPDF_TRUE : HPDF_FALSE);
+			embed ? HPDF_TRUE : HPDF_FALSE);
 	}
 	else if (index >= 0)
 	{
 		return HPDF_LoadTTFontFromFile2(_pdf, 
 			fileName.c_str(), 
 			static_cast<HPDF_UINT>(index), 
-			embedding ? HPDF_TRUE : HPDF_FALSE);
+			embed ? HPDF_TRUE : HPDF_FALSE);
 	}
 	else
 		throw InvalidArgumentException("Invalid font index.");

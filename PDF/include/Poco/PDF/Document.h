@@ -218,9 +218,9 @@ public:
 	std::string loadType1Font(const std::string& afmFileName, const std::string& pfmFileName);
 		/// Loads type 1 font from file. Returns font name.
 
-	std::string loadTTFont(const std::string& fileName, bool embedding, int index = -1);
+	std::string loadTTFont(const std::string& fileName, bool embed, int index = -1);
 		/// Loads true type font from file. Returns font name.
-		/// If the embedding parameter is true, the glyph data of the font is embedded, 
+		/// If the embed parameter is true, the glyph data of the font is embedded, 
 		/// otherwise only the matrix data is included in PDF file.
 
 	const Image& loadPNGImage(const std::string& fileName);
