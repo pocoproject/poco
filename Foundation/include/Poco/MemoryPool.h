@@ -47,6 +47,9 @@ public:
 		
 	~MemoryPool();
 
+	void clear();
+		/// Clear memory pool. Released memory block are freed.
+
 	void* get();
 		/// Returns a memory block. If there are no more blocks
 		/// in the pool, a new block will be allocated.
@@ -70,8 +73,6 @@ private:
 	MemoryPool();
 	MemoryPool(const MemoryPool&);
 	MemoryPool& operator = (const MemoryPool&);
-	
-	void clear();
 	
 	enum
 	{

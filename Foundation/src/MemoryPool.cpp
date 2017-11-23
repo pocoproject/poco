@@ -57,10 +57,14 @@ MemoryPool::~MemoryPool()
 
 void MemoryPool::clear()
 {
+	FastMutex::ScopedLock lock(_mutex);
+
 	for (BlockVec::iterator it = _blocks.begin(); it != _blocks.end(); ++it)
 	{
 		delete [] *it;
 	}
+
+	_allocated -= static_cast<int>(_blocks.size());
 	_blocks.clear();
 }
 
