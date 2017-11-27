@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.5 >> -- hpdf_encryptdict.c
+ * << Haru Free PDF Library >> -- hpdf_encryptdict.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -10,8 +13,7 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.09.04 modified.
- *---------------------------------------------------------------------------*/
+ */
 
 #include <time.h>
 #include "hpdf_conf.h"
@@ -19,10 +21,9 @@
 #include "hpdf_objects.h"
 #include "hpdf_encryptdict.h"
 #include "hpdf_info.h"
-
-/*---------------------------------------------------------------------------*/
-/*------ HPDF_EncryptDict ---------------------------------------------------*/
-
+#ifndef HPDF_UNUSED
+#define HPDF_UNUSED(a) ((void)(a))
+#endif
 
 HPDF_EncryptDict
 HPDF_EncryptDict_New  (HPDF_MMgr  mmgr,
@@ -67,13 +68,15 @@ HPDF_EncryptDict_CreateID  (HPDF_EncryptDict  dict,
     /* use the result of 'time' function to get random value.
      * when debugging, 'time' value is ignored.
      */
-#ifndef HPDF_DEBUG
+#ifndef LIBHPDF_DEBUG
     time_t t = HPDF_TIME (NULL);
-#endif /* HPDF_DEBUG */
+#endif /* LIBHPDF_DEBUG */
 
     HPDF_MD5Init (&ctx);
+    HPDF_UNUSED (xref);
+    HPDF_UNUSED (info);
 
-#ifndef HPDF_DEBUG
+#ifndef LIBHPDF_DEBUG
     HPDF_MD5Update(&ctx, (HPDF_BYTE *)&t, sizeof(t));
 
     /* create File Identifier from elements of Into dictionary. */

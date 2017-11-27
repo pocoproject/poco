@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_font_type1.c
+ * << Haru Free PDF Library >> -- hpdf_font_type1.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -330,13 +333,13 @@ Type1Font_OnWrite  (HPDF_Dict    obj,
     if (!fontdef_attr->is_base14font || encoder_attr->has_differences) {
         char *pbuf;
 
-        pbuf = HPDF_StrCpy (buf, "/FirstChar ", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "/FirstChar ", eptr);
         pbuf = HPDF_IToA (pbuf, encoder_attr->first_char, eptr);
         HPDF_StrCpy (pbuf, "\012", eptr);
         if ((ret = HPDF_Stream_WriteStr (stream, buf)) != HPDF_OK)
             return ret;
 
-        pbuf = HPDF_StrCpy (buf, "/LastChar ", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "/LastChar ", eptr);
         pbuf = HPDF_IToA (pbuf, encoder_attr->last_char, eptr);
         HPDF_StrCpy (pbuf, "\012", eptr);
         if ((ret = HPDF_Stream_WriteStr (stream, buf)) != HPDF_OK)

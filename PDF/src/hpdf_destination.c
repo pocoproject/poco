@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_destination.c
+ * << Haru Free PDF Library >> -- hpdf_destination.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -16,7 +19,7 @@
 #include "hpdf_utils.h"
 #include "hpdf.h"
 
-const char *HPDF_DESTINATION_TYPE_NAMES[] = {
+const char * const HPDF_DESTINATION_TYPE_NAMES[] = {
         "XYZ",
         "Fit",
         "FitH",
@@ -82,8 +85,10 @@ HPDF_Destination_Validate (HPDF_Destination  dst)
         return HPDF_FALSE;
 
     target = (HPDF_Page)HPDF_Array_GetItem (dst, 0, HPDF_OCLASS_DICT);
-    if (!HPDF_Page_Validate (target))
-        return HPDF_SetError (dst->error, HPDF_INVALID_PAGE, 0);
+    if (!HPDF_Page_Validate (target)) {
+	    HPDF_SetError (dst->error, HPDF_INVALID_PAGE, 0);
+        return HPDF_FALSE;
+    }
 
     return HPDF_TRUE;
 }

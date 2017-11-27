@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{903ebe2e-90b9-4dbd-bcdb-67d434dcd21f}</UniqueIdentifier>
+      <UniqueIdentifier>{a78b427b-0039-4122-8e82-2e192f1c832a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{be3072f7-bd18-4669-b546-463f39866605}</UniqueIdentifier>
+      <UniqueIdentifier>{e5eff831-9d7a-495c-a246-32f2eeb77715}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party">
-      <UniqueIdentifier>{cf7dfb3d-1c88-413e-ae16-db84deb3ada9}</UniqueIdentifier>
+      <UniqueIdentifier>{6f46e0bd-3aee-4328-a18c-f7004a671d5e}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG">
-      <UniqueIdentifier>{622f2e0b-46c3-4d86-a25d-7735b9655279}</UniqueIdentifier>
+      <UniqueIdentifier>{43ddd7b2-30f4-49e8-92fa-7102ec5ce534}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG\Header Files">
-      <UniqueIdentifier>{d9b86640-57b0-4960-8f0e-faf21b98896d}</UniqueIdentifier>
+      <UniqueIdentifier>{9762c46a-6bd0-4794-a25c-3453929670cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG\Source Files">
-      <UniqueIdentifier>{5d28c0c3-e691-463e-b0a2-82b1c1bca7fb}</UniqueIdentifier>
+      <UniqueIdentifier>{1b08f5b4-3cf4-4a22-bda1-5c3670840dd2}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib">
-      <UniqueIdentifier>{79876636-1777-44a5-a107-8463b5814ecf}</UniqueIdentifier>
+      <UniqueIdentifier>{b5086a0c-cad8-4fb3-ac71-47f04cb88037}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib\Header Files">
-      <UniqueIdentifier>{805d9f8d-b75f-4e54-9a63-9f5a20415ed6}</UniqueIdentifier>
+      <UniqueIdentifier>{9f150cc4-ce94-4c84-a42d-80cc958a12a4}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib\Source Files">
-      <UniqueIdentifier>{6e06461b-4cc9-4f70-a9c2-a4e52676533a}</UniqueIdentifier>
+      <UniqueIdentifier>{fc8467cb-b0f1-4002-bdc4-2101de6b36ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU">
-      <UniqueIdentifier>{ad23fad6-299b-42fc-8eda-750062049e82}</UniqueIdentifier>
+      <UniqueIdentifier>{348973b0-b61b-4df8-a08b-2e6038a02d01}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU\Source Files">
-      <UniqueIdentifier>{ed7a20d6-bcee-44e6-a8a2-575d7f7c3f47}</UniqueIdentifier>
+      <UniqueIdentifier>{3d4deccc-40b9-4adc-8de7-6fb5adcaddfb}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU\Header Files">
-      <UniqueIdentifier>{8258d4e8-864c-4d6f-9248-5e529ee930c1}</UniqueIdentifier>
+      <UniqueIdentifier>{ebe44bbe-83ac-4bd3-9901-41250a93abc4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +156,9 @@
     <ClCompile Include="src\zutil.c">
       <Filter>3rd Party\zlib\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\hpdf_3dmeasure.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\hpdf_annotation.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
@@ -198,6 +201,9 @@
     <ClCompile Include="src\hpdf_encoder_kr.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\hpdf_encoder_utf.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\hpdf_encrypt.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
@@ -205,6 +211,9 @@
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hpdf_error.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hpdf_exdata.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hpdf_ext_gstate.c">
@@ -255,6 +264,9 @@
     <ClCompile Include="src\hpdf_image.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\hpdf_image_ccitt.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\hpdf_image_png.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
@@ -268,6 +280,9 @@
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hpdf_name.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hpdf_namedict.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hpdf_null.c">
@@ -291,6 +306,9 @@
     <ClCompile Include="src\hpdf_pages.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\hpdf_pdfa.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\hpdf_real.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
@@ -298,6 +316,9 @@
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hpdf_string.c">
+      <Filter>3rd Party\HARU\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hpdf_u3d.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\hpdf_utils.c">
@@ -383,6 +404,9 @@
     <ClInclude Include="include\Poco\PDF\hpdf.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PDF\hpdf_3dmeasure.h">
+      <Filter>3rd Party\HARU\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\PDF\hpdf_annotation.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
@@ -413,6 +437,9 @@
     <ClInclude Include="include\Poco\PDF\hpdf_error.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PDF\hpdf_exdata.h">
+      <Filter>3rd Party\HARU\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\PDF\hpdf_ext_gstate.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
@@ -437,6 +464,9 @@
     <ClInclude Include="include\Poco\PDF\hpdf_mmgr.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PDF\hpdf_namedict.h">
+      <Filter>3rd Party\HARU\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\PDF\hpdf_objects.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
@@ -449,13 +479,22 @@
     <ClInclude Include="include\Poco\PDF\hpdf_pages.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PDF\hpdf_pdfa.h">
+      <Filter>3rd Party\HARU\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\PDF\hpdf_streams.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\PDF\hpdf_types.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\PDF\hpdf_u3d.h">
+      <Filter>3rd Party\HARU\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\PDF\hpdf_utils.h">
+      <Filter>3rd Party\HARU\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\PDF\hpdf_version.h">
       <Filter>3rd Party\HARU\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
