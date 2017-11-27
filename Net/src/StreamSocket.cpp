@@ -73,6 +73,12 @@ StreamSocket& StreamSocket::operator = (const Socket& socket)
 }
 
 
+void StreamSocket::bind(const SocketAddress& address, bool reuseAddress)
+{
+	impl()->bind(address, reuseAddress);
+}
+
+
 void StreamSocket::connect(const SocketAddress& address)
 {
 	impl()->connect(address);
