@@ -203,7 +203,11 @@ public:
 		/// Sets the font.
 
 	void setFont(const std::string& fontName, float size, const std::string& encoding = "");
-		/// Sets the font.
+		/// Sets the font. The name must be a valid Base14 PDF internal font.
+
+	void setTTFont(const std::string& name, float size, const std::string& encoding = "UTF-8", bool embed = true);
+		/// Sets the external true type font. Name must be a valid path to .ttf file.
+		/// If embed is tru, font will be embedded int othe document.
 
 	float textWidth(const std::string& text);
 		/// Returns the width of the supplied text.

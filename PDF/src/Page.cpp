@@ -108,8 +108,13 @@ float Page::textWidth(const std::string& text)
 
 void Page::setFont(const std::string& name, float size, const std::string& encoding)
 {
-	Font font(&_pDocument->handle(), HPDF_GetFont(_pDocument->handle(), name.c_str(), encoding.empty() ? 0 : encoding.c_str()));
-	setFont(font, size);
+	setFont(_pDocument->font(name, encoding), size);
+}
+
+
+void Page::setTTFont(const std::string& name, float size, const std::string& encoding, bool embed)
+{
+	setFont(_pDocument->font(_pDocument->loadTTFont(name, embed), encoding), size);
 }
 
 
