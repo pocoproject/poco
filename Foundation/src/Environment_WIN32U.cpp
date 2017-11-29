@@ -21,6 +21,7 @@
 #include "Poco/UnWindows.h"
 #include <winsock2.h>
 #include <wincrypt.h>
+#include <ws2ipdef.h>
 #include <iphlpapi.h>
 
 
