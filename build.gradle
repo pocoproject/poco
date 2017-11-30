@@ -862,7 +862,6 @@ task packaging() {
 		dependsOn wix
 	}
 }
-}
 /*
     tasks { t ->
         $.components.main.binaries.each { binary ->
