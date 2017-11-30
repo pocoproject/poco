@@ -167,7 +167,9 @@ void Utility::throwException(int rc, const std::string& addErrMsg)
 		throw ExecutionAbortedException(std::string("Callback routine requested an abort"), addErrMsg);
 	case SQLITE_BUSY:
 	case SQLITE_BUSY_RECOVERY:
+#if defined(SQLITE_BUSY_SNAPSHOT)
 	case SQLITE_BUSY_SNAPSHOT:
+#endif
 		throw DBLockedException(std::string("The database file is locked"), addErrMsg);
 	case SQLITE_LOCKED:
 		throw TableLockedException(std::string("A table in the database is locked"), addErrMsg);

@@ -336,7 +336,7 @@ void EVPTest::testECEVPSaveLoadStream()
 			assert (strPubE.str() == pubKey);
 			assert (key == key2);
 			assert (!(key != key2));
-			ECKey ecKeyNE("secp112r2");
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
@@ -391,7 +391,7 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 			assert (strPubE.str() == pubKey);
 			assert (key == key2);
 			assert (!(key != key2));
-			ECKey ecKeyNE("secp112r2");
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
@@ -448,7 +448,7 @@ void EVPTest::testECEVPSaveLoadFile()
 			assert (strPubE.str() == pubKey);
 			assert (key == key2);
 			assert (!(key != key2));
-			ECKey ecKeyNE("secp112r2");
+			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
 			assert (key != keyNE);
 			assert (!(key == keyNE));
