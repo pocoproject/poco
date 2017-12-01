@@ -337,6 +337,45 @@ protected:
 	std::shared_ptr<C> _ptr;
 };
 
+/// Provide a simple way of using SharedPtr to dynamically allocate array.
+/// ex, SharedPtr<class_A[]> p(new class_A[10]);
+/// For non-promitive type it prevents from crash.
+template <class C>
+class SharedPtr<C[]>
+{
+public:
+	typedef C  element_type;
+	typedef C* pointer;
+
+	SharedPtr(C* ptr):
+		_uni_ptr(ptr), _ptr(std::move(_uni_ptr)), m_pT(ptr)
+	{
+	}
+
+	SharedPtr& assign(C* ptr)
+	{
+		_uni_ptr.reset(ptr);
+		_ptr = std::move(_uni_ptr);
+		m_pT = ptr;
+		return *this;
+	}
+
+	element_type& operator [] (size_t i) const
+	{
+		return m_pT[i];
+	}
+
+	~SharedPtr()
+	{
+	}
+
+protected:
+	/// do NOT change the order!
+	std::unique_ptr<C[]> _uni_ptr;
+	std::shared_ptr<C>   _ptr;
+
+	pointer m_pT;
+};
 
 template <class C>
 inline void swap(SharedPtr<C>& p1, SharedPtr<C>& p2)
