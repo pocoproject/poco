@@ -252,6 +252,9 @@ protected:
 			Environment::set("PATH", path);
 		}
 
+		logger().debug("exec " + exec);
+		logger().debug("path " + path);
+
 		if (usePipe)
 		{
 			Poco::Pipe inPipe;
