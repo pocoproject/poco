@@ -753,10 +753,14 @@ PocoDoc.output=releases/poco-${version}-all-doc
 PocoDoc.version=${version}-all
 """
 	if (os.windows) {
-		file.text += """
+		def	String javaVCH = VCHome.replace('\\','/')
+		def	String javaCLP = CLPath.replace('\\','/')
+		def	String javaWDK = WDKHome.replace('\\','/')
+ 		file.text += """
 Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
-VC=${VCHome}
-WDK=${WDKHome}
+VCH=${javaVCH}
+WDK=${javaWDK}
+CLP=${javaCLP}
 """
 	} else {
 	}
@@ -766,6 +770,8 @@ task pocoDoc(type: Exec) {
 	dependsOn PocoDocIni
 	if (os.windows) {
 		environment "Path", "$rootDir\\bin;$Path"
+		println environment.Path
+		
 		executable "PocoDoc/bin/PocoDoc.exe"
 		args "/config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
 		args "/config=$rootDir/PocoDoc/PocoDoc.ini"
@@ -782,10 +788,10 @@ task pocoDoc(type: Exec) {
 		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 //	inputs.files(tasks.getByPath(':production').outputs.files)
-//	inputs.files(executable)
+	inputs.files(executable)
 	inputs.files(fileTree("doc").filter { it.isFile() })
 	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"))
-	outputs.files(new File("releases/$version-all-doc/index.html"))
+	outputs.files(new File("releases/poco-$version-all-doc/index.html"))
 }
 task zipDoc(type: Zip) {
 	from "releases/poco-${version}-all-doc/"
@@ -815,6 +821,7 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 		args "Poco.wxs"
 
+		inputs.files(new File("releases/poco-$version-all-doc/index.html"))
 		inputs.files(new File(workingDir, "Poco.wxs"))
 		inputs.files(project.getTasksByName('poco', true).outputs.files)
 		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
