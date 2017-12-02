@@ -214,22 +214,21 @@ subprojects {
 			debug
 		}
 
+/*
 		toolChains {
-/*			visualCpp(VisualCpp) {
+			visualCpp(VisualCpp) {
 				// Specify the installDir if Visual Studio cannot be located
-//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.11.25503/bin/HostX86/x64/cl.exe"
-//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017"
+//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community"
 //				installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
 			}
-*/
-/*
+
 			gcc(Gcc) {
 				// Uncomment to use a GCC install that is not in the PATH
 				// path "/usr/bin/gcc"
 			}
 			clang(Clang)
-*/
 		}
+*/
 		platforms {
 			win32 {
 				operatingSystem "windows"
@@ -260,10 +259,10 @@ subprojects {
 		repositories {
 			libs(PrebuiltLibraries) {
 				WS2_32 {
-					headers.srcDir 'C:/Program Files (x86)/Windows Kits/10/Include/10.0.15063.0/um'
+					headers.srcDir "$WDKHome/um"
 					binaries.withType(StaticLibraryBinary) {
 						if (targetPlatform.operatingSystem.windows) {
-							staticLibraryFile = file('C:/Program Files (x86)/Windows Kits/10/Lib/10.0.15063.0/um/x86/WS2_32.lib')
+							staticLibraryFile = file("$WDKHome/um/x86/WS2_32.lib")
 						}
 					}
 				}
@@ -850,8 +849,8 @@ def light(VSYEAR, VERSION, target, os) {
 	}
 }
 task wix() {
-	dependsOn 		light('VS2015', version, 'x86', os)
-	dependsOn 		light('VS2015', version, 'x64', os)
+	dependsOn 		light('VS2017', version, 'x86', os)
+	dependsOn 		light('VS2017', version, 'x64', os)
 	onlyIf(new Spec<Task>() {
 		boolean isSatisfiedBy(Task task) {
 			   return os.windows;
@@ -891,14 +890,14 @@ task packaging() {
 }
 def cover(os, Directory, Module) {
 	return tasks.create("cover-${Module}", Exec) {
-		def Set<Task> tests = project.getTasksByName('testsuite', true)
+		def Set<Task> tests = project.getTasksByName("testsuite:${Module}", true)
 		setDependsOn(tests)
 		String PATH = System.getenv("PATH")
 		PATH = "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$PATH"
 		PATH = "$mysql32Home\\lib;$PATH"
 		PATH = "$postgres32Home\\lib;$PATH"
-//		println environment.Path
 		environment "Path", "$PATH"
+//		println environment.Path
 
 		environment "POCO_BASE", "$rootDir"
 //		println "POCO_BASE=" + environment.POCO_BASE
@@ -948,53 +947,41 @@ def report(os, Directory, Module) {
 		dependsOn cover(os, Directory, Module)
 		
 		executable "${ReportGeneratorHome}/ReportGenerator.exe"
-		args "-verbosity:Error"
+		args "-verbosity:Verbose"
 		args "-reports:coverage/${Module}/${Module}TestSuiteCoverage.xml"
 		args "-targetdir:coverage/${Module}"
-	//	args "-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include"
+//		args "-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include"
 
 		File targetDir = new File("coverage/${Module}")
 		inputs.files(new File(targetDir,"${Module}TestSuite.xml"))
 
 		onlyIf(new Spec<Exec>() {
-			boolean isSatisfiedBy(Exec task) {s
+			boolean isSatisfiedBy(Exec task) {
 				   return os.windows;
 			}
 		});
 	}
 }
 task coverage() {
-	def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
-	tasksSet.each { task -> println task.project.parent.path.replace(':','/').substring(1) }
-//	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
-	dependsOn report(os, 'Data/SQLite', 'SQLite')
+	if (os.windows) {
+		def Set<Task> tasksSet = project.getTasksByName('testsuite', true)
+		println "task coverage: list of covered modules"
+		println "--------------------------------------"
+		tasksSet.each { task -> println task.project.parent.path.replace(':','/').substring(1) }
+
+	//	tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
+
+		dependsOn report(os, 'XML', 'XML')
+	}
 }
 
-task all() {
 /*
+task all() {
         FileCollection incs = task.includes;
         incs.each { dir -> fileTree(dir).files.each { file -> inputs.files(file) }};
         inputs.files.each { file -> println file.path }
-*/
 }
-task includes() {
-	doLast {
-		TaskContainer tc;
-//		Task t = tasks.getByPath(':poco');
-//		TaskDependency td = t.taskDependencies;
-//		td.values.each { task -> println task }
-		def ts = subprojects.tasks //.matching { task -> task.name.contains("poco") }
-//		println ts.each { it.matching { task -> task.name.contains("poco") } }
-/*
-		def compileTasks = tasks.withType(CppCompile).matching { Task task -> 
-				String path = task.path;
-				String name = task.name;
-				name.contains("Shared") && name.contains("Release") && name.contains("Win32") && !path.contains("test") && !path.contains("sample")
-		}
-		println compileTasks
 */
-	}
-}
 /*
     tasks { t ->
         $.components.main.binaries.each { binary ->
