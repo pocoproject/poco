@@ -1040,7 +1040,6 @@
                             <File Id="ERROR.H" Name="Error.h" Source="$(var.POCO)\Foundation\include\Poco\Error.h" />
                             <File Id="ERRORHANDLER.H" Name="ErrorHandler.h" Source="$(var.POCO)\Foundation\include\Poco\ErrorHandler.h" />
                             <File Id="EVENT.H" Name="Event.h" Source="$(var.POCO)\Foundation\include\Poco\Event.h" />
-                            <File Id="EVENT_WIN32.H" Name="Event_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Event_WIN32.h" />
                             <File Id="EVENTARGS.H" Name="EventArgs.h" Source="$(var.POCO)\Foundation\include\Poco\EventArgs.h" />
                             <File Id="EVENTLOGCHANNEL.H" Name="EventLogChannel.h" Source="$(var.POCO)\Foundation\include\Poco\EventLogChannel.h" />
                             <File Id="EXCEPTION.H" Name="Exception.h" Source="$(var.POCO)\Foundation\include\Poco\Exception.h" />
@@ -1106,7 +1105,6 @@
                             <File Id="METAOBJECT.H" Name="MetaObject.h" Source="$(var.POCO)\Foundation\include\Poco\MetaObject.h" />
                             <File Id="METAPROGRAMMING.H" Name="MetaProgramming.h" Source="$(var.POCO)\Foundation\include\Poco\MetaProgramming.h" />
                             <File Id="MUTEX.H" Name="Mutex.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex.h" />
-                            <File Id="MUTEX_WIN32.H" Name="Mutex_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Mutex_WIN32.h" />
                             <File Id="NAMEDEVENT.H" Name="NamedEvent.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent.h" />
                             <File Id="NAMEDEVENT_ANDROID.H" Name="NamedEvent_Android.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_Android.h" />
                             <File Id="NAMEDEVENT_WIN32.H" Name="NamedEvent_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\NamedEvent_WIN32.h" />
@@ -1166,7 +1164,6 @@
                             <File Id="SCOPEDLOCK.H" Name="ScopedLock.h" Source="$(var.POCO)\Foundation\include\Poco\ScopedLock.h" />
                             <File Id="SCOPEDUNLOCK.H" Name="ScopedUnlock.h" Source="$(var.POCO)\Foundation\include\Poco\ScopedUnlock.h" />
                             <File Id="SEMAPHORE.H" Name="Semaphore.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore.h" />
-                            <File Id="SEMAPHORE_WIN32.H" Name="Semaphore_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore_WIN32.h" />
                             <File Id="SHA1ENGINE.H" Name="SHA1Engine.h" Source="$(var.POCO)\Foundation\include\Poco\SHA1Engine.h" />
                             <File Id="SHAREDLIBRARY.H" Name="SharedLibrary.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary.h" />
                             <File Id="SHAREDLIBRARY_WIN32.H" Name="SharedLibrary_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\SharedLibrary_WIN32.h" />
@@ -1200,7 +1197,6 @@
                             <File Id="TEXTENCODING.H" Name="TextEncoding.h" Source="$(var.POCO)\Foundation\include\Poco\TextEncoding.h" />
                             <File Id="TEXTITERATOR.H" Name="TextIterator.h" Source="$(var.POCO)\Foundation\include\Poco\TextIterator.h" />
                             <File Id="THREAD.H" Name="Thread.h" Source="$(var.POCO)\Foundation\include\Poco\Thread.h" />
-                            <File Id="THREAD_WIN32.H" Name="Thread_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Thread_WIN32.h" />
                             <File Id="THREADLOCAL.H" Name="ThreadLocal.h" Source="$(var.POCO)\Foundation\include\Poco\ThreadLocal.h" />
                             <File Id="THREADPOOL.H" Name="ThreadPool.h" Source="$(var.POCO)\Foundation\include\Poco\ThreadPool.h" />
                             <File Id="THREADTARGET.H" Name="ThreadTarget.h" Source="$(var.POCO)\Foundation\include\Poco\ThreadTarget.h" />
