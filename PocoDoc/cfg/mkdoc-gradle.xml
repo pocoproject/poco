@@ -40,7 +40,7 @@
 				<options>
 					${Includes},
 					/I${PocoBase}/openssl/include
-					/I${VC}/include,
+					/I${VCH}/include,
 					/I${WDK}/shared
 					/I${WDK}/um
 					/I${WDK}/ucrt
@@ -51,7 +51,7 @@
 					/DPOCO_NO_GCC_API_ATTRIBUTE
 					/DPOCO_NO_WINDOWS_H
 				</options>
-				<path>${VC}/bin</path>
+				<path>${CLP}</path>
 				<usePipe>true</usePipe>
 			</windows>
 			<unix>
