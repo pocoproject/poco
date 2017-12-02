@@ -38,7 +38,6 @@ namespace
 			envbuf[pos] = '\0';
 			++pos;
 		}
-
 		envbuf.resize(pos + 1);
 		envbuf[pos] = '\0';
 

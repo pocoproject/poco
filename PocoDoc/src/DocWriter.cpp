@@ -2195,9 +2195,9 @@ void DocWriter::writePage(Page& page)
 	while (ch != -1 && ch != '\n') { category += (char) ch; ch = istr.get(); }
 	
 	while (std::isspace(ch)) ch = istr.get();
-	while (ch != -1) 
+	while (ch != -1)
 	{
-		text += (char) ch; 
+		text += (char) ch;
 		if (ch == '\n') text += ' ';
 		ch = istr.get();
 	}
@@ -2216,7 +2216,7 @@ void DocWriter::writePage(Page& page)
 	beginBody(ostr);
 	writeNavigationFrame(ostr, "category", category);
 	beginContent(ostr);
-	if (!toc.empty()) 
+	if (!toc.empty())
 	{
 		writeTOC(ostr, toc);
 	}
@@ -2284,7 +2284,7 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 				ostr << "</ul></li>" << std::endl;
 			}
 		}
-		else 
+		else
 		{
 			ostr << "</li>" << std::endl;
 		}
