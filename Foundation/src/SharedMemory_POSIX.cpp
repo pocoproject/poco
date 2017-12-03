@@ -67,7 +67,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 			throw SystemException("Cannot check file information", _name);
 		}
 		if (_size > buf.st_size) {
-			_size = buf.st_size
+			_size = buf.st_size;
 		}
 	}
 	map(addrHint);
