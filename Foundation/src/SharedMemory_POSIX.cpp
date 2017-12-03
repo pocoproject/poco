@@ -32,7 +32,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	_access(mode),
 	_name("/"),
 	_fileMapped(false),
-	_server(server)
+	_server((mode == SharedMemory::AM_WRITE))
 {
 #if POCO_OS == POCO_OS_HPUX
 	_name.append("tmp/");
@@ -58,6 +58,17 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 		_fd = -1;
 		::shm_unlink(_name.c_str());
 		throw SystemException("Cannot resize shared memory object", _name);
+	} else {
+		struct stat buf;
+		if (fstat(_fd, &buf) == -1) {
+			::close(_fd);
+			_fd = -1;
+			::shm_unlink(_name.c_str());
+			throw SystemException("Cannot check file information", _name);
+		}
+		if (_size > buf.st_size) {
+			_size = buf.st_size
+		}
 	}
 	map(addrHint);
 }
