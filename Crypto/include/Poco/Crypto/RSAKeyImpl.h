@@ -81,6 +81,9 @@ public:
 	RSA* getRSA();
 		/// Returns the OpenSSL RSA object.
 
+	EVP_PKEY* getEvpPKey() const;
+		/// Return the OpenSSL EVP_PKEY object.
+
 	const RSA* getRSA() const;
 		/// Returns the OpenSSL RSA object.
 

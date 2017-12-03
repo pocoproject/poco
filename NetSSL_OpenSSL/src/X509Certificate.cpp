@@ -61,10 +61,9 @@ X509Certificate::X509Certificate(const Poco::Crypto::X509Certificate& cert):
 }
 
 
-X509Certificate& X509Certificate::operator = (const Poco::Crypto::X509Certificate& cert)
+X509Certificate& X509Certificate::operator = (Poco::Crypto::X509Certificate other)
 {
-	X509Certificate tmp(cert);
-	swap(tmp);
+	Poco::Crypto::X509Certificate::swap(*this, other);
 	return *this;
 }
 
@@ -133,7 +132,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 	}
 	return ok;
 #else
-	if (X509_check_host(const_cast<X509*>(certificate.certificate()), hostName.c_str(), hostName.length(), 0, NULL) == 1)
+	if (X509_check_host(const_cast<X509*>(static_cast<const X509*>(certificate)), hostName.c_str(), hostName.length(), 0, NULL) == 1)
 	{
 		return true;
 	}
@@ -142,7 +141,7 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 		IPAddress ip;
 		if (IPAddress::tryParse(hostName, ip))
 		{
-		    return (X509_check_ip_asc(const_cast<X509*>(certificate.certificate()), hostName.c_str(), 0) == 1);
+			return (X509_check_ip_asc(const_cast<X509*>(static_cast<const X509*>(certificate)), hostName.c_str(), 0) == 1);
 		}
 	}
 	return false;

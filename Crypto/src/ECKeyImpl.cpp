@@ -41,7 +41,7 @@ ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
 	KeyPairImpl("ec", KT_EC_IMPL),
 	_pEC(0)
 {
-	const X509* pCert = cert.certificate();
+	const X509* pCert = cert;
 	if (pCert)
 	{
 		EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));

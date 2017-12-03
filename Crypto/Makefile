@@ -14,7 +14,8 @@ objects = Cipher CipherFactory CipherImpl CipherKey CipherKeyImpl \
 	CryptoException CryptoStream CryptoTransform ECDSADigestEngine \
 	ECKey ECKeyImpl EVPPKey KeyPair KeyPairImpl PKCS12Container \
 	RSACipherImpl RSAKey RSAKeyImpl RSADigestEngine DigestEngine \
-	X509Certificate OpenSSLInitializer
+	X509Certificate X509RevocationList X509Extension X509Request \
+	X509Store X509Revoked OpenSSLInitializer
 
 target         = PocoCrypto
 target_version = $(LIBVERSION)

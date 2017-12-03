@@ -84,4 +84,13 @@ RSAKeyImpl::ByteVec RSAKey::decryptionExponent() const
 }
 
 
+EVPPKey RSAKey::evppkey() const
+{
+	EVP_PKEY* k = _pImpl->getEvpPKey();
+	EVPPKey ek(k);
+	EVP_PKEY_free(k);
+	return ek;
+}
+
+
 } } // namespace Poco::Crypto

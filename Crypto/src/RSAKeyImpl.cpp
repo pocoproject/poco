@@ -42,7 +42,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(0)
 {
-	const X509* pCert = cert.certificate();
+	const X509* pCert = cert;
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
 	if (pKey)
 	{
@@ -211,6 +211,13 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream,
 RSAKeyImpl::~RSAKeyImpl()
 {
 	freeRSA();
+}
+
+EVP_PKEY* RSAKeyImpl::getEvpPKey() const
+{
+	EVP_PKEY* pkey = EVP_PKEY_new();
+	EVP_PKEY_set1_RSA(pkey, _pRSA);
+	return pkey;
 }
 
 

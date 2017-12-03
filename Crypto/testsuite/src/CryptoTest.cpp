@@ -14,14 +14,24 @@
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/CipherKey.h"
+#include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/RSADigestEngine.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/X509Request.h"
+#include "Poco/Crypto/X509Extension.h"
+#include "Poco/Crypto/X509Store.h"
+#include "Poco/Crypto/X509RevocationList.h"
+#include "Poco/Crypto/X509Revoked.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
+#include <openssl/x509v3.h>
 #include <sstream>
+#include <vector>
 
+#include <iostream>
 
 using namespace Poco::Crypto;
 
@@ -350,6 +360,253 @@ void CryptoTest::testCertificate()
 }
 
 
+void CryptoTest::testSignCertificate()
+{
+	X509Certificate certificate;
+
+	certificate.setCommonName("Common name test");
+	certificate.addSubject(X509Certificate::NID_COUNTRY, "DE");
+	certificate.addSubject(X509Certificate::NID_ORGANIZATION_NAME, "Test organization");
+
+	certificate.addIssuer(X509Certificate::NID_COMMON_NAME, "Issue common name");
+	certificate.addIssuer(X509Certificate::NID_COUNTRY, "DE");
+	certificate.addIssuer(X509Certificate::NID_ORGANIZATION_NAME, "The organization");
+
+	certificate.addExtension(X509Extension::createWithBasicConstraints(X509Extension::CRITICAL_CA_TRUE));
+
+	certificate.setSerialNumber(42);
+
+	Poco::DateTime expireDate(2323, 12, 31);
+	certificate.setExpiresOn(expireDate);
+	Poco::DateTime validFrom(2017, 8, 7);
+	certificate.setValidFrom(validFrom);
+
+	RSAKey rsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	EVPPKey key = rsaKey.evppkey();
+	certificate.setPublicKey(key);
+
+	certificate.sign(key);
+
+	std::string certificateSubjectName = certificate.subjectName();
+	assert (certificateSubjectName == "/CN=Common name test/C=DE/O=Test organization");
+	std::string certificateIssuerName = certificate.issuerName();
+	assert (certificateIssuerName == "/CN=Issue common name/C=DE/O=The organization");
+
+	std::ostringstream stream;
+	certificate.save(stream);
+
+	std::string content = stream.str();
+	std::istringstream certStream(content);
+
+	X509Certificate cert(certStream);
+
+	std::string subjectName(cert.subjectName());
+	std::string issuerName(cert.issuerName());
+	std::string commonName(cert.commonName());
+	std::string country(cert.subjectName(X509Certificate::NID_COUNTRY));
+	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
+
+	X509Extension::List extensions = cert.findExtensionByNID(NID_basic_constraints);
+
+	assert (extensions.size() == 1);
+	X509Extension extension = extensions.at(0);
+
+	assert (extension.isCritical() == true);
+	assert (extension.data()[0] == 0x30);
+	assert (extension.data()[1] == 0x03);
+	assert (extension.data()[2] == 0x01);
+	assert (extension.data()[3] == 0x01);
+	assert (extension.data()[4] == 0xff);
+
+	assert (subjectName == "/CN=Common name test/C=DE/O=Test organization");
+	assert (issuerName == "/CN=Issue common name/C=DE/O=The organization");
+	assert (commonName == "Common name test");
+	assert (country == "DE");
+	assert (organizationName == "Test organization");
+
+	assert (expireDate == cert.expiresOn());
+	assert (validFrom == cert.validFrom());
+}
+
+
+void CryptoTest::testSignRequestCertificate()
+{
+	X509Request certificate;
+
+	certificate.setCommonName("Common name test");
+	certificate.addSubject(X509Request::NID_COUNTRY, "DE");
+	certificate.addSubject(X509Request::NID_ORGANIZATION_NAME, "Test organization");
+
+	X509Extension::List extList;
+	extList.push_back(X509Extension::create(NID_ext_key_usage, "critical,1.3.6.1.5.5.7.3.2"));
+
+	certificate.setExtensions(extList);
+
+	certificate.addExtension(X509Extension::create(NID_basic_constraints, "critical,CA:FALSE"));
+	certificate.addExtension(X509Extension::create(NID_key_usage, "critical,digitalSignature"));
+	certificate.addExtension(X509Extension::createWithBasicConstraints(X509Extension::CRITICAL_CA_TRUE));
+
+	X509Extension::List extList2;
+	extList.push_back(X509Extension::createWithBasicConstraints(X509Extension::CRITICAL_CA_TRUE));
+	extList.push_back(X509Extension::create(NID_key_usage, "digitalSignature"));
+
+	certificate.setExtensions(extList2);
+
+	RSAKey key(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	EVPPKey publicKey = key.evppkey();
+	certificate.setPublicKey(publicKey);
+
+	std::string certificateSubjectName = certificate.subjectName();
+	assert (certificateSubjectName == "/CN=Common name test/C=DE/O=Test organization");
+
+	certificate.sign(publicKey);
+
+	std::ostringstream stream;
+	certificate.save(stream);
+
+	std::string content = stream.str();
+	std::istringstream certStream(content);
+
+	X509Request cert(certStream);
+
+	std::string subjectName(cert.subjectName());
+	std::string commonName(cert.commonName());
+	std::string country(cert.subjectName(X509Request::NID_COUNTRY));
+	std::string organizationName(cert.subjectName(X509Request::NID_ORGANIZATION_NAME));
+
+	X509Extension::List extensions = certificate.extensions();
+
+	assert (extensions.size() == 4);
+	X509Extension extension = extensions.at(0);
+
+	assert (extension.isCritical() == true);
+	assert (extension.data()[0] == 0x30);
+	assert (extension.data()[1] == 0x03);
+	assert (extension.data()[2] == 0x01);
+	assert (extension.data()[3] == 0x01);
+	assert (extension.data()[4] == 0xff);
+
+	assert (subjectName == "/CN=Common name test/C=DE/O=Test organization");
+	assert (commonName == "Common name test");
+	assert (country == "DE");
+	assert (organizationName == "Test organization");
+}
+
+
+void CryptoTest::testVerifyCertificate()
+{
+	Poco::DateTime validFrom(2017, 8, 7);
+	Poco::DateTime expireDate(2323, 12, 31);
+
+	X509Certificate rootCaCert;
+	rootCaCert.setCommonName("Root CA");
+	rootCaCert.setValidFrom(validFrom);
+	rootCaCert.setExpiresOn(expireDate);
+	rootCaCert.addExtension(X509Extension::createWithBasicConstraints(X509Extension::CRITICAL_CA_TRUE));
+	RSAKey caRsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	EVPPKey caKey = caRsaKey.evppkey();
+	rootCaCert.setPublicKey(caKey);
+	rootCaCert.addIssuer(X509Certificate::NID_COMMON_NAME, rootCaCert.commonName());
+	rootCaCert.sign(caKey);
+
+	X509Certificate intermediateCaCert;
+	intermediateCaCert.setCommonName("Intermediate CA");
+	intermediateCaCert.setValidFrom(validFrom);
+	intermediateCaCert.setExpiresOn(expireDate);
+	intermediateCaCert.addExtension(X509Extension::createWithBasicConstraints(X509Extension::CRITICAL_CA_TRUE));
+	intermediateCaCert.addIssuer(X509Certificate::NID_COMMON_NAME, rootCaCert.commonName());
+	RSAKey intermediateCaRsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	EVPPKey intermediateCaKey = intermediateCaRsaKey.evppkey();
+	intermediateCaCert.setPublicKey(intermediateCaKey);
+	intermediateCaCert.sign(caKey);
+
+	X509Certificate cert;
+	cert.setCommonName("Server Cert");
+	cert.setValidFrom(validFrom);
+	cert.setExpiresOn(expireDate);
+	cert.addIssuer(X509Certificate::NID_COMMON_NAME, intermediateCaCert.commonName());
+	RSAKey certRsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	EVPPKey certKey = certRsaKey.evppkey();
+	cert.setPublicKey(certKey);
+	cert.sign(intermediateCaKey);
+
+	std::istringstream wrongCertStream(APPINF_PEM);
+	X509Certificate wrongCert(wrongCertStream);
+
+	X509Store store;
+	store.addCa(rootCaCert);
+	store.addCa(intermediateCaCert);
+
+	X509Store::VerifyResult result = store.verifyCertificateChain(cert);
+	assert (result.isOk() == true);
+	result = store.verifyCertificateChain(wrongCert);
+	assert (result.isOk() == false);
+	assert (wrongCert.equals(result.certificate()) == true);
+}
+
+
+void CryptoTest::testRevokeCertificate()
+{
+	RSAKey rsaKey(RSAKey::KL_2048, RSAKey::EXP_LARGE);
+	EVPPKey key = rsaKey.evppkey();
+
+	X509Certificate rootCa;
+	rootCa.setCommonName("Root CA");
+	rootCa.addIssuer(X509Certificate::NID_COMMON_NAME, rootCa.subjectName(X509Certificate::NID_COMMON_NAME));
+	rootCa.addExtension(X509Extension::createWithBasicConstraints(X509Extension::CRITICAL_CA_TRUE));
+	rootCa.setSerialNumber(42);
+	Poco::DateTime expireDate(2323, 12, 31);
+	rootCa.setExpiresOn(expireDate);
+	Poco::DateTime validFrom(2017, 8, 7);
+	rootCa.setValidFrom(validFrom);
+	rootCa.setPublicKey(key);
+	rootCa.sign(key);
+
+
+	RSAKey rsaCertKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+	EVPPKey certKey = rsaCertKey.evppkey();
+	X509Certificate cert;
+	cert.setCommonName("Test certificate");
+	cert.setPublicKey(certKey);
+	cert.addIssuer(X509Certificate::NID_COMMON_NAME, rootCa.subjectName(X509Certificate::NID_COMMON_NAME));
+	cert.setSerialNumber(232323);
+	cert.setExpiresOn(expireDate);
+	cert.setValidFrom(validFrom);
+	cert.sign(key);
+
+
+	X509Revoked revoked;
+	Poco::DateTime revokeDate(2017, 10, 8);
+	revoked.setRevocationDate(revokeDate);
+	revoked.setSerialNumber(cert.serialNumber());
+	revoked.setReasonCode(X509Revoked::KEY_COMPROMISE);
+
+
+	X509RevocationList crl;
+	Poco::DateTime lastUpdate(2017,10,9);
+	crl.setLastUpdate(lastUpdate);
+	crl.addIssuer(X509RevocationList::NID_COMMON_NAME, rootCa.subjectName(X509Certificate::NID_COMMON_NAME));
+	crl.addRevoked(revoked);
+	crl.sign(key);
+
+
+	X509Store store;
+	store.setX509VerifyFlags(X509_V_FLAG_CRL_CHECK);
+	store.addCa(rootCa);
+	store.addCrl(crl);
+
+
+	X509Store::VerifyResult result = store.verifyCertificateChain(cert);
+	assert (result.isOk() == false);
+	assert (result.code() == X509_V_ERR_CERT_REVOKED);
+	assert (result.certificate().commonName() == "Test certificate");
+
+
+	assert (revoked.getRevocationDate() == revokeDate);
+	assert (revoked.getReasonCode() == X509Revoked::KEY_COMPROMISE);
+}
+
+
 void CryptoTest::setUp()
 {
 }
@@ -375,6 +632,10 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testDecryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
+	CppUnit_addTest(pSuite, CryptoTest, testSignCertificate);
+	CppUnit_addTest(pSuite, CryptoTest, testSignRequestCertificate);
+	CppUnit_addTest(pSuite, CryptoTest, testVerifyCertificate);
+	CppUnit_addTest(pSuite, CryptoTest, testRevokeCertificate);
 
 	return pSuite;
 }

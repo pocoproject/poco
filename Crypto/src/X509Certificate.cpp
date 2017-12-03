@@ -33,6 +33,12 @@ namespace Poco {
 namespace Crypto {
 
 
+X509Certificate::X509Certificate():
+	_pCert(X509_new())
+{
+	X509_set_version(_pCert, 2);
+}
+
 X509Certificate::X509Certificate(std::istream& istr):
 	_pCert(0)
 {
@@ -78,27 +84,40 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 	_issuerName(cert._issuerName),
 	_subjectName(cert._subjectName),
 	_serialNumber(cert._serialNumber),
-	_pCert(cert._pCert)
+	_pCert(0)
 {
-	_pCert = X509_dup(_pCert);
+	duplicate(cert._pCert, &_pCert);
+}
+
+X509Certificate::X509Certificate(X509Certificate&& other) :
+	_issuerName(),
+	_subjectName(),
+	_serialNumber(),
+	_pCert(0)
+{
+	swap(*this, other);
 }
 
 
-X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
+X509Certificate& X509Certificate::operator=(X509Certificate other)
 {
-	X509Certificate tmp(cert);
-	swap(tmp);
+	swap(*this, other);
 	return *this;
 }
 
 
-void X509Certificate::swap(X509Certificate& cert)
+void X509Certificate::swap(X509Certificate &first, X509Certificate &second)
 {
 	using std::swap;
-	swap(cert._issuerName, _issuerName);
-	swap(cert._subjectName, _subjectName);
-	swap(cert._serialNumber, _serialNumber);
-	swap(cert._pCert, _pCert);
+	swap(first._issuerName, second._issuerName);
+	swap(first._subjectName, second._subjectName);
+	swap(first._serialNumber, second._serialNumber);
+	swap(first._pCert, second._pCert);
+}
+
+void X509Certificate::swap(X509Certificate& cert)
+{
+	swap(cert, *this);
 }
 
 
@@ -215,9 +234,38 @@ void X509Certificate::init()
 }
 
 
+void X509Certificate::setSerialNumber(long serial)
+{
+	ASN1_INTEGER* asn1Serial = ASN1_INTEGER_new();
+	ASN1_INTEGER_set(asn1Serial, serial);
+	X509_set_serialNumber(_pCert, asn1Serial);
+	ASN1_INTEGER_free(asn1Serial);
+
+	init();
+}
+
+
+void X509Certificate::addIssuer(X509Certificate::NID nid, const std::string& name)
+{
+	const void* data = name.c_str();
+	unsigned char* bytes = static_cast<unsigned char*>(const_cast<void*>(data));
+	X509_NAME* x509name = X509_get_issuer_name(_pCert);
+	X509_NAME_add_entry_by_NID(x509name, nid, MBSTRING_ASC, bytes, -1, -1, 0);
+	X509_set_issuer_name(_pCert, x509name);
+
+	init();
+}
+
+
 std::string X509Certificate::commonName() const
 {
 	return subjectName(NID_COMMON_NAME);
+}
+
+
+void X509Certificate::setCommonName(const std::string& cn)
+{
+	addSubject(NID_COMMON_NAME, cn);
 }
 
 
@@ -233,9 +281,22 @@ std::string X509Certificate::issuerName(NID nid) const
 }
 
 
+void X509Certificate::addSubject(NID nid, const std::string& name)
+{
+	const void* data = name.c_str();
+	unsigned char* bytes = static_cast<unsigned char*>(const_cast<void*>(data));
+	X509_NAME* x509name = X509_get_subject_name(_pCert);
+	X509_NAME_add_entry_by_NID(x509name, nid, MBSTRING_ASC, bytes, -1, -1, 0);
+	X509_set_subject_name(_pCert, x509name);
+
+	init();
+}
+
+
 std::string X509Certificate::subjectName(NID nid) const
 {
-	if (X509_NAME* subj = X509_get_subject_name(_pCert))
+	X509_NAME* subj = X509_get_subject_name(_pCert);
+	if (subj)
 	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer)) >= 0)
@@ -271,12 +332,39 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 }
 
 
+void X509Certificate::setValidFrom(DateTime from)
+{
+	Timestamp timestamp = from.timestamp();
+	time_t time = timestamp.epochTime();
+	ASN1_TIME* asn1time = ASN1_TIME_new();
+	ASN1_TIME_set(asn1time, time);
+	X509_set_notBefore(_pCert, asn1time);
+	ASN1_TIME_free(asn1time);
+}
+
+
 Poco::DateTime X509Certificate::validFrom() const
 {
 	ASN1_TIME* certTime = X509_get_notBefore(_pCert);
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
+	std::string fmt = "%y%m%d%H%M%S";
+	if(certTime->type == V_ASN1_GENERALIZEDTIME)
+	{
+		fmt = "%Y%m%d%H%M%S";
+	}
 	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	return DateTimeParser::parse(fmt, dateTime, tzd);
+}
+    
+
+void X509Certificate::setExpiresOn(DateTime expires)
+{
+	Timestamp timestamp = expires.timestamp();
+	time_t time = timestamp.epochTime();
+	ASN1_TIME* asn1time = ASN1_TIME_new();
+	ASN1_TIME_set(asn1time, time);
+	X509_set_notAfter(_pCert, asn1time);
+	ASN1_TIME_free(asn1time);
 }
 
 	
@@ -284,15 +372,60 @@ Poco::DateTime X509Certificate::expiresOn() const
 {
 	ASN1_TIME* certTime = X509_get_notAfter(_pCert);
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
+	std::string fmt = "%y%m%d%H%M%S";
+	if(certTime->type == V_ASN1_GENERALIZEDTIME)
+	{
+		fmt = "%Y%m%d%H%M%S";
+	}
 	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	return DateTimeParser::parse(fmt, dateTime, tzd);
+}
+
+
+void X509Certificate::setPublicKey(const EVPPKey &pkey)
+{
+	X509_set_pubkey(_pCert, const_cast<EVP_PKEY*>(static_cast<const EVP_PKEY*>(pkey)));
+}
+
+
+EVPPKey X509Certificate::publicKey() const
+{
+	EVP_PKEY* k = X509_get_pubkey(_pCert);
+	return EVPPKey(k);
+}
+
+
+void X509Certificate::addExtension(const X509Extension &x509Extension)
+{
+	X509_EXTENSION* ext = const_cast<X509_EXTENSION*>(static_cast<const X509_EXTENSION*>(x509Extension));
+	X509_add_ext(_pCert, ext, -1);
+}
+
+
+X509Extension::List X509Certificate::findExtensionByNID(int nid)
+{
+	X509Extension::List extensions;
+	X509_EXTENSION *new_ex = 0;
+	int index = -1;
+	do {
+		index = X509_get_ext_by_NID(_pCert, nid, index);
+		if(index == -1)
+			break;
+
+		X509_EXTENSION* ext = X509_get_ext(_pCert, index);
+		new_ex = X509_EXTENSION_dup(ext);
+		extensions.push_back(X509Extension(new_ex));
+	}
+	while(index >= 0);
+
+	return extensions;
 }
 
 
 bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 {
 	X509* pCert = const_cast<X509*>(_pCert);
-	X509* pIssuerCert = const_cast<X509*>(issuerCertificate.certificate());
+	X509* pIssuerCert = const_cast<X509*>(static_cast<const X509*>(issuerCertificate));
 	EVP_PKEY* pIssuerPublicKey = X509_get_pubkey(pIssuerCert);
 	if (!pIssuerPublicKey) throw Poco::InvalidArgumentException("Issuer certificate has no public key");
 	int rc = X509_verify(pCert, pIssuerPublicKey);
@@ -301,10 +434,18 @@ bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 }
 
 
+bool X509Certificate::sign(const EVPPKey &pkey, const std::string& mdstr)
+{
+	const EVP_MD* md = EVP_get_digestbyname(mdstr.c_str());
+	int rc = X509_sign(_pCert, const_cast<EVP_PKEY*>(static_cast<const EVP_PKEY*>(pkey)), md);
+	return rc > 0;
+}
+
+
 bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 {
 	X509* pCert = const_cast<X509*>(_pCert);
-	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
+	X509* pOtherCert = const_cast<X509*>(static_cast<const X509*>(otherCertificate));
 	return X509_cmp(pCert, pOtherCert) == 0;
 }
 
@@ -359,12 +500,19 @@ void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
 	List::const_iterator end = list.end();
 	for (; it != end; ++it)
 	{
-		if (!PEM_write_bio_X509(pBIO, const_cast<X509*>(it->certificate())))
+		if (!PEM_write_bio_X509(pBIO, const_cast<X509*>(static_cast<const X509*>(*it))))
 		{
 			throw OpenSSLException("X509Certificate::writePEM()");
 		}
 	}
 	BIO_free(pBIO);
+}
+
+
+X509* X509Certificate::duplicate(const X509* pFromExtension, X509** pToExtension)
+{
+	*pToExtension = X509_dup(const_cast<X509*>(pFromExtension));
+	return *pToExtension;
 }
 
 

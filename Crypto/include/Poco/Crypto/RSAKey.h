@@ -56,7 +56,7 @@ public:
 	};
 
 	RSAKey(const EVPPKey& key);
-		/// Constructs ECKeyImpl by extracting the EC key.
+		/// Constructs RSAKey by extracting the RSA key from given EVPKey.
 
 	RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
@@ -97,6 +97,9 @@ public:
 
 	RSAKeyImpl::ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
+
+	EVPPKey evppkey() const;
+		/// Return EVPPKey object.
 
 	RSAKeyImpl::Ptr impl() const;
 		/// Returns the impl object.

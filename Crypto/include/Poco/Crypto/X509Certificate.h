@@ -1,6 +1,7 @@
 //
 // X509Certificate.h
 //
+//
 // Library: Crypto
 // Package: Certificate
 // Module:  X509Certificate
@@ -19,14 +20,15 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/X509Extension.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
 #include <vector>
 #include <set>
 #include <istream>
-#include <openssl/ssl.h>
-
+#include <openssl/x509.h>
 
 namespace Poco {
 namespace Crypto {
@@ -51,6 +53,9 @@ public:
 		NID_PKCS9_EMAIL_ADDRESS = 48,
 		NID_SERIAL_NUMBER = 105
 	};
+
+	X509Certificate();
+		/// Creates the X509Certificate object
 	
 	explicit X509Certificate(std::istream& istr);
 		/// Creates the X509Certificate object by reading
@@ -74,8 +79,14 @@ public:
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
-	X509Certificate& operator = (const X509Certificate& cert);
+	X509Certificate(X509Certificate&& other);
+		/// Move constructor.
+
+	X509Certificate& operator =(X509Certificate other);
 		/// Assigns a certificate.
+ 
+	static void swap(X509Certificate& first, X509Certificate& second);
+		/// Exchanges the certificate with another one.
 
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.
@@ -90,6 +101,12 @@ public:
 		/// Returns the certificate serial number as a
 		/// string in decimal encoding.
 
+	void setSerialNumber(long serial);
+		/// Set certificate serial number
+
+	void addIssuer(NID nid, const std::string& name);
+		/// Set certificate issuer's distinguished name.
+
 	const std::string& issuerName() const;
 		/// Returns the certificate issuer's distinguished name.
 		
@@ -98,6 +115,11 @@ public:
 		/// NID (name identifier) from the certificate issuer's
 		/// distinguished name.
 		
+	void addSubject(NID nid, const std::string& name);
+		/// Set the information specified by the given
+		/// NID (name identifier) from the certificate subject's
+		/// distinguished name.
+
 	const std::string& subjectName() const;
 		/// Returns the certificate subject's distinguished name.
 
@@ -106,6 +128,10 @@ public:
 		/// NID (name identifier) from the certificate subject's
 		/// distinguished name.
 		
+	void setCommonName(const std::string& cn);
+		/// Set the common name stored in the certificate
+		/// subject's distinguished name.
+
 	std::string commonName() const;
 		/// Returns the common name stored in the certificate
 		/// subject's distinguished name.
@@ -114,12 +140,30 @@ public:
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
 		
+	void setValidFrom(Poco::DateTime from);
+		/// Set the date and time the certificate is valid from.
+
 	Poco::DateTime validFrom() const;
 		/// Returns the date and time the certificate is valid from.
 		
+	void setExpiresOn(Poco::DateTime expires);
+		/// Set the date and time the certificate expires.
+
 	Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
 		
+	void setPublicKey(const EVPPKey &pkey);
+		/// Set public key
+
+	EVPPKey publicKey() const;
+		/// Return public key
+
+	void addExtension(const X509Extension& x509Extension);
+		/// Add a specified extension at the end of the extension table.
+
+	X509Extension::List findExtensionByNID(int nid);
+		/// Search and get extension by openssl NID.
+
 	void save(std::ostream& stream) const;
 		/// Writes the certificate to the given stream.
 		/// The certificate is written in PEM format.
@@ -139,6 +183,11 @@ public:
 		///
 		/// Returns true if verification against the issuer certificate
 		/// was successful, false otherwise.
+
+	bool sign(const EVPPKey& pkey, const std::string& mdstr = "default");
+		/// Sign the certificate.
+		///
+		/// NOTE: Changing some certificate value after signing, signature is not valid anymore!
 
 	bool equals(const X509Certificate& otherCertificate) const;
 		/// Checks whether the certificate is equal to
@@ -167,6 +216,16 @@ public:
 	static void writePEM(const std::string& pemFileName, const List& list);
 		/// Writes the list of certificates to the specified PEM file.
 
+	operator const X509*() const;
+		/// Returns pointer to the OpenSSL X509 structure.
+
+	operator X509*();
+		/// Returns pointer to the OpenSSL X509 structure.
+
+	static X509* duplicate(const X509* pFromExtension, X509** pToExtension);
+		/// Duplicates pFromExtension into *pToExtension and returns
+		/// the pointer to duplicated OpenSSL X509 structure.
+
 protected:
 	void load(std::istream& stream);
 		/// Loads the certificate from the given stream. The
@@ -189,7 +248,6 @@ private:
 	std::string _subjectName;
 	std::string _serialNumber;
 	X509*       _pCert;
-	OpenSSLInitializer _openSSLInitializer;
 };
 
 
@@ -222,6 +280,18 @@ inline const std::string& X509Certificate::issuerName() const
 inline const std::string& X509Certificate::subjectName() const
 {
 	return _subjectName;
+}
+
+
+inline X509Certificate::operator X509*()
+{
+	return _pCert;
+}
+
+
+inline X509Certificate::operator const X509*() const
+{
+	return _pCert;
 }
 
 

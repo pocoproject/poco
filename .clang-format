@@ -1,0 +1,9 @@
+﻿---
+IndentWidth: '4'
+Language: Cpp
+SpacesInParentheses: 'false'
+Standard: Cpp11
+TabWidth: '4'
+UseTab: Always
+
+...
