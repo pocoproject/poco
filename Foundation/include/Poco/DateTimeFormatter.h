@@ -88,7 +88,7 @@ public:
 		/// Formats the given local date and time according to the given format.
 		/// See format(const Timestamp&, const std::string&, int) for more information.
 
-	static std::string format(const Timespan& timespan, const std::string& fmt = "%dd %H:%M:%S.%i");
+	static std::string format(const Timespan& timespan, const std::string& fmt = "%d %H:%M:%S.%i");
 		/// Formats the given timespan according to the given format.
 		/// The format string is used as a template to format the date and
 		/// is copied character by character except for the following special characters,
@@ -121,7 +121,7 @@ public:
 		///
 		/// See format() for documentation of the formatting string.
 
-	static void append(std::string& str, const Timespan& timespan, const std::string& fmt = "%dd %H:%M:%S.%i");
+	static void append(std::string& str, const Timespan& timespan, const std::string& fmt = "%d %H:%M:%S.%i");
 		/// Formats the given timespan according to the given format and appends it to str.
 		///
 		/// See format() for documentation of the formatting string.
