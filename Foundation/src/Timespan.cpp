@@ -56,11 +56,6 @@ Timespan::Timespan(const Timespan& timespan):
 }
 
 
-Timespan::~Timespan()
-{
-}
-
-
 Timespan& Timespan::operator = (const Timespan& timespan)
 {
 	_span = timespan._span;
