@@ -48,7 +48,7 @@ MultipartWriter::~MultipartWriter()
 {
 }
 
-	
+
 void MultipartWriter::nextPart(const MessageHeader& header)
 {
 	if (_firstPart)
@@ -60,7 +60,7 @@ void MultipartWriter::nextPart(const MessageHeader& header)
 	_ostr << "\r\n";
 }
 
-	
+
 void MultipartWriter::close()
 {
 	_ostr << "\r\n--" << _boundary << "--\r\n";
@@ -77,6 +77,7 @@ std::string MultipartWriter::createBoundary()
 {
 	std::string boundary("MIME_boundary_");
 	Random rnd;
+	rnd.seed();
 	NumberFormatter::appendHex(boundary, rnd.next(), 8);
 	NumberFormatter::appendHex(boundary, rnd.next(), 8);
 	return boundary;
