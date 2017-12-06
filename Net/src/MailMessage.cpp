@@ -109,7 +109,7 @@ namespace
 					filename = getParamFromHeader(contentDisp, "filename");
 				if (filename.empty())
 					filename = getParamFromHeader(contentType, "name");
-				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
+				Poco::SharedPtr<PartSource> pPS = _pMsg->createPartStore(tmp, contentType, filename);
 				poco_check_ptr (pPS);
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
@@ -124,20 +124,17 @@ namespace
 							_pMsg->addAttachment(getPartName(header), pPS, cte);
 						added = true;
 					}
-					
+
 					pPS->headers().set(it->first, it->second);
 				}
 
 				if (contentDisp.empty())
 				{
 					_pMsg->addContent(pPS, cte);
-					added = true;
 				}
-
-				if (!added) delete pPS;
 			}
 		}
-		
+
 	private:
 		std::string getParamFromHeader(const std::string& header, const std::string& param)
 		{
@@ -177,12 +174,12 @@ namespace
 			/// The content parameter represents the part content.
 		{
 		}
-		
+
 		~StringPartHandler()
 			/// Destroys string part handler.
 		{
 		}
-		
+
 		void handlePart(const MessageHeader& header, std::istream& stream)
 			/// Handles a part.
 		{
@@ -190,7 +187,7 @@ namespace
 			Poco::StreamCopier::copyToString(stream, tmp);
 			_str.append(tmp);
 		}
-		
+
 	private:
 		std::string& _str;
 	};
@@ -260,10 +257,6 @@ MailMessage& MailMessage::operator = (MailMessage&& other)
 
 MailMessage::~MailMessage()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
-	{
-		delete it->pSource;
-	}
 }
 
 
@@ -284,7 +277,7 @@ void MailMessage::setSender(const std::string& sender)
 	set(HEADER_FROM, sender);
 }
 
-	
+
 const std::string& MailMessage::getSender() const
 {
 	if (has(HEADER_FROM))
@@ -293,13 +286,13 @@ const std::string& MailMessage::getSender() const
 		return EMPTY_HEADER;
 }
 
-	
+
 void MailMessage::setSubject(const std::string& subject)
 {
 	set(HEADER_SUBJECT, subject);
 }
 
-	
+
 const std::string& MailMessage::getSubject() const
 {
 	if (has(HEADER_SUBJECT))
@@ -359,7 +352,7 @@ bool MailMessage::isMultipart() const
 }
 
 
-void MailMessage::addPart(const std::string& name, PartSource* pSource, ContentDisposition disposition, ContentTransferEncoding encoding)
+void MailMessage::addPart(const std::string& name, const Poco::SharedPtr<PartSource>& pSource, ContentDisposition disposition, ContentTransferEncoding encoding)
 {
 	poco_check_ptr (pSource);
 
@@ -373,13 +366,13 @@ void MailMessage::addPart(const std::string& name, PartSource* pSource, ContentD
 }
 
 
-void MailMessage::addContent(PartSource* pSource, ContentTransferEncoding encoding)
+void MailMessage::addContent(const Poco::SharedPtr<PartSource>& pSource, ContentTransferEncoding encoding)
 {
 	addPart("", pSource, CONTENT_INLINE, encoding);
 }
 
 
-void MailMessage::addAttachment(const std::string& name, PartSource* pSource, ContentTransferEncoding encoding)
+void MailMessage::addAttachment(const std::string& name, const Poco::SharedPtr<PartSource>& pSource, ContentTransferEncoding encoding)
 {
 	addPart(name, pSource, CONTENT_ATTACHMENT, encoding);
 }
@@ -438,7 +431,7 @@ void MailMessage::makeMultipart()
 	if (!isMultipart())
 	{
 		MediaType mediaType("multipart", "mixed");
-		setContentType(mediaType);	
+		setContentType(mediaType);
 	}
 }
 
@@ -458,7 +451,7 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 	header.set(HEADER_CONTENT_TYPE, mediaType.toString());
 	header.set(HEADER_MIME_VERSION, "1.0");
 	writeHeader(header, ostr);
-	
+
 	MultipartWriter writer(ostr, _boundary);
 	for (PartVec::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
 	{
@@ -468,7 +461,7 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 }
 
 
-void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
+void MailMessage::writePart(MultipartWriter& writer, const Part& part)
 {
 	MessageHeader partHeader(part.pSource->headers());
 	MediaType mediaType(part.pSource->mediaType());
@@ -494,7 +487,7 @@ void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
 }
 
 
-void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding) const
+void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding)
 {
 	switch (encoding)
 	{
@@ -594,7 +587,7 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 	std::string to;
 	std::string cc;
 	std::string bcc;
-	
+
 	for (Recipients::const_iterator it = _recipients.begin(); it != _recipients.end(); ++it)
 	{
 		switch (it->getType())
@@ -729,7 +722,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 		}
 		if (!containsNonASCII) return text;
 	}
-	
+
 	std::string encodedText;
 	std::string::size_type lineLength = 0;
 	if (encoding == 'q' || encoding == 'Q')
@@ -982,9 +975,9 @@ std::string MailMessage::decodeWord(const std::string& charset, char encoding,
 		TextConverter converter(*fromEnc, *toEnc);
 		std::string converted;
 		converter.convert(decoded, converted);
-		return std::move(converted);
+		return converted;
 	}
-	return std::move(decoded);
+	return decoded;
 }
 
 
@@ -992,6 +985,55 @@ PartSource* MailMessage::createPartStore(const std::string& content, const std::
 {
 	if (!_pStoreFactory) return new StringPartSource(content, mediaType, filename);
 	else return _pStoreFactory->createPartStore(content, mediaType, filename);
+}
+
+
+MultipartSource::MultipartSource(const std::string& contentType):
+	PartSource(contentTypeWithBoundary(contentType))
+{
+}
+
+
+MultipartSource::~MultipartSource()
+{
+}
+
+
+void MultipartSource::addPart(const std::string& name,
+	const Poco::SharedPtr<PartSource>& pSource,
+	MailMessage::ContentDisposition disposition,
+	MailMessage::ContentTransferEncoding encoding)
+{
+	MailMessage::Part part;
+	part.name        = name;
+	part.pSource     = pSource;
+	part.disposition = disposition;
+	part.encoding    = encoding;
+	_parts.push_back(part);
+}
+
+
+std::istream& MultipartSource::stream()
+{
+	MediaType mt(mediaType());
+	std::string boundary = mt.getParameter("boundary");
+
+	MultipartWriter writer(_content, boundary);
+	for (MailMessage::PartVec::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
+	{
+		MailMessage::writePart(writer, *it);
+	}
+	writer.close();
+
+	return _content;
+}
+
+
+std::string MultipartSource::contentTypeWithBoundary(const std::string& contentType)
+{
+	MediaType mediaType(contentType);
+	mediaType.setParameter("boundary", MultipartWriter::createBoundary());
+	return mediaType.toString();
 }
 
 
