@@ -48,6 +48,7 @@ notifications:
 env:
   global:
     TEST_NAME=""
+    POCO_VERBOSE=1
 
 before_script:
  - echo ${TEST_NAME}
