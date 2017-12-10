@@ -73,13 +73,22 @@ matrix:
         - ./configure --everything --omit=PDF 
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    test="gcc 5.4 (make) bundled"
+    - env:    test="gcc 5.4 x86 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
-        - ./configure --everything --omit=PDF
+        - ./configure --config=Linux32-gcc --everything --omit=PDF
+        - make -s -j2 && ./travis/Linux/runtests.sh
+
+    - env:    test="gcc 5.4 amd64 (make) bundled"
+      compiler: gcc
+      script:
+        - export CC="gcc-5"
+        - export CXX="g++-5"
+        - $CXX --version
+        - ./configure --config=Linux64-gcc --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     #- env:    test="gcc 5.4 (make) unbundled"
@@ -133,7 +142,7 @@ matrix:
         - export CXX="clang++"
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
-        - ./configure --config=Darwin32-clang --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
+        - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && sudo make install && export OSARCH=x86 && ./travis/OSX/runtests.sh
 
     - env:    test="clang amd64 (make) bundled"
@@ -144,7 +153,7 @@ matrix:
         - export CXX="clang++"
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
-        - ./configure --config=Darwin64-clang --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
+        - ./configure --config=Darwin64-clang-libc++ --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
 
@@ -167,7 +176,7 @@ matrix:
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything --omit=PDF
+        - ./configure --config=Linux64-clang --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    test="clang 5.0 (make) bundled"
