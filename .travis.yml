@@ -74,7 +74,7 @@ matrix:
         - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && sudo make install && export OSARCH=x86 && ./travis/OSX/runtests.sh
 
-    - env:    test="clang amd64 (make) bundled"
+    - env:    test="clang x64 (make) bundled"
       os: osx
       compiler: clang
       script:
@@ -98,7 +98,7 @@ matrix:
     - env:    test="gcc 5.4 x86 (make) bundled"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y lib32gcc-5.4-dev
+        - sudo apt-get install -qq -y g++-5-multilib
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
