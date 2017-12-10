@@ -151,6 +151,7 @@ matrix:
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
+        - sudo apt-get install -qq -y g++-5-multilib
         - export CLANG_VERSTION="-4.0"
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
