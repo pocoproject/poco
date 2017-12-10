@@ -92,7 +92,7 @@ matrix:
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
-        - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL
+        - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    test="gcc 5.4 x64 (make) bundled"
@@ -155,7 +155,7 @@ matrix:
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
         - $CXX --version
-        - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL
+        - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && ./travis/Linux/runtests.sh
 
     - env:    test="clang 4.0 x64 (make) bundled"
