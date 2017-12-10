@@ -71,7 +71,7 @@ matrix:
         - export CXX="clang++"
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
-        - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
+        - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && sudo make install && export OSARCH=i386 && ./travis/OSX/runtests.sh
 
     - env:    test="clang x64 (make) bundled"
