@@ -725,6 +725,9 @@ subprojects {
 		args test
 	}
 }
+tasks.withType(CppCompile) {
+	maxParallelForks = 2
+}
 task pocos() {
 		def Set<Task> tts = project.getTasksByName('poco', true)
 		setDependsOn(tts)
@@ -798,7 +801,7 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 		args "Poco.wxs"
-		inputs.files(new File(workingDir, "Poco-${VERSION}.wxs"))
+		inputs.files(new File(workingDir, "Poco.wxs"))
 //			inputs.files(tasks.getByPath(':poco').outputs.files)
 		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
 		onlyIf(new Spec<Exec>() {
@@ -828,8 +831,8 @@ def light(VSYEAR, VERSION, target, os) {
 	}
 }
 task wix() {
-	dependsOn 		light('VS2015', version, 'x86', os)
-	dependsOn 		light('VS2015', version, 'x64', os)
+	dependsOn 		light('VS2017', version, 'x86', os)
+	dependsOn 		light('VS2017', version, 'x64', os)
 	onlyIf(new Spec<Task>() {
 		boolean isSatisfiedBy(Task task) {
 			   return os.windows;
@@ -861,7 +864,6 @@ task packaging() {
 		dependsOn nuget
 		dependsOn wix
 	}
-}
 }
 /*
     tasks { t ->
