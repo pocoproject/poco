@@ -13,13 +13,10 @@ model {
 		all {
 		}
 		withType(SharedLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 		}
 		withType(StaticLibraryBinarySpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 		withType(NativeExecutableSpec) {
-			lib project: ':Foundation', library: 'Foundation', linkage: 'static'
 		}
 	}
 }

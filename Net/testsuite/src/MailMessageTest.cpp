@@ -46,7 +46,7 @@ namespace
 		StringPartHandler()
 		{
 		}
-		
+
 		void handlePart(const MessageHeader& header, std::istream& stream)
 		{
 			_disp.push_back(header["Content-Disposition"]);
@@ -60,7 +60,7 @@ namespace
 			}
 			_data.push_back(data);
 		}
-		
+
 		const std::vector<std::string>& data() const
 		{
 			return _data;
@@ -75,7 +75,7 @@ namespace
 		{
 			return _type;
 		}
-		
+
 	private:
 		std::vector<std::string> _data;
 		std::vector<std::string> _disp;
@@ -115,9 +115,9 @@ void MailMessageTest::testWriteQP()
 	);
 	Timestamp ts(0);
 	message.setDate(ts);
-	
+
 	assert (!message.isMultipart());
-	
+
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
@@ -154,7 +154,7 @@ void MailMessageTest::testWrite8Bit()
 	);
 	Timestamp ts(0);
 	message.setDate(ts);
-	
+
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
@@ -226,7 +226,7 @@ void MailMessageTest::testWriteManyRecipients()
 	);
 	Timestamp ts(0);
 	message.setDate(ts);
-	
+
 	std::ostringstream str;
 	message.write(str);
 	std::string s = str.str();
@@ -334,10 +334,10 @@ void MailMessageTest::testReadQP()
 		"his should be enough.\r\n"
 		"And here is some more =3Dfe.\r\n"
 	);
-	
+
 	MailMessage message;
 	message.read(istr);
-	
+
 	assert (message.getSender() == "poco@appinf.com");
 	assert (message.getContentType() == "text/plain");
 	assert (message.getContent() ==
@@ -409,10 +409,10 @@ void MailMessageTest::testRead8Bit()
 		"Hello, world!\r\n"
 		"This is a test for the MailMessage class.\r\n"
 	);
-	
+
 	MailMessage message;
 	message.read(istr);
-	
+
 	assert (message.getSender() == "poco@appinf.com");
 	assert (message.getContentType() == "text/plain");
 	assert (message.getContent() ==
@@ -448,11 +448,11 @@ void MailMessageTest::testReadMultiPart()
 		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
 		"--MIME_boundary_01234567--\r\n"
 	);
-	
+
 	StringPartHandler handler;
 	MailMessage message;
 	message.read(istr, handler);
-	
+
 	assert (handler.data().size() == 2);
 	assert (handler.data()[0] == "Hello World!\r\n");
 	assert (handler.type()[0] == "text/plain");
@@ -613,12 +613,12 @@ void MailMessageTest::testReadWriteMultiPartStore()
 	MailMessage message(&pfsf);
 
 	message.read(istr);
-	
+
 	MailMessage::PartVec::const_iterator it = message.parts().begin();
 	MailMessage::PartVec::const_iterator end = message.parts().end();
 	for (; it != end; ++it)
 	{
-		FilePartStore* fps = dynamic_cast<FilePartStore*>(it->pSource);
+		Poco::SharedPtr<FilePartStore> fps = it->pSource.cast<FilePartStore>();
 		if (fps && fps->filename().size())
 		{
 			std::string filename = fps->filename();
@@ -628,7 +628,7 @@ void MailMessageTest::testReadWriteMultiPartStore()
 			// filename is not the same as attachment name
 			std::size_t sz = (path.size() > filename.size()) ? filename.size() : path.size();
 			assert (0 != icompare(path, path.size() - sz, sz, path));
-			
+
 			Poco::FileInputStream fis(path);
 			assert (fis.good());
 			std::string read;
@@ -639,7 +639,7 @@ void MailMessageTest::testReadWriteMultiPartStore()
 			assert (read == "This is some binary data. Really.");
 		}
 	}
-	
+
 	message.write(ostr);
 	std::string msgout(ostr.str());
 	assert (msgout == msgin);
