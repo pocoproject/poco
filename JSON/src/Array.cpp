@@ -1,8 +1,6 @@
 //
 // Array.cpp
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Array

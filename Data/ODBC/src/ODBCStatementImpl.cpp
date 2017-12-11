@@ -45,7 +45,6 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 	_prepared(false),
 	_affectedRowCount(0),
 	_canCompile(true),
-	_isPostgres(false),
 	_insertHint(false)
 {
 	int queryTimeout = rSession.queryTimeout();
@@ -64,7 +63,6 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 		std::string serverString;
 		serverString.resize(static_cast<std::size_t>(t) + 2);
 		r = Poco::Data::ODBC::SQLGetInfo(_rConnection, SQL_DRIVER_NAME, &serverString[0], SQLSMALLINT((serverString.length() - 1) * sizeof(serverString[0])), &t);
-		_isPostgres = (!Utility::isError(r) && Poco::toUpperInPlace(serverString).find("PSQLODBC") == 0);
 	}
 }
 
@@ -152,7 +150,7 @@ bool ODBCStatementImpl::addPreparator(bool addAlways)
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
 
-		prep = new Preparator(_stmt, statement, maxFieldSize, ext, _isPostgres);
+		prep = new Preparator(_stmt, statement, maxFieldSize, ext);
 	}
 	else
 		prep = new Preparator(*_preparations[0]);
@@ -307,14 +305,13 @@ bool ODBCStatementImpl::nextResultSet()
 	if (SQL_NO_DATA == ret)
 		return false;
 
-	if (Utility::isError(ret)) {
+	if (Utility::isError(ret))
 		throw StatementException(_stmt, "SQLMoreResults()");
-	}
 
 	// need to remove old bindings, as Sybase doesn't like old ones
-	if (Utility::isError(SQLFreeStmt(_stmt, SQL_UNBIND))) {
+	if (Utility::isError(SQLFreeStmt(_stmt, SQL_UNBIND)))
 		throw StatementException(_stmt, "SQLFreeStmt(SQL_UNBIND)");
-	}
+
 	return true;
 }
 

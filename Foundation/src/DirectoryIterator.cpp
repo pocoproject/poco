@@ -19,8 +19,6 @@
 #include "DirectoryIterator_WIN32.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "DirectoryIterator_UNIX.cpp"
-#else
-#include "DirectoryIterator_VMS.cpp"
 #endif
 
 
@@ -31,7 +29,7 @@ DirectoryIterator::DirectoryIterator(): _pImpl(0)
 {
 }
 
-	
+
 DirectoryIterator::DirectoryIterator(const std::string& pathString): _path(pathString), _pImpl(new DirectoryIteratorImpl(pathString))
 {
 	_path.makeDirectory();
@@ -49,7 +47,7 @@ DirectoryIterator::DirectoryIterator(const DirectoryIterator& iterator): _path(i
 	}
 }
 
-	
+
 DirectoryIterator::DirectoryIterator(const File& file): _path(file.path()), _pImpl(new DirectoryIteratorImpl(file.path()))
 {
 	_path.makeDirectory();

@@ -1,8 +1,6 @@
 //
 // Stringifier.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Stringifier

@@ -1,8 +1,6 @@
 //
 // Object.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Object

@@ -1,8 +1,6 @@
 //
 // BSONWriter.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  BSONWriter

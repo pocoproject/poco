@@ -1,8 +1,6 @@
 //
 // Error.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Error

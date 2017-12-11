@@ -1,8 +1,6 @@
 //
 // KillCursorsRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  KillCursorsRequest

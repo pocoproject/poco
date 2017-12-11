@@ -11,4 +11,5 @@
 
 #### Operating system and version
 
-#### Other relevant inofrmation
+#### Other relevant information
+

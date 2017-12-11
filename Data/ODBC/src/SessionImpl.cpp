@@ -67,6 +67,7 @@ void SessionImpl::init()
 	setFeature("bulk", true);
 	open();
 	setProperty("handle", _db.handle());
+	setProperty("handle", _db.handle());
 }
 
 

@@ -38,7 +38,7 @@ CompressTest::~CompressTest()
 
 void CompressTest::testSingleFile()
 {
-	std::ofstream out("appinf.zip", std::ios::binary);
+	std::ofstream out(Poco::Path::temp() + "appinf.zip", std::ios::binary);
 	Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 	Compress c(out, true);
 	c.addFile(theFile, theFile.getFileName());
@@ -48,10 +48,9 @@ void CompressTest::testSingleFile()
 
 void CompressTest::testDirectory()
 {
-	std::ofstream out("pocobin.zip", std::ios::binary);
+	std::ofstream out(Poco::Path::temp() + "pocobin.zip", std::ios::binary);
 	Poco::File aFile("some/");
-	if (aFile.exists())
-		aFile.remove(true);
+	if (aFile.exists()) aFile.remove(true);
 	Poco::File aDir("some/recursive/dir/");
 	aDir.createDirectories();
 	Poco::File aDir2("some/other/recursive/dir/");
@@ -67,19 +66,20 @@ void CompressTest::testDirectory()
 	Compress c(out, true);
 	c.addRecursive(theFile, ZipCommon::CL_MAXIMUM, false, theFile);
 	ZipArchive a(c.close());
+	Poco::File(aFile).remove(true);
 }
 
 
 void CompressTest::testManipulator()
 {
 	{
-		std::ofstream out("appinf.zip", std::ios::binary);
+		std::ofstream out(Poco::Path::temp() + "appinf.zip", std::ios::binary);
 		Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 		Compress c(out, true);
 		c.addFile(theFile, theFile.getFileName());
 		ZipArchive a(c.close());
 	}
-	ZipManipulator zm("appinf.zip", true);
+	ZipManipulator zm(Poco::Path::temp() + "appinf.zip", true);
 	zm.renameFile("test.zip", "renamedtest.zip");
 	zm.addFile("doc/othertest.zip", ZipTest::getTestFile("data", "test.zip"));
 	ZipArchive archive=zm.commit();
@@ -90,13 +90,13 @@ void CompressTest::testManipulator()
 void CompressTest::testManipulatorDel()
 {
 	{
-		std::ofstream out("appinf.zip", std::ios::binary);
+		std::ofstream out(Poco::Path::temp() + "appinf.zip", std::ios::binary);
 		Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 		Compress c(out, true);
 		c.addFile(theFile, theFile.getFileName());
 		ZipArchive a(c.close());
 	}
-	ZipManipulator zm("appinf.zip", true);
+	ZipManipulator zm(Poco::Path::temp() + "appinf.zip", true);
 	zm.deleteFile("test.zip");
 	zm.addFile("doc/data.zip", ZipTest::getTestFile("data", "data.zip"));
 	ZipArchive archive=zm.commit();
@@ -108,13 +108,13 @@ void CompressTest::testManipulatorDel()
 void CompressTest::testManipulatorReplace()
 {
 	{
-		std::ofstream out("appinf.zip", std::ios::binary);
+		std::ofstream out(Poco::Path::temp() + "appinf.zip", std::ios::binary);
 		Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 		Compress c(out, true);
 		c.addFile(theFile, theFile.getFileName());
 		ZipArchive a(c.close());
 	}
-	ZipManipulator zm("appinf.zip", true);
+	ZipManipulator zm(Poco::Path::temp() + "appinf.zip", true);
 	zm.replaceFile("test.zip", ZipTest::getTestFile("data", "doc.zip"));
 	
 	ZipArchive archive=zm.commit();
@@ -126,7 +126,7 @@ void CompressTest::testManipulatorReplace()
 void CompressTest::testSetZipComment()
 {
 	std::string comment("Testing...123...");
-	std::ofstream out("comment.zip", std::ios::binary);
+	std::ofstream out(Poco::Path::temp() + "comment.zip", std::ios::binary);
 	Poco::Path theFile(ZipTest::getTestFile("data", "test.zip"));
 	Compress c(out, true);
 	c.addFile(theFile, theFile.getFileName());
@@ -157,27 +157,28 @@ void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size)
 
 void CompressTest::testZip64()
 {
+	typedef std::map<std::string, Poco::UInt64> FileMap;
 	std::cout << std::endl;
-	std::map<std::string, Poco::UInt64> files;
+	FileMap files;
 	files["data1.bin"] = static_cast<Poco::UInt64>(KB)*4096+1;
 	files["data2.bin"] = static_cast<Poco::UInt64>(KB)*16;
 	files["data3.bin"] = static_cast<Poco::UInt64>(KB)*4096-1;
 	
-	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); it++)
 	{
 		std::cout << '\t' << "createDataFile(" << it->first << ", " << it->second << ");" << std::endl;
 		createDataFile(it->first, it->second);
 	}
-	std::ofstream out("zip64.zip", std::ios::binary | std::ios::trunc);
+	std::ofstream out(Poco::Path::temp() + "zip64.zip", std::ios::binary | std::ios::trunc);
 	Compress c(out, true, true);
-	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); it++)
 	{
 		const std::string& path = it->first;
 		std::cout << '\t' << "addFile(" << path <<  ");" << std::endl;
 		c.addFile(path, path, ZipCommon::CM_STORE);
 	}
 	ZipArchive a(c.close());
-	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); it++)
 	{
 		const std::string& path = it->first;
 		Poco::UInt64 size = it->second;
@@ -186,6 +187,10 @@ void CompressTest::testZip64()
 		const Poco::Zip::ZipLocalFileHeader& file = it2->second;
 		assert(file.getUncompressedSize() == size);
 		assert(file.getCompressedSize() == size);
+	}
+	for (FileMap::const_iterator it = files.begin(); it != files.end(); it++)
+	{
+		Poco::File(it->first).remove();
 	}
 }
 

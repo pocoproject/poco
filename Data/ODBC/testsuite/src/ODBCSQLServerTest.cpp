@@ -767,6 +767,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertList);

@@ -19,7 +19,7 @@
 
 #if defined(POCO_NO_FPENVIRONMENT)
 #include "FPEnvironment_DUMMY.cpp"
-#elif defined(__osf__) || defined(__VMS)
+#elif defined(__osf__)
 #include "FPEnvironment_DEC.cpp"
 #elif defined(sun) || defined(__sun)
 #include "FPEnvironment_SUN.cpp"
@@ -47,17 +47,17 @@ FPEnvironment::FPEnvironment(RoundingMode rm)
 	setRoundingMode(rm);
 }
 
-	
+
 FPEnvironment::FPEnvironment(const FPEnvironment& env): FPEnvironmentImpl(env)
 {
 }
 
-	
+
 FPEnvironment::~FPEnvironment()
 {
 }
 
-	
+
 FPEnvironment& FPEnvironment::operator = (const FPEnvironment& env)
 {
 	if (&env != this)

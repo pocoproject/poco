@@ -27,8 +27,6 @@
 #include "Poco/NamedEvent_Android.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/NamedEvent_UNIX.h"
-#else
-#include "Poco/NamedEvent_VMS.h"
 #endif
 
 
@@ -56,7 +54,7 @@ class Foundation_API NamedEvent: public NamedEventImpl
 public:
 	NamedEvent(const std::string& name);
 		/// Creates the event.
-		
+
 	~NamedEvent();
 		/// Destroys the event.
 

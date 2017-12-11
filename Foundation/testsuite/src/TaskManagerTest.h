@@ -35,6 +35,8 @@ public:
 	void testError();
 	void testCustom();
 	void testMultiTasks();
+	void testTaskInclusion();
+	void testTaskQueue();
 	void testCustomThreadPool();
 
 	void setUp();

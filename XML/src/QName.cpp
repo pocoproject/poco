@@ -1,8 +1,6 @@
 //
 // QName.cpp
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  QName

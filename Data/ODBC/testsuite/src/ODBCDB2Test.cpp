@@ -740,6 +740,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testInsertList);

@@ -1,8 +1,6 @@
 //
 // Cursor.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Cursor

@@ -99,9 +99,7 @@ public:
 	Preparator(const StatementHandle& rStmt,
 		const std::string& statement,
 		std::size_t maxFieldSize,
-		DataExtraction dataExtraction,
-		bool isPostgres
-		);
+		DataExtraction dataExtraction);
 		/// Creates the Preparator.
 
 	Preparator(const Preparator& other);

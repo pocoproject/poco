@@ -58,6 +58,7 @@ public:
 	virtual void testAutoPtrComplexTypeVector();
 	virtual void testInsertVector();
 	virtual void testInsertEmptyVector();
+	virtual void testBigStringVector();
 
 	virtual void testSimpleAccessList();
 	virtual void testComplexTypeList();
@@ -161,6 +162,7 @@ protected:
 	virtual void dropObject(const std::string& type, const std::string& name);
 	virtual void recreateNullableTable();
 	virtual void recreatePersonTable();
+	virtual void recreatePersonUnicodeTable();
 	virtual void recreatePersonTupleTable();
 	virtual void recreatePersonBLOBTable();
 	virtual void recreatePersonDateTimeTable();
@@ -278,6 +280,12 @@ inline void ODBCTest::recreateNumericTable()
 inline void ODBCTest::recreatePersonTable()
 {
 	throw Poco::NotImplementedException("ODBCTest::recreatePersonTable()");
+}
+
+
+inline void ODBCTest::recreatePersonUnicodeTable()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreatePersonUnicodeTable()");
 }
 
 

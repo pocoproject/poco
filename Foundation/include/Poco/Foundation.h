@@ -98,8 +98,6 @@
 #include "Poco/Platform.h"
 #if defined(_WIN32)
 	#include "Poco/Platform_WIN32.h"
-#elif defined(__VMS)
-	#include "Poco/Platform_VMS.h"
 #elif defined(POCO_VXWORKS)
 	#include "Poco/Platform_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
