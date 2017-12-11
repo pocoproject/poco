@@ -173,10 +173,8 @@ void ThreadImpl::setStackSizeImpl(int size)
 		const int STACK_PAGE_SIZE = 4096;
 		size = ((size + STACK_PAGE_SIZE - 1)/STACK_PAGE_SIZE)*STACK_PAGE_SIZE;
 #endif
-#if !defined(POCO_ANDROID)
  		if (size < PTHREAD_STACK_MIN)
  			size = PTHREAD_STACK_MIN;
-#endif
 	}
  	_pData->stackSize = size;
 #endif
