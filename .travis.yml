@@ -63,7 +63,7 @@ matrix:
   fast_finish: true
 
   include:
-    - env:    test="clang x86 (make) bundled"
+    - env:    test="x86 (make) bundled"
       os: osx
       compiler: clang
       script:
@@ -74,7 +74,7 @@ matrix:
         - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && sudo make install && export OSARCH=i386 && ./travis/OSX/runtests.sh
 
-    - env:    test="clang x64 (make) bundled"
+    - env:    test="x64 (make) bundled"
       os: osx
       compiler: clang
       script:
@@ -85,7 +85,7 @@ matrix:
         - ./configure --config=Darwin64-clang-libc++ --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
 
-    - env:    test="gcc 5.4 x86 (make) bundled"
+    - env:    test="5.4 x86 (make) bundled"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y g++-5-multilib
@@ -95,7 +95,7 @@ matrix:
         - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    test="gcc 5.4 x64 (make) bundled"
+    - env:    test="5.4 x64 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-5"
@@ -104,7 +104,7 @@ matrix:
         - ./configure --config=Linux64-gcc --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    #- env:    test="gcc 5.4 (make) unbundled"
+    #- env:    test="5.4 (make) unbundled"
     #  ======================================= unit tests fail ures due to unbundled pcre
     # There was 1 error:
     #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
@@ -135,7 +135,7 @@ matrix:
     #    - $CXX --version
     #    - ./configure --everything --omit=PDF --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    test="gcc 4.9 (CMake)"
+    - env:    test="4.9 x64 (CMake)"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y gcc-4.9 g++-4.9
@@ -147,7 +147,7 @@ matrix:
         - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
 
-    - env:    test="clang 4.0 x86 (make) bundled"
+    - env:    test="4.0 x86 (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
@@ -159,7 +159,7 @@ matrix:
         - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    test="clang 4.0 x64 (make) bundled"
+    - env:    test="4.0 x64 (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
@@ -170,7 +170,7 @@ matrix:
         - ./configure --config=Linux64-clang --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    test="clang 5.0 (make) bundled"
+    - env:    test="5.0 x64 (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-5.0 lldb-5.0 libc++-dev libc++abi-dev
@@ -189,7 +189,7 @@ matrix:
     #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
     #    - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    #- env:    test="clang (CMake)"
+    #- env:    test="(CMake)"
     #  compiler: clang
     #  script:
     #    - source ./travis/ignored.sh
