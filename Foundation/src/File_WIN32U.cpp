@@ -167,7 +167,12 @@ bool FileImpl::isDirectoryImpl() const
 
 bool FileImpl::isLinkImpl() const
 {
-	return false;
+	poco_assert (!_path.empty());
+
+	DWORD attr = GetFileAttributesW(_upath.c_str());
+	if (attr == INVALID_FILE_ATTRIBUTES)
+		handleLastErrorImpl(_path);
+	return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0 && (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 }
 
 
@@ -305,6 +310,26 @@ void FileImpl::renameToImpl(const std::string& path)
 	convertPath(path, upath);
 	if (MoveFileExW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
 		handleLastErrorImpl(_path);
+}
+
+
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	poco_assert (!_path.empty());
+
+	std::wstring upath;
+	convertPath(path, upath);
+
+	if (type == 0)
+	{
+		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), NULL) == 0)
+			handleLastErrorImpl(_path);
+	}
+	else
+	{
+		if (CreateSymbolicLinkW(upath.c_str(), _upath.c_str(), (isDirectoryImpl() ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0) | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE) == 0)
+			handleLastErrorImpl(_path);
+	}
 }
 
 

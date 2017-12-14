@@ -256,6 +256,12 @@ void File::renameTo(const std::string& path)
 }
 
 
+void File::linkTo(const std::string& path, LinkType type) const
+{
+	linkToImpl(path, type);
+}
+
+
 void File::remove(bool recursive)
 {
 	if (recursive && !isLink() && isDirectory())

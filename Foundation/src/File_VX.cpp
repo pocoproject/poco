@@ -240,7 +240,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0) 
+	if (fstat(sd, &st) != 0)
 	{
 		close(sd);
 		handleLastErrorImpl(_path);
@@ -259,7 +259,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		int n;
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n) 
+			if (write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -285,6 +285,12 @@ void FileImpl::renameToImpl(const std::string& path)
 }
 
 
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	throw Poco::NotImplementedException("File::linkTo() is not available on this platform");
+}
+
+
 void FileImpl::removeImpl()
 {
 	poco_assert (!_path.empty());
@@ -301,7 +307,7 @@ void FileImpl::removeImpl()
 bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
-	
+
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
@@ -322,7 +328,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str()) != 0) 
+	if (mkdir(_path.c_str()) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }

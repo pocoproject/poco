@@ -49,18 +49,19 @@ protected:
 	void setLastModifiedImpl(const Timestamp& ts);
 	FileSizeImpl getSizeImpl() const;
 	void setSizeImpl(FileSizeImpl size);
-	void setWriteableImpl(bool flag = true);		
-	void setExecutableImpl(bool flag = true);		
+	void setWriteableImpl(bool flag = true);
+	void setExecutableImpl(bool flag = true);
 	void copyToImpl(const std::string& path) const;
 	void renameToImpl(const std::string& path);
+	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();
 	static void handleLastErrorImpl(const std::string& path);
-	
+
 private:
 	std::string _path;
-	
+
 	friend class DirectoryIteratorImpl;
 };
 

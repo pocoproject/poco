@@ -299,6 +299,12 @@ void FileImpl::renameToImpl(const std::string& path)
 }
 
 
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	throw Poco::NotImplementedException("File::linkTo() is not available on this platform");
+}
+
+
 void FileImpl::removeImpl()
 {
 	poco_assert (!_path.empty());
