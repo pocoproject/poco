@@ -13,5 +13,9 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI8FileTestEE.testFileAttributes2, \
   N7CppUnit10TestCallerI9TimerTestEE.testTimer, \
   N7CppUnit10TestCallerI9TimerTestEE.testScheduleAtFixedRate, \
+  N7CppUnit10TestCallerI9TimerTestEE.testScheduleInterval, \
+  N7CppUnit10TestCallerI9TimerTestEE.testScheduleIntervalTimestamp, \
+  N7CppUnit10TestCallerI9TimerTestEE.testScheduleIntervalClock, \
+ 
   "
 
