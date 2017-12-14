@@ -128,6 +128,7 @@
 	#endif
 #endif // POCO_FORCE_MIN_WINDOWS_OS_SUPPORT
 
+
 #if defined(_MSC_VER) && !defined(POCO_MSVC_SECURE_WARNINGS) && !defined(_CRT_SECURE_NO_DEPRECATE)
 	#define _CRT_SECURE_NO_DEPRECATE
 #endif 
