@@ -60,6 +60,13 @@ class Foundation_API File: private FileImpl
 public:
 	typedef FileSizeImpl FileSize;
 
+	enum LinkType
+		/// Type of link for linkTo().
+	{
+		LINK_HARD     = 0, /// hard link
+		LINK_SYMBOLIC = 1  /// symbolic link
+	};
+
 	File();
 		/// Creates the file.
 
@@ -185,6 +192,14 @@ public:
 
 	void renameTo(const std::string& path);
 		/// Renames the file to the new name.
+
+	void linkTo(const std::string& path, LinkType type = LINK_SYMBOLIC) const;
+		/// Creates a link (symbolic or hard, depending on type argument)
+		/// at the given path to the file or directory.
+		///
+		/// May not be supported on all platforms.
+		/// Furthermore, some operating systems do not allow creating
+		/// hard links to directories.
 
 	void remove(bool recursive = false);
 		/// Deletes the file. If recursive is true and the
