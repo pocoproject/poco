@@ -16,6 +16,6 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI9TimerTestEE.testScheduleInterval, \
   N7CppUnit10TestCallerI9TimerTestEE.testScheduleIntervalTimestamp, \
   N7CppUnit10TestCallerI9TimerTestEE.testScheduleIntervalClock, \
- 
+  N7CppUnit10TestCallerI10ThreadTestEE.testSleep, \
   "
 
