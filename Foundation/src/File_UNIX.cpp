@@ -414,6 +414,23 @@ void FileImpl::renameToImpl(const std::string& path)
 }
 
 
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	poco_assert (!_path.empty());
+
+	if (type == 0)
+	{
+		if (link(_path.c_str(), path.c_str()) != 0)
+			handleLastErrorImpl(_path);
+	}
+	else
+	{
+		if (symlink(_path.c_str(), path.c_str()) != 0)
+			handleLastErrorImpl(_path);
+	}
+}
+
+
 void FileImpl::removeImpl()
 {
 	poco_assert (!_path.empty());
