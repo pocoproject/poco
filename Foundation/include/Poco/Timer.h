@@ -101,7 +101,7 @@ public:
 		/// Create the TimerCallback as follows:
 		///     TimerCallback<MyClass> callback(*this, &MyClass::onTimer);
 		///     timer.start(callback);
-		
+
 	void stop();
 		/// Stops the timer. If the callback method is currently running
 		/// it will be allowed to finish first.
@@ -131,7 +131,7 @@ public:
 		/// Sets the periodic interval. If the timer is already running
 		/// the new interval will be effective when the current interval
 		/// expires.
-		
+
 	long skipped() const;
 		/// Returns the number of skipped invocations since the last invocation.
 		/// Skipped invocations happen if the timer callback function takes
@@ -141,15 +141,15 @@ protected:
 	void run();
 
 private:
-	volatile long _startInterval;
-	volatile long _periodicInterval;
-	Event         _wakeUp;
-	Event         _done;
-	long          _skipped;
+	long _startInterval;
+	long _periodicInterval;
+	Event _wakeUp;
+	Event _done;
+	long _skipped;
 	AbstractTimerCallback* _pCallback;
-	Clock                  _nextInvocation;
-	mutable FastMutex      _mutex;
-	
+	Clock _nextInvocation;
+	mutable FastMutex _mutex;
+
 	Timer(const Timer&);
 	Timer& operator = (const Timer&);
 };
@@ -163,7 +163,7 @@ public:
 	AbstractTimerCallback();
 	AbstractTimerCallback(const AbstractTimerCallback& callback);
 	virtual ~AbstractTimerCallback();
-	
+
 	AbstractTimerCallback& operator = (const AbstractTimerCallback& callback);
 
 	virtual void invoke(Timer& timer) const = 0;
