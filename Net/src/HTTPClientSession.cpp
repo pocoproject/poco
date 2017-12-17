@@ -45,7 +45,8 @@ HTTPClientSession::HTTPClientSession():
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_sourceAddressSet(false)
 {
 }
 
@@ -58,7 +59,8 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_sourceAddressSet(false)
 {
 	setKeepAlive(true);
 }
@@ -72,7 +74,8 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_sourceAddressSet(false)
 {
 }
 
@@ -85,7 +88,8 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_sourceAddressSet(false)
 {
 }
 
@@ -98,7 +102,8 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_sourceAddressSet(false)
 {
 }
 
@@ -111,7 +116,8 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConf
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_sourceAddressSet(false)
 {
 	setKeepAlive(true);
 }
@@ -139,6 +145,18 @@ void HTTPClientSession::setPort(Poco::UInt16 port)
 		throw IllegalStateException("Cannot set the port number for an already connected session");
 }
 
+
+
+void HTTPClientSession::setSourceSocketAddress(const SocketAddress& address)
+{
+	if (!connected())
+	{
+		_sourceAddress = address;
+		_sourceAddressSet = true;
+	}
+	else
+		throw IllegalStateException("Cannot set the source address for an already connected session");
+}
 
 void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
@@ -389,7 +407,10 @@ void HTTPClientSession::reconnect()
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
 		SocketAddress addr(_host, _port);
-		connect(addr);
+		if (_sourceAddressSet)
+			connect(addr, _sourceAddress);
+		else
+			connect(addr);
 	}
 	else
 	{
