@@ -221,7 +221,7 @@ protected:
 		Path pp(file);
 		pp.setExtension("i");
 		std::string comp = "PocoDoc.compiler";
-		if (Environment::osFamilyWindows())
+		if (Environment::isWindows())
 			comp += ".windows";
 		else
 			comp += ".unix";
