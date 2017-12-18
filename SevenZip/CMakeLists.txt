@@ -50,7 +50,7 @@ POCO_SOURCES( SRCS 7z
 #    src/XzIn.c
 )
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -78,4 +78,3 @@ endif ()
 if (ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()
-

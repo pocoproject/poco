@@ -87,8 +87,7 @@ option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
 
-option(POCO_STATIC
-  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 # allow disabling of internally built OpenSSL# (see below for details)
 # if POCO pre-built OpenSSL directory is found, and DISABLE_INTERNAL_OPENSSL=OFF,
@@ -175,18 +174,16 @@ if(MSVC)
 endif()
 
 # Uncomment from next two lines to force static or dynamic library, default is autodetection
-if(POCO_STATIC)
-    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
-    set(LIB_MODE STATIC)
-    if(POCO_VERBOSE_MESSAGES)
-        message(STATUS "Building static libraries")
-    endif()
-else(POCO_STATIC)
-    set(LIB_MODE SHARED)
+if(BUILD_SHARED_LIBS)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building dynamic libraries")
     endif()
-endif(POCO_STATIC)
+else(BUILD_SHARED_LIBS)
+    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
+    if(POCO_VERBOSE_MESSAGES)
+        message(STATUS "Building static libraries")
+    endif()
+endif(BUILD_SHARED_LIBS)
 
 if (ENABLE_TESTS)
 	option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)

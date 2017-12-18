@@ -155,7 +155,7 @@ if(UNIX AND NOT APPLE)
 	endif(NOT HAVE_PTHREAD_SETAFFINITY_NP)
 endif(UNIX AND NOT APPLE)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS})
+add_library( "${LIBNAME}" ${SRCS})
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
 	PROPERTIES
