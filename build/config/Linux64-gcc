@@ -1,9 +1,7 @@
 #
-# $Id$
-#
 # Linux
 #
-# Make settings for Linux/clang
+# Make settings for Linux 2.6/gcc 3.3
 #
 #
 
@@ -15,14 +13,22 @@ LINKMODE ?= SHARED
 #
 # Define Tools
 #
-CC     ?= clang
-CXX    ?= clang++
+ifeq ($(origin CROSS_COMPILE), undefined)
+	CC	    ?=gcc
+	CXX	    ?=g++
+	LIB     = ar -cr
+	RANLIB  = ranlib
+	STRIP   = strip
+else
+	CC      = ${CROSS_COMPILE}gcc
+	CXX     = ${CROSS_COMPILE}g++
+	LIB     = ${CROSS_COMPILE}ar -cr
+	RANLIB  = ${CROSS_COMPILE}ranlib
+	STRIP   = ${CROSS_COMPILE}strip
+endif
 LINK    = $(CXX)
-LIB     = ${CROSS_COMPILE}ar -cr
-RANLIB  = ${CROSS_COMPILE}ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = ${CROSS_COMPILE}strip
 DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
@@ -38,24 +44,30 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          =
+CFLAGS          = -std=c99
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -Wall -Wno-sign-compare -stdlib=libstdc++ -ftemplate-depth=340
+CXXFLAGS        = -Wall -Wno-sign-compare
 CXXFLAGS32      =
 CXXFLAGS64      =
+SHLIBFLAGS      =
+SHLIBFLAGS32    =
+SHLIBFLAGS64    =
+LIBFLAGS        =
+LIBFLAGS32      =
+LIBFLAGS64      =
 LINKFLAGS       =
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
-STATICOPT_LINK  = -static
+STATICOPT_LINK  =
 SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
-DEBUGOPT_CC     = -D_DEBUG
-DEBUGOPT_CXX    = -D_DEBUG
-DEBUGOPT_LINK   =
+DEBUGOPT_CC     = -g -D_DEBUG
+DEBUGOPT_CXX    = -g -D_DEBUG
+DEBUGOPT_LINK   = -g
 RELEASEOPT_CC   = -O2 -DNDEBUG
 RELEASEOPT_CXX  = -O2 -DNDEBUG
 RELEASEOPT_LINK = -O2
@@ -63,12 +75,12 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL -DPOCO_HAVE_ADDRINFO -DPOCO_HAVE_LIBRESOLV
+SYSFLAGS = -D_XOPEN_SOURCE=600 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL -DPOCO_HAVE_ADDRINFO -DPOCO_HAVE_LIBRESOLV
 
 #
 # System Specific Libraries
 #
-SYSLIBS  += -lpthread -ldl -lrt
+SYSLIBS  = -lrt -lpthread -ldl
 
 #
 # Auto-detect architecture if not specified
@@ -83,7 +95,6 @@ ifndef OSARCH_64BITS
 endif
 
 #
-#
 # C++11/14 detection
 #
-include $(POCO_BASE)/build/script/cpp11-clang
+include $(POCO_BASE)/build/script/cpp11-gcc
