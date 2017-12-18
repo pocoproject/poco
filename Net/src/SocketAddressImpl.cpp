@@ -144,10 +144,24 @@ LocalSocketAddressImpl::LocalSocketAddressImpl(const struct sockaddr_un* addr)
 
 LocalSocketAddressImpl::LocalSocketAddressImpl(const char* path)
 {
+	poco_assert (std::strlen(path) < sizeof(_pAddr->sun_path));
+
 	_pAddr = new sockaddr_un;
 	poco_set_sun_len(_pAddr, std::strlen(path) + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
 	_pAddr->sun_family = AF_UNIX;
 	std::strcpy(_pAddr->sun_path, path);
+}
+
+
+LocalSocketAddressImpl::LocalSocketAddressImpl(const char* path, std::size_t length)
+{
+	poco_assert (length < sizeof(_pAddr->sun_path));
+
+	_pAddr = new sockaddr_un;
+	poco_set_sun_len(_pAddr, length + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
+	_pAddr->sun_family = AF_UNIX;
+	std::memcpy(_pAddr->sun_path, path, length);
+	_pAddr->sun_path[length] = 0;
 }
 
 
