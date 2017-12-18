@@ -5,7 +5,15 @@ AAAIntroduction
 
 !!Summary of Changes
 
-  - TODO
+  - Added Poco::File::linkTo()
+  - fixed GH #2042: Android abstract namespace local socket address
+  - fixed GH #2038: Poco::Net::MultipartWriter::createBoundary() always returns the same string.
+  - fixed GH #2020: SQLite not handling parameter count mismatch correctly.
+  - fixed GH #2012: Data/SQLite: Exception messages contain duplicate text
+  - fixed GH #2005: Upgraded bundled PCRE to 8.41
+  - fixed GH #2000: Fix building XMLStreamParser with unbundled expat
+  - fixed GH #1603: fix MinGW 4.8.2 Compilation
+  - fixed GH #1991: Support building poco 1.8.0 as cmake sub-project
 
 
 !!!Release 1.8.0.1
