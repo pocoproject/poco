@@ -34,6 +34,9 @@ namespace Poco {
 namespace PDF {
 
 
+class Document;
+
+
 class PDF_API Page
 	/// A Page represents a PDF page object.
 {
@@ -45,7 +48,7 @@ public:
 
 	enum Size
 	{
-		PAGE_SIZE_LETTER = HPDF_PAGE_SIZE_LETTER,
+		PAGE_SIZE_LETTER = HPDF_PAGE_SIZE_LETTER, 
 			/// 8½ x 11 (Inches), 612 x 792 px
 		PAGE_SIZE_LEGAL = HPDF_PAGE_SIZE_LEGAL,
 			/// 8½ x 14 (Inches), 612 x 1008 px
@@ -141,7 +144,7 @@ public:
 			/// Add spaces between the words to justify both left and right side.
 	};
 
-	Page(HPDF_Doc* pPDF,
+	Page(Document* pDocument,
 		const HPDF_Page& page,
 		Size pageSize = PAGE_SIZE_LETTER,
 		Orientation orientation = ORIENTATION_PORTRAIT);
@@ -199,6 +202,13 @@ public:
 	void setFont(const Font& font, float size);
 		/// Sets the font.
 
+	void setFont(const std::string& fontName, float size, const std::string& encoding = "");
+		/// Sets the font. The name must be a valid Base14 PDF internal font.
+
+	void setTTFont(const std::string& name, float size, const std::string& encoding = "UTF-8", bool embed = true);
+		/// Sets the external true type font. Name must be a valid path to .ttf file.
+		/// If embed is tru, font will be embedded int othe document.
+
 	float textWidth(const std::string& text);
 		/// Returns the width of the supplied text.
 
@@ -222,7 +232,7 @@ public:
 		/// prints the text at the current position on the page.
 	
 	void writeNextLineEx(float wordSpace, float charSpace, const std::string& text);
-		/// Moves the current text position to the start of the next line, sets the word spacing,
+		/// Moves the current text position to the start of the next line, sets the word spacing, 
 		/// character spacing and prints the text at the current position on the page.
 
 	int writeOnceInRectangle(float left,
@@ -231,7 +241,7 @@ public:
 		float bottom,
 		const std::string& text,
 		TextAlignment align = TEXT_ALIGN_LEFT);
-		/// Begins, writes and ends text objectinside the specified region.
+		/// Begins, writes and ends text objectinside the specified region. 
 		/// Returns the number of characters written.
 
 	int writeInRectangle(float left,
@@ -240,7 +250,7 @@ public:
 		float bottom,
 		const std::string& text,
 		TextAlignment align);
-		/// Writes the text inside the specified region.
+		/// Writes the text inside the specified region. 
 		/// Returns the number of characters written.
 
 	void drawImage(Image image, float x, float y, float width, float height);
@@ -249,18 +259,18 @@ public:
 	const Destination& createDestination(const std::string& name);
 		/// Creates ad returns reference to destination.
 
-	const TextAnnotation& createTextAnnotation(const std::string& name,
+	const TextAnnotation& createTextAnnotation(const std::string& name, 
 		const Rectangle& rect,
 		const std::string& text,
 		const Encoder& encoder);
 		/// Creates ad returns reference to text annotation.
 
-	const LinkAnnotation& createLinkAnnotation(const std::string& name,
+	const LinkAnnotation& createLinkAnnotation(const std::string& name, 
 		const Rectangle& rect,
 		const Destination& dest);
 		/// Creates ad returns reference to destination link annotation.
 
-	const LinkAnnotation& createURILinkAnnotation(const std::string& name,
+	const LinkAnnotation& createURILinkAnnotation(const std::string& name, 
 		const Rectangle& rect,
 		const std::string& uri);
 		/// Creates ad returns reference to URI annotation.
@@ -292,22 +302,22 @@ public:
 
 	void curveTo(const std::vector<float>& values);
 		/// Appends a Bézier curve to the current path using two specified points.
-		/// The point (x1, y1) and the point (x2, y2) are used as the control points
+		/// The point (x1, y1) and the point (x2, y2) are used as the control points 
 		/// for a Bézier curve and current point is moved to the point (x3, y3)
 
 	void curveToRight(float x2, float y2, float x3, float y3);
 		/// Appends a Bézier curve to the right of the current point using two specified points.
-		/// The current point and the point (x2, y2) are used as the control points
+		/// The current point and the point (x2, y2) are used as the control points 
 		/// for a Bézier curve and current point is moved to the point (x3, y3)
 
 	void curveToLeft(float x2, float y2, float x3, float y3);
 		/// Appends a Bézier curve to the left of the current point using two specified points.
-		/// The current point and the point (x2, y2) are used as the control points
+		/// The current point and the point (x2, y2) are used as the control points 
 		/// for a Bézier curve and current point is moved to the point (x3, y3)
 
 	void closePath();
 		/// Appends a straight line from the current point to the start point of sub path.
-		/// The current point is moved to the start point of sub path.
+		/// The current point is moved to the start point of sub path. 
 
 	void rectangle(float x, float y, float width, float height);
 		/// Draws a rectangle.
@@ -319,7 +329,7 @@ public:
 		/// Draws an arc.
 
 	void ellipse(float x, float y, float xRadius, float yRadius);
-		/// Draws an ellipse.
+		/// Draws an ellips.
 
 	void stroke();
 		/// Paints the current path.
@@ -340,7 +350,7 @@ public:
 		/// Fills the current path using the even-odd rule and then paints it.
 
 	void closeFillAndStroke();
-		/// Closes the current path, fills the current path using the nonzero winding number
+		/// Closes the current path, fills the current path using the nonzero winding number 
 		/// rule and then paints it.
 
 	void closeFillAndEOStroke();
@@ -363,22 +373,22 @@ public:
 
 	void moveTextPos(float x, float y);
 		/// Moves the current text position to the start of the next line
-		/// using specified offset values. If the start position of the current
+		/// using specified offset values. If the start position of the current 
 		/// line is (x1, y1), the start of the next line is (x1 + x, y1 + y).
 	
 	void moveTextNextLine(float x, float y);
-		/// Moves the current text position to the start of the next line
-		/// using specified offset values, and sets the text leading to -y.
-		/// If the start position of the current line is (x1, y1), the start
-		/// of the next line is (x1 + x, y1 + y).
+		/// Moves the current text position to the start of the next line 
+		/// using specified offset values, and sets the text leading to -y. 
+		/// If the start position of the current line is (x1, y1), the start 
+		/// of the next line is (x1 + x, y1 + y). 
 
 	void moveTextNextLine();
 		/// Moves the current text position to the start of the next line.
-		/// If the start position of the current line is (x1, y1), the start of
+		/// If the start position of the current line is (x1, y1), the start of 
 		/// the next line is (x1, y1 - text leading).
 		///
 		/// NOTE:
-		/// Since the default value of Text Leading is 0,  an application has to
+		/// Since the default value of Text Leading is 0,  an application has to 
 		/// invoke HPDF_Page_SetTextLeading() before HPDF_Page_MoveTextPos2() to set
 		/// text leading.
 
@@ -422,7 +432,7 @@ public:
 		/// Returns current dash mode.
 
 	void setDashMode(const PatternVec& pattern, int paramNo, int phase) const;
-		/// Sets the dash mode.
+		/// Sets teh dash mode.
 
 	float getFlatness() const;
 		/// Returns the current flatness.
@@ -511,7 +521,7 @@ public:
 private:
 	Page();
 
-	HPDF_Doc*                _pPDF;
+	Document*                _pDocument;
 	HPDF_Page                _page;
 	Size                     _size;
 	Orientation              _orientation;
@@ -530,12 +540,6 @@ private:
 inline Page::operator const Page::Type& () const
 {
 	return _page;
-}
-
-
-inline bool Page::operator == (const Page& other) const
-{
-	return _pPDF == other._pPDF && _page == other._page;
 }
 
 
@@ -635,7 +639,7 @@ inline void Page::restoreGraphics()
 
 inline void Page::concatenate(const std::vector<float>& values)
 {
-	if (values.size() < 6)
+	if (values.size() < 6) 
 		throw InvalidArgumentException("Needs six values");
 
 	HPDF_Page_Concat(_page,
@@ -662,7 +666,7 @@ inline void Page::lineTo(float x, float y)
 
 inline void Page::curveTo(const std::vector<float>& values)
 {
-	if (values.size() < 6)
+	if (values.size() < 6) 
 		throw InvalidArgumentException("Needs six values");
 
 	HPDF_Page_CurveTo(_page,
@@ -795,13 +799,6 @@ inline void Page::moveTextNextLine()
 }
 
 
-inline const Font& Page::getFont() const
-{
-	delete _pCurrentFont;
-	return *(_pCurrentFont = new Font(_pPDF, HPDF_Page_GetCurrentFont(_page)));
-}
-
-
 inline float Page::getFontSize() const
 {
 	return HPDF_Page_GetCurrentFontSize(_page);
@@ -876,7 +873,7 @@ inline DashMode Page::getDashMode() const
 
 inline void Page::setDashMode(const PatternVec& pattern, int paramNo, int phase) const
 {
-	HPDF_Page_SetDash(_page, &pattern[0],
+	HPDF_Page_SetDash(_page, &pattern[0], 
 		static_cast<HPDF_UINT>(paramNo),
 		static_cast<HPDF_UINT>(phase));
 }

@@ -327,7 +327,7 @@ png_free_default(png_structp png_ptr, png_voidp ptr)
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
-   to improve performance noticeably. */
+   to improve performance noticably. */
 png_voidp /* PRIVATE */
 png_create_struct(int type)
 {
@@ -337,7 +337,7 @@ png_create_struct(int type)
 
 /* Allocate memory for a png_struct or a png_info.  The malloc and
    memset can be replaced by a single call to calloc() if this is thought
-   to improve performance noticeably. */
+   to improve performance noticably. */
 png_voidp /* PRIVATE */
 png_create_struct_2(int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)
 {

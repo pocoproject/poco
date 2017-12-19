@@ -22,7 +22,7 @@ namespace PDF {
 
 LinkAnnotation::LinkAnnotation(HPDF_Doc* pPDF,
 	const HPDF_Annotation& annotation,
-	const std::string& name):
+	const std::string& name): 
 	Resource<HPDF_Annotation>(pPDF, annotation, name)
 {
 }
