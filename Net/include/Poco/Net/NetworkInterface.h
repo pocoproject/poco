@@ -61,7 +61,6 @@ class Net_API NetworkInterface
 {
 public:
 	typedef std::vector<NetworkInterface>                List;
-	typedef List                                         NetworkInterfaceList;//@deprecated
 	typedef std::map<unsigned, NetworkInterface>         Map;
 	typedef Poco::Tuple<IPAddress, IPAddress, IPAddress> AddressTuple;
 	typedef std::vector<AddressTuple>                    AddressList;
