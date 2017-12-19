@@ -79,7 +79,7 @@ void NetworkInterfaceTest::testList()
 {
 	NetworkInterface::List list = NetworkInterface::list(false, false);
 	assert (!list.empty());
-	for (NetworkInterface::NetworkInterfaceList::const_iterator it = list.begin(); it != list.end(); ++it)
+	for (NetworkInterface::List::const_iterator it = list.begin(); it != list.end(); ++it)
 	{
 		std::cout << std::endl << "==============" << std::endl;
 
@@ -92,10 +92,10 @@ void NetworkInterfaceTest::testList()
 		if (!mac.empty() && (it->type() != NetworkInterface::NI_TYPE_SOFTWARE_LOOPBACK))
 			std::cout << "MAC Address: (" << it->type() << ") " << mac << std::endl;
 
-		typedef NetworkInterface::AddressList List;
-		const List& ipList = it->addressList();
-		List::const_iterator ipIt = ipList.begin();
-		List::const_iterator ipEnd = ipList.end();
+		typedef NetworkInterface::AddressList AddrList;
+		const AddrList& ipList = it->addressList();
+		AddrList::const_iterator ipIt = ipList.begin();
+		AddrList::const_iterator ipEnd = ipList.end();
 		for (int counter = 0; ipIt != ipEnd; ++ipIt, ++counter)
 		{
 			std::cout << "IP Address:  " << ipIt->get<NetworkInterface::IP_ADDRESS>() << std::endl;
@@ -213,13 +213,20 @@ void NetworkInterfaceTest::testListMapConformance()
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = mapIt->second.addressList();
-		List::const_iterator ipIt = ipList.begin();
-		List::const_iterator ipEnd = ipList.end();
-		for (; ipIt != ipEnd; ++ipIt, ++counter, ++listIt)
+		if (ipList.size() > 0)
 		{
-			NetworkInterface::MACAddress lmac = listIt->macAddress();
-			assert (lmac == mac);
-			if (listIt == l.end()) fail ("wrong number of list items");
+			List::const_iterator ipIt = ipList.begin();
+			List::const_iterator ipEnd = ipList.end();
+			for(; ipIt != ipEnd; ++ipIt, ++counter, ++listIt)
+			{
+				NetworkInterface::MACAddress lmac = listIt->macAddress();
+				assert (lmac == mac);
+				if(listIt == l.end()) fail("wrong number of list items");
+			}
+		}
+		else
+		{
+			++counter;
 		}
 	}
 
