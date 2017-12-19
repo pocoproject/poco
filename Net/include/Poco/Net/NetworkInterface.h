@@ -89,7 +89,7 @@ public:
 		NI_TYPE_IEEE1394,
 		NI_TYPE_OTHER
 	};
-	
+
 	enum IPVersion
 	{
 		IPv4_ONLY,    /// Return interfaces with IPv4 address only
@@ -173,10 +173,10 @@ public:
 
 	const AddressList& addressList() const;
 		/// Returns the list of IP addresses bound to the interface.
-		
+
 	const IPAddress& subnetMask(unsigned index = 0) const;
 		/// Returns the subnet mask for this network interface.
-		
+
 	const IPAddress& broadcastAddress(unsigned index = 0) const;
 		/// Returns the broadcast address for this network interface.
 
@@ -249,7 +249,7 @@ public:
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the given index does not exist.
-		
+
 	static List list(bool ipOnly = true, bool upOnly = true);
 		/// Returns a list with all network interfaces
 		/// on the system.
@@ -264,7 +264,7 @@ public:
 		/// If there are multiple addresses bound to one interface,
 		/// multiple NetworkInterface entries are listed for
 		/// the same interface.
-		
+
 	static Map map(bool ipOnly = true, bool upOnly = true);
 		/// Returns a map containing system network interfaces
 		/// Map is keyed by interface system indices.
@@ -307,10 +307,10 @@ protected:
 		unsigned index,
 		MACAddress* pMACAddress = 0);
 		/// Creates the NetworkInterface.
-		
+
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;
 		/// Determines the IPAddress bound to the interface with the given name.
-		
+
 	unsigned interfaceNameToIndex(const std::string& interfaceName) const;
 		/// Determines the interface index of the interface with the given name.
 
@@ -318,7 +318,7 @@ protected:
 
 private:
 	NetworkInterfaceImpl* _pImpl;
-	
+
 	static Poco::FastMutex _mutex;
 };
 
