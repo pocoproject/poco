@@ -177,7 +177,7 @@ void SQLiteStatementImpl::bindImpl()
 
 	if (availableCount < paramCount)
 		throw ParameterCountMismatchException();
-	/**/
+
 	Bindings::difference_type remainingBindCount = bindEnd - _bindBegin;
 	if (bindCount < remainingBindCount)
 	{
@@ -186,7 +186,7 @@ void SQLiteStatementImpl::bindImpl()
 	}
 	else if (bindCount > remainingBindCount)
 		throw ParameterCountMismatchException();
-	/**/
+
 	std::size_t boundRowCount;
 	if (_bindBegin != bindings().end())
 	{
