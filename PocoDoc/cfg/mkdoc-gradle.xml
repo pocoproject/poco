@@ -49,7 +49,6 @@
 					/E,
 					/C,
 					/DPOCO_NO_GCC_API_ATTRIBUTE
-					/DPOCO_NO_WINDOWS_H
 				</options>
 				<path>${CLP}</path>
 				<usePipe>true</usePipe>

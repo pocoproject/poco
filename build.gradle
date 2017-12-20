@@ -806,7 +806,7 @@ PocoDoc.version=${version}-all
 	if (os.windows) {
 		def	String javaVCH = VCHome.replace('\\','/')
 		def	String javaCLP = CLPath.replace('\\','/')
-		def	String javaWDK = WDKHome + "/Include/" + WDKVers + "/um/x86"
+		def	String javaWDK = WDKHome + "/Include/" + WDKVers
 		javaWDK = javaWDK.replace('\\','/')
 		
  		file.text += """
