@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_fontdef_type1.c
+ * << Haru Free PDF Library >> -- hpdf_fontdef_type1.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -69,15 +72,12 @@ HPDF_Type1FontDef_New  (HPDF_MMgr  mmgr)
     if (!fontdef)
         return NULL;
 
+    HPDF_MemSet (fontdef, 0, sizeof (HPDF_FontDef_Rec));
     fontdef->sig_bytes = HPDF_FONTDEF_SIG_BYTES;
-    fontdef->base_font[0] = 0;
     fontdef->mmgr = mmgr;
     fontdef->error = mmgr->error;
     fontdef->type = HPDF_FONTDEF_TYPE_TYPE1;
-    fontdef->clean_fn = NULL;
     fontdef->free_fn = FreeFunc;
-    fontdef->descriptor = NULL;
-    fontdef->valid = HPDF_FALSE;
 
     fontdef_attr = HPDF_GetMem (mmgr, sizeof(HPDF_Type1FontDefAttr_Rec));
     if (!fontdef_attr) {
@@ -106,7 +106,7 @@ GetKeyword  (const char  *src,
 
     *keyword = 0;
 
-    while (len > 0) {
+    while (len > 1) {
         if (HPDF_IS_WHITE_SPACE(*src)) {
             *keyword = 0;
 
@@ -175,7 +175,7 @@ LoadAfm (HPDF_FontDef  fontdef,
         } else
 
         if (HPDF_StrCmp (keyword, "ItalicAngle") == 0) {
-            fontdef->italic_angle = HPDF_AToI (s);
+            fontdef->italic_angle = (HPDF_INT16)HPDF_AToI (s);
             if (fontdef->italic_angle != 0)
                 fontdef->flags |= HPDF_FONT_ITALIC;
         } else
@@ -195,35 +195,35 @@ LoadAfm (HPDF_FontDef  fontdef,
             char buf[HPDF_INT_LEN + 1];
 
             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.left = HPDF_AToI (buf);
+            fontdef->font_bbox.left = (HPDF_REAL)HPDF_AToI (buf);
 
             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.bottom = HPDF_AToI (buf);
+            fontdef->font_bbox.bottom = (HPDF_REAL)HPDF_AToI (buf);
 
             s = GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.right = HPDF_AToI (buf);
+            fontdef->font_bbox.right = (HPDF_REAL)HPDF_AToI (buf);
 
             GetKeyword (s, buf, HPDF_INT_LEN + 1);
-            fontdef->font_bbox.top = HPDF_AToI (buf);
+            fontdef->font_bbox.top = (HPDF_REAL)HPDF_AToI (buf);
         } else
         if (HPDF_StrCmp (keyword, "EncodingScheme") == 0) {
             HPDF_StrCpy (attr->encoding_scheme, s,
                     attr->encoding_scheme + HPDF_LIMIT_MAX_NAME_LEN);
         } else
         if (HPDF_StrCmp (keyword, "CapHeight") == 0) {
-            fontdef->cap_height = HPDF_AToI (s);
+            fontdef->cap_height = (HPDF_UINT16)HPDF_AToI (s);
         } else
         if (HPDF_StrCmp (keyword, "Ascender") == 0) {
-            fontdef->ascent = HPDF_AToI (s);
+            fontdef->ascent = (HPDF_INT16)HPDF_AToI (s);
         } else
         if (HPDF_StrCmp (keyword, "Descender") == 0) {
-            fontdef->descent = HPDF_AToI (s);
+            fontdef->descent = (HPDF_INT16)HPDF_AToI (s);
         } else
         if (HPDF_StrCmp (keyword, "STDHW") == 0) {
-            fontdef->stemh = HPDF_AToI (s);
+            fontdef->stemh = (HPDF_UINT16)HPDF_AToI (s);
         } else
         if (HPDF_StrCmp (keyword, "STDHV") == 0) {
-            fontdef->stemv = HPDF_AToI (s);
+            fontdef->stemv = (HPDF_UINT16)HPDF_AToI (s);
         } else
         if (HPDF_StrCmp (keyword, "StartCharMetrics") == 0) {
             attr->widths_count = HPDF_AToI (s);
@@ -261,7 +261,7 @@ LoadAfm (HPDF_FontDef  fontdef,
             s = GetKeyword (s, buf2, HPDF_LIMIT_MAX_NAME_LEN + 1);
               HPDF_AToI (buf2);
 
-            cdata->char_cd = HPDF_AToI (buf2);
+            cdata->char_cd = (HPDF_INT16)HPDF_AToI (buf2);
 
         } else
             return HPDF_SetError (fontdef->error,
@@ -278,7 +278,7 @@ LoadAfm (HPDF_FontDef  fontdef,
         if (buf2[0] == 0)
             return HPDF_SetError (fontdef->error, HPDF_INVALID_WX_DATA, 0);
 
-        cdata->width = HPDF_AToI (buf2);
+        cdata->width = (HPDF_INT16)HPDF_AToI (buf2);
 
         /* N PostScript language character name */
         s = HPDF_StrStr (s, "N ", 0);
@@ -316,14 +316,14 @@ LoadFontData (HPDF_FontDef  fontdef,
         return HPDF_Error_GetCode (fontdef->error);
 
     len = 11;
-    ret = HPDF_Stream_Read (stream, pbuf, &len);
+    ret = HPDF_Stream_Read (stream, (HPDF_BYTE *)pbuf, &len);
     if (ret != HPDF_OK)
         return ret;
     pbuf += 11;
 
     for (;;) {
         len = HPDF_STREAM_BUF_SIZ - 11;
-        ret = HPDF_Stream_Read (stream, pbuf, &len);
+        ret = HPDF_Stream_Read (stream, (HPDF_BYTE *)pbuf, &len);
         if (ret == HPDF_STREAM_EOF) {
             end_flg = HPDF_TRUE;
         } else if (ret != HPDF_OK)
@@ -354,16 +354,16 @@ LoadFontData (HPDF_FontDef  fontdef,
         }
 
         if (end_flg) {
-            if ((ret = HPDF_Stream_Write (attr->font_data, buf, len + 11)) !=
+            if ((ret = HPDF_Stream_Write (attr->font_data, (HPDF_BYTE *)buf, len + 11)) !=
                         HPDF_OK)
                 return ret;
 
             break;
         } else {
-            if ((ret = HPDF_Stream_Write (attr->font_data, buf, len)) !=
+            if ((ret = HPDF_Stream_Write (attr->font_data, (HPDF_BYTE *)buf, len)) !=
                         HPDF_OK)
                 return ret;
-            HPDF_MemCpy (buf, buf + len, 11);
+            HPDF_MemCpy ((HPDF_BYTE *)buf, (HPDF_BYTE *)buf + len, 11);
             pbuf = buf + 11;
         }
     }
@@ -401,7 +401,7 @@ HPDF_Type1FontDef_Load  (HPDF_MMgr         mmgr,
         return NULL;
     }
 
-    /* if font-data is specified, the font data is embedded */
+    /* if font-data is specified, the font data is embeded */
     if (font_data) {
         ret = LoadFontData (fontdef, font_data);
         if (ret != HPDF_OK) {
@@ -424,8 +424,8 @@ HPDF_Type1FontDef_Duplicate  (HPDF_MMgr     mmgr,
     fontdef->type = src->type;
     fontdef->valid = src->valid;
 
-    // copy data of attr,widths
-    // attention to charset
+    /* copy data of attr,widths
+     attention to charset */
     return NULL;
 }
 

@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_pages.c
+ * << Haru Free PDF Library >> -- hpdf_pages.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -62,7 +65,7 @@ typedef struct _HPDF_PageAttr_Rec {
     HPDF_Stream        stream;
     HPDF_Xref          xref;
     HPDF_UINT          compression_mode;
-	HPDF_PDFVer       *ver;
+	HPDF_PDFVer       *ver; 
 } HPDF_PageAttr_Rec;
 
 

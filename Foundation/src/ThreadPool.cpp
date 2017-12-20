@@ -45,15 +45,15 @@ public:
 	void run();
 
 private:
-	volatile bool        _idle;
-	volatile std::time_t _idleTime;
-	Runnable*            _pTarget;
-	std::string          _name;
-	Thread               _thread;
-	Event                _targetReady;
-	Event                _targetCompleted;
-	Event                _started;
-	FastMutex            _mutex;
+	bool _idle;
+	std::time_t _idleTime;
+	Runnable* _pTarget;
+	std::string _name;
+	Thread _thread;
+	Event _targetReady;
+	Event _targetCompleted;
+	Event _started;
+	FastMutex _mutex;
 };
 
 
@@ -97,7 +97,7 @@ void PooledThread::start(int cpu)
 void PooledThread::start(Thread::Priority priority, Runnable& target, int cpu)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	poco_assert (_pTarget == 0);
 
 	_pTarget = &target;
@@ -127,7 +127,7 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 	}
 	_thread.setName(fullName);
 	_thread.setPriority(priority);
-	
+
 	poco_assert (_pTarget == 0);
 
 	_pTarget = &target;
@@ -154,7 +154,7 @@ int PooledThread::idleTime()
 	return (int) (wceex_time(NULL) - _idleTime);
 #else
 	return (int) (time(NULL) - _idleTime);
-#endif	
+#endif
 }
 
 
@@ -171,7 +171,7 @@ void PooledThread::join()
 void PooledThread::activate()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	poco_assert (_idle);
 	_idle = false;
 	_targetCompleted.reset();
@@ -231,7 +231,7 @@ void PooledThread::run()
 			_idleTime = wceex_time(NULL);
 #else
 			_idleTime = time(NULL);
-#endif	
+#endif
 			_idle     = true;
 			_targetCompleted.set();
 			ThreadLocalStorage::clear();
@@ -265,7 +265,7 @@ ThreadPool::ThreadPool(int minCapacity,
 
 	int cpu = -1;
 	int cpuCount = Poco::Environment::processorCount();
-	
+
 	for (int i = 0; i < _minCapacity; i++)
 	{
 		if (_affinityPolicy == TAP_UNIFORM_DISTRIBUTION) 
@@ -472,15 +472,15 @@ void ThreadPool::housekeep()
 	ThreadVec activeThreads;
 	idleThreads.reserve(_threads.size());
 	activeThreads.reserve(_threads.size());
-	
+
 	for (ThreadVec::iterator it = _threads.begin(); it != _threads.end(); ++it)
 	{
 		if ((*it)->idle())
 		{
 			if ((*it)->idleTime() < _idleTime)
 				idleThreads.push_back(*it);
-			else 
-				expiredThreads.push_back(*it);	
+			else
+				expiredThreads.push_back(*it);
 		}
 		else activeThreads.push_back(*it);
 	}
@@ -562,7 +562,7 @@ public:
 	ThreadPool* pool(ThreadPool::ThreadAffinityPolicy affinityPolicy = ThreadPool::TAP_DEFAULT)
 	{
 		FastMutex::ScopedLock lock(_mutex);
-		
+
 		if (!_pPool)
 		{
 			_pPool = new ThreadPool("default");
@@ -572,7 +572,7 @@ public:
 		}
 		return _pPool;
 	}
-	
+
 private:
 	ThreadPool* _pPool;
 	FastMutex   _mutex;

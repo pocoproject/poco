@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_streams.h
+ * << Haru Free PDF Library >> -- hpdf_streams.h
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -31,7 +34,7 @@ typedef enum _HPDF_StreamType {
     HPDF_STREAM_UNKNOWN = 0,
     HPDF_STREAM_CALLBACK,
     HPDF_STREAM_FILE,
-    HPDF_STREAM_MEMORY,
+    HPDF_STREAM_MEMORY
 } HPDF_StreamType;
 
 #define HPDF_STREAM_FILTER_NONE          0x0000
@@ -39,6 +42,7 @@ typedef enum _HPDF_StreamType {
 #define HPDF_STREAM_FILTER_ASCII85       0x0200
 #define HPDF_STREAM_FILTER_FLATE_DECODE  0x0400
 #define HPDF_STREAM_FILTER_DCT_DECODE    0x0800
+#define HPDF_STREAM_FILTER_CCITT_DECODE  0x1000
 
 typedef enum _HPDF_WhenceMode {
     HPDF_SEEK_SET = 0,

@@ -1,16 +1,12 @@
-//
 // Text.cpp
 //
-// This sample demonstrates the Data library.
+// This sample demonstrates the generation and saving of a text PDF
+// document, using external TTF font and UTF-8 encoding.
 //
-// Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
 //
-// This is unpublished proprietary source code of Applied Informatics
-// Software Engineering GmbH.
-// The contents of this file may not be disclosed to third parties,
-// copied or duplicated in any form, in whole or in part, without
-// prior written permission from Applied Informatics.
+// SPDX-License-Identifier:	BSL-1.0
 //
 
 #include "Poco/PDF/Document.h"
@@ -39,13 +35,16 @@ int main(int argc, char** argv)
 
 	Document document(file.path());
 
-	Font helv = document.font("Helvetica");
+	Font font = document.font(document.loadTTFont("DejaVuLGCSans.ttf", true), "UTF-8");
 	Page page = document[0];
-	page.setFont(helv, 24);
+	page.setFont(font, 24);
 	std::string hello = "Hello PDF World from C++ Portable Components";
 	float tw = page.textWidth(hello);
 	page.writeOnce((page.getWidth() - tw) / 2, page.getHeight() - 50, hello);
-
+	page.setFont(font, 14);
+	hello = "~ Courtesy of G\xC3\xBCnter Obiltschnig & Aleksandar Fabijani\xC4\x87 ~";
+	tw = page.textWidth(hello);
+	page.writeOnce((page.getWidth() - tw) / 2, page.getHeight() - 100, hello);
 	document.save();
 	return 0;
 }

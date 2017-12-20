@@ -1040,8 +1040,8 @@ png_set_unknown_chunks(png_structp png_ptr,
         png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
         png_unknown_chunkp from = unknowns + i;
 
-        png_memcpy((png_charp)to->name,
-                   (png_charp)from->name,
+        png_memcpy((png_charp)to->name, 
+                   (png_charp)from->name, 
                    png_sizeof(from->name));
         to->name[png_sizeof(to->name)-1] = '\0';
 

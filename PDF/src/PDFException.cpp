@@ -26,20 +26,20 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 {
 	switch (error_no)
 	{
-	case HPDF_ARRAY_COUNT_ERR:
+	case HPDF_ARRAY_COUNT_ERR: 
 		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
-	case HPDF_ARRAY_ITEM_NOT_FOUND:
+	case HPDF_ARRAY_ITEM_NOT_FOUND: 
 		throw NotFoundException("Internal error. The consistency of the data was lost.");
 	case HPDF_ARRAY_ITEM_UNEXPECTED_TYPE:
 		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
 	case HPDF_BINARY_LENGTH_ERR:
 		throw InvalidArgumentException("The length of the data exceeds HPDF_LIMIT_MAX_STRING_LEN.");
 	case HPDF_CANNOT_GET_PALLET:
-		throw NotFoundException("Cannot get a pallet data from PNG image.");
+		throw NotFoundException("Cannot get a pallet data from PNG image."); 
 	case HPDF_DICT_COUNT_ERR:
 		throw InvalidArgumentException("The count of elements of a dictionary exceeds HPDF_LIMIT_MAX_DICT_ELEMENT");
 	case HPDF_DICT_ITEM_NOT_FOUND:
-		throw NotFoundException("Internal error. The consistency of the data was lost.");
+		throw NotFoundException("Internal error. The consistency of the data was lost."); 
 	case HPDF_DICT_ITEM_UNEXPECTED_TYPE:
 		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
 	case HPDF_DICT_STREAM_LENGTH_NOT_FOUND:
@@ -47,7 +47,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_DOC_ENCRYPTDICT_NOT_FOUND:
 		throw NotFoundException("HPDF_SetPermission() OR HPDF_SetEncryptMode() was called before a password is set.");
 	case HPDF_DOC_INVALID_OBJECT:
-		throw IllegalStateException("Internal error. The consistency of the data was lost.");
+		throw IllegalStateException("Internal error. The consistency of the data was lost.");  
 	case HPDF_DUPLICATE_REGISTRATION:
 		throw IllegalStateException("Tried to register a font that has been registered.");
 	case HPDF_EXCEED_JWW_CODE_NUM_LIMIT:
@@ -55,7 +55,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_ENCRYPT_INVALID_PASSWORD:
 		throw IllegalStateException("Tried to set the owner password to NULL.");
 	case HPDF_ERR_UNKNOWN_CLASS:
-		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
+		throw InvalidArgumentException("Internal error. The consistency of the data was lost."); 
 	case HPDF_EXCEED_GSTATE_LIMIT:
 		throw IllegalStateException("The depth of the stack exceeded HPDF_LIMIT_MAX_GSTATE.");
 	case HPDF_FAILD_TO_ALLOC_MEM:
@@ -65,13 +65,13 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_FILE_OPEN_ERROR:
 		throw IOException("Cannot open a file. (A detailed code is set.)");
 	case HPDF_FONT_EXISTS:
-		throw IllegalStateException("Tried to load a font that has been registered.");
+		throw IllegalStateException("Tried to load a font that has been registered."); 
 	case HPDF_FONT_INVALID_WIDTHS_TABLE:
-		throw IllegalStateException("The format of a font-file is invalid. Internal error. The consistency of the data was lost.");
+		throw IllegalStateException("The format of a font-file is invalid. Internal error. The consistency of the data was lost.");  
 	case HPDF_INVALID_AFM_HEADER:
 		throw IllegalStateException("Cannot recognize a header of an afm file.");
 	case HPDF_INVALID_ANNOTATION:
-		throw IllegalStateException("The specified annotation handle is invalid.");
+		throw IllegalStateException("The specified annotation handle is invalid."); 
 	case HPDF_INVALID_BIT_PER_COMPONENT:
 		throw IllegalStateException("Bit-per-component of a image which was set as mask-image is invalid.");
 	case HPDF_INVALID_CHAR_MATRICS_DATA:
@@ -79,11 +79,11 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_INVALID_COLOR_SPACE:
 		switch (detail_no)
 		{
-		case 1:
+		case 1: 
 			throw InvalidArgumentException("The color_space parameter of HPDF_LoadRawImage is invalid.");
-		case 2:
+		case 2: 
 			throw InvalidArgumentException("Color-space of a image which was set as mask-image is invalid.");
-		case 3:
+		case 3: 
 			throw InvalidArgumentException("The function which is invalid in the present color-space was invoked.");
 		default:
 			throw PDFException();
@@ -109,7 +109,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_INVALID_FONTDEF_DATA:
 		switch (detail_no)
 		{
-		case 1:
+		case 1: 
 			throw InvalidArgumentException("An invalid font handle was set.");
 		case 2:
 			throw InvalidArgumentException("Unsupported font format.");
@@ -131,7 +131,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 		{
 		case 1:
 			throw IllegalStateException("An invalid object is set.");
-		case 2:
+		case 2: 
 			throw IllegalStateException("Internal error. The consistency of the data was lost.");
 		default:
 			throw PDFException();
@@ -167,15 +167,15 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_INVALID_WX_DATA:
 		throw IOException("Cannot read a width-data from an afm file.");
 	case HPDF_ITEM_NOT_FOUND:
-		throw NotFoundException("Internal error. The consistency of the data was lost.");
+		throw NotFoundException("Internal error. The consistency of the data was lost."); 
 	case HPDF_LIBPNG_ERROR:
 		throw IOException("An error has returned from PNGLIB while loading an image.");
 	case HPDF_NAME_INVALID_VALUE:
 		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
 	case HPDF_NAME_OUT_OF_RANGE:
-		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
+		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");  
 	case HPDF_PAGES_MISSING_KIDS_ENTRY:
-		throw IllegalStateException("Internal error. The consistency of the data was lost.");
+		throw IllegalStateException("Internal error. The consistency of the data was lost.");  
 	case HPDF_PAGE_CANNOT_FIND_OBJECT:
 		throw NotFoundException("Internal error. The consistency of the data was lost.");
 	case HPDF_PAGE_CANNOT_GET_ROOT_PAGES:
@@ -197,7 +197,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_PAGE_INVALID_ROTATE_VALUE:
 		throw InvalidArgumentException("The specified value is not a multiple of 90.");
 	case HPDF_PAGE_INVALID_SIZE:
-		throw InvalidArgumentException("An invalid page-size was set.");
+		throw InvalidArgumentException("An invalid page-size was set.");  
 	case HPDF_PAGE_INVALID_XOBJECT:
 		throw InvalidArgumentException("An invalid image-handle was set.");
 	case HPDF_PAGE_OUT_OF_RANGE:
@@ -219,7 +219,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 	case HPDF_TTF_INVALID_FOMAT:
 		throw InvalidArgumentException("Unsupported ttf format.");
 	case HPDF_TTF_MISSING_TABLE:
-		throw InvalidArgumentException("Unsupported ttf format. (cannot find a necessary table)");
+		throw InvalidArgumentException("Unsupported ttf format. (cannot find a necessary table)");  
 	case HPDF_UNSUPPORTED_FONT_TYPE:
 		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
 	case HPDF_UNSUPPORTED_FUNC:

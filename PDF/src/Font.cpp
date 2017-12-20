@@ -19,7 +19,7 @@ namespace Poco {
 namespace PDF {
 
 
-Font::Font(HPDF_Doc* pPDF, const HPDF_Font& font):
+Font::Font(HPDF_Doc* pPDF, const HPDF_Font& font): 
 	Resource<HPDF_Font>(pPDF, font, HPDF_Font_GetFontName(font))
 {
 }

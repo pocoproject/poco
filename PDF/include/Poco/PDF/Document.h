@@ -74,26 +74,26 @@ public:
 
 	enum PageLayout
 	{
-		PAGE_LAYOUT_SINGLE = HPDF_PAGE_LAYOUT_SINGLE,
+		PAGE_LAYOUT_SINGLE = HPDF_PAGE_LAYOUT_SINGLE, 
 			/// Only one page is displayed.
 		PAGE_LAYOUT_ONE_COLUMN = HPDF_PAGE_LAYOUT_ONE_COLUMN,
 			/// Display the pages in one column.
 		PAGE_LAYOUT_TWO_COLUMN_LEFT = HPDF_PAGE_LAYOUT_TWO_COLUMN_LEFT,
-			/// Display the pages in two column. The page of the odd number is displayed left.
+			/// Display the pages in two column. The page of the odd number is displayed left. 
 		PAGE_LAYOUT_TWO_COLUMN_RIGHT = HPDF_PAGE_LAYOUT_TWO_COLUMN_RIGHT
-			/// Display the pages in two column. The page of the odd number is displayed right.
+			/// Display the pages in two column. The page of the odd number is displayed right.  
 	};
 
 	enum PageMode
 	{
-		PAGE_MODE_USE_NONE = HPDF_PAGE_MODE_USE_NONE,
-			/// Display the document with neither outline nor thumbnail.
+		PAGE_MODE_USE_NONE = HPDF_PAGE_MODE_USE_NONE, 
+			/// Display the document with neither outline nor thumbnail.  
 		PAGE_MODE_USE_OUTLINE = HPDF_PAGE_MODE_USE_OUTLINE,
 			/// Display the document with outline pain.
 		PAGE_MODE_USE_THUMBS = HPDF_PAGE_MODE_USE_THUMBS,
 			///Display the document with thumbnail pain.
 		PAGE_MODE_FULL_SCREEN = HPDF_PAGE_MODE_FULL_SCREEN
-			/// Display the document with full screen mode.
+			/// Display the document with full screen mode. 
 	};
 
 	enum Compression
@@ -101,13 +101,13 @@ public:
 		COMPRESSION_NONE = HPDF_COMP_NONE,
 			/// All contents are not compressed.
 		COMPRESSION_TEXT = HPDF_COMP_TEXT,
-			/// Compress the contents stream of the page.
+			/// Compress the contents stream of the page.  
 		COMPRESSION_IMAGE = HPDF_COMP_IMAGE,
-			/// Compress the streams of the image objects.
+			/// Compress the streams of the image objects. 
 		COMPRESSION_METADATA = HPDF_COMP_METADATA,
 			/// Other stream datas (fonts, cmaps and so on)  are compressed.
 		COMPRESSION_ALL = HPDF_COMP_ALL 	
-			/// All stream datas are compressed.
+			/// All stream datas are compressed. 
 			/// (Same as HPDF_COMP_TEXT | HPDF_COMP_IMAGE | HPDF_COMP_METADATA)
 	};
 
@@ -118,7 +118,7 @@ public:
 			/// The length of key is automatically set to 5(40bit).
 		ENCRYPT_R3 = HPDF_ENCRYPT_R3
 			/// Use "Revision 3" algorithm.
-			/// Between 5(40bit) and 16(128bit) can be specified for length of the key.
+			/// Between 5(40bit) and 16(128bit) can be specified for length of the key. 
 	};
 
 	enum PageNumberStyle
@@ -167,11 +167,11 @@ public:
 		/// the sz argument.
 
 	SizeType size();
-		/// Resets the document stream, reads the document into the stream and
+		/// Resets the document stream, reads the document into the stream and 
 		/// returns the document data size.
 
 	void setPages(std::size_t pagePerPages);
-		/// Sets the number of pages per page.
+		/// Sets the number of pages per page. 
 		/// See HARU library HPDF_SetPagesConfiguration API call
 		/// documentation for detailed explanation.
 
@@ -218,9 +218,9 @@ public:
 	std::string loadType1Font(const std::string& afmFileName, const std::string& pfmFileName);
 		/// Loads type 1 font from file. Returns font name.
 
-	std::string loadTTFont(const std::string& fileName, bool embedding, int index = -1);
-		/// Loads type 1 font from file. Returns font name.
-		/// If the embedding parameter is true, the glyph data of the font is embedded,
+	std::string loadTTFont(const std::string& fileName, bool embed, int index = -1);
+		/// Loads true type font from file. Returns font name.
+		/// If the embed parameter is true, the glyph data of the font is embedded, 
 		/// otherwise only the matrix data is included in PDF file.
 
 	const Image& loadPNGImage(const std::string& fileName);
@@ -228,9 +228,9 @@ public:
 
 	const Image& loadPNGImageInfo(const std::string& fileName);
 		/// Loads the specified PNG image information from the file and returns reference to it.
-		/// Unlike loadPNGImage, this function does not load the whole data immediately.
-		/// Only size and color properties are loaded. The image data is loaded just before the
-		/// image object is written to PDF, and the loaded data is deleted immediately.
+		/// Unlike loadPNGImage, this function does not load the whole data immediately. 
+		/// Only size and color properties are loaded. The image data is loaded just before the 
+		/// image object is written to PDF, and the loaded data is deleted immediately. 
 
 	const Image& loadJPEGImage(const std::string& fileName);
 		/// Loads the specified PNG image from the file and returns reference to it.
@@ -252,6 +252,9 @@ public:
 
 	void addPageLabel(int pageNum, PageNumberStyle style, int firstPage, const std::string& prefix = "");
 		/// adds page labeling range for the document.
+
+	void useUTF8Encoding();
+		/// Enables use of UTF-8 encoding (default enabled).
 
 	void useJapaneseFonts();
 		/// Enables use of Japanese fonts.
@@ -281,7 +284,7 @@ public:
 		/// Creates extended graphic state object.
 		/// Bumps up the version of PDF to 1.4.
 		/// NOTE:
-		/// In Acrobat Reader 5.0, when ExtGState object is used combined with HPDF_Page_Concat(),
+		/// In Acrobat Reader 5.0, when ExtGState object is used combined with HPDF_Page_Concat(), 
 		/// there is a case that cannot be correctly displayed.
 
 	const Outline& createOutline(const std::string& title, const Outline& outline, const Encoder& encoder);
@@ -289,9 +292,9 @@ public:
 
 	void setInfo(Info info, const std::string& value);
 		/// Sets the document info.
-
+ 
 	void setInfo(Info info, const LocalDateTime& dt);
-		/// Sets the document creation or modification date.
+		/// Sets the document creation or moidification date.
 
 	std::string getInfo(Info info);
 		/// Returns the document info.
@@ -304,7 +307,13 @@ public:
 
 	std::size_t pageCount() const;
 		/// Returns number of pages in the document.
+
 private:
+	HPDF_Doc& handle();
+
+	void init(Poco::UInt32 pageCount,
+		Page::Size pageSize, Page::Orientation orientation);
+
 	void reset(bool all = false);
 		/// Resets the current document. If all is true, the loaded
 		/// resources (e.g. fonts, encodings ...)are unloaded. Otherwise
@@ -321,6 +330,8 @@ private:
 	EncoderContainer _encoders;
 	OutlineContainer _outlines;
 	ImageContainer   _images;
+
+	friend class Page;
 };
 
 
@@ -360,8 +371,7 @@ inline Document::PageMode Document::getPageMode() const
 /*
 inline void openAction()
 {
-	HPDF_SetOpenAction(_pdf,
-                     HPDF_Destination   open_action);
+	HPDF_SetOpenAction(_pdf, HPDF_Destination open_action);
 }
 */
 
@@ -391,6 +401,12 @@ inline void Document::addPageLabel(int pageNum, PageNumberStyle style, int first
 		static_cast<HPDF_PageNumStyle>(style),
 		static_cast<HPDF_UINT>(firstPage),
 		prefix.c_str());
+}
+
+
+inline void Document::useUTF8Encoding()
+{
+	HPDF_UseUTFEncodings(_pdf);
 }
 
 
@@ -475,6 +491,12 @@ inline void Document::setPermission(Permission perm)
 inline std::size_t Document::pageCount() const
 {
 	return _pages.size();
+}
+
+
+inline HPDF_Doc& Document::handle()
+{
+	return _pdf;
 }
 
 

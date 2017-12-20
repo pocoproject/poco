@@ -429,7 +429,7 @@ void SQLiteTest::testNullCharPointer()
 			bind("firstname"),
 			bind("Address"), bind(pc), now;
 			fail ("must fail");
-	} catch (NullPointerException&)	{ }
+	} catch (NullPointerException&) { }
 
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assert (count == 1);
@@ -468,7 +468,7 @@ void SQLiteTest::testInsertCharPointer()
 		bind("firstname"),
 		bind("Address"),
 		bind(133132));
-	
+
 	std::free((void*) pc); pc = 0;
 	assert (1 == stmt.execute());
 
@@ -2547,7 +2547,6 @@ void SQLiteTest::testPair()
 	std::string tableName("Simpsons");
 	std::pair<std::string, int> junior = std::make_pair("Junior", 12);
 	std::pair<std::string, int> senior = std::make_pair("Senior", 99);
-	
 
 	int count = 0;
 	std::string result;
@@ -2556,7 +2555,6 @@ void SQLiteTest::testPair()
 	tmp << "CREATE TABLE IF NOT EXISTS Simpsons (LastName VARCHAR(30), Age INTEGER(3))", now;
 	tmp << "SELECT name FROM sqlite_master WHERE tbl_name=?", use(tableName), into(result), now;
 	assert (result == tableName);
-
 
 	// these are fine
 	tmp << "INSERT INTO Simpsons VALUES(?, ?)", use(junior), now;
@@ -2571,7 +2569,6 @@ void SQLiteTest::testPair()
 	assert (ret[0].second == 99 || ret[1].second == 99);
 	assert (ret[0].first == "Junior" || ret[1].first == "Junior");
 	assert (ret[0].first == "Senior" || ret[1].first == "Senior");
-	
 }
 
 
@@ -2728,12 +2725,12 @@ void SQLiteTest::testBindingCount()
 	tmp << "CREATE TABLE Ints (int0 INTEGER)", now;
 
 	int i = 42;
-	try	{ tmp << "INSERT INTO Ints VALUES (?)", now; }
+	try { tmp << "INSERT INTO Ints VALUES (?)", now; fail("must fail"); }
 	catch (ParameterCountMismatchException&) { }
 	tmp << "INSERT INTO Ints VALUES (?)", use(i), now;
 
 	i = 0;
-	try	{ tmp << "SELECT int0 from Ints where int0 = ?", into(i), now; }
+	try { tmp << "SELECT int0 from Ints where int0 = ?", into(i), now; fail("must fail"); }
 	catch (ParameterCountMismatchException&) { }
 	tmp << "SELECT int0 from Ints where int0 = ?", bind(42), into(i), now;
 	assert (42 == i);
@@ -2741,8 +2738,8 @@ void SQLiteTest::testBindingCount()
 	tmp << "DROP TABLE IF EXISTS Ints", now;
 	tmp << "CREATE TABLE Ints (int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
 
-	try	{ tmp << "INSERT INTO Ints VALUES (?,?,?)", bind(42), bind(42), now; }
-	catch (ParameterCountMismatchException&) { }
+	try { tmp << "INSERT INTO Ints VALUES (?,?,?)", bind(42), bind(42), now; fail("must fail"); }
+	catch (ParameterCountMismatchException& ex) { }
 }
 
 

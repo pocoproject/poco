@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
+    <_ProjectFileVersion>15.0.26919.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoPDFd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoPDFmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoPDFmtd</TargetName>
@@ -285,6 +285,7 @@
     <ClCompile Include="src\Encoder.cpp"/>
     <ClCompile Include="src\Font.cpp"/>
     <ClCompile Include="src\gzio.c"/>
+    <ClCompile Include="src\hpdf_3dmeasure.c"/>
     <ClCompile Include="src\hpdf_annotation.c"/>
     <ClCompile Include="src\hpdf_array.c"/>
     <ClCompile Include="src\hpdf_binary.c"/>
@@ -299,9 +300,11 @@
     <ClCompile Include="src\hpdf_encoder_cnt.c"/>
     <ClCompile Include="src\hpdf_encoder_jp.c"/>
     <ClCompile Include="src\hpdf_encoder_kr.c"/>
+    <ClCompile Include="src\hpdf_encoder_utf.c"/>
     <ClCompile Include="src\hpdf_encrypt.c"/>
     <ClCompile Include="src\hpdf_encryptdict.c"/>
     <ClCompile Include="src\hpdf_error.c"/>
+    <ClCompile Include="src\hpdf_exdata.c"/>
     <ClCompile Include="src\hpdf_ext_gstate.c"/>
     <ClCompile Include="src\hpdf_font.c"/>
     <ClCompile Include="src\hpdf_fontdef.c"/>
@@ -318,11 +321,13 @@
     <ClCompile Include="src\hpdf_font_type1.c"/>
     <ClCompile Include="src\hpdf_gstate.c"/>
     <ClCompile Include="src\hpdf_image.c"/>
+    <ClCompile Include="src\hpdf_image_ccitt.c"/>
     <ClCompile Include="src\hpdf_image_png.c"/>
     <ClCompile Include="src\hpdf_info.c"/>
     <ClCompile Include="src\hpdf_list.c"/>
     <ClCompile Include="src\hpdf_mmgr.c"/>
     <ClCompile Include="src\hpdf_name.c"/>
+    <ClCompile Include="src\hpdf_namedict.c"/>
     <ClCompile Include="src\hpdf_null.c"/>
     <ClCompile Include="src\hpdf_number.c"/>
     <ClCompile Include="src\hpdf_objects.c"/>
@@ -330,9 +335,11 @@
     <ClCompile Include="src\hpdf_pages.c"/>
     <ClCompile Include="src\hpdf_page_label.c"/>
     <ClCompile Include="src\hpdf_page_operator.c"/>
+    <ClCompile Include="src\hpdf_pdfa.c"/>
     <ClCompile Include="src\hpdf_real.c"/>
     <ClCompile Include="src\hpdf_streams.c"/>
     <ClCompile Include="src\hpdf_string.c"/>
+    <ClCompile Include="src\hpdf_u3d.c"/>
     <ClCompile Include="src\hpdf_utils.c"/>
     <ClCompile Include="src\hpdf_xref.c"/>
     <ClCompile Include="src\Image.cpp"/>
@@ -374,6 +381,7 @@
     <ClInclude Include="include\Poco\PDF\Encoder.h"/>
     <ClInclude Include="include\Poco\PDF\Font.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_3dmeasure.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_annotation.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_catalog.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_conf.h"/>
@@ -384,6 +392,7 @@
     <ClInclude Include="include\Poco\PDF\hpdf_encrypt.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_encryptdict.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_error.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_exdata.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_ext_gstate.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_font.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_fontdef.h"/>
@@ -392,13 +401,17 @@
     <ClInclude Include="include\Poco\PDF\hpdf_info.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_list.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_mmgr.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_namedict.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_objects.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_outline.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_pages.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_page_label.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_pdfa.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_streams.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_types.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_u3d.h"/>
     <ClInclude Include="include\Poco\PDF\hpdf_utils.h"/>
+    <ClInclude Include="include\Poco\PDF\hpdf_version.h"/>
     <ClInclude Include="include\Poco\PDF\Image.h"/>
     <ClInclude Include="include\Poco\PDF\inffast.h"/>
     <ClInclude Include="include\Poco\PDF\inffixed.h"/>

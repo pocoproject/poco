@@ -47,10 +47,11 @@ notifications:
 
 env:
   global:
-    TEST_NAME=""
+    test=""
+    POCO_VERBOSE=1
 
 before_script:
- - echo ${TEST_NAME}
+ - echo ${test}
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
@@ -62,26 +63,48 @@ matrix:
   fast_finish: true
 
   include:
-    - env:    TEST_NAME="gcc 4.9 (make) bundled"
+    - env:    test="x86 (make) bundled"
+      os: osx
+      compiler: clang
+      script:
+        - export CC="clang"
+        - export CXX="clang++"
+        - $CXX --version
+        - $CXX -x c++ /dev/null -dM -E
+        - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
+        - make -s -j2 && sudo make install && export OSARCH=i386 && ./travis/OSX/runtests.sh
+
+    - env:    test="x64 (make) bundled"
+      os: osx
+      compiler: clang
+      script:
+        - export CC="clang"
+        - export CXX="clang++"
+        - $CXX --version
+        - $CXX -x c++ /dev/null -dM -E
+        - ./configure --config=Darwin64-clang-libc++ --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL
+        - make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
+
+    - env:    test="5.4 x86 (make) bundled"
       compiler: gcc
       script:
-        - sudo apt-get install -qq -y gcc-4.9 g++-4.9
-        - export CC="gcc-4.9"
-        - export CXX="g++-4.9"
+        - sudo apt-get install -qq -y g++-5-multilib
+        - export CC="gcc-5"
+        - export CXX="g++-5"
         - $CXX --version
-        - ./configure --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    TEST_NAME="gcc 5.4 (make) bundled"
+    - env:    test="5.4 x64 (make) bundled"
       compiler: gcc
       script:
         - export CC="gcc-5"
         - export CXX="g++-5"
         - $CXX --version
-        - ./configure --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --config=Linux64-gcc --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    #- env:    TEST_NAME="gcc 5.4 (make) unbundled"
+    #- env:    test="5.4 (make) unbundled"
     #  ======================================= unit tests fail ures due to unbundled pcre
     # There was 1 error:
     #  1: N7CppUnit10TestCallerI21RegularExpressionTestEE.testSubst2
@@ -112,7 +135,7 @@ matrix:
     #    - $CXX --version
     #    - ./configure --everything --omit=PDF --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
     
-    - env:    TEST_NAME="gcc 4.9 (CMake)"
+    - env:    test="4.9 x64 (CMake)"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y gcc-4.9 g++-4.9
@@ -124,18 +147,19 @@ matrix:
         - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
  
 
-    - env:    TEST_NAME="clang (make) bundled"
-      os: osx
+    - env:    test="4.0 x86 (make) bundled"
       compiler: clang
       script:
-        - export CC="clang"
-        - export CXX="clang++"
+        - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
+        - sudo apt-get install -qq -y g++-5-multilib
+        - export CLANG_VERSTION="-4.0"
+        - export CC="clang-4.0"
+        - export CXX="clang++-4.0"
         - $CXX --version
-        - $CXX -x c++ /dev/null -dM -E
-        - ./configure --everything --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL && source config.make && cat build/config/$POCO_CONFIG 
-        - make -s -j2 && sudo make install && ./travis/OSX/runtests.sh
+        - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,Data/ODBC,Data/MySQL,Data/PostgreSQL
+        - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    TEST_NAME="clang 4.0 (make) bundled"
+    - env:    test="4.0 x64 (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
@@ -143,10 +167,10 @@ matrix:
         - export CC="clang-4.0"
         - export CXX="clang++-4.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --config=Linux64-clang --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    - env:    TEST_NAME="clang 5.0 (make) bundled"
+    - env:    test="5.0 x64 (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-5.0 lldb-5.0 libc++-dev libc++abi-dev
@@ -154,23 +178,10 @@ matrix:
         - export CC="clang-5.0"
         - export CXX="clang++-5.0"
         - $CXX --version
-        - ./configure --config=Linux-clang --everything --omit=PDF && source config.make && cat build/config/$POCO_CONFIG 
+        - ./configure --config=Linux64-clang --everything --omit=PDF
         - make -s -j2 && ./travis/Linux/runtests.sh
 
-    #- env:    TEST_NAME="clang 3.5.0 (make) unbundled"
-    #  ======================================= compiler error on generating debug info for auto return
-    # error: debug information for auto is not yet supported
-    # error: debug information for auto is not yet supported
-    # ** Creating dependency info for src/Timespan.cpp
-    # make[1]: *** [/home/travis/build/Kampbell/poco/CppUnit/obj/Linux/x86_64/debug_shared/TestRunner.o] Error 1   #  compiler: clang
-    #  =======================================
-    #  script:
-    #    - export CC="clang"
-    #    - export CXX="clang++"
-    #    - $CXX --version
-    #    - ./configure --config=Linux-clang --everything --omit=PDF --unbundled && make -s -j2 && ./travis/Linux/runtests.sh
-    
-    #- env:    TEST_NAME="arm-linux-gnueabi-g++ (make)"
+    #- env:    test="arm-linux-gnueabi-g++ (make)"
     #  compiler: gcc
     #  script:
     #    - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf
@@ -178,14 +189,14 @@ matrix:
     #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
     #    - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Data/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    #- env:    TEST_NAME="clang (CMake)"
+    #- env:    test="(CMake)"
     #  compiler: clang
     #  script:
     #    - source ./travis/ignored.sh
     #    - export POCO_BASE=`pwd`
     #    - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E Data && cd ..
 
-    #- env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
+    #- env:    test="arm-linux-gnueabi-g++ (CMake)"
     #  ======================================= "arm-linux-gnueabi-g++: version 4.7.0: non compliant to c++11
     #  compiler: gcc
     #  script:
@@ -198,7 +209,7 @@ matrix:
     #    - mkdir cmake-build 
     #    - cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -s -j2 && cd ..
 
-    - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
+    - env:    test="arm-linux-gnueabihf-g++ (CMake)"
       compiler: gcc
       script:
         - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf
@@ -213,24 +224,24 @@ matrix:
 
     # QA jobs for code analytics and metrics
     # build documentation and release
-    - env:    TEST_NAME="documentation & release"
+    - env:    test="documentation & release"
       compiler: gcc
       script:
         - $CXX --version
         - . env.sh && mkdoc all && mkrel all
 
     # static code analysis with cppcheck (we can add --enable=all later)
-    - env:    TEST_NAME="cppcheck"
+    - env:    test="cppcheck"
       script: cppcheck --force --quiet --inline-suppr -j2 -iData/SQLite/src/sqlite3.c .
     # search for TODO within source tree
-    - env:    TEST_NAME="TODO"
+    - env:    test="TODO"
       script: grep -r TODO *
     # search for FIXME within source tree
-    - env:    TEST_NAME="FIXME"
+    - env:    test="FIXME"
       script: grep -r FIXME *
     # search for HACK within source tree
-    - env:    TEST_NAME="HACK"
+    - env:    test="HACK"
       script: grep -r HACK *
     # some statistics about the code base
-    - env:    TEST_NAME="sloccount"
+    - env:    test="sloccount"
       script: sloccount .
