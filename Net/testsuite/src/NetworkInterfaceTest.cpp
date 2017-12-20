@@ -219,13 +219,14 @@ void NetworkInterfaceTest::testListMapConformance()
 			List::const_iterator ipEnd = ipList.end();
 			for(; ipIt != ipEnd; ++ipIt, ++counter, ++listIt)
 			{
+				if(listIt == l.end()) fail("wrong number of list items");
 				NetworkInterface::MACAddress lmac = listIt->macAddress();
 				assert (lmac == mac);
-				if(listIt == l.end()) fail("wrong number of list items");
 			}
 		}
 		else
 		{
+			++listIt;
 			++counter;
 		}
 	}
