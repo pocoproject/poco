@@ -210,7 +210,6 @@ void NetworkInterfaceTest::testListMapConformance()
 	for (; mapIt != m.end(); ++mapIt)
 	{
 		NetworkInterface::MACAddress mac(mapIt->second.macAddress());
-
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = mapIt->second.addressList();
 		if (ipList.size() > 0)
@@ -226,6 +225,7 @@ void NetworkInterfaceTest::testListMapConformance()
 		}
 		else
 		{
+			++listIt;
 			++counter;
 		}
 	}
