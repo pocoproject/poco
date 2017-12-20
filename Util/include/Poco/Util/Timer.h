@@ -164,6 +164,7 @@ private:
 	
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
+	bool _stop;
 };
 
 

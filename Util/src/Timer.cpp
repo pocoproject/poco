@@ -37,7 +37,7 @@ public:
 	{
 	}
 	
-	virtual bool execute() = 0;
+	virtual void execute() = 0;
 	
 	Poco::TimedNotificationQueue& queue()
 	{
@@ -61,10 +61,10 @@ public:
 	{
 	}
 	
-	bool execute()
+	void execute()
 	{
 		queue().clear();
-		return false;
+		return;
 	}
 };
 
@@ -81,11 +81,11 @@ public:
 	{
 	}
 	
-	bool execute()
+	void execute()
 	{
 		queue().clear();
 		_finished.set();
-		return true;
+		return;
 	}
 	
 	void wait()
@@ -116,7 +116,7 @@ public:
 		return _pTask;	
 	}
 	
-	bool execute()
+	void execute()
 	{
 		if (!_pTask->isCancelled())
 		{
@@ -138,7 +138,7 @@ public:
 				ErrorHandler::handle();
 			}
 		}
-		return true;
+		return;
 	}
 			
 private:
@@ -159,7 +159,7 @@ public:
 	{
 	}
 	
-	bool execute()
+	void execute()
 	{	
 		TaskNotification::execute();
 
@@ -172,7 +172,7 @@ public:
 			queue().enqueueNotification(this, nextExecution);
 			duplicate();
 		}
-		return true;		
+		return;		
 	}
 	
 private:
@@ -194,7 +194,7 @@ public:
 	{
 	}
 	
-	bool execute()
+	void execute()
 	{	
 		TaskNotification::execute();
 
@@ -206,7 +206,7 @@ public:
 			queue().enqueueNotification(this, _nextExecution);
 			duplicate();
 		}
-		return true;			
+		return;			
 	}
 	
 private:
@@ -215,20 +215,20 @@ private:
 };
 
 
-Timer::Timer()
+Timer::Timer() : _stop( false )
 {
 	_thread.start(*this);
 }
 
 
-Timer::Timer(Poco::Thread::Priority priority)
+Timer::Timer(Poco::Thread::Priority priority) : _stop(false)
 {
 	_thread.setPriority(priority);
 	_thread.start(*this);
 }
 
 
-Timer::Timer(int prio, int policy)
+Timer::Timer(int prio, int policy) : _stop( false )
 {
 	_thread.setOSPriority(prio, policy);
 	_thread.start(*this);
@@ -239,6 +239,7 @@ Timer::~Timer()
 {
 	try
 	{
+		_stop = true;
 		_queue.enqueueNotification(new StopNotification(_queue), Poco::Clock(0));
 		_thread.join();
 	}
@@ -324,11 +325,11 @@ void Timer::scheduleAtFixedRate(TimerTask::Ptr pTask, Poco::Clock clock, long in
 
 void Timer::run()
 {
-	bool cont = true;
-	while (cont)
+	bool terminateThread;
+	while (!( terminateThread = _stop && _queue.empty()))
 	{
 		Poco::AutoPtr<TimerNotification> pNf = static_cast<TimerNotification*>(_queue.waitDequeueNotification());
-		cont = pNf->execute();
+		pNf->execute();
 	}
 }
 
