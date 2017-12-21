@@ -279,6 +279,9 @@ public:
 		/// they are contained within the NetworkInterface (second) 
 		/// member of the pair.
 
+	static std::string toString(const MACAddress& addr);
+		/// Returns MAC address as xx:xx:xx:xx:xx:xx formatted string.
+
 protected:
 	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
 		/// Creates the NetworkInterface.
