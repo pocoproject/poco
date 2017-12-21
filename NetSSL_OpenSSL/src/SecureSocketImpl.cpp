@@ -45,7 +45,7 @@ namespace Poco {
 namespace Net {
 
 
-SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext): 
+SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
 	_pSSL(0),
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
@@ -68,7 +68,7 @@ SecureSocketImpl::~SecureSocketImpl()
 	}
 }
 
-	
+
 SocketImpl* SecureSocketImpl::acceptConnection(SocketAddress& clientAddr)
 {
 	poco_assert (!_pSSL);
@@ -104,7 +104,7 @@ void SecureSocketImpl::acceptSSL()
 void SecureSocketImpl::connect(const SocketAddress& address, bool performHandshake)
 {
 	if (_pSSL) reset();
-	
+
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address);
@@ -115,7 +115,7 @@ void SecureSocketImpl::connect(const SocketAddress& address, bool performHandsha
 void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout, bool performHandshake)
 {
 	if (_pSSL) reset();
-	
+
 	poco_assert (!_pSSL);
 
 	_pSocket->connect(address, timeout);
@@ -125,14 +125,14 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 	_pSocket->setSendTimeout(timeout);
 	connectSSL(performHandshake);
 	_pSocket->setReceiveTimeout(receiveTimeout);
-	_pSocket->setSendTimeout(sendTimeout);	
+	_pSocket->setSendTimeout(sendTimeout);
 }
 
 
 void SecureSocketImpl::connectNB(const SocketAddress& address)
 {
 	if (_pSSL) reset();
-	
+
 	poco_assert (!_pSSL);
 
 	_pSocket->connectNB(address);
@@ -144,19 +144,19 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 {
 	poco_assert (!_pSSL);
 	poco_assert (_pSocket->initialized());
-	
+
 	BIO* pBIO = BIO_new(BIO_s_socket());
 	if (!pBIO) throw SSLException("Cannot create SSL BIO object");
 	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
 	_pSSL = SSL_new(_pContext->sslContext());
-	if (!_pSSL) 
+	if (!_pSSL)
 	{
 		BIO_free(pBIO);
 		throw SSLException("Cannot create SSL object");
 	}
 	SSL_set_bio(_pSSL, pBIO, pBIO);
-	
+
 #if OPENSSL_VERSION_NUMBER >= 0x0908060L && !defined(OPENSSL_NO_TLSEXT)
 	if (!_peerHostName.empty())
 	{
@@ -168,7 +168,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	{
 		SSL_set_session(_pSSL, _pSession->sslSession());
 	}
-	
+
 	try
 	{
 		if (performHandshake && _pSocket->getBlocking())
@@ -199,7 +199,7 @@ void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 	_pSocket->bind(address, reuseAddress);
 }
 
-	
+
 void SecureSocketImpl::listen(int backlog)
 {
 	poco_check_ptr (_pSocket);
@@ -211,7 +211,7 @@ void SecureSocketImpl::listen(int backlog)
 void SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
-	{        
+	{
         // Don't shut down the socket more than once.
         int shutdownState = SSL_get_shutdown(_pSSL);
         bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
@@ -269,7 +269,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		rc = SSL_write(_pSSL, buffer, length);
 	}
 	while (mustRetry(rc));
-	if (rc <= 0) 
+	if (rc <= 0)
 	{
 		rc = handleError(rc);
 		if (rc == 0) throw SSLConnectionUnexpectedlyClosedException();
@@ -297,7 +297,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		rc = SSL_read(_pSSL, buffer, length);
 	}
 	while (mustRetry(rc));
-	if (rc <= 0) 
+	if (rc <= 0)
 	{
 		return handleError(rc);
 	}
@@ -324,7 +324,7 @@ int SecureSocketImpl::completeHandshake()
 		rc = SSL_do_handshake(_pSSL);
 	}
 	while (mustRetry(rc));
-	if (rc <= 0) 
+	if (rc <= 0)
 	{
 		return handleError(rc);
 	}
@@ -336,9 +336,9 @@ int SecureSocketImpl::completeHandshake()
 void SecureSocketImpl::verifyPeerCertificate()
 {
 	if (_peerHostName.empty())
-		_peerHostName = _pSocket->peerAddress().host().toString();
-		
-	verifyPeerCertificate(_peerHostName);
+		verifyPeerCertificate(_pSocket->peerAddress().host().toString());
+	else
+		verifyPeerCertificate(_peerHostName);
 }
 
 
@@ -446,7 +446,7 @@ int SecureSocketImpl::handleError(int rc)
 		return SecureStreamSocket::ERR_SSL_WANT_READ;
 	case SSL_ERROR_WANT_WRITE:
 		return SecureStreamSocket::ERR_SSL_WANT_WRITE;
-	case SSL_ERROR_WANT_CONNECT: 
+	case SSL_ERROR_WANT_CONNECT:
 	case SSL_ERROR_WANT_ACCEPT:
 	case SSL_ERROR_WANT_X509_LOOKUP:
 		// these should not occur
@@ -535,7 +535,7 @@ Session::Ptr SecureSocketImpl::currentSession()
 	return 0;
 }
 
-	
+
 void SecureSocketImpl::useSession(Session::Ptr pSession)
 {
 	_pSession = pSession;
