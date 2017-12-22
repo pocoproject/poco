@@ -6,6 +6,8 @@ AAAIntroduction
 !!Summary of Changes
 
   - Added Poco::File::linkTo()
+  - fixed GH #2044: Poco::Net::NetworkInterface::list does not list inactive interfaces
+    even when explicitly being asked for it.
   - fixed GH #2042: Android abstract namespace local socket address
   - fixed GH #2038: Poco::Net::MultipartWriter::createBoundary() always returns the same string.
   - fixed GH #2020: SQLite not handling parameter count mismatch correctly.
