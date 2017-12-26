@@ -437,7 +437,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip1.isSiteLocal());
 	assert (ip1.isWellKnownMC());
 	assert (!ip1.isNodeLocalMC());
-	assert (ip1.isLinkLocalMC()); 
+	assert (ip1.isLinkLocalMC());
 	assert (!ip1.isSiteLocalMC());
 	assert (!ip1.isOrgLocalMC());
 	assert (!ip1.isGlobalMC());
@@ -455,7 +455,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip2.isLinkLocalMC());
 	assert (!ip2.isSiteLocalMC());
 	assert (!ip2.isOrgLocalMC());
-	assert (!ip2.isGlobalMC()); 
+	assert (!ip2.isGlobalMC());
 
 	IPAddress ip3("ff05:0:0:0:0:0:0:FB"); // site local unicast
 	assert (!ip3.isWildcard());
@@ -497,7 +497,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip5.isSiteLocal());
 	assert (!ip5.isWellKnownMC());
 	assert (!ip5.isNodeLocalMC());
-	assert (!ip5.isLinkLocalMC()); 
+	assert (!ip5.isLinkLocalMC());
 	assert (!ip5.isSiteLocalMC());
 	assert (!ip5.isOrgLocalMC());
 	assert (ip5.isGlobalMC());

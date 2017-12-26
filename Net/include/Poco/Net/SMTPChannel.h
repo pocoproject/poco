@@ -56,9 +56,9 @@ public:
 		///     * local:      If true, local time is used. Default is true.
 		///     * attachment: Filename of the file to attach.
 		///     * type:       Content type of the file to attach.
-		///     * delete:     Boolean value indicating whether to delete 
+		///     * delete:     Boolean value indicating whether to delete
 		///                   the attachment file after sending.
-		///     * throw:      Boolean value indicating whether to throw 
+		///     * throw:      Boolean value indicating whether to throw
 		///                   exception upon failure.
 		
 	std::string getProperty(const std::string& name) const;

@@ -1,8 +1,6 @@
 //
 // Parser.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  ParserImpl
@@ -28,9 +26,9 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
 #include <string>
-extern "C" {
-#include "pd_json.h"
-}
+
+
+struct json_stream;
 
 
 namespace Poco {
@@ -96,6 +94,9 @@ protected:
 		/// Returns the result of parsing as Dynamic::Var;
 
 private:
+	ParserImpl(const ParserImpl&);
+	ParserImpl& operator =(const ParserImpl&);
+
 	void handleArray();
 	void handleObject();
 	void handle();
@@ -103,7 +104,7 @@ private:
 	void stripComments(std::string& json);
 	bool checkError();
 
-	json_stream  _json;
+	json_stream*  _pJSON;
 	Handler::Ptr _pHandler;
 	int          _depth;
 	char         _decimalPoint;
@@ -164,14 +165,6 @@ inline std::size_t ParserImpl::getDepthImpl() const
 inline void ParserImpl::setHandlerImpl(const Handler::Ptr& pHandler)
 {
 	_pHandler = pHandler;
-}
-
-
-inline bool ParserImpl::checkError()
-{
-	const char* err = json_get_error(&_json);
-	if (err) throw Poco::JSON::JSONException(err);
-	return true;
 }
 
 

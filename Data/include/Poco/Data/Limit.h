@@ -37,7 +37,7 @@ public:
 	};
 	
 	Limit(SizeT value, bool hardLimit = false, bool isLowerLimit = false);
-		/// Creates the Limit. 
+		/// Creates the Limit.
 		///
 		/// Value contains the upper row hint, if hardLimit is set to true, the limit acts as a hard
 		/// border, ie. every query must return exactly value rows, returning more than value objects will throw an exception!

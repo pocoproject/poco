@@ -30,29 +30,24 @@ namespace Poco {
 namespace Data {
 
 
-const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
-
-
 RecordSet::RecordSet(const Statement& rStatement,
-	RowFormatter::Ptr pRowFormatter): 
+	RowFormatter::Ptr pRowFormatter):
 	Statement(rStatement),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-	_pEnd(new RowIterator(this, true)),
-	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+	_pEnd(new RowIterator(this, true))
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
 
 
-RecordSet::RecordSet(Session& rSession, 
-	const std::string& query, 
-	RowFormatter::Ptr pRowFormatter): 
+RecordSet::RecordSet(Session& rSession,
+	const std::string& query,
+	RowFormatter::Ptr pRowFormatter):
 	Statement((rSession << query, now)),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-	_pEnd(new RowIterator(this, true)),
-	_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+	_pEnd(new RowIterator(this, true))
 {
 	if (pRowFormatter) setRowFormatter(pRowFormatter);
 }
@@ -63,8 +58,7 @@ RecordSet::RecordSet(const RecordSet& other):
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
-	_pFilter(other._pFilter),
-	_totalRowCount(other._totalRowCount)
+	_pFilter(other._pFilter)
 {
 }
 
@@ -94,7 +88,7 @@ RecordSet& RecordSet::reset(const Statement& stmt)
 	delete _pEnd;
 	_pEnd = 0;
 	_currentRow = 0;
-	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
+	Statement::setTotalRowCount(StatementImpl::UNKNOWN_TOTAL_ROW_COUNT);
 	
 	RowMap::iterator it = _rowMap.begin();
 	RowMap::iterator end = _rowMap.end();
@@ -188,7 +182,7 @@ Row& RecordSet::row(std::size_t pos)
 	{
 		if (_rowMap.size())
 		{
-			//reuse first row column names and sorting fields to save some memory 
+			//reuse first row column names and sorting fields to save some memory
 			pRow = new Row(_rowMap.begin()->second->names(),
 				_rowMap.begin()->second->getSortMap(),
 				getRowFormatter());
@@ -196,7 +190,7 @@ Row& RecordSet::row(std::size_t pos)
 			for (std::size_t col = 0; col < columns; ++col)
 				pRow->set(col, value(col, pos));
 		}
-		else 
+		else
 		{
 			pRow = new Row;
 			pRow->setFormatter(getRowFormatter());
@@ -206,7 +200,7 @@ Row& RecordSet::row(std::size_t pos)
 
 		_rowMap.insert(RowMap::value_type(pos, pRow));
 	}
-	else 
+	else
 	{
 		pRow = it->second;
 		poco_check_ptr (pRow);
@@ -400,12 +394,6 @@ void RecordSet::filter(const Poco::AutoPtr<RowFilter>& pFilter)
 bool RecordSet::isFiltered() const
 {
 	return _pFilter && !_pFilter->isEmpty();
-}
-
-
-void RecordSet::setTotalRowCount(const std::string& sql)
-{
-	session() << sql, into(_totalRowCount), now;
 }
 
 

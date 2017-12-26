@@ -82,6 +82,16 @@ struct ExecUtil
 		return mangleTable("Person");
 	}
 
+	static std::string floats()
+	{
+		return mangleTable("Floats");
+	}
+
+	static std::string doubles()
+	{
+		return mangleTable("Doubles");
+	}
+
 	static std::string strings()
 	{
 		return mangleTable("Strings");
@@ -172,22 +182,22 @@ public:
 
 	void bareboneODBCTest(const std::string& dbConnString,
 		const std::string& tableCreateString,
-		DataBinding bindMode, 
+		DataBinding bindMode,
 		DataExtraction extractMode,
 		bool doTime=true,
 		const std::string& blobPlaceholder="?");
 
-	void bareboneODBCMultiResultTest(const std::string& dbConnString, 
-		const std::string& tableCreateString, 
-		SQLExecutor::DataBinding bindMode, 
+	void bareboneODBCMultiResultTest(const std::string& dbConnString,
+		const std::string& tableCreateString,
+		SQLExecutor::DataBinding bindMode,
 		SQLExecutor::DataExtraction extractMode,
 		const std::string& insert = MULTI_INSERT,
 		const std::string& select = MULTI_SELECT);
-		/// The above two functions use "bare bone" ODBC API calls  
+		/// The above two functions use "bare bone" ODBC API calls
 		/// (i.e. calls are not "wrapped" in PocoData framework structures).
 		/// The purpose of the functions is to verify that a driver behaves
-		/// correctly as well as to determine its capabilities 
-		/// (e.g. SQLGetData() restrictions relaxation policy, if any). 
+		/// correctly as well as to determine its capabilities
+		/// (e.g. SQLGetData() restrictions relaxation policy, if any).
 		/// If these test pass, subsequent tests failures are likely ours.
 
 	void zeroRows();
@@ -201,6 +211,7 @@ public:
 	void autoPtrComplexTypeVector();
 	void insertVector();
 	void insertEmptyVector();
+	void bigStringVector();
 
 	void simpleAccessList();
 	void complexTypeList();
@@ -246,12 +257,12 @@ public:
 			bools.push_back(0 == i % 2);
 		}
 
-		try 
+		try
 		{
-			session() << 
-				Poco::format("INSERT INTO %s VALUES (?,%s,?,?,?,?)", ExecUtil::misctest(), blobPlaceholder), 
-				use(strings), 
-				use(blobs), 
+			session() <<
+				Poco::format("INSERT INTO %s VALUES (?,%s,?,?,?,?)", ExecUtil::misctest(), blobPlaceholder),
+				use(strings),
+				use(blobs),
 				use(ints),
 				use(floats),
 				use(dateTimes),
@@ -263,12 +274,12 @@ public:
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-		try 
+		try
 		{
-			session() <<  
+			session() <<
 				Poco::format("INSERT INTO %s VALUES (?,%s,?,?,?,?)", ExecUtil::misctest(), blobPlaceholder),
-				use(strings, bulk), 
-				use(blobs, bulk), 
+				use(strings, bulk),
+				use(blobs, bulk),
 				use(ints, bulk),
 				use(floats, bulk),
 				use(dateTimes, bulk),
@@ -283,16 +294,16 @@ public:
 		dateTimes.clear();
 		bools.clear();
 		
-		try 
-		{ 
-			session() << "SELECT * FROM "<< ExecUtil::misctest() <<" ORDER BY Third", 
-				into(strings), 
-				into(blobs), 
-				into(ints), 
+		try
+		{
+			session() << "SELECT * FROM "<< ExecUtil::misctest() <<" ORDER BY Third",
+				into(strings),
+				into(blobs),
+				into(ints),
 				into(floats),
 				into(dateTimes),
 				into(bools),
-				now; 
+				now;
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
@@ -313,16 +324,16 @@ public:
 
 		ints.clear();
 
-		try 
-		{ 
-			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints, bulk(size)), limit(size+1), now; 
+		try
+		{
+			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints, bulk(size)), limit(size+1), now;
 			fail ("must fail");
 		}
 		catch(Poco::InvalidArgumentException&){ }
 
-		try 
-		{ 
-			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints), bulk(size), now; 
+		try
+		{
+			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints), bulk(size), now;
 			fail ("must fail");
 		}
 		catch(Poco::InvalidAccessException&){ }
@@ -337,16 +348,16 @@ public:
 		bools.clear();
 		bools.resize(size);
 		
-		try 
-		{ 
-			session() << "SELECT First, Second, Third, Fourth, Fifth, Sixth FROM "<< ExecUtil::misctest() <<" ORDER BY Third", 
+		try
+		{
+			session() << "SELECT First, Second, Third, Fourth, Fifth, Sixth FROM "<< ExecUtil::misctest() <<" ORDER BY Third",
 				into(strings, bulk),
 				into(blobs, bulk(size)),
 				into(ints, bulk(size)),
 				into(floats, bulk),
 				into(dateTimes, bulk(size)),
 				into(bools, bulk),
-				now; 
+				now;
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
@@ -387,11 +398,11 @@ public:
 			floats.push_back(i + .5);
 		}
 
-		try 
+		try
 		{
-			session() << "INSERT INTO "<< ExecUtil::misctest() <<" VALUES (?,?,?,?,?)", 
-				use(strings), 
-				use(blobs), 
+			session() << "INSERT INTO "<< ExecUtil::misctest() <<" VALUES (?,?,?,?,?)",
+				use(strings),
+				use(blobs),
 				use(ints),
 				use(floats),
 				use(dateTimes), now;
@@ -402,11 +413,11 @@ public:
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-		try 
+		try
 		{
-			session() << "INSERT INTO "<< ExecUtil::misctest() <<" VALUES (?,?,?,?,?)", 
-				use(strings, bulk), 
-				use(blobs, bulk), 
+			session() << "INSERT INTO "<< ExecUtil::misctest() <<" VALUES (?,?,?,?,?)",
+				use(strings, bulk),
+				use(blobs, bulk),
 				use(ints, bulk),
 				use(floats, bulk),
 				use(dateTimes, bulk), now;
@@ -419,15 +430,15 @@ public:
 		floats.clear();
 		dateTimes.clear();
 
-		try 
-		{ 
-			session() << "SELECT * FROM "<< ExecUtil::misctest() <<" ORDER BY First", 
-				into(strings), 
-				into(blobs), 
-				into(ints), 
+		try
+		{
+			session() << "SELECT * FROM "<< ExecUtil::misctest() <<" ORDER BY First",
+				into(strings),
+				into(blobs),
+				into(ints),
 				into(floats),
 				into(dateTimes),
-				now; 
+				now;
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
@@ -446,16 +457,16 @@ public:
 
 		ints.clear();
 
-		try 
-		{ 
-			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints, bulk(size)), limit(size+1), now; 
+		try
+		{
+			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints, bulk(size)), limit(size+1), now;
 			fail ("must fail");
 		}
 		catch(Poco::InvalidArgumentException&){ }
 
-		try 
-		{ 
-			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints), bulk(size), now; 
+		try
+		{
+			session() << "SELECT First FROM "<< ExecUtil::misctest(), into(ints), bulk(size), now;
 			fail ("must fail");
 		}
 		catch(Poco::InvalidAccessException&){ }
@@ -466,15 +477,15 @@ public:
 		floats.clear();
 		dateTimes.clear();
 		
-		try 
-		{ 
-			session() << "SELECT * FROM "<< ExecUtil::misctest() <<" ORDER BY First", 
+		try
+		{
+			session() << "SELECT * FROM "<< ExecUtil::misctest() <<" ORDER BY First",
 				into(strings, bulk(size)),
 				into(blobs, bulk(size)),
 				into(ints, bulk(size)),
 				into(floats, bulk(size)),
 				into(dateTimes, bulk(size)),
-				now; 
+				now;
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
@@ -560,153 +571,9 @@ public:
 	void doubles();
 	void tuples();
 	void tupleVector();
+	void internalExtraction();
 
-	template <typename IntType =
-#ifdef POCO_64_BIT
-		Poco::Int64
-#else
-		Poco::Int32
-#endif
-	>
-	void internalExtraction(IntType)
-	{
-		using Poco::Data::RecordSet;
-		using Poco::Data::Column;
-		using Poco::Data::Statement;
-		using Poco::UTF16String;
-		using Poco::Tuple;
-		using Poco::BadCastException;
-		using Poco::RangeException;
-		using Poco::Data::ODBC::ConnectionException;
-		using Poco::Data::ODBC::StatementException;
-		using namespace Poco::Data::Keywords;
-
-		std::string funct = "internalExtraction()";
-		std::vector<Poco::Tuple<int, double, std::string> > v;
-		v.push_back(Poco::Tuple<int, double, std::string>(1, 1.5, "3"));
-		v.push_back(Poco::Tuple<int, double, std::string>(2, 2.5, "4"));
-		v.push_back(Poco::Tuple<int, double, std::string>(3, 3.5, "5"));
-		v.push_back(Poco::Tuple<int, double, std::string>(4, 4.5, "6"));
-
-		try { session() << "INSERT INTO " << ExecUtil::vectors() << " VALUES (?,?,?)", use(v), now; }
-		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-
-		try
-		{
-			Statement stmt = (session() << "SELECT * FROM " << ExecUtil::vectors() , now);
-			RecordSet rset(stmt);
-
-			assert (3 == rset.columnCount());
-			assert (4 == rset.rowCount());
-
-			int curVal = 3;
-			do
-			{
-				assert (rset["str0"] == curVal);
-				++curVal;
-			} while (rset.moveNext());
-
-			rset.moveFirst();
-			assert (rset["str0"] == "3");
-			rset.moveLast();
-			assert(rset["str0"] == "6");
-
-			RecordSet rset2(rset);
-			assert (3 == rset2.columnCount());
-			assert (4 == rset2.rowCount());
-
-			IntType i;
-			try {
-				i = rset.value<IntType>(0, 0);
-				assert(1 == i);
-			}
-			catch (Poco::BadCastException& ex)
-			{
-				std::cout << ex.displayText() << std::endl;
-			}
-			std::string s = rset.value(0,0).convert<std::string>();
-			assert ("1" == s);
-
-			IntType a = rset.value<IntType>(0,2);
-			assert (3 == a);
-
-			try
-			{
-				double d = rset.value<double>(1,1);
-				assert (2.5 == d);
-			}
-			catch (BadCastException&)
-			{
-				float f = rset.value<float>(1,1);
-				assert (2.5 == f);
-			}
-
-			try
-			{
-				s = rset.value<std::string>(2, 2);
-			}
-			catch (BadCastException&)
-			{
-				UTF16String us = rset.value<Poco::UTF16String>(2, 2);
-				Poco::UnicodeConverter::convert(us, s);
-			}
-			assert("5" == s);
-
-			i = rset.value("str0", 2);
-			assert (5 == i);
-
-			const Column<std::deque<IntType> >& col = rset.column<std::deque<IntType> >(0);
-			typename Column<std::deque<IntType> >::Iterator it = col.begin();
-			typename Column<std::deque<IntType> >::Iterator end = col.end();
-			for (int i = 1; it != end; ++it, ++i)
-				assert (*it == i);
-
-			rset = (session() << "SELECT COUNT(*) AS cnt FROM " << ExecUtil::vectors(), now);
-
-			//various results for COUNT(*) are received from different drivers
-			try
-			{
-				//this is what most drivers will return
-				int i = rset.value<int>(0,0);
-				assert (4 == i);
-			}
-			catch(BadCastException&)
-			{
-				try
-				{
-					//this is for Oracle
-					double i = rset.value<double>(0,0);
-					assert (4 == int(i));
-				}
-				catch(BadCastException&)
-				{
-					//this is for PostgreSQL
-					Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-					assert (4 == big);
-				}
-			}
-
-			s = rset.value("cnt", 0).convert<std::string>();
-			assert ("4" == s);
-
-			try { rset.column<std::deque<IntType> >(100); fail ("must fail"); }
-			catch (RangeException&) { }
-
-			try { rset.value<std::string>(0,0); fail ("must fail"); }
-			catch (BadCastException&) {	}
-
-			stmt = (session() << "DELETE FROM " << ExecUtil::vectors(), now);
-			rset = stmt;
-
-			try { rset.column<std::deque<IntType> >(0); fail ("must fail"); }
-			catch (RangeException&) { }
-		}
-		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
-		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	}
-
-	void filter(const std::string& query = 
+	void filter(const std::string& query =
 		"SELECT * FROM " + ExecUtil::vectors() + " ORDER BY int0 ASC",
 		const std::string& intFldName = "int0");
 
@@ -724,7 +591,7 @@ public:
 	void any();
 	void dynamicAny();
 
-	void multipleResults(const std::string& sql = 
+	void multipleResults(const std::string& sql =
 		"SELECT * FROM " + ExecUtil::person() + " WHERE Age = ?; "
 		"SELECT Age FROM " + ExecUtil::person() +" WHERE FirstName = 'Bart'; "
 		"SELECT * FROM " + ExecUtil::person() + " WHERE Age = ? OR Age = ? ORDER BY Age;");

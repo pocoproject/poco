@@ -14,4 +14,4 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
 
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-target_link_libraries( ${TESTUNIT}  PocoPDF PocoFoundation PocoCppUnit )
+target_link_libraries( ${TESTUNIT}  PocoPDF PocoFoundation CppUnit )

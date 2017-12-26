@@ -142,7 +142,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PocoCppUnitd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -173,7 +173,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PocoCppUnit.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnit.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -202,7 +202,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PocoCppUnitmtd.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmtd.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_mt\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -233,7 +233,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PocoCppUnitmt.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmt.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_mt\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -262,7 +262,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PocoCppUnitmdd.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmdd.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_md\TestSuited.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -293,7 +293,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>PocoCppUnitmd.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CppUnitmd.lib;iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin64\static_md\TestSuite.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>

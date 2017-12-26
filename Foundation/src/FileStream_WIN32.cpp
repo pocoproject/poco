@@ -15,7 +15,7 @@
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
-#if defined (POCO_WIN32_UTF8)
+#if !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
 #endif
 
@@ -63,14 +63,10 @@ void FileStreamBuf::open(const std::string& path, std::ios::openmode mode)
 		creationDisp = OPEN_ALWAYS;
 
 	DWORD flags = FILE_ATTRIBUTE_NORMAL;
-	
-#if defined (POCO_WIN32_UTF8)
+
 	std::wstring utf16Path;
 	FileImpl::convertPath(path, utf16Path);
 	_handle = CreateFileW(utf16Path.c_str(), access, shareMode, NULL, creationDisp, flags, NULL);
-#else
-	_handle = CreateFileA(path.c_str(), access, shareMode, NULL, creationDisp, flags, NULL);
-#endif
 
 	if (_handle == INVALID_HANDLE_VALUE)
 		File::handleLastError(_path);

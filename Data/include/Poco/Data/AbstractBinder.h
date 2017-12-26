@@ -55,7 +55,7 @@ struct NullValue
 
 	NullValue()
 	{}
-  
+
 	template <typename T>
 	operator Poco::Nullable<T>() const
 	{
@@ -405,6 +405,9 @@ public:
 
 	static bool isInBound(Direction dir);
 		/// Returns true if direction is in bound;
+
+	static bool isInOutBound(Direction dir);
+	/// Returns true if direction is in and out bound;
 };
 
 
@@ -422,6 +425,10 @@ inline bool AbstractBinder::isOutBound(Direction dir)
 	return PD_OUT == dir || PD_IN_OUT == dir;
 }
 
+inline bool AbstractBinder::isInOutBound(Direction dir)
+{
+	return PD_IN_OUT == dir;
+}
 
 inline bool AbstractBinder::isInBound(Direction dir)
 {

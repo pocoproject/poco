@@ -28,9 +28,9 @@ namespace Zip {
 const char ZipLocalFileHeader::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x03', '\x04'};
 
 
-ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName, 
+ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
     const Poco::DateTime& lastModifiedAt,
-    ZipCommon::CompressionMethod cm, 
+    ZipCommon::CompressionMethod cm,
     ZipCommon::CompressionLevel cl,
     bool forceZip64):
     _forceZip64(forceZip64),
@@ -81,14 +81,14 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
         {
             char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
             inp.read(header, ZipCommon::HEADER_SIZE);
-            if (_forceZip64) 
+            if (_forceZip64)
             {
                 ZipDataInfo64 nfo(inp, true);
                 setCRC(nfo.getCRC32());
                 setCompressedSize(nfo.getCompressedSize());
                 setUncompressedSize(nfo.getUncompressedSize());
-            } 
-            else 
+            }
+            else
             {
                 ZipDataInfo nfo(inp, true);
                 setCRC(nfo.getCRC32());
@@ -156,30 +156,30 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 			inp.read(xtra.begin(), len);
 			_extraField = std::string(xtra.begin(), len);
 			char* ptr = xtra.begin();
-			while (ptr <= xtra.begin() + len - 4) 
+			while (ptr <= xtra.begin() + len - 4)
 			{
-				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); 
+				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
 				ptr += 2;
-				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); 
+				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0);
 				ptr += 2;
-				if (id == ZipCommon::ZIP64_EXTRA_ID) 
+				if (id == ZipCommon::ZIP64_EXTRA_ID)
 				{
 					_forceZip64 = true;
 					poco_assert(size >= 8);
-					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
-						size -= 8; 
+						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
 						ptr += 8;
 					}
-					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
-						size -= 8; 
+						setCompressedSize(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
 						ptr += 8;
 					}
-				} 
-				else 
+				}
+				else
 				{
 					ptr += size;
 				}
@@ -246,7 +246,7 @@ void ZipLocalFileHeader::init(const Poco::Path& fName, ZipCommon::CompressionMet
         setCompressionMethod(ZipCommon::CM_STORE);
     if (_forceZip64)
         setZip64Data();
-    
+
     _rawHeader[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.
 }
 

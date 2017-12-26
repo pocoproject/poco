@@ -105,24 +105,24 @@ public:
 	bool receiveMessage(std::string& message);
 		/// Receives a single-line message, terminated by CR-LF,
 		/// from the socket connection and appends it to response.
-		/// 
+		///
 		/// Returns true if a message has been read or false if
 		/// the connection has been closed by the peer.
 	
 	int receiveStatusMessage(std::string& message);
 		/// Receives a single-line or multi-line response from
 		/// the socket connection. The format must be according to
-		/// one of the response formats specified in the FTP (RFC 959) 
+		/// one of the response formats specified in the FTP (RFC 959)
 		/// or SMTP (RFC 2821) specifications.
 		///
 		/// The first line starts with a 3-digit status code.
-		/// Following the status code is either a space character (' ' ) 
+		/// Following the status code is either a space character (' ' )
 		/// (in case of a single-line response) or a minus character ('-')
 		/// in case of a multi-line response. The following lines can have
 		/// a three-digit status code followed by a minus-sign and some
 		/// text, or some arbitrary text only. The last line again begins
 		/// with a three-digit status code (which must be the same as the
-		/// one in the first line), followed by a space and some arbitrary 
+		/// one in the first line), followed by a space and some arbitrary
 		/// text. All lines must be terminated by a CR-LF sequence.
 		///
 		/// The response contains all response lines, separated by a newline

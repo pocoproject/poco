@@ -33,17 +33,17 @@ namespace XML {
 class XML_API XMLFilterImpl: public XMLFilter, public EntityResolver, public DTDHandler, public ContentHandler, public ErrorHandler
 	/// Base class for deriving an XML filter.
 	///
-	/// This class is designed to sit between an XMLReader and the client application's event 
-	/// handlers. By default, it does nothing but pass requests up to the reader and events on to 
-	/// the handlers unmodified, but subclasses can override specific methods to modify the event 
+	/// This class is designed to sit between an XMLReader and the client application's event
+	/// handlers. By default, it does nothing but pass requests up to the reader and events on to
+	/// the handlers unmodified, but subclasses can override specific methods to modify the event
 	/// stream or the configuration requests as they pass through.
 {
 public:
 	XMLFilterImpl();
 		/// Construct an empty XML filter, with no parent.
 		///
-		/// This filter will have no parent: you must assign a parent before you start a parse or do any 
-		/// configuration with setFeature or setProperty, unless you use this as a pure event consumer rather 
+		/// This filter will have no parent: you must assign a parent before you start a parse or do any
+		/// configuration with setFeature or setProperty, unless you use this as a pure event consumer rather
 		/// than as an XMLReader.
 		
 	XMLFilterImpl(XMLReader* pParent);

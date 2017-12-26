@@ -26,7 +26,7 @@ namespace Poco {
 
 
 class Foundation_API Path
-	/// This class represents filesystem paths in a 
+	/// This class represents filesystem paths in a
 	/// platform-independent manner.
 	/// Unix, Windows and OpenVMS all use a different
 	/// syntax for filesystem paths.
@@ -127,7 +127,7 @@ public:
 		/// Tries to interpret the given string as a path
 		/// in native format.
 		/// If the path is syntactically valid, assigns the
-		/// path and returns true. Otherwise leaves the 
+		/// path and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
 	bool tryParse(const std::string& path, Style style);
@@ -163,7 +163,7 @@ public:
 
 	Path& makeAbsolute(const Path& base);
 		/// Makes the path absolute if it is relative.
-		/// The given path is taken as base. 
+		/// The given path is taken as base.
 
 	Path& append(const Path& path);
 		/// Appends the given path.
@@ -270,9 +270,9 @@ public:
 
 	static char separator();
 		/// Returns the platform's path name separator, which separates
-		/// the components (names) in a path. 
+		/// the components (names) in a path.
 		///
-		/// On Unix systems, this is the slash '/'. On Windows systems, 
+		/// On Unix systems, this is the slash '/'. On Windows systems,
 		/// this is the backslash '\'. On OpenVMS systems, this is the
 		/// period '.'.
 		
@@ -336,7 +336,7 @@ public:
 		/// by it and end. A relative path may be given in name.
 		///
 		/// If the file is found in one of the locations, the complete
-		/// path of the file is stored in the path given as argument and true is returned. 
+		/// path of the file is stored in the path given as argument and true is returned.
 		/// Otherwise false is returned and the path argument remains unchanged.
 
 	static bool find(const std::string& pathList, const std::string& name, Path& path);
@@ -345,14 +345,13 @@ public:
 		/// path separator (see pathSeparator()). A relative path may be given in name.
 		///
 		/// If the file is found in one of the locations, the complete
-		/// path of the file is stored in the path given as argument and true is returned. 
+		/// path of the file is stored in the path given as argument and true is returned.
 		/// Otherwise false is returned and the path argument remains unchanged.
 		
 	static std::string transcode(const std::string& path);
-		/// On Windows, if POCO has been compiled with Windows UTF-8 support 
-		/// (POCO_WIN32_UTF8), this function converts a string (usually containing a path) 
+		/// On Windows, this function converts a string (usually containing a path)
 		/// encoded in UTF-8 into a string encoded in the current Windows code page.
-		/// 
+		///
 		/// This function should be used for every string passed as a file name to
 		/// a string stream or fopen().
 		///

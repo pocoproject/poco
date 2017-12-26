@@ -17,7 +17,7 @@
 <P>Subclass the TestCase class. Override the method "runTest ()". When you want to check a value, call "assert (bool)" and pass in an expression that is true if the test succeeds. </P>
 <P>For example, to test the equality comparison for a Complex number class, write:</P>
 <TT><PRE>&#9;class ComplexNumberTest : public TestCase {&nbsp;
-&#9;public: 
+&#9;public:
                     ComplexNumberTest (string name) : TestCase (name) {}
         void        runTest () {
                         assert (Complex (10, 1) == Complex (10, 1));
@@ -59,7 +59,7 @@
 &#9;void&#9;&#9;setUp ()  {
 &#9;&#9;&#9;    m_10_1 = new Complex (10, 1);
 &#9;&#9;&#9;    m_1_1  = new Complex (1, 1);
-&#9;&#9;&#9;    m_11_2  = new Complex (11, 2);  
+&#9;&#9;&#9;    m_11_2  = new Complex (11, 2);
                         }
 &#9;void&#9;&#9;tearDown ()  {
 &#9;&#9;&#9;    delete m_10_1, delete m_1_1, delete m_11_2;
@@ -83,7 +83,7 @@
 &#9;void&#9;&#9;setUp ()  {
 &#9;&#9;&#9;    m_10_1 = new Complex (10, 1);
 &#9;&#9;&#9;    m_1_1  = new Complex (1, 1);
-&#9;&#9;&#9;    m_11_2 = new Complex (11, 2);  
+&#9;&#9;&#9;    m_11_2 = new Complex (11, 2);
                         }
 &#9;void&#9;&#9;tearDown ()  {
 &#9;&#9;&#9;    delete m_10_1, delete m_1_1, delete m_11_2;

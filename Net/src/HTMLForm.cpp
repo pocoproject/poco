@@ -14,7 +14,6 @@
 
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/PartSource.h"
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
@@ -41,6 +40,24 @@ namespace Poco {
 namespace Net {
 
 
+HTMLForm::Part::Part(const std::string name, PartSource* pSource) :
+	_name(name), _pSource(pSource)
+{
+}
+
+
+HTMLForm::Part::Part(Part&& other) : _name(std::move(other._name)), _pSource(other._pSource)
+{
+	other._pSource = 0;
+}
+
+
+HTMLForm::Part::~Part()
+{
+	delete _pSource;
+}
+
+
 const std::string HTMLForm::ENCODING_URL           = "application/x-www-form-urlencoded";
 const std::string HTMLForm::ENCODING_MULTIPART     = "multipart/form-data";
 const int         HTMLForm::UNKNOWN_CONTENT_LENGTH = -1;
@@ -54,7 +71,7 @@ public:
 	{
 	}
 
-	bool isValid() const 
+	bool isValid() const
 	{
 		return _valid;
 	}
@@ -111,10 +128,6 @@ HTMLForm::HTMLForm(const HTTPRequest& request):
 	
 HTMLForm::~HTMLForm()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
-	{
-		delete it->pSource;
-	}
 }
 
 
@@ -127,11 +140,7 @@ void HTMLForm::setEncoding(const std::string& encoding)
 void HTMLForm::addPart(const std::string& name, PartSource* pSource)
 {
 	poco_check_ptr (pSource);
-
-	Part part;
-	part.name    = name;
-	part.pSource = pSource;
-	_parts.push_back(part);
+	_parts.push_back(Part(name, pSource));
 }
 
 
@@ -151,7 +160,7 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 	{
 		std::string mediaType;
 		NameValueCollection params;
-		MessageHeader::splitParameters(request.getContentType(), mediaType, params); 
+		MessageHeader::splitParameters(request.getContentType(), mediaType, params);
 		_encoding = mediaType;
 		if (_encoding == ENCODING_MULTIPART)
 		{
@@ -416,11 +425,11 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 	}	
 	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
 	{
-		MessageHeader header(ita->pSource->headers());
+		MessageHeader header(ita->headers());
 		std::string disp("form-data; name=\"");
-		disp.append(ita->name);
+		disp.append(ita->name());
 		disp.append("\"");
-		std::string filename = ita->pSource->filename();
+		std::string filename = ita->filename();
 		if (!filename.empty())
 		{
 			disp.append("; filename=\"");
@@ -428,12 +437,12 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 			disp.append("\"");
 		}
 		header.set("Content-Disposition", disp);
-		header.set("Content-Type", ita->pSource->mediaType());
+		header.set("Content-Type", ita->mediaType());
 		writer.nextPart(header);
 		if (pCountingOutputStream)
 		{
 			// count only, don't move stream position
-			std::streamsize partlen = ita->pSource->getContentLength();
+			std::streamsize partlen = ita->source()->getContentLength();
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
 				pCountingOutputStream->addChars(static_cast<int>(partlen));
 			else
@@ -441,7 +450,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 		}
 		else
 		{
-			StreamCopier::copyStream(ita->pSource->stream(), ostr);
+			StreamCopier::copyStream(ita->stream(), ostr);
 		}
 	}
 	writer.close();

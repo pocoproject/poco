@@ -25,6 +25,7 @@ public:
 	~MD5EngineTest();
 
 	void testMD5();
+	void testConstantTimeEquals();
 
 	void setUp();
 	void tearDown();

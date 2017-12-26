@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr> 
+template <typename ch, typename tr>
 class BasicUnbufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of an unbuffered streambuf
 	/// that greatly simplifies the implementation of
@@ -61,7 +61,7 @@ public:
 
 	virtual int_type overflow(int_type c)
 	{
-		if (c != char_traits::eof()) 
+		if (c != char_traits::eof())
 			return writeToDevice(char_traits::to_char_type(c));
 		else
 			return c;
@@ -118,7 +118,7 @@ public:
 	}
 	
 	virtual std::streamsize xsgetn(char_type* p, std::streamsize count)
-		/// Some platforms (for example, Compaq C++) have buggy implementations of 
+		/// Some platforms (for example, Compaq C++) have buggy implementations of
 		/// xsgetn that handle null buffers incorrectly.
 		/// Anyway, it does not hurt to provide an optimized implementation
 		/// of xsgetn for this streambuf implementation.

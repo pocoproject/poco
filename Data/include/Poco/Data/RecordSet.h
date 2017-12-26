@@ -44,7 +44,7 @@ class RowFilter;
 class Data_API RecordSet: private Statement
 	/// RecordSet provides access to data returned from a query.
 	/// Data access indices (row and column) are 0-based, as usual in C++.
-	/// 
+	///
 	/// Recordset provides navigation methods to iterate through the
 	/// recordset, retrieval methods to extract data, and methods
 	/// to get metadata (type, etc.) about columns.
@@ -64,7 +64,7 @@ class Data_API RecordSet: private Statement
 	/// The third (optional) argument passed to the Recordset constructor is a RowFormatter
 	/// implementation. The formatter is used in conjunction with << operator for recordset
 	/// data formatting.
-	/// 
+	///
 	/// The number of rows in the RecordSet can be limited by specifying
 	/// a limit for the Statement.
 {
@@ -75,30 +75,28 @@ public:
 
 	using Statement::isNull;
 	using Statement::subTotalRowCount;
-
-	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
+	using Statement::totalRowCount;
 
 	explicit RecordSet(const Statement& rStatement,
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		RowFormatter::Ptr pRowFormatter = 0);
 		/// Creates the RecordSet.
 
-	RecordSet(Session& rSession, 
+	RecordSet(Session& rSession,
 		const std::string& query,
 		const RowFormatter& rowFormatter);
 		/// Creates the RecordSet.
 
 	template <class RF>
-	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter): 
+	RecordSet(Session& rSession, const std::string& query, const RF& rowFormatter):
 		Statement((rSession << query, Keywords::now)),
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
-		_pEnd(new RowIterator(this, true)),
-		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
+		_pEnd(new RowIterator(this, true))
 		/// Creates the RecordSet.
 	{
 		setRowFormatter(Keywords::format(rowFormatter));
@@ -128,27 +126,6 @@ public:
 		/// Returns the number of rows extracted during the last statement
 		/// execution.
 		/// The number of rows reported is independent of filtering.
-
-	std::size_t totalRowCount() const;
-		//@ deprecated
-		/// Replaced with subTotalRowCount() and getTotalRowCount().
-
-	std::size_t getTotalRowCount() const;
-		/// Returns the total number of rows in the RecordSet.
-		/// The number of rows reported is independent of filtering.
-		/// If the total row count has not been set externally 
-		/// (either explicitly or implicitly through SQL), the value
-		/// returned shall only be accurate if the statement limit
-		/// is less or equal to the total row count.
-
-	void setTotalRowCount(std::size_t totalRowCount);
-		/// Explicitly sets the total row count.
-
-	void setTotalRowCount(const std::string& sql);
-		/// Implicitly sets the total row count.
-		/// The supplied sql must return exactly one column
-		/// and one row. The returned value must be an unsigned
-		/// integer. The value is set as the total number of rows.
 
 	std::size_t columnCount() const;
 		/// Returns the number of columns in the recordset.
@@ -376,11 +353,11 @@ public:
 	void formatNames() const;
 		/// Formats names using the current RowFormatter.
 
-	std::ostream& copyValues(std::ostream& os, 
-		std::size_t offset = 0, 
+	std::ostream& copyValues(std::ostream& os,
+		std::size_t offset = 0,
 		std::size_t length = RowIterator::POSITION_END) const;
 		/// Copies the data values to the supplied output stream.
-		/// The data set to be copied is starting at the specified offset 
+		/// The data set to be copied is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -389,7 +366,7 @@ public:
 
 	void formatValues(std::size_t offset, std::size_t length) const;
 		/// Formats values using the current RowFormatter.
-		/// The data set to be formatted is starting at the specified offset 
+		/// The data set to be formatted is starting at the specified offset
 		/// from the recordset beginning. The number of rows to be copied
 		/// is specified by length argument.
 		/// An invalid combination of offset/length arguments shall
@@ -466,7 +443,7 @@ private:
 		{
 			return pExtraction->column();
 		}
-		else 
+		else
 		{
 			throw Poco::BadCastException(Poco::format("RecordSet::columnImpl(%z) type cast failed!\nTarget type:\t%s"
 				"\nTarget container type:\t%s\nSource container type:\t%s\nSource abstraction type:\t%s",
@@ -495,7 +472,6 @@ private:
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
 	Poco::AutoPtr<RowFilter> _pFilter;
-	std::size_t  _totalRowCount;
 
 	friend class RowIterator;
 	friend class RowFilter;
@@ -510,27 +486,6 @@ private:
 inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
 {
 	return rs.copy(os);
-}
-
-
-inline std::size_t RecordSet::getTotalRowCount() const
-{
-	if (UNKNOWN_TOTAL_ROW_COUNT == _totalRowCount)
-		return subTotalRowCount();
-	else
-		return _totalRowCount;
-}
-
-
-inline std::size_t RecordSet::totalRowCount() const
-{
-	return getTotalRowCount();
-}
-
-
-inline void RecordSet::setTotalRowCount(std::size_t count)
-{
-	_totalRowCount = count;
 }
 
 

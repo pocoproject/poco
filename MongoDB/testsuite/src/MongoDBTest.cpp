@@ -1,8 +1,6 @@
 //
 // MongoDBTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -245,7 +243,7 @@ void MongoDBTest::testCursorRequest()
 	Poco::MongoDB::ResponseMessage& response = cursor.next(*_mongo);
 	while(1)
 	{
-		n += response.documents().size();
+		n += static_cast<int>(response.documents().size());
 		if ( response.cursorID() == 0 )
 			break;
 		response = cursor.next(*_mongo);
@@ -397,6 +395,51 @@ void MongoDBTest::testUUID()
 }
 
 
+void MongoDBTest::testConnectURI()
+{
+	Poco::MongoDB::Connection conn;
+	Poco::MongoDB::Connection::SocketFactory sf;
+
+	conn.connect("mongodb://127.0.0.1", sf);
+	conn.disconnect();
+
+	try
+	{
+		conn.connect("http://127.0.0.1", sf);
+		fail("invalid URI scheme - must throw");
+	}
+	catch (Poco::UnknownURISchemeException&)
+	{
+	}
+
+	try
+	{
+		conn.connect("mongodb://127.0.0.1?ssl=true", sf);
+		fail("SSL not supported, must throw");
+	}
+	catch (Poco::NotImplementedException&)
+	{
+	}
+
+	conn.connect("mongodb://127.0.0.1/admin?ssl=false&connectTimeoutMS=10000&socketTimeoutMS=10000", sf);
+	conn.disconnect();
+
+	try
+	{
+		conn.connect("mongodb://127.0.0.1/admin?connectTimeoutMS=foo", sf);
+		fail("invalid parameter - must throw");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+
+#ifdef MONGODB_TEST_AUTH
+	conn.connect("mongodb://admin:admin@127.0.0.1/admin", sf);
+	conn.disconnect();
+#endif
+}
+
+
 CppUnit::Test* MongoDBTest::suite()
 {
 	try
@@ -425,6 +468,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testObjectID);
 	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testUUID);
+	CppUnit_addTest(pSuite, MongoDBTest, testConnectURI);
 
 	return pSuite;
 }

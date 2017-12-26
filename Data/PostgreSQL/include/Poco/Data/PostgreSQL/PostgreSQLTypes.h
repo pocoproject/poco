@@ -60,7 +60,7 @@ const Oid MACADDROID		= 829;
 const Oid UUIDOID			= 2950;
 
 Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
- 
+
 class InputParameter
 	/// PostgreSQL class to record values for input parameters to SQL statements
 {
@@ -69,17 +69,17 @@ public:
 							const void*								aDataPtr,
 							std::size_t								theDataLength);
     explicit InputParameter();
-    
+
     ~InputParameter();
-    
+
     Poco::Data::MetaColumn::ColumnDataType	fieldType() const;
     const void*								pData() const;
     std::size_t								size() const;
     bool									isBinary() const;
-    
+
     void									setStringVersionRepresentation(const std::string& aString);
     void									setNonStringVersionRepresentation(const void* aPtr, std::size_t theSize);
-    
+
     const void*								pInternalRepresentation() const;
 
 private:
@@ -104,18 +104,18 @@ public:
 							 const char*							aDataPtr,
 							 std::size_t							theSize,
 							 bool									anIsNull);
-    
+
     explicit OutputParameter();
-    
+
     ~OutputParameter();
-    
+
     void setValues(Poco::Data::MetaColumn::ColumnDataType	aFieldType,
 				   Oid										anInternalFieldType,
 				   std::size_t								aRowNumber,
 				   const char*								aDataPtr,
 				   std::size_t								theSize,
 				   bool										anIsNull);
-    
+
     Poco::Data::MetaColumn::ColumnDataType	fieldType() const;
     Oid										internalFieldType() const;
     std::size_t								rowNumber() const;
@@ -141,11 +141,11 @@ class PQConnectionInfoOptionsFree
 public:
     explicit PQConnectionInfoOptionsFree(PQconninfoOption* aConnectionInfoOptionPtr);
     ~PQConnectionInfoOptionsFree();
-        
+
 private:
     PQConnectionInfoOptionsFree            (const PQConnectionInfoOptionsFree&);
     PQConnectionInfoOptionsFree& operator= (const PQConnectionInfoOptionsFree&);
-        
+
 private:
     PQconninfoOption* _pConnectionInfoOption;
 };
@@ -156,15 +156,15 @@ class PQResultClear
 public:
     explicit PQResultClear(PGresult * aPQResultPtr);
     ~PQResultClear();
-        
+
 private:
     PQResultClear            (const PQResultClear&);
     PQResultClear& operator= (const PQResultClear&);
-        
+
 private:
     PGresult* _pPQResult;
 };
-  
+
 
 class PGCancelFree
 	/// PostgreSQL Cancel Info Options free (RAII)
@@ -172,16 +172,16 @@ class PGCancelFree
 public:
     explicit PGCancelFree(PGcancel * aStatementCancelPtr);
     ~PGCancelFree();
-        
+
 private:
     PGCancelFree            (const PGCancelFree&);
     PGCancelFree& operator= (const PGCancelFree&);
-        
+
 private:
     PGcancel* _pPGCancel;
 };
-    
-    
+
+
 //
 // inlines
 //
@@ -258,7 +258,7 @@ void
 InputParameter::setStringVersionRepresentation(const std::string& aString)
 {
     _pNonStringVersionRepresentation = 0;
-    
+
     _stringVersionRepresentation = aString;
     _size = _stringVersionRepresentation.size();
 }
@@ -268,7 +268,7 @@ void
 InputParameter::setNonStringVersionRepresentation(const void* aPtr, std::size_t theDataLength)
 {
     _stringVersionRepresentation = std::string();
-    
+
     _pNonStringVersionRepresentation = const_cast<void *> (aPtr);
     _size = theDataLength;
 }
@@ -390,7 +390,7 @@ OutputParameter::size() const
 {
     return _size;
 }
-    
+
 inline
 bool
 OutputParameter::isNull() const
@@ -451,8 +451,8 @@ PGCancelFree::~PGCancelFree()
         _pPGCancel = 0;
     }
 }
-    
-    
+
+
 }}}
 
 #endif // Data_PostgreSQL_Types_INCLUDED

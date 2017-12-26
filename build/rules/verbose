@@ -1,0 +1,17 @@
+ifdef POCO_VERBOSE
+$(info ----------------------------------------------------)
+$(info CXX                  = $(CXX))
+$(info CXXVERSION           = $(CXXVERSION))
+$(info CXXFLAGS             = $(CXXFLAGS))
+$(info ----------------------------------------------------)
+$(info POCO_BASE            = $(POCO_BASE))
+$(info POCO_BUILD           = $(POCO_BUILD))
+$(info POCO_CONFIG          = $(POCO_CONFIG))
+$(info POCO_HOST_OSNAME     = $(POCO_HOST_OSNAME))
+$(info POCO_HOST_OSARCH     = $(POCO_HOST_OSARCH))
+$(info OSNAME               = $(OSNAME))
+$(info OSARCH               = $(OSARCH))
+$(info POCO_LIB_INSTALLDIR  = $(POCO_LIB_INSTALLDIR))
+$(info ----------------------------------------------------)
+endif
+

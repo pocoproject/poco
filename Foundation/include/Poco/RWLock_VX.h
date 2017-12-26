@@ -48,7 +48,7 @@ private:
 //
 inline void RWLockImpl::readLockImpl()
 {
-	if (pthread_mutex_lock(&_mutex)) 
+	if (pthread_mutex_lock(&_mutex))
 		throw SystemException("cannot lock mutex");
 }
 

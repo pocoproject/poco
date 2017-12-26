@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -46,7 +46,7 @@
 *
 * Return:
 *   Value of time if success, otherwise (time_t)-1 is returned.
-*       
+*
 * Reference:
 *   IEEE Standard and an Open Group Technical Standard 1003.1, 2004 Edition
 *******************************************************************************/
@@ -91,11 +91,11 @@ time_t wceex_time(time_t *timer)
 * Description:
 *   The tmbuff points to structure that contains broken-down time.
 *   Input and output times are encoded as UTC.
-*   
+*
 * Return:
 *   Specified time since the Epoch encoded as a value of type time_t.
 *   (time_t)-1 is returned if time can not be represented by time_t.
-*       
+*
 * Reference:
 *   IEEE Standard and an Open Group Technical Standard 1003.1, 2004 Edition
 *******************************************************************************/
@@ -103,12 +103,12 @@ time_t __wceex_tm_to_time_t(const struct tm *tmbuff)
 {
     time_t timer;
 
-    /* If the year is <1970 or the value is negative, the relationship is undefined */ 
+    /* If the year is <1970 or the value is negative, the relationship is undefined */
     if (tmbuff->tm_year < 70)
     {
         return (time_t) -1;
     }
-    
+
     /* If the year is >=1970 */
     /* Each and every day shall be accounted for by exactly 86400 seconds */
 

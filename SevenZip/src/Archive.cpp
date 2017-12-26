@@ -1,8 +1,6 @@
 //
 // Archive.cpp
 //
-// $Id$
-//
 // Library: SevenZip
 // Package: Archive
 // Module:  Archive
@@ -102,10 +100,10 @@ public:
 			std::size_t offset = 0;
 			std::size_t extractedSize = 0;
 			int err = SzArEx_Extract(
-				&_db, 
-				&_lookStream.s, 
-				entry.index(), 
-				&blockIndex, 
+				&_db,
+				&_lookStream.s,
+				entry.index(),
+				&blockIndex,
 				&pOutBuffer,
 				&outBufferSize,
 				&offset,
@@ -164,15 +162,10 @@ protected:
 	{
 		checkFile();
 
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 		std::wstring wpath;
 		Poco::UnicodeConverter::toUTF16(_path, wpath);
 		if (InFile_OpenW(&_archiveStream.file, wpath.c_str()) != SZ_OK)
-		{
-			throw Poco::OpenFileException(_path);
-		}
-#else
-		if (InFile_Open(&_archiveStream.file, _path.c_str()) != SZ_OK)
 		{
 			throw Poco::OpenFileException(_path);
 		}
@@ -187,7 +180,7 @@ protected:
 		{
 			loadEntries();
 		}
-		else 
+		else
 		{
 			handleError(err);
 		}

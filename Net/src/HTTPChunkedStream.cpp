@@ -81,7 +81,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (n > 0) _chunk -= n;
 		return n;
 	}
-	else 
+	else
 	{
 		int ch = _session.get();
 		while (ch != eof && ch != '\n') ch = _session.get();
@@ -93,7 +93,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 int HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	_chunkBuffer.clear();
-	NumberFormatter::appendHex(_chunkBuffer, length);
+	NumberFormatter::appendHex(_chunkBuffer, static_cast<Poco::UInt64>(length));
 	_chunkBuffer.append("\r\n", 2);
 	_chunkBuffer.append(buffer, static_cast<std::string::size_type>(length));
 	_chunkBuffer.append("\r\n", 2);

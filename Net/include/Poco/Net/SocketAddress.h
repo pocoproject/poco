@@ -57,18 +57,18 @@ public:
 		/// Creates a wildcard (all zero) IPv4 SocketAddress.
 
 	explicit SocketAddress(Family family);
-		/// Creates a SocketAddress with unspecified (wildcard) IP address 
+		/// Creates a SocketAddress with unspecified (wildcard) IP address
 		/// of the given family.
 
 	SocketAddress(const IPAddress& hostAddress, Poco::UInt16 portNumber);
 		/// Creates a SocketAddress from an IP address and given port number.
 
 	explicit SocketAddress(Poco::UInt16 port);
-		/// Creates a SocketAddress with unspecified (wildcard) IP address 
+		/// Creates a SocketAddress with unspecified (wildcard) IP address
 		/// and given port number.
 
 	SocketAddress(Family family, Poco::UInt16 port);
-		/// Creates a SocketAddress with unspecified (wildcard) IP address 
+		/// Creates a SocketAddress with unspecified (wildcard) IP address
 		/// of the given family, and given port number.
 
 	SocketAddress(const std::string& hostAddress, Poco::UInt16 portNumber);
@@ -125,7 +125,7 @@ public:
 		///     www.appinf.com:8080
 		///
 		/// On POSIX platforms supporting UNIX_LOCAL sockets, hostAndPort
-		/// can also be the absolute path of a local socket, starting with a 
+		/// can also be the absolute path of a local socket, starting with a
 		/// slash, e.g. "/tmp/local.socket".
 
 	SocketAddress(Family family, const std::string& addr);
@@ -174,7 +174,7 @@ public:
 
 	enum
 	{
-		MAX_ADDRESS_LENGTH = 
+		MAX_ADDRESS_LENGTH =
 #if defined(POCO_OS_FAMILY_UNIX)
 			sizeof(struct sockaddr_un)
 #elif defined(POCO_HAVE_IPv6)
@@ -226,94 +226,6 @@ private:
 		AlignerType aligner;
 	} _memory;
 };
-
-
-//
-// inlines
-//
-
-
-inline void SocketAddress::destruct()
-{
-	pImpl()->~SocketAddressImpl();
-}
-
-
-inline SocketAddress::Ptr SocketAddress::pImpl() const
-{
-	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
-}
-
-
-inline void SocketAddress::newIPv4()
-{
-	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl;
-}
-
-
-inline void SocketAddress::newIPv4(const sockaddr_in* sockAddr)
-{
-	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(sockAddr);
-}
-
-
-inline void SocketAddress::newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
-{
-	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
-}
-
-
-#if defined(POCO_HAVE_IPv6)
-inline void SocketAddress::newIPv6(const sockaddr_in6* sockAddr)
-{
-	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(sockAddr);
-}
-
-
-inline void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
-{
-	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
-}
-#endif // POCO_HAVE_IPv6
-
-
-#if defined(POCO_OS_FAMILY_UNIX)
-inline void SocketAddress::newLocal(const sockaddr_un* sockAddr)
-{
-	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(sockAddr);
-}
-
-
-inline void SocketAddress::newLocal(const std::string& path)
-{
-	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path.c_str());
-}
-#endif // POCO_OS_FAMILY_UNIX
-
-
-#ifdef POCO_HAVE_ALIGNMENT
-inline char* SocketAddress::storage()
-{
-	return _memory.buffer;
-}
-#endif
-
-
-inline bool SocketAddress::operator == (const SocketAddress& socketAddress) const
-{
-#if defined(POCO_OS_FAMILY_UNIX)
-	if (family() == UNIX_LOCAL)
-		return toString() == socketAddress.toString();
-	else
-#endif
-		return host() == socketAddress.host() && port() == socketAddress.port();		
-}
-
-
-inline bool SocketAddress::operator != (const SocketAddress& socketAddress) const
-{
-	return !(operator == (socketAddress));
-}
 
 
 } } // namespace Poco::Net

@@ -68,6 +68,11 @@ public:
 		/// The TaskManager takes ownership of the Task object
 		/// and deletes it when it it finished.
 
+	void startSync(Task* pTask);
+		/// Starts the given task in the current thread.
+		/// The TaskManager takes ownership of the Task object
+		/// and deletes it when it it finished.
+
 	void cancelAll();
 		/// Requests cancellation of all tasks.
 		
@@ -100,7 +105,7 @@ public:
 
 protected:
 	void postNotification(const Notification::Ptr& pNf);
-		/// Posts a notification to the task manager's 
+		/// Posts a notification to the task manager's
 		/// notification center.
 
 	void taskStarted(Task* pTask);

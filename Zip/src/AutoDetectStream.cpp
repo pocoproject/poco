@@ -62,7 +62,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		std::streamsize n = (_prefix.size() > length) ? length : static_cast<std::streamsize>(_prefix.size());
 		std::memcpy(buffer, _prefix.data(), n);
 		_prefix.erase(0, n);
-		return n;
+		return static_cast<int>(n);
 	}
 
 	if (_eofDetected)
@@ -72,7 +72,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			std::streamsize n = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
 			std::memcpy(buffer, _postfix.data(), n);
 			_postfix.erase(0, n);
-			return n;
+			return static_cast<int>(n);
 		}
 		else return -1;
 	}
@@ -82,7 +82,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	std::streamsize offset = 0;
 	static std::istream::int_type eof = std::istream::traits_type::eof();
 	while (_pIstr->good() && !_pIstr->eof() && (offset + 4) < length)
-	{ 
+	{
 		std::istream::int_type c = _pIstr->get();
 		if (c != eof)
 		{
@@ -135,7 +135,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 								_postfix.erase(0, offset);
 							}
 						
-							return offset;
+							return static_cast<int>(offset);
 						}
 					}
 					else
@@ -159,7 +159,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 								_postfix.erase(0, offset);
 							}
 						
-							return offset;
+							return static_cast<int>(offset);
 						}
 					}
 
@@ -178,14 +178,14 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 					buffer[offset++] = ZipDataInfo::HEADER[1];
 					buffer[offset++] = ZipDataInfo::HEADER[2];
 					buffer[offset++] = c;
-					_matchCnt = 0; 
+					_matchCnt = 0;
 				}
 			}
 		}
 	}
 
 	_length += offset;
-	return offset;
+	return static_cast<int>(offset);
 
 }
 

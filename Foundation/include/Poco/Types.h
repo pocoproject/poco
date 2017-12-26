@@ -78,21 +78,10 @@ typedef std::uint64_t UInt64;
 	// Compaq C++
 	//
 
-	#if defined(__VMS)
-		#if defined(__32BITS)
-			typedef std::int32_t  IntPtr;
-			typedef std::uint32_t UIntPtr;
-		#else
-			typedef Int64  IntPtr;
-			typedef UInt64 UIntPtr;
-			#define POCO_PTR_IS_64_BIT 1
-		#endif
-	#else
-		typedef Int64 IntPtr;
-		typedef UInt64 UIntPtr;
-		#define POCO_PTR_IS_64_BIT 1
-		#define POCO_LONG_IS_64_BIT 1
-	#endif
+	typedef Int64 IntPtr;
+	typedef UInt64 UIntPtr;
+	#define POCO_PTR_IS_64_BIT 1
+	#define POCO_LONG_IS_64_BIT 1
 
 #elif defined(__HP_aCC)
 	//
@@ -124,7 +113,7 @@ typedef std::uint64_t UInt64;
 		typedef UInt32 UIntPtr;
 	#endif
 
-#elif defined(__IBMCPP__) 
+#elif defined(__IBMCPP__)
 	//
 	// IBM XL C++
 	//
@@ -139,7 +128,7 @@ typedef std::uint64_t UInt64;
 		typedef UInt32 UIntPtr;
 	#endif
 
-#elif defined(__sgi) 
+#elif defined(__sgi)
 	//
 	// MIPSpro C++
 	//

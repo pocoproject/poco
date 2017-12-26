@@ -53,16 +53,16 @@ public:
 
 	void open(const std::string& connect = "");
 		/// Opens a connection to the Database.
-		/// 
-		/// An in-memory system database (sys), with a single table (dual) 
+		///
+		/// An in-memory system database (sys), with a single table (dual)
 		/// containing single field (dummy) is attached to the database.
 		/// The in-memory system database is used to force change count
-		/// to be reset to zero on every new query (or batch of queries) 
+		/// to be reset to zero on every new query (or batch of queries)
 		/// execution. Without this functionality, select statements
 		/// executions that do not return any rows return the count of
 		/// changes effected by the most recent insert, update or delete.
 		/// In-memory system database can be queried and updated but can not
-		/// be dropped. It may be used for other purposes 
+		/// be dropped. It may be used for other purposes
 		/// in the future.
 
 	void close();
@@ -73,10 +73,12 @@ public:
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
+		/// Timeout value is in seconds.
 		/// Throws RangeException if the timeout value is overflow.
 
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.
+		/// Timeout value is in seconds.
 
 	void begin();
 		/// Starts a transaction.
@@ -157,7 +159,7 @@ inline const std::string& SessionImpl::connectorName() const
 
 inline std::size_t SessionImpl::getConnectionTimeout()
 {
-	return static_cast<std::size_t>(_timeout);
+	return static_cast<std::size_t>(_timeout/1000);
 }
 
 

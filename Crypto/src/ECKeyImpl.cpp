@@ -77,8 +77,8 @@ ECKeyImpl::ECKeyImpl(int curve):
 }
 
 
-ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile, 
-	const std::string& privateKeyFile, 
+ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
 	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEC(0)
 {
 	if (EVPPKey::loadKey(&_pEC, PEM_read_PrivateKey, EVP_PKEY_get1_EC_KEY, privateKeyFile, privateKeyPassphrase))
@@ -184,7 +184,7 @@ std::string ECKeyImpl::getCurveName(int nid)
 	std::string curveName;
 	size_t len = EC_get_builtin_curves(NULL, 0);
 	EC_builtin_curve* pCurves =
-		(EC_builtin_curve*) OPENSSL_malloc(sizeof(EC_builtin_curve) * len);
+		(EC_builtin_curve*) OPENSSL_malloc(static_cast<int>(sizeof(EC_builtin_curve) * len));
 	if (!pCurves) return curveName;
 
 	if (!EC_get_builtin_curves(pCurves, len))
@@ -209,7 +209,7 @@ int ECKeyImpl::getCurveNID(std::string& name)
 	std::string curveName;
 	size_t len = EC_get_builtin_curves(NULL, 0);
 	EC_builtin_curve* pCurves =
-		(EC_builtin_curve*)OPENSSL_malloc(sizeof(EC_builtin_curve) * len);
+		(EC_builtin_curve*)OPENSSL_malloc(static_cast<int>(sizeof(EC_builtin_curve) * len));
 	if (!pCurves) return -1;
 
 	if (!EC_get_builtin_curves(pCurves, len))

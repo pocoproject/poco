@@ -67,8 +67,8 @@ public:
 
 	RSAKeyImpl(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
 		/// Creates the RSAKey, by reading public and private key from the given files and
-		/// using the given passphrase for the private key. Can only by used for signing if 
-		/// a private key is available. 
+		/// using the given passphrase for the private key. Can only by used for signing if
+		/// a private key is available.
 
 	RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase);
 		/// Creates the RSAKey. Can only by used for signing if pPrivKey
@@ -99,7 +99,7 @@ public:
 	void save(const std::string& publicKeyFile,
 		const std::string& privateKeyFile = "",
 		const std::string& privateKeyPassphrase = "") const;
-		/// Exports the public and private keys to the given files. 
+		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.

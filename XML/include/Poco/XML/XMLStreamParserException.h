@@ -1,8 +1,6 @@
 //
 // XMLStreamParserException.h
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  XMLStreamParserException

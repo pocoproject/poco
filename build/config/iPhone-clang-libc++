@@ -2,6 +2,6 @@
 # iPhone-clang-libc++
 #
 # Build settings for iPhone OS, using Apple's iPhone SDK
-# 
+#
 
 include $(POCO_BASE)/build/config/iPhone

@@ -56,7 +56,6 @@ private:
 		return Poco::NumberParser::parse(s) == n;
 	}
 
-#if defined(POCO_HAVE_INT64)
 	template <class T> bool testUpperLimit64()
 	{
 		T n = std::numeric_limits<T>::max();
@@ -73,7 +72,6 @@ private:
 		std::string s = Poco::NumberFormatter::format(n);
 		return Poco::NumberParser::parse64(s) == n;
 	}
-#endif
 };
 
 

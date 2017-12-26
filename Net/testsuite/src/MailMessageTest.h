@@ -32,12 +32,14 @@ public:
 	void testReadWriteMultiPart();
 	void testReadWriteMultiPartStore();
 	void testReadDefaultTransferEncoding();
+	void testReadDefaultContentType();
 	void testReadQP();
 	void testRead8Bit();
 	void testReadMultiPart();
 	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testEncodeWord();
+	void testDecodeWord();
 
 	void setUp();
 	void tearDown();

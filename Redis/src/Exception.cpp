@@ -1,8 +1,6 @@
 //
 // Exception.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Exception

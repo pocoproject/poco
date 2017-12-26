@@ -14,11 +14,12 @@
 
 // pull in platform identification macros needed below
 #include "Poco/Platform.h"
+#include "Poco/FPEnvironment.h"
 
 
 #if defined(POCO_NO_FPENVIRONMENT)
 #include "FPEnvironment_DUMMY.cpp"
-#elif defined(__osf__) || defined(__VMS)
+#elif defined(__osf__)
 #include "FPEnvironment_DEC.cpp"
 #elif defined(sun) || defined(__sun)
 #include "FPEnvironment_SUN.cpp"
@@ -31,11 +32,6 @@
 #else
 #include "FPEnvironment_DUMMY.cpp"
 #endif
-
-
-// header file must be included after platform-specific part
-// due to _XOPEN_SOURCE conflict on Tru64 (see FPEnvironment_DEC.cpp)
-#include "Poco/FPEnvironment.h"
 
 
 namespace Poco {
@@ -51,17 +47,17 @@ FPEnvironment::FPEnvironment(RoundingMode rm)
 	setRoundingMode(rm);
 }
 
-	
+
 FPEnvironment::FPEnvironment(const FPEnvironment& env): FPEnvironmentImpl(env)
 {
 }
 
-	
+
 FPEnvironment::~FPEnvironment()
 {
 }
 
-	
+
 FPEnvironment& FPEnvironment::operator = (const FPEnvironment& env)
 {
 	if (&env != this)

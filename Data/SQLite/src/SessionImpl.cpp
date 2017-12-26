@@ -54,10 +54,10 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_isTransaction(false)
 {
 	open();
-	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
+	setConnectionTimeout(loginTimeout);
 	setProperty("handle", _pDB);
-	addFeature("autoCommit", 
-		&SessionImpl::autoCommit, 
+	addFeature("autoCommit",
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 	addProperty("connectionTimeout", &SessionImpl::setConnectionTimeout, &SessionImpl::getConnectionTimeout);
 }
@@ -183,16 +183,16 @@ void SessionImpl::open(const std::string& connect)
 	{
 		ActiveConnector connector(connectionString(), &_pDB);
 		ActiveResult<int> result = connector.connect();
-		if (!result.tryWait(getLoginTimeout() * 1000))
+		if (!result.tryWait(static_cast<long>(getLoginTimeout() * 1000)))
 			throw ConnectionFailedException("Timed out.");
 
 		int rc = result.data();
 		if (rc != 0)
 		{
 			close();
-			Utility::throwException(rc);
+			Utility::throwException(_pDB, rc);
 		}
-	} 
+	}
 	catch (SQLiteException& ex)
 	{
 		throw ConnectionFailedException(ex.displayText());
@@ -204,23 +204,23 @@ void SessionImpl::open(const std::string& connect)
 
 void SessionImpl::close()
 {
-	if (_pDB) 
+	if (_pDB)
 	{
 		int result = 0;
 		int times = 10;
-		do 
+		do
 		{
 			result = sqlite3_close(_pDB);
 		} while (SQLITE_BUSY == result && --times > 0);
 
-		if (SQLITE_BUSY == result && times == 0) 
+		if (SQLITE_BUSY == result && times == 0)
 		{
 			times = 10;
 			sqlite3_stmt *pStmt = NULL;
-			do 
+			do
 			{
 				pStmt = sqlite3_next_stmt(_pDB, NULL);
-				if (pStmt && sqlite3_stmt_busy(pStmt)) 
+				if (pStmt && sqlite3_stmt_busy(pStmt))
 				{
 					sqlite3_finalize(pStmt);
 				}
@@ -244,9 +244,9 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
 	if(timeout <= std::numeric_limits<int>::max()/1000)
 	{
-		int tout = 1000 * timeout;
+		int tout = 1000 * static_cast<int>(timeout);
 		int rc = sqlite3_busy_timeout(_pDB, tout);
-		if (rc != 0) Utility::throwException(rc);
+		if (rc != 0) Utility::throwException(_pDB, rc);
 		_timeout = tout;
 	}
 	else

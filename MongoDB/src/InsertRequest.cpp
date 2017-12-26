@@ -1,8 +1,6 @@
 //
 // InsertRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  InsertRequest
@@ -22,7 +20,7 @@ namespace MongoDB {
 
 
 InsertRequest::InsertRequest(const std::string& collectionName, Flags flags):
-	RequestMessage(MessageHeader::OP_INSERT), 
+	RequestMessage(MessageHeader::OP_INSERT),
 	_flags(flags),
 	_fullCollectionName(collectionName)
 {

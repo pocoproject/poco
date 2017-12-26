@@ -1,8 +1,6 @@
 //
 // RedisTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -289,7 +287,7 @@ void RedisTest::testDECR()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
 		fail("This must fail");
 	}
-	catch (RedisException& e)
+	catch (RedisException&)
 	{
 		// ERR value is not an integer or out of range
 	}
@@ -338,7 +336,7 @@ void RedisTest::testError()
 		BulkString result = _redis.execute<BulkString>(command);
 		fail("Invalid command must throw RedisException");
 	}
-	catch (RedisException& e)
+	catch (RedisException&)
 	{
 		// Must fail
 	}

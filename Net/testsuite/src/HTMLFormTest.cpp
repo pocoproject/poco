@@ -115,7 +115,7 @@ void HTMLFormTest::testWriteMultipart()
 	std::ostringstream ostr;
 	form.write(ostr, "MIME_boundary_0123456789");
 	std::string s = ostr.str();
-	assert (s == 
+	assert (s ==
 		"--MIME_boundary_0123456789\r\n"
 		"Content-Disposition: form-data; name=\"field1\"\r\n"
 		"\r\n"
@@ -146,6 +146,13 @@ void HTMLFormTest::testWriteMultipart()
 		"--MIME_boundary_0123456789--\r\n"
 	);
 	assert(s.length() == form.calculateContentLength());
+
+	const HTMLForm::PartVec& parts = form.getPartList();
+	assert(parts.size() == 2);
+	assert(parts[0].name() == "attachment1");
+	assert(parts[1].name() == "attachment2");
+	assert(parts[1].filename() == "att2.txt");
+	assert(parts[1].headers()["Content-ID"] == "1234abcd");
 }
 
 

@@ -21,7 +21,7 @@
 class CryptoTest: public CppUnit::TestCase
 {
 public:
-	enum 
+	enum
 	{
 		MAX_DATA_SIZE = 10000
 	};

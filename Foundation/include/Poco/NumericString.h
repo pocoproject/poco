@@ -107,7 +107,7 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 	{
 		switch (*pStr)
 		{
-		case '0': 
+		case '0':
 			if (state < STATE_SIGNIFICANT_DIGITS) break;
 
 		case '1': case '2': case '3': case '4':
@@ -268,7 +268,7 @@ bool intToStr(T value,
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
 	/// paddings are prepended to the formatted result with minus sign or base prefix included
-	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal, 
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
 {
@@ -469,7 +469,7 @@ Foundation_API std::string& floatToStr(std::string& str,
 	char decSep = 0);
 	/// Converts a float value, assigns it to the supplied string and returns the reference.
 	/// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument)
 	/// and width (total length of formatted string).
 
 
@@ -512,7 +512,7 @@ Foundation_API std::string& doubleToStr(std::string& str,
 	char decSep = 0);
 	/// Converts a double value, assigns it to the supplied string and returns the reference.
 	/// This function calls doubleToStr(char*, int, double, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument)
 	/// and width (total length of formatted string).
 
 
@@ -527,30 +527,36 @@ Foundation_API std::string& doubleToFixedStr(std::string& str,
 	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
-Foundation_API float strToFloat(const char* str);
+Foundation_API float strToFloat(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// Function uses double_convesrion::DoubleToStringConverter to do the conversion.
 
 
-Foundation_API bool strToFloat(const std::string&, float& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToFloat(const std::string&, float& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
-	/// 
+	///
 	/// Returns true if successful, false otherwise.
 
 
-Foundation_API double strToDouble(const char* str);
+Foundation_API double strToDouble(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 
 
-Foundation_API bool strToDouble(const std::string& str, double& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToDouble(const std::string& str, double& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
-	/// 
+	///
 	/// Returns true if successful, false otherwise.
 
 

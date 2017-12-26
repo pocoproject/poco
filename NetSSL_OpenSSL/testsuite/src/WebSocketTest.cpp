@@ -54,7 +54,7 @@ namespace
 				int n;
 				do
 				{
-					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					n = ws.receiveFrame(pBuffer.get(), static_cast<int>(_bufSize), flags);
 					if (n == 0)
 						break;
 					ws.sendFrame(pBuffer.get(), n, flags);

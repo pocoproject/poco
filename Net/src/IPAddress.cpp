@@ -219,6 +219,60 @@ IPAddress::~IPAddress()
 }
 
 
+void IPAddress::destruct()
+{
+	pImpl()->~IPAddressImpl();
+}
+
+
+void IPAddress::newIPv4()
+{
+	new (storage()) Poco::Net::Impl::IPv4AddressImpl;
+}
+
+
+void IPAddress::newIPv4(const void* hostAddr)
+{
+	new (storage()) Poco::Net::Impl::IPv4AddressImpl(hostAddr);
+}
+
+
+void IPAddress::newIPv4(unsigned prefix)
+{
+	new (storage()) Poco::Net::Impl::IPv4AddressImpl(prefix);
+}
+
+
+#if defined(POCO_HAVE_IPv6)
+
+
+void IPAddress::newIPv6()
+{
+	new (storage()) Poco::Net::Impl::IPv6AddressImpl;
+}
+
+
+void IPAddress::newIPv6(const void* hostAddr)
+{
+	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr);
+}
+
+
+void IPAddress::newIPv6(const void* hostAddr, Poco::UInt32 scope)
+{
+	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr, scope);
+}
+
+
+void IPAddress::newIPv6(unsigned prefix)
+{
+	new (storage()) Poco::Net::Impl::IPv6AddressImpl(prefix);
+}
+
+
+#endif // POCO_HAVE_IPv6
+
+
 IPAddress& IPAddress::operator = (const IPAddress& addr)
 {
 	if (&addr != this)
@@ -230,7 +284,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		else if (addr.family() == IPAddress::IPv6)
 			newIPv6(addr.addr(), addr.scope());
 #endif
-		else 
+		else
 			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
 	}
 	return *this;
@@ -598,3 +652,4 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr)
 	ostr << addr.toString();
 	return ostr;
 }
+

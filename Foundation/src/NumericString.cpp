@@ -245,7 +245,8 @@ void doubleToFixedStr(char* buffer, int bufferSize, double value, int precision)
 	StringBuilder builder(buffer, bufferSize);
 	int flags = DoubleToStringConverter::UNIQUE_ZERO |
 		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
-	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, -std::numeric_limits<double>::digits10, std::numeric_limits<double>::digits10, 0, 0);
+	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP,
+			-std::numeric_limits<double>::digits10, std::numeric_limits<double>::digits10, 0, 0);
 	dc.ToFixed(value, precision, &builder);
 	builder.Finalize();
 }
@@ -289,32 +290,32 @@ std::string& doubleToFixedStr(std::string& str, double value, int precision, int
 }
 
 
-float strToFloat(const char* str)
+float strToFloat(const char* str, const char* inf, const char* nan)
 {
 	using namespace double_conversion;
 
 	int processed;
 	int flags = StringToDoubleConverter::ALLOW_LEADING_SPACES |
 		StringToDoubleConverter::ALLOW_TRAILING_SPACES;
-	StringToDoubleConverter converter(flags, 0.0, Single::NaN(), POCO_FLT_INF, POCO_FLT_NAN);
+	StringToDoubleConverter converter(flags, 0.0, Single::NaN(), inf, nan);
 	float result = converter.StringToFloat(str, static_cast<int>(strlen(str)), &processed);
 	return result;
 }
 
 
-double strToDouble(const char* str)
+double strToDouble(const char* str, const char* inf, const char* nan)
 {
 	using namespace double_conversion;
 	int processed;
 	int flags = StringToDoubleConverter::ALLOW_LEADING_SPACES |
 		StringToDoubleConverter::ALLOW_TRAILING_SPACES;
-	StringToDoubleConverter converter(flags, 0.0, Double::NaN(), POCO_FLT_INF, POCO_FLT_NAN);
+	StringToDoubleConverter converter(flags, 0.0, Double::NaN(), inf, nan);
 	double result = converter.StringToDouble(str, static_cast<int>(strlen(str)), &processed);
 	return result;
 }
 
 
-bool strToFloat(const std::string& str, float& result, char decSep, char thSep)
+bool strToFloat(const std::string& str, float& result, char decSep, char thSep, const char* inf, const char* nan)
 {
 	using namespace double_conversion;
 
@@ -323,13 +324,13 @@ bool strToFloat(const std::string& str, float& result, char decSep, char thSep)
 	removeInPlace(tmp, thSep);
 	removeInPlace(tmp, 'f');
 	replaceInPlace(tmp, decSep, '.');
-	result = strToFloat(tmp.c_str());
+	result = strToFloat(tmp.c_str(), inf, nan);
 	return !FPEnvironment::isInfinite(result) &&
 		!FPEnvironment::isNaN(result);
 }
 
 
-bool strToDouble(const std::string& str, double& result, char decSep, char thSep)
+bool strToDouble(const std::string& str, double& result, char decSep, char thSep, const char* inf, const char* nan)
 {
 	if (str.empty()) return false;
 
@@ -340,7 +341,7 @@ bool strToDouble(const std::string& str, double& result, char decSep, char thSep
 	removeInPlace(tmp, thSep);
 	replaceInPlace(tmp, decSep, '.');
 	removeInPlace(tmp, 'f');
-	result = strToDouble(tmp.c_str());
+	result = strToDouble(tmp.c_str(), inf, nan);
 	return !FPEnvironment::isInfinite(result) &&
 		!FPEnvironment::isNaN(result);
 }

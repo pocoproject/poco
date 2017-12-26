@@ -30,7 +30,7 @@ const std::string SimpleFileChannel::PROP_ROTATION      = "rotation";
 const std::string SimpleFileChannel::PROP_FLUSH         = "flush";
 
 
-SimpleFileChannel::SimpleFileChannel(): 
+SimpleFileChannel::SimpleFileChannel():
 	_limit(0),
 	_flush(true),
 	_pFile(0)

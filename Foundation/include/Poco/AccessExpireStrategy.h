@@ -31,7 +31,7 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue
 >

@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 		queue.enqueueNotification(new WorkNotification(i));
 	}
 	
-	// wait until queue is empty and all threads are 
+	// wait until queue is empty and all threads are
 	// waiting for new work.
 	while (!queue.empty()) Thread::sleep(200);
 	Thread::sleep(500);

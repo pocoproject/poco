@@ -61,7 +61,7 @@ public:
 	void setNewLine(const std::string& newLine);
 		/// Sets the line ending characters for the internal
 		/// XMLWriter. See XMLWriter::setNewLine() for a list
-		/// of supported values. 
+		/// of supported values.
 
 	const std::string& getNewLine() const;
 		/// Returns the line ending characters used by the

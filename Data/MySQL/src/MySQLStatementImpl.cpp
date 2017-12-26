@@ -20,10 +20,10 @@ namespace MySQL {
 
 
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
-	Poco::Data::StatementImpl(h), 
-	_stmt(h.handle()), 
+	Poco::Data::StatementImpl(h),
+	_stmt(h.handle()),
 	_pBinder(new Binder),
-	_pExtractor(new Extractor(_stmt, _metadata)), 
+	_pExtractor(new Extractor(_stmt, _metadata)),
 	_hasNext(NEXT_DONTKNOW)
 {
 }
@@ -80,11 +80,11 @@ bool MySQLStatementImpl::hasNext()
 	return false;
 }
 
-	
+
 std::size_t MySQLStatementImpl::next()
 {
 	if (!hasNext())
-		throw StatementException("No data received");	
+		throw StatementException("No data received");
 
 	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();

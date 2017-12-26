@@ -13,7 +13,7 @@
 
 
 #include "Poco/Mutex.h"
-#if (POCO_OS == POCO_OS_CYGWIN)
+#if (POCO_OS == POCO_OS_CYGWIN || defined(POCO_ANDROID))
 #include "Mutex_POSIX.cpp"
 #else
 #include "Mutex_STD.cpp"

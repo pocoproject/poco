@@ -1,8 +1,6 @@
 //
 // Element.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Element
@@ -26,7 +24,7 @@ Element::Element(const std::string& name) : _name(name)
 }
 
 
-Element::~Element() 
+Element::~Element()
 {
 }
 

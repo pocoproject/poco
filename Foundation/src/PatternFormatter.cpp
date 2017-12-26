@@ -74,9 +74,9 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'l': NumberFormatter::append(text, (int) msg.getPriority()); break;
 		case 'p': text.append(getPriorityName((int) msg.getPriority())); break;
 		case 'q': text += getPriorityName((int) msg.getPriority()).at(0); break;
-		case 'P': NumberFormatter::append(text, msg.getPid()); break;
+		case 'P': NumberFormatter::append(text, static_cast<Poco::Int64>(msg.getPid())); break;
+		case 'I': NumberFormatter::append(text, static_cast<Poco::Int64>(msg.getTid())); break;
 		case 'T': text.append(msg.getThread()); break;
-		case 'I': NumberFormatter::append(text, msg.getTid()); break;
 		case 'O': NumberFormatter::append(text, msg.getOsTid()); break;
 		case 'N': text.append(Environment::nodeName()); break;
 		case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
@@ -104,7 +104,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'F': NumberFormatter::append0(text, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
 		case 'z': text.append(DateTimeFormatter::tzdISO(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
 		case 'Z': text.append(DateTimeFormatter::tzdRFC(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
-		case 'E': NumberFormatter::append(text, msg.getTime().epochTime()); break;
+		case 'E': NumberFormatter::append(text, static_cast<Poco::Int64>(msg.getTime().epochTime())); break;
 		case 'v':
 			if (ip->length > msg.getSource().length())	//append spaces
 				text.append(msg.getSource()).append(ip->length - msg.getSource().length(), ' ');
@@ -206,12 +206,12 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 	{
 		_localTime = (value == "local");
 	}
-	else if (name == PROP_PRIORITY_NAMES) 
+	else if (name == PROP_PRIORITY_NAMES)
 	{
 		_priorityNames = value;
 		parsePriorityNames();
 	}
-	else 
+	else
 	{
 		Formatter::setProperty(name, value);
 	}
@@ -233,7 +233,7 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 
 namespace
 {
-	static std::string priorities[] = 
+	static std::string priorities[] =
 	{
 		"",
 		"Fatal",

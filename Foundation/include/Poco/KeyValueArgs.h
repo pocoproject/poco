@@ -24,20 +24,20 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
+template <class TKey, class TValue>
 class KeyValueArgs
 	/// Simply event arguments class to transfer a key and a value via an event call.
 	/// Note that key and value are *NOT* copied, only references to them are stored.
 {
 public:
-	KeyValueArgs(const TKey& aKey, const TValue& aVal): 
-		_key(aKey), 
+	KeyValueArgs(const TKey& aKey, const TValue& aVal):
+		_key(aKey),
 		_value(aVal)
 	{
 	}
 
 	KeyValueArgs(const KeyValueArgs& args):
-		_key(args._key), 
+		_key(args._key),
 		_value(args._value)
 	{
 	}

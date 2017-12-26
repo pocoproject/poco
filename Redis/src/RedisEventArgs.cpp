@@ -1,8 +1,6 @@
 //
 // RedisEventArgs.cpp
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  RedisEventArgs

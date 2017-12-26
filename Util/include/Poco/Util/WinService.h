@@ -22,11 +22,7 @@
 #include "Poco/UnWindows.h"
 
 
-#if defined(POCO_WIN32_UTF8)
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGW
-#else
-#define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGA
-#endif
 
 
 namespace Poco {
@@ -62,7 +58,7 @@ public:
 		/// Returns the service's display name.
 
 	std::string path() const;
-		/// Returns the path to the service executable. 
+		/// Returns the path to the service executable.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
@@ -79,7 +75,7 @@ public:
 		/// Throws a ExistsException if the service has already been registered.
 
 	void unregisterService();
-		/// Deletes the Windows service. 
+		/// Deletes the Windows service.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 

@@ -29,7 +29,7 @@ namespace Util {
 class Util_API ConfigurationMapper: public AbstractConfiguration
 	/// This configuration maps a property hierarchy into another
 	/// hierarchy.
-	/// 
+	///
 	/// For example, given a configuration with the following properties:
 	///     config.value1
 	///     config.value2

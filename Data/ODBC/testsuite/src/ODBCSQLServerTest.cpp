@@ -108,7 +108,7 @@ std::string ODBCSQLServerTest::_connectString = "DRIVER=" MS_SQL_SERVER_ODBC_DRI
 	;
 
 
-ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name): 
+ODBCSQLServerTest::ODBCSQLServerTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -129,13 +129,13 @@ void ODBCSQLServerTest::testBareboneODBC()
 		"Fifth FLOAT,"
 		"Sixth DATETIME)";
 
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_IMMEDIATE, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_MANUAL, true, "CONVERT(VARBINARY(30),?)");
-	executor().bareboneODBCTest(dbConnString(), tableCreateString, 
+	executor().bareboneODBCTest(dbConnString(), tableCreateString,
 		SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND, true, "CONVERT(VARBINARY(30),?)");
 
 	tableCreateString = "CREATE TABLE " + ExecUtil::test_tbl() +
@@ -361,7 +361,7 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 			"BEGIN "
 			" SELECT * "
 			" FROM " << ExecUtil::person() <<
-			" WHERE Age < @ageLimit " 
+			" WHERE Age < @ageLimit "
 			" ORDER BY Age DESC; "
 			"END;"
 		, now;
@@ -528,7 +528,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
 		assert(1 == j);
 		assert(2 == i);
-		assert(3 == result); 
+		assert(3 == result);
 
 		Tuple<int, int> params(1, 2);
 		assert(1 == params.get<0>());
@@ -537,7 +537,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
 		assert(1 == params.get<1>());
 		assert(2 == params.get<0>());
-		assert(3 == result); 
+		assert(3 == result);
 
 		dropObject("PROCEDURE", "storedFunction");
 
@@ -696,15 +696,15 @@ void ODBCSQLServerTest::recreateBoolTable()
 void ODBCSQLServerTest::recreateMiscTable()
 {
 	dropObject("TABLE", ExecUtil::misctest());
-	try 
-	{ 
+	try
+	{
 		session() << "CREATE TABLE  "<< ExecUtil::misctest() <<
 			"(First VARCHAR(30),"
 			"Second VARBINARY(30),"
 			"Third INTEGER,"
 			"Fourth FLOAT,"
 			"Fifth DATETIME,"
-			"Sixth BIT)", now; 
+			"Sixth BIT)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -715,20 +715,20 @@ void ODBCSQLServerTest::recreateLogTable()
 	dropObject("TABLE", ExecUtil::pocolog());;
 	dropObject("TABLE", ExecUtil::pocolog_a());;
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR(max),"
 			"Name VARCHAR(max),"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR(max), "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR(max),"
 			"DateTime DATETIME)";
 
-		session() << sql, ExecUtil::pocolog(), now; 
-		session() << sql, ExecUtil::pocolog_a(), now; 
+		session() << sql, ExecUtil::pocolog(), now;
+		session() << sql, ExecUtil::pocolog_a(), now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -767,6 +767,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertEmptyVector);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigStringVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSimpleAccessList);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testComplexTypeList);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testInsertList);

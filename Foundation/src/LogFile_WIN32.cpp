@@ -15,6 +15,7 @@
 #include "Poco/LogFile_WIN32.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
+#include "Poco/UnicodeConverter.h"
 
 
 namespace Poco {
@@ -86,7 +87,10 @@ const std::string& LogFileImpl::pathImpl() const
 
 void LogFileImpl::createFile()
 {
-	_hFile = CreateFileA(_path.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	std::wstring upath;
+	FileImpl::convertPath(_path, upath);
+
+	_hFile = CreateFileW(upath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (_hFile == INVALID_HANDLE_VALUE) throw OpenFileException(_path);
 	SetFilePointer(_hFile, 0, 0, FILE_END);
 	// There seems to be a strange "optimization" in the Windows NTFS
@@ -107,5 +111,6 @@ void LogFileImpl::createFile()
 	else
 		_creationDate = File(_path).created();
 }
+
 
 } // namespace Poco

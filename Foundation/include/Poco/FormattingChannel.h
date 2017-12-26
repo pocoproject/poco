@@ -54,7 +54,7 @@ public:
 		/// which may be null.
 
 	void setChannel(Channel* pChannel);
-		/// Sets the destination channel to which the formatted 
+		/// Sets the destination channel to which the formatted
 		/// messages are passed on.
 		
 	Channel* getChannel() const;

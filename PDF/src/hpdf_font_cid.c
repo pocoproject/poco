@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_font_cid.c
+ * << Haru Free PDF Library >> -- hpdf_font_cid.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -10,7 +13,6 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.08.04 modified MeasureText().
  */
 
 #include "hpdf_conf.h"
@@ -46,10 +48,16 @@ MeasureText  (HPDF_Font         font,
 
 
 static char*
-UINT16ToHex  (char     *s,
-              HPDF_UINT16    val,
-              char     *eptr);
+UINT16ToHex  (char        *s,
+              HPDF_UINT16  val,
+              char        *eptr,
+              HPDF_BYTE    width);
 
+static char *
+CidRangeToHex (char        *s,
+	       HPDF_UINT16  from,
+	       HPDF_UINT16  to,
+	       char        *eptr);
 
 static HPDF_Dict
 CreateCMap  (HPDF_Encoder   encoder,
@@ -130,12 +138,31 @@ HPDF_Type0Font_New  (HPDF_MMgr        mmgr,
     if (fontdef->type == HPDF_FONTDEF_TYPE_CID) {
         ret += HPDF_Dict_AddName (font, "Encoding", encoder->name);
     } else {
-        attr->cmap_stream = CreateCMap (encoder, xref);
+        /*
+	 * Handle the Unicode encoding, see hpdf_encoding_utf.c For some
+	 * reason, xpdf-based readers cannot deal with our cmap but work
+	 * fine when using the predefined "Identity-H"
+	 * encoding. However, text selection does not work, unless we
+	 * add a ToUnicode cmap. This CMap should also be "Identity",
+	 * but that does not work -- specifying our cmap as a stream however
+	 * does work. Who can understand that ?
+	 */
+        if (HPDF_StrCmp(encoder_attr->ordering, "Identity-H") == 0) {
+	    ret += HPDF_Dict_AddName (font, "Encoding", "Identity-H");
+	    attr->cmap_stream = CreateCMap (encoder, xref);
 
-        if (attr->cmap_stream) {
-            ret += HPDF_Dict_Add (font, "Encoding", attr->cmap_stream);
-        } else
-            return NULL;
+	    if (attr->cmap_stream) {
+	        ret += HPDF_Dict_Add (font, "ToUnicode", attr->cmap_stream);
+	    } else
+	        return NULL;
+	} else {
+            attr->cmap_stream = CreateCMap (encoder, xref);
+
+	    if (attr->cmap_stream) {
+	        ret += HPDF_Dict_Add (font, "Encoding", attr->cmap_stream);
+	    } else
+	      return NULL;
+	}
     }
 
     if (ret != HPDF_OK)
@@ -357,9 +384,9 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
     if (HPDF_Dict_Add (font, "DW2", array) != HPDF_OK)
         return NULL;
 
-    ret += HPDF_Array_AddNumber (array, fontdef->font_bbox.bottom);
-    ret += HPDF_Array_AddNumber (array, fontdef->font_bbox.bottom -
-                fontdef->font_bbox.top);
+    ret += HPDF_Array_AddNumber (array, (HPDF_INT32)(fontdef->font_bbox.bottom));
+    ret += HPDF_Array_AddNumber (array, (HPDF_INT32)(fontdef->font_bbox.bottom -
+                fontdef->font_bbox.top));
 
     HPDF_MemSet (tmp_map, 0, sizeof(HPDF_UNICODE) * 65536);
 
@@ -370,15 +397,25 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
         HPDF_UINT j;
 
         for (j = 0; j < 256; j++) {
-            HPDF_UINT16 cid = encoder_attr->cid_map[i][j];
-            if (cid != 0) {
-                HPDF_UNICODE unicode = encoder_attr->unicode_map[i][j];
-                HPDF_UINT16 gid = HPDF_TTFontDef_GetGlyphid (fontdef, unicode);
-                tmp_map[cid] = gid;
-                if (max < cid)
-                    max = cid;
-            }
-        }
+	    if (encoder->to_unicode_fn == HPDF_CMapEncoder_ToUnicode) {
+		HPDF_UINT16 cid = encoder_attr->cid_map[i][j];
+		if (cid != 0) {
+		    HPDF_UNICODE unicode = encoder_attr->unicode_map[i][j];
+		    HPDF_UINT16 gid = HPDF_TTFontDef_GetGlyphid (fontdef,
+								 unicode);
+		    tmp_map[cid] = gid;
+		    if (max < cid)
+			max = cid;
+		}
+	    } else {
+		HPDF_UNICODE unicode = (i << 8) | j;
+		HPDF_UINT16 gid = HPDF_TTFontDef_GetGlyphid (fontdef,
+							     unicode);
+		tmp_map[unicode] = gid;
+		if (max < unicode)
+		    max = unicode;
+	    }
+	}
     }
 
     if (max > 0) {
@@ -399,14 +436,14 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
 
             if (w != dw) {
                 if (!tmp_array) {
-                    if ((ret = HPDF_Array_AddNumber (array, i)) != HPDF_OK)
+                    if (HPDF_Array_AddNumber (array, i) != HPDF_OK)
                         return NULL;
 
                     tmp_array = HPDF_Array_New (font->mmgr);
                     if (!tmp_array)
                         return NULL;
 
-                    if ((ret = HPDF_Array_Add (array, tmp_array)) != HPDF_OK)
+                    if (HPDF_Array_Add (array, tmp_array) != HPDF_OK)
                         return NULL;
                 }
 
@@ -422,16 +459,15 @@ CIDFontType2_New (HPDF_Font parent, HPDF_Xref xref)
             if (!attr->map_stream)
                 return NULL;
 
-            if ((ret = HPDF_Dict_Add (font, "CIDToGIDMap", attr->map_stream))
-                    != HPDF_OK)
+            if (HPDF_Dict_Add (font, "CIDToGIDMap", attr->map_stream) != HPDF_OK)
                 return NULL;
 
             for (i = 0; i < max; i++) {
                 HPDF_BYTE u[2];
                 HPDF_UINT16 gid = tmp_map[i];
 
-                u[0] = gid >> 8;
-                u[1] = gid;
+                u[0] = (HPDF_BYTE)(gid >> 8);
+                u[1] = (HPDF_BYTE)gid;
 
                 HPDF_MemCpy ((HPDF_BYTE *)(tmp_map + i), u, 2);
             }
@@ -567,14 +603,14 @@ TextWidth  (HPDF_Font         font,
                     (HPDF_CIDFontDefAttr)attr->fontdef->attr;
         dw2 = cid_fontdef_attr->DW2[1];
     } else {
-        dw2 = attr->fontdef->font_bbox.bottom -
-                    attr->fontdef->font_bbox.top;
+        dw2 = (HPDF_INT)(attr->fontdef->font_bbox.bottom -
+                    attr->fontdef->font_bbox.top);
     }
 
     HPDF_Encoder_SetParseText (encoder, &parse_state, text, len);
 
     while (i < len) {
-        HPDF_ByteType btype = HPDF_CMapEncoder_ByteType (encoder, &parse_state);
+        HPDF_ByteType btype = (encoder->byte_type_fn)(encoder, &parse_state);
         HPDF_UINT16 cid;
         HPDF_UNICODE unicode;
         HPDF_UINT16 code;
@@ -585,7 +621,7 @@ TextWidth  (HPDF_Font         font,
 
         if (btype == HPDF_BYTE_TYPE_LEAD) {
             code <<= 8;
-            code += *text;
+            code = (HPDF_UINT16)(code + *text);
         }
 
         if (btype != HPDF_BYTE_TYPE_TRIAL) {
@@ -596,7 +632,7 @@ TextWidth  (HPDF_Font         font,
                     w = HPDF_CIDFontDef_GetCIDWidth (attr->fontdef, cid);
                 } else {
                     /* unicode-based font */
-                    unicode = HPDF_CMapEncoder_ToUnicode (encoder, code);
+                    unicode = (encoder->to_unicode_fn)(encoder, code);
                     w = HPDF_TTFontDef_GetCharWidth (attr->fontdef, unicode);
                 }
             } else {
@@ -652,8 +688,8 @@ MeasureText  (HPDF_Font          font,
                 (HPDF_CIDFontDefAttr)attr->fontdef->attr;
         dw2 = cid_fontdef_attr->DW2[1];
     } else {
-        dw2 = attr->fontdef->font_bbox.bottom -
-                    attr->fontdef->font_bbox.top;
+        dw2 = (HPDF_INT)(attr->fontdef->font_bbox.bottom -
+                    attr->fontdef->font_bbox.top);
     }
 
     HPDF_Encoder_SetParseText (encoder, &parse_state, text, len);
@@ -668,7 +704,7 @@ MeasureText  (HPDF_Font          font,
 
         if (btype == HPDF_BYTE_TYPE_LEAD) {
             code <<= 8;
-            code += b2;
+            code = (HPDF_UINT16)(code + b2);
         }
 
         if (!wordwrap) {
@@ -687,7 +723,8 @@ MeasureText  (HPDF_Font          font,
                 tmp_len = i + 1;
                 if (real_width)
                     *real_width = w;
-            } else
+            } /* else
+			//Commenting this out fixes problem with HPDF_Text_Rect() splitting the words
             if (last_btype == HPDF_BYTE_TYPE_TRIAL ||
                     (btype == HPDF_BYTE_TYPE_LEAD &&
                     last_btype == HPDF_BYTE_TYPE_SINGLE)) {
@@ -696,7 +733,7 @@ MeasureText  (HPDF_Font          font,
                     if (real_width)
                         *real_width = w;
                 }
-            }
+            }*/
         }
 
         if (HPDF_IS_WHITE_SPACE(b)) {
@@ -711,19 +748,19 @@ MeasureText  (HPDF_Font          font,
                     tmp_w = HPDF_CIDFontDef_GetCIDWidth (attr->fontdef, cid);
                 } else {
                     /* unicode-based font */
-                    unicode = HPDF_CMapEncoder_ToUnicode (encoder, code);
+                    unicode = (encoder->to_unicode_fn)(encoder, code);
                     tmp_w = HPDF_TTFontDef_GetCharWidth (attr->fontdef,
                             unicode);
                 }
             } else {
-                tmp_w = -dw2;
+                tmp_w = (HPDF_UINT16)(-dw2);
             }
 
             if (i > 0)
                 w += char_space;
         }
 
-        w += (HPDF_DOUBLE)tmp_w * font_size / 1000;
+        w += (HPDF_REAL)((HPDF_DOUBLE)tmp_w * font_size / 1000);
 
         /* 2006.08.04 break when it encountered  line feed */
         if (w > width || b == 0x0A)
@@ -743,10 +780,12 @@ MeasureText  (HPDF_Font          font,
 }
 
 
+
 static char*
-UINT16ToHex  (char     *s,
-              HPDF_UINT16    val,
-              char     *eptr)
+UINT16ToHex  (char        *s,
+              HPDF_UINT16  val,
+              char        *eptr,
+              HPDF_BYTE    width)
 {
     HPDF_BYTE b[2];
     HPDF_UINT16 val2;
@@ -763,7 +802,14 @@ UINT16ToHex  (char     *s,
 
     *s++ = '<';
 
-    if (b[0] != 0) {
+    /*
+     * In principle a range of <00> - <1F> can now not be
+     * distinguished from <0000> - <001F>..., this seems something
+     * that is wrong with CID ranges. For the UCS-2 encoding we need
+     * to add <0000> - <FFFF> and this cannot be <00> - <FFFF> (or at
+     * least, that crashes Mac OSX Preview).
+     */
+    if (width == 2) {
         c = b[0] >> 4;
         if (c <= 9)
             c += 0x30;
@@ -771,7 +817,7 @@ UINT16ToHex  (char     *s,
             c += 0x41 - 10;
         *s++ = c;
 
-        c = b[0] & 0x0f;
+        c = (char)(b[0] & 0x0f);
         if (c <= 9)
             c += 0x30;
         else
@@ -779,14 +825,14 @@ UINT16ToHex  (char     *s,
         *s++ = c;
     }
 
-    c = b[1] >> 4;
+    c = (char)(b[1] >> 4);
     if (c <= 9)
         c += 0x30;
     else
         c += 0x41 - 10;
     *s++ = c;
 
-    c = b[1] & 0x0f;
+    c = (char)(b[1] & 0x0f);
     if (c <= 9)
         c += 0x30;
     else
@@ -799,6 +845,21 @@ UINT16ToHex  (char     *s,
     return s;
 }
 
+static char*
+CidRangeToHex  (char        *s,
+                HPDF_UINT16  from,
+                HPDF_UINT16  to,
+                char        *eptr)
+{
+    HPDF_BYTE width = (to > 255) ? 2 : 1;
+    char *pbuf;
+
+    pbuf = UINT16ToHex (s, from, eptr, width);
+    *pbuf++ = ' ';
+    pbuf = UINT16ToHex (pbuf, to, eptr, width);
+
+    return pbuf;
+}
 
 static HPDF_Dict
 CreateCMap  (HPDF_Encoder   encoder,
@@ -843,17 +904,17 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream,
                 "%%IncludeResource: ProcSet (CIDInit)\r\n");
 
-    pbuf = HPDF_StrCpy (buf, "%%BeginResource: CMap (", eptr);
-    pbuf = HPDF_StrCpy (pbuf, encoder->name, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "%%BeginResource: CMap (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, encoder->name, eptr);
     HPDF_StrCpy (pbuf, ")\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = HPDF_StrCpy (buf, "%%Title: (", eptr);
-    pbuf = HPDF_StrCpy (pbuf, encoder->name, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "%%Title: (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, encoder->name, eptr);
     *pbuf++ = ' ';
-    pbuf = HPDF_StrCpy (pbuf, attr->registry, eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->registry, eptr);
     *pbuf++ = ' ';
-    pbuf = HPDF_StrCpy (pbuf, attr->ordering, eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->ordering, eptr);
     *pbuf++ = ' ';
     pbuf = HPDF_IToA (pbuf, attr->suppliment, eptr);
     HPDF_StrCpy (pbuf, ")\r\n", eptr);
@@ -874,24 +935,24 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream,
                 "/CIDSystemInfo 3 dict dup begin\r\n");
 
-    pbuf = HPDF_StrCpy (buf, "  /Registry (", eptr);
-    pbuf = HPDF_StrCpy (pbuf, attr->registry, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "  /Registry (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->registry, eptr);
     HPDF_StrCpy (pbuf, ") def\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = HPDF_StrCpy (buf, "  /Ordering (", eptr);
-    pbuf = HPDF_StrCpy (pbuf, attr->ordering, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "  /Ordering (", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, attr->ordering, eptr);
     HPDF_StrCpy (pbuf, ") def\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = HPDF_StrCpy (buf, "  /Supplement ", eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "  /Supplement ", eptr);
     pbuf = HPDF_IToA (pbuf, attr->suppliment, eptr);
-    pbuf = HPDF_StrCpy (pbuf, " def\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, " def\r\n", eptr);
     HPDF_StrCpy (pbuf, "end def\r\n\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = HPDF_StrCpy (buf, "/CMapName /", eptr);
-    pbuf = HPDF_StrCpy (pbuf, encoder->name, eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "/CMapName /", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, encoder->name, eptr);
     HPDF_StrCpy (pbuf, " def\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
@@ -899,13 +960,13 @@ CreateCMap  (HPDF_Encoder   encoder,
     ret += HPDF_Stream_WriteStr (cmap->stream, "/CMapType 1 def\r\n\r\n");
 
     if (attr->uid_offset >= 0) {
-        pbuf = HPDF_StrCpy (buf, "/UIDOffset ", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "/UIDOffset ", eptr);
         pbuf = HPDF_IToA (pbuf, attr->uid_offset, eptr);
         HPDF_StrCpy (pbuf, " def\r\n\r\n", eptr);
         ret += HPDF_Stream_WriteStr (cmap->stream, buf);
     }
 
-    pbuf = HPDF_StrCpy (buf, "/XUID [", eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "/XUID [", eptr);
     pbuf = HPDF_IToA (pbuf, attr->xuid[0], eptr);
     *pbuf++ = ' ';
     pbuf = HPDF_IToA (pbuf, attr->xuid[1], eptr);
@@ -914,7 +975,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     HPDF_StrCpy (pbuf, "] def\r\n\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 
-    pbuf = HPDF_StrCpy (buf, "/WMode ", eptr);
+    pbuf = (char *)HPDF_StrCpy (buf, "/WMode ", eptr);
     pbuf = HPDF_IToA (pbuf, (HPDF_UINT32)attr->writing_mode, eptr);
     HPDF_StrCpy (pbuf, " def\r\n\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
@@ -928,9 +989,8 @@ CreateCMap  (HPDF_Encoder   encoder,
         HPDF_CidRange_Rec *range = HPDF_List_ItemAt (attr->code_space_range,
                         i);
 
-        pbuf = UINT16ToHex (buf, range->from, eptr);
-        *pbuf++ = ' ';
-        pbuf = UINT16ToHex (pbuf, range->to, eptr);
+        pbuf = CidRangeToHex(buf, range->from, range->to, eptr);
+
         HPDF_StrCpy (pbuf, "\r\n", eptr);
 
         ret += HPDF_Stream_WriteStr (cmap->stream, buf);
@@ -952,9 +1012,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     for (i = 0; i < attr->notdef_range->count; i++) {
         HPDF_CidRange_Rec *range = HPDF_List_ItemAt (attr->notdef_range, i);
 
-        pbuf = UINT16ToHex (buf, range->from, eptr);
-        *pbuf++ = ' ';
-        pbuf = UINT16ToHex (pbuf, range->to, eptr);
+        pbuf = CidRangeToHex(buf, range->from, range->to, eptr);
         *pbuf++ = ' ';
         pbuf = HPDF_IToA (pbuf, range->cid, eptr);
         HPDF_StrCpy (pbuf, "\r\n", eptr);
@@ -983,9 +1041,7 @@ CreateCMap  (HPDF_Encoder   encoder,
     for (i = 0; i < attr->cmap_range->count; i++) {
         HPDF_CidRange_Rec *range = HPDF_List_ItemAt (attr->cmap_range, i);
 
-        pbuf = UINT16ToHex (buf, range->from, eptr);
-        *pbuf++ = ' ';
-        pbuf = UINT16ToHex (pbuf, range->to, eptr);
+        pbuf = CidRangeToHex(buf, range->from, range->to, eptr);
         *pbuf++ = ' ';
         pbuf = HPDF_IToA (pbuf, range->cid, eptr);
         HPDF_StrCpy (pbuf, "\r\n", eptr);
@@ -994,7 +1050,7 @@ CreateCMap  (HPDF_Encoder   encoder,
 
         if ((i + 1) %100 == 0) {
             phase--;
-            pbuf = HPDF_StrCpy (buf, "endcidrange\r\n\r\n", eptr);
+            pbuf = (char *)HPDF_StrCpy (buf, "endcidrange\r\n\r\n", eptr);
 
             if (phase > 0)
                 pbuf = HPDF_IToA (pbuf, 100, eptr);
@@ -1011,14 +1067,14 @@ CreateCMap  (HPDF_Encoder   encoder,
     }
 
     if (odd > 0)
-        pbuf = HPDF_StrCpy (buf, "endcidrange\r\n", eptr);
+        pbuf = (char *)HPDF_StrCpy (buf, "endcidrange\r\n", eptr);
 
-    pbuf = HPDF_StrCpy (pbuf, "endcmap\r\n", eptr);
-    pbuf = HPDF_StrCpy (pbuf, "CMapName currentdict /CMap "
+    pbuf = (char *)HPDF_StrCpy (pbuf, "endcmap\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "CMapName currentdict /CMap "
             "defineresource pop\r\n", eptr);
-    pbuf = HPDF_StrCpy (pbuf, "end\r\n", eptr);
-    pbuf = HPDF_StrCpy (pbuf, "end\r\n\r\n", eptr);
-    pbuf = HPDF_StrCpy (pbuf, "%%EndResource\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "end\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "end\r\n\r\n", eptr);
+    pbuf = (char *)HPDF_StrCpy (pbuf, "%%EndResource\r\n", eptr);
     HPDF_StrCpy (pbuf, "%%EOF\r\n", eptr);
     ret += HPDF_Stream_WriteStr (cmap->stream, buf);
 

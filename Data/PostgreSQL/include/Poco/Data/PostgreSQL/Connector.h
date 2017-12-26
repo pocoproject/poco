@@ -25,7 +25,7 @@
 #include <string>
 
 // Note: to avoid static (de)initialization problems,
-// during connector automatic (un)registration, it is 
+// during connector automatic (un)registration, it is
 // best to have this as a macro.
 
 #define POCO_DATA_POSTGRESQL_CONNECTOR_NAME "postgresql"
@@ -65,14 +65,14 @@ public:
 } } } // namespace Poco::Data::PostgreSQL
 
 
-// 
+//
 // Automatic Connector registration
-// 
+//
 
 struct PostgreSQL_API PostgreSQLConnectorRegistrator
 	/// Connector registering class.
 	/// A global instance of this class is instantiated
-	/// with sole purpose to automatically register the 
+	/// with sole purpose to automatically register the
 	/// PostgreSQL connector with central Poco Data registry.
 {
 	PostgreSQLConnectorRegistrator()
@@ -111,9 +111,9 @@ struct PostgreSQL_API PostgreSQLConnectorRegistrator
 	POCO_DATA_POSTGRESQL_FORCE_SYMBOL(pocoPostgreSQLConnectorRegistrator)
 #endif // POCO_NO_AUTOMATIC_LIB_INIT
 
-// 
+//
 // End automatic Connector registration
-// 
+//
 
 
 #endif // Data_PostgreSQL_Connector_INCLUDED

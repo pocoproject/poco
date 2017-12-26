@@ -26,11 +26,11 @@ namespace Poco {
 
 
 template <
-	class TKey, 
-	class TValue, 
-	class TMutex = FastMutex, 
+	class TKey,
+	class TValue,
+	class TMutex = FastMutex,
 	class TEventMutex = FastMutex
-> 
+>
 class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue>, TMutex, TEventMutex>
 	/// An ExpireCache caches entries for a fixed time period (per default 10 minutes).
 	/// Entries expire independently of the access pattern, i.e. after a constant time.
@@ -40,11 +40,11 @@ class ExpireCache: public AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValu
 	/// Be careful when using an ExpireCache. A cache is often used
 	/// like cache.has(x) followed by cache.get x). Note that it could happen
 	/// that the "has" call works, then the current execution thread gets descheduled, time passes,
-	/// the entry gets invalid, thus leading to an empty SharedPtr being returned 
+	/// the entry gets invalid, thus leading to an empty SharedPtr being returned
 	/// when "get" is invoked.
 {
 public:
-	ExpireCache(Timestamp::TimeDiff expire = 600000): 
+	ExpireCache(Timestamp::TimeDiff expire = 600000):
 		AbstractCache<TKey, TValue, ExpireStrategy<TKey, TValue>, TMutex, TEventMutex>(ExpireStrategy<TKey, TValue>(expire))
 	{
 	}

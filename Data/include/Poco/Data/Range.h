@@ -66,7 +66,7 @@ inline const Limit& Range::upper() const
 namespace Keywords {
 
 
-template <typename T> 
+template <typename T>
 Limit limit(T lim, bool hard = false)
 	/// Creates an upperLimit
 {
@@ -74,21 +74,21 @@ Limit limit(T lim, bool hard = false)
 }
 
 
-template <typename T> 
+template <typename T>
 Limit upperLimit(T lim, bool hard = false)
 {
 	return limit(lim, hard);
 }
 
 
-template <typename T> 
+template <typename T>
 Limit lowerLimit(T lim)
 {
 	return Limit(static_cast<Limit::SizeT>(lim), true, true);
 }
 
 
-template <typename T> 
+template <typename T>
 Range range(T low, T upp, bool hard = false)
 {
 	return Range(static_cast<Limit::SizeT>(low), static_cast<Limit::SizeT>(upp), hard);

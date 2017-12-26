@@ -62,7 +62,7 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	{
 		int n = SocketImpl::sendBytes(p, remaining, flags);
 		poco_assert_dbg (n >= 0);
-		p += n; 
+		p += n;
 		sent += n;
 		remaining -= n;
 		if (blocking && remaining > 0)

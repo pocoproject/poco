@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  ObjectId
@@ -47,7 +45,7 @@ public:
 	typedef SharedPtr<ObjectId> Ptr;
 
 	explicit ObjectId(const std::string& id);
-		/// Creates an ObjectId from a string. 
+		/// Creates an ObjectId from a string.
 		///
 		/// The string must contain a hexadecimal representation
 		/// of an object ID. This means a string of 24 characters.
@@ -63,7 +61,7 @@ public:
 
 	std::string toString(const std::string& fmt = "%02x") const;
 		/// Returns the id in string format. The fmt parameter
-		/// specifies the formatting used for individual members 
+		/// specifies the formatting used for individual members
 		/// of the ID char array.
 
 private:

@@ -21,10 +21,10 @@
 
 #if defined(_MSC_VER) && !defined(POCO_MSVC_SECURE_WARNINGS) && !defined(_CRT_SECURE_NO_DEPRECATE)
 	#define _CRT_SECURE_NO_DEPRECATE
-#endif 
+#endif
 
 
-// Verify that we're built with the multithreaded 
+// Verify that we're built with the multithreaded
 // versions of the runtime libraries
 #if defined(_MSC_VER) && !defined(_MT)
 	#error Must compile with /MD, /MDd, /MT or /MTd
@@ -61,17 +61,6 @@
 #elif (_MSC_VER >= 1910) && (_MSC_VER < 2000) // Visual Studio 2017, MSVC++ 14.1
 	#define POCO_MSVS_VERSION 2017
 	#define POCO_MSVC_VERSION 141
-#endif
-
-
-// Unicode Support
-#if defined(UNICODE) && !defined(POCO_WIN32_UTF8)
-	#define POCO_WIN32_UTF8
-#endif
-
-
-#if !defined(POCO_WIN32_UTF8)
-	#pragma message("Compiling POCO on Windows without #define POCO_WIN32_UTF8 is deprecated.")
 #endif
 
 

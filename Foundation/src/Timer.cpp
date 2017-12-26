@@ -21,8 +21,8 @@
 namespace Poco {
 
 
-Timer::Timer(long startInterval, long periodicInterval): 
-	_startInterval(startInterval), 
+Timer::Timer(long startInterval, long periodicInterval):
+	_startInterval(startInterval),
 	_periodicInterval(periodicInterval),
 	_skipped(0),
 	_pCallback(0)

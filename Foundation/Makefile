@@ -8,7 +8,8 @@ include $(POCO_BASE)/build/rules/global
 
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
-	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
+	BinaryReader BinaryWriter Bugcheck ByteOrder Channel \
+	Checksum Checksum32 Checksum64 Clock Configurable ConsoleChannel \
 	Condition CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event Error EventArgs EventChannel ErrorHandler Exception FIFOBufferStream FPEnvironment  \
@@ -30,7 +31,7 @@ objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel \
 	FileStreamFactory URIStreamFactory URIStreamOpener UTF32Encoding UTF16Encoding UTF8Encoding UTF8String \
 	Unicode UnicodeConverter Windows1250Encoding Windows1251Encoding Windows1252Encoding \
 	UUID UUIDGenerator Void Var VarHolder VarIterator Format Pipe PipeImpl PipeStream SharedMemory \
-	MemoryStream FileStream AtomicCounter 
+	MemoryStream FileStream AtomicCounter
 
 zlib_objects = adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil

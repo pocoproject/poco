@@ -36,9 +36,7 @@ Document::Document(const std::string fileName,
 	_pRawData(0),
 	_size(0)
 {
-	compression(COMPRESSION_ALL);
-	for (Poco::UInt32 i = 0; i < pageCount; ++i)
-		addPage(pageSize, orientation);
+	init(pageCount, pageSize, orientation);
 }
 
 
@@ -49,9 +47,7 @@ Document::Document(Poco::UInt32 pageCount,
 	_pRawData(0),
 	_size(0)
 {
-	compression(COMPRESSION_ALL);
-	for (Poco::UInt32 i = 0; i < pageCount; ++i)
-		addPage();
+	init(pageCount, pageSize, orientation);
 }
 
 
@@ -59,6 +55,16 @@ Document::~Document()
 {
 	HPDF_Free(_pdf);
 	delete _pRawData;
+}
+
+
+void Document::init(Poco::UInt32 pageCount,
+	Page::Size pageSize, Page::Orientation orientation)
+{
+	useUTF8Encoding();
+	compression(COMPRESSION_ALL);
+	for (Poco::UInt32 i = 0; i < pageCount; ++i)
+		addPage(pageSize, orientation);
 }
 
 
@@ -99,7 +105,7 @@ Document::SizeType Document::size()
 
 const Page& Document::addPage(Page::Size pageSize, Page::Orientation orientation)
 {
-	Page page(&_pdf, HPDF_AddPage(_pdf), pageSize);
+	Page page(this, HPDF_AddPage(_pdf), pageSize);
 	page.setSizeAndOrientation(pageSize, orientation);
 	_pages.push_back(page);
 	return _pages.back();
@@ -114,7 +120,7 @@ const Page& Document::insertPage(int index,
 	poco_assert (index < _pages.size());
 	HPDF_Page target = *((HPDF_Page*) HPDF_List_ItemAt(_pdf->page_list, static_cast<HPDF_UINT>(index)));
 	return *_pages.insert(_pages.begin() + index,
-		Page(&_pdf,
+		Page(this,
 			HPDF_InsertPage(_pdf, target),
 			pageSize,
 			orientation));
@@ -123,7 +129,7 @@ const Page& Document::insertPage(int index,
 
 const Page& Document::getCurrentPage()
 {
-	Page p(&_pdf, HPDF_GetCurrentPage(_pdf));
+	Page p(this, HPDF_GetCurrentPage(_pdf));
 	PageContainer::iterator it = _pages.begin();
 	PageContainer::iterator end = _pages.end();
 	for (;it != end; ++it)
@@ -149,7 +155,7 @@ const Font& Document::font(const std::string& name, const std::string& encoding)
 {
 	FontContainer::iterator it = _fonts.find(name);
 	if (_fonts.end() != it) return it->second;
-		
+
 	return loadFont(name, encoding);
 }
 
@@ -160,20 +166,20 @@ std::string Document::loadType1Font(const std::string& afmFileName, const std::s
 }
 
 
-std::string Document::loadTTFont(const std::string& fileName, bool embedding, int index)
+std::string Document::loadTTFont(const std::string& fileName, bool embed, int index)
 {
 	if (-1 == index)
 	{
 		return HPDF_LoadTTFontFromFile(_pdf,
 			fileName.c_str(),
-			embedding ? HPDF_TRUE : HPDF_FALSE);
+			embed ? HPDF_TRUE : HPDF_FALSE);
 	}
 	else if (index >= 0)
 	{
 		return HPDF_LoadTTFontFromFile2(_pdf, 
 			fileName.c_str(), 
 			static_cast<HPDF_UINT>(index), 
-			embedding ? HPDF_TRUE : HPDF_FALSE);
+			embed ? HPDF_TRUE : HPDF_FALSE);
 	}
 	else
 		throw InvalidArgumentException("Invalid font index.");

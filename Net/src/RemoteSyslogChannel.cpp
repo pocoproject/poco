@@ -134,7 +134,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 		m += ' ';
 		m += _name;
 		m += ' ';
-		Poco::NumberFormatter::append(m, msg.getPid());
+		Poco::NumberFormatter::append(m, static_cast<Poco::UInt64>(msg.getPid()));
 		m += ' ';
 		m += msg.getSource();
 	}

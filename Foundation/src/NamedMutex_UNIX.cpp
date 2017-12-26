@@ -55,13 +55,13 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 	std::string fileName = getFileName();
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 1);
-	if ((long) _sem == (long) SEM_FAILED) 
+	if ((long) _sem == (long) SEM_FAILED)
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
 	int fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
 		close(fd);
-	else 
+	else
 		throw SystemException(Poco::format("cannot create named mutex %s (lockfile)", fileName), _name);
 	key_t key = ftok(fileName.c_str(), 'p');
 	if (key == -1)
@@ -72,12 +72,17 @@ NamedMutexImpl::NamedMutexImpl(const std::string& name):
 		union semun arg;
 		arg.val = 1;
 		semctl(_semid, 0, SETVAL, arg);
+		_owned = true;
+		return;
 	}
 	else if (errno == EEXIST)
 	{
 		_semid = semget(key, 1, 0);
+		_owned = false;
+		if (_semid >= 0) return;
 	}
-	else throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
+
+	throw SystemException(Poco::format("cannot create named mutex %s (semget() failed, errno=%d)", fileName, errno), _name);
 #endif // defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 }
 
@@ -86,6 +91,8 @@ NamedMutexImpl::~NamedMutexImpl()
 {
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 	sem_close(_sem);
+#else
+	if (_owned) semctl(_semid, 0, IPC_RMID, 0);
 #endif
 }
 

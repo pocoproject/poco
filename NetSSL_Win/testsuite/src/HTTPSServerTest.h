@@ -1,8 +1,6 @@
 //
 // HTTPSServerTest.h
 //
-// $Id$
-//
 // Definition of the HTTPSServerTest class.
 //
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.

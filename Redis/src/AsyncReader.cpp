@@ -1,8 +1,6 @@
 //
 // AsyncReader.cpp
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  AsyncReader
@@ -23,7 +21,7 @@ namespace Poco {
 namespace Redis {
 
 
-AsyncReader::AsyncReader(Client& client): 
+AsyncReader::AsyncReader(Client& client):
 	_client(client),
 	_activity(this, &AsyncReader::runActivity)
 {
