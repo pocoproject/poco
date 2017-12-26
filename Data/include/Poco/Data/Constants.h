@@ -1,11 +1,7 @@
 //
-// Data.h
+// Constants.h
 //
-// Library: Data
-// Package: DataCore
-// Module:  Constants
-//
-// Constant definitions for the Poco Data library.
+// Forward for the Constants class header.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -14,23 +10,4 @@
 //
 
 
-#ifndef Data_Constants_INCLUDED
-#define Data_Constants_INCLUDED
-
-
-#undef max
-#include <limits>
-#include <cstddef>
-
-
-namespace Poco {
-namespace Data {
-
-
-static const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
-
-
-} } // namespace Poco::Data
-
-
-#endif // Data_Constants_INCLUDED
+#include "Poco/SQL/Constants.h"
