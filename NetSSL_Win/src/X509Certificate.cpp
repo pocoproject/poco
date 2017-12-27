@@ -397,8 +397,8 @@ void X509Certificate::importCertificate(const std::string& certPath)
 	Poco::File certFile(certPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(certPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::SQLFormatException("certificate file too large", certPath);
-	if (size < 32) throw Poco::SQLFormatException("certificate file too small", certPath);
+	if (size > 4096) throw Poco::DataFormatException("certificate file too large", certPath);
+	if (size < 32) throw Poco::DataFormatException("certificate file too small", certPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(certPath);
 	istr.read(buffer.begin(), buffer.size());
@@ -436,7 +436,7 @@ void X509Certificate::importPEMCertificate(const char* pBuffer, std::size_t size
 	const char* pemBegin = pBuffer;
 	const char* pemEnd = pemBegin + (size - 25);
 	while (pemEnd > pemBegin && std::memcmp(pemEnd, "-----END CERTIFICATE-----", 25) != 0) --pemEnd;
-	if (pemEnd == pemBegin) throw Poco::SQLFormatException("Not a valid PEM file - end marker missing");
+	if (pemEnd == pemBegin) throw Poco::DataFormatException("Not a valid PEM file - end marker missing");
 
 	Poco::MemoryInputStream istr(pemBegin, pemEnd - pemBegin);
 	Poco::Base64Decoder dec(istr);
@@ -460,7 +460,7 @@ void X509Certificate::importDERCertificate(const char* pBuffer, std::size_t size
 	_pCert = CertCreateCertificateContext(X509_ASN_ENCODING, reinterpret_cast<const BYTE*>(pBuffer), static_cast<DWORD>(size));
 	if (!_pCert)
 	{
-		throw Poco::SQLFormatException("Failed to load certificate from file", GetLastError());
+		throw Poco::DataFormatException("Failed to load certificate from file", GetLastError());
 	}
 }
 

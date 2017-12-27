@@ -257,7 +257,7 @@ protected:
 		switch (err)
 		{
 		case SZ_ERROR_DATA:
-			throw Poco::SQLFormatException("archive", _path, err);
+			throw Poco::DataFormatException("archive", _path, err);
 		case SZ_ERROR_MEM:
 			throw Poco::RuntimeException("7z library out of memory", err);
 		case SZ_ERROR_CRC:

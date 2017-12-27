@@ -25,7 +25,7 @@
 #endif
 
 
-using Poco::SQLFormatException;
+using Poco::DataFormatException;
 
 
 namespace Poco {

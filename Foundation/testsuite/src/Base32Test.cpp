@@ -19,7 +19,7 @@
 
 using Poco::Base32Encoder;
 using Poco::Base32Decoder;
-using Poco::SQLFormatException;
+using Poco::DataFormatException;
 
 
 Base32Test::Base32Test(const std::string& rName): CppUnit::TestCase(rName)

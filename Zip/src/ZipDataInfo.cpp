@@ -49,7 +49,7 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 		if (in.gcount() != ZipCommon::HEADER_SIZE)
 			throw Poco::IOException("Failed to read data info header");
 		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
-			throw Poco::SQLFormatException("Bad data info header");
+			throw Poco::DataFormatException("Bad data info header");
 	}
 	// now copy the rest of the header
 	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
@@ -89,7 +89,7 @@ ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
 		if (in.gcount() != ZipCommon::HEADER_SIZE)
 			throw Poco::IOException("Failed to read data info header");
 		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
-			throw Poco::SQLFormatException("Bad data info header");
+			throw Poco::DataFormatException("Bad data info header");
 	}
 
 	// now copy the rest of the header

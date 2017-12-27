@@ -606,7 +606,7 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 			break;
 		}
 	}
-	if (!done) throw Poco::SQLFormatException("unterminated JSON string");
+	if (!done) throw Poco::DataFormatException("unterminated JSON string");
 	return result;
 }
 
