@@ -1,7 +1,7 @@
 #
 # Makefile
 #
-# Makefile for Poco Data testsuite
+# Makefile for Poco SQL testsuite
 #
 
 include $(POCO_BASE)/build/rules/global
@@ -14,12 +14,12 @@ ifeq ($(findstring SunOS,$(POCO_HOST_OSNAME)),SunOS)
   endif
 endif
 
-objects = DataTestSuite Driver \
-	DataTest SessionPoolTest \
+objects = SQLTestSuite Driver \
+	SQLTest SessionPoolTest \
 	Binder Extractor Preparator SessionImpl Connector TestStatementImpl
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoData PocoFoundation PocoCppUnit
+target_libs    = PocoSQL PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

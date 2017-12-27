@@ -12,8 +12,8 @@ objects = Binder ConnectionHandle Connector EnvironmentHandle \
 	Extractor ODBCException ODBCMetaColumn ODBCStatementImpl \
 	Parameter Preparator SessionImpl TypeInfo Unicode Utility
 
-target         = PocoDataODBC
+target         = PocoSQLODBC
 target_version = $(LIBVERSION)
-target_libs    = PocoData PocoFoundation
+target_libs    = PocoSQL PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

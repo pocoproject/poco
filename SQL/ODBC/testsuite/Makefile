@@ -12,7 +12,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-include $(POCO_BASE)/Data/ODBC/ODBC.make
+include $(POCO_BASE)/SQL/ODBC/ODBC.make
 
 ##################################################################################################
 # Note:                                                                                          #
@@ -38,6 +38,6 @@ endif
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataODBC PocoData PocoFoundation PocoCppUnit
+target_libs    = PocoSQLODBC PocoSQL PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

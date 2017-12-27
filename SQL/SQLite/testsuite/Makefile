@@ -11,6 +11,6 @@ objects = SQLiteTestSuite Driver \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataSQLite PocoData PocoFoundation PocoCppUnit
+target_libs    = PocoSQLSQLite PocoSQL PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec

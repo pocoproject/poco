@@ -24,8 +24,8 @@ objects = Binder Extractor SessionImpl Connector \
 	MySQLStatementImpl ResultMetadata MySQLException \
 	SessionHandle StatementExecutor Utility
 
-target         = PocoDataMySQL
+target         = PocoSQLMySQL
 target_version = $(LIBVERSION)
-target_libs    = PocoData PocoFoundation
+target_libs    = PocoSQL PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

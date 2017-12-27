@@ -15,7 +15,7 @@ objects = AbstractBinder AbstractBinding AbstractExtraction AbstractExtractor \
 	SessionPool SessionPoolContainer SQLChannel \
 	Statement StatementCreator StatementImpl Time
 
-target         = PocoData
+target         = PocoSQL
 target_version = $(LIBVERSION)
 target_libs    = PocoFoundation
 
