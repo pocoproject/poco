@@ -50,4 +50,4 @@ MetaColumn::~MetaColumn()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

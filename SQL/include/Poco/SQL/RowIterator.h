@@ -132,7 +132,7 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 namespace std

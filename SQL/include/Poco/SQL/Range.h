@@ -98,7 +98,7 @@ Range range(T low, T upp, bool hard = false)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Range_INCLUDED

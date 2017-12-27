@@ -215,7 +215,7 @@ inline std::string SessionImpl::uri() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_SessionImpl_INCLUDED

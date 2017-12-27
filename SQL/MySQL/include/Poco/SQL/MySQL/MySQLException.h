@@ -34,7 +34,7 @@ namespace MySQL {
 // End-user include this file and use in code ConnectionException/StatementException
 // So it need not know
 
-class MySQL_API MySQLException: public Poco::SQL::DataException
+class MySQL_API MySQLException: public Poco::SQL::SQLException
 	/// Base class for all MySQL exceptions
 {
 public:
@@ -126,7 +126,7 @@ private:
 
 inline MySQLException& MySQLException::operator=(const MySQLException& exc)
 {
-	Poco::SQL::DataException::operator=(exc);
+	Poco::SQL::SQLException::operator=(exc);
 	return *this;
 }
 

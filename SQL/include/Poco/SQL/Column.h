@@ -483,7 +483,7 @@ inline void swap(Column<C>& c1, Column<C>& c2)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Column_INCLUDED

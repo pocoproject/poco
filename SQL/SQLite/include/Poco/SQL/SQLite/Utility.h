@@ -196,7 +196,7 @@ public:
 
 private:
 	Utility();
-		/// Maps SQLite column declared types to Poco::Data types through
+		/// Maps SQLite column declared types to Poco::SQL types through
 		/// static TypeMap member.
 		///
 		/// Note: SQLite is type-agnostic and it is the end-user responsibility

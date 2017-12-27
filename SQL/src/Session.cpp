@@ -75,4 +75,4 @@ void Session::swap(Session& other)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

@@ -257,13 +257,13 @@ protected:
 		switch (err)
 		{
 		case SZ_ERROR_DATA:
-			throw Poco::DataFormatException("archive", _path, err);
+			throw Poco::SQLFormatException("archive", _path, err);
 		case SZ_ERROR_MEM:
 			throw Poco::RuntimeException("7z library out of memory", err);
 		case SZ_ERROR_CRC:
-			throw Poco::DataException("CRC error", arg, err);
+			throw Poco::SQLException("CRC error", arg, err);
 		case SZ_ERROR_UNSUPPORTED:
-			throw Poco::DataException("unsupported archive format", arg, err);
+			throw Poco::SQLException("unsupported archive format", arg, err);
 		case SZ_ERROR_PARAM:
 			throw Poco::InvalidArgumentException("7z library", err);
 		case SZ_ERROR_INPUT_EOF:

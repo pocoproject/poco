@@ -19,7 +19,7 @@
 
 using Poco::HexBinaryEncoder;
 using Poco::HexBinaryDecoder;
-using Poco::DataFormatException;
+using Poco::SQLFormatException;
 
 
 HexBinaryTest::HexBinaryTest(const std::string& rName): CppUnit::TestCase(rName)

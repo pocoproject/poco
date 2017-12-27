@@ -211,7 +211,7 @@ inline bool SQLChannel::isTrue(const std::string& value) const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_SQLChannel_INCLUDED

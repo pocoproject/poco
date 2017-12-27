@@ -60,7 +60,7 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 		if (inp.gcount() != ZipCommon::HEADER_SIZE)
 			throw Poco::IOException("Failed to read archive info header");
 		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
-			throw Poco::DataFormatException("Bad archive info header");
+			throw Poco::SQLFormatException("Bad archive info header");
 	}
 	else
 	{
@@ -141,7 +141,7 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 		if (inp.gcount() != ZipCommon::HEADER_SIZE)
 			throw Poco::IOException("Failed to read archive info header");
 		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
-			throw Poco::DataFormatException("Bad archive info header");
+			throw Poco::SQLFormatException("Bad archive info header");
 	}
 	else
 	{
@@ -173,7 +173,7 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	if (inp.gcount() != FULL_LOCATOR_SIZE)
 		throw Poco::IOException("Failed to read locator");
 	if (std::memcmp(_locInfo, LOCATOR_HEADER, ZipCommon::HEADER_SIZE) != 0)
-		throw Poco::DataFormatException("Bad locator header");
+		throw Poco::SQLFormatException("Bad locator header");
 
 }
 

@@ -88,7 +88,7 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 		if (inp.gcount() != ZipCommon::HEADER_SIZE)
 			throw Poco::IOException("Failed to read file info header");
 		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
-			throw Poco::DataFormatException("Bad file info header");
+			throw Poco::SQLFormatException("Bad file info header");
 	}
 	else
 	{

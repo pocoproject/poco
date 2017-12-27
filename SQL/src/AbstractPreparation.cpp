@@ -31,4 +31,4 @@ AbstractPreparation::~AbstractPreparation()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

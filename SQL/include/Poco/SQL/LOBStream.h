@@ -144,7 +144,7 @@ typedef LOBOutputStream<char> CLOBOutputStream;
 typedef LOBInputStream<unsigned char> BLOBInputStream;
 typedef LOBInputStream<char> CLOBInputStream;
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_LOBStream_INCLUDED

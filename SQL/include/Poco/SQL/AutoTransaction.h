@@ -29,7 +29,7 @@ namespace SQL {
 typedef Transaction AutoTransaction;
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_AutoTransaction_INCLUDED

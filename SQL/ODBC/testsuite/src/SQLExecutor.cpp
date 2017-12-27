@@ -314,7 +314,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 const std::string SQLExecutor::MULTI_INSERT =

@@ -93,7 +93,7 @@ inline int PooledSessionHolder::idle() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_PooledSessionHolder_INCLUDED

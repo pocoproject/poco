@@ -100,7 +100,7 @@ Time& Time::operator = (const Var& var)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #ifdef __GNUC__

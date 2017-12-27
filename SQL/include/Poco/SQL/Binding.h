@@ -1521,7 +1521,7 @@ inline AbstractBinding::Ptr bind(T t)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Binding_INCLUDED

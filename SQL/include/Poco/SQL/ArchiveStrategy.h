@@ -216,7 +216,7 @@ inline const std::string& ArchiveByAgeStrategy::getThreshold() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_ArchiveStrategy_INCLUDED

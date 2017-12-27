@@ -91,7 +91,7 @@ inline SessionImpl* PooledSessionImpl::impl() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_PooledSessionImpl_INCLUDED

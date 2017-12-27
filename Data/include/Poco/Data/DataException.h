@@ -15,5 +15,5 @@
 
 namespace Poco {
 namespace SQL {
-	typedef SQLException DataException
+	typedef SQLException SQLException
 } } // namespace Poco::SQL

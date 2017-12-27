@@ -107,7 +107,7 @@ inline bool Limit::operator != (const Limit& other) const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Limit_INCLUDED

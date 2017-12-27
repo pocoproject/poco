@@ -345,7 +345,7 @@ inline void AbstractExtractor::reset()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_AbstractExtractor_INCLUDED

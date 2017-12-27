@@ -397,4 +397,4 @@ bool RecordSet::isFiltered() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

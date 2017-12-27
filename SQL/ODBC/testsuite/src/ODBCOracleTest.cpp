@@ -24,7 +24,7 @@
 
 
 using namespace Poco::SQL::Keywords;
-using Poco::SQL::DataException;
+using Poco::SQL::SQLException;
 using Poco::SQL::Statement;
 using Poco::SQL::RecordSet;
 using Poco::SQL::AutoTransaction;
@@ -193,7 +193,7 @@ void ODBCOracleTest::testBLOB()
 		executor().blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&)
+	catch (SQLException&)
 	{
 		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -213,7 +213,7 @@ void ODBCOracleTest::testBLOB()
 		executor().blob(maxFldSize+1);
 		fail ("must fail");
 	}
-	catch (DataException&) { }
+	catch (SQLException&) { }
 }
 
 

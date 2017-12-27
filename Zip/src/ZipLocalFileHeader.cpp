@@ -119,7 +119,7 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 		if (inp.gcount() != ZipCommon::HEADER_SIZE)
 			throw Poco::IOException("Failed to read local file header");
 		if (std::memcmp(_rawHeader, HEADER, ZipCommon::HEADER_SIZE) != 0)
-			throw Poco::DataFormatException("Bad local file header");
+			throw Poco::SQLFormatException("Bad local file header");
     }
     else
     {

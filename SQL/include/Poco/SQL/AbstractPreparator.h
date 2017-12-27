@@ -382,7 +382,7 @@ inline bool AbstractPreparator::isBulk() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_AbstractPreparator_INCLUDED

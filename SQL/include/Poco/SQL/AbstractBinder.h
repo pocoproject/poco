@@ -436,7 +436,7 @@ inline bool AbstractBinder::isInBound(Direction dir)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_AbstractBinder_INCLUDED

@@ -151,7 +151,7 @@ inline bool Date::operator > (const Date& date) const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 //

@@ -151,7 +151,7 @@ inline bool Time::operator > (const Time& time) const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 //

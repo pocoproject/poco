@@ -30,7 +30,7 @@ namespace SQL {
 static const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Constants_INCLUDED

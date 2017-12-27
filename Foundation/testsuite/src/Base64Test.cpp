@@ -19,7 +19,7 @@
 
 using Poco::Base64Encoder;
 using Poco::Base64Decoder;
-using Poco::DataFormatException;
+using Poco::SQLFormatException;
 
 
 Base64Test::Base64Test(const std::string& rName): CppUnit::TestCase(rName)

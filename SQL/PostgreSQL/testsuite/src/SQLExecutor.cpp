@@ -50,7 +50,7 @@
 #include <limits>
 
 
-using namespace Poco::Data;
+using namespace Poco::SQL;
 using namespace Poco::SQL::Keywords;
 using Poco::SQL::PostgreSQL::PostgreSQLException;
 using Poco::SQL::PostgreSQL::ConnectionException;
@@ -156,7 +156,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::SQL::Session* pSession):

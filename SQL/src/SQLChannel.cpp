@@ -293,4 +293,4 @@ void SQLChannel::registerChannel()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

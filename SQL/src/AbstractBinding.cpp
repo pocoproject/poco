@@ -42,4 +42,4 @@ void AbstractBinding::setBinder(BinderPtr pBinder)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

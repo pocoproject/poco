@@ -29,4 +29,4 @@ Connector::~Connector()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

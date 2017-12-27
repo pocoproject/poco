@@ -20,7 +20,7 @@
 
 using Poco::UnbufferedStreamBuf;
 using Poco::NumberParser;
-using Poco::DataFormatException;
+using Poco::SQLFormatException;
 
 
 namespace Poco {

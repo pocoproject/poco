@@ -30,7 +30,7 @@ template <typename T> class LOB;
 typedef LOB<unsigned char> BLOB;
 typedef LOB<char> CLOB;
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 namespace Poco {

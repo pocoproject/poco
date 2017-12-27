@@ -303,4 +303,4 @@ void Statement::setTotalRowCount(const std::string& sql)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

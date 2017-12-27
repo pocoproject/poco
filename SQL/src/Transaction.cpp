@@ -121,4 +121,4 @@ void Transaction::rollback()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

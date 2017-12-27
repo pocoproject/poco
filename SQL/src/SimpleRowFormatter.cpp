@@ -110,4 +110,4 @@ std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string&
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

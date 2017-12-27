@@ -101,7 +101,7 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 namespace std

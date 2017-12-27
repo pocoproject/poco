@@ -188,7 +188,7 @@ inline void Transaction::setLogger(Poco::Logger* pLogger)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Transaction_INCLUDED

@@ -76,7 +76,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 int main(int argc, char** argv)

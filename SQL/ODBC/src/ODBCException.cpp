@@ -21,7 +21,7 @@ namespace SQL {
 namespace ODBC {
 
 
-POCO_IMPLEMENT_EXCEPTION(ODBCException, Poco::SQL::DataException, "Generic ODBC error")
+POCO_IMPLEMENT_EXCEPTION(ODBCException, Poco::SQL::SQLException, "Generic ODBC error")
 POCO_IMPLEMENT_EXCEPTION(InsufficientStorageException, ODBCException, "Insufficient storage error")
 POCO_IMPLEMENT_EXCEPTION(UnknownDataLengthException, ODBCException, "Unknown length of remaining data")
 POCO_IMPLEMENT_EXCEPTION(DataTruncatedException, ODBCException, "Variable length character or binary data truncated")

@@ -90,4 +90,4 @@ SessionFactory::SessionInfo::SessionInfo(Connector* pSI):
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
