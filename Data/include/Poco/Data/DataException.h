@@ -9,7 +9,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
+#include "Poco/Data/Data.h"
 #include "Poco/SQL/SQLException.h"
 
 
