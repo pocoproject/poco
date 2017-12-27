@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-COMMONFLAGS += -I$(POCO_BASE)/Data/SQLite/src
+COMMONFLAGS += -I$(POCO_BASE)/SQL/SQLite/src
 
 SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS \
         -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE \
@@ -23,8 +23,8 @@ else
         objects += $(sqlite_objects)
 endif
 
-target         = PocoDataSQLite
+target         = PocoSQLSQLite
 target_version = $(LIBVERSION)
-target_libs    = PocoData PocoFoundation
+target_libs    = PocoSQL PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib
