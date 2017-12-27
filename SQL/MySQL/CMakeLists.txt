@@ -1,4 +1,4 @@
-set(LIBNAME "DataMySQL")
+set(LIBNAME "SQLMySQL")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
@@ -20,7 +20,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL MySQL_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Data ${MYSQL_LIB})
+target_link_libraries( "${LIBNAME}" Foundation SQL ${MYSQL_LIB})
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

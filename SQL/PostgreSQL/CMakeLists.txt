@@ -1,4 +1,4 @@
-set(LIBNAME "DataPostgreSQL")
+set(LIBNAME "SQLPostgreSQL")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
@@ -18,7 +18,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL PostgreSQL_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Data ${PostgreSQL_LIBRARIES})
+target_link_libraries( "${LIBNAME}" Foundation SQL ${PostgreSQL_LIBRARIES})
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

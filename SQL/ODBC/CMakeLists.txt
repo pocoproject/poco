@@ -1,4 +1,4 @@
-set(LIBNAME "DataODBC")
+set(LIBNAME "SQLODBC")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
@@ -20,7 +20,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Data ${ODBC_LIBRARIES})
+target_link_libraries( "${LIBNAME}" Foundation SQL ${ODBC_LIBRARIES})
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
