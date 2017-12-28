@@ -29,4 +29,4 @@ Position::~Position()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

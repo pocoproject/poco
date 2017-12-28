@@ -311,11 +311,11 @@ protected:
 		/// by the statement implementation.
 
 	std::size_t activateNextDataSet();
-		/// Returns the next data set index, or throws NoDataException if the last
+		/// Returns the next data set index, or throws NoSQLException if the last
 		/// data set was reached.
 
 	std::size_t activatePreviousDataSet();
-		/// Returns the previous data set index, or throws NoDataException if the last
+		/// Returns the previous data set index, or throws NoSQLException if the last
 		/// data set was reached.
 
 	void firstDataSet();
@@ -684,7 +684,7 @@ inline void StatementImpl::firstDataSet()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_StatementImpl_INCLUDED

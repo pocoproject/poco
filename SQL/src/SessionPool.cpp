@@ -305,4 +305,4 @@ void SessionPool::closeAll(SessionList& sessionList)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

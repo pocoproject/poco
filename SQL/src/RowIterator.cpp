@@ -204,4 +204,4 @@ RowIterator RowIterator::operator - (std::size_t diff) const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

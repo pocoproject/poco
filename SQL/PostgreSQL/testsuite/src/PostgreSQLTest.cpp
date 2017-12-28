@@ -46,7 +46,7 @@
 #include "Poco/SQL/SQLException.h"
 #include <iostream>
 
-using namespace Poco::Data;
+using namespace Poco::SQL;
 using namespace Poco::SQL::Keywords;
 using Poco::SQL::PostgreSQL::ConnectionException;
 using Poco::SQL::PostgreSQL::Utility;
@@ -633,7 +633,7 @@ void PostgreSQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&)
+	catch (SQLException&)
 	{
 		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -648,7 +648,7 @@ void PostgreSQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize+1);
 		fail ("must fail");
 	}
-	catch (DataException&) { }
+	catch (SQLException&) { }
 }
 
 void PostgreSQLTest::testCLOBStmt()

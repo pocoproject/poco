@@ -67,7 +67,7 @@ Var::operator BLOB () const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // __GNUC__

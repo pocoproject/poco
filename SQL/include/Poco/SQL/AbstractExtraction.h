@@ -273,7 +273,7 @@ inline bool AbstractExtraction::isValueNull(const Poco::UTF16String& str, bool d
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_AbstractExtraction_INCLUDED

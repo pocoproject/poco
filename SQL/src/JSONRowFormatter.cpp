@@ -188,4 +188,4 @@ std::string& JSONRowFormatter::formatNames(const NameVecPtr pNames, std::string&
 }
 
 
-} }// namespace Poco::Data
+} }// namespace Poco::SQL

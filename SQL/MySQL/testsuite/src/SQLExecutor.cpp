@@ -43,7 +43,7 @@ typedef unsigned long   ulong;          /* System V compatibility */
 
 #include <mysql.h>
 
-using namespace Poco::Data;
+using namespace Poco::SQL;
 using namespace Poco::SQL::Keywords;
 using Poco::SQL::MySQL::ConnectionException;
 using Poco::SQL::MySQL::StatementException;
@@ -149,7 +149,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::SQL::Session* pSession):

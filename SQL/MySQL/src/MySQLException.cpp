@@ -22,13 +22,13 @@ namespace MySQL {
 
 
 MySQLException::MySQLException(const std::string& msg, int errCode) :
-	Poco::SQL::DataException(std::string("[MySQL]: ") + msg, errCode)
+	Poco::SQL::SQLException(std::string("[MySQL]: ") + msg, errCode)
 {
 }
 
 
 MySQLException::MySQLException(const MySQLException& exc) :
-	Poco::SQL::DataException(exc)
+	Poco::SQL::SQLException(exc)
 {
 }
 

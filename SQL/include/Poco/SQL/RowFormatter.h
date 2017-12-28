@@ -237,7 +237,7 @@ inline RowFormatter::Ptr format(const T& formatter)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_RowFormatter_INCLUDED

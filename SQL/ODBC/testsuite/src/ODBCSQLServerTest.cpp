@@ -26,7 +26,7 @@
 
 
 using namespace Poco::SQL::Keywords;
-using Poco::SQL::DataException;
+using Poco::SQL::SQLException;
 using Poco::SQL::Statement;
 using Poco::SQL::RecordSet;
 using Poco::SQL::CLOB;
@@ -161,7 +161,7 @@ void ODBCSQLServerTest::testBLOB()
 		executor().blob(maxFldSize, "CONVERT(VARBINARY(MAX),?)");
 		fail ("must fail");
 	}
-	catch (DataException&)
+	catch (SQLException&)
 	{
 		session().setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -181,7 +181,7 @@ void ODBCSQLServerTest::testBLOB()
 		executor().blob(maxFldSize+1, "CONVERT(VARBINARY(MAX),?)");
 		fail ("must fail");
 	}
-	catch (DataException&) { }
+	catch (SQLException&) { }
 }
 
 

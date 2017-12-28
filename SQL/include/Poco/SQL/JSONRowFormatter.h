@@ -68,7 +68,7 @@ class Poco_SQL_API JSONRowFormatter: public Poco::SQL::RowFormatter
 	///        ]
 	///      }
 	///
-	/// Total row count will be specified by the Poco::DataRecordSet. Note, however, that this is
+	/// Total row count will be specified by the Poco::SQLRecordSet. Note, however, that this is
 	/// not possible to do accurately in case of result set paging. For those cases, there is
 	/// setTotalRowCount() member function, which allows to explicitly set the total row count.
 	/// If the total row count is preset on the formatter, the Data framework shall not interfere.
@@ -153,7 +153,7 @@ inline bool JSONRowFormatter::isFull()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_JSONRowFormatter_INCLUDED

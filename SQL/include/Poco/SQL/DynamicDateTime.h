@@ -30,7 +30,7 @@ namespace SQL {
 class Date;
 class Time;
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 namespace Poco {

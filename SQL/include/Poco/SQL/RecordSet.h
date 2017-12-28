@@ -633,7 +633,7 @@ inline size_t RecordSet::storageRowCount() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_RecordSet_INCLUDED

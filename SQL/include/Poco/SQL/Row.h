@@ -327,7 +327,7 @@ inline void Row::formatValues() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Row_INCLUDED

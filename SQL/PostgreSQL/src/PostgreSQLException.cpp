@@ -20,13 +20,13 @@ namespace PostgreSQL {
 
 
 PostgreSQLException::PostgreSQLException(const std::string& aMessage)
-: Poco::SQL::DataException(std::string("[PostgreSQL]: ") + aMessage)
+: Poco::SQL::SQLException(std::string("[PostgreSQL]: ") + aMessage)
 {
 }
 
 
 PostgreSQLException::PostgreSQLException(const PostgreSQLException& anException)
-: Poco::SQL::DataException(anException)
+: Poco::SQL::SQLException(anException)
 {
 }
 

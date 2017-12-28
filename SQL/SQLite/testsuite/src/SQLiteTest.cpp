@@ -234,7 +234,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 int SQLiteTest::_insertCounter;

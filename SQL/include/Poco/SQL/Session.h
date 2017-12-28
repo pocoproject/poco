@@ -476,7 +476,7 @@ inline void swap(Session& s1, Session& s2)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 namespace std

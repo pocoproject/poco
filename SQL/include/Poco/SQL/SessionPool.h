@@ -227,7 +227,7 @@ inline bool SessionPool::isActive() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_SessionPool_INCLUDED

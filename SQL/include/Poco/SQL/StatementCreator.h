@@ -67,7 +67,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_StatementCreator_INCLUDED

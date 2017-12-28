@@ -50,7 +50,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Connector_INCLUDED

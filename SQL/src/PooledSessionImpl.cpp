@@ -189,4 +189,4 @@ SessionImpl* PooledSessionImpl::access() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

@@ -270,7 +270,7 @@ AbstractExtraction::Ptr into(std::list<T>& t, BulkFnType, const Position& pos = 
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_BulkExtraction_INCLUDED

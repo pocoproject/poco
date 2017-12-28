@@ -195,7 +195,7 @@ inline void swap(LOB<T>& b1, LOB<T>& b2)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 namespace std

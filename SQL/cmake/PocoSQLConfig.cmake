@@ -1,3 +1,3 @@
 include(CMakeFindDependencyMacro)
 find_dependency(PocoFoundation)
-include("${CMAKE_CURRENT_LIST_DIR}/PocoDataTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/PocoSQLTargets.cmake")

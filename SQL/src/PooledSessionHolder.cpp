@@ -31,4 +31,4 @@ PooledSessionHolder::~PooledSessionHolder()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

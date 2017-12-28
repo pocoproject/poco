@@ -38,4 +38,4 @@ AbstractExtraction::~AbstractExtraction()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

@@ -270,7 +270,7 @@ inline bool RowFilter::isNull(const Poco::Dynamic::Var& p1, const Poco::Dynamic:
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_RowFilter_INCLUDED

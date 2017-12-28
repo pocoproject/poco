@@ -385,7 +385,7 @@ std::size_t StatementImpl::activateNextDataSet()
 {
 	if (_curDataSet + 1 < dataSetCount()) return ++_curDataSet;
 	else
-		throw NoDataException("End of data sets reached.");
+		throw NoSQLException("End of data sets reached.");
 }
 
 
@@ -393,7 +393,7 @@ std::size_t StatementImpl::activatePreviousDataSet()
 {
 	if (_curDataSet > 0) return --_curDataSet;
 	else
-		throw NoDataException("Beginning of data sets reached.");
+		throw NoSQLException("Beginning of data sets reached.");
 }
 
 
@@ -487,4 +487,4 @@ void StatementImpl::insertHint()
 {
 }
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

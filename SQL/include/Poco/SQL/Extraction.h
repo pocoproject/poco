@@ -925,7 +925,7 @@ inline AbstractExtractionVec& into(AbstractExtractionVec& ev)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Extraction_INCLUDED

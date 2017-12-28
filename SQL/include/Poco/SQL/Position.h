@@ -71,7 +71,7 @@ inline Position from(const T& value)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Position_INCLUDED

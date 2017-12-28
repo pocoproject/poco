@@ -90,7 +90,7 @@ inline void bulk(Void)
 typedef void (*BulkFnType)(Void);
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_Bulk_INCLUDED

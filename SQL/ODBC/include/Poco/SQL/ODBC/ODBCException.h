@@ -31,7 +31,7 @@ namespace SQL {
 namespace ODBC {
 
 
-POCO_DECLARE_EXCEPTION(ODBC_API, ODBCException, Poco::SQL::DataException)
+POCO_DECLARE_EXCEPTION(ODBC_API, ODBCException, Poco::SQL::SQLException)
 POCO_DECLARE_EXCEPTION(ODBC_API, InsufficientStorageException, ODBCException)
 POCO_DECLARE_EXCEPTION(ODBC_API, UnknownDataLengthException, ODBCException)
 POCO_DECLARE_EXCEPTION(ODBC_API, DataTruncatedException, ODBCException)

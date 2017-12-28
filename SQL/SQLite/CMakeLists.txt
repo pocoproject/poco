@@ -1,4 +1,4 @@
-set(LIBNAME  "DataSQLite")
+set(LIBNAME  "SQLSQLite")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
@@ -41,7 +41,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL SQLite_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Data ${DATASQLITELIBS} )
+target_link_libraries( "${LIBNAME}" Foundation SQL ${DATASQLITELIBS} )
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

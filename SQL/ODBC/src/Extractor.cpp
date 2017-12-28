@@ -287,7 +287,7 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 		if (totalSize <= maxSize)
 			val.append(pChar, fetchedSize);
 		else
-			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+			throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 	}while (true);
 
 	return true;
@@ -342,7 +342,7 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 		if (totalSize <= maxSize)
 			val.append(pChar, fetchedSize / sizeof(UTF16Char));
 		else
-			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+			throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 	} while (true);
 
 	return true;
@@ -418,7 +418,7 @@ bool Extractor::extractManualLOBImpl(std::size_t pos,
 		if (totalSize <= maxSize)
 			val.appendRaw(pChar, fetchedSize);
 		else
-			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+			throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 
 	}while (true);
 
@@ -1325,7 +1325,7 @@ void Extractor::checkDataSize(std::size_t size)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	if (size > maxSize)
-		throw DataException(format(FLD_SIZE_EXCEEDED_FMT, size, maxSize));
+		throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, size, maxSize));
 }
 
 

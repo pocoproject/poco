@@ -379,4 +379,4 @@ void Row::formatNames() const
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

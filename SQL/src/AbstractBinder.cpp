@@ -528,4 +528,4 @@ void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direct
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

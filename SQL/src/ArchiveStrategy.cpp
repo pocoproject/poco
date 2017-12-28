@@ -143,4 +143,4 @@ void ArchiveByAgeStrategy::setThreshold(const std::string& age)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

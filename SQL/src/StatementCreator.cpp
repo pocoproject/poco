@@ -57,4 +57,4 @@ StatementCreator::~StatementCreator()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

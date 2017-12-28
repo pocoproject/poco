@@ -65,7 +65,7 @@ inline AbstractPreparation::PreparatorPtr AbstractPreparation::preparation()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_AbstractPreparation_INCLUDED

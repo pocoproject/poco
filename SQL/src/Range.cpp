@@ -37,4 +37,4 @@ Range::~Range()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

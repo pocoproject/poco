@@ -21,7 +21,7 @@ namespace SQL {
 namespace SQLite {
 
 
-POCO_IMPLEMENT_EXCEPTION(SQLiteException, Poco::SQL::DataException, "SQLite exception")
+POCO_IMPLEMENT_EXCEPTION(SQLiteException, Poco::SQL::SQLException, "SQLite exception")
 POCO_IMPLEMENT_EXCEPTION(InvalidSQLStatementException, SQLiteException, "Invalid SQL statement")
 POCO_IMPLEMENT_EXCEPTION(InternalDBErrorException, SQLiteException, "Internal DB error")
 POCO_IMPLEMENT_EXCEPTION(DBAccessDeniedException, SQLiteException, "DB access denied")

@@ -49,4 +49,4 @@ void SessionImpl::setConnectionString(const std::string& rConnectionString)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

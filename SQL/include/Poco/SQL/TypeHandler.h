@@ -112,7 +112,7 @@ class TypeHandler: public AbstractTypeHandler
 	///		}
 	///	};
 	///
-	/// Note that the TypeHandler template specialization must always be declared in the namespace Poco::Data.
+	/// Note that the TypeHandler template specialization must always be declared in the namespace Poco::SQL.
 	/// Apart from that no further work is needed. One can now use Person with into and use clauses.
 {
 public:
@@ -2226,7 +2226,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_TypeHandler_INCLUDED

@@ -288,7 +288,7 @@ std::size_t SQLiteStatementImpl::next()
 	}
 	else if (SQLITE_DONE == _nextResponse)
 	{
-		throw Poco::SQL::DataException("No data received");
+		throw Poco::SQL::SQLException("No data received");
 	}
 	else
 	{

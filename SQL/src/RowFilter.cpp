@@ -225,4 +225,4 @@ void RowFilter::rewindRecordSet()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

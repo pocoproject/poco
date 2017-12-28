@@ -77,4 +77,4 @@ void RowFormatter::reset()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

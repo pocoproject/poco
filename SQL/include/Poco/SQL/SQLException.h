@@ -3,9 +3,9 @@
 //
 // Library: Data
 // Package: DataCore
-// Module:  DataException
+// Module:  SQLException
 //
-// Definition of the DataException class.
+// Definition of the SQLException class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -14,8 +14,8 @@
 //
 
 
-#ifndef SQL_DataException_INCLUDED
-#define SQL_DataException_INCLUDED
+#ifndef SQL_SQLException_INCLUDED
+#define SQL_SQLException_INCLUDED
 
 
 #include "Poco/SQL/SQL.h"
@@ -26,25 +26,25 @@ namespace Poco {
 namespace SQL {
 
 
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, DataException, Poco::IOException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, RowDataMissingException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, UnknownDataBaseException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, UnknownTypeException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, ExecutionException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, BindingException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, ExtractException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, LimitException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, NotSupportedException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, SessionUnavailableException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, SessionPoolExhaustedException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, SessionPoolExistsException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, NoDataException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, LengthExceededException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, ConnectionFailedException, DataException)
-POCO_DECLARE_EXCEPTION(Poco_SQL_API, NotConnectedException, DataException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, SQLException, Poco::IOException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, RowDataMissingException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, UnknownDataBaseException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, UnknownTypeException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, ExecutionException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, BindingException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, ExtractException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, LimitException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, NotSupportedException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, SessionUnavailableException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, SessionPoolExhaustedException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, SessionPoolExistsException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, NoSQLException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, LengthExceededException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, ConnectionFailedException, SQLException)
+POCO_DECLARE_EXCEPTION(Poco_SQL_API, NotConnectedException, SQLException)
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
-#endif // Data_DataException_INCLUDED
+#endif // Data_SQLException_INCLUDED

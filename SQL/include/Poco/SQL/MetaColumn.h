@@ -182,7 +182,7 @@ inline void MetaColumn::setNullable(bool nullable)
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
 
 
 #endif // Data_MetaColumn_INCLUDED

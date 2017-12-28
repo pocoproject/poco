@@ -30,7 +30,7 @@ namespace PostgreSQL {
 // End-user include this file and use in code ConnectionException/StatementException
 // So it need not know
 
-class PostgreSQL_API PostgreSQLException: public Poco::SQL::DataException
+class PostgreSQL_API PostgreSQLException: public Poco::SQL::SQLException
 	/// Base class for all PostgreSQL exceptions
 {
 public:
@@ -105,7 +105,7 @@ public:
 
 inline PostgreSQLException& PostgreSQLException::operator=(const PostgreSQLException& exc)
 {
-	Poco::SQL::DataException::operator=(exc);
+	Poco::SQL::SQLException::operator=(exc);
 	return *this;
 }
 

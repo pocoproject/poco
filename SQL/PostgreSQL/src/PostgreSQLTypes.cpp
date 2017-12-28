@@ -44,7 +44,7 @@ Poco::SQL::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 			cdt = Poco::SQL::MetaColumn::FDT_DOUBLE;
 			break;
 		case FLOAT4OID:
-			// cdt = Poco::SQL::MetaColumn::FDT_FLOAT;  This a bug in Poco::Data as a 4 byte "float" can't be cast/ugraded to an 8 byte "double"
+			// cdt = Poco::SQL::MetaColumn::FDT_FLOAT;  This a bug in Poco::SQL as a 4 byte "float" can't be cast/ugraded to an 8 byte "double"
 			cdt = Poco::SQL::MetaColumn::FDT_DOUBLE;
 			break;
 		case NUMERICOID:

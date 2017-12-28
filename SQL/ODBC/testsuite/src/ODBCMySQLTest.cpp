@@ -28,7 +28,7 @@
 
 
 using namespace Poco::SQL::Keywords;
-using Poco::SQL::DataException;
+using Poco::SQL::SQLException;
 using Poco::SQL::ODBC::Utility;
 using Poco::SQL::ODBC::ConnectionException;
 using Poco::SQL::ODBC::StatementException;
@@ -129,7 +129,7 @@ void ODBCMySQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize);
 		fail ("must fail");
 	}
-	catch (DataException&)
+	catch (SQLException&)
 	{
 		_pSession->setProperty("maxFieldSize", Poco::Any(maxFldSize));
 	}
@@ -149,7 +149,7 @@ void ODBCMySQLTest::testBLOB()
 		_pExecutor->blob(maxFldSize+1);
 		fail ("must fail");
 	}
-	catch (DataException&) { }
+	catch (SQLException&) { }
 }
 
 
@@ -187,7 +187,7 @@ void ODBCMySQLTest::testStoredProcedure()
 	// Additionally, the standard ODBC stored procedure call syntax
 	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
 	// See http://bugs.mysql.com/bug.php?id=26535
-	// Poco::Data support for MySQL ODBC is postponed until the above
+	// Poco::SQL support for MySQL ODBC is postponed until the above
 	// issues are resolved.
 }
 
@@ -200,7 +200,7 @@ void ODBCMySQLTest::testStoredFunction()
 	// Additionally, the standard ODBC stored procedure call syntax
 	// {call storedProcedure(?)} is currently (3.51.12.00) not supported.
 	// See http://bugs.mysql.com/bug.php?id=26535
-	// Poco::Data support for MySQL ODBC is postponed until the above
+	// Poco::SQL support for MySQL ODBC is postponed until the above
 	// issues are resolved.
 }
 

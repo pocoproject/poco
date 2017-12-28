@@ -434,4 +434,4 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<Poco::Dynamic::Var>& 
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

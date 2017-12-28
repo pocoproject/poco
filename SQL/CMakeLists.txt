@@ -1,4 +1,4 @@
-set(LIBNAME "Data")
+set(LIBNAME "SQL")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
 # Sources
@@ -24,7 +24,7 @@ set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
     OUTPUT_NAME ${POCO_LIBNAME}
-    DEFINE_SYMBOL Data_EXPORTS
+    DEFINE_SYMBOL SQL_EXPORTS
     )
 
 target_link_libraries( "${LIBNAME}" Foundation)
@@ -39,12 +39,12 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if(ENABLE_DATA_SQLITE)
+if(ENABLE_SQL_SQLITE)
     # SQlite3 is built in any case
     add_subdirectory( SQLite )
-endif(ENABLE_DATA_SQLITE)
+endif(ENABLE_SQL_SQLITE)
 
-if(ENABLE_DATA_MYSQL)
+if(ENABLE_SQL_MYSQL)
     find_package(MySQL)
     if(MYSQL_FOUND)
         include_directories("${MYSQL_INCLUDE_DIR}")
@@ -55,9 +55,9 @@ if(ENABLE_DATA_MYSQL)
     elseif(POCO_VERBOSE_MESSAGES)
         message(STATUS "MySQL Support Disabled - no MySQL library")
     endif(MYSQL_FOUND)
-endif(ENABLE_DATA_MYSQL)
+endif(ENABLE_SQL_MYSQL)
 
-if(ENABLE_DATA_POSTGRESQL)
+if(ENABLE_SQL_POSTGRESQL)
     find_package(PostgreSQL)
     if(POSTGRESQL_FOUND)
         include_directories("${PostgreSQL_INCLUDE_DIR}")
@@ -68,9 +68,9 @@ if(ENABLE_DATA_POSTGRESQL)
     elseif(POCO_VERBOSE_MESSAGES)
         message(STATUS "PostgreSQL Support Disabled - no PostgreSQL library")
     endif(POSTGRESQL_FOUND)
-endif(ENABLE_DATA_POSTGRESQL)
+endif(ENABLE_SQL_POSTGRESQL)
 
-if(ENABLE_DATA_ODBC)
+if(ENABLE_SQL_ODBC)
     find_package(ODBC)
     if(WIN32 AND NOT WINCE)
         set(ODBC_LIBRARIES "odbc32" "odbccp32")
@@ -89,7 +89,7 @@ if(ENABLE_DATA_ODBC)
             message(STATUS "ODBC Support Disabled - no ODBC runtime")
         endif()
     endif(WIN32 AND NOT WINCE)
-endif(ENABLE_DATA_ODBC)
+endif(ENABLE_SQL_ODBC)
 
 if (ENABLE_TESTS)
     add_subdirectory(testsuite)

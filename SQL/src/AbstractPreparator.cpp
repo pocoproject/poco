@@ -435,4 +435,4 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::Dynamic:
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL

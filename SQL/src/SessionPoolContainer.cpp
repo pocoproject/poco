@@ -119,4 +119,4 @@ void SessionPoolContainer::shutdown()
 }
 
 
-} } // namespace Poco::Data
+} } // namespace Poco::SQL
