@@ -450,7 +450,7 @@ build_script:
         $defs+=" -DENABLE_PDF=OFF";
         $defs+=" -DENABLE_NETSSL=ON";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
-        $defs+=" -DENABLE_DATA_MYSQL=OFF";
+        $defs+=" -DENABLE_SQL_MYSQL=OFF";
         $defs+=" -DENABLE_REDIS=OFF";
         $defs+=" -DENABLE_SAMPLES=ON";
         $defs+=" -DENABLE_TESTS=ON";
