@@ -11,7 +11,7 @@
 #  CMAKE_MC_COMPILER - where to find mc.exe
 if (WIN32)
   # cmake has CMAKE_RC_COMPILER, but no message compiler
-  if ("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+  if ("${CMAKE_GENERATOR}" MATCHES "Visual Studio" OR "${CMAKE_GENERATOR}" MATCHES "MinGW")
     # this path is only present for 2008+, but we currently require PATH to
     # be set up anyway
     get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
