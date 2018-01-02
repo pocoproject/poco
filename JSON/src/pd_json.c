@@ -1,10 +1,29 @@
 #include <stdio.h>
+#if defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901L)
 #include <stdbool.h>
+#endif // __STDC_VERSION__
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
 #include "pd_json.h"
+
+#if defined(_MSC_VER)
+#define strerror_r(err, buf, len) strerror_s(buf, len, err)
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+
+#define json_error(json, format, ...)                             \
+  if (!json->error) {                                             \
+      json->error = 1;                                            \
+      _snprintf_s(json->errmsg, sizeof(json->errmsg), _TRUNCATE,  \
+               "error: %lu: " format,                             \
+               (unsigned long) json->lineno,                      \
+               __VA_ARGS__);                                      \
+  }                                                               \
+
+#else
 
 #define json_error(json, format, ...)                             \
     if (!json->error) {                                           \
@@ -15,11 +34,7 @@
                  __VA_ARGS__);                                    \
     }                                                             \
 
-#define STACK_INC 4
-
-#if defined(_MSC_VER) || defined(__MINGW32__)
-#define strerror_r(err, buf, len) strerror_s(buf, len, err)
-#endif
+#endif // POCO_MSVS_VERSION
 
 static void json_error_s(json_stream *json, int err)
 {
@@ -28,6 +43,8 @@ static void json_error_s(json_stream *json, int err)
     json_error(json, "%s", errbuf);
 }
 
+#define STACK_INC 4
+
 static enum json_type
 push(json_stream *json, enum json_type type)
 {
@@ -35,7 +52,7 @@ push(json_stream *json, enum json_type type)
 
     if (json->stack_top >= json->stack_size) {
         struct json_stack *stack;
-        stack = json->alloc.realloc(json->stack,
+        stack = (struct json_stack *) json->alloc.realloc(json->stack,
                 (json->stack_size + STACK_INC) * sizeof(*json->stack));
         if (stack == NULL) {
             json_error_s(json, errno);
@@ -103,7 +120,7 @@ static void init(json_stream *json)
     json->error = 0;
     json->errmsg[0] = '\0';
     json->ntokens = 0;
-    json->next = 0;
+    json->next = (enum json_type) 0;
     json->streaming = true;
 
     json->stack = NULL;
@@ -133,7 +150,7 @@ static int pushchar(json_stream *json, int c)
 {
     if (json->data.string_fill == json->data.string_size) {
         size_t size = json->data.string_size * 2;
-        char *buffer = json->alloc.realloc(json->data.string, size);
+        char *buffer = (char*) json->alloc.realloc(json->data.string, size);
         if (buffer == NULL) {
             json_error_s(json, errno);
             return -1;
@@ -151,7 +168,7 @@ static int init_string(json_stream *json)
     json->data.string_fill = 0;
     if (json->data.string == NULL) {
         json->data.string_size = 1024;
-        json->data.string = json->alloc.malloc(json->data.string_size);
+        json->data.string = (char*) json->alloc.malloc(json->data.string_size);
         if (json->data.string == NULL) {
             json_error_s(json, errno);
             return -1;
@@ -317,7 +334,7 @@ int read_escaped(json_stream *json)
         case '"':
             {
                 const char *codes = "\\bfnrt/\"";
-                char *p = strchr(codes, c);
+                const char *p = strchr(codes, c);
                 if (pushchar(json, "\\\b\f\n\r\t/\""[p - codes]) != 0)
                     return -1;
             }
@@ -648,7 +665,7 @@ enum json_type json_next(json_stream *json)
         return JSON_ERROR;
     if (json->next != 0) {
         enum json_type next = json->next;
-        json->next = 0;
+        json->next = (enum json_type) 0;
         return next;
     }
     if (json->ntokens > 0 && json->stack_top == (size_t)-1) {
@@ -780,7 +797,7 @@ void json_open_buffer(json_stream *json, const void *buffer, size_t size)
     init(json);
     json->source.get = buffer_get;
     json->source.peek = buffer_peek;
-    json->source.source.buffer.buffer = buffer;
+    json->source.source.buffer.buffer = (const char*) buffer;
     json->source.source.buffer.length = size;
 }
 
