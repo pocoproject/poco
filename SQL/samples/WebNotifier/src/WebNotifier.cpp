@@ -126,7 +126,7 @@ public:
 			std::cout << std::endl << "WebSocket connection established." << std::endl << PROMPT;
 
 			char buffer[1024];
-			int n, count = 0;
+			int n = 0;
 			do
 			{
 				n = _pWS->receiveFrame(buffer, sizeof(buffer), _flags);

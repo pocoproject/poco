@@ -503,7 +503,7 @@ void SQLTest::testColumnVector()
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -606,7 +606,7 @@ void SQLTest::testColumnVectorBool()
 
 	try
 	{
-		bool b; b = c[100]; // to silence gcc
+		POCO_UNUSED bool b; b = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -682,7 +682,7 @@ void SQLTest::testColumnDeque()
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -799,7 +799,7 @@ void SQLTest::testColumnList()
 
 	try
 	{
-		int i; i = c[100]; // to silence gcc
+		POCO_UNUSED int i; i = c[100]; // to silence gcc
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -911,13 +911,13 @@ void SQLTest::testRow()
 
 	try
 	{
-		int i; i = row[5].convert<int>(); // to silence gcc
+		POCO_UNUSED int i; i = row[5].convert<int>(); // to silence gcc
 		fail ("must fail");
 	}catch (RangeException&) {}
 
 	try
 	{
-		int i; i = row["a bad name"].convert<int>(); // to silence gcc
+		POCO_UNUSED int i; i = row["a bad name"].convert<int>(); // to silence gcc
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
