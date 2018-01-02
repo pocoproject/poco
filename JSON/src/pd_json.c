@@ -17,7 +17,7 @@
 
 #define STACK_INC 4
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #define strerror_r(err, buf, len) strerror_s(buf, len, err)
 #endif
 
