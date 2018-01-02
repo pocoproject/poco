@@ -74,8 +74,9 @@ public:
 	typedef std::multimap<std::string, ComparisonEntry> ComparisonMap;
 	typedef std::map<AutoPtr<RowFilter>, LogicOperator> FilterMap;
 
-	RowFilter(RecordSet* pRecordSet);
-		/// Creates the top-level RowFilter and associates it with the recordset.
+	RowFilter(RecordSet& recordSet);
+		/// Creates the top-level RowFilter and associates it with the recordSet.
+		/// The recordSet object must outlive this RowFilter object.
 
 	RowFilter(Ptr pParent, LogicOperator op = OP_OR);
 		/// Creates child RowFilter and associates it with the parent filter.

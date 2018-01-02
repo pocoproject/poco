@@ -29,16 +29,12 @@
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
-#include "Poco/AutoPtr.h"
 #include <ostream>
 #include <limits>
 
 
 namespace Poco {
 namespace SQL {
-
-
-class RowFilter;
 
 
 class Poco_SQL_API RecordSet: private Statement

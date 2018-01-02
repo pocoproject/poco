@@ -23,9 +23,8 @@ namespace Poco {
 namespace SQL {
 
 
-RowFilter::RowFilter(RecordSet* pRecordSet): _pRecordSet(pRecordSet), _not(false)
+RowFilter::RowFilter(RecordSet& recordSet): _pRecordSet(&recordSet), _not(false)
 {
-	poco_check_ptr(pRecordSet);
 	init();
 	Ptr pThis(this, true);
 	_pRecordSet->filter(pThis);

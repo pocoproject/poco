@@ -13,7 +13,6 @@
 
 
 #include "Poco/SQL/RowFormatter.h"
-#include "Poco/Exception.h"
 #include <iomanip>
 
 

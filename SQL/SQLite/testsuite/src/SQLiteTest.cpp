@@ -2360,7 +2360,7 @@ void SQLiteTest::testFilter()
 	Statement stmt = (ses << "select * from Vectors", now);
 	RecordSet rset(stmt);
 	assert (rset.totalRowCount() == 4);
-	RowFilter::Ptr pRF = new RowFilter(&rset);
+	RowFilter::Ptr pRF = new RowFilter(rset);
 	assert (pRF->isEmpty());
 	std::string intFldName = "int0";
 	pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);

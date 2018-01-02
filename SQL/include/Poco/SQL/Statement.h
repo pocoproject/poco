@@ -396,10 +396,10 @@ public:
 		/// data set. Otherwise, it returns true.
 
 	std::size_t firstDataSet();
-	/// Activates the first data set
+		/// Activates the first data set
 
 	std::size_t currentDataSet() const;
-	/// Returns the current data set.
+		/// Returns the current data set.
 
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Sets the row formatter for this statement.
@@ -407,6 +407,7 @@ public:
 
 	void insertHint();
 		/// Tells the statement that it is an sinsert one
+
 protected:
 	typedef StatementImpl::Ptr ImplPtr;
 

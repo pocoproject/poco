@@ -13,7 +13,6 @@
 
 
 #include "Poco/SQL/RecordSet.h"
-#include "Poco/SQL/RowFilter.h"
 #include "Poco/SQL/Date.h"
 #include "Poco/SQL/Time.h"
 #include "Poco/SQL/SQLException.h"
