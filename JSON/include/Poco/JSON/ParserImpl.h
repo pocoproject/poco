@@ -30,6 +30,7 @@
 
 struct json_stream;
 
+
 namespace Poco {
 namespace JSON {
 
