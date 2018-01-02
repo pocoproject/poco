@@ -46,7 +46,7 @@ public:
 	typedef typename C::size_type              Size;
 	typedef typename C::value_type             Type;
 
-	Column(const MetaColumn& metaColumn, Container* pData):
+	Column(const MetaColumn& metaColumn, ContainerPtr pData):
 		_metaColumn(metaColumn),
 		_pData(pData)
 		/// Creates the Column.
