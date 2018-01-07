@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_encryor.c
+ * << Haru Free PDF Library >> -- hpdf_encryor.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -314,13 +317,13 @@ HPDF_PadOrTrancatePasswd  (const char  *pwd,
 
     HPDF_MemSet (new_pwd, 0x00, HPDF_PASSWD_LEN);
 
-    if (len >= HPDF_PASSWD_LEN)
-        HPDF_MemCpy (new_pwd, pwd, HPDF_PASSWD_LEN);
-    else {
-        if (len > 0)
-            HPDF_MemCpy (new_pwd, pwd, len);
-        HPDF_MemCpy (new_pwd + len, HPDF_PADDING_STRING,
-                    HPDF_PASSWD_LEN - len);
+    if (len >= HPDF_PASSWD_LEN) {
+        HPDF_MemCpy (new_pwd, (HPDF_BYTE *)pwd, HPDF_PASSWD_LEN);
+    } else {
+        if (len > 0) {
+            HPDF_MemCpy (new_pwd, (HPDF_BYTE *)pwd, len);
+        }
+        HPDF_MemCpy (new_pwd + len, HPDF_PADDING_STRING, HPDF_PASSWD_LEN - len);
     }
 }
 
@@ -365,7 +368,7 @@ HPDF_Encrypt_CreateOwnerKey  (HPDF_Encrypt  attr)
         for (i = 0; i < 50; i++) {
             HPDF_MD5Init(&md5_ctx);
 
-            //HPDF_MD5Update (&md5_ctx, digest, HPDF_MD5_KEY_LEN);
+            /* HPDF_MD5Update (&md5_ctx, digest, HPDF_MD5_KEY_LEN); */
             HPDF_MD5Update (&md5_ctx, digest, attr->key_len);
             HPDF_MD5Final(digest, &md5_ctx);
 
@@ -395,7 +398,7 @@ HPDF_Encrypt_CreateOwnerKey  (HPDF_Encrypt  attr)
             HPDF_BYTE new_key[HPDF_MD5_KEY_LEN];
 
             for (j = 0; j < attr->key_len; j++)
-                new_key[j] = digest[j] ^ i;
+                new_key[j] = (HPDF_BYTE)(digest[j] ^ i);
 
             HPDF_PTRACE(("@ Algorithm 3.3 step 7 loop %u\n", i));
 
@@ -429,10 +432,10 @@ HPDF_Encrypt_CreateEncryptionKey  (HPDF_Encrypt  attr)
 
     /* Algorithm3.2 step4 */
     HPDF_PTRACE(("@@@ permission =%d\n", attr->permission));
-    tmp_flg[0] = attr->permission;
-    tmp_flg[1] = (attr->permission >> 8);
-    tmp_flg[2] = (attr->permission >> 16);
-    tmp_flg[3] = (attr->permission >> 24);
+    tmp_flg[0] = (HPDF_BYTE)(attr->permission);
+    tmp_flg[1] = (HPDF_BYTE)(attr->permission >> 8);
+    tmp_flg[2] = (HPDF_BYTE)(attr->permission >> 16);
+    tmp_flg[3] = (HPDF_BYTE)(attr->permission >> 24);
 
     HPDF_MD5Update(&md5_ctx, tmp_flg, 4);
 
@@ -499,7 +502,7 @@ HPDF_Encrypt_CreateUserKey  (HPDF_Encrypt  attr)
             HPDF_PTRACE(("@ Algorithm 3.5 step 5 loop %u\n", i));
 
             for (j = 0; j < attr->key_len; j++)
-                new_key[j] = attr->encryption_key[j] ^ i;
+                new_key[j] = (HPDF_BYTE)(attr->encryption_key[j] ^ i);
 
             HPDF_MemCpy (digest, digest2, HPDF_MD5_KEY_LEN);
 
@@ -526,7 +529,7 @@ ARC4Init  (HPDF_ARC4_Ctx_Rec  *ctx,
     HPDF_PTRACE((" ARC4Init\n"));
 
     for (i = 0; i < HPDF_ARC4_BUF_SIZE; i++)
-        ctx->state[i] = i;
+        ctx->state[i] = (HPDF_BYTE)i;
 
     for (i = 0; i < HPDF_ARC4_BUF_SIZE; i++)
         tmp_array[i] = key[i % key_len];
@@ -561,8 +564,8 @@ ARC4CryptBuf (HPDF_ARC4_Ctx_Rec  *ctx,
     for (i = 0; i < len; i++) {
         HPDF_BYTE tmp;
 
-        ctx->idx1 = (ctx->idx1 + 1) % 256;
-        ctx->idx2 = (ctx->idx2 +  ctx->state[ctx->idx1]) % 256;
+        ctx->idx1 = (HPDF_BYTE)((ctx->idx1 + 1) % 256);
+        ctx->idx2 = (HPDF_BYTE)((ctx->idx2 +  ctx->state[ctx->idx1]) % 256);
 
         tmp = ctx->state[ctx->idx1];
         ctx->state[ctx->idx1] = ctx->state[ctx->idx2];
@@ -571,7 +574,7 @@ ARC4CryptBuf (HPDF_ARC4_Ctx_Rec  *ctx,
         t = (ctx->state[ctx->idx1] + ctx->state[ctx->idx2]) % 256;
         K = ctx->state[t];
 
-        out[i] = in[i] ^ K;
+        out[i] = (HPDF_BYTE)(in[i] ^ K);
     }
 }
 
@@ -586,11 +589,11 @@ HPDF_Encrypt_InitKey  (HPDF_Encrypt  attr,
 
     HPDF_PTRACE((" HPDF_Encrypt_Init\n"));
 
-    attr->encryption_key[attr->key_len] = object_id;
-    attr->encryption_key[attr->key_len + 1] = (object_id >> 8);
-    attr->encryption_key[attr->key_len + 2] = (object_id >> 16);
-    attr->encryption_key[attr->key_len + 3] = gen_no;
-    attr->encryption_key[attr->key_len + 4] = (gen_no >> 8);
+    attr->encryption_key[attr->key_len] = (HPDF_BYTE)object_id;
+    attr->encryption_key[attr->key_len + 1] = (HPDF_BYTE)(object_id >> 8);
+    attr->encryption_key[attr->key_len + 2] = (HPDF_BYTE)(object_id >> 16);
+    attr->encryption_key[attr->key_len + 3] = (HPDF_BYTE)gen_no;
+    attr->encryption_key[attr->key_len + 4] = (HPDF_BYTE)(gen_no >> 8);
 
     HPDF_PTRACE(("@@@ OID=%u, gen_no=%u\n", (HPDF_INT)object_id, gen_no));
 

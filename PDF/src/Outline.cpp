@@ -20,7 +20,7 @@ namespace Poco {
 namespace PDF {
 
 
-Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name):
+Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name): 
 	Resource<HPDF_Outline>(pPDF, outline, name)
 {
 	open();

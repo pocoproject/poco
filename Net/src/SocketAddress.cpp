@@ -461,7 +461,7 @@ void SocketAddress::newLocal(const sockaddr_un* sockAddr)
 
 void SocketAddress::newLocal(const std::string& path)
 {
-	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path.c_str());
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path.c_str(), path.size());
 }
 #endif // POCO_OS_FAMILY_UNIX
 

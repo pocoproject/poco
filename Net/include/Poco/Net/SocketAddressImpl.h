@@ -184,12 +184,13 @@ class Net_API LocalSocketAddressImpl: public SocketAddressImpl
 public:
 	LocalSocketAddressImpl(const struct sockaddr_un* addr);
 	LocalSocketAddressImpl(const char* path);
+	LocalSocketAddressImpl(const char* path, std::size_t length);
 	~LocalSocketAddressImpl();
 	IPAddress host() const;
 	UInt16 port() const;
 	poco_socklen_t length() const;
 	const struct sockaddr* addr() const;
-	int af() const;	
+	int af() const;
 	Family family() const;
 	const char* path() const;
 	std::string toString() const;

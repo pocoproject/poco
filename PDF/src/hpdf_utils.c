@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- HPDF_utils.c
+ * << Haru Free PDF Library >> -- hpdf_utils.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -24,7 +27,11 @@ HPDF_AToI  (const char  *s)
     HPDF_BOOL flg = HPDF_FALSE;
     HPDF_INT  v = 0;
 
-    /* increment pointer until the character of 's' is not
+    if (!s) {
+        return 0;
+    }
+
+    /* increment pointer until the charactor of 's' is not
      * white-space-charactor.
      */
     while (*s) {
@@ -60,7 +67,7 @@ HPDF_AToF  (const char  *s)
     HPDF_DOUBLE v;
     HPDF_INT tmp = 1;
 
-    /* increment pointer until the character of 's' is not
+    /* increment pointer until the charactor of 's' is not
      * white-space-charactor.
      */
     while (*s) {
@@ -129,7 +136,7 @@ HPDF_IToA  (char        *s,
     *t-- = 0;
 
     while (val > 0) {
-        *t = (char)(val % 10) + '0';
+        *t = (char)((char)(val % 10) + '0');
         val /= 10;
         t--;
     }
@@ -158,7 +165,7 @@ HPDF_IToA2  (char         *s,
     *u = 0;
     t = u - 1;
     while (val > 0 && t >= s) {
-        *t = (char)(val % 10) + '0';
+        *t = (char)((char)(val % 10) + '0');
         val /= 10;
         t--;
     }
@@ -202,7 +209,7 @@ HPDF_FToA  (char       *s,
 
     /* process decimal part */
     for (i = 0; i < 5; i++) {
-        *t = (char)(fpart_val % 10) + '0';
+        *t = (char)((char)(fpart_val % 10) + '0');
         fpart_val /= 10;
         t--;
     }
@@ -214,7 +221,7 @@ HPDF_FToA  (char       *s,
         t--;
 
     while (int_val > 0) {
-        *t = (char)(int_val % 10) + '0';
+        *t = (char)((char)(int_val % 10) + '0');
         int_val /= 10;
         t--;
     }
@@ -266,7 +273,7 @@ HPDF_StrCpy  (char          *out,
 
     *out = 0;
 
-    return out;
+    return (HPDF_BYTE *)out;
 }
 
 
@@ -370,7 +377,7 @@ HPDF_StrStr  (const char   *s1,
     maxlen++;
 
     while (maxlen > 0) {
-        if (HPDF_MemCmp (s1, s2, len) == 0)
+        if (HPDF_MemCmp ((HPDF_BYTE *)s1, (HPDF_BYTE *)s2, len) == 0)
             return s1;
 
         s1++;

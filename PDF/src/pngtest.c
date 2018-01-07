@@ -1007,7 +1007,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
          png_memcpy(tIME_string,
-                    png_convert_to_rfc1123(read_ptr, mod_time),
+                    png_convert_to_rfc1123(read_ptr, mod_time), 
                     png_sizeof(tIME_string));
          tIME_string[png_sizeof(tIME_string)-1] = '\0';
          tIME_chunk_present++;

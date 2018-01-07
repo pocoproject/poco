@@ -120,7 +120,7 @@ void Binder::bind(std::size_t pos, const NullData&, Direction, const std::type_i
 void Binder::checkReturn(int rc)
 {
 	if (rc != SQLITE_OK)
-		Utility::throwException(rc);
+		Utility::throwException(sqlite3_db_handle(_pStmt), rc);
 }
 
 

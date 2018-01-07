@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_ext_gstate.c
+ * << Haru Free PDF Library >> -- hpdf_ext_gstate.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -17,7 +20,7 @@
 #include "hpdf_ext_gstate.h"
 #include "hpdf.h"
 
-const static char  *HPDF_BM_NAMES[] = {
+static const char * const HPDF_BM_NAMES[] = {
                                       "Normal",
                                       "Multiply",
                                       "Screen",
@@ -36,7 +39,7 @@ const static char  *HPDF_BM_NAMES[] = {
 HPDF_BOOL
 HPDF_ExtGState_Validate  (HPDF_ExtGState  ext_gstate)
 {
-    if (!ext_gstate || (ext_gstate->header.obj_class !=
+    if (!ext_gstate || (ext_gstate->header.obj_class != 
                 (HPDF_OSUBCLASS_EXT_GSTATE | HPDF_OCLASS_DICT) &&
                 ext_gstate->header.obj_class !=
                  (HPDF_OSUBCLASS_EXT_GSTATE_R | HPDF_OCLASS_DICT)))
@@ -51,8 +54,8 @@ ExtGState_Check  (HPDF_ExtGState  ext_gstate)
 {
     if (!HPDF_ExtGState_Validate (ext_gstate))
         return HPDF_INVALID_OBJECT;
-
-    if (ext_gstate->header.obj_class ==
+    
+    if (ext_gstate->header.obj_class == 
             (HPDF_OSUBCLASS_EXT_GSTATE_R | HPDF_OCLASS_DICT))
         return HPDF_RaiseError (ext_gstate->error, HPDF_EXT_GSTATE_READ_ONLY,
                 0);
@@ -62,7 +65,7 @@ ExtGState_Check  (HPDF_ExtGState  ext_gstate)
 
 
 HPDF_Dict
-HPDF_ExtGState_New  (HPDF_MMgr   mmgr,
+HPDF_ExtGState_New  (HPDF_MMgr   mmgr, 
                      HPDF_Xref   xref)
 {
     HPDF_Dict obj = HPDF_Dict_New (mmgr);
@@ -89,12 +92,12 @@ HPDF_ExtGState_SetAlphaStroke  (HPDF_ExtGState   ext_gstate,
                                 HPDF_REAL        value)
 {
     HPDF_STATUS ret = ExtGState_Check (ext_gstate);
-
+    
     if (ret != HPDF_OK)
         return ret;
-
+    
     if (value < 0 || value > 1.0f)
-        return HPDF_RaiseError (ext_gstate->error,
+        return HPDF_RaiseError (ext_gstate->error, 
                 HPDF_EXT_GSTATE_OUT_OF_RANGE, 0);
 
     return HPDF_Dict_AddReal (ext_gstate, "CA", value);
@@ -106,12 +109,12 @@ HPDF_ExtGState_SetAlphaFill  (HPDF_ExtGState   ext_gstate,
                               HPDF_REAL        value)
 {
     HPDF_STATUS ret = ExtGState_Check (ext_gstate);
-
+    
     if (ret != HPDF_OK)
         return ret;
 
     if (value < 0 || value > 1.0f)
-        return HPDF_RaiseError (ext_gstate->error,
+        return HPDF_RaiseError (ext_gstate->error, 
                 HPDF_EXT_GSTATE_OUT_OF_RANGE, 0);
 
     return HPDF_Dict_AddReal (ext_gstate, "ca", value);
@@ -123,12 +126,12 @@ HPDF_ExtGState_SetBlendMode  (HPDF_ExtGState   ext_gstate,
                               HPDF_BlendMode   bmode)
 {
     HPDF_STATUS ret = ExtGState_Check (ext_gstate);
-
+    
     if (ret != HPDF_OK)
         return ret;
 
     if ((int)bmode < 0 || (int)bmode > (int)HPDF_BM_EOF)
-        return HPDF_RaiseError (ext_gstate->error,
+        return HPDF_RaiseError (ext_gstate->error, 
                 HPDF_EXT_GSTATE_OUT_OF_RANGE, 0);
 
     return HPDF_Dict_AddName (ext_gstate, "BM", HPDF_BM_NAMES[(int)bmode]);
@@ -140,7 +143,7 @@ HPDF_ExtGState_SetStrokeAdjustment  (HPDF_ExtGState   ext_gstate,
                                      HPDF_BOOL        value)
 {
     HPDF_STATUS ret = ExtGState_Check (ext_gstate);
-
+    
     if (ret != HPDF_OK)
         return ret;
 

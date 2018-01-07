@@ -183,14 +183,14 @@ void SessionImpl::open(const std::string& connect)
 	{
 		ActiveConnector connector(connectionString(), &_pDB);
 		ActiveResult<int> result = connector.connect();
-		if (!result.tryWait(static_cast<long>(getLoginTimeout()) * 1000))
+		if (!result.tryWait(static_cast<long>(getLoginTimeout() * 1000)))
 			throw ConnectionFailedException("Timed out.");
 
 		int rc = result.data();
 		if (rc != 0)
 		{
 			close();
-			Utility::throwException(rc);
+			Utility::throwException(_pDB, rc);
 		}
 	}
 	catch (SQLiteException& ex)
@@ -246,7 +246,7 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 	{
 		int tout = 1000 * static_cast<int>(timeout);
 		int rc = sqlite3_busy_timeout(_pDB, tout);
-		if (rc != 0) Utility::throwException(rc);
+		if (rc != 0) Utility::throwException(_pDB, rc);
 		_timeout = tout;
 	}
 	else

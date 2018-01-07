@@ -170,19 +170,23 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(unsigned index):
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
-	_index(index),
-	_broadcast(false),
-	_loopback(false),
-	_multicast(false),
-	_pointToPoint(false),
-	_up(false),
-	_running(false),
-	_mtu(0),
-	_type(NetworkInterface::NI_TYPE_OTHER)
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
+	const std::string& displayName,
+	const std::string& adapterName,
+	const IPAddress& address,
+	unsigned index,
+	NetworkInterface::MACAddress* pMACAddress): _name(name),
+		_displayName(displayName),
+		_adapterName(adapterName),
+		_index(index),
+		_broadcast(false),
+		_loopback(false),
+		_multicast(false),
+		_pointToPoint(false),
+		_up(false),
+		_running(false),
+		_mtu(0),
+		_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	_addressList.push_back(AddressTuple(address, IPAddress(), IPAddress()));
 	setPhyParams();
@@ -190,19 +194,22 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::s
 }
 
 
-NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
-	_index(index),
-	_broadcast(false),
-	_loopback(false),
-	_multicast(false),
-	_pointToPoint(false),
-	_up(false),
-	_running(false),
-	_mtu(0),
-	_type(NetworkInterface::NI_TYPE_OTHER)
+NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
+	const std::string& displayName,
+	const std::string& adapterName,
+	unsigned index,
+	NetworkInterface::MACAddress* pMACAddress): _name(name),
+		_displayName(displayName),
+		_adapterName(adapterName),
+		_index(index),
+		_broadcast(false),
+		_loopback(false),
+		_multicast(false),
+		_pointToPoint(false),
+		_up(false),
+		_running(false),
+		_mtu(0),
+		_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	setPhyParams();
 	if (pMACAddress) setMACAddress(*pMACAddress);
@@ -216,19 +223,18 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
 	const IPAddress& subnetMask,
 	const IPAddress& broadcastAddress,
 	unsigned index,
-	NetworkInterface::MACAddress* pMACAddress):
-	_name(name),
-	_displayName(displayName),
-	_adapterName(adapterName),
-	_index(index),
-	_broadcast(false),
-	_loopback(false),
-	_multicast(false),
-	_pointToPoint(false),
-	_up(false),
-	_running(false),
-	_mtu(0),
-	_type(NetworkInterface::NI_TYPE_OTHER)
+	NetworkInterface::MACAddress* pMACAddress): _name(name),
+		_displayName(displayName),
+		_adapterName(adapterName),
+		_index(index),
+		_broadcast(false),
+		_loopback(false),
+		_multicast(false),
+		_pointToPoint(false),
+		_up(false),
+		_running(false),
+		_mtu(0),
+		_type(NetworkInterface::NI_TYPE_OTHER)
 {
 	_addressList.push_back(AddressTuple(address, subnetMask, broadcastAddress));
 	setPhyParams();
@@ -320,7 +326,8 @@ const IPAddress& NetworkInterfaceImpl::firstAddress(IPAddress::Family family) co
 		if (addr.family() == family) return addr;
 	}
 
-	throw NotFoundException(format("%s family address not found.", (family == IPAddress::IPv4) ? std::string("IPv4") : std::string("IPv6")));
+	throw NotFoundException(format("%s family address not found.",
+							(family == IPAddress::IPv4) ? std::string("IPv4") : std::string("IPv6")));
 }
 
 
@@ -858,6 +865,23 @@ NetworkInterface NetworkInterface::forIndex(unsigned i)
 }
 
 
+std::string NetworkInterface::toString(const MACAddress& addr)
+{
+	std::string ret;
+	if(addr.size() >= 6)
+	{
+		ret = Poco::format("%02x:%02x:%02x:%02x:%02x:%02x",
+						static_cast<unsigned>(addr[0]),
+						static_cast<unsigned>(addr[1]),
+						static_cast<unsigned>(addr[2]),
+						static_cast<unsigned>(addr[3]),
+						static_cast<unsigned>(addr[4]),
+						static_cast<unsigned>(addr[5]));
+	}
+	return ret;
+}
+
+
 NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 {
 	List list;
@@ -874,33 +898,40 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 
 		typedef NetworkInterface::AddressList List;
 		const List& ipList = it->second.addressList();
-		List::const_iterator ipIt = ipList.begin();
-		List::const_iterator ipEnd = ipList.end();
-		for (; ipIt != ipEnd; ++ipIt)
+		if (ipList.size() > 0)
 		{
-			IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
-			IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
-			NetworkInterface ni;
-			if (mask.isWildcard())
+			List::const_iterator ipIt = ipList.begin();
+			List::const_iterator ipEnd = ipList.end();
+			for(; ipIt != ipEnd; ++ipIt)
 			{
-				ni = NetworkInterface(name, displayName, adapterName, addr, index, &mac);
-			}
-			else
-			{
-				IPAddress broadcast = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
-				ni = NetworkInterface(name, displayName, adapterName, addr, mask, broadcast, index, &mac);
-			}
+				IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
+				IPAddress mask = ipIt->get<NetworkInterface::SUBNET_MASK>();
+				NetworkInterface ni;
+				if(mask.isWildcard())
+				{
+					ni = NetworkInterface(name, displayName, adapterName, addr, index, &mac);
+				}
+				else
+				{
+					IPAddress broadcast = ipIt->get<NetworkInterface::BROADCAST_ADDRESS>();
+					ni = NetworkInterface(name, displayName, adapterName, addr, mask, broadcast, index, &mac);
+				}
 
-			ni._pImpl->_broadcast    = it->second._pImpl->_broadcast;
-			ni._pImpl->_loopback     = it->second._pImpl->_loopback;
-			ni._pImpl->_multicast    = it->second._pImpl->_multicast;
-			ni._pImpl->_pointToPoint = it->second._pImpl->_pointToPoint;
-			ni._pImpl->_up           = it->second._pImpl->_up;
-			ni._pImpl->_running      = it->second._pImpl->_running;
-			ni._pImpl->_mtu          = it->second._pImpl->_mtu;
-			ni._pImpl->_type         = it->second._pImpl->_type;
+				ni._pImpl->_broadcast = it->second._pImpl->_broadcast;
+				ni._pImpl->_loopback = it->second._pImpl->_loopback;
+				ni._pImpl->_multicast = it->second._pImpl->_multicast;
+				ni._pImpl->_pointToPoint = it->second._pImpl->_pointToPoint;
+				ni._pImpl->_up = it->second._pImpl->_up;
+				ni._pImpl->_running = it->second._pImpl->_running;
+				ni._pImpl->_mtu = it->second._pImpl->_mtu;
+				ni._pImpl->_type = it->second._pImpl->_type;
 
-			list.push_back(ni);
+				list.push_back(ni);
+			}
+		}
+		else
+		{
+			list.push_back(NetworkInterface(name, displayName, adapterName, index, &mac));
 		}
 	}
 
@@ -1060,7 +1091,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
 		else if (NO_ERROR != dwRetVal) // error occurred
-			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
+			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]",
+								Error::getMessage(dwRetVal)));
 		else
 			break;
 	}
@@ -1456,9 +1488,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			}
 		}
 	}
-	catch (...)
-	{
-	}
+	catch (...) { }
 	if (ifaces) freeifaddrs(ifaces);
 
 	if (ipOnly)

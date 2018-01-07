@@ -30,6 +30,7 @@ extern "C"
 {
 	typedef struct sqlite3 sqlite3;
 	typedef struct sqlite3_stmt sqlite3_stmt;
+	typedef struct sqlite3_mutex* _pMutex;
 }
 
 
@@ -65,13 +66,13 @@ public:
 	static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
 
-	static std::string lastError(sqlite3* pDb);
-		/// Retrieves the last error code from sqlite and converts it to a string.
+	static std::string lastError(sqlite3* pDB);
+		/// Retreives the last error code from sqlite and converts it to a string.
 
 	static std::string lastError(const Session& session);
 		/// Retrieves the last error code from sqlite and converts it to a string.
 
-	static void throwException(int rc, const std::string& addErrMsg = std::string());
+	static void throwException(sqlite3* pDB, int rc, const std::string& addErrMsg = std::string());
 		/// Throws for an error code the appropriate exception
 
 	static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
@@ -181,6 +182,17 @@ public:
 	{
 		return registerUpdateHandler(dbHandle(session), callbackFn, pParam);
 	}
+
+	class SQLiteMutex
+	{
+	public:
+		SQLiteMutex(sqlite3* pDB);
+		~SQLiteMutex();
+
+	private:
+		SQLiteMutex();
+		sqlite3_mutex* _pMutex;
+	};
 
 private:
 	Utility();
