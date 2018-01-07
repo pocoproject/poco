@@ -321,7 +321,7 @@ protected:
 private:
 	std::string     _host;
 	Poco::UInt16    _port;
-        Poco::Net::SocketAddress _sourceAddress;
+	Poco::Net::SocketAddress _sourceAddress;
 	ProxyConfig     _proxyConfig;
 	Poco::Timespan  _keepAliveTimeout;
 	Poco::Timestamp _lastRequest;
