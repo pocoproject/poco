@@ -211,7 +211,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
 	if (0 == nfd) return 0;
 
-	SharedPollArray pPollArr = new pollfd[nfd];
+	// Note: brackets are essential to value-initialise the array
+	SharedPollArray pPollArr = new pollfd[nfd]();
 
 	int idx = 0;
 	for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
@@ -256,7 +257,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	do
 	{
 		Poco::Timestamp start;
-		rc = ::poll(pPollArr, nfd, timeout.totalMilliseconds());
+		rc = ::poll(pPollArr, nfd, remainingTime.totalMilliseconds());
 		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;
