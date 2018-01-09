@@ -16,6 +16,7 @@ AAAIntroduction
   - fixed GH #2000: Fix building XMLStreamParser with unbundled expat
   - fixed GH #1603: fix MinGW 4.8.2 Compilation
   - fixed GH #1991: Support building poco 1.8.0 as cmake sub-project
+  - fixed GH #2080: Bugs in Poco::Net::Socket::select when POCO_HAVE_FD_POLL is defined
 
 
 !!!Release 1.8.0.1
