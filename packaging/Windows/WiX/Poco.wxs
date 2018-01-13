@@ -2918,7 +2918,6 @@
                         <File Id="POCO.NUMBERPARSER.HTML" Name="Poco.NumberParser.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.NumberParser.html" />
                         <File Id="POCO.OBJECTPOOL.HTML" Name="Poco.ObjectPool.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.ObjectPool.html" />
                         <File Id="POCO.OBSERVER.HTML" Name="Poco.Observer.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.Observer.html" />
-                        <File Id="POCO.OPCOMCHANNEL.HTML" Name="Poco.OpcomChannel.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.OpcomChannel.html" />
                         <File Id="POCO.OPENFILEEXCEPTION.HTML" Name="Poco.OpenFileException.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.OpenFileException.html" />
                         <File Id="POCO.OPTIONAL.HTML" Name="Poco.Optional.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.Optional.html" />
                         <File Id="POCO.OUTOFMEMORYEXCEPTION.HTML" Name="Poco.OutOfMemoryException.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.OutOfMemoryException.html" />
@@ -2960,12 +2959,9 @@
                         <File Id="POCO.RECURSIVEDIRECTORYITERATOR.HTML" Name="Poco.RecursiveDirectoryIterator.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RecursiveDirectoryIterator.html" />
                         <File Id="POCO.RECURSIVEDIRECTORYITERATORIMPL.HTML" Name="Poco.RecursiveDirectoryIteratorImpl.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RecursiveDirectoryIteratorImpl.html" />
                         <File Id="POCO.REFCOUNTEDOBJECT.HTML" Name="Poco.RefCountedObject.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RefCountedObject.html" />
-                        <File Id="POCO.REFERENCECOUNTER.HTML" Name="Poco.ReferenceCounter.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.ReferenceCounter.html" />
                         <File Id="POCO.REGULAREXPRESSION.HTML" Name="Poco.RegularExpression.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RegularExpression.html" />
                         <File Id="POCO.REGULAREXPRESSION.MATCH.HTML" Name="Poco.RegularExpression.Match.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RegularExpression.Match.html" />
                         <File Id="POCO.REGULAREXPRESSIONEXCEPTION.HTML" Name="Poco.RegularExpressionException.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RegularExpressionException.html" />
-                        <File Id="POCO.RELEASEARRAYPOLICY.HTML" Name="Poco.ReleaseArrayPolicy.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.ReleaseArrayPolicy.html" />
-                        <File Id="POCO.RELEASEPOLICY.HTML" Name="Poco.ReleasePolicy.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.ReleasePolicy.html" />
                         <File Id="POCO.ROTATEATTIMESTRATEGY.HTML" Name="Poco.RotateAtTimeStrategy.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RotateAtTimeStrategy.html" />
                         <File Id="POCO.ROTATEBYINTERVALSTRATEGY.HTML" Name="Poco.RotateByIntervalStrategy.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RotateByIntervalStrategy.html" />
                         <File Id="POCO.ROTATEBYSIZESTRATEGY.HTML" Name="Poco.RotateBySizeStrategy.html" Source="$(var.POCO)\releases\poco-$(var.VERSION)-all-doc\Poco.RotateBySizeStrategy.html" />
