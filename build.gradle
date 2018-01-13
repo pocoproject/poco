@@ -13,7 +13,8 @@ dependencies {
 }
 */
 plugins {
-  id 'net.saliman.cobertura' version '2.5.1'
+	id 'net.saliman.cobertura' version '2.5.1'
+//	id 'com.jfrog.artifactory' version '4.1'
 }
 apply plugin: 'base' 
 
@@ -844,7 +845,7 @@ task pocoDoc(type: Exec) {
 	inputs.files(executable)
 	inputs.files(fileTree("doc").filter { it.isFile() })
 	inputs.files(new File("$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"))
-	outputs.files(new File("releases/poco-$version-all-doc/index.html"))
+	outputs.files(new File("releases/poco-${version}-all-doc/index.html"))
 }
 task zipDoc(type: Zip) {
 	from "releases/poco-${version}-all-doc/"
@@ -860,7 +861,7 @@ task zipDoc(type: Zip) {
 def candle(VSYEAR, VERSION, target, os) {
 	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
 		def Set<Task> pocos = project.getTasksByName('poco', true)
-		setDependsOn(pocos)
+//		setDependsOn(pocos)
 		dependsOn ':pocoDoc'
 		workingDir "packaging/Windows/WiX"
 
@@ -873,11 +874,14 @@ def candle(VSYEAR, VERSION, target, os) {
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
 		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 		args "Poco.wxs"
-
-		inputs.files(new File("releases/poco-$version-all-doc/index.html"))
+		
+		def File index = new File("$rootDir/releases/poco-$VERSION-all-doc/index.html")
+		inputs.files(index)
 		inputs.files(new File(workingDir, "Poco.wxs"))
 		inputs.files(project.getTasksByName('poco', true).outputs.files)
-		outputs.files(new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
+		
+		def File output = new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
+		outputs.files(output)
 
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
@@ -898,8 +902,12 @@ def light(VSYEAR, VERSION, target, os) {
 		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
 		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 
-		inputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"))
-		outputs.files(new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"))
+		def File input = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
+		println input
+		inputs.files(input)
+		def File output = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi")
+		println output
+		outputs.files(output)
 
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
