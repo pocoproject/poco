@@ -361,7 +361,7 @@ available:
 As an alternative to the platform specific Makefiles and Solutions, CMake can be used
 to do build Poco. CMake is a cross platform Makefile generator that also supports 
 Microsoft Visual Studio and Apple Xcode.
-Poco requires CMake 3.0 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
+Poco requires CMake 3.2 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
 
 CMake supports out of source builds and this is the recommended way to build Poco using CMake.
 
