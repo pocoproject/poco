@@ -26,7 +26,7 @@
 #include "Poco/Any.h"
 #include "Poco/Timer.h"
 #include "Poco/Mutex.h"
-#include <list>
+#include <map>
 
 
 namespace Poco {
@@ -67,6 +67,8 @@ class Poco_SQL_API SessionPool: public RefCountedObject
 	///     ...
 {
 public:
+	typedef Poco::AutoPtr<SessionPool> Ptr;
+
 	SessionPool(const std::string& connector,
 		const std::string& connectionString,
 		int minSessions = 1,
@@ -92,7 +94,7 @@ public:
 		/// If the maximum number of sessions for this pool has
 		/// already been created, a SessionPoolExhaustedException
 		/// is thrown.
-	
+
 	template <typename T>
 	Session get(const std::string& rName, const T& value)
 		/// Returns a Session with requested property set.
@@ -116,19 +118,19 @@ public:
 
 	int capacity() const;
 		/// Returns the maximum number of sessions the SessionPool will manage.
-		
+
 	int used() const;
 		/// Returns the number of sessions currently in use.
-		
+
 	int idle() const;
 		/// Returns the number of idle sessions.
-		
+
 	int dead();
 		/// Returns the number of not connected active sessions.
 
 	int allocated() const;
 		/// Returns the number of allocated sessions.
-		
+
 	int available() const;
 		/// Returns the number of available (idle + remaining capacity) sessions.
 
@@ -164,46 +166,45 @@ protected:
 		///
 		/// The default implementation does nothing.
 
-	typedef Poco::AutoPtr<PooledSessionHolder>    PooledSessionHolderPtr;
-	typedef Poco::AutoPtr<PooledSessionImpl>      PooledSessionImplPtr;
-	typedef std::list<PooledSessionHolderPtr>     SessionList;
-	typedef Poco::HashMap<std::string, bool>      FeatureMap;
-	typedef Poco::HashMap<std::string, Poco::Any> PropertyMap;
+	typedef Poco::AutoPtr<PooledSessionHolder>                     PooledSessionHolderPtr;
+	typedef Poco::AutoPtr<PooledSessionImpl>                       PooledSessionImplPtr;
+	typedef std::map<PooledSessionHolder*, PooledSessionHolderPtr> SessionList;
+	typedef std::map<std::string, bool>                            FeatureMap;
+	typedef std::map<std::string, Poco::Any>                       PropertyMap;
 
 	void purgeDeadSessions();
 	int deadImpl(SessionList& rSessions);
-	void applySettings(SessionImpl* pImpl);
+	void applySettings(SessionImpl::Ptr pImpl);
 	void putBack(PooledSessionHolderPtr pHolder);
 	void onJanitorTimer(Poco::Timer&);
 
 private:
 	typedef std::pair<std::string, Poco::Any> PropertyPair;
 	typedef std::pair<std::string, bool> FeaturePair;
-	typedef std::map<SessionImpl*, PropertyPair> AddPropertyMap;
-	typedef std::map<SessionImpl*, FeaturePair> AddFeatureMap;
+	typedef std::map<SessionImpl::Ptr, PropertyPair> AddPropertyMap;
+	typedef std::map<SessionImpl::Ptr, FeaturePair> AddFeatureMap;
 
 	SessionPool(const SessionPool&);
 	SessionPool& operator = (const SessionPool&);
-		
+
 	void closeAll(SessionList& sessionList);
 
-	std::string    _connector;
-	std::string    _connectionString;
-	int            _minSessions;
-	int            _maxSessions;
-	int            _idleTime;
-	int            _nSessions;
-	SessionList    _idleSessions;
-	SessionList    _activeSessions;
-	Poco::Timer    _janitorTimer;
-	FeatureMap     _featureMap;
-	PropertyMap    _propertyMap;
-	bool           _shutdown;
-	AddPropertyMap _addPropertyMap;
-	AddFeatureMap  _addFeatureMap;
-	mutable
-	Poco::Mutex _mutex;
-	
+	std::string         _connector;
+	std::string         _connectionString;
+	int                 _minSessions;
+	int                 _maxSessions;
+	int                 _idleTime;
+	int                 _nSessions;
+	SessionList         _idleSessions;
+	SessionList         _activeSessions;
+	Poco::Timer         _janitorTimer;
+	FeatureMap          _featureMap;
+	PropertyMap         _propertyMap;
+	std::atomic<bool>   _shutdown;
+	AddPropertyMap      _addPropertyMap;
+	AddFeatureMap       _addFeatureMap;
+	mutable Poco::Mutex _mutex;
+
 	friend class PooledSessionImpl;
 };
 

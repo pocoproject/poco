@@ -20,6 +20,7 @@
 
 #include "Poco/SQL/SQL.h"
 #include "Poco/SQL/SessionImpl.h"
+#include "Poco/SQL/StatementImpl.h"
 #include "Poco/SQL/PooledSessionHolder.h"
 #include "Poco/AutoPtr.h"
 
@@ -37,36 +38,38 @@ class Poco_SQL_API PooledSessionImpl: public SessionImpl
 	/// management to SessionImpl objects.
 {
 public:
-	PooledSessionImpl(PooledSessionHolder* pHolder);
+	PooledSessionImpl(PooledSessionHolder::Ptr pHolder);
 		/// Creates the PooledSessionImpl.
 
 	~PooledSessionImpl();
 		/// Destroys the PooledSessionImpl.
 
 	// SessionImpl
-	StatementImpl* createStatementImpl();
+	StatementImpl::Ptr createStatementImpl();
 	void begin();
 	void commit();
 	void rollback();
 	void open(const std::string& connect = "");
 	void close();
-	bool isConnected();
+	bool isConnected() const;
 	void setConnectionTimeout(std::size_t timeout);
-	std::size_t getConnectionTimeout();
-	bool canTransact();
-	bool isTransaction();
+	std::size_t getConnectionTimeout() const;
+	bool canTransact() const;
+	bool isTransaction() const;
 	void setTransactionIsolation(Poco::UInt32);
-	Poco::UInt32 getTransactionIsolation();
-	bool hasTransactionIsolation(Poco::UInt32);
-	bool isTransactionIsolation(Poco::UInt32);
+	Poco::UInt32 getTransactionIsolation() const;
+	bool hasTransactionIsolation(Poco::UInt32) const;
+	bool isTransactionIsolation(Poco::UInt32) const;
 	const std::string& connectorName() const;
-	void setFeature(const std::string& name, bool state);	
-	bool getFeature(const std::string& name);
+	void setFeature(const std::string& name, bool state);
+	bool getFeature(const std::string& name) const;
 	void setProperty(const std::string& name, const Poco::Any& value);
-	Poco::Any getProperty(const std::string& name);
-	
+	Poco::Any getProperty(const std::string& name) const;
+
+	virtual void putBack();
+
 protected:
-	SessionImpl* access() const;
+	SessionImpl::Ptr access() const;
 		/// Updates the last access timestamp,
 		/// verifies validity of the session
 		/// and returns the session if it is valid.
@@ -74,18 +77,18 @@ protected:
 		/// Throws an SessionUnavailableException if the
 		/// session is no longer valid.
 		
-	SessionImpl* impl() const;
+	SessionImpl::Ptr impl() const;
 		/// Returns a pointer to the SessionImpl.
-				
-private:	
-	mutable Poco::AutoPtr<PooledSessionHolder> _pHolder;
+
+private:
+	mutable PooledSessionHolder::Ptr _pHolder;
 };
 
 
 //
 // inlines
 //
-inline SessionImpl* PooledSessionImpl::impl() const
+inline SessionImpl::Ptr PooledSessionImpl::impl() const
 {
 	return _pHolder->session();
 }

@@ -20,7 +20,7 @@
 
 #include "Poco/SQL/SQL.h"
 #include "Poco/SQL/SessionImpl.h"
-#include "Poco/AutoPtr.h"
+#include "Poco/SharedPtr.h"
 
 
 namespace Poco {
@@ -35,6 +35,8 @@ class Poco_SQL_API Connector
 	/// registered with the SessionFactory.
 {
 public:
+	typedef Poco::SharedPtr<Connector> Ptr;
+
 	Connector();
 		/// Creates the Connector.
 
@@ -44,7 +46,7 @@ public:
 	virtual const std::string& name() const = 0;
 		/// Returns the name associated with this connector.
 
-	virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString,
+	virtual SessionImpl::Ptr createSession(const std::string& connectionString,
 		std::size_t timeout = SessionImpl::LOGIN_TIMEOUT_DEFAULT) = 0;
 		/// Create a SessionImpl object and initialize it with the given connectionString.
 };

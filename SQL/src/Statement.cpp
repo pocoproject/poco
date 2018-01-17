@@ -42,14 +42,21 @@ Statement::Statement(Session& rSession):
 }
 
 
-Statement::Statement(const Statement& stmt):
-	_pImpl(stmt._pImpl),
-	_async(stmt._async),
-	_pResult(stmt._pResult),
-	_pAsyncExec(stmt._pAsyncExec),
-	_arguments(stmt._arguments),
-	_pRowFormatter(stmt._pRowFormatter)
+Statement::Statement(const Statement& stmt)
 {
+	if (stmt.isAsync() && !stmt.done()) wait();
+	_pImpl = stmt._pImpl;
+	_async = stmt._async;
+	_pResult = stmt._pResult;
+	_pAsyncExec = stmt._pAsyncExec;
+	_arguments = stmt._arguments;
+	_pRowFormatter = stmt._pRowFormatter;
+}
+
+
+Statement::Statement(Statement&& stmt)
+{
+	this->move(std::move(stmt));
 }
 
 
@@ -60,8 +67,12 @@ Statement::~Statement()
 
 Statement& Statement::operator = (const Statement& stmt)
 {
-	Statement tmp(stmt);
-	swap(tmp);
+	if (stmt.isAsync() && !stmt.done()) wait();
+	if (this != &stmt)
+	{
+		Statement tmp(stmt);
+		swap(tmp);
+	}
 	return *this;
 }
 
@@ -69,13 +80,34 @@ Statement& Statement::operator = (const Statement& stmt)
 void Statement::swap(Statement& other)
 {
 	using std::swap;
-	
-	swap(_pImpl, other._pImpl);
-	swap(_async, other._async);
-	swap(_pAsyncExec, other._pAsyncExec);
-	swap(_pResult, other._pResult);
-	_arguments.swap(other._arguments);
-	swap(_pRowFormatter, other._pRowFormatter);
+	if (this != &other)
+	{
+		swap(_pImpl, other._pImpl);
+		swap(_async, other._async);
+		swap(_pAsyncExec, other._pAsyncExec);
+		swap(_pResult, other._pResult);
+		_arguments.swap(other._arguments);
+		swap(_pRowFormatter, other._pRowFormatter);
+	}
+}
+
+
+Statement& Statement::operator = (Statement&& stmt)
+{
+	this->move(std::move(stmt));
+	return *this;
+}
+
+
+void Statement::move(Statement&& stmt)
+{
+	if (isAsync() && !done()) wait();
+	_pImpl = stmt._pImpl; stmt._pImpl = nullptr;
+	_async = stmt._async; stmt._async = false;
+	_pResult = stmt._pResult; stmt._pResult = nullptr;
+	_pAsyncExec = stmt._pAsyncExec; stmt._pAsyncExec = nullptr;
+	_arguments = std::move(stmt._arguments); stmt._arguments.clear();
+	_pRowFormatter = stmt._pRowFormatter; stmt._pRowFormatter = nullptr;
 }
 
 

@@ -38,15 +38,14 @@ SessionPoolContainer::~SessionPoolContainer()
 }
 
 
-void SessionPoolContainer::add(SessionPool* pPool)
+void SessionPoolContainer::add(SessionPool::Ptr pPool)
 {
-	poco_check_ptr (pPool);
+	poco_check_ptr (pPool.get());
 
 	FastMutex::ScopedLock lock(_mutex);
 	if (_sessionPools.find(pPool->name()) != _sessionPools.end())
 		throw SessionPoolExistsException("Session pool already exists: " + pPool->name());
 
-	pPool->duplicate();
 	_sessionPools.insert(SessionPoolMap::value_type(pPool->name(), pPool));
 }
 
@@ -65,7 +64,7 @@ Session SessionPoolContainer::add(const std::string& sessionKey,
 	// pool already exists, silently return a session from it
 	if (it != _sessionPools.end()) return it->second->get();
 
-	SessionPool* pSP =
+	SessionPool::Ptr pSP =
 		new SessionPool(sessionKey, connectionString, minSessions, maxSessions, idleTime);
 
 	std::pair<SessionPoolMap::iterator, bool> ins =

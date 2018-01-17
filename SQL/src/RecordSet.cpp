@@ -52,13 +52,22 @@ RecordSet::RecordSet(Session& rSession,
 }
 
 
-RecordSet::RecordSet(const RecordSet& other):
-	Statement(other.impl()),
+RecordSet::RecordSet(const RecordSet& other): Statement(other),
 	_currentRow(other._currentRow),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
 	_pFilter(other._pFilter)
 {
+}
+
+
+RecordSet::RecordSet(RecordSet&& other): Statement(std::move(other))
+{
+	_currentRow = other._currentRow; other._currentRow = 0;
+	_pBegin = other._pBegin; other._pBegin = nullptr;
+	_pEnd = other._pEnd; other._pEnd = nullptr;
+	_pFilter = other._pFilter; other._pFilter = nullptr;
+	_rowMap = std::move(other._rowMap); other._rowMap.clear();
 }
 
 

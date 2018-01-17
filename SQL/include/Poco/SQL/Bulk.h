@@ -44,7 +44,7 @@ public:
 	Poco::UInt32 size() const;
 		/// Returns the value of the limit associated with
 		/// this bulk object.
-	
+
 private:
 	Bulk();
 

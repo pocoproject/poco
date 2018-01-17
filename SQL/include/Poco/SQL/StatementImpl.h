@@ -28,6 +28,7 @@
 #include "Poco/SQL/BulkExtraction.h"
 #include "Poco/SQL/SessionImpl.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"

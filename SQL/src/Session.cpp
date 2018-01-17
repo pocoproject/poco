@@ -35,34 +35,55 @@ Session::Session(const std::string& rConnector,
 	const std::string& connectionString,
 	std::size_t timeout)
 {
-	Session newSession(SessionFactory::instance().create(rConnector, connectionString, timeout));
-	swap(newSession);
+	operator =(SessionFactory::instance().create(rConnector, connectionString, timeout));
 }
 
 
 Session::Session(const std::string& connection,
 	std::size_t timeout)
 {
-	Session newSession(SessionFactory::instance().create(connection, timeout));
-	swap(newSession);
+	operator =(SessionFactory::instance().create(connection, timeout));
 }
 
 
-Session::Session(const Session& other):	_pImpl(other._pImpl),
+Session::Session(const Session& other): _pImpl(other._pImpl),
 	_statementCreator(other._pImpl)
 {
 }
 
 
+Session::Session(Session&& other): _pImpl(other._pImpl),
+	_statementCreator(other._pImpl)
+{
+	other._pImpl = nullptr;
+}
+
+
 Session::~Session()
 {
+	if (_pImpl) _pImpl->putBack();
 }
 
 
 Session& Session::operator = (const Session& other)
 {
-	Session tmp(other);
-	swap(tmp);
+	if (this != &other)
+	{
+		Session tmp(other);
+		swap(tmp);
+	}
+	return *this;
+}
+
+
+Session& Session::operator = (Session&& other)
+{
+	if (this != &other)
+	{
+		_pImpl = other._pImpl;
+		_statementCreator = _pImpl;
+		other._pImpl = nullptr;
+	}
 	return *this;
 }
 

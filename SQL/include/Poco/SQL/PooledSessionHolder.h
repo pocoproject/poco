@@ -36,13 +36,15 @@ class Poco_SQL_API PooledSessionHolder: public Poco::RefCountedObject
 	/// This class is used by SessionPool to manage SessionImpl objects.
 {
 public:
-	PooledSessionHolder(SessionPool& owner, SessionImpl* pSessionImpl);
+	typedef AutoPtr<PooledSessionHolder> Ptr;
+
+	PooledSessionHolder(SessionPool& owner, SessionImpl::Ptr pSessionImpl);
 		/// Creates the PooledSessionHolder.
 
 	~PooledSessionHolder();
 		/// Destroys the PooledSessionHolder.
 
-	SessionImpl* session();
+	SessionImpl::Ptr session();
 		/// Returns a pointer to the SessionImpl.
 
 	SessionPool& owner();
@@ -55,9 +57,9 @@ public:
 		/// Returns the number of seconds the session has not been used.
 
 private:
-	SessionPool& _owner;
-	Poco::AutoPtr<SessionImpl> _pImpl;
-	Poco::Timestamp _lastUsed;
+	SessionPool&            _owner;
+	SessionImpl::Ptr        _pImpl;
+	Poco::Timestamp         _lastUsed;
 	mutable Poco::FastMutex _mutex;
 };
 
@@ -65,7 +67,7 @@ private:
 //
 // inlines
 //
-inline SessionImpl* PooledSessionHolder::session()
+inline SessionImpl::Ptr PooledSessionHolder::session()
 {
 	return _pImpl;
 }
@@ -80,7 +82,7 @@ inline SessionPool& PooledSessionHolder::owner()
 inline void PooledSessionHolder::access()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	
+
 	_lastUsed.update();
 }
 

@@ -38,7 +38,7 @@ SessionFactory& SessionFactory::instance()
 }
 
 
-void SessionFactory::add(Connector* pIn)
+void SessionFactory::add(Connector::Ptr pIn)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	SessionInfo info(pIn);
@@ -83,7 +83,7 @@ Session SessionFactory::create(const std::string& uri,
 }
 
 
-SessionFactory::SessionInfo::SessionInfo(Connector* pSI):
+SessionFactory::SessionInfo::SessionInfo(Connector::Ptr pSI):
 	cnt(1),
 	ptrSI(pSI)
 {

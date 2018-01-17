@@ -117,7 +117,7 @@ public:
 		///                  Setting this property to false may result in log entries being lost.
 		///                  True values are (case insensitive) "true", "t", "yes", "y".
 		///                  Anything else yields false.
-		
+
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 

@@ -50,11 +50,11 @@ class Poco_SQL_API SessionFactory
 	///      Session ses("SQLite", "dummy.db");
 {
 public:
-	
+
 	static SessionFactory& instance();
 		/// returns the static instance of the singleton.
 
-	void add(Connector* pIn);
+	void add(Connector::Ptr pIn);
 		/// Registers a Connector under its key at the factory. If a registration for that
 		/// key is already active, the first registration will be kept, only its reference count will be increased.
 		/// Always takes ownership of parameter pIn.
@@ -83,8 +83,8 @@ private:
 	struct SessionInfo
 	{
 		int cnt;
-		Poco::SharedPtr<Connector> ptrSI;
-		SessionInfo(Connector* pSI);
+		Connector::Ptr ptrSI;
+		SessionInfo(Connector::Ptr pSI);
 	};
 	
 	typedef std::map<std::string, SessionInfo, Poco::CILess> Connectors;

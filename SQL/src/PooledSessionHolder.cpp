@@ -19,9 +19,9 @@ namespace Poco {
 namespace SQL {
 
 
-PooledSessionHolder::PooledSessionHolder(SessionPool& rOwner, SessionImpl* pSessionImpl):
+PooledSessionHolder::PooledSessionHolder(SessionPool& rOwner, SessionImpl::Ptr pSessionImpl):
 	_owner(rOwner),
-	_pImpl(pSessionImpl, true)
+	_pImpl(pSessionImpl)
 {
 }
 

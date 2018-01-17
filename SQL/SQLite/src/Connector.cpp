@@ -46,7 +46,7 @@ Connector::~Connector()
 Poco::AutoPtr<Poco::SQL::SessionImpl> Connector::createSession(const std::string& connectionString,
 	std::size_t timeout)
 {
-	return Poco::AutoPtr<Poco::SQL::SessionImpl>(new SessionImpl(connectionString, timeout));
+	return Poco::AutoPtr<Poco::SQL::SessionImpl>(new Poco::SQL::SQLite::SessionImpl(connectionString, timeout));
 }
 
 

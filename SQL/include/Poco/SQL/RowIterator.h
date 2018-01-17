@@ -45,7 +45,13 @@ public:
 	static const std::size_t POSITION_END;
 		/// End position indicator.
 
+	//@ deprecated
 	RowIterator(RecordSet* pRecordSet, bool positionEnd);
+		/// Creates the RowIterator and positions it at the end of
+		/// the recordset if positionEnd is true. Otherwise, it is
+		/// positioned at the beginning.
+
+	RowIterator(RecordSet& recordSet, bool positionEnd = false);
 		/// Creates the RowIterator and positions it at the end of
 		/// the recordset if positionEnd is true. Otherwise, it is
 		/// positioned at the beginning.

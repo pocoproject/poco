@@ -62,7 +62,7 @@ Poco::AutoPtr<Poco::SQL::SessionImpl> Connector::createSession(const std::string
 		}
 	}
 
-	return Poco::AutoPtr<Poco::SQL::SessionImpl>(new SessionImpl(connectionString, timeout));	
+	return Poco::AutoPtr<Poco::SQL::SessionImpl>(new Poco::SQL::MySQL::SessionImpl(connectionString, timeout));
 }
 
 

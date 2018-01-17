@@ -158,7 +158,7 @@ public:
 	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
 	static const Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
 
-	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
+	Session(SessionImpl::Ptr ptrImpl);
 		/// Creates the Session.
 
 	Session(const std::string& connector,
@@ -175,8 +175,14 @@ public:
 	Session(const Session&);
 		/// Creates a session by copying another one.
 
+	Session(Session&&);
+		/// Creates a session by moving another one.
+
 	Session& operator = (const Session&);
 		/// Assignment operator.
+
+	Session& operator = (Session&&);
+		/// Assignment move operator.
 
 	~Session();
 		/// Destroys the Session.
@@ -191,7 +197,7 @@ public:
 		return _statementCreator << t;
 	}
 
-	StatementImpl* createStatementImpl();
+	StatementImpl::Ptr createStatementImpl();
 		/// Creates a StatementImpl.
 
 	void open(const std::string& connect = "");
@@ -220,7 +226,7 @@ public:
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout();
+	std::size_t getConnectionTimeout() const;
 		/// Returns the session connection timeout value.
 
 	void begin();
@@ -299,21 +305,21 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
-	SessionImpl* impl();
+	SessionImpl::Ptr impl();
 		/// Returns a pointer to the underlying SessionImpl.
 
 private:
 	Session();
 
-	Poco::AutoPtr<SessionImpl> _pImpl;
-	StatementCreator           _statementCreator;
+	SessionImpl::Ptr _pImpl;
+	StatementCreator _statementCreator;
 };
 
 
 //
 // inlines
 //
-inline StatementImpl* Session::createStatementImpl()
+inline StatementImpl::Ptr Session::createStatementImpl()
 {
 	return _pImpl->createStatementImpl();
 }
@@ -361,7 +367,7 @@ inline void Session::setConnectionTimeout(std::size_t timeout)
 }
 
 
-inline std::size_t Session::getConnectionTimeout()
+inline std::size_t Session::getConnectionTimeout() const
 {
 	return _pImpl->getConnectionTimeout();
 }
@@ -448,7 +454,7 @@ inline void Session::setFeature(const std::string& name, bool state)
 
 inline bool Session::getFeature(const std::string& name) const
 {
-	return const_cast<SessionImpl*>(_pImpl.get())->getFeature(name);
+	return _pImpl->getFeature(name);
 }
 
 
@@ -460,11 +466,11 @@ inline void Session::setProperty(const std::string& name, const Poco::Any& value
 
 inline Poco::Any Session::getProperty(const std::string& name) const
 {
-	return const_cast<SessionImpl*>(_pImpl.get())->getProperty(name);
+	return _pImpl->getProperty(name);
 }
 
 
-inline SessionImpl* Session::impl()
+inline SessionImpl::Ptr Session::impl()
 {
 	return _pImpl;
 }

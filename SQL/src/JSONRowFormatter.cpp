@@ -40,7 +40,6 @@ JSONRowFormatter::JSONRowFormatter(int mode) : RowFormatter("{", "]}"),
 	{
 		mode |= JSON_FMT_MODE_ROW_COUNT;
 		mode |= JSON_FMT_MODE_COLUMN_NAMES;
-		//setPostfix("]}");
 	}
 
 	setJSONMode(mode);

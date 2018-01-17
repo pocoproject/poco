@@ -101,6 +101,9 @@ public:
 	RecordSet(const RecordSet& other);
 		/// Copy-creates the recordset.
 
+	RecordSet(RecordSet&& other);
+	/// Move-creates the recordset.
+
 	~RecordSet();
 		/// Destroys the RecordSet.
 

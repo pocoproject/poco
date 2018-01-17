@@ -21,10 +21,10 @@ namespace Poco {
 namespace SQL {
 
 
-PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
+PooledSessionImpl::PooledSessionImpl(PooledSessionHolder::Ptr pHolder):
 	SessionImpl(pHolder->session()->connectionString(),
 		pHolder->session()->getLoginTimeout()),
-	_pHolder(pHolder, true)
+	_pHolder(pHolder)
 {
 }
 
@@ -42,7 +42,7 @@ PooledSessionImpl::~PooledSessionImpl()
 }
 
 
-StatementImpl* PooledSessionImpl::createStatementImpl()
+StatementImpl::Ptr PooledSessionImpl::createStatementImpl()
 {
 	return access()->createStatementImpl();
 }
@@ -60,7 +60,7 @@ void PooledSessionImpl::commit()
 }
 
 
-bool PooledSessionImpl::isConnected()
+bool PooledSessionImpl::isConnected() const
 {
 	return access()->isConnected();
 }
@@ -72,19 +72,19 @@ void PooledSessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-std::size_t PooledSessionImpl::getConnectionTimeout()
+std::size_t PooledSessionImpl::getConnectionTimeout() const
 {
 	return access()->getConnectionTimeout();
 }
 
 
-bool PooledSessionImpl::canTransact()
+bool PooledSessionImpl::canTransact() const
 {
 	return access()->canTransact();
 }
 
 
-bool PooledSessionImpl::isTransaction()
+bool PooledSessionImpl::isTransaction() const
 {
 	return access()->isTransaction();
 }
@@ -96,19 +96,19 @@ void PooledSessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-Poco::UInt32 PooledSessionImpl::getTransactionIsolation()
+Poco::UInt32 PooledSessionImpl::getTransactionIsolation() const
 {
 	return access()->getTransactionIsolation();
 }
 
 
-bool PooledSessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+bool PooledSessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	return access()->hasTransactionIsolation(ti);
 }
 
 
-bool PooledSessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+bool PooledSessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	return access()->isTransactionIsolation(ti);
 }
@@ -123,6 +123,16 @@ void PooledSessionImpl::rollback()
 void PooledSessionImpl::open(const std::string& connect)
 {
 	access()->open(connect);
+}
+
+
+void PooledSessionImpl::putBack()
+{
+	if (_pHolder)
+	{
+		_pHolder->owner().putBack(_pHolder);
+		_pHolder = nullptr;
+	}
 }
 
 
@@ -142,8 +152,7 @@ void PooledSessionImpl::close()
 				access()->close();
 			}
 		}
-		_pHolder->owner().putBack(_pHolder);
-		_pHolder = 0;
+		putBack();
 	}
 }
 
@@ -160,7 +169,7 @@ void PooledSessionImpl::setFeature(const std::string& name, bool state)
 }
 
 
-bool PooledSessionImpl::getFeature(const std::string& name)
+bool PooledSessionImpl::getFeature(const std::string& name) const
 {
 	return access()->getFeature(name);
 }
@@ -172,13 +181,13 @@ void PooledSessionImpl::setProperty(const std::string& name, const Poco::Any& va
 }
 
 
-Poco::Any PooledSessionImpl::getProperty(const std::string& name)
+Poco::Any PooledSessionImpl::getProperty(const std::string& name) const
 {
 	return access()->getProperty(name);
 }
 
 
-SessionImpl* PooledSessionImpl::access() const
+SessionImpl::Ptr PooledSessionImpl::access() const
 {
 	if (_pHolder)
 	{

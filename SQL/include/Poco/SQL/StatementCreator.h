@@ -34,8 +34,8 @@ class Poco_SQL_API StatementCreator
 public:
 	StatementCreator();
 		/// Creates an unitialized StatementCreator.
-		
-	StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl);
+
+	StatementCreator(SessionImpl::Ptr ptrImpl);
 		/// Creates a StatementCreator.
 
 	StatementCreator(const StatementCreator& other);
@@ -46,10 +46,13 @@ public:
 
 	StatementCreator& operator = (const StatementCreator& other);
 		/// Assignment operator.
-		
+
+	StatementCreator& operator = (Poco::AutoPtr<SessionImpl> ptrImpl);
+		/// Assignment operator.
+
 	void swap(StatementCreator& other);
-		/// Swaps the StatementCreator with another one.	
-		
+		/// Swaps the StatementCreator with another one.
+
 	template <typename T>
 	Statement operator << (const T& t)
 		/// Creates a Statement.

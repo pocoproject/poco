@@ -40,14 +40,14 @@ class AbstractSessionImpl: public SessionImpl
 public:
 	typedef void (C::*FeatureSetter)(const std::string&, bool);
 		/// The setter method for a feature.
-		
-	typedef bool (C::*FeatureGetter)(const std::string&);
+
+	typedef bool (C::*FeatureGetter)(const std::string&) const;
 		/// The getter method for a feature.
-		
+
 	typedef void (C::*PropertySetter)(const std::string&, const Poco::Any&);
 		/// The setter method for a property.
-		
-	typedef Poco::Any (C::*PropertyGetter)(const std::string&);
+
+	typedef Poco::Any (C::*PropertyGetter)(const std::string&) const;
 		/// The getter method for a property.
 
 	AbstractSessionImpl(const std::string& rConnectionString,
@@ -129,8 +129,8 @@ public:
 		}
 		else throw NotSupportedException(name);
 	}
-	
-	bool getFeature(const std::string& name)
+
+	bool getFeature(const std::string& name) const
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
 	{
@@ -138,7 +138,7 @@ public:
 		if (it != _features.end())
 		{
 			if (it->second.getter)
-				return (static_cast<C*>(this)->*it->second.getter)(name);
+				return (static_cast<const C*>(this)->*it->second.getter)(name);
 			else
 				throw NotImplementedException("get", name);
 		}
@@ -160,7 +160,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	Poco::Any getProperty(const std::string& name)
+	Poco::Any getProperty(const std::string& name) const
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
 	{
@@ -168,13 +168,13 @@ public:
 		if (it != _properties.end())
 		{
 			if (it->second.getter)
-				return (static_cast<C*>(this)->*it->second.getter)(name);
+				return (static_cast<const C*>(this)->*it->second.getter)(name);
 			else
 				throw NotImplementedException("set", name);
 		}
 		else throw NotSupportedException(name);
 	}
-	
+
 	void setStorage(const std::string& value)
 		/// Sets the storage type.
 	{
@@ -186,8 +186,8 @@ public:
 	{
 		_storage = Poco::RefAnyCast<std::string>(value);
 	}
-		
-	Poco::Any getStorage(const std::string& name="")
+
+	Poco::Any getStorage(const std::string& name="") const
 		/// Returns the storage type
 	{
 		return _storage;
@@ -198,8 +198,8 @@ public:
 	{
 		_handle = handle;
 	}
-		
-	Poco::Any getHandle(const std::string& name="")
+
+	Poco::Any getHandle(const std::string& name="") const
 		/// Returns the native session handle.
 	{
 		return _handle;
@@ -210,8 +210,8 @@ public:
 	{
 		_bulk = bulk;
 	}
-		
-	bool getBulk(const std::string& name="")
+
+	bool getBulk(const std::string& name="") const
 		/// Returns the execution type
 	{
 		return _bulk;
@@ -229,7 +229,7 @@ public:
 		_emptyStringIsNull = emptyStringIsNull;
 	}
 		
-	bool getEmptyStringIsNull(const std::string& name="")
+	bool getEmptyStringIsNull(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -250,7 +250,7 @@ public:
 		_forceEmptyString = forceEmptyString;
 	}
 		
-	bool getForceEmptyString(const std::string& name="")
+	bool getForceEmptyString(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setForceEmptyString(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -270,7 +270,7 @@ protected:
 		feature.getter = getter;
 		_features[name] = feature;
 	}
-		
+
 	void addProperty(const std::string& name, PropertySetter setter, PropertyGetter getter)
 		/// Adds a property to the map of supported properties.
 		///
@@ -289,16 +289,16 @@ private:
 		FeatureSetter setter;
 		FeatureGetter getter;
 	};
-	
+
 	struct Property
 	{
 		PropertySetter setter;
 		PropertyGetter getter;
 	};
-	
+
 	typedef std::map<std::string, Feature>  FeatureMap;
 	typedef std::map<std::string, Property> PropertyMap;
-	
+
 	FeatureMap  _features;
 	PropertyMap _properties;
 	std::string _storage;

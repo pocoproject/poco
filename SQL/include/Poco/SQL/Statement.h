@@ -115,10 +115,28 @@ public:
 		/// synchronized prior to copy operation (i.e. is copied while executing),
 		/// this constructor shall synchronize it.
 
+	Statement(Statement&& stmt);
+		/// Move constructor.
+		/// If the statement has been executed asynchronously and has not been
+		/// synchronized prior to move operation (i.e. is moved while executing),
+		/// this constructor shall synchronize it.
+
 	Statement& operator = (const Statement& stmt);
 		/// Assignment operator.
+		/// If the statement has been executed asynchronously and has not been
+		/// synchronized prior to assignment operation (i.e. is assigned while executing),
+		/// this operator shall synchronize it.
 
 	void swap(Statement& other);
+		/// Swaps the statement with another one.
+
+	Statement& operator = (Statement&& stmt);
+		/// Move assignment operator.
+		/// If the statement has been executed asynchronously and has not been
+		/// synchronized prior to assignment operation (i.e. is assigned while executing),
+		/// this operator shall synchronize it.
+
+	void move(Statement&& stmt);
 		/// Swaps the statement with another one.
 
 	template <typename T>
@@ -326,7 +344,7 @@ public:
 		/// Returns true if the statement was paused (a range limit stopped it
 		/// and there is more work to do).
 
-	bool done();
+	bool done() const;
 		/// Returns true if the statement was completely executed or false if a range limit stopped it
 		/// and there is more work to do. When no limit is set, it will always return true after calling execute().
 
@@ -809,7 +827,7 @@ inline bool Statement::paused()
 }
 
 
-inline bool Statement::done()
+inline bool Statement::done() const
 {
 	return _pImpl->getState() == StatementImpl::ST_DONE;
 }

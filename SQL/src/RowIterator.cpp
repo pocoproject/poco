@@ -33,6 +33,13 @@ RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):
 }
 
 
+RowIterator::RowIterator(RecordSet& recordSet, bool positionEnd):
+		_pRecordSet(&recordSet),
+		_position(positionEnd ? POSITION_END : 0)
+{
+}
+
+
 RowIterator::RowIterator(const RowIterator& other):
 	_pRecordSet(other._pRecordSet),
 	_position(other._position)

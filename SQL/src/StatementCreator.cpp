@@ -25,7 +25,7 @@ StatementCreator::StatementCreator()
 }
 
 
-StatementCreator::StatementCreator(Poco::AutoPtr<SessionImpl> ptrImpl):
+StatementCreator::StatementCreator(SessionImpl::Ptr ptrImpl):
 	_ptrImpl(ptrImpl)
 {
 }
@@ -39,8 +39,18 @@ StatementCreator::StatementCreator(const StatementCreator& other):
 
 StatementCreator& StatementCreator::operator = (const StatementCreator& other)
 {
-	StatementCreator tmp(other);
-	swap(tmp);
+	if (this != &other)
+	{
+		StatementCreator tmp(other);
+		swap(tmp);
+	}
+	return *this;
+}
+
+
+StatementCreator& StatementCreator::operator = (Poco::AutoPtr<SessionImpl> ptrImpl)
+{
+	_ptrImpl = ptrImpl;
 	return *this;
 }
 

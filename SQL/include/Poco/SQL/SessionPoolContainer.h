@@ -39,7 +39,7 @@ public:
 	~SessionPoolContainer();
 		/// Destroys the SessionPoolContainer.
 	
-	void add(SessionPool* pPool);
+	void add(SessionPool::Ptr pPool);
 		/// Adds existing session pool to the container.
 		/// Throws SessionPoolExistsException if pool already exists.
 
@@ -80,11 +80,11 @@ public:
 		/// Shuts down all the held pools.
 
 private:
-	typedef std::map<std::string, AutoPtr<SessionPool>, Poco::CILess> SessionPoolMap;
+	typedef std::map<std::string, SessionPool::Ptr, Poco::CILess> SessionPoolMap;
 
 	SessionPoolContainer(const SessionPoolContainer&);
 	SessionPoolContainer& operator = (const SessionPoolContainer&);
-		
+
 	SessionPoolMap  _sessionPools;
 	Poco::FastMutex _mutex;
 };

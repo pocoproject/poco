@@ -47,7 +47,7 @@ SessionPoolTest::~SessionPoolTest()
 void SessionPoolTest::testSessionPool()
 {
 	SessionPool pool("test", "cs", 1, 4, 2);
-	
+
 	pool.setFeature("f1", true);
 	assert (pool.getFeature("f1"));
 	try { pool.getFeature("g1"); fail ("must fail"); }
@@ -65,13 +65,13 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
 	Session s1(pool.get());
-	
+
 	assert (s1.getFeature("f1"));
 	assert (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
 
 	try { pool.setFeature("f1", true); fail ("must fail"); }
 	catch ( Poco::InvalidAccessException& ) { }
-	
+
 	try { pool.setProperty("p1", 1); fail ("must fail"); }
 	catch ( Poco::InvalidAccessException& ) { }
 
@@ -139,7 +139,7 @@ void SessionPoolTest::testSessionPool()
 		fail("pool exhausted - must throw");
 	}
 	catch (SessionPoolExhaustedException&) { }
-	
+
 	s5.close();
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 4);
@@ -162,7 +162,7 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.available() == 2);
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
-	
+
 	Thread::sleep(5000); // time to clean up idle sessions
 	
 	assert (pool.capacity() == 4);
@@ -171,7 +171,7 @@ void SessionPoolTest::testSessionPool()
 	assert (pool.available() == 2);
 	assert (pool.dead() == 0);
 	assert (pool.allocated() == pool.used() + pool.idle());
-	
+
 	Session s6(pool.get());
 
 	assert (pool.capacity() == 4);
@@ -183,7 +183,7 @@ void SessionPoolTest::testSessionPool()
 
 	s6.setFeature("connected", false);
 	assert (pool.dead() == 1);
-	
+
 	s6.close();
 	assert (pool.capacity() == 4);
 	assert (pool.allocated() == 2);
