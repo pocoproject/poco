@@ -16,6 +16,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormat.h"
 
+
 namespace Poco {
 namespace SQL {
 namespace PostgreSQL {
@@ -29,6 +30,7 @@ Binder::Binder()
 Binder::~Binder()
 {
 }
+
 
 void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir, const WhenNullCb& nullCb)
 {
@@ -128,7 +130,8 @@ void Binder::bind(std::size_t pos, const double& val, Direction dir, const WhenN
 void Binder::bind(std::size_t pos, const char& val, Direction dir, const WhenNullCb& nullCb)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, Poco::SQL::MetaColumn::FDT_UINT8, &val, sizeof(char));	// USING UINT8 because Poco::SQL::MetaColumn does not have a single character type, just std::string
+	// USING UINT8 because Poco::SQL::MetaColumn does not have a single character type, just std::string
+	realBind(pos, Poco::SQL::MetaColumn::FDT_UINT8, &val, sizeof(char));
 }
 
 // complex types
@@ -194,8 +197,8 @@ Binder::bindVector() const
 	return _bindVector;
 }
 
-void
-Binder::updateBindVectorToCurrentValues()
+
+void Binder::updateBindVectorToCurrentValues()
 {
 	InputParameterVector::iterator itr		= _bindVector.begin();
 	InputParameterVector::iterator itrEnd	= _bindVector.end();
@@ -204,107 +207,106 @@ Binder::updateBindVectorToCurrentValues()
 	{
 		switch (itr->fieldType())
 		{
-			case Poco::SQL::MetaColumn::FDT_INT8:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int8*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_INT8:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int8*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_UINT8:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt8*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_UINT8:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt8*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_INT16:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int16*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_INT16:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int16*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_UINT16:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt16*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_UINT16:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt16*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_INT32:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int32*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_INT32:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int32*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_UINT32:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt32*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_UINT32:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt32*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_INT64:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int64*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_INT64:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::Int64*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_UINT64:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt64*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_UINT64:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const Poco::UInt64*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_BOOL:
-				{
-					const bool currentBoolValue = * static_cast<const bool*>(itr->pData());
-					itr->setStringVersionRepresentation(currentBoolValue ? "TRUE" : "FALSE");
-				}
-				break;
+		case Poco::SQL::MetaColumn::FDT_BOOL:
+			{
+				const bool currentBoolValue = * static_cast<const bool*>(itr->pData());
+				itr->setStringVersionRepresentation(currentBoolValue ? "TRUE" : "FALSE");
+			}
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_FLOAT:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const float*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_FLOAT:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const float*>(itr->pData())));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_DOUBLE:
-				itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const double*>(itr->pData())));
-				break;
+		case Poco::SQL::MetaColumn::FDT_DOUBLE:
+			itr->setStringVersionRepresentation(Poco::NumberFormatter::format(* static_cast<const double*>(itr->pData())));
+			break;
 
-//			case Poco::SQL::MetaColumn::FDT_CHAR:
-//				itr->setStringVersionRepresentation(std::string(static_cast<const char*>(itr->pData()), 1));  // single character string
-//				break;
-				
-			case Poco::SQL::MetaColumn::FDT_STRING:
-				itr->setStringVersionRepresentation(* static_cast<const std::string*>(itr->pData()));
-				break;
+//		case Poco::SQL::MetaColumn::FDT_CHAR:
+//			itr->setStringVersionRepresentation(std::string(static_cast<const char*>(itr->pData()), 1));  // single character string
+//			break;
 
-			case Poco::SQL::MetaColumn::FDT_TIMESTAMP:
-				{
-					const Poco::DateTime& dateTime = * static_cast<const Poco::DateTime*>(itr->pData());
-					itr->setStringVersionRepresentation(DateTimeFormatter::format(dateTime, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
-				}
-				break;
+		case Poco::SQL::MetaColumn::FDT_STRING:
+			itr->setStringVersionRepresentation(* static_cast<const std::string*>(itr->pData()));
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_DATE:
-				{
-					const Poco::SQL::Date& date = * static_cast<const Poco::SQL::Date*>(itr->pData());
-					itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(date.year(), date.month(), date.day()), "%Y-%m-%d"));
-				}
-				break;
+		case Poco::SQL::MetaColumn::FDT_TIMESTAMP:
+			{
+				const Poco::DateTime& dateTime = * static_cast<const Poco::DateTime*>(itr->pData());
+				itr->setStringVersionRepresentation(DateTimeFormatter::format(dateTime, Poco::DateTimeFormat::ISO8601_FRAC_FORMAT));
+			}
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_TIME:
-				{
-					const Poco::SQL::Time& time = * static_cast<const Poco::SQL::Time*>(itr->pData());
-					itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(0, 1, 1, time.hour(), time.minute(), time.second()), "%H:%M:%s%z"));
-				}
-				break;
+		case Poco::SQL::MetaColumn::FDT_DATE:
+			{
+				const Poco::SQL::Date& date = * static_cast<const Poco::SQL::Date*>(itr->pData());
+				itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(date.year(), date.month(), date.day()), "%Y-%m-%d"));
+			}
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_BLOB:
-				{
-					const Poco::SQL::BLOB& blob = * static_cast<const Poco::SQL::BLOB*>(itr->pData());
-					itr->setNonStringVersionRepresentation(static_cast<const void*> (blob.rawContent()), blob.size());
-				}
-				break;
+		case Poco::SQL::MetaColumn::FDT_TIME:
+			{
+				const Poco::SQL::Time& time = * static_cast<const Poco::SQL::Time*>(itr->pData());
+				itr->setStringVersionRepresentation(DateTimeFormatter::format(Poco::DateTime(0, 1, 1, time.hour(), time.minute(), time.second()), "%H:%M:%s%z"));
+			}
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_CLOB:
-				{
-					const Poco::SQL::CLOB& clob = * static_cast<const Poco::SQL::CLOB*>(itr->pData());
-					itr->setNonStringVersionRepresentation(static_cast<const void*> (clob.rawContent()), clob.size());
-				}
+		case Poco::SQL::MetaColumn::FDT_BLOB:
+			{
+				const Poco::SQL::BLOB& blob = * static_cast<const Poco::SQL::BLOB*>(itr->pData());
+				itr->setNonStringVersionRepresentation(static_cast<const void*> (blob.rawContent()), blob.size());
+			}
+			break;
 
-			case Poco::SQL::MetaColumn::FDT_UNKNOWN:
-			default:
-				break;
+		case Poco::SQL::MetaColumn::FDT_CLOB:
+			{
+				const Poco::SQL::CLOB& clob = * static_cast<const Poco::SQL::CLOB*>(itr->pData());
+				itr->setNonStringVersionRepresentation(static_cast<const void*> (clob.rawContent()), clob.size());
+			}
+
+		case Poco::SQL::MetaColumn::FDT_UNKNOWN:
+		default:
+			break;
 		}
 	}
 }
 
-///////////////////
+
 //
 // Private
 //
-///////////////////
 
 void Binder::realBind(std::size_t aPosition, Poco::SQL::MetaColumn::ColumnDataType aFieldType, const void* aBufferPtr, std::size_t aLength)
 {

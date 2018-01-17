@@ -21,9 +21,11 @@
 
 #define POCO_POSTGRESQL_VERSION_NUMBER ((NDB_VERSION_MAJOR<<16) | (NDB_VERSION_MINOR<<8) | (NDB_VERSION_BUILD&0xFF))
 
+
 namespace Poco {
 namespace SQL {
 namespace PostgreSQL {
+
 
 //const std::string SessionHandle::POSTGRESQL_READ_UNCOMMITTED = "READ UNCOMMITTED";
 const std::string SessionHandle::POSTGRESQL_READ_COMMITTED  = "READ COMMITTED";
@@ -31,12 +33,11 @@ const std::string SessionHandle::POSTGRESQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionHandle::POSTGRESQL_SERIALIZABLE	= "SERIALIZABLE";
 
 
-SessionHandle::SessionHandle()
-:	_pConnection				(0),
-	_inTransaction				(false),
-	_isAutoCommit				(true),
-	_isAsynchronousCommit		(false),
-	_tranactionIsolationLevel	(Session::TRANSACTION_READ_COMMITTED)
+SessionHandle::SessionHandle(): _pConnection(0),
+	_inTransaction(false),
+	_isAutoCommit(true),
+	_isAsynchronousCommit(false),
+	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
 }
 
@@ -52,16 +53,15 @@ SessionHandle::~SessionHandle()
 }
 
 
-bool
-SessionHandle::isConnected() const
+bool SessionHandle::isConnected() const
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
 	return isConnectedNoLock();
 }
 
-bool
-SessionHandle::isConnectedNoLock() const
+
+bool SessionHandle::isConnectedNoLock() const
 {
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
 
@@ -75,8 +75,7 @@ SessionHandle::isConnectedNoLock() const
 }
 
 
-void
-SessionHandle::connect(const std::string& aConnectionString)
+void SessionHandle::connect(const std::string& aConnectionString)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -97,15 +96,14 @@ SessionHandle::connect(const std::string& aConnectionString)
 }
 
 
-void
-SessionHandle::connect(const char* aConnectionString)
+void SessionHandle::connect(const char* aConnectionString)
 {
 	connect(std::string(aConnectionString));
 }
 
 
-void
-SessionHandle::connect(const char* aHost, const char* aUser, const char* aPassword, const char* aDatabase, unsigned short aPort, unsigned int aConnectionTimeout)
+void SessionHandle::connect(const char* aHost, const char* aUser, const char* aPassword,
+	const char* aDatabase, 	unsigned short aPort, unsigned int aConnectionTimeout)
 {
 	std::string connectionString;
 
@@ -135,8 +133,8 @@ SessionHandle::connect(const char* aHost, const char* aUser, const char* aPasswo
 	connect(connectionString);
 }
 
-void
-SessionHandle::disconnect()
+
+void SessionHandle::disconnect()
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -155,8 +153,7 @@ SessionHandle::disconnect()
 }
 
 // TODO: Figure out what happens if a connection is reset with a pending transaction
-bool
-SessionHandle::reset()
+bool SessionHandle::reset()
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -173,8 +170,8 @@ SessionHandle::reset()
 	return false;
 }
 
-std::string
-SessionHandle::lastError() const
+
+std::string SessionHandle::lastError() const
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -186,8 +183,8 @@ SessionHandle::lastError() const
 	return lastErrorNoLock();
 }
 
-std::string
-SessionHandle::lastErrorNoLock() const
+
+std::string SessionHandle::lastErrorNoLock() const
 {
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
 	std::string lastErrorString (0 != _pConnection ? PQerrorMessage(_pConnection) : "not connected");
@@ -270,8 +267,8 @@ void SessionHandle::rollback()
 	deallocateStoredPreparedStatements();
 }
 
-void
-SessionHandle::setAutoCommit(bool aShouldAutoCommit)
+
+void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
 {
 	if (aShouldAutoCommit == _isAutoCommit)
 	{
@@ -290,8 +287,8 @@ SessionHandle::setAutoCommit(bool aShouldAutoCommit)
 	_isAutoCommit = aShouldAutoCommit;
 }
 
-void
-SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
+
+void SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -317,8 +314,8 @@ SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
 	_isAsynchronousCommit = aShouldAsynchronousCommit;
 }
 
-void
-SessionHandle::cancel()
+
+void SessionHandle::cancel()
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -334,8 +331,8 @@ SessionHandle::cancel()
 	PQcancel(ptrPGCancel, 0, 0); // no error buffer
 }
 
-void
-SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
+
+void SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -386,16 +383,15 @@ SessionHandle::transactionIsolation()
 }
 
 
-bool
-SessionHandle::hasTransactionIsolation(Poco::UInt32 aTI)
+bool SessionHandle::hasTransactionIsolation(Poco::UInt32 aTI)
 {
 	return Session::TRANSACTION_READ_COMMITTED	== aTI
 		|| Session::TRANSACTION_REPEATABLE_READ	== aTI
 		|| Session::TRANSACTION_SERIALIZABLE	== aTI;
 }
 
-void
-SessionHandle::deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate)
+
+void SessionHandle::deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -420,8 +416,8 @@ SessionHandle::deallocatePreparedStatement(const std::string& aPreparedStatement
 	}
 }
 
-void
-SessionHandle::deallocatePreparedStatementNoLock(const std::string& aPreparedStatementToDeAllocate)
+
+void SessionHandle::deallocatePreparedStatementNoLock(const std::string& aPreparedStatementToDeAllocate)
 {
 	PGresult* pPQResult = PQexec(_pConnection, (std::string("DEALLOCATE ") + aPreparedStatementToDeAllocate).c_str());
 	
@@ -432,10 +428,9 @@ SessionHandle::deallocatePreparedStatementNoLock(const std::string& aPreparedSta
 		throw StatementException(std::string("DEALLOCATE statement failed: ") + lastErrorNoLock());
 	}
 }
-	
 
-void
-SessionHandle::deallocateStoredPreparedStatements()
+
+void SessionHandle::deallocateStoredPreparedStatements()
 {
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
 	while (! _preparedStatementsToBeDeallocated.empty())
@@ -447,8 +442,7 @@ SessionHandle::deallocateStoredPreparedStatements()
 }
 
 
-int
-SessionHandle::serverVersion() const
+int SessionHandle::serverVersion() const
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -460,8 +454,8 @@ SessionHandle::serverVersion() const
 	return PQserverVersion(_pConnection);
 }
 
-int
-SessionHandle::serverProcessID() const
+
+int SessionHandle::serverProcessID() const
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -473,8 +467,8 @@ SessionHandle::serverProcessID() const
 	return PQbackendPID(_pConnection);
 }
 
-int
-SessionHandle::protocoVersion() const
+
+int SessionHandle::protocoVersion() const
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -486,8 +480,8 @@ SessionHandle::protocoVersion() const
 	return PQprotocolVersion(_pConnection);
 }
 
-std::string
-SessionHandle::clientEncoding() const
+
+std::string SessionHandle::clientEncoding() const
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
@@ -499,53 +493,46 @@ SessionHandle::clientEncoding() const
 	return pg_encoding_to_char(PQclientEncoding(_pConnection));
 }
 
-int
-SessionHandle::libpqVersion() const
+
+int SessionHandle::libpqVersion() const
 {
 	return PQlibVersion();
 }
 
 
-SessionParametersMap
-SessionHandle::setConnectionInfoParameters(PQconninfoOption* aConnectionInfoOptionsPtr)
+SessionParametersMap SessionHandle::setConnectionInfoParameters(PQconninfoOption* pConnInfOpt)
 {
 	SessionParametersMap sessionParametersMap;
 
-	while (0 != aConnectionInfoOptionsPtr->keyword)
+	while (0 != pConnInfOpt->keyword)
 	{
 		try
 		{
-			std::string keyword						= aConnectionInfoOptionsPtr->keyword  ? aConnectionInfoOptionsPtr->keyword  : std::string();
-			std::string environmentVariableVersion	= aConnectionInfoOptionsPtr->envvar   ? aConnectionInfoOptionsPtr->envvar   : std::string();
-			std::string compiledVersion				= aConnectionInfoOptionsPtr->compiled ? aConnectionInfoOptionsPtr->compiled : std::string();
-			std::string currentValue				= aConnectionInfoOptionsPtr->val  ? aConnectionInfoOptionsPtr->val  : std::string();
-			std::string dialogLabel					= aConnectionInfoOptionsPtr->label? aConnectionInfoOptionsPtr->label: std::string();
-			std::string dialogDisplayCharacter		= aConnectionInfoOptionsPtr->dispchar ? aConnectionInfoOptionsPtr->dispchar : std::string();
-			int dialogDisplaysize					= aConnectionInfoOptionsPtr->dispsize;
+			std::string keyword						= pConnInfOpt->keyword  ? pConnInfOpt->keyword  : std::string();
+			std::string environmentVariableVersion	= pConnInfOpt->envvar   ? pConnInfOpt->envvar   : std::string();
+			std::string compiledVersion				= pConnInfOpt->compiled ? pConnInfOpt->compiled : std::string();
+			std::string currentValue				= pConnInfOpt->val  ? pConnInfOpt->val  : std::string();
+			std::string dialogLabel					= pConnInfOpt->label? pConnInfOpt->label: std::string();
+			std::string dialogDisplayCharacter		= pConnInfOpt->dispchar ? pConnInfOpt->dispchar : std::string();
+			int dialogDisplaysize					= pConnInfOpt->dispsize;
 
-			SessionParameters connectionParameters(keyword,
-													environmentVariableVersion,
-													compiledVersion,
-													currentValue,
-													dialogLabel,
-													dialogDisplayCharacter,
-													dialogDisplaysize
-												);
+			SessionParameters connParams(keyword, environmentVariableVersion, compiledVersion,
+				currentValue, dialogLabel, dialogDisplayCharacter, dialogDisplaysize);
 
-			sessionParametersMap.insert(SessionParametersMap::value_type(connectionParameters.keyword(), connectionParameters));
+			sessionParametersMap.insert(SessionParametersMap::value_type(connParams.keyword(), connParams));
 		}
 		catch (std::bad_alloc&)
 		{
 		}
 
-		++aConnectionInfoOptionsPtr;
+		++pConnInfOpt;
 	}
 
 	return sessionParametersMap;
 }
 
-SessionParametersMap
-SessionHandle::connectionDefaultParameters()
+
+SessionParametersMap SessionHandle::connectionDefaultParameters()
 {
 	PQconninfoOption* ptrConnInfoOptions = PQconndefaults();
 
@@ -554,8 +541,8 @@ SessionHandle::connectionDefaultParameters()
 	return setConnectionInfoParameters(ptrConnInfoOptions);
 }
 
-SessionParametersMap
-SessionHandle::connectionParameters() const
+
+SessionParametersMap SessionHandle::connectionParameters() const
 {
 	if (! isConnected())
 	{
@@ -573,5 +560,6 @@ SessionHandle::connectionParameters() const
 
 	return setConnectionInfoParameters(ptrConnInfoOptions);
 }
+
 
 }}} // Poco::SQL::PostgreSQL

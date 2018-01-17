@@ -14,17 +14,16 @@
 
 #include "Poco/SQL/PostgreSQL/StatementExecutor.h"
 #include "Poco/SQL/PostgreSQL/PostgreSQLTypes.h"
-
 #include "Poco/Format.h"
 #include "Poco/UUID.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberParser.h"
 #include "Poco/RegularExpression.h"  // TODO: remove after C++ 11 implementation
-
 //#include <regex> // saved for C++ 11 implementation
 #include <algorithm>
 #include <set>
+
 
 namespace
 {
@@ -89,18 +88,18 @@ namespace
 	}
 } // namespace
 
+
 namespace Poco {
 namespace SQL {
 namespace PostgreSQL {
 
 
-StatementExecutor::StatementExecutor(SessionHandle& aSessionHandle)
-:	_sessionHandle						(aSessionHandle),
-	_state								(STMT_INITED),
-	_pResultHandle						(0),
-	_countPlaceholdersInSQLStatement	(0),
-	_currentRow							(0),
-	_affectedRowCount					(0)
+StatementExecutor::StatementExecutor(SessionHandle& sessionHandle):_sessionHandle(sessionHandle),
+	_state(STMT_INITED),
+	_pResultHandle(0),
+	_countPlaceholdersInSQLStatement(0),
+	_currentRow(0),
+	_affectedRowCount(0)
 {
 }
 
@@ -125,11 +124,11 @@ StatementExecutor::~StatementExecutor()
 }
 
 
-StatementExecutor::State
-StatementExecutor::state() const
+StatementExecutor::State StatementExecutor::state() const
 {
 	return _state;
 }
+
 
 void StatementExecutor::prepare(const std::string& aSQLStatement)
 {
@@ -170,13 +169,7 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
 		// prepare the statement - temporary PGresult returned
-		ptrPGResult = PQprepare(_sessionHandle,
-								pStatementName,
-								ptrCSQLStatement,
-								countPlaceholdersInSQLStatement,
-								0	// not specifying type Oids
-								);
-
+		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, countPlaceholdersInSQLStatement, 0);
 	}
 
 	{
@@ -189,13 +182,11 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 		{
 			throw StatementException(std::string("postgresql_stmt_prepare error: ") + PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
 		}
-
 	}
 
 	// Determine what the structure of a statement result will look like
 
 	{
-		// lock the session
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
 		ptrPGResult = PQdescribePrepared(_sessionHandle, pStatementName);
@@ -208,37 +199,33 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 			 || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK
 			)
 		{
-			throw StatementException(std::string("postgresql_stmt_describe error: ") + PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
+			throw StatementException(std::string("postgresql_stmt_describe error: ") +
+				PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
 		}
 
 		// remember the structure of the statement result
 
 		int fieldCount = PQnfields(ptrPGResult);
-		if (fieldCount < 0)
-		{
-			fieldCount = 0;
-		}
+		if (fieldCount < 0) fieldCount = 0;
 
 		for (int i = 0; i < fieldCount; ++i)
 		{
 			_resultColumns.push_back(
-				MetaColumn(i,												// position
-						   PQfname(ptrPGResult, i),							// name
-						   oidToColumnDataType(PQftype(ptrPGResult, i)),	// Poco::SQL::MetaColumn type
-						   0,												// column data lengths are not correct as returned by PQfsize() for the various column types
-						   0,												// column precisions are not correct as returned by PQfmod() for the various column types
-						   true												// nullable? - no efficient way to tell at this point, so assume yes
+				MetaColumn(i, // position
+						   PQfname(ptrPGResult, i), // name
+						   oidToColumnDataType(PQftype(ptrPGResult, i)), // Poco::SQL::MetaColumn type
+						   0, // column data lengths are not correct as returned by PQfsize() for the various column types
+						   0, // column precisions are not correct as returned by PQfmod() for the various column types
+						   true // nullable? - no efficient way to tell at this point, so assume yes
 						)
 			);
 		}
 	}
 
-	_SQLStatement						= aSQLStatement;
-	_preparedStatementName				= statementName;
-	_countPlaceholdersInSQLStatement	= countPlaceholdersInSQLStatement;
-
-	_state								= STMT_COMPILED;  // must be last
-
+	_SQLStatement = aSQLStatement;
+	_preparedStatementName = statementName;
+	_countPlaceholdersInSQLStatement = countPlaceholdersInSQLStatement;
+	_state = STMT_COMPILED;  // must be last
 }
 
 
@@ -262,6 +249,7 @@ void StatementExecutor::bindParams(const InputParameterVector& anInputParameterV
 	// Just record the input vector for later execution
 	_inputParameterVector = anInputParameterVector;
 }
+
 
 void StatementExecutor::execute()
 {
@@ -341,10 +329,8 @@ void StatementExecutor::execute()
 
 	// Don't setup to auto clear the result (ptrPGResult).  It is required to retrieve the results later.
 
-	if	(	! ptrPGResult
-		 || (PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK
-		 && PQresultStatus(ptrPGResult) != PGRES_TUPLES_OK)
-		)
+	if (!ptrPGResult || (PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK &&
+		PQresultStatus(ptrPGResult) != PGRES_TUPLES_OK))
 	{
 		PQResultClear resultClearer(ptrPGResult);
 
@@ -355,18 +341,12 @@ void StatementExecutor::execute()
 		const char* pConstraint	= PQresultErrorField(ptrPGResult, PG_DIAG_CONSTRAINT_NAME);
 
 		throw StatementException(std::string("postgresql_stmt_execute error: ")
-									+ PQresultErrorMessage (ptrPGResult)
-									+ " Severity: "
-									+ (pSeverity   ? pSeverity   : "N/A")
-									+ " State: "
-									+ (pSQLState   ? pSQLState   : "N/A")
-									+ " Detail: "
-									+ (pDetail ? pDetail : "N/A")
-									+ " Hint: "
-									+ (pHint   ? pHint   : "N/A")
-									+ " Constraint: "
-									+ (pConstraint ? pConstraint : "N/A")
-								);
+			+ PQresultErrorMessage (ptrPGResult)
+			+ " Severity: " + (pSeverity   ? pSeverity   : "N/A")
+			+ " State: " + (pSQLState   ? pSQLState   : "N/A")
+			+ " Detail: " + (pDetail ? pDetail : "N/A")
+			+ " Hint: " + (pHint   ? pHint   : "N/A")
+			+ " Constraint: " + (pConstraint ? pConstraint : "N/A"));
 	}
 
 	_pResultHandle = ptrPGResult;
@@ -404,8 +384,7 @@ void StatementExecutor::execute()
 }
 
 
-bool
-StatementExecutor::fetch()
+bool StatementExecutor::fetch()
 {
 	if (! _sessionHandle.isConnected())
 	{
@@ -445,36 +424,32 @@ StatementExecutor::fetch()
 		
 		Oid columnInternalDataType = PQftype(_pResultHandle, i);  // Oid of column
 
-		_outputParameterVector.at(i).setValues(oidToColumnDataType(columnInternalDataType),						// Poco::SQL::MetaData version of the Column Data Type
-											   columnInternalDataType,											// Postegres Version
-											   _currentRow,														// the row number of the result
-											   PQgetvalue(_pResultHandle, _currentRow, i),						// a pointer to the data
-											   (-1 == fieldLength ? 0 : fieldLength),							// the length of the data returned
-											   PQgetisnull(_pResultHandle, _currentRow, i) == 1 ? true : false	// is the column value null?
-											   );
+		_outputParameterVector.at(i).setValues(oidToColumnDataType(columnInternalDataType), // Poco::SQL::MetaData version of the Column Data Type
+			columnInternalDataType, // Postgres Version
+			_currentRow, // the row number of the result
+			PQgetvalue(_pResultHandle, _currentRow, i), // a pointer to the data
+			(-1 == fieldLength ? 0 : fieldLength), // the length of the data returned
+			PQgetisnull(_pResultHandle, _currentRow, i) == 1 ? true : false); // is the column value null?
 	}
 
-	// advance to next row
 	++_currentRow;
-
 	return true;
 }
 
 
-std::size_t
-StatementExecutor::getAffectedRowCount() const
+std::size_t StatementExecutor::getAffectedRowCount() const
 {
 	return _affectedRowCount;
 }
 
-std::size_t
-StatementExecutor::columnsReturned() const
+
+std::size_t StatementExecutor::columnsReturned() const
 {
 	return static_cast<std::size_t> (_resultColumns.size());
 }
 
-const MetaColumn&
-StatementExecutor::metaColumn(std::size_t aPosition) const
+
+const MetaColumn& StatementExecutor::metaColumn(std::size_t aPosition) const
 {
 	if (aPosition >= columnsReturned())
 	{
@@ -484,8 +459,8 @@ StatementExecutor::metaColumn(std::size_t aPosition) const
 	return _resultColumns.at(aPosition);
 }
 
-const OutputParameter&
-StatementExecutor::resultColumn(std::size_t aPosition) const
+
+const OutputParameter& StatementExecutor::resultColumn(std::size_t aPosition) const
 {
 	if (aPosition >= columnsReturned())
 	{
@@ -496,8 +471,7 @@ StatementExecutor::resultColumn(std::size_t aPosition) const
 }
 
 
-void
-StatementExecutor::clearResults()
+void StatementExecutor::clearResults()
 {
 	// clear out any old result first
 	{
@@ -510,4 +484,4 @@ StatementExecutor::clearResults()
 }
 
 
-}}}
+}}} // Poco::SQL::PostgreSQL

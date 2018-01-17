@@ -55,13 +55,15 @@ namespace Poco {
 namespace SQL {
 namespace PostgreSQL {
 
-SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout)
-	: Poco::SQL::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout)
+
+SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout):
+	Poco::SQL::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout)
 {
 	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	open();
 }
+
 
 SessionImpl::~SessionImpl()
 {
@@ -75,15 +77,13 @@ SessionImpl::~SessionImpl()
 }
 
 
-void
-SessionImpl::setConnectionTimeout(std::size_t aTimeout)
+void SessionImpl::setConnectionTimeout(std::size_t aTimeout)
 {
 	_timeout = aTimeout;
 }
 
 
-void
-SessionImpl::open(const std::string& aConnectionString)
+void SessionImpl::open(const std::string& aConnectionString)
 {
 	if (connectionString() != aConnectionString)
 	{
@@ -99,7 +99,7 @@ SessionImpl::open(const std::string& aConnectionString)
 	}
 
 	poco_assert_dbg (! connectionString().empty());
-	
+
 	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 
 	// PostgreSQL connections can use environment variables for connection parameters.
@@ -108,13 +108,11 @@ SessionImpl::open(const std::string& aConnectionString)
 	std::map <std::string, std::string> optionsMap;
 
 	// Default values
-	optionsMap[ "connect_timeout" ] = Poco::NumberFormatter::format(timeout);
+	optionsMap["connect_timeout"] = Poco::NumberFormatter::format(timeout);
 
 	const std::string& connString = connectionString();
 
-	for (std::string::const_iterator start = connString.begin();
-			;
-		)
+	for (std::string::const_iterator start = connString.begin();;)
 	{
 		std::string::const_iterator finish = std::find(start, connString.end(), ' '); // space is the separator between keyword=value pairs
 		std::string::const_iterator middle = std::find(start, finish, '=');
@@ -126,12 +124,7 @@ SessionImpl::open(const std::string& aConnectionString)
 
 		optionsMap[ copyStripped(start, middle) ] = copyStripped(middle + 1, finish);
 
-		if	((finish == connString.end())
-			 || (finish + 1 == connString.end())
-			)
-		{
-		break;
-		}
+		if ((finish == connString.end()) || (finish + 1 == connString.end())) break;
 
 		start = finish + 1;
 	}
@@ -149,8 +142,7 @@ SessionImpl::open(const std::string& aConnectionString)
 }
 
 
-void
-SessionImpl::close()
+void SessionImpl::close()
 {
 	if (isConnected())
 	{
@@ -159,30 +151,25 @@ SessionImpl::close()
 }
 
 
-bool
-SessionImpl::isConnected()
+bool SessionImpl::isConnected() const
 {
 	return _sessionHandle.isConnected();
 }
 
 
-Poco::SQL::StatementImpl*
-SessionImpl::createStatementImpl()
+StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
-	return dynamic_cast<Poco::SQL::StatementImpl*> (new PostgreSQLStatementImpl (*this));
-//	return new PostgreSQLStatementImpl(*this);
+	return new PostgreSQLStatementImpl (*this);
 }
 
 
-bool
-SessionImpl::isTransaction()
+bool SessionImpl::isTransaction() const
 {
 	return _sessionHandle.isTransaction();
 }
 
 
-void
-SessionImpl::begin()
+void SessionImpl::begin()
 {
 	if (isTransaction())
 	{
@@ -194,69 +181,60 @@ SessionImpl::begin()
 }
 
 
-void
-SessionImpl::commit()
+ void SessionImpl::commit()
 {
 	// Not an error to issue a COMMIT without a preceding BEGIN
 	_sessionHandle.commit();
 }
 
 
-void
-SessionImpl::rollback()
+void SessionImpl::rollback()
 {
 	// Not an error to issue a ROLLBACK without a preceding BEGIN
 	_sessionHandle.rollback();
 }
 
 
-void
-SessionImpl::setAutoCommit(const std::string&, bool aValue)
+void SessionImpl::setAutoCommit(const std::string&, bool aValue)
 {
 	_sessionHandle.setAutoCommit(aValue);
 }
 
 
-bool
-SessionImpl::isAutoCommit(const std::string&)
+bool SessionImpl::isAutoCommit(const std::string&) const
 {
 	return _sessionHandle.isAutoCommit();
 }
 
 
-void
-SessionImpl::setAsynchronousCommit(const std::string&,  bool aValue)
+void SessionImpl::setAsynchronousCommit(const std::string&,  bool aValue)
 {
 	_sessionHandle.setAsynchronousCommit(aValue);
 }
 
 
-bool
-SessionImpl::isAsynchronousCommit(const std::string&)
+bool SessionImpl::isAsynchronousCommit(const std::string&) const
 {
 	return _sessionHandle.isAsynchronousCommit();
 }
 
 
-void
-SessionImpl::setTransactionIsolation(Poco::UInt32 aTI)
+void SessionImpl::setTransactionIsolation(Poco::UInt32 aTI)
 {
 	return _sessionHandle.setTransactionIsolation(aTI);
 }
 
 
-Poco::UInt32
-SessionImpl::getTransactionIsolation()
+Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	return _sessionHandle.transactionIsolation();
 }
 
 
-bool
-SessionImpl::hasTransactionIsolation(Poco::UInt32 aTI)
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 aTI) const
 {
 	return _sessionHandle.hasTransactionIsolation(aTI);
 }
 
 
-}}}
+}}} // namespace Poco::SQL::PostgreSQL

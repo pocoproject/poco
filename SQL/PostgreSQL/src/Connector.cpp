@@ -16,7 +16,9 @@
 #include "Poco/SQL/PostgreSQL/SessionImpl.h"
 #include "Poco/SQL/SessionFactory.h"
 
+
 const PostgreSQLConnectorRegistrator pocoPostgreSQLConnectorRegistrator;
+
 
 namespace Poco {
 namespace SQL {
@@ -41,9 +43,7 @@ Connector::name() const
 	return n;
 }
 
-Poco::AutoPtr<Poco::SQL::SessionImpl>
-Connector::createSession(const std::string& aConnectionString,
-						 std::size_t aTimeout)
+SessionImpl::Ptr Connector::createSession(const std::string& aConnectionString, std::size_t aTimeout)
 {
 	return Poco::AutoPtr<Poco::SQL::SessionImpl>(new SessionImpl(aConnectionString, aTimeout));
 }

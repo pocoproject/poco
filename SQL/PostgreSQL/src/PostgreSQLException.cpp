@@ -36,11 +36,9 @@ PostgreSQLException::~PostgreSQLException() throw()
 }
 
 
-/////
 //
 // ConnectionException
 //
-/////
 
 
 ConnectionException::ConnectionException(const std::string& aMessage)
@@ -49,11 +47,9 @@ ConnectionException::ConnectionException(const std::string& aMessage)
 }
 
 
-/////
 //
 // TransactionException
 //
-/////
 
 TransactionException::TransactionException(const std::string& aMessage)
 : ConnectionException(aMessage)
@@ -61,11 +57,9 @@ TransactionException::TransactionException(const std::string& aMessage)
 }
 
 
-/////
 //
 // StatementException
 //
-/////
 
 
 StatementException::StatementException(const std::string& aMessage)

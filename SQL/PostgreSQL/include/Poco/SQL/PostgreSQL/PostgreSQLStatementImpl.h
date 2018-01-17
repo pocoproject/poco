@@ -87,14 +87,14 @@ private:
 		NEXT_FALSE
 	};
 
-	StatementExecutor	_statementExecutor;
-	Binder::Ptr			_pBinder;
-	Extractor::Ptr		_pExtractor;
-	NextState			_hasNext;
+	StatementExecutor _statementExecutor;
+	Binder::Ptr       _pBinder;
+	Extractor::Ptr    _pExtractor;
+	NextState         _hasNext;
 };
 
 
 } } } // namespace Poco::SQL::PostgreSQL
 
 
-#endif // Data_PostgreSQL_PostgreSQLStatementImpl_INCLUDED
+#endif // SQL_PostgreSQL_PostgreSQLStatementImpl_INCLUDED

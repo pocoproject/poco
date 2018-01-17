@@ -13,14 +13,12 @@
 
 
 #include "Poco/SQL/PostgreSQL/Extractor.h"
-
 #include "Poco/SQL/Date.h"
 #include "Poco/SQL/Time.h"
-
 #include "Poco/NumberParser.h"
 #include "Poco/DateTimeParser.h"
-
 #include <limits>
+
 
 namespace Poco {
 namespace SQL {
@@ -867,7 +865,6 @@ bool Extractor::extract(std::size_t , std::list<Dynamic::Var>&)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
-
 
 
 } } } // namespace Poco::SQL::PostgreSQL

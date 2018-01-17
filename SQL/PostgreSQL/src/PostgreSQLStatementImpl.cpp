@@ -19,12 +19,11 @@ namespace SQL {
 namespace PostgreSQL {
 
 
-PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl)
-:	Poco::SQL::StatementImpl	(aSessionImpl),
-	_statementExecutor			(aSessionImpl.handle()),
-	_pBinder					(new Binder),
-	_pExtractor					(new Extractor (_statementExecutor)),
-	_hasNext					(NEXT_DONTKNOW)
+PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl): Poco::SQL::StatementImpl(aSessionImpl),
+	_statementExecutor(aSessionImpl.handle()),
+	_pBinder(new Binder),
+	_pExtractor(new Extractor (_statementExecutor)),
+	_hasNext(NEXT_DONTKNOW)
 {
 }
 
@@ -34,22 +33,19 @@ PostgreSQLStatementImpl::~PostgreSQLStatementImpl()
 }
 
 
-std::size_t
-PostgreSQLStatementImpl::columnsReturned() const
+std::size_t PostgreSQLStatementImpl::columnsReturned() const
 {
 	return _statementExecutor.columnsReturned();
 }
 
 
-int
-PostgreSQLStatementImpl::affectedRowCount() const
+int PostgreSQLStatementImpl::affectedRowCount() const
 {
 	return _statementExecutor.getAffectedRowCount();
 }
 
 
-const MetaColumn&
-PostgreSQLStatementImpl::metaColumn(std::size_t aPosition, std::size_t aDataset) const
+const MetaColumn& PostgreSQLStatementImpl::metaColumn(std::size_t aPosition, std::size_t aDataset) const
 {
 	// PostgreSql doesn't support multiple result sets
 	poco_assert_dbg(aDataset == 0);
@@ -58,8 +54,7 @@ PostgreSQLStatementImpl::metaColumn(std::size_t aPosition, std::size_t aDataset)
 }
 
 
-bool
-PostgreSQLStatementImpl::hasNext()
+bool PostgreSQLStatementImpl::hasNext()
 {
 	if (NEXT_DONTKNOW == _hasNext)
 	{
@@ -87,8 +82,7 @@ PostgreSQLStatementImpl::hasNext()
 }
 
 
-std::size_t
-PostgreSQLStatementImpl::next()
+std::size_t PostgreSQLStatementImpl::next()
 {
 	if (! hasNext())
 	{
@@ -112,8 +106,7 @@ PostgreSQLStatementImpl::next()
 }
 
 
-bool
-PostgreSQLStatementImpl::canBind() const
+bool PostgreSQLStatementImpl::canBind() const
 {
 	bool ret = false;
 
@@ -127,22 +120,19 @@ PostgreSQLStatementImpl::canBind() const
 }
 
 
-bool
-PostgreSQLStatementImpl::canCompile() const
+bool PostgreSQLStatementImpl::canCompile() const
 {
 	return (_statementExecutor.state() < StatementExecutor::STMT_COMPILED);
 }
 
 
-void
-PostgreSQLStatementImpl::compileImpl()
+void PostgreSQLStatementImpl::compileImpl()
 {
 	_statementExecutor.prepare(toString());
 }
 
 
-void
-PostgreSQLStatementImpl::bindImpl()
+void PostgreSQLStatementImpl::bindImpl()
 {
 	Poco::SQL::AbstractBindingVec& binds = bindings();
 

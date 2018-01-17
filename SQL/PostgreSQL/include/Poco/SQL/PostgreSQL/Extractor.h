@@ -323,7 +323,7 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<Dynamic::Var>& val);
 		/// Extracts a Dynamic::Var list.
-	
+
 private:
 
 	const OutputParameter& extractPreamble(std::size_t aPosition) const;
@@ -359,10 +359,11 @@ private:
 
 private:
 
-	StatementExecutor&  _statementExecutor;
+	StatementExecutor& _statementExecutor;
 };
+
 
 } } } // namespace Poco::SQL::PostgreSQL
 
 
-#endif // Data_PostgreSQL_Extractor_INCLUDED
+#endif // SQL_PostgreSQL_Extractor_INCLUDED

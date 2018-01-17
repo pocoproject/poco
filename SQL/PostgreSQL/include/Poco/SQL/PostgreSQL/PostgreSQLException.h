@@ -109,20 +109,24 @@ inline PostgreSQLException& PostgreSQLException::operator=(const PostgreSQLExcep
 	return *this;
 }
 
+
 inline const char* PostgreSQLException::name() const throw()
 {
 	return "PostgreSQL";
 }
+
 
 inline const char* PostgreSQLException::className() const throw()
 {
 	return typeid(*this).name();
 }
 
+
 inline Poco::Exception* PostgreSQLException::clone() const
 {
 	return new PostgreSQLException(*this);
 }
+
 
 inline void PostgreSQLException::rethrow() const
 {
@@ -132,4 +136,4 @@ inline void PostgreSQLException::rethrow() const
 
 } } } // namespace Poco::SQL::PostgreSQL
 
-#endif //Data_PostgreSQL_PostgreSQLException_INCLUDED
+#endif //SQL_PostgreSQL_PostgreSQLException_INCLUDED

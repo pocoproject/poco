@@ -15,16 +15,15 @@
 
 #include "Poco/SQL/PostgreSQL/Utility.h"
 #include "Poco/SQL/PostgreSQL/SessionImpl.h"
-
 #include "Poco/NumberFormatter.h"
+
 
 namespace Poco {
 namespace SQL {
 namespace PostgreSQL {
 
 
-std::string
-Utility::serverInfo(SessionHandle* aHandlePtr)
+std::string Utility::serverInfo(SessionHandle* aHandlePtr)
 {
 	std::string srvrInfo = "Process ID: ";
 
@@ -38,29 +37,25 @@ Utility::serverInfo(SessionHandle* aHandlePtr)
 }
 
 
-std::string
-Utility::serverInfo(Session& aSession)
+std::string Utility::serverInfo(Session& aSession)
 {
 	return serverInfo(handle(aSession));
 }
 
 
-int
-Utility::serverVersion(SessionHandle* aHandlePtr)
+int Utility::serverVersion(SessionHandle* aHandlePtr)
 {
 	return aHandlePtr->serverVersion();
 }
 
 
-int
-Utility::serverVersion(Session& aSession)
+int Utility::serverVersion(Session& aSession)
 {
 	return serverVersion(handle(aSession));
 }
 
 
-std::string
-Utility::hostInfo(SessionHandle* aHandlePtr)
+std::string Utility::hostInfo(SessionHandle* aHandlePtr)
 {
 	SessionParametersMap parametersMap = aHandlePtr->connectionParameters();
 
@@ -75,22 +70,19 @@ Utility::hostInfo(SessionHandle* aHandlePtr)
 }
 
 
-std::string
-Utility::hostInfo(Session& aSession)
+std::string Utility::hostInfo(Session& aSession)
 {
 	return hostInfo(handle(aSession));
 }
 
 
-std::string
-Utility::sessionEncoding(SessionHandle* aHandlePtr)
+std::string Utility::sessionEncoding(SessionHandle* aHandlePtr)
 {
 	return aHandlePtr->clientEncoding();
 }
 
 
-std::string
-Utility::sessionEncoding(Poco::SQL::Session& aSession)
+std::string Utility::sessionEncoding(Poco::SQL::Session& aSession)
 {
 	return sessionEncoding(handle(aSession));
 }

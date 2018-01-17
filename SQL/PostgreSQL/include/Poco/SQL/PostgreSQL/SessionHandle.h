@@ -39,32 +39,32 @@ public:
 		HID_DEBUG   // debug use only
 	};
 
-	SessionParameters(	const std::string& aKeyword,
-						const std::string& anEnvironmentVariable,
-						const std::string& aCompiledDefault,
-						const std::string& aCurrentValue,
-						const std::string& aDisplayLabel,
-						const std::string& aHowToDisplay,
-						int aDisplaySize);
+	SessionParameters(const std::string& aKeyword,
+		const std::string& anEnvironmentVariable,
+		const std::string& aCompiledDefault,
+		const std::string& aCurrentValue,
+		const std::string& aDisplayLabel,
+		const std::string& aHowToDisplay,
+		int aDisplaySize);
 
 	~SessionParameters();
 
-	std::string		keyword()const;
-	std::string		enviromentVariable() const;
-	std::string		compiledDefault()const;
-	std::string		currentValue() const;
-	std::string		displayLabel() const;
-	HOW_TO_DISPLAY	howToDisplay() const;
-	int				displaySize()const;
+	std::string    keyword()const;
+	std::string    enviromentVariable() const;
+	std::string    compiledDefault()const;
+	std::string    currentValue() const;
+	std::string    displayLabel() const;
+	HOW_TO_DISPLAY howToDisplay() const;
+	int            displaySize()const;
 
 private:
-	std::string		_keyword;// The keyword of the option
-	std::string		_environmentVariable;// Fallback environment variable name
-	std::string		_compiledDefault;// Fallback compiled in default value
-	std::string		_currentValue;   // Option's current value, or NULL
-	std::string		_displayLabel;   // Label for field in a connect dialog
-	HOW_TO_DISPLAY	_howToDisplay;   // Indicates how to display this field
-	int				_displaySize;// Field size in characters for connect dialog
+	std::string    _keyword;// The keyword of the option
+	std::string    _environmentVariable;// Fallback environment variable name
+	std::string    _compiledDefault;// Fallback compiled in default value
+	std::string    _currentValue;   // Option's current value, or NULL
+	std::string    _displayLabel;   // Label for field in a connect dialog
+	HOW_TO_DISPLAY _howToDisplay;   // Indicates how to display this field
+	int            _displaySize;// Field size in characters for connect dialog
 };
 
 typedef std::map<std::string, SessionParameters> SessionParametersMap;
@@ -81,17 +81,13 @@ public:
 	~SessionHandle();
 		/// Destroy handle, close connection
 
-	void connect (const std::string& aConnectionString);
+	void connect(const std::string& aConnectionString);
 		/// Connect to server
 
-	void connect (const char* aConnectionString);
+	void connect(const char* aConnectionString);
 
-	void connect (	const char* aHost,
-					const char* aUser,
-					const char* aPassword,
-					const char* aDatabase,
-					unsigned short aPort,
-					unsigned int aConnectionTimeout);
+	void connect(const char* aHost, const char* aUser, const char* aPassword,
+		const char* aDatabase, unsigned short aPort, unsigned int aConnectionTimeout);
 
 	bool isConnected() const;
 		/// is a connection established?
@@ -190,14 +186,14 @@ private:
 
 private:
 
-	mutable Poco::FastMutex		_sessionMutex;
-	PGconn*						_pConnection;
-	std::string					_connectionString;
-	bool						_inTransaction;
-	bool						_isAutoCommit;
-	bool						_isAsynchronousCommit;
-	Poco::UInt32				_tranactionIsolationLevel;
-	std::vector <std::string>	_preparedStatementsToBeDeallocated;
+	mutable Poco::FastMutex   _sessionMutex;
+	PGconn*                   _pConnection;
+	std::string               _connectionString;
+	bool                      _inTransaction;
+	bool                      _isAutoCommit;
+	bool                      _isAsynchronousCommit;
+	Poco::UInt32              _tranactionIsolationLevel;
+	std::vector <std::string> _preparedStatementsToBeDeallocated;
 
 //	static const std::string POSTGRESQL_READ_UNCOMMITTED;  // NOT SUPPORTED
 	static const std::string POSTGRESQL_READ_COMMITTED;
@@ -212,21 +208,19 @@ private:
 
 // SessionParameters
 
-inline
-SessionParameters::SessionParameters(	const std::string& aKeyword,
-										const std::string& anEnvironmentVariable,
-										const std::string& aCompiledDefault,
-										const std::string& aCurrentValue,
-										const std::string& aDisplayLabel,
-										const std::string& aHowToDisplay,
-										int aDisplaySize)
-:	_keyword				(aKeyword),
-	_environmentVariable	(anEnvironmentVariable),
-	_compiledDefault		(aCompiledDefault),
-	_currentValue			(aCurrentValue),
-	_displayLabel			(aDisplayLabel),
-	_howToDisplay			(HTD_ASIS),
-	_displaySize			(aDisplaySize)
+inline SessionParameters::SessionParameters(const std::string& aKeyword,
+	const std::string& anEnvironmentVariable,
+	const std::string& aCompiledDefault,
+	const std::string& aCurrentValue,
+	const std::string& aDisplayLabel,
+	const std::string& aHowToDisplay,
+	int aDisplaySize):_keyword(aKeyword),
+		_environmentVariable(anEnvironmentVariable),
+		_compiledDefault(aCompiledDefault),
+		_currentValue(aCurrentValue),
+		_displayLabel(aDisplayLabel),
+		_howToDisplay(HTD_ASIS),
+		_displaySize(aDisplaySize)
 {
 	if (aHowToDisplay == "*")
 	{
@@ -239,103 +233,92 @@ SessionParameters::SessionParameters(	const std::string& aKeyword,
 	}
 }
 
-inline
-SessionParameters::~SessionParameters()
+
+inline SessionParameters::~SessionParameters()
 {
 }
 
-inline
-std::string
-SessionParameters::keyword() const
+
+inline std::string SessionParameters::keyword() const
 {
 	return _keyword;
 }
 
-inline
-std::string
-SessionParameters::enviromentVariable() const
+
+inline std::string SessionParameters::enviromentVariable() const
 {
 	return _environmentVariable;
 }
 
-inline
-std::string
-SessionParameters::compiledDefault() const
+
+inline std::string SessionParameters::compiledDefault() const
 {
 	return _compiledDefault;
 }
 
-inline
-std::string
-SessionParameters::currentValue() const
+
+inline std::string SessionParameters::currentValue() const
 {
 	return _currentValue;
 }
 
-inline
-std::string
-SessionParameters::displayLabel() const
+
+inline std::string SessionParameters::displayLabel() const
 {
 	return _displayLabel;
 }
 
-inline
-SessionParameters::HOW_TO_DISPLAY
-SessionParameters::howToDisplay() const
+
+inline SessionParameters::HOW_TO_DISPLAY SessionParameters::howToDisplay() const
 {
 	return _howToDisplay;
 }
 
-inline
-int
-SessionParameters::displaySize() const
+inline int SessionParameters::displaySize() const
 {
 	return _displaySize;
 }
 
+
 // SessionHandle
 
-inline
-SessionHandle::operator PGconn * ()
+inline SessionHandle::operator PGconn * ()
 {
 	return _pConnection;
 }
 
-inline
-Poco::FastMutex&
-SessionHandle::mutex()
+
+inline Poco::FastMutex&SessionHandle::mutex()
 {
 	return _sessionMutex;
 }
 
-inline
-std::string
-SessionHandle::connectionString() const
+
+inline std::string SessionHandle::connectionString() const
 {
 	return _connectionString;
 }
 
-inline
-bool
-SessionHandle::isTransaction()
+
+inline bool SessionHandle::isTransaction()
 {
 	return _inTransaction;
 }
 
-inline
-bool
-SessionHandle::isAutoCommit()
+
+inline bool SessionHandle::isAutoCommit()
 {
 	return _isAutoCommit;
 }
 
-inline
-bool
-SessionHandle::isAsynchronousCommit()
+
+inline bool SessionHandle::isAsynchronousCommit()
 {
 	return _isAsynchronousCommit;
 }
 
-}}}
 
-#endif // Data_PostgreSQL_SessionHandle_INCLUDED
+}}} // namespace Poco::SQL::PostgreSQL
+
+
+#endif // SQL_PostgreSQL_SessionHandle_INCLUDED

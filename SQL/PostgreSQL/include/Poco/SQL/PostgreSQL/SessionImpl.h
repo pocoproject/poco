@@ -20,8 +20,8 @@
 
 #include "Poco/SQL/PostgreSQL/PostgreSQL.h"
 #include "Poco/SQL/PostgreSQL/SessionHandle.h"
-
 #include "Poco/SQL/AbstractSessionImpl.h"
+#include "Poco/SQL/StatementImpl.h"
 
 #include <string>
 
@@ -53,7 +53,7 @@ public:
 	void setConnectionTimeout(std::size_t aTimeout);
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout();
+	std::size_t getConnectionTimeout() const;
 		/// Returns the session connection timeout value.
 
 	void open(const std::string& aConnectionString = std::string());
@@ -62,51 +62,51 @@ public:
 	void close();
 		/// Closes the connection.
 
-	bool isConnected();
+	bool isConnected() const;
 		/// Returns true if connected, false otherwise.
 
-	Poco::SQL::StatementImpl* createStatementImpl();
+	Poco::SQL::StatementImpl::Ptr createStatementImpl();
 		/// Returns an PostgreSQL StatementImpl
 
 	void begin();
 		/// Starts a transaction
 
 	void commit();
-		/// Commits and ends a transaction		
+		/// Commits and ends a transaction
 
 	void rollback();
 		/// Aborts a transaction
 
-	bool canTransact();
+	bool canTransact() const;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction();
+	bool isTransaction() const;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	void setTransactionIsolation(Poco::UInt32 aTI);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation();
+	Poco::UInt32 getTransactionIsolation() const;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 aTI);
+	bool hasTransactionIsolation(Poco::UInt32 aTI) const;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 aTI);
+	bool isTransactionIsolation(Poco::UInt32 aTI) const;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void setAutoCommit(const std::string&, bool aValue);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& aName = std::string());
+	bool isAutoCommit(const std::string& aName = std::string()) const;
 		/// Returns autocommit property value.
 
 	void setAsynchronousCommit(const std::string&, bool aValue);
 		/// Sets asynchronousCommit property for the session.
 
-	bool isAsynchronousCommit(const std::string& aName = std::string());
+	bool isAsynchronousCommit(const std::string& aName = std::string()) const;
 		/// is the connection in Asynchronous commit mode?
 
 	SessionHandle& handle();
@@ -116,27 +116,27 @@ public:
 		/// Returns the name of the connector.
 
 private:
-	std::string		_connectorName;
-	SessionHandle	_sessionHandle;
-
-	std::size_t		_timeout;
+	std::string	          _connectorName;
+	mutable SessionHandle _sessionHandle;
+	std::size_t           _timeout;
 };
 
 
 //
 // inlines
 //
-inline
-bool
-SessionImpl::canTransact()
+
+inline bool SessionImpl::canTransact() const
 {
 	return true;
 }
+
 
 inline SessionHandle& SessionImpl::handle()
 {
 	return _sessionHandle;
 }
+
 
 inline const std::string& SessionImpl::connectorName() const
 {
@@ -144,13 +144,13 @@ inline const std::string& SessionImpl::connectorName() const
 }
 
 
-inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 aTI)
+inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 aTI) const
 {
 	return getTransactionIsolation() == aTI;
 }
-	
 
-inline std::size_t SessionImpl::getConnectionTimeout()
+
+inline std::size_t SessionImpl::getConnectionTimeout() const
 {
 	return _timeout;
 }
@@ -159,4 +159,4 @@ inline std::size_t SessionImpl::getConnectionTimeout()
 } } } // namespace Poco::SQL::PostgreSQL
 
 
-#endif // Data_PostgreSQL_SessionImpl_INCLUDED
+#endif // SQL_PostgreSQL_SessionImpl_INCLUDED

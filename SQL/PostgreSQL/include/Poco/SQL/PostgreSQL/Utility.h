@@ -14,13 +14,14 @@
 //
 
 
-#ifndef PostgreSQL_Utility_INCLUDED
-#define PostgreSQL_Utility_INCLUDED
+#ifndef SQL_PostgreSQL_Utility_INCLUDED
+#define SQL_PostgreSQL_Utility_INCLUDED
+
 
 #include "Poco/SQL/PostgreSQL/PostgreSQL.h"
 #include "Poco/SQL/PostgreSQL/SessionHandle.h"
-
 #include "Poco/SQL/Session.h"
+
 
 namespace Poco {
 namespace SQL {
@@ -78,4 +79,4 @@ inline SessionHandle* Utility::handle(Session& aSession)
 } } } // namespace Poco::SQL::PostgreSQL
 
 
-#endif // PostgreSQL_Utility_INCLUDED
+#endif // SQL_PostgreSQL_Utility_INCLUDED

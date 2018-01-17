@@ -14,8 +14,8 @@
 //
 
 
-#ifndef SQL_PostgreSQL_StatementHandle_INCLUDED
-#define SQL_PostgreSQL_StatementHandle_INCLUDED
+#ifndef SQL_PostgreSQL_StatementExecutor_INCLUDED
+#define SQL_PostgreSQL_StatementExecutor_INCLUDED
 
 #include "Poco/SQL/PostgreSQL/PostgreSQLException.h"
 #include "Poco/SQL/PostgreSQL/PostgreSQLTypes.h"
@@ -115,4 +115,4 @@ inline StatementExecutor::operator PGresult* ()
 	
 }}}
 
-#endif // Data_PostgreSQL_StatementHandle_INCLUDED
+#endif // SQL_PostgreSQL_StatementExecutor_INCLUDED
