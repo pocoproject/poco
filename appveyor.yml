@@ -1,7 +1,7 @@
 version: build {branch}-{build}
 
 cache:
-  - C:\mysql-5.7.19-win32
+  - C:\mysql-5.7.21-win32
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
@@ -55,9 +55,9 @@ configuration:
 
 environment:
   bundling:     bundled
-  MYSQL32URL:   http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.19-win32.zip
-  MYSQL32ZIP:   mysql-5.7.19-win32.zip
-  MYSQL32:      C:\mysql-5.7.19-win32
+  MYSQL32URL:   http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.21-win32.zip
+  MYSQL32ZIP:   mysql-5.7.21-win32.zip
+  MYSQL32:      C:\mysql-5.7.21-win32
   MYSQL64:      C:\Program Files\MySql\MySQL Server 5.7
   POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.6
   POSTGRES64:   C:\Program Files\PostgreSQL\9.6
