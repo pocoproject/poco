@@ -8,11 +8,11 @@ Net
 Crypto
 NetSSL_OpenSSL
 NetSSL_Win
-Data
-Data/ODBC
-Data/SQLite
-Data/MySQL
-Data/PostgreSQL
+SQL
+SQL/ODBC
+SQL/SQLite
+SQL/MySQL
+SQL/PostgreSQL
 Zip
 PageCompiler
 PageCompiler/File2Page
