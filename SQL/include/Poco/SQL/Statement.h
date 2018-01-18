@@ -331,7 +331,7 @@ public:
 	bool isAsync() const;
 		/// Returns true if statement was marked for asynchronous execution.
 
-	std::size_t wait(long milliseconds = WAIT_FOREVER);
+	std::size_t wait(long milliseconds = WAIT_FOREVER) const;
 		/// Waits for the execution completion for asynchronous statements or
 		/// returns immediately for synchronous ones. The return value for
 		/// asynchronous statement is the execution result (i.e. number of

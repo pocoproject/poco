@@ -2935,7 +2935,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 		Statement stmt = (session() << query, now);
 		RecordSet rset(stmt);
 		assert (rset.totalRowCount() == 4);
-		RowFilter::Ptr pRF = new RowFilter(&rset);
+		RowFilter::Ptr pRF = new RowFilter(rset);
 		assert (pRF->isEmpty());
 		pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);
 		assert (!pRF->isEmpty());
@@ -3371,7 +3371,7 @@ void SQLExecutor::rowIterator()
 	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
 	assert (osLoop.str() == osCopy.str());
 
-	RowFilter::Ptr pRF = new RowFilter(&rset);
+	RowFilter::Ptr pRF = new RowFilter(rset);
 	assert (pRF->isEmpty());
 	pRF->add("str0", RowFilter::VALUE_EQUAL, "3");
 	assert (!pRF->isEmpty());

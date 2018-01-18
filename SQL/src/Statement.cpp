@@ -67,7 +67,7 @@ Statement::~Statement()
 
 Statement& Statement::operator = (const Statement& stmt)
 {
-	if (stmt.isAsync() && !stmt.done()) wait();
+	if (stmt.isAsync() && !stmt.done()) stmt.wait();
 	if (this != &stmt)
 	{
 		Statement tmp(stmt);
@@ -101,7 +101,7 @@ Statement& Statement::operator = (Statement&& stmt)
 
 void Statement::move(Statement&& stmt)
 {
-	if (isAsync() && !done()) wait();
+	if (stmt.isAsync() && !stmt.done()) stmt.wait();
 	_pImpl = stmt._pImpl; stmt._pImpl = nullptr;
 	_async = stmt._async; stmt._async = false;
 	_pResult = stmt._pResult; stmt._pResult = nullptr;
@@ -174,7 +174,7 @@ void Statement::setAsync(bool async)
 }
 
 
-std::size_t Statement::wait(long milliseconds)
+std::size_t Statement::wait(long milliseconds) const
 {
 	if (!_pResult) return 0;
 	bool success = true;
