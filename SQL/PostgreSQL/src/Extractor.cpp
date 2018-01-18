@@ -180,14 +180,13 @@ bool Extractor::extract(std::size_t pos, long& val)
 
 	Poco::Int64 tempVal;
 
-	if	(	isColumnNull(outputParameter)
-		 || ! Poco::NumberParser::tryParse64(outputParameter.pData(), tempVal)
+	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse64(outputParameter.pData(), tempVal)
 		)
 	{
 		return false;
 	}
 
-	val = tempVal;
+	val = (long)tempVal;
 
 	return true;
 }
@@ -206,7 +205,7 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 		return false;
 	}
 
-	val = tempVal;
+	val = (unsigned long)tempVal;
 
 	return true;
 }
@@ -248,7 +247,7 @@ bool Extractor::extract(std::size_t pos, float& val)
 		return false;
 	}
 
-	val = tempVal;
+	val = (float)tempVal;
 
 	return true;
 }

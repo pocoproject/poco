@@ -40,7 +40,7 @@ public:
 	
 	void barebonePostgreSQLTest(std::string host, std::string user, std::string pwd, std::string db, std::string port, const char* tableCreateString);
 		/// This function uses "bare bone"  API calls (i.e. calls are not
-		/// "wrapped" in PocoData framework structures).
+		/// "wrapped" in PocoSQL framework structures).
 		/// The purpose of the function is to verify that driver behaves
 		/// correctly. If this test passes, subsequent tests failures are likely ours.
 

@@ -41,7 +41,7 @@ std::size_t PostgreSQLStatementImpl::columnsReturned() const
 
 int PostgreSQLStatementImpl::affectedRowCount() const
 {
-	return _statementExecutor.getAffectedRowCount();
+	return (int)_statementExecutor.getAffectedRowCount();
 }
 
 

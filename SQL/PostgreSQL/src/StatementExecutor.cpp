@@ -109,18 +109,14 @@ StatementExecutor::~StatementExecutor()
 	try
 	{
 		// remove the prepared statement from the session
-		if	(	 _sessionHandle.isConnected()
-			  && _state >= STMT_COMPILED
-			)
+		if(_sessionHandle.isConnected() && _state >= STMT_COMPILED)
 		{
 			_sessionHandle.deallocatePreparedStatement(_preparedStatementName);
 		}
 
 		PQResultClear resultClearer(_pResultHandle);
 	}
-	catch (...)
-	{
-	}
+	catch (...) { }
 }
 
 
@@ -132,15 +128,8 @@ StatementExecutor::State StatementExecutor::state() const
 
 void StatementExecutor::prepare(const std::string& aSQLStatement)
 {
-	if (! _sessionHandle.isConnected())
-	{
-		throw NotConnectedException();
-	}
-
-	if (_state >= STMT_COMPILED)
-	{
-		return;
-	}
+	if (! _sessionHandle.isConnected()) throw NotConnectedException();
+	if (_state >= STMT_COMPILED) return;
 
 	// clear out the metadata.  One way or another it is now obsolete.
 	_countPlaceholdersInSQLStatement = 0;
@@ -165,60 +154,44 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	PGresult* ptrPGResult = 0;
 
 	{
-		// lock the session
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
 		// prepare the statement - temporary PGresult returned
-		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, countPlaceholdersInSQLStatement, 0);
+		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, (int)countPlaceholdersInSQLStatement, 0);
 	}
 
 	{
 		// setup to clear the result from PQprepare
 		PQResultClear resultClearer(ptrPGResult);
 
-		if	(	! ptrPGResult
-			 || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK
-			)
+		if	(!ptrPGResult || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK)
 		{
 			throw StatementException(std::string("postgresql_stmt_prepare error: ") + PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
 		}
 	}
 
 	// Determine what the structure of a statement result will look like
-
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
-
 		ptrPGResult = PQdescribePrepared(_sessionHandle, pStatementName);
 	}
 
 	{
 		PQResultClear resultClearer(ptrPGResult);
-
-		if	(! ptrPGResult
-			 || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK
-			)
+		if (! ptrPGResult || PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK)
 		{
 			throw StatementException(std::string("postgresql_stmt_describe error: ") +
 				PQresultErrorMessage (ptrPGResult) + " " + aSQLStatement);
 		}
 
 		// remember the structure of the statement result
-
 		int fieldCount = PQnfields(ptrPGResult);
 		if (fieldCount < 0) fieldCount = 0;
 
 		for (int i = 0; i < fieldCount; ++i)
 		{
-			_resultColumns.push_back(
-				MetaColumn(i, // position
-						   PQfname(ptrPGResult, i), // name
-						   oidToColumnDataType(PQftype(ptrPGResult, i)), // Poco::SQL::MetaColumn type
-						   0, // column data lengths are not correct as returned by PQfsize() for the various column types
-						   0, // column precisions are not correct as returned by PQfmod() for the various column types
-						   true // nullable? - no efficient way to tell at this point, so assume yes
-						)
-			);
+			_resultColumns.push_back(MetaColumn(i, PQfname(ptrPGResult, i),
+				oidToColumnDataType(PQftype(ptrPGResult, i)), 0, 0, true));
 		}
 	}
 
@@ -231,19 +204,14 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 
 void StatementExecutor::bindParams(const InputParameterVector& anInputParameterVector)
 {
-	if (! _sessionHandle.isConnected())
-	{
-		throw NotConnectedException();
-	}
+	if (! _sessionHandle.isConnected()) throw NotConnectedException();
 
-	if (_state < STMT_COMPILED)
-	{
-		throw StatementException("Statement is not compiled yet");
-	}
+	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
 
 	if (anInputParameterVector.size() != _countPlaceholdersInSQLStatement)
 	{
-		throw StatementException(std::string("incorrect bind parameters count for SQL Statement: ") + _SQLStatement);
+		throw StatementException(std::string("incorrect bind parameters count for SQL Statement: ") +
+			_SQLStatement);
 	}
 
 	// Just record the input vector for later execution
@@ -253,19 +221,12 @@ void StatementExecutor::bindParams(const InputParameterVector& anInputParameterV
 
 void StatementExecutor::execute()
 {
-	if (! _sessionHandle.isConnected())
-	{
-		throw NotConnectedException();
-	}
+	if (! _sessionHandle.isConnected()) throw NotConnectedException();
 
-	if (_state < STMT_COMPILED)
-	{
-		throw StatementException("Statement is not compiled yet");
-	}
+	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
 
-	if	(	_countPlaceholdersInSQLStatement != 0
-		 && _inputParameterVector.size() != _countPlaceholdersInSQLStatement
-		)
+	if (_countPlaceholdersInSQLStatement != 0 &&
+		_inputParameterVector.size() != _countPlaceholdersInSQLStatement)
 	{
 		throw StatementException("Count of Parameters in Statement different than supplied parameters");
 	}
@@ -290,8 +251,8 @@ void StatementExecutor::execute()
 		try
 		{
 			pParameterVector.push_back  (static_cast<const char*>(cItr->pInternalRepresentation()));
-			parameterLengthVector.push_back(cItr->size());
-			parameterFormatVector.push_back(cItr->isBinary() ? 1 : 0);
+			parameterLengthVector.push_back((int)cItr->size());
+			parameterFormatVector.push_back((int)cItr->isBinary() ? 1 : 0);
 		}
 		catch (std::bad_alloc&)
 		{
@@ -303,28 +264,14 @@ void StatementExecutor::execute()
 	clearResults();
 
 	PGresult* ptrPGResult = 0;
-
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
-		/* - from api doc
-			PGresult *PQexecPrepared(PGconn *conn,
-			const char *stmtName,
-			int nParams,
-			const char * const *paramValues,
-			const int *paramLengths,
-			const int *paramFormats,
-			int resultFormat);
-		*/
 		ptrPGResult = PQexecPrepared (_sessionHandle,
-									  _preparedStatementName.c_str(),
-									  _countPlaceholdersInSQLStatement,
-									  _inputParameterVector.size() != 0 ? &pParameterVector[ 0 ]  : 0,
-									  _inputParameterVector.size() != 0 ? &parameterLengthVector[ 0 ] : 0,
-									  _inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : 0,
-									  0 // text based result please!
-									);
-
+			_preparedStatementName.c_str(), (int)_countPlaceholdersInSQLStatement,
+			_inputParameterVector.size() != 0 ? &pParameterVector[ 0 ] : 0,
+			_inputParameterVector.size() != 0 ? &parameterLengthVector[ 0 ] : 0,
+			_inputParameterVector.size() != 0 ? &parameterFormatVector[ 0 ] : 0, 0);
 	}
 
 	// Don't setup to auto clear the result (ptrPGResult).  It is required to retrieve the results later.
@@ -411,14 +358,12 @@ bool StatementExecutor::fetch()
 		return false;
 	}
 
-	if	(0 == countColumns
-		 || PGRES_TUPLES_OK != PQresultStatus(_pResultHandle)
-		)
+	if	(0 == countColumns || PGRES_TUPLES_OK != PQresultStatus(_pResultHandle))
 	{
 		return false;
 	}
 
-	for (std::size_t i = 0; i < countColumns; ++i)
+	for (int i = 0; i < countColumns; ++i)
 	{
 		int fieldLength = PQgetlength(_pResultHandle, static_cast<int> (_currentRow), static_cast<int> (i));
 		
@@ -427,9 +372,9 @@ bool StatementExecutor::fetch()
 		_outputParameterVector.at(i).setValues(oidToColumnDataType(columnInternalDataType), // Poco::SQL::MetaData version of the Column Data Type
 			columnInternalDataType, // Postgres Version
 			_currentRow, // the row number of the result
-			PQgetvalue(_pResultHandle, _currentRow, i), // a pointer to the data
+			PQgetvalue(_pResultHandle, (int)_currentRow, i), // a pointer to the data
 			(-1 == fieldLength ? 0 : fieldLength), // the length of the data returned
-			PQgetisnull(_pResultHandle, _currentRow, i) == 1 ? true : false); // is the column value null?
+			PQgetisnull(_pResultHandle, (int)_currentRow, i) == 1 ? true : false); // is the column value null?
 	}
 
 	++_currentRow;

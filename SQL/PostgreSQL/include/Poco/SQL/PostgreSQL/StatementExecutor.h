@@ -88,19 +88,20 @@ private:
 	StatementExecutor& operator= (const StatementExecutor&);
 
 private:
-	SessionHandle&				_sessionHandle;
-	State						_state;
+	typedef std::vector<MetaColumn> ColVec;
 
-	PGresult*					_pResultHandle;
-	std::string					_SQLStatement;
-	std::string					_preparedStatementName;	// UUID based to allow multiple prepared statements per transaction.
-	std::size_t					_countPlaceholdersInSQLStatement;
-	std::vector<MetaColumn>		_resultColumns;
+	SessionHandle& _sessionHandle;
+	State          _state;
+	PGresult*      _pResultHandle;
+	std::string    _SQLStatement;
+	std::string    _preparedStatementName;	// UUID based to allow multiple prepared statements per transaction.
+	std::size_t    _countPlaceholdersInSQLStatement;
+	ColVec         _resultColumns;
 
-	InputParameterVector		_inputParameterVector;
-	OutputParameterVector		_outputParameterVector;
-	std::size_t					_currentRow;			// current row of the result
-	std::size_t					_affectedRowCount;
+	InputParameterVector  _inputParameterVector;
+	OutputParameterVector _outputParameterVector;
+	std::size_t           _currentRow;			// current row of the result
+	std::size_t           _affectedRowCount;
 };
 
 
