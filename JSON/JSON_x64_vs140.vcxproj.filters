@@ -89,10 +89,10 @@
     <ClInclude Include="include\Poco\JSON\ParserImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\pd_json.h">
+    <ClInclude Include="src\pd_json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\pd_json_private.h">
+    <ClInclude Include="src\pd_json_private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
