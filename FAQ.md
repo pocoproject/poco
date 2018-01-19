@@ -27,10 +27,12 @@
 - [How To Ask Questions The Smart Way](http://www.catb.org/esr/faqs/smart-questions.html)
 - [How to create a Minimal, Complete, and Verifiable example](http://stackoverflow.com/help/mcve)
 
---
+
 **Q:** How do I contribute to POCO?
 
 **A:** See [Contributing](https://github.com/pocoproject/poco/blob/develop/CONTRIBUTING.md)
+
+---
 
 ## Specific Questions
 
@@ -38,19 +40,20 @@
 
 **A:** POCO builds out-of-the-box on many platforms. See [Building portion](http://pocoproject.org/docs/00200-GettingStarted.html#7) for your platform in the [Getting Started](http://pocoproject.org/docs/00200-GettingStarted.html) document. If things don't work according to the documentation, please let us know. If you find a problem and know how to fix it, please do and send us a [pull request](https://help.github.com/articles/using-pull-requests/).
 
---
+
 **Q:** Is there a coding style guide?
 
 **A:** [Yes](http://www.appinf.com/download/CppCodingStyleGuide.pdf).
 
---
+
 **Q:** Where can I find examples of POCO usage?
 
 **A:** Every POCO library comes with a set of small, fully-functional, example applications; the samples are located in the "samples" directory of each POCO library; additionally, the knowledge on usage of POCO can also be gained by studying and running unit tests, located under "testsuite" directory for each POCO library.
 
+
 **Q:** Why am I getting link errors?
 
-On Linux, see [Why does the order in which libraries are linked sometimes cause errors in GCC?
+**A:** On Linux, see [Why does the order in which libraries are linked sometimes cause errors in GCC?
 ](https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc#409470)  
 On Windows, make sure you are not mixing release/debug binaries.
 If neither of the above applies to your case, file an [issue](https://github.com/pocoproject/poco/issues).
