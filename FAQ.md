@@ -47,3 +47,10 @@
 **Q:** Where can I find examples of POCO usage?
 
 **A:** Every POCO library comes with a set of small, fully-functional, example applications; the samples are located in the "samples" directory of each POCO library; additionally, the knowledge on usage of POCO can also be gained by studying and running unit tests, located under "testsuite" directory for each POCO library.
+
+**Q:** Why am I getting link errors?
+
+On Linux, see [Why does the order in which libraries are linked sometimes cause errors in GCC?
+](https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc#409470)  
+On Windows, make sure you are not mixing release/debug binaries.
+If neither of the above applies to your case, file an [issue](https://github.com/pocoproject/poco/issues).
