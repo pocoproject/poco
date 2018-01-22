@@ -65,7 +65,7 @@ all: libexecs tests samples
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
 
 COMPONENTS =  CppUnit Foundation XML JSON Util Net Crypto NetSSL_OpenSSL
-COMPONENTS += Data Data/ODBC Data/SQLite Data/MySQL Data/PostgreSQL
+COMPONENTS += SQL SQL/ODBC SQL/SQLite SQL/MySQL SQL/PostgreSQL
 COMPONENTS += MongoDB Redis Zip PageCompiler PageCompiler/File2Page CppParser 
 
 cppunit:
@@ -105,22 +105,22 @@ endif
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 libexecs =  Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec
-libexecs += Data-libexec  Data/ODBC-libexec Data/SQLite-libexec Data/MySQL-libexec Data/PostgreSQL-libexec
+libexecs += SQL-libexec  SQL/ODBC-libexec SQL/SQLite-libexec SQL/MySQL-libexec SQL/PostgreSQL-libexec
 libexecs += MongoDB-libexec Redis-libexec Zip-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 tests    =  Foundation-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests
-tests    += Data-tests Data/ODBC-tests  Data/SQLite-tests Data/MySQL-tests Data/PostgreSQL-tests
+tests    += SQL-tests SQL/ODBC-tests  SQL/SQLite-tests SQL/MySQL-tests SQL/PostgreSQL-tests
 tests	 += MongoDB-tests Redis-tests Zip-tests CppParser-tests 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 samples  =  Foundation-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples
-samples  += Data-samples
+samples  += SQL-samples
 samples  += MongoDB-samples Zip-samples PageCompiler-samples 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 cleans   =  Foundation-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean
-cleans   += Data-clean Data/ODBC-clean Data/SQLite-clean Data/MySQL-clean Data/PostgreSQL-clean
+cleans   += SQL-clean SQL/ODBC-clean SQL/SQLite-clean SQL/MySQL-clean SQL/PostgreSQL-clean
 cleans	 += MongoDB-clean Redis-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean 
 
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -232,59 +232,59 @@ NetSSL_OpenSSL-clean:
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/NetSSL_OpenSSL/samples clean
 
-Data-libexec:  Foundation-libexec
-	$(MAKE) -C $(POCO_BASE)/Data
+SQL-libexec:  Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/SQL
 
-Data-tests: Data-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite
+SQL-tests: SQL-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/SQL/testsuite
 	
-Data-samples: Data-libexec  Data-libexec Data/SQLite-libexec Net-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/samples
+SQL-samples: SQL-libexec  SQL-libexec SQL/SQLite-libexec Net-libexec
+	$(MAKE) -C $(POCO_BASE)/SQL/samples
 
-Data-clean:
-	$(MAKE) -C $(POCO_BASE)/Data clean
-	$(MAKE) -C $(POCO_BASE)/Data/testsuite clean
-	$(MAKE) -C $(POCO_BASE)/Data/samples clean
+SQL-clean:
+	$(MAKE) -C $(POCO_BASE)/SQL clean
+	$(MAKE) -C $(POCO_BASE)/SQL/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/SQL/samples clean
 
-Data/SQLite-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite
+SQL/SQLite-libexec:  Foundation-libexec SQL-libexec
+	$(MAKE) -C $(POCO_BASE)/SQL/SQLite
 
-Data/SQLite-tests: Data/SQLite-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite
+SQL/SQLite-tests: SQL/SQLite-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/SQL/SQLite/testsuite
 
-Data/SQLite-clean:
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite clean
-	$(MAKE) -C $(POCO_BASE)/Data/SQLite/testsuite clean
+SQL/SQLite-clean:
+	$(MAKE) -C $(POCO_BASE)/SQL/SQLite clean
+	$(MAKE) -C $(POCO_BASE)/SQL/SQLite/testsuite clean
 
-Data/ODBC-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC
+SQL/ODBC-libexec:  Foundation-libexec SQL-libexec
+	$(MAKE) -C $(POCO_BASE)/SQL/ODBC
 
-Data/ODBC-tests: Data/ODBC-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite
+SQL/ODBC-tests: SQL/ODBC-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/SQL/ODBC/testsuite
 
-Data/ODBC-clean:
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC clean
-	$(MAKE) -C $(POCO_BASE)/Data/ODBC/testsuite clean
+SQL/ODBC-clean:
+	$(MAKE) -C $(POCO_BASE)/SQL/ODBC clean
+	$(MAKE) -C $(POCO_BASE)/SQL/ODBC/testsuite clean
 
-Data/MySQL-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL
+SQL/MySQL-libexec:  Foundation-libexec SQL-libexec
+	$(MAKE) -C $(POCO_BASE)/SQL/MySQL
 
-Data/MySQL-tests: Data/MySQL-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite
+SQL/MySQL-tests: SQL/MySQL-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/SQL/MySQL/testsuite
 
-Data/MySQL-clean:
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL clean
-	$(MAKE) -C $(POCO_BASE)/Data/MySQL/testsuite clean
+SQL/MySQL-clean:
+	$(MAKE) -C $(POCO_BASE)/SQL/MySQL clean
+	$(MAKE) -C $(POCO_BASE)/SQL/MySQL/testsuite clean
 
-Data/PostgreSQL-libexec:  Foundation-libexec Data-libexec
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL
+SQL/PostgreSQL-libexec:  Foundation-libexec SQL-libexec
+	$(MAKE) -C $(POCO_BASE)/SQL/PostgreSQL
 
-Data/PostgreSQL-tests: Data/PostgreSQL-libexec cppunit
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite
+SQL/PostgreSQL-tests: SQL/PostgreSQL-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/SQL/PostgreSQL/testsuite
 
-Data/PostgreSQL-clean:
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL clean
-	$(MAKE) -C $(POCO_BASE)/Data/PostgreSQL/testsuite clean
+SQL/PostgreSQL-clean:
+	$(MAKE) -C $(POCO_BASE)/SQL/PostgreSQL clean
+	$(MAKE) -C $(POCO_BASE)/SQL/PostgreSQL/testsuite clean
 
 MongoDB-libexec:  Foundation-libexec Net-libexec
 	$(MAKE) -C $(POCO_BASE)/MongoDB

@@ -214,9 +214,11 @@ public:
 		/// Throws a NullValueException if the Nullable is empty.
 	{
 		if (!_isNull)
-			return *reinterpret_cast<C*>(_value);
-		else
-			throw NullValueException();
+		{
+			C* ptr = reinterpret_cast<C*>(&_value[0]);
+			return *ptr;
+		}
+		else throw NullValueException();
 	}
 
 	const C& value() const
@@ -225,16 +227,18 @@ public:
 		/// Throws a NullValueException if the Nullable is empty.
 	{
 		if (!_isNull)
-			return *reinterpret_cast<const C*>(_value);
-		else
-			throw NullValueException();
+		{
+			const C* ptr = reinterpret_cast<const C*>(&_value[0]);
+			return *ptr;
+		}
+		else throw NullValueException();
 	}
 
 	const C& value(const C& deflt) const
 		/// Returns the Nullable's value, or the
 		/// given default value if the Nullable is empty.
 	{
-		return _isNull ? deflt : *reinterpret_cast<const C*>(_value);
+		return _isNull ? deflt : *reinterpret_cast<const C*>(&_value[0]);
 	}
 
 	operator C& ()

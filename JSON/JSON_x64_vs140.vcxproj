@@ -290,8 +290,6 @@
     <ClCompile Include="src\TemplateCache.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\pd_json.h" />
-    <ClInclude Include="include\pd_json_private.h" />
     <ClInclude Include="include\Poco\JSON\Array.h" />
     <ClInclude Include="include\Poco\JSON\Handler.h" />
     <ClInclude Include="include\Poco\JSON\JSON.h" />
@@ -305,6 +303,8 @@
     <ClInclude Include="include\Poco\JSON\Stringifier.h" />
     <ClInclude Include="include\Poco\JSON\Template.h" />
     <ClInclude Include="include\Poco\JSON\TemplateCache.h" />
+    <ClInclude Include="src\pd_json.h" />
+    <ClInclude Include="src\pd_json_private.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
