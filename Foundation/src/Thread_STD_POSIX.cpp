@@ -114,7 +114,7 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 		if (_pData->pRunnableTarget)
 		{
 			struct sched_param par;
-			par.sched_priority = prio;
+			par.sched_priority = (policy == SCHED_OTHER) ? 0 : prio;
 			if (pthread_setschedparam(_pData->thread->native_handle(), policy, &par))
 				throw SystemException("cannot set thread priority");
 		}
