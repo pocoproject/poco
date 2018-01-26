@@ -54,7 +54,7 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(SQLite_EXPORTS)
-		#pragma comment(lib, "PocoDataSQLite" POCO_LIB_SUFFIX)
+		#pragma comment(lib, "PocoSQLSQLite" POCO_LIB_SUFFIX)
 	#endif
 #endif
 
