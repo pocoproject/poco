@@ -32,7 +32,7 @@
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 
