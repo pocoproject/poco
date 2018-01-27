@@ -758,8 +758,8 @@ subprojects {
 	tasks.withType(RunTestExecutable) {
 		String PATH = System.getenv("PATH")
 		PATH = "$rootDir\\bin;$rootDir\\openssl\\VS_120\\win32\\bin\\release;$PATH"
-		PATH = "$mysql32Home\\lib;$PATH"
-		PATH = "$postgres32Home\\lib;$PATH"
+		PATH = "$mysql32Home".replace('/','\\') + "\\lib;$PATH"
+		PATH = "$postgres32Home".replace('/','\\') + "\\lib;$PATH"
 		environment "Path", "$PATH"
 //		println environment.Path
 
