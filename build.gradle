@@ -766,8 +766,8 @@ subprojects {
 		environment "POCO_BASE", "$rootDir"
 //		println "POCO_BASE=" + environment.POCO_BASE
 
-		String CPPUNIT_IGNORE = "";
-		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+		String 
+		CPPUNIT_IGNORE =  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
@@ -795,7 +795,7 @@ subprojects {
 		environment "CPPUNIT_IGNORE", "\"$CPPUNIT_IGNORE\""
 		args test
 	}
-	//..\gradle-poco\install\bin\gradle Zip:testsuite:check -Ptest=-all
+//	gradle\bin\gradle Zip:testsuite:check -Ptest=-all
 }
 tasks.withType(CppCompile) {
 	maxParallelForks = 2
@@ -860,7 +860,7 @@ task zipDoc(type: Zip) {
 	destinationDir(file('releases'))
 	inputs.files(new File("releases/$version-all-doc/index.html"))
 	outputs.files(new File("releases/poco-${version}-all-doc.zip"))
-//	dependsOn pocoDoc
+	dependsOn pocoDoc
 }
 
 def candle(VSYEAR, VERSION, target, os) {
@@ -908,10 +908,8 @@ def light(VSYEAR, VERSION, target, os) {
 		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 
 		def File input = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
-		println input
 		inputs.files(input)
 		def File output = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi")
-		println output
 		outputs.files(output)
 
 		onlyIf(new Spec<Exec>() {
