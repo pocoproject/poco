@@ -105,10 +105,6 @@ if(ANDROID)
 	set(SYSLIBS ${SYSLIBS} log)
 endif(ANDROID)
 
-if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-	set(SYSLIBS ${SYSLIBS} rt)
-endif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-
 # TODO: Why is this here?
 add_definitions( -DPCRE_STATIC)
 
