@@ -114,6 +114,12 @@ Util/testsuite/TestConfiguration/
 .settings
 cmake-build/
 
+
+# Clion generated files #
+######################
+cmake-build-debug
+.idea/
+
 # Temporary files #
 ###################
 *.bak
