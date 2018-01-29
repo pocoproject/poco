@@ -9,7 +9,8 @@
 
 
 #include "Poco/Platform.h"
-// see https://github.com/openssl/openssl/blob/master/doc/man3/OPENSSL_Applink.pod
+// see https://www.openssl.org/docs/faq.html
+// and https://github.com/openssl/openssl/blob/master/doc/man3/OPENSSL_Applink.pod
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "openssl/applink.c"
 #endif

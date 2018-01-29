@@ -170,9 +170,23 @@
 // #define POCO_LOG_DEBUG
 
 
-// Uncomment to disable the use of bundled OpenSSL binaries
-// (Windows only)
+//
+// OpenSSL options
+//
+
+// Poco has its own OpenSSL build system.
+// See https://github.com/pocoproject/openssl/blob/master/README.md
+// for details
+//
+// These options are Windows only.
+
+// Disable the use of Poco OpenSSL binaries
+// (external OpenSSL libraries must be provided).
 // #define POCO_EXTERNAL_OPENSSL
+
+//
+// End OpenSSL options
+//
 
 
 // Define to prevent changing the suffix for shared libraries
