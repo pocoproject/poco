@@ -20,7 +20,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -32,7 +32,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -91,7 +91,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\release\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win64\bin\release\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\bin\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -107,7 +107,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;Crypto_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -166,7 +166,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win64\lib\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\lib\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win64\lib\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\lib\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -178,7 +178,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -225,7 +225,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win64\lib\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win64\lib\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -241,7 +241,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -285,7 +285,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win64\bin\debug\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\bin\debug\*.lib ..\lib64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\bin\debug\*.pdb ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -297,7 +297,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -344,7 +344,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win64\bin\release\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win64\bin\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win64\bin\release\*.dll ..\bin64\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win64\bin\release\*.lib ..\lib64\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -360,7 +360,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"

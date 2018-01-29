@@ -20,7 +20,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win32\bin\debug\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\bin\debug\*.lib ..\lib\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\bin\debug\*.pdb ..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win32\bin\debug\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\bin\debug\*.lib ..\lib\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\bin\debug\*.pdb ..\lib\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -34,7 +34,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -99,7 +99,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win32\bin\release\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\bin\release\*.lib ..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win32\bin\release\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\bin\release\*.lib ..\lib\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -115,7 +115,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;$(ProjectName)_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;Crypto_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -179,7 +179,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win32\lib\debug\*.lib ..\lib\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\lib\debug\*.pdb ..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win32\lib\debug\*.lib ..\lib\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\lib\debug\*.pdb ..\lib\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -193,7 +193,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -245,7 +245,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win32\lib\release\*.lib ..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win32\lib\release\*.lib ..\lib\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -261,7 +261,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -312,7 +312,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win32\bin\debug\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\bin\debug\*.lib ..\lib\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\bin\debug\*.pdb ..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win32\bin\debug\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\bin\debug\*.lib ..\lib\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\bin\debug\*.pdb ..\lib\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -326,7 +326,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -378,7 +378,7 @@
 			CharacterSet="1">
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\openssl\VS_120\win32\bin\release\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\VS_120\win32\bin\release\*.lib ..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\openssl\build\win32\bin\release\*.dll ..\bin\* 1&gt;nul&#xA;xcopy /y ..\openssl\build\win32\bin\release\*.lib ..\lib\* 1&gt;nul&#xA;exit 0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -394,7 +394,7 @@
 				Optimization="4"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\openssl\VS_120\include;..\Foundation\include"
+				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCO_STATIC;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;"
 				StringPooling="true"
 				MinimalRebuild="false"

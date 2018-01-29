@@ -22,7 +22,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
-#include <openssl/opensslv.h>
+
 #if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
 #include <openssl/fips.h>
 #endif
