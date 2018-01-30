@@ -71,6 +71,8 @@ class NetSSL_Win_API SSLManager
 	///       <schannel>
 	///          <server|client>
 	///            <certificateName>cert Id</certificateName>
+	///            <certificateHash>cert thumbprint</certificateHash>
+	///            <certificatePath>path of a certificate</certificatePath>
 	///            <certificateStore>MY</certificateStore>
 	///            <verificationMode>none|relaxed|strict</verificationMode>
 	///            <revocationCheck>true|false</revocationCheck>
@@ -101,6 +103,8 @@ class NetSSL_Win_API SSLManager
 	/// 
 	///    - certificateName (string): The subject name of the certificate to use. The certificate must
 	///      be available in the Windows user or machine certificate store.  
+	///    - certificateHash (string): The thumbprint of the certificate to use. Alternative for certificateName.
+	///      The certificate must be available in the Windows user or machine certificate store.
 	///    - certificatePath (string): The path of a certificate and private key file in PKCS #12 format.
 	///    - certificateStore (string): The certificate store location to use. 
 	///      Valid values are "MY", "Root", "Trust" or "CA". Defaults to "MY".
@@ -267,6 +271,8 @@ private:
 
 	static const std::string CFG_CERT_NAME;
 	static const std::string VAL_CERT_NAME;
+	static const std::string CFG_CERT_HASH;
+	static const std::string VAL_CERT_HASH;
 	static const std::string CFG_CERT_PATH;
 	static const std::string VAL_CERT_PATH;
 	static const std::string CFG_CERT_STORE;

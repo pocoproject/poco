@@ -23,8 +23,11 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/Buffer.h"
+#include "Poco/HexBinaryDecoder.h"
+#include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <stdio.h>
 
 
 namespace Poco {
@@ -39,7 +42,7 @@ const std::string Context::CERT_STORE_USERDS("USERDS");
 
 
 Context::Context(Usage usage,
-		const std::string& certNameOrPath, 
+		const std::string& certificateInfoOrPath, 
 		VerificationMode verMode,
 		int options,
 		const std::string& certStore):
@@ -47,7 +50,7 @@ Context::Context(Usage usage,
 	_mode(verMode),
 	_options(options),
 	_extendedCertificateVerification(true),
-	_certNameOrPath(certNameOrPath),
+	_certInfoOrPath(certificateInfoOrPath),
 	_certStoreName(certStore),
 	_hMemCertStore(0),
 	_hCollectionCertStore(0),
@@ -144,7 +147,7 @@ Poco::Net::X509Certificate Context::certificate()
 	if (_pCert)
 		return Poco::Net::X509Certificate(_pCert, true);
 
-	if (_certNameOrPath.empty())
+	if (_certInfoOrPath.empty())
 		throw NoCertificateException("Certificate requested, but no certificate name or path provided");
 
 	if (_options & OPT_LOAD_CERT_FROM_FILE)
@@ -167,35 +170,65 @@ void Context::loadCertificate()
 	if (!_hCertStore)
 	{
 		if (_options & OPT_USE_MACHINE_STORE)
-			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, _certStoreName.c_str());
+			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE | CERT_STORE_OPEN_EXISTING_FLAG, wcertStore.c_str());
 		else
 			_hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
 	}
 	if (!_hCertStore) throw CertificateException("Failed to open certificate store", _certStoreName, GetLastError());
 
-	CERT_RDN_ATTR cert_rdn_attr;
-	cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
-	cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
-	cert_rdn_attr.Value.cbData = (DWORD) _certNameOrPath.size();
-	cert_rdn_attr.Value.pbData = (BYTE *) _certNameOrPath.c_str();
+	// Find the certificate either using name or hash.
+	if(_options & OPT_USE_CERT_HASH)
+	{
+		// Sanity check for the hash value.
+		if(_certInfoOrPath.size() % 2) throw CertificateException(Poco::format("Invalid certificate hash %s", _certInfoOrPath));
 
-	CERT_RDN cert_rdn;
-	cert_rdn.cRDNAttr = 1;
-	cert_rdn.rgRDNAttr = &cert_rdn_attr;
+		// Convert hex to binary.
+		BYTE buffer[256] = {};
+		int bufferSize = 0;
+		int byte = 0;
+		std::string szHex;
+		for(int counter = 0; counter < _certInfoOrPath.size() / 2; counter++)
+		{
+			szHex = _certInfoOrPath.substr(2 * counter, 2);
+			if( sscanf(szHex.c_str(), "%02x", OUT &byte ) != 1)
+				throw CertificateException(Poco::format("Invalid certificate hash %s", _certInfoOrPath));
+			buffer[counter] = (BYTE) byte;
+			bufferSize += 1;
+		}
 
-	_pCert = CertFindCertificateInStore(_hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
-	if (!_pCert) throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", _certNameOrPath, _certStoreName));
+		CRYPT_HASH_BLOB chBlob;
+		chBlob.cbData = bufferSize;
+		chBlob.pbData = buffer;
+
+		_pCert = CertFindCertificateInStore(_hCertStore, PKCS_7_ASN_ENCODING | X509_ASN_ENCODING, 0, CERT_FIND_HASH, &chBlob, NULL);
+		if (!_pCert) throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", _certInfoOrPath, _certStoreName));
+	}
+	else
+	{
+		CERT_RDN_ATTR cert_rdn_attr;
+		cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
+		cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
+		cert_rdn_attr.Value.cbData = (DWORD) _certInfoOrPath.size();
+		cert_rdn_attr.Value.pbData = (BYTE *) _certInfoOrPath.c_str();
+
+		CERT_RDN cert_rdn;
+		cert_rdn.cRDNAttr = 1;
+		cert_rdn.rgRDNAttr = &cert_rdn_attr;
+
+		_pCert = CertFindCertificateInStore(_hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
+		if (!_pCert) throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", _certInfoOrPath, _certStoreName));
+	}
 }
 
 
 void Context::importCertificate()
 {
-	Poco::File certFile(_certNameOrPath);
-	if (!certFile.exists()) throw Poco::FileNotFoundException(_certNameOrPath);
+	Poco::File certFile(_certInfoOrPath);
+	if (!certFile.exists()) throw Poco::FileNotFoundException(_certInfoOrPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certNameOrPath);
+	if (size > 4096) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certInfoOrPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
-	Poco::FileInputStream istr(_certNameOrPath);
+	Poco::FileInputStream istr(_certInfoOrPath);
 	istr.read(buffer.begin(), buffer.size());
 	if (istr.gcount() != size) throw Poco::IOException("error reading PKCS #12 certificate file");
 	importCertificate(buffer.begin(), buffer.size());
