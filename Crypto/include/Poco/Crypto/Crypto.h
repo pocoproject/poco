@@ -114,7 +114,7 @@ enum RSAPaddingMode
 				#pragma comment(lib, "legacy_stdio_definitions.lib")
 				#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
 			#endif
-		#endif // POCO_EXTERNAL_OPENSSL
+		#endif // POCO_INTERNAL_OPENSSL_MSVC_VER
 		#if !defined(Crypto_EXPORTS)
 			#pragma comment(lib, "PocoCrypto" POCO_LIB_SUFFIX)
 		#endif
