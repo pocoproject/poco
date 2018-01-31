@@ -87,9 +87,9 @@ Poco::Exception* OpenSSLException::clone() const
 
 void OpenSSLException::setExtMessage()
 {
-	unsigned long e = ERR_get_error();
+	Poco::UInt64 e = static_cast<Poco::UInt64>(ERR_get_error());
 	char buf[128] = { 0 };
-	char* pErr = ERR_error_string(e, buf);
+	char* pErr = ERR_error_string(static_cast<unsigned long>(e), buf);
 	std::string err;
 	if (pErr) err = pErr;
 	else err = NumberFormatter::format(e);
