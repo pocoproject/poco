@@ -32,7 +32,7 @@
                  __VA_ARGS__);                                    \
     }                                                             \
 
-#endif // POCO_MSVS_VERSION
+#endif // _MSC_VER
 
 #define STACK_INC 4
 
