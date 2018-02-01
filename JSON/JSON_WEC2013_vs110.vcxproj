@@ -8,7 +8,7 @@
     <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Parser.cpp"/>
     <ClCompile Include="src\ParserImpl.cpp"/>
-    <ClCompile Include="src\pd_json.c"/>
+    <ClCompile Include="src\pdjson.c"/>
     <ClCompile Include="src\PrintHandler.cpp"/>
     <ClCompile Include="src\Query.cpp"/>
     <ClCompile Include="src\Stringifier.cpp"/>
@@ -47,8 +47,8 @@
     <ClInclude Include="include\Poco\JSON\ParseHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Parser.h"/>
     <ClInclude Include="include\Poco\JSON\ParserImpl.h"/>
-    <ClInclude Include="include\pd_json.h"/>
-    <ClInclude Include="include\pd_json_private.h"/>
+    <ClInclude Include="src\pdjson.h"/>
+    <ClInclude Include="include\pdjson_private.h"/>
     <ClInclude Include="include\Poco\JSON\PrintHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Query.h"/>
     <ClInclude Include="include\Poco\JSON\Stringifier.h"/>

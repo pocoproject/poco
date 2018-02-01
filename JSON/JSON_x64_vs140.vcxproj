@@ -282,7 +282,7 @@
     <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Parser.cpp"/>
     <ClCompile Include="src\ParserImpl.cpp"/>
-    <ClCompile Include="src\pd_json.c">
+    <ClCompile Include="src\pdjson.c">
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ForceConformanceInForLoopScope>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">CompileAsCpp</CompileAs>
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ForceConformanceInForLoopScope>
@@ -303,8 +303,8 @@
     <ClCompile Include="src\TemplateCache.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\pd_json.h"/>
-    <ClInclude Include="include\pd_json_private.h"/>
+    <ClInclude Include="src\pdjson.h"/>
+    <ClInclude Include="include\pdjson_private.h"/>
     <ClInclude Include="include\Poco\JSON\Array.h"/>
     <ClInclude Include="include\Poco\JSON\Handler.h"/>
     <ClInclude Include="include\Poco\JSON\JSON.h"/>

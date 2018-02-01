@@ -26,7 +26,7 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
 #include <string>
-
+//#include "pdjson.h"
 
 struct json_stream;
 
@@ -104,7 +104,7 @@ private:
 	void stripComments(std::string& json);
 	bool checkError();
 
-	json_stream* _pJSON;
+	struct json_stream* _pJSON;
 	Handler::Ptr _pHandler;
 	int          _depth;
 	char         _decimalPoint;
