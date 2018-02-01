@@ -1,11 +1,4 @@
 #define _POSIX_C_SOURCE 200112L
-#include <stdio.h>
-// patched for poco 1.8.x
-#if defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901L)
-#include <stdbool.h>
-//#elif !defined(_MSC_VER)
-//typedef enum { false, true } bool;
-#endif // __STDC_VERSION__
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
