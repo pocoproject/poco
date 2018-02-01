@@ -8,6 +8,7 @@
 #define JSON_FLAG_ERROR      (1u << 0)
 #define JSON_FLAG_STREAMING  (1u << 1)
 
+
 // patched for poco 1.8.x (VS 2008)
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
 

@@ -6,11 +6,20 @@ extern "C" {
 #endif // __cplusplus
 
 #include <stdio.h>
-#if !defined(_MSC_VER) // for poco 1.8.x we must compile as C++
+
+#if !defined(__cplusplus) && !defined(_MSC_VER) // for poco 1.8.x we must compile as C++
 	#if defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901L)
 		#include <stdbool.h>
 	#else
-		typedef enum { false, true } bool;
+	#ifndef bool
+		#define bool int
+	#endif
+	#ifndef true
+		#define true 1
+	#endif
+	#ifndef false
+		#define false 0
+	#endif
 	#endif // __STDC_VERSION__
 #endif
 
