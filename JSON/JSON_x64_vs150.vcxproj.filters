@@ -89,7 +89,6 @@
     <ClInclude Include="include\Poco\JSON\TemplateCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\pdjson_private.h" />
     <ClInclude Include="src\pdjson.h">
       <Filter>Header Files</Filter>
     </ClInclude>

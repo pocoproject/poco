@@ -643,10 +643,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\pdjson_private.h"
-				>
-			</File>
-			<File
 				RelativePath=".\include\Poco\JSON\PrintHandler.h"
 				>
 			</File>

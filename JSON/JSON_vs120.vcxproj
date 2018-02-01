@@ -313,7 +313,6 @@
     <ClInclude Include="include\Poco\JSON\Parser.h"/>
     <ClInclude Include="include\Poco\JSON\ParserImpl.h"/>
     <ClInclude Include="src\pdjson.h"/>
-    <ClInclude Include="include\pdjson_private.h"/>
     <ClInclude Include="include\Poco\JSON\PrintHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Query.h"/>
     <ClInclude Include="include\Poco\JSON\Stringifier.h"/>

@@ -305,7 +305,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pdjson.h"/>
-    <ClInclude Include="include\pdjson_private.h"/>
     <ClInclude Include="include\Poco\JSON\Array.h"/>
     <ClInclude Include="include\Poco\JSON\Handler.h"/>
     <ClInclude Include="include\Poco\JSON\JSON.h"/>

@@ -527,8 +527,6 @@
 			<File
 				RelativePath=".\src\pdjson.h"/>
 			<File
-				RelativePath=".\include\pdjson_private.h"/>
-			<File
 				RelativePath=".\include\Poco\JSON\PrintHandler.h"/>
 			<File
 				RelativePath=".\include\Poco\JSON\Query.h"/>
