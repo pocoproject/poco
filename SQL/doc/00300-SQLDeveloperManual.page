@@ -1,18 +1,18 @@
-POCO Data Connectors Developer Guide
-POCO Data Library
+POCO SQL Connectors Developer Guide
+POCO SQL Library
 
 !!!Overview
-Developing one's own <*Data Connector*> implementation is rather straight-forward.
+Developing one's own <*SQL Connector*> implementation is rather straight-forward.
 Just implement the following interfaces:
-  * Poco::Data::AbstractBinder
-  * Poco::Data::AbstractExtractor
-  * Poco::Data::StatementImpl
-  * Poco::Data::SessionImpl
-  * Poco::Data::Connector
-  * optional: Poco::Data::AbstractPreparation
+  * Poco::SQL::AbstractBinder
+  * Poco::SQL::AbstractExtractor
+  * Poco::SQL::StatementImpl
+  * Poco::SQL::SessionImpl
+  * Poco::SQL::Connector
+  * optional: Poco::SQL::AbstractPreparation
 
 It is recommended to implement the classes from top to down (ie. start with Binder and Extractor) and to use a
-namespace that has <[ Poco::Data ]> as parent, e.g.<[ Poco::Data::SQLite ]>.
+namespace that has <[ Poco::SQL ]> as parent, e.g.<[ Poco::SQL::SQLite ]>.
 
 !!!AbstractBinder
 An <[AbstractBinder]> is a class that maps values to placeholders. It is also responsible to bind primitive C++ data types to database
@@ -176,7 +176,7 @@ All methods are public.
 ----
 
 !!!AbstractPreparation
-<[AbstractPreparation]> is an optional interface responsible for preparing an extract. If you need it depends on the <[DataConnector]> you implement. For example, SQLite can do perfectly without it, ODBC instead requires it.
+<[AbstractPreparation]> is an optional interface responsible for preparing an extract. If you need it depends on the <[SQLConnector]> you implement. For example, SQLite can do perfectly without it, ODBC instead requires it.
 SQLite doesn't need it because it works as follows:
   * sendQuery
   * getNextResult
@@ -262,8 +262,8 @@ Extract now changes to:
 Note that it is recommended to prepare a statement only once in the compileImpl of <[StatementImpl]>. The AbstractPreparator objects (which make use of <[AbstractPreparation]>
 can be created by iterating over the Extractor objects of the StatementImpl:
 
-    Poco::Data::AbstractExtractingVec::iterator it = extractings().begin();
-    Poco::Data::AbstractExtractingVec::iterator itEnd = extractings().end();
+    Poco::SQL::AbstractExtractingVec::iterator it = extractings().begin();
+    Poco::SQL::AbstractExtractingVec::iterator itEnd = extractings().end();
     std::size_t pos = 0; // sqlite starts with pos 0 for results! your DB maybe with 1
     for (; it != itEnd; ++it)
     {
@@ -318,10 +318,10 @@ The Extracting and Binding objects can be accessed via the calls to the super-cl
 A high-level <*bind*> implementation will look like this:
 
     [...]
-    Poco::Data::AbstractBindingVec& binds = bindings();
+    Poco::SQL::AbstractBindingVec& binds = bindings();
     std::size_t pos = 1; // or 0 depending on your database
-    Poco::Data::AbstractBindingVec::iterator it = binds.begin();
-    Poco::Data::AbstractBindingVec::iterator itEnd = binds.end();
+    Poco::SQL::AbstractBindingVec::iterator it = binds.begin();
+    Poco::SQL::AbstractBindingVec::iterator itEnd = binds.end();
     for (; it != itEnd && (*it)->canBind(); ++it)
     {
         (*it)->bind(pos);
@@ -332,11 +332,11 @@ A high-level <*bind*> implementation will look like this:
 A high-level <*next*> implementation:
 
     if (!hasNext())
-        throw Poco::Data::DataException("No data received");
+        throw Poco::SQL::SQLException("No data received");
     int nCol = countColumnsInResult...;
     poco_assert (columnsHandled() == nCol);
-    Poco::Data::AbstractExtractingVec::iterator it = extractings().begin();
-    Poco::Data::AbstractExtractingVec::iterator itEnd = extractings().end();
+    Poco::SQL::AbstractExtractingVec::iterator it = extractings().begin();
+    Poco::SQL::AbstractExtractingVec::iterator itEnd = extractings().end();
     std::size_t pos = 0; // sqlite starts with pos 0 for results! your DB maybe with 1
     for (; it != itEnd; ++it)
     {
@@ -350,7 +350,7 @@ A high-level <*hasNext*> implementation:
 
     if (enabledhasNext())
     {
-        checkIfItHasMoreData
+        checkIfItHasMoreSQL
         cacheResult
         disablehasNext()
     }
@@ -386,7 +386,7 @@ A high-level <*canBind*>:
 The purpose of the <[SessionImpl]> is simply to open/close a connection to the database, to act as factory for <[StatementImpl]> objects, and to handle transactions.
 The connection is opened in the constructor, and closed in the destructor.
 
-    Poco::Data::StatementImpl* createStatementImpl();
+    Poco::SQL::StatementImpl* createStatementImpl();
         /// Returns an SQLite StatementImpl
 
     void begin();
@@ -404,7 +404,7 @@ Finally, one needs to implement the <[Connector]>.
 Each <[Connector]> should have a public static const string member named <*KEY*> and must have a factory method to <*create*> <[ Poco::AutoPtr ]> objects of type <[SessionImpl]>.
 It should also have a static <*addToFactory()*> and a static <*removeFromFactory()*> method:
 
-    class My_API Connector: public Poco::Data::Connector
+    class My_API Connector: public Poco::SQL::Connector
         /// Connector instantiates SessionImpl objects.
     {
     public:
@@ -417,13 +417,13 @@ It should also have a static <*addToFactory()*> and a static <*removeFromFactory
         ~Connector();
         /// Destroys the Connector.
 
-        Poco::AutoPtr < Poco::Data::SessionImpl > createSession(const std::string& connectionString);
+        Poco::AutoPtr < Poco::SQL::SessionImpl > createSession(const std::string& connectionString);
             /// Creates a SessionImpl object and initializes it with the given connectionString.
 
         static void registerConnector();
-            /// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+            /// Registers the Connector under the Keyword Connector::KEY at the Poco::SQL::SessionFactory
 
         static void unregisterConnector();
-            /// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+            /// Unregisters the Connector under the Keyword Connector::KEY at the Poco::SQL::SessionFactory
     };
 ----

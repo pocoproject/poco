@@ -1,25 +1,25 @@
-POCO Data User Guide
-POCO Data Library
+POCO SQL User Guide
+POCO SQL Library
 
 !!!First Steps
 
-POCO Data is POCO's database abstraction layer which allows users to
+POCO SQL is POCO's database abstraction layer which allows users to
 easily send/retrieve data to/from various databases. Currently supported
 database connectors are SQLite, MySQL and ODBC. Framework is opened
 for extension, so additional native connectors (Oracle, PostgreSQL, ...)
-can be added. The intent behind the Poco::Data framework is to produce the
+can be added. The intent behind the Poco::SQL framework is to produce the
 integration between C++ and relational databses in a simple and natural way.
 
-The following complete example shows how to use POCO Data:
+The following complete example shows how to use POCO SQL:
 
-    #include "Poco/Data/Session.h"
-    #include "Poco/Data/SQLite/Connector.h"
+    #include "Poco/SQL/Session.h"
+    #include "Poco/SQL/SQLite/Connector.h"
     #include <vector>
     #include <iostream>
 
-    using namespace Poco::Data::Keywords;
-    using Poco::Data::Session;
-    using Poco::Data::Statement;
+    using namespace Poco::SQL::Keywords;
+    using Poco::SQL::Session;
+    using Poco::SQL::Statement;
 
     struct Person
     {
@@ -31,7 +31,7 @@ The following complete example shows how to use POCO Data:
     int main(int argc, char** argv)
     {
         // register SQLite connector
-        Poco::Data::SQLite::Connector::registerConnector();
+        Poco::SQL::SQLite::Connector::registerConnector();
 
         // create a session
         Session session("SQLite", "sample.db");
@@ -84,9 +84,9 @@ The following complete example shows how to use POCO Data:
 
 The above example is pretty much self explanatory.
 
-The <[using namespace Poco::Data ]> is for convenience only but highly
+The <[using namespace Poco::SQL ]> is for convenience only but highly
 recommended for good readable code. While <[ses << "SELECT COUNT(*)
-FROM PERSON", Poco::Data::Keywords::into(count), Poco::Data::Keywords::now;]>
+FROM PERSON", Poco::SQL::Keywords::into(count), Poco::SQL::Keywords::now;]>
 is valid, the aesthetic aspect of the code is improved by eliminating the need
 for full namespace qualification; this document uses convention introduced in
 the example above.
@@ -94,7 +94,7 @@ the example above.
 The remainder of this tutorial is split up into the following parts:
 
   * Sessions
-  * Inserting and Retrieving Data
+  * Inserting and Retrieving SQL
   * Statements
   * STL Containers
   * Tuples
@@ -126,9 +126,9 @@ specifying various parameters like host, port, user, password, database, compres
 automatic reconnect. Example: <["host=localhost;port=3306;db=mydb;user=alice;password=s3cr3t;compress=true;auto-reconnect=true"]>
 
 
-!!!Inserting and Retrieving Data
+!!!Inserting and Retrieving SQL
 
-!!Single Data Sets
+!!Single SQL Sets
 
 Inserting data works by <[using]> the content of other variables.
 Assume we have a table that stores only forenames:
@@ -163,7 +163,7 @@ In this example the <[use]> expression matches the placeholder with the
 placeholders -- which are performance and protection against SQL injection
 attacks -- don't show here. Check the <[Statements]> section to find out more.
 
-Retrieving data from the Database works similar. The <[into]>
+Retrieving data from the SQLbase works similar. The <[into]>
 expression matches the returned database values to C++ objects, it also
 allows to provide a default value in case null data is returned from the
 database:
@@ -173,7 +173,7 @@ database:
     ses << "SELECT NAME FROM FORENAME", into(aName, 0, "default"), now;
 
 You'll note the integer zero argument in the second into() call. The reason for
-that is that Poco::Data supports multiple result sets for those databases/drivers
+that is that Poco::SQL supports multiple result sets for those databases/drivers
 that have such capbility and we have to indicate the resultset we are referring to.
 Attempting to create sufficient overloads of <[into()]> creates more trouble than
 what it's worth and null values can effectively be dealt with through use of either
@@ -230,13 +230,13 @@ for the purpose of allowing it to have null value.
 If the returned value was null, age.isNull() will return true. Whether empty
 string is null or not is more of a philosophical question (a topic for discussion
 in some other time and place); for the purpose of this document, suffice it to say
-that different databases handle it differently and Poco::Data provides a way to
+that different databases handle it differently and Poco::SQL provides a way to
 tweak it to user's needs through following <[Session]> features:
 
   *emptyStringIsNull
   *forceEmptyString
 
-So, if your database does not treat empty strings as null but you want Poco::Data
+So, if your database does not treat empty strings as null but you want Poco::SQL
 to emulate such behavior, modify the session like this:
 
     ses.setFeature("emptyStringIsNull", true);
@@ -247,9 +247,9 @@ want it to, you'll alter the session feature:
     ses.setFeature("forceEmptyString", true);
 
 Obviously, the above features are mutually exclusive; an attempt to se them both
-to true will result in an exception being thrown by the Data framework.
+to true will result in an exception being thrown by the SQL framework.
 
-!! Multiple Data Sets
+!! Multiple SQL Sets
 
 Batches of statements are supported. They return multiple sets of data,
 so into() call needs and additional parameter to determine which data
@@ -291,10 +291,10 @@ More on statements and manipulators in the chapters that follow.
 !! Stored Procedures And Functions Support
 
 Most of the modern database systems support stored procedures and/or
-functions. Does Poco::Data provide any support there? You bet.
+functions. Does Poco::SQL provide any support there? You bet.
 While the specifics on what exactly is possible (e.g. the data types
 passed in and out, automatic or manual data binding, binding direction,
-etc.) is ultimately database dependent, POCO Data does it's
+etc.) is ultimately database dependent, POCO SQL does it's
 best to provide reasonable access to such functionality through <[in]>,
 <[out]> and <[io]> binding functions. As their names imply, these
 functions are performing parameters binding tho pass in or receive from
@@ -415,7 +415,7 @@ once and then use the placeholder in combination with the <[use]> clause
 to insert 100 different values into the database.
 
 Still, this isn't the best way to insert a collection of values into a
-database. Poco::Data is STL-aware and will cooperate with STL containers
+database. Poco::SQL is STL-aware and will cooperate with STL containers
 to extract multiple rows from the database. More on that in the chapter
 titled "STL Containers".
 
@@ -618,7 +618,7 @@ Container]] paragraph.
 Complex user-defined data types are supported through type handlers as
 described in one of the chapters below. However, in addition to STL
 containers, which are supported through binding/extraction there is
-another complex data type supported by POCO Data
+another complex data type supported by POCO SQL
 "out-of-the-box". The type is Poco::Tuple. The detailed
 description is beyond the scope of this manual, but suffice it to say
 here that this data structure allows for convenient and type-safe mix of
@@ -630,14 +630,14 @@ Here's the code to clarify the point:
     session << "INSERT INTO Person VALUES(?, ?, ?)", use(person), now;
 ----
 
-Automagically, POCO Data internally takes care of the data
+Automagically, POCO SQL internally takes care of the data
 binding intricacies for you. Of course, as before, it is programmer's
 responsibility to make sure the Tuple data types correspond to the table
 column data types.
 
 I can already see the reader wondering if it's possible to put tuples in
 a container and kill more than one bird with one stone. As usual,
-POCO Data will not disappoint you:
+POCO SQL will not disappoint you:
 
     typedef Poco::Tuple<std::string, std::string, int> Person;
     typedef std::vector<Person> People;
@@ -799,14 +799,14 @@ recommended to use std::vector as it is passed directly as supplied by
 the user. For all the other scenarios (other containers as well as
 non-POD types), framework will create temporary storage.
 
-Data types supported are:
+SQL types supported are:
 
   * All POD types
   * std::string
-  * Poco::Data::LOB (with BLOB and CLOB specializations)
+  * Poco::SQL::LOB (with BLOB and CLOB specializations)
   * Poco::DateTime
-  * Poco::Data::Date
-  * Poco::Data::Time
+  * Poco::SQL::Date
+  * Poco::SQL::Time
   * Poco::Dynamic::Var
 
 !!Important Considerations
@@ -871,9 +871,9 @@ and providing definitions of formatNames() and formatValues() virtual
 functions. See the RowFormatter sample for details on how to accomplish this.
 
 You'll notice the Row class in the above snippet. The
-<[RecordSet::Iterator]> is actually a Poco::Data::RowIterator. It means that
-dereferencing it returns a Poco::Data::Row object. Here's a brief example to get an
-idea of what the Poco::Data::Row class does:
+<[RecordSet::Iterator]> is actually a Poco::SQL::RowIterator. It means that
+dereferencing it returns a Poco::SQL::Row object. Here's a brief example to get an
+idea of what the Poco::SQL::Row class does:
 
     Row row;
     row.append("Field0", 0);
@@ -917,7 +917,7 @@ the data will internally be kept in standard deques. This can be changed
 through use of storage type manipulators.
 
 
-!!!Complex Data Types
+!!!Complex SQL Types
 
 All the previous examples were contented to work with only the most
 basic data types: integer, string, ... a situation, unlikely to occur in real-world scenarios.
@@ -953,11 +953,11 @@ Assume you have a class Person:
 Ideally, one would like to use a Person as simple as one used a string.
 All that is needed is a template specialization of the <[TypeHandler]>
 template. Note that template specializations must be declared in the
-<*same namespace*> as the original template, i.e. <[Poco::Data]>.
+<*same namespace*> as the original template, i.e. <[Poco::SQL]>.
 The template specialization must implement the following methods:
 
     namespace Poco {
-    namespace Data {
+    namespace SQL {
 
     template <>
     class TypeHandler<class Person>
@@ -1010,7 +1010,7 @@ The template specialization must implement the following methods:
         TypeHandler&amp; operator=(const TypeHandler&amp;);
     };
 
-    } } // namespace Poco::Data
+    } } // namespace Poco::SQL
 ----
 
 And that's all you have to do. Working with Person is now as simple as
@@ -1026,7 +1026,7 @@ Creating a connection to a database is often a time consuming
 operation. Therefore it makes sense to save a session object for
 later reuse once it is no longer needed.
 
-A Poco::Data::SessionPool manages a collection of sessions.
+A Poco::SQL::SessionPool manages a collection of sessions.
 When a session is requested, the SessionPool first
 looks in its set of already initialized sessions for an
 available object. If one is found, it is returned to the
@@ -1059,7 +1059,7 @@ SessionPoolContainer:
 !!!Conclusion
 
 This document provides an overview of the most important features
-offered by the POCO Data framework. The framework also supports LOB
+offered by the POCO SQL framework. The framework also supports LOB
 (specialized to BLOB and CLOB) type as well as Poco::DateTime binding.
 The usage of these data types is no different than any C++ type, so we
 did not go into details here.
@@ -1070,11 +1070,11 @@ equivalent of dynamic language data type. Obviously, due to its nature,
 there is a run time performance penalty associated with Poco::Dynamic::Var,
 but the internal details are beyond the scope of this document.
 
-POCO Data tries to provide a broad spectrum of functionality,
+POCO SQL tries to provide a broad spectrum of functionality,
 with configurable efficiency/convenience ratio, providing a solid
 foundation for quick development of database applications. We hope that,
 by reading this manual and experimenting with code along the way, you
 were able to get a solid understanding of the framework. We look forward
-to hearing from you about POCO Data as well as this manual. We
+to hearing from you about POCO SQL as well as this manual. We
 also hope that you find both to be helpful aid in design of elegant and
 efficient standard C++ database access software.

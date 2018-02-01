@@ -13,9 +13,15 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
-				XMLStreamParser.h,
+				Alignment.h,
+				QName.h,
 				CppUnitException.h,
-				RepeatedTest.h,
+				Constants.h,
+				inffast.h,
+				PDF/include/*.h,
+				CppParser/include/*.h,
+				Data/include/*.h
+				Data/*/include/*.h
 			</exclude>
 		</files>
 		<pages>
@@ -31,25 +37,46 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>g++</exec>
-			<options>
-				${Includes},
-				-I/usr/local/mysql/include,
-				-I/usr/include/mysql,
-				-D_DEBUG,
-				-E,
-				-C,
-				-DPOCO_NO_GCC_API_ATTRIBUTE
-			</options>
-			<path></path>
-			<usePipe>true</usePipe>
+			<windows>
+				<exec>cl.exe</exec>
+				<options>
+					${Includes},
+					/I${PocoBase}/openssl/include
+					/I${VCH}/include,
+					/I${WDK}/shared
+					/I${WDK}/um
+					/I${WDK}/ucrt
+					/nologo,
+					/D_DEBUG,
+					/E,
+					/C,
+					/DPOCO_NO_GCC_API_ATTRIBUTE
+				</options>
+				<path>${CLP}</path>
+				<usePipe>true</usePipe>
+			</windows>
+			<unix>
+				<exec>${CXX} ${CXXFLAGS}</exec>
+				<options>
+					${Includes},
+					-I/usr/local/mysql/include,
+					-I/usr/include/mysql,
+					-I/usr/include/postgresql,
+					-D_DEBUG,
+					-E,
+					-C,
+					-DPOCO_NO_GCC_API_ATTRIBUTE
+					-DPOCO_NO_WINDOWS_H
+				</options>
+				<path></path>
+				<usePipe>true</usePipe>
+			</unix>
 		</compiler>
 		<language>EN</language>
 		<charset>utf-8</charset>
-		<software>Applied Informatics C++ Libraries and Tools</software>
+		<software>POCO C++ Libraries</software>
 		<company>Applied Informatics Software Engineering GmbH and Contributors</company>
-		<companyURI>http://www.appinf.com/</companyURI>
-		<headerImage>images/headerlogo.png</headerImage>
+		<companyURI>http://pocoproject.org/</companyURI>
 	</PocoDoc>
 	<Translations>
 		<EN>
