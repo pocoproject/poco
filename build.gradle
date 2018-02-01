@@ -844,6 +844,8 @@ def candle(VSYEAR, VERSION, target, os) {
 		
 		def File index = new File("$rootDir/releases/poco-$VERSION-all-doc/index.html")
 		inputs.files(index)
+
+		inputs.files(pocos.inputs.files)
 		inputs.files(new File(workingDir, "Poco.wxs"))
 		inputs.files(project.getTasksByName('poco', true).outputs.files)
 		
@@ -893,6 +895,7 @@ task wix() {
 task nuget(type: Exec) {
 	String nugetVersion = version.replace('p', '-')
 	def Set<Task> pocos = project.getTasksByName('poco', true)
+	
 	setDependsOn(pocos)
 	workingDir "packaging/Windows/NuGet"
 
@@ -904,8 +907,8 @@ task nuget(type: Exec) {
 	args "-NonInteractive"
 	args "Pocoproject.Poco.vs140.nuspec"
 
+	inputs.files(pocos.inputs.files)
 	inputs.files(new File(workingDir, "Pocoproject.Poco.vs150.nuspec"))
-	inputs.files(project.getTasksByName('poco', true).outputs.files)
 	outputs.files(new File(workingDir,"Pocoproject.Poco.vs150.${version}.nupkg"))
 
 	onlyIf(new Spec<Exec>() {
