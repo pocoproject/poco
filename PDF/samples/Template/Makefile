@@ -1,14 +1,14 @@
 #
 # Makefile
 #
-# Makefile for Poco PDF Image sample
+# Makefile for Poco PDF Template sample
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Image
+objects = Text
 
-target         = Image
+target         = Template
 target_version = 1
 target_libs    = PocoPDF PocoUtil PocoXML PocoFoundation
 

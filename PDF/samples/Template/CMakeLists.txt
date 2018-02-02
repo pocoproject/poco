@@ -1,4 +1,4 @@
-set(SAMPLE_NAME "Text")
+set(SAMPLE_NAME "Template")
 
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
