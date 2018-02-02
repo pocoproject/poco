@@ -29,6 +29,6 @@ objects = Destination Document Encoder Font Image Outline \
 
 target         = PocoPDF
 target_version = $(LIBVERSION)
-target_libs    = PocoFoundation
+target_libs    = PocoUtil PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib
