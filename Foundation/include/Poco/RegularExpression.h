@@ -58,17 +58,29 @@ public:
 		RE_UNGREEDY        = 0x00000200, /// make quantifiers ungreedy [ctor]
 		RE_NOTEMPTY        = 0x00000400, /// empty string never matches [match]
 		RE_UTF8            = 0x00000800, /// assume pattern and subject is UTF-8 encoded [ctor]
+		RE_UTF16           = 0x00000800, /// assume pattern and subject is UTF-16 encoded [ctor]
+		RE_UTF32           = 0x00000800, /// assume pattern and subject is UTF-32 encoded [ctor]
 		RE_NO_AUTO_CAPTURE = 0x00001000, /// disable numbered capturing parentheses [ctor, match]
 		RE_NO_UTF8_CHECK   = 0x00002000, /// do not check validity of UTF-8 code sequences [match]
+		RE_NO_UTF16_CHECK  = 0x00002000, /// do not check validity of UTF-16 code sequences [match]
+		RE_NO_UTF32_CHECK  = 0x00002000, /// do not check validity of UTF-32 code sequences [match]
+		RE_AUTO_CALLOUT    = 0x00004000, /// automatically  inserts callouts, all with number 255,
+		                                 /// before each item in the pattern[ctor]
+		RE_PARTIAL_SOFT    = 0x00008000, /// match if the end of the subject string is reached  successfully,
+		                                 /// but there's no complete match [match]
+		RE_PARTIAL         = 0x00008000, /// synonym for PCRE_PARTIAL_SOFT [match]
+		RE_NO_AUTO_POSSESS = 0x00020000, /// disable the  auto-possessify feature [ctor]
+		RE_NEVER_UTF       = 0x00010000, /// locks out interpretation of the pattern as UTF-8, UTF-16, or UTF-32 [ctor]
 		RE_FIRSTLINE       = 0x00040000, /// an  unanchored  pattern  is  required  to  match
-		                                 /// before  or  at  the  first  newline  in  the subject string, 
-		                                 /// though the matched text may continue over the newline [ctor]
+		                                 /// before  or  at  the  first  newline  in  the subject string,
 		RE_DUPNAMES        = 0x00080000, /// names used to identify capturing  subpatterns  need not be unique [ctor]
 		RE_NEWLINE_CR      = 0x00100000, /// assume newline is CR ('\r'), the default [ctor] 
 		RE_NEWLINE_LF      = 0x00200000, /// assume newline is LF ('\n') [ctor]
 		RE_NEWLINE_CRLF    = 0x00300000, /// assume newline is CRLF ("\r\n") [ctor]
 		RE_NEWLINE_ANY     = 0x00400000, /// assume newline is any valid Unicode newline character [ctor]
 		RE_NEWLINE_ANYCRLF = 0x00500000, /// assume newline is any of CR, LF, CRLF [ctor]
+		RE_PARTIAL_HARD    = 0x08000000, /// partial match is  considered more important that complete match;
+		                                 /// overrides PCRE_PARTIAL_SOFT  [match]
 		RE_GLOBAL          = 0x10000000, /// replace all occurences (/g) [subst]
 		RE_NO_VARS         = 0x20000000  /// treat dollar in replacement string as ordinary character [subst]
 	};
