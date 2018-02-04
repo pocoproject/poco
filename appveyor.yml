@@ -68,6 +68,12 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
 
   matrix:
+    - builder: cmake
+      vsver: 140
+
+    - builder: cmake
+      vsver: 150
+
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -95,13 +101,6 @@ environment:
 #    - builder: msbuild
 #      vsver: 150
 #      linkmode: static_mt
-
-    - builder: cmake
-      vsver: 140
-
-    - builder: cmake
-      vsver: 150
-
 
 matrix:
   fast_finish: true
@@ -347,6 +346,11 @@ before_build:
 
 after_build:
   - ps: |
+      if ($lastexitcode -ne 0)  { 
+           Write-Host -ForegroundColor Yellow 'lastexitcode=' $lastexitcode;
+           exit $lastexitcode 
+      }
+  
       $line='-------------------------------------------------------------------------------------';
       $find='C:\Cygwin\bin\find.exe';
       $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec grep -n -H ";
