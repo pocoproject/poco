@@ -23,7 +23,6 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/Buffer.h"
-#include "Poco/HexBinaryDecoder.h"
 #include <sstream>
 #include <algorithm>
 #include <cctype>
@@ -180,7 +179,7 @@ void Context::loadCertificate()
 	if(_options & OPT_USE_CERT_HASH)
 	{
 		// Sanity check for the hash value.
-		if(_certInfoOrPath.size() % 2) throw CertificateException(Poco::format("Invalid certificate hash %s", _certInfoOrPath));
+		if(_certInfoOrPath.size() < 40 || _certInfoOrPath.size() % 2) throw CertificateException(Poco::format("Invalid certificate hash %s", _certInfoOrPath));
 
 		// Convert hex to binary.
 		BYTE buffer[256] = {};
