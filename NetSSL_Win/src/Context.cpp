@@ -23,7 +23,6 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/Buffer.h"
-#include "Poco/HexBinaryDecoder.h"
 #include <sstream>
 #include <algorithm>
 #include <cctype>
@@ -171,7 +170,11 @@ void Context::loadCertificate()
 	if (!_hCertStore)
 	{
 		if (_options & OPT_USE_MACHINE_STORE)
-			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE | CERT_STORE_OPEN_EXISTING_FLAG, wcertStore.c_str());
+			_hCertStore = CertOpenStore(
+				CERT_STORE_PROV_SYSTEM, 0, 0,
+				CERT_SYSTEM_STORE_LOCAL_MACHINE | CERT_STORE_OPEN_EXISTING_FLAG,
+				wcertStoreName.c_str()
+			);
 		else
 			_hCertStore = CertOpenSystemStoreW(0, wcertStoreName.c_str());
 	}
@@ -181,7 +184,7 @@ void Context::loadCertificate()
 	if(_options & OPT_USE_CERT_HASH)
 	{
 		// Sanity check for the hash value.
-		if(_certInfoOrPath.size() % 2) throw CertificateException(Poco::format("Invalid certificate hash %s", _certInfoOrPath));
+		if(_certInfoOrPath.size() < 40 || _certInfoOrPath.size() % 2) throw CertificateException(Poco::format("Invalid certificate hash %s", _certInfoOrPath));
 
 		// Convert hex to binary.
 		BYTE buffer[256] = {};
@@ -207,7 +210,8 @@ void Context::loadCertificate()
 	else
 	{
 		CERT_RDN_ATTR cert_rdn_attr;
-		cert_rdn_attr.pszObjId = szOID_COMMON_NAME;
+		char cmnName[] = szOID_COMMON_NAME;
+		cert_rdn_attr.pszObjId = cmnName;
 		cert_rdn_attr.dwValueType = CERT_RDN_ANY_TYPE;
 		cert_rdn_attr.Value.cbData = (DWORD) _certInfoOrPath.size();
 		cert_rdn_attr.Value.pbData = (BYTE *) _certInfoOrPath.c_str();
