@@ -94,7 +94,7 @@ void Object::syncKeys(const KeyList& keys)
 {
 	if(_preserveInsOrder)
 	{
-		// need to update pointers in _keys to point to copied _values
+		// update iterators in _keys to point to copied _values
 		for(KeyList::const_iterator it = keys.begin(); it != keys.end(); ++it)
 		{
 			ValueMap::const_iterator itv = _values.find((*it)->first);
