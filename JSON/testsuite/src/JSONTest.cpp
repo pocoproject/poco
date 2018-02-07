@@ -481,6 +481,13 @@ void JSONTest::testComplexObject()
 	Object::Ptr object = result.extract<Object::Ptr>();
 	assert(object->size() > 0);
 
+	Object::NameList names = object->getNames();
+	assert (names.size() == 4);
+	assert (names[0] == "id");
+	assert (names[1] == "jsonrpc");
+	assert (names[2] == "result");
+	assert (names[3] == "total");
+
 	DynamicStruct ds = *object;
 	assert (ds.size() > 0);
 	assert (ds["id"] == 1);
@@ -1525,6 +1532,12 @@ void JSONTest::testStringifyPreserveOrder()
 	std::stringstream ss;
 	presObj.stringify(ss);
 	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+	Object::NameList nl = presObj.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
 	ss.str("");
 	Stringifier::stringify(presObj, ss);
 	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");

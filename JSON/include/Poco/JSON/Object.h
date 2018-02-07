@@ -64,6 +64,7 @@ public:
 	typedef ValueMap::value_type                ValueType;
 	typedef ValueMap::iterator                  Iterator;
 	typedef ValueMap::const_iterator            ConstIterator;
+	typedef std::vector<std::string>            NameList;
 
 	explicit Object(bool preserveInsertionOrder = false, bool escapeUnicode = false);
 		/// Creates an empty Object.
@@ -152,7 +153,10 @@ public:
 		return value.convert<T>();
 	}
 
-	void getNames(std::vector<std::string>& names) const;
+	void getNames(NameList& names) const;
+		/// Fills the supplied vector with all property names.
+
+	NameList getNames() const;
 		/// Returns all property names.
 
 	bool has(const std::string& key) const;
@@ -222,7 +226,11 @@ public:
 		/// Insertion order preservation property is left intact.
 
 private:
+	typedef std::deque<ValueMap::const_iterator>  KeyList;
+	typedef Poco::DynamicStruct::Ptr              StructPtr;
+
 	void resetDynStruct() const;
+	void syncKeys(const KeyList& keys);
 
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
@@ -254,16 +262,13 @@ private:
 		out << '}';
 	}
 
-	typedef std::deque<const std::string*> KeyPtrList;
-	typedef Poco::DynamicStruct::Ptr       StructPtr;
-
 	const std::string& getKey(ValueMap::const_iterator& it) const;
 	const Dynamic::Var& getValue(ValueMap::const_iterator& it) const;
-	const std::string& getKey(KeyPtrList::const_iterator& it) const;
-	const Dynamic::Var& getValue(KeyPtrList::const_iterator& it) const;
+	const std::string& getKey(KeyList::const_iterator& it) const;
+	const Dynamic::Var& getValue(KeyList::const_iterator& it) const;
 
 	ValueMap          _values;
-	KeyPtrList        _keys;
+	KeyList           _keys;
 	bool              _preserveInsOrder;
 	// Note:
 	//  The reason we have this flag here (rather than as argument to stringify())
@@ -368,11 +373,11 @@ inline void Object::remove(const std::string& key)
 	_values.erase(key);
 	if (_preserveInsOrder)
 	{
-		KeyPtrList::iterator it = _keys.begin();
-		KeyPtrList::iterator end = _keys.end();
+		KeyList::iterator it = _keys.begin();
+		KeyList::iterator end = _keys.end();
 		for (; it != end; ++it)
 		{
-			if (key == **it)
+			if (key == (*it)->first)
 			{
 				_keys.erase(it);
 				break;
@@ -395,9 +400,9 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 }
 
 
-inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) const
+inline const Dynamic::Var& Object::getValue(KeyList::const_iterator& it) const
 {
-	ValueMap::const_iterator itv = _values.find(**it);
+	ValueMap::const_iterator itv = _values.find((*it)->first);
 	if (itv != _values.end())
 		return itv->second;
 	else
