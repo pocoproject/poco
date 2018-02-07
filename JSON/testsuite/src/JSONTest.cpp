@@ -1924,7 +1924,7 @@ void JSONTest::testEscapeUnicode()
 	std::stringstream ss;
 	object->stringify(ss);
 
-	assert(ss.str().compare("{\"name\":\"\\u4E2D\"}") == 0);
+	assert(ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
 
 	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
 		'"', 'g', 195, 188, 'n', 't', 'e', 'r', '"', '}', 0};
@@ -1933,7 +1933,7 @@ void JSONTest::testEscapeUnicode()
 	result = parser.parse(utf8Text);
 	object = result.extract<Object::Ptr>();
 	ss.str(""); object->stringify(ss);
-	assert (ss.str() == "{\"name\":\"g\\u00FCnter\"}");
+	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
 }
 
 
