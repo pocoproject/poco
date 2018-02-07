@@ -62,6 +62,15 @@ public:
 		/// Returns the element at the given index.
 		/// An empty element will be returned if the element is not found.
 
+	Int64 getInteger(int pos) const
+		/// Returns an integer. Useful when MongoDB returns Int32, Int64
+		/// or double for a number (count for example). This method will always
+		/// return an Int64. When the element is not found, a
+		/// Poco::NotFoundException will be thrown.
+	{
+		return Document::getInteger(Poco::NumberFormatter::format(pos));
+	}
+
 	template<typename T>
 	bool isType(int pos) const
 		/// Returns true if the type of the element equals the TypeId of ElementTrait,
