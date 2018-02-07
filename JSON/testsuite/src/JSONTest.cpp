@@ -2061,7 +2061,67 @@ void JSONTest::testCopy()
 
 void JSONTest::testMove()
 {
+	Object obj1(true);
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
 
+	Object::NameList nl = obj1.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj2;
+	obj2 = std::move(obj1);
+	assert (obj1.getNames().size() == 0);
+
+	nl = obj2.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj3;
+	obj3.set("foo", 0);
+	obj3.set("bar", 0);
+	obj3.set("baz", 0);
+
+	nl = obj3.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	Object obj4;
+	obj4 = std::move(obj3);
+	assert (obj3.getNames().size() == 0);
+
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	Object obj5(true);
+	obj5.set("foo", 0);
+	obj5.set("bar", 0);
+	obj5.set("baz", 0);
+
+	nl = obj5.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	obj4 = std::move(obj5);
+	assert (obj5.getNames().size() == 0);
+
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
 }
 
 
