@@ -65,11 +65,14 @@ public:
 	typedef ValueMap::iterator                  Iterator;
 	typedef ValueMap::const_iterator            ConstIterator;
 
-	explicit Object(bool preserveInsertionOrder = false);
+	explicit Object(bool preserveInsertionOrder = false, bool escapeUnicode = false);
 		/// Creates an empty Object.
 		///
 		/// If preserveInsertionOrder, object will preserve the items insertion
 		/// order. Otherwise, items will be sorted by keys.
+		///
+		/// If escapeUnicode is true, when the object is stringified, all unicode
+		/// characters will be escaped in the resulting string.
 
 	Object(const Object& copy);
 		/// Creates an Object by copying another one.
@@ -89,25 +92,23 @@ public:
 	Object &operator =(Object &&other);
 		// Move asignment operator
 
-	Iterator begin()
-	{
-		return _values.begin();
-	}
+	void setEscapeUnicode(bool escape = true);
+		/// Sets the flag for escaping unicode.
 
-	ConstIterator begin() const
-	{
-		return _values.begin();
-	}
+	bool getEscapeUnicode() const;
+		/// Returns the flag for escaping unicode.
 
-	Iterator end()
-	{
-		return _values.end();
-	}
+	Iterator begin();
+		/// Returns begin iterator for values.
 
-	ConstIterator end() const
-	{
-		return _values.end();
-	}
+	ConstIterator begin() const;
+		/// Returns const begin iterator for values.
+
+	Iterator end();
+		/// Returns end iterator for values.
+
+	ConstIterator end() const;
+		/// Returns const end iterator for values.
 
 	Dynamic::Var get(const std::string& key) const;
 		/// Retrieves a property. An empty value is
@@ -229,17 +230,17 @@ private:
 		out << '{';
 
 		if (indent > 0) out << std::endl;
-		
+
 		typename C::const_iterator it = container.begin();
 		typename C::const_iterator end = container.end();
 		for (; it != end;)
 		{
 			for (unsigned int i = 0; i < indent; i++) out << ' ';
 
-			Stringifier::stringify(getKey(it), out);
+			Stringifier::stringify(getKey(it), out, indent, step, _escapeUnicode);
 			out << ((indent > 0) ? " : " : ":");
 
-			Stringifier::stringify(getValue(it), out, indent + step, step);
+			Stringifier::stringify(getValue(it), out, indent + step, step, _escapeUnicode);
 
 			if (++it != container.end()) out << ',';
 
@@ -264,6 +265,11 @@ private:
 	ValueMap          _values;
 	KeyPtrList        _keys;
 	bool              _preserveInsOrder;
+	// Note:
+	//  The reason we have this flag here (rather than as argument to stringify())
+	//  is because Object can be returned stringified from a Dynamic::Var:toString(),
+	//  so it must know whether to escape unicode or not.
+	bool              _escapeUnicode;
 	mutable StructPtr _pStruct;
 	mutable bool      _modified;
 };
@@ -272,6 +278,43 @@ private:
 //
 // inlines
 //
+
+inline void Object::setEscapeUnicode(bool escape)
+{
+	_escapeUnicode = true;
+}
+
+
+inline bool Object::getEscapeUnicode() const
+{
+	return _escapeUnicode;
+}
+
+
+inline Object::Iterator Object::begin()
+{
+	return _values.begin();
+}
+
+
+inline Object::ConstIterator Object::begin() const
+{
+	return _values.begin();
+}
+
+
+inline Object::Iterator Object::end()
+{
+	return _values.end();
+}
+
+
+inline Object::ConstIterator Object::end() const
+{
+	return _values.end();
+}
+
+
 inline bool Object::has(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);

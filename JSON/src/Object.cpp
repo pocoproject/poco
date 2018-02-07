@@ -24,8 +24,9 @@ namespace Poco {
 namespace JSON {
 
 
-Object::Object(bool preserveInsOrder):
+Object::Object(bool preserveInsOrder, bool escapeUnicode):
 	_preserveInsOrder(preserveInsOrder),
+	_escapeUnicode(escapeUnicode),
 	_modified(false)
 {
 }
@@ -33,6 +34,7 @@ Object::Object(bool preserveInsOrder):
 
 Object::Object(const Object& copy) : _values(copy._values),
 	_preserveInsOrder(copy._preserveInsOrder),
+	_escapeUnicode(copy._escapeUnicode),
 	_pStruct(!copy._modified ? copy._pStruct : 0),
 	_modified(copy._modified)
 {
@@ -53,9 +55,12 @@ Object::Object(Object&& other) :
 	_values(std::move(other._values)),
 	_keys(std::move(other._keys)),
 	_preserveInsOrder(other._preserveInsOrder),
+	_escapeUnicode(other._escapeUnicode),
 	_pStruct(!other._modified ? other._pStruct : 0),
 	_modified(other._modified)
 {
+	other._values.clear();
+	other._keys.clear();
 }
 
 
@@ -71,6 +76,7 @@ Object &Object::operator= (const Object &other)
 		_values = other._values;
 		_keys = other._keys;
 		_preserveInsOrder = other._preserveInsOrder;
+		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
 	}
@@ -84,7 +90,10 @@ Object &Object::operator= (Object &&other)
 	{
 		_values = std::move(other._values);
 		_keys = std::move(other._keys);
+		other._values.clear();
+		other._keys.clear();
 		_preserveInsOrder = other._preserveInsOrder;
+		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
 	}

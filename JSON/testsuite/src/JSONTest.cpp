@@ -1910,7 +1910,8 @@ void JSONTest::testEscape0()
 	assert(ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
 }
 
-void JSONTest::testEscapeUnicode()
+
+void JSONTest::testNonEscapeUnicode()
 {
 	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
 	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
@@ -1923,17 +1924,44 @@ void JSONTest::testEscapeUnicode()
 
 	std::stringstream ss;
 	object->stringify(ss);
-
 	assert(ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
 
 	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
-		'"', 'g', 195, 188, 'n', 't', 'e', 'r', '"', '}', 0};
+		'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
 	std::string utf8Text((const char*) utf8Chars);
 	parser.reset();
 	result = parser.parse(utf8Text);
 	object = result.extract<Object::Ptr>();
 	ss.str(""); object->stringify(ss);
 	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
+}
+
+
+void JSONTest::testEscapeUnicode()
+{
+	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
+	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
+	Var result = parser.parse(chinese);
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(true);
+
+	std::stringstream ss;
+	object->stringify(ss, 0, -1);
+	assert(ss.str().compare("{\"name\":\"\\u4E2D\"}") == 0);
+
+	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
+			'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
+	std::string utf8Text((const char*) utf8Chars);
+	parser.reset();
+	result = parser.parse(utf8Text);
+	object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(true);
+	ss.str(""); object->stringify(ss, 0, -1);
+	assert (ss.str() == "{\"name\":\"g\\u00FCnter\"}");
 }
 
 
@@ -2012,6 +2040,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testSmallBuffer);
 	CppUnit_addTest(pSuite, JSONTest, testEscape0);
+	CppUnit_addTest(pSuite, JSONTest, testNonEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
 
 	return pSuite;
