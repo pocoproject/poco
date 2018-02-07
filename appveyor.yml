@@ -346,11 +346,6 @@ before_build:
 
 after_build:
   - ps: |
-      if ($global:lastexitcode -ne 0)  { 
-           Write-Host -ForegroundColor Yellow 'lastexitcode=' $global:lastexitcode;
-           exit $global:lastexitcode 
-      }
-  
       $line='-------------------------------------------------------------------------------------';
       $find='C:\Cygwin\bin\find.exe';
       $arg1="$env:POCO_BASE -type f -name '*.cpp' -exec grep -n -H ";
