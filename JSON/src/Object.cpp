@@ -64,8 +64,8 @@ Object &Object::operator= (const Object &other)
 	if (&other != this)
 	{
 		_values = other._values;
-		syncKeys(other._keys);
 		_preserveInsOrder = other._preserveInsOrder;
+		syncKeys(other._keys);
 		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;

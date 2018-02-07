@@ -78,6 +78,10 @@ public:
 	void testEscape0();
 	void testNonEscapeUnicode();
 	void testEscapeUnicode();
+
+	void testCopy();
+	void testMove();
+
 	void setUp();
 	void tearDown();
 

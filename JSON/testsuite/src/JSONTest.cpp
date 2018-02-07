@@ -2007,6 +2007,64 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 }
 
 
+void JSONTest::testCopy()
+{
+	Object obj1(true);
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj2;
+	obj2 = obj1;
+
+	nl = obj2.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj3;
+	obj3.set("foo", 0);
+	obj3.set("bar", 0);
+	obj3.set("baz", 0);
+
+	nl = obj3.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	Object obj4;
+	obj4 = obj3;
+
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	obj4 = obj1;
+
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+}
+
+
+void JSONTest::testMove()
+{
+
+}
+
+
 CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
@@ -2055,6 +2113,8 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testEscape0);
 	CppUnit_addTest(pSuite, JSONTest, testNonEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
+	CppUnit_addTest(pSuite, JSONTest, testCopy);
+	CppUnit_addTest(pSuite, JSONTest, testMove);
 
 	return pSuite;
 }
