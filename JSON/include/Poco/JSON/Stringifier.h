@@ -31,26 +31,29 @@ class JSON_API Stringifier
 	/// Helper class for creating a string from a JSON object or array.
 {
 public:
-	static void condense(const Dynamic::Var& any, std::ostream& out);
+	static void condense(const Dynamic::Var& any, std::ostream& out, bool escapeUnicode = false);
 		/// Writes a condensed string representation of the value to the output stream while preserving the insertion order.
 		///
 		/// This is just a "shortcut" to stringify(any, out) with name indicating the function effect.
 
-	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0, int step = -1);
+	static void stringify(const Dynamic::Var& any, std::ostream& out, unsigned int indent = 0, int step = -1, bool escapeUnicode = false);
 		/// Writes a string representation of the value to the output stream.
 		///
 		/// When indent is 0, the string will be created as small as possible.
-		/// When preserveInsertionOrder is true, the original string object members order will be preserved;
-		/// otherwise, object members are sorted by their names.
+		/// Indentation is increased/decreased using number of spaces defined in step.
+		/// The default value -1 for step indicates that step will be equal to the
+		/// indent size.
+		/// If escapeUnicode is true, all unicode characers will be escaped in the
+		/// resulting string.
 
-	static void formatString(const std::string& value, std::ostream& out);
+	static void formatString(const std::string& value, std::ostream& out, bool escapeUnicode = false);
 		/// Formats the JSON string and streams it into ostream.
 };
 
 
-inline void Stringifier::condense(const Dynamic::Var& any, std::ostream& out)
+inline void Stringifier::condense(const Dynamic::Var& any, std::ostream& out, bool escapeUnicode)
 {
-	stringify(any, out, 0, -1);
+	stringify(any, out, 0, -1, escapeUnicode);
 }
 
 

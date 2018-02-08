@@ -24,7 +24,8 @@ namespace Poco {
 namespace JSON {
 
 
-Array::Array(): _modified(false)
+Array::Array(bool escapeUnicode): _modified(false),
+	_escapeUnicode(escapeUnicode)
 {
 }
 
@@ -162,7 +163,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 	{
 		for (int i = 0; i < indent; i++) out << ' ';
 
-		Stringifier::stringify(*it, out, indent + step, step);
+		Stringifier::stringify(*it, out, indent + step, step, _escapeUnicode);
 
 		if (++it != _values.end())
 		{
@@ -175,8 +176,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 
 	if (indent >= step) indent -= step;
 
-	for (int i = 0; i < indent; i++)
-		out << ' ';
+	for (int i = 0; i < indent; i++) out << ' ';
 
 	out << "]";
 }

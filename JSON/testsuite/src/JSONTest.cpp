@@ -481,6 +481,13 @@ void JSONTest::testComplexObject()
 	Object::Ptr object = result.extract<Object::Ptr>();
 	assert(object->size() > 0);
 
+	Object::NameList names = object->getNames();
+	assert (names.size() == 4);
+	assert (names[0] == "id");
+	assert (names[1] == "jsonrpc");
+	assert (names[2] == "result");
+	assert (names[3] == "total");
+
 	DynamicStruct ds = *object;
 	assert (ds.size() > 0);
 	assert (ds["id"] == 1);
@@ -1374,7 +1381,7 @@ void JSONTest::testStringify()
 
 	std::string str1 = "\r";
 	std::string str2 = "\n";
-	Poco::JSON::Object obj1, obj2;
+	Object obj1, obj2;
 	obj1.set("payload", str1);
 	obj2.set("payload", str2);
 	std::ostringstream oss1, oss2;
@@ -1526,13 +1533,19 @@ void JSONTest::testStringify()
 
 void JSONTest::testStringifyPreserveOrder()
 {
-	Object presObj(true);
+	Object presObj(Object::JSON_PRESERVE_KEY_ORDER);
 	presObj.set("foo", 0);
 	presObj.set("bar", 0);
 	presObj.set("baz", 0);
 	std::stringstream ss;
 	presObj.stringify(ss);
 	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+	Object::NameList nl = presObj.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
 	ss.str("");
 	Stringifier::stringify(presObj, ss);
 	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
@@ -1918,7 +1931,8 @@ void JSONTest::testEscape0()
 	assert(ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
 }
 
-void JSONTest::testEscapeUnicode()
+
+void JSONTest::testNonEscapeUnicode()
 {
 	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
 	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
@@ -1931,16 +1945,43 @@ void JSONTest::testEscapeUnicode()
 
 	std::stringstream ss;
 	object->stringify(ss);
-
-	assert(ss.str().compare("{\"name\":\"\\u4E2D\"}") == 0);
+	assert(ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
 
 	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
-		'"', 'g', 195, 188, 'n', 't', 'e', 'r', '"', '}', 0};
+		'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
 	std::string utf8Text((const char*) utf8Chars);
 	parser.reset();
 	result = parser.parse(utf8Text);
 	object = result.extract<Object::Ptr>();
 	ss.str(""); object->stringify(ss);
+	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
+}
+
+
+void JSONTest::testEscapeUnicode()
+{
+	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
+	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
+	Var result = parser.parse(chinese);
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(true);
+
+	std::stringstream ss;
+	object->stringify(ss, 0, -1);
+	assert(ss.str().compare("{\"name\":\"\\u4E2D\"}") == 0);
+
+	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
+			'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
+	std::string utf8Text((const char*) utf8Chars);
+	parser.reset();
+	result = parser.parse(utf8Text);
+	object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(true);
+	ss.str(""); object->stringify(ss, 0, -1);
 	assert (ss.str() == "{\"name\":\"g\\u00FCnter\"}");
 }
 
@@ -1971,6 +2012,125 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 		throw Poco::NotFoundException("cannot locate directory containing valid JSON test files");
 	}
 	return validDir;
+}
+
+
+void JSONTest::testCopy()
+{
+	Object obj1(Object::JSON_PRESERVE_KEY_ORDER);
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj2;
+	obj2 = obj1;
+	nl = obj2.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj3;
+	obj3.set("foo", 0);
+	obj3.set("bar", 0);
+	obj3.set("baz", 0);
+	nl = obj3.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	Object obj4;
+	obj4 = obj3;
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	obj4 = obj1;
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj5(obj1);
+	nl = obj5.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+}
+
+
+void JSONTest::testMove()
+{
+	Object obj1(Object::JSON_PRESERVE_KEY_ORDER);
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj2;
+	obj2 = std::move(obj1);
+	assert (obj1.getNames().size() == 0);
+
+	nl = obj2.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj3;
+	obj3.set("foo", 0);
+	obj3.set("bar", 0);
+	obj3.set("baz", 0);
+	nl = obj3.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	Object obj4;
+	obj4 = std::move(obj3);
+	assert (obj3.getNames().size() == 0);
+
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "bar");
+	assert (nl[1] == "baz");
+	assert (nl[2] == "foo");
+
+	Object obj5(Object::JSON_PRESERVE_KEY_ORDER);
+	obj5.set("foo", 0);
+	obj5.set("bar", 0);
+	obj5.set("baz", 0);
+	nl = obj5.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	obj4 = std::move(obj5);
+	assert (obj5.getNames().size() == 0);
+
+	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
 }
 
 
@@ -2020,7 +2180,10 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testSmallBuffer);
 	CppUnit_addTest(pSuite, JSONTest, testEscape0);
+	CppUnit_addTest(pSuite, JSONTest, testNonEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
+	CppUnit_addTest(pSuite, JSONTest, testCopy);
+	CppUnit_addTest(pSuite, JSONTest, testMove);
 
 	return pSuite;
 }
