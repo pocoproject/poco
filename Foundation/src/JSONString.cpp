@@ -17,19 +17,51 @@
 
 namespace Poco {
 
-void toJSON(const std::string& value, std::ostream& out, bool wrap)
+void toJSON(const std::string& value, std::ostream& out, bool wrap, bool escapeAllUnicode)
 {
 	if (wrap) out << '"';
-	out << UTF8::escape(value.begin(), value.end());
+	if (escapeAllUnicode)
+	{
+		out << UTF8::escape(value.begin(), value.end());
+	}
+	else
+	{
+		for (std::string::const_iterator it = value.begin(),
+			end = value.end(); it != end; ++it)
+		{
+			// Forward slash isn't strictly required by JSON spec, but some parsers expect it
+			if ((*it >= 0 && *it <= 31) ||  (*it == '"') || (*it == '\\') || (*it == '/'))
+			{
+				out << UTF8::escape(it, it+1);
+			}
+			else out << *it;
+		}
+	}
 	if (wrap) out << '"';
 }
 
 
-std::string toJSON(const std::string& value, bool wrap)
+std::string toJSON(const std::string& value, bool wrap, bool escapeAllUnicode)
 {
 	std::string ret;
 	if (wrap) ret.append(1, '"');
-	ret.append(UTF8::escape(value.begin(), value.end()));
+	if (escapeAllUnicode)
+	{
+		ret.append(UTF8::escape(value.begin(), value.end()));
+	}
+	else
+	{
+		for (std::string::const_iterator it = value.begin(),
+			end = value.end(); it != end; ++it)
+		{
+			// Forward slash isn't strictly required by JSON spec, but some parsers expect it
+			if ((*it >= 0 && *it <= 31) ||  (*it == '"') || (*it == '\\') || (*it == '/'))
+			{
+				ret.append(UTF8::escape(it, it+1));
+			}
+			else ret.append(1, *it);
+		}
+	}
 	if (wrap) ret.append(1, '"');
 	return ret;
 }

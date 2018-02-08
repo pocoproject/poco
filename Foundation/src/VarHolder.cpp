@@ -14,7 +14,7 @@
 
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/UTF8String.h"
+#include "Poco/JSONString.h"
 
 
 namespace Poco {
@@ -36,7 +36,7 @@ namespace Impl {
 
 void escape(std::string& target, const std::string& source)
 {
-	target = UTF8::escape(source.begin(), source.end());
+	target = toJSON(source);
 }
 
 
@@ -53,11 +53,9 @@ bool isJSONString(const Var& any)
 
 void appendJSONString(std::string& val, const Var& any)
 {
-	std::string json(val);
-	val.append(1, '"');
+	std::string json;
 	escape(json, any.convert<std::string>());
 	val.append(json);
-	val.append(1, '"');
 }
 
 
