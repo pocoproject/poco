@@ -37,8 +37,8 @@ namespace JSON {
 
 
 class JSON_API Object
-	/// Represents a JSON object. Object provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to
+	/// Represents a JSON object. Object provides a representation based on
+	/// shared pointers and optimized for performance. It is possible to
 	/// convert Object to DynamicStruct. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
 	///
@@ -56,7 +56,7 @@ class JSON_API Object
 	///    // copy/convert to Poco::DynamicStruct
 	///    Poco::DynamicStruct ds = *object;
 	///    val = ds["test"]["property"]; // val holds "value"
-	/// ----
+	///
 {
 public:
 	typedef SharedPtr<Object>                   Ptr;
@@ -66,14 +66,29 @@ public:
 	typedef ValueMap::const_iterator            ConstIterator;
 	typedef std::vector<std::string>            NameList;
 
-	explicit Object(bool preserveInsertionOrder = false, bool escapeUnicode = false);
+	enum Options
+	{
+		JSON_PRESERVE_KEY_ORDER = 1,
+			/// If specified, the object will preserve the items
+			/// insertion order. Otherwise, items will be sorted
+			/// by keys.
+
+		JSON_ESCAPE_UNICODE = 2
+			/// If specified, when the object is stringified, all
+			/// unicode characters will be escaped in the resulting
+			/// string.
+	};
+
+	explicit Object(int options = 0);
 		/// Creates an empty Object.
 		///
-		/// If preserveInsertionOrder, object will preserve the items insertion
-		/// order. Otherwise, items will be sorted by keys.
+		/// If JSON_PRESERVE_KEY_ORDER is specified, the object will
+		/// preserve the items insertion order. Otherwise, items will be
+		/// sorted by keys.
 		///
-		/// If escapeUnicode is true, when the object is stringified, all unicode
-		/// characters will be escaped in the resulting string.
+		/// If JSON_ESCAPE_UNICODE is specified, when the object is
+		/// stringified, all unicode characters will be escaped in the
+		/// resulting string.
 
 	Object(const Object& copy);
 		/// Creates an Object by copying another one.
@@ -271,8 +286,8 @@ private:
 	KeyList           _keys;
 	bool              _preserveInsOrder;
 	// Note:
-	//  The reason we have this flag here (rather than as argument to stringify())
-	//  is because Object can be returned stringified from a Dynamic::Var:toString(),
+	//  The reason for this flag (rather than as argument to stringify()) is
+	//  because Object can be returned stringified from Dynamic::Var::toString(),
 	//  so it must know whether to escape unicode or not.
 	bool              _escapeUnicode;
 	mutable StructPtr _pStruct;

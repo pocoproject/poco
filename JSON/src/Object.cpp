@@ -24,9 +24,10 @@ namespace Poco {
 namespace JSON {
 
 
-Object::Object(bool preserveInsOrder, bool escapeUnicode):
-	_preserveInsOrder(preserveInsOrder),
-	_escapeUnicode(escapeUnicode),
+
+Object::Object(int options):
+	_preserveInsOrder(options & JSON_PRESERVE_KEY_ORDER),
+	_escapeUnicode(options & JSON_ESCAPE_UNICODE),
 	_modified(false)
 {
 }

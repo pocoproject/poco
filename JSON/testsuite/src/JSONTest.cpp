@@ -1373,7 +1373,7 @@ void JSONTest::testStringify()
 
 	std::string str1 = "\r";
 	std::string str2 = "\n";
-	Poco::JSON::Object obj1, obj2;
+	Object obj1, obj2;
 	obj1.set("payload", str1);
 	obj2.set("payload", str2);
 	std::ostringstream oss1, oss2;
@@ -1525,7 +1525,7 @@ void JSONTest::testStringify()
 
 void JSONTest::testStringifyPreserveOrder()
 {
-	Object presObj(true);
+	Object presObj(Object::JSON_PRESERVE_KEY_ORDER);
 	presObj.set("foo", 0);
 	presObj.set("bar", 0);
 	presObj.set("baz", 0);
@@ -2009,7 +2009,7 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 
 void JSONTest::testCopy()
 {
-	Object obj1(true);
+	Object obj1(Object::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
 	obj1.set("baz", 0);
@@ -2022,7 +2022,6 @@ void JSONTest::testCopy()
 
 	Object obj2;
 	obj2 = obj1;
-
 	nl = obj2.getNames();
 	assert (nl.size() == 3);
 	assert (nl[0] == "foo");
@@ -2033,7 +2032,6 @@ void JSONTest::testCopy()
 	obj3.set("foo", 0);
 	obj3.set("bar", 0);
 	obj3.set("baz", 0);
-
 	nl = obj3.getNames();
 	assert (nl.size() == 3);
 	assert (nl[0] == "bar");
@@ -2042,7 +2040,6 @@ void JSONTest::testCopy()
 
 	Object obj4;
 	obj4 = obj3;
-
 	nl = obj4.getNames();
 	assert (nl.size() == 3);
 	assert (nl[0] == "bar");
@@ -2050,8 +2047,14 @@ void JSONTest::testCopy()
 	assert (nl[2] == "foo");
 
 	obj4 = obj1;
-
 	nl = obj4.getNames();
+	assert (nl.size() == 3);
+	assert (nl[0] == "foo");
+	assert (nl[1] == "bar");
+	assert (nl[2] == "baz");
+
+	Object obj5(obj1);
+	nl = obj5.getNames();
 	assert (nl.size() == 3);
 	assert (nl[0] == "foo");
 	assert (nl[1] == "bar");
@@ -2061,7 +2064,7 @@ void JSONTest::testCopy()
 
 void JSONTest::testMove()
 {
-	Object obj1(true);
+	Object obj1(Object::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
 	obj1.set("baz", 0);
@@ -2086,7 +2089,6 @@ void JSONTest::testMove()
 	obj3.set("foo", 0);
 	obj3.set("bar", 0);
 	obj3.set("baz", 0);
-
 	nl = obj3.getNames();
 	assert (nl.size() == 3);
 	assert (nl[0] == "bar");
@@ -2103,11 +2105,10 @@ void JSONTest::testMove()
 	assert (nl[1] == "baz");
 	assert (nl[2] == "foo");
 
-	Object obj5(true);
+	Object obj5(Object::JSON_PRESERVE_KEY_ORDER);
 	obj5.set("foo", 0);
 	obj5.set("bar", 0);
 	obj5.set("baz", 0);
-
 	nl = obj5.getNames();
 	assert (nl.size() == 3);
 	assert (nl[0] == "foo");
