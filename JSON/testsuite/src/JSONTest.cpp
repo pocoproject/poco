@@ -643,6 +643,9 @@ void JSONTest::testObjectProperty()
 	assert (object->isObject("test"));
 	assert (!object->isArray("test"));
 
+	assert (!object->isArray("nonExistentKey"));
+	assert (!object->isObject("nonExistentKey"));
+
 	Var test = object->get("test");
 	assert (test.type() == typeid(Object::Ptr));
 	Object::Ptr subObject = test.extract<Object::Ptr>();
