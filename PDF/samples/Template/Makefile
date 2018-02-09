@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Text
+objects = Template
 
 target         = Template
 target_version = 1
