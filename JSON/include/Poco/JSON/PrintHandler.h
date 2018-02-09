@@ -20,6 +20,7 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Handler.h"
+#include "Poco/JSONString.h"
 
 
 namespace Poco {
@@ -37,10 +38,10 @@ public:
 
 	static const unsigned JSON_PRINT_FLAT = 0;
 
-	PrintHandler(unsigned indent = 0);
+	PrintHandler(unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.
 
-	PrintHandler(std::ostream& out, unsigned indent = 0);
+	PrintHandler(std::ostream& out, unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.
 
 	~PrintHandler();
@@ -113,6 +114,7 @@ private:
 	std::string   _tab;
 	int           _array;
 	bool          _objStart;
+	int           _options;
 };
 
 

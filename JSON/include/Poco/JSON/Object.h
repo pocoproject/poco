@@ -21,6 +21,7 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Stringifier.h"
+#include "Poco/JSONString.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
@@ -70,19 +71,6 @@ public:
 	typedef ValueMap::iterator                  Iterator;
 	typedef ValueMap::const_iterator            ConstIterator;
 	typedef std::vector<std::string>            NameList;
-
-	enum Options
-	{
-		JSON_PRESERVE_KEY_ORDER = 1,
-			/// If specified, the object will preserve the items
-			/// insertion order. Otherwise, items will be sorted
-			/// by keys.
-
-		JSON_ESCAPE_UNICODE = 2
-			/// If specified, when the object is stringified, all
-			/// unicode characters will be escaped in the resulting
-			/// string.
-	};
 
 	explicit Object(int options = 0);
 		/// Creates an empty Object.
@@ -274,6 +262,9 @@ private:
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
 	{
+		int options = Poco::JSON_WRAP_STRINGS;
+		options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
+
 		out << '{';
 
 		if (indent > 0) out << std::endl;
@@ -284,10 +275,10 @@ private:
 		{
 			for (unsigned int i = 0; i < indent; i++) out << ' ';
 
-			Stringifier::stringify(getKey(it), out, indent, step, _escapeUnicode);
+			Stringifier::stringify(getKey(it), out, indent, step, options);
 			out << ((indent > 0) ? " : " : ":");
 
-			Stringifier::stringify(getValue(it), out, indent + step, step, _escapeUnicode);
+			Stringifier::stringify(getValue(it), out, indent + step, step, options);
 
 			if (++it != container.end()) out << ',';
 

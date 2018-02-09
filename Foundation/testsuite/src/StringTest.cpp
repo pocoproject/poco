@@ -1093,8 +1093,8 @@ void StringTest::testJSONString()
 	assert (toJSON("\t", false) == "\\t");
 	assert (toJSON("\v", false) == "\\v");
 	assert (toJSON("a", false) == "a");
-	assert (toJSON("\xD0\x82", false) == "\xD0\x82");
-	assert (toJSON("\xD0\x82", false, true) == "\\u0402");
+	assert (toJSON("\xD0\x82", 0) == "\xD0\x82");
+	assert (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
 
 	// ??? on MSVC, the assert macro expansion
 	// fails to compile when this string is inline ???
@@ -1107,8 +1107,10 @@ void StringTest::testJSONString()
 	assert (toJSON("bs\b") == "\"bs\\b\"");
 	assert (toJSON("nl\n") == "\"nl\\n\"");
 	assert (toJSON("tb\t") == "\"tb\\t\"");
-	assert (toJSON("\xD0\x82", true) == "\"\xD0\x82\"");
-	assert (toJSON("\xD0\x82", true, true) == "\"\\u0402\"");
+	assert (toJSON("\xD0\x82") == "\"\xD0\x82\"");
+	assert (toJSON("\xD0\x82", Poco::JSON_WRAP_STRINGS) == "\"\xD0\x82\"");
+	assert (toJSON("\xD0\x82",
+			Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE) == "\"\\u0402\"");
 
 	std::ostringstream ostr;
 	toJSON("foo\\", ostr);
@@ -1136,7 +1138,10 @@ void StringTest::testJSONString()
 	toJSON("\xD0\x82", ostr);
 	assert(ostr.str() == "\"\xD0\x82\"");
 	ostr.str("");
-	toJSON("\xD0\x82", ostr, true, true);
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS);
+	assert(ostr.str() == "\"\xD0\x82\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE);
 	assert(ostr.str() == "\"\\u0402\"");
 	ostr.str("");
 }

@@ -15,7 +15,6 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Object.h"
-#include "Poco/JSONString.h"
 #include <iomanip>
 
 
@@ -26,8 +25,10 @@ namespace Poco {
 namespace JSON {
 
 
-void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, bool escapeUnicode)
+void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, int options)
 {
+	bool escapeUnicode = options & Poco::JSON_ESCAPE_UNICODE;
+
 	if (step == -1) step = indent;
 
 	if (any.type() == typeid(Object))
@@ -61,13 +62,13 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 	else if (any.isNumeric() || any.isBoolean())
 	{
 		std::string value = any.convert<std::string>();
-		if (any.type() == typeid(char)) formatString(value, out, escapeUnicode);
+		if (any.type() == typeid(char)) formatString(value, out, options);
 		else out << value;
 	}
 	else if (any.isString() || any.isDateTime() || any.isDate() || any.isTime())
 	{
 		std::string value = any.convert<std::string>();
-		formatString(value, out, escapeUnicode);
+		formatString(value, out, options);
 	}
 	else
 	{
@@ -76,9 +77,9 @@ void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int inde
 }
 
 
-void Stringifier::formatString(const std::string& value, std::ostream& out, bool escapeUnicode)
+void Stringifier::formatString(const std::string& value, std::ostream& out, int options)
 {
-	Poco::toJSON(value, out, true, escapeUnicode);
+	Poco::toJSON(value, out, options);
 }
 
 

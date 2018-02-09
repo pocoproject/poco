@@ -15,6 +15,7 @@
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Stringifier.h"
+#include "Poco/JSONString.h"
 
 
 using Poco::Dynamic::Var;
@@ -24,8 +25,8 @@ namespace Poco {
 namespace JSON {
 
 
-Array::Array(bool escapeUnicode): _modified(false),
-	_escapeUnicode(escapeUnicode)
+Array::Array(int options): _modified(false),
+	_escapeUnicode(options & Poco::JSON_ESCAPE_UNICODE)
 {
 }
 
@@ -153,6 +154,9 @@ bool Array::isObject(ConstIterator& it) const
 
 void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 {
+	int options = Poco::JSON_WRAP_STRINGS;
+	options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
+
 	if (step == -1) step = indent;
 
 	out << "[";
@@ -163,7 +167,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 	{
 		for (int i = 0; i < indent; i++) out << ' ';
 
-		Stringifier::stringify(*it, out, indent + step, step, _escapeUnicode);
+		Stringifier::stringify(*it, out, indent + step, step, options);
 
 		if (++it != _values.end())
 		{
