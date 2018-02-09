@@ -19,6 +19,7 @@
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/Array.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/CppUnit/TestCaller.h"
@@ -72,6 +73,12 @@ void MongoDBTest::testInsertRequest()
 
 	player->add("unknown", NullValue());
 
+	Poco::MongoDB::Array::Ptr points = new Poco::MongoDB::Array();
+	points->add<Poco::Int32>("0", 0);
+	points->add<Poco::Int64>("1", 1);
+	points->add<double>("2", 2);
+	player->add("points", points);
+
 	Poco::MongoDB::InsertRequest request("team.players");
 	request.documents().push_back(player);
 	_mongo->sendRequest(request);
@@ -105,6 +112,8 @@ void MongoDBTest::testQueryRequest()
 			assert(doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
 			assert(!active);
+			Poco::MongoDB::Array::Ptr points = doc->get<Poco::MongoDB::Array::Ptr>("points");
+			assert(points->getInteger(0) == 0 && points->getInteger(1) == 1 && points->getInteger(2) == 2);
 
 			std::string id = doc->get("_id")->toString();
 		}
