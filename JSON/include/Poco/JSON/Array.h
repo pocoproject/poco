@@ -63,11 +63,12 @@ public:
 	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
 	typedef SharedPtr<Array> Ptr;
 
-	Array(bool escapeUnicode = false);
+	Array(int options = 0);
 		/// Creates an empty Array.
 		///
-		/// If escapeUnicode is true, when the object is stringified, all unicode
-		/// characters will be escaped in the resulting string.
+		/// If JSON_ESCAPE_UNICODE is specified, when the object is
+		/// stringified, all unicode characters will be escaped in the
+		/// resulting string.
 
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
