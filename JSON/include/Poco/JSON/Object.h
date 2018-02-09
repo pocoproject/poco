@@ -346,8 +346,7 @@ inline bool Object::isArray(const std::string& key) const
 
 inline bool Object::isArray(ConstIterator& it) const
 {
-	const std::type_info& ti = it->second.type();
-	return it != _values.end() && (ti == typeid(Array::Ptr) || ti == typeid(Array));
+	return it != _values.end() && (it->second.type() == typeid(Array::Ptr) || it->second.type() == typeid(Array));
 }
 
 
@@ -367,8 +366,7 @@ inline bool Object::isObject(const std::string& key) const
 
 inline bool Object::isObject(ConstIterator& it) const
 {
-	const std::type_info& ti = it->second.type();
-	return it != _values.end() && (ti == typeid(Object::Ptr) || ti == typeid(Object));
+	return it != _values.end() && (it->second.type() == typeid(Object::Ptr) || it->second.type() == typeid(Object));
 }
 
 
