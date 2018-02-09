@@ -27,7 +27,7 @@ namespace JSON {
 
 void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, int options)
 {
-	bool escapeUnicode = options & Poco::JSON_ESCAPE_UNICODE;
+	bool escapeUnicode = ((options & Poco::JSON_ESCAPE_UNICODE) != 0);
 
 	if (step == -1) step = indent;
 
