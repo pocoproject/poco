@@ -24,28 +24,22 @@ namespace Poco {
 namespace JSON {
 
 
-Object::Object(bool preserveInsOrder):
-	_preserveInsOrder(preserveInsOrder),
+
+Object::Object(int options):
+	_preserveInsOrder(options & Poco::JSON_PRESERVE_KEY_ORDER),
+	_escapeUnicode(options & Poco::JSON_ESCAPE_UNICODE),
 	_modified(false)
 {
 }
 
 
-Object::Object(const Object& copy) : _values(copy._values),
-	_preserveInsOrder(copy._preserveInsOrder),
-	_pStruct(!copy._modified ? copy._pStruct : 0),
-	_modified(copy._modified)
+Object::Object(const Object& other) : _values(other._values),
+	_preserveInsOrder(other._preserveInsOrder),
+	_escapeUnicode(other._escapeUnicode),
+	_pStruct(!other._modified ? other._pStruct : 0),
+	_modified(other._modified)
 {
-	if (_preserveInsOrder)
-	{
-		// need to update pointers in _keys to point to copied _values
-		for (KeyPtrList::const_iterator it = copy._keys.begin(); it != copy._keys.end(); ++it)
-		{
-			ValueMap::const_iterator itv = _values.find(**it);
-			poco_assert (itv != _values.end());
-			_keys.push_back(&itv->first);
-		}
-	}
+	syncKeys(other._keys);
 }
 
 
@@ -53,9 +47,11 @@ Object::Object(Object&& other) :
 	_values(std::move(other._values)),
 	_keys(std::move(other._keys)),
 	_preserveInsOrder(other._preserveInsOrder),
+	_escapeUnicode(other._escapeUnicode),
 	_pStruct(!other._modified ? other._pStruct : 0),
 	_modified(other._modified)
 {
+	other.clear();
 }
 
 
@@ -69,8 +65,9 @@ Object &Object::operator= (const Object &other)
 	if (&other != this)
 	{
 		_values = other._values;
-		_keys = other._keys;
 		_preserveInsOrder = other._preserveInsOrder;
+		syncKeys(other._keys);
+		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
 	}
@@ -85,10 +82,27 @@ Object &Object::operator= (Object &&other)
 		_values = std::move(other._values);
 		_keys = std::move(other._keys);
 		_preserveInsOrder = other._preserveInsOrder;
+		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
+		other.clear();
 	}
 	return *this;
+}
+
+
+void Object::syncKeys(const KeyList& keys)
+{
+	if(_preserveInsOrder)
+	{
+		// update iterators in _keys to point to copied _values
+		for(KeyList::const_iterator it = keys.begin(); it != keys.end(); ++it)
+		{
+			ValueMap::const_iterator itv = _values.find((*it)->first);
+			poco_assert (itv != _values.end());
+			_keys.push_back(itv);
+		}
+	}
 }
 
 
@@ -128,13 +142,31 @@ Object::Ptr Object::getObject(const std::string& key) const
 }
 
 
-void Object::getNames(std::vector<std::string>& names) const
+void Object::getNames(NameList& names) const
 {
 	names.clear();
-	for (ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+	if (_preserveInsOrder)
 	{
-		names.push_back(it->first);
+		for(KeyList::const_iterator it = _keys.begin(); it != _keys.end(); ++it)
+		{
+			names.push_back((*it)->first);
+		}
 	}
+	else
+	{
+		for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
+		{
+			names.push_back(it->first);
+		}
+	}
+}
+
+
+Object::NameList Object::getNames() const
+{
+	NameList names;
+	getNames(names);
+	return names;
 }
 
 
@@ -149,16 +181,16 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 }
 
 
-const std::string& Object::getKey(KeyPtrList::const_iterator& iter) const
+const std::string& Object::getKey(KeyList::const_iterator& iter) const
 {
 	ValueMap::const_iterator it = _values.begin();
 	ValueMap::const_iterator end = _values.end();
 	for (; it != end; ++it)
 	{
-		if (it->first == **iter) return it->first;
+		if (it == *iter) return it->first;
 	}
 
-	throw NotFoundException(**iter);
+	throw NotFoundException((*iter)->first);
 }
 
 
@@ -168,13 +200,13 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 	if (!ret.second) ret.first->second = value;
 	if (_preserveInsOrder)
 	{
-		KeyPtrList::iterator it = _keys.begin();
-		KeyPtrList::iterator end = _keys.end();
+		KeyList::iterator it = _keys.begin();
+		KeyList::iterator end = _keys.end();
 		for (; it != end; ++it)
 		{
-			if (key == **it) return;
+			if (key == (*it)->first) return;
 		}
-		_keys.push_back(&ret.first->first);
+		_keys.push_back(ret.first);
 	}
 	_modified = true;
 }

@@ -30,6 +30,7 @@ CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
+cmake-build*
 
 # Gradle #
 ##########
