@@ -17,8 +17,7 @@
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/Session.h"
-#include "Poco/ActiveMethod.h"
-#include "Poco/ActiveResult.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/String.h"
 #include "Poco/Mutex.h"
 #include "Poco/Data/DataException.h"
@@ -139,32 +138,6 @@ bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-class ActiveConnector
-{
-public:
-	ActiveConnector(const std::string& connectString, sqlite3** ppDB):
-		connect(this, &ActiveConnector::connectImpl),
-		_connectString(connectString),
-		_ppDB(ppDB)
-	{
-		poco_check_ptr(_ppDB);
-	}
-	
-	ActiveMethod<int, void, ActiveConnector> connect;
-	
-private:
-	ActiveConnector();
-
-	inline int connectImpl()
-	{
-		return sqlite3_open_v2(_connectString.c_str(), _ppDB, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
-	}
-
-	std::string _connectString;
-	sqlite3**   _ppDB;
-};
-
-
 void SessionImpl::open(const std::string& connect)
 {
 	if (connect != connectionString())
@@ -180,16 +153,20 @@ void SessionImpl::open(const std::string& connect)
 
 	try
 	{
-		ActiveConnector connector(connectionString(), &_pDB);
-		ActiveResult<int> result = connector.connect();
-		if (!result.tryWait(static_cast<long>(getLoginTimeout() * 1000)))
-			throw ConnectionFailedException("Timed out.");
-
-		int rc = result.data();
-		if (rc != 0)
+		int rc = 0;
+		size_t tout = getLoginTimeout();
+		Stopwatch sw; sw.start();
+		while (true)
 		{
-			close();
-			Utility::throwException(_pDB, rc);
+			rc = sqlite3_open_v2(connectionString().c_str(), &_pDB,
+				SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
+			if (rc == SQLITE_OK) break;
+			if (sw.elapsedSeconds() >= tout)
+			{
+				close();
+				Utility::throwException(_pDB, rc);
+			}
+			else Thread::sleep(10);
 		}
 	} 
 	catch (SQLiteException& ex)
