@@ -2073,6 +2073,7 @@ void JSONTest::testCopy()
 
 void JSONTest::testMove()
 {
+#ifdef POCO_ENABLE_CPP11
 	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
@@ -2132,6 +2133,7 @@ void JSONTest::testMove()
 	assert (nl[0] == "foo");
 	assert (nl[1] == "bar");
 	assert (nl[2] == "baz");
+#endif // POCO_ENABLE_CPP11
 }
 
 

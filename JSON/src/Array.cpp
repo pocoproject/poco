@@ -26,7 +26,7 @@ namespace JSON {
 
 
 Array::Array(int options): _modified(false),
-	_escapeUnicode(options & Poco::JSON_ESCAPE_UNICODE)
+	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0)
 {
 }
 

@@ -38,13 +38,8 @@ namespace JSON {
 
 
 class JSON_API Object
-<<<<<<< HEAD
-	/// Represents a JSON object. Object provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to 
-=======
 	/// Represents a JSON object. Object provides a representation based on
 	/// shared pointers and optimized for performance. It is possible to
->>>>>>> df5968ce1... Json unicode escape && preserveOrder keys sync (#2145)
 	/// convert Object to DynamicStruct. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
 	/// 
@@ -75,10 +70,6 @@ public:
 	explicit Object(int options = 0);
 		/// Creates an empty Object.
 		///
-<<<<<<< HEAD
-		/// If preserveInsertionOrder, object will preserve the items insertion 
-		/// order. Otherwise, items will be sorted by keys.
-=======
 		/// If JSON_PRESERVE_KEY_ORDER is specified, the object will
 		/// preserve the items insertion order. Otherwise, items will be
 		/// sorted by keys.
@@ -86,7 +77,6 @@ public:
 		/// If JSON_ESCAPE_UNICODE is specified, when the object is
 		/// stringified, all unicode characters will be escaped in the
 		/// resulting string.
->>>>>>> df5968ce1... Json unicode escape && preserveOrder keys sync (#2145)
 
 	Object(const Object& copy);
 		/// Creates an Object by copying another one.
@@ -110,18 +100,8 @@ public:
 	Object &operator =(const Object &other);
 		// Assignment operator
 
-<<<<<<< HEAD
-	Iterator begin()
-	{
-		return _values.begin();
-	}
-=======
-	Object &operator =(Object &&other);
-		// Move asignment operator
-
 	void setEscapeUnicode(bool escape = true);
 		/// Sets the flag for escaping unicode.
->>>>>>> df5968ce1... Json unicode escape && preserveOrder keys sync (#2145)
 
 	bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.

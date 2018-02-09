@@ -26,8 +26,8 @@ namespace JSON {
 
 
 Object::Object(int options):
-	_preserveInsOrder(options & Poco::JSON_PRESERVE_KEY_ORDER),
-	_escapeUnicode(options & Poco::JSON_ESCAPE_UNICODE),
+	_preserveInsOrder((options & Poco::JSON_PRESERVE_KEY_ORDER) != 0),
+	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),
 	_modified(false)
 {
 }
@@ -62,17 +62,13 @@ Object &Object::operator= (Object &&other)
 {
 	if (&other != this)
 	{
-<<<<<<< HEAD
-		_values = std::move(other._values);
-		_keys = std::move(other._keys);
-=======
 		_values = other._values;
->>>>>>> df5968ce1... Json unicode escape && preserveOrder keys sync (#2145)
 		_preserveInsOrder = other._preserveInsOrder;
 		syncKeys(other._keys);
 		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
+		other.clear();
 	}
 	return *this;
 }
@@ -96,7 +92,6 @@ Object &Object::operator= (const Object &other)
 		_escapeUnicode = other._escapeUnicode;
 		_pStruct = !other._modified ? other._pStruct : 0;
 		_modified = other._modified;
-		other.clear();
 	}
 	return *this;
 }

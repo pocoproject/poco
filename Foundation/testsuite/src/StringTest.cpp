@@ -22,6 +22,7 @@
 #include <cstdio>
 #include <map>
 #include <set>
+#include <sstream>
 
 
 using Poco::trimLeft;
