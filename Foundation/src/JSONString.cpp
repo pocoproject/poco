@@ -75,7 +75,7 @@ void toJSON(const std::string& value, std::ostream& out, bool wrap)
 }
 
 
-std::string toJSON(const std::string& value, bool wrap, bool escapeAllUnicode)
+std::string toJSON(const std::string& value, bool wrap)
 {
 	int options = (wrap ? Poco::JSON_WRAP_STRINGS : 0);
 	std::string ret;
