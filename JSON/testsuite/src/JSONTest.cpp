@@ -976,6 +976,7 @@ void JSONTest::testStringElement()
 	json = "[ \"\\u0017\" ]";
 	Var v = Parser().parse(json);
 	Stringifier::condense(v, s);
+	std::string ss = s.str();
 	assert(s.str() == "[\"\\u0017\"]");
 }
 
@@ -1525,7 +1526,7 @@ void JSONTest::testStringify()
 
 void JSONTest::testStringifyPreserveOrder()
 {
-	Object presObj(Object::JSON_PRESERVE_KEY_ORDER);
+	Object presObj(Poco::JSON_PRESERVE_KEY_ORDER);
 	presObj.set("foo", 0);
 	presObj.set("bar", 0);
 	presObj.set("baz", 0);
@@ -2009,7 +2010,7 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 
 void JSONTest::testCopy()
 {
-	Object obj1(Object::JSON_PRESERVE_KEY_ORDER);
+	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
 	obj1.set("baz", 0);
@@ -2064,7 +2065,7 @@ void JSONTest::testCopy()
 
 void JSONTest::testMove()
 {
-	Object obj1(Object::JSON_PRESERVE_KEY_ORDER);
+	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
 	obj1.set("baz", 0);
@@ -2105,7 +2106,7 @@ void JSONTest::testMove()
 	assert (nl[1] == "baz");
 	assert (nl[2] == "foo");
 
-	Object obj5(Object::JSON_PRESERVE_KEY_ORDER);
+	Object obj5(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj5.set("foo", 0);
 	obj5.set("bar", 0);
 	obj5.set("baz", 0);
