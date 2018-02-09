@@ -22,7 +22,7 @@ config.build
 config.make
 
 # CMake #
-########
+#########
 cmake_install.cmake
 cmake_uninstall.cmake
 CMakeFiles
@@ -31,6 +31,22 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
 cmake-build*
+
+# Gradle #
+##########
+.gradle/
+gradle/
+coverage/
+
+# NuGet #
+#########
+*.nupkg
+
+# WiX #
+#######
+*.msi
+*.wixobj
+*.wixpdb
 
 # Packages #
 ############
@@ -52,6 +68,7 @@ cmake-build*
 *.db
 test*.txt
 XML/testsuite/rss.xml
+Zip/testsuite/test.dat
 
 # OS generated files #
 ######################

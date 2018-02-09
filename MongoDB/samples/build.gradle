@@ -1,0 +1,25 @@
+model {
+	components {
+		SQLToMongo(NativeExecutableSpec) {
+			sources {
+				cpp.source { srcDir 'SQLToMongo/src' include '**/*.cpp' }
+				cpp.lib project: ':MongoDB', library: 'MongoDB'				
+				cpp.lib project: ':Net', library: 'Net'				
+				cpp.lib project: ':Foundation', library: 'Foundation'				
+			}
+		}
+	}
+	binaries {
+		all {
+		}
+		withType(SharedLibraryBinarySpec) {
+		}
+		withType(StaticLibraryBinarySpec) {
+		}
+		withType(NativeExecutableSpec) {
+		}
+	}
+}
+task samples { dependsOn "assemble" }
+
+

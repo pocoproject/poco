@@ -488,7 +488,7 @@ test_script:
       {
         if ($env:builder -eq "cygwin")
         {
-          $LastExitCode=0;
+          $global:LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
             $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"
