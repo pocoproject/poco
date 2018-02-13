@@ -79,7 +79,7 @@ void UTF8StringTest::testTransform()
 
 	// a mix of invalid sequences
 	std::string str = "\xC2\xE5\xF0\xF8\xE8\xED\xFB+-++";
-	assert ("???" == UTF8::toLower(str));
+	assert ("???+-++" == UTF8::toLower(str));
 }
 
 

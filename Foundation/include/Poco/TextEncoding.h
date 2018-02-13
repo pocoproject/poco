@@ -48,7 +48,7 @@ public:
 	
 	enum
 	{
-		MAX_SEQUENCE_LENGTH = 6 /// The maximum character byte sequence length supported.
+		MAX_SEQUENCE_LENGTH = 4 /// The maximum character byte sequence length supported.
 	};
 	
 	typedef int CharacterMap[256];
@@ -58,7 +58,7 @@ public:
 		/// If map[b] is -1, then the byte sequence is malformed.
 		/// If map[b] is -n, where n >= 2, then b is the first byte of an n-byte
 		/// sequence that encodes a single Unicode scalar value. Byte sequences up
-		/// to 6 bytes in length are supported.
+		/// to 4 bytes in length are supported.
 
 	virtual ~TextEncoding();
 		/// Destroys the encoding.
@@ -89,6 +89,7 @@ public:
 		///
 		/// The convert function must return the Unicode scalar value
 		/// represented by this byte sequence or -1 if the byte sequence is malformed.
+		///
 		/// The default implementation returns (int) bytes[0].
 
 	virtual	int queryConvert(const unsigned char* bytes, int length) const;
@@ -106,6 +107,7 @@ public:
 		/// Then a second call with length == 2 might return -4
 		/// Eventually, the third call with length == 4 should return either a
 		/// Unicode scalar value, or -1 if the byte sequence is malformed.
+		///
 		/// The default implementation returns (int) bytes[0].
 
 	virtual int sequenceLength(const unsigned char* bytes, int length) const;
