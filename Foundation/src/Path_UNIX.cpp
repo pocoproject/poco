@@ -74,6 +74,82 @@ std::string PathImpl::homeImpl()
 }
 
 
+std::string PathImpl::configHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+#if POCO_OS == POCO_OS_MAC_OS_X
+	  path.append("Library/Preferences/");
+#else
+	  path.append(".config/");
+#endif
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::homeImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+#if POCO_OS == POCO_OS_MAC_OS_X
+	  path.append("Library/Application Support/");
+#else
+	  path.append(".local/share/");
+#endif
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::tempImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+#if POCO_OS == POCO_OS_MAC_OS_X
+	  path.append("Library/Caches/");
+#else
+	  path.append(".cache/");
+#endif
+
+	return path;
+#endif
+}
+
+
+std::string PathImpl::tempHomeImpl()
+{
+#if defined(POCO_VXWORKS)
+	return PathImpl::tempImpl();
+#else
+	std::string path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/') 
+#if POCO_OS == POCO_OS_MAC_OS_X
+	  path.append("Library/Caches/");
+#else
+	  path.append(".local/tmp/");
+#endif
+
+	return path;
+#endif
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	std::string path;
@@ -88,6 +164,19 @@ std::string PathImpl::tempImpl()
 	{
 		path = "/tmp/";
 	}
+	return path;
+}
+
+
+std::string PathImpl::configImpl()
+{
+	std::string path;
+	
+#if POCO_OS == POCO_OS_MAC_OS_X
+	  path = "/Library/Preferences/";
+#else
+	  path = "/etc/";
+#endif
 	return path;
 }
 

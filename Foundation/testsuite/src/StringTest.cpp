@@ -1086,13 +1086,13 @@ void StringTest::testJSONString()
 	assert (toJSON("\\", false) == "\\\\");
 	assert (toJSON("\"", false) == "\\\"");
 	assert (toJSON("/", false) == "\\/");
-	assert (toJSON("\a", false) == "\\a");
+	assert (toJSON("\a", false) == "\\u0007");
 	assert (toJSON("\b", false) == "\\b");
 	assert (toJSON("\f", false) == "\\f");
 	assert (toJSON("\n", false) == "\\n");
 	assert (toJSON("\r", false) == "\\r");
 	assert (toJSON("\t", false) == "\\t");
-	assert (toJSON("\v", false) == "\\v");
+	assert (toJSON("\v", false) == "\\u000B");
 	assert (toJSON("a", false) == "a");
 	assert (toJSON("\xD0\x82", 0) == "\xD0\x82");
 	assert (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
