@@ -172,13 +172,13 @@ void UTF8::removeBOM(std::string& str)
 }
 
 
-std::string UTF8::escape(const std::string &s)
+std::string UTF8::escape(const std::string &s, bool strictJSON)
 {
-	return escape(s.begin(), s.end());
+	return escape(s.begin(), s.end(), strictJSON);
 }
 
 
-std::string UTF8::escape(const std::string::const_iterator& begin, const std::string::const_iterator& end)
+std::string UTF8::escape(const std::string::const_iterator& begin, const std::string::const_iterator& end, bool strictJSON)
 {
 	static Poco::UInt32 offsetsFromUTF8[6] = {
 		0x00000000UL, 0x00003080UL, 0x000E2080UL,
@@ -208,8 +208,8 @@ std::string UTF8::escape(const std::string::const_iterator& begin, const std::st
 		else if (ch == '\r') result += "\\r";
 		else if (ch == '\b') result += "\\b";
 		else if (ch == '\f') result += "\\f";
-		else if (ch == '\v') result += "\\v";
-		else if (ch == '\a') result += "\\a";
+		else if (ch == '\v') result += (strictJSON ? "\\u000B" : "\\v");
+		else if (ch == '\a') result += (strictJSON ? "\\u0007" : "\\a");
 		else if (ch == '\\') result +=  "\\\\";
 		else if (ch == '\"') result +=  "\\\"";
 		else if (ch == '/') result +=  "\\/";

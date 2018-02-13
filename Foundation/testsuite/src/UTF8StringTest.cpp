@@ -83,6 +83,25 @@ void UTF8StringTest::testTransform()
 }
 
 
+void UTF8StringTest::testEscape()
+{
+	std::string s1("A \t, a \v, and an \a walk into a |, and the barman says \xD0\x82");
+
+	assert (UTF8::escape(s1) == "A \\t, a \\v, and an \\a walk into a |, and the barman says \\u0402");
+	assert (UTF8::escape(s1, true) == "A \\t, a \\u000B, and an \\u0007 walk into a |, and the barman says \\u0402");
+}
+
+
+void UTF8StringTest::testUnescape()
+{
+	std::string s1("A \\t, a \\u000B, and an \\u0007 walk into a |, and the barman says \\u0402");
+	std::string s2("A \\t, a \\v, and an \\a walk into a |, and the barman says \\u0402");
+
+	assert (UTF8::unescape(s1) == "A \t, a \v, and an \a walk into a |, and the barman says \xD0\x82");
+	assert (UTF8::unescape(s2) == "A \t, a \v, and an \a walk into a |, and the barman says \xD0\x82");
+}
+
+
 void UTF8StringTest::setUp()
 {
 }
@@ -99,6 +118,8 @@ CppUnit::Test* UTF8StringTest::suite()
 
 	CppUnit_addTest(pSuite, UTF8StringTest, testCompare);
 	CppUnit_addTest(pSuite, UTF8StringTest, testTransform);
+	CppUnit_addTest(pSuite, UTF8StringTest, testEscape);
+	CppUnit_addTest(pSuite, UTF8StringTest, testUnescape);
 
 	return pSuite;
 }

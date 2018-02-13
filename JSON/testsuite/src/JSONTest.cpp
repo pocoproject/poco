@@ -1938,7 +1938,6 @@ void JSONTest::testEscape0()
 
 void JSONTest::testNonEscapeUnicode()
 {
-	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
 	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
 	Var result = parser.parse(chinese);
@@ -1959,6 +1958,27 @@ void JSONTest::testNonEscapeUnicode()
 	object = result.extract<Object::Ptr>();
 	ss.str(""); object->stringify(ss);
 	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
+
+	Poco::JSON::Object obj1;
+	std::string shortEscapeStr("String with \t");
+	std::string longEscapeStr("String with \a and \v plus \t for good measure");
+	obj1.set("shortEscape", shortEscapeStr);
+	obj1.set("longEscape", longEscapeStr);
+
+	ss.str("");
+	obj1.stringify(ss);
+
+	parser.reset();
+	parser.parse(ss.str());
+	result = parser.asVar();
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	object = result.extract<Object::Ptr>();
+	Var shortEscape = object->get("shortEscape");
+	Var longEscape = object->get("longEscape");
+	assert(shortEscape.convert<std::string>() == shortEscapeStr);
+	assert(longEscape.convert<std::string>() == longEscapeStr);
 }
 
 
