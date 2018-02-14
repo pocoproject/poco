@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="TestSuite"
-	Version="8.00"
+	Name="TextConverter"
+	Version="9.00"
 	ProjectType="Visual C++"
-	ProjectGUID="{7784E068-96B2-4DDC-BA8B-780206E06B30}"
-	RootNamespace="TestSuite"
+	ProjectGUID="{3CCF9527-B5D9-3522-84C3-C8E5381D7661}"
+	RootNamespace="TextConverter"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="x64"/>
 	</Platforms>
 	<ToolFiles/>
 	<Configurations>
 		<Configuration
-			Name="debug_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="debug_shared|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -32,8 +31,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\Encodings\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Encodings\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -57,15 +56,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitd.lib WinTestRunnerd.lib "
-				OutputFile="bin\TestSuited.exe"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				OutputFile="bin64\TextConverterd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\TestSuited.pdb"
-				SubSystem="2"
-				TargetMachine="1"
+				ProgramDatabaseFile="bin64\TextConverterd.pdb"
+				SubSystem="1"
+				TargetMachine="17"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -83,11 +82,10 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_shared|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="release_shared|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -106,8 +104,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\Encodings\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Encodings\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -129,15 +127,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnit.lib WinTestRunner.lib "
-				OutputFile="bin\TestSuite.exe"
+				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
+				OutputFile="bin64\TextConverter.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				TargetMachine="17"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -155,11 +153,10 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="debug_static_mt|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -174,8 +171,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\Encodings\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Encodings\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -199,16 +196,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res "
-				OutputFile="bin\static_mt\TestSuited.exe"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				OutputFile="bin64\static_mt\TextConverterd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\static_mt\TestSuited.pdb"
-				SubSystem="2"
-				TargetMachine="1"
+				ProgramDatabaseFile="bin64\static_mt\TextConverterd.pdb"
+				SubSystem="1"
+				TargetMachine="17"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -226,11 +222,10 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static_mt|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="release_static_mt|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -249,8 +244,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\Encodings\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Encodings\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
@@ -272,16 +267,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res "
-				OutputFile="bin\static_mt\TestSuite.exe"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				OutputFile="bin64\static_mt\TextConverter.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\lib"
-				IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				TargetMachine="17"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -299,11 +293,10 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="debug_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="debug_static_md|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -318,8 +311,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\Encodings\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Encodings\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -343,15 +336,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmdd.lib WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res "
-				OutputFile="bin\static_md\TestSuited.exe"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				OutputFile="bin64\static_md\TextConverterd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="bin\static_md\TestSuited.pdb"
-				SubSystem="2"
-				TargetMachine="1"
+				ProgramDatabaseFile="bin64\static_md\TextConverterd.pdb"
+				SubSystem="1"
+				TargetMachine="17"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -369,11 +362,10 @@
 				Name="VCPostBuildEventTool"/>
 		</Configuration>
 		<Configuration
-			Name="release_static_md|Win32"
-			OutputDirectory="obj\$(ConfigurationName)"
-			IntermediateDirectory="obj\$(ConfigurationName)"
+			Name="release_static_md|x64"
+			OutputDirectory="obj64\$(ConfigurationName)"
+			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -392,8 +384,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\Foundation\include;..\..\Encodings\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;"
+				AdditionalIncludeDirectories=".\include;..\..\..\Foundation\include;..\..\..\Encodings\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0500;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -415,15 +407,15 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmd.lib WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res "
-				OutputFile="bin\static_md\TestSuite.exe"
+				AdditionalDependencies="iphlpapi.lib winmm.lib ws2_32.lib iphlpapi.lib"
+				OutputFile="bin64\static_md\TextConverter.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\lib64"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				TargetMachine="17"
 				AdditionalOptions=""/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -444,20 +436,11 @@
 	<References/>
 	<Files>
 		<Filter
+			Name="Header Files"/>
+		<Filter
 			Name="Source Files">
 			<File
-				RelativePath=".\src\DoubleByteEncodingTest.cpp"/>
-			<File
-				RelativePath=".\src\EncodingsTestSuite.cpp"/>
-			<File
-				RelativePath=".\src\WinDriver.cpp"/>
-		</Filter>
-		<Filter
-			Name="Header Files">
-			<File
-				RelativePath=".\src\DoubleByteEncodingTest.h"/>
-			<File
-				RelativePath=".\src\EncodingsTestSuite.h"/>
+				RelativePath=".\src\TextConverter.cpp"/>
 		</Filter>
 	</Files>
 	<Globals/>
