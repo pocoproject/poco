@@ -132,14 +132,12 @@ std::string PathImpl::cacheHomeImpl()
 }
 
 
-<<<<<<< HEAD
-=======
 std::string PathImpl::tempHomeImpl()
 {
 	return tempImpl();
 }
 
->>>>>>> 06e59cb... add Windows compliant implementation of XDG Base Directory Specification
+
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
