@@ -11,6 +11,6 @@ objects = EncodingsTestSuite Driver \
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoEncodings PocoFoundation CppUnit
+target_libs    = PocoEncodings PocoFoundation PocoCppUnit
 
 include $(POCO_BASE)/build/rules/exec
