@@ -87,6 +87,7 @@ include(PocoMacros)
 
 # Allow enabling and disabling components
 option(ENABLE_ENCODINGS "Enable Encodings" ON)
+option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_XML "Enable XML" ON)
 option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
@@ -261,6 +262,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/PageCompiler/File2Page AND ENABLE_PAGECOMPILER_FILE2PAGE)
 add_subdirectory(PageCompiler/File2Page)
 list(APPEND Poco_COMPONENTS "File2Page")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
+add_subdirectory(Encodings/Compiler)
+list(APPEND Poco_COMPONENTS "EncodingsCompiler")
 endif()
 
 
