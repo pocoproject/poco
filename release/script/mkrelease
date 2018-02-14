@@ -17,7 +17,7 @@ if [ "$1" = "" ] ; then
 	exit 1
 fi
 
-comps="Foundation XML JSON Util Net"
+comps="Foundation Encodings XML JSON Util Net"
 internal=0
 specfile=""
 version=""
@@ -271,7 +271,7 @@ endif
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
-poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples) 
+poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
@@ -282,7 +282,7 @@ echo "COMPONENTS = $comps" >>${target}/Makefile
 cat >>${target}/Makefile <<'ENDOFSCRIPT'
 
 cppunit:
-	$(MAKE) -C $(POCO_BASE)/CppUnit 
+	$(MAKE) -C $(POCO_BASE)/CppUnit
 
 CppUnit-clean:
 	$(MAKE) -C $(POCO_BASE)/CppUnit clean
@@ -354,20 +354,20 @@ do
 			dependencies="$dependencies ${dep}-libexec"
 		done
 	fi
-	cat >>${target}/Makefile <<ENDOFSCRIPT 
+	cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-libexec: $dependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}
 ENDOFSCRIPT
 
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-tests: ${comp}-libexec cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
 ENDOFSCRIPT
 	fi
-	
+
 	if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
 		sdependencies=""
 		if [ -f "${POCO_BASE}/${comp}/samples/dependencies" ] ; then
@@ -378,8 +378,8 @@ ENDOFSCRIPT
 				sdependencies="$sdependencies ${dep}-libexec"
 			done
 		fi
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
-	
+		cat >>${target}/Makefile <<ENDOFSCRIPT
+
 ${comp}-samples: ${comp}-libexec $sdependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples
 ENDOFSCRIPT
@@ -392,13 +392,13 @@ ${comp}-clean:
 ENDOFSCRIPT
 
 	if [ -f "${POCO_BASE}/${comp}/testsuite/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite clean
 ENDOFSCRIPT
 	fi
 
 	if [ -f "${POCO_BASE}/${comp}/samples/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples clean
 ENDOFSCRIPT
 	fi
@@ -525,13 +525,13 @@ fi
 if [ "$output" = "" ] ; then
 	cd releases
 	find ${target}/ -print | sed "s:^${target}/*::" >${target}/MANIFEST
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	gzip poco-${version}.tar
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	bzip2 poco-${version}.tar
-	
+
 	if [ -x /usr/bin/zip ] ; then
 		/usr/bin/zip -r -q poco-${version}.zip poco-${version}
 	fi
