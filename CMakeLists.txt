@@ -78,6 +78,7 @@ include(PocoMacros)
 
 # Allow enabling and disabling components
 option(ENABLE_CPPUNIT "Enable CppUnit" ON)
+option(ENABLE_ENCODINGS "Enable Encodings" ON)
 option(ENABLE_XML "Enable XML" ON)
 option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
@@ -213,6 +214,10 @@ if (ENABLE_TESTS OR ENABLE_CPPUNIT)
 endif ()
 
 add_subdirectory(Foundation)
+if(ENABLE_ENCODINGS)
+    add_subdirectory(Encodings)
+    list(APPEND Poco_COMPONENTS "Encodings")
+endif()
 if(ENABLE_XML)
     add_subdirectory(XML)
     list(APPEND Poco_COMPONENTS "XML")
