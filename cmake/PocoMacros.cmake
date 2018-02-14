@@ -226,14 +226,14 @@ install(
     EXPORT "${target_name}Targets"
     FILE "${PROJECT_NAME}${target_name}Targets.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "lib/cmake/${PROJECT_NAME}"
+    DESTINATION "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"
     )
 
 install(
     FILES
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
-    DESTINATION "lib/cmake/${PROJECT_NAME}"
+    DESTINATION "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"
     COMPONENT Devel
     )
 
@@ -267,7 +267,7 @@ if (MSVC)
 # install the targets pdb
   POCO_INSTALL_PDB(${target_name})
 endif()
-  
+
 endmacro()
 
 #  POCO_INSTALL_PDB - Install the given target's companion pdb file (if present)
