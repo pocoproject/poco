@@ -17,7 +17,7 @@ if [ "$1" = "" ] ; then
 	exit 1
 fi
 
-comps="CppUnit CppUnit/WinTestRunner Foundation XML JSON Util Net"
+comps="CppUnit CppUnit/WinTestRunner Foundation Encodings XML JSON Util Net"
 internal=0
 specfile=""
 version=""
@@ -332,7 +332,7 @@ ${comp}-tests: ${comp}-libexec cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
 ENDOFSCRIPT
 	fi
-	
+
 	if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
 		sdependencies=""
 		if [ -f "${POCO_BASE}/${comp}/samples/dependencies" ] ; then
@@ -344,7 +344,7 @@ ENDOFSCRIPT
 			done
 		fi
 		cat >>${target}/Makefile <<ENDOFSCRIPT
-	
+
 ${comp}-samples: ${comp}-libexec $sdependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples
 ENDOFSCRIPT
@@ -430,13 +430,13 @@ fi
 if [ "$output" = "" ] ; then
 	cd releases
 	find ${target}/ -print | sed "s:^${target}/*::" >${target}/MANIFEST
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	gzip poco-${version}.tar
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	bzip2 poco-${version}.tar
-	
+
 	if [ -x /usr/bin/zip ] ; then
 		/usr/bin/zip -r -q poco-${version}.zip poco-${version}
 	fi
