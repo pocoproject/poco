@@ -85,7 +85,7 @@ protected:
 				.callback(OptionCallback<TextEncodingCompiler>(this, &TextEncodingCompiler::handleClassName)));
 
 		options.addOption(
-			Option("encoding-name", "e", "Specify the encoding name.")
+			Option("encoding-name", "e", "Specify the encoding name. Can be specified multiple times.")
 				.required(true)
 				.repeatable(true)
 				.argument("encodingName")
@@ -113,8 +113,22 @@ protected:
 	{
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
-		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Add some text here...");
+		helpFormatter.setUsage("{options} <table-URI>");
+		helpFormatter.setHeader(
+			"\n"
+			"The POCO C++ Text Encodings Compiler.\n"
+			"Copyright (c) 2018 by Applied Informatics Software Engineering GmbH.\n"
+			"All rights reserved.\n\n"
+			"This program compiles Unicode character encoding tables "
+			"from http://www.unicode.org/Public/MAPPINGS/ to TextEncoding "
+			"classes for the Poco Encodings library. \n\n"
+			"The following command line options are supported:"
+		);
+		helpFormatter.setFooter(
+			"For more information, please see the POCO C++ Libraries "
+			"documentation at <http://pocoproject.org/docs/>."
+		);
+		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);
 	}
 
