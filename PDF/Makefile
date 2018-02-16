@@ -8,8 +8,8 @@ include $(POCO_BASE)/build/rules/global
 
 INCLUDE += -I $(POCO_BASE)/PDF/include/Poco/PDF
 
-objects = Destination Document Encoder Font Image Outline \
-	LinkAnnotation Page PDFException TextAnnotation \
+objects = AttributedString Cell Destination Document Encoder Font Image Outline \
+	LinkAnnotation Page PDFException Table TextAnnotation XMLTemplate \
 	hpdf_3dmeasure hpdf_annotation hpdf_array hpdf_binary hpdf_boolean \
 	hpdf_catalog hpdf_destination hpdf_dict hpdf_doc hpdf_doc_png \
 	hpdf_encoder hpdf_encoder_cns hpdf_encoder_cnt hpdf_encoder_jp \
@@ -29,6 +29,6 @@ objects = Destination Document Encoder Font Image Outline \
 
 target         = PocoPDF
 target_version = $(LIBVERSION)
-target_libs    = PocoFoundation
+target_libs    = PocoXML PocoJSON PocoUtil PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

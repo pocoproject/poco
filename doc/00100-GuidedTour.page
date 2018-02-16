@@ -22,7 +22,7 @@ challenges.
 POCO consists of four core libraries, and a number of add-on libraries.
 The core libraries are Foundation, XML, Util and Net. Two of the add-on
 libraries are NetSSL, providing SSL support for the network classes in
-the Net library, and Data, a library for uniformly accessing different
+the Net library, and SQL, a library for uniformly accessing different
 SQL databases.  POCO aims to be for
 network-centric, cross-platform C++ software development what Apple's
 Cocoa is for Mac development, or Ruby on Rails is for Web development --

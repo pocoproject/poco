@@ -282,7 +282,7 @@
     <ClCompile Include="src\ParseHandler.cpp" />
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\ParserImpl.cpp" />
-    <ClCompile Include="src\pd_json.c" />
+    <ClCompile Include="src\pdjson.c" />
     <ClCompile Include="src\PrintHandler.cpp" />
     <ClCompile Include="src\Query.cpp" />
     <ClCompile Include="src\Stringifier.cpp" />
@@ -303,8 +303,7 @@
     <ClInclude Include="include\Poco\JSON\Stringifier.h" />
     <ClInclude Include="include\Poco\JSON\Template.h" />
     <ClInclude Include="include\Poco\JSON\TemplateCache.h" />
-    <ClInclude Include="src\pd_json.h" />
-    <ClInclude Include="src\pd_json_private.h" />
+    <ClInclude Include="src\pdjson.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -4,7 +4,7 @@ set(POCO_LIBNAME "Poco${LIBNAME}")
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
-POCO_SOURCES(SRCS pdjson src/pd_json.c)
+POCO_SOURCES(SRCS pdjson src/pdjson.c)
 
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h" )

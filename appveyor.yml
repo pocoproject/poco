@@ -68,9 +68,15 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
 
   matrix:
-    - builder: msbuild
+    - builder: cmake
       vsver: 140
-      linkmode: shared
+
+#    - builder: cmake
+#      vsver: 150
+
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: shared
 
     - builder: msbuild
       vsver: 150
@@ -95,13 +101,6 @@ environment:
 #    - builder: msbuild
 #      vsver: 150
 #      linkmode: static_mt
-
-    - builder: cmake
-      vsver: 140
-
-    - builder: cmake
-      vsver: 150
-
 
 matrix:
   fast_finish: true
@@ -399,16 +398,8 @@ build_script:
   - ps: |
       if ($env:builder -eq "cygwin")
       {
-          $LastExitCode=0;
           $cmd='bash.exe configure --everything --omit=PDF';iex "& $cmd"
-          if ($LastExitCode -ne 0) {
-            throw "$cmd failed with exit code $LastExitCode."
-          }
-          $LastExitCode=0;
           $cmd='make.exe -s';iex "& $cmd"
-          if ($LastExitCode -ne 0) {
-            throw "$cmd failed with exit code $LastExitCode."
-          }
       }
       if ($env:builder -eq "msbuild")
       {
@@ -443,10 +434,6 @@ build_script:
         $defs = "--config RelWithDebInfo"
         $defs+=" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
-        if ($env:vsver -eq "150")
-        {
-            $defs+=" -DDISABLE_INTERNAL_OPENSSL=ON";
-        }
         $defs+=" -DENABLE_PDF=OFF";
         $defs+=" -DENABLE_NETSSL=ON";
         $defs+=" -DENABLE_NETSSL_WIN=ON";
@@ -501,7 +488,7 @@ test_script:
       {
         if ($env:builder -eq "cygwin")
         {
-          $LastExitCode=0;
+          $global:LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
             $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd"

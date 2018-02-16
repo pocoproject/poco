@@ -22,31 +22,32 @@
 
 #if defined(__APPLE__)
 // OS X 10.7 deprecates some OpenSSL functions
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
 #endif
 
 
 #include "Poco/Foundation.h"
+#include <openssl/opensslv.h>
 
 
 enum RSAPaddingMode
 	/// The padding mode used for RSA public key encryption.
 {
 	RSA_PADDING_PKCS1,
-		/// PKCS #1 v1.5 padding. This currently is the most widely used mode.
+		/// PKCS #1 v1.5 padding. This currently is the most widely used mode. 
 		
 	RSA_PADDING_PKCS1_OAEP,
-		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty
+		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty 
 		/// encoding parameter. This mode is recommended for all new applications.
 		
 	RSA_PADDING_SSLV23,
-		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes
-		/// that the server is SSL3 capable.
+		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes 
+		/// that the server is SSL3 capable. 
 		
 	RSA_PADDING_NONE
-		/// Raw RSA encryption. This mode should only be used to implement cryptographically
-		/// sound padding modes in the application code. Encrypting user data directly with RSA
-		/// is insecure.
+		/// Raw RSA encryption. This mode should only be used to implement cryptographically 
+		/// sound padding modes in the application code. Encrypting user data directly with RSA 
+		/// is insecure. 
 };
 
 
@@ -64,11 +65,6 @@ enum RSAPaddingMode
 			#define Crypto_API __declspec(dllexport)
 		#else
 			#define Crypto_API __declspec(dllimport)
-		#endif
-	#else
-		#if (POCO_MSVS_VERSION >= 2015) // needed for OpenSSL
-			#pragma comment(lib, "legacy_stdio_definitions.lib")
-			#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
 		#endif
 	#endif
 #endif
@@ -88,10 +84,37 @@ enum RSAPaddingMode
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
-		#if !defined(POCO_EXTERNAL_OPENSSL)
-			#pragma comment(lib, "libcrypto.lib")
-			#pragma comment(lib, "libssl.lib")
-		#endif // POCO_EXTERNAL_OPENSSL
+		#if defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
+			#if defined(POCO_EXTERNAL_OPENSSL)
+				#pragma warning "External OpenSSL defined but internal headers used - possible mismatch!"
+			#endif // POCO_EXTERNAL_OPENSSL
+			#if !defined(_DEBUG)
+				#define POCO_DEBUG_SUFFIX ""
+				#if !defined (_DLL)
+					#define POCO_STATIC_SUFFIX "mt"
+				#else // _DLL
+					#define POCO_STATIC_SUFFIX ""
+				#endif
+			#else // _DEBUG
+				#define POCO_DEBUG_SUFFIX "d"
+				#if !defined (_DLL)
+					#define POCO_STATIC_SUFFIX "mt"
+				#else // _DLL
+					#define POCO_STATIC_SUFFIX ""
+				#endif
+			#endif
+			#pragma comment(lib, "libcrypto" POCO_STATIC_SUFFIX POCO_DEBUG_SUFFIX ".lib")
+			#pragma comment(lib, "libssl" POCO_STATIC_SUFFIX POCO_DEBUG_SUFFIX ".lib")
+			#if !defined(_WIN64) && !defined (_DLL) && \
+						(POCO_INTERNAL_OPENSSL_MSVC_VER == 120) && \
+						(POCO_MSVC_VERSION < POCO_INTERNAL_OPENSSL_MSVC_VER)
+				#pragma comment(lib, "libPreVS2013CRT" POCO_STATIC_SUFFIX POCO_DEBUG_SUFFIX ".lib")
+			#endif
+			#if !defined (_DLL) && (POCO_MSVS_VERSION >= 2015)
+				#pragma comment(lib, "legacy_stdio_definitions.lib")
+				#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
+			#endif
+		#endif // POCO_INTERNAL_OPENSSL_MSVC_VER
 		#if !defined(Crypto_EXPORTS)
 			#pragma comment(lib, "PocoCrypto" POCO_LIB_SUFFIX)
 		#endif
@@ -108,7 +131,7 @@ void Crypto_API initializeCrypto();
 	/// libraries, by calling OpenSSLInitializer::initialize().
 	///
 	/// Should be called before using any class from the Crypto library.
-	/// The Crypto library will be initialized automatically, through
+	/// The Crypto library will be initialized automatically, through  
 	/// OpenSSLInitializer instances held by various Crypto classes
 	/// (Cipher, CipherKey, RSAKey, X509Certificate).
 	/// However, it is recommended to call initializeCrypto()
@@ -120,7 +143,7 @@ void Crypto_API initializeCrypto();
 	
 
 void Crypto_API uninitializeCrypto();
-	/// Uninitializes the Crypto library by calling
+	/// Uninitializes the Crypto library by calling 
 	/// OpenSSLInitializer::uninitialize().
 
 
