@@ -144,7 +144,7 @@ matrix:
         - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && ctest -VV -E SQL && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_SAMPLES=ON .. && make -s -j2 && ctest -VV && cd ..
  
 
     - env:    test="4.0 x86 (make) bundled"
