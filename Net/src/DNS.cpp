@@ -164,9 +164,18 @@ HostEntry DNS::resolve(const std::string& address)
 {
 	IPAddress ip;
 	if (IPAddress::tryParse(address, ip))
+	{
 		return hostByAddress(ip);
+	}
+	else if (isIDN(address))
+	{
+		std::string encoded = encodeIDN(address);
+		return hostByName(encoded);
+	}
 	else
+	{
 		return hostByName(address);
+	}
 }
 
 
@@ -235,11 +244,16 @@ std::string DNS::encodeIDN(const std::string& idn)
 	while (it != end)
 	{
 		std::string label;
+		bool mustEncode = false;
 		while (it != end && *it != '.')
 		{
+			if (static_cast<unsigned char>(*it) >= 0x80) mustEncode = true;
 			label += *it++;
 		}
-		encoded += encodeIDNLabel(label);
+		if (mustEncode)
+			encoded += encodeIDNLabel(label);
+		else
+			encoded += label;
 		if (it != end) encoded += *it++;
 	}
 	return encoded;
@@ -258,10 +272,7 @@ std::string DNS::decodeIDN(const std::string& encodedIDN)
 		{
 			label += *it++;
 		}
-		if (label.compare(0, 4, "xn--") == 0)
-			decoded += decodeIDNLabel(label);
-		else
-			decoded += label;
+		decoded += decodeIDNLabel(label);
 		if (it != end) decoded += *it++;
 	}
 	return decoded;
@@ -289,8 +300,8 @@ std::string DNS::encodeIDNLabel(const std::string& label)
 	char buffer[64];
 	std::size_t size = 64;
 	int rc = punycode_encode(uniLabel.size(), &uniLabel[0], &size, buffer);
-	if (rc > 0)
-		return encoded.append(buffer, size);
+	if (rc == punycode_success)
+		encoded.append(buffer, size);
 	else
 		throw DNSException("Failed to encode IDN label", label);
 	return encoded;
@@ -305,12 +316,12 @@ std::string DNS::decodeIDNLabel(const std::string& encodedIDN)
 		std::size_t size = 64;
 		punycode_uint buffer[64];
 		int rc = punycode_decode(encodedIDN.size() - 4, encodedIDN.data() + 4, &size, buffer);
-		if (rc > 0)
+		if (rc == punycode_success)
 		{
 			Poco::UTF32Encoding utf32;
 			Poco::UTF8Encoding utf8;
 			Poco::TextConverter converter(utf32, utf8);
-			converter.convert(buffer, size*rc, decoded);
+			converter.convert(buffer, size*sizeof(punycode_uint), decoded);
 		}
 		else throw DNSException("Failed to decode IDN label: ", encodedIDN);
 	}
@@ -394,7 +405,7 @@ void DNS::aierror(int code, const std::string& arg)
   2018-02-17 with SHA-1 a966a8017f6be579d74a50a226accc7607c40133
   labeled punycode-spec 1.0.3 (2006-Mar-23-Thu).
 
-  Modified for POCO C++ Libraries by Günter Obiltschnig.
+  Modified for POCO C++ Libraries by Guenter Obiltschnig.
 
   License on the original code:
 
@@ -526,8 +537,8 @@ int punycode_encode(size_t input_length_orig, const punycode_uint input[], size_
 			if (max_out - out < 2) return punycode_big_output;
 			output[out++] = (char) input[j];
 		}
-	/* else if (input[j] < n) return punycode_bad_input; */
-	/* (not needed for Punycode with unsigned code points) */
+		/* else if (input[j] < n) return punycode_bad_input; */
+		/* (not needed for Punycode with unsigned code points) */
 	}
 
 	h = b = (punycode_uint) out;

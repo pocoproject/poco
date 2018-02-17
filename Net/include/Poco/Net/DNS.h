@@ -32,7 +32,17 @@ class Net_API DNS
 	/// This class provides an interface to the
 	/// domain name service.
 	///
-	/// An internal DNS cache is used to speed up name lookups.
+	/// Starting with POCO C++ Libraries release 1.9.0,
+	/// this class also supports Internationalized Domain Names (IDNs).
+	///
+	/// Regarding IDNs, the following rules apply:
+	///
+	///   * An IDN passed to hostByName() must be encoded manually, by calling
+	///     encodeIDN() (after testing with isIDN() first).
+	///   * An UTF-8 IDN passed to resolve() or resolveOne() is automatically encoded.
+	///   * IDNs returned in HostEntry objects are never decoded. They can be
+	///     decoded by calling decodeIDN() (after testing for an encoded IDN by
+	///     calling isEncodedIDN()).
 {
 public:
 	enum HintFlag
@@ -59,6 +69,9 @@ public:
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given name. HintFlag argument is only
 		/// used on platforms that have getaddrinfo().
+		///
+		/// Note that Internationalized Domain Names must be encoded
+		/// using Punycode (see encodeIDN()) before calling this method.
 		///
 		/// Throws a HostNotFoundException if a host with the given
 		/// name cannot be found.
@@ -93,8 +106,8 @@ public:
 		/// for the host with the given IP address or host name.
 		///
 		/// If address contains a UTF-8 encoded IDN (internationalized
-		/// domain name), the domain name will be encoded first according
-		/// to Punycode.
+		/// domain name), the domain name will be encoded first using
+		/// Punycode.
 		///
 		/// Throws a HostNotFoundException if a host with the given
 		/// name cannot be found.
