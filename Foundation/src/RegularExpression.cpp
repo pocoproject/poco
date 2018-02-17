@@ -26,7 +26,10 @@
 namespace Poco {
 
 
-const int RegularExpression::OVEC_SIZE = 64;
+// funny size, but:
+// https://www.pcre.org/original/doc/html/pcre_exec.html
+// ovecsize     Number of elements in the vector (a multiple of 3)
+const int RegularExpression::OVEC_SIZE = 66;
 
 
 RegularExpression::RegularExpression(const std::string& pattern, int options, bool study): _pcre(0), _extra(0)
@@ -56,8 +59,8 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 {
 	poco_assert (offset <= subject.length());
 
-	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	std::vector<int> ovec(OVEC_SIZE, -1);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, &ovec[0], OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		mtch.offset = std::string::npos;
@@ -90,8 +93,8 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 
 	matches.clear();
 
-	int ovec[OVEC_SIZE];
-	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, ovec, OVEC_SIZE);
+	std::vector<int> ovec(OVEC_SIZE, -1);
+	int rc = pcre_exec(reinterpret_cast<pcre*>(_pcre), reinterpret_cast<struct pcre_extra*>(_extra), subject.c_str(), int(subject.size()), int(offset), options & 0xFFFF, &ovec[0], OVEC_SIZE);
 	if (rc == PCRE_ERROR_NOMATCH)
 	{
 		return 0;
