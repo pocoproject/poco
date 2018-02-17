@@ -144,13 +144,6 @@ public:
 		/// has been compiled with -DPOCO_HAVE_LIBRESOLV. Otherwise
 		/// it will do nothing.
 
-	//@ deprecated
-	static void flushCache();
-		/// Flushes the internal DNS cache.
-		///
-		/// As of 1.4.2, the DNS cache is no longer used
-		/// and this method does not do anything.
-
 	static std::string hostName();
 		/// Returns the host name of this host.
 

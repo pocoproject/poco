@@ -204,11 +204,6 @@ void DNS::reload()
 }
 
 
-void DNS::flushCache()
-{
-}
-
-
 std::string DNS::hostName()
 {
 	char buffer[256];
