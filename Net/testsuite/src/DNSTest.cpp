@@ -47,7 +47,7 @@ void DNSTest::testHostByName()
 #endif
 	assert (he1.addresses().size() >= 1);
 	assert (he1.addresses()[0].toString() == "1.2.3.4");
-	
+
 	try
 	{
 		HostEntry he1 = DNS::hostByName("nohost.pocoproject.org");
@@ -70,7 +70,7 @@ void DNSTest::testHostByAddress()
 	assert (he1.aliases().empty());
 	assert (he1.addresses().size() >= 1);
 	assert (he1.addresses()[0].toString() == "80.122.195.86");
-	
+
 	IPAddress ip2("10.0.244.253");
 	try
 	{
@@ -87,6 +87,19 @@ void DNSTest::testHostByAddress()
 
 
 void DNSTest::testResolve()
+{
+}
+
+
+void DNSTest::testEncodeIDN()
+{
+	std::string idn("d\xc3\xb6m\xc3\xa4in.example"); // domain.example with umlauts
+	assert (DNS::isIDN(idn));
+	assert (DNS::encodeIDN(idn) == "xn--dmin-moa0i.example");
+}
+
+
+void DNSTest::testDecodeIDN()
 {
 }
 
@@ -108,6 +121,8 @@ CppUnit::Test* DNSTest::suite()
 	CppUnit_addTest(pSuite, DNSTest, testHostByName);
 	CppUnit_addTest(pSuite, DNSTest, testHostByAddress);
 	CppUnit_addTest(pSuite, DNSTest, testResolve);
+	CppUnit_addTest(pSuite, DNSTest, testEncodeIDN);
+	CppUnit_addTest(pSuite, DNSTest, testDecodeIDN);
 
 	return pSuite;
 }

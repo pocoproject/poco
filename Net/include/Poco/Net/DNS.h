@@ -45,7 +45,7 @@ public:
 		DNS_HINT_AI_NUMERICSERV = AI_NUMERICSERV, /// Servicename must be a numeric port number
 		DNS_HINT_AI_ALL         = AI_ALL,         /// Query both IP6 and IP4 with AI_V4MAPPED
 		DNS_HINT_AI_ADDRCONFIG  = AI_ADDRCONFIG,  /// Resolution only if global address configured
-		DNS_HINT_AI_V4MAPPED    = AI_V4MAPPED     /// On v6 failure, query v4 and convert to V4MAPPED format	
+		DNS_HINT_AI_V4MAPPED    = AI_V4MAPPED     /// On v6 failure, query v4 and convert to V4MAPPED format
 #endif
 	};
 
@@ -54,7 +54,7 @@ public:
 		DNS_HINT_AI_CANONNAME | DNS_HINT_AI_ADDRCONFIG
 #else
 		DNS_HINT_NONE
-#endif		
+#endif
 		);
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given name. HintFlag argument is only
@@ -69,13 +69,13 @@ public:
 		/// Throws a DNSException in case of a general DNS error.
 		///
 		/// Throws an IOException in case of any other error.
-		
+
 	static HostEntry hostByAddress(const IPAddress& address, unsigned hintFlags =
 #ifdef POCO_HAVE_ADDRINFO
 		DNS_HINT_AI_CANONNAME | DNS_HINT_AI_ADDRCONFIG
 #else
 		DNS_HINT_NONE
-#endif		
+#endif
 		);
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given IP address. HintFlag argument is only
@@ -92,6 +92,10 @@ public:
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given IP address or host name.
 		///
+		/// If address contains a UTF-8 encoded IDN (internationalized
+		/// domain name), the domain name will be encoded first according
+		/// to Punycode.
+		///
 		/// Throws a HostNotFoundException if a host with the given
 		/// name cannot be found.
 		///
@@ -101,16 +105,16 @@ public:
 		/// Throws a DNSException in case of a general DNS error.
 		///
 		/// Throws an IOException in case of any other error.
-		
+
 	static IPAddress resolveOne(const std::string& address);
-		/// Convenience method that calls resolve(address) and returns 
+		/// Convenience method that calls resolve(address) and returns
 		/// the first address from the HostInfo.
 
 	static HostEntry thisHost();
 		/// Returns a HostEntry object containing the DNS information
 		/// for this host.
 		///
-		/// Throws a HostNotFoundException if DNS information 
+		/// Throws a HostNotFoundException if DNS information
 		/// for this host cannot be found.
 		///
 		/// Throws a NoAddressFoundException if no address can be
@@ -133,19 +137,53 @@ public:
 		///
 		/// As of 1.4.2, the DNS cache is no longer used
 		/// and this method does not do anything.
-		
+
 	static std::string hostName();
 		/// Returns the host name of this host.
+
+	static bool isIDN(const std::string& hostname);
+		/// Returns true if the given hostname is an internationalized
+		/// domain name (IDN) containing non-ASCII characters, otherwise false.
+		///
+		/// The IDN must be UTF-8 encoded.
+
+	static bool isEncodedIDN(const std::string& hostname);
+		/// Returns true if the given hostname is an Punycode-encoded
+		/// internationalized domain name (IDN), otherwise false.
+		///
+		/// An encoded IDN starts with the character sequence "xn--".
+
+	static std::string encodeIDN(const std::string& idn);
+		/// Encodes the given IDN (internationalized domain name), which must
+		/// be in UTF-8 encoding.
+		///
+		/// The resulting string will be encoded according to Punycode.
+
+	static std::string decodeIDN(const std::string& encodedIDN);
+		/// Decodes the given Punycode-encoded IDN (internationalized domain name).
+		///
+		/// The resulting string will be UTF-8 encoded.
 
 protected:
 	static int lastError();
 		/// Returns the code of the last error.
-		
+
 	static void error(int code, const std::string& arg);
 		/// Throws an exception according to the error code.
 
 	static void aierror(int code, const std::string& arg);
 		/// Throws an exception according to the getaddrinfo() error code.
+
+	static std::string encodeIDNLabel(const std::string& idn);
+		/// Encodes the given IDN (internationalized domain name) label, which must
+		/// be in UTF-8 encoding.
+		///
+		/// The resulting string will be encoded according to Punycode.
+
+	static std::string decodeIDNLabel(const std::string& encodedIDN);
+		/// Decodes the given Punycode-encoded IDN (internationalized domain name) label.
+		///
+		/// The resulting string will be UTF-8 encoded.
 };
 
 
