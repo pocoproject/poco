@@ -2,6 +2,7 @@ def os = org.gradle.internal.os.OperatingSystem.current()
 rootProject.name = 'Poco'
 
 include ':CppUnit'
+include ':Encodings'
 include ':Foundation'
 include ':XML'
 include ':JSON'
@@ -29,6 +30,7 @@ include ':Redis'
 include ':PocoDoc'
 include ':ProGen'
 
+include ':Encodings:testsuite'
 include ':Foundation:testsuite'
 include ':XML:testsuite'
 include ':JSON:testsuite'
@@ -51,6 +53,7 @@ include ':Redis:testsuite'
 include ':CppParser:testsuite'
 include ':Zip:testsuite'
 
+include ':Encodings:samples'
 include ':Foundation:samples'
 if (os.windows) {
 	include ':SQL:samples'
