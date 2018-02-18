@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -327,6 +327,12 @@
     <ClCompile Include="src\hpdf_xref.c">
       <Filter>3rd Party\HARU\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\XMLTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AttributedString.cpp" />
+    <ClCompile Include="src\Cell.cpp" />
+    <ClCompile Include="src\Table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\PDF\Destination.h">
