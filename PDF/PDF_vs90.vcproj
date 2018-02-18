@@ -391,6 +391,10 @@
 		<Filter
 			Name="Source Files">
 			<File
+				RelativePath=".\src\AttributedString.cpp"/>
+			<File
+				RelativePath=".\src\Cell.cpp"/>
+			<File
 				RelativePath=".\src\Destination.cpp"/>
 			<File
 				RelativePath=".\src\Document.cpp"/>
@@ -409,7 +413,11 @@
 			<File
 				RelativePath=".\src\PDFException.cpp"/>
 			<File
+				RelativePath=".\src\Table.cpp"/>
+			<File
 				RelativePath=".\src\TextAnnotation.cpp"/>
+			<File
+				RelativePath=".\src\XMLTemplate.cpp"/>
 		</Filter>
 		<Filter
 			Name="Header Files">
