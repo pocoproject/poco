@@ -285,7 +285,7 @@ subprojects {
 						}
 					}
 				}
-				def opensslHome = new File(rootDir, "openssl/VS_120")
+				def opensslHome = new File(rootDir, "openssl/build")
 				def opensslBrewHome = new File('/usr/local/opt/openssl')
 				def opensslLinuxHome = new File('/usr/lib/x86_64-linux-gnu')
 				crypto {
@@ -295,16 +295,16 @@ subprojects {
 						def libName = "foobar"
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-								libName = 'libcrypto.lib'
+								libName = 'libcryptod.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
 							} else if (targetPlatform.name == 'win64') {
-								libName = 'libcrypto.lib'
+								libName = 'libcryptod.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								libName = 'libcrypto.a'
+								libName = 'libcryptod.a'
 								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								libName = 'libcrypto.a'
+								libName = 'libcryptod.a'
 								staticLibraryFile = file("$opensslLinuxHome/$libName")
 							}
 						} else
@@ -331,23 +331,23 @@ subprojects {
 						def linkName
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-								dllName = 'libcrypto.dll'
-								linkName = 'libcrypto.lib'
+								dllName = 'libcryptod.dll'
+								linkName = 'libcryptod.lib'
 								sharedLibraryFile	 = file("$opensslHome/win32/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
 							} else if (targetPlatform.name == 'win64') {
-								dllName = 'libcrypto.dll'
-								linkName = 'libcrypto.lib'
+								dllName = 'libcryptod.dll'
+								linkName = 'libcryptod.lib'
 								sharedLibraryFile	 = file("$opensslHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								dllName = 'libcrypto.dylib'
-								linkName = 'libcrypto.dylib'
+								dllName = 'libcryptod.dylib'
+								linkName = 'libcryptod.dylib'
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								dllName = 'libcrypto.so'
-								linkName = 'libcrypto.so'
+								dllName = 'libcryptod.so'
+								linkName = 'libcryptod.so'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
@@ -386,16 +386,16 @@ subprojects {
 						def libName
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-								libName = 'libssl.lib'
+								libName = 'libssld.lib'
 								staticLibraryFile = file("$opensslHome/win32/lib/debug/$libName")
 							} else if (targetPlatform.name == 'win64') {
-								libName = 'libssl.lib'
+								libName = 'libssld.lib'
 								staticLibraryFile = file("$opensslHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								libName = 'libssl.a'
+								libName = 'libssld.a'
 								staticLibraryFile = file("$opensslBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								libName = 'libssl.a'
+								libName = 'libssld.a'
 								staticLibraryFile = file("$opensslLinuxHome/$libName")
 							}
 						} else
@@ -422,23 +422,23 @@ subprojects {
 						def linkName
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-								dllName = 'libssl.dll'
-								linkName = 'libssl.lib'
+								dllName = 'libssld.dll'
+								linkName = 'libssld.lib'
 								sharedLibraryFile	 = file("$opensslHome/win32/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win32/bin/debug/$linkName")
 							} else if (targetPlatform.name == 'win64') {
-								dllName = 'libssl.dll'
-								linkName = 'libssl.lib'
+								dllName = 'libssld.dll'
+								linkName = 'libssld.lib'
 								sharedLibraryFile	 = file("$opensslHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = file("$opensslHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								dllName = 'libssl.dylib'
-								linkName = 'libssl.dylib'
+								dllName = 'libssld.dylib'
+								linkName = 'libssld.dylib'
 								sharedLibraryFile	 = file("$opensslBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = file("$opensslBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-								dllName = 'libssl.so'
-								linkName = 'libssl.so'
+								dllName = 'libssld.so'
+								linkName = 'libssld.so'
 								sharedLibraryFile	 = file("$opensslLinuxHome/$dllName")
 								sharedLibraryLinkFile = file("$opensslLinuxHome/$linkName")
 							}
