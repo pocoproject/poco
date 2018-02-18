@@ -21,6 +21,7 @@ project(":PDF") {
 							srcDirs 'include', 'include/Poco/PDF'
 						}
 						lib project: ':Util', library: 'Util'
+						lib project: ':XML', library: 'XML'
 						lib project: ':Foundation', library: 'Foundation'
 					}
 				}
