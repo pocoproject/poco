@@ -21,7 +21,7 @@
 
 
 #include "Poco/Net/Net.h"
-
+#include "Poco/Crypto/Crypto.h"
 
 //
 // The following block is the standard way of creating macros which make exporting
@@ -38,11 +38,6 @@
 		#else
 			#define NetSSL_API __declspec(dllimport)
 		#endif
-	#else
-		#if (POCO_MSVS_VERSION >= 2015) // needed for OpenSSL
-			#pragma comment(lib, "legacy_stdio_definitions.lib")
-			#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
-		#endif
 	#endif
 #endif
 
@@ -57,14 +52,10 @@
 
 
 //
-// Automatically link NetSSL and OpenSSL library.
+// Automatically link NetSSL
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
-		#if !defined(POCO_EXTERNAL_OPENSSL)
-			#pragma comment(lib, "libcrypto.lib")
-			#pragma comment(lib, "libssl.lib")
-		#endif // POCO_EXTERNAL_OPENSSL
 		#if !defined(NetSSL_EXPORTS)
 			#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
 		#endif
