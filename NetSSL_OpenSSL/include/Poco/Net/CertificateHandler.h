@@ -1,11 +1,11 @@
 //
-// InvalidCertificateHandler.h
+// CertificateHandler.h
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
-// Module:  InvalidCertificateHandler
+// Module:  CertificateHandler
 //
-// Definition of the InvalidCertificateHandler class.
+// Definition of the CertificateHandler class.
 //
 // Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -14,11 +14,12 @@
 //
 
 
-#ifndef NetSSL_InvalidCertificateHandler_INCLUDED
-#define NetSSL_InvalidCertificateHandler_INCLUDED
+#ifndef NetSSL_CertificateHandler_INCLUDED
+#define NetSSL_CertificateHandler_INCLUDED
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/VerificationArgs.h"
 #include "Poco/Net/VerificationErrorArgs.h"
 
 
@@ -26,13 +27,17 @@ namespace Poco {
 namespace Net {
 
 
-class NetSSL_API InvalidCertificateHandler
-	/// A InvalidCertificateHandler is invoked whenever an error occurs verifying the certificate. It allows the user
+class CertificateHandler;
+typedef CertificateHandler InvalidCertificateHandler;
+
+
+class NetSSL_API CertificateHandler
+	/// A CertificateHandler is invoked whenever a verifying the certificate. It allows the user
 	/// to inspect and accept/reject the certificate.
-	/// One can install one's own InvalidCertificateHandler by implementing this interface. Note that
-	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API 
+	/// One can install one's own CertificateHandler by implementing this interface. Note that
+	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API
 	/// and the name of your handler class is MyGuiHandler):
-	///    
+	///
 	///    #include "Poco/Net/CertificateHandlerFactory.h"
 	///    ...
 	///    POCO_REGISTER_CHFACTORY(My_API, MyGuiHandler)
@@ -43,27 +48,31 @@ class NetSSL_API InvalidCertificateHandler
 	///
 	/// or in case one uses Poco::Util::Application one can rely on an XML configuration and put the following entry
 	/// under the path openSSL.invalidCertificateHandler:
-	///    
-	///    <invalidCertificateHandler>
+	///
+	///    <certificateHandler>
 	///        <name>MyGuiHandler<name>
 	///        <options>
 	///            [...] // Put optional config params for the handler here
 	///        </options>
-	///    </invalidCertificateHandler>
+	///    </certificateHandler>
 	///
-	/// Note that the name of the InvalidCertificateHandler must be same as the one provided to the POCO_REGISTER_CHFACTORY macro.
+	/// Note that the name of the CertificateHandler must be same as the one provided to the POCO_REGISTER_CHFACTORY macro.
 {
 public:
-	InvalidCertificateHandler(bool handleErrorsOnServerSide);
+	CertificateHandler(bool handleErrorsOnServerSide);
 		/// Creates the InvalidCertificateHandler.
-		/// 
+		///
 		/// Set handleErrorsOnServerSide to true if the certificate handler is used on the server side.
 		/// Automatically registers at one of the SSLManager::VerificationError events.
 
-	virtual ~InvalidCertificateHandler();
+	virtual ~CertificateHandler();
 		/// Destroys the InvalidCertificateHandler.
 
-	virtual void onInvalidCertificate(const void* pSender, VerificationErrorArgs& errorCert) = 0;
+	virtual void onValidCertificate(const void*, VerificationArgs& cert);
+		/// Receives the questionable certificate in parameter cert. If one wants to accept the
+		/// certificate, call cert.setError(false).
+
+	virtual void onInvalidCertificate(const void*, VerificationErrorArgs& errorCert);
 		/// Receives the questionable certificate in parameter errorCert. If one wants to accept the
 		/// certificate, call errorCert.setIgnoreError(true).
 
@@ -74,7 +83,21 @@ protected:
 };
 
 
+//
+// inlines
+//
+inline void CertificateHandler::onValidCertificate(const void*, VerificationArgs& cert)
+{
+	cert.setError(false);
+}
+
+inline void CertificateHandler::onInvalidCertificate(const void*, VerificationErrorArgs& errorCert)
+{
+	errorCert.setIgnoreError(false);
+}
+
+
 } } // namespace Poco::Net
 
 
-#endif // NetSSL_InvalidCertificateHandler_INCLUDED
+#endif // NetSSL_CertificateHandler_INCLUDED

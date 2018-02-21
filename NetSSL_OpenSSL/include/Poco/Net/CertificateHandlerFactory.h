@@ -25,7 +25,7 @@ namespace Poco {
 namespace Net {
 
 
-class InvalidCertificateHandler;
+class CertificateHandler;
 
 
 class NetSSL_API CertificateHandlerFactory
@@ -42,7 +42,7 @@ public:
 	virtual ~CertificateHandlerFactory();
 		/// Destroys the CertificateHandlerFactory.
 
-	virtual InvalidCertificateHandler* create(bool server) const = 0;
+	virtual CertificateHandler* create(bool server) const = 0;
 		/// Creates a new InvalidCertificateHandler. Set server to true if the certificate handler is used on the server side.
 };
 
@@ -74,7 +74,7 @@ public:
 	{
 	}
 
-	InvalidCertificateHandler* create(bool server) const
+	CertificateHandler* create(bool server) const
 	{
 		return new T(server);
 	}

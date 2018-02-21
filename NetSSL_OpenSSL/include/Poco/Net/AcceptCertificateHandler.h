@@ -19,7 +19,7 @@
 
 
 #include "Poco/Net/NetSSL.h"
-#include "Poco/Net/InvalidCertificateHandler.h"
+#include "Poco/Net/CertificateHandler.h"
 
 
 namespace Poco {

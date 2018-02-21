@@ -1,9 +1,9 @@
 //
-// InvalidCertificateHandler.cpp
+// CertificateHandler.cpp
 //
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
-// Module:  InvalidCertificateHandler
+// Module:  CertificateHandler
 //
 // Copyright (c) 2006-2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -12,7 +12,7 @@
 //
 
 
-#include "Poco/Net/InvalidCertificateHandler.h"
+#include "Poco/Net/CertificateHandler.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Delegate.h"
 
@@ -24,23 +24,35 @@ namespace Poco {
 namespace Net {
 
 
-InvalidCertificateHandler::InvalidCertificateHandler(bool handleErrorsOnServerSide): _handleErrorsOnServerSide(handleErrorsOnServerSide)
+CertificateHandler::CertificateHandler(bool handleErrorsOnServerSide): _handleErrorsOnServerSide(handleErrorsOnServerSide)
 {
 	if (_handleErrorsOnServerSide)
+	{
+		SSLManager::instance().ServerVerification += Delegate<CertificateHandler, VerificationArgs>(this, &CertificateHandler::onValidCertificate);
 		SSLManager::instance().ServerVerificationError += Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
+	}
 	else
+	{
+		SSLManager::instance().ClientVerification += Delegate<CertificateHandler, VerificationArgs>(this, &CertificateHandler::onValidCertificate);
 		SSLManager::instance().ClientVerificationError += Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
+	}
 }
 
 
-InvalidCertificateHandler::~InvalidCertificateHandler()
+CertificateHandler::~CertificateHandler()
 {
 	try
 	{
 		if (_handleErrorsOnServerSide)
+		{
+			SSLManager::instance().ServerVerification -= Delegate<CertificateHandler, VerificationArgs>(this, &CertificateHandler::onValidCertificate);
 			SSLManager::instance().ServerVerificationError -= Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
+		}
 		else
+		{
+			SSLManager::instance().ClientVerification -= Delegate<CertificateHandler, VerificationArgs>(this, &CertificateHandler::onValidCertificate);
 			SSLManager::instance().ClientVerificationError -= Delegate<InvalidCertificateHandler, VerificationErrorArgs>(this, &InvalidCertificateHandler::onInvalidCertificate);
+		}
 	}
 	catch (...)
 	{

@@ -89,6 +89,8 @@ void SSLManager::shutdown()
 	PrivateKeyPassphraseRequired.clear();
 	ClientVerificationError.clear();
 	ServerVerificationError.clear();
+	ClientVerification.clear();
+	ServerVerification.clear();
 	_ptrDefaultServerContext = 0;
 	_ptrDefaultClientContext = 0;
 }
@@ -106,19 +108,19 @@ SSLManager& SSLManager::instance()
 }
 
 
-void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
+void SSLManager::initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, CertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
 {
-	_ptrServerPassphraseHandler  = ptrPassphraseHandler;
-	_ptrServerCertificateHandler = ptrHandler;
-	_ptrDefaultServerContext     = ptrContext;
+	_ptrServerPassphraseHandler        = ptrPassphraseHandler;
+	_ptrServerCertificateHandler       = ptrHandler;
+	_ptrDefaultServerContext           = ptrContext;
 }
 
 
-void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
+void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, CertificateHandlerPtr ptrHandler, Context::Ptr ptrContext)
 {
-	_ptrClientPassphraseHandler  = ptrPassphraseHandler;
-	_ptrClientCertificateHandler = ptrHandler;
-	_ptrDefaultClientContext     = ptrContext;
+	_ptrClientPassphraseHandler        = ptrPassphraseHandler;
+	_ptrClientCertificateHandler       = ptrHandler;
+	_ptrDefaultClientContext           = ptrContext;
 }
 
 
@@ -177,7 +179,7 @@ SSLManager::PrivateKeyPassphraseHandlerPtr SSLManager::clientPassphraseHandler()
 }
 
 
-SSLManager::InvalidCertificateHandlerPtr SSLManager::serverCertificateHandler()
+SSLManager::CertificateHandlerPtr SSLManager::serverCertificateHandler()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
@@ -188,7 +190,7 @@ SSLManager::InvalidCertificateHandlerPtr SSLManager::serverCertificateHandler()
 }
 
 
-SSLManager::InvalidCertificateHandlerPtr SSLManager::clientCertificateHandler()
+SSLManager::CertificateHandlerPtr SSLManager::clientCertificateHandler()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
@@ -201,19 +203,32 @@ SSLManager::InvalidCertificateHandlerPtr SSLManager::clientCertificateHandler()
 
 int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 {
-	if (!ok)
+	X509* pCert = X509_STORE_CTX_get_current_cert(pStore);
+	X509Certificate x509(pCert, true);
+	X509Certificate x509CertToCheck(pStore->cert, true);
+	int depth = X509_STORE_CTX_get_error_depth(pStore);
+	int err = X509_STORE_CTX_get_error(pStore);
+	std::string error(X509_verify_cert_error_string(err));
+
+	if (ok)
 	{
-		X509* pCert = X509_STORE_CTX_get_current_cert(pStore);
-		X509Certificate x509(pCert, true);
-		int depth = X509_STORE_CTX_get_error_depth(pStore);
-		int err = X509_STORE_CTX_get_error(pStore);
-		std::string error(X509_verify_cert_error_string(err));
-		VerificationErrorArgs args(x509, depth, err, error);
+		VerificationArgs args(x509, x509CertToCheck, depth, err, error);
+		if (server)
+			SSLManager::instance().ServerVerification.notify(&SSLManager::instance(), args);
+		else
+			SSLManager::instance().ClientVerification.notify(&SSLManager::instance(), args);
+		ok = args.isError() ? 0 : 1;
+		X509_STORE_CTX_set_error(pStore, args.errorNumber());
+	}
+	else
+	{
+		VerificationErrorArgs args(x509, x509CertToCheck, depth, err, error);
 		if (server)
 			SSLManager::instance().ServerVerificationError.notify(&SSLManager::instance(), args);
 		else
 			SSLManager::instance().ClientVerificationError.notify(&SSLManager::instance(), args);
 		ok = args.getIgnoreError() ? 1 : 0;
+		X509_STORE_CTX_set_error(pStore, args.errorNumber());
 	}
 
 	return ok;

@@ -19,8 +19,9 @@ namespace Poco {
 namespace Net {
 
 
-VerificationErrorArgs::VerificationErrorArgs(const X509Certificate& cert, int errDepth, int errNum, const std::string& errMsg):
+VerificationErrorArgs::VerificationErrorArgs(const X509Certificate& cert, const X509Certificate &certToCheck, int errDepth, int errNum, const std::string& errMsg):
 	_cert(cert),
+	_certToCheck(certToCheck),
 	_errorDepth(errDepth),
 	_errorNumber(errNum),
 	_errorMessage(errMsg),
