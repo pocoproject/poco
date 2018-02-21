@@ -10,7 +10,7 @@
 SHL_EXT = $(SHAREDLIBLINKEXT)
 
 # Some systems (e.g. Mac OS X) make a difference between
-# shared libraries (as used by the linker/loader) and 
+# shared libraries (as used by the linker/loader) and
 # dynamic libraries, as used for dynamically loadable modules.
 # If no specific instructions for making dynamic libraries
 # are given, use the instructions for making shared libraries.
@@ -27,6 +27,7 @@ DYLIB_S_RELEASE    = $(BINPATH)/static/$(target)$(OSARCH_POSTFIX)$(SHL_EXT)
 
 TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
 TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_EXT     = $(foreach l,$(target_extlibs),-l$(l)$(OSARCH_POSTFIX))
 
 #
 # Include the compile rules
@@ -51,22 +52,22 @@ shared_release: bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, shared)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, shared)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, static)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, static)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 #
