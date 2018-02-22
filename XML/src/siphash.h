@@ -153,7 +153,7 @@ static struct sipkey *sip_tokey(struct sipkey *key, const void *src) {
 
 #define sip_binof(v) sip_tobin((unsigned char[8]){ 0 }, (v))
 
-static void *sip_tobin(void *dst, uint64_t u64) {
+static void POCO_UNUSED *sip_tobin(void *dst, uint64_t u64) {
 	SIP_U64TO8_LE((unsigned char *)dst, u64);
 	return dst;
 } /* sip_tobin() */
@@ -268,7 +268,7 @@ static uint64_t siphash24(const void *src, size_t len,
  * ...
  * in = 00 01 02 ... 3e (63 bytes)
  */
-static int sip24_valid(void) {
+static int POCO_UNUSED sip24_valid(void) {
 	static const unsigned char vectors[64][8] = {
 		{ 0x31, 0x0e, 0x0e, 0xdd, 0x47, 0xdb, 0x6f, 0x72, },
 		{ 0xfd, 0x67, 0xdc, 0x93, 0xc5, 0x39, 0xf8, 0x74, },
