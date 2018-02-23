@@ -202,7 +202,7 @@
     <Link>
       <AdditionalDependencies>iphlpapi.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin\static_mt\Templated.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\lib_2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>bin\static_mt\Templated.pdb</ProgramDatabaseFile>

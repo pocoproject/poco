@@ -21,7 +21,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/NumberParser.h"
 #include <utility>
-
+#include "BmpUtil.h"
 
 namespace Poco {
 namespace PDF {
@@ -215,8 +215,8 @@ const Image& Document::loadBMPImageImpl(const std::string& fileName, bool doLoad
 	Path path(fileName);
 
 	if (File(path).exists())
-	{
-		Image image(&_pdf, HPDF_LoadBMPImageFromFile(_pdf, fileName.c_str()));
+	{		
+		Image image(&_pdf, LoadBMPImageFromFile(_pdf, fileName.c_str()));
 		std::pair<ImageContainer::iterator, bool> it =
 			_images.insert(ImageContainer::value_type(path.getBaseName(), image));
 		if (it.second) return it.first->second;

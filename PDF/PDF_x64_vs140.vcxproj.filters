@@ -342,6 +342,9 @@
     <ClCompile Include="src\bmpread.c">
       <Filter>3rd Party</Filter>
     </ClCompile>
+    <ClCompile Include="src\BmpUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\PDF\Destination.h">
@@ -526,6 +529,9 @@
     </ClInclude>
     <ClInclude Include="src\bmpread.h">
       <Filter>3rd Party</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\PDF\BmpUtil.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

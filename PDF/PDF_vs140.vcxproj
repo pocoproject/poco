@@ -281,6 +281,7 @@
     <ClCompile Include="src\adler32.c" />
     <ClCompile Include="src\AttributedString.cpp" />
     <ClCompile Include="src\bmpread.c" />
+    <ClCompile Include="src\BmpUtil.cpp" />
     <ClCompile Include="src\Cell.cpp" />
     <ClCompile Include="src\compress.c" />
     <ClCompile Include="src\crc32.c" />
@@ -381,6 +382,7 @@
     <ClCompile Include="src\zutil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Poco\PDF\BmpUtil.h" />
     <ClInclude Include="include\Poco\PDF\crc32.h" />
     <ClInclude Include="include\Poco\PDF\deflate.h" />
     <ClInclude Include="include\Poco\PDF\Destination.h" />
