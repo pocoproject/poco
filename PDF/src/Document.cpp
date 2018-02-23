@@ -210,6 +210,22 @@ const Image& Document::loadPNGImageImpl(const std::string& fileName, bool doLoad
 		throw NotFoundException("File not found: " + fileName);
 }
 
+const Image& Document::loadBMPImageImpl(const std::string& fileName, bool doLoad)
+{
+	Path path(fileName);
+
+	if (File(path).exists())
+	{
+		Image image(&_pdf, HPDF_LoadBMPImageFromFile(_pdf, fileName.c_str()));
+		std::pair<ImageContainer::iterator, bool> it =
+			_images.insert(ImageContainer::value_type(path.getBaseName(), image));
+		if (it.second) return it.first->second;
+		else throw IllegalStateException("Could not insert image.");
+	}
+	else
+		throw NotFoundException("File not found: " + fileName);
+}
+
 
 const Image& Document::loadJPEGImage(const std::string& fileName)
 {

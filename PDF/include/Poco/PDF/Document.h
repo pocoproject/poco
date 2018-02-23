@@ -223,6 +223,9 @@ public:
 		/// If the embed parameter is true, the glyph data of the font is embedded, 
 		/// otherwise only the matrix data is included in PDF file.
 
+	const Image& loadBMPImage(const std::string& fileName);
+	/// Loads the specified PNG image from the file and returns reference to it.
+
 	const Image& loadPNGImage(const std::string& fileName);
 		/// Loads the specified PNG image from the file and returns reference to it.
 
@@ -320,6 +323,7 @@ private:
 		/// the resources are not unloaded.
 
 	const Image& loadPNGImageImpl(const std::string& fileName, bool doLoad);
+	const Image& loadBMPImageImpl(const std::string& fileName, bool doLoad);
 
 	HPDF_Doc         _pdf;
 	std::string      _fileName;
@@ -469,6 +473,10 @@ inline const Image& Document::loadPNGImage(const std::string& fileName)
 	return loadPNGImageImpl(fileName, true);
 }
 
+inline const Image& Document::loadBMPImage(const std::string& fileName)
+{
+	return loadBMPImageImpl(fileName, true);
+}
 
 inline const Image& Document::loadPNGImageInfo(const std::string& fileName)
 {

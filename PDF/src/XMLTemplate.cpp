@@ -364,8 +364,20 @@ public:
 		width *= scaleX;
 		height *= scaleY;
 
+		bool aspectratioH = static_cast<bool>(pStyle->getBool("aspectratioH", false));
+		if (aspectratioH) {
+			float fAspectRation = image.width()/ image.height();			
+			width = fAspectRation*height;			
+		}
+
 		float x = static_cast<float>(_styles.current()->getDouble("left", _styles.current()->getDouble("right", width) - width));
 		float y = static_cast<float>(_styles.current()->getDouble("bottom", _styles.current()->getDouble("top", _y) - height));
+
+		float offsetX = static_cast<float>(pStyle->getDouble("offsetX", 0.0F));
+		float offsetY = static_cast<float>(pStyle->getDouble("offsetY", 0.0F));
+
+		x += offsetX;
+		y += offsetY;
 
 		translateInBox(x, y);
 
@@ -716,6 +728,8 @@ protected:
 			return _pDocument->loadJPEGImage(p.toString());
 		else if (Poco::icompare(p.getExtension(), "png") == 0)
 			return _pDocument->loadPNGImage(p.toString());
+		else if (Poco::icompare(p.getExtension(), "bmp") == 0)
+			return _pDocument->loadBMPImage(p.toString());
 		else
 			throw Poco::InvalidArgumentException("cannot determine image type", path);
 	}
@@ -839,9 +853,9 @@ void XMLTemplate::load(std::istream& xmlStream)
 }
 
 
-void XMLTemplate::create(const std::string& path)
+void XMLTemplate::create(const std::string& fileName)
 {
-	_pDocument->save(path);
+	_pDocument->save(fileName);
 }
 
 

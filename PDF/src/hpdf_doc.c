@@ -24,6 +24,7 @@
 #include "hpdf_info.h"
 #include "hpdf_page_label.h"
 #include "hpdf.h"
+#include "bmpread.h"
 
 
 static const char * const HPDF_VERSION_STR[6] = {
@@ -1735,6 +1736,51 @@ HPDF_LoadJpegImageFromFile  (HPDF_Doc     pdf,
         HPDF_CheckError (&pdf->error);
 
     return image;
+}
+
+HPDF_EXPORT(HPDF_Image)
+HPDF_LoadBMPImageFromFile(HPDF_Doc     pdf,
+	const char  *filename)
+{
+	HPDF_Stream imagedata;
+	HPDF_Image image;
+
+	HPDF_PTRACE((" HPDF_LoadBMPImageFromFile\n"));
+
+	if (!HPDF_HasDoc(pdf))
+		return NULL;
+
+	/* create file stream */
+	imagedata = HPDF_FileReader_New(pdf->mmgr, filename);
+
+	if (HPDF_Stream_Validate(imagedata)) {
+		bmpread_t bmp;
+		unsigned int flags = BMPREAD_ANY_SIZE | BMPREAD_TOP_DOWN;
+		if (!bmpread(filename, flags, &bmp)) {
+			image = NULL;
+		}
+		else {
+			//BMP Loaded
+			HPDF_UINT          width = bmp.width;
+			HPDF_UINT          height = bmp.height;
+			HPDF_ColorSpace    color_space = HPDF_CS_DEVICE_RGB;//HPDF_CS_CAL_RGB
+			HPDF_UINT          bits_per_component = 8;
+			
+			image = HPDF_LoadRawImageFromMem(pdf, bmp.data, width, height, color_space, bits_per_component);
+			bmpread_free(&bmp);
+		}
+	}
+	else {
+		image = NULL;
+	}
+
+	/* destroy file stream */
+	HPDF_Stream_Free(imagedata);
+
+	if (!image)
+		HPDF_CheckError(&pdf->error);
+
+	return image;
 }
 
 HPDF_EXPORT(HPDF_Image)

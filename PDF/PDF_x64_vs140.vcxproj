@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|x64">
@@ -186,7 +186,7 @@
       <AdditionalIncludeDirectories>.\include;.\include\Poco\PDF;..\XML\include;..\Util\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -198,6 +198,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoPDFmtd.lib</OutputFile>
@@ -222,6 +223,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat />
       <CompileAs>Default</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoPDFmt.lib</OutputFile>
@@ -277,6 +279,7 @@
   <ItemGroup>
     <ClCompile Include="src\adler32.c" />
     <ClCompile Include="src\AttributedString.cpp" />
+    <ClCompile Include="src\bmpread.c" />
     <ClCompile Include="src\Cell.cpp" />
     <ClCompile Include="src\compress.c" />
     <ClCompile Include="src\crc32.c" />
@@ -437,6 +440,7 @@
     <ClInclude Include="include\Poco\PDF\zconf.h" />
     <ClInclude Include="include\Poco\PDF\zlib.h" />
     <ClInclude Include="include\Poco\PDF\zutil.h" />
+    <ClInclude Include="src\bmpread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
