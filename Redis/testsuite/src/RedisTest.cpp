@@ -32,7 +32,7 @@ RedisTest::RedisTest(const std::string& name):
 	_host("localhost"),
 	_port(6379)
 {
-#ifdef __ANDROID__
+#ifdef POCO_ANDROID
 	_host = "10.0.2.2";
 #endif
 	if (!_connected)

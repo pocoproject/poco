@@ -52,10 +52,9 @@ void ICMPClientTest::testPing()
 	registerDelegates(icmpClient);
 
 	assert(icmpClient.ping("127.0.0.1") > 0);
-
 #ifdef POCO_ANDROID
-	assert(icmpClient.ping("10.0.2.15", 4) > 0);
-	assert(icmpClient.ping("10.0.2.2", 4) > 0);
+	assert(_icmpClient.ping("10.0.2.15", 4) > 0);
+	assert(_icmpClient.ping("10.0.2.2", 4) > 0);
 #else
 	assert(icmpClient.ping("www.appinf.com", 4) > 0);
 

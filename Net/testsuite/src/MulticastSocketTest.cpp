@@ -60,7 +60,7 @@ void MulticastSocketTest::testMulticast()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-#ifndef __ANDROID__
+#ifndef POCO_ANDROID
 		throw e;
 #endif
 	}
