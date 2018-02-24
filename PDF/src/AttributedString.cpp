@@ -1,6 +1,16 @@
 //
 // AttributedString.cpp
 //
+// Library: PDF
+// Package: PDFCore
+// Module:  AttributedString
+//
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
 
 #include "Poco/PDF/AttributedString.h"
 #include "Poco/Format.h"
