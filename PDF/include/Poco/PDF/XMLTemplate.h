@@ -1,6 +1,17 @@
 //
 // XMLTemplate.h
 //
+// Library: PDF
+// Package: PDFCore
+// Module:  XMLTemplate
+//
+// Definition of the XMLTemplate class.
+//
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 
 #ifndef PDF_XMLTemplate_INCLUDED
