@@ -177,7 +177,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 } // namespace Poco
 
 
-#elif defined(__CYGWIN__) || POCO_OS == POCO_OS_LINUX
+#elif defined(__CYGWIN__) || POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 //
 // Linux, Cygwin
 //

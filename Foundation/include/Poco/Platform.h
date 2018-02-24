@@ -38,6 +38,7 @@
 #define POCO_OS_VXWORKS       0x000c
 #define POCO_OS_CYGWIN        0x000d
 #define POCO_OS_NACL	      0x000e
+#define POCO_OS_ANDROID       0x000f
 #define POCO_OS_UNKNOWN_UNIX  0x00ff
 #define POCO_OS_WINDOWS_NT    0x1001
 #define POCO_OS_WINDOWS_CE    0x1011
@@ -62,7 +63,11 @@
 	#define POCO_OS POCO_OS_NACL
 #elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__) || defined(EMSCRIPTEN)
 	#define POCO_OS_FAMILY_UNIX 1
-	#define POCO_OS POCO_OS_LINUX
+	#if defined(__ANDROID__)
+		#define POCO_OS POCO_OS_ANDROID
+	#else
+		#define POCO_OS POCO_OS_LINUX
+	#endif
 #elif defined(__APPLE__) || defined(__TOS_MACOS__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS_FAMILY_BSD 1

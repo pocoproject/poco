@@ -28,7 +28,7 @@
 #else
 #include "Poco/RWLock_WIN32.h"
 #endif
-#elif defined(POCO_ANDROID)
+#elif POCO_OS == POCO_OS_ANDROID
 #include "Poco/RWLock_Android.h"
 #elif defined(POCO_VXWORKS)
 #include "Poco/RWLock_VX.h"
