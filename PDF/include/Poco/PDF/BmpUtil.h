@@ -1,7 +1,17 @@
 //
 // BmpUtil.h
 //
-
+// Library: PDF
+// Package: PDFCore
+// Module:  BmpUtil
+//
+// Definition of the utiity finctions and classes.
+//
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 #ifndef PDF_BmpUtil_INCLUDED
 #define PDF_BmpUtil_INCLUDED
