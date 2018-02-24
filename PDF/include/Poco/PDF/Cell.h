@@ -1,6 +1,17 @@
 //
 // Cell.h
 //
+// Library: PDF
+// Package: PDFCore
+// Module:  Cell
+//
+// Definition of the Cell class.
+//
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 
 #ifndef PDF_Cell_INCLUDED
