@@ -26,11 +26,7 @@ endif()
 target_link_libraries( ${TESTUNIT} PocoCrypto PocoXML PocoUtil PocoFoundation PocoCppUnit )
 
 if(MSVC AND USING_INTERNAL_OPENSSL)
-    foreach(_OSSL_PATH ${OPENSSL_ROOT_DIR})
-        string(REPLACE "/" "\\" _OSSL_PATH ${_OSSL_PATH})
-        string(APPEND _ENV_PATH ${_OSSL_PATH} "\;")
-    endforeach()
-    set_tests_properties(${LIBNAME} PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${_ENV_PATH}")
+	set_tests_properties(${LIBNAME} PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")
 endif(MSVC AND USING_INTERNAL_OPENSSL)
 
 if(UNIX AND NOT ANDROID)
