@@ -21,7 +21,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/NumberParser.h"
 #include <utility>
-#include "BmpUtil.h"
+#include "Util.h"
 
 namespace Poco {
 namespace PDF {

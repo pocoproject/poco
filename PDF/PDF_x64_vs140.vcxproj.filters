@@ -342,7 +342,7 @@
     <ClCompile Include="src\bmpread.c">
       <Filter>3rd Party</Filter>
     </ClCompile>
-    <ClCompile Include="src\BmpUtil.cpp">
+    <ClCompile Include="src\Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -530,7 +530,7 @@
     <ClInclude Include="src\bmpread.h">
       <Filter>3rd Party</Filter>
     </ClInclude>
-    <ClInclude Include="include\Poco\PDF\BmpUtil.h">
+    <ClInclude Include="include\Poco\PDF\Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

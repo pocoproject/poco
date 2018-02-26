@@ -280,7 +280,6 @@
     <ClCompile Include="src\adler32.c" />
     <ClCompile Include="src\AttributedString.cpp" />
     <ClCompile Include="src\bmpread.c" />
-    <ClCompile Include="src\BmpUtil.cpp" />
     <ClCompile Include="src\Cell.cpp" />
     <ClCompile Include="src\compress.c" />
     <ClCompile Include="src\crc32.c" />
@@ -377,12 +376,12 @@
     <ClCompile Include="src\Table.cpp" />
     <ClCompile Include="src\TextAnnotation.cpp" />
     <ClCompile Include="src\trees.c" />
+    <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\XMLTemplate.cpp" />
     <ClCompile Include="src\zutil.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\PDF\AttributedString.h" />
-    <ClInclude Include="include\Poco\PDF\BmpUtil.h" />
     <ClInclude Include="include\Poco\PDF\Cell.h" />
     <ClInclude Include="include\Poco\PDF\crc32.h" />
     <ClInclude Include="include\Poco\PDF\deflate.h" />
@@ -438,6 +437,7 @@
     <ClInclude Include="include\Poco\PDF\Table.h" />
     <ClInclude Include="include\Poco\PDF\TextAnnotation.h" />
     <ClInclude Include="include\Poco\PDF\trees.h" />
+    <ClInclude Include="include\Poco\PDF\Util.h" />
     <ClInclude Include="include\Poco\PDF\XMLTemplate.h" />
     <ClInclude Include="include\Poco\PDF\zconf.h" />
     <ClInclude Include="include\Poco\PDF\zlib.h" />
