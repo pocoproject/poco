@@ -18,7 +18,7 @@
 
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 
-#include "poco/DOM/DOMImplementation.h"
+#include "Poco/DOM/DOMImplementation.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/Element.h"
