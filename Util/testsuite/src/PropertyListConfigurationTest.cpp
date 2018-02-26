@@ -103,6 +103,7 @@ void PropertyListConfigurationTest::testSave()
 	istr.write("#0", 2);
 	pConf->setData("prop5", istr);
 	pConf->setDouble("prop6", 3.14);
+	pConf->setString("prop7.prop8", "nestedvalue");
 
 	std::ostringstream ostr;
 	pConf->save(ostr);
@@ -124,6 +125,11 @@ void PropertyListConfigurationTest::testSave()
 		"\t\t<data>IzA=</data>\n"
 		"\t\t<key>prop6</key>\n"
 		"\t\t<real>3.14</real>\n"
+		"\t\t<key>prop7</key>\n"
+		"\t\t<dict>\n"
+		"\t\t\t<key>prop8</key>\n"
+		"\t\t\t<string>nestedvalue</string>\n"
+		"\t\t</dict>\n"
 		"\t</dict>\n"
 		"</plist>\n");
 }
