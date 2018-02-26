@@ -1,5 +1,5 @@
 //
-// PropertyFileConfiguration.h
+// PropertyListConfiguration.h
 //
 // Library: Util
 // Package: Configuration
