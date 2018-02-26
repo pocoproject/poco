@@ -11,7 +11,7 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	HelpFormatterTest IniFileConfigurationTest LayeredConfigurationTest \
 	LoggingConfiguratorTest MapConfigurationTest \
 	OptionProcessorTest OptionSetTest OptionTest \
-	OptionsTestSuite PropertyFileConfigurationTest PropertyFileConfigurationTest \
+	OptionsTestSuite PropertyFileConfigurationTest PropertyListConfigurationTest \
 	SystemConfigurationTest UtilTestSuite XMLConfigurationTest \
 	FilesystemConfigurationTest ValidatorTest \
 	TimerTestSuite TimerTest \
