@@ -21,7 +21,7 @@
 #include "Poco/Util/Util.h"
 
 
-#ifndef POCO_UTIL_NO_XMLplistCONFIGURATION
+#ifndef POCO_UTIL_NO_XMLCONFIGURATION
 
 
 #include "Poco/Util/AbstractConfiguration.h"
