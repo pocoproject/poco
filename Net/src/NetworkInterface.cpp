@@ -1511,14 +1511,14 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 } } // namespace Poco::Net
 
 
-#elif POCO_OS == POCO_OS_LINUX
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 //
 // Linux
 //
 
 
 #include <sys/types.h>
-#ifndef POCO_ANDROID // Android doesn't have <ifaddrs.h>
+#if POCO_OS != POCO_OS_ANDROID // Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
@@ -1553,7 +1553,7 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
@@ -1609,7 +1609,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
