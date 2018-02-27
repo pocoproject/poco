@@ -66,17 +66,36 @@ void NamedEventTest::testNamedEvent()
 	thr1.start(te);
 	Timestamp now;
 	Thread::sleep(2000);
-	testEvent.set();
+	try {
+		testEvent.set();
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#ifndef POCO_ANDROID
+		throw e;
+#endif
+	}
 	thr1.join();
+#ifndef POCO_ANDROID
 	assert (te.timestamp() > now);
-
+#endif
 	Thread thr2;
 	thr2.start(te);
 	now.update();
 	Thread::sleep(2000);
-	testEvent.set();
+	try {
+		testEvent.set();
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#ifndef POCO_ANDROID
+		throw e;
+#endif
+	}
 	thr2.join();
+#ifndef POCO_ANDROID
 	assert (te.timestamp() > now);
+#endif
 }
 
 

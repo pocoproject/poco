@@ -12,10 +12,6 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
-POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
-    src/WinCEDriver.cpp
-)
-
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 if(ANDROID)
     add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
@@ -23,4 +19,4 @@ if(ANDROID)
 else()
     add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
 endif()
-target_link_libraries( ${TESTUNIT} ${CMAKE_THREAD_LIBS_INIT} PocoXML PocoFoundation PocoCppUnit)
+target_link_libraries( ${TESTUNIT} PocoDataMySQL PocoData PocoFoundation CppUnit )
