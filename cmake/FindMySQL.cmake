@@ -50,7 +50,7 @@ if (WIN32)
 				 ${BINDIR32}/MySQL/*/lib/vs10
 				 $ENV{SystemDrive}/MySQL/*/lib/${libsuffixDist})
 else (WIN32)
-	find_library(MYSQL_LIB NAMES mysqlclient mysqlclient_r
+	find_library(MYSQL_LIB NAMES mysqlclient mysqlclient
 				 PATHS
 				 /usr/lib/mysql
 				 /usr/local/lib/mysql
