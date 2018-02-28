@@ -140,6 +140,23 @@ void HTTPClientSession::setPort(Poco::UInt16 port)
 }
 
 
+void HTTPClientSession::setSourceAddress(const SocketAddress& address)
+{
+	if (!connected())
+	{
+		_sourceAddress = address;
+	}
+	else
+		throw IllegalStateException("Cannot set the source address for an already connected session");
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress()
+{
+	return _sourceAddress;
+}
+
+
 void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
 {
 	if (!connected())
@@ -389,7 +406,10 @@ void HTTPClientSession::reconnect()
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
 		SocketAddress addr(_host, _port);
-		connect(addr);
+		if ((!_sourceAddress.host().isWildcard()) || (_sourceAddress.port() != 0))
+			connect(addr, _sourceAddress);
+		else
+			connect(addr);
 	}
 	else
 	{
