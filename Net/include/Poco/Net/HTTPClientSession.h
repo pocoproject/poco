@@ -126,6 +126,23 @@ public:
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
+        void setSourceAddress(const SocketAddress& address);
+		/// Sets the source IP address and source port for the HTTPClientSession
+		/// socket.
+		///
+		/// The source address must not be changed once there
+		/// is an open connection to the server.
+		///
+		/// Note: Both the source IP address and source port can be set
+		/// using this function, but the typical client use is to set
+		/// the source IP address only and the source port portion
+		/// would normally be passed as 0 meaning that any port value
+		/// can be used on the source side of the socket. 
+		///
+
+        const SocketAddress& getSourceAddress();
+		/// Returns the source address previously set
+
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Sets the proxy host name and port number.
 		
@@ -304,6 +321,7 @@ protected:
 private:
 	std::string     _host;
 	Poco::UInt16    _port;
+	Poco::Net::SocketAddress _sourceAddress;
 	ProxyConfig     _proxyConfig;
 	Poco::Timespan  _keepAliveTimeout;
 	Poco::Timestamp _lastRequest;
