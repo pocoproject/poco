@@ -1,8 +1,6 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#6 $
-//
 // Library: Util
 // Package: Application
 // Module:  Application
@@ -43,9 +41,7 @@
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 using Poco::Logger;
@@ -138,7 +134,7 @@ void Application::init(int argc, char* pArgv[])
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if defined (POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
 void Application::init(int argc, wchar_t* argv[])
 {
 	std::vector<std::string> args;
@@ -170,7 +166,6 @@ void Application::init()
 	_pConfig->setString("application.dir", appPath.parent().toString());
 	_pConfig->setString("application.configDir", Path::configHome() + appPath.getBaseName() + Path::separator());
 	_pConfig->setString("application.cacheDir", Path::cacheHome() + appPath.getBaseName() + Path::separator());
-	_pConfig->setString("application.tempDir", Path::tempHome() + appPath.getBaseName() + Path::separator());
 	_pConfig->setString("application.dataDir", Path::dataHome() + appPath.getBaseName() + Path::separator());
 	processOptions();
 }
@@ -443,7 +438,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 		appPath.makeAbsolute();
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+	#if !defined(POCO_NO_WSTRING)
 		wchar_t path[1024];
 		int n = GetModuleFileNameW(0, path, sizeof(path)/sizeof(wchar_t));
 		if (n > 0)

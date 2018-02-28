@@ -1,8 +1,6 @@
 //
 // NumberParserTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NumberParserTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -33,10 +31,8 @@ using Poco::Int16;
 using Poco::UInt16;
 using Poco::Int32;
 using Poco::UInt32;
-#if defined(POCO_HAVE_INT64)
 using Poco::Int64;
 using Poco::UInt64;
-#endif
 using Poco::format;
 using Poco::decimalSeparator;
 using Poco::thousandSeparator;
@@ -76,6 +72,7 @@ void NumberParserTest::testParse()
 	assert(NumberParser::parseHex("12AB") == 0x12ab);
 	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
 	assert(NumberParser::parseHex("0X12AB") == 0x12ab);
+	assert(NumberParser::parseHex("0x99a") == 0x99a);
 	assert(NumberParser::parseHex("00") == 0);
 	assert(NumberParser::parseOct("123") == 0123);
 	assert(NumberParser::parseOct("0123") == 0123);
@@ -184,12 +181,9 @@ void NumberParserTest::testLimits()
 	assert(testUpperLimit<Int32>());
 	assert(testLowerLimit<Int32>());
 	assert(testUpperLimit<UInt32>());
-
-#if defined(POCO_HAVE_INT64)
 	assert(testUpperLimit64<Int64>());
 	assert(testLowerLimit64<Int64>());
 	assert(testUpperLimit64<UInt64>());
-#endif
 }
 
 
@@ -259,7 +253,14 @@ void NumberParserTest::testParseError()
 		NumberParser::parseHex("23z");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
-	
+
+	try
+	{
+		NumberParser::parseHex("xxx");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException&) {}
+
 #if defined(POCO_HAVE_INT64)
 
 	try
@@ -285,7 +286,7 @@ void NumberParserTest::testParseError()
 		NumberParser::parseHex64("12345z");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
-	
+
 	try
 	{
 		NumberParser::parseHex64(format("123%c45", ts));

@@ -1,8 +1,6 @@
 //
 // ZipFileInfo.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipFileInfo.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipFileInfo
@@ -197,7 +195,7 @@ private:
 		FULLEXTRA_DATA_SIZE = 28
 	};
 	
-	enum 
+	enum
 	{
 		DEFAULT_UNIX_FILE_MODE = 0640,
 		DEFAULT_UNIX_DIR_MODE  = 0755
@@ -213,7 +211,6 @@ private:
 	std::string	   _extraField;
 	std::string	   _fileComment;
 };
-
 
 
 inline Poco::UInt32 ZipFileInfo::getCRCFromHeader() const
@@ -387,36 +384,36 @@ inline Poco::UInt32 ZipFileInfo::getHeaderSize() const
 }
 
 
-inline bool ZipFileInfo::needsZip64() const 
+inline bool ZipFileInfo::needsZip64() const
 {
 	return _localHeaderOffset >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
 }
 
 
-inline void ZipFileInfo::setZip64Data() 
+inline void ZipFileInfo::setZip64Data()
 {
-	if (needsZip64()) 
+	if (needsZip64())
 	{
 		setRequiredVersion(4, 5);
 		char data[FULLEXTRA_DATA_SIZE];
 		ZipUtil::set16BitValue(ZipCommon::ZIP64_EXTRA_ID, data, EXTRA_DATA_TAG_POS);
 		Poco::UInt16 pos = EXTRA_DATA_POS;
-		if (_uncompressedSize >= ZipCommon::ZIP64_MAGIC) 
+		if (_uncompressedSize >= ZipCommon::ZIP64_MAGIC)
 		{
 			ZipUtil::set64BitValue(_uncompressedSize, data, pos); pos += 8;
 		}
-		if (_compressedSize >= ZipCommon::ZIP64_MAGIC) 
+		if (_compressedSize >= ZipCommon::ZIP64_MAGIC)
 		{
 			ZipUtil::set64BitValue(_compressedSize, data, pos); pos += 8;
 		}
-		if (_localHeaderOffset >= ZipCommon::ZIP64_MAGIC) 
+		if (_localHeaderOffset >= ZipCommon::ZIP64_MAGIC)
 		{
 			ZipUtil::set64BitValue(_localHeaderOffset, data, pos); pos += 8;
 		}
 		ZipUtil::set16BitValue(pos - EXTRA_DATA_POS, data, EXTRA_DATA_SIZE_POS);
 		_extraField = std::string(data, pos);
 		ZipUtil::set16BitValue(pos, _rawInfo, EXTRAFIELD_LENGTH_POS);
-	}  
+	}
 }
 
 
@@ -458,7 +455,7 @@ inline void ZipFileInfo::setCompressionLevel(ZipCommon::CompressionLevel cl)
 {
 	// bit 1 and 2 indicate the level
 	Poco::UInt16 val = static_cast<Poco::UInt16>(cl);
-	val <<= 1; 
+	val <<= 1;
 	Poco::UInt16 mask = 0xfff9;
 	_rawInfo[GENERAL_PURPOSE_POS] = ((_rawInfo[GENERAL_PURPOSE_POS] & mask) | val);
 }

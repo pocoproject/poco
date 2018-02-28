@@ -1,8 +1,6 @@
 //
 // RWLock_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RWLock_WINCE.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock
@@ -21,7 +19,7 @@
 namespace Poco {
 
 
-RWLockImpl::RWLockImpl(): 
+RWLockImpl::RWLockImpl():
 	_readerCount(0),
 	_readerWaiting(0),
 	_writerCount(0),
@@ -58,7 +56,7 @@ void RWLockImpl::readLockImpl()
 bool RWLockImpl::tryReadLockImpl(DWORD timeout)
 {
 	bool wait = false;
-	do 
+	do
 	{
 		EnterCriticalSection(&_cs);
 		if (!_writerCount && !_writerWaiting)
@@ -70,31 +68,31 @@ bool RWLockImpl::tryReadLockImpl(DWORD timeout)
 			}
 			_readerCount++;
 		}
-		else 
+		else
 		{
-			if (!wait) 
+			if (!wait)
 			{
 				_readerWaiting++;
 				wait = true;
 			}
 			ResetEvent(_readerGreen);
 		}
-		LeaveCriticalSection(&_cs); 
-		if (wait) 
+		LeaveCriticalSection(&_cs);
+		if (wait)
 		{
-			if (WaitForSingleObject(_readerGreen, timeout) != WAIT_OBJECT_0) 
+			if (WaitForSingleObject(_readerGreen, timeout) != WAIT_OBJECT_0)
 			{
 				EnterCriticalSection(&_cs);
 				_readerWaiting--;
-				SetEvent(_readerGreen); 
+				SetEvent(_readerGreen);
 				SetEvent(_writerGreen);
 				LeaveCriticalSection(&_cs);
 				return false;
 			}
 		}
-	} 
+	}
 	while (wait);
-   
+
 	return true;
 }
 
@@ -109,21 +107,21 @@ bool RWLockImpl::tryWriteLockImpl(DWORD timeout)
 {
 	bool wait = false;
 
-	do 
+	do
 	{
 		EnterCriticalSection(&_cs);
 		if (!_readerCount && !_writerCount)
 		{
-			if (wait) 
+			if (wait)
 			{
 				_writerWaiting--;
 				wait = false;
 			}
 			_writerCount++;
 		}
-		else 
+		else
 		{
-			if (!wait) 
+			if (!wait)
 			{
 				_writerWaiting++;
 				wait = true;
@@ -131,9 +129,9 @@ bool RWLockImpl::tryWriteLockImpl(DWORD timeout)
 			ResetEvent(_writerGreen);
 		}
 		LeaveCriticalSection(&_cs);
-		if (wait) 
+		if (wait)
 		{
-			if (WaitForSingleObject(_writerGreen, timeout) != WAIT_OBJECT_0) 
+			if (WaitForSingleObject(_writerGreen, timeout) != WAIT_OBJECT_0)
 			{
 				EnterCriticalSection(&_cs);
 				_writerWaiting--;
@@ -167,8 +165,8 @@ void RWLockImpl::unlockImpl()
 	if (_writerWaiting)
 		SetEvent(_writerGreen);
 	else if (_readerWaiting)
-		SetEvent(_readerGreen);   
-		  
+		SetEvent(_readerGreen);
+		
 	LeaveCriticalSection(&_cs);
 }
 

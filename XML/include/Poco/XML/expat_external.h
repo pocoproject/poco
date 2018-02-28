@@ -93,7 +93,10 @@ extern "C" {
 #endif
 
 #ifdef XML_UNICODE_WCHAR_T
-#define XML_UNICODE
+# define XML_UNICODE
+# if defined(__SIZEOF_WCHAR_T__) && (__SIZEOF_WCHAR_T__ != 2)
+#  error "sizeof(wchar_t) != 2; Need -fshort-wchar for both Expat and libc"
+# endif
 #endif
 
 #ifdef XML_UNICODE     /* Information is UTF-16 encoded. */
@@ -111,7 +114,7 @@ typedef char XML_LChar;
 
 #ifdef XML_LARGE_SIZE  /* Use large integers for file/stream positions. */
 #if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
-typedef __int64 XML_Index; 
+typedef __int64 XML_Index;
 typedef unsigned __int64 XML_Size;
 #else
 typedef long long XML_Index;

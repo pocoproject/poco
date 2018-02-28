@@ -1,8 +1,6 @@
 //
 // RemoteSyslogListener.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogListener.cpp#4 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogListener
@@ -496,7 +494,7 @@ void RemoteSyslogListener::setProperty(const std::string& name, const std::strin
 		else
 			throw Poco::InvalidArgumentException("Invalid number of threads", value);
 	}
-	else 
+	else
 	{
 		SplitterChannel::setProperty(name, value);
 	}

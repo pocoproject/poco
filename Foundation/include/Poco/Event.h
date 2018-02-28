@@ -1,8 +1,6 @@
 //
 // Event.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Event.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Event
@@ -22,21 +20,15 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/Event_WIN32.h"
-#elif defined(POCO_VXWORKS)
-#include "Poco/Event_VX.h"
-#else
-#include "Poco/Event_POSIX.h"
-#endif
+#include <condition_variable>
+#include <mutex>
+#include <atomic>
 
 
 namespace Poco {
 
 
-class Foundation_API Event: private EventImpl
+class Foundation_API Event
 	/// An Event is a synchronization object that
 	/// allows one thread to signal one or more
 	/// other threads that a certain event
@@ -48,8 +40,8 @@ class Foundation_API Event: private EventImpl
 public:
 	enum EventType
 	{
-		EVENT_MANUALRESET = EVENT_MANUALRESET_IMPL, /// Manual reset event
-		EVENT_AUTORESET = EVENT_AUTORESET_IMPL      /// Auto-reset event
+		EVENT_MANUALRESET, /// Manual reset event
+		EVENT_AUTORESET    /// Auto-reset event
 	};
 
 	explicit Event(EventType type = EVENT_AUTORESET);
@@ -66,7 +58,7 @@ public:
 
 	void set();
 		/// Signals the event. If autoReset is true,
-		/// only one thread waiting for the event 
+		/// only one thread waiting for the event
 		/// can resume execution.
 		/// If autoReset is false, all waiting threads
 		/// can resume execution.
@@ -88,44 +80,33 @@ public:
 
 	void reset();
 		/// Resets the event to unsignalled state.
-	
+
 private:
 	Event(const Event&);
 	Event& operator = (const Event&);
+
+	bool waitImpl(long milliseconds);
+
+	std::condition_variable _cond;
+	std::mutex _mutex;
+	std::atomic<bool> _state;
+	bool _autoreset;
 };
 
 
 //
 // inlines
 //
-inline void Event::set()
-{
-	setImpl();
-}
-
-
-inline void Event::wait()
-{
-	waitImpl();
-}
-
 
 inline void Event::wait(long milliseconds)
 {
-	if (!waitImpl(milliseconds))
-		throw TimeoutException();
+	if (!waitImpl(milliseconds)) throw TimeoutException();
 }
 
 
 inline bool Event::tryWait(long milliseconds)
 {
 	return waitImpl(milliseconds);
-}
-
-
-inline void Event::reset()
-{
-	resetImpl();
 }
 
 

@@ -1,8 +1,6 @@
 //
 // ValueTraits.h
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  ValueTraits
@@ -25,7 +23,7 @@
 
 #include "XMLStreamParserException.h"
 #include <string>
-#include <cstddef> 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 

@@ -1,8 +1,6 @@
 //
 // RSACipherImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSACipherImpl.h#2 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSACipherImpl
@@ -32,9 +30,9 @@ namespace Crypto {
 
 
 class RSACipherImpl: public Cipher
-	/// An implementation of the Cipher class for 
+	/// An implementation of the Cipher class for
 	/// asymmetric (public-private key) encryption
-	/// based on the the RSA algorithm in OpenSSL's 
+	/// based on the the RSA algorithm in OpenSSL's
 	/// crypto library.
 	///
 	/// Encryption is using the public key, decryption

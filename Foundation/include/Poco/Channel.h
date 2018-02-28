@@ -1,8 +1,6 @@
 //
 // Channel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Channel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Channel
@@ -45,7 +43,7 @@ public:
 		/// the reference count to one.
 
 	virtual void open();
-		/// Does whatever is necessary to open the channel. 
+		/// Does whatever is necessary to open the channel.
 		/// The default implementation does nothing.
 		
 	virtual void close();

@@ -1,8 +1,6 @@
 //
 // QName.h
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  QName
@@ -132,6 +130,6 @@ XML_API std::ostream& operator << (std::ostream&, const QName&);
 
 
 } } // namespace Poco::XML
- 
+
 
 #endif // XML_QName_INCLUDED

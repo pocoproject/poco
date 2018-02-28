@@ -1,8 +1,6 @@
 //
 // Process_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process_UNIX.h#3 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process
@@ -64,11 +62,11 @@ public:
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static ProcessHandleImpl* launchImpl(
-		const std::string& command, 
-		const ArgsImpl& args, 
+		const std::string& command,
+		const ArgsImpl& args,
 		const std::string& initialDirectory,
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe,
 		const EnvImpl& env);
 	static void killImpl(ProcessHandleImpl& handle);
@@ -79,11 +77,11 @@ public:
 
 private:
 	static ProcessHandleImpl* launchByForkExecImpl(
-		const std::string& command, 
-		const ArgsImpl& args, 
+		const std::string& command,
+		const ArgsImpl& args,
 		const std::string& initialDirectory,
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe,
 		const EnvImpl& env);
 };

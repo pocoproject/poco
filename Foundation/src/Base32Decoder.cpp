@@ -1,8 +1,6 @@
 //
 // Base32Decoder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Base32Decoder.cpp#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  Base32
@@ -34,7 +32,7 @@ namespace
 }
 
 
-Base32DecoderBuf::Base32DecoderBuf(std::istream& istr): 
+Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
 	_groupLength(0),
 	_groupIndex(0),
 	_buf(*istr.rdbuf())
@@ -63,7 +61,7 @@ Base32DecoderBuf::~Base32DecoderBuf()
 
 int Base32DecoderBuf::readFromDevice()
 {
-	if (_groupIndex < _groupLength) 
+	if (_groupIndex < _groupLength)
 	{
 		return _group[_groupIndex++];
 	}
@@ -111,11 +109,11 @@ int Base32DecoderBuf::readFromDevice()
 
 		if (buffer[2] == '=')
 			_groupLength = 1;
-		else if (buffer[4] == '=') 
+		else if (buffer[4] == '=')
 			_groupLength = 2;
-		else if (buffer[5] == '=') 
+		else if (buffer[5] == '=')
 			_groupLength = 3;
-		else if (buffer[7] == '=') 
+		else if (buffer[7] == '=')
 			_groupLength = 4;
 		else
 			_groupLength = 5;

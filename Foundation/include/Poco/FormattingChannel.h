@@ -1,8 +1,6 @@
 //
 // FormattingChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FormattingChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Formatter
@@ -56,7 +54,7 @@ public:
 		/// which may be null.
 
 	void setChannel(Channel* pChannel);
-		/// Sets the destination channel to which the formatted 
+		/// Sets the destination channel to which the formatted
 		/// messages are passed on.
 		
 	Channel* getChannel() const;

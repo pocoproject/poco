@@ -1,8 +1,6 @@
 //
 // NetSSL.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/NetSSL.h#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  OpenSSL
@@ -23,21 +21,23 @@
 
 
 #include "Poco/Net/Net.h"
-
+#include "Poco/Crypto/Crypto.h"
 
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the NetSSL_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// NetSSL_API functions as being imported from a DLL, wheras this DLL sees symbols
+// NetSSL_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
-	#if defined(NetSSL_EXPORTS)
-		#define NetSSL_API __declspec(dllexport)
-	#else
-		#define NetSSL_API __declspec(dllimport)
+#if defined(_WIN32)
+	#if defined(POCO_DLL)
+		#if defined(NetSSL_EXPORTS)
+			#define NetSSL_API __declspec(dllexport)
+		#else
+			#define NetSSL_API __declspec(dllimport)
+		#endif
 	#endif
 #endif
 
@@ -52,12 +52,14 @@
 
 
 //
-// Automatically link NetSSL library.
+// Automatically link NetSSL
 //
 #if defined(_MSC_VER)
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(NetSSL_EXPORTS)
-		#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
-	#endif
+	#if !defined(POCO_NO_AUTOMATIC_LIBS)
+		#if !defined(NetSSL_EXPORTS)
+			#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
+		#endif
+	#endif // POCO_NO_AUTOMATIC_LIBS
 #endif
 
 
@@ -70,7 +72,7 @@ void NetSSL_API initializeSSL();
 	/// libraries, by calling Poco::Crypto::OpenSSLInitializer::initialize().
 	///
 	/// Should be called before using any class from the NetSSL library.
-	/// The NetSSL will be initialized automatically, through 
+	/// The NetSSL will be initialized automatically, through
 	/// Poco::Crypto::OpenSSLInitializer instances or similar mechanisms
 	/// when creating Context or SSLManager instances.
 	/// However, it is recommended to call initializeSSL()
@@ -82,7 +84,7 @@ void NetSSL_API initializeSSL();
 	
 
 void NetSSL_API uninitializeSSL();
-	/// Uninitializes the NetSSL library by calling 
+	/// Uninitializes the NetSSL library by calling
 	/// Poco::Crypto::OpenSSLInitializer::uninitialize() and
 	/// shutting down the SSLManager.
 

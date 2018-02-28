@@ -1,8 +1,6 @@
 //
 // Object.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Object
@@ -23,6 +21,7 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Stringifier.h"
+#include "Poco/JSONString.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
@@ -39,26 +38,26 @@ namespace JSON {
 
 
 class JSON_API Object
-	/// Represents a JSON object. JSON object provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to 
-	/// convert object to DynamicStruct. Conversion requires copying and therefore
+	/// Represents a JSON object. Object provides a representation based on
+	/// shared pointers and optimized for performance. It is possible to
+	/// convert Object to DynamicStruct. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
-	/// 
+	///
 	///    std::string json = "{ \"test\" : { \"property\" : \"value\" } }";
 	///    Parser parser;
 	///    Var result = parser.parse(json);
-	/// 
+	///
 	///    // use pointers to avoid copying
 	///    Object::Ptr object = result.extract<Object::Ptr>();
 	///    Var test = object->get("test"); // holds { "property" : "value" }
 	///    Object::Ptr subObject = test.extract<Object::Ptr>();
 	///    test = subObject->get("property");
 	///    std::string val = test.toString(); // val holds "value"
-	/// 
+	///
 	///    // copy/convert to Poco::DynamicStruct
 	///    Poco::DynamicStruct ds = *object;
 	///    val = ds["test"]["property"]; // val holds "value"
-	/// 
+	///
 {
 public:
 	typedef SharedPtr<Object>                   Ptr;
@@ -66,38 +65,54 @@ public:
 	typedef ValueMap::value_type                ValueType;
 	typedef ValueMap::iterator                  Iterator;
 	typedef ValueMap::const_iterator            ConstIterator;
+	typedef std::vector<std::string>            NameList;
 
-	explicit Object(bool preserveInsertionOrder = false);
-		/// Default constructor. If preserveInsertionOrder, object
-		/// will preserve the items insertion order. Otherwise, items
-		/// will be sorted by keys.
+	explicit Object(int options = 0);
+		/// Creates an empty Object.
+		///
+		/// If JSON_PRESERVE_KEY_ORDER is specified, the object will
+		/// preserve the items insertion order. Otherwise, items will be
+		/// sorted by keys.
+		///
+		/// If JSON_ESCAPE_UNICODE is specified, when the object is
+		/// stringified, all unicode characters will be escaped in the
+		/// resulting string.
 
 	Object(const Object& copy);
-		/// Copy constructor. Struct is not copied to keep the operation as
+		/// Creates an Object by copying another one.
+		///
+		/// Struct is not copied to keep the operation as
 		/// efficient as possible (when needed, it will be generated upon request).
 
+	Object(Object&& other);
+		/// Move constructor
+
 	virtual ~Object();
-		/// Destroys Object.
+		/// Destroys the Object.
 
-	Iterator begin()
-	{
-		return _values.begin();
-	}
+	Object &operator =(const Object &other);
+		// Assignment operator
 
-	ConstIterator begin() const
-	{
-		return _values.begin();
-	}
+	Object &operator =(Object &&other);
+		// Move asignment operator
 
-	Iterator end()
-	{
-		return _values.end();
-	}
+	void setEscapeUnicode(bool escape = true);
+		/// Sets the flag for escaping unicode.
 
-	ConstIterator end() const
-	{
-		return _values.end();
-	}
+	bool getEscapeUnicode() const;
+		/// Returns the flag for escaping unicode.
+
+	Iterator begin();
+		/// Returns begin iterator for values.
+
+	ConstIterator begin() const;
+		/// Returns const begin iterator for values.
+
+	Iterator end();
+		/// Returns end iterator for values.
+
+	ConstIterator end() const;
+		/// Returns const end iterator for values.
 
 	Dynamic::Var get(const std::string& key) const;
 		/// Retrieves a property. An empty value is
@@ -117,7 +132,7 @@ public:
 	T getValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
-		/// The convert<T> method of Dynamic is called
+		/// The convert<T>() method of Var is called
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
@@ -129,8 +144,8 @@ public:
 	Poco::Nullable<T> getNullableValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
-		/// Returns null if isNull.
-		/// The convert<T> method of Dynamic is called
+		///
+		/// The convert<T> method of Var is called
 		/// which can also throw exceptions for invalid values.
 		/// Note: This will not work for an array or an object.
 	{
@@ -141,26 +156,29 @@ public:
 		return value.convert<T>();
 	}
 
-	void getNames(std::vector<std::string>& names) const;
-		/// Returns all property names
+	void getNames(NameList& names) const;
+		/// Fills the supplied vector with all property names.
+
+	NameList getNames() const;
+		/// Returns all property names.
 
 	bool has(const std::string& key) const;
-		/// Returns true when the given property exists
+		/// Returns true when the given property exists.
 
 	bool isArray(const std::string& key) const;
-		/// Returns true when the given property contains an array
+		/// Returns true when the given property contains an array.
 
 	bool isArray(ConstIterator& it) const;
-		/// Returns true when the given property contains an array
+		/// Returns true when the given property contains an array.
 
 	bool isNull(const std::string& key) const;
-		/// Returns true when the given property contains a null value
+		/// Returns true when the given property contains a null value.
 
 	bool isObject(const std::string& key) const;
-		/// Returns true when the given property contains an object
+		/// Returns true when the given property contains an object.
 
 	bool isObject(ConstIterator& it) const;
-		/// Returns true when the given property contains an object
+		/// Returns true when the given property contains an object.
 
 	template<typename T>
 	T optValue(const std::string& key, const T& def) const
@@ -170,13 +188,13 @@ public:
 	{
 		T value = def;
 		ValueMap::const_iterator it = _values.find(key);
-		if (it != _values.end() && ! it->second.isEmpty() )
+		if (it != _values.end() && ! it->second.isEmpty())
 		{
 			try
 			{
 				value = it->second.convert<T>();
 			}
-			catch(...)
+			catch (...)
 			{
 				// The default value will be returned
 			}
@@ -185,17 +203,19 @@ public:
 	}
 
 	std::size_t size() const;
-		/// Returns the number of properties
+		/// Returns the number of properties.
 
 	void set(const std::string& key, const Dynamic::Var& value);
-		/// Sets a new value
+		/// Sets a new value.
 
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
-		/// Prints the object to out stream. When indent is 0, the object
-		/// will be printed on a single line without indentation.
+		/// Prints the object to out stream.
+		///
+		/// When indent is 0, the object will be printed on a single
+		/// line without indentation.
 
 	void remove(const std::string& key);
-		/// Removes the property with the given key
+		/// Removes the property with the given key.
 
 	static Poco::DynamicStruct makeStruct(const Object::Ptr& obj);
 		/// Utility function for creation of struct.
@@ -204,27 +224,37 @@ public:
 		/// Cast operator to Poco::DynamiStruct.
 
 	void clear();
-		/// Clears the contents of the object. Insertion order 
-		/// preservation property is left intact.
+		/// Clears the contents of the object.
+		///
+		/// Insertion order preservation property is left intact.
 
 private:
+	typedef std::deque<ValueMap::const_iterator>  KeyList;
+	typedef Poco::DynamicStruct::Ptr              StructPtr;
+
+	void resetDynStruct() const;
+	void syncKeys(const KeyList& keys);
+
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
 	{
+		int options = Poco::JSON_WRAP_STRINGS;
+		options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
+
 		out << '{';
 
 		if (indent > 0) out << std::endl;
-		
+
 		typename C::const_iterator it = container.begin();
 		typename C::const_iterator end = container.end();
 		for (; it != end;)
 		{
-			for(unsigned int i = 0; i < indent; i++) out << ' ';
+			for (unsigned int i = 0; i < indent; i++) out << ' ';
 
-			Stringifier::stringify(getKey(it), out);
+			Stringifier::stringify(getKey(it), out, indent, step, options);
 			out << ((indent > 0) ? " : " : ":");
 
-			Stringifier::stringify(getValue(it), out, indent + step, step);
+			Stringifier::stringify(getValue(it), out, indent + step, step, options);
 
 			if (++it != container.end()) out << ',';
 
@@ -233,25 +263,67 @@ private:
 
 		if (indent >= step) indent -= step;
 
-		for (unsigned int i = 0; i < indent; i++)
-			out << ' ';
+		for (unsigned int i = 0; i < indent; i++) out << ' ';
 
 		out << '}';
 	}
 
-	typedef std::deque<const std::string*> KeyPtrList;
-	typedef Poco::DynamicStruct::Ptr       StructPtr;
-
 	const std::string& getKey(ValueMap::const_iterator& it) const;
 	const Dynamic::Var& getValue(ValueMap::const_iterator& it) const;
-	const std::string& getKey(KeyPtrList::const_iterator& it) const;
-	const Dynamic::Var& getValue(KeyPtrList::const_iterator& it) const;
+	const std::string& getKey(KeyList::const_iterator& it) const;
+	const Dynamic::Var& getValue(KeyList::const_iterator& it) const;
 
 	ValueMap          _values;
-	KeyPtrList        _keys;
+	KeyList           _keys;
 	bool              _preserveInsOrder;
+	// Note:
+	//  The reason for this flag (rather than as argument to stringify()) is
+	//  because Object can be returned stringified from Dynamic::Var::toString(),
+	//  so it must know whether to escape unicode or not.
+	bool              _escapeUnicode;
 	mutable StructPtr _pStruct;
+	mutable bool      _modified;
 };
+
+
+//
+// inlines
+//
+
+inline void Object::setEscapeUnicode(bool escape)
+{
+	_escapeUnicode = true;
+}
+
+
+inline bool Object::getEscapeUnicode() const
+{
+	return _escapeUnicode;
+}
+
+
+inline Object::Iterator Object::begin()
+{
+	return _values.begin();
+}
+
+
+inline Object::ConstIterator Object::begin() const
+{
+	return _values.begin();
+}
+
+
+inline Object::Iterator Object::end()
+{
+	return _values.end();
+}
+
+
+inline Object::ConstIterator Object::end() const
+{
+	return _values.end();
+}
 
 
 inline bool Object::has(const std::string& key) const
@@ -270,7 +342,7 @@ inline bool Object::isArray(const std::string& key) const
 
 inline bool Object::isArray(ConstIterator& it) const
 {
-	return it != _values.end() && it->second.type() == typeid(Array::Ptr);
+	return it != _values.end() && (it->second.type() == typeid(Array::Ptr) || it->second.type() == typeid(Array));
 }
 
 
@@ -290,7 +362,7 @@ inline bool Object::isObject(const std::string& key) const
 
 inline bool Object::isObject(ConstIterator& it) const
 {
-	return it != _values.end() && it->second.type() == typeid(Object::Ptr);
+	return it != _values.end() && (it->second.type() == typeid(Object::Ptr) || it->second.type() == typeid(Object));
 }
 
 
@@ -305,17 +377,18 @@ inline void Object::remove(const std::string& key)
 	_values.erase(key);
 	if (_preserveInsOrder)
 	{
-		KeyPtrList::iterator it = _keys.begin();
-		KeyPtrList::iterator end = _keys.end();
+		KeyList::iterator it = _keys.begin();
+		KeyList::iterator end = _keys.end();
 		for (; it != end; ++it)
 		{
-			if (key == **it)
+			if (key == (*it)->first)
 			{
 				_keys.erase(it);
 				break;
 			}
 		}
 	}
+	_modified = true;
 }
 
 
@@ -331,9 +404,9 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 }
 
 
-inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) const
+inline const Dynamic::Var& Object::getValue(KeyList::const_iterator& it) const
 {
-	ValueMap::const_iterator itv = _values.find(**it);
+	ValueMap::const_iterator itv = _values.find((*it)->first);
 	if (itv != _values.end())
 		return itv->second;
 	else
@@ -341,7 +414,7 @@ inline const Dynamic::Var& Object::getValue(KeyPtrList::const_iterator& it) cons
 }
 
 
-}} // Namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 namespace Poco {
@@ -632,7 +705,7 @@ private:
 };
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::Dynamic
 
 
 #endif // JSON_Object_INCLUDED

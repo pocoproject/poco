@@ -1,8 +1,6 @@
 //
 // HTTPSClientSession.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/HTTPSClientSession.cpp#4 $
-//
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSClientSession
@@ -142,7 +140,7 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	if (getProxyHost().empty() || bypassProxy())
 	{
 		SecureStreamSocket sss(socket());
-		if (sss.getPeerHostName().empty()) 
+		if (sss.getPeerHostName().empty())
 		{
 			sss.setPeerHostName(getHost());
 		}
@@ -174,7 +172,7 @@ int HTTPSClientSession::read(char* buffer, std::streamsize length)
 	try
 	{
 		return HTTPSession::read(buffer, length);
-	} 
+	}
 	catch(SSLConnectionUnexpectedlyClosedException&)
 	{
 		return 0;

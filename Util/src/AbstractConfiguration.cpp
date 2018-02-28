@@ -1,8 +1,6 @@
 //
 // AbstractConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/AbstractConfiguration.cpp#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  AbstractConfiguration
@@ -35,7 +33,7 @@ namespace Poco {
 namespace Util {
 
 
-AbstractConfiguration::AbstractConfiguration(): 
+AbstractConfiguration::AbstractConfiguration():
 	_depth(0),
 	_eventsEnabled(true)
 {
@@ -423,11 +421,11 @@ std::string AbstractConfiguration::internalExpand(const std::string& value) cons
 }
 
 
-std::string AbstractConfiguration::uncheckedExpand(const std::string& rValue) const
+std::string AbstractConfiguration::uncheckedExpand(const std::string& value) const
 {
 	std::string result;
-	std::string::const_iterator it  = rValue.begin();
-	std::string::const_iterator end = rValue.end();
+	std::string::const_iterator it  = value.begin();
+	std::string::const_iterator end = value.end();
 	while (it != end)
 	{
 		if (*it == '$')
@@ -512,7 +510,7 @@ bool AbstractConfiguration::parseBool(const std::string& value)
 		return false;
 	else if (icompare(value, "off") == 0)
 		return false;
-	else 
+	else
 		throw SyntaxException("Cannot convert to boolean", value);
 }
 

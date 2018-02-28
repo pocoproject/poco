@@ -1,8 +1,6 @@
 //
 // ZipTest.h
 //
-// $Id: //poco/1.4/Zip/testsuite/src/ZipTest.h#1 $
-//
 // Definition of the ZipTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -31,15 +29,17 @@ public:
 	void testDecompressSingleFile();
 	void testDecompressSingleFileInDir();
 	void testDecompress();
+	void testDecompressFlat();
+	void testDecompressVuln();
+	void testDecompressFlatVuln();
 	void testCrcAndSizeAfterData();
 	void testCrcAndSizeAfterDataWithArchive();
-
-	void testDecompressFlat();
 
 	static const Poco::UInt64 KB = 1024;
 	static const Poco::UInt64 MB = 1024*KB;
 	void verifyDataFile(const std::string& path, Poco::UInt64 size);
 	void testDecompressZip64();
+	void testValidPath();
 
 	void setUp();
 	void tearDown();

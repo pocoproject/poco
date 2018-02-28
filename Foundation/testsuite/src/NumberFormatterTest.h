@@ -1,8 +1,6 @@
 //
 // NumberFormatterTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NumberFormatterTest.h#1 $
-//
 // Definition of the NumberFormatterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -32,6 +30,7 @@ public:
 	void testFormatHex();
 	void testFormatFloat();
 	void testAppend();
+	void testInfNaN();
 
 	void setUp();
 	void tearDown();

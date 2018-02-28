@@ -1,8 +1,6 @@
 //
 // Compress.cpp
 //
-// $Id: //poco/1.4/Zip/src/Compress.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	Compress
@@ -57,9 +55,14 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 	{
 		std::string ext = Poco::toLower(fileName.getExtension());
 		if (_storeExtensions.find(ext) != _storeExtensions.end())
+		{
 			cm = ZipCommon::CM_STORE;
+			cl = ZipCommon::CL_NORMAL;
+		}
 		else
+		{
 			cm = ZipCommon::CM_DEFLATE;
+		}
 	}
 
 	std::string fn = ZipUtil::validZipEntryFileName(fileName);
@@ -67,12 +70,27 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 	if (!in.good())
 		throw ZipException("Invalid input stream");
 
+	// Check if stream is empty.
+	// In this case, we have to set compression to STORE, otherwise
+	// extraction will fail with various tools.
+	const int eof = std::char_traits<char>::eof();
+	int firstChar = in.get();
+	if (firstChar == eof)
+	{
+		cm = ZipCommon::CM_STORE;
+		cl = ZipCommon::CL_NORMAL;
+	}
+
 	std::streamoff localHeaderOffset = _offset;
 	ZipLocalFileHeader hdr(fileName, lastModifiedAt, cm, cl, _forceZip64);
 	hdr.setStartPos(localHeaderOffset);
 
 	ZipOutputStream zipOut(_out, hdr, _seekableOut);
-	Poco::StreamCopier::copyStream(in, zipOut);
+	if (firstChar != eof)
+	{
+		zipOut.put(static_cast<char>(firstChar));
+		Poco::StreamCopier::copyStream(in, zipOut);
+	}
 	Poco::UInt64 extraDataSize;
 	zipOut.close(extraDataSize);
 	_offset = hdr.getEndPos();
@@ -101,7 +119,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	ZipLocalFileHeader hdr(h);
 	hdr.setFileName(fn, h.isDirectory());
 	hdr.setStartPos(localHeaderOffset);
-	if(hdr.needsZip64())
+	if (hdr.needsZip64())
 		hdr.setZip64Data();
 	//bypass zipoutputstream
 	//write the header directly
@@ -113,7 +131,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	{
 		Poco::Buffer<char> buffer(COMPRESS_CHUNK_SIZE);
 		Poco::UInt64 remaining = totalSize;
-		while(remaining > 0)
+		while (remaining > 0)
 		{
 			if (remaining > COMPRESS_CHUNK_SIZE)
 			{
@@ -136,24 +154,24 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	hdr.setStartPos(localHeaderOffset); // This resets EndPos now that compressed Size is known
 	_offset = hdr.getEndPos();
 	//write optional block afterwards
-	if (hdr.searchCRCAndSizesAfterData()) 
+	if (hdr.searchCRCAndSizesAfterData())
 	{
-		if (hdr.needsZip64()) 
+		if (hdr.needsZip64())
 		{
 			ZipDataInfo64 info(in, false);
 			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
 			_offset += ZipDataInfo::getFullHeaderSize();
-		} 
-		else 
+		}
+		else
 		{
 			ZipDataInfo info(in, false);
 			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
 			_offset += ZipDataInfo::getFullHeaderSize();
 		}
-	} 
-	else 
+	}
+	else
 	{
-		if(hdr.hasExtraField())	 // Update sizes in header extension.
+		if (hdr.hasExtraField())	 // Update sizes in header extension.
 			hdr.setZip64Data();
 		_out.seekp(hdr.getStartPos(), std::ios_base::beg);
 		std::string header = hdr.createHeader();
@@ -319,7 +337,7 @@ ZipArchive Compress::close()
 	
 	Poco::UInt64 numEntries64 = _infos.size();
 	needZip64 = needZip64  || _offset >= ZipCommon::ZIP64_MAGIC;
-	if(needZip64) 
+	if (needZip64)
 	{
 		ZipArchiveInfo64 central;
 		central.setCentralDirectorySize(centralDirSize64);

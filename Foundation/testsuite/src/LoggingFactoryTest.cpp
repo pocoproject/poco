@@ -1,8 +1,6 @@
 //
 // LoggingFactoryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/LoggingFactoryTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -20,7 +18,10 @@
 #if defined(_WIN32)
 #include "Poco/WindowsConsoleChannel.h"
 #endif
+#ifndef POCO_NO_FILECHANNEL
 #include "Poco/FileChannel.h"
+#include "Poco/SimpleFileChannel.h"
+#endif
 #include "Poco/SplitterChannel.h"
 #include "Poco/Formatter.h"
 #include "Poco/PatternFormatter.h"
@@ -33,7 +34,10 @@
 using Poco::LoggingFactory;
 using Poco::Channel;
 using Poco::ConsoleChannel;
+#ifndef POCO_NO_FILECHANNEL
 using Poco::FileChannel;
+using Poco::SimpleFileChannel;
+#endif
 using Poco::SplitterChannel;
 using Poco::Formatter;
 using Poco::PatternFormatter;
@@ -82,9 +86,14 @@ void LoggingFactoryTest::testBuiltins()
 	assert (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
 #endif
 
+#ifndef POCO_NO_FILECHANNEL
 	AutoPtr<Channel> pFileChannel = fact.createChannel("FileChannel");
 	assert (dynamic_cast<FileChannel*>(pFileChannel.get()) != 0);
-	
+
+	AutoPtr<Channel> pSimpleFileChannel = fact.createChannel("SimpleFileChannel");
+	assert(dynamic_cast<SimpleFileChannel*>(pSimpleFileChannel.get()) != 0);
+#endif
+
 	AutoPtr<Channel> pSplitterChannel = fact.createChannel("SplitterChannel");
 	assert (dynamic_cast<SplitterChannel*>(pSplitterChannel.get()) != 0);
 	
@@ -113,8 +122,8 @@ void LoggingFactoryTest::testBuiltins()
 
 void LoggingFactoryTest::testCustom()
 {
-	std::auto_ptr<LoggingFactory> fact(new LoggingFactory);
-	
+	std::unique_ptr<LoggingFactory> fact(new LoggingFactory);
+
 	fact->registerChannelClass("CustomChannel", new Instantiator<CustomChannel, Channel>);
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 

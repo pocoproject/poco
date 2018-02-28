@@ -1,8 +1,6 @@
 //
 // HTTPServerResponse.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPServerResponse.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerResponse
@@ -82,7 +80,7 @@ public:
 		/// Sends the response header to the client, followed
 		/// by the content of the given file.
 		///
-		/// Must not be called after send(), sendBuffer() 
+		/// Must not be called after send(), sendBuffer()
 		/// or redirect() has been called.
 		///
 		/// Throws a FileNotFoundException if the file
@@ -97,10 +95,10 @@ public:
 		/// to length and chunked transfer encoding is disabled.
 		///
 		/// If both the HTTP message header and body (from the
-		/// given buffer) fit into one single network packet, the 
+		/// given buffer) fit into one single network packet, the
 		/// complete response can be sent in one network packet.
 		///
-		/// Must not be called after send(), sendFile()  
+		/// Must not be called after send(), sendFile()
 		/// or redirect() has been called.
 		
 	virtual void redirect(const std::string& uri, HTTPStatus status = HTTP_FOUND) = 0;

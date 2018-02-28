@@ -1,8 +1,6 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPRequest
@@ -112,7 +110,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	else
 	{
 		value.append(host);
-	}    
+	}
 
 	if (port != 80 && port != 443)
 	{

@@ -1,8 +1,6 @@
 //
 // WebSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.cpp#3 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -25,7 +23,7 @@
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
-
+#include <iostream>
 
 using Poco::Net::HTTPSClientSession;
 using Poco::Net::HTTPRequest;
@@ -51,15 +49,17 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				std::auto_ptr<char> pBuffer(new char[_bufSize]);
+				std::unique_ptr<char> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					n = ws.receiveFrame(pBuffer.get(), static_cast<int>(_bufSize), flags);
+					if (n == 0)
+						break;
 					ws.sendFrame(pBuffer.get(), n, flags);
 				}
-				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
+				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
 			catch (WebSocketException& exc)
 			{
@@ -183,7 +183,7 @@ void WebSocketTest::testWebSocketLarge()
 	Poco::Net::SecureServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
 	server.start();
-	
+
 	Poco::Thread::sleep(200);
 	
 	HTTPSClientSession cs("127.0.0.1", ss.address().port());
@@ -207,6 +207,8 @@ void WebSocketTest::testWebSocketLarge()
 
 	assert (n == payload.size());
 	assert (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+
+	server.stop();
 }
 
 

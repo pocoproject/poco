@@ -1,8 +1,6 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.4/XML/samples/SAXParser/src/SAXParser.cpp#1 $
-//
 // This sample demonstrates the SAXParser class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -152,8 +150,8 @@ protected:
 		{
 			std::cout << " in "
 			          << _pLocator->getSystemId()
-			          << ", line " << _pLocator->getLineNumber() 
-			          << ", col " << _pLocator->getColumnNumber() 
+			          << ", line " << _pLocator->getLineNumber()
+			          << ", col " << _pLocator->getColumnNumber()
 			          << std::endl;
 		}
 	}

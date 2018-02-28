@@ -1,8 +1,6 @@
 //
 // ZipFileInfo.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipFileInfo.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipFileInfo
@@ -54,7 +52,7 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	if (getHostSystem() == ZipCommon::HS_UNIX)
 		setUnixAttributes();
 
-	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	   
+	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	
 
 	if (header.searchCRCAndSizesAfterData())
 		_rawInfo[GENERAL_PURPOSE_POS] |= 0x08;
@@ -120,35 +118,35 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 			inp.read(xtra.begin(), len);
 			_extraField = std::string(xtra.begin(), len);
 			char* ptr = xtra.begin();
-			while (ptr <= xtra.begin() + len - 4) 
+			while (ptr <= xtra.begin() + len - 4)
 			{
-				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0); 
+				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
 				ptr += 2;
-				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0); 
+				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0);
 				ptr += 2;
-				if (id == ZipCommon::ZIP64_EXTRA_ID) 
+				if (id == ZipCommon::ZIP64_EXTRA_ID)
 				{
 					poco_assert(size >= 8);
-					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
-						size -= 8; 
+						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
 						ptr += 8;
 					}
-					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setCompressedSize(ZipUtil::get64BitValue(ptr, 0)); 
-						size -= 8; 
+						setCompressedSize(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
 						ptr += 8;
 					}
-					if (size >= 8 && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC) 
+					if (size >= 8 && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setOffset(ZipUtil::get64BitValue(ptr, 0)); 
-						size -= 8; 
+						setOffset(ZipUtil::get64BitValue(ptr, 0));
+						size -= 8;
 						ptr += 8;
 					}
-				} 
-				else 
+				}
+				else
 				{
 					ptr += size;
 				}

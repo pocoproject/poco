@@ -1,8 +1,6 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Bugcheck
@@ -34,8 +32,8 @@ namespace Poco {
 class Foundation_API Bugcheck
 	/// This class provides some static methods that are
 	/// used by the
-	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(), 
-	/// poco_bugcheck() and poco_unexpected() macros. 
+	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(),
+	/// poco_bugcheck() and poco_unexpected() macros.
 	/// You should not invoke these methods
 	/// directly. Use the macros instead, as they
 	/// automatically provide useful context information.
@@ -188,7 +186,7 @@ struct POCO_STATIC_ASSERTION_FAILURE<true>
 };
 
 
-template <int x> 
+template <int x>
 struct poco_static_assert_test
 {
 };

@@ -1,8 +1,6 @@
 //
 // FileStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileStreamTest.cpp#1 $
-//
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -31,12 +29,8 @@ FileStreamTest::~FileStreamTest()
 
 void FileStreamTest::testRead()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	char tmp[]={'\xc4', '\xd6', '\xdc', '\xe4', '\xf6', '\xfc', '\0'};
-	std::string file(tmp);
-	file.append(".txt");
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-	char tmp[]={'\xc3', '\x84', '\xc3', '\x96', '\xc3', '\x9c', '\xc3', '\xa4', '\xc3', '\xb6', '\xc3', '\xbc', '\0'};
 	std::string file(tmp);
 	file.append(".txt");
 #else
@@ -59,14 +53,10 @@ void FileStreamTest::testRead()
 
 void FileStreamTest::testWrite()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	char tmp[]={'\xdf', '\xc4', '\xd6', '\xdc', '\xe4', '\xf6', '\xfc', '\0'};
 	std::string file(tmp);
 	file = "dummy_" + file + (".txt");
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-	char tmp[]={'\xc3', '\x9f', '\xc3', '\x84', '\xc3', '\x96', '\xc3', '\x9c', '\xc3', '\xa4', '\xc3', '\xb6', '\xc3', '\xbc', '\0'};
-	std::string file(tmp);
-	file = "dummy_" + file + ".txt";
 #else
 	std::string file("dummy_file.txt");
 #endif
@@ -88,7 +78,7 @@ void FileStreamTest::testWrite()
 
 void FileStreamTest::testReadWrite()
 {
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	char tmp[]={'\xdf', '\xc4', '\xd6', '\xdc', '\xe4', '\xf6', '\xfc', '\0'};
 	std::string file(tmp);
 	file = "dummy_" + file + (".txt");

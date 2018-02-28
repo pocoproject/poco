@@ -1,8 +1,6 @@
 //
 // Clock.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Clock.h#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Clock
@@ -37,8 +35,8 @@ class Foundation_API Clock
 	/// The monotonic() function can be used to check whether
 	/// the system's clock is monotonic.
 	///
-	/// Monotonic Clock is available on Windows, Linux, OS X 
-	/// and on POSIX platforms supporting clock_gettime() with CLOCK_MONOTONIC.	  
+	/// Monotonic Clock is available on Windows, Linux, OS X
+	/// and on POSIX platforms supporting clock_gettime() with CLOCK_MONOTONIC.	
 	///
 	/// Clock values are relative to a system-dependent epoch time
 	/// (usually the system's startup time) and have no relation

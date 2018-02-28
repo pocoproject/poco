@@ -1,8 +1,6 @@
 //
 // PrivateKeyFactory.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/PrivateKeyFactory.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  PrivateKeyFactory
@@ -34,7 +32,7 @@ class NetSSL_API PrivateKeyFactory
 	/// A PrivateKeyFactory is responsible for creating PrivateKeyPassphraseHandlers.
 	///
 	/// You don't need to access this class directly. Use the macro
-	///     POCO_REGISTER_KEYFACTORY(namespace, PrivateKeyPassphraseHandlerName) 
+	///     POCO_REGISTER_KEYFACTORY(namespace, PrivateKeyPassphraseHandlerName)
 	/// instead (see the documentation of PrivateKeyPassphraseHandler for an example).
 {
 public:
@@ -53,7 +51,7 @@ class NetSSL_API PrivateKeyFactoryRegistrar
 	/// Registrar class which automatically registers PrivateKeyFactories at the PrivateKeyFactoryMgr.
 	///
 	/// You don't need to access this class directly. Use the macro
-	///     POCO_REGISTER_KEYFACTORY(namespace, PrivateKeyPassphraseHandlerName) 
+	///     POCO_REGISTER_KEYFACTORY(namespace, PrivateKeyPassphraseHandlerName)
 	/// instead (see the documentation of PrivateKeyPassphraseHandler for an example).
 
 {

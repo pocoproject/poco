@@ -1,8 +1,6 @@
 //
 // SMTPClientSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SMTPClientSession.h#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  SMTPClientSession
@@ -53,7 +51,7 @@ public:
 		AUTH_CRAM_SHA1,
 		AUTH_LOGIN,
 		AUTH_PLAIN,
-		AUTH_XOAUTH2 
+		AUTH_XOAUTH2
 	};
 
 	explicit SMTPClientSession(const StreamSocket& socket);

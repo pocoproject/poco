@@ -5,12 +5,10 @@ setlocal enabledelayedexpansion
 rem
 rem buildwin.cmd
 rem
-rem POCO C++ Libraries command-line build script 
+rem POCO C++ Libraries command-line build script
 rem for MS Visual Studio 2008 to 2013
 rem
-rem $Id: //poco/1.4/dist/buildwin.cmd#2 $
-rem
-rem Copyright (c) 2006-2014 by Applied Informatics Software Engineering GmbH
+rem Copyright (c) 2006-2017 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
 rem
 rem Original version by Aleksandar Fabijanic.
@@ -18,8 +16,8 @@ rem Modified by Guenter Obiltschnig.
 rem
 rem Usage:
 rem ------
-rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ] ] 
-rem VS_VERSION:    90|100|110|120|140
+rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ]
+rem VS_VERSION:    90|100|110|120|140|150
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
 rem CONFIGURATION: release|debug|both
@@ -36,10 +34,17 @@ rem VS_VERSION is required argument. Default is build all.
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
-rem VS_VERSION {90 | 100 | 110 | 120 | 140}
+rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150}
 if "%1"=="" goto usage
 set VS_VERSION=vs%1
-set VS_64_BIT_ENV=VC\bin\x86_amd64\vcvarsx86_amd64.bat
+if %VS_VERSION%==vs150 (
+  if "%VS150COMNTOOLS%"=="" (
+    set VS150COMNTOOLS=C:\Program Files ^(x86^)\Microsoft Visual Studio\2017\Community\Common7\Tools\
+  )
+  set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
+) else (
+  set VS_VARSALL=..\..\VC\vcvarsall.bat
+)
 
 shift /1
 rem ACTION [build|rebuild|clean]
@@ -78,6 +83,9 @@ if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
 if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
+if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
+if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64))
+
 rem SAMPLES [samples|nosamples]
 set SAMPLES=%4
 if "%SAMPLES%"=="" (set SAMPLES=samples)
@@ -89,50 +97,58 @@ if "%TESTS%"=="" (set TESTS=notests)
 if not defined VCINSTALLDIR (
   if %VS_VERSION%==vs90 (
     if %PLATFORM%==x64 (
-      call "%VS90COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+      call "%VS90COMNTOOLS%%VS_VARSALL%" x86_amd64
     ) else (
-      call "%VS90COMNTOOLS%vsvars32.bat"
+      call "%VS90COMNTOOLS%%VS_VARSALL%" x86
     )
   ) else (
     if %VS_VERSION%==vs100 (
       if %PLATFORM%==x64 (
-        call "%VS100COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86_amd64
       ) else (
-        call "%VS100COMNTOOLS%vsvars32.bat"
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86
       )
     ) else (
       if %VS_VERSION%==vs110 (
         if %PLATFORM%==x64 (
-          call "%VS110COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86_amd64
         ) else (
-          call "%VS110COMNTOOLS%vsvars32.bat"
-        ) 
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86
+        )
       ) else (
         if %VS_VERSION%==vs120 (
           if %PLATFORM%==x64 (
-            call "%VS120COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86_amd64
           ) else (
-            call "%VS120COMNTOOLS%vsvars32.bat
-          )     
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86
+          )
         ) else (
           if %VS_VERSION%==vs140 (
             if %PLATFORM%==x64 (
-              call "%VS140COMNTOOLS%..\..\%VS_64_BIT_ENV%"
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64
             ) else (
-              call "%VS140COMNTOOLS%vsvars32.bat
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86
             )
-          )     
+          ) else (
+            if %VS_VERSION%==vs150 (
+              if %PLATFORM%==x64 (
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64
+              ) else (
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86
+              )
+            )
+          )
         )
-      ) 
-    ) 
-  ) 
+      )
+    )
+  )
 )
 
 if not defined VSINSTALLDIR (
   echo Error: No Visual C++ environment found.
   echo Please run this script from a Visual Studio Command Prompt
   echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
-  goto :EOF
+  goto :buildfailed
 )
 
 set VCPROJ_EXT=vcproj
@@ -140,6 +156,7 @@ if %VS_VERSION%==vs100 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs150 (set VCPROJ_EXT=vcxproj)
 
 
 rem ENV      	env|noenv
@@ -166,6 +183,7 @@ if "%VS_VERSION%"=="vs100" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs120" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs140" (set BUILD_TOOL=msbuild)
+if "%VS_VERSION%"=="vs150" (set BUILD_TOOL=msbuild)
 :use_custom
 if "%BUILD_TOOL%"=="msbuild" (
   set ACTIONSW=/t:
@@ -197,6 +215,7 @@ if "%VS_VERSION%"=="vs100" (goto msbuildok)
 if "%VS_VERSION%"=="vs110" (goto msbuildok)
 if "%VS_VERSION%"=="vs120" (goto msbuildok)
 if "%VS_VERSION%"=="vs140" (goto msbuildok)
+if "%VS_VERSION%"=="vs150" (goto msbuildok)
 if "%BUILD_TOOL%"=="msbuild" (
   echo "Cannot use msbuild with Visual Studio 2008 or earlier."
   exit /b 2
@@ -214,8 +233,8 @@ set USEENV=
 if %VS_VERSION%==vs110 (set EXTRASW=/m /p:VisualStudioVersion=11.0)
 if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
+if %VS_VERSION%==vs150 (set EXTRASW=/m /p:VisualStudioVersion=15.0)
 )
-
 
 set DEBUG_SHARED=0
 set RELEASE_SHARED=0
@@ -332,22 +351,22 @@ for /f %%G in ('findstr /R "." components') do (
       set TEST_APP_PROJECT_FILE=testsuite/TestApp%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
       set TEST_LIB_PROJECT_FILE=testsuite/TestLibrary%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
       if exist !PROJECT_FILE! (
-        call :build %%G 
+        call :build %%G
         if ERRORLEVEL 1 goto buildfailed
       )
       set PROJECT_FILE=%%R%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
       if exist !PROJECT_FILE! (
-        call :build %%G 
+        call :build %%G
         if ERRORLEVEL 1 goto buildfailed
       )
       set PROJECT_FILE=%%S%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
       if exist !PROJECT_FILE! (
-        call :build %%G 
+        call :build %%G
         if ERRORLEVEL 1 goto buildfailed
       )
       set PROJECT_FILE=%%T%PLATFORM_SUFFIX%_%VS_VERSION%.%VCPROJ_EXT%
       if exist !PROJECT_FILE! (
-        call :build %%G 
+        call :build %%G
         if ERRORLEVEL 1 goto buildfailed
       )
     )
@@ -371,7 +390,7 @@ echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo.
 
 if %DEBUG_SHARED%==1 (
-  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE! 
+  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
   if %TESTS%==tests (
@@ -390,7 +409,7 @@ if %DEBUG_SHARED%==1 (
   )
 )
 if %RELEASE_SHARED%==1 (
-  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE! 
+  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
   if %TESTS%==tests (
@@ -426,7 +445,7 @@ if %DEBUG_STATIC_MT%==1 (
   )
 )
 if %RELEASE_STATIC_MT%==1 (
-  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !PROJECT_FILE! 
+  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
   if %TESTS%==tests (
@@ -443,7 +462,7 @@ if %RELEASE_STATIC_MT%==1 (
   )
 )
 if %DEBUG_STATIC_MD%==1 (
-  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !PROJECT_FILE! 
+  !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
   if %TESTS%==tests (
@@ -484,7 +503,7 @@ echo ---- Done building [!PROJECT_FILE!]
 echo ------------------------------------------------------------------------
 echo ------------------------------------------------------------------------
 echo.
- 
+
 exit /b
 
 rem ////////////////////
@@ -510,22 +529,22 @@ for /f %%G in ('findstr /R "." components') do (
     set SOLUTION_FILE=samples%PLATFORM_SUFFIX%_%VS_VERSION%.sln
 
     if %DEBUG_SHARED%==1 (
-      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !SOLUTION_FILE! 
+      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %RELEASE_SHARED%==1 (
-      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE! 
+      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %DEBUG_STATIC_MT%==1 (
-      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !SOLUTION_FILE! 
+      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %RELEASE_STATIC_MT%==1 (
-      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !SOLUTION_FILE! 
+      !BUILD_TOOL! !BUILD_TOOL_FLAGS! %USEENV% %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
@@ -539,9 +558,9 @@ for /f %%G in ('findstr /R "." components') do (
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
-    
+
     cd "%POCO_BASE%"
-  
+
     echo.
     echo ------------------------------------------------------------------------
     echo ------------------------------------------------------------------------
@@ -580,8 +599,8 @@ exit /b 1
 :usage
 echo Usage:
 echo ------
-echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] {ENV] [VERBOSITY]
-echo VS_VERSION:    "90|100|110|120|140"
+echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY]
+echo VS_VERSION:    "90|100|110|120|140|150"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
 echo CONFIGURATION: "release|debug|both"

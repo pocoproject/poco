@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/QNX#3 $
-#
 # QNX
 #
 # Make settings for QNX Neutrino 6.3.2 or later.
@@ -41,8 +39,8 @@ LIB     = ar -cr
 RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = 
-DEP     = $(POCO_BASE)/build/script/makedepend.qcc 
+STRIP   =
+DEP     = $(POCO_BASE)/build/script/makedepend.qcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -57,7 +55,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
+CFLAGS          =
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        =

@@ -1,8 +1,6 @@
 //
 // IPAddressTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/IPAddressTest.cpp#2 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -85,6 +83,10 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia6(32, IPAddress::IPv6);
 	assert (ia6.family() == IPAddress::IPv6);
 	assert (ia6.toString() == "ffff:ffff::");
+
+	IPAddress ia7("::");
+	assert (ia7.family() == IPAddress::IPv6);
+	assert (ia7.toString() == "::");
 #endif
 }
 
@@ -435,7 +437,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip1.isSiteLocal());
 	assert (ip1.isWellKnownMC());
 	assert (!ip1.isNodeLocalMC());
-	assert (ip1.isLinkLocalMC()); 
+	assert (ip1.isLinkLocalMC());
 	assert (!ip1.isSiteLocalMC());
 	assert (!ip1.isOrgLocalMC());
 	assert (!ip1.isGlobalMC());
@@ -453,7 +455,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip2.isLinkLocalMC());
 	assert (!ip2.isSiteLocalMC());
 	assert (!ip2.isOrgLocalMC());
-	assert (!ip2.isGlobalMC()); 
+	assert (!ip2.isGlobalMC());
 
 	IPAddress ip3("ff05:0:0:0:0:0:0:FB"); // site local unicast
 	assert (!ip3.isWildcard());
@@ -495,7 +497,7 @@ void IPAddressTest::testMCClassification6()
 	assert (!ip5.isSiteLocal());
 	assert (!ip5.isWellKnownMC());
 	assert (!ip5.isNodeLocalMC());
-	assert (!ip5.isLinkLocalMC()); 
+	assert (!ip5.isLinkLocalMC());
 	assert (!ip5.isSiteLocalMC());
 	assert (!ip5.isOrgLocalMC());
 	assert (ip5.isGlobalMC());

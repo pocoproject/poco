@@ -1,8 +1,6 @@
 //
 // ServerSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ServerSocket.h#2 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  ServerSocket
@@ -99,7 +97,7 @@ public:
 		/// Binds a local port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -108,7 +106,7 @@ public:
 		/// Binds a local port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -157,7 +155,7 @@ public:
 		/// Binds a local IPv6 port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
@@ -173,7 +171,7 @@ public:
 		/// Binds a local IPv6 port to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.

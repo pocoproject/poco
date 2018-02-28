@@ -1,8 +1,6 @@
 //
 // RepeatedTest.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/RepeatedTest.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_RepeatedTest_INCLUDED
@@ -12,13 +10,13 @@
 #include "Poco/CppUnit/CppUnit.h"
 #include "Poco/CppUnit/Guards.h"
 #include "Poco/CppUnit/TestDecorator.h"
+#include "CppUnit/TestResult.h"
 
 
 namespace CppUnit {
 
 
 class Test;
-class TestResult;
 
 
 /*
@@ -31,7 +29,7 @@ class CppUnit_API RepeatedTest: public TestDecorator
 	REFERENCEOBJECT (RepeatedTest)
 
 public:
-	RepeatedTest(Test* test, int timesRepeat): TestDecorator (test), _timesRepeat (timesRepeat) 
+	RepeatedTest(Test* test, int timesRepeat): TestDecorator (test), _timesRepeat (timesRepeat)
 	{
 	}
 
@@ -45,7 +43,7 @@ private:
 
 
 // Counts the number of test cases that will be run by this test.
-inline RepeatedTest::countTestCases ()
+inline int RepeatedTest::countTestCases ()
 {
 	return TestDecorator::countTestCases() * _timesRepeat;
 }
@@ -61,7 +59,7 @@ inline std::string RepeatedTest::toString()
 // Runs a repeated test
 inline void RepeatedTest::run(TestResult *result)
 {
-	for (int n = 0; n < _timesRepeat; n++) 
+	for (int n = 0; n < _timesRepeat; n++)
 	{
 		if (result->shouldStop())
 			break;

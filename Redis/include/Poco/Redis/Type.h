@@ -1,8 +1,6 @@
 //
 // Type.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Type
@@ -38,7 +36,7 @@ class Redis_API RedisType
 	/// element with different types in Array.
 {
 public:
-	enum Types 
+	enum Types
 	{
 		REDIS_INTEGER,       /// Redis Integer
 		REDIS_SIMPLE_STRING, /// Redis Simple String
@@ -77,7 +75,7 @@ public:
 		/// Reads the value from the stream.
 
 	virtual std::string toString() const = 0;
-		/// Converts the value to a RESP (REdis Serialization Protocol) string.
+		/// Converts the value to a RESP (Redis Serialization Protocol) string.
 
 	static RedisType::Ptr createRedisType(char marker);
 		/// Create a Redis type based on the marker:
@@ -134,9 +132,9 @@ struct RedisTypeTraits
 template<>
 struct RedisTypeTraits<Int64>
 {
-	enum 
+	enum
 	{
-		TypeId = RedisType::REDIS_INTEGER 
+		TypeId = RedisType::REDIS_INTEGER
 	};
 
 	static const char marker = ':';
@@ -157,9 +155,9 @@ struct RedisTypeTraits<Int64>
 template<>
 struct RedisTypeTraits<std::string>
 {
-	enum 
-	{ 
-		TypeId = RedisType::REDIS_SIMPLE_STRING 
+	enum
+	{
+		TypeId = RedisType::REDIS_SIMPLE_STRING
 	};
 
 	static const char marker = '+';
@@ -184,9 +182,9 @@ typedef Nullable<std::string> BulkString;
 template<>
 struct RedisTypeTraits<BulkString>
 {
-	enum 
-	{ 
-		TypeId = RedisType::REDIS_BULK_STRING 
+	enum
+	{
+		TypeId = RedisType::REDIS_BULK_STRING
 	};
 
 	static const char marker = '$';
@@ -201,7 +199,7 @@ struct RedisTypeTraits<BulkString>
 		{
 			std::string s = value.value();
 			return marker
-				+ NumberFormatter::format(s.length())
+				+ NumberFormatter::format(static_cast<Poco::UInt64>(s.length()))
 				+ LineEnding::NEWLINE_CRLF
 				+ s
 				+ LineEnding::NEWLINE_CRLF;

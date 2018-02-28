@@ -1,8 +1,6 @@
 //
 // Path_WINCE.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Path_WINCE.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Path
@@ -35,7 +33,6 @@ public:
   static std::string configHomeImpl();
   static std::string dataHomeImpl();
   static std::string cacheHomeImpl();
-  static std::string tempHomeImpl();
   static std::string tempImpl();
   static std::string configImpl();
   static std::string nullImpl();

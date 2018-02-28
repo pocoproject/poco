@@ -1,8 +1,6 @@
 //
 // BinaryReader.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BinaryReader.h#3 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  BinaryReaderWriter
@@ -73,16 +71,14 @@ public:
 	BinaryReader& operator >> (unsigned short& value);
 	BinaryReader& operator >> (int& value);
 	BinaryReader& operator >> (unsigned int& value);
+#ifndef POCO_LONG_IS_64_BIT
 	BinaryReader& operator >> (long& value);
 	BinaryReader& operator >> (unsigned long& value);
+#endif // POCO_LONG_IS_64_BIT
 	BinaryReader& operator >> (float& value);
 	BinaryReader& operator >> (double& value);
-
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 	BinaryReader& operator >> (Int64& value);
 	BinaryReader& operator >> (UInt64& value);
-#endif
-
 	BinaryReader& operator >> (std::string& value);
 
 	template <typename T>
@@ -107,12 +103,10 @@ public:
 		/// See BinaryWriter::write7BitEncoded() for a description
 		/// of the compression algorithm.
 
-#if defined(POCO_HAVE_INT64)
 	void read7BitEncoded(UInt64& value);
 		/// Reads a 64-bit unsigned integer in compressed format.
 		/// See BinaryWriter::write7BitEncoded() for a description
 		/// of the compression algorithm.
-#endif
 
 	void readRaw(std::streamsize length, std::string& value);
 		/// Reads length bytes of raw data into value.
@@ -152,6 +146,12 @@ public:
 		/// Returns the number of available bytes in the stream.
 
 private:
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4800) // forcing value to bool 'true' or 'false' (performance warning)
+#endif
+
 	template<typename T>
 	BinaryReader& read(T& value, bool flipBytes)
 	{
@@ -159,6 +159,10 @@ private:
 		if (flipBytes) value = ByteOrder::flipBytes(value);
 		return *this;
 	}
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(pop)
+#endif
 
 	template<typename T>
 	void read7BitEncoded(T& value)
@@ -179,7 +183,7 @@ private:
 	}
 
 	std::istream&  _istr;
-	bool           _flipBytes; 
+	bool           _flipBytes;
 	TextConverter* _pTextConverter;
 };
 
@@ -241,7 +245,7 @@ inline bool BinaryReader::good()
 	return _istr.good();
 }
 
-	
+
 inline bool BinaryReader::fail()
 {
 	return _istr.fail();
@@ -265,7 +269,7 @@ inline std::istream& BinaryReader::stream() const
 	return _istr;
 }
 
-	
+
 inline BinaryReader::StreamByteOrder BinaryReader::byteOrder() const
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)

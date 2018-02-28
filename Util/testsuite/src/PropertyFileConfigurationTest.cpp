@@ -1,8 +1,6 @@
 //
 // PropertyFileConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/PropertyFileConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -63,7 +61,7 @@ void PropertyFileConfigurationTest::testLoadWithPreserveComment()
 
 void PropertyFileConfigurationTest::testLoad(bool preserveComment)
 {
-	static const std::string propFile = 
+	static const std::string propFile =
 		"! comment\n"
 		"! comment\n"
 		"prop1=value1\n"
@@ -133,7 +131,7 @@ void PropertyFileConfigurationTest::testSave()
 
 void PropertyFileConfigurationTest::testLoadSaveWithPreserveComment()
 {
-	std::string propFile = 
+	std::string propFile =
 		"! comment #\n"
 		"prop1=value1\n"
 		"# comment #\n"

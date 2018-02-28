@@ -1,8 +1,6 @@
 //
 // HTTPTimeServerApp.cpp
 //
-// $Id: //poco/1.4/PageCompiler/samples/HTTPTimeServer/src/HTTPTimeServerApp.cpp#1 $
-//
 // This sample demonstrates the HTTPServer and related classes.
 //
 // Copyright (c) 2010, Applied Informatics Software Engineering GmbH.

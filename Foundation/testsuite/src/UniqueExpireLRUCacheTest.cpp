@@ -1,8 +1,6 @@
 //
 // UniqueExpireLRUCacheTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UniqueExpireLRUCacheTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -129,7 +127,7 @@ void UniqueExpireLRUCacheTest::testExpireN()
 	assert (aCache.has(3));
 	tmp = aCache.get(1);
 	SharedPtr<IntVal> tmp2 = aCache.get(3);
-	assert (tmp->value == 2); 
+	assert (tmp->value == 2);
 	assert (tmp2->value == 4);
 
 	Thread::sleep(DURHALFSLEEP+25); //3|1

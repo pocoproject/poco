@@ -1,8 +1,6 @@
 //
 // XMLStreamParserException.cpp
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  XMLStreamParserException
@@ -28,19 +26,19 @@ XMLStreamParserException::~XMLStreamParserException() throw ()
 
 
 XMLStreamParserException::XMLStreamParserException(const std::string& n, Poco::UInt64 l, Poco::UInt64 c, const std::string& d):
-	_name(n), 
-	_line(l), 
-	_column(c), 
+	_name(n),
+	_line(l),
+	_column(c),
 	_description(d)
 {
 	init();
 }
 
 
-XMLStreamParserException::XMLStreamParserException(const XMLStreamParser& p, const std::string& d): 
-	_name(p.inputName()), 
-	_line(p.line()), 
-	_column(p.column()), 
+XMLStreamParserException::XMLStreamParserException(const XMLStreamParser& p, const std::string& d):
+	_name(p.inputName()),
+	_line(p.line()),
+	_column(p.column()),
 	_description(d)
 {
 	init();

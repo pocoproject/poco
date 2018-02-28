@@ -1,8 +1,6 @@
 //
 // AsyncChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AsyncChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  AsyncChannel
@@ -54,7 +52,7 @@ public:
 		/// Returns the target channel.
 
 	void open();
-		/// Opens the channel and creates the 
+		/// Opens the channel and creates the
 		/// background logging thread.
 		
 	void close();
@@ -68,7 +66,7 @@ public:
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.
 		///
-		/// The "channel" property allows setting the target 
+		/// The "channel" property allows setting the target
 		/// channel via the LoggingRegistry.
 		/// The "channel" property is set-only.
 		///

@@ -1,8 +1,6 @@
 //
 // TCPServer.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/TCPServer.h#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServer
@@ -94,7 +92,7 @@ class Net_API TCPServer: public Poco::Runnable
 	/// on the number of connections waiting to be served.
 	///
 	/// It is possible to specify a maximum number of queued connections.
-	/// This prevents the connection queue from overflowing in the 
+	/// This prevents the connection queue from overflowing in the
 	/// case of an extreme server load. In such a case, connections that
 	/// cannot be queued are silently and immediately closed.
 	///
@@ -207,7 +205,7 @@ public:
 		/// an assertion.
 		
 	TCPServerConnectionFilter::Ptr getConnectionFilter() const;
-		/// Returns the TCPServerConnectionFilter set with setConnectionFilter(), 
+		/// Returns the TCPServerConnectionFilter set with setConnectionFilter(),
 		/// or null pointer if no filter has been set.
 
 protected:

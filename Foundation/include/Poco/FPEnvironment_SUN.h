@@ -1,8 +1,6 @@
 //
 // FPEnvironment_SUN.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_SUN.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment

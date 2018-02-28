@@ -1,8 +1,6 @@
 //
 // Ping.cpp
 //
-// $Id: //poco/1.4/Net/samples/Ping/src/Ping.cpp#1 $
-//
 // This sample demonstrates the Application class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -43,17 +41,17 @@ using Poco::Delegate;
 
 
 class Ping: public Application
-	/// This sample demonstrates the Poco::Net::ICMPClient in conjunction with 
+	/// This sample demonstrates the Poco::Net::ICMPClient in conjunction with
 	/// Poco Foundation C#-like events functionality.
 	///
 	/// Try Ping --help (on Unix platforms) or Ping /help (elsewhere) for
 	/// more information.
 {
 public:
-	Ping(): 
-		_helpRequested(false), 
+	Ping():
+		_helpRequested(false),
 		_icmpClient(IPAddress::IPv4),
-		_repetitions(4), 
+		_repetitions(4),
 		_target("localhost")
 	{
 	}
@@ -128,9 +126,9 @@ protected:
 
 	int main(const std::vector<std::string>& args)
 	{
-		if (_helpRequested) 
+		if (_helpRequested)
 			displayHelp();
-		else 
+		else
 			_icmpClient.ping(_target, _repetitions);
 		
 		return Application::EXIT_OK;
@@ -140,7 +138,7 @@ protected:
 	void onBegin(const void* pSender, ICMPEventArgs& args)
 	{
 		std::ostringstream os;
-		os << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " << args.dataSize() << " bytes of data:" 
+		os << "Pinging " << args.hostName() << " [" << args.hostAddress() << "] with " << args.dataSize() << " bytes of data:"
 		   << std::endl << "---------------------------------------------" << std::endl;
 		logger().information(os.str());
 	}
@@ -149,7 +147,7 @@ protected:
 	{
 		std::ostringstream os;
 		os << "Reply from " << args.hostAddress()
-		   << " bytes=" << args.dataSize() 
+		   << " bytes=" << args.dataSize()
 		   << " time=" << args.replyTime() << "ms"
 		   << " TTL=" << args.ttl();
 		logger().information(os.str());
@@ -169,8 +167,8 @@ protected:
 		   << std::endl << "Packets: Sent=" << args.sent() << ", Received=" << args.received()
 		   << " Lost=" << args.repetitions() - args.received() << " (" << 100.0 - args.percent() << "% loss),"
 		   << std::endl << "Approximate round trip times in milliseconds: " << std::endl
-		   << "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()  
-		   << "ms, Average=" << args.avgRTT() << "ms" 
+		   << "Minimum=" << args.minRTT() << "ms, Maximum=" << args.maxRTT()
+		   << "ms, Average=" << args.avgRTT() << "ms"
 		   << std::endl << "------------------------------------------";
 		logger().information(os.str());
 	}

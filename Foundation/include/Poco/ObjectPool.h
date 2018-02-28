@@ -1,8 +1,6 @@
 //
 // ObjectPool.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ObjectPool.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ObjectPool
@@ -41,7 +39,7 @@ class PoolableObjectFactory
 	/// a policy class to change the behavior of the ObjectPool when
 	/// creating new objects, returning used objects back to the pool
 	/// and destroying objects, when the pool itself is destroyed or
-	/// shrinked.
+	/// shrunk.
 {
 public:
 	P createObject()
@@ -57,7 +55,7 @@ public:
 		/// Returns true if the object is valid,
 		/// false otherwise.
 		///
-		/// To maintain the integrity of the pool, this method 
+		/// To maintain the integrity of the pool, this method
 		/// must not throw an exception.
 	{
 		return true;
@@ -75,7 +73,7 @@ public:
 		/// pool and the object is still valid (a prior call
 		/// to validateObject() returned true).
 		///
-		/// To maintain the integrity of the pool, this method 
+		/// To maintain the integrity of the pool, this method
 		/// must not throw an exception.
 	{
 	}
@@ -83,7 +81,7 @@ public:
 	void destroyObject(P pObject)
 		/// Destroy an object.
 		///
-		/// To maintain the integrity of the pool, this method 
+		/// To maintain the integrity of the pool, this method
 		/// must not throw an exception.
 	{
 		delete pObject;
@@ -155,14 +153,14 @@ class ObjectPool
 	///
 	/// When an object is requested from the pool:
 	///   - If an object is available from the pool, an object from the pool is
-	///     removed from the pool, activated (using the factory) and returned. 
-	///   - Otherwise, if the peak capacity of the pool has not yet been reached, 
-	///     a new object is created and activated, using the object factory, and returned. 
+	///     removed from the pool, activated (using the factory) and returned.
+	///   - Otherwise, if the peak capacity of the pool has not yet been reached,
+	///     a new object is created and activated, using the object factory, and returned.
 	///   - If the peak capacity has already been reached, null is returned after timeout.
 	///
 	/// When an object is returned to the pool:
 	///   - If the object is valid (checked by calling validateObject()
-	///     from the object factory), the object is deactivated. If the 
+	///     from the object factory), the object is deactivated. If the
 	///     number of objects in the pool is below the capacity,
 	///     the object is added to the pool. Otherwise it is destroyed.
 	///   - If the object is not valid, it is destroyed immediately.

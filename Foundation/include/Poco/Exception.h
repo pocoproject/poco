@@ -1,8 +1,6 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Exception.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -230,7 +228,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, PropertyNotSupportedException, RuntimeExc
 POCO_DECLARE_EXCEPTION(Foundation_API, PoolOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoPermissionException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OutOfMemoryException, RuntimeException)
-POCO_DECLARE_EXCEPTION(Foundation_API, DataException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, SQLException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, InterruptedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, IndexOutOfBoundsException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnsupportedOperationException, RuntimeException)
@@ -238,9 +236,9 @@ POCO_DECLARE_EXCEPTION(Foundation_API, EmptyStackException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, StackOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ArithmeticException, RuntimeException)
 
-POCO_DECLARE_EXCEPTION(Foundation_API, DataFormatException, DataException)
-POCO_DECLARE_EXCEPTION(Foundation_API, SyntaxException, DataException)
-POCO_DECLARE_EXCEPTION(Foundation_API, CircularReferenceException, DataException)
+POCO_DECLARE_EXCEPTION(Foundation_API, DataFormatException, SQLException)
+POCO_DECLARE_EXCEPTION(Foundation_API, SyntaxException, SQLException)
+POCO_DECLARE_EXCEPTION(Foundation_API, CircularReferenceException, SQLException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PathSyntaxException, SyntaxException)
 POCO_DECLARE_EXCEPTION(Foundation_API, IOException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ProtocolException, IOException)

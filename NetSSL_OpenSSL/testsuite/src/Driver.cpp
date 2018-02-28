@@ -1,8 +1,6 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/testsuite/src/Driver.cpp#1 $
-//
 // Console-based test driver for Poco NetSSL.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -64,9 +62,9 @@ protected:
 		configPath.pushDirectory("testsuite");
 		configPath.setFileName("TestSuite.xml");
 
-		loadConfiguration(configPath.toString()); 
+		loadConfiguration(configPath.toString());
 #else
-		loadConfiguration(); 
+		loadConfiguration();
 #endif
 		Poco::Util::Application::initialize(self);
 	}

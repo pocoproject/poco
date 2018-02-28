@@ -1,8 +1,6 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/EchoServer/src/EchoServer.cpp#1 $
-//
 // This sample demonstrates the SocketReactor and SocketAcceptor classes.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -53,7 +51,7 @@ class EchoServiceHandler
 	/// data availability. To ensure non-blocking behavior and alleviate spurious
 	/// socket writability callback triggering when no data to be sent is available,
 	/// FIFO buffers are used. I/O FIFOBuffer sends notifications on transitions
-	/// from [1] non-readable (i.e. empty) to readable, [2] writable to non-writable 
+	/// from [1] non-readable (i.e. empty) to readable, [2] writable to non-writable
 	/// (i.e. full) and [3] non-writable (i.e. full) to writable.
 	/// Based on these notifications, the handler member functions react by
 	/// enabling/disabling respective reactor framework notifications.
@@ -247,7 +245,7 @@ protected:
 			SocketReactor reactor;
 			// ... and a SocketAcceptor
 			SocketAcceptor<EchoServiceHandler> acceptor(svs, reactor);
-			// run the reactor in its own thread so that we can wait for 
+			// run the reactor in its own thread so that we can wait for
 			// a termination request
 			Thread thread;
 			thread.start(reactor);

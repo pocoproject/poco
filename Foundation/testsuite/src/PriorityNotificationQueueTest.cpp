@@ -1,8 +1,6 @@
 //
 // PriorityNotificationQueueTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PriorityNotificationQueueTest.cpp#1 $
-//
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -27,7 +25,7 @@ using Poco::Thread;
 using Poco::RunnableAdapter;
 
 
-namespace 
+namespace
 {
 	class QTestNotification: public Notification
 	{

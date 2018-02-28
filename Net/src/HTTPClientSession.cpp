@@ -1,8 +1,6 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#15 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPClientSession
@@ -62,6 +60,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_expectResponseBody(false),
 	_responseReceived(false)
 {
+	setKeepAlive(true);
 }
 
 
@@ -101,6 +100,20 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 	_expectResponseBody(false),
 	_responseReceived(false)
 {
+}
+
+
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig):
+	HTTPSession(socket),
+	_port(HTTPSession::HTTP_PORT),
+	_proxyConfig(proxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false),
+	_responseReceived(false)
+{
+	setKeepAlive(true);
 }
 
 
@@ -167,7 +180,7 @@ void HTTPClientSession::setProxyUsername(const std::string& username)
 {
 	_proxyConfig.username = username;
 }
-	
+
 
 void HTTPClientSession::setProxyPassword(const std::string& password)
 {
@@ -249,7 +262,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		{
 			_pRequestStream = new HTTPOutputStream(*this);
 			request.write(*_pRequestStream);
-		}	
+		}
 		_lastRequest.update();
 		return *_pRequestStream;
 	}
@@ -303,7 +316,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 #endif
 	else
 		_pResponseStream = new HTTPInputStream(*this);
-		
+
 	return *_pResponseStream;
 }
 

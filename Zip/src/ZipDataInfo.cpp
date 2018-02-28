@@ -1,8 +1,6 @@
 //
 // ZipDataInfo.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipDataInfo.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipDataInfo
@@ -62,7 +60,6 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 ZipDataInfo::~ZipDataInfo()
 {
 }
-
 
 
 const char ZipDataInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};

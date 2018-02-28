@@ -1,8 +1,6 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketAddress.cpp#5 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketAddress
@@ -407,6 +405,87 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 			throw ServiceNotFoundException(service);
 #endif
 	}
+}
+
+
+void SocketAddress::destruct()
+{
+	pImpl()->~SocketAddressImpl();
+}
+
+
+SocketAddress::Ptr SocketAddress::pImpl() const
+{
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
+}
+
+
+void SocketAddress::newIPv4()
+{
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl;
+}
+
+
+void SocketAddress::newIPv4(const sockaddr_in* sockAddr)
+{
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(sockAddr);
+}
+
+
+void SocketAddress::newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+}
+
+
+#if defined(POCO_HAVE_IPv6)
+void SocketAddress::newIPv6(const sockaddr_in6* sockAddr)
+{
+	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(sockAddr);
+}
+
+
+void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+}
+#endif // POCO_HAVE_IPv6
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+void SocketAddress::newLocal(const sockaddr_un* sockAddr)
+{
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(sockAddr);
+}
+
+
+void SocketAddress::newLocal(const std::string& path)
+{
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path.c_str(), path.size());
+}
+#endif // POCO_OS_FAMILY_UNIX
+
+
+char* SocketAddress::storage()
+{
+	return _memory.buffer;
+}
+
+
+bool SocketAddress::operator == (const SocketAddress& socketAddress) const
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (family() == UNIX_LOCAL)
+		return toString() == socketAddress.toString();
+	else
+#endif
+		return host() == socketAddress.host() && port() == socketAddress.port();
+}
+
+
+bool SocketAddress::operator != (const SocketAddress& socketAddress) const
+{
+	return !(operator == (socketAddress));
 }
 
 

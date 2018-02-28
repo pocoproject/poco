@@ -1,8 +1,6 @@
 //
 // ICMPPacketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPPacketImpl.cpp#2 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPPacketImpl
@@ -82,13 +80,13 @@ unsigned short ICMPPacketImpl::checksum(UInt16 *addr, Int32 len)
 	UInt16 answer;
 	Int32 sum = 0;
 
-	while (nleft > 1)  
+	while (nleft > 1)
 	{
 		sum   += *w++;
 		nleft -= sizeof(UInt16);
 	}
 
-	if (nleft == 1) 
+	if (nleft == 1)
 	{
 		UInt16 u = 0;
 		*(UInt8*) (&u) = *(UInt8*) w;

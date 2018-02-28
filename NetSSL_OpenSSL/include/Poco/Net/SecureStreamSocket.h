@@ -1,8 +1,6 @@
 //
 // SecureStreamSocket.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocket.h#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureStreamSocket
@@ -36,7 +34,7 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	///
 	/// A few notes about nonblocking IO:
 	/// sendBytes() and receiveBytes() can return a
-	/// negative value when using a nonblocking socket, which means 
+	/// negative value when using a nonblocking socket, which means
 	/// a SSL handshake is currently in progress and more data
 	/// needs to be read or written for the handshake to continue.
 	/// If sendBytes() or receiveBytes() return ERR_SSL_WANT_WRITE,
@@ -45,7 +43,7 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// ERR_SSL_WANT_READ is returned, receiveBytes() must be called
 	/// as soon as data is available for reading (indicated by select()).
 	///
-	/// The SSL handshake is delayed until the first sendBytes() or 
+	/// The SSL handshake is delayed until the first sendBytes() or
 	/// receiveBytes() operation is performed on the socket. No automatic
 	/// post connection check (checking the peer certificate for a valid
 	/// hostname) is performed when using nonblocking I/O. To manually
@@ -85,17 +83,17 @@ public:
 		/// agrees to reuse the session).
 
 	explicit SecureStreamSocket(const SocketAddress& address);
-		/// Creates a secure stream socket using the default 
+		/// Creates a secure stream socket using the default
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 
 	SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 
 	SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext, Session::Ptr pSession);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
@@ -104,21 +102,21 @@ public:
 		/// agrees to reuse the session).
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName);
-		/// Creates a secure stream socket using the default 
+		/// Creates a secure stream socket using the default
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
 		/// The given host name is used for certificate verification.
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///
 		/// The given host name is used for certificate verification.
 
 	SecureStreamSocket(const SocketAddress& address, const std::string& hostName, Context::Ptr pContext, Session::Ptr pSession);
-		/// Creates a secure stream socket using the given 
+		/// Creates a secure stream socket using the given
 		/// client SSL context and connects it to
 		/// the socket specified by address.
 		///

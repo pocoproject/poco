@@ -1,8 +1,6 @@
 //
 // BufferedStreamBuf.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BufferedStreamBuf.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamBuf
@@ -31,7 +29,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch> > 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch> >
 class BasicBufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of a buffered streambuf
 	/// that greatly simplifies the implementation of
@@ -62,24 +60,30 @@ public:
 		_mode(mode)
 	{
 		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);
-		this->setp(_pBuffer, _pBuffer + (_bufsize - 1));
+		this->setp(_pBuffer, _pBuffer + _bufsize);
 	}
 
 	~BasicBufferedStreamBuf()
 	{
-		Allocator::deallocate(_pBuffer, _bufsize);
+		try
+		{
+			Allocator::deallocate(_pBuffer, _bufsize);
+		} catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	virtual int_type overflow(int_type c)
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
-		if (c != char_traits::eof()) 
+		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
+		if (c != char_traits::eof())
 		{
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
 		}
-		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 
 		return c;
 	}
@@ -102,12 +106,12 @@ public:
 		this->setg(_pBuffer + (4 - putback), _pBuffer + 4, _pBuffer + 4 + n);
 
 		// return next character
-		return char_traits::to_int_type(*this->gptr());    
+		return char_traits::to_int_type(*this->gptr());
 	}
 
 	virtual int sync()
 	{
-		if (this->pptr() && this->pptr() > this->pbase()) 
+		if (this->pptr() && this->pptr() > this->pbase())
 		{
 			if (flushBuffer() == -1) return -1;
 		}
@@ -139,7 +143,7 @@ private:
 	int flushBuffer()
 	{
 		int n = int(this->pptr() - this->pbase());
-		if (writeToDevice(this->pbase(), n) == n) 
+		if (writeToDevice(this->pbase(), n) == n)
 		{
 			this->pbump(-n);
 			return n;

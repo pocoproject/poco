@@ -1,8 +1,6 @@
 //
 // MetaObject.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/MetaObject.h#1 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  ClassLoader
@@ -157,18 +155,18 @@ public:
 };
 
 
-template <class C, class B> 
-class MetaSingleton: public AbstractMetaObject<B> 
+template <class C, class B>
+class MetaSingleton: public AbstractMetaObject<B>
 	/// A SingletonMetaObject disables the create() method
 	/// and instead offers an instance() method to access
-	/// the single instance of its class. 
-{ 
-public: 
-	MetaSingleton(const char* name): AbstractMetaObject<B>(name) 
+	/// the single instance of its class.
+{
+public:
+	MetaSingleton(const char* name): AbstractMetaObject<B>(name)
 	{
 	}
 	
-	~MetaSingleton() 
+	~MetaSingleton()
 	{
 	}
 	
@@ -192,9 +190,9 @@ public:
 		return true;
 	}
 
-private: 
-	mutable SingletonHolder<C> _object; 
-}; 
+private:
+	mutable SingletonHolder<C> _object;
+};
 
 
 } // namespace Poco

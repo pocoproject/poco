@@ -1,8 +1,6 @@
 //
 // StreamSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/StreamSocketImpl.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  StreamSocketImpl
@@ -64,7 +62,7 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	{
 		int n = SocketImpl::sendBytes(p, remaining, flags);
 		poco_assert_dbg (n >= 0);
-		p += n; 
+		p += n;
 		sent += n;
 		remaining -= n;
 		if (blocking && remaining > 0)

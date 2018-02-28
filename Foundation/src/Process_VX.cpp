@@ -1,8 +1,6 @@
 //
 // Process_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_VX.cpp#3 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process
@@ -81,13 +79,13 @@ void ProcessImpl::killImpl(PIDImpl pid)
 }
 
 
-bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
+bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid) 
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	throw Poco::NotImplementedException("Process::is_running()");
 }

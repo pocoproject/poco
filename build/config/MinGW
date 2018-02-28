@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/MinGW#2 $
-#
 # MinGW32
 #
 # Make settings for MinGW32
@@ -24,7 +22,7 @@ RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -o $@ -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(basename $(notdir $@))).a
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   = strip
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp

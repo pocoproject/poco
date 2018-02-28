@@ -1,8 +1,6 @@
 //
 // PathTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PathTest.h#2 $
-//
 // Definition of the PathTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -31,10 +29,12 @@ public:
 	void testParseUnix3();
 	void testParseUnix4();
 	void testParseUnix5();
+	void testExpandVariableFromPath();
 	void testParseWindows1();
 	void testParseWindows2();
 	void testParseWindows3();
 	void testParseWindows4();
+	void testParseWindows5();
 	void testParseVMS1();
 	void testParseVMS2();
 	void testParseVMS3();

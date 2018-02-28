@@ -1,8 +1,6 @@
 //
 // RawSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/RawSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -62,7 +60,7 @@ void RawSocketTest::testEchoIPv4()
 	assert (5 == (n - shift));
 	assert ("hello" == std::string((char*)ptr, 5));
 
-	rs.close(); 
+	rs.close();
 }
 
 

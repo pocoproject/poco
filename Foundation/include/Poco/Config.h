@@ -1,8 +1,6 @@
 //
 // Config.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Config.h#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Foundation
@@ -20,16 +18,15 @@
 #define Foundation_Config_INCLUDED
 
 
-// Define to enable Windows Unicode (UTF-8) support
-// NOTE: As of POCO C++ Libraries release 1.6.0, compiling POCO
-// without POCO_WIN32_UTF8 defined on Windows is deprecated.
-#ifndef POCO_WIN32_UTF8
-#define POCO_WIN32_UTF8
-#endif
+// NOTE: As of POCO C++ Libraries release 2.0.0, compiling POCO
+// without c++11 support is deprecated.
+
+// Define to enable C++14 support
+// #define POCO_ENABLE_CPP14
 
 
-// Define to enable C++11 support
-// #define POCO_ENABLE_CPP11
+// Define to force disable C++14 support
+// #define POCO_DISABLE_CPP14
 
 
 // Define to disable implicit linking
@@ -185,6 +182,10 @@
 // Define to prevent changing the suffix for shared libraries
 // to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
 // #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
+
+
+// Disarm POCO_DEPRECATED macro.
+// #define POCO_NO_DEPRECATED
 
 
 #endif // Foundation_Config_INCLUDED

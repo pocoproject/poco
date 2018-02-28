@@ -1,8 +1,6 @@
 //
 // URIStreamOpener.cpp
 //
-// $Id: //poco/1.4/Foundation/src/URIStreamOpener.cpp#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URIStreamOpener
@@ -80,7 +78,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		Path path;
 		if (path.tryParse(pathOrURI, Path::PATH_GUESS))
 			return openFile(path);
-		else 
+		else
 			throw;
 	}
 }

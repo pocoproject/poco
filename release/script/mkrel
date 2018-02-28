@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/release/script/mkrel#1 $
-#
 # mkrel
 #
 # Create a release for distribution.
@@ -36,7 +34,7 @@ esac
 label=""
 spec=""
 lineEndConv=""
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-l" ] ; then
 		shift

@@ -1,9 +1,7 @@
 #
-# $Id: //poco/1.4/build/config/iPhone-clang#2 $
-#
 # iPhone-clang
 #
 # Build settings for iPhone OS, using Apple's iPhone SDK
-# 
+#
 
 include $(POCO_BASE)/build/config/iPhone

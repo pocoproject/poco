@@ -6,7 +6,7 @@
 # Build settings for Mac OS X 10.9 (clang, libc++, i386)
 # The build settings defined in this file are compatible
 # with XCode C++ projects.
-# 
+#
 
 ARCHFLAGS = -arch i386
 POCO_TARGET_OSARCH = i386

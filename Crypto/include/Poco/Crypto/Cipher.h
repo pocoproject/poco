@@ -1,8 +1,6 @@
 //
 // Cipher.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/Cipher.h#3 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  Cipher
@@ -77,10 +75,10 @@ class Crypto_API Cipher: public Poco::RefCountedObject
 	///     // and write pass it to the underlying file stream.
 	///     Poco::FileOutputStream sink("encrypted.dat");
 	///     CryptoOutputStream encryptor(sink, pCipher->createEncryptor());
-	///     
+	///
 	///     Poco::FileInputStream source("source.txt");
 	///     Poco::StreamCopier::copyStream(source, encryptor);
-	///     
+	///
 	///     // Always close output streams to flush all internal buffers
 	///     encryptor.close();
 	///     sink.close();

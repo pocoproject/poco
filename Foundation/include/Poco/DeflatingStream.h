@@ -1,8 +1,6 @@
 //
 // DeflatingStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DeflatingStream.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  ZLibStream
@@ -75,7 +73,7 @@ public:
 		/// Destroys the DeflatingStreamBuf.
 		
 	int close();
-		/// Finishes up the stream. 
+		/// Finishes up the stream.
 		///
 		/// Must be called when deflating to an output stream.
 
@@ -85,7 +83,7 @@ protected:
 	virtual int sync();
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE  = 1024,
 		DEFLATE_BUFFER_SIZE = 32768
@@ -167,7 +165,7 @@ public:
 		/// Destroys the DeflatingOutputStream.
 		
 	int close();
-		/// Finishes up the stream. 
+		/// Finishes up the stream.
 		///
 		/// Must be called when deflating to an output stream.
 

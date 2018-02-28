@@ -1,8 +1,6 @@
 //
 // ICMPSocketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPSocketImpl.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocketImpl
@@ -53,6 +51,9 @@ public:
 	int dataSize() const;
 		/// Returns the data size in bytes.
 
+	int packetSize() const;
+		/// Returns the packet size in bytes.
+
 	int ttl() const;
 		/// Returns the Time-To-Live value.
 
@@ -72,6 +73,12 @@ private:
 //
 // inlines
 //
+
+inline int ICMPSocketImpl::packetSize() const
+{
+	return _icmpPacket.packetSize();
+}
+
 inline int ICMPSocketImpl::dataSize() const
 {
 	return _icmpPacket.getDataSize();

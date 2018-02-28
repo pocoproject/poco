@@ -1,8 +1,6 @@
 //
 // DocWriter.cpp
 //
-// $Id: //poco/1.7/PocoDoc/src/DocWriter.cpp#3 $
-//
 // Copyright (c) 2005-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -48,7 +46,8 @@ using namespace Poco::CppParser;
 std::string DocWriter::_language;
 DocWriter::StringMap DocWriter::_strings;
 Poco::Logger* DocWriter::_pLogger(0);
-const std::string DocWriter::RFC_URI("http://www.ietf.org/rfc/rfc");
+const std::string DocWriter::RFC_URI("https://www.ietf.org/rfc/rfc");
+const std::string DocWriter::GITHUB_POCO_URI("https://github.com/pocoproject/poco");
 
 
 DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& path, bool prettifyCode, bool noFrames):
@@ -1133,6 +1132,39 @@ void DocWriter::writeText(std::ostream& ostr, std::string::const_iterator begin,
 				}
 				begin = it;
 			}
+			if (token == "GH")
+			{
+				std::string uri(GITHUB_POCO_URI);
+				std::string::const_iterator it(begin);
+				std::string spc;
+				nextToken(begin, end, spc);
+				if (spc == ":")
+				{
+					std::string proj;
+					nextToken(begin, end, proj);
+					uri = projectURI(proj);
+					nextToken(begin, end, spc);
+				}
+				if (spc == " ")
+				{
+					std::string hash;
+					nextToken(begin, end, hash);
+					if (hash == "#")
+					{
+						std::string n;
+						nextToken(begin, end, n);
+						if (!n.empty() && std::isdigit(n[0]))
+						{
+							uri += "/issues/";
+							uri += n;
+							writeTargetLink(ostr, uri, token + " #" + n, "_blank");
+							nextToken(begin, end, token);
+							continue;
+						}
+					}
+				}
+				begin = it;
+			}
 			if (token == "http")
 			{
 				std::string::const_iterator it(begin);
@@ -2163,9 +2195,9 @@ void DocWriter::writePage(Page& page)
 	while (ch != -1 && ch != '\n') { category += (char) ch; ch = istr.get(); }
 	
 	while (std::isspace(ch)) ch = istr.get();
-	while (ch != -1) 
+	while (ch != -1)
 	{
-		text += (char) ch; 
+		text += (char) ch;
 		if (ch == '\n') text += ' ';
 		ch = istr.get();
 	}
@@ -2184,7 +2216,7 @@ void DocWriter::writePage(Page& page)
 	beginBody(ostr);
 	writeNavigationFrame(ostr, "category", category);
 	beginContent(ostr);
-	if (!toc.empty()) 
+	if (!toc.empty())
 	{
 		writeTOC(ostr, toc);
 	}
@@ -2233,32 +2265,38 @@ void DocWriter::writeTOC(std::ostream& ostr, const TOC& toc)
 	ostr << "<div class=\"toc\">" << std::endl;
 	ostr << "<ul class=\"collapsibleList\"><li>" << tr("TOC") << std::endl;
 	int lastLevel = 0;
+	std::vector<int> levelStack;
+	levelStack.push_back(0);
 	for (TOC::const_iterator it = toc.begin(); it != toc.end(); ++it)
 	{
 		int level = it->level;
-		if (level > lastLevel)
+		if (level > levelStack.back())
 		{
+			levelStack.push_back(level);
 			ostr << "<ul>" << std::endl;
 		}
-		else if (level < lastLevel)
+		else if (level < levelStack.back())
 		{
-			for (int i = level; i < lastLevel; i++)
+			ostr << "</li>" << std::endl;
+			while (level < levelStack.back())
 			{
+				levelStack.pop_back();
 				ostr << "</ul></li>" << std::endl;
 			}
 		}
-		else 
+		else
 		{
 			ostr << "</li>" << std::endl;
 		}
 		ostr << "<li class=\"level" << level << "\"><a href=\"#" << it->id << "\">" << htmlize(it->title) << "</a>" << std::endl;
 		lastLevel = level;
 	}
-	while (lastLevel-- > 1)
+	while (!levelStack.empty())
 	{
 		ostr << "</li></ul>" << std::endl;
+		levelStack.pop_back();
 	}
-	ostr << "</li></ul></li></ul></div>" << std::endl;
+	ostr << "</div>" << std::endl;
 }
 
 
@@ -2369,4 +2407,19 @@ void DocWriter::loadStrings(const std::string& language)
 	loadString("This", "This", language);
 	loadString("Types", "Types", language);
 	loadString("Variables", "Variables", language);
+}
+
+
+std::string DocWriter::projectURI(const std::string& proj)
+{
+	Application& app = Application::instance();
+	std::string key("PocoDoc.projects.");
+	key += proj;
+	std::string uri = app.config().getString(key, "");
+	if (uri.empty()) 
+	{
+		app.logger().warning("No project URI found for %s", proj);
+		uri = GITHUB_POCO_URI;
+	}
+	return uri;
 }

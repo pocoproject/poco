@@ -1,10 +1,8 @@
 #
-# $Id: //poco/1.4/build/config/iPhoneSimulator-clang#1 $
-#
 # iPhoneSimulator-clang
 #
 # Build settings for iPhone Simulator, using Apple's iPhone SDK
-# 
+#
 
 IPHONE_SDK         = iPhoneSimulator
 POCO_TARGET_OSARCH = i686

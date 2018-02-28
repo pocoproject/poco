@@ -1,8 +1,6 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#5 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTimeParser
@@ -44,10 +42,13 @@ namespace Poco {
 	{ int i = 0; while (i < n && it != end && Ascii::isDigit(*it)) { var = var*10 + ((*it++) - '0'); i++; } while (i++ < n) var *= 10; }
 
 
-void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
+void DateTimeParser::parse(const std::string& fmt,
+	const std::string& str,
+	DateTime& dateTime,
+	int& timeZoneDifferential)
 {
-	if (fmt.empty() || str.empty())
-		throw SyntaxException("Empty string.");
+	if (fmt.empty() || str.empty() || (DateTimeFormat::hasFormat(fmt) && !DateTimeFormat::isValid(str)))
+		throw SyntaxException("Invalid DateTimeString:" + str);
 
 	int year   = 0;
 	int month  = 0;
@@ -92,11 +93,11 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 				case 'o':
 					SKIP_JUNK();
 					PARSE_NUMBER_N(month, 2);
-					break;					 
+					break;					
 				case 'y':
 					SKIP_JUNK();
 					PARSE_NUMBER_N(year, 2);
-					if (year >= 69) 
+					if (year >= 69)
 						year += 1900;
 					else
 						year += 2000;
@@ -110,7 +111,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 					PARSE_NUMBER(year);
 					if (year < 1000)
 					{
-						if (year >= 69) 
+						if (year >= 69)
 							year += 1900;
 						else
 							year += 2000;
@@ -173,7 +174,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	if (day == 0) day = 1;
 	if (DateTime::isValid(year, month, day, hour, minute, second, millis, micros))
 		dateTime.assign(year, month, day, hour, minute, second, millis, micros);
-	else 
+	else
 		throw SyntaxException("date/time component out of range");
 	timeZoneDifferential = tzd;
 }
@@ -186,8 +187,11 @@ DateTime DateTimeParser::parse(const std::string& fmt, const std::string& str, i
 	return result;
 }
 
-	
-bool DateTimeParser::tryParse(const std::string& fmt, const std::string& str, DateTime& dateTime, int& timeZoneDifferential)
+
+bool DateTimeParser::tryParse(const std::string& fmt,
+	const std::string& str,
+	DateTime& dateTime,
+	int& timeZoneDifferential)
 {
 	try
 	{
@@ -328,14 +332,14 @@ int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::strin
 	std::string month;
 	while (it != end && (Ascii::isSpace(*it) || Ascii::isPunct(*it))) ++it;
 	bool isFirst = true;
-	while (it != end && Ascii::isAlpha(*it)) 
+	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
 		if (isFirst) { month += Ascii::toUpper(ch); isFirst = false; }
 		else month += Ascii::toLower(ch);
 	}
 	if (month.length() < 3) throw SyntaxException("Month name must be at least three characters long", month);
-	for (int i = 0; i < 12; ++i) 
+	for (int i = 0; i < 12; ++i)
 	{
 		if (DateTimeFormat::MONTH_NAMES[i].find(month) == 0)
 			return i + 1;
@@ -349,14 +353,14 @@ int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::s
 	std::string dow;
 	while (it != end && (Ascii::isSpace(*it) || Ascii::isPunct(*it))) ++it;
 	bool isFirst = true;
-	while (it != end && Ascii::isAlpha(*it)) 
+	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
 		if (isFirst) { dow += Ascii::toUpper(ch); isFirst = false; }
 		else dow += Ascii::toLower(ch);
 	}
 	if (dow.length() < 3) throw SyntaxException("Weekday name must be at least three characters long", dow);
-	for (int i = 0; i < 7; ++i) 
+	for (int i = 0; i < 7; ++i)
 	{
 		if (DateTimeFormat::WEEKDAY_NAMES[i].find(dow) == 0)
 			return i;
@@ -369,7 +373,7 @@ int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string
 {
 	std::string ampm;
 	while (it != end && (Ascii::isSpace(*it) || Ascii::isPunct(*it))) ++it;
-	while (it != end && Ascii::isAlpha(*it)) 
+	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
 		ampm += Ascii::toUpper(ch);

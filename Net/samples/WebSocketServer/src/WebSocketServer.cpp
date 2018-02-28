@@ -1,8 +1,6 @@
 //
 // WebSocketServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/WebSocketServer/src/WebSocketServer.cpp#1 $
-//
 // This sample demonstrates the WebSocket class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
@@ -149,7 +147,7 @@ public:
 	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
 	{
 		Application& app = Application::instance();
-		app.logger().information("Request from " 
+		app.logger().information("Request from "
 			+ request.clientAddress().toString()
 			+ ": "
 			+ request.getMethod()

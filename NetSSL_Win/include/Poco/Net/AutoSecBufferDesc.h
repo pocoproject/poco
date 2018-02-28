@@ -1,8 +1,6 @@
 //
 // AutoSecBufferDesc.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  AutoSecBufferDesc
@@ -33,7 +31,7 @@ namespace Poco {
 namespace Net {
 
 
-template <int numBufs> 
+template <int numBufs>
 class AutoSecBufferDesc: public SecBufferDesc
 	/// AutoSecBufferDesc is a helper class for automatic initialization and release of SecBuffer objects.
 {

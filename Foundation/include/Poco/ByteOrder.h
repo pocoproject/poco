@@ -1,8 +1,6 @@
 //
 // ByteOrder.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ByteOrder.h#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ByteOrder
@@ -120,7 +118,7 @@ private:
 		#if (POCO_MSVC_VERSION > 71)
 			#define POCO_HAVE_MSC_BYTESWAP 1
 		#endif
-	#elif defined(__clang__) 
+	#elif defined(__clang__)
 		#if __has_builtin(__builtin_bswap32)
 			#define POCO_HAVE_GCC_BYTESWAP 1
 		#endif

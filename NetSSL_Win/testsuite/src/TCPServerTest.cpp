@@ -1,8 +1,6 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/TCPServerTest.cpp#2 $
-//
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -296,7 +294,7 @@ void TCPServerTest::testReuseSession()
 	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
 	
 	Context::Ptr pServerContext = new Context(
-		Context::SERVER_USE, 
+		Context::SERVER_USE,
 		"test.appinf.com");	
 	//pServerContext->enableSessionCache(true, "TestSuite");
 	//pServerContext->setSessionTimeout(10);
@@ -312,7 +310,7 @@ void TCPServerTest::testReuseSession()
 	assert (srv.totalConnections() == 0);
 	
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		"");
 	//pClientContext->enableSessionCache(true);
 	

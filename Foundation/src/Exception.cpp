@@ -1,8 +1,6 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Exception.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -153,7 +151,7 @@ POCO_IMPLEMENT_EXCEPTION(PropertyNotSupportedException, RuntimeException, "Prope
 POCO_IMPLEMENT_EXCEPTION(PoolOverflowException, RuntimeException, "Pool overflow")
 POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission")
 POCO_IMPLEMENT_EXCEPTION(OutOfMemoryException, RuntimeException, "Out of memory")
-POCO_IMPLEMENT_EXCEPTION(DataException, RuntimeException, "Data error")
+POCO_IMPLEMENT_EXCEPTION(SQLException, RuntimeException, "Data error")
 
 POCO_IMPLEMENT_EXCEPTION(InterruptedException, RuntimeException, "Interrupted")
 POCO_IMPLEMENT_EXCEPTION(IndexOutOfBoundsException, RuntimeException, "Index out of bounds")
@@ -162,9 +160,9 @@ POCO_IMPLEMENT_EXCEPTION(EmptyStackException, RuntimeException, "Empty stack")
 POCO_IMPLEMENT_EXCEPTION(StackOverflowException, RuntimeException, "Stack overflow")
 POCO_IMPLEMENT_EXCEPTION(ArithmeticException, RuntimeException, "Arithmetic error")
 
-POCO_IMPLEMENT_EXCEPTION(DataFormatException, DataException, "Bad data format")
-POCO_IMPLEMENT_EXCEPTION(SyntaxException, DataException, "Syntax error")
-POCO_IMPLEMENT_EXCEPTION(CircularReferenceException, DataException, "Circular reference")
+POCO_IMPLEMENT_EXCEPTION(DataFormatException, SQLException, "Bad data format")
+POCO_IMPLEMENT_EXCEPTION(SyntaxException, SQLException, "Syntax error")
+POCO_IMPLEMENT_EXCEPTION(CircularReferenceException, SQLException, "Circular reference")
 POCO_IMPLEMENT_EXCEPTION(PathSyntaxException, SyntaxException, "Bad path syntax")
 POCO_IMPLEMENT_EXCEPTION(IOException, RuntimeException, "I/O error")
 POCO_IMPLEMENT_EXCEPTION(ProtocolException, IOException, "Protocol error")

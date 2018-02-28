@@ -1,8 +1,6 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -39,7 +37,7 @@ XMLConfigurationTest::~XMLConfigurationTest()
 
 void XMLConfigurationTest::testLoad()
 {
-	static const std::string xmlFile = 
+	static const std::string xmlFile =
 		"<config>"
 		"	<prop1>value1</prop1>"
 		"	<prop2>value2</prop2>"
@@ -228,7 +226,7 @@ void XMLConfigurationTest::testLoadAppendSave()
 
 void XMLConfigurationTest::testOtherDelimiter()
 {
-	static const std::string xmlFile = 
+	static const std::string xmlFile =
 		"<config>"
 		"	<prop1>value1</prop1>"
 		"	<prop2>value2</prop2>"

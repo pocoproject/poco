@@ -1,8 +1,6 @@
 //
 // TextIterator.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/TextIterator.h#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  TextIterator
@@ -87,7 +85,7 @@ public:
 		/// If there is no valid character at the current position,
 		/// -1 is returned.
 		
-	TextIterator& operator ++ (); 
+	TextIterator& operator ++ ();
 		/// Prefix increment operator.
 
 	TextIterator operator ++ (int);		

@@ -1,8 +1,6 @@
 //
 // SharedMemoryImpl.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedMemory_DUMMY.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  SharedMemoryImpl
@@ -56,7 +54,7 @@ public:
 		/// Returns the start address of the shared memory segment.
 
 	char* end() const;
-		/// Returns the one-past-end end address of the shared memory segment. 
+		/// Returns the one-past-end end address of the shared memory segment.
 
 protected:
 	~SharedMemoryImpl();

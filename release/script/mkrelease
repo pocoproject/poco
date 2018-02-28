@@ -1,7 +1,5 @@
 #! /bin/bash
 #
-# $Id: //poco/1.4/release/script/mkrelease#8 $
-#
 # mkrelease
 #
 # Create a release for distribution.
@@ -19,7 +17,7 @@ if [ "$1" = "" ] ; then
 	exit 1
 fi
 
-comps="CppUnit CppUnit/WinTestRunner Foundation XML JSON Util Net"
+comps="CppUnit CppUnit/WinTestRunner Foundation Encodings XML JSON Util Net"
 internal=0
 specfile=""
 version=""
@@ -27,7 +25,7 @@ output=""
 lineEndConv=""
 licensingDep=""
 
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-i" ] ; then
 		shift
@@ -115,6 +113,7 @@ mkdir -p ${target}/build/vxconfig
 cp ${POCO_BASE}/build/config/* ${target}/build/config
 cp ${POCO_BASE}/build/rules/* ${target}/build/rules
 cp ${POCO_BASE}/build/vxconfig/* ${target}/build/vxconfig
+cp ${POCO_BASE}/build/script/cpp11-* ${target}/build/script
 cp ${POCO_BASE}/build/script/makedepend.* ${target}/build/script
 cp ${POCO_BASE}/build/script/makeldpath ${target}/build/script
 cp ${POCO_BASE}/build/script/shlibln ${target}/build/script
@@ -240,7 +239,7 @@ endif
 .PHONY: poco all libexecs cppunit tests samples cleans clean distclean install
 
 # TESTS and SAMPLES are set in config.make
-poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples) 
+poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
@@ -320,20 +319,20 @@ do
 			dependencies="$dependencies ${dep}-libexec"
 		done
 	fi
-	cat >>${target}/Makefile <<ENDOFSCRIPT 
+	cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-libexec: $dependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}
 ENDOFSCRIPT
 
 	if [ -d "${POCO_BASE}/${comp}/testsuite" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 
 ${comp}-tests: ${comp}-libexec cppunit
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite
 ENDOFSCRIPT
 	fi
-	
+
 	if [ -d "${POCO_BASE}/${comp}/samples" ] ; then
 		sdependencies=""
 		if [ -f "${POCO_BASE}/${comp}/samples/dependencies" ] ; then
@@ -344,8 +343,8 @@ ENDOFSCRIPT
 				sdependencies="$sdependencies ${dep}-libexec"
 			done
 		fi
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
-	
+		cat >>${target}/Makefile <<ENDOFSCRIPT
+
 ${comp}-samples: ${comp}-libexec $sdependencies
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples
 ENDOFSCRIPT
@@ -358,13 +357,13 @@ ${comp}-clean:
 ENDOFSCRIPT
 
 	if [ -f "${POCO_BASE}/${comp}/testsuite/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/testsuite clean
 ENDOFSCRIPT
 	fi
 
 	if [ -f "${POCO_BASE}/${comp}/samples/Makefile" ] ; then
-		cat >>${target}/Makefile <<ENDOFSCRIPT 
+		cat >>${target}/Makefile <<ENDOFSCRIPT
 	\$(MAKE) -C \$(POCO_BASE)/${comp}/samples clean
 ENDOFSCRIPT
 	fi
@@ -383,49 +382,6 @@ ENDOFSCRIPT
 
 
 #
-# Create Visual Studio 9 build script
-#
-cat >${target}/build_vs90.cmd <<'ENDOFSCRIPT'
-@echo off
-if defined VS90COMNTOOLS (
-call "%VS90COMNTOOLS%\vsvars32.bat")
-buildwin 90 build shared both Win32 samples
-ENDOFSCRIPT
-
-
-#
-# Create Visual Studio 10 build script
-#
-cat >${target}/build_vs100.cmd <<'ENDOFSCRIPT'
-@echo off
-if defined VS100COMNTOOLS (
-call "%VS100COMNTOOLS%\vsvars32.bat")
-buildwin 100 build shared both Win32 samples devenv
-ENDOFSCRIPT
-
-
-#
-# Create Visual Studio 11 build script
-#
-cat >${target}/build_vs110.cmd <<'ENDOFSCRIPT'
-@echo off
-if defined VS110COMNTOOLS (
-call "%VS110COMNTOOLS%\vsvars32.bat")
-buildwin 110 build shared both Win32 samples devenv
-ENDOFSCRIPT
-
-
-#
-# Create Visual Studio 12 build script
-#
-cat >${target}/build_vs120.cmd <<'ENDOFSCRIPT'
-@echo off
-if defined VS120COMNTOOLS (
-call "%VS120COMNTOOLS%\vsvars32.bat")
-buildwin 120 build shared both Win32 samples devenv
-ENDOFSCRIPT
-
-#
 # Create Visual Studio 14 build script
 #
 cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
@@ -433,6 +389,16 @@ cat >${target}/build_vs140.cmd <<'ENDOFSCRIPT'
 if defined VS140COMNTOOLS (
 call "%VS140COMNTOOLS%\vsvars32.bat")
 buildwin 140 build shared both Win32 samples devenv
+ENDOFSCRIPT
+
+#
+# Create Visual Studio 15 build script
+#
+cat >${target}/build_vs150.cmd <<'ENDOFSCRIPT'
+@echo off
+if defined VS150COMNTOOLS (
+call "%VS150COMNTOOLS%\vsvars32.bat")
+buildwin 150 build shared both Win32 samples devenv
 ENDOFSCRIPT
 
 
@@ -445,56 +411,14 @@ buildwin 90 build static_mt both WinCE samples
 ENDOFSCRIPT
 
 
-#
-# Create Visual C++ Express 2008 build script
-#
-cat >${target}/build_vcexpress2008.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 90 build shared both Win32 samples vcexpress
-ENDOFSCRIPT
-
-
-#
-# Create Visual C++ Express 2010 build script
-#
-cat >${target}/build_vcexpress2010.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 100 build shared both Win32 samples vcexpress
-ENDOFSCRIPT
-
-
-#
-# Create Visual C++ Express 2012 build script
-#
-cat >${target}/build_vdexpress2012.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 110 build shared both Win32 samples tests vdexpress
-ENDOFSCRIPT
-
-
-#
-# Create Visual C++ Express 2013 build script
-#
-cat >${target}/build_vdexpress2013.cmd <<'ENDOFSCRIPT'
-@echo off
-buildwin 120 build shared both Win32 samples tests vdexpress
-ENDOFSCRIPT
-
 
 #
 # Fix line endings
 #
 if [ "$lineEndConv" != "" ] ; then
-	$lineEndConv ${target}/build_vs90.cmd
-	$lineEndConv ${target}/build_vs100.cmd
-	$lineEndConv ${target}/build_vs110.cmd
-	$lineEndConv ${target}/build_vs120.cmd
 	$lineEndConv ${target}/build_vs140.cmd
+	$lineEndConv ${target}/build_vs150.cmd
 	$lineEndConv ${target}/build_CE_vs90.cmd
-	$lineEndConv ${target}/build_vcexpress2008.cmd
-	$lineEndConv ${target}/build_vcexpress2010.cmd
-	$lineEndConv ${target}/build_vdexpress2012.cmd
-	$lineEndConv ${target}/build_vdexpress2013.cmd
 	$lineEndConv ${target}/Makefile
 	$lineEndConv ${target}/components
 fi
@@ -506,13 +430,13 @@ fi
 if [ "$output" = "" ] ; then
 	cd releases
 	find ${target}/ -print | sed "s:^${target}/*::" >${target}/MANIFEST
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	gzip poco-${version}.tar
-	
+
 	tar cf poco-${version}.tar poco-${version}
 	bzip2 poco-${version}.tar
-	
+
 	if [ -x /usr/bin/zip ] ; then
 		/usr/bin/zip -r -q poco-${version}.zip poco-${version}
 	fi

@@ -1,8 +1,6 @@
 //
 // ActiveResult.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ActiveResult.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects
@@ -35,7 +33,7 @@ template <class ResultType>
 class ActiveResultHolder: public RefCountedObject
 	/// This class holds the result of an asynchronous method
 	/// invocation. It is used to pass the result from the
-	/// execution thread back to the invocation thread. 
+	/// execution thread back to the invocation thread.
 	/// The class uses reference counting for memory management.
 	/// Do not use this class directly, use ActiveResult instead.
 {
@@ -236,8 +234,8 @@ private:
 template <class RT>
 class ActiveResult
 	/// This class holds the result of an asynchronous method
-	/// invocation (see class ActiveMethod). It is used to pass the 
-	/// result from the execution thread back to the invocation thread. 
+	/// invocation (see class ActiveMethod). It is used to pass the
+	/// result from the execution thread back to the invocation thread.
 {
 public:
 	typedef RT ResultType;
@@ -375,8 +373,8 @@ private:
 template <>
 class ActiveResult<void>
 	/// This class holds the result of an asynchronous method
-	/// invocation (see class ActiveMethod). It is used to pass the 
-	/// result from the execution thread back to the invocation thread. 
+	/// invocation (see class ActiveMethod). It is used to pass the
+	/// result from the execution thread back to the invocation thread.
 {
 public:
 	typedef ActiveResultHolder<void> ActiveResultHolderType;

@@ -1,8 +1,6 @@
 //
 // HashSet.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/HashSet.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  HashSet
@@ -51,7 +49,7 @@ public:
 	{
 	}
 
-	HashSet(std::size_t initialReserve): 
+	HashSet(std::size_t initialReserve):
 		_table(initialReserve)
 		/// Creates the HashSet, using the given initialReserve.
 	{
@@ -129,9 +127,9 @@ public:
 		/// Inserts an element into the set.
 		///
 		/// If the element already exists in the set,
-		/// a pair(iterator, false) with iterator pointing to the 
+		/// a pair(iterator, false) with iterator pointing to the
 		/// existing element is returned.
-		/// Otherwise, the element is inserted an a 
+		/// Otherwise, the element is inserted an a
 		/// pair(iterator, true) with iterator
 		/// pointing to the new element is returned.
 	{

@@ -1,8 +1,6 @@
 //
 // Timestamp.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timestamp.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timestamp
@@ -45,15 +43,15 @@ class Foundation_API Timestamp
 	/// based and thus independent of the timezone
 	/// in effect on the system.
 	///
-	/// The internal reference time is the Unix epoch, 
+	/// The internal reference time is the Unix epoch,
 	/// midnight, January 1, 1970.
 {
 public:
-	typedef Int64 TimeVal; 
+	typedef Int64 TimeVal;
 		/// Monotonic UTC time value in microsecond resolution,
 		/// with base time midnight, January 1, 1970.
 		
-	typedef Int64 UtcTimeVal; 
+	typedef Int64 UtcTimeVal;
 		/// Monotonic UTC time value in 100 nanosecond resolution,
 		/// with base time midnight, October 15, 1582.
 		

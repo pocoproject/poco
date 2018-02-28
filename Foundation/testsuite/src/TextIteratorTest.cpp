@@ -1,8 +1,6 @@
 //
 // TextIteratorTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TextIteratorTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -186,7 +184,7 @@ void TextIteratorTest::testUTF8()
 
 void TextIteratorTest::testUTF8Supplementary()
 {
-	UTF8Encoding encoding; 
+	UTF8Encoding encoding;
 	const unsigned char supp[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
 	std::string text((const char*) supp);
 	TextIterator it(text, encoding);
@@ -208,7 +206,7 @@ void TextIteratorTest::testUTF8Supplementary()
 
 void TextIteratorTest::testUTF16Supplementary()
 {
-	UTF16Encoding encoding; 
+	UTF16Encoding encoding;
 	const Poco::UInt16 supp [] = { 0x0041, 0x0042, 0xD800, 0xDCA4, 0xD87E, 0xDDA0, 0xD87E, 0xDE1D, 0x00};
 	std::string text((const char*) supp, 16);
 	TextIterator it(text, encoding);

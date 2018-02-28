@@ -1,8 +1,6 @@
 //
 // ConsoleCertificateHandler.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/ConsoleCertificateHandler.h#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  ConsoleCertificateHandler
@@ -30,7 +28,7 @@ namespace Net {
 
 class NetSSL_Win_API ConsoleCertificateHandler: public InvalidCertificateHandler
 	/// A ConsoleCertificateHandler is invoked whenever an error occurs verifying the certificate.
-	/// 
+	///
 	/// The certificate is printed to stdout and the user is asked via console if he wants to accept it.
 {
 public:

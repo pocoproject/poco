@@ -1,8 +1,6 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ArchiveStrategy.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel
@@ -85,7 +83,7 @@ protected:
 //
 
 
-ArchiveStrategy::ArchiveStrategy(): 
+ArchiveStrategy::ArchiveStrategy():
 	_compress(false),
 	_pCompressor(0)
 {

@@ -1,8 +1,6 @@
 //
 // POP3ClientSessionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/POP3ClientSessionTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -16,12 +14,14 @@
 #include "DialogServer.h"
 #include "Poco/Net/POP3ClientSession.h"
 #include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/NetException.h"
 
 
 using Poco::Net::POP3ClientSession;
 using Poco::Net::MessageHeader;
 using Poco::Net::MailMessage;
+using Poco::Net::MailRecipient;
 using Poco::Net::POP3Exception;
 
 
@@ -205,7 +205,7 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	server.addResponse(
 		"+OK Here comes the message\r\n"
 		"From: john.doe@no.where\r\n"
-		"To: jane.doe@no.where\r\n"
+		"To: \"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where\r\n"
 		"Subject: test\r\n"
 		"\r\n"
 		"."
@@ -213,7 +213,9 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	server.addResponse(
 		"+OK Here comes the message\r\n"
 		"From: john.doe@no.where\r\n"
-		"To: jane.doe@no.where\r\n"
+		"To: \"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where\r\n"
+		"CC: \"Homer Simpson\" <homer.simpson@no.where>, bart.simpson@no.where\r\n"
+		"BCC: lisa.simpson@no.where, Maggie Simpson <maggie.simpson@no.where>\r\n" // tolerate non-quoted real name
 		"Subject: test\r\n"
 		"\r\n"
 		"Hello Jane,\r\n"
@@ -233,13 +235,33 @@ void POP3ClientSessionTest::testRetrieveMessages()
 	std::string cmd = server.popCommand();
 	assert (cmd == "TOP 1 0");
 	assert (header.get("From") == "john.doe@no.where");
-	assert (header.get("To") == "jane.doe@no.where");
+	assert (header.get("To") == "\"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where");
 	assert (header.get("Subject") == "test");
 
 	MailMessage message;
 	session.retrieveMessage(2, message);
 	cmd = server.popCommand();
 	assert (cmd == "RETR 2");
+	MailMessage::Recipients recipients = message.recipients();
+	assert (recipients.size() == 6);
+	assert (recipients[0].getAddress() == "jane.doe@no.where");
+	assert (recipients[0].getRealName() == "Jane Doe");
+	assert (recipients[0].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assert (recipients[1].getAddress() == "walter.foo@no.where");
+	assert (recipients[1].getRealName().empty());
+	assert (recipients[1].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assert (recipients[2].getAddress() == "homer.simpson@no.where");
+	assert (recipients[2].getRealName() == "Homer Simpson");
+	assert (recipients[2].getType() == MailRecipient::CC_RECIPIENT);
+	assert (recipients[3].getAddress() == "bart.simpson@no.where");
+	assert (recipients[3].getRealName().empty());
+	assert (recipients[3].getType() == MailRecipient::CC_RECIPIENT);
+	assert (recipients[4].getAddress() == "lisa.simpson@no.where");
+	assert (recipients[4].getRealName().empty());
+	assert (recipients[4].getType() == MailRecipient::BCC_RECIPIENT);
+	assert (recipients[5].getAddress() == "maggie.simpson@no.where");
+	assert (recipients[5].getRealName() == "Maggie Simpson");
+	assert (recipients[5].getType() == MailRecipient::BCC_RECIPIENT);
 
 	assert (message.getContent() ==
 		"Hello Jane,\r\n"

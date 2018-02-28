@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/testsuite/Makefile#2 $
-#
 # Makefile for Poco Net testsuite
 #
 
@@ -28,7 +26,8 @@ objects = \
 	NTPClientTest NTPClientTestSuite \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest \
-	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite
+	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
+	PollSetTest
 
 target         = testrunner
 target_version = 1

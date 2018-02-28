@@ -1,8 +1,6 @@
 //
 // Observer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Observer.h#2 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationCenter
@@ -32,7 +30,7 @@ template <class C, class N>
 class Observer: public AbstractObserver
 	/// This template class implements an adapter that sits between
 	/// a NotificationCenter and an object receiving notifications
-	/// from it. It is quite similar in concept to the 
+	/// from it. It is quite similar in concept to the
 	/// RunnableAdapter, but provides some NotificationCenter
 	/// specific additional methods.
 	/// See the NotificationCenter class for information on how
@@ -46,15 +44,15 @@ class Observer: public AbstractObserver
 public:
 	typedef void (C::*Callback)(N*);
 
-	Observer(C& object, Callback method): 
-		_pObject(&object), 
+	Observer(C& object, Callback method):
+		_pObject(&object),
 		_method(method)
 	{
 	}
 	
 	Observer(const Observer& observer):
 		AbstractObserver(observer),
-		_pObject(observer._pObject), 
+		_pObject(observer._pObject),
 		_method(observer._method)
 	{
 	}

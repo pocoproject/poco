@@ -1,8 +1,6 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/SMTPClientSession.cpp#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  SMTPClientSession
@@ -153,7 +151,7 @@ void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::s
 	encoder.close();
 	
 	status = sendCommand(challengeResponseBase64.str(), response);
-  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);  
+  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);
 }
 
 
@@ -197,12 +195,12 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN username failed", response, status);
 		
 		status = sendCommand(passwordBase64.str(), response);
-		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response, status);  
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response, status);
 	}
 	else if  (Poco::icompare(decodedResponse, 0, 8, "password") == 0) // password first (md5("Password:"))
 	{
 		status = sendCommand(passwordBase64.str(), response);
-		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response, status);  
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response, status);
 		
 		status = sendCommand(usernameBase64.str(), response);
 		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN username failed", response, status);

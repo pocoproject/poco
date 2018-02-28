@@ -1,8 +1,6 @@
 //
 // DocumentFragment.cpp
 //
-// $Id: //poco/1.4/XML/src/DocumentFragment.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -24,13 +22,13 @@ namespace XML {
 const XMLString DocumentFragment::NODE_NAME = toXMLString("#document-fragment");
 
 
-DocumentFragment::DocumentFragment(Document* pOwnerDocument): 
+DocumentFragment::DocumentFragment(Document* pOwnerDocument):
 	AbstractContainerNode(pOwnerDocument)
 {
 }
 
 
-DocumentFragment::DocumentFragment( Document* pOwnerDocument, const DocumentFragment& fragment): 
+DocumentFragment::DocumentFragment( Document* pOwnerDocument, const DocumentFragment& fragment):
 	AbstractContainerNode(pOwnerDocument, fragment)
 {
 }

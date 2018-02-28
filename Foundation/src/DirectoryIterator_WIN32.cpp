@@ -1,13 +1,11 @@
 //
 // DirectoryIterator_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryIterator_WIN32.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -15,8 +13,14 @@
 
 
 #include "Poco/DirectoryIterator_WIN32.h"
+#if defined(_WIN32_WCE)
+#include "Poco/File_WINCE.h"
+#else
 #include "Poco/File_WIN32.h"
+#endif
 #include "Poco/Path.h"
+#include "Poco/UnicodeConverter.h"
+#include <cstring>
 
 
 namespace Poco {
@@ -28,8 +32,10 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	p.makeDirectory();
 	std::string findPath = p.toString();
 	findPath.append("*");
+	std::wstring uFindPath;
+	FileImpl::convertPath(findPath, uFindPath);
 
-	_fh = FindFirstFile(findPath.c_str(), &_fd);
+	_fh = FindFirstFileW(uFindPath.c_str(), &_fd);
 	if (_fh == INVALID_HANDLE_VALUE)
 	{
 		if (GetLastError() != ERROR_NO_MORE_FILES)
@@ -37,7 +43,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _fh(INVAL
 	}
 	else
 	{
-		_current = _fd.cFileName;
+		UnicodeConverter::toUTF8(_fd.cFileName, _current);
 		if (_current == "." || _current == "..")	
 			next();
 	}
@@ -55,10 +61,11 @@ const std::string& DirectoryIteratorImpl::next()
 {
 	do
 	{
-		if (FindNextFile(_fh, &_fd) != 0)
-			_current = _fd.cFileName;
-		else
-			_current.clear();
+		_current.clear();
+		if (FindNextFileW(_fh, &_fd) != 0)
+		{
+			UnicodeConverter::toUTF8(_fd.cFileName, _current);
+		}
 	}
 	while (_current == "." || _current == "..");
 	return _current;

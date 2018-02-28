@@ -1,8 +1,6 @@
 //
 // BinaryWriter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BinaryWriter.h#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  BinaryReaderWriter
@@ -36,7 +34,7 @@ class TextConverter;
 
 
 class Foundation_API BinaryWriter
-	/// This class writes basic types (and std::vectors of these) 
+	/// This class writes basic types (and std::vectors of these)
 	/// in binary form into an output stream.
 	/// It provides an inserter-based interface similar to ostream.
 	/// The writer also supports automatic conversion from big-endian
@@ -78,16 +76,14 @@ public:
 	BinaryWriter& operator << (unsigned short value);
 	BinaryWriter& operator << (int value);
 	BinaryWriter& operator << (unsigned int value);
+#ifndef POCO_LONG_IS_64_BIT
 	BinaryWriter& operator << (long value);
 	BinaryWriter& operator << (unsigned long value);
+#endif // POCO_LONG_IS_64_BIT
 	BinaryWriter& operator << (float value);
 	BinaryWriter& operator << (double value);
-
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
 	BinaryWriter& operator << (Int64 value);
 	BinaryWriter& operator << (UInt64 value);
-#endif
-
 	BinaryWriter& operator << (const std::string& value);
 	BinaryWriter& operator << (const char* value);
 
@@ -107,27 +103,25 @@ public:
 	
 	void write7BitEncoded(UInt32 value);
 		/// Writes a 32-bit unsigned integer in a compressed format.
-		/// The value is written out seven bits at a time, starting 
-		/// with the seven least-significant bits. 
-		/// The high bit of a byte indicates whether there are more bytes to be 
+		/// The value is written out seven bits at a time, starting
+		/// with the seven least-significant bits.
+		/// The high bit of a byte indicates whether there are more bytes to be
 		/// written after this one.
-		/// If value will fit in seven bits, it takes only one byte of space. 
-		/// If value will not fit in seven bits, the high bit is set on the first byte and 
-		/// written out. value is then shifted by seven bits and the next byte is written. 
+		/// If value will fit in seven bits, it takes only one byte of space.
+		/// If value will not fit in seven bits, the high bit is set on the first byte and
+		/// written out. value is then shifted by seven bits and the next byte is written.
 		/// This process is repeated until the entire integer has been written.
 
-#if defined(POCO_HAVE_INT64)
 	void write7BitEncoded(UInt64 value);
 		/// Writes a 64-bit unsigned integer in a compressed format.
-		/// The value written out seven bits at a time, starting 
-		/// with the seven least-significant bits. 
-		/// The high bit of a byte indicates whether there are more bytes to be 
+		/// The value written out seven bits at a time, starting
+		/// with the seven least-significant bits.
+		/// The high bit of a byte indicates whether there are more bytes to be
 		/// written after this one.
-		/// If value will fit in seven bits, it takes only one byte of space. 
-		/// If value will not fit in seven bits, the high bit is set on the first byte and 
-		/// written out. value is then shifted by seven bits and the next byte is written. 
+		/// If value will fit in seven bits, it takes only one byte of space.
+		/// If value will not fit in seven bits, the high bit is set on the first byte and
+		/// written out. value is then shifted by seven bits and the next byte is written.
 		/// This process is repeated until the entire integer has been written.
-#endif
 
 	void writeRaw(const std::string& rawData);
 		/// Writes the string as-is to the stream.
@@ -137,30 +131,36 @@ public:
 
 	void writeBOM();
 		/// Writes a byte-order mark to the stream. A byte order mark is
-		/// a 16-bit integer with a value of 0xFEFF, written in host byte-order. 
-		/// A BinaryReader uses the byte-order mark to determine the byte-order 
+		/// a 16-bit integer with a value of 0xFEFF, written in host byte-order.
+		/// A BinaryReader uses the byte-order mark to determine the byte-order
 		/// of the stream.
 
 	void flush();
 		/// Flushes the underlying stream.
-		
+
 	bool good();
 		/// Returns _ostr.good();
-		
+
 	bool fail();
 		/// Returns _ostr.fail();
-	
+
 	bool bad();
 		/// Returns _ostr.bad();
-		
+
 	std::ostream& stream() const;
 		/// Returns the underlying stream.
-		
+
 	StreamByteOrder byteOrder() const;
 		/// Returns the byte ordering used by the writer, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4800) // forcing value to bool 'true' or 'false' (performance warning)
+#endif
+
 	template<typename T>
 	BinaryWriter& write(T value, bool flipBytes)
 	{
@@ -175,6 +175,10 @@ private:
 		}
 		return *this;
 	}
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+#pragma warning(pop)
+#endif
 
 	template<typename T>
 	void write7BitEncoded(T value)
@@ -202,14 +206,14 @@ class BasicMemoryBinaryWriter: public BinaryWriter
 	/// A convenient wrapper for using Buffer and MemoryStream with BinarWriter.
 {
 public:
-	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, StreamByteOrder order = NATIVE_BYTE_ORDER): 
+	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, StreamByteOrder order = NATIVE_BYTE_ORDER):
 		BinaryWriter(_ostr, order),
 		_data(dataBuffer),
 		_ostr(dataBuffer.begin(), dataBuffer.capacity())
 	{
 	}
 
-	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER): 
+	BasicMemoryBinaryWriter(Buffer<T>& dataBuffer, TextEncoding& encoding, StreamByteOrder order = NATIVE_BYTE_ORDER):
 		BinaryWriter(_ostr, encoding, order),
 		_data(dataBuffer),
 		_ostr(dataBuffer.begin(), dataBuffer.capacity())

@@ -1,8 +1,6 @@
 //
 // pkill.cpp
 //
-// $Id: //poco/1.4/Util/samples/pkill/src/pkill.cpp#1 $
-//
 // Process killer utility application.
 //
 // Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
@@ -31,7 +29,7 @@ using Poco::Util::OptionCallback;
 class ProcessKillerApp: public Application
 {
 public:
-	ProcessKillerApp(): 
+	ProcessKillerApp():
 		_helpRequested(false),
 		_friendly(false)
 	{

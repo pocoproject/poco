@@ -1,8 +1,6 @@
 //
 // HTTPDigestCredentials.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPDigestCredentials.h#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:	HTTPDigestCredentials
@@ -112,7 +110,7 @@ public:
 
 	bool verifyAuthParams(const HTTPRequest& request, const HTTPAuthenticationParams& params) const;
 		/// Verifies the digest authentication information in the given HTTPRequest
-		/// and HTTPAuthenticationParams by recomputing the response and comparing 
+		/// and HTTPAuthenticationParams by recomputing the response and comparing
 		/// it with what's in the request.
 
 	static std::string createNonce();

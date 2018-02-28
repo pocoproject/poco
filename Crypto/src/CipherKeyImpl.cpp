@@ -1,8 +1,6 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherKeyImpl.cpp#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKeyImpl
@@ -28,15 +26,14 @@ namespace Crypto {
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
-	const std::string& passphrase, 
+	const std::string& passphrase,
 	const std::string& salt,
 	int iterationCount,
-	const std::string& digest):
-	_pCipher(0),
-	_pDigest(0),
-	_name(name),
-	_key(),
-	_iv()
+	const std::string& digest): _pCipher(0),
+		_pDigest(0),
+		_name(name),
+		_key(),
+		_iv()
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
@@ -57,13 +54,13 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 }
 
 
-CipherKeyImpl::CipherKeyImpl(const std::string& name, 
-	const ByteVec& key, 
-	const ByteVec& iv):
-	_pCipher(0),
-	_name(name),
-	_key(key),
-	_iv(iv)
+CipherKeyImpl::CipherKeyImpl(const std::string& name,
+	const ByteVec& key,
+	const ByteVec& iv): _pCipher(0),
+		_pDigest(0),
+		_name(name),
+		_key(key),
+		_iv(iv)
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
@@ -74,8 +71,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 }
 
 	
-CipherKeyImpl::CipherKeyImpl(const std::string& name):
-	_pCipher(0),
+CipherKeyImpl::CipherKeyImpl(const std::string& name): _pCipher(0),
+	_pDigest(0),
 	_name(name),
 	_key(),
 	_iv()
@@ -167,7 +164,7 @@ void CipherKeyImpl::generateKey(
 	// Now create the key and IV, using the digest set in the constructor.
 	int keySize = EVP_BytesToKey(
 		_pCipher,
-		_pDigest,
+		_pDigest ? _pDigest : EVP_md5(),
 		(salt.empty() ? 0 : saltBytes),
 		reinterpret_cast<const unsigned char*>(password.data()),
 		static_cast<int>(password.size()),

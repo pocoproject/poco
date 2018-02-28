@@ -1,8 +1,6 @@
 //
 // TextTestResult.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TextTestResult.cpp#1 $
-//
 
 
 #include "Poco/CppUnit/TextTestResult.h"
@@ -91,7 +89,7 @@ void TextTestResult::startTest(Test* test)
 
 void TextTestResult::printErrors(std::ostream& stream)
 {
-	if (testErrors() != 0) 
+	if (testErrors() != 0)
 	{
 		stream << "\n";
 
@@ -110,7 +108,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 			       << ": "
 			       << failure->failedTest()->toString() << "\n"
 			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \"" 
+			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
 			if (e == 0)
@@ -158,7 +156,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 			       << ": "
 			       << failure->failedTest()->toString() << "\n"
 			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \"" 
+			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
 			if (e == 0)
@@ -170,7 +168,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 				stream << e->lineNumber();
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
-					stream << " data lines " 
+					stream << " data lines "
 					       << e->data1LineNumber()
                            << ", " << e->data2LineNumber();
 				}
@@ -198,8 +196,8 @@ void TextTestResult::printHeader(std::ostream& stream)
 {
 	stream << "\n\n";
 	if (wasSuccessful())
-		stream << "OK (" 
-		          << runTests() << " tests)" 
+		stream << "OK ("
+		          << runTests() << " tests)"
 		          << std::endl;
 	else
 		stream << "!!!FAILURES!!!" << std::endl

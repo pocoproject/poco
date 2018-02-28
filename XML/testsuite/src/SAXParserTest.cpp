@@ -1,8 +1,6 @@
 //
 // SAXParserTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/SAXParserTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -271,7 +269,7 @@ void SAXParserTest::testEncoding()
 {
 	SAXParser parser;
 	Poco::Latin9Encoding encoding;
-	parser.addEncoding("ISO-8859-15", &encoding); 
+	parser.addEncoding("ISO-8859-15", &encoding);
 	
 	std::istringstream istr(ENCODING);
 	std::ostringstream ostr;
@@ -400,7 +398,7 @@ const std::string SAXParserTest::ATTRIBUTES =
 	"</root>";
 
 
-const std::string SAXParserTest::CDATA = 
+const std::string SAXParserTest::CDATA =
 	"<data>\n"
 	"<![CDATA[\n"
 	"\tThe following <tag attr=\"value\">is inside a CDATA section</tag>.\n"
@@ -428,7 +426,7 @@ const std::string SAXParserTest::PROCESSING_INSTRUCTION =
 	"</html>";
 
 
-const std::string SAXParserTest::DTD = 
+const std::string SAXParserTest::DTD =
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	"<!DOCTYPE test SYSTEM \"test.dtd\">\n"
 	"<foo/>";
@@ -461,7 +459,7 @@ const std::string SAXParserTest::EXTERNAL_UNPARSED =
 	"<sample/>";
 
 
-const std::string SAXParserTest::EXTERNAL_PARSED = 
+const std::string SAXParserTest::EXTERNAL_PARSED =
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	"<!DOCTYPE test [\n"
 	"\t<!ENTITY include SYSTEM \"include.xml\">\n"
@@ -471,7 +469,7 @@ const std::string SAXParserTest::EXTERNAL_PARSED =
 	"</sample>\n";
 
 
-const std::string SAXParserTest::INCLUDE = 
+const std::string SAXParserTest::INCLUDE =
 	"<elem>\n"
 	"\tAn external entity.\n"
 	"</elem>\n";

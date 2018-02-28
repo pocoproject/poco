@@ -1,8 +1,6 @@
 //
 // TimedNotificationQueueTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimedNotificationQueueTest.cpp#1 $
-//
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::Notification;
 using Poco::Timestamp;
 
 
-namespace 
+namespace
 {
 	class QTestNotification: public Notification
 	{
@@ -87,7 +85,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assert (!queue.empty());
 	assert (queue.size() == 4);
 	QTestNotification* pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
@@ -99,7 +97,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assert (queue.size() == 3);
 	
 	pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
@@ -111,7 +109,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assert (queue.size() == 2);
 	
 	pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
@@ -123,7 +121,7 @@ void TimedNotificationQueueTest::testDequeue()
 	assert (queue.size() == 1);
 	
 	pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}

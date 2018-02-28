@@ -1,8 +1,6 @@
 //
 // QuotedPrintableEncoder.cpp
 //
-// $Id: //poco/1.4/Net/src/QuotedPrintableEncoder.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  QuotedPrintableEncoder
@@ -26,7 +24,7 @@ namespace Poco {
 namespace Net {
 
 
-QuotedPrintableEncoderBuf::QuotedPrintableEncoderBuf(std::ostream& ostr): 
+QuotedPrintableEncoderBuf::QuotedPrintableEncoderBuf(std::ostream& ostr):
 	_pending(-1),
 	_lineLength(0),
 	_ostr(ostr)
@@ -137,8 +135,8 @@ QuotedPrintableEncoderBuf* QuotedPrintableEncoderIOS::rdbuf()
 }
 
 
-QuotedPrintableEncoder::QuotedPrintableEncoder(std::ostream& ostr): 
-	QuotedPrintableEncoderIOS(ostr), 
+QuotedPrintableEncoder::QuotedPrintableEncoder(std::ostream& ostr):
+	QuotedPrintableEncoderIOS(ostr),
 	std::ostream(&_buf)
 {
 }

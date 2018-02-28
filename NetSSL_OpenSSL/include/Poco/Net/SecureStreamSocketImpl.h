@@ -1,8 +1,6 @@
 //
 // SecureStreamSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureStreamSocketImpl.h#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureStreamSocketImpl
@@ -47,7 +45,7 @@ public:
 		/// Throws a Poco::InvalidAccessException.
 
 	void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
@@ -55,11 +53,11 @@ public:
 		/// packets are restricted to the specified address.
 
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-		/// Initializes the socket, sets the socket timeout and 
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
 
 	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 		
@@ -175,7 +173,7 @@ public:
 		///
 		/// If the SSL connection was the result of an accept(),
 		/// the server-side handshake is completed, otherwise
-		/// a client-side handshake is performed. 
+		/// a client-side handshake is performed.
 
 	Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,

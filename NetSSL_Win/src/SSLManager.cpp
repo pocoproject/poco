@@ -1,8 +1,6 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.7/NetSSL_Win/src/SSLManager.cpp#2 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager
@@ -125,7 +123,7 @@ Context::Ptr SSLManager::defaultClientContext()
 		try
 		{
 			initDefaultContext(false);
-		} 
+		}
 		catch (Poco::IllegalStateException&)
 		{
 			_ptrClientCertificateHandler = new RejectCertificateHandler(false);
@@ -216,7 +214,7 @@ void SSLManager::initDefaultContext(bool server)
 	if (trustRoots) options |= Context::OPT_TRUST_ROOTS_WIN_CERT_STORE;
 	if (useMachineStore) options |= Context::OPT_USE_MACHINE_STORE;
 	if (useStrongCrypto) options |= Context::OPT_USE_STRONG_CRYPTO;
-	if (!certPath.empty()) 
+	if (!certPath.empty())
 	{
 		options |= Context::OPT_LOAD_CERT_FROM_FILE;
 		certName = certPath;
@@ -343,7 +341,7 @@ void SSLManager::loadSecurityLibrary()
 #if defined(_WIN32_WCE)
 	dllPath = L"Secur32.dll";
 #else
-	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT 
+	if (VerInfo.dwPlatformId == VER_PLATFORM_WIN32_NT
 		&& VerInfo.dwMajorVersion == 4)
 	{
 		dllPath = L"Security.dll";

@@ -1,8 +1,6 @@
 //
 // DefaultStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DefaultStrategy.h#3 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  DefaultStrategy
@@ -28,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// Default notification strategy.
 	///

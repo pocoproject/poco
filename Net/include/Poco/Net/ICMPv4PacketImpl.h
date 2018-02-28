@@ -1,8 +1,6 @@
 //
 // ICMPv4PacketImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPv4PacketImpl.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPv4PacketImpl
@@ -39,7 +37,7 @@ class Net_API ICMPv4PacketImpl : public ICMPPacketImpl
 {
 public:
 	// ICMPv4 header
-	struct Header 
+	struct Header
 	{
 		Poco::UInt8 type;          // ICMP packet type
 		Poco::UInt8 code;          // Type sub code
@@ -128,11 +126,11 @@ public:
 	struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
-		/// 
+		///
 		/// Buffer includes IP header, ICMP header and data.
 
 	bool validReplyID(Poco::UInt8* buffer, int length) const;
-		/// Returns true if the extracted id is recognized 
+		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
 		///	
 		/// Buffer includes IP header, ICMP header and data.

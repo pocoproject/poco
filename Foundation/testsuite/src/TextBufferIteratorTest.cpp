@@ -1,8 +1,6 @@
 //
 // TextBufferIteratorTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TextBufferIteratorTest.cpp#1 $
-//
 // Copyright (c) 2010, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -182,7 +180,7 @@ void TextBufferIteratorTest::testUTF8()
 
 void TextBufferIteratorTest::testUTF8Supplementary()
 {
-	UTF8Encoding encoding; 
+	UTF8Encoding encoding;
 	const unsigned char text[] = {0x41, 0x42, 0xf0, 0x90, 0x82, 0xa4, 0xf0, 0xaf, 0xa6, 0xa0, 0xf0, 0xaf, 0xa8, 0x9d, 0x00};
 	TextBufferIterator it(reinterpret_cast<const char*>(text), encoding);
 	TextBufferIterator end(it.end());
@@ -203,7 +201,7 @@ void TextBufferIteratorTest::testUTF8Supplementary()
 
 void TextBufferIteratorTest::testUTF16Supplementary()
 {
-	UTF16Encoding encoding; 
+	UTF16Encoding encoding;
 	const Poco::UInt16 text[] = { 0x0041, 0x0042, 0xD800, 0xDCA4, 0xD87E, 0xDDA0, 0xD87E, 0xDE1D};
 	TextBufferIterator it(reinterpret_cast<const char*>(text), sizeof(text), encoding);
 	TextBufferIterator end(it.end());

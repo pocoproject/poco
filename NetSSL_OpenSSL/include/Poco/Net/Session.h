@@ -1,8 +1,6 @@
 //
 // Session.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/Session.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Session
@@ -47,8 +45,8 @@ public:
 protected:	
 	Session(SSL_SESSION* pSession);
 		/// Creates a new Session object, using the given
-		/// SSL_SESSION object. 
-		/// 
+		/// SSL_SESSION object.
+		///
 		/// The SSL_SESSION's reference count is not changed.
 
 	~Session();

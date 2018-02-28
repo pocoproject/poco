@@ -1,8 +1,6 @@
 //
 // NTPEventArgs.cpp
 //
-// $Id: //poco/1.4/Net/src/NTPEventArgs.cpp#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPEventArgs
@@ -48,10 +46,10 @@ std::string NTPEventArgs::hostName() const
 	{
 		return DNS::resolve(_address.host().toString()).name();
 	}
-	catch (HostNotFoundException&) 
+	catch (HostNotFoundException&)
 	{
 	}
-	catch (NoAddressFoundException&) 
+	catch (NoAddressFoundException&)
 	{
 	}
 	catch (DNSException&)

@@ -2624,7 +2624,7 @@ for (;;)
           if (isinclass)
             {
             int max = (int)GET2(ecode, 1 + IMM2_SIZE);
-            if (*ecode == OP_CRPOSRANGE)
+            if (*ecode == OP_CRPOSRANGE && count >= (int)GET2(ecode, 1))
               {
               active_count--;           /* Remove non-match possibility */
               next_active_state--;
@@ -2735,9 +2735,10 @@ for (;;)
             condcode == OP_DNRREF)
           return PCRE_ERROR_DFA_UCOND;
 
-        /* The DEFINE condition is always false */
+        /* The DEFINE condition is always false, and the assertion (?!) is
+        converted to OP_FAIL. */
 
-        if (condcode == OP_DEF)
+        if (condcode == OP_DEF || condcode == OP_FAIL)
           { ADD_ACTIVE(state_offset + codelink + LINK_SIZE + 1, 0); }
 
         /* The only supported version of OP_RREF is for the value RREF_ANY,
@@ -3241,7 +3242,7 @@ md->callout_data = NULL;
 
 if (extra_data != NULL)
   {
-  unsigned int flags = extra_data->flags;
+  unsigned long int flags = extra_data->flags;
   if ((flags & PCRE_EXTRA_STUDY_DATA) != 0)
     study = (const pcre_study_data *)extra_data->study_data;
   if ((flags & PCRE_EXTRA_MATCH_LIMIT) != 0) return PCRE_ERROR_DFA_UMLIMIT;

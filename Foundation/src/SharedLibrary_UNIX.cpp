@@ -1,8 +1,6 @@
 //
 // SharedLibrary_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_UNIX.cpp#3 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -76,7 +74,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _handle != 0; 
+	return _handle != 0;
 }
 
 

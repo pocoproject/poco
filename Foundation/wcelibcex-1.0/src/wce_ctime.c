@@ -9,11 +9,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation 
+ * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom 
+ * and/or sell copies of the Software, and to permit persons to whom
  * the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
@@ -56,13 +56,13 @@
 *
 *   IEEE Std 1003.1-2001
 *   The GNU C Library Manual
-* 
+*
 *******************************************************************************/
 char * wceex_ctime(const time_t *timer)
 {
    return wceex_asctime(wceex_localtime(timer));
 }
- 
+
 
 /*******************************************************************************
 * wceex_ctime_r - Convert a time value to a date and time string
@@ -86,7 +86,7 @@ char * wceex_ctime(const time_t *timer)
 *
 *   IEEE Std 1003.1-2001
 *   The GNU C Library Manual
-* 
+*
 *******************************************************************************/
 char * wceex_ctime_r(const time_t *timer, char *buf)
 {

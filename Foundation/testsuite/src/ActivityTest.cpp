@@ -1,8 +1,6 @@
 //
 // ActivityTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActivityTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -26,7 +24,7 @@ namespace
 	class ActiveObject
 	{
 	public:
-		ActiveObject(): 
+		ActiveObject():
 			_activity(this, &ActiveObject::run),
 			_count(0)
 		{
@@ -49,7 +47,7 @@ namespace
 	protected:
 		void run()
 		{
-			while (!_activity.isStopped()) 
+			while (!_activity.isStopped())
 				++_count;
 		}
 
@@ -58,7 +56,7 @@ namespace
 		Poco::UInt64           _count;
 	};
 }
- 
+
 
 ActivityTest::ActivityTest(const std::string& rName): CppUnit::TestCase(rName)
 {

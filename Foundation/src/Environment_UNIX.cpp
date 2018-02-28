@@ -1,8 +1,6 @@
 
 // Environment_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_UNIX.cpp#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment
@@ -158,14 +156,14 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int rc = getifaddrs(&ifaphead);
 	if (rc) return;
 
-	for (struct ifaddrs* ifap = ifaphead; ifap; ifap = ifap->ifa_next) 
+	for (struct ifaddrs* ifap = ifaphead; ifap; ifap = ifap->ifa_next)
 	{
-		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK) 
+		if (ifap->ifa_addr && ifap->ifa_addr->sa_family == AF_LINK)
 		{
 			struct sockaddr_dl* sdl = reinterpret_cast<struct sockaddr_dl*>(ifap->ifa_addr);
 			caddr_t ap = LLADDR(sdl);
 			int alen = sdl->sdl_alen;
-			if (ap && alen > 0) 
+			if (ap && alen > 0)
 			{
 				std::memcpy(&id, ap, sizeof(id));
 				break;
@@ -189,9 +187,9 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 #include <net/if.h>
 #ifndef __CYGWIN__
 #include <net/if_arp.h>
-#else // workaround for Cygwin, which does not have if_arp.h 
+#else // workaround for Cygwin, which does not have if_arp.h
 #define ARPHRD_ETHER 1 /* Ethernet 10Mbps */
-#endif 
+#endif
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/types.h>

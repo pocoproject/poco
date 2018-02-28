@@ -1,8 +1,6 @@
 //
 // NotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/NotificationQueue/src/NotificationQueue.cpp#1 $
-//
 // This sample demonstrates the NotificationQueue, ThreadPool,
 // FastMutex and ScopedLock classes.
 //
@@ -117,7 +115,7 @@ int main(int argc, char** argv)
 		queue.enqueueNotification(new WorkNotification(i));
 	}
 	
-	// wait until queue is empty and all threads are 
+	// wait until queue is empty and all threads are
 	// waiting for new work.
 	while (!queue.empty()) Thread::sleep(200);
 	Thread::sleep(500);
