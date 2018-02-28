@@ -103,7 +103,7 @@ public:
 		PROTO_TLSV1_2 = 0x10
 	};
 	
-	struct Params
+	struct NetSSL_API Params
 	{
 		Params();
 			/// Initializes the struct with default values.
