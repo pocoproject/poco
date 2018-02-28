@@ -72,7 +72,7 @@ public:
 		///     * threads: The number of parser threads processing
 		///       received syslog messages. Defaults to 1. A maximum
 		///       of 16 threads is supported.
-		
+
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
