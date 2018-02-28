@@ -96,7 +96,7 @@ namespace
 			{
 			case 'l':
 			case 'h':
-			case 'L': 
+			case 'L':
 			case '?': mod = *itFmt++; break;
 			}
 		}
@@ -223,7 +223,7 @@ namespace
 					str << RefAnyCast<std::string>(*itVal++);
 					break;
 				case 'z':
-					str << AnyCast<std::size_t>(*itVal++); 
+					str << AnyCast<std::size_t>(*itVal++);
 					break;
 				case 'I':
 				case 'D':
@@ -259,7 +259,7 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 	std::string::const_iterator itFmt  = fmt.begin();
 	std::string::const_iterator endFmt = fmt.end();
 	std::vector<Any>::const_iterator itVal  = values.begin();
-	std::vector<Any>::const_iterator endVal = values.end(); 
+	std::vector<Any>::const_iterator endVal = values.end();
 	while (itFmt != endFmt)
 	{
 		switch (*itFmt)

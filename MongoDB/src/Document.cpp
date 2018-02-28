@@ -1,8 +1,6 @@
 //
 // Document.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Document
@@ -59,7 +57,7 @@ Int64 Document::getInteger(const std::string& name) const
 	if (ElementTraits<double>::TypeId == element->type())
 	{
 		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
-		if (concrete) return concrete->value();
+		if (concrete) return static_cast<Int64>(concrete->value());
 	}
 	else if (ElementTraits<Int32>::TypeId == element->type())
 	{

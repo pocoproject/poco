@@ -40,18 +40,18 @@ class NetworkInterfaceImpl;
 
 class Net_API NetworkInterface
 	/// This class represents a network interface.
-	/// 
+	///
 	/// NetworkInterface is used with MulticastSocket to specify
 	/// multicast interfaces for sending and receiving multicast
 	/// messages.
-	/// 
+	///
 	/// The class also provides static member functions for
 	/// enumerating or searching network interfaces and their
 	/// respective configuration values.
 	///
 	/// On Windows, detection capabilities vary depending on the
 	/// OS version/service pack. Although the best effort is made
-	/// not to attempt access to non-existent features through a 
+	/// not to attempt access to non-existent features through a
 	/// combination of compile/runtime checks, when running binaries
 	/// compiled on a newer version of the OS on an older one
 	/// problems may occur; if possible, it is best to run
@@ -61,7 +61,6 @@ class Net_API NetworkInterface
 {
 public:
 	typedef std::vector<NetworkInterface>                List;
-	typedef List                                         NetworkInterfaceList;//@deprecated
 	typedef std::map<unsigned, NetworkInterface>         Map;
 	typedef Poco::Tuple<IPAddress, IPAddress, IPAddress> AddressTuple;
 	typedef std::vector<AddressTuple>                    AddressList;
@@ -89,7 +88,7 @@ public:
 		NI_TYPE_IEEE1394,
 		NI_TYPE_OTHER
 	};
-	
+
 	enum IPVersion
 	{
 		IPv4_ONLY,    /// Return interfaces with IPv4 address only
@@ -140,7 +139,7 @@ public:
 		///
 		/// On Windows platforms, this is currently the network adapter
 		/// name. This may change to the "friendly name" of the network
-		/// connection in a future version, however. 
+		/// connection in a future version, however.
 		///
 		/// On other platforms this is the same as name().
 
@@ -148,7 +147,7 @@ public:
 		/// Returns the interface adapter name.
 		///
 		/// On Windows platforms, this is the network adapter LUID.
-		/// The adapter name is used by some Windows Net APIs like DHCP. 
+		/// The adapter name is used by some Windows Net APIs like DHCP.
 		///
 		/// On other platforms this is the same as name().
 
@@ -173,10 +172,10 @@ public:
 
 	const AddressList& addressList() const;
 		/// Returns the list of IP addresses bound to the interface.
-		
+
 	const IPAddress& subnetMask(unsigned index = 0) const;
 		/// Returns the subnet mask for this network interface.
-		
+
 	const IPAddress& broadcastAddress(unsigned index = 0) const;
 		/// Returns the broadcast address for this network interface.
 
@@ -221,7 +220,7 @@ public:
 
 	static NetworkInterface forName(const std::string& name, bool requireIPv6 = false);
 		/// Returns the NetworkInterface for the given name.
-		/// 
+		///
 		/// If requireIPv6 is false, an IPv4 interface is returned.
 		/// Otherwise, an IPv6 interface is returned.
 		///
@@ -230,9 +229,9 @@ public:
 
 	static NetworkInterface forName(const std::string& name, IPVersion ipVersion);
 		/// Returns the NetworkInterface for the given name.
-		/// 
+		///
 		/// The ipVersion argument can be used to specify whether
-		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required, 
+		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required,
 		/// or whether the caller does not care (IPv4_OR_IPv6).
 		///
 		/// Throws an InterfaceNotFoundException if an interface
@@ -249,7 +248,7 @@ public:
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the given index does not exist.
-		
+
 	static List list(bool ipOnly = true, bool upOnly = true);
 		/// Returns a list with all network interfaces
 		/// on the system.
@@ -264,7 +263,7 @@ public:
 		/// If there are multiple addresses bound to one interface,
 		/// multiple NetworkInterface entries are listed for
 		/// the same interface.
-		
+
 	static Map map(bool ipOnly = true, bool upOnly = true);
 		/// Returns a map containing system network interfaces
 		/// Map is keyed by interface system indices.
@@ -277,8 +276,11 @@ public:
 		/// Otherwise, both interfaces being up and down are returned.
 		///
 		/// If there are multiple addresses bound to one interface,
-		/// they are contained within the NetworkInterface (second) 
+		/// they are contained within the NetworkInterface (second)
 		/// member of the pair.
+
+	static std::string toString(const MACAddress& addr);
+		/// Returns MAC address as xx:xx:xx:xx:xx:xx formatted string.
 
 protected:
 	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
@@ -307,10 +309,10 @@ protected:
 		unsigned index,
 		MACAddress* pMACAddress = 0);
 		/// Creates the NetworkInterface.
-		
+
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;
 		/// Determines the IPAddress bound to the interface with the given name.
-		
+
 	unsigned interfaceNameToIndex(const std::string& interfaceName) const;
 		/// Determines the interface index of the interface with the given name.
 
@@ -318,7 +320,7 @@ protected:
 
 private:
 	NetworkInterfaceImpl* _pImpl;
-	
+
 	static Poco::FastMutex _mutex;
 };
 

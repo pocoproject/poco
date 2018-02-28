@@ -25,7 +25,7 @@ const int HelpFormatter::TAB_WIDTH  = 4;
 const int HelpFormatter::LINE_WIDTH = 78;
 
 
-HelpFormatter::HelpFormatter(const OptionSet& options): 
+HelpFormatter::HelpFormatter(const OptionSet& options):
 	_options(options),
 	_width(LINE_WIDTH),
 	_indent(0),
@@ -240,7 +240,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 			clearWord(ostr, pos, word, indent);
 			if (pos < _width) { ostr << ' '; ++pos; }
 		}
-		else 
+		else
 		{
 			if (word.length() == maxWordLen)
 			{

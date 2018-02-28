@@ -1,8 +1,6 @@
 //
 // DeleteRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  DeleteRequest
@@ -22,8 +20,8 @@ namespace MongoDB {
 
 
 DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::Flags flags):
-	RequestMessage(MessageHeader::OP_DELETE), 
-	_flags(flags), 
+	RequestMessage(MessageHeader::OP_DELETE),
+	_flags(flags),
 	_fullCollectionName(collectionName),
 	_selector()
 {

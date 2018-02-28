@@ -34,7 +34,7 @@ class NotificationCenter;
 
 
 class Foundation_API Task: public Runnable, public RefCountedObject
-	/// A Task is a subclass of Runnable that has a name 
+	/// A Task is a subclass of Runnable that has a name
 	/// and supports progress reporting and cancellation.
 	///
 	/// A TaskManager object can be used to take care of the
@@ -72,7 +72,7 @@ public:
 
 	bool isCancelled() const;
 		/// Returns true if cancellation of the task has been
-		/// requested. 
+		/// requested.
 		///
 		/// A Task's runTask() method should periodically
 		/// call this method and stop whatever it is doing in an
@@ -105,6 +105,16 @@ protected:
 		/// return value is false.
 		///
 		/// A Task should use this method in favor of Thread::sleep().
+
+	bool yield();
+	    /// Yields cpu to other threads
+		///
+		/// If the task is cancelled while it is suspended,
+		/// yield() will return true. If the tasks resumes
+		/// without being cancelled, the
+		/// return value is false.
+		///
+		/// A Task should use this method in favor of Thread::yield().
 
 	void setProgress(float progress);
 		/// Sets the task's progress.

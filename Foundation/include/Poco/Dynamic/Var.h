@@ -36,7 +36,7 @@ class Struct;
 
 class Foundation_API Var
 	/// Var allows to store data of different types and to convert between these types transparently.
-	/// Var puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent 
+	/// Var puts forth the best effort to provide intuitive and reasonable conversion semantics and prevent
 	/// unexpected data loss, particularly when performing narrowing or signedness conversions of numeric data types.
 	///
 	/// An attempt to convert or extract from a non-initialized ("empty") Var variable shall result
@@ -44,14 +44,14 @@ class Foundation_API Var
 	///
 	/// Loss of signedness is not allowed for numeric values. This means that if an attempt is made to convert 
 	/// the internal value which is a negative signed integer to an unsigned integer type storage, a RangeException is thrown. 
-	/// Overflow is not allowed, so if the internal value is a larger number than the target numeric type size can accommodate, 
+	/// Overflow is not allowed, so if the internal value is a larger number than the target numeric type size can accomodate, 
 	/// a RangeException is thrown.
 	///
 	/// Precision loss, such as in conversion from floating-point types to integers or from double to float on platforms
 	/// where they differ in size (provided internal actual value fits in float min/max range), is allowed.
-	/// 
-	/// String truncation is allowed -- it is possible to convert between string and character when string length is 
-	/// greater than 1. An empty string gets converted to the char '\0', a non-empty string is truncated to the first character. 
+	///
+	/// String truncation is allowed -- it is possible to convert between string and character when string length is
+	/// greater than 1. An empty string gets converted to the char '\0', a non-empty string is truncated to the first character.
 	///
 	/// Boolean conversion is performed as follows:
 	///
@@ -62,18 +62,18 @@ class Foundation_API Var
 	///
 	/// Arithmetic operations with POD types as well as between Var's are supported, subject to following
 	/// limitations:
-	/// 
+	///
 	/// 	- for std::string and const char* values, only '+' and '+=' operations are supported
-	/// 
+	///
 	/// 	- for integral and floating point numeric values, following operations are supported:
-	/// 	  '+', '+=', '-', '-=', '*', '*=' , '/' and '/=' 
+	/// 	  '+', '+=', '-', '-=', '*', '*=' , '/' and '/='
 	///
 	/// 	- for integral values, following operations are supported:
 	///		  prefix and postfix increment (++) and decrement (--)
-	/// 
+	///
 	/// 	- for all other types, InvalidArgumentException is thrown upon attempt of an arithmetic operation
-	/// 
-	/// A Var can be created from and converted to a value of any type for which a specialization of 
+	///
+	/// A Var can be created from and converted to a value of any type for which a specialization of
 	/// VarHolderImpl is available. For supported types, see VarHolder documentation.
 {
 public:
@@ -84,7 +84,7 @@ public:
 	Var();
 		/// Creates an empty Var.
 
-	template <typename T> 
+	template <typename T>
 	Var(const T& val)
 		/// Creates the Var from the given value.
 #ifdef POCO_NO_SOO
@@ -121,7 +121,7 @@ public:
 	Iterator end();
 		/// Returns the Var iterator.
 
-	template <typename T> 
+	template <typename T>
 	void convert(T& val) const
 		/// Invoke this method to perform a safe conversion.
 		///
@@ -144,7 +144,7 @@ public:
 		pHolder->convert(val);
 	}
 	
-	template <typename T> 
+	template <typename T>
 	T convert() const
 		/// Invoke this method to perform a safe conversion.
 		///
@@ -173,8 +173,8 @@ public:
 	template <typename T>
 	operator T () const
 		/// Safe conversion operator for implicit type
-		/// conversions. If the requested type T is same as the 
-		/// type being held, the operation performed is direct 
+		/// conversions. If the requested type T is same as the
+		/// type being held, the operation performed is direct
 		/// extraction, otherwise it is the conversion of the value
 		/// from type currently held to the one requested.
 		///
@@ -223,7 +223,7 @@ public:
 				std::string(typeid(T).name())));
 	}
 
-	template <typename T> 
+	template <typename T>
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
@@ -267,20 +267,20 @@ public:
 	const Var operator -- (int);
 		/// Post-decrement operator
 
-	template <typename T> 
+	template <typename T>
 	Var& operator += (const T& other)
-		/// Addition assignment operator for addition/assignment of POD to Var.
+		/// Addition asignment operator for addition/assignment of POD to Var.
 	{
 		return *this = convert<T>() + other;
 	}
 
 	Var& operator += (const Var& other);
-		/// Addition assignment operator overload for Var
+		/// Addition asignment operator overload for Var
 
 	Var& operator += (const char* other);
-		/// Addition assignment operator overload for const char*
+		/// Addition asignment operator overload for const char*
 
-	template <typename T> 
+	template <typename T>
 	const Var operator - (const T& other) const
 		/// Subtraction operator for subtracting POD from Var
 	{
@@ -290,17 +290,17 @@ public:
 	const Var operator - (const Var& other) const;
 		/// Subtraction operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	Var& operator -= (const T& other)
-		/// Subtraction assignment operator
+		/// Subtraction asignment operator
 	{
 		return *this = convert<T>() - other;
 	}
 
 	Var& operator -= (const Var& other);
-		/// Subtraction assignment operator overload for Var
+		/// Subtraction asignment operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	const Var operator * (const T& other) const
 		/// Multiplication operator for multiplying Var with POD
 	{
@@ -310,17 +310,17 @@ public:
 	const Var operator * (const Var& other) const;
 		/// Multiplication operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	Var& operator *= (const T& other)
-		/// Multiplication assignment operator
+		/// Multiplication asignment operator
 	{
 		return *this = convert<T>() * other;
 	}
 
 	Var& operator *= (const Var& other);
-		/// Multiplication assignment operator overload for Var
+		/// Multiplication asignment operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	const Var operator / (const T& other) const
 		/// Division operator for dividing Var with POD
 	{
@@ -330,17 +330,17 @@ public:
 	const Var operator / (const Var& other) const;
 		/// Division operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	Var& operator /= (const T& other)
-		/// Division assignment operator
+		/// Division asignment operator
 	{
 		return *this = convert<T>() / other;
 	}
 
 	Var& operator /= (const Var& other);
-		/// Division assignment operator specialization for Var
+		/// Division asignment operator specialization for Var
 
-	template <typename T> 
+	template <typename T>
 	bool operator == (const T& other) const
 		/// Equality operator
 	{
@@ -354,7 +354,7 @@ public:
 	bool operator == (const Var& other) const;
 		/// Equality operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	bool operator != (const T& other) const
 		/// Inequality operator
 	{
@@ -368,7 +368,7 @@ public:
 	bool operator != (const char* other) const;
 		/// Inequality operator overload for const char*
 
-	template <typename T> 
+	template <typename T>
 	bool operator < (const T& other) const
 		/// Less than operator
 	{
@@ -379,7 +379,7 @@ public:
 	bool operator < (const Var& other) const;
 		/// Less than operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	bool operator <= (const T& other) const
 		/// Less than or equal operator
 	{
@@ -390,7 +390,7 @@ public:
 	bool operator <= (const Var& other) const;
 		/// Less than or equal operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	bool operator > (const T& other) const
 		/// Greater than operator
 	{
@@ -401,7 +401,7 @@ public:
 	bool operator > (const Var& other) const;
 		/// Greater than operator overload for Var
 
-	template <typename T> 
+	template <typename T>
 	bool operator >= (const T& other) const
 		/// Greater than or equal operator
 	{
@@ -507,10 +507,10 @@ public:
 		/// Returns true if stored value is std::string.
 
 	bool isDate() const;
-		/// Returns true if stored value represents a date.
+		/// Returns true if stored value represents a date.	
 
 	bool isTime() const;
-		/// Returns true if stored value represents time or date/time.
+		/// Returns true if stored value represents time or date/time.	
 
 	bool isDateTime() const;
 		/// Returns true if stored value represents a date/time.
@@ -544,7 +544,7 @@ public:
 	static std::string toString(const Var& var);
 		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
 		/// a different result than Var::convert<std::string>() and Var::toString()!
-	
+
 private:
 	Var& getAt(std::size_t n);
 	Var& getAt(const std::string& n);
@@ -569,7 +569,7 @@ private:
 	{
 		return convert<T>() - other.convert<T>();
 	}
-	
+
 	template <typename T>
 	T multiply(const Var& other) const
 	{
@@ -786,7 +786,7 @@ inline bool Var::isEmpty() const
 
 inline bool Var::isArray() const
 {
-	if (isEmpty() || 
+	if (isEmpty() ||
 		isString()) return false;
 
 	VarHolder* pHolder = content();
@@ -857,24 +857,24 @@ inline bool Var::isString() const
 }
 
 
-inline bool Var::isDate() const
+inline bool Var::isDate() const	
 {
-	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDate() : false;
+	VarHolder* pHolder = content();	
+	return pHolder ? pHolder->isDate() : false;	
 }
 
 
-inline bool Var::isTime() const
+inline bool Var::isTime() const	
 {
-	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isTime() : false;
+	VarHolder* pHolder = content();	
+	return pHolder ? pHolder->isTime() : false;	
 }
 
 
-inline bool Var::isDateTime() const
+inline bool Var::isDateTime() const	
 {
-	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDateTime() : false;
+	VarHolder* pHolder = content();	
+	return pHolder ? pHolder->isDateTime() : false;	
 }
 
 
@@ -926,28 +926,28 @@ inline char operator / (const char& other, const Var& da)
 
 
 inline char operator += (char& other, const Var& da)
-	/// Addition assignment operator for adding Var to char
+	/// Addition asignment operator for adding Var to char
 {
 	return other += da.convert<char>();
 }
 
 
 inline char operator -= (char& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from char
+	/// Subtraction asignment operator for subtracting Var from char
 {
 	return other -= da.convert<char>();
 }
 
 
 inline char operator *= (char& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with char
+	/// Multiplication asignment operator for multiplying Var with char
 {
 	return other *= da.convert<char>();
 }
 
 
 inline char operator /= (char& other, const Var& da)
-	/// Division assignment operator for dividing Var with char
+	/// Division asignment operator for dividing Var with char
 {
 	return other /= da.convert<char>();
 }
@@ -1030,28 +1030,28 @@ inline Poco::Int8 operator / (const Poco::Int8& other, const Var& da)
 
 
 inline Poco::Int8 operator += (Poco::Int8& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::Int8
+	/// Addition asignment operator for adding Var to Poco::Int8
 {
 	return other += da.convert<Poco::Int8>();
 }
 
 
 inline Poco::Int8 operator -= (Poco::Int8& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::Int8
+	/// Subtraction asignment operator for subtracting Var from Poco::Int8
 {
 	return other -= da.convert<Poco::Int8>();
 }
 
 
 inline Poco::Int8 operator *= (Poco::Int8& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::Int8
+	/// Multiplication asignment operator for multiplying Var with Poco::Int8
 {
 	return other *= da.convert<Poco::Int8>();
 }
 
 
 inline Poco::Int8 operator /= (Poco::Int8& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::Int8
+	/// Division asignment operator for dividing Var with Poco::Int8
 {
 	return other /= da.convert<Poco::Int8>();
 }
@@ -1134,28 +1134,28 @@ inline Poco::UInt8 operator / (const Poco::UInt8& other, const Var& da)
 
 
 inline Poco::UInt8 operator += (Poco::UInt8& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::UInt8
+	/// Addition asignment operator for adding Var to Poco::UInt8
 {
 	return other += da.convert<Poco::UInt8>();
 }
 
 
 inline Poco::UInt8 operator -= (Poco::UInt8& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::UInt8
+	/// Subtraction asignment operator for subtracting Var from Poco::UInt8
 {
 	return other -= da.convert<Poco::UInt8>();
 }
 
 
 inline Poco::UInt8 operator *= (Poco::UInt8& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::UInt8
+	/// Multiplication asignment operator for multiplying Var with Poco::UInt8
 {
 	return other *= da.convert<Poco::UInt8>();
 }
 
 
 inline Poco::UInt8 operator /= (Poco::UInt8& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::UInt8
+	/// Division asignment operator for dividing Var with Poco::UInt8
 {
 	return other /= da.convert<Poco::UInt8>();
 }
@@ -1238,28 +1238,28 @@ inline Poco::Int16 operator / (const Poco::Int16& other, const Var& da)
 
 
 inline Poco::Int16 operator += (Poco::Int16& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::Int16
+	/// Addition asignment operator for adding Var to Poco::Int16
 {
 	return other += da.convert<Poco::Int16>();
 }
 
 
 inline Poco::Int16 operator -= (Poco::Int16& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::Int16
+	/// Subtraction asignment operator for subtracting Var from Poco::Int16
 {
 	return other -= da.convert<Poco::Int16>();
 }
 
 
 inline Poco::Int16 operator *= (Poco::Int16& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::Int16
+	/// Multiplication asignment operator for multiplying Var with Poco::Int16
 {
 	return other *= da.convert<Poco::Int16>();
 }
 
 
 inline Poco::Int16 operator /= (Poco::Int16& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::Int16
+	/// Division asignment operator for dividing Var with Poco::Int16
 {
 	return other /= da.convert<Poco::Int16>();
 }
@@ -1342,28 +1342,28 @@ inline Poco::UInt16 operator / (const Poco::UInt16& other, const Var& da)
 
 
 inline Poco::UInt16 operator += (Poco::UInt16& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::UInt16
+	/// Addition asignment operator for adding Var to Poco::UInt16
 {
 	return other += da.convert<Poco::UInt16>();
 }
 
 
 inline Poco::UInt16 operator -= (Poco::UInt16& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::UInt16
+	/// Subtraction asignment operator for subtracting Var from Poco::UInt16
 {
 	return other -= da.convert<Poco::UInt16>();
 }
 
 
 inline Poco::UInt16 operator *= (Poco::UInt16& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::UInt16
+	/// Multiplication asignment operator for multiplying Var with Poco::UInt16
 {
 	return other *= da.convert<Poco::UInt16>();
 }
 
 
 inline Poco::UInt16 operator /= (Poco::UInt16& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::UInt16
+	/// Division asignment operator for dividing Var with Poco::UInt16
 {
 	return other /= da.convert<Poco::UInt16>();
 }
@@ -1446,28 +1446,28 @@ inline Poco::Int32 operator / (const Poco::Int32& other, const Var& da)
 
 
 inline Poco::Int32 operator += (Poco::Int32& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::Int32
+	/// Addition asignment operator for adding Var to Poco::Int32
 {
 	return other += da.convert<Poco::Int32>();
 }
 
 
 inline Poco::Int32 operator -= (Poco::Int32& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::Int32
+	/// Subtraction asignment operator for subtracting Var from Poco::Int32
 {
 	return other -= da.convert<Poco::Int32>();
 }
 
 
 inline Poco::Int32 operator *= (Poco::Int32& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::Int32
+	/// Multiplication asignment operator for multiplying Var with Poco::Int32
 {
 	return other *= da.convert<Poco::Int32>();
 }
 
 
 inline Poco::Int32 operator /= (Poco::Int32& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::Int32
+	/// Division asignment operator for dividing Var with Poco::Int32
 {
 	return other /= da.convert<Poco::Int32>();
 }
@@ -1550,28 +1550,28 @@ inline Poco::UInt32 operator / (const Poco::UInt32& other, const Var& da)
 
 
 inline Poco::UInt32 operator += (Poco::UInt32& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::UInt32
+	/// Addition asignment operator for adding Var to Poco::UInt32
 {
 	return other += da.convert<Poco::UInt32>();
 }
 
 
 inline Poco::UInt32 operator -= (Poco::UInt32& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::UInt32
+	/// Subtraction asignment operator for subtracting Var from Poco::UInt32
 {
 	return other -= da.convert<Poco::UInt32>();
 }
 
 
 inline Poco::UInt32 operator *= (Poco::UInt32& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::UInt32
+	/// Multiplication asignment operator for multiplying Var with Poco::UInt32
 {
 	return other *= da.convert<Poco::UInt32>();
 }
 
 
 inline Poco::UInt32 operator /= (Poco::UInt32& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::UInt32
+	/// Division asignment operator for dividing Var with Poco::UInt32
 {
 	return other /= da.convert<Poco::UInt32>();
 }
@@ -1654,28 +1654,28 @@ inline Poco::Int64 operator / (const Poco::Int64& other, const Var& da)
 
 
 inline Poco::Int64 operator += (Poco::Int64& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::Int64
+	/// Addition asignment operator for adding Var to Poco::Int64
 {
 	return other += da.convert<Poco::Int64>();
 }
 
 
 inline Poco::Int64 operator -= (Poco::Int64& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::Int64
+	/// Subtraction asignment operator for subtracting Var from Poco::Int64
 {
 	return other -= da.convert<Poco::Int64>();
 }
 
 
 inline Poco::Int64 operator *= (Poco::Int64& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::Int64
+	/// Multiplication asignment operator for multiplying Var with Poco::Int64
 {
 	return other *= da.convert<Poco::Int64>();
 }
 
 
 inline Poco::Int64 operator /= (Poco::Int64& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::Int64
+	/// Division asignment operator for dividing Var with Poco::Int64
 {
 	return other /= da.convert<Poco::Int64>();
 }
@@ -1758,28 +1758,28 @@ inline Poco::UInt64 operator / (const Poco::UInt64& other, const Var& da)
 
 
 inline Poco::UInt64 operator += (Poco::UInt64& other, const Var& da)
-	/// Addition assignment operator for adding Var to Poco::UInt64
+	/// Addition asignment operator for adding Var to Poco::UInt64
 {
 	return other += da.convert<Poco::UInt64>();
 }
 
 
 inline Poco::UInt64 operator -= (Poco::UInt64& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from Poco::UInt64
+	/// Subtraction asignment operator for subtracting Var from Poco::UInt64
 {
 	return other -= da.convert<Poco::UInt64>();
 }
 
 
 inline Poco::UInt64 operator *= (Poco::UInt64& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with Poco::UInt64
+	/// Multiplication asignment operator for multiplying Var with Poco::UInt64
 {
 	return other *= da.convert<Poco::UInt64>();
 }
 
 
 inline Poco::UInt64 operator /= (Poco::UInt64& other, const Var& da)
-	/// Division assignment operator for dividing Var with Poco::UInt64
+	/// Division asignment operator for dividing Var with Poco::UInt64
 {
 	return other /= da.convert<Poco::UInt64>();
 }
@@ -1862,28 +1862,28 @@ inline float operator / (const float& other, const Var& da)
 
 
 inline float operator += (float& other, const Var& da)
-	/// Addition assignment operator for adding Var to float
+	/// Addition asignment operator for adding Var to float
 {
 	return other += da.convert<float>();
 }
 
 
 inline float operator -= (float& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from float
+	/// Subtraction asignment operator for subtracting Var from float
 {
 	return other -= da.convert<float>();
 }
 
 
 inline float operator *= (float& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with float
+	/// Multiplication asignment operator for multiplying Var with float
 {
 	return other *= da.convert<float>();
 }
 
 
 inline float operator /= (float& other, const Var& da)
-	/// Division assignment operator for dividing Var with float
+	/// Division asignment operator for dividing Var with float
 {
 	return other /= da.convert<float>();
 }
@@ -1966,28 +1966,28 @@ inline double operator / (const double& other, const Var& da)
 
 
 inline double operator += (double& other, const Var& da)
-	/// Addition assignment operator for adding Var to double
+	/// Addition asignment operator for adding Var to double
 {
 	return other += da.convert<double>();
 }
 
 
 inline double operator -= (double& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from double
+	/// Subtraction asignment operator for subtracting Var from double
 {
 	return other -= da.convert<double>();
 }
 
 
 inline double operator *= (double& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with double
+	/// Multiplication asignment operator for multiplying Var with double
 {
 	return other *= da.convert<double>();
 }
 
 
 inline double operator /= (double& other, const Var& da)
-	/// Division assignment operator for dividing Var with double
+	/// Division asignment operator for dividing Var with double
 {
 	return other /= da.convert<double>();
 }
@@ -2137,28 +2137,28 @@ inline long operator / (const long& other, const Var& da)
 
 
 inline long operator += (long& other, const Var& da)
-	/// Addition assignment operator for adding Var to long
+	/// Addition asignment operator for adding Var to long
 {
 	return other += da.convert<long>();
 }
 
 
 inline long operator -= (long& other, const Var& da)
-	/// Subtraction assignment operator for subtracting Var from long
+	/// Subtraction asignment operator for subtracting Var from long
 {
 	return other -= da.convert<long>();
 }
 
 
 inline long operator *= (long& other, const Var& da)
-	/// Multiplication assignment operator for multiplying Var with long
+	/// Multiplication asignment operator for multiplying Var with long
 {
 	return other *= da.convert<long>();
 }
 
 
 inline long operator /= (long& other, const Var& da)
-	/// Division assignment operator for dividing Var with long
+	/// Division asignment operator for dividing Var with long
 {
 	return other /= da.convert<long>();
 }
@@ -2209,6 +2209,110 @@ inline bool operator >= (const long& other, const Var& da)
 {
 	if (da.isEmpty()) return false;
 	return other >= da.convert<long>();
+}
+
+
+inline unsigned long operator + (const unsigned long& other, const Var& da)
+	/// Addition operator for adding Var to unsigned long
+{
+	return other + da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator - (const unsigned long& other, const Var& da)
+	/// Subtraction operator for subtracting Var from unsigned long
+{
+	return other - da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator * (const unsigned long& other, const Var& da)
+	/// Multiplication operator for multiplying Var with unsigned long
+{
+	return other * da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator / (const unsigned long& other, const Var& da)
+	/// Division operator for dividing Var with unsigned long
+{
+	return other / da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator += (unsigned long& other, const Var& da)
+	/// Addition assignment operator for adding Var to unsigned long
+{
+	return other += da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator -= (unsigned long& other, const Var& da)
+	/// Subtraction assignment operator for subtracting Var from unsigned long
+{
+	return other -= da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator *= (unsigned long& other, const Var& da)
+	/// Multiplication assignment operator for multiplying Var with unsigned long
+{
+	return other *= da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator /= (unsigned long& other, const Var& da)
+	/// Division assignment operator for dividing Var with unsigned long
+{
+	return other /= da.convert<unsigned long>();
+}
+
+
+inline bool operator == (const unsigned long& other, const Var& da)
+	/// Equality operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other == da.convert<unsigned long>();
+}
+
+
+inline bool operator != (const unsigned long& other, const Var& da)
+	/// Inequality operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return true;
+	return other != da.convert<unsigned long>();
+}
+
+
+inline bool operator < (const unsigned long& other, const Var& da)
+	/// Less than operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other < da.convert<unsigned long>();
+}
+
+
+inline bool operator <= (const unsigned long& other, const Var& da)
+	/// Less than or equal operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other <= da.convert<unsigned long>();
+}
+
+
+inline bool operator > (const unsigned long& other, const Var& da)
+	/// Greater than operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other > da.convert<unsigned long>();
+}
+
+
+inline bool operator >= (const unsigned long& other, const Var& da)
+	/// Greater than or equal operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other >= da.convert<unsigned long>();
 }
 
 

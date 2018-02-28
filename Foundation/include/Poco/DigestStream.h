@@ -83,7 +83,7 @@ class Foundation_API DigestOutputStream: public DigestIOS, public std::ostream
 	/// all the data passing through it,
 	/// using a DigestEngine.
 	/// To ensure that all data has been incorporated
-	/// into the digest, call close() or flush() before 
+	/// into the digest, call close() or flush() before
 	/// you obtain the digest from the digest engine.
 {
 public:

@@ -1,8 +1,6 @@
 //
 // Benchmark.cpp
 //
-// $Id$
-//
 // This sample shows a benchmark of the JSON parser.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
@@ -47,15 +45,11 @@ int main(int argc, char** argv)
 		else
 		{
 			std::cout << filePath.toString() << " doesn't exist!" << std::endl;
-			return 1; 
+			return 1;
 		}
 	}
-#ifdef PD_JSON_PARSER
-	std::string parser = "pdparser";
-#elif defined(JSON_ORG_PARSER)
-	std::string parser = "json.org parser";
-#endif
-	std::cout << "JSON Benchmark (" << parser << ')' << std::endl;
+
+	std::cout << "JSON Benchmark" << std::endl;
 	std::cout << "==============" << std::endl;
 
 	std::string jsonStr = ostr.str();

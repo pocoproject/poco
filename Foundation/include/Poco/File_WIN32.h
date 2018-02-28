@@ -5,9 +5,9 @@
 // Package: Filesystem
 // Module:  File
 //
-// Definition of the FileImpl class for WIN32.
+// Definition of the Unicode FileImpl class for WIN32.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -50,10 +50,11 @@ protected:
 	void setLastModifiedImpl(const Timestamp& ts);
 	FileSizeImpl getSizeImpl() const;
 	void setSizeImpl(FileSizeImpl size);
-	void setWriteableImpl(bool flag = true);		
-	void setExecutableImpl(bool flag = true);		
+	void setWriteableImpl(bool flag = true);
+	void setExecutableImpl(bool flag = true);
 	void copyToImpl(const std::string& path) const;
 	void renameToImpl(const std::string& path);
+	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();
@@ -61,13 +62,17 @@ protected:
 	FileSizeImpl usableSpaceImpl() const;
 	FileSizeImpl freeSpaceImpl() const;
 	static void handleLastErrorImpl(const std::string& path);
+	static void convertPath(const std::string& utf8Path, std::wstring& utf16Path);
 	
 private:
-	std::string _path;
+	std::string  _path;
+	std::wstring _upath;
 	
 	friend class FileHandle;
 	friend class DirectoryIteratorImpl;
 	friend class WindowsDirectoryWatcherStrategy;
+	friend class FileStreamBuf;
+	friend class LogFileImpl;
 };
 
 

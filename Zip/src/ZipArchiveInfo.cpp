@@ -155,12 +155,12 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, RECORDSIZE_SIZE);
 	offset += RECORDSIZE_SIZE;
 	Poco::UInt64 len = ZipUtil::get64BitValue(_rawInfo, RECORDSIZE_POS);
-	if (len <= FULL_HEADER_SIZE - offset) 
+	if (len <= FULL_HEADER_SIZE - offset)
 	{
 		inp.read(_rawInfo + offset, len);
 		ZipUtil::set64BitValue(FULL_HEADER_SIZE - offset, _rawInfo, RECORDSIZE_POS);
-	} 
-	else 
+	}
+	else
 	{
 		inp.read(_rawInfo + offset, FULL_HEADER_SIZE - offset);
 		len -= (FULL_HEADER_SIZE - offset);

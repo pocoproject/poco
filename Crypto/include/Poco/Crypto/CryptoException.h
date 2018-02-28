@@ -21,7 +21,6 @@
 
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Exception.h"
-#include <openssl/err.h>
 
 
 namespace Poco {

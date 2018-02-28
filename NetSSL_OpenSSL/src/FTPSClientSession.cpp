@@ -41,10 +41,8 @@ FTPSClientSession::FTPSClientSession(const std::string& host,
 										Poco::UInt16 port,
 										const std::string& username,
 										const std::string& password) :
-	FTPClientSession(host, port)
+	FTPClientSession(host, port, username, password)
 {
-	if(!username.empty())
-		login(username, password);	
 }
 
 void FTPSClientSession::tryFTPSmode(bool bTryFTPS)
@@ -61,10 +59,10 @@ void FTPSClientSession::beforeCreateDataSocket()
 		return;
 	std::string sResponse;
 	int status = sendCommand("PBSZ 0", sResponse);
-	if (isPositiveCompletion(status)) 
+	if (isPositiveCompletion(status))
 	{
 		status = sendCommand("PROT P", sResponse);
-		if (isPositiveCompletion(status)) 
+		if (isPositiveCompletion(status))
 			_bSecureDataConnection = true;
 	}
 }

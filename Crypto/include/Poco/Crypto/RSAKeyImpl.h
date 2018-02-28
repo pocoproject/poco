@@ -67,8 +67,8 @@ public:
 
 	RSAKeyImpl(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
 		/// Creates the RSAKey, by reading public and private key from the given files and
-		/// using the given passphrase for the private key. Can only by used for signing if 
-		/// a private key is available. 
+		/// using the given passphrase for the private key. Can only by used for signing if
+		/// a private key is available.
 
 	RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase);
 		/// Creates the RSAKey. Can only by used for signing if pPrivKey
@@ -96,13 +96,17 @@ public:
 	ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
-	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "");
-		/// Exports the public and private keys to the given files. 
+	void save(const std::string& publicKeyFile,
+		const std::string& privateKeyFile = "",
+		const std::string& privateKeyPassphrase = "") const;
+		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
-	void save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	void save(std::ostream* pPublicKeyStream,
+		std::ostream* pPrivateKeyStream = 0,
+		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding

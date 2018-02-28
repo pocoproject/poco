@@ -1,7 +1,7 @@
 //
 // ifconfig.cpp
 //
-// This sample demonstrates the (display only) ifconfig-like capabilities 
+// This sample demonstrates the (display only) ifconfig-like capabilities
 // of the NetworkInterface class (on platforms where it is supported).
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -32,14 +32,6 @@ using Poco::Net::NetworkInterface;
 
 int main(int argc, char** argv)
 {
-
-	if (argc != 1)
-	{
-		Path p(argv[0]);
-		std::cerr << "usage: " << p.getBaseName() << std::endl;
-		return 1;
-	}
-
 	try
 	{
 		const NetworkInterface::Map map = NetworkInterface::map();
@@ -73,7 +65,7 @@ int main(int argc, char** argv)
 				std::cout << sep << "P2P";
 				sep = ",";
 			}
-			
+
 			if (intf.supportsIPv4())
 			{
 				std::cout << sep << "IPv4";
@@ -128,7 +120,7 @@ int main(int argc, char** argv)
 		std::cerr << exc.displayText() << std::endl;
 		return 1;
 	}
-	
+
 	return 0;
 }
 

@@ -38,19 +38,26 @@ class Crypto_API PKCS12Container
 	/// This class implements PKCS#12 container functionality.
 {
 public:
-	typedef std::vector<X509Certificate> CAList;
+	typedef X509Certificate::List CAList;
+	typedef std::vector<std::string> CANameList;
 
 	explicit PKCS12Container(std::istream& istr, const std::string& password = "");
 		/// Creates the PKCS12Container object from a stream.
 
-	explicit PKCS12Container(const std::string& str, const std::string& password = "");
-		/// Creates the PKCS12Container object from a string.
+	explicit PKCS12Container(const std::string& path, const std::string& password = "");
+		/// Creates the PKCS12Container object from a file.
 
-	PKCS12Container(const PKCS12Container& cert);
+	PKCS12Container(const PKCS12Container& cont);
 		/// Copy constructor.
 
-	PKCS12Container& operator = (const PKCS12Container& cert);
+	PKCS12Container& operator = (const PKCS12Container& cont);
 		/// Assignment operator.
+
+	PKCS12Container(PKCS12Container&& cont);
+		/// Move constructor.
+
+	PKCS12Container& operator = (PKCS12Container&& cont);
+		/// Move assignment operator.
 
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
@@ -74,8 +81,12 @@ public:
 	const std::string& getFriendlyName() const;
 		/// Returns the friendly name of the certificate bag.
 
+	const CANameList& getFriendlyNamesCA() const;
+		/// Returns a list of CA certificates friendly names.
+
 private:
 	void load(PKCS12* pPKCS12, const std::string& password = "");
+	std::string extractFriendlyName(X509* pCert);
 
 	typedef std::unique_ptr<X509Certificate> CertPtr;
 
@@ -83,7 +94,8 @@ private:
 	EVP_PKEY*          _pKey = 0;
 	CertPtr            _pX509Cert;
 	CAList             _caCertList;
-	std::string        _pkcsFriendlyname;
+	CANameList         _caCertNames;
+	std::string        _pkcsFriendlyName;
 };
 
 
@@ -107,13 +119,19 @@ inline const X509Certificate& PKCS12Container::getX509Certificate() const
 
 inline const std::string& PKCS12Container::getFriendlyName() const
 {
-	return _pkcsFriendlyname;
+	return _pkcsFriendlyName;
 }
 
 
 inline const PKCS12Container::CAList& PKCS12Container::getCACerts() const
 {
 	return _caCertList;
+}
+
+
+inline const PKCS12Container::CANameList& PKCS12Container::getFriendlyNamesCA() const
+{
+	return _caCertNames;
 }
 
 

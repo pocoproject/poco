@@ -62,7 +62,7 @@ void NamespaceStrategy::splitName(const XMLChar* qname, XMLString& uri, XMLStrin
 		else
 			prefix.assign(XML_LIT(""));
 	}
-	else 
+	else
 	{
 		uri.assign(XML_LIT(""));
 		localName = qname;

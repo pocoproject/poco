@@ -17,6 +17,7 @@
 #include "SystemConfigurationTest.h"
 #include "IniFileConfigurationTest.h"
 #include "PropertyFileConfigurationTest.h"
+#include "PropertyListConfigurationTest.h"
 #include "XMLConfigurationTest.h"
 #include "FilesystemConfigurationTest.h"
 #include "LoggingConfiguratorTest.h"
@@ -34,6 +35,7 @@ CppUnit::Test* ConfigurationTestSuite::suite()
 	pSuite->addTest(SystemConfigurationTest::suite());
 	pSuite->addTest(IniFileConfigurationTest::suite());
 	pSuite->addTest(PropertyFileConfigurationTest::suite());
+	pSuite->addTest(PropertyListConfigurationTest::suite());
 	pSuite->addTest(XMLConfigurationTest::suite());
 	pSuite->addTest(FilesystemConfigurationTest::suite());
 	pSuite->addTest(LoggingConfiguratorTest::suite());

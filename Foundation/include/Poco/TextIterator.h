@@ -85,7 +85,7 @@ public:
 		/// If there is no valid character at the current position,
 		/// -1 is returned.
 		
-	TextIterator& operator ++ (); 
+	TextIterator& operator ++ ();
 		/// Prefix increment operator.
 
 	TextIterator operator ++ (int);		

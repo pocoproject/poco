@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIterator.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -137,6 +135,18 @@ public:
 		return _pImpl->maxDepth();
 	}
 
+	template <typename T>
+	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
+		/// Binds the event to the given method.
+		///
+		/// The callback method will be called if the Traverse class fails
+		/// to read a directory. 
+		///
+		/// Usage:
+		///     onError(*this, &MyClass::myCallback);
+	{
+		_pImpl->template onError<T>(obj, pCB);
+	}
 
 	MyType& operator = (const MyType& it)
 	{

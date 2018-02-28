@@ -13,8 +13,7 @@
 // an Unicode variant (e.g., GetUserNameA) and an ASCII variant (GetUserNameW).
 // There is also a macro (GetUserName) that's either defined to be the Unicode
 // name or the ASCII name, depending on whether the UNICODE macro is #define'd
-// or not. POCO always calls the Unicode or ASCII functions directly (depending
-// on whether POCO_WIN32_UTF8 is #define'd or not), so the macros are not ignored.
+// or not. POCO always calls the Unicode or ASCII functions directly.
 //
 // These macro definitions are a frequent case of problems and naming conflicts,
 // especially for C++ programmers. Say, you define a class with a member function named
@@ -48,14 +47,14 @@
 #endif
 
 
-// Microsoft Visual C++ includes copies of the Windows header files 
+// Microsoft Visual C++ includes copies of the Windows header files
 // that were current at the time Visual C++ was released.
-// The Windows header files use macros to indicate which versions 
-// of Windows support many programming elements. Therefore, you must 
-// define these macros to use new functionality introduced in each 
-// major operating system release. (Individual header files may use 
-// different macros; therefore, if compilation problems occur, check 
-// the header file that contains the definition for conditional 
+// The Windows header files use macros to indicate which versions
+// of Windows support many programming elements. Therefore, you must
+// define these macros to use new functionality introduced in each
+// major operating system release. (Individual header files may use
+// different macros; therefore, if compilation problems occur, check
+// the header file that contains the definition for conditional
 // definitions.) For more information, see SdkDdkVer.h.
 
 
@@ -82,7 +81,12 @@
 #endif
 
 #if !defined(POCO_NO_WINDOWS_H)
-#include <windows.h>
+	#include <windows.h>
+	#ifdef __MINGW32__
+		#include <Winsock2.h>
+		#include <Iphlpapi.h>
+		#include <ws2tcpip.h>
+	#endif // __MINGW32__
 #endif
 
 // To prevent Platform_WIN32.h to modify version defines,

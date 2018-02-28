@@ -31,7 +31,7 @@ namespace Net {
 
 class Net_API RemoteSyslogChannel: public Poco::Channel
 	/// This Channel implements remote syslog logging over UDP according
-	/// to RFC 5424 "The Syslog Protocol" 
+	/// to RFC 5424 "The Syslog Protocol"
 	/// and RFC 5426 "Transmission of syslog messages over UDP".
 	///
 	/// In addition, RemoteSyslogListener also supports the "old" BSD syslog

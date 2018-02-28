@@ -1,8 +1,6 @@
 //
 // Array.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Array
@@ -22,7 +20,7 @@ namespace Poco {
 namespace MongoDB {
 
 
-Array::Array(): 
+Array::Array():
 	Document()
 {
 }

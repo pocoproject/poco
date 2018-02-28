@@ -305,7 +305,7 @@ void HTTPSClientSessionTest::testInterop()
 	cert.extractNames(commonName, domainNames);
 
 	assert (commonName == "secure.appinf.com" || commonName == "*.appinf.com");
-	assert (domainNames.find("appinf.com") != domainNames.end() 
+	assert (domainNames.find("appinf.com") != domainNames.end()
 		 || domainNames.find("*.appinf.com") != domainNames.end());
 }
 
@@ -353,7 +353,7 @@ void HTTPSClientSessionTest::testCachedSession()
 	HTTPSTestServer srv(pServerContext);
 
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		"");
 	//pClientContext->enableSessionCache(true);
 

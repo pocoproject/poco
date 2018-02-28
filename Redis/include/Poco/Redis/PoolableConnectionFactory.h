@@ -1,8 +1,6 @@
 //
 // PoolableConnectionFactory.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  PoolableConnectionFactory

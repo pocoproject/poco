@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Timestamp.h"
 
 
 namespace Poco {
@@ -53,6 +54,7 @@ protected:
 	void setExecutableImpl(bool flag = true);		
 	void copyToImpl(const std::string& path) const;
 	void renameToImpl(const std::string& path);
+	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();

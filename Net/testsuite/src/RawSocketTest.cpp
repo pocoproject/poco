@@ -60,7 +60,7 @@ void RawSocketTest::testEchoIPv4()
 	assert (5 == (n - shift));
 	assert ("hello" == std::string((char*)ptr, 5));
 
-	rs.close(); 
+	rs.close();
 }
 
 

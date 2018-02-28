@@ -1,8 +1,6 @@
 //
 // UpdateRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  UpdateRequest
@@ -22,7 +20,7 @@ namespace MongoDB {
 
 
 UpdateRequest::UpdateRequest(const std::string& collectionName, UpdateRequest::Flags flags):
-	RequestMessage(MessageHeader::OP_UPDATE), 
+	RequestMessage(MessageHeader::OP_UPDATE),
 	_flags(flags),
 	_fullCollectionName(collectionName),
 	_selector(),

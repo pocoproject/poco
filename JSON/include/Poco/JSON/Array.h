@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Array
@@ -36,10 +34,10 @@ class Object;
 
 class JSON_API Array
 	/// Represents a JSON array. Array provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to 
+	/// based on shared pointers and optimized for performance. It is possible to
 	/// convert Array to Poco::Dynamic::Array. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
-	/// 
+	///
 	///    // use pointers to avoid copying
 	///    using namespace Poco::JSON;
 	///    std::string json = "[ {\"test\" : 0}, { \"test1\" : [1, 2, 3], \"test2\" : 4 } ]";
@@ -51,7 +49,7 @@ class JSON_API Array
 	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
 	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
 	///    i = result = subArr->get(0); // i == 1;
-	/// 
+	///
 	///    // copy/convert to Poco::Dynamic::Array
 	///    Poco::Dynamic::Array da = *arr;
 	///    i = da[0]["test"];     // i == 0
@@ -65,8 +63,12 @@ public:
 	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
 	typedef SharedPtr<Array> Ptr;
 
-	Array();
+	Array(int options = 0);
 		/// Creates an empty Array.
+		///
+		/// If JSON_ESCAPE_UNICODE is specified, when the object is
+		/// stringified, all unicode characters will be escaped in the
+		/// resulting string.
 
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
@@ -83,6 +85,12 @@ public:
 	virtual ~Array();
 		/// Destroys the Array.
 
+	void setEscapeUnicode(bool escape = true);
+		/// Sets the flag for escaping unicode.
+
+	bool getEscapeUnicode() const;
+		/// Returns the flag for escaping unicode.
+
 	ValueVec::const_iterator begin() const;
 		/// Returns the begin iterator for values.
 
@@ -90,7 +98,7 @@ public:
 		/// Returns the end iterator for values.
 
 	Dynamic::Var get(unsigned int index) const;
-		/// Retrieves the element at the given index. 
+		/// Retrieves the element at the given index.
 		/// Will return an empty value when the element doesn't exist.
 
 	Array::Ptr getArray(unsigned int index) const;
@@ -190,12 +198,30 @@ private:
 	ValueVec         _values;
 	mutable ArrayPtr _pArray;
 	mutable bool     _modified;
+	// Note:
+	//  The reason we have this flag here (rather than as argument to stringify())
+	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
+	//  so it must know whether to escape unicode or not.
+	bool             _escapeUnicode;
 };
 
 
 //
 // inlines
 //
+
+inline void Array::setEscapeUnicode(bool escape)
+{
+	_escapeUnicode = true;
+}
+
+
+inline bool Array::getEscapeUnicode() const
+{
+	return _escapeUnicode;
+}
+
+
 inline Array::ValueVec::const_iterator Array::begin() const
 {
 	return _values.begin();

@@ -23,7 +23,7 @@ namespace Poco {
 //
 
 
-PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode): 
+PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, mode),
 	_pipe(pipe)
 {

@@ -29,7 +29,7 @@ using Poco::delegate;
 using std::memcpy;
 
 
-FIFOBufferTest::FIFOBufferTest(const std::string& rName): 
+FIFOBufferTest::FIFOBufferTest(const std::string& rName):
 	CppUnit::TestCase(rName),
 	_notToReadable(0),
 	_notToWritable(0),

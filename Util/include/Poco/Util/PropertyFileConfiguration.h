@@ -70,12 +70,12 @@ public:
 		/// Set the preserveComment to preserve the comments in the given stream.
 		
 	void load(std::istream& istr, bool preserveComment = false);
-		/// Loads the configuration data from the given stream, which 
+		/// Loads the configuration data from the given stream, which
 		/// must be in properties file format.
 		/// Set the preserveComment to preserve the comments in the given stream.
 		
 	void load(const std::string& path, bool preserveComment = false);
-		/// Loads the configuration data from the given file, which 
+		/// Loads the configuration data from the given file, which
 		/// must be in properties file format.
 		/// Set the preserveComment to preserve the comments in the given stream.
 		

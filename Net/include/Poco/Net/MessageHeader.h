@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/MailRecipient.h"
 #include <ostream>
 #include <istream>
 #include <vector>
@@ -35,7 +36,7 @@ class Net_API MessageHeader: public NameValueCollection
 	///
 	/// The name is case-insensitive.
 	///
-	/// There can be more than one name-value pair with the 
+	/// There can be more than one name-value pair with the
 	/// same name.
 	///
 	/// MessageHeader supports writing and reading the
@@ -49,6 +50,8 @@ class Net_API MessageHeader: public NameValueCollection
 	/// adding them. The default limit is 100.
 {
 public:
+	typedef std::vector<MailRecipient> RecipientList;
+
 	MessageHeader();
 		/// Creates the MessageHeader.
 
@@ -67,9 +70,9 @@ public:
 		///
 		/// The format is one name-value pair per line, with
 		/// name and value separated by a colon and lines
-		/// delimited by a carriage return and a linefeed 
+		/// delimited by a carriage return and a linefeed
 		/// character. See RFC 2822 for details.
-		
+
 	virtual void read(std::istream& istr);
 		/// Reads the message header from the given input stream.
 		///
@@ -86,7 +89,14 @@ public:
 		///
 		/// Throws a MessageException if the input stream is
 		/// malformed.
-		
+
+	void read(std::istream& istr, RecipientList* pRecipients);
+		/// Reads the message header from the given input stream
+		/// and populates the supplied recipient list, if not null.
+		///
+		/// See MessageHeader::read(std::istream&) documentation
+		/// for detailed description.
+
 	int getFieldLimit() const;
 		/// Returns the maximum number of header fields
 		/// allowed.
@@ -100,7 +110,7 @@ public:
 		/// Specify 0 for unlimited (not recommended).
 		///
 		/// The default limit is 100.
-	
+
 	bool hasToken(const std::string& fieldName, const std::string& token) const;
 		/// Returns true iff the field with the given fieldName contains
 		/// the given token. Tokens in a header field are expected to be
@@ -110,7 +120,7 @@ public:
 		/// Splits the given string into separate elements. Elements are expected
 		/// to be separated by commas.
 		///
-		/// For example, the string 
+		/// For example, the string
 		///   text/plain; q=0.5, text/html, text/x-dvi; q=0.8
 		/// is split into the elements
 		///   text/plain; q=0.5
@@ -144,13 +154,17 @@ public:
 		/// Checks if the value must be quoted. If so, the value is
 		/// appended to result, enclosed in double-quotes.
 		/// Otherwise, the value is appended to result as-is.
-		
+
 	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
 	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
-	        /// Decode RFC2047 string.
+		/// Decode RFC2047 string.
 
-		
+
 private:
+	static void getRecipients(const std::string& name, const std::string& value, RecipientList* pRecipients);
+		/// Returns the list of email recipients if pRecipients is not null and To, CC or BCC headers are
+		/// found. Otherwise, does nothing.
+
 	enum Limits
 		/// Limits for basic sanity checks when reading a header
 	{

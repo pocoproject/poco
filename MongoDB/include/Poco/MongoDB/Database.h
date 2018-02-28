@@ -1,8 +1,6 @@
 //
 // Database.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Database
@@ -49,8 +47,8 @@ public:
 		/// Authenticates against the database using the given connection,
 		/// username and password, as well as authentication method.
 		///
-		/// "MONGODB-CR" (default prior to MongoDB 3.0) and 
-		/// "SCRAM-SHA-1" (default starting in 3.0) are the only supported 
+		/// "MONGODB-CR" (default prior to MongoDB 3.0) and
+		/// "SCRAM-SHA-1" (default starting in 3.0) are the only supported
 		/// authentication methods.
 		///
 		/// Returns true if authentication was successful, otherwise false.
@@ -59,7 +57,7 @@ public:
 		/// invalid credentials.
 
 	Int64 count(Connection& connection, const std::string& collectionName) const;
-		/// Sends a count request for the given collection to MongoDB. 
+		/// Sends a count request for the given collection to MongoDB.
 		///
 		/// If the command fails, -1 is returned.
 
@@ -67,7 +65,7 @@ public:
 		/// Creates a QueryRequest for a command.
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest to count the given collection. 
+		/// Creates a QueryRequest to count the given collection.
 		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
@@ -79,11 +77,11 @@ public:
 		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest. 
+		/// Creates a QueryRequest.
 		/// The collectionname must not contain the database name.
 
 	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
-		/// Creates an UpdateRequest. 
+		/// Creates an UpdateRequest.
 		/// The collectionname must not contain the database name.
 
 	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,

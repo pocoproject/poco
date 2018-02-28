@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_xref.h
+ * << Haru Free PDF Library >> -- hpdf_xref.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -142,7 +145,7 @@ HPDF_Xref_Add  (HPDF_Xref  xref,
     }
 
     /* in the following, we have to dispose the object when an error is
-     * occurred.
+     * occured.
      */
 
     entry = (HPDF_XrefEntry)HPDF_GetMem (xref->mmgr,
@@ -276,7 +279,7 @@ HPDF_Xref_WriteToStream  (HPDF_Xref    xref,
         tmp_xref->addr = stream->size;
 
         pbuf = buf;
-        pbuf = HPDF_StrCpy (pbuf, "xref\012", eptr);
+        pbuf = (char *)HPDF_StrCpy (pbuf, "xref\012", eptr);
         pbuf = HPDF_IToA (pbuf, tmp_xref->start_offset, eptr);
         *pbuf++ = ' ';
         pbuf = HPDF_IToA (pbuf, tmp_xref->entries->count, eptr);
@@ -295,7 +298,7 @@ HPDF_Xref_WriteToStream  (HPDF_Xref    xref,
             pbuf = HPDF_IToA2 (pbuf, entry->gen_no, HPDF_GEN_NO_LEN + 1);
             *pbuf++ = ' ';
             *pbuf++ = entry->entry_typ;
-            HPDF_StrCpy (pbuf, "\015\012", eptr);
+            HPDF_StrCpy (pbuf, "\015\012", eptr); /* Acrobat 8.15 requires both \r and \n here */
             ret = HPDF_Stream_WriteStr (stream, buf);
             if (ret != HPDF_OK)
                 return ret;

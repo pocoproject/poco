@@ -22,10 +22,36 @@
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
 #include <openssl/conf.h>
 #endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#define POCO_STR_HELPER(x) #x
+	#define POCO_STR(x) POCO_STR_HELPER(x)
+	#if defined POCO_INTERNAL_OPENSSL_MSVC_VER
+		#define POCO_INTERNAL_OPENSSL_BUILD          \
+				" (POCO internal build, MSVC version " \
+				POCO_STR(POCO_INTERNAL_OPENSSL_MSVC_VER) ")"
+	#else
+		#define POCO_INTERNAL_OPENSSL_BUILD ""
+	#endif
+	#pragma message (OPENSSL_VERSION_TEXT POCO_INTERNAL_OPENSSL_BUILD)
+#endif
 
 
 using Poco::RandomInputStream;
 using Poco::Thread;
+
+
+#if defined(_MSC_VER) && !defined(_DLL) && defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
+
+	#if (POCO_MSVS_VERSION >= 2015)
+		FILE _iob[] = { *stdin, *stdout, *stderr };
+		extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
+	#endif // (POCO_MSVS_VERSION >= 2015)
+
+	#if (POCO_MSVS_VERSION < 2012)
+		extern "C" __declspec(noreturn) void __cdecl __report_rangecheckfailure(void) { ::ExitProcess(1); }
+	#endif // (POCO_MSVS_VERSION < 2012)
+
+#endif // defined(_MSC_VER) && !defined(_DLL) && defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
 
 
 namespace Poco {
@@ -85,8 +111,8 @@ void OpenSSLInitializer::initialize()
 // https://sourceforge.net/p/poco/bugs/110/
 //
 // From http://www.openssl.org/docs/crypto/threads.html :
-// "If the application does not register such a callback using CRYPTO_THREADID_set_callback(), 
-//  then a default implementation is used - on Windows and BeOS this uses the system's 
+// "If the application does not register such a callback using CRYPTO_THREADID_set_callback(),
+//  then a default implementation is used - on Windows and BeOS this uses the system's
 //  default thread identifying APIs"
 #ifndef OPENSSL_NO_DEPRECATED
 			CRYPTO_set_id_callback(&OpenSSLInitializer::id);
@@ -193,12 +219,3 @@ void uninitializeCrypto()
 
 
 } } // namespace Poco::Crypto
-
-// needed for OpenSSL static link
-#if defined(_WIN32) && !defined(POCO_DLL) && (POCO_MSVS_VERSION >= 2015) && !defined(POCO_EXTERNAL_OPENSSL)
-	FILE * __cdecl __iob_func(void)
-	{
-		static FILE poco_iob[] = { stdin, stdout, stderr };
-		return poco_iob;
-	}
-#endif

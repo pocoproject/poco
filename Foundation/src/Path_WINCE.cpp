@@ -1,5 +1,5 @@
 //
-// Path_WIN32U.cpp
+// Path_WIN32.cpp
 //
 // Library: Foundation
 // Package: Filesystem
@@ -133,7 +133,7 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 					roots.push_back(root);
 				}
 			}
-		} 
+		}
 		while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}

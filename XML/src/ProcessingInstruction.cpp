@@ -19,7 +19,7 @@ namespace Poco {
 namespace XML {
 
 
-ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data): 
+ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data):
 	AbstractNode(pOwnerDocument),
 	_target(target),
 	_data(data)
@@ -27,7 +27,7 @@ ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const XML
 }
 
 
-ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction): 
+ProcessingInstruction::ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction):
 	AbstractNode(pOwnerDocument, processingInstruction),
 	_target(processingInstruction._target),
 	_data(processingInstruction._data)

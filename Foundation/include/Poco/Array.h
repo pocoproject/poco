@@ -35,10 +35,10 @@ namespace Poco {
 
 template<class T, std::size_t N>
 class Array : public std::array<T, N>
-	/// STL container like C-style array replacement class. 
-	/// 
+	/// STL container like C-style array replacement class.
+	///
 	/// This implementation is based on the idea of Nicolai Josuttis.
-	/// His original implementation can be found at http://www.josuttis.com/cppcode/array.html . 
+	/// His original implementation can be found at http://www.josuttis.com/cppcode/array.html .
 {
 
 public:
@@ -67,7 +67,7 @@ public:
 
 	template <typename Other>
 	Array<T,N>& operator= (const Array<Other,N>& rhs)
-		/// Assignment with type conversion 
+		/// Assignment with type conversion
 	{
 		std::copy(rhs.begin(),rhs.end(), this->begin());
 		return *this;

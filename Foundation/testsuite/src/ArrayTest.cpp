@@ -90,7 +90,7 @@ void ArrayTest::testOperations()
 	}
 
 	// swap
-	Array b; 
+	Array b;
 	b.assign(10);
 	for(int i=0; i<SIZE; i++){
 		assert(a[i] == 100);

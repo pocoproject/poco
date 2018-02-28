@@ -229,9 +229,9 @@ stdint.h is available, include it; it may define INT64_MAX. Systems that do not
 have stdint.h (e.g. Solaris) may have inttypes.h. The macro int64_t may be set
 by "configure". */
 
-#if HAVE_STDINT_H
+#if defined HAVE_STDINT_H
 #include <stdint.h>
-#elif HAVE_INTTYPES_H
+#elif defined HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif
 
@@ -2772,6 +2772,9 @@ extern const pcre_uint8  PRIV(ucd_stage1)[];
 extern const pcre_uint16 PRIV(ucd_stage2)[];
 extern const pcre_uint32 PRIV(ucp_gentype)[];
 extern const pcre_uint32 PRIV(ucp_gbtable)[];
+#ifdef COMPILE_PCRE32
+extern const ucd_record  PRIV(dummy_ucd_record)[];
+#endif
 #ifdef SUPPORT_JIT
 extern const int         PRIV(ucp_typerange)[];
 #endif
@@ -2780,9 +2783,15 @@ extern const int         PRIV(ucp_typerange)[];
 /* UCD access macros */
 
 #define UCD_BLOCK_SIZE 128
-#define GET_UCD(ch) (PRIV(ucd_records) + \
+#define REAL_GET_UCD(ch) (PRIV(ucd_records) + \
         PRIV(ucd_stage2)[PRIV(ucd_stage1)[(int)(ch) / UCD_BLOCK_SIZE] * \
         UCD_BLOCK_SIZE + (int)(ch) % UCD_BLOCK_SIZE])
+
+#ifdef COMPILE_PCRE32
+#define GET_UCD(ch) ((ch > 0x10ffff)? PRIV(dummy_ucd_record) : REAL_GET_UCD(ch))
+#else
+#define GET_UCD(ch) REAL_GET_UCD(ch)
+#endif
 
 #define UCD_CHARTYPE(ch)    GET_UCD(ch)->chartype
 #define UCD_SCRIPT(ch)      GET_UCD(ch)->script

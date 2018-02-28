@@ -99,7 +99,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _moduleId != 0; 
+	return _moduleId != 0;
 }
 
 

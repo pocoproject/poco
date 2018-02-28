@@ -32,7 +32,7 @@ class DocumentType;
 class XML_API DTDMap: public NamedNodeMap
 	/// This implementation of NamedNodeMap
 	/// is returned by DocumentType::entities()
-	/// and DocumentType::notations(). 
+	/// and DocumentType::notations().
 {
 public:
 	Node* getNamedItem(const XMLString& name) const;

@@ -31,7 +31,7 @@ class HMACEngine: public DigestEngine
 	/// This class implements the HMAC message
 	/// authentication code algorithm, as specified
 	/// in RFC 2104. The underlying DigestEngine
-	/// (MD5Engine, SHA1Engine, etc.) must be given as 
+	/// (MD5Engine, SHA1Engine, etc.) must be given as
 	/// template argument.
 	/// Since the HMACEngine is a DigestEngine, it can
 	/// be used with the DigestStream class to create

@@ -267,7 +267,7 @@ void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 			handleError(XML_GetErrorCode(_parser));
 		if (istr.good())
 			n = readBytes(istr, _pBuffer, PARSE_BUFFER_SIZE);
-		else 
+		else
 			n = 0;
 	}
 	if (!XML_Parse(_parser, _pBuffer, 0, 1))
@@ -284,7 +284,7 @@ void ParserEngine::parseCharInputStream(XMLCharInputStream& istr)
 			handleError(XML_GetErrorCode(_parser));
 		if (istr.good())
 			n = readChars(istr, reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
-		else 
+		else
 			n = 0;
 	}
 	if (!XML_Parse(_parser, _pBuffer, 0, 1))
@@ -316,7 +316,7 @@ void ParserEngine::parseExternalByteInputStream(XML_Parser extParser, XMLByteInp
 				handleError(XML_GetErrorCode(extParser));
 			if (istr.good())
 				n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE);
-			else 
+			else
 				n = 0;
 		}
 		if (!XML_Parse(extParser, pBuffer, 0, 1))
@@ -343,7 +343,7 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 				handleError(XML_GetErrorCode(extParser));
 			if (istr.good())
 				n = readChars(istr, pBuffer, static_cast<int>(PARSE_BUFFER_SIZE/sizeof(XMLChar)));
-			else 
+			else
 				n = 0;
 		}
 		if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), 0, 1))
@@ -676,7 +676,7 @@ void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* enti
 	
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
-	if (pThis->_pDTDHandler) 
+	if (pThis->_pDTDHandler)
 		pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : 0, systemId, notationName);
 }
 
@@ -689,7 +689,7 @@ void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationNa
 	if (publicId) pubId.assign(publicId);
 	XMLString sysId;
 	if (systemId) sysId.assign(systemId);
-	if (pThis->_pDTDHandler) 
+	if (pThis->_pDTDHandler)
 		pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : 0, systemId ? &sysId : 0);
 }
 
@@ -846,7 +846,7 @@ void ParserEngine::handleEndDoctypeDecl(void* userData)
 }
 
 
-void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength, 
+void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength,
 	                                const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName)
 {
 	if (value)

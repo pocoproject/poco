@@ -22,7 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
 
-#if (POCO_OS == POCO_OS_CYGWIN)
+#if (POCO_OS == POCO_OS_CYGWIN || defined(POCO_ANDROID))
 #include "Poco/Mutex_POSIX.h"
 #else
 #include "Poco/Mutex_STD.h"
@@ -32,7 +32,7 @@ namespace Poco {
 
 
 class Foundation_API Mutex: private MutexImpl
-	/// A Mutex (mutual exclusion) is a synchronization 
+	/// A Mutex (mutual exclusion) is a synchronization
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multithreaded) scenario.
 	/// Using the ScopedLock class is the preferred way to automatically
@@ -63,7 +63,7 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -77,7 +77,7 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -119,7 +119,7 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
@@ -133,7 +133,7 @@ public:
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
 		///
-		/// Performance Note: On most platforms (including Windows), this member function is 
+		/// Performance Note: On most platforms (including Windows), this member function is
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 

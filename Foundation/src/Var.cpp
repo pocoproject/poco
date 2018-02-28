@@ -14,6 +14,7 @@
 
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/NumberParser.h"
 #include <algorithm>
 #include <cctype>
 #include <vector>
@@ -34,7 +35,7 @@ Var::Var()
 
 
 Var::Var(const char* pVal)
-#ifdef POCO_NO_SOO 
+#ifdef POCO_NO_SOO
 	: _pHolder(new VarHolderImpl<std::string>(pVal))
 {
 }
@@ -415,63 +416,55 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 		case '"':
 			return parseJSONString(val, pos);
 		default:
+		{
+			std::string str = parseString(val, pos);
+			if (str == "false") return false;
+			if (str == "true") return true;
+			bool isNumber = false;
+			bool isSigned = false;
+			int separators = 0;
+			int frac = 0;
+			int index = 0;
+			size_t size = str.size();
+			for (size_t i = 0; i < size ; ++i)
 			{
-				std::string str = parseString(val, pos);
-				if (str == "false")
-					return false;
-
-				if (str == "true")
-					return true;
-
-				bool isNumber = false;
-				bool isSigned = false;
-				int separators = 0;
-				int frac = 0;
-				int index = 0;
-				size_t size = str.size();
-				for (size_t i = 0; i < size ; ++i)
+				int ch = str[i];
+				if ((ch == '-' || ch == '+') && index == 0)
 				{
-					int ch = str[i];
-					if ((ch == '-' || ch == '+') && index == 0)
-					{
-						if (ch == '-')
-							isSigned = true;
-					}
-					else if (Ascii::isDigit(ch))
-					{
-						isNumber |= true;
-					}
-					else if (ch == '.' || ch == ',')
-					{
-						frac = ch;
-						++separators;
-						if (separators > 1)
-							return str;
-					}
-					else
-						return str;
-
-					++index;
+					if (ch == '-') isSigned = true;
 				}
-
-				if (frac && isNumber)
+				else if (Ascii::isDigit(ch))
 				{
-					const double number = NumberParser::parseFloat(str, frac);
-					return Var(number);
+					isNumber |= true;
 				}
-				else if (frac == 0 && isNumber && isSigned)
+				else if (ch == '.' || ch == ',')
 				{
-					const Poco::Int64 number = NumberParser::parse64(str);
-					return number;
+					frac = ch;
+					++separators;
+					if (separators > 1) return str;
 				}
-				else if (frac == 0 && isNumber && !isSigned)
-				{
-					const Poco::UInt64 number = NumberParser::parseUnsigned64(str);
-					return number;
-				}
-
-				return str;
+				else return str;
+				++index;
 			}
+
+			if (frac && isNumber)
+			{
+				const double number = NumberParser::parseFloat(str, frac);
+				return Var(number);
+			}
+			else if (frac == 0 && isNumber && isSigned)
+			{
+				const Poco::Int64 number = NumberParser::parse64(str);
+				return number;
+			}
+			else if (frac == 0 && isNumber && !isSigned)
+			{
+				const Poco::UInt64 number = NumberParser::parseUnsigned64(str);
+				return number;
+			}
+
+			return str;
+		}
 		}
 	}
 	std::string empty;
@@ -490,7 +483,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		std::string key = parseString(val, pos);
 		skipWhiteSpace(val, pos);
 		if (val[pos] != ':')
-			throw DataFormatException("Incorrect object, must contain: key : value pairs"); 
+			throw DataFormatException("Incorrect object, must contain: key : value pairs");
 		++pos; // skip past :
 		Var value = parse(val, pos);
 		aStruct.insert(key, value);
@@ -502,7 +495,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		}
 	}
 	if (val[pos] != '}')
-		throw DataFormatException("Unterminated object"); 
+		throw DataFormatException("Unterminated object");
 	++pos;
 	return aStruct;
 }
@@ -525,7 +518,7 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 		}
 	}
 	if (val[pos] != ']')
-		throw DataFormatException("Unterminated array"); 
+		throw DataFormatException("Unterminated array");
 	++pos;
 	return result;
 }
@@ -541,8 +534,8 @@ std::string Var::parseString(const std::string& val, std::string::size_type& pos
 	else
 	{
 		std::string result;
-		while (pos < val.size() 
-			&& !Poco::Ascii::isSpace(val[pos]) 
+		while (pos < val.size()
+			&& !Poco::Ascii::isSpace(val[pos])
 			&& val[pos] != ','
 			&& val[pos] != ']'
 			&& val[pos] != '}')
@@ -576,19 +569,19 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 				{
 				case 'b':
 					result += '\b';
-					break; 
+					break;
 				case 'f':
 					result += '\f';
-					break; 
+					break;
 				case 'n':
 					result += '\n';
-					break; 
+					break;
 				case 'r':
 					result += '\r';
-					break; 
+					break;
 				case 't':
 					result += '\t';
-					break; 
+					break;
 				default:
 					result += val[pos];
 					break;

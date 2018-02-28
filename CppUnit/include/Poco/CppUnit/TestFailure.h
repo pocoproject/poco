@@ -57,7 +57,7 @@ inline TestFailure::TestFailure(Test* failedTest, CppUnitException* thrownExcept
 
 // Deletes the owned exception.
 inline TestFailure::~TestFailure()
-{ 
+{
 	delete _thrownException;
 }
 

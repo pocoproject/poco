@@ -15,7 +15,7 @@
 
 
 #include "Poco/PDF/PDF.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 
 class PDFTest: public CppUnit::TestCase

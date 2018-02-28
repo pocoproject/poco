@@ -1,8 +1,6 @@
 //
 // ParseHandler.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  ParseHandler
@@ -22,7 +20,6 @@
 
 #include "Poco/JSON/Handler.h"
 #include <stack>
-//#include <iostream>
 
 
 namespace Poco {

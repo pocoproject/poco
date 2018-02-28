@@ -26,9 +26,9 @@
 namespace Poco {
 
 
-template <class TArgs, bool hasSender = true, bool senderIsConst = true> 
+template <class TArgs, bool hasSender = true, bool senderIsConst = true>
 class FunctionDelegate: public AbstractDelegate<TArgs>
-	/// Wraps a freestanding function or static member function 
+	/// Wraps a freestanding function or static member function
 	/// for use as a Delegate.
 {
 public:
@@ -95,7 +95,7 @@ private:
 };
 
 
-template <class TArgs> 
+template <class TArgs>
 class FunctionDelegate<TArgs, true, false>: public AbstractDelegate<TArgs>
 {
 public:
@@ -162,7 +162,7 @@ private:
 };
 
 
-template <class TArgs, bool senderIsConst> 
+template <class TArgs, bool senderIsConst>
 class FunctionDelegate<TArgs, false, senderIsConst>: public AbstractDelegate<TArgs>
 {
 public:
@@ -198,7 +198,7 @@ public:
 		if (_function)
 		{
 			(*_function)(arguments);
-			return true; 
+			return true;
 		}
 		else return false;
 	}
@@ -229,9 +229,9 @@ private:
 };
 
 
-template <> 
+template <>
 class FunctionDelegate<void, true, true>: public AbstractDelegate<void>
-	/// Wraps a freestanding function or static member function 
+	/// Wraps a freestanding function or static member function
 	/// for use as a Delegate.
 {
 public:
@@ -298,7 +298,7 @@ private:
 };
 
 
-template <> 
+template <>
 class FunctionDelegate<void, true, false>: public AbstractDelegate<void>
 {
 public:
@@ -365,7 +365,7 @@ private:
 };
 
 
-template <bool senderIsConst> 
+template <bool senderIsConst>
 class FunctionDelegate<void, false, senderIsConst>: public AbstractDelegate<void>
 {
 public:
@@ -401,7 +401,7 @@ public:
 		if (_function)
 		{
 			(*_function)();
-			return true; 
+			return true;
 		}
 		else return false;
 	}

@@ -22,6 +22,7 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/DateTime.h"
 #include "Poco/SharedPtr.h"
+#include <vector>
 #include <set>
 #include <istream>
 #include <openssl/ssl.h>
@@ -35,6 +36,8 @@ class Crypto_API X509Certificate
 	/// This class represents a X509 Certificate.
 {
 public:
+	typedef std::vector<X509Certificate> List;
+
 	enum NID
 		/// Name identifier for extracting information from
 		/// a certificate subject's or issuer's distinguished name.
@@ -59,13 +62,13 @@ public:
 
 	explicit X509Certificate(X509* pCert);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
+		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate.
 
 	X509Certificate(X509* pCert, bool shared);
 		/// Creates the X509Certificate from an existing
-		/// OpenSSL certificate. Ownership is taken of 
-		/// the certificate. If shared is true, the 
+		/// OpenSSL certificate. Ownership is taken of
+		/// the certificate. If shared is true, the
 		/// certificate's reference count is incremented.
 
 	X509Certificate(const X509Certificate& cert);
@@ -73,15 +76,22 @@ public:
 
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
- 
+
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.
 
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
+	long version() const;
+		/// Returns the version of the certificate.
+
+	const std::string& serialNumber() const;
+		/// Returns the certificate serial number as a
+		/// string in decimal encoding.
+
 	const std::string& issuerName() const;
-		/// Returns the certificate issuer's distinguished name. 
+		/// Returns the certificate issuer's distinguished name.
 		
 	std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given
@@ -141,8 +151,21 @@ public:
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
 
+	std::string signatureAlgorithm() const;
+		/// Returns the certificate signature algorithm long name.
+
 	void print(std::ostream& out) const;
 		/// Prints the certificate information to ostream.
+
+	void printAll(std::ostream& out) const;
+		/// Prints all the certificate names to ostream.
+
+	static List readPEM(const std::string& pemFileName);
+		/// Reads and returns a list of certificates from
+		/// the specified PEM file.
+
+	static void writePEM(const std::string& pemFileName, const List& list);
+		/// Writes the list of certificates to the specified PEM file.
 
 protected:
 	void load(std::istream& stream);
@@ -164,6 +187,7 @@ private:
 	
 	std::string _issuerName;
 	std::string _subjectName;
+	std::string _serialNumber;
 	X509*       _pCert;
 	OpenSSLInitializer _openSSLInitializer;
 };
@@ -172,6 +196,21 @@ private:
 //
 // inlines
 //
+
+inline long X509Certificate::version() const
+{
+	// This is defined by standards (X.509 et al) to be
+	// one less than the certificate version.
+	// So, eg. a version 3 certificate will return 2.
+	return X509_get_version(_pCert) + 1;
+}
+
+inline const std::string& X509Certificate::serialNumber() const
+{
+	return _serialNumber;
+}
+
+
 inline const std::string& X509Certificate::issuerName() const
 {
 	return _issuerName;

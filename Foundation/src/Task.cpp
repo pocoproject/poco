@@ -89,6 +89,13 @@ bool Task::sleep(long milliseconds)
 }
 
 
+bool Task::yield()
+{
+	Thread::yield();
+	return isCancelled();
+}
+
+
 void Task::setProgress(float taskProgress)
 {
 	FastMutex::ScopedLock lock(_mutex);

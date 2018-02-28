@@ -82,7 +82,7 @@ const XMLString& NamespaceSupport::getPrefix(const XMLString& namespaceURI) cons
 	{
 		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
 		{
-			if (it->second == namespaceURI) 
+			if (it->second == namespaceURI)
 				return it->first;
 		}
 	}
@@ -96,7 +96,7 @@ bool NamespaceSupport::isMapped(const XMLString& namespaceURI) const
 	{
 		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
 		{
-			if (it->second == namespaceURI) 
+			if (it->second == namespaceURI)
 				return true;
 		}
 	}
@@ -112,7 +112,7 @@ void NamespaceSupport::getPrefixes(PrefixSet& prefixes) const
 		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
 		{
 			const XMLString& prefix = it->first;
-			if (!prefix.empty() && prefixes.find(prefix) == prefixes.end()) 
+			if (!prefix.empty() && prefixes.find(prefix) == prefixes.end())
 				prefixes.insert(it->first);
 		}
 	}
@@ -127,7 +127,7 @@ void NamespaceSupport::getPrefixes(const XMLString& namespaceURI, PrefixSet& pre
 		for (Context::const_iterator it = rit->begin(); it != rit->end(); ++it)
 		{
 			const XMLString& prefix = it->first;
-			if (it->second == namespaceURI && !prefix.empty() && prefixes.find(prefix) == prefixes.end()) 
+			if (it->second == namespaceURI && !prefix.empty() && prefixes.find(prefix) == prefixes.end())
 				prefixes.insert(it->first);
 		}
 	}
@@ -139,7 +139,7 @@ const XMLString& NamespaceSupport::getURI(const XMLString& prefix) const
 	for (ContextVec::const_reverse_iterator rit = _contexts.rbegin(); rit != _contexts.rend(); ++rit)
 	{
 		Context::const_iterator it = rit->find(prefix);
-		if (it != rit->end()) 
+		if (it != rit->end())
 			return it->second;
 	}
 	return EMPTY_STRING;

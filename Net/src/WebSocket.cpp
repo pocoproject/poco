@@ -57,7 +57,7 @@ WebSocket::WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& 
 }
 
 
-WebSocket::WebSocket(const Socket& socket): 
+WebSocket::WebSocket(const Socket& socket):
 	StreamSocket(socket)
 {
 	if (!dynamic_cast<WebSocketImpl*>(impl()))
@@ -205,7 +205,7 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 WebSocketImpl* WebSocket::completeHandshake(HTTPClientSession& cs, HTTPResponse& response, const std::string& key)
 {
 	std::string connection = response.get("Connection", "");
-	if (Poco::icompare(connection, "Upgrade") != 0) 
+	if (Poco::icompare(connection, "Upgrade") != 0)
 		throw WebSocketException("No Connection: Upgrade header in handshake response", WS_ERR_NO_HANDSHAKE);
 	std::string upgrade = response.get("Upgrade", "");
 	if (Poco::icompare(upgrade, "websocket") != 0)

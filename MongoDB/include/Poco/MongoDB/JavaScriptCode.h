@@ -1,8 +1,6 @@
 //
 // JavaScriptCode.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  JavaScriptCode

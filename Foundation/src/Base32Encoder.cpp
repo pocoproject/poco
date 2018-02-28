@@ -27,7 +27,7 @@ const unsigned char Base32EncoderBuf::OUT_ENCODING[32] =
 };
 
 
-Base32EncoderBuf::Base32EncoderBuf(std::ostream& ostr, bool padding): 
+Base32EncoderBuf::Base32EncoderBuf(std::ostream& ostr, bool padding):
 	_groupLength(0),
 	_buf(*ostr.rdbuf()),
 	_doPadding(padding)

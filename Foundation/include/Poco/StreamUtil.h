@@ -55,11 +55,11 @@
 //
 // In this scenario, std::ios::init() is called twice
 // (the first time by the MyIOS constructor, the second
-// time by the std::istream constructor), resulting in 
-// two locale objects being allocated, the pointer second 
-// one overwriting the pointer to the first one and thus 
+// time by the std::istream constructor), resulting in
+// two locale objects being allocated, the pointer second
+// one overwriting the pointer to the first one and thus
 // causing a memory leak.
-// 
+//
 // The workaround is to call init() only once for each
 // stream object - by the istream, ostream or iostream
 // constructor, and not calling init() in ios-derived

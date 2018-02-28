@@ -98,8 +98,6 @@
 #include "Poco/Platform.h"
 #if defined(_WIN32)
 	#include "Poco/Platform_WIN32.h"
-#elif defined(__VMS)
-	#include "Poco/Platform_VMS.h"
 #elif defined(POCO_VXWORKS)
 	#include "Poco/Platform_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -111,20 +109,6 @@
 // Include alignment settings early
 //
 #include "Poco/Alignment.h"
-
-
-//
-// Cleanup inconsistencies
-//
-#ifdef POCO_OS_FAMILY_WINDOWS
-	#if defined(POCO_WIN32_UTF8) && defined(POCO_NO_WSTRING)
-		#error POCO_WIN32_UTF8 and POCO_NO_WSTRING are mutually exclusive.
-	#endif
-#else
-	#ifdef POCO_WIN32_UTF8
-		#undef POCO_WIN32_UTF8
-	#endif
-#endif
 
 
 //

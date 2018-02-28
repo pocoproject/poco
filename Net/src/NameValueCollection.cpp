@@ -65,7 +65,7 @@ const std::string& NameValueCollection::operator [] (const std::string& name) co
 		throw NotFoundException(name);
 }
 
-	
+
 void NameValueCollection::set(const std::string& name, const std::string& value)	
 {
 	Iterator it = _map.find(name);
@@ -81,7 +81,7 @@ void NameValueCollection::add(const std::string& name, const std::string& value)
 	_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 const std::string& NameValueCollection::get(const std::string& name) const
 {
 	ConstIterator it = _map.find(name);

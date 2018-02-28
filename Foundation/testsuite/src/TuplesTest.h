@@ -45,6 +45,7 @@ public:
 	void testTuple19();
 	void testTuple20();
 	void testTupleOrder();
+	void testTupleNullable();
 	void testMemOverhead();
 	void setUp();
 	void tearDown();

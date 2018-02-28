@@ -42,24 +42,24 @@ class Activity: public Runnable
 	/// be stopped at any time. However, to make stopping
 	/// an activity work, the method implementing the
 	/// activity has to check periodically whether it
-	/// has been requested to stop, and if so, return. 
+	/// has been requested to stop, and if so, return.
 	/// Activities are stopped before the object they belong to is
 	/// destroyed. Methods implementing activities cannot have arguments
-	/// or return values. 
+	/// or return values.
 	///
 	/// Activity objects are used as follows:
 	///
 	///     class ActiveObject
 	///     {
 	///     public:
-	///         ActiveObject(): 
+	///         ActiveObject():
 	///             _activity(this, &ActiveObject::runActivity)
 	///         {
 	///             ...
 	///         }
-	///   
+	///
 	///         ...
-	///  
+	///
 	///     protected:
 	///         void runActivity()
 	///         {
@@ -113,7 +113,6 @@ public:
 	void start(ThreadPool& pool)
 	{
 		FastMutex::ScopedLock lock(_mutex);
-		
 		if (!_running)
 		{
 			_done.reset();
@@ -135,7 +134,6 @@ public:
 		/// Requests to stop the activity.
 	{
 		FastMutex::ScopedLock lock(_mutex);
-
 		_stopped = true;
 	}
 	
@@ -195,8 +193,8 @@ private:
 
 	C*                  _pOwner;
 	RunnableAdapterType _runnable;
-	volatile bool       _stopped;
-	volatile bool       _running;
+	std::atomic<bool>   _stopped;
+	std::atomic<bool>   _running;
 	Event               _done;
 	FastMutex           _mutex;
 };

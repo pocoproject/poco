@@ -1,8 +1,6 @@
 //
 // RedisStream.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  RedisStream

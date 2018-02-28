@@ -41,9 +41,9 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// from an XML document. An XPath-like syntax for property
 	/// names is supported to allow full access to the XML document.
 	/// XML namespaces are not supported. The name of the root element
-	/// of the XML document is not significant and ignored. 
+	/// of the XML document is not significant and ignored.
 	/// Periods in tag names are not supported.
-	/// 
+	///
 	/// Given the following XML document as an example:
 	///
 	///     <config>
@@ -134,7 +134,7 @@ public:
 
 	void load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize);
 		/// Loads the XML document containing the configuration data
-		/// from the given InputSource. Uses the give namePoolSize (which 
+		/// from the given InputSource. Uses the give namePoolSize (which
 		/// should be a suitable prime like 251, 509, 1021, 4093) for the
 		/// internal DOM Document's name pool.
 

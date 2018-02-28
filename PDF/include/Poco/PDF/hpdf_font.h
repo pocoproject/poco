@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_font.h
+ * << Haru Free PDF Library >> -- hpdf_font.h
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -69,7 +72,7 @@ typedef struct _HPDF_FontAttr_Rec {
     HPDF_Encoder                encoder;
 
     /* if the encoding-type is HPDF_ENCODER_TYPE_SINGLE_BYTE, the width of
-     * each characters are cashed in 'widths'.
+     * each charactors are cashed in 'widths'.
      * when HPDF_ENCODER_TYPE_DOUBLE_BYTE the width is calculate each time.
      */
     HPDF_INT16*                 widths;
