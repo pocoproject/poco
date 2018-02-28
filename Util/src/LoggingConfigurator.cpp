@@ -90,7 +90,7 @@ void LoggingConfigurator::configureChannels(AbstractConfiguration* pConfig)
 	for (AbstractConfiguration::Keys::const_iterator it = channels.begin(); it != channels.end(); ++it)
 	{
 		AutoPtr<AbstractConfiguration> pChannelConfig(pConfig->createView(*it));
-		Channel* pChannel = LoggingRegistry::defaultRegistry().channelForName(*it);
+		Channel::Ptr pChannel = LoggingRegistry::defaultRegistry().channelForName(*it);
 		configureChannel(pChannel, pChannelConfig);
 	}
 }
@@ -116,7 +116,7 @@ void LoggingConfigurator::configureLoggers(AbstractConfiguration* pConfig)
 }
 
 
-Formatter* LoggingConfigurator::createFormatter(AbstractConfiguration* pConfig)
+Formatter::Ptr LoggingConfigurator::createFormatter(AbstractConfiguration* pConfig)
 {
 	AutoPtr<Formatter> pFormatter(LoggingFactory::defaultFactory().createFormatter(pConfig->getString("class")));
 	AbstractConfiguration::Keys props;
@@ -130,7 +130,7 @@ Formatter* LoggingConfigurator::createFormatter(AbstractConfiguration* pConfig)
 }
 
 
-Channel* LoggingConfigurator::createChannel(AbstractConfiguration* pConfig)
+Channel::Ptr LoggingConfigurator::createChannel(AbstractConfiguration* pConfig)
 {
 	AutoPtr<Channel> pChannel(LoggingFactory::defaultFactory().createChannel(pConfig->getString("class")));
 	AutoPtr<Channel> pWrapper(pChannel);
@@ -164,7 +164,7 @@ Channel* LoggingConfigurator::createChannel(AbstractConfiguration* pConfig)
 }
 
 
-void LoggingConfigurator::configureChannel(Channel* pChannel, AbstractConfiguration* pConfig)
+void LoggingConfigurator::configureChannel(Channel::Ptr pChannel, AbstractConfiguration* pConfig)
 {
 	AbstractConfiguration::Keys props;
 	pConfig->keys(props);

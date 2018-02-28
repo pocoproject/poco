@@ -45,26 +45,26 @@ LoggingFactory::~LoggingFactory()
 {
 }
 
-		
+
 void LoggingFactory::registerChannelClass(const std::string& className, ChannelInstantiator* pFactory)
 {
 	_channelFactory.registerClass(className, pFactory);
 }
 
-	
+
 void LoggingFactory::registerFormatterClass(const std::string& className, FormatterFactory* pFactory)
 {
 	_formatterFactory.registerClass(className, pFactory);
 }
 
 
-Channel* LoggingFactory::createChannel(const std::string& className) const
+Channel::Ptr LoggingFactory::createChannel(const std::string& className) const
 {
 	return _channelFactory.createInstance(className);
 }
 
-	
-Formatter* LoggingFactory::createFormatter(const std::string& className) const
+
+Formatter::Ptr LoggingFactory::createFormatter(const std::string& className) const
 {
 	return _formatterFactory.createInstance(className);
 }

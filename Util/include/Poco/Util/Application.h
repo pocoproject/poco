@@ -374,19 +374,20 @@ private:
 	bool findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
 	typedef Poco::AutoPtr<LayeredConfiguration> ConfigPtr;
+	typedef Poco::Logger::Ptr LoggerPtr;
 
-	ConfigPtr       _pConfig;
-	SubsystemVec    _subsystems;
-	bool            _initialized;
-	std::string     _command;
-	ArgVec          _argv;
-	ArgVec          _unprocessedArgs;
-	OptionSet       _options;
-	bool            _unixOptions;
-	Poco::Logger*   _pLogger;
-	Poco::Timestamp _startTime;
-	bool            _stopOptionsProcessing;
-	int             _loadedConfigs;
+	ConfigPtr         _pConfig;
+	SubsystemVec      _subsystems;
+	bool              _initialized;
+	std::string       _command;
+	ArgVec            _argv;
+	ArgVec            _unprocessedArgs;
+	OptionSet         _options;
+	bool              _unixOptions;
+	mutable LoggerPtr _pLogger;
+	Poco::Timestamp   _startTime;
+	bool              _stopOptionsProcessing;
+	int               _loadedConfigs;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;

@@ -3843,11 +3843,11 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 	try
 	{
 		Logger& root = Logger::root();
-		SQLChannel* ch = new SQLChannel(Poco::SQL::ODBC::Connector::KEY, connect, "TestSQLChannel");
+		SQLChannel::Ptr ch = new SQLChannel(Poco::SQL::ODBC::Connector::KEY, connect, "TestSQLChannel");
 		ch->setProperty("table", schemaTable(ExecUtil::pocolog()));
 		root.setChannel(ch);
 		root.setLevel(Message::PRIO_INFORMATION);
-		
+
 		root.information("a Informational message");
 		root.warning("b Warning message");
 		root.debug("Debug message");

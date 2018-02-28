@@ -123,9 +123,9 @@ private:
 	void configureFormatters(AbstractConfiguration* pConfig);
 	void configureChannels(AbstractConfiguration* pConfig);
 	void configureLoggers(AbstractConfiguration* pConfig);
-	Poco::Formatter* createFormatter(AbstractConfiguration* pConfig);
-	Poco::Channel* createChannel(AbstractConfiguration* pConfig);
-	void configureChannel(Channel* pChannel, AbstractConfiguration* pConfig);
+	Poco::Formatter::Ptr createFormatter(AbstractConfiguration* pConfig);
+	Poco::Channel::Ptr createChannel(AbstractConfiguration* pConfig);
+	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration* pConfig);
 	void configureLogger(AbstractConfiguration* pConfig);
 	
 	LoggingConfigurator(const LoggingConfigurator&);
