@@ -43,6 +43,8 @@ class Foundation_API ConsoleChannel: public Channel
 	/// same stream.
 {
 public:
+	typedef AutoPtr<ConsoleChannel> Ptr;
+
 	ConsoleChannel();
 		/// Creates the channel and attaches std::clog.
 		

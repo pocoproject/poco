@@ -165,6 +165,8 @@ class Foundation_API FileChannel: public Channel
 	/// For a more lightweight file channel class, see SimpleFileChannel.
 {
 public:
+	typedef AutoPtr<FileChannel> Ptr;
+
 	FileChannel();
 		/// Creates the FileChannel.
 

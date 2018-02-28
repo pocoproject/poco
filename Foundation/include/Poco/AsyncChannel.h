@@ -41,6 +41,8 @@ class Foundation_API AsyncChannel: public Channel, public Runnable
 	/// then processed by a separate thread.
 {
 public:
+	typedef AutoPtr<AsyncChannel> Ptr;
+
 	AsyncChannel(Channel::Ptr pChannel = 0, Thread::Priority prio = Thread::PRIO_NORMAL);
 		/// Creates the AsyncChannel and connects it to
 		/// the given channel.

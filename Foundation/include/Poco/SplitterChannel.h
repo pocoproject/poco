@@ -33,6 +33,8 @@ class Foundation_API SplitterChannel: public Channel
 	/// channels simultaneously.
 {
 public:
+	typedef AutoPtr<SplitterChannel> Ptr;
+
 	SplitterChannel();
 		/// Creates the SplitterChannel.
 
