@@ -157,7 +157,7 @@ public:
 		/// If the application's main thread is waiting in
 		/// waitForTerminationRequest(), this method will return
 		/// and the application can shut down.
-		
+
 protected:
 	int run();
 	virtual void waitForTerminationRequest();

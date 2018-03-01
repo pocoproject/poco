@@ -445,14 +445,14 @@ public:
 		///
 		/// The level is not case sensitive.
 		
-	static const std::string ROOT; /// The name of the root logger ("").	
-		
+	static const std::string ROOT; /// The name of the root logger ("").
+
 protected:
 	typedef std::map<std::string, Ptr> LoggerMap;
 
 	Logger(const std::string& name, Channel::Ptr pChannel, int level);
 	~Logger();
-	
+
 	void log(const std::string& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, int line);
 
@@ -467,7 +467,7 @@ private:
 	Logger();
 	Logger(const Logger&);
 	Logger& operator = (const Logger&);
-	
+
 	std::string  _name;
 	Channel::Ptr _pChannel;
 	int          _level;

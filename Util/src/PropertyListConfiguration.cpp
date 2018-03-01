@@ -21,6 +21,7 @@
 #include "Poco/DOM/DOMImplementation.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/DOM/DOMParser.h"
+#include "Poco/DOM/DocumentType.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/SAX/XMLReader.h"
@@ -38,13 +39,17 @@ namespace Util {
 
 PropertyListConfiguration::PropertyListConfiguration()
 {
-	Poco::XML::DocumentType *doctype = Poco::XML::DOMImplementation::instance().createDocumentType("plist", "-//Apple//DTD PLIST 1.0//EN", "http://www.apple.com/DTDs/PropertyList-1.0.dtd");
+	Poco::XML::DocumentType* doctype =
+			Poco::XML::DOMImplementation::instance().createDocumentType("plist",
+			"-//Apple//DTD PLIST 1.0//EN", "http://www.apple.com/DTDs/PropertyList-1.0.dtd");
+
 	_pDocument = new Poco::XML::Document(doctype);
 	_pRoot = _pDocument->createElement("plist");
 	_pRoot->setAttribute("version", "1.0");
 	_pDocument->appendChild(_pRoot);
 	_pRoot->appendChild(_pDocument->createElement("dict"));
 }
+
 
 PropertyListConfiguration::PropertyListConfiguration(const std::string& path)
 {
@@ -56,6 +61,7 @@ PropertyListConfiguration::PropertyListConfiguration(std::istream& istr)
 {
 	load(istr);
 }
+
 
 PropertyListConfiguration::~PropertyListConfiguration()
 {
@@ -74,6 +80,7 @@ void PropertyListConfiguration::load(const std::string& path)
 	_pRoot = Poco::XML::AutoPtr<Poco::XML::Element>(_pDocument->documentElement(), true);
 }
 
+
 void PropertyListConfiguration::load(std::istream& istr)
 {
 	Poco::XML::InputSource src(istr);
@@ -87,11 +94,13 @@ void PropertyListConfiguration::load(std::istream& istr)
 
 }
 
+
 void PropertyListConfiguration::save(const std::string& path) const
 {
 	std::ofstream out(path);
 	save(out);
 }
+
 
 void PropertyListConfiguration::save(std::ostream& ostr) const
 {
@@ -100,6 +109,7 @@ void PropertyListConfiguration::save(std::ostream& ostr) const
 	writer.setOptions(Poco::XML::XMLWriter::WRITE_XML_DECLARATION | Poco::XML::XMLWriter::PRETTY_PRINT);
 	writer.writeNode(ostr, _pDocument);
 }
+
 
 void PropertyListConfiguration::setInt(const std::string& key, int value)
 {
@@ -118,6 +128,7 @@ void PropertyListConfiguration::setInt(const std::string& key, int value)
 	thevalue->appendChild(pText);
 }
 
+
 void PropertyListConfiguration::setDouble(const std::string& key, double value)
 {
 	// set this, so it fires event
@@ -135,6 +146,7 @@ void PropertyListConfiguration::setDouble(const std::string& key, double value)
 	thevalue->appendChild(pText);
 }
 
+
 void PropertyListConfiguration::setBool(const std::string& key, bool value)
 {
 	// set this, so it fires event
@@ -149,6 +161,7 @@ void PropertyListConfiguration::setBool(const std::string& key, bool value)
 	thevalue->parentNode()->replaceChild(pElem, thevalue);
 	thevalue = pElem;
 }
+
 
 void PropertyListConfiguration::setData(const std::string& key, std::istream &istr)
 {
@@ -166,6 +179,7 @@ void PropertyListConfiguration::setData(const std::string& key, std::istream &is
 	Poco::XML::Node* pText = _pDocument->createTextNode(ostr.str());
 	thevalue->appendChild(pText);
 }
+
 
 bool PropertyListConfiguration::getData(const std::string& key, std::ostream &ostr)
 {
@@ -188,6 +202,7 @@ bool PropertyListConfiguration::getData(const std::string& key, std::ostream &os
 
 	return false;
 }
+
 
 bool PropertyListConfiguration::getRaw(const std::string& key, std::string& value) const
 {
@@ -219,6 +234,7 @@ void PropertyListConfiguration::setRaw(const std::string& key, const std::string
 	thevalue->appendChild(pText);
 }
 
+
 void PropertyListConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	const Poco::XML::Node* thekey = _pRoot->firstChild();
@@ -246,6 +262,7 @@ void PropertyListConfiguration::enumerate(const std::string& key, Keys& range) c
 	}
 }
 
+
 void PropertyListConfiguration::removeRaw(const std::string& key)
 {
 	Poco::XML::Node* thekey = findNode(key);
@@ -258,17 +275,20 @@ void PropertyListConfiguration::removeRaw(const std::string& key)
 	}
 }
 
+
 Poco::XML::Node* PropertyListConfiguration::findNode(const std::string& key, bool create)
 {
 	Poco::XML::Node* dict = const_cast<Poco::XML::Node*>(_pRoot->firstChild());
 	return findNode(key, dict, create);
 }
 
+
 const Poco::XML::Node* PropertyListConfiguration::findNode(const std::string& key, bool create) const
 {
 	Poco::XML::Node* dict = const_cast<Poco::XML::Node*>(_pRoot->firstChild());
 	return findNode(key, dict, create);
 }
+
 
 Poco::XML::Node* PropertyListConfiguration::findNode(const std::string& key, Poco::XML::Node* dict, bool create)
 {
@@ -326,6 +346,7 @@ Poco::XML::Node* PropertyListConfiguration::findNode(const std::string& key, Poc
 
 	return NULL;
 }
+
 
 } } // namespace Poco::Util
 

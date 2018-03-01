@@ -103,7 +103,7 @@ XMLConfiguration::XMLConfiguration(const Poco::XML::Document* pDocument, char de
 	load(pDocument);
 }
 
-	
+
 XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode):
 	_delim('.')
 {
@@ -126,7 +126,7 @@ XMLConfiguration::~XMLConfiguration()
 void XMLConfiguration::load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize)
 {
 	poco_check_ptr (pInputSource);
-	
+
 	Poco::XML::DOMParser parser(namePoolSize);
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
@@ -154,11 +154,11 @@ void XMLConfiguration::load(const std::string& path)
 	load(&src);	
 }
 
-	
+
 void XMLConfiguration::load(const Poco::XML::Document* pDocument)
 {
 	poco_check_ptr (pDocument);
-	
+
 	_pDocument = Poco::XML::AutoPtr<Poco::XML::Document>(const_cast<Poco::XML::Document*>(pDocument), true);
 	_pRoot     = Poco::XML::AutoPtr<Poco::XML::Node>(pDocument->documentElement(), true);
 }
@@ -236,29 +236,29 @@ void XMLConfiguration::setRaw(const std::string& key, const std::string& value)
 	Poco::XML::Node* pNode = findNode(it, key.end(), _pRoot, true);
 	if (pNode)
 	{
-        unsigned short nodeType = pNode->nodeType();
-        if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
-        {
-            pNode->setNodeValue(value);
-        }
-        else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
-        {
-            Poco::XML::Node* pChildNode = pNode->firstChild();
-            if (pChildNode)
-            {
-                if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
-                {
-                    pChildNode->setNodeValue(value);
-                }
-            }
-            else
-            {
+		unsigned short nodeType = pNode->nodeType();
+		if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
+		{
+			pNode->setNodeValue(value);
+		}
+		else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
+		{
+			Poco::XML::Node* pChildNode = pNode->firstChild();
+			if (pChildNode)
+			{
+				if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
+				{
+					pChildNode->setNodeValue(value);
+				}
+			}
+			else
+			{
 				Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(value);
 				pNode->appendChild(pText);
-            }
-        }
+			}
+		}
 	}
-    else throw NotFoundException("Node not found in XMLConfiguration", key);
+	else throw NotFoundException("Node not found in XMLConfiguration", key);
 }
 
 

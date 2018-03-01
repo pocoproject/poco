@@ -126,7 +126,7 @@ void IniFileConfigurationTest::testCaseInsensitiveRemove()
 }
 
 
-AbstractConfiguration* IniFileConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr IniFileConfigurationTest::allocConfiguration() const
 {
 	return new IniFileConfiguration;
 }
