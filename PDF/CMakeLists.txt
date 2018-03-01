@@ -19,6 +19,7 @@ else()
     # zlib
     POCO_SOURCES( SRCS zlib
         src/adler32.c
+        src/bmpread.c
         src/compress.c
         src/crc32.c
         src/deflate.c
