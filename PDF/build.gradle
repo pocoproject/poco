@@ -16,7 +16,6 @@ project(":PDF") {
 						source {
 							srcDir 'src'
 							include '**/*.cpp'
-							exclude 'BmpUtil.cpp'
 						}
 						exportedHeaders {
 							srcDirs 'include', 'include/Poco/PDF'
