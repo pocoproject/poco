@@ -1,6 +1,6 @@
 
 //
-// SetSourceIp.cpp
+// SetSourceIP.cpp
 //
 // This sample demonstrates setting the source IP address.
 //
