@@ -247,13 +247,16 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIteratorOnError(
 	try
 	{
 		// this test can't work for root
-		assert(_onErrorPath.size() > 0);
-		if (first.separator() != *_onErrorPath.rbegin())
-			_onErrorPath += first.separator();
-		if (first.separator() != *errorPath.rbegin())
-			errorPath += first.separator();
-		assertEquals(_onErrorPath, errorPath);
-		assertEquals(7, (long) result.size());
+		if (Environment::get("USER") != "root")
+		{
+			assert(_onErrorPath.size() > 0);
+			if (first.separator() != *_onErrorPath.rbegin())
+				_onErrorPath += first.separator();
+			if (first.separator() != *errorPath.rbegin())
+				errorPath += first.separator();
+			assertEquals(_onErrorPath, errorPath);
+			assertEquals(7, (long) result.size());
+		}
 	}
 	catch (NotFoundException&) { }
 #else
