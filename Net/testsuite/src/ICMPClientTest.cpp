@@ -52,7 +52,7 @@ void ICMPClientTest::testPing()
 	registerDelegates(icmpClient);
 
 	assert(icmpClient.ping("127.0.0.1") > 0);
-#ifdef POCO_ANDROID
+#if POCO_OS == POCO_OS_ANDROID
 	assert(icmpClient.ping("10.0.2.15", 4) > 0);
 	assert(icmpClient.ping("10.0.2.2", 4) > 0);
 #else
@@ -77,7 +77,7 @@ void ICMPClientTest::testBigPing()
 	registerDelegates(icmpClient);
 
 	assert(icmpClient.ping("127.0.0.1", 1) > 0);
-#ifdef POCO_ANDROID
+#if POCO_OS == POCO_OS_ANDROID
 	assert(icmpClient.ping("10.0.2.15", 4) > 0);
 	assert(icmpClient.ping("10.0.2.2", 4) > 0);
 #else

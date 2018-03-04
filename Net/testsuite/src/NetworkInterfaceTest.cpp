@@ -77,7 +77,7 @@ void NetworkInterfaceTest::testMap()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -121,7 +121,7 @@ void NetworkInterfaceTest::testList()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -141,7 +141,7 @@ void NetworkInterfaceTest::testForName()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -186,7 +186,7 @@ void NetworkInterfaceTest::testForAddress()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -206,7 +206,7 @@ void NetworkInterfaceTest::testForIndex()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -233,7 +233,7 @@ void NetworkInterfaceTest::testMapIpOnly()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -253,7 +253,7 @@ void NetworkInterfaceTest::testMapUpOnly()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}
@@ -300,7 +300,7 @@ void NetworkInterfaceTest::testListMapConformance()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-	#ifndef POCO_ANDROID
+	#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 	#endif
 	}

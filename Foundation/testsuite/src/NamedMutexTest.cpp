@@ -100,7 +100,7 @@ void NamedMutexTest::testLock()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 #endif
 	}
@@ -113,7 +113,7 @@ void NamedMutexTest::testTryLock()
 	TestTryLock ttl1;
 	thr1.start(ttl1);
 	thr1.join();
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 	assert (ttl1.locked());
 #endif
 	try {
@@ -127,7 +127,7 @@ void NamedMutexTest::testTryLock()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 #endif
 	}

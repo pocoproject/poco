@@ -503,7 +503,7 @@ void SocketTest::testSelect3()
 void SocketTest::testEchoUnixLocal()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-#if defined(POCO_ANDROID)
+#if POCO_OS == POCO_OS_ANDROID
 	Poco::File socketFile("/data/local/tmp/SocketTest.sock");
 #else
 	Poco::File socketFile("/tmp/SocketTest.sock");
