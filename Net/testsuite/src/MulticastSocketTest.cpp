@@ -60,7 +60,7 @@ void MulticastSocketTest::testMulticast()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 #endif
 	}

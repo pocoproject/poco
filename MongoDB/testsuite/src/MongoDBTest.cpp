@@ -300,7 +300,7 @@ void MongoDBTest::testBuildInfo()
 
 void MongoDBTest::testConnectionPool()
 {
-#ifdef POCO_ANDROID
+#if POCO_OS == POCO_OS_ANDROID
 		std::string host = "10.0.2.2";
 #else
 		std::string host = "127.0.0.1";
@@ -415,7 +415,7 @@ void MongoDBTest::testConnectURI()
 	Poco::MongoDB::Connection conn;
 	Poco::MongoDB::Connection::SocketFactory sf;
 
-#ifdef POCO_ANDROID
+#if POCO_OS == POCO_OS_ANDROID
 		std::string host = "10.0.2.2";
 #else
 		std::string host = "127.0.0.1";
@@ -463,7 +463,7 @@ void MongoDBTest::testConnectURI()
 
 CppUnit::Test* MongoDBTest::suite()
 {
-#ifdef POCO_ANDROID
+#if POCO_OS == POCO_OS_ANDROID
 		std::string host = "10.0.2.2";
 #else
 		std::string host = "127.0.0.1";

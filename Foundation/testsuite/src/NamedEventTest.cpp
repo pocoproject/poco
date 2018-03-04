@@ -71,12 +71,12 @@ void NamedEventTest::testNamedEvent()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 #endif
 	}
 	thr1.join();
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 	assert (te.timestamp() > now);
 #endif
 	Thread thr2;
@@ -88,12 +88,12 @@ void NamedEventTest::testNamedEvent()
 	}
 	catch(Poco::NotImplementedException e)
 	{
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 		throw e;
 #endif
 	}
 	thr2.join();
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 	assert (te.timestamp() > now);
 #endif
 }
