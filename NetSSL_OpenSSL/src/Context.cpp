@@ -185,6 +185,25 @@ void Context::init(const Params& params)
 }
 
 
+void Context::addCertificateAuthority(const Crypto::X509Certificate &certificate)
+{
+	if (X509_STORE* store = SSL_CTX_get_cert_store(_pSSLContext))
+	{
+	  int errCode = X509_STORE_add_cert(store, const_cast<X509*>(certificate.certificate()));
+	  if (errCode != 1)
+	  {
+		  std::string msg = Utility::getLastError();
+		  throw SSLContextException("Cannot add certificate authority for Context", msg);
+	  }
+	}
+	else
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot add certificate authority for Context", msg);
+	}
+}
+
+
 void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 {
 	int errCode = SSL_CTX_use_certificate(_pSSLContext, const_cast<X509*>(certificate.certificate()));
