@@ -210,6 +210,9 @@ public:
 	~Context();
 		/// Destroys the Context.
 
+	void addCertificateAuthority(const Poco::Crypto::X509Certificate& certificate);
+		/// Add one trusted certification authority to be used by the Context.
+
 	void useCertificate(const Poco::Crypto::X509Certificate& certificate);
 		/// Sets the certificate to be used by the Context.
 		///
