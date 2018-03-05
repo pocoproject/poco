@@ -61,7 +61,7 @@ SERVICE_STATUS        ServerApplication::_serviceStatus;
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0;
 #endif
 #endif
-#if defined(POCO_VXWORKS) || defined(POCO_ANDROID) || defined(__NACL__) ||  defined(__EMSCRIPTEN__)
+#if defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID || defined(__NACL__) ||  defined(__EMSCRIPTEN__)
 Poco::Event ServerApplication::_terminate;
 #endif
 
@@ -99,7 +99,7 @@ void ServerApplication::terminate()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	_terminate.set();
-#elif defined(POCO_VXWORKS) || defined(POCO_ANDROID) || defined(__NACL__) || defined(__EMSCRIPTEN__)
+#elif defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID || defined(__NACL__) || defined(__EMSCRIPTEN__)
 	_terminate.set();
 #else
 	Poco::Process::requestTermination(Process::id());
@@ -576,7 +576,7 @@ void ServerApplication::defineOptions(OptionSet& options)
 //
 void ServerApplication::waitForTerminationRequest()
 {
-#if !defined(POCO_ANDROID) && !defined(__NACL__) && !defined(__EMSCRIPTEN__)
+#if POCO_OS != POCO_OS_ANDROID && !defined(__NACL__) && !defined(__EMSCRIPTEN__)
 	sigset_t sset;
 	sigemptyset(&sset);
 	if (!std::getenv("POCO_ENABLE_DEBUGGER"))
@@ -588,7 +588,7 @@ void ServerApplication::waitForTerminationRequest()
 	sigprocmask(SIG_BLOCK, &sset, NULL);
 	int sig;
 	sigwait(&sset, &sig);
-#else // POCO_ANDROID || __NACL__ || __EMSCRIPTEN__
+#else // POCO_OS != POCO_OS_ANDROID || __NACL__ || __EMSCRIPTEN__
 	_terminate.wait();
 #endif
 }
