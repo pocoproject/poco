@@ -103,7 +103,7 @@ public:
 		PROTO_TLSV1_2 = 0x10
 	};
 
-	struct Params
+	struct NetSSL_API Params
 	{
 		Params();
 			/// Initializes the struct with default values.
@@ -151,9 +151,9 @@ public:
 
 	Context(Usage usage, const Params& params);
 		/// Creates a Context using the given parameters.
-			///
-			///   * usage specifies whether the context is used by a client or server.
-			///   * params specifies the context parameters.
+		///
+		///   * usage specifies whether the context is used by a client or server.
+		///   * params specifies the context parameters.
 
 	Context(
 		Usage usage,
@@ -164,26 +164,26 @@ public:
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
 		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
-			/// Creates a Context.
-			///
-			///   * usage specifies whether the context is used by a client or server.
-			///   * privateKeyFile contains the path to the private key file used for encryption.
-			///     Can be empty if no private key file is used.
-			///   * certificateFile contains the path to the certificate file (in PEM format).
-			///     If the private key and the certificate are stored in the same file, this
-			///     can be empty if privateKeyFile is given.
-			///   * caLocation contains the path to the file or directory containing the
-			///     CA/root certificates. Can be empty if the OpenSSL builtin CA certificates
-			///     are used (see loadDefaultCAs).
-			///   * verificationMode specifies whether and how peer certificates are validated.
-			///   * verificationDepth sets the upper limit for verification chain sizes. Verification
-			///     will fail if a certificate chain larger than this is encountered.
-			///   * loadDefaultCAs specifies whether the builtin CA certificates from OpenSSL are used.
-			///   * cipherList specifies the supported ciphers in OpenSSL notation.
-			///
-			/// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
-			/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
-			/// event must be handled.
+		/// Creates a Context.
+		///
+		///   * usage specifies whether the context is used by a client or server.
+		///   * privateKeyFile contains the path to the private key file used for encryption.
+		///     Can be empty if no private key file is used.
+		///   * certificateFile contains the path to the certificate file (in PEM format).
+		///     If the private key and the certificate are stored in the same file, this
+		///     can be empty if privateKeyFile is given.
+		///   * caLocation contains the path to the file or directory containing the
+		///     CA/root certificates. Can be empty if the OpenSSL builtin CA certificates
+		///     are used (see loadDefaultCAs).
+		///   * verificationMode specifies whether and how peer certificates are validated.
+		///   * verificationDepth sets the upper limit for verification chain sizes. Verification
+		///     will fail if a certificate chain larger than this is encountered.
+		///   * loadDefaultCAs specifies whether the builtin CA certificates from OpenSSL are used.
+		///   * cipherList specifies the supported ciphers in OpenSSL notation.
+		///
+		/// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
+		/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
+		/// event must be handled.
 
 	Context(
 		Usage usage,
@@ -192,20 +192,20 @@ public:
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
 		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
-			/// Creates a Context.
-			///
-			///   * usage specifies whether the context is used by a client or server.
-			///   * caLocation contains the path to the file or directory containing the
-			///     CA/root certificates. Can be empty if the OpenSSL builtin CA certificates
-			///     are used (see loadDefaultCAs).
-			///   * verificationMode specifies whether and how peer certificates are validated.
-			///   * verificationDepth sets the upper limit for verification chain sizes. Verification
-			///     will fail if a certificate chain larger than this is encountered.
-			///   * loadDefaultCAs specifies whether the builtin CA certificates from OpenSSL are used.
-			///   * cipherList specifies the supported ciphers in OpenSSL notation.
-			///
-			/// Note that a private key and/or certificate must be specified with
-			/// usePrivateKey()/useCertificate() before the Context can be used.
+		/// Creates a Context.
+		///
+		///   * usage specifies whether the context is used by a client or server.
+		///   * caLocation contains the path to the file or directory containing the
+		///     CA/root certificates. Can be empty if the OpenSSL builtin CA certificates
+		///     are used (see loadDefaultCAs).
+		///   * verificationMode specifies whether and how peer certificates are validated.
+		///   * verificationDepth sets the upper limit for verification chain sizes. Verification
+		///     will fail if a certificate chain larger than this is encountered.
+		///   * loadDefaultCAs specifies whether the builtin CA certificates from OpenSSL are used.
+		///   * cipherList specifies the supported ciphers in OpenSSL notation.
+		///
+		/// Note that a private key and/or certificate must be specified with
+		/// usePrivateKey()/useCertificate() before the Context can be used.
 
 	~Context();
 		/// Destroys the Context.
