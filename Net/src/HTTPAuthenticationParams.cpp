@@ -41,8 +41,8 @@ namespace
 			icompare(name, "uri") == 0 ||
 			icompare(name, "username") == 0;
 	}
-	
-	
+
+
 	void formatParameter(std::string& result, const std::string& name, const std::string& value)
 	{
 		result += name;
@@ -210,7 +210,7 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 		switch (state)
 		{
 		case STATE_SPACE:
-			if (Ascii::isAlphaNumeric(*it) || *it == '_')
+			if (Ascii::isAlphaNumeric(*it) || *it == '_' || *it == '-')
 			{
 				token += *it;
 				state = STATE_TOKEN;
@@ -235,7 +235,7 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 			break;
 
 		case STATE_EQUALS:
-			if (Ascii::isAlphaNumeric(*it) || *it == '_')
+			if (Ascii::isAlphaNumeric(*it) || *it == '_' || *it == '-')
 			{
 				value += *it;
 				state = STATE_VALUE;
