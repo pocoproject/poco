@@ -96,7 +96,7 @@ void TCPServerDispatcher::release()
 
 void TCPServerDispatcher::run()
 {
-	AutoPtr<TCPServerDispatcher> guard(this, false); // ensure _rc is decreased when function exits
+	AutoPtr<TCPServerDispatcher> guard(this, true); // ensure object stays alive
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
@@ -149,10 +149,6 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 			{
 				_threadPool.startWithPriority(_pParams->getThreadPriority(), *this, threadName);
 				++_currentThreads;
-				// Ensure this object lives at least until run() starts
-				// Small chance of leaking if threadpool is stopped before this
-				// work runs, but better than a dangling pointer and crash!
-				duplicate();
 			}
 			catch (Poco::Exception&)
 			{
