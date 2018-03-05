@@ -70,8 +70,7 @@ namespace Poco {
 void toJSON(const std::string& value, std::ostream& out, bool wrap)
 {
 	int options = (wrap ? Poco::JSON_WRAP_STRINGS : 0);
-	writeString<std::ostream,
-				std::streamsize>(value, out, &std::ostream::write, options);
+	writeString<std::ostream, std::streamsize>(value, out, &std::ostream::write, options);
 }
 
 
@@ -94,8 +93,7 @@ void toJSON(const std::string& value, std::ostream& out, int options)
 std::string toJSON(const std::string& value, int options)
 {
 	std::string ret;
-	writeString<std::string,
-				std::string::size_type>(value, ret, &std::string::append, options);
+	writeString<std::string, std::string::size_type>(value, ret, &std::string::append, options);
 	return ret;
 }
 

@@ -87,7 +87,8 @@ NamedMutexTest::~NamedMutexTest()
 
 void NamedMutexTest::testLock()
 {
-	try {
+	try 
+	{
 		testMutex.lock();
 		Thread thr;
 		TestLock tl;
@@ -116,7 +117,8 @@ void NamedMutexTest::testTryLock()
 #if POCO_OS != POCO_OS_ANDROID
 	assert (ttl1.locked());
 #endif
-	try {
+	try 
+	{
 		testMutex.lock();
 		Thread thr2;
 		TestTryLock ttl2;

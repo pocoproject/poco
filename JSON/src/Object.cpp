@@ -24,7 +24,6 @@ namespace Poco {
 namespace JSON {
 
 
-
 Object::Object(int options):
 	_preserveInsOrder((options & Poco::JSON_PRESERVE_KEY_ORDER) != 0),
 	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),

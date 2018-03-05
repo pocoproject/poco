@@ -176,6 +176,7 @@ std::string PathImpl::configImpl()
 	return result;
 }
 
+
 std::string PathImpl::nullImpl()
 {
 	return "NUL:";

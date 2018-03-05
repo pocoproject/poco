@@ -624,6 +624,7 @@ std::string Path::config()
 #endif
 }
 
+
 std::string Path::null()
 {
 	return PathImpl::nullImpl();

@@ -75,10 +75,10 @@ void NetworkInterfaceTest::testMap()
 			std::cout << "=============" << std::endl << std::endl;
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -119,10 +119,10 @@ void NetworkInterfaceTest::testList()
 			std::cout << "==============" << std::endl << std::endl;
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -139,10 +139,10 @@ void NetworkInterfaceTest::testForName()
 			assert (ifc.name() == it->second.name());
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -184,10 +184,10 @@ void NetworkInterfaceTest::testForAddress()
 			}
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -204,10 +204,10 @@ void NetworkInterfaceTest::testForIndex()
 			assert (ifc.index() == it->second.index());
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -231,10 +231,10 @@ void NetworkInterfaceTest::testMapIpOnly()
 				std::cout << "MAC Address:" << mac << std::endl;
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -251,10 +251,10 @@ void NetworkInterfaceTest::testMapUpOnly()
 			assert(it->second.isUp());
 		}
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }
@@ -298,10 +298,10 @@ void NetworkInterfaceTest::testListMapConformance()
 
 		assert (counter == l.size());
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 	#endif
 	}
 }

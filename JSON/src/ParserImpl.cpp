@@ -26,7 +26,10 @@
 #include <istream>
 #include "pdjson.h"
 
+
 typedef struct json_stream json_stream;
+
+
 namespace Poco {
 namespace JSON {
 

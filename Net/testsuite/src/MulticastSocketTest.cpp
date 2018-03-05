@@ -47,7 +47,8 @@ MulticastSocketTest::~MulticastSocketTest()
 
 void MulticastSocketTest::testMulticast()
 {
-	try {
+	try 
+	{
 		MulticastEchoServer echoServer;
 		MulticastSocket ms(SocketAddress::IPv4);
 		int n = ms.sendTo("hello", 5, echoServer.group());
@@ -58,10 +59,10 @@ void MulticastSocketTest::testMulticast()
 		assert (std::string(buffer, n) == "hello");
 		ms.close();
 	}
-	catch(Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException e)
 	{
 #if POCO_OS != POCO_OS_ANDROID
-		throw e;
+		throw;
 #endif
 	}
 }
