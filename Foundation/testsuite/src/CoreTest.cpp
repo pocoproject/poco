@@ -128,7 +128,6 @@ int Parent::i = 0;
 
 struct Medium : public Parent
 {
-	
 };
 
 
