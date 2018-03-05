@@ -19,6 +19,7 @@
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 
 #include "Poco/DOM/DOMImplementation.h"
+#include "Poco/DOM/DocumentType.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/DOM/DOMParser.h"
 #include "Poco/DOM/DocumentType.h"
@@ -39,15 +40,16 @@ namespace Util {
 
 PropertyListConfiguration::PropertyListConfiguration()
 {
-	Poco::XML::DocumentType* doctype =
-			Poco::XML::DOMImplementation::instance().createDocumentType("plist",
-			"-//Apple//DTD PLIST 1.0//EN", "http://www.apple.com/DTDs/PropertyList-1.0.dtd");
-
+	Poco::AutoPtr<Poco::XML::DocumentType> doctype =
+		Poco::XML::DOMImplementation::instance().createDocumentType("plist",
+			"-//Apple//DTD PLIST 1.0//EN",
+			"http://www.apple.com/DTDs/PropertyList-1.0.dtd");
 	_pDocument = new Poco::XML::Document(doctype);
 	_pRoot = _pDocument->createElement("plist");
 	_pRoot->setAttribute("version", "1.0");
 	_pDocument->appendChild(_pRoot);
-	_pRoot->appendChild(_pDocument->createElement("dict"));
+	Poco::AutoPtr<Poco::XML::Element> pElem = _pDocument->createElement("dict");
+	_pRoot->appendChild(pElem);
 }
 
 
@@ -76,7 +78,7 @@ void PropertyListConfiguration::load(const std::string& path)
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
 
-	_pDocument = Poco::XML::AutoPtr<Poco::XML::Document>(const_cast<Poco::XML::Document*>(parser.parse(&src)), true);
+	_pDocument = parser.parse(&src);
 	_pRoot = Poco::XML::AutoPtr<Poco::XML::Element>(_pDocument->documentElement(), true);
 }
 
@@ -89,7 +91,7 @@ void PropertyListConfiguration::load(std::istream& istr)
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
 
-	_pDocument = Poco::XML::AutoPtr<Poco::XML::Document>(const_cast<Poco::XML::Document*>(parser.parse(&src)), true);
+	_pDocument = parser.parse(&src);
 	_pRoot = Poco::XML::AutoPtr<Poco::XML::Element>(_pDocument->documentElement(), true);
 
 }
@@ -121,10 +123,10 @@ void PropertyListConfiguration::setInt(const std::string& key, int value)
 	Poco::XML::Node* thevalue = thekey->nextSibling();
 
 	// change the value to an integer element
-	Poco::XML::Node* pElem = _pDocument->createElement("integer");
+	Poco::AutoPtr<Poco::XML::Node> pElem = _pDocument->createElement("integer");
 	thevalue->parentNode()->replaceChild(pElem, thevalue);
 	thevalue = pElem;
-	Poco::XML::Node* pText = _pDocument->createTextNode(Poco::NumberFormatter::format(value));
+	Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(Poco::NumberFormatter::format(value));
 	thevalue->appendChild(pText);
 }
 
@@ -139,10 +141,10 @@ void PropertyListConfiguration::setDouble(const std::string& key, double value)
 	Poco::XML::Node* thevalue = thekey->nextSibling();
 
 	// change the value to an integer element
-	Poco::XML::Node* pElem = _pDocument->createElement("real");
+	Poco::AutoPtr<Poco::XML::Node> pElem = _pDocument->createElement("real");
 	thevalue->parentNode()->replaceChild(pElem, thevalue);
 	thevalue = pElem;
-	Poco::XML::Node* pText = _pDocument->createTextNode(Poco::NumberFormatter::format(value));
+	Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(Poco::NumberFormatter::format(value));
 	thevalue->appendChild(pText);
 }
 
@@ -157,7 +159,7 @@ void PropertyListConfiguration::setBool(const std::string& key, bool value)
 	Poco::XML::Node* thevalue = thekey->nextSibling();
 
 	// change the value to a boolean element
-	Poco::XML::Node* pElem = _pDocument->createElement(value ? "true" : "false");
+	Poco::AutoPtr<Poco::XML::Node> pElem = _pDocument->createElement(value ? "true" : "false");
 	thevalue->parentNode()->replaceChild(pElem, thevalue);
 	thevalue = pElem;
 }
@@ -168,7 +170,7 @@ void PropertyListConfiguration::setData(const std::string& key, std::istream &is
 	Poco::XML::Node* thekey = findNode(key, true);
 	Poco::XML::Node* thevalue = thekey->nextSibling();
 
-	Poco::XML::Node* pElem = _pDocument->createElement("data");
+	Poco::AutoPtr<Poco::XML::Node> pElem = _pDocument->createElement("data");
 	thevalue->parentNode()->replaceChild(pElem, thevalue);
 	thevalue = pElem;
 
@@ -176,7 +178,7 @@ void PropertyListConfiguration::setData(const std::string& key, std::istream &is
 	Poco::Base64Encoder encoder(ostr);
 	encoder << istr.rdbuf();
 	encoder.close();
-	Poco::XML::Node* pText = _pDocument->createTextNode(ostr.str());
+	Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(ostr.str());
 	thevalue->appendChild(pText);
 }
 
@@ -227,10 +229,10 @@ void PropertyListConfiguration::setRaw(const std::string& key, const std::string
 	Poco::XML::Node* thekey = findNode(key, true);
 	Poco::XML::Node* thevalue = thekey->nextSibling();
 
-	Poco::XML::Node* pElem = _pDocument->createElement("string");
+	Poco::AutoPtr<Poco::XML::Node> pElem = _pDocument->createElement("string");
 	thevalue->parentNode()->replaceChild(pElem, thevalue);
 	thevalue = pElem;
-	Poco::XML::Node* pText = _pDocument->createTextNode(value);
+	Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(value);
 	thevalue->appendChild(pText);
 }
 
@@ -318,8 +320,8 @@ Poco::XML::Node* PropertyListConfiguration::findNode(const std::string& key, Poc
 
 	if (create)
 	{
-		Poco::XML::Element *pElem, *pNew;
-		Poco::XML::Node *pText;
+		Poco::AutoPtr<Poco::XML::Element> pElem, pNew;
+		Poco::AutoPtr<Poco::XML::Node> pText;
 
 		pNew = pElem = dict->ownerDocument()->createElement("key");
 		dict->appendChild(pElem);
