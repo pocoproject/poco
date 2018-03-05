@@ -326,7 +326,7 @@ CppParser-clean:
 	$(MAKE) -C $(POCO_BASE)/CppParser clean
 	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite clean
 
-PDF-libexec:  Foundation-libexec
+PDF-libexec:  Util-libexec XML-libexec JSON-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PDF
 
 PDF-tests: PDF-libexec cppunit
