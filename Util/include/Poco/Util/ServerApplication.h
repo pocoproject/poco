@@ -202,7 +202,9 @@ private:
 #endif
 
 	bool hasConsole();
-	bool isService();
+	bool isService(const ArgVec& args);
+	bool isService(int argc, wchar_t** argv);
+
 	void beService();
 	void registerService();
 	void unregisterService();
@@ -216,6 +218,7 @@ private:
 	std::string _displayName;
 	std::string _description;
 	std::string _startup;
+	static ArgVec _argsSvc;
 
 	static Poco::Event           _terminated;
 	static SERVICE_STATUS        _serviceStatus;
@@ -272,21 +275,6 @@ private:
 			std::cerr << exc.displayText() << std::endl;	\
 			return Poco::Util::Application::EXIT_SOFTWARE; 	\
 		}													\
-	}
-#else
-	#define POCO_SERVER_MAIN(App) \
-	int main(int argc, char** argv)		\
-	{									\
-		try 							\
-		{								\
-			App app;					\
-			return app.run(argc, argv);	\
-		}								\
-		catch (Poco::Exception& exc)	\
-		{								\
-			std::cerr << exc.displayText() << std::endl;	\
-			return Poco::Util::Application::EXIT_SOFTWARE; 	\
-		}								\
 	}
 #endif
 
