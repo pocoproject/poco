@@ -585,7 +585,7 @@ Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::IP
 
 Poco::BinaryReader& operator >> (Poco::BinaryReader& reader, Poco::Net::IPAddress& value)
 {
-	char buf[sizeof(struct in6_addr)];
+	char buf[Poco::Net::IPAddress::MAX_ADDRESS_LENGTH];
 	Poco::UInt8 length;
 	reader >> length;
 	reader.readRaw(buf, length);
