@@ -354,6 +354,24 @@ void File::list(std::vector<std::string>& files) const
 }
 
 
+File::FileSize File::totalSpace() const
+{
+	return totalSpaceImpl();
+}
+
+
+File::FileSize File::usableSpace() const
+{
+	return usableSpaceImpl();
+}
+
+
+File::FileSize File::freeSpace() const
+{
+	return freeSpaceImpl();
+}
+
+
 void File::list(std::vector<File>& files) const
 {
 	files.clear();
