@@ -231,7 +231,7 @@ by "configure". */
 
 #if HAVE_STDINT_H
 #include <stdint.h>
-#elif HAVE_INTTYPES_H
+#elif HAVE_INTTYPES_H || defined(__SUNPRO_C)
 #include <inttypes.h>
 #endif
 
