@@ -65,6 +65,7 @@ ZipArchive::~ZipArchive()
 void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 {
 	// read 4 bytes
+	bool haveSynced = false;
 	while (in.good() && !in.eof())
 	{
 		char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
@@ -75,6 +76,7 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		{
 			ZipLocalFileHeader entry(in, true, pc);
 			poco_assert (_entries.insert(std::make_pair(entry.getFileName(), entry)).second);
+			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
@@ -85,23 +87,36 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 				it->second.setStartPos(info.getOffset());
 			}
 			poco_assert (_infos.insert(std::make_pair(info.getFileName(), info)).second);
+			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo nfo(in, true);
 			poco_assert (_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo64::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo64 nfo(in, true);
 			poco_assert (_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			haveSynced = false;
 		}
 		else
 		{
-			if (_disks.empty() && _disks64.empty())
-				throw Poco::IllegalStateException("Illegal header in zip file");
+			if (!haveSynced)
+			{
+				// Some Zip files have extra data behind the ZipLocalFileHeader.
+				// Try to re-sync.
+				ZipUtil::sync(in);
+				haveSynced = true;
+			}
 			else
-				throw Poco::IllegalStateException("Garbage after directory header");
+			{
+				if (_disks.empty() && _disks64.empty())
+					throw Poco::IllegalStateException("Illegal header in zip file");
+				else
+					throw Poco::IllegalStateException("Garbage after directory header");
+			}
 		}
 	}
 }
