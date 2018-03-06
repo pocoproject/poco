@@ -1,8 +1,6 @@
 //
 // LinearHashTable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LinearHashTable.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  LinearHashTable
@@ -111,7 +109,7 @@ public:
 				swap(_buckIt, it._buckIt);
 				swap(_initialized, it._initialized);
 			}
-			else 
+			else
 			{
 				_vecIt = it._vecIt;
 				_endIt = it._endIt;
@@ -235,7 +233,7 @@ public:
 		friend class LinearHashTable;
 	};
 	
-	LinearHashTable(std::size_t initialReserve = 64): 
+	LinearHashTable(std::size_t initialReserve = 64):
 		_split(0),
 		_front(1),
 		_size(0)
@@ -354,9 +352,9 @@ public:
 		/// Inserts an element into the table.
 		///
 		/// If the element already exists in the table,
-		/// a pair(iterator, false) with iterator pointing to the 
+		/// a pair(iterator, false) with iterator pointing to the
 		/// existing element is returned.
-		/// Otherwise, the element is inserted an a 
+		/// Otherwise, the element is inserted an a
 		/// pair(iterator, true) with iterator
 		/// pointing to the new element is returned.
 	{
@@ -489,7 +487,7 @@ protected:
 	}
 	
 private:
-	// Evil hack: _buckets must be mutable because both ConstIterator and Iterator hold 
+	// Evil hack: _buckets must be mutable because both ConstIterator and Iterator hold
 	// ordinary iterator's (not const_iterator's).
 	mutable BucketVec _buckets;
 	std::size_t _split;

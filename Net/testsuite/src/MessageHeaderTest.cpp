@@ -1,8 +1,6 @@
 //
 // MessageHeaderTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.cpp#3 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::Net::NameValueCollection;
 using Poco::Net::MessageException;
 
 
-MessageHeaderTest::MessageHeaderTest(const std::string& rName): CppUnit::TestCase(rName)
+MessageHeaderTest::MessageHeaderTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -409,7 +407,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
-        CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
-        
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+
 	return pSuite;
 }

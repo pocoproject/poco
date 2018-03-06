@@ -1,8 +1,6 @@
 //
 // LRUCacheTest.h
 //
-// $Id: //poco/Main/Foundation/testsuite/src/LRUCacheTest.h#6 $
-//
 // Tests for LRUCache
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

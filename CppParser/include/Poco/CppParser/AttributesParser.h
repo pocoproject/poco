@@ -1,8 +1,6 @@
 //
 // AttributesParser.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/AttributesParser.h#2 $
-//
 // Library: CppParser
 // Package: Attributes
 // Module:  AttributesParser
@@ -36,13 +34,13 @@ class CppParser_API AttributesParser
 	/// structs/classes, functions, types, etc. can be annotated
 	/// with attributes.
 	///
-	/// Attributes always come immediately before the symbol that 
+	/// Attributes always come immediately before the symbol that
 	/// is being annotated, and are written inside special comments
 	/// with the syntax:
 	///     //@ <attrDecl>[,<attrDec>...]
 	/// where <attrDecl> is
 	///     <name>[=<value>]
-	/// <name> is a valid C++ identifier, or two identifiers separated by 
+	/// <name> is a valid C++ identifier, or two identifiers separated by
 	/// a period (struct accessor notation).
 	/// <value> is a string, integer, identifier, bool literal, or a complex value
 	/// in the form

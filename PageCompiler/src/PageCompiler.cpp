@@ -1,8 +1,6 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#4 $
-//
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -56,7 +54,7 @@ using Poco::OutputLineEndingConverter;
 class CompilerApp: public Application
 {
 public:
-	CompilerApp(): 
+	CompilerApp():
 		_helpRequested(false),
 		_generateOSPCode(false),
 		_generateApacheCode(false),
@@ -71,18 +69,18 @@ protected:
 		Application::initialize(self);
 	}
 	
-	void defineOptions(OptionSet& rOptions)
+	void defineOptions(OptionSet& options)
 	{
-		Application::defineOptions(rOptions);
+		Application::defineOptions(options);
 
-		rOptions.addOption(
+		options.addOption(
 			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHelp)));
 
-		rOptions.addOption(
-			Option("define", "D", 
+		options.addOption(
+			Option("define", "D",
 				"Define a configuration property. A configuration property "
 				"defined with this option can be referenced in the input "
 				"page file, using the following syntax: ${<name>}.")
@@ -91,109 +89,109 @@ protected:
 				.argument("<name>=<value>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleDefine)));
 				
-		rOptions.addOption(
+		options.addOption(
 			Option("config-file", "f", "Load configuration data from the given file.")
 				.required(false)
 				.repeatable(true)
 				.argument("<file>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleConfig)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("output-dir", "o", "Write output files to directory <dir>.")
 				.required(false)
 				.repeatable(false)
 				.argument("<dir>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleOutputDir)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("header-output-dir", "H", "Write header file to directory <dir>.")
 				.required(false)
 				.repeatable(false)
 				.argument("<dir>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderOutputDir)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("header-prefix", "P", "Prepend the given <prefix> to the header file name in the generated #include directive.")
 				.required(false)
 				.repeatable(false)
 				.argument("<prefix>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHeaderPrefix)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("base-file-name", "b", "Use <name> instead of the class name for the output file name.")
 				.required(false)
 				.repeatable(false)
 				.argument("<name>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleBase)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("osp", "O", "Add factory class definition and implementation for use with the Open Service Platform.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleOSP)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("apache", "A", "Add factory class definition and implementation, and shared library manifest for use with ApacheConnector.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleApache)));
 
-		rOptions.addOption(
+		options.addOption(
 			Option("noline", "N", "Do not include #line directives in generated code.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
 	}
 	
-	void handleHelp(const std::string& rName, const std::string& value)
+	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		stopOptionsProcessing();
 	}
 	
-	void handleDefine(const std::string& rName, const std::string& value)
+	void handleDefine(const std::string& name, const std::string& value)
 	{
 		defineProperty(value);
 	}
 	
-	void handleConfig(const std::string& rName, const std::string& value)
+	void handleConfig(const std::string& name, const std::string& value)
 	{
 		loadConfiguration(value);
 	}
 
-	void handleOutputDir(const std::string& rName, const std::string& value)
+	void handleOutputDir(const std::string& name, const std::string& value)
 	{
 		_outputDir = value;
 	}
 
-	void handleHeaderOutputDir(const std::string& rName, const std::string& value)
+	void handleHeaderOutputDir(const std::string& name, const std::string& value)
 	{
 		_headerOutputDir = value;
 	}
 
-	void handleHeaderPrefix(const std::string& rName, const std::string& value)
+	void handleHeaderPrefix(const std::string& name, const std::string& value)
 	{
 		_headerPrefix = value;
 		if (!_headerPrefix.empty() && _headerPrefix[_headerPrefix.size() - 1] != '/')
 			_headerPrefix += '/';
 	}
 
-	void handleBase(const std::string& rName, const std::string& value)
+	void handleBase(const std::string& name, const std::string& value)
 	{
 		_base = value;
 	}
 
-	void handleOSP(const std::string& rName, const std::string& value)
+	void handleOSP(const std::string& name, const std::string& value)
 	{
 		_generateOSPCode = true;	
 	}
 
-	void handleApache(const std::string& rName, const std::string& value)
+	void handleApache(const std::string& name, const std::string& value)
 	{
 		_generateApacheCode = true;
 	}
 	
-	void handleNoLine(const std::string& rName, const std::string& value)
+	void handleNoLine(const std::string& name, const std::string& value)
 	{
 		_emitLineDirectives = false;
 	}
@@ -206,7 +204,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2016 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2017 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "
@@ -223,16 +221,16 @@ protected:
 	
 	void defineProperty(const std::string& def)
 	{
-		std::string configName;
+		std::string name;
 		std::string value;
 		std::string::size_type pos = def.find('=');
 		if (pos != std::string::npos)
 		{
-			configName.assign(def, 0, pos);
+			name.assign(def, 0, pos);
 			value.assign(def, pos + 1, def.length() - pos);
 		}
-		else configName = def;
-		config().setString(configName, value);
+		else name = def;
+		config().setString(name, value);
 	}
 
 	int main(const std::vector<std::string>& args)
@@ -285,7 +283,7 @@ protected:
 			p.setBaseName(clazz);
 		}
 
-		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
+		std::unique_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
 
 		if (!_outputDir.empty())
 		{

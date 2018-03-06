@@ -1,8 +1,6 @@
 //
 // TestCaller.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestCaller.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_TestCaller_INCLUDED
@@ -56,18 +54,18 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& rName, TestMethod test): 
-		TestCase(rName), 
+	TestCaller(const std::string& name, TestMethod test):
+		TestCase(name),
 		_test(test),
-		_fixture(new Fixture(rName))
+		_fixture(new Fixture(name))
 	{
 	}
 	
 	// Returns the name of the test case instance
 	virtual std::string toString()
 	{
-		const std::type_info& thisClass = typeid(*this); 
-		return std::string(thisClass.name()) + "." + name(); 
+		const std::type_info& thisClass = typeid(*this);
+		return std::string(thisClass.name()) + "." + name();
 	}
 
 
@@ -89,7 +87,7 @@ protected:
 
 private:
 	TestMethod             _test;
-	std::auto_ptr<Fixture> _fixture;
+	std::unique_ptr<Fixture> _fixture;
 };
 
 

@@ -1,8 +1,6 @@
 //
 // CryptoTest.h
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/CryptoTest.h#2 $
-//
 // Definition of the CryptoTest class.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -23,25 +21,25 @@
 class CryptoTest: public CppUnit::TestCase
 {
 public:
-	enum 
+	enum
 	{
 		MAX_DATA_SIZE = 10000
 	};
-	
+
 	CryptoTest(const std::string& name);
 	~CryptoTest();
 
 	void testEncryptDecrypt();
 	void testEncryptDecryptWithSalt();
-    void testEncryptDecryptWithSaltSha1();
+	void testEncryptDecryptWithSaltSha1();
 	void testEncryptDecryptDESECB();
 	void testStreams();
 	void testPassword();
-    void testPasswordSha1();
+	void testPasswordSha1();
 	void testEncryptInterop();
 	void testDecryptInterop();
 	void testCertificate();
-	
+
 	void setUp();
 	void tearDown();
 

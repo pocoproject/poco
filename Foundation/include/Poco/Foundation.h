@@ -1,8 +1,6 @@
 //
 // Foundation.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Foundation.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Foundation
@@ -39,18 +37,18 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting 
+// The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the Foundation_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see 
-// Foundation_API functions as being imported from a DLL, wheras this DLL sees symbols
+// that uses this DLL. This way any other project whose source files include this file see
+// Foundation_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if (defined(_WIN32) || defined(_WIN32_WCE)) && defined(POCO_DLL)
 	#if defined(Foundation_EXPORTS)
 		#define Foundation_API __declspec(dllexport)
 	#else
-		#define Foundation_API __declspec(dllimport)	
+		#define Foundation_API __declspec(dllimport)
 	#endif
 #endif
 
@@ -100,8 +98,6 @@
 #include "Poco/Platform.h"
 #if defined(_WIN32)
 	#include "Poco/Platform_WIN32.h"
-#elif defined(__VMS)
-	#include "Poco/Platform_VMS.h"
 #elif defined(POCO_VXWORKS)
 	#include "Poco/Platform_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -116,20 +112,6 @@
 
 
 //
-// Cleanup inconsistencies
-//
-#ifdef POCO_OS_FAMILY_WINDOWS
-	#if defined(POCO_WIN32_UTF8) && defined(POCO_NO_WSTRING)
-		#error POCO_WIN32_UTF8 and POCO_NO_WSTRING are mutually exclusive.
-	#endif
-#else
-	#ifdef POCO_WIN32_UTF8
-		#undef POCO_WIN32_UTF8
-	#endif
-#endif
-
-
-//
 // POCO_JOIN
 //
 // The following piece of macro magic joins the two
@@ -141,6 +123,25 @@
 #define POCO_JOIN(X, Y) POCO_DO_JOIN(X, Y)
 #define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X, Y)
 #define POCO_DO_JOIN2(X, Y) X##Y
+
+
+//
+// POCO_DEPRECATED
+//
+// A macro expanding to a compiler-specific clause to
+// mark a class or function as deprecated.
+//
+#if defined(POCO_NO_DEPRECATED)
+#define POCO_DEPRECATED
+#elif defined(_GNUC_)
+#define POCO_DEPRECATED __attribute__((deprecated))
+#elif defined(__clang__)
+#define POCO_DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+#define POCO_DEPRECATED __declspec(deprecated)
+#else
+#define POCO_DEPRECATED
+#endif
 
 
 //

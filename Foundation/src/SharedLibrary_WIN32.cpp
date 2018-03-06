@@ -1,8 +1,6 @@
 //
 // SharedLibrary_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_WIN32.cpp#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -15,6 +13,7 @@
 
 
 #include "Poco/SharedLibrary_WIN32.h"
+#include "Poco/UnicodeConverter.h"
 #include "Poco/Path.h"
 #include "Poco/UnWindows.h"
 
@@ -42,9 +41,13 @@ void SharedLibraryImpl::loadImpl(const std::string& path, int /*flags*/)
 
 	if (_handle) throw LibraryAlreadyLoadedException(_path);
 	DWORD flags(0);
+#if !defined(_WIN32_WCE)
 	Path p(path);
 	if (p.isAbsolute()) flags |= LOAD_WITH_ALTERED_SEARCH_PATH;
-	_handle = LoadLibraryExA(path.c_str(), 0, flags);
+#endif
+	std::wstring upath;
+	UnicodeConverter::toUTF16(path, upath);
+	_handle = LoadLibraryExW(upath.c_str(), 0, flags);
 	if (!_handle) throw LibraryLoadException(path);
 	_path = path;
 }
@@ -65,7 +68,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _handle != 0; 
+	return _handle != 0;
 }
 
 
@@ -75,7 +78,13 @@ void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 
 	if (_handle)
 	{
+#if defined(_WIN32_WCE)
+		std::wstring uname;
+		UnicodeConverter::toUTF16(name, uname);
+		return (void*) GetProcAddressW((HMODULE) _handle, uname.c_str());
+#else
 		return (void*) GetProcAddress((HMODULE) _handle, name.c_str());
+#endif
 	}
 	else return 0;
 }
@@ -95,7 +104,7 @@ std::string SharedLibraryImpl::prefixImpl()
 
 std::string SharedLibraryImpl::suffixImpl()
 {
-#if defined(_DEBUG)
+#if defined(_DEBUG) && !defined(POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX)
 	return "d.dll";
 #else
 	return ".dll";

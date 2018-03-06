@@ -1,8 +1,6 @@
 //
 // Array.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  Array
@@ -35,11 +33,11 @@ class Object;
 
 
 class JSON_API Array
-	/// Represents a JSON array. JSON array provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to 
-	/// convert object to Poco::Dynamic::Array. Conversion requires copying and therefore
+	/// Represents a JSON array. Array provides a representation
+	/// based on shared pointers and optimized for performance. It is possible to
+	/// convert Array to Poco::Dynamic::Array. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
-	/// 
+	///
 	///    // use pointers to avoid copying
 	///    using namespace Poco::JSON;
 	///    std::string json = "[ {\"test\" : 0}, { \"test1\" : [1, 2, 3], \"test2\" : 4 } ]";
@@ -51,13 +49,13 @@ class JSON_API Array
 	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
 	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
 	///    i = result = subArr->get(0); // i == 1;
-	/// 
+	///
 	///    // copy/convert to Poco::Dynamic::Array
 	///    Poco::Dynamic::Array da = *arr;
 	///    i = da[0]["test"];     // i == 0
 	///    i = da[1]["test1"][1]; // i == 2
 	///    i = da[1]["test2"];    // i == 4
-	/// 
+	/// ----
 {
 public:
 	typedef std::vector<Dynamic::Var>                 ValueVec;
@@ -65,28 +63,47 @@ public:
 	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
 	typedef SharedPtr<Array> Ptr;
 
-	Array();
-		/// Default constructor
+	Array(int options = 0);
+		/// Creates an empty Array.
+		///
+		/// If JSON_ESCAPE_UNICODE is specified, when the object is
+		/// stringified, all unicode characters will be escaped in the
+		/// resulting string.
 
 	Array(const Array& copy);
-		/// Copy Constructor
+		/// Creates an Array by copying another one.
+
+	Array(Array&& other);
+		/// Move constructor
+
+	Array& operator=(const Array& other);
+		/// Assignment operator.
+
+	Array& operator=(Array&& other);
+		/// Move assignment operator.
 
 	virtual ~Array();
-		/// Destructor
+		/// Destroys the Array.
+
+	void setEscapeUnicode(bool escape = true);
+		/// Sets the flag for escaping unicode.
+
+	bool getEscapeUnicode() const;
+		/// Returns the flag for escaping unicode.
 
 	ValueVec::const_iterator begin() const;
-		/// Returns iterator
+		/// Returns the begin iterator for values.
 
 	ValueVec::const_iterator end() const;
-		/// Returns iterator
+		/// Returns the end iterator for values.
 
 	Dynamic::Var get(unsigned int index) const;
-		/// Retrieves an element. Will return an empty value
-		/// when the element doesn't exist.
+		/// Retrieves the element at the given index.
+		/// Will return an empty value when the element doesn't exist.
 
 	Array::Ptr getArray(unsigned int index) const;
 		/// Retrieves an array. When the element is not
-		/// an array or doesn't exist, an empty SharedPtr is returned.
+		/// an Array or doesn't exist, an empty SharedPtr is returned.
 
 	template<typename T>
 	T getElement(unsigned int index) const
@@ -104,30 +121,30 @@ public:
 		/// Retrieves an object. When the element is not
 		/// an object or doesn't exist, an empty SharedPtr is returned.
 
-	std::size_t  size() const;
-		/// Returns the size of the array
+	std::size_t size() const;
+		/// Returns the size of the array.
 
 	bool isArray(unsigned int index) const;
-		/// Returns true when the element is an array
+		/// Returns true when the element is an array.
 
 	bool isArray(const Dynamic::Var& value) const;
-		/// Returns true when the element is an array
+		/// Returns true when the element is an array.
 
 	bool isArray(ConstIterator& value) const;
-		/// Returns true when the element is an array
+		/// Returns true when the element is an array.
 
 	bool isNull(unsigned int index) const;
 		/// Returns true when the element is null or
 		/// when the element doesn't exist.
 
 	bool isObject(unsigned int index) const;
-		/// Returns true when the element is an object
+		/// Returns true when the element is an object.
 
 	bool isObject(const Dynamic::Var& value) const;
-		/// Returns true when the element is an object
+		/// Returns true when the element is an object.
 
 	bool isObject(ConstIterator& value) const;
-		/// Returns true when the element is an object
+		/// Returns true when the element is an object.
 
 	template<typename T>
 	T optElement(unsigned int index, const T& def) const
@@ -137,13 +154,13 @@ public:
 		/// value will be returned
 	{
 		T value = def;
-		if ( index < _values.size() )
+		if (index < _values.size())
 		{
 			try
 			{
 				value = _values[index].convert<T>();
 			}
-			catch(...)
+			catch (...)
 			{
 				// Default value is returned.
 			}
@@ -165,6 +182,7 @@ public:
 		/// Removes the element on the given index.
 
 	operator const Poco::Dynamic::Array& () const;
+		/// Conversion operator to Dynamic::Array.
 
 	static Poco::Dynamic::Array makeArray(const JSON::Array::Ptr& arr);
 		/// Utility function for creation of array.
@@ -173,11 +191,35 @@ public:
 		/// Clears the contents of the array.
 
 private:
+	void resetDynArray() const;
+
 	typedef SharedPtr<Poco::Dynamic::Array> ArrayPtr;
 
 	ValueVec         _values;
 	mutable ArrayPtr _pArray;
+	mutable bool     _modified;
+	// Note:
+	//  The reason we have this flag here (rather than as argument to stringify())
+	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
+	//  so it must know whether to escape unicode or not.
+	bool             _escapeUnicode;
 };
+
+
+//
+// inlines
+//
+
+inline void Array::setEscapeUnicode(bool escape)
+{
+	_escapeUnicode = true;
+}
+
+
+inline bool Array::getEscapeUnicode() const
+{
+	return _escapeUnicode;
+}
 
 
 inline Array::ValueVec::const_iterator Array::begin() const
@@ -221,6 +263,7 @@ inline bool Array::isArray(ConstIterator& it) const
 inline void Array::add(const Dynamic::Var& value)
 {
 	_values.push_back(value);
+	_modified = true;
 }
 
 
@@ -228,6 +271,7 @@ inline void Array::set(unsigned int index, const Dynamic::Var& value)
 {
 	if (index >= _values.size()) _values.resize(index + 1);
 	_values[index] = value;
+	_modified = true;
 }
 
 
@@ -236,7 +280,8 @@ inline void Array::remove(unsigned int index)
 	_values.erase(_values.begin() + index);
 }
 
-}} // Namespace Poco::JSON
+
+} } // namespace Poco::JSON
 
 
 namespace Poco {
@@ -300,9 +345,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& rValue) const
+	void convert(bool& value) const
 	{
-		rValue = !_val.isNull() && _val->size() > 0;
+		value = !_val.isNull() && _val->size() > 0;
 	}
 
 	void convert(float&) const
@@ -350,11 +395,6 @@ public:
 	const JSON::Array::Ptr& value() const
 	{
 		return _val;
-	}
-
-	bool isArray() const
-	{
-		return false;
 	}
 
 	bool isInteger() const
@@ -439,9 +479,9 @@ public:
 		throw BadCastException();
 	}
 
-	void convert(bool& rValue) const
+	void convert(bool& value) const
 	{
-		rValue = _val.size() > 0;
+		value = _val.size() > 0;
 	}
 
 	void convert(float&) const
@@ -491,11 +531,6 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
-	{
-		return false;
-	}
-
 	bool isInteger() const
 	{
 		return false;
@@ -521,7 +556,7 @@ private:
 };
 
 
-}} // namespace Poco::JSON
+} } // namespace Poco::Dynamic
 
 
 #endif // JSON_Array_INCLUDED

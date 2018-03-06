@@ -1,8 +1,6 @@
 //
 // ConfigurationViewTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/ConfigurationViewTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -24,7 +22,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-ConfigurationViewTest::ConfigurationViewTest(const std::string& rName): AbstractConfigurationTest(rName)
+ConfigurationViewTest::ConfigurationViewTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 

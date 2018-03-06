@@ -1,8 +1,6 @@
 //
 // SharedLibrary_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_VX.cpp#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -101,7 +99,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _moduleId != 0; 
+	return _moduleId != 0;
 }
 
 

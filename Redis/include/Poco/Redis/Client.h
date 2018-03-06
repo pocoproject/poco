@@ -1,15 +1,13 @@
 //
 // Client.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  Client
 //
 // Definition of the Client class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -19,13 +17,14 @@
 #ifndef Redis_Client_INCLUDED
 #define Redis_Client_INCLUDED
 
-#include "Poco/Net/SocketAddress.h"
-#include "Poco/Timespan.h"
 
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/Array.h"
 #include "Poco/Redis/Error.h"
 #include "Poco/Redis/RedisStream.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Timespan.h"
+
 
 namespace Poco {
 namespace Redis {
@@ -41,43 +40,42 @@ class Redis_API Client
 	/// implemented as a typedef for Poco::Nullable<std::string>. This is
 	/// because a bulk string can represent a Null value.
 	///
-	///   BulkString bs = client.execute<BulkString>(...);
-	///   if ( bs.isNull() )
-	///   {
-	///      // We have a Null value
-	///   }
-	///   else
-	///   {
-	///      // We have a string value
-	///   }
+	///     BulkString bs = client.execute<BulkString>(...);
+	///     if ( bs.isNull() )
+	///     {
+	///        // We have a Null value
+	///     }
+	///     else
+	///     {
+	///        // We have a string value
+	///     }
 	///
 	/// To create Redis commands, the factory methods of the Command class can
 	/// be used or the Array class can be used directly.
 	///
-	///    Command llen = Command::llen("list");
+	///     Command llen = Command::llen("list");
 	///
-	/// is the same as
+	/// is the same as:
 	///
-	///    Array command;
-	///    command.add("LLEN").add("list");
+	///     Array command;
+	///     command.add("LLEN").add("list");
 	///
-	/// or
+	/// or:
 	///
-	///    Array command;
-	///    command << "LLEN" << "list";
+	///     Array command;
+	///     command << "LLEN" << "list";
 	///
-	///	or even
+	///	or even:
 	///
-	///    Command command("LLEN");
-	///    command << "list";
+	///     Command command("LLEN");
+	///     command << "list";
 {
 public:
-
 	typedef SharedPtr<Client> Ptr;
 
 	Client();
-		/// Default constructor. Use this when you want to
-		/// connect later on.
+		/// Creates an unconnected Client.
+		/// Use this when you want to connect later on.
 
 	Client(const std::string& hostAndPort);
 		/// Constructor which connects to the given Redis host/port.
@@ -90,7 +88,7 @@ public:
 		/// Constructor which connects to the given Redis host/port.
 
 	virtual ~Client();
-		/// Destructor.
+		/// Destroys the Client.
 
 	Net::SocketAddress address() const;
 		/// Returns the address of the Redis connection.
@@ -115,6 +113,12 @@ public:
 	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
 		/// Connects to the given Redis server.
 
+    bool sendAuth(const std::string& password);
+        /// Sends password to Redis server
+
+    bool isAuthenticated();
+        /// Returns true when the client is authenticated
+
 	void disconnect();
 		/// Disconnects from the Redis server.
 
@@ -125,9 +129,9 @@ public:
 		///
 		/// A specialization exists for type void, which doesn't read
 		/// the reply. If the server sends a reply, it is your
-		/// responsibility to read it ... (Use this for pipelining)
+		/// responsibility to read it. Use this for pipelining.
 		///
-		/// A BadCastException will be thrown when the reply couldn't be
+		/// A Poco::BadCastException will be thrown when the reply couldn't be
 		/// converted. Supported types are Int64, std::string, BulkString,
 		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
@@ -179,12 +183,8 @@ public:
 		/// Sets a receive timeout.
 
 private:
-
 	Client(const Client&);
 	Client& operator = (const Client&);
-
-	Net::SocketAddress _address;
-	Net::StreamSocket _socket;
 
 	void connect();
 		/// Connects to the Redis server
@@ -198,9 +198,17 @@ private:
 		/// call readReply as many times as you called writeCommand, even when
 		/// an error occurred on a command.
 
+	Net::SocketAddress _address;
+	Net::StreamSocket _socket;
 	RedisInputStream* _input;
 	RedisOutputStream* _output;
+    bool _authenticated;
 };
+
+
+//
+// inlines
+//
 
 
 inline Net::SocketAddress Client::address() const
@@ -208,11 +216,13 @@ inline Net::SocketAddress Client::address() const
 	return _address;
 }
 
+
 template<> inline
 void Client::execute<void>(const Array& command)
 {
 	writeCommand(command, false);
 }
+
 
 inline void Client::flush()
 {
@@ -220,13 +230,18 @@ inline void Client::flush()
 	_output->flush();
 }
 
+
 inline void Client::setReceiveTimeout(const Timespan& timeout)
 {
 	_socket.setReceiveTimeout(timeout);
 }
 
+inline bool Client::isAuthenticated()
+{
+    return _authenticated;
+}
 
 } } // namespace Poco::Redis
 
 
-#endif //Redis_Client_INCLUDED
+#endif // Redis_Client_INCLUDED

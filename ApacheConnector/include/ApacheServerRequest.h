@@ -1,8 +1,6 @@
 //
 // ApacheServerRequest.h
 //
-// $Id: //poco/1.4/ApacheConnector/include/ApacheServerRequest.h#2 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -27,10 +25,10 @@ class ApacheServerRequest: public Poco::Net::HTTPServerRequest
 {
 public:
 	ApacheServerRequest(
-		ApacheRequestRec* pApacheRequest, 
-		const char* serverName, 
-		int serverPort, 
-		const char* clientName, 
+		ApacheRequestRec* pApacheRequest,
+		const char* serverName,
+		int serverPort,
+		const char* clientName,
 		int clientPort);
 		/// Creates a new ApacheServerRequest.
 

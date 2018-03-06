@@ -1,8 +1,6 @@
 //
 // FileStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FileStream

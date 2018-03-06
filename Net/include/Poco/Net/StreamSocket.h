@@ -1,8 +1,6 @@
 //
 // StreamSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/StreamSocket.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  StreamSocket
@@ -52,7 +50,7 @@ public:
 		/// for the given address family.
 		///
 		/// This is useful if certain socket options
-		/// (like send and receive buffer) sizes, that must 
+		/// (like send and receive buffer) sizes, that must
 		/// be set before connecting the socket, will be
 		/// set later on.
 
@@ -73,7 +71,7 @@ public:
 		/// increments the reference count of the SocketImpl.	
 
 	void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
@@ -81,13 +79,36 @@ public:
 		/// packets are restricted to the specified address.
 
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-		/// Initializes the socket, sets the socket timeout and 
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
 
 	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
+
+	void bind(const SocketAddress& address, bool reuseAddress);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket.
+		///
+		/// TCP clients normally do not bind to a local address,
+		/// but in some special advanced cases it may be useful to have
+		/// this type of functionality.  (e.g. in multihoming situations
+		/// where the traffic will be sent through a particular interface;
+		/// or in computer clustered environments with active/standby
+		/// servers and it is desired to make the traffic from either
+		/// active host present the same source IP address).
+		///
+		/// Note:  Practical use of client source IP address binding
+		///        may require OS networking setup outside the scope of
+		///        the Poco library.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// TODO: implement IPv6 version
 
 	void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
@@ -126,8 +147,8 @@ public:
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
-		/// Returns the number of bytes received. 
-		/// A return value of 0 means a graceful shutdown 
+		/// Returns the number of bytes received.
+		/// A return value of 0 means a graceful shutdown
 		/// of the connection from the peer.
 		///
 		/// Throws a TimeoutException if a receive timeout has
@@ -136,13 +157,13 @@ public:
 
 	int receiveBytes(Poco::FIFOBuffer& buffer);
 		/// Receives data from the socket and stores it
-		/// in buffer. Up to length bytes are received. FIFOBuffer has 
-		/// writable/readable transition notifications which may be enabled 
-		/// to notify the caller when the buffer transitions between empty, 
+		/// in buffer. Up to length bytes are received. FIFOBuffer has
+		/// writable/readable transition notifications which may be enabled
+		/// to notify the caller when the buffer transitions between empty,
 		/// partially full and full states.
 		///
-		/// Returns the number of bytes received. 
-		/// A return value of 0 means a graceful shutdown 
+		/// Returns the number of bytes received.
+		/// A return value of 0 means a graceful shutdown
 		/// of the connection from the peer.
 		///
 		/// Throws a TimeoutException if a receive timeout has

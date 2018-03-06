@@ -1,8 +1,6 @@
 //
 // OptionException.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/OptionException.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionException
@@ -28,7 +26,7 @@ namespace Poco {
 namespace Util {
 
 
-POCO_DECLARE_EXCEPTION(Util_API, OptionException, Poco::DataException)
+POCO_DECLARE_EXCEPTION(Util_API, OptionException, Poco::SQLException)
 POCO_DECLARE_EXCEPTION(Util_API, UnknownOptionException, OptionException)
 POCO_DECLARE_EXCEPTION(Util_API, AmbiguousOptionException, OptionException)
 POCO_DECLARE_EXCEPTION(Util_API, MissingOptionException, OptionException)

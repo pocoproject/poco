@@ -1,8 +1,6 @@
 //
 // ArchiveStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ArchiveStrategy.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel
@@ -34,7 +32,7 @@ class ArchiveCompressor;
 
 
 class Foundation_API ArchiveStrategy
-	/// The ArchiveStrategy is used by FileChannel 
+	/// The ArchiveStrategy is used by FileChannel
 	/// to rename a rotated log file for archiving.
 	///
 	/// Archived files can be automatically compressed,

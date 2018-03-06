@@ -1,8 +1,6 @@
 //
 // IPAddress.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/IPAddress.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  IPAddress
@@ -44,7 +42,7 @@ class Net_API IPAddress
 	///
 	/// Relational operators (==, !=, <, <=, >, >=) are
 	/// supported. However, you must not interpret any
-	/// special meaning into the result of these 
+	/// special meaning into the result of these
 	/// operations, other than that the results are
 	/// consistent.
 	///
@@ -81,7 +79,7 @@ public:
 		/// Creates an IPAddress from the string containing
 		/// an IP address in presentation format (dotted decimal
 		/// for IPv4, hex string for IPv6).
-		/// 
+		///
 		/// Depending on the format of addr, either an IPv4 or
 		/// an IPv6 address is created.
 		///
@@ -96,12 +94,12 @@ public:
 
 	IPAddress(const void* addr, poco_socklen_t length);
 		/// Creates an IPAddress from a native internet address.
-		/// A pointer to a in_addr or a in6_addr structure may be 
+		/// A pointer to a in_addr or a in6_addr structure may be
 		/// passed.
 
 	IPAddress(const void* addr, poco_socklen_t length, Poco::UInt32 scope);
 		/// Creates an IPAddress from a native internet address.
-		/// A pointer to a in_addr or a in6_addr structure may be 
+		/// A pointer to a in_addr or a in6_addr structure may be
 		/// passed. Additionally, for an IPv6 address, a scope ID
 		/// may be specified. The scope ID will be ignored if an IPv4
 		/// address is specified.
@@ -141,23 +139,23 @@ public:
 		///
 		/// Textual representation of IPv6 address is one of the following forms:
 		///
-		/// The preferred form is x:x:x:x:x:x:x:x, where the 'x's are the hexadecimal 
+		/// The preferred form is x:x:x:x:x:x:x:x, where the 'x's are the hexadecimal
 		/// values of the eight 16-bit pieces of the address. This is the full form.
 		/// Example: 1080:0:0:0:8:600:200A:425C
 		///
-		/// It is not necessary to write the leading zeros in an individual field. 
+		/// It is not necessary to write the leading zeros in an individual field.
 		/// However, there must be at least one numeral in every field, except as described below.
-		/// 
-		/// It is common for IPv6 addresses to contain long strings of zero bits. 
-		/// In order to make writing addresses containing zero bits easier, a special syntax is 
-		/// available to compress the zeros. The use of "::" indicates multiple groups of 16-bits of zeros. 
-		/// The "::" can only appear once in an address. The "::" can also be used to compress the leading 
+		///
+		/// It is common for IPv6 addresses to contain long strings of zero bits.
+		/// In order to make writing addresses containing zero bits easier, a special syntax is
+		/// available to compress the zeros. The use of "::" indicates multiple groups of 16-bits of zeros.
+		/// The "::" can only appear once in an address. The "::" can also be used to compress the leading
 		/// and/or trailing zeros in an address. Example: 1080::8:600:200A:425C
 		///
 		/// For dealing with IPv4 compatible addresses in a mixed environment,
-		/// a special syntax is available: x:x:x:x:x:x:d.d.d.d, where the 'x's are the 
-		/// hexadecimal values of the six high-order 16-bit pieces of the address, 
-		/// and the 'd's are the decimal values of the four low-order 8-bit pieces of the 
+		/// a special syntax is available: x:x:x:x:x:x:d.d.d.d, where the 'x's are the
+		/// hexadecimal values of the six high-order 16-bit pieces of the address,
+		/// and the 'd's are the decimal values of the four low-order 8-bit pieces of the
 		/// standard IPv4 representation address. Example: ::FFFF:192.168.1.120
 		///
 		/// If an IPv6 address contains a non-zero scope identifier, it is added
@@ -216,8 +214,8 @@ public:
 		/// IPv4 site local addresses are in on of the 10.0.0.0/24,
 		/// 192.168.0.0/16 or 172.16.0.0 to 172.31.255.255 ranges.
 		///
-		/// Originally, IPv6 site-local addresses had FEC0/10 (1111 1110 11) 
-		/// prefix (RFC 4291), followed by 38 zeros. Interfaces using  
+		/// Originally, IPv6 site-local addresses had FEC0/10 (1111 1110 11)
+		/// prefix (RFC 4291), followed by 38 zeros. Interfaces using
 		/// this mask are supported, but obsolete; RFC 4193 prescribes
 		/// fc00::/7 (1111 110) as local unicast prefix.
 		
@@ -239,10 +237,10 @@ public:
 	bool isWellKnownMC() const;
 		/// Returns true iff the address is a well-known multicast address.
 		///
-		/// For IPv4, well-known multicast addresses are in the 
+		/// For IPv4, well-known multicast addresses are in the
 		/// 224.0.0.0/8 range.
 		///
-		/// For IPv6, well-known multicast addresses are in the 
+		/// For IPv6, well-known multicast addresses are in the
 		/// FF0x:x:x:x:x:x:x:x range.
 	
 	bool isNodeLocalMC() const;
@@ -285,7 +283,7 @@ public:
 	bool isGlobalMC() const;
 		/// Returns true iff the address is a global multicast address.
 		///
-		/// For IPv4, global multicast addresses are in the 
+		/// For IPv4, global multicast addresses are in the
 		/// 224.0.1.0 to 238.255.255.255 range.
 		///
 		/// For IPv6, global multicast addresses are in the
@@ -330,7 +328,7 @@ public:
 		/// Creates an IPAddress from the string containing
 		/// an IP address in presentation format (dotted decimal
 		/// for IPv4, hex string for IPv6).
-		/// 
+		///
 		/// Depending on the format of addr, either an IPv4 or
 		/// an IPv6 address is created.
 		///
@@ -356,7 +354,7 @@ public:
 
 	enum
 	{
-		MAX_ADDRESS_LENGTH = 
+		MAX_ADDRESS_LENGTH =
 #if defined(POCO_HAVE_IPv6)
 			sizeof(struct in6_addr)
 #else
@@ -367,11 +365,7 @@ public:
 
 private:
 	typedef Poco::Net::Impl::IPAddressImpl Impl;
-#ifdef POCO_HAVE_ALIGNMENT
 	typedef Impl* Ptr;
-#else
-	typedef Poco::AutoPtr<Impl> Ptr;
-#endif
 
 	Ptr pImpl() const;
 	void newIPv4();
@@ -385,30 +379,17 @@ private:
 #endif
 	void destruct();
 
-#ifdef POCO_HAVE_ALIGNMENT
 	char* storage();
 
-	#ifdef POCO_ENABLE_CPP11
-		static const unsigned sz = sizeof(Poco::Net::Impl::IPv6AddressImpl);
-		typedef std::aligned_storage<sz>::type AlignerType;
+	static const unsigned sz = sizeof(Poco::Net::Impl::IPv6AddressImpl);
+	typedef std::aligned_storage<sz>::type AlignerType;
 
-		union
-		{
-			char buffer[sz];
-		private:
-			AlignerType aligner;
-		}
-	#else // !POCO_ENABLE_CPP11
-		#if defined(POCO_HAVE_IPv6)
-			AlignedCharArrayUnion <Poco::Net::Impl::IPv6AddressImpl>
-		#else
-			AlignedCharArrayUnion <Poco::Net::Impl::IPv4AddressImpl>
-		#endif
-	#endif // POCO_ENABLE_CPP11
-		_memory;
-#else // !POCO_HAVE_ALIGNMENT
-	Ptr _pImpl;
-#endif // POCO_HAVE_ALIGNMENT
+	union
+	{
+		char buffer[sz];
+	private:
+		AlignerType aligner;
+	} _memory;
 };
 
 
@@ -416,108 +397,16 @@ private:
 // inlines
 //
 
-
-inline void IPAddress::destruct()
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	pImpl()->~IPAddressImpl();
-#endif
-}
-
-
 inline IPAddress::Ptr IPAddress::pImpl() const
 {
-#ifdef POCO_HAVE_ALIGNMENT
 	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
-#else
-	if (_pImpl) return _pImpl;
-	throw NullPointerException("IPaddress implementation pointer is NULL.");
-#endif
 }
 
 
-inline void IPAddress::newIPv4()
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv4AddressImpl;
-#else
-	_pImpl = new Poco::Net::Impl::IPv4AddressImpl;
-#endif
-}
-
-
-inline void IPAddress::newIPv4(const void* hostAddr)
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv4AddressImpl(hostAddr);
-#else
-	_pImpl = new Poco::Net::Impl::IPv4AddressImpl(hostAddr);
-#endif
-}
-
-
-inline void IPAddress::newIPv4(unsigned prefix)
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv4AddressImpl(prefix);
-#else
-	_pImpl = new Poco::Net::Impl::IPv4AddressImpl(prefix);
-#endif
-}
-
-
-#if defined(POCO_HAVE_IPv6)
-
-
-inline void IPAddress::newIPv6()
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl;
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl;
-#endif
-}
-
-
-inline void IPAddress::newIPv6(const void* hostAddr)
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr);
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(hostAddr);
-#endif
-}
-
-
-inline void IPAddress::newIPv6(const void* hostAddr, Poco::UInt32 scopeIdentifier)
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(hostAddr, scopeIdentifier);
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(hostAddr, scopeIdentifier);
-#endif
-}
-
-
-inline void IPAddress::newIPv6(unsigned prefix)
-{
-#ifdef POCO_HAVE_ALIGNMENT
-	new (storage()) Poco::Net::Impl::IPv6AddressImpl(prefix);
-#else
-	_pImpl = new Poco::Net::Impl::IPv6AddressImpl(prefix);
-#endif
-}
-
-
-#endif // POCO_HAVE_IPv6
-
-
-#ifdef POCO_HAVE_ALIGNMENT
 inline char* IPAddress::storage()
 {
 	return _memory.buffer;
 }
-#endif
 
 
 } } // namespace Poco::Net

@@ -1,8 +1,6 @@
 //
 // XMLWriterTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.cpp#4 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::XML::XMLWriter;
 using Poco::XML::AttributesImpl;
 
 
-XMLWriterTest::XMLWriterTest(const std::string& rName): CppUnit::TestCase(rName)
+XMLWriterTest::XMLWriterTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

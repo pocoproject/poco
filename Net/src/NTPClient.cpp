@@ -1,8 +1,6 @@
 //
 // NTPClient.cpp
 //
-// $Id: //poco/1.4/Net/src/NTPClient.cpp#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPClient
@@ -28,7 +26,7 @@ namespace Poco {
 namespace Net {
 
 
-NTPClient::NTPClient(IPAddress::Family family, int timeout): 
+NTPClient::NTPClient(IPAddress::Family family, int timeout):
 	_family(family), _timeout(timeout)
 {
 }

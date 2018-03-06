@@ -41,7 +41,7 @@ specfile=""
 tag=""
 config=""
 
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-f" ] ; then
 		shift
@@ -117,6 +117,13 @@ for inc in `find $build -name include -print` ; do
 	includes="$includes,-I$inc"
 done
 
+: ${CC:=gcc}
+: ${CXX:=g++}
+: ${CXXFLAGS:=-std=c++11}
+
+echo "CC=$CC" >>$build/PocoDoc.ini
+echo "CXX=$CXX" >>$build/PocoDoc.ini
+echo "CXXFLAGS=$CXXFLAGS" >>$build/PocoDoc.ini
 echo "PocoBuild=$build" >>$build/PocoDoc.ini
 echo "PocoBase=$POCO_BASE" >>$build/PocoDoc.ini
 echo "PocoDoc.output=$docPath" >>$build/PocoDoc.ini

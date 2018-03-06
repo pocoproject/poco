@@ -1,8 +1,6 @@
 //
 // NodeTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NodeTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -26,7 +24,7 @@ using Poco::XML::Node;
 using Poco::XML::AutoPtr;
 
 
-NodeTest::NodeTest(const std::string& rName): CppUnit::TestCase(rName)
+NodeTest::NodeTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

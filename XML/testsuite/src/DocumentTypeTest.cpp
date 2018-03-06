@@ -1,8 +1,6 @@
 //
 // DocumentTypeTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/DocumentTypeTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -31,7 +29,7 @@ using Poco::XML::NamedNodeMap;
 using Poco::XML::AutoPtr;
 
 
-DocumentTypeTest::DocumentTypeTest(const std::string& rName): CppUnit::TestCase(rName)
+DocumentTypeTest::DocumentTypeTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

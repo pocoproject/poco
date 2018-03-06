@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIteratorImpl.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -22,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DirectoryIteratorStrategy.h"
+#include "Poco/Delegate.h"
 #include <stack>
 #include <functional>
 
@@ -42,8 +41,8 @@ public:
 		D_INFINITE = 0 /// Special value for infinite traverse depth.
 	};
 
-	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxTraversalDepth = D_INFINITE)
-		: _maxDepth(maxTraversalDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false), _rc(1)
+	RecursiveDirectoryIteratorImpl(const std::string& path, UInt16 maxDepth = D_INFINITE)
+		: _maxDepth(maxDepth), _traverseStrategy(std::ptr_fun(depthFun), _maxDepth), _isFinished(false), _rc(1)
 	{
 		_itStack.push(DirectoryIterator(path));
 		_current = _itStack.top()->path();
@@ -78,6 +77,13 @@ public:
 	{
 		return _current;
 	}
+
+	template <typename T>
+	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
+	{
+		_traverseStrategy.traverseError += delegate(&obj, pCB);
+	}
+
 	const std::string& next()
 	{
 		if (_isFinished)

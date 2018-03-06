@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/NetSSL_OpenSSL/samples/Makefile#2 $
-#
 # Makefile for Poco NetSSL Samples
 #
 
@@ -11,3 +9,4 @@
 	$(MAKE) -C download $(MAKECMDGOALS)
 	$(MAKE) -C Mail $(MAKECMDGOALS)
 	$(MAKE) -C TwitterClient $(MAKECMDGOALS)
+	$(MAKE) -C SetSourceIP $(MAKECMDGOALS)

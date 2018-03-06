@@ -1,8 +1,6 @@
 //
 // NamedEventTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedEventTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -68,17 +66,36 @@ void NamedEventTest::testNamedEvent()
 	thr1.start(te);
 	Timestamp now;
 	Thread::sleep(2000);
-	testEvent.set();
+	try {
+		testEvent.set();
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#if POCO_OS != POCO_OS_ANDROID
+		throw e;
+#endif
+	}
 	thr1.join();
+#if POCO_OS != POCO_OS_ANDROID
 	assert (te.timestamp() > now);
-
+#endif
 	Thread thr2;
 	thr2.start(te);
 	now.update();
 	Thread::sleep(2000);
-	testEvent.set();
+	try {
+		testEvent.set();
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#if POCO_OS != POCO_OS_ANDROID
+		throw e;
+#endif
+	}
 	thr2.join();
+#if POCO_OS != POCO_OS_ANDROID
 	assert (te.timestamp() > now);
+#endif
 }
 
 

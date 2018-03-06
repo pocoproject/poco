@@ -1,8 +1,6 @@
 //
 // SharedLibraryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SharedLibraryTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -147,7 +145,7 @@ CppUnit::Test* SharedLibraryTest::suite()
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary1);
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary2);
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary3);
-#endif 
+#endif
 
 	return pSuite;
 }

@@ -1,8 +1,6 @@
 //
 // ReactorTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/ReactorTestSuite.h#1 $
-//
 // Definition of the ReactorTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

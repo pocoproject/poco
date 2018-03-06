@@ -1,8 +1,6 @@
 //
 // FIFOBufferStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOBufferStream.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FIFOBufferStream
@@ -62,7 +60,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};

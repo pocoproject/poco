@@ -1,8 +1,6 @@
 //
 // Token.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Token.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StringTokenizer
@@ -22,7 +20,7 @@
 namespace Poco {
 
 
-Token::Token(bool isIgnore) : _ignored(isIgnore)
+Token::Token(bool ignore) : _ignored(ignore)
 {
 }
 
@@ -94,9 +92,9 @@ char Token::asChar() const
 }
 
 
-void Token::ignore(bool isIgnored)
+void Token::ignore(bool ignored)
 {
-	_ignored = isIgnored;
+	_ignored = ignored;
 }
 
 bool Token::ignored() const

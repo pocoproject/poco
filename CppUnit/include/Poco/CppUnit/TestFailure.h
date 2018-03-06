@@ -1,8 +1,6 @@
 //
 // TestFailure.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestFailure.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_TestFailure_INCLUDED
@@ -52,14 +50,14 @@ protected:
 
 
 // Constructs a TestFailure with the given test and exception.
-inline TestFailure::TestFailure(Test* pFailedTest, CppUnitException* pThrownException): _failedTest(pFailedTest), _thrownException(pThrownException)
+inline TestFailure::TestFailure(Test* failedTest, CppUnitException* thrownException): _failedTest(failedTest), _thrownException(thrownException)
 {
 }
 
 
 // Deletes the owned exception.
 inline TestFailure::~TestFailure()
-{ 
+{
 	delete _thrownException;
 }
 

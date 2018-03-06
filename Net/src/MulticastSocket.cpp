@@ -1,8 +1,6 @@
 //
 // MulticastSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/MulticastSocket.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  MulticastSocket
@@ -26,10 +24,10 @@
 
 #if defined(hpux) && defined(_XOPEN_SOURCE_EXTENDED) && defined(POCO_HPUX_IP_MREQ_HACK)
 // netinet/in.h does not define struct ip_mreq if
-// _XOPEN_SOURCE_EXTENDED is #define'd in HP-UX 11.x 
+// _XOPEN_SOURCE_EXTENDED is #define'd in HP-UX 11.x
 // versions prior to 11.30. Compile with -DPOCO_HPUX_IP_MREQ_HACK
 // if you experience problems.
-struct ip_mreq 
+struct ip_mreq
 {
 	struct in_addr imr_multiaddr;
 	struct in_addr imr_interface;
@@ -62,7 +60,7 @@ MulticastSocket::MulticastSocket(SocketAddress::Family family): DatagramSocket(f
 }
 
 
-MulticastSocket::MulticastSocket(const SocketAddress& rAddress, bool reuseAddress): DatagramSocket(rAddress, reuseAddress)
+MulticastSocket::MulticastSocket(const SocketAddress& address, bool reuseAddress): DatagramSocket(address, reuseAddress)
 {
 }
 

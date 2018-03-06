@@ -1,8 +1,6 @@
 //
 // GlobTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/GlobTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -461,9 +459,9 @@ void GlobTest::testGlob()
 #if !defined(_WIN32_WCE)
 	// won't work if current directory is root dir
 	files.clear();
-	Glob::glob("../*/globtest/*/", files);
+	Glob::glob("globtest/../*/testsuite/*/", files);
 	translatePaths(files);
-	assert (files.size() == 3);
+	assert (files.size() == 1);
 #endif
 	
 	File dir("globtest");

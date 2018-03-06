@@ -1,8 +1,6 @@
 //
 // HTTPServerSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerSession.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerSession
@@ -21,14 +19,14 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerSession::HTTPServerSession(const StreamSocket& rSocket, HTTPServerParams::Ptr pParams):
-	HTTPSession(rSocket, pParams->getKeepAlive()),
+HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams):
+	HTTPSession(socket, pParams->getKeepAlive()),
 	_firstRequest(true),
 	_keepAliveTimeout(pParams->getKeepAliveTimeout()),
 	_maxKeepAliveRequests(pParams->getMaxKeepAliveRequests())
 {
 	setTimeout(pParams->getTimeout());
-	socket().setReceiveTimeout(pParams->getTimeout());
+	this->socket().setReceiveTimeout(pParams->getTimeout());
 }
 
 
@@ -49,7 +47,7 @@ bool HTTPServerSession::hasMoreRequests()
 	}
 	else if (_maxKeepAliveRequests != 0 && getKeepAlive())
 	{
-		if (_maxKeepAliveRequests > 0) 
+		if (_maxKeepAliveRequests > 0)
 			--_maxKeepAliveRequests;
 		return buffered() > 0 || socket().poll(_keepAliveTimeout, Socket::SELECT_READ);
 	}

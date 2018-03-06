@@ -1,8 +1,6 @@
 //
 // PatternFormatterTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/PatternFormatterTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -16,6 +14,7 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/Message.h"
 #include "Poco/DateTime.h"
+#include "Poco/Exception.h"
 
 
 using Poco::PatternFormatter;

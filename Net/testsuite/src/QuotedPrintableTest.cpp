@@ -1,8 +1,6 @@
 //
 // QuotedPrintableTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/QuotedPrintableTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -22,7 +20,7 @@ using Poco::Net::QuotedPrintableEncoder;
 using Poco::Net::QuotedPrintableDecoder;
 
 
-QuotedPrintableTest::QuotedPrintableTest(const std::string& rName): CppUnit::TestCase(rName)
+QuotedPrintableTest::QuotedPrintableTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

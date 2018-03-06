@@ -1,8 +1,6 @@
 //
 // XMLStreamParser.cpp
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  XMLStreamParser
@@ -31,8 +29,8 @@ namespace XML {
 
 struct StreamExceptionController
 {
-	StreamExceptionController(std::istream& is): 
-		_istr(is), 
+	StreamExceptionController(std::istream& is):
+		_istr(is),
 		_oldState(_istr.exceptions())
 	{
 		_istr.exceptions(_oldState & ~std::istream::failbit);
@@ -88,8 +86,8 @@ std::ostream& operator << (std::ostream& os, XMLStreamParser::EventType e)
 
 
 XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, FeatureType f):
-	_size(0), 
-	_inputName(iname), 
+	_size(0),
+	_inputName(iname),
 	_feature(f)
 {
 	_data.is = &is;
@@ -98,8 +96,8 @@ XMLStreamParser::XMLStreamParser(std::istream& is, const std::string& iname, Fea
 
 
 XMLStreamParser::XMLStreamParser(const void* data, std::size_t size, const std::string& iname, FeatureType f):
-	_size(size), 
-	_inputName(iname), 
+	_size(size),
+	_inputName(iname),
 	_feature(f)
 {
 	poco_assert(data != 0 && size != 0);
@@ -381,7 +379,7 @@ void XMLStreamParser::popElement()
 }
 
 
-XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
+XMLStreamParser::EventType XMLStreamParser::nextImpl(bool peek)
 {
 	EventType e(nextBody());
 
@@ -400,7 +398,7 @@ XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
 		// This way, the attribute map will still be valid until we
 		// call next().
 		//
-		if (!isPeek)
+		if (!peek)
 		{
 			if (!_elementState.empty() && _elementState.back().depth == _depth)
 				popElement();
@@ -426,7 +424,7 @@ XMLStreamParser::EventType XMLStreamParser::nextImpl(bool isPeek)
 
 		// If this is a peek, then delay adjusting the depth.
 		//
-		if (!isPeek)
+		if (!peek)
 			_depth++;
 
 		break;
@@ -769,10 +767,10 @@ void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, 
 				{
 					QName qn;
 					splitName(*atts, qn);
-					AttributeMapType::value_type value(qn, AttributeValueType());
-					value.second.value = *(atts + 1);
-					value.second.handled = false;
-					pe->attributeMap.insert(value);
+					AttributeMapType::value_type v(qn, AttributeValueType());
+					v.second.value = *(atts + 1);
+					v.second.handled = false;
+					pe->attributeMap.insert(v);
 				}
 				else
 				{

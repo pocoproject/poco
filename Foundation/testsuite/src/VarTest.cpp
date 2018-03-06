@@ -1,8 +1,6 @@
 //
 // VarTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -20,7 +18,6 @@
 #include "Poco/Dynamic/Pair.h"
 #include <map>
 #include <utility>
-
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
@@ -101,8 +98,8 @@ void VarTest::testInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -133,8 +130,18 @@ void VarTest::testInt8()
 		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
-	catch (Poco::BadCastException&)
+	catch (Poco::BadCastException&) { }
+
+	try
 	{
+		Poco::UInt8 usrc = 200;
+		a1 = usrc;
+		src = a1;
+		fail("out of range - must throw");
+	}
+	catch (Poco::RangeException&)
+	{
+		a1 = src;
 	}
 
 	Var a3 = a1 + 1;
@@ -189,8 +196,9 @@ void VarTest::testInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -277,8 +285,9 @@ void VarTest::testInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -365,8 +374,9 @@ void VarTest::testInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -453,8 +463,9 @@ void VarTest::testUInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -541,8 +552,8 @@ void VarTest::testUInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -629,8 +640,8 @@ void VarTest::testUInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -717,8 +728,8 @@ void VarTest::testUInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -805,8 +816,8 @@ void VarTest::testBool()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 1);
@@ -876,8 +887,8 @@ void VarTest::testChar()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -950,8 +961,8 @@ void VarTest::testFloat()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1042,8 +1053,8 @@ void VarTest::testDouble()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1130,8 +1141,8 @@ void VarTest::testString()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
 	assert (s14 == 32);
@@ -1184,6 +1195,7 @@ void VarTest::testString()
 
 void VarTest::testLong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	long src = 32;
 	Var a1 = src;
 
@@ -1267,11 +1279,13 @@ void VarTest::testLong()
 	assert (a3 == 32);
 	a3 *= 2;
 	assert (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
 void VarTest::testULong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	unsigned long src = 32;
 	Var a1 = src;
 
@@ -1355,6 +1369,7 @@ void VarTest::testULong()
 	assert (a3 == 32);
 	a3 *= 2;
 	assert (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
@@ -1438,6 +1453,8 @@ void VarTest::testComparisonOperators()
 	assert (any1 >= 0);
 	assert (0 <= any1);
 
+#if !defined(POCO_LONG_IS_64_BIT)
+
 	any1 = 1L;
 	assert (any1 == any2);
 	assert (any1 == 1L);
@@ -1460,6 +1477,8 @@ void VarTest::testComparisonOperators()
 	assert (1L <= any1);
 	assert (any1 >= 0);
 	assert (0 <= any1);
+
+#endif // !defined(POCO_LONG_IS_64_BIT)
 
 	any1 = 0x31;
 	assert (any1 == '1');
@@ -1817,8 +1836,8 @@ void VarTest::testIsArray()
 	double s11(13.555);
 	bool s12(true);
 	char s13('c');
-	long s14(232323);
-	unsigned long s15(21233232u);
+	Int64 s14(232323);
+	UInt64 s15(21233232u);
 	std::vector<Var> s16;
 	DynamicStruct s17;
 
@@ -1956,6 +1975,8 @@ void VarTest::testDynamicStructBasics()
 	aStruct.erase("First Name");
 	assert (aStruct.size() == 1);
 	assert (*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assert (aStruct.size() == 0);
 }
 
 
@@ -2203,11 +2224,11 @@ void VarTest::testJSONDeserializeString()
 	char cc = b2.convert<char>();
 	assert (cc == 'c');
 
-	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\" \n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 
-	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\"\n}";
 	a = Var::parse(tst);
 	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
@@ -2373,15 +2394,43 @@ void VarTest::testJSONDeserializeStruct()
 
 	std::string sStr = Var::toString(aStr);
 	Var a = Var::parse(sStr);
-	assert (aStr["i8"] == i8);
-	assert (aStr["u16"] == u16);
-	assert (aStr["i32"] == i32);
-	assert (aStr["u64"] == u64);
-	assert (aStr["b"] == b);
-	assert (aStr["f"] == f);
-	assert (aStr["d"] == d);
-	assert (aStr["s"] == s);
-	assert (aStr["c"] == c);
+	assert (a["i8"] == i8);
+	assert (a["u16"] == u16);
+	assert (a["i32"] == i32);
+	assert (a["u64"] == u64);
+	assert (a["b"] == b);
+	assert (a["f"] == f);
+	assert (a["d"] == d);
+	assert (a["s"] == s);
+	assert (a["c"] == c);
+}
+
+
+void VarTest::testJSONRoundtripStruct()
+{
+	Poco::Int64 i64(-1234567890);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	double d = 3.1415;
+	std::string s("test string");
+	DynamicStruct aStr;
+	aStr["i64"] = i64;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["d"] = d;
+	aStr["s"] = s;
+
+	std::string sStr = Var::toString(aStr);
+	Var a = Var::parse(sStr);
+	assert (a["i64"].isInteger());
+	assert (!a["u64"].isSigned());
+	assert (a["b"].isBoolean());
+	assert (a["d"].isNumeric());
+	assert (a["s"].isString());
+
+	std::string serialized = Var::toString(a);
+	assert (sStr == serialized);
 }
 
 
@@ -2502,7 +2551,7 @@ void VarTest::testEmpty()
 	testEmptyComparisons<Poco::Int32>();
 	testEmptyComparisons<Poco::UInt64>();
 	testEmptyComparisons<Poco::Int64>();
-#ifdef POCO_LONG_IS_64_BIT
+#ifndef POCO_LONG_IS_64_BIT
 	testEmptyComparisons<unsigned long>();
 	testEmptyComparisons<long>();
 #endif
@@ -2511,13 +2560,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int j = da;
+		int i = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int j = da.extract<int>();
+		int i = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }
@@ -2642,6 +2691,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeArray);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
+	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);

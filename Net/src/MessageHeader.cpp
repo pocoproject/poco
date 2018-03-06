@@ -1,8 +1,6 @@
 //
 // MessageHeader.cpp
 //
-// $Id: //poco/1.4/Net/src/MessageHeader.cpp#4 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MessageHeader
@@ -16,14 +14,15 @@
 
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/MailRecipient.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/TextConverter.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/UTF8Encoding.h"
-
 #include <sstream>
+
 
 namespace Poco {
 namespace Net {
@@ -67,6 +66,12 @@ void MessageHeader::write(std::ostream& ostr) const
 
 void MessageHeader::read(std::istream& istr)
 {
+	read(istr, 0);
+}
+
+
+void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
+{
 	static const int eof = std::char_traits<char>::eof();
 	std::streambuf& buf = *istr.rdbuf();
 
@@ -104,9 +109,64 @@ void MessageHeader::read(std::istream& istr)
 		}
 		Poco::trimRightInPlace(value);
 		add(name, decodeWord(value));
+		if (pRecipients) getRecipients(name, value, pRecipients);
 		++fields;
+
 	}
 	istr.putback(ch);
+}
+
+
+void MessageHeader::getRecipients(const std::string& name, const std::string& value, RecipientList* pRecipients)
+{
+	if(pRecipients)
+	{
+		Poco::istring iName(name.c_str());
+		MailRecipient::RecipientType type;
+		if      (iName == "To")  type = MailRecipient::PRIMARY_RECIPIENT;
+		else if (iName == "CC")  type = MailRecipient::CC_RECIPIENT;
+		else if (iName == "BCC") type = MailRecipient::BCC_RECIPIENT;
+		else return;
+		std::string address;
+		std::string realName;
+		std::vector<std::string> elements;
+		splitElements(value, elements);
+		for(const auto& e : elements)
+		{
+			size_t pos1 = e.find('<');
+			if(pos1 != e.npos) // email in angle brackets, real name must be present
+			{
+				size_t pos2 = e.find('>');
+				if(pos2 == e.npos || pos2 <= pos1)
+					throw Poco::SyntaxException("Invalid email recipient.");
+				address = e.substr(pos1 + 1, pos2 - pos1 - 1);
+				Poco::trimInPlace(address);
+				// real name may or may not be in double quotes
+				size_t posLT = pos1; // remember angle bracket pos for case there's no double-quote
+				pos1 = e.find('"');
+				if(pos1 != e.npos)
+				{
+					pos2 = e.rfind('"', pos2);
+					if (pos2 != e.npos && pos2 > pos1)
+						realName = e.substr(pos1 + 1, pos2 - pos1 - 1);
+					else
+						throw Poco::SyntaxException("Invalid email recipient.");
+				}
+				else
+				{
+					realName = e.substr(0, posLT);
+				}
+			}
+			else
+			{
+				address = e;
+				realName.clear();
+			}
+			Poco::trimInPlace(address);
+			Poco::trimInPlace(realName);
+			pRecipients->emplace_back(MailRecipient(type, address, realName));
+		}
+	}
 }
 
 
@@ -258,10 +318,11 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 	if (mustQuote) result += '"';
 }
 
-void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to) {
+
+void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to)
+{
 	std::string tempout;
 	StringTokenizer tokens(ins, "?");
-
 
 	std::string charset = toUpper(tokens[0]);
 	std::string encoding = toUpper(tokens[1]);
@@ -269,25 +330,31 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 
 	std::istringstream istr(text);
 
-	if (encoding == "B") {
+	if (encoding == "B")
+	{
 		// Base64 encoding.
 		Base64Decoder decoder(istr);
 		for (char c; decoder.get(c); tempout += c) {}
 	}
-	else 	if (encoding == "Q") {
-		// Quoted encoding.				
-		for (char c; istr.get(c);) {
-			if (c == '_') {
+	else if (encoding == "Q")
+	{
+		// Quoted encoding.
+		for (char c; istr.get(c);)
+		{
+			if (c == '_')
+			{
 				//RFC 2047  _ is a space.
 				tempout += " ";
 				continue;
 			}
 
 			// FIXME: check that we have enought chars-
-			if (c == '=') {
+			if (c == '=')
+			{
 				// The next two chars are hex representation of the complete byte.
 				std::string hex;
-				for (int i = 0; i < 2; i++) {
+				for (int i = 0; i < 2; i++)
+				{
 					istr.get(c);
 					hex += c;
 				}
@@ -298,27 +365,32 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 			tempout += c;
 		}
 	}
-	else {
+	else
+	{
 		// Wrong encoding
 		outs = ins;
 		return;
 	}
 
 	// convert to the right charset.
-	if (charset != charset_to) {
-		try {
+	if (charset != charset_to)
+	{
+		try
+		{
 			TextEncoding& enc = TextEncoding::byName(charset);
 			TextEncoding& dec = TextEncoding::byName(charset_to);
 			TextConverter converter(enc, dec);
 			converter.convert(tempout, outs);
 		}
-		catch (...) {
+		catch (...)
+		{
 			// FIXME: Unsuported encoding...
 			outs = tempout;
 		}
 	}
-	else {
-		// Not conversion necesary.
+	else
+	{
+		// Not conversion necessary.
 		outs = tempout;
 	}
 }
@@ -327,27 +399,28 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 std::string MessageHeader::decodeWord(const std::string& text, const std::string& charset)
 {
 	std::string outs, tmp = text;
-	do {
+	do
+	{
 		std::string tmp2;
-		// find the begining of the next rfc2047 chunk 
+		// find the beginning of the next rfc2047 chunk
 		size_t pos = tmp.find("=?");
-		if (pos == std::string::npos) {
+		if (pos == std::string::npos)
+		{
 			// No more found, return
 			outs += tmp;
 			break;
 		}
 
-		// check if there are standar text before the rfc2047 chunk, and if so, copy it.
-		if (pos > 0) {
-			outs += tmp.substr(0, pos);
-		}
+		// check if there is standard text before the rfc2047 chunk, and if so, copy it.
+		if (pos > 0) outs += tmp.substr(0, pos);
 
 		// remove text already copied.
 		tmp = tmp.substr(pos + 2);
 
 		// find the first separator
 		size_t pos1 = tmp.find("?");
-		if (pos1 == std::string::npos) {
+		if (pos1 == std::string::npos)
+		{
 			// not found.
 			outs += tmp;
 			break;
@@ -355,7 +428,8 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 
 		// find the second separator
 		size_t pos2 = tmp.find("?", pos1 + 1);
-		if (pos2 == std::string::npos) {
+		if (pos2 == std::string::npos)
+		{
 			// not found
 			outs += tmp;
 			break;
@@ -363,7 +437,8 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 
 		// find the end of the actual rfc2047 chunk
 		size_t pos3 = tmp.find("?=", pos2 + 1);
-		if (pos3 == std::string::npos) {
+		if (pos3 == std::string::npos)
+		{
 			// not found.
 			outs += tmp;
 			break;

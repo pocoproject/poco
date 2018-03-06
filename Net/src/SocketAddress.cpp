@@ -1,8 +1,6 @@
 //
 // SocketAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketAddress.cpp#5 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketAddress
@@ -77,6 +75,12 @@ SocketAddress::SocketAddress()
 }
 
 
+SocketAddress::SocketAddress(Family fam)
+{
+		init(IPAddress(fam), 0);
+}
+
+
 SocketAddress::SocketAddress(const IPAddress& hostAddress, Poco::UInt16 portNumber)
 {
 	init(hostAddress, portNumber);
@@ -89,9 +93,21 @@ SocketAddress::SocketAddress(Poco::UInt16 portNumber)
 }
 
 
+SocketAddress::SocketAddress(Family fam, Poco::UInt16 portNumber)
+{
+	init(IPAddress(fam), portNumber);
+}
+
+
 SocketAddress::SocketAddress(const std::string& hostAddress, Poco::UInt16 portNumber)
 {
 	init(hostAddress, portNumber);
+}
+
+
+SocketAddress::SocketAddress(Family fam, const std::string& hostAddress, Poco::UInt16 portNumber)
+{
+	init(fam, hostAddress, portNumber);
 }
 
 
@@ -101,9 +117,15 @@ SocketAddress::SocketAddress(const std::string& hostAddress, const std::string& 
 }
 
 
-SocketAddress::SocketAddress(Family addressFamily, const std::string& rAddr)
+SocketAddress::SocketAddress(Family fam, const std::string& hostAddress, const std::string& portNumber)
 {
-	init(addressFamily, rAddr);
+	init(fam, hostAddress, resolveService(portNumber));
+}
+
+
+SocketAddress::SocketAddress(Family fam, const std::string& addr)
+{
+	init(fam, addr);
 }
 
 
@@ -128,16 +150,16 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 }
 
 
-SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t addressLength)
+SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
 {
-	if (addressLength == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
+	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
 		newIPv4(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
 #if defined(POCO_HAVE_IPv6)
-	else if (addressLength == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
+	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
 		newIPv6(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
-	else if (addressLength > 0 && addressLength <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
+	else if (length > 0 && length <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
 		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr));
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length or family passed to SocketAddress()");
@@ -170,7 +192,7 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 		destruct();
 		if (socketAddress.family() == IPv4)
 			newIPv4(reinterpret_cast<const sockaddr_in*>(socketAddress.addr()));
-#if defined(POCO_HAVE_IPv6)			
+#if defined(POCO_HAVE_IPv6)
 		else if (socketAddress.family() == IPv6)
 			newIPv6(reinterpret_cast<const sockaddr_in6*>(socketAddress.addr()));
 #endif
@@ -250,11 +272,40 @@ void SocketAddress::init(const std::string& hostAddress, Poco::UInt16 portNumber
 		HostEntry::AddressList addresses = he.addresses();
 		if (addresses.size() > 0)
 		{
-#if defined(POCO_HAVE_IPv6)
+#if defined(POCO_HAVE_IPv6) && defined(POCO_SOCKETADDRESS_PREFER_IPv4)
 			// if we get both IPv4 and IPv6 addresses, prefer IPv4
-			std::sort(addresses.begin(), addresses.end(), AFLT());
+			std::stable_sort(addresses.begin(), addresses.end(), AFLT());
 #endif
 			init(addresses[0], portNumber);
+		}
+		else throw HostNotFoundException("No address found for host", hostAddress);
+	}
+}
+
+
+void SocketAddress::init(Family fam, const std::string& hostAddress, Poco::UInt16 portNumber)
+{
+	IPAddress ip;
+	if (IPAddress::tryParse(hostAddress, ip))
+	{
+		if (ip.family() != fam) throw AddressFamilyMismatchException(hostAddress);
+		init(ip, portNumber);
+	}
+	else
+	{
+		HostEntry he = DNS::hostByName(hostAddress);
+		HostEntry::AddressList addresses = he.addresses();
+		if (addresses.size() > 0)
+		{
+			for (HostEntry::AddressList::const_iterator it = addresses.begin(); it != addresses.end(); ++it)
+			{
+				if (it->family() == fam)
+				{
+					init(*it, portNumber);
+					return;
+				}
+			}
+			throw AddressFamilyMismatchException(hostAddress);
 		}
 		else throw HostNotFoundException("No address found for host", hostAddress);
 	}
@@ -271,8 +322,29 @@ void SocketAddress::init(Family fam, const std::string& address)
 	else
 #endif
 	{
-		init(address);
-		if (fam != family()) throw Poco::InvalidArgumentException("address does not fit family");
+		std::string host;
+		std::string port;
+		std::string::const_iterator it  = address.begin();
+		std::string::const_iterator end = address.end();
+
+		if (*it == '[')
+		{
+			++it;
+			while (it != end && *it != ']') host += *it++;
+			if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
+			++it;
+		}
+		else
+		{
+			while (it != end && *it != ':') host += *it++;
+		}
+		if (it != end && *it == ':')
+		{
+			++it;
+			while (it != end) port += *it++;
+		}
+		else throw InvalidArgumentException("Missing port number");
+		init(fam, host, resolveService(port));
 	}
 }
 
@@ -281,11 +353,11 @@ void SocketAddress::init(const std::string& hostAndPort)
 {
 	poco_assert (!hostAndPort.empty());
 
-	std::string socketHost;
-	std::string socketPort;
+	std::string host;
+	std::string port;
 	std::string::const_iterator it  = hostAndPort.begin();
 	std::string::const_iterator end = hostAndPort.end();
-	
+
 #if defined(POCO_OS_FAMILY_UNIX)
 	if (*it == '/')
 	{
@@ -296,30 +368,30 @@ void SocketAddress::init(const std::string& hostAndPort)
 	if (*it == '[')
 	{
 		++it;
-		while (it != end && *it != ']') socketHost += *it++;
+		while (it != end && *it != ']') host += *it++;
 		if (it == end) throw InvalidArgumentException("Malformed IPv6 address");
 		++it;
 	}
 	else
 	{
-		while (it != end && *it != ':') socketHost += *it++;
+		while (it != end && *it != ':') host += *it++;
 	}
 	if (it != end && *it == ':')
 	{
 		++it;
-		while (it != end) socketPort += *it++;
+		while (it != end) port += *it++;
 	}
 	else throw InvalidArgumentException("Missing port number");
-	init(socketHost, resolveService(socketPort));
+	init(host, resolveService(port));
 }
 
 
 Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 {
-	unsigned socketPort;
-	if (NumberParser::tryParseUnsigned(service, socketPort) && socketPort <= 0xFFFF)
+	unsigned port;
+	if (NumberParser::tryParseUnsigned(service, port) && port <= 0xFFFF)
 	{
-		return (UInt16) socketPort;
+		return (UInt16) port;
 	}
 	else
 	{
@@ -333,6 +405,87 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 			throw ServiceNotFoundException(service);
 #endif
 	}
+}
+
+
+void SocketAddress::destruct()
+{
+	pImpl()->~SocketAddressImpl();
+}
+
+
+SocketAddress::Ptr SocketAddress::pImpl() const
+{
+	return reinterpret_cast<Ptr>(const_cast<char *>(_memory.buffer));
+}
+
+
+void SocketAddress::newIPv4()
+{
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl;
+}
+
+
+void SocketAddress::newIPv4(const sockaddr_in* sockAddr)
+{
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(sockAddr);
+}
+
+
+void SocketAddress::newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	new (storage()) Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+}
+
+
+#if defined(POCO_HAVE_IPv6)
+void SocketAddress::newIPv6(const sockaddr_in6* sockAddr)
+{
+	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(sockAddr);
+}
+
+
+void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	new (storage()) Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+}
+#endif // POCO_HAVE_IPv6
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+void SocketAddress::newLocal(const sockaddr_un* sockAddr)
+{
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(sockAddr);
+}
+
+
+void SocketAddress::newLocal(const std::string& path)
+{
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path.c_str(), path.size());
+}
+#endif // POCO_OS_FAMILY_UNIX
+
+
+char* SocketAddress::storage()
+{
+	return _memory.buffer;
+}
+
+
+bool SocketAddress::operator == (const SocketAddress& socketAddress) const
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	if (family() == UNIX_LOCAL)
+		return toString() == socketAddress.toString();
+	else
+#endif
+		return host() == socketAddress.host() && port() == socketAddress.port();
+}
+
+
+bool SocketAddress::operator != (const SocketAddress& socketAddress) const
+{
+	return !(operator == (socketAddress));
 }
 
 

@@ -1,8 +1,6 @@
 //
 // CipherKeyImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherKeyImpl.cpp#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKeyImpl
@@ -27,28 +25,27 @@ namespace Poco {
 namespace Crypto {
 
 
-CipherKeyImpl::CipherKeyImpl(const std::string& rName,
-	const std::string& passphrase, 
+CipherKeyImpl::CipherKeyImpl(const std::string& name,
+	const std::string& passphrase,
 	const std::string& salt,
 	int iterationCount,
-	const std::string& rDigest):
-	_pCipher(0),
-	_pDigest(0),
-	_name(rName),
-	_key(),
-	_iv()
+	const std::string& digest): _pCipher(0),
+		_pDigest(0),
+		_name(name),
+		_key(),
+		_iv()
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
-	_pCipher = EVP_get_cipherbyname(rName.c_str());
+	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
-		throw Poco::NotFoundException("Cipher " + rName + " was not found");
+		throw Poco::NotFoundException("Cipher " + name + " was not found");
 
-	_pDigest = EVP_get_digestbyname(rDigest.c_str());
+	_pDigest = EVP_get_digestbyname(digest.c_str());
 
 	if (!_pDigest)
-		throw Poco::NotFoundException("Digest " + rName + " was not found");
+		throw Poco::NotFoundException("Digest " + name + " was not found");
 
 
 	_key = ByteVec(keySize());
@@ -57,35 +54,35 @@ CipherKeyImpl::CipherKeyImpl(const std::string& rName,
 }
 
 
-CipherKeyImpl::CipherKeyImpl(const std::string& rName, 
-	const ByteVec& key, 
-	const ByteVec& iv):
-	_pCipher(0),
-	_name(rName),
-	_key(key),
-	_iv(iv)
+CipherKeyImpl::CipherKeyImpl(const std::string& name,
+	const ByteVec& key,
+	const ByteVec& iv): _pCipher(0),
+		_pDigest(0),
+		_name(name),
+		_key(key),
+		_iv(iv)
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
-	_pCipher = EVP_get_cipherbyname(rName.c_str());
+	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
-		throw Poco::NotFoundException("Cipher " + rName + " was not found");
+		throw Poco::NotFoundException("Cipher " + name + " was not found");
 }
 
 	
-CipherKeyImpl::CipherKeyImpl(const std::string& rName):
-	_pCipher(0),
-	_name(rName),
+CipherKeyImpl::CipherKeyImpl(const std::string& name): _pCipher(0),
+	_pDigest(0),
+	_name(name),
 	_key(),
 	_iv()
 {
 	// dummy access to Cipherfactory so that the EVP lib is initilaized
 	CipherFactory::defaultFactory();
-	_pCipher = EVP_get_cipherbyname(rName.c_str());
+	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
-		throw Poco::NotFoundException("Cipher " + rName + " was not found");
+		throw Poco::NotFoundException("Cipher " + name + " was not found");
 	_key = ByteVec(keySize());
 	_iv = ByteVec(ivSize());
 	generateKey();
@@ -165,9 +162,9 @@ void CipherKeyImpl::generateKey(
 	}
 
 	// Now create the key and IV, using the digest set in the constructor.
-	int cipherKeySize = EVP_BytesToKey(
+	int keySize = EVP_BytesToKey(
 		_pCipher,
-		_pDigest,
+		_pDigest ? _pDigest : EVP_md5(),
 		(salt.empty() ? 0 : saltBytes),
 		reinterpret_cast<const unsigned char*>(password.data()),
 		static_cast<int>(password.size()),
@@ -176,7 +173,7 @@ void CipherKeyImpl::generateKey(
 		ivBytes);
 
 	// Copy the buffers to our member byte vectors.
-	_key.assign(keyBytes, keyBytes + cipherKeySize);
+	_key.assign(keyBytes, keyBytes + keySize);
 
 	if (ivSize() == 0)
 		_iv.clear();

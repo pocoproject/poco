@@ -1,8 +1,6 @@
 //
 // CertificateHandlerFactory.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/CertificateHandlerFactory.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  CertificateHandlerFactory
@@ -34,7 +32,7 @@ class NetSSL_API CertificateHandlerFactory
 	/// A CertificateHandlerFactory is responsible for creating InvalidCertificateHandlers.
 	///
 	/// You don't need to access this class directly. Use the macro
-	///     POCO_REGISTER_CHFACTORY(namespace, InvalidCertificateHandlerName) 
+	///     POCO_REGISTER_CHFACTORY(namespace, InvalidCertificateHandlerName)
 	/// instead (see the documentation of InvalidCertificateHandler for an example).
 {
 public:
@@ -52,7 +50,7 @@ public:
 class NetSSL_API CertificateHandlerFactoryRegistrar
 	/// Registrar class which automatically registers CertificateHandlerFactory at the CertificateHandlerFactoryMgr.
 	/// You don't need to access this class directly. Use the macro
-	///     POCO_REGISTER_CHFACTORY(namespace, InvalidCertificateHandlerName) 
+	///     POCO_REGISTER_CHFACTORY(namespace, InvalidCertificateHandlerName)
 	/// instead (see the documentation of InvalidCertificateHandler for an example).
 {
 public:

@@ -1,8 +1,6 @@
 //
 // Test.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/Test.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_Test_INCLUDED
@@ -48,7 +46,7 @@ inline void Test::run(TestResult *result)
 // Counts the number of test cases that will be run by this test.
 inline int Test::countTestCases()
 {
-	return 0; 
+	return 0;
 }
 
 

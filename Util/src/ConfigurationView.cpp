@@ -1,8 +1,6 @@
 //
 // ConfigurationView.cpp
 //
-// $Id: //poco/1.4/Util/src/ConfigurationView.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationView
@@ -47,7 +45,7 @@ bool ConfigurationView::getRaw(const std::string& key, std::string& value) const
 void ConfigurationView::setRaw(const std::string& key, const std::string& value)
 {
 	std::string translatedKey = translateKey(key);
-	_pConfig->setRaw(translatedKey, value); 
+	_pConfig->setRaw(translatedKey, value);
 }
 
 

@@ -1,8 +1,6 @@
 //
 // ActiveTest.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/ActiveTest.h#1 $
-//
 
 
 #ifndef ActiveTest_INCLUDED
@@ -54,7 +52,7 @@ protected:
 // Construct the active test
 inline ActiveTest::ActiveTest(Test *test): TestDecorator(test)
 {
-	_currentTestResult = NULL; 
+	_currentTestResult = NULL;
 	_threadHandle = INVALID_HANDLE_VALUE;
 }
 
@@ -62,7 +60,7 @@ inline ActiveTest::ActiveTest(Test *test): TestDecorator(test)
 // Pend until the test has completed
 inline ActiveTest::~ActiveTest()
 {
-	CSingleLock(&_runCompleted, TRUE); 
+	CSingleLock(&_runCompleted, TRUE);
 	CloseHandle(_threadHandle);
 }
 
@@ -70,7 +68,7 @@ inline ActiveTest::~ActiveTest()
 // Set the test result that we are to run
 inline void ActiveTest::setTestResult(TestResult* result)
 {
-	_currentTestResult = result; 
+	_currentTestResult = result;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // AbstractHTTPRequestHandler.cpp
 //
-// $Id: //poco/1.4/Net/src/AbstractHTTPRequestHandler.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  AbstractHTTPRequestHandler
@@ -43,10 +41,10 @@ AbstractHTTPRequestHandler::~AbstractHTTPRequestHandler()
 }
 
 
-void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& rRequest, HTTPServerResponse& rResponse)
+void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 {
-	_pRequest  = &rRequest;
-	_pResponse = &rResponse;
+	_pRequest  = &request;
+	_pResponse = &response;
 	if (authenticate())
 	{
 		try
@@ -55,14 +53,14 @@ void AbstractHTTPRequestHandler::handleRequest(HTTPServerRequest& rRequest, HTTP
 		}
 		catch (Poco::Exception& exc)
 		{
-			if (!rResponse.sent())
+			if (!response.sent())
 			{
 				sendErrorResponse(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.displayText());
 			}
 		}
 		catch (std::exception& exc)
 		{
-			if (!rResponse.sent())
+			if (!response.sent())
 			{
 				sendErrorResponse(HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, exc.what());
 			}

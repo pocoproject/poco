@@ -1,8 +1,6 @@
 //
 // Formatter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Formatter.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Formatter
@@ -45,8 +43,8 @@ class Foundation_API Formatter: public Configurable, public RefCountedObject
 	/// The Formatter class supports the Configurable
 	/// interface, so the behaviour of certain formatters
 	/// is configurable.
-	/// 
-	/// Trivial implementations of of getProperty() and 
+	///
+	/// Trivial implementations of of getProperty() and
 	/// setProperty() are provided.
 	///
 	/// Subclasses must at least provide a format() method.
@@ -59,7 +57,7 @@ public:
 		/// Destroys the formatter.
 
 	virtual void format(const Message& msg, std::string& text) = 0;
-		/// Formats the message and places the result in text. 
+		/// Formats the message and places the result in text.
 		/// Subclasses must override this method.
 		
 	void setProperty(const std::string& name, const std::string& value);

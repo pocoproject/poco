@@ -1,8 +1,6 @@
 //
 // NTPEventArgs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NTPEventArgs.h#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPEventArgs
@@ -32,7 +30,7 @@ namespace Net {
 class Net_API NTPEventArgs
 	/// The purpose of the NTPEventArgs class is to be used as template parameter
 	/// to instantiate event members in NTPClient class.
-	/// When clients register for an event notification, the reference to the class is 
+	/// When clients register for an event notification, the reference to the class is
 	///	passed to the handler function to provide information about the event.
 {
 public:
@@ -44,7 +42,7 @@ public:
 
 	std::string hostName() const;
 		/// Tries to resolve the target IP address into host name.
-		/// If unsuccessful, all exceptions are silently ignored and 
+		/// If unsuccessful, all exceptions are silently ignored and
 		///	the IP address is returned.
 
 	std::string hostAddress() const;
@@ -74,9 +72,9 @@ inline const NTPPacket &NTPEventArgs::packet()
 }
 
 
-inline void NTPEventArgs::setPacket(NTPPacket &rPacket)
+inline void NTPEventArgs::setPacket(NTPPacket &packet)
 {
-	_packet = rPacket;
+	_packet = packet;
 }
 
 

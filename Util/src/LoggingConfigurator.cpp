@@ -1,8 +1,6 @@
 //
 // LoggingConfigurator.cpp
 //
-// $Id: //poco/1.4/Util/src/LoggingConfigurator.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  LoggingConfigurator
@@ -105,7 +103,7 @@ void LoggingConfigurator::configureLoggers(AbstractConfiguration* pConfig)
 	AbstractConfiguration::Keys loggers;
 	pConfig->keys(loggers);
 	// use a map to sort loggers by their name, ensuring initialization in correct order (parents before children)
-	LoggerMap loggerMap; 
+	LoggerMap loggerMap;
 	for (AbstractConfiguration::Keys::const_iterator it = loggers.begin(); it != loggers.end(); ++it)
 	{
 		AutoPtr<AbstractConfiguration> pLoggerConfig(pConfig->createView(*it));

@@ -1,8 +1,6 @@
 //
 // JSONConfigurationTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -25,7 +23,7 @@ using Poco::NotFoundException;
 using Poco::JSON::JSONException;
 
 
-JSONConfigurationTest::JSONConfigurationTest(const std::string& rName) : AbstractConfigurationTest(rName)
+JSONConfigurationTest::JSONConfigurationTest(const std::string& name) : AbstractConfigurationTest(name)
 {
 }
 

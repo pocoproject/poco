@@ -1,8 +1,6 @@
 //
 // MailStreamTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MailStreamTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::Net::MailOutputStream;
 using Poco::StreamCopier;
 
 
-MailStreamTest::MailStreamTest(const std::string& rName): CppUnit::TestCase(rName)
+MailStreamTest::MailStreamTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -86,7 +84,7 @@ void MailStreamTest::testMailOutputStream()
 	mos << msg;
 	mos.close();
 	std::string s(ostr.str());
-	assert (s == 
+	assert (s ==
 		"From: john.doe@no.domain\r\n"
 		"To: jane.doe@no.domain\r\n"
 		"Subject: test\r\n"

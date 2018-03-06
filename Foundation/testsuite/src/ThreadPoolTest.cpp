@@ -1,8 +1,6 @@
 //
 // ThreadPoolTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ThreadPoolTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -38,7 +36,7 @@ ThreadPoolTest::~ThreadPoolTest()
 void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 {
 	int cpu = -1;
-	if (affinityPolicy == static_cast<int>(ThreadPool::TAP_CUSTOM)) 
+	if (affinityPolicy == static_cast<int>(ThreadPool::TAP_CUSTOM))
 	{
 		cpu = 0;
 	}

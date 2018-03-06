@@ -1,8 +1,6 @@
 //
 // DocumentTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/DocumentTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -31,7 +29,7 @@ using Poco::XML::XMLString;
 using Poco::XML::DOMException;
 
 
-DocumentTest::DocumentTest(const std::string& rName): CppUnit::TestCase(rName)
+DocumentTest::DocumentTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

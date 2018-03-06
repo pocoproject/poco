@@ -1,8 +1,6 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/PropertyFileConfiguration.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  PropertyFileConfiguration
@@ -31,20 +29,20 @@ namespace Poco {
 namespace Util {
 
 
-PropertyFileConfiguration::PropertyFileConfiguration() : 
+PropertyFileConfiguration::PropertyFileConfiguration() :
 	_preserveComment(false)
 {
 }
 
 
-PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, bool preserveComment) : 
+PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, bool preserveComment) :
 	_preserveComment(preserveComment)
 {
 	load(istr, preserveComment);
 }
 
 	
-PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, bool preserveComment) : 
+PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, bool preserveComment) :
 	_preserveComment(preserveComment)
 {
 	load(path, preserveComment);
@@ -107,7 +105,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 }
 
 
-// If _preserveComment is true, not only save key-value into map 
+// If _preserveComment is true, not only save key-value into map
 // but also save the entire file into _fileContent.
 // Otherwise, only save key-value into map.
 void PropertyFileConfiguration::parseLine(std::istream& istr)
@@ -171,7 +169,7 @@ int PropertyFileConfiguration::readChar(std::istream& istr)
 void PropertyFileConfiguration::setRaw(const std::string& key, const std::string& value)
 {
 	MapConfiguration::setRaw(key, value);
-	if (_preserveComment) 
+	if (_preserveComment)
 	{
 		// Insert the key-value to the end of _fileContent and update _keyFileContentItMap.
 		if (_keyFileContentItMap.count(key) == 0)
@@ -235,9 +233,9 @@ void PropertyFileConfiguration::saveKeyValue(std::istream& istr)
 
 	std::string key;
 	while (!isNewLine(c) && !isKeyValueSeparator(c))
-	{ 
+	{
 		key += (char) c;
-		c = istr.get(); 
+		c = istr.get();
 	}
 
 	std::string value;
@@ -245,8 +243,8 @@ void PropertyFileConfiguration::saveKeyValue(std::istream& istr)
 	{
 		c = readChar(istr);
 		while (!istr.eof() && c)
-		{ 
-			value += (char) c; 
+		{
+			value += (char) c;
 			c = readChar(istr);
 		}
 	}

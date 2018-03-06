@@ -1,8 +1,6 @@
 //
 // NamePoolTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NamePoolTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::XML::Name;
 using Poco::XML::AutoPtr;
 
 
-NamePoolTest::NamePoolTest(const std::string& rName): CppUnit::TestCase(rName)
+NamePoolTest::NamePoolTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -37,16 +35,16 @@ void NamePoolTest::testNamePool()
 {
 	AutoPtr<NamePool> pool = new NamePool;
 	const Name* pName = 0;
-	Name xmlName("pre:local", "http://www.appinf.com");
+	Name name("pre:local", "http://www.appinf.com");
 	
-	pName = &pool->insert(xmlName);
+	pName = &pool->insert(name);
 	const Name* pName2 = &pool->insert("pre:local", "http://www.appinf.com", "local");
 	assert (pName == pName2);
 	
 	pName2 = &pool->insert("pre:local2", "http://www.appinf.com", "local2");
 	assert (pName2 != pName);
 	
-	pName2 = &pool->insert(xmlName);
+	pName2 = &pool->insert(name);
 	assert (pName2 == pName);
 	
 	pName2 = &pool->insert(*pName);

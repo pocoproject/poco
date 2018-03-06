@@ -1,8 +1,6 @@
 //
 // WebSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/WebSocketTest.cpp#3 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -51,12 +49,12 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				std::auto_ptr<char> pBuffer(new char[_bufSize]);
+				std::unique_ptr<char> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(pBuffer.get(), _bufSize, flags);
+					n = ws.receiveFrame(pBuffer.get(), static_cast<int>(_bufSize), flags);
 					if (n == 0)
 						break;
 					ws.sendFrame(pBuffer.get(), n, flags);
@@ -121,7 +119,7 @@ void WebSocketTest::testWebSocket()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPSClientSession cs("localhost", ss.address().port());
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
@@ -188,7 +186,7 @@ void WebSocketTest::testWebSocketLarge()
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPSClientSession cs("localhost", ss.address().port());
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);

@@ -1,8 +1,6 @@
 //
 // SocketAcceptor.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketAcceptor.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketAcceptor
@@ -22,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"
@@ -43,7 +42,7 @@ class SocketAcceptor
 	/// The Acceptor-Connector design pattern decouples connection
 	/// establishment and service initialization in a distributed system
 	/// from the processing performed once a service is initialized.
-	/// This decoupling is achieved with three components: Acceptors, 
+	/// This decoupling is achieved with three components: Acceptors,
 	/// Connectors and Service Handlers.
 	/// The SocketAcceptor passively waits for connection requests (usually
 	/// from a remote Connector) and establishes a connection upon
@@ -69,16 +68,16 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	explicit SocketAcceptor(ServerSocket& rSocket):
-		_socket(rSocket),
+	explicit SocketAcceptor(ServerSocket& socket):
+		_socket(socket),
 		_pReactor(0)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 	{
 	}
 
-	SocketAcceptor(ServerSocket& rSocket, SocketReactor& rReactor):
-		_socket(rSocket),
-		_pReactor(&rReactor)
+	SocketAcceptor(ServerSocket& socket, SocketReactor& reactor):
+		_socket(socket),
+		_pReactor(&reactor)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 		/// The SocketAcceptor registers itself with the given SocketReactor.
 	{
@@ -103,23 +102,23 @@ public:
 		}
 	}
 
-	void setReactor(SocketReactor& rReactor)
+	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
 	{
-		_pReactor = &rReactor;
+		_pReactor = &reactor;
 		if (!_pReactor->hasEventHandler(_socket, Poco::Observer<SocketAcceptor,
 			ReadableNotification>(*this, &SocketAcceptor::onAccept)))
 		{
-			registerAcceptor(rReactor);
+			registerAcceptor(reactor);
 		}
 	}
 
-	virtual void registerAcceptor(SocketReactor& rReactor)
+	virtual void registerAcceptor(SocketReactor& reactor)
 		/// Registers the SocketAcceptor with a SocketReactor.
 		///
 		/// A subclass can override this function to e.g.
 		/// register an event handler for timeout event.
-		/// 
+		///
 		/// If acceptor was constructed without providing reactor to it,
 		/// the override of this method must either call the base class
 		/// implementation or directly register the accept handler with
@@ -128,7 +127,7 @@ public:
 		if (_pReactor)
 			throw Poco::InvalidAccessException("Acceptor already registered.");
 
-		_pReactor = &rReactor;
+		_pReactor = &reactor;
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketAcceptor, ReadableNotification>(*this, &SocketAcceptor::onAccept));
 	}
 	
@@ -137,7 +136,7 @@ public:
 		///
 		/// A subclass can override this function to e.g.
 		/// unregister its event handler for a timeout event.
-		/// 
+		///
 		/// If the accept handler was registered with the reactor,
 		/// the overriding method must either call the base class
 		/// implementation or directly unregister the accept handler.
@@ -158,12 +157,12 @@ public:
 	}
 	
 protected:
-	virtual ServiceHandler* createServiceHandler(StreamSocket& rSocket)
+	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
 		/// Subclasses can override this method.
 	{
-		return new ServiceHandler(rSocket, *_pReactor);
+		return new ServiceHandler(socket, *_pReactor);
 	}
 
 	SocketReactor* reactor()

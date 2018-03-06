@@ -1,8 +1,6 @@
 //
 // POP3ClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/POP3ClientSession.cpp#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  POP3ClientSession
@@ -234,7 +232,8 @@ void POP3ClientSession::retrieveHeader(int id, MessageHeader& header)
 	if (!isPositive(response)) throw POP3Exception("Cannot retrieve header", response);
 	DialogInputStream sis(_socket);
 	MailInputStream mis(sis);
-	header.read(mis);
+	MessageHeader::RecipientList recipients;
+	header.read(mis, &recipients);
 	// skip stuff following header
 	mis.get(); // \r
 	mis.get(); // \n

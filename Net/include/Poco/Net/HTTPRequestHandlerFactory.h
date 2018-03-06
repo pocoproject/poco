@@ -1,8 +1,6 @@
 //
 // HTTPRequestHandlerFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPRequestHandlerFactory.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPRequestHandlerFactory
@@ -58,8 +56,8 @@ public:
 		/// request.
 		///
 		/// If the request contains a "Expect: 100-continue" header, it's possible
-		/// to prevent the server from sending the default 100 Continue response 
-		/// by setting the status of the response object that can be obtained through 
+		/// to prevent the server from sending the default 100 Continue response
+		/// by setting the status of the response object that can be obtained through
 		/// the request object (request.response()) to something other than 200 OK.
 
 protected:

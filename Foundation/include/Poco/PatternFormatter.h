@@ -1,8 +1,6 @@
 //
 // PatternFormatter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PatternFormatter.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  PatternFormatter
@@ -94,13 +92,13 @@ public:
 
 	void format(const Message& msg, std::string& text);
 		/// Formats the message according to the specified
-		/// format pattern and places the result in text. 
+		/// format pattern and places the result in text.
 		
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given name to the given value.
 		///
 		/// The following properties are supported:
-		/// 
+		///
 		///     * pattern: The format pattern. See the PatternFormatter class
 		///       for details.
 		///     * times: Specifies whether times are adjusted for local time
@@ -127,7 +125,7 @@ protected:
 private:
 	struct PatternAction
 	{
-		PatternAction(): key(0), length(0) 
+		PatternAction(): key(0), length(0)
 		{
 		}
 

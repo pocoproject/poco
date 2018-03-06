@@ -1,8 +1,6 @@
 //
 // HTTPRequest.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequest.cpp#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPRequest
@@ -112,7 +110,7 @@ void HTTPRequest::setHost(const std::string& host, Poco::UInt16 port)
 	else
 	{
 		value.append(host);
-	}    
+	}
 
 	if (port != 80 && port != 443)
 	{
@@ -241,11 +239,11 @@ void HTTPRequest::getCredentials(const std::string& header, std::string& scheme,
 	{
 		const std::string& auth = get(header);
 		std::string::const_iterator it  = auth.begin();
-		std::string::const_iterator itEnd = auth.end();
-		while (it != itEnd && Poco::Ascii::isSpace(*it)) ++it;
-		while (it != itEnd && !Poco::Ascii::isSpace(*it)) scheme += *it++;
-		while (it != itEnd && Poco::Ascii::isSpace(*it)) ++it;
-		while (it != itEnd) authInfo += *it++;
+		std::string::const_iterator end = auth.end();
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+		while (it != end && !Poco::Ascii::isSpace(*it)) scheme += *it++;
+		while (it != end && Poco::Ascii::isSpace(*it)) ++it;
+		while (it != end) authInfo += *it++;
 	}
 	else throw NotAuthenticatedException();
 }

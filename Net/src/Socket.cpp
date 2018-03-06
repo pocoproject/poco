@@ -1,8 +1,6 @@
 //
 // Socket.cpp
 //
-// $Id: //poco/1.4/Net/src/Socket.cpp#3 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  Socket
@@ -22,7 +20,6 @@
 #if defined(POCO_HAVE_FD_EPOLL)
 #include <sys/epoll.h>
 #elif defined(POCO_HAVE_FD_POLL)
-#include "Poco/SharedPtr.h"
 #include <poll.h>
 #endif
 
@@ -52,7 +49,7 @@ Socket::Socket(const Socket& socket):
 	_pImpl->duplicate();
 }
 
-	
+
 Socket& Socket::operator = (const Socket& socket)
 {
 	if (&socket != this)
@@ -81,7 +78,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	int epollfd = -1;
 	{
 		struct epoll_event eventsIn[epollSize];
-		memset(eventsIn, 0, sizeof(eventsIn));
+		memset(eventsIn, 0, sizeof(epoll_event) * epollSize );
+
 		struct epoll_event* eventLast = eventsIn;
 		for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
 		{
@@ -144,12 +142,12 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 
 		epollSize = eventLast - eventsIn;
-		epollfd = epoll_create(epollSize);
+		if (epollSize == 0) return 0;
+
+		epollfd = epoll_create(1);
 		if (epollfd < 0)
 		{
-			char buf[1024];
-			strerror_r(errno, buf, sizeof(buf));
-			SocketImpl::error(std::string("Can't create epoll queue: ") + buf);
+			SocketImpl::error("Can't create epoll queue");
 		}
 
 		for (struct epoll_event* e = eventsIn; e != eventLast; ++e)
@@ -159,17 +157,15 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 			{
 				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, e) < 0)
 				{
-					char buf[1024];
-					strerror_r(errno, buf, sizeof(buf));
 					::close(epollfd);
-					SocketImpl::error(std::string("Can't insert socket to epoll queue: ") + buf);
+					SocketImpl::error("Can't insert socket to epoll queue");
 				}
 			}
 		}
 	}
 
 	struct epoll_event eventsOut[epollSize];
-	memset(eventsOut, 0, sizeof(eventsOut));
+	memset(eventsOut, 0, sizeof(epoll_event) * epollSize );
 
 	Poco::Timespan remainingTime(timeout);
 	int rc;
@@ -210,12 +206,10 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return readList.size() + writeList.size() + exceptList.size();
 
 #elif defined(POCO_HAVE_FD_POLL)
-	typedef Poco::SharedPtr<pollfd, Poco::ReferenceCounter, Poco::ReleaseArrayPolicy<pollfd> > SharedPollArray;
-
 	nfds_t nfd = readList.size() + writeList.size() + exceptList.size();
 	if (0 == nfd) return 0;
 
-	SharedPollArray pPollArr = new pollfd[nfd];
+	std::unique_ptr<pollfd[]> pPollArr(new pollfd[nfd]());
 
 	int idx = 0;
 	for (SocketList::iterator it = readList.begin(); it != readList.end(); ++it)
@@ -229,7 +223,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	for (SocketList::iterator it = writeList.begin(); it != writeList.end(); ++it)
 	{
 		SocketList::iterator pos = std::find(begR, endR, *it);
-		if (pos != endR) 
+		if (pos != endR)
 		{
 			pPollArr[pos-begR].events |= POLLOUT;
 			--nfd;
@@ -260,7 +254,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	do
 	{
 		Poco::Timestamp start;
-		rc = ::poll(pPollArr, nfd, timeout.totalMilliseconds());
+		rc = ::poll(pPollArr.get(), nfd, remainingTime.totalMilliseconds());
 		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;
@@ -353,7 +347,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	}
 	while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
 	if (rc < 0) SocketImpl::error();
-	
+
 	SocketList readyReadList;
 	for (SocketList::const_iterator it = readList.begin(); it != readList.end(); ++it)
 	{
@@ -386,8 +380,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 				readyExceptList.push_back(*it);
 		}
 	}
-	std::swap(exceptList, readyExceptList);	
-	return rc; 
+	std::swap(exceptList, readyExceptList);
+	return rc;
 
 #endif // POCO_HAVE_FD_EPOLL
 }

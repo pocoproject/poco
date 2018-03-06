@@ -1,8 +1,6 @@
 //
 // ASCIIEncoding.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ASCIIEncoding.h#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  ASCIIEncoding
@@ -40,7 +38,7 @@ public:
 	int convert(int ch, unsigned char* bytes, int length) const;
 	int queryConvert(const unsigned char* bytes, int length) const;
 	int sequenceLength(const unsigned char* bytes, int length) const;
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

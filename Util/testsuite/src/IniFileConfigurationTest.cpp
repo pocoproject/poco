@@ -1,8 +1,6 @@
 //
 // IniFileConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/IniFileConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -27,7 +25,7 @@ using Poco::NotImplementedException;
 using Poco::NotFoundException;
 
 
-IniFileConfigurationTest::IniFileConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName)
+IniFileConfigurationTest::IniFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 
@@ -39,7 +37,7 @@ IniFileConfigurationTest::~IniFileConfigurationTest()
 
 void IniFileConfigurationTest::testLoad()
 {
-	static const std::string iniFile = 
+	static const std::string iniFile =
 		"; comment\n"
 		"  ; comment  \n"
 		"prop1=value1\n"

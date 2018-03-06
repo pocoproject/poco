@@ -137,6 +137,7 @@ static void TrimAndCut(Vector<const char> buffer, int exponent,
   Vector<const char> right_trimmed = TrimTrailingZeros(left_trimmed);
   exponent += left_trimmed.length() - right_trimmed.length();
   if (right_trimmed.length() > kMaxSignificantDecimalDigits) {
+    (void) space_size;  // Mark variable as used.
     ASSERT(space_size >= kMaxSignificantDecimalDigits);
     CutToMaxSignificantDigits(right_trimmed, exponent,
                               buffer_copy_space, updated_exponent);
@@ -515,6 +516,7 @@ float Strtof(Vector<const char> buffer, int exponent) {
     double double_next2 = Double(double_next).NextDouble();
     f4 = static_cast<float>(double_next2);
   }
+  (void) f2;  // Mark variable as used.
   ASSERT(f1 <= f2 && f2 <= f3 && f3 <= f4);
 
   // If the guess doesn't lie near a single-precision boundary we can simply

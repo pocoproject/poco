@@ -1,26 +1,24 @@
 //
 // RedisTest.cpp
 //
-// $Id$
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-#include <iostream>
+
 
 #include "Poco/Exception.h"
 #include "Poco/Delegate.h"
 #include "Poco/Thread.h"
-
 #include "RedisTest.h"
 #include "Poco/Redis/AsyncReader.h"
 #include "Poco/Redis/Command.h"
 #include "Poco/Redis/PoolableConnectionFactory.h"
-
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
+#include <iostream>
+
 
 using namespace Poco::Redis;
 
@@ -31,9 +29,12 @@ Poco::Redis::Client RedisTest::_redis;
 
 RedisTest::RedisTest(const std::string& name):
 	CppUnit::TestCase("Redis"),
-	_host("localhost"),
+	_host("127.0.0.1"),
 	_port(6379)
 {
+#if POCO_OS == POCO_OS_ANDROID
+	_host = "10.0.2.2";
+#endif
 	if (!_connected)
 	{
 		try
@@ -64,7 +65,6 @@ RedisTest::~RedisTest()
 
 void RedisTest::setUp()
 {
-
 }
 
 
@@ -89,11 +89,11 @@ void RedisTest::testAPPEND()
 		std::string result = _redis.execute<std::string>(setCommand);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -104,11 +104,11 @@ void RedisTest::testAPPEND()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(appendCommand);
 		assert(result == 11);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -119,15 +119,16 @@ void RedisTest::testAPPEND()
 		BulkString result = _redis.execute<BulkString>(getCommand);
 		assert(result.value().compare("Hello World") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testBLPOP()
 {
@@ -146,11 +147,11 @@ void RedisTest::testBLPOP()
 	{
 		_redis.execute<Poco::Int64>(delCommand);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -166,7 +167,7 @@ void RedisTest::testBLPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -179,11 +180,12 @@ void RedisTest::testBLPOP()
 		assert(result.get<BulkString>(0).value().compare("list1") == 0);
 		assert(result.get<BulkString>(1).value().compare("a") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testBRPOP()
 {
@@ -202,11 +204,11 @@ void RedisTest::testBRPOP()
 	{
 		_redis.execute<Poco::Int64>(delCommand);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -222,7 +224,7 @@ void RedisTest::testBRPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -235,11 +237,12 @@ void RedisTest::testBRPOP()
 		assert(result.get<BulkString>(0).value().compare("list1") == 0);
 		assert(result.get<BulkString>(1).value().compare("c") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testDECR()
 {
@@ -255,7 +258,7 @@ void RedisTest::testDECR()
 		std::string result = _redis.execute<std::string>(set);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -266,7 +269,7 @@ void RedisTest::testDECR()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
 		assert(result == 9);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -277,7 +280,7 @@ void RedisTest::testDECR()
 		std::string result = _redis.execute<std::string>(set);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -287,12 +290,13 @@ void RedisTest::testDECR()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
 		fail("This must fail");
 	}
-	catch(RedisException& e)
+	catch (RedisException&)
 	{
 		// ERR value is not an integer or out of range
 	}
 
 }
+
 
 void RedisTest::testECHO()
 {
@@ -312,11 +316,12 @@ void RedisTest::testECHO()
 		assert(!result.isNull());
 		assert(result.value().compare("Hello World") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testError()
 {
@@ -334,11 +339,12 @@ void RedisTest::testError()
 		BulkString result = _redis.execute<BulkString>(command);
 		fail("Invalid command must throw RedisException");
 	}
-	catch(RedisException &e)
+	catch (RedisException&)
 	{
 		// Must fail
 	}
 }
+
 
 void RedisTest::testEVAL()
 {
@@ -368,12 +374,13 @@ void RedisTest::testEVAL()
 		BulkString s = a.get<BulkString>(1);
 		assert(s.value().compare("Hello World!") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 
 }
+
 
 void RedisTest::testHDEL()
 {
@@ -391,7 +398,7 @@ void RedisTest::testHDEL()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -402,7 +409,7 @@ void RedisTest::testHDEL()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(hdel);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -413,11 +420,12 @@ void RedisTest::testHDEL()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(hdel);
 		assert(result == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHEXISTS()
 {
@@ -435,7 +443,7 @@ void RedisTest::testHEXISTS()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -446,7 +454,7 @@ void RedisTest::testHEXISTS()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(hexists);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -457,11 +465,12 @@ void RedisTest::testHEXISTS()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(hexists);
 		assert(result == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHGETALL()
 {
@@ -479,7 +488,7 @@ void RedisTest::testHGETALL()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -490,7 +499,7 @@ void RedisTest::testHGETALL()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -501,11 +510,12 @@ void RedisTest::testHGETALL()
 		Array result = _redis.execute<Array>(hgetall);
 		assert(result.size() == 4);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHINCRBY()
 {
@@ -523,7 +533,7 @@ void RedisTest::testHINCRBY()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -534,7 +544,7 @@ void RedisTest::testHINCRBY()
 		Poco::Int64 n = _redis.execute<Poco::Int64>(hincrby);
 		assert(n == 6);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -545,7 +555,7 @@ void RedisTest::testHINCRBY()
 		Poco::Int64 n = _redis.execute<Poco::Int64>(hincrby);
 		assert(n == 5);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -556,11 +566,12 @@ void RedisTest::testHINCRBY()
 		Poco::Int64 n = _redis.execute<Poco::Int64>(hincrby);
 		assert(n == -5);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHKEYS()
 {
@@ -578,7 +589,7 @@ void RedisTest::testHKEYS()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -589,7 +600,7 @@ void RedisTest::testHKEYS()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -600,7 +611,7 @@ void RedisTest::testHKEYS()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hlen);
 		assert(value == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -613,11 +624,12 @@ void RedisTest::testHKEYS()
 		assert(result.get<BulkString>(0).value().compare("field1") == 0);
 		assert(result.get<BulkString>(1).value().compare("field2") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHMGET()
 {
@@ -635,7 +647,7 @@ void RedisTest::testHMGET()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -646,7 +658,7 @@ void RedisTest::testHMGET()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -665,11 +677,12 @@ void RedisTest::testHMGET()
 		assert(result.get<BulkString>(1).value().compare("World") == 0);
 		assert(result.get<BulkString>(2).isNull());
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHSET()
 {
@@ -687,7 +700,7 @@ void RedisTest::testHSET()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(hset);
 		assert(value == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -698,11 +711,12 @@ void RedisTest::testHSET()
 		BulkString s = _redis.execute<BulkString>(hget);
 		assert(s.value().compare("Hello") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHMSET()
 {
@@ -724,7 +738,7 @@ void RedisTest::testHMSET()
 		std::string result = _redis.execute<std::string>(hmset);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -735,7 +749,7 @@ void RedisTest::testHMSET()
 		BulkString s = _redis.execute<BulkString>(hget);
 		assert(s.value().compare("Hello") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -746,12 +760,13 @@ void RedisTest::testHMSET()
 		BulkString s = _redis.execute<BulkString>(hget);
 		assert(s.value().compare("World") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 
 }
+
 
 void RedisTest::testHSTRLEN()
 {
@@ -774,7 +789,7 @@ void RedisTest::testHSTRLEN()
 		std::string result = _redis.execute<std::string>(hmset);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -785,7 +800,7 @@ void RedisTest::testHSTRLEN()
 		Poco::Int64 len = _redis.execute<Poco::Int64>(hstrlen);
 		assert(len == 10);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -796,7 +811,7 @@ void RedisTest::testHSTRLEN()
 		Poco::Int64 len = _redis.execute<Poco::Int64>(hstrlen);
 		assert(len == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -807,11 +822,12 @@ void RedisTest::testHSTRLEN()
 		Poco::Int64 len = _redis.execute<Poco::Int64>(hstrlen);
 		assert(len == 4);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testHVALS()
 {
@@ -833,7 +849,7 @@ void RedisTest::testHVALS()
 		std::string result = _redis.execute<std::string>(hmset);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -846,11 +862,12 @@ void RedisTest::testHVALS()
 		assert(result.get<BulkString>(0).value().compare("Hello") == 0);
 		assert(result.get<BulkString>(1).value().compare("World") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testINCR()
 {
@@ -867,7 +884,7 @@ void RedisTest::testINCR()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -878,11 +895,12 @@ void RedisTest::testINCR()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(command);
 		assert(value == 11);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testINCRBY()
 {
@@ -899,7 +917,7 @@ void RedisTest::testINCRBY()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -910,11 +928,12 @@ void RedisTest::testINCRBY()
 		Poco::Int64 value = _redis.execute<Poco::Int64>(command);
 		assert(value == 15);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testPING()
 {
@@ -933,11 +952,12 @@ void RedisTest::testPING()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("PONG") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 
+#ifndef OLD_REDIS_VERSION
 	// A PING with a custom string responds with a bulk string
 	command.add("Hello");
 	try
@@ -946,12 +966,13 @@ void RedisTest::testPING()
 		assert(!result.isNull());
 		assert(result.value().compare("Hello") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-
+#endif
 }
+
 
 void RedisTest::testLPOP()
 {
@@ -978,7 +999,7 @@ void RedisTest::testLPOP()
 		result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -989,7 +1010,7 @@ void RedisTest::testLPOP()
 		BulkString result = _redis.execute<BulkString>(lpop);
 		assert(result.value().compare("one") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1003,16 +1024,17 @@ void RedisTest::testLPOP()
 		assert(result.get<BulkString>(0).value().compare("two") == 0);
 		assert(result.get<BulkString>(1).value().compare("three") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 
 }
+
 
 void RedisTest::testLSET()
 {
@@ -1039,7 +1061,7 @@ void RedisTest::testLSET()
 		result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1049,7 +1071,7 @@ void RedisTest::testLSET()
 	{
 		std::string result = _redis.execute<std::string>(lset);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1059,7 +1081,7 @@ void RedisTest::testLSET()
 	{
 		std::string result = _redis.execute<std::string>(lset);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1074,16 +1096,18 @@ void RedisTest::testLSET()
 		assert(result.get<BulkString>(1).value().compare("five") == 0);
 		assert(result.get<BulkString>(2).value().compare("three") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 
 }
+
+
 void RedisTest::testLINDEX()
 {
 	if (!_connected)
@@ -1105,7 +1129,7 @@ void RedisTest::testLINDEX()
 		result = _redis.execute<Poco::Int64>(lpush);
 		assert(result == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1116,11 +1140,12 @@ void RedisTest::testLINDEX()
 		BulkString result = _redis.execute<BulkString>(lindex);
 		assert(result.value().compare("Hello") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testLINSERT()
 {
@@ -1155,19 +1180,20 @@ void RedisTest::testLINSERT()
 		assert(range.get<BulkString>(1).value().compare("There") == 0);
 		assert(range.get<BulkString>(2).value().compare("World") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException &e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testLREM()
 {
@@ -1191,7 +1217,7 @@ void RedisTest::testLREM()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 4);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1202,11 +1228,11 @@ void RedisTest::testLREM()
 		Poco::Int64 n = _redis.execute<Poco::Int64>(lrem);
 		assert(n == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -1220,15 +1246,16 @@ void RedisTest::testLREM()
 		assert(result.get<BulkString>(0).value().compare("hello") == 0);
 		assert(result.get<BulkString>(1).value().compare("foo") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testLTRIM()
 {
@@ -1255,7 +1282,7 @@ void RedisTest::testLTRIM()
 		result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1266,7 +1293,7 @@ void RedisTest::testLTRIM()
 		std::string result = _redis.execute<std::string>(ltrim);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1280,16 +1307,17 @@ void RedisTest::testLTRIM()
 		assert(result.get<BulkString>(0).value().compare("two") == 0);
 		assert(result.get<BulkString>(1).value().compare("three") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 
 }
+
 
 void RedisTest::testMSET()
 {
@@ -1308,7 +1336,7 @@ void RedisTest::testMSET()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1332,15 +1360,16 @@ void RedisTest::testMSET()
 		value = result.get<BulkString>(2);
 		assert(value.isNull());
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testMSETWithMap()
 {
@@ -1362,7 +1391,7 @@ void RedisTest::testMSETWithMap()
 		std::string result = _redis.execute<std::string>(mset);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1387,15 +1416,16 @@ void RedisTest::testMSETWithMap()
 		value = result.get<BulkString>(2);
 		assert(value.isNull());
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testMULTI()
 {
@@ -1416,11 +1446,11 @@ void RedisTest::testMULTI()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -1433,11 +1463,11 @@ void RedisTest::testMULTI()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("QUEUED") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -1450,11 +1480,11 @@ void RedisTest::testMULTI()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("QUEUED") == 0);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -1471,15 +1501,16 @@ void RedisTest::testMULTI()
 		v = result.get<Poco::Int64>(1);
 		assert(v == 1);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testPipeliningWithSendCommands()
 {
@@ -1502,19 +1533,20 @@ void RedisTest::testPipeliningWithSendCommands()
 	assert(result.size() == 2);
 
 	// The 2 results must be simple PONG strings
-	for(size_t i = 0; i < 2; ++i)
+	for (size_t i = 0; i < 2; ++i)
 	{
 		try
 		{
 			std::string pong = result.get<std::string>(i);
 			assert(pong.compare("PONG") == 0);
 		}
-		catch(...)
+		catch (...)
 		{
 			fail("An exception occurred");
 		}
 	}
 }
+
 
 void RedisTest::testPipeliningWithWriteCommand()
 {
@@ -1532,7 +1564,7 @@ void RedisTest::testPipeliningWithWriteCommand()
 	_redis.flush();
 
 	// We expect 2 results with simple "PONG" strings
-	for(int i = 0; i < 2; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
 		std::string pong;
 		try
@@ -1540,33 +1572,33 @@ void RedisTest::testPipeliningWithWriteCommand()
 			_redis.readReply<std::string>(pong);
 			assert(pong.compare("PONG") == 0);
 		}
-		catch(RedisException& e)
+		catch (RedisException& e)
 		{
 			fail(e.message());
 		}
 	}
 }
 
+
 class RedisSubscriber
 {
 public:
-
 	void onMessage(const void* pSender, RedisEventArgs& args)
 	{
-		if ( ! args.message().isNull() )
+		if (!args.message().isNull())
 		{
 			Type<Array>* arrayType = dynamic_cast<Type<Array>*>(args.message().get());
-			if ( arrayType != NULL )
+			if (arrayType != NULL)
 			{
 				Array& array = arrayType->value();
-				if ( array.size() == 3 )
+				if (array.size() == 3)
 				{
 					BulkString type = array.get<BulkString>(0);
-					if ( type.value().compare("unsubscribe") == 0 )
+					if (type.value().compare("unsubscribe") == 0)
 					{
 						Poco::Int64 n = array.get<Poco::Int64>(2);
 						// When 0, no subscribers anymore, so stop reading ...
-						if ( n == 0 ) args.stop();
+						if (n == 0) args.stop();
 					}
 				}
 				else
@@ -1589,8 +1621,8 @@ public:
 		// No need to call stop, AsyncReader stops automatically when an
 		// exception is received.
 	}
-
 };
+
 
 void RedisTest::testPubSub()
 {
@@ -1623,6 +1655,7 @@ void RedisTest::testPubSub()
 	_redis.flush();
 }
 
+
 void RedisTest::testSADD()
 {
 	if (!_connected)
@@ -1639,7 +1672,7 @@ void RedisTest::testSADD()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1650,7 +1683,7 @@ void RedisTest::testSADD()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1661,11 +1694,12 @@ void RedisTest::testSADD()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSCARD()
 {
@@ -1683,7 +1717,7 @@ void RedisTest::testSCARD()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1694,7 +1728,7 @@ void RedisTest::testSCARD()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1705,11 +1739,12 @@ void RedisTest::testSCARD()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(scard);
 		assert(result == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSDIFF()
 {
@@ -1732,7 +1767,7 @@ void RedisTest::testSDIFF()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1747,7 +1782,7 @@ void RedisTest::testSDIFF()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1758,11 +1793,12 @@ void RedisTest::testSDIFF()
 		Array result = _redis.execute<Array>(sdiff);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSDIFFSTORE()
 {
@@ -1786,7 +1822,7 @@ void RedisTest::testSDIFFSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1801,7 +1837,7 @@ void RedisTest::testSDIFFSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1812,7 +1848,7 @@ void RedisTest::testSDIFFSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sdiffstore);
 		assert(result == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1823,11 +1859,12 @@ void RedisTest::testSDIFFSTORE()
 		Array result = _redis.execute<Array>(smembers);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSET()
 {
@@ -1846,7 +1883,7 @@ void RedisTest::testSET()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1859,7 +1896,7 @@ void RedisTest::testSET()
 		BulkString result = _redis.execute<BulkString>(command);
 		assert(result.isNull());
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1887,7 +1924,7 @@ void RedisTest::testSINTER()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1902,7 +1939,7 @@ void RedisTest::testSINTER()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1914,11 +1951,12 @@ void RedisTest::testSINTER()
 		assert(result.size() == 1);
 		assert(result.get<BulkString>(0).value().compare("c") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSINTERSTORE()
 {
@@ -1942,7 +1980,7 @@ void RedisTest::testSINTERSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1957,7 +1995,7 @@ void RedisTest::testSINTERSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1968,7 +2006,7 @@ void RedisTest::testSINTERSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sinterstore);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -1980,11 +2018,12 @@ void RedisTest::testSINTERSTORE()
 		assert(result.size() == 1);
 		assert(result.get<BulkString>(0).value().compare("c") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSISMEMBER()
 {
@@ -2002,7 +2041,7 @@ void RedisTest::testSISMEMBER()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2013,7 +2052,7 @@ void RedisTest::testSISMEMBER()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sismember);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2024,11 +2063,12 @@ void RedisTest::testSISMEMBER()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sismember);
 		assert(result == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSMEMBERS()
 {
@@ -2046,7 +2086,7 @@ void RedisTest::testSMEMBERS()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2057,7 +2097,7 @@ void RedisTest::testSMEMBERS()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2068,11 +2108,12 @@ void RedisTest::testSMEMBERS()
 		Array result = _redis.execute<Array>(smembers);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSMOVE()
 {
@@ -2091,7 +2132,7 @@ void RedisTest::testSMOVE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2102,7 +2143,7 @@ void RedisTest::testSMOVE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2113,7 +2154,7 @@ void RedisTest::testSMOVE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2124,7 +2165,7 @@ void RedisTest::testSMOVE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(smove);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2136,7 +2177,7 @@ void RedisTest::testSMOVE()
 		assert(result.size() == 1);
 		assert(result.get<BulkString>(0).value().compare("one") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2147,11 +2188,12 @@ void RedisTest::testSMOVE()
 		Array result = _redis.execute<Array>(smembers);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSPOP()
 {
@@ -2169,7 +2211,7 @@ void RedisTest::testSPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2180,7 +2222,7 @@ void RedisTest::testSPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2191,7 +2233,7 @@ void RedisTest::testSPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2202,7 +2244,7 @@ void RedisTest::testSPOP()
 		BulkString result = _redis.execute<BulkString>(spop);
 		assert(!result.isNull());
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2213,7 +2255,7 @@ void RedisTest::testSPOP()
 		Array result = _redis.execute<Array>(smembers);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2224,7 +2266,7 @@ void RedisTest::testSPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2235,7 +2277,7 @@ void RedisTest::testSPOP()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2247,12 +2289,13 @@ void RedisTest::testSPOP()
 		Array result = _redis.execute<Array>(spop);
 		assert(result.size() == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 */
 }
+
 
 void RedisTest::testSRANDMEMBER()
 {
@@ -2275,7 +2318,7 @@ void RedisTest::testSRANDMEMBER()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2286,7 +2329,7 @@ void RedisTest::testSRANDMEMBER()
 		BulkString result = _redis.execute<BulkString>(srandmember);
 		assert(!result.isNull());
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2297,7 +2340,7 @@ void RedisTest::testSRANDMEMBER()
 		Array result = _redis.execute<Array>(srandmember);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2308,11 +2351,12 @@ void RedisTest::testSRANDMEMBER()
 		Array result = _redis.execute<Array>(srandmember);
 		assert(result.size() == 5);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSTRLEN()
 {
@@ -2331,7 +2375,7 @@ void RedisTest::testSTRLEN()
 		std::string result = _redis.execute<std::string>(command);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2346,11 +2390,12 @@ void RedisTest::testSTRLEN()
 
 		assert(result == 11);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSREM()
 {
@@ -2368,7 +2413,7 @@ void RedisTest::testSREM()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2378,7 +2423,7 @@ void RedisTest::testSREM()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2388,7 +2433,7 @@ void RedisTest::testSREM()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2399,7 +2444,7 @@ void RedisTest::testSREM()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(srem);
 		assert(result == 1);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2410,7 +2455,7 @@ void RedisTest::testSREM()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(srem);
 		assert(result == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2421,11 +2466,12 @@ void RedisTest::testSREM()
 		Array result = _redis.execute<Array>(smembers);
 		assert(result.size() == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSUNION()
 {
@@ -2448,7 +2494,7 @@ void RedisTest::testSUNION()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2463,7 +2509,7 @@ void RedisTest::testSUNION()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2474,11 +2520,12 @@ void RedisTest::testSUNION()
 		Array result = _redis.execute<Array>(sunion);
 		assert(result.size() == 5);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testSUNIONSTORE()
 {
@@ -2502,7 +2549,7 @@ void RedisTest::testSUNIONSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2517,7 +2564,7 @@ void RedisTest::testSUNIONSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sadd);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2528,7 +2575,7 @@ void RedisTest::testSUNIONSTORE()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(sunionstore);
 		assert(result == 5);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2539,11 +2586,12 @@ void RedisTest::testSUNIONSTORE()
 		Array result = _redis.execute<Array>(smembers);
 		assert(result.size() == 5);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testRENAME()
 {
@@ -2559,7 +2607,7 @@ void RedisTest::testRENAME()
 		std::string result = _redis.execute<std::string>(set);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2570,7 +2618,7 @@ void RedisTest::testRENAME()
 		std::string result = _redis.execute<std::string>(rename);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2581,11 +2629,12 @@ void RedisTest::testRENAME()
 		BulkString result = _redis.execute<BulkString>(get);
 		assert(result.value().compare("Hello") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testRENAMENX()
 {
@@ -2601,7 +2650,7 @@ void RedisTest::testRENAMENX()
 		std::string result = _redis.execute<std::string>(set);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2612,7 +2661,7 @@ void RedisTest::testRENAMENX()
 		std::string result = _redis.execute<std::string>(set);
 		assert(result.compare("OK") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2623,7 +2672,7 @@ void RedisTest::testRENAMENX()
 		Poco::Int64 result = _redis.execute<Poco::Int64>(rename);
 		assert(result == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2634,11 +2683,12 @@ void RedisTest::testRENAMENX()
 		BulkString result = _redis.execute<BulkString>(get);
 		assert(result.value().compare("World") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testRPOP()
 {
@@ -2665,7 +2715,7 @@ void RedisTest::testRPOP()
 		result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2676,7 +2726,7 @@ void RedisTest::testRPOP()
 		BulkString result = _redis.execute<BulkString>(rpop);
 		assert(result.value().compare("three") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2690,16 +2740,17 @@ void RedisTest::testRPOP()
 		assert(result.get<BulkString>(0).value().compare("one") == 0);
 		assert(result.get<BulkString>(1).value().compare("two") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 
 }
+
 
 void RedisTest::testRPOPLPUSH()
 {
@@ -2718,11 +2769,11 @@ void RedisTest::testRPOPLPUSH()
 	{
 		_redis.execute<Poco::Int64>(delCommand);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -2741,7 +2792,7 @@ void RedisTest::testRPOPLPUSH()
 		result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 3);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2752,7 +2803,7 @@ void RedisTest::testRPOPLPUSH()
 		BulkString result = _redis.execute<BulkString>(rpoplpush);
 		assert(result.value().compare("three") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2766,11 +2817,11 @@ void RedisTest::testRPOPLPUSH()
 		assert(result.get<BulkString>(0).value().compare("one") == 0);
 		assert(result.get<BulkString>(1).value().compare("two") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
@@ -2783,15 +2834,16 @@ void RedisTest::testRPOPLPUSH()
 		assert(result.size() == 1);
 		assert(result.get<BulkString>(0).value().compare("three") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testRPUSH()
 {
@@ -2814,7 +2866,7 @@ void RedisTest::testRPUSH()
 		result = _redis.execute<Poco::Int64>(rpush);
 		assert(result == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
@@ -2825,11 +2877,11 @@ void RedisTest::testRPUSH()
 		Poco::Int64 n = _redis.execute<Poco::Int64>(llen);
 		assert(n == 2);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -2843,15 +2895,16 @@ void RedisTest::testRPUSH()
 		assert(result.get<BulkString>(0).value().compare("World") == 0);
 		assert(result.get<BulkString>(1).value().compare("Hello") == 0);
 	}
-	catch(RedisException &e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::NullValueException &e)
+	catch (Poco::NullValueException& e)
 	{
 		fail(e.message());
 	}
 }
+
 
 void RedisTest::testPool()
 {
@@ -2875,6 +2928,7 @@ void RedisTest::testPool()
 	assert(keyValue.value().compare("Hello") == 0);
 }
 
+
 void RedisTest::delKey(const std::string& key)
 {
 	Command delCommand = Command::del(key);
@@ -2882,11 +2936,11 @@ void RedisTest::delKey(const std::string& key)
 	{
 		_redis.execute<Poco::Int64>(delCommand);
 	}
-	catch(RedisException& e)
+	catch (RedisException& e)
 	{
 		fail(e.message());
 	}
-	catch(Poco::BadCastException& e)
+	catch (Poco::BadCastException& e)
 	{
 		fail(e.message());
 	}
@@ -2951,8 +3005,6 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testRPOP);
 	CppUnit_addTest(pSuite, RedisTest, testRPOPLPUSH);
 	CppUnit_addTest(pSuite, RedisTest, testRPUSH);
-
 	CppUnit_addTest(pSuite, RedisTest, testPool);
-
 	return pSuite;
 }

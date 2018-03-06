@@ -1,8 +1,6 @@
 //
 // DTDMap.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DTDMap.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -34,7 +32,7 @@ class DocumentType;
 class XML_API DTDMap: public NamedNodeMap
 	/// This implementation of NamedNodeMap
 	/// is returned by DocumentType::entities()
-	/// and DocumentType::notations(). 
+	/// and DocumentType::notations().
 {
 public:
 	Node* getNamedItem(const XMLString& name) const;

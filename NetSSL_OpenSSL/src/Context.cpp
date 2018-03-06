@@ -1,8 +1,6 @@
 //
 // Context.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Context.cpp#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Context
@@ -41,8 +39,8 @@ Context::Params::Params():
 }
 
 
-Context::Context(Usage contextUsage, const Params& params):
-	_usage(contextUsage),
+Context::Context(Usage usage, const Params& params):
+	_usage(usage),
 	_mode(params.verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
@@ -52,16 +50,16 @@ Context::Context(Usage contextUsage, const Params& params):
 
 
 Context::Context(
-	Usage contextUsage,
-	const std::string& privateKeyFile, 
+	Usage usage,
+	const std::string& privateKeyFile,
 	const std::string& certificateFile,
-	const std::string& caLocation, 
-	VerificationMode mode,
+	const std::string& caLocation,
+	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
 	const std::string& cipherList):
-	_usage(contextUsage),
-	_mode(mode),
+	_usage(usage),
+	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
 {
@@ -69,7 +67,7 @@ Context::Context(
 	params.privateKeyFile = privateKeyFile;
 	params.certificateFile = certificateFile;
 	params.caLocation = caLocation;
-	params.verificationMode = mode;
+	params.verificationMode = verificationMode;
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
@@ -78,20 +76,20 @@ Context::Context(
 
 
 Context::Context(
-	Usage contextUsage,
-	const std::string& caLocation, 
-	VerificationMode mode,
+	Usage usage,
+	const std::string& caLocation,
+	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
 	const std::string& cipherList):
-	_usage(contextUsage),
-	_mode(mode),
+	_usage(usage),
+	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true)
 {
 	Params params;
 	params.caLocation = caLocation;
-	params.verificationMode = mode;
+	params.verificationMode = verificationMode;
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
@@ -209,6 +207,25 @@ void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certifica
 }
 
 	
+void Context::addCertificateAuthority(const Crypto::X509Certificate &certificate)
+{
+	if (X509_STORE* store = SSL_CTX_get_cert_store(_pSSLContext))
+	{
+		int errCode = X509_STORE_add_cert(store, const_cast<X509*>(certificate.certificate()));
+		if (errCode != 1)
+		{
+			std::string msg = Utility::getLastError();
+			throw SSLContextException("Cannot add certificate authority to Context", msg);
+		}
+	}
+	else
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot add certificate authority to Context", msg);
+	}
+}
+
+
 void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 {
 	int errCode = SSL_CTX_use_RSAPrivateKey(_pSSLContext, key.impl()->getRSA());
@@ -291,7 +308,7 @@ long Context::getSessionTimeout() const
 }
 
 
-void Context::flushSessionCache() 
+void Context::flushSessionCache()
 {
 	poco_assert (isForServerUse());
 
@@ -413,7 +430,7 @@ void Context::createSSLContext()
 			throw Poco::InvalidArgumentException("Invalid or unsupported usage");
 		}
 	}
-	if (!_pSSLContext) 
+	if (!_pSSLContext)
 	{
 		unsigned long err = ERR_get_error();
 		throw SSLException("Cannot create SSL_CTX object", ERR_error_string(err, 0));
@@ -439,7 +456,7 @@ void Context::initDH(const std::string& dhParamsFile)
 	// -----END DH PARAMETERS-----
 	//
 
-	static const unsigned char dh1024_p[] = 
+	static const unsigned char dh1024_p[] =
 	{
 		0xB1,0x0B,0x8F,0x96,0xA0,0x80,0xE0,0x1D,0xDE,0x92,0xDE,0x5E,
 		0xAE,0x5D,0x54,0xEC,0x52,0xC9,0x9F,0xBC,0xFB,0x06,0xA3,0xC6,
@@ -454,7 +471,7 @@ void Context::initDH(const std::string& dhParamsFile)
 		0xDF,0x1F,0xB2,0xBC,0x2E,0x4A,0x43,0x71,
 	};
 
-	static const unsigned char dh1024_g[] = 
+	static const unsigned char dh1024_g[] =
 	{
 		0xA4,0xD1,0xCB,0xD5,0xC3,0xFD,0x34,0x12,0x67,0x65,0xA4,0x42,
 		0xEF,0xB9,0x99,0x05,0xF8,0x10,0x4D,0xD2,0x58,0xAC,0x50,0x7F,
@@ -470,38 +487,50 @@ void Context::initDH(const std::string& dhParamsFile)
 	};
 
 	DH* dh = 0;
-	if (!dhParamsFile.empty()) 
+	if (!dhParamsFile.empty())
 	{
 		BIO* bio = BIO_new_file(dhParamsFile.c_str(), "r");
-		if (!bio) 
+		if (!bio)
 		{
 			std::string msg = Utility::getLastError();
 			throw SSLContextException(std::string("Error opening Diffie-Hellman parameters file ") + dhParamsFile, msg);
 		}
 		dh = PEM_read_bio_DHparams(bio, 0, 0, 0);
 		BIO_free(bio);
-		if (!dh) 
+		if (!dh)
 		{
 			std::string msg = Utility::getLastError();
 			throw SSLContextException(std::string("Error reading Diffie-Hellman parameters from file ") + dhParamsFile, msg);
 		}
-	} 
-	else 
+	}
+	else
 	{
 		dh = DH_new();
-		if (!dh) 
+		if (!dh)
 		{
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
-		dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
-		dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
-		dh->length = 160;
-		if ((!dh->p) || (!dh->g)) 
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+		DH_set0_pqg(dh, p, 0, g);
+		DH_set_length(dh, 160);
+		if (!p || !g)
 		{
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
+#else
+		dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+		dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+		dh->length = 160;
+		if ((!dh->p) || (!dh->g))
+		{
+			DH_free(dh);
+			throw SSLContextException("Error creating Diffie-Hellman parameters");
+		}
+#endif
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
@@ -518,21 +547,21 @@ void Context::initECDH(const std::string& curve)
 #if OPENSSL_VERSION_NUMBER >= 0x0090800fL
 #ifndef OPENSSL_NO_ECDH
 	int nid = 0;
-	if (!curve.empty()) 
+	if (!curve.empty())
 	{
 		nid = OBJ_sn2nid(curve.c_str());
-	} 
-	else 
+	}
+	else
 	{
 		nid = OBJ_sn2nid("prime256v1");
 	}
-	if (nid == 0) 
+	if (nid == 0)
 	{
 		throw SSLContextException("Unknown ECDH curve name", curve);
 	}
 
 	EC_KEY* ecdh = EC_KEY_new_by_curve_name(nid);
-	if (!ecdh) 
+	if (!ecdh)
 	{
 		throw SSLContextException("Cannot create ECDH curve");
 	}

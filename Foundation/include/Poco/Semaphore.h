@@ -1,8 +1,6 @@
 //
 // Semaphore.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Semaphore.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Semaphore
@@ -22,31 +20,24 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/Semaphore_WIN32.h"
-#elif defined(POCO_VXWORKS)
-#include "Poco/Semaphore_VX.h"
-#else
-#include "Poco/Semaphore_POSIX.h"
-#endif
+#include <mutex>
+#include <condition_variable>
 
 
 namespace Poco {
 
 
-class Foundation_API Semaphore: private SemaphoreImpl
-	/// A Semaphore is a synchronization object with the following 
+class Foundation_API Semaphore
+	/// A Semaphore is a synchronization object with the following
 	/// characteristics:
 	/// A semaphore has a value that is constrained to be a non-negative
-	/// integer and two atomic operations. The allowable operations are V 
-	/// (here called set()) and P (here called wait()). A V (set()) operation 
-	/// increases the value of the semaphore by one. 
-	/// A P (wait()) operation decreases the value of the semaphore by one, 
-	/// provided that can be done without violating the constraint that the 
-	/// value be non-negative. A P (wait()) operation that is initiated when 
-	/// the value of the semaphore is 0 suspends the calling thread. 
+	/// integer and two atomic operations. The allowable operations are V
+	/// (here called set()) and P (here called wait()). A V (set()) operation
+	/// increases the value of the semaphore by one.
+	/// A P (wait()) operation decreases the value of the semaphore by one,
+	/// provided that can be done without violating the constraint that the
+	/// value be non-negative. A P (wait()) operation that is initiated when
+	/// the value of the semaphore is 0 suspends the calling thread.
 	/// The calling thread may continue when the value becomes positive again.
 {
 public:
@@ -75,7 +66,7 @@ public:
 	void wait();
 		/// Waits for the semaphore to become signalled.
 		/// To become signalled, a semaphore's value must
-		/// be greater than zero. 
+		/// be greater than zero.
 		/// Decrements the semaphore's value by one.
 
 	void wait(long milliseconds);
@@ -102,28 +93,23 @@ private:
 	Semaphore();
 	Semaphore(const Semaphore&);
 	Semaphore& operator = (const Semaphore&);
+
+	bool waitImpl(long milliseconds);
+
+	int _count;
+	int _max;
+	std::mutex _mutex;
+	std::condition_variable _cv;
 };
 
 
 //
 // inlines
 //
-inline void Semaphore::set()
-{
-	setImpl();
-}
-
-
-inline void Semaphore::wait()
-{
-	waitImpl();
-}
-
 
 inline void Semaphore::wait(long milliseconds)
 {
-	if (!waitImpl(milliseconds))
-		throw TimeoutException();
+	if (!waitImpl(milliseconds)) throw TimeoutException();
 }
 
 

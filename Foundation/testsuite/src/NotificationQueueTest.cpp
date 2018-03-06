@@ -1,8 +1,6 @@
 //
 // NotificationQueueTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NotificationQueueTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -32,7 +30,7 @@ namespace
 	class QTestNotification: public Notification
 	{
 	public:
-		QTestNotification(const std::string& rData): _data(rData)
+		QTestNotification(const std::string& data): _data(data)
 		{
 		}
 		~QTestNotification()

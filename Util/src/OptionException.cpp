@@ -1,8 +1,6 @@
 //
 // OptionException.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionException.cpp#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionException
@@ -22,7 +20,7 @@ namespace Poco {
 namespace Util {
 
 
-POCO_IMPLEMENT_EXCEPTION(OptionException, Poco::DataException, "Option exception")
+POCO_IMPLEMENT_EXCEPTION(OptionException, Poco::SQLException, "Option exception")
 POCO_IMPLEMENT_EXCEPTION(UnknownOptionException, OptionException, "Unknown option specified")
 POCO_IMPLEMENT_EXCEPTION(AmbiguousOptionException, OptionException, "Ambiguous option specified")
 POCO_IMPLEMENT_EXCEPTION(MissingOptionException, OptionException, "Required option not specified")

@@ -1,8 +1,6 @@
 //
 // Platform.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform.h#5 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform
@@ -40,6 +38,8 @@
 #define POCO_OS_VXWORKS       0x000c
 #define POCO_OS_CYGWIN        0x000d
 #define POCO_OS_NACL	      0x000e
+#define POCO_OS_ANDROID       0x000f
+#define POCO_OS_EMSCRIPTEN    0x0010
 #define POCO_OS_UNKNOWN_UNIX  0x00ff
 #define POCO_OS_WINDOWS_NT    0x1001
 #define POCO_OS_WINDOWS_CE    0x1011
@@ -62,9 +62,16 @@
 #elif defined(__NACL__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_NACL
-#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__) || defined(EMSCRIPTEN)
+#elif defined(__EMSCRIPTEN__) || defined(EMSCRIPTEN)
 	#define POCO_OS_FAMILY_UNIX 1
-	#define POCO_OS POCO_OS_LINUX
+	#define POCO_OS POCO_OS_EMSCRIPTEN
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__TOS_LINUX__)
+	#define POCO_OS_FAMILY_UNIX 1
+	#if defined(__ANDROID__)
+		#define POCO_OS POCO_OS_ANDROID
+	#else
+		#define POCO_OS POCO_OS_LINUX
+	#endif
 #elif defined(__APPLE__) || defined(__TOS_MACOS__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS_FAMILY_BSD 1
@@ -135,7 +142,7 @@
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 	#define POCO_ARCH POCO_ARCH_ALPHA
 	#define POCO_ARCH_LITTLE_ENDIAN 1
-#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || defined(EMSCRIPTEN)
+#elif defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86) || defined(EMSCRIPTEN) || defined(__EMSCRIPTEN__)
 	#define POCO_ARCH POCO_ARCH_IA32
 	#define POCO_ARCH_LITTLE_ENDIAN 1
 #elif defined(_IA64) || defined(__IA64__) || defined(__ia64__) || defined(__ia64) || defined(_M_IA64)
@@ -185,7 +192,7 @@
 	#else
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
-#elif defined(__arm64__) || defined(__arm64) 
+#elif defined(__arm64__) || defined(__arm64)
 	#define POCO_ARCH POCO_ARCH_ARM64
 	#if defined(__ARMEB__)
 		#define POCO_ARCH_BIG_ENDIAN 1
@@ -227,6 +234,9 @@
 	#define POCO_COMPILER_MSVC
 #elif defined(__clang__)
 	#define POCO_COMPILER_CLANG
+	#if defined(__apple_build_version__)
+		#define POCO_COMPILER_APPLECLANG
+	#endif
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
 #elif defined (__MINGW32__) || defined (__MINGW64__)

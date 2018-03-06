@@ -1,8 +1,6 @@
 //
 // Struct.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Struct.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Struct
@@ -165,6 +163,18 @@ public:
 		_data.erase(it);
 	}
 
+	inline void clear()
+		/// Remove all elements from the struct
+	{
+		_data.clear();
+	}
+	
+	inline void swap(Struct& other)
+		/// Swap content of Struct with another Struct
+	{
+		_data.swap(other._data);
+	}
+
 	inline bool empty() const
 		/// Returns true if the Struct doesn't contain any members
 	{
@@ -186,8 +196,33 @@ public:
 		for (; it != itEnd; ++it) keys.insert(it->first);
 		return keys;
 	}
-
-	std::string toString()
+  
+  inline Var getVar(const K& key) const
+		/// Returns the var value of the element with the given name.
+		/// Throws a NotFoundException if the key does not exist.
+  {
+    ConstIterator it = find(key);
+    if(it == end())
+    {
+      throw NotFoundException("Key not found in Struct");
+    }
+    return it->second;
+  }
+  
+  template<typename DefT = Var>
+  inline Var getVar(const K& key, const DefT& defaultValue) const
+		/// Returns the var value of the element with the given name.
+		/// or defaultValue if none is found.
+  {
+    ConstIterator it = find(key);
+    if(it == end())
+    {
+      return defaultValue;
+    }
+    return it->second;
+  }
+  
+	std::string toString() const
 	{
 		std::string str;
 		Var(*this).template convert<std::string>(str);

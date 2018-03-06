@@ -1,8 +1,6 @@
 //
 // RawSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/RawSocketImpl.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  RawSocketImpl
@@ -44,8 +42,8 @@ RawSocketImpl::RawSocketImpl(SocketAddress::Family family, int proto)
 }
 
 	
-RawSocketImpl::RawSocketImpl(poco_socket_t socketfd): 
-	SocketImpl(socketfd)
+RawSocketImpl::RawSocketImpl(poco_socket_t sockfd):
+	SocketImpl(sockfd)
 {
 }
 

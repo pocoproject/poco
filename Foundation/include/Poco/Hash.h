@@ -1,8 +1,6 @@
 //
 // Hash.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Hash.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  Hash
@@ -55,49 +53,49 @@ struct Hash
 //
 inline std::size_t hash(Int8 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(UInt8 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(Int16 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(UInt16 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(Int32 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(UInt32 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(Int64 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 
 inline std::size_t hash(UInt64 n)
 {
-	return static_cast<std::size_t>(n)*2654435761U; 
+	return static_cast<std::size_t>(n)*2654435761U;
 }
 
 

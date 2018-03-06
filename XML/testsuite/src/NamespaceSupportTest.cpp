@@ -1,8 +1,6 @@
 //
 // NamespaceSupportTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NamespaceSupportTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -19,7 +17,7 @@
 using Poco::XML::NamespaceSupport;
 
 
-NamespaceSupportTest::NamespaceSupportTest(const std::string& rName): CppUnit::TestCase(rName)
+NamespaceSupportTest::NamespaceSupportTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

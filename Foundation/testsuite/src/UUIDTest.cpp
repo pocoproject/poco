@@ -1,8 +1,6 @@
 //
 // UUIDTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UUIDTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -89,6 +87,24 @@ void UUIDTest::testParse()
 	try
 	{
 		uuid.parse("6ba7b810-9dad-11d1-80b4-00x04fd430c8");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b8109dad11d180b400c04fd430c81234");
+		fail("invalid UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	try
+	{
+		uuid.parse("6ba7b810-9dad-11d1-80b4-00c04fd430c81234");
 		fail("invalid UUID - must throw");
 	}
 	catch (Poco::SyntaxException&)

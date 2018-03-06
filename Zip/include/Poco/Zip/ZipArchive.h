@@ -1,8 +1,6 @@
 //
 // ZipArchive.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipArchive.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipArchive
@@ -24,7 +22,6 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipFileInfo.h"
 #include "Poco/Zip/ZipArchiveInfo.h"
-
 #include <istream>
 #include <map>
 

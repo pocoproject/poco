@@ -1,8 +1,6 @@
 //
 // FilesystemConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/FilesystemConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -24,7 +22,7 @@ using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
 
 
-FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& rName): AbstractConfigurationTest(rName),
+FilesystemConfigurationTest::FilesystemConfigurationTest(const std::string& name): AbstractConfigurationTest(name),
 	_path("TestConfiguration")
 {
 }

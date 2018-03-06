@@ -1,8 +1,6 @@
 //
 // ConfigurationView.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ConfigurationView.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationView
@@ -29,9 +27,9 @@ namespace Util {
 
 
 class Util_API ConfigurationView: public AbstractConfiguration
-	/// This configuration implements a "view" into a sub-hierarchy 
+	/// This configuration implements a "view" into a sub-hierarchy
 	/// of another configuration.
-	/// 
+	///
 	/// For example, given a configuration with the following properties:
 	///     config.value1
 	///     config.value2

@@ -1,8 +1,6 @@
 //
 // SimpleHashTable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SimpleHashTable.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  SimpleHashTable
@@ -58,7 +56,7 @@ public:
 
 	typedef std::vector<HashEntry*> HashTableVector;
 
-	SimpleHashTable(UInt32 tableCapacity = 251): _entries(tableCapacity, 0), _size(0), _capacity(tableCapacity)
+	SimpleHashTable(UInt32 capacity = 251): _entries(capacity, 0), _size(0), _capacity(capacity)
 		/// Creates the SimpleHashTable.
 	{
 	}
@@ -70,7 +68,7 @@ public:
 		_entries.reserve(ht._capacity);
 		for (typename HashTableVector::iterator it = ht._entries.begin(); it != ht._entries.end(); ++it)
 		{
-			if (*it) 
+			if (*it)
 				_entries.push_back(new HashEntry(*it));
 			else
 				_entries.push_back(0);
@@ -366,11 +364,11 @@ public:
 			if (_entries[i])
 			{
 				maxEntriesPerHash = 1;
-				UInt32 entrySize = 1;
+				UInt32 size = 1;
 				if (details)
-					detailedEntriesPerHash.push_back(entrySize);
+					detailedEntriesPerHash.push_back(size);
 	#ifdef _DEBUG
-				totalSize += entrySize;
+				totalSize += size;
 	#endif
 			}
 			else

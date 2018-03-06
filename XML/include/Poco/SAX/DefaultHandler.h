@@ -1,8 +1,6 @@
 //
 // DefaultHandler.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/DefaultHandler.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX
@@ -32,15 +30,15 @@ namespace XML {
 
 
 class XML_API DefaultHandler: public EntityResolver, public DTDHandler, public ContentHandler, public ErrorHandler
-	/// Default base class for SAX2 event handlers. 
-	/// This class is available as a convenience base class for SAX2 applications: 
+	/// Default base class for SAX2 event handlers.
+	/// This class is available as a convenience base class for SAX2 applications:
 	/// it provides default implementations for all of the
 	/// callbacks in the four core SAX2 handler classes:
-	///      * EntityResolver 
-	///      * DTDHandler 
-	///      * ContentHandler 
-	///      * ErrorHandler 
-	/// Application writers can extend this class when they need to implement only 
+	///      * EntityResolver
+	///      * DTDHandler
+	///      * ContentHandler
+	///      * ErrorHandler
+	/// Application writers can extend this class when they need to implement only
 	/// part of an interface; parser writers can instantiate this
 	/// class to provide default handlers when the application has not supplied its own.
 {

@@ -1,8 +1,6 @@
 //
 // OptionSetTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/OptionSetTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -22,7 +20,7 @@ using Poco::Util::OptionSet;
 using Poco::Util::Option;
 
 
-OptionSetTest::OptionSetTest(const std::string& rName): CppUnit::TestCase(rName)
+OptionSetTest::OptionSetTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

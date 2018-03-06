@@ -1,8 +1,6 @@
 //
 // ExpireLRUCacheTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ExpireLRUCacheTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -95,7 +93,7 @@ void ExpireLRUCacheTest::testExpireN()
 	assert (aCache.has(3));
 	tmp = aCache.get(1);
 	SharedPtr<int> tmp2 = aCache.get(3);
-	assert (*tmp == 2); 
+	assert (*tmp == 2);
 	assert (*tmp2 == 4);
 
 	Thread::sleep(DURHALFSLEEP+25); //3|1

@@ -1,8 +1,6 @@
 //
 // WindowsConsoleChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/WindowsConsoleChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  WindowsConsoleChannel
@@ -35,14 +33,13 @@ class Foundation_API WindowsConsoleChannel: public Channel
 	/// Only the message's text is written, followed
 	/// by a newline.
 	///
-	/// If POCO has been compiled with POCO_WIN32_UTF8,
-	/// log messages are assumed to be UTF-8 encoded, and
+	/// Log messages are assumed to be UTF-8 encoded, and
 	/// are converted to UTF-16 prior to writing them to the
 	/// console. This is the main difference to the ConsoleChannel
 	/// class, which cannot handle UTF-8 encoded messages on Windows.
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is contained 
+	/// appropriate Formatter to control what is contained
 	/// in the text.
 	///
 	/// Only available on Windows platforms.
@@ -69,8 +66,7 @@ class Foundation_API WindowsColorConsoleChannel: public Channel
 	/// Only the message's text is written, followed
 	/// by a newline.
 	///
-	/// If POCO has been compiled with POCO_WIN32_UTF8,
-	/// log messages are assumed to be UTF-8 encoded, and
+	/// Log messages are assumed to be UTF-8 encoded, and
 	/// are converted to UTF-16 prior to writing them to the
 	/// console. This is the main difference to the ConsoleChannel
 	/// class, which cannot handle UTF-8 encoded messages on Windows.
@@ -81,7 +77,7 @@ class Foundation_API WindowsColorConsoleChannel: public Channel
 	/// property to true (default). Furthermore, colors can be
 	/// configured by setting the following properties
 	/// (default values are given in parenthesis):
-	/// 
+	///
 	///   * traceColor (gray)
 	///   * debugColor (gray)
 	///   * informationColor (default)
@@ -92,7 +88,7 @@ class Foundation_API WindowsColorConsoleChannel: public Channel
 	///   * fatalColor (lightRed)
 	///
 	/// The following color values are supported:
-	/// 
+	///
 	///   * default
 	///   * black
 	///   * red
@@ -112,7 +108,7 @@ class Foundation_API WindowsColorConsoleChannel: public Channel
 	///   * white
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is contained 
+	/// appropriate Formatter to control what is contained
 	/// in the text.
 	///
 	/// Only available on Windows platforms.
@@ -125,8 +121,8 @@ public:
 		/// Logs the given message to the channel's stream.
 
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets the property with the given name. 
-		/// 
+		/// Sets the property with the given name.
+		///
 		/// The following properties are supported:
 		///   * enableColors:      Enable or disable colors.
 		///   * traceColor:        Specify color for trace messages.

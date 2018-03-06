@@ -1,8 +1,6 @@
 //
 // TaskTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TaskTestSuite.h#1 $
-//
 // Definition of the TaskTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // MediaTypeTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MediaTypeTest.cpp#2 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -19,7 +17,7 @@
 using Poco::Net::MediaType;
 
 
-MediaTypeTest::MediaTypeTest(const std::string& rName): CppUnit::TestCase(rName)
+MediaTypeTest::MediaTypeTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

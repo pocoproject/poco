@@ -1,8 +1,6 @@
 //
 // TestSuite.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestSuite.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_TestSuite_INCLUDED
@@ -81,7 +79,7 @@ inline void TestSuite::addTest(Test* test)
 // Returns a std::string representation of the test suite.
 inline std::string TestSuite::toString()
 {
-	return "suite " + _name; 
+	return "suite " + _name;
 }
 
 

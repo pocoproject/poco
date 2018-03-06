@@ -1,8 +1,6 @@
 //
 // FileChannelTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileChannelTest.h#1 $
-//
 // Definition of the FileChannelTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -23,7 +21,7 @@
 class FileChannelTest: public CppUnit::TestCase
 {
 public:
-	enum TimeRotation 
+	enum TimeRotation
 	{
 		DAY_HOUR_MIN = 0,
 		HOUR_MIN,

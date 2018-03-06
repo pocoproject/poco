@@ -1,8 +1,6 @@
 //
 // UnicodeConverter.cpp
 //
-// $Id: //poco/1.4/Foundation/src/UnicodeConverter.cpp#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UnicodeConverter
@@ -21,6 +19,9 @@
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF32Encoding.h"
 #include <cstring>
+
+
+#if !defined(POCO_NO_WSTRING)
 
 
 namespace Poco {
@@ -71,7 +72,7 @@ void UnicodeConverter::convert(const std::string& utf8String, UTF16String& utf16
 	UTF8Encoding utf8Encoding;
 	TextIterator it(utf8String, utf8Encoding);
 	TextIterator end(utf8String);
-	while (it != end) 
+	while (it != end)
 	{
 		int cc = *it++;
 		if (cc <= 0xffff)
@@ -161,3 +162,6 @@ void UnicodeConverter::convert(const UTF32Char* utf32String, std::string& utf8St
 
 
 } // namespace Poco
+
+
+#endif // POCO_OS_FAMILY_WINDOWS && !POCO_NO_WSTRING

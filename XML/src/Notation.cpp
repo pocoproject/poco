@@ -1,8 +1,6 @@
 //
 // Notation.cpp
 //
-// $Id: //poco/1.4/XML/src/Notation.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -21,16 +19,16 @@ namespace Poco {
 namespace XML {
 
 
-Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& rPublicId, const XMLString& rSystemId): 
+Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
 	AbstractNode(pOwnerDocument),
 	_name(name),
-	_publicId(rPublicId),
-	_systemId(rSystemId)
+	_publicId(publicId),
+	_systemId(systemId)
 {
 }
 
 
-Notation::Notation(Document* pOwnerDocument, const Notation& notation): 
+Notation::Notation(Document* pOwnerDocument, const Notation& notation):
 	AbstractNode(pOwnerDocument, notation),
 	_name(notation._name),
 	_publicId(notation._publicId),

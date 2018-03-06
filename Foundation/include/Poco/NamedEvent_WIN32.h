@@ -1,8 +1,6 @@
 //
 // NamedEvent_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedEvent_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent
@@ -36,7 +34,8 @@ protected:
 	void waitImpl();
 	
 private:
-	std::string _name;
+	std::string  _name;
+	std::wstring _uname;
 	HANDLE      _event;	
 };
 

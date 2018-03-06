@@ -1,8 +1,6 @@
 //
 // BinaryReaderWriter.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/BinaryReaderWriter/src/BinaryReaderWriter.cpp#1 $
-//
 // This sample demonstrates the BinaryWriter and BinaryReader classes.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -32,7 +30,7 @@ int main(int argc, char** argv)
 	       << 42
 	       << 3.14159265
 	       << "foo bar";
-	       
+	
 	bool   b;
 	char   c;
 	int    i;
@@ -45,7 +43,7 @@ int main(int argc, char** argv)
 	       >> i
 	       >> d
 	       >> s;
-	       
+	
 	std::cout << b << std::endl
 	          << c << std::endl
 	          << i << std::endl

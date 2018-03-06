@@ -1,8 +1,6 @@
 //
 // OAuth10Credentials.cpp
 //
-// $Id$
-//
 // Library: Net
 // Package: OAuth
 // Module:	OAuth10Credentials
@@ -261,7 +259,7 @@ void OAuth10Credentials::signHMACSHA1(Poco::Net::HTTPRequest& request, const std
 	std::string timestamp(_timestamp);
 	if (timestamp.empty())
 	{
-		timestamp = Poco::NumberFormatter::format(Poco::Timestamp().epochTime());
+		timestamp = Poco::NumberFormatter::format(static_cast<Poco::UInt64>(Poco::Timestamp().epochTime()));
 	}
 	std::string signature(createSignature(request, uri, params, nonce, timestamp));
 

@@ -1,8 +1,6 @@
 //
 // PDFTestSuite.h
 //
-// $Id: //poco/Main/PDF/testsuite/src/PDFTestSuite.h#1 $
-//
 // Definition of the PDFTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -16,7 +14,7 @@
 #define PDFTestSuite_INCLUDED
 
 
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestSuite.h"
 
 
 class PDFTestSuite

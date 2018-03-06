@@ -1,8 +1,6 @@
 //
 // HexBinaryEncoder.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/HexBinaryEncoder.h#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  HexBinary
@@ -31,8 +29,8 @@ namespace Poco {
 class Foundation_API HexBinaryEncoderBuf: public UnbufferedStreamBuf
 	/// This streambuf encodes all data written
 	/// to it in hexBinary encoding and forwards it to a connected
-	/// ostream. 
-	/// In hexBinary encoding, each binary octet is encoded as a character tuple,  
+	/// ostream.
+	/// In hexBinary encoding, each binary octet is encoded as a character tuple,
 	/// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
 	/// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
 	/// section 3.2.15.
@@ -52,7 +50,7 @@ public:
 	void setLineLength(int lineLength);
 		/// Specify the line length.
 		///
-		/// After the given number of characters have been written, 
+		/// After the given number of characters have been written,
 		/// a newline character will be written.
 		///
 		/// Specify 0 for an unlimited line length.
@@ -97,7 +95,7 @@ class Foundation_API HexBinaryEncoder: public HexBinaryEncoderIOS, public std::o
 	/// Always call close() when done
 	/// writing data, to ensure proper
 	/// completion of the encoding operation.
-	/// In hexBinary encoding, each binary octet is encoded as a character tuple,  
+	/// In hexBinary encoding, each binary octet is encoded as a character tuple,
 	/// consisting of two hexadecimal digits ([0-9a-fA-F]) representing the octet code.
 	/// See also: XML Schema Part 2: Datatypes (http://www.w3.org/TR/xmlschema-2/),
 	/// section 3.2.15.

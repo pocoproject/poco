@@ -1,8 +1,6 @@
 //
 // ThreadTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ThreadTest.h#1 $
-//
 // Definition of the ThreadTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

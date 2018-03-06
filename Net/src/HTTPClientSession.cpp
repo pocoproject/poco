@@ -1,8 +1,6 @@
 //
 // HTTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPClientSession.cpp#15 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPClientSession
@@ -52,8 +50,8 @@ HTTPClientSession::HTTPClientSession():
 }
 
 
-HTTPClientSession::HTTPClientSession(const StreamSocket& rSocket):
-	HTTPSession(rSocket),
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
+	HTTPSession(socket),
 	_port(HTTPSession::HTTP_PORT),
 	_proxyConfig(_globalProxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
@@ -62,6 +60,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& rSocket):
 	_expectResponseBody(false),
 	_responseReceived(false)
 {
+	setKeepAlive(true);
 }
 
 
@@ -104,6 +103,20 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 }
 
 
+HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig):
+	HTTPSession(socket),
+	_port(HTTPSession::HTTP_PORT),
+	_proxyConfig(proxyConfig),
+	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
+	_reconnect(false),
+	_mustReconnect(false),
+	_expectResponseBody(false),
+	_responseReceived(false)
+{
+	setKeepAlive(true);
+}
+
+
 HTTPClientSession::~HTTPClientSession()
 {
 }
@@ -124,6 +137,23 @@ void HTTPClientSession::setPort(Poco::UInt16 port)
 		_port = port;
 	else
 		throw IllegalStateException("Cannot set the port number for an already connected session");
+}
+
+
+void HTTPClientSession::setSourceAddress(const SocketAddress& address)
+{
+	if (!connected())
+	{
+		_sourceAddress = address;
+	}
+	else
+		throw IllegalStateException("Cannot set the source address for an already connected session");
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress()
+{
+	return _sourceAddress;
 }
 
 
@@ -167,7 +197,7 @@ void HTTPClientSession::setProxyUsername(const std::string& username)
 {
 	_proxyConfig.username = username;
 }
-	
+
 
 void HTTPClientSession::setProxyPassword(const std::string& password)
 {
@@ -249,7 +279,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		{
 			_pRequestStream = new HTTPOutputStream(*this);
 			request.write(*_pRequestStream);
-		}	
+		}
 		_lastRequest.update();
 		return *_pRequestStream;
 	}
@@ -303,7 +333,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 #endif
 	else
 		_pResponseStream = new HTTPInputStream(*this);
-		
+
 	return *_pResponseStream;
 }
 
@@ -376,7 +406,10 @@ void HTTPClientSession::reconnect()
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
 		SocketAddress addr(_host, _port);
-		connect(addr);
+		if ((!_sourceAddress.host().isWildcard()) || (_sourceAddress.port() != 0))
+			connect(addr, _sourceAddress);
+		else
+			connect(addr);
 	}
 	else
 	{

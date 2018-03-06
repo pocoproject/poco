@@ -1,8 +1,6 @@
 //
 // StreamSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/StreamSocket.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  StreamSocket
@@ -35,9 +33,9 @@ StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
 }
 
 
-StreamSocket::StreamSocket(const SocketAddress& rAddress): Socket(new StreamSocketImpl(rAddress.family()))
+StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl(address.family()))
 {
-	connect(rAddress);
+	connect(address);
 }
 
 
@@ -75,21 +73,27 @@ StreamSocket& StreamSocket::operator = (const Socket& socket)
 }
 
 
-void StreamSocket::connect(const SocketAddress& rAddress)
+void StreamSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
-	impl()->connect(rAddress);
+	impl()->bind(address, reuseAddress);
 }
 
 
-void StreamSocket::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
+void StreamSocket::connect(const SocketAddress& address)
 {
-	impl()->connect(rAddress, timeout);
+	impl()->connect(address);
 }
 
 
-void StreamSocket::connectNB(const SocketAddress& rAddress)
+void StreamSocket::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
-	impl()->connectNB(rAddress);
+	impl()->connect(address, timeout);
+}
+
+
+void StreamSocket::connectNB(const SocketAddress& address)
+{
+	impl()->connectNB(address);
 }
 
 

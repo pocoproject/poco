@@ -1,8 +1,6 @@
 //
 // ConfigurationMapper.cpp
 //
-// $Id: //poco/1.4/Util/src/ConfigurationMapper.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationMapper
@@ -51,7 +49,7 @@ bool ConfigurationMapper::getRaw(const std::string& key, std::string& value) con
 void ConfigurationMapper::setRaw(const std::string& key, const std::string& value)
 {
 	std::string translatedKey = translateKey(key);
-	_pConfig->setRaw(translatedKey, value); 
+	_pConfig->setRaw(translatedKey, value);
 }
 
 

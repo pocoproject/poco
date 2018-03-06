@@ -1,24 +1,30 @@
 //
 // RedisStream.cpp
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  RedisStream
 //
 // Implementation of the RedisStream class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-#include <iostream>
+
+
 #include "Poco/Redis/RedisStream.h"
+#include <iostream>
+
 
 namespace Poco {
 namespace Redis {
+
+
+//
+// RedisStreamBuf
+//
 
 
 RedisStreamBuf::RedisStreamBuf(Net::StreamSocket& redis):
@@ -35,14 +41,20 @@ RedisStreamBuf::~RedisStreamBuf()
 
 int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 {
-	return _redis.receiveBytes(buffer, len);
+	return _redis.receiveBytes(buffer, static_cast<int>(len));
 }
 
 
 int RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	return _redis.sendBytes(buffer, length);
+	return _redis.sendBytes(buffer, static_cast<int>(length));
 }
+
+
+//
+// RedisIOS
+//
+
 
 RedisIOS::RedisIOS(Net::StreamSocket& redis):
 	_buf(redis)
@@ -74,6 +86,12 @@ void RedisIOS::close()
 	_buf.sync();
 }
 
+
+//
+// RedisOutputStream
+//
+
+
 RedisOutputStream::RedisOutputStream(Net::StreamSocket& redis):
 	RedisIOS(redis),
 	std::ostream(&_buf)
@@ -85,6 +103,7 @@ RedisOutputStream::~RedisOutputStream()
 {
 }
 
+
 RedisInputStream::RedisInputStream(Net::StreamSocket& redis):
 	RedisIOS(redis),
 	std::istream(&_buf)
@@ -92,9 +111,15 @@ RedisInputStream::RedisInputStream(Net::StreamSocket& redis):
 }
 
 
+//
+// RedisInputStream
+//
+
+
 RedisInputStream::~RedisInputStream()
 {
 }
+
 
 std::string RedisInputStream::getline()
 {
@@ -105,4 +130,4 @@ std::string RedisInputStream::getline()
 }
 
 
-}}
+} } // namespace Poco::Redis

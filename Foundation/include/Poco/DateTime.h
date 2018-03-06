@@ -1,8 +1,6 @@
 //
 // DateTime.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DateTime.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTime
@@ -36,7 +34,7 @@ class Foundation_API DateTime
 	/// UTC, Julian day and Gregorian calendar dates.
 	///
 	/// The date and time stored in a DateTime is always in UTC
-	/// (Coordinated Universal Time) and thus independent of the 
+	/// (Coordinated Universal Time) and thus independent of the
 	/// timezone in effect on the system.
 	///
 	/// Conversion calculations are based on algorithms
@@ -44,7 +42,7 @@ class Foundation_API DateTime
 	/// http://vsg.cape.com/~pbaum/date/date0.htm
 	///
 	/// Internally, this class stores a date/time in two
-	/// forms (UTC and broken down) for performance reasons. Only use 
+	/// forms (UTC and broken down) for performance reasons. Only use
 	/// this class for conversions between date/time representations.
 	/// Use the Timestamp class for everything else.
 	///
@@ -106,6 +104,7 @@ public:
 		///   * second is from 0 to 59.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	DateTime(double julianDay);
 		/// Creates a DateTime for the given Julian day.
@@ -140,6 +139,7 @@ public:
 		///   * second is from 0 to 59.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	void swap(DateTime& dateTime);
 		/// Swaps the DateTime with another one.
@@ -153,9 +153,9 @@ public:
 	int week(int firstDayOfWeek = MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
-		/// The returned week number will be from 0 to 53. Week number 1 is the week 
+		/// The returned week number will be from 0 to 53. Week number 1 is the week
 		/// containing January 4. This is in accordance to ISO 8601.
-		/// 
+		///
 		/// The following example assumes that firstDayOfWeek is MONDAY. For 2005, which started
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
@@ -280,6 +280,21 @@ private:
 //
 // inlines
 //
+
+
+inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
+{
+	double utcDays = double(utcTime)/864000000000.0;
+	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
+}
+
+
+inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
+{
+	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
+}
+
+
 inline Timestamp DateTime::timestamp() const
 {
 	return Timestamp::fromUtcTime(_utcTime);

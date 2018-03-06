@@ -1,8 +1,6 @@
 //
 // XMLStreamParser.h
 //
-// $Id$
-//
 // Library: XML
 // Package: XML
 // Module:  XMLStreamParser
@@ -32,12 +30,16 @@
 #include "Poco/XML/QName.h"
 #include "Poco/XML/ValueTraits.h"
 #include "Poco/XML/Content.h"
+#if defined(POCO_UNBUNDLED)
+#include <expat.h>
+#else
 #include <Poco/XML/expat.h>
+#endif
 #include <map>
 #include <vector>
 #include <string>
 #include <iosfwd>
-#include <cstddef> 
+#include <cstddef>
 
 
 namespace Poco {
@@ -75,10 +77,10 @@ class XML_API XMLStreamParser
 	///         switch (e)
 	///         {
 	///         case XMLStreamParser::EV_START_ELEMENT:
-	///             cerr << p.line () << ':' << p.column () << ": start " << p.name () << endl; 
+	///             cerr << p.line () << ':' << p.column () << ": start " << p.name () << endl;
 	///             break;
 	///         case XMLStreamParser::EV_END_ELEMENT:
-	///             cerr << p.line () << ':' << p.column () << ": end " << p.name () << endl; 
+	///             cerr << p.line () << ':' << p.column () << ": end " << p.name () << endl;
 	///             break;
 	///         case XMLStreamParser::EV_START_ATTRIBUTE:
 	///             ...

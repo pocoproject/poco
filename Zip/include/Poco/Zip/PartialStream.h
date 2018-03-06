@@ -1,8 +1,6 @@
 //
 // PartialStream.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/PartialStream.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  PartialStream
@@ -36,12 +34,12 @@ class Zip_API PartialStreamBuf: public Poco::BufferedStreamBuf
 {
 public:
 	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& prefix, const std::string& postfix, bool initStream);
-		/// Creates the PartialStream. 
+		/// Creates the PartialStream.
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
 		/// to position start
 
 	PartialStreamBuf(std::ostream& out, std::size_t start, std::size_t end, bool initStream);
-		/// Creates the PartialStream. 
+		/// Creates the PartialStream.
 		/// If initStream is true the status of the stream will be cleared on the first access.
 		/// start and end acts as offset values for the written content. A start value greater than zero,
 		/// means that the first bytes are not written but discarded instead,
@@ -64,7 +62,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE  = 1024
 	};
@@ -155,7 +153,7 @@ public:
 		/// Examples:
 		///     start = 3; end = 1
 		///     write("hello", 5) -> "l"
-		///     
+		///
 		///     start = 3; end = 0
 		///     write("hello", 5) -> "lo"
 

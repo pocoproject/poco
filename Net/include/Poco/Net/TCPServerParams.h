@@ -1,8 +1,6 @@
 //
 // TCPServerParams.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/TCPServerParams.h#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerParams
@@ -87,12 +85,12 @@ public:
 		/// available for this TCPServerDispatcher.	
 		
 	void setThreadPriority(Poco::Thread::Priority prio);
-		/// Sets the priority of TCP server threads 
+		/// Sets the priority of TCP server threads
 		/// created by TCPServer.
 		
 	Poco::Thread::Priority getThreadPriority() const;
 		/// Returns the priority of TCP server threads
-		/// created by TCPServer. 
+		/// created by TCPServer.
 
 protected:
 	virtual ~TCPServerParams();

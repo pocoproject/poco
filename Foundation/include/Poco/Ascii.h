@@ -1,8 +1,6 @@
 //
 // Ascii.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Ascii.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Ascii
@@ -67,12 +65,12 @@ public:
 
 	static bool hasSomeProperties(int ch, int properties);
 		/// Returns true if the given character is
-		/// within the ASCII range and has at least one of 
+		/// within the ASCII range and has at least one of
 		/// the given properties.
 
 	static bool hasProperties(int ch, int properties);
 		/// Returns true if the given character is
-		/// within the ASCII range and has all of 
+		/// within the ASCII range and has all of
 		/// the given properties.
 
 	static bool isAscii(int ch);
@@ -105,6 +103,9 @@ public:
 		/// Returns true iff the given character is an uppercase alphabetic
 		/// character.
 		
+	static bool isPrintable(int ch);
+		/// Returns true iff the given character is printable.
+
 	static int toLower(int ch);
 		/// If the given character is an uppercase character,
 		/// return its lowercase counterpart, otherwise return
@@ -125,7 +126,7 @@ private:
 //
 inline int Ascii::properties(int ch)
 {
-	if (isAscii(ch)) 
+	if (isAscii(ch))
 		return CHARACTER_PROPERTIES[ch];
 	else
 		return 0;
@@ -195,6 +196,12 @@ inline bool Ascii::isLower(int ch)
 inline bool Ascii::isUpper(int ch)
 {
 	return hasProperties(ch, ACP_UPPER);
+}
+
+
+inline bool Ascii::isPrintable(int ch)
+{
+	return hasProperties(ch, ACP_PRINT);
 }
 
 

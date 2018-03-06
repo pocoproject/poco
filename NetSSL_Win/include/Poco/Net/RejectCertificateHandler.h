@@ -1,8 +1,6 @@
 //
 // RejectCertificateHandler.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/RejectCertificateHandler.h#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  RejectCertificateHandler
@@ -29,7 +27,7 @@ namespace Net {
 
 
 class NetSSL_Win_API RejectCertificateHandler: public InvalidCertificateHandler
-	/// A RejectCertificateHandler is invoked whenever an error 
+	/// A RejectCertificateHandler is invoked whenever an error
 	/// occurs verifying the certificate. It always rejects
 	/// the certificate.
 {

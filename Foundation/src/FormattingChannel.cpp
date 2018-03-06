@@ -1,8 +1,6 @@
 //
 // FormattingChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FormattingChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Formatter
@@ -23,23 +21,23 @@
 namespace Poco {
 
 
-FormattingChannel::FormattingChannel(): 
-	_pFormatter(0), 
+FormattingChannel::FormattingChannel():
+	_pFormatter(0),
 	_pChannel(0)
 {
 }
 
 
-FormattingChannel::FormattingChannel(Formatter* pFormatter): 
-	_pFormatter(pFormatter), 
+FormattingChannel::FormattingChannel(Formatter* pFormatter):
+	_pFormatter(pFormatter),
 	_pChannel(0)
 {
 	if (_pFormatter) _pFormatter->duplicate();
 }
 
 
-FormattingChannel::FormattingChannel(Formatter* pFormatter, Channel* pChannel): 
-	_pFormatter(pFormatter), 
+FormattingChannel::FormattingChannel(Formatter* pFormatter, Channel* pChannel):
+	_pFormatter(pFormatter),
 	_pChannel(pChannel)
 {
 	if (_pFormatter) _pFormatter->duplicate();

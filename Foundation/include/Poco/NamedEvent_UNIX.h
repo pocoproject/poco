@@ -1,8 +1,6 @@
 //
 // NamedEvent_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedEvent_UNIX.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent
@@ -21,7 +19,7 @@
 
 
 #include "Poco/Foundation.h"
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 #include <semaphore.h>
 #endif
 
@@ -41,7 +39,7 @@ private:
 	std::string getFileName();
 
 	std::string _name;
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
+#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__EMSCRIPTEN__)
 	sem_t* _sem;
 #else
 	int _semid;  // semaphore id

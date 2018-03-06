@@ -1,8 +1,6 @@
 //
 // RemoteSyslogListener.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogListener.cpp#4 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogListener
@@ -43,15 +41,15 @@ namespace Net {
 class MessageNotification: public Poco::Notification
 {
 public:
-	MessageNotification(const char* buffer, std::size_t length, const Poco::Net::SocketAddress& rSourceAddress):
+	MessageNotification(const char* buffer, std::size_t length, const Poco::Net::SocketAddress& sourceAddress):
 		_message(buffer, length),
-		_sourceAddress(rSourceAddress)
+		_sourceAddress(sourceAddress)
 	{
 	}
 
-	MessageNotification(const std::string& rMessage, const Poco::Net::SocketAddress& rSourceAddress):
-		_message(rMessage),
-		_sourceAddress(rSourceAddress)
+	MessageNotification(const std::string& message, const Poco::Net::SocketAddress& sourceAddress):
+		_message(message),
+		_sourceAddress(sourceAddress)
 	{
 	}
 		
@@ -496,7 +494,7 @@ void RemoteSyslogListener::setProperty(const std::string& name, const std::strin
 		else
 			throw Poco::InvalidArgumentException("Invalid number of threads", value);
 	}
-	else 
+	else
 	{
 		SplitterChannel::setProperty(name, value);
 	}

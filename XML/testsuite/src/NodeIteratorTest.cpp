@@ -1,8 +1,6 @@
 //
 // NodeIteratorTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NodeIteratorTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -46,7 +44,7 @@ namespace
 }
 
 
-NodeIteratorTest::NodeIteratorTest(const std::string& rName): CppUnit::TestCase(rName)
+NodeIteratorTest::NodeIteratorTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

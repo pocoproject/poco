@@ -1,8 +1,6 @@
 //
 // BSONReader.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  BSONReader
@@ -29,16 +27,17 @@ namespace MongoDB {
 
 
 class MongoDB_API BSONReader
-	/// Class for reading BSON from a Poco::BinaryReader
+	/// Class for reading BSON using a Poco::BinaryReader
 {
 public:
-	BSONReader(const Poco::BinaryReader& reader) : _reader(reader)
-		/// Constructor
+	BSONReader(const Poco::BinaryReader& reader):
+		_reader(reader)
+		/// Creates the BSONReader using the given BinaryWriter.
 	{
 	}
 
 	virtual ~BSONReader()
-		/// Destructor
+		/// Destroys the BSONReader.
 	{
 	}
 
@@ -55,11 +54,13 @@ public:
 		/// A cstring is a string terminated with a 0x00.
 
 private:
-
 	Poco::BinaryReader _reader;
 };
 
 
+//
+// inlines
+//
 inline std::string BSONReader::readCString()
 {
 	std::string val;
@@ -80,4 +81,4 @@ inline std::string BSONReader::readCString()
 } } // namespace Poco::MongoDB
 
 
-#endif //  MongoDB_BSONReader_INCLUDED
+#endif // MongoDB_BSONReader_INCLUDED

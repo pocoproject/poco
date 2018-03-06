@@ -1,8 +1,6 @@
 //
 // OptionProcessor.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionProcessor.cpp#2 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionProcessor
@@ -24,7 +22,7 @@ namespace Poco {
 namespace Util {
 
 
-OptionProcessor::OptionProcessor(const OptionSet& options): 
+OptionProcessor::OptionProcessor(const OptionSet& options):
 	_options(options),
 	_unixStyle(true),
 	_ignore(false)

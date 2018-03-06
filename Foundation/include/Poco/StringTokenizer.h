@@ -1,8 +1,6 @@
 //
 // StringTokenizer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/StringTokenizer.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  StringTokenizer
@@ -69,12 +67,12 @@ public:
 		/// Returns true if token exists, false otherwise.
 
 	std::string::size_type find(const std::string& token, std::string::size_type pos = 0) const;
-		/// Returns the index of the first occurence of the token
+		/// Returns the index of the first occurrence of the token
 		/// starting at position pos.
 		/// Throws a NotFoundException if the token is not found.
 
 	std::size_t replace(const std::string& oldToken, const std::string& newToken, std::string::size_type pos = 0);
-		/// Starting at position pos, replaces all subsequent tokens having value 
+		/// Starting at position pos, replaces all subsequent tokens having value
 		/// equal to oldToken with newToken.
 		/// Returns the number of modified tokens.
 		

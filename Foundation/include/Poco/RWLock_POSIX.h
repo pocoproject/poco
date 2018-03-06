@@ -1,8 +1,6 @@
 //
 // RWLock_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RWLock_POSIX.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock
@@ -50,7 +48,7 @@ private:
 //
 inline void RWLockImpl::readLockImpl()
 {
-	if (pthread_rwlock_rdlock(&_rwl)) 
+	if (pthread_rwlock_rdlock(&_rwl))
 		throw SystemException("cannot lock reader/writer lock");
 }
 
@@ -70,7 +68,7 @@ inline bool RWLockImpl::tryReadLockImpl()
 
 inline void RWLockImpl::writeLockImpl()
 {
-	if (pthread_rwlock_wrlock(&_rwl)) 
+	if (pthread_rwlock_wrlock(&_rwl))
 		throw SystemException("cannot lock reader/writer lock");
 }
 

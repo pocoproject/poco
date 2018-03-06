@@ -1,8 +1,6 @@
 //
 // SyslogChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SyslogChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  SyslogChannel
@@ -28,18 +26,18 @@ const std::string SyslogChannel::PROP_FACILITY = "facility";
 const std::string SyslogChannel::PROP_OPTIONS  = "options";
 
 
-SyslogChannel::SyslogChannel(): 
-	_options(SYSLOG_CONS), 
-	_facility(SYSLOG_USER), 
+SyslogChannel::SyslogChannel():
+	_options(SYSLOG_CONS),
+	_facility(SYSLOG_USER),
 	_open(false)
 {
 }
 
 
-SyslogChannel::SyslogChannel(const std::string& name, int options, int facility): 
-	_name(name), 
-	_options(options), 
-	_facility(facility), 
+SyslogChannel::SyslogChannel(const std::string& name, int options, int facility):
+	_name(name),
+	_options(options),
+	_facility(facility),
 	_open(false)
 {
 }

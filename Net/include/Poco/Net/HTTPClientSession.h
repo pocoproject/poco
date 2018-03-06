@@ -1,8 +1,6 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#8 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPClientSession
@@ -102,6 +100,9 @@ public:
 
 	HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig);
 		/// Creates a HTTPClientSession using the given host, port and proxy configuration.
+			
+	HTTPClientSession(const StreamSocket& socket, const ProxyConfig& proxyConfig);
+		/// Creates a HTTPClientSession using the given socket and proxy configuration.
 
 	virtual ~HTTPClientSession();
 		/// Destroys the HTTPClientSession and closes
@@ -124,6 +125,23 @@ public:
 	
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
+
+        void setSourceAddress(const SocketAddress& address);
+		/// Sets the source IP address and source port for the HTTPClientSession
+		/// socket.
+		///
+		/// The source address must not be changed once there
+		/// is an open connection to the server.
+		///
+		/// Note: Both the source IP address and source port can be set
+		/// using this function, but the typical client use is to set
+		/// the source IP address only and the source port portion
+		/// would normally be passed as 0 meaning that any port value
+		/// can be used on the source side of the socket. 
+		///
+
+        const SocketAddress& getSourceAddress();
+		/// Returns the source address previously set
 
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Sets the proxy host name and port number.
@@ -204,7 +222,7 @@ public:
 		/// for the next request.
 		
 	virtual std::istream& receiveResponse(HTTPResponse& response);
-		/// Receives the header for the response to the previous 
+		/// Receives the header for the response to the previous
 		/// HTTP request.
 		///
 		/// The returned input stream can be used to read
@@ -215,7 +233,7 @@ public:
 		/// It must be ensured that the response stream
 		/// is fully consumed before sending a new request
 		/// and persistent connections are enabled. Otherwise,
-		/// the unread part of the response body may be treated as 
+		/// the unread part of the response body may be treated as
 		/// part of the next request's response header, resulting
 		/// in a Poco::Net::MessageException being thrown.
 		///
@@ -229,14 +247,14 @@ public:
 		
 	virtual bool peekResponse(HTTPResponse& response);
 		/// If the request contains a "Expect: 100-continue" header,
-		/// (see HTTPRequest::setExpectContinue()) this method can be 
-		/// used to check whether the server has sent a 100 Continue response 
+		/// (see HTTPRequest::setExpectContinue()) this method can be
+		/// used to check whether the server has sent a 100 Continue response
 		/// before continuing with the request, i.e. sending the request body,
 		/// after calling sendRequest().
 		///
 		/// Returns true if the server has responded with 100 Continue,
 		/// otherwise false. The HTTPResponse object contains the
-		/// response sent by the server. 
+		/// response sent by the server.
 		///
 		/// In any case, receiveResponse() must be called afterwards as well in
 		/// order to complete the request. The same HTTPResponse object
@@ -303,6 +321,7 @@ protected:
 private:
 	std::string     _host;
 	Poco::UInt16    _port;
+	Poco::Net::SocketAddress _sourceAddress;
 	ProxyConfig     _proxyConfig;
 	Poco::Timespan  _keepAliveTimeout;
 	Poco::Timestamp _lastRequest;

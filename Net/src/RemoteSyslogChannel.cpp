@@ -1,8 +1,6 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#2 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogChannel
@@ -136,7 +134,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 		m += ' ';
 		m += _name;
 		m += ' ';
-		Poco::NumberFormatter::append(m, msg.getPid());
+		Poco::NumberFormatter::append(m, static_cast<Poco::UInt64>(msg.getPid()));
 		m += ' ';
 		m += msg.getSource();
 	}

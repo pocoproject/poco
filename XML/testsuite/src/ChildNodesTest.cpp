@@ -1,8 +1,6 @@
 //
 // ChildNodesTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/ChildNodesTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -26,7 +24,7 @@ using Poco::XML::Node;
 using Poco::XML::AutoPtr;
 
 
-ChildNodesTest::ChildNodesTest(const std::string& rName): CppUnit::TestCase(rName)
+ChildNodesTest::ChildNodesTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

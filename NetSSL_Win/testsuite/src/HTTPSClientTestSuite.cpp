@@ -1,8 +1,6 @@
 //
 // HTTPSClientTestSuite.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/HTTPSClientTestSuite.cpp#1 $
-//
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

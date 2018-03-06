@@ -1,8 +1,6 @@
 //
 // TreeWalkerTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/TreeWalkerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -57,7 +55,7 @@ namespace
 }
 
 
-TreeWalkerTest::TreeWalkerTest(const std::string& rName): CppUnit::TestCase(rName)
+TreeWalkerTest::TreeWalkerTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

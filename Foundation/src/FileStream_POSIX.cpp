@@ -1,8 +1,6 @@
 //
 // FileStream_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileStream_POSIX.cpp#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FileStream
@@ -125,7 +123,7 @@ bool FileStreamBuf::close()
 
 std::streampos FileStreamBuf::seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode)
 {
-	if (_fd == -1 || !(getMode() & mode)) 
+	if (_fd == -1 || !(getMode() & mode))
 		return -1;
 
 	if (getMode() & std::ios::out)
@@ -156,7 +154,7 @@ std::streampos FileStreamBuf::seekoff(std::streamoff off, std::ios::seekdir dir,
 
 std::streampos FileStreamBuf::seekpos(std::streampos pos, std::ios::openmode mode)
 {
-	if (_fd == -1 || !(getMode() & mode)) 
+	if (_fd == -1 || !(getMode() & mode))
 		return -1;
 
 	if (getMode() & std::ios::out)

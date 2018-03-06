@@ -1,8 +1,6 @@
 //
 // Optional.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Optional.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Optional
@@ -34,7 +32,7 @@ class Optional
 	/// that allows to introduce a specified/unspecified state
 	/// to value objects.
 	///
-	/// An Optional can be default constructed. In this case, 
+	/// An Optional can be default constructed. In this case,
 	/// the Optional will have a Null value and isSpecified() will
 	/// return false. Calling value()(without default value) on
 	/// a Null object will throw a NullValueException.
@@ -55,16 +53,16 @@ class Optional
 	/// nillable == true.
 {
 public:
-	Optional(): 
+	Optional():
 		/// Creates an empty Optional.
 		_value(),
 		_isSpecified(false)
 	{
 	}
 
-	Optional(const C& rValue):
+	Optional(const C& value):
 		/// Creates a Optional with the given value.
-		_value(rValue),
+		_value(value),
 		_isSpecified(true)
 	{
 	}
@@ -81,10 +79,10 @@ public:
 	{
 	}
 
-	Optional& assign(const C& rValue)
+	Optional& assign(const C& value)
 		/// Assigns a value to the Optional.
 	{
-		_value  = rValue;
+		_value  = value;
 		_isSpecified = true;
 		return *this;
 	}
@@ -97,9 +95,9 @@ public:
 		return *this;
 	}
 	
-	Optional& operator = (const C& rValue)
+	Optional& operator = (const C& value)
 	{
-		return assign(rValue);
+		return assign(value);
 	}
 
 	Optional& operator = (const Optional& other)
@@ -126,7 +124,7 @@ public:
 
 	const C& value(const C& deflt) const
 		/// Returns the Optional's value, or the
-		/// given default value if the Optional's 
+		/// given default value if the Optional's
 		/// value has not been specified.
 	{
 		return _isSpecified ? _value : deflt;

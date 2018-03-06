@@ -1,8 +1,6 @@
 //
 // ICMPEventArgs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPEventArgs.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPEventArgs
@@ -33,7 +31,7 @@ namespace Net {
 class Net_API ICMPEventArgs
 	/// The purpose of the ICMPEventArgs class is to be used as template parameter
 	/// to instantiate event members in ICMPClient class.
-	/// When clients register for an event notification, the reference to the class is 
+	/// When clients register for an event notification, the reference to the class is
 	///	passed to the handler function to provide information about the event.
 {
 public:
@@ -45,7 +43,7 @@ public:
 
 	std::string hostName() const;
 		/// Tries to resolve the target IP address into host name.
-		/// If unsuccessful, all exceptions are silently ignored and 
+		/// If unsuccessful, all exceptions are silently ignored and
 		///	the IP address is returned.
 
 	std::string hostAddress() const;

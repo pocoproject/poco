@@ -13,7 +13,6 @@
 				expat*.h,
 				zconf.h,
 				zlib.h,
-				XMLStreamParser.h
 			</exclude>
 		</files>
 		<pages>
@@ -29,7 +28,7 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>g++</exec>
+			<exec>clang++</exec>
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
@@ -37,7 +36,10 @@
 				-D_DEBUG,
 				-E,
 				-C,
-				-DPOCO_NO_GCC_API_ATTRIBUTE
+				-DPOCO_NO_GCC_API_ATTRIBUTE,
+				-xc++
+				-std=c++11,
+				-stdlib=libc++
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>

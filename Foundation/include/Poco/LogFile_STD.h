@@ -1,8 +1,6 @@
 //
 // LogFile_STD.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LogFile_STD.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LogFile
@@ -45,6 +43,7 @@ private:
 	std::string _path;
 	mutable Poco::FileOutputStream _str;
 	Timestamp _creationDate;
+	UInt64 _size;
 };
 
 

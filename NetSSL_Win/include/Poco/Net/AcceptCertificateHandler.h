@@ -1,8 +1,6 @@
 //
 // AcceptCertificateHandler.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/AcceptCertificateHandler.h#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  AcceptCertificateHandler
@@ -29,7 +27,7 @@ namespace Net {
 
 
 class NetSSL_Win_API AcceptCertificateHandler: public InvalidCertificateHandler
-	/// A AcceptCertificateHandler is invoked whenever an error 
+	/// A AcceptCertificateHandler is invoked whenever an error
 	/// occurs verifying the certificate. It always accepts
 	/// the certificate.
 	///

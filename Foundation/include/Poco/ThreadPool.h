@@ -1,8 +1,6 @@
 //
 // ThreadPool.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ThreadPool.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ThreadPool
@@ -84,7 +82,7 @@ public:
 
 	~ThreadPool();
 		/// Currently running threads will remain active
-		/// until they complete. 
+		/// until they complete.
 	
 	void addCapacity(int n);
 		/// Increases (or decreases, if n is negative)
@@ -144,7 +142,7 @@ public:
 		/// If used, this method should be the last action before
 		/// the thread pool is deleted.
 		///
-		/// Note: If a thread fails to stop within 10 seconds 
+		/// Note: If a thread fails to stop within 10 seconds
 		/// (due to a programming error, for example), the
 		/// underlying thread object will not be deleted and
 		/// this method will return anyway. This allows for a

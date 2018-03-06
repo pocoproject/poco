@@ -1,8 +1,6 @@
 //
 // SecureSMTPClientSession.h
 //
-// $Id: //poco/1.4/NetSSL_Win/include/Poco/Net/SecureSMTPClientSession.h#1 $
-//
 // Library: NetSSL_Win
 // Package: Mail
 // Module:  SecureSMTPClientSession
@@ -61,7 +59,7 @@ public:
 		/// Destroys the SMTPClientSession.
 
 	bool startTLS();
-		/// Sends a STARTTLS command and, if successful, 
+		/// Sends a STARTTLS command and, if successful,
 		/// creates a secure SSL/TLS connection over the
 		/// existing socket connection.
 		///
@@ -73,7 +71,7 @@ public:
 		/// false otherwise.
 
 	bool startTLS(Context::Ptr pContext);
-		/// Sends a STARTTLS command and, if successful, 
+		/// Sends a STARTTLS command and, if successful,
 		/// creates a secure SSL/TLS connection over the
 		/// existing socket connection.
 		///

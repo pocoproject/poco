@@ -1,8 +1,6 @@
 //
 // StringTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StringTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -82,8 +80,8 @@ void StringTest::testTrimLeft()
 		std::string s = "abc";
 		assert (trimLeft(s) == "abc");
 	}
-		std::string s2 = " abc ";
-		assert (trimLeft(s2) == "abc ");
+		std::string s = " abc ";
+		assert (trimLeft(s) == "abc ");
 	{
 	std::string s = "  ab c ";
 	assert (trimLeft(s) == "ab c ");
@@ -593,6 +591,23 @@ void StringTest::testStringToFloat()
 			assertEqualDelta(12.34, result, 0.01);
 		}
 	}
+
+	assert (std::isnan(strToFloat("nan")));
+	assert (std::isnan(strToFloat("xNaNy")));
+	assert (!std::isnan(strToFloat("inf")));
+	assert (!std::isnan(strToFloat("-inf")));
+	assert (std::isnan(strToFloat("infinity")));
+	assert (!std::isnan(strToFloat("infinity", "infinity")));
+	assert (!std::isnan(strToFloat("-infinity", "infinity")));
+	assert (std::isnan(strToFloat("Inf")));
+	assert (!std::isnan(strToFloat("Inf", "Inf")));
+
+	assert (std::isinf(strToFloat("inf")));
+	assert (std::isinf(strToFloat("-inf")));
+	assert (std::isinf(strToFloat("infinity", "infinity")));
+	assert (std::isinf(strToFloat("-infinity", "infinity")));
+	assert (!std::isinf(strToFloat("Inf")));
+	assert (std::isinf(strToFloat("Inf", "Inf")));
 }
 
 
@@ -734,6 +749,23 @@ void StringTest::testStringToDouble()
 			assertEqualDelta(12.34, result, 0.01);
 		}
 	}
+
+	assert (std::isnan(strToDouble("nan")));
+	assert (std::isnan(strToDouble("xNaNy")));
+	assert (!std::isnan(strToDouble("inf")));
+	assert (!std::isnan(strToDouble("-inf")));
+	assert (std::isnan(strToDouble("infinity")));
+	assert (!std::isnan(strToDouble("infinity", "infinity")));
+	assert (!std::isnan(strToDouble("-infinity", "infinity")));
+	assert (std::isnan(strToDouble("Inf")));
+	assert (!std::isnan(strToDouble("Inf", "Inf")));
+
+	assert (std::isinf(strToDouble("inf")));
+	assert (std::isinf(strToDouble("-inf")));
+	assert (std::isinf(strToDouble("infinity", "infinity")));
+	assert (std::isinf(strToDouble("-infinity", "infinity")));
+	assert (!std::isinf(strToDouble("Inf")));
+	assert (std::isinf(strToDouble("Inf", "Inf")));
 }
 
 
@@ -1163,12 +1195,16 @@ void StringTest::testJSONString()
 	assert (toJSON("\\", false) == "\\\\");
 	assert (toJSON("\"", false) == "\\\"");
 	assert (toJSON("/", false) == "\\/");
+	assert (toJSON("\a", false) == "\\u0007");
 	assert (toJSON("\b", false) == "\\b");
 	assert (toJSON("\f", false) == "\\f");
 	assert (toJSON("\n", false) == "\\n");
 	assert (toJSON("\r", false) == "\\r");
 	assert (toJSON("\t", false) == "\\t");
+	assert (toJSON("\v", false) == "\\u000B");
 	assert (toJSON("a", false) == "a");
+	assert (toJSON("\xD0\x82", 0) == "\xD0\x82");
+	assert (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
 
 	// ??? on MSVC, the assert macro expansion
 	// fails to compile when this string is inline ???
@@ -1181,6 +1217,10 @@ void StringTest::testJSONString()
 	assert (toJSON("bs\b") == "\"bs\\b\"");
 	assert (toJSON("nl\n") == "\"nl\\n\"");
 	assert (toJSON("tb\t") == "\"tb\\t\"");
+	assert (toJSON("\xD0\x82") == "\"\xD0\x82\"");
+	assert (toJSON("\xD0\x82", Poco::JSON_WRAP_STRINGS) == "\"\xD0\x82\"");
+	assert (toJSON("\xD0\x82",
+			Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE) == "\"\\u0402\"");
 
 	std::ostringstream ostr;
 	toJSON("foo\\", ostr);
@@ -1204,6 +1244,15 @@ void StringTest::testJSONString()
 	ostr.str("");
 	toJSON("tb\t", ostr);
 	assert(ostr.str() == "\"tb\\t\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr);
+	assert(ostr.str() == "\"\xD0\x82\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS);
+	assert(ostr.str() == "\"\xD0\x82\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE);
+	assert(ostr.str() == "\"\\u0402\"");
 	ostr.str("");
 }
 

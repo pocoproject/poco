@@ -1,8 +1,6 @@
 //
 // MulticastSocketTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/MulticastSocketTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -37,7 +35,7 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
-MulticastSocketTest::MulticastSocketTest(const std::string& rName): CppUnit::TestCase(rName)
+MulticastSocketTest::MulticastSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 
@@ -49,15 +47,23 @@ MulticastSocketTest::~MulticastSocketTest()
 
 void MulticastSocketTest::testMulticast()
 {
-	MulticastEchoServer echoServer;
-	MulticastSocket ms(SocketAddress::IPv4);
-	int n = ms.sendTo("hello", 5, echoServer.group());
-	assert (n == 5);
-	char buffer[256];
-	n = ms.receiveBytes(buffer, sizeof(buffer));
-	assert (n == 5);
-	assert (std::string(buffer, n) == "hello");
-	ms.close();
+	try {
+		MulticastEchoServer echoServer;
+		MulticastSocket ms(SocketAddress::IPv4);
+		int n = ms.sendTo("hello", 5, echoServer.group());
+		assert (n == 5);
+		char buffer[256];
+		n = ms.receiveBytes(buffer, sizeof(buffer));
+		assert (n == 5);
+		assert (std::string(buffer, n) == "hello");
+		ms.close();
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#if POCO_OS != POCO_OS_ANDROID
+		throw e;
+#endif
+	}
 }
 
 

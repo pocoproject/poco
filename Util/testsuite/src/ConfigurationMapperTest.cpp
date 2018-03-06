@@ -1,8 +1,6 @@
 //
 // ConfigurationMapperTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/ConfigurationMapperTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -26,7 +24,7 @@ using Poco::Util::MapConfiguration;
 using Poco::AutoPtr;
 
 
-ConfigurationMapperTest::ConfigurationMapperTest(const std::string& rName): AbstractConfigurationTest(rName)
+ConfigurationMapperTest::ConfigurationMapperTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
 

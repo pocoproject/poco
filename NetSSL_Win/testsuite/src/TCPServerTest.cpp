@@ -1,8 +1,6 @@
 //
 // TCPServerTest.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/TCPServerTest.cpp#2 $
-//
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -95,7 +93,7 @@ void TCPServerTest::testOneConnection()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -123,7 +121,7 @@ void TCPServerTest::testTwoConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	std::string data("hello, world");
@@ -170,7 +168,7 @@ void TCPServerTest::testMultiConnections()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	SecureStreamSocket ss3(sa);
@@ -259,7 +257,7 @@ void TCPServerTest::testReuseSocket()
 	assert (srv.queuedConnections() == 0);
 	assert (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -296,7 +294,7 @@ void TCPServerTest::testReuseSession()
 	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
 	
 	Context::Ptr pServerContext = new Context(
-		Context::SERVER_USE, 
+		Context::SERVER_USE,
 		"test.appinf.com");	
 	//pServerContext->enableSessionCache(true, "TestSuite");
 	//pServerContext->setSessionTimeout(10);
@@ -312,11 +310,11 @@ void TCPServerTest::testReuseSession()
 	assert (srv.totalConnections() == 0);
 	
 	Context::Ptr pClientContext = new Context(
-		Context::CLIENT_USE, 
+		Context::CLIENT_USE,
 		"");
 	//pClientContext->enableSessionCache(true);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa, pClientContext);
 	assert (!ss1.sessionWasReused());
 	std::string data("hello, world");

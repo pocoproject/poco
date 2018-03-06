@@ -1,8 +1,6 @@
 //
 // DirectoryWatcherTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryWatcherTest.cpp#1 $
-//
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -26,7 +24,7 @@
 using Poco::DirectoryWatcher;
 
 
-DirectoryWatcherTest::DirectoryWatcherTest(const std::string& rName): 
+DirectoryWatcherTest::DirectoryWatcherTest(const std::string& rName):
 	CppUnit::TestCase(rName),
 	_error(false)
 {

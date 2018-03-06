@@ -1,8 +1,6 @@
 //
 // HTTPServerRequestImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerRequestImpl.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerRequestImpl
@@ -33,13 +31,13 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& rResponse, HTTPServerSession& session, HTTPServerParams* pParams):
-	_response(rResponse),
+HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPServerSession& session, HTTPServerParams* pParams):
+	_response(response),
 	_session(session),
 	_pStream(0),
 	_pParams(pParams, true)
 {
-	rResponse.attachRequest(this);
+	response.attachRequest(this);
 
 	HTTPHeaderInputStream hs(session);
 	read(hs);

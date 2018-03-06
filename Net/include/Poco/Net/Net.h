@@ -1,8 +1,6 @@
 //
 // Net.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/Net.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  Net
@@ -30,7 +28,7 @@
 // from a DLL simpler. All files within this DLL are compiled with the Net_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// Net_API functions as being imported from a DLL, wheras this DLL sees symbols
+// Net_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
@@ -116,7 +114,7 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 //
 // Define POCO_NET_HAS_INTERFACE for platforms that have network interface detection implemented.
 //
-#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || POCO_OS == (POCO_OS_ANDROID) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 	#define POCO_NET_HAS_INTERFACE
 #endif
 

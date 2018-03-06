@@ -1,8 +1,6 @@
 //
 // ListMapTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ListMapTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -103,7 +101,7 @@ void ListMapTest::testInsertOrder()
 	assert (it != lm.end() && it->first == "bar" && it->second == 43);
 	
 	++it;
-	assert (it == lm.end());	 
+	assert (it == lm.end());	
 }
 
 

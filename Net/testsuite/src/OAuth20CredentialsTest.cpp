@@ -1,8 +1,6 @@
 //
 // OAuth20CredentialsTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::Net::OAuth20Credentials;
 using Poco::Net::NotAuthenticatedException;
 
 
-OAuth20CredentialsTest::OAuth20CredentialsTest(const std::string& rName): CppUnit::TestCase(rName)
+OAuth20CredentialsTest::OAuth20CredentialsTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
 

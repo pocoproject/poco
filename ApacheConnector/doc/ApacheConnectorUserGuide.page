@@ -16,7 +16,7 @@ file (usually <[httpd.conf]>):
 
     LoadModule poco_module modules/mod_pocod.so
 ----
-    
+
 !!!Configuring ApacheConnector
 ApacheConnector must be able to find shared libraries containing request handler, as well
 as optional configuration files. ApacheConnector provides an Poco::Util::Application class
@@ -30,7 +30,7 @@ is used in the Apache configuration file:
 
     AddPocoRequestHandler <FactoryClass> <SharedLibrary> <Path>...
 ----
-    
+
 The first argument specifies the name of the request handler factory class. The second argument
 contains the path of the shared library containing the request handler.
 The third (and optionally following) argument(s) specify the URI paths handled by the
@@ -38,7 +38,7 @@ request handler. For example:
 
     AddPocoRequestHandler TimeRequestHandlerFactory p:/Poco/ApacheConnector/samples/TimeServer/bin/TimeServerd.dll /time
 ----
-   
+
 loads the TimeRequestHandlerFactory from TimeServerd.dll. Whenever a request for a URI starting with "/time"
 is sent by a client, this request will be handled by the TimeRequestHandler.
 
@@ -76,8 +76,8 @@ Following is a sample for a request handler implementation. The complete sample 
     #include "Poco/DateTimeFormatter.h"
     #include "Poco/DateTimeFormat.h"
     #include "Poco/ClassLibrary.h"
-    
-    
+
+
     using Poco::Net::HTTPRequestHandler;
     using Poco::Net::HTTPRequestHandlerFactory;
     using Poco::Net::HTTPServerRequest;
@@ -85,24 +85,24 @@ Following is a sample for a request handler implementation. The complete sample 
     using Poco::Timestamp;
     using Poco::DateTimeFormatter;
     using Poco::DateTimeFormat;
-    
-    
+
+
     class TimeRequestHandler: public HTTPRequestHandler
         /// Return a HTML document with the current date and time.
     {
     public:
-        TimeRequestHandler() 
+        TimeRequestHandler()
         {
         }
-        
+
         void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
         {
             Timestamp now;
             std::string dt(DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
-    
+
             response.setChunkedTransferEncoding(true);
             response.setContentType("text/html");
-    
+
             std::ostream& ostr = response.send();
             ostr << "<html><head><title>TimeServer powered by POCO ApacheConnector</title>";
             ostr << "<meta http-equiv=\"refresh\" content=\"1\"></head>";
@@ -111,22 +111,22 @@ Following is a sample for a request handler implementation. The complete sample 
             ostr << "</p></body></html>";
         }
     };
-    
-    
+
+
     class TimeRequestHandlerFactory: public HTTPRequestHandlerFactory
     {
     public:
         TimeRequestHandlerFactory()
         {
         }
-    
+
         HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
         {
             return new TimeRequestHandler;
         }
     };
-    
-    
+
+
     POCO_BEGIN_MANIFEST(HTTPRequestHandlerFactory)
         POCO_EXPORT_CLASS(TimeRequestHandlerFactory)
     POCO_END_MANIFEST

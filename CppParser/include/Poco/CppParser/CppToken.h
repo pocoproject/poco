@@ -1,8 +1,6 @@
 //
 // CppToken.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/CppToken.h#2 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  CppToken
@@ -68,7 +66,7 @@ public:
 		OP_BITAND_ASSIGN,   // &=
 		OP_AND,             // &&
 		OP_BITOR,           // |
-		OP_BITOR_ASSIGN,    // |= 
+		OP_BITOR_ASSIGN,    // |=
 		OP_OR,              // ||
 		OP_XOR,             // ^
 		OP_XOR_ASSIGN,      // ^=
