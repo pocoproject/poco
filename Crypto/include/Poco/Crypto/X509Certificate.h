@@ -197,6 +197,7 @@ private:
 // inlines
 //
 
+
 inline long X509Certificate::version() const
 {
 	// This is defined by standards (X.509 et al) to be
@@ -204,6 +205,7 @@ inline long X509Certificate::version() const
 	// So, eg. a version 3 certificate will return 2.
 	return X509_get_version(_pCert) + 1;
 }
+
 
 inline const std::string& X509Certificate::serialNumber() const
 {
