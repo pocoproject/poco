@@ -29,7 +29,7 @@ namespace
 	{
 		unsigned long err;
 		std::string msg;
-		
+
 		while ((err = ERR_get_error()))
 		{
 			if (!msg.empty())
@@ -59,10 +59,10 @@ namespace
 			Direction         dir);
 
 		~CryptoTransformImpl();
-		
+
 		std::size_t blockSize() const;
-		int setPadding(int padding);	
-		std::string getTag(std::size_t tagSize) const;
+		int setPadding(int padding);
+		std::string getTag(std::size_t tagSize);
 		void setTag(const std::string& tag);
 
 		std::streamsize transform(
@@ -70,7 +70,7 @@ namespace
 			std::streamsize      inputLength,
 			unsigned char*       output,
 			std::streamsize      outputLength);
-		
+
 		std::streamsize finalize(
 			unsigned char*  output,
 			std::streamsize length);
@@ -147,7 +147,7 @@ namespace
 #endif
 	}
 
-	
+
 	int CryptoTransformImpl::setPadding(int padding)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -156,9 +156,9 @@ namespace
 		return EVP_CIPHER_CTX_set_padding(&_context, padding);
 #endif
 	}
-	
 
-	std::string CryptoTransformImpl::getTag(std::size_t tagSize) const
+
+	std::string CryptoTransformImpl::getTag(std::size_t tagSize)
 	{
 		std::string tag;
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
@@ -224,7 +224,7 @@ namespace
 		std::streamsize length)
 	{
 		poco_assert (length >= blockSize());
-		
+
 		int len = static_cast<int>(length);
 
 		// Use the '_ex' version that does not perform implicit cleanup since we
@@ -238,7 +238,7 @@ namespace
 
 		if (rc == 0)
 			throwError();
-			
+
 		return static_cast<std::streamsize>(len);
 	}
 }

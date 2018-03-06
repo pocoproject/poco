@@ -30,7 +30,7 @@ namespace
 	{
 		unsigned long err;
 		std::string msg;
-		
+
 		while ((err = ERR_get_error()))
 		{
 			if (!msg.empty())
@@ -66,10 +66,10 @@ namespace
 	public:
 		RSAEncryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSAEncryptImpl();
-		
+
 		std::size_t blockSize() const;
 		std::size_t maxDataSize() const;
-		std::string getTag(std::size_t) const;
+		std::string getTag(std::size_t);
 		void setTag(const std::string&);
 
 		std::streamsize transform(
@@ -77,7 +77,7 @@ namespace
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
 			std::streamsize		 outputLength);
-		
+
 		std::streamsize finalize(unsigned char*	output, std::streamsize length);
 
 	private:
@@ -129,7 +129,7 @@ namespace
 	}
 
 
-	std::string RSAEncryptImpl::getTag(std::size_t) const
+	std::string RSAEncryptImpl::getTag(std::size_t)
 	{
 		return std::string();
 	}
@@ -167,7 +167,7 @@ namespace
 				output += n;
 				outputLength -= n;
 				_pos = 0;
-				
+
 			}
 			else
 			{
@@ -203,9 +203,9 @@ namespace
 	public:
 		RSADecryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSADecryptImpl();
-		
+
 		std::size_t blockSize() const;
-		std::string getTag(std::size_t) const;
+		std::string getTag(std::size_t);
 		void setTag(const std::string&);
 
 		std::streamsize transform(
@@ -213,7 +213,7 @@ namespace
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
 			std::streamsize		 outputLength);
-		
+
 		std::streamsize finalize(
 			unsigned char*	output,
 			std::streamsize length);
@@ -248,7 +248,7 @@ namespace
 	}
 
 
-	std::string RSADecryptImpl::getTag(std::size_t) const
+	std::string RSADecryptImpl::getTag(std::size_t)
 	{
 		return std::string();
 	}
@@ -265,7 +265,7 @@ namespace
 		unsigned char*		 output,
 		std::streamsize		 outputLength)
 	{
-		
+
 		// always fill up the buffer before decrypting!
 		std::streamsize rsaSize = static_cast<std::streamsize>(blockSize());
 		poco_assert_dbg(_pos <= rsaSize);
@@ -285,7 +285,7 @@ namespace
 				output += tmp;
 				outputLength -= tmp;
 				_pos = 0;
-				
+
 			}
 			else
 			{
