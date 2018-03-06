@@ -113,6 +113,16 @@ public:
 		///
 		/// If no curves are found, returns empty string;
 
+	static int getCurveNID(std::string& name);
+		/// Returns the NID of the specified curve.
+		///
+		/// If name is empty, returns the first curve NID
+		/// and updates the name accordingly.
+
+	static bool hasCurve(const std::string& name);
+		/// Returns true if the named curve is found,
+		/// false otherwise.
+
 private:
 	void checkEC(const std::string& method, const std::string& func) const;
 	void freeEC();

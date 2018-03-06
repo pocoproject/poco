@@ -16,6 +16,7 @@
 #include "Poco/Crypto/CryptoException.h"
 #include "Poco/NumberFormatter.h"
 #include <typeinfo>
+#include <openssl/err.h>
 
 
 namespace Poco {
