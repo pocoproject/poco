@@ -86,6 +86,13 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 			Poco::File aFile(dir);
 			aFile.createDirectories();
 		}
+		if (hdr.getCompressionMethod() == ZipCommon::CM_DEFLATE)
+		{
+			// If directory is stored with deflate method, two extra bytes
+			// (the result of deflating a zero-length sequence) must be read.
+			char buffer[2];
+			zipStream.read(buffer, 2);
+		}
 		return true;
 	}
 	try
