@@ -15,6 +15,7 @@
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/Exception.h"
+#include "Poco/Buffer.h"
 #include <openssl/err.h>
 
 
@@ -60,8 +61,9 @@ namespace
 		~CryptoTransformImpl();
 		
 		std::size_t blockSize() const;
-
 		int setPadding(int padding);	
+		std::string getTag(std::size_t tagSize) const;
+		void setTag(const std::string& tag);
 
 		std::streamsize transform(
 			const unsigned char* input,
@@ -110,6 +112,18 @@ namespace
 			_iv.empty() ? 0 : &_iv[0],
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, _iv.size(), NULL);
+#else
+			int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_IVLEN, _iv.size(), NULL);
+#endif
+			if (rc == 0) throwError();
+		}
+#endif
 	}
 
 
@@ -143,6 +157,36 @@ namespace
 #endif
 	}
 	
+
+	std::string CryptoTransformImpl::getTag(std::size_t tagSize) const
+	{
+		std::string tag;
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+		Poco::Buffer<char> buffer(tagSize);
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_GET_TAG, tagSize, buffer.begin());
+#else
+		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_GET_TAG, tagSize, buffer.begin());
+#endif
+		if (rc == 0) throwError();
+		tag.assign(buffer.begin(), tagSize);
+#endif
+		return tag;
+	}
+
+
+	void CryptoTransformImpl::setTag(const std::string& tag)
+	{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_TAG, tag.size(), const_cast<char*>(tag.data()));
+#elif OPENSSL_VERSION_NUMBER >= 0x10000000L
+		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_TAG, tag.size(), const_cast<char*>(tag.data()));
+#else
+		int rc = 0;
+#endif
+		if (rc == 0) throwError();
+	}
+
 
 	std::streamsize CryptoTransformImpl::transform(
 		const unsigned char* input,

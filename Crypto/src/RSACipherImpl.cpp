@@ -69,6 +69,8 @@ namespace
 		
 		std::size_t blockSize() const;
 		std::size_t maxDataSize() const;
+		std::string getTag(std::size_t) const;
+		void setTag(const std::string&);
 
 		std::streamsize transform(
 			const unsigned char* input,
@@ -124,6 +126,17 @@ namespace
 			break;
 		}
 		return size;
+	}
+
+
+	std::string RSAEncryptImpl::getTag(std::size_t) const
+	{
+		return std::string();
+	}
+
+
+	void RSAEncryptImpl::setTag(const std::string&)
+	{
 	}
 
 
@@ -192,6 +205,8 @@ namespace
 		~RSADecryptImpl();
 		
 		std::size_t blockSize() const;
+		std::string getTag(std::size_t) const;
+		void setTag(const std::string&);
 
 		std::streamsize transform(
 			const unsigned char* input,
@@ -230,6 +245,17 @@ namespace
 	std::size_t RSADecryptImpl::blockSize() const
 	{
 		return RSA_size(_pRSA);
+	}
+
+
+	std::string RSADecryptImpl::getTag(std::size_t) const
+	{
+		return std::string();
+	}
+
+
+	void RSADecryptImpl::setTag(const std::string&)
+	{
 	}
 
 

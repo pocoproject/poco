@@ -49,7 +49,18 @@ public:
 		/// padding and the padding is checked and removed when decrypting. If the padding parameter is zero then 
 		/// no padding is performed, the total amount of data encrypted or decrypted must then be a multiple of 
 		/// the block size or an error will occur.
-		
+
+	virtual std::string getTag(std::size_t tagSize = 16) const = 0;
+		/// Returns the GCM tag after encrypting using GCM mode.
+		///
+		/// Must be called after finalize().
+
+	virtual void setTag(const std::string& tag) = 0;
+		/// Sets the GCM tag for authenticated decryption using GCM mode.
+		///
+		/// Must be set before finalize() is called, otherwise
+		/// decryption will fail.
+
 	virtual std::streamsize transform(
 		const unsigned char* input,
 		std::streamsize		 inputLength,

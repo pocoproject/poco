@@ -63,7 +63,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(key),
 	_iv(iv)
 {
-	// dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initialized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -115,6 +115,7 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 	case EVP_CIPH_OFB_MODE:
 		return MODE_OFB;
 
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 	case EVP_CIPH_CTR_MODE:
 		return MODE_CTR;
 
@@ -123,6 +124,7 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 
 	case EVP_CIPH_CCM_MODE:
 		return MODE_CCM;
+#endif
 	}
 	throw Poco::IllegalStateException("Unexpected value of EVP_CIPHER_mode()");
 }
@@ -209,6 +211,13 @@ int CipherKeyImpl::blockSize() const
 int CipherKeyImpl::ivSize() const
 {
 	return EVP_CIPHER_iv_length(_pCipher);
+}
+
+
+void CipherKeyImpl::setIV(const ByteVec& iv)
+{
+	poco_assert(mode() == MODE_GCM || iv.size() == static_cast<ByteVec::size_type>(ivSize()));
+	_iv = iv;
 }
 
 

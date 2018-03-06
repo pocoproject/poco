@@ -156,13 +156,6 @@ inline const CipherKeyImpl::ByteVec& CipherKeyImpl::getIV() const
 }
 
 
-inline void CipherKeyImpl::setIV(const ByteVec& iv)
-{
-	poco_assert(iv.size() == static_cast<ByteVec::size_type>(ivSize()));
-	_iv = iv;
-}
-
-
 inline const EVP_CIPHER* CipherKeyImpl::cipher()
 {
 	return _pCipher;
