@@ -1,12 +1,10 @@
-POCO C++ Libraries
-==================
+![alt text][logo]
+
 
 [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.9.0)](https://travis-ci.org/pocoproject/poco)
 [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.9.0?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.9.0)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
-
-![alt text][logo]
 
 POrtable COmponents C++ Libraries are:
 --------------------------------------
