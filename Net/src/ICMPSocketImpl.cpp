@@ -62,7 +62,7 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 		Poco::Timestamp ts;
 		do
 		{
-			if (ts.isElapsed(_timeout)) 
+			if (ts.isElapsed(_timeout))
 			{
 				// This guards against a possible DoS attack, where sending
 				// fake ping responses will cause an endless loop.
@@ -72,12 +72,16 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 		}
 		while (!_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
 	}
+	catch (TimeoutException&)
+	{
+		throw;
+	}
 	catch (Exception&)
 	{
 		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize);
-		if (!err.empty()) 
+		if (!err.empty())
 			throw ICMPException(err);
-		else 
+		else
 			throw;
 	}
 

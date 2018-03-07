@@ -1,6 +1,33 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.9.0 (2018-03-07)
+==========================
+
+- Added additional text encodings, available in the new PocoEncodings library (GH #2165)
+- Added Punycode support for resolving Internationalized Domain Names to Poco::Net::DNS (GH #2164)
+- Added XDG Base Directory Specification support in Poco::Path, Poco::Util::SystemConfiguration
+  and Poco::Util::Application (GH #1609, GH #561, GH #1609)
+- Added support for GCM ciphers in Crypto library (GH #2129)
+- Poco::Net::RemoteSyslogChannel and Poco::Net::RemoteSyslogListener now have basic
+  support for RFC 5424 structured data (GH #2173)
+- Poco::File now has methods for obtaining partition space (GH #1545)
+- Added Poco::Net::Context::addCertificateAuthority() (GH #2197)
+- Added Poco::AutoPtr::reset() and Poco::SharedPtr::reset() to improve compatibility
+  with std::shared_ptr() (GH #2172)
+- fixed GH #703: Poco::Data::SQLite data types (INTEGER is now mapped to Int64)
+- fixed GH #1426: inttypes.h is available on sun solaris
+- fixed GH #1912: Run ping with custom data size #1912
+- fixed GH #2177: Run ping with custom timeout instead of the default
+- fixed GH #2058 and GH #2095: Synchronization issue/deadlock in Poco::Util::Timer at destruction
+- fixed GH #2089: Allow hyphen in HTTP authentication scheme names
+- fixed GH #2106: Undefined behavior in Delegate::equals()
+- fixed GH #2108: POCO SQLite Data Connector hangs for 20 secs waiting for thread timeouts on Windows
+- fixed GH #2142: JSON::Object preserveOrder keys not synced on assignment
+- fixed GH #2199 and GH #2188: Illegal header in zip file exception/assertion failure during JAR file decompression
+- fixed GH #2203: Use MAX_ADDRESS_LENGTH to determine buffer size
+
+
 Release 1.8.1 (2018-01-09)
 ==========================
 

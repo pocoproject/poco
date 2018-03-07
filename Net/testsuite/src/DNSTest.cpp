@@ -47,7 +47,7 @@ void DNSTest::testHostByName()
 #endif
 	assert (he1.addresses().size() >= 1);
 	assert (he1.addresses()[0].toString() == "1.2.3.4");
-	
+
 	try
 	{
 		HostEntry he1 = DNS::hostByName("nohost.pocoproject.org");
@@ -70,7 +70,7 @@ void DNSTest::testHostByAddress()
 	assert (he1.aliases().empty());
 	assert (he1.addresses().size() >= 1);
 	assert (he1.addresses()[0].toString() == "80.122.195.86");
-	
+
 	IPAddress ip2("10.0.244.253");
 	try
 	{
@@ -91,6 +91,94 @@ void DNSTest::testResolve()
 }
 
 
+void DNSTest::testEncodeIDN()
+{
+	std::string idn("d\xc3\xb6m\xc3\xa4in.example"); // d"om"ain.example 
+	assert (DNS::isIDN(idn));
+	assert (DNS::encodeIDN(idn) == "xn--dmin-moa0i.example");
+
+	idn = ".d\xc3\xb6m\xc3\xa4in.example"; // .d"om"ain.example 
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == ".xn--dmin-moa0i.example");
+
+	idn = "d\xc3\xb6m\xc3\xa4in.example."; // .d"om"ain.example.
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "xn--dmin-moa0i.example.");
+
+	idn = "d\xc3\xb6m\xc3\xa4in"; // d"om"ain
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "xn--dmin-moa0i");
+
+	idn = "\xc3\xa4""aaa.example"; // "aaaa.example
+	assert (DNS::isIDN(idn));
+	assert (DNS::encodeIDN(idn) == "xn--aaa-pla.example");
+
+	idn = "a\xc3\xa4""aa.example"; // a"aaa.example
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "xn--aaa-qla.example");
+
+	idn = "foo.\xc3\xa2""bcd\xc3\xa9""f.example"; // foo.^abcd'ef.example
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "foo.xn--bcdf-9na9b.example");
+
+	idn = "\xe2\x98\x83.example"; // <snowman>.example
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "xn--n3h.example");
+
+	idn = "\xe2\x98\x83."; // <snowman>.
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "xn--n3h.");
+
+	idn = "\xe2\x98\x83"; // <snowman>
+	assert(DNS::isIDN(idn));
+	assert(DNS::encodeIDN(idn) == "xn--n3h");
+
+	std::string dn = "www.pocoproject.org";
+	assert (!DNS::isIDN(dn));
+	assert (DNS::encodeIDN(dn) == "www.pocoproject.org");
+}
+
+
+void DNSTest::testDecodeIDN()
+{
+	std::string enc("xn--dmin-moa0i.example");
+	assert (DNS::isEncodedIDN(enc));
+	assert (DNS::decodeIDN(enc) == "d\xc3\xb6m\xc3\xa4in.example"); // d"om"ain.example 
+
+	enc = ".xn--dmin-moa0i.example";
+	assert(DNS::isEncodedIDN(enc));
+	assert(DNS::decodeIDN(enc) == ".d\xc3\xb6m\xc3\xa4in.example"); // .d"om"ain.example 
+
+	enc = "xn--dmin-moa0i.example.";
+	assert(DNS::isEncodedIDN(enc));
+	assert(DNS::decodeIDN(enc) == "d\xc3\xb6m\xc3\xa4in.example."); // d"om"ain.example.
+
+	enc = "xn--dmin-moa0i";
+	assert(DNS::isEncodedIDN(enc));
+	assert(DNS::decodeIDN(enc) == "d\xc3\xb6m\xc3\xa4in"); // d"om"ain
+
+	enc = "foo.xn--bcdf-9na9b.example";
+	assert (DNS::isEncodedIDN(enc));
+	assert (DNS::decodeIDN(enc) == "foo.\xc3\xa2""bcd\xc3\xa9""f.example"); // foo.^abcd'ef.example
+
+	enc = "xn--n3h.example";
+	assert (DNS::isEncodedIDN(enc));
+	assert (DNS::decodeIDN(enc) == "\xe2\x98\x83.example"); // <snowman>.example
+
+	enc = "xn--n3h.";
+	assert(DNS::isEncodedIDN(enc));
+	assert(DNS::decodeIDN(enc) == "\xe2\x98\x83."); // <snowman>.
+
+	enc = "xn--n3h";
+	assert(DNS::isEncodedIDN(enc));
+	assert(DNS::decodeIDN(enc) == "\xe2\x98\x83"); // <snowman>
+
+	std::string dn = "www.pocoproject.org";
+	assert (!DNS::isEncodedIDN(dn));
+	assert (DNS::decodeIDN(dn) == "www.pocoproject.org");
+}
+
+
 void DNSTest::setUp()
 {
 }
@@ -108,6 +196,8 @@ CppUnit::Test* DNSTest::suite()
 	CppUnit_addTest(pSuite, DNSTest, testHostByName);
 	CppUnit_addTest(pSuite, DNSTest, testHostByAddress);
 	CppUnit_addTest(pSuite, DNSTest, testResolve);
+	CppUnit_addTest(pSuite, DNSTest, testEncodeIDN);
+	CppUnit_addTest(pSuite, DNSTest, testDecodeIDN);
 
 	return pSuite;
 }

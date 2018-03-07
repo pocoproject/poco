@@ -141,20 +141,20 @@ On Windows, there are three options:
 <*POCO pre-built OpenSSL binaries*>
 
 OpenSSL binaries (version 1.1.0) built with Visual Studio 2013 are available for
-[[https://github.com/pocoproject/openssl/tree/master/VS_120 download]].
+[[https://github.com/pocoproject/openssl/tree/master/build download]].
 
 In case you are using pre-built binaries, please make sure to copy the
 entire directory to <*C:\%POCO_BASE%\openssl\*>.
 
-Or, %POCO_BASE%\openssl directory can be deleted and openssl
-repository cloned:
+Or, %POCO_BASE%\openssl directory can be deleted (if existing) and POCO openssl
+github repository cloned into it:
 
   $ cd %POCO_BASE%
   $ rmdir /s /q openssl
   $ git clone https://github.com/pocoproject/openssl
 
 All libraries are located in their proper folders (eg. <*win64/bin/debug/*>),
-and all are named identically (<*libcrypto*> and <*libssl*>).
+and all are named accordingly (<*libcrypto[mt[d]]*> and <*libssl[mt[d]]*>).
 
 
 <*Build OpenSSL using scripts from POCO distribution package*>
@@ -178,11 +178,11 @@ Example: Building OpenSSL 1.1.0, DLL release build for x64 with Visual Studio 20
 ----
 
 The above command will download all the necessary packages (perl, nasm, etc)
-and buil OpenSSL in <*C:\%POCO_BASE%\openssl\VS_120*> directory; the built OpenSSL
+and build OpenSSL in <*C:\%POCO_BASE%\openssl\build*> directory; the built OpenSSL
 binaries can be linked from EXEs and DLLs built with Visual Studio 2008 to 2017.
 
 Pre-generated POCO Visual Studio projects are configured to use headers and
-libraries from <*VS_120*> directory.
+libraries from <*C:\%POCO_BASE%\openssl\build*> directory.
 
 <*Use a third-party pre-built OpenSSL*>
 
@@ -195,13 +195,6 @@ you might have to edit the build script (buildwin.cmd), or add the
 necessary paths to the INCLUDE and LIB environment variables. You might also
 have to edit the project settings if the names of the OpenSSL libraries
 from your build differ from the names used in the project files.
-
-NOTE: To disable internal automatic linking of supplied binaries in pre-generated
-POCO Visual Studio projects, define <[POCO_EXTERNAL_OPENSSL]> in your build environment.
-Alternatively, you can either rename your binaries, or edit the
-<*%POCO_BASE%\Crypto\include\Poco\Crypto\Crypto.h*> file if the names of the
-OpenSSL libraries from your build differ from the names used thereof
-(look for "#pragma comment" lines in <*Crypto.h*>).
 
 
 !ODBC

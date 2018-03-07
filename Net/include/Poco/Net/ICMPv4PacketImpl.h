@@ -37,7 +37,7 @@ class Net_API ICMPv4PacketImpl : public ICMPPacketImpl
 {
 public:
 	// ICMPv4 header
-	struct Header 
+	struct Header
 	{
 		Poco::UInt8 type;          // ICMP packet type
 		Poco::UInt8 code;          // Type sub code
@@ -47,7 +47,7 @@ public:
 	};
 
 	// compile-time shield against misalignment
-#ifndef POCO_ANDROID	
+#if POCO_OS != POCO_OS_ANDROID
 	poco_static_assert (offsetof(Header, code) == 0x01);
 	poco_static_assert (offsetof(Header, checksum) == 0x02);
 	poco_static_assert (offsetof(Header, id) == 0x04);
@@ -126,20 +126,20 @@ public:
 	struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
-		/// 
+		///
 		/// Buffer includes IP header, ICMP header and data.
 
 	bool validReplyID(Poco::UInt8* buffer, int length) const;
-		/// Returns true if the extracted id is recognized 
+		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
-		///	
+		///
 		/// Buffer includes IP header, ICMP header and data.
 
 	virtual std::string errorDescription(Poco::UInt8* buffer, int length);
 		/// Returns error description string.
 		/// If supplied buffer contains ICMPv4 echo reply packet, an
 		/// empty string is returned indicating the absence of error.
-		///	
+		///
 		/// Buffer includes IP header, ICMP header and data.
 
 	virtual std::string typeDescription(int typeId);

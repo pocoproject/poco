@@ -37,7 +37,7 @@ void ProcessTest::testLaunch()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
 #endif
 
@@ -67,7 +67,7 @@ void ProcessTest::testLaunchRedirectIn()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
 #endif
 
@@ -96,7 +96,7 @@ void ProcessTest::testLaunchRedirectOut()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
 #endif
 
@@ -127,7 +127,7 @@ void ProcessTest::testLaunchEnv()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
 #endif
 
@@ -213,7 +213,7 @@ void ProcessTest::testIsRunning()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG)
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
 	name += "d";
 #endif
 

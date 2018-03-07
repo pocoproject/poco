@@ -40,4 +40,10 @@ Parser::~Parser()
 }
 
 
+void Parser::setHandler(const Handler::Ptr& pHandler)
+{
+	setHandlerImpl(pHandler);
+}
+
+
 } } // namespace Poco::JSON

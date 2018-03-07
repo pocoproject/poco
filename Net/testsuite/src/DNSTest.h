@@ -27,6 +27,8 @@ public:
 	void testHostByName();
 	void testHostByAddress();
 	void testResolve();
+	void testEncodeIDN();
+	void testDecodeIDN();
 
 	void setUp();
 	void tearDown();

@@ -195,39 +195,39 @@ namespace Impl {
 	
 		char*& operator ++ () // prefix
 		{
-			check(_cur + 1);
+			checkBounds(_cur + 1);
 			return ++_cur;
 		}
 
 		char* operator ++ (int) // postfix
 		{
-			check(_cur + 1);
+			checkBounds(_cur + 1);
 			char* tmp = _cur++;
 			return tmp;
 		}
 	
 		char*& operator -- () // prefix
 		{
-			check(_cur - 1);
+			checkBounds(_cur - 1);
 			return --_cur;
 		}
 
 		char* operator -- (int) // postfix
 		{
-			check(_cur - 1);
+			checkBounds(_cur - 1);
 			char* tmp = _cur--;
 			return tmp;
 		}
 
 		char*& operator += (int incr)
 		{
-			check(_cur + incr);
+			checkBounds(_cur + incr);
 			return _cur += incr;
 		}
 
 		char*& operator -= (int decr)
 		{
-			check(_cur - decr);
+			checkBounds(_cur - decr);
 			return _cur -= decr;
 		}
 
@@ -242,7 +242,7 @@ namespace Impl {
 		}
 
 	private:
-		void check(char* ptr)
+		void checkBounds(char* ptr)
 		{
 			if (ptr > _end) throw RangeException();
 		}

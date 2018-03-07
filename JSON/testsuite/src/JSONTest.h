@@ -72,12 +72,16 @@ public:
 	void testValidJanssonFiles();
 	void testInvalidJanssonFiles();
 	void testTemplate();
-	void testItunes();
 	void testUnicode();
 	void testInvalidUnicodeJanssonFiles();
 	void testSmallBuffer();
 	void testEscape0();
+	void testNonEscapeUnicode();
 	void testEscapeUnicode();
+
+	void testCopy();
+	void testMove();
+
 	void setUp();
 	void tearDown();
 

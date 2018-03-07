@@ -84,6 +84,60 @@ std::string PathImpl::homeImpl()
 }
 
 
+std::string PathImpl::configHomeImpl()
+{
+	std::string result;
+
+	// if APPDATA environment variable no exist, return home directory instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("APPDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = homeImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
+}
+
+
+std::string PathImpl::dataHomeImpl()
+{
+	std::string result;
+
+	// if LOCALAPPDATA environment variable no exist, return config home instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("LOCALAPPDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = configHomeImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
+}
+
+
+std::string PathImpl::cacheHomeImpl()
+{
+	return tempImpl();
+}
+
+
+std::string PathImpl::tempHomeImpl()
+{
+	return tempImpl();
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
@@ -99,6 +153,27 @@ std::string PathImpl::tempImpl()
 		return result;
 	}
 	throw SystemException("Cannot get temporary directory path");
+}
+
+
+std::string PathImpl::configImpl()
+{
+	std::string result;
+
+	// if PROGRAMDATA environment variable not exist, return system directory instead
+	try
+	{
+		result = EnvironmentImpl::getImpl("PROGRAMDATA");
+	}
+	catch (NotFoundException&)
+	{
+		result = systemImpl();
+	}
+
+	std::string::size_type n = result.size();
+	if (n > 0 && result[n - 1] != '\\')
+		result.append("\\");
+	return result;
 }
 
 

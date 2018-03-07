@@ -63,8 +63,12 @@ public:
 	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
 	typedef SharedPtr<Array> Ptr;
 
-	Array();
+	Array(int options = 0);
 		/// Creates an empty Array.
+		///
+		/// If JSON_ESCAPE_UNICODE is specified, when the object is
+		/// stringified, all unicode characters will be escaped in the
+		/// resulting string.
 
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
@@ -84,6 +88,12 @@ public:
 
 	virtual ~Array();
 		/// Destroys the Array.
+
+	void setEscapeUnicode(bool escape = true);
+		/// Sets the flag for escaping unicode.
+
+	bool getEscapeUnicode() const;
+		/// Returns the flag for escaping unicode.
 
 	ValueVec::const_iterator begin() const;
 		/// Returns the begin iterator for values.
@@ -192,12 +202,30 @@ private:
 	ValueVec         _values;
 	mutable ArrayPtr _pArray;
 	mutable bool     _modified;
+	// Note:
+	//  The reason we have this flag here (rather than as argument to stringify())
+	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
+	//  so it must know whether to escape unicode or not.
+	bool             _escapeUnicode;
 };
 
 
 //
 // inlines
 //
+
+inline void Array::setEscapeUnicode(bool escape)
+{
+	_escapeUnicode = true;
+}
+
+
+inline bool Array::getEscapeUnicode() const
+{
+	return _escapeUnicode;
+}
+
+
 inline Array::ValueVec::const_iterator Array::begin() const
 {
 	return _values.begin();

@@ -55,6 +55,8 @@ public:
 	void testFloatToString();
 	void benchmarkFloatToStr();
 
+	void testJSONString();
+
 	void setUp();
 	void tearDown();
 

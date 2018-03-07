@@ -35,7 +35,7 @@ class SyslogParser;
 
 class Net_API RemoteSyslogListener: public Poco::SplitterChannel
 	/// RemoteSyslogListener implements listening for syslog messages
-	/// sent over UDP, according to RFC 5424 "The Syslog Protocol" 
+	/// sent over UDP, according to RFC 5424 "The Syslog Protocol"
 	/// and RFC 5426 "Transmission of syslog messages over UDP".
 	///
 	/// In addition, RemoteSyslogListener also supports the "old" BSD syslog
@@ -50,6 +50,7 @@ class Net_API RemoteSyslogListener: public Poco::SplitterChannel
 	///   - addr: IP address of the host/interface sending the message.
 	///   - host: host name; only for "new" syslog messages.
 	///   - app:  application name; only for "new" syslog messages.
+	///   - structured-data: RFC 5424 structured data, or empty if not present.
 {
 public:
 	RemoteSyslogListener();
@@ -72,7 +73,7 @@ public:
 		///     * threads: The number of parser threads processing
 		///       received syslog messages. Defaults to 1. A maximum
 		///       of 16 threads is supported.
-		
+
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
@@ -81,7 +82,7 @@ public:
 
 	void close();
 		/// Stops the listener.
-		
+
 	void processMessage(const std::string& messageText);
 		/// Parses a single line of text containing a syslog message
 		/// and sends it down the filter chain.
@@ -98,6 +99,7 @@ public:
 
     static const std::string LOG_PROP_APP;
     static const std::string LOG_PROP_HOST;
+	static const std::string LOG_PROP_STRUCTURED_DATA;
 
 protected:
 	~RemoteSyslogListener();

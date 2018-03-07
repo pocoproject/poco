@@ -114,7 +114,7 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 //
 // Define POCO_NET_HAS_INTERFACE for platforms that have network interface detection implemented.
 //
-#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 	#define POCO_NET_HAS_INTERFACE
 #endif
 

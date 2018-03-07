@@ -229,9 +229,9 @@ stdint.h is available, include it; it may define INT64_MAX. Systems that do not
 have stdint.h (e.g. Solaris) may have inttypes.h. The macro int64_t may be set
 by "configure". */
 
-#if defined HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
-#elif defined HAVE_INTTYPES_H
+#elif HAVE_INTTYPES_H || defined(__SUNPRO_C)
 #include <inttypes.h>
 #endif
 

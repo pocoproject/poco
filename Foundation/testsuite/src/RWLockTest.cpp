@@ -131,6 +131,7 @@ RWLockTest::~RWLockTest()
 
 void RWLockTest::testLock()
 {
+#if defined(ENABLE_LONG_RUNNING_TESTS)
 	RWLock lock;
 	int counter = 0;
 	RWLockRunnable r1(lock, counter);
@@ -159,11 +160,13 @@ void RWLockTest::testLock()
 	assert (r3.ok());
 	assert (r4.ok());
 	assert (r5.ok());
+#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 
 void RWLockTest::testTryLock()
 {
+#if defined(ENABLE_LONG_RUNNING_TESTS)
 	RWLock lock;
 	int counter = 0;
 	RWTryLockRunnable r1(lock, counter);
@@ -192,6 +195,7 @@ void RWLockTest::testTryLock()
 	assert (r3.ok());
 	assert (r4.ok());
 	assert (r5.ok());
+#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 

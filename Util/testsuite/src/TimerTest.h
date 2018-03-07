@@ -33,6 +33,8 @@ public:
 	void testScheduleIntervalTimestamp();
 	void testScheduleIntervalClock();
 	void testCancel();
+	void testCancelAllStop();
+	void testCancelAllWaitStop();
 
 	void setUp();
 	void tearDown();

@@ -194,6 +194,7 @@ private:
 // inlines
 //
 
+
 inline long X509Certificate::version() const
 {
 	// This is defined by standards (X.509 et al) to be

@@ -25,8 +25,8 @@ namespace Poco {
 namespace Crypto {
 
 
-CipherKeyImpl::CipherKeyImpl(const std::string& name, 
-	const std::string& passphrase, 
+CipherKeyImpl::CipherKeyImpl(const std::string& name,
+	const std::string& passphrase,
 	const std::string& salt,
 	int iterationCount,
 	const std::string& digest):
@@ -54,8 +54,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 }
 
 
-CipherKeyImpl::CipherKeyImpl(const std::string& name, 
-	const ByteVec& key, 
+CipherKeyImpl::CipherKeyImpl(const std::string& name,
+	const ByteVec& key,
 	const ByteVec& iv):
 	_pCipher(0),
 	_pDigest(0),
@@ -63,7 +63,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(key),
 	_iv(iv)
 {
-	// dummy access to Cipherfactory so that the EVP lib is initilaized
+	// dummy access to Cipherfactory so that the EVP lib is initialized
 	CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
@@ -71,7 +71,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 		throw Poco::NotFoundException("Cipher " + name + " was not found");
 }
 
-	
+
 CipherKeyImpl::CipherKeyImpl(const std::string& name):
 	_pCipher(0),
 	_pDigest(0),
@@ -114,6 +114,17 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 
 	case EVP_CIPH_OFB_MODE:
 		return MODE_OFB;
+
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+	case EVP_CIPH_CTR_MODE:
+		return MODE_CTR;
+
+	case EVP_CIPH_GCM_MODE:
+		return MODE_GCM;
+
+	case EVP_CIPH_CCM_MODE:
+		return MODE_CCM;
+#endif
 	}
 	throw Poco::IllegalStateException("Unexpected value of EVP_CIPHER_mode()");
 }
@@ -125,7 +136,7 @@ void CipherKeyImpl::generateKey()
 
 	getRandomBytes(vec, keySize());
 	setKey(vec);
-	
+
 	getRandomBytes(vec, ivSize());
 	setIV(vec);
 }
@@ -134,7 +145,7 @@ void CipherKeyImpl::generateKey()
 void CipherKeyImpl::getRandomBytes(ByteVec& vec, std::size_t count)
 {
 	Poco::RandomInputStream random;
-	
+
 	vec.clear();
 	vec.reserve(count);
 
@@ -200,6 +211,13 @@ int CipherKeyImpl::blockSize() const
 int CipherKeyImpl::ivSize() const
 {
 	return EVP_CIPHER_iv_length(_pCipher);
+}
+
+
+void CipherKeyImpl::setIV(const ByteVec& iv)
+{
+	poco_assert(mode() == MODE_GCM || iv.size() == static_cast<ByteVec::size_type>(ivSize()));
+	_iv = iv;
 }
 
 

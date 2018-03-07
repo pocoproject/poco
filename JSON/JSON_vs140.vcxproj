@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>14.0.25123.0</_ProjectFileVersion>
+    <_ProjectFileVersion>14.0.25420.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoJSONd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoJSONmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoJSONmtd</TargetName>
@@ -283,7 +283,7 @@
     <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Parser.cpp"/>
     <ClCompile Include="src\ParserImpl.cpp"/>
-    <ClCompile Include="src\pd_json.c">
+    <ClCompile Include="src\pdjson.c">
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ForceConformanceInForLoopScope>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">CompileAsCpp</CompileAs>
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ForceConformanceInForLoopScope>
@@ -304,8 +304,6 @@
     <ClCompile Include="src\TemplateCache.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\pd_json.h"/>
-    <ClInclude Include="include\pd_json_private.h"/>
     <ClInclude Include="include\Poco\JSON\Array.h"/>
     <ClInclude Include="include\Poco\JSON\Handler.h"/>
     <ClInclude Include="include\Poco\JSON\JSON.h"/>
@@ -319,6 +317,7 @@
     <ClInclude Include="include\Poco\JSON\Stringifier.h"/>
     <ClInclude Include="include\Poco\JSON\Template.h"/>
     <ClInclude Include="include\Poco\JSON\TemplateCache.h"/>
+    <ClInclude Include="src\pdjson.h"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

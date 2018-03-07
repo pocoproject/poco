@@ -161,12 +161,6 @@ inline std::size_t Parser::getDepth() const
 }
 
 
-inline void Parser::setHandler(const Handler::Ptr& pHandler)
-{
-	setHandlerImpl(pHandler);
-}
-
-
 inline const Handler::Ptr& Parser::getHandler()
 {
 	return getHandlerImpl();

@@ -2,43 +2,49 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{663ad107-137d-4e9a-93c4-ed94a22a8f17}</UniqueIdentifier>
+      <UniqueIdentifier>{a333418a-2d33-4fd7-b58c-f7582a00228f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{d4c6356e-4a4c-4c45-a6bc-7ccd406ae1ec}</UniqueIdentifier>
+      <UniqueIdentifier>{cfe2f397-a07c-4980-b3fc-60dc34b63f96}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party">
-      <UniqueIdentifier>{e4d66d23-45e3-427d-9c70-8282ba04665b}</UniqueIdentifier>
+      <UniqueIdentifier>{8627de64-c316-4060-b135-3c92b5c9642e}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG">
-      <UniqueIdentifier>{60a90041-e161-42f0-9a77-e9d89c12433e}</UniqueIdentifier>
+      <UniqueIdentifier>{79fe905b-b321-47b3-9c0a-7c2cbcf340c1}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG\Header Files">
-      <UniqueIdentifier>{6c42c33a-60f7-4c5c-b2af-55b120a6f4b0}</UniqueIdentifier>
+      <UniqueIdentifier>{718bfd09-a1ad-4c1f-ad51-a54f81d86ffd}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG\Source Files">
-      <UniqueIdentifier>{0cfb430f-7053-4c6e-84fe-d0aed378c2c6}</UniqueIdentifier>
+      <UniqueIdentifier>{b415870d-d07e-4e24-9cec-4bd673e86c2a}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib">
-      <UniqueIdentifier>{b740ca59-9742-4a13-9f02-d4e547c2a358}</UniqueIdentifier>
+      <UniqueIdentifier>{0be46bda-a0fc-4ca1-91b6-3b22d284a2c8}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib\Header Files">
-      <UniqueIdentifier>{9c88a241-c59c-4b5d-bc0a-b808fa732c60}</UniqueIdentifier>
+      <UniqueIdentifier>{7112cada-de24-4bbe-ad6a-07ba16bc9768}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib\Source Files">
-      <UniqueIdentifier>{419ca7b8-c305-4951-a78d-cbceed8a9d4d}</UniqueIdentifier>
+      <UniqueIdentifier>{843c82b4-8394-42ea-bec1-8aa643e06af7}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU">
-      <UniqueIdentifier>{473ad912-8d9d-482d-bd17-f5323b1211b4}</UniqueIdentifier>
+      <UniqueIdentifier>{30bfc99d-ff27-45b5-81a5-4ea3f121541c}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU\Source Files">
-      <UniqueIdentifier>{d6a021c3-53f4-4e0d-a471-9724e44eacef}</UniqueIdentifier>
+      <UniqueIdentifier>{43f2f752-d45b-4c56-9c53-7fa4ec4afd1a}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU\Header Files">
-      <UniqueIdentifier>{a085d8cd-ef46-4637-9250-40524294edb9}</UniqueIdentifier>
+      <UniqueIdentifier>{b8765d95-3aeb-4df6-b549-53fb29345791}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AttributedString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Cell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Destination.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,7 +72,13 @@
     <ClCompile Include="src\PDFException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\TextAnnotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\png.c">

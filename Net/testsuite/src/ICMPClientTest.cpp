@@ -33,8 +33,7 @@ using Poco::AutoPtr;
 
 
 ICMPClientTest::ICMPClientTest(const std::string& name): 
-	CppUnit::TestCase(name),
-	_icmpClient(IPAddress::IPv4)
+	CppUnit::TestCase(name)
 {
 }
 
@@ -48,31 +47,77 @@ void ICMPClientTest::testPing()
 {
 	assert(ICMPClient::pingIPv4("127.0.0.1") > 0);
 
-	assert(_icmpClient.ping("127.0.0.1") > 0);
-	assert(_icmpClient.ping("www.appinf.com", 4) > 0);
+	Poco::Net::ICMPClient icmpClient(IPAddress::IPv4);
+
+	registerDelegates(icmpClient);
+
+	assert(icmpClient.ping("127.0.0.1") > 0);
+#if POCO_OS == POCO_OS_ANDROID
+	assert(icmpClient.ping("10.0.2.15", 4) > 0);
+	assert(icmpClient.ping("10.0.2.2", 4) > 0);
+#else
+	assert(icmpClient.ping("www.appinf.com", 4) > 0);
 
 	// warning: may fail depending on the existence of the addresses at test site
 	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
-	assert(0 == _icmpClient.ping("192.168.243.1"));
-	assert(0 == _icmpClient.ping("10.11.12.13"));
+	assert(0 == icmpClient.ping("192.168.243.1"));
+	assert(0 == icmpClient.ping("10.11.12.13"));
+#endif
+
+	unregisterDelegates(icmpClient);
+}
+
+
+void ICMPClientTest::testBigPing()
+{
+	assert(ICMPClient::pingIPv4("127.0.0.1", 1, 96) > 0);
+
+	Poco::Net::ICMPClient icmpClient(IPAddress::IPv4, 96);
+
+	registerDelegates(icmpClient);
+
+	assert(icmpClient.ping("127.0.0.1", 1) > 0);
+#if POCO_OS == POCO_OS_ANDROID
+	assert(icmpClient.ping("10.0.2.15", 4) > 0);
+	assert(icmpClient.ping("10.0.2.2", 4) > 0);
+#else
+	assert(icmpClient.ping("www.appinf.com", 4) > 0);
+
+	// warning: may fail depending on the existence of the addresses at test site
+	// if so, adjust accordingly (i.e. specify non-existent or unreachable IP addresses)
+	assert(0 == icmpClient.ping("192.168.243.1"));
+	assert(0 == icmpClient.ping("10.11.12.13"));
+#endif
+
+	unregisterDelegates(icmpClient);
+}
+
+
+void ICMPClientTest::registerDelegates(const ICMPClient& icmpClient)
+{
+	icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
+	icmpClient.pingReply += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
+	icmpClient.pingError += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
+	icmpClient.pingEnd += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
+}
+
+
+void ICMPClientTest::unregisterDelegates(const ICMPClient& icmpClient)
+{
+	icmpClient.pingBegin -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
+	icmpClient.pingReply -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
+	icmpClient.pingError -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
+	icmpClient.pingEnd -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
 }
 
 
 void ICMPClientTest::setUp()
 {
-	_icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
-	_icmpClient.pingReply += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
-	_icmpClient.pingError += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
-	_icmpClient.pingEnd   += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
 }
 
 
 void ICMPClientTest::tearDown()
 {
-	_icmpClient.pingBegin -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
-	_icmpClient.pingReply -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onReply);
-	_icmpClient.pingError -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onError);
-	_icmpClient.pingEnd   -= Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onEnd);
 }
 
 
@@ -125,6 +170,7 @@ CppUnit::Test* ICMPClientTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ICMPClientTest");
 
 	CppUnit_addTest(pSuite, ICMPClientTest, testPing);
+	CppUnit_addTest(pSuite, ICMPClientTest, testBigPing);
 
 	return pSuite;
 }

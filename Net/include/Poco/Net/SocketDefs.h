@@ -143,7 +143,7 @@
 	#include <netinet/tcp.h>
 	#include <netdb.h>
 	#if defined(POCO_OS_FAMILY_UNIX)
-		#if (POCO_OS == POCO_OS_LINUX)
+		#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID)
 			// Net/src/NetworkInterface.cpp changed #include <linux/if.h> to #include <net/if.h>
 			// no more conflict, can use #include <net/if.h> here
 			#include <net/if.h>

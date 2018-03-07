@@ -21,6 +21,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Crypto/Crypto.h"
 
 
 //
@@ -54,10 +55,6 @@
 //
 #if defined(_MSC_VER)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
-		#if !defined(POCO_EXTERNAL_OPENSSL)
-			#pragma comment(lib, "libcrypto.lib")
-			#pragma comment(lib, "libssl.lib")
-		#endif // POCO_EXTERNAL_OPENSSL
 		#if !defined(NetSSL_EXPORTS)
 			#pragma comment(lib, "PocoNetSSL" POCO_LIB_SUFFIX)
 		#endif

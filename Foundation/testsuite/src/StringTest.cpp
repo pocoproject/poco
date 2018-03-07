@@ -16,11 +16,13 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
+#include "Poco/JSONString.h"
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
 #include <map>
 #include <set>
+#include <sstream>
 
 
 using Poco::trimLeft;
@@ -57,6 +59,7 @@ using Poco::CILess;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
+using Poco::toJSON;
 
 
 StringTest::StringTest(const std::string& name): CppUnit::TestCase(name)
@@ -1078,6 +1081,73 @@ void StringTest::benchmarkFloatToStr()
 }
 
 
+void StringTest::testJSONString()
+{
+	assert (toJSON("\\", false) == "\\\\");
+	assert (toJSON("\"", false) == "\\\"");
+	assert (toJSON("/", false) == "\\/");
+	assert (toJSON("\a", false) == "\\u0007");
+	assert (toJSON("\b", false) == "\\b");
+	assert (toJSON("\f", false) == "\\f");
+	assert (toJSON("\n", false) == "\\n");
+	assert (toJSON("\r", false) == "\\r");
+	assert (toJSON("\t", false) == "\\t");
+	assert (toJSON("\v", false) == "\\u000B");
+	assert (toJSON("a", false) == "a");
+	assert (toJSON("\xD0\x82", 0) == "\xD0\x82");
+	assert (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
+
+	// ??? on MSVC, the assert macro expansion
+	// fails to compile when this string is inline ???
+	std::string str = "\"foo\\\\\"";
+	assert (toJSON("foo\\") == str);
+
+	assert (toJSON("bar/") == "\"bar\\/\"");
+	assert (toJSON("baz") == "\"baz\"");
+	assert (toJSON("q\"uote\"d") == "\"q\\\"uote\\\"d\"");
+	assert (toJSON("bs\b") == "\"bs\\b\"");
+	assert (toJSON("nl\n") == "\"nl\\n\"");
+	assert (toJSON("tb\t") == "\"tb\\t\"");
+	assert (toJSON("\xD0\x82") == "\"\xD0\x82\"");
+	assert (toJSON("\xD0\x82", Poco::JSON_WRAP_STRINGS) == "\"\xD0\x82\"");
+	assert (toJSON("\xD0\x82",
+			Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE) == "\"\\u0402\"");
+
+	std::ostringstream ostr;
+	toJSON("foo\\", ostr);
+	assert(ostr.str() == str);
+	ostr.str("");
+
+	toJSON("foo\\", ostr);
+	assert(toJSON("bar/") == "\"bar\\/\"");
+	ostr.str("");
+	toJSON("baz", ostr);
+	assert(ostr.str() == "\"baz\"");
+	ostr.str("");
+	toJSON("q\"uote\"d", ostr);
+	assert(ostr.str() == "\"q\\\"uote\\\"d\"");
+	ostr.str("");
+	toJSON("bs\b", ostr);
+	assert(ostr.str() == "\"bs\\b\"");
+	ostr.str("");
+	toJSON("nl\n", ostr);
+	assert(ostr.str() == "\"nl\\n\"");
+	ostr.str("");
+	toJSON("tb\t", ostr);
+	assert(ostr.str() == "\"tb\\t\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr);
+	assert(ostr.str() == "\"\xD0\x82\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS);
+	assert(ostr.str() == "\"\xD0\x82\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE);
+	assert(ostr.str() == "\"\\u0402\"");
+	ostr.str("");
+}
+
+
 void StringTest::setUp()
 {
 }
@@ -1118,6 +1188,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testIntToString);
 	CppUnit_addTest(pSuite, StringTest, testFloatToString);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkFloatToStr);
+	CppUnit_addTest(pSuite, StringTest, testJSONString);
 
 	return pSuite;
 }

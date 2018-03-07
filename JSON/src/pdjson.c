@@ -1,40 +1,63 @@
-#include <stdio.h>
-#if defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901L)
-#include <stdbool.h>
-#endif // __STDC_VERSION__
+#define _POSIX_C_SOURCE 200112L
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include "pd_json.h"
+#include "pdjson.h"
 
-#if defined(_MSC_VER)
-#define strerror_r(err, buf, len) strerror_s(buf, len, err)
-#endif
+#define JSON_FLAG_ERROR      (1u << 0)
+#define JSON_FLAG_STREAMING  (1u << 1)
 
+
+// patched for poco 1.8.x (VS 2008)
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
 
 #define json_error(json, format, ...)                             \
-  if (!json->error) {                                             \
-      json->error = 1;                                            \
-      _snprintf_s(json->errmsg, sizeof(json->errmsg), _TRUNCATE,  \
-               "error: %lu: " format,                             \
-               (unsigned long) json->lineno,                      \
-               __VA_ARGS__);                                      \
-  }                                                               \
+    if (!(json->flags & JSON_FLAG_ERROR)) {                       \
+        json->flags |= JSON_FLAG_ERROR;                           \
+        _snprintf_s(json->errmsg, sizeof(json->errmsg), _TRUNCATE,\
+                 "error: %lu: " format,                           \
+                 (unsigned long) json->lineno,                    \
+                 __VA_ARGS__);                                    \
+    }                                                             \
 
 #else
 
 #define json_error(json, format, ...)                             \
-    if (!json->error) {                                           \
-        json->error = 1;                                          \
+    if (!(json->flags & JSON_FLAG_ERROR)) {                       \
+        json->flags |= JSON_FLAG_ERROR;                           \
         snprintf(json->errmsg, sizeof(json->errmsg),              \
                  "error: %lu: " format,                           \
                  (unsigned long) json->lineno,                    \
                  __VA_ARGS__);                                    \
     }                                                             \
 
-#endif // POCO_MSVS_VERSION
+#endif // _MSC_VER
+
+#define STACK_INC 4
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#define strerror_r(err, buf, len) strerror_s(buf, len, err)
+#endif
+/*
+const char *json_typename[] = {
+    [JSON_ERROR]      = "ERROR",
+    [JSON_DONE]       = "DONE",
+    [JSON_OBJECT]     = "OBJECT",
+    [JSON_OBJECT_END] = "OBJECT_END",
+    [JSON_ARRAY]      = "ARRAY",
+    [JSON_ARRAY_END]  = "ARRAY_END",
+    [JSON_STRING]     = "STRING",
+    [JSON_NUMBER]     = "NUMBER",
+    [JSON_TRUE]       = "TRUE",
+    [JSON_FALSE]      = "FALSE",
+    [JSON_NULL]       = "NULL",
+};
+*/
+struct json_stack {
+    enum json_type type;
+    long count;
+};
 
 static void json_error_s(json_stream *json, int err)
 {
@@ -42,8 +65,6 @@ static void json_error_s(json_stream *json, int err)
     strerror_r(err, errbuf, sizeof(errbuf));
     json_error(json, "%s", errbuf);
 }
-
-#define STACK_INC 4
 
 static enum json_type
 push(json_stream *json, enum json_type type)
@@ -74,16 +95,10 @@ pop(json_stream *json, int c, enum json_type expected)
 {
     if (json->stack == NULL || json->stack[json->stack_top].type != expected) {
         json_error(json, "unexpected byte, '%c'", c);
-        json->alloc.free(json->stack);
         return JSON_ERROR;
     }
     json->stack_top--;
     return expected == JSON_ARRAY ? JSON_ARRAY_END : JSON_OBJECT_END;
-}
-
-static void pop_all(json_stream *json)
-{
-    json->alloc.free(json->stack);
 }
 
 static int buffer_peek(struct json_source *source)
@@ -117,11 +132,10 @@ static int stream_peek(struct json_source *source)
 static void init(json_stream *json)
 {
     json->lineno = 1;
-    json->error = 0;
+    json->flags = JSON_FLAG_STREAMING;
     json->errmsg[0] = '\0';
     json->ntokens = 0;
     json->next = (enum json_type) 0;
-    json->streaming = true;
 
     json->stack = NULL;
     json->stack_top = -1;
@@ -334,7 +348,7 @@ int read_escaped(json_stream *json)
         case '"':
             {
                 const char *codes = "\\bfnrt/\"";
-                const char *p = strchr(codes, c);
+                char *p = (char*) strchr(codes, c);
                 if (pushchar(json, "\\\b\f\n\r\t/\""[p - codes]) != 0)
                     return -1;
             }
@@ -492,7 +506,7 @@ read_string(json_stream *json)
                 return JSON_ERROR;
         } else {
             if (char_needs_escaping(c)) {
-                json_error(json, "%s:%u", "unescaped control character in string", (unsigned)c);
+                json_error(json, "%s", "unescaped control character in string");
                 return JSON_ERROR;
             }
 
@@ -661,7 +675,7 @@ enum json_type json_peek(json_stream *json)
 
 enum json_type json_next(json_stream *json)
 {
-    if (json->error)
+    if (json->flags & JSON_FLAG_ERROR)
         return JSON_ERROR;
     if (json->next != 0) {
         enum json_type next = json->next;
@@ -677,13 +691,15 @@ enum json_type json_next(json_stream *json)
                 c = json->source.get(&json->source);
             }
         } while (json_isspace(c));
-        if (!json->streaming && c != EOF) {
+
+        if (!(json->flags & JSON_FLAG_STREAMING) && c != EOF) {
             return JSON_ERROR;
         }
+
         return JSON_DONE;
     }
     int c = next(json);
-    if (json->stack == NULL)
+    if (json->stack_top == (size_t)-1)
         return read_value(json, c);
     if (json->stack[json->stack_top].type == JSON_ARRAY) {
         if (json->stack[json->stack_top].count == 0) {
@@ -750,9 +766,9 @@ enum json_type json_next(json_stream *json)
 
 void json_reset(json_stream *json)
 {
-    pop_all(json);
+    json->stack_top = -1;
     json->ntokens = 0;
-    json->error = 0;
+    json->flags &= ~JSON_FLAG_ERROR;
     json->errmsg[0] = '\0';
 }
 
@@ -774,7 +790,7 @@ double json_get_number(json_stream *json)
 
 const char *json_get_error(json_stream *json)
 {
-    return json->error ? json->errmsg : NULL;
+    return json->flags & JSON_FLAG_ERROR ? json->errmsg : NULL;
 }
 
 size_t json_get_lineno(json_stream *json)
@@ -797,7 +813,7 @@ void json_open_buffer(json_stream *json, const void *buffer, size_t size)
     init(json);
     json->source.get = buffer_get;
     json->source.peek = buffer_peek;
-    json->source.source.buffer.buffer = (const char*) buffer;
+    json->source.source.buffer.buffer = (char*) buffer;
     json->source.source.buffer.length = size;
 }
 
@@ -814,6 +830,26 @@ void json_open_stream(json_stream *json, FILE * stream)
     json->source.source.stream.stream = stream;
 }
 
+static int user_get(struct json_source *json)
+{
+    return json->source.user.get(json->source.user.ptr);
+}
+
+static int user_peek(struct json_source *json)
+{
+    return json->source.user.peek(json->source.user.ptr);
+}
+
+void json_open_user(json_stream *json, json_user_io get, json_user_io peek, void *user)
+{
+    init(json);
+    json->source.get = user_get;
+    json->source.peek = user_peek;
+    json->source.source.user.ptr = user;
+    json->source.source.user.get = get;
+    json->source.source.user.peek = peek;
+}
+
 void json_set_allocator(json_stream *json, json_allocator *a)
 {
     json->alloc = *a;
@@ -821,11 +857,14 @@ void json_set_allocator(json_stream *json, json_allocator *a)
 
 void json_set_streaming(json_stream *json, bool streaming)
 {
-    json->streaming = streaming;
+    if (streaming)
+        json->flags |= JSON_FLAG_STREAMING;
+    else
+        json->flags &= ~JSON_FLAG_STREAMING;
 }
 
 void json_close(json_stream *json)
 {
-    pop_all(json);
+    json->alloc.free(json->stack);
     json->alloc.free(json->data.string);
 }

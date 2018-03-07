@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoJSON64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoJSONmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoJSONmtd</TargetName>
@@ -123,7 +123,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JSON_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JSON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -156,7 +156,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;JSON_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;JSON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -282,7 +282,7 @@
     <ClCompile Include="src\ParseHandler.cpp"/>
     <ClCompile Include="src\Parser.cpp"/>
     <ClCompile Include="src\ParserImpl.cpp"/>
-    <ClCompile Include="src\pd_json.c">
+    <ClCompile Include="src\pdjson.c">
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ForceConformanceInForLoopScope>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">CompileAsCpp</CompileAs>
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ForceConformanceInForLoopScope>
@@ -311,13 +311,12 @@
     <ClInclude Include="include\Poco\JSON\ParseHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Parser.h"/>
     <ClInclude Include="include\Poco\JSON\ParserImpl.h"/>
-    <ClInclude Include="include\pd_json.h"/>
-    <ClInclude Include="include\pd_json_private.h"/>
     <ClInclude Include="include\Poco\JSON\PrintHandler.h"/>
     <ClInclude Include="include\Poco\JSON\Query.h"/>
     <ClInclude Include="include\Poco\JSON\Stringifier.h"/>
     <ClInclude Include="include\Poco\JSON\Template.h"/>
     <ClInclude Include="include\Poco\JSON\TemplateCache.h"/>
+    <ClInclude Include="src\pdjson.h"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

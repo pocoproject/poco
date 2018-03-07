@@ -48,11 +48,14 @@ public:
 		MODE_ECB,			/// Electronic codebook (plain concatenation)
 		MODE_CBC,			/// Cipher block chaining (default)
 		MODE_CFB,			/// Cipher feedback
-		MODE_OFB			/// Output feedback
+		MODE_OFB,			/// Output feedback
+		MODE_CTR,           /// Counter mode
+		MODE_GCM,           /// Galois/Counter mode
+		MODE_CCM            /// Counter with CBC-MAC
 	};
 
-	CipherKeyImpl(const std::string& name, 
-		const std::string& passphrase, 
+	CipherKeyImpl(const std::string& name,
+		const std::string& passphrase,
 		const std::string& salt,
 		int iterationCount,
 		const std::string& digest);
@@ -60,10 +63,10 @@ public:
 		/// the given cipher name, passphrase, salt value
 		/// and iteration count.
 
-	CipherKeyImpl(const std::string& name, 
-		const ByteVec& key, 
+	CipherKeyImpl(const std::string& name,
+		const ByteVec& key,
 		const ByteVec& iv);
-		/// Creates a new CipherKeyImpl object, using the 
+		/// Creates a new CipherKeyImpl object, using the
 		/// given cipher name, key and initialization vector.
 
 	CipherKeyImpl(const std::string& name);
@@ -87,7 +90,7 @@ public:
 
 	Mode mode() const;
 		/// Returns the Cipher's mode of operation.
-	
+
 	const ByteVec& getKey() const;
 		/// Returns the key for the Cipher.
 
@@ -102,7 +105,7 @@ public:
 
 	const EVP_CIPHER* cipher();
 		/// Returns the cipher object
-	
+
 private:
 	void generateKey(const std::string& passphrase,
 		const std::string& salt,
@@ -150,13 +153,6 @@ inline void CipherKeyImpl::setKey(const ByteVec& key)
 inline const CipherKeyImpl::ByteVec& CipherKeyImpl::getIV() const
 {
 	return _iv;
-}
-
-
-inline void CipherKeyImpl::setIV(const ByteVec& iv)
-{
-	poco_assert(iv.size() == static_cast<ByteVec::size_type>(ivSize()));
-	_iv = iv;
 }
 
 

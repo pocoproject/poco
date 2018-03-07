@@ -10,7 +10,7 @@ INCLUDE += -I $(POCO_BASE)/JSON/include/Poco/JSON
 
 objects = Array Object Parser ParserImpl Handler \
 	Stringifier ParseHandler PrintHandler Query \
-	JSONException Template TemplateCache pd_json
+	JSONException Template TemplateCache pdjson
 
 target         = PocoJSON
 target_version = $(LIBVERSION)

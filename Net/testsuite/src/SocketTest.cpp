@@ -503,7 +503,11 @@ void SocketTest::testSelect3()
 void SocketTest::testEchoUnixLocal()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
+#if POCO_OS == POCO_OS_ANDROID
+	Poco::File socketFile("/data/local/tmp/SocketTest.sock");
+#else
 	Poco::File socketFile("/tmp/SocketTest.sock");
+#endif
 	if (socketFile.exists()) socketFile.remove();
 	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, socketFile.path());
 	EchoServer echoServer(localAddr);

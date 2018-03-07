@@ -21,7 +21,7 @@ services:
 addons:
   postgresql: "9.4"
 
-  
+
 notifications:
   slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
 
@@ -36,24 +36,24 @@ matrix:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
-        - ./configure --everything && make -s -j2
+        - ./configure --everything --omit=PDF && make -s -j2
         - ./travis/runtests.sh
-    
+
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
-        - ./configure --everything --config=Linux-clang && make -s -j2
+        - ./configure --everything --omit=PDF --config=Linux-clang && make -s -j2
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
       script:
-        - ./configure --omit=Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+        - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     - env:    TEST_NAME="gcc (CMake)"
       compiler: gcc
       script:
         # disable tests, gcc-4.6 gets an internal compiler error
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=OFF .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_PDF=OFF -DENABLE_TESTS=OFF .. && make -j2 && cd ..
 
     - env:    TEST_NAME="gcc-4.8 (CMake)"
       compiler: gcc
@@ -63,24 +63,24 @@ matrix:
         - sudo apt-get install -qq -y g++-4.8
         - export CC="gcc-4.8"
         - export CXX="g++-4.8"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="clang (CMake)"
       compiler: clang
       script:
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabi-gcc"
         - export CXX="arm-linux-gnueabi-g++"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
       script:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
-        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_TESTS=ON .. && make -j2 && cd ..
 
     # TODO osx build
     # TODO run test suite
@@ -98,7 +98,7 @@ matrix:
       script:
         - . env.sh && mkdoc all && mkrel all
         - ls -l releases
-        
+
     # QA jobs for code analytics and metrics
     # static code analysis with cppcheck (we can add --enable=all later)
     - env:    TEST_NAME="cppcheck"
@@ -107,15 +107,15 @@ matrix:
     # search for TODO within source tree
     - env:    TEST_NAME="TODO"
       script: grep -r TODO *
- 
+
     # search for FIXME within source tree
     - env:    TEST_NAME="FIXME"
       script: grep -r FIXME *
- 
+
     # search for HACK within source tree
     - env:    TEST_NAME="HACK"
       script: grep -r HACK *
- 
+
     # some statistics about the code base
     - env:    TEST_NAME="sloccount"
       script: sloccount .

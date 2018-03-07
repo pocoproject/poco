@@ -86,8 +86,10 @@ endif()
 include(PocoMacros)
 
 # Allow enabling and disabling components
-option(ENABLE_XML "Enable the XML" ON)
-option(ENABLE_JSON "Enable the JSON" ON)
+option(ENABLE_ENCODINGS "Enable Encodings" ON)
+option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
+option(ENABLE_XML "Enable XML" ON)
+option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_REDIS "Enable Redis" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
@@ -139,6 +141,7 @@ else(POCO_STATIC)
 endif(POCO_STATIC)
 
 if(ENABLE_TESTS)
+  option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
   include(CTest)
   enable_testing()
   message(STATUS "Building with unittests & samples")
@@ -148,9 +151,9 @@ endif()
 
 if(POCO_UNBUNDLED)
   add_definitions(-DPOCO_UNBUNDLED)
-  message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
+  message(STATUS "Using external sqlite, zlib, pcre, expat, ...")
 else()
-  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
+  message(STATUS "Using internal sqlite, zlib, pcre, expat, ...")
 endif()
 
 include(DefinePlatformSpecifc)
@@ -163,6 +166,10 @@ if(ENABLE_TESTS)
 endif()
 
 add_subdirectory(Foundation)
+if(ENABLE_ENCODINGS)
+add_subdirectory(Encodings)
+list(APPEND Poco_COMPONENTS "Encodings")
+endif()
 if(ENABLE_XML)
 add_subdirectory(XML)
 list(APPEND Poco_COMPONENTS "XML")
@@ -258,6 +265,11 @@ add_subdirectory(PageCompiler/File2Page)
 list(APPEND Poco_COMPONENTS "File2Page")
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
+add_subdirectory(Encodings/Compiler)
+list(APPEND Poco_COMPONENTS "EncodingsCompiler")
+endif()
+
 
 #############################################################
 # Uninstall stuff see: http://www.vtk.org/Wiki/CMake_FAQ
@@ -298,7 +310,7 @@ install(
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION
-        "lib/cmake/${PROJECT_NAME}"
+        "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"
     COMPONENT
         Devel
 )

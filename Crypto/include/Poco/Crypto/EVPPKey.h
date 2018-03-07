@@ -282,6 +282,7 @@ private:
 	friend class RSAKeyImpl;
 };
 
+
 //
 // inlines
 //
@@ -313,6 +314,7 @@ inline int EVPPKey::type() const
 {
 	return type(_pEVPPKey);
 }
+
 
 inline bool EVPPKey::isSupported(int type) const
 {

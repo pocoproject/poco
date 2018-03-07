@@ -27,6 +27,7 @@ public:
 	~ICMPClientTest();
 
 	void testPing();
+	void testBigPing();
 
 	void setUp();
 	void tearDown();
@@ -39,7 +40,8 @@ public:
 	void onEnd(const void* pSender, Poco::Net::ICMPEventArgs& args);
 
 private:
-	Poco::Net::ICMPClient _icmpClient;
+	void registerDelegates(const Poco::Net::ICMPClient& icmpClient);
+	void unregisterDelegates(const Poco::Net::ICMPClient& icmpClient);
 };
 
 

@@ -28,14 +28,14 @@
 namespace Poco {
 
 
-template <class TObj, class TArgs, bool withSender = true> 
+template <class TObj, class TArgs, bool withSender = true>
 class Delegate: public AbstractDelegate<TArgs>
 {
 public:
 	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -50,7 +50,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -74,7 +74,7 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -82,7 +82,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -99,14 +99,14 @@ private:
 };
 
 
-template <class TObj, class TArgs> 
+template <class TObj, class TArgs>
 class Delegate<TObj, TArgs, false>: public AbstractDelegate<TArgs>
 {
 public:
 	typedef void (TObj::*NotifyMethod)(TArgs&);
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -121,7 +121,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -145,7 +145,7 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -153,7 +153,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -240,14 +240,14 @@ inline FunctionDelegate<TArgs, false> delegate(void (*NotifyMethod)(TArgs&))
 }
 
 
-template <class TObj> 
+template <class TObj>
 class Delegate<TObj,void,true>: public AbstractDelegate<void>
 {
 public:
 	typedef void (TObj::*NotifyMethod)(const void*);
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -262,7 +262,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -286,7 +286,7 @@ public:
 
 	bool equals(const AbstractDelegate<void>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -294,7 +294,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -311,14 +311,14 @@ private:
 };
 
 
-template <class TObj> 
+template <class TObj>
 class Delegate<TObj, void, false>: public AbstractDelegate<void>
 {
 public:
 	typedef void (TObj::*NotifyMethod)();
 
 	Delegate(TObj* obj, NotifyMethod method):
-		_receiverObject(obj), 
+		_receiverObject(obj),
 		_receiverMethod(method)
 	{
 	}
@@ -333,7 +333,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -357,7 +357,7 @@ public:
 
 	bool equals(const AbstractDelegate<void>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -365,7 +365,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);

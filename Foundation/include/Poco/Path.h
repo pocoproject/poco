@@ -282,15 +282,43 @@ public:
 		/// On Unix systems, this is the colon ':'. On Windows systems,
 		/// this is the semicolon ';'. On OpenVMS systems, this is the
 		/// comma ','.
-		
+
 	static std::string current();
 		/// Returns the current working directory.
 		
 	static std::string home();
 		/// Returns the user's home directory.
-		
+
+	static std::string configHome();
+		/// Returns the user's config directory.
+		///
+		/// On Unix systems, this is the '~/.config/'. On Windows systems,
+		/// this is '%APPDATA%'.
+
+	static std::string dataHome();
+		/// Returns the user's data directory.
+		///
+		/// On Unix systems, this is the '~/.local/share/'. On Windows systems,
+		/// this is '%APPDATA%'.
+
+	static std::string tempHome();
+		/// Returns the user's temp directory.
+		///
+		/// On Unix systems, this is the '~/.local/temp/'.
+
+	static std::string cacheHome();
+		/// Returns the user's cache directory.
+		///
+		/// On Unix systems, this is the '~/.cache/'. On Windows systems,
+		/// this is '%APPDATA%'.
+
 	static std::string temp();
 		/// Returns the temporary directory.
+		
+	static std::string config();
+		/// Returns the systemwide config directory.
+		///
+		/// On Unix systems, this is the '/etc/'.
 		
 	static std::string null();
 		/// Returns the name of the null device.

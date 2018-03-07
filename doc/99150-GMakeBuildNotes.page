@@ -302,6 +302,42 @@ The difference is the file that is included at the end of the Makefile:
 
 !!!Build System Reference
 
+
+!!Target Variables
+
+!target
+
+The <*target*> variable specifies the name of the resulting library or executable,
+excluding the suffix.
+
+
+!target_version
+
+The <*target_version*> variable specifies the shared library version of the resulting
+shared library.
+
+
+!target_libs
+
+The <*target_libs*> variable specifies all libraries that must be linked to the
+target. These libraries must have been built with this build system and they
+must follow the build system conventions, specifically, the names for debug
+and release builds.
+
+
+!target_extlibs
+
+The <*target_extlibs*> variables specifies additional libraries that must be
+linked to the target. No assumptions are made regarding debug or release builds.
+The names given here are simply passed to the linker by prepending the <[-l]> flag.
+
+
+!target_includes
+
+The <*target_includes*> variable specifies a list of directories used for searching
+header files.
+
+
 !!Postbuild Command
 
 A Makefile can contain a so-called postbuild command -- a shell command

@@ -32,6 +32,9 @@ RedisTest::RedisTest(const std::string& name):
 	_host("localhost"),
 	_port(6379)
 {
+#if POCO_OS == POCO_OS_ANDROID
+	_host = "10.0.2.2";
+#endif
 	if (!_connected)
 	{
 		try
@@ -954,6 +957,7 @@ void RedisTest::testPING()
 		fail(e.message());
 	}
 
+#ifndef OLD_REDIS_VERSION
 	// A PING with a custom string responds with a bulk string
 	command.add("Hello");
 	try
@@ -966,7 +970,7 @@ void RedisTest::testPING()
 	{
 		fail(e.message());
 	}
-
+#endif
 }
 
 
@@ -3002,6 +3006,5 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testRPOPLPUSH);
 	CppUnit_addTest(pSuite, RedisTest, testRPUSH);
 	CppUnit_addTest(pSuite, RedisTest, testPool);
-
 	return pSuite;
 }

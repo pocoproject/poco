@@ -24,7 +24,10 @@
 #include <limits>
 #include <clocale>
 #include <istream>
-#include "pd_json.h"
+#include "pdjson.h"
+
+
+typedef struct json_stream json_stream;
 
 
 namespace Poco {

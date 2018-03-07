@@ -451,7 +451,7 @@
 			<File
 				RelativePath=".\src\ParserImpl.cpp"/>
 			<File
-				RelativePath=".\src\pd_json.c">
+				RelativePath=".\src\pdjson.c">
 				<FileConfiguration
 					Name="debug_shared|Digi JumpStart (ARMV4I)">
 					<Tool
@@ -525,9 +525,7 @@
 			<File
 				RelativePath=".\include\Poco\JSON\ParserImpl.h"/>
 			<File
-				RelativePath=".\include\pd_json.h"/>
-			<File
-				RelativePath=".\include\pd_json_private.h"/>
+				RelativePath=".\src\pdjson.h"/>
 			<File
 				RelativePath=".\include\Poco\JSON\PrintHandler.h"/>
 			<File

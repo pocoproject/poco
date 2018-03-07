@@ -291,7 +291,13 @@ void MongoDBTest::testBuildInfo()
 
 void MongoDBTest::testConnectionPool()
 {
-	Poco::Net::SocketAddress sa("127.0.0.1", 27017);
+#if POCO_OS == POCO_OS_ANDROID
+		std::string host = "10.0.2.2";
+#else
+		std::string host = "127.0.0.1";
+#endif
+
+	Poco::Net::SocketAddress sa(host, 27017);
 	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory(sa);
 	Poco::ObjectPool<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> pool(factory, 10, 15);
 
@@ -400,12 +406,18 @@ void MongoDBTest::testConnectURI()
 	Poco::MongoDB::Connection conn;
 	Poco::MongoDB::Connection::SocketFactory sf;
 
-	conn.connect("mongodb://127.0.0.1", sf);
+#if POCO_OS == POCO_OS_ANDROID
+		std::string host = "10.0.2.2";
+#else
+		std::string host = "127.0.0.1";
+#endif
+
+	conn.connect("mongodb://" + host, sf);
 	conn.disconnect();
 
 	try
 	{
-		conn.connect("http://127.0.0.1", sf);
+		conn.connect("http://" + host, sf);
 		fail("invalid URI scheme - must throw");
 	}
 	catch (Poco::UnknownURISchemeException&)
@@ -414,19 +426,19 @@ void MongoDBTest::testConnectURI()
 
 	try
 	{
-		conn.connect("mongodb://127.0.0.1?ssl=true", sf);
+		conn.connect("mongodb://" + host + "?ssl=true", sf);
 		fail("SSL not supported, must throw");
 	}
 	catch (Poco::NotImplementedException&)
 	{
 	}
 
-	conn.connect("mongodb://127.0.0.1/admin?ssl=false&connectTimeoutMS=10000&socketTimeoutMS=10000", sf);
+	conn.connect("mongodb://" + host + "/admin?ssl=false&connectTimeoutMS=10000&socketTimeoutMS=10000", sf);
 	conn.disconnect();
 
 	try
 	{
-		conn.connect("mongodb://127.0.0.1/admin?connectTimeoutMS=foo", sf);
+		conn.connect("mongodb://" + host + "/admin?connectTimeoutMS=foo", sf);
 		fail("invalid parameter - must throw");
 	}
 	catch (Poco::Exception&)
@@ -442,19 +454,22 @@ void MongoDBTest::testConnectURI()
 
 CppUnit::Test* MongoDBTest::suite()
 {
+#if POCO_OS == POCO_OS_ANDROID
+		std::string host = "10.0.2.2";
+#else
+		std::string host = "127.0.0.1";
+#endif
 	try
 	{
-		_mongo = new Poco::MongoDB::Connection("127.0.0.1", 27017);
-		std::cout << "Connected to [127.0.0.1:27017]" << std::endl;
+		_mongo = new Poco::MongoDB::Connection(host, 27017);
+		std::cout << "Connected to [" << host << ":27017]" << std::endl;
 	}
 	catch (Poco::Net::ConnectionRefusedException& e)
 	{
 		std::cout << "Couldn't connect to " << e.message() << ". " << std::endl;
 		return 0;
 	}
-
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
-
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
@@ -469,6 +484,5 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testUUID);
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectURI);
-
 	return pSuite;
 }

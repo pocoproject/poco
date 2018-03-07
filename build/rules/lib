@@ -31,6 +31,7 @@ endif
 
 TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d$(OSARCH_POSTFIX))
 TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l)$(OSARCH_POSTFIX))
+TARGET_LIBS_EXT     = $(foreach l,$(target_extlibs),-l$(l)$(OSARCH_POSTFIX))
 
 #
 # Include the compile rules
@@ -48,7 +49,7 @@ clean:
 distclean: clean
 	$(RM) obj
 	$(RM) .dep
-	
+
 static_debug:   libdirs $(LIB_DEBUG_STATIC)
 static_release: libdirs $(LIB_RELEASE_STATIC)
 shared_debug:   libdirs $(LIB_DEBUG_SHARED)
@@ -68,7 +69,7 @@ $(LIB_RELEASE_STATIC): $(foreach o,$(objects),$(OBJPATH_RELEASE_STATIC)/$(o).o)
 
 $(LIB_DEBUG_SHARED): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building shared library (debug)" $@
-	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 ifeq ($(OSNAME), CYGWIN)
 	$(SHLIBLN) $(IMP_DEBUG_SHARED) $(IMP_DEBUG_SHARED_LINK)
 endif
@@ -77,7 +78,7 @@ endif
 
 $(LIB_RELEASE_SHARED): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building shared library (release)" $@
-	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(SHLIB) $(SHLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 ifeq ($(OSNAME), CYGWIN)
 	$(SHLIBLN) $(IMP_RELEASE_SHARED) $(IMP_RELEASE_SHARED_LINK)
 endif
