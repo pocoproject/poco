@@ -1,15 +1,10 @@
-POCO C++ Libraries
-==================
-
-Build Status
-------------
-
-- Travis: [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.8.0)](https://travis-ci.org/pocoproject/poco)
-- AppVeyor: [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.8.0?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.8.0)
-- [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
-
-
 ![alt text][logo]
+
+
+[![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.9.0)](https://travis-ci.org/pocoproject/poco)
+[![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.9.0?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.9.0)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
+
 
 POrtable COmponents C++ Libraries are:
 --------------------------------------
@@ -20,6 +15,8 @@ POrtable COmponents C++ Libraries are:
 - Based on and complementing the C++ Standard Library/STL.
 - Highly portable and available on many different platforms, from embedded to server.
 - Open Source, licensed under the [Boost Software License](https://spdx.org/licenses/BSL-1.0).
+
+![alt text][overview]
 
 ----
 To start using POCO, see the [Guided Tour](https://pocoproject.org/docs/00100-GuidedTour.html)
@@ -36,4 +33,5 @@ In regards to Boost, in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurrence.
 
-[logo]: https://raw.githubusercontent.com/pocoproject/poco/develop/doc/poco.png "Poco Layout"
+[overview]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.0/doc/images/overview.png "Poco Overview"
+[logo]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.0/doc/images/logo.png "Poco Logo"
