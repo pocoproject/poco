@@ -56,6 +56,7 @@ namespace Util {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
+Poco::Util::Application::ArgVec ServerApplication::_argsSvc;
 Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
 #if !defined(_WIN32_WCE)
 Poco::Event           ServerApplication::_terminated;
@@ -146,7 +147,6 @@ void ServerApplication::ServiceControlHandler(DWORD control)
 	SetServiceStatus(_serviceStatusHandle,  &_serviceStatus);
 }
 
-
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
 #else
@@ -183,10 +183,53 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 			std::string arg;
 			Poco::UnicodeConverter::toUTF8(argv[i], arg);
 			args.push_back(arg);
+	    }
+
+		// append params of "Path to executable"
+		if (_argsSvc.size() > 1)
+		{
+			args.insert(args.end(), ++_argsSvc.begin(), _argsSvc.end());
+			_argsSvc.clear();
 		}
+
 		app.init(args);
 #else
-		app.init(argc, argv);
+		// append params of "Path to executable"
+		if (_argsSvc.size() > 1)
+		{
+			char** argvSvc = NULL;
+			int argcSvc = argc + _argsSvc.size() - 1;
+
+			argvSvc = (char**)(malloc((argcSvc + 1) * sizeof *argvSvc));
+			int idx;
+			for (idx = 0; idx < argc; ++idx)
+			{
+				size_t length = strlen(argv[idx]) + 1;
+				argvSvc[idx] = (char*)(malloc(length));
+				memcpy(argvSvc[idx], argv[idx], length);
+			}
+			for (size_t idxSvc = 1; idxSvc < _argsSvc.size(); ++idxSvc, ++idx)
+			{
+				size_t length = _argsSvc[idxSvc].size() + 1;
+				argvSvc[idx] = (char*)(malloc(length));
+				memset(argvSvc[idx], 0, length);
+				memcpy(argvSvc[idx], _argsSvc[idxSvc].data(), _argsSvc[idxSvc].size());
+			}
+			argvSvc[idx] = NULL;
+			_argsSvc.clear();
+
+			app.init(argcSvc, argvSvc);
+
+			for (int i = 0; i < (argcSvc + 1); ++i)
+			{
+				free(argvSvc[i]);
+			}
+			free(argvSvc);
+		}
+		else
+		{
+			app.init(argc, argv);
+		}
 #endif
 		_serviceStatus.dwCurrentState = SERVICE_RUNNING;
 		SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
@@ -218,10 +261,10 @@ void ServerApplication::waitForTerminationRequest()
 	_terminated.set();
 }
 
-
-int ServerApplication::run(int argc, char** argv)
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+int ServerApplication::run(int argc, wchar_t** argv)
 {
-	if (!hasConsole() && isService())
+	if (!hasConsole() && isService(argc, argv))
 	{
 		return 0;
 	}
@@ -253,11 +296,46 @@ int ServerApplication::run(int argc, char** argv)
 		return rc;
 	}
 }
-
+#else
+int ServerApplication::run(int argc, char** argv)
+{
+	if (!hasConsole() && isService(argc, argv))
+	{
+		return 0;
+	}
+	else
+	{
+		int rc = EXIT_OK;
+		try
+		{
+			init(argc, argv);
+			switch (_action)
+			{
+			case SRV_REGISTER:
+				registerService();
+				rc = EXIT_OK;
+				break;
+			case SRV_UNREGISTER:
+				unregisterService();
+				rc = EXIT_OK;
+				break;
+			default:
+				rc = run();
+			}
+		}
+		catch (Exception& exc)
+		{
+			logger().log(exc);
+			rc = EXIT_SOFTWARE;
+		}
+		return rc;
+	}
+}
+#endif
 
 int ServerApplication::run(const std::vector<std::string>& args)
 {
-	if (!hasConsole() && isService())
+	if (!hasConsole() && isService(args))
 	{
 		return 0;
 	}
@@ -291,46 +369,10 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
-int ServerApplication::run(int argc, wchar_t** argv)
+bool ServerApplication::isService(const ArgVec& args)
 {
-	if (!hasConsole() && isService())
-	{
-		return 0;
-	}
-	else
-	{
-		int rc = EXIT_OK;
-		try
-		{
-			init(argc, argv);
-			switch (_action)
-			{
-			case SRV_REGISTER:
-				registerService();
-				rc = EXIT_OK;
-				break;
-			case SRV_UNREGISTER:
-				unregisterService();
-				rc = EXIT_OK;
-				break;
-			default:
-				rc = run();
-			}
-		}
-		catch (Exception& exc)
-		{
-			logger().log(exc);
-			rc = EXIT_SOFTWARE;
-		}
-		return rc;
-	}
-}
-#endif
+	_argsSvc = args;
 
-
-bool ServerApplication::isService()
-{
 #if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
 	svcDispatchTable[0].lpServiceName = L"";
@@ -348,6 +390,40 @@ bool ServerApplication::isService()
 #endif
 }
 
+#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+bool ServerApplication::isService(int argc, wchar_t** argv)
+{
+	for (DWORD i = 0; i < argc; ++i)
+	{
+		std::string arg;
+		Poco::UnicodeConverter::toUTF8(argv[i], arg);
+		_argsSvc.push_back(arg);
+	}
+
+	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
+	svcDispatchTable[0].lpServiceName = L"";
+	svcDispatchTable[0].lpServiceProc = ServiceMain;
+	svcDispatchTable[1].lpServiceName = NULL;
+	svcDispatchTable[1].lpServiceProc = NULL;
+	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0;
+}
+#else
+bool ServerApplication::isService(int argc, char** argv)
+{
+	for (DWORD i = 0; i < argc; ++i)
+	{
+		std::string arg(argv[i]);
+		_argsSvc.push_back(arg);
+	}
+
+	SERVICE_TABLE_ENTRY svcDispatchTable[2];
+	svcDispatchTable[0].lpServiceName = "";
+	svcDispatchTable[0].lpServiceProc = ServiceMain;
+	svcDispatchTable[1].lpServiceName = NULL;
+	svcDispatchTable[1].lpServiceProc = NULL;
+	return StartServiceCtrlDispatcherA(svcDispatchTable) != 0;
+}
+#endif
 
 bool ServerApplication::hasConsole()
 {
