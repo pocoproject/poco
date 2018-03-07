@@ -187,6 +187,8 @@ public:
 
 	AutoPtr& operator = (AutoPtr&& ptr)
 	{
+		if (&ptr == this) return *this;
+		if (_ptr) _ptr->release();
 		_ptr = ptr._ptr;
 		ptr._ptr = nullptr;
 		return *this;
