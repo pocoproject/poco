@@ -151,9 +151,9 @@ endif()
 
 if(POCO_UNBUNDLED)
   add_definitions(-DPOCO_UNBUNDLED)
-  message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
+  message(STATUS "Using external sqlite, zlib, pcre, expat, ...")
 else()
-  message(STATUS "Build with using internal copy of sqlite, libz, pcre, expat, ...")
+  message(STATUS "Using internal sqlite, zlib, pcre, expat, ...")
 endif()
 
 include(DefinePlatformSpecifc)
