@@ -187,7 +187,8 @@ public:
 
 	AutoPtr& operator = (AutoPtr&& ptr)
 	{
-		swap(ptr);
+		_ptr = ptr._ptr;
+		ptr._ptr = nullptr;
 		return *this;
 	}
 
