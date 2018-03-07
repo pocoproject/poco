@@ -28,7 +28,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TestSuite</ProjectName>
-    <ProjectGuid>{F1EE93DF-347F-4CB3-B191-C4E63F38E972}</ProjectGuid>
+    <ProjectGuid>{C812E0B9-69A9-4FA1-A1D4-161CF677BD10}</ProjectGuid>
     <DefaultLanguage>en-US</DefaultLanguage>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <EnableRedirectPlatform>true</EnableRedirectPlatform>
