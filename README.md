@@ -1,8 +1,8 @@
 ![alt text][logo]
 
 
-[![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.9.0)](https://travis-ci.org/pocoproject/poco)
-[![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.9.0?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.9.0)
+[![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=poco-1.9.1)](https://travis-ci.org/pocoproject/poco)
+[![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/poco-1.9.1?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/poco-1.9.1)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
 
@@ -33,5 +33,5 @@ In regards to Boost, in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurrence.
 
-[overview]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.0/doc/images/overview.png "Poco Overview"
-[logo]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.0/doc/images/logo.png "Poco Logo"
+[overview]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.1/doc/images/overview.png "Poco Overview"
+[logo]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.1/doc/images/logo.png "Poco Logo"
