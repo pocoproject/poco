@@ -126,6 +126,7 @@ public:
 	static const std::string PROP_FORMAT;
 	static const std::string PROP_LOGHOST;
 	static const std::string PROP_HOST;
+	static const std::string STRUCTURED_DATA;
 
 protected:
 	~RemoteSyslogChannel();
