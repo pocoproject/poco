@@ -21,7 +21,7 @@ services:
 addons:
   postgresql: "9.4"
 
-  
+
 notifications:
   slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
 
@@ -32,106 +32,12 @@ before_script:
  - echo ${TEST_NAME}
 
 matrix:
-  include:
-    - env:    TEST_NAME="android API level 19"
-      language: android
-      jdk: openjdk8
-      android:
-        components:
-          - tools
-          - platform-tools
-          - tools
-          - build-tools-23.0.3
-          - extra-android-support
-          - extra-android-m2repository
-          - android-19
-          - android-24
-          - sys-img-armeabi-v7a-android-24
-          # Unfortunaly travis use the old android sdk tool instead of using the new sdkmanager.
-          # In this deprecated android sdk tool there is no ndk-bundle or cmake package!
-        licenses:
-          - '.+'
-      before_install:
-        - export TERM=dumb
-        - sudo apt-get update -qq
-        # I don't understand why redis and mongodb are not installed although services added above !        
-        - sudo apt-get install -qq -y mongodb-server redis-server
-        - /usr/bin/redis-server &
-        - sudo /usr/bin/mongod --config /etc/mongodb.conf &
-        - touch ~/.android/repositories.cfg
-        - mkdir -p /usr/local/android-sdk/licenses
-        - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > /usr/local/android-sdk/licenses/android-sdk-license
-        - echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> /usr/local/android-sdk/licenses/android-sdk-license
-        # Install NDK and cmake via android sdkmanager.
-        - /usr/local/android-sdk/tools/bin/sdkmanager --update > /dev/null
-        - /usr/local/android-sdk/tools/bin/sdkmanager "emulator" "ndk-bundle" "cmake;3.6.4111459" > /dev/null     
-      before_script:
-        - export TERM=dumb
-        - export _NO_CHECK_SIGNATURE=true
-        - echo no | /usr/local/android-sdk/tools/bin/avdmanager create avd -n test -k "system-images;android-24;default;armeabi-v7a"
-        - /usr/local/android-sdk/emulator/emulator -avd test -no-audio -no-window -dns-server 8.8.8.8 &
-        - android-wait-for-emulator
-        - /usr/local/android-sdk/platform-tools/adb shell input keyevent 82 &
-      script:
-        # Mandatory cmake parameter to set API level and platform for the android toolchain:
-        # /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-22
-        # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
-        
-        # Using the ninja build command. Is much faster then make build command.
-        - mkdir cmake-build && cd cmake-build && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON .. && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build . --target all && /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest --output-on-failure
-
-    - env:    TEST_NAME="android API level 24"
-      language: android
-      jdk: openjdk8
-      android:
-        components:
-          - tools
-          - platform-tools
-          - tools
-          - build-tools-23.0.3
-          - extra-android-support
-          - extra-android-m2repository
-          - android-24
-          - sys-img-armeabi-v7a-android-24
-          # Unfortunaly travis use the old android sdk tool instead of using the new sdkmanager.
-          # In this deprecated android sdk tool there is no ndk-bundle or cmake package!
-        licenses:
-          - '.+'
-      before_install:
-        - export TERM=dumb
-        - sudo apt-get update -qq
-        # I don't understand why redis and mongodb are not installed although services added above !
-        - sudo apt-get install -qq -y mongodb-server redis-server
-        - /usr/bin/redis-server &
-        - sudo /usr/bin/mongod --config /etc/mongodb.conf &
-        - touch ~/.android/repositories.cfg
-        - mkdir -p /usr/local/android-sdk/licenses
-        - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > /usr/local/android-sdk/licenses/android-sdk-license
-        - echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> /usr/local/android-sdk/licenses/android-sdk-license
-        # Install NDK and cmake via android sdkmanager.
-        - /usr/local/android-sdk/tools/bin/sdkmanager --update > /dev/null
-        - /usr/local/android-sdk/tools/bin/sdkmanager "emulator" "ndk-bundle" "cmake;3.6.4111459" > /dev/null     
-      before_script:
-        - export TERM=dumb
-        - export _NO_CHECK_SIGNATURE=true
-        - echo no | /usr/local/android-sdk/tools/bin/avdmanager create avd -n test -k "system-images;android-24;default;armeabi-v7a"
-        - /usr/local/android-sdk/emulator/emulator -avd test -no-audio -no-window -dns-server 8.8.8.8 &
-        - android-wait-for-emulator
-        - /usr/local/android-sdk/platform-tools/adb shell input keyevent 82 &
-      script:
-        # Mandatory cmake parameter to set API level and platform for the android toolchain:
-        # /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-22
-        # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
-        
-        # Using the ninja build command. Is much faster then make build command.
-        - mkdir cmake-build && cd cmake-build && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON .. && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build . --target all && /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest --output-on-failure
-
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
         - ./configure --everything --omit=PDF && make -s -j2
         - ./travis/runtests.sh
-    
+
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
@@ -191,7 +97,7 @@ matrix:
       script:
         - . env.sh && mkdoc all && mkrel all
         - ls -l releases
-        
+
     # QA jobs for code analytics and metrics
     # static code analysis with cppcheck (we can add --enable=all later)
     - env:    TEST_NAME="cppcheck"
@@ -200,15 +106,15 @@ matrix:
     # search for TODO within source tree
     - env:    TEST_NAME="TODO"
       script: grep -r TODO *
- 
+
     # search for FIXME within source tree
     - env:    TEST_NAME="FIXME"
       script: grep -r FIXME *
- 
+
     # search for HACK within source tree
     - env:    TEST_NAME="HACK"
       script: grep -r HACK *
- 
+
     # some statistics about the code base
     - env:    TEST_NAME="sloccount"
       script: sloccount .
