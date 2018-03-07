@@ -18,6 +18,8 @@ POrtable COmponents C++ Libraries are:
 - Highly portable and available on many different platforms, from embedded to server.
 - Open Source, licensed under the [Boost Software License](https://spdx.org/licenses/BSL-1.0).
 
+![alt text][overview]
+
 ----
 To start using POCO, see the [Guided Tour](https://pocoproject.org/docs/00100-GuidedTour.html)
 and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) documents.
@@ -33,4 +35,5 @@ In regards to Boost, in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurrence.
 
-[logo]: https://raw.githubusercontent.com/pocoproject/poco/develop/doc/poco.png "Poco Layout"
+[overview]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.0/doc/images/overview.png "Poco Overview"
+[logo]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.0/doc/images/logo.png "Poco Logo"
