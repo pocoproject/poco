@@ -55,10 +55,10 @@ public:
 
 private:
 	std::string _content;
-	Alignment   _align = ALIGN_LEFT;
-	int         _style = STYLE_PLAIN;
-	std::string _fontName = "Helvetica";
-	int         _fontSize = 10;
+	Alignment   _align;
+	int         _style;
+	std::string _fontName;
+	int         _fontSize;
 };
 
 

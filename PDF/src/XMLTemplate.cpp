@@ -277,7 +277,8 @@ public:
 
 		_pPage = new Page(_pDocument->addPage(parsePageSize(_size), parseOrientation(orientation)));
 		_pPage->setLineWidth(0.2f);
-		_pPage->setRGBStroke({ 0, 0, 0 });
+		RGBColor black = {0, 0, 0};
+		_pPage->setRGBStroke(black);
 		_boxes.push_back(Box(0, 0, _pPage->getWidth(), _pPage->getHeight()));
 
 		float margin = _styles.getFloat("margin", 0);

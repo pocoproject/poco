@@ -10,14 +10,24 @@ namespace PDF {
 
 
 Cell::Cell(const AttributedString& content, const std::string& name, FontMapPtr pFontMap):
-	_content(content), _name(name)
+	_content(content), 
+	_name(name),
+	_outline(OUTLINE_NONE),
+	_lineWidth(1.0f),
+	_encoding("UTF-8"),
+	_trueType(true)
+
 {
 	setFonts(pFontMap);
 }
 
 
 Cell::Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding, bool trueType):
-	_content(content), _encoding(encoding), _trueType(trueType)
+	_content(content), 
+	_outline(OUTLINE_NONE),
+	_lineWidth(1.0f),
+	_encoding(encoding), 
+	_trueType(trueType)
 {
 	setFonts(pFontMap);
 }

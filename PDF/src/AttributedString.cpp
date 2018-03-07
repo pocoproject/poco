@@ -9,18 +9,31 @@ namespace Poco {
 namespace PDF {
 
 
-AttributedString::AttributedString()
+AttributedString::AttributedString():
+	_align(ALIGN_LEFT),
+	_style(STYLE_PLAIN),
+	_fontName("Helvetica"),
+	_fontSize(10)
 {
 }
 
 
-AttributedString::AttributedString(const char* content): _content(content)
+AttributedString::AttributedString(const char* content): 
+	_content(content),
+	_align(ALIGN_LEFT),
+	_style(STYLE_PLAIN),
+	_fontName("Helvetica"),
+	_fontSize(10)
 {
 }
 
 
 AttributedString::AttributedString(const std::string& content, Alignment align, int style):
-	_content(content), _align(align), _style(static_cast<Style>(style))
+	_content(content), 
+	_align(align), 
+	_style(static_cast<Style>(style)),
+	_fontName("Helvetica"),
+	_fontSize(10)
 {
 }
 

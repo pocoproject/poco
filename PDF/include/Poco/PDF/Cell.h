@@ -58,13 +58,13 @@ public:
 	void draw(Page& page, float x, float y, float width, float height);
 
 private:
-	AttributedString   _content = "";
-	std::string        _name = "";
-	unsigned           _outline = OUTLINE_NONE;
-	float              _lineWidth = 1.0f;
+	AttributedString   _content;
+	std::string        _name;
+	unsigned           _outline;
+	float              _lineWidth;
 	FontMapPtr         _pFontMap;
-	std::string        _encoding = "UTF-8";
-	bool               _trueType = true;
+	std::string        _encoding;
+	bool               _trueType;
 };
 
 
