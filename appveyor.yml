@@ -455,7 +455,8 @@ before_test:
 - ps: |
       $line='-------------------------------------------------------------------------------------';
       $CPPUNIT_IGNORE='';
-      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class GlobTest>.testGlob';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
@@ -463,7 +464,6 @@ before_test:
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
-      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class GlobTest>.testGlob';
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
       Write-Host -ForegroundColor Yellow $line;
