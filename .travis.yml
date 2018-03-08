@@ -32,7 +32,6 @@ before_script:
  - echo ${TEST_NAME}
 
 matrix:
-  include:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
