@@ -562,8 +562,8 @@ test_script:
           ctest --config RelWithDebInfo -N
           Write-Host -ForegroundColor Yellow $line;
 
-          Write-Host -ForegroundColor Yellow 'ctest -C Debug -VV -E SQL*'
-          ctest -C Debug -VV -E SQL*
+          Write-Host -ForegroundColor Yellow 'ctest -C Debug -VV'
+          ctest -C Debug -VV 
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
