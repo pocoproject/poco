@@ -6,8 +6,9 @@
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
 
-POrtable COmponents C++ Libraries are:
---------------------------------------
+POCO (Portable Components) C++ Libraries are:
+---------------------------------------------
+
 - A collection of C++ class libraries, conceptually similar to the Java Class Library, the .NET Framework or Apple’s Cocoa.
 - Focused on solutions to frequently-encountered practical problems.
 - Focused on ‘internet-age’ network-centric applications.
@@ -33,5 +34,5 @@ In regards to Boost, in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurrence.
 
-[overview]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.1/doc/images/overview.png "Poco Overview"
-[logo]: https://raw.githubusercontent.com/pocoproject/poco/poco-1.9.1/doc/images/logo.png "Poco Logo"
+[overview]: doc/images/overview.png "Poco Overview"
+[logo]: doc/images/logo.png "Poco Logo"
