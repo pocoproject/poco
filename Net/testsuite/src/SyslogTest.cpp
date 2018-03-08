@@ -211,6 +211,42 @@ void SyslogTest::testOldBSD()
 }
 
 
+void SyslogTest::testStructuredData()
+{
+	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
+	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->open();
+	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
+	listener->open();
+	CachingChannel cl;
+	listener->addChannel(&cl);
+	assert(cl.getCurrentSize() == 0);
+	Poco::Message msg1("asource", "amessage", Poco::Message::PRIO_CRITICAL);
+	msg1.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
+	channel->log(msg1);
+	Poco::Message msg2("asource", "amessage", Poco::Message::PRIO_CRITICAL);
+	msg2.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]");
+	channel->log(msg2);
+	Poco::Thread::sleep(1000);
+	listener->close();
+	channel->close();
+	assert(cl.getCurrentSize() == 2);
+	std::vector<Poco::Message> msgs;
+	cl.getMessages(msgs, 0, 10);
+	assert(msgs.size() == 2);
+
+	assert(msgs[0].getSource() == "asource");
+	assert(msgs[0].getText() == "amessage");
+	assert(msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assert(msgs[0].get("structured-data") == "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]");
+
+	assert(msgs[1].getSource() == "asource");
+	assert(msgs[1].getText() == "amessage");
+	assert(msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assert(msgs[1].get("structured-data") == "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
+}
+
+
 void SyslogTest::setUp()
 {
 }
@@ -228,6 +264,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testListener);
 	CppUnit_addTest(pSuite, SyslogTest, testChannelOpenClose);
 	CppUnit_addTest(pSuite, SyslogTest, testOldBSD);
+	CppUnit_addTest(pSuite, SyslogTest, testStructuredData);
 
 	return pSuite;
 }

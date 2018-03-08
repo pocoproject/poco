@@ -36,6 +36,13 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	///
 	/// In addition, RemoteSyslogListener also supports the "old" BSD syslog
 	/// protocol, as described in RFC 3164.
+	///
+	/// RFC 5425 structured data can be passed via the "structured-data"
+	/// property of the log Message. The content of the "structured-data"
+	/// property must be correct according to RFC 5425.
+	///
+	/// Example:
+	///     msg.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
 {
 public:
 	static const std::string BSD_TIMEFORMAT;
@@ -126,6 +133,7 @@ public:
 	static const std::string PROP_FORMAT;
 	static const std::string PROP_LOGHOST;
 	static const std::string PROP_HOST;
+	static const std::string STRUCTURED_DATA;
 
 protected:
 	~RemoteSyslogChannel();
