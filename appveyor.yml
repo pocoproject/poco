@@ -11,6 +11,8 @@ cache:
 branches:
   except:
     - /.*ravis.*/
+    - /.*ndroid.*/
+    - /.*NDROID.*/
 
 
 skip_commits:
