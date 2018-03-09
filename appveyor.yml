@@ -17,6 +17,7 @@ branches:
 
 skip_commits:
   message: /.*Merge.*/
+  message: /.*ndroid.*/
 
 
 hosts:
