@@ -16,9 +16,8 @@ branches:
 
 
 skip_commits:
-  message: /.*Merge.*/
-  message: /.*ndroid.*/
-
+  message: /.*Merge.*/, /.*ndroid.*/
+ 
 
 hosts:
   localhost: 127.0.0.1
