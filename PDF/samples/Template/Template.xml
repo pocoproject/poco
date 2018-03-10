@@ -2,6 +2,7 @@
   <page style="margin: 35; padding: 20">
     <span style="left: 0; bottom: -120; font-size: 24">Simpsons Report</span>
     <img src="Simpsons_FamilyPicture.png" style="right: ${box.width}; top: ${box.height}; scale=0.3"/>
+	<img src="Simpsons_FamilyPicture2.bmp" style="height: 30; aspectratioH: true; offsetX: 100; offsetY: -10"/>
     <table>
       <tr>
         <td>Springfield</td>

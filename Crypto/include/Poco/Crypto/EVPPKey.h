@@ -284,9 +284,11 @@ private:
 	friend class RSAKeyImpl;
 };
 
+
 //
 // inlines
 //
+
 
 inline bool EVPPKey::operator == (const EVPPKey& other) const
 {

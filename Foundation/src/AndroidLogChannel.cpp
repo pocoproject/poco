@@ -34,7 +34,7 @@ AndroidLogChannel::~AndroidLogChannel()
 
 void AndroidLogChannel::log(const Message& msg)
 {
-	int prio = ANDROID_LOG_DEBUG;
+	int prio = ANDROID_LOG_DEFAULT;
 	switch (msg.getPriority())
 	{
 	case Message::PRIO_FATAL:
@@ -51,11 +51,14 @@ void AndroidLogChannel::log(const Message& msg)
 	case Message::PRIO_INFORMATION:
 		prio = ANDROID_LOG_INFO;
 		break;
+	case Message::PRIO_DEBUG:
+		prio = ANDROID_LOG_DEBUG;
+		break;
 	case Message::PRIO_TRACE:
 		prio = ANDROID_LOG_VERBOSE;
 		break;
 	}
-	__android_log_print(prio, _tag.c_str(), msg.getText().c_str());
+	__android_log_write(prio, _tag.c_str(), msg.getText().c_str());
 }
 
 

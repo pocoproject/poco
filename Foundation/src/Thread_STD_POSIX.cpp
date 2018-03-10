@@ -22,7 +22,7 @@
 		#define __EXTENSIONS__
 	#endif
 #endif
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 	#include <time.h>
 	#include <unistd.h>
 #endif
@@ -31,7 +31,7 @@
 	#include <mach/task.h>
 	#include <mach/thread_policy.h>
 #endif
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	#include <sys/syscall.h>
 #endif
 #include <cstring>

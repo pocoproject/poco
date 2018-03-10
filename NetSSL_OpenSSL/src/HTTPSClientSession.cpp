@@ -139,30 +139,64 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 {
 	if (getProxyHost().empty() || bypassProxy())
 	{
-		SecureStreamSocket sss(socket());
-		if (sss.getPeerHostName().empty())
-		{
-			sss.setPeerHostName(getHost());
-		}
-		if (_pContext->sessionCacheEnabled())
-		{
-			sss.useSession(_pSession);
-		}
+		connectToTargetPre();
 		HTTPSession::connect(address);
-		if (_pContext->sessionCacheEnabled())
-		{
-			_pSession = sss.currentSession();
-		}
+		connectToTargetPost();
 	}
 	else
 	{
-		StreamSocket proxySocket(proxyConnect());
-		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
-		attachSocket(secureSocket);
-		if (_pContext->sessionCacheEnabled())
-		{
-			_pSession = secureSocket.currentSession();
-		}
+		connectToProxy();
+	}
+}
+
+
+void HTTPSClientSession::connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress)
+{
+	if (getProxyHost().empty() || bypassProxy())
+	{
+		connectToTargetPre();
+		HTTPSession::connect(targetAddress, sourceAddress);
+		connectToTargetPost();
+	}
+	else
+	{
+		connectToProxy();
+	}
+}
+
+
+void HTTPSClientSession::connectToTargetPre()
+{
+	SecureStreamSocket sss(socket());
+	if (sss.getPeerHostName().empty())
+	{
+		sss.setPeerHostName(getHost());
+	}
+	if (_pContext->sessionCacheEnabled())
+	{
+		sss.useSession(_pSession);
+	}
+}
+
+
+void HTTPSClientSession::connectToTargetPost()
+{
+	SecureStreamSocket sss(socket());
+	if (_pContext->sessionCacheEnabled())
+	{
+		_pSession = sss.currentSession();
+	}
+}
+
+
+void HTTPSClientSession::connectToProxy()
+{
+	StreamSocket proxySocket(proxyConnect());
+	SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
+	attachSocket(secureSocket);
+	if (_pContext->sessionCacheEnabled())
+	{
+		_pSession = secureSocket.currentSession();
 	}
 }
 

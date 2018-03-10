@@ -12,6 +12,8 @@
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Crypto/EVPPKey.h"
+#include "Poco/Crypto/RSAKey.h"
+#include "Poco/Crypto/KeyPairImpl.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
@@ -24,6 +26,8 @@
 using Poco::Crypto::PKCS12Container;
 using Poco::Crypto::X509Certificate;
 using Poco::Crypto::EVPPKey;
+using Poco::Crypto::RSAKey;
+using Poco::Crypto::KeyPairImpl;
 using Poco::Environment;
 using Poco::Path;
 using Poco::File;
@@ -79,6 +83,9 @@ void PKCS12ContainerTest::full(const PKCS12Container& pkcs12)
 	assert (pkcs12.hasKey());
 	EVPPKey pKey = pkcs12.getKey();
 	assert (EVP_PKEY_RSA == pKey.type());
+
+	RSAKey rsa(pkcs12);
+	assert (rsa.impl()->type() == KeyPairImpl::KT_RSA_IMPL);
 
 	assert (pkcs12.hasX509Certificate());
 	fullCert(pkcs12.getX509Certificate());

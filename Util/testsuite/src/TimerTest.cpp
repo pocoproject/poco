@@ -197,18 +197,18 @@ void TimerTest::testScheduleAtFixedRate()
 void TimerTest::testCancel()
 {
 	Timer timer;
-	
+
 	Timestamp time;
-	
+
 	TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
-	
+
 	assert (pTask->lastExecution() == 0);
-	
+
 	timer.scheduleAtFixedRate(pTask, 5000, 5000);
 
 	pTask->cancel();
 	assert (pTask->isCancelled());
-	
+
 	try
 	{
 		timer.scheduleAtFixedRate(pTask, 5000, 5000);
@@ -221,6 +221,42 @@ void TimerTest::testCancel()
 	{
 		fail("bad exception thrown");
 	}
+}
+
+
+void TimerTest::testCancelAllStop()
+{
+	{
+		Timer timer;
+
+		TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
+
+		timer.scheduleAtFixedRate(pTask, 5000, 5000);
+
+		Poco::Thread::sleep(100);
+
+		timer.cancel(false);
+	}
+
+	assert (true); // don't hang
+}
+
+
+void TimerTest::testCancelAllWaitStop()
+{
+	{
+		Timer timer;
+
+		TimerTask::Ptr pTask = new TimerTaskAdapter<TimerTest>(*this, &TimerTest::onTimer);
+
+		timer.scheduleAtFixedRate(pTask, 5000, 5000);
+
+		Poco::Thread::sleep(100);
+
+		timer.cancel(true);
+	}
+
+	assert (true); // don't hang
 }
 
 
@@ -252,6 +288,8 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testScheduleIntervalClock);
 	CppUnit_addTest(pSuite, TimerTest, testScheduleAtFixedRate);
 	CppUnit_addTest(pSuite, TimerTest, testCancel);
+	CppUnit_addTest(pSuite, TimerTest, testCancelAllStop);
+	CppUnit_addTest(pSuite, TimerTest, testCancelAllWaitStop);
 
 	return pSuite;
 }

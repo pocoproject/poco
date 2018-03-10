@@ -48,11 +48,14 @@ NTPClientTest::~NTPClientTest()
 
 void NTPClientTest::testTimeSync()
 {
+#if POCO_OS != POCO_OS_ANDROID
 	if (ICMPClient::pingIPv4("pool.ntp.org") <= 0)
 	{
 		std::cerr << "pool.ntp.org not accessibe, test skipped" << std::endl;
 		return;
 	}
+#endif
+
 	assert(_ntpClient.request("pool.ntp.org") > 0);
 }
 

@@ -60,7 +60,7 @@ namespace Poco {
 
 	std::string Error::getMessage(int errorCode)
 	{
-#if defined _GNU_SOURCE || (_XOPEN_SOURCE >= 600) || POCO_ANDROID || __APPLE__
+#if defined _GNU_SOURCE || (_XOPEN_SOURCE >= 600) || POCO_OS == POCO_OS_ANDROID || __APPLE__
 		char errmsg[256] = "";
 		return std::string(strerror_result(strerror_r(errorCode, errmsg, sizeof(errmsg)), errmsg));
 #else
