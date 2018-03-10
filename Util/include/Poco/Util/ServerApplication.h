@@ -204,6 +204,8 @@ private:
 	bool hasConsole();
 	bool isService(const ArgVec& args);
 	bool isService(int argc, wchar_t** argv);
+	//@ deprecated
+	bool isService(int argc, char ** argv);
 
 	void beService();
 	void registerService();
@@ -275,6 +277,21 @@ private:
 			std::cerr << exc.displayText() << std::endl;	\
 			return Poco::Util::Application::EXIT_SOFTWARE; 	\
 		}													\
+	}
+#else
+	#define POCO_SERVER_MAIN(App) \
+	int main(int argc, char** argv)		\
+	{									\
+		try 							\
+		{								\
+			App app;					\
+			return app.run(argc, argv);	\
+		}								\
+		catch (Poco::Exception& exc)	\
+		{								\
+			std::cerr << exc.displayText() << std::endl;	\
+			return Poco::Util::Application::EXIT_SOFTWARE; 	\
+		}								\
 	}
 #endif
 

@@ -316,7 +316,7 @@ int ServerApplication::run(int argc, wchar_t** argv)
 
 int ServerApplication::run(int argc, char** argv)
 {
-	if (!hasConsole() && isService())
+	if (!hasConsole() && isService(argc, argv))
 	{
 		return 0;
 	}
@@ -376,6 +376,11 @@ bool ServerApplication::isService(int argc, wchar_t** argv)
 	svcDispatchTable[1].lpServiceName = NULL;
 	svcDispatchTable[1].lpServiceProc = NULL;
 	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0;
+}
+
+bool ServerApplication::isService(int argc, char** argv)
+{
+	return false;
 }
 
 
