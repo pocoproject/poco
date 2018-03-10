@@ -11,11 +11,13 @@ cache:
 branches:
   except:
     - /.*ravis.*/
+    - /.*ndroid.*/
+    - /.*NDROID.*/
 
 
 skip_commits:
-  message: /.*Merge.*/
-
+  message: /.*Merge.*/, /.*ndroid.*/
+ 
 
 hosts:
   localhost: 127.0.0.1
@@ -455,7 +457,8 @@ before_test:
 - ps: |
       $line='-------------------------------------------------------------------------------------';
       $CPPUNIT_IGNORE='';
-      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class GlobTest>.testGlob';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';

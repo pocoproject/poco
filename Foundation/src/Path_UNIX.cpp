@@ -252,6 +252,12 @@ std::string PathImpl::expandImpl(const std::string& path)
 		}
 		else result += *it++;
 	}
+	std::string::size_type found = result.find("//");
+	while (found != std::string::npos)
+	{
+		result.replace(found, 2, "/");
+		found = result.find("//", found+1);
+	}
 	return result;
 }
 

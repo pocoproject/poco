@@ -80,7 +80,11 @@ public:
 		const ByteVec& key,
 		const ByteVec& iv);
 		/// Creates a new CipherKeyImpl object using the given cipher
-		/// name, key and initialization vector.
+		/// name, key and initialization vector (IV).
+		///
+		/// The size of the IV must match the cipher's expected
+		/// IV size (see ivSize()), except for GCM mode, which allows
+		/// a custom IV size.
 
 	CipherKey(const std::string& name);
 		/// Creates a new CipherKeyImpl object. Autoinitializes key and
@@ -115,6 +119,10 @@ public:
 
 	void setIV(const ByteVec& iv);
 		/// Sets the initialization vector (IV) for the Cipher.
+		///
+		/// The size of the vector must match the cipher's expected
+		/// IV size (see ivSize()), except for GCM mode, which allows
+		/// a custom IV size.
 
 	CipherKeyImpl::Ptr impl();
 		/// Returns the impl object

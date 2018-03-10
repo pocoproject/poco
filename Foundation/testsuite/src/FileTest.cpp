@@ -344,7 +344,7 @@ void FileTest::testSize()
 
 void FileTest::testSpace()
 {
-	File f(Path::home());
+	File f(Path::temp());
 	assert(f.totalSpace() > 0);
 	assert(f.usableSpace() > 0);
 	assert(f.freeSpace() > 0);
