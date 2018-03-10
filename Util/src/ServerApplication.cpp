@@ -314,6 +314,41 @@ int ServerApplication::run(int argc, wchar_t** argv)
 }
 #endif
 
+int ServerApplication::run(int argc, char** argv)
+{
+	if (!hasConsole() && isService())
+	{
+		return 0;
+	}
+	else
+	{
+		int rc = EXIT_OK;
+		try
+		{
+			init(argc, argv);
+			switch (_action)
+			{
+			case SRV_REGISTER:
+				registerService();
+				rc = EXIT_OK;
+				break;
+			case SRV_UNREGISTER:
+				unregisterService();
+				rc = EXIT_OK;
+				break;
+			default:
+				rc = run();
+			}
+		}
+		catch (Exception& exc)
+		{
+			logger().log(exc);
+			rc = EXIT_SOFTWARE;
+		}
+		return rc;
+	}
+}
+
 bool ServerApplication::isService(const ArgVec& args)
 {
 	_argsSvc = args;
