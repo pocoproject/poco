@@ -402,9 +402,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="CppParser64.static.debug" Guid="30247E39-4FBD-4D4F-8B90-CEA53E6230BE">
                         <File Id="POCOCPPPARSER64MDD.LIB" Name="PocoCppParser64mdd.lib" Source="$(var.POCO)\lib64\PocoCppParsermdd.lib" />
-                        <File Id="POCOCPPPARSER64MDD.PDB" Name="pococppparser64mdd.pdb" Source="$(var.POCO)\lib64\pococppparsermdd.pdb" />
+                        <File Id="POCOCPPPARSER64MDD.PDB" Name="PocoCppparser64mdd.pdb" Source="$(var.POCO)\lib64\PocoCppparsermdd.pdb" />
                         <File Id="POCOCPPPARSER64MTD.LIB" Name="PocoCppParser64mtd.lib" Source="$(var.POCO)\lib64\PocoCppParsermtd.lib" />
-                        <File Id="POCOCPPPARSER64MTD.PDB" Name="pococppparser64mtd.pdb" Source="$(var.POCO)\lib64\pococppparsermtd.pdb" />
+                        <File Id="POCOCPPPARSER64MTD.PDB" Name="PocoCppparser64mtd.pdb" Source="$(var.POCO)\lib64\PocoCppparsermtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="CppParser64.static.release" Guid="89AB208B-4754-49B3-8B44-77707CEFF2A6">
                         <File Id="POCOCPPPARSER64MD.LIB" Name="PocoCppParser64md.lib" Source="$(var.POCO)\lib64\PocoCppParsermd.lib" />
@@ -412,9 +412,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto64.static.debug" Guid="0D082893-DF9C-4900-AF54-45813DDABAC6">
                         <File Id="POCOCRYPTO64MDD.LIB" Name="PocoCrypto64mdd.lib" Source="$(var.POCO)\lib64\PocoCryptomdd.lib" />
-                        <File Id="POCOCRYPTO64MDD.PDB" Name="pococrypto64mdd.pdb" Source="$(var.POCO)\lib64\pococryptomdd.pdb" />
+                        <File Id="POCOCRYPTO64MDD.PDB" Name="PocoCrypto64mdd.pdb" Source="$(var.POCO)\lib64\PocoCryptomdd.pdb" />
                         <File Id="POCOCRYPTO64MTD.LIB" Name="PocoCrypto64mtd.lib" Source="$(var.POCO)\lib64\PocoCryptomtd.lib" />
-                        <File Id="POCOCRYPTO64MTD.PDB" Name="pococrypto64mtd.pdb" Source="$(var.POCO)\lib64\pococryptomtd.pdb" />
+                        <File Id="POCOCRYPTO64MTD.PDB" Name="PocoCrypto64mtd.pdb" Source="$(var.POCO)\lib64\PocoCryptomtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto64.static.release" Guid="7A77AE62-217A-4269-8F87-9D957B42460C">
                         <File Id="POCOCRYPTO64MD.LIB" Name="PocoCrypto64md.lib" Source="$(var.POCO)\lib64\PocoCryptomd.lib" />
@@ -422,9 +422,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Data64.static.debug" Guid="75E219B6-B236-4527-BA5D-FDE792A8AC63">
                         <File Id="POCODATA64MDD.LIB" Name="PocoData64mdd.lib" Source="$(var.POCO)\lib64\PocoDatamdd.lib" />
-                        <File Id="POCODATA64MDD.PDB" Name="pocodata64mdd.pdb" Source="$(var.POCO)\lib64\pocodatamdd.pdb" />
+                        <File Id="POCODATA64MDD.PDB" Name="PocoData64mdd.pdb" Source="$(var.POCO)\lib64\PocoDatamdd.pdb" />
                         <File Id="POCODATA64MTD.LIB" Name="PocoData64mtd.lib" Source="$(var.POCO)\lib64\PocoDatamtd.lib" />
-                        <File Id="POCODATA64MTD.PDB" Name="pocodata64mtd.pdb" Source="$(var.POCO)\lib64\pocodatamtd.pdb" />
+                        <File Id="POCODATA64MTD.PDB" Name="PocoData64mtd.pdb" Source="$(var.POCO)\lib64\PocoDatamtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Data64.static.release" Guid="95B3334B-2F19-4810-BB41-F5F9E3415FDD">
                         <File Id="POCODATA64MD.LIB" Name="PocoData64md.lib" Source="$(var.POCO)\lib64\PocoDatamd.lib" />
@@ -432,9 +432,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataODBC64.static.debug" Guid="5818B110-4664-4D48-8062-1C10914189E7">
                         <File Id="POCODATAODBC64MDD.LIB" Name="PocoDataODBC64mdd.lib" Source="$(var.POCO)\lib64\PocoDataODBCmdd.lib" />
-                        <File Id="POCODATAODBC64MDD.PDB" Name="pocodataodbc64mdd.pdb" Source="$(var.POCO)\lib64\pocodataodbcmdd.pdb" />
+                        <File Id="POCODATAODBC64MDD.PDB" Name="PocoDataodbc64mdd.pdb" Source="$(var.POCO)\lib64\PocoDataodbcmdd.pdb" />
                         <File Id="POCODATAODBC64MTD.LIB" Name="PocoDataODBC64mtd.lib" Source="$(var.POCO)\lib64\PocoDataODBCmtd.lib" />
-                        <File Id="POCODATAODBC64MTD.PDB" Name="pocodataodbc64mtd.pdb" Source="$(var.POCO)\lib64\pocodataodbcmtd.pdb" />
+                        <File Id="POCODATAODBC64MTD.PDB" Name="PocoDataodbc64mtd.pdb" Source="$(var.POCO)\lib64\PocoDataodbcmtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataODBC64.static.release" Guid="2D3DB6EE-F3DB-4341-8C9A-33D1A6704EF3">
                         <File Id="POCODATAODBC64MD.LIB" Name="PocoDataODBC64md.lib" Source="$(var.POCO)\lib64\PocoDataODBCmd.lib" />
@@ -442,9 +442,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataSQLite64.static.debug" Guid="2D59BA2E-0A6A-4F3C-86CF-A4DD99E3237C">
                         <File Id="POCODATASQLITE64MDD.LIB" Name="PocoDataSQLite64mdd.lib" Source="$(var.POCO)\lib64\PocoDataSQLitemdd.lib" />
-                        <File Id="POCODATASQLITE64MDD.PDB" Name="pocodatasqlite64mdd.pdb" Source="$(var.POCO)\lib64\pocodatasqlitemdd.pdb" />
+                        <File Id="POCODATASQLITE64MDD.PDB" Name="PocoDatasqlite64mdd.pdb" Source="$(var.POCO)\lib64\PocoDatasqlitemdd.pdb" />
                         <File Id="POCODATASQLITE64MTD.LIB" Name="PocoDataSQLite64mtd.lib" Source="$(var.POCO)\lib64\PocoDataSQLitemtd.lib" />
-                        <File Id="POCODATASQLITE64MTD.PDB" Name="pocodatasqlite64mtd.pdb" Source="$(var.POCO)\lib64\pocodatasqlitemtd.pdb" />
+                        <File Id="POCODATASQLITE64MTD.PDB" Name="PocoDatasqlite64mtd.pdb" Source="$(var.POCO)\lib64\PocoDatasqlitemtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataSQLite64.static.release" Guid="23F831FC-4DDA-4CBD-87C5-F98D429A70C1">
                         <File Id="POCODATASQLITE64MD.LIB" Name="PocoDataSQLite64md.lib" Source="$(var.POCO)\lib64\PocoDataSQLitemd.lib" />
@@ -452,9 +452,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataMySQL64.static.debug" Guid="4A5EB45E-024C-45F1-BDB6-3799DAA755AE">
                         <File Id="POCODATAMYSQL64MDD.LIB" Name="PocoDataMySQL64mdd.lib" Source="$(var.POCO)\lib64\PocoDataMySQLmdd.lib" />
-                        <File Id="POCODATAMYSQL64MDD.PDB" Name="pocodatamysql64mdd.pdb" Source="$(var.POCO)\lib64\pocodatamysqlmdd.pdb" />
+                        <File Id="POCODATAMYSQL64MDD.PDB" Name="PocoDatamysql64mdd.pdb" Source="$(var.POCO)\lib64\PocoDatamysqlmdd.pdb" />
                         <File Id="POCODATAMYSQL64MTD.LIB" Name="PocoDataMySQL64mtd.lib" Source="$(var.POCO)\lib64\PocoDataMySQLmtd.lib" />
-                        <File Id="POCODATAMYSQL64MTD.PDB" Name="pocodatamysql64mtd.pdb" Source="$(var.POCO)\lib64\pocodatamysqlmtd.pdb" />
+                        <File Id="POCODATAMYSQL64MTD.PDB" Name="PocoDatamysql64mtd.pdb" Source="$(var.POCO)\lib64\PocoDatamysqlmtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataMySQL64.static.release" Guid="D7CC865C-8337-418C-89A1-437BCD3221EE">
                         <File Id="POCODATAMYSQL64MD.LIB" Name="PocoDataMySQL64md.lib" Source="$(var.POCO)\lib64\PocoDataMySQLmd.lib" />
@@ -492,9 +492,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="PDF64.static.debug" Guid="26D0414F-132E-40DC-92E4-6697B2876A3F">
                         <File Id="POCOPDF64MDD.LIB" Name="PocoPDF64mdd.lib" Source="$(var.POCO)\lib64\PocoPDFmdd.lib" />
-                        <File Id="POCOPDF64MDD.PDB" Name="pocopdf64mdd.pdb" Source="$(var.POCO)\lib64\pocopdfmdd.pdb" />
+                        <File Id="POCOPDF64MDD.PDB" Name="PocoPdf64mdd.pdb" Source="$(var.POCO)\lib64\PocoPdfmdd.pdb" />
                         <File Id="POCOPDF64MTD.LIB" Name="PocoPDF64mtd.lib" Source="$(var.POCO)\lib64\PocoPDFmtd.lib" />
-                        <File Id="POCOPDF64MTD.PDB" Name="pocopdf64mtd.pdb" Source="$(var.POCO)\lib64\pocopdfmtd.pdb" />
+                        <File Id="POCOPDF64MTD.PDB" Name="PocoPdf64mtd.pdb" Source="$(var.POCO)\lib64\PocoPdfmtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="PDF64.static.release" Guid="452E43B6-B81D-4719-A2C5-9AA291223678">
                         <File Id="POCOPDF64MD.LIB" Name="PocoPDF64md.lib" Source="$(var.POCO)\lib64\PocoPDFmd.lib" />
@@ -573,9 +573,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="CppParser.static.debug" Guid="13CF63B2-56E1-456C-AC61-F63A9C8B1372">
                         <File Id="POCOCPPPARSERMDD.LIB" Name="PocoCppParsermdd.lib" Source="$(var.POCO)\lib\PocoCppParsermdd.lib" />
-                        <File Id="POCOCPPPARSERMDD.PDB" Name="pococppparsermdd.pdb" Source="$(var.POCO)\lib\pococppparsermdd.pdb" />
+                        <File Id="POCOCPPPARSERMDD.PDB" Name="PocoCppparsermdd.pdb" Source="$(var.POCO)\lib\PocoCppparsermdd.pdb" />
                         <File Id="POCOCPPPARSERMTD.LIB" Name="PocoCppParsermtd.lib" Source="$(var.POCO)\lib\PocoCppParsermtd.lib" />
-                        <File Id="POCOCPPPARSERMTD.PDB" Name="pococppparsermtd.pdb" Source="$(var.POCO)\lib\pococppparsermtd.pdb" />
+                        <File Id="POCOCPPPARSERMTD.PDB" Name="PocoCppparsermtd.pdb" Source="$(var.POCO)\lib\PocoCppparsermtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="CppParser.static.release" Guid="89AB208B-4754-49B3-8B44-77707CEFF2A6">
                         <File Id="POCOCPPPARSERMD.LIB" Name="PocoCppParsermd.lib" Source="$(var.POCO)\lib\PocoCppParsermd.lib" />
@@ -583,9 +583,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto.static.debug" Guid="CE2992D2-4D56-44B2-A4EE-79B638BD05A8">
                         <File Id="POCOCRYPTOMDD.LIB" Name="PocoCryptomdd.lib" Source="$(var.POCO)\lib\PocoCryptomdd.lib" />
-                        <File Id="POCOCRYPTOMDD.PDB" Name="pococryptomdd.pdb" Source="$(var.POCO)\lib\pococryptomdd.pdb" />
+                        <File Id="POCOCRYPTOMDD.PDB" Name="PocoCryptomdd.pdb" Source="$(var.POCO)\lib\PocoCryptomdd.pdb" />
                         <File Id="POCOCRYPTOMTD.LIB" Name="PocoCryptomtd.lib" Source="$(var.POCO)\lib\PocoCryptomtd.lib" />
-                        <File Id="POCOCRYPTOMTD.PDB" Name="pococryptomtd.pdb" Source="$(var.POCO)\lib\pococryptomtd.pdb" />
+                        <File Id="POCOCRYPTOMTD.PDB" Name="PocoCryptomtd.pdb" Source="$(var.POCO)\lib\PocoCryptomtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto.static.release" Guid="7A77AE62-217A-4269-8F87-9D957B42460C">
                         <File Id="POCOCRYPTOMD.LIB" Name="PocoCryptomd.lib" Source="$(var.POCO)\lib\PocoCryptomd.lib" />
@@ -593,9 +593,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Data.static.debug" Guid="DD35AC73-E4C8-429E-A7D0-E17167F4FD9C">
                         <File Id="POCODATAMDD.LIB" Name="PocoDatamdd.lib" Source="$(var.POCO)\lib\PocoDatamdd.lib" />
-                        <File Id="POCODATAMDD.PDB" Name="pocodatamdd.pdb" Source="$(var.POCO)\lib\pocodatamdd.pdb" />
+                        <File Id="POCODATAMDD.PDB" Name="PocoDatamdd.pdb" Source="$(var.POCO)\lib\PocoDatamdd.pdb" />
                         <File Id="POCODATAMTD.LIB" Name="PocoDatamtd.lib" Source="$(var.POCO)\lib\PocoDatamtd.lib" />
-                        <File Id="POCODATAMTD.PDB" Name="pocodatamtd.pdb" Source="$(var.POCO)\lib\pocodatamtd.pdb" />
+                        <File Id="POCODATAMTD.PDB" Name="PocoDatamtd.pdb" Source="$(var.POCO)\lib\PocoDatamtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Data.static.release" Guid="95B3334B-2F19-4810-BB41-F5F9E3415FDD">
                         <File Id="POCODATAMD.LIB" Name="PocoDatamd.lib" Source="$(var.POCO)\lib\PocoDatamd.lib" />
@@ -603,9 +603,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataODBC.static.debug" Guid="79F5E5DA-421A-4982-A2C1-59A3D921329F">
                         <File Id="POCODATAODBCMDD.LIB" Name="PocoDataODBCmdd.lib" Source="$(var.POCO)\lib\PocoDataODBCmdd.lib" />
-                        <File Id="POCODATAODBCMDD.PDB" Name="pocodataodbcmdd.pdb" Source="$(var.POCO)\lib\pocodataodbcmdd.pdb" />
+                        <File Id="POCODATAODBCMDD.PDB" Name="PocoDataodbcmdd.pdb" Source="$(var.POCO)\lib\PocoDataodbcmdd.pdb" />
                         <File Id="POCODATAODBCMTD.LIB" Name="PocoDataODBCmtd.lib" Source="$(var.POCO)\lib\PocoDataODBCmtd.lib" />
-                        <File Id="POCODATAODBCMTD.PDB" Name="pocodataodbcmtd.pdb" Source="$(var.POCO)\lib\pocodataodbcmtd.pdb" />
+                        <File Id="POCODATAODBCMTD.PDB" Name="PocoDataodbcmtd.pdb" Source="$(var.POCO)\lib\PocoDataodbcmtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataODBC.static.release" Guid="2D3DB6EE-F3DB-4341-8C9A-33D1A6704EF3">
                         <File Id="POCODATAODBCMD.LIB" Name="PocoDataODBCmd.lib" Source="$(var.POCO)\lib\PocoDataODBCmd.lib" />
@@ -613,9 +613,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataSQLite.static.debug" Guid="662F1977-31F3-478A-A0FA-3BB809BD0264">
                         <File Id="POCODATASQLITEMDD.LIB" Name="PocoDataSQLitemdd.lib" Source="$(var.POCO)\lib\PocoDataSQLitemdd.lib" />
-                        <File Id="POCODATASQLITEMDD.PDB" Name="pocodatasqlitemdd.pdb" Source="$(var.POCO)\lib\pocodatasqlitemdd.pdb" />
+                        <File Id="POCODATASQLITEMDD.PDB" Name="PocoDatasqlitemdd.pdb" Source="$(var.POCO)\lib\PocoDatasqlitemdd.pdb" />
                         <File Id="POCODATASQLITEMTD.LIB" Name="PocoDataSQLitemtd.lib" Source="$(var.POCO)\lib\PocoDataSQLitemtd.lib" />
-                        <File Id="POCODATASQLITEMTD.PDB" Name="pocodatasqlitemtd.pdb" Source="$(var.POCO)\lib\pocodatasqlitemtd.pdb" />
+                        <File Id="POCODATASQLITEMTD.PDB" Name="PocoDatasqlitemtd.pdb" Source="$(var.POCO)\lib\PocoDatasqlitemtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataSQLite.static.release" Guid="23F831FC-4DDA-4CBD-87C5-F98D429A70C1">
                         <File Id="POCODATASQLITEMD.LIB" Name="PocoDataSQLitemd.lib" Source="$(var.POCO)\lib\PocoDataSQLitemd.lib" />
@@ -623,9 +623,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataMySQL.static.debug" Guid="C2EA8639-A80D-4271-ABFE-65C00FF7B227">
                         <File Id="POCODATAMYSQLMDD.LIB" Name="PocoDataMySQLmdd.lib" Source="$(var.POCO)\lib\PocoDataMySQLmdd.lib" />
-                        <File Id="POCODATAMYSQLMDD.PDB" Name="pocodatamysqlmdd.pdb" Source="$(var.POCO)\lib\pocodatamysqlmdd.pdb" />
+                        <File Id="POCODATAMYSQLMDD.PDB" Name="PocoDatamysqlmdd.pdb" Source="$(var.POCO)\lib\PocoDatamysqlmdd.pdb" />
                         <File Id="POCODATAMYSQLMTD.LIB" Name="PocoDataMySQLmtd.lib" Source="$(var.POCO)\lib\PocoDataMySQLmtd.lib" />
-                        <File Id="POCODATAMYSQLMTD.PDB" Name="pocodatamysqlmtd.pdb" Source="$(var.POCO)\lib\pocodatamysqlmtd.pdb" />
+                        <File Id="POCODATAMYSQLMTD.PDB" Name="PocoDatamysqlmtd.pdb" Source="$(var.POCO)\lib\PocoDatamysqlmtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataMySQL.static.release" Guid="D7CC865C-8337-418C-89A1-437BCD3221EE">
                         <File Id="POCODATAMYSQLMD.LIB" Name="PocoDataMySQLmd.lib" Source="$(var.POCO)\lib\PocoDataMySQLmd.lib" />
@@ -663,9 +663,9 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="PDF.static.debug" Guid="382A3D4B-2C3A-4427-B52A-96EE10F2C6F9">
                         <File Id="POCOPDFMDD.LIB" Name="PocoPDFmdd.lib" Source="$(var.POCO)\lib\PocoPDFmdd.lib" />
-                        <File Id="POCOPDFMDD.PDB" Name="pocopdfmdd.pdb" Source="$(var.POCO)\lib\pocopdfmdd.pdb" />
+                        <File Id="POCOPDFMDD.PDB" Name="PocoPdfmdd.pdb" Source="$(var.POCO)\lib\PocoPdfmdd.pdb" />
                         <File Id="POCOPDFMTD.LIB" Name="PocoPDFmtd.lib" Source="$(var.POCO)\lib\PocoPDFmtd.lib" />
-                        <File Id="POCOPDFMTD.PDB" Name="pocopdfmtd.pdb" Source="$(var.POCO)\lib\pocopdfmtd.pdb" />
+                        <File Id="POCOPDFMTD.PDB" Name="PocoPdfmtd.pdb" Source="$(var.POCO)\lib\PocoPdfmtd.pdb" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="PDF.static.release" Guid="452E43B6-B81D-4719-A2C5-9AA291223678">
                         <File Id="POCOPDFMD.LIB" Name="PocoPDFmd.lib" Source="$(var.POCO)\lib\PocoPDFmd.lib" />
