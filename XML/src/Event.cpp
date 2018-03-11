@@ -20,7 +20,7 @@ namespace Poco {
 namespace XML {
 
 
-Event::Event(Document* pOwnerDocument, const XMLString& type):
+Event::Event(Document::Ptr pOwnerDocument, const XMLString& type):
 	_pOwner(pOwnerDocument),
 	_type(type),
 	_pTarget(0),
@@ -34,7 +34,7 @@ Event::Event(Document* pOwnerDocument, const XMLString& type):
 }
 
 
-Event::Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable):
+Event::Event(Document::Ptr pOwnerDocument, const XMLString& type, EventTarget::Ptr pTarget, bool canBubble, bool isCancelable):
 	_pOwner(pOwnerDocument),
 	_type(type),
 	_pTarget(pTarget),
@@ -75,7 +75,7 @@ void Event::initEvent(const XMLString& eventType, bool canBubble, bool isCancela
 }
 
 
-void Event::setTarget(EventTarget* pTarget)
+void Event::setTarget(EventTarget::Ptr pTarget)
 {
 	_pTarget = pTarget;
 }
@@ -87,15 +87,21 @@ void Event::setCurrentPhase(PhaseType phase)
 }
 
 
-void Event::setCurrentTarget(EventTarget* pTarget)
+void Event::setCurrentTarget(EventTarget::Ptr pTarget)
 {
 	_pCurrentTarget = pTarget;
 }
 
 
-void Event::autoRelease()
+EventTarget::Ptr Event::target() const
 {
-	_pOwner->autoReleasePool().add(this);
+	return _pTarget;
+}
+
+
+EventTarget::Ptr Event::currentTarget() const
+{
+	return _pCurrentTarget;
 }
 
 

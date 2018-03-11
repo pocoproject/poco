@@ -20,6 +20,8 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/RefCountedObject.h"
 
 
 namespace Poco {
@@ -29,7 +31,7 @@ namespace XML {
 class InputSource;
 
 
-class XML_API EntityResolver
+class XML_API EntityResolver: virtual public RefCountedObject
 	/// If a SAX application needs to implement customized handling for external entities,
 	/// it must implement this interface and register an instance with the SAX driver using
 	/// the setEntityResolver method.
@@ -46,7 +48,9 @@ class XML_API EntityResolver
 	/// URIs or to look up replacements in a catalog (possibly by using the public identifier).
 {
 public:
-	virtual InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId) = 0;
+	typedef AutoPtr<EntityResolver> Ptr;
+
+	virtual AutoPtr<InputSource> resolveEntity(const XMLString* publicId, const XMLString& systemId) = 0;
 		/// Allow the application to resolve external entities.
 		///
 		/// The parser will call this method before opening any external entity except the
@@ -69,11 +73,6 @@ public:
 		/// the application.
 		///
 		/// Note that publicId maybe null, therefore we pass a pointer rather than a reference.
-
-	virtual void releaseInputSource(InputSource* pSource) = 0;
-		/// This is a non-standard extension to SAX!
-		/// Called by the parser when the input source returned by ResolveEntity is
-		/// no longer needed. Should free any resources used by the input source.
 
 protected:
 	virtual ~EntityResolver();

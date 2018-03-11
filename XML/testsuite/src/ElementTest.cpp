@@ -18,6 +18,8 @@
 #include "Poco/DOM/NamedNodeMap.h"
 #include "Poco/DOM/NodeList.h"
 #include "Poco/DOM/AutoPtr.h"
+#include "Poco/NestedDiagnosticContext.h"
+#include <iostream>
 
 
 using Poco::XML::Element;
@@ -50,12 +52,12 @@ void ElementTest::testAttributes()
 
 	pElem->setAttribute("a1", "v1");
 	assert (pElem->hasAttributes());
-	
+
 	assert (pElem->hasAttribute("a1"));
 	assert (pElem->getAttribute("a1") == "v1");
-	
-	Attr* pAttr1 = pElem->getAttributeNode("a1");
-	assert (pAttr1 != 0);
+
+	Attr::Ptr pAttr1 = pElem->getAttributeNode("a1");
+	assert (!pAttr1.isNull());
 	assert (pAttr1->name() == "a1");
 	assert (pAttr1->nodeName() == "a1");
 	assert (pAttr1->value() == "v1");
@@ -63,38 +65,37 @@ void ElementTest::testAttributes()
 	assert (pAttr1->ownerElement() == pElem);
 	assert (pAttr1->ownerDocument() == pDoc);
 	assert (pAttr1->innerText() == "v1");
-	
-	assert (pAttr1->previousSibling() == 0);
-	assert (pAttr1->nextSibling() == 0);
-	
+
+	assert (pAttr1->previousSibling().isNull());
+	assert (pAttr1->nextSibling().isNull());
+
 	pAttr1->setValue("V1");
 	assert (pElem->getAttribute("a1") == "V1");
-	
+
 	pElem->setAttribute("a2", "v2");
 	assert (pElem->hasAttribute("a1"));
 	assert (pElem->getAttribute("a1") == "V1");
 	assert (pElem->hasAttribute("a2"));
 	assert (pElem->getAttribute("a2") == "v2");
-	
-	Attr* pAttr2 = pElem->getAttributeNode("a2");
-	assert (pAttr2 != 0);
+
+	Attr::Ptr pAttr2 = pElem->getAttributeNode("a2");
+	assert (!pAttr2.isNull());
 	assert (pAttr2->name() == "a2");
 	assert (pAttr2->value() == "v2");
 	assert (pAttr2->ownerElement() == pElem);
 
-	assert (pAttr1->previousSibling() == 0);
-	assert (pAttr1->nextSibling() == pAttr2);
-	assert (pAttr2->previousSibling() == pAttr1);
-	assert (pAttr2->nextSibling() == 0);
+	assert (pAttr1->previousSibling().isNull());
+	assert (pAttr1->nextSibling().cast<Attr>() == pAttr2);
+	assert (pAttr2->previousSibling().cast<Attr>() == pAttr1);
+	assert (pAttr2->nextSibling().isNull());
 
-	Attr* pAttr3 = pElem->getAttributeNode("a3");
-	assert (pAttr3 == 0);
+	Attr::Ptr pAttr3 = pElem->getAttributeNode("a3");
+	assert (pAttr3.isNull());
 
 	pAttr3 = pDoc->createAttribute("a3");
 	pAttr3->setValue("v3");
 	pElem->setAttributeNode(pAttr3);
-	pAttr3->release();
-	
+
 	assert (pElem->hasAttribute("a1"));
 	assert (pElem->getAttribute("a1") == "V1");
 	assert (pElem->hasAttribute("a2"));
@@ -102,17 +103,16 @@ void ElementTest::testAttributes()
 	assert (pElem->hasAttribute("a3"));
 	assert (pElem->getAttribute("a3") == "v3");
 
-	assert (pAttr1->previousSibling() == 0);
-	assert (pAttr1->nextSibling() == pAttr2);
-	assert (pAttr2->previousSibling() == pAttr1);
-	assert (pAttr2->nextSibling() == pAttr3);
-	assert (pAttr3->previousSibling() == pAttr2);
-	assert (pAttr3->nextSibling() == 0);
-	
+	assert (!pAttr1->previousSibling().isNull());
+	assert (pAttr1->nextSibling().cast<Attr>() == pAttr2);
+	assert (pAttr2->previousSibling().cast<Attr>() == pAttr1);
+	assert (pAttr2->nextSibling().cast<Attr>() == pAttr3);
+	assert (pAttr3->previousSibling().cast<Attr>() == pAttr2);
+	assert (!pAttr3->nextSibling().isNull());
+
 	pAttr2 = pDoc->createAttribute("a2");
 	pAttr2->setValue("V2");
 	pElem->setAttributeNode(pAttr2);
-	pAttr2->release();
 
 	assert (pElem->hasAttribute("a1"));
 	assert (pElem->getAttribute("a1") == "V1");
@@ -120,12 +120,11 @@ void ElementTest::testAttributes()
 	assert (pElem->getAttribute("a2") == "V2");
 	assert (pElem->hasAttribute("a3"));
 	assert (pElem->getAttribute("a3") == "v3");
-	
+
 	pAttr1 = pDoc->createAttribute("a1");
 	pAttr1->setValue("v1");
 	pElem->setAttributeNode(pAttr1);
-	pAttr1->release();
-	
+
 	assert (pElem->hasAttribute("a1"));
 	assert (pElem->getAttribute("a1") == "v1");
 	assert (pElem->hasAttribute("a2"));
@@ -136,7 +135,6 @@ void ElementTest::testAttributes()
 	pAttr3 = pDoc->createAttribute("a3");
 	pAttr3->setValue("V3");
 	pElem->setAttributeNode(pAttr3);
-	pAttr3->release();
 
 	assert (pElem->hasAttribute("a1"));
 	assert (pElem->getAttribute("a1") == "v1");
@@ -144,16 +142,16 @@ void ElementTest::testAttributes()
 	assert (pElem->getAttribute("a2") == "V2");
 	assert (pElem->hasAttribute("a3"));
 	assert (pElem->getAttribute("a3") == "V3");
-	
+
 	pElem->removeAttributeNode(pAttr3);
 	assert (!pElem->hasAttribute("a3"));
-	
+
 	pElem->removeAttribute("a1");
 	assert (!pElem->hasAttribute("a1"));
-	
+
 	pElem->removeAttribute("a2");
 	assert (!pElem->hasAttribute("a2"));
-	
+
 	assert (!pElem->hasAttributes());
 }
 
@@ -162,22 +160,22 @@ void ElementTest::testAttributesNS()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pElem = pDoc->createElementNS("urn:ns1", "p:elem");
-	
+
 	assert (pElem->namespaceURI() == "urn:ns1");
 	assert (pElem->prefix() == "p");
 	assert (pElem->tagName() == "p:elem");
 	assert (pElem->localName() == "elem");
-	
+
 	assert (!pElem->hasAttributes());
 
 	pElem->setAttributeNS("urn:ns1", "a1", "v1");
 	assert (pElem->hasAttributes());
-	
+
 	assert (pElem->hasAttributeNS("urn:ns1", "a1"));
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "v1");
-	
-	Attr* pAttr1 = pElem->getAttributeNodeNS("urn:ns1", "a1");
-	assert (pAttr1 != 0);
+
+	Attr::Ptr pAttr1 = pElem->getAttributeNodeNS("urn:ns1", "a1");
+	assert (!pAttr1.isNull());
 	assert (pAttr1->name() == "a1");
 	assert (pAttr1->namespaceURI() == "urn:ns1");
 	assert (pAttr1->prefix().empty());
@@ -186,18 +184,18 @@ void ElementTest::testAttributesNS()
 	assert (pAttr1->value() == "v1");
 	assert (pAttr1->nodeValue() == "v1");
 	assert (pAttr1->ownerElement() == pElem);
-	
+
 	pAttr1->setValue("V1");
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "V1");
-	
+
 	pElem->setAttributeNS("urn:ns1", "a2", "v2");
 	assert (pElem->hasAttributeNS("urn:ns1", "a1"));
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "V1");
 	assert (pElem->hasAttributeNS("urn:ns1", "a2"));
 	assert (pElem->getAttributeNS("urn:ns1", "a2") == "v2");
-	
-	Attr* pAttr2 = pElem->getAttributeNodeNS("urn:ns1", "a2");
-	assert (pAttr2 != 0);
+//
+	Attr::Ptr pAttr2 = pElem->getAttributeNodeNS("urn:ns1", "a2");
+	assert (!pAttr2.isNull());
 	assert (pAttr2->name() == "a2");
 	assert (pAttr2->namespaceURI() == "urn:ns1");
 	assert (pAttr2->prefix().empty());
@@ -205,25 +203,23 @@ void ElementTest::testAttributesNS()
 	assert (pAttr2->value() == "v2");
 	assert (pAttr2->ownerElement() == pElem);
 
-	Attr* pAttr3 = pElem->getAttributeNodeNS("urn:ns2", "p:a3");
-	assert (pAttr3 == 0);
+	Attr::Ptr pAttr3 = pElem->getAttributeNodeNS("urn:ns2", "p:a3");
+	assert (pAttr3.isNull());
 
 	pAttr3 = pDoc->createAttributeNS("urn:ns2", "p:a3");
 	pAttr3->setValue("v3");
 	pElem->setAttributeNodeNS(pAttr3);
-	pAttr3->release();
-	
+
 	assert (pElem->hasAttributeNS("urn:ns1", "a1"));
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "V1");
 	assert (pElem->hasAttributeNS("urn:ns1", "a2"));
 	assert (pElem->getAttributeNS("urn:ns1", "a2") == "v2");
 	assert (pElem->hasAttributeNS("urn:ns2", "a3"));
 	assert (pElem->getAttributeNS("urn:ns2", "a3") == "v3");
-	
+
 	pAttr2 = pDoc->createAttributeNS("urn:ns1", "a2");
 	pAttr2->setValue("V2");
 	pElem->setAttributeNodeNS(pAttr2);
-	pAttr2->release();
 
 	assert (pElem->hasAttributeNS("urn:ns1", "a1"));
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "V1");
@@ -231,12 +227,11 @@ void ElementTest::testAttributesNS()
 	assert (pElem->getAttributeNS("urn:ns1", "a2") == "V2");
 	assert (pElem->hasAttributeNS("urn:ns2", "a3"));
 	assert (pElem->getAttributeNS("urn:ns2", "a3") == "v3");
-	
+
 	pAttr1 = pDoc->createAttributeNS("urn:ns1", "a1");
 	pAttr1->setValue("v1");
 	pElem->setAttributeNodeNS(pAttr1);
-	pAttr1->release();
-	
+
 	assert (pElem->hasAttributeNS("urn:ns1", "a1"));
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "v1");
 	assert (pElem->hasAttributeNS("urn:ns1", "a2"));
@@ -247,7 +242,6 @@ void ElementTest::testAttributesNS()
 	pAttr3 = pDoc->createAttributeNS("urn:ns2", "q:a3");
 	pAttr3->setValue("V3");
 	pElem->setAttributeNodeNS(pAttr3);
-	pAttr3->release();
 
 	assert (pElem->hasAttributeNS("urn:ns1", "a1"));
 	assert (pElem->getAttributeNS("urn:ns1", "a1") == "v1");
@@ -258,13 +252,13 @@ void ElementTest::testAttributesNS()
 
 	pElem->removeAttributeNode(pAttr3);
 	assert (!pElem->hasAttributeNS("urn:ns2", "a3"));
-	
+
 	pElem->removeAttributeNS("urn:ns1", "a1");
 	assert (!pElem->hasAttributeNS("urn:ns1", "a1"));
-	
+
 	pElem->removeAttributeNS("urn:ns1", "a2");
 	assert (!pElem->hasAttributeNS("urn:ns1", "a2"));
-	
+
 	assert (!pElem->hasAttributes());
 }
 
@@ -276,7 +270,7 @@ void ElementTest::testAttrMap()
 
 	AutoPtr<NamedNodeMap> pNNM = pElem->attributes();
 	assert (pNNM->length() == 0);
-	
+
 	pElem->setAttribute("a1", "v1");
 	assert (pNNM->length() == 1);
 	assert (pNNM->item(0)->nodeName() == "a1");
@@ -288,11 +282,10 @@ void ElementTest::testAttrMap()
 	assert (pNNM->getNamedItem("a1")->nodeName() == "a1");
 	assert (pNNM->item(1)->nodeName() == "a2");
 	assert (pNNM->getNamedItem("a2")->nodeName() == "a2");
-	
-	Attr* pAttr = pDoc->createAttribute("a3");
+
+	Attr::Ptr pAttr = pDoc->createAttribute("a3");
 	pNNM->setNamedItem(pAttr);
-	pAttr->release();
-	
+
 	assert (pNNM->length() == 3);
 	assert (pNNM->item(0)->nodeName() == "a1");
 	assert (pNNM->getNamedItem("a1")->nodeName() == "a1");
@@ -304,11 +297,11 @@ void ElementTest::testAttrMap()
 	pNNM->removeNamedItem("a2");
 	assert (pNNM->length() == 2);
 	assert (!pElem->hasAttribute("a2"));
-	
+
 	pNNM->removeNamedItem("a3");
 	assert (pNNM->length() == 1);
 	assert (!pElem->hasAttribute("a3"));
-	
+
 	pElem->removeAttribute("a1");
 	assert (pNNM->length() == 0);
 }
@@ -321,7 +314,7 @@ void ElementTest::testAttrMapNS()
 
 	AutoPtr<NamedNodeMap> pNNM = pElem->attributes();
 	assert (pNNM->length() == 0);
-	
+
 	pElem->setAttributeNS("urn:ns1", "a1", "v1");
 	assert (pNNM->length() == 1);
 	assert (pNNM->item(0)->nodeName() == "a1");
@@ -333,11 +326,10 @@ void ElementTest::testAttrMapNS()
 	assert (pNNM->getNamedItem("a1")->nodeName() == "a1");
 	assert (pNNM->item(1)->nodeName() == "a2");
 	assert (pNNM->getNamedItem("a2")->nodeName() == "a2");
-	
-	Attr* pAttr = pDoc->createAttributeNS("urn:ns2", "a3");
+
+	Attr::Ptr pAttr = pDoc->createAttributeNS("urn:ns2", "a3");
 	pNNM->setNamedItem(pAttr);
-	pAttr->release();
-	
+
 	assert (pNNM->length() == 3);
 	assert (pNNM->item(0)->nodeName() == "a1");
 	assert (pNNM->getNamedItemNS("urn:ns1", "a1")->nodeName() == "a1");
@@ -349,11 +341,11 @@ void ElementTest::testAttrMapNS()
 	pNNM->removeNamedItemNS("urn:ns1", "a2");
 	assert (pNNM->length() == 2);
 	assert (!pElem->hasAttributeNS("urn:ns1", "a2"));
-	
+
 	pNNM->removeNamedItemNS("urn:ns2", "a3");
 	assert (pNNM->length() == 1);
 	assert (!pElem->hasAttributeNS("urn:ns2", "a3"));
-	
+
 	pElem->removeAttributeNS("urn:ns1", "a1");
 	assert (pNNM->length() == 0);
 }
@@ -365,80 +357,80 @@ void ElementTest::testElementsByTagName()
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
 	AutoPtr<NodeList> pNL1 = pRoot->getElementsByTagName("*");
 	AutoPtr<NodeList> pNL2 = pRoot->getElementsByTagName("elem");
-	
+
 	assert (pNL1->length() == 0);
 	assert (pNL2->length() == 0);
-	
+
 	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
 	pRoot->appendChild(pElem1);
-	
+
 	assert (pNL1->length() == 1);
 	assert (pNL2->length() == 1);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL2->item(0) == pElem1);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
 
 	AutoPtr<Element> pElem2 = pDoc->createElement("Elem");
 	pRoot->appendChild(pElem2);
 
 	assert (pNL1->length() == 2);
 	assert (pNL2->length() == 1);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem2);
-	assert (pNL2->item(0) == pElem1);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem2);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
 
 	AutoPtr<Element> pElem3 = pDoc->createElement("elem");
 	pRoot->appendChild(pElem3);
 
 	assert (pNL1->length() == 3);
 	assert (pNL2->length() == 2);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem2);
-	assert (pNL1->item(2) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem3);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem2);
+	assert (pNL1->item(2).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem3);
 	
 	AutoPtr<Element> pElem11 = pDoc->createElement("elem");
 	pElem1->appendChild(pElem11);
 
 	assert (pNL1->length() == 4);
 	assert (pNL2->length() == 3);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem11);
-	assert (pNL1->item(2) == pElem2);
-	assert (pNL1->item(3) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem11);
-	assert (pNL2->item(2) == pElem3);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem11);
+	assert (pNL1->item(2).cast<Element>() == pElem2);
+	assert (pNL1->item(3).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem11);
+	assert (pNL2->item(2).cast<Element>() == pElem3);
 
 	AutoPtr<Element> pElem12 = pDoc->createElement("Elem");
 	pElem1->appendChild(pElem12);
 
 	assert (pNL1->length() == 5);
 	assert (pNL2->length() == 3);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem11);
-	assert (pNL1->item(2) == pElem12);
-	assert (pNL1->item(3) == pElem2);
-	assert (pNL1->item(4) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem11);
-	assert (pNL2->item(2) == pElem3);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem11);
+	assert (pNL1->item(2).cast<Element>() == pElem12);
+	assert (pNL1->item(3).cast<Element>() == pElem2);
+	assert (pNL1->item(4).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem11);
+	assert (pNL2->item(2).cast<Element>() == pElem3);
 
 	AutoPtr<Element> pElem21 = pDoc->createElement("elem");
 	pElem2->appendChild(pElem21);
 
 	assert (pNL1->length() == 6);
 	assert (pNL2->length() == 4);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem11);
-	assert (pNL1->item(2) == pElem12);
-	assert (pNL1->item(3) == pElem2);
-	assert (pNL1->item(4) == pElem21);
-	assert (pNL1->item(5) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem11);
-	assert (pNL2->item(2) == pElem21);
-	assert (pNL2->item(3) == pElem3);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem11);
+	assert (pNL1->item(2).cast<Element>() == pElem12);
+	assert (pNL1->item(3).cast<Element>() == pElem2);
+	assert (pNL1->item(4).cast<Element>() == pElem21);
+	assert (pNL1->item(5).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem11);
+	assert (pNL2->item(2).cast<Element>() == pElem21);
+	assert (pNL2->item(3).cast<Element>() == pElem3);
 }
 
 
@@ -459,9 +451,9 @@ void ElementTest::testElementsByTagNameNS()
 	assert (pNL1->length() == 1);
 	assert (pNL2->length() == 1);
 	assert (pNL3->length() == 1);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL3->item(0) == pElem1);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL3->item(0).cast<Element>() == pElem1);
 
 	AutoPtr<Element> pElem2 = pDoc->createElementNS("urn:ns1", "Elem");
 	pRoot->appendChild(pElem2);
@@ -469,10 +461,10 @@ void ElementTest::testElementsByTagNameNS()
 	assert (pNL1->length() == 2);
 	assert (pNL2->length() == 1);
 	assert (pNL3->length() == 1);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem2);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL3->item(0) == pElem1);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem2);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL3->item(0).cast<Element>() == pElem1);
 
 	AutoPtr<Element> pElem3 = pDoc->createElementNS("urn:ns2", "elem");
 	pRoot->appendChild(pElem3);
@@ -480,28 +472,28 @@ void ElementTest::testElementsByTagNameNS()
 	assert (pNL1->length() == 3);
 	assert (pNL2->length() == 2);
 	assert (pNL3->length() == 1);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem2);
-	assert (pNL1->item(2) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem3);
-	assert (pNL3->item(0) == pElem1);
-	
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem2);
+	assert (pNL1->item(2).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem3);
+	assert (pNL3->item(0).cast<Element>() == pElem1);
+
 	AutoPtr<Element> pElem11 = pDoc->createElementNS("urn:ns1", "elem");
 	pElem1->appendChild(pElem11);
 
 	assert (pNL1->length() == 4);
 	assert (pNL2->length() == 3);
 	assert (pNL3->length() == 2);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem11);
-	assert (pNL1->item(2) == pElem2);
-	assert (pNL1->item(3) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem11);
-	assert (pNL2->item(2) == pElem3);
-	assert (pNL3->item(0) == pElem1);
-	assert (pNL3->item(1) == pElem11);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem11);
+	assert (pNL1->item(2).cast<Element>() == pElem2);
+	assert (pNL1->item(3).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem11);
+	assert (pNL2->item(2).cast<Element>() == pElem3);
+	assert (pNL3->item(0).cast<Element>() == pElem1);
+	assert (pNL3->item(1).cast<Element>() == pElem11);
 
 	AutoPtr<Element> pElem12 = pDoc->createElementNS("urn:ns1", "Elem");
 	pElem1->appendChild(pElem12);
@@ -509,16 +501,16 @@ void ElementTest::testElementsByTagNameNS()
 	assert (pNL1->length() == 5);
 	assert (pNL2->length() == 3);
 	assert (pNL3->length() == 2);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem11);
-	assert (pNL1->item(2) == pElem12);
-	assert (pNL1->item(3) == pElem2);
-	assert (pNL1->item(4) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem11);
-	assert (pNL2->item(2) == pElem3);
-	assert (pNL3->item(0) == pElem1);
-	assert (pNL3->item(1) == pElem11);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem11);
+	assert (pNL1->item(2).cast<Element>() == pElem12);
+	assert (pNL1->item(3).cast<Element>() == pElem2);
+	assert (pNL1->item(4).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem11);
+	assert (pNL2->item(2).cast<Element>() == pElem3);
+	assert (pNL3->item(0).cast<Element>() == pElem1);
+	assert (pNL3->item(1).cast<Element>() == pElem11);
 
 	AutoPtr<Element> pElem21 = pDoc->createElementNS("urn:ns1", "elem");
 	pElem2->appendChild(pElem21);
@@ -526,19 +518,19 @@ void ElementTest::testElementsByTagNameNS()
 	assert (pNL1->length() == 6);
 	assert (pNL2->length() == 4);
 	assert (pNL3->length() == 3);
-	assert (pNL1->item(0) == pElem1);
-	assert (pNL1->item(1) == pElem11);
-	assert (pNL1->item(2) == pElem12);
-	assert (pNL1->item(3) == pElem2);
-	assert (pNL1->item(4) == pElem21);
-	assert (pNL1->item(5) == pElem3);
-	assert (pNL2->item(0) == pElem1);
-	assert (pNL2->item(1) == pElem11);
-	assert (pNL2->item(2) == pElem21);
-	assert (pNL2->item(3) == pElem3);
-	assert (pNL3->item(0) == pElem1);
-	assert (pNL3->item(1) == pElem11);
-	assert (pNL3->item(2) == pElem21);
+	assert (pNL1->item(0).cast<Element>() == pElem1);
+	assert (pNL1->item(1).cast<Element>() == pElem11);
+	assert (pNL1->item(2).cast<Element>() == pElem12);
+	assert (pNL1->item(3).cast<Element>() == pElem2);
+	assert (pNL1->item(4).cast<Element>() == pElem21);
+	assert (pNL1->item(5).cast<Element>() == pElem3);
+	assert (pNL2->item(0).cast<Element>() == pElem1);
+	assert (pNL2->item(1).cast<Element>() == pElem11);
+	assert (pNL2->item(2).cast<Element>() == pElem21);
+	assert (pNL2->item(3).cast<Element>() == pElem3);
+	assert (pNL3->item(0).cast<Element>() == pElem1);
+	assert (pNL3->item(1).cast<Element>() == pElem11);
+	assert (pNL3->item(2).cast<Element>() == pElem21);
 }
 
 
@@ -569,18 +561,18 @@ void ElementTest::testChildElement()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem2");
 	AutoPtr<Element> pElem3 = pDoc->createElement("elem3");
 	AutoPtr<Element> pElem4 = pDoc->createElement("elem3");
-	
+
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pRoot->appendChild(pElem3);
 	pRoot->appendChild(pElem4);
-	
-	assert (pRoot->getChildElement("elem1") == pElem1);
-	assert (pRoot->getChildElement("elem2") == pElem2);
-	assert (pRoot->getChildElement("elem3") == pElem3);
-	assert (pRoot->getChildElement("elem4") == 0);
-	
-	assert (pElem1->getChildElement("elem11") == 0);
+
+	assert (pRoot->getChildElement("elem1").cast<Element>() == pElem1);
+	assert (pRoot->getChildElement("elem2").cast<Element>() == pElem2);
+	assert (pRoot->getChildElement("elem3").cast<Element>() == pElem3);
+	assert (pRoot->getChildElement("elem4").isNull());
+
+	assert (pElem1->getChildElement("elem11").isNull());
 }
 
 
@@ -592,19 +584,19 @@ void ElementTest::testChildElementNS()
 	AutoPtr<Element> pElem2 = pDoc->createElementNS("urn:ns", "elem2");
 	AutoPtr<Element> pElem3 = pDoc->createElementNS("urn:ns", "elem3");
 	AutoPtr<Element> pElem4 = pDoc->createElementNS("urn:ns", "elem3");
-	
+
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pRoot->appendChild(pElem3);
 	pRoot->appendChild(pElem4);
-	
-	assert (pRoot->getChildElementNS("urn:ns", "elem1") == pElem1);
-	assert (pRoot->getChildElementNS("urn:ns", "elem2") == pElem2);
-	assert (pRoot->getChildElementNS("urn:ns", "elem3") == pElem3);
-	assert (pRoot->getChildElementNS("urn:ns", "elem4") == 0);
-	assert (pRoot->getChildElementNS("urn:NS", "elem1") == 0);
-	
-	assert (pElem1->getChildElementNS("urn:ns", "elem11") == 0);
+
+	assert (pRoot->getChildElementNS("urn:ns", "elem1").cast<Element>() == pElem1);
+	assert (pRoot->getChildElementNS("urn:ns", "elem2").cast<Element>() == pElem2);
+	assert (pRoot->getChildElementNS("urn:ns", "elem3").cast<Element>() == pElem3);
+	assert (pRoot->getChildElementNS("urn:ns", "elem4").isNull());
+	assert (pRoot->getChildElementNS("urn:NS", "elem1").isNull());
+
+	assert (pElem1->getChildElementNS("urn:ns", "elem11").isNull());
 }
 
 
@@ -633,7 +625,7 @@ void ElementTest::testNodeByPath()
 	*/
 
 	AutoPtr<Document> pDoc   = new Document;
-	
+
 	AutoPtr<Element> pRoot   = pDoc->createElement("root");
 	AutoPtr<Element> pElem1  = pDoc->createElement("elem1");
 	AutoPtr<Element> pElem11 = pDoc->createElement("elemA");
@@ -646,16 +638,16 @@ void ElementTest::testNodeByPath()
 	AutoPtr<Element> pElem25 = pDoc->createElement("elemC");
 	AutoPtr<Element> pElem3  = pDoc->createElement("elem2");
 	AutoPtr<Element> pElem31 = pDoc->createElement("elemB");
-	
+
 	pElem21->setAttribute("attr1", "value1");
 	pElem22->setAttribute("attr1", "value2");
 	pElem23->setAttribute("attr1", "value3");
-	
+
 	pElem24->setAttribute("attr1", "value1");
 	pElem25->setAttribute("attr1", "value2");
-	
+
 	pElem31->setAttribute("attr1", "value4");
-	
+
 	AutoPtr<Element> pElem241 = pDoc->createElement("elemC1");
 	AutoPtr<Element> pElem242 = pDoc->createElement("elemC2");
 	pElem241->setAttribute("attr1", "value1");
@@ -675,86 +667,86 @@ void ElementTest::testNodeByPath()
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);	
 	pRoot->appendChild(pElem3);
-	
+
 	pDoc->appendChild(pRoot);
-	
-	Node* pNode = pRoot->getNodeByPath("/");
-	assert (pNode == pRoot);
-	
+
+	Node::Ptr pNode = pRoot->getNodeByPath("/");
+	assert (pNode.cast<Element>() == pRoot);
+
 	pNode = pRoot->getNodeByPath("/elem1");
-	assert (pNode == pElem1);
-	
+	assert (pNode.cast<Element>() == pElem1);
+
 	pNode = pDoc->getNodeByPath("/root/elem1");
-	assert (pNode == pElem1);
-	
+	assert (pNode.cast<Element>() == pElem1);
+
 	pNode = pRoot->getNodeByPath("/elem2");
-	assert (pNode == pElem2);
-	
+	assert (pNode.cast<Element>() == pElem2);
+
 	pNode = pRoot->getNodeByPath("/elem1/elemA");
-	assert (pNode == pElem11);
-	
+	assert (pNode.cast<Element>() == pElem11);
+
 	pNode = pRoot->getNodeByPath("/elem1/elemA[0]");
-	assert (pNode == pElem11);
+	assert (pNode.cast<Element>() == pElem11);
 
 	pNode = pRoot->getNodeByPath("/elem1/elemA[1]");
-	assert (pNode == pElem12);
-	
+	assert (pNode.cast<Element>() == pElem12);
+
 	pNode = pRoot->getNodeByPath("/elem1/elemA[2]");
-	assert (pNode == 0);
-	
+	assert (pNode.isNull());
+
 	pNode = pRoot->getNodeByPath("/elem2/elemB");
-	assert (pNode == pElem21);
-	
+	assert (pNode.cast<Element>() == pElem21);
+
 	pNode = pRoot->getNodeByPath("/elem2/elemB[0]");
-	assert (pNode == pElem21);
+	assert (pNode.cast<Element>() == pElem21);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[1]");
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() == pElem22);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[2]");
-	assert (pNode == pElem23);
+	assert (pNode.cast<Element>() == pElem23);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[3]");
-	assert (pNode == 0);
-	
+	assert (pNode.isNull());
+
 	pNode = pRoot->getNodeByPath("/elem2/elemB[@attr1]");
 	assert (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[@attr2]");
-	assert (pNode == 0);
+	assert (pNode.isNull());
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[@attr1='value2']");
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() == pElem22);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemC[@attr1='value1']/elemC1");
-	assert (pNode == pElem241);
+	assert (pNode.cast<Element>() == pElem241);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemC[@attr1='value1']/elemC1[@attr1]");
 	assert (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value1']");
-	assert (pNode == pElem21);
+	assert (pNode.cast<Element>() == pElem21);
 	
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value2']");
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() == pElem22);
 
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value3']");
-	assert (pNode == pElem23);
+	assert (pNode.cast<Element>() == pElem23);
 
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value4']");
-	assert (pNode == pElem31);
+	assert (pNode.cast<Element>() == pElem31);
 
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value5']");
-	assert (pNode == 0);
+	assert (pNode.isNull());
 
 	pNode = pDoc->getNodeByPath("//[@attr1='value1']");
-	assert (pNode == pElem21);
+	assert (pNode.cast<Element>() == pElem21);
 
 	pNode = pDoc->getNodeByPath("//[@attr1='value2']");
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() == pElem22);
 
 	pNode = pRoot->getNodeByPath("/elem2/*[@attr1='value2']");
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() == pElem22);
 }
 
 
@@ -824,107 +816,120 @@ void ElementTest::testNodeByPathNS()
 	pRoot->appendChild(pElem3);
 
 	pDoc->appendChild(pRoot);
-	
+
 	Element::NSMap nsMap;
 	nsMap.declarePrefix("ns1", "urn:ns1");
 	nsMap.declarePrefix("NS2", "urn:ns2");
-	
-	Node* pNode = pRoot->getNodeByPathNS("/", nsMap);
-	assert (pNode == pRoot);
-	
+
+	Node::Ptr pNode = pRoot->getNodeByPathNS("/", nsMap);
+	assert (pNode.cast<Element>() ==pRoot);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1", nsMap);
-	assert (pNode == pElem1);
+	assert (pNode.cast<Element>() ==pElem1);
 
 	pNode = pDoc->getNodeByPathNS("/ns1:root/ns1:elem1", nsMap);
-	assert (pNode == pElem1);
+	assert (pNode.cast<Element>() ==pElem1);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2", nsMap);
-	assert (pNode == pElem2);
-	
+	assert (pNode.cast<Element>() ==pElem2);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA", nsMap);
-	assert (pNode == pElem11);
-	
+	assert (pNode.cast<Element>() ==pElem11);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[0]", nsMap);
-	assert (pNode == pElem11);
+	assert (pNode.cast<Element>() ==pElem11);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[1]", nsMap);
-	assert (pNode == pElem12);
-	
+	assert (pNode.cast<Element>() ==pElem12);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[2]", nsMap);
-	assert (pNode == 0);
-	
+	assert (pNode.isNull());
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB", nsMap);
-	assert (pNode == pElem21);
-	
+	assert (pNode.cast<Element>() ==pElem21);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[0]", nsMap);
-	assert (pNode == pElem21);
+	assert (pNode.cast<Element>() ==pElem21);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[1]", nsMap);
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() ==pElem22);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[2]", nsMap);
-	assert (pNode == pElem23);
+	assert (pNode.cast<Element>() ==pElem23);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[3]", nsMap);
-	assert (pNode == 0);
-	
+	assert (pNode.isNull());
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr1]", nsMap);
 	assert (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr2]", nsMap);
-	assert (pNode == 0);
+	assert (pNode.isNull());
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr1='value2']", nsMap);
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() ==pElem22);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemC[@NS2:attr1='value1']/NS2:elemC1", nsMap);
-	assert (pNode == pElem241);
+	assert (pNode.cast<Element>() ==pElem241);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemC[@NS2:attr1='value1']/NS2:elemC1[@NS2:attr1]", nsMap);
 	assert (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pRoot->getNodeByPathNS("/NS2:elem1", nsMap);
-	assert (pNode == 0);
+	assert (pNode.isNull());
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value1']", nsMap);
-	assert (pNode == pElem21);
-	
+	assert (pNode.cast<Element>() ==pElem21);
+
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value2']", nsMap);
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() ==pElem22);
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value3']", nsMap);
-	assert (pNode == pElem23);
+	assert (pNode.cast<Element>() ==pElem23);
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value4']", nsMap);
-	assert (pNode == pElem31);
+	assert (pNode.cast<Element>() ==pElem31);
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value5']", nsMap);
-	assert (pNode == 0);
+	assert (pNode.isNull());
 
 	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value1']", nsMap);
-	assert (pNode == pElem21);
-	
+	assert (pNode.cast<Element>() ==pElem21);
+
 	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value2']", nsMap);
-	assert (pNode == pElem22);
-	
+	assert (pNode.cast<Element>() ==pElem22);
+
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/*[@NS2:attr1='value2']", nsMap);
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() ==pElem22);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:*[@NS2:attr1='value2']", nsMap);
-	assert (pNode == pElem22);
+	assert (pNode.cast<Element>() ==pElem22);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns1:*[@NS2:attr1='value2']", nsMap);
-	assert (pNode == 0);
+	assert (pNode.isNull());
+}
+
+
+void ElementTest::testLeak()
+{
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pElem = pDoc->createElement("elem");
+	//AutoPtr<Element> pElem = pDoc->createElementNS("urn:ns1", "p:elem");
+
+	pElem->setAttribute("a1", "v1");
+	//pElem->setAttributeNS("urn:ns1", "a1", "v1");
 }
 
 
 void ElementTest::setUp()
 {
+	Poco::NDC::clearTraceMap();
 }
 
 
 void ElementTest::tearDown()
 {
+	Poco::NDC::dumpLeakRef(std::cout);
 }
 
 
@@ -943,6 +948,7 @@ CppUnit::Test* ElementTest::suite()
 	CppUnit_addTest(pSuite, ElementTest, testChildElementNS);
 	CppUnit_addTest(pSuite, ElementTest, testNodeByPath);
 	CppUnit_addTest(pSuite, ElementTest, testNodeByPathNS);
+	CppUnit_addTest(pSuite, ElementTest, testLeak);
 
 	return pSuite;
 }

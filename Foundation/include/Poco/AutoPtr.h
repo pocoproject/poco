@@ -79,15 +79,21 @@ public:
 		if (_ptr) _ptr->duplicate();
 	}
 
-	AutoPtr(AutoPtr&& ptr) : _ptr(std::move(ptr._ptr))
+	AutoPtr(AutoPtr&& ptr) : _ptr(ptr._ptr)
 	{
-		ptr._ptr = nullptr;
+		ptr._ptr = 0;
 	}
 
 	template <class Other>
-	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr.get()))
+	AutoPtr(const AutoPtr<Other>& ptr): _ptr(const_cast<Other*>(ptr._ptr))
 	{
 		if (_ptr) _ptr->duplicate();
+	}
+
+	template <class Other>
+	AutoPtr(AutoPtr<Other>&& ptr): _ptr(ptr._ptr)
+	{
+		ptr._ptr = 0;
 	}
 
 	~AutoPtr()
@@ -187,10 +193,26 @@ public:
 
 	AutoPtr& operator = (AutoPtr&& ptr)
 	{
-		swap(ptr);
+		reset();
+		if (ptr._ptr)
+		{
+			_ptr = ptr._ptr;
+			ptr._ptr = 0;
+		}
 		return *this;
 	}
 
+	template <class Other>
+	AutoPtr& operator = (AutoPtr<Other>&& ptr)
+	{
+		reset();
+		if (ptr._ptr)
+		{
+			_ptr = ptr._ptr;
+			ptr._ptr = 0;
+		}
+		return *this;
+	}
 
 	void swap(AutoPtr& ptr)
 	{
@@ -268,22 +290,27 @@ public:
 	{
 		return _ptr;
 	}
-	
+
 	operator const C* () const
 	{
 		return _ptr;
 	}
-	
+
 	bool operator ! () const
 	{
 		return _ptr == 0;
+	}
+
+	operator bool () const
+	{
+		return _ptr != 0;
 	}
 
 	bool isNull() const
 	{
 		return _ptr == 0;
 	}
-	
+
 	C* duplicate()
 	{
 		if (_ptr) _ptr->duplicate();
@@ -382,6 +409,8 @@ public:
 
 private:
 	C* _ptr;
+
+	template<class T> friend class AutoPtr;
 };
 
 

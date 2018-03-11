@@ -19,18 +19,18 @@
 
 
 #include "Poco/XML/XML.h"
-#include "Poco/XML/XMLString.h"
+#include "Poco/SAX/Locator.h"
+#include "Poco/SAX/SAXHandler.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class Locator;
 class Attributes;
 
 
-class XML_API ContentHandler
+class XML_API ContentHandler: public SAXHandler
 	/// Receive notification of the logical content of a document.
 	///
 	/// This is the main interface that most SAX applications implement: if the
@@ -51,7 +51,9 @@ class XML_API ContentHandler
 	/// Receive notification of the logical content of a document.
 {
 public:
-	virtual void setDocumentLocator(const Locator* loc) = 0;
+	typedef AutoPtr<ContentHandler> Ptr;
+
+	virtual void setDocumentLocator(Locator::Ptr loc) = 0;
 		/// Receive an object for locating the origin of SAX document events.
 		///
 		/// SAX parsers are strongly encouraged (though not absolutely required) to

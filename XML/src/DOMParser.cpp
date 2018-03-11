@@ -27,46 +27,46 @@ namespace XML {
 const XMLString DOMParser::FEATURE_FILTER_WHITESPACE = toXMLString("http://www.appinf.com/features/no-whitespace-in-element-content");
 
 
-DOMParser::DOMParser(NamePool* pNamePool):
+DOMParser::DOMParser(NamePool::Ptr pNamePool):
+	_pSAXParser(new SAXParser),
 	_pNamePool(pNamePool),
 	_filterWhitespace(false)
 {
-	if (_pNamePool) _pNamePool->duplicate();
-	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	_pSAXParser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	_pSAXParser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 }
 
 
 DOMParser::DOMParser(unsigned long namePoolSize):
+	_pSAXParser(new SAXParser),
 	_pNamePool(new NamePool(namePoolSize)),
 	_filterWhitespace(false)
 {
-	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	_pSAXParser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	_pSAXParser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 }
 
 
 DOMParser::~DOMParser()
 {
-	if (_pNamePool) _pNamePool->release();
 }
 
 
 void DOMParser::setEncoding(const XMLString& encoding)
 {
-	_saxParser.setEncoding(encoding);
+	_pSAXParser->setEncoding(encoding);
 }
 
 
 const XMLString& DOMParser::getEncoding() const
 {
-	return _saxParser.getEncoding();
+	return _pSAXParser->getEncoding();
 }
 
 
 void DOMParser::addEncoding(const XMLString& name, Poco::TextEncoding* pEncoding)
 {
-	_saxParser.addEncoding(name, pEncoding);
+	_pSAXParser->addEncoding(name, pEncoding);
 }
 
 
@@ -75,7 +75,7 @@ void DOMParser::setFeature(const XMLString& name, bool state)
 	if (name == FEATURE_FILTER_WHITESPACE)
 		_filterWhitespace = state;
 	else
-		_saxParser.setFeature(name, state);
+		_pSAXParser->setFeature(name, state);
 }
 
 
@@ -84,73 +84,73 @@ bool DOMParser::getFeature(const XMLString& name) const
 	if (name == FEATURE_FILTER_WHITESPACE)
 		return _filterWhitespace;
 	else
-		return _saxParser.getFeature(name);
+		return _pSAXParser->getFeature(name);
 }
 
 
-Document* DOMParser::parse(const XMLString& uri)
+Document::Ptr DOMParser::parse(const XMLString& uri)
 {
 	if (_filterWhitespace)
 	{
-		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
-		return builder.parse(uri);
+		WhitespaceFilter::Ptr filter = new WhitespaceFilter(_pSAXParser);
+		DOMBuilder::Ptr builder = new DOMBuilder(filter, _pNamePool);
+		return builder->parse(uri);
 	}
 	else
 	{
-		DOMBuilder builder(_saxParser, _pNamePool);
-		return builder.parse(uri);
+		DOMBuilder::Ptr builder = new DOMBuilder(_pSAXParser, _pNamePool);
+		return builder->parse(uri);
 	}
 }
 
 
-Document* DOMParser::parse(InputSource* pInputSource)
+Document::Ptr DOMParser::parse(InputSource::Ptr pInputSource)
 {
 	if (_filterWhitespace)
 	{
-		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
-		return builder.parse(pInputSource);
+		WhitespaceFilter::Ptr filter = new WhitespaceFilter(_pSAXParser);
+		DOMBuilder::Ptr builder = new DOMBuilder(filter, _pNamePool);
+		return builder->parse(pInputSource);
 	}
 	else
 	{
-		DOMBuilder builder(_saxParser, _pNamePool);
-		return builder.parse(pInputSource);
+		DOMBuilder::Ptr builder = new DOMBuilder(_pSAXParser, _pNamePool);
+		return builder->parse(pInputSource);
 	}
 }
 
 
-Document* DOMParser::parseString(const std::string& xml)
+Document::Ptr DOMParser::parseString(const std::string& xml)
 {
 	return parseMemory(xml.data(), xml.size());
 }
 
 
-Document* DOMParser::parseMemory(const char* xml, std::size_t size)
+Document::Ptr DOMParser::parseMemory(const char* xml, std::size_t size)
 {
 	if (_filterWhitespace)
 	{
-		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
-		return builder.parseMemoryNP(xml, size);
+		WhitespaceFilter::Ptr filter = new WhitespaceFilter(_pSAXParser);
+		DOMBuilder::Ptr builder = new DOMBuilder(filter, _pNamePool);
+		return builder->parseMemoryNP(xml, size);
 	}
 	else
 	{
-		DOMBuilder builder(_saxParser, _pNamePool);
-		return builder.parseMemoryNP(xml, size);
+		DOMBuilder::Ptr builder = new DOMBuilder(_pSAXParser, _pNamePool);
+		return builder->parseMemoryNP(xml, size);
 	}
 }
 
 
-EntityResolver* DOMParser::getEntityResolver() const
+EntityResolver::Ptr DOMParser::getEntityResolver() const
 {
-	return _saxParser.getEntityResolver();
+	return _pSAXParser->getEntityResolver();
 }
 
 
-void DOMParser::setEntityResolver(EntityResolver* pEntityResolver)
+void DOMParser::setEntityResolver(EntityResolver::Ptr pEntityResolver)
 {
-	_saxParser.setEntityResolver(pEntityResolver);
+	_pSAXParser->setEntityResolver(pEntityResolver);
 }
 
 

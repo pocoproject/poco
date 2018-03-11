@@ -23,41 +23,38 @@ namespace Poco {
 namespace XML {
 
 
-AttrMap::AttrMap(Element* pElement):
+AttrMap::AttrMap(Element::Ptr pElement):
 	_pElement(pElement)
 {
 	poco_check_ptr (pElement);
-	
-	_pElement->duplicate();
 }
 
 
 AttrMap::~AttrMap()
 {
-	_pElement->release();
 }
 
 
-Node* AttrMap::getNamedItem(const XMLString& name) const
+Node::Ptr AttrMap::getNamedItem(const XMLString& name) const
 {
 	return _pElement->getAttributeNode(name);
 }
 
 
-Node* AttrMap::setNamedItem(Node* arg)
+Node::Ptr AttrMap::setNamedItem(Node::Ptr arg)
 {
 	poco_check_ptr (arg);
 
 	if (arg->nodeType() != Node::ATTRIBUTE_NODE)
 		throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 		
-	return _pElement->setAttributeNode(static_cast<Attr*>(arg));
+	return _pElement->setAttributeNode(arg.cast<Attr>());
 }
 
 
-Node* AttrMap::removeNamedItem(const XMLString& name)
+Node::Ptr AttrMap::removeNamedItem(const XMLString& name)
 {
-	Attr* pAttr = _pElement->getAttributeNode(name);
+	Attr::Ptr pAttr = _pElement->getAttributeNode(name);
 	if (pAttr)
 		return _pElement->removeAttributeNode(pAttr);
 	else
@@ -65,10 +62,10 @@ Node* AttrMap::removeNamedItem(const XMLString& name)
 }
 
 
-Node* AttrMap::item(unsigned long index) const
+Node::Ptr AttrMap::item(unsigned long index) const
 {
-	AbstractNode* pAttr = _pElement->_pFirstAttr;
-	while (index-- > 0 && pAttr) pAttr = static_cast<AbstractNode*>(pAttr->nextSibling());
+	AbstractNode::Ptr pAttr = _pElement->_pFirstAttr;
+	while (index-- > 0 && pAttr) pAttr = pAttr->nextSibling().cast<AbstractNode>();
 	return pAttr;
 }
 
@@ -76,46 +73,40 @@ Node* AttrMap::item(unsigned long index) const
 unsigned long AttrMap::length() const
 {
 	unsigned long result = 0;
-	AbstractNode* pAttr = _pElement->_pFirstAttr;
+	AbstractNode::Ptr pAttr = _pElement->_pFirstAttr;
 	while (pAttr)
 	{
-		pAttr = static_cast<AbstractNode*>(pAttr->nextSibling());
+		pAttr = pAttr->nextSibling().cast<AbstractNode>();
 		++result;
 	}
 	return result;
 }
 
 
-Node* AttrMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
+Node::Ptr AttrMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
 	return _pElement->getAttributeNodeNS(namespaceURI, localName);
 }
 
 
-Node* AttrMap::setNamedItemNS(Node* arg)
+Node::Ptr AttrMap::setNamedItemNS(Node::Ptr arg)
 {
 	poco_check_ptr (arg);
 
 	if (arg->nodeType() != Node::ATTRIBUTE_NODE)
 		throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 
-	return _pElement->setAttributeNodeNS(static_cast<Attr*>(arg));
+	return _pElement->setAttributeNodeNS(arg.cast<Attr>());
 }
 
 
-Node* AttrMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName)
+Node::Ptr AttrMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName)
 {
-	Attr* pAttr = _pElement->getAttributeNodeNS(namespaceURI, localName);
+	Attr::Ptr pAttr = _pElement->getAttributeNodeNS(namespaceURI, localName);
 	if (pAttr)
 		return _pElement->removeAttributeNode(pAttr);
 	else
 		return 0;
-}
-
-
-void AttrMap::autoRelease()
-{
-	_pElement->ownerDocument()->autoReleasePool().add(this);
 }
 
 

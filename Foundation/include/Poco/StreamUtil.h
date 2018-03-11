@@ -19,6 +19,8 @@
 
 
 #include "Poco/Foundation.h"
+#include <ios>
+#include <iostream>
 
 
 // poco_ios_init
@@ -67,13 +69,13 @@
 //
 // Some stream implementations, however, require that
 // init() is called in the MyIOS constructor.
-// Therefore we replace each call to init() with
+// Therefore we replace each call to init()with
 // the poco_ios_init macro defined below.
 
 
 #if !defined(POCO_IOS_INIT_HACK)
 	// Microsoft Visual Studio with Dinkumware STL (but not STLport)
-#	if defined(_MSC_VER) && (!defined(_STLP_MSVC) || defined(_STLP_NO_OWN_IOSTREAMS))
+#	if defined(_MSC_VER)&& (!defined(_STLP_MSVC) || defined(_STLP_NO_OWN_IOSTREAMS))
 #		define POCO_IOS_INIT_HACK 1
     // QNX with Dinkumware but not GNU C++ Library
 #	elif defined(__QNX__) && !defined(__GLIBCPP__)
@@ -89,4 +91,70 @@
 #endif
 
 
+namespace Poco {
+
+
+class StreamSaver
+	/// Preserves and restores stream state using RAII.
+	///
+	/// Usage example:
+	///
+	/// void func(std::ostream &os)
+	/// {
+	///     StreamSaver(os); // preserve the original stream state
+	///     int i = 42;
+	///     os << std::hex << i;
+	///     // ~StreamSaver() restores the original stream state
+	/// }
+	///
+{
+public:
+	explicit  StreamSaver(std::ios& s):
+		_stream(s), _flags(s.flags()), _precision(s.precision()),
+		_width(s.width()), _rdstate(s.rdstate()),
+		_exceptions(s.exceptions()), _tie(s.tie()),
+		_rdbuf(s.rdbuf()), _fill(s.fill())
+#ifndef POCO_NO_LOCALE
+		, _locale(s.getloc())
+#endif
+		{}
+
+	~StreamSaver()
+	{
+#ifndef POCO_NO_LOCALE
+		_stream.imbue(_locale);
+#endif
+		_stream.fill(_fill);
+		_stream.rdbuf(_rdbuf);
+		_stream.tie(_tie);
+		_stream.exceptions(_exceptions);
+		_stream.clear(_rdstate);
+		_stream.width(_width);
+		_stream.precision(_precision);
+		_stream.flags(_flags);
+	}
+
+private:
+	StreamSaver();
+	StreamSaver(const StreamSaver&);
+	StreamSaver(StreamSaver&&);
+	StreamSaver& operator=(const StreamSaver&);
+	StreamSaver& operator=(StreamSaver&&);
+
+	std::ios&           _stream;
+	std::ios::fmtflags  _flags;
+	std::streamsize     _precision;
+	std::streamsize     _width;
+	std::ios::iostate   _rdstate;
+	std::ios::iostate   _exceptions;
+	std::ostream*       _tie;
+	std::streambuf*     _rdbuf;
+	std::ios::char_type _fill;
+#ifndef POCO_NO_LOCALE
+	std::locale         _locale;
+#endif
+};
+
+
+}
 #endif // Foundation_StreamUtil_INCLUDED

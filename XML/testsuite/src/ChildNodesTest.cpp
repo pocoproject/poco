@@ -42,41 +42,41 @@ void ChildNodesTest::testChildNodes()
 	assert (!pRoot->hasChildNodes());
 	AutoPtr<NodeList> pNL = pRoot->childNodes();
 	assert (pNL->length() == 0);
-	
+
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
 	assert (pRoot->hasChildNodes());
-	
+
 	assert (pNL->length() == 1);
-	assert (pNL->item(0) == pChild1);
+	assert (pNL->item(0).cast<Element>() == pChild1);
 
 	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
 	pRoot->appendChild(pChild2);
 
 	assert (pNL->length() == 2);
-	assert (pNL->item(0) == pChild1);
-	assert (pNL->item(1) == pChild2);
+	assert (pNL->item(0).cast<Element>() == pChild1);
+	assert (pNL->item(1).cast<Element>() == pChild2);
 	
 	AutoPtr<Element> pChild0 = pDoc->createElement("child0");
 	pRoot->insertBefore(pChild0, pChild1);
 
 	assert (pNL->length() == 3);
-	assert (pNL->item(0) == pChild0);
-	assert (pNL->item(1) == pChild1);
-	assert (pNL->item(2) == pChild2);
+	assert (pNL->item(0).cast<Element>() == pChild0);
+	assert (pNL->item(1).cast<Element>() == pChild1);
+	assert (pNL->item(2).cast<Element>() == pChild2);
 
 	pRoot->removeChild(pChild1);
 	assert (pNL->length() == 2);
-	assert (pNL->item(0) == pChild0);
-	assert (pNL->item(1) == pChild2);
+	assert (pNL->item(0).cast<Element>() == pChild0);
+	assert (pNL->item(1).cast<Element>() == pChild2);
 
 	pRoot->removeChild(pChild0);
 	assert (pNL->length() == 1);
-	assert (pNL->item(0) == pChild2);
+	assert (pNL->item(0).cast<Element>() == pChild2);
 
 	pRoot->removeChild(pChild2);
 	assert (pNL->length() == 0);
-	assert (pNL->item(0) == 0);
+	assert (!pNL->item(0).isNull());
 
 	assert (!pRoot->hasChildNodes());
 }

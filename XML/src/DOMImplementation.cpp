@@ -54,19 +54,19 @@ bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& ve
 }
 
 
-DocumentType* DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
+DocumentType::Ptr DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
 	return new DocumentType(0, name, publicId, systemId);
 }
 
 
-Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType* doctype) const
+Document::Ptr DOMImplementation::createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType::Ptr doctype) const
 {
-	Document* pDoc = new Document(doctype);
+	Document::Ptr pDoc = new Document(doctype);
 	if (namespaceURI.empty())
-		pDoc->appendChild(pDoc->createElement(qualifiedName))->release();
+		pDoc->appendChild(pDoc->createElement(qualifiedName));
 	else
-		pDoc->appendChild(pDoc->createElementNS(namespaceURI, qualifiedName))->release();
+		pDoc->appendChild(pDoc->createElementNS(namespaceURI, qualifiedName));
 	return pDoc;
 }
 

@@ -52,8 +52,8 @@ public:
 	void setUp();
 	void tearDown();
 
-	std::string parse(Poco::XML::XMLReader& reader, int options, const std::string& data);
-	std::string parseMemory(Poco::XML::XMLReader& reader, int options, const std::string& data);
+	std::string parse(Poco::XML::XMLReader::Ptr reader, int options, const std::string& data);
+	std::string parseMemory(Poco::XML::XMLReader::Ptr reader, int options, const std::string& data);
 
 	static CppUnit::Test* suite();
 

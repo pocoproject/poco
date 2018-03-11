@@ -20,6 +20,7 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -54,19 +55,19 @@ class XML_API TreeWalker
 	/// does not conform to the DOM Level 2 Traversal specification.
 {
 public:
-	TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
+	TreeWalker(AutoPtr<Node> root, unsigned long whatToShow, AutoPtr<NodeFilter> pFilter = 0);
 		/// Creates a TreeWalker over the subtree rooted at the specified node.
-		
+
 	TreeWalker(const TreeWalker& walker);
 		/// Creates a TreeWalker by copying another TreeWalker.
-		
+
 	TreeWalker& operator = (const TreeWalker& walker);
 		/// Assignment operator.
-	
+
 	~TreeWalker();
 		/// Destroys the TreeWalker.
-	
-	Node* root() const;
+
+	AutoPtr<Node> root() const;
 		/// The root node of the TreeWalker, as specified when it was created.
 
 	unsigned long whatToShow() const;
@@ -76,7 +77,7 @@ public:
 		/// be considered. Note that this skip takes precedence over the filter, if
 		/// any.
 
-	NodeFilter* filter() const;
+	AutoPtr<NodeFilter> filter() const;
 		/// The NodeFilter used to screen nodes.
 
 	bool expandEntityReferences() const;
@@ -97,7 +98,7 @@ public:
 		/// This implementation does not support entity reference expansion and
 		/// thus always returns false.
 
-	Node* currentNode() const;
+	AutoPtr<Node> currentNode() const;
 		/// The node at which the TreeWalker is currently positioned.
 		/// Alterations to the DOM tree may cause the current node to no longer be accepted
 		/// by the TreeWalker's associated filter. currentNode may also be explicitly
@@ -107,69 +108,69 @@ public:
 		/// view, by applying the filters in the requested direction; if no traversal
 		/// is possible, currentNode is not changed.
 
-	Node* getCurrentNode() const;
+	AutoPtr<Node> getCurrentNode() const;
 		/// See currentNode().
 		
-	void setCurrentNode(Node* pNode);
+	void setCurrentNode(AutoPtr<Node> pNode);
 		/// Sets the current node.
 
-	Node* parentNode();
+	AutoPtr<Node> parentNode();
 		/// Moves to and returns the closest visible ancestor node of the current node.
 		/// If the search for parentNode attempts to step upward from the TreeWalker's
 		/// root node, or if it fails to find a visible ancestor node, this method retains
 		/// the current position and returns null.
 
-	Node* firstChild();
+	AutoPtr<Node> firstChild();
 		/// Moves the TreeWalker to the first visible child of the current node, and
 		/// returns the new node. If the current node has no visible children, returns
 		/// null, and retains the current node.
 
-	Node* lastChild();
+	AutoPtr<Node> lastChild();
 		/// Moves the TreeWalker to the last visible child of the current node, and
 		/// returns the new node. If the current node has no visible children, returns
 		/// null, and retains the current node.
 
-	Node* previousSibling();
+	AutoPtr<Node> previousSibling();
 		/// Moves the TreeWalker to the previous sibling of the current node, and returns
 		/// the new node. If the current node has no visible previous sibling, returns
 		/// null, and retains the current node.
 
-	Node* nextSibling();
+	AutoPtr<Node> nextSibling();
 		/// Moves the TreeWalker to the next sibling of the current node, and returns
 		/// the new node. If the current node has no visible next sibling, returns null,
 		/// and retains the current node.
 
-	Node* previousNode();
+	AutoPtr<Node> previousNode();
 		/// Moves the TreeWalker to the previous visible node in document order relative
 		/// to the current node, and returns the new node. If the current node has no
 		/// previous node, or if the search for previousNode attempts to step upward
 		/// from the TreeWalker's root node, returns null, and retains the current node.
 
-	Node* nextNode();
+	AutoPtr<Node> nextNode();
 		/// Moves the TreeWalker to the next visible node in document order relative
 		/// to the current node, and returns the new node. If the current node has no
 		/// next node, or if the search for nextNode attempts to step upward from the
 		/// TreeWalker's root node, returns null, and retains the current node.
 
 protected:
-	int accept(Node* pNode) const;
-	Node* next(Node* pNode) const;
-	Node* previous(Node* pNode) const;
+	int accept(AutoPtr<Node> pNode) const;
+	AutoPtr<Node> next(AutoPtr<Node> pNode) const;
+	AutoPtr<Node> previous(AutoPtr<Node> pNode) const;
 
 private:
 	TreeWalker();
 	
-	Node*         _pRoot;
+	AutoPtr<Node>         _pRoot;
 	unsigned long _whatToShow;
-	NodeFilter*   _pFilter;
-	Node*         _pCurrent;
+	AutoPtr<NodeFilter>   _pFilter;
+	AutoPtr<Node>         _pCurrent;
 };
 
 
 //
 // inlines
 //
-inline Node* TreeWalker::root() const
+inline AutoPtr<Node> TreeWalker::root() const
 {
 	return _pRoot;
 }
@@ -181,7 +182,7 @@ inline unsigned long TreeWalker::whatToShow() const
 }
 
 
-inline NodeFilter* TreeWalker::filter() const
+inline AutoPtr<NodeFilter> TreeWalker::filter() const
 {
 	return _pFilter;
 }
@@ -193,13 +194,13 @@ inline bool TreeWalker::expandEntityReferences() const
 }
 
 
-inline Node* TreeWalker::currentNode() const
+inline AutoPtr<Node> TreeWalker::currentNode() const
 {
 	return _pCurrent;
 }
 
 
-inline Node* TreeWalker::getCurrentNode() const
+inline AutoPtr<Node> TreeWalker::getCurrentNode() const
 {
 	return _pCurrent;
 }

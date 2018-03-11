@@ -61,6 +61,8 @@ class XML_API XMLWriter: public ContentHandler, public LexicalHandler, public DT
 	/// prefixes in the form ns1, ns2, etc.
 {
 public:
+	typedef AutoPtr<XMLWriter> Ptr;
+
 	enum Options
 	{
 		CANONICAL               = 0x00,
@@ -107,9 +109,6 @@ public:
 		/// If pTextEncoding is null, the given encodingName is ignored and the
 		/// default UTF-8 encoding is used.
 
-	~XMLWriter();
-		/// Destroys the XMLWriter.
-
 	void setNewLine(const std::string& newLineCharacters);
 		/// Sets the line ending for the resulting XML file.
 		///
@@ -134,7 +133,7 @@ public:
 		/// Returns the string used for one indentation step.
 
 	// ContentHandler
-	void setDocumentLocator(const Locator* loc);
+	void setDocumentLocator(Locator::Ptr loc);
 		/// Currently unused.
 
 	void startDocument();
@@ -279,6 +278,10 @@ public:
 		/// > 1 for every element nested within the document element.
 
 protected:
+
+	~XMLWriter();
+		/// Destroys the XMLWriter.
+
 	typedef std::map<XMLString, XMLString> AttributeMap;
 	typedef std::map<XMLString, std::pair<XMLString, XMLString> > CanonicalAttributeMap;
 

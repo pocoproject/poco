@@ -26,6 +26,9 @@ public:
 
 	void testAutoPtr();
 	void testOps();
+	void testInheritance();
+	void testMove();
+	void testMoveInherited();
 
 	void setUp();
 	void tearDown();

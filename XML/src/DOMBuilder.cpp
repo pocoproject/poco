@@ -28,6 +28,7 @@
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/XMLReader.h"
 #include "Poco/SAX/AttributesImpl.h"
+#include "Poco/SAX/InputSource.h"
 
 
 namespace Poco {
@@ -37,8 +38,8 @@ namespace XML {
 const XMLString DOMBuilder::EMPTY_STRING;
 
 
-DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
-	_xmlReader(xmlReader),
+DOMBuilder::DOMBuilder(XMLReader::Ptr pXMLReader, NamePool::Ptr pNamePool):
+	_pXMLReader(pXMLReader),
 	_pNamePool(pNamePool),
 	_pDocument(0),
 	_pParent(0),
@@ -46,82 +47,44 @@ DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
 	_inCDATA(false),
 	_namespaces(true)
 {
-	_xmlReader.setContentHandler(this);
-	_xmlReader.setDTDHandler(this);
-	_xmlReader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(this));
-
-	if (_pNamePool) _pNamePool->duplicate();
+	Ptr pThis(this, true);
+	_pXMLReader->setContentHandler(pThis.cast<ContentHandler>());
+	_pXMLReader->setDTDHandler(pThis.cast<DTDHandler>());
+	_pXMLReader->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, pThis.cast<LexicalHandler>());
 }
 
 
 DOMBuilder::~DOMBuilder()
 {
-	if (_pNamePool) _pNamePool->release();
 }
 
 
-Document* DOMBuilder::parse(const XMLString& uri)
+Document::Ptr DOMBuilder::parse(const XMLString& uri)
 {
 	setupParse();
 	_pDocument->suspendEvents();
-	try
-	{
-		_xmlReader.parse(uri);
-	}
-	catch (...)
-	{
-		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
-		throw;
-	}
+	_pXMLReader->parse(uri);
 	_pDocument->resumeEvents();
-	_pDocument->collectGarbage();
 	return _pDocument;
 }
 
 
-Document* DOMBuilder::parse(InputSource* pInputSource)
+Document::Ptr DOMBuilder::parse(InputSource::Ptr pInputSource)
 {
 	setupParse();
 	_pDocument->suspendEvents();
-	try
-	{
-		_xmlReader.parse(pInputSource);
-	}
-	catch (...)
-	{
-		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
-		throw;
-	}
+	_pXMLReader->parse(pInputSource);
 	_pDocument->resumeEvents();
-	_pDocument->collectGarbage();
 	return _pDocument;
 }
 
 
-Document* DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
+Document::Ptr DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
 {
 	setupParse();
 	_pDocument->suspendEvents();
-	try
-	{
-		_xmlReader.parseMemoryNP(xml, size);
-	}
-	catch (...)
-	{
-		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
-		throw;
-	}
+	_pXMLReader->parseMemoryNP(xml, size);
 	_pDocument->resumeEvents();
-	_pDocument->collectGarbage();
 	return _pDocument;
 }
 
@@ -132,17 +95,16 @@ void DOMBuilder::setupParse()
 	_pParent    = _pDocument;
 	_pPrevious  = 0;
 	_inCDATA    = false;
-	_namespaces = _xmlReader.getFeature(XMLReader::FEATURE_NAMESPACES);
+	_namespaces = _pXMLReader->getFeature(XMLReader::FEATURE_NAMESPACES);
 }
 
 
-inline void DOMBuilder::appendNode(AbstractNode* pNode)
+inline void DOMBuilder::appendNode(AbstractNode::Ptr pNode)
 {
-	if (_pPrevious && _pPrevious != _pParent)
+	if (!_pPrevious.isNull() && _pPrevious != _pParent.unsafeCast<AbstractNode>())
 	{
 		_pPrevious->_pNext = pNode;
 		pNode->_pParent = _pParent;
-		pNode->duplicate();
 	}
 	else _pParent->appendChild(pNode);
 	_pPrevious = pNode;
@@ -151,7 +113,7 @@ inline void DOMBuilder::appendNode(AbstractNode* pNode)
 
 void DOMBuilder::notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId)
 {
-	DocumentType* pDoctype = _pDocument->getDoctype();
+	DocumentType::Ptr pDoctype = _pDocument->getDoctype();
 	if (pDoctype)
 	{
 		AutoPtr<Notation> pNotation = _pDocument->createNotation(name, (publicId ? *publicId : EMPTY_STRING), (systemId ? *systemId : EMPTY_STRING));
@@ -162,7 +124,7 @@ void DOMBuilder::notationDecl(const XMLString& name, const XMLString* publicId, 
 
 void DOMBuilder::unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName)
 {
-	DocumentType* pDoctype = _pDocument->getDoctype();
+	DocumentType::Ptr pDoctype = _pDocument->getDoctype();
 	if (pDoctype)
 	{
 		AutoPtr<Entity> pEntity = _pDocument->createEntity(name, publicId ? *publicId : EMPTY_STRING, systemId, notationName);
@@ -171,7 +133,7 @@ void DOMBuilder::unparsedEntityDecl(const XMLString& name, const XMLString* publ
 }
 
 
-void DOMBuilder::setDocumentLocator(const Locator* loc)
+void DOMBuilder::setDocumentLocator(const Locator::Ptr loc)
 {
 }
 
@@ -191,10 +153,10 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
 	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
-	Attr* pPrevAttr = 0;
+	Attr::Ptr pPrevAttr;
 	for (AttributesImpl::iterator it = attrs.begin(); it != attrs.end(); ++it)
 	{
-		AutoPtr<Attr> pAttr = new Attr(_pDocument, 0, it->namespaceURI, it->localName, it->qname, it->value, it->specified);
+		AutoPtr<Attr> pAttr = new Attr(_pDocument, it->namespaceURI, it->localName, it->qname, it->value, it->specified);
 		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, pAttr);
 	}
 	appendNode(pElem);
@@ -205,7 +167,7 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 void DOMBuilder::endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
 {
 	_pPrevious = _pParent;
-	_pParent   = static_cast<AbstractContainerNode*>(_pParent->parentNode());
+	_pParent   = _pParent->parentNode().unsafeCast<AbstractContainerNode>();
 }
 
 
@@ -215,7 +177,7 @@ void DOMBuilder::characters(const XMLChar ch[], int start, int length)
 	{
 		if (_pPrevious && _pPrevious->nodeType() == Node::CDATA_SECTION_NODE)
 		{
-			static_cast<CDATASection*>(_pPrevious)->appendData(XMLString(ch + start, length));
+			_pPrevious.unsafeCast<CDATASection>()->appendData(XMLString(ch + start, length));
 		}
 		else
 		{
@@ -227,11 +189,11 @@ void DOMBuilder::characters(const XMLChar ch[], int start, int length)
 	{
 		if (_pPrevious && _pPrevious->nodeType() == Node::TEXT_NODE)
 		{
-			static_cast<Text*>(_pPrevious)->appendData(XMLString(ch + start, length));
+			_pPrevious.unsafeCast<Text>()->appendData(XMLString(ch + start, length));
 		}
 		else
 		{
-			AutoPtr<Text> pText = _pDocument->createTextNode(XMLString(ch + start, length));
+			Text::Ptr pText = _pDocument->createTextNode(XMLString(ch + start, length));
 			appendNode(pText);
 		}
 	}

@@ -19,15 +19,15 @@ namespace Poco {
 namespace XML {
 
 
-EntityReference::EntityReference(Document* pOwnerDocument, const XMLString& name):
+EntityReference::EntityReference(Document::Ptr pOwnerDocument, const XMLString& name):
 	AbstractNode(pOwnerDocument),
 	_name(name)
 {
 }
 
 
-EntityReference::EntityReference(Document* pOwnerDocument, const EntityReference& ref):
-	AbstractNode(pOwnerDocument, ref),
+EntityReference::EntityReference(Document::Ptr pOwnerDocument, const EntityReference& ref):
+	AbstractNode(pOwnerDocument),
 	_name(ref._name)
 {
 }
@@ -50,7 +50,7 @@ unsigned short EntityReference::nodeType() const
 }
 
 
-Node* EntityReference::copyNode(bool deep, Document* pOwnerDocument) const
+Node::Ptr EntityReference::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
 	return new EntityReference(pOwnerDocument, *this);
 }

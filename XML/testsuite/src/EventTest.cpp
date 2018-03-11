@@ -26,7 +26,6 @@ using Poco::XML::MutationEvent;
 using Poco::XML::EventListener;
 using Poco::XML::Element;
 using Poco::XML::Document;
-using Poco::XML::Attr;
 using Poco::XML::Text;
 using Poco::XML::Node;
 using Poco::XML::AutoPtr;
@@ -36,6 +35,8 @@ using Poco::XML::XMLString;
 class TestEventListener: public EventListener
 {
 public:
+	typedef AutoPtr<TestEventListener> Ptr;
+
 	TestEventListener(const XMLString& name, bool cancel = false, bool readd = false, bool capture = false):
 		_name(name),
 		_cancel(cancel),
@@ -44,7 +45,7 @@ public:
 	{
 	}
 	
-	void handleEvent(Event* evt)
+	void handleEvent(Event::Ptr evt)
 	{
 		XMLString type = evt->type();
 		XMLString phase;
@@ -57,9 +58,9 @@ public:
 		case Event::BUBBLING_PHASE:
 			phase = "BUBBLING_PHASE"; break;
 		}
-		Node* pTarget = static_cast<Node*>(evt->target());
-		Node* pCurrentTarget = static_cast<Node*>(evt->currentTarget());
-		
+		Node::Ptr pTarget = evt->target().cast<Node>();
+		Node::Ptr pCurrentTarget = evt->currentTarget().cast<Node>();
+
 		_log.append(_name);
 		_log.append(":");
 		_log.append(type);
@@ -73,8 +74,8 @@ public:
 		_log.append(evt->bubbles() ? "B" : "-");
 		_log.append(":");
 		_log.append(evt->cancelable() ? "C" : "-");
-		
-		MutationEvent* pME = dynamic_cast<MutationEvent*>(evt);
+
+		MutationEvent::Ptr pME = evt.cast<MutationEvent>();
 		if (pME)
 		{
 			XMLString attrChange;
@@ -88,7 +89,7 @@ public:
 				attrChange = "REMOVAL"; break;
 			}
 			XMLString relatedNode;
-			Node* pRelatedNode = pME->relatedNode();
+			Node::Ptr pRelatedNode = pME->relatedNode();
 			if (pRelatedNode) relatedNode = pRelatedNode->nodeName();
 
 			_log.append(":");
@@ -106,7 +107,7 @@ public:
 		
 		if (_cancel) evt->stopPropagation();
 		if (_readd)
-			pCurrentTarget->addEventListener(type, this, _capture);
+			pCurrentTarget->addEventListener(type, Ptr(this, true), _capture);
 	}
 	
 	static const XMLString& log()

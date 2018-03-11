@@ -20,14 +20,14 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/DOMObject.h"
-#include "Poco/XML/XMLString.h"
+#include "Poco/DOM/EventListener.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class EventListener;
 class Event;
 
 
@@ -39,7 +39,11 @@ class XML_API EventTarget: public DOMObject
 	/// and dispatch of events to that EventTarget.
 {
 public:
-	virtual void addEventListener(const XMLString& type, EventListener* listener, bool useCapture) = 0;
+	typedef AutoPtr<EventTarget> Ptr;
+
+	EventTarget();
+
+	virtual void addEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture) = 0;
 		/// This method allows the registration of event listeners on
 		/// the event target. If an EventListener is added to an
 		/// EventTarget while it is processing an event, it will not
@@ -50,7 +54,7 @@ public:
 		/// discarded. They do not cause the EventListener to be called twice and since they are
 		/// discarded they do not need to be removed with the removeEventListener method. 	
 	
-	virtual void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture) = 0;
+	virtual void removeEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture) = 0;
 		/// This method allows the removal of event listeners from the event
 		/// target. If an EventListener is removed from an EventTarget while it is
 		/// processing an event, it will not be triggered by the current actions.
@@ -58,7 +62,7 @@ public:
 		/// Calling removeEventListener with arguments which do not identify
 		/// any currently registered EventListener on the EventTarget has no effect.
 
-	virtual bool dispatchEvent(Event* evt) = 0;
+	virtual bool dispatchEvent(AutoPtr<Event> evt) = 0;
 		/// This method allows the dispatch of events into the implementations
 		/// event model. Events dispatched in this manner will have the same capturing and
 		/// bubbling behavior as events dispatched directly by the

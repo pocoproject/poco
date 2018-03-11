@@ -27,6 +27,7 @@
 #include "Poco/XML/XMLStream.h"
 #include "Poco/SAX/Locator.h"
 #include "Poco/TextEncoding.h"
+#include "Poco/AutoPtr.h"
 #include <map>
 #include <vector>
 
@@ -55,20 +56,19 @@ class XML_API ParserEngine: public Locator
 	/// a standardized, higher-level interface to the parser.
 {
 public:
+	typedef AutoPtr<ParserEngine> Ptr;
+
 	ParserEngine();
 		/// Creates the parser engine.
-		
+
 	ParserEngine(const XMLString& encoding);
 		/// Creates the parser engine and passes the encoding
 		/// to the underlying parser.
-		
-	~ParserEngine();
-		/// Destroys the parser.
 
 	void setEncoding(const XMLString& encoding);
 		/// Sets the encoding used by expat. The encoding must be
 		/// set before parsing begins, otherwise it will be ignored.
-		
+
 	const XMLString& getEncoding() const;
 		/// Returns the encoding used by expat.
 
@@ -80,7 +80,7 @@ public:
 		/// The parser takes ownership of the strategy object
 		/// and deletes it when it's no longer needed.
 		/// The default is NoNamespacesStrategy.
-		
+
 	NamespaceStrategy* getNamespaceStrategy() const;
 		/// Returns the NamespaceStrategy currently in use.
 
@@ -90,59 +90,59 @@ public:
 		/// are reported via the default handler.
 		/// Must be set before parsing begins, otherwise it will be
 		/// ignored.
-		
+
 	bool getExpandInternalEntities() const;
 		/// Returns true if internal entities will be expanded automatically,
 		/// which is the default.
 
 	void setExternalGeneralEntities(bool flag = true);
 		/// Enable or disable processing of external general entities.
-		
+
 	bool getExternalGeneralEntities() const;
 		/// Returns true if external general entities will be processed; false otherwise.
 
 	void setExternalParameterEntities(bool flag = true);
 		/// Enable or disable processing of external parameter entities.
-		
+
 	bool getExternalParameterEntities() const;
 		/// Returns true if external parameter entities will be processed; false otherwise.
-		
-	void setEntityResolver(EntityResolver* pResolver);
+
+	void setEntityResolver(AutoPtr<EntityResolver> pResolver);
 		/// Allow an application to register an entity resolver.
 
-	EntityResolver* getEntityResolver() const;
+	AutoPtr<EntityResolver> getEntityResolver() const;
 		/// Return the current entity resolver.
 
-	void setDTDHandler(DTDHandler* pDTDHandler);
+	void setDTDHandler(AutoPtr<DTDHandler> pDTDHandler);
 		/// Allow an application to register a DTD event handler.
 
-	DTDHandler* getDTDHandler() const;
+	AutoPtr<DTDHandler> getDTDHandler() const;
 		/// Return the current DTD handler.
 
-	void setDeclHandler(DeclHandler* pDeclHandler);
+	void setDeclHandler(AutoPtr<DeclHandler> pDeclHandler);
 		/// Allow an application to register a DTD declarations event handler.
-		
-	DeclHandler* getDeclHandler() const;
+
+	AutoPtr<DeclHandler> getDeclHandler() const;
 		/// Return the current DTD declarations handler.
 
-	void setContentHandler(ContentHandler* pContentHandler);
+	void setContentHandler(AutoPtr<ContentHandler> pContentHandler);
 		/// Allow an application to register a content event handler.
 
-	ContentHandler* getContentHandler() const;
+	AutoPtr<ContentHandler> getContentHandler() const;
 		/// Return the current content handler.
 
-	void setLexicalHandler(LexicalHandler* pLexicalHandler);
+	void setLexicalHandler(AutoPtr<LexicalHandler> pLexicalHandler);
 		/// Allow an application to register a lexical event handler.
-		
-	LexicalHandler* getLexicalHandler() const;
+
+	AutoPtr<LexicalHandler> getLexicalHandler() const;
 		/// Return the current lexical handler.
 
-	void setErrorHandler(ErrorHandler* pErrorHandler);
+	void setErrorHandler(AutoPtr<ErrorHandler> pErrorHandler);
 		/// Allow an application to register an error event handler.
 
-	ErrorHandler* getErrorHandler() const;
+	AutoPtr<ErrorHandler> getErrorHandler() const;
 		/// Return the current error handler.
-		
+
 	void setEnablePartialReads(bool flag = true);
 		/// Enable or disable partial reads from the input source.
 		///
@@ -158,21 +158,21 @@ public:
 		/// This allows for efficient parsing of "complete" XML documents,
 		/// but fails in a case such as XMPP, where only XML fragments
 		/// are sent at a time.
-		
+
 	bool getEnablePartialReads() const;
 		/// Returns true if partial reads are enabled (see
 		/// setEnablePartialReads()), false otherwise.
-	
-	void parse(InputSource* pInputSource);
+
+	void parse(AutoPtr<InputSource> pInputSource);
 		/// Parse an XML document from the given InputSource.
-		
+
 	void parse(const char* pBuffer, std::size_t size);
 		/// Parses an XML document from the given buffer.
-	
+
 	// Locator
 	XMLString getPublicId() const;
 		/// Return the public identifier for the current document event.
-	
+
 	XMLString getSystemId() const;
 		/// Return the system identifier for the current document event.
 
@@ -183,6 +183,10 @@ public:
 		/// Return the column number where the current document event ends.
 
 protected:
+
+	~ParserEngine();
+	/// Destroys the parser.
+
 	void init();
 		/// initializes expat
 
@@ -191,7 +195,7 @@ protected:
 
 	void parseCharInputStream(XMLCharInputStream& istr);
 		/// Parses an entity from the given stream.
-		
+
 	std::streamsize readBytes(XMLByteInputStream& istr, char* pBuffer, std::streamsize bufferSize);
 		/// Reads at most bufferSize bytes from the given stream into the given buffer.
 
@@ -202,7 +206,7 @@ protected:
 		/// Throws an XMLException with a message corresponding
 		/// to the given Expat error code.
 
-	void parseExternal(XML_Parser extParser, InputSource* pInputSource);
+	void parseExternal(XML_Parser extParser, AutoPtr<InputSource> pInputSource);
 		/// Parse an XML document from the given InputSource.
 
 	void parseExternalByteInputStream(XML_Parser extParser, XMLByteInputStream& istr);
@@ -211,12 +215,12 @@ protected:
 	void parseExternalCharInputStream(XML_Parser extParser, XMLCharInputStream& istr);
 		/// Parses an external entity from the given stream, with a separate parser.
 
-	void pushContext(XML_Parser parser, InputSource* pInputSource);
+	void pushContext(XML_Parser parser, AutoPtr<InputSource> pInputSource);
 		/// Pushes a new entry to the context stack.
-		
+
 	void popContext();
 		/// Pops the top-most entry from the context stack.
-	
+
 	void resetContext();
 		/// Resets and clears the context stack.
 
@@ -241,18 +245,18 @@ protected:
 	static void handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset);
 	static void handleEndDoctypeDecl(void* userData);
 	static void handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength,
-	                             const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName);
+                                 const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName);
 	static void handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId);
 	static void handleInternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* replacementText, int replacementTextLength);
 	static void handleSkippedEntity(void* userData, const XML_Char* entityName, int isParameterEntity);
 
 	// encoding support
 	static int convert(void *data, const char *s);
-	
+
 private:
 	typedef std::map<XMLString, Poco::TextEncoding*> EncodingMap;
-	typedef std::vector<ContextLocator*> ContextStack;
-	
+	typedef std::vector<AutoPtr<ContextLocator>> ContextStack;
+
 	XML_Parser _parser;
 	char*      _pBuffer;
 	bool       _encodingSpecified;
@@ -264,14 +268,15 @@ private:
 	NamespaceStrategy* _pNamespaceStrategy;
 	EncodingMap        _encodings;
 	ContextStack       _context;
-	
-	EntityResolver* _pEntityResolver;
-	DTDHandler*     _pDTDHandler;
-	DeclHandler*    _pDeclHandler;
-	ContentHandler* _pContentHandler;
-	LexicalHandler* _pLexicalHandler;
-	ErrorHandler*   _pErrorHandler;
-	
+
+	//Ptr                     _this; // self-reference to hold while expat uses ref to engine
+	AutoPtr<EntityResolver> _pEntityResolver;
+	AutoPtr<DTDHandler>     _pDTDHandler;
+	AutoPtr<DeclHandler>    _pDeclHandler;
+	AutoPtr<ContentHandler> _pContentHandler;
+	AutoPtr<LexicalHandler> _pLexicalHandler;
+	AutoPtr<ErrorHandler>   _pErrorHandler;
+
 	static const int PARSE_BUFFER_SIZE;
 	static const XMLString EMPTY_STRING;
 };
@@ -307,48 +312,6 @@ inline bool ParserEngine::getExternalGeneralEntities() const
 inline bool ParserEngine::getExternalParameterEntities() const
 {
 	return _externalParameterEntities;
-}
-
-
-inline EntityResolver* ParserEngine::getEntityResolver() const
-{
-	return _pEntityResolver;
-}
-
-
-inline DTDHandler* ParserEngine::getDTDHandler() const
-{
-	return _pDTDHandler;
-}
-
-
-inline DeclHandler* ParserEngine::getDeclHandler() const
-{
-	return _pDeclHandler;
-}
-
-
-inline ContentHandler* ParserEngine::getContentHandler() const
-{
-	return _pContentHandler;
-}
-
-
-inline LexicalHandler* ParserEngine::getLexicalHandler() const
-{
-	return _pLexicalHandler;
-}
-
-
-inline ErrorHandler* ParserEngine::getErrorHandler() const
-{
-	return _pErrorHandler;
-}
-
-
-inline bool ParserEngine::getEnablePartialReads() const
-{
-	return _enablePartialReads;
 }
 
 

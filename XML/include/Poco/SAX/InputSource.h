@@ -21,13 +21,15 @@
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/XMLStream.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class XML_API InputSource
+class XML_API InputSource : public RefCountedObject
 	/// This class allows a SAX application to encapsulate information about an input
 	/// source in a single object, which may include a public identifier, a system
 	/// identifier, a byte stream (possibly with a specified encoding), and/or a character
@@ -52,6 +54,8 @@ class XML_API InputSource
 	/// not attempt to re-use such streams after they have been handed to a parser.
 {
 public:
+	typedef AutoPtr<InputSource> Ptr;
+
 	InputSource();
 		/// Zero-argument default constructor.
 		
@@ -69,9 +73,6 @@ public:
 		/// Application writers should use setSystemId() to provide a base for resolving
 		/// relative URIs, may use setPublicId to include a public identifier, and may use
 		/// setEncoding to specify the object's character encoding.
-
-	~InputSource();
-		/// Destroys the InputSource.
 
 	void setPublicId(const XMLString& publicId);
 		/// Set the public identifier for this input source.
@@ -103,7 +104,7 @@ public:
 		/// Set the byte stream for this input source.
 		/// The SAX parser will ignore this if there is also a character stream specified, but it
 		/// will use a byte stream in preference to opening a URI connection itself.
-		
+
 	XMLByteInputStream* getByteStream() const;
 		/// Get the byte stream for this input source.
 
@@ -117,14 +118,19 @@ public:
 		/// Set the character encoding, if known.
 		/// The encoding must be a string acceptable for an XML encoding declaration
 		/// (see section 4.3.3 of the XML 1.0 recommendation).
-		
+
 	const XMLString& getEncoding() const;
 		/// Get the character encoding for a byte stream or URI.
 
+protected:
+
+	~InputSource();
+		/// Destroys the InputSource.
+
 private:
-	XMLString _publicId;
-	XMLString _systemId;
-	XMLString _encoding;
+	XMLString           _publicId;
+	XMLString           _systemId;
+	XMLString           _encoding;
 	XMLByteInputStream* _bistr;
 	XMLCharInputStream* _cistr;
 };

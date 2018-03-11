@@ -68,27 +68,27 @@ void DOMWriter::setIndent(const std::string& indent)
 }
 
 
-void DOMWriter::writeNode(XMLByteOutputStream& ostr, const Node* pNode)
+void DOMWriter::writeNode(XMLByteOutputStream& ostr, Node::Ptr pNode)
 {
 	poco_check_ptr (pNode);
 
 	bool isFragment = pNode->nodeType() != Node::DOCUMENT_NODE;
 
-	XMLWriter writer(ostr, _options, _encodingName, _pTextEncoding);
-	writer.setNewLine(_newLine);
-	writer.setIndent(_indent);
-	
-	DOMSerializer serializer;
-	serializer.setContentHandler(&writer);
-	serializer.setDTDHandler(&writer);
-	serializer.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(&writer));
-	if (isFragment) writer.startFragment();
-	serializer.serialize(pNode);
-	if (isFragment) writer.endFragment();
+	XMLWriter::Ptr writer = new XMLWriter(ostr, _options, _encodingName, _pTextEncoding);
+	writer->setNewLine(_newLine);
+	writer->setIndent(_indent);
+
+	DOMSerializer::Ptr serializer = new DOMSerializer;
+	serializer->setContentHandler(writer);
+	serializer->setDTDHandler(writer);
+	serializer->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.unsafeCast<LexicalHandler>());
+	if (isFragment) writer->startFragment();
+	serializer->serialize(pNode);
+	if (isFragment) writer->endFragment();
 }
 
 
-void DOMWriter::writeNode(const std::string& systemId, const Node* pNode)
+void DOMWriter::writeNode(const std::string& systemId, Node::Ptr pNode)
 {
 	Poco::FileOutputStream ostr(systemId);
 	if (ostr.good())

@@ -22,6 +22,7 @@
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/XMLStream.h"
 #include "Poco/TextEncoding.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -78,10 +79,10 @@ public:
 	const std::string& getIndent() const;
 		/// Returns the string used for one indentation step.
 
-	void writeNode(XMLByteOutputStream& ostr, const Node* pNode);
+	void writeNode(XMLByteOutputStream& ostr, AutoPtr<Node> pNode);
 		/// Writes the XML for the given node to the specified stream.
 
-	void writeNode(const std::string& systemId, const Node* pNode);
+	void writeNode(const std::string& systemId, AutoPtr<Node> pNode);
 		/// Writes the XML for the given node to the file specified in systemId,
 		/// using a standard file output stream (Poco::FileOutputStream).
 

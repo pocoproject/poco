@@ -60,16 +60,17 @@ class XML_API DocumentFragment: public AbstractContainerNode
 	/// appendChild.
 {
 public:
+	typedef AutoPtr<DocumentFragment> Ptr;
+
 	// Node
 	const XMLString& nodeName() const;
 	unsigned short nodeType() const;
 
 protected:
-	DocumentFragment(Document* pOwnerDocument);
-	DocumentFragment(Document* pOwnerDocument, const DocumentFragment& fragment);
+	DocumentFragment(AutoPtr<Document> pOwnerDocument);
 	~DocumentFragment();
-	
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+
+	Node::Ptr copyNode(bool deep, AutoPtr<Document> pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

@@ -39,10 +39,12 @@ class XML_API CharacterData: public AbstractNode
 	/// Indexing on character data is done in XMLChar units.
 {
 public:
+	typedef AutoPtr<CharacterData> Ptr;
+
 	const XMLString& data() const;
 		/// Returns the character data of the node that
 		/// implements the interface.
-	
+
 	const XMLString& getData() const;
 		/// Returns the character data of the node that
 		/// implements the interface.
@@ -87,8 +89,8 @@ public:
 	void setNodeValue(const XMLString& value);
 
 protected:
-	CharacterData(Document* pOwnerDocument, const XMLString& data);
-	CharacterData(Document* pOwnerDocument, const CharacterData& data);
+	CharacterData(AutoPtr<Document> pOwnerDocument, const XMLString& data);
+	CharacterData(AutoPtr<Document> pOwnerDocument, const CharacterData& data);
 	~CharacterData();
 
 private:

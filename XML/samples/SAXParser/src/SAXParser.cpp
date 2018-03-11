@@ -16,9 +16,11 @@
 #include "Poco/SAX/Attributes.h"
 #include "Poco/SAX/Locator.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
 #include <iostream>
 
 
+using Poco::AutoPtr;
 using Poco::XML::SAXParser;
 using Poco::XML::XMLReader;
 using Poco::XML::XMLString;
@@ -32,13 +34,15 @@ using Poco::XML::Locator;
 class MyHandler: public ContentHandler, public LexicalHandler
 {
 public:
+	typedef AutoPtr<MyHandler> Ptr;
+
 	MyHandler():
 		_pLocator(0)
 	{
 	}
 	
 	// ContentHandler
-	void setDocumentLocator(const Locator* loc)
+	void setDocumentLocator(const Locator::Ptr loc)
 	{
 		_pLocator = loc;
 	}
@@ -157,7 +161,7 @@ protected:
 	}
 	
 private:
-	const Locator* _pLocator;
+	const Locator::Ptr _pLocator;
 };
 
 
@@ -170,18 +174,18 @@ int main(int argc, char** argv)
 		std::cout << "usage: " << argv[0] << ": <xmlfile>" << std::endl;
 		return 1;
 	}
-	
-	MyHandler handler;
 
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&handler);
-	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(&handler));
+	MyHandler::Ptr handler = new MyHandler;
+
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	parser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	parser->setContentHandler(&handler);
+	parser->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, handler.unsafeCast<LexicalHandler>());
 	
 	try
 	{
-		parser.parse(argv[1]);
+		parser->parse(argv[1]);
 	}
 	catch (Poco::Exception& e)
 	{

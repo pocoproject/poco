@@ -87,13 +87,14 @@ void ParserWriterTest::testParseWriteSimple()
 	DOMWriter writer;
 	writer.setNewLine("\n");
 	writer.setOptions(XMLWriter::PRETTY_PRINT);
-	InputSource source(istr);
-	AutoPtr<Document> pDoc = parser.parse(&source);
+	InputSource::Ptr source = new InputSource(istr);
+	AutoPtr<Document> pDoc = parser.parse(source);
 	writer.writeNode(ostr, pDoc);
 
 	unsigned int numChildren = 0;
-	Poco::XML::Node* child = pDoc->documentElement()->firstChild();
-	while (child) {
+	Poco::XML::Node::Ptr child = pDoc->documentElement()->firstChild();
+	while (child)
+	{
 		numChildren++;
 		child = child->nextSibling();
 	}

@@ -24,13 +24,13 @@ namespace XML {
 const XMLString Text::NODE_NAME = toXMLString("#text");
 
 
-Text::Text(Document* pOwnerDocument, const XMLString& data):
+Text::Text(Document::Ptr pOwnerDocument, const XMLString& data):
 	CharacterData(pOwnerDocument, data)
 {
 }
 
 
-Text::Text(Document* pOwnerDocument, const Text& text):
+Text::Text(Document::Ptr pOwnerDocument, const Text& text):
 	CharacterData(pOwnerDocument, text)
 {
 }
@@ -41,14 +41,14 @@ Text::~Text()
 }
 
 
-Text* Text::splitText(unsigned long offset)
+Text::Ptr Text::splitText(unsigned long offset)
 {
-	Node* pParent = parentNode();
+	Node::Ptr pParent = parentNode();
 	if (!pParent) throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 	int n = length() - offset;
-	Text* pNew = ownerDocument()->createTextNode(substringData(offset, n));
+	Text::Ptr pNew = ownerDocument()->createTextNode(substringData(offset, n));
 	deleteData(offset, n);
-	pParent->insertBefore(pNew, nextSibling())->release();
+	pParent->insertBefore(pNew, nextSibling());
 	return pNew;
 }
 
@@ -71,7 +71,7 @@ XMLString Text::innerText() const
 }
 
 
-Node* Text::copyNode(bool deep, Document* pOwnerDocument) const
+Node::Ptr Text::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
 	return new Text(pOwnerDocument, *this);
 }

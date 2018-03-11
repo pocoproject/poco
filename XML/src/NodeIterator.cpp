@@ -22,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
+NodeIterator::NodeIterator(Node::Ptr root, unsigned long whatToShow, NodeFilter::Ptr pFilter):
 	_pRoot(root),
 	_whatToShow(whatToShow),
 	_pFilter(pFilter),
@@ -58,7 +58,7 @@ NodeIterator::~NodeIterator()
 }
 
 
-Node* NodeIterator::nextNode()
+Node::Ptr NodeIterator::nextNode()
 {
 	if (!_pRoot) throw DOMException(DOMException::INVALID_STATE_ERR);
 	
@@ -72,7 +72,7 @@ Node* NodeIterator::nextNode()
 }
 
 
-Node* NodeIterator::previousNode()
+Node::Ptr NodeIterator::previousNode()
 {
 	if (!_pRoot) throw DOMException(DOMException::INVALID_STATE_ERR);
 
@@ -93,7 +93,7 @@ void NodeIterator::detach()
 }
 
 
-bool NodeIterator::accept(Node* pNode) const
+bool NodeIterator::accept(Node::Ptr pNode) const
 {
 	bool accept = false;
 	switch (pNode->nodeType())
@@ -129,14 +129,14 @@ bool NodeIterator::accept(Node* pNode) const
 }
 
 
-Node* NodeIterator::next() const
+Node::Ptr NodeIterator::next() const
 {
-	Node* pNext = _pCurrent->firstChild();
+	Node::Ptr pNext = _pCurrent->firstChild();
 	if (pNext) return pNext;
 	pNext = _pCurrent;
 	while (pNext && pNext != _pRoot)
 	{
-		Node* pSibling = pNext->nextSibling();
+		Node::Ptr pSibling = pNext->nextSibling();
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
@@ -144,13 +144,13 @@ Node* NodeIterator::next() const
 }
 
 
-Node* NodeIterator::previous() const
+Node::Ptr NodeIterator::previous() const
 {
 	if (_pCurrent == _pRoot) return 0;
-	Node* pPrev = _pCurrent->previousSibling();
+	Node::Ptr pPrev = _pCurrent->previousSibling();
 	while (pPrev)
 	{
-		Node* pLastChild = pPrev->lastChild();
+		Node::Ptr pLastChild = pPrev->lastChild();
 		if (pLastChild)
 			pPrev = pLastChild;
 		else
@@ -160,10 +160,10 @@ Node* NodeIterator::previous() const
 }
 
 
-Node* NodeIterator::last()
+Node::Ptr NodeIterator::last()
 {
 	_pCurrent = _pRoot;
-	Node* pLast = 0;
+	Node::Ptr pLast = 0;
 	while (_pCurrent)
 	{
 		pLast = _pCurrent;

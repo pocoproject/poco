@@ -19,6 +19,7 @@
 
 
 #include "Poco/XML/XML.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -46,7 +47,7 @@ class XML_API NodeIterator
 	/// not conform to the DOM Level 2 Traversal specification.
 {
 public:
-	NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
+	NodeIterator(AutoPtr<Node> root, unsigned long whatToShow, AutoPtr<NodeFilter> pFilter = 0);
 		/// Creates a NodeIterator over the subtree rooted at the specified node.
 		
 	NodeIterator(const NodeIterator& iterator);
@@ -58,7 +59,7 @@ public:
 	~NodeIterator();
 		/// Destroys the NodeIterator.
 
-	Node* root() const;
+	AutoPtr<Node> root() const;
 		/// The root node of the NodeIterator, as specified when it was created.
 
 	unsigned long whatToShow() const;
@@ -68,7 +69,7 @@ public:
 		/// still be considered. Note that this skip takes precedence over the filter,
 		/// if any.
 
-	NodeFilter* filter() const;
+	AutoPtr<NodeFilter> filter() const;
 		/// The NodeFilter used to screen nodes.
 
 	bool expandEntityReferences() const;
@@ -89,16 +90,16 @@ public:
 		/// This implementation does not support entity reference expansion and
 		/// thus always returns false.
 
-	Node* nextNode();
+	AutoPtr<Node> nextNode();
 		/// Returns the next node in the set and advances the position of the iterator
 		/// in the set. After a NodeIterator is created, the first call to nextNode()
 		/// returns the first node in the set.
 
-	Node* previousNode();
+	AutoPtr<Node> previousNode();
 		/// Returns the previous node in the set and moves the position of the NodeIterator
 		/// backwards in the set.
 
-	Node* currentNodeNP() const;
+	AutoPtr<Node> currentNodeNP() const;
 		/// Returns the current node in the set.
 		///
 		/// Leaves the NodeIterator unchanged.
@@ -113,31 +114,31 @@ public:
 		/// the exception INVALID_STATE_ERR.
 
 protected:
-	bool accept(Node* pNode) const;
-	Node* next() const;
-	Node* previous() const;
-	Node* last();
+	bool accept(AutoPtr<Node> pNode) const;
+	AutoPtr<Node> next() const;
+	AutoPtr<Node> previous() const;
+	AutoPtr<Node> last();
 
 private:
 	NodeIterator();
 	
-	Node*         _pRoot;
+	AutoPtr<Node>         _pRoot;
 	unsigned long _whatToShow;
-	NodeFilter*   _pFilter;
-	Node*         _pCurrent;
+	AutoPtr<NodeFilter>   _pFilter;
+	AutoPtr<Node>         _pCurrent;
 };
 
 
 //
 // inlines
 //
-inline Node* NodeIterator::root() const
+inline AutoPtr<Node> NodeIterator::root() const
 {
 	return _pRoot;
 }
 
 
-inline Node* NodeIterator::currentNodeNP() const
+inline AutoPtr<Node> NodeIterator::currentNodeNP() const
 {
 	return _pCurrent;
 }
@@ -149,7 +150,7 @@ inline unsigned long NodeIterator::whatToShow() const
 }
 
 
-inline NodeFilter* NodeIterator::filter() const
+inline AutoPtr<NodeFilter> NodeIterator::filter() const
 {
 	return _pFilter;
 }

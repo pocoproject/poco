@@ -21,7 +21,7 @@
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/Node.h"
 #include "Poco/DOM/MutationEvent.h"
-#include "Poco/XML/XMLString.h"
+#include "Poco/DOM/EventListener.h"
 
 
 namespace Poco {
@@ -39,24 +39,26 @@ class XML_API AbstractNode: public Node
 	/// that do not contain other nodes.
 {
 public:
+	typedef Poco::AutoPtr<AbstractNode> Ptr;
+ 
 	// Node
 	const XMLString& nodeName() const;
 	const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& value);
-	Node* parentNode() const;
-	NodeList* childNodes() const;
-	Node* firstChild() const;
-	Node* lastChild() const;
-	Node* previousSibling() const;
-	Node* nextSibling() const;
-	NamedNodeMap* attributes() const;
-	Document* ownerDocument() const;
-	Node* insertBefore(Node* newChild, Node* refChild);
-	Node* replaceChild(Node* newChild, Node* oldChild);
-	Node* removeChild(Node* oldChild);
-	Node* appendChild(Node* newChild);
+	Node::Ptr parentNode() const;
+	Poco::AutoPtr<NodeList> childNodes() const;
+	Node::Ptr firstChild() const;
+	Node::Ptr lastChild() const;
+	Node::Ptr previousSibling() const;
+	Node::Ptr nextSibling() const;
+	AutoPtr<NamedNodeMap> attributes() const;
+	AutoPtr<Document> ownerDocument() const;
+	Node::Ptr insertBefore(Node::Ptr newChild, Node::Ptr refChild);
+	Node::Ptr replaceChild(Node::Ptr newChild, Node::Ptr oldChild);
+	Node::Ptr removeChild(Node::Ptr oldChild);
+	Node::Ptr appendChild(Node::Ptr newChild);
 	bool hasChildNodes() const;
-	Node* cloneNode(bool deep) const;
+	Node::Ptr cloneNode(bool deep) const;
 	void normalize();
 	bool isSupported(const XMLString& feature, const XMLString& version) const;
 	const XMLString& namespaceURI() const;
@@ -65,46 +67,43 @@ public:
 	bool hasAttributes() const;
 
 	// EventTarget
-	void addEventListener(const XMLString& type, EventListener* listener, bool useCapture);
-	void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture);
-	bool dispatchEvent(Event* evt);
+	void addEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture);
+	void removeEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture);
+	bool dispatchEvent(Event::Ptr evt);
 
 	// Extensions
 	XMLString innerText() const;
-	Node* getNodeByPath(const XMLString& path) const;
-	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
-
-	virtual void autoRelease();
+	Node::Ptr getNodeByPath(const XMLString& path) const;
+	Node::Ptr getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
 
 protected:
-	AbstractNode(Document* pOwnerDocument);
-	AbstractNode(Document* pOwnerDocument, const AbstractNode& node);
+	AbstractNode(AutoPtr<Document> pOwnerDocument);
 	~AbstractNode();
 
-	virtual Node* copyNode(bool deep, Document* pOwnerDocument) const = 0;
+	virtual Node::Ptr copyNode(bool deep, AutoPtr<Document> pOwnerDocument) const = 0;
 
 	virtual bool events() const;
 	virtual bool eventsSuspended() const;
-	void captureEvent(Event* evt);
-	void bubbleEvent(Event* evt);
+	void captureEvent(Event::Ptr evt);
+	void bubbleEvent(Event::Ptr evt);
 	void dispatchSubtreeModified();
 	void dispatchNodeInserted();
 	void dispatchNodeRemoved();
 	virtual void dispatchNodeRemovedFromDocument();
 	virtual void dispatchNodeInsertedIntoDocument();
-	void dispatchAttrModified(Attr* pAttr, MutationEvent::AttrChangeType changeType, const XMLString& prevValue, const XMLString& newValue);
+	void dispatchAttrModified(AutoPtr<Attr> pAttr, MutationEvent::AttrChangeType changeType, const XMLString& prevValue, const XMLString& newValue);
 	void dispatchCharacterDataModified(const XMLString& prevValue, const XMLString& newValue);
-	void setOwnerDocument(Document* pOwnerDocument);
+	void setOwnerDocument(AutoPtr<Document> pOwnerDocument);
 
 	static const XMLString EMPTY_STRING;
 
 private:
 	AbstractNode();
 
-	AbstractContainerNode* _pParent;
-	AbstractNode*          _pNext;
-	Document*              _pOwner;
-	EventDispatcher*       _pEventDispatcher;
+	AutoPtr<AbstractContainerNode> _pParent;
+	AbstractNode::Ptr              _pNext;
+	AutoPtr<Document>              _pOwner;
+	AutoPtr<EventDispatcher>       _pEventDispatcher;
 
 	static const XMLString NODE_NAME;
 

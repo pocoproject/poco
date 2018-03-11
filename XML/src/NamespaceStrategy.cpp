@@ -82,7 +82,7 @@ NoNamespacesStrategy::~NoNamespacesStrategy()
 }
 
 
-void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
+void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler::Ptr pContentHandler)
 {
 	poco_assert_dbg (name && atts && pContentHandler);
 
@@ -99,7 +99,7 @@ void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** att
 }
 
 
-void NoNamespacesStrategy::endElement(const XMLChar* name, ContentHandler* pContentHandler)
+void NoNamespacesStrategy::endElement(const XMLChar* name, ContentHandler::Ptr pContentHandler)
 {
 	poco_assert_dbg (name && pContentHandler);
 
@@ -119,7 +119,7 @@ NoNamespacePrefixesStrategy::~NoNamespacePrefixesStrategy()
 }
 
 
-void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
+void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler::Ptr pContentHandler)
 {
 	poco_assert_dbg (name && atts && pContentHandler);
 
@@ -138,7 +138,7 @@ void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLCha
 }
 
 
-void NoNamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* pContentHandler)
+void NoNamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler::Ptr pContentHandler)
 {
 	poco_assert_dbg (name && pContentHandler);
 
@@ -158,7 +158,7 @@ NamespacePrefixesStrategy::~NamespacePrefixesStrategy()
 }
 
 
-void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
+void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler::Ptr pContentHandler)
 {
 	poco_assert_dbg (name && atts && pContentHandler);
 
@@ -181,7 +181,7 @@ void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar*
 }
 
 
-void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* pContentHandler)
+void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler::Ptr pContentHandler)
 {
 	poco_assert_dbg (name && pContentHandler);
 

@@ -187,5 +187,11 @@
 // Disarm POCO_DEPRECATED macro.
 // #define POCO_NO_DEPRECATED
 
+#if defined(_DEBUG)
+// Define to enable stack trace collection for reference counting.
+// See RefCountedObject and NestedDiagnosticContext for details.
+#define POCO_REFCOUNT_NDC
+#endif
+
 
 #endif // Foundation_Config_INCLUDED

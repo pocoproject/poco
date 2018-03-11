@@ -18,10 +18,12 @@
 #define DOM_Node_INCLUDED
 
 
+#include <Poco/RefCountedObject.h>
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/EventTarget.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/SAX/NamespaceSupport.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -54,6 +56,8 @@ class XML_API Node: public EventTarget
 	/// Instead of null strings, this implementation always returns empty strings.
 {
 public:
+	typedef Poco::AutoPtr<Node> Ptr;
+
 	enum
 	{
 		ELEMENT_NODE = 1,             /// The node is an Element.
@@ -86,47 +90,41 @@ public:
 	virtual unsigned short nodeType() const = 0;
 		/// Returns a code representing the type of the underlying object.
 
-	virtual Node* parentNode() const = 0;
+	virtual Node::Ptr parentNode() const = 0;
 		/// The parent of this node. All nodes, except Attr, Document, DocumentFragment,
 		/// Entity, and Notation may have a parent. However, if a node has just been
 		/// created and not yet added to the tree, or if it has been removed from the
 		/// tree, this is null.
 
-	virtual NodeList* childNodes() const = 0;
+	virtual Poco::AutoPtr<NodeList> childNodes() const = 0;
 		/// Returns a NodeList containing all children of this node.
-		///
-		/// The returned NodeList must be released with a call
-		/// to release() when no longer needed.
 
-	virtual Node* firstChild() const = 0;
+	virtual Node::Ptr firstChild() const = 0;
 		/// Returns the first child of this node. If there is no such
 		/// node, this returns null.
 
-	virtual Node* lastChild() const = 0;
+	virtual Node::Ptr lastChild() const = 0;
 		/// Returns the last child of this node. If there is no such
 		/// node, this returns null.
 
-	virtual Node* previousSibling() const = 0;
+	virtual Node::Ptr previousSibling() const = 0;
 		/// Returns the node immediately preceding this node. If there
 		/// is no such node, this returns null.
 
-	virtual Node* nextSibling() const = 0;
+	virtual Node::Ptr nextSibling() const = 0;
 		/// Returns the node immediately following this node. If there
 		/// is no such node, this returns null.
 
-	virtual NamedNodeMap* attributes() const = 0;
+	virtual AutoPtr<NamedNodeMap> attributes() const = 0;
 		/// Returns a NamedNodeMap containing the attributes of this
 		/// node (if it is an Element) or null otherwise.
-		///
-		/// The returned NamedNodeMap must be released with a call
-		/// to release() when no longer needed.
 
-	virtual Document* ownerDocument() const = 0;
+	virtual AutoPtr<Document> ownerDocument() const = 0;
 		/// Returns the Document object associated with this node.
 		/// This is also the Document object used to create new nodes.
 		/// When this node is a Document, this is null.
 
-	virtual Node* insertBefore(Node* newChild, Node* refChild) = 0;
+	virtual Node::Ptr insertBefore(Node::Ptr newChild, Node::Ptr refChild) = 0;
 		/// Inserts the node newChild before the existing child node refChild.
 		///
 		/// If refChild is null, insert newChild at the end of the list of children.
@@ -134,18 +132,18 @@ public:
 		/// inserted in the same order, before refChild. If the newChild is already
 		/// in the tree, it is first removed.
 
-	virtual Node* replaceChild(Node* newChild, Node* oldChild) = 0;
+	virtual Node::Ptr replaceChild(Node::Ptr newChild, Node::Ptr oldChild) = 0;
 		/// Replaces the child node oldChild with newChild in the list of children,
 		/// and returns the oldChild node.
 		/// If newChild is a DocumentFragment object, oldChild is replaced by all of
 		/// the DocumentFragment children, which are inserted in the same order. If
 		/// the newChild is already in the tree, it is first removed.
 
-	virtual Node* removeChild(Node* oldChild) = 0;
+	virtual Node::Ptr removeChild(Node::Ptr oldChild) = 0;
 		/// Removes the child node indicated by oldChild from the list of children
 		/// and returns it.
 
-	virtual Node* appendChild(Node* newChild) = 0;
+	virtual Node::Ptr appendChild(Node::Ptr newChild) = 0;
 		/// Appends the node newChild to the end of the list of children of this node.
 		/// If newChild is already in the tree, it is first removed.
 
@@ -154,7 +152,7 @@ public:
 		/// node has any children.
 		/// Returns true if the node has any children, false otherwise.
 
-	virtual Node* cloneNode(bool deep) const = 0;
+	virtual Node::Ptr cloneNode(bool deep) const = 0;
 		/// Returns a duplicate of this node, i.e., serves as a generic copy constructor
 		/// for nodes. The duplicate node has no parent; (parentNode is null.).
 		/// Cloning an Element copies all attributes and their values, including those
@@ -206,7 +204,7 @@ public:
 
 	virtual bool hasAttributes() const = 0;
 		/// Returns whether this node (if it is an element) has any attributes.
-		
+
 	// Extensions
 	typedef Poco::XML::NamespaceSupport NSMap;
 
@@ -216,7 +214,7 @@ public:
 		///
 		/// This method is not part of the W3C Document Object Model.
 		
-	virtual Node* getNodeByPath(const XMLString& path) const = 0;
+	virtual Node::Ptr getNodeByPath(const XMLString& path) const = 0;
 		/// Searches a node (element or attribute) based on a simplified XPath
 		/// expression.
 		///
@@ -240,7 +238,7 @@ public:
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
-	virtual Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const = 0;
+	virtual Node::Ptr getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const = 0;
 		/// Searches a node (element or attribute) based on a simplified XPath
 		/// expression. The given NSMap must contain mappings from namespace
 		/// prefixes to namespace URIs for all namespace prefixes used in

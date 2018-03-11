@@ -35,6 +35,7 @@ public:
 	void testChildElementNS();
 	void testNodeByPath();
 	void testNodeByPathNS();
+	void testLeak();
 	
 	void setUp();
 	void tearDown();
