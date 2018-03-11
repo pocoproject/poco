@@ -367,13 +367,22 @@ write_basic_package_version_file(
     COMPATIBILITY AnyNewerVersion
 )
 
+# Set config script install location in a location that find_package() will
+# look for, which is different on MS Windows than for UNIX
+# Note: also set in POCO_GENERATE_PACKAGE macro in cmake/PocoMacros.cmake
+if (WIN32)
+  set(PocoConfigPackageLocation "cmake")
+else()
+  set(PocoConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+endif()
+
 configure_file(cmake/${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake" @ONLY)
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION
-        "lib/cmake/${PROJECT_NAME}"
+        "${PocoConfigPackageLocation}"
     COMPONENT
         Devel
 )
