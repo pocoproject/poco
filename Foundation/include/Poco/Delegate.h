@@ -50,7 +50,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -74,7 +74,7 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -82,7 +82,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -121,7 +121,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -145,7 +145,7 @@ public:
 
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -153,7 +153,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -262,7 +262,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -286,7 +286,7 @@ public:
 
 	bool equals(const AbstractDelegate<void>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -294,7 +294,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
@@ -333,7 +333,7 @@ public:
 	~Delegate()
 	{
 	}
-	
+
 	Delegate& operator = (const Delegate& delegate)
 	{
 		if (&delegate != this)
@@ -357,7 +357,7 @@ public:
 
 	bool equals(const AbstractDelegate<void>& other) const
 	{
-		const Delegate* pOtherDelegate = reinterpret_cast<const Delegate*>(other.unwrap());
+		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
@@ -365,7 +365,7 @@ public:
 	{
 		return new Delegate(*this);
 	}
-	
+
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);

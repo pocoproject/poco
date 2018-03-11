@@ -16,6 +16,7 @@
 #include "Poco/Crypto/CipherKey.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/CryptoStream.h"
+#include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
@@ -124,6 +125,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 	}
 }
 
+
 void CryptoTest::testEncryptDecryptWithSaltSha1()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(
@@ -156,6 +158,7 @@ void CryptoTest::testEncryptDecryptWithSaltSha1()
 	}
 }
 
+
 void CryptoTest::testEncryptDecryptDESECB()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("des-ecb", "password"));
@@ -186,6 +189,38 @@ void CryptoTest::testEncryptDecryptDESECB()
 }
 
 
+void CryptoTest::testEncryptDecryptGCM()
+{
+	CipherKey key("aes-256-gcm");
+	
+	CipherKey::ByteVec iv(20, 213);
+	key.setIV(iv);
+
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(key);
+
+	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
+	{
+		std::stringstream str;
+		CryptoTransform* pEncryptor = pCipher->createEncryptor();
+		CryptoOutputStream encryptorStream(str, pEncryptor);
+		std::string in(n, 'x');
+		encryptorStream << in;
+		encryptorStream.close();
+		assert (encryptorStream.good());
+
+		std::string tag = pEncryptor->getTag();
+
+		CryptoTransform* pDecryptor = pCipher->createDecryptor();
+		pDecryptor->setTag(tag);
+		CryptoInputStream decryptorStream(str, pDecryptor);
+		std::string out;
+		decryptorStream >> out;
+
+		assert (in == out);
+	}
+}
+
+
 void CryptoTest::testPassword()
 {
 	CipherKey key("aes256", "password", "salt");
@@ -197,6 +232,7 @@ void CryptoTest::testPassword()
 	std::string base64Key = keyStream.str();
 	assert (base64Key == "hIzxBt58GDd7/6mRp88bewKk42lM4QwaF78ek0FkVoA=");
 }
+
 
 void CryptoTest::testPasswordSha1()
 {
@@ -332,6 +368,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSalt);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSaltSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptDESECB);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptGCM);
 	CppUnit_addTest(pSuite, CryptoTest, testPassword);
 	CppUnit_addTest(pSuite, CryptoTest, testPasswordSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptInterop);
