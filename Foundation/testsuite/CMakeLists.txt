@@ -57,11 +57,9 @@ set_target_properties( TestApp PROPERTIES DEBUG_POSTFIX "") # don't use DEBUG_PO
 set_target_properties( TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries( TestApp PocoFoundation)
 
-if(BUILD_SHARED_LIBS)
 # TestLibrary
-add_library( TestLibrary src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h )
+add_library( TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h )
 # The test requires the library named TestLibrary. By default it is prefixed with lib.
 set_target_properties( TestLibrary PROPERTIES PREFIX "" DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 set_target_properties( TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries( TestLibrary PocoFoundation)
-endif()
