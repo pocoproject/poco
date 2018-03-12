@@ -191,26 +191,34 @@ public:
 		return assign<Other>(ptr);
 	}
 
+	void moveAssign(C** pptr)
+		// Move-assigns pptr to this AutoPtr.
+		// The pptr must not be null.
+		// Self move-assignment is no-op
+	{
+		poco_check_ptr (pptr);
+
+		if (*pptr != _ptr)
+		{
+			reset();
+			if (*pptr)
+			{
+				_ptr = *pptr;
+				*pptr = 0;
+			}
+		}
+	}
+
 	AutoPtr& operator = (AutoPtr&& ptr)
 	{
-		reset();
-		if (ptr._ptr)
-		{
-			_ptr = ptr._ptr;
-			ptr._ptr = 0;
-		}
+		moveAssign(&ptr._ptr);
 		return *this;
 	}
 
 	template <class Other>
 	AutoPtr& operator = (AutoPtr<Other>&& ptr)
 	{
-		reset();
-		if (ptr._ptr)
-		{
-			_ptr = ptr._ptr;
-			ptr._ptr = 0;
-		}
+		moveAssign(&ptr._ptr);
 		return *this;
 	}
 

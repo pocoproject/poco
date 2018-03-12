@@ -255,14 +255,22 @@ void AutoPtrTest::testInheritance()
 
 void AutoPtrTest::testMoveInherited()
 {
-	TestChild* tc = new TestChild;
-	TestChild::Ptr ptc = new TestChild;//tc->getAutoPtr();
-	ptc = tc;
 	TestChild* pObj = new TestChild;
 	assert (pObj->referenceCount() == 1);
 	AutoPtr<TestChild> ptr1 = pObj;
+	ptr1 = ptr1;
+	assert (ptr1->referenceCount() == 1);
+	assert (!ptr1.isNull());
+	assert (pObj->referenceCount() == 1);
+	ptr1 = std::move(ptr1);
+	assert (ptr1->referenceCount() == 1);
+	assert (!ptr1.isNull());
 	assert (pObj->referenceCount() == 1);
 	AutoPtr<TestChild> ptr2 = std::move(ptr1);
+	assert (pObj->referenceCount() == 1);
+	assert (ptr2->referenceCount() == 1);
+	assert (ptr1.isNull());
+	ptr2 = std::move(ptr2);
 	assert (pObj->referenceCount() == 1);
 	assert (ptr2->referenceCount() == 1);
 	assert (ptr1.isNull());
@@ -299,6 +307,10 @@ void AutoPtrTest::testMoveInherited()
 	assert (parent2->referenceCount() == 2);
 	assert (child->referenceCount() == 2);
 	parent1 = child;
+	assert (parent1->referenceCount() == 3);
+	assert (child->referenceCount() == 3);
+	parent1 = std::move(parent1);
+	assert (parent1->referenceCount() == 3);
 	assert (child->referenceCount() == 3);
 
 	TestChild::Ptr child1 = child->getAutoPtr();
