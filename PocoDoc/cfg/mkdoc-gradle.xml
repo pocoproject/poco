@@ -19,7 +19,9 @@
 				Constants.h,
 				inffast.h,
 				PDF/include/*.h,
-				CppParser/include/*.h
+				CppParser/include/*.h,
+				Data/include/*.h
+				Data/*/include/*.h
 			</exclude>
 		</files>
 		<pages>
@@ -40,7 +42,7 @@
 				<options>
 					${Includes},
 					/I${PocoBase}/openssl/include
-					/I${VC}/include,
+					/I${VCH}/include,
 					/I${WDK}/shared
 					/I${WDK}/um
 					/I${WDK}/ucrt
@@ -49,9 +51,8 @@
 					/E,
 					/C,
 					/DPOCO_NO_GCC_API_ATTRIBUTE
-					/DPOCO_NO_WINDOWS_H
 				</options>
-				<path>${VC}/bin</path>
+				<path>${CLP}</path>
 				<usePipe>true</usePipe>
 			</windows>
 			<unix>
