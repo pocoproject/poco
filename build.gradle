@@ -905,7 +905,7 @@ task nuget(type: Exec) {
 	args "-Version", nugetVersion
 	args "-Symbols"
 	args "-NonInteractive"
-	args "Pocoproject.Poco.vs140.nuspec"
+	args "Pocoproject.Poco.vs150.nuspec"
 
 	inputs.files(pocos.inputs.files)
 	inputs.files(new File(workingDir, "Pocoproject.Poco.vs150.nuspec"))
