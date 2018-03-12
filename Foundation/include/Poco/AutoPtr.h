@@ -192,7 +192,7 @@ public:
 	}
 
 	void moveAssign(C** pptr)
-		// Move-assigns pptr to this AutoPtr.
+		// Move-assigns *pptr to this AutoPtr.
 		// The pptr must not be null.
 		// Self move-assignment is no-op
 	{
