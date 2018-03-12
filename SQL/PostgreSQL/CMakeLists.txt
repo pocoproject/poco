@@ -9,7 +9,7 @@ POCO_SOURCES_AUTO( POSTGRESQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( POSTGRESQL_SRCS ${HDRS_G})
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${POSTGRESQL_SRCS} )
+add_library( "${LIBNAME}" ${POSTGRESQL_SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES

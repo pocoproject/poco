@@ -11,7 +11,7 @@ POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
 add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${ODBC_SRCS} )
+add_library( "${LIBNAME}" ${ODBC_SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES

@@ -15,7 +15,7 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     src/WinService.cpp
 )
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
