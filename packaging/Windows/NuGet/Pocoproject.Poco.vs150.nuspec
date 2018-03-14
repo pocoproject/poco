@@ -27,35 +27,35 @@
     </metadata>
     <files>
 		<file src='packaging\Windows\NuGet\Pocoproject.Poco.vs150.targets'			target='build\native'/>
-        <file src='bin\*' 							target='build\native\bin'  	exclude='bin\PocoCppParser*'/>
-        <file src='lib\*' 							target='build\native\lib'  	exclude='lib\PocoCppParser*'/>
-        <file src='bin64\*' 						target='build\native\bin64'	exclude='bin64\PocoCppParser*'/>
-        <file src='lib64\*' 						target='build\native\lib64'	exclude='lib64\PocoCppParser*'/>
-	<file src='openssl\build\win32\bin\debug\*' 							target='build\native\bin'  	exclude='bin\PocoCppParser*'/>
-	<file src='openssl\build\win32\bin\release\*' 							target='build\native\bin'  	exclude='bin\PocoCppParser*'/>
-        <file src='openssl\build\win32\lib\debug\*' 							target='build\native\lib'  	exclude='lib\PocoCppParser*'/>
-        <file src='openssl\build\win32\lib\release\*' 							target='build\native\lib'  	exclude='lib\PocoCppParser*'/>
-	<file src='openssl\build\win64\bin\debug\*' 							target='build\native\bin64'  	exclude='bin\PocoCppParser*'/>
-	<file src='openssl\build\win64\bin\release\*' 							target='build\native\bin64'  	exclude='bin\PocoCppParser*'/>
-        <file src='openssl\build\win64\lib\debug\*' 							target='build\native\lib64'  	exclude='lib\PocoCppParser*'/>
-        <file src='openssl\build\win64\lib\release\*' 							target='build\native\lib64'  	exclude='lib\PocoCppParser*'/>
-		<file src='CppUnit\include\**' 				target='build\native\inc' />
-		<file src='Crypto\include\**' 				target='build\native\inc' />
-		<file src='Data\MySQL\include\**' 			target='build\native\inc' />
-		<file src='Data\include\**' 			target='build\native\inc' />
-		<file src='Data\ODBC\include\**' 			target='build\native\inc' />
-		<file src='Data\SQLite\include\**' 			target='build\native\inc' />
-		<file src='Encodings\include\**' 			target='build\native\inc' />
-		<file src='Foundation\include\**' 			target='build\native\inc' />
-		<file src='JSON\include\**' 				target='build\native\inc' />
-		<file src='MongoDB\include\**' 				target='build\native\inc' />
-		<file src='Net\include\**' 					target='build\native\inc' />
-		<file src='NetSSL_OpenSSL\include\**' 		target='build\native\inc' />
-		<file src='NetSSL_Win\include\**' 			target='build\native\inc' />
-		<file src='openssl\build\include\**' 					target='build\native\inc' />
-		<file src='PDF\include\**' 					target='build\native\inc' />
-		<file src='Util\include\**' 				target='build\native\inc' />
-		<file src='XML\include\**' 					target='build\native\inc' />
-		<file src='Zip\include\**' 					target='build\native\inc' />
+        <file src='bin\*' 								target='build\native\bin'  		exclude='bin\PocoCppParser*'/>
+        <file src='lib\*' 								target='build\native\lib'  		exclude='lib\PocoCppParser*'/>
+        <file src='bin64\*' 							target='build\native\bin64'		exclude='bin64\PocoCppParser*'/>
+        <file src='lib64\*' 							target='build\native\lib64'		exclude='lib64\PocoCppParser*'/>
+		<file src='openssl\build\win32\bin\debug\*' 	target='build\native\bin'  		exclude='bin\PocoCppParser*'/>
+		<file src='openssl\build\win32\bin\release\*' 	target='build\native\bin'  		exclude='bin\PocoCppParser*'/>
+        <file src='openssl\build\win32\lib\debug\*' 	target='build\native\lib'  		exclude='lib\PocoCppParser*'/>
+        <file src='openssl\build\win32\lib\release\*' 	target='build\native\lib'  		exclude='lib\PocoCppParser*'/>
+		<file src='openssl\build\win64\bin\debug\*' 	target='build\native\bin64'  	exclude='bin\PocoCppParser*'/>
+		<file src='openssl\build\win64\bin\release\*' 	target='build\native\bin64'  	exclude='bin\PocoCppParser*'/>
+        <file src='openssl\build\win64\lib\debug\*' 	target='build\native\lib64'  	exclude='lib\PocoCppParser*'/>
+        <file src='openssl\build\win64\lib\release\*' 	target='build\native\lib64'  	exclude='lib\PocoCppParser*'/>
+		<file src='CppUnit\include\**' 					target='build\native\inc' />
+		<file src='Crypto\include\**' 					target='build\native\inc' />
+		<file src='Data\MySQL\include\**' 				target='build\native\inc' />
+		<file src='Data\include\**' 					target='build\native\inc' />
+		<file src='Data\ODBC\include\**' 				target='build\native\inc' />
+		<file src='Data\SQLite\include\**' 				target='build\native\inc' />
+		<file src='Encodings\include\**' 				target='build\native\inc' />
+		<file src='Foundation\include\**' 				target='build\native\inc' />
+		<file src='JSON\include\**' 					target='build\native\inc' />
+		<file src='MongoDB\include\**' 					target='build\native\inc' />
+		<file src='Net\include\**' 						target='build\native\inc' />
+		<file src='NetSSL_OpenSSL\include\**' 			target='build\native\inc' />
+		<file src='NetSSL_Win\include\**' 				target='build\native\inc' />
+		<file src='openssl\build\include\**' 			target='build\native\inc' />
+		<file src='PDF\include\**' 						target='build\native\inc' />
+		<file src='Util\include\**' 					target='build\native\inc' />
+		<file src='XML\include\**' 						target='build\native\inc' />
+		<file src='Zip\include\**' 						target='build\native\inc' />
      </files>
 </package>
