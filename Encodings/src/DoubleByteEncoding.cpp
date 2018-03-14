@@ -17,7 +17,7 @@
 // if _DEBUG is #define'd), std::lower_bound() will fail
 // to compile.
 // See also: <https://github.com/pocoproject/poco/issues/2220>
-#if defined(_MSC_VER) && _MSC_VER <= 1500
+#if defined(_MSC_VER) && defined(_DEBUG) && _MSC_VER <= 1500
 #define _HAS_ITERATOR_DEBUGGING 0
 #endif
 
