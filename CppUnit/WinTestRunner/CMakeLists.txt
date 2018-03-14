@@ -15,7 +15,7 @@ POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 add_definitions("-D_AFXDLL")
 #TODO: Use instead of the flag above: find_package(MFC)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${WIN_SRCS} )
+add_library( "${LIBNAME}" ${WIN_SRCS} )
 set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION "1" SOVERSION "1"
@@ -32,5 +32,3 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 if(WIN32)
     target_link_libraries( ${LIBNAME} winmm )
 endif(WIN32)
-
-

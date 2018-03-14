@@ -18,7 +18,7 @@ if(WIN32)
     endif()
 endif(WIN32)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -45,4 +45,3 @@ endif ()
 if (ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()
-
