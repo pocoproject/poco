@@ -42,6 +42,7 @@ if (os.windows) {
 	include ':NetSSL_Win:testsuite'
 }
 include ':SQL:testsuite'
+/*
 if (os.windows) {
 	include ':SQL:ODBC:testsuite'
 	include ':SQL:SQLite:testsuite'
@@ -50,6 +51,7 @@ if (os.windows) {
 }
 //include ':MongoDB:testsuite'
 include ':Redis:testsuite'
+*/
 include ':CppParser:testsuite'
 include ':Zip:testsuite'
 
