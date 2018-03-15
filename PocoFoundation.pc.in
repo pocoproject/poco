@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoFoundation
+Description: C++ Portable Components (POCO) Foundation library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoFoundation
+Cflags: -I${includedir}

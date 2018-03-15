@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoSevenZip
+Description: C++ Portable Components (POCO) SevenZip library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoSevenZip
+Cflags: -I${includedir}

@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoEncodings
+Description: C++ Portable Components (POCO) Encodings library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoEncodings
+Cflags: -I${includedir}

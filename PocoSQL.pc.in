@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoSQL
+Description: C++ Portable Components (POCO) SQL library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoSQL
+Cflags: -I${includedir}

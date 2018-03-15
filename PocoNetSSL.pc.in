@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoNetSSL
+Description: C++ Portable Components (POCO) Network library with SSL
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoNetSSL
+Cflags: -I${includedir}

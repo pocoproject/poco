@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoMongoDB
+Description: C++ Portable Components (POCO) MongoDB library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoMongoDB
+Cflags: -I${includedir}

@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoNet
+Description: C++ Portable Components (POCO) Network library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoNet
+Cflags: -I${includedir}

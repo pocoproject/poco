@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoXML
+Description: C++ Portable Components (POCO) XML library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoXML
+Cflags: -I${includedir}

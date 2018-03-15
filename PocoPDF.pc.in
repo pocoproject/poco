@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PocoPDF
+Description: C++ Portable Components (POCO) PDF library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lPocoPDF
+Cflags: -I${includedir}
