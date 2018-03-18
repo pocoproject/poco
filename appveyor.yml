@@ -288,6 +288,24 @@ before_build:
       }
 
 # -------------------------------------------------------------------------------------------
+# PostgreSQL
+# -------------------------------------------------------------------------------------------
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+            $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
+        }
+        if ($env:platform -eq "x64")
+        {
+            $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
+        }
+# -------------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------------
 # MySQL
 #        & C:\cygwin\bin\ls -lR $env:MYSQL32
 #        & C:\cygwin\bin\ls -lR $env:MYSQL64
@@ -320,23 +338,6 @@ before_build:
         iex "& $cmd"
 # -------------------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------------------------
-# PostgreSQL
-# -------------------------------------------------------------------------------------------
-  - ps: |
-        if ($env:platform -eq "Win32")
-        {
-            $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
-            $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
-            $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
-        }
-        if ($env:platform -eq "x64")
-        {
-            $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
-            $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
-            $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
-        }
-# -------------------------------------------------------------------------------------------
   - set
 
 after_build:
