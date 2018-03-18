@@ -248,7 +248,6 @@ install:
 
 
 before_build:
-  - set
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -338,6 +337,7 @@ before_build:
             $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
         }
 # -------------------------------------------------------------------------------------------
+  - set
 
 after_build:
   - ps: |
