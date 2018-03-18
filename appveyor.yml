@@ -401,6 +401,8 @@ build_script:
         $logger='"C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
         $verbosity='minimal';
 
+        Write-Host -ForegroundColor Yellow "$env:poco_base\buildwin.cmd" " $env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild env $verbosity"
+        
         $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
         -EA Stop -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild env $verbosity $logger";
         gc cout; gc cerr;

@@ -330,7 +330,7 @@ echo ####
 echo ########################################################################
 echo.
 echo.
-echo buildwin %VS_VERSION% %ACTION% %LINK_MODE% %CONFIGURATION% %PLATFORM% %SAMPLES% %TESTS% !BUILD_TOOL! %VERBOSITY%
+echo buildwin %VS_VERSION% %ACTION% %LINK_MODE% %CONFIGURATION% %PLATFORM% %SAMPLES% %TESTS% !BUILD_TOOL! %USEENV% %VERBOSITY%
 echo.
 echo The following configurations will be built:
 
