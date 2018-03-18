@@ -12,7 +12,6 @@ git:
   submodules: false
   
 before_install:
-  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive --remote
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update  -qq; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y libpcre3-dev libssl-dev libexpat1-dev; fi
