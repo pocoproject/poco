@@ -339,6 +339,8 @@ before_build:
 # -------------------------------------------------------------------------------------------
 
   - set
+  - if "%platform%"=="Win32" ( dir "%MYSQL32%\include" )
+  - if "%platform%"=="x64"   ( dir "%MYSQL64%\include" )
 
 after_build:
   - ps: |
