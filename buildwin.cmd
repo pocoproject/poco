@@ -189,7 +189,7 @@ if "%BUILD_TOOL%"=="msbuild" (
   set ACTIONSW=/t:
   set CONFIGSW=/p:Configuration=
   set EXTRASW=/m
-  set USEENV=/p:UseEnv=true
+  if "%USEENV%"=="env"   set USEENV=/p:UseEnv=true
   if "%USEENV%"=="noenv" set USEENV=/p:UseEnv=false
 
   set BUILD_TOOL_FLAGS=/clp:NoSummary
