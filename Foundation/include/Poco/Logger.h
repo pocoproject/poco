@@ -22,9 +22,11 @@
 #include "Poco/Channel.h"
 #include "Poco/Message.h"
 #include "Poco/Format.h"
+#include "Poco/AutoPtr.h"
 #include <map>
 #include <vector>
 #include <cstddef>
+#include <memory>
 
 
 namespace Poco {
@@ -53,17 +55,16 @@ class Foundation_API Logger: public Channel
 	/// The name of a logger determines the logger's place within the logger hierarchy.
 	/// The name of the root logger is always "", the empty string. For all other
 	/// loggers, the name is made up of one or more components, separated by a period.
-	/// For example, the loggers with the name HTTPServer.RequestHandler and HTTPServer.Listener
-	/// are descendants of the logger HTTPServer, which itself is a descendant of
-	/// the root logger. There is not limit as to how deep
-	/// the logger hierarchy can become. Once a logger has been created and it has
-	/// inherited the channel and level from its ancestor, it loses the connection
-	/// to it. So changes to the level or channel of a logger do not affect its
-	/// descendants. This greatly simplifies the implementation of the framework
-	/// and is no real restriction, because almost always levels and channels are
-	/// set up at application startup and never changed afterwards. Nevertheless,
-	/// there are methods to simultaneously change the level and channel of all
-	/// loggers in a certain hierarchy.
+	/// For example, the loggers with the name HTTPServer.RequestHandler and
+	/// HTTPServer.Listener are descendants of the logger HTTPServer, which itself is a
+	/// descendant of the root logger. There is no limit as to how deep the logger hierarchy
+	/// can become. Once a logger has been created and it has inherited the channel and level
+	/// from its ancestor, it loses the connection to it. So, changes to the level or
+	/// channel of a logger do not affect its descendants. This greatly simplifies the
+	/// implementation of the framework and is no real restriction, because almost always
+	/// levels and channels are set up at application startup and never changed afterwards.
+	/// Nevertheless, there are methods to simultaneously change the level and channel of
+	/// all loggers in a certain hierarchy.
 	///
 	/// There are also convenience macros available that wrap the actual
 	/// logging statement into a check whether the Logger's log level
@@ -79,14 +80,16 @@ class Foundation_API Logger: public Channel
 	///     poco_information_f2(logger, "An informational message with args: %d, %d", 1, 2);
 {
 public:
+	typedef AutoPtr<Logger> Ptr;
+
 	const std::string& name() const;
 		/// Returns the name of the logger, which is set as the
 		/// message source on all messages created by the logger.
 
-	void setChannel(Channel* pChannel);
+	void setChannel(Channel::Ptr pChannel);
 		/// Attaches the given Channel to the Logger.
 		
-	Channel* getChannel() const;
+	Channel::Ptr getChannel() const;
 		/// Returns the Channel attached to the logger.
 		
 	void setLevel(int level);
@@ -374,7 +377,7 @@ public:
 		/// Sets the given log level on all loggers that are
 		/// descendants of the Logger with the given name.
 		
-	static void setChannel(const std::string& name, Channel* pChannel);
+	static void setChannel(const std::string& name, Channel::Ptr pChannel);
 		/// Attaches the given Channel to all loggers that are
 		/// descendants of the Logger with the given name.
 
@@ -397,7 +400,7 @@ public:
 		/// The only time this method should be used is during
 		/// program initialization, when only one thread is running.
 		
-	static Logger& create(const std::string& name, Channel* pChannel, int level = Message::PRIO_INFORMATION);
+	static Logger& create(const std::string& name, Channel::Ptr pChannel, int level = Message::PRIO_INFORMATION);
 		/// Creates and returns a reference to a Logger with the
 		/// given name. The Logger's Channel and log level as set as
 		/// specified.
@@ -406,7 +409,7 @@ public:
 		/// Returns a reference to the root logger, which is the ultimate
 		/// ancestor of all Loggers.
 		
-	static Logger* has(const std::string& name);
+	static Ptr has(const std::string& name);
 		/// Returns a pointer to the Logger with the given name if it
 		/// exists, or a null pointer otherwise.
 		
@@ -442,33 +445,35 @@ public:
 		///
 		/// The level is not case sensitive.
 		
-	static const std::string ROOT; /// The name of the root logger ("").	
-		
-protected:
-	typedef std::map<std::string, Logger*> LoggerMap;
+	static const std::string ROOT; /// The name of the root logger ("").
 
-	Logger(const std::string& name, Channel* pChannel, int level);
+protected:
+	typedef std::map<std::string, Ptr> LoggerMap;
+
+	Logger(const std::string& name, Channel::Ptr pChannel, int level);
 	~Logger();
-	
+
 	void log(const std::string& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, int line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
 	static Logger& parent(const std::string& name);
-	static void add(Logger* pLogger);
-	static Logger* find(const std::string& name);
+	static void add(Ptr pLogger);
+	static Ptr find(const std::string& name);
 
 private:
+	typedef std::unique_ptr<LoggerMap> LoggerMapPtr;
+
 	Logger();
 	Logger(const Logger&);
 	Logger& operator = (const Logger&);
-	
-	std::string _name;
-	Channel*    _pChannel;
-	int         _level;
 
-	static LoggerMap* _pLoggerMap;
-	static Mutex      _mapMtx;
+	std::string  _name;
+	Channel::Ptr _pChannel;
+	int          _level;
+
+	static LoggerMapPtr _pLoggerMap;
+	static Mutex        _mapMtx;
 };
 
 

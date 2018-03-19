@@ -78,6 +78,8 @@ class Foundation_API PatternFormatter: public Formatter
 
 {
 public:
+	typedef AutoPtr<PatternFormatter> Ptr;
+
 	PatternFormatter();
 		/// Creates a PatternFormatter.
 		/// The format pattern must be specified with

@@ -134,7 +134,7 @@ void PropertyListConfigurationTest::testSave()
 		"</plist>\n");
 }
 
-AbstractConfiguration* PropertyListConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr PropertyListConfigurationTest::allocConfiguration() const
 {
 	return new PropertyListConfiguration;
 }

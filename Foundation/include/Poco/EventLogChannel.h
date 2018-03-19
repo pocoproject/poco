@@ -35,6 +35,8 @@ class Foundation_API EventLogChannel: public Channel
 	/// containing the message definition resources can be found in $PATH.
 {
 public:
+	typedef AutoPtr<EventLogChannel> Ptr;
+
 	EventLogChannel();
 		/// Creates the EventLogChannel.
 		/// The name of the current application (or more correctly,

@@ -81,7 +81,7 @@ private:
 	static Poco::XML::Node* findNode(const std::string& key, Poco::XML::Node* dict, bool create = false);
 
 	Poco::XML::AutoPtr<Poco::XML::Element> _pRoot;
-	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;		
+	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;
 };
 
 

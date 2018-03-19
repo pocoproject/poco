@@ -141,11 +141,11 @@ public:
 	void load(std::istream& istr);
 		/// Loads the XML document containing the configuration data
 		/// from the given stream.
-		
+
 	void load(const std::string& path);
 		/// Loads the XML document containing the configuration data
 		/// from the given file.
-		
+
 	void load(const Poco::XML::Document* pDocument);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML document.
@@ -153,11 +153,11 @@ public:
 	void load(const Poco::XML::Node* pNode);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML node.
-	
+
 	void loadEmpty(const std::string& rootElementName);
 		/// Loads an empty XML document containing only the
 		/// root element with the given name.
-		
+
 	void save(const std::string& path) const;
 		/// Writes the XML document containing the configuration data
 		/// to the file given by path.
