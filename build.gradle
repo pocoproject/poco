@@ -1,22 +1,12 @@
 buildscript {
 }
 
-/*
-dependencies {
-	testCompile group: 'org.jvnet.hudson.plugins', name: 'cppunit', version: '1.10'
-}
-*/
-/*
-dependencies {
-	classpath group: 'org.pocoproject', name: 'cppunit-test-suite', version:'1.0.0'
-	classpath group: 'org.pocoproject', name: 'windows-message-compiler', version:'1.0.0'
-}
-*/
 plugins {
-	id 'net.saliman.cobertura' version '2.5.1'
+	id 'com.ullink.nuget' version '2.15'
+//	id 'net.saliman.cobertura' version '2.5.1'
 //	id 'com.jfrog.artifactory' version '4.1'
 }
-apply plugin: 'base' 
+apply plugin: 	'base' 
 
 def os = org.gradle.internal.os.OperatingSystem.current()
 def String version = file("VERSION").text.replaceAll("[\n\r]", "")
@@ -201,7 +191,7 @@ class SliceTasksPlugin extends RuleSource {
 }
 
 allprojects {
-	buildDir = new File('root')	            // DO NOT REMOVE OR CHANGE to 'build' since 'build' is a Poco directory
+	buildDir = new File('guild')	            // DO NOT REMOVE OR CHANGE to 'build' since 'build' is a Poco directory
 	file('bin').mkdirs()
 	file('bin64').mkdirs()
 	file('lib').mkdirs()
@@ -222,8 +212,9 @@ subprojects {
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
 	apply plugin: 	SliceTasksPlugin
+	apply plugin: 	'nuget'
 	
-	buildDir = new File("gradle")	
+	buildDir = new File("guild")	
 	
 
 	model {
@@ -808,10 +799,36 @@ subprojects {
 
 		args test
 	}
+
+	
+	ext.commonNuspecMetadata = [
+		version:     	'2.0.0',
+		owners:			'Günter Obiltschnig & Aleksandar Fabijanic',
+		authors:        'Applied Informatics & Contributors',
+		projectUrl: 	'https://pocoproject.org/',
+		licenseUrl:		'https://pocoproject.org/license.html',
+		iconUrl:		'https://avatars1.githubusercontent.com/u/201918?v=4&s=200',
+		copyright: 		'Applied Informatics copyright 2018',
+		requireLicenseAcceptance: false,
+		description:	'Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.'
+	]
+	ext.commonNuspecFiles = [
+		files: [
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.targets", target: "build\\native") }
+		]
+	]
+	ext.commonNuspecPrefix = 'Pocoproject.Poco'
+	
+	nugetPack {
+		destinationDir "$rootDir/packaging/Windows/Nuget"
+	}
+
 }
+
 tasks.withType(CppCompile) {
 	maxParallelForks = 2
 }
+
 task PocoDocIni {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
@@ -942,6 +959,7 @@ task wix() {
 		}
 	});
 }
+/*
 task nuget(type: Exec) {
 	String nugetVersion = version.replace('p', '-')
 	def Set<Task> pocos = project.getTasksByName('poco', true)
@@ -967,10 +985,10 @@ task nuget(type: Exec) {
 		}
 	});
 }
-
+*/
 task packaging() {
 	if (os.windows) {
-		dependsOn nuget
+//		dependsOn nuget
 		dependsOn wix
 	}
 }

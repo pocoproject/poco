@@ -43,3 +43,27 @@ model {
 }
 task poco { dependsOn "assemble" }
 
+nugetSpec {
+	def String vers = commonNuspecMetadata.find { it.key == "version" }.value;
+	nuspec = [
+		metadata: commonNuspecMetadata + [
+			id:          	"${commonNuspecPrefix}.${project.name}.vs150",
+			title:          "Poco ${project.name}",
+			dependencies: [
+				{ dependency(id: "${commonNuspecPrefix}.Foundation.vs150", version: "${vers}") }
+			]
+		],
+		files: [
+			{ file(src: "$rootDir\\bin\\Poco${project.name}.*", 								target: "build\\native\\bin") },
+			{ file(src: "$rootDir\\lib\\Poco${project.name}.*",									target: "build\\native\\lib") },
+			{ file(src: "$rootDir\\bin64\\Poco${project.name}.*",								target: "build\\native\\bin64") },
+			{ file(src: "$rootDir\\lib64\\Poco${project.name}.*",								target: "build\\native\\lib64") },
+			{ file(src: "$rootDir\\bin\\Poco${project.name}d.*", 								target: "build\\native\\bin") },
+			{ file(src: "$rootDir\\lib\\Poco${project.name}d.*",								target: "build\\native\\lib") },
+			{ file(src: "$rootDir\\bin64\\Poco${project.name}d.*",								target: "build\\native\\bin64") },
+			{ file(src: "$rootDir\\lib64\\Poco${project.name}d.*",								target: "build\\native\\lib64") },
+			{ file(src: "$projectDir\\include\\**", 											target: "build\\native\\inc") }
+		]
+	]
+}
+task pack { dependsOn "poco"; dependsOn "nugetPack" }
