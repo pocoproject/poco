@@ -37,6 +37,7 @@ cmake-build*
 .gradle/
 gradle/
 coverage/
+guild/
 
 # NuGet #
 #########
