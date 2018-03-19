@@ -71,11 +71,11 @@ environment:
 
   matrix:
     - builder: msbuild
-      vsver: 150
+      vsver: 140
       linkmode: shared
 
     - builder: cmake
-      vsver: 140
+      vsver: 150
 
 #    - builder: msbuild
 #      vsver: 140
