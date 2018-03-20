@@ -31,3 +31,6 @@ else()
 endif()
 target_link_libraries( ${TESTUNIT} ${CMAKE_THREAD_LIBS_INIT} PocoNetSSL PocoCrypto PocoNet PocoUtil PocoXML PocoFoundation PocoCppUnit)
 
+if(MSVC AND USING_INTERNAL_OPENSSL)
+	set_tests_properties(${LIBNAME} PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")
+endif(MSVC AND USING_INTERNAL_OPENSSL)

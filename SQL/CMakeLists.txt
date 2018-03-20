@@ -9,16 +9,16 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-if (NOT POCO_STATIC)
+if (BUILD_SHARED_LIBS)
     add_definitions(-DTHREADSAFE)
-endif (NOT POCO_STATIC)
+endif (BUILD_SHARED_LIBS)
 
 if(MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties(src/StatementImpl.cpp
         PROPERTIES COMPILE_FLAGS "/bigobj")
 endif()
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES

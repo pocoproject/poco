@@ -87,40 +87,61 @@ option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
 
+if(POCO_STATIC)
+    message(WARNING "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
+
 # allow disabling of internally built OpenSSL# (see below for details)
 # if POCO pre-built OpenSSL directory is found, and DISABLE_INTERNAL_OPENSSL=OFF,
 # the internal OpenSSL build will be used
 option(DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
 set(USING_INTERNAL_OPENSSL false)
 
-if(MSVC)
-  if((EXISTS "${PROJECT_SOURCE_DIR}\\openssl\\VS_120\\") AND NOT DISABLE_INTERNAL_OPENSSL)
+if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT DISABLE_INTERNAL_OPENSSL)
     set(USING_INTERNAL_OPENSSL true)
-    ## windows xcopy does not tolerate forward-slash, must change this
-    STRING(REGEX REPLACE "/" "\\\\" PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
-    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}\\openssl\\VS_120\\")
-  endif()
-endif(MSVC)
+    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
+    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+        set(_MSVC_ARCH "64")
+    else()
+        set(_MSVC_ARCH "32")
+    endif()
+    if(BUILD_SHARED_LIBS)
+	set(_LIB_DIR "bin")
+    else()
+	set(OPENSSL_MSVC_STATIC_RT TRUE)
+	set(_LIB_DIR "lib")
+	endif()
+	set(INTERNAL_OPENSSL_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/openssl/build/win${_MSVC_ARCH}/${_LIB_DIR}")
+	set(INTERNAL_OPENSSL_LIBRARIES "${INTERNAL_OPENSSL_LIBRARY_DIR}/debug/")
+	list(APPEND INTERNAL_OPENSSL_LIBRARIES "${INTERNAL_OPENSSL_LIBRARY_DIR}/release/")
+	foreach(_OSSL_PATH ${INTERNAL_OPENSSL_LIBRARIES})
+		string(REPLACE "/" "\\" _OSSL_PATH ${_OSSL_PATH})
+		string(APPEND INTERNAL_OPENSSL_PATH ${_OSSL_PATH} "\;")
+	endforeach()
+	list(APPEND OPENSSL_ROOT_DIR ${INTERNAL_OPENSSL_LIBRARIES})
+endif(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT DISABLE_INTERNAL_OPENSSL)
 
-set(OPENSSL_FOUND false)
-if(USING_INTERNAL_OPENSSL)
-  message(STATUS "Using OpenSSL from ${OPENSSL_ROOT_DIR}")
-  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}include\\")
-  set(OPENSSL_FOUND true)
+if(ENABLE_NETSSL OR ENABLE_CRYPTO)
+    find_package(OpenSSL REQUIRED)
 else()
-  find_package(OpenSSL QUIET)
-  if(OPENSSL_FOUND)
-    add_definitions( -DPOCO_EXTERNAL_OPENSSL)
-    message(STATUS "Using OpenSSL from ${OPENSSL_ROOT_DIR}")
-  endif()
-endif()
+    find_package(OpenSSL QUIET)
+endif(ENABLE_NETSSL OR ENABLE_CRYPTO)
+
 if(OPENSSL_FOUND)
-    option(ENABLE_NETSSL "Enable NetSSL" ON)
-    option(ENABLE_CRYPTO "Enable Crypto" ON)
+  message(STATUS "Found OpenSSL")
+  message(STATUS "Enable NetSSL and Crypto support")
+  option(ENABLE_NETSSL "Enable NetSSL" ON)
+  option(ENABLE_CRYPTO "Enable Crypto" ON)
 else()
-    option(ENABLE_NETSSL "Enable NetSSL" OFF)
-    option(ENABLE_CRYPTO "Enable Crypto" OFF)
+  message(STATUS "OpenSSL not found")
+  message(STATUS "Disable NetSSL and Crypto support")
+  option(ENABLE_NETSSL "Enable NetSSL" OFF)
+  option(ENABLE_CRYPTO "Enable Crypto" OFF)
 endif()
+
 if(WIN32)
     option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" ON)
 else()
@@ -146,9 +167,6 @@ option(ENABLE_TESTS
 option(ENABLE_SAMPLES
   "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
 
-option(POCO_STATIC
-  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
-
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
@@ -161,18 +179,16 @@ if(MSVC)
 endif()
 
 # Uncomment from next two lines to force static or dynamic library, default is autodetection
-if(POCO_STATIC)
-    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
-    set(LIB_MODE STATIC)
-    if(POCO_VERBOSE_MESSAGES)
-        message(STATUS "Building static libraries")
-    endif()
-else(POCO_STATIC)
-    set(LIB_MODE SHARED)
+if(BUILD_SHARED_LIBS)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building dynamic libraries")
     endif()
-endif(POCO_STATIC)
+else(BUILD_SHARED_LIBS)
+    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
+    if(POCO_VERBOSE_MESSAGES)
+        message(STATUS "Building static libraries")
+    endif()
+endif(BUILD_SHARED_LIBS)
 
 if (ENABLE_TESTS)
 	option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
@@ -253,11 +269,7 @@ if(WIN32 AND ENABLE_NETSSL_WIN)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
 endif(WIN32 AND ENABLE_NETSSL_WIN)
 
-if(ENABLE_NETSSL OR ENABLE_CRYPTO)
-  if(NOT OPENSSL_FOUND)
-    find_package(OpenSSL REQUIRED)
-  endif()
-  if(OPENSSL_FOUND)
+if(OPENSSL_FOUND)
     if(MSVC)
         list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32)
     endif()
@@ -270,8 +282,7 @@ if(ENABLE_NETSSL OR ENABLE_CRYPTO)
       add_subdirectory(Crypto)
       list(APPEND Poco_COMPONENTS "Crypto")
     endif()
-  endif(OPENSSL_FOUND)
-endif(ENABLE_NETSSL OR ENABLE_CRYPTO)
+endif(OPENSSL_FOUND)
 
 if(ENABLE_SQL)
     add_subdirectory(SQL)
@@ -358,13 +369,22 @@ write_basic_package_version_file(
     COMPATIBILITY AnyNewerVersion
 )
 
+# Set config script install location in a location that find_package() will
+# look for, which is different on MS Windows than for UNIX
+# Note: also set in POCO_GENERATE_PACKAGE macro in cmake/PocoMacros.cmake
+if (WIN32)
+  set(PocoConfigPackageLocation "cmake")
+else()
+  set(PocoConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+endif()
+
 configure_file(cmake/${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake" @ONLY)
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION
-        "lib/cmake/${PROJECT_NAME}"
+        "${PocoConfigPackageLocation}"
     COMPONENT
         Devel
 )

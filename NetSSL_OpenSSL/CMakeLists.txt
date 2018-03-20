@@ -9,11 +9,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-# warning: this must be defined before target, otherwise
-# the link_directories() directive is ignored
-include(OpenSSLInternalLib)
-
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -22,9 +18,7 @@ set_target_properties( "${LIBNAME}"
     DEFINE_SYMBOL NetSSL_EXPORTS
     )
 
-include(OpenSSLInternalLibCopy)
-
-target_link_libraries( "${LIBNAME}" Crypto Net Util Foundation ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} )
+target_link_libraries( "${LIBNAME}" Crypto Net Util Foundation)
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -42,4 +36,3 @@ endif ()
 if (ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()
-
