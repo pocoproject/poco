@@ -73,6 +73,16 @@ if (CMAKE_BUILD_TYPE STREQUAL "")
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
 endif()
 
+option(ENABLE_WSTRING "Enable std::wstring support" ON)
+if (NOT ENABLE_WSTRING)
+    add_definitions(-DPOCO_NO_WSTRING)
+endif()
+
+option(ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
+if (NOT ENABLE_FPENVIRONMENT)
+    add_definitions(-DPOCO_NO_FPENVIRONMENT)
+endif()
+
 # Include some common macros to simpilfy Poco CMake files
 include(PocoMacros)
 
