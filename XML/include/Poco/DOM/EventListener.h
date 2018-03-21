@@ -20,6 +20,8 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -29,7 +31,7 @@ namespace XML {
 class Event;
 
 
-class XML_API EventListener
+class XML_API EventListener: public Poco::RefCountedObject
 	/// The EventListener interface is the primary method for handling events. Users
 	/// implement the EventListener interface and register their listener on an
 	/// EventTarget using the AddEventListener method. The users should also remove
@@ -42,7 +44,9 @@ class XML_API EventListener
 	/// add them manually.
 {
 public:
-	virtual void handleEvent(Event* evt) = 0;
+	typedef AutoPtr<EventListener> Ptr;
+
+	virtual void handleEvent(AutoPtr<Event> evt) = 0;
 		/// This method is called whenever an event occurs of the
 		/// type for which the EventListener interface was registered.
 

@@ -96,10 +96,10 @@ Application::~Application()
 void Application::setup()
 {
 	poco_assert (_pInstance == 0);
-	
-	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false, false);
-	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true, false);
-	
+
+	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false);
+	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true);
+
 	addSubsystem(new LoggingSubsystem);
 	
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -226,27 +226,27 @@ int Application::loadConfiguration(int priority)
 	Path confPath;
 	if (findAppConfigFile(appPath.getBaseName(), "properties", confPath))
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "ini", confPath))
 	{
-		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "json", confPath))
 	{
-		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "xml", confPath))
 	{
-		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
@@ -269,27 +269,27 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	else if (icompare(ext, "ini") == 0)
 	{
-		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 	else if (icompare(ext, "json") == 0)
 	{
-		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	else if (icompare(ext, "xml") == 0)
 	{
-		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif

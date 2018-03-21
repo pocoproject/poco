@@ -34,8 +34,8 @@ ConfigurationViewTest::~ConfigurationViewTest()
 
 void ConfigurationViewTest::testView()
 {
-	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
-	AutoPtr<AbstractConfiguration> pView = pConf->createView("");
+	AbstractConfiguration::Ptr pConf = createConfiguration();
+	AbstractConfiguration::Ptr pView = pConf->createView("");
 	assert (pView->hasProperty("prop1"));
 	assert (pView->hasProperty("prop2"));
 
@@ -46,13 +46,13 @@ void ConfigurationViewTest::testView()
 	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
-	
+
 	assert (pView->getString("prop1") == "foo");
 	assert (pView->getString("prop3.string1") == "foo");
-	
+
 	pView->setString("prop6", "foobar");
 	assert (pConf->getString("prop6") == "foobar");
-	
+
 	pView = pConf->createView("prop1");
 	pView->keys(keys);
 	assert (keys.empty());
@@ -66,7 +66,7 @@ void ConfigurationViewTest::testView()
 	assert (keys.size() == 2);
 	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
 	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
-	
+
 	assert (pView->getString("string1") == "foo");
 	assert (pView->getString("string2") == "bar");
 
@@ -101,7 +101,7 @@ void ConfigurationViewTest::testView()
 }
 
 
-AbstractConfiguration* ConfigurationViewTest::allocConfiguration() const
+AbstractConfiguration::Ptr ConfigurationViewTest::allocConfiguration() const
 {
 	return new MapConfiguration;
 }

@@ -55,14 +55,14 @@ void AbstractConfigurationTest::testHasProperty()
 void AbstractConfigurationTest::testGetString()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
-	
+
 	assert (pConf->getString("prop1") == "foo");
 	assert (pConf->getString("prop2") == "bar");
 	assert (pConf->getString("prop3.string1") == "foo");
 	assert (pConf->getString("prop3.string2") == "bar");
 	assert (pConf->getString("ref1") == "foobar");
 	assert (pConf->getRawString("ref1") == "${prop3.string1}${prop3.string2}");
-	
+
 	try
 	{
 		std::string res = pConf->getString("foo");
@@ -71,7 +71,7 @@ void AbstractConfigurationTest::testGetString()
 	catch (Poco::NotFoundException&)
 	{
 	}
-	
+
 	assert (pConf->getString("prop1", "FOO") == "foo");
 	assert (pConf->getString("prop2", "BAR") == "bar");
 	assert (pConf->getString("prop3.string1", "FOO") == "foo");
@@ -89,7 +89,7 @@ void AbstractConfigurationTest::testGetInt()
 	assert (pConf->getInt("prop4.hex") == 0x1f);
 	assert (pConf->getUInt("prop4.hex") == 0x1f);
 	assert (pConf->getInt("ref2") == 42);
-	
+
 	try
 	{
 		pConf->getInt("prop1");
@@ -98,7 +98,7 @@ void AbstractConfigurationTest::testGetInt()
 	catch (Poco::SyntaxException&)
 	{
 	}
-	
+
 	assert (pConf->getInt("prop4.int1", 100) == 42);
 	assert (pConf->getInt("prop4.int2", 100) == -42);
 	assert (pConf->getInt("prop4.int3", 100) == 100);
@@ -119,7 +119,7 @@ void AbstractConfigurationTest::testGetInt64()
 
 	try
 	{
-		Int64 x = pConf->getInt64("prop1");
+		POCO_UNUSED Int64 x = pConf->getInt64("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -139,7 +139,7 @@ void AbstractConfigurationTest::testGetDouble()
 
 	assert (pConf->getDouble("prop4.double1") == 1);
 	assert (pConf->getDouble("prop4.double2") == -1.5);
-	
+
 	try
 	{
 		pConf->getDouble("prop1");
@@ -148,7 +148,7 @@ void AbstractConfigurationTest::testGetDouble()
 	catch (Poco::SyntaxException&)
 	{
 	}
-	
+
 	assert (pConf->getDouble("prop4.double1", 123.5) == 1);
 	assert (pConf->getDouble("prop4.double2", 123.5) == -1.5);
 	assert (pConf->getDouble("prop4.double3", 123.5) == 123.5);
@@ -190,7 +190,7 @@ void AbstractConfigurationTest::testExpand()
 
 	assert (pConf->getString("ref1") == "foobar");
 	assert (pConf->getInt("ref2") == 42);
-	
+
 	try
 	{
 		std::string s = pConf->getString("ref3");
@@ -199,16 +199,16 @@ void AbstractConfigurationTest::testExpand()
 	catch (Poco::CircularReferenceException&)
 	{
 	}
-	
+
 	assert (pConf->getString("ref5") == "${refx}");
 	assert (pConf->getString("ref6") == "${refx}");
-	
+
 	assert (pConf->expand("answer=${prop4.int1}") == "answer=42");
 	assert (pConf->expand("bool5='${prop4.bool5}'") == "bool5='Yes'");
 	assert (pConf->expand("undef='${undef}'") == "undef='${undef}'");
 	assert (pConf->expand("deep='${ref1}'") == "deep='foobar'");
 	assert (pConf->expand("deep='${ref7}'") == "deep='foobar'");
-	
+
 	assert (pConf->getString("dollar.atend") == "foo$");
 	assert (pConf->getString("dollar.middle") == "foo$bar");
 }
@@ -281,25 +281,25 @@ void AbstractConfigurationTest::testChangeEvents()
 
 	pConf->propertyChanging += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanging);
 	pConf->propertyChanged += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanged);
-	
+
 	pConf->setString("set.string1", "foobar");
 	assert (_changingKey == "set.string1");
 	assert (_changingValue == "foobar");
 	assert (_changedKey == "set.string1");
 	assert (_changedValue == "foobar");
-	
+
 	pConf->setInt("set.int1", 42);
 	assert (_changingKey == "set.int1");
 	assert (_changingValue == "42");
 	assert (_changedKey == "set.int1");
 	assert (_changedValue == "42");
-	
+
 	pConf->setDouble("set.double1", 1.5);
 	assert (_changingKey == "set.double1");
 	assert (_changingValue == "1.5");
 	assert (_changedKey == "set.double1");
 	assert (_changedValue == "1.5");
-	
+
 	pConf->setBool("set.bool1", true);
 	assert (_changingKey == "set.bool1");
 	assert (_changingValue == "true");
@@ -343,7 +343,7 @@ void AbstractConfigurationTest::testKeys()
 
 	pConf->keys("prop1", keys);
 	assert (keys.empty());
-	
+
 	pConf->keys("prop3", keys);
 	assert (keys.size() == 2);
 	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
@@ -394,10 +394,10 @@ void AbstractConfigurationTest::testRemove()
 }
 
 
-Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfiguration() const
+AbstractConfiguration::Ptr AbstractConfigurationTest::createConfiguration() const
 {
-	Poco::AutoPtr<AbstractConfiguration> pConfig = allocConfiguration();
-	
+	AbstractConfiguration::Ptr pConfig = allocConfiguration();
+
 	pConfig->setString("prop1", "foo");
 	pConfig->setString("prop2", "bar");
 	pConfig->setString("prop3.string1", "foo");

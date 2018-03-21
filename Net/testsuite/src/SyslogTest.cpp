@@ -27,8 +27,9 @@ class CachingChannel: public Poco::Channel
 	/// Caches the last n Messages in memory
 {
 public:
+	typedef Poco::AutoPtr<CachingChannel> Ptr;
 	typedef std::list<Poco::Message> Messages;
-	
+
 	CachingChannel(std::size_t n = 100);
 		/// Creates the CachingChannel. Caches n messages in memory
 
@@ -127,17 +128,17 @@ void SyslogTest::testListener()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
-	assert (cl.getCurrentSize() == 0);
+	CachingChannel::Ptr pCL = new CachingChannel;
+	listener->addChannel(pCL);
+	assert (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	assert (cl.getCurrentSize() == 1);
+	assert (pCL->getCurrentSize() == 1);
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	pCL->getMessages(msgs, 0, 10);
 	assert (msgs.size() == 1);
 	assert (msgs[0].getSource() == "asource");
 	assert (msgs[0].getText() == "amessage");
@@ -152,14 +153,14 @@ void SyslogTest::testChannelOpenClose()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
+	CachingChannel::Ptr pCL = new CachingChannel;
+	listener->addChannel(pCL);
 
-	assert (cl.getCurrentSize() == 0);
+	assert (pCL->getCurrentSize() == 0);
 	Poco::Message msg1("source1", "message1", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg1);
 	Poco::Thread::sleep(1000);
-	assert (cl.getCurrentSize() == 1);
+	assert (pCL->getCurrentSize() == 1);
 
 	channel->close(); // close and re-open channel
 	channel->open();
@@ -167,11 +168,11 @@ void SyslogTest::testChannelOpenClose()
 	Poco::Message msg2("source2", "message2", Poco::Message::PRIO_ERROR);
 	channel->log(msg2);
 	Poco::Thread::sleep(1000);
-	assert (cl.getCurrentSize() == 2);
+	assert (pCL->getCurrentSize() == 2);
 
 	listener->close();
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	pCL->getMessages(msgs, 0, 10);
 	assert (msgs.size() == 2);
 
 	assert (msgs[1].getSource() == "source1");
@@ -192,17 +193,17 @@ void SyslogTest::testOldBSD()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
-	assert (cl.getCurrentSize() == 0);
+	CachingChannel::Ptr pCL = new CachingChannel;
+	listener->addChannel(pCL);
+	assert (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	assert (cl.getCurrentSize() == 1);
+	assert (pCL->getCurrentSize() == 1);
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	pCL->getMessages(msgs, 0, 10);
 	assert (msgs.size() == 1);
 	// the source is lost with old BSD messages: we only send the local host name!
 	assert (msgs[0].getSource() == Poco::Net::DNS::thisHost().name());

@@ -16,7 +16,7 @@
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"
-#include "Poco/DOM/AutoPtr.h"
+#include "Poco/AutoPtr.h"
 
 
 using Poco::XML::NodeIterator;
@@ -25,15 +25,15 @@ using Poco::XML::Element;
 using Poco::XML::Document;
 using Poco::XML::Text;
 using Poco::XML::Node;
-using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
+using Poco::AutoPtr;
 
 
 namespace
 {
 	class TestNodeFilter: public NodeFilter
 	{
-		short acceptNode(Node* node)
+		short acceptNode(Node::Ptr node) const
 		{
 			if (node->innerText() == "text1")
 				return NodeFilter::FILTER_ACCEPT;
@@ -62,28 +62,28 @@ void NodeIteratorTest::testShowAll()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
+
 	NodeIterator it(pRoot, NodeFilter::SHOW_ALL);
-	
-	assert (it.nextNode() == pRoot);
-	assert (it.nextNode() == pElem1);
-	assert (it.nextNode() == pText1);
-	assert (it.nextNode() == pElem2);
-	assert (it.nextNode() == pText2);
-	assert (it.nextNode() == 0);
-	
-	assert (it.previousNode() == pText2);
-	assert (it.previousNode() == pElem2);
-	assert (it.previousNode() == pText1);
-	assert (it.previousNode() == pElem1);
-	assert (it.previousNode() == pRoot);
-	assert (it.previousNode() == 0);
+
+	assert (it.nextNode().cast<Element>() == pRoot);
+	assert (it.nextNode().cast<Element>() == pElem1);
+	assert (it.nextNode().cast<Text>() == pText1);
+	assert (it.nextNode().cast<Element>() == pElem2);
+	assert (it.nextNode().cast<Text>() == pText2);
+	assert (it.nextNode().isNull());
+
+	assert (it.previousNode().cast<Text>() == pText2);
+	assert (it.previousNode().cast<Element>() == pElem2);
+	assert (it.previousNode().cast<Text>() == pText1);
+	assert (it.previousNode().cast<Element>() == pElem1);
+	assert (it.previousNode().cast<Element>() == pRoot);
+	assert (it.previousNode().isNull());
 }
 
 
@@ -95,7 +95,7 @@ void NodeIteratorTest::testShowElements()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
@@ -103,16 +103,16 @@ void NodeIteratorTest::testShowElements()
 	pDoc->appendChild(pRoot);
 	
 	NodeIterator it(pRoot, NodeFilter::SHOW_ELEMENT);
-	
-	assert (it.nextNode() == pRoot);
-	assert (it.nextNode() == pElem1);
-	assert (it.nextNode() == pElem2);
-	assert (it.nextNode() == 0);
-	
-	assert (it.previousNode() == pElem2);
-	assert (it.previousNode() == pElem1);
-	assert (it.previousNode() == pRoot);
-	assert (it.previousNode() == 0);
+
+	assert (it.nextNode().cast<Element>() == pRoot);
+	assert (it.nextNode().cast<Element>() == pElem1);
+	assert (it.nextNode().cast<Element>() == pElem2);
+	assert (it.nextNode().isNull());
+
+	assert (it.previousNode().cast<Element>() == pElem2);
+	assert (it.previousNode().cast<Element>() == pElem1);
+	assert (it.previousNode().cast<Element>() == pRoot);
+	assert (it.previousNode().isNull());
 }
 
 
@@ -124,21 +124,21 @@ void NodeIteratorTest::testFilter()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
-	TestNodeFilter filter;
-	NodeIterator it(pRoot, NodeFilter::SHOW_ELEMENT, &filter);
-	
-	assert (it.nextNode() == pElem1);
-	assert (it.nextNode() == 0);
-	
-	assert (it.previousNode() == pElem1);
-	assert (it.previousNode() == 0);
+
+	TestNodeFilter::Ptr filter = new TestNodeFilter;
+	NodeIterator it(pRoot, NodeFilter::SHOW_ELEMENT, filter);
+
+	assert (it.nextNode().cast<Element>() == pElem1);
+	assert (it.nextNode().isNull());
+
+	assert (it.previousNode().cast<Element>() == pElem1);
+	assert (it.previousNode().isNull());
 }
 
 
@@ -150,18 +150,18 @@ void NodeIteratorTest::testShowNothing()
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
-	
+
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-	
+
 	NodeIterator it(pRoot, 0);
-	
-	assert (it.nextNode() == 0);
-	
-	assert (it.previousNode() == 0);
+
+	assert (it.nextNode().isNull());
+
+	assert (it.previousNode().isNull());
 }
 
 

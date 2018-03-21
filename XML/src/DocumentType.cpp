@@ -22,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
+DocumentType::DocumentType(Document::Ptr pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
 	AbstractContainerNode(pOwner),
 	_name(name),
 	_publicId(publicId),
@@ -31,8 +31,8 @@ DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLStr
 }
 
 
-DocumentType::DocumentType(Document* pOwner, const DocumentType& doctype):
-	AbstractContainerNode(pOwner, doctype),
+DocumentType::DocumentType(Document::Ptr pOwner, const DocumentType& doctype):
+	AbstractContainerNode(pOwner),
 	_name(doctype._name),
 	_publicId(doctype._publicId),
 	_systemId(doctype._systemId)
@@ -45,15 +45,15 @@ DocumentType::~DocumentType()
 }
 
 
-NamedNodeMap* DocumentType::entities() const
+NamedNodeMap::Ptr DocumentType::entities() const
 {
-	return new DTDMap(this, Node::ENTITY_NODE);
+	return new DTDMap(Ptr(const_cast<DocumentType*>(this), true), Node::ENTITY_NODE);
 }
 
 
-NamedNodeMap* DocumentType::notations() const
+NamedNodeMap::Ptr DocumentType::notations() const
 {
-	return new DTDMap(this, Node::NOTATION_NODE);
+	return new DTDMap(Ptr(const_cast<DocumentType*>(this), true), Node::NOTATION_NODE);
 }
 
 
@@ -75,7 +75,7 @@ const XMLString& DocumentType::internalSubset() const
 }
 
 
-Node* DocumentType::copyNode(bool deep, Document* pOwnerDocument) const
+Node::Ptr DocumentType::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
 	return new DocumentType(pOwnerDocument, *this);
 }

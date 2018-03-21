@@ -43,14 +43,13 @@ class XML_API SAXParser: public XMLReader
 	///     see ParserEngine::setEnablePartialReads()
 {
 public:
+	typedef AutoPtr<SAXParser> Ptr;
+
 	SAXParser();
 		/// Creates an SAXParser.
 
 	SAXParser(const XMLString& encoding);
 		/// Creates an SAXParser with the given encoding.
-		
-	~SAXParser();
-		/// Destroys the SAXParser.
 	
 	void setEncoding(const XMLString& encoding);
 		/// Sets the encoding used by the parser if no
@@ -65,33 +64,37 @@ public:
 		/// Adds an encoding to the parser. Does not take ownership of the pointer!
 
 	/// XMLReader
-	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
-	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
-	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
-	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
+	void setEntityResolver(AutoPtr<EntityResolver> pResolver);
+	AutoPtr<EntityResolver> getEntityResolver() const;
+	void setDTDHandler(AutoPtr<DTDHandler> pDTDHandler);
+	AutoPtr<DTDHandler> getDTDHandler() const;
+	void setContentHandler(AutoPtr<ContentHandler> pContentHandler);
+	AutoPtr<ContentHandler> getContentHandler() const;
+	void setErrorHandler(AutoPtr<ErrorHandler> pErrorHandler);
+	AutoPtr<ErrorHandler> getErrorHandler() const;
 	void setFeature(const XMLString& featureId, bool state);
 	bool getFeature(const XMLString& featureId) const;
 	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
-	void parse(InputSource* pSource);
+	void setProperty(const XMLString& propertyId, AutoPtr<SAXHandler> value);
+	AutoPtr<SAXHandler> getProperty(const XMLString& propertyId) const;
+	void parse(AutoPtr<InputSource> pSource);
 	void parse(const XMLString& systemId);
 	void parseMemoryNP(const char* xml, std::size_t size);
-	
+
 	/// Extensions
 	void parseString(const std::string& xml);
-	
+
 	static const XMLString FEATURE_PARTIAL_READS;
 
 protected:
+
+	~SAXParser();
+		/// Destroys the SAXParser.
+
 	void setupParse();
 
 private:
-	ParserEngine _engine;
+	ParserEngine::Ptr _pEngine;
 	bool _namespaces;
 	bool _namespacePrefixes;
 };

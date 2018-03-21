@@ -21,7 +21,8 @@ namespace Poco {
 namespace XML {
 
 
-Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified):
+Attr::Attr(Document::Ptr pOwnerDocument, const XMLString& namespaceURI,
+		const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified):
 	AbstractNode(pOwnerDocument),
 	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName)),
 	_value(value),
@@ -30,8 +31,8 @@ Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& na
 }
 
 
-Attr::Attr(Document* pOwnerDocument, const Attr& attr):
-	AbstractNode(pOwnerDocument, attr),
+Attr::Attr(Document::Ptr pOwnerDocument, const Attr& attr):
+	AbstractNode(pOwnerDocument),
 	_name(pOwnerDocument->namePool().insert(attr._name)),
 	_value(attr._value),
 	_specified(attr._specified)
@@ -50,25 +51,25 @@ void Attr::setValue(const XMLString& value)
 	_value     = value;
 	_specified = true;
 	if (_pParent && !_pOwner->eventsSuspended())
-		_pParent->dispatchAttrModified(this, MutationEvent::MODIFICATION, oldValue, value);
+		_pParent->dispatchAttrModified(Ptr(this, true), MutationEvent::MODIFICATION, oldValue, value);
 }
 
 
-Node* Attr::parentNode() const
+Node::Ptr Attr::parentNode() const
 {
 	return 0;
 }
 
 
-Node* Attr::previousSibling() const
+Node::Ptr Attr::previousSibling() const
 {
 	if (_pParent)
 	{
-		Attr* pSibling = static_cast<Element*>(_pParent)->_pFirstAttr;
+		Attr::Ptr pSibling = _pParent.cast<Element>()->_pFirstAttr;
 		while (pSibling)
 		{
-		    if (pSibling->_pNext == const_cast<Attr*>(this)) return pSibling;
-		    pSibling = static_cast<Attr*>(pSibling->_pNext);
+			if (pSibling->_pNext == this) return pSibling;
+			pSibling = pSibling->_pNext.cast<Attr>();
 		}
 		return pSibling;
 	}
@@ -124,7 +125,7 @@ XMLString Attr::innerText() const
 }
 
 
-Node* Attr::copyNode(bool deep, Document* pOwnerDocument) const
+Node::Ptr Attr::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
 	return new Attr(pOwnerDocument, *this);
 }

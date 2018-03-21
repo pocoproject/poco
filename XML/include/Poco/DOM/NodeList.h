@@ -20,13 +20,12 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/DOMObject.h"
+#include "Poco/DOM/Node.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
 namespace XML {
-
-
-class Node;
 
 
 class XML_API NodeList: public DOMObject
@@ -36,12 +35,11 @@ class XML_API NodeList: public DOMObject
 	///
 	/// The items in the NodeList are accessible via an integral index,
 	/// starting from 0.
-	///
-	/// A NodeList returned from a method must be released with a call to
-	/// release() when no longer needed.
 {
 public:
-	virtual Node* item(unsigned long index) const = 0;
+	typedef Poco::AutoPtr<NodeList> Ptr;
+
+	virtual Node::Ptr item(unsigned long index) const = 0;
 		/// Returns the index'th item in the collection. If index is
 		/// greater than or equal to the number of nodes in the list,
 		/// this returns null.

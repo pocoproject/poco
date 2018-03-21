@@ -41,9 +41,9 @@ void NodeAppenderTest::testAppendNode()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element>  pRoot = pDoc->createElement("root");
 	pDoc->appendChild(pRoot);
-	
+
 	NodeAppender appender(pRoot);
-	
+
 	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Element> pElem3 = pDoc->createElement("elem");
@@ -52,20 +52,20 @@ void NodeAppenderTest::testAppendNode()
 	appender.appendChild(pElem2);
 	appender.appendChild(pElem3);
 
-	assert (pRoot->firstChild() == pElem1);
-	assert (pRoot->lastChild() == pElem3);
-	
-	assert (pElem1->nextSibling() == pElem2);
-	assert (pElem2->nextSibling() == pElem3);
-	assert (pElem3->nextSibling() == 0);
-	
-	assert (pElem1->previousSibling() == 0);
-	assert (pElem2->previousSibling() == pElem1);	
-	assert (pElem3->previousSibling() == pElem2);	
-	
-	assert (pElem1->parentNode() == pRoot);
-	assert (pElem2->parentNode() == pRoot);
-	assert (pElem3->parentNode() == pRoot);
+	assert (pRoot->firstChild().cast<Element>() == pElem1);
+	assert (pRoot->lastChild().cast<Element>() == pElem3);
+
+	assert (pElem1->nextSibling().cast<Element>() == pElem2);
+	assert (pElem2->nextSibling().cast<Element>() == pElem3);
+	assert (pElem3->nextSibling().isNull());
+
+	assert (pElem1->previousSibling().isNull());
+	assert (pElem2->previousSibling().cast<Element>() == pElem1);
+	assert (pElem3->previousSibling().cast<Element>() == pElem2);
+
+	assert (pElem1->parentNode().cast<Element>() == pRoot);
+	assert (pElem2->parentNode().cast<Element>() == pRoot);
+	assert (pElem3->parentNode().cast<Element>() == pRoot);
 }
 
 
@@ -74,13 +74,13 @@ void NodeAppenderTest::testAppendNodeList()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element>  pRoot = pDoc->createElement("root");
 	pDoc->appendChild(pRoot);
-	
+
 	NodeAppender appender(pRoot);
-	
+
 	AutoPtr<DocumentFragment> pFrag1 = pDoc->createDocumentFragment();
 	AutoPtr<DocumentFragment> pFrag2 = pDoc->createDocumentFragment();
 	AutoPtr<DocumentFragment> pFrag3 = pDoc->createDocumentFragment();
-	
+
 	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
 	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
 	AutoPtr<Element> pElem3 = pDoc->createElement("elem");
@@ -89,33 +89,33 @@ void NodeAppenderTest::testAppendNodeList()
 	pFrag2->appendChild(pElem1);
 	pFrag2->appendChild(pElem2);
 	pFrag2->appendChild(pElem3);
-	
-	pFrag3->appendChild(pElem4);
-	
-	appender.appendChild(pFrag1);
-	assert (pRoot->firstChild() == 0);
-	
-	appender.appendChild(pFrag2);
-	assert (pRoot->firstChild() == pElem1);
-	assert (pRoot->lastChild() == pElem3);
 
-	assert (pElem1->nextSibling() == pElem2);
-	assert (pElem2->nextSibling() == pElem3);
-	assert (pElem3->nextSibling() == 0);
-	
-	assert (pElem1->previousSibling() == 0);
-	assert (pElem2->previousSibling() == pElem1);	
-	assert (pElem3->previousSibling() == pElem2);	
-	
-	assert (pElem1->parentNode() == pRoot);
-	assert (pElem2->parentNode() == pRoot);
-	assert (pElem3->parentNode() == pRoot);
-	
+	pFrag3->appendChild(pElem4);
+
+	appender.appendChild(pFrag1);
+	assert (pRoot->firstChild().isNull());
+
+	appender.appendChild(pFrag2);
+	assert (pRoot->firstChild().cast<Element>() == pElem1);
+	assert (pRoot->lastChild().cast<Element>() == pElem3);
+
+	assert (pElem1->nextSibling().cast<Element>() == pElem2);
+	assert (pElem2->nextSibling().cast<Element>() == pElem3);
+	assert (pElem3->nextSibling().isNull());
+
+	assert (pElem1->previousSibling().isNull());
+	assert (pElem2->previousSibling().cast<Element>() == pElem1);
+	assert (pElem3->previousSibling().cast<Element>() == pElem2);
+
+	assert (pElem1->parentNode().cast<Element>() == pRoot);
+	assert (pElem2->parentNode().cast<Element>() == pRoot);
+	assert (pElem3->parentNode().cast<Element>() == pRoot);
+
 	appender.appendChild(pFrag3);
-	assert (pRoot->lastChild() == pElem4);
-	assert (pElem4->parentNode() == pRoot);
-	assert (pElem3->nextSibling() == pElem4);
-	assert (pElem4->previousSibling() == pElem3);
+	assert (pRoot->lastChild().cast<Element>() == pElem4);
+	assert (pElem4->parentNode().cast<Element>() == pRoot);
+	assert (pElem3->nextSibling().cast<Element>() == pElem4);
+	assert (pElem4->previousSibling().cast<Element>() == pElem3);
 }
 
 

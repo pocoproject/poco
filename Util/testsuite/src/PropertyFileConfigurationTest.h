@@ -25,10 +25,10 @@ public:
 	virtual ~PropertyFileConfigurationTest();
 
 	void testLoad();
-   void testLoadEmpty();
-   void testLoadWithPreserveComment();
+	void testLoadEmpty();
+	void testLoadWithPreserveComment();
 	void testSave();
-   void testLoadSaveWithPreserveComment();
+	void testLoadSaveWithPreserveComment();
 
 	void setUp();
 	void tearDown();
@@ -36,7 +36,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
 
    void testLoad(bool preserveComment);
 };

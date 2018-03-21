@@ -33,13 +33,13 @@ int main(int argc, char** argv)
 
 	SAXParser parser;
 	WhitespaceFilter filter(&parser);
-	
-	XMLWriter writer(std::cout, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
-	writer.setNewLine(XMLWriter::NEWLINE_LF);
 
-	filter.setContentHandler(&writer);
-	filter.setDTDHandler(&writer);
-	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
+	XMLWriter::Ptr writer = new XMLWriter(std::cout, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
+	writer->setNewLine(XMLWriter::NEWLINE_LF);
+
+	filter.setContentHandler(writer);
+	filter.setDTDHandler(writer);
+	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.cast<Poco::XML::LexicalHandler>();
 
 	try
 	{

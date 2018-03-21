@@ -53,7 +53,7 @@ SHAREDLIBLINKEXT = .dylib
 # Compiler and Linker Flags
 #
 CFLAGS          = $(ARCHFLAGS) $(OSFLAGS)
-CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++11 -stdlib=libstdc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS)  --analyze -std=c++11 -stdlib=libstdc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
 LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++
 SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++
 DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libstdc++

@@ -20,6 +20,7 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/SAX/SAXParser.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -38,7 +39,7 @@ class XML_API DOMParser
 	/// support of a WhitespaceFilter.
 {
 public:
-	explicit DOMParser(NamePool* pNamePool = 0);
+	explicit DOMParser(AutoPtr<NamePool> pNamePool = 0);
 		/// Creates a new DOMParser.
 		/// If a NamePool is given, it becomes the Document's NamePool.
 		
@@ -81,30 +82,30 @@ public:
 		/// If a feature is not recognized by the DOMParser, the
 		/// DOMParser queries the underlying SAXParser for the feature.
 
-	Document* parse(const XMLString& uri);
+	AutoPtr<Document> parse(const XMLString& uri);
 		/// Parse an XML document from a location identified by an URI.
 
-	Document* parse(InputSource* pInputSource);
+	AutoPtr<Document> parse(AutoPtr<InputSource> pInputSource);
 		/// Parse an XML document from a location identified by an InputSource.
 
-	Document* parseString(const std::string& xml);
+	AutoPtr<Document> parseString(const std::string& xml);
 		/// Parse an XML document from a string.
 
-	Document* parseMemory(const char* xml, std::size_t size);
+	AutoPtr<Document> parseMemory(const char* xml, std::size_t size);
 		/// Parse an XML document from memory.
 
-	EntityResolver* getEntityResolver() const;
+	AutoPtr<EntityResolver> getEntityResolver() const;
 		/// Returns the entity resolver used by the underlying SAXParser.
 
-	void setEntityResolver(EntityResolver* pEntityResolver);
+	void setEntityResolver(AutoPtr<EntityResolver> pEntityResolver);
 		/// Sets the entity resolver on the underlying SAXParser.
 
 	static const XMLString FEATURE_FILTER_WHITESPACE;
 	
 private:
-	SAXParser _saxParser;
-	NamePool* _pNamePool;
-	bool      _filterWhitespace;
+	SAXParser::Ptr    _pSAXParser;
+	AutoPtr<NamePool> _pNamePool;
+	bool              _filterWhitespace;
 };
 
 

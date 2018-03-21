@@ -40,35 +40,36 @@ class XML_API EntityResolverImpl: public EntityResolver
 	/// is opened for it.
 {
 public:
+	typedef AutoPtr<EntityResolverImpl> Ptr;
+
 	EntityResolverImpl();
 		/// Creates an EntityResolverImpl that uses the default
 		/// URIStreamOpener.
-		
+
 	EntityResolverImpl(const Poco::URIStreamOpener& opener);
 		/// Creates an EntityResolverImpl that uses the given
 		/// URIStreamOpener.
-		
-	~EntityResolverImpl();
-		/// Destroys the EntityResolverImpl.
-	
-	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);
+
+	AutoPtr<InputSource> resolveEntity(const XMLString* publicId, const XMLString& systemId);
 		/// Tries to use the URIStreamOpener to create and open an istream
 		/// for the given systemId, which is interpreted as an URI.
 		///
 		/// If the systemId is not a valid URI, it is interpreted as
 		/// a local filesystem path and a Poco::FileInputStream is opened for it.
-		
-	void releaseInputSource(InputSource* pSource);
-		/// Deletes the InputSource's stream.
-	
+
 protected:
-	std::istream* resolveSystemId(const XMLString& systemId);	
-	
+
+	~EntityResolverImpl();
+		/// Destroys the EntityResolverImpl.
+
+	std::istream* resolveSystemId(const XMLString& systemId);
+
 private:
 	EntityResolverImpl(const EntityResolverImpl&);
 	EntityResolverImpl& operator = (const EntityResolverImpl&);
-	
+
 	const Poco::URIStreamOpener& _opener;
+	AutoPtr<InputSource>         _pInputSource;
 };
 
 

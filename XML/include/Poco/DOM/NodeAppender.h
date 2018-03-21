@@ -46,14 +46,14 @@ class XML_API NodeAppender
 	/// This class is not part of the DOM specification.
 {
 public:
-	NodeAppender(Element* parent);
+	NodeAppender(AutoPtr<Element> parent);
 		/// Creates the NodeAppender for the given parent node,
 		/// which must be an Element.
 
 	~NodeAppender();
 		/// Destroys the NodeAppender.
 
-	void appendChild(Node* newChild);
+	void appendChild(Node::Ptr newChild);
 		/// Appends the node newChild to the end of the list of children of
 		/// the parent node specified in the constructor.
 		/// If the newChild is already in the tree, it is first removed.
@@ -68,9 +68,9 @@ private:
 	NodeAppender();
 	NodeAppender(const NodeAppender&);
 	NodeAppender& operator = (const NodeAppender&);
-	
-	Element*      _pParent;
-	AbstractNode* _pLast;
+
+	AutoPtr<Element>      _pParent;
+	AutoPtr<AbstractNode> _pLast;
 };
 
 

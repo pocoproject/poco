@@ -76,12 +76,12 @@ protected:
 	~PropertyListConfiguration();
 
 private:
-	Poco::XML::Node* findNode(const std::string& key, bool create = false);
-	const Poco::XML::Node* findNode(const std::string& key, bool create = false) const;
-	static Poco::XML::Node* findNode(const std::string& key, Poco::XML::Node* dict, bool create = false);
+	Poco::XML::Node::Ptr findNode(const std::string& key, bool create = false);
+	const Poco::XML::Node::Ptr findNode(const std::string& key, bool create = false) const;
+	static Poco::XML::Node::Ptr findNode(const std::string& key, Poco::XML::Node::Ptr dict, bool create = false);
 
 	Poco::XML::AutoPtr<Poco::XML::Element> _pRoot;
-	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;		
+	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;
 };
 
 

@@ -22,24 +22,21 @@ namespace Poco {
 namespace XML {
 
 
-ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLString& name):
+ElementsByTagNameList::ElementsByTagNameList(const Node::Ptr pParent, const XMLString& name):
 	_pParent(pParent),
 	_name(name),
 	_count(0)
 {
 	poco_check_ptr (pParent);
-	
-	_pParent->duplicate();
 }
 
 
 ElementsByTagNameList::~ElementsByTagNameList()
 {
-	_pParent->release();
 }
 
 
-Node* ElementsByTagNameList::item(unsigned long index) const
+Node::Ptr ElementsByTagNameList::item(unsigned long index) const
 {
 	_count = 0;
 	return find(_pParent, index);
@@ -60,12 +57,12 @@ namespace
 }
 
 
-Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
+Node::Ptr ElementsByTagNameList::find(const Node::Ptr pParent, unsigned long index) const
 {
 	if (!pParent) return 0;
 
 	// preorder search
-	Node* pCur = pParent->firstChild();
+	Node::Ptr pCur = pParent->firstChild();
 	while (pCur)
 	{
 		if (pCur->nodeType() == Node::ELEMENT_NODE && (_name == asterisk || pCur->nodeName() == _name))
@@ -73,7 +70,7 @@ Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) cons
 			if (_count == index) return pCur;
 			_count++;
 		}
-		Node* pNode = find(pCur, index);
+		Node::Ptr pNode = find(pCur, index);
 		if (pNode) return pNode;
 		pCur = pCur->nextSibling();
 	}
@@ -81,32 +78,23 @@ Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) cons
 }
 
 
-void ElementsByTagNameList::autoRelease()
-{
-	_pParent->ownerDocument()->autoReleasePool().add(this);
-}
-
-
-ElementsByTagNameListNS::ElementsByTagNameListNS(const Node* pParent, const XMLString& namespaceURI, const XMLString& localName):
+ElementsByTagNameListNS::ElementsByTagNameListNS(const Node::Ptr pParent, const XMLString& namespaceURI, const XMLString& localName):
 	_pParent(pParent),
 	_localName(localName),
 	_namespaceURI(namespaceURI),
 	_count(0)
 {
 	poco_check_ptr (pParent);
-	
-	_pParent->duplicate();
 }
 
 
 
 ElementsByTagNameListNS::~ElementsByTagNameListNS()
 {
-	_pParent->release();
 }
 
 
-Node* ElementsByTagNameListNS::item(unsigned long index) const
+Node::Ptr ElementsByTagNameListNS::item(unsigned long index) const
 {
 	_count = 0;
 	return find(_pParent, index);
@@ -121,12 +109,12 @@ unsigned long ElementsByTagNameListNS::length() const
 }
 
 
-Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) const
+Node::Ptr ElementsByTagNameListNS::find(const Node::Ptr pParent, unsigned long index) const
 {
 	if (!pParent) return 0;
 
 	// preorder search
-	Node* pCur = pParent->firstChild();
+	Node::Ptr pCur = pParent->firstChild();
 	while (pCur)
 	{
 		if (pCur->nodeType() == Node::ELEMENT_NODE && (_localName == asterisk || pCur->localName() == _localName) && (_namespaceURI == asterisk || pCur->namespaceURI() == _namespaceURI))
@@ -134,17 +122,11 @@ Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) co
 			if (_count == index) return pCur;
 			_count++;
 		}
-		Node* pNode = find(pCur, index);
+		Node::Ptr pNode = find(pCur, index);
 		if (pNode) return pNode;
 		pCur = pCur->nextSibling();
 	}
 	return pCur;
-}
-
-
-void ElementsByTagNameListNS::autoRelease()
-{
-	_pParent->ownerDocument()->autoReleasePool().add(this);
 }
 
 

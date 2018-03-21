@@ -20,13 +20,14 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/SAX/SAXHandler.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class XML_API DeclHandler
+class XML_API DeclHandler: public SAXHandler
 	/// This is an optional extension handler for SAX2 to provide information
 	/// about DTD declarations in an XML document. XML
 	/// readers are not required to support this handler, and this handler is
@@ -43,6 +44,8 @@ class XML_API DeclHandler
 	/// register the handler.
 {
 public:
+	typedef AutoPtr<DeclHandler> Ptr;
+
 	virtual void attributeDecl(const XMLString& eName, const XMLString& aName, const XMLString* valueDefault, const XMLString* value) = 0;
 		/// Report an attribute type declaration.
 		///

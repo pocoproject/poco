@@ -13,6 +13,7 @@
 
 
 #include "Poco/DOM/Comment.h"
+#include "Poco/DOM/Document.h"
 
 
 namespace Poco {
@@ -22,13 +23,13 @@ namespace XML {
 const XMLString Comment::NODE_NAME = toXMLString("#comment");
 
 
-Comment::Comment(Document* pOwnerDocument, const XMLString& data):
+Comment::Comment(Document::Ptr pOwnerDocument, const XMLString& data):
 	CharacterData(pOwnerDocument, data)
 {
 }
 
 
-Comment::Comment(Document* pOwnerDocument, const Comment& comment):
+Comment::Comment(Document::Ptr pOwnerDocument, const Comment& comment):
 	CharacterData(pOwnerDocument, comment)
 {
 }
@@ -51,7 +52,7 @@ unsigned short Comment::nodeType() const
 }
 
 
-Node* Comment::copyNode(bool deep, Document* pOwnerDocument) const
+Node::Ptr Comment::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
 	return new Comment(pOwnerDocument, *this);
 }

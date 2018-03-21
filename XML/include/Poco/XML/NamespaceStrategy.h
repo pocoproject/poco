@@ -22,6 +22,7 @@
 #include "Poco/XML/XMLString.h"
 #include "Poco/SAX/NamespaceSupport.h"
 #include "Poco/SAX/AttributesImpl.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -39,11 +40,11 @@ class XML_API NamespaceStrategy
 public:
 	virtual ~NamespaceStrategy();
 
-	virtual void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler) = 0;
+	virtual void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, AutoPtr<ContentHandler> pContentHandler) = 0;
 		/// Translate the arguments as delivered by Expat and
 		/// call the startElement() method of the ContentHandler.
 		
-	virtual void endElement(const XMLChar* name, ContentHandler* pContentHandler) = 0;
+	virtual void endElement(const XMLChar* name, AutoPtr<ContentHandler> pContentHandler) = 0;
 		/// Translate the arguments as delivered by Expat and
 		/// call the endElement() method of the ContentHandler.
 
@@ -63,8 +64,8 @@ public:
 	NoNamespacesStrategy();
 	~NoNamespacesStrategy();
 	
-	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
-	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, AutoPtr<ContentHandler> pContentHandler);
+	void endElement(const XMLChar* name, AutoPtr<ContentHandler> pContentHandler);
 	
 private:
 	XMLString _name;
@@ -80,8 +81,8 @@ public:
 	NoNamespacePrefixesStrategy();
 	~NoNamespacePrefixesStrategy();
 	
-	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
-	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, AutoPtr<ContentHandler> pContentHandler);
+	void endElement(const XMLChar* name, AutoPtr<ContentHandler> pContentHandler);
 
 private:
 	XMLString _uri;
@@ -98,8 +99,8 @@ public:
 	NamespacePrefixesStrategy();
 	~NamespacePrefixesStrategy();
 	
-	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler);
-	void endElement(const XMLChar* name, ContentHandler* pContentHandler);
+	void startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, AutoPtr<ContentHandler> pContentHandler);
+	void endElement(const XMLChar* name, AutoPtr<ContentHandler> pContentHandler);
 	
 private:
 	XMLString _uri;

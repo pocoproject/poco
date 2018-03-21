@@ -20,6 +20,7 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -37,7 +38,7 @@ class XML_API DocumentEvent
 	/// Event model.
 {
 public:
-	virtual Event* createEvent(const XMLString& eventType) const = 0;
+	virtual AutoPtr<Event> createEvent(const XMLString& eventType) const = 0;
 		/// Creates an event of the specified type.
 		///
 		/// The eventType parameter specifies the type of Event interface to be created.

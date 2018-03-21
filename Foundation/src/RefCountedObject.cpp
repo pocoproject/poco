@@ -20,11 +20,14 @@ namespace Poco {
 
 RefCountedObject::RefCountedObject(): _counter(1)
 {
+	poco_rc_ndc_dbg;
 }
 
 
 RefCountedObject::~RefCountedObject()
 {
+
+	poco_rc_ndc_dbg;
 }
 
 
