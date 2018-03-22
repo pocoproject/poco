@@ -52,7 +52,7 @@ void ValidatorTest::testRegExpValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option does not match regular expression [0-9]+");
+		assertTrue (s == "argument for option does not match regular expression [0-9]+");
 	}
 
 	try
@@ -63,7 +63,7 @@ void ValidatorTest::testRegExpValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option does not match regular expression [0-9]+");
+		assertTrue (s == "argument for option does not match regular expression [0-9]+");
 	}
 
 	try
@@ -74,7 +74,7 @@ void ValidatorTest::testRegExpValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option does not match regular expression [0-9]+");
+		assertTrue (s == "argument for option does not match regular expression [0-9]+");
 	}
 
 	try
@@ -85,7 +85,7 @@ void ValidatorTest::testRegExpValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option does not match regular expression [0-9]+");
+		assertTrue (s == "argument for option does not match regular expression [0-9]+");
 	}
 }
 
@@ -107,7 +107,7 @@ void ValidatorTest::testIntValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option must be in range 0 to 100");
+		assertTrue (s == "argument for option must be in range 0 to 100");
 	}
 
 	try
@@ -118,7 +118,7 @@ void ValidatorTest::testIntValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option must be in range 0 to 100");
+		assertTrue (s == "argument for option must be in range 0 to 100");
 	}
 
 	try
@@ -129,7 +129,7 @@ void ValidatorTest::testIntValidator()
 	catch (InvalidArgumentException& exc)
 	{
 		std::string s(exc.message());
-		assert (s == "argument for option must be an integer");
+		assertTrue (s == "argument for option must be an integer");
 	}
 }
 

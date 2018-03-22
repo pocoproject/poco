@@ -40,7 +40,7 @@ void TextBufferIteratorTest::testEmptyLatin1()
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it == end);
+	assertTrue (it == end);
 }
 
 
@@ -51,10 +51,10 @@ void TextBufferIteratorTest::testOneLatin1()
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it != end);
-	assert (*it == 'x');
+	assertTrue (it != end);
+	assertTrue (*it == 'x');
 	++it;
-	assert (it == end);
+	assertTrue (it == end);
 }
 
 
@@ -65,24 +65,24 @@ void TextBufferIteratorTest::testLatin1()
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it != end);
-	assert (*it++ == 'L');
-	assert (it != end);
-	assert (*it++ == 'a');
-	assert (it != end);
-	assert (*it++ == 't');
-	assert (it != end);
-	assert (*it++ == 'i');
-	assert (it != end);
-	assert (*it++ == 'n');
-	assert (it != end);
-	assert (*it++ == '1');
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 'L');
+	assertTrue (it != end);
+	assertTrue (*it++ == 'a');
+	assertTrue (it != end);
+	assertTrue (*it++ == 't');
+	assertTrue (it != end);
+	assertTrue (*it++ == 'i');
+	assertTrue (it != end);
+	assertTrue (*it++ == 'n');
+	assertTrue (it != end);
+	assertTrue (*it++ == '1');
+	assertTrue (it == end);
 	
 	const char* empty = "";
 	it  = TextBufferIterator(empty, encoding);
 	end = it.end();
-	assert (it == end);
+	assertTrue (it == end);
 }
 
 
@@ -93,7 +93,7 @@ void TextBufferIteratorTest::testEmptyUTF8()
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(text);
 	
-	assert (it == end);
+	assertTrue (it == end);
 }
 
 
@@ -106,50 +106,50 @@ void TextBufferIteratorTest::testOneUTF8()
 	TextBufferIterator it(text, encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it != end);
-	assert (*it == 'x');
+	assertTrue (it != end);
+	assertTrue (*it == 'x');
 	++it;
-	assert (it == end);
+	assertTrue (it == end);
 	
 	unsigned char data[Poco::TextEncoding::MAX_SEQUENCE_LENGTH];
 	
 	// 2 byte sequence
 	int n = encoding.convert(0xab, data, sizeof(data));
-	assert (n == 2);
+	assertTrue (n == 2);
 	it  = TextBufferIterator(reinterpret_cast<const char*>(data), n, encoding);
 	end = it.end();
 	
-	assert (it != end);
-	assert (*it++ == 0xab);
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0xab);
+	assertTrue (it == end);
 
 	// 3 byte sequence
 	n = encoding.convert(0xabcd, data, sizeof(data));
-	assert (n == 3);
+	assertTrue (n == 3);
 	it  = TextBufferIterator(reinterpret_cast<const char*>(data), n, encoding);
 	end = it.end();
 	
-	assert (it != end);
-	assert (*it++ == 0xabcd);
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0xabcd);
+	assertTrue (it == end);
 
 	// 4 byte sequence
 	n = encoding.convert(0xabcde, data, sizeof(data));
-	assert (n == 4);
+	assertTrue (n == 4);
 	it  = TextBufferIterator(reinterpret_cast<const char*>(data), n, encoding);
 	end = it.end();
 	
-	assert (it != end);
-	assert (*it++ == 0xabcde);
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0xabcde);
+	assertTrue (it == end);
 	
 	// 5 byte sequence - not supported
 	n = encoding.convert(0xabcdef, data, sizeof(data));
-	assert (n == 0);
+	assertTrue (n == 0);
 
 	// 6 byte sequence - not supported
 	n = encoding.convert(0xfabcdef, data, sizeof(data));
-	assert (n == 0);
+	assertTrue (n == 0);
 }
 
 
@@ -160,21 +160,21 @@ void TextBufferIteratorTest::testUTF8()
 	TextBufferIterator it(reinterpret_cast<const char*>(text), encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it != end);
-	assert (*it++ == 0x0020);
-	assert (it != end);
-	assert (*it++ == 0x03ba);
-	assert (it != end);
-	assert (*it++ == 0x1f79);
-	assert (it != end);
-	assert (*it++ == 0x03c3);
-	assert (it != end);
-	assert (*it++ == 0x03bc);
-	assert (it != end);
-	assert (*it++ == 0x03b5);
-	assert (it != end);
-	assert (*it++ == 0x0020);
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x0020);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x03ba);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x1f79);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x03c3);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x03bc);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x03b5);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x0020);
+	assertTrue (it == end);
 }
 
 
@@ -185,17 +185,17 @@ void TextBufferIteratorTest::testUTF8Supplementary()
 	TextBufferIterator it(reinterpret_cast<const char*>(text), encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it != end);
-	assert (*it++ == 0x0041);
-	assert (it != end);
-	assert (*it++ == 0x0042);
-	assert (it != end);
-	assert (*it++ == 0x100a4);
-	assert (it != end);
-	assert (*it++ == 0x2f9a0);
-	assert (it != end);
-	assert (*it++ == 0x2fa1d);
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x0041);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x0042);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x100a4);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x2f9a0);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x2fa1d);
+	assertTrue (it == end);
 }
 
 
@@ -206,17 +206,17 @@ void TextBufferIteratorTest::testUTF16Supplementary()
 	TextBufferIterator it(reinterpret_cast<const char*>(text), sizeof(text), encoding);
 	TextBufferIterator end(it.end());
 	
-	assert (it != end);
-	assert (*it++ == 0x0041);
-	assert (it != end);
-	assert (*it++ == 0x0042);
-	assert (it != end);
-	assert (*it++ == 0x100a4);
-	assert (it != end);
-	assert (*it++ == 0x2f9a0);
-	assert (it != end);
-	assert (*it++ == 0x2fa1d);
-	assert (it == end);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x0041);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x0042);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x100a4);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x2f9a0);
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x2fa1d);
+	assertTrue (it == end);
 }
 
 
@@ -228,11 +228,11 @@ void TextBufferIteratorTest::testSwap()
 	TextBufferIterator it2(text, encoding);
 	TextBufferIterator end(it1.end());
 	
-	assert (it1 == it2);
+	assertTrue (it1 == it2);
 	it2.swap(end);
-	assert (it1 != it2);
+	assertTrue (it1 != it2);
 	it2.swap(end);
-	assert (it1 == it2);
+	assertTrue (it1 == it2);
 }
 
 

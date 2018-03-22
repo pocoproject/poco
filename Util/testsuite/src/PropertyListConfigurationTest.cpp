@@ -60,26 +60,26 @@ void PropertyListConfigurationTest::testLoad()
 	std::istringstream istr(pfileFile);
 	AutoPtr<PropertyListConfiguration> pConf = new PropertyListConfiguration(istr);
 
-	assert (pConf->getString("prop1") == "value1");
-	assert (pConf->getString("prop2") == "8080");
-	assert (pConf->getString("tree1.date1") == "2017-06-21T09:42:33Z");
-	assert (pConf->getString("tree1.prop3") == "false");
+	assertTrue (pConf->getString("prop1") == "value1");
+	assertTrue (pConf->getString("prop2") == "8080");
+	assertTrue (pConf->getString("tree1.date1") == "2017-06-21T09:42:33Z");
+	assertTrue (pConf->getString("tree1.prop3") == "false");
 	std::stringstream buf;
 	pConf->getData("tree1.prop4", buf);
-	assert (buf.str() == "\xda");
+	assertTrue (buf.str() == "\xda");
 
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "tree1") != keys.end());
+	assertTrue (keys.size() == 3);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "tree1") != keys.end());
 
 	pConf->keys("tree1", keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "date1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
-	assert(std::find(keys.begin(), keys.end(), "prop4") != keys.end());
+	assertTrue (keys.size() == 3);
+	assertTrue (std::find(keys.begin(), keys.end(), "date1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
 
 	try
 	{
@@ -109,7 +109,7 @@ void PropertyListConfigurationTest::testSave()
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
 
-	assert(propFile == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	assertTrue (propFile == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
 		"<plist version=\"1.0\">\n"
 		"\t<dict>\n"

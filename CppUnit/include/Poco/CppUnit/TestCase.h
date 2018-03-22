@@ -220,8 +220,7 @@ inline std::string TestCase::toString()
 // and file name at the point of an error.
 // Just goes to show that preprocessors do have some
 // redeeming qualities.
-#undef assert
-#define assert(condition) \
+#define assertTrue(condition) \
 	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
 
 #define loop_1_assert(data1line, condition) \

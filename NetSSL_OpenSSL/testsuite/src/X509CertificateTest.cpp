@@ -79,13 +79,13 @@ void X509CertificateTest::testVerify()
 	std::istringstream certStream(BADSSL_PEM);
 	X509Certificate cert(certStream);
 
-	assert (cert.verify("badssl.com"));
-	assert (cert.verify("host.badssl.com"));
+	assertTrue (cert.verify("badssl.com"));
+	assertTrue (cert.verify("host.badssl.com"));
 
 #if OPENSSL_VERSION_NUMBER < 0x10002000L
-	assert (cert.verify("wrong.host.badssl.com"));
+	assertTrue (cert.verify("wrong.host.badssl.com"));
 #else
-	assert (!cert.verify("wrong.host.badssl.com"));
+	assertTrue (!cert.verify("wrong.host.badssl.com"));
 #endif
 }
 

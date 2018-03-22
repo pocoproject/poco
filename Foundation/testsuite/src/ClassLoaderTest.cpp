@@ -42,11 +42,11 @@ void ClassLoaderTest::testClassLoader1()
 
 	ClassLoader<TestPlugin> cl;
 
-	assert (cl.begin() == cl.end());
+	assertTrue (cl.begin() == cl.end());
 	assertNullPtr (cl.findClass("PluginA"));
 	assertNullPtr (cl.findManifest(path));
 	
-	assert (!cl.isLibraryLoaded(path));
+	assertTrue (!cl.isLibraryLoaded(path));
 	
 	try
 	{
@@ -84,41 +84,41 @@ void ClassLoaderTest::testClassLoader2()
 	ClassLoader<TestPlugin> cl;
 	cl.loadLibrary(path);
 
-	assert (cl.begin() != cl.end());
+	assertTrue (cl.begin() != cl.end());
 	assertNotNullPtr (cl.findClass("PluginA"));
 	assertNotNullPtr (cl.findClass("PluginB"));
 	assertNotNullPtr (cl.findClass("PluginC"));
 	assertNotNullPtr (cl.findManifest(path));
 	
-	assert (cl.isLibraryLoaded(path));
-	assert (cl.manifestFor(path).size() == 3);
+	assertTrue (cl.isLibraryLoaded(path));
+	assertTrue (cl.manifestFor(path).size() == 3);
 	
 	ClassLoader<TestPlugin>::Iterator it = cl.begin();
-	assert (it != cl.end());
-	assert (it->first == path);
-	assert (it->second->size() == 3);
+	assertTrue (it != cl.end());
+	assertTrue (it->first == path);
+	assertTrue (it->second->size() == 3);
 	++it;
-	assert (it == cl.end());
+	assertTrue (it == cl.end());
 	
 	TestPlugin* pPluginA = cl.classFor("PluginA").create();
-	assert (pPluginA->name() == "PluginA");
-	assert (!cl.classFor("PluginA").isAutoDelete(pPluginA));
+	assertTrue (pPluginA->name() == "PluginA");
+	assertTrue (!cl.classFor("PluginA").isAutoDelete(pPluginA));
 	delete pPluginA;
 
 	TestPlugin* pPluginB = cl.classFor("PluginB").create();
-	assert (pPluginB->name() == "PluginB");
+	assertTrue (pPluginB->name() == "PluginB");
 	delete pPluginB;
 	
 	pPluginB = cl.create("PluginB");
-	assert (pPluginB->name() == "PluginB");
+	assertTrue (pPluginB->name() == "PluginB");
 	delete pPluginB;
 	
-	assert (cl.canCreate("PluginA"));
-	assert (cl.canCreate("PluginB"));
-	assert (!cl.canCreate("PluginC"));
+	assertTrue (cl.canCreate("PluginA"));
+	assertTrue (cl.canCreate("PluginB"));
+	assertTrue (!cl.canCreate("PluginC"));
 
 	TestPlugin& pluginC = cl.instance("PluginC");
-	assert (pluginC.name() == "PluginC");
+	assertTrue (pluginC.name() == "PluginC");
 	
 	try
 	{
@@ -149,7 +149,7 @@ void ClassLoaderTest::testClassLoader2()
 	}
 	
 	const AbstractMetaObject<TestPlugin>& meta1 = cl.classFor("PluginC");
-	assert (meta1.isAutoDelete(&(meta1.instance())));
+	assertTrue (meta1.isAutoDelete(&(meta1.instance())));
 
 	// the following must not produce memory leaks
 	const AbstractMetaObject<TestPlugin>& meta2 = cl.classFor("PluginA");
@@ -158,9 +158,9 @@ void ClassLoaderTest::testClassLoader2()
 
 	TestPlugin* pPlugin = meta2.create();
 	meta2.autoDelete(pPlugin);
-	assert (meta2.isAutoDelete(pPlugin));
+	assertTrue (meta2.isAutoDelete(pPlugin));
 	meta2.destroy(pPlugin);
-	assert (!meta2.isAutoDelete(pPlugin));
+	assertTrue (!meta2.isAutoDelete(pPlugin));
 
 	cl.unloadLibrary(path);
 }
@@ -176,14 +176,14 @@ void ClassLoaderTest::testClassLoader3()
 	cl.loadLibrary(path);
 	cl.unloadLibrary(path);
 	
-	assert (cl.manifestFor(path).size() == 3);
+	assertTrue (cl.manifestFor(path).size() == 3);
 	
 	ClassLoader<TestPlugin>::Iterator it = cl.begin();
-	assert (it != cl.end());
-	assert (it->first == path);
-	assert (it->second->size() == 3);
+	assertTrue (it != cl.end());
+	assertTrue (it->first == path);
+	assertTrue (it->second->size() == 3);
 	++it;
-	assert (it == cl.end());
+	assertTrue (it == cl.end());
 	
 	cl.unloadLibrary(path);
 	assertNullPtr (cl.findManifest(path));
