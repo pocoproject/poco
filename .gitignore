@@ -20,6 +20,8 @@
 ##########
 .gradle/
 **/gradle/
+**/options.txt
+**/output.txt
 
 # NuGet #
 #########
