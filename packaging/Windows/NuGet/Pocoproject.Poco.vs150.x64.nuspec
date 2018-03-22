@@ -4,7 +4,7 @@
 ]>
 <package xmlns='http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd'>
     <metadata>
-        <id>Pocoproject.Poco.vs150</id>
+        <id>Pocoproject.Poco.vs150.x64</id>
         <version>$version$</version>
         <title>Poco $version$</title>
         <authors> Applied Informatics &amp; Contributors</authors>
@@ -22,25 +22,15 @@
         <copyright>Copyright 2017</copyright>
         <tags>string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml</tags>
         <dependencies>
-            <dependency id='openssl' version='1.0.2' />
+            <dependency id='Pocoproject.OpenSSL.vs120.x64' version='1.1.0' />
         </dependencies>
     </metadata>
     <files>
-		<file src='packaging\Windows\NuGet\Pocoproject.Poco.vs150.targets'			target='build\native'/>
-        <file src='bin\*' 								target='build\native\bin'  		exclude='bin\PocoCppParser*'/>
-        <file src='lib\*' 								target='build\native\lib'  		exclude='lib\PocoCppParser*'/>
-        <file src='bin64\*' 							target='build\native\bin64'		exclude='bin64\PocoCppParser*'/>
-        <file src='lib64\*' 							target='build\native\lib64'		exclude='lib64\PocoCppParser*'/>
-		<file src='openssl\build\win32\bin\debug\*' 	target='build\native\bin'  		exclude='bin\PocoCppParser*'/>
-		<file src='openssl\build\win32\bin\release\*' 	target='build\native\bin'  		exclude='bin\PocoCppParser*'/>
-        <file src='openssl\build\win32\lib\debug\*' 	target='build\native\lib'  		exclude='lib\PocoCppParser*'/>
-        <file src='openssl\build\win32\lib\release\*' 	target='build\native\lib'  		exclude='lib\PocoCppParser*'/>
-		<file src='openssl\build\win64\bin\debug\*' 	target='build\native\bin64'  	exclude='bin\PocoCppParser*'/>
-		<file src='openssl\build\win64\bin\release\*' 	target='build\native\bin64'  	exclude='bin\PocoCppParser*'/>
-        <file src='openssl\build\win64\lib\debug\*' 	target='build\native\lib64'  	exclude='lib\PocoCppParser*'/>
-        <file src='openssl\build\win64\lib\release\*' 	target='build\native\lib64'  	exclude='lib\PocoCppParser*'/>
-		<file src='CppUnit\include\**' 					target='build\native\inc' />
+		<file src='packaging\Windows\NuGet\Pocoproject.Poco.vs150.x64.targets'				target='build\native'/>
+        <file src='bin64\Poco*' 						target='build\native\bin64' exclude='bin64\*CppParser*.*'/>
+        <file src='lib64\Poco*' 						target='build\native\lib64'	exclude='lib64\*CppParser*.*'/>
 		<file src='Crypto\include\**' 					target='build\native\inc' />
+		<file src='Data\include\**' 					target='build\native\inc' />
 		<file src='Data\MySQL\include\**' 				target='build\native\inc' />
 		<file src='Data\include\**' 					target='build\native\inc' />
 		<file src='Data\ODBC\include\**' 				target='build\native\inc' />
@@ -52,7 +42,6 @@
 		<file src='Net\include\**' 						target='build\native\inc' />
 		<file src='NetSSL_OpenSSL\include\**' 			target='build\native\inc' />
 		<file src='NetSSL_Win\include\**' 				target='build\native\inc' />
-		<file src='openssl\build\include\**' 			target='build\native\inc' />
 		<file src='PDF\include\**' 						target='build\native\inc' />
 		<file src='Util\include\**' 					target='build\native\inc' />
 		<file src='XML\include\**' 						target='build\native\inc' />

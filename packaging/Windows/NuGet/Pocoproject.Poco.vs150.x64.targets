@@ -3,9 +3,6 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-	<Link  Condition="'$(Platform)'=='Win32'">
-		<AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-	</Link>
 	<Link  Condition="'$(Platform)'=='x64'">
 		<AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>
