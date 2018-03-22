@@ -1596,12 +1596,12 @@ void SQLExecutor::clobStmt()
 	assertTrue (count == 1);
 
 	Poco::SQL::CLOB res;
-	poco_assertTrue (res.size() == 0);
+	poco_assert (res.size() == 0);
 	Statement stmt = (*_pSession << "SELECT Story FROM Person", into(res));
 	try { stmt.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	poco_assertTrue (res == clob);
+	poco_assert (res == clob);
 }
 
 
@@ -1623,12 +1623,12 @@ unsigned char BLOBData[ 10 ] = { 0,1,2,3,4,5,6,7,14,15 };
 	assertTrue (count == 1);
 
 	Poco::SQL::BLOB res;
-	poco_assertTrue (res.size() == 0);
+	poco_assert (res.size() == 0);
 	Statement stmt = (*_pSession << "SELECT Image FROM Person", into(res));
 	try { stmt.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	poco_assertTrue (res == blob);
+	poco_assert (res == blob);
 }
 
 
@@ -1786,21 +1786,21 @@ void SQLExecutor::doNull()
 	try { stmt1.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	poco_assertTrue (i0 == -1);
+	poco_assert (i0 == -1);
 
 	float flt0 = 0;
 	Statement stmt2 = (*_pSession << "SELECT flt0 FROM Vectors", into(flt0, Poco::SQL::Position(0), 3.25f));
 	try { stmt2.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	poco_assertTrue (flt0 == 3.25);
+	poco_assert (flt0 == 3.25);
 
 	std::string str0("string");
 	Statement stmt3 = (*_pSession << "SELECT str0 FROM Vectors", into(str0, Poco::SQL::Position(0), std::string("DEFAULT")));
 	try { stmt3.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	poco_assertTrue (str0 == "DEFAULT");
+	poco_assert (str0 == "DEFAULT");
 }
 
 
