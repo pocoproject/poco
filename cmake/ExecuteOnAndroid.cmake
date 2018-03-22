@@ -6,13 +6,15 @@ foreach(_TEST_DATA IN ITEMS ${TEST_FILES})
     message(STATUS "Push ${_TEST_DATA} to android ...")
     execute_process(COMMAND ${ANDROID_NDK}/../platform-tools/adb push ${_TEST_DATA} /data/local/tmp/ OUTPUT_QUIET)
 endforeach()
+message(STATUS "Push ignored.sh to android ...")
+execute_process(COMMAND ${ANDROID_NDK}/../platform-tools/adb push ${CMAKE_CURRENT_LIST_DIR}/../travis/ignored.sh /data/local/tmp/ OUTPUT_QUIET)
 message(STATUS "Push ${LIBRARY_DIR} to android ...")
 execute_process(COMMAND ${ANDROID_NDK}/../platform-tools/adb push ${LIBRARY_DIR} /data/local/tmp/ OUTPUT_QUIET)                       
 message(STATUS "Push ${UNITTEST} to android ...")
 execute_process(COMMAND ${ANDROID_NDK}/../platform-tools/adb push ${UNITTEST} /data/local/tmp/ OUTPUT_QUIET)
 message(STATUS "Execute ${UNITTEST_FILENAME} ${TEST_PARAMETER} on android ...")
 execute_process(
-   COMMAND ${ANDROID_NDK}/../platform-tools/adb shell "cd /data/local/tmp;su root sh -c 'LD_LIBRARY_PATH=/data/local/tmp:/data/local/tmp/lib:/data/local/tmp/data TMPDIR=/data/local/tmp HOME=/data/local/tmp ./${UNITTEST_FILENAME} ${TEST_PARAMETER};echo exit code $?'"
+   COMMAND ${ANDROID_NDK}/../platform-tools/adb shell "cd /data/local/tmp;su root sh -c '. /data/local/tmp/ignored.sh;LD_LIBRARY_PATH=/data/local/tmp:/data/local/tmp/lib:/data/local/tmp/data TMPDIR=/data/local/tmp HOME=/data/local/tmp ./${UNITTEST_FILENAME} ${TEST_PARAMETER};echo exit code $?'"
    RESULT_VARIABLE _RESULT
    OUTPUT_VARIABLE _OUT
    ERROR_VARIABLE _ERR

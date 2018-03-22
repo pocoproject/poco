@@ -78,7 +78,7 @@ matrix:
         # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
         
         # Using the ninja build command. Is much faster then make build command.
-        - mkdir cmake-build && cd cmake-build && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON .. && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build . --target all && /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest --output-on-failure
+        - mkdir cmake-build && cd cmake-build && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON .. && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build . --target all && travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest --output-on-failure
 
     - env:    TEST_NAME="android API level 24"
       language: android
@@ -124,7 +124,7 @@ matrix:
         # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
         
         # Using the ninja build command. Is much faster then make build command.
-        - mkdir cmake-build && cd cmake-build && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON .. && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build . --target all && /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest --output-on-failure
+        - mkdir cmake-build && cd cmake-build && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON .. && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build . --target all && travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest --output-on-failure
 
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
