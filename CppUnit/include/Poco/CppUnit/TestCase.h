@@ -224,8 +224,8 @@ inline std::string TestCase::toString()
 // for backward compatibility only
 // (may conflict with C assert, use at your own risk)
 #undef assert
-#define assert(condition) \	
- 	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
+#define assert(condition) \
+	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
 
 #define assertTrue(condition) \
 	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
