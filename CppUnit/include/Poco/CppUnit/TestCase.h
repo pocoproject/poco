@@ -222,7 +222,8 @@ inline std::string TestCase::toString()
 // redeeming qualities.
 
 // for backward compatibility only
-// (may conflict with C assert, use at your own risk)	
+// (may conflict with C assert, use at your own risk)
+#undef assert
 #define assert(condition) \	
  	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
 
