@@ -220,6 +220,12 @@ inline std::string TestCase::toString()
 // and file name at the point of an error.
 // Just goes to show that preprocessors do have some
 // redeeming qualities.
+
+// for backward compatibility only
+// (may conflict with C assert, use at your own risk)	
+#define assert(condition) \	
+ 	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
+
 #define assertTrue(condition) \
 	(this->assertImplementation((condition), (#condition), __LINE__, __FILE__))
 
