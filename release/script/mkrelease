@@ -108,11 +108,9 @@ mkdir -p ${target}/build/config
 mkdir -p ${target}/build/rules
 mkdir -p ${target}/build/script
 mkdir -p ${target}/build/vms
-mkdir -p ${target}/build/vxconfig
 
 cp ${POCO_BASE}/build/config/* ${target}/build/config
 cp ${POCO_BASE}/build/rules/* ${target}/build/rules
-cp ${POCO_BASE}/build/vxconfig/* ${target}/build/vxconfig
 cp ${POCO_BASE}/build/script/cpp11-* ${target}/build/script
 cp ${POCO_BASE}/build/script/makedepend.* ${target}/build/script
 cp ${POCO_BASE}/build/script/makeldpath ${target}/build/script
