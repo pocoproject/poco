@@ -272,7 +272,11 @@ protected:
 	void parse(const std::string& file)
 	{
 		logger().information("Preprocessing " + file);
+#ifndef POCO_ENABLE_CPP11
+		std::auto_ptr<Preprocessor> pPreProc(preprocess(file));
+#else
 		std::unique_ptr<Preprocessor> pPreProc(preprocess(file));
+#endif // POCO_ENABLE_CPP11
 		logger().information("Parsing " + file);
 		if (pPreProc->stream().good())
 		{
