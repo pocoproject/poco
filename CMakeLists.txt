@@ -87,6 +87,9 @@ option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
 
+option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
+option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
+
 if(POCO_STATIC)
     message(WARNING "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
     option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
