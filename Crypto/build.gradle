@@ -30,8 +30,8 @@ model {
 				linker.args "iphlpapi.lib"
 			}
 			if (toolChain in Gcc) {
-				linker.args "-lssl"
-				linker.args "-lcrypto"
+//				linker.args "-lssl"
+//				linker.args "-lcrypto"
 			}
 		}
 		withType(SharedLibraryBinarySpec) {
