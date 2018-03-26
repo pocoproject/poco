@@ -309,7 +309,7 @@
     <ClCompile Include="src\ActivityTest.cpp"/>
     <ClCompile Include="src\AnyTest.cpp"/>
     <ClCompile Include="src\ArrayTest.cpp"/>
-    <ClCompile Include="src\AutoPtrTest.cpp"/>
+    <ClCompile Include="src\RefPtrTest.cpp"/>
     <ClCompile Include="src\AutoReleasePoolTest.cpp"/>
     <ClCompile Include="src\Base32Test.cpp"/>
     <ClCompile Include="src\Base64Test.cpp"/>
