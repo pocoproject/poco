@@ -14,6 +14,7 @@
 
 #include "Poco/Bugcheck.h"
 #include "Poco/Debugger.h"
+#include "Poco/NestedDiagnosticContext.h"
 #include "Poco/Exception.h"
 #include <sstream>
 
@@ -112,6 +113,7 @@ std::string Bugcheck::what(const char* msg, const char* file, int line, const ch
 	if (msg) str << msg << " ";
    if (text != NULL) str << "(" << text << ") ";
 	str << "in file \"" << file << "\", line " << line;
+	str << std::endl << NDC::backTrace(3, 2);
 	return str.str();
 }
 
