@@ -18,13 +18,38 @@
 namespace Poco {
 
 
-RefCountedObject::RefCountedObject(): _counter(1)
+RefCounter::RefCounter() : _counter(1)
 {
 }
 
 
-RefCountedObject::~RefCountedObject()
+RefCounter::~RefCounter()
 {
+}
+
+
+void RefCounter::duplicate() const
+{
+	++_counter;
+}
+
+
+int RefCounter::release()
+{
+	int counter = --_counter;
+	if (counter == 0)
+	{
+		delete this;
+		return 0;
+	}
+	poco_assert(counter > 0);
+	return counter;
+}
+
+
+int RefCounter::count() const
+{
+	return _counter;
 }
 
 
