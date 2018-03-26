@@ -41,7 +41,7 @@ if(MSVC)
         set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
     endif(POCO_MT)
 
-    if (ENABLE_MSVC_MP)
+    if (POCO_ENABLE_MSVC_MP)
       add_definitions(/MP)
     endif()
 

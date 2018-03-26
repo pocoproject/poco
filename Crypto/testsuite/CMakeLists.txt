@@ -25,9 +25,9 @@ else()
 endif()
 target_link_libraries( ${TESTUNIT} PocoCrypto PocoXML PocoUtil PocoFoundation PocoCppUnit )
 
-if(MSVC AND USING_INTERNAL_OPENSSL)
+if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 	set_tests_properties(${LIBNAME} PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")
-endif(MSVC AND USING_INTERNAL_OPENSSL)
+endif(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 
 if(UNIX AND NOT ANDROID)
     target_link_libraries( ${TESTUNIT} pthread)

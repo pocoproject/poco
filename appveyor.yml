@@ -434,13 +434,13 @@ build_script:
         $defs = "--config RelWithDebInfo"
         $defs+=" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
-        $defs+=" -DENABLE_PDF=OFF";
-        $defs+=" -DENABLE_NETSSL=ON";
-        $defs+=" -DENABLE_NETSSL_WIN=ON";
-        $defs+=" -DENABLE_SQL_MYSQL=OFF";
-        $defs+=" -DENABLE_REDIS=OFF";
-        $defs+=" -DENABLE_SAMPLES=ON";
-        $defs+=" -DENABLE_TESTS=ON";
+        $defs+=" -DPOCO_ENABLE_PDF=OFF";
+        $defs+=" -DPOCO_ENABLE_NETSSL=ON";
+        $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
+        $defs+=" -DPOCO_ENABLE_SQL_MYSQL=OFF";
+        $defs+=" -DPOCO_ENABLE_REDIS=OFF";
+        $defs+=" -DPOCO_ENABLE_SAMPLES=ON";
+        $defs+=" -DPOCO_ENABLE_TESTS=ON";
         $defs+=" ..";
         Write-Host -ForegroundColor Yellow cmake $defs
         $process = Start-Process -PassThru -nnw -Wait -FilePath "cmake" -RSO cout -RSE cerr -Args $defs;
