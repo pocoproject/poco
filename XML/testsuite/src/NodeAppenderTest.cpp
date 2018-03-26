@@ -52,20 +52,20 @@ void NodeAppenderTest::testAppendNode()
 	appender.appendChild(pElem2);
 	appender.appendChild(pElem3);
 
-	assert (pRoot->firstChild() == pElem1);
-	assert (pRoot->lastChild() == pElem3);
+	assertTrue (pRoot->firstChild() == pElem1);
+	assertTrue (pRoot->lastChild() == pElem3);
 	
-	assert (pElem1->nextSibling() == pElem2);
-	assert (pElem2->nextSibling() == pElem3);
-	assert (pElem3->nextSibling() == 0);
+	assertTrue (pElem1->nextSibling() == pElem2);
+	assertTrue (pElem2->nextSibling() == pElem3);
+	assertTrue (pElem3->nextSibling() == 0);
 	
-	assert (pElem1->previousSibling() == 0);
-	assert (pElem2->previousSibling() == pElem1);	
-	assert (pElem3->previousSibling() == pElem2);	
+	assertTrue (pElem1->previousSibling() == 0);
+	assertTrue (pElem2->previousSibling() == pElem1);	
+	assertTrue (pElem3->previousSibling() == pElem2);	
 	
-	assert (pElem1->parentNode() == pRoot);
-	assert (pElem2->parentNode() == pRoot);
-	assert (pElem3->parentNode() == pRoot);
+	assertTrue (pElem1->parentNode() == pRoot);
+	assertTrue (pElem2->parentNode() == pRoot);
+	assertTrue (pElem3->parentNode() == pRoot);
 }
 
 
@@ -93,29 +93,29 @@ void NodeAppenderTest::testAppendNodeList()
 	pFrag3->appendChild(pElem4);
 	
 	appender.appendChild(pFrag1);
-	assert (pRoot->firstChild() == 0);
+	assertTrue (pRoot->firstChild() == 0);
 	
 	appender.appendChild(pFrag2);
-	assert (pRoot->firstChild() == pElem1);
-	assert (pRoot->lastChild() == pElem3);
+	assertTrue (pRoot->firstChild() == pElem1);
+	assertTrue (pRoot->lastChild() == pElem3);
 
-	assert (pElem1->nextSibling() == pElem2);
-	assert (pElem2->nextSibling() == pElem3);
-	assert (pElem3->nextSibling() == 0);
+	assertTrue (pElem1->nextSibling() == pElem2);
+	assertTrue (pElem2->nextSibling() == pElem3);
+	assertTrue (pElem3->nextSibling() == 0);
 	
-	assert (pElem1->previousSibling() == 0);
-	assert (pElem2->previousSibling() == pElem1);	
-	assert (pElem3->previousSibling() == pElem2);	
+	assertTrue (pElem1->previousSibling() == 0);
+	assertTrue (pElem2->previousSibling() == pElem1);	
+	assertTrue (pElem3->previousSibling() == pElem2);	
 	
-	assert (pElem1->parentNode() == pRoot);
-	assert (pElem2->parentNode() == pRoot);
-	assert (pElem3->parentNode() == pRoot);
+	assertTrue (pElem1->parentNode() == pRoot);
+	assertTrue (pElem2->parentNode() == pRoot);
+	assertTrue (pElem3->parentNode() == pRoot);
 	
 	appender.appendChild(pFrag3);
-	assert (pRoot->lastChild() == pElem4);
-	assert (pElem4->parentNode() == pRoot);
-	assert (pElem3->nextSibling() == pElem4);
-	assert (pElem4->previousSibling() == pElem3);
+	assertTrue (pRoot->lastChild() == pElem4);
+	assertTrue (pElem4->parentNode() == pRoot);
+	assertTrue (pElem3->nextSibling() == pElem4);
+	assertTrue (pElem4->previousSibling() == pElem3);
 }
 
 

@@ -1005,36 +1005,38 @@ nugetPack {
 }
 */
 
-task nuget(type: Exec) {
-	String nugetVersion = version.replace('p', '-')
-	def Set<Task> pocos = project.getTasksByName('poco', true)
-	
-	setDependsOn(pocos)
-	workingDir "packaging/Windows/NuGet"
+def nuget(version, target, os) {
+	return tasks.create("NuGet-${target}", Exec) {
+		String nugetVersion = version.replace('p', '-')
+		def Set<Task> pocos = project.getTasksByName('poco', true)
+		
+		setDependsOn(pocos)
+		workingDir "packaging/Windows/NuGet"
 
-	executable "${NuGetHome}/NuGet.exe"
-	args "pack"
-	args "-BasePath", "$rootDir"
-	args "-Version", nugetVersion
-	args "-Symbols"
-	args "-NonInteractive"
-	args "Pocoproject.Poco.vs150.nuspec"
+		executable "${NuGetHome}/NuGet.exe"
+		args "pack"
+		args "-BasePath", "$rootDir"
+		args "-Version", nugetVersion
+		args "-NonInteractive"
+		args "Pocoproject.Poco.vs150.${target}.nuspec"
 
-	inputs.files(pocos.inputs.files)
-	inputs.files(new File(workingDir, "Pocoproject.Poco.vs150.nuspec"))
-	outputs.files(new File(workingDir,"Pocoproject.Poco.vs150.${version}.nupkg"))
+		inputs.files(pocos.inputs.files)
+		inputs.files(new File(workingDir, "Pocoproject.Poco.vs150.${target}.nuspec"))
+		outputs.files(new File(workingDir,"Pocoproject.Poco.vs150.${target}.${version}.nupkg"))
 
-	onlyIf(new Spec<Exec>() {
-		boolean isSatisfiedBy(Exec task) {
-			   return os.windows;
-		}
-	});
+		onlyIf(new Spec<Exec>() {
+			boolean isSatisfiedBy(Exec task) {
+				   return os.windows;
+			}
+		});
+	}
 }
 
 task packaging() {
 	if (os.windows) {
-		dependsOn nuget
-		dependsOn wix
+		dependsOn nuget(version, 'x86', os)
+		dependsOn nuget(version, 'x64', os)
+//		dependsOn wix
 	}
 }
 //

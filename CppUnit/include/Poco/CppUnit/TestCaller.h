@@ -8,8 +8,8 @@
 
 
 #include "Poco/CppUnit/CppUnit.h"
-#include "Guards.h"
-#include "TestCase.h"
+#include "Poco/CppUnit/Guards.h"
+#include "Poco/CppUnit/TestCase.h"
 #include <memory>
 
 

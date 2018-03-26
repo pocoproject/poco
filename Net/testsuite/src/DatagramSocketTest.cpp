@@ -51,10 +51,10 @@ void DatagramSocketTest::testEcho()
 	char buffer[256];
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);
-	assert (n == 5);
+	assertTrue (n == 5);
 	n = ss.receiveBytes(buffer, sizeof(buffer));
-	assert (n == 5);
-	assert (std::string(buffer, n) == "hello");
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
 }
 
@@ -64,14 +64,14 @@ void DatagramSocketTest::testSendToReceiveFrom()
 	UDPEchoServer echoServer(SocketAddress("127.0.0.1", 0));
 	DatagramSocket ss(SocketAddress::IPv4);
 	int n = ss.sendTo("hello", 5, SocketAddress("127.0.0.1", echoServer.port()));
-	assert (n == 5);
+	assertTrue (n == 5);
 	char buffer[256];
 	SocketAddress sa;
 	n = ss.receiveFrom(buffer, sizeof(buffer), sa);
-	assert (sa.host() == echoServer.address().host());
-	assert (sa.port() == echoServer.port());
-	assert (n == 5);
-	assert (std::string(buffer, n) == "hello");
+	assertTrue (sa.host() == echoServer.address().host());
+	assertTrue (sa.port() == echoServer.port());
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
 }
 
@@ -83,10 +83,10 @@ void DatagramSocketTest::testUnbound()
 	char buffer[256];
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendBytes("hello", 5);
-	assert (n == 5);
+	assertTrue (n == 5);
 	n = ss.receiveBytes(buffer, sizeof(buffer));
-	assert (n == 5);
-	assert (std::string(buffer, n) == "hello");
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
 }
 
@@ -120,15 +120,15 @@ void DatagramSocketTest::testBroadcast()
 	poco_socklen_t len = sizeof(opt);
 	ss.impl()->setRawOption(IPPROTO_IP, IP_ONESBCAST, (const char*) &opt, len);
 	ss.impl()->getRawOption(IPPROTO_IP, IP_ONESBCAST, &opt, len);
-	assert (opt == 1);
+	assertTrue (opt == 1);
 #endif
 
 	int n = ss.sendTo("hello", 5, sa);
-	assert (n == 5);
+	assertTrue (n == 5);
 	char buffer[256] = { 0 };
 	n = ss.receiveBytes(buffer, 5);
-	assert (n == 5);
-	assert (std::string(buffer, n) == "hello");
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
 }
 

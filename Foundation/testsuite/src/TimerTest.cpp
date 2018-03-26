@@ -34,8 +34,8 @@ TimerTest::~TimerTest()
 void TimerTest::testTimer()
 {
 	Timer t(100, 200);
-	assert (t.getStartInterval() == 100);
-	assert (t.getPeriodicInterval() == 200);
+	assertTrue (t.getStartInterval() == 100);
+	assertTrue (t.getPeriodicInterval() == 200);
 
 	Stopwatch sw;
 	TimerCallback<TimerTest> tc(*this, &TimerTest::onTimer);
@@ -43,15 +43,15 @@ void TimerTest::testTimer()
 	t.start(tc);
 	_event.wait();
 	sw.stop();
-	assert (sw.elapsed() >= 80000 && sw.elapsed() < 120000);
+	assertTrue (sw.elapsed() >= 80000 && sw.elapsed() < 120000);
 	sw.restart();
 	_event.wait();
 	sw.stop();
-	assert (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
+	assertTrue (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
 	sw.restart();
 	_event.wait();
 	sw.stop();
-	assert (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
+	assertTrue (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
 	t.stop();	
 }
 

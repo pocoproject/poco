@@ -34,14 +34,14 @@ void MultipartWriterTest::testWriteOnePart()
 {
 	std::ostringstream ostr;
 	MultipartWriter w(ostr, "MIME_boundary_01234567");
-	assert (w.boundary() == "MIME_boundary_01234567");
+	assertTrue (w.boundary() == "MIME_boundary_01234567");
 	MessageHeader h;
 	h.set("name1", "value1");
 	w.nextPart(h);
 	ostr << "this is part 1";
 	w.close();
 	std::string s = ostr.str();	
-	assert (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
+	assertTrue (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567--\r\n");
 }
 
 
@@ -58,7 +58,7 @@ void MultipartWriterTest::testWriteTwoParts()
 	ostr << "this is part 2";
 	w.close();
 	std::string s = ostr.str();	
-	assert (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
+	assertTrue (s == "--MIME_boundary_01234567\r\nname1: value1\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
 }
 
 
@@ -67,8 +67,8 @@ void MultipartWriterTest::testBoundary()
 	std::ostringstream ostr;
 	MultipartWriter w(ostr);
 	std::string boundary = w.boundary();
-	assert (boundary.substr(0, 14) == "MIME_boundary_");
-	assert (boundary.length() == 14 + 16);
+	assertTrue (boundary.substr(0, 14) == "MIME_boundary_");
+	assertTrue (boundary.length() == 14 + 16);
 }
 
 
