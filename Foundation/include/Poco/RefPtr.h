@@ -41,13 +41,12 @@ class RefPtr
 	///     void duplicate()
 	///     (increments the reference count by one)
 	///
-	///     int release()
+	///     void release()
 	///     (decrements the reference count by one, if the reference
-	///      count reaches zero, deletes the object, and returns the
-	///      current reference count)
+	///      count reaches zero, deletes the object)
 	///
-	/// For a conforming implementaion, see RefCountedObject class.
-	/// Unless there are spcific reasons not to, it is recommended
+	/// For a conforming implementaion, see RefCountedObject typedef.
+	/// Unless there are specific reasons not to, it is recommended
 	/// that RefPtr-held objects inherit from RefCountedObject.
 	///
 	/// RefPtr works in the following way:
