@@ -17,4 +17,4 @@ echo Initializing Visual Studio environment
 call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat"
 
 echo Building poco
-buildwin 100 build all both Win32 nosamples vcexpress
+buildwin 140 build all both Win32 nosamples vcexpress
