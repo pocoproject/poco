@@ -16,6 +16,7 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Thread.h"
+#include "Poco/AtomicCounter.h"
 #include "Poco/Mutex.h"
 #include "Poco/Runnable.h"
 #include "Poco/Event.h"

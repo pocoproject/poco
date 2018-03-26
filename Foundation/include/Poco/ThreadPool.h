@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/AtomicCounter.h"
 #include <vector>
 
 

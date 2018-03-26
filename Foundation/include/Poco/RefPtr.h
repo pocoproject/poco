@@ -19,7 +19,6 @@
 
 
 #include "Poco/Foundation.h"
-#include "Poco/AtomicCounter.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Exception.h"
 
