@@ -48,6 +48,23 @@ if (WIN32)
   mark_as_advanced(CMAKE_MC_COMPILER)
 endif(WIN32)
 
+# Accept older ENABLE_<COMPONENT>, ENABLE_TESTS and ENABLE_SAMPLES and
+# automatically set the appropriate POCO_ENABLE_* variable
+#
+get_cmake_property(all_variables VARIABLES)
+foreach(variable_name ${all_variables})
+  string(SUBSTRING ${variable_name} 0 7 variable_prefix)
+  if(${variable_prefix} STREQUAL "ENABLE_")
+    list(FIND all_variables "POCO_${variable_name}" variable_found)
+    if(NOT variable_found EQUAL -1)
+      message(WARNING "${variable_name} is deprecated and will be removed! Use POCO_${variable_name} instead")
+      set(POCO_${variable_name} ${${variable_name}} CACHE BOOL "Old value from ${variable_name}" FORCE)
+      unset(${variable_name} CACHE)
+    endif()
+  endif()
+endforeach()
+unset(all_variables)
+
 #===============================================================================
 # Macros for Source file management
 #

@@ -28,6 +28,6 @@ endif()
 
 target_link_libraries( ${TESTUNIT} ${CMAKE_THREAD_LIBS_INIT}  PocoRedis PocoFoundation PocoCppUnit )
 
-if(OLD_REDIS_VERSION)
+if(POCO_OLD_REDIS_VERSION)
   target_compile_definitions( ${TESTUNIT} PRIVATE OLD_REDIS_VERSION)
-endif(OLD_REDIS_VERSION)
+endif(POCO_OLD_REDIS_VERSION)

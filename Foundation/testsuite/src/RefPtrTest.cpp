@@ -273,24 +273,23 @@ RefPtrTest::~RefPtrTest()
 
 void RefPtrTest::testRefPtr()
 {
-	poco_check_ptr(0);
 	{
 		RefPtr<TestObj> ptr = new TestObj;
-		assert (ptr->rc() == 1);
+		assertTrue (ptr->rc() == 1);
 		RefPtr<TestObj> ptr2 = ptr;
-		assert (ptr->rc() == 2);
+		assertTrue (ptr->rc() == 2);
 		ptr2 = new TestObj;
-		assert (ptr->rc() == 1);
+		assertTrue (ptr->rc() == 1);
 		RefPtr<TestObj> ptr3;
 		ptr3 = ptr2;
-		assert (ptr2->rc() == 2);
+		assertTrue (ptr2->rc() == 2);
 		ptr3 = new TestObj;
-		assert (ptr2->rc() == 1);
+		assertTrue (ptr2->rc() == 1);
 		ptr3 = ptr2;
-		assert (ptr2->rc() == 2);
-		assert (TestObj::count() > 0);
+		assertTrue (ptr2->rc() == 2);
+		assertTrue (TestObj::count() > 0);
 	}
-	assert (TestObj::count() == 0);
+	assertTrue (TestObj::count() == 0);
 }
 
 
@@ -306,59 +305,59 @@ void RefPtrTest::testOps()
 		pTO1 = pTO2;
 		pTO2 = pTmp;
 	}
-	assert (pTO1 < pTO2);
+	assertTrue (pTO1 < pTO2);
 	ptr1 = pTO1;
 	RefPtr<TestObj> ptr2 = pTO2;
 	RefPtr<TestObj> ptr3 = ptr1;
 	RefPtr<TestObj> ptr4;
-	assert (ptr1.get() == pTO1);
-	assert (ptr1 == pTO1);
-	assert (ptr2.get() == pTO2);
-	assert (ptr2 == pTO2);
-	assert (ptr3.get() == pTO1);
-	assert (ptr3 == pTO1);
+	assertTrue (ptr1.get() == pTO1);
+	assertTrue (ptr1 == pTO1);
+	assertTrue (ptr2.get() == pTO2);
+	assertTrue (ptr2 == pTO2);
+	assertTrue (ptr3.get() == pTO1);
+	assertTrue (ptr3 == pTO1);
 
-	assert (ptr1 == pTO1);
-	assert (ptr1 != pTO2);
-	assert (ptr1 < pTO2);
-	assert (ptr1 <= pTO2);
-	assert (ptr2 > pTO1);
-	assert (ptr2 >= pTO1);
+	assertTrue (ptr1 == pTO1);
+	assertTrue (ptr1 != pTO2);
+	assertTrue (ptr1 < pTO2);
+	assertTrue (ptr1 <= pTO2);
+	assertTrue (ptr2 > pTO1);
+	assertTrue (ptr2 >= pTO1);
 
-	assert (ptr1 == ptr3);
-	assert (ptr1 != ptr2);
-	assert (ptr1 < ptr2);
-	assert (ptr1 <= ptr2);
-	assert (ptr2 > ptr1);
-	assert (ptr2 >= ptr1);
+	assertTrue (ptr1 == ptr3);
+	assertTrue (ptr1 != ptr2);
+	assertTrue (ptr1 < ptr2);
+	assertTrue (ptr1 <= ptr2);
+	assertTrue (ptr2 > ptr1);
+	assertTrue (ptr2 >= ptr1);
 
 	ptr1 = pTO1;
 	ptr2 = pTO2;
 	ptr1.swap(ptr2);
-	assert (ptr2.get() == pTO1);
-	assert (ptr1.get() == pTO2);
+	assertTrue (ptr2.get() == pTO1);
+	assertTrue (ptr1.get() == pTO2);
 
 	try
 	{
-		assert (ptr4->rc() > 0);
+		assertTrue (ptr4->rc() > 0);
 		fail ("must throw NullPointerException");
 	}
 	catch (NullPointerException&)
 	{
 	}
 
-	assert (!(ptr4 == ptr1));
-	assert (!(ptr4 == ptr2));
-	assert (ptr4 != ptr1);
-	assert (ptr4 != ptr2);
+	assertTrue (!(ptr4 == ptr1));
+	assertTrue (!(ptr4 == ptr2));
+	assertTrue (ptr4 != ptr1);
+	assertTrue (ptr4 != ptr2);
 
 	ptr4 = ptr2;
-	assert (ptr4 == ptr2);
-	assert (!(ptr4 != ptr2));
+	assertTrue (ptr4 == ptr2);
+	assertTrue (!(ptr4 != ptr2));
 
-	assert (!(!ptr1));
+	assertTrue (!(!ptr1));
 	ptr1 = 0;
-	assert (!ptr1);
+	assertTrue (!ptr1);
 }
 
 
@@ -368,14 +367,14 @@ void RefPtrTest::testMove()
 	RefPtr<TestObj> ptr1 = pObj;
 	RefPtr<TestObj> ptr2;
 
-	assert (!ptr1.isNull());
-	assert (ptr1.get() == pObj);
-	assert (ptr2.isNull());
+	assertTrue (!ptr1.isNull());
+	assertTrue (ptr1.get() == pObj);
+	assertTrue (ptr2.isNull());
 	ptr2 = std::move(ptr1);
 
-	assert (ptr1.isNull());
-	assert (ptr2.get() == pObj);
-	assert (!ptr2.isNull());
+	assertTrue (ptr1.isNull());
+	assertTrue (ptr2.get() == pObj);
+	assertTrue (!ptr2.isNull());
 }
 
 
@@ -399,208 +398,208 @@ void RefPtrTest::testInheritance()
 	RefPtr<TestParent1> parent1;
 	parent1 = child;
 
-	assert (!parent1.isNull());
-	assert (parent1->func() == -1);
+	assertTrue (!parent1.isNull());
+	assertTrue (parent1->func() == -1);
 
 	RefPtr<TestParent2> parent2;
 	parent2 = child;
 
-	assert (!parent2.isNull());
-	assert (parent2->func() == -1);
+	assertTrue (!parent2.isNull());
+	assertTrue (parent2->func() == -1);
 }
 
 
 void RefPtrTest::testMoveInherited()
 {
 	TestChild* pObj = new TestChild;
-	assert (pObj->referenceCount() == 1);
+	assertTrue (pObj->referenceCount() == 1);
 	RefPtr<TestChild> ptr1 = pObj;
 	ptr1 = ptr1;
-	assert (ptr1->referenceCount() == 1);
-	assert (!ptr1.isNull());
-	assert (pObj->referenceCount() == 1);
+	assertTrue (ptr1->referenceCount() == 1);
+	assertTrue (!ptr1.isNull());
+	assertTrue (pObj->referenceCount() == 1);
 	ptr1 = std::move(ptr1);
-	assert (ptr1->referenceCount() == 1);
-	assert (!ptr1.isNull());
-	assert (pObj->referenceCount() == 1);
+	assertTrue (ptr1->referenceCount() == 1);
+	assertTrue (!ptr1.isNull());
+	assertTrue (pObj->referenceCount() == 1);
 	RefPtr<TestChild> ptr2 = std::move(ptr1);
-	assert (pObj->referenceCount() == 1);
-	assert (ptr2->referenceCount() == 1);
-	assert (ptr1.isNull());
+	assertTrue (pObj->referenceCount() == 1);
+	assertTrue (ptr2->referenceCount() == 1);
+	assertTrue (ptr1.isNull());
 	ptr2 = std::move(ptr2);
-	assert (pObj->referenceCount() == 1);
-	assert (ptr2->referenceCount() == 1);
-	assert (ptr1.isNull());
+	assertTrue (pObj->referenceCount() == 1);
+	assertTrue (ptr2->referenceCount() == 1);
+	assertTrue (ptr1.isNull());
 
-	assert (!ptr2.isNull());
-	assert (ptr2.get() == pObj);
-	assert (ptr1.isNull());
+	assertTrue (!ptr2.isNull());
+	assertTrue (ptr2.get() == pObj);
+	assertTrue (ptr1.isNull());
 
 	ptr1 = getObjPtr();
-	assert (!ptr1.isNull());
-	assert (ptr1.get() == ptrChild);
-	assert (ptrChild->referenceCount() == 1);
+	assertTrue (!ptr1.isNull());
+	assertTrue (ptr1.get() == ptrChild);
+	assertTrue (ptrChild->referenceCount() == 1);
 	ptr2 = ptr1;
-	assert (!ptr2.isNull());
-	assert (ptr2.get() == ptrChild);
-	assert (ptrChild->referenceCount() == 2);
+	assertTrue (!ptr2.isNull());
+	assertTrue (ptr2.get() == ptrChild);
+	assertTrue (ptrChild->referenceCount() == 2);
 
 	ptr1 = getObjRefPtr();
-	assert (ptrChild->referenceCount() == 1);
-	assert (ptr1->referenceCount() == 1);
+	assertTrue (ptrChild->referenceCount() == 1);
+	assertTrue (ptr1->referenceCount() == 1);
 
 	RefPtr<TestParent1> parent1 = new TestChild;
-	assert (parent1->referenceCount() == 1);
+	assertTrue (parent1->referenceCount() == 1);
 	RefPtr<TestChild> child = parent1.cast<TestChild>();
-	assert (parent1->referenceCount() == 2);
-	assert (child->referenceCount() == 2);
+	assertTrue (parent1->referenceCount() == 2);
+	assertTrue (child->referenceCount() == 2);
 	RefPtr<TestParent2> parent2 = std::move(child);
-	assert (child.isNull());
-	assert (parent1->referenceCount() == 2);
+	assertTrue (child.isNull());
+	assertTrue (parent1->referenceCount() == 2);
 	parent1 = 0;
-	assert (parent1.isNull());
-	assert (parent2->referenceCount() == 1);
+	assertTrue (parent1.isNull());
+	assertTrue (parent2->referenceCount() == 1);
 	child = parent2.unsafeCast<TestChild>();
-	assert (parent2->referenceCount() == 2);
-	assert (child->referenceCount() == 2);
+	assertTrue (parent2->referenceCount() == 2);
+	assertTrue (child->referenceCount() == 2);
 	parent1 = child;
-	assert (parent1->referenceCount() == 3);
-	assert (child->referenceCount() == 3);
+	assertTrue (parent1->referenceCount() == 3);
+	assertTrue (child->referenceCount() == 3);
 	parent1 = std::move(parent1);
-	assert (parent1->referenceCount() == 3);
-	assert (child->referenceCount() == 3);
+	assertTrue (parent1->referenceCount() == 3);
+	assertTrue (child->referenceCount() == 3);
 
 	TestChild::Ptr child1 = child->getRefPtr();
-	assert (child->referenceCount() == 4);
+	assertTrue (child->referenceCount() == 4);
 
 	TestChild::Ptr child2 = child1;
-	assert (child->referenceCount() == 5);
+	assertTrue (child->referenceCount() == 5);
 	child1 = child2;
-	assert (child->referenceCount() == 5);
-	assert (child1->referenceCount() == 5);
-	assert (child2->referenceCount() == 5);
+	assertTrue (child->referenceCount() == 5);
+	assertTrue (child1->referenceCount() == 5);
+	assertTrue (child2->referenceCount() == 5);
 
 	child = 0;
-	assert (child1->referenceCount() == 4);
-	assert (child2->referenceCount() == 4);
+	assertTrue (child1->referenceCount() == 4);
+	assertTrue (child2->referenceCount() == 4);
 
 	child1 = 0;
-	assert (child2->referenceCount() == 3);
-	assert (parent1->referenceCount() == 3);
-	assert (parent2->referenceCount() == 3);
+	assertTrue (child2->referenceCount() == 3);
+	assertTrue (parent1->referenceCount() == 3);
+	assertTrue (parent2->referenceCount() == 3);
 
 	child2 = 0;
-	assert (parent1->referenceCount() == 2);
-	assert (parent2->referenceCount() == 2);
+	assertTrue (parent1->referenceCount() == 2);
+	assertTrue (parent2->referenceCount() == 2);
 
 	parent1 = 0;
-	assert (parent2->referenceCount() == 1);
+	assertTrue (parent2->referenceCount() == 1);
 }
 
 
 void RefPtrTest::testWeakRefPtr()
 {
 	WeakRefPtr<TestWeakObj> toWPtr0;
-	assert (toWPtr0.isNull());
-	assert (!toWPtr0.lock());
+	assertTrue (toWPtr0.isNull());
+	assertTrue (!toWPtr0.lock());
 	{
 		RefPtr<TestWeakObj> toPtr;
-		assert (toPtr.isNull());
+		assertTrue (toPtr.isNull());
 		toWPtr0 = toPtr;
-		assert (toWPtr0.isNull());
+		assertTrue (toWPtr0.isNull());
 		{
 			toPtr = new TestWeakObj;
-			assert (toPtr->referenceCount() == 1);
+			assertTrue (toPtr->referenceCount() == 1);
 			toWPtr0 = toPtr;
-			assert (!toWPtr0.isNull());
-			assert (toWPtr0.referenceCount() == 1);
+			assertTrue (!toWPtr0.isNull());
+			assertTrue (toWPtr0.referenceCount() == 1);
 
 			WeakRefPtr<TestWeakObj> toWPtr = toPtr;
-			assert (toPtr->referenceCount() == 1);
+			assertTrue (toPtr->referenceCount() == 1);
 			{
 				if (auto l = toWPtr.lock())
-					assert (toPtr->referenceCount() == 2);
+					assertTrue (toPtr->referenceCount() == 2);
 				else
 					fail ("1 WeakRefPtr failed to lock!");
 			}
-			assert (toPtr->referenceCount() == 1);
+			assertTrue (toPtr->referenceCount() == 1);
 		}
-		assert (!toPtr.isNull());
-		assert (toPtr->referenceCount() == 1);
+		assertTrue (!toPtr.isNull());
+		assertTrue (toPtr->referenceCount() == 1);
 	}
-	assert (toWPtr0.isNull());
-	assert (!toWPtr0.lock());
+	assertTrue (toWPtr0.isNull());
+	assertTrue (!toWPtr0.lock());
 
 	TestChild::Ptr child = new TestChild;
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 	child->setParent1(child); // be one's self weak parent
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 	WeakRefPtr<TestParent1> wp1 = child->getWeakParent1();
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 	{
 		if (auto l = wp1.lock())
 		{
-			assert (child->referenceCount() == 2);
-			assert(-1 == wp1->func());
+			assertTrue (child->referenceCount() == 2);
+			assertTrue(-1 == wp1->func());
 		}
 		else
 			fail ("2 WeakRefPtr failed to lock!");
 	}
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 
 	child->setParent2(child); // another weak self-parent
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 	WeakRefPtr<TestParent2> wp2 = child->getWeakParent2();
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 	{
 		if (auto l = wp2.lock())
 		{
-			assert (child->referenceCount() == 2);
-			assert(-1 == wp2->func());
+			assertTrue (child->referenceCount() == 2);
+			assertTrue(-1 == wp2->func());
 		}
 		else
 			fail ("3 WeakRefPtr failed to lock!");
 	}
-	assert (child->referenceCount() == 1);
+	assertTrue (child->referenceCount() == 1);
 
 	{
 		TestParent1::Ptr ap1 = child->getParent1();
-		assert (ap1 == child.cast<TestParent1>());
+		assertTrue (ap1 == child.cast<TestParent1>());
 	}
 
 	TestChild::Ptr child2 = new TestChild;
-	assert (child2->referenceCount() == 1);
+	assertTrue (child2->referenceCount() == 1);
 	child->setParent1(child2);
-	assert (child2->referenceCount() == 1);
+	assertTrue (child2->referenceCount() == 1);
 	TestParent1::Ptr tp1 = child->getParent1();
-	assert (tp1 == child->getParent1());
+	assertTrue (tp1 == child->getParent1());
 
 	WeakRefPtr<TestChild> wpChild = child->selfFromThis();
-	assert (child->referenceCount() == 1);
-	assert (!wpChild.isNull());
-	assert (!wpChild.lock().isNull());
+	assertTrue (child->referenceCount() == 1);
+	assertTrue (!wpChild.isNull());
+	assertTrue (!wpChild.lock().isNull());
 
 	WeakRefPtr<TestChild> wpChild1 = child->parent1FromThis().cast<TestChild>();
-	assert (child->referenceCount() == 1);
-	assert (!wpChild1.isNull());
-	assert (!wpChild1.lock().isNull());
+	assertTrue (child->referenceCount() == 1);
+	assertTrue (!wpChild1.isNull());
+	assertTrue (!wpChild1.lock().isNull());
 
 	WeakRefPtr<TestChild> wpChild2 = child->parent2FromThis().cast<TestChild>();
-	assert (child->referenceCount() == 1);
-	assert (!wpChild2.isNull());
-	assert (!wpChild2.lock().isNull());
+	assertTrue (child->referenceCount() == 1);
+	assertTrue (!wpChild2.isNull());
+	assertTrue (!wpChild2.lock().isNull());
 	/*
 	WeakRefPtr<TestChild> wpChild = child->selfFromThis();
-	assert (wpChild);
-	assert (wpChild.lock());
+	assertTrue (wpChild);
+	assertTrue (wpChild.lock());
 
 	WeakRefPtr<TestChild> wpChild1 = child->parent1FromThis().cast<TestChild>();
-	assert (wpChild1);
-	assert (wpChild1.lock());
+	assertTrue (wpChild1);
+	assertTrue (wpChild1.lock());
 
 	WeakRefPtr<TestChild> wpChild2 = child->parent2FromThis().cast<TestChild>();
-	assert (wpChild2);
-	assert (wpChild2.lock());
+	assertTrue (wpChild2);
+	assertTrue (wpChild2.lock());
 	 */
 }
 
@@ -611,21 +610,21 @@ void RefPtrTest::testWeakSemantics()
 	/// when the holding RefPtr is deleted.
 	{
 		WeakRefPtr<TestWeakObj> weak;
-		assert (weak.isNull());
-		assert (!weak.lock());
+		assertTrue (weak.isNull());
+		assertTrue (!weak.lock());
 		{
 			RefPtr<TestWeakObj> original = new TestWeakObj;
-			assert (weak.isNull());
-			assert (!weak.lock());
+			assertTrue (weak.isNull());
+			assertTrue (!weak.lock());
 
 			weak = original;
-			assert(!weak.isNull());
+			assertTrue(!weak.isNull());
 			RefPtr<TestWeakObj> locked = weak.lock();
-			assert(!locked.isNull());
-			assert(locked == original);
+			assertTrue(!locked.isNull());
+			assertTrue(locked == original);
 		}
-		assert (weak.isNull());
-		assert (!weak.lock());
+		assertTrue (weak.isNull());
+		assertTrue (!weak.lock());
 	}
 
 	// RefPtr does not affect the WeakRefPtr in any
@@ -635,40 +634,40 @@ void RefPtrTest::testWeakSemantics()
 	// copy/assign
 	{
 		RefPtr<TestWeakObj> original = new TestWeakObj;
-		assert (original->referenceCount() == 1);
+		assertTrue (original->referenceCount() == 1);
 		WeakRefPtr<TestWeakObj> weak = original;
-		assert (original->referenceCount() == 1);
+		assertTrue (original->referenceCount() == 1);
 		RefPtr<TestWeakObj> locked = weak.lock();
-		assert (original->referenceCount() == 2);
-		assert (locked->referenceCount() == 2);
-		assert(!locked.isNull());
-		assert(locked == original);
+		assertTrue (original->referenceCount() == 2);
+		assertTrue (locked->referenceCount() == 2);
+		assertTrue(!locked.isNull());
+		assertTrue(locked == original);
 
 		RefPtr<TestWeakObj> copied = original;
-		assert (original->referenceCount() == 3);
-		assert (locked->referenceCount() == 3);
-		assert (copied->referenceCount() == 3);
-		assert(!weak.isNull());
+		assertTrue (original->referenceCount() == 3);
+		assertTrue (locked->referenceCount() == 3);
+		assertTrue (copied->referenceCount() == 3);
+		assertTrue(!weak.isNull());
 		locked = weak.lock();
-		assert (original->referenceCount() == 3);
-		assert (locked->referenceCount() == 3);
-		assert(!locked.isNull());
-		assert(locked == original);
-		assert(locked.get() == original.get());
-		assert(locked == copied);
-		assert(locked.get() == copied.get());
+		assertTrue (original->referenceCount() == 3);
+		assertTrue (locked->referenceCount() == 3);
+		assertTrue(!locked.isNull());
+		assertTrue(locked == original);
+		assertTrue(locked.get() == original.get());
+		assertTrue(locked == copied);
+		assertTrue(locked.get() == copied.get());
 		original = 0;
-		assert (locked->referenceCount() == 2);
-		assert (copied->referenceCount() == 2);
-		assert(!weak.isNull());
-		assert(!weak.lock().isNull());
+		assertTrue (locked->referenceCount() == 2);
+		assertTrue (copied->referenceCount() == 2);
+		assertTrue(!weak.isNull());
+		assertTrue(!weak.lock().isNull());
 		copied = 0;
-		assert (locked->referenceCount() == 1);
-		assert(!weak.isNull());
-		assert(!weak.lock().isNull());
+		assertTrue (locked->referenceCount() == 1);
+		assertTrue(!weak.isNull());
+		assertTrue(!weak.lock().isNull());
 		locked = 0;
-		assert(weak.isNull());
-		assert(weak.lock().isNull());
+		assertTrue(weak.isNull());
+		assertTrue(weak.lock().isNull());
 
 	}
 
@@ -677,16 +676,16 @@ void RefPtrTest::testWeakSemantics()
 		RefPtr<TestWeakObj> original = new TestWeakObj;
 
 		WeakRefPtr<TestWeakObj> weak = original;
-		assert(!weak.isNull());
+		assertTrue(!weak.isNull());
 		RefPtr<TestWeakObj> locked = weak.lock();
-		assert(!locked.isNull());
-		assert(locked == original);
+		assertTrue(!locked.isNull());
+		assertTrue(locked == original);
 
 		RefPtr<TestWeakObj> moved = std::move(original);
-		assert(!weak.isNull());
+		assertTrue(!weak.isNull());
 		locked = weak.lock();
-		assert(!locked.isNull());
-		assert(locked == moved);
+		assertTrue(!locked.isNull());
+		assertTrue(locked == moved);
 	}
 }
 
@@ -795,14 +794,14 @@ void RefPtrTest::testRefPtrThread()
 
 	for (auto& r : runnables)
 	{
-		assert(r->errors() == 0);
+		assertTrue(r->errors() == 0);
 		delete r;
 	}
 
 	for (int i = 0; i < num; ++i)
 	{
-		assert (RefPtrRunnable::_rco[i]->referenceCount() == 1);
-		assert (RefPtrRunnable::_wrco[i]->referenceCount() == 1);
+		assertTrue (RefPtrRunnable::_rco[i]->referenceCount() == 1);
+		assertTrue (RefPtrRunnable::_wrco[i]->referenceCount() == 1);
 		delete RefPtrRunnable::_rco[i];
 		delete RefPtrRunnable::_wrco[i];
 	}
@@ -838,23 +837,23 @@ void RefPtrTest::testWeakCast()
 
 	// destroy all RefPtr's in random order
 	b = 0;
-	assert (!weakB.isNull());
-	assert (!weakB.lock().isNull());
+	assertTrue (!weakB.isNull());
+	assertTrue (!weakB.lock().isNull());
 	e = 0;
-	assert (!weakE.isNull());
-	assert (!weakE.lock().isNull());
+	assertTrue (!weakE.isNull());
+	assertTrue (!weakE.lock().isNull());
 	d = 0;
-	assert (!weakD.isNull());
-	assert (!weakD.lock().isNull());
+	assertTrue (!weakD.isNull());
+	assertTrue (!weakD.lock().isNull());
 	c = 0;
-	assert (weakB.isNull());
-	assert (weakB.lock().isNull());
-	assert (weakC.isNull());
-	assert (weakC.lock().isNull());
-	assert (weakD.isNull());
-	assert (weakD.lock().isNull());
-	assert (weakE.isNull());
-	assert (weakE.lock().isNull());
+	assertTrue (weakB.isNull());
+	assertTrue (weakB.lock().isNull());
+	assertTrue (weakC.isNull());
+	assertTrue (weakC.lock().isNull());
+	assertTrue (weakD.isNull());
+	assertTrue (weakD.lock().isNull());
+	assertTrue (weakE.isNull());
+	assertTrue (weakE.lock().isNull());
 }
 
 

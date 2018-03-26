@@ -104,12 +104,12 @@ void ActiveMethodTest::testWait()
 {
 	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(123);
-	assert (!result.available());
+	assertTrue (!result.available());
 	activeObj.cont();
 	result.wait();
-	assert (result.available());
-	assert (result.data() == 123);
-	assert (!result.failed());
+	assertTrue (result.available());
+	assertTrue (result.data() == 123);
+	assertTrue (!result.failed());
 }
 
 
@@ -119,37 +119,37 @@ void ActiveMethodTest::testCopy()
 
 	ActiveObject::IntIntType ii = activeObj.testMethod;
 	ActiveResult<int> rii = ii(123);
-	assert (!rii.available());
+	assertTrue (!rii.available());
 	activeObj.cont();
 	rii.wait();
-	assert (rii.available());
-	assert (rii.data() == 123);
-	assert (!rii.failed());
+	assertTrue (rii.available());
+	assertTrue (rii.data() == 123);
+	assertTrue (!rii.failed());
 
 	ActiveObject::VoidIntType  vi = activeObj.testVoid;
 	ActiveResult<void> rvi = vi(123);
-	assert (!rvi.available());
+	assertTrue (!rvi.available());
 	activeObj.cont();
 	rvi.wait();
-	assert (rvi.available());
-	assert (!rvi.failed());
+	assertTrue (rvi.available());
+	assertTrue (!rvi.failed());
 
 	ActiveObject::VoidVoidType vv = activeObj.testVoidInOut;
 	ActiveResult<void> rvv = vv();
-	assert (!rvv.available());
+	assertTrue (!rvv.available());
 	activeObj.cont();
 	rvv.wait();
-	assert (rvv.available());
-	assert (!rvv.failed());
+	assertTrue (rvv.available());
+	assertTrue (!rvv.failed());
 
 	ActiveObject::IntVoidType  iv = activeObj.testVoidIn;
 	ActiveResult<int> riv = iv();
-	assert (!riv.available());
+	assertTrue (!riv.available());
 	activeObj.cont();
 	riv.wait();
-	assert (riv.available());
-	assert (riv.data() == 123);
-	assert (!riv.failed());
+	assertTrue (riv.available());
+	assertTrue (riv.data() == 123);
+	assertTrue (!riv.failed());
 }
 
 
@@ -157,7 +157,7 @@ void ActiveMethodTest::testWaitInterval()
 {
 	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(123);
-	assert (!result.available());
+	assertTrue (!result.available());
 	try
 	{
 		result.wait(100);
@@ -168,9 +168,9 @@ void ActiveMethodTest::testWaitInterval()
 	}
 	activeObj.cont();
 	result.wait(10000);
-	assert (result.available());
-	assert (result.data() == 123);
-	assert (!result.failed());
+	assertTrue (result.available());
+	assertTrue (result.data() == 123);
+	assertTrue (!result.failed());
 }
 
 
@@ -178,13 +178,13 @@ void ActiveMethodTest::testTryWait()
 {
 	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(123);
-	assert (!result.available());
-	assert (!result.tryWait(200));
+	assertTrue (!result.available());
+	assertTrue (!result.tryWait(200));
 	activeObj.cont();
-	assert (result.tryWait(10000));
-	assert (result.available());
-	assert (result.data() == 123);
-	assert (!result.failed());
+	assertTrue (result.tryWait(10000));
+	assertTrue (result.available());
+	assertTrue (result.data() == 123);
+	assertTrue (!result.failed());
 }
 
 
@@ -193,10 +193,10 @@ void ActiveMethodTest::testFailure()
 	ActiveObject activeObj;
 	ActiveResult<int> result = activeObj.testMethod(100);
 	result.wait();
-	assert (result.available());
-	assert (result.failed());
+	assertTrue (result.available());
+	assertTrue (result.failed());
 	std::string msg = result.error();
-	assert (msg == "n == 100");
+	assertTrue (msg == "n == 100");
 }
 
 
@@ -206,8 +206,8 @@ void ActiveMethodTest::testVoidOut()
 	ActiveResult<void> result = activeObj.testVoid(101);
 	activeObj.cont();
 	result.wait();
-	assert (result.available());
-	assert (!result.failed());
+	assertTrue (result.available());
+	assertTrue (!result.failed());
 }
 
 
@@ -217,8 +217,8 @@ void ActiveMethodTest::testVoidInOut()
 	ActiveResult<void> result = activeObj.testVoidInOut();
 	activeObj.cont();
 	result.wait();
-	assert (result.available());
-	assert (!result.failed());
+	assertTrue (result.available());
+	assertTrue (!result.failed());
 }
 
 
@@ -228,9 +228,9 @@ void ActiveMethodTest::testVoidIn()
 	ActiveResult<int> result = activeObj.testVoidIn();
 	activeObj.cont();
 	result.wait();
-	assert (result.available());
-	assert (!result.failed());
-	assert (result.data() == 123);
+	assertTrue (result.available());
+	assertTrue (!result.failed());
+	assertTrue (result.data() == 123);
 }
 
 

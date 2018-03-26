@@ -103,7 +103,7 @@ void RSATest::testRSANewKeys()
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -126,7 +126,7 @@ void RSATest::testRSANewKeysNoPassphrase()
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -147,7 +147,7 @@ void RSATest::testRSASign()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub);
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
+	assertTrue (eng2.verify(sig));
 }
 
 
@@ -168,7 +168,7 @@ void RSATest::testRSASignSha256()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub, "SHA256");
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
+	assertTrue (eng2.verify(sig));
 }
 
 
@@ -190,7 +190,7 @@ void RSATest::testRSASignManipulated()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub);
 	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
-	assert (!eng2.verify(sig));
+	assertTrue (!eng2.verify(sig));
 }
 
 
@@ -202,7 +202,7 @@ void RSATest::testRSACipher()
 		std::string val(n, 'x');
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
-		assert (dec == val);
+		assertTrue (dec == val);
 	}
 }
 
@@ -229,7 +229,7 @@ void RSATest::testRSACipherLarge()
 		std::string val(*it, 'x');
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
-		assert (dec == val);
+		assertTrue (dec == val);
 	}
 }
 
@@ -247,7 +247,7 @@ void RSATest::testRSACertificate()
 	
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
-	assert (dec == val);
+	assertTrue (dec == val);
 }
 
 

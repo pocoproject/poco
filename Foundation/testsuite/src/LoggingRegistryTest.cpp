@@ -52,14 +52,14 @@ void LoggingRegistryTest::testRegister()
 	reg.registerFormatter("f2", pF2);
 
 	Channel* pC = reg.channelForName("c1");
-	assert (pC1 == pC);
+	assertTrue (pC1 == pC);
 	pC = reg.channelForName("c2");
-	assert (pC2 == pC);
+	assertTrue (pC2 == pC);
 	
 	Formatter* pF = reg.formatterForName("f1");
-	assert (pF1 == pF);
+	assertTrue (pF1 == pF);
 	pF = reg.formatterForName("f2");
-	assert (pF2 == pF);
+	assertTrue (pF2 == pF);
 	
 	try
 	{
@@ -92,15 +92,15 @@ void LoggingRegistryTest::testReregister()
 	
 	reg.registerChannel("c1", pC1b);
 	Channel* pC = reg.channelForName("c1");
-	assert (pC1b == pC);
+	assertTrue (pC1b == pC);
 	pC = reg.channelForName("c2");
-	assert (pC2 == pC);
+	assertTrue (pC2 == pC);
 
 	reg.registerFormatter("f1", pF1b);
 	Formatter* pF = reg.formatterForName("f1");
-	assert (pF1b == pF);
+	assertTrue (pF1b == pF);
 	pF = reg.formatterForName("f2");
-	assert (pF2 == pF);
+	assertTrue (pF2 == pF);
 	
 }
 

@@ -205,7 +205,7 @@ void ODBCDB2Test::testStoredProcedure()
 		int i = 0;
 		session() << "{call " + db2Db() + "." << nm << "(?)}", out(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
-		assert(-1 == i);
+		assertTrue (-1 == i);
 
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
@@ -216,7 +216,7 @@ void ODBCDB2Test::testStoredProcedure()
 		int j = 0;
 		session() << "{call " + db2Db() + "." << nm << "(?, ?)}", in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
-		assert(4 == j);
+		assertTrue (4 == j);
 	
 		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
 			"BEGIN "
@@ -226,7 +226,7 @@ void ODBCDB2Test::testStoredProcedure()
 		i = 2;
 		session() << "{call " + db2Db() + "." << nm << "(?)}", io(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
-		assert(4 == i);
+		assertTrue (4 == i);
 
 		//TIMESTAMP is not supported as stored procedure parameter in DB2
 		//(SQL0182N An expression with a datetime value or a labeled duration is not valid.)
@@ -249,7 +249,7 @@ void ODBCDB2Test::testStoredProcedure()
 		std::string outParam;
 		session() << "{call " + db2Db() + "." << nm << "(?,?)}", in(inParam), out(outParam), now;
 		dropObject("PROCEDURE", nm + "(VARCHAR(1000), VARCHAR(1000))");
-		assert(inParam == outParam);
+		assertTrue (inParam == outParam);
 
 		k += 2;
 	}
@@ -277,7 +277,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 
 		session() << "{call " + db2Db() + "." << nm << "(?, ?)}", in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
-		assert(4 == AnyCast<int>(j));
+		assertTrue (4 == AnyCast<int>(j));
 
 		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
 			"BEGIN "
@@ -287,7 +287,7 @@ void ODBCDB2Test::testStoredProcedureAny()
 		i = 2;
 		session() << "{call " + db2Db() + "." << nm << "(?)}", io(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
-		assert(4 == AnyCast<int>(i));
+		assertTrue (4 == AnyCast<int>(i));
 		
 		k += 2;
 	}
@@ -314,7 +314,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 
 		session() << "{call " + db2Db() + "." << nm << "(?, ?)}", in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
-		assert(4 == j);
+		assertTrue (4 == j);
 
 		session() << "CREATE PROCEDURE " << nm << "(INOUT ioParam INTEGER) "
 			"BEGIN "
@@ -324,7 +324,7 @@ void ODBCDB2Test::testStoredProcedureDynamicAny()
 		i = 2;
 		session() << "{call " + db2Db() + "." << nm << "(?)}", io(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
-		assert(4 == i);
+		assertTrue (4 == i);
 
 		k += 2;
 	}
@@ -358,7 +358,7 @@ void ODBCDB2Test::testStoredFunction()
 			stat << "{ call " + db2Db() + "." << nm << "()}", now;
 			Poco::SQL::RecordSet rs(stat);
 
-			assert(0 == rs.rowCount());
+			assertTrue (0 == rs.rowCount());
 			dropObject("PROCEDURE", nm + "()");
 		}
 		{
@@ -381,15 +381,15 @@ void ODBCDB2Test::testStoredFunction()
 			Poco::Nullable<Any> an(Any(2));
 			stat << "{call " + db2Db() + "." << nm << "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}", useRef(ns), out(nd), out(tm), out(tms), out(n_i), out(i16), out(flt), out(dbl), out(s2), out(an), now;
 			dropObject("PROCEDURE", nm + "(VARCHAR(10), DATE, TIME, TIMESTAMP, INTEGER, SMALLINT, REAL, DOUBLE, VARCHAR(10), INTEGER)");
-			assert(nd.isNull());
-			assert(n_i.isNull());
-			assert(tm.isNull());
-			assert(tms.isNull());
-			assert(i16.isNull());
-			assert(flt.isNull());
-			assert(dbl.isNull());
-			assert(s2.isNull());
-			assert(an.isNull());
+			assertTrue (nd.isNull());
+			assertTrue (n_i.isNull());
+			assertTrue (tm.isNull());
+			assertTrue (tms.isNull());
+			assertTrue (i16.isNull());
+			assertTrue (flt.isNull());
+			assertTrue (dbl.isNull());
+			assertTrue (s2.isNull());
+			assertTrue (an.isNull());
 		}
 
 		session() << "CREATE PROCEDURE " << nm << "() "
@@ -400,7 +400,7 @@ void ODBCDB2Test::testStoredFunction()
 		int i = 0;
 		session() << "{? = call " + db2Db() + "." << nm << "()}", out(i), now;
 		dropObject("PROCEDURE", nm + "()");
-		assert(-1 == i);
+		assertTrue (-1 == i);
 
 
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER) "
@@ -412,7 +412,7 @@ void ODBCDB2Test::testStoredFunction()
 		int result = 0;
 		session() << "{? = call " + db2Db() + "." << nm << "(?)}", out(result), in(i), now;
 		dropObject("PROCEDURE", nm + "(INTEGER)");
-		assert(4 == result);
+		assertTrue (4 == result);
 
 		session() << "CREATE PROCEDURE " << nm << "(inParam INTEGER, OUT outParam INTEGER) "
 			"BEGIN "
@@ -425,8 +425,8 @@ void ODBCDB2Test::testStoredFunction()
 		result = 0;
 		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), in(i), out(j), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
-		assert(4 == j);
-		assert(j == result);
+		assertTrue (4 == j);
+		assertTrue (j == result);
 
 		session() << "CREATE PROCEDURE " << nm << "(INOUT param1 INTEGER, INOUT param2 INTEGER) "
 			"BEGIN "
@@ -441,19 +441,19 @@ void ODBCDB2Test::testStoredFunction()
 		j = 2;
 		result = 0;
 		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), io(i), io(j), now;
-		assert(1 == j);
-		assert(2 == i);
-		assert(3 == result);
+		assertTrue (1 == j);
+		assertTrue (2 == i);
+		assertTrue (3 == result);
 
 		Tuple<int, int> params(1, 2);
-		assert(1 == params.get<0>());
-		assert(2 == params.get<1>());
+		assertTrue (1 == params.get<0>());
+		assertTrue (2 == params.get<1>());
 		result = 0;
 		session() << "{? = call " + db2Db() + "." << nm << "(?, ?)}", out(result), io(params), now;
 		dropObject("PROCEDURE", nm + "(INTEGER, INTEGER)");
-		assert(1 == params.get<1>());
-		assert(2 == params.get<0>());
-		assert(3 == result);
+		assertTrue (1 == params.get<1>());
+		assertTrue (2 == params.get<0>());
+		assertTrue (3 == result);
 
 		session().setFeature("autoBind", true);
 
@@ -468,8 +468,8 @@ void ODBCDB2Test::testStoredFunction()
 		int ret;
 		session() << "{? = call " + db2Db() + "." << nm << "(?,?)}", out(ret), in(inParam), out(outParam), now;
 		dropObject("PROCEDURE", nm + "(VARCHAR(10), VARCHAR(10))");
-		assert(inParam == outParam);
-		assert(ret == inParam.size());
+		assertTrue (inParam == outParam);
+		assertTrue (ret == inParam.size());
 
 		k += 2;
 	}
@@ -490,33 +490,33 @@ void ODBCDB2Test::testXMLColumn()
 		stat << "SELECT id, x,cl, dbcl FROM " << tbl, now;
 		
 		Poco::SQL::RecordSet rs(stat);
-		assert(1 == rs.rowCount());
-		assert(4 == rs.columnCount());
+		assertTrue (1 == rs.rowCount());
+		assertTrue (4 == rs.columnCount());
 		int id = rs.value<int>(0);
-		assert(1 == id);
+		assertTrue (1 == id);
 
 		Poco::SQL::BLOB xml = rs.value<Poco::SQL::BLOB>(1);
 		std::string readStr(reinterpret_cast<const char*>(xml.rawContent()), xml.size());
-		assert(readStr.find(xmlStr) < readStr.length());
+		assertTrue (readStr.find(xmlStr) < readStr.length());
 
 		Poco::SQL::CLOB cl = rs.value<Poco::SQL::CLOB>(2);
-		assert(xmlStr == std::string(cl.rawContent(), cl.size()));
+		assertTrue (xmlStr == std::string(cl.rawContent(), cl.size()));
 
 		const Poco::UTF16String us = rs.value<Poco::UTF16String>(3);
-		assert(uStr == us);
+		assertTrue (uStr == us);
 		// check nullables
 		Poco::Nullable<Poco::SQL::CLOB> ncl = Poco::Nullable<Poco::SQL::CLOB>(Poco::SQL::CLOB());
-		assert(false == ncl.isNull());
+		assertTrue (false == ncl.isNull());
 		Poco::Nullable<Poco::SQL::BLOB> nbl = Poco::Nullable<Poco::SQL::BLOB>(Poco::SQL::BLOB());
-		assert(false == nbl.isNull());
+		assertTrue (false == nbl.isNull());
 		Poco::Nullable<Poco::UTF16String> usn(Poco::UTF16String(2, Poco::UTF16Char('a')));
-		assert(false == usn.isNull());
+		assertTrue (false == usn.isNull());
 		session() << "INSERT INTO " << tbl << " (id) VALUES (99) ", now;
 		session() << "SELECT x,cl, dbcl FROM " << tbl << " WHERE id > 1", into(nbl), into(ncl), into(usn), now;
 
-		assert(true == ncl.isNull());
-		assert(true == nbl.isNull());
-		assert(true == usn.isNull());
+		assertTrue (true == ncl.isNull());
+		assertTrue (true == nbl.isNull());
+		assertTrue (true == usn.isNull());
 	}
 	catch (const Poco::Exception& e)
 	{

@@ -43,54 +43,54 @@ ManifestTest::~ManifestTest()
 void ManifestTest::testManifest()
 {
 	Manifest<MfTestBase> manifest;
-	assert (manifest.empty());
-	assert (manifest.size() == 0);
-	assert (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject1")));
-	assert (!manifest.empty());
-	assert (manifest.size() == 1);
-	assert (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject2")));
+	assertTrue (manifest.empty());
+	assertTrue (manifest.size() == 0);
+	assertTrue (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject1")));
+	assertTrue (!manifest.empty());
+	assertTrue (manifest.size() == 1);
+	assertTrue (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject2")));
 	MetaObject<MfTestObject, MfTestBase>* pMeta = new MetaObject<MfTestObject, MfTestBase>("MfTestObject2");
-	assert (!manifest.insert(pMeta));
+	assertTrue (!manifest.insert(pMeta));
 	delete pMeta;
-	assert (!manifest.empty());
-	assert (manifest.size() == 2);
-	assert (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject3")));
-	assert (manifest.size() == 3);
+	assertTrue (!manifest.empty());
+	assertTrue (manifest.size() == 2);
+	assertTrue (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject3")));
+	assertTrue (manifest.size() == 3);
 
-	assert (manifest.find("MfTestObject1") != manifest.end());
-	assert (manifest.find("MfTestObject2") != manifest.end());
-	assert (manifest.find("MfTestObject3") != manifest.end());
-	assert (manifest.find("MfTestObject4") == manifest.end());
+	assertTrue (manifest.find("MfTestObject1") != manifest.end());
+	assertTrue (manifest.find("MfTestObject2") != manifest.end());
+	assertTrue (manifest.find("MfTestObject3") != manifest.end());
+	assertTrue (manifest.find("MfTestObject4") == manifest.end());
 	
 	std::set<std::string> classes;
 	
 	Manifest<MfTestBase>::Iterator it = manifest.begin();
-	assert (it != manifest.end());
+	assertTrue (it != manifest.end());
 	classes.insert(it->name());
 	++it;
-	assert (it != manifest.end());
+	assertTrue (it != manifest.end());
 	classes.insert(it->name());
 	++it;
-	assert (it != manifest.end());
+	assertTrue (it != manifest.end());
 	classes.insert(it->name());
 	it++;
-	assert (it == manifest.end());
+	assertTrue (it == manifest.end());
 	
-	assert (classes.find("MfTestObject1") != classes.end());
-	assert (classes.find("MfTestObject2") != classes.end());
-	assert (classes.find("MfTestObject3") != classes.end());
+	assertTrue (classes.find("MfTestObject1") != classes.end());
+	assertTrue (classes.find("MfTestObject2") != classes.end());
+	assertTrue (classes.find("MfTestObject3") != classes.end());
 	
 	manifest.clear();
-	assert (manifest.empty());
-	assert (manifest.size() == 0);
-	assert (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject4")));
-	assert (!manifest.empty());
-	assert (manifest.size() == 1);
+	assertTrue (manifest.empty());
+	assertTrue (manifest.size() == 0);
+	assertTrue (manifest.insert(new MetaObject<MfTestObject, MfTestBase>("MfTestObject4")));
+	assertTrue (!manifest.empty());
+	assertTrue (manifest.size() == 1);
 	it = manifest.begin();
-	assert (it != manifest.end());
-	assert (std::string(it->name()) == "MfTestObject4");
+	assertTrue (it != manifest.end());
+	assertTrue (std::string(it->name()) == "MfTestObject4");
 	++it;
-	assert (it == manifest.end());
+	assertTrue (it == manifest.end());
 }
 
 

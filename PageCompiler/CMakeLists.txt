@@ -19,7 +19,7 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     )
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
 #    add_subdirectory(samples)
 endif ()
 
