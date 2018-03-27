@@ -199,7 +199,7 @@ const std::string& Object::getKey(KeyList::const_iterator& iter) const
 }
 
 
-void Object::set(const std::string& key, const Dynamic::Var& value)
+Object& Object::set(const std::string& key, const Dynamic::Var& value)
 {
 	std::pair<ValueMap::iterator, bool> ret = _values.insert(ValueMap::value_type(key, value));
 	if (!ret.second) ret.first->second = value;
@@ -209,11 +209,12 @@ void Object::set(const std::string& key, const Dynamic::Var& value)
 		KeyList::iterator end = _keys.end();
 		for (; it != end; ++it)
 		{
-			if (key == (*it)->first) return;
+			if (key == (*it)->first) return *this;
 		}
 		_keys.push_back(ret.first);
 	}
 	_modified = true;
+	return *this;
 }
 
 
