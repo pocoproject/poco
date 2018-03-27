@@ -322,11 +322,6 @@ public:
 		return _ptr == 0;
 	}
 
-	operator bool () const
-	{
-		return _ptr != 0;
-	}
-
 	bool isNull() const
 	{
 		return _ptr == 0;

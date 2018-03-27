@@ -339,12 +339,6 @@ public:
 		return false;
 	}
 
-	operator bool () const
-	{
-		if (good()) return _ptr != 0;
-		return false;
-	}
-
 	bool isNull() const
 	{
 		if (good()) return (_pCounter == 0 || _ptr == 0);

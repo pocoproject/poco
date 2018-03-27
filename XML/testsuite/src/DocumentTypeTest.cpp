@@ -48,7 +48,7 @@ void DocumentTypeTest::testDocumentType()
 	assertTrue (pDoctype->publicId() == "public");
 	assertTrue (pDoctype->systemId() == "system");
 	
-	AutoPtr<Document> pDoc = new Document((DocumentType*)pDoctype);
+	AutoPtr<Document> pDoc = new Document(pDoctype);
 	assertTrue (pDoc->doctype() == pDoctype);
 	assertTrue (pDoctype->ownerDocument() == pDoc);
 
