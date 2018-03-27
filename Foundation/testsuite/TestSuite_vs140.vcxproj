@@ -359,6 +359,7 @@
     <ClCompile Include="src\LinearHashTableTest.cpp"/>
     <ClCompile Include="src\LineEndingConverterTest.cpp"/>
     <ClCompile Include="src\ListMapTest.cpp"/>
+    <ClCompile Include="src\OrderedContainersTest.cpp"/>
     <ClCompile Include="src\LocalDateTimeTest.cpp"/>
     <ClCompile Include="src\LoggerTest.cpp"/>
     <ClCompile Include="src\LoggingFactoryTest.cpp"/>
@@ -503,6 +504,7 @@
     <ClInclude Include="src\LinearHashTableTest.h"/>
     <ClInclude Include="src\LineEndingConverterTest.h"/>
     <ClInclude Include="src\ListMapTest.h"/>
+    <ClInclude Include="src\OrderedContainersTest.h"/>
     <ClInclude Include="src\LocalDateTimeTest.h"/>
     <ClInclude Include="src\LoggerTest.h"/>
     <ClInclude Include="src\LoggingFactoryTest.h"/>

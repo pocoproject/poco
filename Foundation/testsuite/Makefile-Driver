@@ -19,8 +19,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
-	NotificationsTestSuite NullStreamTest NumberFormatterTest \
-	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
+	NotificationsTestSuite NullStreamTest NumberFormatterTest NumberParserTest \
+	OrderedContainersTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
 	RandomStreamTest RandomTest RefPtrTest RegularExpressionTest SHA1EngineTest \
 	SHA2EngineTest SHA3EngineTest BLAKE2EngineTest SemaphoreTest MutexTest \
 	ConditionTest SharedLibraryTest SharedLibraryTestSuite SimpleFileChannelTest \

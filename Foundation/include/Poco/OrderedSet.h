@@ -31,7 +31,7 @@ template<class Key,
 		class KeyEqual = std::equal_to<Key>,
 		class Allocator = std::allocator<Key>,
 		class ValueTypeContainer = std::deque<Key, Allocator>>
-using OrderedSet = tsl::ordered_set<Key, T, Hash, KeyEqual, Allocator, ValueTypeContainer>;
+using OrderedSet = tsl::ordered_set<Key, Hash, KeyEqual, Allocator, ValueTypeContainer>;
 	/// For documentation, see https://tessil.github.io/ordered-map/
 
 } // namespace Poco

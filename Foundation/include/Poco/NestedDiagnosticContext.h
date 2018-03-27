@@ -151,11 +151,11 @@ public:
 
 	static std::string backTrace(int skipEnd = 1, int skipBegin = 0, int stackSize = 128, int bufSize = 1024);
 
-	static void dumpRef(std::ostream& os, bool leakOnly = true);
+	//static void dumpRef(std::ostream& os, bool leakOnly = true);
 
-	static void dumpAllRef(std::ostream& os);
+	//static void dumpAllRef(std::ostream& os);
 
-	static void dumpLeakRef(std::ostream& os);
+	//static void dumpLeakRef(std::ostream& os);
 
 private:
 	struct Context
@@ -175,7 +175,7 @@ private:
 //
 // inlines
 //
-
+/*
 inline void NestedDiagnosticContext::dumpAllRef(std::ostream& os)
 {
 	dumpRef(os, false);
@@ -186,7 +186,7 @@ inline void NestedDiagnosticContext::dumpLeakRef(std::ostream& os)
 {
 	dumpRef(os, true);
 }
-
+*/
 
 typedef NestedDiagnosticContext NDC;
 
