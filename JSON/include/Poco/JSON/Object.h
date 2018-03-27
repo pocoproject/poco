@@ -205,7 +205,7 @@ public:
 	std::size_t size() const;
 		/// Returns the number of properties.
 
-	void set(const std::string& key, const Dynamic::Var& value);
+	Object& set(const std::string& key, const Dynamic::Var& value);
 		/// Sets a new value.
 
 	void stringify(std::ostream& out, unsigned int indent = 0, int step = -1) const;
