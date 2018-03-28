@@ -106,7 +106,7 @@ public:
 	void testNulls();
 	void testRowIterator();
 	void testRowIteratorLimit();
-	void testFilter();
+	void testRowFilter();
 	void testAsync();
 
 	void testAny();
