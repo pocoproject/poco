@@ -20,7 +20,6 @@
 
 #include "Poco/Redis/Client.h"
 #include "Poco/ObjectPool.h"
-#include "Poco/Version.h"
 
 
 namespace Poco {
