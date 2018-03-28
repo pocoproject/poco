@@ -18,8 +18,12 @@
 #define Foundation_Config_INCLUDED
 
 
-// NOTE: As of POCO C++ Libraries release 2.0.0, compiling POCO
-// without c++11 support is deprecated.
+#include "Poco/Version.h"
+
+
+#if POCO_VERSION >= 0x02000000
+	#define POCO_ENABLE_CPP11
+#endif
 
 // Define to enable C++14 support
 // #define POCO_ENABLE_CPP14
