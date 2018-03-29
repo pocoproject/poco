@@ -1,30 +1,18 @@
-# POCO_BUILD_TYPE
-# POCO_STATIC
-# POCO_UNBUNDLED
-# POCO_NO_LOCALE
-#
-# ENABLE_{COMPONENT}
-# ENABLE_TESTS
-
 cmake_minimum_required(VERSION 3.2.0)
 
 project(Poco)
 
-set(CMAKE_C_STANDARD 11)
-
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
-
 # Read the version information from the VERSION file
-file(STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION)
-message(STATUS "Poco package version: ${PACKAGE_VERSION}")
+file (STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
 string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
 string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
 string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION})
 
-set(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
-set(PROJECT_VERSION ${COMPLETE_VERSION})
-set(CMAKE_C_STANDARD 99)
+
+message(STATUS "Poco package version: ${PROJECT_VERSION}")
 
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
@@ -38,11 +26,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Append our module directory to CMake
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# COMMENT REPLACED BY BIICODE
 
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
+set(CMAKE_C_STANDARD 99)
 
 option(DISABLE_CPP11 "Disable C++11 if available" OFF)
 option(DISABLE_CPP14 "Disable C++14 if available" OFF)
@@ -70,17 +58,10 @@ else()
     endif()
 endif()
 
-if(NOT MSVC_IDE)
-  if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
-      "Choose the type of build, options are: None Debug Release" FORCE)
-  endif()
-  message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "")
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
+message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
 
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
@@ -168,37 +149,43 @@ endif()
 
 add_subdirectory(Foundation)
 if(ENABLE_ENCODINGS)
-add_subdirectory(Encodings)
-list(APPEND Poco_COMPONENTS "Encodings")
+    add_subdirectory(Encodings)
+    list(APPEND Poco_COMPONENTS "Encodings")
 endif()
+
 if(ENABLE_XML)
-add_subdirectory(XML)
-list(APPEND Poco_COMPONENTS "XML")
+    add_subdirectory(XML)
+    list(APPEND Poco_COMPONENTS "XML")
 endif()
+
 if(ENABLE_JSON)
-add_subdirectory(JSON)
-list(APPEND Poco_COMPONENTS "JSON")
+    add_subdirectory(JSON)
+    list(APPEND Poco_COMPONENTS "JSON")
 endif()
+
 if(ENABLE_UTIL)
-add_subdirectory(Util)
-list(APPEND Poco_COMPONENTS "Util")
+    add_subdirectory(Util)
+    list(APPEND Poco_COMPONENTS "Util")
 endif()
+
 if(ENABLE_NET)
-add_subdirectory(Net)
-list(APPEND Poco_COMPONENTS "Net")
+    add_subdirectory(Net)
+    list(APPEND Poco_COMPONENTS "Net")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/MongoDB AND ENABLE_MONGODB)
-add_subdirectory(MongoDB)
-list(APPEND Poco_COMPONENTS "MongoDB")
+    add_subdirectory(MongoDB)
+    list(APPEND Poco_COMPONENTS "MongoDB")
 endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/Redis AND ENABLE_REDIS)
-add_subdirectory(Redis)
-list(APPEND Poco_COMPONENTS "Redis")
+    add_subdirectory(Redis)
+    list(APPEND Poco_COMPONENTS "Redis")
 endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/PDF AND ENABLE_PDF)
-add_subdirectory(PDF)
-list(APPEND Poco_COMPONENTS "PDF")
+    add_subdirectory(PDF)
+    list(APPEND Poco_COMPONENTS "PDF")
 endif()
 
 
@@ -214,26 +201,28 @@ find_package(OpenSSL)
 if(OPENSSL_FOUND)
     include_directories("${OPENSSL_INCLUDE_DIR}")
     if(EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_OpenSSL AND ENABLE_NETSSL)
-    add_subdirectory(NetSSL_OpenSSL)
-    list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
+        add_subdirectory(NetSSL_OpenSSL)
+        list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
     endif()
     if(EXISTS ${PROJECT_SOURCE_DIR}/Crypto AND ENABLE_CRYPTO)
-    add_subdirectory(Crypto)
-    list(APPEND Poco_COMPONENTS "Crypto")
+        add_subdirectory(Crypto)
+        list(APPEND Poco_COMPONENTS "Crypto")
     endif()
 endif(OPENSSL_FOUND)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
-add_subdirectory(Data)
-list(APPEND Poco_COMPONENTS "Data")
+    add_subdirectory(Data)
+    list(APPEND Poco_COMPONENTS "Data")
 endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/SevenZip AND ENABLE_SEVENZIP)
-add_subdirectory(SevenZip)
-list(APPEND Poco_COMPONENTS "SevenZip")
+    add_subdirectory(SevenZip)
+    list(APPEND Poco_COMPONENTS "SevenZip")
 endif()
+
 if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP)
-add_subdirectory(Zip)
-list(APPEND Poco_COMPONENTS "Zip")
+    add_subdirectory(Zip)
+    list(APPEND Poco_COMPONENTS "Zip")
 endif()
 
 find_package(APR)
@@ -241,34 +230,34 @@ find_package(Apache2)
 if(APRUTIL_FOUND AND APACHE_FOUND)
     include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" )
     if(EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
-    add_subdirectory(ApacheConnector)
-    list(APPEND Poco_COMPONENTS "ApacheConnector")
+        add_subdirectory(ApacheConnector)
+        list(APPEND Poco_COMPONENTS "ApacheConnector")
     endif()
 endif(APRUTIL_FOUND AND APACHE_FOUND)
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/CppParser AND ENABLE_CPPPARSER)
-add_subdirectory(CppParser)
-list(APPEND Poco_COMPONENTS "CppParser")
+    add_subdirectory(CppParser)
+    list(APPEND Poco_COMPONENTS "CppParser")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PocoDoc AND ENABLE_POCODOC)
-add_subdirectory(PocoDoc)
-list(APPEND Poco_COMPONENTS "PocoDoc")
+    add_subdirectory(PocoDoc)
+    list(APPEND Poco_COMPONENTS "PocoDoc")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PageCompiler AND ENABLE_PAGECOMPILER)
-add_subdirectory(PageCompiler)
-list(APPEND Poco_COMPONENTS "PageCompiler")
+    add_subdirectory(PageCompiler)
+    list(APPEND Poco_COMPONENTS "PageCompiler")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PageCompiler/File2Page AND ENABLE_PAGECOMPILER_FILE2PAGE)
-add_subdirectory(PageCompiler/File2Page)
-list(APPEND Poco_COMPONENTS "File2Page")
+    add_subdirectory(PageCompiler/File2Page)
+    list(APPEND Poco_COMPONENTS "File2Page")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
-add_subdirectory(Encodings/Compiler)
-list(APPEND Poco_COMPONENTS "EncodingsCompiler")
+    add_subdirectory(Encodings/Compiler)
+    list(APPEND Poco_COMPONENTS "EncodingsCompiler")
 endif()
 
 
@@ -337,6 +326,5 @@ message(STATUS "CMAKE_CXX_FLAGS_MINSIZEREL:=${CMAKE_CXX_FLAGS_MINSIZEREL}")
 message(STATUS "CMAKE_CXX_FLAGS_RELWITHDEBINFO:=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 
 foreach(component ${Poco_COMPONENTS})
-message(STATUS "Building: ${component}")
+    message(STATUS "Building: ${component}")
 endforeach()
-
