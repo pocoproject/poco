@@ -1,13 +1,3 @@
-# POCO_BUILD_TYPE
-# POCO_STATIC
-# POCO_UNBUNDLED
-# POCO_NO_LOCALE
-#
-# POCO_ENABLE_{COMPONENT}
-# POCO_ENABLE_TESTS
-# POCO_ENABLE_SAMPLES
-# POCO_DISABLE_INTERNAL_OPENSSL
-
 cmake_minimum_required(VERSION 3.2.0)
 
 project(Poco)
@@ -15,20 +5,18 @@ project(Poco)
 option(POCO_VERBOSE_MESSAGES "Enable informational messages during configure" ON)
 
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
-
 # Read the version information from the VERSION file
 file (STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
-if(POCO_VERBOSE_MESSAGES)
-    message(STATUS "Poco package version: ${PACKAGE_VERSION}")
-endif()
 string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
 string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
 string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION})
 
-set(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
-set(PROJECT_VERSION ${COMPLETE_VERSION})
-set(CMAKE_C_STANDARD 99)
+
+if(POCO_VERBOSE_MESSAGES)
+    message(STATUS "Poco package version: ${PROJECT_VERSION}")
+endif()
 
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
@@ -46,6 +34,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
+set(CMAKE_C_STANDARD 99)
 
 option(DISABLE_CPP14 "Disable C++14 if available" OFF)
 
@@ -62,14 +51,7 @@ else()
   endif()
 endif()
 
-if(NOT MSVC_IDE)
-    if(NOT CMAKE_BUILD_TYPE)
-      set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
-          "Choose the type of build, options are: None Debug Release" FORCE)
-    endif()
-endif()
-
-if (CMAKE_BUILD_TYPE STREQUAL "")
+if (NO CMAKE_BUILD_TYPE STREQUAL)
     set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
 endif()
 
@@ -91,7 +73,7 @@ option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
 option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
 
 if(POCO_STATIC)
-    message(WARNING "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
+    message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
     option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 else()
     option(BUILD_SHARED_LIBS "Build shared libraries" ON)
