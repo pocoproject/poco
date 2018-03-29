@@ -80,7 +80,7 @@ SemaphoreTest::~SemaphoreTest()
 void SemaphoreTest::testInitZero()
 {
 	SemaRunnable r(0, 3);
-	assert (!r.tryWait(10));
+	assertTrue (!r.tryWait(10));
 	r.set();
 	r.wait();
 	try
@@ -97,18 +97,18 @@ void SemaphoreTest::testInitZero()
 	}
 	r.set();
 	r.set();
-	assert (r.tryWait(0));
+	assertTrue (r.tryWait(0));
 	r.wait();
-	assert (!r.tryWait(10));
+	assertTrue (!r.tryWait(10));
 	
 	Thread t;
 	t.start(r);
 	Thread::sleep(100);
-	assert (!r.ran());
+	assertTrue (!r.ran());
 	r.set();
 	t.join();
-	assert (r.ran());
-	assert (!r.tryWait(10));
+	assertTrue (r.ran());
+	assertTrue (!r.tryWait(10));
 }
 
 
@@ -116,11 +116,11 @@ void SemaphoreTest::testInitNonZero()
 {
 	SemaRunnable r(2, 2);
 	r.wait();
-	assert (r.tryWait(10));
-	assert (!r.tryWait(10));
+	assertTrue (r.tryWait(10));
+	assertTrue (!r.tryWait(10));
 	r.set();
-	assert (r.tryWait(10));
-	assert (!r.tryWait(10));
+	assertTrue (r.tryWait(10));
+	assertTrue (!r.tryWait(10));
 }
 
 

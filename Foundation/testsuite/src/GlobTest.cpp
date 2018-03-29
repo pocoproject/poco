@@ -35,343 +35,343 @@ GlobTest::~GlobTest()
 void GlobTest::testMatchChars()
 {
 	Glob g1("a");
-	assert (g1.match("a"));
-	assert (!g1.match("b"));
-	assert (!g1.match("aa"));
-	assert (!g1.match(""));
+	assertTrue (g1.match("a"));
+	assertTrue (!g1.match("b"));
+	assertTrue (!g1.match("aa"));
+	assertTrue (!g1.match(""));
 	
 	Glob g2("ab");
-	assert (g2.match("ab"));
-	assert (!g2.match("aab"));
-	assert (!g2.match("abab"));
+	assertTrue (g2.match("ab"));
+	assertTrue (!g2.match("aab"));
+	assertTrue (!g2.match("abab"));
 }
 
 
 void GlobTest::testMatchQM()
 {
 	Glob g1("?");
-	assert (g1.match("a"));
-	assert (g1.match("b"));
-	assert (!g1.match("aa"));
-	assert (g1.match("."));
+	assertTrue (g1.match("a"));
+	assertTrue (g1.match("b"));
+	assertTrue (!g1.match("aa"));
+	assertTrue (g1.match("."));
 	
 	Glob g2("\\?");
-	assert (g2.match("?"));
-	assert (!g2.match("a"));
-	assert (!g2.match("ab"));
+	assertTrue (g2.match("?"));
+	assertTrue (!g2.match("a"));
+	assertTrue (!g2.match("ab"));
 	
 	Glob g3("a?");
-	assert (g3.match("aa"));
-	assert (g3.match("az"));
-	assert (!g3.match("a"));
-	assert (!g3.match("aaa"));
+	assertTrue (g3.match("aa"));
+	assertTrue (g3.match("az"));
+	assertTrue (!g3.match("a"));
+	assertTrue (!g3.match("aaa"));
 	
 	Glob g4("??");
-	assert (g4.match("aa"));
-	assert (g4.match("ab"));
-	assert (!g4.match("a"));
-	assert (!g4.match("abc"));
+	assertTrue (g4.match("aa"));
+	assertTrue (g4.match("ab"));
+	assertTrue (!g4.match("a"));
+	assertTrue (!g4.match("abc"));
 	
 	Glob g5("?a?");
-	assert (g5.match("aaa"));
-	assert (g5.match("bac"));
-	assert (!g5.match("bbc"));
-	assert (!g5.match("ba"));
-	assert (!g5.match("ab"));
+	assertTrue (g5.match("aaa"));
+	assertTrue (g5.match("bac"));
+	assertTrue (!g5.match("bbc"));
+	assertTrue (!g5.match("ba"));
+	assertTrue (!g5.match("ab"));
 
 	Glob g6("a\\?");
-	assert (g6.match("a?"));
-	assert (!g6.match("az"));
-	assert (!g6.match("a"));
+	assertTrue (g6.match("a?"));
+	assertTrue (!g6.match("az"));
+	assertTrue (!g6.match("a"));
 	
 	Glob g7("?", Glob::GLOB_DOT_SPECIAL);
-	assert (g7.match("a"));
-	assert (g7.match("b"));
-	assert (!g7.match("aa"));
-	assert (!g7.match("."));
+	assertTrue (g7.match("a"));
+	assertTrue (g7.match("b"));
+	assertTrue (!g7.match("aa"));
+	assertTrue (!g7.match("."));
 }
 
 
 void GlobTest::testMatchAsterisk()
 {
 	Glob g1("*");
-	assert (g1.match(""));
-	assert (g1.match("a"));
-	assert (g1.match("ab"));
-	assert (g1.match("abc"));
-	assert (g1.match("."));
+	assertTrue (g1.match(""));
+	assertTrue (g1.match("a"));
+	assertTrue (g1.match("ab"));
+	assertTrue (g1.match("abc"));
+	assertTrue (g1.match("."));
 	
 	Glob g2("a*");
-	assert (g2.match("a"));
-	assert (g2.match("aa"));
-	assert (g2.match("abc"));
-	assert (!g2.match("b"));
-	assert (!g2.match("ba"));
+	assertTrue (g2.match("a"));
+	assertTrue (g2.match("aa"));
+	assertTrue (g2.match("abc"));
+	assertTrue (!g2.match("b"));
+	assertTrue (!g2.match("ba"));
 
 	Glob g3("ab*");
-	assert (g3.match("ab"));
-	assert (g3.match("abc"));
-	assert (g3.match("abab"));
-	assert (!g3.match("ac"));
-	assert (!g3.match("baab"));
+	assertTrue (g3.match("ab"));
+	assertTrue (g3.match("abc"));
+	assertTrue (g3.match("abab"));
+	assertTrue (!g3.match("ac"));
+	assertTrue (!g3.match("baab"));
 	
 	Glob g4("*a");
-	assert (g4.match("a"));
-	assert (g4.match("ba"));
-	assert (g4.match("aa"));
-	assert (g4.match("aaaaaa"));
-	assert (g4.match("bbbbba"));
-	assert (!g4.match("b"));
-	assert (!g4.match("ab"));
-	assert (!g4.match("aaab"));
+	assertTrue (g4.match("a"));
+	assertTrue (g4.match("ba"));
+	assertTrue (g4.match("aa"));
+	assertTrue (g4.match("aaaaaa"));
+	assertTrue (g4.match("bbbbba"));
+	assertTrue (!g4.match("b"));
+	assertTrue (!g4.match("ab"));
+	assertTrue (!g4.match("aaab"));
 	
 	Glob g5("a*a");
-	assert (g5.match("aa"));
-	assert (g5.match("aba"));
-	assert (g5.match("abba"));
-	assert (!g5.match("aab"));
-	assert (!g5.match("aaab"));
-	assert (!g5.match("baaaa"));
+	assertTrue (g5.match("aa"));
+	assertTrue (g5.match("aba"));
+	assertTrue (g5.match("abba"));
+	assertTrue (!g5.match("aab"));
+	assertTrue (!g5.match("aaab"));
+	assertTrue (!g5.match("baaaa"));
 	
 	Glob g6("a*b*c");
-	assert (g6.match("abc"));
-	assert (g6.match("aabbcc"));
-	assert (g6.match("abcbbc"));
-	assert (g6.match("aaaabbbbcccc"));
-	assert (!g6.match("aaaabbbcb"));
+	assertTrue (g6.match("abc"));
+	assertTrue (g6.match("aabbcc"));
+	assertTrue (g6.match("abcbbc"));
+	assertTrue (g6.match("aaaabbbbcccc"));
+	assertTrue (!g6.match("aaaabbbcb"));
 	
 	Glob g7("a*b*");
-	assert (g7.match("aaabbb"));
-	assert (g7.match("abababab"));
-	assert (g7.match("ab"));
-	assert (g7.match("aaaaab"));
-	assert (!g7.match("a"));
-	assert (!g7.match("aa"));
-	assert (!g7.match("aaa"));
+	assertTrue (g7.match("aaabbb"));
+	assertTrue (g7.match("abababab"));
+	assertTrue (g7.match("ab"));
+	assertTrue (g7.match("aaaaab"));
+	assertTrue (!g7.match("a"));
+	assertTrue (!g7.match("aa"));
+	assertTrue (!g7.match("aaa"));
 
 	Glob g8("**");
-	assert (g1.match(""));
-	assert (g1.match("a"));
-	assert (g1.match("ab"));
-	assert (g1.match("abc"));
+	assertTrue (g1.match(""));
+	assertTrue (g1.match("a"));
+	assertTrue (g1.match("ab"));
+	assertTrue (g1.match("abc"));
 	
 	Glob g9("a\\*");
-	assert (g9.match("a*"));
-	assert (!g9.match("aa"));
-	assert (!g9.match("a"));
+	assertTrue (g9.match("a*"));
+	assertTrue (!g9.match("aa"));
+	assertTrue (!g9.match("a"));
 	
 	Glob g10("a*\\*");
-	assert (g10.match("a*"));
-	assert (g10.match("aaa*"));
-	assert (!g10.match("a"));
-	assert (!g10.match("aa"));
+	assertTrue (g10.match("a*"));
+	assertTrue (g10.match("aaa*"));
+	assertTrue (!g10.match("a"));
+	assertTrue (!g10.match("aa"));
 	
 	Glob g11("*", Glob::GLOB_DOT_SPECIAL);
-	assert (g11.match(""));
-	assert (g11.match("a"));
-	assert (g11.match("ab"));
-	assert (g11.match("abc"));
-	assert (!g11.match("."));
+	assertTrue (g11.match(""));
+	assertTrue (g11.match("a"));
+	assertTrue (g11.match("ab"));
+	assertTrue (g11.match("abc"));
+	assertTrue (!g11.match("."));
 }
 
 
 void GlobTest::testMatchRange()
 {
 	Glob g1("[a]");
-	assert (g1.match("a"));
-	assert (!g1.match("b"));
-	assert (!g1.match("aa"));
+	assertTrue (g1.match("a"));
+	assertTrue (!g1.match("b"));
+	assertTrue (!g1.match("aa"));
 	
 	Glob g2("[ab]");
-	assert (g2.match("a"));
-	assert (g2.match("b"));
-	assert (!g2.match("c"));
-	assert (!g2.match("ab"));
+	assertTrue (g2.match("a"));
+	assertTrue (g2.match("b"));
+	assertTrue (!g2.match("c"));
+	assertTrue (!g2.match("ab"));
 	
 	Glob g3("[abc]");
-	assert (g3.match("a"));
-	assert (g3.match("b"));
-	assert (g3.match("c"));
-	assert (!g3.match("ab"));
+	assertTrue (g3.match("a"));
+	assertTrue (g3.match("b"));
+	assertTrue (g3.match("c"));
+	assertTrue (!g3.match("ab"));
 	
 	Glob g4("[a-z]");
-	assert (g4.match("a"));
-	assert (g4.match("z"));
-	assert (!g4.match("A"));
+	assertTrue (g4.match("a"));
+	assertTrue (g4.match("z"));
+	assertTrue (!g4.match("A"));
 	
 	Glob g5("[!a]");
-	assert (g5.match("b"));
-	assert (g5.match("c"));
-	assert (!g5.match("a"));
-	assert (!g5.match("bb"));
+	assertTrue (g5.match("b"));
+	assertTrue (g5.match("c"));
+	assertTrue (!g5.match("a"));
+	assertTrue (!g5.match("bb"));
 	
 	Glob g6("[!a-z]");
-	assert (g6.match("A"));
-	assert (!g6.match("a"));
-	assert (!g6.match("z"));
+	assertTrue (g6.match("A"));
+	assertTrue (!g6.match("a"));
+	assertTrue (!g6.match("z"));
 	
 	Glob g7("[0-9a-zA-Z_]");
-	assert (g7.match("0"));
-	assert (g7.match("1"));
-	assert (g7.match("8"));
-	assert (g7.match("9"));
-	assert (g7.match("a"));
-	assert (g7.match("b"));
-	assert (g7.match("z"));
-	assert (g7.match("A"));
-	assert (g7.match("Z"));
-	assert (g7.match("_"));
-	assert (!g7.match("-"));
+	assertTrue (g7.match("0"));
+	assertTrue (g7.match("1"));
+	assertTrue (g7.match("8"));
+	assertTrue (g7.match("9"));
+	assertTrue (g7.match("a"));
+	assertTrue (g7.match("b"));
+	assertTrue (g7.match("z"));
+	assertTrue (g7.match("A"));
+	assertTrue (g7.match("Z"));
+	assertTrue (g7.match("_"));
+	assertTrue (!g7.match("-"));
 	
 	Glob g8("[1-3]");
-	assert (g8.match("1"));
-	assert (g8.match("2"));
-	assert (g8.match("3"));
-	assert (!g8.match("0"));
-	assert (!g8.match("4"));
+	assertTrue (g8.match("1"));
+	assertTrue (g8.match("2"));
+	assertTrue (g8.match("3"));
+	assertTrue (!g8.match("0"));
+	assertTrue (!g8.match("4"));
 	
 	Glob g9("[!1-3]");
-	assert (g9.match("0"));
-	assert (g9.match("4"));
-	assert (!g9.match("1"));
-	assert (!g9.match("2"));
-	assert (!g9.match("3"));
+	assertTrue (g9.match("0"));
+	assertTrue (g9.match("4"));
+	assertTrue (!g9.match("1"));
+	assertTrue (!g9.match("2"));
+	assertTrue (!g9.match("3"));
 	
 	Glob g10("[\\!a]");
-	assert (g10.match("!"));
-	assert (g10.match("a"));
-	assert (!g10.match("x"));
+	assertTrue (g10.match("!"));
+	assertTrue (g10.match("a"));
+	assertTrue (!g10.match("x"));
 	
 	Glob g11("[a\\-c]");
-	assert (g11.match("a"));
-	assert (g11.match("c"));
-	assert (g11.match("-"));
-	assert (!g11.match("b"));
+	assertTrue (g11.match("a"));
+	assertTrue (g11.match("c"));
+	assertTrue (g11.match("-"));
+	assertTrue (!g11.match("b"));
 	
 	Glob g12("[\\]]");
-	assert (g12.match("]"));
-	assert (!g12.match("["));
+	assertTrue (g12.match("]"));
+	assertTrue (!g12.match("["));
 	
 	Glob g13("[[\\]]");
-	assert (g13.match("["));
-	assert (g13.match("]"));
-	assert (!g13.match("x"));
+	assertTrue (g13.match("["));
+	assertTrue (g13.match("]"));
+	assertTrue (!g13.match("x"));
 	
 	Glob g14("\\[]");
-	assert (g14.match("[]"));
-	assert (!g14.match("[["));
+	assertTrue (g14.match("[]"));
+	assertTrue (!g14.match("[["));
 	
 	Glob g15("a[bc]");
-	assert (g15.match("ab"));
-	assert (g15.match("ac"));
-	assert (!g15.match("a"));
-	assert (!g15.match("aa"));
+	assertTrue (g15.match("ab"));
+	assertTrue (g15.match("ac"));
+	assertTrue (!g15.match("a"));
+	assertTrue (!g15.match("aa"));
 	
 	Glob g16("[ab]c");
-	assert (g16.match("ac"));
-	assert (g16.match("bc"));
-	assert (!g16.match("a"));
-	assert (!g16.match("b"));
-	assert (!g16.match("c"));
-	assert (!g16.match("aa"));
+	assertTrue (g16.match("ac"));
+	assertTrue (g16.match("bc"));
+	assertTrue (!g16.match("a"));
+	assertTrue (!g16.match("b"));
+	assertTrue (!g16.match("c"));
+	assertTrue (!g16.match("aa"));
 }
 
 
 void GlobTest::testMisc()
 {
 	Glob g1("*.cpp");
-	assert (g1.match("Glob.cpp"));
-	assert (!g1.match("Glob.h"));
+	assertTrue (g1.match("Glob.cpp"));
+	assertTrue (!g1.match("Glob.h"));
 	
 	Glob g2("*.[hc]");
-	assert (g2.match("foo.c"));
-	assert (g2.match("foo.h"));
-	assert (!g2.match("foo.i"));
+	assertTrue (g2.match("foo.c"));
+	assertTrue (g2.match("foo.h"));
+	assertTrue (!g2.match("foo.i"));
 	
 	Glob g3("*.*");
-	assert (g3.match("foo.cpp"));
-	assert (g3.match("foo.h"));
-	assert (g3.match("foo."));
-	assert (!g3.match("foo"));
+	assertTrue (g3.match("foo.cpp"));
+	assertTrue (g3.match("foo.h"));
+	assertTrue (g3.match("foo."));
+	assertTrue (!g3.match("foo"));
 	
 	Glob g4("File*.?pp");
-	assert (g4.match("File.hpp"));
-	assert (g4.match("File.cpp"));
-	assert (g4.match("Filesystem.hpp"));
-	assert (!g4.match("File.h"));
+	assertTrue (g4.match("File.hpp"));
+	assertTrue (g4.match("File.cpp"));
+	assertTrue (g4.match("Filesystem.hpp"));
+	assertTrue (!g4.match("File.h"));
 	
 	Glob g5("File*.[ch]*");
-	assert (g5.match("File.hpp"));
-	assert (g5.match("File.cpp"));
-	assert (g5.match("Filesystem.hpp"));
-	assert (g5.match("File.h"));
-	assert (g5.match("Filesystem.cp"));
+	assertTrue (g5.match("File.hpp"));
+	assertTrue (g5.match("File.cpp"));
+	assertTrue (g5.match("Filesystem.hpp"));
+	assertTrue (g5.match("File.h"));
+	assertTrue (g5.match("Filesystem.cp"));
 }
 
 
 void GlobTest::testCaseless()
 {
 	Glob g1("*.cpp", Glob::GLOB_CASELESS);
-	assert (g1.match("Glob.cpp"));
-	assert (!g1.match("Glob.h"));
-	assert (g1.match("Glob.CPP"));
-	assert (!g1.match("Glob.H"));
+	assertTrue (g1.match("Glob.cpp"));
+	assertTrue (!g1.match("Glob.h"));
+	assertTrue (g1.match("Glob.CPP"));
+	assertTrue (!g1.match("Glob.H"));
 	
 	Glob g2("*.[hc]", Glob::GLOB_CASELESS);
-	assert (g2.match("foo.c"));
-	assert (g2.match("foo.h"));
-	assert (!g2.match("foo.i"));
-	assert (g2.match("foo.C"));
-	assert (g2.match("foo.H"));
-	assert (!g2.match("foo.I"));
+	assertTrue (g2.match("foo.c"));
+	assertTrue (g2.match("foo.h"));
+	assertTrue (!g2.match("foo.i"));
+	assertTrue (g2.match("foo.C"));
+	assertTrue (g2.match("foo.H"));
+	assertTrue (!g2.match("foo.I"));
 		
 	Glob g4("File*.?pp", Glob::GLOB_CASELESS);
-	assert (g4.match("file.hpp"));
-	assert (g4.match("FILE.CPP"));
-	assert (g4.match("filesystem.hpp"));
-	assert (g4.match("FILESYSTEM.HPP"));
-	assert (!g4.match("FILE.H"));
-	assert (!g4.match("file.h"));
+	assertTrue (g4.match("file.hpp"));
+	assertTrue (g4.match("FILE.CPP"));
+	assertTrue (g4.match("filesystem.hpp"));
+	assertTrue (g4.match("FILESYSTEM.HPP"));
+	assertTrue (!g4.match("FILE.H"));
+	assertTrue (!g4.match("file.h"));
 	
 	Glob g5("File*.[ch]*", Glob::GLOB_CASELESS);
-	assert (g5.match("file.hpp"));
-	assert (g5.match("FILE.HPP"));
-	assert (g5.match("file.cpp"));
-	assert (g5.match("FILE.CPP"));
-	assert (g5.match("filesystem.hpp"));
-	assert (g5.match("FILESYSTEM.HPP"));
-	assert (g5.match("file.h"));
-	assert (g5.match("FILE.H"));
-	assert (g5.match("filesystem.cp"));
-	assert (g5.match("FILESYSTEM.CP"));
+	assertTrue (g5.match("file.hpp"));
+	assertTrue (g5.match("FILE.HPP"));
+	assertTrue (g5.match("file.cpp"));
+	assertTrue (g5.match("FILE.CPP"));
+	assertTrue (g5.match("filesystem.hpp"));
+	assertTrue (g5.match("FILESYSTEM.HPP"));
+	assertTrue (g5.match("file.h"));
+	assertTrue (g5.match("FILE.H"));
+	assertTrue (g5.match("filesystem.cp"));
+	assertTrue (g5.match("FILESYSTEM.CP"));
 
 	Glob g6("[abc]", Glob::GLOB_CASELESS);
-	assert (g6.match("a"));
-	assert (g6.match("b"));
-	assert (g6.match("c"));
-	assert (g6.match("A"));
-	assert (g6.match("B"));
-	assert (g6.match("C"));
+	assertTrue (g6.match("a"));
+	assertTrue (g6.match("b"));
+	assertTrue (g6.match("c"));
+	assertTrue (g6.match("A"));
+	assertTrue (g6.match("B"));
+	assertTrue (g6.match("C"));
 
 	Glob g7("[a-f]", Glob::GLOB_CASELESS);
-	assert (g7.match("a"));
-	assert (g7.match("b"));
-	assert (g7.match("f"));
-	assert (!g7.match("g"));
-	assert (g7.match("A"));
-	assert (g7.match("B"));
-	assert (g7.match("F"));
-	assert (!g7.match("G"));
+	assertTrue (g7.match("a"));
+	assertTrue (g7.match("b"));
+	assertTrue (g7.match("f"));
+	assertTrue (!g7.match("g"));
+	assertTrue (g7.match("A"));
+	assertTrue (g7.match("B"));
+	assertTrue (g7.match("F"));
+	assertTrue (!g7.match("G"));
 
 	Glob g8("[A-F]", Glob::GLOB_CASELESS);
-	assert (g8.match("a"));
-	assert (g8.match("b"));
-	assert (g8.match("f"));
-	assert (!g8.match("g"));
-	assert (g8.match("A"));
-	assert (g8.match("B"));
-	assert (g8.match("F"));
-	assert (!g8.match("G"));
+	assertTrue (g8.match("a"));
+	assertTrue (g8.match("b"));
+	assertTrue (g8.match("f"));
+	assertTrue (!g8.match("g"));
+	assertTrue (g8.match("A"));
+	assertTrue (g8.match("B"));
+	assertTrue (g8.match("F"));
+	assertTrue (!g8.match("G"));
 }
 
 
@@ -391,77 +391,77 @@ void GlobTest::testGlob()
 	std::set<std::string> files;
 	Glob::glob("globtest/*", files);
 	translatePaths(files);
-	assert (files.size() == 5);
-	assert (files.find("globtest/Makefile") != files.end());
-	assert (files.find("globtest/.hidden") != files.end());
-	assert (files.find("globtest/include/") != files.end());
-	assert (files.find("globtest/src/") != files.end());
-	assert (files.find("globtest/testsuite/") != files.end());
+	assertTrue (files.size() == 5);
+	assertTrue (files.find("globtest/Makefile") != files.end());
+	assertTrue (files.find("globtest/.hidden") != files.end());
+	assertTrue (files.find("globtest/include/") != files.end());
+	assertTrue (files.find("globtest/src/") != files.end());
+	assertTrue (files.find("globtest/testsuite/") != files.end());
 
 	files.clear();
 	Glob::glob("GlobTest/*", files, Glob::GLOB_CASELESS);
 	translatePaths(files);
-	assert (files.size() == 5);
-	assert (files.find("globtest/Makefile") != files.end());
-	assert (files.find("globtest/.hidden") != files.end());
-	assert (files.find("globtest/include/") != files.end());
-	assert (files.find("globtest/src/") != files.end());
-	assert (files.find("globtest/testsuite/") != files.end());
+	assertTrue (files.size() == 5);
+	assertTrue (files.find("globtest/Makefile") != files.end());
+	assertTrue (files.find("globtest/.hidden") != files.end());
+	assertTrue (files.find("globtest/include/") != files.end());
+	assertTrue (files.find("globtest/src/") != files.end());
+	assertTrue (files.find("globtest/testsuite/") != files.end());
 	
 	files.clear();
 	Glob::glob("globtest/*/*.[hc]", files);
 	translatePaths(files);
-	assert (files.size() == 5);
-	assert (files.find("globtest/include/one.h") != files.end());
-	assert (files.find("globtest/include/two.h") != files.end());
-	assert (files.find("globtest/src/one.c") != files.end());
-	assert (files.find("globtest/src/one.c") != files.end());
-	assert (files.find("globtest/src/main.c") != files.end());
+	assertTrue (files.size() == 5);
+	assertTrue (files.find("globtest/include/one.h") != files.end());
+	assertTrue (files.find("globtest/include/two.h") != files.end());
+	assertTrue (files.find("globtest/src/one.c") != files.end());
+	assertTrue (files.find("globtest/src/one.c") != files.end());
+	assertTrue (files.find("globtest/src/main.c") != files.end());
 	
 	files.clear();
 	Glob::glob("gl?bt?st/*/*/*.c", files);
 	translatePaths(files);
-	assert (files.size() == 2);
-	assert (files.find("globtest/testsuite/src/test.c") != files.end());
-	assert (files.find("globtest/testsuite/src/main.c") != files.end());
+	assertTrue (files.size() == 2);
+	assertTrue (files.find("globtest/testsuite/src/test.c") != files.end());
+	assertTrue (files.find("globtest/testsuite/src/main.c") != files.end());
 
 	files.clear();
 	Glob::glob("Gl?bT?st/*/*/*.C", files, Glob::GLOB_CASELESS);
 	translatePaths(files);
-	assert (files.size() == 2);
-	assert (files.find("globtest/testsuite/src/test.c") != files.end());
-	assert (files.find("globtest/testsuite/src/main.c") != files.end());
+	assertTrue (files.size() == 2);
+	assertTrue (files.find("globtest/testsuite/src/test.c") != files.end());
+	assertTrue (files.find("globtest/testsuite/src/main.c") != files.end());
 	
 	files.clear();
 	Glob::glob("globtest/*/src/*", files);
 	translatePaths(files);
-	assert (files.size() == 3);
-	assert (files.find("globtest/testsuite/src/test.h") != files.end());
-	assert (files.find("globtest/testsuite/src/test.c") != files.end());
-	assert (files.find("globtest/testsuite/src/main.c") != files.end());
+	assertTrue (files.size() == 3);
+	assertTrue (files.find("globtest/testsuite/src/test.h") != files.end());
+	assertTrue (files.find("globtest/testsuite/src/test.c") != files.end());
+	assertTrue (files.find("globtest/testsuite/src/main.c") != files.end());
 	
 	files.clear();
 	Glob::glob("globtest/*/", files);
 	translatePaths(files);
-	assert (files.size() == 3);
-	assert (files.find("globtest/include/") != files.end());
-	assert (files.find("globtest/src/") != files.end());
-	assert (files.find("globtest/testsuite/") != files.end());
+	assertTrue (files.size() == 3);
+	assertTrue (files.find("globtest/include/") != files.end());
+	assertTrue (files.find("globtest/src/") != files.end());
+	assertTrue (files.find("globtest/testsuite/") != files.end());
 
 	files.clear();
 	Glob::glob("globtest/testsuite/src/*", "globtest/testsuite/", files);
 	translatePaths(files);
-	assert (files.size() == 3);
-	assert (files.find("globtest/testsuite/src/test.h") != files.end());
-	assert (files.find("globtest/testsuite/src/test.c") != files.end());
-	assert (files.find("globtest/testsuite/src/main.c") != files.end());
+	assertTrue (files.size() == 3);
+	assertTrue (files.find("globtest/testsuite/src/test.h") != files.end());
+	assertTrue (files.find("globtest/testsuite/src/test.c") != files.end());
+	assertTrue (files.find("globtest/testsuite/src/main.c") != files.end());
 
 #if !defined(_WIN32_WCE)
 	// won't work if current directory is root dir
 	files.clear();
 	Glob::glob("globtest/../*/testsuite/*/", files);
 	translatePaths(files);
-	assert (files.size() == 1);
+	assertTrue (files.size() == 1);
 #endif
 	
 	File dir("globtest");
@@ -474,14 +474,14 @@ void GlobTest::testMatchEmptyPattern()
 	// Run the empty pattern against a number of subjects with all different match options
 	const std::string empty;
 
-	assert (!Glob(empty, Glob::GLOB_DEFAULT).match("subject"));
-	assert (Glob(empty, Glob::GLOB_DEFAULT).match(empty));
+	assertTrue (!Glob(empty, Glob::GLOB_DEFAULT).match("subject"));
+	assertTrue (Glob(empty, Glob::GLOB_DEFAULT).match(empty));
 
-	assert (!Glob(empty, Glob::GLOB_DOT_SPECIAL).match("subject"));
-	assert (Glob(empty, Glob::GLOB_DOT_SPECIAL).match(empty));
+	assertTrue (!Glob(empty, Glob::GLOB_DOT_SPECIAL).match("subject"));
+	assertTrue (Glob(empty, Glob::GLOB_DOT_SPECIAL).match(empty));
 
-	assert (!Glob(empty, Glob::GLOB_CASELESS).match("subject"));
-	assert (Glob(empty, Glob::GLOB_CASELESS).match(empty));
+	assertTrue (!Glob(empty, Glob::GLOB_CASELESS).match("subject"));
+	assertTrue (Glob(empty, Glob::GLOB_CASELESS).match(empty));
 }
 
 

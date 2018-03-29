@@ -38,7 +38,7 @@ void HTTPRequestTest::testWrite1()
 	std::ostringstream ostr;
 	request.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "GET / HTTP/1.0\r\n\r\n");
+	assertTrue (s == "GET / HTTP/1.0\r\n\r\n");
 }
 
 
@@ -51,7 +51,7 @@ void HTTPRequestTest::testWrite2()
 	std::ostringstream ostr;
 	request.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "HEAD /index.html HTTP/1.1\r\nHost: localhost\r\nConnection: Keep-Alive\r\nUser-Agent: Poco\r\n\r\n");
+	assertTrue (s == "HEAD /index.html HTTP/1.1\r\nHost: localhost\r\nConnection: Keep-Alive\r\nUser-Agent: Poco\r\n\r\n");
 }
 
 
@@ -66,7 +66,7 @@ void HTTPRequestTest::testWrite3()
 	std::ostringstream ostr;
 	request.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "POST /test.cgi HTTP/1.1\r\nHost: localhost:8000\r\nConnection: Close\r\nUser-Agent: Poco\r\nContent-Length: 100\r\nContent-Type: text/plain\r\n\r\n");
+	assertTrue (s == "POST /test.cgi HTTP/1.1\r\nHost: localhost:8000\r\nConnection: Close\r\nUser-Agent: Poco\r\nContent-Length: 100\r\nContent-Type: text/plain\r\n\r\n");
 }
 
 
@@ -79,7 +79,7 @@ void HTTPRequestTest::testWrite4()
 	std::ostringstream ostr;
 	request.write(ostr);
 	std::string s = ostr.str();
-	assert (s == "HEAD /index.html HTTP/1.1\r\nHost: [fe80::1]:88\r\nConnection: Keep-Alive\r\nUser-Agent: Poco\r\n\r\n");
+	assertTrue (s == "HEAD /index.html HTTP/1.1\r\nHost: [fe80::1]:88\r\nConnection: Keep-Alive\r\nUser-Agent: Poco\r\n\r\n");
 }
 
 
@@ -89,11 +89,11 @@ void HTTPRequestTest::testRead1()
 	std::istringstream istr(s);
 	HTTPRequest request;
 	request.read(istr);
-	assert (request.getMethod() == HTTPRequest::HTTP_GET);
-	assert (request.getURI() == "/");
-	assert (request.getVersion() == HTTPMessage::HTTP_1_0);
-	assert (request.empty());
-	assert (istr.get() == -1);
+	assertTrue (request.getMethod() == HTTPRequest::HTTP_GET);
+	assertTrue (request.getURI() == "/");
+	assertTrue (request.getVersion() == HTTPMessage::HTTP_1_0);
+	assertTrue (request.empty());
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -103,14 +103,14 @@ void HTTPRequestTest::testRead2()
 	std::istringstream istr(s);
 	HTTPRequest request;
 	request.read(istr);
-	assert (request.getMethod() == HTTPRequest::HTTP_HEAD);
-	assert (request.getURI() == "/index.html");
-	assert (request.getVersion() == HTTPMessage::HTTP_1_1);
-	assert (request.size() == 3);
-	assert (request["Connection"] == "Keep-Alive");
-	assert (request["Host"] == "localhost");
-	assert (request["User-Agent"] == "Poco");
-	assert (istr.get() == -1);
+	assertTrue (request.getMethod() == HTTPRequest::HTTP_HEAD);
+	assertTrue (request.getURI() == "/index.html");
+	assertTrue (request.getVersion() == HTTPMessage::HTTP_1_1);
+	assertTrue (request.size() == 3);
+	assertTrue (request["Connection"] == "Keep-Alive");
+	assertTrue (request["Host"] == "localhost");
+	assertTrue (request["User-Agent"] == "Poco");
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -120,16 +120,16 @@ void HTTPRequestTest::testRead3()
 	std::istringstream istr(s);
 	HTTPRequest request;
 	request.read(istr);
-	assert (request.getMethod() == HTTPRequest::HTTP_POST);
-	assert (request.getURI() == "/test.cgi");
-	assert (request.getVersion() == HTTPMessage::HTTP_1_1);
-	assert (request.size() == 5);
-	assert (request["Connection"] == "Close");
-	assert (request["Host"] == "localhost:8000");
-	assert (request["User-Agent"] == "Poco");
-	assert (request.getContentType() == "text/plain");
-	assert (request.getContentLength() == 100);
-	assert (istr.get() == -1);
+	assertTrue (request.getMethod() == HTTPRequest::HTTP_POST);
+	assertTrue (request.getURI() == "/test.cgi");
+	assertTrue (request.getVersion() == HTTPMessage::HTTP_1_1);
+	assertTrue (request.size() == 5);
+	assertTrue (request["Connection"] == "Close");
+	assertTrue (request["Host"] == "localhost:8000");
+	assertTrue (request["User-Agent"] == "Poco");
+	assertTrue (request.getContentType() == "text/plain");
+	assertTrue (request.getContentLength() == 100);
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -139,16 +139,16 @@ void HTTPRequestTest::testRead4()
 	std::istringstream istr(s);
 	HTTPRequest request;
 	request.read(istr);
-	assert (request.getMethod() == HTTPRequest::HTTP_POST);
-	assert (request.getURI() == "/test.cgi");
-	assert (request.getVersion() == HTTPMessage::HTTP_1_1);
-	assert (request.size() == 5);
-	assert (request["Connection"] == "Close");
-	assert (request["Host"] == "localhost:8000");
-	assert (request["User-Agent"] == "Poco");
-	assert (request.getContentType() == "text/plain");
-	assert (request.getContentLength() == 100);
-	assert (istr.get() == -1);
+	assertTrue (request.getMethod() == HTTPRequest::HTTP_POST);
+	assertTrue (request.getURI() == "/test.cgi");
+	assertTrue (request.getVersion() == HTTPMessage::HTTP_1_1);
+	assertTrue (request.size() == 5);
+	assertTrue (request["Connection"] == "Close");
+	assertTrue (request["Host"] == "localhost:8000");
+	assertTrue (request["User-Agent"] == "Poco");
+	assertTrue (request.getContentType() == "text/plain");
+	assertTrue (request.getContentLength() == 100);
+	assertTrue (istr.get() == -1);
 }
 
 
@@ -208,31 +208,31 @@ void HTTPRequestTest::testCookies()
 	NameValueCollection cookies1;
 	cookies1.add("cookie1", "value1");
 	request1.setCookies(cookies1);
-	assert (request1["Cookie"] == "cookie1=value1");
+	assertTrue (request1["Cookie"] == "cookie1=value1");
 	
 	HTTPRequest request2;
 	NameValueCollection cookies2;
 	cookies2.add("cookie2", "value2");
 	cookies2.add("cookie3", "value3");
 	request2.setCookies(cookies2);
-	assert (request2["Cookie"] == "cookie2=value2; cookie3=value3");
+	assertTrue (request2["Cookie"] == "cookie2=value2; cookie3=value3");
 	
 	request1.setCookies(cookies2);
 	NameValueCollection cookies3;
 	request1.getCookies(cookies3);
-	assert (cookies3.size() == 3);
-	assert (cookies3["cookie1"] == "value1");
-	assert (cookies3["cookie2"] == "value2");
-	assert (cookies3["cookie3"] == "value3");	
+	assertTrue (cookies3.size() == 3);
+	assertTrue (cookies3["cookie1"] == "value1");
+	assertTrue (cookies3["cookie2"] == "value2");
+	assertTrue (cookies3["cookie3"] == "value3");	
 	
 	HTTPRequest request3;
 	request3.add("Cookie", "cookie1=value1");
 	request3.add("cookie", "cookie2=value2");
 	NameValueCollection cookies4;
 	request3.getCookies(cookies4);
-	assert (cookies4.size() == 2);
-	assert (cookies4["cookie1"] == "value1");
-	assert (cookies4["cookie2"] == "value2");	
+	assertTrue (cookies4.size() == 2);
+	assertTrue (cookies4["cookie1"] == "value1");
+	assertTrue (cookies4["cookie2"] == "value2");	
 }
 
 

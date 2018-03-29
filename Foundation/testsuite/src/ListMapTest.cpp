@@ -36,36 +36,36 @@ void ListMapTest::testInsert()
 	typedef ListMap<int, int> IntMap;
 	IntMap hm;
 	
-	assert (hm.empty());
+	assertTrue (hm.empty());
 	
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator res = hm.insert(IntMap::ValueType(i, i*2));
-		assert (res->first == i);
-		assert (res->second == i*2);
+		assertTrue (res->first == i);
+		assertTrue (res->second == i*2);
 		IntMap::Iterator it = hm.find(i);
-		assert (it != hm.end());
-		assert (it->first == i);
-		assert (it->second == i*2);
-		assert (hm.size() == i + 1);
+		assertTrue (it != hm.end());
+		assertTrue (it->first == i);
+		assertTrue (it->second == i*2);
+		assertTrue (hm.size() == i + 1);
 	}		
 	
-	assert (!hm.empty());
+	assertTrue (!hm.empty());
 	
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator it = hm.find(i);
-		assert (it != hm.end());
-		assert (it->first == i);
-		assert (it->second == i*2);
+		assertTrue (it != hm.end());
+		assertTrue (it->first == i);
+		assertTrue (it->second == i*2);
 	}
 	
 	hm.clear();
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator res = hm.insert(IntMap::ValueType(i, 0));
-		assert (res->first == i);
-		assert (res->second == 0);
+		assertTrue (res->first == i);
+		assertTrue (res->second == 0);
 	}		
 }
 
@@ -81,27 +81,27 @@ void ListMapTest::testInsertOrder()
 	lm.insert(StrToIntMap::ValueType("bar", 43));
 
 	StrToIntMap::Iterator it = lm.begin();
-	assert (it != lm.end() && it->first == "foo" && it->second == 42);
+	assertTrue (it != lm.end() && it->first == "foo" && it->second == 42);
 
 	++it;
-	assert (it != lm.end() && it->first == "bar" && it->second == 43);
+	assertTrue (it != lm.end() && it->first == "bar" && it->second == 43);
 
 	++it;
-	assert (it == lm.end());
+	assertTrue (it == lm.end());
 
 	lm.insert(StrToIntMap::ValueType("foo", 44));
 
  	it = lm.begin();
-	assert (it != lm.end() && it->first == "foo" && it->second == 42);
+	assertTrue (it != lm.end() && it->first == "foo" && it->second == 42);
 
 	++it;
-	assert (it != lm.end() && it->first == "foo" && it->second == 44);
+	assertTrue (it != lm.end() && it->first == "foo" && it->second == 44);
 
 	++it;
-	assert (it != lm.end() && it->first == "bar" && it->second == 43);
+	assertTrue (it != lm.end() && it->first == "bar" && it->second == 43);
 
 	++it;
-	assert (it == lm.end());	 
+	assertTrue (it == lm.end());	 
 }
 
 
@@ -116,27 +116,27 @@ void ListMapTest::testErase()
 	{
 		hm.insert(IntMap::ValueType(i, i*2));
 	}
-	assert (hm.size() == N);
+	assertTrue (hm.size() == N);
 	
 	for (int i = 0; i < N; i += 2)
 	{
 		hm.erase(i);
 		IntMap::Iterator it = hm.find(i);
-		assert (it == hm.end());
+		assertTrue (it == hm.end());
 	}
-	assert (hm.size() == N/2);
+	assertTrue (hm.size() == N/2);
 	
 	for (int i = 0; i < N; i += 2)
 	{
 		IntMap::Iterator it = hm.find(i);
-		assert (it == hm.end());
+		assertTrue (it == hm.end());
 	}
 	
 	for (int i = 1; i < N; i += 2)
 	{
 		IntMap::Iterator it = hm.find(i);
-		assert (it != hm.end());
-		assert (it->first == i);
+		assertTrue (it != hm.end());
+		assertTrue (it->first == i);
 	}
 
 	for (int i = 0; i < N; i += 2)
@@ -147,9 +147,9 @@ void ListMapTest::testErase()
 	for (int i = 0; i < N; ++i)
 	{
 		IntMap::Iterator it = hm.find(i);
-		assert (it != hm.end());
-		assert (it->first == i);
-		assert (it->second == i*2);		
+		assertTrue (it != hm.end());
+		assertTrue (it->first == i);
+		assertTrue (it->second == i*2);		
 	}
 }
 
@@ -171,12 +171,12 @@ void ListMapTest::testIterator()
 	it = hm.begin();
 	while (it != hm.end())
 	{
-		assert (values.find(it->first) == values.end());
+		assertTrue (values.find(it->first) == values.end());
 		values[it->first] = it->second;
 		++it;
 	}
 	
-	assert (values.size() == N);
+	assertTrue (values.size() == N);
 }
 
 
@@ -196,12 +196,12 @@ void ListMapTest::testConstIterator()
 	IntMap::ConstIterator it = hm.begin();
 	while (it != hm.end())
 	{
-		assert (values.find(it->first) == values.end());
+		assertTrue (values.find(it->first) == values.end());
 		values[it->first] = it->second;
 		++it;
 	}
 	
-	assert (values.size() == N);
+	assertTrue (values.size() == N);
 }
 
 
@@ -214,10 +214,10 @@ void ListMapTest::testIntIndex()
 	hm[2] = 4;
 	hm[3] = 6;
 
-	assert (hm.size() == 3);
-	assert (hm[1] == 2);
-	assert (hm[2] == 4);
-	assert (hm[3] == 6);
+	assertTrue (hm.size() == 3);
+	assertTrue (hm[1] == 2);
+	assertTrue (hm[2] == 4);
+	assertTrue (hm[3] == 6);
 
 	try
 	{
@@ -240,10 +240,10 @@ void ListMapTest::testStringIndex()
 	hm["index2"] = "value4";
 	hm["index3"] = "value6";
 	
-	assert (hm.size() == 3);
-	assert (hm["index1"] == "value2");
-	assert (hm["Index2"] == "value4");
-	assert (hm["inDeX3"] == "value6");
+	assertTrue (hm.size() == 3);
+	assertTrue (hm["index1"] == "value2");
+	assertTrue (hm["Index2"] == "value4");
+	assertTrue (hm["inDeX3"] == "value6");
 	
 	try
 	{

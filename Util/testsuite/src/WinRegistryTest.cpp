@@ -41,20 +41,20 @@ void WinRegistryTest::testRegistry()
 {
 	WinRegistryKey regKey("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
 	if (regKey.exists()) regKey.deleteKey();
-	assert (!regKey.exists());
+	assertTrue (!regKey.exists());
 
 	regKey.setString("name1", "value1");
-	assert (regKey.getString("name1") == "value1");
+	assertTrue (regKey.getString("name1") == "value1");
 	regKey.setString("name1", "Value1");
-	assert (regKey.getString("name1") == "Value1");
+	assertTrue (regKey.getString("name1") == "Value1");
 	regKey.setString("name2", "value2");
-	assert (regKey.getString("name2") == "value2");
-	assert (regKey.exists("name1"));
-	assert (regKey.exists("name2"));
-	assert (regKey.exists());
+	assertTrue (regKey.getString("name2") == "value2");
+	assertTrue (regKey.exists("name1"));
+	assertTrue (regKey.exists("name2"));
+	assertTrue (regKey.exists());
 	
 	WinRegistryKey regKeyRO("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test", true);
-	assert (regKeyRO.getString("name1") == "Value1");
+	assertTrue (regKeyRO.getString("name1") == "Value1");
 	try
 	{
 		regKeyRO.setString("name1", "newValue1");
@@ -63,33 +63,33 @@ void WinRegistryTest::testRegistry()
 	{
 		std::string msg = exc.displayText();
 	}
-	assert (regKey.getString("name1") == "Value1");
+	assertTrue (regKey.getString("name1") == "Value1");
 	
 	WinRegistryKey::Values vals;
 	regKey.values(vals);
-	assert (vals.size() == 2);
-	assert (vals[0] == "name1" || vals[0] == "name2");
-	assert (vals[1] == "name1" || vals[1] == "name2");
-	assert (vals[0] != vals[1]);
+	assertTrue (vals.size() == 2);
+	assertTrue (vals[0] == "name1" || vals[0] == "name2");
+	assertTrue (vals[1] == "name1" || vals[1] == "name2");
+	assertTrue (vals[0] != vals[1]);
 
 	Environment::set("FOO", "bar");
 	regKey.setStringExpand("name3", "%FOO%");
-	assert (regKey.getStringExpand("name3") == "bar");
+	assertTrue (regKey.getStringExpand("name3") == "bar");
 	
 	regKey.setInt("name4", 42);
-	assert (regKey.getInt("name4") == 42);
+	assertTrue (regKey.getInt("name4") == 42);
 	
-	assert (regKey.exists("name4"));
+	assertTrue (regKey.exists("name4"));
 	regKey.deleteValue("name4");
-	assert (!regKey.exists("name4"));
+	assertTrue (!regKey.exists("name4"));
 	
 #if defined(POCO_HAVE_INT64)
 	regKey.setInt64("name5", std::numeric_limits<Int64>::max());
-	assert (regKey.getInt64("name5") == std::numeric_limits<Int64>::max());
+	assertTrue (regKey.getInt64("name5") == std::numeric_limits<Int64>::max());
 
-	assert (regKey.exists("name5"));
+	assertTrue (regKey.exists("name5"));
 	regKey.deleteValue("name5");
-	assert (!regKey.exists("name5"));
+	assertTrue (!regKey.exists("name5"));
 #endif
 
 	const int dataSize = 127;
@@ -97,14 +97,14 @@ void WinRegistryTest::testRegistry()
 	for (int i = 0; i < dataSize; ++i)
 		data[i] = rand() % 256;
 	regKey.setBinary("binary", data);
-	assert (regKey.getBinary("binary") == data);
+	assertTrue (regKey.getBinary("binary") == data);
 
-	assert (regKey.exists("binary"));
+	assertTrue (regKey.exists("binary"));
 	regKey.deleteValue("binary");
-	assert (!regKey.exists("binary"));
+	assertTrue (!regKey.exists("binary"));
 
 	regKey.deleteKey();
-	assert (!regKey.exists());
+	assertTrue (!regKey.exists());
 }
 
 

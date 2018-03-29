@@ -51,7 +51,7 @@ void HTTPStreamFactoryTest::testNoRedirect()
 #endif // POCO_ENABLE_CPP11
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
@@ -68,7 +68,7 @@ void HTTPStreamFactoryTest::testEmptyPath()
 #endif // POCO_ENABLE_CPP11
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::SMALL_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::SMALL_BODY);
 }
 
 
@@ -86,7 +86,7 @@ void HTTPStreamFactoryTest::testRedirect()
 #endif // POCO_ENABLE_CPP11
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
@@ -102,7 +102,7 @@ void HTTPStreamFactoryTest::testProxy()
 #endif // POCO_ENABLE_CPP11
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 

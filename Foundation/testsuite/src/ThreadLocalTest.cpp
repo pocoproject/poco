@@ -83,9 +83,9 @@ void ThreadLocalTest::testLocality()
 	t2.join();
 	t3.join();
 	
-	assert (r1.result() == 5000);
-	assert (r2.result() == 7500);
-	assert (r3.result() == 6000);
+	assertTrue (r1.result() == 5000);
+	assertTrue (r2.result() == 7500);
+	assertTrue (r3.result() == 6000);
 }
 
 
@@ -94,10 +94,10 @@ void ThreadLocalTest::testAccessors()
 	ThreadLocal<TLTestStruct> ts;
 	ts->i = 100;
 	ts->s = "foo";
-	assert ((*ts).i == 100);
-	assert ((*ts).s == "foo");
-	assert (ts.get().i == 100);
-	assert (ts.get().s == "foo");
+	assertTrue ((*ts).i == 100);
+	assertTrue ((*ts).s == "foo");
+	assertTrue (ts.get().i == 100);
+	assertTrue (ts.get().s == "foo");
 }
 
 

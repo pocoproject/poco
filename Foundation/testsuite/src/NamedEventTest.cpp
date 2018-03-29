@@ -78,7 +78,7 @@ void NamedEventTest::testNamedEvent()
 	}
 	thr1.join();
 #if POCO_OS != POCO_OS_ANDROID
-	assert (te.timestamp() > now);
+	assertTrue (te.timestamp() > now);
 #endif
 	Thread thr2;
 	thr2.start(te);
@@ -96,7 +96,7 @@ void NamedEventTest::testNamedEvent()
 	}
 	thr2.join();
 #if POCO_OS != POCO_OS_ANDROID
-	assert (te.timestamp() > now);
+	assertTrue (te.timestamp() > now);
 #endif
 }
 

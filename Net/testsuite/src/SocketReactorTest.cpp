@@ -318,10 +318,10 @@ void SocketReactorTest::testSocketReactor()
 	ClientServiceHandler::resetData();
 	reactor.run();
 	std::string data(ClientServiceHandler::data());
-	assert (data.size() == 1024);
-	assert (!ClientServiceHandler::readableError());
-	assert (!ClientServiceHandler::writableError());
-	assert (!ClientServiceHandler::timeoutError());
+	assertTrue (data.size() == 1024);
+	assertTrue (!ClientServiceHandler::readableError());
+	assertTrue (!ClientServiceHandler::writableError());
+	assertTrue (!ClientServiceHandler::timeoutError());
 }
 
 
@@ -338,10 +338,10 @@ void SocketReactorTest::testSetSocketReactor()
 	ClientServiceHandler::resetData();
 	reactor.run();
 	std::string data(ClientServiceHandler::data());
-	assert(data.size() == 1024);
-	assert(!ClientServiceHandler::readableError());
-	assert(!ClientServiceHandler::writableError());
-	assert(!ClientServiceHandler::timeoutError());
+	assertTrue (data.size() == 1024);
+	assertTrue (!ClientServiceHandler::readableError());
+	assertTrue (!ClientServiceHandler::writableError());
+	assertTrue (!ClientServiceHandler::timeoutError());
 }
 
 
@@ -360,10 +360,10 @@ void SocketReactorTest::testParallelSocketReactor()
 	ClientServiceHandler::resetData();
 	reactor.run();
 	std::string data(ClientServiceHandler::data());
-	assert (data.size() == 4096);
-	assert (!ClientServiceHandler::readableError());
-	assert (!ClientServiceHandler::writableError());
-	assert (!ClientServiceHandler::timeoutError());
+	assertTrue (data.size() == 4096);
+	assertTrue (!ClientServiceHandler::readableError());
+	assertTrue (!ClientServiceHandler::writableError());
+	assertTrue (!ClientServiceHandler::timeoutError());
 }
 
 
@@ -373,11 +373,11 @@ void SocketReactorTest::testSocketConnectorFail()
 	reactor.setTimeout(Poco::Timespan(3, 0));
 	SocketAddress sa("192.168.168.192", 12345);
 	FailConnector connector(sa, reactor);
-	assert (!connector.failed());
-	assert (!connector.shutdown());
+	assertTrue (!connector.failed());
+	assertTrue (!connector.shutdown());
 	reactor.run();
-	assert (connector.failed());
-	assert (connector.shutdown());
+	assertTrue (connector.failed());
+	assertTrue (connector.shutdown());
 }
 
 
@@ -391,7 +391,7 @@ void SocketReactorTest::testSocketConnectorTimeout()
 	SocketAddress sa("127.0.0.1", ss.address().port());
 	SocketConnector<ClientServiceHandler> connector(sa, reactor);
 	reactor.run();
-	assert (ClientServiceHandler::timeout());
+	assertTrue (ClientServiceHandler::timeout());
 }
 
 

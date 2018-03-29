@@ -43,13 +43,13 @@ void DateTimeFormatterTest::testISO8601()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FORMAT);
-	assert (str == "2005-01-08T12:30:00Z");
+	assertTrue (str == "2005-01-08T12:30:00Z");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FORMAT, 3600);
-	assert (str == "2005-01-08T12:30:00+01:00");
+	assertTrue (str == "2005-01-08T12:30:00+01:00");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FORMAT, -3600);
-	assert (str == "2005-01-08T12:30:00-01:00");
+	assertTrue (str == "2005-01-08T12:30:00-01:00");
 }
 
 
@@ -58,13 +58,13 @@ void DateTimeFormatterTest::testISO8601Frac()
 	DateTime dt(2005, 1, 8, 12, 30, 00, 12, 34);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT);
-	assert(str == "2005-01-08T12:30:00.012034Z");
+	assertTrue (str == "2005-01-08T12:30:00.012034Z");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, 3600);
-	assert(str == "2005-01-08T12:30:00.012034+01:00");
+	assertTrue (str == "2005-01-08T12:30:00.012034+01:00");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::ISO8601_FRAC_FORMAT, -3600);
-	assert(str == "2005-01-08T12:30:00.012034-01:00");
+	assertTrue (str == "2005-01-08T12:30:00.012034-01:00");
 }
 
 
@@ -73,13 +73,13 @@ void DateTimeFormatterTest::testRFC822()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::RFC822_FORMAT);
-	assert (str == "Sat, 8 Jan 05 12:30:00 GMT");
+	assertTrue (str == "Sat, 8 Jan 05 12:30:00 GMT");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC822_FORMAT, 3600);
-	assert (str == "Sat, 8 Jan 05 12:30:00 +0100");
+	assertTrue (str == "Sat, 8 Jan 05 12:30:00 +0100");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC822_FORMAT, -3600);
-	assert (str == "Sat, 8 Jan 05 12:30:00 -0100");
+	assertTrue (str == "Sat, 8 Jan 05 12:30:00 -0100");
 }
 
 
@@ -88,13 +88,13 @@ void DateTimeFormatterTest::testRFC1123()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::RFC1123_FORMAT);
-	assert (str == "Sat, 8 Jan 2005 12:30:00 GMT");
+	assertTrue (str == "Sat, 8 Jan 2005 12:30:00 GMT");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC1123_FORMAT, 3600);
-	assert (str == "Sat, 8 Jan 2005 12:30:00 +0100");
+	assertTrue (str == "Sat, 8 Jan 2005 12:30:00 +0100");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC1123_FORMAT, -3600);
-	assert (str == "Sat, 8 Jan 2005 12:30:00 -0100");
+	assertTrue (str == "Sat, 8 Jan 2005 12:30:00 -0100");
 }
 
 
@@ -103,13 +103,13 @@ void DateTimeFormatterTest::testHTTP()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::HTTP_FORMAT);
-	assert (str == "Sat, 08 Jan 2005 12:30:00 GMT");
+	assertTrue (str == "Sat, 08 Jan 2005 12:30:00 GMT");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::HTTP_FORMAT, 3600);
-	assert (str == "Sat, 08 Jan 2005 12:30:00 +0100");
+	assertTrue (str == "Sat, 08 Jan 2005 12:30:00 +0100");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::HTTP_FORMAT, -3600);
-	assert (str == "Sat, 08 Jan 2005 12:30:00 -0100");
+	assertTrue (str == "Sat, 08 Jan 2005 12:30:00 -0100");
 }
 
 
@@ -118,13 +118,13 @@ void DateTimeFormatterTest::testRFC850()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::RFC850_FORMAT);
-	assert (str == "Saturday, 8-Jan-05 12:30:00 GMT");
+	assertTrue (str == "Saturday, 8-Jan-05 12:30:00 GMT");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC850_FORMAT, 3600);
-	assert (str == "Saturday, 8-Jan-05 12:30:00 +0100");
+	assertTrue (str == "Saturday, 8-Jan-05 12:30:00 +0100");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC850_FORMAT, -3600);
-	assert (str == "Saturday, 8-Jan-05 12:30:00 -0100");
+	assertTrue (str == "Saturday, 8-Jan-05 12:30:00 -0100");
 }
 
 
@@ -133,13 +133,13 @@ void DateTimeFormatterTest::testRFC1036()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::RFC1036_FORMAT);
-	assert (str == "Saturday, 8 Jan 05 12:30:00 GMT");
+	assertTrue (str == "Saturday, 8 Jan 05 12:30:00 GMT");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC1036_FORMAT, 3600);
-	assert (str == "Saturday, 8 Jan 05 12:30:00 +0100");
+	assertTrue (str == "Saturday, 8 Jan 05 12:30:00 +0100");
 
 	str = DateTimeFormatter::format(dt, DateTimeFormat::RFC1036_FORMAT, -3600);
-	assert (str == "Saturday, 8 Jan 05 12:30:00 -0100");
+	assertTrue (str == "Saturday, 8 Jan 05 12:30:00 -0100");
 }
 
 
@@ -148,7 +148,7 @@ void DateTimeFormatterTest::testASCTIME()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::ASCTIME_FORMAT);
-	assert (str == "Sat Jan  8 12:30:00 2005");
+	assertTrue (str == "Sat Jan  8 12:30:00 2005");
 }
 
 
@@ -157,7 +157,7 @@ void DateTimeFormatterTest::testSORTABLE()
 	DateTime dt(2005, 1, 8, 12, 30, 00);
 
 	std::string str = DateTimeFormatter::format(dt, DateTimeFormat::SORTABLE_FORMAT);
-	assert (str == "2005-01-08 12:30:00");
+	assertTrue (str == "2005-01-08 12:30:00");
 }
 
 
@@ -166,7 +166,7 @@ void DateTimeFormatterTest::testCustom()
 	DateTime dt(2005, 1, 8, 12, 30, 00, 250);
 
 	std::string str = DateTimeFormatter::format(dt, "%w/%W/%b/%B/%d/%e/%f/%m/%n/%o/%y/%Y/%H/%h/%a/%A/%M/%S/%i/%c/%z/%Z/%%");
-	assert (str == "Sat/Saturday/Jan/January/08/8/ 8/01/1/ 1/05/2005/12/12/pm/PM/30/00/250/2/Z/GMT/%");
+	assertTrue (str == "Sat/Saturday/Jan/January/08/8/ 8/01/1/ 1/05/2005/12/12/pm/PM/30/00/250/2/Z/GMT/%");
 }
 
 
@@ -174,27 +174,27 @@ void DateTimeFormatterTest::testTimespan()
 {
 	Timespan ts(1, 1, 1, 1, 1000);
 	std::string str = DateTimeFormatter::format(ts);
-	assert (str == "1d 01:01:01.001");
+	assertTrue (str == "1d 01:01:01.001");
 
 	Timespan ts1(1, 24, 1, 1, 1000);
 	str = DateTimeFormatter::format(ts1);
-	assert (str == "2d 00:01:01.001");
+	assertTrue (str == "2d 00:01:01.001");
 
 	Timespan ts2(1, 25, 1, 1, 1000);
 	str = DateTimeFormatter::format(ts2);
-	assert (str == "2d 01:01:01.001");
+	assertTrue (str == "2d 01:01:01.001");
 
 	Timespan ts3(5, 4, 3, 2, 1000);
 	str = DateTimeFormatter::format(ts3, "%i.%S:%M:%H d%d %%");
-	assert (str == "001.02:03:04 d5 %");
+	assertTrue (str == "001.02:03:04 d5 %");
 
 	Timespan ts4(0, 24, 60, 60, 1001000);
 	str = DateTimeFormatter::format(ts4);
-	assert (str == "1d 01:01:01.001");
+	assertTrue (str == "1d 01:01:01.001");
 	
 	Timespan ts5(2, 11, 30, 20, 0);
 	str = DateTimeFormatter::format(ts5, "%h %m %s");
-	assert (str == "59 3570 214220");
+	assertTrue (str == "59 3570 214220");
 }
 
 

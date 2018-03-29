@@ -44,11 +44,11 @@ void AbstractConfigurationTest::testHasProperty()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 
-	assert (pConf->hasProperty("prop1"));
-	assert (pConf->hasProperty("prop2"));
-	assert (pConf->hasProperty("prop3.string1"));
-	assert (!pConf->hasProperty("prop3.string3"));
-	assert (!pConf->hasProperty("foobar"));
+	assertTrue (pConf->hasProperty("prop1"));
+	assertTrue (pConf->hasProperty("prop2"));
+	assertTrue (pConf->hasProperty("prop3.string1"));
+	assertTrue (!pConf->hasProperty("prop3.string3"));
+	assertTrue (!pConf->hasProperty("foobar"));
 }
 
 
@@ -56,12 +56,12 @@ void AbstractConfigurationTest::testGetString()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 	
-	assert (pConf->getString("prop1") == "foo");
-	assert (pConf->getString("prop2") == "bar");
-	assert (pConf->getString("prop3.string1") == "foo");
-	assert (pConf->getString("prop3.string2") == "bar");
-	assert (pConf->getString("ref1") == "foobar");
-	assert (pConf->getRawString("ref1") == "${prop3.string1}${prop3.string2}");
+	assertTrue (pConf->getString("prop1") == "foo");
+	assertTrue (pConf->getString("prop2") == "bar");
+	assertTrue (pConf->getString("prop3.string1") == "foo");
+	assertTrue (pConf->getString("prop3.string2") == "bar");
+	assertTrue (pConf->getString("ref1") == "foobar");
+	assertTrue (pConf->getRawString("ref1") == "${prop3.string1}${prop3.string2}");
 	
 	try
 	{
@@ -72,11 +72,11 @@ void AbstractConfigurationTest::testGetString()
 	{
 	}
 	
-	assert (pConf->getString("prop1", "FOO") == "foo");
-	assert (pConf->getString("prop2", "BAR") == "bar");
-	assert (pConf->getString("prop3.string1", "FOO") == "foo");
-	assert (pConf->getString("prop3.string2", "BAR") == "bar");
-	assert (pConf->getString("prop3.string3", "FOOBAR") == "FOOBAR");
+	assertTrue (pConf->getString("prop1", "FOO") == "foo");
+	assertTrue (pConf->getString("prop2", "BAR") == "bar");
+	assertTrue (pConf->getString("prop3.string1", "FOO") == "foo");
+	assertTrue (pConf->getString("prop3.string2", "BAR") == "bar");
+	assertTrue (pConf->getString("prop3.string3", "FOOBAR") == "FOOBAR");
 }
 
 
@@ -84,11 +84,11 @@ void AbstractConfigurationTest::testGetInt()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 
-	assert (pConf->getInt("prop4.int1") == 42);
-	assert (pConf->getInt("prop4.int2") == -42);
-	assert (pConf->getInt("prop4.hex") == 0x1f);
-	assert (pConf->getUInt("prop4.hex") == 0x1f);
-	assert (pConf->getInt("ref2") == 42);
+	assertTrue (pConf->getInt("prop4.int1") == 42);
+	assertTrue (pConf->getInt("prop4.int2") == -42);
+	assertTrue (pConf->getInt("prop4.hex") == 0x1f);
+	assertTrue (pConf->getUInt("prop4.hex") == 0x1f);
+	assertTrue (pConf->getInt("ref2") == 42);
 	
 	try
 	{
@@ -99,9 +99,9 @@ void AbstractConfigurationTest::testGetInt()
 	{
 	}
 	
-	assert (pConf->getInt("prop4.int1", 100) == 42);
-	assert (pConf->getInt("prop4.int2", 100) == -42);
-	assert (pConf->getInt("prop4.int3", 100) == 100);
+	assertTrue (pConf->getInt("prop4.int1", 100) == 42);
+	assertTrue (pConf->getInt("prop4.int2", 100) == -42);
+	assertTrue (pConf->getInt("prop4.int3", 100) == 100);
 }
 
 
@@ -110,12 +110,12 @@ void AbstractConfigurationTest::testGetInt64()
 #if defined(POCO_HAVE_INT64)
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 
-	assert (pConf->getInt64("prop4.bigint1") == std::numeric_limits<Int64>::max());
-	assert (pConf->getInt64("prop4.bigint2") == std::numeric_limits<Int64>::min());
-	assert (pConf->getUInt64("prop4.biguint") == std::numeric_limits<UInt64>::max());
-	assert (pConf->getInt64("prop4.hex") == 0x1f);
-	assert (pConf->getUInt64("prop4.hex") == 0x1f);
-	assert (pConf->getInt64("ref2") == 42);
+	assertTrue (pConf->getInt64("prop4.bigint1") == std::numeric_limits<Int64>::max());
+	assertTrue (pConf->getInt64("prop4.bigint2") == std::numeric_limits<Int64>::min());
+	assertTrue (pConf->getUInt64("prop4.biguint") == std::numeric_limits<UInt64>::max());
+	assertTrue (pConf->getInt64("prop4.hex") == 0x1f);
+	assertTrue (pConf->getUInt64("prop4.hex") == 0x1f);
+	assertTrue (pConf->getInt64("ref2") == 42);
 
 	try
 	{
@@ -127,9 +127,9 @@ void AbstractConfigurationTest::testGetInt64()
 	{
 	}
 
-	assert (pConf->getInt64("prop4.bigint1", 100) == std::numeric_limits<Int64>::max());
-	assert (pConf->getInt64("prop4.bigint2", 100) == std::numeric_limits<Int64>::min());
-	assert (pConf->getUInt64("prop4.biguint", 100) == std::numeric_limits<UInt64>::max());
+	assertTrue (pConf->getInt64("prop4.bigint1", 100) == std::numeric_limits<Int64>::max());
+	assertTrue (pConf->getInt64("prop4.bigint2", 100) == std::numeric_limits<Int64>::min());
+	assertTrue (pConf->getUInt64("prop4.biguint", 100) == std::numeric_limits<UInt64>::max());
 #endif
 }
 
@@ -138,8 +138,8 @@ void AbstractConfigurationTest::testGetDouble()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 
-	assert (pConf->getDouble("prop4.double1") == 1);
-	assert (pConf->getDouble("prop4.double2") == -1.5);
+	assertTrue (pConf->getDouble("prop4.double1") == 1);
+	assertTrue (pConf->getDouble("prop4.double2") == -1.5);
 	
 	try
 	{
@@ -150,9 +150,9 @@ void AbstractConfigurationTest::testGetDouble()
 	{
 	}
 	
-	assert (pConf->getDouble("prop4.double1", 123.5) == 1);
-	assert (pConf->getDouble("prop4.double2", 123.5) == -1.5);
-	assert (pConf->getDouble("prop4.double3", 123.5) == 123.5);
+	assertTrue (pConf->getDouble("prop4.double1", 123.5) == 1);
+	assertTrue (pConf->getDouble("prop4.double2", 123.5) == -1.5);
+	assertTrue (pConf->getDouble("prop4.double3", 123.5) == 123.5);
 }
 
 
@@ -160,14 +160,14 @@ void AbstractConfigurationTest::testGetBool()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 
-	assert (pConf->getBool("prop4.bool1"));
-	assert (!pConf->getBool("prop4.bool2"));
-	assert (pConf->getBool("prop4.bool3"));
-	assert (!pConf->getBool("prop4.bool4"));
-	assert (pConf->getBool("prop4.bool5"));
-	assert (!pConf->getBool("prop4.bool6"));
-	assert (pConf->getBool("prop4.bool7"));
-	assert (!pConf->getBool("prop4.bool8"));
+	assertTrue (pConf->getBool("prop4.bool1"));
+	assertTrue (!pConf->getBool("prop4.bool2"));
+	assertTrue (pConf->getBool("prop4.bool3"));
+	assertTrue (!pConf->getBool("prop4.bool4"));
+	assertTrue (pConf->getBool("prop4.bool5"));
+	assertTrue (!pConf->getBool("prop4.bool6"));
+	assertTrue (pConf->getBool("prop4.bool7"));
+	assertTrue (!pConf->getBool("prop4.bool8"));
 
 	try
 	{
@@ -178,10 +178,10 @@ void AbstractConfigurationTest::testGetBool()
 	{
 	}
 
-	assert (pConf->getBool("prop4.bool1", false));
-	assert (!pConf->getBool("prop4.bool2", true));
-	assert (pConf->getBool("prop4.boolx", true));
-	assert (!pConf->getBool("prop4.booly", false));
+	assertTrue (pConf->getBool("prop4.bool1", false));
+	assertTrue (!pConf->getBool("prop4.bool2", true));
+	assertTrue (pConf->getBool("prop4.boolx", true));
+	assertTrue (!pConf->getBool("prop4.booly", false));
 }
 
 
@@ -189,8 +189,8 @@ void AbstractConfigurationTest::testExpand()
 {
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 
-	assert (pConf->getString("ref1") == "foobar");
-	assert (pConf->getInt("ref2") == 42);
+	assertTrue (pConf->getString("ref1") == "foobar");
+	assertTrue (pConf->getInt("ref2") == 42);
 	
 	try
 	{
@@ -201,17 +201,17 @@ void AbstractConfigurationTest::testExpand()
 	{
 	}
 	
-	assert (pConf->getString("ref5") == "${refx}");
-	assert (pConf->getString("ref6") == "${refx}");
+	assertTrue (pConf->getString("ref5") == "${refx}");
+	assertTrue (pConf->getString("ref6") == "${refx}");
 	
-	assert (pConf->expand("answer=${prop4.int1}") == "answer=42");
-	assert (pConf->expand("bool5='${prop4.bool5}'") == "bool5='Yes'");
-	assert (pConf->expand("undef='${undef}'") == "undef='${undef}'");
-	assert (pConf->expand("deep='${ref1}'") == "deep='foobar'");
-	assert (pConf->expand("deep='${ref7}'") == "deep='foobar'");
+	assertTrue (pConf->expand("answer=${prop4.int1}") == "answer=42");
+	assertTrue (pConf->expand("bool5='${prop4.bool5}'") == "bool5='Yes'");
+	assertTrue (pConf->expand("undef='${undef}'") == "undef='${undef}'");
+	assertTrue (pConf->expand("deep='${ref1}'") == "deep='foobar'");
+	assertTrue (pConf->expand("deep='${ref7}'") == "deep='foobar'");
 	
-	assert (pConf->getString("dollar.atend") == "foo$");
-	assert (pConf->getString("dollar.middle") == "foo$bar");
+	assertTrue (pConf->getString("dollar.atend") == "foo$");
+	assertTrue (pConf->getString("dollar.middle") == "foo$bar");
 }
 
 
@@ -221,8 +221,8 @@ void AbstractConfigurationTest::testSetString()
 
 	pConf->setString("set.string1", "foobar");
 	pConf->setString("set.string2", "");
-	assert (pConf->getString("set.string1") == "foobar");
-	assert (pConf->getString("set.string2") == "");
+	assertTrue (pConf->getString("set.string1") == "foobar");
+	assertTrue (pConf->getString("set.string2") == "");
 }
 
 void AbstractConfigurationTest::testSetInt()
@@ -232,9 +232,9 @@ void AbstractConfigurationTest::testSetInt()
 	pConf->setInt("set.int1", 42);
 	pConf->setInt("set.int2", -100);
 	pConf->setInt("set.uint", 42U);
-	assert (pConf->getInt("set.int1") == 42);
-	assert (pConf->getInt("set.int2") == -100);
-	assert (pConf->getInt("set.uint") == 42U);
+	assertTrue (pConf->getInt("set.int1") == 42);
+	assertTrue (pConf->getInt("set.int2") == -100);
+	assertTrue (pConf->getInt("set.uint") == 42U);
 }
 
 
@@ -247,9 +247,9 @@ void AbstractConfigurationTest::testSetInt64()
 	pConf->setInt64("set.bigint2", std::numeric_limits<Int64>::min());
 	pConf->setInt64("set.biguint", std::numeric_limits<UInt64>::max());
 
-	assert (pConf->getInt64("set.bigint1") == std::numeric_limits<Int64>::max());
-	assert (pConf->getInt64("set.bigint2") == std::numeric_limits<Int64>::min());
-	assert (pConf->getInt64("set.biguint") == std::numeric_limits<UInt64>::max());
+	assertTrue (pConf->getInt64("set.bigint1") == std::numeric_limits<Int64>::max());
+	assertTrue (pConf->getInt64("set.bigint2") == std::numeric_limits<Int64>::min());
+	assertTrue (pConf->getInt64("set.biguint") == std::numeric_limits<UInt64>::max());
 #endif //defined(POCO_HAVE_INT64)
 }
 
@@ -260,8 +260,8 @@ void AbstractConfigurationTest::testSetDouble()
 
 	pConf->setDouble("set.double1", 1.5);
 	pConf->setDouble("set.double2", -1.5);
-	assert (pConf->getDouble("set.double1") == 1.5);
-	assert (pConf->getDouble("set.double2") == -1.5);	
+	assertTrue (pConf->getDouble("set.double1") == 1.5);
+	assertTrue (pConf->getDouble("set.double2") == -1.5);	
 }
 
 
@@ -271,8 +271,8 @@ void AbstractConfigurationTest::testSetBool()
 
 	pConf->setBool("set.bool1", true);
 	pConf->setBool("set.bool2", false);
-	assert (pConf->getBool("set.bool1"));
-	assert (!pConf->getBool("set.bool2"));
+	assertTrue (pConf->getBool("set.bool1"));
+	assertTrue (!pConf->getBool("set.bool2"));
 }
 
 
@@ -284,28 +284,28 @@ void AbstractConfigurationTest::testChangeEvents()
 	pConf->propertyChanged += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanged);
 	
 	pConf->setString("set.string1", "foobar");
-	assert (_changingKey == "set.string1");
-	assert (_changingValue == "foobar");
-	assert (_changedKey == "set.string1");
-	assert (_changedValue == "foobar");
+	assertTrue (_changingKey == "set.string1");
+	assertTrue (_changingValue == "foobar");
+	assertTrue (_changedKey == "set.string1");
+	assertTrue (_changedValue == "foobar");
 	
 	pConf->setInt("set.int1", 42);
-	assert (_changingKey == "set.int1");
-	assert (_changingValue == "42");
-	assert (_changedKey == "set.int1");
-	assert (_changedValue == "42");
+	assertTrue (_changingKey == "set.int1");
+	assertTrue (_changingValue == "42");
+	assertTrue (_changedKey == "set.int1");
+	assertTrue (_changedValue == "42");
 	
 	pConf->setDouble("set.double1", 1.5);
-	assert (_changingKey == "set.double1");
-	assert (_changingValue == "1.5");
-	assert (_changedKey == "set.double1");
-	assert (_changedValue == "1.5");
+	assertTrue (_changingKey == "set.double1");
+	assertTrue (_changingValue == "1.5");
+	assertTrue (_changedKey == "set.double1");
+	assertTrue (_changedValue == "1.5");
 	
 	pConf->setBool("set.bool1", true);
-	assert (_changingKey == "set.bool1");
-	assert (_changingValue == "true");
-	assert (_changedKey == "set.bool1");
-	assert (_changedValue == "true");
+	assertTrue (_changingKey == "set.bool1");
+	assertTrue (_changingValue == "true");
+	assertTrue (_changedKey == "set.bool1");
+	assertTrue (_changedValue == "true");
 }
 
 
@@ -317,8 +317,8 @@ void AbstractConfigurationTest::testRemoveEvents()
 	pConf->propertyRemoved += Poco::delegate(this, &AbstractConfigurationTest::onPropertyRemoved);
 
 	pConf->remove("prop4.bool1");
-	assert (_removingKey == "prop4.bool1");
-	assert (_removedKey == "prop4.bool1");
+	assertTrue (_removingKey == "prop4.bool1");
+	assertTrue (_removedKey == "prop4.bool1");
 }
 
 
@@ -328,31 +328,31 @@ void AbstractConfigurationTest::testKeys()
 
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 13);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref3") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref4") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref5") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref6") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "ref7") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "dollar") != keys.end());
+	assertTrue (keys.size() == 13);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref3") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref4") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref5") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref6") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "ref7") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "dollar") != keys.end());
 
 	pConf->keys("prop1", keys);
-	assert (keys.empty());
+	assertTrue (keys.empty());
 	
 	pConf->keys("prop3", keys);
-	assert (keys.size() == 2);
-	assert (std::find(keys.begin(), keys.end(), "string1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "string2") != keys.end());
+	assertTrue (keys.size() == 2);
+	assertTrue (std::find(keys.begin(), keys.end(), "string1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "string2") != keys.end());
 
-	assert (!pConf->hasProperty("nonexistent.sub"));
+	assertTrue (!pConf->hasProperty("nonexistent.sub"));
 	pConf->keys("nonexistent.sub", keys);
-	assert (keys.empty());
+	assertTrue (keys.empty());
 }
 
 
@@ -361,37 +361,37 @@ void AbstractConfigurationTest::testRemove()
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 	AbstractConfiguration::Keys keys;
 
-	assert (pConf->hasProperty("prop1"));
-	assert (pConf->hasProperty("prop4.bool1"));
-	assert (pConf->hasProperty("prop4.bool2"));
-	assert (pConf->hasProperty("prop4.bool3"));
+	assertTrue (pConf->hasProperty("prop1"));
+	assertTrue (pConf->hasProperty("prop4.bool1"));
+	assertTrue (pConf->hasProperty("prop4.bool2"));
+	assertTrue (pConf->hasProperty("prop4.bool3"));
 	pConf->keys(keys);
-	assert (keys.size() == 13);
+	assertTrue (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 17);
+	assertTrue (keys.size() == 17);
 
 	pConf->remove("prop4.bool1");
-	assert (!pConf->hasProperty("prop4.bool1"));
-	assert (pConf->hasProperty("prop4.bool2"));
-	assert (pConf->hasProperty("prop4.bool3"));
+	assertTrue (!pConf->hasProperty("prop4.bool1"));
+	assertTrue (pConf->hasProperty("prop4.bool2"));
+	assertTrue (pConf->hasProperty("prop4.bool3"));
 	pConf->keys(keys);
-	assert (keys.size() == 13);
+	assertTrue (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 16);
+	assertTrue (keys.size() == 16);
 
 	pConf->remove("prop4");
-	assert (!pConf->hasProperty("prop4.bool1"));
-	assert (!pConf->hasProperty("prop4.bool2"));
-	assert (!pConf->hasProperty("prop4.bool3"));
-	assert (pConf->hasProperty("prop1"));
+	assertTrue (!pConf->hasProperty("prop4.bool1"));
+	assertTrue (!pConf->hasProperty("prop4.bool2"));
+	assertTrue (!pConf->hasProperty("prop4.bool3"));
+	assertTrue (pConf->hasProperty("prop1"));
 	pConf->keys(keys);
-	assert (keys.size() == 12);
+	assertTrue (keys.size() == 12);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 0);
+	assertTrue (keys.size() == 0);
 
-	assert (!pConf->hasProperty("nonexistent.sub.value"));
+	assertTrue (!pConf->hasProperty("nonexistent.sub.value"));
 	pConf->remove("nonexistent.sub.value");
-	assert (!pConf->hasProperty("nonexistent.sub.value"));
+	assertTrue (!pConf->hasProperty("nonexistent.sub.value"));
 }
 
 

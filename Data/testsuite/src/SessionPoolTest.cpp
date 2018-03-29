@@ -49,25 +49,25 @@ void SessionPoolTest::testSessionPool()
 	SessionPool pool("test", "cs", 1, 4, 2);
 	
 	pool.setFeature("f1", true);
-	assert (pool.getFeature("f1"));
+	assertTrue (pool.getFeature("f1"));
 	try { pool.getFeature("g1"); fail ("must fail"); }
 	catch ( Poco::NotFoundException& ) { }
 
 	pool.setProperty("p1", 1);
-	assert (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
+	assertTrue (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
 	try { pool.getProperty("r1"); fail ("must fail"); }
 	catch ( Poco::NotFoundException& ) { }
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 0);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 4);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 4);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 	Session s1(pool.get());
 	
-	assert (s1.getFeature("f1"));
-	assert (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
+	assertTrue (s1.getFeature("f1"));
+	assertTrue (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
 
 	try { pool.setFeature("f1", true); fail ("must fail"); }
 	catch ( Poco::InvalidAccessException& ) { }
@@ -75,63 +75,63 @@ void SessionPoolTest::testSessionPool()
 	try { pool.setProperty("p1", 1); fail ("must fail"); }
 	catch ( Poco::InvalidAccessException& ) { }
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 1);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 3);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 1);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 3);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	Session s2(pool.get("f1", false));
-	assert (!s2.getFeature("f1"));
-	assert (1 == Poco::AnyCast<int>(s2.getProperty("p1")));
+	assertTrue (!s2.getFeature("f1"));
+	assertTrue (1 == Poco::AnyCast<int>(s2.getProperty("p1")));
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 2);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 2);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 2);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 	
 	{
 		Session s3(pool.get("p1", 2));
-		assert (s3.getFeature("f1"));
-		assert (2 == Poco::AnyCast<int>(s3.getProperty("p1")));
+		assertTrue (s3.getFeature("f1"));
+		assertTrue (2 == Poco::AnyCast<int>(s3.getProperty("p1")));
 
-		assert (pool.capacity() == 4);
-		assert (pool.allocated() == 3);
-		assert (pool.idle() == 0);
-		assert (pool.available() == 1);
-		assert (pool.dead() == 0);
-		assert (pool.allocated() == pool.used() + pool.idle());
+		assertTrue (pool.capacity() == 4);
+		assertTrue (pool.allocated() == 3);
+		assertTrue (pool.idle() == 0);
+		assertTrue (pool.available() == 1);
+		assertTrue (pool.dead() == 0);
+		assertTrue (pool.allocated() == pool.used() + pool.idle());
 	}
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 3);
-	assert (pool.idle() == 1);
-	assert (pool.available() == 2);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 3);
+	assertTrue (pool.idle() == 1);
+	assertTrue (pool.available() == 2);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	Session s4(pool.get());
-	assert (s4.getFeature("f1"));
-	assert (1 == Poco::AnyCast<int>(s4.getProperty("p1")));
+	assertTrue (s4.getFeature("f1"));
+	assertTrue (1 == Poco::AnyCast<int>(s4.getProperty("p1")));
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 3);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 1);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 3);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 1);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	Session s5(pool.get());
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 4);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 0);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 4);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 0);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 	
 	try
 	{
@@ -141,12 +141,12 @@ void SessionPoolTest::testSessionPool()
 	catch (SessionPoolExhaustedException&) { }
 	
 	s5.close();
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 4);
-	assert (pool.idle() == 1);
-	assert (pool.available() == 1);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 4);
+	assertTrue (pool.idle() == 1);
+	assertTrue (pool.available() == 1);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	try
 	{
@@ -156,45 +156,45 @@ void SessionPoolTest::testSessionPool()
 	catch (SessionUnavailableException&) { }
 
 	s4.close();
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 4);
-	assert (pool.idle() == 2);
-	assert (pool.available() == 2);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 4);
+	assertTrue (pool.idle() == 2);
+	assertTrue (pool.available() == 2);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 	
 	Thread::sleep(5000); // time to clean up idle sessions
 	
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 2);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 2);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 2);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 	
 	Session s6(pool.get());
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 3);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 1);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 3);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 1);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	s6.setFeature("connected", false);
-	assert (pool.dead() == 1);
+	assertTrue (pool.dead() == 1);
 	
 	s6.close();
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 2);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 2);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 2);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
-	assert (pool.isActive());
+	assertTrue (pool.isActive());
 	pool.shutdown();
-	assert (!pool.isActive());
+	assertTrue (!pool.isActive());
 	try
 	{
 		Session s7(pool.get());
@@ -202,12 +202,12 @@ void SessionPoolTest::testSessionPool()
 	}
 	catch (InvalidAccessException&) { }
 
-	assert (pool.capacity() == 4);
-	assert (pool.allocated() == 0);
-	assert (pool.idle() == 0);
-	assert (pool.available() == 0);
-	assert (pool.dead() == 0);
-	assert (pool.allocated() == pool.used() + pool.idle());
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.available() == 0);
+	assertTrue (pool.dead() == 0);
+	assertTrue (pool.allocated() == pool.used() + pool.idle());
 }
 
 
@@ -216,36 +216,36 @@ void SessionPoolTest::testSessionPoolContainer()
 	SessionPoolContainer spc;
 	AutoPtr<SessionPool> pPool = new SessionPool("TeSt", "Cs");
 	spc.add(pPool);
-	assert (pPool->isActive());
-	assert (spc.isActive("test", "cs"));
-	assert (spc.isActive("test:///cs"));
-	assert (spc.has("test:///cs"));
-	assert (1 == spc.count());
+	assertTrue (pPool->isActive());
+	assertTrue (spc.isActive("test", "cs"));
+	assertTrue (spc.isActive("test:///cs"));
+	assertTrue (spc.has("test:///cs"));
+	assertTrue (1 == spc.count());
 
 	Poco::Data::Session sess = spc.get("test:///cs");
-	assert ("test" == sess.impl()->connectorName());
-	assert ("Cs" == sess.impl()->connectionString());
-	assert ("test:///Cs" == sess.uri());
+	assertTrue ("test" == sess.impl()->connectorName());
+	assertTrue ("Cs" == sess.impl()->connectionString());
+	assertTrue ("test:///Cs" == sess.uri());
 
 	try { spc.add(pPool); fail ("must fail"); }
 	catch (SessionPoolExistsException&) { }
 	pPool->shutdown();
-	assert (!pPool->isActive());
-	assert (!spc.isActive("test", "cs"));
-	assert (!spc.isActive("test:///cs"));
+	assertTrue (!pPool->isActive());
+	assertTrue (!spc.isActive("test", "cs"));
+	assertTrue (!spc.isActive("test:///cs"));
 	spc.remove(pPool->name());
-	assert (!spc.has("test:///cs"));
-	assert (!spc.isActive("test", "cs"));
-	assert (!spc.isActive("test:///cs"));
-	assert (0 == spc.count());
+	assertTrue (!spc.has("test:///cs"));
+	assertTrue (!spc.isActive("test", "cs"));
+	assertTrue (!spc.isActive("test:///cs"));
+	assertTrue (0 == spc.count());
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }
 
 	spc.add("tEsT", "cs");
 	spc.add("TeSt", "cs");//duplicate request, must be silently ignored
-	assert (1 == spc.count());
+	assertTrue (1 == spc.count());
 	spc.remove("TesT:///cs");
-	assert (0 == spc.count());
+	assertTrue (0 == spc.count());
 	try { spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }
 }

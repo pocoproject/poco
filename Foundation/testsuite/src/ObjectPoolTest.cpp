@@ -32,59 +32,59 @@ void ObjectPoolTest::testObjectPool()
 {
 	ObjectPool<std::string, Poco::SharedPtr<std::string> > pool(3, 4);
 	
-	assert (pool.capacity() == 3);
-	assert (pool.peakCapacity() == 4);
-	assert (pool.size() == 0);
-	assert (pool.available() == 4);
+	assertTrue (pool.capacity() == 3);
+	assertTrue (pool.peakCapacity() == 4);
+	assertTrue (pool.size() == 0);
+	assertTrue (pool.available() == 4);
 	
 	Poco::SharedPtr<std::string> pStr1 = pool.borrowObject();
 	pStr1->assign("first");
-	assert (pool.size() == 1);
-	assert (pool.available() == 3);
+	assertTrue (pool.size() == 1);
+	assertTrue (pool.available() == 3);
 	
 	Poco::SharedPtr<std::string> pStr2 = pool.borrowObject();
 	pStr2->assign("second");
-	assert (pool.size() == 2);
-	assert (pool.available() == 2);
+	assertTrue (pool.size() == 2);
+	assertTrue (pool.available() == 2);
 
 	Poco::SharedPtr<std::string> pStr3 = pool.borrowObject();
 	pStr3->assign("third");
-	assert (pool.size() == 3);
-	assert (pool.available() == 1);
+	assertTrue (pool.size() == 3);
+	assertTrue (pool.available() == 1);
 	
 	Poco::SharedPtr<std::string> pStr4 = pool.borrowObject();
 	pStr4->assign("fourth");
-	assert (pool.size() == 4);
-	assert (pool.available() == 0);
+	assertTrue (pool.size() == 4);
+	assertTrue (pool.available() == 0);
 	
 	Poco::SharedPtr<std::string> pStr5 = pool.borrowObject();
-	assert (pStr5.isNull());
+	assertTrue (pStr5.isNull());
 	
 	pool.returnObject(pStr4);
-	assert (pool.size() == 4);
-	assert (pool.available() == 1);
+	assertTrue (pool.size() == 4);
+	assertTrue (pool.available() == 1);
 	
 	pool.returnObject(pStr3);
-	assert (pool.size() == 4);
-	assert (pool.available() == 2);
+	assertTrue (pool.size() == 4);
+	assertTrue (pool.available() == 2);
 
 	pStr3 = pool.borrowObject();
-	assert (*pStr3 == "third");
-	assert (pool.available() == 1);
+	assertTrue (*pStr3 == "third");
+	assertTrue (pool.available() == 1);
 
 	pool.returnObject(pStr3);
 	pool.returnObject(pStr2);
 	pool.returnObject(pStr1);
 	
-	assert (pool.size() == 3);
-	assert (pool.available() == 4);
+	assertTrue (pool.size() == 3);
+	assertTrue (pool.available() == 4);
 	
 	pStr1 = pool.borrowObject();
-	assert (*pStr1 == "second");
-	assert (pool.available() == 3);
+	assertTrue (*pStr1 == "second");
+	assertTrue (pool.available() == 3);
 
 	pool.returnObject(pStr1);
-	assert (pool.available() == 4);
+	assertTrue (pool.available() == 4);
 }
 
 

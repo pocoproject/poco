@@ -70,17 +70,17 @@ void ODBCAccessTest::testSimpleAccess()
 	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	try { *_pSession << "SELECT LastName FROM PERSON", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (lastName == result);
+	assertTrue (lastName == result);
 
 	try { *_pSession << "SELECT Age FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (count == age);
+	assertTrue (count == age);
 }
 
 

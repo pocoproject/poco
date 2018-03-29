@@ -42,29 +42,29 @@ void EVPTest::testRSAEVPPKey()
 	try
 	{
 		RSAKey* key = new RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
-		assert(key->type() == Poco::Crypto::KeyPair::KT_RSA);
+		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
 		// construct EVPPKey from RSAKey*
 		EVPPKey* pKey = new EVPPKey(key);
 		// EVPPKey increments reference count, so freeing the original must be ok
 		delete key;
 
-		assert (!pKey->isSupported(0));
-		assert (!pKey->isSupported(-1));
-		assert (pKey->isSupported(pKey->type()));
-		assert (pKey->type() == EVP_PKEY_RSA);
+		assertTrue (!pKey->isSupported(0));
+		assertTrue (!pKey->isSupported(-1));
+		assertTrue (pKey->isSupported(pKey->type()));
+		assertTrue (pKey->type() == EVP_PKEY_RSA);
 
 		// construct RSAKey from const EVPPKey&
 		key = new RSAKey(*pKey);
 		delete pKey;
-		assert(key->type() == Poco::Crypto::KeyPair::KT_RSA);
+		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
 		// construct EVPPKey from RSAKey*
 		pKey = new EVPPKey(key);
-		assert (pKey->type() == EVP_PKEY_RSA);
+		assertTrue (pKey->type() == EVP_PKEY_RSA);
 
 		BIO* bioPriv1 = BIO_new(BIO_s_mem());
 		BIO* bioPub1 = BIO_new(BIO_s_mem());
-		assert (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
-		assert (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
 		char* pPrivData1;
 		long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
 		char* pPubData1;
@@ -74,39 +74,39 @@ void EVPTest::testRSAEVPPKey()
 		EVPPKey evpPKey(pKey->operator EVP_PKEY*());
 		// EVPPKey makes duplicate, so freeing the original must be ok
 		delete pKey;
-		assert (evpPKey.type() == EVP_PKEY_RSA);
+		assertTrue (evpPKey.type() == EVP_PKEY_RSA);
 
 		BIO* bioPriv2 = BIO_new(BIO_s_mem());
 		BIO* bioPub2 = BIO_new(BIO_s_mem());
-		assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
-		assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
 		char* pPrivData2;
 		long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 		char* pPubData2;
 		long sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-		assert (sizePriv1 && (sizePriv1 == sizePriv2));
-		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-		assert (sizePub1 && (sizePub1 == sizePub2));
-		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+		assertTrue (sizePriv1 && (sizePriv1 == sizePriv2));
+		assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+		assertTrue (sizePub1 && (sizePub1 == sizePub2));
+		assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
 		BIO_free(bioPub2);
 		BIO_free(bioPriv2);
 
 		// copy
 		EVPPKey evpPKey2(evpPKey);
-		assert (evpPKey2.type() == EVP_PKEY_RSA);
+		assertTrue (evpPKey2.type() == EVP_PKEY_RSA);
 		bioPriv2 = BIO_new(BIO_s_mem());
 		bioPub2 = BIO_new(BIO_s_mem());
-		assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
-		assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
 		sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 		sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-		assert (sizePriv1 && (sizePriv1 == sizePriv2));
-		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-		assert (sizePub1 && (sizePub1 == sizePub2));
-		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+		assertTrue (sizePriv1 && (sizePriv1 == sizePriv2));
+		assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+		assertTrue (sizePub1 && (sizePub1 == sizePub2));
+		assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
 #ifdef POCO_ENABLE_CPP11
 
@@ -115,18 +115,18 @@ void EVPTest::testRSAEVPPKey()
 
 		// move
 		EVPPKey evpPKey3(std::move(evpPKey2));
-		assert (evpPKey3.type() == EVP_PKEY_RSA);
+		assertTrue (evpPKey3.type() == EVP_PKEY_RSA);
 		bioPriv2 = BIO_new(BIO_s_mem());
 		bioPub2 = BIO_new(BIO_s_mem());
-		assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
-		assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
 		sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 		sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-		assert (sizePriv1 && (sizePriv1 == sizePriv2));
-		assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-		assert (sizePub1 && (sizePub1 == sizePub2));
-		assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+		assertTrue (sizePriv1 && (sizePriv1 == sizePriv2));
+		assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+		assertTrue (sizePub1 && (sizePub1 == sizePub2));
+		assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
 #endif // POCO_ENABLE_CPP11
 
@@ -158,25 +158,25 @@ void EVPTest::testRSAEVPSaveLoadStream()
 	std::istringstream iPriv(privKey);
 	EVPPKey key2(&iPub, &iPriv, "testpwd");
 
-	assert (key == key2);
-	assert (!(key != key2));
+	assertTrue (key == key2);
+	assertTrue (!(key != key2));
 	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
 	EVPPKey keyNE(&rsaKeyNE);
-	assert (key != keyNE);
-	assert (!(key == keyNE));
-	assert (key2 != keyNE);;
-	assert (!(key2 == keyNE));
+	assertTrue (key != keyNE);
+	assertTrue (!(key == keyNE));
+	assertTrue (key2 != keyNE);;
+	assertTrue (!(key2 == keyNE));
 
 	std::ostringstream strPub2;
 	std::ostringstream strPriv2;
 	key2.save(&strPub2, &strPriv2, "testpwd");
-	assert (strPub2.str() == pubKey);
+	assertTrue (strPub2.str() == pubKey);
 
 	std::istringstream iPriv2(strPriv2.str());
 	EVPPKey key3(0, &iPriv2,  "testpwd");
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
-	assert (strPub3.str() == pubKey);
+	assertTrue (strPub3.str() == pubKey);
 }
 
 
@@ -195,21 +195,21 @@ void EVPTest::testRSAEVPSaveLoadStreamNoPass()
 	std::istringstream iPriv(privKey);
 	EVPPKey key2(&iPub, &iPriv);
 
-	assert (key == key2);
-	assert (!(key != key2));
+	assertTrue (key == key2);
+	assertTrue (!(key != key2));
 	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
 	EVPPKey keyNE(&rsaKeyNE);
-	assert (key != keyNE);
-	assert (!(key == keyNE));
-	assert (key2 != keyNE);;
-	assert (!(key2 == keyNE));
+	assertTrue (key != keyNE);
+	assertTrue (!(key == keyNE));
+	assertTrue (key2 != keyNE);;
+	assertTrue (!(key2 == keyNE));
 
 	std::istringstream iPriv2(privKey);
 	EVPPKey key3(0, &iPriv2);
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -221,16 +221,16 @@ void EVPTest::testECEVPPKey()
 		if (!curveName.empty())
 		{
 			EVPPKey* pKey = new EVPPKey(curveName);
-			assert (pKey != 0);
-			assert (!pKey->isSupported(0));
-			assert (!pKey->isSupported(-1));
-			assert (pKey->isSupported(pKey->type()));
-			assert (pKey->type() == EVP_PKEY_EC);
+			assertTrue (pKey != 0);
+			assertTrue (!pKey->isSupported(0));
+			assertTrue (!pKey->isSupported(-1));
+			assertTrue (pKey->isSupported(pKey->type()));
+			assertTrue (pKey->type() == EVP_PKEY_EC);
 
 			BIO* bioPriv1 = BIO_new(BIO_s_mem());
 			BIO* bioPub1 = BIO_new(BIO_s_mem());
-			assert (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
-			assert (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
+			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
 			char* pPrivData1;
 			long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
 			char* pPubData1;
@@ -238,41 +238,41 @@ void EVPTest::testECEVPPKey()
 
 			// construct EVPPKey from EVP_PKEY*
 			EVPPKey evpPKey(pKey->operator EVP_PKEY*());
-			assert (evpPKey.type() == EVP_PKEY_EC);
+			assertTrue (evpPKey.type() == EVP_PKEY_EC);
 			// EVPPKey makes duplicate, so freeing the original must be ok
 			delete pKey;
 
 			BIO* bioPriv2 = BIO_new(BIO_s_mem());
 			BIO* bioPub2 = BIO_new(BIO_s_mem());
-			assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
-			assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
+			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
 			char* pPrivData2;
 			long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 			char* pPubData2;
 			long sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-			assert (sizePriv1 && (sizePriv1 == sizePriv2));
-			assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-			assert (sizePub1 && (sizePub1 == sizePub2));
-			assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+			assertTrue (sizePriv1 && (sizePriv1 == sizePriv2));
+			assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+			assertTrue (sizePub1 && (sizePub1 == sizePub2));
+			assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
 			BIO_free(bioPub2);
 			BIO_free(bioPriv2);
 
 			// copy
 			EVPPKey evpPKey2(evpPKey);
-			assert (evpPKey2.type() == EVP_PKEY_EC);
+			assertTrue (evpPKey2.type() == EVP_PKEY_EC);
 			bioPriv2 = BIO_new(BIO_s_mem());
 			bioPub2 = BIO_new(BIO_s_mem());
-			assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
-			assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
+			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
 			sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 			sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-			assert (sizePriv1 && (sizePriv1 == sizePriv2));
-			assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-			assert (sizePub1 && (sizePub1 == sizePub2));
-			assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+			assertTrue (sizePriv1 && (sizePriv1 == sizePriv2));
+			assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+			assertTrue (sizePub1 && (sizePub1 == sizePub2));
+			assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
 	#ifdef POCO_ENABLE_CPP11
 
@@ -281,18 +281,18 @@ void EVPTest::testECEVPPKey()
 
 			// move
 			EVPPKey evpPKey3(std::move(evpPKey2));
-			assert (evpPKey3.type() == EVP_PKEY_EC);
+			assertTrue (evpPKey3.type() == EVP_PKEY_EC);
 			bioPriv2 = BIO_new(BIO_s_mem());
 			bioPub2 = BIO_new(BIO_s_mem());
-			assert (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
-			assert (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
+			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
 			sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 			sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
 
-			assert (sizePriv1 && (sizePriv1 == sizePriv2));
-			assert (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
-			assert (sizePub1 && (sizePub1 == sizePub2));
-			assert (0 == memcmp(pPubData1, pPubData2, sizePub1));
+			assertTrue (sizePriv1 && (sizePriv1 == sizePriv2));
+			assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
+			assertTrue (sizePub1 && (sizePub1 == sizePub2));
+			assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 	#endif // POCO_ENABLE_CPP11
 
 			BIO_free(bioPub2);
@@ -333,27 +333,27 @@ void EVPTest::testECEVPSaveLoadStream()
 			std::ostringstream strPubE;
 			std::ostringstream strPrivE;
 			key2.save(&strPubE, &strPrivE, "testpwd");
-			assert (strPubE.str() == pubKey);
-			assert (key == key2);
-			assert (!(key != key2));
+			assertTrue (strPubE.str() == pubKey);
+			assertTrue (key == key2);
+			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
-			assert (key != keyNE);
-			assert (!(key == keyNE));
-			assert (key2 != keyNE);
-			assert (!(key2 == keyNE));
+			assertTrue (key != keyNE);
+			assertTrue (!(key == keyNE));
+			assertTrue (key2 != keyNE);
+			assertTrue (!(key2 == keyNE));
 
 			std::ostringstream strPub2;
 			std::ostringstream strPriv2;
 			key2.save(&strPub2, &strPriv2, "testpwd");
-			assert (strPub2.str() == pubKey);
+			assertTrue (strPub2.str() == pubKey);
 
 			std::istringstream iPriv2(strPriv2.str());
 			EVPPKey key3(0, &iPriv2,  "testpwd");
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
-			assert (pubFromPrivate == pubKey);
+			assertTrue (pubFromPrivate == pubKey);
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
@@ -388,28 +388,28 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 			std::ostringstream strPubE;
 			std::ostringstream strPrivE;
 			key2.save(&strPubE, &strPrivE);
-			assert (strPubE.str() == pubKey);
-			assert (key == key2);
-			assert (!(key != key2));
+			assertTrue (strPubE.str() == pubKey);
+			assertTrue (key == key2);
+			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
-			assert (key != keyNE);
-			assert (!(key == keyNE));
-			assert (key2 != keyNE);
-			assert (!(key2 == keyNE));
+			assertTrue (key != keyNE);
+			assertTrue (!(key == keyNE));
+			assertTrue (key2 != keyNE);
+			assertTrue (!(key2 == keyNE));
 
 			std::ostringstream strPub2;
 			std::ostringstream strPriv2;
 			key2.save(&strPub2, &strPriv2);
-			assert (strPub2.str() == pubKey);
-			assert (strPriv2.str() == privKey);
+			assertTrue (strPub2.str() == pubKey);
+			assertTrue (strPriv2.str() == privKey);
 
 			std::istringstream iPriv2(privKey);
 			EVPPKey key3(0, &iPriv2);
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
-			assert (pubFromPrivate == pubKey);
+			assertTrue (pubFromPrivate == pubKey);
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
@@ -445,26 +445,26 @@ void EVPTest::testECEVPSaveLoadFile()
 			std::ostringstream strPubE;
 			std::ostringstream strPrivE;
 			key2.save(&strPubE, &strPrivE, "testpwd");
-			assert (strPubE.str() == pubKey);
-			assert (key == key2);
-			assert (!(key != key2));
+			assertTrue (strPubE.str() == pubKey);
+			assertTrue (key == key2);
+			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
 			EVPPKey keyNE(&ecKeyNE);
-			assert (key != keyNE);
-			assert (!(key == keyNE));
-			assert (key2 != keyNE);
-			assert (!(key2 == keyNE));
+			assertTrue (key != keyNE);
+			assertTrue (!(key == keyNE));
+			assertTrue (key2 != keyNE);
+			assertTrue (!(key2 == keyNE));
 
 			std::ostringstream strPub2;
 			std::ostringstream strPriv2;
 			key2.save(&strPub2, &strPriv2, "testpwd");
-			assert (strPub2.str() == pubKey);
+			assertTrue (strPub2.str() == pubKey);
 
 			EVPPKey key3("", filePriv.path(),  "testpwd");
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
-			assert (pubFromPrivate == pubKey);
+			assertTrue (pubFromPrivate == pubKey);
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
@@ -499,13 +499,13 @@ void EVPTest::testECEVPSaveLoadFileNoPass()
 			std::ostringstream strPub2;
 			std::ostringstream strPriv2;
 			key2.save(&strPub2, &strPriv2);
-			assert (strPub2.str() == pubKey);
+			assertTrue (strPub2.str() == pubKey);
 
 			EVPPKey key3("", filePriv.path());
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
-			assert (pubFromPrivate == pubKey);
+			assertTrue (pubFromPrivate == pubKey);
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;

@@ -33,18 +33,18 @@ void RegularExpressionTest::testIndex()
 {
 	RegularExpression re("[0-9]+");
 	RegularExpression::Match match;
-	assert (re.match("", 0, match) == 0);
-	assert (re.match("123", 3, match) == 0);
+	assertTrue (re.match("", 0, match) == 0);
+	assertTrue (re.match("123", 3, match) == 0);
 }
 
 
 void RegularExpressionTest::testMatch1()
 {
 	RegularExpression re("[0-9]+");
-	assert (re.match("123"));
-	assert (!re.match("123cd"));
-	assert (!re.match("abcde"));
-	assert (re.match("ab123", 2));
+	assertTrue (re.match("123"));
+	assertTrue (!re.match("123cd"));
+	assertTrue (!re.match("abcde"));
+	assertTrue (re.match("ab123", 2));
 }
 
 
@@ -52,21 +52,21 @@ void RegularExpressionTest::testMatch2()
 {
 	RegularExpression re("[0-9]+");
 	RegularExpression::Match match;
-	assert (re.match("123", 0, match) == 1);
-	assert (match.offset == 0);
-	assert (match.length == 3);
+	assertTrue (re.match("123", 0, match) == 1);
+	assertTrue (match.offset == 0);
+	assertTrue (match.length == 3);
 
-	assert (re.match("abc123def", 0, match) == 1);
-	assert (match.offset == 3);
-	assert (match.length == 3);
+	assertTrue (re.match("abc123def", 0, match) == 1);
+	assertTrue (match.offset == 3);
+	assertTrue (match.length == 3);
 
-	assert (re.match("abcdef", 0, match) == 0);
-	assert (match.offset == std::string::npos);
-	assert (match.length == 0);
+	assertTrue (re.match("abcdef", 0, match) == 0);
+	assertTrue (match.offset == std::string::npos);
+	assertTrue (match.length == 0);
 
-	assert (re.match("abc123def", 3, match) == 1);
-	assert (match.offset == 3);
-	assert (match.length == 3);
+	assertTrue (re.match("abc123def", 3, match) == 1);
+	assertTrue (match.offset == 3);
+	assertTrue (match.length == 3);
 }
 
 
@@ -74,23 +74,23 @@ void RegularExpressionTest::testMatch3()
 {
 	RegularExpression re("[0-9]+");
 	RegularExpression::MatchVec match;
-	assert (re.match("123", 0, match) == 1);
-	assert (match.size() == 1);
-	assert (match[0].offset == 0);
-	assert (match[0].length == 3);
+	assertTrue (re.match("123", 0, match) == 1);
+	assertTrue (match.size() == 1);
+	assertTrue (match[0].offset == 0);
+	assertTrue (match[0].length == 3);
 
-	assert (re.match("abc123def", 0, match) == 1);
-	assert (match.size() == 1);
-	assert (match[0].offset == 3);
-	assert (match[0].length == 3);
+	assertTrue (re.match("abc123def", 0, match) == 1);
+	assertTrue (match.size() == 1);
+	assertTrue (match[0].offset == 3);
+	assertTrue (match[0].length == 3);
 
-	assert (re.match("abcdef", 0, match) == 0);
-	assert (match.size() == 0);
+	assertTrue (re.match("abcdef", 0, match) == 0);
+	assertTrue (match.size() == 0);
 
-	assert (re.match("abc123def", 3, match) == 1);
-	assert (match.size() == 1);
-	assert (match[0].offset == 3);
-	assert (match[0].length == 3);
+	assertTrue (re.match("abc123def", 3, match) == 1);
+	assertTrue (match.size() == 1);
+	assertTrue (match[0].offset == 3);
+	assertTrue (match[0].length == 3);
 }
 
 
@@ -98,41 +98,41 @@ void RegularExpressionTest::testMatch4()
 {
 	RegularExpression re("([0-9]+) ([0-9]+)");
 	RegularExpression::MatchVec matches;
-	assert (re.match("123 456", 0, matches) == 3);
-	assert (matches.size() == 3);
-	assert (matches[0].offset == 0);
-	assert (matches[0].length == 7);
-	assert (matches[1].offset == 0);
-	assert (matches[1].length == 3);
-	assert (matches[2].offset == 4);
-	assert (matches[2].length == 3);
+	assertTrue (re.match("123 456", 0, matches) == 3);
+	assertTrue (matches.size() == 3);
+	assertTrue (matches[0].offset == 0);
+	assertTrue (matches[0].length == 7);
+	assertTrue (matches[1].offset == 0);
+	assertTrue (matches[1].length == 3);
+	assertTrue (matches[2].offset == 4);
+	assertTrue (matches[2].length == 3);
 
-	assert (re.match("abc123 456def", 0, matches) == 3);
-	assert (matches.size() == 3);
-	assert (matches[0].offset == 3);
-	assert (matches[0].length == 7);
-	assert (matches[1].offset == 3);
-	assert (matches[1].length == 3);
-	assert (matches[2].offset == 7);
-	assert (matches[2].length == 3);
+	assertTrue (re.match("abc123 456def", 0, matches) == 3);
+	assertTrue (matches.size() == 3);
+	assertTrue (matches[0].offset == 3);
+	assertTrue (matches[0].length == 7);
+	assertTrue (matches[1].offset == 3);
+	assertTrue (matches[1].length == 3);
+	assertTrue (matches[2].offset == 7);
+	assertTrue (matches[2].length == 3);
 }
 
 
 void RegularExpressionTest::testMatch5()
 {
 	std::string digits = "0123";
-	assert (RegularExpression::match(digits, "[0-9]+"));
+	assertTrue (RegularExpression::match(digits, "[0-9]+"));
 	std::string alphas = "abcd";
-	assert (!RegularExpression::match(alphas, "[0-9]+"));
+	assertTrue (!RegularExpression::match(alphas, "[0-9]+"));
 }
 
 
 void RegularExpressionTest::testMatch6()
 {
 	RegularExpression expr("^([a-z]*)?$");
-	assert (expr.match("", 0, 0));
-	assert (expr.match("abcde", 0, 0));
-	assert (!expr.match("123", 0, 0));
+	assertTrue (expr.match("", 0, 0));
+	assertTrue (expr.match("abcde", 0, 0));
+	assertTrue (!expr.match("123", 0, 0));
 }
 
 
@@ -140,17 +140,17 @@ void RegularExpressionTest::testExtract()
 {
 	RegularExpression re("[0-9]+");
 	std::string str;
-	assert (re.extract("123", str) == 1);
-	assert (str == "123");
+	assertTrue (re.extract("123", str) == 1);
+	assertTrue (str == "123");
 
-	assert (re.extract("abc123def", 0, str) == 1);
-	assert (str == "123");
+	assertTrue (re.extract("abc123def", 0, str) == 1);
+	assertTrue (str == "123");
 
-	assert (re.extract("abcdef", 0, str) == 0);
-	assert (str == "");
+	assertTrue (re.extract("abcdef", 0, str) == 0);
+	assertTrue (str == "");
 
-	assert (re.extract("abc123def", 3, str) == 1);
-	assert (str == "123");
+	assertTrue (re.extract("abc123def", 3, str) == 1);
+	assertTrue (str == "123");
 }
 
 
@@ -158,20 +158,20 @@ void RegularExpressionTest::testSplit1()
 {
 	RegularExpression re("[0-9]+");
 	std::vector<std::string> strings;
-	assert (re.split("123", 0, strings) == 1);
-	assert (strings.size() == 1);
-	assert (strings[0] == "123");
+	assertTrue (re.split("123", 0, strings) == 1);
+	assertTrue (strings.size() == 1);
+	assertTrue (strings[0] == "123");
 
-	assert (re.split("abc123def", 0, strings) == 1);
-	assert (strings.size() == 1);
-	assert (strings[0] == "123");
+	assertTrue (re.split("abc123def", 0, strings) == 1);
+	assertTrue (strings.size() == 1);
+	assertTrue (strings[0] == "123");
 
-	assert (re.split("abcdef", 0, strings) == 0);
-	assert (strings.empty());
+	assertTrue (re.split("abcdef", 0, strings) == 0);
+	assertTrue (strings.empty());
 
-	assert (re.split("abc123def", 3, strings) == 1);
-	assert (strings.size() == 1);
-	assert (strings[0] == "123");
+	assertTrue (re.split("abc123def", 3, strings) == 1);
+	assertTrue (strings.size() == 1);
+	assertTrue (strings[0] == "123");
 }
 
 
@@ -179,17 +179,17 @@ void RegularExpressionTest::testSplit2()
 {
 	RegularExpression re("([0-9]+) ([0-9]+)");
 	std::vector<std::string> strings;
-	assert (re.split("123 456", 0, strings) == 3);
-	assert (strings.size() == 3);
-	assert (strings[0] == "123 456");
-	assert (strings[1] == "123");
-	assert (strings[2] == "456");
+	assertTrue (re.split("123 456", 0, strings) == 3);
+	assertTrue (strings.size() == 3);
+	assertTrue (strings[0] == "123 456");
+	assertTrue (strings[1] == "123");
+	assertTrue (strings[2] == "456");
 
-	assert (re.split("abc123 456def", 0, strings) == 3);
-	assert (strings.size() == 3);
-	assert (strings[0] == "123 456");
-	assert (strings[1] == "123");
-	assert (strings[2] == "456");
+	assertTrue (re.split("abc123 456def", 0, strings) == 3);
+	assertTrue (strings.size() == 3);
+	assertTrue (strings[0] == "123 456");
+	assertTrue (strings[1] == "123");
+	assertTrue (strings[2] == "456");
 }
 
 
@@ -197,29 +197,29 @@ void RegularExpressionTest::testSubst1()
 {
 	RegularExpression re("[0-9]+");
 	std::string s = "123";
-	assert (re.subst(s, "ABC") == 1);
-	assert (s == "ABC");
-	assert (re.subst(s, "123") == 0);
+	assertTrue (re.subst(s, "ABC") == 1);
+	assertTrue (s == "ABC");
+	assertTrue (re.subst(s, "123") == 0);
 
 	s = "123";
-	assert (re.subst(s, "AB$0CD") == 1);
-	assert (s == "AB123CD");
+	assertTrue (re.subst(s, "AB$0CD") == 1);
+	assertTrue (s == "AB123CD");
 
 	s = "123";
-	assert (re.subst(s, "AB$1CD") == 1);
-	assert (s == "ABCD");
+	assertTrue (re.subst(s, "AB$1CD") == 1);
+	assertTrue (s == "ABCD");
 
 	s = "123";
-	assert (re.subst(s, "AB$2CD") == 1);
-	assert (s == "ABCD");
+	assertTrue (re.subst(s, "AB$2CD") == 1);
+	assertTrue (s == "ABCD");
 
 	s = "123";
-	assert (re.subst(s, "AB$$CD") == 1);
-	assert (s == "AB$$CD");
+	assertTrue (re.subst(s, "AB$$CD") == 1);
+	assertTrue (s == "AB$$CD");
 
 	s = "123";
-	assert (re.subst(s, "AB$0CD", RegularExpression::RE_NO_VARS) == 1);
-	assert (s == "AB$0CD");
+	assertTrue (re.subst(s, "AB$0CD", RegularExpression::RE_NO_VARS) == 1);
+	assertTrue (s == "AB$0CD");
 }
 
 
@@ -227,8 +227,8 @@ void RegularExpressionTest::testSubst2()
 {
 	RegularExpression re("([0-9]+) ([0-9]+)");
 	std::string s = "123 456";
-	assert (re.subst(s, "$2-$1") == 1);
-	assert (s == "456-123");
+	assertTrue (re.subst(s, "$2-$1") == 1);
+	assertTrue (s == "456-123");
 }
 
 
@@ -236,8 +236,8 @@ void RegularExpressionTest::testSubst3()
 {
 	RegularExpression re("[0-9]+");
 	std::string s = "123 456 789";
-	assert (re.subst(s, "n", RegularExpression::RE_GLOBAL) == 3);
-	assert (s == "n n n");
+	assertTrue (re.subst(s, "n", RegularExpression::RE_GLOBAL) == 3);
+	assertTrue (s == "n n n");
 }
 
 
@@ -245,8 +245,8 @@ void RegularExpressionTest::testSubst4()
 {
 	RegularExpression re("[0-9]+");
 	std::string s = "ABC 123 456 789 DEF";
-	assert (re.subst(s, "n", RegularExpression::RE_GLOBAL) == 3);
-	assert (s == "ABC n n n DEF");
+	assertTrue (re.subst(s, "n", RegularExpression::RE_GLOBAL) == 3);
+	assertTrue (s == "ABC n n n DEF");
 }
 
 

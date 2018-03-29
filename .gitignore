@@ -19,6 +19,7 @@
 # Gradle #
 ##########
 .gradle/
+**/guild/
 **/gradle/
 **/options.txt
 **/output.txt

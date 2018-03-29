@@ -33,19 +33,19 @@ void NameValueCollectionTest::testNameValueCollection()
 {
 	NameValueCollection nvc;
 	
-	assert (nvc.empty());
-	assert (nvc.size() == 0);
+	assertTrue (nvc.empty());
+	assertTrue (nvc.size() == 0);
 	
 	nvc.set("name", "value");
-	assert (!nvc.empty());
-	assert (nvc["name"] == "value");
-	assert (nvc["Name"] == "value");
+	assertTrue (!nvc.empty());
+	assertTrue (nvc["name"] == "value");
+	assertTrue (nvc["Name"] == "value");
 	
 	nvc.set("name2", "value2");
-	assert (nvc.get("name2") == "value2");
-	assert (nvc.get("NAME2") == "value2");
+	assertTrue (nvc.get("name2") == "value2");
+	assertTrue (nvc.get("NAME2") == "value2");
 	
-	assert (nvc.size() == 2);
+	assertTrue (nvc.size() == 2);
 	
 	try
 	{
@@ -65,44 +65,44 @@ void NameValueCollectionTest::testNameValueCollection()
 	{
 	}
 	
-	assert (nvc.get("name", "default") == "value");
-	assert (nvc.get("name3", "default") == "default");
+	assertTrue (nvc.get("name", "default") == "value");
+	assertTrue (nvc.get("name3", "default") == "default");
 
-	assert (nvc.has("name"));
-	assert (nvc.has("name2"));
-	assert (!nvc.has("name3"));	
+	assertTrue (nvc.has("name"));
+	assertTrue (nvc.has("name2"));
+	assertTrue (!nvc.has("name3"));	
 	
 	nvc.add("name3", "value3");
-	assert (nvc.get("name3") == "value3");
+	assertTrue (nvc.get("name3") == "value3");
 	
 	nvc.add("name3", "value31");
 	
 	NameValueCollection::ConstIterator it = nvc.find("Name3");
-	assert (it != nvc.end());
+	assertTrue (it != nvc.end());
 	std::string v1 = it->second;
-	assert (it->first == "name3");
+	assertTrue (it->first == "name3");
 	++it;
-	assert (it != nvc.end());
+	assertTrue (it != nvc.end());
 	std::string v2 = it->second;
-	assert (it->first == "name3");
+	assertTrue (it->first == "name3");
 	
-	assert ((v1 == "value3" && v2 == "value31") || (v1 == "value31" && v2 == "value3"));
+	assertTrue ((v1 == "value3" && v2 == "value31") || (v1 == "value31" && v2 == "value3"));
 	
 	nvc.erase("name3");
-	assert (!nvc.has("name3"));
-	assert (nvc.find("name3") == nvc.end());
+	assertTrue (!nvc.has("name3"));
+	assertTrue (nvc.find("name3") == nvc.end());
 	
 	it = nvc.begin();
-	assert (it != nvc.end());
+	assertTrue (it != nvc.end());
 	++it;
-	assert (it != nvc.end());
+	assertTrue (it != nvc.end());
 	++it;
-	assert (it == nvc.end());
+	assertTrue (it == nvc.end());
 	
 	nvc.clear();
-	assert (nvc.empty());
+	assertTrue (nvc.empty());
 	
-	assert (nvc.size() == 0);
+	assertTrue (nvc.size() == 0);
 }
 
 

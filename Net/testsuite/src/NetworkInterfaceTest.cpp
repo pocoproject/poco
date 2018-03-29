@@ -42,7 +42,7 @@ void NetworkInterfaceTest::testMap()
 	try
 	{
 		NetworkInterface::Map m = NetworkInterface::map(false, false);
-		assert (!m.empty());
+		assertTrue (!m.empty());
 		for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
 		{
 			std::cout << std::endl << "=============" << std::endl;
@@ -89,7 +89,7 @@ void NetworkInterfaceTest::testList()
 	try
 	{
 		NetworkInterface::List list = NetworkInterface::list(false, false);
-		assert (!list.empty());
+		assertTrue (!list.empty());
 		for (NetworkInterface::List::const_iterator it = list.begin(); it != list.end(); ++it)
 		{
 			std::cout << std::endl << "==============" << std::endl;
@@ -136,7 +136,7 @@ void NetworkInterfaceTest::testForName()
 		for (NetworkInterface::Map::const_iterator it = map.begin(); it != map.end(); ++it)
 		{
 			NetworkInterface ifc = NetworkInterface::forName(it->second.name());
-			assert (ifc.name() == it->second.name());
+			assertTrue (ifc.name() == it->second.name());
 		}
 	}
 	catch (Poco::NotImplementedException e)
@@ -161,12 +161,12 @@ void NetworkInterfaceTest::testForAddress()
 			if (it->second.supportsIPv4())
 			{
 				NetworkInterface ifc = NetworkInterface::forAddress(it->second.firstAddress(IPAddress::IPv4));
-				assert (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
+				assertTrue (ifc.firstAddress(IPAddress::IPv4) == it->second.firstAddress(IPAddress::IPv4));
 
 				IPAddress addr(IPAddress::IPv4);
-				assert (addr.isWildcard());
+				assertTrue (addr.isWildcard());
 				it->second.firstAddress(addr, IPAddress::IPv4);
-				assert (!addr.isWildcard());
+				assertTrue (!addr.isWildcard());
 			}
 			else
 			{
@@ -178,9 +178,9 @@ void NetworkInterfaceTest::testForAddress()
 				catch (NotFoundException&) { }
 
 				IPAddress addr(IPAddress::IPv4);
-				assert (addr.isWildcard());
+				assertTrue (addr.isWildcard());
 				it->second.firstAddress(addr, IPAddress::IPv4);
-				assert (addr.isWildcard());
+				assertTrue (addr.isWildcard());
 			}
 		}
 	}
@@ -201,7 +201,7 @@ void NetworkInterfaceTest::testForIndex()
 		for (NetworkInterface::Map::const_iterator it = map.begin(); it != map.end(); ++it)
 		{
 			NetworkInterface ifc = NetworkInterface::forIndex(it->second.index());
-			assert (ifc.index() == it->second.index());
+			assertTrue (ifc.index() == it->second.index());
 		}
 	}
 	catch (Poco::NotImplementedException e)
@@ -218,12 +218,12 @@ void NetworkInterfaceTest::testMapIpOnly()
 	try
 	{
 		NetworkInterface::Map m = NetworkInterface::map(true, false);
-		assert (!m.empty());
+		assertTrue (!m.empty());
 
 		std::cout << std::endl;
 		for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
 		{
-			assert(it->second.supportsIPv4() || it->second.supportsIPv6());
+			assertTrue (it->second.supportsIPv4() || it->second.supportsIPv6());
 			std::cout << "Interface: (" << it->second.index() << ")" << std::endl;
 			std::cout << "Address:    " << it->second.address() << std::endl;
 			NetworkInterface::MACAddress mac(it->second.macAddress());
@@ -245,10 +245,10 @@ void NetworkInterfaceTest::testMapUpOnly()
 	try
 	{
 		NetworkInterface::Map m = NetworkInterface::map(false, true);
-		assert (!m.empty());
+		assertTrue (!m.empty());
 		for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
 		{
-			assert(it->second.isUp());
+			assertTrue (it->second.isUp());
 		}
 	}
 	catch (Poco::NotImplementedException e)
@@ -265,9 +265,9 @@ void NetworkInterfaceTest::testListMapConformance()
 	try
 	{
 		NetworkInterface::Map m = NetworkInterface::map(false, false);
-		assert (!m.empty());
+		assertTrue (!m.empty());
 		NetworkInterface::List l = NetworkInterface::list(false, false);
-		assert (!l.empty());
+		assertTrue (!l.empty());
 
 		int counter = 0;
 		NetworkInterface::Map::const_iterator mapIt = m.begin();
@@ -286,7 +286,7 @@ void NetworkInterfaceTest::testListMapConformance()
 				{
 					if(listIt == l.end()) fail("wrong number of list items");
 					NetworkInterface::MACAddress lmac = listIt->macAddress();
-					assert (lmac == mac);
+					assertTrue (lmac == mac);
 				}
 			}
 			else
@@ -296,7 +296,7 @@ void NetworkInterfaceTest::testListMapConformance()
 			}
 		}
 
-		assert (counter == l.size());
+		assertTrue (counter == l.size());
 	}
 	catch (Poco::NotImplementedException e)
 	{

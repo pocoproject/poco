@@ -32,141 +32,141 @@ void NamespaceSupportTest::testNamespaceSupport()
 	NamespaceSupport ns;
 	NamespaceSupport::PrefixSet prefixes;
 	ns.getDeclaredPrefixes(prefixes);
-	assert (prefixes.size() == 2);
-	assert (prefixes.find("xml") != prefixes.end());
-	assert (prefixes.find("xmlns") != prefixes.end());
+	assertTrue (prefixes.size() == 2);
+	assertTrue (prefixes.find("xml") != prefixes.end());
+	assertTrue (prefixes.find("xmlns") != prefixes.end());
 	
 	ns.getPrefixes(prefixes);
-	assert (prefixes.size() == 2);
-	assert (prefixes.find("xml") != prefixes.end());
-	assert (prefixes.find("xmlns") != prefixes.end());
+	assertTrue (prefixes.size() == 2);
+	assertTrue (prefixes.find("xml") != prefixes.end());
+	assertTrue (prefixes.find("xmlns") != prefixes.end());
 	
 	ns.pushContext();
 	ns.declarePrefix("ns1", "urn:ns1");
 	ns.declarePrefix("ns2", "urn:ns2");
 	
 	ns.getDeclaredPrefixes(prefixes);
-	assert (prefixes.size() == 2);
-	assert (prefixes.find("ns1") != prefixes.end());
-	assert (prefixes.find("ns2") != prefixes.end());
+	assertTrue (prefixes.size() == 2);
+	assertTrue (prefixes.find("ns1") != prefixes.end());
+	assertTrue (prefixes.find("ns2") != prefixes.end());
 
 	ns.pushContext();
 	ns.declarePrefix("ns3", "urn:ns3");
 	
 	ns.getDeclaredPrefixes(prefixes);
-	assert (prefixes.size() == 1);
-	assert (prefixes.find("ns3") != prefixes.end());
+	assertTrue (prefixes.size() == 1);
+	assertTrue (prefixes.find("ns3") != prefixes.end());
 
 	ns.getPrefixes(prefixes);
-	assert (prefixes.size() == 5);
-	assert (prefixes.find("xml") != prefixes.end());
-	assert (prefixes.find("xmlns") != prefixes.end());
-	assert (prefixes.find("ns1") != prefixes.end());
-	assert (prefixes.find("ns2") != prefixes.end());
-	assert (prefixes.find("ns3") != prefixes.end());
+	assertTrue (prefixes.size() == 5);
+	assertTrue (prefixes.find("xml") != prefixes.end());
+	assertTrue (prefixes.find("xmlns") != prefixes.end());
+	assertTrue (prefixes.find("ns1") != prefixes.end());
+	assertTrue (prefixes.find("ns2") != prefixes.end());
+	assertTrue (prefixes.find("ns3") != prefixes.end());
 
 	ns.popContext();
 	ns.getDeclaredPrefixes(prefixes);
-	assert (prefixes.size() == 2);
-	assert (prefixes.find("ns1") != prefixes.end());
-	assert (prefixes.find("ns2") != prefixes.end());
+	assertTrue (prefixes.size() == 2);
+	assertTrue (prefixes.find("ns1") != prefixes.end());
+	assertTrue (prefixes.find("ns2") != prefixes.end());
 
-	assert (ns.isMapped("urn:ns1"));
-	assert (ns.isMapped("urn:ns2"));
-	assert (ns.isMapped("http://www.w3.org/XML/1998/namespace"));
-	assert (!ns.isMapped("urn:ns3"));
+	assertTrue (ns.isMapped("urn:ns1"));
+	assertTrue (ns.isMapped("urn:ns2"));
+	assertTrue (ns.isMapped("http://www.w3.org/XML/1998/namespace"));
+	assertTrue (!ns.isMapped("urn:ns3"));
 	
 	ns.getPrefixes("urn:ns2", prefixes);
-	assert (prefixes.size() == 1);
-	assert (prefixes.find("ns2") != prefixes.end());
+	assertTrue (prefixes.size() == 1);
+	assertTrue (prefixes.find("ns2") != prefixes.end());
 	
 	ns.pushContext();
 	ns.declarePrefix("", "urn:ns3");
 	ns.declarePrefix("NS2", "urn:ns2");
 	
 	ns.getPrefixes("urn:ns2", prefixes);
-	assert (prefixes.size() == 2);
-	assert (prefixes.find("ns2") != prefixes.end());
-	assert (prefixes.find("NS2") != prefixes.end());
+	assertTrue (prefixes.size() == 2);
+	assertTrue (prefixes.find("ns2") != prefixes.end());
+	assertTrue (prefixes.find("NS2") != prefixes.end());
 	
 	ns.getPrefixes(prefixes);
-	assert (prefixes.size() == 5);
-	assert (prefixes.find("xml") != prefixes.end());
-	assert (prefixes.find("xmlns") != prefixes.end());
-	assert (prefixes.find("ns1") != prefixes.end());
-	assert (prefixes.find("ns2") != prefixes.end());
-	assert (prefixes.find("NS2") != prefixes.end());
+	assertTrue (prefixes.size() == 5);
+	assertTrue (prefixes.find("xml") != prefixes.end());
+	assertTrue (prefixes.find("xmlns") != prefixes.end());
+	assertTrue (prefixes.find("ns1") != prefixes.end());
+	assertTrue (prefixes.find("ns2") != prefixes.end());
+	assertTrue (prefixes.find("NS2") != prefixes.end());
 
 	ns.getDeclaredPrefixes(prefixes);
-	assert (prefixes.size() == 2);
-	assert (prefixes.find("") != prefixes.end());
-	assert (prefixes.find("NS2") != prefixes.end());
+	assertTrue (prefixes.size() == 2);
+	assertTrue (prefixes.find("") != prefixes.end());
+	assertTrue (prefixes.find("NS2") != prefixes.end());
 	
-	assert (ns.getPrefix("urn:ns3") == "");
-	assert (ns.getPrefix("urn:ns2") == "NS2");
-	assert (ns.getPrefix("urn:ns4") == "");
+	assertTrue (ns.getPrefix("urn:ns3") == "");
+	assertTrue (ns.getPrefix("urn:ns2") == "NS2");
+	assertTrue (ns.getPrefix("urn:ns4") == "");
 	
-	assert (ns.isMapped("urn:ns3"));
-	assert (ns.isMapped("urn:ns2"));
-	assert (!ns.isMapped("urn:ns4"));
+	assertTrue (ns.isMapped("urn:ns3"));
+	assertTrue (ns.isMapped("urn:ns2"));
+	assertTrue (!ns.isMapped("urn:ns4"));
 
-	assert (ns.getURI("xml") == "http://www.w3.org/XML/1998/namespace");
-	assert (ns.getURI("ns1") == "urn:ns1");
-	assert (ns.getURI("") == "urn:ns3");
-	assert (ns.getURI("NS2") == "urn:ns2");
+	assertTrue (ns.getURI("xml") == "http://www.w3.org/XML/1998/namespace");
+	assertTrue (ns.getURI("ns1") == "urn:ns1");
+	assertTrue (ns.getURI("") == "urn:ns3");
+	assertTrue (ns.getURI("NS2") == "urn:ns2");
 	
 	std::string localName;
 	std::string namespaceURI;
 	bool declared = ns.processName("elem", namespaceURI, localName, false);
-	assert (declared);
-	assert (localName == "elem");
-	assert (namespaceURI == "urn:ns3");
+	assertTrue (declared);
+	assertTrue (localName == "elem");
+	assertTrue (namespaceURI == "urn:ns3");
 	
 	declared = ns.processName("NS2:elem", namespaceURI, localName, false);
-	assert (declared);
-	assert (localName == "elem");
-	assert (namespaceURI == "urn:ns2");
+	assertTrue (declared);
+	assertTrue (localName == "elem");
+	assertTrue (namespaceURI == "urn:ns2");
 
 	declared = ns.processName("ns3:elem", namespaceURI, localName, false);
-	assert (!declared);
-	assert (localName == "elem");
-	assert (namespaceURI == "");
+	assertTrue (!declared);
+	assertTrue (localName == "elem");
+	assertTrue (namespaceURI == "");
 
 	declared = ns.processName("ns2:attr", namespaceURI, localName, true);
-	assert (declared);
-	assert (localName == "attr");
-	assert (namespaceURI == "urn:ns2");
+	assertTrue (declared);
+	assertTrue (localName == "attr");
+	assertTrue (namespaceURI == "urn:ns2");
 
 	declared = ns.processName("attr", namespaceURI, localName, true);
-	assert (declared);
-	assert (localName == "attr");
-	assert (namespaceURI == "");
+	assertTrue (declared);
+	assertTrue (localName == "attr");
+	assertTrue (namespaceURI == "");
 
 	declared = ns.processName("ns3:attr", namespaceURI, localName, true);
-	assert (!declared);
-	assert (localName == "attr");
-	assert (namespaceURI == "");
+	assertTrue (!declared);
+	assertTrue (localName == "attr");
+	assertTrue (namespaceURI == "");
 	
 	ns.popContext();
-	assert (ns.getURI("xml") == "http://www.w3.org/XML/1998/namespace");
-	assert (ns.getURI("ns1") == "urn:ns1");
-	assert (ns.getURI("") == "");
-	assert (ns.getURI("NS2") == "");
+	assertTrue (ns.getURI("xml") == "http://www.w3.org/XML/1998/namespace");
+	assertTrue (ns.getURI("ns1") == "urn:ns1");
+	assertTrue (ns.getURI("") == "");
+	assertTrue (ns.getURI("NS2") == "");
 	
 	declared = ns.processName("elem", namespaceURI, localName, false);
-	assert (declared);
-	assert (localName == "elem");
-	assert (namespaceURI == "");
+	assertTrue (declared);
+	assertTrue (localName == "elem");
+	assertTrue (namespaceURI == "");
 	
 	declared = ns.processName("ns2:elem", namespaceURI, localName, false);
-	assert (declared);
-	assert (localName == "elem");
-	assert (namespaceURI == "urn:ns2");
+	assertTrue (declared);
+	assertTrue (localName == "elem");
+	assertTrue (namespaceURI == "urn:ns2");
 
 	declared = ns.processName("ns3:elem", namespaceURI, localName, false);
-	assert (!declared);
-	assert (localName == "elem");
-	assert (namespaceURI == "");
+	assertTrue (!declared);
+	assertTrue (localName == "elem");
+	assertTrue (namespaceURI == "");
 }
 
 

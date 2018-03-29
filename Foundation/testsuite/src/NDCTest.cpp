@@ -31,36 +31,36 @@ NDCTest::~NDCTest()
 void NDCTest::testNDC()
 {
 	NDC ndc;
-	assert (ndc.depth() == 0);
+	assertTrue (ndc.depth() == 0);
 	ndc.push("item1");
-	assert (ndc.toString() == "item1");
-	assert (ndc.depth() == 1);
+	assertTrue (ndc.toString() == "item1");
+	assertTrue (ndc.depth() == 1);
 	ndc.push("item2");
-	assert (ndc.toString() == "item1:item2");
-	assert (ndc.depth() == 2);
+	assertTrue (ndc.toString() == "item1:item2");
+	assertTrue (ndc.depth() == 2);
 	ndc.pop();
-	assert (ndc.depth() == 1);
-	assert (ndc.toString() == "item1");
+	assertTrue (ndc.depth() == 1);
+	assertTrue (ndc.toString() == "item1");
 	ndc.pop();
-	assert (ndc.depth() == 0);
+	assertTrue (ndc.depth() == 0);
 }
 
 
 void NDCTest::testNDCScope()
 {
 	poco_ndc("item1");
-	assert (NDC::current().depth() == 1);
+	assertTrue (NDC::current().depth() == 1);
 	{
 		poco_ndc("item2");
-		assert (NDC::current().depth() == 2);
+		assertTrue (NDC::current().depth() == 2);
 		{
 			poco_ndc("item3");
-			assert (NDC::current().depth() == 3);
+			assertTrue (NDC::current().depth() == 3);
 			NDC::current().dump(std::cout);
 		}
-		assert (NDC::current().depth() == 2);
+		assertTrue (NDC::current().depth() == 2);
 	}
-	assert (NDC::current().depth() == 1);
+	assertTrue (NDC::current().depth() == 1);
 }
 
 

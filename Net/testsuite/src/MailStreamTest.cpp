@@ -50,7 +50,7 @@ void MailStreamTest::testMailInputStream()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(mis, ostr);
 	std::string s(ostr.str());
-	assert (s ==
+	assertTrue (s ==
 		"From: john.doe@no.domain\r\n"
 		"To: jane.doe@no.domain\r\n"
 		"Subject: test\r\n"
@@ -84,7 +84,7 @@ void MailStreamTest::testMailOutputStream()
 	mos << msg;
 	mos.close();
 	std::string s(ostr.str());
-	assert (s == 
+	assertTrue (s == 
 		"From: john.doe@no.domain\r\n"
 		"To: jane.doe@no.domain\r\n"
 		"Subject: test\r\n"

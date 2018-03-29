@@ -38,21 +38,21 @@ void StopwatchTest::testStopwatch()
 	Thread::sleep(200);
 	sw.stop();
 	Timestamp::TimeDiff d = sw.elapsed();
-	assert (d >= 180000 && d <= 300000);	
+	assertTrue (d >= 180000 && d <= 300000);	
 	sw.start();	
 	Thread::sleep(100);
 	d = sw.elapsed();
-	assert (d >= 280000 && d <= 400000);	
+	assertTrue (d >= 280000 && d <= 400000);	
 	Thread::sleep(100);
 	sw.stop();
 	d = sw.elapsed();
-	assert (d >= 380000 && d <= 500000);
+	assertTrue (d >= 380000 && d <= 500000);
 	sw.reset();
 	sw.start();
 	Thread::sleep(200);
 	sw.stop();
 	d = sw.elapsed();
-	assert (d >= 180000 && d <= 300000);	
+	assertTrue (d >= 180000 && d <= 300000);	
 }
 
 

@@ -62,7 +62,7 @@ void OAuth10CredentialsTest::testCallback()
 	creds.authenticate(request, uri);
 
 	std::string auth = request.get("Authorization");	
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" oauth_consumer_key=\"cChZNFj6T5R0TigYB9yd1w\","
 		" oauth_nonce=\"ea9ec8429b68d6b77cd5600adbbb0456\","
 		" oauth_signature=\"F1Li3tvehgcraF8DMJ7OyxO4w9Y%3D\","
@@ -110,7 +110,7 @@ void OAuth10CredentialsTest::testParams()
 	creds.authenticate(request, uri, params);
 	
 	std::string auth = request.get("Authorization");
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\","
 		" oauth_nonce=\"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg\","
 		" oauth_signature=\"tnnArxj06cWHq44gCs1OSKk%2FjLY%3D\","
@@ -160,7 +160,7 @@ void OAuth10CredentialsTest::testRealm()
 	creds.authenticate(request, uri, params);
 	
 	std::string auth = request.get("Authorization");
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" realm=\"Twitter API\","
 		" oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\","
 		" oauth_nonce=\"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg\","
@@ -183,7 +183,7 @@ void OAuth10CredentialsTest::testPlaintext()
 
 	std::string auth = request.get("Authorization");	
 	
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" oauth_consumer_key=\"consumerKey\","
 		" oauth_signature=\"consumerSecret%26\","
 		" oauth_signature_method=\"PLAINTEXT\","
@@ -206,8 +206,8 @@ void OAuth10CredentialsTest::testVerify()
 		" oauth_version=\"1.0\"");
 	
 	OAuth10Credentials creds(request);
-	assert (creds.getConsumerKey() == "xvz1evFS4wEEPTGEFPHBog");
-	assert (creds.getToken() == "370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb");
+	assertTrue (creds.getConsumerKey() == "xvz1evFS4wEEPTGEFPHBog");
+	assertTrue (creds.getToken() == "370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb");
 	creds.setConsumerSecret("kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw");
 	creds.setTokenSecret("LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE");
 	
@@ -215,7 +215,7 @@ void OAuth10CredentialsTest::testVerify()
 	params.read(uri.getRawQuery());
 	params.read("status=Hello%20Ladies%20%2b%20Gentlemen%2c%20a%20signed%20OAuth%20request%21");
 	
-	assert (creds.verify(request, uri, params));
+	assertTrue (creds.verify(request, uri, params));
 }
 
 
@@ -231,11 +231,11 @@ void OAuth10CredentialsTest::testVerifyPlaintext()
 		" oauth_version=\"1.0\"");
 	
 	OAuth10Credentials creds(request);
-	assert (creds.getConsumerKey() == "consumerKey");
+	assertTrue (creds.getConsumerKey() == "consumerKey");
 	creds.setConsumerSecret("consumerSecret");
 	
-	assert (creds.verify(request, uri));
-	assert (creds.getCallback() == "http://localhost/sign-in-with-twitter/");
+	assertTrue (creds.verify(request, uri));
+	assertTrue (creds.getCallback() == "http://localhost/sign-in-with-twitter/");
 }
 
 

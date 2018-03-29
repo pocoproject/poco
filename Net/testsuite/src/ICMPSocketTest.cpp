@@ -67,7 +67,7 @@ void ICMPSocketTest::testSendToReceiveFrom()
 	ss.sendTo(sa);
 	ss.receiveFrom(sa);
 
-	assert(sr.host().toString() == sa.host().toString());
+	assertTrue (sr.host().toString() == sa.host().toString());
 	ss.close();
 }
 
