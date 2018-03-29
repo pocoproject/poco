@@ -2437,12 +2437,12 @@ void SQLExecutor::blobStmt()
 	assertTrue (count == 1);
 
 	CLOB res;
-	poco_assertTrue (res.size() == 0);
+	poco_assert (res.size() == 0);
 	Statement stmt = (session() << "SELECT Image FROM Person", into(res));
 	try { stmt.execute(); }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	poco_assertTrue (res == blob);
+	poco_assert (res == blob);
 }
 
 
