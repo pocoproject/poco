@@ -1,5 +1,6 @@
 def os = org.gradle.internal.os.OperatingSystem.current()
 rootProject.name = 'Poco'
+//rootProject.build.gradle = 'build.gradle.win'
 
 include ':CppUnit'
 include ':Encodings'

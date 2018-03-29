@@ -38,6 +38,15 @@ File appendStaticSuffix(File binaryFile) {
     }
     return new File(parent, name.substring(0, extensionSeparatorIndex) + "MT" + name.substring(extensionSeparatorIndex))
 }
+File appendSemiStaticSuffix(File binaryFile) {
+	String name = binaryFile.getName()
+	File parent = binaryFile.getParentFile()
+	int extensionSeparatorIndex = name.lastIndexOf('.')
+	if (extensionSeparatorIndex == -1) {
+		return new File(parent, name + "MD")
+	}
+	return new File(parent, name.substring(0, extensionSeparatorIndex) + "MD" + name.substring(extensionSeparatorIndex))
+}
 File prefixByPoco(File binaryFile) {
 	String name = binaryFile.getName()
 	String prefix = ''
@@ -510,8 +519,13 @@ subprojects {
 								}
 							}
 						} else
+						if (it instanceof SemiStaticLibraryBinarySpec) {
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendDebugSuffix(appendSemiStaticSuffix(semiStaticLibraryFile))), targetPlatform)
+						} else
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(appendDebugSuffix(executable.file), targetPlatform)
+						} else {
+							throw new GradleException("Unknown native library binary")
 						}
 					} else
 					if (buildType == buildTypes.release) {
@@ -542,8 +556,19 @@ subprojects {
 								}
 							}
 						} else
+						if (it instanceof SemiStaticLibraryBinarySpec) {
+							semiStaticLibraryFile = toStatic(prefixByPoco(appendSemiStaticSuffix(semiStaticLibraryFile)), targetPlatform)
+							def binary = it
+							tasks.withType(CreateSemiStaticLibrary) {
+								doFirst {
+									binary.semiStaticLibraryFile.parentFile.mkdirs()
+								}
+							}
+						} else
 						if (it instanceof NativeExecutableBinarySpec) {
 							executable.file = toBin(executable.file, targetPlatform)
+						} else {
+							throw new GradleException("Unknown native library binary")
 						} 
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
@@ -678,6 +703,28 @@ subprojects {
 					if (buildType == buildTypes.release) {
 						cCompiler.args "/MT"
 						cppCompiler.args "/MT"
+					} else {
+						throw new GradleException("Unknown buildType" + buildType)
+					}
+				}
+				if (toolChain in Gcc) {
+				}
+			}
+			withType(SemiStaticLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					cCompiler.define   '_LIB'
+					cCompiler.define   'POCO_STATIC'
+					cppCompiler.define '_LIB'
+					cppCompiler.define 'POCO_STATIC'
+					if (buildType == buildTypes.debug) {
+						cCompiler.args "/MDd"
+						cCompiler.args "/Fd" + toStatic(toPDB(semiStaticLibraryFile), targetPlatform)
+						cppCompiler.args "/MDd"
+						cppCompiler.args "/Fd" + toStatic(toPDB(semiStaticLibraryFile), targetPlatform)
+					} else 
+					if (buildType == buildTypes.release) {
+						cCompiler.args "/MD"
+						cppCompiler.args "/MD"
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
 					}
