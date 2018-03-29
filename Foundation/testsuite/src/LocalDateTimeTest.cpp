@@ -47,29 +47,29 @@ LocalDateTimeTest::~LocalDateTimeTest()
 void LocalDateTimeTest::testGregorian1()
 {
 	LocalDateTime dt(1970, 1, 1);
-	assert (dt.year() == 1970);
-	assert (dt.month() == 1);
-	assert (dt.day() == 1);
-	assert (dt.hour() == 0);
-	assert (dt.minute() == 0);
-	assert (dt.second() == 0);
-	assert (dt.millisecond() == 0);
-	assert (dt.dayOfWeek() == 4);
+	assertTrue (dt.year() == 1970);
+	assertTrue (dt.month() == 1);
+	assertTrue (dt.day() == 1);
+	assertTrue (dt.hour() == 0);
+	assertTrue (dt.minute() == 0);
+	assertTrue (dt.second() == 0);
+	assertTrue (dt.millisecond() == 0);
+	assertTrue (dt.dayOfWeek() == 4);
 	// REMOVED: this fails when the current DST offset differs from
 	//          the one on 1970-1-1
-	//assert (dt.tzd() == Timezone::tzd());
-	assert (dt.julianDay() == 2440587.5);
+	//assertTrue (dt.tzd() == Timezone::tzd());
+	assertTrue (dt.julianDay() == 2440587.5);
 	
 	dt.assign(2001, 9, 9, 1, 46, 40);
-	assert (dt.year() == 2001);
-	assert (dt.month() == 9);
-	assert (dt.day() == 9);
-	assert (dt.hour() == 1);
-	assert (dt.minute() == 46);
-	assert (dt.second() == 40);
-	assert (dt.millisecond() == 0);
-	assert (dt.dayOfWeek() == 0);
-	//assert (dt.tzd() == Timezone::tzd());
+	assertTrue (dt.year() == 2001);
+	assertTrue (dt.month() == 9);
+	assertTrue (dt.day() == 9);
+	assertTrue (dt.hour() == 1);
+	assertTrue (dt.minute() == 46);
+	assertTrue (dt.second() == 40);
+	assertTrue (dt.millisecond() == 0);
+	assertTrue (dt.dayOfWeek() == 0);
+	//assertTrue (dt.tzd() == Timezone::tzd());
 	assertEqualDelta (dt.julianDay(), 2452161.574074, 0.000001);
 }
 
@@ -77,26 +77,26 @@ void LocalDateTimeTest::testGregorian1()
 void LocalDateTimeTest::testGregorian2()
 {
 	LocalDateTime dt(2*3600, 1970, 1, 1, 0, 0, 0, 0, 0);
-	assert (dt.year() == 1970);
-	assert (dt.month() == 1);
-	assert (dt.day() == 1);
-	assert (dt.hour() == 0);
-	assert (dt.minute() == 0);
-	assert (dt.second() == 0);
-	assert (dt.millisecond() == 0);
-	assert (dt.dayOfWeek() == 4);
-	assert (dt.tzd() == 2*3600);
+	assertTrue (dt.year() == 1970);
+	assertTrue (dt.month() == 1);
+	assertTrue (dt.day() == 1);
+	assertTrue (dt.hour() == 0);
+	assertTrue (dt.minute() == 0);
+	assertTrue (dt.second() == 0);
+	assertTrue (dt.millisecond() == 0);
+	assertTrue (dt.dayOfWeek() == 4);
+	assertTrue (dt.tzd() == 2*3600);
 	
 	dt.assign(-7*3600, 2001, 9, 9, 1, 46, 40, 0, 0);
-	assert (dt.year() == 2001);
-	assert (dt.month() == 9);
-	assert (dt.day() == 9);
-	assert (dt.hour() == 1);
-	assert (dt.minute() == 46);
-	assert (dt.second() == 40);
-	assert (dt.millisecond() == 0);
-	assert (dt.dayOfWeek() == 0);
-	assert (dt.tzd() == -7*3600);
+	assertTrue (dt.year() == 2001);
+	assertTrue (dt.month() == 9);
+	assertTrue (dt.day() == 9);
+	assertTrue (dt.hour() == 1);
+	assertTrue (dt.minute() == 46);
+	assertTrue (dt.second() == 40);
+	assertTrue (dt.millisecond() == 0);
+	assertTrue (dt.dayOfWeek() == 0);
+	assertTrue (dt.tzd() == -7*3600);
 }
 
 
@@ -109,163 +109,163 @@ void LocalDateTimeTest::testConversions()
 	LocalDateTime dt4(dt2);
 	LocalDateTime dt5(-4*3600, dt1.utc());
 
-	assert (dt2.year() == 2005);
-	assert (dt2.month() == 1);
-	assert (dt2.day() == 28);
-	assert (dt2.hour() == 14);
-	assert (dt2.minute() == 24);
-	assert (dt2.second() == 44);
-	assert (dt2.millisecond() == 234);
-	assert (dt2.dayOfWeek() == 5);
-	assert (dt2.tzd() == 2*3600);
+	assertTrue (dt2.year() == 2005);
+	assertTrue (dt2.month() == 1);
+	assertTrue (dt2.day() == 28);
+	assertTrue (dt2.hour() == 14);
+	assertTrue (dt2.minute() == 24);
+	assertTrue (dt2.second() == 44);
+	assertTrue (dt2.millisecond() == 234);
+	assertTrue (dt2.dayOfWeek() == 5);
+	assertTrue (dt2.tzd() == 2*3600);
 
-	assert (dt5.year() == 2005);
-	assert (dt5.month() == 1);
-	assert (dt5.day() == 28);
-	assert (dt5.hour() == 8);
-	assert (dt5.minute() == 24);
-	assert (dt5.second() == 44);
-	assert (dt5.millisecond() == 234);
-	assert (dt5.dayOfWeek() == 5);
-	assert (dt5.tzd() == -4*3600);
+	assertTrue (dt5.year() == 2005);
+	assertTrue (dt5.month() == 1);
+	assertTrue (dt5.day() == 28);
+	assertTrue (dt5.hour() == 8);
+	assertTrue (dt5.minute() == 24);
+	assertTrue (dt5.second() == 44);
+	assertTrue (dt5.millisecond() == 234);
+	assertTrue (dt5.dayOfWeek() == 5);
+	assertTrue (dt5.tzd() == -4*3600);
 	
 	DateTime dt6(2005, 1, 28, 14, 24, 44, 234, 0);
 	LocalDateTime dt7(3600, dt6);
 	LocalDateTime dt8(3600, dt6, false);
 	LocalDateTime dt9(3600, dt6, true);
 	
-	assert (dt7.hour() == 15);
-	assert (dt8.hour() == 14);
-	assert (dt9.hour() == 15);
+	assertTrue (dt7.hour() == 15);
+	assertTrue (dt8.hour() == 14);
+	assertTrue (dt9.hour() == 15);
 }
 
 
 void LocalDateTimeTest::testCalcs()
 {
 	LocalDateTime dt1(2005, 1, 1);
-	assert (dt1.dayOfYear() == 1);
-	assert (dt1.week(DateTime::MONDAY) == 0);
+	assertTrue (dt1.dayOfYear() == 1);
+	assertTrue (dt1.week(DateTime::MONDAY) == 0);
 	dt1.assign(2005, 1, 3);
-	assert (dt1.dayOfYear() == 3);
-	assert (dt1.week(DateTime::MONDAY) == 1);
+	assertTrue (dt1.dayOfYear() == 3);
+	assertTrue (dt1.week(DateTime::MONDAY) == 1);
 	dt1.assign(2005, 1, 9);
-	assert (dt1.dayOfYear() == 9);
-	assert (dt1.week(DateTime::MONDAY) == 1);
+	assertTrue (dt1.dayOfYear() == 9);
+	assertTrue (dt1.week(DateTime::MONDAY) == 1);
 	dt1.assign(2005, 1, 10);
-	assert (dt1.dayOfYear() == 10);
-	assert (dt1.week(DateTime::MONDAY) == 2);
+	assertTrue (dt1.dayOfYear() == 10);
+	assertTrue (dt1.week(DateTime::MONDAY) == 2);
 	dt1.assign(2005, 2, 1);
-	assert (dt1.dayOfYear() == 32);
-	assert (dt1.week(DateTime::MONDAY) == 5);
+	assertTrue (dt1.dayOfYear() == 32);
+	assertTrue (dt1.week(DateTime::MONDAY) == 5);
 	dt1.assign(2005, 12, 31);
-	assert (dt1.week(DateTime::MONDAY) == 52);
+	assertTrue (dt1.week(DateTime::MONDAY) == 52);
 	dt1.assign(2007, 1, 1);
-	assert (dt1.week(DateTime::MONDAY) == 1);
+	assertTrue (dt1.week(DateTime::MONDAY) == 1);
 	dt1.assign(2007, 12, 31);
-	assert (dt1.week(DateTime::MONDAY) == 53);
+	assertTrue (dt1.week(DateTime::MONDAY) == 53);
 	
 	// Jan 1 is Mon
 	dt1.assign(2001, 1, 1);  
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2001, 1, 7);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2001, 1, 8);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(2001, 1, 21);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 	dt1.assign(2001, 1, 22);
-	assert (dt1.week() == 4);
+	assertTrue (dt1.week() == 4);
 
 	// Jan 1 is Tue
 	dt1.assign(2002, 1, 1);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2002, 1, 6);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2002, 1, 7);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(2002, 1, 20);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 	dt1.assign(2002, 1, 21);
-	assert (dt1.week() == 4);
+	assertTrue (dt1.week() == 4);
 
 	// Jan 1 is Wed
 	dt1.assign(2003, 1, 1);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2003, 1, 5);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2003, 1, 6);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(2003, 1, 19);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 	dt1.assign(2003, 1, 20);
-	assert (dt1.week() == 4);
+	assertTrue (dt1.week() == 4);
 	
 	// Jan 1 is Thu
 	dt1.assign(2004, 1, 1);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2004, 1, 4);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2004, 1, 5);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(2004, 1, 18);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 	dt1.assign(2004, 1, 19);
-	assert (dt1.week() == 4);
+	assertTrue (dt1.week() == 4);
 
 	// Jan 1 is Fri
 	dt1.assign(1999, 1, 1);
-	assert (dt1.week() == 0);
+	assertTrue (dt1.week() == 0);
 	dt1.assign(1999, 1, 3);
-	assert (dt1.week() == 0);
+	assertTrue (dt1.week() == 0);
 	dt1.assign(1999, 1, 4);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(1999, 1, 17);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(1999, 1, 18);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 
 	// Jan 1 is Sat
 	dt1.assign(2000, 1, 1);
-	assert (dt1.week() == 0);
+	assertTrue (dt1.week() == 0);
 	dt1.assign(2000, 1, 2);
-	assert (dt1.week() == 0);
+	assertTrue (dt1.week() == 0);
 	dt1.assign(2000, 1, 3);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(2000, 1, 16);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(2000, 1, 17);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 	
 	// Jan 1 is Sun
 	dt1.assign(1995, 1, 1);
-	assert (dt1.week() == 0);
+	assertTrue (dt1.week() == 0);
 	dt1.assign(1995, 1, 2);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(1995, 1, 3);
-	assert (dt1.week() == 1);
+	assertTrue (dt1.week() == 1);
 	dt1.assign(1995, 1, 15);
-	assert (dt1.week() == 2);
+	assertTrue (dt1.week() == 2);
 	dt1.assign(1995, 1, 16);
-	assert (dt1.week() == 3);
+	assertTrue (dt1.week() == 3);
 }
 
 
 void LocalDateTimeTest::testAMPM()
 {
 	LocalDateTime dt1(2005, 1, 1, 0, 15, 30);
-	assert (dt1.isAM());
-	assert (!dt1.isPM());
-	assert (dt1.hourAMPM() == 12);
+	assertTrue (dt1.isAM());
+	assertTrue (!dt1.isPM());
+	assertTrue (dt1.hourAMPM() == 12);
 	
 	dt1.assign(2005, 1, 1, 12, 15, 30);
-	assert (!dt1.isAM());
-	assert (dt1.isPM());
-	assert (dt1.hourAMPM() == 12);
+	assertTrue (!dt1.isAM());
+	assertTrue (dt1.isPM());
+	assertTrue (dt1.hourAMPM() == 12);
 
 	dt1.assign(2005, 1, 1, 13, 15, 30);
-	assert (!dt1.isAM());
-	assert (dt1.isPM());
-	assert (dt1.hourAMPM() == 1);
+	assertTrue (!dt1.isAM());
+	assertTrue (dt1.isPM());
+	assertTrue (dt1.hourAMPM() == 1);
 }
 
 
@@ -275,19 +275,19 @@ void LocalDateTimeTest::testRelational1()
 	LocalDateTime dt2(2005, 1, 2, 0, 15, 30);
 	LocalDateTime dt3(dt1);
 	
-	assert (dt1 < dt2);
-	assert (dt1 <= dt2);
-	assert (dt2 > dt1);
-	assert (dt2 >= dt1);
-	assert (dt1 != dt2);
-	assert (!(dt1 == dt2));
+	assertTrue (dt1 < dt2);
+	assertTrue (dt1 <= dt2);
+	assertTrue (dt2 > dt1);
+	assertTrue (dt2 >= dt1);
+	assertTrue (dt1 != dt2);
+	assertTrue (!(dt1 == dt2));
 	
-	assert (dt1 == dt3);
-	assert (!(dt1 != dt3));
-	assert (dt1 >= dt3);
-	assert (dt1 <= dt3);
-	assert (!(dt1 > dt3));
-	assert (!(dt1 < dt3));
+	assertTrue (dt1 == dt3);
+	assertTrue (!(dt1 != dt3));
+	assertTrue (dt1 >= dt3);
+	assertTrue (dt1 <= dt3);
+	assertTrue (!(dt1 > dt3));
+	assertTrue (!(dt1 < dt3));
 }
 
 
@@ -297,19 +297,19 @@ void LocalDateTimeTest::testRelational2()
 	LocalDateTime dt2(2*3600, 2005, 1, 1, 17, 30, 0, 0, 0);
 	LocalDateTime dt3(5*3600, 2005, 1, 1, 18, 30, 0, 0, 0);
 
-	assert (dt1 < dt2);
-	assert (dt1 <= dt2);
-	assert (dt2 > dt1);
-	assert (dt2 >= dt1);
-	assert (dt1 != dt2);
-	assert (!(dt1 == dt2));
+	assertTrue (dt1 < dt2);
+	assertTrue (dt1 <= dt2);
+	assertTrue (dt2 > dt1);
+	assertTrue (dt2 >= dt1);
+	assertTrue (dt1 != dt2);
+	assertTrue (!(dt1 == dt2));
 	
-	assert (dt1 == dt3);
-	assert (!(dt1 != dt3));
-	assert (dt1 >= dt3);
-	assert (dt1 <= dt3);
-	assert (!(dt1 > dt3));
-	assert (!(dt1 < dt3));
+	assertTrue (dt1 == dt3);
+	assertTrue (!(dt1 != dt3));
+	assertTrue (dt1 >= dt3);
+	assertTrue (dt1 <= dt3);
+	assertTrue (!(dt1 > dt3));
+	assertTrue (!(dt1 < dt3));
 }
 
 
@@ -319,15 +319,15 @@ void LocalDateTimeTest::testArithmetics1()
 	LocalDateTime dt2(2005, 1, 2, 0, 15, 30);
 	
 	Timespan s = dt2 - dt1;
-	assert (s.days() == 1);
+	assertTrue (s.days() == 1);
 	
 	LocalDateTime dt3 = dt1 + s;
-	assert (dt3 == dt2);
+	assertTrue (dt3 == dt2);
 	
 	dt3 -= s;
-	assert (dt3 == dt1);
+	assertTrue (dt3 == dt1);
 	dt1 += s;
-	assert (dt1 == dt2);
+	assertTrue (dt1 == dt2);
 }
 
 
@@ -337,15 +337,15 @@ void LocalDateTimeTest::testArithmetics2()
 	LocalDateTime dt2(5*3600, 2005, 1, 2, 18, 30, 0, 0, 0);
 	
 	Timespan s = dt2 - dt1;
-	assert (s.days() == 1);
+	assertTrue (s.days() == 1);
 	
 	LocalDateTime dt3 = dt1 + s;
-	assert (dt3 == dt2);
+	assertTrue (dt3 == dt2);
 	
 	dt3 -= s;
-	assert (dt3 == dt1);
+	assertTrue (dt3 == dt1);
 	dt1 += s;
-	assert (dt1 == dt2);
+	assertTrue (dt1 == dt2);
 }
 
 
@@ -354,9 +354,9 @@ void LocalDateTimeTest::testSwap()
 	LocalDateTime dt1(2005, 1, 1, 0, 15, 30);
 	LocalDateTime dt2(2005, 1, 2, 0, 15, 30);
 	
-	assert (dt1 < dt2);
+	assertTrue (dt1 < dt2);
 	dt1.swap(dt2);
-	assert (dt2 < dt1);
+	assertTrue (dt2 < dt1);
 }
 
 
@@ -432,7 +432,7 @@ void LocalDateTimeTest::testTimezone()
 											 then.tm_sec,
 											 dt2.millisecond(),
 											 dt2.microsecond()));
-				assert (dt2 == calcd);
+				assertTrue (dt2 == calcd);
 			}
 		}
 	}

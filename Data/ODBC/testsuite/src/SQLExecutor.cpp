@@ -350,7 +350,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		poco_odbc_check_stmt (rc, hstmt);
 		
 		rc = SQLFetch(hstmt);
-		assert (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
+		assertTrue (SQL_SUCCEEDED(rc) || SQL_NO_DATA == rc);
 
 		SQLULEN dateTimeColSize = 0;
 		SQLSMALLINT dateTimeDecDigits = 0;
@@ -362,7 +362,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			rc = SQLGetData(hstmt, 14, SQL_C_SSHORT, &dateTimeDecDigits, sizeof(SQLSMALLINT), &ind);
 			poco_odbc_check_stmt (rc, hstmt);
 
-			assert (sizeof(SQL_TIMESTAMP_STRUCT) <= dateTimeColSize);
+			assertTrue (sizeof(SQL_TIMESTAMP_STRUCT) <= dateTimeColSize);
 		}
 		else if (SQL_NO_DATA == rc)
 			std::cerr << '[' << name() << ']' << " Warning: no SQL_TYPE_TIMESTAMP data type info returned by driver." << std::endl;
@@ -511,7 +511,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
-			assert (SQL_NEED_DATA == rc || SQL_SUCCEEDED(rc));
+			assertTrue (SQL_NEED_DATA == rc || SQL_SUCCEEDED(rc));
 
 			if (SQL_NEED_DATA == rc)
 			{
@@ -537,7 +537,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 					else if (pParam == (SQLPOINTER) &sixth)
 						dataSize = (SQLINTEGER) sizeof(sixth);
 
-					assert (0 != dataSize);
+					assertTrue (0 != dataSize);
 					rc = SQLPutData(hstmt, pParam, dataSize);
 					poco_odbc_check_stmt (rc, hstmt);
 				}
@@ -680,27 +680,27 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				poco_odbc_check_stmt (rc, hstmt);
 			}
 
-			assert (0 == std::strncmp(str[0].c_str(), chr[0], str[0].size()));
-			assert (0 == std::strncmp(str[1].c_str(), chr[1], str[1].size()));
-			assert (0 == std::strncmp(str[2].c_str(), chr[2], str[2].size()));
-			assert (4 == fourth);
-			assert (1.5 == fifth);
+			assertTrue (0 == std::strncmp(str[0].c_str(), chr[0], str[0].size()));
+			assertTrue (0 == std::strncmp(str[1].c_str(), chr[1], str[1].size()));
+			assertTrue (0 == std::strncmp(str[2].c_str(), chr[2], str[2].size()));
+			assertTrue (4 == fourth);
+			assertTrue (1.5 == fifth);
 
-			assert (1965 == sixth.year);
-			assert (6 == sixth.month);
-			assert (18 == sixth.day);
+			assertTrue (1965 == sixth.year);
+			assertTrue (6 == sixth.month);
+			assertTrue (18 == sixth.day);
 			if (doTime)
 			{
-				assert (5 == sixth.hour);
-				assert (34 == sixth.minute);
+				assertTrue (5 == sixth.hour);
+				assertTrue (34 == sixth.minute);
 				if (sixth.fraction) // MySQL rounds fraction
 				{
-					assert(58 == sixth.second);
-					assert(997000000 == sixth.fraction);
+					assertTrue (58 == sixth.second);
+					assertTrue (997000000 == sixth.fraction);
 				}
 				else
 				{
-					assert(59 == sixth.second);
+					assertTrue (59 == sixth.second);
 				}
 			}
 
@@ -789,7 +789,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 			{
 				SQLLEN rowCount = 0;
 				SQLRowCount(hstmt, &rowCount);
-				assert (1 == rowCount);
+				assertTrue (1 == rowCount);
 			} while (SQL_NO_DATA != SQLMoreResults(hstmt));
 
 			// make sure all five rows made it in
@@ -826,7 +826,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 					&length);
 				poco_odbc_check_stmt (rc, hstmt);
 			}
-			assert (5 == count);
+			assertTrue (5 == count);
 
 			rc = SQLCloseCursor(hstmt);
 			poco_odbc_check_stmt (rc, hstmt);
@@ -908,15 +908,15 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 					poco_odbc_check_stmt (rc, hstmt);
 				}
 
-				assert (one++ == chr[0]);
-				assert (two++ == second);
-				assert (three == third);
+				assertTrue (one++ == chr[0]);
+				assertTrue (two++ == second);
+				assertTrue (three == third);
 				three += 1.0;
 
 				++count;
 			} while (SQL_NO_DATA != SQLMoreResults(hstmt));
 
-			assert (5 == count);
+			assertTrue (5 == count);
 
 			sql = "DROP TABLE Test";
 			pStr = (SQLCHAR*) sql.c_str();
@@ -949,7 +949,7 @@ void SQLExecutor::execute(const std::string& sql)
 void SQLExecutor::zeroRows()
 {
 	Statement stmt = (session() << "SELECT * FROM Person WHERE 0 = 1");
-	assert(0 == stmt.execute());
+	assertTrue (0 == stmt.execute());
 }
 
 
@@ -971,17 +971,17 @@ void SQLExecutor::simpleAccess()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	try { session() << "SELECT LastName FROM Person", into(result), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (lastName == result);
+	assertTrue (lastName == result);
 
 	try { session() << "SELECT Age FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == age);
+	assertTrue (count == age);
 }
 
 
@@ -1003,13 +1003,13 @@ void SQLExecutor::complexType()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	Person c1;
 	try { session() << "SELECT * FROM Person WHERE LastName = 'LN1'", into(c1), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (c1 == p1);
+	assertTrue (c1 == p1);
 }
 
 
@@ -1025,11 +1025,11 @@ void SQLExecutor::complexTypeTuple()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	Tuple<Person,Person> ret;
-	assert (ret != t);
+	assertTrue (ret != t);
 	try { *_pSession << "SELECT * FROM Person", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ret == t);
+	assertTrue (ret == t);
 }
 
 
@@ -1059,7 +1059,7 @@ void SQLExecutor::simpleAccessVector()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::vector<std::string> lastNamesR;
 	std::vector<std::string> firstNamesR;
@@ -1068,10 +1068,10 @@ void SQLExecutor::simpleAccessVector()
 	try { session() << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ages == agesR);
-	assert (lastNames == lastNamesR);
-	assert (firstNames == firstNamesR);
-	assert (addresses == addressesR);
+	assertTrue (ages == agesR);
+	assertTrue (lastNames == lastNamesR);
+	assertTrue (firstNames == firstNamesR);
+	assertTrue (addresses == addressesR);
 }
 
 
@@ -1090,13 +1090,13 @@ void SQLExecutor::complexTypeVector()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::vector<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result == people);
+	assertTrue (result == people);
 }
 
 
@@ -1115,15 +1115,15 @@ void SQLExecutor::sharedPtrComplexTypeVector()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::vector<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == result.size());
-	assert (result[0] == *people[0]);
-	assert (result[1] == *people[1]);
+	assertTrue (2 == result.size());
+	assertTrue (result[0] == *people[0]);
+	assertTrue (result[1] == *people[1]);
 }
 
 
@@ -1142,21 +1142,21 @@ void SQLExecutor::autoPtrComplexTypeVector()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::vector<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == result.size());
-	assert (result[0].address == people[0]->address);
-	assert (result[0].age == people[0]->age);
-	assert (result[0].firstName == people[0]->firstName);
-	assert (result[0].lastName == people[0]->lastName);
-	assert (result[1].address == people[1]->address);
-	assert (result[1].age == people[1]->age);
-	assert (result[1].firstName == people[1]->firstName);
-	assert (result[1].lastName == people[1]->lastName);
+	assertTrue (2 == result.size());
+	assertTrue (result[0].address == people[0]->address);
+	assertTrue (result[0].age == people[0]->age);
+	assertTrue (result[0].firstName == people[0]->firstName);
+	assertTrue (result[0].lastName == people[0]->lastName);
+	assertTrue (result[1].address == people[1]->address);
+	assertTrue (result[1].age == people[1]->age);
+	assertTrue (result[1].firstName == people[1]->firstName);
+	assertTrue (result[1].lastName == people[1]->lastName);
 }
 
 
@@ -1175,7 +1175,7 @@ void SQLExecutor::insertVector()
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == 0);
+		assertTrue (count == 0);
 
 		try { stmt.execute(); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -1183,13 +1183,13 @@ void SQLExecutor::insertVector()
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == 4);
+		assertTrue (count == 4);
 	}
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 4);
+	assertTrue (count == 4);
 }
 
 
@@ -1235,7 +1235,7 @@ void SQLExecutor::simpleAccessList()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::list<std::string> lastNamesR;
 	std::list<std::string> firstNamesR;
@@ -1244,10 +1244,10 @@ void SQLExecutor::simpleAccessList()
 	try { session() << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ages == agesR);
-	assert (lastNames == lastNamesR);
-	assert (firstNames == firstNamesR);
-	assert (addresses == addressesR);
+	assertTrue (ages == agesR);
+	assertTrue (lastNames == lastNamesR);
+	assertTrue (firstNames == firstNamesR);
+	assertTrue (addresses == addressesR);
 }
 
 
@@ -1266,13 +1266,13 @@ void SQLExecutor::complexTypeList()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::list<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result == people);
+	assertTrue (result == people);
 }
 
 
@@ -1291,7 +1291,7 @@ void SQLExecutor::insertList()
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == 0);
+		assertTrue (count == 0);
 
 		try { stmt.execute(); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -1299,13 +1299,13 @@ void SQLExecutor::insertList()
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == 4);
+		assertTrue (count == 4);
 	}
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 4);
+	assertTrue (count == 4);
 }
 
 
@@ -1351,7 +1351,7 @@ void SQLExecutor::simpleAccessDeque()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::deque<std::string> lastNamesR;
 	std::deque<std::string> firstNamesR;
@@ -1360,10 +1360,10 @@ void SQLExecutor::simpleAccessDeque()
 	try { session() << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ages == agesR);
-	assert (lastNames == lastNamesR);
-	assert (firstNames == firstNamesR);
-	assert (addresses == addressesR);
+	assertTrue (ages == agesR);
+	assertTrue (lastNames == lastNamesR);
+	assertTrue (firstNames == firstNamesR);
+	assertTrue (addresses == addressesR);
 }
 
 
@@ -1382,13 +1382,13 @@ void SQLExecutor::complexTypeDeque()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::deque<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result == people);
+	assertTrue (result == people);
 }
 
 
@@ -1407,7 +1407,7 @@ void SQLExecutor::insertDeque()
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == 0);
+		assertTrue (count == 0);
 
 		try { stmt.execute(); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -1415,13 +1415,13 @@ void SQLExecutor::insertDeque()
 		try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == 4);
+		assertTrue (count == 4);
 	}
 	count = 0;
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 4);
+	assertTrue (count == 4);
 }
 
 
@@ -1452,21 +1452,21 @@ void SQLExecutor::affectedRows(const std::string& whereClause)
 
 	Statement stmt1((session() << "INSERT INTO Strings VALUES(?)", use(str)));
 	session() << "SELECT COUNT(*) FROM Strings", into(count), now;
-	assert (count == 0);
-	assert (4 == stmt1.execute());
+	assertTrue (count == 0);
+	assertTrue (4 == stmt1.execute());
 	session() << "SELECT COUNT(*) FROM Strings", into(count), now;
-	assert (count == 4);
+	assertTrue (count == 4);
 
 	Statement stmt2(session() << "UPDATE Strings SET str = 's4' WHERE str = 's3'");
-	assert (2 == stmt2.execute());
+	assertTrue (2 == stmt2.execute());
 
 	Statement stmt3(session() << "DELETE FROM Strings WHERE str = 's1'");
-	assert (1 == stmt3.execute());
+	assertTrue (1 == stmt3.execute());
 
 	std::string sql;
 	format(sql, "DELETE FROM Strings %s", whereClause);
 	Statement stmt4(session() << sql);
-	assert (3 == stmt4.execute());
+	assertTrue (3 == stmt4.execute());
 }
 
 
@@ -1479,18 +1479,18 @@ void SQLExecutor::insertSingleBulk()
 	for (x = 0; x < 100; ++x)
 	{
 		std::size_t i = stmt.execute();
-		assert (1 == i);
+		assertTrue (1 == i);
 	}
 	int count = 0;
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 100);
+	assertTrue (count == 100);
 
 	try { session() << "SELECT SUM(str) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == ((0+99)*100/2));
+	assertTrue (count == ((0+99)*100/2));
 }
 
 
@@ -1508,12 +1508,12 @@ void SQLExecutor::floats()
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	try { session() << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ret == data);
+	assertTrue (ret == data);
 }
 
 
@@ -1531,12 +1531,12 @@ void SQLExecutor::doubles()
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	try { session() << "SELECT str FROM Strings", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ret == data);
+	assertTrue (ret == data);
 }
 
 
@@ -1556,11 +1556,11 @@ void SQLExecutor::insertSingleBulkVec()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	assert (count == 100);
+	assertTrue (count == 100);
 	try { session() << "SELECT SUM(str) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == ((0+99)*100/2));
+	assertTrue (count == ((0+99)*100/2));
 }
 
 
@@ -1581,10 +1581,10 @@ void SQLExecutor::limits()
 	try { session() << "SELECT * FROM Strings", into(retData), limit(50), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (retData.size() == 50);
+	assertTrue (retData.size() == 50);
 	for (int x = 0; x < 50; ++x)
 	{
-		assert(data[x] == retData[x]);
+		assertTrue (data[x] == retData[x]);
 	}
 }
 
@@ -1606,7 +1606,7 @@ void SQLExecutor::limitZero()
 	try { session() << "SELECT * FROM Strings", into(retData), limit(0), now; }// stupid test, but at least we shouldn't crash
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (retData.size() == 0);
+	assertTrue (retData.size() == 0);
 }
 
 
@@ -1625,18 +1625,18 @@ void SQLExecutor::limitOnce()
 
 	std::vector<int> retData;
 	Statement stmt = (session() << "SELECT * FROM Strings", into(retData), limit(50), now);
-	assert (!stmt.done());
-	assert (retData.size() == 50);
+	assertTrue (!stmt.done());
+	assertTrue (retData.size() == 50);
 	stmt.execute();
-	assert (!stmt.done());
-	assert (retData.size() == 100);
+	assertTrue (!stmt.done());
+	assertTrue (retData.size() == 100);
 	stmt.execute();
-	assert (stmt.done());
-	assert (retData.size() == 101);
+	assertTrue (stmt.done());
+	assertTrue (retData.size() == 101);
 
 	for (int x = 0; x < 101; ++x)
 	{
-		assert(data[x] == retData[x]);
+		assertTrue (data[x] == retData[x]);
 	}
 }
 
@@ -1653,34 +1653,34 @@ void SQLExecutor::limitPrepare()
 	try 
 	{ 
 		Statement stmt = (session() << "INSERT INTO Strings VALUES (?)", use(data)); 
-		assert (100 == stmt.execute());
+		assertTrue (100 == stmt.execute());
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	std::vector<int> retData;
 	Statement stmt = (session() << "SELECT * FROM Strings", into(retData), limit(50));
-	assert (retData.size() == 0);
-	assert (!stmt.done());
+	assertTrue (retData.size() == 0);
+	assertTrue (!stmt.done());
 
 	try { stmt.execute(); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (!stmt.done());
-	assert (retData.size() == 50);
+	assertTrue (!stmt.done());
+	assertTrue (retData.size() == 50);
 
 	try { stmt.execute(); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (stmt.done());
-	assert (retData.size() == 100);
+	assertTrue (stmt.done());
+	assertTrue (retData.size() == 100);
 
 	try { stmt.execute(); }// will restart execution!
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-	assert (!stmt.done());
-	assert (retData.size() == 150);
+	assertTrue (!stmt.done());
+	assertTrue (retData.size() == 150);
 	for (int x = 0; x < 150; ++x)
 	{
-		assert(data[x%100] == retData[x]);
+		assertTrue (data[x%100] == retData[x]);
 	}
 }
 
@@ -1703,7 +1703,7 @@ void SQLExecutor::prepare()
 	try { session() << "SELECT COUNT(*) FROM Strings", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 0);
+	assertTrue (count == 0);
 }
 
 
@@ -1783,7 +1783,7 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	
 	time = sw.elapsed() / 1000.0;
 
-	assert (ints.size() == size);
+	assertTrue (ints.size() == size);
 
 	ints.clear();
 	strings.clear();
@@ -1805,7 +1805,7 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 	
 	bulkTime = sw.elapsed() / 1000.0;
 
-	assert (ints.size() == size);
+	assertTrue (ints.size() == size);
 
 	if (0.0 == bulkTime)
 	{
@@ -1848,7 +1848,7 @@ void SQLExecutor::setSimple()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::set<std::string> lastNamesR;
 	std::set<std::string> firstNamesR;
@@ -1857,10 +1857,10 @@ void SQLExecutor::setSimple()
 	try { session() << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ages == agesR);
-	assert (lastNames == lastNamesR);
-	assert (firstNames == firstNamesR);
-	assert (addresses == addressesR);
+	assertTrue (ages == agesR);
+	assertTrue (lastNames == lastNamesR);
+	assertTrue (firstNames == firstNamesR);
+	assertTrue (addresses == addressesR);
 }
 
 
@@ -1878,13 +1878,13 @@ void SQLExecutor::setComplex()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::set<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result == people);
+	assertTrue (result == people);
 }
 
 
@@ -1907,15 +1907,15 @@ void SQLExecutor::setComplexUnique()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 5);
+	assertTrue (count == 5);
 
 	std::set<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result.size() == 2);
-	assert (*result.begin() == p1);
-	assert (*++result.begin() == p2);
+	assertTrue (result.size() == 2);
+	assertTrue (*result.begin() == p1);
+	assertTrue (*++result.begin() == p2);
 }
 
 void SQLExecutor::multiSetSimple()
@@ -1943,7 +1943,7 @@ void SQLExecutor::multiSetSimple()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::multiset<std::string> lastNamesR;
 	std::multiset<std::string> firstNamesR;
@@ -1952,10 +1952,10 @@ void SQLExecutor::multiSetSimple()
 	try { session() << "SELECT * FROM Person", into(lastNamesR), into(firstNamesR), into(addressesR), into(agesR), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ages.size() == agesR.size());
-	assert (lastNames.size() == lastNamesR.size());
-	assert (firstNames.size() == firstNamesR.size());
-	assert (addresses.size() == addressesR.size());
+	assertTrue (ages.size() == agesR.size());
+	assertTrue (lastNames.size() == lastNamesR.size());
+	assertTrue (firstNames.size() == firstNamesR.size());
+	assertTrue (addresses.size() == addressesR.size());
 }
 
 
@@ -1978,13 +1978,13 @@ void SQLExecutor::multiSetComplex()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 5);
+	assertTrue (count == 5);
 
 	std::multiset<Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result.size() == people.size());
+	assertTrue (result.size() == people.size());
 }
 
 
@@ -2004,13 +2004,13 @@ void SQLExecutor::mapComplex()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 
 	std::map<std::string, Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result == people);
+	assertTrue (result == people);
 }
 
 
@@ -2033,13 +2033,13 @@ void SQLExecutor::mapComplexUnique()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 5);
+	assertTrue (count == 5);
 
 	std::map<std::string, Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result.size() == 2);
+	assertTrue (result.size() == 2);
 }
 
 
@@ -2062,13 +2062,13 @@ void SQLExecutor::multiMapComplex()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 5);
+	assertTrue (count == 5);
 
 	std::multimap<std::string, Person> result;
 	try { session() << "SELECT * FROM Person", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result.size() == people.size());
+	assertTrue (result.size() == people.size());
 }
 
 
@@ -2088,12 +2088,12 @@ void SQLExecutor::selectIntoSingle()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	try { session() << "SELECT * FROM Person ORDER BY LastName", into(result), limit(1), now; }// will return 1 object into one single result
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result == p1);
+	assertTrue (result == p1);
 }
 
 
@@ -2114,15 +2114,15 @@ void SQLExecutor::selectIntoSingleStep()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	Statement stmt = (session() << "SELECT * FROM Person", into(result), limit(1)); 
 	stmt.execute();
-	assert (result == p1);
-	assert (!stmt.done());
+	assertTrue (result == p1);
+	assertTrue (!stmt.done());
 	stmt.execute();
-	assert (result == p2);
-	assert (stmt.done());
+	assertTrue (result == p2);
+	assertTrue (stmt.done());
 }
 
 
@@ -2142,7 +2142,7 @@ void SQLExecutor::selectIntoSingleFail()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), limit(2, true), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	try
 	{
@@ -2172,7 +2172,7 @@ void SQLExecutor::lowerLimitOk()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	try
 	{
@@ -2202,15 +2202,15 @@ void SQLExecutor::singleSelect()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	Statement stmt = (session() << "SELECT * FROM Person", into(result), limit(1));
 	stmt.execute();
-	assert (result == p1);
-	assert (!stmt.done());
+	assertTrue (result == p1);
+	assertTrue (!stmt.done());
 	stmt.execute();
-	assert (result == p2);
-	assert (stmt.done());
+	assertTrue (result == p2);
+	assertTrue (stmt.done());
 }
 
 
@@ -2230,7 +2230,7 @@ void SQLExecutor::lowerLimitFail()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	try
 	{
@@ -2259,14 +2259,14 @@ void SQLExecutor::combinedLimits()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	std::vector <Person> result;
 	try { session() << "SELECT * FROM Person", into(result), lowerLimit(2), upperLimit(2), now; }// will return 2 objects
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result.size() == 2);
-	assert (result[0] == p1);
-	assert (result[1] == p2);
+	assertTrue (result.size() == 2);
+	assertTrue (result[0] == p1);
+	assertTrue (result[1] == p2);
 }
 
 
@@ -2287,14 +2287,14 @@ void SQLExecutor::ranges()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	std::vector <Person> result;
 	try { session() << "SELECT * FROM Person", into(result), range(2, 2), now; }// will return 2 objects
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (result.size() == 2);
-	assert (result[0] == p1);
-	assert (result[1] == p2);
+	assertTrue (result.size() == 2);
+	assertTrue (result[0] == p1);
+	assertTrue (result[1] == p2);
 }
 
 
@@ -2314,7 +2314,7 @@ void SQLExecutor::combinedIllegalLimits()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	try
 	{
@@ -2343,7 +2343,7 @@ void SQLExecutor::illegalRange()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 2);
+	assertTrue (count == 2);
 	Person result;
 	try
 	{
@@ -2363,13 +2363,13 @@ void SQLExecutor::emptyDB()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 0);
+	assertTrue (count == 0);
 
 	Person result;
 	Statement stmt = (session() << "SELECT * FROM Person", into(result), limit(1));
 	stmt.execute();
-	assert (result.firstName.empty());
-	assert (stmt.done());
+	assertTrue (result.firstName.empty());
+	assertTrue (stmt.done());
 }
 
 
@@ -2389,20 +2389,20 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	CLOB res;
-	assert (res.size() == 0);
+	assertTrue (res.size() == 0);
 	try { session() << "SELECT Image FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (res == img);
+	assertTrue (res == img);
 
 	CLOB big;
 	std::vector<char> v(bigSize, 'x');
 	big.assignRaw(&v[0], v.size());
 
-	assert (big.size() == bigSize);
+	assertTrue (big.size() == bigSize);
 
 	try { session() << "DELETE FROM Person", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -2416,7 +2416,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	try { session() << "SELECT Image FROM Person", into(res), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (res == big);
+	assertTrue (res == big);
 }
 
 
@@ -2434,7 +2434,7 @@ void SQLExecutor::blobStmt()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	CLOB res;
 	poco_assert (res.size() == 0);
@@ -2461,19 +2461,19 @@ void SQLExecutor::dateTime()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
-	assert(count == 1);
+	assertTrue (count == 1);
 
 	DateTime res;
 	try { session() << "SELECT Born FROM Person", into(res), now; }
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
-	assert(res == born);
+	assertTrue (res == born);
 
 	Statement stmt = (session() << "SELECT Born FROM Person", now);
 	RecordSet rset(stmt);
 
 	res = rset["Born"].convert<DateTime>();
-	assert(res == born);
+	assertTrue (res == born);
 }
 
 
@@ -2497,14 +2497,14 @@ void SQLExecutor::date()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	Date d;
 	Time t;
 	try { session() << "SELECT BornDate FROM Person", into(d), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (d == bornDate);
+	assertTrue (d == bornDate);
 
 	Statement stmt = (session() << "SELECT BornDate FROM Person", now);
 	RecordSet rset(stmt);
@@ -2512,7 +2512,7 @@ void SQLExecutor::date()
 	DateTime dt1 = rset["BornDate"].convert<DateTime>();
 
 	Date d2(dt1);
-	assert (d2 == bornDate);
+	assertTrue (d2 == bornDate);
 }
 
 
@@ -2536,21 +2536,21 @@ void SQLExecutor::time()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	Date d;
 	Time t;
 	try { session() << "SELECT BornTime FROM Person", into(t), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (t == bornTime);
+	assertTrue (t == bornTime);
 
 	Statement stmt = (session() << "SELECT BornTime FROM Person", now);
 	RecordSet rset(stmt);
 
 	DateTime dt2 = rset["BornTime"].convert<DateTime>();
 	Time t2(dt2);
-	assert (t2 == bornTime);
+	assertTrue (t2 == bornTime);
 }
 
 
@@ -2565,11 +2565,11 @@ void SQLExecutor::tuples()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	TupleType ret(-10,-11,-12,-13,-14,-15,-16,-17,-18,-19);
-	assert (ret != t);
+	assertTrue (ret != t);
 	try { session() << "SELECT * FROM Tuples", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ret == t);
+	assertTrue (ret == t);
 }
 
 void SQLExecutor::tupleVector()
@@ -2593,13 +2593,13 @@ void SQLExecutor::tupleVector()
 	try { session() << "SELECT COUNT(*) FROM Tuples", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (v.size() == count);
+	assertTrue (v.size() == count);
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> > ret;
 	try { session() << "SELECT * FROM Tuples", into(ret), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (ret == v);
+	assertTrue (ret == v);
 }
 
 
@@ -2621,43 +2621,43 @@ void SQLExecutor::internalExtraction()
 		Statement stmt = (session() << "SELECT * FROM Vectors", now);
 		RecordSet rset(stmt);
 
-		assert (3 == rset.columnCount());
-		assert (4 == rset.rowCount());
+		assertTrue (3 == rset.columnCount());
+		assertTrue (4 == rset.rowCount());
 
 		int curVal = 3;
 		do
 		{
-			assert (rset["str0"] == curVal);
+			assertTrue (rset["str0"] == curVal);
 			++curVal;
 		} while (rset.moveNext());
 
 		rset.moveFirst();
-		assert (rset["str0"] == "3");
+		assertTrue (rset["str0"] == "3");
 		rset.moveLast();
-		assert(rset["str0"] == "6");
+		assertTrue (rset["str0"] == "6");
 
 		RecordSet rset2(rset);
-		assert (3 == rset2.columnCount());
-		assert (4 == rset2.rowCount());
+		assertTrue (3 == rset2.columnCount());
+		assertTrue (4 == rset2.rowCount());
 
 		int i = rset.value<int>(0,0);
-		assert (1 == i);
+		assertTrue (1 == i);
 
 		std::string s = rset.value(0,0).convert<std::string>();
-		assert ("1" == s);
+		assertTrue ("1" == s);
 
 		int a = rset.value<int>(0,2);
-		assert (3 == a);
+		assertTrue (3 == a);
 
 		try
 		{
 			double d = rset.value<double>(1,1);
-			assert (2.5 == d);
+			assertTrue (2.5 == d);
 		}
 		catch (BadCastException&)
 		{
 			float f = rset.value<float>(1,1);
-			assert (2.5 == f);
+			assertTrue (2.5 == f);
 		}
 
 		try
@@ -2669,16 +2669,16 @@ void SQLExecutor::internalExtraction()
 			UTF16String us = rset.value<Poco::UTF16String>(2, 2);
 			Poco::UnicodeConverter::convert(us, s);
 		}
-		assert("5" == s);
+		assertTrue ("5" == s);
 
 		i = rset.value("str0", 2);
-		assert (5 == i);
+		assertTrue (5 == i);
 		
 		const Column<std::deque<int> >& col = rset.column<std::deque<int> >(0);
 		Column<std::deque<int> >::Iterator it = col.begin();
 		Column<std::deque<int> >::Iterator end = col.end();
 		for (int i = 1; it != end; ++it, ++i)
-			assert (*it == i);
+			assertTrue (*it == i);
 
 		rset = (session() << "SELECT COUNT(*) AS cnt FROM Vectors", now);
 
@@ -2687,7 +2687,7 @@ void SQLExecutor::internalExtraction()
 		{
 			//this is what most drivers will return
 			int i = rset.value<int>(0,0);
-			assert (4 == i);
+			assertTrue (4 == i);
 		}
 		catch(BadCastException&)
 		{
@@ -2695,18 +2695,18 @@ void SQLExecutor::internalExtraction()
 			{
 				//this is for Oracle
 				double i = rset.value<double>(0,0);
-				assert (4 == int(i));
+				assertTrue (4 == int(i));
 			}
 			catch(BadCastException&)
 			{
 				//this is for PostgreSQL
 				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assert (4 == big);
+				assertTrue (4 == big);
 			}
 		}
 
 		s = rset.value("cnt", 0).convert<std::string>();
-		assert ("4" == s);
+		assertTrue ("4" == s);
 
 		try { rset.column<std::deque<int> >(100); fail ("must fail"); }
 		catch (RangeException&) { }
@@ -2742,11 +2742,11 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 	{ 
 		Statement stmt = (session() << query, now);
 		RecordSet rset(stmt);
-		assert (rset.totalRowCount() == 4);
+		assertTrue (rset.totalRowCount() == 4);
 		RowFilter::Ptr pRF = new RowFilter(&rset);
-		assert (pRF->isEmpty());
+		assertTrue (pRF->isEmpty());
 		pRF->add(intFldName, RowFilter::VALUE_EQUAL, 1);
-		assert (!pRF->isEmpty());
+		assertTrue (!pRF->isEmpty());
 
 		Var da;
 		try 
@@ -2756,49 +2756,49 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 		} catch (InvalidAccessException&) 
 		{
 			da = rset.value(0, 1, false);
-			assert (2 == da);
+			assertTrue (2 == da);
 			da = rset.value(0, 0);
-			assert (1 == da);
+			assertTrue (1 == da);
 		}
 
-		assert (rset.rowCount() == 1);
-		assert (rset.moveFirst());
-		assert (1 == rset[intFldName]);
-		assert (!rset.moveNext());
+		assertTrue (rset.rowCount() == 1);
+		assertTrue (rset.moveFirst());
+		assertTrue (1 == rset[intFldName]);
+		assertTrue (!rset.moveNext());
 		pRF->add("flt0", RowFilter::VALUE_LESS_THAN_OR_EQUAL, 3.5f);
-		assert (rset.rowCount() == 3);
-		assert (rset.moveNext());
-		assert (2.5 == rset["flt0"]);
-		assert (rset.moveNext());
-		assert (3.5 == rset["flt0"]);
-		assert (!rset.moveNext());
+		assertTrue (rset.rowCount() == 3);
+		assertTrue (rset.moveNext());
+		assertTrue (2.5 == rset["flt0"]);
+		assertTrue (rset.moveNext());
+		assertTrue (3.5 == rset["flt0"]);
+		assertTrue (!rset.moveNext());
 		pRF->add("str0", RowFilter::VALUE_EQUAL, 6);
-		assert (rset.rowCount() == 4);
-		assert (rset.moveLast());
-		assert ("6" == rset["str0"]);
+		assertTrue (rset.rowCount() == 4);
+		assertTrue (rset.moveLast());
+		assertTrue ("6" == rset["str0"]);
 		pRF->remove("flt0");
-		assert (rset.rowCount() == 2);
-		assert (rset.moveFirst());
-		assert ("3" == rset["str0"]);
-		assert (rset.moveNext());
-		assert ("6" == rset["str0"]);
+		assertTrue (rset.rowCount() == 2);
+		assertTrue (rset.moveFirst());
+		assertTrue ("3" == rset["str0"]);
+		assertTrue (rset.moveNext());
+		assertTrue ("6" == rset["str0"]);
 		pRF->remove(intFldName);
 		pRF->remove("str0");
-		assert (pRF->isEmpty());
+		assertTrue (pRF->isEmpty());
 		pRF->add("str0", "!=", 3);
-		assert (rset.rowCount() == 3);
+		assertTrue (rset.rowCount() == 3);
 
 		RowFilter::Ptr pRF1 = new RowFilter(pRF, RowFilter::OP_AND);
 		pRF1->add(intFldName, "==", 2);
-		assert (rset.rowCount() == 1);
+		assertTrue (rset.rowCount() == 1);
 		pRF1->add(intFldName, "<", 2);
-		assert (rset.rowCount() == 1);
+		assertTrue (rset.rowCount() == 1);
 		pRF1->add(intFldName, ">", 3);
-		assert (rset.rowCount() == 2);
+		assertTrue (rset.rowCount() == 2);
 		pRF->removeFilter(pRF1);
 		pRF->remove("str0");
-		assert (pRF->isEmpty());
-		assert (rset.rowCount() == 4);
+		assertTrue (pRF->isEmpty());
+		assertTrue (rset.rowCount() == 4);
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2838,15 +2838,15 @@ void SQLExecutor::internalBulkExtraction()
 	{ 
 		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
 		RecordSet rset(stmt); 
-		assert (size == rset.rowCount());
-		assert("LN0" == rset["LastName"]);
-		assert (0 == rset["Age"]);
+		assertTrue (size == rset.rowCount());
+		assertTrue ("LN0" == rset["LastName"]);
+		assertTrue (0 == rset["Age"]);
 		rset.moveNext();
-		assert("LN1" == rset["LastName"]);
-		assert(1 == rset["Age"]);
+		assertTrue ("LN1" == rset["LastName"]);
+		assertTrue (1 == rset["Age"]);
 		rset.moveLast();
-		assert (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
-		assert (size - 1 == rset["Age"]);
+		assertTrue (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assertTrue (size - 1 == rset["Age"]);
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2855,12 +2855,12 @@ void SQLExecutor::internalBulkExtraction()
 	{ 
 		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
 		RecordSet rset(stmt); 
-		assert (size == rset.rowCount());
-		assert ("LN0" == rset["LastName"]);
-		assert (0 == rset["Age"]);
+		assertTrue (size == rset.rowCount());
+		assertTrue ("LN0" == rset["LastName"]);
+		assertTrue (0 == rset["Age"]);
 		rset.moveLast();
-		assert (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
-		assert (size - 1 == rset["Age"]);
+		assertTrue (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assertTrue (size - 1 == rset["Age"]);
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -2900,15 +2900,15 @@ void SQLExecutor::internalBulkExtractionUTF16()
 	{
 		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
 		RecordSet rset(stmt);
-		assert(size == rset.rowCount());
-		assert(Poco::UnicodeConverter::to<UTF16String>("LN0") == rset["LastName"]);
-		assert(0 == rset["Age"]);
+		assertTrue (size == rset.rowCount());
+		assertTrue (Poco::UnicodeConverter::to<UTF16String>("LN0") == rset["LastName"]);
+		assertTrue (0 == rset["Age"]);
 		rset.moveNext();
-		assert(Poco::UnicodeConverter::to<UTF16String>("LN1") == rset["LastName"]);
-		assert(1 == rset["Age"]);
+		assertTrue (Poco::UnicodeConverter::to<UTF16String>("LN1") == rset["LastName"]);
+		assertTrue (1 == rset["Age"]);
 		rset.moveLast();
-		assert(std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
-		assert(size - 1 == rset["Age"]);
+		assertTrue (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assertTrue (size - 1 == rset["Age"]);
 	}
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
@@ -2917,12 +2917,12 @@ void SQLExecutor::internalBulkExtractionUTF16()
 	{
 		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
 		RecordSet rset(stmt);
-		assert(size == rset.rowCount());
-		assert("LN0" == rset["LastName"]);
-		assert(0 == rset["Age"]);
+		assertTrue (size == rset.rowCount());
+		assertTrue ("LN0" == rset["LastName"]);
+		assertTrue (0 == rset["Age"]);
 		rset.moveLast();
-		assert(std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
-		assert(size - 1 == rset["Age"]);
+		assertTrue (std::string("LN") + NumberFormatter::format(size - 1) == rset["LastName"]);
+		assertTrue (size - 1 == rset["Age"]);
 	}
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail(funct); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail(funct); }
@@ -2957,20 +2957,20 @@ void SQLExecutor::internalStorageType()
 			Statement stmt = (session() << "SELECT * FROM Vectors", *it, now);
 			RecordSet rset(stmt);
 
-			assert (3 == rset.columnCount());
-			assert (4 == rset.rowCount());
+			assertTrue (3 == rset.columnCount());
+			assertTrue (4 == rset.rowCount());
 
 			int curVal = 3;
 			do
 			{
-				assert (rset["str0"] == curVal);
+				assertTrue (rset["str0"] == curVal);
 				++curVal;
 			} while (rset.moveNext());
 
 			rset.moveFirst();
-			assert (rset["str0"] == "3");
+			assertTrue (rset["str0"] == "3");
 			rset.moveLast();
-			assert (rset["str0"] == "6");
+			assertTrue (rset["str0"] == "6");
 
 			try
 			{
@@ -3029,19 +3029,19 @@ void SQLExecutor::nulls()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	RecordSet rs(session(), "SELECT * FROM NullTest");
-	assert (1 == rs.rowCount());
+	assertTrue (1 == rs.rowCount());
 	rs.moveFirst();
-	assert (rs.isNull("i"));
-	assert (rs["i"] != 0);
-	assert (rs.isNull("r"));
-	assert (rs.isNull("v"));
-	assert (rs["v"] != "");
-	assert (rs.nvl<int>("i") == 0);
-	assert (rs.nvl("i", -1) == -1);
-	assert (rs.nvl<double>("r") == double());
-	assert (rs.nvl("r", -1.5) == -1.5);
-	assert (rs.nvl<std::string>("v") == "");
-	assert (rs.nvl("v", "123") == "123");
+	assertTrue (rs.isNull("i"));
+	assertTrue (rs["i"] != 0);
+	assertTrue (rs.isNull("r"));
+	assertTrue (rs.isNull("v"));
+	assertTrue (rs["v"] != "");
+	assertTrue (rs.nvl<int>("i") == 0);
+	assertTrue (rs.nvl("i", -1) == -1);
+	assertTrue (rs.nvl<double>("r") == double());
+	assertTrue (rs.nvl("r", -1.5) == -1.5);
+	assertTrue (rs.nvl<std::string>("v") == "");
+	assertTrue (rs.nvl("v", "123") == "123");
 	try { session() << "DELETE FROM NullTest", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -3054,19 +3054,19 @@ void SQLExecutor::nulls()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	rs = (session() << "SELECT * FROM NullTest", now);
-	assert (1 == rs.rowCount());
+	assertTrue (1 == rs.rowCount());
 	rs.moveFirst();
-	assert (!rs.isNull("i"));
-	assert (rs["i"] == 1);
-	assert (!rs.isNull("v"));
-	assert (!rs.isNull("r"));
-	assert (rs["v"] == "123");
-	assert (rs.nvl<int>("i") == 1);
-	assert (rs.nvl("i", -1) == 1);
-	assert (rs.nvl<double>("r") == 1.5);
-	assert (rs.nvl("r", -1.5) == 1.5);
-	assert (rs.nvl<std::string>("v") == "123");
-	assert (rs.nvl("v", "456") == "123");
+	assertTrue (!rs.isNull("i"));
+	assertTrue (rs["i"] == 1);
+	assertTrue (!rs.isNull("v"));
+	assertTrue (!rs.isNull("r"));
+	assertTrue (rs["v"] == "123");
+	assertTrue (rs.nvl<int>("i") == 1);
+	assertTrue (rs.nvl("i", -1) == 1);
+	assertTrue (rs.nvl<double>("r") == 1.5);
+	assertTrue (rs.nvl("r", -1.5) == 1.5);
+	assertTrue (rs.nvl<std::string>("v") == "123");
+	assertTrue (rs.nvl("v", "456") == "123");
 	try { session() << "UPDATE NullTest SET v = ? WHERE i = ?", use(null), use(i), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
@@ -3076,20 +3076,20 @@ void SQLExecutor::nulls()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	rs = (session() << "SELECT i, r, v FROM NullTest ORDER BY i ASC", now);
-	assert (2 == rs.rowCount());
+	assertTrue (2 == rs.rowCount());
 	rs.moveFirst();
-	assert (!rs.isNull("i"));
-	assert (rs["i"] == 1);
-	assert (!rs.isNull("r"));
-	assert (rs.isNull("v"));
-	assert (rs["v"] != "");
+	assertTrue (!rs.isNull("i"));
+	assertTrue (rs["i"] == 1);
+	assertTrue (!rs.isNull("r"));
+	assertTrue (rs.isNull("v"));
+	assertTrue (rs["v"] != "");
 
-	assert (rs.moveNext());
-	assert (!rs.isNull("i"));
-	assert (rs["i"] == 2);
-	assert (rs.isNull("r"));
-	assert (rs.isNull("v"));
-	assert (rs["v"] != "");
+	assertTrue (rs.moveNext());
+	assertTrue (!rs.isNull("i"));
+	assertTrue (rs["i"] == 2);
+	assertTrue (rs.isNull("r"));
+	assertTrue (rs.isNull("v"));
+	assertTrue (rs["v"] != "");
 
 	try { session() << "DELETE FROM NullTest", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -3112,18 +3112,18 @@ void SQLExecutor::nulls()
 	session().setFeature("forceEmptyString", false);
 
 	RecordSet rs1(session(), "SELECT v FROM NullTest");
-	assert (1 == rs1.rowCount());
+	assertTrue (1 == rs1.rowCount());
 	rs1.moveFirst();
-	assert (rs1.isNull("v"));
-	assert (!(rs["v"] == ""));
+	assertTrue (rs1.isNull("v"));
+	assertTrue (!(rs["v"] == ""));
 
 	session().setFeature("emptyStringIsNull", false);
 	session().setFeature("forceEmptyString", true);
 	RecordSet rs2(session(), "SELECT v FROM NullTest");
-	assert (1 == rs2.rowCount());
+	assertTrue (1 == rs2.rowCount());
 	rs2.moveFirst();
-	assert (!rs2.isNull("v"));
-	assert ((rs2["v"] == ""));
+	assertTrue (!rs2.isNull("v"));
+	assertTrue ((rs2["v"] == ""));
 
 	try
 	{
@@ -3150,7 +3150,7 @@ void SQLExecutor::rowIterator()
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
 	RecordSet rset0(session(), "SELECT * FROM Vectors");
-	assert (rset0.begin() == rset0.end());
+	assertTrue (rset0.begin() == rset0.end());
 
 	try { session() << "INSERT INTO Vectors VALUES (?,?,?)", use(v), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -3163,25 +3163,25 @@ void SQLExecutor::rowIterator()
 	RecordSet::Iterator end = rset.end();
 	for (int i = 1; it != end; ++it, ++i) 
 	{
-		assert (it->get(0) == i);
+		assertTrue (it->get(0) == i);
 		osLoop << *it;
 	}
-	assert (!osLoop.str().empty());
+	assertTrue (!osLoop.str().empty());
 
 	std::ostringstream osCopy;
 	std::copy(rset.begin(), rset.end(), std::ostream_iterator<Row>(osCopy));
-	assert (osLoop.str() == osCopy.str());
+	assertTrue (osLoop.str() == osCopy.str());
 
 	RowFilter::Ptr pRF = new RowFilter(&rset);
-	assert (pRF->isEmpty());
+	assertTrue (pRF->isEmpty());
 	pRF->add("str0", RowFilter::VALUE_EQUAL, "3");
-	assert (!pRF->isEmpty());
+	assertTrue (!pRF->isEmpty());
 	it = rset.begin();
 	end = rset.end();
 	for (int i = 1; it != end; ++it, ++i) 
 	{
-		assert (it->get(0) == i);
-		assert (1 == i);
+		assertTrue (it->get(0) == i);
+		assertTrue (1 == i);
 	}
 }
 
@@ -3197,7 +3197,7 @@ void SQLExecutor::stdVectorBool()
 
 	b = true;
 	session() << "SELECT * FROM BoolTest", into(b), now;
-	assert (false == b);
+	assertTrue (false == b);
 	session() << "DELETE FROM BoolTest", now;
 
 	b = true;
@@ -3207,7 +3207,7 @@ void SQLExecutor::stdVectorBool()
 
 	b = false;
 	session() << "SELECT * FROM BoolTest", into(b), now;
-	assert (true == b);
+	assertTrue (true == b);
 	session() << "DELETE FROM BoolTest", now;
 
 	std::vector<bool> v;
@@ -3223,13 +3223,13 @@ void SQLExecutor::stdVectorBool()
 	v.clear();
 	session() << "SELECT * FROM BoolTest", into(v), now;
 
-	assert (4 == v.size());
+	assertTrue (4 == v.size());
 	std::vector<bool>::iterator it = v.begin();
 	std::vector<bool>::iterator end = v.end();
 	int t = 0;
 	for (; it != end; ++it)
 		t += *it ? 1 : 0;
-	assert (2 == t);
+	assertTrue (2 == t);
 
 	try { session() << "SELECT * FROM BoolTest WHERE b = ?", out(v), now; fail("must fail"); }
 	catch (BindingException&) { }
@@ -3242,7 +3242,7 @@ void SQLExecutor::stdVectorBool()
 	t = 0;
 	for (int i = 0; i < 4; ++i)
 		t += rset.value<bool>(0, i) ? 1 : 0;
-	assert (2 == t);
+	assertTrue (2 == t);
 }
 
 
@@ -3253,12 +3253,12 @@ void SQLExecutor::asynchronous(int rowCount)
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(?)", use(data));
 	Statement::Result result = stmt.executeAsync();
-	assert (!stmt.isAsync());
+	assertTrue (!stmt.isAsync());
 	result.wait();
 	
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
-	assert (stmt1.isAsync());
-	assert (stmt1.wait() == rowCount);
+	assertTrue (stmt1.isAsync());
+	assertTrue (stmt1.wait() == rowCount);
 
 	// +++ if this part of the test case fails, increase the rowCount until achieved
 	//  that first execute is still executing when the second one is called
@@ -3275,9 +3275,9 @@ void SQLExecutor::asynchronous(int rowCount)
 	// ---
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
-	assert (stmt.isAsync());
+	assertTrue (stmt.isAsync());
 	stmt.wait();
-	assert (stmt.execute() == 0);
+	assertTrue (stmt.execute() == 0);
 	
 	// +++ if this part of the test case fails, increase the rowCount until achieved
 	//  that first execute is still executing when the second one is called
@@ -3286,49 +3286,49 @@ void SQLExecutor::asynchronous(int rowCount)
 		fail ("executeAsync() must fail");
 	} catch (InvalidAccessException&)
 	{
-		assert (stmt.isAsync());
+		assertTrue (stmt.isAsync());
 		stmt.wait();
 		result = stmt.executeAsync();
 	}
 	// ---
 
-	assert (stmt.wait() == rowCount);
-	assert (result.data() == rowCount);
+	assertTrue (stmt.wait() == rowCount);
+	assertTrue (result.data() == rowCount);
 	stmt.setAsync(false);
-	assert (!stmt.isAsync());
-	assert (stmt.execute() == rowCount);
+	assertTrue (!stmt.isAsync());
+	assertTrue (stmt.execute() == rowCount);
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), sync, now;
-	assert (!stmt.isAsync());
-	assert (stmt.wait() == 0);
-	assert (stmt.execute() == rowCount);
+	assertTrue (!stmt.isAsync());
+	assertTrue (stmt.wait() == 0);
+	assertTrue (stmt.execute() == rowCount);
 	result = stmt.executeAsync();
-	assert (!stmt.isAsync());
+	assertTrue (!stmt.isAsync());
 	result.wait();
-	assert (result.data() == rowCount);
+	assertTrue (result.data() == rowCount);
 
-	assert (0 == rowCount % 10);
+	assertTrue (0 == rowCount % 10);
 	int step = (int) (rowCount/10);
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
-	assert (data.size() == 0);
-	assert (!stmt2.done());
+	assertTrue (data.size() == 0);
+	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
 	
 	for (int i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
 		rows = stmt2.wait();
-		assert (step == rows);
-		assert (step + i == data.size());
+		assertTrue (step == rows);
+		assertTrue (step + i == data.size());
 	}
-	assert (stmt2.done());
-	assert (rowCount == data.size());
+	assertTrue (stmt2.done());
+	assertTrue (rowCount == data.size());
 
 	stmt2 = tmp << "SELECT * FROM Strings", reset;
-	assert (!stmt2.isAsync());
-	assert ("deque" == stmt2.getStorage());
-	assert (stmt2.execute() == rowCount);
+	assertTrue (!stmt2.isAsync());
+	assertTrue ("deque" == stmt2.getStorage());
+	assertTrue (stmt2.execute() == rowCount);
 }
 
 
@@ -3349,26 +3349,26 @@ void SQLExecutor::any()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
-	assert (1 == count);
+	assertTrue (1 == count);
 
 	i = 0;
 	f = 0.0;
 	s = std::string("");
 	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
-	assert (AnyCast<int>(i) == 42);
-	assert (AnyCast<double>(f) == 42.5);
+	assertTrue (AnyCast<int>(i) == 42);
+	assertTrue (AnyCast<double>(f) == 42.5);
 #ifdef POCO_ODBC_UNICODE
 	// drivers may behave differently here
 	try
 	{
-		assert(AnyCast<UTF16String>(s) == us);
+		assertTrue (AnyCast<UTF16String>(s) == us);
 	}
 	catch (BadCastException&)
 	{
-		assert (AnyCast<std::string>(s) == "42");
+		assertTrue (AnyCast<std::string>(s) == "42");
 	}
 #else
-	assert (AnyCast<std::string>(s) == "42");
+	assertTrue (AnyCast<std::string>(s) == "42");
 #endif
 }
 
@@ -3384,15 +3384,15 @@ void SQLExecutor::dynamicAny()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Anys", into(count), now;
-	assert (1 == count);
+	assertTrue (1 == count);
 
 	i = 0;
 	f = 0.0;
 	s = std::string("");
 	tmp << "SELECT * FROM Anys", into(i), into(f), into(s), now;
-	assert (42 == i);
-	assert (42.5 == f);
-	assert ("42" == s);
+	assertTrue (42 == i);
+	assertTrue (42.5 == f);
+	assertTrue ("42" == s);
 }
 
 
@@ -3419,12 +3419,12 @@ void SQLExecutor::multipleResults(const std::string& sql)
 		, into(aBart, pos1)
 		, into(people2, from(pos2)), use(aLisa), use(aHomer);
 
-	assert (4 == stmt.execute());
-	assert (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
-	assert (10 == aBart);
-	assert (2 == people2.size());
-	assert (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
-	assert (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+	assertTrue (4 == stmt.execute());
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assertTrue (10 == aBart);
+	assertTrue (2 == people2.size());
+	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
 
@@ -3448,18 +3448,18 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 		pChannel->log(msgWarnS);
 
 		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
-		assert (4 == rs.rowCount());
-		assert ("InformationSource" == rs["Source"]);
-		assert ("a Informational async message" == rs["Text"]);
+		assertTrue (4 == rs.rowCount());
+		assertTrue ("InformationSource" == rs["Source"]);
+		assertTrue ("a Informational async message" == rs["Text"]);
 		rs.moveNext();
-		assert ("WarningSource" == rs["Source"]);
-		assert ("b Warning async message" == rs["Text"]);
+		assertTrue ("WarningSource" == rs["Source"]);
+		assertTrue ("b Warning async message" == rs["Text"]);
 		rs.moveNext();
-		assert ("InformationSource" == rs["Source"]);
-		assert ("c Informational sync message" == rs["Text"]);
+		assertTrue ("InformationSource" == rs["Source"]);
+		assertTrue ("c Informational sync message" == rs["Text"]);
 		rs.moveNext();
-		assert ("WarningSource" == rs["Source"]);
-		assert ("d Warning sync message" == rs["Text"]);
+		assertTrue ("WarningSource" == rs["Source"]);
+		assertTrue ("d Warning sync message" == rs["Text"]);
 
 		Thread::sleep(3000);
 
@@ -3469,17 +3469,17 @@ void SQLExecutor::sqlChannel(const std::string& connect)
 		pChannel->log(msgWarnA);
 
 		RecordSet rs1(session(), "SELECT * FROM T_POCO_LOG_ARCHIVE");
-		assert (4 == rs1.rowCount());
+		assertTrue (4 == rs1.rowCount());
 
 		pChannel->setProperty("keep", "");
-		assert ("forever" == pChannel->getProperty("keep"));
+		assertTrue ("forever" == pChannel->getProperty("keep"));
 		RecordSet rs2(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
-		assert (2 == rs2.rowCount());
-		assert ("InformationSource" == rs2["Source"]);
-		assert ("e Informational sync message" == rs2["Text"]);
+		assertTrue (2 == rs2.rowCount());
+		assertTrue ("InformationSource" == rs2["Source"]);
+		assertTrue ("e Informational sync message" == rs2["Text"]);
 		rs2.moveNext();
-		assert ("WarningSource" == rs2["Source"]);
-		assert ("f Warning sync message" == rs2["Text"]);
+		assertTrue ("WarningSource" == rs2["Source"]);
+		assertTrue ("f Warning sync message" == rs2["Text"]);
 		
 	} 
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlChannel()"); }
@@ -3501,12 +3501,12 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 
 		Thread::sleep(100);
 		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
-		assert (2 == rs.rowCount());
-		assert ("TestSQLChannel" == rs["Source"]);
-		assert ("a Informational message" == rs["Text"]);
+		assertTrue (2 == rs.rowCount());
+		assertTrue ("TestSQLChannel" == rs["Source"]);
+		assertTrue ("a Informational message" == rs["Text"]);
 		rs.moveNext();
-		assert ("TestSQLChannel" == rs["Source"]);
-		assert ("b Warning message" == rs["Text"]);
+		assertTrue ("TestSQLChannel" == rs["Source"]);
+		assertTrue ("b Warning message" == rs["Text"]);
 	} 
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("sqlLogger()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("sqlLogger()"); }
@@ -3524,11 +3524,11 @@ void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 			Transaction t(session, false);
 			t.setIsolation(ti);
 			
-			assert (ti == t.getIsolation());
-			assert (t.isIsolation(ti));
+			assertTrue (ti == t.getIsolation());
+			assertTrue (t.isIsolation(ti));
 			
-			assert (ti == session.getTransactionIsolation());
-			assert (session.isTransactionIsolation(ti));
+			assertTrue (ti == session.getTransactionIsolation());
+			assertTrue (session.isTransactionIsolation(ti));
 		}
 		catch(Poco::Exception& e){ std::cout << funct << ':' << e.displayText() << std::endl;}
 	}
@@ -3584,9 +3584,9 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	bool autoCommit = session().getFeature("autoCommit");
 
 	session().setFeature("autoCommit", true);
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 	session().setFeature("autoCommit", false);
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
 	setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
@@ -3595,49 +3595,49 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 
 	session().begin();
-	assert (session().isTransaction());
+	assertTrue (session().isTransaction());
 	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (session().isTransaction());
+	assertTrue (session().isTransaction());
 
 	Statement stmt = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == count);
-	assert (session().isTransaction());
+	assertTrue (2 == count);
+	assertTrue (session().isTransaction());
 	session().rollback();
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 
 	stmt.wait();
-	assert (0 == locCount);
+	assertTrue (0 == locCount);
 
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
-	assert (!session().isTransaction());
+	assertTrue (0 == count);
+	assertTrue (!session().isTransaction());
 
 	session().begin();
 	try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (session().isTransaction());
+	assertTrue (session().isTransaction());
 
 	Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 
 	session().commit();
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 
 	stmt1.wait();
-	assert (2 == locCount);
+	assertTrue (2 == locCount);
 
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == count);
+	assertTrue (2 == count);
 
 	session().setFeature("autoCommit", autoCommit);
 }
@@ -3680,37 +3680,37 @@ void SQLExecutor::transaction(const std::string& connect)
 	bool autoCommit = session().getFeature("autoCommit");
 
 	session().setFeature("autoCommit", true);
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 	session().setFeature("autoCommit", false);
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 	session().setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
 
 	{
 		Transaction trans(session());
-		assert (trans.isActive());
-		assert (session().isTransaction());
+		assertTrue (trans.isActive());
+		assertTrue (session().isTransaction());
 		
 		try { session() << "INSERT INTO Person VALUES (?,?,?,?)", use(lastNames), use(firstNames), use(addresses), use(ages), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
-		assert (session().isTransaction());
-		assert (trans.isActive());
+		assertTrue (session().isTransaction());
+		assertTrue (trans.isActive());
 
 		try { session() << "SELECT COUNT(*) FROM Person", into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (2 == count);
-		assert (session().isTransaction());
-		assert (trans.isActive());
+		assertTrue (2 == count);
+		assertTrue (session().isTransaction());
+		assertTrue (trans.isActive());
 	}
-	assert (!session().isTransaction());
+	assertTrue (!session().isTransaction());
 
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
-	assert (!session().isTransaction());
+	assertTrue (0 == count);
+	assertTrue (!session().isTransaction());
 
 	{
 		Transaction trans(session());
@@ -3720,20 +3720,20 @@ void SQLExecutor::transaction(const std::string& connect)
 
 		Statement stmt1 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 
-		assert (session().isTransaction());
-		assert (trans.isActive());
+		assertTrue (session().isTransaction());
+		assertTrue (trans.isActive());
 		trans.commit();
-		assert (!session().isTransaction());
-		assert (!trans.isActive());
+		assertTrue (!session().isTransaction());
+		assertTrue (!trans.isActive());
 
 		stmt1.wait();
-		assert (2 == locCount);
+		assertTrue (2 == locCount);
 	}
 
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == count);
+	assertTrue (2 == count);
 
 	try { session() << "DELETE FROM Person", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -3744,12 +3744,12 @@ void SQLExecutor::transaction(const std::string& connect)
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 	try 
 	{
 		stmt1.wait(5000);
 		if (local.getTransactionIsolation() == Session::TRANSACTION_READ_UNCOMMITTED)
-			assert (0 == locCount);
+			assertTrue (0 == locCount);
 	} catch (TimeoutException&)
 	{ std::cerr << '[' << name() << ']' << " Warning: async query timed out." << std::endl; }
 	session().commit();
@@ -3758,7 +3758,7 @@ void SQLExecutor::transaction(const std::string& connect)
 	{
 		stmt1.wait();
 		local << "SELECT count(*) FROM Person", into(locCount), now;
-		assert (0 == locCount);
+		assertTrue (0 == locCount);
 	}
 
 	std::string sql1 = format("INSERT INTO Person VALUES ('%s','%s','%s',%d)", lastNames[0], firstNames[0], addresses[0], ages[0]);
@@ -3773,34 +3773,34 @@ void SQLExecutor::transaction(const std::string& connect)
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (1 == count);
+	assertTrue (1 == count);
 	trans.execute(sql2, false);
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == count);
+	assertTrue (2 == count);
 
 	Statement stmt2 = (local << "SELECT COUNT(*) FROM Person", into(locCount), async, now);
 
 	trans.rollback();
 
 	stmt2.wait();
-	assert (0 == locCount);
+	assertTrue (0 == locCount);
 
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 
 	trans.execute(sql);
 	
 	Statement stmt3 = (local << "SELECT COUNT(*) FROM Person", into(locCount), now);
-	assert (2 == locCount);
+	assertTrue (2 == locCount);
 
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (2 == count);
+	assertTrue (2 == count);
 
 	session().setFeature("autoCommit", autoCommit);
 }
@@ -3840,7 +3840,7 @@ void SQLExecutor::transactor()
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (1 == count);
+	assertTrue (1 == count);
 
 	try { session() << "DELETE FROM Person", now; session().commit();}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -3849,7 +3849,7 @@ void SQLExecutor::transactor()
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 
 	try
 	{
@@ -3861,7 +3861,7 @@ void SQLExecutor::transactor()
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 
 	try
 	{
@@ -3874,7 +3874,7 @@ void SQLExecutor::transactor()
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 
 	try
 	{
@@ -3887,7 +3887,7 @@ void SQLExecutor::transactor()
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 
 	try
 	{
@@ -3900,7 +3900,7 @@ void SQLExecutor::transactor()
 	try { session() << "SELECT count(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (0 == count);
+	assertTrue (0 == count);
 
 	session().setFeature("autoCommit", autoCommit);
 }
@@ -3917,42 +3917,42 @@ void SQLExecutor::nullable()
 	Nullable<std::string> s = std::string("abc");
 	Nullable<DateTime> d = DateTime();
 
-	assert (!i.isNull());
-	assert (!f.isNull());
-	assert (!s.isNull());
-	assert (!d.isNull());
+	assertTrue (!i.isNull());
+	assertTrue (!f.isNull());
+	assertTrue (!s.isNull());
+	assertTrue (!d.isNull());
 
 	session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(s), into(i), into(f), into(d), now;
 
-	assert (i.isNull());
-	assert (f.isNull());
-	assert (s.isNull());
-	assert (d.isNull());
+	assertTrue (i.isNull());
+	assertTrue (f.isNull());
+	assertTrue (s.isNull());
+	assertTrue (d.isNull());
 
 	RecordSet rs(session(), "SELECT * FROM NullableTest");
 
 	rs.moveFirst();
-	assert (rs.isNull("EmptyString"));
-	assert (rs.isNull("EmptyInteger"));
-	assert (rs.isNull("EmptyFloat"));
-	assert (rs.isNull("EmptyDateTime"));
+	assertTrue (rs.isNull("EmptyString"));
+	assertTrue (rs.isNull("EmptyInteger"));
+	assertTrue (rs.isNull("EmptyFloat"));
+	assertTrue (rs.isNull("EmptyDateTime"));
 	
 	Var di = 1;
 	Var df = 1.5;
 	Var ds = "abc";
 	Var dd = DateTime();
 
-	assert (!di.isEmpty());
-	assert (!df.isEmpty());
-	assert (!ds.isEmpty());
-	assert (!dd.isEmpty());
+	assertTrue (!di.isEmpty());
+	assertTrue (!df.isEmpty());
+	assertTrue (!ds.isEmpty());
+	assertTrue (!dd.isEmpty());
 	
 	Statement stmt = (session() << "SELECT EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime FROM NullableTest", into(ds), into(di), into(df), into(dd), now);
 
-	assert (di.isEmpty());
-	assert (df.isEmpty());
-	assert (ds.isEmpty());
-	assert (dd.isEmpty());
+	assertTrue (di.isEmpty());
+	assertTrue (df.isEmpty());
+	assertTrue (ds.isEmpty());
+	assertTrue (dd.isEmpty());
 }
 
 
@@ -3974,26 +3974,26 @@ void SQLExecutor::reconnect()
 	try { session() << "SELECT COUNT(*) FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
-	assert (session().isConnected());
+	assertTrue (session().isConnected());
 	session().close();
-	assert (!session().isConnected());
+	assertTrue (!session().isConnected());
 	try 
 	{
 		session() << "SELECT LastName FROM Person", into(result), now;  
 		fail ("must fail");
 	}
 	catch(NotConnectedException&){ }
-	assert (!session().isConnected());
+	assertTrue (!session().isConnected());
 
 	session().open();
-	assert (session().isConnected());
+	assertTrue (session().isConnected());
 	try { session() << "SELECT Age FROM Person", into(count), now;  }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-	assert (count == age);
-	assert (session().isConnected());
+	assertTrue (count == age);
+	assertTrue (session().isConnected());
 }
 
 
@@ -4009,5 +4009,5 @@ void SQLExecutor::unicode(const std::string& dbConnString)
 	text.clear();
 	session() << "SELECT str FROM UnicodeTable", into(wtext), now;
 	Poco::UnicodeConverter::convert(wtext, text);
-	assert(text == std::string((const char*)supp));
+	assertTrue (text == std::string((const char*)supp));
 }

@@ -90,7 +90,7 @@ void FTPStreamFactoryTest::testDownload()
 	pStr.reset();
 		
 	std::string s(dataStr.str());
-	assert (s == "line1\r\nline2\r\n");
+	assertTrue (s == "line1\r\nline2\r\n");
 }
 
 
@@ -132,7 +132,7 @@ void FTPStreamFactoryTest::testList()
 	pStr.reset();
 		
 	std::string s(dataStr.str());
-	assert (s == "file1\r\nfile2\r\n");
+	assertTrue (s == "file1\r\nfile2\r\n");
 }
 
 
@@ -174,7 +174,7 @@ void FTPStreamFactoryTest::testUserInfo()
 	pStr.reset();
 		
 	std::string s(dataStr.str());
-	assert (s == "line1\r\nline2\r\n");
+	assertTrue (s == "line1\r\nline2\r\n");
 }
 
 
@@ -217,7 +217,7 @@ void FTPStreamFactoryTest::testPasswordProvider()
 	pStr.reset();
 		
 	std::string s(dataStr.str());
-	assert (s == "line1\r\nline2\r\n");
+	assertTrue (s == "line1\r\nline2\r\n");
 }
 
 

@@ -54,28 +54,28 @@ void PropertyFileConfigurationTest::testLoad()
 	std::istringstream istr(propFile);
 	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(istr);
 	
-	assert (pConf->getString("prop1") == "value1");
-	assert (pConf->getString("prop2") == "value2");
-	assert (pConf->getString("prop3.prop31") == "value3");
-	assert (pConf->getString("prop3.prop32") == "value 4");
-	assert (pConf->getString("prop3.prop33") == "value5, value6, value7, value8, value9");
-	assert (pConf->getString("prop4") == "escaped[\t\r\n\f]");
-	assert (pConf->getString("prop5") == "foo");
+	assertTrue (pConf->getString("prop1") == "value1");
+	assertTrue (pConf->getString("prop2") == "value2");
+	assertTrue (pConf->getString("prop3.prop31") == "value3");
+	assertTrue (pConf->getString("prop3.prop32") == "value 4");
+	assertTrue (pConf->getString("prop3.prop33") == "value5, value6, value7, value8, value9");
+	assertTrue (pConf->getString("prop4") == "escaped[\t\r\n\f]");
+	assertTrue (pConf->getString("prop5") == "foo");
 	
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 5);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
+	assertTrue (keys.size() == 5);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
 	
 	pConf->keys("prop3", keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "prop31") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop32") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop33") != keys.end());
+	assertTrue (keys.size() == 3);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop31") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop32") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop33") != keys.end());
 	
 	try
 	{
@@ -99,7 +99,7 @@ void PropertyFileConfigurationTest::testSave()
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
-	assert (propFile == "prop1: value1\n"
+	assertTrue (propFile == "prop1: value1\n"
 	                    "prop2: 42\n"
 	                    "prop3: value\\\\1\\txxx\n");
 }

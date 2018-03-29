@@ -57,7 +57,7 @@ void ECTest::testECNewKeys()
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
-			assert (pubFromPrivate == pubKey);
+			assertTrue (pubFromPrivate == pubKey);
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
@@ -94,7 +94,7 @@ void ECTest::testECNewKeysNoPassphrase()
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
-			assert (pubFromPrivate == pubKey);
+			assertTrue (pubFromPrivate == pubKey);
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
@@ -128,7 +128,7 @@ void ECTest::testECDSASignSha256()
 			ECKey keyPub(&iPub);
 			ECDSADigestEngine eng2(keyPub, "SHA256");
 			eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-			assert(eng2.verify(sig));
+			assertTrue(eng2.verify(sig));
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;
@@ -164,7 +164,7 @@ void ECTest::testECDSASignManipulated()
 			ECKey keyPub(&iPub);
 			ECDSADigestEngine eng2(keyPub, "SHA256");
 			eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
-			assert (!eng2.verify(sig));
+			assertTrue (!eng2.verify(sig));
 		}
 		else
 			std::cerr << "No elliptic curves found!" << std::endl;

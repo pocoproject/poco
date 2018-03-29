@@ -69,47 +69,47 @@ void CppParserTest::testExtractName()
 {
 	std::string decl("int _var");
 	std::string name = Symbol::extractName(decl);
-	assert (name == "_var");
+	assertTrue (name == "_var");
 	
 	decl = "void func(int arg1, int arg2)";
 	name = Symbol::extractName(decl);
-	assert (name == "func");
+	assertTrue (name == "func");
 	
 	decl = "const std::vector<NS::MyType>* var";
 	name = Symbol::extractName(decl);
-	assert (name == "var");
+	assertTrue (name == "var");
 	
 	decl = "const std::vector<NS::MyType>* func(int arg) = 0";
 	name = Symbol::extractName(decl);
-	assert (name == "func");
+	assertTrue (name == "func");
 
 	decl = "int (*func)(int, const std::string&)";
 	name = Symbol::extractName(decl);
-	assert (name == "func");
+	assertTrue (name == "func");
 
 	decl = "int ( * func )(int, const std::string&)";
 	name = Symbol::extractName(decl);
-	assert (name == "func");
+	assertTrue (name == "func");
 
 	decl = "template <typename A, typename B> B func(A a, B b)";
 	name = Symbol::extractName(decl);
-	assert (name == "func");
+	assertTrue (name == "func");
 	
 	decl = "template <typename A, typename B> class Class";
 	name = Symbol::extractName(decl);
-	assert (name == "Class");
+	assertTrue (name == "Class");
 
 	decl = "template <> class Class<int, std::string>";
 	name = Symbol::extractName(decl);
-	assert (name == "Class");
+	assertTrue (name == "Class");
 
 	decl = "template <> class Class <int, std::string>";
 	name = Symbol::extractName(decl);
-	assert (name == "Class");
+	assertTrue (name == "Class");
 
 	decl = "template <> class Class<int, MyTemplate<int> >";
 	name = Symbol::extractName(decl);
-	assert (name == "Class");
+	assertTrue (name == "Class");
 }
 
 

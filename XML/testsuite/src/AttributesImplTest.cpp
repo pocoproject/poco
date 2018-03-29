@@ -31,51 +31,51 @@ void AttributesImplTest::testNoNamespaces()
 {
 	AttributesImpl attrs;
 
-	assert (attrs.getLength() == 0);
-	assert (attrs.getIndex("foo") == -1);
-	assert (attrs.getValue("foo").empty());
+	assertTrue (attrs.getLength() == 0);
+	assertTrue (attrs.getIndex("foo") == -1);
+	assertTrue (attrs.getValue("foo").empty());
 	
 	attrs.addAttribute("", "", "a1", "CDATA", "v1");
-	assert (attrs.getLength() == 1);
-	assert (attrs.getIndex("a1") == 0);
-	assert (attrs.getQName(0) == "a1");
-	assert (attrs.getType(0) == "CDATA");
-	assert (attrs.getValue(0) == "v1");
-	assert (attrs.isSpecified(0));
+	assertTrue (attrs.getLength() == 1);
+	assertTrue (attrs.getIndex("a1") == 0);
+	assertTrue (attrs.getQName(0) == "a1");
+	assertTrue (attrs.getType(0) == "CDATA");
+	assertTrue (attrs.getValue(0) == "v1");
+	assertTrue (attrs.isSpecified(0));
 	
-	assert (attrs.getType("a1") == "CDATA");
-	assert (attrs.getValue("a1") == "v1");
+	assertTrue (attrs.getType("a1") == "CDATA");
+	assertTrue (attrs.getValue("a1") == "v1");
 
 	attrs.addAttribute("", "", "a2", "CDATA", "v2");
-	assert (attrs.getLength() == 2);
-	assert (attrs.getIndex("a2") == 1);
-	assert (attrs.getQName(1) == "a2");
-	assert (attrs.getType(1) == "CDATA");
-	assert (attrs.getValue(1) == "v2");
-	assert (attrs.isSpecified(1));
+	assertTrue (attrs.getLength() == 2);
+	assertTrue (attrs.getIndex("a2") == 1);
+	assertTrue (attrs.getQName(1) == "a2");
+	assertTrue (attrs.getType(1) == "CDATA");
+	assertTrue (attrs.getValue(1) == "v2");
+	assertTrue (attrs.isSpecified(1));
 	
-	assert (attrs.getType("a2") == "CDATA");
-	assert (attrs.getValue("a2") == "v2");
+	assertTrue (attrs.getType("a2") == "CDATA");
+	assertTrue (attrs.getValue("a2") == "v2");
 
 	attrs.addAttribute("", "", "a3", "CDATA", "v3");
-	assert (attrs.getLength() == 3);
-	assert (attrs.getIndex("a3") == 2);	
-	assert (attrs.getValue("a3") == "v3");
+	assertTrue (attrs.getLength() == 3);
+	assertTrue (attrs.getIndex("a3") == 2);	
+	assertTrue (attrs.getValue("a3") == "v3");
 	
 	attrs.removeAttribute(0);
-	assert (attrs.getLength() == 2);
-	assert (attrs.getIndex("a1") == -1);
-	assert (attrs.getIndex("a2") == 0);
-	assert (attrs.getIndex("a3") == 1);
-	assert (attrs.getQName(0) == "a2");
-	assert (attrs.getQName(1) == "a3");
+	assertTrue (attrs.getLength() == 2);
+	assertTrue (attrs.getIndex("a1") == -1);
+	assertTrue (attrs.getIndex("a2") == 0);
+	assertTrue (attrs.getIndex("a3") == 1);
+	assertTrue (attrs.getQName(0) == "a2");
+	assertTrue (attrs.getQName(1) == "a3");
 	
 	attrs.removeAttribute("a3");
-	assert (attrs.getLength() == 1);
-	assert (attrs.getIndex("a1") == -1);
-	assert (attrs.getIndex("a2") == 0);
-	assert (attrs.getIndex("a3") == -1);
-	assert (attrs.getQName(0) == "a2");
+	assertTrue (attrs.getLength() == 1);
+	assertTrue (attrs.getIndex("a1") == -1);
+	assertTrue (attrs.getIndex("a2") == 0);
+	assertTrue (attrs.getIndex("a3") == -1);
+	assertTrue (attrs.getQName(0) == "a2");
 }
 
 
@@ -83,64 +83,64 @@ void AttributesImplTest::testNamespaces()
 {
 	AttributesImpl attrs;
 
-	assert (attrs.getLength() == 0);
-	assert (attrs.getIndex("urn:ns", "foo") == -1);
-	assert (attrs.getValue("urn:ns", "foo").empty());
+	assertTrue (attrs.getLength() == 0);
+	assertTrue (attrs.getIndex("urn:ns", "foo") == -1);
+	assertTrue (attrs.getValue("urn:ns", "foo").empty());
 	
 	attrs.addAttribute("urn:ns", "a1", "p:a1", "CDATA", "v1");
-	assert (attrs.getLength() == 1);
-	assert (attrs.getIndex("urn:ns", "a1") == 0);
-	assert (attrs.getQName(0) == "p:a1");
-	assert (attrs.getLocalName(0) == "a1");
-	assert (attrs.getURI(0) == "urn:ns");
-	assert (attrs.getType(0) == "CDATA");
-	assert (attrs.getValue(0) == "v1");
-	assert (attrs.isSpecified(0));
+	assertTrue (attrs.getLength() == 1);
+	assertTrue (attrs.getIndex("urn:ns", "a1") == 0);
+	assertTrue (attrs.getQName(0) == "p:a1");
+	assertTrue (attrs.getLocalName(0) == "a1");
+	assertTrue (attrs.getURI(0) == "urn:ns");
+	assertTrue (attrs.getType(0) == "CDATA");
+	assertTrue (attrs.getValue(0) == "v1");
+	assertTrue (attrs.isSpecified(0));
 	
-	assert (attrs.getType("urn:ns", "a1") == "CDATA");
-	assert (attrs.getValue("urn:ns", "a1") == "v1");
+	assertTrue (attrs.getType("urn:ns", "a1") == "CDATA");
+	assertTrue (attrs.getValue("urn:ns", "a1") == "v1");
 
 	attrs.addAttribute("urn:ns", "a2", "p:a2", "CDATA", "v2");
-	assert (attrs.getLength() == 2);
-	assert (attrs.getIndex("urn:ns", "a2") == 1);
-	assert (attrs.getQName(1) == "p:a2");
-	assert (attrs.getLocalName(1) == "a2");
-	assert (attrs.getURI(1) == "urn:ns");
-	assert (attrs.getType(1) == "CDATA");
-	assert (attrs.getValue(1) == "v2");
-	assert (attrs.isSpecified(1));
+	assertTrue (attrs.getLength() == 2);
+	assertTrue (attrs.getIndex("urn:ns", "a2") == 1);
+	assertTrue (attrs.getQName(1) == "p:a2");
+	assertTrue (attrs.getLocalName(1) == "a2");
+	assertTrue (attrs.getURI(1) == "urn:ns");
+	assertTrue (attrs.getType(1) == "CDATA");
+	assertTrue (attrs.getValue(1) == "v2");
+	assertTrue (attrs.isSpecified(1));
 	
-	assert (attrs.getType("urn:ns", "a2") == "CDATA");
-	assert (attrs.getValue("urn:ns", "a2") == "v2");
+	assertTrue (attrs.getType("urn:ns", "a2") == "CDATA");
+	assertTrue (attrs.getValue("urn:ns", "a2") == "v2");
 
-	assert (attrs.getIndex("urn:ns2", "a2") == -1);
+	assertTrue (attrs.getIndex("urn:ns2", "a2") == -1);
 
 	attrs.addAttribute("urn:ns2", "a3", "q:a3", "CDATA", "v3");
-	assert (attrs.getLength() == 3);
-	assert (attrs.getIndex("urn:ns2", "a3") == 2);	
-	assert (attrs.getValue("urn:ns2", "a3") == "v3");
+	assertTrue (attrs.getLength() == 3);
+	assertTrue (attrs.getIndex("urn:ns2", "a3") == 2);	
+	assertTrue (attrs.getValue("urn:ns2", "a3") == "v3");
 	
 	attrs.removeAttribute(0);
-	assert (attrs.getLength() == 2);
-	assert (attrs.getIndex("urn:ns", "a1") == -1);
-	assert (attrs.getIndex("urn:ns", "a2") == 0);
-	assert (attrs.getIndex("urn:ns2", "a3") == 1);
-	assert (attrs.getQName(0) == "p:a2");
-	assert (attrs.getLocalName(0) == "a2");
-	assert (attrs.getURI(0) == "urn:ns");
-	assert (attrs.getQName(1) == "q:a3");
-	assert (attrs.getLocalName(1) == "a3");
-	assert (attrs.getURI(1) == "urn:ns2");
+	assertTrue (attrs.getLength() == 2);
+	assertTrue (attrs.getIndex("urn:ns", "a1") == -1);
+	assertTrue (attrs.getIndex("urn:ns", "a2") == 0);
+	assertTrue (attrs.getIndex("urn:ns2", "a3") == 1);
+	assertTrue (attrs.getQName(0) == "p:a2");
+	assertTrue (attrs.getLocalName(0) == "a2");
+	assertTrue (attrs.getURI(0) == "urn:ns");
+	assertTrue (attrs.getQName(1) == "q:a3");
+	assertTrue (attrs.getLocalName(1) == "a3");
+	assertTrue (attrs.getURI(1) == "urn:ns2");
 	
 	attrs.removeAttribute("urn:ns", "a3");
-	assert (attrs.getLength() == 2);
+	assertTrue (attrs.getLength() == 2);
 	
 	attrs.removeAttribute("urn:ns2", "a3");
-	assert (attrs.getLength() == 1);
-	assert (attrs.getIndex("urn:ns", "a1") == -1);
-	assert (attrs.getIndex("urn:ns", "a2") == 0);
-	assert (attrs.getIndex("urn:ns2", "a3") == -1);
-	assert (attrs.getQName(0) == "p:a2");
+	assertTrue (attrs.getLength() == 1);
+	assertTrue (attrs.getIndex("urn:ns", "a1") == -1);
+	assertTrue (attrs.getIndex("urn:ns", "a2") == 0);
+	assertTrue (attrs.getIndex("urn:ns2", "a3") == -1);
+	assertTrue (attrs.getQName(0) == "p:a2");
 }
 
 
@@ -151,43 +151,43 @@ void AttributesImplTest::testAccessors()
 	attrs.addAttribute("urn:ns1", "a2", "p:a2", "CDATA", "v2", false);
 	attrs.addAttribute("urn:ns2", "a3", "q:a3", "CDATA", "v3", true);
 
-	assert (attrs.getQName(0) == "p:a1");
-	assert (attrs.getQName(1) == "p:a2");
-	assert (attrs.getQName(2) == "q:a3");
+	assertTrue (attrs.getQName(0) == "p:a1");
+	assertTrue (attrs.getQName(1) == "p:a2");
+	assertTrue (attrs.getQName(2) == "q:a3");
 
-	assert (attrs.getLocalName(0) == "a1");
-	assert (attrs.getLocalName(1) == "a2");
-	assert (attrs.getLocalName(2) == "a3");
+	assertTrue (attrs.getLocalName(0) == "a1");
+	assertTrue (attrs.getLocalName(1) == "a2");
+	assertTrue (attrs.getLocalName(2) == "a3");
 
-	assert (attrs.getURI(0) == "urn:ns1");
-	assert (attrs.getURI(1) == "urn:ns1");
-	assert (attrs.getURI(2) == "urn:ns2");
+	assertTrue (attrs.getURI(0) == "urn:ns1");
+	assertTrue (attrs.getURI(1) == "urn:ns1");
+	assertTrue (attrs.getURI(2) == "urn:ns2");
 
-	assert (attrs.getValue(0) == "v1");
-	assert (attrs.getValue(1) == "v2");
-	assert (attrs.getValue(2) == "v3");
+	assertTrue (attrs.getValue(0) == "v1");
+	assertTrue (attrs.getValue(1) == "v2");
+	assertTrue (attrs.getValue(2) == "v3");
 
-	assert (attrs.isSpecified(0));
-	assert (!attrs.isSpecified(1));
-	assert (attrs.isSpecified(2));
+	assertTrue (attrs.isSpecified(0));
+	assertTrue (!attrs.isSpecified(1));
+	assertTrue (attrs.isSpecified(2));
 
 	attrs.setType(0, "NMTOKEN");
-	assert (attrs.getType(0) == "NMTOKEN");
-	assert (attrs.getType("urn:ns1", "a1") == "NMTOKEN");
+	assertTrue (attrs.getType(0) == "NMTOKEN");
+	assertTrue (attrs.getType("urn:ns1", "a1") == "NMTOKEN");
 	
 	attrs.setValue(1, "v2 v2");
-	assert (attrs.getValue(1) == "v2 v2");
-	assert (attrs.getValue("urn:ns1", "a2") == "v2 v2");
-	assert (attrs.isSpecified(1));
+	assertTrue (attrs.getValue(1) == "v2 v2");
+	assertTrue (attrs.getValue("urn:ns1", "a2") == "v2 v2");
+	assertTrue (attrs.isSpecified(1));
 	
 	attrs.setLocalName(2, "A3");
-	assert (attrs.getLocalName(2) == "A3");
+	assertTrue (attrs.getLocalName(2) == "A3");
 	attrs.setQName(2, "p:A3");
-	assert (attrs.getQName(2) == "p:A3");
+	assertTrue (attrs.getQName(2) == "p:A3");
 	attrs.setURI(2, "urn:ns1");
-	assert (attrs.getURI(2) == "urn:ns1");
+	assertTrue (attrs.getURI(2) == "urn:ns1");
 	
-	assert (attrs.getValue("urn:ns1", "A3") == "v3");
+	assertTrue (attrs.getValue("urn:ns1", "A3") == "v3");
 }
 
 
@@ -201,23 +201,23 @@ void AttributesImplTest::testCopy()
 	AttributesImpl attrs2;
 	attrs2.setAttributes(attrs);
 
-	assert (attrs2.getLength() == 3);
+	assertTrue (attrs2.getLength() == 3);
 	
-	assert (attrs2.getQName(0) == "p:a1");
-	assert (attrs2.getQName(1) == "p:a2");
-	assert (attrs2.getQName(2) == "q:a3");
+	assertTrue (attrs2.getQName(0) == "p:a1");
+	assertTrue (attrs2.getQName(1) == "p:a2");
+	assertTrue (attrs2.getQName(2) == "q:a3");
 	
-	assert (attrs2.getLocalName(0) == "a1");
-	assert (attrs2.getLocalName(1) == "a2");
-	assert (attrs2.getLocalName(2) == "a3");
+	assertTrue (attrs2.getLocalName(0) == "a1");
+	assertTrue (attrs2.getLocalName(1) == "a2");
+	assertTrue (attrs2.getLocalName(2) == "a3");
 
-	assert (attrs2.getURI(0) == "urn:ns1");
-	assert (attrs2.getURI(1) == "urn:ns1");
-	assert (attrs2.getURI(2) == "urn:ns2");
+	assertTrue (attrs2.getURI(0) == "urn:ns1");
+	assertTrue (attrs2.getURI(1) == "urn:ns1");
+	assertTrue (attrs2.getURI(2) == "urn:ns2");
 
-	assert (attrs2.getValue(0) == "v1");
-	assert (attrs2.getValue(1) == "v2");
-	assert (attrs2.getValue(2) == "v3");
+	assertTrue (attrs2.getValue(0) == "v1");
+	assertTrue (attrs2.getValue(1) == "v2");
+	assertTrue (attrs2.getValue(2) == "v3");
 }
 
 

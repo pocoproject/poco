@@ -40,45 +40,45 @@ void ByteOrderTest::testByteOrderFlip()
 	{
 		Int16 norm = (Int16) 0xAABB;
 		Int16 flip = ByteOrder::flipBytes(norm);
-		assert (UInt16(flip) == 0xBBAA);
+		assertTrue (UInt16(flip) == 0xBBAA);
 		flip = ByteOrder::flipBytes(flip);
-		assert (flip == norm);
+		assertTrue (flip == norm);
 	}
 	{
 		UInt16 norm = (UInt16) 0xAABB;
 		UInt16 flip = ByteOrder::flipBytes(norm);
-		assert (flip == 0xBBAA);
+		assertTrue (flip == 0xBBAA);
 		flip = ByteOrder::flipBytes(flip);
-		assert (flip == norm);
+		assertTrue (flip == norm);
 	}
 	{
 		Int32 norm = 0xAABBCCDD;
 		Int32 flip = ByteOrder::flipBytes(norm);
-		assert (UInt32(flip) == 0xDDCCBBAA);
+		assertTrue (UInt32(flip) == 0xDDCCBBAA);
 		flip = ByteOrder::flipBytes(flip);
-		assert (flip == norm);
+		assertTrue (flip == norm);
 	}
 	{
 		UInt32 norm = 0xAABBCCDD;
 		UInt32 flip = ByteOrder::flipBytes(norm);
-		assert (flip == 0xDDCCBBAA);
+		assertTrue (flip == 0xDDCCBBAA);
 		flip = ByteOrder::flipBytes(flip);
-		assert (flip == norm);
+		assertTrue (flip == norm);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = (Int64(0x8899AABB) << 32) + 0xCCDDEEFF;
 		Int64 flip = ByteOrder::flipBytes(norm);
-		assert (flip == (Int64(0xFFEEDDCC) << 32) + 0xBBAA9988);
+		assertTrue (flip == (Int64(0xFFEEDDCC) << 32) + 0xBBAA9988);
 		flip = ByteOrder::flipBytes(flip);
-		assert (flip == norm);
+		assertTrue (flip == norm);
 	}
 	{
 		UInt64 norm = (UInt64(0x8899AABB) << 32) + 0xCCDDEEFF;
 		UInt64 flip = ByteOrder::flipBytes(norm);
-		assert (flip == (UInt64(0xFFEEDDCC) << 32) + 0xBBAA9988);
+		assertTrue (flip == (UInt64(0xFFEEDDCC) << 32) + 0xBBAA9988);
 		flip = ByteOrder::flipBytes(flip);
-		assert (flip == norm);
+		assertTrue (flip == norm);
 	}
 	#endif
 }
@@ -93,66 +93,66 @@ void ByteOrderTest::testByteOrderBigEndian()
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 	
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 #else
@@ -162,90 +162,90 @@ void ByteOrderTest::testByteOrderBigEndian()
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 	
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::fromBigEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 #endif
@@ -261,66 +261,66 @@ void ByteOrderTest::testByteOrderLittleEndian()
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 	
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 #else
@@ -330,90 +330,90 @@ void ByteOrderTest::testByteOrderLittleEndian()
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 	
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::fromLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::fromLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::fromLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::fromLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::fromLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::fromLittleEndian(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 #endif
@@ -429,66 +429,66 @@ void ByteOrderTest::testByteOrderNetwork()
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 	
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::fromNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::fromNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::fromNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::fromNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::fromNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::fromNetwork(norm);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 #else
@@ -498,90 +498,90 @@ void ByteOrderTest::testByteOrderNetwork()
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::toNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::toNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::toNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::toNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::toNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::toNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 	
 	{
 		Int16 norm = 4;
 		Int16 flip = ByteOrder::fromNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt16 norm = 4;
 		UInt16 flip = ByteOrder::fromNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		Int32 norm = 4;
 		Int32 flip = ByteOrder::fromNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt32 norm = 4;
 		UInt32 flip = ByteOrder::fromNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#if defined(POCO_HAVE_INT64)
 	{
 		Int64 norm = 4;
 		Int64 flip = ByteOrder::fromNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	{
 		UInt64 norm = 4;
 		UInt64 flip = ByteOrder::fromNetwork(norm);
-		assert (norm != flip);
+		assertTrue (norm != flip);
 		flip = ByteOrder::flipBytes(flip);
-		assert (norm == flip);
+		assertTrue (norm == flip);
 	}
 	#endif
 #endif

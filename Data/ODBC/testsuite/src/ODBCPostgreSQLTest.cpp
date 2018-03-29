@@ -220,7 +220,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 
 		int i = 0;
 		session() << "{? = call storedFunction()}", out(i), now;
-		assert(-1 == i);
+		assertTrue (-1 == i);
 		dropObject("FUNCTION", "storedFunction()");
 
 		try 
@@ -237,7 +237,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		i = 2;
 		int result = 0;
 		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assert(4 == result);
+		assertTrue (4 == result);
 		dropObject("FUNCTION", "storedFunction(INTEGER)");
 
 		dropObject("FUNCTION", "storedFunction(TIMESTAMP)");
@@ -255,7 +255,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		DateTime dtIn(1965, 6, 18, 5, 35, 1);
 		DateTime dtOut;
 		session() << "{? = call storedFunction(?)}", out(dtOut), in(dtIn), now;
-		assert(dtOut == dtIn);
+		assertTrue (dtOut == dtIn);
 		dropObject("FUNCTION", "storedFunction(TIMESTAMP)");
 
 		dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
@@ -280,7 +280,7 @@ void ODBCPostgreSQLTest::testStoredFunction()
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (func); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (func); }
 
-		assert(ret == "Hello, world!");
+		assertTrue (ret == "Hello, world!");
 		dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
 
 		k += 2;
@@ -304,7 +304,7 @@ void ODBCPostgreSQLTest::testStoredFunctionAny()
 		Any i = 2;
 		Any result = 0;
 		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assert(4 == AnyCast<int>(result));
+		assertTrue (4 == AnyCast<int>(result));
 
 		k += 2;
 	}
@@ -329,7 +329,7 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 		DynamicAny i = 2;
 		DynamicAny result = 0;
 		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assert(4 == result);
+		assertTrue (4 == result);
 
 		k += 2;
 	}

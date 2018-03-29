@@ -50,16 +50,16 @@ void SocketStreamTest::testStreamEcho()
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	SocketStream str(ss);
 	str << "hello";
-	assert (str.good());
+	assertTrue (str.good());
 	str.flush();
-	assert (str.good());
+	assertTrue (str.good());
 	ss.shutdownSend();
 
 	char buffer[5];
 	str.read(buffer, sizeof(buffer));
-	assert (str.good());
-	assert (str.gcount() == 5);
-	assert (std::string(buffer, 5) == "hello");
+	assertTrue (str.good());
+	assertTrue (str.gcount() == 5);
+	assertTrue (std::string(buffer, 5) == "hello");
 
 	ss.close();
 }
@@ -76,16 +76,16 @@ void SocketStreamTest::testLargeStreamEcho()
 	ss.setReceiveBufferSize(msgSize);
 	std::string payload(msgSize, 'x');
 	str << payload;
-	assert (str.good());
+	assertTrue (str.good());
 	str.flush();
-	assert (str.good());
+	assertTrue (str.good());
 	ss.shutdownSend();
 
-	assert (str.gcount() == 0);
+	assertTrue (str.gcount() == 0);
 	char buffer[msgSize];
 	str.read(buffer, sizeof(buffer));
-	assert (str.good());
-	assert (str.gcount() == msgSize);
+	assertTrue (str.good());
+	assertTrue (str.gcount() == msgSize);
 
 	ss.close();
 }
@@ -100,21 +100,21 @@ void SocketStreamTest::testEOF()
 
 		ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 		str << "hello";
-		assert (str.good());
+		assertTrue (str.good());
 		str.flush();
-		assert (str.good());
+		assertTrue (str.good());
 		ss.shutdownSend();
 
 		char buffer[5];
 		str.read(buffer, sizeof(buffer));
-		assert (str.good());
-		assert (str.gcount() == 5);
-		assert (std::string(buffer, 5) == "hello");
+		assertTrue (str.good());
+		assertTrue (str.gcount() == 5);
+		assertTrue (std::string(buffer, 5) == "hello");
 	}
 	
 	int c = str.get();
-	assert (c == -1);
-	assert (str.eof());
+	assertTrue (c == -1);
+	assertTrue (str.eof());
 	
 	ss.close();
 }

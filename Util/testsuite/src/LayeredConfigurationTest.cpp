@@ -42,9 +42,9 @@ void LayeredConfigurationTest::testEmpty()
 	
 	AbstractConfiguration::Keys keys;
 	pLC->keys(keys);
-	assert (keys.empty());
+	assertTrue (keys.empty());
 	
-	assert (!pLC->hasProperty("foo"));
+	assertTrue (!pLC->hasProperty("foo"));
 	try
 	{
 		pLC->setString("foo", "bar");
@@ -77,18 +77,18 @@ void LayeredConfigurationTest::testOneLayer()
 
 	AbstractConfiguration::Keys keys;
 	pLC->keys(keys);
-	assert (keys.size() == 2);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (keys.size() == 2);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	
-	assert (pLC->getString("prop1") == "value1");
-	assert (pLC->getString("prop2") == "value2");
+	assertTrue (pLC->getString("prop1") == "value1");
+	assertTrue (pLC->getString("prop2") == "value2");
 
 	pLC->setString("prop3", "value3");
-	assert (pLC->getString("prop3") == "value3");
+	assertTrue (pLC->getString("prop3") == "value3");
 
 	pLC->remove("prop3");
-	assert (!pLC->hasProperty("prop3"));
+	assertTrue (!pLC->hasProperty("prop3"));
 }
 
 
@@ -108,28 +108,28 @@ void LayeredConfigurationTest::testTwoLayers()
 
 	AbstractConfiguration::Keys keys;
 	pLC->keys(keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	assertTrue (keys.size() == 3);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
 	
-	assert (pLC->getString("prop1") == "value1");
-	assert (pLC->getString("prop2") == "value2");
-	assert (pLC->getString("prop3") == "value4");
+	assertTrue (pLC->getString("prop1") == "value1");
+	assertTrue (pLC->getString("prop2") == "value2");
+	assertTrue (pLC->getString("prop3") == "value4");
 
 	pLC->setString("prop4", "value4");
-	assert (pLC->getString("prop4") == "value4");
+	assertTrue (pLC->getString("prop4") == "value4");
 
-	assert (!pMC1->hasProperty("prop4"));
-	assert (pMC2->hasProperty("prop4"));
+	assertTrue (!pMC1->hasProperty("prop4"));
+	assertTrue (pMC2->hasProperty("prop4"));
 
 	pLC->setString("prop1", "value11");
-	assert (pLC->getString("prop1") == "value1");
-	assert (pMC2->getString("prop1") == "value11");
+	assertTrue (pLC->getString("prop1") == "value1");
+	assertTrue (pMC2->getString("prop1") == "value11");
 
 	pLC->remove("prop1");
-	assert (pLC->getString("prop1") == "value1");
-	assert (!pMC2->hasProperty("prop1"));
+	assertTrue (pLC->getString("prop1") == "value1");
+	assertTrue (!pMC2->hasProperty("prop1"));
 }
 
 
@@ -152,11 +152,11 @@ void LayeredConfigurationTest::testThreeLayers()
 	pLC->add(pMC2, 1);
 	pLC->add(pMC3, -1);
 	
-	assert (pLC->getString("prop1") == "value7");
-	assert (pLC->getString("prop2") == "value2");
-	assert (pLC->getString("prop3") == "value3");
-	assert (pLC->getString("prop4") == "value5");
-	assert (pLC->getString("prop5") == "value6");
+	assertTrue (pLC->getString("prop1") == "value7");
+	assertTrue (pLC->getString("prop2") == "value2");
+	assertTrue (pLC->getString("prop3") == "value3");
+	assertTrue (pLC->getString("prop4") == "value5");
+	assertTrue (pLC->getString("prop5") == "value6");
 }
 
 
@@ -176,22 +176,22 @@ void LayeredConfigurationTest::testRemove()
 
 	AbstractConfiguration::Keys keys;
 	pLC->keys(keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	assertTrue (keys.size() == 3);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
 	
-	assert (pLC->getString("prop1") == "value1");
-	assert (pLC->getString("prop2") == "value3");
-	assert (pLC->getString("prop3") == "value4");
+	assertTrue (pLC->getString("prop1") == "value1");
+	assertTrue (pLC->getString("prop2") == "value3");
+	assertTrue (pLC->getString("prop3") == "value4");
 
 	pLC->removeConfiguration(pMC2);
 	keys.clear();
 	pLC->keys(keys);
-	assert (keys.size() == 2);
+	assertTrue (keys.size() == 2);
 	
-	assert (pLC->getString("prop1") == "value1");
-	assert (pLC->getString("prop2") == "value2");
+	assertTrue (pLC->getString("prop1") == "value1");
+	assertTrue (pLC->getString("prop2") == "value2");
 }
 
 
@@ -205,10 +205,10 @@ void LayeredConfigurationTest::testFind()
 	pLC->add(pMC2, "label", -1);
 	
 	AutoPtr<AbstractConfiguration> pFound = pLC->find("label");
-	assert (pFound == pMC2);
+	assertTrue (pFound == pMC2);
 	
 	pFound = pLC->find("notfound");
-	assert (pFound.isNull());
+	assertTrue (pFound.isNull());
 }
 
 

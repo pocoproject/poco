@@ -56,7 +56,7 @@ void NTPClientTest::testTimeSync()
 	}
 #endif
 
-	assert(_ntpClient.request("pool.ntp.org") > 0);
+	assertTrue (_ntpClient.request("pool.ntp.org") > 0);
 }
 
 

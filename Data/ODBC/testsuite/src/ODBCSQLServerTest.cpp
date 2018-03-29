@@ -257,7 +257,7 @@ void ODBCSQLServerTest::testStoredProcedure()
 		
 		int i = 0;
 		session() << "{call storedProcedure(?)}", out(i), now;
-		assert(-1 == i);
+		assertTrue (-1 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		session() << "CREATE PROCEDURE storedProcedure(@inParam int, @outParam int OUTPUT) AS "
@@ -269,7 +269,7 @@ void ODBCSQLServerTest::testStoredProcedure()
 		i = 2;
 		int j = 0;
 		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assert(4 == j);
+		assertTrue (4 == j);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
@@ -280,7 +280,7 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		i = 2;
 		session() << "{call storedProcedure(?)}", io(i), now;
-		assert(4 == i);
+		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		session() << "CREATE PROCEDURE storedProcedure(@ioParam DATETIME OUTPUT) AS "
@@ -290,7 +290,7 @@ void ODBCSQLServerTest::testStoredProcedure()
 
 		DateTime dt(1965, 6, 18, 5, 35, 1);
 		session() << "{call storedProcedure(?)}", io(dt), now;
-		assert(19 == dt.day());
+		assertTrue (19 == dt.day());
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
@@ -313,7 +313,7 @@ Deprecated types are not supported as output parameters.  Use current large obje
 	try{
 	session() << "{call storedProcedure(?, ?)}", in(inParam), out(outParam), now;
 	}catch(StatementException& ex){std::cout << ex.toString();}
-	assert(outParam == inParam);
+	assertTrue (outParam == inParam);
 	dropObject("PROCEDURE", "storedProcedure");
 	*/
 }
@@ -349,16 +349,16 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 		
 		session() << "{call storedCursorProcedure(?)}", in(age), into(people), now;
 		
-		assert (2 == people.size());
-		assert (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
-		assert (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
+		assertTrue (2 == people.size());
+		assertTrue (Person("Simpson", "Bart", "Springfield", 12) == people[0]);
+		assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people[1]);
 
 		Statement stmt = ((session() << "{call storedCursorProcedure(?)}", in(age), now));
 		RecordSet rs(stmt);
-		assert (rs["LastName"] == "Simpson");
-		assert (rs["FirstName"] == "Bart");
-		assert (rs["Address"] == "Springfield");
-		assert (rs["Age"] == 12);
+		assertTrue (rs["LastName"] == "Simpson");
+		assertTrue (rs["FirstName"] == "Bart");
+		assertTrue (rs["Address"] == "Springfield");
+		assertTrue (rs["Age"] == 12);
 
 		dropObject("TABLE", "Person");
 		dropObject("PROCEDURE", "storedCursorProcedure");
@@ -385,7 +385,7 @@ void ODBCSQLServerTest::testStoredProcedureAny()
 		, now;
 
 		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assert(4 == AnyCast<int>(j));
+		assertTrue (4 == AnyCast<int>(j));
 		session() << "DROP PROCEDURE storedProcedure;", now;
 
 		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
@@ -396,7 +396,7 @@ void ODBCSQLServerTest::testStoredProcedureAny()
 
 		i = 2;
 		session() << "{call storedProcedure(?)}", io(i), now;
-		assert(4 == AnyCast<int>(i));
+		assertTrue (4 == AnyCast<int>(i));
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
@@ -420,7 +420,7 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 		, now;
 
 		session() << "{call storedProcedure(?, ?)}", in(i), out(j), now;
-		assert(4 == j);
+		assertTrue (4 == j);
 		session() << "DROP PROCEDURE storedProcedure;", now;
 
 		session() << "CREATE PROCEDURE storedProcedure(@ioParam int OUTPUT) AS "
@@ -431,7 +431,7 @@ void ODBCSQLServerTest::testStoredProcedureDynamicAny()
 
 		i = 2;
 		session() << "{call storedProcedure(?)}", io(i), now;
-		assert(4 == i);
+		assertTrue (4 == i);
 		dropObject("PROCEDURE", "storedProcedure");
 
 		k += 2;
@@ -457,7 +457,7 @@ void ODBCSQLServerTest::testStoredFunction()
 
 		int i = 0;
 		session() << "{? = call storedFunction}", out(i), now;
-		assert(-1 == i);
+		assertTrue (-1 == i);
 		dropObject("PROCEDURE", "storedFunction");
 
 
@@ -470,7 +470,7 @@ void ODBCSQLServerTest::testStoredFunction()
 		i = 2;
 		int result = 0;
 		session() << "{? = call storedFunction(?)}", out(result), in(i), now;
-		assert(4 == result);
+		assertTrue (4 == result);
 		dropObject("PROCEDURE", "storedFunction");
 
 
@@ -485,8 +485,8 @@ void ODBCSQLServerTest::testStoredFunction()
 		int j = 0;
 		result = 0;
 		session() << "{? = call storedFunction(?, ?)}", out(result), in(i), out(j), now;
-		assert(4 == j);
-		assert(j == result);
+		assertTrue (4 == j);
+		assertTrue (j == result);
 		dropObject("PROCEDURE", "storedFunction");
 
 
@@ -504,18 +504,18 @@ void ODBCSQLServerTest::testStoredFunction()
 		j = 2;
 		result = 0;
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now;
-		assert(1 == j);
-		assert(2 == i);
-		assert(3 == result); 
+		assertTrue (1 == j);
+		assertTrue (2 == i);
+		assertTrue (3 == result); 
 
 		Tuple<int, int> params(1, 2);
-		assert(1 == params.get<0>());
-		assert(2 == params.get<1>());
+		assertTrue (1 == params.get<0>());
+		assertTrue (2 == params.get<1>());
 		result = 0;
 		session() << "{? = call storedFunction(?, ?)}", out(result), io(params), now;
-		assert(1 == params.get<1>());
-		assert(2 == params.get<0>());
-		assert(3 == result); 
+		assertTrue (1 == params.get<1>());
+		assertTrue (2 == params.get<0>());
+		assertTrue (3 == result); 
 
 		dropObject("PROCEDURE", "storedFunction");
 

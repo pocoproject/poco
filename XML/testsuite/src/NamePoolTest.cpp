@@ -39,16 +39,16 @@ void NamePoolTest::testNamePool()
 	
 	pName = &pool->insert(name);
 	const Name* pName2 = &pool->insert("pre:local", "http://www.appinf.com", "local");
-	assert (pName == pName2);
+	assertTrue (pName == pName2);
 	
 	pName2 = &pool->insert("pre:local2", "http://www.appinf.com", "local2");
-	assert (pName2 != pName);
+	assertTrue (pName2 != pName);
 	
 	pName2 = &pool->insert(name);
-	assert (pName2 == pName);
+	assertTrue (pName2 == pName);
 	
 	pName2 = &pool->insert(*pName);
-	assert (pName2 == pName);
+	assertTrue (pName2 == pName);
 }
 
 

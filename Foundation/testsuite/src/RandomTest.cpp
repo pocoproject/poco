@@ -37,7 +37,7 @@ void RandomTest::testSequence1()
 	rnd2.seed(12345);
 	for (int i = 0; i < 100; ++i)
 	{
-		assert (rnd1.next() == rnd2.next());
+		assertTrue (rnd1.next() == rnd2.next());
 	}
 }
 
@@ -58,7 +58,7 @@ void RandomTest::testSequence2()
 			break;
 		}
 	}
-	assert (!equals);
+	assertTrue (!equals);
 }
 
 
@@ -75,7 +75,7 @@ void RandomTest::testDistribution1()
 	int sum = 0;
 	for (int k = 0; k < n; ++k) sum += d[k];
 	
-	assert (sum == n);
+	assertTrue (sum == n);
 }
 
 
@@ -97,8 +97,8 @@ void RandomTest::testDistribution2()
 	var /= n;
 	int sd = int(std::sqrt((double) var));
 	
-	assert (95 < avg && avg < 105);
-	assert (sd < 15);
+	assertTrue (95 < avg && avg < 105);
+	assertTrue (sd < 15);
 }
 
 
@@ -120,8 +120,8 @@ void RandomTest::testDistribution3()
 	var /= n;
 	int sd = int(std::sqrt((double) var));
 	
-	assert (95 < avg && avg < 105);
-	assert (sd < 15);
+	assertTrue (95 < avg && avg < 105);
+	assertTrue (sd < 15);
 }
 
 

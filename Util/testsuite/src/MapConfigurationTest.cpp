@@ -35,10 +35,10 @@ void MapConfigurationTest::testClear()
 	AutoPtr<MapConfiguration> pConf = new MapConfiguration;
 	
 	pConf->setString("foo", "bar");
-	assert (pConf->hasProperty("foo"));
+	assertTrue (pConf->hasProperty("foo"));
 	
 	pConf->clear();
-	assert (!pConf->hasProperty("foo"));
+	assertTrue (!pConf->hasProperty("foo"));
 }
 
 

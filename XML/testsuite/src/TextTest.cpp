@@ -40,9 +40,9 @@ void TextTest::testLength()
 {
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Text> pText1 = pDoc->createTextNode("");
-	assert (pText1->length() == 0);
+	assertTrue (pText1->length() == 0);
 	AutoPtr<Text> pText2 = pDoc->createTextNode("foo bar");
-	assert (pText2->length() == 7);
+	assertTrue (pText2->length() == 7);
 }
 
 
@@ -51,11 +51,11 @@ void TextTest::testSubstring()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Text> pText1 = pDoc->createTextNode("foo bar");
 	XMLString str = pText1->substringData(0, 3);
-	assert (str == "foo");
+	assertTrue (str == "foo");
 	str = pText1->substringData(4, 3);
-	assert (str == "bar");
+	assertTrue (str == "bar");
 	str = pText1->substringData(3, 0);
-	assert (str == "");
+	assertTrue (str == "");
 }
 
 
@@ -64,7 +64,7 @@ void TextTest::testAppend()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Text> pText1 = pDoc->createTextNode("foo");
 	pText1->appendData("bar");
-	assert (pText1->data() == "foobar");
+	assertTrue (pText1->data() == "foobar");
 }
 
 
@@ -73,11 +73,11 @@ void TextTest::testInsert()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Text> pText1 = pDoc->createTextNode("bar");
 	pText1->insertData(0, "foo");
-	assert (pText1->data() == "foobar");
+	assertTrue (pText1->data() == "foobar");
 	pText1->insertData(pText1->length(), "!");
-	assert (pText1->data() == "foobar!");
+	assertTrue (pText1->data() == "foobar!");
 	pText1->insertData(3, " ");
-	assert (pText1->data() == "foo bar!");
+	assertTrue (pText1->data() == "foo bar!");
 }
 
 
@@ -86,13 +86,13 @@ void TextTest::testDelete()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Text> pText1 = pDoc->createTextNode("foo bar");
 	pText1->deleteData(3, 1);
-	assert (pText1->data() == "foobar");
+	assertTrue (pText1->data() == "foobar");
 	pText1->deleteData(0, 3);
-	assert (pText1->data() == "bar");
+	assertTrue (pText1->data() == "bar");
 	pText1->deleteData(1, 0);
-	assert (pText1->data() == "bar");
+	assertTrue (pText1->data() == "bar");
 	pText1->deleteData(0, pText1->length());
-	assert (pText1->data() == "");
+	assertTrue (pText1->data() == "");
 }
 
 
@@ -101,17 +101,17 @@ void TextTest::testReplace()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Text> pText1 = pDoc->createTextNode("foo bar");
 	pText1->replaceData(0, 3, "FOO");
-	assert (pText1->data() == "FOO bar");
+	assertTrue (pText1->data() == "FOO bar");
 	pText1->replaceData(4, 3, "BAR!!!");
-	assert (pText1->data() == "FOO BAR!!!");
+	assertTrue (pText1->data() == "FOO BAR!!!");
 	pText1->replaceData(3, 1, "-");
-	assert (pText1->data() == "FOO-BAR!!!");
+	assertTrue (pText1->data() == "FOO-BAR!!!");
 	pText1->replaceData(3, 1, "---");
-	assert (pText1->data() == "FOO---BAR!!!");
+	assertTrue (pText1->data() == "FOO---BAR!!!");
 	pText1->replaceData(3, 3, " ");
-	assert (pText1->data() == "FOO BAR!!!");
+	assertTrue (pText1->data() == "FOO BAR!!!");
 	pText1->replaceData(0, pText1->length(), "foo bar");
-	assert (pText1->data() == "foo bar");
+	assertTrue (pText1->data() == "foo bar");
 }
 
 
@@ -122,8 +122,8 @@ void TextTest::testSplit()
 	AutoPtr<Text> pText1 = pDoc->createCDATASection("foobar");
 	pElem->appendChild(pText1);
 	pText1->splitText(3);
-	assert (pElem->firstChild()->nodeValue() == "foo");
-	assert (pElem->lastChild()->nodeValue() == "bar");
+	assertTrue (pElem->firstChild()->nodeValue() == "foo");
+	assertTrue (pElem->lastChild()->nodeValue() == "bar");
 }
 
 
@@ -134,8 +134,8 @@ void TextTest::testSplitCDATA()
 	AutoPtr<Text> pText1 = pDoc->createTextNode("foobar");
 	pElem->appendChild(pText1);
 	pText1->splitText(3);
-	assert (pElem->firstChild()->nodeValue() == "foo");
-	assert (pElem->lastChild()->nodeValue() == "bar");
+	assertTrue (pElem->firstChild()->nodeValue() == "foo");
+	assertTrue (pElem->lastChild()->nodeValue() == "bar");
 
 }
 

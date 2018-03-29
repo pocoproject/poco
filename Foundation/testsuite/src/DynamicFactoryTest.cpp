@@ -61,10 +61,10 @@ void DynamicFactoryTest::testDynamicFactory()
 	dynFactory.registerClass<A>("A");
 	dynFactory.registerClass<B>("B");
 	
-	assert (dynFactory.isClass("A"));
-	assert (dynFactory.isClass("B"));
+	assertTrue (dynFactory.isClass("A"));
+	assertTrue (dynFactory.isClass("B"));
 	
-	assert (!dynFactory.isClass("C"));
+	assertTrue (!dynFactory.isClass("C"));
 
 #ifndef POCO_ENABLE_CPP11
 	std::auto_ptr<A> a(dynamic_cast<A*>(dynFactory.createInstance("A")));
@@ -87,8 +87,8 @@ void DynamicFactoryTest::testDynamicFactory()
 	}
 	
 	dynFactory.unregisterClass("B");
-	assert (dynFactory.isClass("A"));
-	assert (!dynFactory.isClass("B"));
+	assertTrue (dynFactory.isClass("A"));
+	assertTrue (!dynFactory.isClass("B"));
 	
 	try
 	{

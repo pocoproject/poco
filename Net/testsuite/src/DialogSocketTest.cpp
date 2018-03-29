@@ -40,53 +40,53 @@ void DialogSocketTest::testDialogSocket()
 	ds.sendMessage("Hello, world!");
 	std::string str;
 	ds.receiveMessage(str);
-	assert (str == "Hello, world!");
+	assertTrue (str == "Hello, world!");
 
 	ds.sendString("Hello, World!\n");
 	ds.receiveMessage(str);
-	assert (str == "Hello, World!");
+	assertTrue (str == "Hello, World!");
 	
 	ds.sendMessage("EHLO", "appinf.com");
 	ds.receiveMessage(str);
-	assert (str == "EHLO appinf.com");
+	assertTrue (str == "EHLO appinf.com");
 	
 	ds.sendMessage("PUT", "local.txt", "remote.txt");
 	ds.receiveMessage(str);
-	assert (str == "PUT local.txt remote.txt");
+	assertTrue (str == "PUT local.txt remote.txt");
 
 	ds.sendMessage("220 Hello, world!");
 	int status = ds.receiveStatusMessage(str);
-	assert (status == 220);
-	assert (str == "220 Hello, world!");
+	assertTrue (status == 220);
+	assertTrue (str == "220 Hello, world!");
 	
 	ds.sendString("220-line1\r\n220 line2\r\n");
 	status = ds.receiveStatusMessage(str);
-	assert (status == 220);
-	assert (str == "220-line1\n220 line2");
+	assertTrue (status == 220);
+	assertTrue (str == "220-line1\n220 line2");
 	
 	ds.sendString("220-line1\r\nline2\r\n220 line3\r\n");
 	status = ds.receiveStatusMessage(str);
-	assert (status == 220);
-	assert (str == "220-line1\nline2\n220 line3");
+	assertTrue (status == 220);
+	assertTrue (str == "220-line1\nline2\n220 line3");
 
 	ds.sendMessage("Hello, world!");
 	status = ds.receiveStatusMessage(str);
-	assert (status == 0);
-	assert (str == "Hello, world!");
+	assertTrue (status == 0);
+	assertTrue (str == "Hello, world!");
 	
 	ds.sendString("Header\nMore Bytes");
 	status = ds.receiveStatusMessage(str);
-	assert (status == 0);
-	assert (str == "Header");
+	assertTrue (status == 0);
+	assertTrue (str == "Header");
 	char buffer[16];
 	int n = ds.receiveRawBytes(buffer, sizeof(buffer));
-	assert (n == 10);
-	assert (std::memcmp(buffer, "More Bytes", 10) == 0);
+	assertTrue (n == 10);
+	assertTrue (std::memcmp(buffer, "More Bytes", 10) == 0);
 
 	ds.sendString("Even More Bytes");
 	n = ds.receiveRawBytes(buffer, sizeof(buffer));
-	assert (n == 15);
-	assert (std::memcmp(buffer, "Even More Bytes", 15) == 0);
+	assertTrue (n == 15);
+	assertTrue (std::memcmp(buffer, "Even More Bytes", 15) == 0);
 }
 
 

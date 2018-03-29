@@ -95,11 +95,11 @@ void HTTPSClientSessionTest::testGetSmall()
 	s.sendRequest(request);
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response.getContentType() == "text/plain");
+	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
 
@@ -111,11 +111,11 @@ void HTTPSClientSessionTest::testGetLarge()
 	s.sendRequest(request);
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
-	assert (response.getContentType() == "text/plain");
+	assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == HTTPSTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPSTestServer::LARGE_BODY);
 }
 
 
@@ -127,10 +127,10 @@ void HTTPSClientSessionTest::testHead()
 	s.sendRequest(request);
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
-	assert (response.getContentType() == "text/plain");
+	assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
 	std::ostringstream ostr;
-	assert (StreamCopier::copyStream(rs, ostr) == 0);
+	assertTrue (StreamCopier::copyStream(rs, ostr) == 0);
 }
 
 
@@ -144,10 +144,10 @@ void HTTPSClientSessionTest::testPostSmallIdentity()
 	s.sendRequest(request) << body;
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == body.length());
+	assertTrue (response.getContentLength() == body.length());
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == body);
+	assertTrue (ostr.str() == body);
 }
 
 
@@ -162,10 +162,10 @@ void HTTPSClientSessionTest::testPostLargeIdentity()
 	s.sendRequest(request) << body;
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == body.length());
+	assertTrue (response.getContentLength() == body.length());
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == body);
+	assertTrue (ostr.str() == body);
 }
 
 
@@ -179,11 +179,11 @@ void HTTPSClientSessionTest::testPostSmallChunked()
 	s.sendRequest(request) << body;
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getChunkedTransferEncoding());
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assertTrue (response.getChunkedTransferEncoding());
+	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == body);
+	assertTrue (ostr.str() == body);
 }
 
 
@@ -197,11 +197,11 @@ void HTTPSClientSessionTest::testPostLargeChunked()
 	s.sendRequest(request) << body;
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getChunkedTransferEncoding());
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assertTrue (response.getChunkedTransferEncoding());
+	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == body);
+	assertTrue (ostr.str() == body);
 }
 
 
@@ -222,11 +222,11 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 			s.sendRequest(request) << body;
 			HTTPResponse response;
 			std::istream& rs = s.receiveResponse(response);
-			assert (response.getChunkedTransferEncoding());
-			assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+			assertTrue (response.getChunkedTransferEncoding());
+			assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
 			std::ostringstream ostr;
 			StreamCopier::copyStream(rs, ostr);
-			assert (ostr.str() == body);
+			assertTrue (ostr.str() == body);
 		}
 		srv.stop();
 	}
@@ -247,42 +247,42 @@ void HTTPSClientSessionTest::testKeepAlive()
 	s.sendRequest(request);
 	HTTPResponse response;
 	std::istream& rs1 = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response.getContentType() == "text/plain");
-	assert (response.getKeepAlive());
+	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
+	assertTrue (response.getKeepAlive());
 	std::ostringstream ostr1;
-	assert (StreamCopier::copyStream(rs1, ostr1) == 0);
+	assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
 
 	request.setMethod(HTTPRequest::HTTP_GET);
 	request.setURI("/small");
 	s.sendRequest(request);
 	std::istream& rs2 = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response.getKeepAlive());
+	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response.getKeepAlive());
 	std::ostringstream ostr2;
 	StreamCopier::copyStream(rs2, ostr2);
-	assert (ostr2.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
 
 	request.setMethod(HTTPRequest::HTTP_GET);
 	request.setURI("/large");
 	s.sendRequest(request);
 	std::istream& rs3 = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getChunkedTransferEncoding());
-	assert (response.getKeepAlive());
+	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assertTrue (response.getChunkedTransferEncoding());
+	assertTrue (response.getKeepAlive());
 	std::ostringstream ostr3;
 	StreamCopier::copyStream(rs3, ostr3);
-	assert (ostr3.str() == HTTPSTestServer::LARGE_BODY);
+	assertTrue (ostr3.str() == HTTPSTestServer::LARGE_BODY);
 
 	request.setMethod(HTTPRequest::HTTP_HEAD);
 	request.setURI("/large");
 	s.sendRequest(request);
 	std::istream& rs4 = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
-	assert (response.getContentType() == "text/plain");
-	assert (!response.getKeepAlive());
+	assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
+	assertTrue (!response.getKeepAlive());
 	std::ostringstream ostr4;
-	assert (StreamCopier::copyStream(rs4, ostr4) == 0);
+	assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
 }
 
 
@@ -297,8 +297,8 @@ void HTTPSClientSessionTest::testInterop()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
-	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assertTrue (str == "This is a test file for NetSSL.\n");
+	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 
@@ -318,8 +318,8 @@ void HTTPSClientSessionTest::testProxy()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
-	assert (str == "This is a test file for NetSSL.\n");
-	assert (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assertTrue (str == "This is a test file for NetSSL.\n");
+	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 
@@ -362,11 +362,11 @@ void HTTPSClientSessionTest::testCachedSession()
 	Session::Ptr pSession1 = s1.sslSession();
 	HTTPResponse response1;
 	std::istream& rs1 = s1.receiveResponse(response1);
-	assert (response1.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response1.getContentType() == "text/plain");
+	assertTrue (response1.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response1.getContentType() == "text/plain");
 	std::ostringstream ostr1;
 	StreamCopier::copyStream(rs1, ostr1);
-	assert (ostr1.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr1.str() == HTTPSTestServer::SMALL_BODY);
 
 	HTTPSClientSession s2("127.0.0.1", srv.port(), pClientContext, pSession1);
 	HTTPRequest request2(HTTPRequest::HTTP_GET, "/small");
@@ -374,26 +374,26 @@ void HTTPSClientSessionTest::testCachedSession()
 	Session::Ptr pSession2 = s2.sslSession();
 	HTTPResponse response2;
 	std::istream& rs2 = s2.receiveResponse(response2);
-	assert (response2.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response2.getContentType() == "text/plain");
+	assertTrue (response2.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response2.getContentType() == "text/plain");
 	std::ostringstream ostr2;
 	StreamCopier::copyStream(rs2, ostr2);
-	assert (ostr2.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
 
-	assert (pSession1 == pSession2);
+	assertTrue (pSession1 == pSession2);
 
 	HTTPRequest request3(HTTPRequest::HTTP_GET, "/small");
 	s2.sendRequest(request3);
 	Session::Ptr pSession3 = s2.sslSession();
 	HTTPResponse response3;
 	std::istream& rs3 = s2.receiveResponse(response3);
-	assert (response3.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response3.getContentType() == "text/plain");
+	assertTrue (response3.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response3.getContentType() == "text/plain");
 	std::ostringstream ostr3;
 	StreamCopier::copyStream(rs3, ostr3);
-	assert (ostr3.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr3.str() == HTTPSTestServer::SMALL_BODY);
 
-	assert (pSession1 == pSession3);
+	assertTrue (pSession1 == pSession3);
 
 	Thread::sleep(15000); // wait for session to expire
 	pServerContext->flushSessionCache();
@@ -403,13 +403,13 @@ void HTTPSClientSessionTest::testCachedSession()
 	Session::Ptr pSession4 = s2.sslSession();
 	HTTPResponse response4;
 	std::istream& rs4 = s2.receiveResponse(response4);
-	assert (response4.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assert (response4.getContentType() == "text/plain");
+	assertTrue (response4.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response4.getContentType() == "text/plain");
 	std::ostringstream ostr4;
 	StreamCopier::copyStream(rs4, ostr4);
-	assert (ostr4.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr4.str() == HTTPSTestServer::SMALL_BODY);
 
-	assert (pSession1 != pSession4);
+	assertTrue (pSession1 != pSession4);
 }
 
 
@@ -421,11 +421,11 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 	s.sendRequest(request);
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getContentType() == "text/plain");
+	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assertTrue (response.getContentType() == "text/plain");
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
 
@@ -437,12 +437,12 @@ void HTTPSClientSessionTest::testServerAbort()
 	s.sendRequest(request);
 	HTTPResponse response;
 	std::istream& rs = s.receiveResponse(response);
-	assert (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assert (response.getContentType() == "text/plain");
+	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+	assertTrue (response.getContentType() == "text/plain");
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
-	assert (ostr.str() == HTTPSTestServer::SMALL_BODY);
-	assert ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
 	         s.networkException()) != NULL );
 }
 

@@ -33,14 +33,14 @@ void SimpleHashTableTest::testInsert()
 	std::string s1("str1");
 	std::string s2("str2");
 	SimpleHashTable<std::string, int> hashTable;
-	assert (!hashTable.exists(s1));
+	assertTrue (!hashTable.exists(s1));
 	hashTable.insert(s1, 13);
-	assert (hashTable.exists(s1));
-	assert (hashTable.get(s1) == 13);
+	assertTrue (hashTable.exists(s1));
+	assertTrue (hashTable.get(s1) == 13);
 	int retVal = 0;
 
-	assert (hashTable.get(s1, retVal));
-	assert (retVal == 13);
+	assertTrue (hashTable.get(s1, retVal));
+	assertTrue (retVal == 13);
 	try
 	{
 		hashTable.insert(s1, 22);
@@ -54,9 +54,9 @@ void SimpleHashTableTest::testInsert()
 	}
 	catch (Exception&){}
 
-	assert (!hashTable.exists(s2));
+	assertTrue (!hashTable.exists(s2));
 	hashTable.insert(s2, 13);
-	assert (hashTable.exists(s2));
+	assertTrue (hashTable.exists(s2));
 }
 
 
@@ -68,16 +68,16 @@ void SimpleHashTableTest::testUpdate()
 	SimpleHashTable<std::string, int> hashTable;
 	hashTable.insert(s1, 13);
 	hashTable.update(s1, 14);
-	assert (hashTable.exists(s1));
-	assert (hashTable.get(s1) == 14);
+	assertTrue (hashTable.exists(s1));
+	assertTrue (hashTable.get(s1) == 14);
 	int retVal = 0;
 
-	assert (hashTable.get(s1, retVal));
-	assert (retVal == 14);
+	assertTrue (hashTable.get(s1, retVal));
+	assertTrue (retVal == 14);
 
 	// updating a non existing item must work too
 	hashTable.update(s2, 15);
-	assert (hashTable.get(s2) == 15);
+	assertTrue (hashTable.get(s2) == 15);
 }
 
 
@@ -92,8 +92,8 @@ void SimpleHashTableTest::testOverflow()
 	for (int i = 0; i < 31; ++i)
 	{
 		std::string tmp = Poco::NumberFormatter::format(i);
-		assert (hashTable.exists(tmp));
-		assert (hashTable.get(tmp) == i*i);
+		assertTrue (hashTable.exists(tmp));
+		assertTrue (hashTable.get(tmp) == i*i);
 	}
 }
 
@@ -101,20 +101,20 @@ void SimpleHashTableTest::testOverflow()
 void SimpleHashTableTest::testSize()
 {
 	SimpleHashTable<std::string, int> hashTable(13);
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 	Poco::UInt32 POCO_UNUSED h1 = hashTable.insert("1", 1);
-	assert (hashTable.size() == 1);
+	assertTrue (hashTable.size() == 1);
 	Poco::UInt32 POCO_UNUSED h2 = hashTable.update("2", 2);
-	assert (hashTable.size() == 2);
+	assertTrue (hashTable.size() == 2);
 	hashTable.clear();
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 }
 
 
 void SimpleHashTableTest::testResize()
 {
 	SimpleHashTable<std::string, int> hashTable(13);
-	assert (hashTable.size() == 0);
+	assertTrue (hashTable.size() == 0);
 	hashTable.resize(2467);
 	for (int i = 0; i < 1024; ++i)
 	{
@@ -125,8 +125,8 @@ void SimpleHashTableTest::testResize()
 	for (int i = 0; i < 1024; ++i)
 	{
 		std::string tmp = Poco::NumberFormatter::format(i);
-		assert (hashTable.exists(tmp));
-		assert (hashTable.get(tmp) == i*i);
+		assertTrue (hashTable.exists(tmp));
+		assertTrue (hashTable.get(tmp) == i*i);
 	}
 }
 

@@ -68,23 +68,23 @@ void JSONTest::testNullProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
-	assert(object->isNull("test"));
+	assertTrue (object->isNull("test"));
 	Var test = object->get("test");
-	assert(test.isEmpty());
+	assertTrue (test.isEmpty());
 
 	Poco::Nullable<int> test2 = object->getNullableValue<int>("test");
-	assert(test2.isNull());
+	assertTrue (test2.isNull());
 
 	DynamicStruct ds = *object;
-	assert (ds["test"].isEmpty());
+	assertTrue (ds["test"].isEmpty());
 
 	const DynamicStruct& rds = *object;
-	assert (rds["test"].isEmpty());
+	assertTrue (rds["test"].isEmpty());
 }
 
 
@@ -101,24 +101,24 @@ void JSONTest::testTrueProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.type() == typeid(bool));
+	assertTrue (test.type() == typeid(bool));
 	bool value = test;
-	assert(value);
+	assertTrue (value);
 
 	DynamicStruct ds = *object;
-	assert (!ds["test"].isEmpty());
-	assert (ds["test"]);
+	assertTrue (!ds["test"].isEmpty());
+	assertTrue (ds["test"]);
 
 	const DynamicStruct& rds = *object;
-	assert (!rds["test"].isEmpty());
-	assert (rds["test"]);
+	assertTrue (!rds["test"].isEmpty());
+	assertTrue (rds["test"]);
 }
 
 
@@ -135,24 +135,24 @@ void JSONTest::testFalseProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.type() == typeid(bool));
+	assertTrue (test.type() == typeid(bool));
 	bool value = test;
-	assert(!value);
+	assertTrue (!value);
 
 	DynamicStruct ds = *object;
-	assert (!ds["test"].isEmpty());
-	assert (!ds["test"]);
+	assertTrue (!ds["test"].isEmpty());
+	assertTrue (!ds["test"]);
 
 	const DynamicStruct& rds = *object;
-	assert (!rds["test"].isEmpty());
-	assert (!rds["test"]);
+	assertTrue (!rds["test"].isEmpty());
+	assertTrue (!rds["test"]);
 }
 
 
@@ -179,33 +179,33 @@ void JSONTest::testUnsignedNumberProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.isNumeric());
-	assert(test.isInteger());
+	assertTrue (test.isNumeric());
+	assertTrue (test.isInteger());
 	Poco::UInt32 value = test;
-	assert(value == -1);
+	assertTrue (value == -1);
 
 	DynamicStruct ds = *object;
-	assert (!ds["test"].isEmpty());
-	assert (ds["test"].isNumeric());
-	assert (ds["test"].isInteger());
-	assert (ds["test"] == 4294967295u);
+	assertTrue (!ds["test"].isEmpty());
+	assertTrue (ds["test"].isNumeric());
+	assertTrue (ds["test"].isInteger());
+	assertTrue (ds["test"] == 4294967295u);
 	value = ds["test"];
-	assert(value == -1);
+	assertTrue (value == -1);
 
 	const DynamicStruct& rds = *object;
-	assert (!rds["test"].isEmpty());
-	assert (rds["test"].isNumeric());
-	assert (rds["test"].isInteger());
-	assert (rds["test"] == 4294967295u);
+	assertTrue (!rds["test"].isEmpty());
+	assertTrue (rds["test"].isNumeric());
+	assertTrue (rds["test"].isInteger());
+	assertTrue (rds["test"] == 4294967295u);
 	value = rds["test"];
-	assert(value == -1);
+	assertTrue (value == -1);
 }
 
 #if defined(POCO_HAVE_INT64)
@@ -224,32 +224,32 @@ void JSONTest::testNumber64Property()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object object = *result.extract<Object::Ptr>();
 	Var test = object.get("test");
-	assert(test.isInteger());
+	assertTrue (test.isInteger());
 	Poco::Int64 value = test;
-	assert(value == -5000000000000000);
+	assertTrue (value == -5000000000000000);
 
 	DynamicStruct ds = object;
-	assert (!ds["test"].isEmpty());
-	assert (ds["test"].isNumeric());
-	assert (ds["test"].isInteger());
-	assert (ds["test"] == -5000000000000000);
+	assertTrue (!ds["test"].isEmpty());
+	assertTrue (ds["test"].isNumeric());
+	assertTrue (ds["test"].isInteger());
+	assertTrue (ds["test"] == -5000000000000000);
 	value = ds["test"];
-	assert(value == -5000000000000000);
+	assertTrue (value == -5000000000000000);
 
 	const DynamicStruct& rds = object;
-	assert (!rds["test"].isEmpty());
-	assert (rds["test"].isNumeric());
-	assert (rds["test"].isInteger());
-	assert (rds["test"] == -5000000000000000);
+	assertTrue (!rds["test"].isEmpty());
+	assertTrue (rds["test"].isNumeric());
+	assertTrue (rds["test"].isInteger());
+	assertTrue (rds["test"] == -5000000000000000);
 	value = rds["test"];
-	assert(value == -5000000000000000);
+	assertTrue (value == -5000000000000000);
 }
 
 
@@ -267,32 +267,32 @@ void JSONTest::testUnsignedNumber64Property()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.isInteger());
+	assertTrue (test.isInteger());
 	Poco::UInt64 value = test;
-	assert(value == -1);
+	assertTrue (value == -1);
 /* TODO: clang has trouble here
 	DynamicStruct ds = *object;
-	assert (!ds["test"].isEmpty());
-	assert (ds["test"].isNumeric());
-	assert (ds["test"].isInteger());
-	assert (ds["test"] == 18446744073709551615);
+	assertTrue (!ds["test"].isEmpty());
+	assertTrue (ds["test"].isNumeric());
+	assertTrue (ds["test"].isInteger());
+	assertTrue (ds["test"] == 18446744073709551615);
 	value = ds["test"];
-	assert(value == -1);
+	assertTrue (value == -1);
 
 	const DynamicStruct& rds = *object;
-	assert (!rds["test"].isEmpty());
-	assert (rds["test"].isNumeric());
-	assert (rds["test"].isInteger());
-	assert (rds["test"] == 18446744073709551615);
+	assertTrue (!rds["test"].isEmpty());
+	assertTrue (rds["test"].isNumeric());
+	assertTrue (rds["test"].isInteger());
+	assertTrue (rds["test"] == 18446744073709551615);
 	value = rds["test"];
-	assert(value == -1);
+	assertTrue (value == -1);
 */
 }
 
@@ -312,37 +312,37 @@ void JSONTest::testStringProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object object = *result.extract<Object::Ptr>();
 	Var test = object.get("test");
-	assert(test.isString());
+	assertTrue (test.isString());
 	std::string value = test.convert<std::string>();
-	assert(value.compare("value") == 0);
+	assertTrue (value.compare("value") == 0);
 
 	object.set("test2", 'a');
 	std::ostringstream ostr;
 	object.stringify(ostr);
-	assert(ostr.str() == "{\"test\":\"value\",\"test2\":\"a\"}");
+	assertTrue (ostr.str() == "{\"test\":\"value\",\"test2\":\"a\"}");
 
 	DynamicStruct ds = object;
-	assert (!ds["test"].isEmpty());
-	assert (ds["test"].isString());
-	assert (!ds["test"].isInteger());
-	assert (ds["test"] == "value");
+	assertTrue (!ds["test"].isEmpty());
+	assertTrue (ds["test"].isString());
+	assertTrue (!ds["test"].isInteger());
+	assertTrue (ds["test"] == "value");
 	value = ds["test"].toString();
-	assert(value == "value");
+	assertTrue (value == "value");
 
 	const DynamicStruct& rds = object;
-	assert (!rds["test"].isEmpty());
-	assert (rds["test"].isString());
-	assert (!rds["test"].isInteger());
-	assert (rds["test"] == "value");
+	assertTrue (!rds["test"].isEmpty());
+	assertTrue (rds["test"].isString());
+	assertTrue (!rds["test"].isInteger());
+	assertTrue (rds["test"] == "value");
 	value = rds["test"].toString();
-	assert(value == "value");
+	assertTrue (value == "value");
 }
 
 
@@ -359,19 +359,19 @@ void JSONTest::testEmptyObject()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
-	assert(object->size() == 0);
+	assertTrue (object->size() == 0);
 
 	DynamicStruct ds = *object;
-	assert (ds.size() == 0);
+	assertTrue (ds.size() == 0);
 
 	const DynamicStruct& rds = *object;
-	assert (rds.size() == 0);
+	assertTrue (rds.size() == 0);
 }
 
 
@@ -388,21 +388,21 @@ void JSONTest::testEmptyPropertyName()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
-	assert(object->size() == 1);
+	assertTrue (object->size() == 1);
 
 	DynamicStruct ds = *object;
-	assert (ds.size() == 1);
+	assertTrue (ds.size() == 1);
 
 	const DynamicStruct& rds = *object;
-	assert (rds.size() == 1);
+	assertTrue (rds.size() == 1);
 	
-	assert (ds[""] == 42);
+	assertTrue (ds[""] == 42);
 }
 
 
@@ -473,39 +473,39 @@ void JSONTest::testComplexObject()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
-	assert(object->size() > 0);
+	assertTrue (object->size() > 0);
 
 	Object::NameList names = object->getNames();
-	assert (names.size() == 4);
-	assert (names[0] == "id");
-	assert (names[1] == "jsonrpc");
-	assert (names[2] == "result");
-	assert (names[3] == "total");
+	assertTrue (names.size() == 4);
+	assertTrue (names[0] == "id");
+	assertTrue (names[1] == "jsonrpc");
+	assertTrue (names[2] == "result");
+	assertTrue (names[3] == "total");
 
 	DynamicStruct ds = *object;
-	assert (ds.size() > 0);
-	assert (ds["id"] == 1);
-	assert (ds["jsonrpc"] == 2.0);
+	assertTrue (ds.size() > 0);
+	assertTrue (ds["id"] == 1);
+	assertTrue (ds["jsonrpc"] == 2.0);
 
-	assert (ds["result"].isArray());
-	assert (ds["result"].size() == 1);
-	assert (ds["result"][0].isStruct());
-	assert (ds["result"][0]["id"] == 1);
-	assert (ds["result"][0]["guid"] == "67acfb26-17eb-4a75-bdbd-f0669b7d8f73");
-	assert (ds["result"][0]["age"] == 40);
-	assert (ds["result"][0]["name"] == "Angelina Crossman");
-	assert (ds["result"][0]["gender"] == "female");
-	assert (ds["result"][0]["company"] == "Raylog");
-	assert (ds["result"][0]["phone"] == "892-470-2803");
-	assert (ds["result"][0]["email"] == "angelina@raylog.com");
-	assert (ds["result"][0]["address"] == "20726, CostaMesa, Horatio Streets");
-	assert (ds["result"][0]["about"] == "Consectetuer suscipit volutpat eros dolor euismod, "
+	assertTrue (ds["result"].isArray());
+	assertTrue (ds["result"].size() == 1);
+	assertTrue (ds["result"][0].isStruct());
+	assertTrue (ds["result"][0]["id"] == 1);
+	assertTrue (ds["result"][0]["guid"] == "67acfb26-17eb-4a75-bdbd-f0669b7d8f73");
+	assertTrue (ds["result"][0]["age"] == 40);
+	assertTrue (ds["result"][0]["name"] == "Angelina Crossman");
+	assertTrue (ds["result"][0]["gender"] == "female");
+	assertTrue (ds["result"][0]["company"] == "Raylog");
+	assertTrue (ds["result"][0]["phone"] == "892-470-2803");
+	assertTrue (ds["result"][0]["email"] == "angelina@raylog.com");
+	assertTrue (ds["result"][0]["address"] == "20726, CostaMesa, Horatio Streets");
+	assertTrue (ds["result"][0]["about"] == "Consectetuer suscipit volutpat eros dolor euismod, "
 		"et dignissim in feugiat sed, ea tation exerci quis. Consectetuer, "
 		"dolor dolore ad vero ullamcorper, tincidunt facilisis at in facilisi, "
 		"iusto illum illum. Autem nibh, sed elit consequat volutpat tation, "
@@ -515,28 +515,28 @@ void JSONTest::testComplexObject()
 		"suscipit, vulputate elit ut lobortis exerci, nulla dolore eros at "
 		"aliquam, ullamcorper vero ad iusto. Adipiscing, nisl eros exerci "
 		"nisl vel, erat in luptatum in duis, iusto.");
-	assert (ds["result"][0]["registered"] == "2008-04-09T11:13:17 +05:00");
+	assertTrue (ds["result"][0]["registered"] == "2008-04-09T11:13:17 +05:00");
 
-	assert (ds["result"][0]["tags"].isArray());
-	assert (ds["result"][0]["tags"].size() == 7);
-	assert (ds["result"][0]["tags"][0] == "ut");
-	assert (ds["result"][0]["tags"][1] == "accumsan");
-	assert (ds["result"][0]["tags"][2] == "feugait");
-	assert (ds["result"][0]["tags"][3] == "ex");
-	assert (ds["result"][0]["tags"][4] == "odio");
-	assert (ds["result"][0]["tags"][5] == "consequat");
-	assert (ds["result"][0]["tags"][6] == "delenit");
+	assertTrue (ds["result"][0]["tags"].isArray());
+	assertTrue (ds["result"][0]["tags"].size() == 7);
+	assertTrue (ds["result"][0]["tags"][0] == "ut");
+	assertTrue (ds["result"][0]["tags"][1] == "accumsan");
+	assertTrue (ds["result"][0]["tags"][2] == "feugait");
+	assertTrue (ds["result"][0]["tags"][3] == "ex");
+	assertTrue (ds["result"][0]["tags"][4] == "odio");
+	assertTrue (ds["result"][0]["tags"][5] == "consequat");
+	assertTrue (ds["result"][0]["tags"][6] == "delenit");
 
-	assert (ds["result"][0]["friends"][0].isStruct());
-	assert (ds["result"][0]["friends"][0]["id"] == 1);
-	assert (ds["result"][0]["friends"][0]["name"] == "Hailey Hardman");
-	assert (ds["result"][0]["friends"][1]["id"] == 2);
-	assert (ds["result"][0]["friends"][1]["name"] == "Bailey Oldridge");
-	assert (ds["result"][0]["friends"][2]["id"] == 3);
-	assert (ds["result"][0]["friends"][2]["name"] == "Makayla Campbell");
+	assertTrue (ds["result"][0]["friends"][0].isStruct());
+	assertTrue (ds["result"][0]["friends"][0]["id"] == 1);
+	assertTrue (ds["result"][0]["friends"][0]["name"] == "Hailey Hardman");
+	assertTrue (ds["result"][0]["friends"][1]["id"] == 2);
+	assertTrue (ds["result"][0]["friends"][1]["name"] == "Bailey Oldridge");
+	assertTrue (ds["result"][0]["friends"][2]["id"] == 3);
+	assertTrue (ds["result"][0]["friends"][2]["name"] == "Makayla Campbell");
 
 	const DynamicStruct& rds = *object;
-	assert (rds.size() > 0);
+	assertTrue (rds.size() > 0);
 }
 
 
@@ -553,19 +553,19 @@ void JSONTest::testDoubleProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.isNumeric());
+	assertTrue (test.isNumeric());
 	double value = test;
-	assert(value == 1234.5);
+	assertTrue (value == 1234.5);
 
 	DynamicStruct ds = *object;
-	assert (ds["test"] == 1234.5);
+	assertTrue (ds["test"] == 1234.5);
 }
 
 
@@ -582,16 +582,16 @@ void JSONTest::testDouble2Property()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.isNumeric());
+	assertTrue (test.isNumeric());
 	double value = test;
-	assert(value >= 1.99e34 && value <= 12.01e34);
+	assertTrue (value >= 1.99e34 && value <= 12.01e34);
 }
 
 
@@ -608,16 +608,16 @@ void JSONTest::testDouble3Property()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
-	assert(test.isNumeric());
+	assertTrue (test.isNumeric());
 	double value = test;
-	assert(value == 12e-34);
+	assertTrue (value == 12e-34);
 }
 
 
@@ -634,30 +634,30 @@ void JSONTest::testObjectProperty()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert (false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
-	assert (object->isObject("test"));
-	assert (!object->isArray("test"));
+	assertTrue (object->isObject("test"));
+	assertTrue (!object->isArray("test"));
 
-	assert (!object->isArray("nonExistentKey"));
-	assert (!object->isObject("nonExistentKey"));
+	assertTrue (!object->isArray("nonExistentKey"));
+	assertTrue (!object->isObject("nonExistentKey"));
 
 	Var test = object->get("test");
-	assert (test.type() == typeid(Object::Ptr));
+	assertTrue (test.type() == typeid(Object::Ptr));
 	Object::Ptr subObject = test.extract<Object::Ptr>();
 
 	test = subObject->get("property");
-	assert (test.isString());
+	assertTrue (test.isString());
 	std::string value = test.convert<std::string>();
-	assert (value.compare("value") == 0);
+	assertTrue (value.compare("value") == 0);
 
 	DynamicStruct ds = *object;
-	assert (ds["test"].isStruct());
-	assert (ds["test"]["property"] == "value");
+	assertTrue (ds["test"].isStruct());
+	assertTrue (ds["test"]["property"] == "value");
 
 	// make sure that Object is recognized as such
 	{
@@ -667,7 +667,7 @@ void JSONTest::testObjectProperty()
 		inner.set("some_string", "xyz");
 		std::string key = "new_object";
 		obj.set(key, inner);
-		assert(obj.isObject(key));
+		assertTrue (obj.isObject(key));
 	}
 
 	// make sure that Object pointer is recognized as Object
@@ -678,7 +678,7 @@ void JSONTest::testObjectProperty()
 		inner->set("some_string", "xyz");
 		std::string key = "new_object";
 		obj.set(key, inner);
-		assert(obj.isObject(key));
+		assertTrue (obj.isObject(key));
 	}
 }
 
@@ -696,43 +696,43 @@ void JSONTest::testObjectArray()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 	Object::Ptr object = result.extract<Object::Ptr>();
-	assert(object->isObject("test"));
+	assertTrue (object->isObject("test"));
 	Object::Ptr subObject = object->getObject("test");
-	assert(!subObject->isObject("test1"));
-	assert(subObject->isArray("test1"));
-	assert(!subObject->isObject("test2"));
-	assert(!subObject->isArray("test2"));
+	assertTrue (!subObject->isObject("test1"));
+	assertTrue (subObject->isArray("test1"));
+	assertTrue (!subObject->isObject("test2"));
+	assertTrue (!subObject->isArray("test2"));
 
 	DynamicStruct ds = *object;
-	assert (ds.size() > 0);
-	assert (ds.size() == 1);
+	assertTrue (ds.size() > 0);
+	assertTrue (ds.size() == 1);
 
-	assert (ds["test"].isStruct());
-	assert (ds["test"]["test1"].isArray());
-	assert (ds["test"]["test1"].size() == 3);
-	assert (ds["test"]["test1"][0] == 1);
-	assert (ds["test"]["test1"][1] == 2);
-	assert (ds["test"]["test1"][2] == 3);
-	assert (ds["test"]["test2"] == 4);
+	assertTrue (ds["test"].isStruct());
+	assertTrue (ds["test"]["test1"].isArray());
+	assertTrue (ds["test"]["test1"].size() == 3);
+	assertTrue (ds["test"]["test1"][0] == 1);
+	assertTrue (ds["test"]["test1"][1] == 2);
+	assertTrue (ds["test"]["test1"][2] == 3);
+	assertTrue (ds["test"]["test2"] == 4);
 
 #ifdef POCO_ENABLE_CPP11
 
 	object->set("test3", "another top level value");
 	ds = std::move(*object);
-	assert (ds.size() == 2);
-	assert (ds["test"].isStruct());
-	assert (ds["test"]["test1"].isArray());
-	assert (ds["test"]["test1"].size() == 3);
-	assert (ds["test"]["test1"][0] == 1);
-	assert (ds["test"]["test1"][1] == 2);
-	assert (ds["test"]["test1"][2] == 3);
-	assert (ds["test"]["test2"] == 4);
-	assert (ds["test3"] == "another top level value");
+	assertTrue (ds.size() == 2);
+	assertTrue (ds["test"].isStruct());
+	assertTrue (ds["test"]["test1"].isArray());
+	assertTrue (ds["test"]["test1"].size() == 3);
+	assertTrue (ds["test"]["test1"][0] == 1);
+	assertTrue (ds["test"]["test1"][1] == 2);
+	assertTrue (ds["test"]["test1"][2] == 3);
+	assertTrue (ds["test"]["test2"] == 4);
+	assertTrue (ds["test3"] == "another top level value");
 
 #endif // POCO_ENABLE_CPP11
 }
@@ -751,29 +751,29 @@ void JSONTest::testArrayOfObjects()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.isArray());
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.isArray());
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 	Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
 	Object::Ptr object = arr->getObject(0);
-	assert (object->getValue<int>("test") == 0);
+	assertTrue (object->getValue<int>("test") == 0);
 	Object::Ptr subObject = arr->getObject(1);
 	Poco::JSON::Array::Ptr subArr = subObject->getArray("test1");
 	result = subArr->get(0);
-	assert (result == 1);
+	assertTrue (result == 1);
 
 	Poco::Dynamic::Array da = *arr;
-	assert (da.size() == 2);
-	assert (da[0].isStruct());
-	assert (da[0]["test"] == 0);
-	assert (da[1].isStruct());
-	assert (da[1]["test1"].isArray());
-	assert (da[1]["test1"][0] == 1);
-	assert (da[1]["test1"][1] == 2);
-	assert (da[1]["test1"][2] == 3);
-	assert (da[1]["test2"] == 4);
+	assertTrue (da.size() == 2);
+	assertTrue (da[0].isStruct());
+	assertTrue (da[0]["test"] == 0);
+	assertTrue (da[1].isStruct());
+	assertTrue (da[1]["test1"].isArray());
+	assertTrue (da[1]["test1"][0] == 1);
+	assertTrue (da[1]["test1"][1] == 2);
+	assertTrue (da[1]["test1"][2] == 3);
+	assertTrue (da[1]["test2"] == 4);
 }
 
 
@@ -790,16 +790,16 @@ void JSONTest::testEmptyArray()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	assert(array->size() == 0);
+	assertTrue (array->size() == 0);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 0);
+	assertTrue (da.size() == 0);
 }
 
 
@@ -816,19 +816,19 @@ void JSONTest::testNestedArray()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	assert(array->size() == 1);
+	assertTrue (array->size() == 1);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0].size() == 1);
-	assert (da[0][0].size() == 1);
-	assert (da[0][0][0].size() == 0);
+	assertTrue (da.size() == 1);
+	assertTrue (da[0].size() == 1);
+	assertTrue (da[0][0].size() == 1);
+	assertTrue (da[0][0][0].size() == 0);
 }
 
 
@@ -845,19 +845,19 @@ void JSONTest::testNullElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
-	assert(array->isNull(0));
+	assertTrue (array->isNull(0));
 	Var test = array->get(0);
-	assert(test.isEmpty());
+	assertTrue (test.isEmpty());
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0].isEmpty());
+	assertTrue (da.size() == 1);
+	assertTrue (da[0].isEmpty());
 }
 
 
@@ -874,20 +874,20 @@ void JSONTest::testTrueElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	Var test = array->get(0);
-	assert(test.type() == typeid(bool));
+	assertTrue (test.type() == typeid(bool));
 	bool value = test;
-	assert(value);
+	assertTrue (value);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0]);
+	assertTrue (da.size() == 1);
+	assertTrue (da[0]);
 }
 
 
@@ -904,20 +904,20 @@ void JSONTest::testFalseElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	Var test = array->get(0);
-	assert(test.type() == typeid(bool));
+	assertTrue (test.type() == typeid(bool));
 	bool value = test;
-	assert(!value);
+	assertTrue (!value);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (!da[0]);
+	assertTrue (da.size() == 1);
+	assertTrue (!da[0]);
 }
 
 
@@ -934,20 +934,20 @@ void JSONTest::testNumberElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	Var test = array->get(0);
-	assert(test.isInteger());
+	assertTrue (test.isInteger());
 	int value = test;
-	assert(value == 1969);
+	assertTrue (value == 1969);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0] == 1969);
+	assertTrue (da.size() == 1);
+	assertTrue (da[0] == 1969);
 }
 
 
@@ -964,27 +964,27 @@ void JSONTest::testStringElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	Var test = array->get(0);
-	assert(test.isString());
+	assertTrue (test.isString());
 	std::string value = test.convert<std::string>();
-	assert(value.compare("value") == 0);
+	assertTrue (value.compare("value") == 0);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0] == "value");
+	assertTrue (da.size() == 1);
+	assertTrue (da[0] == "value");
 
 	std::stringstream s;
 	json = "[ \"\\u0017\" ]";
 	Var v = Parser().parse(json);
 	Stringifier::condense(v, s);
 	std::string ss = s.str();
-	assert(s.str() == "[\"\\u0017\"]");
+	assertTrue (s.str() == "[\"\\u0017\"]");
 }
 
 
@@ -1001,19 +1001,19 @@ void JSONTest::testEmptyObjectElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	Object::Ptr object = array->getObject(0);
-	assert(object->size() == 0);
+	assertTrue (object->size() == 0);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0].isStruct());
-	assert (da[0].size() == 0);
+	assertTrue (da.size() == 1);
+	assertTrue (da[0].isStruct());
+	assertTrue (da[0].size() == 0);
 }
 
 
@@ -1030,20 +1030,20 @@ void JSONTest::testDoubleElement()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	Var test = array->get(0);
-	assert(test.isNumeric());
+	assertTrue (test.isNumeric());
 	double value = test;
-	assert(value == 1234.5);
+	assertTrue (value == 1234.5);
 
 	Poco::Dynamic::Array da = *array;
-	assert (da.size() == 1);
-	assert (da[0] == 1234.5);
+	assertTrue (da.size() == 1);
+	assertTrue (da[0] == 1234.5);
 }
 
 
@@ -1055,49 +1055,49 @@ void JSONTest::testSetArrayElement()
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 
 	Poco::Dynamic::Array dynArray = *array;
-	assert(dynArray.size() == 0);
+	assertTrue (dynArray.size() == 0);
 
 	// array[0] = 7
 	array->set(0, 7);
-	assert(array->size() == 1);
-	assert(array->getElement<int>(0) == 7);
+	assertTrue (array->size() == 1);
+	assertTrue (array->getElement<int>(0) == 7);
 
 	dynArray = *array;
-	assert(dynArray.size() == 1);
-	assert(dynArray[0] == 7);
+	assertTrue (dynArray.size() == 1);
+	assertTrue (dynArray[0] == 7);
 
 	// array[2] = "foo"
 	array->set(2, std::string("foo"));
-	assert(array->size() == 3);
-	assert(array->getElement<int>(0) == 7);
-	assert(array->isNull(1));
-	assert(array->getElement<std::string>(2) == "foo");
+	assertTrue (array->size() == 3);
+	assertTrue (array->getElement<int>(0) == 7);
+	assertTrue (array->isNull(1));
+	assertTrue (array->getElement<std::string>(2) == "foo");
 
 	dynArray = *array;
-	assert(dynArray.size() == 3);
-	assert(dynArray[0] == 7);
-	assert(dynArray[1].isEmpty());
-	assert(dynArray[2] == "foo");
+	assertTrue (dynArray.size() == 3);
+	assertTrue (dynArray[0] == 7);
+	assertTrue (dynArray[1].isEmpty());
+	assertTrue (dynArray[2] == "foo");
 
 	// array[1] = 13
 	array->set(1, 13);
-	assert(array->size() == 3);
-	assert(array->getElement<int>(0) == 7);
-	assert(array->getElement<int>(1) == 13);
-	assert(array->getElement<std::string>(2) == "foo");
+	assertTrue (array->size() == 3);
+	assertTrue (array->getElement<int>(0) == 7);
+	assertTrue (array->getElement<int>(1) == 13);
+	assertTrue (array->getElement<std::string>(2) == "foo");
 
 #ifdef POCO_ENABLE_CPP11
 
 	dynArray = std::move(*array);
-	assert(dynArray.size() == 3);
-	assert(dynArray[0] == 7);
-	assert(dynArray[1] == 13);
-	assert(dynArray[2] == "foo");
+	assertTrue (dynArray.size() == 3);
+	assertTrue (dynArray[0] == 7);
+	assertTrue (dynArray[1] == 13);
+	assertTrue (dynArray[2] == "foo");
 
 #endif // POCO_ENABLE_CPP11
 
 	dynArray.clear();
-	assert(dynArray.size() == 0);
+	assertTrue (dynArray.size() == 0);
 }
 
 
@@ -1114,14 +1114,14 @@ void JSONTest::testOptValue()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	int n = object->optValue("test", 123);
-	assert(n == 123);
+	assertTrue (n == 123);
 }
 
 
@@ -1138,61 +1138,61 @@ void JSONTest::testQuery()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Query query(result);
 
 	std::string firstChild = query.findValue("children[0]", "");
-	assert(firstChild.compare("Jonas") == 0);
+	assertTrue (firstChild.compare("Jonas") == 0);
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
-	assert (ds["name"] == "Franky");
-	assert (ds["children"].size() == 2);
-	assert (ds["children"][0] == "Jonas");
-	assert (ds["children"][1] == "Ellen");
+	assertTrue (ds["name"] == "Franky");
+	assertTrue (ds["children"].size() == 2);
+	assertTrue (ds["children"][0] == "Jonas");
+	assertTrue (ds["children"][1] == "Ellen");
 
 	Object::Ptr pAddress = query.findObject("address");
-	assert (pAddress->getValue<std::string>("street") == "A Street");
+	assertTrue (pAddress->getValue<std::string>("street") == "A Street");
 	pAddress = query.findObject("bad address");
-	assert (pAddress.isNull());
+	assertTrue (pAddress.isNull());
 
 	Object address;
 	address.set("dummy", 123);
 	query.findObject("bad address", address);
-	assert (!address.has("dummy"));
+	assertTrue (!address.has("dummy"));
 	Object& rAddress = query.findObject("address", address);
-	assert (rAddress.getValue<int>("number") == 123);
+	assertTrue (rAddress.getValue<int>("number") == 123);
 
 	Var badAddr = query.find("address.street.anotherObject");
-	assert(badAddr.isEmpty());
+	assertTrue (badAddr.isEmpty());
 
 	using Poco::JSON::Array;
 
 	Array::Ptr pChildren = query.findArray("children");
-	assert (pChildren->getElement<std::string>(0) == "Jonas");
+	assertTrue (pChildren->getElement<std::string>(0) == "Jonas");
 	pChildren = query.findArray("no children");
-	assert (pChildren.isNull());
+	assertTrue (pChildren.isNull());
 
 	Array children;
 	children.add("dummy");
 	query.findArray("no children", children);
-	assert (children.size() == 0);
+	assertTrue (children.size() == 0);
 	Array& rChildren = query.findArray("children", children);
-	assert (rChildren.getElement<std::string>(1) == "Ellen");
+	assertTrue (rChildren.getElement<std::string>(1) == "Ellen");
 
 	Object::Ptr pObj = new Poco::JSON::Object;
 	pObj->set("Id", 22);
 
 	Query queryPointer(pObj);
 	Var idQueryPointer = queryPointer.find("Id");
-	assert(22 == idQueryPointer);
+	assertTrue (22 == idQueryPointer);
 
 	Query queryObj(*pObj);
 	Var idQueryObj = queryObj.find("Id");
-	assert (22 == idQueryObj);
+	assertTrue (22 == idQueryObj);
 
 	Var bad = 1;
 	try
@@ -1231,15 +1231,15 @@ void JSONTest::testComment()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Query query(result);
 
 	std::string firstChild = query.findValue("children[0]", "");
-	assert(firstChild.compare("Jonas") == 0);
+	assertTrue (firstChild.compare("Jonas") == 0);
 }
 
 
@@ -1251,13 +1251,13 @@ void JSONTest::testPrintHandler()
 	PrintHandler::Ptr pHandler = new PrintHandler(ostr);
 	parser.setHandler(pHandler);
 	parser.parse(json);
-	assert (ostr.str() == "{\"name\":\"Homer\",\"age\":38,\"wife\":\"Marge\",\"age\":36,\"children\":[\"Bart\",\"Lisa\",\"Maggie\"]}");
+	assertTrue (ostr.str() == "{\"name\":\"Homer\",\"age\":38,\"wife\":\"Marge\",\"age\":36,\"children\":[\"Bart\",\"Lisa\",\"Maggie\"]}");
 
 	pHandler->setIndent(1);
 	ostr.str("");
 	parser.reset();
 	parser.parse(json);
-	assert (ostr.str() == "{\n"
+	assertTrue (ostr.str() == "{\n"
 		" \"name\" : \"Homer\",\n"
 		" \"age\" : 38,\n"
 		" \"wife\" : \"Marge\",\n"
@@ -1274,7 +1274,7 @@ void JSONTest::testPrintHandler()
 	ostr.str("");
 	parser.reset();
 	parser.parse(json);
-	assert (ostr.str() == "{\n"
+	assertTrue (ostr.str() == "{\n"
 		"  \"name\" : \"Homer\",\n"
 		"  \"age\" : 38,\n"
 		"  \"wife\" : \"Marge\",\n"
@@ -1291,7 +1291,7 @@ void JSONTest::testPrintHandler()
 	ostr.str("");
 	parser.reset();
 	parser.parse(json);
-	assert (ostr.str() == "{\n"
+	assertTrue (ostr.str() == "{\n"
 		"    \"name\" : \"Homer\",\n"
 		"    \"age\" : 38,\n"
 		"    \"wife\" : \"Marge\",\n"
@@ -1341,21 +1341,21 @@ void JSONTest::testPrintHandler()
 	pHandler->setIndent(0);
 	parser.reset();
 	parser.parse(json);
-	assert (json == ostr.str());
+	assertTrue (json == ostr.str());
 
 	json="[[\"a\"],[\"b\"],[[\"c\"],[\"d\"]]]";
 	ostr.str("");
 	pHandler->setIndent(0);
 	parser.reset();
 	parser.parse(json);
-	assert (json == ostr.str());
+	assertTrue (json == ostr.str());
 
 	json="[{\"1\":\"one\",\"0\":[\"zero\",\"nil\"]}]";
 	ostr.str("");
 	pHandler->setIndent(0);
 	parser.reset();
 	parser.parse(json);
-	assert (json == ostr.str());
+	assertTrue (json == ostr.str());
 
 }
 
@@ -1365,23 +1365,23 @@ void JSONTest::testStringify()
 	std::ostringstream os;
 	Var i = 123;
 	Stringifier::stringify(i, os);
-	assert(os.str() == "123");
+	assertTrue (os.str() == "123");
 
 	os.str("");
 	Var f = 123.456;
 	Stringifier::stringify(f, os);
-	assert(os.str() == "123.456");
+	assertTrue (os.str() == "123.456");
 
 	os.str("");
 	Var s = "abcdef";
 	Stringifier::stringify(s, os);
-	assert(os.str() == "\"abcdef\"");
+	assertTrue (os.str() == "\"abcdef\"");
 
 	os.str("");
 	DateTime dt;
 	Var d = dt;
 	Stringifier::stringify(d, os);
-	assert(os.str() == std::string("\"" + DateTimeFormatter::format(dt, Poco::DateTimeFormat::ISO8601_FORMAT) + "\""));
+	assertTrue (os.str() == std::string("\"" + DateTimeFormatter::format(dt, Poco::DateTimeFormat::ISO8601_FORMAT) + "\""));
 
 	std::string str1 = "\r";
 	std::string str2 = "\n";
@@ -1391,9 +1391,9 @@ void JSONTest::testStringify()
 	std::ostringstream oss1, oss2;
 	Poco::JSON::Stringifier::stringify(obj1, oss1);
 	Poco::JSON::Stringifier::stringify(obj2, oss2);
-	assert(oss1.str() == "{\"payload\":\"\\r\"}");
+	assertTrue (oss1.str() == "{\"payload\":\"\\r\"}");
 	std::cout << "\"" << oss1.str() << "\"" << std::endl;
-	assert(oss2.str() == "{\"payload\":\"\\n\"}");
+	assertTrue (oss2.str() == "{\"payload\":\"\\n\"}");
 
 	Object jObj(false);
 	jObj.set("foo\\", 0);
@@ -1407,7 +1407,7 @@ void JSONTest::testStringify()
 	std::stringstream ss;
 	jObj.stringify(ss);
 
-	assert(ss.str() == "{\"backspace\":\"bs\\b\",\"bar\\/\":0,\"baz\":0,\"foo\\\\\":0,"
+	assertTrue (ss.str() == "{\"backspace\":\"bs\\b\",\"bar\\/\":0,\"baz\":0,\"foo\\\\\":0,"
 		"\"newline\":\"nl\\n\",\"q\\\"uote\\\"d\":0,\"tab\":\"tb\\t\"}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
@@ -1423,10 +1423,10 @@ void JSONTest::testStringify()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 	std::ostringstream ostr;
 
 	Stringifier::condense(result, ostr);
@@ -1449,11 +1449,11 @@ void JSONTest::testStringify()
 						"\"age\":36,\"name\":\"Marge\""
 						"}}}";
 
-	assert (ostr.str() == str);
+	assertTrue (ostr.str() == str);
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr);
-	assert (ostr.str() == str);
+	assertTrue (ostr.str() == str);
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 1);
@@ -1479,7 +1479,7 @@ void JSONTest::testStringify()
 		"  }\n"
 		" }\n"
 		"}";
-	assert (ostr.str() == str);
+	assertTrue (ostr.str() == str);
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 2);
@@ -1505,7 +1505,7 @@ void JSONTest::testStringify()
 		"    }\n"
 		"  }\n"
 		"}";
-	assert (ostr.str() == str);
+	assertTrue (ostr.str() == str);
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 4);
@@ -1531,7 +1531,7 @@ void JSONTest::testStringify()
 		"        }\n"
 		"    }\n"
 		"}";
-	assert (ostr.str() == str);
+	assertTrue (ostr.str() == str);
 }
 
 
@@ -1543,16 +1543,16 @@ void JSONTest::testStringifyPreserveOrder()
 	presObj.set("baz", 0);
 	std::stringstream ss;
 	presObj.stringify(ss);
-	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+	assertTrue (ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
 	Object::NameList nl = presObj.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	ss.str("");
 	Stringifier::stringify(presObj, ss);
-	assert(ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
+	assertTrue (ss.str() == "{\"foo\":0,\"bar\":0,\"baz\":0}");
 
 	Object noPresObj;
 	noPresObj.set("foo", 0);
@@ -1560,10 +1560,10 @@ void JSONTest::testStringifyPreserveOrder()
 	noPresObj.set("baz", 0);
 	ss.str("");
 	noPresObj.stringify(ss);
-	assert(ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
+	assertTrue (ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
 	ss.str("");
 	Stringifier::stringify(noPresObj, ss);
-	assert(ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
+	assertTrue (ss.str() == "{\"bar\":0,\"baz\":0,\"foo\":0}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
 						"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
@@ -1580,27 +1580,27 @@ void JSONTest::testStringifyPreserveOrder()
 	catch(JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 	std::ostringstream ostr;
 
 	Stringifier::condense(result, ostr);
 	std::cout << ostr.str() << std::endl;
-	assert (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
+	assertTrue (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
 						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
 						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr);
-	assert (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
+	assertTrue (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
 						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
 						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 1);
-	assert (ostr.str() == "{\n"
+	assertTrue (ostr.str() == "{\n"
 						" \"Simpsons\" : {\n"
 						"  \"husband\" : {\n"
 						"   \"name\" : \"Homer\",\n"
@@ -1625,7 +1625,7 @@ void JSONTest::testStringifyPreserveOrder()
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 2);
-	assert (ostr.str() == "{\n"
+	assertTrue (ostr.str() == "{\n"
 						"  \"Simpsons\" : {\n"
 						"    \"husband\" : {\n"
 						"      \"name\" : \"Homer\",\n"
@@ -1650,7 +1650,7 @@ void JSONTest::testStringifyPreserveOrder()
 
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 4);
-	assert (ostr.str() == "{\n"
+	assertTrue (ostr.str() == "{\n"
 						"    \"Simpsons\" : {\n"
 						"        \"husband\" : {\n"
 						"            \"name\" : \"Homer\",\n"
@@ -1674,24 +1674,24 @@ void JSONTest::testStringifyPreserveOrder()
 						"}");
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
-	assert (ds["Simpsons"].isStruct());
-	assert (ds["Simpsons"]["husband"].isStruct());
-	assert (ds["Simpsons"]["husband"]["name"] == "Homer");
-	assert (ds["Simpsons"]["husband"]["age"] == 38);
+	assertTrue (ds["Simpsons"].isStruct());
+	assertTrue (ds["Simpsons"]["husband"].isStruct());
+	assertTrue (ds["Simpsons"]["husband"]["name"] == "Homer");
+	assertTrue (ds["Simpsons"]["husband"]["age"] == 38);
 
-	assert (ds["Simpsons"]["wife"].isStruct());
-	assert (ds["Simpsons"]["wife"]["name"] == "Marge");
-	assert (ds["Simpsons"]["wife"]["age"] == 36);
+	assertTrue (ds["Simpsons"]["wife"].isStruct());
+	assertTrue (ds["Simpsons"]["wife"]["name"] == "Marge");
+	assertTrue (ds["Simpsons"]["wife"]["age"] == 36);
 
-	assert (ds["Simpsons"]["children"].isArray());
-	assert (ds["Simpsons"]["children"][0] == "Bart");
-	assert (ds["Simpsons"]["children"][1] == "Lisa");
-	assert (ds["Simpsons"]["children"][2] == "Maggie");
+	assertTrue (ds["Simpsons"]["children"].isArray());
+	assertTrue (ds["Simpsons"]["children"][0] == "Bart");
+	assertTrue (ds["Simpsons"]["children"][1] == "Lisa");
+	assertTrue (ds["Simpsons"]["children"][2] == "Maggie");
 
-	assert (ds["Simpsons"]["address"].isStruct());
-	assert (ds["Simpsons"]["address"]["number"] == 742);
-	assert (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
-	assert (ds["Simpsons"]["address"]["town"] == "Springfield");
+	assertTrue (ds["Simpsons"]["address"].isStruct());
+	assertTrue (ds["Simpsons"]["address"]["number"] == 742);
+	assertTrue (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
+	assertTrue (ds["Simpsons"]["address"]["town"] == "Springfield");
 }
 
 
@@ -1836,7 +1836,7 @@ void JSONTest::testTemplate()
 	std::ostringstream ostr;
 	tpl.render(data, ostr);
 	std::cout << ostr.str();
-	assert (ostr.str() == "Hello world! From Franky.\nYou're too old.");
+	assertTrue (ostr.str() == "Hello world! From Franky.\nYou're too old.");
 }
 
 
@@ -1852,7 +1852,7 @@ void JSONTest::testUnicode()
 	parser.parse(json);
 	result = parser.asVar();
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	Var test = object->get("test");
@@ -1863,7 +1863,7 @@ void JSONTest::testUnicode()
 	std::string original;
 	converter.convert(text, original);
 
-	assert(test.convert<std::string>() == original);
+	assertTrue (test.convert<std::string>() == original);
 
 	parser.reset();
 	std::ostringstream os;
@@ -1879,7 +1879,7 @@ void JSONTest::testUnicode()
 	os.str("");
 	os << "[\"" << (char)0xC2 << (char)0x92 << "\"]";
 	result = parser.parse(os.str());
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	parser.reset();
 	os.str("");
@@ -1895,7 +1895,7 @@ void JSONTest::testUnicode()
 	os.str("");
 	os << "[\"" << (char)0xE2 << (char)0x82 << (char)0xAC << "\"]";
 	result = parser.parse(os.str());
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 
 	parser.reset();
 	os.str("");
@@ -1911,7 +1911,7 @@ void JSONTest::testUnicode()
 	os.str("");
 	os << "[\"" << (char)0xF0 << (char)0xA4 << (char)0xAD << (char)0xAD << "\"]";
 	result = parser.parse(os.str());
-	assert(result.type() == typeid(Poco::JSON::Array::Ptr));
+	assertTrue (result.type() == typeid(Poco::JSON::Array::Ptr));
 }
 
 
@@ -1932,7 +1932,7 @@ void JSONTest::testEscape0()
 	std::stringstream ss;
 	json->stringify(ss);
 
-	assert(ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
+	assertTrue (ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
 }
 
 
@@ -1942,13 +1942,13 @@ void JSONTest::testNonEscapeUnicode()
 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
 	Var result = parser.parse(chinese);
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 
 	std::stringstream ss;
 	object->stringify(ss);
-	assert(ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
+	assertTrue (ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
 
 	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
 		'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
@@ -1957,7 +1957,7 @@ void JSONTest::testNonEscapeUnicode()
 	result = parser.parse(utf8Text);
 	object = result.extract<Object::Ptr>();
 	ss.str(""); object->stringify(ss);
-	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
+	assertTrue (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
 
 	Poco::JSON::Object obj1;
 	std::string shortEscapeStr("String with \t");
@@ -1972,13 +1972,13 @@ void JSONTest::testNonEscapeUnicode()
 	parser.parse(ss.str());
 	result = parser.asVar();
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	object = result.extract<Object::Ptr>();
 	Var shortEscape = object->get("shortEscape");
 	Var longEscape = object->get("longEscape");
-	assert(shortEscape.convert<std::string>() == shortEscapeStr);
-	assert(longEscape.convert<std::string>() == longEscapeStr);
+	assertTrue (shortEscape.convert<std::string>() == shortEscapeStr);
+	assertTrue (longEscape.convert<std::string>() == longEscapeStr);
 }
 
 
@@ -1989,14 +1989,14 @@ void JSONTest::testEscapeUnicode()
 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
 	Var result = parser.parse(chinese);
 
-	assert(result.type() == typeid(Object::Ptr));
+	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
 	object->setEscapeUnicode(true);
 
 	std::stringstream ss;
 	object->stringify(ss, 0, -1);
-	assert(ss.str().compare("{\"name\":\"\\u4E2D\"}") == 0);
+	assertTrue (ss.str().compare("{\"name\":\"\\u4E2D\"}") == 0);
 
 	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
 			'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
@@ -2006,7 +2006,7 @@ void JSONTest::testEscapeUnicode()
 	object = result.extract<Object::Ptr>();
 	object->setEscapeUnicode(true);
 	ss.str(""); object->stringify(ss, 0, -1);
-	assert (ss.str() == "{\"name\":\"g\\u00FCnter\"}");
+	assertTrue (ss.str() == "{\"name\":\"g\\u00FCnter\"}");
 }
 
 
@@ -2047,50 +2047,50 @@ void JSONTest::testCopy()
 	obj1.set("baz", 0);
 
 	Object::NameList nl = obj1.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	Object obj2;
 	obj2 = obj1;
 	nl = obj2.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	Object obj3;
 	obj3.set("foo", 0);
 	obj3.set("bar", 0);
 	obj3.set("baz", 0);
 	nl = obj3.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "bar");
-	assert (nl[1] == "baz");
-	assert (nl[2] == "foo");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "bar");
+	assertTrue (nl[1] == "baz");
+	assertTrue (nl[2] == "foo");
 
 	Object obj4;
 	obj4 = obj3;
 	nl = obj4.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "bar");
-	assert (nl[1] == "baz");
-	assert (nl[2] == "foo");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "bar");
+	assertTrue (nl[1] == "baz");
+	assertTrue (nl[2] == "foo");
 
 	obj4 = obj1;
 	nl = obj4.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	Object obj5(obj1);
 	nl = obj5.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 }
 
 
@@ -2103,59 +2103,59 @@ void JSONTest::testMove()
 	obj1.set("baz", 0);
 
 	Object::NameList nl = obj1.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	Object obj2;
 	obj2 = std::move(obj1);
-	assert (obj1.getNames().size() == 0);
+	assertTrue (obj1.getNames().size() == 0);
 
 	nl = obj2.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	Object obj3;
 	obj3.set("foo", 0);
 	obj3.set("bar", 0);
 	obj3.set("baz", 0);
 	nl = obj3.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "bar");
-	assert (nl[1] == "baz");
-	assert (nl[2] == "foo");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "bar");
+	assertTrue (nl[1] == "baz");
+	assertTrue (nl[2] == "foo");
 
 	Object obj4;
 	obj4 = std::move(obj3);
-	assert (obj3.getNames().size() == 0);
+	assertTrue (obj3.getNames().size() == 0);
 
 	nl = obj4.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "bar");
-	assert (nl[1] == "baz");
-	assert (nl[2] == "foo");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "bar");
+	assertTrue (nl[1] == "baz");
+	assertTrue (nl[2] == "foo");
 
 	Object obj5(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj5.set("foo", 0);
 	obj5.set("bar", 0);
 	obj5.set("baz", 0);
 	nl = obj5.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 
 	obj4 = std::move(obj5);
-	assert (obj5.getNames().size() == 0);
+	assertTrue (obj5.getNames().size() == 0);
 
 	nl = obj4.getNames();
-	assert (nl.size() == 3);
-	assert (nl[0] == "foo");
-	assert (nl[1] == "bar");
-	assert (nl[2] == "baz");
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
 #endif // POCO_ENABLE_CPP11
 }
 

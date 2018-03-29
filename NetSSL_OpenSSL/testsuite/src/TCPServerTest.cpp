@@ -88,10 +88,10 @@ void TCPServerTest::testOneConnection()
 	SecureServerSocket svs(0);
 	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
 	srv.start();
-	assert (srv.currentConnections() == 0);
-	assert (srv.currentThreads() == 0);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.currentThreads() == 0);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
@@ -99,15 +99,15 @@ void TCPServerTest::testOneConnection()
 	ss1.sendBytes(data.data(), (int) data.size());
 	char buffer[256];
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
-	assert (srv.currentConnections() == 1);
-	assert (srv.currentThreads() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 1);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.currentThreads() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 1);
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 }
 
 
@@ -116,10 +116,10 @@ void TCPServerTest::testTwoConnections()
 	SecureServerSocket svs(0);
 	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
 	srv.start();
-	assert (srv.currentConnections() == 0);
-	assert (srv.currentThreads() == 0);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.currentThreads() == 0);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
@@ -130,27 +130,27 @@ void TCPServerTest::testTwoConnections()
 
 	char buffer[256];
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
 
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
 
-	assert (srv.currentConnections() == 2);
-	assert (srv.currentThreads() == 2);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 2);
+	assertTrue (srv.currentConnections() == 2);
+	assertTrue (srv.currentThreads() == 2);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 2);
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 1);
-	assert (srv.currentThreads() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 2);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.currentThreads() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 2);
 	ss2.close();
 
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 }
 
 
@@ -163,10 +163,10 @@ void TCPServerTest::testMultiConnections()
 	pParams->setThreadIdleTime(100);
 	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs, pParams);
 	srv.start();
-	assert (srv.currentConnections() == 0);
-	assert (srv.currentThreads() == 0);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.currentThreads() == 0);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
@@ -181,69 +181,69 @@ void TCPServerTest::testMultiConnections()
 
 	char buffer[256];
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
 
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
 
 	n = ss3.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
 
 	n = ss4.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
 
-	assert (srv.currentConnections() == 4);
-	assert (srv.currentThreads() == 4);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 4);
+	assertTrue (srv.currentConnections() == 4);
+	assertTrue (srv.currentThreads() == 4);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 4);
 
 	SecureStreamSocket ss5;
 	ss5.setLazyHandshake();
 	ss5.connect(sa);
 	Thread::sleep(200);
-	assert (srv.queuedConnections() == 1);
+	assertTrue (srv.queuedConnections() == 1);
 	SecureStreamSocket ss6;
 	ss6.setLazyHandshake();
 	ss6.connect(sa);
 	Thread::sleep(200);
-	assert (srv.queuedConnections() == 2);
+	assertTrue (srv.queuedConnections() == 2);
 
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 4);
-	assert (srv.currentThreads() == 4);
-	assert (srv.queuedConnections() == 1);
-	assert (srv.totalConnections() == 5);
+	assertTrue (srv.currentConnections() == 4);
+	assertTrue (srv.currentThreads() == 4);
+	assertTrue (srv.queuedConnections() == 1);
+	assertTrue (srv.totalConnections() == 5);
 
 	ss2.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 4);
-	assert (srv.currentThreads() == 4);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 6);
+	assertTrue (srv.currentConnections() == 4);
+	assertTrue (srv.currentThreads() == 4);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 6);
 
 	ss3.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 3);
-	assert (srv.currentThreads() == 3);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 6);
+	assertTrue (srv.currentConnections() == 3);
+	assertTrue (srv.currentThreads() == 3);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 6);
 
 	ss4.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 2);
-	assert (srv.currentThreads() == 2);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 6);
+	assertTrue (srv.currentConnections() == 2);
+	assertTrue (srv.currentThreads() == 2);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 6);
 
 	ss5.close();
 	ss6.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 }
 
 
@@ -252,10 +252,10 @@ void TCPServerTest::testReuseSocket()
 	SecureServerSocket svs(0);
 	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
 	srv.start();
-	assert (srv.currentConnections() == 0);
-	assert (srv.currentThreads() == 0);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.currentThreads() == 0);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
@@ -263,27 +263,27 @@ void TCPServerTest::testReuseSocket()
 	ss1.sendBytes(data.data(), (int) data.size());
 	char buffer[256];
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
-	assert (srv.currentConnections() == 1);
-	assert (srv.currentThreads() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 1);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.currentThreads() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 1);
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 
 	ss1.connect(sa);
 	ss1.sendBytes(data.data(), (int) data.size());
 	n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
-	assert (srv.currentConnections() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 2);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 2);
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 }
 
 
@@ -310,10 +310,10 @@ void TCPServerTest::testReuseSession()
 	SecureServerSocket svs(0, 64, pServerContext);
 	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
 	srv.start();
-	assert (srv.currentConnections() == 0);
-	assert (srv.currentThreads() == 0);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.currentThreads() == 0);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
 
 	Context::Ptr pClientContext = new Context(
 		Context::CLIENT_USE,
@@ -328,56 +328,56 @@ void TCPServerTest::testReuseSession()
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa, pClientContext);
-	assert (!ss1.sessionWasReused());
+	assertTrue (!ss1.sessionWasReused());
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
 	char buffer[256];
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
-	assert (srv.currentConnections() == 1);
-	assert (srv.currentThreads() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 1);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.currentThreads() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 1);
 
 	Session::Ptr pSession = ss1.currentSession();
 
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 
 	ss1.useSession(pSession);
 	ss1.connect(sa);
-	assert (ss1.sessionWasReused());
-	assert (ss1.currentSession() == pSession);
+	assertTrue (ss1.sessionWasReused());
+	assertTrue (ss1.currentSession() == pSession);
 	ss1.sendBytes(data.data(), (int) data.size());
 	n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
-	assert (srv.currentConnections() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 2);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 2);
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 
 	Thread::sleep(15000); // wait for session to expire
 	pServerContext->flushSessionCache();
 
 	ss1.useSession(pSession);
 	ss1.connect(sa);
-	assert (!ss1.sessionWasReused());
-	assert (ss1.currentSession() != pSession);
+	assertTrue (!ss1.sessionWasReused());
+	assertTrue (ss1.currentSession() != pSession);
 	ss1.sendBytes(data.data(), (int) data.size());
 	n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n > 0);
-	assert (std::string(buffer, n) == data);
-	assert (srv.currentConnections() == 1);
-	assert (srv.queuedConnections() == 0);
-	assert (srv.totalConnections() == 3);
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.queuedConnections() == 0);
+	assertTrue (srv.totalConnections() == 3);
 	ss1.close();
 	Thread::sleep(300);
-	assert (srv.currentConnections() == 0);
+	assertTrue (srv.currentConnections() == 0);
 }
 
 

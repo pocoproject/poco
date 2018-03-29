@@ -41,7 +41,7 @@ void PBKDF2EngineTest::testPBKDF2a()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 1, 20);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "0c60c80f961f0e71f3a9b524af6012062fe037a6"); 
+	assertTrue (dk == "0c60c80f961f0e71f3a9b524af6012062fe037a6"); 
 }
 
 
@@ -54,7 +54,7 @@ void PBKDF2EngineTest::testPBKDF2b()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 2, 20);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957");
+	assertTrue (dk == "ea6c014dc72d6f8ccd1ed92ace1d41f0d8de8957");
 }
 
 
@@ -67,7 +67,7 @@ void PBKDF2EngineTest::testPBKDF2c()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 4096, 20);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "4b007901b765489abead49d926f721d065a429c1");
+	assertTrue (dk == "4b007901b765489abead49d926f721d065a429c1");
 }
 
 
@@ -80,7 +80,7 @@ void PBKDF2EngineTest::testPBKDF2d()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 16777216, 20);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "eefe3d61cd4da4e4e9945b3d6ba2158c2634e984");
+	assertTrue (dk == "eefe3d61cd4da4e4e9945b3d6ba2158c2634e984");
 #endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
@@ -94,7 +94,7 @@ void PBKDF2EngineTest::testPBKDF2e()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 4096, 25);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038");
+	assertTrue (dk == "3d2eec4fe41c849b80c8d83662c0e44a8b291a964cf2f07038");
 }
 
 
@@ -107,7 +107,7 @@ void PBKDF2EngineTest::testPBKDF2f()
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 4096, 16);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
-	assert (dk == "56fa6aa75548099dcc37d7f03425e0c3");
+	assertTrue (dk == "56fa6aa75548099dcc37d7f03425e0c3");
 }
 
 

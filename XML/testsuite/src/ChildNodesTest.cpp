@@ -39,46 +39,46 @@ void ChildNodesTest::testChildNodes()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
 
-	assert (!pRoot->hasChildNodes());
+	assertTrue (!pRoot->hasChildNodes());
 	AutoPtr<NodeList> pNL = pRoot->childNodes();
-	assert (pNL->length() == 0);
+	assertTrue (pNL->length() == 0);
 	
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
-	assert (pRoot->hasChildNodes());
+	assertTrue (pRoot->hasChildNodes());
 	
-	assert (pNL->length() == 1);
-	assert (pNL->item(0) == pChild1);
+	assertTrue (pNL->length() == 1);
+	assertTrue (pNL->item(0) == pChild1);
 
 	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
 	pRoot->appendChild(pChild2);
 
-	assert (pNL->length() == 2);
-	assert (pNL->item(0) == pChild1);
-	assert (pNL->item(1) == pChild2);
+	assertTrue (pNL->length() == 2);
+	assertTrue (pNL->item(0) == pChild1);
+	assertTrue (pNL->item(1) == pChild2);
 	
 	AutoPtr<Element> pChild0 = pDoc->createElement("child0");
 	pRoot->insertBefore(pChild0, pChild1);
 
-	assert (pNL->length() == 3);
-	assert (pNL->item(0) == pChild0);
-	assert (pNL->item(1) == pChild1);
-	assert (pNL->item(2) == pChild2);
+	assertTrue (pNL->length() == 3);
+	assertTrue (pNL->item(0) == pChild0);
+	assertTrue (pNL->item(1) == pChild1);
+	assertTrue (pNL->item(2) == pChild2);
 
 	pRoot->removeChild(pChild1);
-	assert (pNL->length() == 2);
-	assert (pNL->item(0) == pChild0);
-	assert (pNL->item(1) == pChild2);
+	assertTrue (pNL->length() == 2);
+	assertTrue (pNL->item(0) == pChild0);
+	assertTrue (pNL->item(1) == pChild2);
 
 	pRoot->removeChild(pChild0);
-	assert (pNL->length() == 1);
-	assert (pNL->item(0) == pChild2);
+	assertTrue (pNL->length() == 1);
+	assertTrue (pNL->item(0) == pChild2);
 
 	pRoot->removeChild(pChild2);
-	assert (pNL->length() == 0);
-	assert (pNL->item(0) == 0);
+	assertTrue (pNL->length() == 0);
+	assertTrue (pNL->item(0) == 0);
 
-	assert (!pRoot->hasChildNodes());
+	assertTrue (!pRoot->hasChildNodes());
 }
 
 

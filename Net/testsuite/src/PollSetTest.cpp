@@ -57,8 +57,8 @@ void PollSetTest::testPoll()
 	Stopwatch sw;
 	sw.start();
 	Timespan timeout(1000000);
-	assert (ps.poll(timeout).empty());
-	assert (sw.elapsed() >= 900000);
+	assertTrue (ps.poll(timeout).empty());
+	assertTrue (sw.elapsed() >= 900000);
 	sw.restart();
 
 	ps.add(ss2, PollSet::POLL_READ);
@@ -66,10 +66,10 @@ void PollSetTest::testPoll()
 	// ss1 must be writable, if polled for
 	ps.update(ss1, PollSet::POLL_READ | PollSet::POLL_WRITE);
 	PollSet::SocketModeMap sm = ps.poll(timeout);
-	assert (sm.find(ss1) != sm.end());
-	assert (sm.find(ss2) == sm.end());
-	assert (sm.find(ss1)->second == PollSet::POLL_WRITE);
-	assert (sw.elapsed() < 100000);
+	assertTrue (sm.find(ss1) != sm.end());
+	assertTrue (sm.find(ss2) == sm.end());
+	assertTrue (sm.find(ss1)->second == PollSet::POLL_WRITE);
+	assertTrue (sw.elapsed() < 100000);
 
 	ps.update(ss1, PollSet::POLL_READ);
 
@@ -77,38 +77,38 @@ void PollSetTest::testPoll()
 	char buffer[256];
 	sw.restart();
 	sm = ps.poll(timeout);
-	assert (sm.find(ss1) != sm.end());
-	assert (sm.find(ss2) == sm.end());
-	assert (sm.find(ss1)->second == PollSet::POLL_READ);
-	assert (sw.elapsed() < 100000);
+	assertTrue (sm.find(ss1) != sm.end());
+	assertTrue (sm.find(ss2) == sm.end());
+	assertTrue (sm.find(ss1)->second == PollSet::POLL_READ);
+	assertTrue (sw.elapsed() < 100000);
 
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	assert (n == 5);
-	assert (std::string(buffer, n) == "hello");
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
 
 
 	ss2.sendBytes("HELLO", 5);
 	sw.restart();
 	sm = ps.poll(timeout);
-	assert (sm.find(ss1) == sm.end());
-	assert (sm.find(ss2) != sm.end());
-	assert (sm.find(ss2)->second == PollSet::POLL_READ);
-	assert (sw.elapsed() < 100000);
+	assertTrue (sm.find(ss1) == sm.end());
+	assertTrue (sm.find(ss2) != sm.end());
+	assertTrue (sm.find(ss2)->second == PollSet::POLL_READ);
+	assertTrue (sw.elapsed() < 100000);
 
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
-	assert (n == 5);
-	assert (std::string(buffer, n) == "HELLO");
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "HELLO");
 
 	ps.remove(ss2);
 
 	ss2.sendBytes("HELLO", 5);
 	sw.restart();
 	sm = ps.poll(timeout);
-	assert (sm.empty());
+	assertTrue (sm.empty());
 
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
-	assert (n == 5);
-	assert (std::string(buffer, n) == "HELLO");
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "HELLO");
 
 	ss1.close();
 	ss2.close();

@@ -43,7 +43,7 @@ void QuotedPrintableTest::testEncode()
 		"\200\201\r\n";
 	encoder.close();
 	std::string txt = ostr.str();
-	assert (txt == "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
+	assertTrue (txt == "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
 	               "Proin id odio sit amet metus dignissim porttitor.=20\r\n"
 	               "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin s=\r\n"
 	               "odales molestie arcu.\r\n"
@@ -70,7 +70,7 @@ void QuotedPrintableTest::testDecode()
 		str += (char) c;
 		c = decoder.get();
 	}
-	assert (str == "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
+	assertTrue (str == "Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\r\n"
 	               "Proin id odio sit amet metus dignissim porttitor. \r\n"
 	               "Aliquam nulla ipsum, faucibus non, aliquet quis, aliquet id, felis. Proin sodales molestie arcu.\r\n"
 	               "\t\bSed suscipit, mi in facilisis feugiat, \t   \r\n"
