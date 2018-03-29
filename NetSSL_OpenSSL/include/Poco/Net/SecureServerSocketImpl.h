@@ -63,7 +63,7 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 	
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
