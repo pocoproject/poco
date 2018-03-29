@@ -2,12 +2,12 @@ model {
 	repositories {
 		libs(PrebuiltLibraries) {
 			mysql {
-				headers.srcDir "$mysql32Home/include"
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
 						libName = 'libmysqld.lib'
 						if (targetPlatform.name == 'win32') {
+							headers.srcDir "$mysql32Home/include"
 							staticLibraryFile = file("$mysql32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
