@@ -1387,10 +1387,10 @@ void SQLiteTest::testCLOB()
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assertTrue (count == 1);
 	CLOB res;
-	poco_assertTrue (res.size() == 0);
+	poco_assert (res.size() == 0);
 
 	tmp << "SELECT Image FROM Person WHERE LastName == :ln", bind("lastname"), into(res), now;
-	poco_assertTrue (res == img);
+	poco_assert (res == img);
 
 	tmp << "DROP TABLE IF EXISTS BlobTest", now;
 	std::vector<CLOB> resVec;
@@ -1409,10 +1409,10 @@ void SQLiteTest::testCLOB()
 		tmp << "INSERT INTO BlobTest VALUES(?, ?)", use(i), use(img), now;
 	}
 	tmp << "SELECT Image FROM BlobTest", into(resVec), now;
-	poco_assertTrue (resVec.size() == arrSize);
+	poco_assert (resVec.size() == arrSize);
 	for (int i = 0; i < arrSize; ++i)
 	{
-		poco_assertTrue (*resVec[i].begin() == (char) (0x30 + i));
+		poco_assert (*resVec[i].begin() == (char) (0x30 + i));
 	}
 }
 
@@ -2661,22 +2661,22 @@ void SQLiteTest::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB,
 	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
 	if (opCode == Utility::OPERATION_INSERT)
 	{
-		poco_assertTrue (*pV == 2);
-		poco_assertTrue (row == 1);
+		poco_assert (*pV == 2);
+		poco_assert (row == 1);
 		std::cout << "Inserted " << pDB << '.' << pTable << ", RowID=" << row << std::endl;
 		++_insertCounter;
 	}
 	else if (opCode == Utility::OPERATION_UPDATE)
 	{
-		poco_assertTrue (*pV == 3);
-		poco_assertTrue (row == 1);
+		poco_assert (*pV == 3);
+		poco_assert (row == 1);
 		std::cout << "Updated " << pDB << '.' << pTable << ", RowID=" << row << std::endl;
 		++_updateCounter;
 	}
 	else if (opCode == Utility::OPERATION_DELETE)
 	{
-		poco_assertTrue (*pV == 4);
-		poco_assertTrue (row == 1);
+		poco_assert (*pV == 4);
+		poco_assert (row == 1);
 		std::cout << "Deleted " << pDB << '.' << pTable << ", RowID=" << row << std::endl;
 		++_deleteCounter;
 	}
@@ -2776,7 +2776,7 @@ int SQLiteTest::sqliteCommitCallbackFn(void* pVal)
 {
 	poco_check_ptr(pVal);
 	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
-	poco_assertTrue ((*pV) == 1);
+	poco_assert ((*pV) == 1);
 	++(*pV);
 	return 0;
 }
@@ -2818,7 +2818,7 @@ void SQLiteTest::sqliteRollbackCallbackFn(void* pVal)
 {
 	poco_check_ptr(pVal);
 	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);
-	poco_assertTrue ((*pV) == 1);
+	poco_assert ((*pV) == 1);
 	++(*pV);
 }
 
