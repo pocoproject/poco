@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class C, class M = Mutex>
+template <class C>
 class WeakRefPtr
 	/// WeakRefPtr is a "smart" pointer for classes implementing
 	/// reference counting. WeakRefPtr keeps a "weak" reference
@@ -251,7 +251,7 @@ public:
 		/// convertible to pointer to the type held by this
 		/// WeakRefPtr.
 	{
-		if (&autoPtr.get() != _ptr)
+		if (autoPtr.get() != _ptr)
 		{
 			release();
 			_ptr = const_cast<Other*>(autoPtr.get());
@@ -274,7 +274,7 @@ public:
 		/// Moved-from RefPtr count is decreased and the
 		/// pointer is set to zero.
 	{
-		if (&autoPtr.get() != _ptr)
+		if (autoPtr.get() != _ptr)
 		{
 			release();
 			_ptr = const_cast<Other*>(autoPtr.get());
@@ -347,42 +347,42 @@ public:
 
 	bool operator == (const WeakRefPtr& ptr) const
 	{
-		if      (good()   &&  ptr) return *_ptr == *ptr;
+		if      (good())           return _ptr == ptr;
 		else if (isNull() && !ptr) return true;
 		return false;
 	}
 
 	bool operator == (const C* ptr) const
 	{
-		if      (good()   &&  ptr) return *_ptr == *ptr;
+		if      (good())           return _ptr == ptr;
 		else if (isNull() && !ptr) return true;
 		return false;
 	}
 
 	bool operator == (C* ptr) const
 	{
-		if      (good()   &&  ptr) return *_ptr == *ptr;
+		if      (good())           return _ptr == ptr;
 		else if (isNull() && !ptr) return true;
 		return false;
 	}
 
 	bool operator != (const WeakRefPtr& ptr) const
 	{
-		if      (good()   &&  ptr) return *_ptr != *ptr;
+		if      (good())           return _ptr != ptr;
 		else if (isNull() && !ptr) return false;
 		return true;
 	}
 
 	bool operator != (const C* ptr) const
 	{
-		if      (good()   &&  ptr) return *_ptr != *ptr;
+		if      (good())           return _ptr != ptr;
 		else if (isNull() && !ptr) return false;
 		return true;
 	}
 
 	bool operator != (C* ptr) const
 	{
-		if      (good()   &&  ptr) return *_ptr != *ptr;
+		if      (good())           return _ptr != ptr;
 		else if (isNull() && !ptr) return false;
 		return true;
 	}
@@ -418,8 +418,10 @@ private:
 		return _ptr != 0;
 	}
 
-	mutable C*         _ptr = 0;
-	WeakRefCounter<M>* _pCounter = 0;
+	typedef WeakRefCounter<typename C::MutexType> CounterType;
+
+	mutable C*   _ptr = 0;
+	CounterType* _pCounter = 0;
 };
 
 
