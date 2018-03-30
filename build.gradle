@@ -466,8 +466,6 @@ subprojects {
 		}
 		components {
 			withType(NativeComponentSpec) {
-		//		targetPlatform "win32"
-		//      targetPlatform "win64"
 				targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
