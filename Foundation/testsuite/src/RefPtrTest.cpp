@@ -184,9 +184,6 @@ class TestIntermediate: public TestParent1, public TestParent2
 public:
 	int func() { return 0; }
 	virtual int func1() { return 1; }
-
-private:
-	int _dummy = 1;
 };
 
 class TestChild: public TestIntermediate
@@ -699,16 +696,22 @@ namespace {
 	{
 	public:
 		class Dummy: public RCO {};
-		class WeakDummy: public WRCO {};
+		class WeakDummyMutex:
+				public Poco::RefCountedObjectImpl<Poco::WeakRefCounter<Poco::Mutex>>
+		{};
+		class WeakDummySpinlock:
+			public Poco::RefCountedObjectImpl<Poco::WeakRefCounter<Poco::SpinlockMutex>>
+		{};
 
-		RefPtrRunnable(): _errors(0)
+		RefPtrRunnable(): _errors(0), _msWeak(0), _msSpinlock(0)
 		{
 		}
 
 		void run()
 		{
 			work();
-			workWeak();
+			workWeakMutex();
+			workWeakSpinlock();
 		}
 
 		int errors() const
@@ -716,15 +719,26 @@ namespace {
 			return _errors.value();
 		}
 
+		int msWeak() const
+		{
+			return _msWeak.load();
+		}
+
+		int msSpinlock() const
+		{
+			return _msSpinlock.load();
+		}
+
 		static const int _size = 10;
 		static Dummy* _rco[_size];
-		static WeakDummy* _wrco[_size];
+		static WeakDummyMutex* _wrco[_size];
+		static WeakDummySpinlock* _wsrco[_size];
 
 	private:
 		void work()
 		{
 			RefPtr<Dummy> ptr;
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < _size; ++i)
 			{
 				ptr = RefPtr<Dummy>(_rco[i], true);
 				if (!ptr) ++_errors;
@@ -736,15 +750,16 @@ namespace {
 			}
 		}
 
-		void workWeak()
+		void workWeakMutex()
 		{
-			WeakRefPtr<WeakDummy> wptr;
+			Stopwatch sw; sw.start();
+			WeakRefPtr<WeakDummyMutex> wptr;
 			{
 				if(wptr.lock()) ++_errors;
-				RefPtr<WeakDummy> ptr;
-				for(int i = 0; i < 10; ++i)
+				RefPtr<WeakDummyMutex> ptr;
+				for(int i = 0; i < _size; ++i)
 				{
-					ptr = RefPtr<WeakDummy>(_wrco[i], true);
+					ptr = RefPtr<WeakDummyMutex>(_wrco[i], true);
 					if(!ptr) ++_errors;
 					wptr = ptr;
 					if(!wptr.lock()) ++_errors;
@@ -752,13 +767,37 @@ namespace {
 			}
 			// originals must be still alive
 			if (!wptr.lock() || wptr.referenceCount() < 1) ++_errors;
+			sw.stop(); _msWeak += sw.elapsed();
+		}
+
+		void workWeakSpinlock()
+		{
+			Stopwatch sw; sw.start();
+			WeakRefPtr<WeakDummySpinlock> wptr;
+			{
+				if(wptr.lock()) ++_errors;
+				RefPtr<WeakDummySpinlock> ptr;
+				for(int i = 0; i < _size; ++i)
+				{
+					ptr = RefPtr<WeakDummySpinlock>(_wsrco[i], true);
+					if(!ptr) ++_errors;
+					wptr = ptr;
+					if(!wptr.lock()) ++_errors;
+				}
+			}
+			// originals must be still alive
+			if (!wptr.lock() || wptr.referenceCount() < 1) ++_errors;
+			sw.stop(); _msSpinlock += sw.elapsed();// / 1000;
 		}
 
 		AtomicCounter _errors;
+		std::atomic<Poco::Clock::ClockDiff> _msWeak;
+		std::atomic<Poco::Clock::ClockDiff> _msSpinlock;
 	};
 
 	RefPtrRunnable::Dummy* RefPtrRunnable::_rco[RefPtrRunnable::_size] = {0};
-	RefPtrRunnable::WeakDummy* RefPtrRunnable::_wrco[RefPtrRunnable::_size] = {0};
+	RefPtrRunnable::WeakDummyMutex* RefPtrRunnable::_wrco[RefPtrRunnable::_size] = {0};
+	RefPtrRunnable::WeakDummySpinlock* RefPtrRunnable::_wsrco[RefPtrRunnable::_size] = {0};
 }
 
 
@@ -769,7 +808,8 @@ void RefPtrTest::testRefPtrThread()
 	for (int i = 0; i < num; ++i)
 	{
 		RefPtrRunnable::_rco[i] = new RefPtrRunnable::Dummy;
-		RefPtrRunnable::_wrco[i] = new RefPtrRunnable::WeakDummy;
+		RefPtrRunnable::_wrco[i] = new RefPtrRunnable::WeakDummyMutex;
+		RefPtrRunnable::_wsrco[i] = new RefPtrRunnable::WeakDummySpinlock;
 	}
 
 	std::vector<Thread*> threads;
@@ -792,9 +832,11 @@ void RefPtrTest::testRefPtrThread()
 		delete t;
 	}
 
+	std::cout << num << "threads, " << num << " loops/thread" << std::endl;
 	for (auto& r : runnables)
 	{
 		assertTrue(r->errors() == 0);
+		std::cout << "Mutex/Spinlock : " << r->msWeak() << '/' << r->msSpinlock() << " us" << std::endl;
 		delete r;
 	}
 
@@ -802,8 +844,10 @@ void RefPtrTest::testRefPtrThread()
 	{
 		assertTrue (RefPtrRunnable::_rco[i]->referenceCount() == 1);
 		assertTrue (RefPtrRunnable::_wrco[i]->referenceCount() == 1);
+		assertTrue (RefPtrRunnable::_wsrco[i]->referenceCount() == 1);
 		delete RefPtrRunnable::_rco[i];
 		delete RefPtrRunnable::_wrco[i];
+		delete RefPtrRunnable::_wsrco[i];
 	}
 }
 
@@ -902,105 +946,58 @@ namespace {
 		clobber();
 	}
 
-	struct Dummy:public RefCountedObject
+	struct DummyImpl
 	{
 		void dummy()
 		{
 			unoptimize();
 		}
 
-		Dummy &operator++()
+		DummyImpl& operator++()
 		{
 			unoptimize();
 			return *this;
 		}
 
-		Dummy &operator++(int)
+		DummyImpl& operator++(int)
 		{
 			unoptimize();
 			return *this;
 		}
 
-		Dummy &operator--()
+		DummyImpl& operator--()
 		{
 			unoptimize();
 			return *this;
 		}
 
-		Dummy &operator--(int)
+		DummyImpl& operator--(int)
 		{
 			unoptimize();
 			return *this;
 		}
 	};
 
-	struct WeakDummy:public WeakRefCountedObject
+	struct Dummy: public DummyImpl, public RefCountedObject
 	{
-		void dummy()
-		{
-			unoptimize();
-		}
-
-		WeakDummy &operator++()
-		{
-			unoptimize();
-			return *this;
-		}
-
-		WeakDummy &operator++(int)
-		{
-			unoptimize();
-			return *this;
-		}
-
-		WeakDummy &operator--()
-		{
-			unoptimize();
-			return *this;
-		}
-
-		WeakDummy &operator--(int)
-		{
-			unoptimize();
-			return *this;
-		}
 	};
 
-	struct WeakDummyNoMutex:public Poco::RefCountedObjectImpl<Poco::WeakRefCounter<Poco::NullMutex>>
+	struct WeakDummyMutex: public DummyImpl, public WeakRefCountedObject
 	{
-		void dummy()
-		{
-			unoptimize();
-		}
-
-		WeakDummyNoMutex &operator++()
-		{
-			unoptimize();
-			return *this;
-		}
-
-		WeakDummyNoMutex &operator++(int)
-		{
-			unoptimize();
-			return *this;
-		}
-
-		WeakDummyNoMutex &operator--()
-		{
-			unoptimize();
-			return *this;
-		}
-
-		WeakDummyNoMutex &operator--(int)
-		{
-			unoptimize();
-			return *this;
-		}
 	};
 
+	struct WeakDummyNoMutex: public DummyImpl,
+		public Poco::RefCountedObjectImpl<Poco::WeakRefCounter<Poco::NullMutex>>
+	{
+	};
+
+	struct WeakDummySpinlockMutex: public DummyImpl,
+		public Poco::RefCountedObjectImpl<Poco::WeakRefCounter<Poco::SpinlockMutex>>
+	{
+	};
 
 	template<typename P>
-	void ops(P*p)
+	void ops(P* p)
 	{
 		++(**p);
 		--(**p);
@@ -1009,35 +1006,35 @@ namespace {
 	}
 
 	template<typename P>
-	void doWork(P*p)
+	void doWork(P* p)
 	{
 		(*p)->dummy();
 		ops(p);
 	}
 
 	template<>
-	void doWork(int*p)
+	void doWork(int* p)
 	{
 		unoptimize();
 		ops(&p);
 	}
 
 	template<>
-	void doWork(std::unique_ptr<int>*p)
+	void doWork(std::unique_ptr<int>* p)
 	{
 		unoptimize();
 		ops(p);
 	}
 
 	template<>
-	void doWork(std::shared_ptr<int>*p)
+	void doWork(std::shared_ptr<int>* p)
 	{
 		unoptimize();
 		ops(p);
 	}
 
 	template<>
-	void doWork(SharedPtr<int>*p)
+	void doWork(SharedPtr<int>* p)
 	{
 		unoptimize();
 		ops(p);
@@ -1055,7 +1052,7 @@ namespace {
 			doWork(&p);
 		}
 		sw.stop();
-		std::cout << '\t' << NDC::typeName<T>() << ", " << reps << " repetitions: " << sw.elapsed() / 1000 << " ms" << std::endl;
+		std::cout << '\t' << NDC::typeName<T>() << " : " << sw.elapsed() / 1000 << " ms" << std::endl;
 	}
 
 
@@ -1071,7 +1068,7 @@ namespace {
 			delete p;
 		}
 		sw.stop();
-		std::cout << '\t' << NDC::typeName<Dummy*>() << ", " << reps << " repetitions: " << sw.elapsed() / 1000 << " ms" << std::endl;
+		std::cout << '\t' << NDC::typeName<Dummy*>() << " : " << sw.elapsed() / 1000 << " ms" << std::endl;
 	}
 
 
@@ -1087,7 +1084,7 @@ namespace {
 			delete p;
 		}
 		sw.stop();
-		std::cout << '\t' << NDC::typeName<int*>() << ", " << reps << " repetitions: " << sw.elapsed() / 1000 << " ms" << std::endl;
+		std::cout << '\t' << NDC::typeName<int*>() << " : " << sw.elapsed() / 1000 << " ms" << std::endl;
 	}
 }
 
@@ -1099,6 +1096,7 @@ void RefPtrTest::pointersBenchmark()
 #ifdef REF_PTR_BENCHMARK
 
 	int reps = 1000000;
+	std::cout << reps << " repetitions" << std::endl;
 	std::cout << std::endl;
 
 	runBenchmark<int, int*>(reps);
@@ -1109,7 +1107,8 @@ void RefPtrTest::pointersBenchmark()
 
 	runBenchmark<Dummy, Dummy*>(reps);
 	runBenchmark<Dummy, RefPtr<Dummy>>(reps);
-	runBenchmark<WeakDummy, RefPtr<WeakDummy>>(reps);
+	runBenchmark<WeakDummyMutex, RefPtr<WeakDummyMutex>>(reps);
+	runBenchmark<WeakDummySpinlockMutex, RefPtr<WeakDummySpinlockMutex>>(reps);
 	runBenchmark<WeakDummyNoMutex, RefPtr<WeakDummyNoMutex>>(reps);
 	runBenchmark<Dummy, SharedPtr<Dummy>>(reps);
 	runBenchmark<Dummy, std::unique_ptr<Dummy>>(reps);
@@ -1143,7 +1142,7 @@ CppUnit::Test* RefPtrTest::suite()
 	CppUnit_addTest(pSuite, RefPtrTest, testWeakSemantics);
 	CppUnit_addTest(pSuite, RefPtrTest, testWeakCast);
 	CppUnit_addTest(pSuite, RefPtrTest, testRefPtrThread);
-	//CppUnit_addTest(pSuite, RefPtrTest, pointersBenchmark);
+	CppUnit_addTest(pSuite, RefPtrTest, pointersBenchmark);
 
 	return pSuite;
 }
