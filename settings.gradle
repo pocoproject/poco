@@ -13,10 +13,11 @@ include ':Net'
 if (os.windows) {
 	include ':NetSSL_Win'
 }
+// SQL not ready yet
 //include ':Data'
 //include ':Data:ODBC'
 //include ':Data:SQLite'
-include ':Data:MySQL'
+//include ':Data:MySQL'
 include ':Zip'
 include ':PageCompiler'
 include ':PageCompiler:File2Page'
