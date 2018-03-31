@@ -4,6 +4,7 @@ model {
 			mysql {
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
+					println "StaticLibraryBinary:targetPlatform.name=" + targetPlatform.name
 					if (buildType == buildTypes.debug) {
 						libName = 'libmysqld.lib'
 						if (targetPlatform.name == 'win32') {
@@ -30,6 +31,8 @@ model {
 				binaries.withType(SharedLibraryBinary) {
 					def dllName
 					def linkName
+					println "SharedLibraryBinary:targetPlatform.name=" + targetPlatform.name
+					println ""
 					if (buildType == buildTypes.debug) {
 						dllName = 'libmysqld.dll'
 						linkName = 'libmysqld.lib'
