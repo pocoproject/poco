@@ -7,10 +7,6 @@ plugins {
 //	id 'com.jfrog.artifactory' version '4.1'
 }
 apply plugin: 	'base' 
-apply plugin: 	'nuget'
-nuget {
-	version = '4.4.1'
-}
 
 def os = org.gradle.internal.os.OperatingSystem.current()
 def String version = file("VERSION").text.replaceAll("[\n\r]", "")
@@ -665,7 +661,12 @@ subprojects {
 					}
 				}
 				if (toolChain in Gcc) {
-					linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
+					if (targetPlatform == platforms.linux32) {
+					    linker.args "-Wl,-rpath,$rootDir/lib"   //FIXME
+                    } else
+					if (targetPlatform == platforms.linux64) {
+					    linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
+                    }
 				}
 			}
 			withType(StaticLibraryBinarySpec) {
@@ -688,6 +689,7 @@ subprojects {
 					}
 				}
 				if (toolChain in Gcc) {
+					linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
 				}
 			}
 			withType(NativeExecutableBinarySpec) {
@@ -704,6 +706,12 @@ subprojects {
 					}
 				}
 				if (toolChain in Gcc) {
+					if (targetPlatform == platforms.linux32) {
+					    linker.args "-Wl,-rpath,$rootDir/lib"   //FIXME
+                    } else
+					if (targetPlatform == platforms.linux64) {
+					    linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
+                    }
 				}
 			}
 		}
@@ -805,6 +813,7 @@ PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-${version}-all-doc
 PocoDoc.version=${version}-all
+Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 """
 	if (os.windows) {
 		def	String javaVCH = VCHome.replace('\\','/')
@@ -813,12 +822,18 @@ PocoDoc.version=${version}-all
 		javaWDK = javaWDK.replace('\\','/')
 		
  		file.text += """
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 VCH=${javaVCH}
 WDK=${javaWDK}
 CLP=${javaCLP}
 """
-	} else {
+	} else 
+    if (os.linux) {
+ 		file.text += """
+CXX=g++
+CXXFLAGS=
+"""
+	} else 
+    if (os.macos) {
 	}
 }
 task pocoDoc(type: Exec) {
@@ -860,169 +875,7 @@ task zipDoc(type: Zip) {
 	dependsOn pocoDoc
 }
 
-def candle(VSYEAR, VERSION, target, os) {
-	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
-		def Set<Task> pocos = project.getTasksByName('poco', true)
-		setDependsOn(pocos)
-		dependsOn ':pocoDoc'
-		workingDir "packaging/Windows/WiX"
-
-		executable "${WiXHome}/bin/Candle.exe"
-		args "-arch", "${target}"
-		args "-dVSYEAR=${VSYEAR}"
-		args "-dVERSION=${VERSION}"
-		args "-dPOCO=${rootDir}"
-		args "-dPlatform=${target}"
-		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
-		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-		args "Poco.wxs"
-		
-		def File index = new File("$rootDir/releases/poco-$VERSION-all-doc/index.html")
-		inputs.files(index)
-
-		inputs.files(pocos.inputs.files)
-		inputs.files(new File(workingDir, "Poco.wxs"))
-		inputs.files(project.getTasksByName('poco', true).outputs.files)
-		
-		def File output = new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
-		outputs.files(output)
-
-		onlyIf(new Spec<Exec>() {
-			boolean isSatisfiedBy(Exec task) {
-				   return os.windows;
-			}
-		});
-	}
-}
-def light(VSYEAR, VERSION, target, os) {
-	return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
-		dependsOn candle(VSYEAR, VERSION, target, os)
-		workingDir "packaging/Windows/WiX"
-
-		executable "${WiXHome}/bin/Light.exe"
-		args "-cultures:null"
-		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
-		args "-out"
-		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
-		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
-
-		def File input = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
-		inputs.files(input)
-		def File output = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi")
-		outputs.files(output)
-
-		onlyIf(new Spec<Exec>() {
-			boolean isSatisfiedBy(Exec task) {
-				   return os.windows;
-			}
-		});
-	}
-}
-task wix() {
-	dependsOn 		light('VS2017', version, 'x86', os)
-	dependsOn 		light('VS2017', version, 'x64', os)
-	onlyIf(new Spec<Task>() {
-		boolean isSatisfiedBy(Task task) {
-			   return os.windows;
-		}
-	});
-}
-/*
-ext.commonNuspecMetadata = [
-	version:     	'2.0.0',
-	owners:			'Günter Obiltschnig & Aleksandar Fabijanic',
-	authors:        'Applied Informatics & Contributors',
-	projectUrl: 	'https://pocoproject.org/',
-	licenseUrl:		'https://pocoproject.org/license.html',
-	iconUrl:		'https://avatars1.githubusercontent.com/u/201918?v=4&s=200',
-	copyright: 		'Applied Informatics copyright 2018',
-	requireLicenseAcceptance: false,
-	description:	'Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.',
-	tags:			'string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml'
-]
-def pocoNugetSpec(os) {
-	return tasks.create("nugetSpec-$os", nugetSpec) {
-	def String vers = commonNuspecMetadata.find { it.key == "version" }.value;
-	nuspec = [
-		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.vs150",
-			title:          "Poco $vers",
-			dependencies: [
-			]
-		],
-		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.targets", 	target: "build\\native") },
-			{ file(src: "$rootDir\\bin\\Poco*.*", 												target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*.*",												target: "build\\native\\lib"), 		exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\bin64\\Poco*64.*",											target: "build\\native\\bin64"), 	exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\lib64\\Poco*.*",												target: "build\\native\\lib64"), 	exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\bin\\Poco*d.*", 												target: "build\\native\\bin"), 		exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\lib\\Poco*d.*",												target: "build\\native\\lib"), 		exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\bin64\\Poco*64d.*",											target: "build\\native\\bin64"), 	exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\lib64\\Poco*d.*",											target: "build\\native\\lib64"), 	exclude: "$rootDir\\bin\\*CppParser*.*" },
-			{ file(src: "$rootDir\\CppUnit\\include\\**",										target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Crypto\\include\\**",										target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",									target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\include\\**",											target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",										target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",									target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Encodings\\include\\**",										target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",									target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\JSON\\include\\**",											target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\MongoDB\\include\\**",										target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Net\\include\\**",											target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",								target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",									target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\PDF\\include\\**",											target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Util\\include\\**",											target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\XML\\include\\**",											target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Zip\\include\\**",											target: "build\\native\\inc") }
-			
-			]
-	]
-}
-}
-nugetPack {
-	destinationDir "$rootDir/packaging/Windows/Nuget"
-	def Set<Task> pocos = project.getTasksByName('poco', true)
-	setDependsOn(pocos)
-	dependsOn pocoNugetSpec('x86')
-}
-*/
-
-def nuget(version, target, os) {
-	return tasks.create("NuGet-${target}", Exec) {
-		String nugetVersion = version.replace('p', '-')
-		def Set<Task> pocos = project.getTasksByName('poco', true)
-		
-		setDependsOn(pocos)
-		workingDir "packaging/Windows/NuGet"
-
-		executable "${NuGetHome}/NuGet.exe"
-		args "pack"
-		args "-BasePath", "$rootDir"
-		args "-Version", nugetVersion
-		args "-NonInteractive"
-		args "Pocoproject.Poco.vs150.${target}.nuspec"
-
-		inputs.files(pocos.inputs.files)
-		inputs.files(new File(workingDir, "Pocoproject.Poco.vs150.${target}.nuspec"))
-		outputs.files(new File(workingDir,"Pocoproject.Poco.vs150.${target}.${version}.nupkg"))
-
-		onlyIf(new Spec<Exec>() {
-			boolean isSatisfiedBy(Exec task) {
-				   return os.windows;
-			}
-		});
-	}
-}
-
 task packaging() {
-	if (os.windows) {
-		dependsOn nuget(version, 'x86', os)
-		dependsOn nuget(version, 'x64', os)
-		dependsOn wix
-	}
 }
 //
 //	gradle\bin\gradle Zip:testsuite:check -Ptest=-all
