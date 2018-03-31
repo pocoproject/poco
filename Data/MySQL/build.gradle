@@ -25,8 +25,6 @@ model {
 							headers.srcDir "$mysql64Home/include"
 							staticLibraryFile = file("$mysql64Home/lib/$libName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 				binaries.withType(SharedLibraryBinary) {
@@ -59,8 +57,6 @@ model {
 							sharedLibraryFile     = file("$mysql64Home/lib/$dllName")
 							sharedLibraryLinkFile = file("$mysql64Home/lib/$linkName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 			}
@@ -88,7 +84,9 @@ model {
 		all {
 			cppCompiler.define	"THREADSAFE"
 			cppCompiler.define 	"__LCC__"	
-			cppCompiler.define 	"WINVER=0x0600"
+			if (toolChain in VisualCpp) {
+			    cppCompiler.define 	"WINVER=0x0600"
+            }
 		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
