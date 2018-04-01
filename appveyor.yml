@@ -70,9 +70,9 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
 
   matrix:
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: shared
 
     - builder: cmake
       vsver: 150
