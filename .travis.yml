@@ -21,6 +21,8 @@ services:
 addons:
   postgresql: "9.4"
 
+git:
+  submodules: false
   
 notifications:
   slack: pocoproject:ItIUZvs8aJGyPdaKxIKMnS1t
