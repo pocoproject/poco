@@ -13,6 +13,7 @@
 
 
 #include "Poco/Exception.h"
+#include "Poco/NestedDiagnosticContext.h"
 #include <typeinfo>
 
 
@@ -21,26 +22,39 @@ namespace Poco {
 
 Exception::Exception(int otherCode): _pNested(0), _code(otherCode)
 {
+	addBacktrace();
 }
 
 
-Exception::Exception(const std::string& msg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
+Exception::Exception(const std::string& msg, int otherCode):
+	_msg(msg),
+	_pNested(0),
+	_code(otherCode)
 {
+	addBacktrace();
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
+Exception::Exception(const std::string& msg, const std::string& arg, int otherCode):
+	_msg(msg),
+	_pNested(0),
+	_code(otherCode)
 {
 	if (!arg.empty())
 	{
 		_msg.append(": ");
 		_msg.append(arg);
 	}
+	addBacktrace();
 }
 
 
-Exception::Exception(const std::string& msg, const Exception& nestedException, int otherCode): _msg(msg), _pNested(nestedException.clone()), _code(otherCode)
+Exception::Exception(const std::string& msg, const Exception& nestedException, int otherCode):
+	_msg(msg),
+	_pNested(nestedException.clone()),
+	_code(otherCode)
 {
+	addBacktrace();
 }
 
 
@@ -52,7 +66,7 @@ Exception::Exception(const Exception& exc):
 	_pNested = exc._pNested ? exc._pNested->clone() : 0;
 }
 
-	
+
 Exception::~Exception() throw()
 {
 	delete _pNested;
@@ -84,21 +98,18 @@ const char* Exception::className() const throw()
 	return typeid(*this).name();
 }
 
-	
+
 const char* Exception::what() const throw()
 {
-	return name();
+	return msg().c_str();//name();
 }
 
-	
+
 std::string Exception::displayText() const
 {
-	std::string txt = name();
-	if (!_msg.empty())
-	{
-		txt.append(": ");
-		txt.append(_msg);
-	}
+	std::string txt;
+	if (!_msg.empty()) txt.append(msg());
+	else txt = name();
 	return txt;
 }
 
@@ -109,6 +120,15 @@ void Exception::extendedMessage(const std::string& arg)
 	{
 		if (!_msg.empty()) _msg.append(": ");
 		_msg.append(arg);
+	}
+}
+
+
+void Exception::addBacktrace()
+{
+	if (NDC::hasBacktrace())
+	{
+		_msg.append(1, '\n').append(NDC::backtrace(2, 3));
 	}
 }
 

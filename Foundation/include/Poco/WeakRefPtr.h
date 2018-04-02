@@ -105,8 +105,8 @@ public:
 		/// Moved-from RefPtr count is decreased and the
 		/// pointer is set to zero.
 	{
-		autoPtr.reset();
 		duplicate();
+		autoPtr.reset();
 	}
 
 	template <class Other>
@@ -119,8 +119,8 @@ public:
 		/// Moved-from RefPtr count is decreased and the
 		/// pointer is set to zero.
 	{
-		autoPtr.reset();
 		duplicate();
+		autoPtr.reset();
 	}
 
 	~WeakRefPtr()
@@ -321,16 +321,19 @@ public:
 		return 0;
 	}
 
-	operator C* ()
+	operator bool () const
 	{
-		if (good()) return _ptr;
-		return 0;
+		return good();
 	}
 
-	operator const C* () const
+	operator RefPtr<C> ()
 	{
-		if (good()) return _ptr;
-		return 0;
+		return lock();
+	}
+
+	operator RefPtr<C> () const
+	{
+		return lock();
 	}
 
 	bool operator ! () const
@@ -352,6 +355,13 @@ public:
 		return false;
 	}
 
+	bool operator == (const RefPtr<C>& ptr) const
+	{
+		if      (good())           return _ptr == ptr;
+		else if (isNull() && !ptr) return true;
+		return false;
+	}
+
 	bool operator == (const C* ptr) const
 	{
 		if      (good())           return _ptr == ptr;
@@ -367,6 +377,13 @@ public:
 	}
 
 	bool operator != (const WeakRefPtr& ptr) const
+	{
+		if      (good())           return _ptr != ptr;
+		else if (isNull() && !ptr) return false;
+		return true;
+	}
+
+	bool operator != (const RefPtr<C>& ptr) const
 	{
 		if      (good())           return _ptr != ptr;
 		else if (isNull() && !ptr) return false;

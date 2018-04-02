@@ -16,6 +16,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/CppUnit/TestCase.h"
+#include "Poco/RefCountedObject.h"
 
 
 class RefPtrTest: public CppUnit::TestCase
@@ -31,9 +32,10 @@ public:
 	void testMoveInherited();
 	void testWeakRefPtr();
 	void testWeakSemantics();
-	void pointersBenchmark();
+	void testLeak();
 	void testWeakCast();
 	void testRefPtrThread();
+	void pointersBenchmark();
 
 	void setUp();
 	void tearDown();
@@ -41,6 +43,12 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	class LeakTest: public Poco::WeakRefCountedObject
+	{
+	protected: ~LeakTest() { }
+	friend class RefPtrTest;
+	};
+	LeakTest* _leak = 0;
 };
 
 

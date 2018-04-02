@@ -192,4 +192,8 @@
 // #define POCO_NO_DEPRECATED
 
 
+// macro to enable refcounting NDC
+// (effective only in conjunction with _DEBUG)
+// #define POCO_REFCOUNT_NDC
+
 #endif // Foundation_Config_INCLUDED

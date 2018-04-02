@@ -22,18 +22,21 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/OrderedMap.h"
-#include "Poco/Mutex.h"
 #include <vector>
 #include <ostream>
 #include <typeinfo>
 #include <utility>
 
-#ifdef POCO_COMPILER_GCC
+#if defined(POCO_COMPILER_GCC) && (POCO_OS == POCO_OS_LINUX)
+	#define POCO_HAS_BACKTRACE
+#endif
 
-#include <cxxabi.h>
-#include <execinfo.h>
-#include <dlfcn.h>
-
+#ifdef POCO_HAS_BACKTRACE
+	#ifdef POCO_COMPILER_GCC
+		#include <cxxabi.h>
+		#include <execinfo.h>
+		#include <dlfcn.h>
+	#endif
 #endif
 
 namespace Poco {
@@ -64,20 +67,6 @@ class Foundation_API NestedDiagnosticContext
 	/// source code line number and file name.
 {
 public:
-	/*
-	struct TraceRecord
-	{
-		TraceRecord(void* ptr, int refCount, const std::string& entry = "", const std::string& backtrace = ""):
-				_ptr(ptr), _refCount(refCount), _entry(entry), _backtrace(backtrace)
-		{
-		}
-
-		void*       _ptr = 0;
-		int         _refCount = 0;
-		std::string _entry;
-		std::string _backtrace;
-	};*/
-
 	typedef NDCScope Scope;
 
 	NestedDiagnosticContext();
@@ -149,13 +138,18 @@ public:
 		return name;
 	}
 
-	static std::string backTrace(int skipEnd = 1, int skipBegin = 0, int stackSize = 128, int bufSize = 1024);
+	static std::string backtrace(int skipEnd = 1, int skipBegin = 0, int stackSize = 128, int bufSize = 1024);
+		/// Returns string containing the formatted current thread stack trace. To "trim" returned stack
+		/// frames, set skipEnd and skipBegin to the appropriate values; trace entries are sorted in
+		/// reverse order (last entry is first). So, to omit this function from the returned string,
+		/// skipEnd defaults to 1. For larger stacks, adjust stackSize and bufSize accordingly.
+		///
+		/// Note that the output may depend on many factors, mostly on the compiler/linker settings,
+		/// but also on the code being analyzed in some cases; for example, g++ stack trace will not
+		/// show static (or the ones in anonymous namespaces) functions by name, but only by address.
 
-	//static void dumpRef(std::ostream& os, bool leakOnly = true);
-
-	//static void dumpAllRef(std::ostream& os);
-
-	//static void dumpLeakRef(std::ostream& os);
+	static bool hasBacktrace();
+		/// Returns true if backtrace functionality is available, false otherwise.
 
 private:
 	struct Context
@@ -163,7 +157,7 @@ private:
 		std::string info;
 		const char* file;
 		int         line;
-		std::string trace;
+		std::string trace; // TODO: add backtrace
 	};
 
 	typedef std::vector<Context> Stack;
@@ -171,22 +165,6 @@ private:
 	Stack    _stack;
 };
 
-
-//
-// inlines
-//
-/*
-inline void NestedDiagnosticContext::dumpAllRef(std::ostream& os)
-{
-	dumpRef(os, false);
-}
-
-
-inline void NestedDiagnosticContext::dumpLeakRef(std::ostream& os)
-{
-	dumpRef(os, true);
-}
-*/
 
 typedef NestedDiagnosticContext NDC;
 
@@ -211,6 +189,15 @@ public:
 //
 // inlines
 //
+
+inline bool NestedDiagnosticContext::hasBacktrace()
+{
+#ifdef POCO_HAS_BACKTRACE
+	return true;
+#endif
+	return false;
+}
+
 
 inline NDCScope::NDCScope(const std::string& info)
 {

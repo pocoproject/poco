@@ -22,24 +22,178 @@
 #include "Poco/Mutex.h"
 #include <atomic>
 
-/*
+
 #if defined(_DEBUG) && defined(POCO_REFCOUNT_NDC)
 
+
 #include "Poco/NestedDiagnosticContext.h"
+#include "Poco/OrderedMap.h"
+#include "Poco/Mutex.h"
 
-// Diagnostic utility macro; it collects stack backtraces at every refcount increment/decrement.
-// To trim stack entries from beginning or end, adjust paramters to NDC::backTrace() here.
-// Usable only from classes that conform to the (Weak)RefCountedObject interface.
-// Works only with g++ at this time.
-#define poco_rc_ndc_dbg Poco::NDC::TraceRecord tr((void*)this, referenceCount(), "", Poco::NDC::backTrace(1, 7)); \
-						Poco::NDC::TraceEntry entry({(uint64_t)this, tr}); Poco::NDC::addEntry(entry);
 
-#else
+namespace Poco {
 
-#define poco_rc_ndc_dbg
 
-#endif
-*/
+//
+// RefCountDiagnosticContext
+//
+
+class Foundation_API RefCountDiagnosticContext
+	/// This utility class is used for debugging and testing purposes
+	/// of the reference counting functionality and should not be used
+	/// for any other purpose. It is created on the heap and safely
+	/// deleted by a custom atexit() handler.
+	///
+	/// See poco_rcdc_* set of macros below for explanation how it is used.
+{
+public:
+	class TraceRecord
+	{
+	public:
+		TraceRecord(void *ptr, int refCount, int threshold, const char* func, const std::string &backtrace = "");
+		TraceRecord(const TraceRecord& other);
+		TraceRecord(TraceRecord&& other);
+		TraceRecord& operator == (const TraceRecord& other);
+		TraceRecord& operator == (TraceRecord&& other);
+
+	private:
+		TraceRecord();
+
+		void*       _ptr = 0;
+		int         _refCount = 0;
+		// threshold depends on whether duplicate()/release()
+		// were ever called; if not, it is 0, because all
+		// we've ever seen was refCount=1 in constructor
+		int         _threshold = 0;
+		std::string _functionName;
+		std::string _backtrace;
+
+		friend class RefCountDiagnosticContext;
+	};
+
+	typedef OrderedMap<void*, std::vector<TraceRecord>> TraceMap;
+	typedef std::atomic<RefCountDiagnosticContext*>     Ptr;
+
+	RefCountDiagnosticContext(bool full = false);
+	~RefCountDiagnosticContext();
+
+	void addEntry(TraceRecord&& record) const;
+	void dumpRef(std::ostream &os, bool leakOnly = true) const;
+	void dumpAllRef(std::ostream &os) const;
+	void dumpLeakRef(std::ostream &os) const;
+	void clear() const;
+
+	static RefCountDiagnosticContext* get();
+
+private:
+	RefCountDiagnosticContext(const RefCountDiagnosticContext&) = delete;
+	RefCountDiagnosticContext& operator = (const RefCountDiagnosticContext&) = delete;
+	RefCountDiagnosticContext(RefCountDiagnosticContext&&) = delete;
+	RefCountDiagnosticContext& operator = (RefCountDiagnosticContext&&) = delete;
+
+	static TraceMap& traceMap() { return _traceMap; }
+
+	static TraceMap _traceMap;
+	static Mutex    _mutex;
+	static Ptr      _pRCDC;
+	static bool     _full;
+
+	friend void atExitHandler();
+};
+
+
+//
+// inlines
+//
+
+inline void RefCountDiagnosticContext::addEntry(TraceRecord&& record) const
+{
+	Mutex::ScopedLock l(_mutex);
+	// if not full recording and this is the last record (ie. it is being
+	// garbage collected) for this pointer, remove it;
+	// full recording can get quite big and keeping collected garbage
+	// records does not make much sense in most scenarios, but it is possible
+	// by setting `_full` flag to true
+	auto found = traceMap().find(record._ptr);
+	if (found != traceMap().end() && !_full && record._refCount == record._threshold)
+	{
+		// memory has been released and full recording is disabled,
+		// remove entry
+		traceMap().erase(found);
+	}
+	else // otherwise, record it
+	{
+		traceMap()[record._ptr].emplace_back(std::move(record));
+	}
+}
+
+
+inline void RefCountDiagnosticContext::dumpAllRef(std::ostream& os) const
+{
+	dumpRef(os, false);
+	if (!_full)
+	{
+		os << std::endl;
+		os << "Full dump requested but not recorded, leaks only (if any) displayed.";
+		os << std::endl;
+	}
+}
+
+
+inline void RefCountDiagnosticContext::dumpLeakRef(std::ostream& os) const
+{
+	dumpRef(os, true);
+}
+
+
+inline void RefCountDiagnosticContext::clear() const
+{
+	Mutex::ScopedLock l(_mutex);
+	traceMap().clear();
+}
+
+
+typedef RefCountDiagnosticContext RCDC;
+
+
+} // namespace Poco
+
+
+// Diagnostic utility macros for tracing and managing records of refcount increments/decrements.
+// To trim stack entries from beginning or end, adjust parameters to NDC::backTrace() below.
+// Meaningfully usable only from classes that conform to the [Weak]RefCountedObject interface
+// and functionality.
+//
+// Note: since access to the internal RefCountDiagnosticContext (static) storage is protected
+// by a static mutex, using this functionality partially disables the multi-threaded nature
+// of RefCounted access, so it should not be permanently enabled in code, but used as a temporary
+// reference counting troubleshooting tool (compile with POCO_REFCOUNT_NDC in Config.h defined
+// to globally enable/disable this functionality).
+//
+// Backtrace works only with g++ at this time; without it this functionality is of limited use.
+// Disabled by default and always (even if POCO_REFCOUNT_NDC is defined) disabled for non-debug
+// builds.
+
+#define poco_rcdc_log(t) if (RCDC* p=RCDC::get()) p->addEntry(RCDC::TraceRecord((void*)this, referenceCount(), t, __func__, NDC::backtrace(1, 7)))
+
+#define poco_rcdc_dump_leak(os) if (RCDC* p=RCDC::get()) p->dumpLeakRef(os)
+
+#define poco_rcdc_dump_all(os) if (RCDC* p=RCDC::get()) p->dumpAllRef(os)
+
+#define poco_rcdc_reset if (RCDC* p=RCDC::get()) p->clear();
+
+#else // !(_DEBUG && POCO_REFCOUNT_NDC)
+
+
+namespace Poco { typedef void RCDC; }
+
+#define poco_rcdc_log(t)
+#define poco_rcdc_dump_leak(os)
+#define poco_rcdc_dump_all(os)
+#define poco_rcdc_reset
+
+#endif // _DEBUG && POCO_REFCOUNT_NDC
+
 
 namespace Poco {
 
@@ -61,6 +215,8 @@ class Foundation_API RefCounter
 	/// the count reaches zero.
 {
 public:
+	typedef void MutexType;
+
 	RefCounter();
 
 	void duplicate() const;
@@ -79,6 +235,7 @@ private:
 
 	mutable RefCounterType _counter;
 	template <class T> friend class RefCountedObjectImpl;
+	friend class RefCountDiagnosticContext;
 };
 
 //
@@ -99,6 +256,7 @@ class WeakRefCounter
 {
 public:
 	typedef typename M::ScopedLock ScopedLock;
+	typedef M MutexType;
 
 	WeakRefCounter(): _counter(1)
 	{
@@ -185,7 +343,7 @@ private:
 
 
 template <typename T>
-class RefCountedObjectImpl//: public RefCountedObjectBase
+class RefCountedObjectImpl
 	/// A base class for objects that employ
 	/// reference counting based garbage collection.
 	///
@@ -226,11 +384,14 @@ class RefCountedObjectImpl//: public RefCountedObjectBase
 {
 public:
 	typedef typename std::atomic<T*> CounterType;
+	typedef typename T::MutexType MutexType;
 
 	void duplicate() const
 		/// Increments the object's reference count.
 	{
+		poco_assert_dbg(_counter.load() != 0);
 		_counter.load()->duplicate();
+		poco_rcdc_log(1);
 	}
 
 	void release() const throw()
@@ -238,6 +399,8 @@ public:
 		/// deletes the object if the count reaches
 		/// zero.
 	{
+		poco_assert_dbg(_counter.load() != 0);
+		poco_rcdc_log(1);
 		if(_counter.load()->release() == 0)
 		{
 			// disarm _counter delete in destructor
@@ -249,8 +412,11 @@ public:
 
 	int referenceCount() const
 		/// Returns the reference count.
+		/// This function is not thread-safe.
 	{
-		return _counter.load()->count();
+		T* pCounter = _counter.load();
+		poco_assert_dbg (pCounter != 0);
+		return pCounter ? pCounter->count() : 0;
 	}
 
 	T* counter() const
@@ -263,11 +429,13 @@ protected:
 		/// Creates the RefCountedObjectImpl.
 		/// The initial reference count is one.
 	{
+		poco_rcdc_log(0);
 	}
 
 	virtual ~RefCountedObjectImpl()
 		/// Destroys the RefCountedObjectImpl.
 	{
+		poco_rcdc_log(1);
 		// prevent leak if release() was never called
 		// (eg. this object new-ed into bare pointer
 		// and deleted from outside using delete)
@@ -283,20 +451,32 @@ private:
 	RefCountedObjectImpl& operator = (RefCountedObjectImpl&&) = delete;
 
 	mutable CounterType _counter;
+
+	friend class RefCountDiagnosticContext;
 };
 
+
+// MS linker has trouble with duplicate symbols unless these are defined
+// externally as fully specialized and inlined; unfortunately, this means
+// same code in two places (ie. defeats the main purpose of templates).
+// While this code could be factored out in standalone functions, it involves
+// `delete this`, shapes everything in even uglier way and further complicates
+// development and troubleshooting. So, for now, we live with this workaround
+// annoyance.
 
 #ifdef POCO_COMPILER_MSVC
 
 template <>
 inline RefCountedObjectImpl<RefCounter>::RefCountedObjectImpl() : _counter(new RefCounter)
 {
+	poco_rcdc_log(0);
 }
 
 
 template <>
 inline RefCountedObjectImpl<RefCounter>::~RefCountedObjectImpl()
 {
+	poco_rcdc_log(1);
 	delete _counter.load();
 }
 
@@ -304,14 +484,18 @@ inline RefCountedObjectImpl<RefCounter>::~RefCountedObjectImpl()
 template <>
 inline void RefCountedObjectImpl<RefCounter>::duplicate() const
 {
+	poco_assert_dbg(_counter.load() != 0);
 	_counter.load()->duplicate();
+	poco_rcdc_log(1);
 }
 
 
 template <>
 inline void RefCountedObjectImpl<RefCounter>::release() const throw()
 {
-	if (_counter.load()->release() == 0)
+	poco_assert_dbg(_counter.load() != 0);
+	poco_rcdc_log(1);
+	if(_counter.load()->release() == 0)
 	{
 		_counter.store(0);
 		delete this;
@@ -322,7 +506,9 @@ inline void RefCountedObjectImpl<RefCounter>::release() const throw()
 template <>
 inline int RefCountedObjectImpl<RefCounter>::referenceCount() const
 {
-	return _counter.load()->count();
+	T* pCounter = _counter.load();
+	poco_assert_dbg (pCounter != 0);
+	return pCounter ? pCounter->count() : 0;
 }
 
 

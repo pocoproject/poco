@@ -204,9 +204,10 @@ public:
 	}
 
 	void moveAssign(C** pptr)
-		// Move-assigns pointer to this RefPtr.
-		// The pointer must not be null.
-		// Self move-assignment is no-op
+		/// Move-assigns pointer to this RefPtr.
+		/// The pointer to pointer must not be null,
+		/// but the dereferenced pointer may be null.
+		/// Self move-assignment is no-op
 	{
 		poco_check_ptr (pptr);
 
@@ -221,16 +222,25 @@ public:
 		}
 	}
 
-	RefPtr& operator = (RefPtr&& ptr)
+	RefPtr& operator = (RefPtr&& refPtr)
 	{
-		moveAssign(&ptr._ptr);
+		moveAssign(&refPtr._ptr);
 		return *this;
 	}
 
 	template <class Other>
-	RefPtr& operator = (RefPtr<Other>&& ptr)
+	RefPtr& operator = (RefPtr<Other>&& otherRefPtr)
 	{
-		moveAssign(&ptr._ptr);
+		Other* pOther = otherRefPtr.get();
+		if (pOther != _ptr)
+		{
+			reset();
+			if (pOther)
+			{
+				_ptr = pOther;
+				otherRefPtr.resetMove();
+			}
+		}
 		return *this;
 	}
 
