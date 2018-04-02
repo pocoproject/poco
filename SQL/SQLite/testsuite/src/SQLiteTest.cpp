@@ -89,6 +89,8 @@ using Poco::Int64;
 using Poco::Dynamic::Var;
 using Poco::SQL::SQLite::Utility;
 using Poco::delegate;
+using Poco::RefCountedObject;
+using Poco::RCDC;
 
 
 class Person
@@ -244,11 +246,13 @@ int SQLiteTest::_deleteCounter;
 
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 {
+	//poco_rcdc_reset;
 }
 
 
 SQLiteTest::~SQLiteTest()
 {
+	//poco_rcdc_dump_leak(std::cerr);
 }
 
 
@@ -2423,10 +2427,12 @@ void SQLiteTest::testRowFilter()
 
 void SQLiteTest::testAsync()
 {
+// many false leak reports due to thread pool
+#ifndef POCO_REFCOUNT_NDC
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
-	
+
 	int rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
@@ -2491,7 +2497,7 @@ void SQLiteTest::testAsync()
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
-	
+
 	for (int i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
@@ -2506,6 +2512,9 @@ void SQLiteTest::testAsync()
 	assertTrue (!stmt2.isAsync());
 	assertTrue ("deque" == stmt2.getStorage());
 	assertTrue (stmt2.execute() == rowCount);
+#else
+	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
+#endif // POCO_REFCOUNT_NDC
 }
 
 
@@ -2574,6 +2583,8 @@ void SQLiteTest::testPair()
 
 void SQLiteTest::testSQLChannel()
 {
+// many false leak reports due to thread pool
+#ifndef POCO_REFCOUNT_NDC
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
 	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
@@ -2643,11 +2654,16 @@ void SQLiteTest::testSQLChannel()
 	rs2.moveNext();
 	assertTrue ("WarningSource" == rs2["Source"]);
 	assertTrue ("f Warning sync message" == rs2["Text"]);
+#else
+	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
+#endif // POCO_REFCOUNT_NDC
 }
 
 
 void SQLiteTest::testSQLLogger()
 {
+// many false leak reports due to static logger
+#ifndef POCO_REFCOUNT_NDC
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
 	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
@@ -2678,6 +2694,9 @@ void SQLiteTest::testSQLLogger()
 	rs.moveNext();
 	assertTrue ("TestSQLChannel" == rs["Source"]);
 	assertTrue ("Warning message" == rs["Text"]);
+#else
+	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
+#endif // POCO_REFCOUNT_NDC
 }
 
 
@@ -3238,6 +3257,8 @@ void SQLiteTest::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 
 void SQLiteTest::testSessionTransaction()
 {
+// many false leak reports due to thread pool
+#ifndef POCO_REFCOUNT_NDC
 	Session session (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	assertTrue (session.isConnected());
 
@@ -3329,6 +3350,9 @@ void SQLiteTest::testSessionTransaction()
 	
 	local.close();
 	assertTrue (!local.isConnected());
+#else
+	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
+#endif // POCO_REFCOUNT_NDC
 }
 
 
@@ -3780,7 +3804,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorLimit);
-	//CppUnit_addTest(pSuite, SQLiteTest, testRowFilter);TODO: fix RefPtr
+	CppUnit_addTest(pSuite, SQLiteTest, testRowFilter);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
