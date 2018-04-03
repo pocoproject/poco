@@ -144,7 +144,7 @@ exit 0</Command>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;libcrypto.lib;libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin64\PocoCrypto64d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -181,7 +181,7 @@ exit 0</Command>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;libcrypto.lib;libssl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin64\PocoCrypto64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>false</GenerateDebugInformation>
