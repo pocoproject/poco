@@ -63,18 +63,18 @@ void DynamicFactoryTest::testDynamicFactoryAutoPtr()
 
 	dynFactory.registerClass<A>("A");
 	dynFactory.registerClass<B>("B");
+	
+	assertTrue (dynFactory.isClass("A"));
+	assertTrue (dynFactory.isClass("B"));
 
-	assert (dynFactory.isClass("A"));
-	assert (dynFactory.isClass("B"));
-
-	assert (!dynFactory.isClass("C"));
+	assertTrue (!dynFactory.isClass("C"));
 
 	AutoPtr<A> a(dynFactory.createInstance("A").cast<A>());
 	AutoPtr<B> b(dynFactory.createInstance("B").cast<B>());
 
 	assertNotNull(a.get());
 	assertNotNull(b.get());
-	
+
 	try
 	{
 		dynFactory.registerClass<A>("A");
@@ -83,11 +83,11 @@ void DynamicFactoryTest::testDynamicFactoryAutoPtr()
 	catch (Poco::ExistsException&)
 	{
 	}
-	
+
 	dynFactory.unregisterClass("B");
 	assert (dynFactory.isClass("A"));
 	assert (!dynFactory.isClass("B"));
-	
+
 	try
 	{
 		AutoPtr<B> b(dynFactory.createInstance("B").cast<B>());
@@ -127,9 +127,9 @@ void DynamicFactoryTest::testDynamicFactoryPtr()
 	}
 
 	dynFactory.unregisterClass("B");
-	assert (dynFactory.isClass("A"));
-	assert (!dynFactory.isClass("B"));
-
+	assertTrue (dynFactory.isClass("A"));
+	assertTrue (!dynFactory.isClass("B"));
+	
 	try
 	{
 		std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));

@@ -35,26 +35,26 @@ void MD5EngineTest::testMD5()
 	// test vectors from RFC 1321
 
 	engine.update("");
-	assert (DigestEngine::digestToHex(engine.digest()) == "d41d8cd98f00b204e9800998ecf8427e");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "d41d8cd98f00b204e9800998ecf8427e");
 
 	engine.update("a");
-	assert (DigestEngine::digestToHex(engine.digest()) == "0cc175b9c0f1b6a831c399e269772661");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "0cc175b9c0f1b6a831c399e269772661");
 
 	engine.update("abc");
-	assert (DigestEngine::digestToHex(engine.digest()) == "900150983cd24fb0d6963f7d28e17f72");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "900150983cd24fb0d6963f7d28e17f72");
 
 	engine.update("message digest");
-	assert (DigestEngine::digestToHex(engine.digest()) == "f96b697d7cb7938d525a2f31aaf161d0");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "f96b697d7cb7938d525a2f31aaf161d0");
 
 	engine.update("abcdefghijklmnopqrstuvwxyz");
-	assert (DigestEngine::digestToHex(engine.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
 
 	engine.update("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	engine.update("abcdefghijklmnopqrstuvwxyz0123456789");
-	assert (DigestEngine::digestToHex(engine.digest()) == "d174ab98d277d9f5a5611c2c9f419d9f");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "d174ab98d277d9f5a5611c2c9f419d9f");
 
 	engine.update("12345678901234567890123456789012345678901234567890123456789012345678901234567890");
-	assert (DigestEngine::digestToHex(engine.digest()) == "57edf4a22be3c955ac49da2e2107b67a");
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "57edf4a22be3c955ac49da2e2107b67a");
 }
 
 
@@ -64,8 +64,8 @@ void MD5EngineTest::testConstantTimeEquals()
 	DigestEngine::Digest d2 = DigestEngine::digestFromHex("d41d8cd98f00b204e9800998ecf8427e");
 	DigestEngine::Digest d3 = DigestEngine::digestFromHex("0cc175b9c0f1b6a831c399e269772661");
 
-	assert (DigestEngine::constantTimeEquals(d1, d2));
-	assert (!DigestEngine::constantTimeEquals(d1, d3));
+	assertTrue (DigestEngine::constantTimeEquals(d1, d2));
+	assertTrue (!DigestEngine::constantTimeEquals(d1, d3));
 }
 
 

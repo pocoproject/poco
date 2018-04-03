@@ -81,21 +81,21 @@ void LoggingFactoryTest::testBuiltins()
 
 	Channel::Ptr pConsoleChannel = fact.createChannel("ConsoleChannel");
 #if defined(_WIN32) && !defined(_WIN32_WCE)
-	assert (!pConsoleChannel.cast<Poco::WindowsConsoleChannel>().isNull());
+	assertTrue (!pConsoleChannel.cast<Poco::WindowsConsoleChannel>().isNull());
 #else
-	assert (!pConsoleChannel.cast<ConsoleChannel>().isNull());
+	assertTrue (!pConsoleChannel.cast<ConsoleChannel>().isNull());
 #endif
 
 #ifndef POCO_NO_FILECHANNEL
 	Channel::Ptr pFileChannel = fact.createChannel("FileChannel");
-	assert (!pFileChannel.cast<FileChannel>().isNull());
+	assertTrue (!pFileChannel.cast<FileChannel>().isNull());
 
 	Channel::Ptr pSimpleFileChannel = fact.createChannel("SimpleFileChannel");
-	assert(!pSimpleFileChannel.cast<SimpleFileChannel>().isNull());
+	assertTrue(!pSimpleFileChannel.cast<SimpleFileChannel>().isNull());
 #endif
 
 	Channel::Ptr pSplitterChannel = fact.createChannel("SplitterChannel");
-	assert (!pSplitterChannel.cast<SplitterChannel>().isNull());
+	assertTrue (!pSplitterChannel.cast<SplitterChannel>().isNull());
 
 	try
 	{
@@ -107,7 +107,7 @@ void LoggingFactoryTest::testBuiltins()
 	}
 
 	Formatter::Ptr pPatternFormatter = fact.createFormatter("PatternFormatter");
-	assert (!pPatternFormatter.isNull());
+	assertTrue (!pPatternFormatter.isNull());
 
 	try
 	{
@@ -128,10 +128,10 @@ void LoggingFactoryTest::testCustom()
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 
 	Channel::Ptr pCustomChannel = fact->createChannel("CustomChannel");
-	assert (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
+	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
 
 	Formatter::Ptr pCustomFormatter = fact->createFormatter("CustomFormatter");
-	assert (!pCustomFormatter.isNull());
+	assertTrue (!pCustomFormatter.isNull());
 }
 
 

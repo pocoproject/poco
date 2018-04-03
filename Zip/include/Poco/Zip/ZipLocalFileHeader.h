@@ -308,7 +308,7 @@ inline std::streamoff ZipLocalFileHeader::getStartPos() const
 inline void ZipLocalFileHeader::setStartPos(std::streamoff start)
 {
 	_startPos = start;
-	_endPos = start + getHeaderSize()+getCompressedSize();
+	_endPos = start + getHeaderSize()+static_cast<std::streamoff>(getCompressedSize());
 }
 
 
@@ -464,7 +464,7 @@ inline bool ZipLocalFileHeader::isFile() const
 inline bool ZipLocalFileHeader::isDirectory() const
 {
 	poco_assert_dbg(!_fileName.empty());
-	return getUncompressedSize() == 0 && getCompressionMethod() == ZipCommon::CM_STORE && _fileName[_fileName.length()-1] == '/';
+	return getUncompressedSize() == 0 && _fileName[_fileName.length()-1] == '/';
 }
 
 
@@ -494,7 +494,7 @@ inline std::streamoff ZipLocalFileHeader::getDataStartPos() const
 
 inline std::streamoff ZipLocalFileHeader::getDataEndPos() const
 {
-	return getDataStartPos()+getCompressedSize();
+	return getDataStartPos()+static_cast<std::streamoff>(getCompressedSize());
 }
 
 

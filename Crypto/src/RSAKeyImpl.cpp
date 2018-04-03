@@ -55,7 +55,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 
 
 RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
-	KeyPairImpl("ec", KT_EC_IMPL),
+	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(0)
 {
 	EVPPKey key = cont.getKey();

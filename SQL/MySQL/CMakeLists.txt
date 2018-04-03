@@ -11,7 +11,7 @@ POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
 add_definitions(-DTHREADSAFE -DNO_TCL)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${MYSQL_SRCS} )
+add_library( "${LIBNAME}" ${MYSQL_SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -32,6 +32,6 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)
 endif ()

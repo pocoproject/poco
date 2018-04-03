@@ -46,27 +46,27 @@ private:
 		T wtext, wtext2, wtext3;
 		Poco::UnicodeConverter::convert(text, wtext);
 		if (sizeof(typename T::value_type) == 2)
-			assert(Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 8);
+			assertTrue (Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 8);
 		else if (sizeof(typename T::value_type) == 4)
-			assert(Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 5);
+			assertTrue (Poco::UnicodeConverter::UTFStrlen(wtext.data()) == 5);
 		Poco::UnicodeConverter::convert((const char*) supp, strlen((const char*) supp), wtext2);
 		Poco::UnicodeConverter::convert((const char*)supp, wtext3);
-		assert(wtext == wtext2);
-		assert(wtext == wtext3);
+		assertTrue (wtext == wtext2);
+		assertTrue (wtext == wtext3);
 
 		std::string text2, text3, text4;
-		assert (text != text2);
-		assert (text != text3);
-		assert (text != text4);
+		assertTrue (text != text2);
+		assertTrue (text != text3);
+		assertTrue (text != text4);
 
 		// Convert from wide to UTF-8
 		Poco::UnicodeConverter::convert(wtext, text2);
 		Poco::UnicodeConverter::convert(wtext2, text3);
 		Poco::UnicodeConverter::convert(wtext3, text4);
 
-		assert (text == text2);
-		assert (text == text3);
-		assert (text == text4);
+		assertTrue (text == text2);
+		assertTrue (text == text3);
+		assertTrue (text == text4);
 	}
 };
 

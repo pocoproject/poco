@@ -86,28 +86,28 @@ void LoggingConfiguratorTest::testConfigurator()
 	configurator.configure(pConfig);
 
 	Logger& root = Logger::get("");
-	assert (root.getLevel() == Message::PRIO_WARNING);
+	assertTrue (root.getLevel() == Message::PRIO_WARNING);
 	FormattingChannel::Ptr pFC = root.getChannel().cast<FormattingChannel>();
 	assertNotNull (pFC);
 #if defined(_WIN32) && !defined(_WIN32_WCE)
-	assert (!pFC->getChannel().cast<Poco::WindowsConsoleChannel>().isNull());
+	assertTrue (!pFC->getChannel().cast<Poco::WindowsConsoleChannel>().isNull());
 #else
-	assert (!pFC->getChannel().cast<Poco::ConsoleChannel>().isNull());
+	assertTrue (!pFC->getChannel().cast<Poco::ConsoleChannel>().isNull());
 #endif
-	assert (!pFC->getFormatter().cast<Poco::PatternFormatter>().isNull());
-	assert ((pFC->getFormatter().cast<PatternFormatter>())->getProperty("pattern") == "%s-[%p] %t");
+	assertTrue (!pFC->getFormatter().cast<Poco::PatternFormatter>().isNull());
+	assertTrue ((pFC->getFormatter().cast<PatternFormatter>())->getProperty("pattern") == "%s-[%p] %t");
 
 	Logger& logger1 = Logger::get("logger1");
-	assert (logger1.getLevel() == Message::PRIO_INFORMATION);
+	assertTrue (logger1.getLevel() == Message::PRIO_INFORMATION);
 	pFC = logger1.getChannel().cast<FormattingChannel>();
-	assert (!pFC.isNull());
-	assert (!pFC->getChannel().cast<FileChannel>().isNull());
-	assert (!pFC->getFormatter().cast<PatternFormatter>().isNull());
-	assert (pFC->getFormatter().cast<PatternFormatter>()->getProperty("pattern") == "%s: [%p] %t");
+	assertTrue (!pFC.isNull());
+	assertTrue (!pFC->getChannel().cast<FileChannel>().isNull());
+	assertTrue (!pFC->getFormatter().cast<PatternFormatter>().isNull());
+	assertTrue (pFC->getFormatter().cast<PatternFormatter>()->getProperty("pattern") == "%s: [%p] %t");
 
 	Logger& logger2 = Logger::get("logger2");
-	assert (logger2.getLevel() == Message::PRIO_DEBUG);
-	assert (!logger2.getChannel().cast<SplitterChannel>().isNull());
+	assertTrue (logger2.getLevel() == Message::PRIO_DEBUG);
+	assertTrue (!logger2.getChannel().cast<SplitterChannel>().isNull());
 }
 
 

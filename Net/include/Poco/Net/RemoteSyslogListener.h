@@ -50,6 +50,7 @@ class Net_API RemoteSyslogListener: public Poco::SplitterChannel
 	///   - addr: IP address of the host/interface sending the message.
 	///   - host: host name; only for "new" syslog messages.
 	///   - app:  application name; only for "new" syslog messages.
+	///   - structured-data: RFC 5424 structured data, or empty if not present.
 {
 public:
 	RemoteSyslogListener();
@@ -98,6 +99,7 @@ public:
 
     static const std::string LOG_PROP_APP;
     static const std::string LOG_PROP_HOST;
+	static const std::string LOG_PROP_STRUCTURED_DATA;
 
 protected:
 	~RemoteSyslogListener();

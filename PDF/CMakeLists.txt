@@ -122,7 +122,7 @@ POCO_SOURCES( SRCS libpng
 #TODO: Can we put this with the below includes? PRIVAT eg.
 include_directories( "include/Poco/PDF" ) # zip src
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -143,8 +143,7 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
     add_subdirectory(samples)
     add_subdirectory(testsuite)
 endif ()
-

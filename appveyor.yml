@@ -11,11 +11,13 @@ cache:
 branches:
   except:
     - /.*ravis.*/
+    - /.*ndroid.*/
+    - /.*NDROID.*/
 
 
 skip_commits:
-  message: /.*Merge.*/
-
+  message: /.*Merge.*/, /.*ndroid.*/
+ 
 
 hosts:
   localhost: 127.0.0.1
@@ -69,11 +71,11 @@ environment:
 
   matrix:
     - builder: msbuild
-      vsver: 150
+      vsver: 140
       linkmode: shared
 
     - builder: cmake
-      vsver: 140
+      vsver: 150
 
 #    - builder: msbuild
 #      vsver: 140
@@ -99,7 +101,7 @@ matrix:
   fast_finish: true
 
 install:
-  - git submodule update --init --recursive
+  - git submodule update --init --recursive --remote
 # -------------------------------------------------------------------------------------------
 # VS2017 setup. VS2017 does not provide VS150COMNTOOLS.
 # See https://blogs.msdn.microsoft.com/vcblog/2017/03/06/finding-the-visual-c-compiler-tools-in-visual-studio-2017/
@@ -246,7 +248,6 @@ install:
 
 
 before_build:
-  - set
   - ps: |
       if ($env:builder -eq "cmake")
       {
@@ -287,6 +288,24 @@ before_build:
       }
 
 # -------------------------------------------------------------------------------------------
+# PostgreSQL
+# -------------------------------------------------------------------------------------------
+  - ps: |
+        if ($env:platform -eq "Win32")
+        {
+            $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
+        }
+        if ($env:platform -eq "x64")
+        {
+            $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
+            $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
+            $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
+        }
+# -------------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------------------
 # MySQL
 #        & C:\cygwin\bin\ls -lR $env:MYSQL32
 #        & C:\cygwin\bin\ls -lR $env:MYSQL64
@@ -319,23 +338,9 @@ before_build:
         iex "& $cmd"
 # -------------------------------------------------------------------------------------------
 
-# -------------------------------------------------------------------------------------------
-# PostgreSQL
-# -------------------------------------------------------------------------------------------
-  - ps: |
-        if ($env:platform -eq "Win32")
-        {
-            $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
-            $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
-            $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
-        }
-        if ($env:platform -eq "x64")
-        {
-            $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
-            $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
-            $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
-        }
-# -------------------------------------------------------------------------------------------
+  - set
+  - if "%platform%"=="Win32" ( dir "%MYSQL32%\include" )
+  - if "%platform%"=="x64"   ( dir "%MYSQL64%\include" )
 
 after_build:
   - ps: |
@@ -399,6 +404,8 @@ build_script:
         $logger='"C:\Progra~1\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"';
         $verbosity='minimal';
 
+        Write-Host -ForegroundColor Yellow "$env:poco_base\buildwin.cmd" " $env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild env $verbosity"
+        
         $process = Start-Process -PassThru -nnw -Wait -FilePath "$env:poco_base\buildwin.cmd" -RSO cout -RSE cerr `
         -EA Stop -Args "$env:vsver build $env:linkmode $env:configuration $env:platform samples tests msbuild env $verbosity $logger";
         gc cout; gc cerr;
@@ -427,13 +434,13 @@ build_script:
         $defs = "--config RelWithDebInfo"
         $defs+=" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
-        $defs+=" -DENABLE_PDF=OFF";
-        $defs+=" -DENABLE_NETSSL=ON";
-        $defs+=" -DENABLE_NETSSL_WIN=ON";
-        $defs+=" -DENABLE_SQL_MYSQL=OFF";
-        $defs+=" -DENABLE_REDIS=OFF";
-        $defs+=" -DENABLE_SAMPLES=ON";
-        $defs+=" -DENABLE_TESTS=ON";
+        $defs+=" -DPOCO_ENABLE_PDF=OFF";
+        $defs+=" -DPOCO_ENABLE_NETSSL=ON";
+        $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
+        $defs+=" -DPOCO_ENABLE_SQL_MYSQL=OFF";
+        $defs+=" -DPOCO_ENABLE_REDIS=OFF";
+        $defs+=" -DPOCO_ENABLE_SAMPLES=ON";
+        $defs+=" -DPOCO_ENABLE_TESTS=ON";
         $defs+=" ..";
         Write-Host -ForegroundColor Yellow cmake $defs
         $process = Start-Process -PassThru -nnw -Wait -FilePath "cmake" -RSO cout -RSE cerr -Args $defs;
@@ -455,7 +462,8 @@ before_test:
 - ps: |
       $line='-------------------------------------------------------------------------------------';
       $CPPUNIT_IGNORE='';
-      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+      $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class GlobTest>.testGlob';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
       $CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
@@ -499,12 +507,12 @@ test_script:
           if ($env:platform -eq "Win32")
           {
             $env:PATH = "$env:POCO_BASE\bin;" + $env:PATH;$suffix = '';
-            $excluded   = @('SQL', 'SQL/ODBC', 'Redis', 'PDF')
+            $excluded   = @('Redis', 'PDF')
           }
           if ($env:platform -eq "x64")
           {
             $env:PATH = "$env:POCO_BASE\bin64;" + $env:PATH;$suffix = 64;
-            $excluded   = @('SQL', 'SQL/ODBC', 'Redis', 'PDF')
+            $excluded   = @('Redis', 'PDF')
           }
 
           Write-Host -ForegroundColor Yellow '>>> current directory is '  $(get-location).Path;

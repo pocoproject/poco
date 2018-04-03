@@ -33,18 +33,18 @@ void NameTest::testSplit()
 	std::string prefix;
 	std::string local;
 	Name::split(qname, prefix, local);
-	assert (prefix.empty());
-	assert (local == "name");
+	assertTrue (prefix.empty());
+	assertTrue (local == "name");
 	
 	qname = "p:l";
 	Name::split(qname, prefix, local);
-	assert (prefix == "p");
-	assert (local == "l");
+	assertTrue (prefix == "p");
+	assertTrue (local == "l");
 	
 	qname = "pre:local";
 	Name::split(qname, prefix, local);
-	assert (prefix == "pre");
-	assert (local == "local");
+	assertTrue (prefix == "pre");
+	assertTrue (local == "local");
 }
 
 
@@ -52,13 +52,13 @@ void NameTest::testLocalName()
 {
 	std::string qname = "name";
 	std::string local = Name::localName(qname);
-	assert (local == "name");
+	assertTrue (local == "name");
 	qname = "p:l";
 	local = Name::localName(qname);
-	assert (local == "l");
+	assertTrue (local == "l");
 	qname = "pre:local";
 	local = Name::localName(qname);
-	assert (local == "local");
+	assertTrue (local == "local");
 }
 
 
@@ -66,13 +66,13 @@ void NameTest::testPrefix()
 {
 	std::string qname = "name";
 	std::string prefix = Name::prefix(qname);
-	assert (prefix.empty());
+	assertTrue (prefix.empty());
 	qname = "p:l";
 	prefix = Name::prefix(qname);
-	assert (prefix == "p");
+	assertTrue (prefix == "p");
 	qname = "pre:local";
 	prefix = Name::prefix(qname);
-	assert (prefix == "pre");
+	assertTrue (prefix == "pre");
 }
 
 
@@ -80,29 +80,29 @@ void NameTest::testName()
 {
 	std::string qname = "name";
 	Name name(qname);
-	assert (name.qname() == "name");
-	assert (name.prefix().empty());
-	assert (name.namespaceURI().empty());
-	assert (name.localName().empty());
+	assertTrue (name.qname() == "name");
+	assertTrue (name.prefix().empty());
+	assertTrue (name.namespaceURI().empty());
+	assertTrue (name.localName().empty());
 
 	qname.clear();
 	name.assign(qname, "http://www.appinf.com/", "local");
-	assert (name.qname().empty());
-	assert (name.prefix().empty());
-	assert (name.namespaceURI() == "http://www.appinf.com/");
-	assert (name.localName() == "local");
+	assertTrue (name.qname().empty());
+	assertTrue (name.prefix().empty());
+	assertTrue (name.namespaceURI() == "http://www.appinf.com/");
+	assertTrue (name.localName() == "local");
 
 	Name name2("pre:local", "http://www.appinf.com/");
-	assert (name2.qname() == "pre:local");
-	assert (name2.prefix() == "pre");
-	assert (name2.namespaceURI() == "http://www.appinf.com/");
-	assert (name2.localName() == "local");
+	assertTrue (name2.qname() == "pre:local");
+	assertTrue (name2.prefix() == "pre");
+	assertTrue (name2.namespaceURI() == "http://www.appinf.com/");
+	assertTrue (name2.localName() == "local");
 
 	name2.assign("PRE:Local", "http://www.appinf.com/");
-	assert (name2.qname() == "PRE:Local");
-	assert (name2.prefix() == "PRE");
-	assert (name2.namespaceURI() == "http://www.appinf.com/");
-	assert (name2.localName() == "Local");
+	assertTrue (name2.qname() == "PRE:Local");
+	assertTrue (name2.prefix() == "PRE");
+	assertTrue (name2.namespaceURI() == "http://www.appinf.com/");
+	assertTrue (name2.localName() == "Local");
 }
 
 
@@ -112,23 +112,23 @@ void NameTest::testCompare()
 	Name n2(n1);
 	Name n3("pre:local2");
 	
-	assert (n1.equals(n2));
-	assert (!n1.equals(n3));
+	assertTrue (n1.equals(n2));
+	assertTrue (!n1.equals(n3));
 	
 	n1.assign("pre:local", "http://www.appinf.com", "local");
 	n2.assign("pre:local", "http://www.appinf.com", "local");
 	n3.assign("pre:local2", "http://www.appinf.com", "local2");
 	
-	assert (n1.equals(n2));
-	assert (!n1.equals(n3));
+	assertTrue (n1.equals(n2));
+	assertTrue (!n1.equals(n3));
 	
-	assert (n1.equals("pre:local", "http://www.appinf.com", "local"));
-	assert (!n1.equals("pre:local", "", ""));
-	assert (n1.equalsWeakly("pre:local", "", ""));
-	assert (!n1.equalsWeakly("pre:local2", "", ""));
-	assert (!n1.equals("", "http://www.appinf.com", "local"));
-	assert (n1.equalsWeakly("", "http://www.appinf.com", "local"));
-	assert (!n1.equalsWeakly("", "http://www.appinf.com", "local2"));
+	assertTrue (n1.equals("pre:local", "http://www.appinf.com", "local"));
+	assertTrue (!n1.equals("pre:local", "", ""));
+	assertTrue (n1.equalsWeakly("pre:local", "", ""));
+	assertTrue (!n1.equalsWeakly("pre:local2", "", ""));
+	assertTrue (!n1.equals("", "http://www.appinf.com", "local"));
+	assertTrue (n1.equalsWeakly("", "http://www.appinf.com", "local"));
+	assertTrue (!n1.equalsWeakly("", "http://www.appinf.com", "local2"));
 }
 
 
@@ -137,12 +137,12 @@ void NameTest::testSwap()
 	Name n1("ns:name1", "http://www.appinf.com");
 	Name n2("ns:name2", "http://www.foobar.com");
 	n1.swap(n2);
-	assert (n1.qname() == "ns:name2");
-	assert (n1.namespaceURI() == "http://www.foobar.com");
-	assert (n1.localName() == "name2");
-	assert (n2.qname() == "ns:name1");
-	assert (n2.namespaceURI() == "http://www.appinf.com");
-	assert (n2.localName() == "name1");
+	assertTrue (n1.qname() == "ns:name2");
+	assertTrue (n1.namespaceURI() == "http://www.foobar.com");
+	assertTrue (n1.localName() == "name2");
+	assertTrue (n2.qname() == "ns:name1");
+	assertTrue (n2.namespaceURI() == "http://www.appinf.com");
+	assertTrue (n2.localName() == "name1");
 }
 
 

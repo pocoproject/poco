@@ -38,9 +38,9 @@ LoggingRegistryTest::~LoggingRegistryTest()
 void LoggingRegistryTest::testRegister()
 {
 	LoggingRegistry& reg = LoggingRegistry::defaultRegistry();
-	
+
 	reg.clear();
-	
+
 	Channel::Ptr pC1 = new ConsoleChannel();
 	Channel::Ptr pC2 = new ConsoleChannel();
 	Formatter::Ptr pF1 = new PatternFormatter("");
@@ -51,15 +51,15 @@ void LoggingRegistryTest::testRegister()
 	reg.registerFormatter("f1", pF1);
 	reg.registerFormatter("f2", pF2);
 
-	Channel::Ptr pC = reg.channelForName("c1");
-	assert (pC1 == pC);
+	Channel* pC = reg.channelForName("c1");
+	assertTrue (pC1 == pC);
 	pC = reg.channelForName("c2");
-	assert (pC2 == pC);
+	assertTrue (pC2 == pC);
 
-	Formatter::Ptr pF = reg.formatterForName("f1");
-	assert (pF1 == pF);
+	Formatter* pF = reg.formatterForName("f1");
+	assertTrue (pF1 == pF);
 	pF = reg.formatterForName("f2");
-	assert (pF2 == pF);
+	assertTrue (pF2 == pF);
 
 	try
 	{
@@ -91,16 +91,19 @@ void LoggingRegistryTest::testReregister()
 	reg.registerFormatter("f2", pF2);
 
 	reg.registerChannel("c1", pC1b);
+
 	Channel::Ptr pC = reg.channelForName("c1");
-	assert (pC1b == pC);
+	assertTrue (pC1b == pC);
+
 	pC = reg.channelForName("c2");
-	assert (pC2 == pC);
+	assertTrue (pC2 == pC);
 
 	reg.registerFormatter("f1", pF1b);
+
 	Formatter::Ptr pF = reg.formatterForName("f1");
-	assert (pF1b == pF);
+	assertTrue (pF1b == pF);
 	pF = reg.formatterForName("f2");
-	assert (pF2 == pF);
+	assertTrue (pF2 == pF);
 }
 
 
