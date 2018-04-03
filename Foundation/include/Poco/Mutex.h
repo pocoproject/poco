@@ -22,6 +22,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 #include "Poco/ScopedLock.h"
+#include <atomic>
+
 
 #if (POCO_OS == POCO_OS_CYGWIN || POCO_OS == POCO_OS_ANDROID)
 #include "Poco/Mutex_POSIX.h"

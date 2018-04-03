@@ -72,7 +72,7 @@ protected:
 	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
 
 	// ContentHandler
-	void setDocumentLocator(const Locator::Ptr loc);
+	void setDocumentLocator(Locator::Ptr loc);
 	void startDocument();
 	void endDocument();
 	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes);

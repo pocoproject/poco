@@ -514,7 +514,7 @@ inline void RefCountedObjectImpl<RefCounter>::release() const throw()
 template <>
 inline int RefCountedObjectImpl<RefCounter>::referenceCount() const
 {
-	T* pCounter = _counter.load();
+	RefCounter* pCounter = _counter.load();
 	poco_assert_dbg (pCounter != 0);
 	return pCounter ? pCounter->count() : 0;
 }
