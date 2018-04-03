@@ -381,6 +381,14 @@ class RefCountedObjectImpl
 	///      ever be called; since this means that counter was never notified
 	///      of the reference count change, it follows that it is the
 	///      responsibility of the [W]RCO to delete the counter
+	///
+	///    - reference counting is thread-safe; reference counted objects,
+	///      as well as smart pointers "wrapping" them, however, are not
+	///      thread-safe; access to null counter pointer means there is a
+	///      bug somewhere in user application (there is a debug build
+	///      check for such circumstances, but no non-debug checks,
+	///      so - thread carefully!)
+	///
 {
 public:
 	typedef typename std::atomic<T*> CounterType;
@@ -403,8 +411,8 @@ public:
 		poco_rcdc_log(1);
 		if(_counter.load()->release() == 0)
 		{
-			// disarm _counter delete in destructor
-			// (_counter has deleted itself)
+			// _counter has deleted itself, disarm
+			// the delete in `this` destructor
 			_counter.store(0);
 			delete this;
 		}
