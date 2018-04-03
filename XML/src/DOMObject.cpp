@@ -19,11 +19,11 @@ namespace Poco {
 namespace XML {
 
 
-DOMObject::DOMObject(): _rc(1)
+DOMObject::DOMObject()
 {
 }
 
-	
+
 DOMObject::~DOMObject()
 {
 }

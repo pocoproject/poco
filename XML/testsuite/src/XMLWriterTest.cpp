@@ -34,11 +34,11 @@ XMLWriterTest::~XMLWriterTest()
 void XMLWriterTest::testTrivial()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<foo/>");
 }
@@ -47,11 +47,11 @@ void XMLWriterTest::testTrivial()
 void XMLWriterTest::testTrivialCanonical()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
-	writer.startDocument();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::CANONICAL_XML);
+	writer->startDocument();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<foo></foo>");
 }
@@ -60,11 +60,11 @@ void XMLWriterTest::testTrivialCanonical()
 void XMLWriterTest::testTrivialDecl()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION);
-	writer.startDocument();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION);
+	writer->startDocument();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo/>");
 }
@@ -73,12 +73,12 @@ void XMLWriterTest::testTrivialDecl()
 void XMLWriterTest::testTrivialDeclPretty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo/>\n");
 }
@@ -87,11 +87,11 @@ void XMLWriterTest::testTrivialDeclPretty()
 void XMLWriterTest::testTrivialFragment()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startFragment();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endFragment();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startFragment();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endFragment();
 	std::string xml = str.str();
 	assertTrue (xml == "<foo/>");
 }
@@ -100,12 +100,12 @@ void XMLWriterTest::testTrivialFragment()
 void XMLWriterTest::testTrivialFragmentPretty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startFragment();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endFragment();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startFragment();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endFragment();
 	std::string xml = str.str();
 	assertTrue (xml == "<foo/>\n");
 }
@@ -114,14 +114,14 @@ void XMLWriterTest::testTrivialFragmentPretty()
 void XMLWriterTest::testDTDPretty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startDTD("test", "", "http://www.appinf.com/DTDs/test");
-	writer.endDTD();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startDTD("test", "", "http://www.appinf.com/DTDs/test");
+	writer->endDTD();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	               "<!DOCTYPE test SYSTEM \"http://www.appinf.com/DTDs/test\">\n"
@@ -132,14 +132,14 @@ void XMLWriterTest::testDTDPretty()
 void XMLWriterTest::testDTD()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startDTD("test", "", "http://www.appinf.com/DTDs/test");
-	writer.endDTD();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startDTD("test", "", "http://www.appinf.com/DTDs/test");
+	writer->endDTD();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 	               "<!DOCTYPE test SYSTEM \"http://www.appinf.com/DTDs/test\">"
@@ -150,14 +150,14 @@ void XMLWriterTest::testDTD()
 void XMLWriterTest::testDTDPublic()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startDTD("test", "test", "http://www.appinf.com/DTDs/test");
-	writer.endDTD();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startDTD("test", "test", "http://www.appinf.com/DTDs/test");
+	writer->endDTD();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 	               "<!DOCTYPE test PUBLIC \"test\" \"http://www.appinf.com/DTDs/test\">"
@@ -168,18 +168,18 @@ void XMLWriterTest::testDTDPublic()
 void XMLWriterTest::testDTDNotation()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startDTD("test", "", "");
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startDTD("test", "", "");
 	std::string systemId("quicktime");
-	writer.notationDecl("mov", 0, &systemId);
+	writer->notationDecl("mov", 0, &systemId);
 	std::string publicId("-//W3C//NOTATION XML 1.0//EN");
-	writer.notationDecl("xml", &publicId, 0);
-	writer.endDTD();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	writer->notationDecl("xml", &publicId, 0);
+	writer->endDTD();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	               "<!DOCTYPE test [\n"
@@ -193,18 +193,18 @@ void XMLWriterTest::testDTDNotation()
 void XMLWriterTest::testDTDEntity()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startDTD("test", "", "");
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::WRITE_XML_DECLARATION | XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startDTD("test", "", "");
 	std::string systemId("quicktime");
-	writer.notationDecl("mov", 0, &systemId);
+	writer->notationDecl("mov", 0, &systemId);
 	std::string publicId("-//W3C//NOTATION XML 1.0//EN");
-	writer.unparsedEntityDecl("movie", 0, "movie.mov", "mov");
-	writer.endDTD();
-	writer.startElement("", "", "foo");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	writer->unparsedEntityDecl("movie", 0, "movie.mov", "mov");
+	writer->endDTD();
+	writer->startElement("", "", "foo");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	               "<!DOCTYPE test [\n"
@@ -218,14 +218,14 @@ void XMLWriterTest::testDTDEntity()
 void XMLWriterTest::testAttributes()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
 	AttributesImpl attrs;
 	attrs.addAttribute("", "", "a1", "CDATA", "v1");
 	attrs.addAttribute("", "", "a2", "CDATA", "v2");
-	writer.startElement("", "", "el", attrs);
-	writer.endElement("", "", "el");
-	writer.endDocument();
+	writer->startElement("", "", "el", attrs);
+	writer->endElement("", "", "el");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<el a1=\"v1\" a2=\"v2\"/>");
 }
@@ -234,15 +234,15 @@ void XMLWriterTest::testAttributes()
 void XMLWriterTest::testAttributesPretty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::PRETTY_PRINT | XMLWriter::PRETTY_PRINT_ATTRIBUTES);
-	writer.setNewLine(XMLWriter::NEWLINE_LF);
-	writer.startDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::PRETTY_PRINT | XMLWriter::PRETTY_PRINT_ATTRIBUTES);
+	writer->setNewLine(XMLWriter::NEWLINE_LF);
+	writer->startDocument();
 	AttributesImpl attrs;
 	attrs.addAttribute("", "", "a1", "CDATA", "v1");
 	attrs.addAttribute("", "", "a2", "CDATA", "v2");
-	writer.startElement("", "", "el", attrs);
-	writer.endElement("", "", "el");
-	writer.endDocument();
+	writer->startElement("", "", "el", attrs);
+	writer->endElement("", "", "el");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<el\n\ta1=\"v1\"\n\ta2=\"v2\"/>\n");
 }
@@ -251,10 +251,10 @@ void XMLWriterTest::testAttributesPretty()
 void XMLWriterTest::testData()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.dataElement("", "", "d", "data", "a1", "v1", "a2", "v2", "a3", "v3");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->dataElement("", "", "d", "data", "a1", "v1", "a2", "v2", "a3", "v3");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<d a1=\"v1\" a2=\"v2\" a3=\"v3\">data</d>");
 }
@@ -263,10 +263,10 @@ void XMLWriterTest::testData()
 void XMLWriterTest::testEmptyData()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.dataElement("", "", "d", "", "a1", "v1", "a2", "v2", "a3", "v3");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->dataElement("", "", "d", "", "a1", "v1", "a2", "v2", "a3", "v3");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<d a1=\"v1\" a2=\"v2\" a3=\"v3\"/>");
 }
@@ -275,13 +275,13 @@ void XMLWriterTest::testEmptyData()
 void XMLWriterTest::testDataPretty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startElement("", "", "r");
-	writer.dataElement("", "", "d", "data", "a1", "v1", "a2", "v2", "a3", "v3");
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startElement("", "", "r");
+	writer->dataElement("", "", "d", "data", "a1", "v1", "a2", "v2", "a3", "v3");
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r>\n\t<d a1=\"v1\" a2=\"v2\" a3=\"v3\">data</d>\n</r>\n");
 }
@@ -290,13 +290,13 @@ void XMLWriterTest::testDataPretty()
 void XMLWriterTest::testEmptyDataPretty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.startElement("", "", "r");
-	writer.dataElement("", "", "d", "", "a1", "v1", "a2", "v2", "a3", "v3");
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->startElement("", "", "r");
+	writer->dataElement("", "", "d", "", "a1", "v1", "a2", "v2", "a3", "v3");
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r>\n\t<d a1=\"v1\" a2=\"v2\" a3=\"v3\"/>\n</r>\n");
 }
@@ -305,15 +305,15 @@ void XMLWriterTest::testEmptyDataPretty()
 void XMLWriterTest::testComment()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.comment("a comment", 0, 9);
-	writer.startElement("", "", "r");
-	writer.comment("<another comment>", 0, 17);
-	writer.dataElement("", "", "d", "data");
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->comment("a comment", 0, 9);
+	writer->startElement("", "", "r");
+	writer->comment("<another comment>", 0, 17);
+	writer->dataElement("", "", "d", "data");
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<!--a comment-->\n<r>\n\t<!--<another comment>-->\n\t<d>data</d>\n</r>\n");
 }
@@ -322,15 +322,15 @@ void XMLWriterTest::testComment()
 void XMLWriterTest::testPI()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::PRETTY_PRINT);
-	writer.setNewLine("\n");
-	writer.startDocument();
-	writer.processingInstruction("target", "a processing instruction");
-	writer.startElement("", "", "r");
-	writer.processingInstruction("target", "another processing instruction");
-	writer.dataElement("", "", "d", "data");
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::PRETTY_PRINT);
+	writer->setNewLine("\n");
+	writer->startDocument();
+	writer->processingInstruction("target", "a processing instruction");
+	writer->startElement("", "", "r");
+	writer->processingInstruction("target", "another processing instruction");
+	writer->dataElement("", "", "d", "data");
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<?target a processing instruction?>\n<r>\n\t<?target another processing instruction?>\n\t<d>data</d>\n</r>\n");
 }
@@ -339,12 +339,12 @@ void XMLWriterTest::testPI()
 void XMLWriterTest::testCharacters()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "r");
-	writer.characters("some \"chars\" that <must> be & escaped");
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "r");
+	writer->characters("some \"chars\" that <must> be & escaped");
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r>some &quot;chars&quot; that &lt;must&gt; be &amp; escaped</r>");
 }
@@ -353,12 +353,12 @@ void XMLWriterTest::testCharacters()
 void XMLWriterTest::testEmptyCharacters()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "r");
-	writer.characters("");
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "r");
+	writer->characters("");
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r/>");
 }
@@ -367,14 +367,14 @@ void XMLWriterTest::testEmptyCharacters()
 void XMLWriterTest::testCDATA()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "r");
-	writer.startCDATA();
-	writer.characters("some \"chars\" that <must> be & escaped");
-	writer.endCDATA();
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "r");
+	writer->startCDATA();
+	writer->characters("some \"chars\" that <must> be & escaped");
+	writer->endCDATA();
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r><![CDATA[some \"chars\" that <must> be & escaped]]></r>");
 }
@@ -383,14 +383,14 @@ void XMLWriterTest::testCDATA()
 void XMLWriterTest::testRawCharacters()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "r");
-	writer.startCDATA();
-	writer.rawCharacters("some \"chars\" that <must> be & escaped");
-	writer.endCDATA();
-	writer.endElement("", "", "r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "r");
+	writer->startCDATA();
+	writer->rawCharacters("some \"chars\" that <must> be & escaped");
+	writer->endCDATA();
+	writer->endElement("", "", "r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r><![CDATA[some \"chars\" that <must> be & escaped]]></r>");
 }
@@ -399,14 +399,14 @@ void XMLWriterTest::testRawCharacters()
 void XMLWriterTest::testAttributeCharacters()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
 	AttributesImpl attrs;
 	attrs.addAttribute("", "", "a1", "CDATA", "a b c\n\td");
 	attrs.addAttribute("", "", "a2", "CDATA", "a b c\r\nd");
-	writer.startElement("", "", "el", attrs);
-	writer.endElement("", "", "el");
-	writer.endDocument();
+	writer->startElement("", "", "el", attrs);
+	writer->endElement("", "", "el");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<el a1=\"a b c&#xA;&#x9;d\" a2=\"a b c&#xD;&#xA;d\"/>");
 }
@@ -415,14 +415,14 @@ void XMLWriterTest::testAttributeCharacters()
 void XMLWriterTest::testDefaultNamespace()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startPrefixMapping("", "urn:ns");
-	writer.startElement("", "", "r");
-	writer.characters("data");
-	writer.endElement("", "", "r");
-	writer.endPrefixMapping("");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startPrefixMapping("", "urn:ns");
+	writer->startElement("", "", "r");
+	writer->characters("data");
+	writer->endElement("", "", "r");
+	writer->endPrefixMapping("");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r xmlns=\"urn:ns\">data</r>");
 }
@@ -431,12 +431,12 @@ void XMLWriterTest::testDefaultNamespace()
 void XMLWriterTest::testQNamespaces()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("urn:ns", "r", "p:r");
-	writer.characters("data");
-	writer.endElement("urn:ns", "r", "p:r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("urn:ns", "r", "p:r");
+	writer->characters("data");
+	writer->endElement("urn:ns", "r", "p:r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<p:r xmlns:p=\"urn:ns\">data</p:r>");
 }
@@ -445,13 +445,13 @@ void XMLWriterTest::testQNamespaces()
 void XMLWriterTest::testQNamespacesNested()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("urn:ns", "r", "p:r");
-	writer.startElement("urn:ns", "e", "p:e");
-	writer.endElement("urn:ns", "e", "p:e");
-	writer.endElement("urn:ns", "r", "p:r");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("urn:ns", "r", "p:r");
+	writer->startElement("urn:ns", "e", "p:e");
+	writer->endElement("urn:ns", "e", "p:e");
+	writer->endElement("urn:ns", "r", "p:r");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<p:r xmlns:p=\"urn:ns\"><p:e/></p:r>");
 }
@@ -460,12 +460,12 @@ void XMLWriterTest::testQNamespacesNested()
 void XMLWriterTest::testNamespaces()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("urn:ns", "r", "");
-	writer.characters("data");
-	writer.endElement("urn:ns", "r", "");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("urn:ns", "r", "");
+	writer->characters("data");
+	writer->endElement("urn:ns", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<ns1:r xmlns:ns1=\"urn:ns\">data</ns1:r>");
 }
@@ -474,12 +474,12 @@ void XMLWriterTest::testNamespaces()
 void XMLWriterTest::testNamespacesCanonical()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
-	writer.startDocument();
-	writer.startElement("urn:ns", "r", "");
-	writer.characters("data");
-	writer.endElement("urn:ns", "r", "");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::CANONICAL_XML);
+	writer->startDocument();
+	writer->startElement("urn:ns", "r", "");
+	writer->characters("data");
+	writer->endElement("urn:ns", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r xmlns=\"urn:ns\">data</r>");
 }
@@ -488,15 +488,15 @@ void XMLWriterTest::testNamespacesCanonical()
 void XMLWriterTest::testAttributeNamespaces()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
 	Poco::XML::AttributesImpl attrs;
 	attrs.addAttribute("urn:other", "myattr", "", "", "attrValue");
 	attrs.addAttribute("urn:ns", "myattr2", "", "", "attrValue2");
-	writer.startDocument();
-	writer.startElement("urn:ns", "r", "", attrs);
-	writer.characters("data");
-	writer.endElement("urn:ns", "r", "");
-	writer.endDocument();
+	writer->startDocument();
+	writer->startElement("urn:ns", "r", "", attrs);
+	writer->characters("data");
+	writer->endElement("urn:ns", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<ns2:r ns1:myattr=\"attrValue\" ns2:myattr2=\"attrValue2\" xmlns:ns1=\"urn:other\" xmlns:ns2=\"urn:ns\">data</ns2:r>");
 }
@@ -505,15 +505,15 @@ void XMLWriterTest::testAttributeNamespaces()
 void XMLWriterTest::testAttributeNamespacesCanonical()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::CANONICAL_XML);
 	Poco::XML::AttributesImpl attrs;
 	attrs.addAttribute("urn:other", "myattr", "", "", "attrValue");
 	attrs.addAttribute("urn:ns", "myattr2", "", "", "attrValue2");
-	writer.startDocument();
-	writer.startElement("urn:ns", "r", "", attrs);
-	writer.characters("data");
-	writer.endElement("urn:ns", "r", "");
-	writer.endDocument();
+	writer->startDocument();
+	writer->startElement("urn:ns", "r", "", attrs);
+	writer->characters("data");
+	writer->endElement("urn:ns", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r xmlns=\"urn:ns\" xmlns:ns1=\"urn:other\" myattr2=\"attrValue2\" ns1:myattr=\"attrValue\">data</r>");
 }
@@ -522,15 +522,15 @@ void XMLWriterTest::testAttributeNamespacesCanonical()
 void XMLWriterTest::testNamespacesNested()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("urn:ns1", "r", "");
-	writer.startElement("urn:ns1", "e", "");
-	writer.endElement("urn:ns1", "e", "");
-	writer.startElement("urn:ns2", "f", "");
-	writer.endElement("urn:ns2", "f", "");
-	writer.endElement("urn:ns1", "r", "");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("urn:ns1", "r", "");
+	writer->startElement("urn:ns1", "e", "");
+	writer->endElement("urn:ns1", "e", "");
+	writer->startElement("urn:ns2", "f", "");
+	writer->endElement("urn:ns2", "f", "");
+	writer->endElement("urn:ns1", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<ns1:r xmlns:ns1=\"urn:ns1\"><ns1:e/><ns2:f xmlns:ns2=\"urn:ns2\"/></ns1:r>");
 }
@@ -539,17 +539,17 @@ void XMLWriterTest::testNamespacesNested()
 void XMLWriterTest::testNamespacesNestedCanonical()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, XMLWriter::CANONICAL_XML);
-	writer.startDocument();
-	writer.startElement("urn:ns1", "r", "");
-	writer.startElement("urn:ns1", "e", "");
-	writer.endElement("urn:ns1", "e", "");
+	XMLWriter::Ptr writer = new XMLWriter(str, XMLWriter::CANONICAL_XML);
+	writer->startDocument();
+	writer->startElement("urn:ns1", "r", "");
+	writer->startElement("urn:ns1", "e", "");
+	writer->endElement("urn:ns1", "e", "");
 	Poco::XML::AttributesImpl attrs;
 	attrs.addAttribute("urn:ns1", "myattr", "myattr", "", "attrValue");
-	writer.startElement("urn:ns2", "f", "", attrs);
-	writer.endElement("urn:ns2", "f", "");
-	writer.endElement("urn:ns1", "r", "");
-	writer.endDocument();
+	writer->startElement("urn:ns2", "f", "", attrs);
+	writer->endElement("urn:ns2", "f", "");
+	writer->endElement("urn:ns1", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r xmlns=\"urn:ns1\"><e></e><ns1:f xmlns:ns1=\"urn:ns2\" myattr=\"attrValue\"></ns1:f></r>");
 }
@@ -558,20 +558,20 @@ void XMLWriterTest::testNamespacesNestedCanonical()
 void XMLWriterTest::testExplicitNamespaces()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startPrefixMapping("p1", "urn:ns1");
-	writer.startPrefixMapping("p2", "urn:ns2");
-	writer.startElement("urn:ns1", "r", "");
-	writer.startElement("urn:ns2", "e", "");
-	writer.endElement("urn:ns2", "e", "");
-	writer.startPrefixMapping("p3", "urn:ns3");
-	writer.startElement("urn:ns2", "e", "");
-	writer.startElement("urn:ns3", "f", "");
-	writer.endElement("urn:ns3", "f", "");
-	writer.endElement("urn:ns2", "e", "");
-	writer.endElement("urn:ns1", "r", "");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startPrefixMapping("p1", "urn:ns1");
+	writer->startPrefixMapping("p2", "urn:ns2");
+	writer->startElement("urn:ns1", "r", "");
+	writer->startElement("urn:ns2", "e", "");
+	writer->endElement("urn:ns2", "e", "");
+	writer->startPrefixMapping("p3", "urn:ns3");
+	writer->startElement("urn:ns2", "e", "");
+	writer->startElement("urn:ns3", "f", "");
+	writer->endElement("urn:ns3", "f", "");
+	writer->endElement("urn:ns2", "e", "");
+	writer->endElement("urn:ns1", "r", "");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<p1:r xmlns:p1=\"urn:ns1\" xmlns:p2=\"urn:ns2\"><p2:e/><p2:e xmlns:p3=\"urn:ns3\"><p3:f/></p2:e></p1:r>");
 }
@@ -580,12 +580,12 @@ void XMLWriterTest::testExplicitNamespaces()
 void XMLWriterTest::testWellformed()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "foo");
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "foo");
 	try
 	{
-		writer.endElement("", "", "bar");
+		writer->endElement("", "", "bar");
 		fail("not wellformed - must throw exception");
 	}
 	catch (Poco::Exception&)
@@ -597,13 +597,13 @@ void XMLWriterTest::testWellformed()
 void XMLWriterTest::testWellformedNested()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "foo");
-	writer.startElement("", "", "bar");
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "foo");
+	writer->startElement("", "", "bar");
 	try
 	{
-		writer.endElement("", "", "foo");
+		writer->endElement("", "", "foo");
 		fail("not wellformed - must throw exception");
 	}
 	catch (Poco::Exception&)
@@ -615,13 +615,13 @@ void XMLWriterTest::testWellformedNested()
 void XMLWriterTest::testWellformedNamespace()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("urn:ns1", "foo", "");
-	writer.startElement("urn:ns2", "bar", "");
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("urn:ns1", "foo", "");
+	writer->startElement("urn:ns2", "bar", "");
 	try
 	{
-		writer.endElement("urn:ns1", "bar", "");
+		writer->endElement("urn:ns1", "bar", "");
 		fail("not wellformed - must throw exception");
 	}
 	catch (Poco::Exception&)
@@ -633,14 +633,14 @@ void XMLWriterTest::testWellformedNamespace()
 void XMLWriterTest::testEmpty()
 {
 	std::ostringstream str;
-	XMLWriter writer(str, 0);
-	writer.startDocument();
-	writer.startElement("", "", "foo");
-	writer.startElement("", "", "bar");
-	writer.emptyElement("", "", "empty");
-	writer.endElement("", "", "bar");
-	writer.endElement("", "", "foo");
-	writer.endDocument();
+	XMLWriter::Ptr writer = new XMLWriter(str, 0);
+	writer->startDocument();
+	writer->startElement("", "", "foo");
+	writer->startElement("", "", "bar");
+	writer->emptyElement("", "", "empty");
+	writer->endElement("", "", "bar");
+	writer->endElement("", "", "foo");
+	writer->endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<foo><bar><empty/></bar></foo>");
 }

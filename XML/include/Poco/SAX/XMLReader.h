@@ -20,6 +20,8 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/DOM/RefCountedObject.h"
+#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -27,6 +29,7 @@ namespace XML {
 
 
 class EntityResolver;
+class SAXHandler;
 class DTDHandler;
 class ContentHandler;
 class ErrorHandler;
@@ -35,7 +38,7 @@ class LexicalHandler;
 class NamespaceHandler;
 
 
-class XML_API XMLReader
+class XML_API XMLReader: virtual public Poco::XML::WeakRefCountedObject
 	/// Interface for reading an XML document using callbacks.
 	/// XMLReader is the interface that an XML parser's SAX2 driver must
 	/// implement. This interface allows an application to set and
@@ -46,7 +49,9 @@ class XML_API XMLReader
 	/// must wait for an event-handler callback to return before reporting the next event.
 {
 public:
-	virtual void setEntityResolver(EntityResolver* pResolver) = 0;
+	typedef RefPtr<XMLReader> Ptr;
+
+	virtual void setEntityResolver(RefPtr<EntityResolver> pResolver) = 0;
 		/// Allow an application to register an entity resolver.
 		///
 		/// If the application does not register an entity resolver, the
@@ -55,10 +60,10 @@ public:
 		/// Applications may register a new or different resolver in the middle of a
 		/// parse, and the SAX parser must begin using the new resolver immediately.
 
-	virtual EntityResolver* getEntityResolver() const = 0;
+	virtual RefPtr<EntityResolver> getEntityResolver() const = 0;
 		/// Return the current entity resolver.
 
-	virtual void setDTDHandler(DTDHandler* pDTDHandler) = 0;
+	virtual void setDTDHandler(RefPtr<DTDHandler> pDTDHandler) = 0;
 		/// Allow an application to register a DTD event handler.
 		///
 		/// If the application does not register a DTD handler, all DTD events reported by
@@ -67,10 +72,10 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse,
 		/// and the SAX parser must begin using the new handler immediately.
 
-	virtual DTDHandler* getDTDHandler() const = 0;
+	virtual RefPtr<DTDHandler> getDTDHandler() const = 0;
 		/// Return the current DTD handler.
 
-	virtual void setContentHandler(ContentHandler* pContentHandler) = 0;
+	virtual void setContentHandler(RefPtr<ContentHandler> pContentHandler) = 0;
 		/// Allow an application to register a content event handler.
 		///
 		/// If the application does not register a content handler, all content events
@@ -79,10 +84,10 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse,
 		/// and the SAX parser must begin using the new handler immediately.
 
-	virtual ContentHandler* getContentHandler() const = 0;
+	virtual RefPtr<ContentHandler> getContentHandler() const = 0;
 		/// Return the current content handler.
 
-	virtual void setErrorHandler(ErrorHandler* pErrorHandler) = 0;
+	virtual void setErrorHandler(RefPtr<ErrorHandler> pErrorHandler) = 0;
 		/// Allow an application to register an error event handler.
 		///
 		/// If the application does not register an error handler, all error events reported by
@@ -93,7 +98,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse, and the
 		/// SAX parser must begin using the new handler immediately.
 
-	virtual ErrorHandler* getErrorHandler() const = 0;
+	virtual RefPtr<ErrorHandler> getErrorHandler() const = 0;
 		/// Return the current error handler.
 	
 	virtual void setFeature(const XMLString& featureId, bool state) = 0;
@@ -137,11 +142,11 @@ public:
 		///
 		/// This method is also the standard mechanism for setting extended handlers.
 
-	virtual void setProperty(const XMLString& propertyId, void* value) = 0;
+	virtual void setProperty(const XMLString& propertyId, RefPtr<SAXHandler> value) = 0;
 		/// Set the value of a property.
 		/// See also setProperty(const XMLString&, const XMLString&).
 
-	virtual void* getProperty(const XMLString& propertyId) const = 0;
+	virtual RefPtr<SAXHandler> getProperty(const XMLString& propertyId) const = 0;
 		/// Look up the value of a property.
 		/// String values are returned as XMLChar*
 		/// The property name is any fully-qualified URI. It is possible for an XMLReader to
@@ -154,7 +159,7 @@ public:
 		/// Implementors are free (and encouraged) to invent their own properties, using names
 		/// built on their own URIs.
 
-	virtual void parse(InputSource* pSource) = 0;
+	virtual void parse(RefPtr<InputSource> pSource) = 0;
 		/// Parse an XML document.
 		///
 		/// The application can use this method to instruct the XML reader to begin parsing an
@@ -176,11 +181,11 @@ public:
 
 	virtual void parse(const XMLString& systemId) = 0;
 		/// Parse an XML document from a system identifier.
-		/// See also parse(InputSource*).
+		/// See also parse(InputSource::Ptr).
 		
 	virtual void parseMemoryNP(const char* xml, std::size_t size) = 0;
 		/// Parse an XML document from memory.
-		/// See also parse(InputSource*).
+		/// See also parse(InputSource::Ptr).
 
 	// SAX Features
 	static const XMLString FEATURE_VALIDATION;

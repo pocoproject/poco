@@ -26,7 +26,6 @@ public:
 
 	void testParseWriteXHTML();
 	void testParseWriteXHTML2();
-	void testParseWriteWSDL();
 	void testParseWriteSimple();
 
 	void setUp();

@@ -20,7 +20,9 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/AbstractNode.h"
+#include "Poco/DOM/Document.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -33,6 +35,8 @@ class XML_API ProcessingInstruction: public AbstractNode
 	/// of the document.
 {
 public:
+	typedef RefPtr<ProcessingInstruction> Ptr;
+
 	const XMLString& target() const;
 		/// Returns the target of this processing instruction.
 		/// XML defines this as being the first token following
@@ -58,11 +62,11 @@ public:
 	unsigned short nodeType() const;
 
 protected:
-	ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data);
-	ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction);
+	ProcessingInstruction(Document::Ptr pOwnerDocument, const XMLString& target, const XMLString& data);
+	ProcessingInstruction(Document::Ptr pOwnerDocument, const ProcessingInstruction& processingInstruction);
 	~ProcessingInstruction();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node::Ptr copyNode(bool deep, Document::Ptr pOwnerDocument) const;
 
 private:
 	XMLString _target;

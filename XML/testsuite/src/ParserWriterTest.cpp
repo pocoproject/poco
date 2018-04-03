@@ -15,9 +15,9 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
-#include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
+#include "Poco/RefPtr.h"
 #include <sstream>
 
 
@@ -26,8 +26,8 @@ using Poco::XML::DOMWriter;
 using Poco::XML::XMLReader;
 using Poco::XML::XMLWriter;
 using Poco::XML::Document;
-using Poco::XML::AutoPtr;
 using Poco::XML::InputSource;
+using Poco::RefPtr;
 
 
 ParserWriterTest::ParserWriterTest(const std::string& name): CppUnit::TestCase(name)
@@ -47,7 +47,7 @@ void ParserWriterTest::testParseWriteXHTML()
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
-	AutoPtr<Document> pDoc = parser.parseString(XHTML);
+	RefPtr<Document> pDoc = parser.parseString(XHTML);
 	writer.writeNode(ostr, pDoc);
 	
 	std::string xml = ostr.str();
@@ -62,7 +62,7 @@ void ParserWriterTest::testParseWriteXHTML2()
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 	DOMWriter writer;
-	AutoPtr<Document> pDoc = parser.parseString(XHTML2);
+	RefPtr<Document> pDoc = parser.parseString(XHTML2);
 	writer.writeNode(ostr, pDoc);
 	
 	std::string xml = ostr.str();
@@ -87,13 +87,14 @@ void ParserWriterTest::testParseWriteSimple()
 	DOMWriter writer;
 	writer.setNewLine("\n");
 	writer.setOptions(XMLWriter::PRETTY_PRINT);
-	InputSource source(istr);
-	AutoPtr<Document> pDoc = parser.parse(&source);
+	InputSource::Ptr source = new InputSource(istr);
+	RefPtr<Document> pDoc = parser.parse(source);
 	writer.writeNode(ostr, pDoc);
 
 	unsigned int numChildren = 0;
-	Poco::XML::Node* child = pDoc->documentElement()->firstChild();
-	while (child) {
+	Poco::XML::Node::Ptr child = pDoc->documentElement()->firstChild();
+	while (child)
+	{
 		numChildren++;
 		child = child->nextSibling();
 	}

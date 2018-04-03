@@ -21,6 +21,7 @@
 #include "Poco/XML/XML.h"
 #include "Poco/SAX/XMLReader.h"
 #include "Poco/XML/ParserEngine.h"
+#include "Poco/WeakRefPtr.h"
 
 
 namespace Poco {
@@ -43,14 +44,14 @@ class XML_API SAXParser: public XMLReader
 	///     see ParserEngine::setEnablePartialReads()
 {
 public:
+	typedef RefPtr<SAXParser> Ptr;
+	typedef WeakRefPtr<SAXParser> WeakPtr;
+
 	SAXParser();
 		/// Creates an SAXParser.
 
 	SAXParser(const XMLString& encoding);
 		/// Creates an SAXParser with the given encoding.
-		
-	~SAXParser();
-		/// Destroys the SAXParser.
 	
 	void setEncoding(const XMLString& encoding);
 		/// Sets the encoding used by the parser if no
@@ -65,35 +66,41 @@ public:
 		/// Adds an encoding to the parser. Does not take ownership of the pointer!
 
 	/// XMLReader
-	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
-	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
-	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
-	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
+	void setEntityResolver(RefPtr<EntityResolver> pResolver);
+	RefPtr<EntityResolver> getEntityResolver() const;
+	void setDTDHandler(RefPtr<DTDHandler> pDTDHandler);
+	RefPtr<DTDHandler> getDTDHandler() const;
+	void setContentHandler(RefPtr<ContentHandler> pContentHandler);
+	RefPtr<ContentHandler> getContentHandler() const;
+	void setErrorHandler(RefPtr<ErrorHandler> pErrorHandler);
+	RefPtr<ErrorHandler> getErrorHandler() const;
 	void setFeature(const XMLString& featureId, bool state);
 	bool getFeature(const XMLString& featureId) const;
 	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
-	void parse(InputSource* pSource);
+	void setProperty(const XMLString& propertyId, RefPtr<SAXHandler> value);
+	RefPtr<SAXHandler> getProperty(const XMLString& propertyId) const;
+	void parse(RefPtr<InputSource> pSource);
 	void parse(const XMLString& systemId);
 	void parseMemoryNP(const char* xml, std::size_t size);
-	
+
 	/// Extensions
 	void parseString(const std::string& xml);
-	
+
 	static const XMLString FEATURE_PARTIAL_READS;
 
 protected:
+
+	~SAXParser();
+		/// Destroys the SAXParser.
+
 	void setupParse();
 
 private:
-	ParserEngine _engine;
+	ParserEngine::Ptr _pEngine;
 	bool _namespaces;
 	bool _namespacePrefixes;
+
+	friend class DOMParser;
 };
 
 

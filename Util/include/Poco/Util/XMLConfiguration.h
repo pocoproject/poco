@@ -26,7 +26,7 @@
 
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/DOM/Document.h"
-#include "Poco/DOM/AutoPtr.h"
+#include "Poco/DOM/RefCountedObject.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/SAX/InputSource.h"
 #include <istream>

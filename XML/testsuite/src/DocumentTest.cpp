@@ -15,8 +15,8 @@
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"
 #include "Poco/DOM/NodeList.h"
-#include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/DOMException.h"
+#include "Poco/RefPtr.h"
 
 
 using Poco::XML::Element;
@@ -24,9 +24,9 @@ using Poco::XML::Document;
 using Poco::XML::Text;
 using Poco::XML::Node;
 using Poco::XML::NodeList;
-using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 using Poco::XML::DOMException;
+using Poco::RefPtr;
 
 
 DocumentTest::DocumentTest(const std::string& name): CppUnit::TestCase(name)
@@ -41,27 +41,26 @@ DocumentTest::~DocumentTest()
 
 void DocumentTest::testDocumentElement()
 {
-	AutoPtr<Document> pDoc = new Document;
-	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	RefPtr<Document> pDoc = new Document;
+	RefPtr<Element> pRoot = pDoc->createElement("root");
 
-	assertTrue (pDoc->documentElement() == 0);
+	assertTrue (pDoc->documentElement().isNull());
 	pDoc->appendChild(pRoot);
 	assertTrue (pDoc->documentElement() == pRoot);
-	
-	AutoPtr<Text> pText = pDoc->createTextNode("   ");
+
+	RefPtr<Text> pText = pDoc->createTextNode("   ");
 	pDoc->insertBefore(pText, pRoot);
 	assertTrue (pDoc->documentElement() == pRoot);
-	
 }
 
 
 void DocumentTest::testImport()
 {
-	AutoPtr<Document> pDoc1 = new Document;
-	AutoPtr<Element> pRoot1 = pDoc1->createElement("root");
+	RefPtr<Document> pDoc1 = new Document;
+	RefPtr<Element> pRoot1 = pDoc1->createElement("root");
 
-	AutoPtr<Document> pDoc2 = new Document;
-	
+	RefPtr<Document> pDoc2 = new Document;
+
 	try
 	{
 		pDoc2->appendChild(pRoot1);
@@ -70,21 +69,21 @@ void DocumentTest::testImport()
 	catch (DOMException&)
 	{
 	}
-	
-	AutoPtr<Element> pRoot2 = static_cast<Element*>(pDoc2->importNode(pRoot1, false));
+
+	RefPtr<Element> pRoot2 = pDoc2->importNode(pRoot1, false).cast<Element>();
 	assertTrue (pRoot2->ownerDocument() == pDoc2);
 	assertTrue (pRoot1->ownerDocument() == pDoc1);
-	
+
 	pDoc2->appendChild(pRoot2);
 }
 
 
 void DocumentTest::testImportDeep()
 {
-	AutoPtr<Document> pDoc1 = new Document;
-	AutoPtr<Element> pRoot1 = pDoc1->createElement("root");
-	AutoPtr<Element> pElem1 = pDoc1->createElement("elem");
-	AutoPtr<Text> pText1 = pDoc1->createTextNode("text");
+	RefPtr<Document> pDoc1 = new Document;
+	RefPtr<Element> pRoot1 = pDoc1->createElement("root");
+	RefPtr<Element> pElem1 = pDoc1->createElement("elem");
+	RefPtr<Text> pText1 = pDoc1->createTextNode("text");
 
 	pElem1->appendChild(pText1);
 	pRoot1->appendChild(pElem1);
@@ -92,7 +91,7 @@ void DocumentTest::testImportDeep()
 	pRoot1->setAttribute("a1", "v1");
 	pRoot1->setAttribute("a2", "v2");
 
-	AutoPtr<Document> pDoc2 = new Document;
+	RefPtr<Document> pDoc2 = new Document;
 	
 	try
 	{
@@ -103,7 +102,7 @@ void DocumentTest::testImportDeep()
 	{
 	}
 	
-	AutoPtr<Element> pRoot2 = static_cast<Element*>(pDoc2->importNode(pRoot1, true));
+	RefPtr<Element> pRoot2 = pDoc2->importNode(pRoot1, true).unsafeCast<Element>();
 	assertTrue (pRoot2->ownerDocument() == pDoc2);
 	assertTrue (pRoot2->firstChild()->ownerDocument() == pDoc2);
 	assertTrue (pRoot2->firstChild()->firstChild()->ownerDocument() == pDoc2);
@@ -117,81 +116,81 @@ void DocumentTest::testImportDeep()
 
 void DocumentTest::testElementsByTagName()
 {
-	AutoPtr<Document> pDoc = new Document;
-	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	RefPtr<Document> pDoc = new Document;
+	RefPtr<Element> pRoot = pDoc->createElement("root");
 	pDoc->appendChild(pRoot);
-	AutoPtr<NodeList> pNL1 = pDoc->getElementsByTagName("*");
-	AutoPtr<NodeList> pNL2 = pDoc->getElementsByTagName("elem");
+	RefPtr<NodeList> pNL1 = pDoc->getElementsByTagName("*");
+	RefPtr<NodeList> pNL2 = pDoc->getElementsByTagName("elem");
 	
 	assertTrue (pNL1->length() == 1);
-	assertTrue (pNL1->item(0) == pRoot);
+	assertTrue (pNL1->item(0).cast<Element>() == pRoot);
 	assertTrue (pNL2->length() == 0);
 	
-	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	RefPtr<Element> pElem1 = pDoc->createElement("elem");
 	pRoot->appendChild(pElem1);
 	
 	assertTrue (pNL1->length() == 2);
 	assertTrue (pNL2->length() == 1);
-	assertTrue (pNL1->item(0) == pRoot);
-	assertTrue (pNL1->item(1) == pElem1);
-	assertTrue (pNL2->item(0) == pElem1);
+	assertTrue (pNL1->item(0).cast<Element>() == pRoot);
+	assertTrue (pNL1->item(1).cast<Element>() == pElem1);
+	assertTrue (pNL2->item(0).cast<Element>() == pElem1);
 
-	AutoPtr<Element> pElem2 = pDoc->createElement("Elem");
+	RefPtr<Element> pElem2 = pDoc->createElement("Elem");
 	pRoot->appendChild(pElem2);
 
 	assertTrue (pNL1->length() == 3);
 	assertTrue (pNL2->length() == 1);
-	assertTrue (pNL1->item(0) == pRoot);
-	assertTrue (pNL1->item(1) == pElem1);
-	assertTrue (pNL1->item(2) == pElem2);
-	assertTrue (pNL2->item(0) == pElem1);
+	assertTrue (pNL1->item(0).cast<Element>() == pRoot);
+	assertTrue (pNL1->item(1).cast<Element>() == pElem1);
+	assertTrue (pNL1->item(2).cast<Element>() == pElem2);
+	assertTrue (pNL2->item(0).cast<Element>() == pElem1);
 }
 
 
 void DocumentTest::testElementsByTagNameNS()
 {
-	AutoPtr<Document> pDoc = new Document;
-	AutoPtr<Element> pRoot = pDoc->createElementNS("urn:ns1", "root");
+	RefPtr<Document> pDoc = new Document;
+	RefPtr<Element> pRoot = pDoc->createElementNS("urn:ns1", "root");
 	pDoc->appendChild(pRoot);
-	AutoPtr<NodeList> pNL1 = pDoc->getElementsByTagNameNS("*", "*");
-	AutoPtr<NodeList> pNL2 = pDoc->getElementsByTagNameNS("*", "elem");
-	
+	RefPtr<NodeList> pNL1 = pDoc->getElementsByTagNameNS("*", "*");
+	RefPtr<NodeList> pNL2 = pDoc->getElementsByTagNameNS("*", "elem");
+
 	assertTrue (pNL1->length() == 1);
-	assertTrue (pNL1->item(0) == pRoot);
+	assertTrue (pNL1->item(0).cast<Element>() == pRoot);
 	assertTrue (pNL2->length() == 0);
-	
-	AutoPtr<Element> pElem1 = pDoc->createElementNS("urn:ns1", "elem");
+
+	RefPtr<Element> pElem1 = pDoc->createElementNS("urn:ns1", "elem");
 	pRoot->appendChild(pElem1);
-	
+
 	assertTrue (pNL1->length() == 2);
 	assertTrue (pNL2->length() == 1);
-	assertTrue (pNL1->item(0) == pRoot);
-	assertTrue (pNL1->item(1) == pElem1);
-	assertTrue (pNL2->item(0) == pElem1);
+	assertTrue (pNL1->item(0).cast<Element>() == pRoot);
+	assertTrue (pNL1->item(1).cast<Element>() == pElem1);
+	assertTrue (pNL2->item(0).cast<Element>() == pElem1);
 
-	AutoPtr<Element> pElem2 = pDoc->createElementNS("urn:ns1", "Elem");
+	RefPtr<Element> pElem2 = pDoc->createElementNS("urn:ns1", "Elem");
 	pRoot->appendChild(pElem2);
 
 	assertTrue (pNL1->length() == 3);
 	assertTrue (pNL2->length() == 1);
-	assertTrue (pNL1->item(0) == pRoot);
-	assertTrue (pNL1->item(1) == pElem1);
-	assertTrue (pNL1->item(2) == pElem2);
-	assertTrue (pNL2->item(0) == pElem1);
+	assertTrue (pNL1->item(0).cast<Element>() == pRoot);
+	assertTrue (pNL1->item(1).cast<Element>() == pElem1);
+	assertTrue (pNL1->item(2).cast<Element>() == pElem2);
+	assertTrue (pNL2->item(0).cast<Element>() == pElem1);
 }
 
 
 void DocumentTest::testElementById()
 {
-	AutoPtr<Document> pDoc = new Document;
-	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	RefPtr<Document> pDoc = new Document;
+	RefPtr<Element> pRoot = pDoc->createElement("root");
 	pRoot->setAttribute("id", "0");
-	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	RefPtr<Element> pElem1 = pDoc->createElement("elem");
 	pElem1->setAttribute("id", "1");
-	AutoPtr<Text> pText1 = pDoc->createTextNode("text");
-	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
+	RefPtr<Text> pText1 = pDoc->createTextNode("text");
+	RefPtr<Element> pElem2 = pDoc->createElement("elem");
 	pElem2->setAttribute("id", "2");
-	AutoPtr<Element> pElem3 = pDoc->createElement("elem");
+	RefPtr<Element> pElem3 = pDoc->createElement("elem");
 	pElem3->setAttribute("id", "3");
 
 	pElem1->appendChild(pText1);
@@ -222,15 +221,15 @@ void DocumentTest::testElementById()
 
 void DocumentTest::testElementByIdNS()
 {
-	AutoPtr<Document> pDoc = new Document;
-	AutoPtr<Element> pRoot = pDoc->createElementNS("urn:ns1", "root");
+	RefPtr<Document> pDoc = new Document;
+	RefPtr<Element> pRoot = pDoc->createElementNS("urn:ns1", "root");
 	pRoot->setAttributeNS("urn:ns1", "id", "0");
-	AutoPtr<Element> pElem1 = pDoc->createElementNS("urn:ns1", "elem");
+	RefPtr<Element> pElem1 = pDoc->createElementNS("urn:ns1", "elem");
 	pElem1->setAttributeNS("urn:ns1", "id", "1");
-	AutoPtr<Text> pText1 = pDoc->createTextNode("text");
-	AutoPtr<Element> pElem2 = pDoc->createElementNS("urn:ns1", "elem");
+	RefPtr<Text> pText1 = pDoc->createTextNode("text");
+	RefPtr<Element> pElem2 = pDoc->createElementNS("urn:ns1", "elem");
 	pElem2->setAttributeNS("urn:ns1", "id", "2");
-	AutoPtr<Element> pElem3 = pDoc->createElementNS("urn:ns1", "elem");
+	RefPtr<Element> pElem3 = pDoc->createElementNS("urn:ns1", "elem");
 	pElem3->setAttributeNS("urn:ns1", "id", "3");
 
 	pElem1->appendChild(pText1);
@@ -264,11 +263,13 @@ void DocumentTest::testElementByIdNS()
 
 void DocumentTest::setUp()
 {
+	poco_rcdc_reset;
 }
 
 
 void DocumentTest::tearDown()
 {
+	poco_rcdc_dump_leak(std::cerr);
 }
 
 

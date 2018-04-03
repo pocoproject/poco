@@ -25,14 +25,17 @@
 #include "Poco/DOM/Entity.h"
 #include "Poco/DOM/Notation.h"
 #include "Poco/DOM/NamedNodeMap.h"
-#include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/SAXHandler.h"
+#include "Poco/SAX/DeclHandler.h"
 #include "Poco/SAX/DTDHandler.h"
 #include "Poco/SAX/ContentHandler.h"
 #include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/AttributesImpl.h"
 #include "Poco/SAX/ErrorHandler.h"
 #include "Poco/SAX/SAXException.h"
+#include "Poco/SAX/InputSource.h"
+#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -58,49 +61,49 @@ DOMSerializer::~DOMSerializer()
 }
 
 
-void DOMSerializer::setEntityResolver(EntityResolver* pEntityResolver)
+void DOMSerializer::setEntityResolver(EntityResolver::Ptr pEntityResolver)
 {
 	_pEntityResolver = pEntityResolver;
 }
 
 
-EntityResolver* DOMSerializer::getEntityResolver() const
+EntityResolver::Ptr DOMSerializer::getEntityResolver() const
 {
 	return _pEntityResolver;
 }
 
 
-void DOMSerializer::setDTDHandler(DTDHandler* pDTDHandler)
+void DOMSerializer::setDTDHandler(DTDHandler::Ptr pDTDHandler)
 {
 	_pDTDHandler = pDTDHandler;
 }
 
 
-DTDHandler* DOMSerializer::getDTDHandler() const
+DTDHandler::Ptr DOMSerializer::getDTDHandler() const
 {
 	return _pDTDHandler;
 }
 
 
-void DOMSerializer::setContentHandler(ContentHandler* pContentHandler)
+void DOMSerializer::setContentHandler(ContentHandler::Ptr pContentHandler)
 {
 	_pContentHandler = pContentHandler;
 }
 
 
-ContentHandler* DOMSerializer::getContentHandler() const
+ContentHandler::Ptr DOMSerializer::getContentHandler() const
 {
 	return _pContentHandler;
 }
 
 
-void DOMSerializer::setErrorHandler(ErrorHandler* pErrorHandler)
+void DOMSerializer::setErrorHandler(ErrorHandler::Ptr pErrorHandler)
 {
 	_pErrorHandler = pErrorHandler;
 }
 
 
-ErrorHandler* DOMSerializer::getErrorHandler() const
+ErrorHandler::Ptr DOMSerializer::getErrorHandler() const
 {
 	return _pErrorHandler;
 }
@@ -137,27 +140,27 @@ void DOMSerializer::setProperty(const XMLString& propertyId, const XMLString& va
 }
 
 
-void DOMSerializer::setProperty(const XMLString& propertyId, void* value)
+void DOMSerializer::setProperty(const XMLString& propertyId, SAXHandler::Ptr value)
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER)
-		_pDeclHandler = reinterpret_cast<DeclHandler*>(value);
+		_pDeclHandler = value.cast<DeclHandler>();
 	else if (propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
-		_pLexicalHandler = reinterpret_cast<LexicalHandler*>(value);
+		_pLexicalHandler = value.cast<LexicalHandler>();
 	else throw SAXNotRecognizedException(fromXMLString(propertyId));
 }
 
 
-void* DOMSerializer::getProperty(const XMLString& propertyId) const
+SAXHandler::Ptr DOMSerializer::getProperty(const XMLString& propertyId) const
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER)
-		return _pDeclHandler;
+		return _pDeclHandler.cast<SAXHandler>();
 	else if (propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
-		return _pLexicalHandler;
+		return _pLexicalHandler.cast<SAXHandler>();
 	else throw SAXNotSupportedException(fromXMLString(propertyId));
 }
 
 
-void DOMSerializer::serialize(const Node* pNode)
+void DOMSerializer::serialize(const Node::Ptr pNode)
 {
 	poco_check_ptr (pNode);
 
@@ -165,7 +168,7 @@ void DOMSerializer::serialize(const Node* pNode)
 }
 
 
-void DOMSerializer::parse(InputSource* pSource)
+void DOMSerializer::parse(InputSource::Ptr pSource)
 {
 	throw XMLException("The DOMSerializer cannot parse an InputSource");
 }
@@ -183,7 +186,7 @@ void DOMSerializer::parseMemoryNP(const char* xml, std::size_t size)
 }
 
 
-void DOMSerializer::iterate(const Node* pNode) const
+void DOMSerializer::iterate(Node::Ptr pNode) const
 {
 	while (pNode)
 	{
@@ -193,53 +196,53 @@ void DOMSerializer::iterate(const Node* pNode) const
 }
 
 
-void DOMSerializer::handleNode(const Node* pNode) const
+void DOMSerializer::handleNode(Node::Ptr pNode) const
 {
 	switch (pNode->nodeType())
 	{
 	case Node::ELEMENT_NODE:
-		handleElement(static_cast<const Element*>(pNode));
+		handleElement(pNode.unsafeCast<Element>());
 		break;
 	case Node::TEXT_NODE:
-		handleCharacterData(static_cast<const Text*>(pNode));
+		handleCharacterData(pNode.unsafeCast<Text>());
 		break;
 	case Node::CDATA_SECTION_NODE:
-		handleCDATASection(static_cast<const CDATASection*>(pNode));
+		handleCDATASection(pNode.unsafeCast<CDATASection>());
 		break;
 	case Node::ENTITY_NODE:
-		handleEntity(static_cast<const Entity*>(pNode));
+		handleEntity(pNode.unsafeCast<Entity>());
 		break;
 	case Node::PROCESSING_INSTRUCTION_NODE:
-		handlePI(static_cast<const ProcessingInstruction*>(pNode));
+		handlePI(pNode.unsafeCast<ProcessingInstruction>());
 		break;
 	case Node::COMMENT_NODE:
-		handleComment(static_cast<const Comment*>(pNode));
+		handleComment(pNode.unsafeCast<Comment>());
 		break;
 	case Node::DOCUMENT_NODE:
-		handleDocument(static_cast<const Document*>(pNode));
+		handleDocument(pNode.unsafeCast<Document>());
 		break;
 	case Node::DOCUMENT_TYPE_NODE:
-		handleDocumentType(static_cast<const DocumentType*>(pNode));
+		handleDocumentType(pNode.unsafeCast<DocumentType>());
 		break;
 	case Node::DOCUMENT_FRAGMENT_NODE:
-		handleFragment(static_cast<const DocumentFragment*>(pNode));
+		handleFragment(pNode.unsafeCast<DocumentFragment>());
 		break;
 	case Node::NOTATION_NODE:
-		handleNotation(static_cast<const Notation*>(pNode));
+		handleNotation(pNode.unsafeCast<Notation>());
 		break;
 	}
 }
 
 
-void DOMSerializer::handleElement(const Element* pElement) const
+void DOMSerializer::handleElement(Element::Ptr pElement) const
 {
 	if (_pContentHandler)
 	{
-		AutoPtr<NamedNodeMap> pAttrs = pElement->attributes();
+		RefPtr<NamedNodeMap> pAttrs = pElement->attributes();
 		AttributesImpl saxAttrs;
 		for (unsigned long i = 0; i < pAttrs->length(); ++i)
 		{
-			Attr* pAttr = static_cast<Attr*>(pAttrs->item(i));
+			Attr::Ptr pAttr = pAttrs->item(i).unsafeCast<Attr>();
 			saxAttrs.addAttribute(pAttr->namespaceURI(), pAttr->localName(), pAttr->nodeName(), CDATA, pAttr->value(), pAttr->specified());
 		}
 		_pContentHandler->startElement(pElement->namespaceURI(), pElement->localName(), pElement->tagName(), saxAttrs);
@@ -250,7 +253,7 @@ void DOMSerializer::handleElement(const Element* pElement) const
 }
 
 
-void DOMSerializer::handleCharacterData(const Text* pText) const
+void DOMSerializer::handleCharacterData(Text::Ptr pText) const
 {
 	if (_pContentHandler)
 	{
@@ -260,7 +263,7 @@ void DOMSerializer::handleCharacterData(const Text* pText) const
 }
 
 
-void DOMSerializer::handleComment(const Comment* pComment) const
+void DOMSerializer::handleComment(Comment::Ptr pComment) const
 {
 	if (_pLexicalHandler)
 	{
@@ -270,13 +273,13 @@ void DOMSerializer::handleComment(const Comment* pComment) const
 }
 
 
-void DOMSerializer::handlePI(const ProcessingInstruction* pPI) const
+void DOMSerializer::handlePI(ProcessingInstruction::Ptr pPI) const
 {
 	if (_pContentHandler) _pContentHandler->processingInstruction(pPI->target(), pPI->data());
 }
 
 
-void DOMSerializer::handleCDATASection(const CDATASection* pCDATA) const
+void DOMSerializer::handleCDATASection(CDATASection::Ptr pCDATA) const
 {
 	if (_pLexicalHandler) _pLexicalHandler->startCDATA();
 	handleCharacterData(pCDATA);
@@ -284,17 +287,17 @@ void DOMSerializer::handleCDATASection(const CDATASection* pCDATA) const
 }
 
 
-void DOMSerializer::handleDocument(const Document* pDocument) const
+void DOMSerializer::handleDocument(Document::Ptr pDocument) const
 {
 	if (_pContentHandler) _pContentHandler->startDocument();
-	const DocumentType* pDoctype = pDocument->doctype();
+	DocumentType::Ptr pDoctype = pDocument->doctype();
 	if (pDoctype) handleDocumentType(pDoctype);
 	iterate(pDocument->firstChild());
 	if (_pContentHandler) _pContentHandler->endDocument();
 }
 
 
-void DOMSerializer::handleDocumentType(const DocumentType* pDocumentType) const
+void DOMSerializer::handleDocumentType(DocumentType::Ptr pDocumentType) const
 {
 	if (_pLexicalHandler) _pLexicalHandler->startDTD(pDocumentType->name(), pDocumentType->publicId(), pDocumentType->systemId());
 	iterate(pDocumentType->firstChild());
@@ -302,19 +305,19 @@ void DOMSerializer::handleDocumentType(const DocumentType* pDocumentType) const
 }
 
 
-void DOMSerializer::handleFragment(const DocumentFragment* pFragment) const
+void DOMSerializer::handleFragment(DocumentFragment::Ptr pFragment) const
 {
 	iterate(pFragment->firstChild());
 }
 
 
-void DOMSerializer::handleNotation(const Notation* pNotation) const
+void DOMSerializer::handleNotation(Notation::Ptr pNotation) const
 {
 	if (_pDTDHandler) _pDTDHandler->notationDecl(pNotation->nodeName(), &pNotation->publicId(), &pNotation->systemId());
 }
 
 
-void DOMSerializer::handleEntity(const Entity* pEntity) const
+void DOMSerializer::handleEntity(Entity::Ptr pEntity) const
 {
 	if (_pDTDHandler) _pDTDHandler->unparsedEntityDecl(pEntity->nodeName(), &pEntity->publicId(), pEntity->systemId(), pEntity->notationName());
 }

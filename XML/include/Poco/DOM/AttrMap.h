@@ -34,27 +34,27 @@ class XML_API AttrMap: public NamedNodeMap
 	// returned by Element::attributes()
 {
 public:
-	Node* getNamedItem(const XMLString& name) const;
-	Node* setNamedItem(Node* arg);
-	Node* removeNamedItem(const XMLString& name);
-	Node* item(unsigned long index) const;
+	typedef RefPtr<AttrMap> Ptr;
+
+	Node::Ptr getNamedItem(const XMLString& name) const;
+	Node::Ptr setNamedItem(Node::Ptr arg);
+	Node::Ptr removeNamedItem(const XMLString& name);
+	Node::Ptr item(unsigned long index) const;
 	unsigned long length() const;
 
-	Node* getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const;
-	Node* setNamedItemNS(Node* arg);
-	Node* removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName);
-
-	void autoRelease();
+	Node::Ptr getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const;
+	Node::Ptr setNamedItemNS(Node::Ptr arg);
+	Node::Ptr removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName);
 
 protected:
-	AttrMap(Element* pElement);
+	AttrMap(RefPtr<Element> pElement);
 	~AttrMap();
 
 private:
 	AttrMap();
 
-	Element* _pElement;
-	
+	RefPtr<Element> _pElement;
+
 	friend class Element;
 };
 

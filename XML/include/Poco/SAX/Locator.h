@@ -18,6 +18,8 @@
 #define SAX_Locator_INCLUDED
 
 
+#include "Poco/RefCountedObject.h"
+#include "Poco/RefPtr.h"
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
 
@@ -26,7 +28,7 @@ namespace Poco {
 namespace XML {
 
 
-class XML_API Locator
+class XML_API Locator: public RefCountedObject
 	/// Interface for associating a SAX event with a document location.
 	///
 	/// If a SAX parser provides location information to the SAX application, it does so by
@@ -44,6 +46,8 @@ class XML_API Locator
 	/// the application should assume that a locator is not available.
 {
 public:
+	typedef RefPtr<Locator> Ptr;
+
 	virtual XMLString getPublicId() const = 0;
 		/// Return the public identifier for the current document event.
 		///

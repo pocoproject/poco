@@ -34,6 +34,8 @@ class XML_API MutationEvent: public Event
 	/// information associated with Mutation events.
 {
 public:
+	typedef RefPtr<MutationEvent> Ptr;
+
 	enum AttrChangeType
 	{
 		MODIFICATION = 1, /// The Attr was modified in place.
@@ -41,7 +43,7 @@ public:
 		REMOVAL      = 3  /// The Attr was just removed.
 	};
 
-	Node* relatedNode() const;
+	RefPtr<Node> relatedNode() const;
 		/// relatedNode is used to identify a secondary node related to a mutation
 		/// event. For example, if a mutation event is dispatched
 		/// to a node indicating that its parent has changed, the relatedNode is the
@@ -66,7 +68,7 @@ public:
 		/// DOMAttrModified event. The values can be MODIFICATION,
 		/// ADDITION, or REMOVAL.
 
-	void initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node* relatedNode,
+	void initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, RefPtr<Node> relatedNode,
 	                       const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change);
 		/// The initMutationEvent method is used to initialize the value of a
 		/// MutationEvent created through the DocumentEvent
@@ -86,18 +88,23 @@ public:
 	static const XMLString DOMCharacterDataModified;
 
 protected:
-	MutationEvent(Document* pOwnerDocument, const XMLString& type);
-	MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode);
-	MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode,
+	MutationEvent(RefPtr<Document> pOwnerDocument, const XMLString& type);
+	MutationEvent(RefPtr<Document> pOwnerDocument, const XMLString& type, RefPtr<EventTarget> pTarget, bool canBubble, bool cancelable, RefPtr<Node> relatedNode);
+	MutationEvent(RefPtr<Document> pOwnerDocument, const XMLString& type, RefPtr<EventTarget> pTarget, bool canBubble, bool cancelable, RefPtr<Node> relatedNode,
 				  const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change);
 	~MutationEvent();
 
 private:
+	MutationEvent(const MutationEvent&);
+	MutationEvent& operator=(const MutationEvent&);
+	MutationEvent(MutationEvent&&);
+	MutationEvent& operator=(MutationEvent&&);
+
 	XMLString      _prevValue;
 	XMLString      _newValue;
 	XMLString      _attrName;
 	AttrChangeType _change;
-	Node*          _pRelatedNode;
+	RefPtr<Node>  _pRelatedNode;
 
 	friend class AbstractNode;
 	friend class Document;
@@ -107,7 +114,7 @@ private:
 //
 // inlines
 //
-inline Node* MutationEvent::relatedNode() const
+inline RefPtr<Node> MutationEvent::relatedNode() const
 {
 	return _pRelatedNode;
 }

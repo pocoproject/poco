@@ -24,18 +24,18 @@ public:
 	ElementTest(const std::string& name);
 	~ElementTest();
 
-	void testAttributes();
-	void testAttributesNS();
-	void testAttrMap();
-	void testAttrMapNS();
+	void testElementAttributes();
+	void testElementAttributesNS();
+	void testElementAttrMap();
+	void testElementAttrMapNS();
 	void testElementsByTagName();
 	void testElementsByTagNameNS();
 	void testInnerText();
 	void testChildElement();
 	void testChildElementNS();
-	void testNodeByPath();
-	void testNodeByPathNS();
-	
+	void testElementNodeByPath();
+	void testElementNodeByPathNS();
+
 	void setUp();
 	void tearDown();
 

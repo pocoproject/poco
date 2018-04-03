@@ -33,17 +33,18 @@ class XML_API ElementsByTagNameList: public NodeList
 	// Element::getElementsByTagName().
 {
 public:
-	Node* item(unsigned long index) const;
+	typedef RefPtr<ElementsByTagNameList> Ptr;
+
+	Node::Ptr item(unsigned long index) const;
 	unsigned long length() const;
-	void autoRelease();
 
 protected:
-	ElementsByTagNameList(const Node* pParent, const XMLString& name);
+	ElementsByTagNameList(const Node::Ptr pParent, const XMLString& name);
 	~ElementsByTagNameList();
 
-	Node* find(const Node* pParent, unsigned long index) const;
+	Node::Ptr find(const Node::Ptr pParent, unsigned long index) const;
 
-	const Node* _pParent;
+	const Node::Ptr _pParent;
 	XMLString   _name;
 	mutable unsigned long _count;
 	
@@ -59,17 +60,16 @@ class XML_API ElementsByTagNameListNS: public NodeList
 	// Element::getElementsByTagNameNS().
 {
 public:
-	virtual Node* item(unsigned long index) const;
+	virtual Node::Ptr item(unsigned long index) const;
 	virtual unsigned long length() const;
-	virtual void autoRelease();
 
 protected:
-	ElementsByTagNameListNS(const Node* pParent, const XMLString& namespaceURI, const XMLString& localName);
+	ElementsByTagNameListNS(const Node::Ptr pParent, const XMLString& namespaceURI, const XMLString& localName);
 	~ElementsByTagNameListNS();
 
-	Node* find(const Node* pParent, unsigned long index) const;
+	Node::Ptr find(const Node::Ptr pParent, unsigned long index) const;
 
-	const Node* _pParent;
+	const Node::Ptr _pParent;
 	XMLString   _localName;
 	XMLString   _namespaceURI;
 	mutable unsigned long _count;

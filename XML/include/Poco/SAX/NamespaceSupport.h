@@ -44,7 +44,7 @@ public:
 
 	NamespaceSupport();
 		/// Creates a NamespaceSupport object.
-		
+
 	~NamespaceSupport();
 		/// Destroys a NamespaceSupport object.
 	

@@ -26,7 +26,7 @@
 
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/DOM/Document.h"
-#include "Poco/DOM/AutoPtr.h"
+#include "Poco/DOM/RefCountedObject.h"
 
 
 namespace Poco {

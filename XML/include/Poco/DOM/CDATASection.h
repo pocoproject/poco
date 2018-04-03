@@ -20,6 +20,7 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/Text.h"
+#include "Poco/DOM/Document.h"
 
 
 namespace Poco {
@@ -57,19 +58,21 @@ class XML_API CDATASection: public Text
 	/// corrupted on serialization more difficult.
 {
 public:
+	typedef RefPtr<CDATASection> Ptr;
+
 	// Text
-	Text* splitText(unsigned long offset);
+	Text::Ptr splitText(unsigned long offset);
 
 	// Node
 	const XMLString& nodeName() const;
 	unsigned short nodeType() const;
 
 protected:
-	CDATASection(Document* pOwnerDocument, const XMLString& data);
-	CDATASection(Document* pOwnerDocument, const CDATASection& sec);
+	CDATASection(Document::Ptr pOwnerDocument, const XMLString& data);
+	CDATASection(Document::Ptr pOwnerDocument, const CDATASection& sec);
 	~CDATASection();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node::Ptr copyNode(bool deep, Document::Ptr pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

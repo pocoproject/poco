@@ -19,6 +19,7 @@
 #include "Poco/XML/XMLWriter.h"
 #include "Poco/Latin9Encoding.h"
 #include "Poco/FileStream.h"
+#include "Poco/RefPtr.h"
 #include <sstream>
 
 
@@ -35,30 +36,36 @@ using Poco::XML::WhitespaceFilter;
 class TestEntityResolver: public EntityResolver
 {
 public:
-	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId)
+	typedef Poco::RefPtr<TestEntityResolver> Ptr;
+
+	InputSource::Ptr resolveEntity(const XMLString* publicId, const XMLString& systemId)
 	{
 		if (systemId == "include.xml")
 		{
 			std::istringstream* istr = new std::istringstream(SAXParserTest::INCLUDE);
-			InputSource* pIS = new InputSource(*istr);
-			pIS->setSystemId(systemId);
-			return pIS;
+			_pIS = new InputSource(*istr);
+			_pIS->setSystemId(systemId);
+			return _pIS;
 		}
 		else if (systemId == "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent")
 		{
-			std::istringstream* istr = new std::istringstream(SAXParserTest::XHTML_LATIN1_ENTITIES);
-			InputSource* pIS = new InputSource(*istr);
-			pIS->setSystemId(systemId);
-			return pIS;
+			std::istringstream* pIstr = new std::istringstream(SAXParserTest::XHTML_LATIN1_ENTITIES);
+			_pIS = new InputSource(*pIstr);
+			_pIS->setSystemId(systemId);
+			return _pIS;
 		}
 		return 0;
 	}
-	
-	void releaseInputSource(InputSource* pSource)
+
+protected:
+	~TestEntityResolver()
 	{
-		delete pSource->getByteStream();
-		delete pSource;
+		std::istream* pIstr = _pIS ? _pIS->getByteStream() : 0;
+		if (pIstr) delete pIstr;
 	}
+
+private:
+	InputSource::Ptr _pIS;
 };
 
 
@@ -74,7 +81,7 @@ SAXParserTest::~SAXParserTest()
 
 void SAXParserTest::testSimple1()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, SIMPLE1);
 	assertTrue (xml == "<foo/>");
 }
@@ -82,7 +89,7 @@ void SAXParserTest::testSimple1()
 
 void SAXParserTest::testSimple2()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, SIMPLE2);
 	assertTrue (xml == "<foo/>");
 }
@@ -90,7 +97,7 @@ void SAXParserTest::testSimple2()
 
 void SAXParserTest::testAttributes()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, ATTRIBUTES);
 	assertTrue (xml == ATTRIBUTES);
 }
@@ -98,7 +105,7 @@ void SAXParserTest::testAttributes()
 
 void SAXParserTest::testCDATA()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, CDATA);
 	assertTrue (xml == CDATA);
 }
@@ -106,7 +113,7 @@ void SAXParserTest::testCDATA()
 
 void SAXParserTest::testComment()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, COMMENT);
 	assertTrue (xml == COMMENT);
 }
@@ -114,7 +121,7 @@ void SAXParserTest::testComment()
 
 void SAXParserTest::testPI()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, PROCESSING_INSTRUCTION);
 	assertTrue (xml == PROCESSING_INSTRUCTION);
 }
@@ -122,7 +129,7 @@ void SAXParserTest::testPI()
 
 void SAXParserTest::testDTD()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, DTD);
 	assertTrue (xml == "<!DOCTYPE test SYSTEM \"test.dtd\"><foo/>");
 }
@@ -130,7 +137,7 @@ void SAXParserTest::testDTD()
 
 void SAXParserTest::testInternalEntity()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, INTERNAL_ENTITY);
 	assertTrue (xml ==	"<!DOCTYPE sample><root>\n\t<company>Applied Informatics</company>\n</root>");
 }
@@ -138,7 +145,7 @@ void SAXParserTest::testInternalEntity()
 
 void SAXParserTest::testNotation()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, NOTATION);
 	assertTrue (xml == "<!DOCTYPE test [<!NOTATION mov SYSTEM \"quicktime\">"
 	               "<!NOTATION xml PUBLIC \"-//W3C//NOTATION XML 1.0//EN\">]>"
@@ -148,7 +155,7 @@ void SAXParserTest::testNotation()
 
 void SAXParserTest::testExternalUnparsed()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, EXTERNAL_UNPARSED);
 	assertTrue (xml == "<!DOCTYPE test [<!NOTATION mov SYSTEM \"quicktime\">"
 	               "<!ENTITY movie SYSTEM \"movie.mov\" NDATA mov>]>"
@@ -158,10 +165,10 @@ void SAXParserTest::testExternalUnparsed()
 
 void SAXParserTest::testExternalParsed()
 {
-	SAXParser parser;
-	TestEntityResolver resolver;
-	parser.setEntityResolver(&resolver);
-	parser.setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
+	SAXParser::Ptr parser = new SAXParser;
+	TestEntityResolver::Ptr resolver = new TestEntityResolver;
+	parser->setEntityResolver(resolver);
+	parser->setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, EXTERNAL_PARSED);
 	assertTrue (xml == "<!DOCTYPE test><sample>\n\t<elem>\n\tAn external entity.\n</elem>\n\n</sample>");
 }
@@ -169,7 +176,7 @@ void SAXParserTest::testExternalParsed()
 
 void SAXParserTest::testDefaultNamespace()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	std::string xml = parse(parser, XMLWriter::CANONICAL, DEFAULT_NAMESPACE);
 	assertTrue (xml ==	DEFAULT_NAMESPACE);
 }
@@ -177,9 +184,9 @@ void SAXParserTest::testDefaultNamespace()
 
 void SAXParserTest::testNamespaces()
 {
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	parser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, NAMESPACES);
 	assertTrue (xml == NAMESPACES);
 }
@@ -187,9 +194,9 @@ void SAXParserTest::testNamespaces()
 
 void SAXParserTest::testNamespacesNoPrefixes()
 {
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	parser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, NAMESPACES);
 	assertTrue (xml == NAMESPACES);
 }
@@ -197,8 +204,8 @@ void SAXParserTest::testNamespacesNoPrefixes()
 
 void SAXParserTest::testNoNamespaces()
 {
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, false);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, false);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, NAMESPACES);
 	assertTrue (xml == NAMESPACES);
 }
@@ -206,9 +213,9 @@ void SAXParserTest::testNoNamespaces()
 
 void SAXParserTest::testUndeclaredNamespace()
 {
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	parser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
 	try
 	{
 		std::string xml = parse(parser, XMLWriter::CANONICAL, UNDECLARED_NAMESPACE);
@@ -222,9 +229,9 @@ void SAXParserTest::testUndeclaredNamespace()
 
 void SAXParserTest::testUndeclaredNamespaceNoPrefixes()
 {
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	parser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	try
 	{
 		std::string xml = parse(parser, XMLWriter::CANONICAL, UNDECLARED_NAMESPACE);
@@ -238,8 +245,8 @@ void SAXParserTest::testUndeclaredNamespaceNoPrefixes()
 
 void SAXParserTest::testUndeclaredNoNamespace()
 {
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, false);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, false);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, UNDECLARED_NAMESPACE);
 	assertTrue (xml == UNDECLARED_NAMESPACE);
 }
@@ -247,38 +254,38 @@ void SAXParserTest::testUndeclaredNoNamespace()
 
 void SAXParserTest::testRSS()
 {
-	SAXParser parser;
-	WhitespaceFilter filter(&parser);
-	TestEntityResolver resolver;
-	filter.setEntityResolver(&resolver);
-	parser.setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
-	parser.setFeature(XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES, true);
-	
+	SAXParser::Ptr parser = new SAXParser;
+	WhitespaceFilter::Ptr filter = new WhitespaceFilter(parser);
+	TestEntityResolver::Ptr resolver = new TestEntityResolver;
+	filter->setEntityResolver(resolver);
+	parser->setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
+	parser->setFeature(XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES, true);
+
 	std::istringstream istr(RSS);
 	Poco::FileOutputStream ostr("rss.xml");
-	XMLWriter writer(ostr, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
-	filter.setContentHandler(&writer);
-	filter.setDTDHandler(&writer);
-	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
-	InputSource source(istr);
-	filter.parse(&source);
+	XMLWriter::Ptr writer = new XMLWriter(ostr, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
+	filter->setContentHandler(writer);
+	filter->setDTDHandler(writer);
+	filter->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.unsafeCast<Poco::XML::LexicalHandler>());
+	InputSource::Ptr source = new InputSource(istr);
+	filter->parse(source);
 }
 
 
 void SAXParserTest::testEncoding()
 {
-	SAXParser parser;
+	SAXParser::Ptr parser = new SAXParser;
 	Poco::Latin9Encoding encoding;
-	parser.addEncoding("ISO-8859-15", &encoding);
-	
+	parser->addEncoding("ISO-8859-15", &encoding);
+
 	std::istringstream istr(ENCODING);
 	std::ostringstream ostr;
-	XMLWriter writer(ostr, XMLWriter::WRITE_XML_DECLARATION, "ISO-8859-15", encoding);
-	parser.setContentHandler(&writer);
-	parser.setDTDHandler(&writer);
-	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
-	InputSource source(istr);
-	parser.parse(&source);
+	XMLWriter::Ptr writer = new XMLWriter(ostr, XMLWriter::WRITE_XML_DECLARATION, "ISO-8859-15", encoding);
+	parser->setContentHandler(writer);
+	parser->setDTDHandler(writer);
+	parser->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.cast<Poco::XML::LexicalHandler>());
+	InputSource::Ptr source = new InputSource(istr);
+	parser->parse(source);
 	
 	std::string xml = ostr.str();
 	assertTrue (xml == ENCODING);
@@ -288,25 +295,25 @@ void SAXParserTest::testEncoding()
 void SAXParserTest::testCharacters()
 {
 	static const XMLString xml("<textnode> TEXT &amp; AMPERSAND </textnode>");
-	SAXParser parser;
-	parser.setFeature(XMLReader::FEATURE_NAMESPACES, false);
-	std::string result = parse(parser, XMLWriter::CANONICAL, xml);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature(XMLReader::FEATURE_NAMESPACES, false);
+	std::string result = parse(parser.cast<XMLReader>(), XMLWriter::CANONICAL, xml);
 	assertTrue (result == xml);
 }
 
 
 void SAXParserTest::testParseMemory()
 {
-	SAXParser parser;
-	std::string xml = parseMemory(parser, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT, WSDL);
+	SAXParser::Ptr parser = new SAXParser;
+	std::string xml = parseMemory(parser.cast<XMLReader>(), XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT, WSDL);
 	assertTrue (xml == WSDL);
 }
 
 
 void SAXParserTest::testParsePartialReads()
 {
-	SAXParser parser;
-	parser.setFeature("http://www.appinf.com/features/enable-partial-reads", true);
+	SAXParser::Ptr parser = new SAXParser;
+	parser->setFeature("http://www.appinf.com/features/enable-partial-reads", true);
 
 	std::string xml = parse(parser, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT, WSDL);
 	assertTrue (xml == WSDL);
@@ -323,30 +330,30 @@ void SAXParserTest::tearDown()
 }
 
 
-std::string SAXParserTest::parse(XMLReader& reader, int options, const std::string& data)
+std::string SAXParserTest::parse(XMLReader::Ptr reader, int options, const std::string& data)
 {
 	std::istringstream istr(data);
 	std::ostringstream ostr;
-	XMLWriter writer(ostr, options);
-	writer.setNewLine(XMLWriter::NEWLINE_LF);
-	reader.setContentHandler(&writer);
-	reader.setDTDHandler(&writer);
-	reader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
-	InputSource source(istr);
-	reader.parse(&source);
+	XMLWriter::Ptr writer = new XMLWriter(ostr, options);
+	writer->setNewLine(XMLWriter::NEWLINE_LF);
+	reader->setContentHandler(writer);
+	reader->setDTDHandler(writer);
+	reader->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.unsafeCast<Poco::XML::LexicalHandler>());
+	InputSource::Ptr source = new InputSource(istr);
+	reader->parse(source);
 	return ostr.str();
 }
 
 
-std::string SAXParserTest::parseMemory(XMLReader& reader, int options, const std::string& data)
+std::string SAXParserTest::parseMemory(XMLReader::Ptr reader, int options, const std::string& data)
 {
 	std::ostringstream ostr;
-	XMLWriter writer(ostr, options);
-	writer.setNewLine(XMLWriter::NEWLINE_LF);
-	reader.setContentHandler(&writer);
-	reader.setDTDHandler(&writer);
-	reader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
-	reader.parseMemoryNP(data.data(), data.size());
+	XMLWriter::Ptr writer = new XMLWriter(ostr, options);
+	writer->setNewLine(XMLWriter::NEWLINE_LF);
+	reader->setContentHandler(writer);
+	reader->setDTDHandler(writer);
+	reader->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.unsafeCast<Poco::XML::LexicalHandler>());
+	reader->parseMemoryNP(data.data(), data.size());
 	return ostr.str();
 }
 
@@ -980,7 +987,9 @@ const std::string SAXParserTest::RSS =
 	"    <title>Features: SAML 2: The Building Blocks of Federated Identity</title>\n"
 	"    <link>http://www.xml.com/pub/a/2005/01/12/saml2.html</link>\n"
 	"    <description>\n"
-	"    Paul Madsen reports on the developments in web services security, including a new major release of SAML, which provides the basis for building federated identity.\n"
+	"    Paul Madsen reports on the developments in web services security, including a new major "
+			""
+			"release of SAML, which provides the basis for building federated identity.\n"
 	"   </description>\n"
 	"    <dc:source>XML.com</dc:source>\n"
 	"    <dc:creator>Paul Madsen</dc:creator>\n"

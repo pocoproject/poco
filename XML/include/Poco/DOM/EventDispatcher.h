@@ -19,7 +19,8 @@
 
 
 #include "Poco/XML/XML.h"
-#include "Poco/XML/XMLString.h"
+#include "Poco/DOM/EventListener.h"
+#include "Poco/RefPtr.h"
 #include <list>
 
 
@@ -31,7 +32,7 @@ class Event;
 class EventListener;
 
 
-class XML_API EventDispatcher
+class XML_API EventDispatcher: public RefCountedObject
 	/// This helper class manages event listener subscriptions
 	/// and event dispatching for AbstractNode.
 	///
@@ -43,14 +44,11 @@ class XML_API EventDispatcher
 public:
 	EventDispatcher();
 		/// Creates the EventDispatcher.
-		
-	~EventDispatcher();
-		/// Destroys the EventDispatcher.
-		
-	void addEventListener(const XMLString& type, EventListener* listener, bool useCapture);
+
+	void addEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture);
 		/// Adds an EventListener to the internal list.
-		
-	void removeEventListener(const XMLString& type, EventListener* listener, bool useCapture);
+
+	void removeEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture);
 		/// Removes an EventListener from the internal list.
 		///
 		/// If a dispatch is currently in progress, the list
@@ -58,35 +56,40 @@ public:
 		/// If no dispatch is currently in progress, all EventListeners
 		/// marked for deletion are removed from the list.
 
-	void dispatchEvent(Event* evt);
+	void dispatchEvent(RefPtr<Event> evt);
 		/// Dispatches the event.
 		///
 		/// Also removes all EventListeners marked for deletion from the
 		/// event dispatcher list.
-		
-	void captureEvent(Event* evt);
+
+	void captureEvent(RefPtr<Event> evt);
 		/// Dispatches the event in its capturing phase.
 		///
 		/// Also removes all EventListeners marked for deletion from the
 		/// event dispatcher list.
-		
-	void bubbleEvent(Event* evt);
+
+	void bubbleEvent(RefPtr<Event> evt);
 		/// Dispatches the event in its bubbling phase.
 		///
 		/// Also removes all EventListeners marked for deletion from the
 		/// event dispatcher list.
 
+protected:
+
+	~EventDispatcher();
+		/// Destroys the EventDispatcher.
+
 private:
 	struct EventListenerItem
 	{
-		XMLString      type;
-		EventListener* pListener;
-		bool           useCapture;
+		XMLString          type;
+		EventListener::Ptr pListener;
+		bool               useCapture;
 	};
 
 	typedef std::list<EventListenerItem> EventListenerList;
-	
-	int               _inDispatch;
+
+	std::atomic<int>  _inDispatch;
 	EventListenerList _listeners;
 };
 

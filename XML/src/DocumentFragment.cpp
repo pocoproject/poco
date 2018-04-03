@@ -13,6 +13,7 @@
 
 
 #include "Poco/DOM/DocumentFragment.h"
+#include "Poco/DOM/Document.h"
 
 
 namespace Poco {
@@ -22,14 +23,8 @@ namespace XML {
 const XMLString DocumentFragment::NODE_NAME = toXMLString("#document-fragment");
 
 
-DocumentFragment::DocumentFragment(Document* pOwnerDocument):
+DocumentFragment::DocumentFragment(Document::Ptr pOwnerDocument):
 	AbstractContainerNode(pOwnerDocument)
-{
-}
-
-
-DocumentFragment::DocumentFragment( Document* pOwnerDocument, const DocumentFragment& fragment):
-	AbstractContainerNode(pOwnerDocument, fragment)
 {
 }
 
@@ -51,15 +46,15 @@ unsigned short DocumentFragment::nodeType() const
 }
 
 
-Node* DocumentFragment::copyNode(bool deep, Document* pOwnerDocument) const
+Node::Ptr DocumentFragment::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
-	DocumentFragment* pClone = new DocumentFragment(pOwnerDocument, *this);
+	DocumentFragment::Ptr pClone = new DocumentFragment(pOwnerDocument);
 	if (deep)
 	{
-		Node* pCur = firstChild();
+		Node::Ptr pCur = firstChild();
 		while (pCur)
 		{
-			pClone->appendChild(static_cast<AbstractNode*>(pCur)->copyNode(deep, pOwnerDocument))->release();
+			pClone->appendChild(pCur.unsafeCast<AbstractNode>()->copyNode(deep, pOwnerDocument));
 			pCur = pCur->nextSibling();
 		}
 	}

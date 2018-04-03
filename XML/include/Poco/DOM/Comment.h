@@ -34,16 +34,18 @@ class XML_API Comment: public CharacterData
 	/// HTML, although some HTML tools may implement the full SGML comment structure.
 {
 public:
+	typedef RefPtr<Comment> Ptr;
+
 	// Node
 	const XMLString& nodeName() const;
 	unsigned short nodeType() const;
 
 protected:
-	Comment(Document* pOwnerDocument, const XMLString& data);
-	Comment(Document* pOwnerDocument, const Comment& comment);
+	Comment(RefPtr<Document> pOwnerDocument, const XMLString& data);
+	Comment(RefPtr<Document> pOwnerDocument, const Comment& comment);
 	~Comment();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

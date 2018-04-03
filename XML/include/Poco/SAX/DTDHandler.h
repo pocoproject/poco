@@ -20,13 +20,14 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
+#include "Poco/SAX/SAXHandler.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class XML_API DTDHandler
+class XML_API DTDHandler: public SAXHandler
 	/// If a SAX application needs information about notations and unparsed entities,
 	/// then the application implements this interface and registers an instance with the
 	/// SAX parser using the parser's setDTDHandler method. The parser uses the instance
@@ -46,6 +47,8 @@ class XML_API DTDHandler
 	/// corresponding with the attribute value.
 {
 public:
+	typedef RefPtr<DTDHandler> Ptr;
+
 	virtual void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId) = 0;
 		/// Receive notification of a notation declaration event.
 		///

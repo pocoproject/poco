@@ -18,9 +18,9 @@ CppUnit::Test* SAXTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SAXTestSuite");
 
-	pSuite->addTest(AttributesImplTest::suite());
-	pSuite->addTest(NamespaceSupportTest::suite());
-	pSuite->addTest(SAXParserTest::suite());
+	pSuite->addTest(AttributesImplTest::suite()); // good
+	pSuite->addTest(NamespaceSupportTest::suite()); // good
+	pSuite->addTest(SAXParserTest::suite()); // refleaks
 
 	return pSuite;
 }
