@@ -21,6 +21,7 @@
 !gradle.properties
 !settings.gradle
 !build.gradle
+!build.gradle.win
 .gradle/
 **/guild/
 coverage/
