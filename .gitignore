@@ -18,11 +18,13 @@
 
 # Gradle #
 ##########
+!gradle.properties
+!settings.gradle
+!build.gradle
+!build.gradle.win
 .gradle/
 **/guild/
-**/gradle/
-**/options.txt
-**/output.txt
+coverage/
 
 # NuGet #
 #########

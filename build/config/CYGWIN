@@ -69,13 +69,9 @@ RELEASEOPT_LINK =
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500
+SYSFLAGS = -D_GNU_SOURCE
 
-# give visibility of old BSD typedef like u_short, u_int, u_long...
-# used in some networking system includes, needed when using PocoNet
-SYSFLAGS += -D__BSD_VISIBLE
-
-
+#
 #
 # System Specific Libraries
 #
