@@ -23,6 +23,7 @@
 !build.gradle
 .gradle/
 **/guild/
+coverage/
 
 # NuGet #
 #########
