@@ -403,19 +403,16 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
+	SocketAddress addr;
 	if (_proxyConfig.host.empty() || bypassProxy())
-	{
-		SocketAddress addr(_host, _port);
-		if ((!_sourceAddress.host().isWildcard()) || (_sourceAddress.port() != 0))
-			connect(addr, _sourceAddress);
-		else
-			connect(addr);
-	}
+		addr = SocketAddress(_host, _port);
 	else
-	{
-		SocketAddress addr(_proxyConfig.host, _proxyConfig.port);
+		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
+
+	if ((!_sourceAddress.host().isWildcard()) || (_sourceAddress.port() != 0))
+		connect(addr, _sourceAddress);
+	else
 		connect(addr);
-	}
 }
 
 
@@ -470,6 +467,7 @@ StreamSocket HTTPClientSession::proxyConnect()
 	proxyRequest.set("Host", getHost());
 	proxyAuthenticateImpl(proxyRequest);
 	proxySession.setKeepAlive(true);
+	proxySession.setSourceAddress(_sourceAddress);
 	proxySession.sendRequest(proxyRequest);
 	proxySession.receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
