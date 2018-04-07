@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 	programName = argv[0];
 
 	std::string uriString;
-	std::string sourceIpString;
+	std::list<std::string> sourceIpList;
 	std::string proxyUriString;
 
 	for (int i = 1; i < argc; ++i)
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 				usage("Missing option arguments");
 			}
 
-			sourceIpString = argv[i];
+			sourceIpList.push_back(argv[i]);
 			continue;
 		}
 
@@ -144,8 +144,11 @@ int main(int argc, char **argv)
 			usage("wrong scheme '" + uri.getScheme() + "' for target uri, expected http or https");
 		}
 
-		if (!sourceIpString.empty())
+		while (!sourceIpList.empty())
 		{
+			std::string sourceIpString = sourceIpList.front();
+			sourceIpList.pop_front();
+
 			// Set the sourceIP address, but leave the source port to 0 so ANY port can be used
 			Poco::Net::SocketAddress sa = Poco::Net::SocketAddress(sourceIpString, 0);
 			session->setSourceAddress(sa);
