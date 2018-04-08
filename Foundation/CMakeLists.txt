@@ -1,6 +1,3 @@
-set(LIBNAME "Foundation")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -98,7 +95,7 @@ if(WIN32)
 	set(SYSLIBS ${SYSLIBS} iphlpapi)
 endif(WIN32)
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-	set_target_properties( "${LIBNAME}" PROPERTIES LINK_FLAGS "-library=stlport4")
+	set_target_properties( Foundation PROPERTIES LINK_FLAGS "-library=stlport4")
 endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
 if(ANDROID)
@@ -155,34 +152,34 @@ if(UNIX AND NOT APPLE)
 	endif(NOT HAVE_PTHREAD_SETAFFINITY_NP)
 endif(UNIX AND NOT APPLE)
 
-add_library( "${LIBNAME}" ${SRCS})
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(Foundation ${LIB_MODE} ${SRCS})
+add_library(Poco::Foundation ALIAS Foundation)
+set_target_properties(Foundation
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-	OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoFoundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries( "${LIBNAME}" ${SYSLIBS})
-target_include_directories( "${LIBNAME}"
+target_link_libraries( Foundation ${SYSLIBS})
+target_include_directories( Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(Foundation PUBLIC ${LIB_MODE_DEFINITIONS})
 
 if (NOT POCO_ENABLE_WSTRING)
-    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_WSTRING)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_WSTRING)
 endif()
 
 if (NOT POCO_ENABLE_FPENVIRONMENT)
-    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_FPENVIRONMENT)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT)
 endif()
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(Foundation)
+POCO_GENERATE_PACKAGE(Foundation)
 
 if (POCO_ENABLE_TESTS)
 	add_subdirectory( testsuite )

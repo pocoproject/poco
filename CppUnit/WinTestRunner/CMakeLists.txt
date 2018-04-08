@@ -1,5 +1,3 @@
-set(LIBNAME "WinTestRunner")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( WIN_SRCS ${SRCS_G})
@@ -15,20 +13,20 @@ POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 add_definitions("-D_AFXDLL")
 #TODO: Use instead of the flag above: find_package(MFC)
 
-add_library( "${LIBNAME}" ${WIN_SRCS} )
-set_target_properties( "${LIBNAME}"
+add_library(WinTestRunner ${WIN_SRCS} )
+set_target_properties(WinTestRunner
     PROPERTIES
     VERSION "1" SOVERSION "1"
     DEFINE_SYMBOL WinTestRunner_EXPORTS)
-target_link_libraries( "${LIBNAME}" PocoCppUnit )
-target_include_directories( "${LIBNAME}"
+target_link_libraries(WinTestRunner Poco::CppUnit)
+target_include_directories(WinTestRunner
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(WinTestRunner PUBLIC ${LIB_MODE_DEFINITIONS})
 
 if(WIN32)
-    target_link_libraries( ${LIBNAME} winmm )
+	target_link_libraries(WinTestRunner winmm )
 endif(WIN32)

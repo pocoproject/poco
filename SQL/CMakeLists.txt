@@ -1,6 +1,3 @@
-set(LIBNAME "SQL")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -18,26 +15,26 @@ if(MSVC AND NOT(MSVC_VERSION LESS 1400))
         PROPERTIES COMPILE_FLAGS "/bigobj")
 endif()
 
-add_library( "${LIBNAME}" ${SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(SQL ${SRCS} )
+add_library(Poco::SQL ALIAS SQL)
+set_target_properties(SQL
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoSQL
     DEFINE_SYMBOL SQL_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation)
-target_include_directories( "${LIBNAME}"
+target_link_libraries(SQL Poco::Foundation)
+target_include_directories(SQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(SQL PUBLIC ${LIB_MODE_DEFINITIONS})
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(SQL)
+POCO_GENERATE_PACKAGE(SQL)
 
 if(POCO_ENABLE_SQL_SQLITE)
     # SQlite3 is built in any case

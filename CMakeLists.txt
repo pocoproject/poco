@@ -29,13 +29,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Append our module directory to CMake
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+if(${CMAKE_VERSION} VERSION_LESS "3.4")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake32)
+endif()
 
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
-set(CMAKE_C_STANDARD 99)
-
 option(DISABLE_CPP14 "Disable C++14 if available" OFF)
 
 if (DISABLE_CPP14)
@@ -51,8 +53,8 @@ else()
   endif()
 endif()
 
-if (NO CMAKE_BUILD_TYPE STREQUAL)
-    set( CMAKE_BUILD_TYPE "RelWithDebInfo" )
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
 # Include some common macros to simpilfy Poco CMake files
@@ -174,7 +176,7 @@ else(BUILD_SHARED_LIBS)
 endif(BUILD_SHARED_LIBS)
 
 if (POCO_ENABLE_TESTS)
-	option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
+	option(POCO_ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
     include(CTest)
     enable_testing()
     if(POCO_VERBOSE_MESSAGES)
