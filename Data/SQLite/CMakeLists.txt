@@ -1,6 +1,3 @@
-set(LIBNAME  "DataSQLite")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SQLITE_SRCS ${SRCS_G})
@@ -32,26 +29,26 @@ endif(WINCE)
 
 add_definitions(-DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SQLITE_SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(DataSQLite ${LIB_MODE} ${SQLITE_SRCS} )
+add_library(Poco::DataSQLite ALIAS DataSQLite)
+set_target_properties(DataSQLite
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
+    OUTPUT_NAME PocoDataSQLite
     DEFINE_SYMBOL SQLite_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation Data ${DATASQLITELIBS} )
-target_include_directories( "${LIBNAME}"
+target_link_libraries(DataSQLite Poco::Foundation Poco::Data ${DATASQLITELIBS} )
+target_include_directories(DataSQLite
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(DataSQLite PUBLIC ${LIB_MODE_DEFINITIONS})
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(DataSQLite)
+POCO_GENERATE_PACKAGE(DataSQLite)
 
 if (ENABLE_TESTS)
     add_subdirectory(testsuite)

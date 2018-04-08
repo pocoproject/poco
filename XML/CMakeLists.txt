@@ -1,6 +1,3 @@
-set(LIBNAME "XML")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Expat CPP sources to be excluded from globbed SRCS_G
 # They are added back on the list if POCO_UNBUNDLED is not set
 set(EXPAT_CPP "${CMAKE_CURRENT_SOURCE_DIR}/src/xmlparse.cpp")
@@ -37,26 +34,26 @@ else()
 add_definitions(-DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H)
 endif()
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(XML ${LIB_MODE} ${SRCS} )
+add_library(Poco::XML ALIAS XML)
+set_target_properties( XML
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoXML
     DEFINE_SYMBOL XML_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" ${SYSLIBS} Foundation)
-target_include_directories( "${LIBNAME}"
+target_link_libraries(XML PUBLIC ${SYSLIBS} Poco::Foundation)
+target_include_directories(XML
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(XML PUBLIC ${LIB_MODE_DEFINITIONS})
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(XML)
+POCO_GENERATE_PACKAGE(XML)
 
 if (ENABLE_TESTS)
     add_subdirectory(samples)
