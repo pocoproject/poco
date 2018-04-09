@@ -59,15 +59,18 @@ Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 
 
-Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex(sqlite3_db_mutex(pDB))
+Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB)
 {
-	sqlite3_mutex_enter(_pMutex);
+	_pMutex = (pDB) ? sqlite3_db_mutex(pDB) : NULL;
+	if (_pMutex)
+		sqlite3_mutex_enter(_pMutex);
 }
 
 
 Utility::SQLiteMutex::~SQLiteMutex()
 {
-	sqlite3_mutex_leave(_pMutex);
+	if (_pMutex)
+		sqlite3_mutex_leave(_pMutex);
 }
 
 
