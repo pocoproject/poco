@@ -133,6 +133,8 @@ public:
 
 	void testFTS3();
 
+	void testIllegalFilePath();
+
 	void setUp();
 	void tearDown();
 
