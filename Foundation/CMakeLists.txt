@@ -155,8 +155,8 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries( Foundation ${SYSLIBS})
-target_include_directories( Foundation
+target_link_libraries(Foundation PUBLIC ${SYSLIBS})
+target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>

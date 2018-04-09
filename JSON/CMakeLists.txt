@@ -23,7 +23,7 @@ set_target_properties(JSON
     DEFINE_SYMBOL JSON_EXPORTS
     )
 
-target_link_libraries(JSON Poco::Foundation)
+target_link_libraries(JSON PUBLIC Poco::Foundation)
 target_include_directories(JSON
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

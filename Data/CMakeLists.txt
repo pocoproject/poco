@@ -24,7 +24,7 @@ set_target_properties(Data
     DEFINE_SYMBOL Data_EXPORTS
     )
 
-target_link_libraries(Data Poco::Foundation)
+target_link_libraries(Data PUBLIC Poco::Foundation)
 target_include_directories(Data
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

@@ -4,7 +4,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
 add_executable(PocoDoc ${SRCS} )
 
-target_link_libraries(PocoDoc Poco::Util Poco::XML Poco::Foundation Poco::CppParser)
+target_link_libraries(PocoDoc PUBLIC Poco::Util Poco::XML Poco::Foundation Poco::CppParser)
 
 install(
 	TARGETS PocoDoc EXPORT PocoDocTargets

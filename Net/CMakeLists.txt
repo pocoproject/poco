@@ -24,7 +24,7 @@ set_target_properties( Net
     DEFINE_SYMBOL Net_EXPORTS
     )
 
-target_link_libraries(Net Poco::Foundation ${SYSLIBS})
+target_link_libraries(Net PUBLIC Poco::Foundation ${SYSLIBS})
 target_include_directories(Net
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

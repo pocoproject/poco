@@ -15,7 +15,7 @@ set_target_properties(CppParser
     DEFINE_SYMBOL CppParser_EXPORTS
     )
 
-target_link_libraries(CppParser Poco::Foundation)
+target_link_libraries(CppParser PUBLIC Poco::Foundation)
 target_include_directories(CppParser
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
