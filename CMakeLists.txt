@@ -24,9 +24,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Append our module directory to CMake
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-
+if(${CMAKE_VERSION} VERSION_LESS "3.4")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake32)
+endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
@@ -197,9 +199,12 @@ if(WIN32 AND EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_Win AND ENABLE_NETSSL_WIN)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
 endif(WIN32 AND EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_Win AND ENABLE_NETSSL_WIN)
 
-find_package(OpenSSL)
+if(ENABLE_CRYPTO)
+	find_package(OpenSSL REQUIRED)
+else()
+	find_package(OpenSSL)
+endif()
 if(OPENSSL_FOUND)
-    include_directories("${OPENSSL_INCLUDE_DIR}")
     if(EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_OpenSSL AND ENABLE_NETSSL)
         add_subdirectory(NetSSL_OpenSSL)
         list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
