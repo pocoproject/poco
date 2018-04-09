@@ -10,7 +10,7 @@ set_target_properties(PageCompiler
     OUTPUT_NAME cpspc
     )
 
-target_link_libraries(PageCompiler ${CMAKE_THREAD_LIBS_INIT} Poco::Net Poco::Util Poco::XML Poco::JSON Poco::Foundation)
+target_link_libraries(PageCompiler PUBLIC ${CMAKE_THREAD_LIBS_INIT} Poco::Net Poco::Util Poco::XML Poco::JSON Poco::Foundation)
 
 install(
 	TARGETS PageCompiler EXPORT PageCompilerTargets

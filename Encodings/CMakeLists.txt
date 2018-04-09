@@ -15,7 +15,7 @@ set_target_properties(Encodings
     DEFINE_SYMBOL Encodings_EXPORTS
     )
 
-target_link_libraries(Encodings Poco::Foundation)
+target_link_libraries(Encodings PUBLIC Poco::Foundation)
 target_include_directories(Encodings
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
