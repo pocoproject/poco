@@ -14,12 +14,12 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
     src/WinCEDriver.cpp
 )
 
-add_executable(NetSSLWin ${TEST_SRCS} )
-add_test(NAME NetSSLWin WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND NetSSLWin -all)
-target_link_libraries(NetSSLWin Poco::NetSSL Poco::Crypto Poco::Net Poco::Util Poco::XML Poco::Foundation CppUnit)
+add_executable(NetSSLWin-testrunner ${TEST_SRCS} )
+add_test(NAME NetSSLWin WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND NetSSLWin-testrunner -all)
+target_link_libraries(NetSSLWin-testrunner Poco::NetSSL Poco::Crypto Poco::Net Poco::Util Poco::XML Poco::Foundation CppUnit)
 
 # The test is run in the build directory. So the test data is copied there too
-add_custom_command(TARGET NetSSLWin POST_BUILD
+add_custom_command(TARGET NetSSLWin-testrunner POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/any.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/rootcert.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 				   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSLWin.xml
