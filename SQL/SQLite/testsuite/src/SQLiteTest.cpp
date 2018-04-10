@@ -55,6 +55,7 @@ using Poco::SQL::Column;
 using Poco::SQL::Row;
 using Poco::SQL::SQLChannel;
 using Poco::SQL::LimitException;
+using Poco::SQL::ConnectionFailedException;
 using Poco::SQL::CLOB;
 using Poco::SQL::Date;
 using Poco::SQL::Time;
@@ -3708,6 +3709,18 @@ void SQLiteTest::testIncrementVacuum()
 	tmp << "PRAGMA incremental_vacuum(1024);", now;
 }
 
+void SQLiteTest::testIllegalFilePath()
+{
+	try
+	{
+		Session tmp (Poco::SQL::SQLite::Connector::KEY, "\\/some\\/illegal\\/path\\/dummy.db", 1);
+		fail("must fail");
+	}
+	catch (ConnectionFailedException&)
+	{
+	}
+}
+
 CppUnit::Test* SQLiteTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTest");
@@ -3801,6 +3814,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
 	CppUnit_addTest(pSuite, SQLiteTest, testJSONRowFormatter);
+	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 //
 //	To be fixed by dimanikulin
 //	CppUnit_addTest(pSuite, SQLiteTest, testIncrementVacuum);
