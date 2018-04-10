@@ -10,7 +10,6 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 POCO_SOURCES(SRCS pdjson src/pdjson.c)
-set_source_files_properties(src/pdjson.c PROPERTIES C_STANDARD 99)
 
 add_library(JSON ${LIB_MODE} ${SRCS} )
 add_library(Poco::JSON ALIAS JSON)
@@ -29,6 +28,7 @@ target_include_directories(JSON
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions(JSON PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_features(JSON PUBLIC c_variadic_macros)
 
 POCO_INSTALL(JSON)
 POCO_GENERATE_PACKAGE(JSON)
