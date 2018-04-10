@@ -32,8 +32,6 @@ endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
-set(CMAKE_C_STANDARD 99)
-
 option(DISABLE_CPP11 "Disable C++11 if available" OFF)
 option(DISABLE_CPP14 "Disable C++14 if available" OFF)
 
