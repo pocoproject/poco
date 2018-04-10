@@ -52,6 +52,7 @@ using Poco::Data::Column;
 using Poco::Data::Row;
 using Poco::Data::SQLChannel;
 using Poco::Data::LimitException;
+using Poco::Data::ConnectionFailedException;
 using Poco::Data::CLOB;
 using Poco::Data::Date;
 using Poco::Data::Time;
@@ -3362,6 +3363,19 @@ void SQLiteTest::testFTS3()
 }
 
 
+void SQLiteTest::testIllegalFilePath()
+{
+	try
+	{
+		Session tmp (Poco::Data::SQLite::Connector::KEY, "\\/some\\/illegal\\/path\\/dummy.db", 1);
+		fail("must fail");
+	}
+	catch (ConnectionFailedException&)
+	{
+	}
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -3462,6 +3476,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS3);
+	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 
 	return pSuite;
 }
