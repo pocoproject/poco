@@ -28,7 +28,11 @@ target_include_directories(JSON
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions(JSON PUBLIC ${LIB_MODE_DEFINITIONS})
-target_compile_features(JSON PUBLIC c_variadic_macros)
+if(MSVC)
+	set_property(TARGET JSON PROPERTY C_STANDARD 99)
+else()
+	target_compile_features(JSON PUBLIC c_variadic_macros)
+endif()
 
 POCO_INSTALL(JSON)
 POCO_GENERATE_PACKAGE(JSON)
