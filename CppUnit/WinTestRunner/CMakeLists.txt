@@ -9,10 +9,6 @@ POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h" )
 POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 
-# TODO: Is this flag always required?
-add_definitions("-D_AFXDLL")
-#TODO: Use instead of the flag above: find_package(MFC)
-
 add_library(WinTestRunner ${LIB_MODE} ${WIN_SRCS} )
 set_target_properties(WinTestRunner
     PROPERTIES
@@ -25,7 +21,15 @@ target_include_directories(WinTestRunner
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(WinTestRunner PUBLIC ${LIB_MODE_DEFINITIONS})
+# TODO: Is this flag _AFXDLL always required?
+target_compile_definitions(WinTestRunner
+  PUBLIC
+  ${LIB_MODE_DEFINITIONS}
+  PRIVATE
+  _AFXDLL
+  )
+#TODO: Use instead of the flag _AFXDLL above: find_package(MFC)
+
 
 if(WIN32)
 	target_link_libraries(WinTestRunner winmm )
