@@ -144,7 +144,6 @@ else()
 endif()
 
 if(POCO_UNBUNDLED)
-  add_definitions(-DPOCO_UNBUNDLED)
   message(STATUS "Using external sqlite, zlib, pcre, expat, ...")
 else()
   message(STATUS "Using internal sqlite, zlib, pcre, expat, ...")

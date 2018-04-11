@@ -15,8 +15,6 @@ POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
     find_package(EXPAT REQUIRED)
-    set(SYSLIBS ${SYSLIBS} ${EXPAT_LIBRARIES})
-    include_directories(${EXPAT_INCLUDE_DIRS})
 else()
     POCO_SOURCES( SRCS expat
     src/xmlparse.cpp
@@ -43,7 +41,7 @@ set_target_properties( XML
     DEFINE_SYMBOL XML_EXPORTS
     )
 
-target_link_libraries(XML PUBLIC ${SYSLIBS} Poco::Foundation)
+target_link_libraries(XML PUBLIC ${EXPAT_LIBRARIES} Poco::Foundation)
 target_include_directories(XML
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -51,6 +49,10 @@ target_include_directories(XML
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions(XML PUBLIC ${LIB_MODE_DEFINITIONS})
+if (POCO_UNBUNDLED)
+	target_include_directories(XML PUBLIC "${EXPAT_INCLUDE_DIRS}")
+	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
+endif()
 
 POCO_INSTALL(XML)
 POCO_GENERATE_PACKAGE(XML)

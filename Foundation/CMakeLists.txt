@@ -30,20 +30,13 @@ POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
 	find_package(PCRE REQUIRED)
-	set(SYSLIBS ${SYSLIBS} ${PCRE_LIBRARIES})
-	include_directories(${PCRE_INCLUDE_DIRS})
+	find_package(ZLIB REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES( SRCS RegExp
 		src/pcre_ucd.c
 		src/pcre_tables.c
 	)
-
-	find_package(ZLIB REQUIRED)
-	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-	include_directories(${ZLIB_INCLUDE_DIRS})
-
-	add_definitions(-DPOCO_UNBUNDLED)
 
 else()
 	# pcre
@@ -90,20 +83,6 @@ else()
 		src/zutil.c
 	)
 endif (POCO_UNBUNDLED)
-
-if(WIN32)
-	set(SYSLIBS ${SYSLIBS} iphlpapi)
-endif(WIN32)
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-	set_target_properties( Foundation PROPERTIES LINK_FLAGS "-library=stlport4")
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-
-if(ANDROID)
-	set(SYSLIBS ${SYSLIBS} log)
-endif(ANDROID)
-
-# TODO: Why is this here?
-add_definitions( -DPCRE_STATIC)
 
 # For SetAffinity
 if(UNIX AND NOT APPLE)
@@ -155,7 +134,13 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries(Foundation PUBLIC ${SYSLIBS})
+target_link_libraries(Foundation PUBLIC ${SYSLIBS} ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
+if(WIN32)
+	target_link_libraries(Foundation PUBLIC iphlpapi)
+endif()
+if(ANDROID)
+	target_link_libraries(Foundation PUBLIC log)
+endif()
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -163,6 +148,10 @@ target_include_directories(Foundation
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
 target_compile_definitions(Foundation PUBLIC ${LIB_MODE_DEFINITIONS})
+if(POCO_UNBUNDLED)
+	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+endif()
 
 POCO_INSTALL(Foundation)
 POCO_GENERATE_PACKAGE(Foundation)

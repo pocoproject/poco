@@ -10,8 +10,6 @@ POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
     find_package(ZLIB REQUIRED)
-    set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-    include_directories(${ZLIB_INCLUDE_DIRS})
 else()
     # zlib
     POCO_SOURCES( SRCS zlib
@@ -127,14 +125,18 @@ set_target_properties(PDF
     DEFINE_SYMBOL PDF_EXPORTS
     )
 
-target_link_libraries(PDF PUBLIC ${SYSLIBS} Poco::XML Poco::Util Poco::Foundation)
+target_link_libraries(PDF PUBLIC ${ZLIB_LIBRARIES} Poco::XML Poco::Util Poco::Foundation)
 target_include_directories(PDF
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+		"${ZLIB_INCLUDE_DIRS}"
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions(PDF PUBLIC ${LIB_MODE_DEFINITIONS})
+if (POCO_UNBUNDLED)
+	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+endif()
 
 POCO_INSTALL(PDF)
 POCO_GENERATE_PACKAGE(PDF)
