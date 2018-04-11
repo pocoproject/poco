@@ -87,52 +87,6 @@ else()
 	)
 endif (POCO_UNBUNDLED)
 
-# For POSIX threads on Unix
-if(UNIX AND NOT APPLE)
-	# We still need pthreads on Unix
-	set(SYSLIBS ${SYSLIBS} ${CMAKE_THREAD_LIBS_INIT})
-	INCLUDE (CheckFunctionExists)
-	INCLUDE (CheckCXXSourceCompiles)
-	INCLUDE (CheckLibraryExists)
-	CHECK_LIBRARY_EXISTS(pthread pthread_setaffinity_np "pthread.h" HAVE_PTHREAD_SETAFFINITY_NP)
-	if(NOT HAVE_PTHREAD_SETAFFINITY_NP)
-        if(POCO_VERBOSE_MESSAGES)
-            message(STATUS "Platform has not PTHREAD_SETAFFINITY_NP")
-        endif()
-	else(HAVE_PTHREAD_SETAFFINITY_NP)
-		add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
-		CHECK_CXX_SOURCE_COMPILES("
-		#include <sched.h>
-		int main() {
-			cpu_set_t cpumask;
-			sched_setaffinity( 0, sizeof(cpumask), &cpumask );
-			return 0;
-		}" HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-
-		if(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-            if(POCO_VERBOSE_MESSAGES)
-                message(STATUS "Platform has THREE PARAM at PTHREAD_SETAFFINITY_NP")
-            endif()
-			add_definitions(-DHAVE_THREE_PARAM_SCHED_SETAFFINITY)
-		else(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-			CHECK_CXX_SOURCE_COMPILES("
-			#include <sched.h>
-			int main() {
-				cpu_set_t cpumask;
-				sched_setaffinity( 0, &cpumask );
-				return 0;
-			}" HAVE_TWO_PARAM_SCHED_SETAFFINITY)
-
-			if(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
-                if(POCO_VERBOSE_MESSAGES)
-                    message(STATUS "Platform has TWO PARAM at PTHREAD_SETAFFINITY_NP")
-                endif()
-				add_definitions(-DHAVE_TWO_PARAM_SCHED_SETAFFINITY)
-			endif(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
-
-		endif(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-	endif(NOT HAVE_PTHREAD_SETAFFINITY_NP)
-endif(UNIX AND NOT APPLE)
 
 add_library(Foundation ${LIB_MODE} ${SRCS})
 add_library(Poco::Foundation ALIAS Foundation)
