@@ -1,8 +1,4 @@
 # Sources
-if (WIN32)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif (WIN32)
-
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
@@ -29,6 +25,7 @@ target_include_directories(JSON
     )
 target_compile_definitions(JSON PUBLIC ${LIB_MODE_DEFINITIONS})
 if(WIN32)
+	target_compile_definitions(JSON PRIVATE _CRT_SECURE_NO_WARNINGS)
 	set_source_files_properties(src/pdjson.c PROPERTIES LANGUAGE CXX)
 	set_property(TARGET JSON PROPERTY C_STANDARD 99)
 else()
