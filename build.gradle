@@ -1036,7 +1036,7 @@ task packaging() {
 	if (os.windows) {
 		dependsOn nuget(version, 'x86', os)
 		dependsOn nuget(version, 'x64', os)
-//		dependsOn wix
+		dependsOn wix
 	}
 }
 //
@@ -1140,6 +1140,7 @@ task coverage() {
 		tasksSet.each { task -> dependsOn report(os, task.project.parent.path.replace(':','/').substring(1), task.project.parent.name) }
 	}
 }
+
 /*
 task all() {
         FileCollection incs = task.includes;
