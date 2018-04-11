@@ -173,9 +173,10 @@ std::string PathImpl::selfImpl()
 	#else
 		std::size_t sz = 4096;
 	#endif
-	char buf[sz] = {0};
+	char buf[sz];
 	ssize_t ret = readlink("/proc/self/exe", buf, sz);
 	if (-1 == ret) throw SystemException("cannot obtain path for executable");
+	poco_assert_dbg(ret < sz);
 	buf[ret-1] = '\0';
 	return buf;
 #endif
