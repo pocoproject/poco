@@ -7,9 +7,7 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SQLITE_SRCS ${HDRS_G})
 
 if (POCO_UNBUNDLED)
-    find_package(SQLite3)
-    set(DATASQLITELIBS ${SQLITE3_LIBRARIES})
-    include_directories("${SQLITE3_INCLUDE_DIRS}")
+	find_package(SQLite3 REQUIRED)
 else()
     # sqlite3
     POCO_SOURCES( SQLITE_SRCS sqlite3
@@ -19,8 +17,6 @@ else()
     POCO_HEADERS( SQLITE_SRCS sqlite3
         src/sqlite3.h
     )
-
-    set(DATASQLITELIBS "")
 endif()
 
 if(WINCE)
@@ -38,7 +34,7 @@ set_target_properties(SQLSQLite
     DEFINE_SYMBOL SQLite_EXPORTS
     )
 
-target_link_libraries(SQLSQLite Poco::SQL ${DATASQLITELIBS} )
+target_link_libraries(SQLSQLite PUBLIC Poco::SQL ${SQLITE3_LIBRARIES})
 target_include_directories(SQLSQLite
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -46,6 +42,10 @@ target_include_directories(SQLSQLite
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions(SQLSQLite PUBLIC ${LIB_MODE_DEFINITIONS})
+if(POCO_UNBUNDLED)
+	target_include_directories(SQLSQLite PUBLIC "${SQLITE3_INCLUDE_DIRS}")
+	target_compile_definitions(SQLSQLite PUBLIC POCO_UNBUNDLED)
+endif()
 
 POCO_INSTALL(SQLSQLite)
 POCO_GENERATE_PACKAGE(SQLSQLite)

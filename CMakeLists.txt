@@ -195,7 +195,6 @@ elseif (POCO_VERBOSE_MESSAGES)
 endif ()
 
 if (POCO_UNBUNDLED)
-    add_definitions( -DPOCO_UNBUNDLED)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Build with using external sqlite, libz, pcre, expat ...")
     endif()
