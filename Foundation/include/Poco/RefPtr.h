@@ -43,7 +43,7 @@ class RefPtr
 	///     (decrements the reference count by one, if the reference
 	///      count reaches zero, deletes the object)
 	///
-	/// For a conforming implementaion, see RefCountedObject typedef.
+	/// For a conforming implementation, see RefCountedObject.
 	/// Unless there are specific reasons not to, it is recommended
 	/// that RefPtr-held objects inherit from RefCountedObject.
 	///
@@ -258,8 +258,7 @@ public:
 		///    RefPtr<Sub> sub = super.cast<Sub>();
 		///    poco_assert (sub.get());
 	{
-		Other* pOther = dynamic_cast<Other*>(_ptr);
-		return RefPtr<Other>(pOther, true);
+		return RefPtr<Other>(dynamic_cast<Other*>(_ptr), true);
 	}
 
 	template <class Other>
@@ -270,8 +269,7 @@ public:
 		///    RefPtr<Sub> sub = super.unsafeCast<Sub>();
 		///    poco_assert (sub.get());
 	{
-		Other* pOther = static_cast<Other*>(_ptr);
-		return RefPtr<Other>(pOther, true);
+		return RefPtr<Other>(static_cast<Other*>(_ptr), true);
 	}
 
 	C* operator -> ()

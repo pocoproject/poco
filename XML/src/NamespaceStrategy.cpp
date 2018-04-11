@@ -52,22 +52,21 @@ void NamespaceStrategy::splitName(const XMLChar* qname, XMLString& uri, XMLStrin
 	while (*p && *p != '\t') ++p;
 	if (*p)
 	{
-		uri.assign(qname, p - qname);
-		++p;
+		uri.assign(qname, p++ - qname);
 		const XMLChar* loc = p;
 		while (*p && *p != '\t') ++p;
 		localName.assign(loc, p - loc);
 		if (*p)
 			prefix.assign(++p);
 		else
-			prefix.assign(XML_LIT(""));
+			prefix.clear();
 	}
 	else
 	{
-		uri.assign(XML_LIT(""));
+		uri.clear();
 		localName = qname;
-		prefix.assign(XML_LIT(""));
-	}	
+		prefix.clear();
+	}
 }
 
 
@@ -169,13 +168,13 @@ void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar*
 		const XMLChar* attrValue = *atts++;
 		AttributesImpl::Attribute& attr = _attrs.addAttribute();
 		splitName(attrName, attr.namespaceURI, attr.localName, attr.qname);
-		if (!attr.qname.empty()) attr.qname += ':';
+		if (!attr.qname.empty()) attr.qname.append(1, ':');
 		attr.qname.append(attr.localName);
 		attr.value.assign(attrValue);
 		attr.specified = i < specifiedCount;
 	}
 	splitName(name, _uri, _local, _qname);
-	if (!_qname.empty()) _qname += ':';
+	if (!_qname.empty()) _qname.append(1, ':');
 	_qname.append(_local);
 	pContentHandler->startElement(_uri, _local, _qname, _attrs);
 }
@@ -186,7 +185,7 @@ void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler::
 	poco_assert_dbg (name && pContentHandler);
 
 	splitName(name, _uri, _local, _qname);
-	if (!_qname.empty()) _qname += ':';
+	if (!_qname.empty()) _qname.append(1, ':');
 	_qname.append(_local);
 	pContentHandler->endElement(_uri, _local, _qname);
 }

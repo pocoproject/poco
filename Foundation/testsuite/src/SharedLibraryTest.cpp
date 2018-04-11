@@ -12,6 +12,7 @@
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/SharedLibrary.h"
+#include "Poco/Path.h"
 #include "Poco/Exception.h"
 
 
@@ -19,6 +20,7 @@ using Poco::SharedLibrary;
 using Poco::NotFoundException;
 using Poco::LibraryLoadException;
 using Poco::LibraryAlreadyLoadedException;
+using Poco::Path;
 
 
 typedef int (*GimmeFiveFunc)();
@@ -36,7 +38,8 @@ SharedLibraryTest::~SharedLibraryTest()
 
 void SharedLibraryTest::testSharedLibrary1()
 {
-	std::string path = "TestLibrary";
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string path = self + "TestLibrary";
 	path.append(SharedLibrary::suffix());
 	SharedLibrary sl;
 	assertTrue (!sl.isLoaded());
@@ -70,7 +73,8 @@ void SharedLibraryTest::testSharedLibrary1()
 
 void SharedLibraryTest::testSharedLibrary2()
 {
-	std::string path = "TestLibrary";
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string path = self + "TestLibrary";
 	path.append(SharedLibrary::suffix());
 	SharedLibrary sl(path);
 	assertTrue (sl.getPath() == path);
@@ -140,12 +144,9 @@ CppUnit::Test* SharedLibraryTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedLibraryTest");
 
-#if !defined(_DEBUG)
-	// FIXME exclude from the Debug build temporarly for AppVeyor stability
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary1);
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary2);
 	CppUnit_addTest(pSuite, SharedLibraryTest, testSharedLibrary3);
-#endif
 
 	return pSuite;
 }

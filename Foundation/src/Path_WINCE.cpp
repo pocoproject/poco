@@ -72,6 +72,12 @@ std::string PathImpl::nullImpl()
 }
 
 
+std::string PathImpl::selfImpl()
+{
+	return "\\";
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	return "\\Temp\\";

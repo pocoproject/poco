@@ -38,7 +38,7 @@ TreeWalker::TreeWalker(const TreeWalker& walker):
 {
 }
 
-	
+
 TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
 {
 	if (&walker != this)
@@ -51,7 +51,7 @@ TreeWalker& TreeWalker::operator = (const TreeWalker& walker)
 	return *this;
 }
 
-	
+
 TreeWalker::~TreeWalker()
 {
 }

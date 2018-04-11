@@ -89,8 +89,10 @@ public:
 	void setNodeValue(const XMLString& value);
 
 protected:
-	CharacterData(RefPtr<Document> pOwnerDocument, const XMLString& data);
-	CharacterData(RefPtr<Document> pOwnerDocument, const CharacterData& data);
+	CharacterData(RefPtr<Document>&& pOwnerDocument, const XMLString& data);
+	CharacterData(RefPtr<Document>&& pOwnerDocument, const CharacterData& data);
+	CharacterData(RefPtr<Document>&& pOwnerDocument, XMLString&& data);
+	CharacterData(RefPtr<Document>&& pOwnerDocument, CharacterData&& data);
 	~CharacterData();
 
 private:

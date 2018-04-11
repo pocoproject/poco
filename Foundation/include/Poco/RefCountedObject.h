@@ -19,12 +19,17 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/MemoryPool.h"
 #include "Poco/Mutex.h"
 #include <atomic>
 
 
-#if defined(_DEBUG) && defined(POCO_REFCOUNT_NDC)
+#if defined(_DEBUG) && defined(POCO_REFCOUNT_DC)
+#define ENABLE_REFCOUNT_DC
+#endif
 
+
+#ifdef ENABLE_REFCOUNT_DC
 
 #include "Poco/NestedDiagnosticContext.h"
 #include "Poco/OrderedMap.h"
@@ -41,8 +46,8 @@ namespace Poco {
 class Foundation_API RefCountDiagnosticContext
 	/// This utility class is used for debugging and testing purposes
 	/// of the reference counting functionality and should not be used
-	/// for any other purpose. It is created on the heap and safely
-	/// deleted by a custom atexit() handler.
+	/// for any other purpose. it is enabled only for debug builds and
+	/// if POCO_REFCOUNT_DC macro is defined in Config.h.
 	///
 	/// See poco_rcdc_* set of macros below for explanation how it is used.
 {
@@ -50,7 +55,7 @@ public:
 	class TraceRecord
 	{
 	public:
-		TraceRecord(void *ptr, int refCount, int threshold, const char* func, const std::string &backtrace = "");
+		TraceRecord(void *ptr, int refCount, const char* func, const std::string &backtrace = "");
 		TraceRecord(const TraceRecord& other);
 		TraceRecord(TraceRecord&& other);
 		TraceRecord& operator == (const TraceRecord& other);
@@ -61,10 +66,6 @@ public:
 
 		void*       _ptr = 0;
 		int         _refCount = 0;
-		// threshold depends on whether duplicate()/release()
-		// were ever called; if not, it is 0, because all
-		// we've ever seen was refCount=1 in constructor
-		int         _threshold = 0;
 		std::string _functionName;
 		std::string _backtrace;
 
@@ -72,7 +73,6 @@ public:
 	};
 
 	typedef OrderedMap<void*, std::vector<TraceRecord>> TraceMap;
-	typedef std::atomic<RefCountDiagnosticContext*>     Ptr;
 
 	RefCountDiagnosticContext(bool full = false);
 	~RefCountDiagnosticContext();
@@ -83,7 +83,8 @@ public:
 	void dumpLeakRef(std::ostream &os) const;
 	void clear() const;
 
-	static RefCountDiagnosticContext* get();
+	// definition in Foundation.cpp
+	static RefCountDiagnosticContext& get();
 
 private:
 	RefCountDiagnosticContext(const RefCountDiagnosticContext&) = delete;
@@ -93,12 +94,10 @@ private:
 
 	static TraceMap& traceMap() { return _traceMap; }
 
-	static TraceMap _traceMap;
-	static Mutex    _mutex;
-	static Ptr      _pRCDC;
-	static bool     _full;
-
-	friend void atExitHandler();
+	// definitions in Foundation.cpp
+	static TraceMap      _traceMap;
+	static SpinlockMutex _mutex;
+	static bool          _full;
 };
 
 
@@ -108,23 +107,8 @@ private:
 
 inline void RefCountDiagnosticContext::addEntry(TraceRecord&& record) const
 {
-	Mutex::ScopedLock l(_mutex);
-	// if not full recording and this is the last record (ie. it is being
-	// garbage collected) for this pointer, remove it;
-	// full recording can get quite big and keeping collected garbage
-	// records does not make much sense in most scenarios, but it is possible
-	// by setting `_full` flag to true
-	auto found = traceMap().find(record._ptr);
-	if (found != traceMap().end() && !_full && record._refCount == record._threshold)
-	{
-		// memory has been released and full recording is disabled,
-		// remove entry
-		traceMap().erase(found);
-	}
-	else // otherwise, record it
-	{
-		traceMap()[record._ptr].emplace_back(std::move(record));
-	}
+	SpinlockMutex::ScopedLock l(_mutex);
+	traceMap()[record._ptr].emplace_back(std::move(record));
 }
 
 
@@ -148,7 +132,7 @@ inline void RefCountDiagnosticContext::dumpLeakRef(std::ostream& os) const
 
 inline void RefCountDiagnosticContext::clear() const
 {
-	Mutex::ScopedLock l(_mutex);
+	SpinlockMutex::ScopedLock l(_mutex);
 	traceMap().clear();
 }
 
@@ -160,181 +144,41 @@ typedef RefCountDiagnosticContext RCDC;
 
 
 // Diagnostic utility macros for tracing and managing records of refcount increments/decrements.
-// To trim stack entries from beginning or end, adjust parameters to NDC::backTrace() below.
-// Meaningfully usable only from classes that conform to the [Weak]RefCountedObject interface
-// and functionality.
+// To trim stack backtrace entries from beginning or end, adjust parameters to NDC::backTrace()
+// below. Usable only for classes that inherit from [Weak]RefCountedObject.
 //
 // Note: since access to the internal RefCountDiagnosticContext (static) storage is protected
 // by a static mutex, using this functionality partially disables the multi-threaded nature
-// of RefCounted access, so it should not be permanently enabled in code, but used as a temporary
-// reference counting troubleshooting tool (compile with POCO_REFCOUNT_NDC in Config.h defined
-// to globally enable/disable this functionality).
+// of RefCounted access, so it should never be permanently enabled in code, but used as a
+// temporary reference counting troubleshooting tool (compile debug, with POCO_REFCOUNT_DC in
+// Config.h defined to enable/disable this functionality).
 //
 // Backtrace works only with g++ at this time; without it this functionality is of limited use.
-// Disabled by default and always (even if POCO_REFCOUNT_NDC is defined) disabled for non-debug
-// builds.
+// Disabled by default for al builds and always (even if POCO_REFCOUNT_DC is defined) disabled
+// for non-debug builds.
 
-#define poco_rcdc_log(t) if (RCDC* p=RCDC::get()) p->addEntry(RCDC::TraceRecord((void*)this, referenceCount(), t, __func__, NDC::backtrace(1, 7)))
+#define poco_rcdc_log RCDC::get().addEntry(RCDC::TraceRecord((void*)this, _counter, __func__, NDC::backtrace(1, 7)))
 
-#define poco_rcdc_dump_leak(os) if (RCDC* p=RCDC::get()) p->dumpLeakRef(os)
+#define poco_rcdc_dump_leak(os) RCDC::get().dumpLeakRef(os)
 
-#define poco_rcdc_dump_all(os) if (RCDC* p=RCDC::get()) p->dumpAllRef(os)
+#define poco_rcdc_dump_all(os) RCDC::get().dumpAllRef(os)
 
-#define poco_rcdc_reset if (RCDC* p=RCDC::get()) p->clear();
+#define poco_rcdc_reset RCDC::get().clear();
 
-#else // !(_DEBUG && POCO_REFCOUNT_NDC)
+#else // !ENABLE_REFCOUNT_DC
 
 
 namespace Poco { typedef void RCDC; }
 
-#define poco_rcdc_log(t)
+#define poco_rcdc_log
 #define poco_rcdc_dump_leak(os)
 #define poco_rcdc_dump_all(os)
 #define poco_rcdc_reset
 
-#endif // _DEBUG && POCO_REFCOUNT_NDC
+#endif // ENABLE_REFCOUNT_DC
 
 
 namespace Poco {
-
-
-typedef std::atomic<int> RefCounterType;
-
-
-//
-// RefCounter
-//
-
-
-class Foundation_API RefCounter
-	/// A class for thread-safe strong reference counting.
-	///
-	/// RefCounter is created from RefCountedObject and used
-	/// internally as template parameter for RefCountedObjectImpl.
-	/// It maintains the reference count and deletes itself when
-	/// the count reaches zero.
-{
-public:
-	typedef void MutexType;
-
-	RefCounter();
-
-	void duplicate() const;
-
-	int release();
-
-	int count() const;
-
-private:
-	~RefCounter();
-
-	RefCounter(const RefCounter&) = delete;
-	RefCounter(RefCounter&&) = delete;
-	RefCounter& operator = (const RefCounter&) = delete;
-	RefCounter& operator = (RefCounter&&) = delete;
-
-	mutable RefCounterType _counter;
-	template <class T> friend class RefCountedObjectImpl;
-	friend class RefCountDiagnosticContext;
-};
-
-//
-// WeakRefCounter
-//
-
-template <typename M = Mutex>
-class WeakRefCounter
-	/// A class for thread-safe strong and weak reference
-	/// counting.
-	///
-	/// WeakRefCounter is created from WeakRefCountedObject and
-	/// used internally as template parameter for RefCountedObjectImpl.
-	/// It maintains two reference counts, "strong" and "weak" and
-	/// deletes itself when both counts reach zero.
-	/// WeakRefCounter can be instantiated with Mutex (default, thread-safe),
-	/// or NullMutex (no synchronization access from multiple threads).
-{
-public:
-	typedef typename M::ScopedLock ScopedLock;
-	typedef M MutexType;
-
-	WeakRefCounter(): _counter(1)
-	{
-	}
-
-	void duplicate()
-	{
-		++_counter;
-	}
-
-	int release()
-	{
-		int counter = --_counter;
-		if (counter == 0)
-		{
-			if (!_pWeakCounter || *_pWeakCounter == 0)
-			{
-				delete this;
-				return 0;
-			}
-		}
-		return counter;
-	}
-
-	WeakRefCounter* duplicateWeak()
-	{
-		ScopedLock l(_mutex);
-		if (!_pWeakCounter) _pWeakCounter = new RefCounterType(1);
-		else                ++*_pWeakCounter;
-		return this;
-	}
-
-	WeakRefCounter* releaseWeak()
-	{
-		ScopedLockWithUnlock<M> l(_mutex);
-
-		poco_check_ptr(_pWeakCounter);
-		if (--*_pWeakCounter > 0) return this;
-		poco_assert (*_pWeakCounter == 0);
-
-		if(_counter.load() == 0)
-		{
-			l.unlock();
-			delete this;
-		}
-
-		return 0;
-	}
-
-	int count() const
-	{
-		return _counter;
-	}
-
-	int weakCount() const
-	{
-		ScopedLock l(_mutex);
-		if (_pWeakCounter) return *_pWeakCounter;
-		return 0;
-	}
-
-private:
-	~WeakRefCounter()
-	{
-		delete _pWeakCounter;
-	}
-
-	WeakRefCounter(const WeakRefCounter&);
-	WeakRefCounter(WeakRefCounter&&);
-	WeakRefCounter& operator = (const WeakRefCounter&);
-	WeakRefCounter& operator = (WeakRefCounter&&);
-
-	RefCounterType  _counter;
-	RefCounterType* _pWeakCounter = 0;
-	mutable M       _mutex;
-
-	template <class T> friend class RefCountedObjectImpl;
-};
 
 
 //
@@ -342,198 +186,418 @@ private:
 //
 
 
-template <typename T>
-class RefCountedObjectImpl
-	/// A base class for objects that employ
+class RefCounter
+	/// A class for thread-safe atomic reference counting.
+{
+public:
+	RefCounter();
+		/// Creates RefCounter.
+
+	~RefCounter();
+		/// Destroys RefCounter.
+
+	int operator++ ();
+		/// Prefix increment.
+
+	int operator++ (int);
+		/// Postfix increment.
+
+	int operator-- ();
+		/// Prefix decrement.
+
+	int operator-- (int);
+		/// Postfix decrement.
+
+	operator int();
+		/// Returns the current value as int.
+
+private:
+	RefCounter(const RefCounter&) = delete;
+	RefCounter(RefCounter&&) = delete;
+	RefCounter& operator = (const RefCounter&) = delete;
+	RefCounter& operator = (RefCounter&&) = delete;
+
+	mutable std::atomic<int> _counter;
+};
+
+//
+// inlines
+//
+
+inline int RefCounter::operator++()
+{
+#ifdef ENABLE_REFCOUNT_DC
+	int c = _counter.fetch_add(1, std::memory_order_relaxed) + 1;
+	poco_rcdc_log;
+	return c;
+#endif
+	return _counter.fetch_add(1, std::memory_order_relaxed) + 1;
+}
+
+
+inline int RefCounter::operator++(int)
+{
+#ifdef ENABLE_REFCOUNT_DC
+	int c = _counter.fetch_add(1, std::memory_order_relaxed);
+	poco_rcdc_log;
+	return c;
+#endif
+	return _counter.fetch_add(1, std::memory_order_relaxed);
+}
+
+
+inline int RefCounter::operator--()
+{
+#ifdef ENABLE_REFCOUNT_DC
+	int c = _counter.fetch_sub(1, std::memory_order_acquire) - 1;
+	poco_rcdc_log;
+	return c;
+#endif
+	return _counter.fetch_sub(1, std::memory_order_acquire) - 1;
+}
+
+
+inline int RefCounter::operator--(int)
+{
+#ifdef ENABLE_REFCOUNT_DC
+	int c = _counter.fetch_sub(1, std::memory_order_acquire);
+	poco_rcdc_log;
+	return c;
+#endif
+	return _counter.fetch_sub(1, std::memory_order_acquire);
+}
+
+
+inline RefCounter::operator int()
+{
+	return _counter;
+}
+
+
+//
+// RefCountedObject
+//
+
+class Foundation_API RefCountedObject
+	/// A class for thread-safe strong reference counting.
+	///
+	/// RefCountedObject is created from RefCountedObject.
+	/// It maintains the reference count and deletes itself when
+	/// the count reaches zero.
+{
+public:
+	RefCountedObject();
+		/// Creates RefCountedObject
+
+	void duplicate() const;
+		/// Increments the reference counter.
+
+	void release();
+		/// Decrements the reference counter.
+		/// If counter value after decrement is zero,
+		/// this object is deleted.
+
+	int referenceCount() const;
+		/// Returns the reference count.
+
+protected:
+	virtual ~RefCountedObject();
+		/// Destroys RefCountedObject
+
+private:
+	RefCountedObject(const RefCountedObject&) = delete;
+	RefCountedObject(RefCountedObject&&) = delete;
+	RefCountedObject& operator = (const RefCountedObject&) = delete;
+	RefCountedObject& operator = (RefCountedObject&&) = delete;
+
+	mutable RefCounter _counter;
+
+	friend class RefCountDiagnosticContext;
+};
+
+//
+// inlines
+//
+
+inline void RefCountedObject::duplicate() const
+{
+	_counter++;
+}
+
+
+inline void RefCountedObject::release()
+{
+	if (--_counter == 0) delete this;
+}
+
+
+inline int RefCountedObject::referenceCount() const
+{
+	return _counter;
+}
+
+
+typedef RefCountedObject RCO;
+
+
+//
+// WeakRefCounter
+//
+
+
+// global memory pool for weak counters;
+// see definition in Foundation.cpp
+template<typename T>
+extern FastMemoryPool<T>& getFastMemoryPool();
+
+
+class Foundation_API WeakRefCounter
+	/// A class for thread-safe strong and weak reference
+	/// counting.
+	///
+	/// WeakRefCounter is created on the heap from WeakRefCountedObject
+	/// and may outlive the WeakRefCountedObject that created it.
+	/// It maintains two reference counts, "strong" and "weak"; deletes
+	/// itself when both counts reach zero. This is the only reference
+	/// counting facility accessed by WeakRefPtr.
+	///
+	/// Note: this class has a very specific library-internal purpose;
+	/// it is not meant for general use.
+{
+public:
+	WeakRefCounter();
+		/// Creates WeakRefCounter.
+
+	void duplicate();
+		/// Increments strong counter.
+
+	int release();
+		/// Decrements strong counter.
+		/// If, after decrement, both strong and weak
+		/// counters are zero, it deletes this object.
+
+	WeakRefCounter* duplicateWeak();
+		/// Increments weak counter.
+
+	WeakRefCounter* releaseWeak();
+		/// Decrements weak counter.
+		/// If, after decrement, both strong and weak
+		/// counters are zero, it deletes this object.
+
+	int count() const;
+		/// Rteturns the current value of the strong
+		/// reference count.
+
+	int weakCount() const;
+		/// Rteturns the current value of the weak
+		/// reference count.
+
+private:
+	~WeakRefCounter();
+		/// Destroys WeakRefCounter.
+
+	void* operator new(std::size_t);
+		/// Returns a block of memory from FastMemoryPool.
+
+	void operator delete(void* ptr);
+		/// Returns the block of memory to the FastMemoryPool.
+
+	void* operator new [] (std::size_t);
+		/// Not used; must never be accessed.
+		/// throws InvalidAccessException.
+
+	void operator delete [] (void* ptr);
+		/// Not used; does nothing.
+
+	WeakRefCounter(const WeakRefCounter&);
+	WeakRefCounter(WeakRefCounter&&);
+	WeakRefCounter& operator = (const WeakRefCounter&);
+	WeakRefCounter& operator = (WeakRefCounter&&);
+
+	mutable RefCounter _counter;
+	mutable RefCounter _weakCounter;
+
+	friend class WeakRefCountedObject;
+	template <typename T, class M> friend class FastMemoryPool;
+};
+
+//
+// inlines
+//
+
+inline void WeakRefCounter::duplicate()
+{
+	_counter++;
+}
+
+
+inline int WeakRefCounter::release()
+{
+	if (--_counter == 0 && _weakCounter == 0)
+	{
+		delete this;
+		return 0;
+	}
+	return _counter;
+}
+
+
+inline WeakRefCounter* WeakRefCounter::duplicateWeak()
+{
+	_weakCounter++;
+	return this;
+}
+
+
+inline WeakRefCounter* WeakRefCounter::releaseWeak()
+{
+	if (--_weakCounter == 0 && _counter == 0)
+	{
+		delete this;
+		return nullptr;
+	}
+	return this;
+}
+
+
+inline int WeakRefCounter::count() const
+{
+	return _counter;
+}
+
+
+inline int WeakRefCounter::weakCount() const
+{
+	return _weakCounter;
+}
+
+
+//
+// RefCountedObject
+//
+
+class Foundation_API WeakRefCountedObject
+	/// A base class for objects that employ weak/strong
 	/// reference counting based garbage collection.
 	///
 	/// Reference-counted objects inhibit construction
 	/// by copying and assignment.
 	///
-	///  The semantic of the RefCountedImpl object
-	///  and involved classes are:
+	///  The semantics of the RefCountedImpl object
+	///  and involved classes are as follows:
 	///
-	///    - RefCountedObjectImpl can be instantiated as
-	///      RefCountedObject (RCO) or WeakRefCountedobject (WRCO)
+	///    - WeakRefCountedObject (WRCO) is used by WeakRefPtr and
+	///      RefPtr; RefPtr accesses only WRCO, WeakRefPtr accesses
+	///      only WeakRefCounter (which is created from this class
+	///      and may outlive it if "strong" count reaches zero before
+	///      the weak one)
 	///
-	///    - RCO and WRCO must be created on the heap and can not be
-	///      created on the stack
+	///    - WRCO must be created on the heap and should never be
+	///      created on the stack (if a user class inherits from WRCO,
+	///      it should have protected destructor)
 	///
-	///    - RCO has one reference count; when the count reaches
-	///      zero, object deletes itself
-	///
-	///    - WRCO has two reference counts, "strong" and "weak";
-	///      when the strong count reaches zero, this object deletes
-	///      itself; the reference counter, however, continues to exist
-	///      until the last weak reference is released (see below)
-	///
-	///    - counts are maintained by objects (RefCounter and WeakRefCounter)
-	///      used to instantiate the RefCountedObjectImpl template;
-	///      these objects delete itself under normal circumstances
+	///    - both reference counts are maintained by WeakRefCounter,
+	///      which deletes itself under normal circumstances
 	///      (see below for an exception to normal circumstances)
 	///
-	///    - when instantiated using WeakRefCounter, the counter object
-	///      may "outlive" this object if weak reference count is greater
-	///      than zero at the time when strong reference count reaches zero
+	///    - WeakRefCounter may "outlive" this object if weak reference
+	///      count is greater than zero at the time when the strong
+	///      reference count reaches zero
 	///
-	///    - there is a "corner" case when a [W]RCO object may be created as
-	///      a pointer and deleted using delete operator, without release()
-	///      ever be called; since this means that counter was never notified
-	///      of the reference count change, it follows that it is the
-	///      responsibility of the [W]RCO to delete the counter
+	///    - WeakRefCounter will always delete itself. except in one "corner"
+	///      case when a WRCO object is created outside of RefPtr/WealRefPtr
+	///      wrappers and deleted using `delete` operator, without release()
+	///      ever be called; since not calling release() means that the counter
+	///      was never notified of the reference count change, it follows that
+	///      it is the responsibility of this object to delete the counter
 	///
 	///    - reference counting is thread-safe; reference counted objects,
-	///      as well as smart pointers "wrapping" them, however, are not
+	///      as well as the smart pointers "wrapping" them, however, are not
 	///      thread-safe; access to null counter pointer means there is a
-	///      bug somewhere in user application (there is a debug build
-	///      check for such circumstances, but no non-debug checks,
+	///      bug somewhere in user application (there are debug build checks
+	///      indicating such circumstances, but no non-debug checks,
 	///      so - thread carefully!)
 	///
+	///    - mutexes are not used, so there is no performance difference between
+	///      single- and multi-threaded modes of operation; note that, depending
+	///      on the underlying atomics implementation, locking may still happen
+	///      in both modes
 {
 public:
-	typedef typename std::atomic<T*> CounterType;
-	typedef typename T::MutexType MutexType;
-
-	void duplicate() const
+	void duplicate() const;
 		/// Increments the object's reference count.
-	{
-		poco_assert_dbg(_counter.load() != 0);
-		_counter.load()->duplicate();
-		poco_rcdc_log(1);
-	}
 
-	void release() const throw()
+	void release() const throw();
 		/// Decrements the object's reference count;
 		/// deletes the object if the count reaches
 		/// zero.
-	{
-		poco_assert_dbg(_counter.load() != 0);
-		poco_rcdc_log(1);
-		if(_counter.load()->release() == 0)
-		{
-			// _counter has deleted itself, disarm
-			// the delete in `this` destructor
-			_counter.store(0);
-			delete this;
-		}
-	}
 
-	int referenceCount() const
+	int referenceCount() const;
 		/// Returns the reference count.
-		/// This function is not thread-safe.
-	{
-		T* pCounter = _counter.load();
-		poco_assert_dbg (pCounter != 0);
-		return pCounter ? pCounter->count() : 0;
-	}
 
-	T* counter() const
-	{
-		return _counter;
-	}
+	WeakRefCounter* counter() const;
+		/// Return pointer to counter.
 
 protected:
-	RefCountedObjectImpl(): _counter(new T)
-		/// Creates the RefCountedObjectImpl.
-		/// The initial reference count is one.
-	{
-		poco_rcdc_log(0);
-	}
 
-	virtual ~RefCountedObjectImpl()
+	WeakRefCountedObject();
+		/// Creates the RefCountedObjectImpl.
+		/// The initial reference count is one.;
+
+	virtual ~WeakRefCountedObject();
 		/// Destroys the RefCountedObjectImpl.
-	{
-		poco_rcdc_log(1);
-		// prevent leak if release() was never called
-		// (eg. this object new-ed into bare pointer
-		// and deleted from outside using delete)
-		// to prevent double delete, release() flags
-		// access by setting the counter pointer to 0
-		delete _counter.load();
-	}
 
 private:
-	RefCountedObjectImpl(const RefCountedObjectImpl&) = delete;
-	RefCountedObjectImpl& operator = (const RefCountedObjectImpl&) = delete;
-	RefCountedObjectImpl(RefCountedObjectImpl&&) = delete;
-	RefCountedObjectImpl& operator = (RefCountedObjectImpl&&) = delete;
+	WeakRefCountedObject(const WeakRefCountedObject&) = delete;
+	WeakRefCountedObject& operator = (const WeakRefCountedObject&) = delete;
+	WeakRefCountedObject(WeakRefCountedObject&&) = delete;
+	WeakRefCountedObject& operator = (WeakRefCountedObject&&) = delete;
 
-	mutable CounterType _counter;
+	mutable std::atomic<WeakRefCounter*> _pCounter;
 
 	friend class RefCountDiagnosticContext;
+	template <typename T, class M> friend class FastMemoryPool;
 };
 
 
-// MS linker has trouble with duplicate symbols unless these are defined
-// externally as fully specialized and inlined; unfortunately, this means
-// same code in two places (ie. defeats the main purpose of templates).
-// While this code could be factored out in standalone functions, it involves
-// `delete this`, shapes everything in even uglier way and further complicates
-// development and troubleshooting. So, for now, we live with this workaround
-// annoyance.
+typedef WeakRefCountedObject WRCO;
 
-#ifdef POCO_COMPILER_MSVC
 
-template <>
-inline RefCountedObjectImpl<RefCounter>::RefCountedObjectImpl() : _counter(new RefCounter)
+//
+// inlines
+//
+
+inline void WeakRefCountedObject::duplicate() const
 {
-	poco_rcdc_log(0);
+	poco_assert_dbg(_pCounter.load() != 0);
+	_pCounter.load()->duplicate();
 }
 
 
-template <>
-inline RefCountedObjectImpl<RefCounter>::~RefCountedObjectImpl()
+inline void WeakRefCountedObject::release() const throw()
 {
-	poco_rcdc_log(1);
-	delete _counter.load();
-}
-
-
-template <>
-inline void RefCountedObjectImpl<RefCounter>::duplicate() const
-{
-	poco_assert_dbg(_counter.load() != 0);
-	_counter.load()->duplicate();
-	poco_rcdc_log(1);
-}
-
-
-template <>
-inline void RefCountedObjectImpl<RefCounter>::release() const throw()
-{
-	poco_assert_dbg(_counter.load() != 0);
-	poco_rcdc_log(1);
-	if(_counter.load()->release() == 0)
+	poco_assert_dbg(_pCounter.load() != 0);
+	if(_pCounter.load()->release() == 0)
 	{
-		_counter.store(0);
+		// _pCounter has deleted itself, disarm
+		// the delete in the destructor
+		_pCounter = 0;
 		delete this;
+		return;
 	}
 }
 
 
-template <>
-inline int RefCountedObjectImpl<RefCounter>::referenceCount() const
+inline int WeakRefCountedObject::referenceCount() const
 {
-	RefCounter* pCounter = _counter.load();
-	poco_assert_dbg (pCounter != 0);
-	return pCounter ? pCounter->count() : 0;
+	return _pCounter.load()->count();
 }
 
 
-template <>
-inline RefCounter* RefCountedObjectImpl<RefCounter>::counter() const
+inline WeakRefCounter* WeakRefCountedObject::counter() const
 {
-	return _counter;
+	return _pCounter;
 }
-
-#endif // POCO_COMPILER_MSVC
-
-
-typedef RefCountedObjectImpl<WeakRefCounter<Mutex>> WeakRefCountedObject;
-typedef WeakRefCountedObject WRCO;
-
-typedef RefCountedObjectImpl<RefCounter> RefCountedObject;
-typedef RefCountedObject RCO;
 
 
 } // namespace Poco

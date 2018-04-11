@@ -41,8 +41,8 @@ public:
 	unsigned short nodeType() const;
 
 protected:
-	Comment(RefPtr<Document> pOwnerDocument, const XMLString& data);
-	Comment(RefPtr<Document> pOwnerDocument, const Comment& comment);
+	Comment(RefPtr<Document>&& pOwnerDocument, const XMLString& data);
+	Comment(RefPtr<Document>&& pOwnerDocument, const Comment& comment);
 	~Comment();
 
 	Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const;

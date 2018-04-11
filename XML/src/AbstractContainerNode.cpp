@@ -30,7 +30,7 @@ namespace XML {
 const XMLString AbstractContainerNode::WILDCARD(toXMLString("*"));
 
 
-AbstractContainerNode::AbstractContainerNode(Document::Ptr pOwnerDocument):
+AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument):
 	AbstractNode(pOwnerDocument)
 {
 }
@@ -39,14 +39,11 @@ AbstractContainerNode::AbstractContainerNode(Document::Ptr pOwnerDocument):
 AbstractContainerNode::~AbstractContainerNode()
 {
 	AbstractNode::Ptr pChild = _pFirstChild.cast<AbstractNode>();
-	while (pChild)
+	while(pChild && pChild->_pNext)
 	{
-		AbstractNode::Ptr pDelNode = pChild;
-		pChild = pChild->_pNext;
-		pDelNode->_pNext   = 0;
-		if (pChild.isNull()) break;
-		RefPtr<AbstractNode> p = pChild->_pParent.lock();
-		pDelNode->_pParent = p.cast<AbstractContainerNode>();
+		AbstractNode::Ptr pDelNode(std::move(pChild->_pNext));
+		pDelNode->_pParent = 0;
+		pChild = std::move(pDelNode);
 	}
 }
 
@@ -71,11 +68,14 @@ Node::Ptr AbstractContainerNode::lastChild() const
 
 Node::Ptr AbstractContainerNode::insertBefore(Node::Ptr newChild, Node::Ptr refChild)
 {
-	poco_assert (!newChild.isNull());
+	poco_assert (newChild);
 
-	if (newChild.cast<AbstractNode>()->_pOwner != _pOwner && newChild.cast<AbstractNode>()->_pOwner != this)
+	AbstractNode* pNewChild = newChild.cast<AbstractNode>();
+	AbstractNode* pRefChild = refChild.cast<AbstractNode>();
+
+	if (pNewChild->_pOwner != _pOwner && pNewChild->_pOwner != this)
 		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
-	if (refChild && refChild.cast<AbstractNode>()->_pParent != this)
+	if (refChild && pRefChild->_pParent != this)
 		throw DOMException(DOMException::NOT_FOUND_ERR);
 	if (newChild == refChild)
 		return newChild;
@@ -102,10 +102,9 @@ Node::Ptr AbstractContainerNode::insertBefore(Node::Ptr newChild, Node::Ptr refC
 	}
 	else
 	{
-		RefPtr<AbstractNode> p = newChild.cast<AbstractNode>()->_pParent.lock();
-		AbstractContainerNode::Ptr pParent = p.cast<AbstractContainerNode>();
+		AbstractContainerNode::Ptr pParent = pNewChild->_pParent;
 		if (pParent) pParent->removeChild(newChild);
-		pFirst = newChild.cast<AbstractNode>();
+		pFirst.assign(pNewChild, true);
 		pLast  = pFirst;
 		pFirst->_pParent = Poco::RefPtr<AbstractContainerNode>(this, true);
 	}
@@ -147,12 +146,15 @@ Node::Ptr AbstractContainerNode::insertBefore(Node::Ptr newChild, Node::Ptr refC
 
 Node::Ptr AbstractContainerNode::replaceChild(Node::Ptr newChild, Node::Ptr oldChild)
 {
-	poco_assert (!newChild.isNull());
-	poco_assert (!oldChild.isNull());
+	poco_assert (newChild);
+	poco_assert (oldChild);
 
-	if (newChild.cast<AbstractNode>()->_pOwner != _pOwner && newChild.cast<AbstractNode>()->_pOwner != this)
+	AbstractNode* pNewChild = newChild.cast<AbstractNode>();
+	AbstractNode* pOldChild = oldChild.cast<AbstractNode>();
+
+	if (pNewChild->_pOwner != _pOwner && pNewChild->_pOwner != this)
 		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
-	if (oldChild.cast<AbstractNode>()->_pParent != this)
+	if (pOldChild->_pParent != this)
 		throw DOMException(DOMException::NOT_FOUND_ERR);
 	if (newChild == oldChild)
 		return newChild;
@@ -167,50 +169,48 @@ Node::Ptr AbstractContainerNode::replaceChild(Node::Ptr newChild, Node::Ptr oldC
 	}
 	else
 	{
-		RefPtr<AbstractNode> p = newChild.cast<AbstractNode>()->_pParent.lock();
-		AbstractContainerNode::Ptr pParent = p.cast<AbstractContainerNode>();
-		if (pParent) pParent->removeChild(newChild);
+		if (pNewChild->_pParent) pNewChild->_pParent->removeChild(newChild);
 
-		if (oldChild == _pFirstChild.cast<Node>())
+		if (pOldChild == _pFirstChild)
 		{
 			if (doEvents)
 			{
 				_pFirstChild->dispatchNodeRemoved();
 				_pFirstChild->dispatchNodeRemovedFromDocument();
 			}
-			newChild.cast<AbstractNode>()->_pNext   = oldChild.cast<AbstractNode>()->_pNext;
-			newChild.cast<AbstractNode>()->_pParent = Ptr(this, true);
+			pNewChild->_pNext   = pOldChild->_pNext;
+			pNewChild->_pParent = Ptr(this, true);
 			_pFirstChild->_pNext   = 0;
 			_pFirstChild->_pParent = 0;
-			_pFirstChild = newChild.cast<AbstractNode>();
+			_pFirstChild.assign(pNewChild, true);
 			if (doEvents)
 			{
-				newChild.cast<AbstractNode>()->dispatchNodeInserted();
-				newChild.cast<AbstractNode>()->dispatchNodeInsertedIntoDocument();
+				pNewChild->dispatchNodeInserted();
+				pNewChild->dispatchNodeInsertedIntoDocument();
 			}
 		}
 		else
 		{
-			AbstractNode::Ptr pCur = _pFirstChild;
-			while (!pCur.isNull() && pCur->_pNext != oldChild.cast<AbstractNode>()) pCur = pCur->_pNext;
+			AbstractNode* pCur = _pFirstChild;
+			while (pCur && pCur->_pNext != pOldChild) pCur = pCur->_pNext;
 			if (pCur)
 			{
-				poco_assert_dbg (pCur->_pNext == oldChild.cast<AbstractNode>());
+				poco_assert_dbg (pCur->_pNext == pOldChild);
 
 				if (doEvents)
 				{
-					oldChild.cast<AbstractNode>()->dispatchNodeRemoved();
-					oldChild.cast<AbstractNode>()->dispatchNodeRemovedFromDocument();
+					pOldChild->dispatchNodeRemoved();
+					pOldChild->dispatchNodeRemovedFromDocument();
 				}
-				newChild.cast<AbstractNode>()->_pNext   = oldChild.cast<AbstractNode>()->_pNext;
-				newChild.cast<AbstractNode>()->_pParent = Ptr(this, true);
-				oldChild.cast<AbstractNode>()->_pNext   = 0;
-				oldChild.cast<AbstractNode>()->_pParent = 0;
-				pCur->_pNext = newChild.cast<AbstractNode>();
+				pNewChild->_pNext   = pOldChild->_pNext;
+				pNewChild->_pParent = Ptr(this, true);
+				pOldChild->_pNext   = 0;
+				pOldChild->_pParent = 0;
+				pCur->_pNext.assign(pNewChild, true);
 				if (doEvents)
 				{
-					newChild.cast<AbstractNode>()->dispatchNodeInserted();
-					newChild.cast<AbstractNode>()->dispatchNodeInsertedIntoDocument();
+					pNewChild->dispatchNodeInserted();
+					pNewChild->dispatchNodeInsertedIntoDocument();
 				}
 			}
 			else throw DOMException(DOMException::NOT_FOUND_ERR);
@@ -225,17 +225,19 @@ Node::Ptr AbstractContainerNode::removeChild(Node::Ptr oldChild)
 {
 	poco_check_ptr (oldChild);
 
+	AbstractNode* pOldChild = oldChild.cast<AbstractNode>();
+
 	bool doEvents = events();
 	if (oldChild == _pFirstChild.cast<Node>())
 	{
 		if (doEvents)
 		{
-			oldChild.cast<AbstractNode>()->dispatchNodeRemoved();
-			oldChild.cast<AbstractNode>()->dispatchNodeRemovedFromDocument();
+			pOldChild->dispatchNodeRemoved();
+			pOldChild->dispatchNodeRemovedFromDocument();
 		}
 		_pFirstChild = _pFirstChild->_pNext;
-		oldChild.cast<AbstractNode>()->_pNext   = 0;
-		oldChild.cast<AbstractNode>()->_pParent = 0;
+		pOldChild->_pNext.reset();
+		pOldChild->_pParent = 0;
 	}
 	else
 	{
@@ -245,12 +247,12 @@ Node::Ptr AbstractContainerNode::removeChild(Node::Ptr oldChild)
 		{
 			if (doEvents)
 			{
-				oldChild.cast<AbstractNode>()->dispatchNodeRemoved();
-				oldChild.cast<AbstractNode>()->dispatchNodeRemovedFromDocument();
+				pOldChild->dispatchNodeRemoved();
+				pOldChild->dispatchNodeRemovedFromDocument();
 			}
 			pCur->_pNext = pCur->_pNext->_pNext;
-			oldChild.cast<AbstractNode>()->_pNext   = 0;
-			oldChild.cast<AbstractNode>()->_pParent = 0;
+			pOldChild->_pNext.reset();
+			pOldChild->_pParent = 0;
 		}
 		else throw DOMException(DOMException::NOT_FOUND_ERR);
 	}
@@ -459,7 +461,7 @@ Node::Ptr AbstractContainerNode::findElement(const XMLString& name, Node::Ptr pN
 
 Node::Ptr AbstractContainerNode::findElement(int index, Node::Ptr pNode, const NSMap* pNSMap)
 {
-	const Node::Ptr pRefNode = pNode;
+	Node::Ptr pRefNode = pNode;
 	if (index > 0)
 	{
 		pNode = pNode->nextSibling();
@@ -499,8 +501,8 @@ Node::Ptr AbstractContainerNode::findElement(const XMLString& attr, const XMLStr
 
 const Attr::Ptr AbstractContainerNode::findAttribute(const XMLString& name, Node::Ptr pNode, const NSMap* pNSMap)
 {
-	Attr::Ptr pResult(0);
-	Element::Ptr pElem = pNode.cast<Element>();
+	Attr::Ptr pResult;
+	Element* pElem = pNode.cast<Element>();
 	if (pElem)
 	{
 		if (pNSMap)

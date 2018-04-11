@@ -64,8 +64,10 @@ public:
 	XMLString innerText() const;
 
 protected:
-	Text(Document::Ptr pOwnerDocument, const XMLString& data);
-	Text(Document::Ptr pOwnerDocument, const Text& text);
+	Text(Document::Ptr& pOwnerDocument, const XMLString& data);
+	Text(Document::Ptr& pOwnerDocument, const Text& text);
+	Text(Document::Ptr&& pOwnerDocument, XMLString&& data);
+	Text(Document::Ptr&& pOwnerDocument, Text&& text);
 	~Text();
 
 	Node::Ptr copyNode(bool deep, Document::Ptr pOwnerDocument) const;

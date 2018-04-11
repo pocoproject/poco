@@ -35,101 +35,57 @@ LayeredConfiguration::~LayeredConfiguration()
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
 {
-	add(pConfig, highest(), false, true);
+	add(pConfig, highest(), false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label)
 {
-	add(pConfig, label, highest(), false, true);
+	add(pConfig, label, highest(), false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, bool shared)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, int priority)
 {
-	add(pConfig, highest(), false, shared);
+	add(pConfig, priority, false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, bool shared)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority)
 {
-	add(pConfig, label, highest(), false, shared);
+	add(pConfig, label, priority, false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority)
+void LayeredConfiguration::addWriteable(AbstractConfiguration::Ptr pConfig, int priority)
 {
-	add(pConfig, priority, false, true);
+	add(pConfig, priority, true);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, int priority, bool writeable)
 {
-	add(pConfig, label, priority, false, true);
+	add(pConfig, std::string(), priority, writeable);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool shared)
-{
-	add(pConfig, priority, false, shared);
-}
-
-
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool shared)
-{
-	add(pConfig, label, priority, false, shared);
-}
-
-
-void LayeredConfiguration::addFront(AbstractConfiguration* pConfig)
-{
-	add(pConfig, lowest(), false, true);
-}
-
-
-void LayeredConfiguration::addFront(AbstractConfiguration* pConfig, bool shared)
-{
-	add(pConfig, lowest(), false, shared);
-}
-
-
-void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int priority)
-{
-	add(pConfig, priority, true, true);
-}
-
-
-void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int priority, bool shared)
-{
-	add(pConfig, priority, true, shared);
-}
-
-
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool writeable, bool shared)
-{
-	add(pConfig, std::string(), priority, writeable, shared);
-}
-
-
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool writeable, bool shared)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority, bool writeable)
 {
 	ConfigItem item;
-	item.pConfig   = ConfigPtr(pConfig, shared);
+	item.pConfig   = pConfig;
 	item.priority  = priority;
 	item.writeable = writeable;
 	item.label     = label;
-	
+
 	ConfigList::iterator it = _configs.begin();
-	while (it != _configs.end() && it->priority < priority)
-		++it;
-		
+	while (it != _configs.end() && it->priority < priority) ++it;
 	_configs.insert(it, item);
 }
 
 
-void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
+void LayeredConfiguration::removeConfiguration(AbstractConfiguration::Ptr pConfig)
 {
 	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
@@ -142,14 +98,11 @@ void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
 }
 
 
-LayeredConfiguration::ConfigPtr LayeredConfiguration::find(const std::string& label) const
+AbstractConfiguration::Ptr LayeredConfiguration::find(const std::string& label) const
 {
 	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
-		if (it->label == label)
-		{
-			return it->pConfig;
-		}
+		if (it->label == label) return it->pConfig;
 	}
 	return 0;
 }
@@ -159,8 +112,7 @@ bool LayeredConfiguration::getRaw(const std::string& key, std::string& value) co
 {
 	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
-		if (it->pConfig->getRaw(key, value))
-			return true;
+		if (it->pConfig->getRaw(key, value)) return true;
 	}
 	return false;
 }
@@ -172,8 +124,7 @@ void LayeredConfiguration::setRaw(const std::string& key, const std::string& val
 	{
 		if (it->writeable)
 		{
-			it->pConfig->setRaw(key, value);
-			return;
+			it->pConfig->setRaw(key, value); return;
 		}
 	}
 	throw RuntimeException("No writeable configuration object to store the property", key);

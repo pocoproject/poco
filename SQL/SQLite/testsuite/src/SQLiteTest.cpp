@@ -2427,8 +2427,6 @@ void SQLiteTest::testRowFilter()
 
 void SQLiteTest::testAsync()
 {
-// many false leak reports due to thread pool
-#ifndef POCO_REFCOUNT_NDC
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
@@ -2512,9 +2510,6 @@ void SQLiteTest::testAsync()
 	assertTrue (!stmt2.isAsync());
 	assertTrue ("deque" == stmt2.getStorage());
 	assertTrue (stmt2.execute() == rowCount);
-#else
-	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
-#endif // POCO_REFCOUNT_NDC
 }
 
 
@@ -2583,8 +2578,6 @@ void SQLiteTest::testPair()
 
 void SQLiteTest::testSQLChannel()
 {
-// many false leak reports due to thread pool
-#ifndef POCO_REFCOUNT_NDC
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
 	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
@@ -2654,16 +2647,11 @@ void SQLiteTest::testSQLChannel()
 	rs2.moveNext();
 	assertTrue ("WarningSource" == rs2["Source"]);
 	assertTrue ("f Warning sync message" == rs2["Text"]);
-#else
-	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
-#endif // POCO_REFCOUNT_NDC
 }
 
 
 void SQLiteTest::testSQLLogger()
 {
-// many false leak reports due to static logger
-#ifndef POCO_REFCOUNT_NDC
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS T_POCO_LOG", now;
 	tmp << "CREATE TABLE T_POCO_LOG (Source VARCHAR,"
@@ -2678,9 +2666,9 @@ void SQLiteTest::testSQLLogger()
 	{
 		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::SQL::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
 		Logger& root = Logger::root();
-		root.setChannel(pChannel.get());
+		root.setChannel(pChannel);
 		root.setLevel(Message::PRIO_INFORMATION);
-		
+
 		root.information("Informational message");
 		root.warning("Warning message");
 		root.debug("Debug message");
@@ -2694,9 +2682,6 @@ void SQLiteTest::testSQLLogger()
 	rs.moveNext();
 	assertTrue ("TestSQLChannel" == rs["Source"]);
 	assertTrue ("Warning message" == rs["Text"]);
-#else
-	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
-#endif // POCO_REFCOUNT_NDC
 }
 
 
@@ -3257,8 +3242,6 @@ void SQLiteTest::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 
 void SQLiteTest::testSessionTransaction()
 {
-// many false leak reports due to thread pool
-#ifndef POCO_REFCOUNT_NDC
 	Session session (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	assertTrue (session.isConnected());
 
@@ -3350,9 +3333,6 @@ void SQLiteTest::testSessionTransaction()
 	
 	local.close();
 	assertTrue (!local.isConnected());
-#else
-	std::cout << "ignored due to POCO_REFCOUNT_NDC" << std::endl;
-#endif // POCO_REFCOUNT_NDC
 }
 
 

@@ -22,12 +22,12 @@ namespace Poco {
 namespace XML {
 
 
-ElementsByTagNameList::ElementsByTagNameList(const Node::Ptr pParent, const XMLString& name):
-	_pParent(pParent),
+ElementsByTagNameList::ElementsByTagNameList(Node::Ptr pParent, const XMLString& name):
+	_pParent(std::move(pParent)),
 	_name(name),
 	_count(0)
 {
-	poco_check_ptr (pParent);
+	poco_check_ptr (_pParent);
 }
 
 
@@ -57,7 +57,7 @@ namespace
 }
 
 
-Node::Ptr ElementsByTagNameList::find(const Node::Ptr pParent, unsigned long index) const
+Node::Ptr ElementsByTagNameList::find(Node::Ptr pParent, unsigned long index) const
 {
 	if (!pParent) return 0;
 
@@ -78,13 +78,13 @@ Node::Ptr ElementsByTagNameList::find(const Node::Ptr pParent, unsigned long ind
 }
 
 
-ElementsByTagNameListNS::ElementsByTagNameListNS(const Node::Ptr pParent, const XMLString& namespaceURI, const XMLString& localName):
-	_pParent(pParent),
+ElementsByTagNameListNS::ElementsByTagNameListNS(Node::Ptr pParent, const XMLString& namespaceURI, const XMLString& localName):
+	_pParent(std::move(pParent)),
 	_localName(localName),
 	_namespaceURI(namespaceURI),
 	_count(0)
 {
-	poco_check_ptr (pParent);
+	poco_check_ptr (_pParent);
 }
 
 
@@ -109,7 +109,7 @@ unsigned long ElementsByTagNameListNS::length() const
 }
 
 
-Node::Ptr ElementsByTagNameListNS::find(const Node::Ptr pParent, unsigned long index) const
+Node::Ptr ElementsByTagNameListNS::find(Node::Ptr pParent, unsigned long index) const
 {
 	if (!pParent) return 0;
 

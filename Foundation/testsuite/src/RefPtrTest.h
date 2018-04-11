@@ -32,7 +32,7 @@ public:
 	void testMoveInherited();
 	void testWeakRefPtr();
 	void testWeakSemantics();
-	void testLeak();
+	void testWeakLeak();
 	void testWeakCast();
 	void testRefPtrThread();
 	void pointersBenchmark();
@@ -41,14 +41,6 @@ public:
 	void tearDown();
 
 	static CppUnit::Test* suite();
-
-private:
-	class LeakTest: public Poco::WeakRefCountedObject
-	{
-	protected: ~LeakTest() { }
-	friend class RefPtrTest;
-	};
-	LeakTest* _leak = 0;
 };
 
 

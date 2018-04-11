@@ -23,14 +23,14 @@ namespace XML {
 const XMLString Comment::NODE_NAME = toXMLString("#comment");
 
 
-Comment::Comment(Document::Ptr pOwnerDocument, const XMLString& data):
-	CharacterData(pOwnerDocument, data)
+Comment::Comment(Document::Ptr&& pOwnerDocument, const XMLString& data):
+	CharacterData(std::move(pOwnerDocument), data)
 {
 }
 
 
-Comment::Comment(Document::Ptr pOwnerDocument, const Comment& comment):
-	CharacterData(pOwnerDocument, comment)
+Comment::Comment(Document::Ptr&& pOwnerDocument, const Comment& comment):
+	CharacterData(std::move(pOwnerDocument), comment)
 {
 }
 
@@ -54,7 +54,7 @@ unsigned short Comment::nodeType() const
 
 Node::Ptr Comment::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 {
-	return new Comment(pOwnerDocument, *this);
+	return new Comment(std::move(pOwnerDocument), *this);
 }
 
 

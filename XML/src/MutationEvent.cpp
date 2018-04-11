@@ -29,25 +29,25 @@ const XMLString MutationEvent::DOMAttrModified             = toXMLString("DOMAtt
 const XMLString MutationEvent::DOMCharacterDataModified    = toXMLString("DOMCharacterDataModified");
 
 
-MutationEvent::MutationEvent(Document::Ptr pOwnerDocument, const XMLString& type):
-	Event(pOwnerDocument, type, 0, true, false),
+MutationEvent::MutationEvent(Document::Ptr&& pOwnerDocument, const XMLString& type):
+	Event(std::move(pOwnerDocument), type, 0, true, false),
 	_change(MODIFICATION),
 	_pRelatedNode(0)
 {
 }
 
 
-MutationEvent::MutationEvent(Document::Ptr pOwnerDocument, const XMLString& type, EventTarget::Ptr pTarget, bool canBubble, bool cancelable, Node::Ptr relatedNode):
-	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
+MutationEvent::MutationEvent(Document::Ptr&& pOwnerDocument, const XMLString& type, EventTarget::Ptr&& pTarget, bool canBubble, bool cancelable, Node::Ptr relatedNode):
+	Event(std::move(pOwnerDocument), type, std::move(pTarget), canBubble, cancelable),
 	_change(MODIFICATION),
 	_pRelatedNode(relatedNode)
 {
 }
 
 
-MutationEvent::MutationEvent(Document::Ptr pOwnerDocument, const XMLString& type, EventTarget::Ptr pTarget, bool canBubble, bool cancelable, Node::Ptr relatedNode,
+MutationEvent::MutationEvent(Document::Ptr&& pOwnerDocument, const XMLString& type, EventTarget::Ptr&& pTarget, bool canBubble, bool cancelable, Node::Ptr relatedNode,
 	                         const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change):
-	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
+	Event(std::move(pOwnerDocument), type, std::move(pTarget), canBubble, cancelable),
 	_prevValue(prevValue),
 	_newValue(newValue),
 	_attrName(attrName),

@@ -186,8 +186,8 @@ protected:
 	Element(Element&&);
 	Element& operator=(const Element&);
 	Element& operator=(Element&&);
-	Element(RefPtr<Document> pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
-	Element(RefPtr<Document> pOwnerDocument, const Element& elem);
+	Element(RefPtr<Document>& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
+	Element(RefPtr<Document>& pOwnerDocument, const Element& elem);
 	~Element();
 
 	Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const;
@@ -196,6 +196,9 @@ protected:
 	void dispatchNodeInsertedIntoDocument();
 
 private:
+	Element(RefPtr<Document>&& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
+	Element(RefPtr<Document>&& pOwnerDocument, const Element& element);
+
 	const Name&  _name;
 	RefPtr<Attr> _pFirstAttr;
 

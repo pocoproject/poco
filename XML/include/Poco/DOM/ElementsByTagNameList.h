@@ -39,12 +39,12 @@ public:
 	unsigned long length() const;
 
 protected:
-	ElementsByTagNameList(const Node::Ptr pParent, const XMLString& name);
+	ElementsByTagNameList(Node::Ptr pParent, const XMLString& name);
 	~ElementsByTagNameList();
 
-	Node::Ptr find(const Node::Ptr pParent, unsigned long index) const;
+	Node::Ptr find(Node::Ptr pParent, unsigned long index) const;
 
-	const Node::Ptr _pParent;
+	RefPtr<Node> _pParent;
 	XMLString   _name;
 	mutable unsigned long _count;
 	
@@ -64,12 +64,12 @@ public:
 	virtual unsigned long length() const;
 
 protected:
-	ElementsByTagNameListNS(const Node::Ptr pParent, const XMLString& namespaceURI, const XMLString& localName);
+	ElementsByTagNameListNS(Node::Ptr pParent, const XMLString& namespaceURI, const XMLString& localName);
 	~ElementsByTagNameListNS();
 
-	Node::Ptr find(const Node::Ptr pParent, unsigned long index) const;
+	Node::Ptr find(Node::Ptr pParent, unsigned long index) const;
 
-	const Node::Ptr _pParent;
+	RefPtr<Node> _pParent;
 	XMLString   _localName;
 	XMLString   _namespaceURI;
 	mutable unsigned long _count;

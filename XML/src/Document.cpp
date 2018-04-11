@@ -155,7 +155,13 @@ DocumentFragment::Ptr Document::createDocumentFragment() const
 
 Text::Ptr Document::createTextNode(const XMLString& data) const
 {
-	return new Text(Ptr(const_cast<Document*>(this), true), data);
+	return new Text(Ptr(const_cast<Document*>(this), true), std::string(data));
+}
+
+
+Text::Ptr Document::createTextNode(XMLString&& data) const
+{
+	return new Text(Ptr(const_cast<Document*>(this), true), std::move(data));
 }
 
 
@@ -209,7 +215,7 @@ unsigned short Document::nodeType() const
 
 Node::Ptr Document::importNode(Node::Ptr importedNode, bool deep)
 {
-	return importedNode.cast<AbstractNode>()->copyNode(deep, Ptr(this, true));
+	return importedNode.unsafeCast<AbstractNode>()->copyNode(deep, Ptr(this, true));
 }
 
 
@@ -271,13 +277,13 @@ void Document::setDoctype(DocumentType::Ptr pDoctype)
 
 DocumentType::Ptr Document::doctype() const
 {
-	return _pDocumentType.lock();
+	return _pDocumentType;
 }
 
 
 DocumentType::Ptr Document::getDoctype()
 {
-	return _pDocumentType.lock();
+	return _pDocumentType;
 }
 
 

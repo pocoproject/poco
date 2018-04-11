@@ -19,6 +19,7 @@
 
 
 #include "Poco/XML/XML.h"
+#include "Poco/XML/Name.h"
 #include "Poco/DOM/Node.h"
 #include "Poco/DOM/MutationEvent.h"
 #include "Poco/DOM/EventListener.h"
@@ -31,6 +32,7 @@ namespace XML {
 class AbstractContainerNode;
 class Attr;
 class EventDispatcher;
+class Element;
 
 
 class XML_API AbstractNode: public Node
@@ -78,7 +80,7 @@ public:
 	Node::Ptr getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
 
 protected:
-	AbstractNode(RefPtr<Document> pOwnerDocument);
+	AbstractNode(Document* pOwnerDocument);
 	~AbstractNode();
 
 	virtual Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const = 0;
@@ -101,8 +103,14 @@ protected:
 private:
 	AbstractNode();
 
+	template <typename T>
+	static typename T::Ptr makeTarget(T* pTarget)
+	{
+		return typename T::Ptr(pTarget, true);
+	}
+
 	WeakRefPtr<AbstractNode> _pParent;
-	RefPtr<AbstractNode> _pNext;
+	RefPtr<AbstractNode>     _pNext;
 	Document*                _pOwner;
 	RefPtr<EventDispatcher>  _pEventDispatcher;
 

@@ -83,7 +83,7 @@ void DOMWriter::writeNode(XMLByteOutputStream& ostr, Node::Ptr pNode)
 	serializer->setDTDHandler(writer);
 	serializer->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.unsafeCast<LexicalHandler>());
 	if (isFragment) writer->startFragment();
-	serializer->serialize(pNode);
+	serializer->serialize(std::move(pNode));
 	if (isFragment) writer->endFragment();
 }
 

@@ -22,16 +22,30 @@ namespace Poco {
 namespace XML {
 
 
-CharacterData::CharacterData(Document::Ptr pOwnerDocument, const XMLString& data):
-	AbstractNode(pOwnerDocument),
+CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, const XMLString& data):
+	AbstractNode(std::move(pOwnerDocument)),
 	_data(data)
 {
 }
 
 
-CharacterData::CharacterData(Document::Ptr pOwnerDocument, const CharacterData& data):
-	AbstractNode(pOwnerDocument),
+CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, const CharacterData& data):
+	AbstractNode(std::move(pOwnerDocument)),
 	_data(data._data)
+{
+}
+
+
+CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, XMLString&& data):
+		AbstractNode(std::move(pOwnerDocument)),
+		_data(std::move(data))
+{
+}
+
+
+CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, CharacterData&& data):
+		AbstractNode(std::move(pOwnerDocument)),
+		_data(std::move(data._data))
 {
 }
 

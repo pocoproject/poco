@@ -36,12 +36,10 @@ NodeAppender::~NodeAppender()
 
 void NodeAppender::appendChild(Node::Ptr newChild)
 {
-	poco_check_ptr (newChild);
-	poco_assert (_pLast.isNull() || _pLast->_pNext.isNull());
-
 	if (newChild.unsafeCast<AbstractNode>()->_pOwner != _pParent->_pOwner)
 		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
-		
+
+	Element::Ptr pParent = _pParent;
 	if (newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
 	{
 		AbstractContainerNode::Ptr pFrag = newChild.unsafeCast<AbstractContainerNode>();
@@ -55,7 +53,7 @@ void NodeAppender::appendChild(Node::Ptr newChild)
 			while (pChild)
 			{
 				_pLast = pChild;
-				pChild->_pParent = _pParent.lock();
+				pChild->_pParent = pParent;
 				pChild = pChild->_pNext;
 			}
 			pFrag->_pFirstChild = 0;
@@ -66,7 +64,7 @@ void NodeAppender::appendChild(Node::Ptr newChild)
 		AbstractNode::Ptr pAN = newChild.unsafeCast<AbstractNode>();
 		if (pAN->_pParent)
 			pAN->_pParent->removeChild(pAN);
-		pAN->_pParent = _pParent.lock();
+		pAN->_pParent = pParent;
 		if (_pLast)
 			_pLast->_pNext = pAN;
 		else

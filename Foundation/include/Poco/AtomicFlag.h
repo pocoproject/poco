@@ -25,7 +25,7 @@
 namespace Poco {
 
 
-class Foundation_API AtomicFlag
+class AtomicFlag
 	/// This class implements an atomic boolean flag by wrapping
 	/// the std::atomic_flag. It is guaranteed to be thread-safe
 	/// and lock-free.

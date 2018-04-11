@@ -263,13 +263,11 @@ void DocumentTest::testElementByIdNS()
 
 void DocumentTest::setUp()
 {
-	poco_rcdc_reset;
 }
 
 
 void DocumentTest::tearDown()
 {
-	poco_rcdc_dump_leak(std::cerr);
 }
 
 

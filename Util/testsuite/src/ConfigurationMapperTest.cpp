@@ -169,7 +169,7 @@ void ConfigurationMapperTest::testMapper4()
 }
 
 
-AbstractConfiguration* ConfigurationMapperTest::allocConfiguration() const
+AbstractConfiguration::Ptr ConfigurationMapperTest::allocConfiguration() const
 {
 	return new MapConfiguration;
 }

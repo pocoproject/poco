@@ -257,9 +257,11 @@ private:
 	typedef std::map<XMLString, Poco::TextEncoding*> EncodingMap;
 	typedef std::vector<RefPtr<ContextLocator>> ContextStack;
 
-	static Ptr getThis(void* userData)
+	template <typename T>
+	static T* getThis(void* userData)
 	{
-		return Ptr(reinterpret_cast<ParserEngine*>(userData), true);
+		//return Ptr(reinterpret_cast<ParserEngine*>(userData), true);
+		return reinterpret_cast<ParserEngine*>(userData);
 	}
 
 	XML_Parser _parser;

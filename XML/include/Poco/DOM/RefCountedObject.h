@@ -27,7 +27,7 @@ namespace Poco {
 namespace XML {
 
 
-typedef Poco::RefCountedObjectImpl<Poco::WeakRefCounter<Poco::Mutex>> WeakRefCountedObject;
+typedef Poco::WeakRefCountedObject WeakRefCountedObject;
 
 
 } } // namespace Poco::XML

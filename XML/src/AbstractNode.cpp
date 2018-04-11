@@ -31,16 +31,14 @@ const XMLString AbstractNode::NODE_NAME = toXMLString("#node");
 const XMLString AbstractNode::EMPTY_STRING;
 
 
-AbstractNode::AbstractNode(Document::Ptr pOwnerDocument):
+AbstractNode::AbstractNode(Document* pOwnerDocument):
 	_pOwner(pOwnerDocument)
 {
-	//if (_pOwner) _pOwner->duplicate();
 }
 
 
 AbstractNode::~AbstractNode()
 {
-	//if (_pOwner) _pOwner->release();
 }
 
 
@@ -64,7 +62,7 @@ void AbstractNode::setNodeValue(const XMLString& value)
 
 Node::Ptr AbstractNode::parentNode() const
 {
-	return _pParent.lock();
+	return _pParent;
 }
 
 
@@ -90,7 +88,7 @@ Node::Ptr AbstractNode::previousSibling() const
 {
 	if (_pParent)
 	{
-		AbstractContainerNode::Ptr pParent = _pParent.lock().cast<AbstractContainerNode>();
+		AbstractContainerNode::Ptr pParent = _pParent;
 		AbstractNode::Ptr pSibling = pParent->_pFirstChild;
 		while (!pSibling.isNull())
 		{
@@ -282,57 +280,43 @@ void AbstractNode::bubbleEvent(Event::Ptr evt)
 
 void AbstractNode::dispatchSubtreeModified()
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMSubtreeModified, pThis, true, false, 0);
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMSubtreeModified, makeTarget(this), true, false, 0));
 }
 
 
 void AbstractNode::dispatchNodeInserted()
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMNodeInserted, pThis, true, false, parentNode());
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeInserted, makeTarget(this), true, false, parentNode()));
 }
 
 
 void AbstractNode::dispatchNodeRemoved()
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMNodeRemoved, pThis, true, false, parentNode());
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeRemoved, makeTarget(this), true, false, parentNode()));
 }
 
 
 void AbstractNode::dispatchNodeRemovedFromDocument()
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMNodeRemovedFromDocument, pThis, false, false, 0);
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeRemovedFromDocument, makeTarget(this), false, false, 0));
 }
 
 
 void AbstractNode::dispatchNodeInsertedIntoDocument()
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMNodeInsertedIntoDocument, pThis, false, false, 0);
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeInsertedIntoDocument, makeTarget(this), false, false, 0));
 }
 
 
 void AbstractNode::dispatchAttrModified(Attr::Ptr pAttr, MutationEvent::AttrChangeType changeType, const XMLString& prevValue, const XMLString& newValue)
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMAttrModified, pThis, true, false, pAttr, prevValue, newValue, pAttr->name(), changeType);
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMAttrModified, makeTarget(this), true, false, pAttr, prevValue, newValue, pAttr->name(), changeType));
 }
 
 
 void AbstractNode::dispatchCharacterDataModified(const XMLString& prevValue, const XMLString& newValue)
 {
-	EventTarget::Ptr pThis(this, true);
-	MutationEvent::Ptr pEvent = new MutationEvent(Document::Ptr(_pOwner, true), MutationEvent::DOMCharacterDataModified, pThis, true, false, 0, prevValue, newValue, EMPTY_STRING, MutationEvent::MODIFICATION);
-	dispatchEvent(pEvent);
+	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMCharacterDataModified, makeTarget(this), true, false, 0, prevValue, newValue, EMPTY_STRING, MutationEvent::MODIFICATION));
 }
 
 

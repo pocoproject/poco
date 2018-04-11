@@ -47,14 +47,20 @@ public:
 	Name(const Name& name);
 		/// Copy constructor.
 
+	Name(Name&& name);
+		/// Move constructor.
+
 	~Name();
 		/// Destroys the name.
 
 	Name& operator = (const Name& name);
 		/// Assignment operator.
 
+	Name& operator = (Name&& name);
+		/// Assignment operator.
+
 	void swap(Name& name);
-		/// Swaps the name with another one.	
+		/// Swaps the name with another one.
 
 	void assign(const XMLString& qname);
 		/// Assigns a new value to the name.

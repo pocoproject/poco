@@ -13,57 +13,110 @@
 
 
 #include "Poco/RefCountedObject.h"
-#if defined(_DEBUG) && defined(POCO_REFCOUNT_NDC)
+#ifdef ENABLE_REFCOUNT_DC
 #include "Poco/String.h"
 #include "Poco/AtomicFlag.h"
 #include <iostream>
-#endif // _DEBUG && POCO_REFCOUNT_NDC
+#endif // ENABLE_REFCOUNT_DC
 
 
 namespace Poco {
 
 
-RefCounter::RefCounter() : _counter(1)
+//
+// RefCounter
+//
+
+RefCounter::RefCounter(): _counter(1)
 {
+	poco_rcdc_log;
 }
 
 
 RefCounter::~RefCounter()
 {
+	poco_rcdc_log;
 }
 
 
-void RefCounter::duplicate() const
+//
+// RefCountedObject
+//
+
+RefCountedObject::RefCountedObject()
 {
-	++_counter;
 }
 
 
-int RefCounter::release()
+RefCountedObject::~RefCountedObject()
 {
-	int counter = --_counter;
-	if (counter == 0)
-	{
-		delete this;
-		return 0;
-	}
-	poco_assert(counter > 0);
-	return counter;
 }
 
 
-int RefCounter::count() const
+//
+// WeakRefCounter
+//
+
+WeakRefCounter::WeakRefCounter()
 {
-	return _counter;
 }
 
 
-#if defined(_DEBUG) && defined(POCO_REFCOUNT_NDC)
+WeakRefCounter::~WeakRefCounter()
+{
+}
 
 
-RCDC::TraceRecord::TraceRecord(void *ptr, int refCount, int threshold, const char* func, const std::string &backtrace) : _ptr(ptr),
+//
+// WeakRefCounter
+//
+
+WeakRefCountedObject::WeakRefCountedObject(): _pCounter(new WeakRefCounter)
+{
+}
+
+
+WeakRefCountedObject::~WeakRefCountedObject()
+{
+	// prevent leak if release() was never called
+	// (eg. this object new-ed into bare pointer
+	// and deleted from outside using delete)
+	// to prevent double delete, release() flags
+	// access by setting the counter pointer to 0
+	// before deleting `this`
+	delete _pCounter.load();
+}
+
+
+void* WeakRefCounter::operator new(std::size_t)
+{
+	return getFastMemoryPool<WeakRefCounter>().get();
+}
+
+
+void WeakRefCounter::operator delete(void* ptr)
+{
+	if (!ptr) return;
+	getFastMemoryPool<WeakRefCounter>().release(ptr);
+}
+
+
+void* WeakRefCounter::operator new [] (std::size_t)
+{
+	throw InvalidAccessException("WeakRefCounter arrays not allowed.");
+}
+
+
+void WeakRefCounter::operator delete [] (void* ptr)
+{
+}
+
+
+#ifdef ENABLE_REFCOUNT_DC
+
+
+RCDC::TraceRecord::TraceRecord(void *ptr, int refCount, const char* func, const std::string &backtrace) : _ptr(ptr),
 		_refCount(refCount),
-		_threshold(threshold),
 		_functionName(func),
 		_backtrace(backtrace)
 {
@@ -72,7 +125,6 @@ RCDC::TraceRecord::TraceRecord(void *ptr, int refCount, int threshold, const cha
 
 RCDC::TraceRecord::TraceRecord(const TraceRecord& other): _ptr(other._ptr),
 	_refCount(other._refCount),
-	_threshold(other._threshold),
 	_functionName(other._functionName),
 	_backtrace(other._backtrace)
 {
@@ -81,7 +133,6 @@ RCDC::TraceRecord::TraceRecord(const TraceRecord& other): _ptr(other._ptr),
 
 RCDC::TraceRecord::TraceRecord(TraceRecord&& other): _ptr(other._ptr),
 	_refCount(other._refCount),
-	_threshold(other._threshold),
 	_functionName(other._functionName),
 	_backtrace(std::move(other._backtrace))
 {
@@ -91,12 +142,11 @@ RCDC::TraceRecord::TraceRecord(TraceRecord&& other): _ptr(other._ptr),
 
 RCDC::TraceRecord& RCDC::TraceRecord::operator == (const TraceRecord& other)
 {
-	Mutex::ScopedLock l(_mutex);
+	SpinlockMutex::ScopedLock l(_mutex);
 	if (&other != this)
 	{
 		_ptr = other._ptr;
 		_refCount = other._refCount;
-		_threshold = other._threshold;
 		_functionName = other._functionName;
 		_backtrace = other._backtrace;
 	}
@@ -106,24 +156,17 @@ RCDC::TraceRecord& RCDC::TraceRecord::operator == (const TraceRecord& other)
 
 RCDC::TraceRecord& RCDC::TraceRecord::operator == (TraceRecord&& other)
 {
-	Mutex::ScopedLock l(_mutex);
+	SpinlockMutex::ScopedLock l(_mutex);
 	if (&other != this)
 	{
 		_ptr = other._ptr;
 		_refCount = other._refCount;
-		_threshold = other._threshold;
 		_functionName = std::move(other._functionName);
 		_backtrace = std::move(other._backtrace);
 		other._backtrace.clear();
 	}
 	return *this;
 }
-
-
-RCDC::TraceMap RCDC::_traceMap;
-Mutex          RCDC::_mutex;
-RCDC::Ptr      RCDC::_pRCDC(0);
-bool           RCDC::_full = false;
 
 
 RefCountDiagnosticContext::RefCountDiagnosticContext(bool full)
@@ -134,7 +177,6 @@ RefCountDiagnosticContext::RefCountDiagnosticContext(bool full)
 
 RefCountDiagnosticContext::~RefCountDiagnosticContext()
 {
-	// GH #2261 https://github.com/pocoproject/poco/issues/2261
 	dumpLeakRef(std::cerr);
 }
 
@@ -144,15 +186,15 @@ void RCDC::dumpRef(std::ostream& os, bool leakOnly) const
 	typedef OrderedMap<void*, int> SummaryMap;
 	AtomicFlag firstStep;
 	SummaryMap* pSummary = 0;
-	Mutex::ScopedLock l(_mutex);
+	SpinlockMutex::ScopedLock l(_mutex);
 	for(const auto &entry : traceMap())
 	{
 		bool out = true;
-		const TraceRecord& record = entry.second[entry.second.size() - 1];
+		const TraceRecord& record = entry.second.back();
 
 		if(leakOnly)
 		{
-			out = out && entry.second.size() && (record._refCount > record._threshold);
+			out = out && entry.second.size() && record._refCount > 1;
 		}
 
 		if(entry.second.size() > 0 && out)
@@ -161,7 +203,7 @@ void RCDC::dumpRef(std::ostream& os, bool leakOnly) const
 			if(leakOnly)
 			{
 				if(!pSummary) pSummary = new SummaryMap;
-				(*pSummary)[entry.first] = record._refCount - record._threshold;
+				(*pSummary)[entry.first] = record._refCount;
 				os << "Leaks detected for object at ";
 			}
 			os << "[0x" << std::hex << entry.first << "]:" << std::endl;
@@ -182,8 +224,11 @@ void RCDC::dumpRef(std::ostream& os, bool leakOnly) const
 				std::string indent;
 				std::string nlIndent(nl);
 				nlIndent.append(indent);
-				os << prevIndent << "refCount=" << trace._refCount << " (" << trace._functionName << ')' << prevIndent << indent << Poco::replace(
-						trace._backtrace, nl, prevIndent + indent) << std::endl;
+				os << prevIndent << "refCount=" << trace._refCount
+					<< " (" << trace._functionName << ')'
+					<< prevIndent << indent
+					<< Poco::replace(trace._backtrace, nl, prevIndent + indent)
+					<< std::endl;
 			}
 			os << std::endl;
 		}
@@ -199,35 +244,7 @@ void RCDC::dumpRef(std::ostream& os, bool leakOnly) const
 }
 
 
-void atExitHandler()
-{
-	delete RCDC::_pRCDC.load();
-	RCDC::_pRCDC.store(0);
-}
-
-
-namespace
-{
-	AtomicFlag beenHere;
-}
-
-
-RCDC* RefCountDiagnosticContext::get()
-{
-	if (!beenHere)
-	{
-		if (0 != std::atexit(atExitHandler))
-		{
-			std::cerr << "Failed to set exit handler, exiting." << std::endl;
-			std::exit(EXIT_FAILURE);
-		}
-		_pRCDC.store(new RCDC);
-	}
-	return _pRCDC;
-}
-
-
-#endif // _DEBUG && POCO_REFCOUNT_NDC
+#endif // ENABLE_REFCOUNT_DC
 
 
 } // namespace Poco

@@ -39,7 +39,7 @@ XMLFilterImpl::~XMLFilterImpl()
 
 XMLReader::Ptr XMLFilterImpl::getParent() const
 {
-	return _pParent.lock();
+	return _pParent;
 }
 
 

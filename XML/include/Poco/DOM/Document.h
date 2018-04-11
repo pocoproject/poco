@@ -127,6 +127,9 @@ public:
 	RefPtr<Text> createTextNode(const XMLString& data) const;
 		/// Creates a text node given the specified string.
 
+	RefPtr<Text> createTextNode(XMLString&& data) const;
+		/// Creates a text node given the specified string.
+
 	RefPtr<Comment> createComment(const XMLString& data) const;
 		/// Creates a comment node given the specified string.
 
@@ -234,9 +237,9 @@ protected:
 	void setDoctype(RefPtr<DocumentType> pDoctype);
 
 private:
-	WeakRefPtr<DocumentType> _pDocumentType;
-	RefPtr<NamePool>         _pNamePool;
-	int                      _eventSuspendLevel;
+	RefPtr<DocumentType> _pDocumentType;
+	RefPtr<NamePool>     _pNamePool;
+	int                  _eventSuspendLevel;
 
 	static const XMLString NODE_NAME;
 

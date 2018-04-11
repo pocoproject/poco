@@ -37,7 +37,7 @@ class Poco_SQL_API Transaction
 	/// See Transaction for more details and purpose of this template.
 {
 public:
-	Transaction(Poco::SQL::Session& session, Poco::Logger* pLogger = 0);
+	Transaction(Poco::SQL::Session& session, Poco::Logger::Ptr pLogger = 0);
 		/// Creates the Transaction and starts it, using the given database session and logger.
 
 	Transaction(Poco::SQL::Session& session, bool start);
@@ -46,7 +46,7 @@ public:
 		/// to start the transaction.
 		
 	template <typename T>
-	Transaction(Poco::SQL::Session& rSession, T& t, Poco::Logger* pLogger = 0):
+	Transaction(Poco::SQL::Session& rSession, T& t, Poco::Logger::Ptr pLogger = 0):
 		_rSession(rSession),
 		_pLogger(pLogger)
 		/// Creates the Transaction, using the given database session, transactor and logger.
@@ -134,7 +134,7 @@ public:
 		/// Returns false after the transaction has been committed or rolled back,
 		/// true if the transaction is ongoing.
 
-	void setLogger(Poco::Logger* pLogger);
+	void setLogger(Poco::Logger::Ptr pLogger);
 		/// Sets the logger for this transaction.
 		/// Transaction does not take the ownership of the pointer.
 
@@ -147,8 +147,8 @@ private:
 		/// Begins the transaction if the session is already not in transaction.
 		/// Otherwise does nothing.
 
-	Session _rSession;
-	Logger* _pLogger;
+	Session     _rSession;
+	Logger::Ptr _pLogger;
 };
 
 
@@ -182,7 +182,7 @@ inline bool Transaction::isIsolation(Poco::UInt32 ti)
 }
 
 
-inline void Transaction::setLogger(Poco::Logger* pLogger)
+inline void Transaction::setLogger(Poco::Logger::Ptr pLogger)
 {
 	_pLogger = pLogger;
 }

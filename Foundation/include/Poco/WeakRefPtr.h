@@ -28,13 +28,17 @@ namespace Poco {
 
 template <class C>
 class WeakRefPtr
-	/// WeakRefPtr is a "smart" pointer for classes implementing
-	/// reference counting. WeakRefPtr keeps a "weak" reference
-	/// to the object; the referenced object lifetime is not dependent
-	/// on the WeakRefPtr reference(s) to it - it will be destroyed
-	/// even when those exist.
+	/// WeakRefPtr is a "smart" pointer for classes implementing mixed
+	/// ("strong"/"weak") reference counting. WeakRefPtr keeps a "weak"
+	/// reference to the object; the referenced object lifetime is not
+	/// dependent on the WeakRefPtr reference(s) to it - it will be
+	/// destroyed when the last strong reference count reaches zero,
+	/// even if weak references still exist.
+	/// The main purpose for WeakRefPtr is to avoid RefPtr circular
+	/// reference problem (ie. memory leaks).
 	/// To enforce referenced object's lifetime duration for as long as
-	/// references to it exist, use RefPtr.
+	/// references to it exist, use RefPtr. A RefPtr of the underlying
+	/// pointer can be obtained from WeakRefPtr by calling lock().
 {
 public:
 	WeakRefPtr(): _ptr(0)
@@ -326,14 +330,15 @@ public:
 		return good();
 	}
 
-	operator RefPtr<C> ()
+	operator RefPtr<C> () const
 	{
 		return lock();
 	}
 
-	operator RefPtr<C> () const
+	template <typename Other>
+	operator RefPtr<Other> () const
 	{
-		return lock();
+		return lock().template cast<Other>();
 	}
 
 	bool operator ! () const
@@ -405,23 +410,28 @@ public:
 	}
 
 	int referenceCount()
+		/// Returns the strong reference count.
 	{
 		return good() ? _pCounter->count() : 0;
 	}
 
 	RefPtr<C> lock() const
+		/// Returns a RefPtr. If all the strong references
+		/// have expired, the returned RefPtr wi be null.
 	{
 		good(); // to set _ptr to 0, if needed
 		return RefPtr<C>(_ptr, true);
 	}
 
 	void duplicate()
+		/// Increments the weak reference count.
 	{
 		if (_pCounter)  _pCounter = _pCounter->duplicateWeak();
 		if (!_pCounter) _ptr = 0;
 	}
 
 	void release()
+		/// Decrements the weak reference count.
 	{
 		if (_pCounter)  _pCounter = _pCounter->releaseWeak();
 		if (!_pCounter) _ptr = 0;
@@ -435,7 +445,7 @@ private:
 		return _ptr != 0;
 	}
 
-	typedef WeakRefCounter<typename C::MutexType> CounterType;
+	typedef WeakRefCounter CounterType;
 
 	mutable C*   _ptr = 0;
 	CounterType* _pCounter = 0;

@@ -43,7 +43,6 @@ using Poco::Event;
 using Poco::NullPointerException;
 using Poco::NDC;
 using Poco::Mutex;
-using Poco::RefCountedObjectImpl;
 using Poco::WeakRefCounter;
 using Poco::Mutex;
 using Poco::FastMutex;
@@ -366,6 +365,11 @@ void RefPtrTest::testMove()
 	TestObj* pObj = new TestObj;
 	RefPtr<TestObj> ptr1 = pObj;
 	RefPtr<TestObj> ptr2;
+
+	assertTrue (ptr2.isNull());
+	RefPtr<TestObj> ptr3 = std::move(ptr2);
+	assertTrue (ptr3.isNull());
+	assertTrue (ptr2.isNull());
 
 	assertTrue (!ptr1.isNull());
 	assertTrue (ptr1.get() == pObj);
@@ -729,30 +733,22 @@ namespace {
 	{
 	public:
 		class Dummy: public RCO {};
-		class WeakDummyMutex: public RefCountedObjectImpl<WeakRefCounter<Mutex>> {};
-		class WeakDummyFastMutex: public RefCountedObjectImpl<WeakRefCounter<FastMutex>> {};
-		class WeakDummySpinlock: public Poco::RefCountedObjectImpl<WeakRefCounter<SpinlockMutex>> {};
+		class WeakDummy: public WeakRefCountedObject {};
 
-		RefPtrRunnable(): _errors(0), _msWeak(0), _msWeakFast(0), _msSpinlock(0) {}
+		RefPtrRunnable(): _errors(0), _msWeak(0) {}
 
 		void run()
 		{
 			work();
-			workMutex<WeakDummyMutex>(_wrco, _msWeak);
-			workMutex<WeakDummyFastMutex>(_wfrco, _msWeakFast);
-			workMutex<WeakDummySpinlock>(_wsrco, _msSpinlock);
+			work<WeakDummy>(_wrco, _msWeak);
 		}
 
-		int errors() const { return _errors.value(); }
-		int msWeak() const { return _msWeak.load(); }
-		int msWeakFast() const { return _msWeakFast.load(); }
-		int msSpinlock() const { return _msSpinlock.load(); }
+		int64_t errors() const { return _errors.value(); }
+		int64_t msWeak() const { return _msWeak.load(); }
 
 		static const int _size = 10;
 		static Dummy* _rco[_size];
-		static WeakDummyMutex* _wrco[_size];
-		static WeakDummyFastMutex* _wfrco[_size];
-		static WeakDummySpinlock* _wsrco[_size];
+		static WeakDummy* _wrco[_size];
 
 	private:
 		typedef std::atomic<Poco::Clock::ClockDiff> TimerType;
@@ -773,7 +769,7 @@ namespace {
 		}
 
 		template <typename T>
-		void workMutex(T** rco, TimerType& timer)
+		void work(T** rco, TimerType& timer)
 		{
 			Stopwatch sw; sw.start();
 			WeakRefPtr<T> wptr;
@@ -794,15 +790,11 @@ namespace {
 		}
 
 		AtomicCounter _errors;
-		TimerType _msWeak;
-		TimerType _msWeakFast;
-		TimerType _msSpinlock;
+		TimerType     _msWeak;
 	};
 
 	RefPtrRunnable::Dummy* RefPtrRunnable::_rco[RefPtrRunnable::_size] = {0};
-	RefPtrRunnable::WeakDummyMutex* RefPtrRunnable::_wrco[RefPtrRunnable::_size] = {0};
-	RefPtrRunnable::WeakDummyFastMutex* RefPtrRunnable::_wfrco[RefPtrRunnable::_size] = {0};
-	RefPtrRunnable::WeakDummySpinlock* RefPtrRunnable::_wsrco[RefPtrRunnable::_size] = {0};
+	RefPtrRunnable::WeakDummy* RefPtrRunnable::_wrco[RefPtrRunnable::_size] = {0};
 }
 
 
@@ -813,9 +805,7 @@ void RefPtrTest::testRefPtrThread()
 	for (int i = 0; i < num; ++i)
 	{
 		RefPtrRunnable::_rco[i] = new RefPtrRunnable::Dummy;
-		RefPtrRunnable::_wrco[i] = new RefPtrRunnable::WeakDummyMutex;
-		RefPtrRunnable::_wfrco[i] = new RefPtrRunnable::WeakDummyFastMutex;
-		RefPtrRunnable::_wsrco[i] = new RefPtrRunnable::WeakDummySpinlock;
+		RefPtrRunnable::_wrco[i] = new RefPtrRunnable::WeakDummy;
 	}
 
 	std::vector<Thread*> threads;
@@ -839,25 +829,22 @@ void RefPtrTest::testRefPtrThread()
 	}
 
 	std::cout << num << " threads, " << num << " loops/thread" << std::endl;
+	double weak = 0;
 	for (auto& r : runnables)
 	{
 		assertTrue(r->errors() == 0);
-		std::cout << "Mutex/FastMutex/Spinlock : "
-				  << r->msWeak() << '/' << r->msWeakFast() << '/' << r->msSpinlock() << " us"
-				  << std::endl;
+		weak += r->msWeak();
 		delete r;
 	}
+	std::cout << "WeakRefPtr (avg. ms): "
+			<< weak/num << " us" << std::endl;
 
 	for (int i = 0; i < num; ++i)
 	{
 		assertTrue (RefPtrRunnable::_rco[i]->referenceCount() == 1);
 		assertTrue (RefPtrRunnable::_wrco[i]->referenceCount() == 1);
-		assertTrue (RefPtrRunnable::_wfrco[i]->referenceCount() == 1);
-		assertTrue (RefPtrRunnable::_wsrco[i]->referenceCount() == 1);
 		delete RefPtrRunnable::_rco[i];
 		delete RefPtrRunnable::_wrco[i];
-		delete RefPtrRunnable::_wfrco[i];
-		delete RefPtrRunnable::_wsrco[i];
 	}
 }
 
@@ -879,26 +866,17 @@ struct E:public D { };
 }
 
 
-void RefPtrTest::testLeak()
+void RefPtrTest::testWeakLeak()
 {
-#if defined(_DEBUG) && defined(POCO_REFCOUNT_NDC)
-
-	{
-		_leak = new LeakTest;
-	}
-
-	std::cout << std::endl <<
-		"+++ A single leak report printout ('refCount=1 (RefCountedObjectImpl)') "
-		"below is expected +++" << std::endl;
-
-#endif // _DEBUG) && defined(POCO_REFCOUNT_NDC
-
 	{
 		E* e = new E;
 		e->release();
+		e = new E;
+		delete e;
 		WeakRefPtr<E> we(new E);
 	}
-	// there should be no leak reports for this
+	// there should be no leak reports for this,
+	// valgrind, or refcount DC (if enabled)
 }
 
 
@@ -1036,17 +1014,7 @@ namespace {
 	{
 	};
 
-	struct WeakDummyMutex: public DummyImpl, public WeakRefCountedObject
-	{
-	};
-
-	struct WeakDummyNoMutex: public DummyImpl,
-		public RefCountedObjectImpl<WeakRefCounter<NullMutex>>
-	{
-	};
-
-	struct WeakDummySpinlockMutex: public DummyImpl,
-		public RefCountedObjectImpl<WeakRefCounter<SpinlockMutex>>
+	struct WeakDummy: public DummyImpl, public WeakRefCountedObject
 	{
 	};
 
@@ -1149,7 +1117,7 @@ void RefPtrTest::pointersBenchmark()
 {
 #ifdef REF_PTR_BENCHMARK
 
-	int reps = 10;
+	int reps = 100;//0000;
 	std::cout << reps << " repetitions" << std::endl;
 	std::cout << std::endl;
 
@@ -1161,9 +1129,7 @@ void RefPtrTest::pointersBenchmark()
 
 	runBenchmark<Dummy, Dummy*>(reps);
 	runBenchmark<Dummy, RefPtr<Dummy>>(reps);
-	runBenchmark<WeakDummyMutex, RefPtr<WeakDummyMutex>>(reps);
-	runBenchmark<WeakDummySpinlockMutex, RefPtr<WeakDummySpinlockMutex>>(reps);
-	runBenchmark<WeakDummyNoMutex, RefPtr<WeakDummyNoMutex>>(reps);
+	runBenchmark<WeakDummy, RefPtr<WeakDummy>>(reps);
 	runBenchmark<Dummy, SharedPtr<Dummy>>(reps);
 	runBenchmark<Dummy, std::unique_ptr<Dummy>>(reps);
 	runBenchmark<Dummy, std::shared_ptr<Dummy>>(reps);
@@ -1179,7 +1145,6 @@ void RefPtrTest::setUp()
 
 void RefPtrTest::tearDown()
 {
-	delete _leak;
 }
 
 
@@ -1194,7 +1159,7 @@ CppUnit::Test* RefPtrTest::suite()
 	CppUnit_addTest(pSuite, RefPtrTest, testMoveInherited);
 	CppUnit_addTest(pSuite, RefPtrTest, testWeakRefPtr);
 	CppUnit_addTest(pSuite, RefPtrTest, testWeakSemantics);
-	CppUnit_addTest(pSuite, RefPtrTest, testLeak);
+	CppUnit_addTest(pSuite, RefPtrTest, testWeakLeak);
 	CppUnit_addTest(pSuite, RefPtrTest, testWeakCast);
 	CppUnit_addTest(pSuite, RefPtrTest, testRefPtrThread);
 	//CppUnit_addTest(pSuite, RefPtrTest, pointersBenchmark);

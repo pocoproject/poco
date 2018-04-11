@@ -610,7 +610,7 @@ void ParserEngine::resetContext()
 
 void ParserEngine::handleStartElement(void* userData, const XML_Char* name, const XML_Char** atts)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pNamespaceStrategy && pThis->_pContentHandler)
 	{
@@ -630,7 +630,7 @@ void ParserEngine::handleStartElement(void* userData, const XML_Char* name, cons
 
 void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pNamespaceStrategy && pThis->_pContentHandler)
 	{
@@ -648,25 +648,19 @@ void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 
 void ParserEngine::handleCharacterData(void* userData, const XML_Char* s, int len)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
-	if (pThis->_pContentHandler)
-	{
-		if(pThis->_pContentHandler)
-			pThis->_pContentHandler->characters(s, 0, len);
-	}
+	if(pThis->_pContentHandler)
+		pThis->_pContentHandler->characters(s, 0, len);
 }
 
 
 void ParserEngine::handleProcessingInstruction(void* userData, const XML_Char* target, const XML_Char* data)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
-	if (pThis->_pContentHandler)
-	{
-		if(pThis->_pContentHandler)
-			pThis->_pContentHandler->processingInstruction(target, data);
-	}
+	if(pThis->_pContentHandler)
+		pThis->_pContentHandler->processingInstruction(target, data);
 }
 
 
@@ -677,37 +671,31 @@ void ParserEngine::handleDefault(void* userData, const XML_Char* s, int len)
 
 void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId, const XML_Char* notationName)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
-	if (pThis->_pDTDHandler)
-	{
-		if(pThis->_pDTDHandler)
-			pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : 0, systemId, notationName);
-	}
+	if(pThis->_pDTDHandler)
+		pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : 0, systemId, notationName);
 }
 
 
 void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	XMLString sysId;
 	if (systemId) sysId.assign(systemId);
-	if (pThis->_pDTDHandler)
-	{
-		if(pThis->_pDTDHandler)
-			pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : 0, systemId ? &sysId : 0);
-	}
+	if(pThis->_pDTDHandler)
+		pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : 0, systemId ? &sysId : 0);
 }
 
 
 int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* context, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
-	ParserEngine::Ptr pThis = getThis(XML_GetUserData(parser));
+	auto pThis = getThis<ParserEngine>(XML_GetUserData(parser));
 
 	if (!context && !pThis->_externalParameterEntities) return XML_STATUS_ERROR;
 	if (context && !pThis->_externalGeneralEntities) return XML_STATUS_ERROR;
@@ -759,7 +747,7 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 
 int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Char* name, XML_Encoding* info)
 {
-	ParserEngine::Ptr pThis = getThis(encodingHandlerData);
+	auto pThis = getThis<ParserEngine>(encodingHandlerData);
 
 	XMLString encoding(name);
 	TextEncoding* knownEncoding = 0;
@@ -787,7 +775,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 
 void ParserEngine::handleComment(void* userData, const XML_Char* data)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 #if defined(XML_UNICODE_WCHAR_T)
 	if (pThis->_pLexicalHandler)
@@ -801,7 +789,7 @@ void ParserEngine::handleComment(void* userData, const XML_Char* data)
 
 void ParserEngine::handleStartCdataSection(void* userData)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->startCDATA();
@@ -810,7 +798,7 @@ void ParserEngine::handleStartCdataSection(void* userData)
 
 void ParserEngine::handleEndCdataSection(void* userData)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->endCDATA();
@@ -819,7 +807,7 @@ void ParserEngine::handleEndCdataSection(void* userData)
 
 void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* prefix, const XML_Char* uri)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->startPrefixMapping((prefix ? XMLString(prefix) : EMPTY_STRING), (uri ? XMLString(uri) : EMPTY_STRING));
@@ -828,7 +816,7 @@ void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* pref
 
 void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->endPrefixMapping(prefix ? XMLString(prefix) : EMPTY_STRING);
@@ -837,7 +825,7 @@ void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix
 
 void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -850,7 +838,7 @@ void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctyp
 
 void ParserEngine::handleEndDoctypeDecl(void* userData)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->endDTD();
@@ -869,7 +857,7 @@ void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, 
 
 void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
@@ -880,7 +868,7 @@ void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char
 
 void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* replacementText, int replacementTextLength)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	XMLString replText(replacementText, replacementTextLength);
 	if (pThis->_pDeclHandler)
@@ -890,7 +878,7 @@ void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char
 
 void ParserEngine::handleSkippedEntity(void* userData, const XML_Char* entityName, int isParameterEntity)
 {
-	ParserEngine::Ptr pThis = getThis(userData);
+	auto pThis = getThis<ParserEngine>(userData);
 
 	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->skippedEntity(entityName);

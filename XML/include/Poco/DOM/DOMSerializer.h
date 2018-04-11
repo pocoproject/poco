@@ -57,7 +57,7 @@ public:
 	DOMSerializer();
 		/// Creates the DOMSerializer.
 
-	void serialize(RefPtr<Node> pNode);
+	void serialize(RefPtr<Node>&& pNode);
 		/// Serializes a DOM node and its children
 		/// into a sequence of SAX events, which are
 		/// reported to the registered SAX event
@@ -96,17 +96,17 @@ protected:
 		/// so this method simply throws an XMLException when invoked.
 
 	void iterate(RefPtr<Node> pNode) const;
-	void handleNode(RefPtr<Node> pNode) const;
-	void handleElement(RefPtr<Element> pElement) const;
-	void handleCharacterData(RefPtr<Text> pText) const;
-	void handleComment(RefPtr<Comment> pComment) const;
-	void handlePI(RefPtr<ProcessingInstruction> pPI) const;
-	void handleCDATASection(RefPtr<CDATASection> pCDATA) const;
-	void handleDocument(RefPtr<Document> pDocument) const;
-	void handleDocumentType(RefPtr<DocumentType> pDocumentType) const;
-	void handleFragment(RefPtr<DocumentFragment> pFragment) const;
-	void handleNotation(RefPtr<Notation> pNotation) const;
-	void handleEntity(RefPtr<Entity> pEntity) const;
+	void handleNode(RefPtr<Node>&& pNode) const;
+	void handleElement(RefPtr<Element>&& pElement) const;
+	void handleCharacterData(RefPtr<Text>&& pText) const;
+	void handleComment(RefPtr<Comment>&& pComment) const;
+	void handlePI(RefPtr<ProcessingInstruction>&& pPI) const;
+	void handleCDATASection(RefPtr<CDATASection>&& pCDATA) const;
+	void handleDocument(RefPtr<Document>&& pDocument) const;
+	void handleDocumentType(RefPtr<DocumentType>&& pDocumentType) const;
+	void handleFragment(RefPtr<DocumentFragment>&& pFragment) const;
+	void handleNotation(RefPtr<Notation>&& pNotation) const;
+	void handleEntity(RefPtr<Entity>&& pEntity) const;
 
 private:
 	RefPtr<EntityResolver> _pEntityResolver;

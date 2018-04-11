@@ -113,7 +113,9 @@ std::string Bugcheck::what(const char* msg, const char* file, int line, const ch
 	if (msg) str << msg << " ";
    if (text != NULL) str << "(" << text << ") ";
 	str << "in file \"" << file << "\", line " << line;
+#ifdef POCO_EXCEPTION_BACKTRACE
 	str << std::endl << NDC::backtrace(3, 2);
+#endif // POCO_EXCEPTION_BACKTRACE
 	return str.str();
 }
 

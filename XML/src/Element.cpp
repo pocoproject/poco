@@ -25,15 +25,37 @@ namespace Poco {
 namespace XML {
 
 
-Element::Element(Document::Ptr pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
-	AbstractContainerNode(pOwnerDocument),
+Element::Element(Document::Ptr& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
+	AbstractContainerNode(pOwnerDocument.get()),
 	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName))
 {
 }
 
 
-Element::Element(Document::Ptr pOwnerDocument, const Element& element):
-	AbstractContainerNode(pOwnerDocument),
+Element::Element(Document::Ptr& pOwnerDocument, const Element& element):
+	AbstractContainerNode(pOwnerDocument.get()),
+	_name(pOwnerDocument->namePool().insert(element._name))
+{
+	Attr::Ptr pAttr = element._pFirstAttr;
+	while (pAttr)
+	{
+		Attr::Ptr pClonedAttr = pAttr->copyNode(false, pOwnerDocument).unsafeCast<Attr>();
+		setAttributeNode(pClonedAttr);
+		pAttr = pAttr->_pNext.unsafeCast<Attr>();
+	}
+}
+
+
+Element::Element(RefPtr<Document>&& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
+	AbstractContainerNode(pOwnerDocument.get()),
+	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName))
+{
+
+}
+
+
+Element::Element(RefPtr<Document>&& pOwnerDocument, const Element& element):
+	AbstractContainerNode(pOwnerDocument.get()),
 	_name(pOwnerDocument->namePool().insert(element._name))
 {
 	Attr::Ptr pAttr = element._pFirstAttr;
@@ -95,8 +117,6 @@ Attr::Ptr Element::getAttributeNode(const XMLString& name) const
 
 Attr::Ptr Element::setAttributeNode(Attr::Ptr newAttr)
 {
-	poco_check_ptr (newAttr);
-
 	if (newAttr->ownerDocument() != ownerDocument())
 		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
 	if (newAttr->ownerElement())

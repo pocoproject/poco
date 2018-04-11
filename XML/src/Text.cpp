@@ -24,14 +24,26 @@ namespace XML {
 const XMLString Text::NODE_NAME = toXMLString("#text");
 
 
-Text::Text(Document::Ptr pOwnerDocument, const XMLString& data):
-	CharacterData(pOwnerDocument, data)
+Text::Text(Document::Ptr& pOwnerDocument, const XMLString& data):
+	CharacterData(std::move(pOwnerDocument), data)
 {
 }
 
 
-Text::Text(Document::Ptr pOwnerDocument, const Text& text):
-	CharacterData(pOwnerDocument, text)
+Text::Text(Document::Ptr& pOwnerDocument, const Text& text):
+	CharacterData(std::move(pOwnerDocument), text)
+{
+}
+
+
+Text::Text(Document::Ptr&& pOwnerDocument, XMLString&& data):
+		CharacterData(std::move(pOwnerDocument), std::move(data))
+{
+}
+
+
+Text::Text(Document::Ptr&& pOwnerDocument, Text&& text):
+		CharacterData(std::move(pOwnerDocument), std::move(text))
 {
 }
 

@@ -15,6 +15,7 @@
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
 #include "Poco/Thread.h"
+#include "Poco/Path.h"
 #include <csignal>
 
 
@@ -23,6 +24,7 @@ using Poco::ProcessHandle;
 using Poco::Pipe;
 using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
+using Poco::Path;
 
 
 ProcessTest::ProcessTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -37,7 +39,11 @@ ProcessTest::~ProcessTest()
 
 void ProcessTest::testLaunch()
 {
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -64,7 +70,11 @@ void ProcessTest::testLaunch()
 void ProcessTest::testLaunchRedirectIn()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -90,7 +100,11 @@ void ProcessTest::testLaunchRedirectIn()
 void ProcessTest::testLaunchRedirectOut()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -118,7 +132,11 @@ void ProcessTest::testLaunchRedirectOut()
 void ProcessTest::testLaunchEnv()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -148,7 +166,11 @@ void ProcessTest::testLaunchEnv()
 void ProcessTest::testLaunchArgs()
 {
 #if defined (_WIN32) && !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd = name;
 
 	std::vector<std::string> args;
@@ -201,7 +223,11 @@ void ProcessTest::testLaunchArgs()
 void ProcessTest::testIsRunning()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -231,7 +257,11 @@ void ProcessTest::testIsRunning()
 void ProcessTest::testIsRunningAllowsForTermination()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -252,7 +282,11 @@ void ProcessTest::testIsRunningAllowsForTermination()
 void ProcessTest::testSignalExitCode()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	std::string name("TestApp");
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string name(self + "TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
 	std::string cmd;
 
 	cmd = "./";

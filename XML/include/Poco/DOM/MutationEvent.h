@@ -88,9 +88,9 @@ public:
 	static const XMLString DOMCharacterDataModified;
 
 protected:
-	MutationEvent(RefPtr<Document> pOwnerDocument, const XMLString& type);
-	MutationEvent(RefPtr<Document> pOwnerDocument, const XMLString& type, RefPtr<EventTarget> pTarget, bool canBubble, bool cancelable, RefPtr<Node> relatedNode);
-	MutationEvent(RefPtr<Document> pOwnerDocument, const XMLString& type, RefPtr<EventTarget> pTarget, bool canBubble, bool cancelable, RefPtr<Node> relatedNode,
+	MutationEvent(RefPtr<Document>&& pOwnerDocument, const XMLString& type);
+	MutationEvent(RefPtr<Document>&& pOwnerDocument, const XMLString& type, RefPtr<EventTarget>&& pTarget, bool canBubble, bool cancelable, RefPtr<Node> relatedNode);
+	MutationEvent(RefPtr<Document>&& pOwnerDocument, const XMLString& type, RefPtr<EventTarget>&& pTarget, bool canBubble, bool cancelable, RefPtr<Node> relatedNode,
 				  const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change);
 	~MutationEvent();
 

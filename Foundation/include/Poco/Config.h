@@ -192,8 +192,30 @@
 // #define POCO_NO_DEPRECATED
 
 
-// macro to enable refcounting NDC
-// (effective only in conjunction with _DEBUG)
-// #define POCO_REFCOUNT_NDC
+// Enable refcounting diagnostic context
+// (effective only in conjunction with _DEBUG).
+// Enabling this will record every reference
+// count change and automatically dump any leaks
+// at program termination. It is a heavy
+// functionality that records stack backtrace
+// (if available, otherwise it is not of much use)
+// on every refcount change, so it should be used
+// cautiously, with performance deterioration and
+// the amount of available memory taken into account.
+//#define POCO_REFCOUNT_DC
+
+
+// Macro defining the default initial size of
+// RefCountedObject FastMemoryPool.
+// Meaningful only if POCO_REFCOUNT_DC is defined
+#ifdef POCO_REFCOUNT_DC
+#define POCO_REFCOUNT_POOL_PREALLOC 1000000
+#endif // POCO_REFCOUNT_DC
+
+
+// Macro enabling POCO Exceptions and assertions
+// to append stack backtrace (if available)
+#define POCO_EXCEPTION_BACKTRACE
+
 
 #endif // Foundation_Config_INCLUDED

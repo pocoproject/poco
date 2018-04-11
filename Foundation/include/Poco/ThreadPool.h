@@ -170,6 +170,7 @@ public:
 		/// or an empty string if no name has been
 		/// specified in the constructor.
 
+	// definition in Foundation.cpp
 	static ThreadPool& defaultPool(ThreadAffinityPolicy affinityPolicy = TAP_DEFAULT);
 		/// Returns a reference to the default
 		/// thread pool.

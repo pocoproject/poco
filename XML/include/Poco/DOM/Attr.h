@@ -172,8 +172,7 @@ inline bool Attr::specified() const
 
 inline Element::Ptr Attr::ownerElement() const
 {
-	Element::Ptr pEl = _pParent.lock().cast<Element>();
-	return pEl;
+	return _pParent;
 }
 
 

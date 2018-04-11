@@ -27,6 +27,7 @@ public:
 	void testParseWriteXHTML();
 	void testParseWriteXHTML2();
 	void testParseWriteSimple();
+	void xmlBenchmark();
 
 	void setUp();
 	void tearDown();

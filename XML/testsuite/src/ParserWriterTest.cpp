@@ -18,7 +18,11 @@
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
 #include "Poco/RefPtr.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/Path.h"
 #include <sstream>
+#include <fstream>
+#include <iostream>
 
 
 using Poco::XML::DOMParser;
@@ -28,6 +32,8 @@ using Poco::XML::XMLWriter;
 using Poco::XML::Document;
 using Poco::XML::InputSource;
 using Poco::RefPtr;
+using Poco::Stopwatch;
+using Poco::Path;
 
 
 ParserWriterTest::ParserWriterTest(const std::string& name): CppUnit::TestCase(name)
@@ -43,13 +49,13 @@ ParserWriterTest::~ParserWriterTest()
 void ParserWriterTest::testParseWriteXHTML()
 {
 	std::ostringstream ostr;
-	
+
 	DOMParser parser;
 	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, false);
 	DOMWriter writer;
 	RefPtr<Document> pDoc = parser.parseString(XHTML);
 	writer.writeNode(ostr, pDoc);
-	
+
 	std::string xml = ostr.str();
 	assertTrue (xml == XHTML);
 }
@@ -105,6 +111,25 @@ void ParserWriterTest::testParseWriteSimple()
 }
 
 
+void ParserWriterTest::xmlBenchmark()
+{
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string path = self + "data.xml";
+	std::cout << path << '\n';
+	std::ifstream istr(path);
+
+	std::ostringstream ostr;
+	DOMParser parser;
+	Stopwatch sw;
+
+	InputSource::Ptr source = new InputSource(istr);
+	sw.start();
+	parser.parse(source);
+	sw.stop();
+	std::cout << "Parsed in " << sw.elapsed() / 1000 << " ms" << std::endl;
+}
+
+
 void ParserWriterTest::setUp()
 {
 }
@@ -122,6 +147,7 @@ CppUnit::Test* ParserWriterTest::suite()
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML2);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteSimple);
+	//CppUnit_addTest(pSuite, ParserWriterTest, xmlBenchmark);
 
 	return pSuite;
 }
@@ -167,4 +193,3 @@ const std::string ParserWriterTest::XHTML2 =
 	"\t\t]]>\n"
 	"\t</xns:body>\n"
 	"</xns:html>";
-

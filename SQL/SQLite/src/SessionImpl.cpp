@@ -187,7 +187,7 @@ void SessionImpl::close()
 		int times = 10;
 		do
 		{
-			result = sqlite3_close(_pDB);
+			result = sqlite3_close_v2(_pDB);
 		} while (SQLITE_BUSY == result && --times > 0);
 
 		if (SQLITE_BUSY == result && times == 0)
@@ -202,7 +202,7 @@ void SessionImpl::close()
 					sqlite3_finalize(pStmt);
 				}
 			} while (pStmt != NULL && --times > 0);
-			sqlite3_close(_pDB);
+			sqlite3_close_v2(_pDB);
 		}
 		_pDB = 0;
 	}

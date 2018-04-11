@@ -26,6 +26,9 @@ namespace Poco {
 namespace XML {
 
 
+class Element;
+
+
 class XML_API AbstractContainerNode: public AbstractNode
 	/// AbstractContainerNode is an implementation of Node
 	/// that stores and manages child nodes.
@@ -49,7 +52,7 @@ public:
 	Node::Ptr getNodeByPathNS(const XMLString& path, const Node::NSMap& nsMap) const;
 
 protected:
-	AbstractContainerNode(RefPtr<Document> pOwnerDocument);
+	AbstractContainerNode(Document* pOwnerDocument);
 	~AbstractContainerNode();
 
 	void dispatchNodeRemovedFromDocument();

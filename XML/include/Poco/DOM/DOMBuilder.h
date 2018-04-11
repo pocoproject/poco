@@ -93,18 +93,18 @@ protected:
 	void endCDATA();
 	void comment(const XMLChar ch[], int start, int length);
 
-	void appendNode(AbstractNode::Ptr pNode);
-	
 	void setupParse();
 
 private:
 	static const XMLString EMPTY_STRING;
 
+	AbstractNode::Ptr& appendNode(AbstractNode::Ptr&& pNode);
+
 	WeakRefPtr<XMLReader>      _pXMLReader;
 	RefPtr<NamePool>           _pNamePool;
 	Document::Ptr              _pDocument;
 	AbstractContainerNode::Ptr _pParent;
-	AbstractNode::WeakPtr      _pPrevious;
+	AbstractNode::Ptr          _pPrevious;
 	bool                       _inCDATA;
 	bool                       _namespaces;
 };

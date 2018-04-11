@@ -21,7 +21,8 @@
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/DOM/DOMObject.h"
-#include "Poco/RefPtr.h"
+//#include "Poco/DOM/Document.h"
+//#include "Poco/WeakRefPtr.h"
 
 
 namespace Poco {
@@ -113,8 +114,8 @@ public:
 		/// initEvent method are modified, all other attributes are left unchanged.
 
 protected:
-	Event(RefPtr<Document> pOwnerDocument, const XMLString& type);
-	Event(RefPtr<Document> pOwnerDocument, const XMLString& type, RefPtr<EventTarget> pTarget, bool canBubble, bool isCancelable);
+	Event(RefPtr<Document>&& pOwnerDocument, const XMLString& type);
+	Event(RefPtr<Document>&& pOwnerDocument, const XMLString& type, RefPtr<EventTarget>&& pTarget, bool canBubble, bool isCancelable);
 	~Event();
 
 	bool isCanceled() const;
@@ -138,10 +139,10 @@ private:
 	Event(Event&&);
 	Event& operator=(Event&&);
 
-	RefPtr<Document>    _pOwner;
+	Document*            _pOwner;
 	XMLString            _type;
-	RefPtr<EventTarget> _pTarget;
-	RefPtr<EventTarget> _pCurrentTarget;
+	RefPtr<EventTarget>  _pTarget;
+	RefPtr<EventTarget>  _pCurrentTarget;
 	PhaseType            _currentPhase;
 	bool                 _bubbles;
 	bool                 _cancelable;
