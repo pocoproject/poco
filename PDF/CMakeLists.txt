@@ -131,12 +131,12 @@ target_include_directories(PDF
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-		"${ZLIB_INCLUDE_DIRS}"
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 target_compile_definitions(PDF PUBLIC ${LIB_MODE_DEFINITIONS})
 if (POCO_UNBUNDLED)
-	target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+    target_include_directories(PDF PUBLIC "${ZLIB_INCLUDE_DIRS}")
+    target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
 endif()
 
 POCO_INSTALL(PDF)
