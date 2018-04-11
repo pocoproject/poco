@@ -187,12 +187,12 @@ protected:
 	static void loadString(const std::string& id, const std::string& def, const std::string& language);
 	static std::string projectURI(const std::string& id);
 
-	static Poco::Logger& logger();
-	
+	Poco::Logger& logger();
+
 	static const std::string RFC_URI;
 	static const std::string GITHUB_POCO_URI;
 	
-private:	
+private:
 	bool _prettifyCode;
 	bool _noFrames;
 	bool _htmlMode;
@@ -204,11 +204,10 @@ private:
 	bool _pendingLine;
 	int  _indent;
 	int  _titleId;
-	
+	Poco::Logger& _logger;
+
 	static std::string _language;
 	static StringMap   _strings;
-	
-	static Poco::Logger* _pLogger;
 };
 
 
@@ -217,9 +216,7 @@ private:
 //
 inline Poco::Logger& DocWriter::logger()
 {
-	poco_check_ptr (_pLogger);
-
-	return *_pLogger;
+	return _logger;
 }
 
 
