@@ -6,7 +6,6 @@ POCO_SOURCES_AUTO( MYSQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
-add_definitions(-DTHREADSAFE -DNO_TCL)
 
 add_library(SQLMySQL ${MYSQL_SRCS} )
 add_library(Poco::SQLMySQL ALIAS SQLMySQL)
@@ -17,14 +16,14 @@ set_target_properties(SQLMySQL
     DEFINE_SYMBOL MySQL_EXPORTS
     )
 
-target_link_libraries( SQLMySQL Poco::SQL ${MYSQL_LIB})
-target_include_directories( SQLMySQL
+target_link_libraries(SQLMySQL Poco::SQL ${MYSQL_LIB})
+target_include_directories(SQLMySQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SQLMySQL PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(SQLMySQL PUBLIC THREADSAFE NO_TCL ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(SQLMySQL)
 POCO_GENERATE_PACKAGE(SQLMySQL)
