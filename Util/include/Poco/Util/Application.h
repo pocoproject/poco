@@ -241,7 +241,10 @@ public:
 		/// Returns the full command path used to invoke the application.
 
 	LayeredConfiguration& config() const;
-		/// Returns the application's configuration.
+		/// Returns the application's configuration reference.
+
+	LayeredConfiguration::Ptr configPtr() const;
+		/// Returns the application's configuration smart pointer.
 
 	Poco::Logger& logger() const;
 		/// Returns the application's logger.
@@ -384,7 +387,7 @@ private:
 	ArgVec            _unprocessedArgs;
 	OptionSet         _options;
 	bool              _unixOptions;
-	mutable LoggerPtr _pLogger;
+	Logger*           _pLogger;
 	Poco::Timestamp   _startTime;
 	bool              _stopOptionsProcessing;
 	int               _loadedConfigs;
@@ -430,7 +433,14 @@ inline bool Application::initialized() const
 
 inline LayeredConfiguration& Application::config() const
 {
+	poco_assert(!_pConfig.isNull());
 	return *const_cast<LayeredConfiguration*>(_pConfig.get());
+}
+
+
+inline LayeredConfiguration::Ptr Application::configPtr() const
+{
+	return _pConfig;
 }
 
 
