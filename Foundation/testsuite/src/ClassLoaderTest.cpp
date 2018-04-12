@@ -13,6 +13,7 @@
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/ClassLoader.h"
 #include "Poco/Manifest.h"
+#include "Poco/Path.h"
 #include "Poco/Exception.h"
 #include "TestPlugin.h"
 
@@ -23,6 +24,7 @@ using Poco::SharedLibrary;
 using Poco::AbstractMetaObject;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
+using Poco::Path;
 
 
 ClassLoaderTest::ClassLoaderTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -37,7 +39,8 @@ ClassLoaderTest::~ClassLoaderTest()
 
 void ClassLoaderTest::testClassLoader1()
 {
-	std::string path = "TestLibrary";
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string path = self + "TestLibrary";
 	path.append(SharedLibrary::suffix());
 
 	ClassLoader<TestPlugin> cl;
@@ -78,7 +81,8 @@ void ClassLoaderTest::testClassLoader1()
 
 void ClassLoaderTest::testClassLoader2()
 {
-	std::string path = "TestLibrary";
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string path = self + "TestLibrary";
 	path.append(SharedLibrary::suffix());
 
 	ClassLoader<TestPlugin> cl;
@@ -168,7 +172,8 @@ void ClassLoaderTest::testClassLoader2()
 
 void ClassLoaderTest::testClassLoader3()
 {
-	std::string path = "TestLibrary";
+	std::string self = Path(Path::self()).makeParent().toString();
+	std::string path = self + "TestLibrary";
 	path.append(SharedLibrary::suffix());
 
 	ClassLoader<TestPlugin> cl;
