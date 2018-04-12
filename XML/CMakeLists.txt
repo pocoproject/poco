@@ -25,14 +25,8 @@ else()
     )
 endif (POCO_UNBUNDLED)
 
-if(WIN32)
-#TODO: Is XML_STATIC only required with Windows? What does it do?
-add_definitions(-DXML_STATIC -DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H)
-else()
-add_definitions(-DXML_NS -DXML_DTD -DHAVE_EXPAT_CONFIG_H)
-endif()
-
 add_library(XML ${SRCS} )
+
 add_library(Poco::XML ALIAS XML)
 set_target_properties( XML
     PROPERTIES
@@ -52,6 +46,14 @@ target_compile_definitions(XML PUBLIC ${LIB_MODE_DEFINITIONS})
 if (POCO_UNBUNDLED)
 	target_include_directories(XML PUBLIC "${EXPAT_INCLUDE_DIRS}")
 	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
+else()
+	if(WIN32)
+		#TODO: Is XML_STATIC only required with Windows? What does it do?
+		target_compile_definitions(XML PUBLIC XML_STATIC)
+	endif()
+	target_compile_definitions(XML
+		PUBLIC XML_DTD
+		PRIVATE XML_NS HAVE_EXPAT_CONFIG_H)
 endif()
 
 POCO_INSTALL(XML)
