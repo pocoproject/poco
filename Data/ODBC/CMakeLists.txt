@@ -6,8 +6,6 @@ POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
-add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
-
 add_library(DataODBC ${LIB_MODE} ${ODBC_SRCS})
 add_library(Poco::DataODBC ALIAS DataODBC)
 set_target_properties(DataODBC
@@ -24,7 +22,7 @@ target_include_directories(DataODBC
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(DataODBC PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(DataODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(DataODBC)
 POCO_GENERATE_PACKAGE(DataODBC)
