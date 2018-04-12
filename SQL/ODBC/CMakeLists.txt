@@ -6,7 +6,6 @@ POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
-add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
 
 add_library(SQLODBC ${ODBC_SRCS} )
 add_library(Poco::SQLODBC ALIAS SQLODBC)
@@ -17,14 +16,14 @@ set_target_properties(SQLODBC
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries( SQLODBC Poco::SQL ${ODBC_LIBRARIES})
-target_include_directories( SQLODBC
+target_link_libraries(SQLODBC PUBLIC Poco::SQL ${ODBC_LIBRARIES})
+target_include_directories(SQLODBC
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SQLODBC PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(SQLODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(SQLODBC)
 POCO_GENERATE_PACKAGE(SQLODBC)
