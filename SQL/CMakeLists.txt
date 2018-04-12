@@ -6,10 +6,6 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-if (BUILD_SHARED_LIBS)
-    add_definitions(-DTHREADSAFE)
-endif (BUILD_SHARED_LIBS)
-
 if(MSVC AND NOT(MSVC_VERSION LESS 1400))
     set_source_files_properties(src/StatementImpl.cpp
         PROPERTIES COMPILE_FLAGS "/bigobj")
