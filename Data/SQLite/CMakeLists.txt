@@ -19,13 +19,8 @@ else()
     )
 endif()
 
-if(WINCE)
-    add_definitions(-DSQLITE_MSVC_LOCALTIME_API)
-endif(WINCE)
-
-add_definitions(-DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED)
-
 add_library(DataSQLite ${LIB_MODE} ${SQLITE_SRCS} )
+
 add_library(Poco::DataSQLite ALIAS DataSQLite)
 set_target_properties(DataSQLite
     PROPERTIES
@@ -44,6 +39,19 @@ target_compile_definitions(DataSQLite PUBLIC ${LIB_MODE_DEFINITIONS})
 if(POCO_UNBUNDLED)
 	target_include_directories(DataSQLite PUBLIC "${SQLITE3_INCLUDE_DIRS}")
 	target_compile_definitions(DataSQLite PUBLIC POCO_UNBUNDLED)
+else()
+	if(WINCE)
+		target_compile_definitions(DataSQLite PRIVATE SQLITE_MSVC_LOCALTIME_API)
+	endif(WINCE)
+	target_compile_definitions(DataSQLite PRIVATE
+		SQLITE_THREADSAFE=1
+		SQLITE_DISABLE_LFS
+		SQLITE_OMIT_UTF16
+		SQLITE_OMIT_PROGRESS_CALLBACK
+		SQLITE_OMIT_COMPLETE
+		SQLITE_OMIT_TCL_VARIABLE
+		SQLITE_OMIT_DEPRECATED
+	)
 endif()
 
 POCO_INSTALL(DataSQLite)
