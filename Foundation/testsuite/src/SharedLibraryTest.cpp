@@ -106,7 +106,8 @@ void SharedLibraryTest::testSharedLibrary3()
 	}
 	assertTrue (!sl.isLoaded());
 
-	path = "TestLibrary";
+	std::string self = Path(Path::self()).makeParent().toString();
+	path = self + "TestLibrary";
 	path.append(SharedLibrary::suffix());
 	sl.load(path);
 	assertTrue (sl.isLoaded());
