@@ -433,7 +433,7 @@ build_script:
         }
         $defs = "--config RelWithDebInfo"
         $defs+=" -G" + $generator;
-        $defs+=" -DCMAKE_BUILD_TYPE=RelWithDebInfo";
+        $defs+=" -DCMAKE_BUILD_TYPE=Debug";
         $defs+=" -DPOCO_ENABLE_PDF=OFF";
         $defs+=" -DPOCO_ENABLE_NETSSL=ON";
         $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
