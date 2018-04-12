@@ -165,6 +165,7 @@ void SessionImpl::open(const std::string& connect)
 			if (sw.elapsedSeconds() >= tout)
 			{
 				close();
+				poco_assert(_pDB);
 				Utility::throwException(_pDB, rc);
 			}
 			else Thread::sleep(10);

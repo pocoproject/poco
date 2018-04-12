@@ -1374,6 +1374,18 @@ void SQLiteTest::testEmptyDB()
 }
 
 
+void SQLiteTest::testNonexistingDB()
+{
+	try
+	{
+		Session tmp (Poco::SQL::SQLite::Connector::KEY, "foo/bar/nonexisting.db");
+	}
+	catch(...)
+	{
+	}
+}
+
+
 void SQLiteTest::testCLOB()
 {
 	std::string lastName("lastname");
@@ -3752,6 +3764,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalRange);
 	CppUnit_addTest(pSuite, SQLiteTest, testSingleSelect);
 	CppUnit_addTest(pSuite, SQLiteTest, testEmptyDB);
+	CppUnit_addTest(pSuite, SQLiteTest, testNonexistingDB);
 	CppUnit_addTest(pSuite, SQLiteTest, testCLOB);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector10);
