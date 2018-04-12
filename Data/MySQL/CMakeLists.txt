@@ -6,8 +6,6 @@ POCO_SOURCES_AUTO( MYSQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
-add_definitions(-DTHREADSAFE -DNO_TCL)
-
 add_library(DataMySQL ${LIB_MODE} ${MYSQL_SRCS} )
 add_library(Poco::DataMySQL ALIAS DataMySQL)
 set_target_properties(DataMySQL
@@ -24,7 +22,7 @@ target_include_directories(DataMySQL
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(DataMySQL PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(DataMySQL PUBLIC THREADSAFE NO_TCL ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(DataMySQL)
 POCO_GENERATE_PACKAGE(DataMySQL)
