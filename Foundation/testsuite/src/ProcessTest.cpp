@@ -50,11 +50,15 @@ std::string ProcessTest::execName()
 
 void ProcessTest::testLaunch()
 {
+	std::string cmd = execName();
+#if defined(_WIN32_WCE)
+-	cmd += ".EXE";
+#endif
 	std::vector<std::string> args;
 	args.push_back("arg1");
 	args.push_back("arg2");
 	args.push_back("arg3");
-	ProcessHandle ph = Process::launch(execName(), args);
+	ProcessHandle ph = Process::launch(cmd, args);
 	int rc = ph.wait();
 	assertTrue (rc == 3);
 }
