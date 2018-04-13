@@ -94,20 +94,97 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries(Foundation PUBLIC ${SYSLIBS} ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
-if(WIN32)
-	target_link_libraries(Foundation PUBLIC iphlpapi)
-endif()
-if(ANDROID)
-	target_link_libraries(Foundation PUBLIC log)
-endif()
+target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
+
 target_compile_definitions(Foundation PUBLIC ${LIB_MODE_DEFINITIONS})
+
+if(WIN32)
+	target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
+	target_link_libraries(Foundation PUBLIC iphlpapi)
+endif()
+
+if (CYGWIN)
+  target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT POCO_NO_WSTRING _XOPEN_SOURCE=500 __BSD_VISIBLE)
+else (CYGWIN)
+	if (UNIX AND NOT ANDROID )
+	  target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_UNIX)
+	  if (APPLE)
+		target_compile_definitions(Foundation PUBLIC POCO_HAVE_IPv6 POCO_NO_STAT64)
+		target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS})
+	  else (APPLE)
+		target_compile_definitions(Foundation PUBLIC _REENTRANT _THREAD_SAFE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64)
+		if (QNX)
+		  target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
+		  target_link_libraries(Foundation PUBLIC m socket)
+		else (QNX)
+		  target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
+		  target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+		endif (QNX)
+	  endif (APPLE)
+	endif(UNIX AND NOT ANDROID )
+endif (CYGWIN)
+
+if (CMAKE_SYSTEM MATCHES "SunOS")
+  target_compile_definitions(Foundation
+	  PUBLIC
+		POCO_OS_FAMILY_UNIX
+		_XOPEN_SOURCE=500
+		_REENTRANT
+		_THREAD_SAFE
+		_LARGEFILE64_SOURCE
+		_FILE_OFFSET_BITS=64
+	)
+  target_link_libraries(Foundation PUBLIC pthread socket xnet nsl resolv rt ${CMAKE_DL_LIBS})
+endif()
+
+if(CMAKE_COMPILER_IS_MINGW)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		WC_NO_BEST_FIT_CHARS=0x400
+		POCO_WIN32_UTF8
+		_WIN32
+		MINGW32
+		WINVER=0x500
+		ODBCVER=0x0300
+		POCO_THREAD_STACK_SIZE
+	)
+endif()
+
+# SunPro C++
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+	target_compile_definitions(Foundation PUBLIC _BSD_SOURCE)
+	target_compile_options(Foundation PUBLIC -library=stlport4)
+endif()
+
+# iOS
+if (IOS)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		POCO_HAVE_IPv6
+		POCO_NO_FPENVIRONMENT
+		POCO_NO_STAT64
+		POCO_NO_SHAREDLIBS
+		POCO_NO_NET_IFTYPES
+	)
+endif()
+
+#Android
+if (ANDROID)
+	target_compile_definitions(Foundation
+		PUBLIC
+			POCO_NO_FPENVIRONMENT
+			POCO_NO_WSTRING
+			POCO_NO_SHAREDMEMORY
+	)
+	target_link_libraries(Foundation PUBLIC log)
+endif()
+
 if(POCO_UNBUNDLED)
 	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
