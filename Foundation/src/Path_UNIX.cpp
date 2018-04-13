@@ -167,7 +167,7 @@ std::string PathImpl::selfImpl()
 	if (_NSGetExecutablePath(path, &size) != 0)
 		throw SystemException("cannot obtain path for executable");
 	return path;
-#elif POCO_OS == POCO_OS_LINUX
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	#ifdef PATH_MAX
 		std::size_t sz = PATH_MAX;
 	#else
