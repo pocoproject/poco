@@ -175,6 +175,10 @@ void SessionImpl::open(const std::string& connect)
 	{
 		throw ConnectionFailedException(ex.displayText());
 	}
+	catch (AssertionViolationException& ex)
+	{
+		throw ConnectionFailedException(ex.displayText());
+	}
 
 	_connected = true;
 }
