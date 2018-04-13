@@ -66,4 +66,4 @@ set_target_properties( TestLibrary PROPERTIES PREFIX "")
 set_target_properties(TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries(TestLibrary Poco::Foundation )
 
-add_dependencies(${TESTUNIT} TestLibrary TestApp)
+add_dependencies(Foundation-testrunner TestApp TestLibrary)
