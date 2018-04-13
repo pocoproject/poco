@@ -751,7 +751,7 @@ namespace {
 		static WeakDummy* _wrco[_size];
 
 	private:
-		typedef std::atomic<Poco::Clock::ClockDiff> TimerType;
+		typedef std::atomic<unsigned long> TimerType;
 
 		void work()
 		{
