@@ -1379,6 +1379,7 @@ void SQLiteTest::testNonexistingDB()
 	try
 	{
 		Session tmp (Poco::SQL::SQLite::Connector::KEY, "foo/bar/nonexisting.db");
+		fail("must fail");
 	}
 	catch(...)
 	{
