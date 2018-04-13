@@ -378,7 +378,7 @@ This will build Poco in a subdirectory <*cmake_build*>. All files produced durin
 CMake allows you to set some build time options. As an example: to disable the SevenZip support
 type the following command:
 
-    $ cmake -DENABLE_SEVENZIP=OFF ..
+    $ cmake -DPOCO_ENABLE_SEVENZIP=OFF ..
 
 Similar options are available for other components (see: CMakeLists.txt).
 
@@ -396,9 +396,9 @@ The discovery goes as follows:
 
   1) If %POCO_BASE%/openssl/VS_120 directory is found, headers and binaries from that location will be used; please
      see "Build OpenSSL using scripts from POCO distribution package" on how to build your own or get POCO pre-built
-     OpenSSL binaries. This behavior can be disabled by specifying DISABLE_INTERNAL_OPENSSL=ON.
+     OpenSSL binaries. This behavior can be disabled by specifying POCO_DISABLE_INTERNAL_OPENSSL=ON.
 
-  2) If %POCO_BASE%/openssl/VS_120 directory is not found, or DISABLE_INTERNAL_OPENSSL=ON was specified, CMake will
+  2) If %POCO_BASE%/openssl/VS_120 directory is not found, or POCO_DISABLE_INTERNAL_OPENSSL=ON was specified, CMake will
      attempt to find the system-installed OpenSSL. If it is found, it will be used.
 
   3) IF OpenSSL is not discovered through steps 1) or 2), Cypto and NetSSL_OpenSSL will not be built.

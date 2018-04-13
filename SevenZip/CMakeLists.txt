@@ -71,10 +71,10 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
     # TODO: Add tests
     #add_subdirectory(testsuite)
 endif ()
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()
