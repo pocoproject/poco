@@ -102,7 +102,11 @@ target_include_directories(Foundation
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
 
-target_compile_definitions(Foundation PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(Foundation
+  PUBLIC
+    ${LIB_MODE_DEFINITIONS}
+    $<$<CONFIG:Debug>:_DEBUG>
+  )
 
 if(WIN32)
 	target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
