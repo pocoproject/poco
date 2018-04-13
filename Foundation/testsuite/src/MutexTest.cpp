@@ -76,27 +76,27 @@ void MutexTest::testMutexRecursion()
 	mtx.lock();
 	
 	bool success = mtx.tryLock();
-	assert (!success);
+	assertTrue (!success);
 	
 	Timestamp mark;
 	success = mtx.tryLock(2000); // Wait 2 seconds
-	assert (!success);
+	assertTrue (!success);
 
 	// Test that we waited approx. 2 sec
 	Timestamp::TimeDiff elapsed = mark.elapsed();
-	assert (elapsed > 1000000);
-	assert (elapsed < 3000000);
+	assertTrue (elapsed > 1000000);
+	assertTrue (elapsed < 3000000);
 	
 	success = mtx.tryLock(0);
-	assert (!success);
+	assertTrue (!success);
 
 	SelfDeadlockRunnable r;
 	Thread t;
 
 	t.start(r);
 	success = t.tryJoin(2000);
-	assert (!success);
-	assert (!r.ran());
+	assertTrue (!success);
+	assertTrue (!r.ran());
 }
 
 
@@ -106,18 +106,18 @@ void MutexTest::testRecursiveMutexRecursion()
 	mtx.lock();
 	
 	bool success = mtx.tryLock();
-	assert (success);
+	assertTrue (success);
 	
 	Timestamp mark;
 	success = mtx.tryLock(2000); // Wait 2 seconds
-	assert (success);
+	assertTrue (success);
 
 	// Test that we completed almost immediately
 	Timestamp::TimeDiff elapsed = mark.elapsed();
-	assert (elapsed < 100000);
+	assertTrue (elapsed < 100000);
 	
 	success = mtx.tryLock(0);
-	assert (success);
+	assertTrue (success);
 }
 
 void MutexTest::setUp()

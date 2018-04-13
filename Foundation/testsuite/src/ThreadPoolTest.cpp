@@ -44,40 +44,40 @@ void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 	ThreadPool pool(2, 3, 3, POCO_THREAD_STACK_SIZE, static_cast<ThreadPool::ThreadAffinityPolicy>(affinityPolicy));
 	pool.setStackSize(1);
 
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 0);
-	assert (pool.capacity() == 3);
-	assert (pool.available() == 3);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.capacity() == 3);
+	assertTrue (pool.available() == 3);
 	pool.addCapacity(1);
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 0);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 4);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 4);
 
 	RunnableAdapter<ThreadPoolTest> ra(*this, &ThreadPoolTest::count);
 	pool.start(ra, cpu);
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 1);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 3);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 1);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 3);
 
 	pool.start(ra, cpu);
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 2);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 2);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 2);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 2);
 
 	pool.start(ra, cpu);
-	assert (pool.allocated() == 3);
-	assert (pool.used() == 3);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 1);
+	assertTrue (pool.allocated() == 3);
+	assertTrue (pool.used() == 3);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 1);
 
 	pool.start(ra, cpu);
-	assert (pool.allocated() == 4);
-	assert (pool.used() == 4);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 0);
+	assertTrue (pool.allocated() == 4);
+	assertTrue (pool.used() == 4);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 0);
 
 	try
 	{
@@ -95,43 +95,43 @@ void ThreadPoolTest::startThreadPoolTest(int affinityPolicy)
 	_event.set(); // go!!!
 	pool.joinAll();
 	
-	assert (_count == 40000);
+	assertTrue (_count == 40000);
 	
-	assert (pool.allocated() == 4);
-	assert (pool.used() == 0);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 4);
+	assertTrue (pool.allocated() == 4);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 4);
 	
 	Thread::sleep(4000);
 
 	pool.collect();
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 0);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 4);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 4);
 	
 	_count = 0;
 	_event.reset();
 	pool.start(ra, cpu);
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 1);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 3);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 1);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 3);
 
 	pool.start(ra, cpu);
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 2);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 2);
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 2);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 2);
 	_event.set(); // go!!!
 	pool.joinAll();
 
-	assert (_count == 20000);
+	assertTrue (_count == 20000);
 	
-	assert (pool.allocated() == 2);
-	assert (pool.used() == 0);
-	assert (pool.capacity() == 4);
-	assert (pool.available() == 4);	
+	assertTrue (pool.allocated() == 2);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.capacity() == 4);
+	assertTrue (pool.available() == 4);	
 }
 
 

@@ -34,7 +34,7 @@
 		Poco::SQL::ODBC::EnvironmentException ee(h); \
 		std::cout << ee.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r))
+	assertTrue (SQL_SUCCEEDED(r))
 
 
 #define poco_odbc_check_dbc(r, h) \
@@ -43,7 +43,7 @@
 		Poco::SQL::ODBC::ConnectionException ce(h); \
 		std::cout << ce.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r))
+	assertTrue (SQL_SUCCEEDED(r))
 
 
 #define poco_odbc_check_stmt(r, h) \
@@ -52,7 +52,7 @@
 		Poco::SQL::ODBC::StatementException se(h); \
 		std::cout << se.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r))
+	assertTrue (SQL_SUCCEEDED(r))
 
 
 #define poco_odbc_check_desc(r, h) \
@@ -61,7 +61,7 @@
 		Poco::SQL::ODBC::DescriptorException de(h); \
 		std::cout << de.toString() << std::endl; \
 	} \
-	assert (SQL_SUCCEEDED(r))
+	assertTrue (SQL_SUCCEEDED(r))
 
 
 #define poco_data_using_statements using Poco::SQL::Keywords::now; \
@@ -308,19 +308,19 @@ public:
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
 		std::string number = Poco::NumberFormatter::format(size - 1);
-		assert (size == ints.size());
-		assert (0 == ints.front());
-		assert (size - 1 == ints.back());
-		assert (std::string("xyz0") == strings.front());
-		assert (std::string("xyz") + number == strings.back());
-		assert (CLOB("abc0") == blobs.front());
+		assertTrue (size == ints.size());
+		assertTrue (0 == ints.front());
+		assertTrue (size - 1 == ints.back());
+		assertTrue (std::string("xyz0") == strings.front());
+		assertTrue (std::string("xyz") + number == strings.back());
+		assertTrue (CLOB("abc0") == blobs.front());
 		CLOB blob("abc");
 		blob.appendRaw(number.c_str(), number.size());
-		assert (blob == blobs.back());
-		assert (.5 == floats.front());
-		assert (floats.size() - 1 + .5 == floats.back());
-		assert (bools.front());
-		assert (((0 == ((bools.size() - 1) % 2)) == bools.back()));
+		assertTrue (blob == blobs.back());
+		assertTrue (.5 == floats.front());
+		assertTrue (floats.size() - 1 + .5 == floats.back());
+		assertTrue (bools.front());
+		assertTrue (((0 == ((bools.size() - 1) % 2)) == bools.back()));
 
 		ints.clear();
 
@@ -361,19 +361,19 @@ public:
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
-		assert (size == ints.size());
-		assert (0 == ints.front());
-		assert (size - 1 == ints.back());
-		assert (std::string("xyz0") == strings.front());
-		assert (std::string("xyz") + number == strings.back());
-		assert (CLOB("abc0") == blobs.front());
+		assertTrue (size == ints.size());
+		assertTrue (0 == ints.front());
+		assertTrue (size - 1 == ints.back());
+		assertTrue (std::string("xyz0") == strings.front());
+		assertTrue (std::string("xyz") + number == strings.back());
+		assertTrue (CLOB("abc0") == blobs.front());
 		blob.assignRaw("abc", 3);
 		blob.appendRaw(number.c_str(), number.size());
-		assert (blob == blobs.back());
-		assert (.5 == floats.front());
-		assert (floats.size() - 1 + .5 == floats.back());
-		assert (bools.front());
-		assert (((0 == ((bools.size() - 1) % 2)) == bools.back()));
+		assertTrue (blob == blobs.back());
+		assertTrue (.5 == floats.front());
+		assertTrue (floats.size() - 1 + .5 == floats.back());
+		assertTrue (bools.front());
+		assertTrue (((0 == ((bools.size() - 1) % 2)) == bools.back()));
 	}
 
 	void doBulkPerformance(Poco::UInt32 size);
@@ -443,17 +443,17 @@ public:
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
 		std::string number = Poco::NumberFormatter::format(size - 1);
-		assert (size == ints.size());
-		assert (0 == ints.front());
-		assert (size - 1 == ints.back());
-		assert (std::string("xyz0") == strings.front());
-		assert (std::string("xyz") + number == strings.back());
-		assert (CLOB("abc0") == blobs.front());
+		assertTrue (size == ints.size());
+		assertTrue (0 == ints.front());
+		assertTrue (size - 1 == ints.back());
+		assertTrue (std::string("xyz0") == strings.front());
+		assertTrue (std::string("xyz") + number == strings.back());
+		assertTrue (CLOB("abc0") == blobs.front());
 		CLOB blob("abc");
 		blob.appendRaw(number.c_str(), number.size());
-		assert (blob == blobs.back());
-		assert (.5 == floats.front());
-		assert (floats.size() - 1 + .5 == floats.back());
+		assertTrue (blob == blobs.back());
+		assertTrue (.5 == floats.front());
+		assertTrue (floats.size() - 1 + .5 == floats.back());
 
 		ints.clear();
 
@@ -489,17 +489,17 @@ public:
 		} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 		
-		assert (size == ints.size());
-		assert (0 == ints.front());
-		assert (size - 1 == ints.back());
-		assert (std::string("xyz0") == strings.front());
-		assert (std::string("xyz") + number == strings.back());
-		assert (CLOB("abc0") == blobs.front());
+		assertTrue (size == ints.size());
+		assertTrue (0 == ints.front());
+		assertTrue (size - 1 == ints.back());
+		assertTrue (std::string("xyz0") == strings.front());
+		assertTrue (std::string("xyz") + number == strings.back());
+		assertTrue (CLOB("abc0") == blobs.front());
 		blob.assignRaw("abc", 3);
 		blob.appendRaw(number.c_str(), number.size());
-		assert (blob == blobs.back());
-		assert (.5 == floats.front());
-		assert (floats.size() - 1 + .5 == floats.back());
+		assertTrue (blob == blobs.back());
+		assertTrue (.5 == floats.front());
+		assertTrue (floats.size() - 1 + .5 == floats.back());
 	}
 
 	void setSimple();
@@ -552,14 +552,14 @@ public:
 		try { session() << "SELECT COUNT(*) FROM " << ExecUtil::person(), into(count), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (count == size);
+		assertTrue (count == size);
 
 		C2 res;
 		try { session() << "SELECT Image FROM " << ExecUtil::person(), into(res), now; }
 		catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
-		assert (res.size() == img.size());
-		assert (res == img);
+		assertTrue (res.size() == img.size());
+		assertTrue (res == img);
 	}
 
 	void blobStmt();

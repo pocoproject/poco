@@ -334,7 +334,7 @@ void SybaseODBC::testStoredProcedure()
 			stat << "{ call " << nm << "() }", now;
 			Poco::SQL::RecordSet rs(stat);
 			dropObject("procedure", nm);
-			assert(0 == rs.rowCount());
+			assertTrue (0 == rs.rowCount());
 		}
 		{
 			Poco::Nullable<std::string> ins;
@@ -353,10 +353,10 @@ void SybaseODBC::testStoredProcedure()
 				, now;
 			session() << "{ call " << nm << "(?, ?, ?, ?, ?) }", in(ins), out(oi), out(os), out(od), out(odtm), now;
 			dropObject("procedure", nm);
-			assert(oi.isNull());
-			assert(os.isNull());
-			assert(od.isNull());
-			assert(odtm.isNull());
+			assertTrue (oi.isNull());
+			assertTrue (os.isNull());
+			assertTrue (od.isNull());
+			assertTrue (odtm.isNull());
 		}
 		{
 			session() << "create procedure " << nm << " @c char(8) AS select @c", now;
@@ -365,9 +365,9 @@ void SybaseODBC::testStoredProcedure()
 			stat << "{ call " << nm << "(?) }", use(ns), now;
 			dropObject("procedure", nm);
 			Poco::SQL::RecordSet rs(stat);
-			assert(1 == rs.rowCount());
+			assertTrue (1 == rs.rowCount());
 			bool nl = rs.isNull(size_t(0), 0);
-			assert( nl );
+			assertTrue ( nl );
 		}
 		{
 			Poco::SQL::Statement stat(session());
@@ -376,7 +376,7 @@ void SybaseODBC::testStoredProcedure()
 			{
 				stat.execute();
 				Poco::SQL::RecordSet rs(stat);
-				assert(0 == rs.rowCount());
+				assertTrue (0 == rs.rowCount());
 			}
 		}
 
@@ -388,7 +388,7 @@ void SybaseODBC::testStoredProcedure()
 		int i = 0;
 		session() << "{ call " << nm << "(?) }", out(i), now;
 		dropObject("procedure", nm);
-		assert(-1 == i);
+		assertTrue (-1 == i);
 
 		session() << "create procedure " + nm + " "
 			"@inParam int, @outParam int output "
@@ -400,7 +400,7 @@ void SybaseODBC::testStoredProcedure()
 		int j = 0;
 		session() << "{ call " << nm << "(?, ?)} ", in(i), out(j), now;
 		dropObject("procedure", nm);
-		assert(4 == j);
+		assertTrue (4 == j);
 
 		session() << "create procedure " + nm + " "
 			"@ioParam int output "
@@ -411,7 +411,7 @@ void SybaseODBC::testStoredProcedure()
 		i = 2;
 		session() << "{ call " << nm << "(?) }", io(i), now;
 		dropObject("procedure", nm);
-		assert(4 == i);
+		assertTrue (4 == i);
 
 		session() << "create procedure " + nm + " "
 			"@inParam varchar(1000), @outParam varchar(1000) output "
@@ -432,7 +432,7 @@ void SybaseODBC::testStoredProcedure()
 		std::string outParam;
 		session() << "{ call " << nm << "(?,?) }", in(inParam), out(outParam), now;
 		dropObject("procedure", nm);
-		assert(inParam == outParam);
+		assertTrue (inParam == outParam);
 
 		k += 2;
 	}
@@ -458,7 +458,7 @@ void SybaseODBC::testStoredProcedureDynamicAny()
 
 		session() << "{ call " << nm << "(?, ?) }", in(i), out(j), now;
 		dropObject("procedure", nm);
-		assert(4 == j);
+		assertTrue (4 == j);
 
 		session() << "create procedure " << nm << " @outParam int output "
 			"as "
@@ -468,7 +468,7 @@ void SybaseODBC::testStoredProcedureDynamicAny()
 		i = 2;
 		session() << "{ call " << nm << "(?) }", io(i), now;
 		dropObject("procedure", nm);
-		assert(4 == i);
+		assertTrue (4 == i);
 
 		k += 2;
 	}
@@ -496,7 +496,7 @@ void SybaseODBC::testStoredProcedureAny()
 		session() << "{ call " << nm << "(?, ?) }", in(i), out(j), now;
 
 		dropObject("procedure", nm);
-		assert(4 == AnyCast<int>(j));
+		assertTrue (4 == AnyCast<int>(j));
 
 		session() << "create procedure " << nm << " @outParam int output "
 			"as "
@@ -506,7 +506,7 @@ void SybaseODBC::testStoredProcedureAny()
 		i = 2;
 		session() << "{ call " << nm << "(?) }", io(i), now;
 		dropObject("procedure", nm);
-		assert(4 == AnyCast<int>(i));
+		assertTrue (4 == AnyCast<int>(i));
 
 		session() << "create procedure " << nm << " "
 			"@i int , @f float , @s1 varchar(10) , @d date , @t time , @dt datetime , @bin binary , @res int output"
@@ -528,7 +528,7 @@ void SybaseODBC::testStoredProcedureAny()
 		stat.addBind(Poco::SQL::Keywords::out(res));
 		stat.execute();
 		dropObject("procedure", nm);
-		assert(11 == res.extract<int>());
+		assertTrue (11 == res.extract<int>());
 
 		k += 2;
 	}

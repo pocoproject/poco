@@ -140,6 +140,8 @@ public:
 
 	void testIncrementVacuum();
 
+	void testIllegalFilePath();
+
 	void setUp();
 	void tearDown();
 

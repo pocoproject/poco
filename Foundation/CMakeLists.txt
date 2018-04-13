@@ -173,13 +173,21 @@ target_include_directories( "${LIBNAME}"
 	)
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
+if (NOT POCO_ENABLE_WSTRING)
+    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_WSTRING)
+endif()
+
+if (NOT POCO_ENABLE_FPENVIRONMENT)
+    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_FPENVIRONMENT)
+endif()
+
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
 	add_subdirectory( testsuite )
 endif ()
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
 	add_subdirectory( samples )
 endif ()
 

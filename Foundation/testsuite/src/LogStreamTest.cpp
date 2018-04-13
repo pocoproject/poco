@@ -43,13 +43,13 @@ void LogStreamTest::testLogStream()
 	LogStream ls(root);
 
 	ls << "information" << ' ' << 1 << std::endl;
-	assert (pChannel->list().begin()->getPriority() == Message::PRIO_INFORMATION);
-	assert (pChannel->list().begin()->getText() == "information 1");
+	assertTrue (pChannel->list().begin()->getPriority() == Message::PRIO_INFORMATION);
+	assertTrue (pChannel->list().begin()->getText() == "information 1");
 	pChannel->list().clear();
 
 	ls.error() << "error" << std::endl;
-	assert (pChannel->list().begin()->getPriority() == Message::PRIO_ERROR);
-	assert (pChannel->list().begin()->getText() == "error");
+	assertTrue (pChannel->list().begin()->getPriority() == Message::PRIO_ERROR);
+	assertTrue (pChannel->list().begin()->getText() == "error");
 	pChannel->list().clear();
 }
 

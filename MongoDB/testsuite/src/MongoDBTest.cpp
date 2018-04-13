@@ -102,18 +102,18 @@ void MongoDBTest::testQueryRequest()
 		try
 		{
 			std::string lastname = doc->get<std::string>("lastname");
-			assert(lastname.compare("Braem") == 0);
+			assertTrue (lastname.compare("Braem") == 0);
 			std::string firstname = doc->get<std::string>("firstname");
-			assert(firstname.compare("Franky") == 0);
+			assertTrue (firstname.compare("Franky") == 0);
 			Poco::Timestamp birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
-			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
+			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
 			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
-			assert(doc->isType<NullValue>("unknown"));
+			assertTrue (doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
-			assert(!active);
+			assertTrue (!active);
 			Poco::MongoDB::Array::Ptr points = doc->get<Poco::MongoDB::Array::Ptr>("points");
-			assert(points->getInteger(0) == 0 && points->getInteger(1) == 1 && points->getInteger(2) == 2);
+			assertTrue (points->getInteger(0) == 0 && points->getInteger(1) == 1 && points->getInteger(2) == 2);
 
 			std::string id = doc->get("_id")->toString();
 		}
@@ -145,14 +145,14 @@ void MongoDBTest::testDBQueryRequest()
 		try
 		{
 			std::string lastname = doc->get<std::string>("lastname");
-			assert(lastname.compare("Braem") == 0);
+			assertTrue (lastname.compare("Braem") == 0);
 			std::string firstname = doc->get<std::string>("firstname");
-			assert(firstname.compare("Franky") == 0);
+			assertTrue (firstname.compare("Franky") == 0);
 			Poco::Timestamp birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
-			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
+			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
 			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
-			assert(doc->isType<NullValue>("unknown"));
+			assertTrue (doc->isType<NullValue>("unknown"));
 
 			std::string id = doc->get("_id")->toString();
 		}
@@ -181,7 +181,7 @@ void MongoDBTest::testCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		assert(doc->getInteger("n") == 1);
+		assertTrue (doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -201,7 +201,7 @@ void MongoDBTest::testDBCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		assert(doc->getInteger("n") == 1);
+		assertTrue (doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -214,7 +214,7 @@ void MongoDBTest::testDBCount2Command()
 {
 	Poco::MongoDB::Database db("team");
 	Poco::Int64 count = db.count(*_mongo, "players");
-	assert(count == 1);
+	assertTrue (count == 1);
 }
 
 
@@ -244,7 +244,7 @@ void MongoDBTest::testCursorRequest()
 	_mongo->sendRequest(*insertRequest);
 
 	Poco::Int64 count = db.count(*_mongo, "numbers");
-	assert(count == 10000);
+	assertTrue (count == 10000);
 
 	Poco::MongoDB::Cursor cursor("team", "numbers");
 
@@ -257,7 +257,7 @@ void MongoDBTest::testCursorRequest()
 			break;
 		response = cursor.next(*_mongo);
 	}
-	assert(n == 10000);
+	assertTrue (n == 10000);
 
 	Poco::MongoDB::QueryRequest drop("team.$cmd");
 	drop.setNumberToReturn(1);
@@ -322,7 +322,7 @@ void MongoDBTest::testConnectionPool()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		assert(doc->getInteger("n") == 1);
+		assertTrue (doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -335,7 +335,7 @@ void MongoDBTest::testObjectID()
 {
 	ObjectId oid("536aeebba081de6815000002");
 	std::string str2 = oid.toString();
-	assert(str2 == "536aeebba081de6815000002");
+	assertTrue (str2 == "536aeebba081de6815000002");
 }
 
 
@@ -389,10 +389,10 @@ void MongoDBTest::testUUID()
 		try
 		{
 			std::string name = doc->get<std::string>("name");
-			assert(name.compare("Barcelona") == 0);
+			assertTrue (name.compare("Barcelona") == 0);
 
 			Poco::MongoDB::Binary::Ptr uuidBinary = doc->get<Binary::Ptr>("uuid");
-			assert(uuid == uuidBinary->uuid());
+			assertTrue (uuid == uuidBinary->uuid());
 		}
 		catch(Poco::NotFoundException& nfe)
 		{
