@@ -1375,6 +1375,19 @@ void SQLiteTest::testEmptyDB()
 }
 
 
+void SQLiteTest::testNonexistingDB()
+{
+	try
+	{
+		Session tmp (Poco::SQL::SQLite::Connector::KEY, "foo/bar/nonexisting.db");
+		fail("must fail");
+	}
+	catch(...)
+	{
+	}
+}
+
+
 void SQLiteTest::testCLOB()
 {
 	std::string lastName("lastname");
@@ -3765,6 +3778,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalRange);
 	CppUnit_addTest(pSuite, SQLiteTest, testSingleSelect);
 	CppUnit_addTest(pSuite, SQLiteTest, testEmptyDB);
+	CppUnit_addTest(pSuite, SQLiteTest, testNonexistingDB);
 	CppUnit_addTest(pSuite, SQLiteTest, testCLOB);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector10);
@@ -3816,7 +3830,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 //
-//	To be fixed by dimanikulin
+//	FIXME dimanikulin 
 //	CppUnit_addTest(pSuite, SQLiteTest, testIncrementVacuum);
 //
 	return pSuite;

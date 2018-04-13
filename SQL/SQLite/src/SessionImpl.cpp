@@ -165,12 +165,17 @@ void SessionImpl::open(const std::string& connect)
 			if (sw.elapsedSeconds() >= tout)
 			{
 				close();
+				poco_assert(_pDB);
 				Utility::throwException(_pDB, rc);
 			}
 			else Thread::sleep(10);
 		}
 	}
 	catch (SQLiteException& ex)
+	{
+		throw ConnectionFailedException(ex.displayText());
+	}
+	catch (AssertionViolationException& ex)
 	{
 		throw ConnectionFailedException(ex.displayText());
 	}
