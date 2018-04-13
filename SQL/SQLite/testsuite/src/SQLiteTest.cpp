@@ -3830,7 +3830,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 //
-//	To be fixed by dimanikulin 
+//	FIXME dimanikulin 
 //	CppUnit_addTest(pSuite, SQLiteTest, testIncrementVacuum);
 //
 	return pSuite;
