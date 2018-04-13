@@ -154,7 +154,7 @@ void ActiveDispatcherTest::testFailure()
 	assertTrue (result.available());
 	assertTrue (result.failed());
 	std::string msg = result.error();
-	assertTrue (msg == "n == 100");
+	assertTrue (msg.find("n == 100") != std::string::npos);
 }
 
 
