@@ -97,13 +97,7 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries(Foundation PUBLIC ${SYSLIBS} ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
-if(WIN32)
-	target_link_libraries(Foundation PUBLIC iphlpapi)
-endif()
-if(ANDROID)
-	target_link_libraries(Foundation PUBLIC log)
-endif()
+target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -111,6 +105,115 @@ target_include_directories(Foundation
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
 target_compile_definitions(Foundation PUBLIC ${LIB_MODE_DEFINITIONS})
+
+if(WIN32)
+  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
+  target_link_libraries(Foundation PUBLIC iphlpapi)
+endif(WIN32)
+
+if (CYGWIN)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		POCO_NO_FPENVIRONMENT
+		POCO_NO_WSTRING
+		_XOPEN_SOURCE=500
+		__BSD_VISIBLE
+	)
+else (CYGWIN)
+	if (UNIX AND NOT ANDROID )
+	  # Standard 'must be' defines
+	  if (APPLE)
+		  target_compile_definitions(Foundation
+			  PUBLIC
+				POCO_HAVE_IPv6
+				POCO_NO_STAT64
+			)
+		target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS})
+	  else (APPLE)
+		  target_compile_definitions(Foundation
+			  PUBLIC
+				_REENTRANT
+				_THREAD_SAFE
+				_LARGEFILE64_SOURCE
+				_FILE_OFFSET_BITS=64
+			)
+		if (QNX)
+		  target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
+		  target_link_libraries(Foundation PUBLIC m socket)
+		elseif(${CMAKE_SYSTEM} MATCHES "AIX")
+		  target_compile_definitions(Foundation PUBLIC __IBMCPP_TR1__)
+		elseif(CMAKE_SYSTEM MATCHES "^FreeBSD")
+			target_compile_definitions(Foundation
+				PUBLIC
+					_XOPEN_SOURCE=600
+					__BSD_VISIBLE
+					_REENTRANT
+					_THREAD_SAFE
+					_LARGEFILE64_SOURCE
+					_FILE_OFFSET_BITS=64
+					POCO_HAVE_IPv6
+					POCO_HAVE_FD_POLL
+			)
+			target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+		else ()
+		  target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
+		  target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+		endif ()
+	  endif (APPLE)
+	endif(UNIX AND NOT ANDROID )
+endif (CYGWIN)
+
+if (CMAKE_SYSTEM MATCHES "SunOS")
+  # Standard 'must be' defines
+  target_compile_definitions(Foundation PUBLIC _REENTRANT _THREAD_SAFE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64)
+  target_compile_options(Foundation PUBLIC -m64 )
+  target_link_libraries(Foundation PUBLIC pthread socket xnet nsl resolv rt ${CMAKE_DL_LIBS})
+endif()
+
+if (CMAKE_COMPILER_IS_MINGW)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		WC_NO_BEST_FIT_CHARS=0x400
+		_WIN32
+		MINGW32
+		WINVER=0x500
+		ODBCVER=0x0300
+		POCO_THREAD_STACK_SIZE
+	)
+endif()
+
+# iOS
+if (IOS)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		POCO_HAVE_IPv6
+		POCO_NO_FPENVIRONMENT
+		POCO_NO_STAT64
+		POCO_NO_SHAREDLIBS
+		POCO_NO_NET_IFTYPES
+	)
+endif()
+
+#Android
+if (ANDROID)
+  target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT POCO_NO_SHAREDMEMORY )
+  target_link_libraries(Foundation PUBLIC log)
+endif(ANDROID)
+
+# IBM XLC for AIX
+if ((${CMAKE_CXX_COMPILER_ID} MATCHES "XL") AND (${CMAKE_SYSTEM} MATCHES "AIX"))
+  target_compile_options(Foundation
+	  PUBLIC
+		-qlanglvl=extended0x
+		-qlanglvl=noconstexpr
+		-qlanglvl=newexcp
+		-qsuppress=1540-0198
+		-qsuppress=1540-1628
+		-qsuppress=1540-0095
+		-qsuppress=1500-030
+	)
+endif()
+
 if(POCO_UNBUNDLED)
 	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
