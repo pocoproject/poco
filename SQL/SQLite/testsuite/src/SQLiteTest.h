@@ -74,6 +74,7 @@ public:
 	void testIllegalRange();
 	void testSingleSelect();
 	void testEmptyDB();
+	void testNonexistingDB();
 
 	void testCLOB();
 
