@@ -241,7 +241,7 @@ matrix:
         - $CXX --version
         - source ./travis/ignored.sh
         - export POCO_BASE=`pwd`
-        - mkdir cmake-build && cd cmake-build && cmake --config Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON .. && make -s -j2 && ctest -VV && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake --config Debug -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON .. && make -s -j2 && ctest -VV && cd ..
  
 
     - env:    test="4.0 x86 (make) bundled"
