@@ -254,6 +254,11 @@ protected:
 
 		logger().debug("exec " + exec);
 		logger().debug("path " + path);
+        for (int no = 0; no < args.size(); ++no)
+        {
+            logger().debug("arg " + args[no]);
+        }
+
 
 		if (usePipe)
 		{
