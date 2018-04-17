@@ -150,7 +150,7 @@ protected:
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleHelp)));
 
 		options.addOption(
-			Option("config-file", "f", "load configuration data from a file")
+			Option("config", "f", "load configuration data from a file")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
