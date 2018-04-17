@@ -390,6 +390,7 @@ echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo.
 
 if %DEBUG_SHARED%==1 (
+  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE!
   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
