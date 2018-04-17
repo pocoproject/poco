@@ -473,6 +473,7 @@ before_test:
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class HTTPSClientSessionTest>.testInterop,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class TimerTest>.testTimer,';
+      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class PathTest>.testFind,';
       
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
