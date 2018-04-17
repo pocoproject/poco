@@ -28,7 +28,7 @@
 			${PocoBuild}/*/doc/images
 		</resources>
 		<compiler>
-			<exec>clang++</exec>
+			<exec>g++</exec>
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
@@ -38,8 +38,6 @@
 				-C,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
 				-xc++
-				-std=c++11,
-				-stdlib=libc++
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>
