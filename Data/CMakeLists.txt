@@ -12,7 +12,7 @@ if(MSVC AND NOT(MSVC_VERSION LESS 1400))
 endif()
 
 
-add_library(Data ${LIB_MODE} ${SRCS} )
+add_library(Data ${SRCS} )
 add_library(Poco::Data ALIAS Data)
 set_target_properties(Data
     PROPERTIES

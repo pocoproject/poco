@@ -6,7 +6,7 @@ POCO_SOURCES_AUTO( MYSQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
-add_library(DataMySQL ${LIB_MODE} ${MYSQL_SRCS} )
+add_library(DataMySQL ${MYSQL_SRCS} )
 add_library(Poco::DataMySQL ALIAS DataMySQL)
 set_target_properties(DataMySQL
     PROPERTIES

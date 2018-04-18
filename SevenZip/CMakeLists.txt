@@ -47,7 +47,7 @@ POCO_SOURCES( SRCS 7z
 #    src/XzIn.c
 )
 
-add_library(SevenZip ${LIB_MODE} ${SRCS} )
+add_library(SevenZip ${SRCS} )
 add_library(Poco::SevenZip ALIAS SevenZip)
 set_target_properties(SevenZip
     PROPERTIES

@@ -6,7 +6,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-add_library(MongoDB ${LIB_MODE} ${SRCS} )
+add_library(MongoDB ${SRCS} )
 add_library(Poco::MongoDB ALIAS MongoDB)
 set_target_properties(MongoDB
     PROPERTIES

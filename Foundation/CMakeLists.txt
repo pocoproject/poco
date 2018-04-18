@@ -85,7 +85,7 @@ else()
 endif (POCO_UNBUNDLED)
 
 
-add_library(Foundation ${LIB_MODE} ${SRCS})
+add_library(Foundation ${SRCS})
 add_library(Poco::Foundation ALIAS Foundation)
 set_target_properties(Foundation
 	PROPERTIES

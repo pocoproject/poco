@@ -19,7 +19,7 @@ else()
     )
 endif()
 
-add_library(DataSQLite ${LIB_MODE} ${SQLITE_SRCS} )
+add_library(DataSQLite ${SQLITE_SRCS} )
 
 add_library(Poco::DataSQLite ALIAS DataSQLite)
 set_target_properties(DataSQLite

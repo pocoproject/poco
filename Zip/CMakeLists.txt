@@ -6,7 +6,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-add_library(Zip ${LIB_MODE} ${SRCS} )
+add_library(Zip ${SRCS} )
 add_library(Poco::Zip ALIAS Zip)
 set_target_properties( Zip
     PROPERTIES

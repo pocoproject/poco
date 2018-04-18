@@ -6,7 +6,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-add_library(Redis ${LIB_MODE} ${SRCS} )
+add_library(Redis ${SRCS} )
 add_library(Poco::Redis ALIAS Redis)
 set_target_properties(Redis
     PROPERTIES

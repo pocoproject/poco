@@ -116,7 +116,7 @@ POCO_SOURCES( SRCS libpng
 #TODO: Can we put this with the below includes? PRIVAT eg.
 include_directories( "include/Poco/PDF" ) # zip src
 
-add_library(PDF ${LIB_MODE} ${SRCS} )
+add_library(PDF ${SRCS} )
 add_library(Poco::PDF ALIAS PDF)
 set_target_properties(PDF
     PROPERTIES

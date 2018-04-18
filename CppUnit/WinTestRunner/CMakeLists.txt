@@ -9,7 +9,7 @@ POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h" )
 POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 
-add_library(WinTestRunner ${LIB_MODE} ${WIN_SRCS} )
+add_library(WinTestRunner ${WIN_SRCS} )
 set_target_properties(WinTestRunner
     PROPERTIES
     VERSION "1" SOVERSION "1"

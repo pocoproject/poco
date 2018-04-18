@@ -7,7 +7,7 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 POCO_SOURCES(SRCS pdjson src/pdjson.c)
 
-add_library(JSON ${LIB_MODE} ${SRCS} )
+add_library(JSON ${SRCS} )
 add_library(Poco::JSON ALIAS JSON)
 set_target_properties(JSON
     PROPERTIES

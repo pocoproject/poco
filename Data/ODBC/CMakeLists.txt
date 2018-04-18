@@ -6,7 +6,7 @@ POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
-add_library(DataODBC ${LIB_MODE} ${ODBC_SRCS})
+add_library(DataODBC ${ODBC_SRCS})
 add_library(Poco::DataODBC ALIAS DataODBC)
 set_target_properties(DataODBC
     PROPERTIES

@@ -15,7 +15,7 @@ if(WIN32)
     endif()    
 endif(WIN32)
 
-add_library(Net ${LIB_MODE} ${SRCS} )
+add_library(Net ${SRCS} )
 add_library(Poco::Net ALIAS Net)
 set_target_properties( Net
     PROPERTIES

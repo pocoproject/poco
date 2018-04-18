@@ -25,7 +25,7 @@ else()
     )
 endif (POCO_UNBUNDLED)
 
-add_library(XML ${LIB_MODE} ${SRCS} )
+add_library(XML ${SRCS} )
 
 add_library(Poco::XML ALIAS XML)
 set_target_properties( XML

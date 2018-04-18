@@ -6,7 +6,7 @@ POCO_SOURCES( SRCS Encodings ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS( SRCS Encodings ${HDRS_G})
 
-add_library(Encodings ${LIB_MODE} ${SRCS} )
+add_library(Encodings ${SRCS} )
 add_library(Poco::Encodings ALIAS Encodings)
 set_target_properties(Encodings
     PROPERTIES
