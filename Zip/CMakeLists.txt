@@ -22,7 +22,6 @@ target_include_directories(Zip
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Zip PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(Zip)
 POCO_GENERATE_PACKAGE(Zip)

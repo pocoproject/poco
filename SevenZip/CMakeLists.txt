@@ -63,7 +63,6 @@ target_include_directories(SevenZip
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SevenZip PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(SevenZip)
 POCO_GENERATE_PACKAGE(SevenZip)

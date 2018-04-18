@@ -22,7 +22,6 @@ target_include_directories(Encodings
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Encodings PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(Encodings)
 POCO_GENERATE_PACKAGE(Encodings)

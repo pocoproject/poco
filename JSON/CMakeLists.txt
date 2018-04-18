@@ -23,7 +23,7 @@ target_include_directories(JSON
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(JSON PUBLIC ${LIB_MODE_DEFINITIONS})
+
 if(MSVC)
 	set_property(TARGET JSON PROPERTY C_STANDARD 99)
 else()

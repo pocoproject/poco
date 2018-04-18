@@ -23,7 +23,6 @@ target_include_directories(Crypto
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Crypto PUBLIC ${LIB_MODE_DEFINITIONS})
 
 if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL)
     target_compile_definitions(Crypto PUBLIC POCO_EXTERNAL_OPENSSL)	

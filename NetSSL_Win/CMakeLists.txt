@@ -22,7 +22,6 @@ target_include_directories(NetSSLWin
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(NetSSLWin PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(NetSSLWin)
 POCO_GENERATE_PACKAGE(NetSSLWin)

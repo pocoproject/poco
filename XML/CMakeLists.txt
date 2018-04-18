@@ -42,7 +42,7 @@ target_include_directories(XML
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(XML PUBLIC ${LIB_MODE_DEFINITIONS})
+
 if (POCO_UNBUNDLED)
 	target_include_directories(XML PUBLIC "${EXPAT_INCLUDE_DIRS}")
 	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)

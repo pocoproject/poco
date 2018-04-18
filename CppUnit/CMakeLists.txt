@@ -22,6 +22,12 @@ target_include_directories(CppUnit
     PRIVATE
     	${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(CppUnit PUBLIC ${LIB_MODE_DEFINITIONS})
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(CppUnit
+        PUBLIC
+            POCO_STATIC
+    )
+endif()
 
 POCO_INSTALL(CppUnit)

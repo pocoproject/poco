@@ -22,7 +22,6 @@ target_include_directories(MongoDB
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(MongoDB PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(MongoDB)
 POCO_GENERATE_PACKAGE(MongoDB)

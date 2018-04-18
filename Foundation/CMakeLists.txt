@@ -106,9 +106,15 @@ target_include_directories(Foundation
 	)
 target_compile_definitions(Foundation
   PUBLIC
-    ${LIB_MODE_DEFINITIONS}
     $<$<CONFIG:Debug>:_DEBUG>
 )
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(Foundation
+        PUBLIC
+            POCO_STATIC
+    )
+endif()
 
 if(WIN32)
   target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h

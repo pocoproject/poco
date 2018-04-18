@@ -27,7 +27,6 @@ target_include_directories(SQL
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SQL PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(SQL)
 POCO_GENERATE_PACKAGE(SQL)

@@ -23,7 +23,7 @@ target_include_directories(SQLMySQL
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SQLMySQL PUBLIC THREADSAFE NO_TCL ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(SQLMySQL PUBLIC THREADSAFE NO_TCL)
 
 POCO_INSTALL(SQLMySQL)
 POCO_GENERATE_PACKAGE(SQLMySQL)

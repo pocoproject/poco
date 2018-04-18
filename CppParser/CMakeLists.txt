@@ -22,7 +22,6 @@ target_include_directories(CppParser
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(CppParser PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(CppParser)
 POCO_GENERATE_PACKAGE(CppParser)

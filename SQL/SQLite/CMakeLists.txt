@@ -35,7 +35,7 @@ target_include_directories(SQLSQLite
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SQLSQLite PUBLIC ${LIB_MODE_DEFINITIONS})
+
 if(POCO_UNBUNDLED)
 	target_include_directories(SQLSQLite PUBLIC "${SQLITE3_INCLUDE_DIRS}")
 	target_compile_definitions(SQLSQLite PUBLIC POCO_UNBUNDLED)
