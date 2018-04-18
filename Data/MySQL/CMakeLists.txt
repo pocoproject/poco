@@ -22,7 +22,7 @@ target_include_directories(DataMySQL
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(DataMySQL PUBLIC THREADSAFE NO_TCL ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(DataMySQL PUBLIC THREADSAFE NO_TCL)
 
 POCO_INSTALL(DataMySQL)
 POCO_GENERATE_PACKAGE(DataMySQL)

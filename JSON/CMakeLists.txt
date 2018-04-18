@@ -23,7 +23,7 @@ target_include_directories(JSON
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(JSON PUBLIC ${LIB_MODE_DEFINITIONS})
+
 if(WIN32)
 	target_compile_definitions(JSON PRIVATE _CRT_SECURE_NO_WARNINGS)
 	set_source_files_properties(src/pdjson.c PROPERTIES LANGUAGE CXX)

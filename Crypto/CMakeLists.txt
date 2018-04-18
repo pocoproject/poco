@@ -22,7 +22,6 @@ target_include_directories(Crypto
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Crypto PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(Crypto)
 POCO_GENERATE_PACKAGE(Crypto)

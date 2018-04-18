@@ -19,7 +19,6 @@ target_include_directories(CppUnit
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(CppUnit PUBLIC ${LIB_MODE_DEFINITIONS})
 if (WIN32)
     target_compile_definitions(CppUnit PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif (WIN32)

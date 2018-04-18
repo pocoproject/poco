@@ -23,8 +23,6 @@ target_include_directories(WinTestRunner
     )
 # TODO: Is this flag _AFXDLL always required?
 target_compile_definitions(WinTestRunner
-  PUBLIC
-  ${LIB_MODE_DEFINITIONS}
   PRIVATE
   _AFXDLL
   )

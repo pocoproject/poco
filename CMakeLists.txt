@@ -111,6 +111,13 @@ option(ENABLE_TESTS
 
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
+if(POCO_STATIC)
+    message(STATUS "Building static libraries")
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+    message(STATUS "Building dynamic libraries")
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
@@ -123,15 +130,6 @@ if(MSVC)
       "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
 endif()
 
-# Uncomment from next two lines to force static or dynamic library, default is autodetection
-if(POCO_STATIC)
-    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
-    message(STATUS "Building static libraries")
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-    message(STATUS "Building dynamic libraries")
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
 
 if(ENABLE_TESTS)
   option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)

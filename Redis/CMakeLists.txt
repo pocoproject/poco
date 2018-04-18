@@ -22,7 +22,6 @@ target_include_directories(Redis
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Redis PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(Redis)
 POCO_GENERATE_PACKAGE(Redis)

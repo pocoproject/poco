@@ -31,7 +31,6 @@ target_include_directories(Net
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Net PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(Net)
 POCO_GENERATE_PACKAGE(Net)

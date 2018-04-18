@@ -22,7 +22,7 @@ target_include_directories(DataODBC
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(DataODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(DataODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE)
 
 POCO_INSTALL(DataODBC)
 POCO_GENERATE_PACKAGE(DataODBC)

@@ -22,7 +22,6 @@ target_include_directories(NetSSL
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(NetSSL PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(NetSSL)
 POCO_GENERATE_PACKAGE(NetSSL)

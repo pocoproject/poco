@@ -132,7 +132,7 @@ target_include_directories(PDF
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(PDF PUBLIC ${LIB_MODE_DEFINITIONS})
+
 if (POCO_UNBUNDLED)
     target_include_directories(PDF PUBLIC "${ZLIB_INCLUDE_DIRS}")
     target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)

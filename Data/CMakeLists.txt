@@ -28,7 +28,6 @@ target_include_directories(Data
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(Data PUBLIC ${LIB_MODE_DEFINITIONS})
 
 POCO_INSTALL(Data)
 POCO_GENERATE_PACKAGE(Data)
