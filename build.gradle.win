@@ -772,31 +772,30 @@ subprojects {
 		environment "Path", "$PATH"
 
 		String CPPUNIT_IGNORE;
-		CPPUNIT_IGNORE =  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testBigPing';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
+		CPPUNIT_IGNORE ='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPClientTest>.testPing,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket,';
 
 		//FIXME Those tests below should work
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunch';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunch,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testIsRunning,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination,';
 
 		//FIXME won't work until SharedLibraries be properly generated
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary1';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary2';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary3';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader2';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader3';
-		CPPUNIT_IGNORE+=' ';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary1,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary2,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary3,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader2,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader3,';
 		
 		environment "CPPUNIT_IGNORE", "\"$CPPUNIT_IGNORE\""
 
@@ -1058,31 +1057,30 @@ def cover(os, Directory, Module) {
 //		println "POCO_BASE=" + environment.POCO_BASE
 
 		String CPPUNIT_IGNORE;
-		CPPUNIT_IGNORE =  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testBigPing';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
+		CPPUNIT_IGNORE ='class CppUnit::TestCaller<class NTPClientTest>.testTimeSync,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPClientTest>.testPing,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket,';
 
 		//FIXME Those test below should work
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunch';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunch,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testIsRunning,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination,';
 		
 		//FIXME won't work until SharedLibraries be properly generated
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary1';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary2';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary3';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader2';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader3';
-		CPPUNIT_IGNORE+=' ';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary1,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary2,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary3,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader2,';
+		CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader3,';
 		
 		environment "CPPUNIT_IGNORE", "\"$CPPUNIT_IGNORE\""
 //		println "CPPUNIT_IGNORE=" + environment.CPPUNIT_IGNORE
