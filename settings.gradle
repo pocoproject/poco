@@ -15,7 +15,7 @@ if (os.windows) {
 }
 include ':Data'
 // SQL not ready yet
-//include ':Data:ODBC'
+include ':Data:ODBC'
 //include ':Data:SQLite'
 //include ':Data:MySQL'
 include ':Zip'
@@ -39,10 +39,11 @@ include ':Net:testsuite'
 if (os.windows) {
 	include ':NetSSL_Win:testsuite'
 }
-//include ':Data:testsuite'
-//include ':Data:ODBC:testsuite'
-//include ':Data:SQLite:testsuite'
+include ':Data:testsuite'
+include ':Data:ODBC:testsuite'
+include ':Data:SQLite:testsuite'
 //include ':Data:MySQL:testsuite'
+//include ':Data:SQLite:testsuite'
 include ':MongoDB:testsuite'
 include ':Redis:testsuite'
 include ':CppParser:testsuite'
@@ -50,7 +51,7 @@ include ':Zip:testsuite'
 
 include ':Encodings:samples'
 include ':Foundation:samples'
-//include ':Data:samples'
+include ':Data:samples'
 //include ':NetSSL_OpenSSL:samples'
 if (os.windows) {
 	include ':NetSSL_Win:samples'

@@ -54,6 +54,23 @@ model {
 				cppCompiler.define	"SQLITE_OMIT_TCL_VARIABLE"
 				cppCompiler.define	"SQLITE_OMIT_DEPRECATED"
 			}
+			if (toolchain in Gcc) {
+				cCompiler.define	"SQLITE_THREADSAFE=1"
+				cCompiler.define	"SQLITE_DISABLE_LFS"
+				cCompiler.define	"SQLITE_OMIT_UTF16"
+				cCompiler.define	"SQLITE_OMIT_PROGRESS_CALLBACK"
+				cCompiler.define	"SQLITE_OMIT_COMPLETE"
+				cCompiler.define	"SQLITE_OMIT_TCL_VARIABLE"
+				cCompiler.define	"SQLITE_OMIT_DEPRECATED"
+				
+				cppCompiler.define	"SQLITE_THREADSAFE=1"
+				cCompiler.define	"SQLITE_DISABLE_LFS"
+				cppCompiler.define	"SQLITE_OMIT_UTF16"
+				cppCompiler.define	"SQLITE_OMIT_PROGRESS_CALLBACK"
+				cppCompiler.define	"SQLITE_OMIT_COMPLETE"
+				cppCompiler.define	"SQLITE_OMIT_TCL_VARIABLE"
+				cppCompiler.define	"SQLITE_OMIT_DEPRECATED"
+			}
 		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
