@@ -29,9 +29,9 @@ if(ANDROID)
 else()
 	add_test(NAME Foundation WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND Foundation-testrunner -all)
 	if(WIN32)
-		set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
+		set_tests_properties(Foundation PROPERTIES ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
 	elseif(UNIX)
-		set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
+		set_tests_properties(Foundation PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
 	endif()
     # The test is run in the runtime directory. So the test data is copied there too
 	add_custom_command(TARGET Foundation-testrunner POST_BUILD
