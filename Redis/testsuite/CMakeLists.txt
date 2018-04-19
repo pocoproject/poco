@@ -14,6 +14,8 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
     src/WinCEDriver.cpp
 )
 
+option(POCO_OLD_REDIS_VERSION "Use old redis version" OFF)
+
 add_executable(Redis-testrunner ${TEST_SRCS} )
 if(ANDROID)
 	add_test(NAME Redis WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
@@ -24,6 +26,6 @@ endif()
 
 target_link_libraries(Redis-testrunner ${CMAKE_THREAD_LIBS_INIT}  Poco::Redis Poco::Foundation Poco::CppUnit )
 
-if(OLD_REDIS_VERSION)
+if(POCO_OLD_REDIS_VERSION)
   target_compile_definitions(Redis-testrunner PRIVATE OLD_REDIS_VERSION)
-endif(OLD_REDIS_VERSION)
+endif()
