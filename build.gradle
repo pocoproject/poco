@@ -272,37 +272,37 @@ subprojects {
 						def libName = "foobar"
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-					            headers.srcDir "$openSSLWinHome/include"
+					            headers.srcDir "$openSSLWindowsHome/include"
 								libName = 'libcryptod.lib'
-								staticLibraryFile = file("$openSSLWinHome/win32/lib/debug/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win32/lib/debug/$libName")
 							} else if (targetPlatform.name == 'win64') {
-					            headers.srcDir "$openSSLWinHome/include"
+					            headers.srcDir "$openSSLWindowsHome/include"
 								libName = 'libcryptod.lib'
-								staticLibraryFile = file("$openSSLWinHome/win64/lib/debug/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 					            headers.srcDir "$openSSLBrewHome/include"
 								libName = 'libcryptod.a'
-								staticLibraryFile = file("$openSSLBrewHome/lib/$libName")
+								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								libName = 'libcrypto.a'
-								staticLibraryFile = file("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSLLinuxLib/$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
 								libName = 'libcrypto.lib'
-								staticLibraryFile = file("$openSSLWinHome/win32/lib/release/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win32/lib/release/$libName")
 							} else if (targetPlatform.name == 'win64') {
 								libName = 'libcrypto.lib'
-								staticLibraryFile = file("$openSSLWinHome/win64/lib/release/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libcrypto.a'
-								staticLibraryFile = file("$openSSLBrewHome/lib/$libName")
+								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								libName = 'libcrypto.a'
-								staticLibraryFile = file("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSLLinuxLib/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -315,48 +315,48 @@ subprojects {
 							if (targetPlatform.name == 'win32') {
 								dllName = 'libcryptod.dll'
 								linkName = 'libcryptod.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win32/bin/debug/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win32/bin/debug/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win32/bin/debug/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win32/bin/debug/$linkName")
 							} else if (targetPlatform.name == 'win64') {
 								dllName = 'libcryptod.dll'
 								linkName = 'libcryptod.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win64/bin/debug/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win64/bin/debug/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/debug/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								dllName = 'libcryptod.dylib'
 								linkName = 'libcryptod.dylib'
-								sharedLibraryFile	 = file("$openSSLBrewHome/lib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLBrewHome/lib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								dllName = 'libcrypto.so'
 								linkName = 'libcrypto.a'
-								sharedLibraryFile	 = file("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLLinuxLib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLLinuxLib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLLinuxLib/$linkName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
 								dllName = 'libcrypto.dll'
 								linkName = 'libcrypto.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win32/bin/release/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win32/bin/release/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win32/bin/release/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win32/bin/release/$linkName")
 							} else if (targetPlatform.name == 'win64') {
 								dllName = 'libcrypto.dll'
 								linkName = 'libcrypto.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win64/bin/release/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win64/bin/release/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/release/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								dllName = 'libcrypto.dylib'
 								linkName = 'libcrypto.dylib'
-								sharedLibraryFile	 = file("$openSSLBrewHome/lib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLBrewHome/lib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								dllName = 'libcrypto.so'
 								linkName = 'libcrypto.a'
-								sharedLibraryFile	 = file("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLLinuxLib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLLinuxLib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLLinuxLib/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -369,36 +369,36 @@ subprojects {
 						def libName
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-					            headers.srcDir "$openSSLWinHome/include"
+					            headers.srcDir "$openSSLWindowsHome/include"
 								libName = 'libssld.lib'
-								staticLibraryFile = file("$openSSLWinHome/win32/lib/debug/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win32/lib/debug/$libName")
 							} else if (targetPlatform.name == 'win64') {
-					            headers.srcDir "$openSSLWinHome/include"
+					            headers.srcDir "$openSSLWindowsHome/include"
 								libName = 'libssld.lib'
-								staticLibraryFile = file("$openSSLWinHome/win64/lib/debug/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libssld.a'
-								staticLibraryFile = file("$openSSLBrewHome/lib/$libName")
+								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								libName = 'libssl.a'
-								staticLibraryFile = file("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSLLinuxLib", "$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
 								libName = 'libssl.lib'
-								staticLibraryFile = file("$openSSLWinHome/win32/lib/release/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win32/lib/release/$libName")
 							} else if (targetPlatform.name == 'win64') {
 								libName = 'libssl.lib'
-								staticLibraryFile = file("$openSSLWinHome/win64/lib/release/$libName")
+								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								libName = 'libssl.a'
-								staticLibraryFile = file("$openSSLBrewHome/lib/$libName")
+								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								libName = 'libssl.a'
-								staticLibraryFile = file("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSLLinuxLib/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -411,47 +411,48 @@ subprojects {
 							if (targetPlatform.name == 'win32') {
 								dllName = 'libssld.dll'
 								linkName = 'libssld.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win32/bin/debug/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win32/bin/debug/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win32/bin/debug/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win32/bin/debug/$linkName")
 							} else if (targetPlatform.name == 'win64') {
 								dllName = 'libssld.dll'
 								linkName = 'libssld.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win64/bin/debug/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win64/bin/debug/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/debug/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								dllName = 'libssld.dylib'
 								linkName = 'libssld.dylib'
-								sharedLibraryFile	 = file("$openSSLBrewHome/lib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLBrewHome/lib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
+                                def File openSSLLinuxLibFile = new File("$openSSLLinuxLib")
 					            headers.srcDir "$openSSLLinuxInc/include"
-								dllName  = 'libssl.so'
-								linkName = 'libssl.a'
-								sharedLibraryFile	 = file("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLLinuxLib/$linkName")
+								dllName  = "libssl.so"
+								linkName = "libssl.a"
+								sharedLibraryFile	 = new File(openSSLLinuxLibFile, dllName)
+								sharedLibraryLinkFile = new File(openSSLLinuxLibFile, linkName)
 							}
 						} else if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
 								dllName = 'libssl.dll'
 								linkName = 'libssl.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win32/bin/release/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win32/bin/release/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win32/bin/release/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win32/bin/release/$linkName")
 							} else if (targetPlatform.name == 'win64') {
 								dllName = 'libssl.dll'
 								linkName = 'libssl.lib'
-								sharedLibraryFile	 = file("$openSSLWinHome/win64/bin/release/$dllName")
-								sharedLibraryLinkFile = file("$openSSLWinHome/win64/bin/release/$linkName")
+								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/release/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
 								dllName = 'libssl.dylib'
 								linkName = 'libssl.dylib'
-								sharedLibraryFile	 = file("$openSSLBrewHome/lib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLBrewHome/lib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
 					            headers.srcDir "$openSSLLinuxInc/include"
 								dllName = 'libssl.so'
 								linkName = 'libssl.a'
-								sharedLibraryFile	 = file("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = file("$openSSLLinuxLib/$linkName")
+								sharedLibraryFile	 = new File("$openSSLLinuxLib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSLLinuxLib/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -462,7 +463,7 @@ subprojects {
 		}
 		components {
 			withType(NativeComponentSpec) {
-				targetPlatform "linux32"
+				//targetPlatform "linux32"
 				targetPlatform "linux64"
 				targetPlatform "macos"
 
@@ -796,24 +797,21 @@ subprojects {
 
 		args test
 	}
-
-	
-
 }
 
 tasks.withType(CppCompile) {
 	maxParallelForks = 2
 }
 
-task PocoDocIni {
+task PocoDocIni() {
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
     file.text = """
+Includes=-I$rootDir/CppParser/include,-I$rootDir/CppUnit/include,-I$rootDir/Encodings/include,-I$rootDir/Crypto/include,-I$rootDir/Data/include,-I$rootDir/Data/include,-I$rootDir/Data/MySQL/include,-I$rootDir/Data/ODBC/include,-I$rootDir/Data/PostgreSQL/include,-I$rootDir/Data/SQLite/include, -I$rootDir/Data/SQLite/src,-I$rootDir/Foundation/include,-I$rootDir/JSON/include,-I$rootDir/MongoDB/include,-I$rootDir/Net/include,-I$rootDir/NetSSL_OpenSSL/include,-I$rootDir/NetSSL_Win/include,-I$rootDir/Redis/include,-I$rootDir/Util/include,-I$rootDir/XML/include,-I$rootDir/Zip/include,-I$rootDir/SevenZip/include,-I$rootDir/PDF/include
 PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-${version}-all-doc
 PocoDoc.version=${version}-all
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 """
 	if (os.windows) {
 		def	String javaVCH = VCHome.replace('\\','/')
@@ -830,7 +828,7 @@ CLP=${javaCLP}
     if (os.linux) {
  		file.text += """
 CXX=g++
-CXXFLAGS=
+CXXFLAGS=-std=c++11
 """
 	} else 
     if (os.macos) {
@@ -850,13 +848,13 @@ task pocoDoc(type: Exec) {
 	if (os.linux) {
 		environment "LD_LIBRARY_PATH", "$rootDir/lib64:$LD_LIBRARY_PATH"
 		executable "PocoDoc/bin64/PocoDoc"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
-		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
+		args "--config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
+		args "--config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 	if (os.macOsX) {
 		//FIXME environment "LD_LIBRARY_PATH", "$rootDir/bin:$LD_LIBRARY_PATH"
-		args "-config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
-		args "-config=$rootDir/PocoDoc/PocoDoc.ini"
+		args "--config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"
+		args "--config=$rootDir/PocoDoc/PocoDoc.ini"
 	}
 //	inputs.files(tasks.getByPath(':production').outputs.files)
 	inputs.files(executable)
