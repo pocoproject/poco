@@ -827,6 +827,28 @@ void ODBCTest::testBLOB()
 }
 
 
+// Very similar to ODBCTest::testBLOB(), except it forces the "big" BLOB to be
+// twice the maxFieldSize setting, to verify that the switchover to manual
+// extract mode happens correctly.
+//
+void ODBCTest::testBLOBNoTruncation()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBLOBTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->blob(2 * maxFieldSize);
+		i += 2;
+	}
+	dropObject("TABLE", ExecUtil::person());
+}
+
+
 void ODBCTest::testBLOBContainer()
 {
 	for (int i = 0; i < 8;)

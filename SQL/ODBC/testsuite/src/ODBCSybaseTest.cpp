@@ -207,10 +207,19 @@ void SybaseODBC::recreateStringsTable()
 
 void SybaseODBC::recreateFloatsTable()
 {
-	dropObject("TABLE", ExecUtil::strings());
-	try { session() << "CREATE TABLE " << ExecUtil::strings() << " (str FLOAT)", now; }
+	dropObject("TABLE", ExecUtil::floats());
+	try { session() << "CREATE TABLE " << ExecUtil::floats() << " (str FLOAT)", now; }
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateFloatsTable()"); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateFloatsTable()"); }
+}
+
+
+void SybaseODBC::recreateDoublesTable()
+{
+	dropObject("TABLE", ExecUtil::doubles());
+	try { session() << "CREATE TABLE " << ExecUtil::doubles() <<" (str FLOAT)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateDoublesTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateDoublesTable()"); }
 }
 
 
@@ -343,13 +352,13 @@ void SybaseODBC::testStoredProcedure()
 			Poco::Nullable<Poco::SQL::Date> od = Poco::Nullable<Poco::SQL::Date>(Poco::SQL::Date());
 			Poco::Nullable<Poco::DateTime> odtm = Poco::Nullable<Poco::DateTime>(Poco::DateTime());
 			session() << "create procedure " + nm + " @ins varchar(40), @oi integer output, @os varchar(10) output, @od date output, @dtm datetime output "
-				"as "
-				"begin "
-				"select @oi = null;"
-				"select @os = @ins;"
-				"select @od = null;"
-				"select @dtm = null;"
-					" end"
+				"as\n"
+				"begin\n"
+				"select @oi = null\n"
+				"select @os = @ins\n"
+				"select @od = null\n"
+				"select @dtm = null\n"
+				"end"
 				, now;
 			session() << "{ call " << nm << "(?, ?, ?, ?, ?) }", in(ins), out(oi), out(os), out(od), out(odtm), now;
 			dropObject("procedure", nm);
@@ -389,7 +398,6 @@ void SybaseODBC::testStoredProcedure()
 		session() << "{ call " << nm << "(?) }", out(i), now;
 		dropObject("procedure", nm);
 		assert(-1 == i);
-
 		session() << "create procedure " + nm + " "
 			"@inParam int, @outParam int output "
 			"as "
@@ -401,24 +409,20 @@ void SybaseODBC::testStoredProcedure()
 		session() << "{ call " << nm << "(?, ?)} ", in(i), out(j), now;
 		dropObject("procedure", nm);
 		assert(4 == j);
-
 		session() << "create procedure " + nm + " "
 			"@ioParam int output "
 			"as "
 			"select @ioParam = @ioParam * @ioParam"
 			, now;
-
 		i = 2;
 		session() << "{ call " << nm << "(?) }", io(i), now;
 		dropObject("procedure", nm);
 		assert(4 == i);
-
 		session() << "create procedure " + nm + " "
 			"@inParam varchar(1000), @outParam varchar(1000) output "
 			"as "
 			"select @outParam = @inParam"
 			, now;
-
 		std::string inParam =
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
 			"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
@@ -433,7 +437,6 @@ void SybaseODBC::testStoredProcedure()
 		session() << "{ call " << nm << "(?,?) }", in(inParam), out(outParam), now;
 		dropObject("procedure", nm);
 		assert(inParam == outParam);
-
 		k += 2;
 	}
 }
@@ -568,7 +571,7 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit_addTest(pSuite, SybaseODBC, testAutoPtrComplexTypeVector);
 		CppUnit_addTest(pSuite, SybaseODBC, testInsertVector);
 		CppUnit_addTest(pSuite, SybaseODBC, testInsertEmptyVector);
-		CppUnit_addTest(pSuite, SybaseODBC, testBigStringVector);
+		//CppUnit_addTest(pSuite, SybaseODBC, testBigStringVector); // Sybase doesn't raise any error when a string is too big
 		CppUnit_addTest(pSuite, SybaseODBC, testSimpleAccessList);
 		CppUnit_addTest(pSuite, SybaseODBC, testComplexTypeList);
 		CppUnit_addTest(pSuite, SybaseODBC, testInsertList);
@@ -629,7 +632,7 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit_addTest(pSuite, SybaseODBC, testAny);
 		CppUnit_addTest(pSuite, SybaseODBC, testDynamicAny);
 		CppUnit_addTest(pSuite, SybaseODBC, testMultipleResults);
-		CppUnit_addTest(pSuite, SybaseODBC, testMultipleResultsNoProj);
+		//CppUnit_addTest(pSuite, SybaseODBC, testMultipleResultsNoProj); // the par twith limit fails on Sybase
 		CppUnit_addTest(pSuite, SybaseODBC, testSQLChannel); // this test may suffer from race conditions
 		CppUnit_addTest(pSuite, SybaseODBC, testSQLLogger);
 		//CppUnit_addTest(pSuite, SybaseODBC, testSessionTransaction); // this test fails when connection is fast

@@ -135,6 +135,7 @@ void ODBCMetaColumn::init()
 
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
+	case -360: // IBM DB2 DecFloat
 		// Oracle has no INTEGER type - it's essentially NUMBER with 38 whole and
 		// 0 fractional digits. It also does not recognize SQL_BIGINT type,
 		// so the workaround here is to hardcode it to 32 bit integer

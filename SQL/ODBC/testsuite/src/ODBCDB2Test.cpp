@@ -779,6 +779,7 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testSingleSelect);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testEmptyDB);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOB);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOBNoTruncation);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testDate);

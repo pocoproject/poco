@@ -3712,9 +3712,9 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 	people.push_back(Lisa);
 	people.push_back(PersonMRT("Simpson", "Maggie", "Springfield", 3));
 	session() << "INSERT INTO " << ExecUtil::person() <<" VALUES (?, ?, ?, ?)", use(people), now;
-
 	Poco::SQL::Statement stmt(session());
 	stmt << sql, useRef(HomerAge), useRef(BartName), useRef(LisaAge), useRef(HomerAge);
+
 
 	const size_t rowsToGet = stmt.execute();
 	assert(3 == stmt.dataSetCount());
@@ -3734,9 +3734,9 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 		RowIterator rowIt = rs.begin();
 		for (size_t rowNo = 0; r; ++rowNo, r = rs.moveNext(), ++valIt, ++rowIt, ++rowCnt)
 		{
-      ReadPerson::compare(this, *valIt, ReadPerson::RSReader(rs, rowNo));
-      ReadPerson::compare(this, *valIt, ReadPerson::ITReader(rowIt));
-      ReadPerson::compare(this, *valIt, ReadPerson::RSReaderCur(rs));
+			ReadPerson::compare(this, *valIt, ReadPerson::RSReader(rs, rowNo));
+			ReadPerson::compare(this, *valIt, ReadPerson::ITReader(rowIt));
+			ReadPerson::compare(this, *valIt, ReadPerson::RSReaderCur(rs));
 		}
 		assert(rowIt == rs.end());
 		if (!stmt.hasMoreDataSets())
@@ -3763,9 +3763,9 @@ void SQLExecutor::multipleResultsNoProj(const std::string& sql)
 				for (size_t row = 0; row < rs.rowCount(); ++row, ++rIt, mf = rs.moveNext(), ++valIt)
 				{
 					assert(mf);
-          ReadPerson::compare(this, *valIt, ReadPerson::RSReader(rs, row));
-          ReadPerson::compare(this, *valIt, ReadPerson::ITReader(rIt));
-          ReadPerson::compare(this, *valIt, ReadPerson::RSReaderCur(rs));
+          			ReadPerson::compare(this, *valIt, ReadPerson::RSReader(rs, row));
+          			ReadPerson::compare(this, *valIt, ReadPerson::ITReader(rIt));
+          			ReadPerson::compare(this, *valIt, ReadPerson::RSReaderCur(rs));
 				}
 				assert(rIt == rs.end());
 

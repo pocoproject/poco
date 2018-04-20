@@ -104,6 +104,7 @@ public:
 	virtual void testEmptyDB();
 
 	virtual void testBLOB();
+	virtual void testBLOBNoTruncation();
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
 

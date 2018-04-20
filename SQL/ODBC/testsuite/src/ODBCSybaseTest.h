@@ -34,6 +34,7 @@ private:
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
+	void recreateDoublesTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateAnysTable();

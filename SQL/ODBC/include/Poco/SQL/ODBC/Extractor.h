@@ -492,6 +492,9 @@ private:
 	template<typename T>
 	bool extractManualLOBImpl(std::size_t pos, Poco::SQL::LOB<T>& val, SQLSMALLINT cType);
 
+	template<typename T>
+	bool extractManualStringImpl(std::size_t pos, T& val, SQLSMALLINT cType);
+
 	template <typename T, typename NT>
 	bool extAny(std::size_t pos, T& val)
 	{
