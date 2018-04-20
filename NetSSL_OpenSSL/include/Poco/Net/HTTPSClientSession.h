@@ -146,11 +146,15 @@ public:
 
 protected:
 	void connect(const SocketAddress& address);
+	void connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress);
 	std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
 	int read(char* buffer, std::streamsize length);
 
 private:
+	void connectToTargetPre();
+	void connectToTargetPost();
+	void connectToProxy();
 	HTTPSClientSession(const HTTPSClientSession&);
 	HTTPSClientSession& operator = (const HTTPSClientSession&);
 	

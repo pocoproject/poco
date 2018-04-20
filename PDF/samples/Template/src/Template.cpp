@@ -7,6 +7,7 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
+#include <iostream>
 
 
 #if defined(POCO_OS_FAMILY_UNIX)

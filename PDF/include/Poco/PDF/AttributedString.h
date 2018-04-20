@@ -1,6 +1,17 @@
 //
 // DocumentTemplate.h
 //
+// Library: PDF
+// Package: PDFCore
+// Module:  DocumentTemplate
+//
+// Definition of the DocumentTemplate class.
+//
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
 
 
 #ifndef PDF_AttributedString_INCLUDED

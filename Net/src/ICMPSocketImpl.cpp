@@ -93,6 +93,10 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 	{
 		throw;
 	}
+	catch (TimeoutException&)
+	{
+		throw;
+	}
 	catch (Exception&)
 	{
 		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize);

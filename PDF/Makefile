@@ -8,8 +8,8 @@ include $(POCO_BASE)/build/rules/global
 
 INCLUDE += -I $(POCO_BASE)/PDF/include/Poco/PDF
 
-objects = Destination Document Encoder Font Image Outline \
-	LinkAnnotation Page PDFException TextAnnotation \
+objects = AttributedString Cell Destination Document Encoder Font Image Outline \
+	LinkAnnotation Page PDFException Table TextAnnotation Util XMLTemplate \
 	hpdf_3dmeasure hpdf_annotation hpdf_array hpdf_binary hpdf_boolean \
 	hpdf_catalog hpdf_destination hpdf_dict hpdf_doc hpdf_doc_png \
 	hpdf_encoder hpdf_encoder_cns hpdf_encoder_cnt hpdf_encoder_jp \
@@ -21,7 +21,7 @@ objects = Destination Document Encoder Font Image Outline \
 	hpdf_image_png hpdf_info hpdf_list hpdf_mmgr hpdf_name hpdf_namedict hpdf_null \
 	hpdf_number hpdf_objects hpdf_outline hpdf_page_label hpdf_page_operator \
 	hpdf_pages hpdf_pdfa hpdf_real hpdf_streams hpdf_string hpdf_u3d hpdf_utils hpdf_xref \
-	adler32 compress crc32 deflate gzio \
+	adler32 bmpread compress crc32 deflate gzio \
 	infback inffast inflate inftrees trees zutil \
 	png pngerror pnggccrd pngget pngmem pngpread \
 	pngread pngrio pngrtran pngrutil pngset pngtest \
@@ -29,6 +29,6 @@ objects = Destination Document Encoder Font Image Outline \
 
 target         = PocoPDF
 target_version = $(LIBVERSION)
-target_libs    = PocoUtil PocoFoundation
+target_libs    = PocoXML PocoJSON PocoUtil PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

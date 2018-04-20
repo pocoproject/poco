@@ -51,7 +51,7 @@ using Poco::Thread;
 		extern "C" __declspec(noreturn) void __cdecl __report_rangecheckfailure(void) { ::ExitProcess(1); }
 	#endif // (POCO_MSVS_VERSION < 2012)
 
-#endif // _MSC_VER && _MT && !POCO_EXTERNAL_OPENSSL && (POCO_MSVS_VERSION < 2013)
+#endif // defined(_MSC_VER) && !defined(_DLL) && defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
 
 
 namespace Poco {

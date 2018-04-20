@@ -41,16 +41,16 @@ if(MSVC)
         set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
     endif(POCO_MT)
 
-    if (ENABLE_MSVC_MP)
+    if (POCO_ENABLE_MSVC_MP)
       add_definitions(/MP)
     endif()
 
 else(MSVC)
     # Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
     set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
-    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -D_DEBUG")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 endif(MSVC)
+set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -D_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 
 # Add a d postfix to the debug libraries
 if(POCO_STATIC)
@@ -91,10 +91,11 @@ else (CYGWIN)
 		elseif(${CMAKE_SYSTEM} MATCHES "AIX")
 		  add_definitions(-D__IBMCPP_TR1__)
 		elseif(${CMAKE_SYSTEM} MATCHES "SunOS")
-        add_definitions(-m64)
+              add_definitions(-m64)
 	      set(SYSLIBS  pthread dl rt)
-    elseif (CMAKE_SYSTEM_NAME MATCHES "^FreeBSD")
-	      add_definitions( -D_XOPEN_SOURCE=700 -D__BSD_VISIBLE -DPOCO_HAVE_FD_POLL)
+		elseif(CMAKE_SYSTEM MATCHES "^FreeBSD")
+			add_definitions(-D_XOPEN_SOURCE=600 -D__BSD_VISIBLE -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -DPOCO_HAVE_IPv6 -DPOCO_HAVE_FD_POLL)
+			set(SYSLIBS pthread ${CMAKE_DL_LIBS} rt)
 		else ()
 	      add_definitions(-D_XOPEN_SOURCE=500 -DPOCO_HAVE_FD_EPOLL)
 	      set(SYSLIBS  pthread ${CMAKE_DL_LIBS} rt)
@@ -121,7 +122,7 @@ endif(IOS)
 
 #Android
 if (ANDROID)
-  add_definitions( -DPOCO_ANDROID -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING -DPOCO_NO_SHAREDMEMORY )
+  add_definitions( -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_SHAREDMEMORY )
 endif(ANDROID)
 
 # IBM XLC for AIX

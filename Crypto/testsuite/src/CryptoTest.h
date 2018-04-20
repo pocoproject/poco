@@ -33,6 +33,7 @@ public:
 	void testEncryptDecryptWithSalt();
 	void testEncryptDecryptWithSaltSha1();
 	void testEncryptDecryptDESECB();
+	void testEncryptDecryptGCM();
 	void testStreams();
 	void testPassword();
 	void testPasswordSha1();

@@ -19,6 +19,7 @@
 #include "Poco/MongoDB/Cursor.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/Array.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/CppUnit/TestCaller.h"
@@ -72,6 +73,12 @@ void MongoDBTest::testInsertRequest()
 
 	player->add("unknown", NullValue());
 
+	Poco::MongoDB::Array::Ptr points = new Poco::MongoDB::Array();
+	points->add<Poco::Int32>("0", 0);
+	points->add<Poco::Int64>("1", 1);
+	points->add<double>("2", 2);
+	player->add("points", points);
+
 	Poco::MongoDB::InsertRequest request("team.players");
 	request.documents().push_back(player);
 	_mongo->sendRequest(request);
@@ -95,16 +102,18 @@ void MongoDBTest::testQueryRequest()
 		try
 		{
 			std::string lastname = doc->get<std::string>("lastname");
-			assert(lastname.compare("Braem") == 0);
+			assertTrue (lastname.compare("Braem") == 0);
 			std::string firstname = doc->get<std::string>("firstname");
-			assert(firstname.compare("Franky") == 0);
+			assertTrue (firstname.compare("Franky") == 0);
 			Poco::Timestamp birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
-			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
+			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
 			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
-			assert(doc->isType<NullValue>("unknown"));
+			assertTrue (doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
-			assert(!active);
+			assertTrue (!active);
+			Poco::MongoDB::Array::Ptr points = doc->get<Poco::MongoDB::Array::Ptr>("points");
+			assertTrue (points->getInteger(0) == 0 && points->getInteger(1) == 1 && points->getInteger(2) == 2);
 
 			std::string id = doc->get("_id")->toString();
 		}
@@ -136,14 +145,14 @@ void MongoDBTest::testDBQueryRequest()
 		try
 		{
 			std::string lastname = doc->get<std::string>("lastname");
-			assert(lastname.compare("Braem") == 0);
+			assertTrue (lastname.compare("Braem") == 0);
 			std::string firstname = doc->get<std::string>("firstname");
-			assert(firstname.compare("Franky") == 0);
+			assertTrue (firstname.compare("Franky") == 0);
 			Poco::Timestamp birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
-			assert(birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
+			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
 			Poco::Timestamp lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
-			assert(doc->isType<NullValue>("unknown"));
+			assertTrue (doc->isType<NullValue>("unknown"));
 
 			std::string id = doc->get("_id")->toString();
 		}
@@ -172,7 +181,7 @@ void MongoDBTest::testCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		assert(doc->getInteger("n") == 1);
+		assertTrue (doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -192,7 +201,7 @@ void MongoDBTest::testDBCountCommand()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		assert(doc->getInteger("n") == 1);
+		assertTrue (doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -205,7 +214,7 @@ void MongoDBTest::testDBCount2Command()
 {
 	Poco::MongoDB::Database db("team");
 	Poco::Int64 count = db.count(*_mongo, "players");
-	assert(count == 1);
+	assertTrue (count == 1);
 }
 
 
@@ -235,7 +244,7 @@ void MongoDBTest::testCursorRequest()
 	_mongo->sendRequest(*insertRequest);
 
 	Poco::Int64 count = db.count(*_mongo, "numbers");
-	assert(count == 10000);
+	assertTrue (count == 10000);
 
 	Poco::MongoDB::Cursor cursor("team", "numbers");
 
@@ -248,7 +257,7 @@ void MongoDBTest::testCursorRequest()
 			break;
 		response = cursor.next(*_mongo);
 	}
-	assert(n == 10000);
+	assertTrue (n == 10000);
 
 	Poco::MongoDB::QueryRequest drop("team.$cmd");
 	drop.setNumberToReturn(1);
@@ -291,7 +300,13 @@ void MongoDBTest::testBuildInfo()
 
 void MongoDBTest::testConnectionPool()
 {
-	Poco::Net::SocketAddress sa("127.0.0.1", 27017);
+#if POCO_OS == POCO_OS_ANDROID
+		std::string host = "10.0.2.2";
+#else
+		std::string host = "127.0.0.1";
+#endif
+
+	Poco::Net::SocketAddress sa(host, 27017);
 	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory(sa);
 	Poco::ObjectPool<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> pool(factory, 10, 15);
 
@@ -307,7 +322,7 @@ void MongoDBTest::testConnectionPool()
 	if ( response.documents().size() > 0 )
 	{
 		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		assert(doc->getInteger("n") == 1);
+		assertTrue (doc->getInteger("n") == 1);
 	}
 	else
 	{
@@ -320,7 +335,7 @@ void MongoDBTest::testObjectID()
 {
 	ObjectId oid("536aeebba081de6815000002");
 	std::string str2 = oid.toString();
-	assert(str2 == "536aeebba081de6815000002");
+	assertTrue (str2 == "536aeebba081de6815000002");
 }
 
 
@@ -374,10 +389,10 @@ void MongoDBTest::testUUID()
 		try
 		{
 			std::string name = doc->get<std::string>("name");
-			assert(name.compare("Barcelona") == 0);
+			assertTrue (name.compare("Barcelona") == 0);
 
 			Poco::MongoDB::Binary::Ptr uuidBinary = doc->get<Binary::Ptr>("uuid");
-			assert(uuid == uuidBinary->uuid());
+			assertTrue (uuid == uuidBinary->uuid());
 		}
 		catch(Poco::NotFoundException& nfe)
 		{
@@ -400,12 +415,18 @@ void MongoDBTest::testConnectURI()
 	Poco::MongoDB::Connection conn;
 	Poco::MongoDB::Connection::SocketFactory sf;
 
-	conn.connect("mongodb://127.0.0.1", sf);
+#if POCO_OS == POCO_OS_ANDROID
+		std::string host = "10.0.2.2";
+#else
+		std::string host = "127.0.0.1";
+#endif
+
+	conn.connect("mongodb://" + host, sf);
 	conn.disconnect();
 
 	try
 	{
-		conn.connect("http://127.0.0.1", sf);
+		conn.connect("http://" + host, sf);
 		fail("invalid URI scheme - must throw");
 	}
 	catch (Poco::UnknownURISchemeException&)
@@ -414,19 +435,19 @@ void MongoDBTest::testConnectURI()
 
 	try
 	{
-		conn.connect("mongodb://127.0.0.1?ssl=true", sf);
+		conn.connect("mongodb://" + host + "?ssl=true", sf);
 		fail("SSL not supported, must throw");
 	}
 	catch (Poco::NotImplementedException&)
 	{
 	}
 
-	conn.connect("mongodb://127.0.0.1/admin?ssl=false&connectTimeoutMS=10000&socketTimeoutMS=10000", sf);
+	conn.connect("mongodb://" + host + "/admin?ssl=false&connectTimeoutMS=10000&socketTimeoutMS=10000", sf);
 	conn.disconnect();
 
 	try
 	{
-		conn.connect("mongodb://127.0.0.1/admin?connectTimeoutMS=foo", sf);
+		conn.connect("mongodb://" + host + "/admin?connectTimeoutMS=foo", sf);
 		fail("invalid parameter - must throw");
 	}
 	catch (Poco::Exception&)
@@ -442,19 +463,22 @@ void MongoDBTest::testConnectURI()
 
 CppUnit::Test* MongoDBTest::suite()
 {
+#if POCO_OS == POCO_OS_ANDROID
+		std::string host = "10.0.2.2";
+#else
+		std::string host = "127.0.0.1";
+#endif
 	try
 	{
-		_mongo = new Poco::MongoDB::Connection("127.0.0.1", 27017);
-		std::cout << "Connected to [127.0.0.1:27017]" << std::endl;
+		_mongo = new Poco::MongoDB::Connection(host, 27017);
+		std::cout << "Connected to [" << host << ":27017]" << std::endl;
 	}
 	catch (Poco::Net::ConnectionRefusedException& e)
 	{
 		std::cout << "Couldn't connect to " << e.message() << ". " << std::endl;
 		return 0;
 	}
-
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
-
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
@@ -469,6 +493,5 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit_addTest(pSuite, MongoDBTest, testCommand);
 	CppUnit_addTest(pSuite, MongoDBTest, testUUID);
 	CppUnit_addTest(pSuite, MongoDBTest, testConnectURI);
-
 	return pSuite;
 }
