@@ -139,6 +139,36 @@ public:
 		return *this;
 	}
 
+	void reset()
+	{
+		if (_ptr)
+		{
+			_ptr->release();
+			_ptr = 0;
+		}
+	}
+
+	void reset(C* ptr)
+	{
+		assign(ptr);
+	}
+
+	void reset(C* ptr, bool shared)
+	{
+		assign(ptr, shared);
+	}
+
+	void reset(const AutoPtr& ptr)
+	{
+		assign(ptr);
+	}
+
+	template <class Other>
+	void reset(const AutoPtr<Other>& ptr)
+	{
+		assign<Other>(ptr);
+	}
+
 	AutoPtr& operator = (C* ptr)
 	{
 		return assign(ptr);
@@ -157,7 +187,10 @@ public:
 
 	AutoPtr& operator = (AutoPtr&& ptr)
 	{
-		swap(ptr);
+		if (&ptr == this) return *this;
+		if (_ptr) _ptr->release();
+		_ptr = ptr._ptr;
+		ptr._ptr = nullptr;
 		return *this;
 	}
 

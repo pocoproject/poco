@@ -81,21 +81,21 @@ void LoggingFactoryTest::testBuiltins()
 	
 	AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
 #if defined(_WIN32) && !defined(_WIN32_WCE)
-	assert (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
+	assertTrue (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
 #else
-	assert (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
+	assertTrue (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
 #endif
 
 #ifndef POCO_NO_FILECHANNEL
 	AutoPtr<Channel> pFileChannel = fact.createChannel("FileChannel");
-	assert (dynamic_cast<FileChannel*>(pFileChannel.get()) != 0);
+	assertTrue (dynamic_cast<FileChannel*>(pFileChannel.get()) != 0);
 
 	AutoPtr<Channel> pSimpleFileChannel = fact.createChannel("SimpleFileChannel");
-	assert(dynamic_cast<SimpleFileChannel*>(pSimpleFileChannel.get()) != 0);
+	assertTrue (dynamic_cast<SimpleFileChannel*>(pSimpleFileChannel.get()) != 0);
 #endif
 
 	AutoPtr<Channel> pSplitterChannel = fact.createChannel("SplitterChannel");
-	assert (dynamic_cast<SplitterChannel*>(pSplitterChannel.get()) != 0);
+	assertTrue (dynamic_cast<SplitterChannel*>(pSplitterChannel.get()) != 0);
 	
 	try
 	{
@@ -107,7 +107,7 @@ void LoggingFactoryTest::testBuiltins()
 	}
 	
 	AutoPtr<Formatter> pPatternFormatter = fact.createFormatter("PatternFormatter");
-	assert (dynamic_cast<PatternFormatter*>(pPatternFormatter.get()) != 0);
+	assertTrue (dynamic_cast<PatternFormatter*>(pPatternFormatter.get()) != 0);
 	
 	try
 	{
@@ -128,10 +128,10 @@ void LoggingFactoryTest::testCustom()
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 
 	AutoPtr<Channel> pCustomChannel = fact->createChannel("CustomChannel");
-	assert (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
+	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
 
 	AutoPtr<Formatter> pCustomFormatter = fact->createFormatter("CustomFormatter");
-	assert (dynamic_cast<CustomFormatter*>(pCustomFormatter.get()) != 0);
+	assertTrue (dynamic_cast<CustomFormatter*>(pCustomFormatter.get()) != 0);
 }
 
 

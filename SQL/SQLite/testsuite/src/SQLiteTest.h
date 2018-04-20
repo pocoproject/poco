@@ -74,6 +74,7 @@ public:
 	void testIllegalRange();
 	void testSingleSelect();
 	void testEmptyDB();
+	void testNonexistingDB();
 
 	void testCLOB();
 
@@ -138,6 +139,8 @@ public:
 	void testJSONRowFormatter();
 
 	void testIncrementVacuum();
+
+	void testIllegalFilePath();
 
 	void setUp();
 	void tearDown();

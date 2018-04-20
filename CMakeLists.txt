@@ -3,10 +3,10 @@
 # POCO_UNBUNDLED
 # POCO_NO_LOCALE
 #
-# ENABLE_{COMPONENT}
-# ENABLE_TESTS
-# ENABLE_SAMPLES
-# DISABLE_INTERNAL_OPENSSL
+# POCO_ENABLE_{COMPONENT}
+# POCO_ENABLE_TESTS
+# POCO_ENABLE_SAMPLES
+# POCO_DISABLE_INTERNAL_OPENSSL
 
 cmake_minimum_required(VERSION 3.2.0)
 
@@ -77,75 +77,96 @@ endif()
 include(PocoMacros)
 
 # Allow enabling and disabling components
-option(ENABLE_CPPUNIT "Enable CppUnit" ON)
-option(ENABLE_XML "Enable XML" ON)
-option(ENABLE_JSON "Enable JSON" ON)
-option(ENABLE_MONGODB "Enable MongoDB" ON)
-option(ENABLE_PDF "Enable PDF" OFF)
-option(ENABLE_UTIL "Enable Util" ON)
-option(ENABLE_NET "Enable Net" ON)
+option(POCO_ENABLE_CPPUNIT "Enable CppUnit" ON)
+option(POCO_ENABLE_ENCODINGS "Enable Encodings" ON)
+option(POCO_ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
+option(POCO_ENABLE_XML "Enable XML" ON)
+option(POCO_ENABLE_JSON "Enable JSON" ON)
+option(POCO_ENABLE_MONGODB "Enable MongoDB" ON)
+option(POCO_ENABLE_PDF "Enable PDF" OFF)
+option(POCO_ENABLE_UTIL "Enable Util" ON)
+option(POCO_ENABLE_NET "Enable Net" ON)
+
+option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
+option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
+
+if(POCO_STATIC)
+    message(WARNING "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
 # allow disabling of internally built OpenSSL# (see below for details)
-# if POCO pre-built OpenSSL directory is found, and DISABLE_INTERNAL_OPENSSL=OFF,
+# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
 # the internal OpenSSL build will be used
-option(DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
-set(USING_INTERNAL_OPENSSL false)
+option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
 
-if(MSVC)
-  if((EXISTS "${PROJECT_SOURCE_DIR}\\openssl\\VS_120\\") AND NOT DISABLE_INTERNAL_OPENSSL)
-    set(USING_INTERNAL_OPENSSL true)
-    ## windows xcopy does not tolerate forward-slash, must change this
-    STRING(REGEX REPLACE "/" "\\\\" PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR})
-    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}\\openssl\\VS_120\\")
-  endif()
-endif(MSVC)
+if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
+    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
+    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
+        set(_MSVC_ARCH "64")
+    else()
+        set(_MSVC_ARCH "32")
+    endif()
+    if(BUILD_SHARED_LIBS)
+	set(_LIB_DIR "bin")
+    else()
+	set(OPENSSL_MSVC_STATIC_RT TRUE)
+	set(_LIB_DIR "lib")
+	endif()
+	set(INTERNAL_OPENSSL_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/openssl/build/win${_MSVC_ARCH}/${_LIB_DIR}")
+	set(INTERNAL_OPENSSL_LIBRARIES "${INTERNAL_OPENSSL_LIBRARY_DIR}/debug/")
+	list(APPEND INTERNAL_OPENSSL_LIBRARIES "${INTERNAL_OPENSSL_LIBRARY_DIR}/release/")
+	foreach(_OSSL_PATH ${INTERNAL_OPENSSL_LIBRARIES})
+		string(REPLACE "/" "\\" _OSSL_PATH ${_OSSL_PATH})
+		string(APPEND INTERNAL_OPENSSL_PATH ${_OSSL_PATH} "\;")
+	endforeach()
+	list(APPEND OPENSSL_ROOT_DIR ${INTERNAL_OPENSSL_LIBRARIES})
+endif(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 
-set(OPENSSL_FOUND false)
-if(USING_INTERNAL_OPENSSL)
-  message(STATUS "Using OpenSSL from ${OPENSSL_ROOT_DIR}")
-  set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}include\\")
-  set(OPENSSL_FOUND true)
+if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO)
+    find_package(OpenSSL REQUIRED)
 else()
-  find_package(OpenSSL QUIET)
-  if(OPENSSL_FOUND)
-    add_definitions( -DPOCO_EXTERNAL_OPENSSL)
-    message(STATUS "Using OpenSSL from ${OPENSSL_ROOT_DIR}")
-  endif()
-endif()
+    find_package(OpenSSL QUIET)
+endif(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO)
+
 if(OPENSSL_FOUND)
-    option(ENABLE_NETSSL "Enable NetSSL" ON)
-    option(ENABLE_CRYPTO "Enable Crypto" ON)
+  message(STATUS "Found OpenSSL")
+  message(STATUS "Enable NetSSL and Crypto support")
+  option(POCO_ENABLE_NETSSL "Enable NetSSL" ON)
+  option(POCO_ENABLE_CRYPTO "Enable Crypto" ON)
 else()
-    option(ENABLE_NETSSL "Enable NetSSL" OFF)
-    option(ENABLE_CRYPTO "Enable Crypto" OFF)
+  message(STATUS "OpenSSL not found")
+  message(STATUS "Disable NetSSL and Crypto support")
+  option(POCO_ENABLE_NETSSL "Enable NetSSL" OFF)
+  option(POCO_ENABLE_CRYPTO "Enable Crypto" OFF)
 endif()
-if(WIN32)
-    option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" ON)
-else()
-    set(ENABLE_NETSSL_WIN OFF)
-endif()
-option(ENABLE_SQL "Enable SQL" ON)
-option(ENABLE_SQL_SQLITE "Enable SQL SQlite" ON)
-option(ENABLE_SQL_MYSQL "Enable SQL MySQL" ON)
-option(ENABLE_SQL_POSTGRESQL "Enable SQL PosgreSQL" ON)
-option(ENABLE_SQL_ODBC "Enable SQL ODBC" ON)
-option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
-option(ENABLE_ZIP "Enable Zip" ON)
-option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
-option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
-option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
-option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
-option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
-option(ENABLE_REDIS "Enable Redis" ON)
 
-option(ENABLE_TESTS
+if(WIN32)
+    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)
+else()
+    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" OFF)
+endif()
+option(POCO_ENABLE_SQL "Enable SQL" ON)
+option(POCO_ENABLE_SQL_SQLITE "Enable SQL SQLite" ON)
+option(POCO_ENABLE_SQL_MYSQL "Enable SQL MySQL" ON)
+option(POCO_ENABLE_SQL_POSTGRESQL "Enable SQL PosgreSQL" ON)
+option(POCO_ENABLE_SQL_ODBC "Enable SQL ODBC" ON)
+option(POCO_ENABLE_SEVENZIP "Enable SevenZip" OFF)
+option(POCO_ENABLE_ZIP "Enable Zip" ON)
+option(POCO_ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
+option(POCO_ENABLE_CPPPARSER "Enable C++ parser" OFF)
+option(POCO_ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
+option(POCO_ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
+option(POCO_ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
+option(POCO_ENABLE_REDIS "Enable Redis" ON)
+
+option(POCO_ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
-option(ENABLE_SAMPLES
+option(POCO_ENABLE_SAMPLES
   "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
-
-option(POCO_STATIC
-  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
 
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
@@ -154,25 +175,24 @@ if(MSVC)
     option(POCO_MT
       "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
 
-    option(ENABLE_MSVC_MP
+    option(POCO_ENABLE_MSVC_MP
       "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
 endif()
 
 # Uncomment from next two lines to force static or dynamic library, default is autodetection
-if(POCO_STATIC)
-    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
-    set(LIB_MODE STATIC)
-    if(POCO_VERBOSE_MESSAGES)
-        message(STATUS "Building static libraries")
-    endif()
-else(POCO_STATIC)
-    set(LIB_MODE SHARED)
+if(BUILD_SHARED_LIBS)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building dynamic libraries")
     endif()
-endif(POCO_STATIC)
+else(BUILD_SHARED_LIBS)
+    set(LIB_MODE_DEFINITIONS -DPOCO_STATIC)
+    if(POCO_VERBOSE_MESSAGES)
+        message(STATUS "Building static libraries")
+    endif()
+endif(BUILD_SHARED_LIBS)
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
+	option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
     include(CTest)
     enable_testing()
     if(POCO_VERBOSE_MESSAGES)
@@ -182,7 +202,7 @@ elseif (POCO_VERBOSE_MESSAGES)
     message(STATUS "Building without tests")
 endif ()
 
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building with samples")
     endif()
@@ -207,33 +227,37 @@ set(Poco_COMPONENTS "")
 # Pthreads/threads support
 find_package(Threads REQUIRED)
 
-if (ENABLE_TESTS OR ENABLE_CPPUNIT)
+if (POCO_ENABLE_TESTS OR POCO_ENABLE_CPPUNIT)
     add_subdirectory(CppUnit)
     list(APPEND Poco_COMPONENTS "CppUnit")
 endif ()
 
 add_subdirectory(Foundation)
-if(ENABLE_XML)
+if(POCO_ENABLE_ENCODINGS)
+    add_subdirectory(Encodings)
+    list(APPEND Poco_COMPONENTS "Encodings")
+endif()
+if(POCO_ENABLE_XML)
     add_subdirectory(XML)
     list(APPEND Poco_COMPONENTS "XML")
 endif()
-if(ENABLE_JSON)
+if(POCO_ENABLE_JSON)
     add_subdirectory(JSON)
     list(APPEND Poco_COMPONENTS "JSON")
 endif()
-if(ENABLE_MONGODB)
+if(POCO_ENABLE_MONGODB)
     add_subdirectory(MongoDB)
     list(APPEND Poco_COMPONENTS "MongoDB")
 endif()
-if(ENABLE_PDF)
+if(POCO_ENABLE_PDF)
     add_subdirectory(PDF)
     list(APPEND Poco_COMPONENTS "PDF")
 endif()
-if(ENABLE_UTIL)
+if(POCO_ENABLE_UTIL)
     add_subdirectory(Util)
     list(APPEND Poco_COMPONENTS "Util")
 endif()
-if(ENABLE_NET)
+if(POCO_ENABLE_NET)
     add_subdirectory(Net)
     list(APPEND Poco_COMPONENTS "Net")
 endif()
@@ -241,44 +265,39 @@ endif()
 #NetSSL
 
 
-if(WIN32 AND ENABLE_NETSSL_WIN)
+if(WIN32 AND POCO_ENABLE_NETSSL_WIN)
     add_subdirectory(NetSSL_Win)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
-endif(WIN32 AND ENABLE_NETSSL_WIN)
+endif(WIN32 AND POCO_ENABLE_NETSSL_WIN)
 
-if(ENABLE_NETSSL OR ENABLE_CRYPTO)
-  if(NOT OPENSSL_FOUND)
-    find_package(OpenSSL REQUIRED)
-  endif()
-  if(OPENSSL_FOUND)
+if(OPENSSL_FOUND)
     if(MSVC)
         list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32)
     endif()
     include_directories("${OPENSSL_INCLUDE_DIR}")
-    if(ENABLE_NETSSL)
+    if(POCO_ENABLE_NETSSL)
       add_subdirectory(NetSSL_OpenSSL)
       list(APPEND Poco_COMPONENTS "NetSSL_OpenSSL")
     endif()
-    if(ENABLE_CRYPTO)
+    if(POCO_ENABLE_CRYPTO)
       add_subdirectory(Crypto)
       list(APPEND Poco_COMPONENTS "Crypto")
     endif()
-  endif(OPENSSL_FOUND)
-endif(ENABLE_NETSSL OR ENABLE_CRYPTO)
+endif(OPENSSL_FOUND)
 
-if(ENABLE_SQL)
+if(POCO_ENABLE_SQL)
     add_subdirectory(SQL)
     list(APPEND Poco_COMPONENTS "SQL")
 endif()
-if(ENABLE_SEVENZIP)
+if(POCO_ENABLE_SEVENZIP)
     add_subdirectory(SevenZip)
     list(APPEND Poco_COMPONENTS "SevenZip")
 endif()
-if(ENABLE_ZIP)
+if(POCO_ENABLE_ZIP)
     add_subdirectory(Zip)
     list(APPEND Poco_COMPONENTS "Zip")
 endif()
-if(ENABLE_REDIS)
+if(POCO_ENABLE_REDIS)
     add_subdirectory(Redis)
     list(APPEND Poco_COMPONENTS "Redis")
 endif()
@@ -287,30 +306,35 @@ find_package(APR)
 find_package(Apache2)
 if(APRUTIL_FOUND AND APACHE_FOUND)
     include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" )
-    if(ENABLE_APACHECONNECTOR)
+    if(POCO_ENABLE_APACHECONNECTOR)
     add_subdirectory(ApacheConnector)
     list(APPEND Poco_COMPONENTS "ApacheConnector")
     endif()
 endif(APRUTIL_FOUND AND APACHE_FOUND)
 
-if(ENABLE_CPPPARSER)
+if(POCO_ENABLE_CPPPARSER)
     add_subdirectory(CppParser)
     list(APPEND Poco_COMPONENTS "CppParser")
 endif()
 
-if(ENABLE_POCODOC)
+if(POCO_ENABLE_POCODOC)
     add_subdirectory(PocoDoc)
     list(APPEND Poco_COMPONENTS "PocoDoc")
 endif()
 
-if(ENABLE_PAGECOMPILER)
+if(POCO_ENABLE_PAGECOMPILER)
     add_subdirectory(PageCompiler)
     list(APPEND Poco_COMPONENTS "PageCompiler")
 endif()
 
-if(ENABLE_PAGECOMPILER_FILE2PAGE)
+if(POCO_ENABLE_PAGECOMPILER_FILE2PAGE)
     add_subdirectory(PageCompiler/File2Page)
     list(APPEND Poco_COMPONENTS "File2Page")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND POCO_ENABLE_ENCODINGS_COMPILER)
+	add_subdirectory(Encodings/Compiler)
+	list(APPEND Poco_COMPONENTS "EncodingsCompiler")
 endif()
 
 #############################################################
@@ -346,13 +370,22 @@ write_basic_package_version_file(
     COMPATIBILITY AnyNewerVersion
 )
 
+# Set config script install location in a location that find_package() will
+# look for, which is different on MS Windows than for UNIX
+# Note: also set in POCO_GENERATE_PACKAGE macro in cmake/PocoMacros.cmake
+if (WIN32)
+  set(PocoConfigPackageLocation "cmake")
+else()
+  set(PocoConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+endif()
+
 configure_file(cmake/${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake" @ONLY)
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION
-        "lib/cmake/${PROJECT_NAME}"
+        "${PocoConfigPackageLocation}"
     COMPONENT
         Devel
 )

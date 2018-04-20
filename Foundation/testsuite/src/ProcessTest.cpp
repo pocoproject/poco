@@ -57,7 +57,7 @@ void ProcessTest::testLaunch()
 	args.push_back("arg3");
 	ProcessHandle ph = Process::launch(cmd, args);
 	int rc = ph.wait();
-	assert (rc == 3);
+	assertTrue (rc == 3);
 }
 
 
@@ -82,7 +82,7 @@ void ProcessTest::testLaunchRedirectIn()
 	ostr << std::string(100, 'x');
 	ostr.close();
 	int rc = ph.wait();
-	assert (rc == 100);
+	assertTrue (rc == 100);
 #endif // !defined(_WIN32_WCE)
 }
 
@@ -108,9 +108,9 @@ void ProcessTest::testLaunchRedirectOut()
 	std::string s;
 	int c = istr.get();
 	while (c != -1) { s += (char) c; c = istr.get(); }
-	assert (s == "Hello, world!");
+	assertTrue (s == "Hello, world!");
 	int rc = ph.wait();
-	assert (rc == 1);
+	assertTrue (rc == 1);
 #endif // !defined(_WIN32_WCE)
 }
 
@@ -138,9 +138,9 @@ void ProcessTest::testLaunchEnv()
 	std::string s;
 	int c = istr.get();
 	while (c != -1) { s += (char) c; c = istr.get(); }
-	assert (s == "test");
+	assertTrue (s == "test");
 	int rc = ph.wait();
-	assert (rc == 0);
+	assertTrue (rc == 0);
 #endif // !defined(_WIN32_WCE)
 }
 
@@ -176,12 +176,12 @@ void ProcessTest::testLaunchArgs()
 	{
 		if ('\n' == c)
 		{
-			assert(argNumber < args.size());
+			assertTrue (argNumber < args.size());
 			std::string expectedArg = args[argNumber];
 			if (expectedArg.npos != expectedArg.find("already quoted")) {
 				expectedArg = "already quoted \" \\";
 			}
-			assert(receivedArg == expectedArg);
+			assertTrue (receivedArg == expectedArg);
 			++argNumber;
 			receivedArg = "";
 		}
@@ -191,9 +191,9 @@ void ProcessTest::testLaunchArgs()
 		}
 		c = istr.get();
 	}
-	assert(argNumber == args.size());
+	assertTrue (argNumber == args.size());
 	int rc = ph.wait();
-	assert(rc == args.size());
+	assertTrue (rc == args.size());
 #endif // !defined(_WIN32_WCE)
 }
 
@@ -216,14 +216,14 @@ void ProcessTest::testIsRunning()
 	Pipe inPipe;
 	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
 	Process::PID id = ph.id();
-	assert (Process::isRunning(ph));
-	assert (Process::isRunning(id));
+	assertTrue (Process::isRunning(ph));
+	assertTrue (Process::isRunning(id));
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(100, 'x');
 	ostr.close();
 	int rc = ph.wait();
-	assert (!Process::isRunning(ph));
-	assert (!Process::isRunning(id));
+	assertTrue (!Process::isRunning(ph));
+	assertTrue (!Process::isRunning(id));
 #endif // !defined(_WIN32_WCE)
 }
 
@@ -262,7 +262,7 @@ void ProcessTest::testSignalExitCode()
 	args.push_back("-raise-int");
 	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
 	int rc = ph.wait();
-	assert (rc == -SIGINT);
+	assertTrue (rc == -SIGINT);
 #endif // defined(POCO_OS_FAMILY_UNIX)
 }
 

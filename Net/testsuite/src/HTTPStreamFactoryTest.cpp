@@ -47,7 +47,7 @@ void HTTPStreamFactoryTest::testNoRedirect()
 	std::unique_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
@@ -60,7 +60,7 @@ void HTTPStreamFactoryTest::testEmptyPath()
 	std::unique_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::SMALL_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::SMALL_BODY);
 }
 
 
@@ -74,7 +74,7 @@ void HTTPStreamFactoryTest::testRedirect()
 	std::unique_ptr<std::istream> pStr(opener.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
@@ -86,7 +86,7 @@ void HTTPStreamFactoryTest::testProxy()
 	std::unique_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 

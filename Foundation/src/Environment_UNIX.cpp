@@ -37,7 +37,7 @@ FastMutex EnvironmentImpl::_mutex;
 std::string EnvironmentImpl::getImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	const char* val = getenv(name.c_str());
 	if (val)
 		return std::string(val);
@@ -57,7 +57,7 @@ bool EnvironmentImpl::hasImpl(const std::string& name)
 void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	std::string var = name;
 	var.append("=");
 	var.append(value);
@@ -177,7 +177,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 } // namespace Poco
 
 
-#elif defined(__CYGWIN__) || POCO_OS == POCO_OS_LINUX
+#elif defined(__CYGWIN__) || POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 //
 // Linux, Cygwin
 //

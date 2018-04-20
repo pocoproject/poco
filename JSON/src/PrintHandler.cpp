@@ -21,20 +21,22 @@ namespace Poco {
 namespace JSON {
 
 
-PrintHandler::PrintHandler(unsigned indent):
+PrintHandler::PrintHandler(unsigned indent, int options):
 	_out(std::cout),
 	_indent(indent),
 	_array(0),
-	_objStart(true)
+	_objStart(true),
+	_options(options)
 {
 }
 
 
-PrintHandler::PrintHandler(std::ostream& out, unsigned indent):
+PrintHandler::PrintHandler(std::ostream& out, unsigned indent, int options):
 	_out(out),
 	_indent(indent),
 	_array(0),
-	_objStart(true)
+	_objStart(true),
+	_options(options)
 {
 }
 
@@ -118,10 +120,10 @@ void PrintHandler::key(const std::string& k)
 {
 	if (!_objStart) comma();
 	
-	_objStart = true;	
+	_objStart = true;
 		
 	_out << _tab;
-	Stringifier::formatString(k, _out);
+	Stringifier::formatString(k, _out, _options);
 	if (!printFlat()) _out << ' ';
 	_out << ':';
 	if (!printFlat()) _out << ' ';
@@ -173,7 +175,7 @@ void PrintHandler::value(UInt64 v)
 void PrintHandler::value(const std::string& value)
 {
 	arrayValue();
-	Stringifier::formatString(value, _out);
+	Stringifier::formatString(value, _out, _options);
 	_objStart = false;
 }
 

@@ -5,6 +5,11 @@
 #
 
 #
+# Target-specific include paths
+#
+INCLUDE += $(foreach l,$(target_includes),-I$(l))
+
+#
 # Targets
 #
 .PHONY: all all_static all_shared all_debug all_release \
@@ -30,11 +35,11 @@ $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OB
 
 #
 # Rules for compiling
-#	
+#
 $(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@
-	
+
 $(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@

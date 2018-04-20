@@ -43,48 +43,48 @@ void DocumentTypeTest::testDocumentType()
 {
 	AutoPtr<DocumentType> pDoctype = DOMImplementation::instance().createDocumentType("test", "public", "system");
 	
-	assert (pDoctype->ownerDocument() == 0);
-	assert (pDoctype->name() == "test");
-	assert (pDoctype->publicId() == "public");
-	assert (pDoctype->systemId() == "system");
+	assertTrue (pDoctype->ownerDocument() == 0);
+	assertTrue (pDoctype->name() == "test");
+	assertTrue (pDoctype->publicId() == "public");
+	assertTrue (pDoctype->systemId() == "system");
 	
 	AutoPtr<Document> pDoc = new Document(pDoctype);
-	assert (pDoc->doctype() == pDoctype);
-	assert (pDoctype->ownerDocument() == pDoc);
+	assertTrue (pDoc->doctype() == pDoctype);
+	assertTrue (pDoctype->ownerDocument() == pDoc);
 
 	AutoPtr<NamedNodeMap> pEntities = pDoctype->entities();
 	AutoPtr<NamedNodeMap> pNotations = pDoctype->notations();
 	
-	assert (pEntities->length() == 0);
-	assert (pNotations->length() == 0);
+	assertTrue (pEntities->length() == 0);
+	assertTrue (pNotations->length() == 0);
 	
 	AutoPtr<Entity> pEntity1 = pDoc->createEntity("entity1", "public1", "system1", "");
 	pDoctype->appendChild(pEntity1);
 	
-	assert (pEntities->length() == 1);
-	assert (pNotations->length() == 0);
-	assert (pEntities->item(0) == pEntity1);
-	assert (pEntities->getNamedItem("entity1") == pEntity1);
+	assertTrue (pEntities->length() == 1);
+	assertTrue (pNotations->length() == 0);
+	assertTrue (pEntities->item(0) == pEntity1);
+	assertTrue (pEntities->getNamedItem("entity1") == pEntity1);
 
 	AutoPtr<Entity> pEntity2 = pDoc->createEntity("entity2", "public2", "system2", "");
 	pDoctype->appendChild(pEntity2);
-	assert (pEntities->length() == 2);
-	assert (pNotations->length() == 0);
-	assert (pEntities->item(0) == pEntity1);
-	assert (pEntities->item(1) == pEntity2);
-	assert (pEntities->getNamedItem("entity1") == pEntity1);
-	assert (pEntities->getNamedItem("entity2") == pEntity2);
+	assertTrue (pEntities->length() == 2);
+	assertTrue (pNotations->length() == 0);
+	assertTrue (pEntities->item(0) == pEntity1);
+	assertTrue (pEntities->item(1) == pEntity2);
+	assertTrue (pEntities->getNamedItem("entity1") == pEntity1);
+	assertTrue (pEntities->getNamedItem("entity2") == pEntity2);
 	
 	AutoPtr<Notation> pNotation = pDoc->createNotation("notation", "public", "system");
 	pDoctype->appendChild(pNotation);
-	assert (pEntities->length() == 2);
-	assert (pNotations->length() == 1);
-	assert (pEntities->item(0) == pEntity1);
-	assert (pEntities->item(1) == pEntity2);
-	assert (pNotations->item(0) == pNotation);
-	assert (pEntities->getNamedItem("entity1") == pEntity1);
-	assert (pEntities->getNamedItem("entity2") == pEntity2);
-	assert (pNotations->getNamedItem("notation") == pNotation);
+	assertTrue (pEntities->length() == 2);
+	assertTrue (pNotations->length() == 1);
+	assertTrue (pEntities->item(0) == pEntity1);
+	assertTrue (pEntities->item(1) == pEntity2);
+	assertTrue (pNotations->item(0) == pNotation);
+	assertTrue (pEntities->getNamedItem("entity1") == pEntity1);
+	assertTrue (pEntities->getNamedItem("entity2") == pEntity2);
+	assertTrue (pNotations->getNamedItem("notation") == pNotation);
 }
 
 

@@ -1,0 +1,274 @@
+
+SetSourceIP is an example program and test tool that will set the source IP address in the socket of clients using the HTTPClientSession or HTTPSClientSession classes.
+
+
+Setting the source IP address in a client is not a common thing to do, but could be useful in the following sitations:
+
+1) In a multi-homed system where multiple network interfaces are used and the client http/https traffic must go out through the interface that is not considered the "default" routed interface.  This is sometimes referred to as traffic separation or traffic isolation.  Setting the source IP address is one part of the puzzle in order to allow this to work.  Additonal OS routing setup is required to successfully make this work.
+
+2) In a clustered environment, where two hosts provide a client service in a Active/Standby situation and it is desirable to present a single source IP address to the remote server and/or intermediate firewalls.  This might be referred to as Floating, Mobile, or Virtual IP addressing.
+
+3) In a host where a network interface supports multiple IP addresses and the client wants to assign the source IP address for some application specific reason.
+
+
+For more in depth information, please do additional research with keywords such as:
+Linux Multihomed
+Routing with multiple network interfaces
+Linux Advanced Routing & Traffic Control
+
+
+
+What follows is an example of the routing setup required in a Linux VM in order to experiment and get comfortable with this type of source IP address routing.
+
+
+WARNING: Thoroughly verify and validate the procedure and all the included commands in a test environment before using in any sort of production system.  No promises are made to the fitness of any information that is provided in this document.
+
+
+1- Create a VM in your vm environment of choice. (e.g. Virtual Box, VmWare Server)
+
+2- Make sure that the VM has two network interfaces defined and that they are attached to through NAT. NAT is required so that they both can reach the Internet when required.
+
+3- Install your OS of choice on the VM. (e.g. OpenSuse Leap 42.3)
+
+4- After the VM is started up, check that the two network interfaces are well defined (i.e. they are 'UP', they have a reasonable IP address, netmask, broadcast address.)  Usually they will be named 'eth0' and 'eth1', but it might be something else in your OS.  Make sure that the Internet can be reachable at least on one of the interfaces.
+
+Command:
+ifconfig -a
+
+
+
+5- Find which one of the two interfaces is the 'default' destination router. Usually it will be the 'eth0' interface, but it might be the 'eth1' one instead.
+
+Command:
+netstat -r
+
+
+
+6- For the remainer of this procedure let's assume that the 'eth0' interface is the default route for all traffic.
+
+7- With 'eth0' the default route, then 'eth1' will be used as the alternate route.
+
+
+8- Here is an example output that you might have with some network commands:
+
+
+Command:
+ifconfig eth0
+
+Example Output:
+eth0      Link encap:Ethernet  HWaddr 08:00:27:79:1A:85
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:fe79:1a85/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:9833 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:7859 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:4502896 (4.2 Mb)  TX bytes:1322623 (1.2 Mb)
+
+
+
+Command:
+ifconfig eth1
+
+Example Output:
+eth1      Link encap:Ethernet  HWaddr 08:00:27:AE:16:3E
+          inet addr:10.0.3.15  Bcast:10.0.3.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:feae:163e/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:41 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:590 (590.0 b)  TX bytes:7683 (7.5 Kb)
+
+
+
+Command:
+netstat -r
+
+Example Output:
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+default         10.0.2.2        0.0.0.0         UG        0 0          0 eth0
+10.0.2.0        *               255.255.255.0   U         0 0          0 eth0
+10.0.3.0        *               255.255.255.0   U         0 0          0 eth1
+
+
+
+Command:
+ip route
+
+Example Output:
+default via 10.0.2.2 dev eth0  proto dhcp
+10.0.2.0/24 dev eth0  proto kernel  scope link  src 10.0.2.15
+10.0.3.0/24 dev eth1  proto kernel  scope link  src 10.0.3.15
+
+
+
+9- In the above output the following information is available.
+
+eth0 network interface IP address is 10.0.2.15
+eth1 network interface IP address is 10.0.3.15
+default router on eth0 network is 10.0.2.2
+
+
+10- What is missing is the router used on the 'eth1' interface.  In that case it might require digging in the VM host application (e.g. Virtual Box, VmWare Server) to see if the settings are explicitly set in the Network Management tabs or by checking in the host OS network setup (using similar network commands as on the target environment) to find the router used in that particular network.  It might not be perfectly obvious in all cases, sorry about that.
+
+
+11- After some investigation (using the 'ping' command), trial and error (assigning the router address from active addresses reported by the ping command), and some guessing (assuming that the router address has a similar pattern as eth0 router address) the router on the eth1 network interface was determined to be 10.0.3.2
+
+
+12- List of required info is:
+
+eth0 network interface IP address is 10.0.2.15
+eth1 network interface IP address is 10.0.3.15
+
+    default router on eth0 network is 10.0.2.2
+non-default router on eth1 network is 10.0.3.2
+
+
+13- With this info in hand it is now possible to setup the routing on the target system.
+
+
+NOTE: instructions that follow are specific to the latest Linux versions. They have been tested on OpenSuse Leap 42.3, but most likely work on other versions of GNU Linux OS.  Please verify the provided information against your particular OS to confirm the appropriate commands needed to configuring the routing on your particular environment.
+
+
+14- Verify the content of the file /etc/iproute2/rt_tables to see the route tables entries.
+
+Command:
+cat /etc/iproute2/rt_tables
+
+Example Output:
+#
+# reserved values
+#
+255     local
+254     main
+253     default
+0       unspec
+#
+# local
+#
+#1      inr.ruhep
+
+
+
+15- In the file output above, specifically check if there is an entry for the eth1 network interface.
+
+
+16- If no eth1 routing table entry exists, then carefully append a new line to the file that will define the eth1 network in this routing table.
+
+Command:
+echo "1 eth1" >>/etc/iproute2/rt_tables
+
+
+
+17- Add a new route for the eth1 network interface based on the 'eth1' routing table entry.
+
+Commands:
+ip route add 10.0.3.0/24 dev eth1 src 10.0.3.15 table eth1
+ip route add default via 10.0.3.2 dev eth1 table eth1
+
+
+
+18- Add ip rules so that packets having source IP address 10.0.3.15 will be routed through the eth1 router, instead of the default router on eth0.
+
+Commands:
+ip rule add from 10.0.3.15/32 table eth1
+ip rule add to 10.0.3.15/32 table eth1
+
+
+
+19- In a second terminal use the tcpdump commmand to monitor/snoop the traffic on eth1
+
+Command:
+tcpdump -i eth1
+
+
+
+20- Use the SetSourceIP commmand to send traffic through eth1
+
+Command:
+./SetSourceIp --sourceip 10.0.3.15 https://www.google.com/
+
+
+
+21- Some https traffic (port 443) should be seen on eth1.  Bi-directional https traffic should be seen, both incoming and outgoing traffic destined for the google.com domain.
+
+
+22- Double check that no traffic is going through eth0 using tcpdump.   Some DNS (domain) traffic will likely be seen on the default route.
+
+Command:
+tcpdump -i eth0
+
+
+
+
+
+ADDITIONAL INFO
+
+Some quick info on how to simulate creating a Floating IP (FIP), or Mobile IP (MIP) or Virtual IP (VIP) that can be (re)assigned to various hosts depending on application requirements.
+
+NOTE: the following commands assume the the routing was properly setup with the commands from the previous section of this document.
+
+
+1- Add another IP address to existing eth1 interface to act as a FIP/MIP/VIP address.  Now the eth1 interface will respond to both the orignal 10.0.3.15 IP address and also this new "FIP/MIP/VIP" 10.0.3.42 IP address.
+
+Command:
+ifconfig eth1 add 10.0.3.42 broadcast 10.0.3.255 netmask 255.255.255.0
+
+
+
+2- Check the network setup to see the additional IP address
+
+Command:
+ifconfig -a
+
+
+
+3- An entry such as the one below should be presented.
+
+Example Output:
+eth1:0    Link encap:Ethernet  HWaddr 08:00:27:AE:16:3E
+          inet addr:10.0.3.42  Bcast:10.0.3.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+
+
+
+4- Add ip rules so that packets having source IP address 10.0.3.42 will be routed through the eth1 router, instead of the default router on eth0.
+
+Commands:
+ip rule add from 10.0.3.42/32 table eth1
+ip rule add to 10.0.3.42/32 table eth1
+
+
+
+5- In a second terminal use the tcpdump commmand to monitor/snoop the traffic on eth1
+
+Command:
+tcpdump -i eth1
+
+
+
+6- Use the SetSourceIP commmand to send traffic through eth1
+
+Command:
+./SetSourceIp --sourceip 10.0.3.42 https://www.google.com/
+
+
+
+7- Some https traffic (port 443) should be seen on eth1.  Bi-directional https traffic should be seen, both incoming and outgoing traffic destined for the google.com domain.
+
+
+
+8- Double check that no traffic is going through eth0 using tcpdump.   Some DNS (domain) traffic will likely be seen on the default route.
+
+Command:
+tcpdump -i eth0
+
+
+
+
+Good Luck!!!
+
+Rocco Corsi
+December 16, 2017

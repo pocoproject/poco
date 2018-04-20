@@ -41,61 +41,61 @@ void BasicEventTest::testNoDelegate()
 	int tmp = 0;
 	EventArgs args;
 
-	assert (_count == 0);
-	assert (Void.empty());
+	assertTrue (_count == 0);
+	assertTrue (Void.empty());
 	Void.notify(this);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Void += delegate(this, &BasicEventTest::onVoid);
-	assert (!Void.empty());
+	assertTrue (!Void.empty());
 	Void -= delegate(this, &BasicEventTest::onVoid);
-	assert (Void.empty());
+	assertTrue (Void.empty());
 	Void.notify(this);
 
-	assert (_count == 0);
-	assert (Simple.empty());
+	assertTrue (_count == 0);
+	assertTrue (Simple.empty());
 	Simple.notify(this, tmp);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple);
-	assert (!Simple.empty());
+	assertTrue (!Simple.empty());
 	Simple -= delegate(this, &BasicEventTest::onSimple);
-	assert (Simple.empty());
+	assertTrue (Simple.empty());
 	Simple.notify(this, tmp);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimpleNoSender);
 	Simple -= delegate(this, &BasicEventTest::onSimpleNoSender);
 	Simple.notify(this, tmp);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 	
 	ConstSimple += delegate(this, &BasicEventTest::onConstSimple);
 	ConstSimple -= delegate(this, &BasicEventTest::onConstSimple);
 	ConstSimple.notify(this, tmp);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 	
 	//Note: passing &args will not work due to &
 	EventArgs* pArgs = &args;
 	Complex += delegate(this, &BasicEventTest::onComplex);
 	Complex -= delegate(this, &BasicEventTest::onComplex);
 	Complex.notify(this, pArgs);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Complex2 += delegate(this, &BasicEventTest::onComplex2);
 	Complex2 -= delegate(this, &BasicEventTest::onComplex2);
 	Complex2.notify(this, args);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	const EventArgs* pCArgs = &args;
 	ConstComplex += delegate(this, &BasicEventTest::onConstComplex);
 	ConstComplex -= delegate(this, &BasicEventTest::onConstComplex);
 	ConstComplex.notify(this, pCArgs);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Const2Complex += delegate(this, &BasicEventTest::onConst2Complex);
 	Const2Complex -= delegate(this, &BasicEventTest::onConst2Complex);
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(&BasicEventTest::onStaticSimple);
 	Simple += delegate(&BasicEventTest::onStaticSimple);
@@ -103,14 +103,14 @@ void BasicEventTest::testNoDelegate()
 	Simple += delegate(&BasicEventTest::onStaticSimple3);
 	
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assertTrue (_count == 3);
 	Simple -= delegate(BasicEventTest::onStaticSimple);
 
 	Void += delegate(&BasicEventTest::onStaticVoid);
 	Void += delegate(&BasicEventTest::onStaticVoid);
 
 	Void.notify(this);
-	assert (_count == 5);
+	assertTrue (_count == 5);
 	Void -= delegate(BasicEventTest::onStaticVoid);
 }
 
@@ -121,50 +121,50 @@ void BasicEventTest::testSingleDelegate()
 	std::string tmpStr;
 	EventArgs args;
 
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Void += delegate(this, &BasicEventTest::onVoid);
 	Void.notify(this);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 2);
+	assertTrue (_count == 2);
 	
 	ConstSimple += delegate(this, &BasicEventTest::onConstSimple);
 	ConstSimple.notify(this, tmp);
-	assert (_count == 3);
+	assertTrue (_count == 3);
 
 	tmpStr = "str";
 	SimpleString += delegate(this, &BasicEventTest::onString);
 	SimpleString.notify(this, tmpStr);
-	assert(_str == "str");
+	assertTrue (_str == "str");
 
 	tmpStr = "strConst";
 	ConstString += delegate(this, &BasicEventTest::onConstString);
 	ConstString.notify(this, tmpStr);
-	assert(_str == "strConst");
+	assertTrue (_str == "strConst");
 
 	EventArgs* pArgs = &args;
 	Complex += delegate(this, &BasicEventTest::onComplex);
 	Complex.notify(this, pArgs);
-	assert (_count == 4);
+	assertTrue (_count == 4);
 
 	Complex2 += delegate(this, &BasicEventTest::onComplex2);
 	Complex2.notify(this, args);
-	assert (_count == 5);
+	assertTrue (_count == 5);
 
 	const EventArgs* pCArgs = &args;
 	ConstComplex += delegate(this, &BasicEventTest::onConstComplex);
 	ConstComplex.notify(this, pCArgs);
-	assert (_count == 6);
+	assertTrue (_count == 6);
 
 	Const2Complex += delegate(this, &BasicEventTest::onConst2Complex);
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 7);
+	assertTrue (_count == 7);
 	// check if 2nd notify also works
 	Const2Complex.notify(this, pArgs);
-	assert (_count == 8);
+	assertTrue (_count == 8);
 	
 }
 
@@ -173,15 +173,15 @@ void BasicEventTest::testDuplicateRegister()
 {
 	int tmp = 0;
 	
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 2);
+	assertTrue (_count == 2);
 	Simple -= delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assertTrue (_count == 3);
 }
 
 
@@ -190,15 +190,15 @@ void BasicEventTest::testNullMutex()
 	Poco::BasicEvent<int, NullMutex> ev;
 	int tmp = 0;
 	
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	ev += delegate(this, &BasicEventTest::onSimple);
 	ev += delegate(this, &BasicEventTest::onSimple);
 	ev.notify(this, tmp);
-	assert (_count == 2);
+	assertTrue (_count == 2);
 	ev -= delegate(this, &BasicEventTest::onSimple);
 	ev.notify(this, tmp);
-	assert (_count == 3);
+	assertTrue (_count == 3);
 }
 
 
@@ -207,23 +207,23 @@ void BasicEventTest::testDuplicateUnregister()
 	// duplicate unregister shouldn't give an error,
 	int tmp = 0;
 	
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple -= delegate(this, &BasicEventTest::onSimple); // should work
 	Simple.notify(this, tmp);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 
 	Simple -= delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 
 	Simple -= delegate(this, &BasicEventTest::onSimple);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 }
 
 
@@ -231,22 +231,22 @@ void BasicEventTest::testDisabling()
 {
 	int tmp = 0;
 	
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple);
 	Simple.disable();
 	Simple.notify(this, tmp);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 	Simple.enable();
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 
 	// unregister should also work with disabled event
 	Simple.disable();
 	Simple -= delegate(this, &BasicEventTest::onSimple);
 	Simple.enable();
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 }
 
 
@@ -254,24 +254,24 @@ void BasicEventTest::testExpire()
 {
 	int tmp = 0;
 	
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple, 500);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 	Poco::Thread::sleep(700);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 
 	Simple += delegate(&BasicEventTest::onStaticSimple, 400);
 	Simple += delegate(&BasicEventTest::onStaticSimple, 400);
 	Simple += delegate(&BasicEventTest::onStaticSimple2, 400);
 	Simple += delegate(&BasicEventTest::onStaticSimple3, 400);
 	Simple.notify(this, tmp);
-	assert (_count == 4);
+	assertTrue (_count == 4);
 	Poco::Thread::sleep(700);
 	Simple.notify(this, tmp);
-	assert (_count == 4);
+	assertTrue (_count == 4);
 }
 
 
@@ -279,22 +279,22 @@ void BasicEventTest::testExpireReRegister()
 {
 	int tmp = 0;
 	
-	assert (_count == 0);
+	assertTrue (_count == 0);
 
 	Simple += delegate(this, &BasicEventTest::onSimple, 500);
 	Simple.notify(this, tmp);
-	assert (_count == 1);
+	assertTrue (_count == 1);
 	Poco::Thread::sleep(200);
 	Simple.notify(this, tmp);
-	assert (_count == 2);
+	assertTrue (_count == 2);
 	// renew registration
 	Simple += delegate(this, &BasicEventTest::onSimple, 600);
 	Poco::Thread::sleep(400);
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assertTrue (_count == 3);
 	Poco::Thread::sleep(300);
 	Simple.notify(this, tmp);
-	assert (_count == 3);
+	assertTrue (_count == 3);
 }
 
 
@@ -305,7 +305,7 @@ void BasicEventTest::testReturnParams()
 
 	int tmp = 0;
 	Simple.notify(this, tmp);
-	assert (tmp == 1);
+	assertTrue (tmp == 1);
 }
 
 
@@ -317,7 +317,7 @@ void BasicEventTest::testOverwriteDelegate()
 
 	int tmp = 0; // onsimple requires 0 as input
 	Simple.notify(this, tmp);
-	assert (tmp == 2);
+	assertTrue (tmp == 2);
 }
 
 
@@ -325,15 +325,15 @@ void BasicEventTest::testAsyncNotify()
 {
 	Poco::BasicEvent<int>* pSimple= new Poco::BasicEvent<int>();
 	(*pSimple) += delegate(this, &BasicEventTest::onAsync);
-	assert (_count == 0);
+	assertTrue (_count == 0);
 	int tmp = 0;
 	Poco::ActiveResult<int>retArg = pSimple->notifyAsync(this, tmp);
 	delete pSimple; // must work even when the event got deleted!
 	pSimple = NULL;
-	assert (_count == 0);
+	assertTrue (_count == 0);
 	retArg.wait();
-	assert (retArg.data() == tmp);
-	assert (_count == LARGEINC);
+	assertTrue (retArg.data() == tmp);
+	assertTrue (_count == LARGEINC);
 }
 
 
@@ -345,10 +345,10 @@ void BasicEventTest::testLambda()
 	Simple += f;
 	int cparam = 1;
 	Simple.notify(this, cparam);
-	assert(count == 1);
+	assertTrue (count == 1);
 
 	Simple -= f;
-	assert(Simple.empty());
+	assertTrue (Simple.empty());
 }
 
 

@@ -131,6 +131,7 @@ RWLockTest::~RWLockTest()
 
 void RWLockTest::testLock()
 {
+#if defined(ENABLE_LONG_RUNNING_TESTS)
 	RWLock lock;
 	int counter = 0;
 	RWLockRunnable r1(lock, counter);
@@ -153,17 +154,19 @@ void RWLockTest::testLock()
 	t3.join();
 	t4.join();
 	t5.join();
-	assert (counter == 50000);
-	assert (r1.ok());
-	assert (r2.ok());
-	assert (r3.ok());
-	assert (r4.ok());
-	assert (r5.ok());
+	assertTrue (counter == 50000);
+	assertTrue (r1.ok());
+	assertTrue (r2.ok());
+	assertTrue (r3.ok());
+	assertTrue (r4.ok());
+	assertTrue (r5.ok());
+#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 
 void RWLockTest::testTryLock()
 {
+#if defined(ENABLE_LONG_RUNNING_TESTS)
 	RWLock lock;
 	int counter = 0;
 	RWTryLockRunnable r1(lock, counter);
@@ -186,12 +189,13 @@ void RWLockTest::testTryLock()
 	t3.join();
 	t4.join();
 	t5.join();
-	assert (counter == 50000);
-	assert (r1.ok());
-	assert (r2.ok());
-	assert (r3.ok());
-	assert (r4.ok());
-	assert (r5.ok());
+	assertTrue (counter == 50000);
+	assertTrue (r1.ok());
+	assertTrue (r2.ok());
+	assertTrue (r3.ok());
+	assertTrue (r4.ok());
+	assertTrue (r5.ok());
+#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 

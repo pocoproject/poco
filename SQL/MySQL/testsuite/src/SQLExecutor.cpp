@@ -568,7 +568,7 @@ void SQLExecutor::any()
 	Any t = Time(DateTime());
 	Any dateTime = DateTime(2017, 9, 2, 18, 49, 15, 227, 987);
 	Any e;
-	assert (e.empty());
+	assertTrue (e.empty());
 
 	try { *_pSession << "INSERT INTO Anys VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)",
 				use(i8), use(i16), use(i32), use(i64), use(f), use(d), use(s), use(s), use(date),
@@ -594,25 +594,25 @@ void SQLExecutor::any()
 	Any tR = Time();
 	Any dateTimeR = DateTime();
 	e = 1;
-	assert (!e.empty());
+	assertTrue (!e.empty());
 
 	try { *_pSession << "SELECT * FROM Anys", into(i8), into(i16), into(i32), into(i64),
 				into(f), into(d), into(s), into(s2), into(dateR), into(tR), into(dateTimeR), into(e), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
-	assert (42 == AnyCast<Poco::Int8>(i8));
-	assert (420 == AnyCast<Poco::Int16>(i16));
-	assert (42058 == AnyCast<Poco::Int32>(i32));
-	assert (2205861 == AnyCast<Poco::Int64>(i64));
-	assert (42.5f == AnyCast<float>(f));
-	assert (4278.5 == AnyCast<double>(d));
-	assert ("42" == AnyCast<std::string>(s));
-	assert ("42" == AnyCast<std::string>(s2));
-	assert (AnyCast<Date>(date) == AnyCast<Date>(dateR));
-	assert (AnyCast<Time>(t) == AnyCast<Time>(tR));
-	assert (AnyCast<DateTime>(dateTimeR) == AnyCast<DateTime>(dateTime));
-	assert (e.empty());
+	assertTrue (42 == AnyCast<Poco::Int8>(i8));
+	assertTrue (420 == AnyCast<Poco::Int16>(i16));
+	assertTrue (42058 == AnyCast<Poco::Int32>(i32));
+	assertTrue (2205861 == AnyCast<Poco::Int64>(i64));
+	assertTrue (42.5f == AnyCast<float>(f));
+	assertTrue (4278.5 == AnyCast<double>(d));
+	assertTrue ("42" == AnyCast<std::string>(s));
+	assertTrue ("42" == AnyCast<std::string>(s2));
+	assertTrue (AnyCast<Date>(date) == AnyCast<Date>(dateR));
+	assertTrue (AnyCast<Time>(t) == AnyCast<Time>(tR));
+	assertTrue (AnyCast<DateTime>(dateTimeR) == AnyCast<DateTime>(dateTime));
+	assertTrue (e.empty());
 }
 
 void SQLExecutor::dynamicAny()
@@ -629,7 +629,7 @@ void SQLExecutor::dynamicAny()
 	DynamicAny t = Time(DateTime());
 	DynamicAny dateTime = DateTime();
 	DynamicAny e;
-	assert (e.isEmpty());
+	assertTrue (e.isEmpty());
 
 	try { *_pSession << "INSERT INTO Anys VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)",
 				use(i8), use(i16), use(i32), use(i64), use(f), use(d), use(s), use(s), use(date),
@@ -655,25 +655,25 @@ void SQLExecutor::dynamicAny()
 	DynamicAny tR = Time();
 	DynamicAny dateTimeR = DateTime();
 	e = 1;
-	assert (!e.isEmpty());
+	assertTrue (!e.isEmpty());
 
 	try { *_pSession << "SELECT * FROM Anys", into(i8), into(i16), into(i32), into(i64),
 				into(f), into(d), into(s), into(s2), into(dateR), into(tR), into(dateTimeR), into(e), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
-	assert (42 == i8);
-	assert (420 == i16);
-	assert (42058 == i32);
-	assert (2205861 == i64);
-	assert (42.5f == f);
-	assert (4278.5 == d);
-	assert ("42" == s);
-	assert ("42" == s2);
-	assert (date == dateR);
-	assert (t == tR);
-	assert (dateTimeR.convert<DateTime>() == dateTime.convert<DateTime>());
-	assert (e.isEmpty());
+	assertTrue (42 == i8);
+	assertTrue (420 == i16);
+	assertTrue (42058 == i32);
+	assertTrue (2205861 == i64);
+	assertTrue (42.5f == f);
+	assertTrue (4278.5 == d);
+	assertTrue ("42" == s);
+	assertTrue ("42" == s2);
+	assertTrue (date == dateR);
+	assertTrue (t == tR);
+	assertTrue (dateTimeR.convert<DateTime>() == dateTime.convert<DateTime>());
+	assertTrue (e.isEmpty());
 }
 
 
@@ -1560,7 +1560,7 @@ void SQLExecutor::longText()
 	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	std::string res;
 	poco_assert (res.size() == 0);

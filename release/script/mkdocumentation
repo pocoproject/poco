@@ -130,6 +130,8 @@ echo "PocoDoc.output=$docPath" >>$build/PocoDoc.ini
 echo "PocoDoc.version=$docVersion" >> $build/PocoDoc.ini
 echo "Includes=$includes" >> $build/PocoDoc.ini
 
+cat $build/PocoDoc.ini
+
 echo "PocoDoc --config=$docConfig --config=$build/PocoDoc.ini"
 PocoDoc --config=$docConfig --config=$build/PocoDoc.ini
 

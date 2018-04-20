@@ -131,6 +131,12 @@ int ApacheRequestRec::sendFile(const std::string& path, unsigned int fileSize, c
 }
 
 
+bool ApacheRequestRec::secure()
+{
+	return DEFAULT_HTTPS_PORT == ap_default_port(_pRec) && ap_http_scheme(_pRec) == "https";
+}
+
+
 void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 {
 	const apr_array_header_t* arr = apr_table_elts(_pRec->headers_in);
@@ -154,7 +160,7 @@ void ApacheConnector::log(const char* file, int line, int level, int status, con
 #if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
 		ap_log_error(file, line, level, 0, NULL, "%s", text);
 #else
-		ap_log_error(file, line, level, 0, NULL, 0, text);
+	ap_log_error(file, line, level, 0, 0, 0, text);
 #endif
 }
 
@@ -181,19 +187,19 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 		// The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
 		// Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
 #if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
-			std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-				&rec,
-				r->connection->local_ip,
-				r->connection->local_addr->port,
-				r->connection->remote_ip,
-				r->connection->remote_addr->port));
+		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+			&rec,
+			r->connection->local_ip,
+			r->connection->local_addr->port,
+			r->connection->remote_ip,
+			r->connection->remote_addr->port));
 #else
-			std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-				&rec,
-				r->connection->local_ip,
-				r->connection->local_addr->port,
-				r->connection->client_ip,
-				r->connection->client_addr->port));
+		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+			&rec,
+			r->connection->local_ip,
+			r->connection->local_addr->port,
+			r->connection->client_ip,
+			r->connection->client_addr->port));
 #endif
 
 		std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));

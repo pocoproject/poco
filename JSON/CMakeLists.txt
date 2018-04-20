@@ -10,7 +10,7 @@ POCO_SOURCES(SRCS pdjson src/pdjson.c)
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -31,10 +31,10 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)
 endif ()
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()
 

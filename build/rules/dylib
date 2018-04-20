@@ -27,6 +27,7 @@ DYLIB_S_RELEASE    = $(BINPATH)/static/$(target)$(SHL_EXT)
 
 TARGET_LIBS_DEBUG   = $(foreach l,$(target_libs),-l$(l)d)
 TARGET_LIBS_RELEASE = $(foreach l,$(target_libs),-l$(l))
+TARGET_LIBS_EXT     = $(foreach l,$(target_extlibs),-l$(l))
 
 #
 # Include the compile rules
@@ -51,22 +52,22 @@ shared_release: bindirs $(DYLIB_RELEASE)
 
 $(DYLIB_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, shared)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, shared)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_DEBUG): $(foreach o,$(objects),$(OBJPATH_DEBUG_SHARED)/$(o).o)
 	@echo "** Building dynamic library (debug, static)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_DEBUG) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 $(DYLIB_S_RELEASE): $(foreach o,$(objects),$(OBJPATH_RELEASE_SHARED)/$(o).o)
 	@echo "** Building dynamic library (release, static)" $@
-	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(SYSLIBS)
+	$(DYLIB) $(DYLIBFLAGS) $^ $(LIBRARY) $(TARGET_LIBS_RELEASE) $(TARGET_LIBS_EXT) $(SYSLIBS)
 	$(postbuild)
 
 #
