@@ -27,10 +27,14 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
 add_executable( ${TESTUNIT} ${TEST_SRCS} )
 if(ANDROID)
     add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
-	   COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;${CMAKE_BINARY_DIR}/bin/TestApp;${CMAKE_BINARY_DIR}/bin/TestLibrary.so" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/${TESTUNIT} -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
+	   COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;${CMAKE_BINARY_DIR}/bin/TestApp;${CMAKE_BINARY_DIR}/bin/TestLibrary$<$<CONFIG:Debug>:d>.so" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/${TESTUNIT} -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
 else()
     add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
-    set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # The SharedLibaryTest has to look for shared libraries in the working directory
+	if(WIN32)
+		set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
+	elseif(UNIX)
+		set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
+	endif()
     # The test is run in the runtime directory. So the test data is copied there too
     add_custom_command(TARGET ${TESTUNIT} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data )
@@ -60,6 +64,6 @@ target_link_libraries( TestApp PocoFoundation)
 # TestLibrary
 add_library( TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h )
 # The test requires the library named TestLibrary. By default it is prefixed with lib.
-set_target_properties( TestLibrary PROPERTIES PREFIX "" DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+set_target_properties( TestLibrary PROPERTIES PREFIX "")
 set_target_properties( TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
 target_link_libraries( TestLibrary PocoFoundation)
