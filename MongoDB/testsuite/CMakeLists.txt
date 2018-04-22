@@ -21,5 +21,4 @@ if(ANDROID)
 else()
 	add_test(NAME MongoDB WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND MongoDB-testrunner -all)
 endif()
-
-target_link_libraries(MongoDB-testrunner ${CMAKE_THREAD_LIBS_INIT} Poco::MongoDB Poco::Foundation Poco::CppUnit )
+target_link_libraries(MongoDB-testrunner  Poco::MongoDB Poco::CppUnit)

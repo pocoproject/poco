@@ -30,5 +30,5 @@ target_compile_definitions(WinTestRunner
 
 
 if(WIN32)
-	target_link_libraries(WinTestRunner winmm )
+	target_link_libraries(WinTestRunner winmm)
 endif(WIN32)

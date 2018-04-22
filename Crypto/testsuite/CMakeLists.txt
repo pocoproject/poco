@@ -21,7 +21,7 @@ if(ANDROID)
 else()
     add_test(NAME Crypto WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND Crypto-testrunner -all)
 endif()
-target_link_libraries( Crypto-testrunner Poco::Crypto Poco::NetSSL Poco::XML Poco::Util Poco::Foundation Poco::CppUnit )
+target_link_libraries(Crypto-testrunner Poco::NetSSL Poco::XML Poco::CppUnit)
 
 if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 	set_tests_properties(${LIBNAME} PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")

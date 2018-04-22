@@ -24,7 +24,7 @@ else()
 	add_test(NAME Redis WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND Redis-testrunner -all)
 endif()
 
-target_link_libraries(Redis-testrunner ${CMAKE_THREAD_LIBS_INIT}  Poco::Redis Poco::Foundation Poco::CppUnit )
+target_link_libraries(Redis-testrunner ${CMAKE_THREAD_LIBS_INIT}  Poco::Redis Poco::CppUnit )
 
 if(POCO_OLD_REDIS_VERSION)
   target_compile_definitions(Redis-testrunner PRIVATE OLD_REDIS_VERSION)

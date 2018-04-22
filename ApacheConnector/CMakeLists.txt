@@ -17,6 +17,7 @@ target_include_directories(mod_poco
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+target_link_libraries(mod_poco PUBLIC Poco::Util Poco::Net)
 
 if (POCO_ENABLE_SAMPLES)
   add_subdirectory(samples)

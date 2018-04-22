@@ -15,7 +15,7 @@ set_target_properties( NetSSL
     DEFINE_SYMBOL NetSSL_EXPORTS
     )
 
-target_link_libraries(NetSSL PUBLIC Poco::Crypto Poco::Net Poco::Util Poco::Foundation OpenSSL::Crypto OpenSSL::SSL)
+target_link_libraries(NetSSL PUBLIC Poco::Crypto Poco::Net)
 target_include_directories(NetSSL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

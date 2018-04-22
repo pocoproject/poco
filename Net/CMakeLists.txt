@@ -6,15 +6,6 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-# Windows and WindowsCE need additional libraries
-if(WIN32)
-    if(WINCE)
-        set(SYSLIBS ${SYSLIBS} "ws2.lib" "iphlpapi.lib")
-    else()
-        set(SYSLIBS ${SYSLIBS} "ws2_32.lib" "iphlpapi.lib")
-    endif()
-endif(WIN32)
-
 add_library(Net ${SRCS} )
 add_library(Poco::Net ALIAS Net)
 set_target_properties( Net
@@ -24,7 +15,17 @@ set_target_properties( Net
     DEFINE_SYMBOL Net_EXPORTS
     )
 
-target_link_libraries(Net PUBLIC Poco::Foundation ${SYSLIBS})
+target_link_libraries(Net PUBLIC Poco::Foundation)
+# Windows and WindowsCE need additional libraries
+if(WIN32)
+    target_link_libraries(Net PUBLIC "iphlpapi.lib")
+    if(WINCE)
+        target_link_libraries(Net PUBLIC "ws2.lib")
+    else()    
+        target_link_libraries(Net PUBLIC "ws2_32.lib")
+    endif()    
+endif(WIN32)
+
 target_include_directories(Net
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
