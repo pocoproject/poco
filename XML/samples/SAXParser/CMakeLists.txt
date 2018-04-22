@@ -1,2 +1,2 @@
 add_executable(SAXParser src/SAXParser.cpp)
-target_link_libraries(SAXParser Poco::XML Poco::Foundation)
+target_link_libraries(SAXParser Poco::XML)

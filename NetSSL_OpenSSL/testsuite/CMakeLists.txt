@@ -27,5 +27,5 @@ else()
 				   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-testrunner.xml
                    )
 endif()
-target_link_libraries(NetSSL-testrunner Poco::NetSSL Poco::Crypto Poco::Net Poco::Util Poco::XML Poco::Foundation CppUnit)
+target_link_libraries(NetSSL-testrunner Poco::NetSSL Poco::Util Poco::XML CppUnit)
 

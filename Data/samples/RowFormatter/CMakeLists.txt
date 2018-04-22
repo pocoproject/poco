@@ -1,2 +1,2 @@
 add_executable(RowFormatter src/RowFormatter.cpp)
-target_link_libraries(RowFormatter Poco::DataSQLite Poco::Data Poco::Foundation )
+target_link_libraries(RowFormatter Poco::DataSQLite)

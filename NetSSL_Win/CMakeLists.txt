@@ -15,7 +15,7 @@ set_target_properties(NetSSLWin
     DEFINE_SYMBOL NetSSL_Win_EXPORTS
     )
 
-target_link_libraries(NetSSLWin PUBLIC Poco::Net Poco::Util Poco::Foundation Crypt32.lib)
+target_link_libraries(NetSSLWin PUBLIC Poco::Net Poco::Util Crypt32.lib)
 target_include_directories(NetSSLWin
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

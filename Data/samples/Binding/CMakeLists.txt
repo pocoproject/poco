@@ -1,2 +1,2 @@
 add_executable(Binding src/Binding.cpp)
-target_link_libraries(Binding Poco::DataSQLite Poco::Data Poco::Foundation)
+target_link_libraries(Binding Poco::DataSQLite)

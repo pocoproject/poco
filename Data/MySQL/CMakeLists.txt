@@ -15,7 +15,7 @@ set_target_properties(DataMySQL
     DEFINE_SYMBOL MySQL_EXPORTS
     )
 
-target_link_libraries(DataMySQL Poco::Foundation Poco::Data ${MYSQL_LIB})
+target_link_libraries(DataMySQL Poco::Data ${MYSQL_LIB})
 target_include_directories(DataMySQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

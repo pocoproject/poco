@@ -1,2 +1,2 @@
 add_executable(Mail src/Mail.cpp)
-target_link_libraries(Mail Poco::Net Poco::Util Poco::JSON Poco::XML Poco::Foundation)
+target_link_libraries(Mail Poco::Net Poco::Util Poco::JSON)

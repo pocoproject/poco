@@ -28,7 +28,7 @@ set_target_properties(DataSQLite
     OUTPUT_NAME PocoDataSQLite
     DEFINE_SYMBOL SQLite_EXPORTS
     )
-target_link_libraries(DataSQLite PUBLIC Poco::Foundation Poco::Data ${SQLITE3_LIBRARIES})
+target_link_libraries(DataSQLite PUBLIC Poco::Data ${SQLITE3_LIBRARIES})
 target_include_directories(DataSQLite
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

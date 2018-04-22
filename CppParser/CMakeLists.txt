@@ -6,7 +6,7 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-add_library(CppParser ${SRCS} )
+add_library(CppParser ${SRCS})
 add_library(Poco::CppParser ALIAS CppParser)
 set_target_properties(CppParser
     PROPERTIES

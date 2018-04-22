@@ -15,7 +15,7 @@ set_target_properties(Redis
     DEFINE_SYMBOL Redis_EXPORTS
     )
 
-target_link_libraries(Redis PUBLIC Poco::Net Poco::Foundation)
+target_link_libraries(Redis PUBLIC Poco::Net)
 target_include_directories(Redis
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
