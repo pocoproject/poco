@@ -233,32 +233,75 @@ source.
 !!Building using CMake
 
 As an alternative to the platform specific Makefiles and Solutions, CMake can be used
-to do build Poco. CMake is a cross platform Makefile generator that also supports
-Microsoft Visual Studio and Apple Xcode.
-Poco requires CMake 3.0 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
+to do build Poco on any platform with any compiler. CMake is a meta build system and it 
+generate native makefiles and workspaces that can be used in the compiler environment of 
+your choice. For a quick overview see http://cgold.readthedocs.io/en/latest/overview/cmake-can.html
+
+Poco requires CMake 3.2 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
 
 CMake supports out of source builds and this is the recommended way to build Poco using CMake.
 
-Assuming you are currently in the Poco source directory on a Unix machine
-and you like to build Poco with the generated Makefiles just type the following commands.
+Assuming the Poco source is located in /path/to/poco directory and you like to build Poco just type the 
+following commands (Command parameters are all the same on any platform).
 
-    $ mkdir cmake_build
-    $ cd cmake_build
-    $ cmake ..
-    $ make
+    $ cmake -H/path/to/poco -B/path/to/poco-build
+    $ cmake --build /path/to/poco-build --target all
 
-This will build Poco in a subdirectory <*cmake_build*>. All files produced during build are located in this directory.
+This will build Poco in a subdirectory <*poco-build*>. All files produced during build are located in this directory.
 
-CMake allows you to set some build time options. As an example: to disable the SevenZip support
+Poco allows you to set some build time options. As an example: to disable the SevenZip support
 type the following command:
 
-    $ cmake -DENABLE_SEVENZIP=OFF ..
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DENABLE_SEVENZIP=OFF
+    $ cmake --build /path/to/poco-build --target all
 
-Similar options are available for other components (see: CMakeLists.txt).
+Similar options are available for other components. To see and enable or disable available options execute following command:
 
-If you cannot or do not want to build with CMake, there are other options,
-described in the following.
+    $ cmake-gui /path/to/poco-build
 
+or for console only:
+
+    $ ccmake /path/to/poco-build
+
+Poco options are prefixed with <*ENABLE_*>. (This will be changed in Poco 2.x.x to <*POCO_*>)
+
+Some Hints:
+
+To use the compiler of your choice for example clang compiler, execute following cmake command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    $ cmake --build /path/to/poco-build --target all
+    
+To cross compile poco for another architecture/device you should have a <*cmake toolchain file*> and execute following command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_TOOLCHAIN_FILE=/PATH/TO/TOOLCHAINFILE
+    $ cmake --build /path/to/poco-build --target all    
+
+See https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html for more information.
+
+For a faster build, use ninja as build system. See https://ninja-build.org/
+For example on Ubuntu execute following commands:
+
+    $ sudo apt-get install ninja-build
+    
+This install <*ninja*> command. To use ninja-build execute following cmake commands:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -GNinja
+    $ cmake --build /path/to/poco-build --target all
+
+See https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html for other generators.
+
+To enable verbose output from Makefile builds, execute following cmake commands:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_VERBOSE_MAKEFILE=ON
+    $ cmake --build /path/to/poco-build --target all
+
+
+Some more infos about cmake see:
+
+https://cmake.org/cmake/help/latest/
+http://cgold.readthedocs.io/en/latest/index.html
+    
 
 !!Building On Windows
 
