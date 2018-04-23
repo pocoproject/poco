@@ -65,12 +65,6 @@ message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
 
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
-include(CMakeDependentOption)
-
-if(ENABLE_APACHECONNECTOR)
-    find_package(APR REQUIRED)
-    find_package(Apache2 REQUIRED)
-endif()
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL)
 	find_package(OpenSSL REQUIRED)
@@ -78,72 +72,56 @@ else()
 	find_package(OpenSSL)
 endif()
 
-option(ENABLE_TESTS
-  "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
+if(OPENSSL_FOUND)
+	option(ENABLE_NETSSL "Enable NetSSL" ON)
+	option(ENABLE_CRYPTO "Enable Crypto" ON)
+else()
+	option(ENABLE_NETSSL "Enable NetSSL" OFF)
+	option(ENABLE_CRYPTO "Enable Crypto" OFF)
+endif()
 
+if(ENABLE_APACHECONNECTOR)
+    find_package(APR REQUIRED)
+    find_package(Apache2 REQUIRED)
+else()
+    find_package(APR)
+    find_package(Apache2)    
+endif()
+
+if(APRUTIL_FOUND AND APACHE_FOUND AND 
+    EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
+    option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
+else()
+    option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
+endif()
+
+# Allow enabling and disabling components
+option(ENABLE_ENCODINGS "Enable Encodings" ON)
+option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
+option(ENABLE_XML "Enable XML" ON)
+option(ENABLE_JSON "Enable JSON" ON)
 option(ENABLE_MONGODB "Enable MongoDB" ON)
 option(ENABLE_REDIS "Enable Redis" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
-option(ENABLE_ENCODINGS "Enable Encodings" ON)
-option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
+option(ENABLE_UTIL "Enable Util" ON)
+option(ENABLE_NET "Enable Net" ON)
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+option(ENABLE_DATA "Enable Data" ON)
+option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON)
 option(ENABLE_DATA_MYSQL "Enable Data MySQL" ON)
 option(ENABLE_DATA_POSTGRESQL "Enable Data PostgreSQL" ON)
 option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_ZIP "Enable Zip" ON)
-option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
+option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 
-CMAKE_DEPENDENT_OPTION(ENABLE_CRYPTO "Enable Crypto" ON "OPENSSL_FOUND" OFF)
-CMAKE_DEPENDENT_OPTION(ENABLE_CRYPTO "Enable Crypto" ON "ENABLE_TESTS;ENABLE_NETSSL_WIN" OFF)
-CMAKE_DEPENDENT_OPTION(ENABLE_CRYPTO "Enable Crypto" ON "ENABLE_TESTS;ENABLE_NETSSL" OFF)
+option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
 
-CMAKE_DEPENDENT_OPTION(ENABLE_NETSSL "Enable NetSSL" ON "OPENSSL_FOUND" OFF)
-CMAKE_DEPENDENT_OPTION(ENABLE_NETSSL "Enable NetSSL" ON "ENABLE_TESTS;ENABLE_CRYPTO" OFF)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_TESTS;ENABLE_ENCODINGS_COMPILER" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_TESTS;ENABLE_ZIP" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_APACHECONNECTOR;APRUTIL_FOUND;APACHE_FOUND" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_PAGECOMPILER_FILE2PAGE" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_MONGODB" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_REDIS" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_TESTS;ENABLE_DATA_SQLITE" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_TESTS;ENABLE_DATA_MYSQL" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_TESTS;ENABLE_DATA_ODBC" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_NET "Enable Net" ON "ENABLE_NETSSL" ON)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_XML "Enable XML" ON "ENABLE_TESTS" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_XML "Enable XML" ON "ENABLE_PAGECOMPILER_FILE2PAGE" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_XML "Enable XML" ON "ENABLE_PDF" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_XML "Enable XML" ON "ENABLE_POCODOC" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_XML "Enable XML" ON "ENABLE_SEVENZIP" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_XML "Enable XML" ON "ENABLE_ZIP" ON)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_JSON "Enable JSON" ON "ENABLE_TESTS" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_JSON "Enable JSON" ON "ENABLE_PAGECOMPILER_FILE2PAGE" ON)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "APRUTIL_FOUND;APACHE_FOUND;ENABLE_APACHECONNECTOR" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_PAGECOMPILER_FILE2PAGE" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_NETSSL_WIN" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_TESTS;ENABLE_NETSSL" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_TESTS;ENABLE_NET" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_PDF" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_POCODOC" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_SEVENZIP" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_UTIL "Enable Util" ON "ENABLE_ZIP" ON)
-
-
-CMAKE_DEPENDENT_OPTION(ENABLE_DATA "Enable Data" ON "ENABLE_DATA_SQLITE" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_DATA "Enable Data" ON "ENABLE_DATA_MYSQL" ON)
-CMAKE_DEPENDENT_OPTION(ENABLE_DATA "Enable Data" ON "ENABLE_DATA_ODBC" ON)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_DATA_SQLITE "Enable Data SQlite" ON "ENABLE_TESTS;ENABLE_DATA" ON)
-
-CMAKE_DEPENDENT_OPTION(ENABLE_CPPPARSER "Enable C++ parser" ON "ENABLE_POCODOC" OFF)
-
+option(ENABLE_TESTS
+  "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
@@ -187,82 +165,78 @@ include(DefinePlatformSpecifc)
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
-# POCO dependencies
 if(ENABLE_TESTS)
    add_subdirectory(CppUnit)
-endif()
-#    option(ENABLE_XML "Enable XML" ON FORCE)
-#    option(ENABLE_JSON "Enable JSON" ON FORCE)
-# 
-#     if(ENABLE_ENCODINGS_COMPILER OR ENABLE_ZIP)
-#         option(ENABLE_NET "Enable Net" ON FORCE)
-#     endif()
-# endif()
-# 
-# if(ENABLE_APACHECONNECTOR AND APRUTIL_FOUND AND APACHE_FOUND AND
-#     EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector)
-#     option(ENABLE_NET "Enable Net" ON FORCE)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-# endif()
-# 
-# if(ENABLE_PAGECOMPILER_FILE2PAGE)
-#     option(ENABLE_NET "Enable Net" ON FORCE)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-#     option(ENABLE_XML "Enable XML" ON FORCE)
-#     option(ENABLE_JSON "Enable JSON" ON FORCE)
-# endif()
-# 
-# if(ENABLE_MONGODB OR ENABLE_REDIS)
-#     option(ENABLE_NET "Enable Net" ON FORCE)
-# endif()
-# 
-# if(ENABLE_DATA_SQLITE OR ENABLE_DATA_MYSQL OR ENABLE_DATA_ODBC)
-#     option(ENABLE_DATA "Enable Data" ON FORCE)
-#     if(ENABLE_TESTS)
-#         option(ENABLE_NET "Enable Net" ON FORCE)
-#         option(ENABLE_DATA_SQLITE "Enable Data SQlite" ON FORCE)
-#     endif()
-# endif()
-# 
-# if(ENABLE_NETSSL_WIN)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-#     if(ENABLE_TESTS)
-#         option(ENABLE_CRYPTO "Enable Crypto" ON FORCE)
-#     endif()
-# endif()
-# 
-# if(ENABLE_NETSSL)
-# 	option(ENABLE_CRYPTO "Enable Crypto" ON FORCE)
-#     option(ENABLE_NET "Enable Net" ON FORCE)
-#     if(ENABLE_TESTS)
-#         option(ENABLE_UTIL "Enable Util" ON FORCE)
-#     endif()
-# endif()
-# 
-# if(ENABLE_NET AND ENABLE_TESTS)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-# endif()
-# 
-# if(ENABLE_CRYPTO AND ENABLE_TESTS)
-#     option(ENABLE_NETSSL "Enable NetSSL" ON FORCE)
-# endif()
-# 
-# if(ENABLE_PDF)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-#     option(ENABLE_XML "Enable XML" ON FORCE)
-# endif()
-# 
-# if(ENABLE_POCODOC)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-#     option(ENABLE_XML "Enable XML" ON FORCE)
-#     option(ENABLE_CPPPARSER "Enable C++ parser" ON FORCE)
-# endif()
-# 
-# if(ENABLE_SEVENZIP OR ENABLE_ZIP)
-#     option(ENABLE_UTIL "Enable Util" ON FORCE)
-#     option(ENABLE_XML "Enable XML" ON FORCE)    
-# endif()
+   set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE )
+   set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
 
+    if(ENABLE_ENCODINGS_COMPILER OR ENABLE_ZIP)
+        set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+    endif()
+endif()
+
+if(ENABLE_APACHECONNECTOR)
+    set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+endif()
+
+if(ENABLE_PAGECOMPILER_FILE2PAGE)
+    set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+    set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+    set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+endif()
+
+if(ENABLE_MONGODB OR ENABLE_REDIS)
+    set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+endif()
+
+if(ENABLE_DATA_SQLITE OR ENABLE_DATA_MYSQL OR ENABLE_DATA_ODBC)
+    set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+    if(ENABLE_TESTS)
+        set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+        set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
+    endif()
+endif()
+
+if(ENABLE_NETSSL_WIN)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+    if(ENABLE_TESTS)
+        set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
+    endif()
+endif()
+
+if(ENABLE_NETSSL)
+	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
+    set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+    if(ENABLE_TESTS)
+        set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+    endif()
+endif()
+
+if(ENABLE_NET AND ENABLE_TESTS)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+endif()
+
+if(ENABLE_CRYPTO AND ENABLE_TESTS)
+    set(ENABLE_NETSSL ON CACHE BOOL "Enable NetSSL" FORCE)
+endif()
+
+if(ENABLE_PDF)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+    set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
+if(ENABLE_POCODOC)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+    set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+    set(ENABLE_CPPPARSER ON CACHE BOOL "Enable C++ parser" FORCE)
+endif()
+
+if(ENABLE_SEVENZIP OR ENABLE_ZIP)
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+    set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)    
+endif()
 
 add_subdirectory(Foundation)
 if(ENABLE_ENCODINGS)
@@ -340,11 +314,11 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP)
     list(APPEND Poco_COMPONENTS "Zip")
 endif()
 
-if(ENABLE_APACHECONNECTOR AND APRUTIL_FOUND AND APACHE_FOUND AND
-    EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector)
-        include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" ) # TODO(Bjoe) use target_link_libraries
-        add_subdirectory(ApacheConnector)
-        list(APPEND Poco_COMPONENTS "ApacheConnector")
+if(APRUTIL_FOUND AND APACHE_FOUND AND 
+    EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
+    include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" ) # TODO(Bjoe) use target_include_directories or target_link_libraries
+    add_subdirectory(ApacheConnector)
+    list(APPEND Poco_COMPONENTS "ApacheConnector")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/CppParser AND ENABLE_CPPPARSER)

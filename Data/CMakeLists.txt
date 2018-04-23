@@ -40,7 +40,7 @@ endif(ENABLE_DATA_SQLITE)
 if(ENABLE_DATA_MYSQL)
     find_package(MySQL)
     if(MYSQL_FOUND)
-        include_directories("${MYSQL_INCLUDE_DIR}") # TODO(BJoe) remove
+        include_directories("${MYSQL_INCLUDE_DIR}") # TODO(Bjoe) use target_include_directories or target_link_libraries
         message(STATUS "MySQL Support Enabled")
         add_subdirectory( MySQL )
     else()
@@ -64,12 +64,12 @@ endif(ENABLE_DATA_POSTGRESQL)
 if(ENABLE_DATA_ODBC)
     find_package(ODBC)
     if(WIN32 AND NOT WINCE)
-        set(ODBC_LIBRARIES "odbc32" "odbccp32") # TODO(Bjoe) verify
+        set(ODBC_LIBRARIES "odbc32" "odbccp32") # TODO(Bjoe) Verify if this is not set via find_package(ODBC)
         message(STATUS "Windows native ODBC Support Enabled")
         add_subdirectory( ODBC )
     else(WIN32 AND NOT WINCE)
         if(ODBC_FOUND)
-            include_directories("${ODBC_INCLUDE_DIRECTORIES}") # TODO(BJoe) remove
+            include_directories("${ODBC_INCLUDE_DIRECTORIES}") # TODO(Bjoe) use target_include_directories or target_link_libraries
             message(STATUS "ODBC Support Enabled")
             add_subdirectory( ODBC )
         else()
