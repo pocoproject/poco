@@ -413,6 +413,22 @@ void ODBCTest::testInsertSingleBulkVec()
 }
 
 
+void ODBCTest::testInsertSingleBulkNullableVec()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 1;)
+	{
+		recreateNullableTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->insertSingleBulkNullableVec();
+		i += 2;
+	}
+	dropObject("TABLE", ExecUtil::nullabletest());
+}
+
+
 void ODBCTest::testLimit()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1393,7 +1409,7 @@ bool ODBCTest::canConnect(const std::string& driver,
 		}
 	}
 	else
-		std::cout << "No DSNs found, will attempt DSN-less connection ..." << std::endl;
+		std::cout << "No DSNs found, will attempt DSN-less connection (" << driver << " / " << dbConnString << ") ..." << std::endl;
 
 	dsn = "";
 	return true;

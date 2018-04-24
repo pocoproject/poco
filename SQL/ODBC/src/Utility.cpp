@@ -112,7 +112,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 
 void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 {
-	double msec = ts.fraction/1000000;
+	double msec = ts.fraction/1000000.0;
 	double usec = 1000 * (msec - std::floor(msec));
 
 	dt.assign(ts.year,

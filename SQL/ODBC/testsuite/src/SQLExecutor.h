@@ -227,6 +227,7 @@ public:
 
 	void insertSingleBulk();
 	void insertSingleBulkVec();
+	void insertSingleBulkNullableVec();
 
 	void limits();
 	void limitOnce();

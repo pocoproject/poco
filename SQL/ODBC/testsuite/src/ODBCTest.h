@@ -74,6 +74,7 @@ public:
 
 	virtual void testInsertSingleBulk();
 	virtual void testInsertSingleBulkVec();
+	virtual void testInsertSingleBulkNullableVec();
 
 	virtual void testLimit();
 	virtual void testLimitOnce();

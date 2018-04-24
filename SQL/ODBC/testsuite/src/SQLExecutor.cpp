@@ -1582,6 +1582,69 @@ void SQLExecutor::insertSingleBulk()
 }
 
 
+void SQLExecutor::insertSingleBulkNullableVec()
+{
+	std::string funct = "insertSingleBulkNullableVec()";
+	
+	std::vector<Nullable<std::string>> dataString;
+	std::vector<Nullable<UTF16String>> dataWString;
+	std::vector<Nullable<Poco::Int32>> dataInt;
+	std::vector<Nullable<float>> dataFloat;
+	std::vector<Nullable<CLOB>> dataBlob;
+	std::vector<Nullable<DateTime>> dataDateTime;
+	std::vector<Nullable<Date>> dataDate;
+	std::vector<Nullable<Time>> dataTime;
+	
+	DateTime date;
+	int sum = 0;
+	for (int x = 0; x < 100; ++x)
+		if (x % 2 == 0)
+		{
+			dataString.push_back("String" + std::to_string(x));
+			UTF16String utf = Poco::UnicodeConverter::to<UTF16String>("WString" + std::to_string(x));
+			dataWString.push_back(utf);
+			dataInt.push_back(x);
+			dataFloat.push_back(x * 1.5);
+			dataBlob.push_back(CLOB(std::string("Blob" + std::to_string(x))));
+			date += Poco::Timespan(2, 0, 2, 0, 0);
+			dataDateTime.push_back(date);
+			dataDate.push_back(Date(date));
+			dataTime.push_back(Time(date));
+			sum += x;
+		}
+		else
+		{
+			dataString.push_back(Nullable<std::string>());
+			dataWString.push_back(Nullable<UTF16String>());
+			dataInt.push_back(Nullable<int>());
+			dataFloat.push_back(Nullable<float>());
+			dataBlob.push_back(Nullable<CLOB>());
+			dataDateTime.push_back(Nullable<DateTime>());
+			dataDate.push_back(Nullable<Date>());
+			dataTime.push_back(Nullable<Time>());
+		}
+
+	try
+	{
+		Statement stmt((session() << "INSERT INTO " << ExecUtil::nullabletest() << " VALUES (?,?,?,?,?,?,?,?)", use(dataWString, bulk), use(dataString, bulk), use(dataInt, bulk), use(dataFloat, bulk), use(dataBlob, bulk), use(dataDateTime, bulk), use(dataDate, bulk), use(dataTime, bulk)));
+		stmt.execute();
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { session() << "SELECT COUNT(1) FROM " << ExecUtil::nullabletest(), into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == 100);
+
+	try { session() << "SELECT SUM(EmptyInteger) FROM " << ExecUtil::nullabletest(), into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
+	assert (count == sum);
+}
+
+
 void SQLExecutor::floats()
 {
 	std::string funct = "floats()";
@@ -3061,7 +3124,7 @@ void SQLExecutor::internalBulkExtraction()
 
 void SQLExecutor::internalBulkExtractionUTF16()
 {
-	std::string funct = "internalBulkExtraction()";
+	std::string funct = "internalBulkExtractionUTF16()";
 	int size = 100;
 	std::vector<UTF16String> lastName(size);
 	std::vector<UTF16String> firstName(size);
@@ -4266,11 +4329,11 @@ void SQLExecutor::nullable()
   try {
 		Nullable<int> nint;
 		session() << "INSERT INTO " << ExecUtil::nullabletest() <<
-		" VALUES(?, ?, ?, ?)", useRef(nint), bind(Nullable<double>()), bind(Any()), bind(Nullable<DateTime>()), now;
+		" (EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime) VALUES(?, ?, ?, ?)", useRef(nint), bind(Nullable<double>()), bind(Any()), bind(Nullable<DateTime>()), now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("nullable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("nullable()"); }
-
+s
 	Nullable<int> i = 1;
 	Nullable<double> f = 1.5;
 	Nullable<std::string> s = std::string("abc");

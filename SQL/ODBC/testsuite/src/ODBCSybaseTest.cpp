@@ -69,6 +69,20 @@ static std::string sybaseExtra()
 	return (e.empty() ? "" : e + ";");
 }
 
+static std::string sybaseDatabase()
+{
+	return Poco::Environment::get("POCO_TEST_SYBASE_DB", SYBASE_DB);
+}
+
+static std::string sybaseUid()
+{
+	return Poco::Environment::get("POCO_TEST_SYBASE_UID", SYBASE_UID);
+}
+
+static std::string sybasePwd()
+{
+	return Poco::Environment::get("POCO_TEST_SYBASE_PWD", SYBASE_PWD);
+}
 
 std::string SybaseODBC::_connectString =
 	"driver=" + sybaseDriver() + ";" +
@@ -76,6 +90,9 @@ std::string SybaseODBC::_connectString =
 	"db=" SYBASE_DB ";"
 	"uid=" SYBASE_UID ";"
 	"pwd=" SYBASE_PWD ";"
+	"db=" + sybaseDatabase() + ";" +
+	"uid=" + sybaseUid() + ";" +
+	"pwd=" + sybasePwd() + ";" +
 	"DynamicPrepare=1;"
 #if !defined(POCO_OS_FAMILY_WINDOWS)
 	"CS=iso_1;"
@@ -86,10 +103,10 @@ std::string SybaseODBC::_connectString =
 
 ODBCTest::SessionPtr SybaseODBC::_pSession;
 ODBCTest::ExecPtr    SybaseODBC::_pExecutor;
-std::string          SybaseODBC::_driver = "";
+std::string          SybaseODBC::_driver = sybaseDriver();
 std::string          SybaseODBC::_dsn = SYBASE_DSN;
-std::string          SybaseODBC::_uid = SYBASE_UID;
-std::string          SybaseODBC::_pwd = SYBASE_PWD;
+std::string          SybaseODBC::_uid = sybaseUid();
+std::string          SybaseODBC::_pwd = sybasePwd();
 
 
 SybaseODBC::SybaseODBC(const std::string& name) :
@@ -131,7 +148,7 @@ void SybaseODBC::dropObject(const std::string& type, const std::string& name)
 void SybaseODBC::recreateNullableTable()
 {
 	dropObject("TABLE", ExecUtil::nullabletest());
-	try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL , EmptyDateTime DATETIME NULL)", now; }
+	try { session() << "CREATE TABLE " << ExecUtil::nullabletest() << " (EmptyUniString UNIVARCHAR(30) NULL, EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat FLOAT NULL, EmptyLob VARBINARY(100) NULL, EmptyDateTime DATETIME NULL, EmptyDate DATE NULL, EmptyTime TIME NULL)", now; }
 	catch (ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail("recreateNullableTable()"); }
 	catch (StatementException& se){ std::cout << se.toString() << std::endl; fail("recreateNullableTable()"); }
 }
@@ -583,6 +600,7 @@ CppUnit::Test* SybaseODBC::suite()
 		CppUnit_addTest(pSuite, SybaseODBC, testAffectedRows);
 		CppUnit_addTest(pSuite, SybaseODBC, testInsertSingleBulk);
 		CppUnit_addTest(pSuite, SybaseODBC, testInsertSingleBulkVec);
+		CppUnit_addTest(pSuite, SybaseODBC, testInsertSingleBulkNullableVec);
 		CppUnit_addTest(pSuite, SybaseODBC, testLimit);
 		CppUnit_addTest(pSuite, SybaseODBC, testLimitOnce);
 		CppUnit_addTest(pSuite, SybaseODBC, testLimitPrepare);

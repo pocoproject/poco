@@ -249,6 +249,110 @@ private:
 	TypeHandler& operator = (const TypeHandler&);
 };
 
+template <class T>
+class TypeHandler<std::deque<Nullable<T> > >: public AbstractTypeHandler
+	/// Specialization of type handler for std::deque.
+{
+public:
+	static void bind(std::size_t pos, const std::deque<Nullable<T> >& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+	{
+		poco_assert_dbg (!pBinder.isNull());
+		pBinder->bind(pos, obj, dir);
+	}
+
+	static std::size_t size()
+	{
+		return 1u;
+	}
+
+	static void extract(std::size_t pos, std::deque<Nullable<T> >& obj, const T& defVal, AbstractExtractor::Ptr pExt)
+	{
+		poco_assert_dbg (!pExt.isNull());
+		if (!pExt->extract(pos, obj))
+			obj.assign(obj.size(), defVal);
+	}
+
+	static void prepare(std::size_t pos, const std::deque<Nullable<T> >& obj, AbstractPreparator::Ptr pPreparator)
+	{
+		poco_assert_dbg (!pPreparator.isNull());
+		pPreparator->prepare(pos, obj);
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator = (const TypeHandler&);
+};
+
+
+template <class T>
+class TypeHandler<std::vector<Nullable<T> > >: public AbstractTypeHandler
+	/// Specialization of type handler for std::vector.
+{
+public:
+	static void bind(std::size_t pos, const std::vector<Nullable<T> >& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+	{
+		poco_assert_dbg (!pBinder.isNull());
+		pBinder->bind(pos, obj, dir);
+	}
+
+	static std::size_t size()
+	{
+		return 1u;
+	}
+
+	static void extract(std::size_t pos, std::vector<Nullable<T> >& obj, const T& defVal, AbstractExtractor::Ptr pExt)
+	{
+		poco_assert_dbg (!pExt.isNull());
+		if (!pExt->extract(pos, obj))
+			obj.assign(obj.size(), defVal);
+	}
+
+	static void prepare(std::size_t pos, const std::vector<Nullable<T> >& obj, AbstractPreparator::Ptr pPreparator)
+	{
+		poco_assert_dbg (!pPreparator.isNull());
+		pPreparator->prepare(pos, obj);
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator = (const TypeHandler&);
+};
+
+
+template <class T>
+class TypeHandler<std::list<Nullable<T> > >: public AbstractTypeHandler
+	/// Specialization of type handler for std::list.
+{
+public:
+	static void bind(std::size_t pos, const std::list<Nullable<T> >& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+	{
+		poco_assert_dbg (!pBinder.isNull());
+		pBinder->bind(pos, obj, dir);
+	}
+
+	static std::size_t size()
+	{
+		return 1u;
+	}
+
+	static void extract(std::size_t pos, std::list<Nullable<T> >& obj, const T& defVal, AbstractExtractor::Ptr pExt)
+	{
+		poco_assert_dbg (!pExt.isNull());
+		if (!pExt->extract(pos, obj))
+			obj.assign(obj.size(), defVal);
+	}
+
+	static void prepare(std::size_t pos, const std::list<Nullable<T> >& obj, AbstractPreparator::Ptr pPreparator)
+	{
+		poco_assert_dbg (!pPreparator.isNull());
+		pPreparator->prepare(pos, obj);
+	}
+
+private:
+	TypeHandler(const TypeHandler&);
+	TypeHandler& operator = (const TypeHandler&);
+};
+
 template <typename T>
 class TypeHandler<Nullable<T> >
 	/// Specialization of type handler for Nullable.
