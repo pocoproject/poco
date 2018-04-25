@@ -1642,6 +1642,34 @@ void SQLExecutor::insertSingleBulkNullableVec()
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	assert (count == sum);
+
+	try
+	{
+		Statement stat(session());
+		stat << "SELECT convert(varbinary, EmptyString), convert(varbinary, EmptyUniString) FROM " << ExecUtil::nullabletest(), now;
+		RecordSet rs(stat);
+		size_t ndx = 0;
+		for (bool cont = rs.moveFirst(); cont; cont = rs.moveNext())
+		{
+			Nullable<std::string> str = dataString[ndx];
+			Poco::SQL::BLOB blob = rs.value<Poco::SQL::BLOB>(0);
+			if (str.isNull())
+				assert(blob.size() == 0);
+			else
+				assert(blob.size() == str.value().length());
+
+			Nullable<UTF16String> wstr = dataWString[ndx];
+			blob = rs.value<Poco::SQL::BLOB>(1);
+			if (wstr.isNull())
+				assert(blob.size() == 0);
+			else
+				assert(blob.size() == wstr.value().length() * 2);
+
+			ndx++;
+		}
+	}
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 }
 
 
@@ -1860,7 +1888,7 @@ void SQLExecutor::prepare()
 
 void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 {
-	std::string funct = "doBulk()";
+	std::string funct = "doBulkPerformance()";
 	std::vector<int> ints(size, 1);
 	std::vector<std::string> strings(size, "abc");
 	std::vector<double> floats(size, .5);
@@ -3280,7 +3308,7 @@ void SQLExecutor::nulls(bool emptyStrIsSpace)
 {
 	std::string funct = "nulls()";
 
-	try { session() << "INSERT INTO " << ExecUtil::nulltest() << " (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now; }
+	try { session() << "INSERT INTO " << ExecUtil::nulltest() << " (i,r,v) VALUES (?,?,?)", use(Poco::SQL::DATA_NULL_INTEGER), use(Poco::SQL::DATA_NULL_FLOAT), use(Poco::SQL::DATA_NULL_STRING), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 
@@ -3323,12 +3351,12 @@ void SQLExecutor::nulls(bool emptyStrIsSpace)
 	assertTrue (rs.nvl("r", -1.5) == 1.5);
 	assertTrue (rs.nvl<std::string>("v") == "123");
 	assertTrue (rs.nvl("v", "456") == "123");
-	try { session() << "UPDATE " << ExecUtil::nulltest() << " SET v = ? WHERE i = ?", use(null), use(i), now; }
+	try { session() << "UPDATE " << ExecUtil::nulltest() << " SET v = ? WHERE i = ?", use(Poco::SQL::DATA_NULL_STRING), use(i), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	i = 2;
 	f = 3.4;
-	try { session() << "INSERT INTO " << ExecUtil::nulltest() << " (i, r, v) VALUES (?,?,?)", use(i), use(null), use(null), now; }
+	try { session() << "INSERT INTO " << ExecUtil::nulltest() << " (i, r, v) VALUES (?,?,?)", use(i), use(Poco::SQL::DATA_NULL_FLOAT), use(Poco::SQL::DATA_NULL_STRING), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (funct); }
 	rs = (session() << "SELECT i, r, v FROM " << ExecUtil::nulltest() << " ORDER BY i ASC", now);
@@ -4028,7 +4056,7 @@ void SQLExecutor::sessionTransaction(const std::string& connect)
 	assertTrue (!session().isTransaction());
 
 	stmt.wait();
-	assertTrue (0 == locCount);
+	assertTrue (0 == locCount || 2 == locCount); // the stmt might have executed before or after the rollback
 
 	try { session() << "SELECT count(*) FROM " << ExecUtil::person(), into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (funct); }
@@ -4329,11 +4357,11 @@ void SQLExecutor::nullable()
   try {
 		Nullable<int> nint;
 		session() << "INSERT INTO " << ExecUtil::nullabletest() <<
-		" (EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime) VALUES(?, ?, ?, ?)", useRef(nint), bind(Nullable<double>()), bind(Any()), bind(Nullable<DateTime>()), now;
+		" (EmptyString, EmptyInteger, EmptyFloat, EmptyDateTime) VALUES(?, ?, ?, ?)", bind(Nullable<std::string>()), useRef(nint), bind(Nullable<double>()), bind(Nullable<DateTime>()), now;
 	}
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("nullable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("nullable()"); }
-s
+
 	Nullable<int> i = 1;
 	Nullable<double> f = 1.5;
 	Nullable<std::string> s = std::string("abc");

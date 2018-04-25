@@ -1681,19 +1681,19 @@ inline void Binder::bind(std::size_t pos, const bool& val, Direction dir, const 
 
 inline void Binder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir)
 {
-	bindImplContainerBool(pos, val, SQL_C_BIT, dir);
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<bool>& val, Direction dir)
 {
-	bindImplContainerBool(pos, val, SQL_C_BIT, dir);
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<bool>& val, Direction dir)
 {
-	bindImplContainerBool(pos, val, SQL_C_BIT, dir);
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
 }
 
 
@@ -1759,19 +1759,19 @@ inline void Binder::bind(std::size_t pos, const std::list<Nullable<char> >& val,
 
 inline void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
 {
-	bindImplContainerString(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<std::string>& val, Direction dir)
 {
-	bindImplContainerString(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir)
 {
-	bindImplContainerString(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
 }
 
 
@@ -1795,19 +1795,19 @@ inline void Binder::bind(std::size_t pos, const std::list<Nullable<std::string> 
 
 inline void Binder::bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir)
 {
-	bindImplContainerUTF16String(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir)
 {
-	bindImplContainerUTF16String(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir)
 {
-	bindImplContainerUTF16String(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
 }
 
 
@@ -1843,19 +1843,19 @@ inline void Binder::bind(std::size_t pos, const CLOB& val, Direction dir, const 
 
 inline void Binder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<BLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
@@ -1879,19 +1879,19 @@ inline void Binder::bind(std::size_t pos, const std::list<Nullable<BLOB> >& val,
 
 inline void Binder::bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<CLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
@@ -1915,19 +1915,19 @@ inline void Binder::bind(std::size_t pos, const std::list<Nullable<CLOB> >& val,
 
 inline void Binder::bind(std::size_t pos, const std::vector<Date>& val, Direction dir)
 {
-	bindImplContainerDate(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<Date>& val, Direction dir)
 {
-	bindImplContainerDate(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<Date>& val, Direction dir)
 {
-	bindImplContainerDate(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
 }
 
 
@@ -1951,19 +1951,19 @@ inline void Binder::bind(std::size_t pos, const std::list<Nullable<Date> >& val,
 
 inline void Binder::bind(std::size_t pos, const std::vector<Time>& val, Direction dir)
 {
-	bindImplContainerTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<Time>& val, Direction dir)
 {
-	bindImplContainerTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<Time>& val, Direction dir)
 {
-	bindImplContainerTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
 }
 
 
@@ -1987,19 +1987,19 @@ inline void Binder::bind(std::size_t pos, const std::list<Nullable<Time> >& val,
 
 inline void Binder::bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir)
 {
-	bindImplContainerDateTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir)
 {
-	bindImplContainerDateTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<DateTime>& val, Direction dir)
 {
-	bindImplContainerDateTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
 }
 
 
