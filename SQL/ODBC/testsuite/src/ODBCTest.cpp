@@ -29,6 +29,7 @@
 #include "Poco/SQL/SQLException.h"
 #include <sqltypes.h>
 #include <iostream>
+#include <dlfcn.h>
 
 
 using namespace Poco::SQL::Keywords;
@@ -1436,11 +1437,25 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
 	
+	static bool iqloaded = false;
+	if (!iqloaded)
+	{
+		const char* filename="/ms/dist/spg/PROJ/iq/iq_client_prod/lib64/libdbodbc11.so";
+		void* lib = dlopen(filename, RTLD_NOW);
+		if (!lib)
+		{
+			const char* error = dlerror();
+			std::cout << "Failed to load " << filename << ": " << (error ? error : "No error message") << std::endl;
+		}
+		iqloaded = true;
+	}
+
 	try
 	{
 		std::cout << "Connecting to [" << dbConnString << ']' << std::endl;
 		return new Session(Poco::SQL::ODBC::Connector::KEY, dbConnString, 5);
-	}catch (ConnectionFailedException& ex)
+	}
+	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
 		return 0;

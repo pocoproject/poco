@@ -192,7 +192,7 @@ void StatementImpl::compile()
 		compileImpl();
 		_state = ST_COMPILED;
 
-		if (!extractions().size() && !isStoredProcedure())
+		if (canMakeExtractors())
 		{
 			std::size_t cols = columnsReturned();
 			if (cols) makeExtractors(cols);
@@ -309,6 +309,12 @@ void StatementImpl::setStorage(const std::string& storage)
 		_storage = STORAGE_UNKNOWN_IMPL;
 	else
 		throw NotFoundException();
+}
+
+
+bool StatementImpl::canMakeExtractors()
+{
+	return extractions().empty() && !isStoredProcedure();
 }
 
 

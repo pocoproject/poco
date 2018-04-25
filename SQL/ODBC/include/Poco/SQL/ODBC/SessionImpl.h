@@ -56,7 +56,8 @@ public:
 		std::size_t loginTimeout,
 		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool autoBind = true,
-		bool autoExtract = true);
+		bool autoExtract = true,
+		bool makeExtractorsBeforeExecute = false);
 		/// Creates the SessionImpl. Opens a connection to the database.
 		/// Throws NotConnectedException if connection was not successful.
 
@@ -65,7 +66,8 @@ public:
 		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
-		bool autoExtract = true);
+		bool autoExtract = true,
+		bool makeExtractorsBeforeExecute = false);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
 	~SessionImpl();
@@ -140,6 +142,12 @@ public:
 	bool isAutoExtract(const std::string& name="") const;
 		/// Returns true if extraction is automatic for this session.
 
+	void makeExtractorsBeforeExecute(const std::string&, bool val);
+		/// Sets internal extractor creation flag for the session.
+
+	bool isMakeExtractorsBeforeExecute(const std::string& name="") const;
+		/// Returns true if internal extractor creator is done before execution of statement.
+
 	void setMaxFieldSize(const std::string& rName, const Poco::Any& rValue);
 		/// Sets the max field size (the default used when column size is unknown).
 		
@@ -188,6 +196,7 @@ private:
 	Poco::Any              _maxFieldSize;
 	bool                   _autoBind;
 	bool                   _autoExtract;
+	bool                   _makeExtractorsBeforeExecute;
 	TypeInfo               _dataTypes;
 	mutable char           _canTransact;
 	bool                   _inTransaction;
@@ -257,6 +266,18 @@ inline void SessionImpl::autoExtract(const std::string&, bool val)
 inline bool SessionImpl::isAutoExtract(const std::string& name) const
 {
 	return _autoExtract;
+}
+
+
+inline void SessionImpl::makeExtractorsBeforeExecute(const std::string&, bool val)
+{
+	_makeExtractorsBeforeExecute = val;
+}
+
+
+inline bool SessionImpl::isMakeExtractorsBeforeExecute(const std::string& name) const
+{
+	return _makeExtractorsBeforeExecute;
 }
 
 
