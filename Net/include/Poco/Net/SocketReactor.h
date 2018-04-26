@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timespan.h"
 #include "Poco/Observer.h"
@@ -205,7 +206,10 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
 	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
+	typedef Poco::FastMutex MutexType;
+	typedef MutexType::ScopedLock ScopedLock;
 
+	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
 
 	enum
@@ -216,13 +220,14 @@ private:
 	bool            _stop;
 	Poco::Timespan  _timeout;
 	EventHandlerMap _handlers;
+	PollSet         _pollSet;
 	NotificationPtr _pReadableNotification;
 	NotificationPtr _pWritableNotification;
 	NotificationPtr _pErrorNotification;
 	NotificationPtr _pTimeoutNotification;
 	NotificationPtr _pIdleNotification;
 	NotificationPtr _pShutdownNotification;
-	Poco::FastMutex _mutex;
+	MutexType       _mutex;
 	Poco::Thread*   _pThread;
 	
 	friend class SocketNotifier;
