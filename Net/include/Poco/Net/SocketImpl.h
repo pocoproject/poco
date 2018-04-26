@@ -475,7 +475,7 @@ inline poco_socket_t SocketImpl::sockfd() const
 	return _sockfd;
 }
 
-inline poco_socket_t SocketImpl::detachSocket() const
+inline poco_socket_t SocketImpl::detachSocket()
 {
 	poco_socket_t sock = sockfd();
 	reset(POCO_INVALID_SOCKET);
