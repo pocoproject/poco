@@ -190,7 +190,7 @@ private:
 
 
 //
-// BSD implementation using poll
+// BSD/Windows implementation using poll
 //
 class PollSetImpl
 {
