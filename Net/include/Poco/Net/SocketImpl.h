@@ -376,6 +376,10 @@ public:
 	poco_socket_t sockfd() const;
 		/// Returns the socket descriptor for the
 		/// underlying native socket.
+		
+	poco_socket_t detachSocket();
+		/// Returns the socket descriptor for the
+		/// underlying native socket and reset current SocketImpl socket descriptor
 
 	void ioctl(poco_ioctl_request_t request, int& arg);
 		/// A wrapper for the ioctl system call.
@@ -471,6 +475,12 @@ inline poco_socket_t SocketImpl::sockfd() const
 	return _sockfd;
 }
 
+inline poco_socket_t SocketImpl::detachSocket() const
+{
+	poco_socket_t sock = sockfd();
+	reset(POCO_INVALID_SOCKET);
+	return sock;
+}
 
 inline bool SocketImpl::initialized() const
 {
