@@ -50,11 +50,13 @@ namespace
 			_reactor(reactor)
 		{
 			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
 		}
-		
+
 		~EchoServiceHandler()
 		{
 			_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+			_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
 		}
 
 		void onReadable(ReadableNotification* pNf)
@@ -66,11 +68,12 @@ namespace
 			{
 				_socket.sendBytes(buffer, n);
 			}
-			else
-			{
-				_socket.shutdownSend();
-				delete this;
-			}
+		}
+
+		void onShutdown(ShutdownNotification* pNf)
+		{
+			pNf->release();
+			delete this;
 		}
 
 	private:
@@ -125,7 +128,7 @@ namespace
 				}
 			}
 		}
-		
+
 		void onWritable(WritableNotification* pNf)
 		{
 			pNf->release();
@@ -136,7 +139,7 @@ namespace
 			_socket.sendBytes(data.data(), (int) data.length());
 			_socket.shutdownSend();
 		}
-		
+
 		void onTimeout(TimeoutNotification* pNf)
 		{
 			pNf->release();
@@ -147,7 +150,7 @@ namespace
 				delete this;
 			}
 		}
-		
+
 		static std::string data()
 		{
 			return _data;
@@ -167,22 +170,22 @@ namespace
 		{
 			return _closeOnTimeout;
 		}
-		
+
 		static void setCloseOnTimeout(bool flag)
 		{
 			_closeOnTimeout = flag;
 		}
-		
+
 		static bool readableError()
 		{
 			return _readableError;
 		}
-		
+
 		static bool writableError()
 		{
 			return _writableError;
 		}
-		
+
 		static bool timeoutError()
 		{
 			return _timeoutError;
@@ -235,8 +238,8 @@ namespace
 		static bool                                          _closeOnTimeout;
 		static bool                                          _once;
 	};
-	
-	
+
+
 	std::string ClientServiceHandler::_data;
 	bool ClientServiceHandler::_readableError = false;
 	bool ClientServiceHandler::_writableError = false;
@@ -244,8 +247,8 @@ namespace
 	bool ClientServiceHandler::_timeout = false;
 	bool ClientServiceHandler::_closeOnTimeout = false;
 	bool ClientServiceHandler::_once = false;
-	
-	
+
+
 	class FailConnector: public SocketConnector<ClientServiceHandler>
 	{
 	public:
@@ -257,13 +260,13 @@ namespace
 			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
 			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
-		
+
 		void onShutdown(ShutdownNotification* pNf)
 		{
 			pNf->release();
 			_shutdown = true;
 		}
-		
+
 		void onTimeout(TimeoutNotification* pNf)
 		{
 			pNf->release();
@@ -276,7 +279,7 @@ namespace
 			_failed = true;
 			reactor()->stop();
 		}
-		
+
 		bool failed() const
 		{
 			return _failed;
@@ -286,7 +289,7 @@ namespace
 		{
 			return _shutdown;
 		}
-		
+
 	private:
 		bool _failed;
 		bool _shutdown;
