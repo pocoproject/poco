@@ -61,19 +61,6 @@ SocketReactor::~SocketReactor()
 }
 
 
-bool SocketReactor::hasSocketHandlers()
-{
-	ScopedLock lock(_mutex);
-	for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
-	{
-		if (it->second->accepts(_pReadableNotification) ||
-			it->second->accepts(_pWritableNotification) ||
-			it->second->accepts(_pErrorNotification)) return true;
-	}
-	return false;
-}
-
-
 void SocketReactor::run()
 {
 	_pThread = Thread::current();
@@ -97,13 +84,13 @@ void SocketReactor::run()
 					PollSet::SocketModeMap::iterator end = sm.end();
 					for (; it != end; ++it)
 					{
-						if ((it->second & PollSet::POLL_READ) != 0)
+						if (it->second & PollSet::POLL_READ)
 						{
 							dispatch(it->first, _pReadableNotification);
 							readable = true;
 						}
-						if ((it->second & PollSet::POLL_WRITE) != 0) dispatch(it->first, _pWritableNotification);
-						if ((it->second & PollSet::POLL_ERROR) != 0) dispatch(it->first, _pErrorNotification);
+						if (it->second & PollSet::POLL_WRITE) dispatch(it->first, _pWritableNotification);
+						if (it->second & PollSet::POLL_ERROR) dispatch(it->first, _pErrorNotification);
 					}
 				}
 				if (!readable) onTimeout();
@@ -123,6 +110,19 @@ void SocketReactor::run()
 		}
 	}
 	onShutdown();
+}
+
+
+bool SocketReactor::hasSocketHandlers()
+{
+	ScopedLock lock(_mutex);
+	for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
+	{
+		if (it->second->accepts(_pReadableNotification) ||
+			it->second->accepts(_pWritableNotification) ||
+			it->second->accepts(_pErrorNotification)) return true;
+	}
+	return false;
 }
 
 

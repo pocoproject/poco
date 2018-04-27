@@ -70,7 +70,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	void notify(Notification* pNf) const
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);
