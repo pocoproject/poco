@@ -123,8 +123,8 @@ namespace
 				_str.write(buffer, n);
 				_data += _str.str();
 				_str.str("");
-				if ((_once && _data.size() >= 1024) ||
-					(!_once && _data.size() >= 4096))
+				if ((_once && _data.size() == 1024) ||
+					(!_once && _data.size() == 4096))
 				{
 					_reactor.stop();
 					delete this;
