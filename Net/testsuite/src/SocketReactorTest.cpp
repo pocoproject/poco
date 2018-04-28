@@ -70,6 +70,7 @@ namespace
 			{
 				_socket.sendBytes(buffer, n);
 			}
+			else delete this;
 		}
 
 		void onShutdown(ShutdownNotification* pNf)
@@ -122,12 +123,14 @@ namespace
 				_str.write(buffer, n);
 				_data += _str.str();
 				_str.str("");
-				if ((_once && _data.size() >= 1024) ||
-					(!_once && _data.size() >= 4096))
-				{
-					_reactor.stop();
-					delete this;
-				}
+			}
+			else
+			{
+				checkReadableObserverCount(1);
+				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
+				checkReadableObserverCount(0);
+				if (_once || _data.size() == 4096) _reactor.stop();
+				delete this;
 			}
 		}
 
@@ -321,8 +324,8 @@ namespace
 		void onReadable(ReadableNotification* pNf)
 		{
 			pNf->release();
-			char buffer[8] = {0};
-			int n = _socket.receiveBytes(&buffer[0], sizeof(buffer) - 1);
+			char buffer[64];
+			int n = _socket.receiveBytes(&buffer[0], sizeof(buffer));
 			if (n > 0)
 			{
 				_data[_pos].append(buffer, n);
