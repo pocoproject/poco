@@ -123,6 +123,12 @@ namespace
 				_str.write(buffer, n);
 				_data += _str.str();
 				_str.str("");
+				if ((_once && _data.size() >= 1024) ||
+					(!_once && _data.size() >= 4096))
+				{
+					_reactor.stop();
+					delete this;
+				}
 			}
 			else
 			{
@@ -484,7 +490,7 @@ void SocketReactorTest::testDataCollection()
 					  "  \"ts\":\"1524864651000001\","
 					  "  \"data\":123"
 					  "}\n");
-	sock.sendBytes(data0.data(), data0.size());
+	sock.sendBytes(data0.data(), static_cast<int>(data0.size()));
 
 	std::string data1("{"
 					  "  \"src\":\"127.0.0.1\","
@@ -501,7 +507,7 @@ void SocketReactorTest::testDataCollection()
 					  "   }"
 					  "  ]"
 					  "}\n");
-	sock.sendBytes(data1.data(), data1.size());
+	sock.sendBytes(data1.data(), static_cast<int>(data1.size()));
 
 	std::string data2 = "{"
 						"  \"src\":\"127.0.0.1\","
@@ -539,7 +545,7 @@ void SocketReactorTest::testDataCollection()
 						"   }"
 						" ]"
 						"}\n";
-	sock.sendBytes(data2.data(), data2.size());
+	sock.sendBytes(data2.data(), static_cast<int>(data2.size()));
 	Thread::sleep(500);
 	reactor.stop();
 	thread.join();
