@@ -16,7 +16,7 @@ set_target_properties(SQLMySQL
     DEFINE_SYMBOL MySQL_EXPORTS
     )
 
-target_link_libraries(SQLMySQL Poco::SQL ${MYSQL_LIB})
+  target_link_libraries(SQLMySQL Poco::SQL ${MYSQL_LIB}) # TODO(Bjoe) Use namespace target
 target_include_directories(SQLMySQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

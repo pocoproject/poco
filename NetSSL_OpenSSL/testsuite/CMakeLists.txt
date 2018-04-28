@@ -24,11 +24,11 @@ else()
 	add_custom_command(TARGET NetSSL-testrunner POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/any.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/rootcert.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-				   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-testrunner.xml
+		   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-testrunner.xml
                    )
 endif()
 target_link_libraries(NetSSL-testrunner Poco::NetSSL Poco::Util Poco::XML Poco::CppUnit)
 
 if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-	set_tests_properties(${LIBNAME} PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")
+	set_tests_properties(NetSSL PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")
 endif(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)

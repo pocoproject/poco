@@ -11,5 +11,5 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
 )
 
 add_executable(SQLPostgreSQL-testrunner ${TEST_SRCS} )
-add_test(NAME SQLPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-target_link_libraries(SQLPostgreSQL-testrunner Poco::SQLPostgreSQL Poco::CppUnit ${PostgreSQL_LIBRARIES})
+add_test(NAME SQLPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND SQLPostgreSQL-testrunner -all)
+target_link_libraries(SQLPostgreSQL-testrunner Poco::SQLPostgreSQL Poco::CppUnit ${PostgreSQL_LIBRARIES}) # TODO(Bjoe) Use namespace target to include all dependencies

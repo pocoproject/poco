@@ -16,7 +16,7 @@ set_target_properties(SQLODBC
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries(SQLODBC PUBLIC Poco::SQL ${ODBC_LIBRARIES})
+target_link_libraries(SQLODBC PUBLIC Poco::SQL ${ODBC_LIBRARIES}) # TODO(Bjoe) Use namespace target
 target_include_directories(SQLODBC
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

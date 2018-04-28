@@ -28,7 +28,7 @@ set_target_properties(SQLSQLite
     DEFINE_SYMBOL SQLite_EXPORTS
     )
 
-target_link_libraries(SQLSQLite PUBLIC Poco::SQL ${SQLITE3_LIBRARIES})
+target_link_libraries(SQLSQLite PUBLIC Poco::SQL ${SQLITE3_LIBRARIES}) # TODO(BJoe) Use namespace target
 target_include_directories(SQLSQLite
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
