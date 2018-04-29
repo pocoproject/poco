@@ -379,7 +379,8 @@ public:
 		
 	poco_socket_t detachSocket();
 		/// Returns the socket descriptor for the
-		/// underlying native socket and reset current SocketImpl socket descriptor
+		/// underlying native socket and resets the
+		/// current SocketImpl socket descriptor.
 
 	void ioctl(poco_ioctl_request_t request, int& arg);
 		/// A wrapper for the ioctl system call.
