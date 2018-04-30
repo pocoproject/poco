@@ -896,11 +896,11 @@ def candle(VSYEAR, VERSION, target, os) {
 		inputs.files(index)
 
 		inputs.files(pocos.inputs.files)
-		inputs.files(new File(workingDir, "Poco.wxs"))
-		inputs.files(project.getTasksByName('poco', true).outputs.files)
+		inputs.file(new File(workingDir, "Poco.wxs"))
+		inputs.files(pocos.outputs.files)
 		
 		def File output = new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
-		outputs.files(output)
+		outputs.file(output)
 
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
@@ -922,9 +922,9 @@ def light(VSYEAR, VERSION, target, os) {
 		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
 
 		def File input = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
-		inputs.files(input)
+		inputs.file(input)
 		def File output = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi")
-		outputs.files(output)
+		outputs.file(output)
 
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
@@ -1021,8 +1021,8 @@ def nuget(version, target, os) {
 		args "Pocoproject.Poco.vs150.${target}.nuspec"
 
 		inputs.files(pocos.inputs.files)
-		inputs.files(new File(workingDir, "Pocoproject.Poco.vs150.${target}.nuspec"))
-		outputs.files(new File(workingDir,"Pocoproject.Poco.vs150.${target}.${version}.nupkg"))
+		inputs.file(new File(workingDir, "Pocoproject.Poco.vs150.${target}.nuspec"))
+		outputs.file(new File(workingDir,"Pocoproject.Poco.vs150.${target}.${version}.nupkg"))
 
 		onlyIf(new Spec<Exec>() {
 			boolean isSatisfiedBy(Exec task) {
