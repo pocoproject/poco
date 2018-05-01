@@ -10,7 +10,8 @@ objects = AbstractConfiguration Application ConfigurationMapper \
 	ConfigurationView HelpFormatter IniFileConfiguration LayeredConfiguration \
 	LoggingConfigurator LoggingSubsystem MapConfiguration \
 	Option OptionException OptionProcessor OptionSet \
-	PropertyFileConfiguration Subsystem SystemConfiguration \
+	PropertyFileConfiguration PropertyListConfiguration \
+	Subsystem SystemConfiguration \
 	FilesystemConfiguration ServerApplication \
 	Validator IntValidator RegExpValidator OptionCallback \
 	Timer TimerTask

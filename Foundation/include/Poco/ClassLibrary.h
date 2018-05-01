@@ -25,6 +25,8 @@
 
 #if defined(_WIN32)
 	#define POCO_LIBRARY_API __declspec(dllexport)
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
+	#define POCO_LIBRARY_API __attribute__ ((visibility ("default")))
 #else
 	#define POCO_LIBRARY_API
 #endif

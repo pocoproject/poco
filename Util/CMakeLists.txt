@@ -15,7 +15,7 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     src/WinService.cpp
 )
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
+add_library( "${LIBNAME}" ${SRCS} )
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
@@ -25,12 +25,12 @@ set_target_properties( "${LIBNAME}"
     )
 
 target_link_libraries( "${LIBNAME}" Foundation)
-if (ENABLE_XML)
+if (POCO_ENABLE_XML)
 	target_link_libraries( "${LIBNAME}" XML)
 else ()
 	add_definitions( -DPOCO_UTIL_NO_XMLCONFIGURATION )
 endif()
-if (ENABLE_JSON)
+if (POCO_ENABLE_JSON)
 	target_link_libraries( "${LIBNAME}" JSON)
 else ()
 	add_definitions( -DPOCO_UTIL_NO_JSONCONFIGURATION )
@@ -47,9 +47,9 @@ target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)
 endif ()
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()

@@ -114,21 +114,21 @@ void ConditionTest::testSignal()
 	Thread::sleep(200);
 	t2.start(r2);
 	
-	assert (!r1.ran());
-	assert (!r2.ran());
+	assertTrue (!r1.ran());
+	assertTrue (!r2.ran());
 	
 	cond.signal();
 	
 	t1.join();
-	assert (r1.ran());
+	assertTrue (r1.ran());
 	
-	assert (!t2.tryJoin(200));
+	assertTrue (!t2.tryJoin(200));
 	
 	cond.signal();
 	
 	t2.join();
 
-	assert (r2.ran());
+	assertTrue (r2.ran());
 }
 
 
@@ -150,24 +150,24 @@ void ConditionTest::testBroadcast()
 	Thread::sleep(200);
 	t3.start(r3);
 	
-	assert (!r1.ran());
-	assert (!r2.ran());
-	assert (!r3.ran());
+	assertTrue (!r1.ran());
+	assertTrue (!r2.ran());
+	assertTrue (!r3.ran());
 	
 	cond.signal();
 	t1.join();
 	
-	assert (r1.ran());
-	assert (!t2.tryJoin(500));
-	assert (!t3.tryJoin(500));
+	assertTrue (r1.ran());
+	assertTrue (!t2.tryJoin(500));
+	assertTrue (!t3.tryJoin(500));
 	
 	cond.broadcast();
 	
 	t2.join();
 	t3.join();
 	
-	assert (r2.ran());
-	assert (r3.ran());
+	assertTrue (r2.ran());
+	assertTrue (r3.ran());
 }
 
 

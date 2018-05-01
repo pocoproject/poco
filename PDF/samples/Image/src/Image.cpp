@@ -17,7 +17,7 @@
 
 #if defined(POCO_OS_FAMILY_UNIX)
 const std::string pdfFileName = "${POCO_BASE}/PDF/samples/Image/Image.pdf";
-const std::string pngFileName = "${POCO_BASE}/PDF/samples/Image/logo.PNG";
+const std::string pngFileName = "${POCO_BASE}/PDF/samples/Image/logo.png";
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 const std::string pdfFileName = "%POCO_BASE%/PDF/samples/Image/Image.pdf";
 const std::string pngFileName = "%POCO_BASE%/PDF/samples/Image/logo.PNG";

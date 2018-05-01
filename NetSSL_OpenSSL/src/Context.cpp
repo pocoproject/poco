@@ -207,6 +207,25 @@ void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certifica
 }
 
 	
+void Context::addCertificateAuthority(const Crypto::X509Certificate &certificate)
+{
+	if (X509_STORE* store = SSL_CTX_get_cert_store(_pSSLContext))
+	{
+		int errCode = X509_STORE_add_cert(store, const_cast<X509*>(certificate.certificate()));
+		if (errCode != 1)
+		{
+			std::string msg = Utility::getLastError();
+			throw SSLContextException("Cannot add certificate authority to Context", msg);
+		}
+	}
+	else
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot add certificate authority to Context", msg);
+	}
+}
+
+
 void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 {
 	int errCode = SSL_CTX_use_RSAPrivateKey(_pSSLContext, key.impl()->getRSA());
@@ -492,7 +511,7 @@ void Context::initDH(const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
 		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 		DH_set0_pqg(dh, p, 0, g);

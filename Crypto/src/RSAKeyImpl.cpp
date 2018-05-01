@@ -55,7 +55,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 
 
 RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
-	KeyPairImpl("ec", KT_EC_IMPL),
+	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pRSA(0)
 {
 	EVPPKey key = cont.getKey();
@@ -229,7 +229,7 @@ int RSAKeyImpl::size() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
 	const BIGNUM* n = 0;
 	const BIGNUM* e = 0;
 	const BIGNUM* d = 0;
@@ -243,7 +243,7 @@ RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
 	const BIGNUM* n = 0;
 	const BIGNUM* e = 0;
 	const BIGNUM* d = 0;
@@ -257,7 +257,7 @@ RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
 	const BIGNUM* n = 0;
 	const BIGNUM* e = 0;
 	const BIGNUM* d = 0;

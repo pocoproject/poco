@@ -15,6 +15,7 @@
 #include "Poco/SortedDirectoryIterator.h"
 #include "Poco/RecursiveDirectoryIterator.h"
 #include "Poco/FileStream.h"
+#include "Poco/Environment.h"
 #include "Poco/Exception.h"
 
 #include <iostream>
@@ -31,7 +32,7 @@ using namespace Poco;
 
 static void setReadable(const std::string& path, bool flag)
 {
-	poco_assert(!path.empty());
+	poco_assert (!path.empty());
 
 	struct stat st;
 	if (stat(path.c_str(), &st) != 0)
@@ -58,7 +59,7 @@ static void setReadable(const std::string& path, bool flag)
 
 static void setReadable(const std::string& path, bool flag)
 {
-	poco_assert(!path.empty());
+	poco_assert (!path.empty());
 }
 
 #endif
@@ -181,14 +182,21 @@ void DirectoryIteratorsTest::testSimpleRecursiveDirectoryIteratorOnError()
 	}
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	assert(_onErrorPath.size() > 0);
-	if (second.separator() != *_onErrorPath.rbegin())
-		_onErrorPath += second.separator();
-	if (second.separator() != *errorPath.rbegin())
-		errorPath += second.separator();
-
-	assertEquals(_onErrorPath, errorPath);
-	assertEquals(14, (long) result.size());
+	try
+	{
+		// this test can't work for root
+		if (Environment::get("USER") != "root")
+		{
+			assertTrue (_onErrorPath.size() > 0);
+			if (second.separator() != *_onErrorPath.rbegin())
+				_onErrorPath += second.separator();
+			if (second.separator() != *errorPath.rbegin())
+				errorPath += second.separator();
+			assertEquals(_onErrorPath, errorPath);
+			assertEquals(14, (long) result.size());
+		}
+	}
+	catch (NotFoundException&) { }
 #else
 	assertEquals(20, (long) result.size());
 #endif
@@ -236,14 +244,21 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIteratorOnError(
 	}
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	assert(_onErrorPath.size() > 0);
-	if (first.separator() != *_onErrorPath.rbegin())
-		_onErrorPath += first.separator();
-	if (first.separator() != *errorPath.rbegin())
-		errorPath += first.separator();
-
-	assertEquals(_onErrorPath, errorPath);
-	assertEquals(7, (long) result.size());
+	try
+	{
+		// this test can't work for root
+		if (Environment::get("USER") != "root")
+		{
+			assertTrue (_onErrorPath.size() > 0);
+			if (first.separator() != *_onErrorPath.rbegin())
+				_onErrorPath += first.separator();
+			if (first.separator() != *errorPath.rbegin())
+				errorPath += first.separator();
+			assertEquals(_onErrorPath, errorPath);
+			assertEquals(7, (long) result.size());
+		}
+	}
+	catch (NotFoundException&) { }
 #else
 	assertEquals(20, (long) result.size());
 #endif

@@ -77,7 +77,7 @@ public:
 	{
 	}
 
-	~SharedPtr()
+	~SharedPtr() noexcept
 	{
 	}
 
@@ -106,6 +106,27 @@ public:
 			swap(tmp);
 		}
 		return *this;
+	}
+
+	void reset() noexcept
+	{
+		_ptr.reset();
+	}
+
+	void reset(C* ptr)
+	{
+		_ptr.reset(ptr);
+	}
+
+	void reset(const SharedPtr& ptr)
+	{
+		assign(ptr);
+	}
+
+	template <class Other>
+	void reset(const SharedPtr<Other>& ptr)
+	{
+		assign<Other>(ptr);
 	}
 
 	SharedPtr& operator = (C* ptr)

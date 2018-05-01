@@ -32,16 +32,16 @@ void MemoryPoolTest::testMemoryPool()
 {
 	MemoryPool pool1(100, 0, 10);
 	
-	assert (pool1.blockSize() == 100);
-	assert (pool1.allocated() == 0);
-	assert (pool1.available() == 0);
+	assertTrue (pool1.blockSize() == 100);
+	assertTrue (pool1.allocated() == 0);
+	assertTrue (pool1.available() == 0);
 	
 	std::vector<void*> ptrs;
 	for (int i = 0; i < 10; ++i)
 	{
 		ptrs.push_back(pool1.get());
-		assert (pool1.allocated() == i + 1);
-		assert (pool1.available() == 0);
+		assertTrue (pool1.allocated() == i + 1);
+		assertTrue (pool1.available() == 0);
 	}
 	
 	try
@@ -58,13 +58,13 @@ void MemoryPoolTest::testMemoryPool()
 	{
 		pool1.release(*it);
 		++av;
-		assert (pool1.available() == av);
+		assertTrue (pool1.available() == av);
 	}
 	
 	MemoryPool pool2(32, 5, 10);
-	assert (pool2.available() == 5);
-	assert (pool2.blockSize() == 32);
-	assert (pool2.allocated() == 5);
+	assertTrue (pool2.available() == 5);
+	assertTrue (pool2.blockSize() == 32);
+	assertTrue (pool2.allocated() == 5);
 }
 
 

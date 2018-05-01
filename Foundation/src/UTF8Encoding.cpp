@@ -44,7 +44,7 @@ const TextEncoding::CharacterMap UTF8Encoding::_charMap =
 	/* c0 */	  -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,
 	/* d0 */	  -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,
 	/* e0 */	  -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,   -3,
-	/* f0 */	  -4,   -4,   -4,   -4,   -4,   -4,   -4,   -4,   -5,   -5,   -5,   -5,   -6,   -6,   -1,   -1,
+	/* f0 */	  -4,   -4,   -4,   -4,   -4,   -4,   -4,   -4,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
 };
 
 
@@ -88,8 +88,6 @@ int UTF8Encoding::convert(const unsigned char* bytes) const
 	
 	switch (n)
 	{
-	case -6:
-	case -5:
 	case -1:
 		return -1;
 	case -4:
@@ -165,8 +163,6 @@ int UTF8Encoding::queryConvert(const unsigned char* bytes, int length) const
 	{
 		switch (n)
 		{
-		case -6:
-		case -5:
 		case -1:
 			return -1;
 		case -4:

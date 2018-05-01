@@ -33,23 +33,23 @@ LRUCacheTest::~LRUCacheTest()
 void LRUCacheTest::testClear()
 {
 	LRUCache<int, int> aCache(3);
-	assert (aCache.size() == 0);
-	assert (aCache.getAllKeys().size() == 0);
+	assertTrue (aCache.size() == 0);
+	assertTrue (aCache.getAllKeys().size() == 0);
 	aCache.add(1, 2);
 	aCache.add(3, 4);
 	aCache.add(5, 6);
-	assert (aCache.size() == 3);
-	assert (aCache.getAllKeys().size() == 3);
-	assert (aCache.has(1));
-	assert (aCache.has(3));
-	assert (aCache.has(5));
-	assert (*aCache.get(1) == 2);
-	assert (*aCache.get(3) == 4);
-	assert (*aCache.get(5) == 6);
+	assertTrue (aCache.size() == 3);
+	assertTrue (aCache.getAllKeys().size() == 3);
+	assertTrue (aCache.has(1));
+	assertTrue (aCache.has(3));
+	assertTrue (aCache.has(5));
+	assertTrue (*aCache.get(1) == 2);
+	assertTrue (*aCache.get(3) == 4);
+	assertTrue (*aCache.get(5) == 6);
 	aCache.clear();
-	assert (!aCache.has(1));
-	assert (!aCache.has(3));
-	assert (!aCache.has(5));
+	assertTrue (!aCache.has(1));
+	assertTrue (!aCache.has(3));
+	assertTrue (!aCache.has(5));
 }
 
 
@@ -71,22 +71,22 @@ void LRUCacheTest::testCacheSize1()
 {
 	LRUCache<int, int> aCache(1);
 	aCache.add(1, 2);
-	assert (aCache.has(1));
-	assert (*aCache.get(1) == 2);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 2);
 
 	aCache.add(3, 4); // replaces 1
-	assert (!aCache.has(1));
-	assert (aCache.has(3));
-	assert (*aCache.get(3) == 4);
+	assertTrue (!aCache.has(1));
+	assertTrue (aCache.has(3));
+	assertTrue (*aCache.get(3) == 4);
 
 	aCache.add(5, 6);
-	assert (!aCache.has(1));
-	assert (!aCache.has(3));
-	assert (aCache.has(5));
-	assert (*aCache.get(5) == 6);
+	assertTrue (!aCache.has(1));
+	assertTrue (!aCache.has(3));
+	assertTrue (aCache.has(5));
+	assertTrue (*aCache.get(5) == 6);
 
 	aCache.remove(5);
-	assert (!aCache.has(5));
+	assertTrue (!aCache.has(5));
 
 	// removing illegal entries should work too
 	aCache.remove(666);
@@ -99,37 +99,37 @@ void LRUCacheTest::testCacheSize2()
 	// 3-1|5 -> 5 gets removed
 	LRUCache<int, int> aCache(2);
 	aCache.add(1, 2); // 1
-	assert (aCache.has(1));
-	assert (*aCache.get(1) == 2);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 2);
 
 	aCache.add(3, 4); // 3-1
-	assert (aCache.has(1));
-	assert (aCache.has(3));
-	assert (*aCache.get(1) == 2); // 1-3
-	assert (*aCache.get(3) == 4); // 3-1
+	assertTrue (aCache.has(1));
+	assertTrue (aCache.has(3));
+	assertTrue (*aCache.get(1) == 2); // 1-3
+	assertTrue (*aCache.get(3) == 4); // 3-1
 
 	aCache.add(5, 6); // 5-3|1
-	assert (!aCache.has(1));
-	assert (aCache.has(3));
-	assert (aCache.has(5));
-	assert (*aCache.get(5) == 6);  // 5-3
-	assert (*aCache.get(3) == 4);  // 3-5
+	assertTrue (!aCache.has(1));
+	assertTrue (aCache.has(3));
+	assertTrue (aCache.has(5));
+	assertTrue (*aCache.get(5) == 6);  // 5-3
+	assertTrue (*aCache.get(3) == 4);  // 3-5
 
 	// test remove from the end and the beginning of the list
 	aCache.remove(5); // 3
-	assert (!aCache.has(5));
-	assert (*aCache.get(3) == 4);  // 3
+	assertTrue (!aCache.has(5));
+	assertTrue (*aCache.get(3) == 4);  // 3
 	aCache.add(5, 6); // 5-3
-	assert (*aCache.get(3) == 4);  // 3-5
+	assertTrue (*aCache.get(3) == 4);  // 3-5
 	aCache.remove(3); // 5
-	assert (!aCache.has(3));
-	assert (*aCache.get(5) == 6);  // 5
+	assertTrue (!aCache.has(3));
+	assertTrue (*aCache.get(5) == 6);  // 5
 
 	// removing illegal entries should work too
 	aCache.remove(666);
 
 	aCache.clear();
-	assert (!aCache.has(5));
+	assertTrue (!aCache.has(5));
 }
 
 
@@ -139,48 +139,48 @@ void LRUCacheTest::testCacheSizeN()
 	// 3-1|5 -> 5 gets removed
 	LRUCache<int, int> aCache(3);
 	aCache.add(1, 2); // 1
-	assert (aCache.has(1));
-	assert (*aCache.get(1) == 2);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 2);
 
 	aCache.add(3, 4); // 3-1
-	assert (aCache.has(1));
-	assert (aCache.has(3));
-	assert (*aCache.get(1) == 2); // 1-3
-	assert (*aCache.get(3) == 4); // 3-1
+	assertTrue (aCache.has(1));
+	assertTrue (aCache.has(3));
+	assertTrue (*aCache.get(1) == 2); // 1-3
+	assertTrue (*aCache.get(3) == 4); // 3-1
 
 	aCache.add(5, 6); // 5-3-1
-	assert (aCache.has(1));
-	assert (aCache.has(3));
-	assert (aCache.has(5));
-	assert (*aCache.get(5) == 6);  // 5-3-1
-	assert (*aCache.get(3) == 4);  // 3-5-1
+	assertTrue (aCache.has(1));
+	assertTrue (aCache.has(3));
+	assertTrue (aCache.has(5));
+	assertTrue (*aCache.get(5) == 6);  // 5-3-1
+	assertTrue (*aCache.get(3) == 4);  // 3-5-1
 
 	aCache.add(7, 8); // 7-5-3|1
-	assert (!aCache.has(1));
-	assert (aCache.has(7));
-	assert (aCache.has(3));
-	assert (aCache.has(5));
-	assert (*aCache.get(5) == 6);  // 5-7-3
-	assert (*aCache.get(3) == 4);  // 3-5-7
-	assert (*aCache.get(7) == 8);  // 7-3-5
+	assertTrue (!aCache.has(1));
+	assertTrue (aCache.has(7));
+	assertTrue (aCache.has(3));
+	assertTrue (aCache.has(5));
+	assertTrue (*aCache.get(5) == 6);  // 5-7-3
+	assertTrue (*aCache.get(3) == 4);  // 3-5-7
+	assertTrue (*aCache.get(7) == 8);  // 7-3-5
 
 	// test remove from the end and the beginning of the list
 	aCache.remove(5); // 7-3
-	assert (!aCache.has(5));
-	assert (*aCache.get(3) == 4);  // 3-7
+	assertTrue (!aCache.has(5));
+	assertTrue (*aCache.get(3) == 4);  // 3-7
 	aCache.add(5, 6); // 5-3-7
-	assert (*aCache.get(7) == 8);  // 7-5-3
+	assertTrue (*aCache.get(7) == 8);  // 7-5-3
 	aCache.remove(7); // 5-3
-	assert (!aCache.has(7));
-	assert (aCache.has(3));
-	assert (*aCache.get(5) == 6);  // 5-3
+	assertTrue (!aCache.has(7));
+	assertTrue (aCache.has(3));
+	assertTrue (*aCache.get(5) == 6);  // 5-3
 
 	// removing illegal entries should work too
 	aCache.remove(666);
 
 	aCache.clear();
-	assert (!aCache.has(5));
-	assert (!aCache.has(3));
+	assertTrue (!aCache.has(5));
+	assertTrue (!aCache.has(3));
 }
 
 
@@ -188,11 +188,11 @@ void LRUCacheTest::testDuplicateAdd()
 {
 	LRUCache<int, int> aCache(3);
 	aCache.add(1, 2); // 1
-	assert (aCache.has(1));
-	assert (*aCache.get(1) == 2);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 2);
 	aCache.add(1, 3);
-	assert (aCache.has(1));
-	assert (*aCache.get(1) == 3);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 3);
 }
 
 
@@ -206,18 +206,18 @@ void LRUCacheTest::testUpdate()
 	aCache.Remove += delegate(this, &LRUCacheTest::onRemove);
 	aCache.Update += delegate(this, &LRUCacheTest::onUpdate);
 	aCache.add(1, 2); // 1 ,one add event
-	assert(addCnt == 1);
-	assert(updateCnt == 0);
-	assert(removeCnt == 0);
+	assertTrue (addCnt == 1);
+	assertTrue (updateCnt == 0);
+	assertTrue (removeCnt == 0);
 
-	assert(aCache.has(1));
-	assert(*aCache.get(1) == 2);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 2);
 	aCache.update(1, 3); // one update event only!
-	assert(addCnt == 1);
-	assert(updateCnt == 1);
-	assert(removeCnt == 0);
-	assert(aCache.has(1));
-	assert(*aCache.get(1) == 3);
+	assertTrue (addCnt == 1);
+	assertTrue (updateCnt == 1);
+	assertTrue (removeCnt == 0);
+	assertTrue (aCache.has(1));
+	assertTrue (*aCache.get(1) == 3);
 }
 
 

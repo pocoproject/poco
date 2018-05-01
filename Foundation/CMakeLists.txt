@@ -105,10 +105,6 @@ if(ANDROID)
 	set(SYSLIBS ${SYSLIBS} log)
 endif(ANDROID)
 
-if (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-	set(SYSLIBS ${SYSLIBS} dl rt)
-endif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
-
 # TODO: Why is this here?
 add_definitions( -DPCRE_STATIC)
 
@@ -159,7 +155,7 @@ if(UNIX AND NOT APPLE)
 	endif(NOT HAVE_PTHREAD_SETAFFINITY_NP)
 endif(UNIX AND NOT APPLE)
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS})
+add_library( "${LIBNAME}" ${SRCS})
 add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
 	PROPERTIES
@@ -177,13 +173,21 @@ target_include_directories( "${LIBNAME}"
 	)
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
+if (NOT POCO_ENABLE_WSTRING)
+    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_WSTRING)
+endif()
+
+if (NOT POCO_ENABLE_FPENVIRONMENT)
+    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_FPENVIRONMENT)
+endif()
+
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 
-if (ENABLE_TESTS)
+if (POCO_ENABLE_TESTS)
 	add_subdirectory( testsuite )
 endif ()
-if (ENABLE_SAMPLES)
+if (POCO_ENABLE_SAMPLES)
 	add_subdirectory( samples )
 endif ()
 

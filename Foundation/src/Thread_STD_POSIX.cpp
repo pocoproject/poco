@@ -22,7 +22,7 @@
 		#define __EXTENSIONS__
 	#endif
 #endif
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 	#include <time.h>
 	#include <unistd.h>
 #endif
@@ -31,7 +31,7 @@
 	#include <mach/task.h>
 	#include <mach/thread_policy.h>
 #endif
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	#include <sys/syscall.h>
 #endif
 #include <cstring>
@@ -95,10 +95,6 @@ void ThreadImpl::setPriorityImpl(int prio)
 		if (isRunningImpl())
 		{
 			struct sched_param par;
-			struct MyStruct
-			{
-
-			};
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
 			if (pthread_setschedparam(_pData->thread->native_handle(), SCHED_OTHER, &par))
 				throw SystemException("cannot set thread priority");
@@ -114,7 +110,7 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 		if (_pData->pRunnableTarget)
 		{
 			struct sched_param par;
-			par.sched_priority = prio;
+			par.sched_priority = (policy == SCHED_OTHER) ? 0 : prio;
 			if (pthread_setschedparam(_pData->thread->native_handle(), policy, &par))
 				throw SystemException("cannot set thread priority");
 		}
@@ -158,7 +154,7 @@ void ThreadImpl::setStackSizeImpl(int size)
 
 void ThreadImpl::setAffinityImpl(int cpu)
 {
-#if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X
+#if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X && POCO_OS != POCO_OS_FREE_BSD
 #ifdef HAVE_PTHREAD_SETAFFINITY_NP
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
@@ -195,7 +191,7 @@ void ThreadImpl::setAffinityImpl(int cpu)
 int ThreadImpl::getAffinityImpl() const
 {
 	int cpuSet = -1;
-#if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X
+#if defined (POCO_OS_FAMILY_UNIX) && POCO_OS != POCO_OS_MAC_OS_X && POCO_OS != POCO_OS_FREE_BSD
 #ifdef HAVE_PTHREAD_SETAFFINITY_NP
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);

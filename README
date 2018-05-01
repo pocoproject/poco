@@ -183,8 +183,7 @@ or
 Once you have GNU Make up and running, the rest is quite simple.
 To extract the sources and build all libraries, testsuites and samples, simply
 
-> gunzip poco-X.Y.tar.gz
-> tar -xf poco-X.Y.tar
+> tar -xzf poco-X.Y.tar.gz
 > cd poco-X.Y
 > ./configure
 > gmake -s
