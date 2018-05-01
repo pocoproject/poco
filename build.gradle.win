@@ -808,39 +808,6 @@ subprojects {
 
 		args test
 	}
-/*
-	nugetSpec {
-		nuspec = [
-			metadata: [
-				version:     	$version,
-				id:          	"Pocoproject.Poco.vs150",
-				title:          "Pocoproject Poco vs150 $version $os",
-				owners:			'Guenter Obiltschnig & Aleksandar Fabijanic',
-				authors:        'Applied Informatics & Contributors',
-				projectUrl: 	'https://pocoproject.org/',
-				licenseUrl:		'https://pocoproject.org/license.html',
-				iconUrl:		'https://avatars1.githubusercontent.com/u/201918?v=4&s=200',
-				copyright: 		'Applied Informatics copyright 2018',
-				requireLicenseAcceptance: false,
-				description:	'Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.',
-				tags:			'string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml',
-				dependencies: [
-				]
-			],
-			files: [
-				{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.${os}.targets", 	target: "build\\native") },
-				{ file(src: "$rootDir\\bin\\Poco*.*", 			target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\lib\\Poco*.*",			target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\bin64\\Poco*64.*",		target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\lib64\\Poco*.*",			target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\bin\\Poco*d.*", 			target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\lib\\Poco*d.*",			target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\bin64\\Poco*64d.*",		target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-				{ file(src: "$rootDir\\lib64\\Poco*d.*",		target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") }
-			]
-		]
-	}
-*/
 }
 
 tasks.withType(CppCompile) {
@@ -1063,7 +1030,7 @@ task 'nugetSpec-x64'(type: NuGetSpec) {
 
 task 'nugetPack-x86'(type: NuGetPack) {
 	def Set<Task> pocos = project.getTasksByName('poco', true)
-//TEMP	setDependsOn(pocos)
+	setDependsOn(pocos)
 	destinationDir "$rootDir/packaging/Windows/Nuget"
 	dependsOn 'nugetSpec-x86'
 	nuspecFile = project.tasks.findByPath('nugetSpec-x86').nuspecFile
@@ -1075,7 +1042,7 @@ task 'nugetPack-x86'(type: NuGetPack) {
 }
 task 'nugetPack-x64'(type: NuGetPack) {
 	def Set<Task> pocos = project.getTasksByName('poco', true)
-//TEMP	setDependsOn(pocos)
+	setDependsOn(pocos)
 	destinationDir "$rootDir/packaging/Windows/Nuget"
 	dependsOn 'nugetSpec-x64'
 	nuspecFile = project.tasks.findByPath('nugetSpec-x64').nuspecFile
