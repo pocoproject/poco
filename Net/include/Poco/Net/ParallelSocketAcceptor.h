@@ -185,8 +185,8 @@ protected:
 		/// Returns reactor where this socket is already registered
 		/// for polling, if found; otherwise returns null pointer.
 	{
-		ReactorVec::iterator it = _reactors.begin();
-		ReactorVec::iterator end = _reactors.end();
+		typename ReactorVec::iterator it = _reactors.begin();
+		typename ReactorVec::iterator end = _reactors.end();
 		for (; it != end; ++it)
 		{
 			if ((*it)->has(socket)) return it->get();

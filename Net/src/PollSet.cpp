@@ -114,7 +114,7 @@ public:
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		SocketImpl* sockImpl = socket.impl();
 		return sockImpl &&
-			(_socketMap.find(sockImpl->sockfd()) != _socketMap.end());
+			(_socketMap.find(sockImpl) != _socketMap.end());
 	}
 
 	bool empty() const
