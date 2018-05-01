@@ -166,6 +166,9 @@ public:
 		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.removeEventHandler(obs);
 
+	bool has(const Socket& socket) const;
+		/// Returns true if socket is registered with this rector.
+
 protected:
 	virtual void onTimeout();
 		/// Called if the timeout expires and no other events are available.

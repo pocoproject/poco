@@ -21,6 +21,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/ParallelSocketAcceptor.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"
@@ -79,7 +80,7 @@ public:
 		_socket.connectNB(address);
 	}
 
-	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true):
+	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
 		_pReactor(0)
 		/// Creates a SocketConnector, using the given ServerSocket.
 		///
@@ -205,8 +206,8 @@ private:
 	SocketConnector(const SocketConnector&);
 	SocketConnector& operator = (const SocketConnector&);
 
-	StreamSocket   _socket;
-	SocketReactor* _pReactor;
+	StreamSocket           _socket;
+	SocketReactor*         _pReactor;
 };
 
 
