@@ -89,5 +89,6 @@
     <ClInclude Include="src\pdjson.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\JSON\ParserImpl.h" />
   </ItemGroup>
 </Project>

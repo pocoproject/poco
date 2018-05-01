@@ -36,7 +36,7 @@ void Subsystem::reinitialize(Application& app)
 }
 
 
-void Subsystem::defineOptions(OptionSet& options)
+void Subsystem::defineOptions(OptionSet& /*options*/)
 {
 }
 

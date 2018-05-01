@@ -108,7 +108,7 @@ int ASCIIEncoding::queryConvert(const unsigned char* bytes, int length) const
 }
 
 
-int ASCIIEncoding::sequenceLength(const unsigned char* bytes, int length) const
+int ASCIIEncoding::sequenceLength(const unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 1;
 }

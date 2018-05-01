@@ -169,7 +169,7 @@ int UTF32Encoding::queryConvert(const unsigned char* bytes, int length) const
 }
 
 
-int UTF32Encoding::sequenceLength(const unsigned char* bytes, int length) const
+int UTF32Encoding::sequenceLength(const unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 4;
 }

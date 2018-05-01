@@ -407,7 +407,7 @@ bool AbstractConfiguration::eventsEnabled() const
 }
 
 
-void AbstractConfiguration::removeRaw(const std::string& key)
+void AbstractConfiguration::removeRaw(const std::string& /*key*/)
 {
 	throw Poco::NotImplementedException("removeRaw()");
 }
@@ -437,10 +437,10 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 				std::string prop;
 				while (it != end && *it != '}') prop += *it++;
 				if (it != end) ++it;
-				std::string value;
-				if (getRaw(prop, value))
+				std::string rawValue;
+				if (getRaw(prop, rawValue))
 				{
-					result.append(internalExpand(value));
+					result.append(internalExpand(rawValue));
 				}
 				else
 				{

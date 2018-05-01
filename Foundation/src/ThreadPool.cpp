@@ -567,8 +567,9 @@ public:
 		{
 			_pPool = new ThreadPool("default");
 			_pPool->setAffinityPolicy(affinityPolicy);
-			if (POCO_THREAD_STACK_SIZE > 0)
-				_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
+#if (POCO_THREAD_STACK_SIZE > 0)
+			_pPool->setStackSize(POCO_THREAD_STACK_SIZE);
+#endif
 		}
 		return _pPool;
 	}

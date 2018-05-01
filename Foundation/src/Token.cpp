@@ -30,14 +30,14 @@ Token::~Token()
 }
 
 
-bool Token::start(char c, std::istream& istr)
+bool Token::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return false;
 }
 
 
-void Token::finish(std::istream& istr)
+void Token::finish(std::istream& /*istr*/)
 {
 }
 
@@ -151,7 +151,7 @@ Token::Class WhitespaceToken::tokenClass() const
 }
 
 
-bool WhitespaceToken::start(char c, std::istream& istr)
+bool WhitespaceToken::start(char c, std::istream& /*istr*/)
 {
 	if (Ascii::isSpace(c))
 	{
