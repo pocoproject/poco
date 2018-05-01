@@ -966,11 +966,11 @@ task 'nugetSpec-x86'(type: NuGetSpec) {
 			]
 		],
 		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x86.targets", 	target: "build\\native") },
-			{ file(src: "$rootDir\\bin\\Poco*.*", 			target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*.*",			target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\bin\\Poco*d.*", 			target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*d.*",			target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.x86.targets", 	target: "build\\native") },
+			{ file(src: "$rootDir\\bin\\Poco*.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib\\Poco*.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\bin\\Poco*d.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib\\Poco*d.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
@@ -1001,11 +1001,11 @@ task 'nugetSpec-x64'(type: NuGetSpec) {
 			]
 		],
 		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x86.targets", 	target: "build\\native") },
-			{ file(src: "$rootDir\\bin64\\Poco*64.*",		target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib64\\Poco*.*",			target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\bin64\\Poco*64d.*",		target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib64\\Poco*d.*",		target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.x64.targets", 		target: "build\\native") },
+			{ file(src: "$rootDir\\bin64\\Poco*64.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib64\\Poco*.*",				target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\bin64\\Poco*64d.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib64\\Poco*d.*",			target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
