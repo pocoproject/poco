@@ -124,7 +124,7 @@ namespace
 				_data += _str.str();
 				_str.str("");
 				if ((_once && _data.size() == 1024) ||
-					(!_once && _data.size() == 4096))
+					(!_once && _data.size() == 8192))
 				{
 					_reactor.stop();
 					delete this;
@@ -135,7 +135,7 @@ namespace
 				checkReadableObserverCount(1);
 				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
 				checkReadableObserverCount(0);
-				if (_once || _data.size() == 4096) _reactor.stop();
+				if (_once || _data.size() == 8192) _reactor.stop();
 				delete this;
 			}
 		}
@@ -433,11 +433,16 @@ void SocketReactorTest::testParallelSocketReactor()
 	SocketConnector<ClientServiceHandler> connector2(sa, reactor);
 	SocketConnector<ClientServiceHandler> connector3(sa, reactor);
 	SocketConnector<ClientServiceHandler> connector4(sa, reactor);
+	SocketConnector<ClientServiceHandler> connector5(sa, reactor);
+	SocketConnector<ClientServiceHandler> connector6(sa, reactor);
+	SocketConnector<ClientServiceHandler> connector7(sa, reactor);
+	SocketConnector<ClientServiceHandler> connector8(sa, reactor);
 	ClientServiceHandler::setOnce(false);
 	ClientServiceHandler::resetData();
 	reactor.run();
+	//acceptor.run();
 	std::string data(ClientServiceHandler::data());
-	assertTrue (data.size() == 4096);
+	assertTrue (data.size() == 8192);
 	assertTrue (!ClientServiceHandler::readableError());
 	assertTrue (!ClientServiceHandler::writableError());
 	assertTrue (!ClientServiceHandler::timeoutError());

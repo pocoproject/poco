@@ -116,6 +116,9 @@ void SocketReactor::run()
 bool SocketReactor::hasSocketHandlers()
 {
 	ScopedLock lock(_mutex);
+
+	if (_pollSet.empty()) return false;
+
 	for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
 	{
 		if (it->second->accepts(_pReadableNotification) ||
@@ -216,6 +219,12 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 		pNotifier->removeObserver(this, observer);
 	}
 
+}
+
+
+bool SocketReactor::has(const Socket& socket) const
+{
+	return _pollSet.has(socket);
 }
 
 

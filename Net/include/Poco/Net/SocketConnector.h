@@ -20,6 +20,11 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketNotification.h"
+<<<<<<< HEAD
+=======
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/ParallelSocketAcceptor.h"
+>>>>>>> 0d7f39f... add PollSet::has/empty(); ParallelAcceptor: always use same reactor for a socket, if registered
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"
@@ -70,7 +75,7 @@ class SocketConnector
 	/// Subclasses can override the createServiceHandler() factory method
 	/// if special steps are necessary to create a ServiceHandler object.
 {
-public:		
+public:
 	explicit SocketConnector(SocketAddress& address):
 		_pReactor(0)
 		/// Creates a SocketConnector, using the given Socket.
@@ -78,13 +83,13 @@ public:
 		_socket.connectNB(address);
 	}
 
-	SocketConnector(SocketAddress& address, SocketReactor& reactor):
+	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
 		_pReactor(0)
 		/// Creates an acceptor, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
 		_socket.connectNB(address);
-		registerConnector(reactor);
+		if (doRegister) registerConnector(reactor);
 	}
 
 	virtual ~SocketConnector()
@@ -99,7 +104,7 @@ public:
 			poco_unexpected();
 		}
 	}
-	
+
 	virtual void registerConnector(SocketReactor& reactor)
 		/// Registers the SocketConnector with a SocketReactor.
 		///
@@ -113,7 +118,7 @@ public:
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
 		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 	}
-	
+
 	virtual void unregisterConnector()
 		/// Unregisters the SocketConnector.
 		///
@@ -129,7 +134,7 @@ public:
 			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 		}
 	}
-	
+
 	void onReadable(ReadableNotification* pNotification)
 	{
 		pNotification->release();
@@ -200,7 +205,7 @@ private:
 	SocketConnector();
 	SocketConnector(const SocketConnector&);
 	SocketConnector& operator = (const SocketConnector&);
-	
+
 	StreamSocket   _socket;
 	SocketReactor* _pReactor;
 };
