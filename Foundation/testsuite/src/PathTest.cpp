@@ -1589,8 +1589,8 @@ void PathTest::testFind()
 #if defined(_WIN32_WCE)
 	return;
 #endif
-	bool found = Path::find(Environment::get("PATH"), "cmd.exe", p);
-	bool notfound = Path::find(Environment::get("PATH"), "xxxyyy123.zzz", p);
+	bool found = Path::find(Environment::get("Path"), "cmd.exe", p);
+	bool notfound = Path::find(Environment::get("Path"), "xxxyyy123.zzz", p);
 #else
 	bool found = true;
 	bool notfound = false;

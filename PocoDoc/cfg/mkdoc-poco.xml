@@ -37,7 +37,8 @@
 				-E,
 				-C,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
-				-xc++
+				-DPOCO_NO_WINDOWS_H,
+				-xc++,
 				-std=c++11,
 				-stdlib=libc++
 			</options>
