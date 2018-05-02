@@ -46,6 +46,10 @@ model {
 				linker.args 'odbc32.lib'
 				linker.args 'odbccp32.lib'
 			}
+			if (toolChain in Gcc) {
+                linker.args         ( "-L", "/usr/lib/x86_64-linux-gnu")
+                linker.args         ( "-l", "odbc")
+			}
 		}
         withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
