@@ -59,7 +59,7 @@ unsigned short Entity::nodeType() const
 }
 
 
-Node* Entity::copyNode(bool deep, Document* pOwnerDocument) const
+Node* Entity::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new Entity(pOwnerDocument, *this);
 }

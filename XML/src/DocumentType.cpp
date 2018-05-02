@@ -75,7 +75,7 @@ const XMLString& DocumentType::internalSubset() const
 }
 
 
-Node* DocumentType::copyNode(bool deep, Document* pOwnerDocument) const
+Node* DocumentType::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new DocumentType(pOwnerDocument, *this);
 }

@@ -142,7 +142,7 @@ XMLWriter::~XMLWriter()
 }
 
 
-void XMLWriter::setDocumentLocator(const Locator* loc)
+void XMLWriter::setDocumentLocator(const Locator* /*loc*/)
 {
 }
 
@@ -424,13 +424,13 @@ void XMLWriter::startPrefixMapping(const XMLString& prefix, const XMLString& nam
 }
 
 
-void XMLWriter::endPrefixMapping(const XMLString& prefix)
+void XMLWriter::endPrefixMapping(const XMLString& /*prefix*/)
 {
 	// Note: prefix removed by popContext() at element closing tag
 }
 
 
-void XMLWriter::skippedEntity(const XMLString& name)
+void XMLWriter::skippedEntity(const XMLString& /*name*/)
 {
 }
 
@@ -502,12 +502,12 @@ void XMLWriter::endDTD()
 }
 
 
-void XMLWriter::startEntity(const XMLString& name)
+void XMLWriter::startEntity(const XMLString& /*name*/)
 {
 }
 
 
-void XMLWriter::endEntity(const XMLString& name)
+void XMLWriter::endEntity(const XMLString& /*name*/)
 {
 }
 
@@ -704,7 +704,7 @@ void XMLWriter::closeStartTag()
 }
 
 
-void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
+void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString& /*localName*/, const XMLString& qname, const Attributes& attributes)
 {
 	std::map<XMLString, std::set<XMLString> > usedNamespaces;
 	bool defaultNameSpaceUsed = false;
@@ -743,15 +743,15 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		const std::set<XMLString> namespaceURIs = it->second;
 		for (std::set<XMLString>::const_iterator itURI = namespaceURIs.begin(); itURI != namespaceURIs.end(); ++itURI)
 		{
-			XMLString prefix = it->first;
-			if (prefix.empty())
-				prefix = _namespaces.getPrefix(*itURI);
-			if (prefix.empty() && !_namespaces.isMapped(*itURI))
+			XMLString prefix2 = it->first;
+			if (prefix2.empty())
+				prefix2 = _namespaces.getPrefix(*itURI);
+			if (prefix2.empty() && !_namespaces.isMapped(*itURI))
 			{
 				if (defaultNameSpaceUsed)
 				{
 					if (*itURI != defaultNamespaceURI)
-						prefix = uniquePrefix();
+						prefix2 = uniquePrefix();
 				}
 				else
 				{
@@ -760,10 +760,10 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 				}
 
 			}
-			const XMLString& uri = _namespaces.getURI(prefix);
+			const XMLString& uri = _namespaces.getURI(prefix2);
 			if ((uri.empty() || uri != *itURI) && !itURI->empty())
 			{
-				_namespaces.declarePrefix(prefix, *itURI);
+				_namespaces.declarePrefix(prefix2, *itURI);
 			}
 		}
 	}
@@ -839,7 +839,7 @@ void XMLWriter::addNamespaceAttributes(CanonicalAttributeMap& attributeMap)
 }
 
 
-void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI)
+void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attributes, const XMLString& /*elementNamespaceURI*/)
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
@@ -864,7 +864,7 @@ void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attr
 }
 
 
-void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI)
+void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attributes& attributes, const XMLString& /*elementNamespaceURI*/)
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
