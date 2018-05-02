@@ -159,15 +159,39 @@ public:
 	}
 
 protected:
+	typedef std::vector<typename ParallelReactor::Ptr> ReactorVec;
+
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
+		/// If socket is already registered with a reactor, the new
+		/// ServiceHandler instance is given that reactor; otherwise,
+		/// the next reactor is used. Reactors are rotated in round-robin
+		/// fashion.
 		///
 		/// Subclasses can override this method.
 	{
-		std::size_t next = _next++;
-		if (_next == _reactors.size()) _next = 0;
-		_reactors[next]->wakeUp();
-		return new ServiceHandler(socket, *_reactors[next]);
+		SocketReactor* pReactor = reactor(socket);
+		if (!pReactor)
+		{
+			std::size_t next = _next++;
+			if (_next == _reactors.size()) _next = 0;
+			pReactor = _reactors[next];
+		}
+		pReactor->wakeUp();
+		return new ServiceHandler(socket, *pReactor);
+	}
+
+	SocketReactor* reactor(const Socket& socket)
+		/// Returns reactor where this socket is already registered
+		/// for polling, if found; otherwise returns null pointer.
+	{
+		typename ReactorVec::iterator it = _reactors.begin();
+		typename ReactorVec::iterator end = _reactors.end();
+		for (; it != end; ++it)
+		{
+			if ((*it)->has(socket)) return it->get();
+		}
+		return 0;
 	}
 
 	SocketReactor* reactor()
@@ -194,8 +218,6 @@ protected:
 			_reactors.push_back(new ParallelReactor);
 	}
 
-	typedef std::vector<typename ParallelReactor::Ptr> ReactorVec;
-
 	ReactorVec& reactors()
 		/// Returns reference to vector of reactors.
 	{
@@ -208,8 +230,8 @@ protected:
 		return _reactors.at(idx).get();
 	}
 
-	std::size_t& next()
-		/// Returns reference to the next reactor index.
+	std::size_t next()
+		/// Returns the next reactor index.
 	{
 		return _next;
 	}
