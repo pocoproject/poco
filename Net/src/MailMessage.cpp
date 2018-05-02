@@ -947,7 +947,7 @@ std::string MailMessage::decodeWord(const std::string& charset, char encoding,
 				if (wideChar.size() % 2 == 0)
 				{
 					std::string wcStr(&wideChar[0], wideChar.size());
-					UInt8 char chr = static_cast<UInt8>(NumberParser::parseHex(wcStr));
+					UInt8 chr = static_cast<UInt8>(NumberParser::parseHex(wcStr));
 					wideCharSeq.push_back(chr);
 					if (fromEnc->sequenceLength(&wideCharSeq[0], static_cast<int>(wideCharSeq.size())) > 0)
 					{
