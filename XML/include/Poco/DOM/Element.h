@@ -43,8 +43,6 @@ class XML_API Element: public AbstractContainerNode
 	/// fairly complex sub-tree representing the attribute value.
 {
 public:
-	typedef RefPtr<Element> Ptr;
-
 	const XMLString& tagName() const;
 		/// Returns the name of the element.
 		///
@@ -74,29 +72,32 @@ public:
 	void removeAttribute(const XMLString& name);
 		/// Removes an attribute by name.
 
-	RefPtr<Attr> getAttributeNode(const XMLString& name) const;
+	Attr* getAttributeNode(const XMLString& name) const;
 		/// Retrieves an Attr node by name.
 
-	RefPtr<Attr> setAttributeNode(RefPtr<Attr> newAttr);
+	Attr* setAttributeNode(Attr* newAttr);
 		/// Adds a new attribute. If an attribute with that name is already
 		/// present in the element, it is replaced by the new one.
 
-	RefPtr<Attr> addAttributeNodeNP(RefPtr<Attr> oldAttr, RefPtr<Attr> newAttr);
+	Attr* addAttributeNodeNP(Attr* oldAttr, Attr* newAttr);
 		/// For internal use only.
 		/// Adds a new attribute after oldAttr.
 		/// If oldAttr is 0, newAttr is set as first attribute.
 		/// Returns newAttr.
 		/// Does not fire any events.
 
-	RefPtr<Attr> removeAttributeNode(RefPtr<Attr> oldAttr);
+	Attr* removeAttributeNode(Attr* oldAttr);
 		/// Removes the specified attribute.
 
-	RefPtr<NodeList> getElementsByTagName(const XMLString& name) const;
+	NodeList* getElementsByTagName(const XMLString& name) const;
 		/// Returns a NodeList of all descendant elements with a given tag
 		/// name, in the order in which they would be encountered in a
 		/// preorder traversal of the Element tree.
 		///
 		/// The special name "*" matches all tags.
+		///
+		/// The returned NodeList must be released with a call
+		/// to release() when no longer needed.
 
 	void normalize();
 		/// Puts all Text nodes in the full depth of the sub-tree underneath this Element,
@@ -126,10 +127,10 @@ public:
 	void removeAttributeNS(const XMLString& namespaceURI, const XMLString& localName);
 		/// Removes an attribute by name.
 
-	RefPtr<Attr> getAttributeNodeNS(const XMLString& namespaceURI, const XMLString& localName) const;
+	Attr* getAttributeNodeNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Retrieves an Attr node by name.
 
-	RefPtr<Attr> setAttributeNodeNS(RefPtr<Attr> newAttr);
+	Attr* setAttributeNodeNS(Attr* newAttr);
 		/// Adds a new attribute. If an attribute with that name is already
 		/// present in the element, it is replaced by the new one.
 
@@ -139,11 +140,14 @@ public:
 	bool hasAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true if and only if the element has the specified attribute.
 
-	RefPtr<NodeList> getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const;
+	NodeList* getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns a NodeList of all the descendant Elements with a given local name and namespace URI
 		/// in the order in which they are encountered in a preorder traversal of this Element tree.
 		///
 		/// The special value "*" matches all namespaces, or local names respectively.
+		///
+		/// The returned NodeList must be released with a call
+		/// to release() when no longer needed.
 
 	const XMLString& namespaceURI() const;
 	XMLString prefix() const;
@@ -151,25 +155,25 @@ public:
 	bool hasAttributes() const;
 	XMLString innerText() const;
 
-	Element::Ptr getChildElement(const XMLString& name) const;
+	Element* getChildElement(const XMLString& name) const;
 		/// Returns the first child element with the given name, or null
 		/// if such an element does not exist.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
-	Element::Ptr getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const;
+	Element* getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns the first child element with the given namespaceURI and localName,
 		/// or null if such an element does not exist.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 	
-	Element::Ptr getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
+	Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
 		/// Returns the first Element whose ID attribute (given in idAttribute)
 		/// has the given elementId. If no such element exists, returns null.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
-	Element::Ptr getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
+	Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
 		/// Returns the first Element whose ID attribute (given in idAttributeURI and idAttributeLocalName)
 		/// has the given elementId. If no such element exists, returns null.
 		///
@@ -177,30 +181,22 @@ public:
 	
 	// Node
 	const XMLString& nodeName() const;
-	RefPtr<NamedNodeMap> attributes() const;
+	NamedNodeMap* attributes() const;
 	unsigned short nodeType() const;
 
 protected:
-	Element();
-	Element(const Element&);
-	Element(Element&&);
-	Element& operator=(const Element&);
-	Element& operator=(Element&&);
-	Element(RefPtr<Document>& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
-	Element(RefPtr<Document>& pOwnerDocument, const Element& elem);
+	Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
+	Element(Document* pOwnerDocument, const Element& elem);
 	~Element();
 
-	Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 	void dispatchNodeRemovedFromDocument();
 	void dispatchNodeInsertedIntoDocument();
 
 private:
-	Element(RefPtr<Document>&& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname);
-	Element(RefPtr<Document>&& pOwnerDocument, const Element& element);
-
-	const Name&  _name;
-	RefPtr<Attr> _pFirstAttr;
+	const Name& _name;
+	Attr*       _pFirstAttr;
 
 	friend class Attr;
 	friend class Document;

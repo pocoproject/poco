@@ -14,84 +14,92 @@
 
 #include "Poco/SAX/XMLFilterImpl.h"
 #include "Poco/SAX/SAXException.h"
-#include "Poco/SAX/InputSource.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-XMLFilterImpl::XMLFilterImpl()
+XMLFilterImpl::XMLFilterImpl():
+	_pParent(0),
+	_pEntityResolver(0),
+	_pDTDHandler(0),
+	_pContentHandler(0),
+	_pErrorHandler(0)
 {
 }
 
-
-XMLFilterImpl::XMLFilterImpl(XMLReader::Ptr pParent):
-	_pParent(pParent)
+	
+XMLFilterImpl::XMLFilterImpl(XMLReader* pParent):
+	_pParent(pParent),
+	_pEntityResolver(0),
+	_pDTDHandler(0),
+	_pContentHandler(0),
+	_pErrorHandler(0)
 {
 }
 
-
+	
 XMLFilterImpl::~XMLFilterImpl()
 {
 }
 
 
-XMLReader::Ptr XMLFilterImpl::getParent() const
+XMLReader* XMLFilterImpl::getParent() const
 {
 	return _pParent;
 }
 
 
-void XMLFilterImpl::setParent(XMLReader::Ptr pParent)
+void XMLFilterImpl::setParent(XMLReader* pParent)
 {
 	_pParent = pParent;
 }
 
 
-void XMLFilterImpl::setEntityResolver(EntityResolver::Ptr pResolver)
+void XMLFilterImpl::setEntityResolver(EntityResolver* pResolver)
 {
 	_pEntityResolver = pResolver;
 }
 
 
-EntityResolver::Ptr XMLFilterImpl::getEntityResolver() const
+EntityResolver* XMLFilterImpl::getEntityResolver() const
 {
 	return _pEntityResolver;
 }
 
 
-void XMLFilterImpl::setDTDHandler(DTDHandler::Ptr pDTDHandler)
+void XMLFilterImpl::setDTDHandler(DTDHandler* pDTDHandler)
 {
 	_pDTDHandler = pDTDHandler;
 }
 
 
-DTDHandler::Ptr XMLFilterImpl::getDTDHandler() const
+DTDHandler* XMLFilterImpl::getDTDHandler() const
 {
 	return _pDTDHandler;
 }
 
 
-void XMLFilterImpl::setContentHandler(ContentHandler::Ptr pContentHandler)
+void XMLFilterImpl::setContentHandler(ContentHandler* pContentHandler)
 {
 	_pContentHandler = pContentHandler;
 }
 
 
-ContentHandler::Ptr XMLFilterImpl::getContentHandler() const
+ContentHandler* XMLFilterImpl::getContentHandler() const
 {
 	return _pContentHandler;
 }
 
 
-void XMLFilterImpl::setErrorHandler(ErrorHandler::Ptr pErrorHandler)
+void XMLFilterImpl::setErrorHandler(ErrorHandler* pErrorHandler)
 {
 	_pErrorHandler = pErrorHandler;
 }
 
 
-ErrorHandler::Ptr XMLFilterImpl::getErrorHandler() const
+ErrorHandler* XMLFilterImpl::getErrorHandler() const
 {
 	return _pErrorHandler;
 }
@@ -124,7 +132,7 @@ void XMLFilterImpl::setProperty(const XMLString& propertyId, const XMLString& va
 }
 
 
-void XMLFilterImpl::setProperty(const XMLString& propertyId, SAXHandler::Ptr value)
+void XMLFilterImpl::setProperty(const XMLString& propertyId, void* value)
 {
 	if (_pParent)
 		_pParent->setProperty(propertyId, value);
@@ -133,7 +141,7 @@ void XMLFilterImpl::setProperty(const XMLString& propertyId, SAXHandler::Ptr val
 }
 
 
-SAXHandler::Ptr XMLFilterImpl::getProperty(const XMLString& propertyId) const
+void* XMLFilterImpl::getProperty(const XMLString& propertyId) const
 {
 	if (_pParent)
 		return _pParent->getProperty(propertyId);
@@ -142,7 +150,7 @@ SAXHandler::Ptr XMLFilterImpl::getProperty(const XMLString& propertyId) const
 }
 
 
-void XMLFilterImpl::parse(InputSource::Ptr pSource)
+void XMLFilterImpl::parse(InputSource* pSource)
 {
 	setupParse();
 	_pParent->parse(pSource);
@@ -163,12 +171,19 @@ void XMLFilterImpl::parseMemoryNP(const char* xml, std::size_t size)
 }
 
 
-InputSource::Ptr XMLFilterImpl::resolveEntity(const XMLString* publicId, const XMLString& systemId)
+InputSource* XMLFilterImpl::resolveEntity(const XMLString* publicId, const XMLString& systemId)
 {
 	if (_pEntityResolver)
 		return _pEntityResolver->resolveEntity(publicId, systemId);
 	else
 		return 0;
+}
+
+
+void XMLFilterImpl::releaseInputSource(InputSource* pSource)
+{
+	if (_pEntityResolver)
+		_pEntityResolver->releaseInputSource(pSource);
 }
 
 
@@ -186,7 +201,7 @@ void XMLFilterImpl::unparsedEntityDecl(const XMLString& name, const XMLString* p
 }
 
 
-void XMLFilterImpl::setDocumentLocator(Locator::Ptr loc)
+void XMLFilterImpl::setDocumentLocator(const Locator* loc)
 {
 	if (_pContentHandler)
 		_pContentHandler->setDocumentLocator(loc);
@@ -288,10 +303,10 @@ void XMLFilterImpl::setupParse()
 {
 	poco_check_ptr (_pParent);
 
-	_pParent->setEntityResolver(Ptr(this, true));
-	_pParent->setDTDHandler(Ptr(this, true));
-	_pParent->setContentHandler(Ptr(this, true));
-	_pParent->setErrorHandler(Ptr(this, true));
+	_pParent->setEntityResolver(this);
+	_pParent->setDTDHandler(this);
+	_pParent->setContentHandler(this);
+	_pParent->setErrorHandler(this);
 }
 
 

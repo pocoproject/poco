@@ -43,20 +43,22 @@ class XML_API DefaultHandler: public EntityResolver, public DTDHandler, public C
 	/// class to provide default handlers when the application has not supplied its own.
 {
 public:
-	typedef RefPtr<DefaultHandler> Ptr;
-
 	DefaultHandler();
 		/// Creates the DefaultHandler.
-
+		
+	~DefaultHandler();
+		/// Destroys the DefaultHandler.
+	
 	// EntityResolver
-	RefPtr<InputSource> resolveEntity(const XMLString* publicId, const XMLString& systemId);
-
+	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);
+	void releaseInputSource(InputSource* pSource);
+	
 	// DTDHandler
 	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId);
 	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
 
 	// ContentHandler
-	void setDocumentLocator(Locator::Ptr loc);
+	void setDocumentLocator(const Locator* loc);
 	void startDocument();
 	void endDocument();
 	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
@@ -72,11 +74,6 @@ public:
 	void warning(const SAXException& exc);
 	void error(const SAXException& exc);
 	void fatalError(const SAXException& exc);
-
-protected:
-
-	~DefaultHandler();
-		/// Destroys the DefaultHandler.
 };
 
 

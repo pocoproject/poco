@@ -22,19 +22,19 @@ namespace
 	class DispatchGuard
 	{
 	public:
-		DispatchGuard(std::atomic<int>& count):
+		DispatchGuard(int& count):
 			_count(count)
 		{
 			++_count;
 		}
-
+		
 		~DispatchGuard()
 		{
 			--_count;
 		}
 		
 	private:
-		std::atomic<int>& _count;
+		int& _count;
 	};
 }
 
@@ -48,13 +48,13 @@ EventDispatcher::EventDispatcher():
 {
 }
 
-
+	
 EventDispatcher::~EventDispatcher()
 {
 }
 
 
-void EventDispatcher::addEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture)
+void EventDispatcher::addEventListener(const XMLString& type, EventListener* listener, bool useCapture)
 {
 	EventListenerItem item;
 	item.type       = type;
@@ -64,7 +64,7 @@ void EventDispatcher::addEventListener(const XMLString& type, EventListener::Ptr
 }
 
 
-void EventDispatcher::removeEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture)
+void EventDispatcher::removeEventListener(const XMLString& type, EventListener* listener, bool useCapture)
 {
 	EventListenerList::iterator it = _listeners.begin();
 	while (it != _listeners.end())
@@ -83,7 +83,7 @@ void EventDispatcher::removeEventListener(const XMLString& type, EventListener::
 }
 
 
-void EventDispatcher::dispatchEvent(Event::Ptr evt)
+void EventDispatcher::dispatchEvent(Event* evt)
 {
 	DispatchGuard guard(_inDispatch);
 	EventListenerList::iterator it = _listeners.begin();
@@ -103,7 +103,7 @@ void EventDispatcher::dispatchEvent(Event::Ptr evt)
 }
 
 
-void EventDispatcher::captureEvent(Event::Ptr evt)
+void EventDispatcher::captureEvent(Event* evt)
 {
 	DispatchGuard guard(_inDispatch);
 	EventListenerList::iterator it = _listeners.begin();
@@ -123,7 +123,7 @@ void EventDispatcher::captureEvent(Event::Ptr evt)
 }
 
 
-void EventDispatcher::bubbleEvent(Event::Ptr evt)
+void EventDispatcher::bubbleEvent(Event* evt)
 {
 	DispatchGuard guard(_inDispatch);
 	EventListenerList::iterator it = _listeners.begin();

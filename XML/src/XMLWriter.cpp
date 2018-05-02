@@ -142,7 +142,7 @@ XMLWriter::~XMLWriter()
 }
 
 
-void XMLWriter::setDocumentLocator(const Locator::Ptr loc)
+void XMLWriter::setDocumentLocator(const Locator* loc)
 {
 }
 

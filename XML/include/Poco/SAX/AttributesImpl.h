@@ -50,7 +50,7 @@ public:
 
 	AttributesImpl();
 		/// Creates the AttributesImpl.
-
+		
 	AttributesImpl(const Attributes& attributes);
 		/// Creates the AttributesImpl by copying another one.
 
@@ -150,7 +150,7 @@ public:
 	iterator end() const;
 		/// Iterator support.
 
-protected:
+protected:	
 	Attribute* find(const XMLString& qname) const;
 	Attribute* find(const XMLString& namespaceURI, const XMLString& localName) const;
 

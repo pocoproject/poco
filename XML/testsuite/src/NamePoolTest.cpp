@@ -13,12 +13,12 @@
 #include "Poco/CppUnit/TestSuite.h"
 #include "Poco/XML/NamePool.h"
 #include "Poco/XML/Name.h"
-#include "Poco/RefPtr.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
 using Poco::XML::NamePool;
 using Poco::XML::Name;
-using Poco::RefPtr;
+using Poco::XML::AutoPtr;
 
 
 NamePoolTest::NamePoolTest(const std::string& name): CppUnit::TestCase(name)
@@ -33,7 +33,7 @@ NamePoolTest::~NamePoolTest()
 
 void NamePoolTest::testNamePool()
 {
-	RefPtr<NamePool> pool = new NamePool;
+	AutoPtr<NamePool> pool = new NamePool;
 	const Name* pName = 0;
 	Name name("pre:local", "http://www.appinf.com");
 	

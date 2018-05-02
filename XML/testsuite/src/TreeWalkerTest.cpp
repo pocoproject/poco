@@ -16,7 +16,7 @@
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Text.h"
-#include "Poco/RefPtr.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
 using Poco::XML::TreeWalker;
@@ -25,7 +25,7 @@ using Poco::XML::Element;
 using Poco::XML::Document;
 using Poco::XML::Text;
 using Poco::XML::Node;
-using Poco::RefPtr;
+using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
 
 
@@ -33,28 +33,24 @@ namespace
 {
 	class RejectNodeFilter: public NodeFilter
 	{
-		short acceptNode(Node::Ptr node) const
+		short acceptNode(Node* node)
 		{
 			if (node->nodeType() != Node::ELEMENT_NODE || node->innerText() == "text1" || node->nodeName() == "root")
 				return NodeFilter::FILTER_ACCEPT;
 			else
 				return NodeFilter::FILTER_REJECT;
 		}
-
-		~RejectNodeFilter() {}
 	};
 
 	class SkipNodeFilter: public NodeFilter
 	{
-		short acceptNode(Node::Ptr node) const
+		short acceptNode(Node* node)
 		{
 			if (node->nodeType() != Node::ELEMENT_NODE || node->innerText() == "text1")
 				return NodeFilter::FILTER_ACCEPT;
 			else
 				return NodeFilter::FILTER_SKIP;
 		}
-
-		~SkipNodeFilter() {}
 	};
 }
 
@@ -71,220 +67,220 @@ TreeWalkerTest::~TreeWalkerTest()
 
 void TreeWalkerTest::testShowAll()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pRoot = pDoc->createElement("root");
-	RefPtr<Element> pElem1 = pDoc->createElement("elem");
-	RefPtr<Element> pElem2 = pDoc->createElement("elem");
-	RefPtr<Text> pText1 = pDoc->createTextNode("text1");
-	RefPtr<Text> pText2 = pDoc->createTextNode("text2");
-
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
+	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
+	
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-
+	
 	TreeWalker it(pRoot, NodeFilter::SHOW_ALL);
-
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.nextNode().cast<Element>() == pElem1);
-	assertTrue (it.nextNode().cast<Text>() == pText1);
-	assertTrue (it.nextNode().cast<Element>() == pElem2);
-	assertTrue (it.nextNode().cast<Text>() == pText2);
-	assertTrue (it.nextNode().isNull());
-
-	assertTrue (it.currentNode().cast<Text>() == pText2);
-	assertTrue (it.previousNode().cast<Element>() == pElem2);
-	assertTrue (it.previousNode().cast<Text>() == pText1);
-	assertTrue (it.previousNode().cast<Element>() == pElem1);
-	assertTrue (it.previousNode().cast<Element>() == pRoot);
-	assertTrue (it.previousNode().isNull());
-
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.parentNode().isNull());
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.firstChild().cast<Element>() == pElem1);
-	assertTrue (it.parentNode().cast<Element>() == pRoot);
-	assertTrue (it.lastChild().cast<Element>() == pElem2);
-	assertTrue (it.previousSibling().cast<Element>() == pElem1);
-	assertTrue (it.previousSibling().isNull());
-	assertTrue (it.currentNode().cast<Element>() == pElem1);
-	assertTrue (it.nextSibling().cast<Element>() == pElem2);
-	assertTrue (it.nextSibling().isNull());
-	assertTrue (it.currentNode().cast<Element>() == pElem2);
-	assertTrue (it.firstChild().cast<Text>() == pText2);
-	assertTrue (it.nextSibling().isNull());
-	assertTrue (it.previousSibling().isNull());
-	assertTrue (it.parentNode().cast<Element>() == pElem2);
-	assertTrue (it.lastChild().cast<Text>() == pText2);
+	
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.nextNode() == pElem1);
+	assertTrue (it.nextNode() == pText1);
+	assertTrue (it.nextNode() == pElem2);
+	assertTrue (it.nextNode() == pText2);
+	assertTrue (it.nextNode() == 0);
+	
+	assertTrue (it.currentNode() == pText2);
+	assertTrue (it.previousNode() == pElem2);
+	assertTrue (it.previousNode() == pText1);
+	assertTrue (it.previousNode() == pElem1);
+	assertTrue (it.previousNode() == pRoot);
+	assertTrue (it.previousNode() == 0);
+	
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.parentNode() == 0);
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.firstChild() == pElem1);
+	assertTrue (it.parentNode() == pRoot);
+	assertTrue (it.lastChild() == pElem2);
+	assertTrue (it.previousSibling() == pElem1);
+	assertTrue (it.previousSibling() == 0);
+	assertTrue (it.currentNode() == pElem1);
+	assertTrue (it.nextSibling() == pElem2);
+	assertTrue (it.nextSibling() == 0);
+	assertTrue (it.currentNode() == pElem2);
+	assertTrue (it.firstChild() == pText2);
+	assertTrue (it.nextSibling() == 0);
+	assertTrue (it.previousSibling() == 0);
+	assertTrue (it.parentNode() == pElem2);
+	assertTrue (it.lastChild() == pText2);
 }
 
 
 void TreeWalkerTest::testShowElements()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pRoot = pDoc->createElement("root");
-	RefPtr<Element> pElem1 = pDoc->createElement("elem");
-	RefPtr<Element> pElem2 = pDoc->createElement("elem");
-	RefPtr<Text> pText1 = pDoc->createTextNode("text1");
-	RefPtr<Text> pText2 = pDoc->createTextNode("text2");
-
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
+	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
+	
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-
+	
 	TreeWalker it(pRoot, NodeFilter::SHOW_ELEMENT);
-
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.nextNode().cast<Element>() == pElem1);
-	assertTrue (it.nextNode().cast<Element>() == pElem2);
-	assertTrue (it.nextNode().isNull());
-
-	assertTrue (it.currentNode().cast<Element>() == pElem2);
-	assertTrue (it.previousNode().cast<Element>() == pElem1);
-	assertTrue (it.previousNode().cast<Element>() == pRoot);
-	assertTrue (it.previousNode().isNull());
-
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.parentNode().isNull());
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.firstChild().cast<Element>() == pElem1);
-	assertTrue (it.parentNode().cast<Element>() == pRoot);
-	assertTrue (it.lastChild().cast<Element>() == pElem2);
-	assertTrue (it.firstChild().isNull());
-	assertTrue (it.currentNode().cast<Element>() == pElem2);
-	assertTrue (it.lastChild().isNull());
-	assertTrue (it.currentNode().cast<Element>() == pElem2);
-	assertTrue (it.previousSibling().cast<Element>() == pElem1);
-	assertTrue (it.firstChild().isNull());
-	assertTrue (it.lastChild().isNull());
-	assertTrue (it.parentNode().cast<Element>() == pRoot);
+	
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.nextNode() == pElem1);
+	assertTrue (it.nextNode() == pElem2);
+	assertTrue (it.nextNode() == 0);
+	
+	assertTrue (it.currentNode() == pElem2);
+	assertTrue (it.previousNode() == pElem1);
+	assertTrue (it.previousNode() == pRoot);
+	assertTrue (it.previousNode() == 0);
+	
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.parentNode() == 0);
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.firstChild() == pElem1);
+	assertTrue (it.parentNode() == pRoot);
+	assertTrue (it.lastChild() == pElem2);
+	assertTrue (it.firstChild() == 0);
+	assertTrue (it.currentNode() == pElem2);
+	assertTrue (it.lastChild() == 0);
+	assertTrue (it.currentNode() == pElem2);
+	assertTrue (it.previousSibling() == pElem1);
+	assertTrue (it.firstChild() == 0);
+	assertTrue (it.lastChild() == 0);
+	assertTrue (it.parentNode() == pRoot);
 }
 
 
 void TreeWalkerTest::testFilter()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pRoot = pDoc->createElement("root");
-	RefPtr<Element> pElem1 = pDoc->createElement("elem");
-	RefPtr<Element> pElem2 = pDoc->createElement("elem");
-	RefPtr<Text> pText1 = pDoc->createTextNode("text1");
-	RefPtr<Text> pText2 = pDoc->createTextNode("text2");
-
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
+	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
+	
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
+	
+	SkipNodeFilter skipFilter;
+	TreeWalker it1(pRoot, NodeFilter::SHOW_ELEMENT, &skipFilter);
+	
+	assertTrue (it1.nextNode() == pElem1);
+	assertTrue (it1.nextNode() == 0);
+	
+	assertTrue (it1.currentNode() == pElem1);
+	assertTrue (it1.previousNode() == 0);
+	
+	assertTrue (it1.parentNode() == 0);
+	assertTrue (it1.firstChild() == 0);
+	assertTrue (it1.lastChild() == 0);
+	assertTrue (it1.nextSibling() == 0);
+	assertTrue (it1.previousSibling() == 0);
 
-	SkipNodeFilter::Ptr skipFilter = new SkipNodeFilter;
-	TreeWalker it1(pRoot, NodeFilter::SHOW_ELEMENT, skipFilter);
+	TreeWalker it2(pRoot, NodeFilter::SHOW_ALL, &skipFilter);
+	
+	assertTrue (it2.nextNode() == pElem1);
+	assertTrue (it2.nextNode() == pText1);
+	assertTrue (it2.nextNode() == pText2);
+	assertTrue (it2.nextNode() == 0);
+	
+	assertTrue (it2.currentNode() == pText2);
+	assertTrue (it2.previousNode() == pText1);
+	assertTrue (it2.previousNode() == pElem1);
+	assertTrue (it2.previousNode() == 0);
+	
+	assertTrue (it2.currentNode() == pElem1);
+	assertTrue (it2.parentNode() == 0);
+	assertTrue (it2.nextSibling() == 0);
+	assertTrue (it2.previousSibling() == 0);
+	assertTrue (it2.firstChild() == pText1);
+	assertTrue (it2.nextSibling() == 0);
+	assertTrue (it2.previousSibling() == 0);
+	assertTrue (it2.parentNode() == pElem1);
 
-	assertTrue (it1.nextNode().cast<Element>() == pElem1);
-	assertTrue (it1.nextNode().isNull());
+	RejectNodeFilter rejectFilter;
+	TreeWalker it3(pRoot, NodeFilter::SHOW_ELEMENT, &rejectFilter);
+	
+	assertTrue (it3.nextNode() == pElem1);
+	assertTrue (it3.nextNode() == 0);
+	
+	assertTrue (it3.currentNode() == pElem1);
+	assertTrue (it3.previousNode() == pRoot);
+	assertTrue (it3.previousNode() == 0);
+	
+	assertTrue (it3.currentNode() == pRoot);
+	assertTrue (it3.parentNode() == 0);
+	assertTrue (it3.firstChild() == pElem1);
+	assertTrue (it3.nextSibling() == 0);
+	assertTrue (it3.previousSibling() == 0);
+	assertTrue (it3.parentNode() == pRoot);
+	assertTrue (it3.lastChild() == pElem1);
 
-	assertTrue (it1.currentNode().cast<Element>() == pElem1);
-	assertTrue (it1.previousNode().isNull());
-
-	assertTrue (it1.parentNode().isNull());
-	assertTrue (it1.firstChild().isNull());
-	assertTrue (it1.lastChild().isNull());
-	assertTrue (it1.nextSibling().isNull());
-	assertTrue (it1.previousSibling().isNull());
-
-	TreeWalker it2(pRoot, NodeFilter::SHOW_ALL, skipFilter);
-
-	assertTrue (it2.nextNode().cast<Element>() == pElem1);
-	assertTrue (it2.nextNode().cast<Text>() == pText1);
-	assertTrue (it2.nextNode().cast<Text>() == pText2);
-	assertTrue (it2.nextNode().isNull());
-
-	assertTrue (it2.currentNode().cast<Text>() == pText2);
-	assertTrue (it2.previousNode().cast<Text>() == pText1);
-	assertTrue (it2.previousNode().cast<Element>() == pElem1);
-	assertTrue (it2.previousNode().isNull());
-
-	assertTrue (it2.currentNode().cast<Element>() == pElem1);
-	assertTrue (it2.parentNode().isNull());
-	assertTrue (it2.nextSibling().isNull());
-	assertTrue (it2.previousSibling().isNull());
-	assertTrue (it2.firstChild().cast<Text>() == pText1);
-	assertTrue (it2.nextSibling().isNull());
-	assertTrue (it2.previousSibling().isNull());
-	assertTrue (it2.parentNode().cast<Element>() == pElem1);
-
-	RejectNodeFilter::Ptr rejectFilter = new RejectNodeFilter;
-	TreeWalker it3(pRoot, NodeFilter::SHOW_ELEMENT, rejectFilter);
-
-	assertTrue (it3.nextNode().cast<Element>() == pElem1);
-	assertTrue (it3.nextNode().isNull());
-
-	assertTrue (it3.currentNode().cast<Element>() == pElem1);
-	assertTrue (it3.previousNode().cast<Element>() == pRoot);
-	assertTrue (it3.previousNode().isNull());
-
-	assertTrue (it3.currentNode().cast<Element>() == pRoot);
-	assertTrue (it3.parentNode().isNull());
-	assertTrue (it3.firstChild().cast<Element>() == pElem1);
-	assertTrue (it3.nextSibling().isNull());
-	assertTrue (it3.previousSibling().isNull());
-	assertTrue (it3.parentNode().cast<Element>() == pRoot);
-	assertTrue (it3.lastChild().cast<Element>() == pElem1);
-
-	TreeWalker it4(pRoot, NodeFilter::SHOW_ALL, rejectFilter);
-
-	assertTrue (it4.nextNode().cast<Element>() == pElem1);
-	assertTrue (it4.nextNode().cast<Text>() == pText1);
-	assertTrue (it4.nextNode().isNull());
-
-	assertTrue (it4.currentNode().cast<Text>() == pText1);
-	assertTrue (it4.previousNode().cast<Element>() == pElem1);
-	assertTrue (it4.previousNode().cast<Element>() == pRoot);
-	assertTrue (it4.previousNode().isNull());
-
-	assertTrue (it4.currentNode().cast<Element>() == pRoot);
-	assertTrue (it4.parentNode().isNull());
-	assertTrue (it4.firstChild().cast<Element>() == pElem1);
-	assertTrue (it4.firstChild().cast<Text>() == pText1);
-	assertTrue (it4.nextSibling().isNull());
-	assertTrue (it4.previousSibling().isNull());
-	assertTrue (it4.parentNode().cast<Element>() == pElem1);
-	assertTrue (it4.lastChild().cast<Text>() == pText1);
-	assertTrue (it4.parentNode().cast<Element>() == pElem1);
-	assertTrue (it4.nextSibling().isNull());
-	assertTrue (it4.previousSibling().isNull());
-	assertTrue (it4.parentNode().cast<Element>() == pRoot);
+	TreeWalker it4(pRoot, NodeFilter::SHOW_ALL, &rejectFilter);
+	
+	assertTrue (it4.nextNode() == pElem1);
+	assertTrue (it4.nextNode() == pText1);
+	assertTrue (it4.nextNode() == 0);
+	
+	assertTrue (it4.currentNode() == pText1);
+	assertTrue (it4.previousNode() == pElem1);
+	assertTrue (it4.previousNode() == pRoot);
+	assertTrue (it4.previousNode() == 0);
+	
+	assertTrue (it4.currentNode() == pRoot);
+	assertTrue (it4.parentNode() == 0);
+	assertTrue (it4.firstChild() == pElem1);
+	assertTrue (it4.firstChild() == pText1);
+	assertTrue (it4.nextSibling() == 0);
+	assertTrue (it4.previousSibling() == 0);
+	assertTrue (it4.parentNode() == pElem1);
+	assertTrue (it4.lastChild() == pText1);
+	assertTrue (it4.parentNode() == pElem1);
+	assertTrue (it4.nextSibling() == 0);
+	assertTrue (it4.previousSibling() == 0);
+	assertTrue (it4.parentNode() == pRoot);
 }
 
 
 void TreeWalkerTest::testShowNothing()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pRoot = pDoc->createElement("root");
-	RefPtr<Element> pElem1 = pDoc->createElement("elem");
-	RefPtr<Element> pElem2 = pDoc->createElement("elem");
-	RefPtr<Text> pText1 = pDoc->createTextNode("text1");
-	RefPtr<Text> pText2 = pDoc->createTextNode("text2");
-
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("root");
+	AutoPtr<Element> pElem1 = pDoc->createElement("elem");
+	AutoPtr<Element> pElem2 = pDoc->createElement("elem");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("text1");
+	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
+	
 	pElem1->appendChild(pText1);
 	pElem2->appendChild(pText2);
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);
 	pDoc->appendChild(pRoot);
-
+	
 	TreeWalker it(pRoot, 0);
-
-	assertTrue (it.nextNode().isNull());
-
-	assertTrue (it.previousNode().isNull());
-
-	assertTrue (it.currentNode().cast<Element>() == pRoot);
-	assertTrue (it.firstChild().isNull());
-	assertTrue (it.lastChild().isNull());
-	assertTrue (it.nextSibling().isNull());
-	assertTrue (it.previousSibling().isNull());
+	
+	assertTrue (it.nextNode() == 0);
+	
+	assertTrue (it.previousNode() == 0);
+	
+	assertTrue (it.currentNode() == pRoot);
+	assertTrue (it.firstChild() == 0);
+	assertTrue (it.lastChild() == 0);
+	assertTrue (it.nextSibling() == 0);
+	assertTrue (it.previousSibling() == 0);
 }
 
 

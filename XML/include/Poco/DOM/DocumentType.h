@@ -19,7 +19,6 @@
 
 
 #include "Poco/XML/XML.h"
-//#include "Poco/DOM/Document.h"
 #include "Poco/DOM/AbstractContainerNode.h"
 
 
@@ -40,13 +39,11 @@ class XML_API DocumentType: public AbstractContainerNode
 	/// The DOM Level 1 doesn't support editing DocumentType nodes.
 {
 public:
-	typedef RefPtr<DocumentType> Ptr;
-
 	const XMLString& name() const;
 		/// The name of the DTD; i.e., the name immediately following the
 		/// DOCTYPE keyword.
 
-	RefPtr<NamedNodeMap> entities() const;
+	NamedNodeMap* entities() const;
 		/// A NamedNodeMap containing the general entities,
 		/// both external and internal, declared in the DTD.
 		/// Duplicates are discarded.
@@ -55,12 +52,18 @@ public:
 		/// external entities are reported.
 		/// Every node in this map also implements the
 		/// Entity interface.
+		///
+		/// The returned NamedNodeMap must be released with a call
+		/// to release() when no longer needed.
 
-	RefPtr<NamedNodeMap> notations() const;
+	NamedNodeMap* notations() const;
 		/// A NamedNodeMap containing the notations declared in the DTD. Duplicates
 		/// are discarded. Every node in this map also implements the Notation interface.
 		/// The DOM Level 1 does not support editing notations, therefore notations
 		/// cannot be altered in any way.
+		///
+		/// The returned NamedNodeMap must be released with a call
+		/// to release() when no longer needed.
 
 	// DOM Level 2
 	const XMLString& publicId() const;
@@ -78,11 +81,11 @@ public:
 	unsigned short nodeType() const;
 
 protected:
-	DocumentType(RefPtr<Document> pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
-	DocumentType(RefPtr<Document> pOwner, const DocumentType& dt);
+	DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
+	DocumentType(Document* pOwner, const DocumentType& dt);
 	~DocumentType();
 
-	Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	XMLString _name;

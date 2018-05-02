@@ -22,7 +22,7 @@ namespace XML {
 const XMLString Entity::NODE_NAME = toXMLString("#entity");
 
 
-Entity::Entity(Document::Ptr pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName):
+Entity::Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName):
 	AbstractContainerNode(pOwnerDocument),
 	_name(name),
 	_publicId(publicId),
@@ -32,8 +32,8 @@ Entity::Entity(Document::Ptr pOwnerDocument, const XMLString& name, const XMLStr
 }
 
 
-Entity::Entity(Document::Ptr pOwnerDocument, const Entity& entity):
-	AbstractContainerNode(pOwnerDocument),
+Entity::Entity(Document* pOwnerDocument, const Entity& entity):
+	AbstractContainerNode(pOwnerDocument, entity),
 	_name(entity._name),
 	_publicId(entity._publicId),
 	_systemId(entity._systemId),
@@ -59,7 +59,7 @@ unsigned short Entity::nodeType() const
 }
 
 
-Node::Ptr Entity::copyNode(bool deep, Document::Ptr pOwnerDocument) const
+Node* Entity::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	return new Entity(pOwnerDocument, *this);
 }

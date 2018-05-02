@@ -21,11 +21,13 @@ namespace Poco {
 namespace XML {
 
 
-NodeAppender::NodeAppender(Element::Ptr parent):
-	_pParent(parent)
+NodeAppender::NodeAppender(Element* parent):
+	_pParent(parent),
+	_pLast(0)
 {
-	poco_check_ptr (!_pParent.isNull());
-	_pLast = _pParent->lastChild().cast<AbstractNode>();
+	poco_check_ptr (parent);
+
+	_pLast = static_cast<AbstractNode*>(_pParent->lastChild());
 }
 
 
@@ -34,16 +36,18 @@ NodeAppender::~NodeAppender()
 }
 
 
-void NodeAppender::appendChild(Node::Ptr newChild)
+void NodeAppender::appendChild(Node* newChild)
 {
-	if (newChild.unsafeCast<AbstractNode>()->_pOwner != _pParent->_pOwner)
-		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
+	poco_check_ptr (newChild);
+	poco_assert (_pLast == 0 || _pLast->_pNext == 0);
 
-	Element::Ptr pParent = _pParent;
+	if (static_cast<AbstractNode*>(newChild)->_pOwner != _pParent->_pOwner)
+		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
+		
 	if (newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
 	{
-		AbstractContainerNode::Ptr pFrag = newChild.unsafeCast<AbstractContainerNode>();
-		AbstractNode::Ptr pChild = pFrag->_pFirstChild;
+		AbstractContainerNode* pFrag = static_cast<AbstractContainerNode*>(newChild);
+		AbstractNode* pChild = pFrag->_pFirstChild;
 		if (pChild)
 		{
 			if (_pLast)
@@ -53,7 +57,7 @@ void NodeAppender::appendChild(Node::Ptr newChild)
 			while (pChild)
 			{
 				_pLast = pChild;
-				pChild->_pParent = pParent;
+				pChild->_pParent = _pParent;
 				pChild = pChild->_pNext;
 			}
 			pFrag->_pFirstChild = 0;
@@ -61,10 +65,11 @@ void NodeAppender::appendChild(Node::Ptr newChild)
 	}
 	else
 	{
-		AbstractNode::Ptr pAN = newChild.unsafeCast<AbstractNode>();
+		AbstractNode* pAN = static_cast<AbstractNode*>(newChild);
+		pAN->duplicate();
 		if (pAN->_pParent)
 			pAN->_pParent->removeChild(pAN);
-		pAN->_pParent = pParent;
+		pAN->_pParent = _pParent;
 		if (_pLast)
 			_pLast->_pNext = pAN;
 		else

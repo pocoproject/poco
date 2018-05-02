@@ -16,12 +16,6 @@
 #include "Poco/SAX/SAXException.h"
 #include "Poco/SAX/EntityResolverImpl.h"
 #include "Poco/SAX/InputSource.h"
-#include "Poco/SAX/SAXHandler.h"
-#include "Poco/SAX/DTDHandler.h"
-#include "Poco/SAX/ContentHandler.h"
-#include "Poco/SAX/ErrorHandler.h"
-#include "Poco/SAX/DeclHandler.h"
-#include "Poco/SAX/LexicalHandler.h"
 #include "Poco/XML/NamespaceStrategy.h"
 #include <sstream>
 
@@ -34,7 +28,6 @@ const XMLString SAXParser::FEATURE_PARTIAL_READS = toXMLString("http://www.appin
 
 
 SAXParser::SAXParser():
-	_pEngine(new ParserEngine),
 	_namespaces(true),
 	_namespacePrefixes(false)
 {
@@ -42,7 +35,7 @@ SAXParser::SAXParser():
 
 
 SAXParser::SAXParser(const XMLString& encoding):
-	_pEngine(new ParserEngine(encoding)),
+	_engine(encoding),
 	_namespaces(true),
 	_namespacePrefixes(false)
 {
@@ -56,67 +49,67 @@ SAXParser::~SAXParser()
 
 void SAXParser::setEncoding(const XMLString& encoding)
 {
-	_pEngine->setEncoding(encoding);
+	_engine.setEncoding(encoding);
 }
 
-
+	
 const XMLString& SAXParser::getEncoding() const
 {
-	return _pEngine->getEncoding();
+	return _engine.getEncoding();
 }
 
 
 void SAXParser::addEncoding(const XMLString& name, Poco::TextEncoding* pEncoding)
 {
-	_pEngine->addEncoding(name, pEncoding);
+	_engine.addEncoding(name, pEncoding);
 }
 
 
-void SAXParser::setEntityResolver(EntityResolver::Ptr pResolver)
+void SAXParser::setEntityResolver(EntityResolver* pResolver)
 {
-	_pEngine->setEntityResolver(pResolver);
+	_engine.setEntityResolver(pResolver);
 }
 
 
-EntityResolver::Ptr SAXParser::getEntityResolver() const
+EntityResolver* SAXParser::getEntityResolver() const
 {
-	return _pEngine->getEntityResolver();
+	return _engine.getEntityResolver();
 }
 
 
-void SAXParser::setDTDHandler(DTDHandler::Ptr pDTDHandler)
+void SAXParser::setDTDHandler(DTDHandler* pDTDHandler)
 {
-	_pEngine->setDTDHandler(pDTDHandler);
+	_engine.setDTDHandler(pDTDHandler);
 }
 
 
-DTDHandler::Ptr SAXParser::getDTDHandler() const
+DTDHandler* SAXParser::getDTDHandler() const
 {
-	return _pEngine->getDTDHandler();
+	return _engine.getDTDHandler();
 }
 
 
-void SAXParser::setContentHandler(ContentHandler::Ptr pContentHandler)
+void SAXParser::setContentHandler(ContentHandler* pContentHandler)
 {
-	_pEngine->setContentHandler(pContentHandler);
+	_engine.setContentHandler(pContentHandler);
 }
 
 
-ContentHandler::Ptr SAXParser::getContentHandler() const
+ContentHandler* SAXParser::getContentHandler() const
 {
-	return _pEngine->getContentHandler();
+	return _engine.getContentHandler();
 }
 
 
-void SAXParser::setErrorHandler(ErrorHandler::Ptr pErrorHandler)
+void SAXParser::setErrorHandler(ErrorHandler* pErrorHandler)
 {
-	_pEngine->setErrorHandler(pErrorHandler);
+	_engine.setErrorHandler(pErrorHandler);
 }
 
 
-ErrorHandler::Ptr SAXParser::getErrorHandler() const
+ErrorHandler* SAXParser::getErrorHandler() const
 {
-	return _pEngine->getErrorHandler();
+	return _engine.getErrorHandler();
 }
 
 
@@ -125,15 +118,15 @@ void SAXParser::setFeature(const XMLString& featureId, bool state)
 	if (featureId == XMLReader::FEATURE_VALIDATION || featureId == XMLReader::FEATURE_STRING_INTERNING)
 		throw SAXNotSupportedException(fromXMLString(XMLReader::FEATURE_VALIDATION));
 	else if (featureId == XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES)
-		_pEngine->setExternalGeneralEntities(state);
+		_engine.setExternalGeneralEntities(state);
 	else if (featureId == XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES)
-		_pEngine->setExternalParameterEntities(state);
+		_engine.setExternalParameterEntities(state);
 	else if (featureId == XMLReader::FEATURE_NAMESPACES)
 		_namespaces = state;
 	else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
 		_namespacePrefixes = state;
 	else if (featureId == FEATURE_PARTIAL_READS)
-		_pEngine->setEnablePartialReads(state);
+		_engine.setEnablePartialReads(state);
 	else throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
@@ -143,15 +136,15 @@ bool SAXParser::getFeature(const XMLString& featureId) const
 	if (featureId == XMLReader::FEATURE_VALIDATION || featureId == XMLReader::FEATURE_STRING_INTERNING)
 		throw SAXNotSupportedException(fromXMLString(XMLReader::FEATURE_VALIDATION));
 	else if (featureId == XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES)
-		return _pEngine->getExternalGeneralEntities();
+		return _engine.getExternalGeneralEntities();
 	else if (featureId == XMLReader::FEATURE_EXTERNAL_PARAMETER_ENTITIES)
-		return _pEngine->getExternalParameterEntities();
+		return _engine.getExternalParameterEntities();
 	else if (featureId == XMLReader::FEATURE_NAMESPACES)
 		return _namespaces;
 	else if (featureId == XMLReader::FEATURE_NAMESPACE_PREFIXES)
 		return _namespacePrefixes;
 	else if (featureId == FEATURE_PARTIAL_READS)
-		return _pEngine->getEnablePartialReads();
+		return _engine.getEnablePartialReads();
 	else throw SAXNotRecognizedException(fromXMLString(featureId));
 }
 
@@ -165,32 +158,32 @@ void SAXParser::setProperty(const XMLString& propertyId, const XMLString& value)
 }
 
 
-void SAXParser::setProperty(const XMLString& propertyId, SAXHandler::Ptr value)
+void SAXParser::setProperty(const XMLString& propertyId, void* value)
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER)
-		_pEngine->setDeclHandler(value.cast<DeclHandler>());
+		_engine.setDeclHandler(reinterpret_cast<DeclHandler*>(value));
 	else if (propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
-		_pEngine->setLexicalHandler(value.cast<LexicalHandler>());
+		_engine.setLexicalHandler(reinterpret_cast<LexicalHandler*>(value));
 	else throw SAXNotRecognizedException(fromXMLString(propertyId));
 }
 
 
-SAXHandler::Ptr SAXParser::getProperty(const XMLString& propertyId) const
+void* SAXParser::getProperty(const XMLString& propertyId) const
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER)
-		return _pEngine->getDeclHandler();
+		return _engine.getDeclHandler();
 	else if (propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
-		return _pEngine->getLexicalHandler();
+		return _engine.getLexicalHandler();
 	else throw SAXNotSupportedException(fromXMLString(propertyId));
 }
 
 
-void SAXParser::parse(InputSource::Ptr pInputSource)
+void SAXParser::parse(InputSource* pInputSource)
 {
 	if (pInputSource->getByteStream() || pInputSource->getCharacterStream())
 	{
 		setupParse();
-		_pEngine->parse(pInputSource);
+		_engine.parse(pInputSource);
 	}
 	else parse(pInputSource->getSystemId());
 }
@@ -199,20 +192,20 @@ void SAXParser::parse(InputSource::Ptr pInputSource)
 void SAXParser::parse(const XMLString& systemId)
 {
 	setupParse();
-	EntityResolverImpl::Ptr entityResolver = new EntityResolverImpl;
-	InputSource::Ptr pInputSource = entityResolver->resolveEntity(0, systemId);
+	EntityResolverImpl entityResolver;
+	InputSource* pInputSource = entityResolver.resolveEntity(0, systemId);
 	if (pInputSource)
 	{
 		try
 		{
-			_pEngine->parse(pInputSource);
+			_engine.parse(pInputSource);
 		}
 		catch (...)
 		{
-			pInputSource = 0;
+			entityResolver.releaseInputSource(pInputSource);
 			throw;
 		}
-		pInputSource = 0;
+		entityResolver.releaseInputSource(pInputSource);
 	}
 	else throw XMLException("Cannot resolve system identifier", fromXMLString(systemId));
 }
@@ -227,18 +220,18 @@ void SAXParser::parseString(const std::string& xml)
 void SAXParser::parseMemoryNP(const char* xml, std::size_t size)
 {
 	setupParse();
-	_pEngine->parse(xml, size);
+	_engine.parse(xml, size);
 }
 
 
 void SAXParser::setupParse()
 {
 	if (_namespaces && !_namespacePrefixes)
-		_pEngine->setNamespaceStrategy(new NoNamespacePrefixesStrategy);
+		_engine.setNamespaceStrategy(new NoNamespacePrefixesStrategy);
 	else if (_namespaces && _namespacePrefixes)
-		_pEngine->setNamespaceStrategy(new NamespacePrefixesStrategy);
+		_engine.setNamespaceStrategy(new NamespacePrefixesStrategy);
 	else
-		_pEngine->setNamespaceStrategy(new NoNamespacesStrategy);
+		_engine.setNamespaceStrategy(new NoNamespacesStrategy);
 }
 
 

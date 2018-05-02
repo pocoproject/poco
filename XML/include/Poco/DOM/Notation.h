@@ -20,7 +20,6 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/AbstractNode.h"
-#include "Poco/DOM/Document.h"
 #include "Poco/XML/XMLString.h"
 
 
@@ -43,8 +42,6 @@ class XML_API Notation: public AbstractNode
 	/// A Notation node does not have any parent.
 {
 public:
-	typedef RefPtr<Notation> Ptr;
-
 	const XMLString& publicId() const;
 		/// Returns the public identifier of this notation.
 		/// If not specified, this is an empty string (and not null,
@@ -60,11 +57,11 @@ public:
 	unsigned short nodeType() const;
 
 protected:
-	Notation(Document::Ptr pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
-	Notation(Document::Ptr pOwnerDocument, const Notation& notation);
+	Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
+	Notation(Document* pOwnerDocument, const Notation& notation);
 	~Notation();
 	
-	Node::Ptr copyNode(bool deep, Document::Ptr pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	XMLString _name;

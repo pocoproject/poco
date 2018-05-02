@@ -14,7 +14,6 @@
 
 #include "Poco/DOM/CharacterData.h"
 #include "Poco/DOM/DOMException.h"
-#include "Poco/DOM/Document.h"
 #include "Poco/String.h"
 
 
@@ -22,30 +21,16 @@ namespace Poco {
 namespace XML {
 
 
-CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, const XMLString& data):
-	AbstractNode(std::move(pOwnerDocument)),
+CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data):
+	AbstractNode(pOwnerDocument),
 	_data(data)
 {
 }
 
 
-CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, const CharacterData& data):
-	AbstractNode(std::move(pOwnerDocument)),
+CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& data):
+	AbstractNode(pOwnerDocument, data),
 	_data(data._data)
-{
-}
-
-
-CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, XMLString&& data):
-		AbstractNode(std::move(pOwnerDocument)),
-		_data(std::move(data))
-{
-}
-
-
-CharacterData::CharacterData(Document::Ptr&& pOwnerDocument, CharacterData&& data):
-		AbstractNode(std::move(pOwnerDocument)),
-		_data(std::move(data._data))
 {
 }
 

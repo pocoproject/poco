@@ -33,18 +33,19 @@ class XML_API WhitespaceFilter: public XMLFilterImpl, public LexicalHandler
 	/// content.
 {
 public:
-	typedef RefPtr<WhitespaceFilter> Ptr;
-
 	WhitespaceFilter();
 		/// Creates the WhitespaceFilter, with no parent.
-
-	WhitespaceFilter(RefPtr<XMLReader> pReader);
+		
+	WhitespaceFilter(XMLReader* pReader);
 		/// Creates the WhitespaceFilter with the specified parent.
+
+	~WhitespaceFilter();
+		/// Destroys the WhitespaceFilter.
 
 	// XMLReader
 	void setProperty(const XMLString& propertyId, const XMLString& value);
-	void setProperty(const XMLString& propertyId, RefPtr<SAXHandler> value);
-	RefPtr<SAXHandler> getProperty(const XMLString& propertyId) const;
+	void setProperty(const XMLString& propertyId, void* value);
+	void* getProperty(const XMLString& propertyId) const;
 
 	// ContentHandler
 	void startDocument();
@@ -65,16 +66,12 @@ public:
 	void comment(const XMLChar ch[], int start, int length);
 
 protected:
-
-	~WhitespaceFilter();
-		/// Destroys the WhitespaceFilter.
-
 	void setupParse();
 
 private:
-	LexicalHandler::Ptr _pLexicalHandler;
-	XMLString           _data;
-	bool                _filter;
+	LexicalHandler* _pLexicalHandler;
+	XMLString       _data;
+	bool            _filter;
 };
 
 

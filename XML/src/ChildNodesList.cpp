@@ -21,22 +21,25 @@ namespace Poco {
 namespace XML {
 
 
-ChildNodesList::ChildNodesList(const Node::Ptr pParent):
-		_pParentNode(pParent)
+ChildNodesList::ChildNodesList(const Node* pParent):
+	_pParent(pParent)
 {
 	poco_check_ptr (pParent);
+
+	_pParent->duplicate();
 }
 
 
 ChildNodesList::~ChildNodesList()
 {
+	_pParent->release();
 }
 
 
-Node::Ptr ChildNodesList::item(unsigned long index) const
+Node* ChildNodesList::item(unsigned long index) const
 {
 	unsigned long n = 0;
-	Node::Ptr pCur = _pParentNode->firstChild();
+	Node* pCur = _pParent->firstChild();
 	while (pCur && n++ < index)
 	{
 		pCur = pCur->nextSibling();
@@ -48,13 +51,19 @@ Node::Ptr ChildNodesList::item(unsigned long index) const
 unsigned long ChildNodesList::length() const
 {
 	unsigned long n = 0;
-	Node::Ptr pCur = _pParentNode->firstChild();
+	Node* pCur = _pParent->firstChild();
 	while (pCur)
 	{
 		++n;
 		pCur = pCur->nextSibling();
 	}
 	return n;
+}
+
+
+void ChildNodesList::autoRelease()
+{
+	_pParent->ownerDocument()->autoReleasePool().add(this);
 }
 
 

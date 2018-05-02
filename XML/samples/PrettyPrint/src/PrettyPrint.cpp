@@ -31,20 +31,20 @@ int main(int argc, char** argv)
 {
 	// read XML from standard input and pretty-print it to standard output
 
-	SAXParser::Ptr parser = new SAXParser;
-	WhitespaceFilter::Ptr filter = new WhitespaceFilter(parser);
+	SAXParser parser;
+	WhitespaceFilter filter(&parser);
+	
+	XMLWriter writer(std::cout, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
+	writer.setNewLine(XMLWriter::NEWLINE_LF);
 
-	XMLWriter::Ptr writer = new XMLWriter(std::cout, XMLWriter::CANONICAL | XMLWriter::PRETTY_PRINT);
-	writer->setNewLine(XMLWriter::NEWLINE_LF);
-
-	filter->setContentHandler(writer);
-	filter->setDTDHandler(writer);
-	filter->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, writer.cast<Poco::XML::LexicalHandler>());
+	filter.setContentHandler(&writer);
+	filter.setDTDHandler(&writer);
+	filter.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<Poco::XML::LexicalHandler*>(&writer));
 
 	try
 	{
-		InputSource::Ptr source = new InputSource(std::cin);
-		filter->parse(source);
+		InputSource source(std::cin);
+		filter.parse(&source);
 	}
 	catch (Exception& exc)
 	{

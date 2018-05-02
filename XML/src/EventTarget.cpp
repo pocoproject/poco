@@ -19,11 +19,6 @@ namespace Poco {
 namespace XML {
 
 
-EventTarget::EventTarget()
-{
-}
-
-
 EventTarget::~EventTarget()
 {
 }

@@ -13,7 +13,6 @@
 
 
 #include "Poco/SAX/DefaultHandler.h"
-#include "Poco/SAX/InputSource.h"
 
 
 namespace Poco {
@@ -30,9 +29,14 @@ DefaultHandler::~DefaultHandler()
 }
 
 
-InputSource::Ptr DefaultHandler::resolveEntity(const XMLString* publicId, const XMLString& systemId)
+InputSource* DefaultHandler::resolveEntity(const XMLString* publicId, const XMLString& systemId)
 {
 	return 0;
+}
+
+
+void DefaultHandler::releaseInputSource(InputSource* pSource)
+{
 }
 
 
@@ -46,7 +50,7 @@ void DefaultHandler::unparsedEntityDecl(const XMLString& name, const XMLString* 
 }
 
 
-void DefaultHandler::setDocumentLocator(const Locator::Ptr loc)
+void DefaultHandler::setDocumentLocator(const Locator* loc)
 {
 }
 

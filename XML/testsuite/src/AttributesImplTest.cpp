@@ -59,7 +59,7 @@ void AttributesImplTest::testNoNamespaces()
 
 	attrs.addAttribute("", "", "a3", "CDATA", "v3");
 	assertTrue (attrs.getLength() == 3);
-	assertTrue (attrs.getIndex("a3") == 2);
+	assertTrue (attrs.getIndex("a3") == 2);	
 	assertTrue (attrs.getValue("a3") == "v3");
 	
 	attrs.removeAttribute(0);
@@ -117,7 +117,7 @@ void AttributesImplTest::testNamespaces()
 
 	attrs.addAttribute("urn:ns2", "a3", "q:a3", "CDATA", "v3");
 	assertTrue (attrs.getLength() == 3);
-	assertTrue (attrs.getIndex("urn:ns2", "a3") == 2);
+	assertTrue (attrs.getIndex("urn:ns2", "a3") == 2);	
 	assertTrue (attrs.getValue("urn:ns2", "a3") == "v3");
 	
 	attrs.removeAttribute(0);

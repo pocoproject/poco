@@ -38,7 +38,7 @@ namespace XML {
 const XMLString Document::NODE_NAME = toXMLString("#document");
 
 
-Document::Document(NamePool::Ptr pNamePool):
+Document::Document(NamePool* pNamePool):
 	AbstractContainerNode(0),
 	_pDocumentType(0),
 	_eventSuspendLevel(0)
@@ -46,6 +46,7 @@ Document::Document(NamePool::Ptr pNamePool):
 	if (pNamePool)
 	{
 		_pNamePool = pNamePool;
+		_pNamePool->duplicate();
 	}
 	else
 	{
@@ -63,7 +64,7 @@ Document::Document(unsigned long namePoolSize):
 }
 
 
-Document::Document(DocumentType::Ptr pDocumentType, NamePool::Ptr pNamePool):
+Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
 	AbstractContainerNode(0),
 	_pDocumentType(pDocumentType),
 	_eventSuspendLevel(0)
@@ -71,6 +72,7 @@ Document::Document(DocumentType::Ptr pDocumentType, NamePool::Ptr pNamePool):
 	if (pNamePool)
 	{
 		_pNamePool = pNamePool;
+		_pNamePool->duplicate();
 	}
 	else
 	{
@@ -78,12 +80,13 @@ Document::Document(DocumentType::Ptr pDocumentType, NamePool::Ptr pNamePool):
 	}
 	if (_pDocumentType)
 	{
+		_pDocumentType->duplicate();
 		_pDocumentType->setOwnerDocument(this);
 	}
 }
 
 
-Document::Document(DocumentType::Ptr pDocumentType, unsigned long namePoolSize):
+Document::Document(DocumentType* pDocumentType, unsigned long namePoolSize):
 	AbstractContainerNode(0),
 	_pDocumentType(pDocumentType),
 	_pNamePool(new NamePool(namePoolSize)),
@@ -91,6 +94,7 @@ Document::Document(DocumentType::Ptr pDocumentType, unsigned long namePoolSize):
 {
 	if (_pDocumentType)
 	{
+		_pDocumentType->duplicate();
 		_pDocumentType->setOwnerDocument(this);
 	}
 }
@@ -98,12 +102,20 @@ Document::Document(DocumentType::Ptr pDocumentType, unsigned long namePoolSize):
 
 Document::~Document()
 {
+	if (_pDocumentType) _pDocumentType->release();
+	_pNamePool->release();
 }
 
 
-bool Document::dispatchEvent(Event::Ptr evt)
+bool Document::dispatchEvent(Event* evt)
 {
 	return _eventSuspendLevel > 0 || AbstractContainerNode::dispatchEvent(evt);
+}
+
+
+void Document::collectGarbage()
+{
+	_autoReleasePool.release();
 }
 
 
@@ -127,77 +139,71 @@ const DOMImplementation& Document::implementation() const
 }
 
 
-Element::Ptr Document::documentElement() const
+Element* Document::documentElement() const
 {
 	// Skip non-element nodes before the document element
-	Node::Ptr pCur = firstChild();
+	Node* pCur = firstChild();
 	while (pCur)
 	{
-		if (pCur.cast<Element>())
-			return pCur.cast<Element>();
+		if (dynamic_cast<Element*>(pCur))
+			return static_cast<Element*>(pCur);
 		pCur = pCur->nextSibling();
 	}
 	return 0;
 }
 
 
-Element::Ptr Document::createElement(const XMLString& tagName) const
+Element* Document::createElement(const XMLString& tagName) const
 {
-	return new Element(Ptr(const_cast<Document*>(this), true), EMPTY_STRING, EMPTY_STRING, tagName);
+	return new Element(const_cast<Document*>(this), EMPTY_STRING, EMPTY_STRING, tagName);
 }
 
 
-DocumentFragment::Ptr Document::createDocumentFragment() const
+DocumentFragment* Document::createDocumentFragment() const
 {
-	return new DocumentFragment(Ptr(const_cast<Document*>(this), true));
+	return new DocumentFragment(const_cast<Document*>(this));
 }
 
 
-Text::Ptr Document::createTextNode(const XMLString& data) const
+Text* Document::createTextNode(const XMLString& data) const
 {
-	return new Text(Ptr(const_cast<Document*>(this), true), std::string(data));
+	return new Text(const_cast<Document*>(this), data);
 }
 
 
-Text::Ptr Document::createTextNode(XMLString&& data) const
+Comment* Document::createComment(const XMLString& data) const
 {
-	return new Text(Ptr(const_cast<Document*>(this), true), std::move(data));
+	return new Comment(const_cast<Document*>(this), data);
 }
 
 
-Comment::Ptr Document::createComment(const XMLString& data) const
+CDATASection* Document::createCDATASection(const XMLString& data) const
 {
-	return new Comment(Ptr(const_cast<Document*>(this), true), data);
+	return new CDATASection(const_cast<Document*>(this), data);
 }
 
 
-CDATASection::Ptr Document::createCDATASection(const XMLString& data) const
+ProcessingInstruction* Document::createProcessingInstruction(const XMLString& target, const XMLString& data) const
 {
-	return new CDATASection(Ptr(const_cast<Document*>(this), true), data);
+	return new ProcessingInstruction(const_cast<Document*>(this), target, data);
 }
 
 
-ProcessingInstruction::Ptr Document::createProcessingInstruction(const XMLString& target, const XMLString& data) const
+Attr* Document::createAttribute(const XMLString& name) const
 {
-	return new ProcessingInstruction(Ptr(const_cast<Document*>(this), true), target, data);
+	return new Attr(const_cast<Document*>(this), 0, EMPTY_STRING, EMPTY_STRING, name, EMPTY_STRING);
 }
 
 
-Attr::Ptr Document::createAttribute(const XMLString& name) const
+EntityReference* Document::createEntityReference(const XMLString& name) const
 {
-	return new Attr(Ptr(const_cast<Document*>(this), true), EMPTY_STRING, EMPTY_STRING, name, EMPTY_STRING);
+	return new EntityReference(const_cast<Document*>(this), name);
 }
 
 
-EntityReference::Ptr Document::createEntityReference(const XMLString& name) const
+NodeList* Document::getElementsByTagName(const XMLString& name) const
 {
-	return new EntityReference(Ptr(const_cast<Document*>(this), true), name);
-}
-
-
-NodeList::Ptr Document::getElementsByTagName(const XMLString& name) const
-{
-	return new ElementsByTagNameList(Ptr(const_cast<Document*>(this), true), name);
+	return new ElementsByTagNameList(const_cast<Document*>(this), name);	
 }
 
 
@@ -213,37 +219,37 @@ unsigned short Document::nodeType() const
 }
 
 
-Node::Ptr Document::importNode(Node::Ptr importedNode, bool deep)
+Node* Document::importNode(Node* importedNode, bool deep)
 {
-	return importedNode.unsafeCast<AbstractNode>()->copyNode(deep, Ptr(this, true));
+	return static_cast<AbstractNode*>(importedNode)->copyNode(deep, this);
 }
 
 
-Element::Ptr Document::createElementNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
+Element* Document::createElementNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
 {
-	return new Element(Ptr(const_cast<Document*>(this), true), namespaceURI, Name::localName(qualifiedName), qualifiedName);
+	return new Element(const_cast<Document*>(this), namespaceURI, Name::localName(qualifiedName), qualifiedName);
 }
 
 
-Attr::Ptr Document::createAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
+Attr* Document::createAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
 {
-	return new Attr(Ptr(const_cast<Document*>(this), true), namespaceURI, Name::localName(qualifiedName), qualifiedName, EMPTY_STRING);
+	return new Attr(const_cast<Document*>(this), 0, namespaceURI, Name::localName(qualifiedName), qualifiedName, EMPTY_STRING);
 }
 
 
-NodeList::Ptr Document::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
+NodeList* Document::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return new ElementsByTagNameListNS(Ptr(const_cast<Document*>(this), true), namespaceURI, localName);
+	return new ElementsByTagNameListNS(const_cast<Document*>(this), namespaceURI, localName);	
 }
 
 
-Element::Ptr Document::getElementById(const XMLString& elementId) const
+Element* Document::getElementById(const XMLString& elementId) const
 {
 	return 0;
 }
 
 
-Event::Ptr Document::createEvent(const XMLString& eventType) const
+Event* Document::createEvent(const XMLString& eventType) const
 {
 	if (eventType == MutationEvent::DOMSubtreeModified          ||
 	    eventType == MutationEvent::DOMNodeInserted             ||
@@ -253,37 +259,27 @@ Event::Ptr Document::createEvent(const XMLString& eventType) const
 		eventType == MutationEvent::DOMAttrModified             ||
 		eventType == MutationEvent::DOMCharacterDataModified)
 	{
-		return new MutationEvent(Document::Ptr(const_cast<Document*>(this), true), eventType);
+		return new MutationEvent(const_cast<Document*>(this), eventType);
 	}
 	throw DOMException(DOMException::NOT_SUPPORTED_ERR);
 }
 
 
-Node::Ptr Document::copyNode(bool deep, Document::Ptr pOwnerDocument) const
+Node* Document::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	throw DOMException(DOMException::NOT_SUPPORTED_ERR);
 }
 
 
-void Document::setDoctype(DocumentType::Ptr pDoctype)
+void Document::setDoctype(DocumentType* pDoctype)
 {
+	if (_pDocumentType) _pDocumentType->release();
 	_pDocumentType = pDoctype;
 	if (_pDocumentType)
 	{
-		_pDocumentType->setOwnerDocument(Ptr(this, true));
+		_pDocumentType->duplicate();
+		_pDocumentType->setOwnerDocument(this);
 	}
-}
-
-
-DocumentType::Ptr Document::doctype() const
-{
-	return _pDocumentType;
-}
-
-
-DocumentType::Ptr Document::getDoctype()
-{
-	return _pDocumentType;
 }
 
 
@@ -299,29 +295,29 @@ bool Document::events() const
 }
 
 
-Entity::Ptr Document::createEntity(const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName) const
+Entity* Document::createEntity(const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName) const
 {
-	return new Entity(Document::Ptr(const_cast<Document*>(this), true), name, publicId, systemId, notationName);
+	return new Entity(const_cast<Document*>(this), name, publicId, systemId, notationName);
 }
 
 
-Notation::Ptr Document::createNotation(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
+Notation* Document::createNotation(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
-	return new Notation(Document::Ptr(const_cast<Document*>(this), true), name, publicId, systemId);
+	return new Notation(const_cast<Document*>(this), name, publicId, systemId);
 }
 
 
-Element::Ptr Document::getElementById(const XMLString& elementId, const XMLString& idAttribute) const
+Element* Document::getElementById(const XMLString& elementId, const XMLString& idAttribute) const
 {
-	Element::Ptr pElem = documentElement();
+	Element* pElem = documentElement();
 	if (pElem) pElem = pElem->getElementById(elementId, idAttribute);
 	return pElem;
 }
 
 
-Element::Ptr Document::getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const
+Element* Document::getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const
 {
-	Element::Ptr pElem = documentElement();
+	Element* pElem = documentElement();
 	if (pElem) pElem = pElem->getElementByIdNS(elementId, idAttributeURI, idAttributeLocalName);
 	return pElem;
 }

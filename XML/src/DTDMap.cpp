@@ -22,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-DTDMap::DTDMap(const DocumentType::Ptr pDocumentType, unsigned short type):
+DTDMap::DTDMap(const DocumentType* pDocumentType, unsigned short type):
 	_pDocumentType(pDocumentType),
 	_type(type)
 {
@@ -35,9 +35,9 @@ DTDMap::~DTDMap()
 }
 
 
-Node::Ptr DTDMap::getNamedItem(const XMLString& name) const
+Node* DTDMap::getNamedItem(const XMLString& name) const
 {
-	Node::Ptr pCur = _pDocumentType->firstChild();
+	Node* pCur = _pDocumentType->firstChild();
 	while (pCur)
 	{
 		if (pCur->nodeType() == _type && pCur->nodeName() == name)
@@ -48,22 +48,22 @@ Node::Ptr DTDMap::getNamedItem(const XMLString& name) const
 }
 
 
-Node::Ptr DTDMap::setNamedItem(Node::Ptr arg)
+Node* DTDMap::setNamedItem(Node* arg)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node::Ptr DTDMap::removeNamedItem(const XMLString& name)
+Node* DTDMap::removeNamedItem(const XMLString& name)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node::Ptr DTDMap::item(unsigned long index) const
+Node* DTDMap::item(unsigned long index) const
 {
 	unsigned long n = 0;
-	Node::Ptr pCur = _pDocumentType->firstChild();
+	Node* pCur = _pDocumentType->firstChild();
 	while (pCur)
 	{
 		if (pCur->nodeType() == _type)
@@ -80,7 +80,7 @@ Node::Ptr DTDMap::item(unsigned long index) const
 unsigned long DTDMap::length() const
 {
 	unsigned long n = 0;
-	Node::Ptr pCur = _pDocumentType->firstChild();
+	Node* pCur = _pDocumentType->firstChild();
 	while (pCur)
 	{
 		if (pCur->nodeType() == _type) ++n;
@@ -90,21 +90,27 @@ unsigned long DTDMap::length() const
 }
 
 
-Node::Ptr DTDMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
+Node* DTDMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
 	return 0;
 }
 
 
-Node::Ptr DTDMap::setNamedItemNS(Node::Ptr arg)
+Node* DTDMap::setNamedItemNS(Node* arg)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node::Ptr DTDMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName)
+Node* DTDMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
+}
+
+
+void DTDMap::autoRelease()
+{
+	_pDocumentType->ownerDocument()->autoReleasePool().add(this);
 }
 
 

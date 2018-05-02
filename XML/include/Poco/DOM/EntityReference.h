@@ -20,7 +20,6 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/AbstractNode.h"
-#include "Poco/DOM/Document.h"
 #include "Poco/XML/XMLString.h"
 
 
@@ -50,18 +49,16 @@ class XML_API EntityReference: public AbstractNode
 	/// to trigger the evaluation.
 {
 public:
-	typedef RefPtr<EntityReference> Ptr;
-
 	// Node
 	const XMLString& nodeName() const;
 	unsigned short nodeType() const;
 
 protected:
-	EntityReference(Document::Ptr pOwnerDocument, const XMLString& name);
-	EntityReference(Document::Ptr pOwnerDocument, const EntityReference& ref);
+	EntityReference(Document* pOwnerDocument, const XMLString& name);
+	EntityReference(Document* pOwnerDocument, const EntityReference& ref);
 	~EntityReference();
 
-	Node::Ptr copyNode(bool deep, Document::Ptr pOwnerDocument) const;
+	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	XMLString _name;

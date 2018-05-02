@@ -19,7 +19,6 @@
 
 
 #include "Poco/XML/XML.h"
-#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -47,7 +46,7 @@ class XML_API NodeIterator
 	/// not conform to the DOM Level 2 Traversal specification.
 {
 public:
-	NodeIterator(RefPtr<Node> root, unsigned long whatToShow, RefPtr<NodeFilter> pFilter = 0);
+	NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
 		/// Creates a NodeIterator over the subtree rooted at the specified node.
 		
 	NodeIterator(const NodeIterator& iterator);
@@ -59,7 +58,7 @@ public:
 	~NodeIterator();
 		/// Destroys the NodeIterator.
 
-	RefPtr<Node> root() const;
+	Node* root() const;
 		/// The root node of the NodeIterator, as specified when it was created.
 
 	unsigned long whatToShow() const;
@@ -69,7 +68,7 @@ public:
 		/// still be considered. Note that this skip takes precedence over the filter,
 		/// if any.
 
-	RefPtr<NodeFilter> filter() const;
+	NodeFilter* filter() const;
 		/// The NodeFilter used to screen nodes.
 
 	bool expandEntityReferences() const;
@@ -90,16 +89,16 @@ public:
 		/// This implementation does not support entity reference expansion and
 		/// thus always returns false.
 
-	RefPtr<Node> nextNode();
+	Node* nextNode();
 		/// Returns the next node in the set and advances the position of the iterator
 		/// in the set. After a NodeIterator is created, the first call to nextNode()
 		/// returns the first node in the set.
 
-	RefPtr<Node> previousNode();
+	Node* previousNode();
 		/// Returns the previous node in the set and moves the position of the NodeIterator
 		/// backwards in the set.
 
-	RefPtr<Node> currentNodeNP() const;
+	Node* currentNodeNP() const;
 		/// Returns the current node in the set.
 		///
 		/// Leaves the NodeIterator unchanged.
@@ -114,31 +113,31 @@ public:
 		/// the exception INVALID_STATE_ERR.
 
 protected:
-	bool accept(RefPtr<Node> pNode) const;
-	RefPtr<Node> next() const;
-	RefPtr<Node> previous() const;
-	RefPtr<Node> last();
+	bool accept(Node* pNode) const;
+	Node* next() const;
+	Node* previous() const;
+	Node* last();
 
 private:
 	NodeIterator();
 	
-	RefPtr<Node>         _pRoot;
+	Node*         _pRoot;
 	unsigned long _whatToShow;
-	RefPtr<NodeFilter>   _pFilter;
-	RefPtr<Node>         _pCurrent;
+	NodeFilter*   _pFilter;
+	Node*         _pCurrent;
 };
 
 
 //
 // inlines
 //
-inline RefPtr<Node> NodeIterator::root() const
+inline Node* NodeIterator::root() const
 {
 	return _pRoot;
 }
 
 
-inline RefPtr<Node> NodeIterator::currentNodeNP() const
+inline Node* NodeIterator::currentNodeNP() const
 {
 	return _pCurrent;
 }
@@ -150,7 +149,7 @@ inline unsigned long NodeIterator::whatToShow() const
 }
 
 
-inline RefPtr<NodeFilter> NodeIterator::filter() const
+inline NodeFilter* NodeIterator::filter() const
 {
 	return _pFilter;
 }

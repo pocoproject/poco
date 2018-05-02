@@ -20,7 +20,8 @@
 #include "Poco/DOM/EventException.h"
 #include "Poco/DOM/DOMImplementation.h"
 #include "Poco/DOM/Attr.h"
-#include "Poco/DOM/NamedNodeMap.h"
+#include "Poco/XML/Name.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
 namespace Poco {
@@ -32,13 +33,33 @@ const XMLString AbstractNode::EMPTY_STRING;
 
 
 AbstractNode::AbstractNode(Document* pOwnerDocument):
-	_pOwner(pOwnerDocument)
+	_pParent(0),
+	_pNext(0),
+	_pOwner(pOwnerDocument),
+	_pEventDispatcher(0)
+{
+}
+
+
+AbstractNode::AbstractNode(Document* pOwnerDocument, const AbstractNode& node):
+	_pParent(0),
+	_pNext(0),
+	_pOwner(pOwnerDocument),
+	_pEventDispatcher(0)
 {
 }
 
 
 AbstractNode::~AbstractNode()
 {
+	delete _pEventDispatcher;
+	if (_pNext) _pNext->release();
+}
+
+
+void AbstractNode::autoRelease()
+{
+	_pOwner->autoReleasePool().add(this);
 }
 
 
@@ -60,83 +81,82 @@ void AbstractNode::setNodeValue(const XMLString& value)
 }
 
 
-Node::Ptr AbstractNode::parentNode() const
+Node* AbstractNode::parentNode() const
 {
 	return _pParent;
 }
 
 
-NodeList::Ptr AbstractNode::childNodes() const
+NodeList* AbstractNode::childNodes() const
 {
-	return new ChildNodesList(RefPtr<AbstractNode>(const_cast<AbstractNode*>(this), true));
+	return new ChildNodesList(this);
 }
 
 
-Node::Ptr AbstractNode::firstChild() const
-{
-	return 0;
-}
-
-
-Node::Ptr AbstractNode::lastChild() const
+Node* AbstractNode::firstChild() const
 {
 	return 0;
 }
 
 
-Node::Ptr AbstractNode::previousSibling() const
+Node* AbstractNode::lastChild() const
+{
+	return 0;
+}
+
+
+Node* AbstractNode::previousSibling() const
 {
 	if (_pParent)
 	{
-		AbstractContainerNode::Ptr pParent = _pParent;
-		AbstractNode::Ptr pSibling = pParent->_pFirstChild;
-		while (!pSibling.isNull())
+		AbstractNode* pSibling = _pParent->_pFirstChild;
+		while (pSibling)
 		{
-			if (pSibling->_pNext == this) return pSibling.unsafeCast<Node>();
-			pSibling = pSibling->_pNext;
+		    if (pSibling->_pNext == this) return pSibling;
+		    pSibling = pSibling->_pNext;
 		}
 	}
 	return 0;
 }
 
 
-Node::Ptr AbstractNode::nextSibling() const
+Node* AbstractNode::nextSibling() const
 {
 	return _pNext;
 }
 
 
-NamedNodeMap::Ptr AbstractNode::attributes() const
+NamedNodeMap* AbstractNode::attributes() const
 {
-	return nullptr;
+	return 0;
 }
 
 
-Document::Ptr AbstractNode::ownerDocument() const
+Document* AbstractNode::ownerDocument() const
 {
-	return Document::Ptr(_pOwner, true);
+	return _pOwner;
 }
 
 
-Node::Ptr AbstractNode::insertBefore(Node::Ptr newChild, Node::Ptr refChild)
-{
-	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
-}
-
-
-Node::Ptr AbstractNode::replaceChild(Node::Ptr newChild, Node::Ptr oldChild)
+Node* AbstractNode::insertBefore(Node* newChild, Node* refChild)
 {
 	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 }
 
 
-Node::Ptr AbstractNode::removeChild(Node::Ptr oldChild)
+Node* AbstractNode::replaceChild(Node* newChild, Node* oldChild)
+{
+	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
+}
+
+
+Node* AbstractNode::removeChild(Node* oldChild)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node::Ptr AbstractNode::appendChild(Node::Ptr newChild)
+Node* AbstractNode::appendChild(Node* newChild)
 {
 	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 }
@@ -148,9 +168,9 @@ bool AbstractNode::hasChildNodes() const
 }
 
 
-Node::Ptr AbstractNode::cloneNode(bool deep) const
+Node* AbstractNode::cloneNode(bool deep) const
 {
-	return copyNode(deep, Document::Ptr(_pOwner, true));
+	return copyNode(deep, _pOwner);
 }
 
 
@@ -195,44 +215,43 @@ XMLString AbstractNode::innerText() const
 }
 
 
-Node::Ptr AbstractNode::getNodeByPath(const XMLString& path) const
+Node* AbstractNode::getNodeByPath(const XMLString& path) const
 {
 	return 0;
 }
 
 
-Node::Ptr AbstractNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
+Node* AbstractNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
 {
 	return 0;
 }
 
 
-void AbstractNode::addEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture)
+void AbstractNode::addEventListener(const XMLString& type, EventListener* listener, bool useCapture)
 {
 	if (_pEventDispatcher)
 		_pEventDispatcher->removeEventListener(type, listener, useCapture);
 	else
 		_pEventDispatcher = new EventDispatcher;
-
+	
 	_pEventDispatcher->addEventListener(type, listener, useCapture);
 }
 
 
-void AbstractNode::removeEventListener(const XMLString& type, EventListener::Ptr listener, bool useCapture)
+void AbstractNode::removeEventListener(const XMLString& type, EventListener* listener, bool useCapture)
 {
 	if (_pEventDispatcher)
 		_pEventDispatcher->removeEventListener(type, listener, useCapture);
 }
 
 
-bool AbstractNode::dispatchEvent(Event::Ptr evt)
+bool AbstractNode::dispatchEvent(Event* evt)
 {
 	if (eventsSuspended()) return true;
 
-	if (evt.isNull() || evt->type().empty())
-		throw EventException(EventException::UNSPECIFIED_EVENT_TYPE_ERR);
+	if (evt->type().empty()) throw EventException(EventException::UNSPECIFIED_EVENT_TYPE_ERR);
 
-	evt->setTarget(EventTarget::Ptr(this, true));
+	evt->setTarget(this);
 	evt->setCurrentPhase(Event::CAPTURING_PHASE);
 
 	if (_pParent) _pParent->captureEvent(evt);
@@ -240,7 +259,7 @@ bool AbstractNode::dispatchEvent(Event::Ptr evt)
 	if (_pEventDispatcher && !evt->isStopped())
 	{
 		evt->setCurrentPhase(Event::AT_TARGET);
-		evt->setCurrentTarget(EventTarget::Ptr(this, true));
+		evt->setCurrentTarget(this);
 		_pEventDispatcher->dispatchEvent(evt);
 	}
 	if (!evt->isStopped() && evt->bubbles() && _pParent)
@@ -253,22 +272,22 @@ bool AbstractNode::dispatchEvent(Event::Ptr evt)
 }
 
 
-void AbstractNode::captureEvent(Event::Ptr evt)
+void AbstractNode::captureEvent(Event* evt)
 {
 	if (_pParent)
 		_pParent->captureEvent(evt);
 	
 	if (_pEventDispatcher && !evt->isStopped())
 	{
-		evt->setCurrentTarget(EventTarget::Ptr(this, true));
+		evt->setCurrentTarget(this);
 		_pEventDispatcher->captureEvent(evt);
 	}
 }
 
 
-void AbstractNode::bubbleEvent(Event::Ptr evt)
+void AbstractNode::bubbleEvent(Event* evt)
 {
-	evt->setCurrentTarget(EventTarget::Ptr(this, true));
+	evt->setCurrentTarget(this);
 	if (_pEventDispatcher)
 	{
 		_pEventDispatcher->bubbleEvent(evt);
@@ -280,65 +299,68 @@ void AbstractNode::bubbleEvent(Event::Ptr evt)
 
 void AbstractNode::dispatchSubtreeModified()
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMSubtreeModified, makeTarget(this), true, false, 0));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMSubtreeModified, this, true, false, 0);
+	dispatchEvent(pEvent.get());
 }
 
 
 void AbstractNode::dispatchNodeInserted()
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeInserted, makeTarget(this), true, false, parentNode()));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeInserted, this, true, false, parentNode());
+	dispatchEvent(pEvent.get());
 }
 
 
 void AbstractNode::dispatchNodeRemoved()
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeRemoved, makeTarget(this), true, false, parentNode()));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeRemoved, this, true, false, parentNode());
+	dispatchEvent(pEvent.get());
 }
 
 
 void AbstractNode::dispatchNodeRemovedFromDocument()
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeRemovedFromDocument, makeTarget(this), false, false, 0));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeRemovedFromDocument, this, false, false, 0);
+	dispatchEvent(pEvent.get());
 }
 
 
 void AbstractNode::dispatchNodeInsertedIntoDocument()
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMNodeInsertedIntoDocument, makeTarget(this), false, false, 0));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMNodeInsertedIntoDocument, this, false, false, 0);
+	dispatchEvent(pEvent.get());
 }
 
 
-void AbstractNode::dispatchAttrModified(Attr::Ptr pAttr, MutationEvent::AttrChangeType changeType, const XMLString& prevValue, const XMLString& newValue)
+void AbstractNode::dispatchAttrModified(Attr* pAttr, MutationEvent::AttrChangeType changeType, const XMLString& prevValue, const XMLString& newValue)
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMAttrModified, makeTarget(this), true, false, pAttr, prevValue, newValue, pAttr->name(), changeType));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMAttrModified, this, true, false, pAttr, prevValue, newValue, pAttr->name(), changeType);
+	dispatchEvent(pEvent.get());
 }
 
 
 void AbstractNode::dispatchCharacterDataModified(const XMLString& prevValue, const XMLString& newValue)
 {
-	dispatchEvent(new MutationEvent(makeTarget(_pOwner), MutationEvent::DOMCharacterDataModified, makeTarget(this), true, false, 0, prevValue, newValue, EMPTY_STRING, MutationEvent::MODIFICATION));
+	AutoPtr<MutationEvent> pEvent = new MutationEvent(_pOwner, MutationEvent::DOMCharacterDataModified, this, true, false, 0, prevValue, newValue, EMPTY_STRING, MutationEvent::MODIFICATION);
+	dispatchEvent(pEvent.get());
 }
 
 
 bool AbstractNode::events() const
 {
-	if (_pOwner) return _pOwner->events();
-	return false;
+	return _pOwner->events();
 }
 
 
 bool AbstractNode::eventsSuspended() const
 {
-	if (_pOwner) return _pOwner->eventsSuspended();
-	return false;
+	return _pOwner->eventsSuspended();
 }
 
 
-void AbstractNode::setOwnerDocument(Document::Ptr pOwnerDocument)
+void AbstractNode::setOwnerDocument(Document* pOwnerDocument)
 {
-	if (_pOwner) _pOwner->release();
-	_pOwner = pOwnerDocument.get();
-	if (_pOwner) _pOwner->duplicate();
+	_pOwner = pOwnerDocument;
 }
 
 

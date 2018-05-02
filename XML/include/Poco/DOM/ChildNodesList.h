@@ -31,18 +31,20 @@ class XML_API ChildNodesList: public NodeList
 	// by Node::getChildNodes().
 {
 public:
-	Node::Ptr item(unsigned long index) const;
+	Node* item(unsigned long index) const;
 	unsigned long length() const;
 
+	void autoRelease();
+
 protected:
-	ChildNodesList(const Node::Ptr pParent);
+	ChildNodesList(const Node* pParent);
 	~ChildNodesList();
 	
 private:
 	ChildNodesList();
 
-	Node::Ptr _pParentNode;
-
+	const Node* _pParent;
+	
 	friend class AbstractNode;
 };
 

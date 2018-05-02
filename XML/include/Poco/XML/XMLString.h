@@ -75,7 +75,7 @@ namespace XML {
 	{
 		return str;
 	}
-
+	
 	#define XML_LIT(lit) lit
 
 #endif

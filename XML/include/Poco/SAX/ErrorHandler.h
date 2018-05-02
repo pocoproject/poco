@@ -19,7 +19,6 @@
 
 
 #include "Poco/XML/XML.h"
-#include "Poco/SAX/SAXHandler.h"
 
 
 namespace Poco {
@@ -29,7 +28,7 @@ namespace XML {
 class SAXException;
 
 
-class XML_API ErrorHandler: public SAXHandler
+class XML_API ErrorHandler
 	/// If a SAX application needs to implement customized error handling, it must
 	/// implement this interface and then register an instance with the XML reader
 	/// using the setErrorHandler method. The parser will then report all errors and
@@ -50,8 +49,6 @@ class XML_API ErrorHandler: public SAXHandler
 	/// the document.
 {
 public:
-	typedef RefPtr<ErrorHandler> Ptr;
-
 	virtual void warning(const SAXException& exc) = 0;
 		/// Receive notification of a warning.
 		///

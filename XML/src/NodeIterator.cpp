@@ -22,7 +22,7 @@ namespace Poco {
 namespace XML {
 
 
-NodeIterator::NodeIterator(Node::Ptr root, unsigned long whatToShow, NodeFilter::Ptr pFilter):
+NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
 	_pRoot(root),
 	_whatToShow(whatToShow),
 	_pFilter(pFilter),
@@ -58,7 +58,7 @@ NodeIterator::~NodeIterator()
 }
 
 
-Node::Ptr NodeIterator::nextNode()
+Node* NodeIterator::nextNode()
 {
 	if (!_pRoot) throw DOMException(DOMException::INVALID_STATE_ERR);
 	
@@ -72,7 +72,7 @@ Node::Ptr NodeIterator::nextNode()
 }
 
 
-Node::Ptr NodeIterator::previousNode()
+Node* NodeIterator::previousNode()
 {
 	if (!_pRoot) throw DOMException(DOMException::INVALID_STATE_ERR);
 
@@ -93,7 +93,7 @@ void NodeIterator::detach()
 }
 
 
-bool NodeIterator::accept(Node::Ptr pNode) const
+bool NodeIterator::accept(Node* pNode) const
 {
 	bool accept = false;
 	switch (pNode->nodeType())
@@ -129,14 +129,14 @@ bool NodeIterator::accept(Node::Ptr pNode) const
 }
 
 
-Node::Ptr NodeIterator::next() const
+Node* NodeIterator::next() const
 {
-	Node::Ptr pNext = _pCurrent->firstChild();
+	Node* pNext = _pCurrent->firstChild();
 	if (pNext) return pNext;
 	pNext = _pCurrent;
 	while (pNext && pNext != _pRoot)
 	{
-		Node::Ptr pSibling = pNext->nextSibling();
+		Node* pSibling = pNext->nextSibling();
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
@@ -144,13 +144,13 @@ Node::Ptr NodeIterator::next() const
 }
 
 
-Node::Ptr NodeIterator::previous() const
+Node* NodeIterator::previous() const
 {
 	if (_pCurrent == _pRoot) return 0;
-	Node::Ptr pPrev = _pCurrent->previousSibling();
+	Node* pPrev = _pCurrent->previousSibling();
 	while (pPrev)
 	{
-		Node::Ptr pLastChild = pPrev->lastChild();
+		Node* pLastChild = pPrev->lastChild();
 		if (pLastChild)
 			pPrev = pLastChild;
 		else
@@ -160,10 +160,10 @@ Node::Ptr NodeIterator::previous() const
 }
 
 
-Node::Ptr NodeIterator::last()
+Node* NodeIterator::last()
 {
 	_pCurrent = _pRoot;
-	Node::Ptr pLast = 0;
+	Node* pLast = 0;
 	while (_pCurrent)
 	{
 		pLast = _pCurrent;

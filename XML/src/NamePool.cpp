@@ -67,7 +67,7 @@ NamePool::NamePool(unsigned long size):
 	poco_assert (size > 1);
 
 	_pItems = new NamePoolItem[size];
-
+	
 	Poco::Random rnd;
 	rnd.seed();
 	_salt = rnd.next();
@@ -80,6 +80,19 @@ NamePool::~NamePool()
 }
 
 
+void NamePool::duplicate()
+{
+	++_rc;
+}
+
+
+void NamePool::release()
+{
+	if (--_rc == 0)
+		delete this;
+}
+
+
 const Name& NamePool::insert(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName)
 {
 	unsigned long i = 0;
@@ -87,7 +100,7 @@ const Name& NamePool::insert(const XMLString& qname, const XMLString& namespaceU
 
 	while (!_pItems[n].set(qname, namespaceURI, localName) && i++ < _size)
 		n = (n + 1) % _size;
-
+		
 	if (i > _size) throw Poco::PoolOverflowException("XML name pool");
 
 	return _pItems[n].get();

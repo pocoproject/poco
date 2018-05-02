@@ -25,57 +25,39 @@ namespace Poco {
 namespace XML {
 
 
-Element::Element(Document::Ptr& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
-	AbstractContainerNode(pOwnerDocument.get()),
-	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName))
+Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
+	AbstractContainerNode(pOwnerDocument),
+	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName)),
+	_pFirstAttr(0)
 {
 }
 
 
-Element::Element(Document::Ptr& pOwnerDocument, const Element& element):
-	AbstractContainerNode(pOwnerDocument.get()),
-	_name(pOwnerDocument->namePool().insert(element._name))
+Element::Element(Document* pOwnerDocument, const Element& element):
+	AbstractContainerNode(pOwnerDocument, element),
+	_name(pOwnerDocument->namePool().insert(element._name)),
+	_pFirstAttr(0)
 {
-	Attr::Ptr pAttr = element._pFirstAttr;
+	Attr* pAttr = element._pFirstAttr;
 	while (pAttr)
 	{
-		Attr::Ptr pClonedAttr = pAttr->copyNode(false, pOwnerDocument).unsafeCast<Attr>();
+		Attr* pClonedAttr = static_cast<Attr*>(pAttr->copyNode(false, pOwnerDocument));
 		setAttributeNode(pClonedAttr);
-		pAttr = pAttr->_pNext.unsafeCast<Attr>();
-	}
-}
-
-
-Element::Element(RefPtr<Document>&& pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
-	AbstractContainerNode(pOwnerDocument.get()),
-	_name(pOwnerDocument->namePool().insert(qname, namespaceURI, localName))
-{
-
-}
-
-
-Element::Element(RefPtr<Document>&& pOwnerDocument, const Element& element):
-	AbstractContainerNode(pOwnerDocument.get()),
-	_name(pOwnerDocument->namePool().insert(element._name))
-{
-	Attr::Ptr pAttr = element._pFirstAttr;
-	while (pAttr)
-	{
-		Attr::Ptr pClonedAttr = pAttr->copyNode(false, pOwnerDocument).unsafeCast<Attr>();
-		setAttributeNode(pClonedAttr);
-		pAttr = pAttr->_pNext.unsafeCast<Attr>();
+		pClonedAttr->release();
+		pAttr = static_cast<Attr*>(pAttr->_pNext);
 	}
 }
 
 
 Element::~Element()
 {
+	if (_pFirstAttr) _pFirstAttr->release();
 }
 
 
 const XMLString& Element::getAttribute(const XMLString& name) const
 {
-	Attr::Ptr pAttr = getAttributeNode(name);
+	Attr* pAttr = getAttributeNode(name);
 	if (pAttr)
 		return pAttr->getValue();
 	else
@@ -85,7 +67,7 @@ const XMLString& Element::getAttribute(const XMLString& name) const
 
 void Element::setAttribute(const XMLString& name, const XMLString& value)
 {
-	Attr::Ptr pAttr = getAttributeNode(name);
+	Attr* pAttr = getAttributeNode(name);
 	if (pAttr)
 	{
 		pAttr->setValue(value);
@@ -95,45 +77,47 @@ void Element::setAttribute(const XMLString& name, const XMLString& value)
 		pAttr = ownerDocument()->createAttribute(name);
 		pAttr->setValue(value);
 		setAttributeNode(pAttr);
+		pAttr->release();
 	}
 }
 
 
 void Element::removeAttribute(const XMLString& name)
 {
-	Attr::Ptr pAttr = getAttributeNode(name);
+	Attr* pAttr = getAttributeNode(name);
 	if (pAttr) removeAttributeNode(pAttr);
 }
 
 
-Attr::Ptr Element::getAttributeNode(const XMLString& name) const
+Attr* Element::getAttributeNode(const XMLString& name) const
 {
-	Attr::Ptr pAttr = _pFirstAttr;
-	while (pAttr && pAttr->_name.qname() != name)
-		pAttr = pAttr->_pNext.unsafeCast<Attr>();
+	Attr* pAttr = _pFirstAttr;
+	while (pAttr && pAttr->_name.qname() != name) pAttr = static_cast<Attr*>(pAttr->_pNext);
 	return pAttr;
 }
 
 
-Attr::Ptr Element::setAttributeNode(Attr::Ptr newAttr)
+Attr* Element::setAttributeNode(Attr* newAttr)
 {
+	poco_check_ptr (newAttr);
+
 	if (newAttr->ownerDocument() != ownerDocument())
 		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
 	if (newAttr->ownerElement())
 		throw DOMException(DOMException::INUSE_ATTRIBUTE_ERR);
 
-	Attr::Ptr oldAttr = getAttributeNode(newAttr->name());
+	Attr* oldAttr = getAttributeNode(newAttr->name());
 	if (oldAttr) removeAttributeNode(oldAttr);
 
-	Attr::Ptr pCur = _pFirstAttr;
+	Attr* pCur = _pFirstAttr;
 	if (pCur)
 	{
-		while (pCur->_pNext) pCur = pCur->_pNext.unsafeCast<Attr>();
+		while (pCur->_pNext) pCur = static_cast<Attr*>(pCur->_pNext);
 		pCur->_pNext = newAttr;
 	}
-	else
-		_pFirstAttr = newAttr;
-	newAttr->_pParent = Ptr(this, true).cast<AbstractContainerNode>();
+	else _pFirstAttr = newAttr;
+	newAttr->duplicate();
+	newAttr->_pParent = this;
 	if (_pOwner->events())
 		dispatchAttrModified(newAttr, MutationEvent::ADDITION, EMPTY_STRING, newAttr->getValue());
 
@@ -141,36 +125,35 @@ Attr::Ptr Element::setAttributeNode(Attr::Ptr newAttr)
 }
 
 
-Attr::Ptr Element::removeAttributeNode(Attr::Ptr oldAttr)
+Attr* Element::removeAttributeNode(Attr* oldAttr)
 {
 	poco_check_ptr (oldAttr);
 
 	if (_pOwner->events())
 		dispatchAttrModified(oldAttr, MutationEvent::REMOVAL, oldAttr->getValue(), EMPTY_STRING);
 
-	if(oldAttr != _pFirstAttr)
+	if (oldAttr != _pFirstAttr)
 	{
-		Attr::Ptr pCur = _pFirstAttr;
-		while(pCur->_pNext.cast<Attr>() != oldAttr) pCur = pCur->_pNext.unsafeCast<Attr>();
-		if(pCur)
+		Attr* pCur = _pFirstAttr;
+		while (pCur->_pNext != oldAttr) pCur = static_cast<Attr*>(pCur->_pNext);
+		if (pCur)
 		{
-			pCur->_pNext = pCur->_pNext->_pNext.cast<AbstractNode>();
+			pCur->_pNext = static_cast<Attr*>(pCur->_pNext->_pNext);
 		}
 		else throw DOMException(DOMException::NOT_FOUND_ERR);
 	}
-	else
-		_pFirstAttr = _pFirstAttr->_pNext.unsafeCast<Attr>();
-	oldAttr->_pNext = 0;
+	else _pFirstAttr = static_cast<Attr*>(_pFirstAttr->_pNext);
+	oldAttr->_pNext   = 0;
 	oldAttr->_pParent = 0;
-	oldAttr = 0;
+	oldAttr->autoRelease();
 
 	return oldAttr;
 }
 
 
-Attr::Ptr Element::addAttributeNodeNP(Attr::Ptr oldAttr, Attr::Ptr newAttr)
+Attr* Element::addAttributeNodeNP(Attr* oldAttr, Attr* newAttr)
 {
-	newAttr->_pParent = Ptr(this, true).cast<AbstractContainerNode>();
+	newAttr->_pParent = this;
 	if (oldAttr)
 	{
 		oldAttr->_pNext = newAttr;
@@ -184,25 +167,26 @@ Attr::Ptr Element::addAttributeNodeNP(Attr::Ptr oldAttr, Attr::Ptr newAttr)
 	{
 		_pFirstAttr = newAttr;
 	}
+	newAttr->duplicate();
 	return newAttr;
 }
 
 
-NodeList::Ptr Element::getElementsByTagName(const XMLString& name) const
+NodeList* Element::getElementsByTagName(const XMLString& name) const
 {
-	return new ElementsByTagNameList(RefPtr<Element>(const_cast<Element*>(this), true), name);
+	return new ElementsByTagNameList(this, name);
 }
 
 
-NodeList::Ptr Element::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
+NodeList* Element::getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return new ElementsByTagNameListNS(RefPtr<Element>(const_cast<Element*>(this), true), namespaceURI, localName);
+	return new ElementsByTagNameListNS(this, namespaceURI, localName);
 }
 
 
 void Element::normalize()
 {
-	Node::Ptr pCur = firstChild();
+	Node* pCur = firstChild();
 	while (pCur)
 	{
 		if (pCur->nodeType() == Node::ELEMENT_NODE)
@@ -211,10 +195,10 @@ void Element::normalize()
 		}
 		else if (pCur->nodeType() == Node::TEXT_NODE)
 		{
-			Node::Ptr pNext = pCur->nextSibling();
+			Node* pNext = pCur->nextSibling();
 			while (pNext && pNext->nodeType() == Node::TEXT_NODE)
 			{
-				pCur.unsafeCast<Text>()->appendData(pNext->nodeValue());
+				static_cast<Text*>(pCur)->appendData(pNext->nodeValue());
 				removeChild(pNext);
 				pNext = pCur->nextSibling();
 			}
@@ -230,9 +214,9 @@ const XMLString& Element::nodeName() const
 }
 
 
-NamedNodeMap::Ptr Element::attributes() const
+NamedNodeMap* Element::attributes() const
 {
-	return new AttrMap(RefPtr<Element>(const_cast<Element*>(this), true));
+	return new AttrMap(const_cast<Element*>(this));
 }
 
 
@@ -244,7 +228,7 @@ unsigned short Element::nodeType() const
 
 const XMLString& Element::getAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	Attr::Ptr pAttr = getAttributeNodeNS(namespaceURI, localName);
+	Attr* pAttr = getAttributeNodeNS(namespaceURI, localName);
 	if (pAttr)
 		return pAttr->getValue();
 	else
@@ -254,7 +238,7 @@ const XMLString& Element::getAttributeNS(const XMLString& namespaceURI, const XM
 
 void Element::setAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName, const XMLString& value)
 {
-	Attr::Ptr pAttr = getAttributeNodeNS(namespaceURI, qualifiedName);
+	Attr* pAttr = getAttributeNodeNS(namespaceURI, qualifiedName);
 	if (pAttr)
 	{
 		pAttr->setValue(value);
@@ -264,27 +248,27 @@ void Element::setAttributeNS(const XMLString& namespaceURI, const XMLString& qua
 		pAttr = _pOwner->createAttributeNS(namespaceURI, qualifiedName);
 		pAttr->setValue(value);
 		setAttributeNodeNS(pAttr);
+		pAttr->release();
 	}
 }
 
 
 void Element::removeAttributeNS(const XMLString& namespaceURI, const XMLString& localName)
 {
-	Attr::Ptr pAttr = getAttributeNodeNS(namespaceURI, localName);
+	Attr* pAttr = getAttributeNodeNS(namespaceURI, localName);
 	if (pAttr) removeAttributeNode(pAttr);
 }
 
 
-Attr::Ptr Element::getAttributeNodeNS(const XMLString& namespaceURI, const XMLString& localName) const
+Attr* Element::getAttributeNodeNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	Attr::Ptr pAttr = _pFirstAttr;
-	while (!pAttr.isNull() && (pAttr->_name.namespaceURI() != namespaceURI || pAttr->_name.localName() != localName))
-		pAttr = pAttr->_pNext.cast<Attr>();
+	Attr* pAttr = _pFirstAttr;
+	while (pAttr && (pAttr->_name.namespaceURI() != namespaceURI || pAttr->_name.localName() != localName)) pAttr = static_cast<Attr*>(pAttr->_pNext);
 	return pAttr;
 }
 
 
-Attr::Ptr Element::setAttributeNodeNS(Attr::Ptr newAttr)
+Attr* Element::setAttributeNodeNS(Attr* newAttr)
 {
 	poco_check_ptr (newAttr);
 
@@ -293,18 +277,18 @@ Attr::Ptr Element::setAttributeNodeNS(Attr::Ptr newAttr)
 	if (newAttr->ownerElement())
 		throw DOMException(DOMException::INUSE_ATTRIBUTE_ERR);
 
-	Attr::Ptr oldAttr = getAttributeNodeNS(newAttr->namespaceURI(), newAttr->localName());
+	Attr* oldAttr = getAttributeNodeNS(newAttr->namespaceURI(), newAttr->localName());
 	if (oldAttr) removeAttributeNode(oldAttr);
 
-	Attr::Ptr pCur = _pFirstAttr;
+	Attr* pCur = _pFirstAttr;
 	if (pCur)
 	{
-		while (pCur->_pNext) pCur = pCur->_pNext.cast<Attr>();
+		while (pCur->_pNext) pCur = static_cast<Attr*>(pCur->_pNext);
 		pCur->_pNext = newAttr;
 	}
-	else
-		_pFirstAttr = newAttr;
-	newAttr->_pParent = Ptr(this, true).cast<AbstractContainerNode>();
+	else _pFirstAttr = newAttr;
+	newAttr->_pParent = this;
+	newAttr->duplicate();
 	if (_pOwner->events())
 		dispatchAttrModified(newAttr, MutationEvent::ADDITION, EMPTY_STRING, newAttr->getValue());
 
@@ -314,13 +298,13 @@ Attr::Ptr Element::setAttributeNodeNS(Attr::Ptr newAttr)
 
 bool Element::hasAttribute(const XMLString& name) const
 {
-	return !getAttributeNode(name).isNull();
+	return getAttributeNode(name) != 0;
 }
 
 
 bool Element::hasAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return !getAttributeNodeNS(namespaceURI, localName).isNull();
+	return getAttributeNodeNS(namespaceURI, localName) != 0;
 }
 
 
@@ -344,14 +328,14 @@ const XMLString& Element::localName() const
 
 bool Element::hasAttributes() const
 {
-	return !_pFirstAttr.isNull();
+	return _pFirstAttr != 0;
 }
 
 
 XMLString Element::innerText() const
 {
 	XMLString result;
-	Node::Ptr pChild = firstChild();
+	Node* pChild = firstChild();
 	while (pChild)
 	{
 		result.append(pChild->innerText());
@@ -361,32 +345,32 @@ XMLString Element::innerText() const
 }
 
 
-Element::Ptr Element::getChildElement(const XMLString& name) const
+Element* Element::getChildElement(const XMLString& name) const
 {
-	Node::Ptr pNode = firstChild().unsafeCast<Node>();
-	while (!pNode.isNull() && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->nodeName() == name))
-		pNode = pNode->nextSibling().unsafeCast<Node>();
-	return pNode.unsafeCast<Element>();
+	Node* pNode = firstChild();
+	while (pNode && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->nodeName() == name))
+		pNode = pNode->nextSibling();
+	return static_cast<Element*>(pNode);
 }
 
 
-Element::Ptr Element::getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const
+Element* Element::getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	Node::Ptr pNode = firstChild();
+	Node* pNode = firstChild();
 	while (pNode && !(pNode->nodeType() == Node::ELEMENT_NODE && pNode->namespaceURI() == namespaceURI && pNode->localName() == localName))
 		pNode = pNode->nextSibling();
-	return pNode.unsafeCast<Element>();
+	return static_cast<Element*>(pNode);
 }
 
 
 void Element::dispatchNodeRemovedFromDocument()
 {
 	AbstractContainerNode::dispatchNodeRemovedFromDocument();
-	Attr::Ptr pAttr = _pFirstAttr;
+	Attr* pAttr = _pFirstAttr;
 	while (pAttr)
 	{
 		pAttr->dispatchNodeRemovedFromDocument();
-		pAttr = pAttr->_pNext.unsafeCast<Attr>();
+		pAttr = static_cast<Attr*>(pAttr->_pNext);
 	}
 }
 
@@ -394,24 +378,24 @@ void Element::dispatchNodeRemovedFromDocument()
 void Element::dispatchNodeInsertedIntoDocument()
 {
 	AbstractContainerNode::dispatchNodeInsertedIntoDocument();
-	Attr::Ptr pAttr = _pFirstAttr;
+	Attr* pAttr = _pFirstAttr;
 	while (pAttr)
 	{
 		pAttr->dispatchNodeInsertedIntoDocument();
-		pAttr = pAttr->_pNext.unsafeCast<Attr>();
+		pAttr = static_cast<Attr*>(pAttr->_pNext);
 	}
 }
 
 
-Node::Ptr Element::copyNode(bool deep, Document::Ptr pOwnerDocument) const
+Node* Element::copyNode(bool deep, Document* pOwnerDocument) const
 {
-	Element::Ptr pClone = new Element(pOwnerDocument, *this);
+	Element* pClone = new Element(pOwnerDocument, *this);
 	if (deep)
 	{
-		Node::Ptr pNode = firstChild();
+		Node* pNode = firstChild();
 		while (pNode)
 		{
-			pClone->appendChild(pNode.unsafeCast<AbstractNode>()->copyNode(true, pOwnerDocument));
+			pClone->appendChild(static_cast<AbstractNode*>(pNode)->copyNode(true, pOwnerDocument))->release();
 			pNode = pNode->nextSibling();
 		}
 	}
@@ -419,17 +403,17 @@ Node::Ptr Element::copyNode(bool deep, Document::Ptr pOwnerDocument) const
 }
 
 
-Element::Ptr Element::getElementById(const XMLString& elementId, const XMLString& idAttribute) const
+Element* Element::getElementById(const XMLString& elementId, const XMLString& idAttribute) const
 {
 	if (getAttribute(idAttribute) == elementId)
-		return RefPtr<Element>(const_cast<Element*>(this), true);
+		return const_cast<Element*>(this);
 
-	Node::Ptr pNode = firstChild();
+	Node* pNode = firstChild();
 	while (pNode)
 	{
 		if (pNode->nodeType() == Node::ELEMENT_NODE)
 		{
-			Element::Ptr pResult = pNode.unsafeCast<Element>()->getElementById(elementId, idAttribute);
+			Element* pResult = static_cast<Element*>(pNode)->getElementById(elementId, idAttribute);
 			if (pResult) return pResult;
 		}
 		pNode = pNode->nextSibling();
@@ -438,17 +422,17 @@ Element::Ptr Element::getElementById(const XMLString& elementId, const XMLString
 }
 
 
-Element::Ptr Element::getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const
+Element* Element::getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const
 {
 	if (getAttributeNS(idAttributeURI, idAttributeLocalName) == elementId)
-		return RefPtr<Element>(const_cast<Element*>(this), true);
+		return const_cast<Element*>(this);
 
-	Node::Ptr pNode = firstChild();
+	Node* pNode = firstChild();
 	while (pNode)
 	{
 		if (pNode->nodeType() == Node::ELEMENT_NODE)
 		{
-			Element::Ptr pResult = pNode.unsafeCast<Element>()->getElementByIdNS(elementId, idAttributeURI, idAttributeLocalName);
+			Element* pResult = static_cast<Element*>(pNode)->getElementByIdNS(elementId, idAttributeURI, idAttributeLocalName);
 			if (pResult) return pResult;
 		}
 		pNode = pNode->nextSibling();

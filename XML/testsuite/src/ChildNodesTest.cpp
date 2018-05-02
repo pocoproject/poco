@@ -14,14 +14,14 @@
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/NodeList.h"
-#include "Poco/RefPtr.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
 using Poco::XML::Element;
 using Poco::XML::Document;
 using Poco::XML::NodeList;
 using Poco::XML::Node;
-using Poco::RefPtr;
+using Poco::XML::AutoPtr;
 
 
 ChildNodesTest::ChildNodesTest(const std::string& name): CppUnit::TestCase(name)
@@ -36,47 +36,47 @@ ChildNodesTest::~ChildNodesTest()
 
 void ChildNodesTest::testChildNodes()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pRoot = pDoc->createElement("root");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("root");
 
 	assertTrue (!pRoot->hasChildNodes());
-	RefPtr<NodeList> pNL = pRoot->childNodes();
+	AutoPtr<NodeList> pNL = pRoot->childNodes();
 	assertTrue (pNL->length() == 0);
-
-	RefPtr<Element> pChild1 = pDoc->createElement("child1");
+	
+	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
 	assertTrue (pRoot->hasChildNodes());
-
+	
 	assertTrue (pNL->length() == 1);
-	assertTrue (pNL->item(0).cast<Element>() == pChild1);
+	assertTrue (pNL->item(0) == pChild1);
 
-	RefPtr<Element> pChild2 = pDoc->createElement("child2");
+	AutoPtr<Element> pChild2 = pDoc->createElement("child2");
 	pRoot->appendChild(pChild2);
 
 	assertTrue (pNL->length() == 2);
-	assertTrue (pNL->item(0).cast<Element>() == pChild1);
-	assertTrue (pNL->item(1).cast<Element>() == pChild2);
+	assertTrue (pNL->item(0) == pChild1);
+	assertTrue (pNL->item(1) == pChild2);
 	
-	RefPtr<Element> pChild0 = pDoc->createElement("child0");
+	AutoPtr<Element> pChild0 = pDoc->createElement("child0");
 	pRoot->insertBefore(pChild0, pChild1);
 
 	assertTrue (pNL->length() == 3);
-	assertTrue (pNL->item(0).cast<Element>() == pChild0);
-	assertTrue (pNL->item(1).cast<Element>() == pChild1);
-	assertTrue (pNL->item(2).cast<Element>() == pChild2);
+	assertTrue (pNL->item(0) == pChild0);
+	assertTrue (pNL->item(1) == pChild1);
+	assertTrue (pNL->item(2) == pChild2);
 
 	pRoot->removeChild(pChild1);
 	assertTrue (pNL->length() == 2);
-	assertTrue (pNL->item(0).cast<Element>() == pChild0);
-	assertTrue (pNL->item(1).cast<Element>() == pChild2);
+	assertTrue (pNL->item(0) == pChild0);
+	assertTrue (pNL->item(1) == pChild2);
 
 	pRoot->removeChild(pChild0);
 	assertTrue (pNL->length() == 1);
-	assertTrue (pNL->item(0).cast<Element>() == pChild2);
+	assertTrue (pNL->item(0) == pChild2);
 
 	pRoot->removeChild(pChild2);
 	assertTrue (pNL->length() == 0);
-	assertTrue (pNL->item(0).isNull());
+	assertTrue (pNL->item(0) == 0);
 
 	assertTrue (!pRoot->hasChildNodes());
 }

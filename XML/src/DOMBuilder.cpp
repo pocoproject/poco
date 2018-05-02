@@ -25,10 +25,9 @@
 #include "Poco/DOM/EntityReference.h"
 #include "Poco/DOM/Notation.h"
 #include "Poco/DOM/ProcessingInstruction.h"
+#include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/XMLReader.h"
 #include "Poco/SAX/AttributesImpl.h"
-#include "Poco/SAX/InputSource.h"
-#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -38,50 +37,91 @@ namespace XML {
 const XMLString DOMBuilder::EMPTY_STRING;
 
 
-DOMBuilder::DOMBuilder(XMLReader::Ptr pXMLReader, NamePool::Ptr pNamePool):
-	_pXMLReader(pXMLReader),
+DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
+	_xmlReader(xmlReader),
 	_pNamePool(pNamePool),
+	_pDocument(0),
+	_pParent(0),
+	_pPrevious(0),
 	_inCDATA(false),
 	_namespaces(true)
 {
-	Ptr pThis(this, true);
-	_pXMLReader->setContentHandler(pThis.cast<ContentHandler>());
-	_pXMLReader->setDTDHandler(pThis.cast<DTDHandler>());
-	_pXMLReader->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, pThis.cast<LexicalHandler>());
+	_xmlReader.setContentHandler(this);
+	_xmlReader.setDTDHandler(this);
+	_xmlReader.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(this));
+
+	if (_pNamePool) _pNamePool->duplicate();
 }
 
 
 DOMBuilder::~DOMBuilder()
 {
+	if (_pNamePool) _pNamePool->release();
 }
 
 
-Document::Ptr DOMBuilder::parse(const XMLString& uri)
+Document* DOMBuilder::parse(const XMLString& uri)
 {
 	setupParse();
 	_pDocument->suspendEvents();
-	_pXMLReader->parse(uri);
+	try
+	{
+		_xmlReader.parse(uri);
+	}
+	catch (...)
+	{
+		_pDocument->release();
+		_pDocument = 0;
+		_pParent   = 0;
+		_pPrevious = 0;
+		throw;
+	}
 	_pDocument->resumeEvents();
+	_pDocument->collectGarbage();
 	return _pDocument;
 }
 
 
-Document::Ptr DOMBuilder::parse(InputSource::Ptr pInputSource)
+Document* DOMBuilder::parse(InputSource* pInputSource)
 {
 	setupParse();
 	_pDocument->suspendEvents();
-	_pXMLReader->parse(pInputSource);
+	try
+	{
+		_xmlReader.parse(pInputSource);
+	}
+	catch (...)
+	{
+		_pDocument->release();
+		_pDocument = 0;
+		_pParent   = 0;
+		_pPrevious = 0;
+		throw;
+	}
 	_pDocument->resumeEvents();
+	_pDocument->collectGarbage();
 	return _pDocument;
 }
 
 
-Document::Ptr DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
+Document* DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
 {
 	setupParse();
 	_pDocument->suspendEvents();
-	_pXMLReader->parseMemoryNP(xml, size);
+	try
+	{
+		_xmlReader.parseMemoryNP(xml, size);
+	}
+	catch (...)
+	{
+		_pDocument->release();
+		_pDocument = 0;
+		_pParent   = 0;
+		_pPrevious = 0;
+		throw;
+	}
 	_pDocument->resumeEvents();
+	_pDocument->collectGarbage();
 	return _pDocument;
 }
 
@@ -89,36 +129,32 @@ Document::Ptr DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
 void DOMBuilder::setupParse()
 {
 	_pDocument  = new Document(_pNamePool);
-	_pParent    = _pDocument.cast<AbstractContainerNode>();
+	_pParent    = _pDocument;
 	_pPrevious  = 0;
 	_inCDATA    = false;
-	_namespaces = _pXMLReader->getFeature(XMLReader::FEATURE_NAMESPACES);
+	_namespaces = _xmlReader.getFeature(XMLReader::FEATURE_NAMESPACES);
 }
 
 
-AbstractNode::Ptr& DOMBuilder::appendNode(AbstractNode::Ptr&& pNode)
+inline void DOMBuilder::appendNode(AbstractNode* pNode)
 {
-	if (_pParent)
+	if (_pPrevious && _pPrevious != _pParent)
 	{
-		if(!_pPrevious.isNull() && _pPrevious/*.lock()*/ != _pParent.unsafeCast<AbstractNode>())
-		{
-			_pPrevious->_pNext = pNode;
-			pNode->_pParent = _pParent.cast<AbstractContainerNode>();
-		}
-		else _pParent->appendChild(pNode);
+		_pPrevious->_pNext = pNode;
+		pNode->_pParent = _pParent;
+		pNode->duplicate();
 	}
-	else throw NullPointerException("DOMBuilder::endElement(): _pParent is null");
-	_pPrevious = std::move(pNode);
-	return _pPrevious;
+	else _pParent->appendChild(pNode);
+	_pPrevious = pNode;
 }
 
 
 void DOMBuilder::notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId)
 {
-	DocumentType::Ptr pDoctype = _pDocument->getDoctype();
+	DocumentType* pDoctype = _pDocument->getDoctype();
 	if (pDoctype)
 	{
-		RefPtr<Notation> pNotation = _pDocument->createNotation(name, (publicId ? *publicId : EMPTY_STRING), (systemId ? *systemId : EMPTY_STRING));
+		AutoPtr<Notation> pNotation = _pDocument->createNotation(name, (publicId ? *publicId : EMPTY_STRING), (systemId ? *systemId : EMPTY_STRING));
 		pDoctype->appendChild(pNotation);
 	}
 }
@@ -126,16 +162,16 @@ void DOMBuilder::notationDecl(const XMLString& name, const XMLString* publicId, 
 
 void DOMBuilder::unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName)
 {
-	DocumentType::Ptr pDoctype = _pDocument->getDoctype();
+	DocumentType* pDoctype = _pDocument->getDoctype();
 	if (pDoctype)
 	{
-		RefPtr<Entity> pEntity = _pDocument->createEntity(name, publicId ? *publicId : EMPTY_STRING, systemId, notationName);
+		AutoPtr<Entity> pEntity = _pDocument->createEntity(name, publicId ? *publicId : EMPTY_STRING, systemId, notationName);
 		pDoctype->appendChild(pEntity);
 	}
 }
 
 
-void DOMBuilder::setDocumentLocator(const Locator::Ptr loc)
+void DOMBuilder::setDocumentLocator(const Locator* loc)
 {
 }
 
@@ -152,53 +188,51 @@ void DOMBuilder::endDocument()
 
 void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
-	Element::Ptr pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
+	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
 	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
-	Attr::Ptr pPrevAttr;
+	Attr* pPrevAttr = 0;
 	for (AttributesImpl::iterator it = attrs.begin(); it != attrs.end(); ++it)
 	{
-		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, new Attr(_pDocument, it->namespaceURI, it->localName, it->qname, it->value, it->specified));
+		AutoPtr<Attr> pAttr = new Attr(_pDocument, 0, it->namespaceURI, it->localName, it->qname, it->value, it->specified);
+		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, pAttr);
 	}
-
-	_pParent = appendNode(pElem).cast<AbstractContainerNode>();
+	appendNode(pElem);
+	_pParent = pElem;
 }
 
 
 void DOMBuilder::endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
 {
-	if (_pParent)
-	{
-		_pPrevious = _pParent;
-		_pParent = _pParent->parentNode().unsafeCast<AbstractContainerNode>();
-	}
-	else throw NullPointerException("DOMBuilder::endElement(): _pParent is null");
+	_pPrevious = _pParent;
+	_pParent   = static_cast<AbstractContainerNode*>(_pParent->parentNode());
 }
 
 
 void DOMBuilder::characters(const XMLChar ch[], int start, int length)
 {
-	AbstractNode* pPrevious = _pPrevious.get();
 	if (_inCDATA)
 	{
-		if (pPrevious && pPrevious->nodeType() == Node::CDATA_SECTION_NODE)
+		if (_pPrevious && _pPrevious->nodeType() == Node::CDATA_SECTION_NODE)
 		{
-			(static_cast<CDATASection*>(pPrevious))->appendData(XMLString(ch + start, length));
+			static_cast<CDATASection*>(_pPrevious)->appendData(XMLString(ch + start, length));
 		}
 		else
 		{
-			appendNode(_pDocument->createCDATASection(XMLString(ch + start, length)));
+			AutoPtr<CDATASection> pCDATA = _pDocument->createCDATASection(XMLString(ch + start, length));
+			appendNode(pCDATA);
 		}
 	}
 	else
 	{
-		if (pPrevious && pPrevious->nodeType() == Node::TEXT_NODE)
+		if (_pPrevious && _pPrevious->nodeType() == Node::TEXT_NODE)
 		{
-			(static_cast<Text*>(pPrevious))->appendData(XMLString(ch + start, length));
+			static_cast<Text*>(_pPrevious)->appendData(XMLString(ch + start, length));
 		}
 		else
 		{
-			appendNode(_pDocument->createTextNode(XMLString(ch + start, length)));
+			AutoPtr<Text> pText = _pDocument->createTextNode(XMLString(ch + start, length));
+			appendNode(pText);
 		}
 	}
 }
@@ -212,7 +246,8 @@ void DOMBuilder::ignorableWhitespace(const XMLChar ch[], int start, int length)
 
 void DOMBuilder::processingInstruction(const XMLString& target, const XMLString& data)
 {
-	appendNode(_pDocument->createProcessingInstruction(target, data));
+	AutoPtr<ProcessingInstruction> pPI = _pDocument->createProcessingInstruction(target, data);
+	appendNode(pPI);
 }
 
 
@@ -228,13 +263,15 @@ void DOMBuilder::endPrefixMapping(const XMLString& prefix)
 
 void DOMBuilder::skippedEntity(const XMLString& name)
 {
-	appendNode(_pDocument->createEntityReference(name));
+	AutoPtr<EntityReference> pER = _pDocument->createEntityReference(name);
+	appendNode(pER);
 }
 
 
 void DOMBuilder::startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId)
 {
-	_pDocument->setDoctype(new DocumentType(_pDocument, name, publicId, systemId));
+	AutoPtr<DocumentType> pDoctype = new DocumentType(_pDocument, name, publicId, systemId);
+	_pDocument->setDoctype(pDoctype);
 }
 
 
@@ -267,8 +304,8 @@ void DOMBuilder::endCDATA()
 
 void DOMBuilder::comment(const XMLChar ch[], int start, int length)
 {
-	//RefPtr<Comment> pComment = _pDocument->createComment(XMLString(ch + start, length));
-	appendNode(_pDocument->createComment(XMLString(ch + start, length)));
+	AutoPtr<Comment> pComment = _pDocument->createComment(XMLString(ch + start, length));
+	appendNode(pComment);
 }
 
 

@@ -20,9 +20,6 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/Node.h"
-#include "Poco/DOM/Element.h"
-#include "Poco/RefPtr.h"
-#include "Poco/WeakRefPtr.h"
 
 
 namespace Poco {
@@ -30,6 +27,8 @@ namespace XML {
 
 
 class AbstractNode;
+class Element;
+
 
 class XML_API NodeAppender
 	/// The NodeAppender class provides a very fast way to
@@ -47,14 +46,14 @@ class XML_API NodeAppender
 	/// This class is not part of the DOM specification.
 {
 public:
-	NodeAppender(RefPtr<Element> parent);
+	NodeAppender(Element* parent);
 		/// Creates the NodeAppender for the given parent node,
 		/// which must be an Element.
 
 	~NodeAppender();
 		/// Destroys the NodeAppender.
 
-	void appendChild(Node::Ptr newChild);
+	void appendChild(Node* newChild);
 		/// Appends the node newChild to the end of the list of children of
 		/// the parent node specified in the constructor.
 		/// If the newChild is already in the tree, it is first removed.
@@ -69,9 +68,9 @@ private:
 	NodeAppender();
 	NodeAppender(const NodeAppender&);
 	NodeAppender& operator = (const NodeAppender&);
-
-	WeakRefPtr<Element>  _pParent;
-	RefPtr<AbstractNode> _pLast;
+	
+	Element*      _pParent;
+	AbstractNode* _pLast;
 };
 
 

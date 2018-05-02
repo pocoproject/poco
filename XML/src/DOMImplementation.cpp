@@ -53,20 +53,20 @@ bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& ve
 	       (lcFeature == FEATURE_TRAVERSAL && version == VERSION_2_0);
 }
 
-
-DocumentType::Ptr DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
+		
+DocumentType* DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
 	return new DocumentType(0, name, publicId, systemId);
 }
 
 
-Document::Ptr DOMImplementation::createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType::Ptr doctype) const
+Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType* doctype) const
 {
-	Document::Ptr pDoc = new Document(doctype);
+	Document* pDoc = new Document(doctype);
 	if (namespaceURI.empty())
-		pDoc->appendChild(pDoc->createElement(qualifiedName));
+		pDoc->appendChild(pDoc->createElement(qualifiedName))->release();
 	else
-		pDoc->appendChild(pDoc->createElementNS(namespaceURI, qualifiedName));
+		pDoc->appendChild(pDoc->createElementNS(namespaceURI, qualifiedName))->release();
 	return pDoc;
 }
 

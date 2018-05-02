@@ -20,8 +20,6 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -31,7 +29,7 @@ namespace XML {
 class Node;
 
 
-class XML_API NodeFilter: public RefCountedObject
+class XML_API NodeFilter
 	/// Filters are objects that know how to "filter out" nodes. If a NodeIterator
 	/// or TreeWalker is given a NodeFilter, it applies the filter before it returns
 	/// the next node. If the filter says to accept the node, the traversal logic
@@ -48,8 +46,6 @@ class XML_API NodeFilter: public RefCountedObject
 	/// a number of different kinds of traversals, encouraging code reuse.
 {
 public:
-	typedef RefPtr<NodeFilter> Ptr;
-
 	enum
 	{
 		FILTER_ACCEPT = 1,
@@ -129,8 +125,8 @@ public:
 			/// notations are not part of the document tree, they do not appear when traversing
 			/// over the document tree.
 	};
-
-	virtual short acceptNode(RefPtr<Node> node) const = 0;
+	
+	virtual short acceptNode(Node* node) = 0;
 		/// Test whether a specified node is visible in the logical view of a TreeWalker
 		/// or NodeIterator. This function will be called by the implementation of TreeWalker
 		/// and NodeIterator; it is not normally called directly from user code. (Though

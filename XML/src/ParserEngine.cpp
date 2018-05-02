@@ -23,9 +23,11 @@
 #include "Poco/SAX/LexicalHandler.h"
 #include "Poco/SAX/ErrorHandler.h"
 #include "Poco/SAX/InputSource.h"
+#include "Poco/SAX/Locator.h"
 #include "Poco/SAX/LocatorImpl.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/URI.h"
+#include <cstring>
 
 
 using Poco::URI;
@@ -39,20 +41,22 @@ namespace XML {
 class ContextLocator: public Locator
 {
 public:
-	typedef RefPtr<ContextLocator> Ptr;
-
 	ContextLocator(XML_Parser parser, const XMLString& publicId, const XMLString& systemId):
 		_parser(parser),
 		_publicId(publicId),
 		_systemId(systemId)
 	{
 	}
-
+		
+	~ContextLocator()
+	{
+	}
+		
 	XMLString getPublicId() const
 	{
 		return _publicId;
 	}
-
+		
 	XMLString getSystemId() const
 	{
 		return _systemId;
@@ -62,17 +66,12 @@ public:
 	{
 		return XML_GetCurrentLineNumber(_parser);
 	}
-
+		
 	int getColumnNumber() const
 	{
 		return XML_GetCurrentColumnNumber(_parser);
 	}
-
-protected:
-	~ContextLocator()
-	{
-	}
-
+		
 private:
 	XML_Parser _parser;
 	XMLString  _publicId;
@@ -177,37 +176,37 @@ void ParserEngine::setExternalParameterEntities(bool flag)
 }
 
 
-void ParserEngine::setEntityResolver(EntityResolver::Ptr pResolver)
+void ParserEngine::setEntityResolver(EntityResolver* pResolver)
 {
 	_pEntityResolver = pResolver;
 }
 
 
-void ParserEngine::setDTDHandler(DTDHandler::Ptr pDTDHandler)
+void ParserEngine::setDTDHandler(DTDHandler* pDTDHandler)
 {
 	_pDTDHandler = pDTDHandler;
 }
 
 
-void ParserEngine::setDeclHandler(DeclHandler::Ptr pDeclHandler)
+void ParserEngine::setDeclHandler(DeclHandler* pDeclHandler)
 {
 	_pDeclHandler = pDeclHandler;
 }
 
 
-void ParserEngine::setContentHandler(ContentHandler::Ptr pContentHandler)
+void ParserEngine::setContentHandler(ContentHandler* pContentHandler)
 {
 	_pContentHandler = pContentHandler;
 }
 
 
-void ParserEngine::setLexicalHandler(LexicalHandler::Ptr pLexicalHandler)
+void ParserEngine::setLexicalHandler(LexicalHandler* pLexicalHandler)
 {
 	_pLexicalHandler = pLexicalHandler;
 }
 
 
-void ParserEngine::setErrorHandler(ErrorHandler::Ptr pErrorHandler)
+void ParserEngine::setErrorHandler(ErrorHandler* pErrorHandler)
 {
 	_pErrorHandler = pErrorHandler;
 }
@@ -219,12 +218,12 @@ void ParserEngine::setEnablePartialReads(bool flag)
 }
 
 
-void ParserEngine::parse(InputSource::Ptr pInputSource)
+void ParserEngine::parse(InputSource* pInputSource)
 {
 	init();
 	resetContext();
 	pushContext(_parser, pInputSource);
-	if (_pContentHandler) _pContentHandler->setDocumentLocator(Ptr(this, true));
+	if (_pContentHandler) _pContentHandler->setDocumentLocator(this);
 	if (_pContentHandler) _pContentHandler->startDocument();
 	if (pInputSource->getCharacterStream())
 		parseCharInputStream(*pInputSource->getCharacterStream());
@@ -240,9 +239,9 @@ void ParserEngine::parse(const char* pBuffer, std::size_t size)
 {
 	init();
 	resetContext();
-	InputSource::Ptr src = new InputSource;
-	pushContext(_parser, src);
-	if (_pContentHandler) _pContentHandler->setDocumentLocator(Ptr(this, true));
+	InputSource src;
+	pushContext(_parser, &src);
+	if (_pContentHandler) _pContentHandler->setDocumentLocator(this);
 	if (_pContentHandler) _pContentHandler->startDocument();
 	std::size_t processed = 0;
 	while (processed < size)
@@ -293,7 +292,7 @@ void ParserEngine::parseCharInputStream(XMLCharInputStream& istr)
 }
 
 
-void ParserEngine::parseExternal(XML_Parser extParser, InputSource::Ptr pInputSource)
+void ParserEngine::parseExternal(XML_Parser extParser, InputSource* pInputSource)
 {
 	pushContext(extParser, pInputSource);
 	if (pInputSource->getCharacterStream())
@@ -425,14 +424,14 @@ int ParserEngine::getColumnNumber() const
 
 namespace
 {
-	static LocatorImpl::Ptr nullLocator = new LocatorImpl;
+	static LocatorImpl nullLocator;
 }
 
 
 const Locator& ParserEngine::locator() const
 {
 	if (_context.empty())
-		return *nullLocator;
+		return nullLocator;
 	else
 		return *_context.back();
 }
@@ -470,7 +469,6 @@ void ParserEngine::init()
 
 	if (!_parser) throw XMLException("Cannot create Expat parser");
 
-	//_this = Ptr(this, true);
 	XML_SetUserData(_parser, this);
 	XML_SetElementHandler(_parser, handleStartElement, handleEndElement);
 	XML_SetCharacterDataHandler(_parser, handleCharacterData);
@@ -588,9 +586,9 @@ void ParserEngine::handleError(int errorNo)
 }	
 
 
-void ParserEngine::pushContext(XML_Parser parser, InputSource::Ptr pInputSource)
+void ParserEngine::pushContext(XML_Parser parser, InputSource* pInputSource)
 {
-	ContextLocator::Ptr pLocator = new ContextLocator(parser, pInputSource->getPublicId(), pInputSource->getSystemId());
+	ContextLocator* pLocator = new ContextLocator(parser, pInputSource->getPublicId(), pInputSource->getSystemId());
 	_context.push_back(pLocator);
 }
 
@@ -598,27 +596,30 @@ void ParserEngine::pushContext(XML_Parser parser, InputSource::Ptr pInputSource)
 void ParserEngine::popContext()
 {
 	poco_assert (!_context.empty());
+	delete _context.back();
 	_context.pop_back();
 }
 
 
 void ParserEngine::resetContext()
 {
+	for (ContextStack::iterator it = _context.begin(); it != _context.end(); ++it)
+	{
+		delete *it;
+	}
 	_context.clear();
 }
 
 
 void ParserEngine::handleStartElement(void* userData, const XML_Char* name, const XML_Char** atts)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
-	if (pThis->_pNamespaceStrategy && pThis->_pContentHandler)
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
+	if (pThis->_pContentHandler)
 	{
 		try
 		{
-			pThis->_pNamespaceStrategy->startElement(name, atts,
-					XML_GetSpecifiedAttributeCount(pThis->_parser)/2,
-					pThis->_pContentHandler);
+			pThis->_pNamespaceStrategy->startElement(name, atts, XML_GetSpecifiedAttributeCount(pThis->_parser)/2, pThis->_pContentHandler);	
 		}
 		catch (XMLException& exc)
 		{
@@ -630,13 +631,13 @@ void ParserEngine::handleStartElement(void* userData, const XML_Char* name, cons
 
 void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
-	if (pThis->_pNamespaceStrategy && pThis->_pContentHandler)
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
+	if (pThis->_pContentHandler)
 	{
 		try
 		{
-			pThis->_pNamespaceStrategy->endElement(name, pThis->_pContentHandler);
+			pThis->_pNamespaceStrategy->endElement(name, pThis->_pContentHandler);	
 		}
 		catch (XMLException& exc)
 		{
@@ -648,18 +649,18 @@ void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 
 void ParserEngine::handleCharacterData(void* userData, const XML_Char* s, int len)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
-	if(pThis->_pContentHandler)
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
+	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->characters(s, 0, len);
 }
 
 
 void ParserEngine::handleProcessingInstruction(void* userData, const XML_Char* target, const XML_Char* data)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
-	if(pThis->_pContentHandler)
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
+	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->processingInstruction(target, data);
 }
 
@@ -671,43 +672,43 @@ void ParserEngine::handleDefault(void* userData, const XML_Char* s, int len)
 
 void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId, const XML_Char* notationName)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
-	if(pThis->_pDTDHandler)
+	if (pThis->_pDTDHandler)
 		pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : 0, systemId, notationName);
 }
 
 
 void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	XMLString sysId;
 	if (systemId) sysId.assign(systemId);
-	if(pThis->_pDTDHandler)
+	if (pThis->_pDTDHandler)
 		pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : 0, systemId ? &sysId : 0);
 }
 
 
 int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* context, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
-	auto pThis = getThis<ParserEngine>(XML_GetUserData(parser));
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(XML_GetUserData(parser));
 
 	if (!context && !pThis->_externalParameterEntities) return XML_STATUS_ERROR;
 	if (context && !pThis->_externalGeneralEntities) return XML_STATUS_ERROR;
 
-	InputSource::Ptr pInputSource = new InputSource;
-	EntityResolverImpl::Ptr defaultResolver = new EntityResolverImpl;
-	EntityResolver::Ptr pEntityResolver = defaultResolver.unsafeCast<EntityResolver>();
+	InputSource* pInputSource = 0;
+	EntityResolver* pEntityResolver = 0;
+	EntityResolverImpl defaultResolver;
 
 	XMLString sysId(systemId);
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
-
+	
 	URI uri(fromXMLString(pThis->_context.back()->getSystemId()));
 	uri.resolve(fromXMLString(sysId));
 
@@ -718,7 +719,7 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 	}
 	if (!pInputSource && pThis->_externalGeneralEntities)
 	{
-		pEntityResolver = defaultResolver;
+		pEntityResolver = &defaultResolver;
 		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
 	}
 
@@ -733,11 +734,11 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 		}
 		catch (XMLException&)
 		{
-			pInputSource = 0;
+			pEntityResolver->releaseInputSource(pInputSource);
 			XML_ParserFree(extParser);
 			throw;
 		}
-		pInputSource = 0;
+		pEntityResolver->releaseInputSource(pInputSource);
 		XML_ParserFree(extParser);
 		return XML_STATUS_OK;
 	}
@@ -747,8 +748,8 @@ int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* con
 
 int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Char* name, XML_Encoding* info)
 {
-	auto pThis = getThis<ParserEngine>(encodingHandlerData);
-
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(encodingHandlerData);
+	
 	XMLString encoding(name);
 	TextEncoding* knownEncoding = 0;
 
@@ -775,7 +776,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 
 void ParserEngine::handleComment(void* userData, const XML_Char* data)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 #if defined(XML_UNICODE_WCHAR_T)
 	if (pThis->_pLexicalHandler)
@@ -789,7 +790,7 @@ void ParserEngine::handleComment(void* userData, const XML_Char* data)
 
 void ParserEngine::handleStartCdataSection(void* userData)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->startCDATA();
@@ -798,7 +799,7 @@ void ParserEngine::handleStartCdataSection(void* userData)
 
 void ParserEngine::handleEndCdataSection(void* userData)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->endCDATA();
@@ -807,7 +808,7 @@ void ParserEngine::handleEndCdataSection(void* userData)
 
 void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* prefix, const XML_Char* uri)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->startPrefixMapping((prefix ? XMLString(prefix) : EMPTY_STRING), (uri ? XMLString(uri) : EMPTY_STRING));
@@ -816,7 +817,7 @@ void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* pref
 
 void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->endPrefixMapping(prefix ? XMLString(prefix) : EMPTY_STRING);
@@ -825,7 +826,7 @@ void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix
 
 void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -838,7 +839,7 @@ void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctyp
 
 void ParserEngine::handleEndDoctypeDecl(void* userData)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	if (pThis->_pLexicalHandler)
 		pThis->_pLexicalHandler->endDTD();
@@ -846,7 +847,7 @@ void ParserEngine::handleEndDoctypeDecl(void* userData)
 
 
 void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength,
-                                    const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName)
+	                                const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName)
 {
 	if (value)
 		handleInternalParsedEntityDecl(userData, entityName, value, valueLength);
@@ -857,7 +858,7 @@ void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, 
 
 void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
@@ -868,7 +869,7 @@ void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char
 
 void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* replacementText, int replacementTextLength)
 {
-	auto pThis = getThis<ParserEngine>(userData);
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
 	XMLString replText(replacementText, replacementTextLength);
 	if (pThis->_pDeclHandler)
@@ -878,8 +879,8 @@ void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char
 
 void ParserEngine::handleSkippedEntity(void* userData, const XML_Char* entityName, int isParameterEntity)
 {
-	auto pThis = getThis<ParserEngine>(userData);
-
+	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	
 	if (pThis->_pContentHandler)
 		pThis->_pContentHandler->skippedEntity(entityName);
 }
@@ -889,48 +890,6 @@ int ParserEngine::convert(void* data, const char* s)
 {
 	TextEncoding* pEncoding = reinterpret_cast<TextEncoding*>(data);
 	return pEncoding->convert((const unsigned char*) s);
-}
-
-
-EntityResolver::Ptr ParserEngine::getEntityResolver() const
-{
-	return _pEntityResolver;
-}
-
-
-DTDHandler::Ptr ParserEngine::getDTDHandler() const
-{
-	return _pDTDHandler;
-}
-
-
-DeclHandler::Ptr ParserEngine::getDeclHandler() const
-{
-	return _pDeclHandler;
-}
-
-
-ContentHandler::Ptr ParserEngine::getContentHandler() const
-{
-	return _pContentHandler;
-}
-
-
-LexicalHandler::Ptr ParserEngine::getLexicalHandler() const
-{
-	return _pLexicalHandler;
-}
-
-
-RefPtr<ErrorHandler> ParserEngine::getErrorHandler() const
-{
-	return _pErrorHandler;
-}
-
-
-bool ParserEngine::getEnablePartialReads() const
-{
-	return _enablePartialReads;
 }
 
 

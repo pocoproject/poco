@@ -21,8 +21,6 @@
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/DOM/DOMObject.h"
-//#include "Poco/DOM/Document.h"
-//#include "Poco/WeakRefPtr.h"
 
 
 namespace Poco {
@@ -43,8 +41,6 @@ class XML_API Event: public DOMObject
 	/// by the object passed to the event listener.
 {
 public:
-	typedef RefPtr<Event> Ptr;
-
 	enum PhaseType
 	{
 		CAPTURING_PHASE = 1, /// The event is currently being evaluated at the target EventTarget.
@@ -55,10 +51,10 @@ public:
 	const XMLString& type() const;
 		/// The name of the event (case-insensitive). The name must be an XML name.
 
-	RefPtr<EventTarget> target() const;
+	EventTarget* target() const;
 		/// Used to indicate the EventTarget to which the event was originally dispatched.
 
-	RefPtr<EventTarget> currentTarget() const;
+	EventTarget* currentTarget() const;
 		/// Used to indicate the EventTarget whose EventListeners are currently being
 		/// processed. This is particularly useful during capturing and bubbling.
 
@@ -113,9 +109,11 @@ public:
 		/// a subclass of Event interface only the values specified in the
 		/// initEvent method are modified, all other attributes are left unchanged.
 
+	void autoRelease();
+
 protected:
-	Event(RefPtr<Document>&& pOwnerDocument, const XMLString& type);
-	Event(RefPtr<Document>&& pOwnerDocument, const XMLString& type, RefPtr<EventTarget>&& pTarget, bool canBubble, bool isCancelable);
+	Event(Document* pOwnerDocument, const XMLString& type);
+	Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable);
 	~Event();
 
 	bool isCanceled() const;
@@ -124,31 +122,26 @@ protected:
 	bool isStopped() const;
 		/// returns true if and only if propagation of the event has been stopped.
 
-	void setTarget(RefPtr<EventTarget> pTarget);
+	void setTarget(EventTarget* pTarget);
 		/// sets the target
 
 	void setCurrentPhase(PhaseType phase);
 		/// sets the current phase
 
-	void setCurrentTarget(RefPtr<EventTarget> pTarget);
+	void setCurrentTarget(EventTarget* pTarget);
 		/// sets the current target
 
 private:
-	Event(const Event&);
-	Event& operator=(const Event&);
-	Event(Event&&);
-	Event& operator=(Event&&);
-
-	Document*            _pOwner;
-	XMLString            _type;
-	RefPtr<EventTarget>  _pTarget;
-	RefPtr<EventTarget>  _pCurrentTarget;
-	PhaseType            _currentPhase;
-	bool                 _bubbles;
-	bool                 _cancelable;
-	bool                 _canceled;
-	bool                 _stopped;
-
+	Document*    _pOwner;
+	XMLString    _type;
+	EventTarget* _pTarget;
+	EventTarget* _pCurrentTarget;
+	PhaseType    _currentPhase;
+	bool         _bubbles;
+	bool         _cancelable;
+	bool         _canceled;
+	bool         _stopped;
+	
 	friend class AbstractNode;
 };
 
@@ -159,6 +152,18 @@ private:
 inline const XMLString& Event::type() const
 {
 	return _type;
+}
+
+
+inline EventTarget* Event::target() const
+{
+	return _pTarget;
+}
+
+
+inline EventTarget* Event::currentTarget() const
+{
+	return _pCurrentTarget;
 }
 
 

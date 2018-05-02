@@ -20,14 +20,13 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
-#include "Poco/SAX/SAXHandler.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class XML_API LexicalHandler: public SAXHandler
+class XML_API LexicalHandler
 	/// This is an optional extension handler for SAX2 to provide lexical information
 	/// about an XML document, such as comments and CDATA section boundaries.
 	/// XML readers are not required to recognize this handler, and it is not part of
@@ -43,8 +42,6 @@ class XML_API LexicalHandler: public SAXHandler
 	/// it will throw a SAXNotRecognizedException when you attempt to register the handler.
 {
 public:
-	typedef RefPtr<LexicalHandler> Ptr;
-
 	virtual void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId) = 0;
 		/// Report the start of DTD declarations, if any.
 		///
@@ -100,7 +97,7 @@ public:
 
 	virtual void endEntity(const XMLString& name) = 0;
 		/// Report the end of an entity.
-
+		
 	virtual void startCDATA() = 0;
 		/// Report the start of a CDATA section.
 		///

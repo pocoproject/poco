@@ -20,7 +20,6 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/DOM/AbstractContainerNode.h"
-#include "Poco/DOM/Document.h"
 #include "Poco/XML/XMLString.h"
 
 
@@ -62,8 +61,6 @@ class XML_API Entity: public AbstractContainerNode
 	/// An Entity node does not have any parent.
 {
 public:
-	typedef RefPtr<Entity> Ptr;
-
 	const XMLString& publicId() const;
 		/// Returns the public identifier associated with
 		/// the entity, if specified. If the public identifier
@@ -84,11 +81,11 @@ public:
 	unsigned short nodeType() const;
 
 protected:
-	Entity(Document::Ptr pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName);
-	Entity(Document::Ptr pOwnerDocument, const Entity& entity);
+	Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName);
+	Entity(Document* pOwnerDocument, const Entity& entity);
 	~Entity();
-
-	Node::Ptr copyNode(bool deep, Document::Ptr pOwnerDocument) const;
+	
+	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

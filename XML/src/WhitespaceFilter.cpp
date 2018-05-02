@@ -26,8 +26,8 @@ WhitespaceFilter::WhitespaceFilter():
 {
 }
 
-
-WhitespaceFilter::WhitespaceFilter(XMLReader::Ptr pReader):
+	
+WhitespaceFilter::WhitespaceFilter(XMLReader* pReader):
 	XMLFilterImpl(pReader),
 	_pLexicalHandler(0),
 	_filter(true)
@@ -50,16 +50,16 @@ void WhitespaceFilter::setProperty(const XMLString& propertyId, const XMLString&
 }
 
 
-void WhitespaceFilter::setProperty(const XMLString& propertyId, SAXHandler::Ptr value)
+void WhitespaceFilter::setProperty(const XMLString& propertyId, void* value)
 {
 	if (propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
-		_pLexicalHandler = value.cast<LexicalHandler>();
+		_pLexicalHandler = reinterpret_cast<LexicalHandler*>(value);
 	else
 		XMLFilterImpl::setProperty(propertyId, value);
 }
 
 
-SAXHandler::Ptr WhitespaceFilter::getProperty(const XMLString& propertyId) const
+void* WhitespaceFilter::getProperty(const XMLString& propertyId) const
 {
 	if (propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
 		return _pLexicalHandler;
@@ -121,7 +121,7 @@ void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 		{
 			XMLFilterImpl::characters(_data.data(), 0, (int) _data.length());
 			_filter = false;
-			_data.clear();
+			_data.clear();	
 		}
 	}
 	else XMLFilterImpl::characters(ch, start, length);
@@ -205,7 +205,7 @@ void WhitespaceFilter::setupParse()
 {
 	XMLFilterImpl::setupParse();
 
-	parent()->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, Ptr(this, true).unsafeCast<LexicalHandler>());
+	parent()->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(this));
 }
 
 

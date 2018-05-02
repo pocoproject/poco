@@ -13,7 +13,6 @@
 
 
 #include "Poco/DOM/MutationEvent.h"
-#include "Poco/DOM/Document.h"
 
 
 namespace Poco {
@@ -29,25 +28,25 @@ const XMLString MutationEvent::DOMAttrModified             = toXMLString("DOMAtt
 const XMLString MutationEvent::DOMCharacterDataModified    = toXMLString("DOMCharacterDataModified");
 
 
-MutationEvent::MutationEvent(Document::Ptr&& pOwnerDocument, const XMLString& type):
-	Event(std::move(pOwnerDocument), type, 0, true, false),
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type):
+	Event(pOwnerDocument, type, 0, true, false),
 	_change(MODIFICATION),
 	_pRelatedNode(0)
 {
 }
 
 
-MutationEvent::MutationEvent(Document::Ptr&& pOwnerDocument, const XMLString& type, EventTarget::Ptr&& pTarget, bool canBubble, bool cancelable, Node::Ptr relatedNode):
-	Event(std::move(pOwnerDocument), type, std::move(pTarget), canBubble, cancelable),
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode):
+	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
 	_change(MODIFICATION),
 	_pRelatedNode(relatedNode)
 {
 }
 
 
-MutationEvent::MutationEvent(Document::Ptr&& pOwnerDocument, const XMLString& type, EventTarget::Ptr&& pTarget, bool canBubble, bool cancelable, Node::Ptr relatedNode,
+MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool cancelable, Node* relatedNode,
 	                         const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change):
-	Event(std::move(pOwnerDocument), type, std::move(pTarget), canBubble, cancelable),
+	Event(pOwnerDocument, type, pTarget, canBubble, cancelable),
 	_prevValue(prevValue),
 	_newValue(newValue),
 	_attrName(attrName),
@@ -62,7 +61,7 @@ MutationEvent::~MutationEvent()
 }
 
 
-void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node::Ptr relatedNode,
+void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, bool cancelable, Node* relatedNode,
 	                                  const XMLString& prevValue, const XMLString& newValue, const XMLString& attrName, AttrChangeType change)
 {
 	initEvent(type, canBubble, cancelable);

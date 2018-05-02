@@ -16,11 +16,9 @@
 #include "Poco/SAX/Attributes.h"
 #include "Poco/SAX/Locator.h"
 #include "Poco/Exception.h"
-#include "Poco/RefPtr.h"
 #include <iostream>
 
 
-using Poco::RefPtr;
 using Poco::XML::SAXParser;
 using Poco::XML::XMLReader;
 using Poco::XML::XMLString;
@@ -34,28 +32,27 @@ using Poco::XML::Locator;
 class MyHandler: public ContentHandler, public LexicalHandler
 {
 public:
-	typedef RefPtr<MyHandler> Ptr;
-
-	MyHandler()
+	MyHandler():
+		_pLocator(0)
 	{
 	}
-
+	
 	// ContentHandler
-	void setDocumentLocator(const Locator::Ptr loc)
+	void setDocumentLocator(const Locator* loc)
 	{
 		_pLocator = loc;
 	}
-
+	
 	void startDocument()
 	{
 		where("startDocument");
 	}
-
+	
 	void endDocument()
 	{
 		where("endDocument");
 	}
-
+	
 	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 	{
 		where("startElement");
@@ -68,88 +65,84 @@ public:
 			std::cout << attributes.getLocalName(i) << "=" << attributes.getValue(i) << std::endl;
 		}
 	}
-
+	
 	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
 	{
 		where("endElement");
 	}
-
+	
 	void characters(const XMLChar ch[], int start, int length)
 	{
 		where("characters");
 		std::cout << std::string(ch + start, length) << std::endl;
 	}
-
+	
 	void ignorableWhitespace(const XMLChar ch[], int start, int length)
 	{
 		where("ignorableWhitespace");
 	}
-
+	
 	void processingInstruction(const XMLString& target, const XMLString& data)
 	{
 		where("processingInstruction");
 		std::cout << "target=" << target << ", data=" << data << std::endl;
 	}
-
+	
 	void startPrefixMapping(const XMLString& prefix, const XMLString& uri)
 	{
 		where("startPrefixMapping");
 		std::cout << "prefix=" << prefix << " uri=" << uri << std::endl;
 	}
-
+	
 	void endPrefixMapping(const XMLString& prefix)
 	{
 		where("endPrefixMapping");
 		std::cout << "prefix=" << prefix << std::endl;
 	}
-
+	
 	void skippedEntity(const XMLString& name)
 	{
 		where("skippedEntity");
 		std::cout << "name=" << name << std::endl;
 	}
-
+	
 	// LexicalHandler
 	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId)
 	{
 		where("startDTD");
 	}
-
+	
 	void endDTD()
 	{
 		where("endDTD");
 	}
-
+	
 	void startEntity(const XMLString& name)
 	{
 		where("startEntity");
 	}
-
+	
 	void endEntity(const XMLString& name)
 	{
 		where("endEntity");
 	}
-
+	
 	void startCDATA()
 	{
 		where("startCDATA");
 	}
-
+	
 	void endCDATA()
 	{
 		where("endCDATA");
 	}
-
+	
 	void comment(const XMLChar ch[], int start, int length)
 	{
 		where("comment");
 	}
-
+	
 protected:
-	~MyHandler()
-	{
-	}
-
 	void where(const std::string& meth)
 	{
 		std::cout << "*** " << meth;
@@ -164,7 +157,7 @@ protected:
 	}
 	
 private:
-	Locator::Ptr _pLocator;
+	const Locator* _pLocator;
 };
 
 
@@ -177,18 +170,18 @@ int main(int argc, char** argv)
 		std::cout << "usage: " << argv[0] << ": <xmlfile>" << std::endl;
 		return 1;
 	}
+	
+	MyHandler handler;
 
-	MyHandler::Ptr handler = new MyHandler;
-
-	SAXParser::Ptr parser = new SAXParser;
-	parser->setFeature(XMLReader::FEATURE_NAMESPACES, true);
-	parser->setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser->setContentHandler(handler);
-	parser->setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, handler.unsafeCast<LexicalHandler>());
+	SAXParser parser;
+	parser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
+	parser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	parser.setContentHandler(&handler);
+	parser.setProperty(XMLReader::PROPERTY_LEXICAL_HANDLER, static_cast<LexicalHandler*>(&handler));
 	
 	try
 	{
-		parser->parse(argv[1]);
+		parser.parse(argv[1]);
 	}
 	catch (Poco::Exception& e)
 	{

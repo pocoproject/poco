@@ -52,21 +52,22 @@ void NamespaceStrategy::splitName(const XMLChar* qname, XMLString& uri, XMLStrin
 	while (*p && *p != '\t') ++p;
 	if (*p)
 	{
-		uri.assign(qname, p++ - qname);
+		uri.assign(qname, p - qname);
+		++p;
 		const XMLChar* loc = p;
 		while (*p && *p != '\t') ++p;
 		localName.assign(loc, p - loc);
 		if (*p)
 			prefix.assign(++p);
 		else
-			prefix.clear();
+			prefix.assign(XML_LIT(""));
 	}
 	else
 	{
-		uri.clear();
+		uri.assign(XML_LIT(""));
 		localName = qname;
-		prefix.clear();
-	}
+		prefix.assign(XML_LIT(""));
+	}	
 }
 
 
@@ -81,7 +82,7 @@ NoNamespacesStrategy::~NoNamespacesStrategy()
 }
 
 
-void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler::Ptr pContentHandler)
+void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
 {
 	poco_assert_dbg (name && atts && pContentHandler);
 
@@ -98,7 +99,7 @@ void NoNamespacesStrategy::startElement(const XMLChar* name, const XMLChar** att
 }
 
 
-void NoNamespacesStrategy::endElement(const XMLChar* name, ContentHandler::Ptr pContentHandler)
+void NoNamespacesStrategy::endElement(const XMLChar* name, ContentHandler* pContentHandler)
 {
 	poco_assert_dbg (name && pContentHandler);
 
@@ -118,7 +119,7 @@ NoNamespacePrefixesStrategy::~NoNamespacePrefixesStrategy()
 }
 
 
-void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler::Ptr pContentHandler)
+void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
 {
 	poco_assert_dbg (name && atts && pContentHandler);
 
@@ -137,7 +138,7 @@ void NoNamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLCha
 }
 
 
-void NoNamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler::Ptr pContentHandler)
+void NoNamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* pContentHandler)
 {
 	poco_assert_dbg (name && pContentHandler);
 
@@ -157,7 +158,7 @@ NamespacePrefixesStrategy::~NamespacePrefixesStrategy()
 }
 
 
-void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler::Ptr pContentHandler)
+void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar** atts, int specifiedCount, ContentHandler* pContentHandler)
 {
 	poco_assert_dbg (name && atts && pContentHandler);
 
@@ -168,24 +169,24 @@ void NamespacePrefixesStrategy::startElement(const XMLChar* name, const XMLChar*
 		const XMLChar* attrValue = *atts++;
 		AttributesImpl::Attribute& attr = _attrs.addAttribute();
 		splitName(attrName, attr.namespaceURI, attr.localName, attr.qname);
-		if (!attr.qname.empty()) attr.qname.append(1, ':');
+		if (!attr.qname.empty()) attr.qname += ':';
 		attr.qname.append(attr.localName);
 		attr.value.assign(attrValue);
 		attr.specified = i < specifiedCount;
 	}
 	splitName(name, _uri, _local, _qname);
-	if (!_qname.empty()) _qname.append(1, ':');
+	if (!_qname.empty()) _qname += ':';
 	_qname.append(_local);
 	pContentHandler->startElement(_uri, _local, _qname, _attrs);
 }
 
 
-void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler::Ptr pContentHandler)
+void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* pContentHandler)
 {
 	poco_assert_dbg (name && pContentHandler);
 
 	splitName(name, _uri, _local, _qname);
-	if (!_qname.empty()) _qname.append(1, ':');
+	if (!_qname.empty()) _qname += ':';
 	_qname.append(_local);
 	pContentHandler->endElement(_uri, _local, _qname);
 }

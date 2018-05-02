@@ -20,8 +20,8 @@ namespace Poco {
 namespace XML {
 
 
-Event::Event(Document::Ptr&& pOwnerDocument, const XMLString& type):
-	_pOwner(std::move(pOwnerDocument)),
+Event::Event(Document* pOwnerDocument, const XMLString& type):
+	_pOwner(pOwnerDocument),
 	_type(type),
 	_pTarget(0),
 	_pCurrentTarget(0),
@@ -34,10 +34,10 @@ Event::Event(Document::Ptr&& pOwnerDocument, const XMLString& type):
 }
 
 
-Event::Event(Document::Ptr&& pOwnerDocument, const XMLString& type, EventTarget::Ptr&& pTarget, bool canBubble, bool isCancelable):
-	_pOwner(std::move(pOwnerDocument)),
+Event::Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable):
+	_pOwner(pOwnerDocument),
 	_type(type),
-	_pTarget(std::move(pTarget)),
+	_pTarget(pTarget),
 	_pCurrentTarget(0),
 	_currentPhase(CAPTURING_PHASE),
 	_bubbles(canBubble),
@@ -75,7 +75,7 @@ void Event::initEvent(const XMLString& eventType, bool canBubble, bool isCancela
 }
 
 
-void Event::setTarget(EventTarget::Ptr pTarget)
+void Event::setTarget(EventTarget* pTarget)
 {
 	_pTarget = pTarget;
 }
@@ -87,21 +87,15 @@ void Event::setCurrentPhase(PhaseType phase)
 }
 
 
-void Event::setCurrentTarget(EventTarget::Ptr pTarget)
+void Event::setCurrentTarget(EventTarget* pTarget)
 {
 	_pCurrentTarget = pTarget;
 }
 
 
-EventTarget::Ptr Event::target() const
+void Event::autoRelease()
 {
-	return _pTarget;
-}
-
-
-EventTarget::Ptr Event::currentTarget() const
-{
-	return _pCurrentTarget;
+	_pOwner->autoReleasePool().add(this);
 }
 
 

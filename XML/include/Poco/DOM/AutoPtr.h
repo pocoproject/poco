@@ -1,9 +1,11 @@
 //
-// DOMObject.cpp
+// AutoPtr.h
 //
 // Library: XML
 // Package: DOM
 // Module:  DOM
+//
+// Import Poco::AutoPtr into the XML namespace.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -12,21 +14,22 @@
 //
 
 
-#include "Poco/DOM/DOMObject.h"
+#ifndef DOM_DOMAutoPtr_INCLUDED
+#define DOM_DOMAutoPtr_INCLUDED
+
+
+#include "Poco/XML/XML.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-DOMObject::DOMObject(): _rc(1)
-{
-}
-
-	
-DOMObject::~DOMObject()
-{
-}
+using Poco::AutoPtr;
 
 
 } } // namespace Poco::XML
+
+
+#endif // DOM_DOMAutoPtr_INCLUDED

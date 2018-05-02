@@ -21,8 +21,6 @@
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
 #include "Poco/XML/Name.h"
-#include "Poco/RefCountedObject.h"
-#include "Poco/RefPtr.h"
 
 
 #ifndef POCO_XML_NAMEPOOL_DEFAULT_SIZE
@@ -37,13 +35,11 @@ namespace XML {
 class NamePoolItem;
 
 
-class XML_API NamePool: public RefCountedObject
+class XML_API NamePool
 	/// A hashtable that stores XML names consisting of an URI, a
 	/// local name and a qualified name.
 {
 public:
-	typedef RefPtr<NamePool> Ptr;
-
 	NamePool(unsigned long size = POCO_XML_NAMEPOOL_DEFAULT_SIZE);
 		/// Creates a name pool with room for up to size strings.
 		///
@@ -59,6 +55,12 @@ public:
 		/// Returns a const reference to an Name for the given name.
 		/// Creates the Name if it does not already exist.
 		/// Throws a PoolOverflowException if the name pool is full.
+
+	void duplicate();
+		/// Increments the reference count.
+
+	void release();
+		/// Decrements the reference count and deletes the object if the reference count reaches zero.
 
 protected:
 	unsigned long hash(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);

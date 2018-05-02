@@ -15,15 +15,15 @@
 #include "Poco/DOM/CDATASection.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/Document.h"
-#include "Poco/RefPtr.h"
+#include "Poco/DOM/AutoPtr.h"
 
 
 using Poco::XML::Text;
 using Poco::XML::CDATASection;
 using Poco::XML::Element;
 using Poco::XML::Document;
+using Poco::XML::AutoPtr;
 using Poco::XML::XMLString;
-using Poco::RefPtr;
 
 
 TextTest::TextTest(const std::string& name): CppUnit::TestCase(name)
@@ -38,18 +38,18 @@ TextTest::~TextTest()
 
 void TextTest::testLength()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Text> pText1 = pDoc->createTextNode("");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Text> pText1 = pDoc->createTextNode("");
 	assertTrue (pText1->length() == 0);
-	RefPtr<Text> pText2 = pDoc->createTextNode("foo bar");
+	AutoPtr<Text> pText2 = pDoc->createTextNode("foo bar");
 	assertTrue (pText2->length() == 7);
 }
 
 
 void TextTest::testSubstring()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Text> pText1 = pDoc->createTextNode("foo bar");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Text> pText1 = pDoc->createTextNode("foo bar");
 	XMLString str = pText1->substringData(0, 3);
 	assertTrue (str == "foo");
 	str = pText1->substringData(4, 3);
@@ -61,8 +61,8 @@ void TextTest::testSubstring()
 
 void TextTest::testAppend()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Text> pText1 = pDoc->createTextNode("foo");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Text> pText1 = pDoc->createTextNode("foo");
 	pText1->appendData("bar");
 	assertTrue (pText1->data() == "foobar");
 }
@@ -70,8 +70,8 @@ void TextTest::testAppend()
 
 void TextTest::testInsert()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Text> pText1 = pDoc->createTextNode("bar");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Text> pText1 = pDoc->createTextNode("bar");
 	pText1->insertData(0, "foo");
 	assertTrue (pText1->data() == "foobar");
 	pText1->insertData(pText1->length(), "!");
@@ -83,8 +83,8 @@ void TextTest::testInsert()
 
 void TextTest::testDelete()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Text> pText1 = pDoc->createTextNode("foo bar");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Text> pText1 = pDoc->createTextNode("foo bar");
 	pText1->deleteData(3, 1);
 	assertTrue (pText1->data() == "foobar");
 	pText1->deleteData(0, 3);
@@ -98,8 +98,8 @@ void TextTest::testDelete()
 
 void TextTest::testReplace()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Text> pText1 = pDoc->createTextNode("foo bar");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Text> pText1 = pDoc->createTextNode("foo bar");
 	pText1->replaceData(0, 3, "FOO");
 	assertTrue (pText1->data() == "FOO bar");
 	pText1->replaceData(4, 3, "BAR!!!");
@@ -117,9 +117,9 @@ void TextTest::testReplace()
 
 void TextTest::testSplit()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pElem = pDoc->createElement("elem");
-	RefPtr<Text> pText1 = pDoc->createCDATASection("foobar");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pElem = pDoc->createElement("elem");
+	AutoPtr<Text> pText1 = pDoc->createCDATASection("foobar");
 	pElem->appendChild(pText1);
 	pText1->splitText(3);
 	assertTrue (pElem->firstChild()->nodeValue() == "foo");
@@ -129,9 +129,9 @@ void TextTest::testSplit()
 
 void TextTest::testSplitCDATA()
 {
-	RefPtr<Document> pDoc = new Document;
-	RefPtr<Element> pElem = pDoc->createElement("elem");
-	RefPtr<Text> pText1 = pDoc->createTextNode("foobar");
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pElem = pDoc->createElement("elem");
+	AutoPtr<Text> pText1 = pDoc->createTextNode("foobar");
 	pElem->appendChild(pText1);
 	pText1->splitText(3);
 	assertTrue (pElem->firstChild()->nodeValue() == "foo");

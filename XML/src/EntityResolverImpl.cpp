@@ -46,18 +46,25 @@ EntityResolverImpl::EntityResolverImpl(const URIStreamOpener& opener):
 
 EntityResolverImpl::~EntityResolverImpl()
 {
-	std::istream* pIstr = _pInputSource ? _pInputSource->getByteStream() : 0;
-	if (pIstr) delete pIstr;
 }
 
 
-InputSource::Ptr EntityResolverImpl::resolveEntity(const XMLString* publicId, const XMLString& systemId)
+InputSource* EntityResolverImpl::resolveEntity(const XMLString* publicId, const XMLString& systemId)
 {
 	std::istream* pIstr = resolveSystemId(systemId);
-	_pInputSource = new InputSource(systemId);
-	if (publicId) _pInputSource->setPublicId(*publicId);
-	_pInputSource->setByteStream(*pIstr);
-	return _pInputSource;
+	InputSource* pInputSource = new InputSource(systemId);
+	if (publicId) pInputSource->setPublicId(*publicId);
+	pInputSource->setByteStream(*pIstr);
+	return pInputSource;
+}
+
+		
+void EntityResolverImpl::releaseInputSource(InputSource* pSource)
+{
+	poco_check_ptr (pSource);
+
+	delete pSource->getByteStream();
+	delete pSource;
 }
 
 

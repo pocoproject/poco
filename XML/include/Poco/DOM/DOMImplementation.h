@@ -20,7 +20,6 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/XML/XMLString.h"
-#include "Poco/RefPtr.h"
 
 
 namespace Poco {
@@ -52,12 +51,12 @@ public:
 		/// "Events", "MutationEvents" and "Traversal", version "2.0".
 	
 	// DOM Level 2
-	RefPtr<DocumentType> createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const;
+	DocumentType* createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const;
 		/// Creates an empty DocumentType node. Entity declarations and notations
 		/// are not made available. Entity reference expansions and default attribute
 		/// additions do not occur.
 
-	RefPtr<Document> createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, RefPtr<DocumentType> doctype) const;
+	Document* createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType* doctype) const;
 		/// Creates an XML Document object of the specified type with its document element.
 		///
 		/// Note: You can also create a Document directly using the new operator.

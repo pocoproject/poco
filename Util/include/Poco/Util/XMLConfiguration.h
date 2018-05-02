@@ -26,7 +26,7 @@
 
 #include "Poco/Util/MapConfiguration.h"
 #include "Poco/DOM/Document.h"
-#include "Poco/DOM/RefCountedObject.h"
+#include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/SAX/InputSource.h"
 #include <istream>
@@ -87,11 +87,11 @@ public:
 		/// Creates an empty XMLConfiguration with a "config" root element,
 		/// using the given delimiter char instead of the default '.'.
 
-	XMLConfiguration(Poco::XML::InputSource::Ptr pInputSource);
+	XMLConfiguration(Poco::XML::InputSource* pInputSource);
 		/// Creates an XMLConfiguration and loads the XML document from
 		/// the given InputSource.
 
-	XMLConfiguration(Poco::XML::InputSource::Ptr pInputSource, char delim);
+	XMLConfiguration(Poco::XML::InputSource* pInputSource, char delim);
 		/// Creates an XMLConfiguration and loads the XML document from
 		/// the given InputSource. Uses the given delimiter char instead
 		/// of the default '.'.
@@ -114,25 +114,25 @@ public:
 		/// the given path. Uses the given delimiter char instead
 		/// of the default '.'.
 
-	XMLConfiguration(const Poco::XML::Document::Ptr pDocument);
+	XMLConfiguration(const Poco::XML::Document* pDocument);
 		/// Creates the XMLConfiguration using the given XML document.
 
-	XMLConfiguration(const Poco::XML::Document::Ptr pDocument, char delim);
+	XMLConfiguration(const Poco::XML::Document* pDocument, char delim);
 		/// Creates the XMLConfiguration using the given XML document.
 		/// Uses the given delimiter char instead of the default '.'.
 		
-	XMLConfiguration(const Poco::XML::Node::Ptr pNode);
+	XMLConfiguration(const Poco::XML::Node* pNode);
 		/// Creates the XMLConfiguration using the given XML node.
 
-	XMLConfiguration(const Poco::XML::Node::Ptr pNode, char delim);
+	XMLConfiguration(const Poco::XML::Node* pNode, char delim);
 		/// Creates the XMLConfiguration using the given XML node.
 		/// Uses the given delimiter char instead of the default '.'.
 
-	void load(Poco::XML::InputSource::Ptr pInputSource);
+	void load(Poco::XML::InputSource* pInputSource);
 		/// Loads the XML document containing the configuration data
 		/// from the given InputSource.
 
-	void load(Poco::XML::InputSource::Ptr pInputSource, unsigned long namePoolSize);
+	void load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize);
 		/// Loads the XML document containing the configuration data
 		/// from the given InputSource. Uses the give namePoolSize (which
 		/// should be a suitable prime like 251, 509, 1021, 4093) for the
@@ -141,23 +141,23 @@ public:
 	void load(std::istream& istr);
 		/// Loads the XML document containing the configuration data
 		/// from the given stream.
-
+		
 	void load(const std::string& path);
 		/// Loads the XML document containing the configuration data
 		/// from the given file.
-
-	void load(const Poco::XML::Document::Ptr pDocument);
+		
+	void load(const Poco::XML::Document* pDocument);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML document.
 
-	void load(const Poco::XML::Node::Ptr pNode);
+	void load(const Poco::XML::Node* pNode);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML node.
-
+	
 	void loadEmpty(const std::string& rootElementName);
 		/// Loads an empty XML document containing only the
 		/// root element with the given name.
-
+		
 	void save(const std::string& path) const;
 		/// Writes the XML document containing the configuration data
 		/// to the file given by path.
@@ -186,16 +186,16 @@ protected:
 	~XMLConfiguration();
 
 private:
-	const Poco::XML::Node::Ptr findNode(const std::string& key) const;
-	Poco::XML::Node::Ptr findNode(const std::string& key);
-	Poco::XML::Node::Ptr findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node::Ptr pNode, bool create = false) const;
-	static Poco::XML::Node::Ptr findElement(const std::string& name, Poco::XML::Node::Ptr pNode, bool create);
-	static Poco::XML::Node::Ptr findElement(int index, Poco::XML::Node::Ptr pNode, bool create);
-	static Poco::XML::Node::Ptr findElement(const std::string& attr, const std::string& value, Poco::XML::Node::Ptr pNode);
-	static Poco::XML::Node::Ptr findAttribute(const std::string& name, Poco::XML::Node::Ptr pNode, bool create);
+	const Poco::XML::Node* findNode(const std::string& key) const;
+	Poco::XML::Node* findNode(const std::string& key);
+	Poco::XML::Node* findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node* pNode, bool create = false) const;
+	static Poco::XML::Node* findElement(const std::string& name, Poco::XML::Node* pNode, bool create);
+	static Poco::XML::Node* findElement(int index, Poco::XML::Node* pNode, bool create);
+	static Poco::XML::Node* findElement(const std::string& attr, const std::string& value, Poco::XML::Node* pNode);
+	static Poco::XML::Node* findAttribute(const std::string& name, Poco::XML::Node* pNode, bool create);
 
-	Poco::RefPtr<Poco::XML::Node>     _pRoot;
-	Poco::RefPtr<Poco::XML::Document> _pDocument;
+	Poco::XML::AutoPtr<Poco::XML::Node>     _pRoot;
+	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;
 	char _delim;
 };
 

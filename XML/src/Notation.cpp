@@ -19,7 +19,7 @@ namespace Poco {
 namespace XML {
 
 
-Notation::Notation(Document::Ptr pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
+Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
 	AbstractNode(pOwnerDocument),
 	_name(name),
 	_publicId(publicId),
@@ -28,8 +28,8 @@ Notation::Notation(Document::Ptr pOwnerDocument, const XMLString& name, const XM
 }
 
 
-Notation::Notation(Document::Ptr pOwnerDocument, const Notation& notation):
-	AbstractNode(pOwnerDocument),
+Notation::Notation(Document* pOwnerDocument, const Notation& notation):
+	AbstractNode(pOwnerDocument, notation),
 	_name(notation._name),
 	_publicId(notation._publicId),
 	_systemId(notation._systemId)
@@ -54,7 +54,7 @@ unsigned short Notation::nodeType() const
 }
 
 
-Node::Ptr Notation::copyNode(bool deep, Document::Ptr pOwnerDocument) const
+Node* Notation::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	return new Notation(pOwnerDocument, *this);
 }

@@ -61,8 +61,6 @@ class XML_API Attr: public AbstractNode
 	/// attribute values.
 {
 public:
-	typedef RefPtr<Attr> Ptr;
-
 	const XMLString& name() const;
 		/// Returns the name of this attribute.
 
@@ -107,17 +105,17 @@ public:
 		/// Element interface.
 
 	// DOM Level 2
-	Element::Ptr ownerElement() const;
+	Element* ownerElement() const;
 		/// The Element node this attribute is attached to or null
 		/// if this attribute is not in use.
 
 	// Node
-	Node::Ptr parentNode() const;
+	Node* parentNode() const;
 	const XMLString& nodeName() const;
 	const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& value);
 	unsigned short nodeType() const;
-	Node::Ptr previousSibling() const;
+	Node* previousSibling() const;
 	const XMLString& namespaceURI() const;
 	XMLString prefix() const;
 	const XMLString& localName() const;
@@ -126,11 +124,11 @@ public:
 	XMLString innerText() const;
 
 protected:
-	Attr(RefPtr<Document> pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified = true);
-	Attr(RefPtr<Document> pOwnerDocument, const Attr& attr);
+	Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified = true);
+	Attr(Document* pOwnerDocument, const Attr& attr);
 	~Attr();
-
-	Node::Ptr copyNode(bool deep, RefPtr<Document> pOwnerDocument) const;
+	
+	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	const Name& _name;
@@ -170,9 +168,9 @@ inline bool Attr::specified() const
 }
 
 
-inline Element::Ptr Attr::ownerElement() const
+inline Element* Attr::ownerElement() const
 {
-	return _pParent;
+	return static_cast<Element*>(_pParent);
 }
 
 

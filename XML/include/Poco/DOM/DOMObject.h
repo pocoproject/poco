@@ -19,32 +19,55 @@
 
 
 #include "Poco/XML/XML.h"
-#include "Poco/DOM/RefCountedObject.h"
-#include "Poco/RefPtr.h"
-#include "Poco/WeakRefPtr.h"
 
 
 namespace Poco {
 namespace XML {
 
 
-class XML_API DOMObject: public Poco::XML::WeakRefCountedObject
+class XML_API DOMObject
 	/// The base class for all objects in the Document Object Model.
 	///
-	/// DOMObject can not be created on the stack and every DOMObject
-	/// pointer must be wrapped in RefPtr. Using bare DOMObject
-	/// pointers may result in memory leaks or dangling pointers.
+	/// DOMObject defines the rules for memory management
+	/// in this implementation of the DOM. Violation of these
+	/// rules, which are outlined in the following, results
+	/// in memory leaks or dangling pointers.
+	///
+	/// Every object created by new or by a factory
+	/// method (for example, Document::create*) must be released
+	/// with a call to release() or autoRelease() when it
+	/// is no longer needed.
+	///
+	/// Every object created by cloning or importing another
+	/// object must be released.
+	/// For every call to duplicate() there must be a matching
+	/// call to release().
+	/// An object obtained via any other way must not be
+	/// released, except ownership of it has been explicitly
+	/// taken with a call to duplicate().
 	///
 	/// While DOMObjects are safe for use in multithreaded programs,
 	/// a DOMObject or one of its subclasses must not be accessed
 	/// from multiple threads simultaneously.
 {
 public:
-	typedef RefPtr<DOMObject> Ptr;
-	typedef WeakRefPtr<DOMObject> WeakPtr;
-
 	DOMObject();
 		/// Creates the DOMObject.
+		/// The object's reference count is initialized to one.
+
+	void duplicate() const;
+		/// Increases the object's reference count.
+
+	void release() const;
+		/// Decreases the object's reference count.
+		/// If the reference count reaches zero,
+		/// the object is deleted.
+		
+	virtual void autoRelease() = 0;
+		/// Adds the object to an appropriate
+		/// AutoReleasePool, which is usually the
+		/// AutoReleasePool managed by the Document
+		/// to which this object belongs.
 
 protected:
 	virtual ~DOMObject();
@@ -53,9 +76,25 @@ protected:
 private:
 	DOMObject(const DOMObject&);
 	DOMObject& operator = (const DOMObject&);
-	DOMObject(DOMObject&&);
-	DOMObject& operator=(DOMObject&&);
+	
+	mutable int _rc;
 };
+
+
+//
+// inlines
+//
+inline void DOMObject::duplicate() const
+{
+	++_rc;
+}
+
+
+inline void DOMObject::release() const
+{
+	if (--_rc == 0)
+		delete this;
+}
 
 
 } } // namespace Poco::XML

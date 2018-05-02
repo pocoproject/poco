@@ -24,26 +24,14 @@ namespace XML {
 const XMLString Text::NODE_NAME = toXMLString("#text");
 
 
-Text::Text(Document::Ptr& pOwnerDocument, const XMLString& data):
-	CharacterData(std::move(pOwnerDocument), data)
+Text::Text(Document* pOwnerDocument, const XMLString& data):
+	CharacterData(pOwnerDocument, data)
 {
 }
 
 
-Text::Text(Document::Ptr& pOwnerDocument, const Text& text):
-	CharacterData(std::move(pOwnerDocument), text)
-{
-}
-
-
-Text::Text(Document::Ptr&& pOwnerDocument, XMLString&& data):
-		CharacterData(std::move(pOwnerDocument), std::move(data))
-{
-}
-
-
-Text::Text(Document::Ptr&& pOwnerDocument, Text&& text):
-		CharacterData(std::move(pOwnerDocument), std::move(text))
+Text::Text(Document* pOwnerDocument, const Text& text):
+	CharacterData(pOwnerDocument, text)
 {
 }
 
@@ -53,14 +41,14 @@ Text::~Text()
 }
 
 
-Text::Ptr Text::splitText(unsigned long offset)
+Text* Text::splitText(unsigned long offset)
 {
-	Node::Ptr pParent = parentNode();
+	Node* pParent = parentNode();
 	if (!pParent) throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 	int n = length() - offset;
-	Text::Ptr pNew = ownerDocument()->createTextNode(substringData(offset, n));
+	Text* pNew = ownerDocument()->createTextNode(substringData(offset, n));
 	deleteData(offset, n);
-	pParent->insertBefore(pNew, nextSibling());
+	pParent->insertBefore(pNew, nextSibling())->release();
 	return pNew;
 }
 
@@ -83,7 +71,7 @@ XMLString Text::innerText() const
 }
 
 
-Node::Ptr Text::copyNode(bool deep, Document::Ptr pOwnerDocument) const
+Node* Text::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	return new Text(pOwnerDocument, *this);
 }

@@ -24,13 +24,13 @@ namespace XML {
 const XMLString CDATASection::NODE_NAME = toXMLString("#cdata-section");
 
 
-CDATASection::CDATASection(Document::Ptr pOwnerDocument, const XMLString& data):
+CDATASection::CDATASection(Document* pOwnerDocument, const XMLString& data):
 	Text(pOwnerDocument, data)
 {
 }
 
 
-CDATASection::CDATASection(Document::Ptr pOwnerDocument, const CDATASection& sec):
+CDATASection::CDATASection(Document* pOwnerDocument, const CDATASection& sec):
 	Text(pOwnerDocument, sec)
 {
 }
@@ -41,14 +41,14 @@ CDATASection::~CDATASection()
 }
 
 
-Text::Ptr CDATASection::splitText(unsigned long offset)
+Text* CDATASection::splitText(unsigned long offset)
 {
-	Node::Ptr pParent = parentNode();
+	Node* pParent = parentNode();
 	if (!pParent) throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 	int n = length() - offset;
-	Text::Ptr pNew = ownerDocument()->createCDATASection(substringData(offset, n));
+	Text* pNew = ownerDocument()->createCDATASection(substringData(offset, n));
 	deleteData(offset, n);
-	pParent->insertBefore(pNew, nextSibling());
+	pParent->insertBefore(pNew, nextSibling())->release();
 	return pNew;
 }
 
@@ -65,7 +65,7 @@ unsigned short CDATASection::nodeType() const
 }
 
 
-Node::Ptr CDATASection::copyNode(bool deep, Document::Ptr pOwnerDocument) const
+Node* CDATASection::copyNode(bool deep, Document* pOwnerDocument) const
 {
 	return new CDATASection(pOwnerDocument, *this);
 }

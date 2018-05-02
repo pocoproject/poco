@@ -37,15 +37,13 @@ class XML_API XMLFilter: public XMLReader
 	/// all EntityResolver, DTDHandler, ContentHandler and ErrorHandler events automatically.
 {
 public:
-	typedef RefPtr<XMLFilter> Ptr;
-
-	virtual RefPtr<XMLReader> getParent() const = 0;
+	virtual XMLReader* getParent() const = 0;
 		/// Set the parent reader.
 		///
 		/// This method allows the application to link the filter to a parent reader (which may be another
 		/// filter). The argument may not be null.
 		
-	virtual void setParent(RefPtr<XMLReader> pParent) = 0;
+	virtual void setParent(XMLReader* pParent) = 0;
 		/// Get the parent reader.
 		///
 		/// This method allows the application to query the parent reader (which may be another filter).
