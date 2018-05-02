@@ -1,6 +1,6 @@
 model {
 	components {
-		DataODBC(NativeLibrarySpec) {
+		DataODBC(NativeLibrarySpec) { m ->
 			sources {
 				rc {
 					source {
@@ -25,7 +25,28 @@ model {
 		}
 	}
 	binaries {
-		all {
+        all {
+            sources {
+                if (targetPlatform.operatingSystem.windows) {
+                    platformWindows(CppSourceSet) {
+                        lib m.sources.cpp
+                        source {
+                            srcDir 'src'
+                            include 'Unicode_WIN32.cpp'
+                        }
+                    }
+                } else
+                if (targetPlatform.operatingSystem.macOsX || targetPlatform.operatingSystem.linux) {
+                    platformNix(CppSourceSet) {
+                        lib m.sources.cpp
+                        source {
+                            srcDir 'src'
+                            include 'Unicode_UNIXODBC.cpp'
+                        }
+                    }
+                }
+            }
+
 			if (toolChain in VisualCpp) {
 				cppCompiler.define	"THREADSAFE=1"
 			}
