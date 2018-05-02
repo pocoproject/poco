@@ -28,7 +28,7 @@ model {
 						srcDir 'src'
 					}
 					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-					lib project: ':Data:MySQL', library: 'mysql', linkage: 'shared'
+//					lib project: ':Data:MySQL', library: 'mysql', linkage: 'shared'
 					lib project: ':Data:MySQL', library: 'DataMySQL', linkage: 'shared'
 					lib project: ':Data', library: 'Data', linkage: 'shared'
 					lib project: ':Util', library: 'Util'
@@ -48,11 +48,11 @@ model {
 		all {
 			cppCompiler.define	"THREADSAFE"
 			cppCompiler.define 	"__LCC__"	
-			cppCompiler.define 	"WINVER=0x0600"
 		}
         withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			if (toolChain in VisualCpp) {
+			    cppCompiler.define 	"WINVER=0x0600"
 				if (buildType == buildTypes.debug) {
 					cCompiler.args "/MDd"
 					cppCompiler.args "/MDd"
@@ -65,6 +65,19 @@ model {
 				}
 			}
 			if (toolChain in Gcc) {
+                def String LIB64SUFFIX = "64"
+			    cppCompiler.define 	"NO_TCL"
+			    cppCompiler.args	( "-I", "/usr/local/include/mysql/" )
+                cppCompiler.args    ( "-I", "/usr/include/mysql/" )
+                cppCompiler.args    ( "-I", "/usr/mysql/include/mysql"  )
+                cppCompiler.args    ( "-I", "/usr/local/mysql/include" )
+                linker.args         ( "-L", "/usr/lib/x86_64-linux-gnu")
+                linker.args         ( "-L", "/usr/local/lib$LIB64SUFFIX/mysql" )
+                linker.args         ( "-L", "/usr/lib$LIB64SUFFIX/mysql" )
+                linker.args         ( "-L", "/usr/mysql/lib$LIB64SUFFIX" ) 
+                linker.args         ( "-L", "/usr/mysql/lib$LIB64SUFFIX/mysql" ) 
+                linker.args         ( "-L", "/usr/local/mysql/lib$LIB64SUFFIX" ) 
+                linker.args         ( "-l", "mysqlclient" )
 			}
         }
 	}
