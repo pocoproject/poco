@@ -40,7 +40,7 @@ public:
 		/// On Unix, this function returns true if the environment
 		/// variable POCO_ENABLE_DEBUGGER is set.
 
-	static void message(const std::string& msg);
+	static void message(const std::string& msg, bool backTrace = true);
 		/// Writes a message to the debugger log, if available, otherwise to
 		/// standard error output.
 

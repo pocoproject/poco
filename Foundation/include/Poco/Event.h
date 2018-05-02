@@ -87,16 +87,17 @@ private:
 
 	bool waitImpl(long milliseconds);
 
+	std::atomic<bool>       _state;
+	bool                    _autoreset;
+	mutable std::mutex      _mutex;
 	std::condition_variable _cond;
-	std::mutex _mutex;
-	std::atomic<bool> _state;
-	bool _autoreset;
 };
 
 
 //
 // inlines
 //
+
 
 inline void Event::wait(long milliseconds)
 {

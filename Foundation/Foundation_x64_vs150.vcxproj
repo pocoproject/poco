@@ -419,6 +419,7 @@
     <ClCompile Include="src\Format.cpp" />
     <ClCompile Include="src\Formatter.cpp" />
     <ClCompile Include="src\FormattingChannel.cpp" />
+    <ClCompile Include="src\Foundation.cpp" />
     <ClCompile Include="src\FPEnvironment.cpp" />
     <ClCompile Include="src\FPEnvironment_C99.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">true</ExcludedFromBuild>

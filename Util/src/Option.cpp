@@ -15,7 +15,6 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionException.h"
 #include "Poco/Util/Validator.h"
-#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/String.h"
 #include <algorithm>
 
@@ -54,7 +53,6 @@ Option::Option(const Option& option):
 {
 	if (_pValidator) _pValidator->duplicate();
 	if (_pCallback) _pCallback = _pCallback->clone();
-	if (_pConfig) _pConfig->duplicate();
 }
 
 
@@ -103,7 +101,6 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 Option::~Option()
 {
 	if (_pValidator) _pValidator->release();
-	if (_pConfig) _pConfig->release();
 	delete _pCallback;
 }
 
@@ -135,7 +132,7 @@ void Option::swap(Option& option)
 	std::swap(_pConfig, option._pConfig);
 }
 
-	
+
 Option& Option::shortName(const std::string& name)
 {
 	_shortName = name;
@@ -203,9 +200,7 @@ Option& Option::binding(const std::string& propertyName)
 Option& Option::binding(const std::string& propertyName, AbstractConfiguration* pConfig)
 {
 	_binding = propertyName;
-	if (_pConfig) _pConfig->release();
 	_pConfig = pConfig;
-	if (_pConfig) _pConfig->duplicate();
 	return *this;
 }
 

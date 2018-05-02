@@ -38,29 +38,29 @@ LoggingRegistryTest::~LoggingRegistryTest()
 void LoggingRegistryTest::testRegister()
 {
 	LoggingRegistry& reg = LoggingRegistry::defaultRegistry();
-	
+
 	reg.clear();
-	
-	AutoPtr<Channel> pC1 = new ConsoleChannel();
-	AutoPtr<Channel> pC2 = new ConsoleChannel();
-	AutoPtr<Formatter> pF1 = new PatternFormatter("");
-	AutoPtr<Formatter> pF2 = new PatternFormatter("");
-	
+
+	Channel::Ptr pC1 = new ConsoleChannel();
+	Channel::Ptr pC2 = new ConsoleChannel();
+	Formatter::Ptr pF1 = new PatternFormatter("");
+	Formatter::Ptr pF2 = new PatternFormatter("");
+
 	reg.registerChannel("c1", pC1);
 	reg.registerChannel("c2", pC2);
 	reg.registerFormatter("f1", pF1);
 	reg.registerFormatter("f2", pF2);
 
-	Channel* pC = reg.channelForName("c1");
+	Channel::Ptr pC = reg.channelForName("c1");
 	assertTrue (pC1 == pC);
 	pC = reg.channelForName("c2");
 	assertTrue (pC2 == pC);
-	
+
 	Formatter* pF = reg.formatterForName("f1");
 	assertTrue (pF1 == pF);
 	pF = reg.formatterForName("f2");
 	assertTrue (pF2 == pF);
-	
+
 	try
 	{
 		pC = reg.channelForName("c3");
@@ -75,47 +75,49 @@ void LoggingRegistryTest::testRegister()
 void LoggingRegistryTest::testReregister()
 {
 	LoggingRegistry& reg = LoggingRegistry::defaultRegistry();
-	
+
 	reg.clear();
-	
-	AutoPtr<Channel> pC1 = new ConsoleChannel();
-	AutoPtr<Channel> pC2 = new ConsoleChannel();
-	AutoPtr<Channel> pC1b = new ConsoleChannel();
+
+	Channel::Ptr pC1 = new ConsoleChannel();
+	Channel::Ptr pC2 = new ConsoleChannel();
+	Channel::Ptr pC1b = new ConsoleChannel();
 	AutoPtr<Formatter> pF1 = new PatternFormatter("");
 	AutoPtr<Formatter> pF2 = new PatternFormatter("");
 	AutoPtr<Formatter> pF1b = new PatternFormatter("");
-	
+
 	reg.registerChannel("c1", pC1);
 	reg.registerChannel("c2", pC2);
 	reg.registerFormatter("f1", pF1);
 	reg.registerFormatter("f2", pF2);
-	
+
 	reg.registerChannel("c1", pC1b);
-	Channel* pC = reg.channelForName("c1");
+
+	Channel::Ptr pC = reg.channelForName("c1");
 	assertTrue (pC1b == pC);
+
 	pC = reg.channelForName("c2");
 	assertTrue (pC2 == pC);
 
 	reg.registerFormatter("f1", pF1b);
-	Formatter* pF = reg.formatterForName("f1");
+
+	Formatter::Ptr pF = reg.formatterForName("f1");
 	assertTrue (pF1b == pF);
 	pF = reg.formatterForName("f2");
 	assertTrue (pF2 == pF);
-	
 }
 
 
 void LoggingRegistryTest::testUnregister()
 {
 	LoggingRegistry& reg = LoggingRegistry::defaultRegistry();
-	
+
 	reg.clear();
-	
-	AutoPtr<Channel> pC1 = new ConsoleChannel();
-	AutoPtr<Channel> pC2 = new ConsoleChannel();
+
+	Channel::Ptr pC1 = new ConsoleChannel();
+	Channel::Ptr pC2 = new ConsoleChannel();
 	AutoPtr<Formatter> pF1 = new PatternFormatter("");
 	AutoPtr<Formatter> pF2 = new PatternFormatter("");
-	
+
 	reg.registerChannel("c1", pC1);
 	reg.registerChannel("c2", pC2);
 	reg.registerFormatter("f1", pF1);
@@ -123,10 +125,10 @@ void LoggingRegistryTest::testUnregister()
 
 	reg.unregisterChannel("c1");
 	reg.unregisterFormatter("f2");
-	
+
 	try
 	{
-		Channel* pC = reg.channelForName("c1");
+		Channel::Ptr pC = reg.channelForName("c1");
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)
@@ -135,7 +137,7 @@ void LoggingRegistryTest::testUnregister()
 
 	try
 	{
-		Formatter* pF = reg.formatterForName("f2");
+		Formatter::Ptr pF = reg.formatterForName("f2");
 		fail("unregistered - must throw");
 	}
 	catch (Poco::NotFoundException&)

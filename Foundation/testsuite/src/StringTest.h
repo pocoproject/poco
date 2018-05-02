@@ -49,6 +49,7 @@ public:
 	void testStringToFloat();
 	void testStringToDouble();
 	void testNumericStringPadding();
+	void testNumericStringLimit();
 	void testStringToFloatError();
 	void testNumericLocale();
 	void benchmarkStrToFloat();
@@ -92,6 +93,53 @@ private:
 		
 		assertTrue (Poco::strToInt("0", result, 010)); assertTrue (result == 0);
 		assertTrue (Poco::strToInt("000", result, 010)); assertTrue (result == 0);
+	}
+
+	template <typename Larger, typename Smaller>
+	void numericStringLimitSameSign()
+	{
+		Larger l = std::numeric_limits<Smaller>::max();
+		std::string str = std::to_string(l);
+
+		Smaller s;
+		assertTrue(Poco::strToInt<Smaller>(str, s, 10));
+		assertTrue(s == std::numeric_limits<Smaller>::max());
+		++l; str = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(str, s, 10));
+		++l; str = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(str, s, 10));
+		++l; str = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(str, s, 10));
+		++l; str = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(str, s, 10));
+		++l; str = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(str, s, 10));
+		++l; str = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(str, s, 10));
+	}
+
+	template <typename Larger, typename Smaller>
+	void numericStringLowerLimit()
+	{
+		Larger l = std::numeric_limits<Smaller>::min();
+		std::string val = std::to_string(l);
+		Smaller s = -1;
+		assertFalse(s == std::numeric_limits<Smaller>::min());
+		assertTrue(Poco::strToInt<Smaller>(val, s, 10));
+		assertTrue (s == std::numeric_limits<Smaller>::min());
+		assertTrue(s == std::numeric_limits<Smaller>::min());
+		--l; val = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
+		--l; val = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
+		--l; val = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
+		--l; val = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
+		--l; val = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
+		--l; val = std::to_string(l);
+		assertFalse(Poco::strToInt<Smaller>(val, s, 10));
 	}
 
 	template <typename T>

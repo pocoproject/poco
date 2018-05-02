@@ -13,7 +13,6 @@
 
 
 #include "Poco/Environment.h"
-#include "Poco/Version.h"
 #include <cstdlib>
 #include <cstdio> // sprintf()
 
