@@ -34,8 +34,11 @@ POCO_GENERATE_PACKAGE(Data)
 
 if(ENABLE_DATA_SQLITE)
     # SQlite3 is built in any case
+    message(STATUS "SQLite Support Enabled")
     add_subdirectory( SQLite )
-endif(ENABLE_DATA_SQLITE)
+else(ENABLE_DATA_SQLITE)
+    message(STATUS "SQLite Support Disabled")
+endif()
 
 if(ENABLE_DATA_MYSQL)
     find_package(MySQL)

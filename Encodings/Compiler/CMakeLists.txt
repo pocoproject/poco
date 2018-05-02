@@ -8,7 +8,7 @@ set_target_properties(EncodingsCompiler
     OUTPUT_NAME tec
     )
 
-target_link_libraries(EncodingsCompiler Poco::Net Poco::Util Poco::XML Poco::JSON)
+target_link_libraries(EncodingsCompiler Poco::Net Poco::Util)
 
 install(
     TARGETS EncodingsCompiler EXPORT "EncodingsCompilerTargets"
