@@ -47,7 +47,7 @@ namespace
 	class EchoServiceHandler
 	{
 	public:
-		EchoServiceHandler(StreamSocket& socket, SocketReactor& reactor):
+		EchoServiceHandler(const StreamSocket& socket, SocketReactor& reactor):
 			_socket(socket),
 			_reactor(reactor)
 		{
@@ -87,7 +87,7 @@ namespace
 	class ClientServiceHandler
 	{
 	public:
-		ClientServiceHandler(StreamSocket& socket, SocketReactor& reactor):
+		ClientServiceHandler(const StreamSocket& socket, SocketReactor& reactor):
 			_socket(socket),
 			_reactor(reactor),
 			_or(*this, &ClientServiceHandler::onReadable),
@@ -123,12 +123,6 @@ namespace
 				_str.write(buffer, n);
 				_data += _str.str();
 				_str.str("");
-				if ((_once && _data.size() == 1024) ||
-					(!_once && _data.size() == 8192))
-				{
-					_reactor.stop();
-					delete this;
-				}
 			}
 			else
 			{

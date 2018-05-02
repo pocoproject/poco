@@ -211,7 +211,7 @@ private:
 
 
 //
-// BSD/Windows implementation using poll
+// BSD/Windows implementation using poll/WSAPoll
 //
 class PollSetImpl
 {
@@ -355,6 +355,10 @@ public:
 							result[its->second] |= PollSet::POLL_WRITE;
 						if (it->revents & POLLERR)
 							result[its->second] |= PollSet::POLL_ERROR;
+#ifdef _WIN32
+						if (it->revents & POLLHUP)
+							result[its->second] |= PollSet::POLL_READ;
+#endif
 					}
 					it->revents = 0;
 				}

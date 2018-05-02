@@ -68,7 +68,7 @@ class SocketConnector
 	/// The ServiceHandler class must provide a constructor that
 	/// takes a StreamSocket and a SocketReactor as arguments,
 	/// e.g.:
-	///     MyServiceHandler(const StreamSocket& socket, ServiceReactor& reactor)
+	///     MyServiceHandler(const StreamSocket& socket, SocketReactor& reactor)
 	///
 	/// When the ServiceHandler is done, it must destroy itself.
 	///

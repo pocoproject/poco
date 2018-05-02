@@ -117,14 +117,16 @@ bool SocketReactor::hasSocketHandlers()
 {
 	ScopedLock lock(_mutex);
 
-	if (_pollSet.empty()) return false;
-
-	for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
+	if (!_pollSet.empty())
 	{
-		if (it->second->accepts(_pReadableNotification) ||
-			it->second->accepts(_pWritableNotification) ||
-			it->second->accepts(_pErrorNotification)) return true;
+		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
+		{
+			if (it->second->accepts(_pReadableNotification) ||
+				it->second->accepts(_pWritableNotification) ||
+				it->second->accepts(_pErrorNotification)) return true;
+		}
 	}
+
 	return false;
 }
 
