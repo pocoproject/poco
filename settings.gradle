@@ -16,7 +16,7 @@ if (os.windows) {
 include ':Data'
 // SQL not ready yet
 include ':Data:ODBC'
-//include ':Data:SQLite'
+include ':Data:SQLite'
 include ':Data:MySQL'
 include ':Zip'
 include ':PageCompiler'
@@ -41,7 +41,7 @@ if (os.windows) {
 }
 include ':Data:testsuite'
 include ':Data:ODBC:testsuite'
-//include ':Data:SQLite:testsuite'
+include ':Data:SQLite:testsuite'
 include ':Data:MySQL:testsuite'
 include ':MongoDB:testsuite'
 include ':Redis:testsuite'
