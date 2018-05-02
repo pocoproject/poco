@@ -129,7 +129,7 @@ DirectoryIterator& DirectoryIterator::operator ++ ()
 }
 
 
-DirectoryIterator DirectoryIterator::operator ++ (int dummy)
+DirectoryIterator DirectoryIterator::operator ++ (int /*dummy*/)
 {
 	if (_pImpl)
 	{

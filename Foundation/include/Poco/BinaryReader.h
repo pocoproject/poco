@@ -156,7 +156,7 @@ private:
 	BinaryReader& read(T& value, bool flipBytes)
 	{
 		_istr.read((char*) &value, sizeof(value));
-		if (flipBytes) value = ByteOrder::flipBytes(value);
+		if (flipBytes) value = static_cast<T>(ByteOrder::flipBytes(value));
 		return *this;
 	}
 

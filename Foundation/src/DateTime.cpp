@@ -41,14 +41,14 @@ DateTime::DateTime(const Timestamp& rTimestamp):
 
 
 DateTime::DateTime(int otherYear, int otherMonth, int otherDay, int otherHour, int otherMinute, int otherSecond, int otherMillisecond, int otherMicrosecond):
-	_year(otherYear),
-	_month(otherMonth),
-	_day(otherDay),
-	_hour(otherHour),
-	_minute(otherMinute),
-	_second(otherSecond),
-	_millisecond(otherMillisecond),
-	_microsecond(otherMicrosecond)
+	_year(static_cast<short>(otherYear)),
+	_month(static_cast<short>(otherMonth)),
+	_day(static_cast<short>(otherDay)),
+	_hour(static_cast<short>(otherHour)),
+	_minute(static_cast<short>(otherMinute)),
+	_second(static_cast<short>(otherSecond)),
+	_millisecond(static_cast<short>(otherMillisecond)),
+	_microsecond(static_cast<short>(otherMicrosecond))
 {
 	if (isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
 	{
@@ -148,14 +148,14 @@ DateTime& DateTime::assign(int otherYear, int otherMonth, int otherDay, int othe
 	if(isValid(otherYear, otherMonth, otherDay, otherHour, otherMinute, otherSecond, otherMillisecond, otherMicrosecond))
 	{
 		_utcTime     = toUtcTime(toJulianDay(otherYear, otherMonth, otherDay)) + 10*(otherHour*Timespan::HOURS + otherMinute*Timespan::MINUTES + otherSecond*Timespan::SECONDS + otherMillisecond*Timespan::MILLISECONDS + otherMicrosecond);
-		_year        = otherYear;
-		_month       = otherMonth;
-		_day         = otherDay;
-		_hour        = otherHour;
-		_minute      = otherMinute;
-		_second      = otherSecond;
-		_millisecond = otherMillisecond;
-		_microsecond = otherMicrosecond;
+		_year        = static_cast<short>(otherYear);
+		_month       = static_cast<short>(otherMonth);
+		_day         = static_cast<short>(otherDay);
+		_hour        = static_cast<short>(otherHour);
+		_minute      = static_cast<short>(otherMinute);
+		_second      = static_cast<short>(otherSecond);
+		_millisecond = static_cast<short>(otherMillisecond);
+		_microsecond = static_cast<short>(otherMicrosecond);
 	}
 	else
 	{
@@ -343,7 +343,7 @@ void DateTime::normalize()
 
 	if (_day > daysOfMonth(_year, _month))
 	{
-		_day -= daysOfMonth(_year, _month);
+		_day -= static_cast<short>(daysOfMonth(_year, _month));
 		if (++_month > 12)
 		{
 			++_year;
@@ -414,7 +414,7 @@ void DateTime::computeDaytime()
 				_month = 12;
 				_year--;
 			}
-			_day = daysOfMonth(_year, _month);
+			_day = static_cast<short>(daysOfMonth(_year, _month));
 		}
 	}
 	else if (spanHour == 0 && _hour == 23)
@@ -431,11 +431,11 @@ void DateTime::computeDaytime()
 			_day = 1;
 		}
 	}
-	_hour        = spanHour;
-	_minute      = span.minutes();
-	_second      = span.seconds();
-	_millisecond = span.milliseconds();
-	_microsecond = span.microseconds();
+	_hour        = static_cast<short>(spanHour);
+	_minute      = static_cast<short>(span.minutes());
+	_second      = static_cast<short>(span.seconds());
+	_millisecond = static_cast<short>(span.milliseconds());
+	_microsecond = static_cast<short>(span.microseconds());
 }
 
 
