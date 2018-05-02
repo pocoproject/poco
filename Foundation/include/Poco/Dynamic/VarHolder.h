@@ -399,6 +399,7 @@ protected:
 private:
 #pragma warning( push )
 #pragma warning( disable : 4127 )
+#pragma warning( disable : 4018 )
 		template <typename F, typename T>
 		void POCO_UNUSED checkUpperLimit(const F& from) const
 		{
