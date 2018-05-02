@@ -82,7 +82,7 @@ function Set-Environment
     else
     {
       Write-Host 'Visual Studio not found, exiting.'
-      Exit
+      Exit 1
     }
   }
 
@@ -110,6 +110,11 @@ function Set-Environment
   }
 
   $vsct = "VS$($vs_version)COMNTOOLS"
+  $vsdir = ''
+  if ($vs_version -eq 150)
+  {
+    if (-not (Test-Path Env:$vsct)) { Set-Item -path Env:$vsct -value 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools' }
+  }
   $vsdir = (Get-Item Env:$vsct).Value
   $Command = ''
   $CommandArg = ''
@@ -190,8 +195,8 @@ function Process-Input
     }
 
     # NB: this won't work in PowerShell ISE
-    Write-Host "Press Ctrl-C to exit or any other key to continue ..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+    #Write-Host "Press Ctrl-C to exit or any other key to continue ..."
+    #$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
   }
 }
 
