@@ -180,7 +180,7 @@ namespace
 		{
 		}
 
-		void handlePart(const MessageHeader& header, std::istream& stream)
+		void handlePart(const MessageHeader& /*header*/, std::istream& stream)
 			/// Handles a part.
 		{
 			std::string tmp;
@@ -387,8 +387,8 @@ void MailMessage::read(std::istream& istr, PartHandler& handler)
 	}
 	else
 	{
-		StringPartHandler handler(_content);
-		readPart(istr, *this, handler);
+		StringPartHandler handler2(_content);
+		readPart(istr, *this, handler2);
 	}
 }
 
@@ -947,7 +947,7 @@ std::string MailMessage::decodeWord(const std::string& charset, char encoding,
 				if (wideChar.size() % 2 == 0)
 				{
 					std::string wcStr(&wideChar[0], wideChar.size());
-					unsigned char chr = NumberParser::parseHex(wcStr);
+					UInt8 char chr = static_cast<UInt8>(NumberParser::parseHex(wcStr));
 					wideCharSeq.push_back(chr);
 					if (fromEnc->sequenceLength(&wideCharSeq[0], static_cast<int>(wideCharSeq.size())) > 0)
 					{
