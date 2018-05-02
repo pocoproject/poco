@@ -54,7 +54,7 @@ model {
 				cppCompiler.define	"SQLITE_OMIT_TCL_VARIABLE"
 				cppCompiler.define	"SQLITE_OMIT_DEPRECATED"
 			}
-			if (toolchain in Gcc) {
+			if (toolChain in Gcc) {
 				cCompiler.define	"SQLITE_THREADSAFE=1"
 				cCompiler.define	"SQLITE_DISABLE_LFS"
 				cCompiler.define	"SQLITE_OMIT_UTF16"
