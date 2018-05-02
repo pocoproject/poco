@@ -32,8 +32,13 @@ POCO_INSTALL(SQL)
 POCO_GENERATE_PACKAGE(SQL)
 
 if(POCO_ENABLE_SQL_SQLITE)
+    if(POCO_VERBOSE_MESSAGES)
+        message(STATUS "SQLite Support Enabled")
+    endif()
     # SQlite3 is built in any case
     add_subdirectory( SQLite )
+elseif(POCO_VERBOSE_MESSAGES)
+    message(STATUS "SQLite Support Disabled")
 endif(POCO_ENABLE_SQL_SQLITE)
 
 if(POCO_ENABLE_SQL_MYSQL)

@@ -10,7 +10,7 @@ set_target_properties(PageCompiler
     OUTPUT_NAME cpspc
     )
 
-target_link_libraries(PageCompiler PUBLIC Poco::Net Poco::Util Poco::XML Poco::JSON)
+target_link_libraries(PageCompiler PUBLIC Poco::Net Poco::Util)
 
 install(
 	TARGETS PageCompiler EXPORT PageCompilerTargets
