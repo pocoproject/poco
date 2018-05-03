@@ -32,7 +32,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 if(${CMAKE_VERSION} VERSION_LESS "3.4")
-	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake32)
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/V33)
 endif()
 
 #################################################################################
@@ -113,7 +113,7 @@ if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO)
     find_package(OpenSSL REQUIRED)
 else()
     find_package(OpenSSL QUIET)
-endif(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO)
+endif()
 
 if(OPENSSL_FOUND)
   message(STATUS "Found OpenSSL. Enable NetSSL and Crypto support")
@@ -147,11 +147,49 @@ else()
   option(POCO_ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
 endif()
 
-option(POCO_ENABLE_SQL "Enable SQL" ON)
-option(POCO_ENABLE_SQL_SQLITE "Enable SQL SQLite" ON)
-option(POCO_ENABLE_SQL_MYSQL "Enable SQL MySQL" ON)
-option(POCO_ENABLE_SQL_POSTGRESQL "Enable SQL PosgreSQL" ON)
-option(POCO_ENABLE_SQL_ODBC "Enable SQL ODBC" ON)
+if(POCO_ENABLE_SQL_MYSQL)
+    find_package(MySQL REQUIRED)
+else()
+    find_package(MySQL QUIET)
+endif()
+
+if(MYSQL_FOUND)
+    option(POCO_ENABLE_SQL "Enable SQL" ON)
+    option(POCO_ENABLE_SQL_MYSQL "Enable SQL MySQL" ON)
+else()
+    option(POCO_ENABLE_SQL "Enable SQL" OFF)
+    option(POCO_ENABLE_SQL_MYSQL "Enable SQL MySQL" OFF)
+endif()
+
+if(POCO_ENABLE_SQL_POSTGRESQL)
+    find_package(PostgreSQL REQUIRED)
+else()
+    find_package(PostgreSQL QUIET)
+endif()
+
+if(POSTGRESQL_FOUND)
+    option(POCO_ENABLE_SQL "Enable SQL" ON)
+    option(POCO_ENABLE_SQL_POSTGRESQL "Enable SQL PosgreSQL" ON)
+else()
+    option(POCO_ENABLE_SQL "Enable SQL" OFF)
+    option(POCO_ENABLE_SQL_POSTGRESQL "Enable SQL PosgreSQL" OFF)
+endif()
+
+if(POCO_ENABLE_SQL_ODBC)
+    find_package(ODBC REQUIRED)
+else()
+    find_package(ODBC QUIET)
+endif()
+
+if(ODBC_FOUND)
+    option(POCO_ENABLE_SQL "Enable SQL" ON)
+    option(POCO_ENABLE_SQL_ODBC "Enable SQL ODBC" ON)
+else()
+    option(POCO_ENABLE_SQL "Enable SQL" OFF)
+    option(POCO_ENABLE_SQL_ODBC "Enable SQL ODBC" OFF)
+endif()
+
+option(POCO_ENABLE_SQL_SQLITE "Enable SQL SQLite" OFF)
 option(POCO_ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(POCO_ENABLE_ZIP "Enable Zip" ON)
 option(POCO_ENABLE_CPPPARSER "Enable C++ parser" OFF)
@@ -177,7 +215,6 @@ if(MSVC)
       "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
 endif()
 
-# Uncomment from next two lines to force static or dynamic library, default is autodetection
 if(BUILD_SHARED_LIBS)
     if(POCO_VERBOSE_MESSAGES)
         message(STATUS "Building dynamic libraries")
@@ -216,9 +253,6 @@ elseif (POCO_VERBOSE_MESSAGES)
 endif ()
 
 include(DefinePlatformSpecifc)
-
-# Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
-set(Poco_COMPONENTS "")
 
 # Pthreads/threads support
 find_package(Threads REQUIRED)
@@ -316,6 +350,9 @@ if(POCO_ENABLE_UTIL AND POCO_ENABLE_SAMPLES)
     set(POCO_ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
+# Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
+set(Poco_COMPONENTS "")
+
 if (POCO_ENABLE_TESTS OR POCO_ENABLE_CPPUNIT)
     add_subdirectory(CppUnit)
     list(APPEND Poco_COMPONENTS "CppUnit")
@@ -351,9 +388,6 @@ if(POCO_ENABLE_NET)
     list(APPEND Poco_COMPONENTS "Net")
 endif()
 
-#NetSSL
-
-
 if(WIN32 AND POCO_ENABLE_NETSSL_WIN)
     add_subdirectory(NetSSL_Win)
     list(APPEND Poco_COMPONENTS "NetSSL_Win")
@@ -361,7 +395,7 @@ endif(WIN32 AND POCO_ENABLE_NETSSL_WIN)
 
 if(OPENSSL_FOUND)
     if(MSVC)
-        list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32)
+        list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32) # TODO(BJoe) Is this really needed?
     endif()
     if(POCO_ENABLE_NETSSL)
       add_subdirectory(NetSSL_OpenSSL)
