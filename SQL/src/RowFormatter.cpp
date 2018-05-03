@@ -49,14 +49,14 @@ void RowFormatter::formatNames(const NameVecPtr pNames)
 }
 
 
-std::string& RowFormatter::formatValues(const ValueVec& vals, std::string& formattedValues)
+std::string& RowFormatter::formatValues(const ValueVec& /*vals*/, std::string& formattedValues)
 {
 	formattedValues.clear();
 	return formattedValues;
 }
 
 
-void RowFormatter::formatValues(const ValueVec& vals)
+void RowFormatter::formatValues(const ValueVec& /*vals*/)
 {
 	return;
 }

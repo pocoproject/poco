@@ -186,7 +186,7 @@ public:
 	}
 
 	Extraction(std::vector<T>& rResult, const T& def, const Position& pos = Position(0)):
-		AbstractExtraction(typeid(std::vector<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		AbstractExtraction(typeid(std::vector<T>).name(), static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), pos.value()),
 		_rResult(rResult),
 		_default(def)
 	{
@@ -368,7 +368,7 @@ public:
 	}
 
 	Extraction(std::list<T>& rResult, const T& def, const Position& pos = Position(0)):
-		AbstractExtraction(typeid(std::list<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		AbstractExtraction(typeid(std::list<T>).name(), static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), pos.value()),
 		_rResult(rResult),
 		_default(def)
 	{
@@ -458,7 +458,7 @@ public:
 	}
 
 	Extraction(std::deque<T>& rResult, const T& def, const Position& pos = Position(0)):
-		AbstractExtraction(typeid(std::deque<T>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		AbstractExtraction(typeid(std::deque<T>).name(), static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), pos.value()),
 		_rResult(rResult),
 		_default(def)
 	{
