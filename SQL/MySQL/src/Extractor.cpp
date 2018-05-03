@@ -292,7 +292,7 @@ bool Extractor::realExtractFixedBlob(std::size_t pos, enum_field_types type, voi
 	bind.is_null	   = &isNull;
 	bind.buffer_type   = type;
 	bind.buffer	   = buffer;
-	bind.buffer_length = len;
+	bind.buffer_length = static_cast<unsigned long>(len);
 	
 	if (!_stmt.fetchColumn(pos, &bind))
 		return false;
