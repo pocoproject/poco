@@ -42,7 +42,7 @@ void MapConfigurationTest::testClear()
 }
 
 
-AbstractConfiguration* MapConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr MapConfigurationTest::allocConfiguration() const
 {
 	return new MapConfiguration;
 }

@@ -20,6 +20,7 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/Util/OptionCallback.h"
+#include "Poco/Util/AbstractConfiguration.h"
 
 
 namespace Poco {
@@ -28,7 +29,6 @@ namespace Util {
 
 class Application;
 class Validator;
-class AbstractConfiguration;
 
 
 class Util_API Option
@@ -90,19 +90,19 @@ public:
 
 	Option& operator = (const Option& option);
 		/// Assignment operator.
-		
+
 	void swap(Option& option);
 		/// Swaps the option with another one.
 
 	Option& shortName(const std::string& name);
 		/// Sets the short name of the option.
-		
+
 	Option& fullName(const std::string& name);
 		/// Sets the full name of the option.
-		
+
 	Option& description(const std::string& text);
 		/// Sets the description of the option.
-		
+
 	Option& required(bool flag);
 		/// Sets whether the option is required (flag == true)
 		/// or optional (flag == false).
@@ -110,17 +110,17 @@ public:
 	Option& repeatable(bool flag);
 		/// Sets whether the option can be specified more than once
 		/// (flag == true) or at most once (flag == false).
-		
+
 	Option& argument(const std::string& name, bool required = true);
 		/// Specifies that the option takes an (optional or required)
 		/// argument.
-		
+
 	Option& noArgument();
 		/// Specifies that the option does not take an argument (default).
 
 	Option& group(const std::string& group);
 		/// Specifies the option group the option is part of.
-		
+
 	Option& binding(const std::string& propertyName);
 		/// Binds the option to the configuration property with the given name.
 		///
@@ -131,7 +131,7 @@ public:
 		/// using the given AbstractConfiguration.
 		///
 		/// The configuration will automatically receive the option's argument.
-		
+
 	Option& callback(const AbstractOptionCallback& cb);
 		/// Binds the option to the given method.
 		///
@@ -149,23 +149,23 @@ public:
 
 	const std::string& shortName() const;
 		/// Returns the short name of the option.
-		
+
 	const std::string& fullName() const;
 		/// Returns the full name of the option.
-		
+
 	const std::string& description() const;
 		/// Returns the description of the option.
-		
+
 	bool required() const;
 		/// Returns true if the option is required, false if not.
-	
+
 	bool repeatable() const;
 		/// Returns true if the option can be specified more than
 		/// once, or false if at most once.
-	
+
 	bool takesArgument() const;
 		/// Returns true if the options takes an (optional) argument.
-		
+
 	bool argumentRequired() const;
 		/// Returns true if the argument is required.
 
@@ -176,11 +176,11 @@ public:
 		/// Returns the option group the option is part of,
 		/// or an empty string, if the option is not part of
 		/// a group.
-		
+
 	const std::string& binding() const;
 		/// Returns the property name the option is bound to,
 		/// or an empty string in case it is not bound.
-		
+
 	AbstractOptionCallback* callback() const;
 		/// Returns a pointer to the callback method for the option,
 		/// or NULL if no callback has been specified.
@@ -188,10 +188,10 @@ public:
 	Validator* validator() const;
 		/// Returns the option's Validator, if one has been specified,
 		/// or NULL otherwise.	
-		
-	AbstractConfiguration* config() const;
+
+	AbstractConfiguration::Ptr config() const;
 		/// Returns the configuration, if specified, or NULL otherwise.
-		
+
 	bool matchesShort(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// short name.
@@ -214,7 +214,7 @@ public:
 		///
 		/// The option string must partially match the full
 		/// name (case insensitive).
-		
+
 	void process(const std::string& option, std::string& arg) const;
 		/// Verifies that the given option string matches the
 		/// requirements of the option, and extracts the option argument,
@@ -238,8 +238,8 @@ private:
 	std::string _group;
 	std::string _binding;
 	Validator*  _pValidator;
-	AbstractOptionCallback* _pCallback;
-	AbstractConfiguration*  _pConfig;
+	AbstractOptionCallback*    _pCallback;
+	AbstractConfiguration::Ptr _pConfig;
 };
 
 
@@ -320,7 +320,7 @@ inline Validator* Option::validator() const
 }
 
 
-inline AbstractConfiguration* Option::config() const
+inline AbstractConfiguration::Ptr Option::config() const
 {
 	return _pConfig;
 }

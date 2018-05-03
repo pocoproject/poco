@@ -21,6 +21,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cstdio>
+#include <climits>
 #include <map>
 #include <set>
 
@@ -62,6 +63,9 @@ using Poco::CILess;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
+using Poco::isIntOverflow;
+using Poco::isSafeIntCast;
+using Poco::safeIntCast;
 
 
 StringTest::StringTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -1113,6 +1117,182 @@ void StringTest::testFloatToString()
 }
 
 
+void StringTest::testNumericStringLimit()
+{
+	char c = 0, t = -1;
+	assertTrue(!isIntOverflow<char>(c));
+	assertTrue(safeIntCast<char>(c, t) == c);
+	assertTrue(t == c);
+
+	short s = SHRT_MAX;
+	assertTrue(isIntOverflow<char>(s));
+	try
+	{
+		safeIntCast(s, t);
+		fail("cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	s = SHRT_MIN;
+	assertTrue(isIntOverflow<char>(s));
+	try
+	{
+		safeIntCast(s, t);
+		fail("short => char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	signed char sc = 0, st = -1;
+	assertTrue(!isIntOverflow<signed char>(sc));
+	assertTrue(safeIntCast<char>(sc, st) == sc);
+	assertTrue(st == sc);
+
+	short ss = SHRT_MAX;
+	assertTrue(isIntOverflow<signed char>(ss));
+	assertTrue(isIntOverflow<char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("short => signed char  cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	ss = SHRT_MIN;
+	assertTrue(isIntOverflow<signed char>(ss));
+	assertTrue(isIntOverflow<char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("short => signed char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	assertTrue(safeIntCast<signed char>(sc, st) == c);
+	assertTrue(st == sc);
+
+	unsigned char uc = 0, ut = -1;
+	assertTrue(!isIntOverflow<unsigned char>(uc));
+	assertTrue(safeIntCast<char>(uc, ut) == uc);
+	assertTrue(ut == uc);
+
+	ss = SHRT_MAX;
+	assertTrue(isIntOverflow<unsigned char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	ss = -1;
+	assertTrue(isIntOverflow<unsigned char>(ss));
+	try
+	{
+		safeIntCast(ss, uc);
+		fail("unsigned short => unsigned char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	int i = 0;
+	assertTrue(!isIntOverflow<int>(i));
+	assertTrue(!isIntOverflow<unsigned>(i));
+	i = -1;
+	unsigned int ti = -1;
+	assertTrue(isIntOverflow<unsigned>(i));
+	try
+	{
+		safeIntCast(i, ti);
+		fail("unsigned int => int cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	if (sizeof(long) > sizeof(int))
+	{
+		long l = LONG_MAX;
+		assertTrue(isIntOverflow<int>(l));
+		l = -1L;
+		assertTrue(isIntOverflow<unsigned>(l));
+		i = -1;
+		assertTrue(!isIntOverflow<long>(i));
+		long tl = 0;
+		assertTrue(safeIntCast(i, tl) == i);
+		unsigned long ul = ULONG_MAX, tul = 0;
+		assertTrue(isIntOverflow<long>(ul));
+		try
+		{
+			safeIntCast(ul, tl);
+			fail("unsigned long => long cast must fail");
+		}
+		catch(Poco::BadCastException&){}
+		assertTrue(!isIntOverflow<unsigned long>(ul));
+		tl = 0;
+		assertTrue(safeIntCast(ul, tul) == ul);
+		l = LONG_MIN;
+		assertTrue(isIntOverflow<unsigned long>(l));
+		try
+		{
+			safeIntCast(l, ul);
+			fail("unsigned long => long cast must fail");
+		}
+		catch(Poco::BadCastException&){}
+		ul = LONG_MAX;
+		assertTrue(!isIntOverflow<long>(ul));
+		assertTrue(safeIntCast(ul, l) == ul);
+	}
+
+	numericStringLimitSameSign<unsigned short, unsigned char>();
+	numericStringLimitSameSign<short, char>();
+	numericStringLimitSameSign<unsigned int, unsigned short>();
+	numericStringLimitSameSign<int, short>();
+
+	if (sizeof(long) > sizeof(int))
+	{
+		numericStringLimitSameSign<unsigned long, unsigned int>();
+		numericStringLimitSameSign<long, int>();
+	}
+
+	numericStringLowerLimit<short, char>();
+	numericStringLowerLimit<int, short>();
+
+	if (sizeof(long) > sizeof(int))
+	{
+		numericStringLowerLimit<int64_t, int32_t>();
+	}
+
+#ifdef POCO_ENABLE_CPP11
+	assertTrue(!isIntOverflow<int8_t>(0));
+	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::max()));
+	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::min()));
+	assertTrue(!isIntOverflow<uint8_t>(0));
+	assertTrue(isIntOverflow<uint8_t>(std::numeric_limits<int16_t>::max()));
+	assertTrue(isIntOverflow<uint8_t>(-1));
+	assertTrue(!isIntOverflow<int32_t>(0));
+	assertTrue(isIntOverflow<int32_t>(std::numeric_limits<int64_t>::max()));
+	assertTrue(!isIntOverflow<uint32_t>(0));
+	assertTrue(isIntOverflow<uint32_t>(-1));
+	assertTrue(isIntOverflow<uint32_t>(-1L));
+	assertTrue(isIntOverflow<uint32_t>(-1LL));
+	assertTrue(!isIntOverflow<int64_t>(-1));
+	assertTrue(isIntOverflow<int64_t>(std::numeric_limits<uint64_t>::max()));
+	assertTrue(!isIntOverflow<uint64_t>(std::numeric_limits<uint64_t>::max()));
+	assertTrue(isIntOverflow<uint64_t>(std::numeric_limits<int64_t>::min()));
+	assertTrue(!isIntOverflow<uint64_t>(std::numeric_limits<uint64_t>::min()));
+	assertTrue(!isIntOverflow<int64_t>(std::numeric_limits<int64_t>::max()));
+
+	numericStringLimitSameSign<uint16_t, uint8_t>();
+	numericStringLimitSameSign<int16_t, int8_t>();
+	numericStringLimitSameSign<uint32_t, uint16_t>();
+	numericStringLimitSameSign<int32_t, int16_t>();
+	numericStringLimitSameSign<uint64_t, uint32_t>();
+	numericStringLimitSameSign<int64_t, int32_t>();
+
+	numericStringLowerLimit<int16_t, int8_t>();
+	numericStringLowerLimit<int32_t, int16_t>();
+	numericStringLowerLimit<int64_t, int32_t>();
+#endif
+}
+
+
 void formatStream(double value, std::string& str)
 {
 	char buffer[128];
@@ -1293,6 +1473,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToDouble);
 	CppUnit_addTest(pSuite, StringTest, testNumericStringPadding);
+	CppUnit_addTest(pSuite, StringTest, testNumericStringLimit);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);

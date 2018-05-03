@@ -541,7 +541,7 @@ void FileTest::testLongPath()
 	assertTrue (d.isDirectory());
 
 	Poco::File f(p.toString());
-	f.remove(true);	
+	f.remove(true);
 #endif
 }
 

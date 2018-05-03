@@ -45,6 +45,8 @@ class Foundation_API WindowsConsoleChannel: public Channel
 	/// Only available on Windows platforms.
 {
 public:
+	typedef AutoPtr<WindowsConsoleChannel> Ptr;
+
 	WindowsConsoleChannel();
 		/// Creates the WindowsConsoleChannel.
 

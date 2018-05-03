@@ -38,18 +38,16 @@ SplitterChannel::~SplitterChannel()
 }
 
 
-void SplitterChannel::addChannel(Channel* pChannel)
+void SplitterChannel::addChannel(Channel::Ptr pChannel)
 {
 	poco_check_ptr (pChannel);
 
 	FastMutex::ScopedLock lock(_mutex);
-	
-	pChannel->duplicate();
 	_channels.push_back(pChannel);
 }
 
 
-void SplitterChannel::removeChannel(Channel* pChannel)
+void SplitterChannel::removeChannel(Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
@@ -57,7 +55,6 @@ void SplitterChannel::removeChannel(Channel* pChannel)
 	{
 		if (*it == pChannel)
 		{
-			pChannel->release();
 			_channels.erase(it);
 			break;
 		}
@@ -93,11 +90,6 @@ void SplitterChannel::log(const Message& msg)
 void SplitterChannel::close()
 {
 	FastMutex::ScopedLock lock(_mutex);
-
-	for (ChannelVec::iterator it = _channels.begin(); it != _channels.end(); ++it)
-	{
-		(*it)->release();
-	}
 	_channels.clear();
 }
 
@@ -105,7 +97,6 @@ void SplitterChannel::close()
 int SplitterChannel::count() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
 	return (int) _channels.size();
 }
 

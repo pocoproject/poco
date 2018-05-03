@@ -13,6 +13,7 @@
 
 
 #include "Poco/Debugger.h"
+#include "Poco/NestedDiagnosticContext.h"
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
@@ -64,11 +65,13 @@ bool Debugger::isAvailable()
 }
 
 
-void Debugger::message(const std::string& msg)
+void Debugger::message(const std::string& msg, bool backTrace)
 {
 #if defined(_DEBUG)
 	std::fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
-	std::fputs(msg.c_str(), stderr);
+	std::string lmsg = msg;
+	if (backTrace) lmsg.append(1, '\n').append(NDC::backtrace(5, 1));
+	std::fputs(lmsg.c_str(), stderr);
 	std::fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	if (isAvailable())
