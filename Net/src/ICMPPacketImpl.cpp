@@ -95,7 +95,7 @@ unsigned short ICMPPacketImpl::checksum(UInt16 *addr, Int32 len)
 
 	sum = (sum >> 16) + (sum & 0xffff);
 	sum += (sum >> 16);
-	answer = ~sum;
+	answer = static_cast<UInt16>(~sum);
 	return answer;
 }
 

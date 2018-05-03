@@ -58,8 +58,9 @@ bool checkIsBrokenTimeout()
 	vi.dwOSVersionInfoSize = sizeof(vi);
 	if (GetVersionEx(&vi) == 0) return true; //throw SystemException("Cannot get OS version information");
 	return vi.dwMajorVersion < 6 || (vi.dwMajorVersion == 6 && vi.dwMinorVersion < 2);
-#endif
+#else
 	return false;
+#endif
 }
 
 
@@ -777,7 +778,7 @@ void SocketImpl::setLinger(bool on, int seconds)
 {
 	struct linger l;
 	l.l_onoff  = on ? 1 : 0;
-	l.l_linger = seconds;
+	l.l_linger = static_cast<u_short>(seconds);
 	setRawOption(SOL_SOCKET, SO_LINGER, &l, sizeof(l));
 }
 
@@ -851,6 +852,8 @@ void SocketImpl::setReusePort(bool flag)
 		// support SO_REUSEPORT, even if the macro
 		// is defined.
 	}
+#else
+	(void)flag;
 #endif
 }
 
