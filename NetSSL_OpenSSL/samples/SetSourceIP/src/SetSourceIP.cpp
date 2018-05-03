@@ -39,15 +39,24 @@ void usage(std::string errorMessage)
 	std::cerr << "ERROR: " << errorMessage << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "   syntax: " << std::endl;
-	std::cerr << "           " << programName.getBaseName() << " [--sourceip <source IP address>] uri" << std::endl;
+
+	std::cerr << "           " << programName.getBaseName() << " OPTIONS uri" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "           supported uri schemes are http and https" << std::endl;
+	std::cerr << "              OPTIONS:" << std::endl;
+	std::cerr << "                      --sourceip <source IP address>" << std::endl;
+	std::cerr << "                      --proxyuri <proxy uri>" << std::endl;
+
+	std::cerr << std::endl;
+	std::cerr << "           supported uri schemes for target are http and https" << std::endl;
+	std::cerr << "           supported uri scheme for proxy is http" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "   examples: " << std::endl;
 	std::cerr << "           " << programName.getBaseName() << " http://www.example.com/" << std::endl;
 	std::cerr << "           " << programName.getBaseName() << " https://www.example.com/" << std::endl;
 	std::cerr << "           " << programName.getBaseName() << " --sourceip 10.2.5.6 http://www.example.com/" << std::endl;
 	std::cerr << "           " << programName.getBaseName() << " --sourceip 192.168.15.122 https://www.example.com/" << std::endl;
+	std::cerr << "           " << programName.getBaseName() << " --proxyuri http://localhost:3128 https://www.example.com/" << std::endl;
+	std::cerr << "           " << programName.getBaseName() << " --sourceip 192.168.15.122 --proxyuri http://localhost:3128 https://www.example.com/" << std::endl;
 	std::cerr << std::endl;
 	exit(1);
 }
@@ -58,26 +67,48 @@ int main(int argc, char **argv)
 	// save program name in case usage() gets called
 	programName = argv[0];
 
-	if ((argc != 2) && (argc != 4))
+	std::string uriString;
+	std::list<std::string> sourceIpList;
+	std::string proxyUriString;
+
+	for (int i = 1; i < argc; ++i)
 	{
-		usage("incorrect number of parameters.");
+		std::string optionName = argv[i];
+
+		if (optionName == "--sourceip")
+		{
+			++i;
+			if (i >= argc)
+			{
+				usage("Missing option arguments");
+			}
+
+			sourceIpList.push_back(argv[i]);
+			continue;
+		}
+
+		if (optionName == "--proxyuri")
+		{
+			++i;
+			if (i >= argc)
+			{
+				usage("Missing option arguments");
+			}
+
+			proxyUriString = argv[i];
+			continue;
+		}
+
+		// last argument??
+		if ((i+1) == argc)
+			uriString = argv[i];
+		else
+			usage("Unknown option");
 	}
 
-	std::string uriString = argv[1];
-	std::string sourceIpString;
-	bool sourceIpSet = false;
-
-	if (argc == 4)
+	if (uriString.empty())
 	{
-		std::string optionName = argv[1];
-		sourceIpString = argv[2];
-		sourceIpSet = true;
-		uriString = argv[3];
-
-		if (optionName != "--sourceip")
-		{
-			usage("Invalid option specified");
-		}
+		usage("URI not specified");
 	}
 
 	Poco::SharedPtr<Poco::Net::HTTPClientSession> session;
@@ -110,14 +141,36 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			usage("wrong scheme '" + uri.getScheme() + "',  expected http or https");
+			usage("wrong scheme '" + uri.getScheme() + "' for target uri, expected http or https");
 		}
 
-		if (sourceIpSet)
+		while (!sourceIpList.empty())
 		{
+			std::string sourceIpString = sourceIpList.front();
+			sourceIpList.pop_front();
+
 			// Set the sourceIP address, but leave the source port to 0 so ANY port can be used
 			Poco::Net::SocketAddress sa = Poco::Net::SocketAddress(sourceIpString, 0);
 			session->setSourceAddress(sa);
+
+			std::cout << "Using source IP address" << std::endl;
+			std::cout << "source IP address : " << sa.toString() << std::endl;
+			std::cout << std::endl;
+		}
+
+		if (!proxyUriString.empty())
+		{
+			Poco::URI proxyUri(proxyUriString);
+
+			if (proxyUri.getScheme() == "http")
+				session->setProxy(proxyUri.getHost(), proxyUri.getPort());
+			else
+				usage("wrong scheme '" + proxyUri.getScheme() + "' for proxy uri, expected http");
+
+			std::cout << "Using proxy" << std::endl;
+			std::cout << "Proxy Host: " << proxyUri.getHost() << std::endl;
+			std::cout << "Proxy Port: " << proxyUri.getPort() << std::endl;
+			std::cout << std::endl;
 		}
 
 		std::string path(uri.getPathAndQuery());
