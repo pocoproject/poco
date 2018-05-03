@@ -103,7 +103,6 @@ model {
 		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
-//					addCompilerDefine "Foundation_EXPORTS" ""
 				cCompiler.define "Foundation_EXPORTS"
 				cppCompiler.define "Foundation_EXPORTS"
 			}

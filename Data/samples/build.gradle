@@ -4,6 +4,7 @@ model {
 			sources {
 				cpp.source { srcDir 'Binding/src' include '**/*.cpp' }
 				cpp.lib project: ':Data', library: 'Data'				
+				cpp.lib project: ':Data:SQLite', library: 'DataSQLite'				
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}
 		}
@@ -11,6 +12,7 @@ model {
 			sources {
 				cpp.source { srcDir 'RecordSet/src' include '**/*.cpp' }
 				cpp.lib project: ':Data', library: 'Data'				
+				cpp.lib project: ':Data:SQLite', library: 'DataSQLite'				
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}
 		}
@@ -18,6 +20,7 @@ model {
 			sources {
 				cpp.source { srcDir 'RowFormatter/src' include '**/*.cpp' }
 				cpp.lib project: ':Data', library: 'Data'				
+				cpp.lib project: ':Data:SQLite', library: 'DataSQLite'				
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}
 		}
@@ -25,6 +28,7 @@ model {
 			sources {
 				cpp.source { srcDir 'Tuple/src' include '**/*.cpp' }
 				cpp.lib project: ':Data', library: 'Data'				
+				cpp.lib project: ':Data:SQLite', library: 'DataSQLite'				
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}
 		}
@@ -32,6 +36,7 @@ model {
 			sources {
 				cpp.source { srcDir 'TypeHandler/src' include '**/*.cpp' }
 				cpp.lib project: ':Data', library: 'Data'				
+				cpp.lib project: ':Data:SQLite', library: 'DataSQLite'				
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}
 		}
@@ -39,6 +44,7 @@ model {
 			sources {
 				cpp.source { srcDir 'WebNotifier/src' include '**/*.cpp' }
 				cpp.lib project: ':Data', library: 'Data'				
+				cpp.lib project: ':Data:SQLite', library: 'DataSQLite'				
 				cpp.lib project: ':Net', library: 'Net'				
 				cpp.lib project: ':Foundation', library: 'Foundation'				
 			}

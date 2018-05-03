@@ -28,7 +28,7 @@ model {
 						srcDir 'src'
 					}
 					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
-//					lib project: ':Data:MySQL', library: 'mysql', linkage: 'shared'
+					lib project: ':Data:MySQL', library: 'mysql', linkage: 'shared'
 					lib project: ':Data:MySQL', library: 'DataMySQL', linkage: 'shared'
 					lib project: ':Data', library: 'Data', linkage: 'shared'
 					lib project: ':Util', library: 'Util'

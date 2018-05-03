@@ -18,7 +18,7 @@ include ':Data'
 if (os.windows) {
 	include ':Data:ODBC'
 	include ':Data:SQLite'
-//	include ':Data:MySQL'
+	include ':Data:MySQL'
 }
 include ':Zip'
 include ':PageCompiler'
@@ -45,9 +45,9 @@ include ':Data:testsuite'
 if (os.windows) {
 	include ':Data:ODBC:testsuite'
 	include ':Data:SQLite:testsuite'
-//	include ':Data:MySQL:testsuite'
+	include ':Data:MySQL:testsuite'
 }
-//include ':MongoDB:testsuite'
+include ':MongoDB:testsuite'
 include ':Redis:testsuite'
 include ':CppParser:testsuite'
 include ':Zip:testsuite'

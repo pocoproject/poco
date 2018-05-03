@@ -73,7 +73,7 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-//					lib library: 'mysql'
+					lib library: 'mysql'
 					lib project: ':Data', library: 'Data'
 					lib project: ':Foundation', library: 'Foundation'
 				}
