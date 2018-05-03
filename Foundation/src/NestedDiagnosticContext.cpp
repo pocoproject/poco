@@ -222,6 +222,10 @@ std::string NestedDiagnosticContext::backtrace(int skipEnd, int skipBegin, int s
 	#endif // POCO_COMPILER_GCC
 #else
 	traceBuf = "[call trace not available]";
+	(void)skipEnd;
+	(void)skipBegin;
+	(void)stackSize;
+	(void)bufSize;
 #endif
 	return traceBuf;
 }

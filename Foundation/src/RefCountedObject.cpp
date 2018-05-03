@@ -107,7 +107,7 @@ void* WeakRefCounter::operator new [] (std::size_t)
 }
 
 
-void WeakRefCounter::operator delete [] (void* ptr)
+void WeakRefCounter::operator delete [] (void* /*ptr*/)
 {
 }
 
