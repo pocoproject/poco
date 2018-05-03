@@ -61,6 +61,8 @@ class Poco_SQL_API SQLChannel: public Poco::Channel
 	/// a risk of long blocking periods in case of remote server communication delays.
 {
 public:
+	typedef AutoPtr<SQLChannel> Ptr;
+
 	SQLChannel();
 		/// Creates SQLChannel.
 

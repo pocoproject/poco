@@ -40,7 +40,7 @@ namespace PDF {
 class StackedConfiguration : public Poco::Util::AbstractConfiguration
 {
 public:
-	typedef Poco::AutoPtr<Poco::Util::AbstractConfiguration> ConfigPtr;
+	typedef Poco::Util::AbstractConfiguration::Ptr ConfigPtr;
 	typedef std::vector<ConfigPtr> ConfigStack;
 
 	void push(ConfigPtr pConfig)

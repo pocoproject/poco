@@ -609,6 +609,12 @@ std::string Path::cacheHome()
 }
 
 
+std::string Path::self()
+{
+	return PathImpl::selfImpl();
+}
+
+
 std::string Path::temp()
 {
 	return PathImpl::tempImpl();

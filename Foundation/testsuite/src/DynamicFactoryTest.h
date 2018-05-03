@@ -24,7 +24,8 @@ public:
 	DynamicFactoryTest(const std::string& name);
 	~DynamicFactoryTest();
 
-	void testDynamicFactory();
+	void testDynamicFactoryPtr();
+	void testDynamicFactoryAutoPtr();
 
 	void setUp();
 	void tearDown();

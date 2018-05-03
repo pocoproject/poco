@@ -38,6 +38,8 @@ class Foundation_API StreamChannel: public Channel
 	/// in the text.
 {
 public:
+	typedef AutoPtr<StreamChannel> Ptr;
+
 	StreamChannel(std::ostream& str);
 		/// Creates the channel.
 

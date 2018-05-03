@@ -38,8 +38,8 @@ int main (int, char**)
 {
 	AutoPtr<SplitterChannel> splitterChannel(new SplitterChannel());
 
-	AutoPtr<Channel> consoleChannel(new ConsoleChannel());
-	AutoPtr<Channel> fileChannel(new FileChannel("test.log"));
+	Channel::Ptr consoleChannel(new ConsoleChannel());
+	Channel::Ptr fileChannel(new FileChannel("test.log"));
 	AutoPtr<FileChannel> rotatedFileChannel(new FileChannel("rotated.log"));
 
 	rotatedFileChannel->setProperty("rotation", "100");
@@ -51,7 +51,7 @@ int main (int, char**)
 
 
 	AutoPtr<Formatter> formatter(new PatternFormatter("%h-%M-%S.%i: %t"));
-	AutoPtr<Channel> formattingChannel(new FormattingChannel(formatter, splitterChannel));
+	Channel::Ptr formattingChannel(new FormattingChannel(formatter, splitterChannel));
 
 	Logger& logger = Logger::create("TestLog", formattingChannel, Message::PRIO_TRACE);
 

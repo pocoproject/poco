@@ -27,13 +27,11 @@ class CachingChannel: public Poco::Channel
 	/// Caches the last n Messages in memory
 {
 public:
+	typedef Poco::AutoPtr<CachingChannel> Ptr;
 	typedef std::list<Poco::Message> Messages;
-	
+
 	CachingChannel(std::size_t n = 100);
 		/// Creates the CachingChannel. Caches n messages in memory
-
-	~CachingChannel();
-		/// Destroys the CachingChannel.
 
 	void log(const Poco::Message& msg);
 		/// Writes the log message to the cache
@@ -44,6 +42,10 @@ public:
 	std::size_t getMaxSize() const;
 
 	std::size_t getCurrentSize() const;
+
+protected:
+	~CachingChannel();
+		/// Destroys the CachingChannel.
 
 private:
 	CachingChannel(const CachingChannel&);
@@ -127,17 +129,17 @@ void SyslogTest::testListener()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
-	assertTrue (cl.getCurrentSize() == 0);
+	CachingChannel::Ptr pCL = new CachingChannel;
+	listener->addChannel(pCL);
+	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	assertTrue (cl.getCurrentSize() == 1);
+	assertTrue (pCL->getCurrentSize() == 1);
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	pCL->getMessages(msgs, 0, 10);
 	assertTrue (msgs.size() == 1);
 	assertTrue (msgs[0].getSource() == "asource");
 	assertTrue (msgs[0].getText() == "amessage");
@@ -152,14 +154,14 @@ void SyslogTest::testChannelOpenClose()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
+	CachingChannel::Ptr pCL = new CachingChannel;
+	listener->addChannel(pCL);
 
-	assertTrue (cl.getCurrentSize() == 0);
+	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg1("source1", "message1", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg1);
 	Poco::Thread::sleep(1000);
-	assertTrue (cl.getCurrentSize() == 1);
+	assertTrue (pCL->getCurrentSize() == 1);
 
 	channel->close(); // close and re-open channel
 	channel->open();
@@ -167,11 +169,11 @@ void SyslogTest::testChannelOpenClose()
 	Poco::Message msg2("source2", "message2", Poco::Message::PRIO_ERROR);
 	channel->log(msg2);
 	Poco::Thread::sleep(1000);
-	assertTrue (cl.getCurrentSize() == 2);
+	assertTrue (pCL->getCurrentSize() == 2);
 
 	listener->close();
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	pCL->getMessages(msgs, 0, 10);
 	assertTrue (msgs.size() == 2);
 
 	assertTrue (msgs[1].getSource() == "source1");
@@ -192,17 +194,17 @@ void SyslogTest::testOldBSD()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
-	assertTrue (cl.getCurrentSize() == 0);
+	CachingChannel::Ptr pCL = new CachingChannel;
+	listener->addChannel(pCL);
+	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	assertTrue (cl.getCurrentSize() == 1);
+	assertTrue (pCL->getCurrentSize() == 1);
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	pCL->getMessages(msgs, 0, 10);
 	assertTrue (msgs.size() == 1);
 	// the source is lost with old BSD messages: we only send the local host name!
 	assertTrue (msgs[0].getSource() == Poco::Net::DNS::thisHost().name());
@@ -218,9 +220,9 @@ void SyslogTest::testStructuredData()
 	channel->open();
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
 	listener->open();
-	CachingChannel cl;
-	listener->addChannel(&cl);
-	assertTrue (cl.getCurrentSize() == 0);
+	CachingChannel::Ptr cl = new CachingChannel;
+	listener->addChannel(cl);
+	assertTrue (cl->getCurrentSize() == 0);
 	Poco::Message msg1("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	msg1.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
 	channel->log(msg1);
@@ -230,9 +232,9 @@ void SyslogTest::testStructuredData()
 	Poco::Thread::sleep(1000);
 	listener->close();
 	channel->close();
-	assertTrue (cl.getCurrentSize() == 2);
+	assertTrue (cl->getCurrentSize() == 2);
 	std::vector<Poco::Message> msgs;
-	cl.getMessages(msgs, 0, 10);
+	cl->getMessages(msgs, 0, 10);
 	assertTrue (msgs.size() == 2);
 
 	assertTrue (msgs[0].getSource() == "asource");

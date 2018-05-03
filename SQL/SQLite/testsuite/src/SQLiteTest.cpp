@@ -90,6 +90,8 @@ using Poco::Int64;
 using Poco::Dynamic::Var;
 using Poco::SQL::SQLite::Utility;
 using Poco::delegate;
+using Poco::RefCountedObject;
+using Poco::RCDC;
 
 
 class Person
@@ -245,11 +247,13 @@ int SQLiteTest::_deleteCounter;
 
 SQLiteTest::SQLiteTest(const std::string& name): CppUnit::TestCase(name)
 {
+	//poco_rcdc_reset;
 }
 
 
 SQLiteTest::~SQLiteTest()
 {
+	//poco_rcdc_dump_leak(std::cerr);
 }
 
 
@@ -2357,7 +2361,7 @@ void SQLiteTest::testRowIteratorLimit()
 }
 
 
-void SQLiteTest::testFilter()
+void SQLiteTest::testRowFilter()
 {
 	Session ses(Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	ses << "DROP TABLE IF EXISTS Vectors", now;
@@ -2440,7 +2444,7 @@ void SQLiteTest::testAsync()
 	Session tmp (Poco::SQL::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
-	
+
 	int rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
@@ -2505,7 +2509,7 @@ void SQLiteTest::testAsync()
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
-	
+
 	for (int i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
@@ -2676,9 +2680,9 @@ void SQLiteTest::testSQLLogger()
 	{
 		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::SQL::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
 		Logger& root = Logger::root();
-		root.setChannel(pChannel.get());
+		root.setChannel(pChannel);
 		root.setLevel(Message::PRIO_INFORMATION);
-		
+
 		root.information("Informational message");
 		root.warning("Warning message");
 		root.debug("Debug message");
@@ -3807,7 +3811,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorLimit);
-	CppUnit_addTest(pSuite, SQLiteTest, testFilter);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowFilter);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);

@@ -7,7 +7,7 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
-	AutoPtrTest ArrayTest SharedPtrTest AutoReleasePoolTest \
+	ArrayTest SharedPtrTest AutoReleasePoolTest \
 	Base32Test Base64Test BinaryReaderWriterTest LineEndingConverterTest \
 	ByteOrderTest ChannelTest ClassLoaderTest ClockTest CoreTest CoreTestSuite \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
@@ -19,12 +19,12 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	MemoryPoolTest MD4EngineTest MD5EngineTest ManifestTest \
 	NDCTest NotificationCenterTest NotificationQueueTest \
 	PriorityNotificationQueueTest TimedNotificationQueueTest \
-	NotificationsTestSuite NullStreamTest NumberFormatterTest \
-	NumberParserTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
-	RandomStreamTest RandomTest RegularExpressionTest SHA1EngineTest SHA2EngineTest SHA3EngineTest BLAKE2EngineTest \
-	SemaphoreTest MutexTest ConditionTest SharedLibraryTest SharedLibraryTestSuite \
-	SimpleFileChannelTest StopwatchTest \
-	StreamConverterTest StreamCopierTest StreamTokenizerTest \
+	NotificationsTestSuite NullStreamTest NumberFormatterTest NumberParserTest \
+	OrderedContainersTest PathTest PatternFormatterTest PBKDF2EngineTest RWLockTest \
+	RandomStreamTest RandomTest RefPtrTest RegularExpressionTest SHA1EngineTest \
+	SHA2EngineTest SHA3EngineTest BLAKE2EngineTest SemaphoreTest MutexTest \
+	ConditionTest SharedLibraryTest SharedLibraryTestSuite SimpleFileChannelTest \
+	StopwatchTest StreamConverterTest StreamCopierTest StreamTokenizerTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \
 	TaskManagerTest TestChannel TeeStreamTest UTF8StringTest \
 	TextConverterTest TextIteratorTest TextBufferIteratorTest TextTestSuite TextEncodingTest \
