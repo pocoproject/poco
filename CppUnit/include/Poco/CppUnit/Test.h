@@ -38,7 +38,7 @@ inline Test::~Test()
 
 
 // Runs a test and collects its result in a TestResult instance.
-inline void Test::run(TestResult *result)
+inline void Test::run(TestResult* /*result*/)
 {
 }
 
