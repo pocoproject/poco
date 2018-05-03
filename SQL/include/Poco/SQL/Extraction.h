@@ -86,7 +86,7 @@ public:
 	typedef SharedPtr<Type>     Ptr;
 
 	Extraction(T& rResult, const Position& pos = Position(0)):
-		AbstractExtraction(typeid(T).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		AbstractExtraction(typeid(T).name(), static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), pos.value()),
 		_rResult(rResult),
 		_default(),
 		_extracted(false),
@@ -127,7 +127,7 @@ public:
 		return 1u;
 	}
 
-	bool isNull(std::size_t row = 0) const
+	bool isNull(std::size_t /*row*/ = 0) const
 	{
 		return _null;
 	}
@@ -268,7 +268,7 @@ public:
 	typedef SharedPtr<Type>     Ptr;
 
 	Extraction(std::vector<bool>& rResult, const Position& pos = Position(0)):
-		AbstractExtraction(typeid(std::vector<bool>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		AbstractExtraction(typeid(std::vector<bool>).name(), static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), pos.value()),
 		_rResult(rResult),
 		_default()
 	{
@@ -276,7 +276,7 @@ public:
 	}
 
 	Extraction(std::vector<bool>& rResult, const bool& def, const Position& pos = Position(0)):
-		AbstractExtraction(typeid(std::vector<bool>).name(), Limit::LIMIT_UNLIMITED, pos.value()),
+		AbstractExtraction(typeid(std::vector<bool>).name(), static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), pos.value()),
 		_rResult(rResult),
 		_default(def)
 	{
