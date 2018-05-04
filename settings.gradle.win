@@ -19,6 +19,7 @@ if (os.windows) {
 	include ':SQL:ODBC'
 	include ':SQL:SQLite'
 	include ':SQL:MySQL'
+	include ':SQL:PostgreSQL'
 }
 include ':Zip'
 include ':PageCompiler'
@@ -41,11 +42,12 @@ include ':NetSSL_OpenSSL:testsuite'
 if (os.windows) {
 	include ':NetSSL_Win:testsuite'
 }
-include ':Data:testsuite'
+include ':SQL:testsuite'
 if (os.windows) {
 	include ':SQL:ODBC:testsuite'
 	include ':SQL:SQLite:testsuite'
 	include ':SQL:MySQL:testsuite'
+	include ':SQL:PostgreSQL:testsuite'
 }
 //include ':MongoDB:testsuite'
 include ':Redis:testsuite'
