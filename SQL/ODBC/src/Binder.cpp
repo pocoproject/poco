@@ -420,7 +420,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir, const std
 		(SQLUSMALLINT) pos + 1,
 		SQL_PARAM_INPUT,
 		colType,
-		Utility::sqlDataType(colType),
+		static_cast<SQLSMALLINT>(Utility::sqlDataType(colType)),
 		colSize,
 		decDigits,
 		0,
@@ -444,7 +444,7 @@ std::size_t Binder::parameterSize(SQLPOINTER pAddr) const
 }
 
 
-void Binder::bind(std::size_t pos, const char* const &pVal, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t /*pos*/, const char* const &/*pVal*/, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	throw NotImplementedException("char* binding not implemented, Use std::string instead.");
 }
