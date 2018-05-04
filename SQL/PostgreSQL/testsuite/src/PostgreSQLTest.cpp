@@ -68,7 +68,7 @@ std::string PostgreSQLTest::getPass(){
 	}
 	else
 	{
-		return "postgres";
+		return "poco";
 	}
 }
 
