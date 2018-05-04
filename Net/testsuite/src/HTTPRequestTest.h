@@ -28,6 +28,7 @@ public:
 	void testWrite2();
 	void testWrite3();
 	void testWrite4();
+	void testWrite5();
 	void testRead1();
 	void testRead2();
 	void testRead3();
