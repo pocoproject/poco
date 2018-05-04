@@ -50,7 +50,7 @@ unsigned short EntityReference::nodeType() const
 }
 
 
-Node* EntityReference::copyNode(bool deep, Document* pOwnerDocument) const
+Node* EntityReference::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new EntityReference(pOwnerDocument, *this);
 }

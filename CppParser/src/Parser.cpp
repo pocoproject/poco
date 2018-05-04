@@ -373,7 +373,7 @@ const Token* Parser::parseBaseClassList(const Token* pNext, Struct* pClass)
 }
 
 
-const Token* Parser::parseClassMembers(const Token* pNext, Struct* pClass)
+const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
 	

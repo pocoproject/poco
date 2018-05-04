@@ -432,31 +432,31 @@ void ServerApplication::defineOptions(OptionSet& options)
 }
 
 
-void ServerApplication::handleRegisterService(const std::string& name, const std::string& value)
+void ServerApplication::handleRegisterService(const std::string& /*name*/, const std::string& /*value*/)
 {
 	_action = SRV_REGISTER;
 }
 
 
-void ServerApplication::handleUnregisterService(const std::string& name, const std::string& value)
+void ServerApplication::handleUnregisterService(const std::string& /*name*/, const std::string& /*value*/)
 {
 	_action = SRV_UNREGISTER;
 }
 
 
-void ServerApplication::handleDisplayName(const std::string& name, const std::string& value)
+void ServerApplication::handleDisplayName(const std::string& /*name*/, const std::string& value)
 {
 	_displayName = value;
 }
 
 
-void ServerApplication::handleDescription(const std::string& name, const std::string& value)
+void ServerApplication::handleDescription(const std::string& /*name*/, const std::string& value)
 {
 	_description = value;
 }
 
 
-void ServerApplication::handleStartup(const std::string& name, const std::string& value)
+void ServerApplication::handleStartup(const std::string& /*name*/, const std::string& value)
 {
 	if (Poco::icompare(value, 4, std::string("auto")) == 0)
 		_startup = "auto";

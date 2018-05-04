@@ -360,10 +360,10 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 			}
 		}
 
-		unsigned char utf8[4];
+		unsigned char utf8Code[4];
 		UTF8Encoding encoding;
-		int sz = encoding.convert(ch, utf8, 4);
-		result.append((char*) utf8, sz);
+		int sz = encoding.convert(ch, utf8Code, 4);
+		result.append((char*)utf8Code, sz);
 	}
 
 	return result;

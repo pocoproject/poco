@@ -1423,7 +1423,7 @@ inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
 	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
 }
 
-inline AbstractBinding::Ptr use(const NullValue& t, const std::string& name = "")
+inline AbstractBinding::Ptr use(const NullValue& /*t*/, const std::string& name = "")
 /// NullData overload.
 {
 	return use(NullValue::nullCode<void>(), name);

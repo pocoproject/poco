@@ -994,20 +994,20 @@ static SRes SzReadHeader2(
 
   for (;;)
   {
-    UInt64 type;
+    UInt64 type2;
     UInt64 size;
-    RINOK(SzReadID(sd, &type));
-    if (type == k7zIdEnd)
+    RINOK(SzReadID(sd, &type2));
+    if (type2 == k7zIdEnd)
       break;
     RINOK(SzReadNumber(sd, &size));
     if (size > sd->Size)
       return SZ_ERROR_ARCHIVE;
-    if ((UInt64)(int)type != type)
+    if ((UInt64)(int)type2 != type2)
     {
       RINOK(SzSkeepDataSize(sd, size));
     }
     else
-    switch((int)type)
+    switch((int)type2)
     {
       case k7zIdName:
       {

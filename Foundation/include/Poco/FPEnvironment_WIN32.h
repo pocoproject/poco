@@ -121,7 +121,7 @@ inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 #ifdef __MINGW32__
         return isfinite(value) == 0;
 #else
-        return _finite(value) == 0;
+        return _finite(static_cast<double>(value)) == 0;
 #endif
 }
 
@@ -151,7 +151,7 @@ inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 #ifdef __MINGW32__
         return isnan(value) != 0;
 #else
-        return _isnan(value) != 0;
+        return _isnan(static_cast<double>(value)) != 0;
 #endif
 }
 

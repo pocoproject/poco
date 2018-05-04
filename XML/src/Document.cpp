@@ -243,7 +243,7 @@ NodeList* Document::getElementsByTagNameNS(const XMLString& namespaceURI, const 
 }
 
 
-Element* Document::getElementById(const XMLString& elementId) const
+Element* Document::getElementById(const XMLString& /*elementId*/) const
 {
 	return 0;
 }
@@ -265,7 +265,7 @@ Event* Document::createEvent(const XMLString& eventType) const
 }
 
 
-Node* Document::copyNode(bool deep, Document* pOwnerDocument) const
+Node* Document::copyNode(bool /*deep*/, Document* /*pOwnerDocument*/) const
 {
 	throw DOMException(DOMException::NOT_SUPPORTED_ERR);
 }

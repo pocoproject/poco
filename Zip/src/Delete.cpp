@@ -25,7 +25,7 @@ Delete::Delete(const ZipLocalFileHeader& hdr):
 }
 
 
-void Delete::execute(Compress& c, std::istream& input)
+void Delete::execute(Compress& /*c*/, std::istream& /*input*/)
 {
 	// due to absolute positioning in compress we don't need to do anything
 }

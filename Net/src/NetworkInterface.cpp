@@ -896,12 +896,12 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		std::string adapterName = it->second.adapterName();
 		NetworkInterface::MACAddress mac = it->second.macAddress();
 
-		typedef NetworkInterface::AddressList List;
-		const List& ipList = it->second.addressList();
+		typedef NetworkInterface::AddressList AddrList;
+		const AddrList& ipList = it->second.addressList();
 		if (ipList.size() > 0)
 		{
-			List::const_iterator ipIt = ipList.begin();
-			List::const_iterator ipEnd = ipList.end();
+			AddrList::const_iterator ipIt = ipList.begin();
+			AddrList::const_iterator ipEnd = ipList.end();
 			for(; ipIt != ipEnd; ++ipIt)
 			{
 				IPAddress addr = ipIt->get<NetworkInterface::IP_ADDRESS>();
@@ -1196,8 +1196,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				pUniAddr = pUniAddr->Next)
 			{
 				address = IPAddress(pUniAddr->Address);
-				ADDRESS_FAMILY family = pUniAddr->Address.lpSockaddr->sa_family;
-				switch (family)
+				ADDRESS_FAMILY family2 = pUniAddr->Address.lpSockaddr->sa_family;
+				switch (family2)
 				{
 				case AF_INET:
 				{

@@ -166,7 +166,7 @@ private:
 	{
 		if (flipBytes)
 		{
-			T fValue = ByteOrder::flipBytes(value);
+			T fValue = static_cast<T>(ByteOrder::flipBytes(value));
 			_ostr.write((const char*) &fValue, sizeof(fValue));
 		}
 		else

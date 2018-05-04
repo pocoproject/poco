@@ -115,7 +115,7 @@ private:
 		/// if error has occurred.
 
 	template <typename T>
-	void bindLOB(std::size_t pos, const Poco::SQL::LOB<T>& val, Direction dir, const WhenNullCb& nullCb)
+	void bindLOB(std::size_t pos, const Poco::SQL::LOB<T>& val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 	{
 		// convert a blob to a an unsigned char* array
 		const T* pData = reinterpret_cast<const T*>(val.rawContent());

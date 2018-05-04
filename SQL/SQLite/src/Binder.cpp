@@ -42,14 +42,14 @@ Binder::~Binder()
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int32 &val, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t pos, const Poco::Int32 &val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	int rc = sqlite3_bind_int(_pStmt, (int) pos, val);
 	checkReturn(rc);
 }
 
 
-void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	int rc = sqlite3_bind_int64(_pStmt, (int) pos, val);
 	checkReturn(rc);
@@ -57,14 +57,14 @@ void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir, const 
 
 
 #ifndef POCO_LONG_IS_64_BIT
-void Binder::bind(std::size_t pos, const long &val, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t pos, const long &val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	long tmp = static_cast<long>(val);
 	int rc = sqlite3_bind_int(_pStmt, (int) pos, tmp);
 	checkReturn(rc);
 }
 
-void Binder::bind(std::size_t pos, const unsigned long &val, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t pos, const unsigned long &val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	long tmp = static_cast<long>(val);
 	int rc = sqlite3_bind_int(_pStmt, (int) pos, tmp);
@@ -73,14 +73,14 @@ void Binder::bind(std::size_t pos, const unsigned long &val, Direction dir, cons
 #endif
 
 
-void Binder::bind(std::size_t pos, const double &val, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t pos, const double &val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	int rc = sqlite3_bind_double(_pStmt, (int) pos, val);
 	checkReturn(rc);
 }
 
 
-void Binder::bind(std::size_t pos, const std::string& val, Direction dir, const WhenNullCb& nullCb)
+void Binder::bind(std::size_t pos, const std::string& val, Direction /*dir*/, const WhenNullCb& /*nullCb*/)
 {
 	int rc = sqlite3_bind_text(_pStmt, (int) pos, val.c_str(), (int) val.size()*sizeof(char), SQLITE_TRANSIENT);
 	checkReturn(rc);
@@ -111,7 +111,7 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir, const Whe
 }
 
 
-void Binder::bind(std::size_t pos, const NullData&, Direction, const std::type_info& bindType)
+void Binder::bind(std::size_t pos, const NullData&, Direction, const std::type_info& /*bindType*/)
 {
 	sqlite3_bind_null(_pStmt, static_cast<int>(pos));
 }

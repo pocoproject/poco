@@ -296,7 +296,8 @@ bool MultipartReader::readLine(std::string& line, std::string::size_type n)
 	while (ch != eof && ch != '\r' && ch != '\n' && length < maxLength)
 	{
 		ch = (char) _istr.get();
-		if (line.length() < n) line += ch;
+		if (line.length() < n) 
+			line += static_cast<char>(ch);
 		ch = _istr.peek();
 		length++;
 	}

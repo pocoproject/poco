@@ -196,7 +196,7 @@ inline bool ODBCStatementImpl::hasData() const
 
 inline bool ODBCStatementImpl::nextRowReady() const
 {
-	return (!Utility::isError(_nextResponse));
+	return (!Utility::isError(static_cast<SQLRETURN>(_nextResponse)));
 }
 
 

@@ -65,7 +65,7 @@ unsigned short CDATASection::nodeType() const
 }
 
 
-Node* CDATASection::copyNode(bool deep, Document* pOwnerDocument) const
+Node* CDATASection::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new CDATASection(pOwnerDocument, *this);
 }

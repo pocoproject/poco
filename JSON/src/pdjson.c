@@ -123,7 +123,7 @@ static void init(json_stream *json)
     json->next = 0;
 
     json->stack = NULL;
-    json->stack_top = -1;
+    json->stack_top = (size_t)(-1);
     json->stack_size = 0;
 
     json->data.string = NULL;
@@ -158,7 +158,7 @@ static int pushchar(json_stream *json, int c)
             json->data.string = buffer;
         }
     }
-    json->data.string[json->data.string_fill++] = c;
+    json->data.string[json->data.string_fill++] = (char)(c);
     return 0;
 }
 
@@ -440,7 +440,7 @@ is_legal_utf8(const unsigned char *bytes, int length)
 static int
 read_utf8(json_stream* json, int next_char)
 {
-    int count = utf8_seq_length(next_char);
+    int count = utf8_seq_length((char)(next_char));
     if (!count)
     {
         json_error(json, "%s", "Bad character.");
@@ -448,10 +448,10 @@ read_utf8(json_stream* json, int next_char)
     }
 
     char buffer[4];
-    buffer[0] = next_char;
+    buffer[0] = (char)(next_char);
     for (int i = 1; i < count; ++i)
     {
-        buffer[i] = json->source.get(&json->source);;
+        buffer[i] = (char)(json->source.get(&json->source));
     }
 
     if (!is_legal_utf8((unsigned char*) buffer, count))
@@ -751,7 +751,7 @@ enum json_type json_next(json_stream *json)
 
 void json_reset(json_stream *json)
 {
-    json->stack_top = -1;
+	json->stack_top = (size_t)(-1);
     json->ntokens = 0;
     json->flags &= ~JSON_FLAG_ERROR;
     json->errmsg[0] = '\0';

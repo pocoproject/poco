@@ -29,28 +29,28 @@ DefaultHandler::~DefaultHandler()
 }
 
 
-InputSource* DefaultHandler::resolveEntity(const XMLString* publicId, const XMLString& systemId)
+InputSource* DefaultHandler::resolveEntity(const XMLString* /*publicId*/, const XMLString& /*systemId*/)
 {
 	return 0;
 }
 
 
-void DefaultHandler::releaseInputSource(InputSource* pSource)
+void DefaultHandler::releaseInputSource(InputSource* /*pSource*/)
 {
 }
 
 
-void DefaultHandler::notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId)
+void DefaultHandler::notationDecl(const XMLString& /*name*/, const XMLString* /*publicId*/, const XMLString* /*systemId*/)
 {
 }
 
 
-void DefaultHandler::unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName)
+void DefaultHandler::unparsedEntityDecl(const XMLString& /*name*/, const XMLString* /*publicId*/, const XMLString& /*systemId*/, const XMLString& /*notationName*/)
 {
 }
 
 
-void DefaultHandler::setDocumentLocator(const Locator* loc)
+void DefaultHandler::setDocumentLocator(const Locator* /*loc*/)
 {
 }
 
@@ -65,57 +65,57 @@ void DefaultHandler::endDocument()
 }
 
 
-void DefaultHandler::startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
+void DefaultHandler::startElement(const XMLString& /*uri*/, const XMLString& /*localName*/, const XMLString& /*qname*/, const Attributes& /*attributes*/)
 {
 }
 
 
-void DefaultHandler::endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
+void DefaultHandler::endElement(const XMLString& /*uri*/, const XMLString& /*localName*/, const XMLString& /*qname*/)
 {
 }
 
 
-void DefaultHandler::characters(const XMLChar ch[], int start, int length)
+void DefaultHandler::characters(const XMLChar /*ch*/[], int /*start*/, int /*length*/)
 {
 }
 
 
-void DefaultHandler::ignorableWhitespace(const XMLChar ch[], int start, int length)
+void DefaultHandler::ignorableWhitespace(const XMLChar /*ch*/[], int /*start*/, int /*length*/)
 {
 }
 
 
-void DefaultHandler::processingInstruction(const XMLString& target, const XMLString& data)
+void DefaultHandler::processingInstruction(const XMLString& /*target*/, const XMLString& /*data*/)
 {
 }
 
 
-void DefaultHandler::startPrefixMapping(const XMLString& prefix, const XMLString& uri)
+void DefaultHandler::startPrefixMapping(const XMLString& /*prefix*/, const XMLString& /*uri*/)
 {
 }
 
 
-void DefaultHandler::endPrefixMapping(const XMLString& prefix)
+void DefaultHandler::endPrefixMapping(const XMLString& /*prefix*/)
 {
 }
 
 
-void DefaultHandler::skippedEntity(const XMLString& name)
+void DefaultHandler::skippedEntity(const XMLString& /*name*/)
 {
 }
 
 
-void DefaultHandler::warning(const SAXException& exc)
+void DefaultHandler::warning(const SAXException& /*exc*/)
 {
 }
 
 
-void DefaultHandler::error(const SAXException& exc)
+void DefaultHandler::error(const SAXException& /*exc*/)
 {
 }
 
 
-void DefaultHandler::fatalError(const SAXException& exc)
+void DefaultHandler::fatalError(const SAXException& /*exc*/)
 {
 }
 

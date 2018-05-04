@@ -22,7 +22,7 @@ namespace Poco {
 namespace PDF {
 
 
-void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data)
+void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* /*user_data*/)
 {
 	switch (error_no)
 	{

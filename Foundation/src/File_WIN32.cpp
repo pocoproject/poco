@@ -285,7 +285,7 @@ void FileImpl::setWriteableImpl(bool flag)
 }
 
 
-void FileImpl::setExecutableImpl(bool flag)
+void FileImpl::setExecutableImpl(bool /*flag*/)
 {
 	// not supported
 }
