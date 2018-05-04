@@ -19,12 +19,14 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #include <wincrypt.h>
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
-#endif
 #include <sspi.h>
+#endif
+#endif
 
 
 namespace Poco {

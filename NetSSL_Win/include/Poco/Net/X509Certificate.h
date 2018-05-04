@@ -22,7 +22,9 @@
 #include "Poco/DateTime.h"
 #include <set>
 #include <istream>
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <wincrypt.h>
+#endif
 
 
 namespace Poco {
