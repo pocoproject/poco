@@ -3554,7 +3554,11 @@ void SQLExecutor::any()
 
 	i = 0;
 	f = 0.0;
-	s = std::string("");
+#ifdef POCO_ODBC_UNICODE
+	s = UTF16String();
+#else
+	s = std::string();
+#endif
 	tmp << "SELECT * FROM " << ExecUtil::anys(), into(i), into(f), into(s), now;
 	assertTrue (AnyCast<int>(i) == 42);
 	assertTrue (AnyCast<double>(f) == 42.5);
