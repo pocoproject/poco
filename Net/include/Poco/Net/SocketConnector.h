@@ -20,11 +20,8 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketNotification.h"
-<<<<<<< HEAD
-=======
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/ParallelSocketAcceptor.h"
->>>>>>> 0d7f39f... add PollSet::has/empty(); ParallelAcceptor: always use same reactor for a socket, if registered
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"
