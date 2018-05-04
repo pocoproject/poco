@@ -26,6 +26,7 @@ public:
 
 	void testMutexRecursion();
 	void testRecursiveMutexRecursion();
+	void testSpinlockMutex();
 
 	void setUp();
 	void tearDown();

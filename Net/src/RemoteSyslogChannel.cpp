@@ -108,7 +108,7 @@ void RemoteSyslogChannel::close()
 	}
 }
 
-	
+
 void RemoteSyslogChannel::log(const Message& msg)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
@@ -154,7 +154,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 	_socket.sendTo(m.data(), static_cast<int>(m.size()), _socketAddress);
 }
 
-	
+
 void RemoteSyslogChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_NAME)

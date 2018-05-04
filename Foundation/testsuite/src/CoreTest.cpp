@@ -19,6 +19,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/FIFOBuffer.h"
 #include "Poco/AtomicCounter.h"
+#include "Poco/AtomicFlag.h"
 #include "Poco/Nullable.h"
 #include "Poco/Ascii.h"
 #include "Poco/BasicEvent.h"
@@ -39,6 +40,7 @@ using Poco::Thread;
 using Poco::Runnable;
 using Poco::Buffer;
 using Poco::AtomicCounter;
+using Poco::AtomicFlag;
 using Poco::Nullable;
 using Poco::Ascii;
 using Poco::BasicEvent;
@@ -355,8 +357,6 @@ void CoreTest::testBuffer()
 }
 
 
-
-
 void CoreTest::testAtomicCounter()
 {
 	AtomicCounter ac(0);
@@ -396,6 +396,19 @@ void CoreTest::testAtomicCounter()
 	t5.join();
 	
 	assertTrue (ac.value() == 0);
+}
+
+
+void CoreTest::testAtomicFlag()
+{
+	AtomicFlag f;
+	assertTrue(!f);
+	assertFalse(!f);
+	assertTrue(f);
+	f.reset();
+	assertFalse(f);
+	assertTrue(f);
+	assertFalse(!f);
 }
 
 
@@ -678,6 +691,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
+	CppUnit_addTest(pSuite, CoreTest, testAtomicFlag);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
 	CppUnit_addTest(pSuite, CoreTest, testChecksum64);

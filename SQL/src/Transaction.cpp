@@ -20,7 +20,7 @@ namespace Poco {
 namespace SQL {
 
 
-Transaction::Transaction(Poco::SQL::Session& rSession, Poco::Logger* pLogger):
+Transaction::Transaction(Poco::SQL::Session& rSession, Poco::Logger::Ptr pLogger):
 	_rSession(rSession),
 	_pLogger(pLogger)
 {
@@ -35,7 +35,7 @@ Transaction::Transaction(Poco::SQL::Session& rSession, bool start):
 	if (start) begin();
 }
 
-	
+
 Transaction::~Transaction()
 {
 	try

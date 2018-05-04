@@ -43,6 +43,8 @@ class Foundation_API ConsoleChannel: public Channel
 	/// same stream.
 {
 public:
+	typedef AutoPtr<ConsoleChannel> Ptr;
+
 	ConsoleChannel();
 		/// Creates the channel and attaches std::clog.
 		
@@ -173,9 +175,9 @@ protected:
 	void initColors();
 
 private:
-	std::ostream& _str;
-	bool _enableColors;
-	Color _colors[9];
+	std::ostream&    _str;
+	bool             _enableColors;
+	Color            _colors[9];
 	static FastMutex _mutex;
 	static const std::string CSI;
 };

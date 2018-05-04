@@ -39,6 +39,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	std::string execName();
 };
 
 

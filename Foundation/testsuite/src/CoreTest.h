@@ -31,6 +31,7 @@ public:
 	void testEnvironment();
 	void testBuffer();
 	void testAtomicCounter();
+	void testAtomicFlag();
 	void testNullable();
 	void testAscii();
 	void testChecksum64();

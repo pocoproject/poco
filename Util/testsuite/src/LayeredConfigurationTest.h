@@ -37,7 +37,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
 };
 
 

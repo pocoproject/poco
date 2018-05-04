@@ -58,20 +58,6 @@ void RowFilter::init()
 
 RowFilter::~RowFilter()
 {
-	try
-	{
-		if (_pRecordSet) _pRecordSet->filter(0);
-		if (_pParent)
-		{
-			Ptr pThis(this, true);
-			if(_pParent->has(pThis))
-				_pParent->removeFilter(pThis);
-		}
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
 }
 
 
@@ -209,7 +195,7 @@ RecordSet& RowFilter::recordSet() const
 {
 	if (!_pRecordSet)
 	{
-		Ptr pParent = _pParent;
+		Ptr pParent = _pParent.lock();
 		while (pParent && !_pRecordSet)
 			_pRecordSet = pParent->_pRecordSet;
 	}

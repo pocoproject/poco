@@ -21,13 +21,11 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Formatter.h"
 #include "Poco/Channel.h"
+#include "Poco/Util/AbstractConfiguration.h"
 
 
 namespace Poco {
 namespace Util {
-
-
-class AbstractConfiguration;
 
 
 class Util_API LoggingConfigurator
@@ -112,7 +110,7 @@ public:
 	~LoggingConfigurator();
 		/// Destroys the LoggingConfigurator.
 		
-	void configure(AbstractConfiguration* pConfig);
+	void configure(AbstractConfiguration::Ptr pConfig);
 		/// Configures the logging subsystem based on
 		/// the given configuration.
 		///
@@ -120,13 +118,13 @@ public:
 		/// a part of a larger configuration.
 
 private:
-	void configureFormatters(AbstractConfiguration* pConfig);
-	void configureChannels(AbstractConfiguration* pConfig);
-	void configureLoggers(AbstractConfiguration* pConfig);
-	Poco::Formatter* createFormatter(AbstractConfiguration* pConfig);
-	Poco::Channel* createChannel(AbstractConfiguration* pConfig);
-	void configureChannel(Channel* pChannel, AbstractConfiguration* pConfig);
-	void configureLogger(AbstractConfiguration* pConfig);
+	void configureFormatters(AbstractConfiguration::Ptr pConfig);
+	void configureChannels(AbstractConfiguration::Ptr pConfig);
+	void configureLoggers(AbstractConfiguration::Ptr pConfig);
+	Poco::Formatter::Ptr createFormatter(AbstractConfiguration::Ptr pConfig);
+	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
+	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
+	void configureLogger(AbstractConfiguration::Ptr pConfig);
 	
 	LoggingConfigurator(const LoggingConfigurator&);
 	LoggingConfigurator& operator = (const LoggingConfigurator&);
