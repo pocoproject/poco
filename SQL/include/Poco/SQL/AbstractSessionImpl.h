@@ -181,43 +181,43 @@ public:
 		_storage = value;
 	}
 
-	void setStorage(const std::string& name, const Poco::Any& value)
+	void setStorage(const std::string& /*name*/, const Poco::Any& value)
 		/// Sets the storage type.
 	{
 		_storage = Poco::RefAnyCast<std::string>(value);
 	}
 
-	Poco::Any getStorage(const std::string& name="") const
+	Poco::Any getStorage(const std::string& /*name*/="") const
 		/// Returns the storage type
 	{
 		return _storage;
 	}
 
-	void setHandle(const std::string& name, const Poco::Any& handle)
+	void setHandle(const std::string& /*name*/, const Poco::Any& handle)
 		/// Sets the native session handle.
 	{
 		_handle = handle;
 	}
 
-	Poco::Any getHandle(const std::string& name="") const
+	Poco::Any getHandle(const std::string& /*name*/ = "") const
 		/// Returns the native session handle.
 	{
 		return _handle;
 	}
 
-	void setBulk(const std::string& name, bool bulk)
+	void setBulk(const std::string& /*name*/, bool bulk)
 		/// Sets the execution type.
 	{
 		_bulk = bulk;
 	}
 
-	bool getBulk(const std::string& name="") const
+	bool getBulk(const std::string& /*name*/ = "") const
 		/// Returns the execution type
 	{
 		return _bulk;
 	}
 
-	void setEmptyStringIsNull(const std::string& name, bool emptyStringIsNull)
+	void setEmptyStringIsNull(const std::string& /*name*/, bool emptyStringIsNull)
 		/// Sets the behavior regarding empty variable length strings.
 		/// Those are treated as NULL by Oracle and as empty string by
 		/// most other databases.
@@ -229,7 +229,7 @@ public:
 		_emptyStringIsNull = emptyStringIsNull;
 	}
 		
-	bool getEmptyStringIsNull(const std::string& name="") const
+	bool getEmptyStringIsNull(const std::string& /*name*/ = "") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -237,7 +237,7 @@ public:
 		return _emptyStringIsNull;
 	}
 
-	void setForceEmptyString(const std::string& name, bool forceEmptyString)
+	void setForceEmptyString(const std::string& /*name*/, bool forceEmptyString)
 		/// Sets the behavior regarding empty variable length strings.
 		/// Those are treated as NULL by Oracle and as empty string by
 		/// most other databases.
@@ -250,7 +250,7 @@ public:
 		_forceEmptyString = forceEmptyString;
 	}
 		
-	bool getForceEmptyString(const std::string& name="") const
+	bool getForceEmptyString(const std::string& /*name*/ = "") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setForceEmptyString(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.

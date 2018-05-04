@@ -110,7 +110,7 @@ namespace
 		Poco::Random random;
 		for (int i = 0; i < 4; i++)
 		{
-			md5.update(randomStream.get());
+			md5.update(static_cast<char>(randomStream.get()));
 			md5.update(random.nextChar());
 		}
 		return digestToHexString(md5);

@@ -37,7 +37,7 @@ KeyFileHandler::~KeyFileHandler()
 }
 
 
-void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)
+void KeyFileHandler::onPrivateKeyRequested(const void* /*pSender*/, std::string& privateKey)
 {
 	try
 	{

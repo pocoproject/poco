@@ -36,7 +36,7 @@ NullPartHandler::~NullPartHandler()
 }
 
 
-void NullPartHandler::handlePart(const MessageHeader& header, std::istream& stream)
+void NullPartHandler::handlePart(const MessageHeader& /*header*/, std::istream& stream)
 {
 	NullOutputStream ostr;
 	StreamCopier::copyStream(stream, ostr);

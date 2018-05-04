@@ -118,8 +118,7 @@ struct ElementTraits<ObjectId::Ptr>
 {
 	enum { TypeId = 0x07 };
 
-	static std::string toString(const ObjectId::Ptr& id,
-		int indent = 0,
+	static std::string toString(const ObjectId::Ptr& id, int /*indent*/ = 0,
 		const std::string& fmt = "%02x")
 	{
 		return id->toString(fmt);

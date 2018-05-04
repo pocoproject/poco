@@ -239,13 +239,13 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-void SessionImpl::setConnectionTimeout(const std::string& prop, const Poco::Any& value)
+void SessionImpl::setConnectionTimeout(const std::string& /*prop*/, const Poco::Any& value)
 {
 	setConnectionTimeout(Poco::RefAnyCast<std::size_t>(value));
 }
 
 
-Poco::Any SessionImpl::getConnectionTimeout(const std::string& prop) const
+Poco::Any SessionImpl::getConnectionTimeout(const std::string& /*prop*/) const
 {
 	return Poco::Any(_timeout/1000);
 }

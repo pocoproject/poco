@@ -767,10 +767,10 @@ void XMLCALL XMLStreamParser::handleStartElement(void* v, const XML_Char* name, 
 				{
 					QName qn;
 					splitName(*atts, qn);
-					AttributeMapType::value_type v(qn, AttributeValueType());
-					v.second.value = *(atts + 1);
-					v.second.handled = false;
-					pe->attributeMap.insert(v);
+					AttributeMapType::value_type value(qn, AttributeValueType());
+					value.second.value = *(atts + 1);
+					value.second.handled = false;
+					pe->attributeMap.insert(value);
 				}
 				else
 				{

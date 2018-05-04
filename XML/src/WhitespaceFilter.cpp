@@ -128,7 +128,7 @@ void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 }
 
 
-void WhitespaceFilter::ignorableWhitespace(const XMLChar ch[], int start, int length)
+void WhitespaceFilter::ignorableWhitespace(const XMLChar /*ch*/[], int /*start*/, int /*length*/)
 {
 	// the handler name already says that this data can be ignored
 }

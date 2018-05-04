@@ -129,19 +129,19 @@ int TextEncoding::convert(const unsigned char* bytes) const
 }
 
 
-int TextEncoding::convert(int ch, unsigned char* bytes, int length) const
+int TextEncoding::convert(int /*ch*/, unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 0;
 }
 
 
-int TextEncoding::queryConvert(const unsigned char* bytes, int length) const
+int TextEncoding::queryConvert(const unsigned char* bytes, int /*length*/) const
 {
 	return (int) *bytes;
 }
 
 
-int TextEncoding::sequenceLength(const unsigned char* bytes, int length) const
+int TextEncoding::sequenceLength(const unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 1;
 }

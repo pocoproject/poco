@@ -54,7 +54,7 @@ unsigned short Notation::nodeType() const
 }
 
 
-Node* Notation::copyNode(bool deep, Document* pOwnerDocument) const
+Node* Notation::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new Notation(pOwnerDocument, *this);
 }

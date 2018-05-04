@@ -103,7 +103,15 @@ void EventLogChannel::log(const Message& msg)
 	std::wstring utext;
 	UnicodeConverter::toUTF16(msg.getText(), utext);
 	const wchar_t* pMsg = utext.c_str();
-	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL);
+	ReportEventW(_h, 
+		static_cast<WORD>(getType(msg)), 
+		static_cast<WORD>(getCategory(msg)),
+		POCO_MSG_LOG, 
+		NULL, 
+		1, 
+		0, 
+		&pMsg, 
+		NULL);
 }
 
 
@@ -236,9 +244,9 @@ std::wstring EventLogChannel::findLibrary(const wchar_t* name)
 	if (dll)
 	{
 		const DWORD maxPathLen = MAX_PATH + 1;
-		wchar_t name[maxPathLen];
-		int n = GetModuleFileNameW(dll, name, maxPathLen);
-		if (n > 0) path = name;
+		wchar_t moduleName[maxPathLen];
+		int n = GetModuleFileNameW(dll, moduleName, maxPathLen);
+		if (n > 0) path = moduleName;
 		FreeLibrary(dll);
 	}
 	return path;

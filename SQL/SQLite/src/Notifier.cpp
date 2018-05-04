@@ -154,7 +154,7 @@ bool Notifier::disableAll()
 }
 
 
-void Notifier::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row)
+void Notifier::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* /*pDB*/, const char* pTable, Poco::Int64 row)
 {
 	poco_check_ptr(pVal);
 	Notifier* pV = reinterpret_cast<Notifier*>(pVal);

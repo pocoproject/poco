@@ -56,9 +56,9 @@ UUID::UUID(const char* uuid)
 
 
 UUID::UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]):
-	_timeLow(timeLow),
-	_timeMid(timeMid),
-	_timeHiAndVersion(timeHiAndVersion),
+	_timeLow(static_cast<UInt16>(timeLow)),
+	_timeMid(static_cast<UInt16>(timeMid)),
+	_timeHiAndVersion(static_cast<UInt16>(timeHiAndVersion)),
 	_clockSeq(clockSeq)
 {
 	std::memcpy(_node, node, sizeof(_node));
@@ -183,7 +183,7 @@ bool UUID::tryParse(const std::string& uuid)
 		Int16 n2 = nibble(*it++);
 		if (n2 < 0) return false;
 
-		newUUID._node[i] = (n1 << 4) | n2;			
+		newUUID._node[i] = static_cast<UInt8>((n1 << 4) | n2);
 	}
 	swap(newUUID);
 

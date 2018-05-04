@@ -51,7 +51,7 @@ Base64DecoderBuf::Base64DecoderBuf(std::istream& istr, int options):
 			}
 			for (unsigned i = 0; i < sizeof(Base64EncoderBuf::OUT_ENCODING_URL); i++)
 			{
-				IN_ENCODING_URL[Base64EncoderBuf::OUT_ENCODING_URL[i]] = i;
+				IN_ENCODING_URL[Base64EncoderBuf::OUT_ENCODING_URL[i]] = static_cast<UInt8>(i);
 			}
 			IN_ENCODING_URL[static_cast<unsigned char>('=')] = '\0';
 			IN_ENCODING_URL_INIT = true;
@@ -67,7 +67,7 @@ Base64DecoderBuf::Base64DecoderBuf(std::istream& istr, int options):
 			}
 			for (unsigned i = 0; i < sizeof(Base64EncoderBuf::OUT_ENCODING); i++)
 			{
-				IN_ENCODING[Base64EncoderBuf::OUT_ENCODING[i]] = i;
+				IN_ENCODING[Base64EncoderBuf::OUT_ENCODING[i]] = static_cast<UInt8>(i);
 			}
 			IN_ENCODING[static_cast<unsigned char>('=')] = '\0';
 			IN_ENCODING_INIT = true;
@@ -92,20 +92,20 @@ int Base64DecoderBuf::readFromDevice()
 		unsigned char buffer[4];
 		int c;
 		if ((c = readOne()) == -1) return -1;
-		buffer[0] = (unsigned char) c;
+		buffer[0] = static_cast<UInt8>(c);
 		if (_pInEncoding[buffer[0]] == 0xFF) throw DataFormatException();
 		if ((c = readOne()) == -1) return -1;
-		buffer[1] = (unsigned char) c;
+		buffer[1] = static_cast<UInt8>(c);
 		if (_pInEncoding[buffer[1]] == 0xFF) throw DataFormatException();
 		if (_options & BASE64_NO_PADDING)
 		{
 			if ((c = readOne()) != -1)
-				buffer[2] = c;
+				buffer[2] = static_cast<UInt8>(c);
 			else
 				buffer[2] = '=';
 			if (_pInEncoding[buffer[2]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) != -1)
-				buffer[3] = c;
+				buffer[3] = static_cast<UInt8>(c);
 			else
 				buffer[3] = '=';
 			if (_pInEncoding[buffer[3]] == 0xFF) throw DataFormatException();
@@ -113,10 +113,10 @@ int Base64DecoderBuf::readFromDevice()
 		else
 		{
 			if ((c = readOne()) == -1) throw DataFormatException();
-			buffer[2] = c;
+			buffer[2] = static_cast<UInt8>(c);
 			if (_pInEncoding[buffer[2]] == 0xFF) throw DataFormatException();
 			if ((c = readOne()) == -1) throw DataFormatException();
-			buffer[3] = c;
+			buffer[3] = static_cast<UInt8>(c);
 			if (_pInEncoding[buffer[3]] == 0xFF) throw DataFormatException();
 		}
 

@@ -1173,7 +1173,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::DateTime>
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const Poco::Any& val)
+inline void Preparator::prepare(std::size_t pos, const Poco::Any& /*val*/)
 {
 	prepareImpl<std::vector<Poco::Any> >(pos);
 }
@@ -1197,7 +1197,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Any>& val
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const Poco::DynamicAny& val)
+inline void Preparator::prepare(std::size_t pos, const Poco::DynamicAny& /*val*/)
 {
 	prepareImpl<std::vector<Poco::DynamicAny> >(pos);
 }

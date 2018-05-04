@@ -352,7 +352,7 @@ int Application::run()
 }
 
 
-int Application::main(const ArgVec& args)
+int Application::main(const ArgVec& /*args*/)
 {
 	return EXIT_OK;
 }

@@ -134,14 +134,14 @@ SQLRETURN SQLDescribeCol(SQLHSTMT hstmt,
 }
 
 
-SQLRETURN SQLError(SQLHENV henv,
-	SQLHDBC      hdbc,
-	SQLHSTMT     hstmt,
-	SQLCHAR*     szSqlState,
-	SQLINTEGER*  pfNativeError,
-	SQLCHAR*     szErrorMsg,
-	SQLSMALLINT  cbErrorMsgMax,
-	SQLSMALLINT* pcbErrorMsg)
+SQLRETURN SQLError(SQLHENV /*henv*/,
+	SQLHDBC      /*hdbc*/,
+	SQLHSTMT     /*hstmt*/,
+	SQLCHAR*     /*szSqlState*/,
+	SQLINTEGER*  /*pfNativeError*/,
+	SQLCHAR*     /*szErrorMsg*/,
+	SQLSMALLINT  /*cbErrorMsgMax*/,
+	SQLSMALLINT* /*pcbErrorMsg*/)
 {
 	throw NotImplementedException("SQLError is obsolete. "
 		"Use SQLGetDiagRec instead.");
@@ -190,10 +190,10 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 }
 
 
-SQLRETURN SQLGetCursorName(SQLHSTMT hstmt,
-	SQLCHAR*     szCursor,
-	SQLSMALLINT  cbCursorMax,
-	SQLSMALLINT* pcbCursor)
+SQLRETURN SQLGetCursorName(SQLHSTMT /*hstmt*/,
+	SQLCHAR*     /*szCursor*/,
+	SQLSMALLINT  /*cbCursorMax*/,
+	SQLSMALLINT* /*pcbCursor*/)
 {
 	throw NotImplementedException("Not implemented");
 }
@@ -258,17 +258,17 @@ SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 }
 
 
-SQLRETURN SQLGetDescRec(SQLHDESC hdesc,
-	SQLSMALLINT  iRecord,
-	SQLCHAR*     szName,
-	SQLSMALLINT  cbNameMax,
-	SQLSMALLINT* pcbName,
-	SQLSMALLINT* pfType,
-	SQLSMALLINT* pfSubType,
-	SQLLEN*      pLength,
-	SQLSMALLINT* pPrecision,
-	SQLSMALLINT* pScale,
-	SQLSMALLINT* pNullable)
+SQLRETURN SQLGetDescRec(SQLHDESC /*hdesc*/,
+	SQLSMALLINT  /*iRecord*/,
+	SQLCHAR*     /*szName*/,
+	SQLSMALLINT  /*cbNameMax*/,
+	SQLSMALLINT* /*pcbName*/,
+	SQLSMALLINT* /*pfType*/,
+	SQLSMALLINT* /*pfSubType*/,
+	SQLLEN*      /*pLength*/,
+	SQLSMALLINT* /*pPrecision*/,
+	SQLSMALLINT* /*pScale*/,
+	SQLSMALLINT* /*pNullable*/)
 {
 	throw NotImplementedException();
 }
@@ -373,9 +373,9 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 }
 
 
-SQLRETURN SQLSetCursorName(SQLHSTMT hstmt,
-	SQLCHAR*    szCursor,
-	SQLSMALLINT cbCursor)
+SQLRETURN SQLSetCursorName(SQLHSTMT /*hstmt*/,
+	SQLCHAR*    /*szCursor*/,
+	SQLSMALLINT /*cbCursor*/)
 {
 	throw NotImplementedException("Not implemented");
 }
@@ -429,23 +429,23 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT hstmt,
 }
 
 
-SQLRETURN SQLColumns(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szTableName,
-	SQLSMALLINT cbTableName,
-	SQLCHAR*    szColumnName,
-	SQLSMALLINT cbColumnName)
+SQLRETURN SQLColumns(SQLHSTMT /*hstmt*/,
+	SQLCHAR*    /*szCatalogName*/,
+	SQLSMALLINT /*cbCatalogName*/,
+	SQLCHAR*    /*szSchemaName*/,
+	SQLSMALLINT /*cbSchemaName*/,
+	SQLCHAR*    /*szTableName*/,
+	SQLSMALLINT /*cbTableName*/,
+	SQLCHAR*    /*szColumnName*/,
+	SQLSMALLINT /*cbColumnName*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLGetConnectOption(SQLHDBC hdbc,
-	SQLUSMALLINT fOption,
-	SQLPOINTER   pvParam)
+SQLRETURN SQLGetConnectOption(SQLHDBC /*hdbc*/,
+	SQLUSMALLINT /*fOption*/,
+	SQLPOINTER   /*pvParam*/)
 {
 	throw NotImplementedException();
 }
@@ -486,52 +486,53 @@ SQLRETURN SQLGetTypeInfo(SQLHSTMT StatementHandle, SQLSMALLINT DataType)
 }
 
 
-SQLRETURN SQLSetConnectOption(SQLHDBC hdbc,
-	SQLUSMALLINT fOption,
-	SQLULEN      vParam)
+SQLRETURN SQLSetConnectOption(SQLHDBC /*hdbc*/,
+	SQLUSMALLINT /*fOption*/,
+	SQLULEN      /*vParam*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLSpecialColumns(SQLHSTMT hstmt,
-	SQLUSMALLINT fColType,
-	SQLCHAR*     szCatalogName,
-	SQLSMALLINT  cbCatalogName,
-	SQLCHAR*     szSchemaName,
-	SQLSMALLINT  cbSchemaName,
-	SQLCHAR*     szTableName,
-	SQLSMALLINT  cbTableName,
-	SQLUSMALLINT fScope,
-	SQLUSMALLINT fNullable)
+SQLRETURN SQLSpecialColumns(SQLHSTMT /*hstmt*/,
+	SQLUSMALLINT /*fColType*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLSMALLINT  /*cbCatalogName*/,
+	SQLCHAR*     /*szSchemaName*/,
+	SQLSMALLINT  /*cbSchemaName*/,
+	SQLCHAR*     /*szTableName*/,
+	SQLSMALLINT  /*cbTableName*/,
+	SQLUSMALLINT /*fScope*/,
+	SQLUSMALLINT /*fNullable*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLStatistics(SQLHSTMT hstmt,
-	SQLCHAR*     szCatalogName,
-	SQLSMALLINT  cbCatalogName,
-	SQLCHAR*     szSchemaName,
-	SQLSMALLINT  cbSchemaName,
-	SQLCHAR*     szTableName,
-	SQLSMALLINT  cbTableName,
-	SQLUSMALLINT fUnique,
-	SQLUSMALLINT fAccuracy)
+SQLRETURN SQLStatistics(SQLHSTMT /*hstmt*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLSMALLINT  /*cbCatalogName*/,
+	SQLCHAR*     /*szSchemaName*/,
+	SQLSMALLINT  /*cbSchemaName*/,
+	SQLCHAR*     /*szTableName*/,
+	SQLSMALLINT  /*cbTableName*/,
+	SQLUSMALLINT /*fUnique*/,
+	SQLUSMALLINT /*fAccuracy*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLTables(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szTableName,
-	SQLSMALLINT cbTableName,
-	SQLCHAR*    szTableType,
-	SQLSMALLINT cbTableType)
+SQLRETURN SQLTables(SQLHSTMT /*hstmt*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLSMALLINT  /*cbCatalogName*/,
+	SQLCHAR*     /*szSchemaName*/,
+	SQLSMALLINT  /*cbSchemaName*/,
+	SQLCHAR*     /*szTableName*/,
+	SQLSMALLINT  /*cbTableName*/,
+	SQLCHAR*     /*szTableType*/,
+	SQLSMALLINT  /*cbTableType*/)
 {
 	throw NotImplementedException();
 }
@@ -623,33 +624,33 @@ SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 }
 
 
-SQLRETURN SQLColumnPrivileges(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szTableName,
-	SQLSMALLINT cbTableName,
-	SQLCHAR*    szColumnName,
-	SQLSMALLINT cbColumnName)
+SQLRETURN SQLColumnPrivileges(SQLHSTMT /*hstmt*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLSMALLINT  /*cbCatalogName*/,
+	SQLCHAR*     /*szSchemaName*/,
+	SQLSMALLINT  /*cbSchemaName*/,
+	SQLCHAR*     /*szTableName*/,
+	SQLSMALLINT  /*cbTableName*/,
+	SQLCHAR*    /*szColumnName*/,
+	SQLSMALLINT /*cbColumnName*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLForeignKeys(SQLHSTMT hstmt,
-	SQLCHAR*    szPkCatalogName,
-	SQLSMALLINT cbPkCatalogName,
-	SQLCHAR*    szPkSchemaName,
-	SQLSMALLINT cbPkSchemaName,
-	SQLCHAR*    szPkTableName,
-	SQLSMALLINT cbPkTableName,
-	SQLCHAR*    szFkCatalogName,
-	SQLSMALLINT cbFkCatalogName,
-	SQLCHAR*    szFkSchemaName,
-	SQLSMALLINT cbFkSchemaName,
-	SQLCHAR*    szFkTableName,
-	SQLSMALLINT cbFkTableName)
+SQLRETURN SQLForeignKeys(SQLHSTMT /*hstmt*/,
+	SQLCHAR*    /*szPkCatalogName*/,
+	SQLSMALLINT /*cbPkCatalogName*/,
+	SQLCHAR*    /*szPkSchemaName*/,
+	SQLSMALLINT /*cbPkSchemaName*/,
+	SQLCHAR*    /*szPkTableName*/,
+	SQLSMALLINT /*cbPkTableName*/,
+	SQLCHAR*    /*szFkCatalogName*/,
+	SQLSMALLINT /*cbFkCatalogName*/,
+	SQLCHAR*    /*szFkSchemaName*/,
+	SQLSMALLINT /*cbFkSchemaName*/,
+	SQLCHAR*    /*szFkTableName*/,
+	SQLSMALLINT /*cbFkTableName*/)
 {
 	throw NotImplementedException();
 }
@@ -680,51 +681,51 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 }
 
 
-SQLRETURN SQLPrimaryKeys(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szTableName,
-	SQLSMALLINT cbTableName)
+SQLRETURN SQLPrimaryKeys(SQLHSTMT /*hstmt*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLSMALLINT  /*cbCatalogName*/,
+	SQLCHAR*     /*szSchemaName*/,
+	SQLSMALLINT  /*cbSchemaName*/,
+	SQLCHAR*     /*szTableName*/,
+	SQLSMALLINT  /*cbTableName*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLProcedureColumns(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szProcName,
-	SQLSMALLINT cbProcName,
-	SQLCHAR*    szColumnName,
-	SQLSMALLINT cbColumnName)
+SQLRETURN SQLProcedureColumns(SQLHSTMT /*hstmt*/,
+	SQLCHAR*    /*szCatalogName*/,
+	SQLSMALLINT /*cbCatalogName*/,
+	SQLCHAR*    /*szSchemaName*/,
+	SQLSMALLINT /*cbSchemaName*/,
+	SQLCHAR*    /*szProcName*/,
+	SQLSMALLINT /*cbProcName*/,
+	SQLCHAR*    /*szColumnName*/,
+	SQLSMALLINT /*cbColumnName*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLProcedures(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szProcName,
-	SQLSMALLINT cbProcName)
+SQLRETURN SQLProcedures(SQLHSTMT /*hstmt*/,
+	SQLCHAR*    /*szCatalogName*/,
+	SQLSMALLINT /*cbCatalogName*/,
+	SQLCHAR*    /*szSchemaName*/,
+	SQLSMALLINT /*cbSchemaName*/,
+	SQLCHAR*    /*szProcName*/,
+	SQLSMALLINT /*cbProcName*/)
 {
 	throw NotImplementedException();
 }
 
 
-SQLRETURN SQLTablePrivileges(SQLHSTMT hstmt,
-	SQLCHAR*    szCatalogName,
-	SQLSMALLINT cbCatalogName,
-	SQLCHAR*    szSchemaName,
-	SQLSMALLINT cbSchemaName,
-	SQLCHAR*    szTableName,
-	SQLSMALLINT cbTableName)
+SQLRETURN SQLTablePrivileges(SQLHSTMT /*hstmt*/,
+	SQLCHAR*     /*szCatalogName*/,
+	SQLSMALLINT  /*cbCatalogName*/,
+	SQLCHAR*     /*szSchemaName*/,
+	SQLSMALLINT  /*cbSchemaName*/,
+	SQLCHAR*     /*szTableName*/,
+	SQLSMALLINT  /*cbTableName*/)
 {
 	throw NotImplementedException();
 }

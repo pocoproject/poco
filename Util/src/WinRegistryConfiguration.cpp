@@ -120,7 +120,7 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 }
 
 
-void WinRegistryConfiguration::removeRaw(const std::string& key)
+void WinRegistryConfiguration::removeRaw(const std::string& /*key*/)
 {
 	throw Poco::NotImplementedException("Removing a key in a WinRegistryConfiguration");
 }
