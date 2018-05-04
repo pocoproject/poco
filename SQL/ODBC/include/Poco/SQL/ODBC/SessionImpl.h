@@ -212,25 +212,25 @@ inline const ConnectionHandle& SessionImpl::dbc() const
 }
 
 
-inline void SessionImpl::setMaxFieldSize(const std::string& rName, const Poco::Any& rValue)
+inline void SessionImpl::setMaxFieldSize(const std::string& /*rName*/, const Poco::Any& rValue)
 {
 	_maxFieldSize = rValue;
 }
 
 
-inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName) const
+inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& /*rName*/) const
 {
 	return _maxFieldSize;
 }
 
 
-inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::Any& rValue)
+inline void SessionImpl::setDataTypeInfo(const std::string& /*rName*/, const Poco::Any& /*rValue*/)
 {
 	throw InvalidAccessException();
 }
 
 
-inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName) const
+inline Poco::Any SessionImpl::dataTypeInfo(const std::string& /*rName*/) const
 {
 	return const_cast<TypeInfo*>(&_dataTypes);
 }
@@ -242,7 +242,7 @@ inline void SessionImpl::autoBind(const std::string&, bool val)
 }
 
 
-inline bool SessionImpl::isAutoBind(const std::string& name) const
+inline bool SessionImpl::isAutoBind(const std::string& /*name*/) const
 {
 	return _autoBind;
 }
@@ -254,7 +254,7 @@ inline void SessionImpl::autoExtract(const std::string&, bool val)
 }
 
 
-inline bool SessionImpl::isAutoExtract(const std::string& name) const
+inline bool SessionImpl::isAutoExtract(const std::string& /*name*/) const
 {
 	return _autoExtract;
 }
