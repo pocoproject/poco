@@ -83,6 +83,16 @@ void HTTPRequestTest::testWrite4()
 }
 
 
+void HTTPRequestTest::testWrite5()
+{
+	HTTPRequest request(HTTPRequest::HTTP_PURGE, "/test.txt", HTTPMessage::HTTP_1_1);
+	std::ostringstream ostr;
+	request.write(ostr);
+	std::string s = ostr.str();
+	assertTrue (s == "PURGE /test.txt HTTP/1.1\r\n\r\n");
+}
+
+
 void HTTPRequestTest::testRead1()
 {
 	std::string s("GET / HTTP/1.0\r\n\r\n");
@@ -254,6 +264,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite3);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite4);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testWrite5);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testRead3);
