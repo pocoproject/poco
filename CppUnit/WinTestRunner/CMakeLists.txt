@@ -14,7 +14,7 @@ set_target_properties(WinTestRunner
     PROPERTIES
     VERSION "1" SOVERSION "1"
     DEFINE_SYMBOL WinTestRunner_EXPORTS)
-target_link_libraries(WinTestRunner CppUnit)
+target_link_libraries(WinTestRunner PUBLIC CppUnit)
 target_include_directories(WinTestRunner
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -30,7 +30,7 @@ target_compile_definitions(WinTestRunner
 
 
 if(WIN32)
-	target_link_libraries(WinTestRunner winmm)
+	target_link_libraries(WinTestRunner PUBLIC winmm)
 endif(WIN32)
 
 

@@ -24,5 +24,5 @@ else()
 	add_custom_command(TARGET JSON-testrunner POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data )
 endif()
-target_link_libraries(JSON-testrunner Poco::JSON CppUnit)
+target_link_libraries(JSON-testrunner PUBLIC Poco::JSON CppUnit)
 

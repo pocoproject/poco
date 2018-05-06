@@ -1,2 +1,2 @@
 add_executable(download src/download.cpp)
-target_link_libraries(download Poco::Net Poco::Util Poco::JSON)
+target_link_libraries(download PUBLIC Poco::Net Poco::Util Poco::JSON)

@@ -25,5 +25,5 @@ else()
 				   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data )
 endif()
 #set_target_properties(Encodings-testrunner PROPERTIES COMPILE_FLAGS ${RELEASE_CXX_FLAGS} )
-target_link_libraries(Encodings-testrunner Poco::Encodings CppUnit)
+target_link_libraries(Encodings-testrunner PUBLIC Poco::Encodings CppUnit)
 
