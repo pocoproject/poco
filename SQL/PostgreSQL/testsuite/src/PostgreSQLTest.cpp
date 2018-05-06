@@ -50,7 +50,10 @@ std::string PostgreSQLTest::_dbConnString;
 // Parameters for barebone-test
 //
 std::string PostgreSQLTest::getHost() {
-	return "localhost";
+	if (Environment::has("POSTGRESQL_HOST"))
+		return Environment::get("POSTGRESQL_HOST");
+	else
+		return "localhost";
 }
 std::string PostgreSQLTest::getPort() {
 	return "5432";

@@ -47,7 +47,10 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 std::string MySQLTest::getHost()
 {
-	return "127.0.0.1"; //do not change to "localhost"!
+	if (Environment::has("MYSQL_HOST"))
+		return Environment::get("MYSQL_HOST");
+	else
+		return "127.0.0.1"; //do not change to "localhost"!
 }
 
 
