@@ -20,7 +20,7 @@ set_target_properties(SQL
     DEFINE_SYMBOL SQL_EXPORTS
     )
 
-target_link_libraries(SQL Poco::Foundation)
+target_link_libraries(SQL PUBLIC Poco::Foundation)
 target_include_directories(SQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

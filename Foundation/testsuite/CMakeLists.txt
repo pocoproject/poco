@@ -38,9 +38,9 @@ else()
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data )
 endif()
 
-target_link_libraries(Foundation-testrunner Poco::Foundation Poco::CppUnit)
+target_link_libraries(Foundation-testrunner PUBLIC Poco::Foundation Poco::CppUnit)
 if(UNIX AND NOT ANDROID)
-	target_link_libraries(Foundation-testrunner pthread)
+	target_link_libraries(Foundation-testrunner PUBLIC pthread)
 endif(UNIX AND NOT ANDROID)
 
 if(POCO_ENABLE_LONG_RUNNING_TESTS)
@@ -57,13 +57,13 @@ endif()
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests
 set_target_properties( TestApp PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties( TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-target_link_libraries( TestApp Poco::Foundation )
+target_link_libraries( TestApp PUBLIC Poco::Foundation )
 
 # TestLibrary
 add_library( TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h )
 # The test requires the library named TestLibrary. By default it is prefixed with lib.
 set_target_properties( TestLibrary PROPERTIES PREFIX "")
 set_target_properties(TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-target_link_libraries(TestLibrary Poco::Foundation )
+target_link_libraries(TestLibrary PUBLIC Poco::Foundation )
 
 add_dependencies(Foundation-testrunner TestApp TestLibrary)

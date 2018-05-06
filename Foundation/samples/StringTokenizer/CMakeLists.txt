@@ -1,2 +1,2 @@
 add_executable(StringTokenizer src/StringTokenizer.cpp)
-target_link_libraries(StringTokenizer Poco::Foundation)
+target_link_libraries(StringTokenizer PUBLIC Poco::Foundation)

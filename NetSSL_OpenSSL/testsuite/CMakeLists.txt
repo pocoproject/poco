@@ -27,7 +27,7 @@ else()
 		   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-testrunner.xml
                    )
 endif()
-target_link_libraries(NetSSL-testrunner Poco::NetSSL Poco::Util Poco::XML Poco::CppUnit)
+target_link_libraries(NetSSL-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML Poco::CppUnit)
 
 if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 	set_tests_properties(NetSSL PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")

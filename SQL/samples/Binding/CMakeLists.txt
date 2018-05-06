@@ -1,2 +1,2 @@
 add_executable(Binding src/Binding.cpp)
-target_link_libraries(Binding Poco::SQLSQLite)
+target_link_libraries(Binding PUBLIC Poco::SQLSQLite)

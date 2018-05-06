@@ -12,4 +12,4 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
 
 add_executable(SQLPostgreSQL-testrunner ${TEST_SRCS} )
 add_test(NAME SQLPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND SQLPostgreSQL-testrunner -all)
-target_link_libraries(SQLPostgreSQL-testrunner Poco::SQLPostgreSQL Poco::CppUnit)
+target_link_libraries(SQLPostgreSQL-testrunner PUBLIC Poco::SQLPostgreSQL Poco::CppUnit)

@@ -22,5 +22,5 @@ else()
 	add_test(NAME SQLSQLite WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND SQLSQLite-testrunner -all)
 endif()
 
-target_link_libraries(SQLSQLite-testrunner Poco::SQLSQLite Poco::CppUnit)
+target_link_libraries(SQLSQLite-testrunner PUBLIC Poco::SQLSQLite Poco::CppUnit)
 

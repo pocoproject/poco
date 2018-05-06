@@ -27,5 +27,5 @@ else()
 	add_test(NAME SQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND SQL-testrunner -all)
 endif()
 
-target_link_libraries(SQL-testrunner Poco::SQL Poco::CppUnit)
+target_link_libraries(SQL-testrunner PUBLIC Poco::SQL Poco::CppUnit)
 

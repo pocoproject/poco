@@ -1,2 +1,2 @@
 add_executable(SMTPLogger src/SMTPLogger.cpp)
-target_link_libraries(SMTPLogger Poco::Net)
+target_link_libraries(SMTPLogger PUBLIC Poco::Net)
