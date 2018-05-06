@@ -228,7 +228,7 @@
 #elif defined(__riscv) && (__riscv_xlen == 64)
 	#define POCO_ARCH POCO_ARCH_RISCV64
 	#define POCO_ARCH_LITTLE_ENDIAN 1
-endif
+#endif
 
 
 #if defined(_MSC_VER)
