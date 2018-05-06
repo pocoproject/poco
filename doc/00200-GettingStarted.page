@@ -263,7 +263,7 @@ or for console only:
 
     $ ccmake /path/to/poco-build
 
-POCO C++ Libraries options are prefixed with <*POCO_*>.
+POCO C++ Libraries options are prefixed with <*ENABLE_*>. (This will be changed in POCO 2.x.x to <*POCO_*>)
 
 To use POCO C++ Libraries in your cmake project, add following line in your project for example to use crypto:
 
