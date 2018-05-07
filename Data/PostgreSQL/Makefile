@@ -14,8 +14,8 @@ objects = Extractor Binder SessionImpl Connector \
 	PostgreSQLStatementImpl PostgreSQLException \
 	SessionHandle StatementExecutor PostgreSQLTypes Utility
 
-target         = PocoSQLPostgreSQL
+target         = PocoDataPostgreSQL
 target_version = $(LIBVERSION)
-target_libs    = PocoSQL PocoFoundation
+target_libs    = PocoData PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib
