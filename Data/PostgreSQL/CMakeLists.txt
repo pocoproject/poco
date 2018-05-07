@@ -6,25 +6,25 @@ POCO_SOURCES_AUTO( POSTGRESQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( POSTGRESQL_SRCS ${HDRS_G})
 
-add_library(SQLPostgreSQL ${POSTGRESQL_SRCS} )
-add_library(Poco::SQLPostgreSQL ALIAS SQLPostgreSQL)
-set_target_properties(SQLPostgreSQL
+add_library(DataPostgreSQL ${POSTGRESQL_SRCS} )
+add_library(Poco::DataPostgreSQL ALIAS DataPostgreSQL)
+set_target_properties(DataPostgreSQL
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-       OUTPUT_NAME PocoSQLPostgreSQL
+       OUTPUT_NAME PocoDataPostgreSQL
     DEFINE_SYMBOL PostgreSQL_EXPORTS
     )
 
-target_link_libraries(SQLPostgreSQL PUBLIC Poco::SQL ${PostgreSQL_LIBRARIES})
-target_include_directories(SQLPostgreSQL
+target_link_libraries(DataPostgreSQL PUBLIC Poco::Data ${PostgreSQL_LIBRARIES})
+target_include_directories(DataPostgreSQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-POCO_INSTALL(SQLPostgreSQL)
-POCO_GENERATE_PACKAGE(SQLPostgreSQL)
+POCO_INSTALL(DataPostgreSQL)
+POCO_GENERATE_PACKAGE(DataPostgreSQL)
 
 if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)

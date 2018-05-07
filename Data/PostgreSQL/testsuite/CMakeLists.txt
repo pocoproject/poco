@@ -10,6 +10,6 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
-add_executable(SQLPostgreSQL-testrunner ${TEST_SRCS} )
-add_test(NAME SQLPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND SQLPostgreSQL-testrunner -all)
-target_link_libraries(SQLPostgreSQL-testrunner PUBLIC Poco::SQLPostgreSQL CppUnit)
+add_executable(DataPostgreSQL-testrunner ${TEST_SRCS} )
+add_test(NAME DataPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND DataPostgreSQL-testrunner -all)
+target_link_libraries(DataPostgreSQL-testrunner PUBLIC Poco::DataPostgreSQL CppUnit)

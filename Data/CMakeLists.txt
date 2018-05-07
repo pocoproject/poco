@@ -48,7 +48,7 @@ else()
     message(STATUS "MySQL Support Disabled - no MySQL library")
 endif()
 
-if(POSTGRESQL_FOUND AND ENABLE_SQL_POSTGRESQL)
+if(POSTGRESQL_FOUND AND ENABLE_DATA_POSTGRESQL)
     include_directories("${PostgreSQL_INCLUDE_DIR}") # TODO(Bjoe) Use target_link_libraries()
     message(STATUS "PostgreSQL Support Enabled")
     add_subdirectory( PostgreSQL )
