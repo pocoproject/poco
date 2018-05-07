@@ -193,7 +193,7 @@ model {
 		}
 	}
 	components {
-		SQLPostgreSQL(NativeLibrarySpec) {
+		DataPostgreSQL(NativeLibrarySpec) {
 			sources {
 				rc {
 					source {
@@ -210,7 +210,7 @@ model {
 						srcDir 'include'
 					}
 					lib library: 'postgres'
-					lib project: ':SQL', library: 'SQL'
+					lib project: ':Data', library: 'Data'
 					lib project: ':Foundation', library: 'Foundation'
 				}
 			}

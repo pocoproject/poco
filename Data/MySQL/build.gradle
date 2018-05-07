@@ -5,7 +5,32 @@ model {
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
-						libName = 'libmysqld.lib'
+						libName = 'libmysql.lib'
+						if (targetPlatform.name == 'win32') {
+							headers.srcDir new File("$mysql32Home/include")
+							staticLibraryFile = new File("$mysql32Home/lib/$libName")
+						} else
+						if (targetPlatform.name == 'win64') {
+							headers.srcDir new File("$mysql64Home/include")
+							staticLibraryFile = new File("$mysql64Home/lib/$libName")
+						}
+					} else
+					if (buildType == buildTypes.release) {
+						libName = 'libmysql.lib'
+						if (targetPlatform.name == 'win32') {
+							headers.srcDir new File("$mysql32Home/include")
+							staticLibraryFile = new File("$mysql32Home/lib/$libName")
+						} else
+						if (targetPlatform.name == 'win64') {
+							headers.srcDir  new File("$mysql64Home/include")
+							staticLibraryFile = new File("$mysql64Home/lib/$libName")
+						}
+					}
+				}
+				binaries.withType(SemiStaticLibraryBinary) {
+					def libName = "foobar"
+					if (buildType == buildTypes.debug) {
+						libName = 'libmysql.lib'
 						if (targetPlatform.name == 'win32') {
 							headers.srcDir new File("$mysql32Home/include")
 							staticLibraryFile = new File("$mysql32Home/lib/$libName")
@@ -31,8 +56,8 @@ model {
 					def dllName
 					def linkName
 					if (buildType == buildTypes.debug) {
-						dllName = 'libmysqld.dll'
-						linkName = 'libmysqld.lib'
+						dllName = 'libmysql.dll'
+						linkName = 'libmysql.lib'
 						if (targetPlatform.name == 'win32') {
 							headers.srcDir new File("$mysql32Home/include")
 							sharedLibraryFile     = new File("$mysql32Home/lib/$dllName")

@@ -28,11 +28,11 @@ model {
 						srcDir 'src'
 					}
 					lib project: ':CppUnit', library: 'CppUnit'
-					lib project: ':SQL:PostgreSQL', library: 'SQLPostgreSQL'
-					lib project: ':SQL:PostgreSQL', library: 'postgres'
-					lib project: ':SQL:PostgreSQL', library: 'intl'
-					lib project: ':SQL:PostgreSQL', library: 'iconv'
-					lib project: ':SQL', library: 'SQL'
+					lib project: ':Data:PostgreSQL', library: 'DataPostgreSQL'
+					lib project: ':Data:PostgreSQL', library: 'postgres'
+					lib project: ':Data:PostgreSQL', library: 'intl'
+					lib project: ':Data:PostgreSQL', library: 'iconv'
+					lib project: ':Data', library: 'Data'
 					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
