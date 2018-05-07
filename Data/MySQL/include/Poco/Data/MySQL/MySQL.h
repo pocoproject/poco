@@ -54,7 +54,7 @@
 	#if !defined(MySQL_EXPORTS)
 		#pragma comment(lib, "PocoDataMySQL" POCO_LIB_SUFFIX)
 	#endif
-	#pragma comment(lib, "libmysql")
+	#pragma comment(lib, "libmysql" POCO_LIB_SUFFIX)
 #endif
 
 

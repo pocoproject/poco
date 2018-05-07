@@ -54,7 +54,7 @@
 	#if !defined(PostgreSQL_EXPORTS)
 		#pragma comment(lib, "PocoDataPostgreSQL" POCO_LIB_SUFFIX)
 	#endif
-	#pragma comment(lib, "libpq")
+	#pragma comment(lib, "libpq" POCO_LIB_SUFFIX)
 #endif
 
 
