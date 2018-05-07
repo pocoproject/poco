@@ -19,6 +19,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <typeinfo>
 
 
 namespace Poco {
@@ -68,10 +69,9 @@ bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
 	typedef UTF16String::value_type CharT;
 	if (isNull(pos)) return false;
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	//CharT* sp = AnyCast<CharT*>(_pPreparator->at(pos));
 	CharT* sp = 0;
 	UTF16String us;
-	const type_info& ti = _pPreparator->at(pos).type();
+	const std::type_info& ti = _pPreparator->at(pos).type();
 	if (ti == typeid(CharT*))
 	{
 		sp = AnyCast<CharT*>(_pPreparator->at(pos));
