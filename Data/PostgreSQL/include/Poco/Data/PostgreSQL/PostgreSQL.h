@@ -52,7 +52,7 @@
 //
 #if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
 	#if !defined(PostgreSQL_EXPORTS)
-		#pragma comment(lib, "PocoSQLPostgreSQL" POCO_LIB_SUFFIX)
+		#pragma comment(lib, "PocoDataPostgreSQL" POCO_LIB_SUFFIX)
 	#endif
 	#pragma comment(lib, "libpq")
 #endif
