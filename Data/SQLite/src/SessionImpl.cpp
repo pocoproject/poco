@@ -74,7 +74,7 @@ SessionImpl::~SessionImpl()
 }
 
 
-Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
+Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	poco_check_ptr (_pDB);
 	return new SQLiteStatementImpl(*this, _pDB);
@@ -118,20 +118,20 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-Poco::UInt32 SessionImpl::getTransactionIsolation()
+Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	return Session::TRANSACTION_READ_COMMITTED;
 }
 
 
-bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
 	return false;
 }
 
 
-bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	if (ti == Session::TRANSACTION_READ_COMMITTED) return true;
 	return false;
@@ -182,7 +182,7 @@ void SessionImpl::close()
 {
 	if (_pDB)
 	{
-		sqlite3_close(_pDB);
+		sqlite3_close_v2(_pDB);
 		_pDB = 0;
 	}
 
@@ -190,7 +190,7 @@ void SessionImpl::close()
 }
 
 
-bool SessionImpl::isConnected()
+bool SessionImpl::isConnected() const
 {
 	return _connected;
 }
@@ -211,7 +211,7 @@ void SessionImpl::setConnectionTimeout(const std::string& prop, const Poco::Any&
 }
 
 
-Poco::Any SessionImpl::getConnectionTimeout(const std::string& prop)
+Poco::Any SessionImpl::getConnectionTimeout(const std::string& prop) const
 {
 	return Poco::Any(_timeout/1000);
 }
@@ -227,7 +227,7 @@ void SessionImpl::autoCommit(const std::string&, bool)
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&)
+bool SessionImpl::isAutoCommit(const std::string&) const
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 	return (0 != sqlite3_get_autocommit(_pDB));

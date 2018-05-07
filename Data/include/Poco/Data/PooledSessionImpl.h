@@ -21,6 +21,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/Data/PooledSessionHolder.h"
+#include "Poco/Data/StatementImpl.h"
 #include "Poco/AutoPtr.h"
 
 
@@ -43,22 +44,21 @@ public:
 	~PooledSessionImpl();
 		/// Destroys the PooledSessionImpl.
 
-	// SessionImpl
-	StatementImpl* createStatementImpl();
+	StatementImpl::Ptr createStatementImpl();
 	void begin();
 	void commit();
 	void rollback();
 	void open(const std::string& connect = "");
 	void close();
-	bool isConnected();
+	bool isConnected() const;
 	void setConnectionTimeout(std::size_t timeout);
-	std::size_t getConnectionTimeout();
-	bool canTransact();
-	bool isTransaction();
+	std::size_t getConnectionTimeout() const;
+	bool canTransact() const;
+	bool isTransaction()const ;
 	void setTransactionIsolation(Poco::UInt32);
-	Poco::UInt32 getTransactionIsolation();
-	bool hasTransactionIsolation(Poco::UInt32);
-	bool isTransactionIsolation(Poco::UInt32);
+	Poco::UInt32 getTransactionIsolation() const;
+	bool hasTransactionIsolation(Poco::UInt32) const;
+	bool isTransactionIsolation(Poco::UInt32) const;
 	const std::string& connectorName() const;
 	void setFeature(const std::string& name, bool state);	
 	bool getFeature(const std::string& name);
