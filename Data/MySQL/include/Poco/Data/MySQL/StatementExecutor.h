@@ -76,7 +76,7 @@ private:
 	MYSQL*      _pSessionHandle;
 	MYSQL_STMT* _pHandle;
 	int         _state;
-	int         _affectedRowCount;
+	std::size_t _affectedRowCount;
 	std::string _query;
 };
 

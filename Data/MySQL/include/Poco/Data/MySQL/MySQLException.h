@@ -22,10 +22,13 @@
 #include <typeinfo>
 #include <string>
 
-
+#ifndef MYSQL
 typedef struct st_mysql MYSQL;
-typedef struct st_mysql_stmt MYSQL_STMT;
+#endif
 
+#ifndef MYSQL_STMT
+typedef struct st_mysql_stmt MYSQL_STMT;
+#endif
 
 namespace Poco {
 namespace Data {

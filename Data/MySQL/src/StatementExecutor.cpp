@@ -139,9 +139,10 @@ bool StatementExecutor::fetchColumn(std::size_t n, MYSQL_BIND *bind)
 	return (res == 0);
 }
 
+
 int StatementExecutor::getAffectedRowCount() const
 {
-	return _affectedRowCount;
+	return static_cast<int>(_affectedRowCount);
 }
 
 
