@@ -249,7 +249,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer.begin(), 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), buffer.begin(), n) == 0);
 
 	ws.sendFrame(payload.data(), msgSize);
 
@@ -257,7 +257,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	n = ws.receiveFrame(pocobuffer, flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), n) == 0);
 }
 
 
