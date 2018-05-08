@@ -136,7 +136,7 @@ cmake-build/
 
 # Clion generated files #
 ######################
-cmake-build-debug
+cmake-build-*
 .idea/
 
 # Temporary files #
