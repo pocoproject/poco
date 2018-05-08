@@ -126,7 +126,11 @@ public:
 		std::string name(typeid(T).name());
 #ifdef POCO_COMPILER_GCC
 		int status = 0;
+#if (POCO_OS == POCO_OS_CYGWIN)
+		char* pName = __cxxabiv1::__cxa_demangle(typeid(T).name(), 0, 0, &status);
+#else
 		char* pName = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
+#endif
 		if (status == 0) name = pName;
 		free(pName);
 		if (!full) // strip scope, if any
