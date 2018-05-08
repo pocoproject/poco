@@ -14,8 +14,8 @@ branches:
     - /.*ndroid.*/
     - /.*NDROID.*/
 
-skip_commits:
-  message: /.*Merge.*/
+#skip_commits:
+#  message: /.*Merge.*/
   
 hosts:
   localhost: 127.0.0.1
