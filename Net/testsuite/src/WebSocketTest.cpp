@@ -127,7 +127,7 @@ void WebSocketTest::testWebSocket()
 
 	std::string payload("x");
 	ws.sendFrame(payload.data(), (int) payload.size());
-	char buffer[1024];
+	char buffer[1024] = {};
 	int flags;
 	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == payload.size());
@@ -212,7 +212,7 @@ void WebSocketTest::testWebSocketLarge()
 	sstr << payload;
 	sstr.flush();
 
-	char buffer[msgSize + 1];
+	char buffer[msgSize + 1] = {};
 	int flags;
 	int n = 0;
 	do
