@@ -9,24 +9,23 @@
 
 
 #include "WebSocketTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/SocketStream.h"
-#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPSClientSession.h"
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
-#include "Poco/Buffer.h"
 
 
-using Poco::Net::HTTPClientSession;
+using Poco::Net::HTTPSClientSession;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerRequest;
@@ -50,15 +49,17 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				Poco::Buffer<char> buffer(_bufSize);
+				std::unique_ptr<char[]> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do
 				{
-					n = ws.receiveFrame(buffer.begin(), static_cast<int>(buffer.size()), flags);
-					ws.sendFrame(buffer.begin(), n, flags);
+					n = ws.receiveFrame(pBuffer.get(), static_cast<int>(_bufSize), flags);
+					if (n == 0)
+						break;
+					ws.sendFrame(pBuffer.get(), n, flags);
 				}
-				while (n > 0 || (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
+				while ((flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
 			}
 			catch (WebSocketException& exc)
 			{
@@ -112,14 +113,14 @@ WebSocketTest::~WebSocketTest()
 
 void WebSocketTest::testWebSocket()
 {
-	Poco::Net::ServerSocket ss(0);
+	Poco::Net::SecureServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
 	server.start();
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPClientSession cs("127.0.0.1", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
 
@@ -140,13 +141,6 @@ void WebSocketTest::testWebSocket()
 		assertTrue (n == payload.size());
 		assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
 		assertTrue (flags == WebSocket::FRAME_TEXT);
-
-		ws.sendFrame(payload.data(), (int) payload.size());
-		Poco::Buffer<char> pocobuffer(0);
-		n = ws.receiveFrame(pocobuffer, flags);
-		assertTrue (n == payload.size());
-		assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
-		assertTrue (flags == WebSocket::FRAME_TEXT);
 	}
 
 	for (int i = 125; i < 129; i++)
@@ -156,13 +150,6 @@ void WebSocketTest::testWebSocket()
 		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 		assertTrue (n == payload.size());
 		assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
-		assertTrue (flags == WebSocket::FRAME_TEXT);
-
-		ws.sendFrame(payload.data(), (int) payload.size());
-		Poco::Buffer<char> pocobuffer(0);
-		n = ws.receiveFrame(pocobuffer, flags);
-		assertTrue (n == payload.size());
-		assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
 		assertTrue (flags == WebSocket::FRAME_TEXT);
 	}
 
@@ -193,14 +180,14 @@ void WebSocketTest::testWebSocketLarge()
 {
 	const int msgSize = 64000;
 
-	Poco::Net::ServerSocket ss(0);
+	Poco::Net::SecureServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
 	server.start();
 	
 	Poco::Thread::sleep(200);
 	
-	HTTPClientSession cs("127.0.0.1", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPSClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
 	WebSocket ws(cs, request, response);
 	ws.setSendBufferSize(msgSize);
@@ -223,49 +210,6 @@ void WebSocketTest::testWebSocketLarge()
 }
 
 
-void WebSocketTest::testOneLargeFrame(int msgSize)
-{
-	Poco::Net::ServerSocket ss(0);
-	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	Poco::Thread::sleep(200);
-
-	HTTPClientSession cs("127.0.0.1", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
-	HTTPResponse response;
-	WebSocket ws(cs, request, response);
-	ws.setSendBufferSize(msgSize);
-	ws.setReceiveBufferSize(msgSize);
-	std::string payload(msgSize, 'x');
-
-	ws.sendFrame(payload.data(), msgSize);
-
-	Poco::Buffer<char> buffer(msgSize);
-	int flags;
-	int n;
-
-	n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
-	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer.begin(), 0, n) == 0);
-
-	ws.sendFrame(payload.data(), msgSize);
-
-	Poco::Buffer<char> pocobuffer(0);
-
-	n = ws.receiveFrame(pocobuffer, flags);
-	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
-}
-
-
-void WebSocketTest::testWebSocketLargeInOneFrame()
-{
-	testOneLargeFrame(64000);
-	testOneLargeFrame(70000);
-}
-
-
 void WebSocketTest::setUp()
 {
 }
@@ -282,7 +226,6 @@ CppUnit::Test* WebSocketTest::suite()
 
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocket);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
-	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLargeInOneFrame);
 
 	return pSuite;
 }
