@@ -22,6 +22,8 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Any.h"
 
 
@@ -37,6 +39,8 @@ class Data_API SessionImpl: public Poco::RefCountedObject
 	/// SessionImpl objects are noncopyable.
 {
 public:
+	typedef Poco::AutoPtr<SessionImpl> Ptr;
+
 	static const std::size_t LOGIN_TIMEOUT_INFINITE = 0;
 		/// Infinite connection/login timeout.
 
@@ -56,7 +60,7 @@ public:
 	virtual ~SessionImpl();
 		/// Destroys the SessionImpl.
 
-	virtual StatementImpl* createStatementImpl() = 0;
+	virtual Poco::SharedPtr<StatementImpl> createStatementImpl() = 0;
 		/// Creates a StatementImpl.
 
 	virtual void open(const std::string& connectionString = "") = 0;
@@ -70,7 +74,7 @@ public:
 	virtual void close() = 0;
 		/// Closes the connection.
 
-	virtual bool isConnected() = 0;
+	virtual bool isConnected() const = 0;
 		/// Returns true if session is connected, false otherwise.
 
 	void setLoginTimeout(std::size_t timeout);
@@ -82,7 +86,7 @@ public:
 	virtual void setConnectionTimeout(std::size_t timeout) = 0;
 		/// Sets the session connection timeout value.
 
-	virtual std::size_t getConnectionTimeout() = 0;
+	virtual std::size_t getConnectionTimeout() const = 0;
 		/// Returns the session connection timeout value.
 
 	void reconnect();
@@ -97,23 +101,23 @@ public:
 	virtual void rollback() = 0;
 		/// Aborts a transaction.
 
-	virtual bool canTransact() = 0;
+	virtual bool canTransact() const = 0;
 		/// Returns true if session has transaction capabilities.
 
-	virtual bool isTransaction() = 0;
+	virtual bool isTransaction() const = 0;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	virtual void setTransactionIsolation(Poco::UInt32) = 0;
 		/// Sets the transaction isolation level.
 
-	virtual Poco::UInt32 getTransactionIsolation() = 0;
+	virtual Poco::UInt32 getTransactionIsolation() const = 0;
 		/// Returns the transaction isolation level.
 
-	virtual bool hasTransactionIsolation(Poco::UInt32) = 0;
+	virtual bool hasTransactionIsolation(Poco::UInt32) const = 0;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	virtual bool isTransactionIsolation(Poco::UInt32) = 0;
+	virtual bool isTransactionIsolation(Poco::UInt32) const = 0;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 

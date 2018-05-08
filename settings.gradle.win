@@ -15,11 +15,10 @@ if (os.windows) {
 	include ':NetSSL_Win'
 }
 include ':Data'
-if (os.windows) {
-	include ':Data:ODBC'
-	include ':Data:SQLite'
-	include ':Data:MySQL'
-}
+include ':Data:ODBC'
+include ':Data:SQLite'
+include ':Data:MySQL'
+include ':Data:PostgreSQL'
 include ':Zip'
 include ':PageCompiler'
 include ':PageCompiler:File2Page'
@@ -42,11 +41,10 @@ if (os.windows) {
 	include ':NetSSL_Win:testsuite'
 }
 include ':Data:testsuite'
-if (os.windows) {
-	include ':Data:ODBC:testsuite'
-	include ':Data:SQLite:testsuite'
-	include ':Data:MySQL:testsuite'
-}
+include ':Data:ODBC:testsuite'
+include ':Data:SQLite:testsuite'
+include ':Data:MySQL:testsuite'
+include ':Data:PostgreSQL:testsuite'
 include ':MongoDB:testsuite'
 include ':Redis:testsuite'
 include ':CppParser:testsuite'
@@ -54,9 +52,7 @@ include ':Zip:testsuite'
 
 include ':Encodings:samples'
 include ':Foundation:samples'
-if (os.windows) {
-	include ':Data:samples'
-}
+include ':Data:samples'
 include ':NetSSL_OpenSSL:samples'
 if (os.windows) {
 	include ':NetSSL_Win:samples'

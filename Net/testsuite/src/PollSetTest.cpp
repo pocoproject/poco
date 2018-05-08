@@ -51,7 +51,11 @@ void PollSetTest::testPoll()
 	ss2.connect(SocketAddress("127.0.0.1", echoServer2.port()));
 
 	PollSet ps;
+	assertTrue(ps.empty());
 	ps.add(ss1, PollSet::POLL_READ);
+	assertTrue(!ps.empty());
+	assertTrue(ps.has(ss1));
+	assertTrue(!ps.has(ss2));
 
 	// nothing readable
 	Stopwatch sw;
@@ -62,6 +66,9 @@ void PollSetTest::testPoll()
 	sw.restart();
 
 	ps.add(ss2, PollSet::POLL_READ);
+	assertTrue(!ps.empty());
+	assertTrue(ps.has(ss1));
+	assertTrue(ps.has(ss2));
 
 	// ss1 must be writable, if polled for
 	ps.update(ss1, PollSet::POLL_READ | PollSet::POLL_WRITE);
@@ -100,6 +107,9 @@ void PollSetTest::testPoll()
 	assertTrue (std::string(buffer, n) == "HELLO");
 
 	ps.remove(ss2);
+	assertTrue(!ps.empty());
+	assertTrue(ps.has(ss1));
+	assertTrue(!ps.has(ss2));
 
 	ss2.sendBytes("HELLO", 5);
 	sw.restart();

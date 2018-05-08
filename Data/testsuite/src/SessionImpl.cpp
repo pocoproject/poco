@@ -50,7 +50,7 @@ void SessionImpl::close()
 }
 
 
-bool SessionImpl::isConnected()
+bool SessionImpl::isConnected() const
 {
 	return _connected;
 }
@@ -61,13 +61,13 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-std::size_t SessionImpl::getConnectionTimeout()
+std::size_t SessionImpl::getConnectionTimeout() const
 {
 	return 0;
 }
 
 
-Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
+StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	return new TestStatementImpl(*this);
 }
@@ -88,13 +88,13 @@ void SessionImpl::rollback()
 }
 
 
-bool SessionImpl::canTransact()
+bool SessionImpl::canTransact() const
 {
 	return false;
 }
 
 
-bool SessionImpl::isTransaction()
+bool SessionImpl::isTransaction() const
 {
 	return false;
 }
@@ -105,19 +105,19 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32)
 }
 
 
-Poco::UInt32 SessionImpl::getTransactionIsolation()
+Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	return 0;
 }
 
 
-bool SessionImpl::hasTransactionIsolation(Poco::UInt32)
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32) const
 {
 	return false;
 }
 
 
-bool SessionImpl::isTransactionIsolation(Poco::UInt32)
+bool SessionImpl::isTransactionIsolation(Poco::UInt32) const
 {
 	return false;
 }
@@ -129,7 +129,7 @@ const std::string& SessionImpl::connectorName() const
 }
 
 
-bool SessionImpl::getConnected(const std::string& name)
+bool SessionImpl::getConnected(const std::string& name) const
 {
 	return _connected;
 }
@@ -147,7 +147,7 @@ void SessionImpl::setF(const std::string& name, bool value)
 }
 
 
-bool SessionImpl::getF(const std::string& name)
+bool SessionImpl::getF(const std::string& name) const
 {
 	return _f;
 }
@@ -159,7 +159,7 @@ void SessionImpl::setP(const std::string& name, const Poco::Any& value)
 }
 
 
-Poco::Any SessionImpl::getP(const std::string& name)
+Poco::Any SessionImpl::getP(const std::string& name) const
 {
 	return _p;
 }

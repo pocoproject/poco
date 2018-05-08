@@ -29,7 +29,7 @@ namespace ODBC {
 Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
-	TypeInfo* pDataTypes):
+	const TypeInfo* pDataTypes):
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),

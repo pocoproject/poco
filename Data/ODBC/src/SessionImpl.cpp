@@ -85,7 +85,7 @@ SessionImpl::~SessionImpl()
 }
 
 
-Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
+Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	return new ODBCStatementImpl(*this);
 }
@@ -164,7 +164,7 @@ void SessionImpl::open(const std::string& connect)
 }
 
 
-bool SessionImpl::isConnected()
+bool SessionImpl::isConnected() const
 {
 	SQLULEN value = 0;
 
@@ -189,7 +189,7 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-std::size_t SessionImpl::getConnectionTimeout()
+std::size_t SessionImpl::getConnectionTimeout() const
 {
 	SQLULEN value = 0;
 
@@ -203,7 +203,7 @@ std::size_t SessionImpl::getConnectionTimeout()
 }
 
 
-bool SessionImpl::canTransact()
+bool SessionImpl::canTransact() const
 {
 	if (ODBC_TXN_CAPABILITY_UNKNOWN == _canTransact)
 	{
@@ -221,6 +221,12 @@ bool SessionImpl::canTransact()
 
 
 void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
+{
+	setTransactionIsolationImpl(ti);
+}
+
+
+void SessionImpl::setTransactionIsolationImpl(Poco::UInt32 ti) const
 {
 #if POCO_PTR_IS_64_BIT
 	Poco::UInt64 isolation = 0;
@@ -244,7 +250,7 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-Poco::UInt32 SessionImpl::getTransactionIsolation()
+Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	SQLULEN isolation = 0;
 	checkError(SQLGetConnectAttr(_db, SQL_ATTR_TXN_ISOLATION,
@@ -256,20 +262,20 @@ Poco::UInt32 SessionImpl::getTransactionIsolation()
 }
 
 
-bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	if (isTransaction()) throw InvalidAccessException();
 
 	bool retval = true;
 	Poco::UInt32 old = getTransactionIsolation();
-	try { setTransactionIsolation(ti); }
+	try { setTransactionIsolationImpl(ti); }
 	catch (Poco::Exception&) { retval = false; }
-	setTransactionIsolation(old);
+	setTransactionIsolationImpl(old);
 	return retval;
 }
 
 
-Poco::UInt32 SessionImpl::getDefaultTransactionIsolation()
+Poco::UInt32 SessionImpl::getDefaultTransactionIsolation() const
 {
 	SQLUINTEGER isolation = 0;
 	checkError(SQLGetInfo(_db, SQL_DEFAULT_TXN_ISOLATION,
@@ -317,7 +323,7 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&)
+bool SessionImpl::isAutoCommit(const std::string&) const
 {
 	SQLULEN value = 0;
 
@@ -331,7 +337,7 @@ bool SessionImpl::isAutoCommit(const std::string&)
 }
 
 
-bool SessionImpl::isTransaction()
+bool SessionImpl::isTransaction() const
 {
 	if (!canTransact()) return false;
 
@@ -397,7 +403,7 @@ void SessionImpl::close()
 }
 
 
-int SessionImpl::maxStatementLength()
+int SessionImpl::maxStatementLength() const
 {
 	SQLUINTEGER info;
 	SQLRETURN rc = 0;

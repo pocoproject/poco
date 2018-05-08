@@ -159,7 +159,7 @@ SessionImpl::~SessionImpl()
 }
 	
 
-Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
+Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	return new MySQLStatementImpl(*this);
 }	
@@ -199,7 +199,7 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&)
+bool SessionImpl::isAutoCommit(const std::string&) const
 {
 	int ac = 0;
 	return 1 == getSetting("autocommit", ac);
@@ -229,7 +229,7 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-Poco::UInt32 SessionImpl::getTransactionIsolation()
+Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	std::string isolation;
 	getSetting("tx_isolation", isolation);
@@ -247,7 +247,7 @@ Poco::UInt32 SessionImpl::getTransactionIsolation()
 }
 
 
-bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	return Session::TRANSACTION_READ_UNCOMMITTED == ti ||
 		Session::TRANSACTION_READ_COMMITTED == ti ||

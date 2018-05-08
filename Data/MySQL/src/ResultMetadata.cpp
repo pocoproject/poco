@@ -167,7 +167,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	std::size_t commonSize = 0;
 	_columns.reserve(count);
 
-	{for (std::size_t i = 0; i < count; i++)
+	for (std::size_t i = 0; i < count; i++)
 	{
 		std::size_t size = fieldSize(fields[i]);
 		if (size == 0xFFFFFFFF) size = 0;
@@ -182,7 +182,7 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 			));
 
 		commonSize += _columns[i].length();
-	}}
+	}
 
 	_buffer.resize(commonSize);
 	_row.resize(count);

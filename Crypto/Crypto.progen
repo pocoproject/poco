@@ -30,5 +30,3 @@ vc.project.prebuild.release_static_md = xcopy /y ${openssl}\\build\\win${bits}\\
 vc.project.prebuild.release_static_mt = xcopy /y ${openssl}\\build\\win${bits}\\lib\\release\\*.lib ..\\lib${dirbits}\\* 1>nul\nexit 0
 vc.solution.create = true
 vc.solution.include = testsuite\\TestSuite
-vc.solution.create = true
-vc.solution.include = testsuite\\TestSuite

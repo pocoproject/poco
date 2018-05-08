@@ -13,6 +13,7 @@ Data
 Data/SQLite
 Data/ODBC
 Data/MySQL
+Data/PostgreSQL
 Zip
 PageCompiler
 PageCompiler/File2Page
