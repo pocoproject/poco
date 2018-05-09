@@ -428,9 +428,10 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
-
+#include <iostream>
 void HTTPSClientSessionTest::testServerAbort()
 {
+	try {
 	HTTPSTestServer srv;
 	HTTPSClientSession s("127.0.0.1", srv.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/nolength/connection/abort");
@@ -444,6 +445,9 @@ void HTTPSClientSessionTest::testServerAbort()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 	assertTrue ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
 	         s.networkException()) != NULL );
+	} catch(Poco::Exception& e) {
+		std::cout << e.message() << std::endl;
+	}
 }
 
 
