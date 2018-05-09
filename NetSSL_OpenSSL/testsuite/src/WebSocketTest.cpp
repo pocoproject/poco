@@ -49,7 +49,11 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
+#ifndef POCO_ENABLE_CPP11
+				std::auto_ptr<char[]> pBuffer(new char[_bufSize]);
+#else
 				std::unique_ptr<char[]> pBuffer(new char[_bufSize]);
+#endif // POCO_ENABLE_CPP11
 				int flags;
 				int n;
 				do
