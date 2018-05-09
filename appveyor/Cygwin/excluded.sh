@@ -1,2 +1,2 @@
-export EXCLUDE_TESTS="Foundation Net NetSSL_OpenSSL Data/ODBC Data/MySQL Redis PDF"
+export EXCLUDE_TESTS="Foundation Net Data/ODBC Data/MySQL Redis PDF"
 
