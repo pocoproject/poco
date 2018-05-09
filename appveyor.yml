@@ -5,5 +5,5 @@ install:
 
 build_script:
   - set PATH=C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\bin;%PATH%
-  - cmake -H. -Bcmake-build
+  - cmake --trace-expand -H. -Bcmake-build -DPostgreSQL_ROOT="C:\Program Files (x86)"
   - cmake --build cmake-build
