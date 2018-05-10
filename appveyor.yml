@@ -503,9 +503,14 @@ test_script:
           {
             $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
           }
-          $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=domain,private protocol=any enable=yes DIR=In program="%POCO_BASE%\net\testsuite\bin\cygwin\i686\testrunner.exe" Action=Allow';iex "& $cmd";
-          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';iex "& $cmd";
-          Write-Host -ForegroundColor Yellow $cmd ': LastExitCode=' $lastExitCode;
+
+          $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="%POCO_BASE%\net\testsuite\bin\cygwin\i686\testrunner.exe" action=allow';
+          Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
+          Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
+
+          $cmd = 'bash.exe -c "appveyor/Cygwin/runtests.sh"';
+          Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
+          Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
         }
         if ($env:builder -eq "msbuild" -and $env:linkmode -eq "shared")
         {
