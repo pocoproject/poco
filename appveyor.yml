@@ -504,7 +504,7 @@ test_script:
             $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd"
           }
 
-          $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="%POCO_BASE%\net\testsuite\bin\cygwin\i686\testrunner.exe" action=allow';
+          $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$env:POCO_BASE\net\testsuite\bin\cygwin\i686\testrunner.exe" action=allow';
           Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
           Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
 
