@@ -36,7 +36,8 @@ void LoggerTest::testLogger()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
+
 	assertTrue (root.getLevel() == Message::PRIO_INFORMATION);
 	assertTrue (root.is(Message::PRIO_INFORMATION));
 	assertTrue (root.fatal());
@@ -53,8 +54,8 @@ void LoggerTest::testLogger()
 	root.warning("Warning message");
 	assertTrue (pChannel->list().size() == 2);
 	root.debug("Debug message");
-	assertTrue (pChannel->list().size() == 2);
-	
+	assert (pChannel->list().size() == 2);
+
 	Logger& logger1 = Logger::get("Logger1");
 	Logger& logger2 = Logger::get("Logger2");
 	Logger& logger11 = Logger::get("Logger1.Logger1");
@@ -106,14 +107,14 @@ void LoggerTest::testLogger()
 	assertTrue (logger22.getLevel() == Message::PRIO_WARNING);
 	
 	AutoPtr<TestChannel> pChannel2 = new TestChannel;
-	Logger::setChannel("Logger2", pChannel2.get());
-	assertTrue (pChannel  == root.getChannel());
-	assertTrue (pChannel  == logger1.getChannel());
-	assertTrue (pChannel  == logger11.getChannel());
-	assertTrue (pChannel  == logger12.getChannel());
-	assertTrue (pChannel2 == logger2.getChannel());
-	assertTrue (pChannel2 == logger21.getChannel());
-	assertTrue (pChannel2 == logger22.getChannel());
+	Logger::setChannel("Logger2", pChannel2);
+	assertTrue (pChannel.get()  == root.getChannel().get());
+	assertTrue (pChannel.get()  == logger1.getChannel().get());
+	assertTrue (pChannel.get()  == logger11.getChannel().get());
+	assertTrue (pChannel.get()  == logger12.getChannel().get());
+	assertTrue (pChannel2.get() == logger2.getChannel().get());
+	assertTrue (pChannel2.get() == logger21.getChannel().get());
+	assertTrue (pChannel2.get() == logger22.getChannel().get());
 	
 	root.setLevel(Message::PRIO_TRACE);
 	pChannel->list().clear();
@@ -161,7 +162,6 @@ void LoggerTest::testLogger()
 	catch(Poco::InvalidArgumentException&)
 	{
 	}
-
 }
 
 
@@ -191,7 +191,7 @@ void LoggerTest::testFormatAny()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
 
 	root.error("%s%s", std::string("foo"), std::string("bar"));
 	assertTrue (pChannel->getLastMessage().getText() == "foobar");
@@ -253,7 +253,7 @@ void LoggerTest::testDump()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
 	root.setLevel(Message::PRIO_INFORMATION);
 	
 	char buffer1[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};

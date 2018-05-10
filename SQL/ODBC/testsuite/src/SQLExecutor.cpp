@@ -3645,7 +3645,11 @@ void SQLExecutor::any()
 
 	i = 0;
 	f = 0.0;
-	s = std::string("");
+#ifdef POCO_ODBC_UNICODE
+	s = UTF16String();
+#else
+	s = std::string();
+#endif
 	tmp << "SELECT * FROM " << ExecUtil::anys(), into(i), into(f), into(s), now;
 	assertTrue (AnyCast<int>(i) == 42);
 	assertTrue (AnyCast<double>(f) == 42.5);
@@ -3934,11 +3938,11 @@ void SQLExecutor::sqlLogger(const std::string& connect)
 	try
 	{
 		Logger& root = Logger::root();
-		SQLChannel* ch = new SQLChannel(Poco::SQL::ODBC::Connector::KEY, connect, "TestSQLChannel");
+		SQLChannel::Ptr ch = new SQLChannel(Poco::SQL::ODBC::Connector::KEY, connect, "TestSQLChannel");
 		ch->setProperty("table", schemaTable(ExecUtil::pocolog()));
 		root.setChannel(ch);
 		root.setLevel(Message::PRIO_INFORMATION);
-		
+
 		root.information("a Informational message");
 		root.warning("b Warning message");
 		root.debug("Debug message");

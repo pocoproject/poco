@@ -1,11 +1,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Foundation", "Foundation_x64_vs140.vcxproj", "{B01196CC-B693-4548-8464-2FF60499E73F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_x64_vs140.vcxproj", "{C812E0B9-69A9-4FA1-A1D4-161CF677BD10}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0955EB03-544B-4BD4-9C10-89CF38078F5F} = {0955EB03-544B-4BD4-9C10-89CF38078F5F}
+		{6C41E55D-C0FC-4E01-AA8D-B7DA40E31D3A} = {6C41E55D-C0FC-4E01-AA8D-B7DA40E31D3A}
 		{B01196CC-B693-4548-8464-2FF60499E73F} = {B01196CC-B693-4548-8464-2FF60499E73F}
 	EndProjectSection
 EndProject

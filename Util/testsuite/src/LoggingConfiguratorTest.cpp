@@ -84,30 +84,30 @@ void LoggingConfiguratorTest::testConfigurator()
 
 	LoggingConfigurator configurator;
 	configurator.configure(pConfig);
-	
+
 	Logger& root = Logger::get("");
 	assertTrue (root.getLevel() == Message::PRIO_WARNING);
-	FormattingChannel* pFC = dynamic_cast<FormattingChannel*>(root.getChannel());
+	FormattingChannel::Ptr pFC = root.getChannel().cast<FormattingChannel>();
 	assertNotNull (pFC);
 #if defined(_WIN32) && !defined(_WIN32_WCE)
-	assertNotNull (dynamic_cast<Poco::WindowsConsoleChannel*>(pFC->getChannel()));
+	assertTrue (!pFC->getChannel().cast<Poco::WindowsConsoleChannel>().isNull());
 #else
-	assertNotNull (dynamic_cast<ConsoleChannel*>(pFC->getChannel()));
+	assertTrue (!pFC->getChannel().cast<Poco::ConsoleChannel>().isNull());
 #endif
-	assertNotNull (dynamic_cast<PatternFormatter*>(pFC->getFormatter()));
-	assertTrue (static_cast<PatternFormatter*>(pFC->getFormatter())->getProperty("pattern") == "%s-[%p] %t");
-	
+	assertTrue (!pFC->getFormatter().cast<Poco::PatternFormatter>().isNull());
+	assertTrue ((pFC->getFormatter().cast<PatternFormatter>())->getProperty("pattern") == "%s-[%p] %t");
+
 	Logger& logger1 = Logger::get("logger1");
 	assertTrue (logger1.getLevel() == Message::PRIO_INFORMATION);
-	pFC = dynamic_cast<FormattingChannel*>(logger1.getChannel());
-	assertNotNull (pFC);
-	assertNotNull (dynamic_cast<FileChannel*>(pFC->getChannel()));
-	assertNotNull (dynamic_cast<PatternFormatter*>(pFC->getFormatter()));
-	assertTrue (static_cast<PatternFormatter*>(pFC->getFormatter())->getProperty("pattern") == "%s: [%p] %t");
+	pFC = logger1.getChannel().cast<FormattingChannel>();
+	assertTrue (!pFC.isNull());
+	assertTrue (!pFC->getChannel().cast<FileChannel>().isNull());
+	assertTrue (!pFC->getFormatter().cast<PatternFormatter>().isNull());
+	assertTrue (pFC->getFormatter().cast<PatternFormatter>()->getProperty("pattern") == "%s: [%p] %t");
 
 	Logger& logger2 = Logger::get("logger2");
 	assertTrue (logger2.getLevel() == Message::PRIO_DEBUG);
-	assertNotNull (dynamic_cast<SplitterChannel*>(logger2.getChannel()));	
+	assertTrue (!logger2.getChannel().cast<SplitterChannel>().isNull());
 }
 
 

@@ -666,7 +666,7 @@ inline void StatementImpl::resetBulk()
 {
 	_bulkExtraction = BULK_UNDEFINED;
 	_bulkBinding = BULK_UNDEFINED;\
-	setExtractionLimit(Limit(Limit::LIMIT_UNLIMITED, false, false));
+	setExtractionLimit(Limit(static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), false, false));
 }
 
 

@@ -144,6 +144,10 @@ void HTTPClientSession::setSourceAddress(const SocketAddress& address)
 {
 	if (!connected())
 	{
+		if (address.family() == IPAddress::IPv4)
+			_sourceAddress4 = address;
+		else
+			_sourceAddress6 = address;
 		_sourceAddress = address;
 	}
 	else
@@ -154,6 +158,18 @@ void HTTPClientSession::setSourceAddress(const SocketAddress& address)
 const SocketAddress& HTTPClientSession::getSourceAddress()
 {
 	return _sourceAddress;
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress4()
+{
+	return _sourceAddress4;
+}
+
+
+const SocketAddress& HTTPClientSession::getSourceAddress6()
+{
+	return _sourceAddress6;
 }
 
 
@@ -403,19 +419,22 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
+	SocketAddress addr;
 	if (_proxyConfig.host.empty() || bypassProxy())
-	{
-		SocketAddress addr(_host, _port);
-		if ((!_sourceAddress.host().isWildcard()) || (_sourceAddress.port() != 0))
-			connect(addr, _sourceAddress);
-		else
-			connect(addr);
-	}
+		addr = SocketAddress(_host, _port);
 	else
-	{
-		SocketAddress addr(_proxyConfig.host, _proxyConfig.port);
+		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
+
+	SocketAddress sourceAddr;
+	if (addr.family() == IPAddress::IPv4)
+		sourceAddr = _sourceAddress4;
+	else
+		sourceAddr = _sourceAddress6;
+
+	if ((!sourceAddr.host().isWildcard()) || (sourceAddr.port() != 0))
+		connect(addr, sourceAddr);
+	else
 		connect(addr);
-	}
 }
 
 
@@ -470,6 +489,8 @@ StreamSocket HTTPClientSession::proxyConnect()
 	proxyRequest.set("Host", getHost());
 	proxyAuthenticateImpl(proxyRequest);
 	proxySession.setKeepAlive(true);
+	proxySession.setSourceAddress(_sourceAddress4);
+	proxySession.setSourceAddress(_sourceAddress6);
 	proxySession.sendRequest(proxyRequest);
 	proxySession.receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)

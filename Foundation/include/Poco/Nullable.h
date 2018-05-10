@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/MemoryPool.h"
 #include "Poco/Exception.h"
 #include <algorithm>
 #include <iostream>
@@ -215,7 +216,7 @@ public:
 	{
 		if (!_isNull)
 		{
-			C* ptr = reinterpret_cast<C*>(&_value[0]);
+			C* ptr = reinterpret_cast<C*>(_value.buffer);
 			return *ptr;
 		}
 		else throw NullValueException();
@@ -228,7 +229,7 @@ public:
 	{
 		if (!_isNull)
 		{
-			const C* ptr = reinterpret_cast<const C*>(&_value[0]);
+			const C* ptr = reinterpret_cast<const C*>(_value.buffer);
 			return *ptr;
 		}
 		else throw NullValueException();
@@ -238,7 +239,9 @@ public:
 		/// Returns the Nullable's value, or the
 		/// given default value if the Nullable is empty.
 	{
-		return _isNull ? deflt : *reinterpret_cast<const C*>(&_value[0]);
+		if (_isNull) return deflt;
+		const C* pC = reinterpret_cast<const C*>(_value.buffer);
+		return *pC;
 	}
 
 	operator C& ()
@@ -283,12 +286,12 @@ private:
 		destruct();
 		if (pVal)
 		{
-			new(_value) C(*pVal);
+			new(_value.buffer) C(*pVal);
 			_isNull = false;
 		}
 	}
 
-	void destruct(bool init = true)
+	void destruct(bool /*init*/ = true)
 	{
 		if (!_isNull)
 		{
@@ -297,7 +300,13 @@ private:
 		}
 	}
 
-	char     _value[sizeof(C)];
+	typedef typename std::aligned_storage<sizeof(C)>::type AlignerType;
+	union
+	{
+		char buffer[sizeof(C)];
+	private:
+		AlignerType aligner;
+	}        _value;
 	bool     _isNull;
 	NullType _null;
 };

@@ -49,7 +49,7 @@ SessionImpl::SessionImpl(const std::string& connect,
 
 SessionImpl::SessionImpl(const std::string& connect,
 	Poco::Any maxFieldSize,
-	bool enforceCapability,
+	bool /*enforceCapability*/,
 	bool autoBind,
 	bool autoExtract,
 	bool makeExtractorsBeforeExecute): Poco::SQL::AbstractSessionImpl<SessionImpl>(connect),
@@ -224,8 +224,7 @@ bool SessionImpl::canTransact() const
 		SQLRETURN res = Poco::SQL::ODBC::SQLGetInfo(_db, SQL_TXN_CAPABLE, &ret, 0, 0);
 		if (!Utility::isError(res))
 		{
-			_canTransact = (SQL_TC_NONE != ret) ?
-			ODBC_TXN_CAPABILITY_TRUE : ODBC_TXN_CAPABILITY_FALSE;
+			_canTransact = static_cast<char>((SQL_TC_NONE != ret) ? ODBC_TXN_CAPABILITY_TRUE : ODBC_TXN_CAPABILITY_FALSE);
 		}
 		else
 		{

@@ -5,6 +5,7 @@
 # ------
 # buildwin.ps1 [-poco_base    dir]
 #              [-vs_version   150 | 140]
+#              [-vs_flavor    Community | Professional | Enterprise]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -25,6 +26,10 @@ Param
   [Parameter()]
   [ValidateSet(140, 150)]
   [int] $vs_version,
+
+  [Parameter()]
+  [ValidateSet('Community' , 'Professional' , 'Enterprise')]
+  [string] $vs_flavor = 'Community',
 
   [Parameter()]
   [ValidateSet('build', 'rebuild', 'clean')]
@@ -82,7 +87,7 @@ function Set-Environment
     else
     {
       Write-Host 'Visual Studio not found, exiting.'
-      Exit
+      Exit 1
     }
   }
 
@@ -110,6 +115,11 @@ function Set-Environment
   }
 
   $vsct = "VS$($vs_version)COMNTOOLS"
+  $vsdir = ''
+  if ($vs_version -eq 150)
+  {
+    if (-not (Test-Path Env:$vsct)) { Set-Item -path Env:$vsct -value "C:\Program Files (x86)\Microsoft Visual Studio\2017\$($vs_flavor)\Common7\Tools" }
+  }
   $vsdir = (Get-Item Env:$vsct).Value
   $Command = ''
   $CommandArg = ''
@@ -117,14 +127,15 @@ function Set-Environment
   else                     { $CommandArg = "x86" }
   if ($vs_version -ge 150)
   {
-    $Command = "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
-    $script:msbuild_exe = "$($vsdir)\..\..\MSBuild\15.0\Bin\MSBuild.exe"
+    $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
+    $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\15.0\Bin\MSBuild.exe"
   }
   else
   {
-    $Command = "$($vsdir)\..\..\VC\vcvarsall.bat"
+    $Command = Resolve-Path "$($vsdir)\..\..\VC\vcvarsall.bat"
     $script:msbuild_exe = "MSBuild.exe"
   }
+
   $tempFile = [IO.Path]::GetTempFileName()
   cmd /c " `"$Command`" $CommandArg && set > `"$tempFile`" "
   Get-Content $tempFile | Foreach-Object {
@@ -145,6 +156,7 @@ function Process-Input
     Write-Host '------'
     Write-Host 'buildwin.ps1 [-poco_base    dir]'
     Write-Host '             [-vs_version   150 | 140]'
+    Write-Host '             [-vs_flavor    Community | Professional | Enterprise]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
@@ -174,6 +186,11 @@ function Process-Input
     Write-Host "Samples:       $samples"
     Write-Host "Build Tool:    $tool"
 
+    if ($vs_version -eq 150)
+    {
+      Write-Host "VS flavor:     $vs_flavor"
+    }
+
     if ($omit -ne '')
     {
       Write-Host "Omit:          $omit"
@@ -190,8 +207,8 @@ function Process-Input
     }
 
     # NB: this won't work in PowerShell ISE
-    Write-Host "Press Ctrl-C to exit or any other key to continue ..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
+    #Write-Host "Press Ctrl-C to exit or any other key to continue ..."
+    #$x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp")
   }
 }
 
@@ -203,7 +220,7 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
     return
   }
 
-  $cmd = "&`"$script:msbuild_exe`" $vsProject /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=true"
+  $cmd = "&`"$script:msbuild_exe`" $vsProject /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=true"
   Write-Host $cmd
   Invoke-Expression $cmd
   if ($LastExitCode -ne 0) { Exit $LastExitCode }
@@ -310,16 +327,8 @@ function Build-samples
 }
 
 
-function Build
+function Build-Components([string] $extension, [string] $platformName, [string] $type)
 {
-  Process-Input
-
-  if ($vs_version -lt 100) { $extension = 'vcproj'  }
-  else                     { $extension = 'vcxproj' }
-
-  $platformName = ''
-  if ($platform -eq 'x64')       { $platformName = '_x64' }
-  elseif ($platform -eq 'WinCE') { $platformName = '_CE' }
 
   Get-Content "$poco_base\components" | Foreach-Object {
 
@@ -354,16 +363,18 @@ function Build
       Write-Host "| Building $vsProject"
       Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
-      if ($tool -eq 'devenv')      { Build-Devenv $vsProject }
-      elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject }
-      elseif ($tool -ne '')        { Write-Host "Build tool not supported: $tool" }
-      else
+      if ($type -eq "lib")
       {
-        Write-Host "Build tool not specified. Exiting."
-        Exit
+        if ($tool -eq 'devenv')      { Build-Devenv $vsProject }
+        elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject }
+        elseif ($tool -ne '')        { Write-Host "Build tool not supported: $tool" }
+        else
+        {
+          Write-Host "Build tool not specified. Exiting."
+          Exit -1
+        }
       }
-
-      if ($tests)
+      ElseIf ($tests -and ($type -eq "test"))
       {
         $vsTestProject = "$poco_base\$componentDir\testsuite\TestSuite$($platformName)$($suffix).$($extension)"
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -374,8 +385,7 @@ function Build
         elseif ($tool -eq 'msbuild') { Build-MSBuild $vsTestProject }
         else{ Write-Host "Tool not supported: $tool" }
       }
-
-      if ($samples)
+      ElseIf ($samples -and ($type -eq "sample"))
       {
         Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
           Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$platformName$($suffix)" } `
@@ -389,6 +399,23 @@ function Build
       Write-Host "-------------------------------"
     }
   }
+}
+
+
+function Build
+{
+  Process-Input
+
+  if ($vs_version -lt 100) { $extension = 'vcproj'  }
+  else                     { $extension = 'vcxproj' }
+
+  $platformName = ''
+  if ($platform -eq 'x64')       { $platformName = '_x64' }
+  elseif ($platform -eq 'WinCE') { $platformName = '_CE' }
+
+  Build-Components $extension $platformName "lib"
+  Build-Components $extension $platformName "test"
+  Build-Components $extension $platformName "sample"
 }
 
 

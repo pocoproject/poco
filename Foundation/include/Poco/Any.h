@@ -361,8 +361,8 @@ private:
 		/// Creates an any which stores the init parameter inside.
 		///
 		/// Example:
-		///	 Any a(13);
-		///	 Any a(string("12345"));
+		/// Any a(13);
+		/// Any a(string("12345"));
 	{
 	}
 
@@ -471,6 +471,14 @@ private:
 	template <typename ValueType>
 	friend ValueType* UnsafeAnyCast(Any*);
 
+	template <typename ValueType>
+	friend const ValueType& RefAnyCast(const Any&);
+
+	template <typename ValueType>
+	friend ValueType& RefAnyCast(Any&);
+
+	template <typename ValueType>
+	friend ValueType AnyCast(Any&);
 };
 
 
@@ -480,7 +488,7 @@ ValueType* AnyCast(Any* operand)
 	/// to the stored value.
 	///
 	/// Example Usage:
-	///	 MyType* pTmp = AnyCast<MyType*>(pAny).
+	/// MyType* pTmp = AnyCast<MyType*>(pAny).
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
 	return operand && operand->type() == typeid(ValueType)
@@ -495,7 +503,7 @@ const ValueType* AnyCast(const Any* operand)
 	/// to the stored value.
 	///
 	/// Example Usage:
-	///	 const MyType* pTmp = AnyCast<MyType*>(pAny).
+	/// const MyType* pTmp = AnyCast<MyType*>(pAny).
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
 	return AnyCast<ValueType>(const_cast<Any*>(operand));
@@ -507,7 +515,7 @@ ValueType AnyCast(Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an Any&.
 	///
 	/// Example Usage:
-	///	 MyType tmp = AnyCast<MyType>(anAny).
+	/// MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
 	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
@@ -516,7 +524,19 @@ ValueType AnyCast(Any& operand)
 	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
 
 	NonRef* result = AnyCast<NonRef>(&operand);
-	if (!result) throw BadCastException("Failed to convert between Any types");
+	if (!result)
+	{
+		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		if (operand._pHolder)
+		{
+			s.append(1, '(');
+			s.append(operand._pHolder->type().name());
+			s.append(" => ");
+			s.append(typeid(ValueType).name());
+			s.append(1, ')');
+		}
+		throw BadCastException(s);
+	}
 	return *result;
 }
 
@@ -526,7 +546,7 @@ ValueType AnyCast(const Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
 	///
 	/// Example Usage:
-	///	 MyType tmp = AnyCast<MyType>(anAny).
+	/// MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
 	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
@@ -543,10 +563,18 @@ const ValueType& RefAnyCast(const Any & operand)
 	/// AnyCast operator used to return a const reference to the internal data.
 	///
 	/// Example Usage:
-	///	 const MyType& tmp = RefAnyCast<MyType>(anAny);
+	/// const MyType& tmp = RefAnyCast<MyType>(anAny);
 {
 	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	if (!result) throw BadCastException("RefAnyCast: Failed to convert between const Any types");
+	std::string s = "RefAnyCast: Failed to convert between Any types ";
+	if (operand._pHolder)
+	{
+		s.append(1, '(');
+		s.append(operand._pHolder->type().name());
+		s.append(" => ");
+		s.append(typeid(ValueType).name());
+		s.append(1, ')');
+	}
 	return *result;
 }
 
@@ -556,10 +584,22 @@ ValueType& RefAnyCast(Any& operand)
 	/// AnyCast operator used to return a reference to the internal data.
 	///
 	/// Example Usage:
-	///	 MyType& tmp = RefAnyCast<MyType>(anAny);
+	/// MyType& tmp = RefAnyCast<MyType>(anAny);
 {
 	ValueType* result = AnyCast<ValueType>(&operand);
-	if (!result) throw BadCastException("RefAnyCast: Failed to convert between Any types");
+	if (!result)
+	{
+		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		if (operand._pHolder)
+		{
+			s.append(1, '(');
+			s.append(operand._pHolder->type().name());
+			s.append(" => ");
+			s.append(typeid(ValueType).name());
+			s.append(1, ')');
+		}
+		throw BadCastException(s);
+	}
 	return *result;
 }
 

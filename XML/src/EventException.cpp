@@ -21,7 +21,7 @@ namespace XML {
 
 
 EventException::EventException(int code):
-	XMLException("Unspecified event type")
+	XMLException("Unspecified event type", code)
 {
 }
 

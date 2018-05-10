@@ -449,7 +449,7 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 
 			if (frac && isNumber)
 			{
-				const double number = NumberParser::parseFloat(str, frac);
+				const double number = NumberParser::parseFloat(str, static_cast<char>(frac));
 				return Var(number);
 			}
 			else if (frac == 0 && isNumber && isSigned)

@@ -290,7 +290,7 @@ void SyslogParser::parsePrio(const std::string& line, std::size_t& pos, RemoteSy
 }
 
 
-void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message)
+void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility /*fac*/, std::size_t& pos, Poco::Message& message)
 {
 	Poco::Message::Priority prio = convert(severity);
 	// rest of the unparsed header is:
@@ -321,7 +321,7 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 }
 
 
-void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message)
+void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility /*fac*/, std::size_t& pos, Poco::Message& message)
 {
 	Poco::Message::Priority prio = convert(severity);
 	// rest of the unparsed header is:

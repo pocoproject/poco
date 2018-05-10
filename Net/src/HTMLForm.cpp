@@ -377,7 +377,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		{
 			std::string name = params["name"];
 			std::string value;
-			std::istream& istr = reader.stream();
+			std::istream& input = reader.stream();
 			int ch = istr.get();
 			while (ch != eof)
 			{
@@ -385,7 +385,7 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 					value += (char) ch;
 				else
 					throw HTMLFormException("Field value too long");
-				ch = istr.get();
+				ch = input.get();
 			}
 			add(name, value);
 		}

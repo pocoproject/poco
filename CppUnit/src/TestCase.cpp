@@ -128,13 +128,11 @@ void TestCase::run(TestResult *result)
 		result->addError(this, new CppUnitException(msg));
 
 	}
-#if !defined(_WIN32)
 	catch (...)
 	{
 		CppUnitException *e = new CppUnitException ("unknown exception");
 		result->addError (this, e);
 	}
-#endif
 	tearDown ();
 	result->endTest(this);
 }

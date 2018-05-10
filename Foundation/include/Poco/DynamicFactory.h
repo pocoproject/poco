@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Instantiator.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/Mutex.h"
 #include <map>
@@ -29,12 +30,13 @@
 namespace Poco {
 
 
-template <class Base>
+template <class BaseT, class PtrT = AutoPtr<BaseT> >
 class DynamicFactory
 	/// A factory that creates objects by class name.
 {
 public:
-	typedef AbstractInstantiator<Base> AbstractFactory;
+	typedef AbstractInstantiator<BaseT> AbstractFactory;
+	typedef PtrT Ptr;
 
 	DynamicFactory()
 		/// Creates the DynamicFactory.
@@ -51,7 +53,7 @@ public:
 		}
 	}
 
-	Base* createInstance(const std::string& className) const
+	Ptr createInstance(const std::string& className) const
 		/// Creates a new instance of the class with the given name.
 		/// The class must have been registered with registerClass.
 		/// If the class name is unknown, a NotFoundException is thrown.
@@ -73,7 +75,7 @@ public:
 		/// If the class has already been registered, an ExistsException is thrown
 		/// and the instantiator is deleted.
 	{
-		registerClass(className, new Instantiator<C, Base>);
+		registerClass(className, new Instantiator<C, BaseT>);
 	}
 
 	void registerClass(const std::string& className, AbstractFactory* pAbstractFactory)

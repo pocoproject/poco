@@ -127,11 +127,11 @@ void WebSocketTest::testWebSocket()
 
 	std::string payload("x");
 	ws.sendFrame(payload.data(), (int) payload.size());
-	char buffer[1024];
+	char buffer[1024] = {};
 	int flags;
 	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
 	assertTrue (flags == WebSocket::FRAME_TEXT);
 
 	for (int i = 2; i < 20; i++)
@@ -140,14 +140,16 @@ void WebSocketTest::testWebSocket()
 		ws.sendFrame(payload.data(), (int) payload.size());
 		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 		assertTrue (n == payload.size());
-		assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+		assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
 		assertTrue (flags == WebSocket::FRAME_TEXT);
 
 		ws.sendFrame(payload.data(), (int) payload.size());
 		Poco::Buffer<char> pocobuffer(0);
+		assertTrue(0 == pocobuffer.size());
 		n = ws.receiveFrame(pocobuffer, flags);
 		assertTrue (n == payload.size());
-		assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
+		assertTrue (n == pocobuffer.size());
+		assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), n) == 0);
 		assertTrue (flags == WebSocket::FRAME_TEXT);
 	}
 
@@ -157,14 +159,14 @@ void WebSocketTest::testWebSocket()
 		ws.sendFrame(payload.data(), (int) payload.size());
 		n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 		assertTrue (n == payload.size());
-		assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+		assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
 		assertTrue (flags == WebSocket::FRAME_TEXT);
 
 		ws.sendFrame(payload.data(), (int) payload.size());
 		Poco::Buffer<char> pocobuffer(0);
 		n = ws.receiveFrame(pocobuffer, flags);
 		assertTrue (n == payload.size());
-		assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
+		assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), n) == 0);
 		assertTrue (flags == WebSocket::FRAME_TEXT);
 	}
 
@@ -172,15 +174,15 @@ void WebSocketTest::testWebSocket()
 	ws.sendFrame(payload.data(), (int) payload.size());
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
 	assertTrue (flags == WebSocket::FRAME_TEXT);
 	
 	payload = "Hello, universe!";
 	ws.sendFrame(payload.data(), (int) payload.size(), WebSocket::FRAME_BINARY);
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
-	assertTrue (flags == WebSocket::FRAME_BINARY);	
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
+	assertTrue (flags == WebSocket::FRAME_BINARY);
 	
 	ws.shutdown();
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
@@ -212,7 +214,7 @@ void WebSocketTest::testWebSocketLarge()
 	sstr << payload;
 	sstr.flush();
 
-	char buffer[msgSize + 1];
+	char buffer[msgSize + 1] = {};
 	int flags;
 	int n = 0;
 	do
@@ -221,7 +223,7 @@ void WebSocketTest::testWebSocketLarge()
 	} while (n > 0 && n < msgSize);
 
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
 }
 
 
@@ -249,7 +251,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	n = ws.receiveFrame(buffer.begin(), static_cast<int>(buffer.size()), flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), buffer.begin(), 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), buffer.begin(), n) == 0);
 
 	ws.sendFrame(payload.data(), msgSize);
 
@@ -257,7 +259,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 
 	n = ws.receiveFrame(pocobuffer, flags);
 	assertTrue (n == payload.size());
-	assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), 0, n) == 0);
+	assertTrue (payload.compare(0, payload.size(), pocobuffer.begin(), n) == 0);
 }
 
 

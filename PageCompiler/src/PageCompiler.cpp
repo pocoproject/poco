@@ -143,55 +143,55 @@ protected:
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
 	}
 	
-	void handleHelp(const std::string& name, const std::string& value)
+	void handleHelp(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_helpRequested = true;
 		stopOptionsProcessing();
 	}
 	
-	void handleDefine(const std::string& name, const std::string& value)
+	void handleDefine(const std::string& /*name*/, const std::string& value)
 	{
 		defineProperty(value);
 	}
 	
-	void handleConfig(const std::string& name, const std::string& value)
+	void handleConfig(const std::string& /*name*/, const std::string& value)
 	{
 		loadConfiguration(value);
 	}
 
-	void handleOutputDir(const std::string& name, const std::string& value)
+	void handleOutputDir(const std::string& /*name*/, const std::string& value)
 	{
 		_outputDir = value;
 	}
 
-	void handleHeaderOutputDir(const std::string& name, const std::string& value)
+	void handleHeaderOutputDir(const std::string& /*name*/, const std::string& value)
 	{
 		_headerOutputDir = value;
 	}
 
-	void handleHeaderPrefix(const std::string& name, const std::string& value)
+	void handleHeaderPrefix(const std::string& /*name*/, const std::string& value)
 	{
 		_headerPrefix = value;
 		if (!_headerPrefix.empty() && _headerPrefix[_headerPrefix.size() - 1] != '/')
 			_headerPrefix += '/';
 	}
 
-	void handleBase(const std::string& name, const std::string& value)
+	void handleBase(const std::string& /*name*/, const std::string& value)
 	{
 		_base = value;
 	}
 
-	void handleOSP(const std::string& name, const std::string& value)
+	void handleOSP(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_generateOSPCode = true;	
 	}
 
-	void handleApache(const std::string& name, const std::string& value)
+	void handleApache(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_generateApacheCode = true;
 	}
 	
-	void handleNoLine(const std::string& name, const std::string& value)
+	void handleNoLine(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_emitLineDirectives = false;
 	}
@@ -204,7 +204,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2017 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2018 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "
@@ -265,7 +265,7 @@ protected:
 		else
 		{
 			clazz = p.getBaseName() + "Handler";
-			clazz[0] = Poco::Ascii::toUpper(clazz[0]);
+			clazz[0] = static_cast<char>(Poco::Ascii::toUpper(clazz[0]));
 		}			
 	}
 	

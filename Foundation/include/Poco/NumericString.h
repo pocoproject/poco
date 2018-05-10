@@ -35,6 +35,12 @@
 #endif
 
 
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4146)
+#endif // POCO_COMPILER_MSVC
+
+
 // binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
 #define POCO_MAX_INT_STRING_LEN 65
 // value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
@@ -47,6 +53,82 @@
 
 namespace Poco {
 
+
+namespace Impl {
+
+	template<bool SIGNED, typename T>
+	class IsNegativeImpl;
+
+	template<typename T>
+	class IsNegativeImpl<true, T>
+	{
+	public:
+		bool operator()(T x) { return x < 0; }
+	};
+
+	template<typename T>
+	class IsNegativeImpl<false, T>
+	{
+	public:
+		bool operator()(T /*x*/) { return false; }
+	};
+
+}
+
+
+template<typename T>
+inline bool isNegative(T x)
+{
+	using namespace Impl;
+	return IsNegativeImpl<std::numeric_limits<T>::is_signed, T>()(x);
+}
+
+
+template<typename To, typename From>
+inline bool isIntOverflow(From val)
+{
+	poco_assert_dbg (std::numeric_limits<From>::is_integer);
+	poco_assert_dbg (std::numeric_limits<To>::is_integer);
+	bool ret;
+	if (std::numeric_limits<To>::is_signed)
+	{
+		ret = (!std::numeric_limits<From>::is_signed &&
+			  (std::uintmax_t)val > (std::uintmax_t)INTMAX_MAX) ||
+			  (std::intmax_t)val  < (std::intmax_t)std::numeric_limits<To>::min() ||
+			  (std::intmax_t)val  > (std::intmax_t)std::numeric_limits<To>::max();
+	}
+	else
+	{
+		ret = isNegative(val) ||
+				(std::uintmax_t)val > (std::uintmax_t)std::numeric_limits<To>::max();
+	}
+	return ret;
+}
+
+
+template <typename F, typename T>
+inline T& isSafeIntCast(F from)
+	/// Returns true if it is safe to cast
+	/// integer from F to T.
+{
+	if (!isIntOverflow<T, F>(from)) return true;
+	return false;
+}
+
+
+template <typename F, typename T>
+inline T& safeIntCast(F from, T& to)
+	/// Returns csted value if it is safe
+	/// to cast integer from F to T,
+	/// otherwise throws BadCastException.
+{
+	if (!isIntOverflow<T, F>(from))
+	{
+		to = static_cast<T>(from);
+		return to;
+	}
+	throw BadCastException("safeIntCast: Integer overflow");
+}
 
 inline char decimalSeparator()
 	/// Returns decimal separator from global locale or
@@ -77,72 +159,90 @@ inline char thousandSeparator()
 //
 
 template <typename I>
-bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
+bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
-	/// it is silently skipped but not verified for correct positioning.
+	/// they are silently skipped and not verified for correct positioning.
+	/// It is not allowed to convert a negative number to unsigned integer.
+	///
 	/// Function returns true if successful. If parsing was unsuccessful,
 	/// the return value is false with the result value undetermined.
 {
+	poco_assert_dbg (base == 2 || base == 8 || base == 10 || base == 16);
+
 	if (!pStr) return false;
 	while (std::isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
-	short sign = 1;
+	bool negative = false;
 	if ((base == 10) && (*pStr == '-'))
 	{
-		// Unsigned types can't be negative so abort parsing
-		if (std::numeric_limits<I>::min() >= 0) return false;
-		sign = -1;
+		if (!std::numeric_limits<I>::is_signed) return false;
+		negative = true;
 		++pStr;
 	}
 	else if (*pStr == '+') ++pStr;
 
-	// parser states:
-	const char STATE_SIGNIFICANT_DIGITS = 1;
-	char state = 0;
-	
-	result = 0;
-	I limitCheck = std::numeric_limits<I>::max() / base;
+	// all numbers are parsed as positive; the sign
+	// for negative numbers is adjusted after parsing
+	::uintmax_t limitCheck = std::numeric_limits<I>::max();
+	if (negative)
+	{
+		poco_assert_dbg(std::numeric_limits<I>::is_signed);
+		// to cover the entire range, (-min > max) has to be
+		// taken into account;
+		// to avoid overflow for the largest int size,
+		// we resort to ::copysign() (ie. floating-point)
+		if (sizeof(I) == sizeof(::intmax_t))
+			limitCheck = static_cast<::uintmax_t>(::copysign(std::numeric_limits<I>::min(), 1));
+		else
+		{
+			::intmax_t i = std::numeric_limits<I>::min();
+			limitCheck = -i;
+		}
+	}
+
+	std::uintmax_t result = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
+		if  (result > (limitCheck / base)) return false;
 		switch (*pStr)
 		{
-		case '0':
-			if (state < STATE_SIGNIFICANT_DIGITS) break;
-
-		case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7':
-			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-			if (result > limitCheck) return false;
-			result = result * base + (*pStr - '0');
-
+		case '0': case '1': case '2': case '3':
+		case '4': case '5': case '6': case '7':
+			{
+				char add = (*pStr - '0');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + add;
+			}
 			break;
 
 		case '8': case '9':
 			if ((base == 10) || (base == 0x10))
 			{
-				if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-				if (result > limitCheck) return false;
-				result = result * base + (*pStr - '0');
+				char  add = (*pStr - '0');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + add;
 			}
 			else return false;
 
 			break;
 
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			if (base != 0x10) return false;
-			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-			if (result > limitCheck) return false;
-			result = result * base + (10 + *pStr - 'a');
-
+			{
+				if (base != 0x10) return false;
+				char  add = (*pStr - 'a');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + (10 + add);
+			}
 			break;
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			if (base != 0x10) return false;
-			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-			if (result > limitCheck) return false;
-			result = result * base + (10 + *pStr - 'A');
-
+			{
+				if (base != 0x10) return false;
+				char add = (*pStr - 'A');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + (10 + add);
+			}
 			break;
 
 		case '.':
@@ -155,14 +255,28 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 
 		case ' ':
 			if ((base == 10) && (thSep == ' ')) break;
-			// fallthrough
 
 		default:
 			return false;
 		}
 	}
 
-	if ((sign < 0) && (base == 10)) result *= sign;
+	if (negative && (base == 10))
+	{
+		poco_assert_dbg(std::numeric_limits<I>::is_signed);
+		::intmax_t i;
+		if (sizeof(I) == sizeof(::intmax_t))
+			i = static_cast<::intmax_t>(::copysign(result, -1));
+		else
+			i = static_cast<::intmax_t>(-result);
+		if (isIntOverflow<I>(i)) return false;
+		outResult = static_cast<I>(i);
+	}
+	else
+	{
+		if (isIntOverflow<I>(result)) return false;
+		outResult = static_cast<I>(result);
+	}
 
 	return true;
 }
@@ -561,6 +675,11 @@ Foundation_API bool strToDouble(const std::string& str, double& result,
 
 
 } // namespace Poco
+
+
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#endif // POCO_COMPILER_MSVC
 
 
 #endif // Foundation_NumericString_INCLUDED

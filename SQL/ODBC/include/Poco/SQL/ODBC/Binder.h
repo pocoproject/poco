@@ -598,10 +598,10 @@ private:
 		_lengthIndicator.push_back(pLenIn);
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
+			(SQLUSMALLINT) (pos + 1),
 			toODBCDirection(dir),
 			cDataType,
-			Utility::sqlDataType(cDataType),
+			static_cast<SQLSMALLINT>(Utility::sqlDataType(cDataType)),
 			colSize,
 			decDigits,
 			(SQLPOINTER)&val, 0,

@@ -63,6 +63,7 @@
     defined(__SH4__) || defined(__alpha__) || \
     defined(_MIPS_ARCH_MIPS32R2) || \
     defined(__AARCH64EL__) || \
+    defined(__riscv) || \
     defined(nios2) || defined(__nios2) || defined(__nios2__) || defined(__EMSCRIPTEN__)
 #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
 #elif defined(__mc68000__)

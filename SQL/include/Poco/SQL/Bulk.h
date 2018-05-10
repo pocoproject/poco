@@ -70,7 +70,7 @@ inline Poco::UInt32 Bulk::size() const
 namespace Keywords {
 
 
-inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
+inline Bulk bulk(const Limit& limit = Limit(static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), false, false))
 	/// Convenience function for creation of bulk.
 {
 	return Bulk(limit);

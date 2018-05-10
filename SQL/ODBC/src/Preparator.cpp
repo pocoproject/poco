@@ -140,7 +140,7 @@ void Preparator::resize() const
 {
 	SQLSMALLINT nCol = 0;
 	int rc = SQLNumResultCols(_rStmt, &nCol);
-	if (!Utility::isError(rc) && (0 != nCol))
+	if (!Utility::isError(static_cast<SQLRETURN>(rc)) && (0 != nCol))
 	{
 		_values.resize(nCol, 0);
 		_hugeFlags.resize(nCol, false);

@@ -259,7 +259,7 @@ void SecureSocketImpl::close()
 }
 
 
-int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
+int SecureSocketImpl::sendBytes(const void* buffer, int length, int /*flags*/)
 {
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);
@@ -289,7 +289,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
-int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
+int SecureSocketImpl::receiveBytes(void* buffer, int length, int /*flags*/)
 {
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);

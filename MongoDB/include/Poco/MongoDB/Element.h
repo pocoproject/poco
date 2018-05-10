@@ -94,7 +94,7 @@ struct ElementTraits<double>
 {
 	enum { TypeId = 0x01 };
 
-	static std::string toString(const double& value, int indent = 0)
+	static std::string toString(const double& value, int /*indent*/ = 0)
 	{
 		return Poco::NumberFormatter::format(value);
 	}
@@ -109,7 +109,7 @@ struct ElementTraits<std::string>
 {
 	enum { TypeId = 0x02 };
 
-	static std::string toString(const std::string& value, int indent = 0)
+	static std::string toString(const std::string& value, int /*indent*/ = 0)
 	{
 		std::string result;
 		result.append(1, '"');
@@ -145,7 +145,7 @@ struct ElementTraits<bool>
 {
 	enum { TypeId = 0x08 };
 
-	static std::string toString(const bool& value, int indent = 0)
+	static std::string toString(const bool& value, int /*indent*/ = 0)
 	{
 		return value ? "true" : "false";
 	}
@@ -177,7 +177,7 @@ struct ElementTraits<Int32>
 	enum { TypeId = 0x10 };
 
 
-	static std::string toString(const Int32& value, int indent = 0)
+	static std::string toString(const Int32& value, int /*indent*/ = 0)
 	{
 		return Poco::NumberFormatter::format(value);
 	}
@@ -191,7 +191,7 @@ struct ElementTraits<Timestamp>
 {
 	enum { TypeId = 0x09 };
 
-	static std::string toString(const Timestamp& value, int indent = 0)
+	static std::string toString(const Timestamp& value, int /*indent*/ = 0)
 	{
 		std::string result;
 		result.append(1, '"');
@@ -229,7 +229,7 @@ struct ElementTraits<NullValue>
 {
 	enum { TypeId = 0x0A };
 
-	static std::string toString(const NullValue& value, int indent = 0)
+	static std::string toString(const NullValue& /*value*/, int /*indent*/ = 0)
 	{
 		return "null";
 	}
@@ -237,13 +237,13 @@ struct ElementTraits<NullValue>
 
 
 template<>
-inline void BSONReader::read<NullValue>(NullValue& to)
+inline void BSONReader::read<NullValue>(NullValue& /*to*/)
 {
 }
 
 
 template<>
-inline void BSONWriter::write<NullValue>(NullValue& from)
+inline void BSONWriter::write<NullValue>(NullValue& /*from*/)
 {
 }
 
@@ -262,7 +262,7 @@ struct ElementTraits<BSONTimestamp>
 {
 	enum { TypeId = 0x11 };
 
-	static std::string toString(const BSONTimestamp& value, int indent = 0)
+	static std::string toString(const BSONTimestamp& value, int /*indent*/ = 0)
 	{
 		std::string result;
 		result.append(1, '"');
@@ -303,7 +303,7 @@ struct ElementTraits<Int64>
 {
 	enum { TypeId = 0x12 };
 
-	static std::string toString(const Int64& value, int indent = 0)
+	static std::string toString(const Int64& value, int /*indent*/ = 0)
 	{
 		return NumberFormatter::format(value);
 	}

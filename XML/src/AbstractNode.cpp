@@ -41,7 +41,7 @@ AbstractNode::AbstractNode(Document* pOwnerDocument):
 }
 
 
-AbstractNode::AbstractNode(Document* pOwnerDocument, const AbstractNode& node):
+AbstractNode::AbstractNode(Document* pOwnerDocument, const AbstractNode& /*node*/):
 	_pParent(0),
 	_pNext(0),
 	_pOwner(pOwnerDocument),
@@ -75,7 +75,7 @@ const XMLString& AbstractNode::getNodeValue() const
 }
 
 
-void AbstractNode::setNodeValue(const XMLString& value)
+void AbstractNode::setNodeValue(const XMLString& /*value*/)
 {
 	throw DOMException(DOMException::NO_DATA_ALLOWED_ERR);
 }
@@ -138,25 +138,25 @@ Document* AbstractNode::ownerDocument() const
 }
 
 
-Node* AbstractNode::insertBefore(Node* newChild, Node* refChild)
+Node* AbstractNode::insertBefore(Node* /*newChild*/, Node* /*refChild*/)
 {
 	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 }
 
 
-Node* AbstractNode::replaceChild(Node* newChild, Node* oldChild)
+Node* AbstractNode::replaceChild(Node* /*newChild*/, Node* /*oldChild*/)
 {
 	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 }
 
 
-Node* AbstractNode::removeChild(Node* oldChild)
+Node* AbstractNode::removeChild(Node* /*oldChild*/)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node* AbstractNode::appendChild(Node* newChild)
+Node* AbstractNode::appendChild(Node* /*newChild*/)
 {
 	throw DOMException(DOMException::HIERARCHY_REQUEST_ERR);
 }
@@ -215,13 +215,13 @@ XMLString AbstractNode::innerText() const
 }
 
 
-Node* AbstractNode::getNodeByPath(const XMLString& path) const
+Node* AbstractNode::getNodeByPath(const XMLString& /*path*/) const
 {
 	return 0;
 }
 
 
-Node* AbstractNode::getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const
+Node* AbstractNode::getNodeByPathNS(const XMLString& /*path*/, const NSMap& /*nsMap*/) const
 {
 	return 0;
 }

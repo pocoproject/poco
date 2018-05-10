@@ -227,7 +227,7 @@ int Windows1251Encoding::queryConvert(const unsigned char* bytes, int length) co
 }
 
 
-int Windows1251Encoding::sequenceLength(const unsigned char* bytes, int length) const
+int Windows1251Encoding::sequenceLength(const unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 1;
 }

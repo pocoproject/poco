@@ -116,11 +116,11 @@ void PropertyFileConfigurationTest::testLoad(bool preserveComment)
 void PropertyFileConfigurationTest::testSave()
 {
 	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration;
-	
+
 	pConf->setString("prop1", "value1");
 	pConf->setInt("prop2", 42);
 	pConf->setString("prop3", "value\\1\txxx");
-	
+
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
@@ -140,7 +140,7 @@ void PropertyFileConfigurationTest::testLoadSaveWithPreserveComment()
 		"! comment !\n"
 		"prop3:foo\n"
 		"prop4";
-		
+
 	std::istringstream istr(propFile);
 	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(istr, true);
 
@@ -198,7 +198,7 @@ void PropertyFileConfigurationTest::testLoadSaveWithPreserveComment()
 }
 
 
-AbstractConfiguration* PropertyFileConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
 }

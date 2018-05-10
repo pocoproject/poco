@@ -335,8 +335,12 @@ int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::strin
 	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
-		if (isFirst) { month += Ascii::toUpper(ch); isFirst = false; }
-		else month += Ascii::toLower(ch);
+		if (isFirst) 
+		{ 
+			month += static_cast<char>(Ascii::toUpper(ch));
+			isFirst = false; 
+		}
+		else month += static_cast<char>(Ascii::toLower(ch));
 	}
 	if (month.length() < 3) throw SyntaxException("Month name must be at least three characters long", month);
 	for (int i = 0; i < 12; ++i)
@@ -356,8 +360,12 @@ int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::s
 	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
-		if (isFirst) { dow += Ascii::toUpper(ch); isFirst = false; }
-		else dow += Ascii::toLower(ch);
+		if (isFirst) 
+		{ 
+			dow += static_cast<char>(Ascii::toUpper(ch));
+			isFirst = false; 
+		}
+		else dow += static_cast<char>(Ascii::toLower(ch));
 	}
 	if (dow.length() < 3) throw SyntaxException("Weekday name must be at least three characters long", dow);
 	for (int i = 0; i < 7; ++i)
@@ -376,7 +384,7 @@ int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string
 	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
-		ampm += Ascii::toUpper(ch);
+		ampm += static_cast<char>(Ascii::toUpper(ch));
 	}
 	if (ampm == "AM")
 	{

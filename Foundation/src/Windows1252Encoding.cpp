@@ -96,7 +96,7 @@ int Windows1252Encoding::convert(int ch, unsigned char* bytes, int length) const
 	if (ch >= 0 && ch <= 255 && _charMap[ch] == ch)
 	{
 		if (bytes && length >= 1)
-			*bytes = ch;
+			*bytes = static_cast<UInt8>(ch);
 		return 1;
 	}
 	else switch (ch)
@@ -142,7 +142,7 @@ int Windows1252Encoding::queryConvert(const unsigned char* bytes, int length) co
 }
 
 
-int Windows1252Encoding::sequenceLength(const unsigned char* bytes, int length) const
+int Windows1252Encoding::sequenceLength(const unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 1;
 }

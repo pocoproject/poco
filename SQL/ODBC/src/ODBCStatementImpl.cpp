@@ -361,8 +361,8 @@ bool ODBCStatementImpl::hasNext()
 				makeStep();
 			} while (!nextRowReady());
 		}
-		else if (Utility::isError(_nextResponse))
-			checkError(_nextResponse, "SQLFetch()");
+		else if (Utility::isError(static_cast<SQLRETURN>(_nextResponse)))
+			checkError(static_cast<SQLRETURN>(_nextResponse), "SQLFetch()");
 
 		return true;
 	}
@@ -375,7 +375,7 @@ void ODBCStatementImpl::makeStep()
 {
 	_extractors[currentDataSet()]->reset();
 	_nextResponse = SQLFetch(_stmt);
-	checkError(_nextResponse);
+	checkError(static_cast<SQLRETURN>(_nextResponse));
 	_stepCalled = true;
 }
 
