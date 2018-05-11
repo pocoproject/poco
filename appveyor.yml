@@ -417,7 +417,7 @@ build_script:
 
       if ($env:builder -eq "cmake")
       {
-        mkdir cmake-build | out-null;pushd cmake-build;
+        mkdir build-cmake | out-null;pushd build-cmake;
         if ($env:platform -eq "Win32")
         {
             $openssl = $env:OPENSSL32
