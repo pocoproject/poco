@@ -190,7 +190,7 @@ matrix:
         - export CXX="g++-5"
         - $CXX --version
         - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make -s -j2 && ./travis/Linux/runtests.sh
+        - make -s -j2 && export OSARCH=x86 && ./travis/Linux/runtests.sh
 
     - env:    test="5.4 x64 (make) bundled"
       compiler: gcc
@@ -254,7 +254,7 @@ matrix:
         - export CXX="clang++-4.0"
         - $CXX --version
         - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make -s -j2 && ./travis/Linux/runtests.sh
+        - make -s -j2 && export OSARCH=x86 && ./travis/Linux/runtests.sh
 
     - env:    test="4.0 x64 (make) bundled"
       compiler: clang
