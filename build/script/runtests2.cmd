@@ -29,6 +29,8 @@ if "%1" =="-d" (
   shift
 )
 
+set PATH=%CD%\%BINDIR%;%PATH
+
 if not "%1" == "" (
   set TESTCOMPONENTS="%1"
   if not "%2" == "" (
