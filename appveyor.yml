@@ -297,12 +297,14 @@ before_build:
             $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
             $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
             $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
+            $env:PATH    = "C:\cygwin\bin;" + $env:PATH
         }
         if ($env:platform -eq "x64")
         {
             $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
             $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
             $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
+            $env:PATH    = "C:\cygwin64\bin;" + $env:PATH
         }
 # -------------------------------------------------------------------------------------------
 
@@ -494,9 +496,7 @@ test_script:
       {
         if ($env:builder -eq "cygwin")
         {
-          $runner="";
-          $runnerd="";
-          $global:LastExitCode=0;
+          $runner="";$runnerd="";$global:LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
             $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd";
@@ -512,7 +512,7 @@ test_script:
 
           Write-Host -ForegroundColor Yellow $runner;
           $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runner" action=allow';
-          Write-Host -ForegroundColor Yellow $runner;d
+          Write-Host -ForegroundColor Yellow $runnerd;
           $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runnerd" action=allow';
           Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
           Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
