@@ -494,7 +494,7 @@ test_script:
       {
         if ($env:builder -eq "cygwin")
         {
-          $runner=foo;
+          $runner="";
           $global:LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
@@ -507,6 +507,7 @@ test_script:
             $runner="$env:POCO_BASE\net\testsuite\bin\cygwin\x86_64\testrunner.exe"
           }
 
+          Write-Host -ForegroundColor Yellow $runner;
           $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runner" action=allow';
           Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
           Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
