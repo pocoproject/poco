@@ -495,20 +495,25 @@ test_script:
         if ($env:builder -eq "cygwin")
         {
           $runner="";
+          $runnerd="";
           $global:LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
             $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd";
             $runner="$env:POCO_BASE\net\testsuite\bin\cygwin\i686\testrunner.exe"
+            $runnerd="$env:POCO_BASE\net\testsuite\bin\cygwin\i686\testrunnerd.exe"
           }
           if ($env:platform -eq "x64")
           {
             $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd";
             $runner="$env:POCO_BASE\net\testsuite\bin\cygwin\x86_64\testrunner.exe"
+            $runnerd="$env:POCO_BASE\net\testsuite\bin\cygwin\x86_64\testrunnerd.exe"
           }
 
           Write-Host -ForegroundColor Yellow $runner;
           $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runner" action=allow';
+          Write-Host -ForegroundColor Yellow $runner;d
+          $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runnerd" action=allow';
           Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
           Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
 
