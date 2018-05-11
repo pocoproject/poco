@@ -284,9 +284,9 @@ subprojects {
 								libName = 'libcryptod.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								libName = 'libcrypto.a'
-								staticLibraryFile = new File("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSL64LinuxLib/$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
@@ -300,9 +300,9 @@ subprojects {
 								libName = 'libcrypto.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								libName = 'libcrypto.a'
-								staticLibraryFile = new File("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSL64LinuxLib/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -328,11 +328,11 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								dllName = 'libcrypto.so'
 								linkName = 'libcrypto.a'
-								sharedLibraryFile	 = new File("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = new File("$openSSLLinuxLib/$linkName")
+								sharedLibraryFile	 = new File("$openSSL64LinuxLib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSL64LinuxLib/$linkName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
@@ -352,11 +352,11 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								dllName = 'libcrypto.so'
 								linkName = 'libcrypto.a'
-								sharedLibraryFile	 = new File("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = new File("$openSSLLinuxLib/$linkName")
+								sharedLibraryFile	 = new File("$openSSL64LinuxLib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSL64LinuxLib/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -380,9 +380,9 @@ subprojects {
 								libName = 'libssld.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								libName = 'libssl.a'
-								staticLibraryFile = new File("$openSSLLinuxLib", "$libName")
+								staticLibraryFile = new File("$openSSL64LinuxLib", "$libName")
 							}
 						} else
 						if (buildType == buildTypes.release) {
@@ -396,9 +396,9 @@ subprojects {
 								libName = 'libssl.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								libName = 'libssl.a'
-								staticLibraryFile = new File("$openSSLLinuxLib/$libName")
+								staticLibraryFile = new File("$openSSL64LinuxLib/$libName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)
@@ -424,12 +424,12 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-                                def File openSSLLinuxLibFile = new File("$openSSLLinuxLib")
-					            headers.srcDir "$openSSLLinuxInc/include"
+                                def File openSSL64LinuxLibFile = new File("$openSSL64LinuxLib")
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								dllName  = "libssl.so"
 								linkName = "libssl.a"
-								sharedLibraryFile	 = new File(openSSLLinuxLibFile, dllName)
-								sharedLibraryLinkFile = new File(openSSLLinuxLibFile, linkName)
+								sharedLibraryFile	 = new File(openSSL64LinuxLibFile, dllName)
+								sharedLibraryLinkFile = new File(openSSL64LinuxLibFile, linkName)
 							}
 						} else if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
@@ -448,11 +448,11 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					            headers.srcDir "$openSSLLinuxInc/include"
+					            headers.srcDir "$openSSL64LinuxInc/include"
 								dllName = 'libssl.so'
 								linkName = 'libssl.a'
-								sharedLibraryFile	 = new File("$openSSLLinuxLib/$dllName")
-								sharedLibraryLinkFile = new File("$openSSLLinuxLib/$linkName")
+								sharedLibraryFile	 = new File("$openSSL64LinuxLib/$dllName")
+								sharedLibraryLinkFile = new File("$openSSL64LinuxLib/$linkName")
 							}
 						} else {
 							throw new GradleException("Unknown buildType" + buildType)

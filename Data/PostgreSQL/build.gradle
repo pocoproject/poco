@@ -5,62 +5,104 @@ model {
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
-						libName = 'libintl.lib'
 						if (targetPlatform.name == 'win32') {
+						    libName = 'libintl.lib'
 							headers.srcDir "$postgres32Home/include"
-							staticLibraryFile = file("$postgres32Home/lib/$libName")
+							staticLibraryFile = new File("$postgres32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    libName = 'libintl.lib'
 							headers.srcDir "$postgres64Home/include"
-							staticLibraryFile = file("$postgres64Home/lib/$libName")
+							staticLibraryFile = new File("$postgres64Home/lib/$libName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    libName = 'libintl.lib'
+                            //staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    libName = 'libintl.a'
+                            staticLibraryFile = new File("$postgres32LinuxLib/$libName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
-						libName = 'libintl.lib'
 						if (targetPlatform.name == 'win32') {
+						    libName = 'libintl.lib'
 							headers.srcDir "$postgres32Home/include"
-							staticLibraryFile = file("$postgres32Home/lib/$libName")
+							staticLibraryFile = new File("$postgres32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    libName = 'libintl.lib'
 							headers.srcDir "$postgres64Home/include"
-							staticLibraryFile = file("$postgres64Home/lib/$libName")
+							staticLibraryFile = new File("$postgres64Home/lib/$libName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    libName = 'libintl.a'
+                            staticLibraryFile = new File("$postgres32LinuxLib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    libName = 'libintl.a'
+                            staticLibraryFile = new File("$postgres32LinuxLib/$libName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 				binaries.withType(SharedLibraryBinary) {
 					def dllName
 					def linkName
 					if (buildType == buildTypes.debug) {
-						dllName = 'libintl-8.dll'
-						linkName = 'libintl.lib'
 						if (targetPlatform.name == 'win32') {
+						    dllName = 'libintl-8.dll'
+						    linkName = 'libintl.lib'
 							headers.srcDir "$postgres32Home/include"
-							sharedLibraryFile     = file("$postgres32Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres32Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    dllName = 'libintl-8.dll'
+						    linkName = 'libintl.lib'
 							headers.srcDir "$postgres64Home/include"
-							sharedLibraryFile     = file("$postgres64Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres64Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres64Home/lib/$linkName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    dllName = 'libintl-8.dll'
+						    linkName = 'libintl.lib'
+                            //staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    dllName = 'libintl-8.so'
+						    linkName = 'libintl.a'
+							headers.srcDir "$postgres32LinuxInc"
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
-						dllName = 'libintl-8.dll'
-						linkName = 'libintl.lib'
 						if (targetPlatform.name == 'win32') {
+						    dllName = 'libintl-8.dll'
+						    linkName = 'libintl.lib'
 							headers.srcDir "$postgres32Home/include"
-							sharedLibraryFile     = file("$postgres32Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres32Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    dllName = 'libintl-8.dll'
+						    linkName = 'libintl.lib'
 							headers.srcDir "$postgres64Home/include"
-							sharedLibraryFile     = file("$postgres64Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres64Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres64Home/lib/$linkName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    dllName = 'libintl-8.so'
+						    linkName = 'libintl.a'
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    dllName = 'libintl-8.so'
+						    linkName = 'libintl.a'
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 			}
@@ -68,62 +110,100 @@ model {
 				binaries.withType(StaticLibraryBinary) {
 					def libName = "foobar"
 					if (buildType == buildTypes.debug) {
-						libName = 'iconv.lib'
 						if (targetPlatform.name == 'win32') {
+						    libName = 'iconv.lib'
 							headers.srcDir "$postgres32Home/include"
-							staticLibraryFile = file("$postgres32Home/lib/$libName")
+							staticLibraryFile = new File("$postgres32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    libName = 'iconv.lib'
 							headers.srcDir "$postgres64Home/include"
-							staticLibraryFile = file("$postgres64Home/lib/$libName")
+							staticLibraryFile = new File("$postgres64Home/lib/$libName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    libName = 'iconv.a'
+                            //staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    libName = 'iconv.a'
+                            staticLibraryFile = new File("$postgres32LinuxLib/$libName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
 						libName = 'iconv.lib'
 						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$postgres32Home/include"
-							staticLibraryFile = file("$postgres32Home/lib/$libName")
+							staticLibraryFile = new File("$postgres32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$postgres64Home/include"
-							staticLibraryFile = file("$postgres64Home/lib/$libName")
+							staticLibraryFile = new File("$postgres64Home/lib/$libName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+                            //staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    libName = 'iconv.a'
+                            staticLibraryFile = new File("$postgres32LinuxLib/$libName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 				binaries.withType(SharedLibraryBinary) {
 					def dllName
 					def linkName
 					if (buildType == buildTypes.debug) {
-						dllName = 'libiconv-2.dll'
-						linkName = 'iconv.lib'
 						if (targetPlatform.name == 'win32') {
+						    dllName = 'libiconv-2.dll'
+						    linkName = 'iconv.lib'
 							headers.srcDir "$postgres32Home/include"
-							sharedLibraryFile     = file("$postgres32Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres32Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    dllName = 'libiconv-2.dll'
+						    linkName = 'iconv.lib'
 							headers.srcDir "$postgres64Home/include"
-							sharedLibraryFile     = file("$postgres64Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres64Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres64Home/lib/$linkName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    dllName = 'libiconv-2.so'
+						    linkName = 'iconv.a'
+                            //staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    dllName = 'libiconv-2.so'
+						    linkName = 'iconv.a'
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
-						dllName = 'libiconv-2.dll'
-						linkName = 'iconv.lib'
 						if (targetPlatform.name == 'win32') {
+						    dllName = 'libiconv-2.dll'
+					    	linkName = 'iconv.lib'
 							headers.srcDir "$postgres32Home/include"
-							sharedLibraryFile     = file("$postgres32Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres32Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    dllName = 'libiconv-2.dll'
+					    	linkName = 'iconv.lib'
 							headers.srcDir "$postgres64Home/include"
-							sharedLibraryFile     = file("$postgres64Home/bin/$dllName")
-							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres64Home/bin/$dllName")
+							sharedLibraryLinkFile = new File("$postgres64Home/lib/$linkName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    dllName = 'libiconv-2.so'
+					    	linkName = 'iconv.a'
+                            //staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    dllName = 'libiconv-2.so'
+					    	linkName = 'iconv.a'
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 			}
@@ -134,42 +214,72 @@ model {
 						libName = 'libpq.lib'
 						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$postgres32Home/include"
-							staticLibraryFile = file("$postgres32Home/lib/$libName")
+							staticLibraryFile = new File("$postgres32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$postgres64Home/include"
-							staticLibraryFile = file("$postgres64Home/lib/$libName")
+							staticLibraryFile = new File("$postgres64Home/lib/$libName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+                            staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    libName = 'libpq.a'
+							headers.srcDir "$postgres32LinuxInc"
+							staticLibraryFile   = new File("$postgres32LinuxLib/lib/$libName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
-						libName = 'libpq.lib'
 						if (targetPlatform.name == 'win32') {
+						    libName = 'libpq.lib'
 							headers.srcDir "$postgres32Home/include"
-							staticLibraryFile = file("$postgres32Home/lib/$libName")
+							staticLibraryFile = new File("$postgres32Home/lib/$libName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    libName = 'libpq.lib'
 							headers.srcDir "$postgres64Home/include"
-							staticLibraryFile = file("$postgres64Home/lib/$libName")
+							staticLibraryFile = new File("$postgres64Home/lib/$libName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+                            staticLibraryFile = new File("$postgres32OSXHome/lib/$libName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    libName = 'libpq.a'
+							staticLibraryFile = new File("$postgres32LinuxLib/lib/$libName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 				binaries.withType(SharedLibraryBinary) {
 					def dllName
 					def linkName
 					if (buildType == buildTypes.debug) {
-						dllName = 'libpq.dll'
-						linkName = 'libpq.lib'
 						if (targetPlatform.name == 'win32') {
+						    dllName = 'libpq.dll'
+						    linkName = 'libpq.lib'
 							headers.srcDir "$postgres32Home/include"
-							sharedLibraryFile     = file("$postgres32Home/lib/$dllName")
-							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres32Home/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
 						} else
 						if (targetPlatform.name == 'win64') {
+						    dllName = 'libpq.dll'
+						    linkName = 'libpq.lib'
 							headers.srcDir "$postgres64Home/include"
-							sharedLibraryFile     = file("$postgres64Home/lib/$dllName")
-							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres64Home/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres64Home/lib/$linkName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    dllName = 'libpq.dll'
+						    linkName = 'libpq.lib'
+							headers.srcDir "$postgres32Home/include"
+							sharedLibraryFile     = new File("$postgres32Home/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    dllName = 'libpq.so'
+						    linkName = 'libpq.a'
+							headers.srcDir "$postgres32LinuxInc"
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
 						}
 					} else
 					if (buildType == buildTypes.release) {
@@ -177,16 +287,28 @@ model {
 						linkName = 'libpq.lib'
 						if (targetPlatform.name == 'win32') {
 							headers.srcDir "$postgres32Home/include"
-							sharedLibraryFile     = file("$postgres32Home/lib/$dllName")
-							sharedLibraryLinkFile = file("$postgres32Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres32Home/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32Home/lib/$linkName")
 						} else
 						if (targetPlatform.name == 'win64') {
 							headers.srcDir "$postgres64Home/include"
-							sharedLibraryFile     = file("$postgres64Home/lib/$dllName")
-							sharedLibraryLinkFile = file("$postgres64Home/lib/$linkName")
+							sharedLibraryFile     = new File("$postgres64Home/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres64Home/lib/$linkName")
+                        } else 
+                        if (targetPlatform.operatingSystem.macOsX) {
+						    dllName = 'libpq.so'
+						    linkName = 'libpq.a'
+							headers.srcDir "$postgres32LinuxInc"
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
+                        } else
+                        if (targetPlatform.operatingSystem.linux) {
+						    dllName = 'libpq.so'
+						    linkName = 'libpq.a'
+							headers.srcDir "$postgres32LinuxInc"
+							sharedLibraryFile     = new File("$postgres32LinuxLib/lib/$dllName")
+							sharedLibraryLinkFile = new File("$postgres32LinuxLib/lib/$linkName")
 						}
-					} else {
-						throw new GradleException("Unknown buildType" + buildType)
 					}
 				}
 			}
@@ -209,7 +331,7 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-					lib library: 'postgres'
+//					lib library: 'postgres'
 					lib project: ':Data', library: 'Data'
 					lib project: ':Foundation', library: 'Foundation'
 				}
@@ -218,6 +340,11 @@ model {
 	}
 	binaries {
 		all {
+            if (toolChain in Gcc) {
+                cppCompiler.args ( "-I", "/usr/include/postgresql")
+                linker.args ( "-L", "/usr/lib/x86_64-linux-gnu/")
+                linker.args ( "-l", "pq")
+            }
 		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
