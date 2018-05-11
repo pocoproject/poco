@@ -16,6 +16,7 @@ rem
 
 setlocal EnableDelayedExpansion
 
+
 set TESTRUNNERARGS=-all
 set TESTCOMPONENTS='findstr /R "." components'
 set BINDIR=bin
@@ -28,6 +29,8 @@ if "%1" =="-d" (
   set DEBUG=d
   shift
 )
+
+set PATH=%CD%\%BINDIR%;%PATH
 
 if not "%1" == "" (
   set TESTCOMPONENTS="%1"
