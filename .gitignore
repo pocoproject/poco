@@ -41,6 +41,10 @@ coverage/
 config.build
 config.make
 
+# CLion #
+########
+.idea/
+
 # CMake #
 ########
 cmake_install.cmake
@@ -50,6 +54,7 @@ CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
+cmake-build-*
 
 # Packages #
 ############

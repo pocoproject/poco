@@ -428,7 +428,6 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
-
 void HTTPSClientSessionTest::testServerAbort()
 {
 	HTTPSTestServer srv;
