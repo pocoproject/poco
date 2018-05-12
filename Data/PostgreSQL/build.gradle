@@ -19,7 +19,7 @@ model {
                         } else
                         if (targetPlatform.operatingSystem.linux) {
 						    libName = 'libintl.lib'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
                             staticLibraryFile = new File("$postgres64LinuxLib/$libName")
 						}
 					} else
@@ -38,7 +38,7 @@ model {
                         } else
                         if (targetPlatform.operatingSystem.linux) {
 						    libName = 'libintl.lib'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
                             staticLibraryFile = new File("$postgres64LinuxLib/$libName")
 						}
 					}
@@ -66,7 +66,7 @@ model {
                         if (targetPlatform.operatingSystem.linux) {
 						    dllName = 'libintl-8.so'
 					    	linkName = 'libintl.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
 							sharedLibraryFile     = new File("$postgres64LinuxLib/bin/$dllName")
 							sharedLibraryLinkFile = new File("$postgres64LinuxLib/$linkName")
 						}
@@ -91,7 +91,7 @@ model {
                         if (targetPlatform.operatingSystem.linux) {
 						    dllName = 'libintl-8.so'
 					    	linkName = 'libintl.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
 							sharedLibraryFile     = new File("$postgres64LinuxLib/bin/$dllName")
 							sharedLibraryLinkFile = new File("$postgres64LinuxLib/$linkName")
 						}
@@ -116,7 +116,7 @@ model {
                         } else
                         if (targetPlatform.operatingSystem.linux) {
 						    libName = 'iconv.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
                             staticLibraryFile = new File("$postgres64LinuxLib/$libName")
 						}
 					} else
@@ -135,7 +135,7 @@ model {
                         } else
                         if (targetPlatform.operatingSystem.linux) {
 						    libName = 'iconv.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
                             staticLibraryFile = new File("$postgres64LinuxLib/$libName")
 						}
 					}
@@ -163,7 +163,7 @@ model {
                         if (targetPlatform.operatingSystem.linux) {
 						    dllName = 'libiconv-2.so'
 						    linkName = 'iconv.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
 							sharedLibraryFile     = new File("$postgres64LinuxLib/bin/$dllName")
 							sharedLibraryLinkFile = new File("$postgres64LinuxLib/$linkName")
 						}
@@ -188,7 +188,7 @@ model {
                         if (targetPlatform.operatingSystem.linux) {
 						    dllName = 'libiconv-2.so'
 						    linkName = 'iconv.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
 							sharedLibraryFile     = new File("$postgres64LinuxLib/bin/$dllName")
 							sharedLibraryLinkFile = new File("$postgres64LinuxLib/$linkName")
 						}
@@ -213,7 +213,7 @@ model {
                         } else
                         if (targetPlatform.operatingSystem.linux) {
 						    libName = 'libpq.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include") )
+							headers.srcDir(new File("$postgres64LinuxInc") )
                             staticLibraryFile = new File("$postgres32LinuxLib/$libName")
 						}
 					} else
@@ -232,7 +232,7 @@ model {
                         } else
                         if (targetPlatform.operatingSystem.linux) {
 						    libName = 'libpq.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
                             staticLibraryFile = new File("$postgres32LinuxLib/$libName")
 						}
 					}
@@ -260,7 +260,7 @@ model {
                         if (targetPlatform.operatingSystem.linux) {
 						    dllName = 'libpq.so'
 						    linkName = 'libpq.a'
-							headers.srcDir( new File("$postgres64LinuxInc/include") )
+							headers.srcDir( new File("$postgres64LinuxInc") )
 							sharedLibraryFile     = new File("$postgres64LinuxLib/$dllName")
 							sharedLibraryLinkFile = new File("$postgres64LinuxLib/$linkName")
 						}
@@ -285,7 +285,7 @@ model {
                         if (targetPlatform.operatingSystem.linux) {
 						    dllName = 'libpq.so'
 						    linkName = 'libpq.a'
-							headers.srcDir(new File("$postgres64LinuxInc/include"))
+							headers.srcDir(new File("$postgres64LinuxInc"))
 							sharedLibraryFile     = new File("$postgres64LinuxLib/$dllName")
 							sharedLibraryLinkFile = new File("$postgres64LinuxLib/$linkName")
 						}

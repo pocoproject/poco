@@ -43,7 +43,7 @@ include ':Data:testsuite'
 include ':Data:ODBC:testsuite'
 include ':Data:SQLite:testsuite'
 //include ':Data:MySQL:testsuite'
-include ':Data:PostgreSQL:testsuite'
+//include ':Data:PostgreSQL:testsuite' // needs OpenSSL setup
 include ':MongoDB:testsuite'
 include ':Redis:testsuite'
 include ':CppParser:testsuite'
