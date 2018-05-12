@@ -497,13 +497,15 @@ test_script:
           $runner="";$runnerd="";$global:LastExitCode=0;
           if ($env:platform -eq "Win32")
           {
-            $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';iex "& $cmd";
+            $cmd = 'C:\cygwin\usr\sbin\cygserver.exe "&"';
+            Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
             $runner="$env:POCO_BASE\net\testsuite\bin\cygwin\i686\testrunner.exe"
             $runnerd="$env:POCO_BASE\net\testsuite\bin\cygwin\i686\testrunnerd.exe"
           }
           if ($env:platform -eq "x64")
           {
-            $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';iex "& $cmd";
+            $cmd = 'C:\cygwin64\usr\sbin\cygserver.exe "&"';
+            Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
             $runner="$env:POCO_BASE\net\testsuite\bin\cygwin\x86_64\testrunner.exe"
             $runnerd="$env:POCO_BASE\net\testsuite\bin\cygwin\x86_64\testrunnerd.exe"
           }
