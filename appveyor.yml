@@ -297,14 +297,12 @@ before_build:
             $env:INCLUDE = $env:POSTGRES32 + "\include;" + $env:INCLUDE
             $env:LIB     = $env:POSTGRES32 + "\lib;" + $env:LIB
             $env:PATH    = $env:POSTGRES32 + "\bin;" + $env:PATH
-            $env:PATH    = "C:\cygwin\bin;" + $env:PATH
         }
         if ($env:platform -eq "x64")
         {
             $env:INCLUDE = $env:POSTGRES64 + "\include;" + $env:INCLUDE
             $env:LIB     = $env:POSTGRES64 + "\lib;" + $env:LIB
             $env:PATH    = $env:POSTGRES64 + "\bin;" + $env:PATH
-            $env:PATH    = "C:\cygwin64\bin;" + $env:PATH
         }
 # -------------------------------------------------------------------------------------------
 
@@ -512,6 +510,9 @@ test_script:
 
           Write-Host -ForegroundColor Yellow $runner;
           $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runner" action=allow';
+          Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
+          Write-Host -ForegroundColor Yellow ': LastExitCode=' $lastExitCode;
+ 
           Write-Host -ForegroundColor Yellow $runnerd;
           $cmd = 'netsh advfirewall firewall add rule name="TestRunner" profile=any dir=in program="$runnerd" action=allow';
           Write-Host -ForegroundColor Yellow $cmd;iex "& $cmd";
@@ -584,13 +585,14 @@ test_script:
         }
         if ($env:builder -eq "cmake")
         {
-          pushd cmake-build;
+          pushd build-cmake;
           Write-Host -ForegroundColor Yellow $line;
           ctest --config RelWithDebInfo -N
           Write-Host -ForegroundColor Yellow $line;
 
-          Write-Host -ForegroundColor Yellow 'ctest -C Debug -VV -E SQL*'
-          ctest -C Debug -VV -E SQL*
+          $cmd='ctest -C Debug -VV -E SQL*';
+          Write-Host -ForegroundColor Yellow $cmd
+          $cmd
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
