@@ -10,5 +10,7 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync, \
   N7CppUnit10TestCallerI9TimerTestEE.testScheduleInterval, \
   N7CppUnit10TestCallerI9TimerTestEE.testTimer, \
+  N7CppUnit10TestCallerI15FileChannelTestEE.testPurgeAge, \
+  N7CppUnit10TestCallerI8FileTestEE.testFileAttributes2, \
   "
 
