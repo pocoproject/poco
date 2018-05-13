@@ -131,13 +131,13 @@ matrix:
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
       script:
-        - ./configure --everything --omit=PDF && make all -s -j2 && make install
+        - ./configure --everything --omit=PDF && make all -s -j2 && sudo make install
         - ./travis/runtests.sh
     
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
-        - ./configure --everything --omit=PDF --config=Linux-clang && make all -s -j2  && make install
+        - ./configure --everything --omit=PDF --config=Linux-clang && make all -s -j2  && sudo make install
         - ./travis/runtests.sh
 
     - env:    TEST_NAME="arm-linux-gnueabi- (make)"
