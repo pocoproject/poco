@@ -136,9 +136,9 @@ install:
         {
           $env:PATH = "c:\cygwin64\bin;" + $env:PATH
         }
+        find /cygdrive/c/cygwin -name "cygpq-5.dll"
         g++ --version
       }
-  - find /cygdrive/c/cygwin -name "cygpq-5.dll"
   - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
