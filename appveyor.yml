@@ -138,6 +138,7 @@ install:
         }
         g++ --version
       }
+  - find /cygdrive/c/cygwin -name "libpq-5.dll"
   - uname -a
   - cat /proc/cpuinfo
   - cat /proc/meminfo
