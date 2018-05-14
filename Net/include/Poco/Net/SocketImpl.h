@@ -167,6 +167,13 @@ public:
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
 
+	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
+		/// Receives data from the socket and stores it in buffers.
+		///
+		/// Returns the number of bytes received.
+		///
+		/// Always returns zero for platforms where not implemented.
+
 	virtual int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
@@ -176,6 +183,13 @@ public:
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
 
+	virtual int receiveBytes(SocketBufVec& buffers, int flags = 0);
+		/// Receives data from the socket and stores it in buffers.
+		///
+		/// Returns the number of bytes received.
+		///
+		/// Always returns zero for platforms where not implemented.
+
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 		/// Sends the contents of the given buffer through
 		/// the socket to the given address.
@@ -183,12 +197,30 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	virtual int sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags = 0);
+		/// Sends the contents of the buffers through
+		/// the socket to the given address.
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+		///
+		/// Always returns zero for platforms where not implemented.
+
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		/// Stores the address of the sender in address.
 		///
 		/// Returns the number of bytes received.
+
+	virtual int receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags = 0);
+		/// Receives data from the socket and stores it
+		/// in buffers.
+		/// Stores the address of the sender in address.
+		///
+		/// Returns the number of bytes received.
+		///
+		/// Always returns zero for platforms where not implemented.
 
 	virtual void sendUrgent(unsigned char data);
 		/// Sends one byte of urgent data through
@@ -436,6 +468,8 @@ protected:
 
 	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
+
+	void checkBrokenTimeout();
 
 	static int lastError();
 		/// Returns the last error code.

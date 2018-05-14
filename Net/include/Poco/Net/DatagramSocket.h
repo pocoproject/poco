@@ -108,9 +108,21 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	int sendBytes(const SocketBufVec& buffer, int flags = 0);
+		/// Sends the contents of the given buffers through
+		/// the socket.
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
+		///
+		/// Returns the number of bytes received.
+
+	int receiveBytes(SocketBufVec& buffer, int flags = 0);
+		/// Receives data from the socket and stores it in buffers.
 		///
 		/// Returns the number of bytes received.
 
@@ -121,9 +133,23 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	int sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags = 0);
+		/// Sends the contents of the given buffers through
+		/// the socket to the given address.
+		///
+		/// Returns the number of bytes sent, which may be
+		/// less than the number of bytes specified.
+
 	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
+		/// Stores the address of the sender in address.
+		///
+		/// Returns the number of bytes received.
+
+	int receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags = 0);
+		/// Receives data from the socket and stores it
+		/// in buffers. Up to length bytes are received.
 		/// Stores the address of the sender in address.
 		///
 		/// Returns the number of bytes received.
