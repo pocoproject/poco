@@ -28,6 +28,8 @@ public:
 	void testSendToReceiveFrom();
 	void testUnbound();
 	void testBroadcast();
+	void testGatherScatterFixed();
+	void testGatherScatterVariable();
 
 	void setUp();
 	void tearDown();
@@ -35,6 +37,13 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void testGatherScatterFixedWin();
+	void testGatherScatterSTRFFixedWin();
+	void testGatherScatterVariableWin();
+	void testGatherScatterSTRFVariableWin();
+
+	void testGatherScatterFixedUNIX();
+	void testGatherScatterVariableUNIX();
 };
 
 
