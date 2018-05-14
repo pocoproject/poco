@@ -18,7 +18,7 @@ setlocal EnableDelayedExpansion
 
 
 set TESTRUNNERARGS=-all
-set TESTCOMPONENTS='findstr /R "." components'
+set TESTCOMPONENTS='C:\Windows\System32\findstr.exe /R "." components'
 set BINDIR=bin
 
 if "%1"=="64" (
