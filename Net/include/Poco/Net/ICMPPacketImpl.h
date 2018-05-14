@@ -71,11 +71,13 @@ public:
 		/// Supplied buffer includes IP header, ICMP header and data.
 		/// Must be overriden.
 
-	virtual std::string errorDescription(Poco::UInt8* buffer, int length) = 0;
+	virtual std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code) = 0;
 		/// Returns error description string.
 		/// If supplied buffer contains an ICMP echo reply packet, an
 		/// empty string is returned indicating the absence of error.
-		///	
+		/// If type and code of the error can be determined, they are
+		/// assigned to the type and code respectively.
+		///
 		/// Supplied buffer includes IP header, ICMP header and data.
 		/// Must be overriden.
 
@@ -84,6 +86,7 @@ public:
 		/// Must be overriden.
 
 	static const Poco::UInt16 MAX_PACKET_SIZE;
+	static const Poco::UInt16 MAX_PAYLOAD_SIZE;
 	static const Poco::UInt16 MAX_SEQ_VALUE;
 
 protected:

@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/ICMPSocketImpl.h"
+#include "Poco/Net/ICMPv4PacketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
@@ -78,9 +79,18 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 	}
 	catch (Exception&)
 	{
-		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize);
+		int type = 0, code = 0;
+		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
 		if (!err.empty())
-			throw ICMPException(err);
+		{
+			if (address.family() == IPAddress::IPv4 &&
+				type == ICMPv4PacketImpl::DESTINATION_UNREACHABLE &&
+				code == ICMPv4PacketImpl::FRAGMENTATION_NEEDED_AND_DF_SET)
+			{
+				throw ICMPFragmentationException(err);
+			}
+			else throw ICMPException(err);
+		}
 		else
 			throw;
 	}
