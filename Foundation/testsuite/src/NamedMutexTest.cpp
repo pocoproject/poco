@@ -131,7 +131,6 @@ void NamedMutexTest::testTryLock()
 #endif
 	}
 }
-#endif
 
 
 void NamedMutexTest::setUp()
