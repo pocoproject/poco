@@ -22,17 +22,8 @@ using Poco::Thread;
 using Poco::Runnable;
 using Poco::Timestamp;
 
-
-NamedMutexTest::NamedMutexTest(const std::string& rName): CppUnit::TestCase(rName)
-{
-}
-
-
-NamedMutexTest::~NamedMutexTest()
-{
-}
-
 #if POCO != POCO_OS_CYGWIN
+
 static NamedMutex testMutex("TestMutex");
 
 namespace
@@ -81,6 +72,16 @@ namespace
 	private:
 		bool _locked;
 	};
+}
+
+
+NamedMutexTest::NamedMutexTest(const std::string& rName): CppUnit::TestCase(rName)
+{
+}
+
+
+NamedMutexTest::~NamedMutexTest()
+{
 }
 
 
