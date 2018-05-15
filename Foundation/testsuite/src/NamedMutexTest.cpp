@@ -22,7 +22,6 @@ using Poco::Thread;
 using Poco::Runnable;
 using Poco::Timestamp;
 
-
 static NamedMutex testMutex("TestMutex");
 
 
@@ -132,6 +131,7 @@ void NamedMutexTest::testTryLock()
 #endif
 	}
 }
+#endif
 
 
 void NamedMutexTest::setUp()
@@ -148,10 +148,8 @@ CppUnit::Test* NamedMutexTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NamedMutexTest");
 
-#if POCO_OS != POCO_OS_CYGWIN	//FIXME
 	CppUnit_addTest(pSuite, NamedMutexTest, testLock);
 	CppUnit_addTest(pSuite, NamedMutexTest, testTryLock);
-#endif
 
 	return pSuite;
 }
