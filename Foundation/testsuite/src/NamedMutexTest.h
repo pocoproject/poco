@@ -24,8 +24,10 @@ public:
 	NamedMutexTest(const std::string& name);
 	~NamedMutexTest();
 
+#if POCO != POCO_OS_CYGWIN
 	void testLock();
 	void testTryLock();
+#endif
 	
 	void setUp();
 	void tearDown();
