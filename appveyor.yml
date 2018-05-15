@@ -71,9 +71,6 @@ environment:
     - builder: cygwin
       vsver: 150
 
-    - builder: cmake
-      vsver: 150
-
     - builder: msbuild
       vsver: 140
       linkmode: shared
@@ -97,6 +94,9 @@ environment:
 #    - builder: msbuild
 #      vsver: 150
 #      linkmode: static_mt
+
+    - builder: cmake
+      vsver: 150
 
 matrix:
   fast_finish: true
