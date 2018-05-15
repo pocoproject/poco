@@ -27,7 +27,7 @@
 #include <typeinfo>
 #include <utility>
 
-#if defined(POCO_COMPILER_GCC) && (POCO_OS == POCO_OS_LINUX)
+#if defined(POCO_COMPILER_GCC) && (POCO_OS == POCO_OS_LINUX) && (POCO_OS != POCO_OS_CYGWIN)
 	#define POCO_HAS_BACKTRACE
 #endif
 
@@ -124,13 +124,14 @@ public:
 		/// If full is false, the scope is trimmed off.
 	{
 		std::string name(typeid(T).name());
-#ifdef POCO_COMPILER_GCC
+#ifdef POCO_HAS_BACKTRACE
+	#ifdef POCO_COMPILER_GCC
 		int status = 0;
-#if (POCO_OS == POCO_OS_CYGWIN)
+	#if (POCO_OS == POCO_OS_CYGWIN)
 		char* pName = __cxxabiv1::__cxa_demangle(typeid(T).name(), 0, 0, &status);
-#else
+	#else
 		char* pName = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
-#endif
+	#endif
 		if (status == 0) name = pName;
 		free(pName);
 		if (!full) // strip scope, if any
@@ -138,7 +139,8 @@ public:
 			std::size_t pos = name.rfind("::");
 			if (pos != std::string::npos) name = name.substr(pos+2);
 		}
-#endif // TODO: demangle other compilers
+	#endif // TODO: demangle other compilers
+#endif
 		return name;
 	}
 

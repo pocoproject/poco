@@ -21,11 +21,13 @@
 class NamedMutexTest: public CppUnit::TestCase
 {
 public:
+#if POCO != POCO_OS_CYGWIN
 	NamedMutexTest(const std::string& name);
 	~NamedMutexTest();
 
 	void testLock();
 	void testTryLock();
+#endif
 	
 	void setUp();
 	void tearDown();
