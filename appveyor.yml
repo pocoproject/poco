@@ -133,12 +133,12 @@ install:
         if ($env:platform -eq "Win32")
         {
           $env:PATH = "C:\cygwin\bin;" + $env:PATH
-          /usr/sbin/cygserver.exe &
+          '/usr/sbin/cygserver.exe &'
         }
         if ($env:platform -eq "x64")
         {
           $env:PATH = "c:\cygwin64\bin;" + $env:PATH
-          /usr/sbin/cygserver.exe &
+          '/usr/sbin/cygserver.exe &'
         }
         find /cygdrive/c/cygwin -name "cygpq-5.dll"
         g++ --version
