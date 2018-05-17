@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ev
-export POCO_BASE=$pwd
+export POCO_BASE=$(pwd)
 export PATH=$PATH:.
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
 source ./appveyor/ignored.sh
