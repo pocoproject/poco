@@ -1,32 +1,10 @@
-//
-// FTPSClientSession.h
-//
-// Library: Net
-// Package: FTP
-// Module:  FTPSClientSession
-//
-// Definition of the FTPSClientSession class.
-//
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
-
-
-#ifndef NetSSL_FTPSClientSession_INCLUDED
-#define NetSSL_FTPSClientSession_INCLUDED
-
-
-#include "Poco/Net/NetSSL.h"
+#pragma once
 #include "Poco/Net/FTPClientSession.h"
-
 
 namespace Poco {
 namespace Net {
 
-
-class NetSSL_API FTPSClientSession :
+class FTPSClientSession :
 	public Poco::Net::FTPClientSession
 {
 public:
@@ -35,7 +13,7 @@ public:
 	///
 	/// Passive mode will be used for data transfers.
 
-	explicit FTPSClientSession(const StreamSocket& socket, bool bReadWelcomeMessage = true);
+	explicit FTPSClientSession(const StreamSocket& socket, bool bReadWelcomeMessage = true, bool bTryUseFTPS = true);
 	/// Creates an FTPSClientSession using the given
 	/// connected socket for the control connection.
 	///
@@ -78,11 +56,6 @@ private:
 	bool _bSecureDataConnection = false;
 };
 
-
-//
-// inlines
-//
-
 inline bool FTPSClientSession::isSecure() const
 {
 	if (_pControlSocket != nullptr)
@@ -90,8 +63,4 @@ inline bool FTPSClientSession::isSecure() const
 	return false;
 }
 
-
 }} // namespace Poco::Net
-
-
-#endif // #define NetSSL_FTPSClientSession_INCLUDED

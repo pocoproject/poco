@@ -1,17 +1,3 @@
-//
-// FTPSClientSession.cpp
-//
-// Library: Net
-// Package: FTP
-// Module:  FTPSClientSession
-//
-// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
-
-
 #include "Poco/Net/FTPSClientSession.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
@@ -31,8 +17,8 @@ FTPSClientSession::~FTPSClientSession()
 {
 }
 
-FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool bReadWelcomeMessage) :
-	FTPClientSession(socket, bReadWelcomeMessage)
+FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool bReadWelcomeMessage, bool bTryUseFTPS) :
+	FTPClientSession(socket, bReadWelcomeMessage), _bTryFTPS(bTryUseFTPS)
 {
 }
 
@@ -41,8 +27,10 @@ FTPSClientSession::FTPSClientSession(const std::string& host,
 										Poco::UInt16 port,
 										const std::string& username,
 										const std::string& password) :
-	FTPClientSession(host, port, username, password)
+	FTPClientSession(host, port)
 {
+	if(!username.empty())
+		login(username, password);	
 }
 
 void FTPSClientSession::tryFTPSmode(bool bTryFTPS)
@@ -59,10 +47,10 @@ void FTPSClientSession::beforeCreateDataSocket()
 		return;
 	std::string sResponse;
 	int status = sendCommand("PBSZ 0", sResponse);
-	if (isPositiveCompletion(status))
+	if (isPositiveCompletion(status)) 
 	{
 		status = sendCommand("PROT P", sResponse);
-		if (isPositiveCompletion(status))
+		if (isPositiveCompletion(status)) 
 			_bSecureDataConnection = true;
 	}
 }
