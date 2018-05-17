@@ -42,7 +42,7 @@ FTPClientSession::FTPClientSession():
 }
 
 	
-FTPClientSession::FTPClientSession(const StreamSocket& socket):
+FTPClientSession::FTPClientSession(const StreamSocket& socket, bool bReadWelcomeMessage):
 	_pControlSocket(new DialogSocket(socket)),
 	_pDataStream(0),
 	_host(socket.address().host().toString()),
@@ -55,6 +55,13 @@ FTPClientSession::FTPClientSession(const StreamSocket& socket):
 	_timeout(DEFAULT_TIMEOUT)
 {
 	_pControlSocket->setReceiveTimeout(_timeout);
+	if (bReadWelcomeMessage) 
+	{
+		receiveServerReadyReply();
+	}
+	else {
+		_serverReady = true;
+	}	
 }
 
 

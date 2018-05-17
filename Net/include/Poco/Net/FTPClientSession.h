@@ -63,7 +63,7 @@ public:
 		///
 		/// Passive mode will be used for data transfers.
 
-	explicit FTPClientSession(const StreamSocket& socket);
+	explicit FTPClientSession(const StreamSocket& socket, bool bReadWelcomeMessage = true);
 		/// Creates an FTPClientSession using the given
 		/// connected socket for the control connection.
 		///

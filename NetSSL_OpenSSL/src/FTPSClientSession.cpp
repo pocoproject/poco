@@ -31,8 +31,8 @@ FTPSClientSession::~FTPSClientSession()
 {
 }
 
-FTPSClientSession::FTPSClientSession(const StreamSocket& socket) :
-	FTPClientSession(socket)
+FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool bReadWelcomeMessage) :
+	FTPClientSession(socket, bReadWelcomeMessage)
 {
 }
 
