@@ -19,5 +19,13 @@ $(info OSNAME               = $(OSNAME))
 $(info OSARCH               = $(OSARCH))
 $(info POCO_LIB_INSTALLDIR  = $(POCO_LIB_INSTALLDIR))
 $(info ----------------------------------------------------)
+$(info CFLAGS     			= $(CFLAGS)
+$(info CXXFLAGS   			= $(CXXFLAGS)
+$(info LIBFLAGS   			= $(LIBFLAGS)
+$(info SHLIBFLAGS 			= $(SHLIBFLAGS)
+$(info DYLIBFLAGS 			= $(DYLIBFLAGS)
+$(info LINKFLAGS  			= $(LINKFLAGS)
+$(info ----------------------------------------------------)
+
 endif
 
