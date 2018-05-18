@@ -9,5 +9,16 @@ export CPPUNIT_IGNORE="\
   N7CppUnit10TestCallerI22HTTPSStreamFactoryTestEE.testProxy, \
   N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast, \
   N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync, \
+  N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary1, \
+  N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary2, \
+  N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary3, \
+  N7CppUnit10TestCallerI15ClassLoaderTestEE.testClassLoader2, \
+  N7CppUnit10TestCallerI15ClassLoaderTestEE.testClassLoader3, \
   "
-
+# FIXME won't work until PATH be setup with the directory containing the dll
+# N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary1, \
+# N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary2, \
+# N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary3, \
+# N7CppUnit10TestCallerI15ClassLoaderTestEE.testClassLoader2, \
+# N7CppUnit10TestCallerI15ClassLoaderTestEE.testClassLoader3, \
+  
