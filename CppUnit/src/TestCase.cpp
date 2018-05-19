@@ -110,7 +110,10 @@ void TestCase::run(TestResult *result)
 {
 	result->startTest(this);
 
-	setUp();
+	if (_setup.size() > 0)
+		setUp(_setup);
+	else
+		setUp();
 	try 
 	{
 		runTest();

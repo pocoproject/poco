@@ -96,6 +96,7 @@ public:
 	std::string toString();
 
 	virtual void setUp();
+	virtual void setUp(const std::vector<std::string>& setup);
 	virtual void tearDown();
 
 protected:
@@ -198,6 +199,12 @@ inline const std::string& TestCase::name() const
 
 // A hook for fixture set up
 inline void TestCase::setUp()
+{
+}
+
+
+// A hook for fixture set up with command line arguments
+inline void TestCase::setUp(const std::vector<std::string>& setup)
 {
 }
 
