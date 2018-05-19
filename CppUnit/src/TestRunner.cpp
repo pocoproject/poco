@@ -48,6 +48,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	bool all     = false;
 	bool wait    = false;
 	bool printed = false;
+	std::vector<std::string>	setup;
 
 	for (int i = 1; i < args.size(); i++) 
 	{
@@ -71,6 +72,13 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			printed = true;
 			continue;
 		}
+		else if (arg == "-setup")
+		{
+			if (i + 1 < args.size())
+				setup.push_back(args[++i]);
+
+			continue;
+		}
 
 		if (!all)
 		{
@@ -89,6 +97,8 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 			if (testToRun)
 			{
+				if (setup.size() > 0)
+					testToRun->addSetup(setup);
 				if (!run(testToRun)) success = false;
 			}
 			numberOfTests++;
