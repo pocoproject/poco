@@ -999,6 +999,12 @@ task all() {
             binary.tasks.build.dependsOn stripTask
         }
     }
+        components.withType(SwiftXCTestBundle) { binary ->
+            binary.getLinkTask().configure { link ->
+                link.args.add("-foo")
+            }
+        }
+
 */
 
 

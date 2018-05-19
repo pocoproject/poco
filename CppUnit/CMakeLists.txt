@@ -17,7 +17,7 @@ set_target_properties( "${LIBNAME}"
     OUTPUT_NAME ${POCO_LIBNAME}
     DEFINE_SYMBOL CppUnit_EXPORTS
     )
-
+target_link_libraries( "${LIBNAME}" Foundation)
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
