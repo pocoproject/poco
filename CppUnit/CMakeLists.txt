@@ -1,6 +1,7 @@
 set(LIBNAME "CppUnit")
 
 # Sources
+add_definitions(-DPOCO_NO_AUTOMATIC_LIBS)
 if (WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif (WIN32)
@@ -16,7 +17,7 @@ set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION "1" SOVERSION "1"
     DEFINE_SYMBOL CppUnit_EXPORTS)
-target_link_libraries( "${LIBNAME}" )
+target_link_libraries( "${LIBNAME}" Foundation)
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
