@@ -1,4 +1,4 @@
-vc.project.guid = ${vc.project.guidFromName}
+vc.project.guid = 138BB448-808A-4FE5-A66D-78D1F8770F59
 vc.project.name = CppUnit
 vc.project.target = Poco${vc.project.name}
 vc.project.type = library
@@ -13,4 +13,4 @@ vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
 vc.solution.create = true
-vc.solution.include = testsuite\\TestSuite
+vc.solution.include = 
