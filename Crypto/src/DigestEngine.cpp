@@ -12,9 +12,12 @@
 //
 
 
+//Changed for port OpenSSL -> BoringSSL
+#if defined(OPENSSL_IS_BORINGSSL)
+	#include "openssl/digest.h"
+#endif
 #include "Poco/Crypto/DigestEngine.h"
 #include "Poco/Exception.h"
-
 
 namespace Poco {
 namespace Crypto {
@@ -37,7 +40,12 @@ DigestEngine::~DigestEngine()
 
 int DigestEngine::nid() const
 {
-	return EVP_MD_nid(EVP_MD_CTX_md(_pContext));
+	//Changed for port OpenSSL -> BoringSSL
+	#if defined(OPENSSL_IS_BORINGSSL)
+		return EVP_MD_type(EVP_MD_CTX_md(_pContext));
+	#else 
+		return EVP_MD_nid(EVP_MD_CTX_md(_pContext));
+	#endif
 }
 
 std::size_t DigestEngine::digestLength() const

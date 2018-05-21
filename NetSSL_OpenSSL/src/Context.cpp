@@ -198,7 +198,13 @@ void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 
 void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certificate)
 {
-	int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, certificate.certificate());
+	//Changed for port OpenSSL -> BoringSSL
+	#if defined(OPENSSL_IS_BORINGSSL)
+		int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, const_cast<X509*>(certificate.certificate()));
+	#else 
+		int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, certificate.certificate());
+	#endif
+	
 	if (errCode != 1)
 	{
 		std::string msg = Utility::getLastError();
@@ -511,25 +517,37 @@ void Context::initDH(const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
-		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
-		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
-		DH_set0_pqg(dh, p, 0, g);
-		DH_set_length(dh, 160);
-		if (!p || !g)
-		{
-			DH_free(dh);
-			throw SSLContextException("Error creating Diffie-Hellman parameters");
-		}
-#else
+
+//Changed for port OpenSSL -> BoringSSL	
+#if defined(OPENSSL_IS_BORINGSSL)
 		dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
-		dh->length = 160;
 		if ((!dh->p) || (!dh->g))
 		{
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
+#else
+	#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+			BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+			BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+			DH_set0_pqg(dh, p, 0, g);
+			DH_set_length(dh, 160);
+			if (!p || !g)
+			{
+				DH_free(dh);
+				throw SSLContextException("Error creating Diffie-Hellman parameters");
+			}
+	#else
+			dh->p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+			dh->g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+			dh->length = 160;
+			if ((!dh->p) || (!dh->g))
+			{
+				DH_free(dh);
+				throw SSLContextException("Error creating Diffie-Hellman parameters");
+			}
+	#endif
 #endif
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
