@@ -72,6 +72,11 @@ protected:
 		_fixture.get()->setUp();
 	}
 
+	void setUp(const std::vector<std::string>& setup)
+	{
+		_fixture.get()->setUp(setup);
+	}
+
 	void tearDown()
 	{
 		_fixture.get()->tearDown();

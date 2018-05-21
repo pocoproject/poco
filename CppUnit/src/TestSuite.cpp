@@ -27,6 +27,8 @@ void TestSuite::run(TestResult *result)
 			break;
 
 		Test *test = *it;
+		if (_setup.size() > 0)
+			test->addSetup(_setup);
 		test->run(result);
 	}
 }
