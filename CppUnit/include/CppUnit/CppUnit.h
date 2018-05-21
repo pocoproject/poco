@@ -53,15 +53,6 @@
 #endif
 
 
-//
-// Automatically link Data library.
-//
-#if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
-	#if !defined(CppUnit_EXPORTS)
-		#pragma comment(lib, "PocoCppUnit" POCO_LIB_SUFFIX)
-	#endif
-#endif
-
 // Turn off some annoying warnings
 #ifdef _MSC_VER
 	#pragma warning(disable:4786)  // identifier truncation warning
