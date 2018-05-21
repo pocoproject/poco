@@ -128,26 +128,31 @@ PKCS12Container::~PKCS12Container()
 
 std::string PKCS12Container::extractFriendlyName(X509* pCert)
 {
-	std::string friendlyName;
-	if(pCert)
-	{
-		STACK_OF(PKCS12_SAFEBAG)*pBags = 0;
-		PKCS12_SAFEBAG*pBag = PKCS12_add_cert(&pBags, pCert);
-		if(pBag)
-		{
-			char* pBuffer = PKCS12_get_friendlyname(pBag);
-			if(pBuffer)
+	//Changed for port OpenSSL -> BoringSSL
+	#if defined(OPENSSL_IS_BORINGSSL)
+    	throw NotImplementedException();
+	#else 
+		std::string friendlyName;
+		f(pCert)
+		{	
+			STACK_OF(PKCS12_SAFEBAG)*pBags = 0;
+			PKCS12_SAFEBAG*pBag = PKCS12_add_cert(&pBags, pCert);
+			if(pBag)
 			{
-				friendlyName = pBuffer;
-				OPENSSL_free(pBuffer);
+				char* pBuffer = PKCS12_get_friendlyname(pBag);
+				if(pBuffer)
+				{
+					friendlyName = pBuffer;
+					OPENSSL_free(pBuffer);
+				}
+				if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
 			}
-			if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
+			else throw OpenSSLException("PKCS12Container::extractFriendlyName()");
 		}
-		else throw OpenSSLException("PKCS12Container::extractFriendlyName()");
-	}
-	else throw NullPointerException("PKCS12Container::extractFriendlyName()");
+		else throw NullPointerException("PKCS12Container::extractFriendlyName()");
 
-	return friendlyName;
+		return friendlyName;
+	#endif
 }
 
 
