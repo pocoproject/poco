@@ -12,6 +12,7 @@
 #include "CppUnit/Test.h"
 #include "CppUnit/CppUnitException.h"
 #include <string>
+#include <vector>
 #include <typeinfo>
 
 
