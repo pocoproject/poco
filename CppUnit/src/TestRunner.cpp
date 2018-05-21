@@ -76,7 +76,6 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		{
 			if (i + 1 < args.size())
 				setup.push_back(args[++i]);
-
 			continue;
 		}
 
@@ -115,6 +114,8 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	{
 		for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it) 
 		{
+			if (setup.size() > 0)
+				it->second->addSetup(setup);
 			if (!run(it->second)) success = false;
 			numberOfTests++;
 		}
