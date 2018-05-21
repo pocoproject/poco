@@ -32,8 +32,9 @@ public:
 	virtual std::string toString() = 0;
 
 	void addSetup(const std::vector<std::string>& setup);
+	const std::vector<std::string>& setup() const;
 
-protected:
+private:
 	std::vector<std::string>	_setup;
 };
 
@@ -67,6 +68,13 @@ inline void Test::addSetup(const std::vector<std::string>& setup)
 {
 	_setup = setup;
 }
+
+
+inline const std::vector<std::string>& Test::setup() const
+{
+	return _setup;
+}
+
 
 } // namespace CppUnit
 
