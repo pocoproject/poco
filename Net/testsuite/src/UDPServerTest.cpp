@@ -56,7 +56,7 @@ namespace
 			if (!addr.empty() && addr != address(buf).toString())
 				throw Poco::InvalidArgumentException("Invalid address.");
 			addr = address(buf).toString();
-			counter = counter.value() + payload(buf, '\n').count();
+			counter = counter.value() + static_cast<AtomicCounter::ValueType>(payload(buf, '\n').count());
 			if (counter % 10)
 			{
 				if (payload(buf, '\n').count() == 0)
@@ -65,7 +65,7 @@ namespace
 			}
 			else // fake error
 			{
-				errCounter = errCounter.value() + payload(buf, '\n').count();
+				errCounter = errCounter.value() + static_cast<AtomicCounter::ValueType>(payload(buf, '\n').count());
 				setError(buf, "error");
 				processError(buf);
 			}
