@@ -36,7 +36,7 @@ public:
 	enum Options
 	{
 		TOK_IGNORE_EMPTY = 1, /// ignore empty tokens
-		TOK_TRIM	 = 2  /// remove leading and trailing whitespace from tokens
+		TOK_TRIM         = 2  /// remove leading and trailing whitespace from tokens
 	};
 	
 	typedef std::vector<std::string> TokenVec;
@@ -83,9 +83,6 @@ public:
 		/// Returns the number of tokens equal to the specified token.
 
 private:
-	StringTokenizer(const StringTokenizer&);
-	StringTokenizer& operator = (const StringTokenizer&);
-	
 	void trim(std::string& token);
 
 	TokenVec _tokens;
