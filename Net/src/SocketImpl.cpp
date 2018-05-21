@@ -464,23 +464,30 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 
 int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
-	checkBrokenTimeout();
-
 	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
-	int rc;
-	do
-	{
-		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-		rc = ::recvfrom(_sockfd, reinterpret_cast<char*>(buffer), length, flags, pSA, &saLen);
-	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	poco_socklen_t* pSALen = &saLen;
+	int rc = receiveFrom(buffer, length, &pSA, &pSALen, flags);
 	if (rc >= 0)
 	{
 		address = SocketAddress(pSA, saLen);
 	}
-	else
+	return rc;
+}
+
+
+int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** pSA, poco_socklen_t** saLen, int flags)
+{
+	checkBrokenTimeout();
+	int rc;
+	do
+	{
+		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
+		rc = ::recvfrom(_sockfd, reinterpret_cast<char*>(buffer), length, flags, *pSA, *saLen);
+	}
+	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	if (rc < 0)
 	{
 		int err = lastError();
 		if (err == POCO_EAGAIN && !_blocking)
