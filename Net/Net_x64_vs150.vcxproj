@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>15.0.26228.4</_ProjectFileVersion>
+    <_ProjectFileVersion>15.0.27428.2015</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoNet64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoNetmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoNetmtd</TargetName>
@@ -335,6 +335,7 @@
     <ClInclude Include="include\Poco\Net\MulticastSocket.h"/>
     <ClInclude Include="include\Poco\Net\MultipartReader.h"/>
     <ClInclude Include="include\Poco\Net\MultipartWriter.h"/>
+    <ClInclude Include="include\Poco\Net\MultiSocketPoller.h"/>
     <ClInclude Include="include\Poco\Net\NameValueCollection.h"/>
     <ClInclude Include="include\Poco\Net\Net.h"/>
     <ClInclude Include="include\Poco\Net\NetException.h"/>
@@ -360,6 +361,7 @@
     <ClInclude Include="include\Poco\Net\RemoteSyslogListener.h"/>
     <ClInclude Include="include\Poco\Net\ServerSocket.h"/>
     <ClInclude Include="include\Poco\Net\ServerSocketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\SingleSocketPoller.h"/>
     <ClInclude Include="include\Poco\Net\SMTPChannel.h"/>
     <ClInclude Include="include\Poco\Net\SMTPClientSession.h"/>
     <ClInclude Include="include\Poco\Net\Socket.h"/>
@@ -381,6 +383,11 @@
     <ClInclude Include="include\Poco\Net\TCPServerConnectionFactory.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerDispatcher.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerParams.h"/>
+    <ClInclude Include="include\Poco\Net\UDPClient.h"/>
+    <ClInclude Include="include\Poco\Net\UDPHandler.h"/>
+    <ClInclude Include="include\Poco\Net\UDPServer.h"/>
+    <ClInclude Include="include\Poco\Net\UDPServerParams.h"/>
+    <ClInclude Include="include\Poco\Net\UDPSocketReader.h"/>
     <ClInclude Include="include\Poco\Net\WebSocket.h"/>
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
   </ItemGroup>
@@ -483,6 +490,8 @@
     <ClCompile Include="src\TCPServerConnectionFactory.cpp"/>
     <ClCompile Include="src\TCPServerDispatcher.cpp"/>
     <ClCompile Include="src\TCPServerParams.cpp"/>
+    <ClCompile Include="src\UDPClient.cpp"/>
+    <ClCompile Include="src\UDPServerParams.cpp"/>
     <ClCompile Include="src\WebSocket.cpp"/>
     <ClCompile Include="src\WebSocketImpl.cpp"/>
   </ItemGroup>

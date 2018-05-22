@@ -205,7 +205,7 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int)
 	int payloadLength = receiveHeader(mask, useMask);
 	if (payloadLength <= 0)
 		return payloadLength;
-	int oldSize = buffer.size();
+	int oldSize = static_cast<int>(buffer.size());
 	buffer.resize(oldSize + payloadLength);
 	return receivePayload(buffer.begin() + oldSize, payloadLength, mask, useMask);
 }
@@ -231,7 +231,7 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 
 int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 	{
 		if (bytes < n) n = bytes;
@@ -375,7 +375,7 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 
 int WebSocketImpl::available()
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 		return n + _pStreamSocketImpl->available();
 	else
