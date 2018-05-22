@@ -93,8 +93,8 @@ public:
 
 private:
 	Poco::Net::DatagramSocket _socket;
-	Poco::Timespan            _timeout;
 	UDPSocketReader<S>        _reader;
+	Poco::Timespan            _timeout;
 };
 
 
