@@ -21,6 +21,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/AtomicCounter.h"
 #include "Poco/StringTokenizer.h"
+#include <cstring>
 
 
 using Poco::Net::DatagramSocket;
@@ -31,33 +32,31 @@ using Poco::Net::UDPHandler;
 using Poco::Net::Socket;
 using Poco::Net::SocketBufVec;
 using Poco::Net::SocketAddress;
-using Poco::Net::IPAddress;
-#ifdef POCO_NET_HAS_INTERFACE
-	using Poco::Net::NetworkInterface;
-#endif
 using Poco::Timespan;
 using Poco::Thread;
 using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::AtomicCounter;
 using Poco::StringTokenizer;
-using Poco::IOException;
 
 
-namespace {
-	struct TestUDPHandler : public Poco::Net::UDPHandler {
+namespace
+{
+	struct TestUDPHandler : public Poco::Net::UDPHandler
+	{
 		TestUDPHandler() : counter(0), errCounter(0) {}
 
-		void processData(char *buf) {
-			if (!addr.empty() && addr != address(buf).toString())
-				throw Poco::InvalidArgumentException("Invalid address.");
+		void processData(char *buf)
+		{
+			if (!addr.empty() && addr != address(buf).toString()) ++errors;
 			addr = address(buf).toString();
 			counter = counter.value() + static_cast<AtomicCounter::ValueType>(payload(buf, '\n').count());
-			if (counter % 10) {
-				if (payload(buf, '\n').count() == 0)
-					throw Poco::InvalidArgumentException("Invalid error string.");
+			if (counter % 10)
+			{
+				if (payload(buf, '\n').count() == 0) ++errors;
 				std::memset(buf, 0, blockSize());
-			} else // fake error
+			}
+			else // fake error
 			{
 				errCounter = errCounter.value() + static_cast<AtomicCounter::ValueType>(payload(buf, '\n').count());
 				setError(buf, "error");
@@ -65,20 +64,22 @@ namespace {
 			}
 		}
 
-		void processError(char *buf) {
-			if (std::string(error(buf)) != "error")
-				throw Poco::InvalidArgumentException("Invalid error string.");
+		void processError(char *buf)
+		{
+			if (std::string(error(buf)) != "error") ++errors;
 			std::memset(buf, 0, blockSize());
 		}
 
 		AtomicCounter counter;
 		AtomicCounter errCounter;
+		static AtomicCounter errors;
 		std::string addr;
 	};
 
+	AtomicCounter TestUDPHandler::errors;
 
 	template<typename S>
-	void server(int handlerCount, int reps, int port = 0)
+	bool server(int handlerCount, int reps, int port = 0)
 	{
 		Poco::Net::UDPHandler::List handlers;
 		for (int i = 0; i < handlerCount; ++i)
@@ -93,44 +94,48 @@ namespace {
 		std::vector<std::string> data;
 		int i = 0;
 		const char *str = "hello\n";
-		for (; i < reps; ++i) {
+		for (; i < reps; ++i)
+		{
 			data.push_back(str);
-			if (data.size() == 230 || i == reps - 1) {
+			if (data.size() == 230 || i == reps - 1)
+			{
 				data.back().append(1, '\0');
 				std::size_t sz = (data.size() * strlen(str)) + 1;
 				if (sz != client.send(Poco::Net::Socket::makeBufVec(data)))
-					throw Poco::RuntimeException();
-				Poco::Thread::sleep(10);
+					return false;
+				//Poco::Thread::sleep(10);
 				data.clear();
 			}
 		}
 
 		int count = 0;
 		int errCount = 0;
-		do {
+		do
+		{
 			count = 0;
 			errCount = 0;
 			Poco::Thread::sleep(10);
 			Poco::Net::UDPHandler::Iterator it = handlers.begin();
 			Poco::Net::UDPHandler::Iterator end = handlers.end();
-			for (; it != end; ++it) {
+			for (; it != end; ++it)
+			{
 				count += dynamic_cast<TestUDPHandler &>(*(*it)).counter.value();
 				errCount += count / 10;
 			}
 		} while (count < i);
-		if (reps != count)
-			throw Poco::RuntimeException();
+		if (reps != count) return false;
 		Poco::Net::UDPHandler::Iterator it = handlers.begin();
 		Poco::Net::UDPHandler::Iterator end = handlers.end();
-		for (; it != end; ++it) {
+		for (; it != end; ++it)
+		{
 			TestUDPHandler &h = dynamic_cast<TestUDPHandler &>(*(*it));
 			count = h.counter.value();
 			errCount = h.errCounter.value();
-			if (errCount < count / 10)
-				throw Poco::RuntimeException();
+			if (errCount < count / 10) return false;
 			if (h.addr.empty() && h.addr != client.address().toString())
-				throw Poco::RuntimeException();
+				return false;
 		}
+		return true;
 	}
 }
 
@@ -147,8 +152,10 @@ UDPServerTest::~UDPServerTest()
 
 void UDPServerTest::testServer()
 {
-	server<Poco::Net::UDPServer>(1, 10000);
-	server<Poco::Net::UDPMultiServer>(10, 10000, 22080);
+	int msgs = 10000;
+	assertTrue (server<Poco::Net::UDPServer>(1, msgs));
+	assertTrue (server<Poco::Net::UDPMultiServer>(10, msgs, 22080));
+	assertTrue (TestUDPHandler::errors == 0);
 }
 
 
