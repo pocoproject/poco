@@ -79,7 +79,7 @@ template<typename T>
 bool fastMemPoolTest(int n)
 {
 	bool ret = true;
-	std::vector<T*> vec(n, 0);
+	std::vector<T*> vec(n, (T*)0);
 	Poco::FastMemoryPool<T> pool(sizeof(T*), vec.size()/2);
 	for (int i = 0; i < vec.size(); ++i)
 	{
@@ -103,7 +103,7 @@ template <typename T>
 bool fastMemPoolTestCustom(int n, const T& val)
 {
 	bool ret = true;
-	std::vector<T*> vec(n, 0);
+	std::vector<T*> vec(n, (T*)0);
 	Poco::FastMemoryPool<T> pool(sizeof(T*), vec.size()/2);
 	for (int i = 0; i < vec.size(); ++i)
 	{
