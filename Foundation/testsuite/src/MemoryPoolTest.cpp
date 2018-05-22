@@ -169,7 +169,7 @@ void MemoryPoolTest::testFastMemoryPool()
 	Poco::FastMemoryPool<int> fastIntPool(blocks);
 	Poco::FastMemoryPool<std::string> fastStringPool(blocks);
 
-	std::vector<int*> intVec(blocks, 0);
+	std::vector<int*> intVec(blocks, (int*)0);
 	std::vector<std::string*> strVec(blocks);
 
 	for (int i = 0; i < blocks; ++i)
@@ -223,7 +223,7 @@ void MemoryPoolTest::memoryPoolBenchmark()
 	Poco::Stopwatch sw;
 
 	int reps = 1000000;
-	std::vector<int*> iVec(reps, 0);
+	std::vector<int*> iVec(reps, (int*)0);
 	Poco::FastMemoryPool<int> fastPool(reps);
 	sw.restart();
 	for (int i = 0; i < reps; ++i)
