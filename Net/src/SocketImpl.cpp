@@ -453,7 +453,15 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 		if (rc == SOCKET_ERROR) error();
 		rc = sent;
 #elif defined(POCO_OS_FAMILY_UNIX)
-		//TODO
+		struct msghdr msgHdr;
+		msgHdr.msg_name = const_cast<sockaddr*>(address.addr());
+		msgHdr.msg_namelen = address.length();
+		msgHdr.msg_iov = const_cast<iovec*>(&buffers[0]);
+		msgHdr.msg_iovlen = buffers.size();
+		msgHdr.msg_control = 0;
+		msgHdr.msg_controllen = 0;
+		msgHdr.msg_flags = flags;
+		rc = sendmsg(_sockfd, &msgHdr, flags);
 #endif
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
@@ -477,14 +485,14 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 }
 
 
-int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** pSA, poco_socklen_t** saLen, int flags)
+int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags)
 {
 	checkBrokenTimeout();
 	int rc;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-		rc = ::recvfrom(_sockfd, reinterpret_cast<char*>(buffer), length, flags, *pSA, *saLen);
+		rc = ::recvfrom(_sockfd, reinterpret_cast<char*>(buffer), length, flags, *ppSA, *ppSALen);
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0)
@@ -503,11 +511,21 @@ int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** pSA, poc
 
 int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags)
 {
-	checkBrokenTimeout();
-
 	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
+	int rc = receiveFrom(buffers, &pSA, &saLen, flags);
+	if(rc >= 0)
+	{
+		address = SocketAddress(pSA, saLen);
+	}
+	return rc;
+}
+
+
+int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_socklen_t* pSALen, int flags)
+{
+	checkBrokenTimeout();
 	int rc = 0;
 	do
 	{
@@ -520,15 +538,20 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int f
 		if (rc == SOCKET_ERROR) error();
 		rc = recvd;
 #elif defined(POCO_OS_FAMILY_UNIX)
-		//TODO
+		struct msghdr msgHdr;
+		msgHdr.msg_name = *pSA;
+		msgHdr.msg_namelen = *pSALen;
+		msgHdr.msg_iov = &buffers[0];
+		msgHdr.msg_iovlen = buffers.size();
+		msgHdr.msg_control = 0;
+		msgHdr.msg_controllen = 0;
+		msgHdr.msg_flags = flags;
+		rc = recvmsg(_sockfd, &msgHdr, flags);
+		if (rc >= 0) *pSALen = msgHdr.msg_namelen;
 #endif
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
-	if (rc >= 0)
-	{
-		address = SocketAddress(pSA, saLen);
-	}
-	else
+	if (rc < 0)
 	{
 		int err = lastError();
 		if (err == POCO_EAGAIN && !_blocking)

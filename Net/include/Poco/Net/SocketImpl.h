@@ -206,11 +206,11 @@ public:
 		///
 		/// Always returns zero for platforms where not implemented.
 
-	int receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** saLen, int flags = 0);
+	int receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		/// Stores the native address of the sender in
-		/// ppSA, and the length of native address in saLen.
+		/// ppSA, and the length of native address in ppSALen.
 		///
 		/// Returns the number of bytes received.
 
@@ -229,6 +229,14 @@ public:
 		/// Returns the number of bytes received.
 		///
 		/// Always returns zero for platforms where not implemented.
+
+	int receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t* pSALen, int flags);
+		/// Receives data from the socket and stores it
+		/// in buffers.
+		/// Stores the native address of the sender in
+		/// ppSA, and the length of native address in pSALen.
+		///
+		/// Returns the number of bytes received.
 
 	virtual void sendUrgent(unsigned char data);
 		/// Sends one byte of urgent data through

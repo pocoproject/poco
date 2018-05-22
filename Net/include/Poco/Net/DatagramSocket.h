@@ -147,18 +147,27 @@ public:
 		///
 		/// Returns the number of bytes received.
 
-	int receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** saLen, int flags = 0);
+	int receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		/// Stores the native address of the sender in
-		/// ppSA, and the length of native address in saLen.
+		/// ppSA, and the length of native address in ppSALen.
 		///
 		/// Returns the number of bytes received.
 
 	int receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags = 0);
 		/// Receives data from the socket and stores it
-		/// in buffers. Up to length bytes are received.
+		/// in buffers. Up to total length of all buffers
+		/// are received.
 		/// Stores the address of the sender in address.
+		///
+		/// Returns the number of bytes received.
+
+	int receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t* pSALen, int flags = 0);
+		/// Receives data from the socket and stores it
+		/// in buffers.
+		/// Stores the native address of the sender in
+		/// ppSA, and the length of native address in pSALen.
 		///
 		/// Returns the number of bytes received.
 
