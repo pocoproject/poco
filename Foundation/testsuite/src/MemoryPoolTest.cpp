@@ -16,6 +16,7 @@
 #include "Poco/Stopwatch.h"
 #include <vector>
 #include <cstring>
+#include <iostream>
 
 
 using Poco::MemoryPool;
