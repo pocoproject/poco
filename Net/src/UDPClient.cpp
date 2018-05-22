@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/UDPClient.h"
+#include "Poco/ErrorHandler.h"
 
 
 namespace Poco {
@@ -61,9 +62,17 @@ void UDPClient::run()
 				int n = _socket.receiveBytes(buffer, sizeof(buffer));
 				if (n >= sizeof(Poco::Int32)) handleResponse(buffer, n);
 			}
-			catch (Poco::Exception& exc)
+			catch (Exception& exc)
 			{
-				std::cerr << "UDPEchoServer: " << exc.displayText() << std::endl;
+				ErrorHandler::handle(exc);
+			}
+			catch (std::exception& exc)
+			{
+				ErrorHandler::handle(exc);
+			}
+			catch (...)
+			{
+				ErrorHandler::handle();
 			}
 		}
 	}
