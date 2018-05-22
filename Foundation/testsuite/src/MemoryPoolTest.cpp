@@ -14,6 +14,7 @@
 #include "Poco/MemoryPool.h"
 #include "Poco/Stopwatch.h"
 #include <vector>
+#include <cstring>
 #include <iostream>
 
 
