@@ -71,9 +71,9 @@ public:
 		_done(false),
 		_bufListSize(bufListSize),
 		_blockSize(S),
-		_pErr(pErr),
 		_dataBacklog(0),
-		_errorBacklog(0)
+		_errorBacklog(0),
+		_pErr(pErr)
 		/// Creates the UDPHandlerImpl.
 	{
 		_thread.start(*this);
