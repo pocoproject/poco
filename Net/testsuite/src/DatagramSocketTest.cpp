@@ -141,6 +141,7 @@ void DatagramSocketTest::testGatherScatterFixed()
 	testGatherScatterSTRFFixedWin();
 #elif defined(POCO_OS_FAMILY_UNIX)
 	testGatherScatterFixedUNIX();
+	testGatherScatterSTRFFixedUNIX();
 #endif
 }
 
@@ -176,6 +177,8 @@ void DatagramSocketTest::testGatherScatterFixedWin()
 	assertTrue (0 == std::memcmp(sbv[0].buf, "1234567890", 10));
 	assertTrue (0 == std::memcmp(sbv[1].buf, "abcdefghij", 10));
 	assertTrue (0 == std::memcmp(sbv[2].buf, "helloworld", 10));
+
+	Socket::destroyBufVec(sbv);
 
 	ss.close();
 #endif
@@ -217,6 +220,8 @@ void DatagramSocketTest::testGatherScatterSTRFFixedWin()
 	assertTrue (0 == std::memcmp(sbv[1].buf, "abcdefghij", 10));
 	assertTrue (0 == std::memcmp(sbv[2].buf, "helloworld", 10));
 
+	Socket::destroyBufVec(sbv);
+
 	ss.close();
 #endif
 }
@@ -254,6 +259,50 @@ void DatagramSocketTest::testGatherScatterFixedUNIX()
 	assertTrue (0 == std::memcmp(sbv[1].iov_base, "abcdefghij", 10));
 	assertTrue (0 == std::memcmp(sbv[2].iov_base, "helloworld", 10));
 
+	Socket::destroyBufVec(sbv);
+
+	ss.close();
+#endif
+}
+
+
+void DatagramSocketTest::testGatherScatterSTRFFixedUNIX()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	UDPEchoServer echoServer(SocketAddress("127.0.0.1", 0));
+	DatagramSocket ss;
+	Socket::BufVec sbv = Socket::makeBufVec(3, 10);
+	assertTrue (sbv.size() == 3);
+
+	std::memcpy(sbv[0].iov_base, "1234567890", 10);
+	std::memcpy(sbv[1].iov_base, "abcdefghij", 10);
+	std::memcpy(sbv[2].iov_base, "helloworld", 10);
+
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	int n = ss.sendTo(sbv, SocketAddress("127.0.0.1", echoServer.port()));
+	assertTrue (n == 30);
+
+	std::memset(sbv[0].iov_base, 0, 10);
+	std::memset(sbv[1].iov_base, 0, 10);
+	std::memset(sbv[2].iov_base, 0, 10);
+
+	char empty[10] = {};
+	assertTrue (0 == std::memcmp(sbv[0].iov_base, empty, 10));
+	assertTrue (0 == std::memcmp(sbv[1].iov_base, empty, 10));
+	assertTrue (0 == std::memcmp(sbv[2].iov_base, empty, 10));
+
+	SocketAddress sa;
+	n = ss.receiveFrom(sbv, sa);
+	assertTrue (sa.host() == echoServer.address().host());
+	assertTrue (sa.port() == echoServer.port());
+	assertTrue (n == 30);
+
+	assertTrue (0 == std::memcmp(sbv[0].iov_base, "1234567890", 10));
+	assertTrue (0 == std::memcmp(sbv[1].iov_base, "abcdefghij", 10));
+	assertTrue (0 == std::memcmp(sbv[2].iov_base, "helloworld", 10));
+
+	Socket::destroyBufVec(sbv);
+
 	ss.close();
 #endif
 }
@@ -266,6 +315,7 @@ void DatagramSocketTest::testGatherScatterVariable()
 	testGatherScatterSTRFVariableWin();
 #elif defined(POCO_OS_FAMILY_UNIX)
 	testGatherScatterVariableUNIX();
+	testGatherScatterSTRFVariableUNIX();
 #endif
 }
 
@@ -393,6 +443,71 @@ void DatagramSocketTest::testGatherScatterSTRFVariableWin()
 	assertTrue (0 == std::memcmp(sbvIn[0].buf, "123abcdefh", 10));
 	assertTrue (0 == std::memcmp(sbvIn[1].buf, "ellowo", 6));
 	assertTrue (0 == std::memcmp(sbvIn[2].buf, "rld", 3));
+
+	delete [] strIn[0];
+	delete [] strIn[1];
+	delete [] strIn[2];
+
+	ss.close();
+#endif
+}
+
+
+void DatagramSocketTest::testGatherScatterSTRFVariableUNIX()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	UDPEchoServer echoServer;
+	DatagramSocket ss;
+	std::vector<std::string> strOut(3);
+	strOut[0] = "123";
+	strOut[1] = "abcdef";
+	strOut[2] = "helloworld";
+	Socket::BufVec sbvOut = Socket::makeBufVec(strOut);
+	assertTrue (sbvOut.size() == 3);
+	assertTrue (sbvOut[0].iov_len == 3);
+	assertTrue (sbvOut[1].iov_len == 6);
+	assertTrue (sbvOut[2].iov_len == 10);
+	assertTrue (0 == std::memcmp(sbvOut[0].iov_base, "123", 3));
+	assertTrue (0 == std::memcmp(sbvOut[1].iov_base, "abcdef", 6));
+	assertTrue (0 == std::memcmp(sbvOut[2].iov_base, "helloworld", 10));
+
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	int n = ss.sendBytes(sbvOut);
+	assertTrue (n == 19);
+
+	std::vector<char*> strIn(3);
+	strIn[0] = new char[4];
+	strIn[1] = new char[7];
+	strIn[2] = new char[11];
+	std::memcpy(strIn[0], "321", 3); strIn[0][3] = '\0';
+	std::memcpy(strIn[1], "fedcba", 6); strIn[1][6] = '\0';
+	std::memcpy(strIn[2], "dlrowolleh", 10); strIn[2][10] = '\0';
+	Socket::BufVec sbvIn = Socket::makeBufVec(strIn);
+	assertTrue (sbvIn.size() == 3);
+	assertTrue (sbvIn[0].iov_len == 3);
+	assertTrue (sbvIn[1].iov_len == 6);
+	assertTrue (sbvIn[2].iov_len == 10);
+	assertTrue (0 == std::memcmp(sbvIn[0].iov_base, "321", 3));
+	assertTrue (0 == std::memcmp(sbvIn[1].iov_base, "fedcba", 6));
+	assertTrue (0 == std::memcmp(sbvIn[2].iov_base, "dlrowolleh", 10));
+
+	n = ss.receiveBytes(sbvIn);
+	assertTrue (n == 19);
+
+	assertTrue (0 == std::memcmp(sbvIn[0].iov_base, "123", 3));
+	assertTrue (0 == std::memcmp(sbvIn[1].iov_base, "abcdef", 6));
+	assertTrue (0 == std::memcmp(sbvIn[2].iov_base, "helloworld", 10));
+
+	n = ss.sendBytes(sbvOut);
+	assertTrue (n == 19);
+
+	std::reverse(sbvIn.begin(), sbvIn.end());
+	n = ss.receiveBytes(sbvIn);
+	assertTrue (n == 19);
+
+	assertTrue (0 == std::memcmp(sbvIn[0].iov_base, "123abcdefh", 10));
+	assertTrue (0 == std::memcmp(sbvIn[1].iov_base, "ellowo", 6));
+	assertTrue (0 == std::memcmp(sbvIn[2].iov_base, "rld", 3));
 
 	delete [] strIn[0];
 	delete [] strIn[1];

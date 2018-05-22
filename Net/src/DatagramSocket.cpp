@@ -141,4 +141,10 @@ int DatagramSocket::receiveFrom(SocketBufVec& buffers, SocketAddress& address, i
 }
 
 
+int DatagramSocket::receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t* pSALen, int flags)
+{
+	return impl()->receiveFrom(buffers, ppSA, pSALen, flags);
+}
+
+
 } } // namespace Poco::Net
