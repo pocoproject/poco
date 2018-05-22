@@ -101,7 +101,7 @@ public:
 		/// for replying to sender and data or error backlog threshold is
 		/// exceeded, sender is notified of the current backlog size.
 	{
-		typedef UDPHandlerImpl<S>::MsgSizeT RT;
+		typedef typename UDPHandlerImpl<S>::MsgSizeT RT;
 		char* p = 0;
 		struct sockaddr* pSA = 0;
 		poco_socklen_t* pAL = 0;
@@ -123,7 +123,8 @@ public:
 					AtomicCounter::ValueType errors = setError(sock.impl()->sockfd(), p, Error::getMessage(Error::last()));
 					if (_notifySender && errors > _backlogThreshold && errors != _errorBacklog[sockfd])
 					{
-						sock.sendTo(&static_cast<Poco::Int32>(errors), sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
+						Poco::Int32 err = static_cast<Poco::Int32>(errors);
+						sock.sendTo(&err, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 						_errorBacklog[sockfd] = errors;
 					}
 					return;
@@ -132,7 +133,8 @@ public:
 				p[off + ret] = 0; // for ascii convenience, zero-terminate
 				if (_notifySender && data > _backlogThreshold && data != _dataBacklog[sockfd])
 				{
-					sock.sendTo(&static_cast<Poco::Int32>(data), sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
+					Poco::Int32 d = static_cast<Poco::Int32>(data);
+					sock.sendTo(&d, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 					_dataBacklog[sockfd] = data;
 				}
 			}
@@ -143,7 +145,8 @@ public:
 			AtomicCounter::ValueType errors = setError(sock.impl()->sockfd(), p, exc.displayText());
 			if (_notifySender && errors > _backlogThreshold && errors != _errorBacklog[sockfd] && pSA && pAL)
 			{
-				sock.sendTo(&static_cast<Poco::Int32>(errors), sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
+				Poco::Int32 err = static_cast<Poco::Int32>(errors);
+				sock.sendTo(&err, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 				_errorBacklog[sockfd] = errors;
 			}
 		}

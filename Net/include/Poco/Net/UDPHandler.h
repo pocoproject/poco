@@ -26,6 +26,7 @@
 #include "Poco/MemoryPool.h"
 #include "Poco/Event.h"
 #include "Poco/Error.h"
+#include "Poco/Mutex.h"
 #include "Poco/StringTokenizer.h"
 #include <deque>
 
