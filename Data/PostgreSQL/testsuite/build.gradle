@@ -27,13 +27,15 @@ model {
 					exportedHeaders {
 						srcDir 'src'
 					}
-					lib project: ':CppUnit', library: 'CppUnit'
-					lib project: ':Data:PostgreSQL', library: 'DataPostgreSQL'
 					lib project: ':Data:PostgreSQL', library: 'postgres'
+					lib project: ':Data:PostgreSQL', library: 'DataPostgreSQL'
 					lib project: ':Data:PostgreSQL', library: 'intl'
 					lib project: ':Data:PostgreSQL', library: 'iconv'
 					lib project: ':Data', library: 'Data'
 					lib project: ':Foundation', library: 'Foundation'
+					lib project: ':CppUnit', library: 'CppUnit'
+					lib library: 'ssl'
+					lib library: 'crypto'
 				}
 			}
 		}
@@ -59,6 +61,9 @@ model {
 				}
 			}
 			if (toolChain in Gcc) {
+                linker.args ( "-l", "z")
+                linker.args ( "-l", "pthread")
+                linker.args ( "-l", "dl")
 			}
         }
 	}

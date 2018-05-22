@@ -955,21 +955,24 @@ ext.commonNuspecMetadata = [
 	copyright: 		'Applied Informatics copyright 2018',
 	requireLicenseAcceptance: false,
 	description:	'Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.',
-	tags:			'string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml'
+	tags:			'natif string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml',
+	copyright:		'Copyright 2018',
+	releaseNotes:	'releaseNotes'
 ]
 task 'nugetSpec-x86'(type: NuGetSpec) {
 	nuspec = [
 		metadata: commonNuspecMetadata + [
 			id:          	"Pocoproject.Poco.vs150.x86",
 			title:          "Pocoproject Poco vs150 $version x86",
-			dependencies: [
-			]
+			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x86", version: "1.1.0") } ]
 		],
 		files: [
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x86.targets", 				target: "build\\native") },
 			{ file(src: "$rootDir\\bin\\Poco*.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\lib\\Poco*.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\bin\\Poco*d.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\lib\\Poco*d.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\CppUnit\\include\\**",		target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
@@ -996,14 +999,15 @@ task 'nugetSpec-x64'(type: NuGetSpec) {
 		metadata: commonNuspecMetadata + [
 			id:          	"Pocoproject.Poco.vs150.x64",
 			title:          "Pocoproject Poco vs150 $version x64",
-			dependencies: [
-			]
+			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x64", version: "1.1.0") } ]
 		],
 		files: [
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x64.targets", 				target: "build\\native") },
 			{ file(src: "$rootDir\\bin64\\Poco*64.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\lib64\\Poco*.*",				target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\bin64\\Poco*64d.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\lib64\\Poco*d.*",			target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\CppUnit\\include\\**",		target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
 			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },

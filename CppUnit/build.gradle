@@ -16,11 +16,15 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
+					lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}
 	}
 	binaries {
+		all {
+			cppCompiler.define "POCO_NO_AUTOMATIC_LIBS"
+		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
 				 cppCompiler.define "CppUnit_EXPORTS"

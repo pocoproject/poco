@@ -69,6 +69,8 @@ protected:
 
 	void setUp()
 	{
+		if (!setup().empty())
+			_fixture.get()->addSetup(setup());
 		_fixture.get()->setUp();
 	}
 
