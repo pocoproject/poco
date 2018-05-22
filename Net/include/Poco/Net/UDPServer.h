@@ -34,7 +34,7 @@ namespace Net {
 
 
 template <std::size_t S = POCO_UDP_BUF_SIZE,
-		typename P = SingleSocketPoller<M, S> >
+		typename P = SingleSocketPoller<S> >
 class UDPServerImpl: public Poco::Runnable
 	/// UDP server, runs in its own thread and owns a poller, to which
 	/// data arrival and discovery is delegated. See SingleSocketPoller and

@@ -139,7 +139,7 @@ void DatagramSocketTest::testGatherScatterFixed()
 	testGatherScatterFixedWin();
 	testGatherScatterSTRFFixedWin();
 #elif defined(POCO_OS_FAMILY_UNIX)
-	testGatherScatterFixedUnix()
+	testGatherScatterFixedUNIX();
 #endif
 }
 
@@ -264,7 +264,7 @@ void DatagramSocketTest::testGatherScatterVariable()
 	testGatherScatterVariableWin();
 	testGatherScatterSTRFVariableWin();
 #elif defined(POCO_OS_FAMILY_UNIX)
-	testGatherScatterVariableUnix()
+	testGatherScatterVariableUNIX();
 #endif
 }
 

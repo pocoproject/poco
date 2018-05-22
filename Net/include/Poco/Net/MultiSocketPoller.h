@@ -85,7 +85,8 @@ public:
 		{
 			if (it->second & PollSet::POLL_READ)
 			{
-				_reader.read(DatagramSocket(it->first));
+				DatagramSocket ds(it->first);
+				_reader.read(ds);
 			}
 			else if (it->second & PollSet::POLL_ERROR)
 			{

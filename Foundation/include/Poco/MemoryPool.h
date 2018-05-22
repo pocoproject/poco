@@ -363,8 +363,8 @@ private:
 
 	void clear()
 	{
-		BucketVec::iterator it = _buckets.begin();
-		BucketVec::iterator end = _buckets.end();
+		typename BucketVec::iterator it = _buckets.begin();
+		typename BucketVec::iterator end = _buckets.end();
 		for (; it != end; ++it) delete[] *it;
 	}
 

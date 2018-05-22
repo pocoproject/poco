@@ -359,7 +359,7 @@ namespace Net {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	typedef WSABUF SocketBuf;
 #elif defined(POCO_OS_FAMILY_UNIX) // TODO: may need more refinement
-	typedef iovec SocketBufVec;
+	typedef iovec SocketBuf;
 #endif
 
 typedef std::vector<SocketBuf> SocketBufVec;
