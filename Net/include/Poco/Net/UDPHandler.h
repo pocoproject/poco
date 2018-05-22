@@ -29,6 +29,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/StringTokenizer.h"
 #include <deque>
+#include <cstring>
 
 
 namespace Poco {
