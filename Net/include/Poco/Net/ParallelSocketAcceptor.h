@@ -53,7 +53,8 @@ class ParallelSocketAcceptor
 	/// details.
 {
 public:
-	typedef Poco::Net::ParallelSocketReactor<SR> ParallelReactor;
+	typedef Poco::Net::ParallelSocketReactor<SR>                         ParallelReactor;
+	typedef Poco::Observer<ParallelSocketAcceptor, ReadableNotification> Observer;
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
 		unsigned threads = Poco::Environment::processorCount()):
@@ -79,9 +80,7 @@ public:
 		/// with the given SocketReactor.
 	{
 		init();
-		_pReactor->addEventHandler(_socket,
-			Poco::Observer<ParallelSocketAcceptor,
-			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept));
+		_pReactor->addEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept));
 	}
 
 	virtual ~ParallelSocketAcceptor()
@@ -91,9 +90,7 @@ public:
 		{
 			if (_pReactor)
 			{
-				_pReactor->removeEventHandler(_socket,
-					Poco::Observer<ParallelSocketAcceptor,
-					ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept));
+				_pReactor->removeEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept));
 			}
 		}
 		catch (...)
@@ -105,15 +102,9 @@ public:
 	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
 	{
-		_pReactor = &reactor;
-		if (!_pReactor->hasEventHandler(_socket,
-			Poco::Observer<ParallelSocketAcceptor,
-			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept)))
-		{
-			registerAcceptor(reactor);
-		}
+		registerAcceptor(reactor);
 	}
-	
+
 	virtual void registerAcceptor(SocketReactor& reactor)
 		/// Registers the ParallelSocketAcceptor with a SocketReactor.
 		///
@@ -123,13 +114,11 @@ public:
 		/// The overriding method must either call the base class
 		/// implementation or register the accept handler on its own.
 	{
-		if (_pReactor)
-			throw Poco::InvalidAccessException("Acceptor already registered.");
-
 		_pReactor = &reactor;
-		_pReactor->addEventHandler(_socket,
-			Poco::Observer<ParallelSocketAcceptor,
-			ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept));
+		if (!_pReactor->hasEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept)))
+		{
+			_pReactor->addEventHandler(_socket,Observer(*this, &ParallelSocketAcceptor::onAccept));
+		}
 	}
 	
 	virtual void unregisterAcceptor()
@@ -143,9 +132,7 @@ public:
 	{
 		if (_pReactor)
 		{
-			_pReactor->removeEventHandler(_socket,
-				Poco::Observer<ParallelSocketAcceptor,
-				ReadableNotification>(*this, &ParallelSocketAcceptor::onAccept));
+			_pReactor->removeEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept));
 		}
 	}
 	
