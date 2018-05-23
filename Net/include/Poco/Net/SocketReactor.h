@@ -209,8 +209,8 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
 	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
-	typedef Poco::FastMutex MutexType;
-	typedef MutexType::ScopedLock ScopedLock;
+	typedef Poco::Mutex                       MutexType;
+	typedef MutexType::ScopedLock             ScopedLock;
 
 	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);

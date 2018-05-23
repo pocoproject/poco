@@ -434,7 +434,6 @@ void SocketReactorTest::testParallelSocketReactor()
 	ClientServiceHandler::setOnce(false);
 	ClientServiceHandler::resetData();
 	reactor.run();
-	//acceptor.run();
 	std::string data(ClientServiceHandler::data());
 	assertTrue (data.size() == 8192);
 	assertTrue (!ClientServiceHandler::readableError());

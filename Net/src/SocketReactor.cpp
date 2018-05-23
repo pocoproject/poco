@@ -160,18 +160,18 @@ void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractOb
 	NotifierPtr pNotifier;
 	{
 		ScopedLock lock(_mutex);
-		
+
 		EventHandlerMap::iterator it = _handlers.find(socket);
-		if (it == _handlers.end())
+		if(it == _handlers.end())
 		{
 			pNotifier = new SocketNotifier(socket);
 			_handlers[socket] = pNotifier;
 		}
 		else pNotifier = it->second;
-
-		if (!pNotifier->hasObserver(observer))
-			pNotifier->addObserver(this, observer);
 	}
+
+	if (!pNotifier->hasObserver(observer))
+		pNotifier->addObserver(this, observer);
 
 	int mode = 0;
 	if (pNotifier->accepts(_pReadableNotification)) mode |= PollSet::POLL_READ;
@@ -186,7 +186,7 @@ bool SocketReactor::hasEventHandler(const Socket& socket, const Poco::AbstractOb
 	NotifierPtr pNotifier;
 	{
 		ScopedLock lock(_mutex);
-	
+
 		EventHandlerMap::iterator it = _handlers.find(socket);
 		if (it != _handlers.end())
 		{
@@ -204,7 +204,7 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 	NotifierPtr pNotifier;
 	{
 		ScopedLock lock(_mutex);
-	
+
 		EventHandlerMap::iterator it = _handlers.find(socket);
 		if (it != _handlers.end())
 		{
