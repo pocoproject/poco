@@ -26,12 +26,12 @@ SocketNotifier::SocketNotifier(const Socket& socket):
 {
 }
 
-	
+
 SocketNotifier::~SocketNotifier()
 {
 }
 
-	
+
 void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)
 {
 	_nc.addObserver(observer);
@@ -45,7 +45,7 @@ void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractOb
 		_events.insert(pReactor->_pTimeoutNotification.get());
 }
 
-	
+
 void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)
 {
 	_nc.removeObserver(observer);
