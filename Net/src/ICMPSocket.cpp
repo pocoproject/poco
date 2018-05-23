@@ -109,6 +109,8 @@ Poco::UInt16 ICMPSocket::mtu(const SocketAddress& address, Poco::UInt16 sz)
 
 #ifdef IP_DONTFRAGMENT
 		icmpSocket.setOption(IPPROTO_IP, IP_DONTFRAGMENT, 1);
+#elif defined(IP_MTU_DISCOVER)
+		icmpSocket.setOption(IPPROTO_IP, IP_MTU_DISCOVER, 1);
 #elif defined(IP_DONTFRAG)
 		icmpSocket.setOption(IPPROTO_IP, IP_DONTFRAG, 1);
 #else
