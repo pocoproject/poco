@@ -209,30 +209,35 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
 	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
-	typedef Poco::Mutex                       MutexType;
+	typedef Poco::FastMutex                   MutexType;
 	typedef MutexType::ScopedLock             ScopedLock;
 
 	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
+	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	enum
 	{
 		DEFAULT_TIMEOUT = 250000
 	};
 
-	bool            _stop;
-	Poco::Timespan  _timeout;
-	EventHandlerMap _handlers;
-	PollSet         _pollSet;
-	NotificationPtr _pReadableNotification;
-	NotificationPtr _pWritableNotification;
-	NotificationPtr _pErrorNotification;
-	NotificationPtr _pTimeoutNotification;
-	NotificationPtr _pIdleNotification;
-	NotificationPtr _pShutdownNotification;
-	MutexType       _mutex;
-	Poco::Thread*   _pThread;
-	
+#ifdef POCO_ENABLE_CPP11
+	std::atomic<bool> _stop;
+#else
+	bool              _stop;
+#endif
+	Poco::Timespan    _timeout;
+	EventHandlerMap   _handlers;
+	PollSet           _pollSet;
+	NotificationPtr   _pReadableNotification;
+	NotificationPtr   _pWritableNotification;
+	NotificationPtr   _pErrorNotification;
+	NotificationPtr   _pTimeoutNotification;
+	NotificationPtr   _pIdleNotification;
+	NotificationPtr   _pShutdownNotification;
+	MutexType         _mutex;
+	Poco::Thread*     _pThread;
+
 	friend class SocketNotifier;
 };
 

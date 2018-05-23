@@ -119,10 +119,9 @@ void SocketReactor::run()
 
 bool SocketReactor::hasSocketHandlers()
 {
-	ScopedLock lock(_mutex);
-
 	if (!_pollSet.empty())
 	{
+		ScopedLock lock(_mutex);
 		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
 		{
 			if (it->second->accepts(_pReadableNotification) ||
@@ -161,21 +160,9 @@ const Poco::Timespan& SocketReactor::getTimeout() const
 
 void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	NotifierPtr pNotifier;
-	{
-		ScopedLock lock(_mutex);
+	NotifierPtr pNotifier = getNotifier(socket, true);
 
-		EventHandlerMap::iterator it = _handlers.find(socket);
-		if(it == _handlers.end())
-		{
-			pNotifier = new SocketNotifier(socket);
-			_handlers[socket] = pNotifier;
-		}
-		else pNotifier = it->second;
-	}
-
-	if (!pNotifier->hasObserver(observer))
-		pNotifier->addObserver(this, observer);
+	if (!pNotifier->hasObserver(observer)) pNotifier->addObserver(this, observer);
 
 	int mode = 0;
 	if (pNotifier->accepts(_pReadableNotification)) mode |= PollSet::POLL_READ;
@@ -187,43 +174,39 @@ void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractOb
 
 bool SocketReactor::hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	NotifierPtr pNotifier;
-	{
-		ScopedLock lock(_mutex);
-
-		EventHandlerMap::iterator it = _handlers.find(socket);
-		if (it != _handlers.end())
-		{
-			if (it->second->hasObserver(observer))
-				return true;
-		}
-	}
-
+	NotifierPtr pNotifier = getNotifier(socket);
+	if (!pNotifier) return false;
+	if (pNotifier->hasObserver(observer)) return true;
 	return false;
+}
+
+
+SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool makeNew)
+{
+	ScopedLock lock(_mutex);
+
+	EventHandlerMap::iterator it = _handlers.find(socket);
+	if (it != _handlers.end()) return it->second;
+	else if (makeNew) return (_handlers[socket] = new SocketNotifier(socket));
+
+	return 0;
 }
 
 
 void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	NotifierPtr pNotifier;
+	NotifierPtr pNotifier = getNotifier(socket);
+	if (pNotifier && pNotifier->hasObserver(observer))
 	{
-		ScopedLock lock(_mutex);
-
-		EventHandlerMap::iterator it = _handlers.find(socket);
-		if (it != _handlers.end())
+		if(pNotifier->countObservers() == 1)
 		{
-			pNotifier = it->second;
-			if (pNotifier->hasObserver(observer) && pNotifier->countObservers() == 1)
 			{
-				_handlers.erase(it);
-				_pollSet.remove(socket);
+				ScopedLock lock(_mutex);
+				_handlers.erase(socket);
 			}
+			_pollSet.remove(socket);
 		}
-
-		if (pNotifier && pNotifier->hasObserver(observer))
-		{
-			pNotifier->removeObserver(this, observer);
-		}
+		pNotifier->removeObserver(this, observer);
 	}
 }
 
@@ -259,15 +242,8 @@ void SocketReactor::onBusy()
 
 void SocketReactor::dispatch(const Socket& socket, SocketNotification* pNotification)
 {
-	NotifierPtr pNotifier;
-	{
-		ScopedLock lock(_mutex);
-		EventHandlerMap::iterator it = _handlers.find(socket);
-		if (it != _handlers.end())
-			pNotifier = it->second;
-		else
-			return;
-	}
+	NotifierPtr pNotifier = getNotifier(socket);
+	if (!pNotifier) return;
 	dispatch(pNotifier, pNotification);
 }
 
@@ -275,9 +251,9 @@ void SocketReactor::dispatch(const Socket& socket, SocketNotification* pNotifica
 void SocketReactor::dispatch(SocketNotification* pNotification)
 {
 	std::vector<NotifierPtr> delegates;
-	delegates.reserve(_handlers.size());
 	{
 		ScopedLock lock(_mutex);
+		delegates.reserve(_handlers.size());
 		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
 			delegates.push_back(it->second);
 	}

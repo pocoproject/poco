@@ -117,7 +117,7 @@ public:
 		_pReactor = &reactor;
 		if (!_pReactor->hasEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept)))
 		{
-			_pReactor->addEventHandler(_socket,Observer(*this, &ParallelSocketAcceptor::onAccept));
+			_pReactor->addEventHandler(_socket, Observer(*this, &ParallelSocketAcceptor::onAccept));
 		}
 	}
 	

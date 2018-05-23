@@ -456,11 +456,11 @@ private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
 
-	poco_socket_t _sockfd;
+	poco_socket_t  _sockfd;
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
-	bool          _blocking;
-	bool          _isBrokenTimeout;
+	bool           _blocking;
+	bool           _isBrokenTimeout;
 
 	friend class Socket;
 	friend class SecureSocketImpl;
