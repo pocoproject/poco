@@ -83,18 +83,18 @@ void ICMPSocketTest::testMTU()
 {
 	Poco::UInt16 sz = ICMPPacketImpl::MAX_PAYLOAD_SIZE + 1;
 	SocketAddress addr("127.0.0.1:0");
-	Poco::UInt16 mtu = 0;
-	mtu = ICMPSocket::mtu(addr, sz);
+	Poco::UInt16 mtu = ICMPSocket::mtu(addr, sz);
+	std::cout << addr.toString() << " : MTU=" << mtu << std::endl;
 	assertTrue (mtu != 0 && mtu <= ICMPPacketImpl::MAX_PAYLOAD_SIZE);
 	sz = ICMPPacketImpl::MAX_PAYLOAD_SIZE;
 	mtu = ICMPSocket::mtu(addr, sz);
-	assertTrue (mtu != 0);
 	std::cout << addr.toString() << " : MTU=" << mtu << std::endl;
+	assertTrue (mtu != 0);
 	sz = 1500;
 	addr = SocketAddress("www.appinf.com:0");
 	mtu = ICMPSocket::mtu(addr, sz);
-	assertTrue (mtu != 0 && mtu <= sz);
 	std::cout << addr.toString() << " : MTU=" << mtu << std::endl;
+	assertTrue (mtu != 0 && mtu <= sz);
 }
 
 
