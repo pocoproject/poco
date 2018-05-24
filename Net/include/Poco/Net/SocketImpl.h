@@ -230,11 +230,11 @@ public:
 		///
 		/// Always returns zero for platforms where not implemented.
 
-	int receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t* pSALen, int flags);
+	int receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags);
 		/// Receives data from the socket and stores it
 		/// in buffers.
 		/// Stores the native address of the sender in
-		/// ppSA, and the length of native address in pSALen.
+		/// ppSA, and the length of native address in ppSALen.
 		///
 		/// Returns the number of bytes received.
 
