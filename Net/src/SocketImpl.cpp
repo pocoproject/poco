@@ -514,7 +514,8 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int f
 	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
-	int rc = receiveFrom(buffers, &pSA, &saLen, flags);
+	poco_socklen_t* pSALen = &saLen;
+	int rc = receiveFrom(buffers, &pSA, &pSALen, flags);
 	if(rc >= 0)
 	{
 		address = SocketAddress(pSA, saLen);
@@ -523,7 +524,7 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int f
 }
 
 
-int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_socklen_t* pSALen, int flags)
+int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_socklen_t** ppSALen, int flags)
 {
 	checkBrokenTimeout();
 	int rc = 0;
@@ -534,20 +535,20 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_s
 		DWORD recvd = 0;
 		DWORD dwFlags = static_cast<DWORD>(flags);
 		rc = WSARecvFrom(_sockfd, &buffers[0], static_cast<DWORD>(buffers.size()),
-						&recvd, &dwFlags, pSA, &saLen, 0, 0);
+						&recvd, &dwFlags, *pSA, *ppSALen, 0, 0);
 		if (rc == SOCKET_ERROR) error();
 		rc = recvd;
 #elif defined(POCO_OS_FAMILY_UNIX)
 		struct msghdr msgHdr;
 		msgHdr.msg_name = *pSA;
-		msgHdr.msg_namelen = *pSALen;
+		msgHdr.msg_namelen = **ppSALen;
 		msgHdr.msg_iov = &buffers[0];
 		msgHdr.msg_iovlen = buffers.size();
 		msgHdr.msg_control = 0;
 		msgHdr.msg_controllen = 0;
 		msgHdr.msg_flags = flags;
 		rc = recvmsg(_sockfd, &msgHdr, flags);
-		if (rc >= 0) *pSALen = msgHdr.msg_namelen;
+		if (rc >= 0) **ppSALen = msgHdr.msg_namelen;
 #endif
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);

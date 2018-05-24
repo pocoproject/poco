@@ -141,9 +141,9 @@ int DatagramSocket::receiveFrom(SocketBufVec& buffers, SocketAddress& address, i
 }
 
 
-int DatagramSocket::receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t* pSALen, int flags)
+int DatagramSocket::receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags)
 {
-	return impl()->receiveFrom(buffers, ppSA, pSALen, flags);
+	return impl()->receiveFrom(buffers, ppSA, ppSALen, flags);
 }
 
 
