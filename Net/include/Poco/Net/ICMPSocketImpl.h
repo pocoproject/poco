@@ -64,6 +64,8 @@ protected:
 	~ICMPSocketImpl();
 
 private:
+	void checkFragmentation(const std::string& err, int type, int code);
+
 	ICMPPacket _icmpPacket;
 	int _ttl;
 	int _timeout;

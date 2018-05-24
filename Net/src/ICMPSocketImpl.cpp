@@ -52,16 +52,27 @@ int ICMPSocketImpl::sendTo(const void*, int, const SocketAddress& address, int f
 }
 
 
+void ICMPSocketImpl::checkFragmentation(const std::string& err, int type, int code)
+{
+	if (type == ICMPv4PacketImpl::DESTINATION_UNREACHABLE &&
+		code == ICMPv4PacketImpl::FRAGMENTATION_NEEDED_AND_DF_SET)
+	{
+		throw ICMPFragmentationException(err);
+	}
+}
+
+
 int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 {
 	int maxPacketSize = _icmpPacket.maxPacketSize();
 	Poco::Buffer<unsigned char> buffer(maxPacketSize);
+	int expected = _icmpPacket.packetSize();
+	int type = 0, code = 0;
 
 	try
 	{
 		Poco::Timestamp ts;
 		int rc;
-		int expected = _icmpPacket.packetSize();
 		do
 		{
 			// guard against a DoS attack
@@ -76,20 +87,15 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 				if (expected == 0)
 				{
 					if (_icmpPacket.validReplyID(buffer.begin(), maxPacketSize)) break;
-					int type = 0, code = 0;
 					std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
+					if (address.family() == IPAddress::IPv4) checkFragmentation(err, type, code);
 					if (!err.empty()) throw ICMPException(err);
 					throw ICMPException("Invalid ICMP reply");
 				}
 			}
-			else
-			{
-				throw ICMPException(Poco::format("Reply from an unknown IP address "
-												 "(requested %s, received %s).",
-												 address.host().toString(), respAddr.host().toString()));
-			}
+			else continue;
 		}
-		while (expected && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
+		while (expected > 0 && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
 	}
 	catch (ICMPException&)
 	{
@@ -97,20 +103,16 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 	}
 	catch (Exception&)
 	{
-		int type = 0, code = 0;
 		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
-		if (!err.empty())
-		{
-			if (address.family() == IPAddress::IPv4 &&
-				type == ICMPv4PacketImpl::DESTINATION_UNREACHABLE &&
-				code == ICMPv4PacketImpl::FRAGMENTATION_NEEDED_AND_DF_SET)
-			{
-				throw ICMPFragmentationException(err);
-			}
-			else throw ICMPException(err);
-		}
-		else
-			throw;
+		if (address.family() == IPAddress::IPv4) checkFragmentation(err, type, code);
+		if (!err.empty()) throw ICMPException(err);
+		else throw;
+	}
+
+	if (expected > 0)
+	{
+		throw ICMPException(Poco::format("No response: expected %d, received: %d", _icmpPacket.packetSize(),
+				_icmpPacket.packetSize() - expected));
 	}
 
 	struct timeval then = _icmpPacket.time(buffer.begin(), maxPacketSize);
