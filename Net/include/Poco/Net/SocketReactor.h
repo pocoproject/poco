@@ -26,6 +26,9 @@
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
 #include <map>
+#ifdef POCO_ENABLE_CPP11
+#include <atomic>
+#endif
 
 
 namespace Poco {
