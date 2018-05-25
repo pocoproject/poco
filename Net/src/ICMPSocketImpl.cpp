@@ -76,7 +76,8 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 				if (expected == 0)
 				{
 					if (_icmpPacket.validReplyID(buffer.begin(), maxPacketSize)) break;
-					std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize);
+					int type = 0, code = 0;
+					std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
 					if (!err.empty()) throw ICMPException(err);
 					throw ICMPException("Invalid ICMP reply");
 				}
