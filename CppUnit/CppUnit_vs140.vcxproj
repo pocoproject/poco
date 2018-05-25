@@ -30,6 +30,7 @@
     <ProjectName>CppUnit</ProjectName>
     <ProjectGuid>{138BB448-808A-4FE5-A66D-78D1F8770F59}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="Configuration">
@@ -106,12 +107,12 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">obj\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">obj\$(Configuration)\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">CppUnitd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">CppUnit</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">CppUnitmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">CppUnitmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">CppUnitmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">CppUnitmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoCppUnitd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoCppUnit</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoCppUnitmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoCppUnitmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoCppUnitmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoCppUnitmt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <Midl>
@@ -154,12 +155,12 @@
     </ResourceCompile>
     <Link>
       <ShowProgress>NotSet</ShowProgress>
-      <OutputFile>..\bin\CppUnitd.dll</OutputFile>
+      <OutputFile>..\bin\PocoCppUnitd.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>..\bin\CppUnitd.pdb</ProgramDatabaseFile>
-      <ImportLibrary>..\lib\CppUnitd.lib</ImportLibrary>
+      <ProgramDatabaseFile>..\bin\PocoCppUnitd.pdb</ProgramDatabaseFile>
+      <ImportLibrary>..\lib\Poco</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -202,12 +203,12 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\bin\CppUnit.dll</OutputFile>
+      <OutputFile>..\bin\PocoCppUnit.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <ImportLibrary>..\lib\CppUnit.lib</ImportLibrary>
+      <ImportLibrary>..\lib\PocoCppUnit.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -251,7 +252,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\CppUnitmdd.lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -293,7 +294,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\CppUnitmd.lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
@@ -336,7 +337,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\CppUnitmtd.lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -378,7 +379,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\CppUnitmt.lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

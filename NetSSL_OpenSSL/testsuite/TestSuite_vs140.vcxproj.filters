@@ -52,6 +52,9 @@
     <Filter Include="HTTPSClient\Source Files">
       <UniqueIdentifier>{96fabf4a-c96c-481b-b649-59dbff864609}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WebSocket">
+      <UniqueIdentifier>{42029b7f-9712-41cb-8b9c-317f64705526}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\HTTPSTestServer.h">
@@ -112,6 +115,12 @@
     </ClCompile>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp">
       <Filter>HTTPSClient\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTest.cpp">
+      <Filter>WebSocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WebSocketTestSuite.cpp">
+      <Filter>WebSocket</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

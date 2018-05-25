@@ -159,7 +159,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>..\bin64\CppUnit64d.pdb</ProgramDatabaseFile>
-      <ImportLibrary>..\lib64\CppUnitd.lib</ImportLibrary>
+      <ImportLibrary>..\lib64\</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
