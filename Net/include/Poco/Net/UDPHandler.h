@@ -219,14 +219,14 @@ public:
 		setStatus(pBuf, BUF_STATUS_IDLE);
 	}
 
-	AtomicCounter::ValueType setData(char*& pBuf, MsgSizeT sz)
+	Poco::Int32 setData(char*& pBuf, MsgSizeT sz)
 		/// Flags the buffer as containing data.
 	{
 		setStatus(pBuf, sz);
 		return ++_dataBacklog;
 	}
 
-	AtomicCounter::ValueType setError(char*& pBuf, const std::string& err)
+	Poco::Int32 setError(char*& pBuf, const std::string& err)
 		/// Sets the error into the buffer.
 	{
 		std::size_t availLen = S - sizeof(MsgSizeT);
@@ -335,6 +335,7 @@ private:
 	typedef typename BufList::iterator       BLIt;
 	typedef std::map<poco_socket_t, BLIt>    BufIt;
 	typedef Poco::FastMemoryPool<char[S]>    MemPool;
+	typedef std::atomic<Poco::Int32>         Counter;
 
 	void setStatusImpl(char*& pBuf, MsgSizeT status)
 	{
@@ -364,8 +365,8 @@ private:
 	std::size_t       _bufListSize;
 	const std::size_t _blockSize;
 	MemPool           _memPool;
-	AtomicCounter     _dataBacklog;
-	AtomicCounter     _errorBacklog;
+	Counter           _dataBacklog;
+	Counter           _errorBacklog;
 	Poco::FastMutex   _mutex;
 	DFMutex           _dfMutex;
 	std::ostream*     _pErr;

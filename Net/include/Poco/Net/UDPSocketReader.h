@@ -36,39 +36,6 @@ class UDPSocketReader
 	/// Depending on settings, data senders may be notified of the handler's
 	/// data and error backlogs.
 {
-private:
-	class Counter
-	{
-	public:
-		Counter(): val(0)
-		{
-		}
-
-		operator AtomicCounter::ValueType ()
-		{
-			return static_cast<AtomicCounter::ValueType>(val);
-		}
-
-		Counter& operator=(AtomicCounter::ValueType value)
-		{
-			val = static_cast<Poco::Int32>(value);
-			return *this;
-		}
-
-		Poco::Int32 operator++()
-		{
-			return ++val;
-		}
-
-		Counter& operator++(int)
-		{
-			return val++;
-		}
-
-	private:
-		Poco::Int32 val;
-	};
-
 public:
 	UDPSocketReader(typename UDPHandlerImpl<S>::List& handlers, bool notifySender = false, int backlogThreshold = 10):
 		_handlers(handlers),
@@ -120,21 +87,19 @@ public:
 				++_msgCount[SocketAddress(pSA, *pAL)];
 				if (ret < 0)
 				{
-					AtomicCounter::ValueType errors = setError(sock.impl()->sockfd(), p, Error::getMessage(Error::last()));
+					Poco::Int32 errors = setError(sock.impl()->sockfd(), p, Error::getMessage(Error::last()));
 					if (_notifySender && errors > _backlogThreshold && errors != _errorBacklog[sockfd])
 					{
-						Poco::Int32 err = static_cast<Poco::Int32>(errors);
-						sock.sendTo(&err, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
+						sock.sendTo(&errors, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 						_errorBacklog[sockfd] = errors;
 					}
 					return;
 				}
-				AtomicCounter::ValueType data = handler().setData(p, ret);
+				Poco::Int32 data = handler().setData(p, ret);
 				p[off + ret] = 0; // for ascii convenience, zero-terminate
 				if (_notifySender && data > _backlogThreshold && data != _dataBacklog[sockfd])
 				{
-					Poco::Int32 d = static_cast<Poco::Int32>(data);
-					sock.sendTo(&d, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
+					sock.sendTo(&data, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 					_dataBacklog[sockfd] = data;
 				}
 			}
@@ -142,11 +107,10 @@ public:
 		}
 		catch (Poco::Exception& exc)
 		{
-			AtomicCounter::ValueType errors = setError(sock.impl()->sockfd(), p, exc.displayText());
+			Poco::Int32 errors = setError(sock.impl()->sockfd(), p, exc.displayText());
 			if (_notifySender && errors > _backlogThreshold && errors != _errorBacklog[sockfd] && pSA && pAL)
 			{
-				Poco::Int32 err = static_cast<Poco::Int32>(errors);
-				sock.sendTo(&err, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
+				sock.sendTo(&errors, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 				_errorBacklog[sockfd] = errors;
 			}
 		}
@@ -181,7 +145,7 @@ public:
 		return done;
 	}
 
-	AtomicCounter::ValueType setError(poco_socket_t sock, char* buf = 0, const std::string& err = "")
+	Poco::Int32 setError(poco_socket_t sock, char* buf = 0, const std::string& err = "")
 		/// Sets error to the provided buffer buf. If the buffer is null, a new buffer is obtained
 		/// from handler.
 		/// If successful, returns the handler's eror backlog size, otherwise returns zero.
@@ -209,8 +173,8 @@ private:
 
 	typedef typename UDPHandlerImpl<S>::List           HandlerList;
 	typedef typename UDPHandlerImpl<S>::List::iterator HandlerIterator;
-	typedef std::map<poco_socket_t, Counter>           CounterMap;
-	typedef std::map<SocketAddress, Counter>           MsgCounterMap;
+	typedef std::map<poco_socket_t, Poco::Int32>       CounterMap;
+	typedef std::map<SocketAddress, Poco::Int32>       MsgCounterMap;
 
 	HandlerList&    _handlers;
 	HandlerIterator _handler;

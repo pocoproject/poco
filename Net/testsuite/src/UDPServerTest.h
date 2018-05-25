@@ -15,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "CppUnit/TestCase.h"
+#include "Poco/CppUnit/TestCase.h"
 #include "Poco/Thread.h"
 
 class UDPServerTest: public CppUnit::TestCase

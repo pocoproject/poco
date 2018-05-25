@@ -9,8 +9,8 @@
 
 
 #include "UDPServerTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/Net/UDPServer.h"
 #include "Poco/Net/UDPClient.h"
 #include "Poco/Net/UDPHandler.h"
