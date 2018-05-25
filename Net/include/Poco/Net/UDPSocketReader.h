@@ -37,10 +37,9 @@ class UDPSocketReader
 	/// data and error backlogs.
 {
 public:
-	UDPSocketReader(typename UDPHandlerImpl<S>::List& handlers, bool notifySender = false, int backlogThreshold = 10):
+	UDPSocketReader(typename UDPHandlerImpl<S>::List& handlers, int backlogThreshold = 0):
 		_handlers(handlers),
 		_handler(_handlers.begin()),
-		_notifySender(notifySender),
 		_backlogThreshold(backlogThreshold)
 		/// Creates the UDPSocketReader.
 	{
@@ -50,7 +49,6 @@ public:
 	UDPSocketReader(typename UDPHandlerImpl<S>::List& handlers, const UDPServerParams& serverParams):
 		_handlers(handlers),
 		_handler(_handlers.begin()),
-		_notifySender(serverParams.notifySender()),
 		_backlogThreshold(serverParams.backlogThreshold())
 		/// Creates the UDPSocketReader.
 	{
@@ -84,11 +82,10 @@ public:
 				*pAL = SocketAddress::MAX_ADDRESS_LENGTH;
 				struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(p + sizeof(RT) + sizeof(poco_socklen_t));
 				RT ret = sock.receiveFrom(p + off, S - off - 1, &pSA, &pAL);
-				++_msgCount[SocketAddress(pSA, *pAL)];
 				if (ret < 0)
 				{
 					Poco::Int32 errors = setError(sock.impl()->sockfd(), p, Error::getMessage(Error::last()));
-					if (_notifySender && errors > _backlogThreshold && errors != _errorBacklog[sockfd])
+					if (_backlogThreshold > 0 && errors > _backlogThreshold && errors != _errorBacklog[sockfd])
 					{
 						sock.sendTo(&errors, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 						_errorBacklog[sockfd] = errors;
@@ -97,7 +94,7 @@ public:
 				}
 				Poco::Int32 data = handler().setData(p, ret);
 				p[off + ret] = 0; // for ascii convenience, zero-terminate
-				if (_notifySender && data > _backlogThreshold && data != _dataBacklog[sockfd])
+				if (_backlogThreshold > 0 && data > _backlogThreshold && data != _dataBacklog[sockfd])
 				{
 					sock.sendTo(&data, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 					_dataBacklog[sockfd] = data;
@@ -108,7 +105,7 @@ public:
 		catch (Poco::Exception& exc)
 		{
 			Poco::Int32 errors = setError(sock.impl()->sockfd(), p, exc.displayText());
-			if (_notifySender && errors > _backlogThreshold && errors != _errorBacklog[sockfd] && pSA && pAL)
+			if (_backlogThreshold > 0 && errors > _backlogThreshold && errors != _errorBacklog[sockfd] && pSA && pAL)
 			{
 				sock.sendTo(&errors, sizeof(Poco::Int32), SocketAddress(pSA, *pAL));
 				_errorBacklog[sockfd] = errors;
@@ -178,10 +175,8 @@ private:
 
 	HandlerList&    _handlers;
 	HandlerIterator _handler;
-	MsgCounterMap   _msgCount;
 	CounterMap      _dataBacklog;
 	CounterMap      _errorBacklog;
-	bool            _notifySender;
 	int             _backlogThreshold;
 };
 
