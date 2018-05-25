@@ -33,7 +33,7 @@ namespace Poco {
 namespace Net {
 
 
-const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE = 65535;
+const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE  = 65535;
 const UInt16 ICMPPacketImpl::MAX_PAYLOAD_SIZE = 65507;
 const UInt16 ICMPPacketImpl::MAX_SEQ_VALUE    = 65535;
 
