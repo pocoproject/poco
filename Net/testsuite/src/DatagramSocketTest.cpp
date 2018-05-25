@@ -17,6 +17,7 @@
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
+#include "Poco/Buffer.h"
 #include "Poco/Stopwatch.h"
 #include <cstring>
 
@@ -29,6 +30,7 @@ using Poco::Net::IPAddress;
 	using Poco::Net::NetworkInterface;
 #endif
 using Poco::Timespan;
+using Poco::Buffer;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
@@ -56,6 +58,25 @@ void DatagramSocketTest::testEcho()
 	n = ss.receiveBytes(buffer, sizeof(buffer));
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
+	ss.close();
+}
+
+
+void DatagramSocketTest::testEchoBuffer()
+{
+	UDPEchoServer echoServer;
+	DatagramSocket ss;
+	Buffer<char> buffer(0);
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	int n = ss.receiveBytes(buffer);
+	assertTrue (n == 0);
+	assertTrue (buffer.size() == 0);
+	n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	n = ss.receiveBytes(buffer);
+	assertTrue (n == 5);
+	assertTrue (buffer.size() == 5);
+	assertTrue (std::string(buffer.begin(), n) == "hello");
 	ss.close();
 }
 
@@ -278,7 +299,6 @@ void DatagramSocketTest::testGatherScatterSTRFFixedUNIX()
 	std::memcpy(sbv[1].iov_base, "abcdefghij", 10);
 	std::memcpy(sbv[2].iov_base, "helloworld", 10);
 
-	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	int n = ss.sendTo(sbv, SocketAddress("127.0.0.1", echoServer.port()));
 	assertTrue (n == 30);
 
@@ -587,6 +607,7 @@ CppUnit::Test* DatagramSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DatagramSocketTest");
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testEchoBuffer);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testUnbound);
 #if (POCO_OS != POCO_OS_FREE_BSD) // works only with local net bcast and very randomly

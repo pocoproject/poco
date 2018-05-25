@@ -198,7 +198,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 }
 
 
-int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int)
+int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Timespan&)
 {
 	char mask[4];
 	bool useMask;

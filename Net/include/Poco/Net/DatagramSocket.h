@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Buffer.h"
 
 
 namespace Poco {
@@ -122,6 +123,11 @@ public:
 		/// Returns the number of bytes received.
 
 	int receiveBytes(SocketBufVec& buffer, int flags = 0);
+		/// Receives data from the socket and stores it in buffers.
+		///
+		/// Returns the number of bytes received.
+
+	int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000);
 		/// Receives data from the socket and stores it in buffers.
 		///
 		/// Returns the number of bytes received.
