@@ -67,7 +67,7 @@ public:
 		int repeat = 1,
 		int dataSize = 48,
 		int ttl = 128,
-		int timeout = 50000);
+		int timeout = 100000);
 		/// Pings the specified address [repeat] times.
 		/// Notifications are not posted for events.
 		/// 
@@ -77,7 +77,7 @@ public:
 		int repeat = 1,
 		int dataSize = 48,
 		int ttl = 128,
-		int timeout = 50000);
+		int timeout = 100000);
 		/// Calls ICMPClient::ping(SocketAddress&, int) and
 		/// returns the result.
 		/// 
