@@ -111,6 +111,12 @@ int DatagramSocket::receiveBytes(SocketBufVec& buffers, int flags)
 }
 
 
+int DatagramSocket::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::Timespan& timeout)
+{
+	return impl()->receiveBytes(buffer, flags, timeout);
+}
+
+
 int DatagramSocket::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
 	return impl()->sendTo(buffer, length, address, flags);

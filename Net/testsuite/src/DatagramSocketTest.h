@@ -25,6 +25,7 @@ public:
 	~DatagramSocketTest();
 
 	void testEcho();
+	void testEchoBuffer();
 	void testSendToReceiveFrom();
 	void testUnbound();
 	void testBroadcast();

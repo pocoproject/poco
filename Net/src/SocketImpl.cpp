@@ -259,7 +259,7 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reu
 #endif
 }
 
-	
+
 void SocketImpl::listen(int backlog)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -287,7 +287,7 @@ void SocketImpl::shutdownReceive()
 	if (rc != 0) error();
 }
 
-	
+
 void SocketImpl::shutdownSend()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -296,7 +296,7 @@ void SocketImpl::shutdownSend()
 	if (rc != 0) error();
 }
 
-	
+
 void SocketImpl::shutdown()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -419,12 +419,42 @@ int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 }
 
 
+int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::Timespan& timeout)
+{
+	int rc = 0;
+	if (poll(timeout, SELECT_READ))
+	{
+		int avail = available();
+		if (buffer.size() < avail) buffer.resize(avail);
+
+		do
+		{
+			if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
+			rc = ::recv(_sockfd, buffer.begin(), buffer.size(), flags);
+		}
+		while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+		if (rc < 0)
+		{
+			int err = lastError();
+			if (err == POCO_EAGAIN && !_blocking)
+				;
+			else if (err == POCO_EAGAIN || err == POCO_ETIMEDOUT)
+				throw TimeoutException(err);
+			else
+				error(err);
+		}
+		if (rc < buffer.size()) buffer.resize(rc);
+	}
+	return rc;
+}
+
+
 int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
 	int rc;
 	do
 	{
-		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
+		if (_sockfd == POCO_INVALID_SOCKET) init(address.af());
 #if defined(POCO_VXWORKS)
 		rc = ::sendto(_sockfd, (char*) buffer, length, flags, (sockaddr*) address.addr(), address.length());
 #else
@@ -442,7 +472,7 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 	int rc = 0;
 	do
 	{
-		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
+		if (_sockfd == POCO_INVALID_SOCKET) init(address.af());
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		DWORD sent = 0;
 		rc = WSASendTo(_sockfd, const_cast<LPWSABUF>(&buffers[0]),
@@ -576,7 +606,7 @@ void SocketImpl::sendUrgent(unsigned char data)
 
 int SocketImpl::available()
 {
-	int result;
+	int result = 0;
 	ioctl(FIONREAD, result);
 	return result;
 }
@@ -1104,7 +1134,7 @@ void SocketImpl::initSocket(int af, int type, int proto)
 	// will crash the process. This only happens on UNIX, and not Linux.
 	//
 	// In order to have POCO sockets behave the same across platforms, it is
-	// best to just ignore SIGPIPE all together.
+	// best to just ignore SIGPIPE altogether.
 	setOption(SOL_SOCKET, SO_NOSIGPIPE, 1);
 #endif
 }

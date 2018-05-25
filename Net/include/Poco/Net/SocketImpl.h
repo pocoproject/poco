@@ -23,6 +23,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Timespan.h"
+#include "Poco/Buffer.h"
 
 
 namespace Poco {
@@ -189,6 +190,15 @@ public:
 		/// Returns the number of bytes received.
 		///
 		/// Always returns zero for platforms where not implemented.
+
+	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000);
+		/// Receives data from the socket and stores it in the buffer.
+		/// If needed, the buffer will be resized to accomodate the
+		/// data. Note that this function may impose additional
+		/// performance penalties due to the check for the available
+		/// amount of data.
+		///
+		/// Returns the number of bytes received.
 
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 		/// Sends the contents of the given buffer through
