@@ -25,7 +25,7 @@ set failedTests=
 set status=0
 set excluded=0
 
-for /f %%C in ('findstr /R "." components') do (
+for /f %%C in ('C:\Windows\System32\findstr.exe /R "." components') do (
   set excluded=0
   for %%X in (%EXCLUDE_TESTS%) do (
     if "%%X"=="%%C" (
