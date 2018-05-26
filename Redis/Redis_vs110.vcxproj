@@ -285,7 +285,6 @@
     <ClCompile Include="src\RedisEventArgs.cpp"/>
     <ClCompile Include="src\RedisStream.cpp"/>
     <ClCompile Include="src\Type.cpp"/>
-    <ClCompile Include="include\Poco\Redis\RedisEventArgs.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Redis\Array.h"/>
