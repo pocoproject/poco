@@ -155,12 +155,12 @@
     </ResourceCompile>
     <Link>
       <ShowProgress>NotSet</ShowProgress>
-      <OutputFile>..\bin\PocoCppUnitd.dll</OutputFile>
+      <OutputFile>..\bin\$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>..\bin\PocoCppUnitd.pdb</ProgramDatabaseFile>
-      <ImportLibrary>..\lib\Poco</ImportLibrary>
+      <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -203,12 +203,12 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\bin\PocoCppUnit.dll</OutputFile>
+      <OutputFile>..\bin\$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>
       </ProgramDatabaseFile>
-      <ImportLibrary>..\lib\PocoCppUnit.lib</ImportLibrary>
+      <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -252,7 +252,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmdd.lib</OutputFile>
+      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -294,7 +294,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmd.lib</OutputFile>
+      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
@@ -337,7 +337,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmtd.lib</OutputFile>
+      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -379,7 +379,7 @@
       <Culture>0x0c07</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmt.lib</OutputFile>
+      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
