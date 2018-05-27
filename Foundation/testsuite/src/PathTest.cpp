@@ -390,8 +390,8 @@ void PathTest::testExpandVariableFromPath()
 	s = p.expand(pathWithVar);
 	Poco::Path tmpPath = Poco::Path::home();
 	tmpPath.append("folder");
-	clog << endl << "s                 =" << s << endl;
-	clog << endl << "tmpPath.toString()=" << s << endl;
+	clog << endl << "s                 =>" << s << '<' << endl;
+	clog << endl << "tmpPath.toString()=>" << tmpPath.toString() << '<' << endl;
 	assertTrue (s == tmpPath.toString());
 }
 
