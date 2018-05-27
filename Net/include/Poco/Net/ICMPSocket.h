@@ -78,6 +78,10 @@ public:
 	int timeout() const;
 		/// Returns the socket timeout value.
 
+	static Poco::UInt16 mtu(const SocketAddress& address, Poco::UInt16 sz);
+		/// Returns minimum payload path MTU size for the destination,
+		/// or 0 if MTU can not be determined.
+
 protected:
 	ICMPSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.

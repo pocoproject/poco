@@ -332,7 +332,8 @@ public:
 		return ret;
 	}
 
-	void release(void* ptr)
+	template <typename P>
+	void release(P* ptr)
 		/// Recycles the released memory by initializing it for
 		/// internal use and setting it as next available block;
 		/// previously next block becomes this block's next.
@@ -340,7 +341,7 @@ public:
 		/// Destructor is called for the returned pointer.
 	{
 		if (!ptr) return;
-		reinterpret_cast<T*>(ptr)->~T();
+		reinterpret_cast<P*>(ptr)->~P();
 		++_available;
 		ScopedLock l(_mutex);
 		_firstBlock = new (ptr) Block(_firstBlock);

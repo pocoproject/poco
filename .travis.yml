@@ -171,7 +171,7 @@ matrix:
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
         - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && export OSARCH=i386 && ./travis/OSX/runtests.sh
+        - make all -s -j2 && sudo make install && export OSARCH=i386 && sudo -s ./travis/OSX/runtests.sh
 
     - env:    test="x64 (make) bundled"
       os: osx
@@ -182,7 +182,7 @@ matrix:
         - $CXX --version
         - $CXX -x c++ /dev/null -dM -E
         - ./configure --config=Darwin64-clang-libc++ --everything --omit=PDF,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && ./travis/OSX/runtests.sh
+        - make all -s -j2 && sudo make install && sudo -s ./travis/OSX/runtests.sh
 
     - env:    test="5.4 x86 (make) bundled"
       compiler: gcc
@@ -192,7 +192,7 @@ matrix:
         - export CXX="g++-5"
         - $CXX --version
         - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && export OSARCH=x86 && ./travis/Linux/runtests.sh
+        - make all -s -j2 && sudo make install && export OSARCH=x86 && sudo -s ./travis/Linux/runtests.sh
 
     - env:    test="5.4 x64 (make) bundled"
       compiler: gcc
@@ -201,7 +201,7 @@ matrix:
         - export CXX="g++-5"
         - $CXX --version
         - ./configure --config=Linux64-gcc --everything --omit=PDF
-        - make all -s -j2 && sudo make install && ./travis/Linux/runtests.sh
+        - make all -s -j2 && sudo make install && sudo -s ./travis/Linux/runtests.sh
 
     #- env:    test="5.4 (make) unbundled"
     #  ======================================= unit tests fail ures due to unbundled pcre
@@ -256,7 +256,7 @@ matrix:
         - export CXX="clang++-4.0"
         - $CXX --version
         - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && export OSARCH=x86 && ./travis/Linux/runtests.sh
+        - make all -s -j2 && sudo make install && export OSARCH=x86 && sudo -s ./travis/Linux/runtests.sh
 
     - env:    test="4.0 x64 (make) bundled"
       compiler: clang
@@ -267,7 +267,7 @@ matrix:
         - export CXX="clang++-4.0"
         - $CXX --version
         - ./configure --config=Linux64-clang --everything --omit=PDF
-        - make all -s -j2 && sudo make install && ./travis/Linux/runtests.sh
+        - make all -s -j2 && sudo make install && sudo -s ./travis/Linux/runtests.sh
 
     - env:    test="5.0 x64 (make) bundled"
       compiler: clang
@@ -278,7 +278,7 @@ matrix:
         - export CXX="clang++-5.0"
         - $CXX --version
         - ./configure --config=Linux64-clang --everything --omit=PDF
-        - make all -s -j2 && sudo make install && ./travis/Linux/runtests.sh
+        - make all -s -j2 && sudo make install && sudo -s ./travis/Linux/runtests.sh
 
     #- env:    test="arm-linux-gnueabi-g++ (make)"
     #  compiler: gcc
