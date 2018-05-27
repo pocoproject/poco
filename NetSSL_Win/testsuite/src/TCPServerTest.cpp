@@ -93,7 +93,7 @@ void TCPServerTest::testOneConnection()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -121,7 +121,7 @@ void TCPServerTest::testTwoConnections()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	std::string data("hello, world");
@@ -168,7 +168,7 @@ void TCPServerTest::testMultiConnections()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	SecureStreamSocket ss2(sa);
 	SecureStreamSocket ss3(sa);
@@ -257,7 +257,7 @@ void TCPServerTest::testReuseSocket()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), (int) data.size());
@@ -314,7 +314,7 @@ void TCPServerTest::testReuseSession()
 		"");
 	//pClientContext->enableSessionCache(true);
 	
-	SocketAddress sa("localhost", svs.address().port());
+	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa, pClientContext);
 	assertTrue (!ss1.sessionWasReused());
 	std::string data("hello, world");
