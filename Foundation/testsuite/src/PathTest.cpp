@@ -28,7 +28,8 @@
 using Poco::Path;
 using Poco::PathSyntaxException;
 using Poco::Environment;
-
+using std::clog;
+using std::endl;
 
 PathTest::PathTest(const std::string& rName): CppUnit::TestCase(rName)
 {
@@ -389,6 +390,8 @@ void PathTest::testExpandVariableFromPath()
 	s = p.expand(pathWithVar);
 	Poco::Path tmpPath = Poco::Path::home();
 	tmpPath.append("folder");
+	clog << endl << "s                 =" << s << endl;
+	clog << endl << "tmpPath.toString()=" << s << endl;
 	assertTrue (s == tmpPath.toString());
 }
 
