@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\CppUnit\include"
+				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\Poco\CppUnit\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitd.lib PocoFoundationd.lib"
+				AdditionalDependencies="PocoCppUnitd.lib PocoFoundationd.lib"
 				OutputFile="bin\$(PlatformName)\shared\$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -139,7 +139,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\CppUnit\include"
+				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\Poco\CppUnit\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -166,7 +166,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnit.lib PocoFoundation.lib"
+				AdditionalDependencies="PocoCppUnit.lib PocoFoundation.lib"
 				OutputFile="bin\$(PlatformName)\shared\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -235,7 +235,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\CppUnit\include"
+				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\Poco\CppUnit\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -261,7 +261,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib PocoFoundationmt.lib iphlpapi.lib"
+				AdditionalDependencies="PocoCppUnitmt.lib PocoFoundationmt.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -327,7 +327,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\CppUnit\include"
+				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\Poco\CppUnit\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -353,7 +353,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib PocoFoundationmtd.lib iphlpapi.lib"
+				AdditionalDependencies="PocoCppUnitmtd.lib PocoFoundationmtd.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -418,7 +418,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\CppUnit\include"
+				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\Poco\CppUnit\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -444,7 +444,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmtd.lib PocoFoundationmtd.lib iphlpapi.lib"
+				AdditionalDependencies="PocoCppUnitmtd.lib PocoFoundationmtd.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -512,7 +512,7 @@
 				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\CppUnit\include"
+				AdditionalIncludeDirectories="..\include;..\wcelibcex-1.0\src;..\..\Poco\CppUnit\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;$(ARCHFAM);$(_ARCHFAM_);WINVER=0x0500;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -538,7 +538,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="CppUnitmt.lib PocoFoundationmt.lib iphlpapi.lib"
+				AdditionalDependencies="PocoCppUnitmt.lib PocoFoundationmt.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
