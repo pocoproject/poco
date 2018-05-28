@@ -276,7 +276,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>libeay32md.lib;ssleay32md.lib;Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Crypt32.lib;ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\lib\PocoNetSSLmd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
