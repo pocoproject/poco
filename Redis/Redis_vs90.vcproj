@@ -428,8 +428,6 @@
 			<File
 				RelativePath=".\include\Poco\Redis\Redis.h"/>
 			<File
-				RelativePath=".\include\Poco\Redis\RedisEventArgs.cpp"/>
-			<File
 				RelativePath=".\include\Poco\Redis\RedisStream.h"/>
 			<File
 				RelativePath=".\include\Poco\Redis\Type.h"/>

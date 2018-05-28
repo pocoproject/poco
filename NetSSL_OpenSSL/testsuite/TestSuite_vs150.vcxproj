@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>15.0.26228.10</_ProjectFileVersion>
+    <_ProjectFileVersion>15.0.27428.2015</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">TestSuited</TargetName>
@@ -313,6 +313,8 @@
     <ClInclude Include="src\NetSSLTestSuite.h"/>
     <ClInclude Include="src\TCPServerTest.h"/>
     <ClInclude Include="src\TCPServerTestSuite.h"/>
+    <ClInclude Include="src\WebSocketTest.h"/>
+    <ClInclude Include="src\WebSocketTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver.cpp"/>
@@ -325,6 +327,8 @@
     <ClCompile Include="src\NetSSLTestSuite.cpp"/>
     <ClCompile Include="src\TCPServerTest.cpp"/>
     <ClCompile Include="src\TCPServerTestSuite.cpp"/>
+    <ClCompile Include="src\WebSocketTest.cpp"/>
+    <ClCompile Include="src\WebSocketTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

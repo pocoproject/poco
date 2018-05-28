@@ -6,8 +6,6 @@
 #ifndef CppUnit_CppUnit_INCLUDED
 #define CppUnit_CppUnit_INCLUDED
 
-#include "Poco/Foundation.h"
-
 //
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
 //
@@ -46,6 +44,29 @@
 //
 // Automatically link Data library.
 //
+#if defined(_MSC_VER)
+	#if defined(POCO_DLL)
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "d.lib"
+		#else
+			#define POCO_LIB_SUFFIX ".lib"
+		#endif
+	#elif defined(_DLL)
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "mdd.lib"
+		#else
+			#define POCO_LIB_SUFFIX "md.lib"
+		#endif
+	#else
+		#if defined(_DEBUG)
+			#define POCO_LIB_SUFFIX "mtd.lib"
+		#else
+			#define POCO_LIB_SUFFIX "mt.lib"
+		#endif
+	#endif
+#endif
+
+
 #if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
 	#if !defined(CppUnit_EXPORTS)
 		#pragma comment(lib, "PocoCppUnit" POCO_LIB_SUFFIX)
