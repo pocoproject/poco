@@ -26,7 +26,7 @@ namespace Poco {
 namespace Util {
 
 
-POCO_DECLARE_EXCEPTION(Util_API, OptionException, Poco::SQLException)
+POCO_DECLARE_EXCEPTION(Util_API, OptionException, Poco::DataException)
 POCO_DECLARE_EXCEPTION(Util_API, UnknownOptionException, OptionException)
 POCO_DECLARE_EXCEPTION(Util_API, AmbiguousOptionException, OptionException)
 POCO_DECLARE_EXCEPTION(Util_API, MissingOptionException, OptionException)
