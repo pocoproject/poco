@@ -220,7 +220,7 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
     return
   }
 
-  $cmd = "&`"$script:msbuild_exe`" $vsProject /m /t:$action /maxcpucount /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=true"
+  $cmd = "&`"$script:msbuild_exe`" $vsProject /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=true"
   Write-Host $cmd
   Invoke-Expression $cmd
   if ($LastExitCode -ne 0) { Exit $LastExitCode }
