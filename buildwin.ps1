@@ -228,11 +228,17 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
 }
 
 
-function Build-MSBuild([string] $vsProject)
+function Build-MSBuild([string] $vsProject, [switch] $skipStatic)
 {
+  if ($linkmode -contains "static" -and $skipStatic) { Return }
+
   if ($linkmode -eq 'all')
   {
-    $linkModeArr = 'shared', 'static_mt', 'static_md'
+    $linkModeArr = @('shared')
+    if (-not $skipStatic)
+    {
+      $linkModeArr += 'static_mt', 'static_md'
+    }
 
     foreach ($mode in $linkModeArr)
     {
@@ -276,11 +282,17 @@ function Exec-Devenv([string] $projectConfig, [string] $vsProject)
 }
 
 
-function Build-Devenv([string] $vsProject)
+function Build-Devenv([string] $vsProject, [switch] $skipStatic)
 {
+  if ($linkmode -contains "static" -and $skipStatic) { Return }
+
   if ($linkmode -eq 'all')
   {
-    $linkModeArr = 'shared', 'static_mt', 'static_md'
+    $linkModeArr = @('shared')
+    if (-not $skipStatic)
+    {
+      $linkModeArr += 'static_mt', 'static_md'
+    }
 
     foreach ($mode in $linkModeArr)
     {
@@ -328,6 +340,25 @@ function Build-samples
 }
 
 
+function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
+{
+   if (!(Test-Path -Path $vsProject)) # not found
+   {
+      Write-Host "+------------------------------------------------------------------"
+      Write-Host "| VS project $vsProject not found, skipping."
+      Write-Host "+------------------------------------------------------------------"
+      Return
+   }
+   if     ($tool -eq 'devenv')  { Build-Devenv $vsProject -skipStatic:$skipStatic }
+   elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject -skipStatic:$skipStatic }
+   else
+   {
+      Write-Host "Build tool $tool not supported. Exiting."
+      Exit -1
+   }
+}
+
+
 function Build-Components([string] $extension, [string] $platformName, [string] $type)
 {
 
@@ -341,7 +372,7 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
     $omitArray = @()
     $omit.Split(',;') | ForEach {
-        $omitArray += "$_"
+        $omitArray += $_.Trim()
     }
 
     if ($omitArray -NotContains $component)
@@ -366,14 +397,7 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
       if ($type -eq "lib")
       {
-        if ($tool -eq 'devenv')      { Build-Devenv $vsProject }
-        elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject }
-        elseif ($tool -ne '')        { Write-Host "Build tool not supported: $tool" }
-        else
-        {
-          Write-Host "Build tool not specified. Exiting."
-          Exit -1
-        }
+        Build-Exec $tool $vsProject
       }
       ElseIf ($tests -and ($type -eq "test"))
       {
@@ -381,10 +405,22 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         Write-Host "| Building $vsTestProject"
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        Build-Exec $tool $vsTestProject
 
-        if ($tool -eq 'devenv') { Build-Devenv $vsTestProject }
-        elseif ($tool -eq 'msbuild') { Build-MSBuild $vsTestProject }
-        else{ Write-Host "Tool not supported: $tool" }
+        if ($component -eq "Foundation") # special case for Foundation, which needs test app and dll
+        {
+          $vsTestProject = "$poco_base\$componentDir\testsuite\TestApp$($platformName)$($suffix).$($extension)"
+          Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+          Write-Host "| Building $vsTestProject"
+          Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+          Build-Exec $tool $vsTestProject
+
+          $vsTestProject = "$poco_base\$componentDir\testsuite\TestLibrary$($platformName)$($suffix).$($extension)"
+          Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+          Write-Host "| Building $vsTestProject"
+          Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+          Build-Exec $tool $vsTestProject -skipStatic
+        }
       }
       ElseIf ($samples -and ($type -eq "sample"))
       {
