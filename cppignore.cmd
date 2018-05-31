@@ -13,4 +13,5 @@ class CppUnit::TestCaller^<class TimerTest^>.testTimer, ^
 class CppUnit::TestCaller^<class PathTest^>.testFind, ^
 class CppUnit::TestCaller^<class ThreadTest^>.testSleep, ^
 class CppUnit::TestCaller^<class ICMPSocketTest^>.testSendToReceiveFrom, ^
-class CppUnit::TestCaller^<class ICMPSocketTest^>.testMTU, 
+class CppUnit::TestCaller^<class ICMPSocketTest^>.testMTU, ^
+class CppUnit::TestCaller^<class TimerTest^>.testScheduleAtFixedRate, ^
