@@ -35,6 +35,7 @@ SocketNotifier::~SocketNotifier()
 void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)
 {
 	_nc.addObserver(observer);
+	ScopedLock l(_mutex);
 	if (observer.accepts(pReactor->_pReadableNotification))
 		_events.insert(pReactor->_pReadableNotification.get());
 	else if (observer.accepts(pReactor->_pWritableNotification))
@@ -49,6 +50,7 @@ void SocketNotifier::addObserver(SocketReactor* pReactor, const Poco::AbstractOb
 void SocketNotifier::removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer)
 {
 	_nc.removeObserver(observer);
+	ScopedLock l(_mutex);
 	EventSet::iterator it = _events.end();
 	if (observer.accepts(pReactor->_pReadableNotification))
 		it = _events.find(pReactor->_pReadableNotification.get());
