@@ -52,13 +52,10 @@ namespace
 			_reactor(reactor)
 		{
 			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
-			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
 		}
 
 		~EchoServiceHandler()
 		{
-			_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
-			_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ShutdownNotification>(*this, &EchoServiceHandler::onShutdown));
 		}
 
 		void onReadable(ReadableNotification* pNf)
@@ -70,13 +67,11 @@ namespace
 			{
 				_socket.sendBytes(buffer, n);
 			}
-			else delete this;
-		}
-
-		void onShutdown(ShutdownNotification* pNf)
-		{
-			pNf->release();
-			delete this;
+			else
+			{
+				_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+				delete this;
+			}
 		}
 
 	private:
@@ -129,8 +124,11 @@ namespace
 				checkReadableObserverCount(1);
 				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
 				checkReadableObserverCount(0);
-				if (_once || _data.size() == 8192) _reactor.stop();
-				delete this;
+				if (_once || _data.size() == 8192)
+				{
+					_reactor.stop();
+					delete this;
+				}
 			}
 		}
 
