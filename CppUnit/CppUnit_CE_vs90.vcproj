@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="PocoCppUnit"
+	Name="CppUnit"
 	Version="9.00"
 	ProjectType="Visual C++"
 	ProjectGUID="{138BB448-808A-4FE5-A66D-78D1F8770F59}"
-	RootNamespace="PocoCppUnit"
+	RootNamespace="CppUnit"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
