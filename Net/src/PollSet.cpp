@@ -159,7 +159,10 @@ public:
 	{
 		PollSet::SocketModeMap result;
 
-		if(_socketMap.empty()) return result;
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			if(_socketMap.empty()) return result;
+		}
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
