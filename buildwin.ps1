@@ -388,9 +388,18 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
       }
       ElseIf ($samples -and ($type -eq "sample"))
       {
-        Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
-          Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$platformName$($suffix)" } `
-          | Build-samples "$_"
+        if ($platform -eq 'x64')
+        {
+          Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
+            Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$platformName$($suffix)" } `
+            | Build-samples "$_"
+        }
+        else
+        {
+          Get-Childitem "$poco_base\$($componentDir)" -Recurse |`
+            Where {$_.Extension -Match $extension -And $_.DirectoryName -Like "*samples*" -And $_.BaseName -Like "*$($suffix)" -And $_.BaseName -NotLike "*_x64_*" } `
+            | Build-samples "$_"
+        }
       }
     }
     else
