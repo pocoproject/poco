@@ -480,7 +480,8 @@ before_test:
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class PathTest>.testFind,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,';
-      
+      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,';
+      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,';     
       
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
