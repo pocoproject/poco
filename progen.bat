@@ -1,3 +1,24 @@
+ProGen\bin\progen.exe CppUnit\CppUnit.progen
+ProGen\bin\progen.exe Foundation\Foundation.progen
+ProGen\bin\progen.exe Encodings\Encodings.progen
+ProGen\bin\progen.exe XML\XML.progen
+ProGen\bin\progen.exe JSON\JSON.progen
+ProGen\bin\progen.exe Util\Util.progen
+ProGen\bin\progen.exe Net\Net.progen
+ProGen\bin\progen.exe NetSSL_OpenSSL\NetSSL_OpenSSL.progen
+ProGen\bin\progen.exe NetSSL_Win\NetSSL_Win.progen
+ProGen\bin\progen.exe Data\Data.progen
+ProGen\bin\progen.exe Data\SQLite\SQLite.progen
+ProGen\bin\progen.exe Data\ODBC\ODBC.progen
+ProGen\bin\progen.exe Data\MySQL\MySQL.progen
+ProGen\bin\progen.exe Data\PostgreSQL\PostgreSQL.progen
+ProGen\bin\progen.exe Zip\Zip.progen
+ProGen\bin\progen.exe PDF\PDF.progen
+ProGen\bin\progen.exe CppParser\CppParser.progen
+ProGen\bin\progen.exe MongoDB\MongoDB.progen
+ProGen\bin\progen.exe Redis\Redis.progen
+
+ProGen\bin\progen.exe CppUnit\testsuite\TestSuite.progen
 ProGen\bin\progen.exe Foundation\testsuite\TestSuite.progen
 ProGen\bin\progen.exe Encodings\testsuite\TestSuite.progen
 ProGen\bin\progen.exe XML\testsuite\TestSuite.progen
