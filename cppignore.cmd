@@ -12,3 +12,4 @@ class CppUnit::TestCaller^<class HTTPSClientSessionTest^>.testInterop, ^
 class CppUnit::TestCaller^<class TimerTest^>.testTimer, ^
 class CppUnit::TestCaller^<class PathTest^>.testFind, ^
 class CppUnit::TestCaller^<class ThreadTest^>.testSleep, ^
+%CPPUNIT_IGNORE%
