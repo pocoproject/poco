@@ -68,12 +68,12 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 			if (ts.isElapsed(_timeout)) throw TimeoutException();
 			buffer.clear();
 			SocketAddress respAddr;
-			rc = SocketImpl::receiveFrom(buffer.begin(), expected, respAddr, flags);
+			rc = SocketImpl::receiveFrom(buffer.begin(), maxPacketSize, respAddr, flags);
 			if (rc == 0) break;
 			if (respAddr == address)
 			{
 				expected -= rc;
-				if (expected == 0)
+				if (expected <= 0)
 				{
 					if (_icmpPacket.validReplyID(buffer.begin(), maxPacketSize)) break;
 					int type = 0, code = 0;

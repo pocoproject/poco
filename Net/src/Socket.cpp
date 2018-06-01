@@ -422,7 +422,7 @@ SocketBuf Socket::makeBuffer(void* buffer, std::size_t length)
 	SocketBuf ret;
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	ret.buf = reinterpret_cast<char*>(buffer);
-	ret.len = length;
+	ret.len = static_cast<ULONG>(length);
 #elif defined(POCO_OS_FAMILY_UNIX)
 	ret.iov_base = buffer;
 	ret.iov_len = length;

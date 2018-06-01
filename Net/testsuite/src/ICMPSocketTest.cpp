@@ -52,6 +52,7 @@ void ICMPSocketTest::testAssign()
 	ICMPSocket s2(s1);
 }
 
+
 void ICMPSocketTest::testSendToReceiveFrom()
 {
 	ICMPSocket ss(IPAddress::IPv4);
@@ -64,12 +65,9 @@ void ICMPSocketTest::testSendToReceiveFrom()
 		ss.receiveFrom(sa);
 		fail("must throw");
 	}
-	catch(ICMPException&)
-	{
-	}
-	catch(TimeoutException&)
-	{
-	}
+	catch (ICMPException&) { }
+	catch (TimeoutException&) { }
+	catch (Exception&) { }
 
 	ss.sendTo(sa);
 	ss.receiveFrom(sa);
