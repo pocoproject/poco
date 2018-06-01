@@ -102,7 +102,7 @@ Poco::UInt16 ICMPSocket::mtu(const SocketAddress& address, Poco::UInt16 sz)
 {
 	if (address.family() != IPAddress::IPv4) return 0;
 
-	SocketAddress returnAddress = address;
+	SocketAddress returnAddress(address);
 	for (; sz >= 68 /*RFC791*/; --sz)
 	{
 		ICMPSocket icmpSocket(address.family(), sz);

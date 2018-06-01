@@ -64,12 +64,9 @@ void ICMPSocketTest::testSendToReceiveFrom()
 		ss.receiveFrom(sa);
 		fail("must throw");
 	}
-	catch(ICMPException&)
-	{
-	}
-	catch(TimeoutException&)
-	{
-	}
+	catch (ICMPException&) { }
+	catch (TimeoutException&) { }
+	catch (Exception&) { }
 
 	ss.sendTo(sa);
 	ss.receiveFrom(sa);

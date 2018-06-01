@@ -430,7 +430,7 @@ int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::
 		do
 		{
 			if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-			rc = ::recv(_sockfd, buffer.begin(), buffer.size(), flags);
+			rc = ::recv(_sockfd, buffer.begin(), static_cast<int>(buffer.size()), flags);
 		}
 		while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 		if (rc < 0)
