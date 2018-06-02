@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitd.lib "
+				AdditionalDependencies=""
 				OutputFile="bin\$(PlatformName)\shared\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -128,7 +128,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnit.lib "
+				AdditionalDependencies=""
 				OutputFile="bin\$(PlatformName)\shared\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -201,7 +201,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitmtd.lib iphlpapi.lib "
+				AdditionalDependencies="iphlpapi.lib "
 				OutputFile="bin\$(PlatformName)\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -276,7 +276,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitmt.lib iphlpapi.lib "
+				AdditionalDependencies="iphlpapi.lib "
 				OutputFile="bin\$(PlatformName)\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -349,7 +349,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitmdd.lib iphlpapi.lib "
+				AdditionalDependencies="iphlpapi.lib "
 				OutputFile="bin\$(PlatformName)\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -424,7 +424,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies="CppUnitmd.lib iphlpapi.lib "
+				AdditionalDependencies="iphlpapi.lib "
 				OutputFile="bin\$(PlatformName)\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"

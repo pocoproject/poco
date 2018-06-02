@@ -39,7 +39,7 @@ if "%1"=="" goto usage
 set VS_VERSION=vs%1
 if %VS_VERSION%==vs150 (
   if "%VS150COMNTOOLS%"=="" (
-    set VS150COMNTOOLS=C:\Program Files ^(x86^)\Microsoft Visual Studio\2017\Community\Common7\Tools\
+    set VS150COMNTOOLS=C:\Program Files ^(x86^)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\
   )
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
 ) else (
@@ -83,8 +83,6 @@ if "%PLATFORM%"=="x64" (set PLATFORM_SUFFIX=_x64) else (
 if "%PLATFORM%"=="WinCE" (set PLATFORM_SUFFIX=_CE) else (
 if "%PLATFORM%"=="WEC2013" (set PLATFORM_SUFFIX=_WEC2013))))
 
-if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
-if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64))
 
 rem SAMPLES [samples|nosamples]
 set SAMPLES=%4
@@ -186,6 +184,9 @@ if "%VS_VERSION%"=="vs140" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs150" (set BUILD_TOOL=msbuild)
 :use_custom
 if "%BUILD_TOOL%"=="msbuild" (
+  if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
+  if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64))
+
   set ACTIONSW=/t:
   set CONFIGSW=/p:Configuration=
   set EXTRASW=/m
@@ -431,6 +432,7 @@ if %RELEASE_SHARED%==1 (
   )
 )
 if %DEBUG_STATIC_MT%==1 (
+  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !PROJECT_FILE!
   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
@@ -448,6 +450,7 @@ if %DEBUG_STATIC_MT%==1 (
   )
 )
 if %RELEASE_STATIC_MT%==1 (
+  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !PROJECT_FILE!
   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
@@ -465,6 +468,7 @@ if %RELEASE_STATIC_MT%==1 (
   )
 )
 if %DEBUG_STATIC_MD%==1 (
+  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !PROJECT_FILE!
   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
@@ -482,6 +486,7 @@ if %DEBUG_STATIC_MD%==1 (
   )
 )
 if %RELEASE_STATIC_MD%==1 (
+  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !PROJECT_FILE!
   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
