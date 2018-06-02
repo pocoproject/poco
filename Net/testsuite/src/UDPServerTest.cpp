@@ -22,6 +22,7 @@
 #include "Poco/AtomicCounter.h"
 #include "Poco/StringTokenizer.h"
 #include <cstring>
+#include <iostream>
 
 
 using Poco::Net::DatagramSocket;
