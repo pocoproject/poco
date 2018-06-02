@@ -35,6 +35,8 @@ class Net_API Socket
 	/// It provides operations common to all socket types.
 {
 public:
+	typedef SocketBufVec BufVec;
+
 	enum SelectMode
 		/// The mode argument to poll() and select().
 	{
@@ -293,6 +295,44 @@ public:
 		/// a few situations where calling this method after creation
 		/// of the Socket object makes sense. One example is setting
 		/// a socket option before calling bind() on a ServerSocket.
+
+	static SocketBuf makeBuffer(void* buffer, std::size_t length);
+		/// Creates and returns buffer. Suitable for creating
+		/// the appropriate buffer for the platform.
+
+	static SocketBufVec makeBufVec(std::size_t size, std::size_t bufLen);
+		/// Creates and returns a vector of requested size, with
+		/// allocated buffers and lengths set accordingly.
+		/// This utility function works well when all buffers are
+		/// of same size.
+
+	static void destroyBufVec(SocketBufVec& buf);
+		/// Releases the memory pointed to by vector members
+		/// and shrinks the vector to size 0.
+		/// The vector must be created by makeBufVec(size_t, size_t).
+
+	static SocketBufVec makeBufVec(const std::vector<char*>& vec);
+		/// Creates and returns a vector of requested size, with
+		/// buffers pointing to the supplied data (so, `vec` must
+		/// remain available at the time of use) and lengths set
+		/// accordingly.
+		/// Notes:
+		///   - data length is determined using `strlen`, so this
+		///     function is not meant to be used with binary data.
+		///
+		///   - if the returned buffer is used for read operations
+		///     (ie. operations that write to the bufer), pointing
+		///     to string literals will result in undefined behavior,
+		///     in best case an I/O error and subsequent exception
+
+	static SocketBufVec makeBufVec(const std::vector<std::string>& vec);
+		/// Creates and returns a vector of requested size, with
+		/// buffers pointing to the supplied data (so, `vec` must
+		/// remain available at the time of use) and lengths set
+		/// accordingly.
+		/// Note:: this function is not suitable for creation
+		/// of buffers used for writing (ie. reading from socket
+		/// into buffers).
 
 protected:
 	Socket(SocketImpl* pImpl);

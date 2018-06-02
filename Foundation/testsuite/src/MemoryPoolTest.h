@@ -25,6 +25,8 @@ public:
 	~MemoryPoolTest();
 
 	void testMemoryPool();
+	void testFastMemoryPool();
+	void memoryPoolBenchmark();
 
 	void setUp();
 	void tearDown();

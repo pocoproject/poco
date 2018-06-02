@@ -30,7 +30,7 @@ namespace Net {
 
 class Net_API ICMPv4PacketImpl : public ICMPPacketImpl
 	/// This class implements the ICMPv4 packet.
-	/// Parts are based on original ICMP code by
+	/// Parts are based on the original ICMP code by
 	/// Mike Muuss
 	/// U. S. Army Ballistic Research Laboratory
  	/// December, 1983
@@ -135,10 +135,12 @@ public:
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
-	virtual std::string errorDescription(Poco::UInt8* buffer, int length);
+	virtual std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code);
 		/// Returns error description string.
 		/// If supplied buffer contains ICMPv4 echo reply packet, an
 		/// empty string is returned indicating the absence of error.
+		/// If type and code of the error can be determined, they are
+		/// assigned to the type and code respectively.
 		///
 		/// Buffer includes IP header, ICMP header and data.
 

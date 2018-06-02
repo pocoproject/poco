@@ -381,6 +381,13 @@
     <ClInclude Include="include\Poco\Net\WebSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\OAuth10Credentials.h"/>
     <ClInclude Include="include\Poco\Net\OAuth20Credentials.h"/>
+    <ClInclude Include="include\Poco\Net\MultiSocketPoller.h"/>
+    <ClInclude Include="include\Poco\Net\SingleSocketPoller.h"/>
+    <ClInclude Include="include\Poco\Net\UDPClient.h"/>
+    <ClInclude Include="include\Poco\Net\UDPHandler.h"/>
+    <ClInclude Include="include\Poco\Net\UDPServer.h"/>
+    <ClInclude Include="include\Poco\Net\UDPServerParams.h"/>
+    <ClInclude Include="include\Poco\Net\UDPSocketReader.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp"/>
@@ -483,6 +490,8 @@
     <ClCompile Include="src\WebSocketImpl.cpp"/>
     <ClCompile Include="src\OAuth10Credentials.cpp"/>
     <ClCompile Include="src\OAuth20Credentials.cpp"/>
+    <ClCompile Include="src\UDPClient.cpp"/>
+    <ClCompile Include="src\UDPServerParams.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

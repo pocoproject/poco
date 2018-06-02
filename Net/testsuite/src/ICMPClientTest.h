@@ -18,6 +18,7 @@
 #include "CppUnit/TestCase.h"
 #include "Poco/Net/ICMPClient.h"
 #include "Poco/Net/ICMPEventArgs.h"
+#include "Poco/Mutex.h"
 
 
 class ICMPClientTest: public CppUnit::TestCase
@@ -42,6 +43,7 @@ public:
 private:
 	void registerDelegates(const Poco::Net::ICMPClient& icmpClient);
 	void unregisterDelegates(const Poco::Net::ICMPClient& icmpClient);
+	static Poco::FastMutex _mutex;
 };
 
 

@@ -944,6 +944,33 @@
 					RelativePath=".\src\OAuth20Credentials.cpp"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="UDP">
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\UDPClient.cpp"/>
+				<File
+					RelativePath=".\src\UDPServerParams.cpp"/>
+			</Filter>
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\MultiSocketPoller.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SingleSocketPoller.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\UDPClient.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\UDPHandler.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\UDPServer.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\UDPServerParams.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\UDPSocketReader.h"/>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration

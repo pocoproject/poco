@@ -316,7 +316,7 @@ std::string DNS::decodeIDNLabel(const std::string& encodedIDN)
 			Poco::UTF32Encoding utf32;
 			Poco::UTF8Encoding utf8;
 			Poco::TextConverter converter(utf32, utf8);
-			converter.convert(buffer, size*sizeof(punycode_uint), decoded);
+			converter.convert(buffer, static_cast<int>(size*sizeof(punycode_uint)), decoded);
 		}
 		else throw DNSException("Failed to decode IDN label: ", encodedIDN);
 	}

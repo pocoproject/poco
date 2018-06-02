@@ -867,6 +867,23 @@
 					RelativePath=".\src\OAuthTestSuite.cpp"/>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="UDP">
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\UDPServerTest.cpp"/>
+				<File
+					RelativePath=".\src\UDPServerTestSuite.cpp"/>
+			</Filter>
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\src\UDPServerTest.h"/>
+				<File
+					RelativePath=".\src\UDPServerTestSuite.h"/>
+			</Filter>
+		</Filter>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

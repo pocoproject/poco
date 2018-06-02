@@ -142,3 +142,9 @@ cmake-build/
 *.bak
 stage/
 releases/
+
+# Development files #
+#####################
+postgresql/
+mysql/
+

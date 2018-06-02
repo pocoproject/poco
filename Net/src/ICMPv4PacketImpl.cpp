@@ -36,10 +36,10 @@ namespace Poco {
 namespace Net {
 
 
-const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE       = 3;
+const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE = 3;
 const Poco::UInt8 ICMPv4PacketImpl::SOURCE_QUENCH_TYPE     = 4;
 const Poco::UInt8 ICMPv4PacketImpl::REDIRECT_MESSAGE_TYPE  = 5;
-const UInt8 ICMPv4PacketImpl::TIME_EXCEEDED_TYPE                 = 11;
+const UInt8 ICMPv4PacketImpl::TIME_EXCEEDED_TYPE           = 11;
 const Poco::UInt8 ICMPv4PacketImpl::PARAMETER_PROBLEM_TYPE = 12;
 
 
@@ -193,7 +193,7 @@ bool ICMPv4PacketImpl::validReplyID(Poco::UInt8* buffer, int length) const
 }
 
 
-std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length)
+std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length, int& type, int& code)
 {
 	Header *icp = header(buffer, length);
 
@@ -207,11 +207,12 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 		pointer = icp->id & mask;
 	}
 
-	MessageType type = static_cast<MessageType>(icp->type);
-	int code = icp->code;
+	type = icp->type;
+	MessageType msgType = static_cast<MessageType>(type);
+	code = icp->code;
 	std::ostringstream err;
 
-	switch (type)
+	switch (msgType)
 	{
 	case DESTINATION_UNREACHABLE_TYPE:
 		if (code >= NET_UNREACHABLE && code < DESTINATION_UNREACHABLE_UNKNOWN)
@@ -220,7 +221,7 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 			err << DESTINATION_UNREACHABLE_CODE[DESTINATION_UNREACHABLE_UNKNOWN];
 		break;
 	
-	case SOURCE_QUENCH_TYPE:		
+	case SOURCE_QUENCH_TYPE:
 		err << "Source quench";
 		break;
 	

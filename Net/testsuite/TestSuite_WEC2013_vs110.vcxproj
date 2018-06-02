@@ -62,6 +62,8 @@
     <ClInclude Include="src\OAuth10CredentialsTest.h"/>
     <ClInclude Include="src\OAuth20CredentialsTest.h"/>
     <ClInclude Include="src\OAuthTestSuite.h"/>
+    <ClInclude Include="src\UDPServerTest.h"/>
+    <ClInclude Include="src\UDPServerTestSuite.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TestSuite</ProjectName>
@@ -149,6 +151,8 @@
     <ClCompile Include="src\OAuth10CredentialsTest.cpp"/>
     <ClCompile Include="src\OAuth20CredentialsTest.cpp"/>
     <ClCompile Include="src\OAuthTestSuite.cpp"/>
+    <ClCompile Include="src\UDPServerTest.cpp"/>
+    <ClCompile Include="src\UDPServerTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
