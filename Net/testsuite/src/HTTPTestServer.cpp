@@ -78,7 +78,6 @@ void HTTPTestServer::run()
 					else
 						n = 0;
 				}
-				std::cout <<_lastRequest << std::endl;
 				std::string response = handleRequest();
 				ss.sendBytes(response.data(), (int) response.size());
 				Poco::Thread::sleep(1000);
@@ -112,7 +111,6 @@ std::string HTTPTestServer::handleRequest() const
 {
 	std::string response;
 	response.reserve(16000);
-	std::cout <<_lastRequest << std::endl;
 	if (_lastRequest.substr(0, 10) == "GET /small" ||
 	    _lastRequest.substr(0, 11) == "HEAD /small")
 	{
