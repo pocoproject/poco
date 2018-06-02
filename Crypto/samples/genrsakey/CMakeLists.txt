@@ -1,5 +1,10 @@
 set(SAMPLE_NAME "genrsakey")
 
+# Set flags to enable unicode
+if(MINGW)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -municode")
+endif()
+
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
 

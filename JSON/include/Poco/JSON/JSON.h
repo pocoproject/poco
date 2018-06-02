@@ -31,6 +31,10 @@
 // JSON_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
+#if defined(__MINGW32__) && defined(POCO_DLL)
+	#define JSON_EXPORTS
+#endif
+
 #if defined(_WIN32) && defined(POCO_DLL)
 	#if defined(JSON_EXPORTS)
 		#define JSON_API __declspec(dllexport)

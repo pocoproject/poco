@@ -31,6 +31,10 @@
 // CppParser_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
+#if defined(__MINGW32__) && defined(POCO_DLL)
+	#define CppParser_EXPORTS
+#endif
+
 #if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
 	#if defined(CppParser_EXPORTS)
 		#define CppParser_API __declspec(dllexport)

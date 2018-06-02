@@ -21,7 +21,7 @@
 #include <set>
 
 
-#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
+#if defined(_WIN32) && _WIN32_WINNT >= 0x0600 && !defined(__MINGW32__)
 #ifndef POCO_HAVE_FD_POLL
 #define POCO_HAVE_FD_POLL 1
 #endif
@@ -43,7 +43,6 @@
 
 namespace Poco {
 namespace Net {
-
 
 #if defined(POCO_HAVE_FD_EPOLL)
 

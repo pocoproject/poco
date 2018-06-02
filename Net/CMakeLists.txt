@@ -12,9 +12,9 @@ POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 # Windows and WindowsCE need additional libraries
 if(WIN32)
     if(WINCE)
-        set(SYSLIBS ${SYSLIBS} "ws2.lib" "iphlpapi.lib")
+        set(SYSLIBS ${SYSLIBS} "ws2"    "iphlpapi")
     else()
-        set(SYSLIBS ${SYSLIBS} "ws2_32.lib" "iphlpapi.lib")
+        set(SYSLIBS ${SYSLIBS} "ws2_32" "iphlpapi")
     endif()
 endif(WIN32)
 

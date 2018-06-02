@@ -39,11 +39,19 @@ namespace Poco {
 	{
 		std::string errMsg;
 		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-	#if !defined(POCO_NO_WSTRING)
+
 		LPWSTR lpMsgBuf = 0;
-		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
+		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL)) {
+	#if !defined(POCO_NO_WSTRING)
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
+	#else
+			std::wstring filename = lpMsgBuf;
+			int size = WideCharToMultiByte(CP_UTF8, 0, &filename[0], (int) filename.size(), NULL, 0, NULL, NULL);
+			errMsg.resize(size);
+			WideCharToMultiByte(CP_UTF8, 0, &filename[0], (int) filename.size(), &errMsg[0], (int) errMsg.size(),
+								NULL, NULL);
 	#endif
+		}
 		LocalFree(lpMsgBuf);
 		return errMsg;
 	}

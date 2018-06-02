@@ -1,6 +1,12 @@
 set(LIBNAME "SQL")
 set(POCO_LIBNAME "Poco${LIBNAME}")
 
+# Fix error "too many sections"
+if(MINGW)
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -Wa,-mbig-obj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
+endif()
+
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})

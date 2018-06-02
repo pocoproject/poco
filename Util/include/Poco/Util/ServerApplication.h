@@ -232,7 +232,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(_WIN32)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\
