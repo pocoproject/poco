@@ -1,5 +1,4 @@
 # Sources
-add_definitions(-DPOCO_NO_AUTOMATIC_LIBS)
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 
@@ -19,6 +18,7 @@ target_include_directories(CppUnit
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+target_compile_definitions(CppUnit PUBLIC POCO_NO_AUTOMATIC_LIBS)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(CppUnit
         PUBLIC

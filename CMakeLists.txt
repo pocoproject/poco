@@ -134,7 +134,7 @@ if(ODBC_FOUND)
   option(ENABLE_DATA_ODBC "Enable Data ODBC" ON)
 else()
   option(ENABLE_DATA "Enable Data" OFF)
-  option(ENABLE_DATA_MYSQL "Enable Data MySQL" OFF)
+  option(ENABLE_DATA_ODBC "Enable Data ODBC" OFF)
 endif()
 
 # Allow enabling and disabling components
