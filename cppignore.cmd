@@ -9,7 +9,9 @@ class CppUnit::TestCaller^<class HTTPSClientSessionTest^>.testProxy, ^
 class CppUnit::TestCaller^<class HTTPSStreamFactoryTest^>.testProxy, ^
 class CppUnit::TestCaller^<class TCPServerTest^>.testReuseSocket, ^
 class CppUnit::TestCaller^<class HTTPSClientSessionTest^>.testInterop, ^
-class CppUnit::TestCaller^<class TimerTest^>.testTimer, ^
 class CppUnit::TestCaller^<class PathTest^>.testFind, ^
 class CppUnit::TestCaller^<class ThreadTest^>.testSleep, ^
+class CppUnit::TestCaller^<class TimerTest^>.testTimer, ^
+class CppUnit::TestCaller^<class TimerTest^>.testScheduleInterval, ^
+class CppUnit::TestCaller^<class TimerTest^>.testScheduleIntervalTimestamp, ^
 %CPPUNIT_IGNORE%
