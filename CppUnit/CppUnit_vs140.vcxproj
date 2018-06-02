@@ -85,27 +85,39 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">..\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">obj\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">..\bin\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">obj\$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">..\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">..\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">..\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">obj\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">..\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">obj\$(Configuration)\</IntDir>
+    <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoCppUnitd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoCppUnit</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoCppUnitmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoCppUnitmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoCppUnit</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoCppUnitmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoCppUnitmt</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>obj\CppUnit\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
+    <OutDir>..\bin\</OutDir>
+    <IntDir>obj\CppUnit\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
+    <OutDir>..\lib\</OutDir>
+    <IntDir>obj\CppUnit\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
+    <OutDir>..\lib\</OutDir>
+    <IntDir>obj\CppUnit\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
+    <OutDir>..\lib\</OutDir>
+    <IntDir>obj\CppUnit\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
+    <OutDir>..\lib\</OutDir>
+    <IntDir>obj\CppUnit\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
@@ -126,12 +138,13 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <ShowProgress>NotSet</ShowProgress>
-      <OutputFile>..\bin\$(TargetName).dll</OutputFile>
+      <OutputFile>..\bin\PocoCppUnitd.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>..\bin\PocoCppUnitd.pdb</ProgramDatabaseFile>
-      <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <ImportLibrary>..\lib\PocoCppUnitd.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -156,12 +169,14 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <OutputFile>..\bin\$(TargetName).dll</OutputFile>
+      <OutputFile>..\bin\PocoCppUnit.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>
-      </ProgramDatabaseFile>
-      <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <ImportLibrary>..\lib\PocoCppUnit.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -185,7 +200,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -209,7 +224,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
@@ -232,7 +247,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -257,7 +272,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\$(TargetName).lib</OutputFile>
+      <OutputFile>..\lib\PocoCppUnitmd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

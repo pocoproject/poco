@@ -247,7 +247,7 @@ void WebSocketTest::testOneLargeFrame(int msgSize)
 	int flags;
 	int n;
 
-	n = ws.receiveFrame(buffer.begin(), buffer.size(), flags);
+	n = ws.receiveFrame(buffer.begin(), static_cast<int>(buffer.size()), flags);
 	assertTrue (n == payload.size());
 	assertTrue (payload.compare(0, payload.size(), buffer.begin(), n) == 0);
 

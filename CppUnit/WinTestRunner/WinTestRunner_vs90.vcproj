@@ -82,7 +82,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="cppunit.lib winmm.lib"
+				AdditionalDependencies="winmm.lib"
 				OutputFile="..\..\bin\WinTestRunner.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -181,7 +181,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="cppunitd.lib winmm.lib"
+				AdditionalDependencies="winmm.lib"
 				ShowProgress="0"
 				OutputFile="..\..\bin\WinTestRunnerd.dll"
 				LinkIncremental="2"

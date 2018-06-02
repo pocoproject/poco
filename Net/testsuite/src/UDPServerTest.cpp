@@ -101,9 +101,14 @@ namespace
 			{
 				data.back().append(1, '\0');
 				std::size_t sz = (data.size() * strlen(str)) + 1;
-				if (sz != client.send(Poco::Net::Socket::makeBufVec(data)))
+				int sent = client.send(Poco::Net::Socket::makeBufVec(data));
+				if (sz != sent)
+				{
+					std::cerr << "Send count mismatch, expected: " << sz
+						<< ", sent: " << sent << std::endl;
 					return false;
-				//Poco::Thread::sleep(10);
+				}
+				Poco::Thread::sleep(10);
 				data.clear();
 			}
 		}
@@ -123,7 +128,12 @@ namespace
 				errCount += count / 10;
 			}
 		} while (count < i);
-		if (reps != count) return false;
+		if (reps != count)
+		{
+			std::cerr << "Response mismatch, expected: " << reps
+					<< ", received: " << count << std::endl;
+			return false;
+		}
 		Poco::Net::UDPHandler::Iterator it = handlers.begin();
 		Poco::Net::UDPHandler::Iterator end = handlers.end();
 		for (; it != end; ++it)
@@ -131,9 +141,19 @@ namespace
 			TestUDPHandler &h = dynamic_cast<TestUDPHandler &>(*(*it));
 			count = h.counter.value();
 			errCount = h.errCounter.value();
-			if (errCount < count / 10) return false;
-			if (h.addr.empty() && h.addr != client.address().toString())
+			if (errCount < count / 10)
+			{
+				std::cerr << "Error count mismatch, expected: <" << count / 10
+					<< ", received: " << errCount << std::endl;
 				return false;
+			}
+
+			if (h.counter && (h.addr.empty() || h.addr != client.address().toString()))
+			{
+				std::cerr << "Address mismatch, expected: " << client.address().toString()
+					<< ", received: " << h.addr << std::endl;
+				return false;
+			}
 		}
 		return true;
 	}
