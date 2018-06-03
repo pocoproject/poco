@@ -612,7 +612,7 @@ void StringTest::testStringToFloat()
 	assertTrue (FPEnvironment::isInfinite(strToFloat("-inf")));
 	assertTrue (FPEnvironment::isInfinite(strToFloat("infinity", "infinity")));
 	assertTrue (FPEnvironment::isInfinite(strToFloat("-infinity", "infinity")));
-	assertTrue (FPEnvironment::isInfinite(strToFloat("Inf")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("abc")));
 	assertTrue (FPEnvironment::isInfinite(strToFloat("Inf", "Inf")));
 }
 
@@ -770,7 +770,7 @@ void StringTest::testStringToDouble()
 	assertTrue (FPEnvironment::isInfinite(strToDouble("-inf")));
 	assertTrue (FPEnvironment::isInfinite(strToDouble("infinity", "infinity")));
 	assertTrue (FPEnvironment::isInfinite(strToDouble("-infinity", "infinity")));
-	assertTrue (FPEnvironment::isInfinite(strToDouble("Inf")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("abc")));
 	assertTrue (FPEnvironment::isInfinite(strToDouble("Inf", "Inf")));
 }
 
