@@ -29,6 +29,7 @@
 #include "Poco/SQL/SQLException.h"
 #include <sqltypes.h>
 #include <iostream>
+#include <dlfcn.h>
 
 
 using namespace Poco::SQL::Keywords;
@@ -410,6 +411,22 @@ void ODBCTest::testInsertSingleBulkVec()
 		_pExecutor->insertSingleBulkVec();
 		i += 2;
 	}	
+}
+
+
+void ODBCTest::testInsertSingleBulkNullableVec()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 1;)
+	{
+		recreateNullableTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->insertSingleBulkNullableVec();
+		i += 2;
+	}
+	dropObject("TABLE", ExecUtil::nullabletest());
 }
 
 
@@ -824,6 +841,28 @@ void ODBCTest::testBLOB()
 		_pExecutor->blob();
 		i += 2;
 	}
+}
+
+
+// Very similar to ODBCTest::testBLOB(), except it forces the "big" BLOB to be
+// twice the maxFieldSize setting, to verify that the switchover to manual
+// extract mode happens correctly.
+//
+void ODBCTest::testBLOBNoTruncation()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	const std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonBLOBTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->blob(2 * maxFieldSize);
+		i += 2;
+	}
+	dropObject("TABLE", ExecUtil::person());
 }
 
 
@@ -1371,7 +1410,7 @@ bool ODBCTest::canConnect(const std::string& driver,
 		}
 	}
 	else
-		std::cout << "No DSNs found, will attempt DSN-less connection ..." << std::endl;
+		std::cout << "No DSNs found, will attempt DSN-less connection (" << driver << " / " << dbConnString << ") ..." << std::endl;
 
 	dsn = "";
 	return true;
@@ -1398,11 +1437,25 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
 	
+	static bool iqloaded = false;
+	if (!iqloaded)
+	{
+		const char* filename="/ms/dist/spg/PROJ/iq/iq_client_prod/lib64/libdbodbc11.so";
+		void* lib = dlopen(filename, RTLD_NOW);
+		if (!lib)
+		{
+			const char* error = dlerror();
+			std::cout << "Failed to load " << filename << ": " << (error ? error : "No error message") << std::endl;
+		}
+		iqloaded = true;
+	}
+
 	try
 	{
 		std::cout << "Connecting to [" << dbConnString << ']' << std::endl;
 		return new Session(Poco::SQL::ODBC::Connector::KEY, dbConnString, 5);
-	}catch (ConnectionFailedException& ex)
+	}
+	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
 		return 0;
