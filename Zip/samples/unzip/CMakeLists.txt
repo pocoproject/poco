@@ -1,10 +1,5 @@
 set(SAMPLE_NAME "sample-unzip")
 
-# Set flags to enable unicode
-if(MINGW)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -municode")
-endif()
-
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
 
@@ -13,3 +8,6 @@ if(WINCE)
 set_target_properties( ${SAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
 endif()
 target_link_libraries( ${SAMPLE_NAME} PocoZip PocoUtil PocoXML PocoFoundation )
+
+POCO_ENABLE_EXE_WMAIN( "${SAMPLE_NAME}" )
+

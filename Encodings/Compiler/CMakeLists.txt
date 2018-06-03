@@ -1,10 +1,5 @@
 set(POCO_EXENAME "EncodingsCompiler")
 
-# Set flags to enable unicode
-if(MINGW)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -municode")
-endif()
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -24,3 +19,6 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     )
+
+POCO_ENABLE_EXE_WMAIN( "${POCO_EXENAME}" )
+

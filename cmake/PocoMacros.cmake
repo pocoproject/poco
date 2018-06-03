@@ -216,6 +216,13 @@ macro(POCO_MESSAGES out name)
 endmacro()
 
 
+macro(POCO_ENABLE_EXE_WMAIN target_name)
+    if(MINGW)
+        set_target_properties( "${target_name}" PROPERTIES LINK_FLAGS "-municode")
+    endif()
+endmacro()
+
+
 #===============================================================================
 # Macros for Package generation
 #

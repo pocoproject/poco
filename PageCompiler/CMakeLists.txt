@@ -1,10 +1,5 @@
 set(POCO_EXENAME "PageCompiler")
 
-# Set flags to enable unicode
-if(MINGW)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -municode")
-endif()
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -27,4 +22,6 @@ install(
 if (POCO_ENABLE_SAMPLES)
 #    add_subdirectory(samples)
 endif ()
+
+POCO_ENABLE_EXE_WMAIN( "${POCO_EXENAME}" )
 

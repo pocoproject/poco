@@ -40,10 +40,6 @@
 // PDF_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(__MINGW32__) && defined(POCO_DLL)
-	#define PDF_EXPORTS
-#endif
-
 #if defined(_WIN32) && defined(POCO_DLL)
 	#if defined(PDF_EXPORTS)
 		#define PDF_API __declspec(dllexport)
