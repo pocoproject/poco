@@ -29,8 +29,9 @@
 #include "Poco/SQL/SQLException.h"
 #include <sqltypes.h>
 #include <iostream>
+#ifdef POCO_OS_FAMILY_UNIX
 #include <dlfcn.h>
-
+#endif
 
 using namespace Poco::SQL::Keywords;
 using Poco::SQL::Session;
@@ -1436,7 +1437,8 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 {
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
-	
+
+#ifdef POCO_OS_FAMILY_UNIX
 	static bool iqloaded = false;
 	if (!iqloaded)
 	{
@@ -1449,7 +1451,7 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 		}
 		iqloaded = true;
 	}
-
+#endif
 	try
 	{
 		std::cout << "Connecting to [" << dbConnString << ']' << std::endl;
