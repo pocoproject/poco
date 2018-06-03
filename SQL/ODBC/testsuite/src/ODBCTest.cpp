@@ -1436,19 +1436,6 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 {
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
-	
-	static bool iqloaded = false;
-	if (!iqloaded)
-	{
-		const char* filename="/ms/dist/spg/PROJ/iq/iq_client_prod/lib64/libdbodbc11.so";
-		void* lib = dlopen(filename, RTLD_NOW);
-		if (!lib)
-		{
-			const char* error = dlerror();
-			std::cout << "Failed to load " << filename << ": " << (error ? error : "No error message") << std::endl;
-		}
-		iqloaded = true;
-	}
 
 	try
 	{
