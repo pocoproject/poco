@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "DOMParser")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoXML PocoFoundation )
+add_executable(DOMParser src/DOMParser.cpp)
+target_link_libraries(DOMParser PUBLIC Poco::XML)

@@ -82,6 +82,12 @@ protected:
 	void bindImpl();
 		/// Binds all parameters and executes the statement.
 
+	virtual bool canMakeExtractors();
+		/// Returns true if extractors can be created.
+
+	virtual void makeExtractors(std::size_t count);
+		/// Create extractors for the specified dataset
+
 	AbstractExtraction::ExtractorPtr extractor();
 		/// Returns the concrete extractor used by the statement.
 
@@ -113,9 +119,6 @@ private:
 	
 	void doBind();
 		/// Binds parameters.
-
-	void makeInternalExtractors();
-		/// Creates internal extractors if none were supplied from the user.
 
 	bool isStoredProcedure() const;
 		/// Returns true if SQL is a stored procedure call.

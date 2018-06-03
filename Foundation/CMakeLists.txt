@@ -1,6 +1,3 @@
-set(LIBNAME "Foundation")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -36,8 +33,7 @@ POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
 	find_package(PCRE REQUIRED)
-	set(SYSLIBS ${SYSLIBS} ${PCRE_LIBRARIES})
-	include_directories(${PCRE_INCLUDE_DIRS})
+	find_package(ZLIB REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
 	POCO_SOURCES( SRCS RegExp
@@ -45,9 +41,6 @@ if (POCO_UNBUNDLED)
 		src/pcre_tables.c
 	)
 
-	find_package(ZLIB REQUIRED)
-	set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-	include_directories(${ZLIB_INCLUDE_DIRS})
 else()
 	# pcre
 	POCO_SOURCES( SRCS pcre
@@ -94,95 +87,158 @@ else()
 	)
 endif (POCO_UNBUNDLED)
 
-if(WIN32)
-	set(SYSLIBS ${SYSLIBS} iphlpapi)
-endif(WIN32)
-if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
-	set_target_properties( "${LIBNAME}" PROPERTIES LINK_FLAGS "-library=stlport4")
-endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 
-if(ANDROID)
-	set(SYSLIBS ${SYSLIBS} log)
-endif(ANDROID)
-
-# TODO: Why is this here?
-add_definitions( -DPCRE_STATIC)
-
-# For POSIX threads on Unix
-if(UNIX AND NOT APPLE)
-	# We still need pthreads on Unix
-	set(SYSLIBS ${SYSLIBS} ${CMAKE_THREAD_LIBS_INIT})
-	INCLUDE (CheckFunctionExists)
-	INCLUDE (CheckCXXSourceCompiles)
-	INCLUDE (CheckLibraryExists)
-	CHECK_LIBRARY_EXISTS(pthread pthread_setaffinity_np "pthread.h" HAVE_PTHREAD_SETAFFINITY_NP)
-	if(NOT HAVE_PTHREAD_SETAFFINITY_NP)
-        if(POCO_VERBOSE_MESSAGES)
-            message(STATUS "Platform has not PTHREAD_SETAFFINITY_NP")
-        endif()
-	else(HAVE_PTHREAD_SETAFFINITY_NP)
-		add_definitions(-DHAVE_PTHREAD_SETAFFINITY_NP)
-		CHECK_CXX_SOURCE_COMPILES("
-		#include <sched.h>
-		int main() {
-			cpu_set_t cpumask;
-			sched_setaffinity( 0, sizeof(cpumask), &cpumask );
-			return 0;
-		}" HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-
-		if(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-            if(POCO_VERBOSE_MESSAGES)
-                message(STATUS "Platform has THREE PARAM at PTHREAD_SETAFFINITY_NP")
-            endif()
-			add_definitions(-DHAVE_THREE_PARAM_SCHED_SETAFFINITY)
-		else(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-			CHECK_CXX_SOURCE_COMPILES("
-			#include <sched.h>
-			int main() {
-				cpu_set_t cpumask;
-				sched_setaffinity( 0, &cpumask );
-				return 0;
-			}" HAVE_TWO_PARAM_SCHED_SETAFFINITY)
-
-			if(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
-                if(POCO_VERBOSE_MESSAGES)
-                    message(STATUS "Platform has TWO PARAM at PTHREAD_SETAFFINITY_NP")
-                endif()
-				add_definitions(-DHAVE_TWO_PARAM_SCHED_SETAFFINITY)
-			endif(HAVE_TWO_PARAM_SCHED_SETAFFINITY)
-
-		endif(HAVE_THREE_PARAM_SCHED_SETAFFINITY)
-	endif(NOT HAVE_PTHREAD_SETAFFINITY_NP)
-endif(UNIX AND NOT APPLE)
-
-add_library( "${LIBNAME}" ${SRCS})
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(Foundation ${LIB_MODE} ${SRCS})
+add_library(Poco::Foundation ALIAS Foundation)
+set_target_properties(Foundation
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-	OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoFoundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries( "${LIBNAME}" ${SYSLIBS})
-target_include_directories( "${LIBNAME}"
+target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
+target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:include>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(Foundation
+  PUBLIC
+    $<$<CONFIG:Debug>:_DEBUG>
+)
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(Foundation
+        PUBLIC
+            POCO_STATIC
+    )
+endif()
+
+if(WIN32)
+  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
+  target_link_libraries(Foundation PUBLIC iphlpapi)
+endif(WIN32)
+
+if (CYGWIN)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		POCO_NO_FPENVIRONMENT
+		POCO_NO_WSTRING
+		_XOPEN_SOURCE=500
+		__BSD_VISIBLE
+	)
+else (CYGWIN)
+	if (UNIX AND NOT ANDROID )
+	  # Standard 'must be' defines
+	  if (APPLE)
+		  target_compile_definitions(Foundation
+			  PUBLIC
+				POCO_HAVE_IPv6
+				POCO_NO_STAT64
+			)
+		target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS})
+	  else (APPLE)
+		  target_compile_definitions(Foundation
+			  PUBLIC
+				_REENTRANT
+				_THREAD_SAFE
+				_LARGEFILE64_SOURCE
+				_FILE_OFFSET_BITS=64
+			)
+		if (QNX)
+		  target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
+		  target_link_libraries(Foundation PUBLIC m socket)
+		elseif(${CMAKE_SYSTEM} MATCHES "AIX")
+		  target_compile_definitions(Foundation PUBLIC __IBMCPP_TR1__)
+		elseif(CMAKE_SYSTEM MATCHES "^FreeBSD")
+			target_compile_definitions(Foundation
+				PUBLIC
+					_XOPEN_SOURCE=600
+					__BSD_VISIBLE
+					_REENTRANT
+					_THREAD_SAFE
+					_LARGEFILE64_SOURCE
+					_FILE_OFFSET_BITS=64
+					POCO_HAVE_IPv6
+					POCO_HAVE_FD_POLL
+			)
+			target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+		else ()
+		  target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
+		  target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+		endif ()
+	  endif (APPLE)
+	endif(UNIX AND NOT ANDROID )
+endif (CYGWIN)
+
+if (CMAKE_SYSTEM MATCHES "SunOS")
+  # Standard 'must be' defines
+  target_compile_definitions(Foundation PUBLIC _REENTRANT _THREAD_SAFE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64)
+  target_compile_options(Foundation PUBLIC -m64 )
+  target_link_libraries(Foundation PUBLIC pthread socket xnet nsl resolv rt ${CMAKE_DL_LIBS})
+endif()
+
+if (CMAKE_COMPILER_IS_MINGW)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		WC_NO_BEST_FIT_CHARS=0x400
+		_WIN32
+		MINGW32
+		WINVER=0x500
+		ODBCVER=0x0300
+		POCO_THREAD_STACK_SIZE
+	)
+endif()
+
+# iOS
+if (IOS)
+  target_compile_definitions(Foundation
+	  PUBLIC
+		POCO_HAVE_IPv6
+		POCO_NO_FPENVIRONMENT
+		POCO_NO_STAT64
+		POCO_NO_SHAREDLIBS
+		POCO_NO_NET_IFTYPES
+	)
+endif()
+
+#Android
+if (ANDROID)
+  target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT POCO_NO_SHAREDMEMORY )
+  target_link_libraries(Foundation PUBLIC log)
+endif(ANDROID)
+
+# IBM XLC for AIX
+if ((${CMAKE_CXX_COMPILER_ID} MATCHES "XL") AND (${CMAKE_SYSTEM} MATCHES "AIX"))
+  target_compile_options(Foundation
+	  PUBLIC
+		-qlanglvl=extended0x
+		-qlanglvl=noconstexpr
+		-qlanglvl=newexcp
+		-qsuppress=1540-0198
+		-qsuppress=1540-1628
+		-qsuppress=1540-0095
+		-qsuppress=1500-030
+	)
+endif()
+
+if(POCO_UNBUNDLED)
+	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+endif()
 
 if (NOT POCO_ENABLE_WSTRING)
-    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_WSTRING)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_WSTRING)
 endif()
 
 if (NOT POCO_ENABLE_FPENVIRONMENT)
-    target_compile_definitions("${LIBNAME}" PUBLIC POCO_NO_FPENVIRONMENT)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT)
 endif()
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(Foundation)
+POCO_GENERATE_PACKAGE(Foundation)
 
 if (POCO_ENABLE_TESTS)
 	add_subdirectory( testsuite )
