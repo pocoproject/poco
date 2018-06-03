@@ -3,8 +3,6 @@ buildscript {
 
 plugins {
 	id 'com.ullink.nuget' version '2.15'
-//	id 'net.saliman.cobertura' version '2.5.1'
-//	id 'com.jfrog.artifactory' version '4.1'
 }
 apply plugin: 	'base' 
 
