@@ -101,14 +101,14 @@ inline bool isIntOverflow(From val)
 	if (std::numeric_limits<To>::is_signed)
 	{
 		ret = (!std::numeric_limits<From>::is_signed &&
-			  (::uintmax_t)val > (::uintmax_t)INTMAX_MAX) ||
-			  (::intmax_t)val  < (::intmax_t)std::numeric_limits<To>::min() ||
-			  (::intmax_t)val  > (::intmax_t)std::numeric_limits<To>::max();
+			  (uintmax_t)val > (uintmax_t)INTMAX_MAX) ||
+			  (intmax_t)val  < (intmax_t)std::numeric_limits<To>::min() ||
+			  (intmax_t)val  > (intmax_t)std::numeric_limits<To>::max();
 	}
 	else
 	{
 		ret = isNegative(val) ||
-				(::uintmax_t)val > (::uintmax_t)std::numeric_limits<To>::max();
+				(uintmax_t)val > (uintmax_t)std::numeric_limits<To>::max();
 	}
 	return ret;
 }
@@ -192,7 +192,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 
 	// all numbers are parsed as positive; the sign
 	// for negative numbers is adjusted after parsing
-	::uintmax_t limitCheck = std::numeric_limits<I>::max();
+	uintmax_t limitCheck = std::numeric_limits<I>::max();
 	if (negative)
 	{
 		poco_assert_dbg(std::numeric_limits<I>::is_signed);
@@ -200,16 +200,16 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		// taken into account;
 		// to avoid overflow for the largest int size,
 		// we resort to FPEnvironment::copySign() (ie. floating-point)
-		if (sizeof(I) == sizeof(::intmax_t))
-			limitCheck = static_cast<::uintmax_t>(FPEnvironment::copySign(static_cast<double>(std::numeric_limits<I>::min()), 1));
+		if (sizeof(I) == sizeof(intmax_t))
+			limitCheck = static_cast<uintmax_t>(FPEnvironment::copySign(static_cast<double>(std::numeric_limits<I>::min()), 1));
 		else
 		{
-			::intmax_t i = std::numeric_limits<I>::min();
+			intmax_t i = std::numeric_limits<I>::min();
 			limitCheck = -i;
 		}
 	}
 
-	::uintmax_t result = 0;
+	uintmax_t result = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
 		if  (result > (limitCheck / base)) return false;
@@ -272,11 +272,11 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	if (negative && (base == 10))
 	{
 		poco_assert_dbg(std::numeric_limits<I>::is_signed);
-		::intmax_t i;
-		if (sizeof(I) == sizeof(::intmax_t))
-			i = static_cast<::intmax_t>(FPEnvironment::copySign(static_cast<double>(result), -1));
+		intmax_t i;
+		if (sizeof(I) == sizeof(intmax_t))
+			i = static_cast<intmax_t>(FPEnvironment::copySign(static_cast<double>(result), -1));
 		else
-			i = static_cast<::intmax_t>(-result);
+			i = static_cast<intmax_t>(-result);
 		if (isIntOverflow<I>(i)) return false;
 		outResult = static_cast<I>(i);
 	}
