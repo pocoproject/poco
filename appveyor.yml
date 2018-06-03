@@ -418,7 +418,6 @@ build_script:
 
       if ($env:builder -eq "cmake")
       {
-        mkdir build-cmake | out-null;pushd build-cmake;
         if ($env:platform -eq "Win32")
         {
             $openssl = $env:OPENSSL32
@@ -435,7 +434,8 @@ build_script:
         {
             $generator = '"Visual Studio 15 2017"'
         }
-        $defs = "--config Debug"
+        $defs = "-H."
+        $defs+=" -Bbuild-cmake"
         $defs+=" -G" + $generator;
         $defs+=" -DCMAKE_BUILD_TYPE=Debug";
         $defs+=" -DPOCO_ENABLE_PDF=OFF";
@@ -445,14 +445,13 @@ build_script:
         $defs+=" -DPOCO_ENABLE_REDIS=OFF";
         $defs+=" -DPOCO_ENABLE_SAMPLES=ON";
         $defs+=" -DPOCO_ENABLE_TESTS=ON";
-        $defs+=" ..";
         Write-Host -ForegroundColor Yellow cmake $defs
         $process = Start-Process -PassThru -nnw -Wait -FilePath "cmake" -RSO cout -RSE cerr -Args $defs;
         gc cout; gc cerr;
         try {
           $ErrorActionPreference = 'Continue';
-          Write-Host -ForegroundColor Yellow cmake `-`-build .
-          cmake `-`-build .
+          Write-Host -ForegroundColor Yellow cmake `-`-build build-cmake
+          cmake `-`-build build-cmake
         } catch {
           Write-Warning "Oops: $_"
         }

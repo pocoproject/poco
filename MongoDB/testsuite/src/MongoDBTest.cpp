@@ -10,6 +10,7 @@
 
 #include "Poco/DateTime.h"
 #include "Poco/ObjectPool.h"
+#include "Poco/Environment.h"
 #include "Poco/MongoDB/InsertRequest.h"
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
@@ -32,6 +33,21 @@ using namespace Poco::MongoDB;
 
 
 Poco::MongoDB::Connection::Ptr MongoDBTest::_mongo;
+
+namespace
+{
+	std::string getHost()
+	{
+#if POCO_OS == POCO_OS_ANDROID
+		return "10.0.2.2";
+#else
+		if(Poco::Environment::has("MONGODB_HOST"))
+			return Poco::Environment::get("MONGODB_HOST");
+		else
+			return "127.0.0.1";
+#endif
+	}
+}
 
 
 MongoDBTest::MongoDBTest(const std::string& name):
@@ -300,12 +316,7 @@ void MongoDBTest::testBuildInfo()
 
 void MongoDBTest::testConnectionPool()
 {
-#if POCO_OS == POCO_OS_ANDROID
-		std::string host = "10.0.2.2";
-#else
-		std::string host = "127.0.0.1";
-#endif
-
+	std::string host = getHost();
 	Poco::Net::SocketAddress sa(host, 27017);
 	Poco::PoolableObjectFactory<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> factory(sa);
 	Poco::ObjectPool<Poco::MongoDB::Connection, Poco::MongoDB::Connection::Ptr> pool(factory, 10, 15);
@@ -414,13 +425,7 @@ void MongoDBTest::testConnectURI()
 {
 	Poco::MongoDB::Connection conn;
 	Poco::MongoDB::Connection::SocketFactory sf;
-
-#if POCO_OS == POCO_OS_ANDROID
-		std::string host = "10.0.2.2";
-#else
-		std::string host = "127.0.0.1";
-#endif
-
+	std::string host = getHost();
 	conn.connect("mongodb://" + host, sf);
 	conn.disconnect();
 
@@ -463,11 +468,7 @@ void MongoDBTest::testConnectURI()
 
 CppUnit::Test* MongoDBTest::suite()
 {
-#if POCO_OS == POCO_OS_ANDROID
-		std::string host = "10.0.2.2";
-#else
-		std::string host = "127.0.0.1";
-#endif
+	std::string host = getHost();
 	try
 	{
 		_mongo = new Poco::MongoDB::Connection(host, 27017);
