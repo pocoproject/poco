@@ -237,6 +237,17 @@ void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 }
 
 
+void Context::usePrivateKey(const Poco::Crypto::EVPPKey& pkey)
+{
+	int errCode = SSL_CTX_use_PrivateKey(_pSSLContext, const_cast<EVP_PKEY*>(static_cast<const EVP_PKEY*>(pkey)));
+	if (errCode != 1)
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot set private key for Context", msg);
+	}
+}
+
+
 void Context::enableSessionCache(bool flag)
 {
 	if (flag)
