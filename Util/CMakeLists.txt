@@ -1,6 +1,3 @@
-set(LIBNAME "Util")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -15,37 +12,36 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     src/WinService.cpp
 )
 
-add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(Util ${SRCS} )
+add_library(Poco::Util ALIAS Util)
+set_target_properties(Util
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoUtil
     DEFINE_SYMBOL Util_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation)
+target_link_libraries(Util PUBLIC Poco::Foundation)
 if (ENABLE_XML)
-	target_link_libraries( "${LIBNAME}" XML)
+	target_link_libraries(Util PUBLIC Poco::XML)
 else ()
-	add_definitions( -DPOCO_UTIL_NO_XMLCONFIGURATION )
+	target_compile_definitions(Util PUBLIC POCO_UTIL_NO_XMLCONFIGURATION )
 endif()
 if (ENABLE_JSON)
-	target_link_libraries( "${LIBNAME}" JSON)
+	target_link_libraries(Util PUBLIC Poco::JSON)
 else ()
-	add_definitions( -DPOCO_UTIL_NO_JSONCONFIGURATION )
+	target_compile_definitions(Util PUBLIC POCO_UTIL_NO_JSONCONFIGURATION )
 endif()
 
-target_include_directories( "${LIBNAME}"
+target_include_directories(Util
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
-    )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+)
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(Util)
+POCO_GENERATE_PACKAGE(Util)
 
 if (ENABLE_TESTS)
     add_subdirectory(samples)

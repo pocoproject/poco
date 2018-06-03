@@ -1,5 +1,3 @@
-set(TESTUNIT "${LIBNAME}-testrunner")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
@@ -12,6 +10,6 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
-add_executable( ${TESTUNIT} ${TEST_SRCS} )
-add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-target_link_libraries( ${TESTUNIT} PocoSQLPostgreSQL PocoSQL PocoFoundation CppUnit ${PostgreSQL_LIBRARIES})
+add_executable(DataPostgreSQL-testrunner ${TEST_SRCS} )
+add_test(NAME DataPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND DataPostgreSQL-testrunner -all)
+target_link_libraries(DataPostgreSQL-testrunner PUBLIC Poco::DataPostgreSQL CppUnit)

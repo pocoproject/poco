@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "HTTPSTimeServer-win")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoNetSSLWin PocoCrypto PocoUtil PocoNet PocoXML PocoFoundation )
+add_executable(HTTPSTimeServer-win src/HTTPSTimeServer.cpp)
+target_link_libraries(HTTPSTimeServer-win PUBLIC Poco::NetSSLWin Poco::Crypto Poco::XML)

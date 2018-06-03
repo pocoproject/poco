@@ -1,5 +1,3 @@
-set(LIBNAME "mod_poco")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -8,18 +6,18 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
-add_library( "${LIBNAME}" SHARED ${SRCS} )
-set_target_properties( "${LIBNAME}"
+add_library(mod_poco SHARED ${SRCS})
+set_target_properties(mod_poco
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
     DEFINE_SYMBOL ApacheHandlers_EXPORTS)
-target_link_libraries( "${LIBNAME}" )
-target_include_directories( "${LIBNAME}"
+target_include_directories(mod_poco
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+target_link_libraries(mod_poco PUBLIC Poco::Util Poco::Net)
 
 if (ENABLE_TESTS)
   add_subdirectory(samples)
