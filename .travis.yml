@@ -245,7 +245,7 @@ matrix:
         - export POCO_BASE=`pwd`
         - type cmake
         - type ctest
-        - mkdir cmake-build && cd cmake-build && cmake --config Debug -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON .. && make -s -j2 && sudo /usr/bin/ctest -VV && cd ..
+        - mkdir cmake-build && cd cmake-build && cmake --config Debug -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON .. && make -s -j2 && sudo /usr/local/cmake-3.9.2/bin/ctest -VV && cd ..
  
 
     - env:    test="4.0 x86 (make) bundled"
@@ -295,7 +295,7 @@ matrix:
     #  script:
     #    - source ./travis/ignored.sh
     #    - export POCO_BASE=`pwd`
-    #    - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && sudo /usr/bin/ctest -VV -E SQL && cd ..
+    #    - mkdir cmake-build && cd cmake-build && cmake  -DENABLE_PDF=OFF -DENABLE_TESTS=ON .. && make -s -j2 && sudo /usr/local/cmake-3.9.2/bin/ctest -VV -E SQL && cd ..
 
     #- env:    test="arm-linux-gnueabi-g++ (CMake)"
     #  ======================================= "arm-linux-gnueabi-g++: version 4.7.0: non compliant to c++11
