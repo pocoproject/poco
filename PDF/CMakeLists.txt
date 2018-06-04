@@ -140,6 +140,10 @@ target_include_directories( "${LIBNAME}"
     )
 target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
+if(MINGW)
+    add_definitions(-DHPDF_DLL_MAKE_CDECL)
+endif()
+
 POCO_INSTALL("${LIBNAME}")
 POCO_GENERATE_PACKAGE("${LIBNAME}")
 

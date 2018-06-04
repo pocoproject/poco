@@ -33,7 +33,7 @@ namespace Poco {
 namespace Crypto {
 
 
-class CipherKeyImpl: public RefCountedObject
+class Crypto_API CipherKeyImpl: public RefCountedObject
 	/// An implementation of the CipherKey class for OpenSSL's crypto library.
 {
 public:

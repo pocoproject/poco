@@ -491,7 +491,7 @@ inline Poco::Timespan Application::uptime() const
 //
 // Macro to implement main()
 //
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING) && !defined(POCO_NO_MINGW_UNICODE)
 	#define POCO_APP_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)		\
 	{										\

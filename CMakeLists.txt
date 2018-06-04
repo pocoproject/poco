@@ -97,6 +97,10 @@ else()
     option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 endif()
 
+if(BUILD_SHARED_LIBS AND MINGW)
+    add_definitions(-D_DLL)
+endif()
+
 # allow disabling of internally built OpenSSL# (see below for details)
 # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
 # the internal OpenSSL build will be used
