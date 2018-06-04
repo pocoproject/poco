@@ -29,7 +29,6 @@
 #include "Poco/SQL/SQLException.h"
 #include <sqltypes.h>
 #include <iostream>
-#include <dlfcn.h>
 
 
 using namespace Poco::SQL::Keywords;
@@ -859,7 +858,7 @@ void ODBCTest::testBLOBNoTruncation()
 		recreatePersonBLOBTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->blob(2 * maxFieldSize);
+		_pExecutor->blob(2 * static_cast<int>(maxFieldSize));
 		i += 2;
 	}
 	dropObject("TABLE", ExecUtil::person());
