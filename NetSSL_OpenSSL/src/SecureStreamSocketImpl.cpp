@@ -89,9 +89,9 @@ void SecureStreamSocketImpl::connectSSL()
 }
 	
 
-void SecureStreamSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+void SecureStreamSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
-	_impl.bind(address, reuseAddress);
+	_impl.bind(address, reuseAddress, reusePort);
 	reset(_impl.sockfd());
 }
 
