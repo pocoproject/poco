@@ -20,8 +20,9 @@
 #include <set>
 
 
-#define MAX_PATH 260
-
+#ifndef MAX_PATH
+    #define MAX_PATH 260
+#endif
 
 using Poco::File;
 using Poco::TemporaryFile;

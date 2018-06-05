@@ -39,12 +39,11 @@ namespace Poco {
 	{
 		std::string errMsg;
 		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-
 	#if !defined(POCO_NO_WSTRING)
 		LPWSTR lpMsgBuf = 0;
-		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL)) {
+		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-		}
+
 		LocalFree(lpMsgBuf);
     #endif
 		return errMsg;

@@ -2,7 +2,5 @@ add_executable(pkill src/pkill.cpp)
 if(WINCE)
 	set_target_properties(pkill PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
 endif()
-
 target_link_libraries(pkill PUBLIC Poco::Util Poco::JSON Poco::XML)
-
 POCO_ENABLE_EXE_WMAIN(pkill)
