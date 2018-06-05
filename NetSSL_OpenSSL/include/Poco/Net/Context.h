@@ -21,6 +21,7 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
@@ -227,6 +228,16 @@ public:
 		/// Add one trusted certification authority to be used by the Context.
 
 	void usePrivateKey(const Poco::Crypto::RSAKey& key);
+		/// Sets the private key to be used by the Context.
+		///
+		/// Note that useCertificate() must always be called before
+		/// usePrivateKey().
+		///
+		/// Note: If the private key is protected by a passphrase, a PrivateKeyPassphraseHandler
+		/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
+		/// event must be handled.
+
+	void usePrivateKey(const Poco::Crypto::EVPPKey &pkey);
 		/// Sets the private key to be used by the Context.
 		///
 		/// Note that useCertificate() must always be called before

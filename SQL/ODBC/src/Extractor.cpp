@@ -255,113 +255,89 @@ bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos,
 }
 
 
-template<>
-bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val, SQLSMALLINT cType)
+template<typename T>
+bool Extractor::extractManualStringImpl(std::size_t pos, T& val, SQLSMALLINT cType)
 {
-	std::size_t maxSize = _pPreparator->getMaxFieldSize();
-	std::size_t fetchedSize = 0;
-	std::size_t totalSize = 0;
-	
-	SQLLEN len;
-	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<char> apChar(bufSize);
-	char* pChar = apChar.begin();
-	SQLRETURN rc = 0;
+	typedef typename T::value_type CharType;
+	const std::size_t bytesPerChar = sizeof(CharType);
+	const std::size_t charsPerChunk = CHUNK_SIZE;
+	const std::size_t bytesPerChunk = charsPerChunk * bytesPerChar;
+	SQLLEN totalBytes;
+	SQLRETURN rc;
+	CharType tmpBuf[charsPerChunk + 1];  // space for NUL terminator
 	
 	val.clear();
 	resizeLengths(pos);
 
-	do
+	rc = SQLGetData(_rStmt,
+		(SQLUSMALLINT)pos + 1,
+		cType,                         // C data type
+		tmpBuf,                        // returned value
+		bytesPerChunk + bytesPerChar,  // buffer length in bytes, including NUL terminator
+		&totalBytes);                  // size in bytes of this field, not including NULL terminator
+
+	if (SQL_NO_DATA != rc && Utility::isError(rc))
+		throw StatementException(_rStmt, "SQLGetData()");
+
+	if (SQL_NO_TOTAL == totalBytes)  // unknown length, throw
+		throw UnknownDataLengthException("Could not determine returned data length.");
+
+	if (isNullLengthIndicator(totalBytes))
 	{
-		std::memset(pChar, 0, bufSize);
-		len = 0;
+		_lengths[pos] = totalBytes;
+		return false;
+	}
+
+	if (SQL_NO_DATA == rc || !totalBytes)
+		return true;
+
+	_lengths[pos] = totalBytes;
+	const std::size_t totalChars = totalBytes / bytesPerChar;
+
+	if (totalBytes <= bytesPerChunk)
+	{
+		// There is no additional data; we've already got it all
+		val.append(tmpBuf, totalChars);
+	}
+	else
+	{
+		// Reserve space in result string, append what we already have, resize and insert the remaining
+		// data in-place.
+		const std::size_t bytesRemaining = totalBytes - bytesPerChunk;
+		SQLLEN fetchedBytes = 0;
+		val.reserve(totalChars);
+		val.append(tmpBuf, charsPerChunk);
+		val.resize(totalChars);
 		rc = SQLGetData(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			cType, //C data type
-			pChar, //returned value
-			bufSize, //buffer length
-			&len); //length indicator
+			(SQLUSMALLINT)pos + 1,
+			cType,                          // C data type
+			&val[charsPerChunk],            // buffer to write to
+			bytesRemaining + bytesPerChar,  // buffer length in bytes, including NUL terminator
+			&fetchedBytes);                 // number of bytes remaining, not including NULL terminator
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "SQLGetData()");
 
-		if (SQL_NO_TOTAL == len)//unknown length, throw
+		if (SQL_NO_TOTAL == fetchedBytes)  // unknown length, throw
 			throw UnknownDataLengthException("Could not determine returned data length.");
 
-		if (isNullLengthIndicator(len))
-		{
-			_lengths[pos] = len;
-			return false;
-		}
-
-		if (SQL_NO_DATA == rc || !len)
-			break;
-
-		_lengths[pos] += len;
-		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
-		totalSize += fetchedSize;
-		if (totalSize <= maxSize)
-			val.append(pChar, fetchedSize);
-		else
-			throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
-	}while (true);
-
+		if (bytesRemaining != fetchedBytes)  // unexpected number of bytes
+			throw UnknownDataLengthException("Unexpected number of bytes returned from second call to SQLGetData().");
+	}
 	return true;
+}
+
+template<>
+bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val, SQLSMALLINT cType)
+{
+	return extractManualStringImpl(pos, val, cType);
 }
 
 
 template<>
 bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val, SQLSMALLINT cType)
 {
-	std::size_t maxSize = _pPreparator->getMaxFieldSize();
-	std::size_t fetchedSize = 0;
-	std::size_t totalSize = 0;
-
-	SQLLEN len;
-	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<UTF16String::value_type> apChar(bufSize);
-	UTF16String::value_type* pChar = apChar.begin();
-	SQLRETURN rc = 0;
-
-	val.clear();
-	resizeLengths(pos);
-
-	do
-	{
-		std::memset(pChar, 0, bufSize);
-		len = 0;
-		rc = SQLGetData(_rStmt,
-			(SQLUSMALLINT)pos + 1,
-			cType, //C data type
-			pChar, //returned value
-			bufSize, //buffer length
-			&len); //length indicator
-
-		if (SQL_NO_DATA != rc && Utility::isError(rc))
-			throw StatementException(_rStmt, "SQLGetData()");
-
-		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("Could not determine returned data length.");
-
-		if (isNullLengthIndicator(len))
-		{
-			_lengths[pos] = len;
-			return false;
-		}
-
-		if (SQL_NO_DATA == rc || !len)
-			break;
-
-		_lengths[pos] += len;
-		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
-		totalSize += fetchedSize;
-		if (totalSize <= maxSize)
-			val.append(pChar, fetchedSize / sizeof(UTF16Char));
-		else
-			throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
-	} while (true);
-
-	return true;
+	return extractManualStringImpl(pos, val, cType);
 }
 
 
@@ -388,7 +364,6 @@ bool Extractor::extractManualLOBImpl(std::size_t pos,
 	Poco::SQL::LOB<T>& val,
 	SQLSMALLINT cType)
 {
-	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	const int bufSize = CHUNK_SIZE;
 	std::size_t fetchedSize = bufSize;
 	std::size_t totalSize = 0;
@@ -431,11 +406,7 @@ bool Extractor::extractManualLOBImpl(std::size_t pos,
 
 		fetchedSize = len > bufSize ? bufSize : len;
 		totalSize += fetchedSize;
-		if (totalSize <= maxSize)
-			val.appendRaw(pChar, fetchedSize);
-		else
-			throw SQLException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
-
+		val.appendRaw(pChar, fetchedSize);
 	}while (true);
 
 	return true;
@@ -680,7 +651,7 @@ bool Extractor::extract(std::size_t pos, std::list<double>& val)
 
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
-	if (Preparator::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction || _pPreparator->isPotentiallyHuge(pos))
 		return extractManualImpl(pos, val, SQL_C_CHAR);
 	else
 		return extractBoundImpl(pos, val);
@@ -716,7 +687,7 @@ bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
 
 bool Extractor::extract(std::size_t pos, UTF16String& val)
 {
-	if (Preparator::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction || _pPreparator->isPotentiallyHuge(pos))
 		return extractManualImpl(pos, val, SQL_C_WCHAR);
 	else
 		return extractBoundImpl(pos, val);
@@ -752,7 +723,7 @@ bool Extractor::extract(std::size_t pos, std::list<UTF16String>& val)
 
 bool Extractor::extract(std::size_t pos, Poco::SQL::BLOB& val)
 {
-	if (Preparator::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction || _pPreparator->isPotentiallyHuge(pos))
 		return extractManualImpl(pos, val, SQL_C_BINARY);
 	else
 		return extractBoundImpl(pos, val);
@@ -761,7 +732,7 @@ bool Extractor::extract(std::size_t pos, Poco::SQL::BLOB& val)
 
 bool Extractor::extract(std::size_t pos, Poco::SQL::CLOB& val)
 {
-	if (Preparator::DE_MANUAL == _dataExtraction)
+	if (Preparator::DE_MANUAL == _dataExtraction || _pPreparator->isPotentiallyHuge(pos))
 		return extractManualImpl(pos, val, SQL_C_BINARY);
 	else
 		return extractBoundImpl(pos, val);

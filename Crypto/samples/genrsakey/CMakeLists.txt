@@ -1,10 +1,4 @@
-set(SAMPLE_NAME "genrsakey")
+add_executable(genrsakey src/genrsakey.cpp)
+target_link_libraries(genrsakey PUBLIC Poco::Crypto Poco::Util Poco::XML)
 
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoCrypto PocoUtil PocoXML PocoFoundation )
-
-POCO_ENABLE_EXE_WMAIN( "${SAMPLE_NAME}" )
-
+POCO_ENABLE_EXE_WMAIN(genrsakey)

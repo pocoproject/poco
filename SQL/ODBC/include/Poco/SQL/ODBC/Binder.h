@@ -106,6 +106,15 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir);
 		/// Binds an Int8 list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::Int8> >& val, Direction dir);
+		/// Binds an Int8 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::Int8> >& val, Direction dir);
+		/// Binds an Int8 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::Int8> >& val, Direction dir);
+		/// Binds an Int8 list.
+
 	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt8.
 
@@ -116,6 +125,15 @@ public:
 		/// Binds an UInt8 deque.
 
 	void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir);
+		/// Binds an UInt8 list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::UInt8> >& val, Direction dir);
+		/// Binds an UInt8 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::UInt8> >& val, Direction dir);
+		/// Binds an UInt8 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::UInt8> >& val, Direction dir);
 		/// Binds an UInt8 list.
 
 	void bind(std::size_t pos, const Poco::Int16& val, Direction dir, const WhenNullCb& nullCb);
@@ -130,6 +148,15 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir);
 		/// Binds an Int16 list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::Int16> >& val, Direction dir);
+		/// Binds an Int16 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::Int16> >& val, Direction dir);
+		/// Binds an Int16 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::Int16> >& val, Direction dir);
+		/// Binds an Int16 list.
+
 	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt16.
 
@@ -140,6 +167,15 @@ public:
 		/// Binds an UInt16 deque.
 
 	void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir);
+		/// Binds an UInt16 list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::UInt16> >& val, Direction dir);
+		/// Binds an UInt16 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::UInt16> >& val, Direction dir);
+		/// Binds an UInt16 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::UInt16> >& val, Direction dir);
 		/// Binds an UInt16 list.
 
 	void bind(std::size_t pos, const Poco::Int32& val, Direction dir, const WhenNullCb& nullCb);
@@ -154,6 +190,15 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir);
 		/// Binds an Int32 list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::Int32> >& val, Direction dir);
+		/// Binds an Int32 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::Int32> >& val, Direction dir);
+		/// Binds an Int32 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::Int32> >& val, Direction dir);
+		/// Binds an Int32 list.
+
 	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt32.
 
@@ -164,6 +209,15 @@ public:
 		/// Binds an UInt32 deque.
 
 	void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir);
+		/// Binds an UInt32 list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::UInt32> >& val, Direction dir);
+		/// Binds an UInt32 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::UInt32> >& val, Direction dir);
+		/// Binds an UInt32 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::UInt32> >& val, Direction dir);
 		/// Binds an UInt32 list.
 
 	void bind(std::size_t pos, const Poco::Int64& val, Direction dir, const WhenNullCb& nullCb);
@@ -178,6 +232,15 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir);
 		/// Binds an Int64 list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::Int64> >& val, Direction dir);
+		/// Binds an Int64 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::Int64> >& val, Direction dir);
+		/// Binds an Int64 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::Int64> >& val, Direction dir);
+		/// Binds an Int64 list.
+
 	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds an UInt64.
 
@@ -188,6 +251,15 @@ public:
 		/// Binds an UInt64 deque.
 
 	void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir);
+		/// Binds an UInt64 list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<Poco::UInt64> >& val, Direction dir);
+		/// Binds an UInt64 vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Poco::UInt64> >& val, Direction dir);
+		/// Binds an UInt64 deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Poco::UInt64> >& val, Direction dir);
 		/// Binds an UInt64 list.
 
 #ifndef POCO_LONG_IS_64_BIT
@@ -205,6 +277,15 @@ public:
 
 	void bind(std::size_t pos, const std::list<long>& val, Direction dir);
 		/// Binds a long list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<long> >& val, Direction dir);
+		/// Binds a long vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<long> >& val, Direction dir);
+		/// Binds a long deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<long> >& val, Direction dir);
+		/// Binds a long list.
 #endif
 
 	void bind(std::size_t pos, const bool& val, Direction dir, const WhenNullCb& nullCb);
@@ -219,6 +300,15 @@ public:
 	void bind(std::size_t pos, const std::list<bool>& val, Direction dir);
 		/// Binds a boolean list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<bool> >& val, Direction dir);
+		/// Binds a boolean vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<bool> >& val, Direction dir);
+		/// Binds a boolean deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<bool> >& val, Direction dir);
+		/// Binds a boolean list.
+
 	void bind(std::size_t pos, const float& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a float.
 
@@ -230,6 +320,24 @@ public:
 
 	void bind(std::size_t pos, const std::list<float>& val, Direction dir);
 		/// Binds a float list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<float> >& val, Direction dir);
+		/// Binds a float vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<float> >& val, Direction dir);
+		/// Binds a float deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<float> >& val, Direction dir);
+		/// Binds a float list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<double> >& val, Direction dir);
+		/// Binds a double vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<double> >& val, Direction dir);
+		/// Binds a double deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<double> >& val, Direction dir);
+		/// Binds a double list.
 
 	void bind(std::size_t pos, const double& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a double.
@@ -255,6 +363,15 @@ public:
 	void bind(std::size_t pos, const std::list<char>& val, Direction dir);
 		/// Binds a character list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<char> >& val, Direction dir);
+		/// Binds a character vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<char> >& val, Direction dir);
+		/// Binds a character deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<char> >& val, Direction dir);
+		/// Binds a character list.
+
 	void bind(std::size_t pos, const std::string& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a string.
 
@@ -267,17 +384,35 @@ public:
 	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir);
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const UTF16String& val, Direction dir, const WhenNullCb& nullCb);
-		/// Binds a string.
-
-	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Nullable<std::string> >& val, Direction dir);
 		/// Binds a string vector.
 
-	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Nullable<std::string> >& val, Direction dir);
 		/// Binds a string deque.
 
-	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Nullable<std::string> >& val, Direction dir);
 		/// Binds a string list.
+
+	void bind(std::size_t pos, const UTF16String& val, Direction dir, const WhenNullCb& nullCb);
+		/// Binds a UTF-16 Unicode string.
+
+	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir);
+		/// Binds a UTF-16 Unicode string vector.
+
+	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir);
+		/// Binds a UTF-16 Unicode string deque.
+
+	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir);
+		/// Binds a UTF-16 Unicode string list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<UTF16String> >& val, Direction dir);
+		/// Binds a UTF-16 Unicode string vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<UTF16String> >& val, Direction dir);
+		/// Binds a UTF-16 Unicode string deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<UTF16String> >& val, Direction dir);
+		/// Binds a UTF-16 Unicode string list.
 
 	void bind(std::size_t pos, const BLOB& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a BLOB. In-bound only.
@@ -294,6 +429,15 @@ public:
 	void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir);
 		/// Binds a BLOB list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<BLOB> >& val, Direction dir);
+		/// Binds a BLOB vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<BLOB> >& val, Direction dir);
+		/// Binds a BLOB deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<BLOB> >& val, Direction dir);
+		/// Binds a BLOB list.
+
 	void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir);
 		/// Binds a CLOB vector.
 
@@ -301,6 +445,15 @@ public:
 		/// Binds a CLOB deque.
 
 	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir);
+		/// Binds a CLOB list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<CLOB> >& val, Direction dir);
+		/// Binds a CLOB vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<CLOB> >& val, Direction dir);
+		/// Binds a CLOB deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<CLOB> >& val, Direction dir);
 		/// Binds a CLOB list.
 
 	void bind(std::size_t pos, const Date& val, Direction dir, const WhenNullCb& nullCb);
@@ -315,6 +468,15 @@ public:
 	void bind(std::size_t pos, const std::list<Date>& val, Direction dir);
 		/// Binds a Date list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<Date> >& val, Direction dir);
+		/// Binds a Date vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Date> >& val, Direction dir);
+		/// Binds a Date deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Date> >& val, Direction dir);
+		/// Binds a Date list.
+
 	void bind(std::size_t pos, const Time& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a Time.
 
@@ -327,6 +489,15 @@ public:
 	void bind(std::size_t pos, const std::list<Time>& val, Direction dir);
 		/// Binds a Time list.
 
+	void bind(std::size_t pos, const std::vector<Nullable<Time> >& val, Direction dir);
+		/// Binds a Time vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<Time> >& val, Direction dir);
+		/// Binds a Time deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<Time> >& val, Direction dir);
+		/// Binds a Time list.
+
 	void bind(std::size_t pos, const DateTime& val, Direction dir, const WhenNullCb& nullCb);
 		/// Binds a DateTime.
 
@@ -337,6 +508,15 @@ public:
 		/// Binds a DateTime deque.
 
 	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir);
+		/// Binds a DateTime list.
+
+	void bind(std::size_t pos, const std::vector<Nullable<DateTime> >& val, Direction dir);
+		/// Binds a DateTime vector.
+
+	void bind(std::size_t pos, const std::deque<Nullable<DateTime> >& val, Direction dir);
+		/// Binds a DateTime deque.
+
+	void bind(std::size_t pos, const std::list<Nullable<DateTime> >& val, Direction dir);
 		/// Binds a DateTime list.
 
 	void bind(std::size_t pos, const NullData& val, Direction dir, const std::type_info& bindType);
@@ -469,488 +649,490 @@ private:
 		}
 	}
 
-	template <typename T>
-	void bindImplVec(std::size_t pos, const std::vector<T>& val, SQLSMALLINT cDataType, Direction dir)
+	template<typename T>
+	size_t getValueSize(const T& val)
 	{
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("std::vector can only be bound immediately.");
+		return 0;
+	}
 
-		std::size_t length = val.size();
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
+	size_t getValueSize(const std::string& val)
+	{
+		return val.length();
+	}
+
+	size_t getValueSize(const UTF16String& val)
+	{
+		return val.length() * sizeof(UTF16Char);
+	}
+	
+	template <typename T>
+	size_t getValueSize(const LOB<T>& val)
+	{
+		return val.size();
+	}
+
+	template<typename T>
+	size_t getValueSize(const Nullable<T>& val)
+	{
+		if (val.isNull())
+			return 0;
+			
+		return getValueSize(val.value());
+	}
+	
+	template <typename T>
+	SQLLEN getLengthIndicator(const T& val)
+	{
+		return getValueSize(val);
+	}
+
+	SQLLEN getLengthIndicator(const NullData& val)
+	{
+		return SQL_NULL_DATA;
+	}
+
+	template <typename T>
+	SQLLEN getLengthIndicator(const Nullable<T>& val)
+	{
+		if (val.isNull())
+			return SQL_NULL_DATA;
+		else
+			return getLengthIndicator(val.value());
+	}
+	
+	template <typename C>
+	void initLengthIndicator(std::size_t pos, const C& val, size_t length)
+	{
 		setParamSetSize(length);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length);
-		}
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			toODBCDirection(dir),
-			cDataType,
-			static_cast<SQLSMALLINT>(Utility::sqlDataType(cDataType)),
-			colSize,
-			decDigits,
-			(SQLPOINTER) &val[0],
-			0,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter()");
+			_vecLengthIndicator.resize(pos + 1);
+			LengthVec* lenVec = new LengthVec(length);
+			_vecLengthIndicator[pos] = lenVec;
+			LengthVec::iterator itLen = lenVec->begin();
+			for (typename C::const_iterator it = val.begin(); it != val.end(); ++it, ++itLen)
+				*itLen = getLengthIndicator(*it);
 		}
 	}
 
-	template <typename C>
-	void bindImplContainer(std::size_t pos, const C& val, SQLSMALLINT cDataType, Direction dir)
-		/// Utility function - a "stand-in" for non-vector containers.
-		/// Creates, fills and stores the reference to the replacement std::vector container
-		/// for std::deque and std::list. Calls std::vector binding.
+	template <typename T>
+	bool isVariableSizeType(const T*)
 	{
-		typedef typename C::value_type Type;
+		return false;
+	}
+	
+	bool isVariableSizeType(const std::string*)
+	{
+		return true;
+	}
+	
+	bool isVariableSizeType(const UTF16String*)
+	{
+		return true;
+	}
+	
+	template <typename T>
+	bool isVariableSizeType(const LOB<T>*)
+	{
+		return true;
+	}
+	
+	template <typename T>
+	bool isVariableSizeType(const Nullable<T>*)
+	{
+		return isVariableSizeType((T*)nullptr);
+	}
+	
+	template <typename C>
+	void getColSizeAndPrecision(std::size_t pos, 
+		const C& val,
+		SQLSMALLINT cDataType, 
+		SQLINTEGER& colSize, 
+		SQLSMALLINT& decDigits,
+		SQLINTEGER& bufSize)
+	{
+		if (isVariableSizeType((typename C::value_type*)nullptr))
+		{
+			size_t maxSize = 0;
+			for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
+				maxSize = std::max(getValueSize(*it), maxSize);
 
+			colSize = static_cast<SQLINTEGER>(maxSize);
+			decDigits = 0;
+			bufSize = static_cast<SQLINTEGER>(maxSize);
+		}
+		else
+		{
+			getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
+			bufSize = 0;
+		}
+	}
+	
+	template <typename T>
+	void next(T& target, SQLINTEGER)
+	{
+		target++;
+	}
+	
+	template <typename T>
+	void next(T*& target, SQLINTEGER)
+	{
+		target++;
+	}
+	
+	void next(char*& target, SQLINTEGER bufSize)
+	{
+		target += bufSize;
+	}
+	
+	void next(UTF16Char*& target, SQLINTEGER bufSize)
+	{
+		target += bufSize / 2;
+	}
+	
+	template <typename T>
+	void copyValue(T& target, const T& val, SQLINTEGER)
+	{
+		target = val;
+	}
+	
+	void copyValue(char& target, const std::string& str, SQLINTEGER bufSize)
+	{
+		std::size_t strSize = str.length();
+		if (strSize > bufSize)
+			throw LengthExceededException("copyValue(std::vector of strings)");
+		std::memcpy(&target, str.c_str(), strSize);
+	}
+
+	void copyValue(UTF16Char& target, const UTF16String& str, SQLINTEGER bufSize)
+	{
+		std::size_t strSize = str.length();
+		if (strSize > bufSize)
+			throw LengthExceededException("copyValue(std::vector of strings)");
+		std::memcpy(&target, str.c_str(), strSize * sizeof(UTF16Char));
+	}
+
+	template <typename T>
+	void copyValue(char& target, const LOB<T>& lob, SQLINTEGER bufSize)
+	{
+		std::size_t lobSize = lob.size();
+		if (lobSize > bufSize)
+			throw LengthExceededException("copyValue(std::vector of LOB)");
+		std::memcpy(&target, lob.rawContent(), lobSize * sizeof(typename LOB<T>::ValueType));
+	}
+	
+	void copyValue(SQL_DATE_STRUCT& target, const Date& dt, SQLINTEGER)
+	{
+		Utility::dateSync(target, dt);
+	}
+	
+	void copyValue(SQL_TIME_STRUCT& target, const Time& dt, SQLINTEGER)
+	{
+		Utility::timeSync(target, dt);
+	}
+	
+	void copyValue(SQL_TIMESTAMP_STRUCT& target, const DateTime& dt, SQLINTEGER)
+	{
+		Utility::dateTimeSync(target, dt);
+	}
+
+	template <typename T, typename C>
+	std::vector<T>* allocBuffer(size_t pos, size_t bufSize, const C& val, const T*)
+	{
 		if (_containers.size() <= pos)
 			_containers.resize(pos + 1);
+		
+		_containers[pos].push_back(new Any(std::vector<T>(val.size())));
+		std::vector<T>& cont = RefAnyCast<std::vector<T> >(*_containers[pos].back());
+		return &cont;
+	}
+	
+	template <typename C>
+	char* allocBuffer(size_t pos, size_t bufSize, const C& val, const std::string*)
+	{
+		if (_charPtrs.size() <= pos)
+			_charPtrs.resize(pos + 1, 0);
 
-		_containers[pos].push_back( new Any(std::vector<Type>()) );
+		_charPtrs[pos] = (char*)std::calloc(val.size() * bufSize, sizeof(char));
+		return _charPtrs[pos];
+	}
+	
+	template <typename C>
+	UTF16Char* allocBuffer(size_t pos, size_t bufSize, const C& val, const UTF16String*)
+	{
+		if (_utf16CharPtrs.size() <= pos)
+			_utf16CharPtrs.resize(pos + 1, 0);
 
-		std::vector<Type>& cont = RefAnyCast<std::vector<Type> >( *_containers[pos].back() );
-		cont.assign(val.begin(), val.end());
-		bindImplVec(pos, cont, cDataType, dir);
+		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * bufSize, sizeof(UTF16Char));
+		return _utf16CharPtrs[pos];
+	}
+	
+	template <typename T, typename C>
+	char* allocBuffer(size_t pos, size_t bufSize, const C& val, const LOB<T>*)
+	{
+		if (_charPtrs.size() <= pos)
+			_charPtrs.resize(pos + 1, 0);
+
+		_charPtrs[pos] = (char*)std::calloc(val.size() * bufSize, sizeof(typename LOB<T>::ValueType));
+		return _charPtrs[pos];
+	}
+	
+	template <typename C>
+	DateVec* allocBuffer(size_t pos, size_t bufSize, const C& val, const Date*)
+	{
+		if (_dateVecVec.size() <= pos)
+			_dateVecVec.resize(pos + 1, 0);
+
+		_dateVecVec[pos] = new DateVec(val.size());
+		return _dateVecVec[pos];
+	}
+	
+	template <typename C>
+	TimeVec* allocBuffer(size_t pos, size_t bufSize, const C& val, const Time*)
+	{
+		if (_timeVecVec.size() <= pos)
+			_timeVecVec.resize(pos + 1, 0);
+
+		_timeVecVec[pos] = new TimeVec(val.size());
+		return _timeVecVec[pos];
+	}
+	
+	template <typename C>
+	DateTimeVec* allocBuffer(size_t pos, size_t bufSize, const C& val, const DateTime*)
+	{
+		if (_dateTimeVecVec.size() <= pos)
+			_dateTimeVecVec.resize(pos + 1, 0);
+
+		_dateTimeVecVec[pos] = new DateTimeVec(val.size());
+		return _dateTimeVecVec[pos];
 	}
 
 	template <typename C>
-	void bindImplContainerBool(std::size_t pos, const C& val, SQLSMALLINT cDataType, Direction dir)
+	bool* allocBuffer(size_t pos, size_t bufSize, const C& val, const bool*)
 	{
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("std::vector can only be bound immediately.");
-
-		std::size_t length = val.size();
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
-
-		setParamSetSize(val.size());
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length);
-		}
-
 		if (_boolPtrs.size() <= pos)
 			_boolPtrs.resize(pos + 1);
 
 		_boolPtrs[pos] = new bool[val.size()];
+		return _boolPtrs[pos];
+	}
+	
+	template <typename T, typename C>
+	auto* allocBuffer(size_t pos, size_t bufSize, const C& val, const Nullable<T>* dummy)
+	{
+		return allocBuffer(pos, bufSize, val, (const T*)nullptr);
+	}
 
-		typename C::const_iterator it = val.begin();
-		typename C::const_iterator end = val.end();
-		for (int i = 0; it != end; ++it, ++i) _boolPtrs[pos][i] = *it;
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			toODBCDirection(dir),
-			cDataType,
-			static_cast<SQLSMALLINT>(Utility::sqlDataType(cDataType)),
-			colSize,
-			decDigits,
-			(SQLPOINTER) &_boolPtrs[pos][0],
-			0,
-			&(*_vecLengthIndicator[pos])[0])))
+	template <typename C, typename OUTPUT, typename T>
+	void copyContainerValues(OUTPUT out, size_t bufSize, const C& val, const T*)
+	{
+		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
 		{
-			throw StatementException(_rStmt, "SQLBindParameter()");
+			copyValue(*out, *it, static_cast<SQLINTEGER>(bufSize));
+			next(out, static_cast<SQLINTEGER>(bufSize));
 		}
 	}
 
+	template <typename C, typename OUTPUT, typename T>
+	void copyContainerValues(OUTPUT out, size_t bufSize, const C& val, const Nullable<T>*)
+	{
+		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
+		{
+			if (!it->isNull())
+				copyValue(*out, it->value(), static_cast<SQLINTEGER>(bufSize));
+			next(out, static_cast<SQLINTEGER>(bufSize));
+		}
+	}
+	
+	template <typename T>
+	typename std::vector<T>::iterator getOutput(std::vector<T>* cont)
+	{
+		return cont->begin();
+	}
+	
+	template <typename T>
+	T* getOutput(T* cont)
+	{
+		return cont;
+	}
+	
+	template <typename T>
+	SQLPOINTER getContainerPointer(const std::vector<T>* cont)
+	{
+		return (SQLPOINTER)&((*cont)[0]);
+	}
+	
+	template <typename T>
+	SQLPOINTER getContainerPointer(const T* cont)
+	{
+		return (SQLPOINTER)cont;
+	}
+	
 	template <typename C>
-	void bindImplContainerString(std::size_t pos, const C& val, Direction dir)
-		/// Utility function to bind containers of strings.
+	SQLPOINTER copyContainer(size_t pos, size_t bufSize, const C& val)
+	{
+		auto* cont = allocBuffer(pos, bufSize, val, (const typename C::value_type*)nullptr);
+		copyContainerValues(getOutput(cont), bufSize, val, (const typename C::value_type*)nullptr);
+		return getContainerPointer(cont);
+	}
+	
+	SQLPOINTER copyContainer(size_t pos, size_t bufSize, const std::vector<bool>& val)
+	{
+		bool* cont = allocBuffer(pos, bufSize, val, (const bool*)nullptr);
+		copyContainerValues(getOutput(cont), bufSize, val, (const bool*)nullptr);
+		return cont;
+	}
+
+	template <typename T>
+	bool isNativeType(const T*)
+	{
+		return true;
+	}
+	
+	bool isNativeType(const Date*)
+	{
+		return false;
+	}
+	
+	bool isNativeType(const Time*)
+	{
+		return false;
+	}
+	
+	bool isNativeType(const DateTime*)
+	{
+		return false;
+	}
+	
+	template <typename T>
+	SQLPOINTER copyContainer(size_t pos, size_t bufSize, const std::vector<T>& val)
+	{
+		if (isVariableSizeType((const T*)nullptr) || !isNativeType((const T*)nullptr))
+			return copyContainer<std::vector<T>>(pos, bufSize, val);
+		else
+			return (SQLPOINTER)&val[0];
+	}
+	
+	template <typename T>
+	SQLPOINTER copyContainer(size_t pos, size_t bufSize, const std::vector<Nullable<T>>& val)
+	{
+		auto cont = allocBuffer(pos, bufSize, val, (const Nullable<T>*)nullptr);
+		copyContainerValues(getOutput(cont), bufSize, val, (const Nullable<T>*)nullptr);
+		return getContainerPointer(cont);
+	}
+	
+	template <typename T>
+	SQLSMALLINT getSqlType(const T*, SQLSMALLINT cDataType, size_t colSize)
+	{
+		return Utility::sqlDataType(cDataType);
+	}
+	
+	SQLSMALLINT getSqlType(const std::string*, SQLSMALLINT cDataType, size_t colSize)
+	{
+		if (colSize > _maxCharColLength)
+			return SQL_LONGVARCHAR;
+		return SQL_VARCHAR;
+	}
+	
+	SQLSMALLINT getSqlType(const UTF16String*, SQLSMALLINT cDataType, size_t colSize)
+	{
+		if (colSize > _maxWCharColLength)
+			return SQL_WLONGVARCHAR;
+		return SQL_WVARCHAR;
+	}
+	
+	template <typename T>
+	SQLSMALLINT getSqlType(const LOB<T>*, SQLSMALLINT cDataType, size_t colSize)
+	{
+		if (colSize > _maxVarBinColSize)
+			return SQL_LONGVARBINARY;
+		return SQL_VARBINARY;
+	}
+	
+	template <typename T>
+	SQLSMALLINT getSqlType(const Nullable<T>* val, SQLSMALLINT cDataType, size_t colSize)
+	{
+		return getSqlType((T*)nullptr, cDataType, colSize);
+	}
+	
+	template <typename T>
+	void validateDirection(Direction, const T*)
+	{
+	}
+	
+	void validateDirection(Direction dir, const std::string*)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("String container parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
-
-		std::size_t length = val.size();
-
-		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
-
-		setParamSetSize(length);
-
-		SQLINTEGER size = 0;
-		getColumnOrParameterSize(pos, size);
-		poco_assert (size > 0);
-
-		if (size == _maxFieldSize)
-		{
-			getMinValueSize(val, size);
-			// accommodate for terminating zero
-			if (size != _maxFieldSize) ++size;
-		}
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
-		}
-
-		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
-
-		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
-
-		std::size_t strSize;
-		std::size_t offset = 0;
-		typename C::const_iterator it = val.begin();
-		typename C::const_iterator end = val.end();
-		for (; it != end; ++it)
-		{
-			strSize = it->size();
-			if (strSize > size)	
-				throw LengthExceededException("SQLBindParameter(std::vector<std::string>)");
-			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
-			offset += size;
-		}
-		SQLSMALLINT sqlType = (isInBound(dir) && size < _maxCharColLength) ? SQL_VARCHAR : SQL_LONGVARCHAR;
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			toODBCDirection(dir),
-			SQL_C_CHAR,
-			sqlType,
-			(SQLUINTEGER) size - 1,
-			0,
-			_charPtrs[pos],
-			(SQLINTEGER) size,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter(std::vector<std::string>)");
-		}
 	}
-
-	template <typename C>
-	void bindImplContainerUTF16String(std::size_t pos, const C& val, Direction dir)
-		/// Utility function to bind containers of strings.
+	
+	void validateDirection(Direction dir, const UTF16String*)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("String container parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
-
-		std::size_t length = val.size();
-		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
-
-		setParamSetSize(val.size());
-
-		SQLINTEGER fieldSize = 0;
-		getColumnOrParameterSize(pos, fieldSize);
-		poco_assert(fieldSize > 0);
-
-		if (fieldSize == _maxFieldSize)
-		{
-			getMinValueSize(val, fieldSize);
-			// accommodate for terminating zero
-			if (fieldSize != _maxFieldSize) fieldSize += sizeof(UTF16Char);
-		}
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
-		}
-
-		if (_utf16CharPtrs.size() <= pos)
-			_utf16CharPtrs.resize(pos + 1, 0);
-
-		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * fieldSize, sizeof(UTF16Char));
-
-		std::size_t strSize;
-		std::size_t offset = 0;
-		char* pBuf = (char*)_utf16CharPtrs[pos];
-		typename C::const_iterator it = val.begin();
-		typename C::const_iterator end = val.end();
-		for (; it != end; ++it)
-		{
-			strSize = it->size() * sizeof(UTF16Char);
-			if (strSize > fieldSize - sizeof(UTF16Char))
-				throw LengthExceededException("Binder::bindImplContainerUTF16String");
-			std::memcpy(pBuf + offset, it->data(), strSize);
-			offset += fieldSize;
-		}
-		SQLSMALLINT sqlType = (isInBound(dir) && fieldSize < _maxWCharColLength) ? SQL_WVARCHAR : SQL_WLONGVARCHAR;
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT)pos + 1,
-			toODBCDirection(dir),
-			SQL_C_WCHAR,
-			sqlType,
-			(SQLUINTEGER)fieldSize,
-			0,
-			_utf16CharPtrs[pos],
-			(SQLINTEGER)fieldSize,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter(std::vector<UTF16String>)");
-		}
+			throw NotImplementedException("UTF16String container parameter type can only be inbound.");
 	}
-
-	template <typename C>
-	void bindImplContainerLOB(std::size_t pos, const C& val, Direction dir)
-	{
-		typedef typename C::value_type LOBType;
-		typedef typename LOBType::ValueType CharType;
-
-		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("BLOB container parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
-
-		std::size_t length = val.size();
-		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
-
-		setParamSetSize(length);
-
-		SQLINTEGER size = 0;
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
-		}
-
-		std::vector<SQLLEN>::iterator lIt = _vecLengthIndicator[pos]->begin();
-		std::vector<SQLLEN>::iterator lEnd = _vecLengthIndicator[pos]->end();
-		typename C::const_iterator cIt = val.begin();
-		for (; lIt != lEnd; ++lIt, ++cIt)
-		{
-			SQLLEN sz = static_cast<SQLLEN>(cIt->size());
-			if (sz > size) size = static_cast<SQLINTEGER>(sz);
-			*lIt = sz;
-		}
-
-		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
-
-		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(CharType));
-		poco_check_ptr (_charPtrs[pos]);
-
-		std::size_t blobSize;
-		std::size_t offset = 0;
-		cIt = val.begin();
-		typename C::const_iterator cEnd = val.end();
-		for (; cIt != cEnd; ++cIt)
-		{
-			blobSize = cIt->size();
-			if (blobSize > size)	
-				throw LengthExceededException("SQLBindParameter(std::vector<BLOB>)");
-			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
-			offset += size;
-		}
-		SQLSMALLINT sqlType = (isInBound(dir) && size <= _maxVarBinColSize) ? SQL_VARBINARY : SQL_LONGVARBINARY;
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			SQL_PARAM_INPUT,
-			SQL_C_BINARY,
-			sqlType,
-			(SQLUINTEGER) size,
-			0,
-			_charPtrs[pos],
-			(SQLINTEGER) size,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter(std::vector<BLOB>)");
-		}
-	}
-
-	template<typename C>
-	void bindImplContainerDate(std::size_t pos, const C& val, Direction dir)
+	
+	template <typename T>
+	void validateDirection(Direction dir, const LOB<T>*)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("Date vector parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("std::vector can only be bound immediately.");
-
-		std::size_t length = val.size();
-
-		if (0 == length)
-			throw InvalidArgumentException("Empty vector not allowed.");
-
-		setParamSetSize(length);
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
-		}
-
-		if (_dateVecVec.size() <= pos)
-		{
-			_dateVecVec.resize(pos + 1, 0);
-			_dateVecVec[pos] = new DateVec(length ? length : 1);
-		}
-
-		Utility::dateSync(*_dateVecVec[pos], val);
-
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_TYPE_DATE, colSize, decDigits);
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			toODBCDirection(dir),
-			SQL_C_TYPE_DATE,
-			SQL_TYPE_DATE,
-			colSize,
-			decDigits,
-			(SQLPOINTER) &(*_dateVecVec[pos])[0],
-			0,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter(Date[])");
-		}
+			throw NotImplementedException("LOB container parameter type can only be inbound.");
 	}
-
-	template<typename C>
-	void bindImplContainerTime(std::size_t pos, const C& val, Direction dir)
+	
+	void validateDirection(Direction dir, const Date*)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("Date container parameter type can only be inbound.");
+	}
+	
+	void validateDirection(Direction dir, const Time*)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("Time container parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
-
-		std::size_t length = val.size();
-		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
-
-		setParamSetSize(val.size());
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
-		}
-
-		if (_timeVecVec.size() <= pos)
-		{
-			_timeVecVec.resize(pos + 1, 0);
-			_timeVecVec[pos] = new TimeVec(length ? length : 1);
-		}
-
-		Utility::timeSync(*_timeVecVec[pos], val);
-
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_TYPE_TIME, colSize, decDigits);
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			toODBCDirection(dir),
-			SQL_C_TYPE_TIME,
-			SQL_TYPE_TIME,
-			colSize,
-			decDigits,
-			(SQLPOINTER) &(*_timeVecVec[pos])[0],
-			0,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
-		}
 	}
-
-	template<typename C>
-	void bindImplContainerDateTime(std::size_t pos, const C& val, Direction dir)
+	
+	void validateDirection(Direction dir, const DateTime*)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("DateTime container parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
-
-		std::size_t length = val.size();
-
-		if (0 == length)
-			throw InvalidArgumentException("Empty Containers not allowed.");
-
-		setParamSetSize(length);
-
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
-		}
-
-		if (_dateTimeVecVec.size() <= pos)
-		{
-			_dateTimeVecVec.resize(pos + 1, 0);
-			_dateTimeVecVec[pos] = new DateTimeVec(length ? length : 1);
-		}
-
-		Utility::dateTimeSync(*_dateTimeVecVec[pos], val);
-
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_TYPE_TIMESTAMP, colSize, decDigits);
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			toODBCDirection(dir),
-			SQL_C_TYPE_TIMESTAMP,
-			SQL_TYPE_TIMESTAMP,
-			colSize,
-			decDigits,
-			(SQLPOINTER) &(*_dateTimeVecVec[pos])[0],
-			0,
-			&(*_vecLengthIndicator[pos])[0])))
-		{
-			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
-		}
 	}
-
-	template<typename C>
-	void bindImplNullContainer(std::size_t pos, const C& val, Direction dir, const std::type_info& bindElemType)
+	
+	template <typename T>
+	void validateDirection(Direction dir, const Nullable<T>*)
 	{
-		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("Null container parameter type can only be inbound.");
-
-		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Container can only be bound immediately.");
-
-		std::size_t length = val.size();
-
-		if (0 == length)
+		validateDirection(dir, (T*)nullptr);
+	}
+	
+	template <typename C>
+	void bindImplContainer(std::size_t pos, const C& val, SQLSMALLINT cDataType, Direction dir)
+	{
+		if (val.empty())
 			throw InvalidArgumentException("Empty container not allowed.");
 
-		setParamSetSize(length);
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("container can only be bound immediately.");
 
-		if (_vecLengthIndicator.size() <= pos)
-		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
-		}
+		validateDirection(dir, (typename C::value_type*)nullptr);
+		
+		const size_t length = val.size();
+		initLengthIndicator(pos, val, length);
+		
+		SQLINTEGER colSize;
+		SQLINTEGER bufSize;
+		SQLSMALLINT decDigits;
+		getColSizeAndPrecision(pos, val, cDataType, colSize, decDigits, bufSize);
+		SQLPOINTER cont = copyContainer(pos, bufSize, val);
 
-		SQLINTEGER colSize = 0;
-		SQLSMALLINT decDigits = 0;
-		SQLSMALLINT colType = _pTypeInfo->tryTypeidToCType(bindElemType, SQL_C_STINYINT);
-		getColSizeAndPrecision(pos, colType, colSize, decDigits);
-
-		if (Utility::isError(SQLBindParameter(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			SQL_PARAM_INPUT,
-			colType,
-			static_cast<SQLSMALLINT>(Utility::sqlDataType(colType)),
+		if (Utility::isError(SQLBindParameter(_rStmt, 
+			(SQLUSMALLINT) pos + 1, 
+			toODBCDirection(dir),
+			cDataType,
+			getSqlType((typename C::value_type*)NULL, cDataType, colSize),
 			colSize,
 			decDigits,
-			0,
-			0,
+			cont,
+			bufSize,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
@@ -983,40 +1165,6 @@ private:
 
 	void freeMemory();
 		/// Frees all dynamically allocated memory resources.
-
-
-	template<typename T>
-	void getMinValueSize(T& val, SQLINTEGER& size)
-		/// Some ODBC drivers return DB-wide maximum allowed size for variable size columns,
-		/// rather than the allowed size for the actual column. In such cases, the length is
-		/// automatically resized to the maximum field size allowed by the session.
-		/// This function, in order to prevent unnecessary memory allocation, does further
-		/// optimization, looking for the maximum length within supplied data container and
-		/// uses the smaller of maximum found and maximum predefined data length.
-	{
-		typedef typename T::value_type ContainedValType;
-		typedef typename ContainedValType::value_type BaseValType;
-		std::size_t typeSize = sizeof(BaseValType);
-		std::size_t maxSize = 0;
-		typename T::const_iterator it = val.begin();
-		typename T::const_iterator end = val.end();
-		for (; it != end; ++it)
-		{
-			std::size_t sz = it->size() * typeSize;
-			if (sz > _maxFieldSize)
-				throw LengthExceededException();
-
-			if (sz == _maxFieldSize)
-			{
-				maxSize = 0;
-				break;
-			}
-
-			if (sz < _maxFieldSize && sz > maxSize)
-				maxSize = sz;
-		}
-		if (maxSize) size = static_cast<SQLINTEGER>(maxSize);
-	}
 
 	const StatementHandle& _rStmt;
 
@@ -1063,7 +1211,7 @@ inline void Binder::bind(std::size_t pos, const Poco::Int8& val, Direction dir, 
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_STINYINT, dir);
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
 }
 
 
@@ -1079,6 +1227,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int8>& val, Dire
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::Int8> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::Int8> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::Int8> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_UTINYINT, dir, nullCb);
@@ -1087,7 +1253,7 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt8& val, Direction dir,
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_UTINYINT, dir);
+	bindImplContainer(pos, val, SQL_C_UTINYINT, dir);
 }
 
 
@@ -1103,6 +1269,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt8>& val, Dir
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::UInt8> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_UTINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::UInt8> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_UTINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::UInt8> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_UTINYINT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_SSHORT, dir, nullCb);
@@ -1111,7 +1295,7 @@ inline void Binder::bind(std::size_t pos, const Poco::Int16& val, Direction dir,
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_SSHORT, dir);
+	bindImplContainer(pos, val, SQL_C_SSHORT, dir);
 }
 
 
@@ -1127,6 +1311,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int16>& val, Dir
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::Int16> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SSHORT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::Int16> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SSHORT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::Int16> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SSHORT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_USHORT, dir, nullCb);
@@ -1135,7 +1337,7 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt16& val, Direction dir
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_USHORT, dir);
+	bindImplContainer(pos, val, SQL_C_USHORT, dir);
 }
 
 
@@ -1151,6 +1353,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt16>& val, Di
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::UInt16> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_USHORT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::UInt16> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_USHORT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::UInt16> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_USHORT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_SLONG, dir, nullCb);
@@ -1159,7 +1379,7 @@ inline void Binder::bind(std::size_t pos, const Poco::Int32& val, Direction dir,
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_SLONG, dir);
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
 }
 
 
@@ -1175,6 +1395,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int32>& val, Dir
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::Int32> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::Int32> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::Int32> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_ULONG, dir, nullCb);
@@ -1183,7 +1421,7 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt32& val, Direction dir
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_ULONG, dir);
+	bindImplContainer(pos, val, SQL_C_ULONG, dir);
 }
 
 
@@ -1199,6 +1437,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt32>& val, Di
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::UInt32> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_ULONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::UInt32> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_ULONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::UInt32> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_ULONG, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_SBIGINT, dir, nullCb);
@@ -1207,7 +1463,7 @@ inline void Binder::bind(std::size_t pos, const Poco::Int64& val, Direction dir,
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_SBIGINT, dir);
+	bindImplContainer(pos, val, SQL_C_SBIGINT, dir);
 }
 
 
@@ -1223,6 +1479,24 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Dir
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::Int64> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::Int64> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::Int64> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SBIGINT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_UBIGINT, dir, nullCb);
@@ -1231,7 +1505,7 @@ inline void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir
 
 inline void Binder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_UBIGINT, dir);
+	bindImplContainer(pos, val, SQL_C_UBIGINT, dir);
 }
 
 
@@ -1242,6 +1516,24 @@ inline void Binder::bind(std::size_t pos, const std::deque<Poco::UInt64>& val, D
 
 
 inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_UBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Poco::UInt64> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_UBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Poco::UInt64> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_UBIGINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Poco::UInt64> >& val, Direction dir)
 {
 	bindImplContainer(pos, val, SQL_C_UBIGINT, dir);
 }
@@ -1262,7 +1554,7 @@ inline void Binder::bind(std::size_t pos, const unsigned long& val, Direction di
 
 inline void Binder::bind(std::size_t pos, const std::vector<long>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_SLONG, dir);
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
 }
 
 
@@ -1273,6 +1565,24 @@ inline void Binder::bind(std::size_t pos, const std::deque<long>& val, Direction
 
 
 inline void Binder::bind(std::size_t pos, const std::list<long>& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<long> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<long> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_SLONG, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<long> >& val, Direction dir)
 {
 	bindImplContainer(pos, val, SQL_C_SLONG, dir);
 }
@@ -1287,7 +1597,7 @@ inline void Binder::bind(std::size_t pos, const float& val, Direction dir, const
 
 inline void Binder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_FLOAT, dir);
+	bindImplContainer(pos, val, SQL_C_FLOAT, dir);
 }
 
 
@@ -1303,6 +1613,24 @@ inline void Binder::bind(std::size_t pos, const std::list<float>& val, Direction
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<float> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_FLOAT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<float> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_FLOAT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<float> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_FLOAT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const double& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_DOUBLE, dir, nullCb);
@@ -1311,7 +1639,7 @@ inline void Binder::bind(std::size_t pos, const double& val, Direction dir, cons
 
 inline void Binder::bind(std::size_t pos, const std::vector<double>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_DOUBLE, dir);
+	bindImplContainer(pos, val, SQL_C_DOUBLE, dir);
 }
 
 
@@ -1327,6 +1655,24 @@ inline void Binder::bind(std::size_t pos, const std::list<double>& val, Directio
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<double> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_DOUBLE, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<double> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_DOUBLE, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<double> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_DOUBLE, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const bool& val, Direction dir, const WhenNullCb& nullCb)
 {
 	bindImpl(pos, val, SQL_C_BIT, dir, nullCb);
@@ -1335,19 +1681,37 @@ inline void Binder::bind(std::size_t pos, const bool& val, Direction dir, const 
 
 inline void Binder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir)
 {
-	bindImplContainerBool(pos, val, SQL_C_BIT, dir);
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<bool>& val, Direction dir)
 {
-	bindImplContainerBool(pos, val, SQL_C_BIT, dir);
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<bool>& val, Direction dir)
 {
-	bindImplContainerBool(pos, val, SQL_C_BIT, dir);
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<bool> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<bool> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<bool> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BIT, dir);
 }
 
 
@@ -1359,7 +1723,7 @@ inline void Binder::bind(std::size_t pos, const char& val, Direction dir, const 
 
 inline void Binder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
 {
-	bindImplVec(pos, val, SQL_C_STINYINT, dir);
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
 }
 
 
@@ -1375,40 +1739,95 @@ inline void Binder::bind(std::size_t pos, const std::list<char>& val, Direction 
 }
 
 
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<char> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<char> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<char> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
+}
+
+
 inline void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
 {
-	bindImplContainerString(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<std::string>& val, Direction dir)
 {
-	bindImplContainerString(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir)
 {
-	bindImplContainerString(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<std::string> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<std::string> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<std::string> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_CHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir)
 {
-	bindImplContainerUTF16String(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir)
 {
-	bindImplContainerUTF16String(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir)
 {
-	bindImplContainerUTF16String(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
 }
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<UTF16String> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<UTF16String> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<UTF16String> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_WCHAR, dir);
+}
+
 
 inline void Binder::bind(std::size_t pos, const BLOB& val, Direction dir, const WhenNullCb& nullCb)
 {
@@ -1424,109 +1843,199 @@ inline void Binder::bind(std::size_t pos, const CLOB& val, Direction dir, const 
 
 inline void Binder::bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<BLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<BLOB> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<BLOB> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<BLOB> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<CLOB>& val, Direction dir)
 {
-	bindImplContainerLOB(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<CLOB> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<CLOB> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<CLOB> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_BINARY, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::vector<Date>& val, Direction dir)
 {
-	bindImplContainerDate(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<Date>& val, Direction dir)
 {
-	bindImplContainerDate(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<Date>& val, Direction dir)
 {
-	bindImplContainerDate(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Date> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Date> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Date> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_DATE, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::vector<Time>& val, Direction dir)
 {
-	bindImplContainerTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<Time>& val, Direction dir)
 {
-	bindImplContainerTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<Time>& val, Direction dir)
 {
-	bindImplContainerTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<Time> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<Time> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<Time> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_TIME, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir)
 {
-	bindImplContainerDateTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir)
 {
-	bindImplContainerDateTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<DateTime>& val, Direction dir)
 {
-	bindImplContainerDateTime(pos, val, dir);
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Nullable<DateTime> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Nullable<DateTime> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Nullable<DateTime> >& val, Direction dir)
+{
+	bindImplContainer(pos, val, SQL_C_TYPE_TIMESTAMP, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir, const std::type_info& bindElemType)
 {
-	bindImplNullContainer(pos, val, dir, bindElemType);
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::deque<NullData>& val, Direction dir, const std::type_info& bindElemType)
 {
-	bindImplNullContainer(pos, val, dir, bindElemType);
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
 }
 
 
 inline void Binder::bind(std::size_t pos, const std::list<NullData>& val, Direction dir, const std::type_info& bindElemType)
 {
-	bindImplNullContainer(pos, val, dir, bindElemType);
+	bindImplContainer(pos, val, SQL_C_STINYINT, dir);
 }
 
 

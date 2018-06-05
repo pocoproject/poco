@@ -29,7 +29,6 @@ include ':CppParser'
 include ':MongoDB'
 include ':Redis'
 include ':PocoDoc'
-include ':ProGen'
 
 include ':Encodings:testsuite'
 include ':Foundation:testsuite'

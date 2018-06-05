@@ -34,6 +34,7 @@ private:
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateFloatsTable();
+	void recreateDoublesTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateAnysTable();
@@ -41,6 +42,7 @@ private:
 	void recreateMiscTable();
 	void recreateLogTable();
 	void testStoredProcedure();
+	void testStoredProcedureIQ();
 	void testStoredProcedureDynamicAny();
 	void testStoredProcedureAny();
 	void testTransaction();

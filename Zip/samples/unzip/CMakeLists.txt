@@ -1,13 +1,8 @@
-set(SAMPLE_NAME "sample-unzip")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
+add_executable(sample-unzip src/unzip.cpp)
 if(WINCE)
-set_target_properties( ${SAMPLE_NAME} PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
+	set_target_properties(sample-unzip PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
 endif()
-target_link_libraries( ${SAMPLE_NAME} PocoZip PocoUtil PocoXML PocoFoundation )
 
-POCO_ENABLE_EXE_WMAIN( "${SAMPLE_NAME}" )
+target_link_libraries(sample-unzip PUBLIC Poco::Zip Poco::Util Poco::XML)
 
+POCO_ENABLE_EXE_WMAIN(sample-unzip)

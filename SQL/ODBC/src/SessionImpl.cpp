@@ -31,12 +31,14 @@ SessionImpl::SessionImpl(const std::string& connect,
 	std::size_t loginTimeout,
 	std::size_t maxFieldSize,
 	bool autoBind,
-	bool autoExtract):
+	bool autoExtract,
+	bool makeExtractorsBeforeExecute):
 	Poco::SQL::AbstractSessionImpl<SessionImpl>(connect, loginTimeout),
 		_connector(Connector::KEY),
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
+		_makeExtractorsBeforeExecute(makeExtractorsBeforeExecute),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
 		_queryTimeout(-1)
@@ -49,11 +51,13 @@ SessionImpl::SessionImpl(const std::string& connect,
 	Poco::Any maxFieldSize,
 	bool /*enforceCapability*/,
 	bool autoBind,
-	bool autoExtract): Poco::SQL::AbstractSessionImpl<SessionImpl>(connect),
+	bool autoExtract,
+	bool makeExtractorsBeforeExecute): Poco::SQL::AbstractSessionImpl<SessionImpl>(connect),
 		_connector(Connector::KEY),
 		_maxFieldSize(maxFieldSize),
 		_autoBind(autoBind),
 		_autoExtract(autoExtract),
+		_makeExtractorsBeforeExecute(makeExtractorsBeforeExecute),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
 		_queryTimeout(-1)
@@ -154,6 +158,10 @@ void SessionImpl::open(const std::string& connect)
 	addFeature("autoExtract",
 		&SessionImpl::autoExtract,
 		&SessionImpl::isAutoExtract);
+
+	addFeature("makeExtractorsBeforeExecute", 
+		&SessionImpl::makeExtractorsBeforeExecute, 
+		&SessionImpl::isMakeExtractorsBeforeExecute);
 
 	addProperty("maxFieldSize",
 		&SessionImpl::setMaxFieldSize,
