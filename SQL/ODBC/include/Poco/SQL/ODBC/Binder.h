@@ -757,10 +757,10 @@ private:
 			size_t maxSize = 0;
 			for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
 				maxSize = std::max(getValueSize(*it), maxSize);
-				
-			colSize = maxSize;
+
+			colSize = static_cast<SQLINTEGER>(maxSize);
 			decDigits = 0;
-			bufSize = maxSize;
+			bufSize = static_cast<SQLINTEGER>(maxSize);
 		}
 		else
 		{
@@ -929,8 +929,8 @@ private:
 	{
 		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
 		{
-			copyValue(*out, *it, bufSize);
-			next(out, bufSize);
+			copyValue(*out, *it, static_cast<SQLINTEGER>(bufSize));
+			next(out, static_cast<SQLINTEGER>(bufSize));
 		}
 	}
 
@@ -940,8 +940,8 @@ private:
 		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
 		{
 			if (!it->isNull())
-				copyValue(*out, it->value(), bufSize);
-			next(out, bufSize);
+				copyValue(*out, it->value(), static_cast<SQLINTEGER>(bufSize));
+			next(out, static_cast<SQLINTEGER>(bufSize));
 		}
 	}
 	

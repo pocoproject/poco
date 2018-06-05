@@ -1604,7 +1604,7 @@ void SQLExecutor::insertSingleBulkNullableVec()
 			UTF16String utf = Poco::UnicodeConverter::to<UTF16String>("WString" + std::to_string(x));
 			dataWString.push_back(utf);
 			dataInt.push_back(x);
-			dataFloat.push_back(x * 1.5);
+			dataFloat.push_back(x * 1.5f);
 			dataBlob.push_back(CLOB(std::string("Blob" + std::to_string(x))));
 			date += Poco::Timespan(2, 0, 2, 0, 0);
 			dataDateTime.push_back(date);

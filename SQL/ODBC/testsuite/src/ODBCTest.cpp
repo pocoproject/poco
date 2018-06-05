@@ -29,9 +29,6 @@
 #include "Poco/SQL/SQLException.h"
 #include <sqltypes.h>
 #include <iostream>
-#ifdef POCO_OS_FAMILY_UNIX
-#include <dlfcn.h>
-#endif
 
 using namespace Poco::SQL::Keywords;
 using Poco::SQL::Session;
@@ -860,7 +857,7 @@ void ODBCTest::testBLOBNoTruncation()
 		recreatePersonBLOBTable();
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->blob(2 * maxFieldSize);
+		_pExecutor->blob(2 * static_cast<int>(maxFieldSize));
 		i += 2;
 	}
 	dropObject("TABLE", ExecUtil::person());
@@ -1438,20 +1435,6 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
 
-#ifdef POCO_OS_FAMILY_UNIX
-	static bool iqloaded = false;
-	if (!iqloaded)
-	{
-		const char* filename="/ms/dist/spg/PROJ/iq/iq_client_prod/lib64/libdbodbc11.so";
-		void* lib = dlopen(filename, RTLD_NOW);
-		if (!lib)
-		{
-			const char* error = dlerror();
-			std::cout << "Failed to load " << filename << ": " << (error ? error : "No error message") << std::endl;
-		}
-		iqloaded = true;
-	}
-#endif
 	try
 	{
 		std::cout << "Connecting to [" << dbConnString << ']' << std::endl;
