@@ -605,6 +605,7 @@ void StringTest::testStringToFloat()
 	assertTrue (FPEnvironment::isNaN(strToFloat("infinity")));
 	assertTrue (!FPEnvironment::isNaN(strToFloat("infinity", "infinity")));
 	assertTrue (!FPEnvironment::isNaN(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("1.23")));
 	assertTrue (FPEnvironment::isNaN(strToFloat("Inf")));
 	assertTrue (!FPEnvironment::isNaN(strToFloat("Inf", "Inf")));
 
@@ -612,6 +613,7 @@ void StringTest::testStringToFloat()
 	assertTrue (FPEnvironment::isInfinite(strToFloat("-inf")));
 	assertTrue (FPEnvironment::isInfinite(strToFloat("infinity", "infinity")));
 	assertTrue (FPEnvironment::isInfinite(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("1.23")));
 	assertTrue (!FPEnvironment::isInfinite(strToFloat("abc")));
 	assertTrue (FPEnvironment::isInfinite(strToFloat("Inf", "Inf")));
 }
@@ -763,6 +765,7 @@ void StringTest::testStringToDouble()
 	assertTrue (FPEnvironment::isNaN(strToDouble("infinity")));
 	assertTrue (!FPEnvironment::isNaN(strToDouble("infinity", "infinity")));
 	assertTrue (!FPEnvironment::isNaN(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("1.23")));
 	assertTrue (FPEnvironment::isNaN(strToDouble("Inf")));
 	assertTrue (!FPEnvironment::isNaN(strToDouble("Inf", "Inf")));
 
@@ -770,6 +773,7 @@ void StringTest::testStringToDouble()
 	assertTrue (FPEnvironment::isInfinite(strToDouble("-inf")));
 	assertTrue (FPEnvironment::isInfinite(strToDouble("infinity", "infinity")));
 	assertTrue (FPEnvironment::isInfinite(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("1.23")));
 	assertTrue (!FPEnvironment::isInfinite(strToDouble("abc")));
 	assertTrue (FPEnvironment::isInfinite(strToDouble("Inf", "Inf")));
 }

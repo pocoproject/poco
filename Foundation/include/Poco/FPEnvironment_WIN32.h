@@ -92,18 +92,21 @@ private:
 //
 inline bool FPEnvironmentImpl::isInfiniteImpl(float value)
 {
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(double value)
 {
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 {
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 }
 
