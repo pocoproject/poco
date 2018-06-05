@@ -33,19 +33,24 @@ TextTestResult::TextTestResult(std::ostream& ostr):
 void TextTestResult::setup()
 {
 #if !defined(_WIN32_WCE)
-	const char* env = std::getenv("CPPUNIT_IGNORE");
-	if (env)
+	const char* ignore = std::getenv("CPPUNIT_IGNORE");
+	const char* verbose = std::getenv("CPPUNIT_VERBOSE");
+	if (ignore)
 	{
-		std::string ignored = env;
+		std::string ignored = ignore;
 		std::string::const_iterator it = ignored.begin();
 		std::string::const_iterator end = ignored.end();
-		while (it != end)
+		for (;;)
 		{
-			while (it != end && (std::isspace(*it) || *it == '"' || *it == '\'')) ++it;
+			while (it != end && (std::isspace(*it) || *it == '"' || *it == ',' || *it == '\'')) ++it;
+			if (it == end)
+				break;
+
 			std::string test;
 			while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
-			if (it != end && (*it == ',' || *it == '"' || *it == '\'')) ++it;
 			if (!test.empty()) _ignored.insert(test);
+			if (verbose)
+				_ostr << "ignored: " << test << std::endl;
 		}
 	}
 #endif
