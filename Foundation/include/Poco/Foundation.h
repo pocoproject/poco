@@ -137,6 +137,8 @@
 #define POCO_DEPRECATED __attribute__((deprecated))
 #elif defined(__clang__)
 #define POCO_DEPRECATED __attribute__((deprecated))
+#elif defined(__MINGW32__)
+#define POCO_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER)
 #define POCO_DEPRECATED __declspec(deprecated)
 #else
