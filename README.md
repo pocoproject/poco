@@ -1,6 +1,6 @@
 ![alt text][logo]
 
-[![VSTS Build Status](https://pocoproject.visualstudio.com/_apis/public/build/definitions/61efe068-acd0-462e-9dc0-37a7ebfc59a3/12/badge)]
+[![VSTS Build Status](https://pocoproject.visualstudio.com/_apis/public/build/definitions/61efe068-acd0-462e-9dc0-37a7ebfc59a3/12/badge)](https://pocoproject.visualstudio.com/poco)
 [![Travis Build Status](https://travis-ci.org/pocoproject/poco.png?branch=develop)](https://travis-ci.org/pocoproject/poco)
 [![Build status](https://ci.appveyor.com/api/projects/status/7iyrx3f233s3akae/branch/develop?svg=true)](https://ci.appveyor.com/project/obiltschnig/poco/branch/develop)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
@@ -35,3 +35,4 @@ Side-by-side use of Boost and POCO is a very common occurrence.
 
 [overview]: https://raw.githubusercontent.com/pocoproject/poco/develop/doc/images/overview.png "Poco Overview"
 [logo]: https://raw.githubusercontent.com/pocoproject/poco/develop/doc/images/logo.png "Poco Logo"
+)
