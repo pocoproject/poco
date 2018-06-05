@@ -42,6 +42,7 @@ if (WIN32)
 				 $ENV{MYSQL_DIR}/lib/${libsuffixDist}
 				 $ENV{MYSQL_DIR}/libmysql/${libsuffixBuild}
 				 $ENV{MYSQL_DIR}/client/${libsuffixBuild}
+				 $ENV{MYSQL_DIR}/lib
 				 $ENV{ProgramFiles}/MySQL/*/lib/${libsuffixDist}
 				 ${BINDIR32}/MySQL/lib
 				 ${BINDIR32}/MySQL/*/lib
