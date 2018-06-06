@@ -135,7 +135,7 @@ target_include_directories(PDF
     )
 
 if(MINGW)
-    add_definitions(-DHPDF_DLL_MAKE_CDECL)
+    target_compile_definitions(PDF PRIVATE HPDF_DLL_MAKE_CDECL)
 endif()
 
 if (POCO_UNBUNDLED)

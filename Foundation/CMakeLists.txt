@@ -237,6 +237,10 @@ if (NOT POCO_ENABLE_FPENVIRONMENT)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT)
 endif()
 
+if(BUILD_SHARED_LIBS AND MINGW)
+	target_compile_definitions(Foundation PUBLIC _DLL)
+endif()
+
 POCO_INSTALL(Foundation)
 POCO_GENERATE_PACKAGE(Foundation)
 

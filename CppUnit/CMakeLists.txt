@@ -30,4 +30,8 @@ if(NOT BUILD_SHARED_LIBS)
     )
 endif()
 
+if(BUILD_SHARED_LIBS AND MINGW)
+	target_compile_definitions(CppUnit PUBLIC _DLL)
+endif()
+
 POCO_INSTALL(CppUnit)

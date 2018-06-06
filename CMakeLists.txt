@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.2.0)
 
 project(Poco)
 
-if(WINCE AND MINGW)
-    message(FATAL_ERROR "MinGW does not support WinCE")
-endif()
-
 option(POCO_VERBOSE_MESSAGES "Enable informational messages during configure" ON)
 
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
@@ -83,10 +79,6 @@ if(POCO_STATIC)
     option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 else()
     option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
-
-if(BUILD_SHARED_LIBS AND MINGW)
-    add_definitions(-D_DLL)
 endif()
 
 # allow disabling of internally built OpenSSL# (see below for details)
