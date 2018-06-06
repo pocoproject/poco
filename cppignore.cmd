@@ -16,4 +16,8 @@ class CppUnit::TestCaller^<class TimerTest^>.testScheduleInterval, ^
 class CppUnit::TestCaller^<class TimerTest^>.testScheduleIntervalTimestamp, ^
 class CppUnit::TestCaller^<class TimerTest^>.testScheduleIntervalClock, ^
 class CppUnit::TestCaller^<class TimerTest^>.testScheduleAtFixedRate, ^
+class CppUnit::TestCaller^<class SyslogTest^>.testListener, ^
+class CppUnit::TestCaller^<class SyslogTest^>.testChannelOpenClose, ^
+class CppUnit::TestCaller^<class SyslogTest^>.testOldBSD, ^
+class CppUnit::TestCaller^<class SyslogTest^>.testStructuredData, ^
 %CPPUNIT_IGNORE%
