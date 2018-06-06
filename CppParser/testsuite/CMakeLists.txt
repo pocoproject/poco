@@ -1,5 +1,3 @@
-set(TESTUNIT "${LIBNAME}-testrunner")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
@@ -12,11 +10,11 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
-add_executable( ${TESTUNIT} ${TEST_SRCS} )
+add_executable(CppParser-testrunner ${TEST_SRCS} )
 if(ANDROID)
-    add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
-            COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/${TESTUNIT} -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
+    add_test(NAME CppParser WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} 
+            COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/CppParser-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
 else()
-    add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
+    add_test(NAME CppParser WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND CppParser-testrunner -all)
 endif()
-target_link_libraries( ${TESTUNIT}  PocoCppParser PocoFoundation CppUnit )
+target_link_libraries(CppParser-testrunner PUBLIC Poco::CppParser CppUnit)

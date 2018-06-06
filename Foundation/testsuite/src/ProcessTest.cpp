@@ -159,6 +159,9 @@ void ProcessTest::testLaunchArgs()
 {
 #if defined (_WIN32) && !defined(_WIN32_WCE)
 	std::string name("TestApp");
+#if defined(_DEBUG)
+	name += 'd';
+#endif
 	std::string cmd = name;
 
 	std::vector<std::string> args;

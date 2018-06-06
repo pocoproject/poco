@@ -9,20 +9,22 @@
 
 
 #include "StringTest.h"
-#include "CppUnit/TestCaller.h"
-#include "CppUnit/TestSuite.h"
+#include "Poco/CppUnit/TestCaller.h"
+#include "Poco/CppUnit/TestSuite.h"
 #include "Poco/String.h"
+#include "Poco/JSONString.h"
 #include "Poco/Format.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/FPEnvironment.h"
 #include "Poco/Exception.h"
-#include "Poco/JSONString.h"
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <cstdio>
+#include <climits>
 #include <map>
 #include <set>
-#include <sstream>
 
 
 using Poco::trimLeft;
@@ -45,6 +47,8 @@ using Poco::replaceInPlace;
 using Poco::remove;
 using Poco::removeInPlace;
 using Poco::cat;
+using Poco::startsWith;
+using Poco::endsWith;
 using Poco::strToInt;
 using Poco::strToFloat;
 using Poco::strToDouble;
@@ -55,14 +59,18 @@ using Poco::doubleToStr;
 using Poco::thousandSeparator;
 using Poco::decimalSeparator;
 using Poco::format;
+using Poco::toJSON;
 using Poco::CILess;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
-using Poco::toJSON;
+using Poco::isIntOverflow;
+using Poco::isSafeIntCast;
+using Poco::safeIntCast;
+using Poco::FPEnvironment;
 
 
-StringTest::StringTest(const std::string& name): CppUnit::TestCase(name)
+StringTest::StringTest(const std::string& rName): CppUnit::TestCase(rName)
 {
 }
 
@@ -270,7 +278,7 @@ void StringTest::testIcompare()
 	assertTrue (icompare(ss1, 2, 2, ss2, 1, 3) < 0);
 	assertTrue (icompare(ss1, 2, 2, ss2, 1, 2) == 0);
 	assertTrue (icompare(ss3, 1, 3, ss1, 2, 3) > 0);
-	
+
 	assertTrue (icompare(s1, s2.c_str()) == 0);
 	assertTrue (icompare(s1, s3.c_str()) < 0);
 	assertTrue (icompare(s1, s4.c_str()) < 0);
@@ -279,12 +287,12 @@ void StringTest::testIcompare()
 	assertTrue (icompare(s2, s4.c_str()) < 0);
 	assertTrue (icompare(s1, s5.c_str()) > 0);
 	assertTrue (icompare(s5, s4.c_str()) < 0);
-	
+
 	assertTrue (icompare(ss1, 2, 3, "aaa") == 0);
 	assertTrue (icompare(ss1, 2, 2, "aaa") < 0);
 	assertTrue (icompare(ss1, 2, 3, "AAA") == 0);
 	assertTrue (icompare(ss1, 2, 2, "bb") < 0);
-	
+
 	assertTrue (icompare(ss1, 2, "aaa") > 0);
 }
 
@@ -293,7 +301,7 @@ void StringTest::testCILessThan()
 {
 	typedef std::map<std::string, int, CILess> CIMapType;
 	CIMapType ciMap;
-	
+
 	ciMap["z"] = 1;
 	ciMap["b"] = 2;
 	ciMap["A"] = 3;
@@ -307,7 +315,7 @@ void StringTest::testCILessThan()
 	assertTrue (it->second == 4);
 
 	typedef std::set<std::string, CILess> CISetType;
-	
+
 	CISetType ciSet;
 	ciSet.insert("z");
 	ciSet.insert("b");
@@ -344,7 +352,7 @@ void StringTest::testTranslateInPlace()
 void StringTest::testReplace()
 {
 	std::string s("aabbccdd");
-	
+
 	assertTrue (replace(s, std::string("aa"), std::string("xx")) == "xxbbccdd");
 	assertTrue (replace(s, std::string("bb"), std::string("xx")) == "aaxxccdd");
 	assertTrue (replace(s, std::string("dd"), std::string("xx")) == "aabbccxx");
@@ -363,7 +371,7 @@ void StringTest::testReplace()
 	assertTrue (replace(s, "b", "") == "aaccdd");
 	assertTrue (replace(s, "ee", "xx") == "aabbccdd");
 	assertTrue (replace(s, "dd", "") == "aabbcc");
-	
+
 	s = "aabbaabb";
 	assertTrue (replace(s, std::string("aa"), std::string("")) == "bbbb");
 	assertTrue (replace(s, std::string("a"), std::string("")) == "bbbb");
@@ -378,7 +386,7 @@ void StringTest::testReplace()
 	assertTrue (replace(s, "a", "x") == "xxbbxxbb");
 	assertTrue (replace(s, "a", "xx") == "xxxxbbxxxxbb");
 	assertTrue (replace(s, "aa", "xxx") == "xxxbbxxxbb");
-	
+
 	assertTrue (replace(s, "aa", "xx", 2) == "aabbxxbb");
 	assertTrue (replace(s, 'a', 'x', 2) == "aabbxxbb");
 	assertTrue (remove(s, 'a', 2) == "aabbbb");
@@ -420,7 +428,7 @@ void StringTest::testCat()
 	assertTrue (cat(s1, s2, s3, s4) == "onetwothreefour");
 	assertTrue (cat(s1, s2, s3, s4, s5) == "onetwothreefourfive");
 	assertTrue (cat(s1, s2, s3, s4, s5, s6) == "onetwothreefourfivesix");
-	
+
 	std::vector<std::string> vec;
 	assertTrue (cat(std::string(), vec.begin(), vec.end()) == "");
 	assertTrue (cat(std::string(","), vec.begin(), vec.end()) == "");
@@ -430,6 +438,55 @@ void StringTest::testCat()
 	assertTrue (cat(std::string(","), vec.begin(), vec.end()) == "one,two");
 	vec.push_back(s3);
 	assertTrue (cat(std::string(","), vec.begin(), vec.end()) == "one,two,three");
+}
+
+
+void StringTest::testStartsWith()
+{
+	std::string s1("o");
+
+	assertTrue (startsWith(s1, std::string("o")));
+	assertTrue (startsWith(s1, std::string("")));
+
+	assertTrue (!startsWith(s1, std::string("O")));
+	assertTrue (!startsWith(s1, std::string("1")));
+
+	std::string s2("");
+
+	assertTrue (startsWith(s2, std::string("")));
+
+	assertTrue (!startsWith(s2, std::string("o")));
+
+	std::string s3("oO");
+
+	assertTrue (startsWith(s3, std::string("o")));
+
+	assertTrue (!startsWith(s3, std::string(" o")));
+}
+
+
+void StringTest::testEndsWith()
+{
+	std::string s1("o");
+
+	assertTrue (endsWith(s1, std::string("o")));
+	assertTrue (endsWith(s1, std::string("")));
+
+	assertTrue (!endsWith(s1, std::string("O")));
+	assertTrue (!endsWith(s1, std::string("1")));
+
+
+	std::string s2("");
+
+	assertTrue (endsWith(s2, std::string("")));
+
+	assertTrue (!endsWith(s2, std::string("o")));
+
+	std::string s3("Oo");
+
+	assertTrue (endsWith(s3, std::string("o")));
+
+	assertTrue (!endsWith(s3, std::string("o ")));
 }
 
 
@@ -518,7 +575,7 @@ void StringTest::testStringToFloat()
 				float d = 12e34f;
 				assertTrue (strToFloat(format("12e34", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01e34);
-			
+
 				d = 1.234e30f;
 				assertTrue (strToFloat(format("1%c234e30", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
@@ -531,7 +588,7 @@ void StringTest::testStringToFloat()
 			assertEqualDelta(d, result, 0.01);
 			assertTrue (strToFloat(format("-12%c34", ds), result, ds, ts));
 			assertEqualDelta(-12.34, result, 0.01);
-	
+
 			assertTrue (strToFloat(format("   12%c34", ds), result, ds, ts));
 			assertEqualDelta(12.34, result, 0.01);
 			assertTrue (strToFloat(format("12%c34   ", ds), result, ds, ts));
@@ -540,6 +597,25 @@ void StringTest::testStringToFloat()
 			assertEqualDelta(12.34, result, 0.01);
 		}
 	}
+
+	assertTrue (FPEnvironment::isNaN(strToFloat("nan")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("xNaNy")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("inf")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("-inf")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("1.23")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("Inf")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isInfinite(strToFloat("inf")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("-inf")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("infinity", "infinity")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("1.23")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("abc")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("Inf", "Inf")));
 }
 
 
@@ -619,23 +695,23 @@ void StringTest::testStringToDouble()
 				double d = 12e34;
 				assertTrue (strToDouble(format("12e34", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01e34);
-			
+
 				d = 1.234e100;
 				assertTrue (strToDouble(format("1%c234e100", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
 				assertTrue (strToDouble(format("1%c234E+100", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
-		
+
 				d = 1.234e-100;
 				assertTrue (strToDouble(format("1%c234E-100", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
-		
+
 				d = -1.234e100;
 				assertTrue (strToDouble(format("-1%c234e+100", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
 				assertTrue (strToDouble(format("-1%c234E100", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
-		
+
 				d = 1.234e-100;
 				assertTrue (strToDouble(format(" 1%c234e-100 ", ds), result, ds, ts));
 				assertEqualDelta(d, result, 0.01);
@@ -672,7 +748,7 @@ void StringTest::testStringToDouble()
 			assertEqualDelta(d, result, 0.01);
 			assertTrue (strToDouble(format("-12%c34", ds), result, ds, ts));
 			assertEqualDelta(-12.34, result, 0.01);
-	
+
 			assertTrue (strToDouble(format("   12%c34", ds), result, ds, ts));
 			assertEqualDelta(12.34, result, 0.01);
 			assertTrue (strToDouble(format("12%c34   ", ds), result, ds, ts));
@@ -681,8 +757,51 @@ void StringTest::testStringToDouble()
 			assertEqualDelta(12.34, result, 0.01);
 		}
 	}
+
+	assertTrue (FPEnvironment::isNaN(strToDouble("nan")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("xNaNy")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("inf")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("-inf")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("1.23")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("Inf")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isInfinite(strToDouble("inf")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("-inf")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("infinity", "infinity")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("1.23")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("abc")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("Inf", "Inf")));
 }
 
+
+void StringTest::testNumericStringPadding()
+{
+	std::string str;
+	assertTrue (floatToStr(str, 0.999f, 2, 4) == "1.00");
+	assertTrue (floatToStr(str, 0.945f, 2, 4) == "0.95");
+	assertTrue (floatToStr(str, 0.944f, 2, 4) == "0.94");
+	assertTrue (floatToStr(str, 12.45f, 2, 5) == "12.45");
+	assertTrue (floatToStr(str, 12.45f, 1, 4) == "12.5");
+	assertTrue (floatToStr(str, 12.45f, 2, 6) == " 12.45");
+	assertTrue (floatToStr(str, 12.455f, 3, 7) == " 12.455");
+	assertTrue (floatToStr(str, 12.455f, 2, 6) == " 12.46");
+	assertTrue (floatToStr(str, 1.23556E-16f, 2, 6) == "1.24e-16");
+
+	assertTrue (doubleToStr(str, 0.999, 2, 4) == "1.00");
+	assertTrue (doubleToStr(str, 0.945, 2, 4) == "0.95");
+	assertTrue (doubleToStr(str, 0.944, 2, 4) == "0.94");
+	assertTrue (doubleToStr(str, 12.45, 2, 5) == "12.45");
+	assertTrue (doubleToStr(str, 12.45, 1, 4) == "12.5");
+	assertTrue (doubleToStr(str, 12.45, 2, 6) == " 12.45");
+	assertTrue (doubleToStr(str, 12.455, 3, 7) == " 12.455");
+	assertTrue (doubleToStr(str, 12.455, 2, 6) == " 12.46");
+	assertTrue (doubleToStr(str, 1.23556E-16, 2, 6) == "1.24e-16");
+}
 
 void StringTest::testStringToFloatError()
 {
@@ -782,13 +901,13 @@ void StringTest::benchmarkStrToInt()
 	sw.stop();
 	std::cout << "std::strtol Number: " << res << std::endl;
 	double timeStrtol = sw.elapsed() / 1000.0;
-	
+
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res, 10);
 	sw.stop();
 	std::cout << "strToInt Number: " << res << std::endl;
 	double timeStrToInt = sw.elapsed() / 1000.0;
-	
+
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res);
 	sw.stop();
@@ -799,11 +918,11 @@ void StringTest::benchmarkStrToInt()
 	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
 	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
 
-	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" << 
+	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
 	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
 
-	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" << 
+	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
 	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
 
@@ -841,7 +960,7 @@ void StringTest::benchmarkStrToFloat()
 	sw.stop();
 	std::cout << "strToDouble Number: " << res << std::endl;
 	double timeStrToDouble = sw.elapsed() / 1000.0;
-	
+
 	// standard sscanf
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res);
@@ -860,11 +979,11 @@ void StringTest::benchmarkStrToFloat()
 	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
 	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
 
-	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" << 
+	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
 	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
 
-	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" << 
+	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToDouble) << '\t' ;
 	graph = (int) (timeStream / timeStrToDouble); for (int i = 0; i < graph; ++i) std::cout << '#';
 
@@ -983,13 +1102,13 @@ void StringTest::testFloatToString()
 {
 	double val = 1.03721575516329e-112;
 	std::string str;
-	
+
 	assertTrue (doubleToStr(str, val, 14, 21) == "1.03721575516329e-112");
 	assertTrue (doubleToStr(str, val, 14, 22) == " 1.03721575516329e-112");
 	val = -val;
 	assertTrue (doubleToStr(str, val, 14, 22) == "-1.03721575516329e-112");
 	assertTrue (doubleToStr(str, val, 14, 23) == " -1.03721575516329e-112");
-	
+
 	val = -10372157551632.9;
 	assertTrue (doubleToStr(str, val, 1, 21, ',') == "-10,372,157,551,632.9");
 	assertTrue (doubleToStr(str, val, 1, 22, ',') == " -10,372,157,551,632.9");
@@ -1001,6 +1120,182 @@ void StringTest::testFloatToString()
 	assertTrue (doubleToStr(str, ival, 1, 15, ',') == "1,234,567,890.0");
 	ival = -123456789;
 	assertTrue (doubleToStr(str, ival, 1, 14, ',') == "-123,456,789.0");
+}
+
+
+void StringTest::testNumericStringLimit()
+{
+	char c = 0, t = -1;
+	assertTrue(!isIntOverflow<char>(c));
+	assertTrue(safeIntCast<char>(c, t) == c);
+	assertTrue(t == c);
+
+	short s = SHRT_MAX;
+	assertTrue(isIntOverflow<char>(s));
+	try
+	{
+		safeIntCast(s, t);
+		fail("cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	s = SHRT_MIN;
+	assertTrue(isIntOverflow<char>(s));
+	try
+	{
+		safeIntCast(s, t);
+		fail("short => char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	signed char sc = 0, st = -1;
+	assertTrue(!isIntOverflow<signed char>(sc));
+	assertTrue(safeIntCast<char>(sc, st) == sc);
+	assertTrue(st == sc);
+
+	short ss = SHRT_MAX;
+	assertTrue(isIntOverflow<signed char>(ss));
+	assertTrue(isIntOverflow<char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("short => signed char  cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	ss = SHRT_MIN;
+	assertTrue(isIntOverflow<signed char>(ss));
+	assertTrue(isIntOverflow<char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("short => signed char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	assertTrue(safeIntCast<signed char>(sc, st) == c);
+	assertTrue(st == sc);
+
+	unsigned char uc = 0, ut = -1;
+	assertTrue(!isIntOverflow<unsigned char>(uc));
+	assertTrue(safeIntCast<char>(uc, ut) == uc);
+	assertTrue(ut == uc);
+
+	ss = SHRT_MAX;
+	assertTrue(isIntOverflow<unsigned char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	ss = -1;
+	assertTrue(isIntOverflow<unsigned char>(ss));
+	try
+	{
+		safeIntCast(ss, uc);
+		fail("unsigned short => unsigned char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	int i = 0;
+	assertTrue(!isIntOverflow<int>(i));
+	assertTrue(!isIntOverflow<unsigned>(i));
+	i = -1;
+	unsigned int ti = -1;
+	assertTrue(isIntOverflow<unsigned>(i));
+	try
+	{
+		safeIntCast(i, ti);
+		fail("unsigned int => int cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	if (sizeof(long) > sizeof(int))
+	{
+		long l = LONG_MAX;
+		assertTrue(isIntOverflow<int>(l));
+		l = -1L;
+		assertTrue(isIntOverflow<unsigned>(l));
+		i = -1;
+		assertTrue(!isIntOverflow<long>(i));
+		long tl = 0;
+		assertTrue(safeIntCast(i, tl) == i);
+		unsigned long ul = ULONG_MAX, tul = 0;
+		assertTrue(isIntOverflow<long>(ul));
+		try
+		{
+			safeIntCast(ul, tl);
+			fail("unsigned long => long cast must fail");
+		}
+		catch(Poco::BadCastException&){}
+		assertTrue(!isIntOverflow<unsigned long>(ul));
+		tl = 0;
+		assertTrue(safeIntCast(ul, tul) == ul);
+		l = LONG_MIN;
+		assertTrue(isIntOverflow<unsigned long>(l));
+		try
+		{
+			safeIntCast(l, ul);
+			fail("unsigned long => long cast must fail");
+		}
+		catch(Poco::BadCastException&){}
+		ul = LONG_MAX;
+		assertTrue(!isIntOverflow<long>(ul));
+		assertTrue(safeIntCast(ul, l) == ul);
+	}
+
+	numericStringLimitSameSign<unsigned short, unsigned char>();
+	numericStringLimitSameSign<short, char>();
+	numericStringLimitSameSign<unsigned int, unsigned short>();
+	numericStringLimitSameSign<int, short>();
+
+	if (sizeof(long) > sizeof(int))
+	{
+		numericStringLimitSameSign<unsigned long, unsigned int>();
+		numericStringLimitSameSign<long, int>();
+	}
+
+	numericStringLowerLimit<short, char>();
+	numericStringLowerLimit<int, short>();
+
+	if (sizeof(long) > sizeof(int))
+	{
+		numericStringLowerLimit<Poco::Int64, Poco::Int32>();
+	}
+
+#ifdef POCO_ENABLE_CPP11
+	assertTrue(!isIntOverflow<int8_t>(0));
+	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::max()));
+	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::min()));
+	assertTrue(!isIntOverflow<uint8_t>(0));
+	assertTrue(isIntOverflow<uint8_t>(std::numeric_limits<int16_t>::max()));
+	assertTrue(isIntOverflow<uint8_t>(-1));
+	assertTrue(!isIntOverflow<int32_t>(0));
+	assertTrue(isIntOverflow<int32_t>(std::numeric_limits<int64_t>::max()));
+	assertTrue(!isIntOverflow<uint32_t>(0));
+	assertTrue(isIntOverflow<uint32_t>(-1));
+	assertTrue(isIntOverflow<uint32_t>(-1L));
+	assertTrue(isIntOverflow<uint32_t>(-1LL));
+	assertTrue(!isIntOverflow<int64_t>(-1));
+	assertTrue(isIntOverflow<int64_t>(std::numeric_limits<uint64_t>::max()));
+	assertTrue(!isIntOverflow<uint64_t>(std::numeric_limits<uint64_t>::max()));
+	assertTrue(isIntOverflow<uint64_t>(std::numeric_limits<int64_t>::min()));
+	assertTrue(!isIntOverflow<uint64_t>(std::numeric_limits<uint64_t>::min()));
+	assertTrue(!isIntOverflow<int64_t>(std::numeric_limits<int64_t>::max()));
+
+	numericStringLimitSameSign<uint16_t, uint8_t>();
+	numericStringLimitSameSign<int16_t, int8_t>();
+	numericStringLimitSameSign<uint32_t, uint16_t>();
+	numericStringLimitSameSign<int32_t, int16_t>();
+	numericStringLimitSameSign<uint64_t, uint32_t>();
+	numericStringLimitSameSign<int64_t, int32_t>();
+
+	numericStringLowerLimit<int16_t, int8_t>();
+	numericStringLowerLimit<int32_t, int16_t>();
+	numericStringLowerLimit<int64_t, int32_t>();
+#endif
 }
 
 
@@ -1043,7 +1338,7 @@ void StringTest::benchmarkFloatToStr()
 	sw.stop();
 	std::cout << "std::sprintf Number: " << str << std::endl;
 	double timeSprintf = sw.elapsed() / 1000.0;
-	
+
 	// POCO Way (via double-conversion)
 	// no padding
 	sw.restart();
@@ -1053,7 +1348,7 @@ void StringTest::benchmarkFloatToStr()
 	std::cout << "doubleToStr(char) Number: " << buffer << std::endl;
 	double timeDoubleToStrChar = sw.elapsed() / 1000.0;
 
-	// with padding 
+	// with padding
 	str = "";
 	sw.restart();
 	for (int i = 0; i < 1000000; ++i) doubleToStr(str, val);
@@ -1064,16 +1359,16 @@ void StringTest::benchmarkFloatToStr()
 	int graph;
 	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
 	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
-	
-	std::cout << std::setw(14) << "sprintf:\t" << std::setw(10) << std::setfill(' ') << timeSprintf << "[ms]" << 
+
+	std::cout << std::setw(14) << "sprintf:\t" << std::setw(10) << std::setfill(' ') << timeSprintf << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeSprintf) << '\t' ;
 	graph = (int) (timeStream / timeSprintf); for (int i = 0; i < graph; ++i) std::cout << '#';
-	
-	std::cout << std::endl << std::setw(14) << "doubleToChar:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrChar << "[ms]" << 
+
+	std::cout << std::endl << std::setw(14) << "doubleToChar:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrChar << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrChar) << '\t' ;
 	graph = (int) (timeStream / timeDoubleToStrChar); for (int i = 0; i < graph; ++i) std::cout << '#';
-	
-	std::cout << std::endl << std::setw(14) << "doubleToString:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrString << "[ms]" << 
+
+	std::cout << std::endl << std::setw(14) << "doubleToString:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrString << "[ms]" <<
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrString) << '\t' ;
 	graph = (int) (timeStream / timeDoubleToStrString); for (int i = 0; i < graph; ++i) std::cout << '#';
 
@@ -1178,9 +1473,13 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testReplace);
 	CppUnit_addTest(pSuite, StringTest, testReplaceInPlace);
 	CppUnit_addTest(pSuite, StringTest, testCat);
+	CppUnit_addTest(pSuite, StringTest, testStartsWith);
+	CppUnit_addTest(pSuite, StringTest, testEndsWith);
 	CppUnit_addTest(pSuite, StringTest, testStringToInt);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToDouble);
+	CppUnit_addTest(pSuite, StringTest, testNumericStringPadding);
+	CppUnit_addTest(pSuite, StringTest, testNumericStringLimit);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);

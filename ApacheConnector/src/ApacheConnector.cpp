@@ -131,6 +131,12 @@ int ApacheRequestRec::sendFile(const std::string& path, unsigned int fileSize, c
 }
 
 
+bool ApacheRequestRec::secure()
+{
+	return DEFAULT_HTTPS_PORT == ap_default_port(_pRec) && ap_http_scheme(_pRec) == "https";
+}
+
+
 void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 {
 	const apr_array_header_t* arr = apr_table_elts(_pRec->headers_in);
@@ -149,7 +155,13 @@ void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 
 void ApacheConnector::log(const char* file, int line, int level, int status, const char *text)
 {
-	ap_log_error(file, line, level, 0, NULL, "%s", text);
+	// ap_log_error() has undergone significant changes in Apache 2.4.
+	// Validate Apache version for using a proper ap_log_error() version.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+		ap_log_error(file, line, level, 0, NULL, "%s", text);
+#else
+	ap_log_error(file, line, level, 0, 0, 0, text);
+#endif
 }
 
 
@@ -172,24 +184,33 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
 			return rv;
 
-#ifndef POCO_ENABLE_CPP11
-		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-			&rec, 
-			r->connection->local_ip, 
-			r->connection->local_addr->port,
-			r->connection->remote_ip, 
-			r->connection->remote_addr->port));
-
-		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+                // The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
+                // Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+                const char* clientIp = r->connection->remote_ip;
+                apr_port_t clientPort = r->connection->remote_addr->port;
 #else
-		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-			&rec,
-			r->connection->local_ip,
-			r->connection->local_addr->port,
-			r->connection->remote_ip,
-			r->connection->remote_addr->port));
+                const char* clientIp = r->connection->client_ip;
+                apr_port_t clientPort = r->connection->client_addr->port;
+#endif
+#ifndef POCO_ENABLE_CPP11
+                std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+                        &rec,
+                        r->connection->local_ip,
+                        r->connection->local_addr->port,
+                        clientIp,
+                        clientPort));
 
-		std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+                std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+#else
+                std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+                        &rec,
+                        r->connection->local_ip,
+                        r->connection->local_addr->port,
+                        clientIp,
+                        clientPort));
+
+                std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 #endif // POCO_ENABLE_CPP11
 
 		// add header information to request

@@ -202,12 +202,12 @@ class SliceTasksPlugin extends RuleSource {
 
 allprojects {
 	buildDir = new File('guild')	            // DO NOT REMOVE OR CHANGE to 'build' since 'build' is a Poco directory
-}
-subprojects {
 	file('bin').mkdirs()
 	file('bin64').mkdirs()
 	file('lib').mkdirs()
 	file('lib64').mkdirs()
+}
+subprojects {
 /*
 	clean.doFirst {
 		file(projectDir, 'bin').delete()
@@ -222,8 +222,6 @@ subprojects {
  	apply plugin:	'windows-resources'
 	apply plugin:	'windows-messages'
 	apply plugin: 	SliceTasksPlugin
-	
-	buildDir = new File("guild")	
 	
 
 	model {

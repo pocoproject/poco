@@ -14,4 +14,6 @@ class CppUnit::TestCaller^<class ThreadTest^>.testSleep, ^
 class CppUnit::TestCaller^<class TimerTest^>.testTimer, ^
 class CppUnit::TestCaller^<class TimerTest^>.testScheduleInterval, ^
 class CppUnit::TestCaller^<class TimerTest^>.testScheduleIntervalTimestamp, ^
+class CppUnit::TestCaller^<class TimerTest^>.testScheduleIntervalClock, ^
+class CppUnit::TestCaller^<class TimerTest^>.testScheduleAtFixedRate, ^
 %CPPUNIT_IGNORE%
