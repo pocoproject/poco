@@ -30,7 +30,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 		_pData->policy = 0;
 		if (_pData->started && !_pData->joined && _pData->thread)
 		{
-			if (SetThreadPriority((HANDLE) _pData->thread->native_handle(), _pData->prio) == 0)
+			if (SetThreadPriority(reinterpret_cast<HANDLE>(_pData->thread->native_handle()), _pData->prio) == 0)
 				throw SystemException("cannot set thread priority");
 		}
 	}
@@ -68,7 +68,7 @@ void ThreadImpl::setAffinityImpl(int cpu)
 	mask <<= cpu;
 	if (_pData->started && !_pData->joined && _pData->thread)
 	{
-		if (SetThreadAffinityMask((HANDLE) _pData->thread->native_handle(), mask) == 0)
+		if (SetThreadAffinityMask(reinterpret_cast<HANDLE>(_pData->thread->native_handle()), mask) == 0)
 		{
 			throw SystemException("Failed to set affinity");
 		}
