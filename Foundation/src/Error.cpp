@@ -45,7 +45,7 @@ namespace Poco {
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
 
 		LocalFree(lpMsgBuf);
-    #endif
+	#endif
 		return errMsg;
 	}
 

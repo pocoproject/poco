@@ -104,8 +104,8 @@ void Net_API uninitializeNetwork();
 				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
 			#endif
 		#endif // Net_EXPORTS
-    #else // __GNUC__
-    	#define POCO_NET_FORCE_SYMBOL(s) extern "C" const struct NetworkInitializer s;
+	#else // __GNUC__
+		#define POCO_NET_FORCE_SYMBOL(s) extern "C" const struct NetworkInitializer s;
 	#endif // !__GNUC__
 	POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif // POCO_OS_FAMILY_WINDOWS

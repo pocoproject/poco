@@ -16,6 +16,6 @@ install(
     ARCHIVE DESTINATION lib${LIB_SUFFIX}
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
-    )
+)
 
 POCO_ENABLE_EXE_WMAIN(EncodingsCompiler)
