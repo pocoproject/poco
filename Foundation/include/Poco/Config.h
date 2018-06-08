@@ -70,7 +70,7 @@
 
 // Define if unicode is not available in MinGW
 // To enable unicode use option "-municode"
-#if defined(__MINGW32__) && (!defined(_UNICODE) || !defined(UNICODE))
+#if defined(__MINGW32__) && !defined(UNICODE)
 	#define POCO_NO_MINGW_UNICODE
 #endif
 
