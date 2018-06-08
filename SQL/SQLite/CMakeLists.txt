@@ -62,3 +62,6 @@ if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)
 endif ()
 
+configure_file(PocoSQLSQLite.pc.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoSQLSQLite.pc @ONLY)
+list(APPEND POCO_PKG_CONFIG_FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoSQLSQLite.pc)
+set(POCO_PKG_CONFIG_FILES ${POCO_PKG_CONFIG_FILES} PARENT_SCOPE)

@@ -146,3 +146,7 @@ if (POCO_ENABLE_TESTS)
     add_subdirectory(samples)
     add_subdirectory(testsuite)
 endif ()
+
+configure_file(PocoPDF.pc.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoPDF.pc @ONLY)
+list(APPEND POCO_PKG_CONFIG_FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoPDF.pc)
+set(POCO_PKG_CONFIG_FILES ${POCO_PKG_CONFIG_FILES} PARENT_SCOPE)
