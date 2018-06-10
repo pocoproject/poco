@@ -229,7 +229,9 @@ if(POCO_UNBUNDLED)
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif()
 
-if (NOT POCO_ENABLE_WSTRING)
+if (POCO_ENABLE_WSTRING AND MINGW)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -municode") # FIXME(BJoe) This is against rule 2. "Don't modify global compile/link flags", its a quick and dirty hack and should be fixed.
+elsif (NOT POCO_ENABLE_WSTRING)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_WSTRING)
 endif()
 

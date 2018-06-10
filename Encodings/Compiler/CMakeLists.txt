@@ -17,5 +17,3 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
 )
-
-POCO_ENABLE_EXE_WMAIN(EncodingsCompiler)
