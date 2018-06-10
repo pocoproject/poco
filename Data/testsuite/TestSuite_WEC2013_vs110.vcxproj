@@ -37,7 +37,7 @@
   <ItemGroup>
     <ClCompile Include="src\DataTest.cpp"/>
     <ClCompile Include="src\DataTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\Binder.cpp"/>
     <ClCompile Include="src\Connector.cpp"/>
     <ClCompile Include="src\Extractor.cpp"/>

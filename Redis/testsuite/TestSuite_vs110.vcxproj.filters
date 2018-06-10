@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{be93cd23-cdd6-4338-b111-b87ccf3552f6}</UniqueIdentifier>
+      <UniqueIdentifier>{61aeb5bc-8562-4519-8684-e240a52e3466}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{6c7e4cd7-f974-462c-a22d-dc02f39ad8fa}</UniqueIdentifier>
+      <UniqueIdentifier>{b264f480-8c54-4ea7-9e3c-7abadb1ef7d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -15,7 +15,7 @@
     <ClCompile Include="src\RedisTestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
+    <ClCompile Include="src\Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

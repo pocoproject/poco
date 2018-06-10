@@ -55,6 +55,7 @@
     <ClCompile Include="src\ConfigurationMapperTest.cpp"/>
     <ClCompile Include="src\ConfigurationTestSuite.cpp"/>
     <ClCompile Include="src\ConfigurationViewTest.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\FilesystemConfigurationTest.cpp"/>
     <ClCompile Include="src\HelpFormatterTest.cpp"/>
     <ClCompile Include="src\IniFileConfigurationTest.cpp"/>
@@ -72,7 +73,6 @@
     <ClCompile Include="src\TimerTestSuite.cpp"/>
     <ClCompile Include="src\UtilTestSuite.cpp"/>
     <ClCompile Include="src\ValidatorTest.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
     <ClCompile Include="src\WinConfigurationTest.cpp"/>
     <ClCompile Include="src\WindowsTestSuite.cpp"/>
     <ClCompile Include="src\WinRegistryTest.cpp"/>

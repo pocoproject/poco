@@ -2,37 +2,37 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="CppParser">
-      <UniqueIdentifier>{777134c0-4b44-44db-83b0-ed6be9283236}</UniqueIdentifier>
+      <UniqueIdentifier>{ae20d8de-c0ba-4878-baf6-8046bcd1a984}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Header Files">
-      <UniqueIdentifier>{624c69f1-c204-4171-b5cd-db9fe51d1f9e}</UniqueIdentifier>
+      <UniqueIdentifier>{ba1a9ffc-2327-4368-9af2-a73a5a93b111}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Source Files">
-      <UniqueIdentifier>{22f6e07b-7880-4c19-b385-3dddb9dcbdd9}</UniqueIdentifier>
+      <UniqueIdentifier>{47c73566-518b-4ae7-a566-e881267edc2b}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{e207e699-4234-4d97-b438-5a6d17dc5f6e}</UniqueIdentifier>
+      <UniqueIdentifier>{283921fb-392d-4da8-82db-76589f379246}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{839eca5e-9bc5-419f-8543-d2d532dd47ec}</UniqueIdentifier>
+      <UniqueIdentifier>{edc3296b-0f2a-4871-ae40-c085cf0c4dc4}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{1e18b0d8-ff08-43c7-a228-49821e349cb7}</UniqueIdentifier>
+      <UniqueIdentifier>{efe991f8-30f9-4029-9f7b-6056eca4d2cb}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{fe5ac07b-7e29-45d8-b9ee-7e1861919b0b}</UniqueIdentifier>
+      <UniqueIdentifier>{6006fef9-c607-4d0d-9e9c-afda48861bea}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{daec52af-ba05-48d5-af68-d82f6a4a2419}</UniqueIdentifier>
+      <UniqueIdentifier>{85af86e3-5ece-44bf-99c5-47bf8de34baf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes">
-      <UniqueIdentifier>{f2423503-a315-45f9-92a9-535d6b258761}</UniqueIdentifier>
+      <UniqueIdentifier>{1ce69f68-b503-4c4c-85fc-66693b1f1060}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Header Files">
-      <UniqueIdentifier>{2c5a4c46-3e2f-4a80-bef5-8a0f57debfde}</UniqueIdentifier>
+      <UniqueIdentifier>{9687d5d6-4ce9-4914-ba47-c732b5f1989b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Source Files">
-      <UniqueIdentifier>{b2548d0e-dd8f-455e-b864-e2679ba5d446}</UniqueIdentifier>
+      <UniqueIdentifier>{75274cc8-35e7-4530-b2e0-944f838196a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -56,7 +56,7 @@
     <ClCompile Include="src\CppParserTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
+    <ClCompile Include="src\Driver.cpp">
       <Filter>_Driver\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AttributesParserTest.cpp">

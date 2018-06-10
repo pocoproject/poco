@@ -3,7 +3,7 @@
 	OutputDirectory="obj\$(ConfigurationName)"
 	IntermediateDirectory="obj\$(ConfigurationName)"
 	ConfigurationType="1"
-	UseOfMFC="1"
+	UseOfMFC="0"
 	CharacterSet="2"
 	>
 	<Tool
@@ -24,7 +24,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		Optimization="4"
-		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${project.pocobase}\CppUnit\WinTestRunner\include;${configuration.compiler.includes}"
+		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${configuration.compiler.includes}"
 		PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;${configuration.compiler.defines}"
 		StringPooling="true"
 		MinimalRebuild="true"
@@ -53,7 +53,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies=${configuration.linker.dependencies}"
+		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="bin\static_mt\${project.target}d.exe"
 		LinkIncremental="2"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
@@ -61,7 +61,7 @@
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
 		ProgramDatabaseFile="bin\static_mt\${project.target}d.pdb"
-		SubSystem="2"
+		SubSystem="1"
 		TargetMachine="1"
 		AdditionalOptions="${configuration.linker.additionalOptions}"
 	/>

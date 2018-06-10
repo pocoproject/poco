@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ODBC">
-      <UniqueIdentifier>{9a9ca7fb-8d61-4549-8e54-ed0d204f02a3}</UniqueIdentifier>
+      <UniqueIdentifier>{dfe2a695-a99f-4d3f-b727-34da88410bf1}</UniqueIdentifier>
     </Filter>
     <Filter Include="ODBC\Header Files">
-      <UniqueIdentifier>{2a32f1cd-ea9d-464c-a4d1-c070815f2a4a}</UniqueIdentifier>
+      <UniqueIdentifier>{3dceed7f-582f-4da3-9959-ab21c66a0a28}</UniqueIdentifier>
     </Filter>
     <Filter Include="ODBC\Source Files">
-      <UniqueIdentifier>{bffc941a-ddd6-45e7-ae8a-7e911b411295}</UniqueIdentifier>
+      <UniqueIdentifier>{fb17d90b-5b73-42c0-b715-8531f4278d30}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{ed22e75f-1ccd-4941-80ab-7b677a44bcca}</UniqueIdentifier>
+      <UniqueIdentifier>{107e80b6-2529-402d-8044-17cb6ce558e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{00a35377-d5a0-4b8c-81a0-74193a69b1bf}</UniqueIdentifier>
+      <UniqueIdentifier>{54de5d80-0802-420d-bd9b-99a144922ad6}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{dc50d4e5-4213-47e7-a741-7606c49fbaa8}</UniqueIdentifier>
+      <UniqueIdentifier>{889a7a33-7f36-4dce-aae6-b1fe93ad833b}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{1c3bb517-893e-4c74-a219-a449caab4699}</UniqueIdentifier>
+      <UniqueIdentifier>{cbd40839-ff26-4fe0-a20c-30d86b5301de}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{a0fdf6d6-324c-4e2b-8f6e-9f114f9d405f}</UniqueIdentifier>
+      <UniqueIdentifier>{1822d2ed-943c-4349-a262-3b2df724382a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -89,7 +89,7 @@
     <ClCompile Include="src\ODBCTestSuite.cpp">
       <Filter>_Suite\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinDriver.cpp">
+    <ClCompile Include="src\Driver.cpp">
       <Filter>_Driver\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

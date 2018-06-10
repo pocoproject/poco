@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="SSLCore">
-      <UniqueIdentifier>{1a20e745-7fc6-45b7-96b9-a7b5c053b79a}</UniqueIdentifier>
+      <UniqueIdentifier>{de4bde86-81b5-409f-9785-21e25df50fb6}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Header Files">
-      <UniqueIdentifier>{8b1701b0-6090-4ab6-93c3-6fc6a9260cc1}</UniqueIdentifier>
+      <UniqueIdentifier>{8e740e5b-b035-42e3-a18e-0a059b54e1b9}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLCore\Source Files">
-      <UniqueIdentifier>{2ab6a506-6942-417b-92b1-5ddb6acd78d3}</UniqueIdentifier>
+      <UniqueIdentifier>{fa9cef92-1cf6-406c-9040-03b8c9cf7ba7}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient">
-      <UniqueIdentifier>{cfdaaa00-1218-40d9-b651-2daa2b1b6dd6}</UniqueIdentifier>
+      <UniqueIdentifier>{f1bb4aad-096f-46c3-b00f-42b66ddffa68}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Header Files">
-      <UniqueIdentifier>{b40ed1dc-2cdb-4b3a-9a4e-c98af899804f}</UniqueIdentifier>
+      <UniqueIdentifier>{da536134-5cab-470f-9a6a-3fcf04d36e5f}</UniqueIdentifier>
     </Filter>
     <Filter Include="HTTPSClient\Source Files">
-      <UniqueIdentifier>{6efdebfc-7881-45ff-8728-88df397a124d}</UniqueIdentifier>
+      <UniqueIdentifier>{092ce90c-9a13-4f50-913d-760ab25b6d3f}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets">
-      <UniqueIdentifier>{70a124bb-bbb9-47d4-bec0-01e49ad64c70}</UniqueIdentifier>
+      <UniqueIdentifier>{3160d8f0-6621-497f-a014-57bae23548fd}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Header Files">
-      <UniqueIdentifier>{01a30665-da16-4a3a-84c5-11dcc1763677}</UniqueIdentifier>
+      <UniqueIdentifier>{85753ab4-919f-4121-bb79-eab556ca702d}</UniqueIdentifier>
     </Filter>
     <Filter Include="SSLSockets\Source Files">
-      <UniqueIdentifier>{26e0f93f-57dc-49b2-a8f5-66900898c9a3}</UniqueIdentifier>
+      <UniqueIdentifier>{afde73de-c467-4531-a6f8-6201152bef9d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail">
-      <UniqueIdentifier>{e39c51a5-f581-40cb-b7b7-209a21503896}</UniqueIdentifier>
+      <UniqueIdentifier>{08a3e285-b4fc-496f-82f7-90688209cbbe}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Header Files">
-      <UniqueIdentifier>{90832d53-557f-4d60-acc3-826f5a52b744}</UniqueIdentifier>
+      <UniqueIdentifier>{ed1814f3-c267-44f7-9a26-36631c9507b7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Mail\Source Files">
-      <UniqueIdentifier>{2cb6b52d-baad-4cdb-8b1a-4c61c4c2b804}</UniqueIdentifier>
+      <UniqueIdentifier>{3a03ec56-7a28-48c8-a63f-94878c826165}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

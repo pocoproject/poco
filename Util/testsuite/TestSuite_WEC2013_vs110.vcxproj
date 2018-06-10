@@ -52,7 +52,7 @@
   <ItemDefinitionGroup/>
   <ItemGroup>
     <ClCompile Include="src\UtilTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\AbstractConfigurationTest.cpp"/>
     <ClCompile Include="src\ConfigurationMapperTest.cpp"/>
     <ClCompile Include="src\ConfigurationTestSuite.cpp"/>

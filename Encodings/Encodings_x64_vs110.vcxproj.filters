@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Encodings">
-      <UniqueIdentifier>{7fddcd46-339e-4892-a48a-ee3cb474e7b0}</UniqueIdentifier>
+      <UniqueIdentifier>{c8e1ce6c-25f6-4cfe-ac2d-cf6a835abdb5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Encodings\Header Files">
-      <UniqueIdentifier>{56ff6c06-3047-4df8-b4ff-8aa8112bc572}</UniqueIdentifier>
+      <UniqueIdentifier>{e0989893-d4e5-4bfe-a198-a880483a2d68}</UniqueIdentifier>
     </Filter>
     <Filter Include="Encodings\Source Files">
-      <UniqueIdentifier>{bd4735d8-f011-4fb7-9826-378d158af9e4}</UniqueIdentifier>
+      <UniqueIdentifier>{c7addbbe-9e1f-4021-83ad-4ca6e0434e51}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

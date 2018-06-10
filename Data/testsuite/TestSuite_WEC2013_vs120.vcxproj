@@ -39,12 +39,12 @@
     <ClCompile Include="src\Connector.cpp"/>
     <ClCompile Include="src\DataTest.cpp"/>
     <ClCompile Include="src\DataTestSuite.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\Extractor.cpp"/>
     <ClCompile Include="src\Preparator.cpp"/>
     <ClCompile Include="src\SessionImpl.cpp"/>
     <ClCompile Include="src\SessionPoolTest.cpp"/>
     <ClCompile Include="src\TestStatementImpl.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="CppParser">
-      <UniqueIdentifier>{64aacbb4-5665-47b3-99de-30d2290eab41}</UniqueIdentifier>
+      <UniqueIdentifier>{a006d611-c65e-4b56-bca3-80868363d6a4}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Header Files">
-      <UniqueIdentifier>{f6fac554-950f-49c8-afde-90d5a4c37f88}</UniqueIdentifier>
+      <UniqueIdentifier>{81fd3102-97fd-41f0-a379-c673c2c5e960}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Source Files">
-      <UniqueIdentifier>{8294379e-6bc5-46ca-a30a-60952cfb3f95}</UniqueIdentifier>
+      <UniqueIdentifier>{6b5636fa-a89d-47b2-a7a0-1daf40db9f88}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table">
-      <UniqueIdentifier>{d2a30143-2ee1-4b6e-bd19-195615129e37}</UniqueIdentifier>
+      <UniqueIdentifier>{588efe86-0fe0-4e32-a98c-16ece36e592e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table\Header Files">
-      <UniqueIdentifier>{ab6012c6-db97-464e-9150-4799a0268ac0}</UniqueIdentifier>
+      <UniqueIdentifier>{bfe38019-4410-44ad-9d4f-bece79bf39f6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table\Source Files">
-      <UniqueIdentifier>{05a8e672-d86f-4822-85ed-2c2f32f46eb3}</UniqueIdentifier>
+      <UniqueIdentifier>{b6002fb0-f25a-4632-840a-1593d508b557}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes">
-      <UniqueIdentifier>{bae9e2a9-ba20-4f5d-8064-522f5cfc13b8}</UniqueIdentifier>
+      <UniqueIdentifier>{fac5a3e1-f114-4d29-b16c-0cca9f9e3abc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Header Files">
-      <UniqueIdentifier>{bfae0602-82f1-4a4d-b0e0-1731054b140f}</UniqueIdentifier>
+      <UniqueIdentifier>{38c96733-8fd8-41ab-83a2-b92e73ad0c66}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Source Files">
-      <UniqueIdentifier>{4a7c2953-dee0-4d58-a56c-77568b6b9b24}</UniqueIdentifier>
+      <UniqueIdentifier>{c733d58f-d7d1-4810-8622-46f3b6c038f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

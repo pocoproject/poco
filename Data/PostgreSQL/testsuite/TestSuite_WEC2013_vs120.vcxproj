@@ -29,10 +29,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\PostgreSQLTest.cpp"/>
     <ClCompile Include="src\PostgreSQLTestSuite.cpp"/>
     <ClCompile Include="src\SQLExecutor.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

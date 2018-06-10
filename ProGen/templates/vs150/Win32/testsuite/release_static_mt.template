@@ -27,7 +27,7 @@
 		EnableIntrinsicFunctions="true"
 		FavorSizeOrSpeed="1"
 		OmitFramePointers="true"
-		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${project.pocobase}\CppUnit\WinTestRunner\include;${configuration.compiler.includes}"
+		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${configuration.compiler.includes}"
 		PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;${configuration.compiler.defines}"
 		StringPooling="true"
 		RuntimeLibrary="0"
@@ -54,7 +54,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies=${configuration.linker.dependencies}"
+		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="bin\static_mt\${project.target}.exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
