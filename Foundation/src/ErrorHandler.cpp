@@ -36,18 +36,21 @@ ErrorHandler::~ErrorHandler()
 void ErrorHandler::exception(const Exception& exc)
 {
 	poco_debugger_msg(exc.what());
+    std::cerr << "An exception occured: " << exc.what() << '\n';
 }
 
 	
 void ErrorHandler::exception(const std::exception& exc)
 {
 	poco_debugger_msg(exc.what());
+    std::cerr << "An exception occured: " << exc.what() << '\n';
 }
 
 
 void ErrorHandler::exception()
 {
 	poco_debugger_msg("unknown exception");
+    std::cerr << "An exception unknown occured.\n";
 }
 
 
