@@ -11,6 +11,7 @@ set_target_properties(PageCompiler
     )
 
 target_link_libraries(PageCompiler PUBLIC Poco::Net Poco::Util)
+target_compile_options(PageCompiler PUBLIC $<$<BOOL:${MINGW}>-municode>)
 
 install(
 	TARGETS PageCompiler EXPORT PageCompilerTargets

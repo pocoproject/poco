@@ -3,3 +3,4 @@ add_executable(TwitterCLient
 	src/Twitter.cpp
 )
 target_link_libraries(TwitterCLient PUBLIC Poco::NetSSL Poco::Util Poco::JSON Poco::XML)
+target_compile_options(TwitterCLient PUBLIC $<$<BOOL:${MINGW}>-municode>)

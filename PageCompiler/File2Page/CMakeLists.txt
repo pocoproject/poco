@@ -9,6 +9,7 @@ set_target_properties(File2Page
     )
 
 target_link_libraries(File2Page PUBLIC Poco::Util)
+target_compile_options(File2Page PUBLIC $<$<BOOL:${MINGW}>-municode>)
 
 install(
 	TARGETS File2Page EXPORT File2PageTargets

@@ -9,6 +9,7 @@ set_target_properties(EncodingsCompiler
     )
 
 target_link_libraries(EncodingsCompiler PUBLIC Poco::Net Poco::Util)
+target_compile_options(EncodingsCompiler PUBLIC $<$<BOOL:${MINGW}>-municode>)
 
 install(
     TARGETS EncodingsCompiler EXPORT "EncodingsCompilerTargets"
