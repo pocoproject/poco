@@ -29,3 +29,7 @@ POCO_GENERATE_PACKAGE(SQLPostgreSQL)
 if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)
 endif ()
+
+configure_file(PocoSQLPostgreSQL.pc.in ${CMAKE_BINARY_DIR}/PocoSQLPostgreSQL.pc @ONLY)
+list(APPEND POCO_PKG_CONFIG_FILES ${CMAKE_BINARY_DIR}/PocoSQLPostgreSQL.pc)
+set(POCO_PKG_CONFIG_FILES ${POCO_PKG_CONFIG_FILES} PARENT_SCOPE)
