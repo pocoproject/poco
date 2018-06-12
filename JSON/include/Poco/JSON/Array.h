@@ -216,7 +216,7 @@ private:
 
 inline void Array::setEscapeUnicode(bool escape)
 {
-	_escapeUnicode = true;
+	_escapeUnicode = escape;
 }
 
 
