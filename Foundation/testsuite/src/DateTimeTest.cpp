@@ -854,6 +854,23 @@ void DateTimeTest::testLeapSeconds()
 }
 
 
+void DateTimeTest::testTM()
+{
+	time_t now;
+	time(&now);
+	tm* pTM = gmtime(&now);
+	DateTime dt(*pTM);
+	assertTrue (dt.second() == pTM->tm_sec);
+	assertTrue (dt.minute() == pTM->tm_min);
+	assertTrue (dt.hour() == pTM->tm_hour);
+	assertTrue (dt.day() == pTM->tm_mday);
+	assertTrue (dt.month() == pTM->tm_mon + 1);
+	assertTrue (dt.year() == pTM->tm_year + 1900);
+	assertTrue (dt.dayOfWeek() == pTM->tm_wday);
+	assertTrue (dt.dayOfYear() == pTM->tm_yday + 1);
+}
+
+
 void DateTimeTest::setUp()
 {
 }
@@ -886,6 +903,7 @@ CppUnit::Test* DateTimeTest::suite()
 	CppUnit_addTest(pSuite, DateTimeTest, testIncrementDecrement);
 	CppUnit_addTest(pSuite, DateTimeTest, testUTC);
 	CppUnit_addTest(pSuite, DateTimeTest, testLeapSeconds);
+	CppUnit_addTest(pSuite, DateTimeTest, testTM);
 
 	return pSuite;
 }

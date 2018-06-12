@@ -23,6 +23,9 @@
 #include "Poco/Timespan.h"
 
 
+struct tm;
+
+
 namespace Poco {
 
 
@@ -86,9 +89,12 @@ public:
 		FRIDAY,
 		SATURDAY
 	};
-		
+
 	DateTime();
 		/// Creates a DateTime for the current date and time.
+
+	DateTime(const tm& tmStruct);
+		/// Creates a DateTime from tm struct.
 
 	DateTime(const Timestamp& timestamp);
 		/// Creates a DateTime for the date and time given in
@@ -206,7 +212,7 @@ public:
 		/// Returns the date and time expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
-		
+
 	bool operator == (const DateTime& dateTime) const;	
 	bool operator != (const DateTime& dateTime) const;	
 	bool operator <  (const DateTime& dateTime) const;	
@@ -219,28 +225,31 @@ public:
 	Timespan  operator -  (const DateTime& dateTime) const;
 	DateTime& operator += (const Timespan& span);
 	DateTime& operator -= (const Timespan& span);
-	
+
+	tm makeTM() const;
+		/// Converts DateTime to tm struct.
+
 	void makeUTC(int tzd);
 		/// Converts a local time into UTC, by applying the given time zone differential.
-		
+
 	void makeLocal(int tzd);
 		/// Converts a UTC time into a local time, by applying the given time zone differential.
-	
+
 	static bool isLeapYear(int year);
 		/// Returns true if the given year is a leap year;
 		/// false otherwise.
-		
+
 	static int daysOfMonth(int year, int month);
 		/// Returns the number of days in the given month
 		/// and year. Month is from 1 to 12.
-		
+
 	static bool isValid(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Checks if the given date and time is valid
 		/// (all arguments are within a proper range).
 		///
 		/// Returns true if all arguments are valid, false otherwise.
-		
-protected:	
+
+protected:
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 	
@@ -264,14 +273,14 @@ private:
 		///utility functions used to correct the overflow in computeGregorian
 
 	Timestamp::UtcTimeVal _utcTime;
-	short  _year;
-	short  _month;
-	short  _day;
-	short  _hour;
-	short  _minute;
-	short  _second;
-	short  _millisecond;
-	short  _microsecond;
+	short _year;
+	short _month;
+	short _day;
+	short _hour;
+	short _minute;
+	short _second;
+	short _millisecond;
+	short _microsecond;
 };
 
 

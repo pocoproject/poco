@@ -41,6 +41,7 @@ public:
 	void testIncrementDecrement();
 	void testUTC();
 	void testLeapSeconds();
+	void testTM();
 
 	void setUp();
 	void tearDown();
