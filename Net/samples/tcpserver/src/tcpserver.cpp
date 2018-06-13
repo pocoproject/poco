@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 		srv.start();
 
 		std::cout << "TCP server listening on port " << port << '.'
-			 << std::endl << "Press Ctrl-C quit." << std::endl;
+			 << std::endl << "Press Ctrl-C to quit." << std::endl;
 
 		terminator.wait();
 	}
