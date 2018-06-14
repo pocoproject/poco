@@ -35,19 +35,19 @@ void ThreadImpl::setPriorityImpl(int prio)
 }
 
 
-void ThreadImpl::setOSPriorityImpl(int prio, int policy)
+void ThreadImpl::setOSPriorityImpl(int prio, int /*policy*/)
 {
 	setPriorityImpl(prio);
 }
 
 
-int ThreadImpl::getMinOSPriorityImpl(int policy)
+int ThreadImpl::getMinOSPriorityImpl(int /*policy*/)
 {
 	return PRIO_LOWEST_IMPL;
 }
 
 
-int ThreadImpl::getMaxOSPriorityImpl(int policy)
+int ThreadImpl::getMaxOSPriorityImpl(int /*policy*/)
 {
 	return PRIO_HIGHEST_IMPL;
 }

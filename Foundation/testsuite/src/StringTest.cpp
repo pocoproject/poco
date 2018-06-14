@@ -16,6 +16,7 @@
 #include "Poco/Format.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/FPEnvironment.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
@@ -66,6 +67,7 @@ using Poco::RangeException;
 using Poco::isIntOverflow;
 using Poco::isSafeIntCast;
 using Poco::safeIntCast;
+using Poco::FPEnvironment;
 
 
 StringTest::StringTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -612,6 +614,25 @@ void StringTest::testStringToFloat()
 	assertTrue (std::isinf(strToFloat("-infinity", "infinity")));
 	assertTrue (!std::isinf(strToFloat("Inf")));
 	assertTrue (std::isinf(strToFloat("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isNaN(strToFloat("nan")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("xNaNy")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("inf")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("-inf")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("1.23")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("Inf")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isInfinite(strToFloat("inf")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("-inf")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("infinity", "infinity")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("1.23")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("abc")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("Inf", "Inf")));
 }
 
 
@@ -770,6 +791,25 @@ void StringTest::testStringToDouble()
 	assertTrue (std::isinf(strToDouble("-infinity", "infinity")));
 	assertTrue (!std::isinf(strToDouble("Inf")));
 	assertTrue (std::isinf(strToDouble("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isNaN(strToDouble("nan")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("xNaNy")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("inf")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("-inf")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("1.23")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("Inf")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isInfinite(strToDouble("inf")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("-inf")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("infinity", "infinity")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("1.23")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("abc")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("Inf", "Inf")));
 }
 
 

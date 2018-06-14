@@ -63,7 +63,7 @@ Binary::~Binary()
 }
 
 
-std::string Binary::toString(int indent) const
+std::string Binary::toString(int /*indent*/) const
 {
 	std::ostringstream oss;
 	Base64Encoder encoder(oss);

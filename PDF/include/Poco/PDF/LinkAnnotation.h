@@ -71,7 +71,7 @@ inline void LinkAnnotation::setHighlight(Highlight mode)
 
 inline void LinkAnnotation::setBorderStyle(float width, Poco::UInt32 dashOn, Poco::UInt32 dashOff)
 {
-	HPDF_LinkAnnot_SetBorderStyle(handle(), width, dashOn, dashOff);
+	HPDF_LinkAnnot_SetBorderStyle(handle(), width, static_cast<HPDF_UINT16>(dashOn), static_cast<HPDF_UINT16>(dashOff));
 }
 
 

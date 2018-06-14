@@ -206,8 +206,8 @@ private:
 	SocketConnector(const SocketConnector&);
 	SocketConnector& operator = (const SocketConnector&);
 
-	StreamSocket           _socket;
-	SocketReactor*         _pReactor;
+	StreamSocket   _socket;
+	SocketReactor* _pReactor;
 };
 
 

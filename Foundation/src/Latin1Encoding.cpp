@@ -110,7 +110,7 @@ int Latin1Encoding::queryConvert(const unsigned char* bytes, int length) const
 }
 
 
-int Latin1Encoding::sequenceLength(const unsigned char* bytes, int length) const
+int Latin1Encoding::sequenceLength(const unsigned char* /*bytes*/, int /*length*/) const
 {
 	return 1;
 }

@@ -398,6 +398,12 @@ protected:
 
 private:
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4018 )
+#endif
+
 		template <typename F, typename T>
 		void POCO_UNUSED checkUpperLimit(const F& from) const
 		{
@@ -429,6 +435,9 @@ private:
 			}
 		}
 
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 	template <typename F, typename T>
 	void checkUpperLimitFloat(const F& from) const

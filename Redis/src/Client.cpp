@@ -44,7 +44,7 @@ Client::Client(const std::string& hostAndPort):
 
 
 Client::Client(const std::string& host, int port):
-	_address(host, port),
+	_address(host, static_cast<UInt16>(port)),
 	_socket(),
 	_input(0),
 	_output(0),
@@ -93,7 +93,7 @@ void Client::connect(const std::string& hostAndPort)
 
 void Client::connect(const std::string& host, int port)
 {
-	_address = Net::SocketAddress(host, port);
+	_address = Net::SocketAddress(host, static_cast<UInt16>(port));
 	connect();
 }
 
@@ -125,7 +125,7 @@ void Client::connect(const std::string& hostAndPort, const Timespan& timeout)
 
 void Client::connect(const std::string& host, int port, const Timespan& timeout)
 {
-	_address = Net::SocketAddress(host, port);
+	_address = Net::SocketAddress(host, static_cast<UInt16>(port));
 	connect(timeout);
 }
 
@@ -184,7 +184,7 @@ RedisType::Ptr Client::readReply()
 {
 	poco_assert(_input);
 
-	int c = _input->get();
+	char c = static_cast<char>(_input->get());
 	RedisType::Ptr result = RedisType::createRedisType(c);
 	if (result.isNull())
 	{

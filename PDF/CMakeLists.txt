@@ -1,6 +1,3 @@
-set(LIBNAME "PDF")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( SRCS ${SRCS_G})
@@ -13,8 +10,6 @@ POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
     find_package(ZLIB REQUIRED)
-    set(SYSLIBS ${SYSLIBS} ${ZLIB_LIBRARIES})
-    include_directories(${ZLIB_INCLUDE_DIRS})
 else()
     # zlib
     POCO_SOURCES( SRCS zlib
@@ -122,28 +117,36 @@ POCO_SOURCES( SRCS libpng
 #TODO: Can we put this with the below includes? PRIVAT eg.
 include_directories( "include/Poco/PDF" ) # zip src
 
-add_library( "${LIBNAME}" ${SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(PDF ${SRCS} )
+add_library(Poco::PDF ALIAS PDF)
+set_target_properties(PDF
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoPDF
     DEFINE_SYMBOL PDF_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" ${SYSLIBS} XML Util Foundation )
-target_include_directories( "${LIBNAME}"
+target_link_libraries(PDF PUBLIC ${ZLIB_LIBRARIES} Poco::XML Poco::Util)
+target_include_directories(PDF
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+if (POCO_UNBUNDLED)
+    target_include_directories(PDF PUBLIC "${ZLIB_INCLUDE_DIRS}")
+    target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+endif()
+
+POCO_INSTALL(PDF)
+POCO_GENERATE_PACKAGE(PDF)
 
 if (POCO_ENABLE_TESTS)
     add_subdirectory(samples)
     add_subdirectory(testsuite)
 endif ()
+
+configure_file(PocoPDF.pc.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoPDF.pc @ONLY)
+list(APPEND POCO_PKG_CONFIG_FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoPDF.pc)
+set(POCO_PKG_CONFIG_FILES ${POCO_PKG_CONFIG_FILES} PARENT_SCOPE)

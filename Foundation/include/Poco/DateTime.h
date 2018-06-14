@@ -23,6 +23,9 @@
 #include "Poco/Timespan.h"
 
 
+struct tm;
+
+
 namespace Poco {
 
 
@@ -86,9 +89,12 @@ public:
 		FRIDAY,
 		SATURDAY
 	};
-		
+
 	DateTime();
 		/// Creates a DateTime for the current date and time.
+
+	DateTime(const tm& tmStruct);
+		/// Creates a DateTime from tm struct.
 
 	DateTime(const Timestamp& timestamp);
 		/// Creates a DateTime for the date and time given in
@@ -101,7 +107,7 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 59.
+		///   * second is from 0 to 60.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 		/// Throws an InvalidArgumentException if an argument date is out of range.
@@ -136,7 +142,7 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 59.
+		///   * second is from 0 to 60.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 		/// Throws an InvalidArgumentException if an argument date is out of range.
@@ -222,6 +228,9 @@ public:
 	DateTime& operator += (const Timespan& span);
 	DateTime& operator -= (const Timespan& span);
 
+	tm makeTM() const;
+		/// Converts DateTime to tm struct.
+
 	void makeUTC(int tzd);
 		/// Converts a local time into UTC, by applying the given time zone differential.
 
@@ -266,14 +275,14 @@ private:
 		///utility functions used to correct the overflow in computeGregorian
 
 	Timestamp::UtcTimeVal _utcTime;
-	short  _year;
-	short  _month;
-	short  _day;
-	short  _hour;
-	short  _minute;
-	short  _second;
-	short  _millisecond;
-	short  _microsecond;
+	short _year;
+	short _month;
+	short _day;
+	short _hour;
+	short _minute;
+	short _second;
+	short _millisecond;
+	short _microsecond;
 };
 
 

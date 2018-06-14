@@ -112,7 +112,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 
 void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 {
-	double msec = ts.fraction/1000000;
+	double msec = ts.fraction/1000000.0;
 	double usec = 1000 * (msec - std::floor(msec));
 
 	dt.assign(ts.year,
@@ -128,28 +128,28 @@ void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 
 void Utility::dateSync(SQL_DATE_STRUCT& ds, const Date& d)
 {
-	ds.year = d.year();
-	ds.month = d.month();
-	ds.day = d.day();
+	ds.year = static_cast<SQLSMALLINT>(d.year());
+	ds.month = static_cast<SQLUSMALLINT>(d.month());
+	ds.day = static_cast<SQLUSMALLINT>(d.day());
 }
 
 
 void Utility::timeSync(SQL_TIME_STRUCT& ts, const Time& t)
 {
-	ts.hour = t.hour();
-	ts.minute = t.minute();
-	ts.second = t.second();
+	ts.hour = static_cast<SQLUSMALLINT>(t.hour());
+	ts.minute = static_cast<SQLUSMALLINT>(t.minute());
+	ts.second = static_cast<SQLUSMALLINT>(t.second());
 }
 
 
 void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 {
-	ts.year = dt.year();
-	ts.month = dt.month();
-	ts.day = dt.day();
-	ts.hour = dt.hour();
-	ts.minute = dt.minute();
-	ts.second = dt.second();
+	ts.year = static_cast<SQLSMALLINT>(dt.year());
+	ts.month = static_cast<SQLUSMALLINT>(dt.month());
+	ts.day = static_cast<SQLUSMALLINT>(dt.day());
+	ts.hour = static_cast<SQLUSMALLINT>(dt.hour());
+	ts.minute = static_cast<SQLUSMALLINT>(dt.minute());
+	ts.second = static_cast<SQLUSMALLINT>(dt.second());
 	// Fraction support is limited to milliseconds due to MS SQL Server limitation
 	// see http://support.microsoft.com/kb/263872
 	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);

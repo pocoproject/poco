@@ -665,12 +665,12 @@ void ParserEngine::handleProcessingInstruction(void* userData, const XML_Char* t
 }
 
 
-void ParserEngine::handleDefault(void* userData, const XML_Char* s, int len)
+void ParserEngine::handleDefault(void* /*userData*/, const XML_Char* /*s*/, int /*len*/)
 {
 }
 
 
-void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId, const XML_Char* notationName)
+void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* /*base*/, const XML_Char* systemId, const XML_Char* publicId, const XML_Char* notationName)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 	
@@ -681,7 +681,7 @@ void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* enti
 }
 
 
-void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
+void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationName, const XML_Char* /*base*/, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 	
@@ -694,7 +694,7 @@ void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationNa
 }
 
 
-int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* context, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
+int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* context, const XML_Char* /*base*/, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(XML_GetUserData(parser));
 
@@ -824,7 +824,7 @@ void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix
 }
 
 
-void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset)
+void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int /*hasInternalSubset*/)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
@@ -846,8 +846,8 @@ void ParserEngine::handleEndDoctypeDecl(void* userData)
 }
 
 
-void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, int isParamEntity, const XML_Char *value, int valueLength,
-	                                const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char *notationName)
+void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, int /*isParamEntity*/, const XML_Char *value, int valueLength,
+	                                const XML_Char *base, const XML_Char *systemId, const XML_Char *publicId, const XML_Char* /*notationName*/)
 {
 	if (value)
 		handleInternalParsedEntityDecl(userData, entityName, value, valueLength);
@@ -856,7 +856,7 @@ void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, 
 }
 
 
-void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
+void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* /*base*/, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 
@@ -877,7 +877,7 @@ void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char
 }
 
 
-void ParserEngine::handleSkippedEntity(void* userData, const XML_Char* entityName, int isParameterEntity)
+void ParserEngine::handleSkippedEntity(void* userData, const XML_Char* entityName, int /*isParameterEntity*/)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
 	

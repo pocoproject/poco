@@ -39,7 +39,7 @@ Poco::Net::StreamSocket Connection::SocketFactory::createSocket(const std::strin
 {
 	if (!secure)
 	{
-		Poco::Net::SocketAddress addr(host, port);
+		Poco::Net::SocketAddress addr(host, static_cast<UInt16>(port));
 		Poco::Net::StreamSocket socket;
 		if (connectTimeout > 0)
 			socket.connect(addr, connectTimeout);
@@ -75,7 +75,7 @@ Connection::Connection(const std::string& uri, SocketFactory& socketFactory):
 
 
 Connection::Connection(const std::string& host, int port):
-	_address(host, port),
+	_address(host, static_cast<UInt16>(port)),
 	_socket()
 {
 	connect();
@@ -124,7 +124,7 @@ void Connection::connect(const std::string& hostAndPort)
 
 void Connection::connect(const std::string& host, int port)
 {
-	_address = Poco::Net::SocketAddress(host, port);
+	_address = Poco::Net::SocketAddress(host, static_cast<UInt16>(port));
 	connect();
 }
 

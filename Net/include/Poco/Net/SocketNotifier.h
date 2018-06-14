@@ -70,10 +70,13 @@ protected:
 
 private:
 	typedef std::multiset<SocketNotification*> EventSet;
+	typedef Poco::FastMutex                    MutexType;
+	typedef MutexType::ScopedLock              ScopedLock;
 
 	EventSet                 _events;
 	Poco::NotificationCenter _nc;
 	Socket                   _socket;
+	MutexType                _mutex;
 };
 
 
@@ -82,6 +85,7 @@ private:
 //
 inline bool SocketNotifier::accepts(SocketNotification* pNotification)
 {
+	ScopedLock l(_mutex);
 	return _events.find(pNotification) != _events.end();
 }
 

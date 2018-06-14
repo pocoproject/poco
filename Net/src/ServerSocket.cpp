@@ -52,7 +52,7 @@ ServerSocket::ServerSocket(Poco::UInt16 port, int backlog): Socket(new ServerSoc
 }
 
 
-ServerSocket::ServerSocket(SocketImpl* pImpl, bool ignore): Socket(pImpl)
+ServerSocket::ServerSocket(SocketImpl* pImpl, bool /*ignore*/): Socket(pImpl)
 {
 }
 

@@ -30,7 +30,7 @@ KeyConsoleHandler::~KeyConsoleHandler()
 }
 
 
-void KeyConsoleHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)
+void KeyConsoleHandler::onPrivateKeyRequested(const void* /*pSender*/, std::string& privateKey)
 {
 	std::cout << "Please enter the passphrase for the private key: ";
 	std::cin >> privateKey;

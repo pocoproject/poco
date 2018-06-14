@@ -14,6 +14,7 @@
 #include "Poco/MemoryPool.h"
 #include "Poco/Stopwatch.h"
 #include <vector>
+#include <cstring>
 #include <iostream>
 
 
@@ -77,7 +78,7 @@ template<typename T>
 bool fastMemPoolTest(int n)
 {
 	bool ret = true;
-	std::vector<T*> vec(n, 0);
+	std::vector<T*> vec(n, (T*)0);
 	Poco::FastMemoryPool<T> pool(sizeof(T*), vec.size()/2);
 	for (int i = 0; i < vec.size(); ++i)
 	{
@@ -101,7 +102,7 @@ template <typename T>
 bool fastMemPoolTestCustom(int n, const T& val)
 {
 	bool ret = true;
-	std::vector<T*> vec(n, 0);
+	std::vector<T*> vec(n, (T*)0);
 	Poco::FastMemoryPool<T> pool(sizeof(T*), vec.size()/2);
 	for (int i = 0; i < vec.size(); ++i)
 	{
@@ -169,7 +170,7 @@ void MemoryPoolTest::testFastMemoryPool()
 	Poco::FastMemoryPool<int> fastIntPool(blocks);
 	Poco::FastMemoryPool<std::string> fastStringPool(blocks);
 
-	std::vector<int*> intVec(blocks, 0);
+	std::vector<int*> intVec(blocks, (int*)0);
 	std::vector<std::string*> strVec(blocks);
 
 	for (int i = 0; i < blocks; ++i)
@@ -223,7 +224,7 @@ void MemoryPoolTest::memoryPoolBenchmark()
 	Poco::Stopwatch sw;
 
 	int reps = 1000000;
-	std::vector<int*> iVec(reps, 0);
+	std::vector<int*> iVec(reps, (int*)0);
 	Poco::FastMemoryPool<int> fastPool(reps);
 	sw.restart();
 	for (int i = 0; i < reps; ++i)

@@ -29,13 +29,13 @@ Formatter::~Formatter()
 }
 
 
-void Formatter::setProperty(const std::string& name, const std::string& value)
+void Formatter::setProperty(const std::string& /*name*/, const std::string& /*value*/)
 {
 	throw PropertyNotSupportedException();
 }
 
 
-std::string Formatter::getProperty(const std::string& name) const
+std::string Formatter::getProperty(const std::string& /*name*/) const
 {
 	throw PropertyNotSupportedException();
 }

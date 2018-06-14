@@ -106,7 +106,7 @@ ErrorHandler* DOMSerializer::getErrorHandler() const
 }
 
 
-void DOMSerializer::setFeature(const XMLString& featureId, bool state)
+void DOMSerializer::setFeature(const XMLString& featureId, bool /*state*/)
 {
 	if (featureId == XMLReader::FEATURE_NAMESPACES)
 		throw SAXNotSupportedException(fromXMLString(XMLReader::FEATURE_NAMESPACES));
@@ -128,7 +128,7 @@ bool DOMSerializer::getFeature(const XMLString& featureId) const
 }
 
 
-void DOMSerializer::setProperty(const XMLString& propertyId, const XMLString& value)
+void DOMSerializer::setProperty(const XMLString& propertyId, const XMLString& /*value*/)
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER || propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
 		throw SAXNotSupportedException(std::string("property does not take a string value: ") + fromXMLString(propertyId));
@@ -165,19 +165,19 @@ void DOMSerializer::serialize(const Node* pNode)
 }
 
 
-void DOMSerializer::parse(InputSource* pSource)
+void DOMSerializer::parse(InputSource* /*pSource*/)
 {
 	throw XMLException("The DOMSerializer cannot parse an InputSource");
 }
 
 
-void DOMSerializer::parse(const XMLString& systemId)
+void DOMSerializer::parse(const XMLString& /*systemId*/)
 {
 	throw XMLException("The DOMSerializer cannot parse from a system identifier");
 }
 
 
-void DOMSerializer::parseMemoryNP(const char* xml, std::size_t size)
+void DOMSerializer::parseMemoryNP(const char* /*xml*/, std::size_t /*size*/)
 {
 	throw XMLException("The DOMSerializer cannot parse from memory");
 }

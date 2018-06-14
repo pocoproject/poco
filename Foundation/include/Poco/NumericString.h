@@ -70,7 +70,7 @@ namespace Impl {
 	class IsNegativeImpl<false, T>
 	{
 	public:
-		bool operator()(T x) { return false; }
+		bool operator()(T /*x*/) { return false; }
 	};
 
 }

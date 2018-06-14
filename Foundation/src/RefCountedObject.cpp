@@ -97,7 +97,7 @@ void* WeakRefCounter::operator new(std::size_t)
 void WeakRefCounter::operator delete(void* ptr)
 {
 	if (!ptr) return;
-	getFastMemoryPool<WeakRefCounter>().release(ptr);
+	getFastMemoryPool<WeakRefCounter>().release(reinterpret_cast<WeakRefCounter*>(ptr));
 }
 
 
@@ -107,7 +107,7 @@ void* WeakRefCounter::operator new [] (std::size_t)
 }
 
 
-void WeakRefCounter::operator delete [] (void* ptr)
+void WeakRefCounter::operator delete [] (void* /*ptr*/)
 {
 }
 

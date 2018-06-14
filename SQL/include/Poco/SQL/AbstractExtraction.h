@@ -125,7 +125,7 @@ public:
 		/// Returns the force empty string flag.
 
 	template <typename T>
-	bool isValueNull(const T& str, bool deflt)
+	bool isValueNull(const T& /*str*/, bool deflt)
 		/// Utility function to determine the nullness of the value.
 		/// This generic version always returns default value
 		/// (i.e. does nothing). The std::string overload does
@@ -208,7 +208,7 @@ inline Poco::UInt32 AbstractExtraction::getLimit() const
 }
 
 
-inline bool AbstractExtraction::isNull(std::size_t row) const
+inline bool AbstractExtraction::isNull(std::size_t /*row*/) const
 {
 	throw NotImplementedException("Check for null values not implemented.");
 }

@@ -49,7 +49,7 @@ namespace
 			try
 			{
 				WebSocket ws(request, response);
-				std::unique_ptr<char> pBuffer(new char[_bufSize]);
+				std::unique_ptr<char[]> pBuffer(new char[_bufSize]);
 				int flags;
 				int n;
 				do
@@ -126,7 +126,7 @@ void WebSocketTest::testWebSocket()
 
 	std::string payload("x");
 	ws.sendFrame(payload.data(), (int) payload.size());
-	char buffer[1024];
+	char buffer[1024] = {};
 	int flags;
 	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == payload.size());
@@ -197,7 +197,7 @@ void WebSocketTest::testWebSocketLarge()
 	sstr << payload;
 	sstr.flush();
 
-	char buffer[msgSize + 1];
+	char buffer[msgSize + 1] = {};
 	int flags;
 	int n = 0;
 	do

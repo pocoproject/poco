@@ -210,7 +210,7 @@ const Image& Document::loadPNGImageImpl(const std::string& fileName, bool doLoad
 		throw NotFoundException("File not found: " + fileName);
 }
 
-const Image& Document::loadBMPImageImpl(const std::string& fileName, bool doLoad)
+const Image& Document::loadBMPImageImpl(const std::string& fileName, bool /*doLoad*/)
 {
 	Path path(fileName);
 

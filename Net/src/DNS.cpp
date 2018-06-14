@@ -316,7 +316,7 @@ std::string DNS::decodeIDNLabel(const std::string& encodedIDN)
 			Poco::UTF32Encoding utf32;
 			Poco::UTF8Encoding utf8;
 			Poco::TextConverter converter(utf32, utf8);
-			converter.convert(buffer, size*sizeof(punycode_uint), decoded);
+			converter.convert(buffer, static_cast<int>(size*sizeof(punycode_uint)), decoded);
 		}
 		else throw DNSException("Failed to decode IDN label: ", encodedIDN);
 	}
@@ -460,7 +460,7 @@ enum
 
 static char encode_digit(punycode_uint d, int flag)
 {
-	return d + 22 + 75 * (d < 26) - ((flag != 0) << 5);
+	return static_cast<char>(d + 22 + 75 * (d < 26) - ((flag != 0) << 5));
 	/*  0..25 map to ASCII a..z or A..Z */
 	/* 26..35 map to ASCII 0..9         */
 }
@@ -478,7 +478,7 @@ static unsigned decode_digit(int cp)
 /*** Platform-specific constants ***/
 
 /* maxint is the maximum value of a punycode_uint variable: */
-static const punycode_uint maxint = -1;
+static const punycode_uint maxint = punycode_uint (-1);
 /* Because maxint is unsigned, -1 becomes the maximum value. */
 
 /*** Bias adaptation function ***/

@@ -30,16 +30,16 @@ TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
 	fillSQLTypes();
 	if (_pHDBC) fillTypeInfo(*_pHDBC);
 
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(std::string), SQL_C_CHAR));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(std::wstring), SQL_C_WCHAR));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Poco::UTF16String), SQL_C_WCHAR));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Date), SQL_TYPE_DATE));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Time), SQL_TYPE_TIME));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(DateTime), SQL_TYPE_TIMESTAMP));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(BLOB), SQL_BINARY));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(float), SQL_REAL));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(double), SQL_DOUBLE));
-	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(bool), SQL_BIT));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(std::string), static_cast<SQLSMALLINT>(SQL_C_CHAR)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(std::wstring), static_cast<SQLSMALLINT>(SQL_C_WCHAR)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Poco::UTF16String), static_cast<SQLSMALLINT>(SQL_C_WCHAR)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Date), static_cast<SQLSMALLINT>(SQL_TYPE_DATE)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(Time), static_cast<SQLSMALLINT>(SQL_TYPE_TIME)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(DateTime), static_cast<SQLSMALLINT>(SQL_TYPE_TIMESTAMP)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(BLOB), static_cast<SQLSMALLINT>(SQL_BINARY)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(float), static_cast<SQLSMALLINT>(SQL_REAL)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(double), static_cast<SQLSMALLINT>(SQL_DOUBLE)));
+	_cppDataTypes.insert(CppTypeInfoMap::value_type(&typeid(bool), static_cast<SQLSMALLINT>(SQL_BIT)));
 }
 
 

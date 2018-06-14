@@ -185,9 +185,9 @@ class FastMemoryPool
 	///   - FastMemoryPool can not be used for arrays of types smaller
 	///     than pointer
 	///
-	///   - if FastMemoryPool is used to store arrays, it must not have
-	///     multiple buckets; the way to achieve this is by specifying
-	///     proper argument values at construction.
+	///   - if FastMemoryPool is used to store variable-size arrays, it
+	///     must not have multiple buckets; the way to achieve this is by
+	///     specifying proper argument values at construction.
 	///
 	/// Neither of the above are primarily intended or recommended modes
 	/// of use. It is recommended to use a FastMemoryPool for creation of
@@ -199,8 +199,8 @@ class FastMemoryPool
 	/// when a block is returned to the pool, it is re-inserted in the
 	/// list. Pool will return held memory to the system at destruction,
 	/// and will not leak memory after destruction; this means that after
-	/// pool destruction, any memory that was taken, but not returned to
-	/// it becomes invalid.
+	/// pool destruction, any memory that was taken from, but not returned
+	/// to the pool becomes invalid.
 	///
 	/// FastMemoryPool is thread safe; it uses Poco::SpinlockMutex by
 	/// default, but other mutexes can be specified through te template
@@ -259,8 +259,8 @@ private:
 			/// Note that this storage is properly aligned
 			/// for the datatypes it holds. It will not work
 			/// for arrays of types smaller than pointer size.
-			/// Furthermore, the pool object itself will not
-			/// work for an array of any type after it is
+			/// Furthermore, the pool itself will not work for
+			/// a variable-size array of any type after it is
 			/// resized.
 		{
 			char buffer[sizeof(T)];
@@ -294,7 +294,6 @@ public:
 		///
 		///   - blocksPerBucket specifies how many blocks each bucket contains
 		///                     defaults to POCO_FAST_MEMORY_POOL_PREALLOC
-		///                     (defined in Config.h)
 		///
 		///   - bucketPreAlloc specifies how much space for bucket pointers
 		///                    (buckets themselves are not prealocated) will be
@@ -333,7 +332,8 @@ public:
 		return ret;
 	}
 
-	void release(void* ptr)
+	template <typename P>
+	void release(P* ptr)
 		/// Recycles the released memory by initializing it for
 		/// internal use and setting it as next available block;
 		/// previously next block becomes this block's next.
@@ -341,7 +341,7 @@ public:
 		/// Destructor is called for the returned pointer.
 	{
 		if (!ptr) return;
-		reinterpret_cast<T*>(ptr)->~T();
+		reinterpret_cast<P*>(ptr)->~P();
 		++_available;
 		ScopedLock l(_mutex);
 		_firstBlock = new (ptr) Block(_firstBlock);

@@ -120,7 +120,7 @@ HTTPFixedLengthInputStream::~HTTPFixedLengthInputStream()
 }
 
 
-void* HTTPFixedLengthInputStream::operator new(std::size_t size)
+void* HTTPFixedLengthInputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }
@@ -159,7 +159,7 @@ HTTPFixedLengthOutputStream::~HTTPFixedLengthOutputStream()
 }
 
 
-void* HTTPFixedLengthOutputStream::operator new(std::size_t size)
+void* HTTPFixedLengthOutputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }

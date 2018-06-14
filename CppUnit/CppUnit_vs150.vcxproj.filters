@@ -82,5 +82,8 @@
     <ClInclude Include="include\Poco\CppUnit\TextTestResult.h">
       <Filter>Include Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\CppUnit\CppUnit.h">
+      <Filter>Include Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

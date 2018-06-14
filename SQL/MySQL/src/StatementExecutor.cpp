@@ -26,7 +26,7 @@ StatementExecutor::StatementExecutor(MYSQL* mysql)
 	: _pSessionHandle(mysql)
 	, _affectedRowCount(0)
 {
-	if (!(_pHandle = mysql_stmt_init(mysql)))
+	if ((_pHandle = mysql_stmt_init(mysql)) == 0)
 		throw StatementException("mysql_stmt_init error");
 
 	_state = STMT_INITED;
@@ -107,7 +107,7 @@ void StatementExecutor::execute()
 
 	my_ulonglong affectedRows = mysql_affected_rows(_pSessionHandle);
 	if (affectedRows != ((my_ulonglong) - 1))
-		_affectedRowCount = static_cast<std::size_t>(affectedRows); //Was really a DELETE, UPDATE or INSERT statement
+		_affectedRowCount = static_cast<int>(affectedRows); //Was really a DELETE, UPDATE or INSERT statement
 }
 
 

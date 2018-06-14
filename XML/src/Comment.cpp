@@ -51,7 +51,7 @@ unsigned short Comment::nodeType() const
 }
 
 
-Node* Comment::copyNode(bool deep, Document* pOwnerDocument) const
+Node* Comment::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new Comment(pOwnerDocument, *this);
 }

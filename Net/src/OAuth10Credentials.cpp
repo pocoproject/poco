@@ -294,7 +294,7 @@ std::string OAuth10Credentials::createNonce() const
 	Poco::RandomInputStream randomStream;
 	for (int i = 0; i < 32; i++)
 	{
-		base64Encoder.put(randomStream.get());
+		base64Encoder.put(static_cast<char>(randomStream.get()));
 	}
 	base64Encoder.close();
 	std::string nonce = base64Nonce.str();

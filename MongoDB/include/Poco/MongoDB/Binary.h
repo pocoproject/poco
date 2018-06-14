@@ -117,7 +117,7 @@ struct ElementTraits<Binary::Ptr>
 {
 	enum { TypeId = 0x05 };
 
-	static std::string toString(const Binary::Ptr& value, int indent = 0)
+	static std::string toString(const Binary::Ptr& value, int /*indent*/ = 0)
 	{
 		return value.isNull() ? "" : value->toString();
 	}

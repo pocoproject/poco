@@ -228,7 +228,7 @@ AbstractTimerCallback::AbstractTimerCallback()
 }
 
 
-AbstractTimerCallback::AbstractTimerCallback(const AbstractTimerCallback& callback)
+AbstractTimerCallback::AbstractTimerCallback(const AbstractTimerCallback& /*callback*/)
 {
 }
 
@@ -238,7 +238,7 @@ AbstractTimerCallback::~AbstractTimerCallback()
 }
 
 
-AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCallback& callback)
+AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCallback& /*callback*/)
 {
 	return *this;
 }

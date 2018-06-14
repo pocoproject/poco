@@ -290,9 +290,9 @@ private:
 // inlines
 //
 
-inline void Object::setEscapeUnicode(bool escape)
+inline void Object::setEscapeUnicode(bool /*escape*/)
 {
-	_escapeUnicode = true;
+	_escapeUnicode = escape;
 }
 
 

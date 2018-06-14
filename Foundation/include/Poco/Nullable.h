@@ -291,7 +291,7 @@ private:
 		}
 	}
 
-	void destruct(bool init = true)
+	void destruct(bool /*init*/ = true)
 	{
 		if (!_isNull)
 		{

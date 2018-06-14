@@ -33,7 +33,7 @@ class ScopedLock
 	/// The destructor unlocks the mutex.
 {
 public:
-	explicit ScopedLock(M& mutex): _mutex(mutex)
+	explicit ScopedLock(M& mtx): _mutex(mtx)
 	{
 		_mutex.lock();
 	}

@@ -117,7 +117,7 @@ HTTPHeaderInputStream::~HTTPHeaderInputStream()
 }
 
 
-void* HTTPHeaderInputStream::operator new(std::size_t size)
+void* HTTPHeaderInputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }
@@ -156,7 +156,7 @@ HTTPHeaderOutputStream::~HTTPHeaderOutputStream()
 }
 
 
-void* HTTPHeaderOutputStream::operator new(std::size_t size)
+void* HTTPHeaderOutputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }
