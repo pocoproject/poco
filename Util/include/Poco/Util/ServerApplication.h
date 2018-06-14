@@ -247,7 +247,7 @@ private:
 			return Poco::Util::Application::EXIT_SOFTWARE; 	\
 		}								\
 	}									\
-	POCO_WRAPPER_WMAIN()
+	POCO_WMAIN_WRAPPER()
 #elif defined(POCO_VXWORKS)
 	#define POCO_SERVER_MAIN(App) \
 	int pocoSrvMain(const char* appName, ...) 				\
