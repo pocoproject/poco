@@ -254,6 +254,7 @@ endif ()
 
 include(DefinePlatformSpecifc)
 
+set(POCO_PKG_CONFIG_FILES "")
 # Pthreads/threads support
 find_package(Threads REQUIRED)
 
@@ -359,6 +360,7 @@ if (POCO_ENABLE_TESTS OR POCO_ENABLE_CPPUNIT)
 endif ()
 
 add_subdirectory(Foundation)
+
 if(POCO_ENABLE_ENCODINGS)
     add_subdirectory(Encodings)
     list(APPEND Poco_COMPONENTS "Encodings")
@@ -510,6 +512,10 @@ install(
 
 # in tree build settings
 #configure_file(PocoBuildTreeSettings.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PocoBuildTreeSettings.cmake @ONLY)
+
+# Install pkg-config files
+install(FILES ${POCO_PKG_CONFIG_FILES}
+        DESTINATION lib${LIB_SUFFIX}/pkgconfig)
 
 if(POCO_VERBOSE_MESSAGES)
     message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")

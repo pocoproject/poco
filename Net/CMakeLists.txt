@@ -51,3 +51,7 @@ endif ()
 if (POCO_ENABLE_SAMPLES)
     add_subdirectory(samples)
 endif ()
+
+configure_file(PocoNet.pc.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoNet.pc @ONLY)
+list(APPEND POCO_PKG_CONFIG_FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoNet.pc)
+set(POCO_PKG_CONFIG_FILES ${POCO_PKG_CONFIG_FILES} PARENT_SCOPE)

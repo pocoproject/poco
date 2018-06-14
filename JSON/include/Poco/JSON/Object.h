@@ -292,7 +292,7 @@ private:
 
 inline void Object::setEscapeUnicode(bool /*escape*/)
 {
-	_escapeUnicode = true;
+	_escapeUnicode = escape;
 }
 
 

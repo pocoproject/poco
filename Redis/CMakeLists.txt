@@ -32,3 +32,7 @@ endif ()
 if (POCO_ENABLE_SAMPLES)
 #    add_subdirectory(samples)
 endif ()
+
+configure_file(PocoRedis.pc.in ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoRedis.pc @ONLY)
+list(APPEND POCO_PKG_CONFIG_FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/PocoRedis.pc)
+set(POCO_PKG_CONFIG_FILES ${POCO_PKG_CONFIG_FILES} PARENT_SCOPE)
