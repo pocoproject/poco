@@ -210,7 +210,7 @@ private:
 // inlines
 //
 
-inline void Array::setEscapeUnicode(bool /*escape*/)
+inline void Array::setEscapeUnicode(bool escape)
 {
 	_escapeUnicode = escape;
 }
