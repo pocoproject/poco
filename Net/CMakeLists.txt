@@ -23,7 +23,16 @@ if(WIN32)
         target_link_libraries(Net PUBLIC "ws2")
     else()    
         target_link_libraries(Net PUBLIC "ws2_32")
-    endif()    
+    endif()
+
+    if(MINGW) # Needed by WinAPI in MinGW
+        string(REGEX MATCH "^[0-9]+\\.[0-9]+" WIN_VERSION ${CMAKE_SYSTEM_VERSION})
+        string(REGEX REPLACE "\\.[0-9]+$" "" WIN_MAJOR_VERSION ${WIN_VERSION})
+        string(REGEX REPLACE "^[0-9]+\\." "" WIN_MINOR_VERSION ${WIN_VERSION})
+        math(EXPR WINAPI_VERSION "256 * ${WIN_MAJOR_VERSION} + ${WIN_MINOR_VERSION}")
+        set_source_files_properties(src/PollSet.cpp
+                PROPERTIES COMPILE_DEFINITIONS "_WIN32_WINNT=${WINAPI_VERSION}")
+    endif()
 endif(WIN32)
 
 target_include_directories(Net

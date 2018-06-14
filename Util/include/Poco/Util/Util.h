@@ -54,8 +54,8 @@
 // Use option "-municode" to enable wmain().
 // Required by Application and ServerApplication.
 //
-#if defined(__MINGW32__)
-	#define POCO_WRAPPER_WMAIN()  \
+#if defined(__MINGW32__) && !defined(POCO_NO_WMAIN_WRAPPER)
+	#define POCO_WMAIN_WRAPPER()  \
 	extern int _CRT_glob;         \
 	extern "C" void __wgetmainargs(int*, wchar_t***, wchar_t***, int, int*); \
 	int main() {			      \
@@ -65,7 +65,7 @@
 		return wmain(argc, argv); \
 	}
 #else
-	#define POCO_WRAPPER_WMAIN()
+	#define POCO_WMAIN_WRAPPER()
 #endif
 
 

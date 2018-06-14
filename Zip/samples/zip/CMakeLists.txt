@@ -1,2 +1,5 @@
 add_executable(sample-zip src/zip.cpp)
+if(WINCE)
+	set_target_properties(sample-zip PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
+endif()
 target_link_libraries(sample-zip PUBLIC Poco::Zip Poco::Util Poco::XML)

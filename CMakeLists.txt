@@ -71,7 +71,7 @@ option(POCO_ENABLE_PDF "Enable PDF" OFF)
 option(POCO_ENABLE_UTIL "Enable Util" ON)
 option(POCO_ENABLE_NET "Enable Net" ON)
 
-option(POCO_ENABLE_WSTRING "Enable std::wstring/Unicode support" ON)
+option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
 option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
 
 if(POCO_STATIC)

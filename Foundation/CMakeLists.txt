@@ -119,10 +119,6 @@ endif()
 if(WIN32)
   target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
   target_link_libraries(Foundation PUBLIC iphlpapi)
-
-  if(MINGW AND ${CMAKE_SYSTEM_VERSION} GREATER_EQUAL 6.0) # Needed by WinAPI in MinGW
-	  target_compile_definitions(Foundation PUBLIC _WIN32_WINNT=0x0600)
-  endif()
 endif(WIN32)
 
 if (CYGWIN)
