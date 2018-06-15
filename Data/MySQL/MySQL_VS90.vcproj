@@ -57,7 +57,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\..\bin\PocoDataMySQLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -130,7 +130,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\..\bin\PocoDataMySQL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

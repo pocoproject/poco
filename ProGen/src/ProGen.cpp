@@ -535,6 +535,18 @@ protected:
 				pPropertyGroup->appendChild(pTargetName);
 			}
 		}
+		if (platform == "x64")
+		{
+			Poco::AutoPtr<Poco::XML::NodeList> pLibs = pProjectDoc->getElementsByTagName("Lib");
+			for (unsigned long i = 0; i < pLibs->length(); i++)
+			{
+				Poco::XML::Element* pLib = static_cast<Poco::XML::Element*>(pLibs->item(i));
+				Poco::AutoPtr<Poco::XML::Element> pTargetMachine = pProjectDoc->createElement("TargetMachine");
+				Poco::AutoPtr<Poco::XML::Text> pText = pProjectDoc->createTextNode("MachineX64");
+				pTargetMachine->appendChild(pText);
+				pLib->appendChild(pTargetMachine);
+			}
+		}
 	}
 	
 	void fix2012Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)

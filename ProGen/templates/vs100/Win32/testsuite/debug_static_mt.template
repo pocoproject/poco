@@ -57,7 +57,7 @@
 		OutputFile="bin\static_mt\${project.target}d.exe"
 		LinkIncremental="2"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
-		IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
+		IgnoreDefaultLibraryNames="nafxcwd.lib"
 		SuppressStartupBanner="true"
 		GenerateDebugInformation="true"
 		ProgramDatabaseFile="bin\static_mt\${project.target}d.pdb"

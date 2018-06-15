@@ -59,7 +59,7 @@
 		OutputFile="bin\static_mt\${project.target}.exe"
 		LinkIncremental="1"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
-		IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib"
+		IgnoreDefaultLibraryNames="nafxcw.lib"
 		GenerateDebugInformation="false"
 		SubSystem="1"
 		OptimizeReferences="2"
