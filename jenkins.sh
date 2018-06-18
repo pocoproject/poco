@@ -5,28 +5,37 @@ set -x
 
 USE_CMAKE=
 CONFIGURE_FLAGS=
-CMAKE_FLAGS=
+CMAKE_FLAGS=()
 MAKE=make
 JOBS=2
 
 case "$PLATFORM" in
   linux*)
+    USE_CMAKE=true
     CONFIGURE_FLAGS="
       --cflags=-D_GLIBCXX_EXTERN_TEMPLATE=0
       --include-path=/opt/openssl/include
       --library-path=/opt/openssl/lib
     "
+    CMAKE_FLAGS=(
+      -DOPENSSL_ROOT_DIR=/opt/openssl
+    )
     JOBS=$(getconf _NPROCESSORS_ONLN)
     ;;
   macosx)
+    USE_CMAKE=true
     CONFIGURE_FLAGS="
       --include-path=/usr/local/opt/openssl/include
       --library-path=/usr/local/opt/openssl/lib
     "
+    CMAKE_FLAGS=(
+      -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+    )
     JOBS=$(getconf _NPROCESSORS_ONLN)
     ;;
   solaris*)
     export PATH=/usr/sfw/bin:/usr/gnu/bin:/usr/bin:/usr/sbin:/sbin
+    USE_CMAKE=true
     MAKE=gmake
     CONFIGURE_FLAGS="
       --config=SunOS-GCC
