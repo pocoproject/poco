@@ -22,4 +22,3 @@ install(
 if (POCO_ENABLE_SAMPLES)
 #    add_subdirectory(samples)
 endif ()
-

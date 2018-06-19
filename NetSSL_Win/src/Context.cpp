@@ -91,7 +91,7 @@ void Context::init()
 	_hMemCertStore = CertOpenStore(
 					CERT_STORE_PROV_MEMORY,   // The memory provider type
 					0,                        // The encoding type is not needed
-					NULL,                     // Use the default provider
+					0,                        // Use the default provider
 					0,                        // Accept the default dwFlags
 					NULL);                    // pvPara is not used
 
@@ -101,7 +101,7 @@ void Context::init()
 	_hCollectionCertStore = CertOpenStore(
 			CERT_STORE_PROV_COLLECTION, // A collection store
 			0,                          // Encoding type; not used with a collection store
-			NULL,                       // Use the default provider
+			0,                          // Use the default provider
 			0,                          // No flags
 			NULL);                      // Not needed
 
@@ -270,7 +270,8 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	if (_pCert)
 	{
 		schannelCred.cCreds = 1; // how many cred are stored in &pCertContext
-		schannelCred.paCred = &const_cast<PCCERT_CONTEXT>(_pCert);
+		auto ppContext = const_cast<PCCERT_CONTEXT*>(&_pCert);
+		schannelCred.paCred = ppContext;
 	}
 
 	schannelCred.grbitEnabledProtocols = proto();

@@ -76,7 +76,7 @@ public:
 		SecureStreamSocket socket = static_cast<HTTPServerRequestImpl&>(request).socket();
 		if (socket.havePeerCertificate())
 		{
-			X509Certificate cert = socket.peerCertificate();
+			auto cert = socket.peerCertificate();
 			app.logger().information("Client certificate: " + cert.subjectName());
 		}
 		else

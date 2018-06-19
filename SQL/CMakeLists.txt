@@ -11,6 +11,11 @@ if(MSVC AND NOT(MSVC_VERSION LESS 1400))
         PROPERTIES COMPILE_FLAGS "/bigobj")
 endif()
 
+if(MINGW)
+    set_source_files_properties(src/StatementImpl.cpp
+        PROPERTIES COMPILE_FLAGS "-Wa,-mbig-obj")
+endif()
+
 add_library(SQL ${SRCS} )
 add_library(Poco::SQL ALIAS SQL)
 set_target_properties(SQL

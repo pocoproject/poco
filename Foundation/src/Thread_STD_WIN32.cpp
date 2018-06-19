@@ -15,7 +15,9 @@
 #include "Poco/Thread_STD.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/UnWindows.h"
+#endif
 
 namespace Poco {
 
@@ -28,7 +30,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 		_pData->policy = 0;
 		if (_pData->started && !_pData->joined && _pData->thread)
 		{
-			if (SetThreadPriority(_pData->thread->native_handle(), _pData->prio) == 0)
+			if (SetThreadPriority(reinterpret_cast<HANDLE>(_pData->thread->native_handle()), _pData->prio) == 0)
 				throw SystemException("cannot set thread priority");
 		}
 	}
@@ -66,7 +68,7 @@ void ThreadImpl::setAffinityImpl(int cpu)
 	mask <<= cpu;
 	if (_pData->started && !_pData->joined && _pData->thread)
 	{
-		if (SetThreadAffinityMask(_pData->thread->native_handle(), mask) == 0)
+		if (SetThreadAffinityMask(reinterpret_cast<HANDLE>(_pData->thread->native_handle()), mask) == 0)
 		{
 			throw SystemException("Failed to set affinity");
 		}
