@@ -88,26 +88,26 @@ void Net_API uninitializeNetwork();
 // Automate network initialization (only relevant on Windows).
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT) && !defined(__GNUC__)
-
-extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
-
-#if defined(Net_EXPORTS)
-	#if defined(_WIN64) || defined(_WIN32_WCE)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
-	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
-	#endif
-#else  // !Net_EXPORTS
-	#if defined(_WIN64) || defined(_WIN32_WCE)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
-	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
-	#endif
-#endif // Net_EXPORTS
-
-POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
-
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+	#if !defined(__GNUC__)
+		extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
+		#if defined(Net_EXPORTS)
+			#if defined(_WIN64) || defined(_WIN32_WCE)
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
+			#elif defined(_WIN32)
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
+			#endif
+		#else  // !Net_EXPORTS
+			#if defined(_WIN64) || defined(_WIN32_WCE)
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
+			#elif defined(_WIN32)
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
+			#endif
+		#endif // Net_EXPORTS
+	#else // __GNUC__
+		#define POCO_NET_FORCE_SYMBOL(s) extern "C" const struct NetworkInitializer s;
+	#endif // !__GNUC__
+	POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif // POCO_OS_FAMILY_WINDOWS
 
 

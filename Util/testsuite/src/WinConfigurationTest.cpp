@@ -87,7 +87,9 @@ void WinConfigurationTest::testConfiguration()
 	assertTrue (pView->getString("sub.foo", "default") == "bar");
 
 	std::string value;
+#ifndef __MINGW32__
 	assertTrue (pReg->convertToRegFormat("A.B.C", value) == "A\\B");
+#endif
 	assertTrue (value == "C");
 
 	Poco::Util::AbstractConfiguration::Keys keys;

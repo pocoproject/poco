@@ -84,7 +84,6 @@
 	#include <windows.h>
 	#ifdef __MINGW32__
 		#include <Winsock2.h>
-		#include <Iphlpapi.h>
 		#include <ws2tcpip.h>
 	#endif // __MINGW32__
 #endif
