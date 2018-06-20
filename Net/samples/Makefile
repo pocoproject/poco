@@ -20,3 +20,4 @@ projects:
 	$(MAKE) -C WebSocketServer $(MAKECMDGOALS)
 	$(MAKE) -C SMTPLogger $(MAKECMDGOALS)
 	$(MAKE) -C ifconfig $(MAKECMDGOALS)
+	$(MAKE) -C tcpserver $(MAKECMDGOALS)
