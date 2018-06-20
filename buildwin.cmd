@@ -35,7 +35,7 @@ set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
 rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150}
 if "%1"=="" goto usage
-set vswhere='build\script\vswhere.exe -property installationPath'
+set vswhere='build\exe\vswhere.exe -property installationPath'
 for /f "delims=" %%a in (%vswhere%) do @set VS150COMNTOOLS=%%a
 set VS150COMNTOOLS=%VS150COMNTOOLS%\Common7\Tools\
 
