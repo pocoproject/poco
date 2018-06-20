@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataODBCmtd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataODBCMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataODBCmtd.lib"
+				OutputFile="..\..\lib64\PocoDataODBCMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataODBCmt.lib"
+				OutputFile="..\..\lib64\PocoDataODBCMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataODBCmdd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataODBCMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataODBCmdd.lib"
+				OutputFile="..\..\lib64\PocoDataODBCMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataODBCmd.lib"
+				OutputFile="..\..\lib64\PocoDataODBCMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

@@ -41,11 +41,11 @@
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">PocoZipd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoZipmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoZipmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoZipMDd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoZipMTd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">PocoZip</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoZipmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoZipmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoZipMD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoZipMT</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>

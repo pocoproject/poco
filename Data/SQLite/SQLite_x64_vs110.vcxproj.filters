@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="SQLite">
-      <UniqueIdentifier>{60bed258-ef4e-4612-916d-c40edae5fb69}</UniqueIdentifier>
+      <UniqueIdentifier>{87ebe70f-d6bb-459e-9609-6e3ffdb8ed94}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLite\Header Files">
-      <UniqueIdentifier>{8d5a01d8-0002-456b-aaa2-892779fd25f5}</UniqueIdentifier>
+      <UniqueIdentifier>{f257f9cf-2a0e-434d-94f8-bb06d7fef260}</UniqueIdentifier>
     </Filter>
     <Filter Include="SQLite\Source Files">
-      <UniqueIdentifier>{59485c93-094f-49fb-a275-02c38b732621}</UniqueIdentifier>
+      <UniqueIdentifier>{e0c9bf11-f9aa-44c7-906e-a73a0df80b0c}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rdparty">
-      <UniqueIdentifier>{f23b9ffe-50ef-42aa-877e-11ab12489217}</UniqueIdentifier>
+      <UniqueIdentifier>{ca18ccec-5187-451a-99c3-67050ea24e32}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rdparty\Header Files">
-      <UniqueIdentifier>{0f683511-6abd-43b4-9efa-53b022f0a599}</UniqueIdentifier>
+      <UniqueIdentifier>{c5839e8a-27b0-4283-bb4f-5b7b229a0449}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rdparty\Source Files">
-      <UniqueIdentifier>{37d9857c-be83-49d1-b505-31de8e562772}</UniqueIdentifier>
+      <UniqueIdentifier>{e773fc95-f167-4ba8-8d48-9f96d4f75bd7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

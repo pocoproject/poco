@@ -106,11 +106,11 @@
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V310'">PocoXMLd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoXMLmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoXMLmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoXMLMDd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoXMLMTd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V310'">PocoXML</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoXMLmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoXMLmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V310'">PocoXMLMD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V310'">PocoXMLMT</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>

@@ -2,40 +2,40 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{bfabfa01-1db2-41ee-b006-df902789f8c9}</UniqueIdentifier>
+      <UniqueIdentifier>{9f357c53-b979-4dc3-a573-d04611559d62}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{13148f7d-40ee-448d-a48e-5ec236685472}</UniqueIdentifier>
+      <UniqueIdentifier>{b4a9725a-9c6b-4cb5-a1fa-3949e33e5353}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party">
-      <UniqueIdentifier>{97353a5b-3cab-4ad3-9696-7f98636dd0e5}</UniqueIdentifier>
+      <UniqueIdentifier>{c4b8d8fe-4912-4ba7-95ee-0b8a341dddc5}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG">
-      <UniqueIdentifier>{f850433c-1b02-42bc-8f75-fa0277a50562}</UniqueIdentifier>
+      <UniqueIdentifier>{6a922617-df6c-4d90-86bb-f9311a754ee3}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG\Header Files">
-      <UniqueIdentifier>{ba5fe8d1-4c37-45d9-a7fb-70dba29ff539}</UniqueIdentifier>
+      <UniqueIdentifier>{69389a55-7f71-40bc-bc82-c5d68242d241}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\PNG\Source Files">
-      <UniqueIdentifier>{4d0589f4-0b94-4327-9f6e-466d99237011}</UniqueIdentifier>
+      <UniqueIdentifier>{5948db26-7838-4565-91d1-86df14b7eda7}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib">
-      <UniqueIdentifier>{3aabb6d0-8d4a-4104-b3d7-dfef21515128}</UniqueIdentifier>
+      <UniqueIdentifier>{627f2d15-06a3-4ea1-9d3a-bf5245b79472}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib\Header Files">
-      <UniqueIdentifier>{fe7f6ab5-21ed-42a5-a25f-63d324253569}</UniqueIdentifier>
+      <UniqueIdentifier>{1e5330a2-05e3-4cda-99ec-6b4281c45a36}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\zlib\Source Files">
-      <UniqueIdentifier>{4b4038d0-e4c0-4539-bc27-86638d2a8d40}</UniqueIdentifier>
+      <UniqueIdentifier>{e8e3eced-7173-4dc5-b086-4e2b4ac7551f}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU">
-      <UniqueIdentifier>{f2c6d7c4-2abf-4c82-9fe9-7d28b6c29a89}</UniqueIdentifier>
+      <UniqueIdentifier>{523240f5-1f1a-4ed4-aa3a-36c188cb2fda}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU\Source Files">
-      <UniqueIdentifier>{68edfbd3-0a63-4361-81e9-4b3da7623594}</UniqueIdentifier>
+      <UniqueIdentifier>{b28d8e14-745e-478f-b85c-4402cef8fc65}</UniqueIdentifier>
     </Filter>
     <Filter Include="3rd Party\HARU\Header Files">
-      <UniqueIdentifier>{7d5c87a8-a747-405e-87bd-c7084759063d}</UniqueIdentifier>
+      <UniqueIdentifier>{bfeb410d-1e8f-4226-aaf6-9a628dac3320}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

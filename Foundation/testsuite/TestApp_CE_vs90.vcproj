@@ -252,7 +252,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmt.lib iphlpapi.lib"
+				AdditionalDependencies="PocoFoundationMT.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -342,7 +342,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmtd.lib iphlpapi.lib"
+				AdditionalDependencies="PocoFoundationMTd.lib iphlpapi.lib"
 				ShowProgress="0"
 				OutputFile="bin\$(PlatformName)\static_mt\$(ProjectName)d.exe"
 				LinkIncremental="2"
@@ -433,7 +433,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmtd.lib iphlpapi.lib"
+				AdditionalDependencies="PocoFoundationMTd.lib iphlpapi.lib"
 				ShowProgress="0"
 				OutputFile="bin\$(PlatformName)\static_md\$(ProjectName)d.exe"
 				LinkIncremental="2"
@@ -526,7 +526,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PocoFoundationmt.lib iphlpapi.lib"
+				AdditionalDependencies="PocoFoundationMT.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"

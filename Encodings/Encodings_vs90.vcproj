@@ -56,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin\PocoEncodingsd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -128,7 +128,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin\PocoEncodings.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -185,7 +185,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoEncodingsmtd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoEncodingsMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -200,7 +200,8 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmtd.lib"/>
+				AdditionalDependencies=""
+				OutputFile="..\lib\PocoEncodingsMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -258,7 +259,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmt.lib"/>
+				OutputFile="..\lib\PocoEncodingsMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -300,7 +301,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoEncodingsmdd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoEncodingsMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -315,7 +316,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmdd.lib"/>
+				OutputFile="..\lib\PocoEncodingsMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -373,7 +374,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoEncodingsmd.lib"/>
+				OutputFile="..\lib\PocoEncodingsMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

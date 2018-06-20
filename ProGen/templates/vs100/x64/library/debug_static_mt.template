@@ -53,7 +53,8 @@
 	/>
 	<Tool
 		Name="VCLibrarianTool"
-		OutputFile="${project.outdir}\lib64\${project.target}mtd.lib"
+		AdditionalDependencies="${configuration.linker.dependencies}"
+		OutputFile="${project.outdir}\lib64\${project.target}MTd.lib"
 		TargetMachine="17"
 	/>
 	<Tool

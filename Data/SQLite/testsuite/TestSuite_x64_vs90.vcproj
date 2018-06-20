@@ -57,7 +57,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="bin64\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -129,7 +129,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="bin64\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -199,7 +199,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="bin64\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -272,7 +272,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="bin64\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -343,7 +343,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="bin64\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -415,7 +415,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="bin64\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"

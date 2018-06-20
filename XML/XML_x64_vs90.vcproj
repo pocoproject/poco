@@ -56,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin64\PocoXML64d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -128,7 +128,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin64\PocoXML64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoXMLmtd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoXMLMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoXMLmtd.lib"
+				OutputFile="..\lib64\PocoXMLMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoXMLmt.lib"
+				OutputFile="..\lib64\PocoXMLMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoXMLmdd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoXMLMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoXMLmdd.lib"
+				OutputFile="..\lib64\PocoXMLMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoXMLmd.lib"
+				OutputFile="..\lib64\PocoXMLMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

@@ -199,7 +199,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib Iphlpapi.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile="bin64\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib64"
@@ -272,7 +272,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib Iphlpapi.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib"
 				OutputFile="bin64\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib64"

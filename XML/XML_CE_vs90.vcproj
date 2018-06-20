@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin\$(PlatformName)\PocoXMLd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -136,7 +136,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="Iphlpapi.lib"
+				AdditionalDependencies=""
 				OutputFile="..\bin\$(PlatformName)\PocoXML.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -198,7 +198,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoXMLmtd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoXMLMTd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -214,7 +214,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoXMLmtd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoXMLMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -280,7 +280,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoXMLmt.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoXMLMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -329,7 +329,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoXMLmdd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoXMLMDd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -345,7 +345,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoXMLmdd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoXMLMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -411,7 +411,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoXMLmd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoXMLMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
