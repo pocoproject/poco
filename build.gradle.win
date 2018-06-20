@@ -960,12 +960,12 @@ ext.commonNuspecMetadata = [
 task 'nugetSpec-x86'(type: NuGetSpec) {
 	nuspec = [
 		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.vs150.x86",
-			title:          "Pocoproject Poco vs150 $version x86",
+			id:          	"Pocoproject.Poco.v141.x86",
+			title:          "Pocoproject Poco v141 $version x86",
 			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x86", version: "1.1.0") } ]
 		],
 		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x86.targets", 				target: "build\\native") },
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.v141.x86.targets", 				target: "build\\native") },
 			{ file(src: "$rootDir\\bin\\Poco*.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\lib\\Poco*.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\bin\\Poco*d.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
@@ -995,12 +995,12 @@ task 'nugetSpec-x86'(type: NuGetSpec) {
 task 'nugetSpec-x64'(type: NuGetSpec) {
 	nuspec = [
 		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.vs150.x64",
-			title:          "Pocoproject Poco vs150 $version x64",
+			id:          	"Pocoproject.Poco.v141.x64",
+			title:          "Pocoproject Poco v141 $version x64",
 			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x64", version: "1.1.0") } ]
 		],
 		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x64.targets", 				target: "build\\native") },
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.v141.x64.targets", 				target: "build\\native") },
 			{ file(src: "$rootDir\\bin64\\Poco*64.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\lib64\\Poco*.*",				target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
 			{ file(src: "$rootDir\\bin64\\Poco*64d.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
