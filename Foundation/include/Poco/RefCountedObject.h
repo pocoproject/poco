@@ -154,7 +154,7 @@ typedef RefCountDiagnosticContext RCDC;
 // Config.h defined to enable/disable this functionality).
 //
 // Backtrace works only with g++ at this time; without it this functionality is of limited use.
-// Disabled by default for al builds and always (even if POCO_REFCOUNT_DC is defined) disabled
+// Disabled by default for all builds and always (even if POCO_REFCOUNT_DC is defined) disabled
 // for non-debug builds.
 
 #define poco_rcdc_log RCDC::get().addEntry(RCDC::TraceRecord((void*)this, _counter, __func__, NDC::backtrace(1, 7)))
@@ -281,9 +281,9 @@ inline RefCounter::operator int()
 class Foundation_API RefCountedObject
 	/// A class for thread-safe strong reference counting.
 	///
-	/// RefCountedObject is created from RefCountedObject.
-	/// It maintains the reference count and deletes itself when
-	/// the count reaches zero.
+	/// It maintains the reference count, and deletes itself
+	/// when the count reaches zero; it follows that a
+	/// RefCountedObject must always be created on the heap.
 {
 public:
 	RefCountedObject();
