@@ -73,7 +73,7 @@ if [[ -z $USE_CMAKE ]]; then
       --omit=PDF,Data,MongoDB,PageCompiler,CppParser
   $MAKE -j${JOBS}
 else
-  for build_type in Release; do
+  for build_type in Debug Release; do
     (
       build_dir="cmake_build_${build_type}"
       [[ -d ${build_dir} ]] || mkdir ${build_dir}
