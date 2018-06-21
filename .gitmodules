@@ -1,6 +1,6 @@
 [submodule "openssl"]
 	path = openssl
-	url = https://github.com/pocoproject/openssl
+	url = git@github.com:teamookla/poco-openssl.git
 	branch = poco-1.8.x
 
 [submodule "gradle"]
