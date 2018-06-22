@@ -291,5 +291,14 @@ int DialogSocket::receiveRawBytes(void* buffer, int length)
 	return n;
 }
 
+int DialogSocket::flushBytes(int length)
+{
+	refill();
+	int n = static_cast<int>(_pEnd - _pNext);
+	if (n > length) n = length;
+	_pNext += n;
+	return n;
+}
+
 
 } } // namespace Poco::Net
