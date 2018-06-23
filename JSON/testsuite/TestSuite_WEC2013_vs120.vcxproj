@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\JSONTest.cpp"/>
     <ClCompile Include="src\JSONTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TestSuite</ProjectName>

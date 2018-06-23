@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{00745ad6-062f-4701-b5f4-6f6ca335d747}</UniqueIdentifier>
+      <UniqueIdentifier>{9d3beaec-c070-480c-8ab1-a7f587ec094a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{acb7726a-afde-4d3d-a212-4d1b868859a2}</UniqueIdentifier>
+      <UniqueIdentifier>{e2f4e369-bf28-42ef-89ad-2974d89ebf61}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -15,7 +15,7 @@
     <ClCompile Include="src\EncodingsTestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinCEDriver.cpp">
+    <ClCompile Include="src\Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

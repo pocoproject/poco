@@ -56,7 +56,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\bin64\PocoSevenZip64d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -128,7 +128,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\bin64\PocoSevenZip64.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoSevenZipmtd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoSevenZipMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoSevenZipmtd.lib"
+				OutputFile="..\lib64\PocoSevenZipMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoSevenZipmt.lib"
+				OutputFile="..\lib64\PocoSevenZipMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoSevenZipmdd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoSevenZipMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoSevenZipmdd.lib"
+				OutputFile="..\lib64\PocoSevenZipMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoSevenZipmd.lib"
+				OutputFile="..\lib64\PocoSevenZipMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

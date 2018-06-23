@@ -85,13 +85,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoUtild</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoUtilmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoUtilmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoUtilMDd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoUtilMTd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoUtil</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoUtilmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoUtilmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoUtilMD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoUtilMT</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <OutDir>..\bin\</OutDir>
@@ -200,7 +200,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoUtilmtd.lib</OutputFile>
+      <OutputFile>..\lib\PocoUtilMTd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -224,7 +224,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoUtilmt.lib</OutputFile>
+      <OutputFile>..\lib\PocoUtilMT.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
@@ -241,13 +241,13 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib\PocoUtilmdd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\PocoUtilMDd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoUtilmdd.lib</OutputFile>
+      <OutputFile>..\lib\PocoUtilMDd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -272,7 +272,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoUtilmd.lib</OutputFile>
+      <OutputFile>..\lib\PocoUtilMD.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

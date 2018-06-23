@@ -95,11 +95,11 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">..\..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">obj\PostgreSQL\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoDataPostgreSQLd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoDataPostgreSQLmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoDataPostgreSQLmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoDataPostgreSQLMDd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoDataPostgreSQLMTd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoDataPostgreSQL</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoDataPostgreSQLmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoDataPostgreSQLmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoDataPostgreSQLMD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoDataPostgreSQLMT</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <PreBuildEvent>
@@ -207,7 +207,8 @@ exit 0</Command>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <OutputFile>..\..\lib\PocoDataPostgreSQLmtd.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\lib\PocoDataPostgreSQLMTd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -238,7 +239,8 @@ exit 0</Command>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <OutputFile>..\..\lib\PocoDataPostgreSQLmt.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\lib\PocoDataPostgreSQLMT.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
@@ -260,7 +262,7 @@ exit 0</Command>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\..\lib\PocoDataPostgreSQLmdd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\..\lib\PocoDataPostgreSQLMDd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -268,7 +270,8 @@ exit 0</Command>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <OutputFile>..\..\lib\PocoDataPostgreSQLmdd.lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>..\..\lib\PocoDataPostgreSQLMDd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -301,7 +304,7 @@ exit 0</Command>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\lib\PocoDataPostgreSQLmd.lib</OutputFile>
+      <OutputFile>..\..\lib\PocoDataPostgreSQLMD.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

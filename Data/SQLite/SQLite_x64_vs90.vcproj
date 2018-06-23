@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataSQLitemtd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataSQLiteMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataSQLitemtd.lib"
+				OutputFile="..\..\lib64\PocoDataSQLiteMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataSQLitemt.lib"
+				OutputFile="..\..\lib64\PocoDataSQLiteMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataSQLitemdd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataSQLiteMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataSQLitemdd.lib"
+				OutputFile="..\..\lib64\PocoDataSQLiteMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataSQLitemd.lib"
+				OutputFile="..\..\lib64\PocoDataSQLiteMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

@@ -57,7 +57,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\un7zipd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"
@@ -130,7 +130,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\shared\un7zip.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\lib\$(PlatformName)"

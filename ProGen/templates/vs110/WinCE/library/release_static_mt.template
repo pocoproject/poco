@@ -47,7 +47,7 @@
 	/>
 	<Tool
 		Name="VCLibrarianTool"
-		OutputFile="${project.pocobase}\lib\$(PlatformName)\${project.target}mt.lib"
+		OutputFile="${project.pocobase}\lib\$(PlatformName)\${project.target}MT.lib"
 	/>
 	<Tool
 		Name="VCALinkTool"

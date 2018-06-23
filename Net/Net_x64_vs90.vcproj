@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoNetmtd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoNetMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetmtd.lib"
+				OutputFile="..\lib64\PocoNetMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetmt.lib"
+				OutputFile="..\lib64\PocoNetMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoNetmdd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoNetMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetmdd.lib"
+				OutputFile="..\lib64\PocoNetMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetmd.lib"
+				OutputFile="..\lib64\PocoNetMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

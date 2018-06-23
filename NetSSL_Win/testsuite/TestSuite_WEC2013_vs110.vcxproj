@@ -37,7 +37,7 @@
   <ItemGroup>
     <ClCompile Include="src\HTTPSTestServer.cpp"/>
     <ClCompile Include="src\NetSSLTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\TCPServerTest.cpp"/>
     <ClCompile Include="src\TCPServerTestSuite.cpp"/>
     <ClCompile Include="src\HTTPSServerTest.cpp"/>

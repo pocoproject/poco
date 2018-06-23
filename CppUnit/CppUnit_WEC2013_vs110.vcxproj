@@ -26,11 +26,11 @@
   <PropertyGroup>
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitMDd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitMTd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnit</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitMD</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoCppUnitMT</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>

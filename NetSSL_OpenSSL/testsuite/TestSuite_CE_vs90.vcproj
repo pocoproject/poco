@@ -204,7 +204,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="iphlpapi.lib Crypt32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -280,7 +280,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="iphlpapi.lib Crypt32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -354,7 +354,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="iphlpapi.lib Crypt32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -430,7 +430,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies="iphlpapi.lib Crypt32.lib ws2.lib iphlpapi.lib"
+				AdditionalDependencies="Crypt32.lib ws2.lib iphlpapi.lib"
 				OutputFile="bin\$(PlatformName)\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\$(PlatformName)"
@@ -493,7 +493,7 @@
 			<Filter
 				Name="Source Files">
 				<File
-					RelativePath=".\src\WinCEDriver.cpp"/>
+					RelativePath=".\src\Driver.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter

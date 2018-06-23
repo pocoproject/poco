@@ -13,4 +13,4 @@ vc.project.compiler.defines.shared = ${vc.project.name}_EXPORTS
 vc.project.compiler.defines.debug_shared = ${vc.project.compiler.defines.shared}
 vc.project.compiler.defines.release_shared = ${vc.project.compiler.defines.shared}
 vc.solution.create = true
-vc.solution.include = WinTestRunner\\WinTestRunner
+vc.solution.include =

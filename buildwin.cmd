@@ -1,6 +1,5 @@
 @echo off
-setlocal enableextensions
-setlocal enabledelayedexpansion
+setlocal enableextensions enabledelayedexpansion
 
 rem
 rem buildwin.cmd
@@ -36,11 +35,12 @@ set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
 rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150}
 if "%1"=="" goto usage
+set vswhere='build\exe\vswhere.exe -property installationPath'
+for /f "delims=" %%a in (%vswhere%) do @set VS150COMNTOOLS=%%a
+set VS150COMNTOOLS=%VS150COMNTOOLS%\Common7\Tools\
+
 set VS_VERSION=vs%1
 if %VS_VERSION%==vs150 (
-  if "%VS150COMNTOOLS%"=="" (
-    set VS150COMNTOOLS=C:\Program Files ^(x86^)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\
-  )
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
 ) else (
   set VS_VARSALL=..\..\VC\vcvarsall.bat

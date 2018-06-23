@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoCppParsermtd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoCppParserMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoCppParsermtd.lib"
+				OutputFile="..\lib64\PocoCppParserMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoCppParsermt.lib"
+				OutputFile="..\lib64\PocoCppParserMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoCppParsermdd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoCppParserMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoCppParsermdd.lib"
+				OutputFile="..\lib64\PocoCppParserMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoCppParsermd.lib"
+				OutputFile="..\lib64\PocoCppParserMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

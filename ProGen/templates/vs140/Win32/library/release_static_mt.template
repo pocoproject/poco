@@ -54,7 +54,7 @@
 	/>
 	<Tool
 		Name="VCLibrarianTool"
-		OutputFile="${project.outdir}\lib\${project.target}mt.lib"
+		OutputFile="${project.outdir}\lib\${project.target}MT.lib"
 	/>
 	<Tool
 		Name="VCALinkTool"

@@ -37,6 +37,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\HTTPSClientSessionTest.cpp"/>
     <ClCompile Include="src\HTTPSClientTestSuite.cpp"/>
     <ClCompile Include="src\HTTPSServerTest.cpp"/>
@@ -48,7 +49,6 @@
     <ClCompile Include="src\TCPServerTestSuite.cpp"/>
     <ClCompile Include="src\WebSocketTest.cpp"/>
     <ClCompile Include="src\WebSocketTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

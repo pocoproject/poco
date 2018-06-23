@@ -198,7 +198,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoDatamtd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoDataMTd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -214,7 +214,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoDatamtd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoDataMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -280,7 +280,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoDatamt.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoDataMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -329,7 +329,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoDatamdd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoDataMDd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -345,7 +345,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoDatamdd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoDataMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -411,7 +411,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoDatamd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoDataMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

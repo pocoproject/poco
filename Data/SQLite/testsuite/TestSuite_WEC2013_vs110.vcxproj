@@ -30,7 +30,7 @@
   <ItemGroup>
     <ClCompile Include="src\SQLiteTest.cpp"/>
     <ClCompile Include="src\SQLiteTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

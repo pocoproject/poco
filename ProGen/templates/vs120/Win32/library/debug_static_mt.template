@@ -53,7 +53,7 @@
 	/>
 	<Tool
 		Name="VCLibrarianTool"
-		OutputFile="${project.outdir}\lib\${project.target}mtd.lib"
+		OutputFile="${project.outdir}\lib\${project.target}MTd.lib"
 	/>
 	<Tool
 		Name="VCALinkTool"

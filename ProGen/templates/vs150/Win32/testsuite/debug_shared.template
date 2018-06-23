@@ -23,7 +23,7 @@
 	<Tool
 		Name="VCCLCompilerTool"
 		Optimization="0"
-		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${project.pocobase}\CppUnit\WinTestRunner\include;${configuration.compiler.includes}"
+		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${configuration.compiler.includes}"
 		PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;${configuration.compiler.defines}"
 		StringPooling="true"
 		MinimalRebuild="true"
@@ -52,7 +52,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies=${configuration.linker.dependencies}"
+		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="bin\${project.target}d.exe"
 		LinkIncremental="2"
 		AdditionalLibraryDirectories="${project.pocobase}\lib"
