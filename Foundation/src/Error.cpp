@@ -43,8 +43,9 @@ namespace Poco {
 		LPWSTR lpMsgBuf = 0;
 		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
-	#endif
 		LocalFree(lpMsgBuf);
+	#endif
+
 		return errMsg;
 	}
 

@@ -134,6 +134,10 @@ target_include_directories(PDF
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
+if(MINGW)
+    target_compile_definitions(PDF PRIVATE HPDF_DLL_MAKE_CDECL)
+endif()
+
 if (POCO_UNBUNDLED)
     target_include_directories(PDF PUBLIC "${ZLIB_INCLUDE_DIRS}")
     target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)

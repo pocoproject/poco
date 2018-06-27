@@ -90,7 +90,7 @@ struct PostgreSQL_API PostgreSQLConnectorRegistrator
 
 
 #if !defined(POCO_NO_AUTOMATIC_LIB_INIT)
-	#if defined(POCO_OS_FAMILY_WINDOWS)
+	#if defined(_MSC_VER)
 		extern "C" const struct PostgreSQL_API PostgreSQLConnectorRegistrator pocoPostgreSQLConnectorRegistrator;
 		#if defined(PostgreSQL_EXPORTS)
 			#if defined(_WIN64)

@@ -506,7 +506,8 @@ inline Poco::Timespan Application::uptime() const
 			return Poco::Util::Application::EXIT_CONFIG;\
 		}									\
 		return pApp->run();					\
-	}
+	}										\
+	POCO_WMAIN_WRAPPER()
 #elif defined(POCO_VXWORKS)
 	#define POCO_APP_MAIN(App) \
 	int pocoAppMain(const char* appName, ...) \

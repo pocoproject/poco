@@ -232,7 +232,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\
@@ -246,7 +246,8 @@ private:
 			std::cerr << exc.displayText() << std::endl;	\
 			return Poco::Util::Application::EXIT_SOFTWARE; 	\
 		}								\
-	}
+	}									\
+	POCO_WMAIN_WRAPPER()
 #elif defined(POCO_VXWORKS)
 	#define POCO_SERVER_MAIN(App) \
 	int pocoSrvMain(const char* appName, ...) 				\

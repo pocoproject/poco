@@ -68,8 +68,8 @@ environment:
   OPENSSL64:    C:\OpenSSL-Win64
 
   matrix:
-    - builder: cygwin
-      vsver: 150
+#    - builder: cygwin
+#      vsver: 150
 
     - builder: msbuild
       vsver: 140
