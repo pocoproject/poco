@@ -99,19 +99,8 @@ private:
 };
 
 
-FTPPasswordProvider::FTPPasswordProvider()
-{
-}
-
-
-FTPPasswordProvider::~FTPPasswordProvider()
-{
-}
-
-
-std::string          FTPSStreamFactory::_anonymousPassword("poco@localhost");
+std::string FTPSStreamFactory::_anonymousPassword("poco@localhost");
 FTPPasswordProvider* FTPSStreamFactory::_pPasswordProvider(0);
-
 
 FTPSStreamFactory::FTPSStreamFactory()
 {
