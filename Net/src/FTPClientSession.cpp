@@ -156,7 +156,11 @@ void  FTPClientSession::receiveServerReadyReply()
 	int status = _pControlSocket->receiveStatusMessage(response);
 	if (!isPositiveCompletion(status))
 		throw FTPException("Cannot receive status message", response, status);
-
+		
+	{
+		Poco::FastMutex::ScopedLock lock(_fmWelcomeMessage);
+		_welcomeMessage = response;
+	}
 	_serverReady = true;
 }
 
