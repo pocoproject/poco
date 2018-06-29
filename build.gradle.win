@@ -199,6 +199,46 @@ class SliceTasksPlugin extends RuleSource {
 	}
 }
 
+def getSelectedVisualStudioToolChain() {
+    String selector = System.properties["VS"]
+
+    if (selector == null) {
+        selector = "VS2017"
+    }
+
+    String installDir = null
+    String toolset = null;
+	String vsvers = null;
+    switch (selector) {
+        case "VS2008": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 9.0";vsvers="vs90";toolset = "v90";
+		break;
+        case "VS2010": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 10.0";vsvers="vs100";toolset = "v100";
+		break;
+		case "VS2012": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 11.0";vsvers="vs110";toolset = "v110";
+		break;
+		case "VS2013": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 12.0";vsvers="vs120";toolset = "v120";
+		break;
+    	case "VS2015": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 14.0";vsvers="vs140";toolset = "v140";
+		break;
+    	case "VS2017": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio/2017/Community";vsvers="vs150";toolset = "v141";
+		break;
+        default:
+            throw new IllegalArgumentException()
+    }
+
+    return [
+        vsyear:		selector,
+		vsvers: 	vsvers,
+		toolset: 	toolset,
+        installDir: installDir,
+    ]
+}
 
 allprojects {
 	buildDir = new File('guild')	            // DO NOT REMOVE OR CHANGE to 'build' since 'build' is a Poco directory
@@ -229,13 +269,36 @@ subprojects {
 			release
 			debug
 		}
+    	toolChains {
+        	def vsToolChain = getSelectedVisualStudioToolChain()
+        	create(vsToolChain.vsyear, VisualCpp) {
+        	    installDir vsToolChain.installDir
+        	}
+    	}
 
-/*
-		toolChains {
-			visualCpp(VisualCpp) {
-				// Specify the installDir if Visual Studio cannot be located
-//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community"
-//				installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
+/*		toolChains {
+			VS2008(VisualCpp) {
+				installDir = VS2008installDir
+			}
+			VS2010(VisualCpp) {
+				installDir = VS2010installDir
+			}
+			VS2012(VisualCpp) {
+				installDir = VS2012installDir
+			}
+			VS2013(VisualCpp) {
+				installDir = VS2013installDir
+			}
+			VS2015(VisualCpp) {
+				installDir = VS2015installDir
+			}
+			VS2017(VisualCpp) {
+				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community"
+				eachPlatform {
+					cppCompiler.withArguments { args ->
+						args << "-DFRENCH"
+					}
+				}
 			}
 
 			gcc(Gcc) {
@@ -243,8 +306,9 @@ subprojects {
 				// path "/usr/bin/gcc"
 			}
 			clang(Clang)
+
 		}
-*/
+*/		
 		platforms {
 			win32 {
 				operatingSystem "windows"
@@ -957,72 +1021,98 @@ ext.commonNuspecMetadata = [
 	copyright:		'Copyright 2018',
 	releaseNotes:	'releaseNotes'
 ]
+task nugetCopyx86Target(type: Copy) {
+	def vsToolChain = getSelectedVisualStudioToolChain()
+	String toolset = vsToolChain.toolset
+	from file("$rootDir/packaging/Windows/NuGet/Pocoproject.Poco.x86.targets")
+    rename { String filename ->
+		int insert = filename.indexOf("x86")
+		return filename[0..insert - 1] + toolset + "." + filename.substring(insert)
+    }
+	into file("$rootDir/packaging/Windows/NuGet")
+}
+task nugetCopyx64Target(type: Copy) {
+	def vsToolChain = getSelectedVisualStudioToolChain()
+	String toolset = vsToolChain.toolset
+	from file("$rootDir/packaging/Windows/NuGet/Pocoproject.Poco.x64.targets")
+    rename { String filename ->
+		int insert = filename.indexOf("x64")
+		return filename[0..insert - 1] + toolset + "." + filename.substring(insert)
+    }
+	into file("$rootDir/packaging/Windows/NuGet")
+}
 task 'nugetSpec-x86'(type: NuGetSpec) {
+	dependsOn 'nugetCopyx86Target'
+	def vsToolChain = getSelectedVisualStudioToolChain()
+	String toolset = vsToolChain.toolset
 	nuspec = [
 		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.v141.x86",
-			title:          "Pocoproject Poco v141 $version x86",
+			id:          	"Pocoproject.Poco.${toolset}.x86",
+			title:          "Pocoproject Poco ${toolset} $version x86",
 			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x86", version: "1.1.0") } ]
 		],
 		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.v141.x86.targets", 				target: "build\\native") },
-			{ file(src: "$rootDir\\bin\\Poco*.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\bin\\Poco*d.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*d.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\CppUnit\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Encodings\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\JSON\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\MongoDB\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Net\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\PDF\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Util\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\XML\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Zip\\include\\**",			target: "build\\native\\inc") }			
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.${vsToolChain["toolset"]}.x86.targets", 				target: "build\\native") },
+			{ file(src: "$rootDir\\bin\\Poco*.*", 					target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib\\Poco*.*",					target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\bin\\Poco*d.*", 					target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib\\Poco*d.*",					target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\CppUnit\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Foundation\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Encodings\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Crypto\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\PostgreSQL\\include\\**",	target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\JSON\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\MongoDB\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Net\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",	target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\PDF\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Util\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\XML\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Zip\\include\\**",				target: "build\\native\\inc") }			
 		]
 	]
 	outputs.file(nuspecFile)
 }
 task 'nugetSpec-x64'(type: NuGetSpec) {
+	dependsOn 'nugetCopyx64Target'
+	def vsToolChain = getSelectedVisualStudioToolChain()
+	String toolset = vsToolChain.toolset
 	nuspec = [
 		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.v141.x64",
-			title:          "Pocoproject Poco v141 $version x64",
+			id:          	"Pocoproject.Poco.${toolset}.x64",
+			title:          "Pocoproject Poco ${toolset} $version x64",
 			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x64", version: "1.1.0") } ]
 		],
 		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.v141.x64.targets", 				target: "build\\native") },
-			{ file(src: "$rootDir\\bin64\\Poco*64.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib64\\Poco*.*",				target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\bin64\\Poco*64d.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib64\\Poco*d.*",			target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\CppUnit\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Encodings\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\JSON\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\MongoDB\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Net\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\PDF\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Util\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\XML\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Zip\\include\\**",			target: "build\\native\\inc") }			
+			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.${vsToolChain["toolset"]}.x64.targets", 				target: "build\\native") },
+			{ file(src: "$rootDir\\bin64\\Poco*64.*",				target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib64\\Poco*.*",					target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\bin64\\Poco*64d.*",				target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\lib64\\Poco*d.*",				target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
+			{ file(src: "$rootDir\\CppUnit\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Foundation\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Encodings\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Crypto\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\PostgreSQL\\include\\**",	target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\JSON\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\MongoDB\\include\\**",			target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Net\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",	target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",		target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\PDF\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Util\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\XML\\include\\**",				target: "build\\native\\inc") },
+			{ file(src: "$rootDir\\Zip\\include\\**",				target: "build\\native\\inc") }			
 		]
 	]
 	outputs.file(nuspecFile)

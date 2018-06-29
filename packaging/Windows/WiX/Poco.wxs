@@ -7,6 +7,9 @@
 <?define ProductAuthor = 'Applied Informatics Software Engineering GmbH and Contributors' ?>
 <?define ProductAppFolder = 'InstallLocation' ?>
 <?define VisualStudio = '$(var.VSYEAR)' ?>
+<?if $(var.VisualStudio) = VS2017 ?>
+<?define PlatformToolSetVersion = 'v141' ?>
+<?endif ?>
 <?if $(var.Platform) = x64 ?>
 <?define ProductDisplayName = '$(var.ProductName) 64-bit' ?>
 <!-- <?define ProductId = 'DAEF6430-C2C6-427F-BB76-B17908FC3162' ?> -->
@@ -83,8 +86,8 @@
             </Directory>
         </Directory>
         <DirectoryRef Id="APPLICATIONFOLDER">
-			<Directory Id="VisualStudio" Name="$(var.VisualStudio)">
-            <Directory Id="Version" Name="$(var.VERSION)">
+            <Directory Id="Version" Name="$(var.ProductVersion)">
+ 			<Directory Id="VisualStudio" Name="$(var.PlatformToolSetVersion)">
                 <Directory Id="bin" Name="bin">
                     <?if $(var.Platform) = x64 ?>
                     <Component Win64="$(var.Win64)" Id="PocoCppUnit64.shared.debug" DiskId="1" Guid="1139732C-64FC-4F3C-82F0-2442CBEB3E43">
