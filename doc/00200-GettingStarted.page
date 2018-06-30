@@ -125,6 +125,7 @@ On Windows, there are three options:
 
   - Use POCO pre-built OpenSSL binaries (simplest and recommended)
   - Build OpenSSL using scripts from POCO distribution package
+  - Build from sources using MSYS2 (for MinGW)
   - Use a third-party pre-built OpenSSL
 
 !!! POCO pre-built OpenSSL binaries
@@ -174,6 +175,18 @@ binaries can be linked from EXEs and DLLs built with VS 2008-2017.
 
 Pre-generated POCO Visual Studio projects are configured to use headers and
 libraries from VS_120 directory.
+
+!!! Build from sources using MSYS2 (for MinGW)
+
+Also you can build OpenSSL from sources using MSYS2. MSYS2 is a unix-like terminal.
+Open https://www.msys2.org site, download and install MSYS2 binaries. Open msys2.exe.
+First, you need to install 'build-essential' and Git, use command 'pacman -S build-essential git'.
+Second, set environment variable 'PATH', use command 'export PATH=$PATH:/mnt/%DRIVE_LETTER%/%PATH_TO_COMPILER_BIN'.
+Now you can clone official OpenSSL repository (https://github.com/openssl/openssl). Better, if you will use stable
+branch, it is 'OpenSSL_1_1_0-stable' now. Use command 'git clone -b OpenSSL_1_1_0-stable https://github.com/openssl/openssl'.
+Enter to downloaded directory, configure OpenSSL using './configure %MINGW% shared enable-capieng --prefix=%YOUR_INSTALL_PATH%'.
+Where '%MINGW%', you need to place 'mingw' or 'mingw64' depending on compiler bit capacity. Now, type 'make install -j4'.
+Sources will be compiled and installed.
 
 !!! Use a third-party pre-built OpenSSL
 
