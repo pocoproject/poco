@@ -7,9 +7,7 @@
 <?define ProductAuthor = 'Applied Informatics Software Engineering GmbH and Contributors' ?>
 <?define ProductAppFolder = 'InstallLocation' ?>
 <?define VisualStudio = '$(var.VSYEAR)' ?>
-<?if $(var.VisualStudio) = VS2017 ?>
-<?define PlatformToolSetVersion = 'v141' ?>
-<?endif ?>
+<?define PlatformToolSetVersion = '$(var.Toolset)' ?>
 <?if $(var.Platform) = x64 ?>
 <?define ProductDisplayName = '$(var.ProductName) 64-bit' ?>
 <!-- <?define ProductId = 'DAEF6430-C2C6-427F-BB76-B17908FC3162' ?> -->
@@ -97,14 +95,7 @@
                     <Component Win64="$(var.Win64)" Id="PocoCppUnit64.shared.release" DiskId="1" Guid="C2C5F39F-91A5-43F2-8ACC-4FC1775BC100">
                         <File Id="CPPUNIT64.DLL" Name="PocoCppUnit64.dll" Source="$(var.POCO)\bin64\PocoCppUnit64.dll" />
                     </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser64.shared.debug" DiskId="1" Guid="65872309-1DB2-4EE8-8317-A160F4A6C9F3">
-                        <File Id="POCOCPPPARSER64D.DLL" Name="PocoCppParser64d.dll" Source="$(var.POCO)\bin64\PocoCppParser64d.dll" />
-                        <File Id="POCOCPPPARSER64D.PDB" Name="PocoCppParser64d.pdb" Source="$(var.POCO)\bin64\PocoCppParser64d.pdb" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser64.shared.release" DiskId="1" Guid="478E6EA2-F127-4EE4-9AD4-5B70B1150074">
-                        <File Id="POCOCPPPARSER64.DLL" Name="PocoCppParser64.dll" Source="$(var.POCO)\bin64\PocoCppParser64.dll" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="Crypto64.shared.debug" DiskId="1" Guid="3E77B3AE-79A3-4E81-9C13-048680980662">
+                   <Component Win64="$(var.Win64)" Id="Crypto64.shared.debug" DiskId="1" Guid="3E77B3AE-79A3-4E81-9C13-048680980662">
                         <File Id="POCOCRYPTO64D.DLL" Name="PocoCrypto64d.dll" Source="$(var.POCO)\bin64\PocoCrypto64d.dll" />
                         <File Id="POCOCRYPTO64D.PDB" Name="PocoCrypto64d.pdb" Source="$(var.POCO)\bin64\PocoCrypto64d.pdb" />
                     </Component>
@@ -138,6 +129,13 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataSQLite64.shared.release" DiskId="1" Guid="065D2D21-8BEE-4DAF-9CC9-30CFB9E6152E">
                         <File Id="POCODATASQLITE64.DLL" Name="PocoDataSQLite64.dll" Source="$(var.POCO)\bin64\PocoDataSQLite64.dll" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL64.shared.debug" DiskId="1" Guid="390F5FF7-0CA9-4CA3-AF6A-98AF04371F5D">
+                        <File Id="POCODataPostgreSQL64D.DLL" Name="PocoDataPostgreSQL64d.dll" Source="$(var.POCO)\bin64\PocoDataPostgreSQL64d.dll" />
+                        <File Id="POCODataPostgreSQL64D.PDB" Name="PocoDataPostgreSQL64d.pdb" Source="$(var.POCO)\bin64\PocoDataPostgreSQL64d.pdb" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL64.shared.release" DiskId="1" Guid="B0C66A77-24BF-4711-A663-374177BB9C8F">
+                        <File Id="POCODataPostgreSQL64.DLL" Name="PocoDataPostgreSQL64.dll" Source="$(var.POCO)\bin64\PocoDataPostgreSQL64.dll" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Foundation64.shared.debug" DiskId="1" Guid="11130E01-30F8-4855-960D-2C9D133428B1">
                         <File Id="POCOFOUNDATION64D.DLL" Name="PocoFoundation64d.dll" Source="$(var.POCO)\bin64\PocoFoundation64d.dll" />
@@ -259,14 +257,7 @@
                     <Component Win64="$(var.Win64)" Id="MongoDB.shared.release" Guid="AED8C4C2-FC12-4048-BD10-0FBD15F3DDFA">
                         <File Id="POCOMONGODB.DLL" Name="PocoMongoDB.dll" Source="$(var.POCO)\bin\PocoMongoDB.dll" />
                     </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser.shared.debug" Guid="30731704-8C3E-4A34-B147-6B0C138B2C4A">
-                        <File Id="POCOCPPPARSERD.DLL" Name="PocoCppParserd.dll" Source="$(var.POCO)\bin\PocoCppParserd.dll" />
-                        <File Id="POCOCPPPARSERD.PDB" Name="PocoCppParserd.pdb" Source="$(var.POCO)\bin\PocoCppParserd.pdb" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser.shared.release" Guid="8DD79403-19E9-4D09-A331-05521288F5A3">
-                        <File Id="POCOCPPPARSER.DLL" Name="PocoCppParser.dll" Source="$(var.POCO)\bin\PocoCppParser.dll" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="Crypto.shared.debug" Guid="EAEC10D7-D8BC-4615-9C99-12AF75670571">
+                   <Component Win64="$(var.Win64)" Id="Crypto.shared.debug" Guid="EAEC10D7-D8BC-4615-9C99-12AF75670571">
                         <File Id="POCOCRYPTOD.DLL" Name="PocoCryptod.dll" Source="$(var.POCO)\bin\PocoCryptod.dll" />
                         <File Id="POCOCRYPTOD.PDB" Name="PocoCryptod.pdb" Source="$(var.POCO)\bin\PocoCryptod.pdb" />
                     </Component>
@@ -300,6 +291,13 @@
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataSQLite.shared.release" Guid="ECDE1FD4-4EDA-4695-9B03-8906099044A9">
                         <File Id="POCODATASQLITE.DLL" Name="PocoDataSQLite.dll" Source="$(var.POCO)\bin\PocoDataSQLite.dll" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL.shared.debug" Guid="FCA6CF33-E959-4955-88F6-21796BBB7743">
+                        <File Id="POCODataPostgreSQLD.DLL" Name="PocoDataPostgreSQLd.dll" Source="$(var.POCO)\bin\PocoDataPostgreSQLd.dll" />
+                        <File Id="POCODataPostgreSQLD.PDB" Name="PocoDataPostgreSQLd.pdb" Source="$(var.POCO)\bin\PocoDataPostgreSQLd.pdb" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL.shared.release" Guid="FF708009-E321-45B7-B52A-04A26D536EC3">
+                        <File Id="POCODataPostgreSQL.DLL" Name="PocoDataPostgreSQL.dll" Source="$(var.POCO)\bin\PocoDataPostgreSQL.dll" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="NetSSLWin.shared.debug" Guid="0428E44D-072C-47C3-97A8-52F81F420F62">
                         <File Id="POCONETSSLWIND.DLL" Name="PocoNetSSLWind.dll" Source="$(var.POCO)\bin\PocoNetSSLWind.dll" />
@@ -403,16 +401,6 @@
                         <File Id="POCOMONGODB64MD.LIB" Name="PocoMongoDB64md.lib" Source="$(var.POCO)\lib64\PocoMongoDBmd.lib" />
                         <File Id="POCOMONGODB64MT.LIB" Name="PocoMongoDB64mt.lib" Source="$(var.POCO)\lib64\PocoMongoDBmt.lib" />
                     </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser64.static.debug" Guid="30247E39-4FBD-4D4F-8B90-CEA53E6230BE">
-                        <File Id="POCOCPPPARSER64MDD.LIB" Name="PocoCppParser64mdd.lib" Source="$(var.POCO)\lib64\PocoCppParsermdd.lib" />
-                        <File Id="POCOCPPPARSER64MDD.PDB" Name="pococppparser64mdd.pdb" Source="$(var.POCO)\lib64\pococppparsermdd.pdb" />
-                        <File Id="POCOCPPPARSER64MTD.LIB" Name="PocoCppParser64mtd.lib" Source="$(var.POCO)\lib64\PocoCppParsermtd.lib" />
-                        <File Id="POCOCPPPARSER64MTD.PDB" Name="pococppparser64mtd.pdb" Source="$(var.POCO)\lib64\pococppparsermtd.pdb" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser64.static.release" Guid="89AB208B-4754-49B3-8B44-77707CEFF2A6">
-                        <File Id="POCOCPPPARSER64MD.LIB" Name="PocoCppParser64md.lib" Source="$(var.POCO)\lib64\PocoCppParsermd.lib" />
-                        <File Id="POCOCPPPARSER64MT.LIB" Name="PocoCppParser64mt.lib" Source="$(var.POCO)\lib64\PocoCppParsermt.lib" />
-                    </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto64.static.debug" Guid="0D082893-DF9C-4900-AF54-45813DDABAC6">
                         <File Id="POCOCRYPTO64MDD.LIB" Name="PocoCrypto64mdd.lib" Source="$(var.POCO)\lib64\PocoCryptomdd.lib" />
                         <File Id="POCOCRYPTO64MDD.PDB" Name="pococrypto64mdd.pdb" Source="$(var.POCO)\lib64\pococryptomdd.pdb" />
@@ -452,6 +440,16 @@
                     <Component Win64="$(var.Win64)" Id="DataSQLite64.static.release" Guid="23F831FC-4DDA-4CBD-87C5-F98D429A70C1">
                         <File Id="POCODATASQLITE64MD.LIB" Name="PocoDataSQLite64md.lib" Source="$(var.POCO)\lib64\PocoDataSQLitemd.lib" />
                         <File Id="POCODATASQLITE64MT.LIB" Name="PocoDataSQLite64mt.lib" Source="$(var.POCO)\lib64\PocoDataSQLitemt.lib" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL64.static.debug" Guid="C9E4D208-C1DF-4622-BFE3-F88F1B0DA95B">
+                        <File Id="POCODATAPOSTGRESQL64MDD.LIB" Name="PocoDataPostgreSQL64mdd.lib" Source="$(var.POCO)\lib64\PocoDataPostgreSQLmdd.lib" />
+                        <File Id="POCODATAPOSTGRESQL64MDD.PDB" Name="pocoDataPostgreSQL64mdd.pdb" Source="$(var.POCO)\lib64\pocoDataPostgreSQLmdd.pdb" />
+                        <File Id="POCODATAPOSTGRESQL64MTD.LIB" Name="PocoDataPostgreSQL64mtd.lib" Source="$(var.POCO)\lib64\PocoDataPostgreSQLmtd.lib" />
+                        <File Id="POCODATAPOSTGRESQL64MTD.PDB" Name="pocoDataPostgreSQL64mtd.pdb" Source="$(var.POCO)\lib64\pocoDataPostgreSQLmtd.pdb" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL64.static.release" Guid="74C3FFF4-1DB3-45D0-AB96-F89A85A39D30">
+                        <File Id="POCODATAPOSTGRESQL64MD.LIB" Name="PocoDataPostgreSQL64md.lib" Source="$(var.POCO)\lib64\PocoDataPostgreSQLmd.lib" />
+                        <File Id="POCODATAPOSTGRESQL64MT.LIB" Name="PocoDataPostgreSQL64mt.lib" Source="$(var.POCO)\lib64\PocoDataPostgreSQLmt.lib" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataMySQL64.static.debug" Guid="4A5EB45E-024C-45F1-BDB6-3799DAA755AE">
                         <File Id="POCODATAMYSQL64MDD.LIB" Name="PocoDataMySQL64mdd.lib" Source="$(var.POCO)\lib64\PocoDataMySQLmdd.lib" />
@@ -574,16 +572,6 @@
                         <File Id="POCOMONGODBMD.LIB" Name="PocoMongoDBmd.lib" Source="$(var.POCO)\lib\PocoMongoDBmd.lib" />
                         <File Id="POCOMONGODBMT.LIB" Name="PocoMongoDBmt.lib" Source="$(var.POCO)\lib\PocoMongoDBmt.lib" />
                     </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser.static.debug" Guid="13CF63B2-56E1-456C-AC61-F63A9C8B1372">
-                        <File Id="POCOCPPPARSERMDD.LIB" Name="PocoCppParsermdd.lib" Source="$(var.POCO)\lib\PocoCppParsermdd.lib" />
-                        <File Id="POCOCPPPARSERMDD.PDB" Name="pococppparsermdd.pdb" Source="$(var.POCO)\lib\pococppparsermdd.pdb" />
-                        <File Id="POCOCPPPARSERMTD.LIB" Name="PocoCppParsermtd.lib" Source="$(var.POCO)\lib\PocoCppParsermtd.lib" />
-                        <File Id="POCOCPPPARSERMTD.PDB" Name="pococppparsermtd.pdb" Source="$(var.POCO)\lib\pococppparsermtd.pdb" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser.static.release" Guid="89AB208B-4754-49B3-8B44-77707CEFF2A6">
-                        <File Id="POCOCPPPARSERMD.LIB" Name="PocoCppParsermd.lib" Source="$(var.POCO)\lib\PocoCppParsermd.lib" />
-                        <File Id="POCOCPPPARSERMT.LIB" Name="PocoCppParsermt.lib" Source="$(var.POCO)\lib\PocoCppParsermt.lib" />
-                    </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto.static.debug" Guid="CE2992D2-4D56-44B2-A4EE-79B638BD05A8">
                         <File Id="POCOCRYPTOMDD.LIB" Name="PocoCryptomdd.lib" Source="$(var.POCO)\lib\PocoCryptomdd.lib" />
                         <File Id="POCOCRYPTOMDD.PDB" Name="pococryptomdd.pdb" Source="$(var.POCO)\lib\pococryptomdd.pdb" />
@@ -623,6 +611,16 @@
                     <Component Win64="$(var.Win64)" Id="DataSQLite.static.release" Guid="23F831FC-4DDA-4CBD-87C5-F98D429A70C1">
                         <File Id="POCODATASQLITEMD.LIB" Name="PocoDataSQLitemd.lib" Source="$(var.POCO)\lib\PocoDataSQLitemd.lib" />
                         <File Id="POCODATASQLITEMT.LIB" Name="PocoDataSQLitemt.lib" Source="$(var.POCO)\lib\PocoDataSQLitemt.lib" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL.static.debug" Guid="4D5B3239-0736-4717-9EED-76F3A8CAB565">
+                        <File Id="POCODATAPOSTGRESQLMDD.LIB" Name="PocoDataPostgreSQLmdd.lib" Source="$(var.POCO)\lib\PocoDataPostgreSQLmdd.lib" />
+                        <File Id="POCODATAPOSTGRESQLMDD.PDB" Name="pocoDataPostgreSQLmdd.pdb" Source="$(var.POCO)\lib\pocoDataPostgreSQLmdd.pdb" />
+                        <File Id="POCODATAPOSTGRESQLMTD.LIB" Name="PocoDataPostgreSQLmtd.lib" Source="$(var.POCO)\lib\PocoDataPostgreSQLmtd.lib" />
+                        <File Id="POCODATAPOSTGRESQLMTD.PDB" Name="pocoDataPostgreSQLmtd.pdb" Source="$(var.POCO)\lib\pocoDataPostgreSQLmtd.pdb" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL.static.release" Guid="E827B78F-06FA-41E8-AD8F-44AD2CA8A64E">
+                        <File Id="POCODATAPOSTGRESQLMD.LIB" Name="PocoDataPostgreSQLmd.lib" Source="$(var.POCO)\lib\PocoDataPostgreSQLmd.lib" />
+                        <File Id="POCODATAPOSTGRESQLMT.LIB" Name="PocoDataPostgreSQLmt.lib" Source="$(var.POCO)\lib\PocoDataPostgreSQLmt.lib" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="DataMySQL.static.debug" Guid="C2EA8639-A80D-4271-ABFE-65C00FF7B227">
                         <File Id="POCODATAMYSQLMDD.LIB" Name="PocoDataMySQLmdd.lib" Source="$(var.POCO)\lib\PocoDataMySQLmdd.lib" />
@@ -682,14 +680,6 @@
                     <Component Win64="$(var.Win64)" Id="PocoCppUnit64.import.release" DiskId="1" Guid="EE55C781-8DF5-49D3-9940-D7689590D0CE">
                         <File Id="CPPUNIT64.LIB" Name="PocoCppUnit64.lib" Source="$(var.POCO)\lib64\PocoCppUnit.lib" />
                     </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser64.import.debug" DiskId="1" Guid="C9B5D078-EBFD-46EA-BD7F-C654BB2828E1">
-                        <File Id="POCOCPPPARSER64D.LIB" Name="PocoCppParser64d.lib" Source="$(var.POCO)\lib64\PocoCppParserd.lib" />
-                        <File Id="POCOCPPPARSER64D.EXP" Name="PocoCppParser64d.exp" Source="$(var.POCO)\lib64\PocoCppParserd.exp" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser64.import.release" DiskId="1" Guid="5DBFE6DD-9804-4823-AE2D-26EF2BCFF6B5">
-                        <File Id="POCOCPPPARSER64.LIB" Name="PocoCppParser64.lib" Source="$(var.POCO)\lib64\PocoCppParser.lib" />
-                        <File Id="POCOCPPPARSER64.EXP" Name="PocoCppParser64.exp" Source="$(var.POCO)\lib64\PocoCppParser.exp" />
-                    </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto64.import.debug" DiskId="1" Guid="30A5F403-5C87-4854-98A8-E60801CB52F4">
                         <File Id="POCOCRYPTO64D.LIB" Name="PocoCrypto64d.lib" Source="$(var.POCO)\lib64\PocoCryptod.lib" />
                         <File Id="POCOCRYPTO64D.EXP" Name="PocoCrypto64d.exp" Source="$(var.POCO)\lib64\PocoCryptod.exp" />
@@ -729,6 +719,14 @@
                     <Component Win64="$(var.Win64)" Id="DataSQLite64.import.release" DiskId="1" Guid="5CCC88D5-362E-4681-A218-74A750BA4C0D">
                         <File Id="POCODATASQLITE64.LIB" Name="PocoDataSQLite64.lib" Source="$(var.POCO)\lib64\PocoDataSQLite.lib" />
                         <File Id="POCODATASQLITE64.EXP" Name="PocoDataSQLite64.exp" Source="$(var.POCO)\lib64\PocoDataSQLite.exp" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL64.import.debug" DiskId="1" Guid="ED0E2BDB-6357-464F-9476-CFA5B7FF2BF4">
+                        <File Id="POCODATAPOSTGRESQL64D.LIB" Name="PocoDataPostgreSQL64d.lib" Source="$(var.POCO)\lib64\PocoDataPostgreSQLd.lib" />
+                        <File Id="POCODATAPOSTGRESQL64D.EXP" Name="PocoDataPostgreSQL64d.exp" Source="$(var.POCO)\lib64\PocoDataPostgreSQLd.exp" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL64.import.release" DiskId="1" Guid="6B0B3ACC-5386-4C26-BC9C-FA338CF48317">
+                        <File Id="POCODataPostgreSQL64.LIB" Name="PocoDataPostgreSQL64.lib" Source="$(var.POCO)\lib64\PocoDataPostgreSQL.lib" />
+                        <File Id="POCODataPostgreSQL64.EXP" Name="PocoDataPostgreSQL64.exp" Source="$(var.POCO)\lib64\PocoDataPostgreSQL.exp" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="Foundation64.import.debug" DiskId="1" Guid="3A02770F-522D-44D5-8A84-B66F8B486311">
                         <File Id="POCOFOUNDATION64D.LIB" Name="PocoFoundation64d.lib" Source="$(var.POCO)\lib64\PocoFoundationd.lib" />
@@ -867,14 +865,6 @@
                         <File Id="POCOMONGODB.LIB" Name="PocoMongoDB.lib" Source="$(var.POCO)\lib\PocoMongoDB.lib" />
                         <File Id="POCOMONGODB.EXP" Name="PocoMongoDB.exp" Source="$(var.POCO)\lib\PocoMongoDB.exp" />
                     </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser.import.debug" Guid="D60F21F1-E805-43F7-AFD7-5C05A1AC5F8B">
-                        <File Id="POCOCPPPARSERD.LIB" Name="PocoCppParserd.lib" Source="$(var.POCO)\lib\PocoCppParserd.lib" />
-                        <File Id="POCOCPPPARSERD.EXP" Name="PocoCppParserd.exp" Source="$(var.POCO)\lib\PocoCppParserd.exp" />
-                    </Component>
-                    <Component Win64="$(var.Win64)" Id="CppParser.import.release" Guid="742EAFA8-8A26-4AF1-85C8-EBAFBF2BD05F">
-                        <File Id="POCOCPPPARSER.LIB" Name="PocoCppParser.lib" Source="$(var.POCO)\lib\PocoCppParser.lib" />
-                        <File Id="POCOCPPPARSER.EXP" Name="PocoCppParser.exp" Source="$(var.POCO)\lib\PocoCppParser.exp" />
-                    </Component>
                     <Component Win64="$(var.Win64)" Id="Crypto.import.debug" Guid="BD70B6BE-72FB-48B2-B75E-18913EAB0D0F">
                         <File Id="POCOCRYPTOD.LIB" Name="PocoCryptod.lib" Source="$(var.POCO)\lib\PocoCryptod.lib" />
                         <File Id="POCOCRYPTOD.EXP" Name="PocoCryptod.exp" Source="$(var.POCO)\lib\PocoCryptod.exp" />
@@ -914,6 +904,14 @@
                     <Component Win64="$(var.Win64)" Id="DataSQLite.import.release" Guid="5266FB89-8A5D-4FED-8667-185D03F5D44C">
                         <File Id="POCODATASQLITE.LIB" Name="PocoDataSQLite.lib" Source="$(var.POCO)\lib\PocoDataSQLite.lib" />
                         <File Id="POCODATASQLITE.EXP" Name="PocoDataSQLite.exp" Source="$(var.POCO)\lib\PocoDataSQLite.exp" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL.import.debug" Guid="0542F84E-9346-498A-AD64-7173650E8F41">
+                        <File Id="POCODATAPOSTGRESQLD.LIB" Name="PocoDataPostgreSQLd.lib" Source="$(var.POCO)\lib\PocoDataPostgreSQLd.lib" />
+                        <File Id="POCODATAPOSTGRESQLD.EXP" Name="PocoDataPostgreSQLd.exp" Source="$(var.POCO)\lib\PocoDataPostgreSQLd.exp" />
+                    </Component>
+                    <Component Win64="$(var.Win64)" Id="DataPostgreSQL.import.release" Guid="EC681B9F-4AC6-40F8-A9E7-3BFF23315943">
+                        <File Id="POCODATAPOSTGRESQL.LIB" Name="PocoDataPostgreSQL.lib" Source="$(var.POCO)\lib\PocoDataPostgreSQL.lib" />
+                        <File Id="POCODATAPOSTGRESQL.EXP" Name="PocoDataPostgreSQL.exp" Source="$(var.POCO)\lib\PocoDataPostgreSQL.exp" />
                     </Component>
                     <Component Win64="$(var.Win64)" Id="NetSSLWin.import.debug" Guid="A15DE4D9-A7C7-4D6C-AB6A-D62206B959EA">
                         <File Id="POCONETSSLWIND.LIB" Name="PocoNetSSLWind.lib" Source="$(var.POCO)\lib\PocoNetSSLWind.lib" />
@@ -1234,28 +1232,6 @@
                                 <File Id="VAR.H" Name="Var.h" Source="$(var.POCO)\Foundation\include\Poco\Dynamic\Var.h" />
                                 <File Id="VARHOLDER.H" Name="VarHolder.h" Source="$(var.POCO)\Foundation\include\Poco\Dynamic\VarHolder.h" />
                                 <File Id="VARITERATOR.H" Name="VarIterator.h" Source="$(var.POCO)\Foundation\include\Poco\Dynamic\VarIterator.h" />
-                            </Component>
-                        </Directory>
-                        <Directory Id="CPPPARSER" Name="CppParser">
-                            <Component Win64="$(var.Win64)" Id="Poco.CppParser.inc" DiskId="1" Guid="23391F57-440D-4D6A-8B4E-1CBE8486196F">
-                                <File Id="ATTRIBUTES.H" Name="Attributes.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Attributes.h" />
-                                <File Id="ATTRIBUTESPARSER.H" Name="AttributesParser.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\AttributesParser.h" />
-                                <File Id="BUILTIN.H" Name="BuiltIn.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\BuiltIn.h" />
-                                <File Id="CPPPARSER.H" Name="CppParser.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\CppParser.h" />
-                                <File Id="CPPTOKEN.H" Name="CppToken.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\CppToken.h" />
-                                <File Id="DECL.H" Name="Decl.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Decl.h" />
-                                <File Id="ENUM.H" Name="Enum.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Enum.h" />
-                                <File Id="ENUMVALUE.H" Name="EnumValue.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\EnumValue.h" />
-                                <File Id="FUNCTION.H" Name="Function.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Function.h" />
-                                <File Id="NAMESPACE.H" Name="NameSpace.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\NameSpace.h" />
-                                <File Id="PARAMETER.H" Name="Parameter.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Parameter.h" />
-                                <File Id="PARSER.H" Name="Parser.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Parser.h" />
-                                <File Id="STRUCT.H_1" Name="Struct.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Struct.h" />
-                                <File Id="SYMBOL.H" Name="Symbol.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Symbol.h" />
-                                <File Id="TOKENIZER.H" Name="Tokenizer.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Tokenizer.h" />
-                                <File Id="TYPEDEF.H" Name="TypeDef.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\TypeDef.h" />
-                                <File Id="UTILITY.H" Name="Utility.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Utility.h" />
-                                <File Id="VARIABLE.H" Name="Variable.h" Source="$(var.POCO)\CppParser\include\Poco\CppParser\Variable.h" />
                             </Component>
                         </Directory>
                         <Directory Id="CRYPTO" Name="Crypto">
@@ -3145,12 +3121,12 @@
                 <Feature Id="SharedRelease" Level="1" Description="As shared libraries" TypicalDefault="install" Title="SharedRelease">
                     <?if $(var.Platform) = x64 ?>
                     <ComponentRef Id="PocoCppUnit64.shared.release" />
-                    <ComponentRef Id="CppParser64.shared.release" />
                     <ComponentRef Id="Crypto64.shared.release" />
                     <ComponentRef Id="Data64.shared.release" />
                     <ComponentRef Id="DataMySQL64.shared.release" />
                     <ComponentRef Id="DataODBC64.shared.release" />
                     <ComponentRef Id="DataSQLite64.shared.release" />
+                    <ComponentRef Id="DataPostgreSQL64.shared.release" />
                     <ComponentRef Id="Foundation64.shared.release" />
                     <ComponentRef Id="JSON64.shared.release" />
                     <ComponentRef Id="MongoDB64.shared.release" />
@@ -3162,12 +3138,12 @@
                     <ComponentRef Id="XML64.shared.release" />
                     <ComponentRef Id="ZIP64.shared.release" />
                     <ComponentRef Id="PocoCppUnit64.import.release" />
-                    <ComponentRef Id="CppParser64.import.release" />
                     <ComponentRef Id="Crypto64.import.release" />
                     <ComponentRef Id="Data64.import.release" />
                     <ComponentRef Id="DataMySQL64.import.release" />
                     <ComponentRef Id="DataODBC64.import.release" />
                     <ComponentRef Id="DataSQLite64.import.release" />
+                    <ComponentRef Id="DataPostgreSQL64.import.release" />
                     <ComponentRef Id="Foundation64.import.release" />
                     <ComponentRef Id="JSON64.import.release" />
                     <ComponentRef Id="MongoDB64.import.release" />
@@ -3179,13 +3155,13 @@
                     <ComponentRef Id="XML64.import.release" />
                     <ComponentRef Id="ZIP64.import.release" />
                     <?else ?>
-                    <ComponentRef Id="CppParser.shared.release" />
                     <ComponentRef Id="PocoCppUnit.shared.release" />
                     <ComponentRef Id="Crypto.shared.release" />
                     <ComponentRef Id="Data.shared.release" />
                     <ComponentRef Id="DataMySQL.shared.release" />
                     <ComponentRef Id="DataODBC.shared.release" />
                     <ComponentRef Id="DataSQLite.shared.release" />
+                    <ComponentRef Id="DataPostgreSQL.shared.release" />
                     <ComponentRef Id="Foundation.shared.release" />
                     <ComponentRef Id="JSON.shared.release" />
                     <ComponentRef Id="MongoDB.shared.release" />
@@ -3196,13 +3172,13 @@
                     <ComponentRef Id="Util.shared.release" />
                     <ComponentRef Id="XML.shared.release" />
                     <ComponentRef Id="Zip.shared.release" />
-                    <ComponentRef Id="CppParser.import.release" />
                     <ComponentRef Id="PocoCppUnit.import.release" />
                     <ComponentRef Id="Crypto.import.release" />
                     <ComponentRef Id="Data.import.release" />
                     <ComponentRef Id="DataMySQL.import.release" />
                     <ComponentRef Id="DataODBC.import.release" />
                     <ComponentRef Id="DataSQLite.import.release" />
+                    <ComponentRef Id="DataPostgreSQL.import.release" />
                     <ComponentRef Id="Foundation.import.release" />
                     <ComponentRef Id="JSON.import.release" />
                     <ComponentRef Id="MongoDB.import.release" />
@@ -3217,13 +3193,13 @@
                 </Feature>
                 <Feature Id="StaticRelease" Level="1" Description="As static libraries" TypicalDefault="advertise" Title="StaticRelease">
                     <?if $(var.Platform) = x64 ?>
-                    <ComponentRef Id="CppParser64.static.release" />
                     <ComponentRef Id="PocoCppUnit64.static.release" />
                     <ComponentRef Id="Crypto64.static.release" />
                     <ComponentRef Id="Data64.static.release" />
                     <ComponentRef Id="DataMySQL64.static.release" />
                     <ComponentRef Id="DataODBC64.static.release" />
                     <ComponentRef Id="DataSQLite64.static.release" />
+                    <ComponentRef Id="DataPostgreSQL64.static.release" />
                     <ComponentRef Id="Foundation64.static.release" />
                     <ComponentRef Id="JSON64.static.release" />
                     <ComponentRef Id="MongoDB64.static.release" />
@@ -3235,13 +3211,13 @@
                     <ComponentRef Id="XML64.static.release" />
                     <ComponentRef Id="Zip64.static.release" />
                     <?else ?>
-                    <ComponentRef Id="CppParser.static.release" />
                     <ComponentRef Id="PocoCppUnit.static.release" />
                     <ComponentRef Id="Crypto.static.release" />
                     <ComponentRef Id="Data.static.release" />
                     <ComponentRef Id="DataMySQL.static.release" />
                     <ComponentRef Id="DataODBC.static.release" />
                     <ComponentRef Id="DataSQLite.static.release" />
+                    <ComponentRef Id="DataPostgreSQL.static.release" />
                     <ComponentRef Id="Foundation.static.release" />
                     <ComponentRef Id="JSON.static.release" />
                     <ComponentRef Id="MongoDB.static.release" />
@@ -3260,7 +3236,6 @@
                 <Feature Id="Includes" Level="1" Description="Includes" Title="Includes" InstallDefault="followParent">
                     <ComponentRef Id="Poco.inc" />
                     <ComponentRef Id="Poco.Dynamic.inc" />
-                    <ComponentRef Id="Poco.CppParser.inc" />
                     <ComponentRef Id="Poco.Crypto.inc" />
                     <ComponentRef Id="Poco.Data.inc" />
                     <ComponentRef Id="Poco.Data.MySQL.inc" />
@@ -3281,12 +3256,12 @@
                 <Feature Id="SharedDebug" Description="As shared libraries" Level="1" Title="SharedDebug" InstallDefault="followParent">
                     <?if $(var.Platform) = x64 ?>
                     <ComponentRef Id="PocoCppUnit64.shared.debug" />
-                    <ComponentRef Id="CppParser64.shared.debug" />
                     <ComponentRef Id="Crypto64.shared.debug" />
                     <ComponentRef Id="Data64.shared.debug" />
                     <ComponentRef Id="DataMySQL64.shared.debug" />
                     <ComponentRef Id="DataODBC64.shared.debug" />
                     <ComponentRef Id="DataSQLite64.shared.debug" />
+                    <ComponentRef Id="DataPostgreSQL64.shared.debug" />
                     <ComponentRef Id="Foundation64.shared.debug" />
                     <ComponentRef Id="JSON64.shared.debug" />
                     <ComponentRef Id="MongoDB64.shared.debug" />
@@ -3298,12 +3273,12 @@
                     <ComponentRef Id="XML64.shared.debug" />
                     <ComponentRef Id="ZIP64.shared.debug" />
                     <ComponentRef Id="PocoCppUnit64.import.debug" />
-                    <ComponentRef Id="CppParser64.import.debug" />
                     <ComponentRef Id="Crypto64.import.debug" />
                     <ComponentRef Id="Data64.import.debug" />
                     <ComponentRef Id="DataMySQL64.import.debug" />
                     <ComponentRef Id="DataODBC64.import.debug" />
                     <ComponentRef Id="DataSQLite64.import.debug" />
+                    <ComponentRef Id="DataPostgreSQL64.import.debug" />
                     <ComponentRef Id="Foundation64.import.debug" />
                     <ComponentRef Id="JSON64.import.debug" />
                     <ComponentRef Id="MongoDB64.import.debug" />
@@ -3315,13 +3290,13 @@
                     <ComponentRef Id="XML64.import.debug" />
                     <ComponentRef Id="ZIP64.import.debug" />
                     <?else ?>
-                    <ComponentRef Id="CppParser.shared.debug" />
                     <ComponentRef Id="PocoCppUnit.shared.debug" />
                     <ComponentRef Id="Crypto.shared.debug" />
                     <ComponentRef Id="Data.shared.debug" />
                     <ComponentRef Id="DataMySQL.shared.debug" />
                     <ComponentRef Id="DataODBC.shared.debug" />
                     <ComponentRef Id="DataSQLite.shared.debug" />
+                    <ComponentRef Id="DataPostgreSQL.shared.debug" />
                     <ComponentRef Id="Foundation.shared.debug" />
                     <ComponentRef Id="JSON.shared.debug" />
                     <ComponentRef Id="MongoDB.shared.debug" />
@@ -3332,13 +3307,13 @@
                     <ComponentRef Id="Util.shared.debug" />
                     <ComponentRef Id="XML.shared.debug" />
                     <ComponentRef Id="Zip.shared.debug" />
-                    <ComponentRef Id="CppParser.import.debug" />
                     <ComponentRef Id="PocoCppUnit.import.debug" />
                     <ComponentRef Id="Crypto.import.debug" />
                     <ComponentRef Id="Data.import.debug" />
                     <ComponentRef Id="DataMySQL.import.debug" />
                     <ComponentRef Id="DataODBC.import.debug" />
                     <ComponentRef Id="DataSQLite.import.debug" />
+                    <ComponentRef Id="DataPostgreSQL.import.debug" />
                     <ComponentRef Id="Foundation.import.debug" />
                     <ComponentRef Id="JSON.import.debug" />
                     <ComponentRef Id="MongoDB.import.debug" />
@@ -3353,13 +3328,13 @@
                 </Feature>
                 <Feature Id="StaticDebug" Description="As static libraries" Title="StaticDebug" Level="1" TypicalDefault="advertise">
                     <?if $(var.Platform) = x64 ?>
-                    <ComponentRef Id="CppParser64.static.debug" />
                     <ComponentRef Id="PocoCppUnit64.static.debug" />
                     <ComponentRef Id="Crypto64.static.debug" />
                     <ComponentRef Id="Data64.static.debug" />
                     <ComponentRef Id="DataMySQL64.static.debug" />
                     <ComponentRef Id="DataODBC64.static.debug" />
                     <ComponentRef Id="DataSQLite64.static.debug" />
+                    <ComponentRef Id="DataPostgreSQL64.static.debug" />
                     <ComponentRef Id="Foundation64.static.debug" />
                     <ComponentRef Id="JSON64.static.debug" />
                     <ComponentRef Id="MongoDB64.static.debug" />
@@ -3371,13 +3346,13 @@
                     <ComponentRef Id="XML64.static.debug" />
                     <ComponentRef Id="Zip64.static.debug" />
                     <?else ?>
-                    <ComponentRef Id="CppParser.static.debug" />
-                    <ComponentRef Id="PocoCppUnit.static.debug" />
+                   <ComponentRef Id="PocoCppUnit.static.debug" />
                     <ComponentRef Id="Crypto.static.debug" />
                     <ComponentRef Id="Data.static.debug" />
                     <ComponentRef Id="DataMySQL.static.debug" />
                     <ComponentRef Id="DataODBC.static.debug" />
                     <ComponentRef Id="DataSQLite.static.debug" />
+                    <ComponentRef Id="DataPostgreSQL.static.debug" />
                     <ComponentRef Id="Foundation.static.debug" />
                     <ComponentRef Id="JSON.static.debug" />
                     <ComponentRef Id="MongoDB.static.debug" />
