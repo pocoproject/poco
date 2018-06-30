@@ -943,7 +943,7 @@ def candle(vsyear, toolset, version, arch, os) {
 	return tasks.create("Candle-${vsyear}-${toolset}-${version}-${arch}", Exec) {
 		def Set<Task> pocos = project.getTasksByName('poco', true)
 		setDependsOn(pocos)
-//		dependsOn ':pocoDoc'
+		dependsOn ':pocoDoc'
 		workingDir "packaging/Windows/WiX"
 		String wixobj	= "Poco-$toolset-$arch-${version}.wixobj"
 
