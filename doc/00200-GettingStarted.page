@@ -178,27 +178,26 @@ libraries from VS_120 directory.
 
 !!! Build OpenSSL using MSYS2 for MinGW
 
-Also you can build OpenSSL from sources using MSYS2. MSYS2 is a unix-like terminal.
-Open https://www.msys2.org site, download and install MSYS2 binaries. Open it.
+MSYS2 is a unix-like terminal. To build OpenSSL from sources using MSYS2, download and install MSYS2 binaries
+from https://www.msys2.org.
 
-Use '/mnt/e' instead of 'E:', '/mnt/c' instead of 'C' and so on for every drive letter.
+MSYS2 uses special paths for Windows drive letters, eg. '/mnt/e' instead of 'E:', '/mnt/c' instead of 'C', etc.
 
-You need to install 'build-essential' and git, type:
+Install 'build-essential' and git:
 
     $ pacman -Sy build-essential git
 
-Set environment variable 'PATH', execute command:
+Set environment variable 'PATH':
 
     $ export PATH=$PATH:/%PATH_TO_COMPILER_BIN%
 
-Where %PATH_TO_COMPILER_BIN% type path to compiler directory with binaries. For example: '/mnt/e/compilers/mingw-w64-8.1.0-x64'.
+Where %PATH_TO_COMPILER_BIN% type path to compiler directory with binaries, for example: '/mnt/e/compilers/mingw-w64-8.1.0-x64'.
 
-Now, clone official OpenSSL repository (https://github.com/openssl/openssl). Better, if you will use stable branch
-like 'OpenSSL_1_1_0-stable':
+Clone the official OpenSSL repository (https://github.com/openssl/openssl) - best to use stable branch, eg. 'OpenSSL_1_1_0-stable':
 
     $ git clone -b OpenSSL_1_1_0-stable https://github.com/openssl/openssl
 
-And enter to directory, that git created:
+Enter the OpenSSL directory:
 
     $ cd openssl
 
@@ -206,14 +205,14 @@ Configure OpenSSL:
 
     $ ./configure mingw enable-capieng --prefix=%INSTALL_PATH%
 
-Also you can type 'mingw64' instead of 'mingw', if you need x64 library version.
 Where %INSTALL_PATH% type full installation path, there will be put binaries, libraries, docs and etc.
+For x64 library version, use 'mingw64' instead of 'mingw'.
 
-Start building:
+Build:
 
     $ make install -j4
 
-OpenSSL source code will be compiled, then files will be installed.
+The above command will compile the OpenSSL sources and install the files.
 
 
 !!! Use a third-party pre-built OpenSSL
