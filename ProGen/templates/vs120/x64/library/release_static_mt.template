@@ -54,7 +54,7 @@
 	/>
 	<Tool
 		Name="VCLibrarianTool"
-		OutputFile="${project.outdir}\lib64\${project.target}mt.lib"
+		OutputFile="${project.outdir}\lib64\${project.target}MT.lib"
 		TargetMachine="17"
 	/>
 	<Tool

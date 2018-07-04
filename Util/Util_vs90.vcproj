@@ -185,7 +185,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoUtilmtd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoUtilMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -200,7 +200,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmtd.lib"/>
+				OutputFile="..\lib\PocoUtilMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -258,7 +258,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmt.lib"/>
+				OutputFile="..\lib\PocoUtilMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -300,7 +300,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoUtilmdd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoUtilMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -315,7 +315,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmdd.lib"/>
+				OutputFile="..\lib\PocoUtilMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -373,7 +373,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoUtilmd.lib"/>
+				OutputFile="..\lib\PocoUtilMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

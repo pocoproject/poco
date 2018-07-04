@@ -16,7 +16,7 @@ model {
 					exportedHeaders {
 						srcDir 'include'
 					}
-					lib project: ':Foundation', library: 'Foundation'
+					//lib project: ':Foundation', library: 'Foundation'
 				}
 			}
 		}

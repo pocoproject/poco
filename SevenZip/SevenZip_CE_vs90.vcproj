@@ -56,7 +56,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoSevenZipd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -136,7 +136,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE "
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoSevenZip.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -198,7 +198,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoSevenZipmtd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoSevenZipMTd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -214,7 +214,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoSevenZipmtd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoSevenZipMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -280,7 +280,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoSevenZipmt.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoSevenZipMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -329,7 +329,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoSevenZipmdd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoSevenZipMDd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -345,7 +345,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoSevenZipmdd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoSevenZipMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -411,7 +411,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoSevenZipmd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoSevenZipMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

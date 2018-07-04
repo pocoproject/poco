@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="PDFCore">
-      <UniqueIdentifier>{9bda5e92-8371-40bf-8309-f8821cdde5aa}</UniqueIdentifier>
+      <UniqueIdentifier>{bc3c7860-f259-4e18-a65b-240a46057165}</UniqueIdentifier>
     </Filter>
     <Filter Include="PDFCore\Header Files">
-      <UniqueIdentifier>{5ab4a9ce-6941-4cf4-a0e4-ef76d84d70a7}</UniqueIdentifier>
+      <UniqueIdentifier>{255f9628-2848-484d-aa74-4e3e702ee539}</UniqueIdentifier>
     </Filter>
     <Filter Include="PDFCore\Source Files">
-      <UniqueIdentifier>{0cdbccff-fd58-4d1e-a297-a0ca794f9352}</UniqueIdentifier>
+      <UniqueIdentifier>{030e8b2c-89af-49c5-95a6-09b8dda26ce0}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{a735d638-6f21-46d2-96b1-2886c686aa25}</UniqueIdentifier>
+      <UniqueIdentifier>{9b180b13-a449-4ec6-ab50-9b2af7a1456f}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{6ce264d7-75d1-4b69-a5c9-ab5dc5add17a}</UniqueIdentifier>
+      <UniqueIdentifier>{80620750-5d53-40f7-901b-c9f35bf8ea7b}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{c0810433-e860-47a5-b75f-6e18096799fb}</UniqueIdentifier>
+      <UniqueIdentifier>{bef07151-60ad-40d7-b516-b244a9cc830b}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{e2bb6cc8-0be4-45f1-87f8-f4ef5a352086}</UniqueIdentifier>
+      <UniqueIdentifier>{3b081921-422c-4c07-821d-3385a1985cdb}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{adc99b41-3cf1-4f7b-a025-c034b0c17362}</UniqueIdentifier>
+      <UniqueIdentifier>{a0d506f4-3b40-4228-95e9-bc6a51f155c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

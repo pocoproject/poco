@@ -21,7 +21,7 @@
 			OutputDirectory="obj64\$(ConfigurationName)"
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2"
 			>
 			<Tool
@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\openssl\build\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\Poco\CppUnit\include;..\..\CppUnit\include;..\..\openssl\build\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -72,14 +72,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="WinTestRunnerd.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="bin64\TestSuited.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\lib64"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\TestSuited.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -109,7 +109,7 @@
 			OutputDirectory="obj64\$(ConfigurationName)"
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2"
 			>
 			<Tool
@@ -135,7 +135,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\openssl\build\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\Poco\CppUnit\include;..\..\CppUnit\include;..\..\openssl\build\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -162,12 +162,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="WinTestRunner.lib ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="bin64\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib64"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="17"
@@ -199,7 +199,7 @@
 			OutputDirectory="obj64\$(ConfigurationName)"
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			CharacterSet="2"
 			>
 			<Tool
@@ -221,7 +221,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\openssl\build\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\Poco\CppUnit\include;..\..\CppUnit\include;..\..\openssl\build\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -250,15 +250,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="WinTestRunnermtd.lib iphlpapi.lib winmm.lib nafxcwd.lib libcmtd.lib WinTestRunner.res ws2_32.lib Crypt32.lib"
+				AdditionalDependencies="Crypt32.lib ws2_32.lib Iphlpapi.lib"
 				OutputFile="bin64\static_mt\TestSuited.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\lib64"
-				IgnoreDefaultLibraryNames="nafxcwd.lib;libcmtd.lib"
+				IgnoreDefaultLibraryNames="nafxcwd.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\static_mt\TestSuited.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -288,7 +288,7 @@
 			OutputDirectory="obj64\$(ConfigurationName)"
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="1"
+			UseOfMFC="0"
 			CharacterSet="2"
 			>
 			<Tool
@@ -314,7 +314,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\openssl\build\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\Poco\CppUnit\include;..\..\CppUnit\include;..\..\openssl\build\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -341,13 +341,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="WinTestRunnermt.lib iphlpapi.lib winmm.lib nafxcw.lib libcmt.lib WinTestRunner.res ws2_32.lib Crypt32.lib"
+				AdditionalDependencies="Crypt32.lib ws2_32.lib Iphlpapi.lib"
 				OutputFile="bin64\static_mt\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib64"
-				IgnoreDefaultLibraryNames="nafxcw.lib;libcmt.lib"
+				IgnoreDefaultLibraryNames="nafxcw.lib"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="17"
@@ -379,7 +379,7 @@
 			OutputDirectory="obj64\$(ConfigurationName)"
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2"
 			>
 			<Tool
@@ -401,7 +401,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="4"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\openssl\build\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\Poco\CppUnit\include;..\..\CppUnit\include;..\..\openssl\build\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -430,14 +430,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="WinTestRunnermdd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="bin64\static_md\TestSuited.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\lib64"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="bin64\static_md\TestSuited.pdb"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -467,7 +467,7 @@
 			OutputDirectory="obj64\$(ConfigurationName)"
 			IntermediateDirectory="obj64\$(ConfigurationName)"
 			ConfigurationType="1"
-			UseOfMFC="2"
+			UseOfMFC="0"
 			CharacterSet="2"
 			>
 			<Tool
@@ -493,7 +493,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\include;..\..\CppUnit\include;..\..\CppUnit\WinTestRunner\include;..\..\openssl\build\include;..\..\Foundation\include"
+				AdditionalIncludeDirectories="..\include;..\..\Poco\CppUnit\include;..\..\CppUnit\include;..\..\openssl\build\include;..\..\Foundation\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x0501;POCO_STATIC;_CRT_SECURE_NO_WARNINGS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -520,12 +520,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="WinTestRunnermd.lib iphlpapi.lib winmm.lib WinTestRunner.res ws2_32.lib iphlpapi.lib"
+				AdditionalDependencies="iphlpapi.lib"
 				OutputFile="bin64\static_md\TestSuite.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib64"
 				GenerateDebugInformation="false"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="17"
@@ -643,7 +643,7 @@
 				Name="Source Files"
 				>
 				<File
-					RelativePath=".\src\WinDriver.cpp"
+					RelativePath=".\src\Driver.cpp"
 					>
 				</File>
 			</Filter>

@@ -29,6 +29,7 @@
     <ClCompile Include="src\DigestStreamTest.cpp"/>
     <ClCompile Include="src\DirectoryIteratorsTest.cpp"/>
     <ClCompile Include="src\DirectoryWatcherTest.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\DummyDelegate.cpp"/>
     <ClCompile Include="src\DynamicFactoryTest.cpp"/>
     <ClCompile Include="src\EventTestSuite.cpp"/>
@@ -135,7 +136,6 @@
     <ClCompile Include="src\UUIDTest.cpp"/>
     <ClCompile Include="src\UUIDTestSuite.cpp"/>
     <ClCompile Include="src\VarTest.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
     <ClCompile Include="src\ZLibTest.cpp"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">

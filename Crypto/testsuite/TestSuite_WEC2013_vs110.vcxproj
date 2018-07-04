@@ -40,7 +40,7 @@
     <ClCompile Include="src\PKCS12ContainerTest.cpp"/>
     <ClCompile Include="src\RSATest.cpp"/>
     <ClCompile Include="src\CryptoTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

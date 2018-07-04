@@ -3,7 +3,7 @@
   <ItemGroup Label="ProjectConfigurations">
     <ClCompile Include="src\JSONTest.cpp"/>
     <ClCompile Include="src\JSONTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>TestSuite</ProjectName>

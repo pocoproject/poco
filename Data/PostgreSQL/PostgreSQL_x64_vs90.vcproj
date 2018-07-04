@@ -189,7 +189,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataPostgreSQLmtd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataPostgreSQLMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -204,7 +204,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataPostgreSQLmtd.lib"
+				OutputFile="..\..\lib64\PocoDataPostgreSQLMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -264,7 +264,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataPostgreSQLmt.lib"
+				OutputFile="..\..\lib64\PocoDataPostgreSQLMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -308,7 +308,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataPostgreSQLmdd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataPostgreSQLMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -323,7 +323,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataPostgreSQLmdd.lib"
+				OutputFile="..\..\lib64\PocoDataPostgreSQLMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -383,7 +383,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataPostgreSQLmd.lib"
+				OutputFile="..\..\lib64\PocoDataPostgreSQLMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

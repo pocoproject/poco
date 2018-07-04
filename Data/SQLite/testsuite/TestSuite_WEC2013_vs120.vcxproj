@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\SQLiteTest.cpp"/>
     <ClCompile Include="src\SQLiteTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

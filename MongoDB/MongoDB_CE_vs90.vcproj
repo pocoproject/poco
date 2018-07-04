@@ -55,7 +55,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoMongoDBd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -134,7 +134,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/FORCE:MULTIPLE"
-				AdditionalDependencies=""
+				AdditionalDependencies="Iphlpapi.lib"
 				OutputFile="..\bin\$(PlatformName)\PocoMongoDB.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib\$(PlatformName)"
@@ -196,7 +196,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoMongoDBmtd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoMongoDBMTd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -211,7 +211,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoMongoDBmtd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoMongoDBMTd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -276,7 +276,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoMongoDBmt.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoMongoDBMT.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -325,7 +325,7 @@
 				BufferSecurityCheck="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoMongoDBmdd.pdb"
+				ProgramDataBaseFileName="..\lib\$(PlatformName)\PocoMongoDBMDd.pdb"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -340,7 +340,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoMongoDBmdd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoMongoDBMDd.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool
@@ -405,7 +405,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\$(PlatformName)\PocoMongoDBmd.lib"/>
+				OutputFile="..\lib\$(PlatformName)\PocoMongoDBMD.lib"/>
 			<Tool
 				Name="VCALinkTool"/>
 			<Tool

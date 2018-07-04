@@ -2,58 +2,58 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Cipher">
-      <UniqueIdentifier>{0707f04b-926c-40e9-bb29-7c375b19f825}</UniqueIdentifier>
+      <UniqueIdentifier>{1f3b32fe-06b3-42f1-b862-2f7e93bb2008}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cipher\Header Files">
-      <UniqueIdentifier>{cabd421d-fb63-4995-bfad-1431a4c74a10}</UniqueIdentifier>
+      <UniqueIdentifier>{c21e7b9d-6bec-4ff2-b11d-787062233953}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cipher\Source Files">
-      <UniqueIdentifier>{69b0240e-fa49-4236-9ba1-9531cd8f4a90}</UniqueIdentifier>
+      <UniqueIdentifier>{a9732f8a-5898-451f-903e-12e990d1f818}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA">
-      <UniqueIdentifier>{0fd96c3b-6595-4969-8d49-397e0c7229f7}</UniqueIdentifier>
+      <UniqueIdentifier>{1c604635-a4fd-4e6b-b8d8-44e770d76bd5}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA\Header Files">
-      <UniqueIdentifier>{e4235854-697b-4de0-8f88-f1b87b820cc4}</UniqueIdentifier>
+      <UniqueIdentifier>{bd6a84db-f15d-4019-a010-6da5aed7424a}</UniqueIdentifier>
     </Filter>
     <Filter Include="RSA\Source Files">
-      <UniqueIdentifier>{663012ce-b771-4112-a74c-356594d52bce}</UniqueIdentifier>
+      <UniqueIdentifier>{399e3401-5d51-41af-af01-ef400ff552f5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate">
-      <UniqueIdentifier>{c58ffd91-543d-4086-8cd9-3fe51da9c2f8}</UniqueIdentifier>
+      <UniqueIdentifier>{8fa9be54-03d8-4bd3-b455-f363698c1d38}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate\Header Files">
-      <UniqueIdentifier>{b33cd251-ff70-43e4-b12d-a6d1966e4f6f}</UniqueIdentifier>
+      <UniqueIdentifier>{2cfecbac-4388-4460-9c3f-db096dcc6b32}</UniqueIdentifier>
     </Filter>
     <Filter Include="Certificate\Source Files">
-      <UniqueIdentifier>{9ec6eced-eab2-412b-8cbf-82235b8718f4}</UniqueIdentifier>
+      <UniqueIdentifier>{6ba56e2c-fb5e-4000-b8ee-e278559f3f7b}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore">
-      <UniqueIdentifier>{0570468f-f298-4bf4-a031-c10f06e52995}</UniqueIdentifier>
+      <UniqueIdentifier>{53f9adbc-ed7c-4e35-b070-18e0692e265f}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore\Header Files">
-      <UniqueIdentifier>{fca6f3f2-7afb-433c-afc7-a20690ff50f9}</UniqueIdentifier>
+      <UniqueIdentifier>{5f79920e-1c5f-4ef4-a48c-80a8a144afd9}</UniqueIdentifier>
     </Filter>
     <Filter Include="CryptoCore\Source Files">
-      <UniqueIdentifier>{a818f0fd-24f9-4ba2-bea5-1edb0a6b6d4e}</UniqueIdentifier>
+      <UniqueIdentifier>{20693de3-adec-4500-8ee7-d9f508694bb1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Digest">
-      <UniqueIdentifier>{7d9e0ed8-e804-4b3c-a810-06b8d4fe56ad}</UniqueIdentifier>
+      <UniqueIdentifier>{98132ebd-a31d-4afc-905d-2dcce210c785}</UniqueIdentifier>
     </Filter>
     <Filter Include="Digest\Header Files">
-      <UniqueIdentifier>{8c538cf5-06e5-449f-977e-41ef5d52538a}</UniqueIdentifier>
+      <UniqueIdentifier>{6307bd54-0fa6-4243-ac82-272aa9031345}</UniqueIdentifier>
     </Filter>
     <Filter Include="Digest\Source Files">
-      <UniqueIdentifier>{b599d6db-86a6-43af-a284-b53dda015875}</UniqueIdentifier>
+      <UniqueIdentifier>{4de69e4e-5058-499f-9982-a362d57efd80}</UniqueIdentifier>
     </Filter>
     <Filter Include="EC">
-      <UniqueIdentifier>{5ddfc64c-cf0c-45d0-a6d4-1f56ad3a95b0}</UniqueIdentifier>
+      <UniqueIdentifier>{fb31ca1b-58d1-40cb-9b7a-c29c26db82a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="EC\Header Files">
-      <UniqueIdentifier>{e49b21f4-33c9-457f-843f-ad0690264fb2}</UniqueIdentifier>
+      <UniqueIdentifier>{14778bdd-a8b8-428c-a3ef-a864e6552095}</UniqueIdentifier>
     </Filter>
     <Filter Include="EC\Source Files">
-      <UniqueIdentifier>{72fba5c6-c2da-4a64-b0d3-a0b43f44201c}</UniqueIdentifier>
+      <UniqueIdentifier>{346d4b58-03f7-483b-ad9a-8d0795e01c48}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

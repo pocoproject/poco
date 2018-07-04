@@ -189,7 +189,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataMySQLmtd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataMySQLMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -204,7 +204,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataMySQLmtd.lib"
+				OutputFile="..\..\lib64\PocoDataMySQLMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -264,7 +264,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataMySQLmt.lib"
+				OutputFile="..\..\lib64\PocoDataMySQLMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -308,7 +308,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\..\lib64\PocoDataMySQLmdd.pdb"
+				ProgramDataBaseFileName="..\..\lib64\PocoDataMySQLMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -323,7 +323,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataMySQLmdd.lib"
+				OutputFile="..\..\lib64\PocoDataMySQLMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -383,7 +383,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib64\PocoDataMySQLmd.lib"
+				OutputFile="..\..\lib64\PocoDataMySQLMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>

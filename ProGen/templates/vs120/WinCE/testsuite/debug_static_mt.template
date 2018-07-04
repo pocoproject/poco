@@ -52,7 +52,7 @@
 	/>
 	<Tool
 		Name="VCLinkerTool"
-		AdditionalDependencies=${configuration.linker.dependencies}"
+		AdditionalDependencies="${configuration.linker.dependencies}"
 		OutputFile="bin\$(PlatformName)\static_mt\${project.target}d.exe"
 		LinkIncremental="2"
 		AdditionalLibraryDirectories="${project.pocobase}\lib\$(PlatformName)"

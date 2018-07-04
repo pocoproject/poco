@@ -199,6 +199,46 @@ class SliceTasksPlugin extends RuleSource {
 	}
 }
 
+def getSelectedVisualStudioToolChain() {
+    String selector = System.properties["VS"]
+
+    if (selector == null) {
+        selector = "VS2017"
+    }
+
+    String installDir = null
+    String toolset = null;
+	String vsvers = null;
+    switch (selector) {
+        case "VS2008": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 9.0";vsvers="vs90";toolset = "v90";
+		break;
+        case "VS2010": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 10.0";vsvers="vs100";toolset = "v100";
+		break;
+		case "VS2012": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 11.0";vsvers="vs110";toolset = "v110";
+		break;
+		case "VS2013": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 12.0";vsvers="vs120";toolset = "v120";
+		break;
+    	case "VS2015": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio 14.0";vsvers="vs140";toolset = "v140";
+		break;
+    	case "VS2017": 
+			installDir = "file://C:/Program Files (x86)/Microsoft Visual Studio/2017/Community";vsvers="vs150";toolset = "v141";
+		break;
+        default:
+            throw new IllegalArgumentException()
+    }
+
+    return [
+        vsyear:		selector,
+		vsvers: 	vsvers,
+		toolset: 	toolset,
+        installDir: installDir,
+    ]
+}
 
 allprojects {
 	buildDir = new File('guild')	            // DO NOT REMOVE OR CHANGE to 'build' since 'build' is a Poco directory
@@ -229,13 +269,36 @@ subprojects {
 			release
 			debug
 		}
+    	toolChains {
+        	def vsToolChain = getSelectedVisualStudioToolChain()
+        	create(vsToolChain.vsyear, VisualCpp) {
+        	    installDir vsToolChain.installDir
+        	}
+    	}
 
-/*
-		toolChains {
-			visualCpp(VisualCpp) {
-				// Specify the installDir if Visual Studio cannot be located
-//				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community"
-//				installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
+/*		toolChains {
+			VS2008(VisualCpp) {
+				installDir = VS2008installDir
+			}
+			VS2010(VisualCpp) {
+				installDir = VS2010installDir
+			}
+			VS2012(VisualCpp) {
+				installDir = VS2012installDir
+			}
+			VS2013(VisualCpp) {
+				installDir = VS2013installDir
+			}
+			VS2015(VisualCpp) {
+				installDir = VS2015installDir
+			}
+			VS2017(VisualCpp) {
+				installDir "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community"
+				eachPlatform {
+					cppCompiler.withArguments { args ->
+						args << "-DFRENCH"
+					}
+				}
 			}
 
 			gcc(Gcc) {
@@ -243,8 +306,9 @@ subprojects {
 				// path "/usr/bin/gcc"
 			}
 			clang(Clang)
+
 		}
-*/
+*/		
 		platforms {
 			win32 {
 				operatingSystem "windows"
@@ -875,31 +939,33 @@ task zipDoc(type: Zip) {
 	dependsOn pocoDoc
 }
 
-def candle(VSYEAR, VERSION, target, os) {
-	return tasks.create("Candle-${VSYEAR}-${VERSION}-${target}", Exec) {
+def candle(vsyear, toolset, version, arch, os) {
+	return tasks.create("Candle-${vsyear}-${toolset}-${version}-${arch}", Exec) {
 		def Set<Task> pocos = project.getTasksByName('poco', true)
 		setDependsOn(pocos)
 		dependsOn ':pocoDoc'
 		workingDir "packaging/Windows/WiX"
+		String wixobj	= "Poco-$toolset-$arch-${version}.wixobj"
 
 		executable "${WiXHome}/bin/Candle.exe"
-		args "-arch", "${target}"
-		args "-dVSYEAR=${VSYEAR}"
-		args "-dVERSION=${VERSION}"
+		args "-arch", "${arch}"
+		args "-dVSYEAR=${vsyear}"
+		args "-dVERSION=${version}"
 		args "-dPOCO=${rootDir}"
-		args "-dPlatform=${target}"
+		args "-dPlatform=${arch}"
+		args "-dToolset=${toolset}"
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
-		args "-out", "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+		args "-out", "${vsyear}/${wixobj}"
 		args "Poco.wxs"
 		
-		def File index = new File("$rootDir/releases/poco-$VERSION-all-doc/index.html")
+		def File index = new File("$rootDir/releases/poco-$version-all-doc/index.html")
 		inputs.file(index)
 
 		inputs.files(pocos.inputs.files)
 		inputs.file(new File(workingDir, "Poco.wxs"))
 		inputs.files(project.getTasksByName('poco', true).outputs.files)
 		
-		def File output = new File(workingDir,"${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
+		def File output = new File(workingDir,"${vsyear}/${vsyear}-Poco-$version-${arch}.wixobj")
 		outputs.file(output)
 
 		onlyIf(new Spec<Exec>() {
@@ -909,21 +975,22 @@ def candle(VSYEAR, VERSION, target, os) {
 		});
 	}
 }
-def light(VSYEAR, VERSION, target, os) {
-	return tasks.create("Light-${VSYEAR}-${VERSION}-${target}", Exec) {
-		dependsOn candle(VSYEAR, VERSION, target, os)
+def light(vsyear, toolset, version, arch, os) {
+	return tasks.create("Light-${vsyear}-${toolset}-${version}-${arch}", Exec) {
+		dependsOn candle(vsyear, toolset, version, arch, os)
 		workingDir "packaging/Windows/WiX"
-
+		String msi 		= "Poco-$toolset-$arch-${version}.msi"
+		String wixobj	= "Poco-$toolset-$arch-${version}.wixobj"
+		
 		executable "${WiXHome}/bin/Light.exe"
 		args "-cultures:null"
 		args "-ext", "${WiXHome}/bin/WixUIExtension.dll"
-		args "-out"
-		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi"
-		args "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj"
+		args "-out", "${vsyear}/${msi}"
+		args "${vsyear}/${wixobj}"
 
-		def File input = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.wixobj")
+		def File input = new File(workingDir, "${vsyear}/${wixobj}")
 		inputs.file(input)
-		def File output = new File(workingDir, "${VSYEAR}/${VSYEAR}-Poco-$VERSION-${target}.msi")
+		def File output = new File(workingDir, "${vsyear}/${msi}")
 		outputs.file(output)
 
 		onlyIf(new Spec<Exec>() {
@@ -934,8 +1001,10 @@ def light(VSYEAR, VERSION, target, os) {
 	}
 }
 task wix() {
-	dependsOn 		light('VS2017', version, 'x86', os)
-	dependsOn 		light('VS2017', version, 'x64', os)
+	String vsyear  = getSelectedVisualStudioToolChain().vsyear
+	String toolset = getSelectedVisualStudioToolChain().toolset
+	dependsOn 		light(vsyear, toolset, version, 'x86', os)
+	dependsOn 		light(vsyear, toolset, version, 'x64', os)
 	onlyIf(new Spec<Task>() {
 		boolean isSatisfiedBy(Task task) {
 			   return os.windows;
@@ -943,7 +1012,7 @@ task wix() {
 	});
 }
 
-ext.commonNuspecMetadata = [
+ext.commoNuspecMetadata = [
 	version:     	"1.9.1",
 	owners:			'Guenter Obiltschnig & Aleksandar Fabijanic',
 	authors:        'Applied Informatics & Contributors',
@@ -953,111 +1022,80 @@ ext.commonNuspecMetadata = [
 	copyright: 		'Applied Informatics copyright 2018',
 	requireLicenseAcceptance: false,
 	description:	'Modern, powerful open source C++ class libraries for building network- and internet-based applications that run on desktop, server, mobile and embedded systems.',
-	tags:			'natif string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml',
+	tags:			'native string filesystem thread date log event regex uri uuid cache native nativepackage sockets mime http ftp mail pop3 smtp html sax sax2 dom xml',
 	copyright:		'Copyright 2018',
 	releaseNotes:	'releaseNotes'
 ]
-task 'nugetSpec-x86'(type: NuGetSpec) {
-	nuspec = [
-		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.vs150.x86",
-			title:          "Pocoproject Poco vs150 $version x86",
-			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x86", version: "1.1.0") } ]
-		],
-		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x86.targets", 				target: "build\\native") },
-			{ file(src: "$rootDir\\bin\\Poco*.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\bin\\Poco*d.*", 				target: "build\\native\\bin", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib\\Poco*d.*",				target: "build\\native\\lib", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\CppUnit\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Encodings\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\JSON\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\MongoDB\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Net\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\PDF\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Util\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\XML\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Zip\\include\\**",			target: "build\\native\\inc") }			
-		]
-	]
-	outputs.file(nuspecFile)
-}
-task 'nugetSpec-x64'(type: NuGetSpec) {
-	nuspec = [
-		metadata: commonNuspecMetadata + [
-			id:          	"Pocoproject.Poco.vs150.x64",
-			title:          "Pocoproject Poco vs150 $version x64",
-			dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.x64", version: "1.1.0") } ]
-		],
-		files: [
-			{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.vs150.x64.targets", 				target: "build\\native") },
-			{ file(src: "$rootDir\\bin64\\Poco*64.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib64\\Poco*.*",				target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\bin64\\Poco*64d.*",			target: "build\\native\\bin64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\lib64\\Poco*d.*",			target: "build\\native\\lib64", 	exclude: "$rootDir\\bin\\*CppParser*.*") },
-			{ file(src: "$rootDir\\CppUnit\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Crypto\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\MySQL\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\ODBC\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Data\\SQLite\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Encodings\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Foundation\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\JSON\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\MongoDB\\include\\**",		target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Net\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\NetSSL_Win\\include\\**",	target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\PDF\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Util\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\XML\\include\\**",			target: "build\\native\\inc") },
-			{ file(src: "$rootDir\\Zip\\include\\**",			target: "build\\native\\inc") }			
-		]
-	]
-	outputs.file(nuspecFile)
-}
-
-task 'nugetPack-x86'(type: NuGetPack) {
-	def Set<Task> pocos = project.getTasksByName('poco', true)
-	setDependsOn(pocos)
-	destinationDir "$rootDir/packaging/Windows/Nuget"
-	dependsOn 'nugetSpec-x86'
-	nuspecFile = project.tasks.findByPath('nugetSpec-x86').nuspecFile
-	onlyIf(new Spec<Exec>() {
-		boolean isSatisfiedBy(Exec task) {
-			   return os.windows;
+def nugetCopyTarget(arch) {
+	return tasks.create("nugetCopyTarget-${arch}", Copy) {
+		String toolset = getSelectedVisualStudioToolChain().toolset
+		from file("$rootDir/packaging/Windows/NuGet/Pocoproject.Poco.${arch}.targets")
+		rename { String filename ->
+			int insert = filename.indexOf(arch)
+			return filename[0..insert - 1] + toolset + "." + filename.substring(insert)
 		}
-	});
+		into file("$rootDir/packaging/Windows/NuGet")
+	}
 }
-task 'nugetPack-x64'(type: NuGetPack) {
-	def Set<Task> pocos = project.getTasksByName('poco', true)
-	setDependsOn(pocos)
-	destinationDir "$rootDir/packaging/Windows/Nuget"
-	dependsOn 'nugetSpec-x64'
-	nuspecFile = project.tasks.findByPath('nugetSpec-x64').nuspecFile
-	onlyIf(new Spec<Exec>() {
-		boolean isSatisfiedBy(Exec task) {
-			   return os.windows;
+def pocoNugetSpec(arch) {
+	return tasks.create("pocoNugetSpec-${arch}", NuGetSpec) {
+		dependsOn nugetCopyTarget(arch)
+		String toolset = getSelectedVisualStudioToolChain().toolset
+		String bin = "bin"
+		String lib = "lib"
+		String suffix = ""
+		if (arch == 'x64') {
+			bin += "64";lib += "64";suffix = "64";
 		}
-	});
+		nuspec = [
+			metadata: commoNuspecMetadata + [
+				id:          	"Pocoproject.Poco.${toolset}.${arch}",
+				title:          "Pocoproject Poco ${toolset} $version ${arch}",
+				dependencies: [ { dependency(id: "Pocoproject.OpenSSL.vs120.${arch}", version: "1.1.0") } ]
+			],
+			files: [
+				{ file(src: "$rootDir\\packaging\\Windows\\NuGet\\Pocoproject.Poco.${toolset}.${arch}.targets", 				target: "build\\native") },
+				{ file(src: "$rootDir\\${bin}\\Poco*${suffix}.*", 		target: "build\\native\\${bin}", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+				{ file(src: "$rootDir\\${lib}\\Poco*.*",				target: "build\\native\\${lib}", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+				{ file(src: "$rootDir\\${bin}\\Poco*${suffix}d.*", 		target: "build\\native\\${bin}", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+				{ file(src: "$rootDir\\${lib}\\Poco*d.*",				target: "build\\native\\${lib}", 		exclude: "$rootDir\\bin\\*CppParser*.*") },
+				{ file(src: "$rootDir\\CppUnit\\include\\**",			target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Foundation\\include\\**",		target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Encodings\\include\\**",			target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Crypto\\include\\**",			target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Data\\include\\**",				target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Data\\MySQL\\include\\**",		target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Data\\ODBC\\include\\**",		target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Data\\SQLite\\include\\**",		target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Data\\PostgreSQL\\include\\**",	target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\JSON\\include\\**",				target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\MongoDB\\include\\**",			target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Net\\include\\**",				target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\NetSSL_OpenSSL\\include\\**",	target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\NetSSL_Win\\include\\**",		target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\PDF\\include\\**",				target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Util\\include\\**",				target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\XML\\include\\**",				target: "build\\native\\inc") },
+				{ file(src: "$rootDir\\Zip\\include\\**",				target: "build\\native\\inc") }			
+			]
+		]
+		outputs.file(nuspecFile)
+	}
 }
-
+def pocoNugetPack(arch) {
+	return tasks.create("pocoNugetPack-${arch}", NuGetPack) {
+		def Set<Task> pocos = project.getTasksByName('poco', true)
+		setDependsOn(pocos)
+		destinationDir "$rootDir/packaging/Windows/Nuget"
+		dependsOn pocoNugetSpec(arch)
+		nuspecFile = project.tasks.findByPath("pocoNugetSpec-$arch").nuspecFile
+	}
+}
 
 task packaging() {
 	if (os.windows) {
-		dependsOn 'nugetPack-x86'
-		dependsOn 'nugetPack-x64'
+		dependsOn pocoNugetPack('x86')
+		dependsOn pocoNugetPack('x64')
 		dependsOn wix
 	}
 }

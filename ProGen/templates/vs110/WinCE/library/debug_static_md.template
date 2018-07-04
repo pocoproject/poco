@@ -26,7 +26,7 @@
 		BufferSecurityCheck="true"
 		RuntimeTypeInfo="true"
 		UsePrecompiledHeader="0"
-		ProgramDataBaseFileName="${project.pocobase}\lib\$(PlatformName)\${project.target}mdd.pdb"
+		ProgramDataBaseFileName="${project.pocobase}\lib\$(PlatformName)\${project.target}MDd.pdb"
 		WarningLevel="3"
 		DebugInformationFormat="3"
 		CompileAs="0"
@@ -46,7 +46,7 @@
 	/>
 	<Tool
 		Name="VCLibrarianTool"
-		OutputFile="${project.pocobase}\lib\$(PlatformName)\${project.target}mdd.lib"
+		OutputFile="${project.pocobase}\lib\$(PlatformName)\${project.target}MDd.lib"
 	/>
 	<Tool
 		Name="VCALinkTool"

@@ -93,6 +93,7 @@
     <ClCompile Include="src\DialogServer.cpp"/>
     <ClCompile Include="src\DialogSocketTest.cpp"/>
     <ClCompile Include="src\DNSTest.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\EchoServer.cpp"/>
     <ClCompile Include="src\FTPClientSessionTest.cpp"/>
     <ClCompile Include="src\FTPClientTestSuite.cpp"/>
@@ -152,7 +153,6 @@
     <ClCompile Include="src\UDPServerTestSuite.cpp"/>
     <ClCompile Include="src\WebSocketTest.cpp"/>
     <ClCompile Include="src\WebSocketTestSuite.cpp"/>
-    <ClCompile Include="src\WinCEDriver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

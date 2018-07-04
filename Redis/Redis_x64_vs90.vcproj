@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoRedismtd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoRedisMTd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoRedismtd.lib"
+				OutputFile="..\lib64\PocoRedisMTd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoRedismt.lib"
+				OutputFile="..\lib64\PocoRedisMT.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoRedismdd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoRedisMDd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoRedismdd.lib"
+				OutputFile="..\lib64\PocoRedisMDd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoRedismd.lib"
+				OutputFile="..\lib64\PocoRedisMD.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -433,7 +433,7 @@
 			<File
 				RelativePath=".\include\Poco\Redis\Redis.h"/>
 			<File
-				RelativePath=".\include\Poco\Redis\RedisEventArgs.cpp"/>
+				RelativePath=".\include\Poco\Redis\RedisEventArgs.h"/>
 			<File
 				RelativePath=".\include\Poco\Redis\RedisStream.h"/>
 			<File
