@@ -184,32 +184,49 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK)))
 			return rv;
 
-		// The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
-		// Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
-#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
-		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+#ifndef POCO_ENABLE_CPP11
+		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
 			&rec,
 			r->connection->local_ip,
 			r->connection->local_addr->port,
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+// It checks Apache Server version for using the proper version of the API.
 			r->connection->remote_ip,
 			r->connection->remote_addr->port));
+#else
+			r->connection->client_ip,
+			r->connection->client_addr->port));
+#endif // AP_SERVER_MAJORVERSION_NUMBER && AP_SERVER_MINORVERSION_NUMBER
+
+		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 #else
 		std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
 			&rec,
 			r->connection->local_ip,
 			r->connection->local_addr->port,
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+// It checks Apache Server version for using the proper version of the API.
+			r->connection->remote_ip,
+			r->connection->remote_addr->port));
+#else
 			r->connection->client_ip,
 			r->connection->client_addr->port));
-#endif
+#endif // AP_SERVER_MAJORVERSION_NUMBER && AP_SERVER_MINORVERSION_NUMBER
 
 		std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+#endif // POCO_ENABLE_CPP11
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
 		
 		try
 		{
+
+#ifndef POCO_ENABLE_CPP11
+			std::auto_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+#else
 			std::unique_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+#endif // POCO_ENABLE_CPP11
 
 			if (pHandler.get())
 			{				
