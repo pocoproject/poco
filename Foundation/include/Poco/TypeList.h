@@ -32,7 +32,7 @@ namespace Poco {
 template <class Head, class Tail> 
 struct TypeList;
 
-	
+
 struct NullTypeList
 {
 	enum
@@ -86,8 +86,8 @@ struct TypeList
 	{
 		if (this != &tl)
 		{
-			TypeList tmp(tl);
-			swap(tmp);
+			head = tl.head;
+			tail = tl.tail;
 		}
 		return *this;
 	}
@@ -109,12 +109,6 @@ struct TypeList
 		else if (head == tl.head)
 			return tail < tl.tail;
 		return false;
-	}
-
-	void swap(TypeList& tl)
-	{
-		std::swap(head, tl.head);
-		std::swap(tail, tl.tail);
 	}
 	
 	HeadType head;
