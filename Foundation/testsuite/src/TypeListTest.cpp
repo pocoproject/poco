@@ -76,8 +76,8 @@ void TypeListTest::testTypeList()
 		Int32,
 		UInt32,
 		float>::HeadType Type15;
-
-	Tuple<TypeGetter<0, Type15>::HeadType,
+const int i = 0;
+	Tuple<TypeGetter<i, Type15>::HeadType,
 		TypeGetter<1, Type15>::HeadType,
 		TypeGetter<2, Type15>::HeadType,
 		TypeGetter<3, Type15>::HeadType,
