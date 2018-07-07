@@ -33,7 +33,7 @@ namespace Dynamic {
 
 class Var;
 class VarHolder;
-template <class> class VarHolderImpl;
+template <class, class Enable = void> class VarHolderImpl;
 
 }
 
