@@ -63,7 +63,7 @@ public:
 		///
 		/// Passive mode will be used for data transfers.
 
-	explicit FTPClientSession(const StreamSocket& socket, bool bReadWelcomeMessage = true);
+	explicit FTPClientSession(const StreamSocket& socket, bool readWelcomeMessage = true);
 		/// Creates an FTPClientSession using the given
 		/// connected socket for the control connection.
 		///
@@ -359,7 +359,7 @@ private:
 	bool	   _isLoggedIn = false;
 	Poco::Timespan _timeout = DEFAULT_TIMEOUT;
 	std::string _welcomeMessage;
-	Poco::FastMutex _fmWelcomeMessage;	
+	Poco::FastMutex _wmMutex;	
 };
 
 
@@ -414,7 +414,7 @@ inline bool FTPClientSession::isSecure() const
 
 inline const std::string& FTPClientSession::welcomeMessage()
 {
-	Poco::FastMutex::ScopedLock lock(_fmWelcomeMessage);
+	Poco::FastMutex::ScopedLock lock(_wmMutex);
 	return _welcomeMessage;
 }
 

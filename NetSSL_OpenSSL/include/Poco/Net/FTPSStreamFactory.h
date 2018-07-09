@@ -22,7 +22,7 @@
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/URIStreamFactory.h"
 #include "Poco/Net/FTPStreamFactory.h"
-
+#include "Poco/Net/FTPPasswordProvider.h"
 
 namespace Poco {
 namespace Net {

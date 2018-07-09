@@ -21,27 +21,11 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/URIStreamFactory.h"
+#include "Poco/Net/FTPPasswordProvider.h"
 
 
 namespace Poco {
 namespace Net {
-
-
-class Net_API FTPPasswordProvider
-	/// The base class for all password providers.
-	/// An instance of a subclass of this class can be
-	/// registered with the FTPStreamFactory to
-	/// provide a password
-{
-public:
-	virtual std::string password(const std::string& username, const std::string& host) = 0;
-		/// Provide the password for the given user on the given host.
-
-protected:
-	FTPPasswordProvider();
-	virtual ~FTPPasswordProvider();
-};
-
 
 class Net_API FTPStreamFactory: public Poco::URIStreamFactory
 	/// An implementation of the URIStreamFactory interface

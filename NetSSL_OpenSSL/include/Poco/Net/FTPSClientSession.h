@@ -35,7 +35,7 @@ namespace Poco {
 			///
 			/// Passive mode will be used for data transfers.
 
-			explicit FTPSClientSession(const StreamSocket& socket, bool bReadWelcomeMessage = true, bool bTryUseFTPS = true);
+			explicit FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage = true, bool tryUseFTPS = true);
 			/// Creates an FTPSClientSession using the given
 			/// connected socket for the control connection.
 			///
@@ -67,7 +67,7 @@ namespace Poco {
 			/// Function that read server welcome message after connetion and set and make secure socket
 
 		private:
-			bool _bTryFTPS = true;
+			bool _tryFTPS = true;
 
 			void beforeCreateDataSocket();
 			///Send commands to check if we can encrypt data socket
@@ -75,7 +75,7 @@ namespace Poco {
 			void afterCreateControlSocket();
 			///Send commands to make SSL negotiating of control channel
 
-			bool _bSecureDataConnection = false;
+			bool _secureDataConnection = false;
 		};
 
 
