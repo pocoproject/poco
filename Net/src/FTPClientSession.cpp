@@ -42,7 +42,7 @@ FTPClientSession::FTPClientSession():
 }
 
 	
-FTPClientSession::FTPClientSession(const StreamSocket& socket):
+FTPClientSession::FTPClientSession(const StreamSocket& socket, bool readWelcomeMessage):
 	_pControlSocket(new DialogSocket(socket)),
 	_pDataStream(0),
 	_host(socket.address().host().toString()),
@@ -55,6 +55,14 @@ FTPClientSession::FTPClientSession(const StreamSocket& socket):
 	_timeout(DEFAULT_TIMEOUT)
 {
 	_pControlSocket->setReceiveTimeout(_timeout);
+	if (readWelcomeMessage) 
+	{
+		receiveServerReadyReply();
+	}
+	else 
+	{
+		_serverReady = true;
+	}	
 }
 
 
@@ -149,7 +157,11 @@ void  FTPClientSession::receiveServerReadyReply()
 	int status = _pControlSocket->receiveStatusMessage(response);
 	if (!isPositiveCompletion(status))
 		throw FTPException("Cannot receive status message", response, status);
-
+		
+	{
+		Poco::FastMutex::ScopedLock lock(_wmMutex);
+		_welcomeMessage = response;
+	}
 	_serverReady = true;
 }
 
