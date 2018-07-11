@@ -55,6 +55,7 @@ env:
     POCO_VERBOSE=1
 
 before_script:
+ - export PATH=/usr/lib/postgresql/9.4/bin:$PATH
  - echo ${test}
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
