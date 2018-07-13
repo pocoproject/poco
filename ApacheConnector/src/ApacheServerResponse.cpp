@@ -47,6 +47,9 @@ void ApacheServerResponse::initApacheOutputStream()
 
 	_pApacheRequest->setContentType(getContentType());
 
+	int statusCode = static_cast<std::underlying_type<Poco::Net::HTTPResponse::HTTPStatus>::type>(getStatus());
+	_pApacheRequest->setStatus(statusCode);
+
 	std::vector<HTTPCookie> cookies;
 	getCookies(cookies);
 	
