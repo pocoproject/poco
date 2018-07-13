@@ -11,6 +11,18 @@ JOBS=2
 
 case "$PLATFORM" in
   linux*)
+    case "$PLATFORM" in
+      linux32)
+        TOOLCHAIN=/home/jenkins/toolchains/gcc-6.3-i686
+        ;;
+      linux64)
+        TOOLCHAIN=/home/jenkins/toolchains/gcc-6.3-x86_64
+        ;;
+    esac
+    export LD_LIBRARY_PATH=$TOOLCHAIN/lib
+    if [[ -d $TOOLCHAIN/lib64 ]]; then
+      LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TOOLCHAIN/lib64
+    fi
     USE_CMAKE=true
     CONFIGURE_FLAGS="
       --cflags=-D_GLIBCXX_EXTERN_TEMPLATE=0
@@ -18,6 +30,7 @@ case "$PLATFORM" in
       --library-path=/opt/openssl/lib
     "
     CMAKE_FLAGS=(
+      -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN/Toolchain.cmake
       -DOPENSSL_ROOT_DIR=/opt/openssl
     )
     JOBS=$(getconf _NPROCESSORS_ONLN)

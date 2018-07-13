@@ -172,7 +172,7 @@
 
 // Uncomment to disable the use of bundled OpenSSL binaries
 // (Windows only)
-// #define POCO_EXTERNAL_OPENSSL
+#define POCO_EXTERNAL_OPENSSL
 
 
 // Define to prevent changing the suffix for shared libraries
