@@ -145,7 +145,7 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
 	else if (socketAddress.family() == UNIX_LOCAL)
-		newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
+		newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()), socketAddress.length());
 #endif
 }
 
@@ -160,7 +160,7 @@ SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t len
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
 	else if (length > 0 && length <= sizeof(struct sockaddr_un) && sockAddr->sa_family == AF_UNIX)
-		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr));
+		newLocal(reinterpret_cast<const sockaddr_un*>(sockAddr), length);
 #endif
 	else throw Poco::InvalidArgumentException("Invalid address length or family passed to SocketAddress()");
 }
@@ -198,7 +198,7 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 #endif
 #if defined(POCO_OS_FAMILY_UNIX)
 		else if (socketAddress.family() == UNIX_LOCAL)
-			newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
+			newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()), socketAddress.length());
 #endif
 	}
 	return *this;
@@ -359,7 +359,7 @@ void SocketAddress::init(const std::string& hostAndPort)
 	std::string::const_iterator end = hostAndPort.end();
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	if (*it == '/')
+	if (*it == '/' || *it == '\0')
 	{
 		newLocal(hostAndPort);
 		return;
@@ -453,15 +453,15 @@ void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumbe
 
 
 #if defined(POCO_OS_FAMILY_UNIX)
-void SocketAddress::newLocal(const sockaddr_un* sockAddr)
+void SocketAddress::newLocal(const sockaddr_un* sockAddr, poco_socklen_t length)
 {
-	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(sockAddr);
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(sockAddr, length);
 }
 
 
 void SocketAddress::newLocal(const std::string& path)
 {
-	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path.c_str(), path.size());
+	new (storage()) Poco::Net::Impl::LocalSocketAddressImpl(path);
 }
 #endif // POCO_OS_FAMILY_UNIX
 

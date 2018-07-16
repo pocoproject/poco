@@ -135,33 +135,27 @@ std::string IPv6SocketAddressImpl::toString() const
 //
 
 
-LocalSocketAddressImpl::LocalSocketAddressImpl(const struct sockaddr_un* addr)
+LocalSocketAddressImpl::LocalSocketAddressImpl(const struct sockaddr_un* addr, poco_socklen_t length)
 {
 	_pAddr = new sockaddr_un;
 	std::memcpy(_pAddr, addr, sizeof(struct sockaddr_un));
+	_addressLength = length ? length : sizeof(struct sockaddr_un);
 }
 
 
-LocalSocketAddressImpl::LocalSocketAddressImpl(const char* path)
+LocalSocketAddressImpl::LocalSocketAddressImpl(const std::string& path)
 {
-	poco_assert (std::strlen(path) < sizeof(_pAddr->sun_path));
+	poco_assert(path.length() < sizeof(_pAddr->sun_path) && !path.empty());
 
 	_pAddr = new sockaddr_un;
-	poco_set_sun_len(_pAddr, std::strlen(path) + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
+	std::memset(_pAddr, 0, sizeof(struct sockaddr_un));
+
 	_pAddr->sun_family = AF_UNIX;
-	std::strcpy(_pAddr->sun_path, path);
-}
+	std::memcpy(_pAddr->sun_path, path.data(), path.size());
 
-
-LocalSocketAddressImpl::LocalSocketAddressImpl(const char* path, std::size_t length)
-{
-	poco_assert (length < sizeof(_pAddr->sun_path));
-
-	_pAddr = new sockaddr_un;
-	poco_set_sun_len(_pAddr, length + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
-	_pAddr->sun_family = AF_UNIX;
-	std::memcpy(_pAddr->sun_path, path, length);
-	_pAddr->sun_path[length] = 0;
+	_addressLength = path.size() + offsetof(struct sockaddr_un, sun_path);
+	if (path[0] != 0) _addressLength++;
+	poco_set_sun_len(_pAddr, _addressLength);
 }
 
 
@@ -173,8 +167,9 @@ LocalSocketAddressImpl::~LocalSocketAddressImpl()
 
 std::string LocalSocketAddressImpl::toString() const
 {
-	std::string result(path());
-	return result;
+	std::size_t len = _addressLength - offsetof(struct sockaddr_un, sun_path);
+	if (path()[0] != 0) len--;
+	return std::string(path(), len);
 }
 
 
