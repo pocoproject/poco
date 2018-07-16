@@ -28,7 +28,7 @@ public:
 	void testSocketRelationals();
 	void testSocketAddress6();
 	void testSocketAddressUnixLocal();
-	void testSocketAddressUnixAbstract();
+	void testSocketAddressLinuxAbstract();
 
 	void setUp();
 	void tearDown();

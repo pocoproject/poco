@@ -195,9 +195,9 @@ void SocketAddressTest::testSocketAddressUnixLocal()
 }
 
 
-void SocketAddressTest::testSocketAddressUnixAbstract()
+void SocketAddressTest::testSocketAddressLinuxAbstract()
 {
-#ifdef POCO_OS_FAMILY_UNIX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	std::string path("sock1.pocoproject.org");
 	path.insert(0, 1, '\0');
 	SocketAddress sa1(SocketAddress::UNIX_LOCAL, path);
@@ -249,7 +249,7 @@ CppUnit::Test* SocketAddressTest::suite()
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketRelationals);
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddress6);
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddressUnixLocal);
-	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddressUnixAbstract);
+	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddressLinuxAbstract);
 
 	return pSuite;
 }
