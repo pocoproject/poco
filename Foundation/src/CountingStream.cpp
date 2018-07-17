@@ -94,19 +94,19 @@ void CountingStreamBuf::setCurrentLineNumber(int line)
 }
 
 
-void CountingStreamBuf::addChars(int charsToAdd)
+void CountingStreamBuf::addChars(std::streamsize charsToAdd)
 {
 	_chars += charsToAdd;
 }
 
 		
-void CountingStreamBuf::addLines(int linesToAdd)
+void CountingStreamBuf::addLines(std::streamsize linesToAdd)
 {
 	_lines += linesToAdd;
 }
 
 		
-void CountingStreamBuf::addPos(int posToAdd)
+void CountingStreamBuf::addPos(std::streamsize posToAdd)
 {
 	_pos += posToAdd;
 }
@@ -141,25 +141,25 @@ void CountingIOS::reset()
 }
 
 
-void CountingIOS::setCurrentLineNumber(int line)
+void CountingIOS::setCurrentLineNumber(std::streamsize line)
 {
 	_buf.setCurrentLineNumber(line);
 }
 
 
-void CountingIOS::addChars(int charsToAdd)
+void CountingIOS::addChars(std::streamsize charsToAdd)
 {
 	_buf.addChars(charsToAdd);
 }
 
 		
-void CountingIOS::addLines(int linesToAdd)
+void CountingIOS::addLines(std::streamsize linesToAdd)
 {
 	_buf.addLines(linesToAdd);
 }
 
 		
-void CountingIOS::addPos(int posToAdd)
+void CountingIOS::addPos(std::streamsize posToAdd)
 {
 	_buf.addPos(posToAdd);
 }
