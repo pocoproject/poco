@@ -89,6 +89,8 @@ class Foundation_API Base32Encoder: public Base32EncoderIOS, public std::ostream
 	/// writing data, to ensure proper
 	/// completion of the encoding operation.
 	///
+	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
+	///
 	/// Note: The characters are directly written
 	/// to the ostream's streambuf, thus bypassing
 	/// the ostream. The ostream's state is therefore
