@@ -161,7 +161,7 @@ void Parser::parse()
 		std::string m(exc.message());
 		std::string where(_currentPath);
 		where.append("(");
-		where.append(NumberFormatter::format(_istr.getCurrentLineNumber()));
+		where.append(NumberFormatter::format(static_cast<int>(_istr.getCurrentLineNumber())));
 		where.append(")");
 		throw SyntaxException(m, where);
 	}
