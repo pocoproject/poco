@@ -41,6 +41,7 @@ public:
 	void testSelect2();
 	void testSelect3();
 	void testEchoUnixLocal();
+	void testEchoLinuxAbstract();
 
 	void setUp();
 	void tearDown();

@@ -23,75 +23,76 @@
 
 
 namespace Poco {
-namespace Net {
+	namespace Net {
 
 
-class NetSSL_API FTPSClientSession :
-	public Poco::Net::FTPClientSession
-{
-public:
-	FTPSClientSession();
-	/// Creates an FTPSClientSession.
-	///
-	/// Passive mode will be used for data transfers.
+		class NetSSL_API FTPSClientSession :
+			public Poco::Net::FTPClientSession
+		{
+		public:
+			FTPSClientSession();
+			/// Creates an FTPSClientSession.
+			///
+			/// Passive mode will be used for data transfers.
 
-	explicit FTPSClientSession(const StreamSocket& socket);
-	/// Creates an FTPSClientSession using the given
-	/// connected socket for the control connection.
-	///
-	/// Passive mode will be used for data transfers.
+			explicit FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage = true, bool tryUseFTPS = true);
+			/// Creates an FTPSClientSession using the given
+			/// connected socket for the control connection.
+			///
+			/// Passive mode will be used for data transfers.
 
-	FTPSClientSession(const std::string& host,
-		Poco::UInt16 port = FTP_PORT,
-		const std::string& username = "",
-		const std::string& password = "");
-	/// Creates an FTPSClientSession using a socket connected
-	/// to the given host and port. If username is supplied,
-	/// login is attempted.
-	///
-	/// Passive mode will be used for data transfers.
+			FTPSClientSession(const std::string& host,
+				Poco::UInt16 port = FTP_PORT,
+				const std::string& username = "",
+				const std::string& password = "");
+			/// Creates an FTPSClientSession using a socket connected
+			/// to the given host and port. If username is supplied,
+			/// login is attempted.
+			///
+			/// Passive mode will be used for data transfers.
 
-	virtual ~FTPSClientSession();	
+			virtual ~FTPSClientSession();
 
-	void tryFTPSmode(bool bTryFTPS);
-		/// avoid or require TLS mode
+			void tryFTPSmode(bool bTryFTPS);
+			/// avoid or require TLS mode
 
-	bool isSecure() const;
-		/// Returns true if the session is FTPS.
+			bool isSecure() const;
+			/// Returns true if the session is FTPS.
 
-protected:
-	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
-		/// Create secure data connection
+		protected:
+			virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
+			/// Create secure data connection
 
-	virtual void receiveServerReadyReply();
-		/// Function that read server welcome message after connetion and set and make secure socket
+			virtual void receiveServerReadyReply();
+			/// Function that read server welcome message after connetion and set and make secure socket
 
-private:
-	bool _bTryFTPS = true;
+		private:
+			bool _tryFTPS = true;
 
-	void beforeCreateDataSocket();
-		///Send commands to check if we can encrypt data socket
+			void beforeCreateDataSocket();
+			///Send commands to check if we can encrypt data socket
 
-	void afterCreateControlSocket();
-		///Send commands to make SSL negotiating of control channel
+			void afterCreateControlSocket();
+			///Send commands to make SSL negotiating of control channel
 
-	bool _bSecureDataConnection = false;
-};
-
-
-//
-// inlines
-//
-
-inline bool FTPSClientSession::isSecure() const
-{
-	if (_pControlSocket != nullptr)
-		return _pControlSocket->secure();
-	return false;
-}
+			bool _secureDataConnection = false;
+		};
 
 
-}} // namespace Poco::Net
+		//
+		// inlines
+		//
+
+		inline bool FTPSClientSession::isSecure() const
+		{
+			if (_pControlSocket != nullptr)
+				return _pControlSocket->secure();
+			return false;
+		}
+
+
+	}
+} // namespace Poco::Net
 
 
 #endif // #define NetSSL_FTPSClientSession_INCLUDED

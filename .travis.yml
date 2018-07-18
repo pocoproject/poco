@@ -55,12 +55,13 @@ env:
     POCO_VERBOSE=1
 
 before_script:
+ - export PATH=/usr/lib/postgresql/9.4/bin:$PATH
  - echo ${test}
  - chmod 755 ./travis/Linux/runtests.sh
  - chmod 755 ./travis/OSX/runtests.sh
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql -u root -e 'create database pocotestdb;'; fi
  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mysql --version; fi
- - if [ "$TRAVIS_OS_NAME" == "linux" ]; then postgres --version; fi
+ # - if [ "$TRAVIS_OS_NAME" == "linux" ]; then postgres --version; fi
  - sqlite3 -version
 
 matrix:

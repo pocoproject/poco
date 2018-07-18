@@ -27,6 +27,7 @@ HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParam
 {
 	setTimeout(pParams->getTimeout());
 	this->socket().setReceiveTimeout(pParams->getTimeout());
+	this->socket().setSendTimeout(pParams->getTimeout());
 }
 
 

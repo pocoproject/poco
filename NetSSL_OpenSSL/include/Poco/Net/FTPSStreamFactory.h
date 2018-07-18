@@ -21,26 +21,11 @@
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/URIStreamFactory.h"
-
+#include "Poco/Net/FTPStreamFactory.h"
+#include "Poco/Net/FTPPasswordProvider.h"
 
 namespace Poco {
 namespace Net {
-
-
-class NetSSL_API FTPPasswordProvider
-	/// The base class for all password providers.
-	/// An instance of a subclass of this class can be
-	/// registered with the FTPSStreamFactory to
-	/// provide a password
-{
-public:
-	virtual std::string password(const std::string& username, const std::string& host) = 0;
-		/// Provide the password for the given user on the given host.
-
-protected:
-	FTPPasswordProvider();
-	virtual ~FTPPasswordProvider();
-};
 
 
 class NetSSL_API FTPSStreamFactory: public Poco::URIStreamFactory
