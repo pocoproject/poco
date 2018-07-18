@@ -62,6 +62,9 @@ public:
 		/// is used, or if it is not known whether a secure
 		/// connection is used.
 
+	void setStatus(int status);
+		/// Set specific HTTP status code for the request.
+
 private:
 	request_rec* _pRec;
 };

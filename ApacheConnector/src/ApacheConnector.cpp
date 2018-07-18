@@ -137,6 +137,12 @@ bool ApacheRequestRec::secure()
 }
 
 
+void ApacheRequestRec::setStatus(int status)
+{
+	_pRec->status = status;
+}
+
+
 void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 {
 	const apr_array_header_t* arr = apr_table_elts(_pRec->headers_in);
