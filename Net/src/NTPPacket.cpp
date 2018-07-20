@@ -16,10 +16,21 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/ByteOrder.h"
-
+#ifndef POCO_OS_FAMILY_WINDOWS
+#include <sys/time.h>
+#else
+#include <winsock2.h>
+#endif
 
 namespace Poco {
 namespace Net {
+
+#define JAN_1970        2208988800UL /* 1970 - 1900 in seconds */
+#define FRAC       4294967296.             /* 2^32 as a double */
+#define U2LFP(a)   (((unsigned long long) \
+                       ((a).tv_sec + JAN_1970) << 32) + \
+                       (unsigned long long) \
+                       ((a).tv_usec / 1e6 * FRAC))
 
 
 #if !defined(POCO_COMPILER_SUN)
@@ -65,8 +76,7 @@ NTPPacket::NTPPacket() :
 	_receiveTimestamp(0),
 	_transmitTimestamp(0)
 {
-	Poco::Timestamp ts;
-	_originateTimestamp = ts.utcTime() - 2874597888;
+	_originateTimestamp = NTPPacket::getNTPTime();
 }
 
 
@@ -153,5 +163,13 @@ Poco::Timestamp NTPPacket::convertTime(Poco::Int64 tm) const
 	return Poco::Timestamp::fromEpochTime(epoch);
 }
 
+inline Poco::UInt64 NTPPacket::getNTPTime(int secOffset)
+{
+	struct timeval unix_time;
+	Poco::Timestamp ts;
+	unix_time.tv_sec = ts.epochTime() + secOffset;
+	unix_time.tv_usec = ts.epochMicroseconds() % Poco::Timestamp::resolution();
+	return (U2LFP(unix_time));
+}
 
 } } // namespace Poco::Net
