@@ -15,19 +15,14 @@ namespace Net {
 
 static int ntp_reply(DatagramSocket& socket, SocketAddress& sender, NTPPacket& recv_pack, Poco::UInt64 iRecvTime)
 {
-	/* Assume that recv_time is in local endian ! */
-
 	//RFC 5905 - IETF	
 
-	if ((recv_pack.mode() != 3) || (recv_pack.version() > 4) || (recv_pack.version() < 1) || (recv_pack.stratum() >= 16)) {
-		//log_ntp_event("Invalid request: found error at the first byte");
-		//poco_log_error_safe("NTPServer: Invalid request: found error at the first byte mode[%?d] version[%?d] stratum[%?d]", recv_pack.mode(), recv_pack.version(), recv_pack.stratum());
+	if ((recv_pack.mode() != 3) || (recv_pack.version() > 4) || (recv_pack.version() < 1) || (recv_pack.stratum() >= 16)) 
 		return 1;
-	}
 
-	/* füllt LI VN Mode aus
+	/*
 	LI   = 0
-	VN   = Version Nummer aus dem Client
+	VN   = Version Nummer same as Client
 	Mode = 4
 	*/
 	NTPPacket send_pack;
@@ -37,7 +32,6 @@ static int ntp_reply(DatagramSocket& socket, SocketAddress& sender, NTPPacket& r
 
 	/* Stratum = 1 (primary reference)
 	Reference ID = 'LOCL"
-	(falscher) Bezug auf der lokalen Uhr.
 	*/
 	/* Stratum */
 	send_pack.setStratum(0x01);
@@ -98,19 +92,24 @@ NTPServer::~NTPServer()
 	stop();
 }
 
-void NTPServer::stop() {
+void NTPServer::stop() 
+{
 	if (_stop)
 		return;
 	_stop = true;
-	try {
+	try 
+	{
 		_socket.close();
 	}
-	catch (...) {
+	catch (...) 
+	{
 	}
-	try {
+	try 
+	{
 		_thread.join();
 	}
-	catch (...) {
+	catch (...) 
+	{
 	}
 }
 
