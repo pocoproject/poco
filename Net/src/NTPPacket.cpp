@@ -165,7 +165,7 @@ Poco::Timestamp NTPPacket::convertTime(Poco::Int64 tm) const
 	return Poco::Timestamp::fromEpochTime(epoch);
 }
 
-inline Poco::UInt64 NTPPacket::getNTPTime(int secOffset)
+Poco::UInt64 NTPPacket::getNTPTime(int secOffset)
 {
 	struct timeval unix_time;
 	Poco::Timestamp ts;
