@@ -16,10 +16,12 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/ByteOrder.h"
-#ifndef POCO_OS_FAMILY_WINDOWS
-#include <sys/time.h>
-#else
+#if defined(POCO_OS_ANDROID)
+#include <time.h>
+#elif defined(POCO_OS_FAMILY_UNIX)
 #include <winsock2.h>
+#else
+#include <sys/time.h>
 #endif
 
 namespace Poco {
