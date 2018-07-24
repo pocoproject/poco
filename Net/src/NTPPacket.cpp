@@ -18,7 +18,7 @@
 #include "Poco/ByteOrder.h"
 #if defined(POCO_OS_ANDROID)
 #include <time.h>
-#elif defined(POCO_OS_FAMILY_UNIX)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include <winsock2.h>
 #else
 #include <sys/time.h>
