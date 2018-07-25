@@ -59,6 +59,11 @@ void ApacheServerResponse::initApacheOutputStream()
 		_pApacheRequest->addHeader("Set-Cookie", cookies[c].toString());
 	}
 
+	for (Poco::Net::NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
+	{
+		_pApacheRequest->addHeader(it->first, it->second);
+	}
+
 	_pStream = new ApacheOutputStream(_pApacheRequest);
 }
 
