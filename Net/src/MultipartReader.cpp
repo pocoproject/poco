@@ -105,6 +105,10 @@ int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		*buffer++ = (char) buf.sbumpc(); ++n;
 		ch = buf.sgetc();
 	}
+	if (ch == eof)
+	{
+		_lastPart = true;
+	}
 	return n;
 }
 

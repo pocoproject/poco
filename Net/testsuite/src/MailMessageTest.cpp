@@ -20,7 +20,9 @@
 #include "Poco/Timestamp.h"
 #include "Poco/FileStream.h"
 #include "Poco/String.h"
+#include "Poco/TemporaryFile.h"
 #include <sstream>
+#include <fstream>
 #include <vector>
 
 
@@ -36,6 +38,7 @@ using Poco::Timestamp;
 using Poco::FileInputStream;
 using Poco::replaceInPlace;
 using Poco::icompare;
+using Poco::TemporaryFile;
 
 
 namespace
@@ -540,6 +543,52 @@ void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 	assertTrue (handler.disp()[1] == "attachment; filename=sample.dat");
 }
 
+void MailMessageTest::testReadMultiPartNoFinalBoundaryFromFile()
+{
+	std::string data(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+	);
+
+	// The problem #2401 occurs during reading message from file.
+	// (For stringstreams it works fine.)
+	TemporaryFile file;
+	std::ofstream(file.path()) << data;
+	std::ifstream istr(file.path());
+
+	StringPartHandler handler;
+	MailMessage message;
+	message.read(istr, handler);
+
+	assertTrue (handler.data().size() == 2);
+	assertTrue (handler.data()[0] == "Hello World!\r\n");
+	assertTrue (handler.type()[0] == "text/plain");
+	assertTrue (handler.disp()[0] == "inline");
+
+	assertTrue (handler.data()[1] == "This is some binary data. Really.");
+	assertTrue (handler.type()[1] == "application/octet-stream; name=sample");
+	assertTrue (handler.disp()[1] == "attachment; filename=sample.dat");
+}
+
 
 void MailMessageTest::testReadWriteMultiPart()
 {
@@ -839,6 +888,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithAttachmentNames);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartNoFinalBoundaryFromFile);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);

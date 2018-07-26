@@ -113,7 +113,10 @@ void MessageHeader::read(std::istream& istr, RecipientList* pRecipients)
 		++fields;
 
 	}
-	istr.putback(static_cast<char>(ch));
+	if (istr.good() && ch != eof)
+	{
+		istr.putback(static_cast<char>(ch));
+	}
 }
 
 
