@@ -191,7 +191,7 @@ public:
 		return keys;
 	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		std::string str;
 		Var(*this).convert<std::string>(str);
