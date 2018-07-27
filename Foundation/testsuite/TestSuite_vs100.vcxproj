@@ -330,6 +330,7 @@
     <ClCompile Include="src\NumberFormatterTest.cpp"/>
     <ClCompile Include="src\NumberParserTest.cpp"/>
     <ClCompile Include="src\ObjectPoolTest.cpp"/>
+    <ClCompile Include="src\OrderedContainersTest.cpp"/>
     <ClCompile Include="src\RegularExpressionTest.cpp"/>
     <ClCompile Include="src\SharedPtrTest.cpp"/>
     <ClCompile Include="src\StringTest.cpp"/>
@@ -469,6 +470,7 @@
     <ClInclude Include="src\NumberFormatterTest.h"/>
     <ClInclude Include="src\NumberParserTest.h"/>
     <ClInclude Include="src\ObjectPoolTest.h"/>
+    <ClInclude Include="src\OrderedContainersTest.h"/>
     <ClInclude Include="src\RegularExpressionTest.h"/>
     <ClInclude Include="src\SharedPtrTest.h"/>
     <ClInclude Include="src\StringTest.h"/>

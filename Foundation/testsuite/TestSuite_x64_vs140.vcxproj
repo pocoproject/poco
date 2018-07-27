@@ -380,6 +380,7 @@
     <ClCompile Include="src\NumberFormatterTest.cpp"/>
     <ClCompile Include="src\NumberParserTest.cpp"/>
     <ClCompile Include="src\ObjectPoolTest.cpp"/>
+    <ClCompile Include="src\OrderedContainersTest.cpp"/>
     <ClCompile Include="src\PathTest.cpp"/>
     <ClCompile Include="src\PatternFormatterTest.cpp"/>
     <ClCompile Include="src\PBKDF2EngineTest.cpp"/>
@@ -518,6 +519,7 @@
     <ClInclude Include="src\NumberFormatterTest.h"/>
     <ClInclude Include="src\NumberParserTest.h"/>
     <ClInclude Include="src\ObjectPoolTest.h"/>
+    <ClInclude Include="src\OrderedContainersTest.h"/>
     <ClInclude Include="src\PathTest.h"/>
     <ClInclude Include="src\PatternFormatterTest.h"/>
     <ClInclude Include="src\PBKDF2EngineTest.h"/>
