@@ -18,6 +18,7 @@
 #include "Poco/CppUnit/TestCase.h"
 #include "Poco/OrderedMap.h"
 #include "Poco/OrderedSet.h"
+#include "ordered_map_util.h"
 #include <tuple>
 #include <deque>
 
