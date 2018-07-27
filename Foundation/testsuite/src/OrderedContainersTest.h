@@ -7,8 +7,8 @@
 //
 
 
-#ifndef ActiveDispatcherTest_INCLUDED
-#define ActiveDispatcherTest_INCLUDED
+#ifndef OrderedContainersTest_INCLUDED
+#define OrderedContainersTest_INCLUDED
 
 
 #include "Poco/Foundation.h"
@@ -332,4 +332,4 @@ private:
 #pragma warning(pop)
 #endif // POCO_COMPILER_MSVC
 
-#endif // ActiveDispatcherTest_INCLUDED
+#endif // OrderedContainersTest_INCLUDED
