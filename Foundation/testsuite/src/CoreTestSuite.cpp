@@ -36,6 +36,7 @@
 #include "TypeListTest.h"
 #include "ObjectPoolTest.h"
 #include "ListMapTest.h"
+#include "OrderedContainersTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -69,6 +70,9 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(TypeListTest::suite());
 	pSuite->addTest(ObjectPoolTest::suite());
 	pSuite->addTest(ListMapTest::suite());
+#ifdef POCO_ENABLE_CPP11
+	pSuite->addTest(OrderedContainersTest::suite());
+#endif
 
 	return pSuite;
 }

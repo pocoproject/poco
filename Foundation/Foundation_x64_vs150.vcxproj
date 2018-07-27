@@ -1100,6 +1100,8 @@
     <ClInclude Include="include\Poco\ObjectPool.h"/>
     <ClInclude Include="include\Poco\Observer.h"/>
     <ClInclude Include="include\Poco\Optional.h"/>
+    <ClInclude Include="include\Poco\OrderedMap.h"/>
+    <ClInclude Include="include\Poco\OrderedSet.h"/>
     <ClInclude Include="include\Poco\Path.h"/>
     <ClInclude Include="include\Poco\Path_UNIX.h"/>
     <ClInclude Include="include\Poco\Path_WIN32.h"/>

@@ -959,6 +959,8 @@
     <ClInclude Include="include\Poco\NumericString.h"/>
     <ClInclude Include="include\Poco\ObjectPool.h"/>
     <ClInclude Include="include\Poco\Optional.h"/>
+    <ClInclude Include="include\Poco\OrderedMap.h"/>
+    <ClInclude Include="include\Poco\OrderedSet.h"/>
     <ClInclude Include="include\Poco\Platform.h"/>
     <ClInclude Include="include\Poco\Platform_POSIX.h"/>
     <ClInclude Include="include\Poco\Platform_WIN32.h"/>
