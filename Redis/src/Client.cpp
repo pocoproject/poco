@@ -169,6 +169,12 @@ void Client::disconnect()
 }
 
 
+bool Client::isConnected() const
+{
+	return _input != 0;
+}
+
+
 void Client::writeCommand(const Array& command, bool doFlush)
 {
 	poco_assert(_output);
