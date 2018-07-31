@@ -41,7 +41,7 @@ using Poco::Net::SSLManager;
 using Poco::Thread;
 using Poco::Util::Application;
 
-static const int closeSleepTime = 2000;
+static const int closeSleepTime = 3000;
 
 namespace
 {
