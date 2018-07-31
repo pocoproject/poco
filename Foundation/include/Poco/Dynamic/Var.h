@@ -21,16 +21,20 @@
 #include "Poco/Foundation.h"
 #include "Poco/Format.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/OrderedMap.h"
+#include "Poco/OrderedSet.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Dynamic/VarIterator.h"
 #include <typeinfo>
+#include <map>
+#include <set>
 
 
 namespace Poco {
 namespace Dynamic {
 
 
-template <typename T>
+template <typename K, typename M, typename S>
 class Struct;
 
 
@@ -449,6 +453,10 @@ public:
 	bool isStruct() const;
 		/// Returns true if Var represents a struct.
 
+	bool isOrdered() const;
+		/// Returns true if Var represents an ordered struct,
+		/// false if struct is sorted.
+
 	char& at(std::size_t n);
 		/// Returns character at position n. This function only works with
 		/// Var containing a std::string.
@@ -595,7 +603,11 @@ private:
 			throw E(errorMessage);
 	}
 
-	Var& structIndexOperator(VarHolderImpl<Struct<int> >* pStr, int n) const;
+	template <typename T, typename N>
+	Var& structIndexOperator(T* pStr, N n) const
+	{
+		return pStr->operator[](n);
+	}
 
 #ifdef POCO_NO_SOO
 
@@ -819,6 +831,13 @@ inline bool Var::isStruct() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isStruct() : false;
+}
+
+
+inline bool Var::isOrdered() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isOrdered() : false;
 }
 
 
