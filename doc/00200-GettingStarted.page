@@ -181,7 +181,7 @@ libraries from VS_120 directory.
 MSYS2 is a unix-like terminal. To build OpenSSL from sources using MSYS2, download and install MSYS2 binaries
 from https://www.msys2.org.
 
-MSYS2 uses special paths for Windows drive letters, eg. '/mnt/e' instead of 'E:', '/mnt/c' instead of 'C', etc.
+MSYS2 uses special paths for Windows drive letters, eg. '/e' instead of 'E:', '/c' instead of 'C:', etc.
 
 Install 'build-essential' and git:
 
@@ -191,7 +191,7 @@ Set environment variable 'PATH':
 
     $ export PATH=$PATH:/%PATH_TO_COMPILER_BIN%
 
-Where %PATH_TO_COMPILER_BIN% type path to compiler directory with binaries, for example: '/mnt/e/compilers/mingw-w64-8.1.0-x64'.
+Where %PATH_TO_COMPILER_BIN% type path to compiler directory with binaries, for example: '/e/compilers/mingw-w64-8.1.0-x64'.
 
 Clone the official OpenSSL repository (https://github.com/openssl/openssl) - best to use stable branch, eg. 'OpenSSL_1_1_0-stable':
 
