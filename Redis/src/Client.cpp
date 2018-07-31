@@ -22,39 +22,39 @@ namespace Poco {
 namespace Redis {
 
 
-Client::Client(): 
-	_address(), 
-	_socket(), 
-	_input(0), 
+Client::Client():
+	_address(),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 }
 
 
 Client::Client(const std::string& hostAndPort):
-	_address(hostAndPort), 
-	_socket(), 
-	_input(0), 
+	_address(hostAndPort),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const std::string& host, int port): 
-	_address(host, port), 
-	_socket(), 
-	_input(0), 
+Client::Client(const std::string& host, int port):
+	_address(host, port),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const Net::SocketAddress& addrs): 
-	_address(addrs), 
-	_socket(), 
-	_input(0), 
+Client::Client(const Net::SocketAddress& addrs):
+	_address(addrs),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 	connect();
@@ -141,6 +141,12 @@ void Client::disconnect()
 	_output = 0;
 
 	_socket.close();
+}
+
+
+bool Client::isConnected() const
+{
+	return _input != 0;
 }
 
 
