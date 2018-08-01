@@ -286,6 +286,9 @@ Object::operator const Poco::DynamicStruct& () const
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+
+
 Object::operator const Poco::OrderedDynamicStruct& () const
 {
 	if (!_values.size())
@@ -340,6 +343,9 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 
 	return *_pOrdStruct;
 }
+
+
+#endif // POCO_ENABLE_CPP11
 
 
 void Object::clear()
