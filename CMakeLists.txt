@@ -143,7 +143,7 @@ if(APRUTIL_FOUND AND APACHE_FOUND)
   message(STATUS "Found Apache and APR. Enable Apache connector")
   option(POCO_ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 else()
-  message(STATUS "Apache and APR not found. Enable Apache connector")
+  message(STATUS "Apache and APR not found. Disable Apache connector")
   option(POCO_ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
 endif()
 
