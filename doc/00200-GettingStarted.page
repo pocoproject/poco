@@ -203,10 +203,11 @@ Enter the OpenSSL directory:
 
 Configure OpenSSL:
 
-    $ ./configure mingw enable-capieng --prefix=%INSTALL_PATH%
+    $ ./configure mingw shared enable-capieng --prefix=%INSTALL_PATH%
 
 Where %INSTALL_PATH% type full installation path, there will be put binaries, libraries, docs and etc.
 For x64 library version, use 'mingw64' instead of 'mingw'.
+For static library version, use 'no-shared' instead of 'shared'.
 
 Build:
 
