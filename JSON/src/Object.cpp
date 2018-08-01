@@ -220,52 +220,51 @@ Object& Object::set(const std::string& key, const Dynamic::Var& value)
 
 Poco::DynamicStruct Object::makeStruct(const Object::Ptr& obj)
 {
-	Poco::DynamicStruct ds;
-
-	ConstIterator it  = obj->begin();
-	ConstIterator end = obj->end();
-	for (; it != end; ++it)
-	{
-		if (obj->isObject(it))
-		{
-			Object::Ptr pObj = obj->getObject(it->first);
-			DynamicStruct str = makeStruct(pObj);
-			ds.insert(it->first, str);
-		}
-		else if (obj->isArray(it))
-		{
-			Array::Ptr pArr = obj->getArray(it->first);
-			std::vector<Poco::Dynamic::Var> v = Poco::JSON::Array::makeArray(pArr);
-			ds.insert(it->first, v);
-		}
-		else
-			ds.insert(it->first, it->second);
-	}
-
-	return ds;
+	return makeStructImpl<Poco::DynamicStruct>(obj);
 }
 
 
+#ifdef POCO_ENABLE_CPP11
+
+
+Poco::OrderedDynamicStruct Object::makeOrderedStruct(const Object::Ptr& obj)
+{
+	return makeStructImpl<Poco::OrderedDynamicStruct>(obj);
+}
+
+/*
+void Object::resetOrdDynStruct() const
+{
+	if (!_pOrdStruct)
+		_pOrdStruct = new Poco::OrderedDynamicStruct;
+	else
+		_pOrdStruct->clear();
+}
+*/
+
+#endif // POCO_ENABLE_CPP11
+
+/*
 void Object::resetDynStruct() const
 {
 	if (!_pStruct)
 		_pStruct = new Poco::DynamicStruct;
 	else
 		_pStruct->clear();
-}
+}*/
 
 
 Object::operator const Poco::DynamicStruct& () const
 {
 	if (!_values.size())
 	{
-		resetDynStruct();
+		resetDynStruct(_pStruct);
 	}
 	else if (_modified)
 	{
 		ValueMap::const_iterator it = _values.begin();
 		ValueMap::const_iterator end = _values.end();
-		resetDynStruct();
+		resetDynStruct(_pStruct);
 		for (; it != end; ++it)
 		{
 			if (isObject(it))
@@ -285,6 +284,68 @@ Object::operator const Poco::DynamicStruct& () const
 
 	return *_pStruct;
 }
+
+
+#ifdef POCO_ENABLE_CPP11
+
+
+Object::operator const Poco::OrderedDynamicStruct& () const
+{
+	if (!_values.size())
+	{
+		resetDynStruct(_pOrdStruct);
+	}
+	else if (_modified)
+	{
+		if (_preserveInsOrder)
+		{
+			KeyList::const_iterator it = _keys.begin();
+			KeyList::const_iterator end = _keys.end();
+			resetDynStruct(_pOrdStruct);
+			for (; it != end; ++it)
+			{
+				if (isObject((*it)->first))
+				{
+					_pOrdStruct->insert((*it)->first, makeOrderedStruct(getObject((*it)->first)));
+				}
+				else if (isArray((*it)->first))
+				{
+					_pOrdStruct->insert((*it)->first, Poco::JSON::Array::makeArray(getArray((*it)->first)));
+				}
+				else
+				{
+					_pOrdStruct->insert((*it)->first, (*it)->second);
+				}
+			}
+		}
+		else
+		{
+			ValueMap::const_iterator it = _values.begin();
+			ValueMap::const_iterator end = _values.end();
+			resetDynStruct(_pOrdStruct);
+			for (; it != end; ++it)
+			{
+				if (isObject(it))
+				{
+					_pOrdStruct->insert(it->first, makeOrderedStruct(getObject(it->first)));
+				}
+				else if (isArray(it))
+				{
+					_pOrdStruct->insert(it->first, Poco::JSON::Array::makeArray(getArray(it->first)));
+				}
+				else
+				{
+					_pOrdStruct->insert(it->first, it->second);
+				}
+			}
+		}
+	}
+
+	return *_pOrdStruct;
+}
+
+
+#endif // POCO_ENABLE_CPP11
 
 
 void Object::clear()

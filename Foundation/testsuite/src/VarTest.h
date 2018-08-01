@@ -55,11 +55,15 @@ public:
 	void testArrayIdxOperator();
 	void testDynamicPair();
 	void testDynamicStructBasics();
+	void testOrderedDynamicStructBasics();
 	void testDynamicStructString();
+	void testOrderedDynamicStructString();
 	void testDynamicStructInt();
+	void testOrderedDynamicStructInt();
 	void testArrayToString();
 	void testArrayToStringEscape();
 	void testStructToString();
+	void testOrderedStructToString();
 	void testStructToStringEscape();
 	void testArrayOfStructsToString();
 	void testStructWithArraysToString();
