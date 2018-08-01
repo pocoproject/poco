@@ -322,3 +322,14 @@ following copyrighted material, the use of which is hereby acknowledged.
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+----
+
+
+!!! Wrapper for function "wmain" for MinGW
+
+    http://www.coderforlife.com/projects/utilities/#MinGWUnicodeSupport
+
+    Copyright (c) 2012 Jeff Bush <jeff@coderforlife.com>
+
+    This document is released into the public domain. Absolutely no warranty is provided.
+    See http://www.coderforlife.com/projects/utilities.

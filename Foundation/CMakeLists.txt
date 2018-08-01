@@ -180,7 +180,7 @@ if (CMAKE_SYSTEM MATCHES "SunOS")
   target_link_libraries(Foundation PUBLIC pthread socket xnet nsl resolv rt ${CMAKE_DL_LIBS})
 endif()
 
-if (CMAKE_COMPILER_IS_MINGW)
+if (MINGW)
   target_compile_definitions(Foundation
 	  PUBLIC
 		WC_NO_BEST_FIT_CHARS=0x400
@@ -189,6 +189,7 @@ if (CMAKE_COMPILER_IS_MINGW)
 		WINVER=0x500
 		ODBCVER=0x0300
 		POCO_THREAD_STACK_SIZE
+		$<$<BOOL:BUILD_SHARED_LIBS>:_DLL>
 	)
 endif()
 
@@ -235,10 +236,6 @@ endif()
 
 if (NOT POCO_ENABLE_FPENVIRONMENT)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_FPENVIRONMENT)
-endif()
-
-if(BUILD_SHARED_LIBS AND MINGW)
-	target_compile_definitions(Foundation PUBLIC _DLL)
 endif()
 
 POCO_INSTALL(Foundation)
