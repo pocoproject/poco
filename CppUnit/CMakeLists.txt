@@ -28,10 +28,10 @@ if(NOT BUILD_SHARED_LIBS)
         PUBLIC
             POCO_STATIC
     )
-endif()
-
-if(BUILD_SHARED_LIBS AND MINGW)
-	target_compile_definitions(CppUnit PUBLIC _DLL)
+elseif(MINGW)
+	target_compile_definitions(CppUnit
+		PUBLIC
+			_DLL)
 endif()
 
 POCO_INSTALL(CppUnit)

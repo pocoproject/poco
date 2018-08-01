@@ -24,13 +24,14 @@ namespace Poco {
 
 void ThreadImpl::setPriorityImpl(int prio)
 {
+	HANDLE handle = reinterpret_cast<HANDLE>(_pData->thread->native_handle());
 	if (prio != _pData->prio)
 	{
 		_pData->prio = prio;
 		_pData->policy = 0;
 		if (_pData->started && !_pData->joined && _pData->thread)
 		{
-			if (SetThreadPriority(reinterpret_cast<HANDLE>(_pData->thread->native_handle()), _pData->prio) == 0)
+			if (SetThreadPriority(handle, _pData->prio) == 0)
 				throw SystemException("cannot set thread priority");
 		}
 	}
@@ -64,11 +65,12 @@ void ThreadImpl::setStackSizeImpl(int size)
 
 void ThreadImpl::setAffinityImpl(int cpu)
 {
+	HANDLE handle = reinterpret_cast<HANDLE>(_pData->thread->native_handle());
 	DWORD mask = 1;
 	mask <<= cpu;
 	if (_pData->started && !_pData->joined && _pData->thread)
 	{
-		if (SetThreadAffinityMask(reinterpret_cast<HANDLE>(_pData->thread->native_handle()), mask) == 0)
+		if (SetThreadAffinityMask(handle, mask) == 0)
 		{
 			throw SystemException("Failed to set affinity");
 		}
