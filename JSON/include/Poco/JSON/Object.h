@@ -220,6 +220,16 @@ public:
 	static Poco::DynamicStruct makeStruct(const Object::Ptr& obj);
 		/// Utility function for creation of struct.
 
+#ifdef POCO_ENABLE_CPP11
+
+	static Poco::OrderedDynamicStruct makeOrderedStruct(const Object::Ptr& obj);
+		/// Utility function for creation of ordered struct.
+
+	operator const Poco::OrderedDynamicStruct& () const;
+		/// Cast operator to Poco::OrderedDynamiStruct.
+
+#endif // POCO_ENABLE_CPP11
+
 	operator const Poco::DynamicStruct& () const;
 		/// Cast operator to Poco::DynamiStruct.
 
@@ -231,9 +241,20 @@ public:
 private:
 	typedef std::deque<ValueMap::const_iterator>  KeyList;
 	typedef Poco::DynamicStruct::Ptr              StructPtr;
+#ifdef POCO_ENABLE_CPP11
+	typedef Poco::OrderedDynamicStruct::Ptr       OrdStructPtr;
+#endif // POCO_ENABLE_CPP11
 
-	void resetDynStruct() const;
 	void syncKeys(const KeyList& keys);
+
+	template <typename T>
+	void resetDynStruct(T& pStruct) const
+	{
+		if (!pStruct)
+			pStruct = new typename T::Type;
+		else
+			pStruct->clear();
+	}
 
 	template <typename C>
 	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
@@ -268,6 +289,59 @@ private:
 		out << '}';
 	}
 
+	template <typename S>
+	static S makeStructImpl(const Object::Ptr& obj)
+	{
+		S ds;
+
+		if (obj->_preserveInsOrder)
+		{
+			KeyList::const_iterator it = obj->_keys.begin();
+			KeyList::const_iterator end = obj->_keys.end();
+			for (; it != end; ++it)
+			{
+				if (obj->isObject((*it)->first))
+				{
+					Object::Ptr pObj = obj->getObject((*it)->first);
+					S str = makeStructImpl<S>(pObj);
+					ds.insert((*it)->first, str);
+				}
+				else if (obj->isArray((*it)->first))
+				{
+					Array::Ptr pArr = obj->getArray((*it)->first);
+					std::vector<Poco::Dynamic::Var> v = Poco::JSON::Array::makeArray(pArr);
+					ds.insert((*it)->first, v);
+				}
+				else
+					ds.insert((*it)->first, (*it)->second);
+			}
+		}
+		else
+		{
+			ConstIterator it = obj->begin();
+			ConstIterator end = obj->end();
+			for (; it != end; ++it)
+			{
+				if (obj->isObject(it))
+				{
+					Object::Ptr pObj = obj->getObject(it->first);
+					S str = makeStructImpl<S>(pObj);
+					ds.insert(it->first, str);
+				}
+				else if (obj->isArray(it))
+				{
+					Array::Ptr pArr = obj->getArray(it->first);
+					std::vector<Poco::Dynamic::Var> v = Poco::JSON::Array::makeArray(pArr);
+					ds.insert(it->first, v);
+				}
+				else
+					ds.insert(it->first, it->second);
+			}
+		}
+
+		return ds;
+	}
+
 	const std::string& getKey(ValueMap::const_iterator& it) const;
 	const Dynamic::Var& getValue(ValueMap::const_iterator& it) const;
 	const std::string& getKey(KeyList::const_iterator& it) const;
@@ -281,8 +355,11 @@ private:
 	//  because Object can be returned stringified from Dynamic::Var::toString(),
 	//  so it must know whether to escape unicode or not.
 	bool              _escapeUnicode;
-	mutable StructPtr _pStruct;
-	mutable bool      _modified;
+	mutable StructPtr    _pStruct;
+#ifdef POCO_ENABLE_CPP11
+	mutable OrdStructPtr _pOrdStruct;
+#endif // POCO_ENABLE_CPP11
+	mutable bool         _modified;
 };
 
 

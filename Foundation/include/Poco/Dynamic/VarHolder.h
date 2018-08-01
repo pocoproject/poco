@@ -231,6 +231,10 @@ public:
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to support the diagnostic.
 
+	virtual bool isOrdered() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to support the diagnostic.
+
 	virtual bool isInteger() const;
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to support the diagnostic.
@@ -597,6 +601,13 @@ inline bool VarHolder::isStruct() const
 {
 	return false;
 }
+
+
+inline bool VarHolder::isOrdered() const
+{
+	return false;
+}
+
 
 inline bool VarHolder::isInteger() const
 {

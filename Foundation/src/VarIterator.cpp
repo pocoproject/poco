@@ -14,7 +14,7 @@
 
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/Dynamic/Struct.h"
+//#include "Poco/Dynamic/Struct.h"
 #undef min
 #undef max
 #include <limits>

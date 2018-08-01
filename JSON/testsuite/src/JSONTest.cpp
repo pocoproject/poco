@@ -1579,7 +1579,6 @@ void JSONTest::testStringifyPreserveOrder()
 	std::ostringstream ostr;
 
 	Stringifier::condense(result, ostr);
-	std::cout << ostr.str() << std::endl;
 	assertTrue (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
 						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
 						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
@@ -1666,7 +1665,12 @@ void JSONTest::testStringifyPreserveOrder()
 						"}");
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
+	assertTrue(ds.toString() == "{ \"Simpsons\" : { \"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" }, "
+		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+		"\"husband\" : { \"age\" : 38, \"name\" : \"Homer\" }, "
+		"\"wife\" : { \"age\" : 36, \"name\" : \"Marge\" } } }");
 	assertTrue (ds["Simpsons"].isStruct());
+	assertFalse(ds["Simpsons"].isOrdered());
 	assertTrue (ds["Simpsons"]["husband"].isStruct());
 	assertTrue (ds["Simpsons"]["husband"]["name"] == "Homer");
 	assertTrue (ds["Simpsons"]["husband"]["age"] == 38);
@@ -1684,6 +1688,17 @@ void JSONTest::testStringifyPreserveOrder()
 	assertTrue (ds["Simpsons"]["address"]["number"] == 742);
 	assertTrue (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
 	assertTrue (ds["Simpsons"]["address"]["town"] == "Springfield");
+
+#ifdef POCO_ENABLE_CPP11
+	Poco::OrderedDynamicStruct ods = *result.extract<Object::Ptr>();
+	assertTrue(ods["Simpsons"].isStruct());
+	assertTrue(ods["Simpsons"].isOrdered());
+	assertTrue(ods.toString() == "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\", \"age\" : 38 }, "
+		"\"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
+		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+		"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", "
+		"\"town\" : \"Springfield\" } } }");
+#endif // POCO_ENABLE_CPP11
 }
 
 

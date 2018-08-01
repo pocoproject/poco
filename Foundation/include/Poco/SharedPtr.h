@@ -28,7 +28,6 @@
 namespace Poco {
 
 
-//@ deprecated
 template <class C>
 class SharedPtr
 	/// As of POCO C++ Libraries Release 2.0, SharedPtr is a small wrapper around
@@ -36,12 +35,10 @@ class SharedPtr
 	/// implementation.
 	///
 	/// Note: ReleasePolicy is no longer supported.
-	///
-	/// SharedPtr will be removed in a future release. New code should use
-	/// std::shared_ptr and existing code should be changed to use std::shared_ptr
-	/// instead of Poco::SharedPtr.
 {
 public:
+	typedef C Type;
+
 	SharedPtr()
 	{
 	}
