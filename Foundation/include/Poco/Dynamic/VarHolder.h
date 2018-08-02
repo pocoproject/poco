@@ -537,6 +537,28 @@ inline void VarHolder::convert(Timestamp& /*val*/) const
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+
+
+inline void VarHolder::convert(long& val) const
+{
+	Int32 tmp;
+	convert(tmp);
+	val = tmp;
+}
+
+
+inline void VarHolder::convert(unsigned long& val) const
+{
+	UInt32 tmp;
+	convert(tmp);
+	val = tmp;
+}
+
+
+#endif
+
+
 inline void VarHolder::convert(bool& /*val*/) const
 {
 	throw BadCastException("Can not convert to bool");
