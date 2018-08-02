@@ -2807,9 +2807,14 @@ private:
 };
 
 
-template <>
-class VarHolderImpl<long,
-	typename std::enable_if<!std::is_same<long, Int64>::value && !std::is_same<long, Int32>::value>::type>: public VarHolder
+template <typename T>
+class VarHolderImpl<T,
+	typename std::enable_if<
+		 std::is_same<T, long       >::value &&
+		!std::is_same<T, Poco::Int64>::value &&
+		!std::is_same<T, Poco::Int32>::value
+	>::type
+>: public VarHolder
 {
 public:
 	VarHolderImpl(long val): _val(val)
@@ -2946,9 +2951,14 @@ private:
 };
 
 
-template <>
-class VarHolderImpl<unsigned long,
-	typename std::enable_if<!std::is_same<unsigned long, UInt64>::value && !std::is_same<unsigned long, UInt32>::value>::type>: public VarHolder
+template <typename T>
+class VarHolderImpl<T,
+	typename std::enable_if<
+		 std::is_same<T, unsigned long>::value &&
+		!std::is_same<T, Poco::UInt64 >::value &&
+		!std::is_same<T, Poco::UInt32 >::value
+		>::type
+>: public VarHolder
 {
 public:
 	VarHolderImpl(unsigned long val): _val(val)
