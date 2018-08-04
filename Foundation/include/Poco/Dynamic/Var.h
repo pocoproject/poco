@@ -220,7 +220,7 @@ public:
 		else
 			throw BadCastException(format("Can not convert %s to %s.",
 				std::string(pHolder->type().name()),
-				std::string(typeid(T).name())));
+				std::string(poco_typeid_name<T>())));
 	}
 
 	template <typename T>

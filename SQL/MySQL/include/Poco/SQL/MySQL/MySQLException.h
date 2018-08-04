@@ -19,6 +19,7 @@
 
 #include "Poco/SQL/MySQL/MySQL.h"
 #include "Poco/SQL/SQLException.h"
+#include "Poco/TypeId.h"
 #include <typeinfo>
 #include <string>
 
@@ -137,7 +138,7 @@ inline const char* MySQLException::name() const throw()
 
 inline const char* MySQLException::className() const throw()
 {
-	return typeid(*this).name();
+	return poco_typeid_name<decltype(*this)>();
 }
 
 inline Poco::Exception* MySQLException::clone() const

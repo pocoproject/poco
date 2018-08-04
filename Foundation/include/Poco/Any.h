@@ -532,7 +532,7 @@ ValueType AnyCast(Any& operand)
 			s.append(1, '(');
 			s.append(operand._pHolder->type().name());
 			s.append(" => ");
-			s.append(typeid(ValueType).name());
+			s.append(poco_typeid_name<ValueType>());
 			s.append(1, ')');
 		}
 		throw BadCastException(s);
@@ -572,7 +572,7 @@ const ValueType& RefAnyCast(const Any & operand)
 		s.append(1, '(');
 		s.append(operand._pHolder->type().name());
 		s.append(" => ");
-		s.append(typeid(ValueType).name());
+		s.append(poco_typeid_name<ValueType>());
 		s.append(1, ')');
 	}
 	return *result;
@@ -595,7 +595,7 @@ ValueType& RefAnyCast(Any& operand)
 			s.append(1, '(');
 			s.append(operand._pHolder->type().name());
 			s.append(" => ");
-			s.append(typeid(ValueType).name());
+			s.append(poco_typeid_name<ValueType>());
 			s.append(1, ')');
 		}
 		throw BadCastException(s);

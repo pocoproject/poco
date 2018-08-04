@@ -14,6 +14,7 @@
 
 #include "Poco/Exception.h"
 #include "Poco/NestedDiagnosticContext.h"
+#include "Poco/TypeId.h"
 #include <typeinfo>
 
 
@@ -95,7 +96,7 @@ const char* Exception::name() const throw()
 
 const char* Exception::className() const throw()
 {
-	return typeid(*this).name();
+	return poco_typeid_name<decltype(*this)>();
 }
 
 

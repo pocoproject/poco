@@ -29,6 +29,7 @@
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
+#include "Poco/TypeId.h"
 #include <ostream>
 #include <limits>
 
@@ -413,7 +414,7 @@ private:
 			throw NotFoundException(Poco::format("Column name: %s", name));
 		else
 			throw NotFoundException(Poco::format("Column type: %s, Container type: %s, name: %s",
-				std::string(typeid(T).name()), std::string(typeid(ExtractionVecPtr).name()), name));
+				std::string(poco_typeid_name<T>()), poco_typeid_name<ExtractionVecPtr>(), name));
 	}
 
 	template <class C, class E>
@@ -447,10 +448,10 @@ private:
 			throw Poco::BadCastException(Poco::format("RecordSet::columnImpl(%z) type cast failed!\nTarget type:\t%s"
 				"\nTarget container type:\t%s\nSource container type:\t%s\nSource abstraction type:\t%s",
 				pos,
-				std::string(typeid(T).name()),
-				std::string(typeid(ExtractionVecPtr).name()),
+				std::string(poco_typeid_name<T>()),
+				std::string(poco_typeid_name<ExtractionVecPtr>()),
 				rExtractions[pos]->type(),
-				std::string(typeid(rExtractions[pos].get()).name())));
+				std::string(poco_typeid_name<decltype(rExtractions[pos].get())>())));
 		}
 	}
 

@@ -11,6 +11,7 @@
 #include "Poco/CppUnit/Guards.h"
 #include "Poco/CppUnit/Test.h"
 #include "Poco/CppUnit/CppUnitException.h"
+#include "Poco/TypeId.h"
 #include <string>
 #include <typeinfo>
 
@@ -212,8 +213,8 @@ inline void TestCase::tearDown()
 // Returns the name of the test case instance
 inline std::string TestCase::toString()
 {
-	const std::type_info& thisClass = typeid(*this);
-	return std::string(thisClass.name()) + "." + name();
+	std::string className = poco_typeid_name<decltype(*this)>();
+	return className + "." + name();
 }
 
 

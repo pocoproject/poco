@@ -31,7 +31,7 @@ Notification::~Notification()
 
 std::string Notification::name() const
 {
-	return typeid(*this).name();
+	return poco_typeid_name<decltype(*this)>();
 }
 
 

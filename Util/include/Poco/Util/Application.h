@@ -28,6 +28,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/TypeId.h"
 #if defined(POCO_VXWORKS)
 #include <cstdarg>
 #endif
@@ -416,7 +417,7 @@ template <class C> C& Application::getSubsystem() const
 		const C* pC = dynamic_cast<const C*>(pSS);
 		if (pC) return *const_cast<C*>(pC);
 	}
-	throw Poco::NotFoundException("The subsystem has not been registered", typeid(C).name());
+	throw Poco::NotFoundException("The subsystem has not been registered", poco_typeid_name<C>());
 }
 
 inline Application::SubsystemVec& Application::subsystems()

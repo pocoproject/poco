@@ -24,6 +24,7 @@
 #include "Poco/SQL/ODBC/Error.h"
 #include "Poco/SQL/SQLException.h"
 #include "Poco/Format.h"
+#include "Poco/TypeId.h"
 
 
 namespace Poco {
@@ -100,7 +101,7 @@ public:
 	const char* className() const throw()
 		/// Returns the HandleException class name.
 	{
-		return typeid(*this).name();
+		return poco_typeid_name<decltype(*this)>();
 	}
 
 	Poco::Exception* clone() const

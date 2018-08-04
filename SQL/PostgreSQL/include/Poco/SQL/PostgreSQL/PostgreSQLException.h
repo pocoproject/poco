@@ -19,6 +19,7 @@
 
 #include "Poco/SQL/PostgreSQL/PostgreSQL.h"
 #include "Poco/SQL/SQLException.h"
+#include "Poco/TypeId.h"
 
 #include <typeinfo>
 #include <string>
@@ -118,7 +119,7 @@ inline const char* PostgreSQLException::name() const throw()
 
 inline const char* PostgreSQLException::className() const throw()
 {
-	return typeid(*this).name();
+	return poco_typeid_name<decltype(*this)>();
 }
 
 

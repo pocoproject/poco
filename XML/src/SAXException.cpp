@@ -104,7 +104,7 @@ const char* SAXParseException::name() const throw()
 
 const char* SAXParseException::className() const throw()
 {
-	return typeid(*this).name();
+	return poco_typeid_name<decltype(*this)>();
 }
 
 

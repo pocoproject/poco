@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/TypeId.h"
 #include <stdexcept>
 
 
@@ -202,7 +203,7 @@ inline int Exception::code() const
 	}																								\
 	const char* CLS::className() const throw()														\
 	{																								\
-		return typeid(*this).name();																\
+		return poco_typeid_name<decltype(*this)>();																\
 	}																								\
 	Poco::Exception* CLS::clone() const																\
 	{																								\

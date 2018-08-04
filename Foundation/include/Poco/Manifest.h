@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/MetaObject.h"
+#include "Poco/TypeId.h"
 #include <map>
 #include <typeinfo>
 
@@ -166,7 +167,7 @@ public:
 
 	const char* className() const
 	{
-		return typeid(*this).name();
+		return poco_typeid_name<decltype(*this)>();
 	}
 
 private:

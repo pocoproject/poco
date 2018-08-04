@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <math.h>
+#include "Poco/TypeId.h"
 #include "Poco/CppUnit/TestCase.h"
 #include "Poco/CppUnit/TestResult.h"
 #include "Poco/CppUnit/estring.h"
@@ -122,7 +123,7 @@ void TestCase::run(TestResult *result)
 	}
 	catch (std::exception& e)
 	{
-		std::string msg(typeid(e).name());
+		std::string msg(poco_typeid_name<decltype(e)>());
 		msg.append(": ");
 		msg.append(e.what());
 		result->addError(this, new CppUnitException(msg));

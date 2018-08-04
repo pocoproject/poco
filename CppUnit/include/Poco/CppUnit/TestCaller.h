@@ -64,8 +64,8 @@ public:
 	// Returns the name of the test case instance
 	virtual std::string toString()
 	{
-		const std::type_info& thisClass = typeid(*this);
-		return std::string(thisClass.name()) + "." + name();
+		std::string className = poco_typeid_name<decltype(*this)>();
+		return className + "." + name();
 	}
 
 
