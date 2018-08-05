@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Manifest.h"
+#include "Poco/TypeId.h"
 #include <typeinfo>
 
 
@@ -69,7 +70,7 @@ extern "C"	\
 	{																				\
 		typedef base _Base;															\
 		typedef Poco::Manifest<_Base> _Manifest;									\
-		std::string requiredType(typeid(_Manifest).name());							\
+		std::string requiredType(poco_typeid_name<_Manifest>());					\
 		std::string actualType(pManifest_->className());							\
 		if (requiredType == actualType)												\
 		{																			\

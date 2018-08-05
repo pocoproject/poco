@@ -174,10 +174,10 @@ inline int Exception::code() const
 	POCO_DECLARE_EXCEPTION_CODE(API, CLS, BASE, 0)
 
 #define POCO_IMPLEMENT_EXCEPTION(CLS, BASE, NAME)													\
-	CLS::CLS(int otherCode): BASE(otherCode)																	\
+	CLS::CLS(int otherCode): BASE(otherCode)														\
 	{																								\
 	}																								\
-	CLS::CLS(const std::string& msg, int otherCode): BASE(msg, otherCode)										\
+	CLS::CLS(const std::string& msg, int otherCode): BASE(msg, otherCode)							\
 	{																								\
 	}																								\
 	CLS::CLS(const std::string& msg, const std::string& arg, int otherCode): BASE(msg, arg, otherCode)		\
@@ -186,7 +186,7 @@ inline int Exception::code() const
 	CLS::CLS(const std::string& msg, const Poco::Exception& exc, int otherCode): BASE(msg, exc, otherCode)	\
 	{																								\
 	}																								\
-	CLS::CLS(const CLS& exc): BASE(exc)																\
+	CLS::CLS(const CLS& exc): BASE(exc)															\
 	{																								\
 	}																								\
 	CLS::~CLS() throw()																				\
@@ -203,7 +203,7 @@ inline int Exception::code() const
 	}																								\
 	const char* CLS::className() const throw()														\
 	{																								\
-		return poco_typeid_name<decltype(*this)>();																\
+		return poco_typeid_name<decltype(*this)>();													\
 	}																								\
 	Poco::Exception* CLS::clone() const																\
 	{																								\

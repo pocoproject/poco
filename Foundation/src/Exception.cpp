@@ -14,7 +14,6 @@
 
 #include "Poco/Exception.h"
 #include "Poco/NestedDiagnosticContext.h"
-#include "Poco/TypeId.h"
 #include <typeinfo>
 
 

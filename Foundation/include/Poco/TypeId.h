@@ -19,10 +19,13 @@
 
 
 #if defined(POCO_COMPILER_GCC) || defined(POCO_COMPILER_MINGW) || POCO_OS == POCO_OS_CYGWIN
+	#define POCO_HAS_CXXABI
+#endif // TODO: demangle other compilers
 
 
-#include <cxxabi.h>
-#include <string>
+#ifdef POCO_HAS_CXXABI
+	#include <cxxabi.h>
+#endif
 
 
 template <typename T>
@@ -32,6 +35,8 @@ const char* poco_typeid_name(bool full = true)
 	/// If full is false, the scope is trimmed off.
 {
 	std::string name(typeid(T).name());
+
+#ifdef POCO_HAS_CXXABI
 	int status = 0;
 #if (POCO_OS == POCO_OS_CYGWIN)
 	char* pName = __cxxabiv1::__cxa_demangle(typeid(T).name(), 0, 0, &status);
@@ -45,25 +50,10 @@ const char* poco_typeid_name(bool full = true)
 		std::size_t pos = name.rfind("::");
 		if (pos != std::string::npos) name = name.substr(pos+2);
 	}
+#endif
 
 	return name.c_str();
-} // TODO: demangle other compilers
-
-
-#else
-
-
-template <typename T>
-const char* poco_typeid_name(bool full)
-	/// Returns type name for the provided type.
-	/// Names are demangled for g++ only at this time.
-	/// If full is false, the scope is trimmed off.
-{
-	return typeid(c).name();
 }
-
-
-#endif
 
 
 #endif // Foundation_TypeId_INCLUDED
