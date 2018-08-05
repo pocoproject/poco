@@ -18,6 +18,10 @@
 #define Foundation_TypeId_INCLUDED
 
 
+#include <string>
+#include <typeinfo>
+
+
 #if defined(POCO_COMPILER_GCC) || defined(POCO_COMPILER_MINGW) || POCO_OS == POCO_OS_CYGWIN
 	#define POCO_HAS_CXXABI
 #endif // TODO: demangle other compilers
