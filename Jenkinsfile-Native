@@ -1,0 +1,119 @@
+import java.util.regex.*
+
+def agents = [
+  deb5_32bit:    [ label: 'nr-build32-deb5-1' ],
+  deb5_64bit:    [ label: 'nr-build64-deb5-1', ],
+  freebsd32:     [ label: 'freebsd32-11' ],
+  freebsd64:     [ label: 'freebsd-11' ],
+  macos:         [ label: 'macos' ],
+  win32:         [ label: 'aw-win-lab1' ],
+  win64:         [ label: 'aw-win-lab1' ],
+]
+
+def builds = [
+  'freebsd32': [ agent: agents.freebsd32 ],
+  'freebsd64': [ agent: agents.freebsd64 ],
+  'linux32':   [ agent: agents.deb5_32bit ],
+  'linux64':   [ agent: agents.deb5_64bit ],
+  'freebsd64': [ agent: agents.freebsd64 ],
+  // 'macosx':    [ agent: agents.macos ],
+  'win32':     [ agent: agents.win32, winPlatform:'x86' ],
+  'win64':     [ agent: agents.win64, winPlatform:'x64' ],
+]
+
+def doSh(unixScript, windowsScript) {
+  if (Boolean.valueOf(env.UNIX)) {
+    sh unixScript
+  } else {
+    bat windowsScript
+  }
+}
+
+def withAwsCredentials(id, Closure cl) {
+  withCredentials([[
+    $class: 'AmazonWebServicesCredentialsBinding',
+    credentialsId: id,
+    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+  ]], cl)
+}
+
+def createBuildStages(builds) {
+  builds.collectEntries { name, definition ->
+    [ "${name}": createBuildStage(name, definition) ]
+  }
+}
+
+def createBuildStage(name, definition) {
+  return {
+    stage(name) {
+      node(definition.agent.label) {
+        checkout scm
+        withEnv([
+          "PLATFORM=${definition.platform ?: name}",
+          "UNIX=${isUnix()}",
+        ]) {
+          if (definition.agent.toolchains) {
+            withAwsCredentials('ookla-native-toolchains') {
+              definition.agent.toolchains.each { toolchain, dest ->
+                sh "aws s3 cp s3://ookla-native-toolchains/${toolchain} - | tar xz -C ${dest}"
+              }
+            }
+          }
+          doSh('/sbin/ifconfig || true; hostname', '')
+
+          doSh(
+            'PATH=$PATH:/opt/cmake-3.11.4/bin exec ./jenkins.sh',
+            "call jenkins.cmd ${definition.winPlatform}"
+          )
+
+          def version = env.BRANCH_NAME
+          def m = Pattern.compile("${APPLICATION_NAME}-(\\d.\\d.\\d)").matcher(env.BRANCH_NAME)
+          if (m.matches()) {
+            version = m.getAt(0)[1]
+          }
+          m = null
+
+          // zip and publish results
+          withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'ookla-native-artifacts',
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+          ]]) {
+            ['Debug', 'Release'].each { buildType ->
+              doSh(
+                "rm -f cmake_install_${buildType}.zip",
+                "del /q cmake_install_${buildType}.zip"
+              )
+              zip zipFile:"cmake_install_${buildType}.zip", dir:"cmake_install_${buildType}"
+              s3Upload(
+                bucket:'ookla-native-artifacts',
+                path:"${APPLICATION_NAME}/${env.BRANCH_NAME}/${APPLICATION_NAME}-${version}-${PLATFORM}-${buildType}.zip",
+                file:"cmake_install_${buildType}.zip")
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+pipeline {
+  agent none
+  environment {
+    APPLICATION_NAME = "poco"
+    BUILD_TIMESTAMP = "${timeStamp}"
+  }
+  stages {
+    stage('Build All') {
+      steps {
+        script {
+          throttle(['fargate']) {
+            parallel createBuildStages(builds)
+          }
+        }
+      }
+    }
+  }
+}

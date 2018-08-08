@@ -1,5 +1,18 @@
-@echo off
+rem @echo off
 
+if "%1" == ""         goto x86
+if /i %1 == x86       goto x86
+if /i %1 == x64       goto x64
+goto usage
+
+:x86
+set platform=x86
+goto check_vs_install_dir
+:x64
+set platform=x64
+goto check_vs_install_dir
+
+:check_vs_install_dir
 if not "%VSINSTALLDIR%"=="" goto vs_install_dir_defined
 
 :define_vs_install_dir
@@ -32,22 +45,19 @@ if %VS_VERSION%==vs90 (
 if not defined VSINSTALLDIR (
   echo Error: No Visual C++ environment found.
   echo Please run this script from a Visual Studio Command Prompt
-  echo or run "%%VSnnCOMNTOOLS%%\vsvars32.bat" first.
+  echo or run "%%VSnnCOMNTOOLS%%\VC\vcvarsall.bat" first.
   exit /b 1
 )
 
 :vs_install_dir_defined
 
 if defined VCINSTALLDIR goto vs_vars_loaded
-call %VSINSTALLDIR%\VC\bin\vcvars32.bat
+call %VSINSTALLDIR%\VC\vcvarsall.bat %platform%
 
 :vs_vars_loaded
 
 rem Build Poco
 set POCO_BASE=%cd%
-
-echo Initializing Visual Studio environment
-call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\vcvars32.bat"
 
 echo Building poco Release
 
@@ -87,3 +97,12 @@ cmake .. ^
     -DCMAKE_INSTALL_PREFIX=%POCO_BASE%/cmake_install_Debug
 cmake --build . --config Release --target install
 cd ..
+
+goto :eof
+
+:usage
+echo Error in script usage. The correct usage is:
+echo     %0 [option]
+echo where [option] is: x86 ^| x64
+echo :
+goto :eof
