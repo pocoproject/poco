@@ -272,6 +272,11 @@ is actually written to a string stream (<[std::ostringstream]>).
 Sending of the HTTP response back to the client is deferred to
 when the page is complete.
 
+!cacheControl
+
+If set to a non-empty string (e.g., "no-cache, no-store"), adds a "Cache-Control"
+header to the response with the given argument as value.
+
 !session (OSP only)
 
 For use with the POCO Open Service Platform only.
