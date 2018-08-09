@@ -68,7 +68,7 @@ void SocketAddressTest::testSocketAddress()
 	}
 
 	SocketAddress sa4("pocoproject.org", 80);
-	assertTrue (sa4.host().toString() == "162.209.7.4");
+	assertTrue (sa4.host().toString() == "104.130.199.50");
 	assertTrue (sa4.port() == 80);
 
 	try
@@ -119,16 +119,16 @@ void SocketAddressTest::testSocketAddress()
 	}
 	
 	SocketAddress sa10("www6.pocoproject.org", 80);
-	assertTrue (sa10.host().toString() == "162.209.7.4" || sa10.host().toString() == "[2001:4801:7819:74:be76:4eff:fe10:6b73]");
+	assertTrue (sa10.host().toString() == "104.130.199.50" || sa10.host().toString() == "[2001:4801:7828:101:be76:4eff:fe10:1455]");
 	
 	SocketAddress sa11(SocketAddress::IPv4, "www6.pocoproject.org", 80);
-	assertTrue (sa11.host().toString() == "162.209.7.4");
+	assertTrue (sa11.host().toString() == "104.130.199.50");
 
 #ifdef POCO_HAVE_IPv6
 	try
 	{
 		SocketAddress sa12(SocketAddress::IPv6, "www6.pocoproject.org", 80);
-		assertTrue (sa12.host().toString() == "2001:4801:7819:74:be76:4eff:fe10:6b73");
+		assertTrue (sa12.host().toString() == "2001:4801:7828:101:be76:4eff:fe10:1455");
 	}
 	catch (AddressFamilyMismatchException&)
 	{
