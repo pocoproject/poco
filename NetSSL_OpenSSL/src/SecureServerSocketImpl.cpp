@@ -68,7 +68,12 @@ void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddres
 	reset(_impl.sockfd());
 }
 
-	
+void SecureServerSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	_impl.bind6(address, reuseAddress, ipV6Only);
+	reset(_impl.sockfd());
+}
+
 void SecureServerSocketImpl::listen(int backlog)
 {
 	_impl.listen(backlog);
