@@ -16,7 +16,7 @@ def builds = [
   'linux32':   [ agent: agents.deb5_32bit ],
   'linux64':   [ agent: agents.deb5_64bit ],
   'freebsd64': [ agent: agents.freebsd64 ],
-  // 'macosx':    [ agent: agents.macos ],
+  'macosx':    [ agent: agents.macos ],
   'win32':     [ agent: agents.win32, winPlatform:'x86' ],
   'win64':     [ agent: agents.win64, winPlatform:'x64' ],
 ]
@@ -60,8 +60,6 @@ def createBuildStage(name, definition) {
               }
             }
           }
-          doSh('/sbin/ifconfig || true; hostname', '')
-
           doSh(
             'PATH=$PATH:/opt/cmake-3.11.4/bin exec ./jenkins.sh',
             "call jenkins.cmd ${definition.winPlatform}"
