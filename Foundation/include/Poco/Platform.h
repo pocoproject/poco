@@ -234,13 +234,13 @@
 #endif
 
 
-#if defined(_MSC_VER)
-	#define POCO_COMPILER_MSVC
-#elif defined(__clang__)
+#if defined(__clang__)
 	#define POCO_COMPILER_CLANG
 	#if defined(__apple_build_version__)
 		#define POCO_COMPILER_APPLECLANG
 	#endif
+#elif defined(_MSC_VER)
+	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
 #elif defined (__MINGW32__) || defined (__MINGW64__)
