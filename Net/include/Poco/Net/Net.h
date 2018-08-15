@@ -92,13 +92,13 @@ void Net_API uninitializeNetwork();
 	#if !defined(__GNUC__)
 		extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
 		#if defined(Net_EXPORTS)
-			#if defined(_WIN64) || defined(_WIN32_WCE)
+			#if defined(_WIN64) || (defined(_WIN32_WCE) && !defined(x86))
 				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
 			#elif defined(_WIN32)
 				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
 			#endif
 		#else  // !Net_EXPORTS
-			#if defined(_WIN64) || defined(_WIN32_WCE)
+			#if defined(_WIN64) || (defined(_WIN32_WCE) && !defined(x86))
 				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
 			#elif defined(_WIN32)
 				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
