@@ -109,7 +109,7 @@ if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE
 	list(APPEND OPENSSL_ROOT_DIR ${INTERNAL_OPENSSL_LIBRARIES})
 endif(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 
-if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO)
+if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW))
     find_package(OpenSSL REQUIRED)
 else()
     find_package(OpenSSL QUIET)
@@ -143,7 +143,7 @@ if(APRUTIL_FOUND AND APACHE_FOUND)
   message(STATUS "Found Apache and APR. Enable Apache connector")
   option(POCO_ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 else()
-  message(STATUS "Apache and APR not found. Enable Apache connector")
+  message(STATUS "Apache and APR not found. Disable Apache connector")
   option(POCO_ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
 endif()
 

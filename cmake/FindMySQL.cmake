@@ -24,10 +24,11 @@ if (NOT MYSQL_INCLUDE_DIR)
 			/usr/local/mariadb/include
 			/usr/local/mariadb/include/mariadb
 			$ENV{MARIADB_INCLUDE_DIR}
-			$ENV{MARIADB_DIR}/include)
+			$ENV{MARIADB_DIR}/include
+			${MARIADB_DIR}/include/mariadb)
 endif (NOT MYSQL_INCLUDE_DIR)
 
-if (WIN32)
+if (MSVC)
 	if (CMAKE_BUILD_TYPE STREQUAL Debug)
 		set(libsuffixDist debug)
 		set(libsuffixBuild Debug)
@@ -36,7 +37,6 @@ if (WIN32)
 		set(libsuffixBuild Release)
 		add_definitions(-DDBUG_OFF)
 	endif (CMAKE_BUILD_TYPE STREQUAL Debug)
-
 	find_library(MYSQL_LIB NAMES mysqlclient.lib
 				 PATHS
 				 $ENV{MYSQL_DIR}/lib/${libsuffixDist}
@@ -49,7 +49,7 @@ if (WIN32)
 				 ${BINDIR32}/MySQL/*/lib/vs11
 				 ${BINDIR32}/MySQL/*/lib/vs10
 				 $ENV{SystemDrive}/MySQL/*/lib/${libsuffixDist})
-else (WIN32)
+else (MSVC)
 	find_library(MYSQL_LIB NAMES mysqlclient mysqlclient_r
 				 PATHS
 				 /usr/lib/mysql
@@ -73,9 +73,10 @@ else (WIN32)
 					/opt/mariadb/mariadb/lib/mariadb
 					$ENV{MARIADB_DIR}/libmariadb/.libs
 					$ENV{MARIADB_DIR}/lib
-					$ENV{MARIADB_DIR}/lib/mariadb)
+					$ENV{MARIADB_DIR}/lib/mariadb
+					${MARIADB_DIR}/lib)
 	endif (NOT MYSQL_LIB)
-endif (WIN32)
+endif (MSVC)
 
 if (MYSQL_INCLUDE_DIR AND MYSQL_LIB)
 	get_filename_component(MYSQL_LIB_DIR ${MYSQL_LIB} PATH)
