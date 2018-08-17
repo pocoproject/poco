@@ -12,8 +12,10 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		$ENV{MYSQL_DIR}/include
 		$ENV{ProgramFiles}/MySQL/*/include
 		${BINDIR32}/MySQL/include
-        ${BINDIR32}/MySQL/*/include
-        $ENV{SystemDrive}/MySQL/*/include)
+		${BINDIR32}/MySQL/*/include
+		$ENV{SystemDrive}/MySQL/*/include
+		${MYSQL_INCLUDE_DIR}
+		${MYSQL_DIR}/include)
 
 if (NOT MYSQL_INCLUDE_DIR)
 	find_path(MARIADB_INCLUDE_DIR mysql.h
@@ -25,7 +27,8 @@ if (NOT MYSQL_INCLUDE_DIR)
 			/usr/local/mariadb/include/mariadb
 			$ENV{MARIADB_INCLUDE_DIR}
 			$ENV{MARIADB_DIR}/include
-			${MARIADB_DIR}/include/mariadb)
+			${MARIADB_INCLUDE_DIR}
+			${MARIADB_DIR}/include)
 endif (NOT MYSQL_INCLUDE_DIR)
 
 if (MSVC)
@@ -60,7 +63,8 @@ else (MSVC)
 				 /opt/mysql/mysql/lib/mysql
 				 $ENV{MYSQL_DIR}/libmysql_r/.libs
 				 $ENV{MYSQL_DIR}/lib
-				 $ENV{MYSQL_DIR}/lib/mysql)
+				 $ENV{MYSQL_DIR}/lib/mysql
+				 ${MYSQL_DIR}/lib)
 
 	if (NOT MYSQL_LIB)
 		find_library(MARIADB_LIB NAMES mariadbclient
