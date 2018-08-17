@@ -120,8 +120,13 @@ enum RSAPaddingMode
 			#endif
 		#elif defined(POCO_EXTERNAL_OPENSSL)
 			#if POCO_EXTERNAL_OPENSSL == POCO_EXTERNAL_OPENSSL_SLPRO
-				#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
-				#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
+				#if defined(POCO_DLL)
+					#pragma comment(lib, "libeay32.lib")
+					#pragma comment(lib, "ssleay32.lib")
+			  	#else
+					#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
+					#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
+				#endif
 			#elif POCO_EXTERNAL_OPENSSL == POCO_EXTERNAL_OPENSSL_DEFAULT
 				#pragma comment(lib, "libeay32.lib")
 				#pragma comment(lib, "ssleay32.lib")
