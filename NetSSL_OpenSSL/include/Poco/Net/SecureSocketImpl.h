@@ -78,7 +78,7 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -86,6 +86,9 @@ public:
 		/// specific address.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 		
 	void listen(int backlog = 64);
