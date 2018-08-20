@@ -8,6 +8,8 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		/opt/mysql/mysql/include/mysql
 		/usr/local/mysql/include
 		/usr/local/mysql/include/mysql
+		$ENV{MINGW_PREFIX}/include
+		$ENV{MINGW_PREFIX}/include/mysql
 		$ENV{MYSQL_INCLUDE_DIR}
 		$ENV{MYSQL_DIR}/include
 		$ENV{ProgramFiles}/MySQL/*/include
@@ -15,7 +17,8 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		${BINDIR32}/MySQL/*/include
 		$ENV{SystemDrive}/MySQL/*/include
 		${MYSQL_INCLUDE_DIR}
-		${MYSQL_DIR}/include)
+		${MYSQL_DIR}/include
+		${MYSQL_DIR}/include/mysql)
 
 if (NOT MYSQL_INCLUDE_DIR)
 	find_path(MARIADB_INCLUDE_DIR mysql.h
@@ -25,10 +28,12 @@ if (NOT MYSQL_INCLUDE_DIR)
 			/opt/mariadb/mariadb/include/mariadb
 			/usr/local/mariadb/include
 			/usr/local/mariadb/include/mariadb
+			$ENV{MINGW_PREFIX}/include/mariadb
 			$ENV{MARIADB_INCLUDE_DIR}
 			$ENV{MARIADB_DIR}/include
 			${MARIADB_INCLUDE_DIR}
-			${MARIADB_DIR}/include)
+			${MARIADB_DIR}/include
+			${MARIADB_DIR}/include/mariadb)
 endif (NOT MYSQL_INCLUDE_DIR)
 
 if (MSVC)
@@ -61,6 +66,7 @@ else (MSVC)
 				 /usr/local/mysql/lib/mysql
 				 /opt/mysql/mysql/lib
 				 /opt/mysql/mysql/lib/mysql
+				 $ENV{MINGW_PREFIX}/lib
 				 $ENV{MYSQL_DIR}/libmysql_r/.libs
 				 $ENV{MYSQL_DIR}/lib
 				 $ENV{MYSQL_DIR}/lib/mysql
@@ -75,6 +81,7 @@ else (MSVC)
 					/usr/local/mariadb/lib/mariadb
 					/opt/mariadb/mariadb/lib
 					/opt/mariadb/mariadb/lib/mariadb
+					$ENV{MINGW_PREFIX}/lib
 					$ENV{MARIADB_DIR}/libmariadb/.libs
 					$ENV{MARIADB_DIR}/lib
 					$ENV{MARIADB_DIR}/lib/mariadb

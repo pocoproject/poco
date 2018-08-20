@@ -38,15 +38,17 @@ if (WIN32)
         endif()
       endforeach()
     endif (X64)
+    find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}" ${kit10_bindir}
+		DOC "path to message compiler")
+  elseif ("${CMAKE_GENERATOR}" MATCHES "MSYS")
+	find_program(CMAKE_MC_COMPILER windmc.exe HINTS "$ENV{MINGW_PREFIX}/bin"
+		DOC "path to message compiler")
   endif ()
-  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}" ${kit10_bindir}
-    DOC "path to message compiler")
-  if(NOT CMAKE_MC_COMPILER AND MSVC)
-    message(FATAL_ERROR "message compiler not found: required to build")
-  endif(NOT CMAKE_MC_COMPILER AND MSVC)
   if(CMAKE_MC_COMPILER)
     message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
     mark_as_advanced(CMAKE_MC_COMPILER)
+  else(CMAKE_MC_COMPILER)
+    message(FATAL_ERROR "message compiler not found: required to build")
   endif(CMAKE_MC_COMPILER)
 endif(WIN32)
 
@@ -185,7 +187,7 @@ endmacro()
 
 
 macro(POCO_MESSAGES out name)
-    if (WIN32 AND CMAKE_MC_COMPILER)
+    if (WIN32)
         foreach(msg ${ARGN})
             get_filename_component(msg_name ${msg} NAME)
             get_filename_component(msg_path ${msg} ABSOLUTE)
@@ -214,7 +216,7 @@ macro(POCO_MESSAGES out name)
         source_group("${name}\\Message Files" FILES ${ARGN})
         list(APPEND ${out} ${ARGN})
 
-    endif (WIN32 AND CMAKE_MC_COMPILER)
+    endif (WIN32)
 endmacro()
 
 #===============================================================================
