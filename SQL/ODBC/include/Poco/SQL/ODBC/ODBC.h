@@ -34,7 +34,7 @@
 // ODBC_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if defined(_MSC_VER) && defined(POCO_DLL)
 	#if defined(ODBC_EXPORTS)
 		#define ODBC_API __declspec(dllexport)
 	#else
