@@ -193,12 +193,12 @@ It is also possible to combine into and use expressions:
 Typically, tables will not be so trivial, i.e. they will have more than
 one column which allows for more than one into/use.
 
-Lets assume we have a Person table that contains an age, a first and a last name:
+Let's assume we have a Person table that contains an age, a first and a last name:
 
-    std::string firstName("Peter";
+    std::string firstName("Peter");
     std::string lastName("Junior");
     int age = 0;
-    ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
+    ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
 ----
 
@@ -215,10 +215,10 @@ first into clause.
 A common case with databases are optional data fields that can contain NULL.
 To accommodate for NULL, use the Poco::Nullable template:
 
-    std::string firstName("Peter";
+    std::string firstName("Peter");
     Poco::Nullable<std::string> lastName("Junior");
     Poco::Nullable<int> age = 0;
-    ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
+    ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
     // now you can check if age was null:
     if (!lastName.isNull()) { ... }
