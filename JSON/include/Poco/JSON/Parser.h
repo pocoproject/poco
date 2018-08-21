@@ -59,8 +59,8 @@ class JSON_API Parser: private ParserImpl
 	///    Parser parser;
 	///    Var result = parser.parse(json);
 	///    Object::Ptr object = result.extract<Object::Ptr>();
-	///    std::string name = object.getValue<std::string>("name");
-	///    Array::Ptr children = object.getArray("children");
+	///    std::string name = object->getValue<std::string>("name");
+	///    Array::Ptr children = object->getArray("children");
 	/// ----
 {
 public:
