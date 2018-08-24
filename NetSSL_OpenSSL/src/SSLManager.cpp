@@ -57,6 +57,7 @@ const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
+const std::string SSLManager::CFG_REQUIRE_TLSV1_3("requireTLSv1_3");
 const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
 const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
 const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
@@ -125,7 +126,7 @@ void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHa
 Context::Ptr SSLManager::defaultServerContext()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (!_ptrDefaultServerContext)
 		initDefaultContext(true);
 
@@ -150,7 +151,7 @@ Context::Ptr SSLManager::defaultClientContext()
 			_ptrDefaultClientContext->disableProtocols(Context::PROTO_SSLV2 | Context::PROTO_SSLV3);
 		}
 	}
-		
+
 	return _ptrDefaultClientContext;
 }
 
@@ -256,7 +257,7 @@ void SSLManager::initDefaultContext(bool server)
 	Context::Params params;
 	// mandatory options
 	params.privateKeyFile = config.getString(prefix + CFG_PRIV_KEY_FILE, "");
-	params.certificateFile = config.getString(prefix + CFG_CERTIFICATE_FILE, params.privateKeyFile);	
+	params.certificateFile = config.getString(prefix + CFG_CERTIFICATE_FILE, params.privateKeyFile);
 	params.caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
 
 	if (server && params.certificateFile.empty() && params.privateKeyFile.empty())
@@ -278,15 +279,18 @@ void SSLManager::initDefaultContext(bool server)
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
+	bool requireTLSv1_3 = config.getBool(prefix + CFG_REQUIRE_TLSV1_3, false);
 
 	params.dhParamsFile = config.getString(prefix + CFG_DH_PARAMS_FILE, "");
 	params.ecdhCurve    = config.getString(prefix + CFG_ECDH_CURVE, "");
 
 	Context::Usage usage;
-	
+
 	if (server)
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_SERVER_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_SERVER_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_SERVER_USE;
@@ -298,7 +302,9 @@ void SSLManager::initDefaultContext(bool server)
 	}
 	else
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_CLIENT_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_CLIENT_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_CLIENT_USE;
@@ -308,7 +314,7 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::CLIENT_USE;
 		_ptrDefaultClientContext = new Context(usage, params);
 	}
-	
+
 	std::string disabledProtocolsList = config.getString(prefix + CFG_DISABLE_PROTOCOLS, "");
 	Poco::StringTokenizer dpTok(disabledProtocolsList, ";,", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
 	int disabledProtocols = 0;
@@ -324,12 +330,14 @@ void SSLManager::initDefaultContext(bool server)
 			disabledProtocols |= Context::PROTO_TLSV1_1;
 		else if (*it == "tlsv1_2")
 			disabledProtocols |= Context::PROTO_TLSV1_2;
+		else if (*it == "tlsv1_3")
+			disabledProtocols |= Context::PROTO_TLSV1_3;
 	}
 	if (server)
 		_ptrDefaultServerContext->disableProtocols(disabledProtocols);
 	else
 		_ptrDefaultClientContext->disableProtocols(disabledProtocols);
-		
+
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)
 	{
@@ -378,7 +386,7 @@ void SSLManager::initPassphraseHandler(bool server)
 {
 	if (server && _ptrServerPassphraseHandler) return;
 	if (!server && _ptrClientPassphraseHandler) return;
-	
+
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 	Poco::Util::AbstractConfiguration& config = appConfig();
 
@@ -399,7 +407,7 @@ void SSLManager::initPassphraseHandler(bool server)
 	}
 	else throw Poco::Util::UnknownOptionException(std::string("No passphrase handler known with the name ") + className);
 }
-	
+
 
 void SSLManager::initCertificateHandler(bool server)
 {
