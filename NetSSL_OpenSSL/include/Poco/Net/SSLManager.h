@@ -93,7 +93,8 @@ class NetSSL_API SSLManager
 	///            <requireTLSv1>true|false</requireTLSv1>
 	///            <requireTLSv1_1>true|false</requireTLSv1_1>
 	///            <requireTLSv1_2>true|false</requireTLSv1_2>
-	///            <disableProtocols>sslv2,sslv3,tlsv1,tlsv1_1,tlsv1_2</disableProtocols>
+	///            <requireTLSv1_3>true|false</requireTLSv1_3>
+	///            <disableProtocols>sslv2,sslv3,tlsv1,tlsv1_1,tlsv1_2,tlsv1_3</disableProtocols>
 	///            <dhParamsFile>dh.pem</dhParamsFile>
 	///            <ecdhCurve>prime256v1</ecdhCurve>
 	///          </server|client>
@@ -143,14 +144,17 @@ class NetSSL_API SSLManager
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection.
+	///    - requireTLSv1_3 (boolean): Require a TLSv1.3 connection
 	///    - disableProtocols (string): A comma-separated list of protocols that should be
-	///      disabled. Valid protocol names are sslv2, sslv3, tlsv1, tlsv1_1, tlsv1_2.
+	///      disabled. Valid protocol names are sslv2, sslv3, tlsv1, tlsv1_1, tlsv1_2, tlsv1_3.
 	///    - dhParamsFile (string): Specifies a file containing Diffie-Hellman parameters.
 	///      If not specified or empty, the default parameters are used.
 	///    - ecdhCurve (string): Specifies the name of the curve to use for ECDH, based
 	///      on the curve names specified in RFC 4492. Defaults to "prime256v1".
 	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version
 	///      that this library is built against supports FIPS mode.
+	///
+	/// Please see the Context class documentation regarding TLSv1.3 support.
 {
 public:
 	typedef Poco::SharedPtr<PrivateKeyPassphraseHandler> PrivateKeyPassphraseHandlerPtr;
@@ -333,6 +337,7 @@ private:
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;
+	static const std::string CFG_REQUIRE_TLSV1_3;
 	static const std::string CFG_DISABLE_PROTOCOLS;
 	static const std::string CFG_DH_PARAMS_FILE;
 	static const std::string CFG_ECDH_CURVE;
