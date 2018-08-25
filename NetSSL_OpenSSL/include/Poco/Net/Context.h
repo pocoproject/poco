@@ -42,6 +42,23 @@ class NetSSL_API Context: public Poco::RefCountedObject
 	///
 	/// The Context class is also used to control
 	/// SSL session caching on the server and client side.
+	///
+	/// A Note Regarding TLSv1.3 Support:
+	///
+	/// TLSv1.3 support requires at least OpenSSL version 1.1.1.
+	/// In order to enable TLSv1.3 support, specify TLSV1_3_CLIENT_USE
+	/// or TLSV1_3_SERVER_USE and make sure that the TLSv1.3
+	/// cipher suites are enabled:
+	///
+	///   - TLS_AES_256_GCM_SHA384
+	///   - TLS_CHACHA20_POLY1305_SHA256
+	///   - TLS_AES_128_GCM_SHA256
+	///   - TLS_AES_128_CCM_8_SHA256
+	///   - TLS_AES_128_CCM_SHA256
+	///
+	/// The first three of the above cipher suites should be enabled
+	/// by default in OpenSSL if you do not provide an explicit
+	/// cipher configuration (cipherList).
 {
 public:
 	typedef Poco::AutoPtr<Context> Ptr;
@@ -55,7 +72,9 @@ public:
 		TLSV1_1_CLIENT_USE, /// Context is used by a client requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
 		TLSV1_1_SERVER_USE, /// Context is used by a server requiring TLSv1.1 (OpenSSL 1.0.0 or newer).
 		TLSV1_2_CLIENT_USE, /// Context is used by a client requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
-		TLSV1_2_SERVER_USE  /// Context is used by a server requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
+		TLSV1_2_SERVER_USE, /// Context is used by a server requiring TLSv1.2 (OpenSSL 1.0.1 or newer).
+		TLSV1_3_CLIENT_USE, /// Context is used by a client requiring TLSv1.3 (OpenSSL 1.1.1 or newer).
+		TLSV1_3_SERVER_USE  /// Context is used by a server requiring TLSv1.3 (OpenSSL 1.1.1 or newer).
 	};
 
 	enum VerificationMode
@@ -101,7 +120,8 @@ public:
 		PROTO_SSLV3   = 0x02,
 		PROTO_TLSV1   = 0x04,
 		PROTO_TLSV1_1 = 0x08,
-		PROTO_TLSV1_2 = 0x10
+		PROTO_TLSV1_2 = 0x10,
+		PROTO_TLSV1_3 = 0x20
 	};
 
 	struct NetSSL_API Params
