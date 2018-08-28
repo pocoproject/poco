@@ -1384,14 +1384,16 @@ NetworkInterface::Type fromNative(u_char nativeType)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
-	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
 	impl.setName(iface->ifa_name);
 	impl.setDisplayName(iface->ifa_name);
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
-	impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
-	impl.setType(fromNative(sdl->sdl_type));
+    if(iface->ifa_addr->sa_family == AF_LINK) {
+        struct sockaddr_dl *sdl = (struct sockaddr_dl *) iface->ifa_addr;
+        impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
+        impl.setType(fromNative(sdl->sdl_type));
+    }
 }
 
 
