@@ -389,4 +389,10 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 }
 
 
+bool Socket::poll(const Poco::Timespan& timeout, int mode) const
+{
+	return _pImpl->poll(timeout, mode);
+}
+
+
 } } // namespace Poco::Net

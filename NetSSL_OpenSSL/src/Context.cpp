@@ -198,9 +198,11 @@ void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 	
 void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certificate)
 {
-	int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, certificate.certificate());
+	X509* copy = certificate.dup();
+	int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, copy);
 	if (errCode != 1)
 	{
+		X509_free(copy);
 		std::string msg = Utility::getLastError();
 		throw SSLContextException("Cannot add chain certificate to Context", msg);
 	}
@@ -492,7 +494,7 @@ void Context::initDH(const std::string& dhParamsFile)
 			std::string msg = Utility::getLastError();
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if 0 && OPENSSL_VERSION_NUMBER >= 0x10100000L
 		BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 		BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 		DH_set0_pqg(dh, p, 0, g);

@@ -151,6 +151,11 @@ public:
 		/// Returns the number of bytes read, which may be
 		/// less than requested.
 
+	int flushBytes(int length);
+		/// Read and discard up to length bytes from the connection./
+		/// Equivalent to receiveRawBytes, except without overhead of copying
+		/// the data (in case you want to ignore it).
+                
 	void synch();
 		/// Sends a TELNET SYNCH signal over the connection.
 		///
@@ -194,7 +199,7 @@ protected:
 private:
 	enum
 	{
-		RECEIVE_BUFFER_SIZE = 1024,
+		RECEIVE_BUFFER_SIZE = 65535,
 		MAX_LINE_LENGTH     = 4096,
 		EOF_CHAR            = -1
 	};

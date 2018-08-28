@@ -68,5 +68,5 @@ SYSFLAGS = -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE -DPOCO_
 #
 # System Specific Libraries
 #
-SYSLIBS  = -lpthread -lssl -lcrypto -ldl -lrt
+SYSLIBS  = -lpthread -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -ldl -lrt
 

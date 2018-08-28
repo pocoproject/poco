@@ -8,9 +8,9 @@ include $(POCO_BASE)/build/rules/global
 
 # Note: linking order is important, do not change it.
 ifeq ($(POCO_CONFIG),FreeBSD)
-SYSLIBS += -lssl -lcrypto -lz
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz
 else
-SYSLIBS += -lssl -lcrypto -lz -ldl
+SYSLIBS += -l$(POCO_SSL_LIB) -l$(POCO_CRYPTO_LIB) -lz -ldl
 endif
 
 objects = HTTPSTimeServer

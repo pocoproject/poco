@@ -16,6 +16,7 @@
 #include "Poco/Net/TCPServerConnectionFactory.h"
 #include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/ErrorHandler.h"
 #include <memory>
 
 
@@ -102,24 +103,38 @@ void TCPServerDispatcher::run()
 
 	for (;;)
 	{
-		AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
-		if (pNf)
-		{
-			TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
-			if (pCNf)
+		try {
+			AutoPtr<Notification> pNf = _queue.waitDequeueNotification(idleTime);
+			if (pNf)
 			{
+				TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
+				if (pCNf)
+				{
 #ifndef POCO_ENABLE_CPP11
-				std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+					std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
 #else
-				std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+					std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
 #endif // POCO_ENABLE_CPP11
-				poco_check_ptr(pConnection.get());
-				beginConnection();
-				pConnection->start();
-				endConnection();
+					poco_check_ptr(pConnection.get());
+					beginConnection();
+					pConnection->start();
+					endConnection();
+				}
 			}
 		}
-	
+		catch (Poco::Exception &exc)
+		{
+			ErrorHandler::handle(exc);
+		}
+		catch (std::exception &exc)
+		{
+			ErrorHandler::handle(exc);
+		}
+		catch (...)
+		{
+			ErrorHandler::handle();
+		}
+
 		FastMutex::ScopedLock lock(_mutex);
 		if (_stopped || (_currentThreads > 1 && _queue.empty()))
 		{

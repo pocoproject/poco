@@ -28,9 +28,10 @@ rem
 rem VS_VERSION is required argument. Default is build all.
 
 rem Change OPENSSL_DIR to match your setup
-set OPENSSL_DIR=C:\OpenSSL
+set OPENSSL_DIR=C:\OpenSSL-Win32
 set OPENSSL_INCLUDE=%OPENSSL_DIR%\include
-set OPENSSL_LIB=%OPENSSL_DIR%\lib;%OPENSSL_DIR%\lib\VC
+set OPENSSL_LIB=%OPENSSL_DIR%\lib
+SET OPENSSL_SSL_LIBS=ssleay32.lib;libeay32.lib;crypt32.lib
 set INCLUDE=%INCLUDE%;%OPENSSL_INCLUDE%
 set LIB=%LIB%;%OPENSSL_LIB%
 
@@ -307,6 +308,8 @@ if %DEBUG_STATIC_MT%==1   (echo debug_static_mt)
 if %DEBUG_STATIC_MD%==1   (echo debug_static_md)
 if %RELEASE_STATIC_MT%==1 (echo release_static_mt)
 if %RELEASE_STATIC_MD%==1 (echo release_static_md)
+
+echo on
 
 rem build for up to 4 levels deep
 for /f %%G in ('findstr /R "." components') do (

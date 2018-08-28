@@ -229,7 +229,7 @@ int RSAKeyImpl::size() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if 0 && OPENSSL_VERSION_NUMBER >= 0x10100000L
 	const BIGNUM* n = 0;
 	const BIGNUM* e = 0;
 	const BIGNUM* d = 0;
@@ -243,7 +243,7 @@ RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if 0 && OPENSSL_VERSION_NUMBER >= 0x10100000L
 	const BIGNUM* n = 0;
 	const BIGNUM* e = 0;
 	const BIGNUM* d = 0;
@@ -257,7 +257,7 @@ RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 
 RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+#if 0 && OPENSSL_VERSION_NUMBER >= 0x10100000L
 	const BIGNUM* n = 0;
 	const BIGNUM* e = 0;
 	const BIGNUM* d = 0;

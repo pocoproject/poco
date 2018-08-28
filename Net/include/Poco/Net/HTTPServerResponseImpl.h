@@ -88,6 +88,24 @@ public:
 		/// Must not be called after send(), sendFile()  
 		/// or redirect() has been called.
 		
+	std::ostream& sendRaw();
+		/// Sends the response header to the client and
+		/// returns an output stream for sending the
+		/// response body.
+		///
+		/// The returned stream is valid until the response
+		/// object is destroyed.
+		///
+		/// Must not be called after sendFile(), sendBuffer()
+		/// or redirect() has been called.
+		///
+		/// Differs from send() in that the output stream created
+		/// is a HTTPHeaderOutputStream
+
+	int writeBytes(const char* buffer, std::streamsize length);
+		/// Writes data to the HTTP session from the provided
+		/// buffer.
+		
 	void redirect(const std::string& uri, HTTPStatus status = HTTP_FOUND);
 		/// Sets the status code, which must be one of
 		/// HTTP_MOVED_PERMANENTLY (301), HTTP_FOUND (302),
