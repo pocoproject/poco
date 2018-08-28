@@ -151,6 +151,11 @@ public:
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
 
+	X509* dup() const;
+		/// Duplicates and returns the underlying OpenSSL certificate. Note that
+		/// the caller assumes responsibility for the lifecycle of the created
+		/// certificate.
+
 	std::string signatureAlgorithm() const;
 		/// Returns the certificate signature algorithm long name.
 
@@ -224,6 +229,12 @@ inline const std::string& X509Certificate::subjectName() const
 inline const X509* X509Certificate::certificate() const
 {
 	return _pCert;
+}
+
+
+inline X509* X509Certificate::dup() const
+{
+	return X509_dup(_pCert);
 }
 
 

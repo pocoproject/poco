@@ -198,9 +198,11 @@ void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 	
 void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certificate)
 {
-	int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, certificate.certificate());
+	X509* copy = certificate.dup();
+	int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, copy);
 	if (errCode != 1)
 	{
+		X509_free(copy);
 		std::string msg = Utility::getLastError();
 		throw SSLContextException("Cannot add chain certificate to Context", msg);
 	}
