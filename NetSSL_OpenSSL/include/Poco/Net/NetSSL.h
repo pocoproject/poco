@@ -31,7 +31,7 @@
 // NetSSL_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_MSC_VER) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(NetSSL_EXPORTS)
 		#define NetSSL_API __declspec(dllexport)
 	#else
@@ -52,7 +52,7 @@
 //
 // Automatically link NetSSL
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
 		#if defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
 			#if defined(POCO_EXTERNAL_OPENSSL)

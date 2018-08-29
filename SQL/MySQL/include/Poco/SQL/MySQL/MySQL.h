@@ -29,7 +29,7 @@
 // ODBC_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_MSC_VER) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(MySQL_EXPORTS)
 		#define MySQL_API __declspec(dllexport)
 	#else
@@ -50,7 +50,7 @@
 //
 // Automatically link Data library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(MySQL_EXPORTS)
 		#pragma comment(lib, "PocoSQLMySQL" POCO_LIB_SUFFIX)
 	#endif
