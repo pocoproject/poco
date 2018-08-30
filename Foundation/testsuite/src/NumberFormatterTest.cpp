@@ -221,8 +221,8 @@ void NumberFormatterTest::testFormatFloat()
 	assertTrue (NumberFormatter::format(50.123f, 3) == "50.123");
 	assertTrue (NumberFormatter::format(50.123, 0) == "50");
 	assertTrue (NumberFormatter::format(50.123f, 0) == "50");
-	assertTrue (NumberFormatter::format(50.546, 0) == "51");
-	assertTrue (NumberFormatter::format(50.546f, 0) == "51");
+	assertTrue (NumberFormatter::format(50.546, 0) == "50");
+	assertTrue (NumberFormatter::format(50.546f, 0) == "50");
 	assertTrue (NumberFormatter::format(50.546f, 2) == "50.55");
 }
 
