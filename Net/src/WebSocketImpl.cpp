@@ -193,7 +193,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 	if (payloadLength <= 0)
 		return payloadLength;
 	if (payloadLength > length)
-		throw WebSocketException(Poco::format("Insufficient buffer for payload size %hu", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		throw WebSocketException(Poco::format("Insufficient buffer for payload size %d", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 	return receivePayload(reinterpret_cast<char*>(buffer), payloadLength, mask, useMask);
 }
 
