@@ -307,13 +307,14 @@ void SocketImpl::shutdown()
 }
 
 
-void SocketImpl::checkBrokenTimeout()
+void SocketImpl::checkBrokenTimeout(const SelectMode& mode)
 {
 	if (_isBrokenTimeout)
 	{
-		if (_recvTimeout.totalMicroseconds() != 0)
+		Poco::Timespan timeout = (mode == SelectMode::SELECT_READ) ? _recvTimeout : _sndTimeout;
+		if (timeout.totalMicroseconds() != 0)
 		{
-			if (!poll(_recvTimeout, SELECT_READ))
+			if (!poll(timeout, mode))
 				throw TimeoutException();
 		}
 	}
@@ -322,7 +323,7 @@ void SocketImpl::checkBrokenTimeout()
 
 int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
-	checkBrokenTimeout();
+	checkBrokenTimeout(SELECT_WRITE);
 
 	int rc;
 	do
@@ -338,7 +339,7 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 {
-	checkBrokenTimeout();
+	checkBrokenTimeout(SELECT_WRITE);
 
 	int rc = 0;
 	do
@@ -363,7 +364,7 @@ int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 
 int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
-	checkBrokenTimeout();
+	checkBrokenTimeout(SELECT_READ);
 
 	int rc;
 	do
@@ -388,7 +389,7 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 
 int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 {
-	checkBrokenTimeout();
+	checkBrokenTimeout(SELECT_READ);
 
 	int rc = 0;
 	do
@@ -517,7 +518,7 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 
 int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** ppSA, poco_socklen_t** ppSALen, int flags)
 {
-	checkBrokenTimeout();
+	checkBrokenTimeout(SELECT_READ);
 	int rc;
 	do
 	{
@@ -556,7 +557,7 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int f
 
 int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_socklen_t** ppSALen, int flags)
 {
-	checkBrokenTimeout();
+	checkBrokenTimeout(SELECT_READ);
 	int rc = 0;
 	do
 	{
