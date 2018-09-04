@@ -521,30 +521,56 @@ bool uIntToStr(T value,
 	return true;
 }
 
+template <typename T>
+bool intToStr(T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+  /// Converts integer to string; This is a wrapper function, for details see see the
+  /// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
+{
+  char res[POCO_MAX_INT_STRING_LEN] = { 0 };
+  std::size_t size = POCO_MAX_INT_STRING_LEN;
+  bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
+  result.assign(res, size);
+  return ret;
+}
+
 
 template <typename T>
-bool intToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+std::string intToStr (T number, unsigned short base, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
 	/// Converts integer to string; This is a wrapper function, for details see see the
 	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
+	std::string result;
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
-	result.assign(res, size);
-	return ret;
+	const bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
+	if (ret) result.assign(res, size);
+	return result;
+}
+
+template <typename T>
+bool uIntToStr(T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+  /// Converts unsigned integer to string; This is a wrapper function, for details see see the
+  /// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
+{
+  char res[POCO_MAX_INT_STRING_LEN] = { 0 };
+  std::size_t size = POCO_MAX_INT_STRING_LEN;
+  bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
+  result.assign(res, size);
+  return ret;
 }
 	
 	
 template <typename T>
-bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
+std::string uIntToStr (T number, unsigned short base, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
 	/// Converts unsigned integer to string; This is a wrapper function, for details see see the
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
+	std::string result;
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
-	result.assign(res, size);
-	return ret;
+	const bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
+	if (ret) result.assign(res, size);
+	return result;
 }
 
 
@@ -587,6 +613,17 @@ Foundation_API std::string& floatToStr(std::string& str,
 	/// and width (total length of formatted string).
 
 
+Foundation_API std::string floatToStr(float value,
+  int precision = -1,
+  int width = 0,
+  char thSep = 0,
+  char decSep = 0);
+  /// Converts a float value, returns it to the supplied string.
+  /// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
+  /// precision (total number of digits after the decimal point, -1 means ignore precision argument)
+  /// and width (total length of formatted string).
+
+
 Foundation_API std::string& floatToFixedStr(std::string& str,
 	float value,
 	int precision,
@@ -596,6 +633,16 @@ Foundation_API std::string& floatToFixedStr(std::string& str,
 	/// Converts a float value, assigns it to the supplied string and returns the reference.
 	/// This function calls floatToFixedStr(char*, int, float, int) and formats the result according to
 	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API std::string floatToFixedStr(float value,
+  int precision,
+  int width = 0,
+  char thSep = 0,
+  char decSep = 0);
+  /// Converts a float value, returns it to the supplied string.
+  /// This function calls floatToFixedStr(char*, int, float, int) and formats the result according to
+  /// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
 Foundation_API void doubleToStr(char* buffer,
@@ -630,6 +677,17 @@ Foundation_API std::string& doubleToStr(std::string& str,
 	/// and width (total length of formatted string).
 
 
+Foundation_API std::string doubleToStr(double value,
+  int precision = -1,
+  int width = 0,
+  char thSep = 0,
+  char decSep = 0);
+  /// Converts a double value, returns it to the supplied string.
+  /// This function calls doubleToStr(char*, int, double, int, int) and formats the result according to
+  /// precision (total number of digits after the decimal point, -1 means ignore precision argument)
+  /// and width (total length of formatted string).
+
+
 Foundation_API std::string& doubleToFixedStr(std::string& str,
 	double value,
 	int precision = -1,
@@ -639,6 +697,16 @@ Foundation_API std::string& doubleToFixedStr(std::string& str,
 	/// Converts a double value, assigns it to the supplied string and returns the reference.
 	/// This function calls doubleToFixedStr(char*, int, double, int) and formats the result according to
 	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API std::string doubleToFixedStr(double value,
+  int precision = -1,
+  int width = 0,
+  char thSep = 0,
+  char decSep = 0);
+  /// Converts a double value, returns it to the supplied string.
+  /// This function calls doubleToFixedStr(char*, int, double, int) and formats the result according to
+  /// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
 Foundation_API float strToFloat(const char* str,
