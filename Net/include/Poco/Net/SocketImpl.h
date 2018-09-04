@@ -490,7 +490,7 @@ protected:
 	void reset(poco_socket_t fd = POCO_INVALID_SOCKET);
 		/// Allows subclasses to set the socket manually, iff no valid socket is set yet.
 
-	void checkBrokenTimeout(const SelectMode& mode);
+	void checkBrokenTimeout(SelectMode mode);
 
 	static int lastError();
 		/// Returns the last error code.

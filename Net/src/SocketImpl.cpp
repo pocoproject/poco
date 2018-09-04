@@ -306,11 +306,11 @@ void SocketImpl::shutdown()
 }
 
 
-void SocketImpl::checkBrokenTimeout(const SelectMode& mode)
+void SocketImpl::checkBrokenTimeout(SelectMode mode)
 {
 	if (_isBrokenTimeout)
 	{
-		Poco::Timespan timeout = (mode == SelectMode::SELECT_READ) ? _recvTimeout : _sndTimeout;
+		Poco::Timespan timeout = (mode == SELECT_READ) ? _recvTimeout : _sndTimeout;
 		if (timeout.totalMicroseconds() != 0)
 		{
 			if (!poll(timeout, mode))
