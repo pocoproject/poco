@@ -112,7 +112,7 @@ endif()
 if(ENABLE_DATA_POSTGRESQL)
     find_package(PostgreSQL REQUIRED)
 else()
-    find_package(PostgreSQL QUIET)
+    find_package(PostgreSQL)
 endif()
  
 if(POSTGRESQL_FOUND)
@@ -440,16 +440,13 @@ install(
         Devel
 )
 
-# in tree build settings
-#configure_file(PocoBuildTreeSettings.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PocoBuildTreeSettings.cmake @ONLY)
-
-
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
-message(STATUS "[cmake] build with cxx flags:      ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
-message(STATUS "[cmake] build with c flags:          ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] build type:             ${CMAKE_BUILD_TYPE}")
+message(STATUS "[cmake] build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
+message(STATUS "[cmake] build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
 
 foreach(component ${Poco_COMPONENTS})
     message(STATUS "Building: ${component}")
