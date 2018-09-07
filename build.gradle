@@ -295,6 +295,7 @@ subprojects {
 								libName = 'libcrypto.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								libName = 'libcrypto.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -321,6 +322,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								dllName = 'libcryptod.dylib'
 								linkName = 'libcryptod.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
@@ -345,6 +347,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								dllName = 'libcrypto.dylib'
 								linkName = 'libcrypto.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
@@ -375,6 +378,7 @@ subprojects {
 								libName = 'libssld.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								libName = 'libssld.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -391,6 +395,7 @@ subprojects {
 								libName = 'libssl.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								libName = 'libssl.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -417,6 +422,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								dllName = 'libssld.dylib'
 								linkName = 'libssld.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
@@ -441,6 +447,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
+					            headers.srcDir "$openSSLBrewHome/include"
 								dllName = 'libssl.dylib'
 								linkName = 'libssl.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
