@@ -269,7 +269,7 @@
 #endif
 
 
-#ifdef POCO_COMPILER_GCC
+#if defined(POCO_COMPILER_GCC) || defined(POCO_COMPILER_CLANG)
 #define POCO_UNUSED __attribute__((unused))
 #else
 #define POCO_UNUSED
