@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "MutexBenchmark")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoFoundation )
+add_executable(MutexBenchmark src/Benchmark.cpp)
+target_link_libraries(MutexBenchmark PUBLIC Poco::Foundation )

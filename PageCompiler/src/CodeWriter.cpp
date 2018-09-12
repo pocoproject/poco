@@ -311,6 +311,7 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 {
 	std::string contentType(_page.get("page.contentType", "text/html"));
 	std::string contentLang(_page.get("page.contentLanguage", ""));
+	std::string cacheControl(_page.get("page.cacheControl", ""));
 	bool buffered(_page.getBool("page.buffered", false));
 	bool chunked(_page.getBool("page.chunked", !buffered));
 	bool compressed(_page.getBool("page.compressed", false));
@@ -332,6 +333,10 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 	{
 		ostr << "\tbool _compressResponse(request.hasToken(\"Accept-Encoding\", \"gzip\"));\n"
 		     << "\tif (_compressResponse) response.set(\"Content-Encoding\", \"gzip\");\n";
+	}
+	if (!cacheControl.empty())
+	{
+		ostr << "\tresponse.set(\"Cache-Control\", \"" << cacheControl << "\");\n";
 	}
 	ostr << "\n";
 }

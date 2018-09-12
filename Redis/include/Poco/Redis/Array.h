@@ -302,8 +302,8 @@ struct RedisTypeTraits<Array>
 		{
 			for(int i = 0; i < length; ++i)
 			{
-				char marker = input.get();
-				RedisType::Ptr element = RedisType::createRedisType(marker);
+				char mark = static_cast<char>(input.get());
+				RedisType::Ptr element = RedisType::createRedisType(mark);
 
 				if ( element.isNull() )
 					throw RedisException("Wrong answer received from Redis server");

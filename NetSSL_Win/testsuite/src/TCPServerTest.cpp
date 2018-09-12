@@ -41,6 +41,7 @@ using Poco::Net::SSLManager;
 using Poco::Thread;
 using Poco::Util::Application;
 
+static const int closeSleepTime = 2000;
 
 namespace
 {
@@ -106,7 +107,7 @@ void TCPServerTest::testOneConnection()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 1);
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -141,15 +142,16 @@ void TCPServerTest::testTwoConnections()
 	assertTrue (srv.currentThreads() == 2);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 2);
+
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 1);
 	assertTrue (srv.currentThreads() == 1);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 2);
+	
 	ss2.close();
-
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -213,28 +215,28 @@ void TCPServerTest::testMultiConnections()
 	assertTrue (srv.queuedConnections() == 2);
 	
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 4);
 	assertTrue (srv.currentThreads() == 4);
 	assertTrue (srv.queuedConnections() == 1);
 	assertTrue (srv.totalConnections() == 5);
 
 	ss2.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 4);
 	assertTrue (srv.currentThreads() == 4);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 6);
 	
 	ss3.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 3);
 	assertTrue (srv.currentThreads() == 3);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 6);
 
 	ss4.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 2);
 	assertTrue (srv.currentThreads() == 2);
 	assertTrue (srv.queuedConnections() == 0);
@@ -242,7 +244,7 @@ void TCPServerTest::testMultiConnections()
 
 	ss5.close();
 	ss6.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -269,6 +271,7 @@ void TCPServerTest::testReuseSocket()
 	assertTrue (srv.currentThreads() == 1);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 1);
+
 	ss1.close();
 	Thread::sleep(300);
 	assertTrue (srv.currentConnections() == 0);
@@ -281,8 +284,9 @@ void TCPServerTest::testReuseSocket()
 	assertTrue (srv.currentConnections() == 1);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 2);
+
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -331,7 +335,7 @@ void TCPServerTest::testReuseSession()
 	Session::Ptr pSession = ss1.currentSession();
 	
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 
 	ss1.useSession(pSession);
@@ -345,8 +349,9 @@ void TCPServerTest::testReuseSession()
 	assertTrue (srv.currentConnections() == 1);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 2);
+
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 
 	Thread::sleep(15000); // wait for session to expire
@@ -363,8 +368,9 @@ void TCPServerTest::testReuseSession()
 	assertTrue (srv.currentConnections() == 1);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 3);
+
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -387,7 +393,8 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testTwoConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSocket);
-	//CppUnit_addTest(pSuite, TCPServerTest, testReuseSession);
-
+#ifdef FIXME
+	CppUnit_addTest(pSuite, TCPServerTest, testReuseSession);
+#endif
 	return pSuite;
 }

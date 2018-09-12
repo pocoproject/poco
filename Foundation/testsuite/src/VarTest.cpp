@@ -1980,6 +1980,34 @@ void VarTest::testDynamicStructBasics()
 }
 
 
+void VarTest::testOrderedDynamicStructBasics()
+{
+#ifdef POCO_ENABLE_CPP11
+	OrderedDynamicStruct aStruct;
+	assertTrue(aStruct.empty());
+	assertTrue(aStruct.size() == 0);
+	assertTrue(aStruct.members().empty());
+
+	aStruct.insert("First Name", "Little");
+	assertTrue(!aStruct.empty());
+	assertTrue(aStruct.size() == 1);
+	assertTrue(*(aStruct.members().begin()) == "First Name");
+	assertTrue(aStruct["First Name"] == "Little");
+	aStruct.insert("Last Name", "POCO");
+	assertTrue(aStruct.members().size() == 2);
+	aStruct.erase("First Name");
+	assertTrue(aStruct.size() == 1);
+	assertTrue(*(aStruct.members().begin()) == "Last Name");
+	aStruct.insert("Age", 1);
+	assertTrue(aStruct["Age"] == 1);
+	assertTrue(aStruct.members().size() == 2);
+	assertTrue(*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assertTrue(aStruct.size() == 0);
+#endif // POCO_ENABLE_CPP11
+}
+
+
 void VarTest::testDynamicStructString()
 {
 	DynamicStruct aStruct;
@@ -2011,6 +2039,45 @@ void VarTest::testDynamicStructString()
 	assertTrue (m2["1"] == 1);
 	assertTrue (m2["2"] == 2);
 	assertTrue (m2["3"] == 3);
+}
+
+
+void VarTest::testOrderedDynamicStructString()
+{
+#ifdef POCO_ENABLE_CPP11
+	OrderedDynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	Var a1(aStruct);
+	assertTrue(a1["First Name"] == "Junior");
+	assertTrue(a1["Last Name"] == "POCO");
+	a1["First Name"] = "Senior";
+	assertTrue(a1["First Name"] == "Senior");
+	testGetIdxMustThrow(a1, 0);
+
+	typedef Struct<std::string, OrderedMap<std::string, Var>, OrderedSet<std::string> > OrderedStruct;
+	OrderedStruct s1;
+	s1["1"] = 1;
+	s1["2"] = 2;
+	s1["3"] = 3;
+
+	OrderedStruct s2(s1);
+	assertTrue(s2["1"] == 1);
+	assertTrue(s2["2"] == 2);
+	assertTrue(s2["3"] == 3);
+
+	OrderedMap<std::string, int> m1;
+	m1["2"] = 2;
+	m1["1"] = 1;
+	m1["3"] = 3;
+	assertTrue (m1.begin()->first == "2");
+	assertTrue(m1.begin()->second == 2);
+
+	OrderedStruct m2(m1);
+	assertTrue(m2["1"] == 1);
+	assertTrue(m2["2"] == 2);
+	assertTrue(m2["3"] == 3);
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2046,6 +2113,47 @@ void VarTest::testDynamicStructInt()
 	assertTrue (m2[1] == "1");
 	assertTrue (m2[2] == "2");
 	assertTrue (m2[3] == "3");
+}
+
+
+void VarTest::testOrderedDynamicStructInt()
+{
+#ifdef POCO_ENABLE_CPP11
+	typedef Struct<int, OrderedMap<int, Var>, OrderedSet<int> > OrderedStruct;
+	OrderedStruct aStruct;
+	aStruct[0] = "POCO";
+	aStruct[1] = "Junior";
+	aStruct[2] = 100;
+	aStruct[3] = 10;
+
+	Var a1(aStruct);
+	assertTrue(a1[0] == "POCO");
+	assertTrue(a1[1] == "Junior");
+	assertTrue(a1[2] == 100);
+	assertTrue(a1[3] == 10);
+	a1[0] = "Senior";
+	assertTrue(a1[0] == "Senior");
+
+	OrderedStruct s1;
+	s1[1] = "1";
+	s1[2] = "2";
+	s1[3] = "3";
+
+	OrderedStruct s2(s1);
+	assertTrue(s2[1] == "1");
+	assertTrue(s2[2] == "2");
+	assertTrue(s2[3] == "3");
+
+	OrderedMap<int, std::string> m1;
+	m1[1] = "2";
+	m1[2] = "1";
+	m1[3] = "3";
+
+	OrderedStruct m2(m1);
+	assertTrue(m2[1] == "2");
+	assertTrue(m2[2] == "1");
+	assertTrue(m2[3] == "3");
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2135,6 +2243,22 @@ void VarTest::testStructToString()
 	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
 	assertTrue (res == expected);
 	assertTrue (aStruct.toString() == res);
+}
+
+
+void VarTest::testOrderedStructToString()
+{
+#ifdef POCO_ENABLE_CPP11
+	OrderedDynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	aStruct["Age"] = 1;
+	Var a1(aStruct);
+	std::string res = a1.convert<std::string>();
+	std::string expected = "{ \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\", \"Age\" : 1 }";
+	assertTrue(res == expected);
+	assertTrue(aStruct.toString() == res);
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2678,11 +2802,15 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testArrayIdxOperator);
 	CppUnit_addTest(pSuite, VarTest, testDynamicPair);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructBasics);
+	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructBasics);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
+	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
+	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
 	CppUnit_addTest(pSuite, VarTest, testArrayToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);
+	CppUnit_addTest(pSuite, VarTest, testOrderedStructToString);
 	CppUnit_addTest(pSuite, VarTest, testStructToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testArrayOfStructsToString);
 	CppUnit_addTest(pSuite, VarTest, testStructWithArraysToString);

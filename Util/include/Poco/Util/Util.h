@@ -50,6 +50,26 @@
 
 
 //
+// Define wrapper if wmain() is disabled in MinGW.
+// Use option "-municode" to enable wmain().
+// Required by Application and ServerApplication.
+//
+#if defined(__MINGW32__) && !defined(POCO_NO_WMAIN_WRAPPER)
+	#define POCO_WMAIN_WRAPPER()  \
+	extern int _CRT_glob;         \
+	extern "C" void __wgetmainargs(int*, wchar_t***, wchar_t***, int, int*); \
+	int main() {			      \
+		wchar_t **enpv, **argv;   \
+		int argc, si = 0;	      \
+		__wgetmainargs(&argc, &argv, &enpv, _CRT_glob, &si); \
+		return wmain(argc, argv); \
+	}
+#else
+	#define POCO_WMAIN_WRAPPER()
+#endif
+
+
+//
 // Automatically link Util library.
 //
 #if defined(_MSC_VER)

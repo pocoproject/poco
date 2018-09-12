@@ -122,7 +122,7 @@ void HTTPAuthenticationParams::fromRequest(const HTTPRequest& request)
 	if (icompare(scheme, "Digest") != 0)
 		throw InvalidArgumentException("Could not parse non-Digest authentication information", scheme);
 
-	fromAuthInfo(authInfo);
+	fromAuthInfo(authInfo); 
 }
 
 
@@ -135,15 +135,15 @@ void HTTPAuthenticationParams::fromResponse(const HTTPResponse& response, const 
 	bool found = false;
 	while (!found && it != response.end() && icompare(it->first, header) == 0)
 	{
-		const std::string& header = it->second;
-		if (icompare(header, 0, 6, "Basic ") == 0)
+		const std::string& header2 = it->second;
+		if (icompare(header2, 0, 6, "Basic ") == 0)
 		{
-			parse(header.begin() + 6, header.end());
+			parse(header2.begin() + 6, header2.end());
 			found = true;
 		}
-		else if (icompare(header, 0, 7, "Digest ") == 0)
+		else if (icompare(header2, 0, 7, "Digest ") == 0)
 		{
-			parse(header.begin() + 7, header.end());
+			parse(header2.begin() + 7, header2.end());
 			found = true;
 		}
 		++it;

@@ -25,7 +25,6 @@
 #include "Poco/NullStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Format.h"
-#include "Poco/Version.h"
 
 
 using Poco::URIStreamFactory;

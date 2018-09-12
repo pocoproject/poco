@@ -1,6 +1,3 @@
-set(LIBNAME "SQLODBC")
-set(POCO_LIBNAME "Poco${LIBNAME}")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
@@ -9,28 +6,27 @@ POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
-add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
 
-add_library( "${LIBNAME}" ${ODBC_SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
-set_target_properties( "${LIBNAME}"
+add_library(SQLODBC ${ODBC_SRCS} )
+add_library(Poco::SQLODBC ALIAS SQLODBC)
+set_target_properties(SQLODBC
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME ${POCO_LIBNAME}
+	OUTPUT_NAME PocoSQLODBC
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries( "${LIBNAME}" Foundation SQL ${ODBC_LIBRARIES})
-target_include_directories( "${LIBNAME}"
+target_link_libraries(SQLODBC PUBLIC Poco::SQL ${ODBC_LIBRARIES}) # TODO(Bjoe) Use namespace target
+target_include_directories(SQLODBC
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions("${LIBNAME}" PUBLIC ${LIB_MODE_DEFINITIONS})
+target_compile_definitions(SQLODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE)
 
-POCO_INSTALL("${LIBNAME}")
-POCO_GENERATE_PACKAGE("${LIBNAME}")
+POCO_INSTALL(SQLODBC)
+POCO_GENERATE_PACKAGE(SQLODBC)
 
 if (POCO_ENABLE_TESTS)
     add_subdirectory(testsuite)

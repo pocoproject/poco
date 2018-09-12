@@ -119,7 +119,7 @@ void AbstractConfigurationTest::testGetInt64()
 
 	try
 	{
-		Int64 x = pConf->getInt64("prop1");
+		POCO_UNUSED Int64 x = pConf->getInt64("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -202,13 +202,13 @@ void AbstractConfigurationTest::testExpand()
 	
 	assertTrue (pConf->getString("ref5") == "${refx}");
 	assertTrue (pConf->getString("ref6") == "${refx}");
-	
+
 	assertTrue (pConf->expand("answer=${prop4.int1}") == "answer=42");
 	assertTrue (pConf->expand("bool5='${prop4.bool5}'") == "bool5='Yes'");
 	assertTrue (pConf->expand("undef='${undef}'") == "undef='${undef}'");
 	assertTrue (pConf->expand("deep='${ref1}'") == "deep='foobar'");
 	assertTrue (pConf->expand("deep='${ref7}'") == "deep='foobar'");
-	
+
 	assertTrue (pConf->getString("dollar.atend") == "foo$");
 	assertTrue (pConf->getString("dollar.middle") == "foo$bar");
 }
@@ -260,7 +260,7 @@ void AbstractConfigurationTest::testSetDouble()
 	pConf->setDouble("set.double1", 1.5);
 	pConf->setDouble("set.double2", -1.5);
 	assertTrue (pConf->getDouble("set.double1") == 1.5);
-	assertTrue (pConf->getDouble("set.double2") == -1.5);	
+	assertTrue (pConf->getDouble("set.double2") == -1.5);
 }
 
 
@@ -281,7 +281,7 @@ void AbstractConfigurationTest::testChangeEvents()
 
 	pConf->propertyChanging += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanging);
 	pConf->propertyChanged += Poco::delegate(this, &AbstractConfigurationTest::onPropertyChanged);
-	
+
 	pConf->setString("set.string1", "foobar");
 	assertTrue (_changingKey == "set.string1");
 	assertTrue (_changingValue == "foobar");
@@ -394,10 +394,10 @@ void AbstractConfigurationTest::testRemove()
 }
 
 
-Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfiguration() const
+AbstractConfiguration::Ptr AbstractConfigurationTest::createConfiguration() const
 {
-	Poco::AutoPtr<AbstractConfiguration> pConfig = allocConfiguration();
-	
+	AbstractConfiguration::Ptr pConfig = allocConfiguration();
+
 	pConfig->setString("prop1", "foo");
 	pConfig->setString("prop2", "bar");
 	pConfig->setString("prop3.string1", "foo");
@@ -410,9 +410,9 @@ Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfigurat
 	pConfig->setString("prop4.bigint2", NumberFormatter::format(std::numeric_limits<Int64>::min()));
 	pConfig->setString("prop4.biguint", NumberFormatter::format(std::numeric_limits<UInt64>::max()));
 #else /// just to make sure property count is consistent
-	pConfig->setString("prop4.bigint1", 0));
-	pConfig->setString("prop4.bigint2", 0));
-	pConfig->setString("prop4.biguint", 0));
+	pConfig->setString("prop4.bigint1", 0);
+	pConfig->setString("prop4.bigint2", 0);
+	pConfig->setString("prop4.biguint", 0);
 #endif
 	pConfig->setString("prop4.hex", "0x1f");
 	pConfig->setString("prop4.double1", "1");

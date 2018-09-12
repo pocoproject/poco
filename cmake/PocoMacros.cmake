@@ -41,11 +41,13 @@ if (WIN32)
   endif ()
   find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}" ${kit10_bindir}
     DOC "path to message compiler")
-  if (NOT CMAKE_MC_COMPILER)
+  if(NOT CMAKE_MC_COMPILER AND MSVC)
     message(FATAL_ERROR "message compiler not found: required to build")
-  endif (NOT CMAKE_MC_COMPILER)
-  message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
-  mark_as_advanced(CMAKE_MC_COMPILER)
+  endif(NOT CMAKE_MC_COMPILER AND MSVC)
+  if(CMAKE_MC_COMPILER)
+    message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
+    mark_as_advanced(CMAKE_MC_COMPILER)
+  endif(CMAKE_MC_COMPILER)
 endif(WIN32)
 
 # Accept older ENABLE_<COMPONENT>, ENABLE_TESTS and ENABLE_SAMPLES and
@@ -57,7 +59,7 @@ foreach(variable_name ${all_variables})
   if(${variable_prefix} STREQUAL "ENABLE_")
     list(FIND all_variables "POCO_${variable_name}" variable_found)
     if(NOT variable_found EQUAL -1)
-      message(WARNING "${variable_name} is deprecated and will be removed! Use POCO_${variable_name} instead")
+      message(DEPRECATION "${variable_name} is deprecated and will be removed! Use POCO_${variable_name} instead")
       set(POCO_${variable_name} ${${variable_name}} CACHE BOOL "Old value from ${variable_name}" FORCE)
       unset(${variable_name} CACHE)
     endif()
@@ -183,7 +185,7 @@ endmacro()
 
 
 macro(POCO_MESSAGES out name)
-    if (WIN32)
+    if (WIN32 AND CMAKE_MC_COMPILER)
         foreach(msg ${ARGN})
             get_filename_component(msg_name ${msg} NAME)
             get_filename_component(msg_path ${msg} ABSOLUTE)
@@ -212,9 +214,8 @@ macro(POCO_MESSAGES out name)
         source_group("${name}\\Message Files" FILES ${ARGN})
         list(APPEND ${out} ${ARGN})
 
-    endif (WIN32)
+    endif (WIN32 AND CMAKE_MC_COMPILER)
 endmacro()
-
 
 #===============================================================================
 # Macros for Package generation

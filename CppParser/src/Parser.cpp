@@ -161,7 +161,7 @@ void Parser::parse()
 		std::string m(exc.message());
 		std::string where(_currentPath);
 		where.append("(");
-		where.append(NumberFormatter::format(_istr.getCurrentLineNumber()));
+		where.append(NumberFormatter::format(static_cast<int>(_istr.getCurrentLineNumber())));
 		where.append(")");
 		throw SyntaxException(m, where);
 	}
@@ -373,7 +373,7 @@ const Token* Parser::parseBaseClassList(const Token* pNext, Struct* pClass)
 }
 
 
-const Token* Parser::parseClassMembers(const Token* pNext, Struct* pClass)
+const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
 	

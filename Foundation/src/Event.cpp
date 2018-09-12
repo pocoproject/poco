@@ -18,17 +18,13 @@
 namespace Poco {
 
 
-Event::Event(EventType type): _cond(),
-	_mutex(),
-	_state(false),
+Event::Event(EventType type): _state(false),
 	_autoreset(type == EVENT_AUTORESET)
 {
 }
 
 
-Event::Event(bool autoReset): _cond(),
-	_mutex(),
-	_state(false),
+Event::Event(bool autoReset): _state(false),
 	_autoreset(autoReset)
 {
 }
@@ -43,12 +39,10 @@ void Event::set()
 {
 	try
 	{
-		std::unique_lock<std::mutex> lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_state = true;
-		if (_autoreset)
-			_cond.notify_one();
-		else
-			_cond.notify_all();
+		if (_autoreset) _cond.notify_one();
+		else            _cond.notify_all();
 	}
 	catch (std::system_error &e)
 	{
@@ -61,7 +55,7 @@ void Event::reset()
 {
 	try
 	{
-		std::unique_lock<std::mutex> lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_state = false;
 	}
 	catch (std::system_error &e)
@@ -76,7 +70,8 @@ void Event::wait()
 	try
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
-		_cond.wait(lock, [this]() { return this->_state.load(); });
+		while (!_state)
+			_cond.wait(lock, [this]() { return this->_state.load(); });
 		if (_autoreset) _state = false;
 	}
 	catch (std::system_error &e)

@@ -11,7 +11,7 @@
 #include "CoreTestSuite.h"
 #include "CoreTest.h"
 #include "ArrayTest.h"
-#include "AutoPtrTest.h"
+#include "RefPtrTest.h"
 #include "SharedPtrTest.h"
 #include "AutoReleasePoolTest.h"
 #include "ByteOrderTest.h"
@@ -30,12 +30,13 @@
 #include "VarTest.h"
 #include "FormatTest.h"
 #include "TuplesTest.h"
-//#ifndef POCO_VXWORKS
-//#include "NamedTuplesTest.h"
-//#endif
+#ifndef POCO_VXWORKS
+#include "NamedTuplesTest.h"
+#endif
 #include "TypeListTest.h"
 #include "ObjectPoolTest.h"
 #include "ListMapTest.h"
+#include "OrderedContainersTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -44,7 +45,7 @@ CppUnit::Test* CoreTestSuite::suite()
 
 	pSuite->addTest(CoreTest::suite());
 	pSuite->addTest(ArrayTest::suite());
-	pSuite->addTest(AutoPtrTest::suite());
+	pSuite->addTest(RefPtrTest::suite());
 	pSuite->addTest(SharedPtrTest::suite());
 	pSuite->addTest(AutoReleasePoolTest::suite());
 	pSuite->addTest(ByteOrderTest::suite());
@@ -64,11 +65,23 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(FormatTest::suite());
 	pSuite->addTest(TuplesTest::suite());
 #ifndef POCO_VXWORKS
-	//pSuite->addTest(NamedTuplesTest::suite());
+	pSuite->addTest(NamedTuplesTest::suite());
 #endif
 	pSuite->addTest(TypeListTest::suite());
 	pSuite->addTest(ObjectPoolTest::suite());
 	pSuite->addTest(ListMapTest::suite());
+	pSuite->addTest(OrderedContainersTest::suite());
 
 	return pSuite;
 }
+
+#if POCO_ARCH == POCO_ARCH_AMD64
+
+// see RefPtrTest for use of this
+namespace unopt {
+
+void unoptimizer() { }
+
+}
+
+#endif

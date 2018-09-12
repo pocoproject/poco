@@ -31,30 +31,30 @@ FTPSClientSession::~FTPSClientSession()
 {
 }
 
-FTPSClientSession::FTPSClientSession(const StreamSocket& socket) :
-	FTPClientSession(socket)
+FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage, bool tryUseFTPS) :
+	FTPClientSession(socket, readWelcomeMessage), _tryFTPS(tryUseFTPS)
 {
 }
 
 
 FTPSClientSession::FTPSClientSession(const std::string& host,
-										Poco::UInt16 port,
-										const std::string& username,
-										const std::string& password) :
+	Poco::UInt16 port,
+	const std::string& username,
+	const std::string& password) :
 	FTPClientSession(host, port, username, password)
 {
 }
 
 void FTPSClientSession::tryFTPSmode(bool bTryFTPS)
 {
-	_bTryFTPS = bTryFTPS;
+	_tryFTPS = bTryFTPS;
 }
 
 void FTPSClientSession::beforeCreateDataSocket()
 {
-	if (_bSecureDataConnection)
+	if (_secureDataConnection)
 		return;
-	_bSecureDataConnection = false;
+	_secureDataConnection = false;
 	if (!_pControlSocket->secure())
 		return;
 	std::string sResponse;
@@ -63,13 +63,13 @@ void FTPSClientSession::beforeCreateDataSocket()
 	{
 		status = sendCommand("PROT P", sResponse);
 		if (isPositiveCompletion(status))
-			_bSecureDataConnection = true;
+			_secureDataConnection = true;
 	}
 }
 
 void FTPSClientSession::afterCreateControlSocket()
 {
-	if (!_bTryFTPS)
+	if (!_tryFTPS)
 		return;
 	_pControlSocket->setNoDelay(true);
 	if (_pControlSocket->secure())
@@ -95,7 +95,7 @@ void FTPSClientSession::afterCreateControlSocket()
 	}
 	else
 	{
-		_bTryFTPS = false;
+		_tryFTPS = false;
 	}
 }
 
@@ -107,7 +107,7 @@ StreamSocket FTPSClientSession::establishDataConnection(const std::string& comma
 	ss.setNoDelay(true);
 
 	//SSL nogotiating of data socket
-	if ((_bSecureDataConnection) && (_pControlSocket->secure()))
+	if ((_secureDataConnection) && (_pControlSocket->secure()))
 	{
 		//We need to reuse the control socket SSL session so the server can ensure that client that opened control socket is the same using data socket
 		Poco::Net::SecureStreamSocketImpl* pSecure = dynamic_cast<Poco::Net::SecureStreamSocketImpl*>(_pControlSocket->impl());
@@ -126,4 +126,5 @@ void FTPSClientSession::receiveServerReadyReply()
 	afterCreateControlSocket();
 }
 
-}} // namespace Poco::Net
+}
+} // namespace Poco::Net

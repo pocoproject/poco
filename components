@@ -1,5 +1,4 @@
 CppUnit
-CppUnit/WinTestRunner
 Foundation
 Encodings
 XML
@@ -21,4 +20,3 @@ CppParser
 MongoDB
 Redis
 PocoDoc
-ProGen

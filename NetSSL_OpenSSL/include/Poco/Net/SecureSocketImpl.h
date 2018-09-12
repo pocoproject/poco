@@ -78,7 +78,7 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -87,7 +87,24 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
-		
+
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+		/// Bind a local IPv6 address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket. SSL clients should not bind a socket to a
+		/// specific address.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// The given address must be an IPv6 address. The
+		/// IPPROTO_IPV6/IPV6_V6ONLY option is set on the socket
+		/// according to the ipV6Only parameter.
+		///
+		/// If the library has not been built with IPv6 support,
+		/// a Poco::NotImplementedException will be thrown.
+
 	void listen(int backlog = 64);
 		/// Puts the socket into listening state.
 		///

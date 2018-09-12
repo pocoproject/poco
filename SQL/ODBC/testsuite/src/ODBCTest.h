@@ -74,6 +74,7 @@ public:
 
 	virtual void testInsertSingleBulk();
 	virtual void testInsertSingleBulkVec();
+	virtual void testInsertSingleBulkNullableVec();
 
 	virtual void testLimit();
 	virtual void testLimitOnce();
@@ -104,6 +105,7 @@ public:
 	virtual void testEmptyDB();
 
 	virtual void testBLOB();
+	virtual void testBLOBNoTruncation();
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
 

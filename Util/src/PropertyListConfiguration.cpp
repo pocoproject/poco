@@ -181,7 +181,6 @@ bool PropertyListConfiguration::getData(const std::string& key, std::ostream &os
 			std::stringstream strs(thevalue->firstChild()->nodeValue());
 			Poco::Base64Decoder decoder(strs);
 			ostr << decoder.rdbuf();
-			return true;
 		}
 		else
 			return false;

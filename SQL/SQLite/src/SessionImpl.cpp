@@ -192,7 +192,7 @@ void SessionImpl::close()
 		int times = 10;
 		do
 		{
-			result = sqlite3_close(_pDB);
+			result = sqlite3_close_v2(_pDB);
 		} while (SQLITE_BUSY == result && --times > 0);
 
 		if (SQLITE_BUSY == result && times == 0)
@@ -207,7 +207,7 @@ void SessionImpl::close()
 					sqlite3_finalize(pStmt);
 				}
 			} while (pStmt != NULL && --times > 0);
-			sqlite3_close(_pDB);
+			sqlite3_close_v2(_pDB);
 		}
 		_pDB = 0;
 	}
@@ -239,13 +239,13 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-void SessionImpl::setConnectionTimeout(const std::string& prop, const Poco::Any& value)
+void SessionImpl::setConnectionTimeout(const std::string& /*prop*/, const Poco::Any& value)
 {
 	setConnectionTimeout(Poco::RefAnyCast<std::size_t>(value));
 }
 
 
-Poco::Any SessionImpl::getConnectionTimeout(const std::string& prop) const
+Poco::Any SessionImpl::getConnectionTimeout(const std::string& /*prop*/) const
 {
 	return Poco::Any(_timeout/1000);
 }

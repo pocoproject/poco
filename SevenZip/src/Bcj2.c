@@ -67,12 +67,12 @@ int Bcj2_Decode(
       limit = outSize - outPos;
     while (limit != 0)
     {
-      Byte b = buf0[inPos];
-      outBuf[outPos++] = b;
-      if (IsJ(prevByte, b))
+      Byte b2 = buf0[inPos];
+      outBuf[outPos++] = b2;
+      if (IsJ(prevByte, b2))
         break;
       inPos++;
-      prevByte = b;
+      prevByte = b2;
       limit--;
     }
 

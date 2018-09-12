@@ -209,7 +209,7 @@ private:
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	void newLocal(const sockaddr_un* sockAddr);
+	void newLocal(const sockaddr_un* sockAddr, poco_socklen_t length);
 	void newLocal(const std::string& path);
 #endif
 

@@ -72,6 +72,23 @@ std::string PathImpl::nullImpl()
 }
 
 
+std::string PathImpl::selfImpl()
+{
+	Buffer<wchar_t> buffer(MAX_PATH_LEN);
+	DWORD n = GetModuleFileNameW(NULL, buffer.begin(), static_cast<DWORD>(buffer.size()));
+	DWORD err = GetLastError();
+	if (n > 0)
+	{
+		if (err == ERROR_INSUFFICIENT_BUFFER)
+			throw SystemException("Buffer too small to get executable name.");
+		std::string result;
+		UnicodeConverter::toUTF8(buffer.begin(), result);
+		return result;
+	}
+	throw SystemException("Cannot get executable name.");
+}
+
+
 std::string PathImpl::tempImpl()
 {
 	return "\\Temp\\";

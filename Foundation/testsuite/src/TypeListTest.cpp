@@ -76,8 +76,8 @@ void TypeListTest::testTypeList()
 		Int32,
 		UInt32,
 		float>::HeadType Type15;
-
-	Tuple<TypeGetter<0, Type15>::HeadType,
+const int i = 0;
+	Tuple<TypeGetter<i, Type15>::HeadType,
 		TypeGetter<1, Type15>::HeadType,
 		TypeGetter<2, Type15>::HeadType,
 		TypeGetter<3, Type15>::HeadType,
@@ -205,7 +205,8 @@ void TypeListTest::testTypeList()
 	assertTrue (typeid(TypeGetter<3, TypeAllReplacer1>::HeadType) == typeid(Int16));
 	assertTrue (typeid(TypeGetter<4, TypeAllReplacer1>::HeadType) == typeid(Int32));
 
-	typedef TypeListType<Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void>::HeadType TypeVoid;
+	typedef TypeListType<Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,
+						Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void,Void>::HeadType TypeVoid;
 	assertTrue (typeid(TypeGetter<0, TypeVoid>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<1, TypeVoid>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<2, TypeVoid>::HeadType) == typeid(Void));
@@ -226,6 +227,26 @@ void TypeListTest::testTypeList()
 	assertTrue (typeid(TypeGetter<17, TypeVoid>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<18, TypeVoid>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<19, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<20, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<21, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<22, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<23, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<24, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<25, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<26, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<27, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<28, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<29, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<30, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<31, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<32, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<33, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<34, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<35, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<36, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<37, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<38, TypeVoid>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<39, TypeVoid>::HeadType) == typeid(Void));
 	
 
 	typedef TypeOneReplacer<TypeVoid, Void, Int8>::HeadType TypeFirstReplacer;
@@ -249,6 +270,26 @@ void TypeListTest::testTypeList()
 	assertTrue (typeid(TypeGetter<17, TypeFirstReplacer>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<18, TypeFirstReplacer>::HeadType) == typeid(Void));
 	assertTrue (typeid(TypeGetter<19, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<20, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<21, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<22, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<23, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<24, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<25, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<26, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<27, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<28, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<29, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<30, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<31, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<32, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<33, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<34, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<35, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<36, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<37, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<38, TypeFirstReplacer>::HeadType) == typeid(Void));
+	assertTrue (typeid(TypeGetter<39, TypeFirstReplacer>::HeadType) == typeid(Void));
 
 	typedef TypeOneReplacer<TypeFirstReplacer, Void, Int16>::HeadType TypeSecondReplacer;
 	assertTrue (typeid(TypeGetter<0, TypeSecondReplacer>::HeadType) == typeid(Int8));
@@ -258,7 +299,6 @@ void TypeListTest::testTypeList()
 	assertTrue (typeid(TypeGetter<0, TypeThirdReplacer>::HeadType) == typeid(Int8));
 	assertTrue (typeid(TypeGetter<1, TypeThirdReplacer>::HeadType) == typeid(Int16));
 	assertTrue (typeid(TypeGetter<2, TypeThirdReplacer>::HeadType) == typeid(Int32));
-
 
 	typedef TypeAllReplacer<TypeThirdReplacer, Void, float>::HeadType TypeFourthReplacer;
 	assertTrue (typeid(TypeGetter<0, TypeFourthReplacer>::HeadType) == typeid(Int8));
@@ -281,6 +321,26 @@ void TypeListTest::testTypeList()
 	assertTrue (typeid(TypeGetter<17, TypeFourthReplacer>::HeadType) == typeid(float));
 	assertTrue (typeid(TypeGetter<18, TypeFourthReplacer>::HeadType) == typeid(float));
 	assertTrue (typeid(TypeGetter<19, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<20, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<21, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<22, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<23, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<24, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<25, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<26, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<27, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<28, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<29, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<30, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<31, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<32, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<33, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<34, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<35, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<36, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<37, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<38, TypeFourthReplacer>::HeadType) == typeid(float));
+	assertTrue (typeid(TypeGetter<39, TypeFourthReplacer>::HeadType) == typeid(float));
 }
 
 

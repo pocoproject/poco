@@ -123,7 +123,7 @@ struct ODBC_API ODBCConnectorRegistrator
 			#endif
 		#endif // ODBC_EXPORTS
 	#else // !POCO_OS_FAMILY_WINDOWS
-			#define POCO_DATA_ODBC_FORCE_SYMBOL(s) extern "C" const struct ODBCConnectorRegistrator s;
+		#define POCO_DATA_ODBC_FORCE_SYMBOL(s) extern "C" const struct ODBCConnectorRegistrator s;
 	#endif // POCO_OS_FAMILY_WINDOWS
 	POCO_DATA_ODBC_FORCE_SYMBOL(pocoODBCConnectorRegistrator)
 #endif // POCO_NO_AUTOMATIC_LIB_INIT

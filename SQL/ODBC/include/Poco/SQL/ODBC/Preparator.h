@@ -393,6 +393,9 @@ public:
 	std::size_t getMaxFieldSize() const;
 		// Returns maximum supported field size.
 
+	bool isPotentiallyHuge(std::size_t col) const;
+		// Returns true if the values can potentially be very large.
+
 	std::size_t maxDataSize(std::size_t pos) const;
 		/// Returns max supported size for column at position pos.
 		/// Returned length for variable length fields is the one
@@ -416,6 +419,7 @@ public:
 
 private:
 	typedef std::vector<Poco::Any> ValueVec;
+	typedef std::vector<bool>      HugeFlagVec;
 	typedef std::vector<SQLLEN>    LengthVec;
 	typedef std::vector<LengthVec> LengthLengthVec;
 	typedef std::map<std::size_t, DataType> IndexMap;
@@ -614,21 +618,29 @@ private:
 		poco_assert (DE_BOUND == _dataExtraction);
 		poco_assert (pos < _values.size());
 
-		T* pCache = new T[size];
-		std::memset(pCache, 0, size);
-
-		_values[pos] = Any(pCache);
-		_lengths[pos] = (SQLLEN) size;
-		_varLengthArrays.insert(IndexMap::value_type(pos, dt));
-
-		if (Utility::isError(SQLBindCol(_rStmt,
-			(SQLUSMALLINT) pos + 1,
-			valueType,
-			(SQLPOINTER) pCache,
-			(SQLINTEGER) size*sizeof(T),
-			&_lengths[pos])))
+		ODBCMetaColumn col(_rStmt, pos);
+		if (col.length() >= _maxFieldSize)
 		{
-			throw StatementException(_rStmt, "SQLBindCol()");
+			_hugeFlags[pos] = true;
+		}
+		else
+		{
+			T* pCache = new T[size];
+			std::memset(pCache, 0, size);
+
+			_values[pos] = Any(pCache);
+			_lengths[pos] = (SQLLEN) size;
+			_varLengthArrays.insert(IndexMap::value_type(pos, dt));
+
+			if (Utility::isError(SQLBindCol(_rStmt,
+				(SQLUSMALLINT) pos + 1,
+				valueType,
+				(SQLPOINTER) pCache,
+				(SQLINTEGER) size*sizeof(T),
+				&_lengths[pos])))
+			{
+				throw StatementException(_rStmt, "SQLBindCol()");
+			}
 		}
 	}
 
@@ -674,6 +686,7 @@ private:
 
 	const StatementHandle&  _rStmt;
 	mutable ValueVec        _values;
+	mutable HugeFlagVec     _hugeFlags;
 	mutable LengthVec       _lengths;
 	mutable LengthLengthVec _lenLengths;
 	mutable IndexMap        _varLengthArrays;
@@ -1173,7 +1186,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::DateTime>
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const Poco::Any& val)
+inline void Preparator::prepare(std::size_t pos, const Poco::Any& /*val*/)
 {
 	prepareImpl<std::vector<Poco::Any> >(pos);
 }
@@ -1197,7 +1210,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Any>& val
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const Poco::DynamicAny& val)
+inline void Preparator::prepare(std::size_t pos, const Poco::DynamicAny& /*val*/)
 {
 	prepareImpl<std::vector<Poco::DynamicAny> >(pos);
 }
@@ -1238,6 +1251,12 @@ inline void Preparator::setMaxFieldSize(std::size_t size)
 inline std::size_t Preparator::getMaxFieldSize() const
 {
 	return _maxFieldSize;
+}
+
+
+inline bool Preparator::isPotentiallyHuge(std::size_t col) const
+{
+	return _hugeFlags[col];
 }
 
 

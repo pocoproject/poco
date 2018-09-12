@@ -41,6 +41,7 @@ using Poco::Net::SSLManager;
 using Poco::Thread;
 using Poco::Util::Application;
 
+static const int closeSleepTime = 3000;
 
 namespace
 {
@@ -106,7 +107,7 @@ void TCPServerTest::testOneConnection()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 1);
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -149,7 +150,7 @@ void TCPServerTest::testTwoConnections()
 	assertTrue (srv.totalConnections() == 2);
 	ss2.close();
 
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -242,7 +243,7 @@ void TCPServerTest::testMultiConnections()
 
 	ss5.close();
 	ss6.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -282,7 +283,7 @@ void TCPServerTest::testReuseSocket()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 2);
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 
@@ -376,7 +377,7 @@ void TCPServerTest::testReuseSession()
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 3);
 	ss1.close();
-	Thread::sleep(300);
+	Thread::sleep(closeSleepTime);
 	assertTrue (srv.currentConnections() == 0);
 }
 

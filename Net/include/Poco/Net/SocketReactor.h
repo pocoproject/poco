@@ -20,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timespan.h"
 #include "Poco/Observer.h"
@@ -165,6 +166,9 @@ public:
 		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.removeEventHandler(obs);
 
+	bool has(const Socket& socket) const;
+		/// Returns true if socket is registered with this rector.
+
 protected:
 	virtual void onTimeout();
 		/// Called if the timeout expires and no other events are available.
@@ -205,26 +209,35 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
 	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
+	typedef Poco::FastMutex                   MutexType;
+	typedef MutexType::ScopedLock             ScopedLock;
 
+	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
+	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	enum
 	{
 		DEFAULT_TIMEOUT = 250000
 	};
 
-	bool            _stop;
-	Poco::Timespan  _timeout;
-	EventHandlerMap _handlers;
-	NotificationPtr _pReadableNotification;
-	NotificationPtr _pWritableNotification;
-	NotificationPtr _pErrorNotification;
-	NotificationPtr _pTimeoutNotification;
-	NotificationPtr _pIdleNotification;
-	NotificationPtr _pShutdownNotification;
-	Poco::FastMutex _mutex;
-	Poco::Thread*   _pThread;
-	
+#ifdef POCO_ENABLE_CPP11
+	std::atomic<bool> _stop;
+#else
+	bool              _stop;
+#endif
+	Poco::Timespan    _timeout;
+	EventHandlerMap   _handlers;
+	PollSet           _pollSet;
+	NotificationPtr   _pReadableNotification;
+	NotificationPtr   _pWritableNotification;
+	NotificationPtr   _pErrorNotification;
+	NotificationPtr   _pTimeoutNotification;
+	NotificationPtr   _pIdleNotification;
+	NotificationPtr   _pShutdownNotification;
+	MutexType         _mutex;
+	Poco::Thread*     _pThread;
+
 	friend class SocketNotifier;
 };
 

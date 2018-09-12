@@ -231,6 +231,10 @@ public:
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to support the diagnostic.
 
+	virtual bool isOrdered() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to support the diagnostic.
+
 	virtual bool isInteger() const;
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to support the diagnostic.
@@ -398,6 +402,12 @@ protected:
 
 private:
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4018 )
+#endif
+
 		template <typename F, typename T>
 		void POCO_UNUSED checkUpperLimit(const F& from) const
 		{
@@ -429,6 +439,9 @@ private:
 			}
 		}
 
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 	template <typename F, typename T>
 	void checkUpperLimitFloat(const F& from) const
@@ -523,7 +536,9 @@ inline void VarHolder::convert(Timestamp& /*val*/) const
 	throw BadCastException("Can not convert to Timestamp");
 }
 
+
 #ifndef POCO_LONG_IS_64_BIT
+
 
 inline void VarHolder::convert(long& val) const
 {
@@ -540,7 +555,9 @@ inline void VarHolder::convert(unsigned long& val) const
 	val = tmp;
 }
 
+
 #endif
+
 
 inline void VarHolder::convert(bool& /*val*/) const
 {
@@ -607,6 +624,13 @@ inline bool VarHolder::isStruct() const
 	return false;
 }
 
+
+inline bool VarHolder::isOrdered() const
+{
+	return false;
+}
+
+
 inline bool VarHolder::isInteger() const
 {
 	return false;
@@ -654,13 +678,14 @@ inline bool VarHolder::isDateTime() const
 	return false;
 }
 
+
 inline std::size_t VarHolder::size() const
 {
 	return 1u;
 }
 
 
-template <typename T>
+template <typename T, class Enable>
 class VarHolderImpl: public VarHolder
 	/// Template based implementation of a VarHolder.
 	/// This class provides type storage for user-defined types
@@ -2782,11 +2807,14 @@ private:
 };
 
 
-#ifndef POCO_LONG_IS_64_BIT
-
-
-template <>
-class VarHolderImpl<long>: public VarHolder
+template <typename T>
+class VarHolderImpl<T,
+	typename std::enable_if<
+		 std::is_same<T, long       >::value &&
+		!std::is_same<T, Poco::Int64>::value &&
+		!std::is_same<T, Poco::Int32>::value
+	>::type
+>: public VarHolder
 {
 public:
 	VarHolderImpl(long val): _val(val)
@@ -2866,7 +2894,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val = NumberFormatter::format(_val);
+		val = NumberFormatter::format(static_cast<Int64 >(_val));
 	}
 
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
@@ -2923,8 +2951,14 @@ private:
 };
 
 
-template <>
-class VarHolderImpl<unsigned long>: public VarHolder
+template <typename T>
+class VarHolderImpl<T,
+	typename std::enable_if<
+		 std::is_same<T, unsigned long>::value &&
+		!std::is_same<T, Poco::UInt64 >::value &&
+		!std::is_same<T, Poco::UInt32 >::value
+		>::type
+>: public VarHolder
 {
 public:
 	VarHolderImpl(unsigned long val): _val(val)
@@ -3004,7 +3038,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val = NumberFormatter::format(_val);
+		val = NumberFormatter::format(static_cast<UInt64>(_val));
 	}
 
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
@@ -3059,9 +3093,6 @@ private:
 
 	unsigned long _val;
 };
-
-
-#endif // POCO_LONG_IS_64_BIT
 
 
 template <typename T>

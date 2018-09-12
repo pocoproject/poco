@@ -150,7 +150,7 @@ bool SystemConfiguration::getRaw(const std::string& key, std::string& value) con
 }
 
 
-void SystemConfiguration::setRaw(const std::string& key, const std::string& value)
+void SystemConfiguration::setRaw(const std::string& key, const std::string& /*value*/)
 {
 	throw Poco::InvalidAccessException("Attempt to modify a system property", key);
 }
@@ -185,7 +185,7 @@ void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 }
 
 
-void SystemConfiguration::removeRaw(const std::string& key)
+void SystemConfiguration::removeRaw(const std::string& /*key*/)
 {
 	throw Poco::NotImplementedException("Removing a key in a SystemConfiguration");
 }

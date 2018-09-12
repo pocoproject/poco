@@ -227,6 +227,7 @@ public:
 
 	void insertSingleBulk();
 	void insertSingleBulkVec();
+	void insertSingleBulkNullableVec();
 
 	void limits();
 	void limitOnce();
@@ -574,8 +575,8 @@ public:
 	void internalExtraction();
 
 	void filter(const std::string& query =
-		"SELECT * FROM " + ExecUtil::vectors() + " ORDER BY int0 ASC",
-		const std::string& intFldName = "int0");
+		"SELECT * FROM " + ExecUtil::vectors() + " ORDER BY i0 ASC",
+		const std::string& intFldName = "i0");
 
 	void internalBulkExtraction();
 	void internalBulkExtractionUTF16();

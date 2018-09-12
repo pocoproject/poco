@@ -16,11 +16,13 @@
 #include "Poco/Format.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/FPEnvironment.h"
 #include "Poco/Exception.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <cstdio>
+#include <climits>
 #include <map>
 #include <set>
 
@@ -62,6 +64,10 @@ using Poco::CILess;
 using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
+using Poco::isIntOverflow;
+using Poco::isSafeIntCast;
+using Poco::safeIntCast;
+using Poco::FPEnvironment;
 
 
 StringTest::StringTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -608,6 +614,25 @@ void StringTest::testStringToFloat()
 	assertTrue (std::isinf(strToFloat("-infinity", "infinity")));
 	assertTrue (!std::isinf(strToFloat("Inf")));
 	assertTrue (std::isinf(strToFloat("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isNaN(strToFloat("nan")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("xNaNy")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("inf")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("-inf")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("1.23")));
+	assertTrue (FPEnvironment::isNaN(strToFloat("Inf")));
+	assertTrue (!FPEnvironment::isNaN(strToFloat("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isInfinite(strToFloat("inf")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("-inf")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("infinity", "infinity")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("1.23")));
+	assertTrue (!FPEnvironment::isInfinite(strToFloat("abc")));
+	assertTrue (FPEnvironment::isInfinite(strToFloat("Inf", "Inf")));
 }
 
 
@@ -766,6 +791,25 @@ void StringTest::testStringToDouble()
 	assertTrue (std::isinf(strToDouble("-infinity", "infinity")));
 	assertTrue (!std::isinf(strToDouble("Inf")));
 	assertTrue (std::isinf(strToDouble("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isNaN(strToDouble("nan")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("xNaNy")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("inf")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("-inf")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("1.23")));
+	assertTrue (FPEnvironment::isNaN(strToDouble("Inf")));
+	assertTrue (!FPEnvironment::isNaN(strToDouble("Inf", "Inf")));
+
+	assertTrue (FPEnvironment::isInfinite(strToDouble("inf")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("-inf")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("infinity", "infinity")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("-infinity", "infinity")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("1.23")));
+	assertTrue (!FPEnvironment::isInfinite(strToDouble("abc")));
+	assertTrue (FPEnvironment::isInfinite(strToDouble("Inf", "Inf")));
 }
 
 
@@ -995,87 +1039,123 @@ void StringTest::testIntToString()
 
 	// decimal
 	std::string result;
-	assertTrue (intToStr(0, 10, result));
+	result = intToStr(0, 10);
 	assertTrue (result == "0");
-	assertTrue (intToStr(0, 10, result, false, 10, '0'));
+	result.clear();
+	result = intToStr(0, 10, false, 10, '0');
 	assertTrue (result == "0000000000");
-	assertTrue (intToStr(1234567890, 10, result));
+	result.clear();
+	result = intToStr(1234567890, 10);
 	assertTrue (result == "1234567890");
-	assertTrue (intToStr(-1234567890, 10, result));
+	result.clear();
+	result = intToStr(-1234567890, 10);
 	assertTrue (result == "-1234567890");
-	assertTrue (intToStr(-1234567890, 10, result, false, 15, '0'));
+	result.clear();
+	result = intToStr(-1234567890, 10, false, 15, '0');
 	assertTrue (result == "-00001234567890");
-	assertTrue (intToStr(-1234567890, 10, result, false, 15));
+	result.clear();
+	result = intToStr(-1234567890, 10, false, 15);
 	assertTrue (result == "    -1234567890");
-	assertTrue (intToStr(-1234567890, 10, result, false, 0, 0, ','));
+	result.clear();
+	result = intToStr(-1234567890, 10, false, 0, 0, ',');
 	assertTrue (result == "-1,234,567,890");
+	result.clear();
 
 	// binary
-	assertTrue (intToStr(1234567890, 2, result));
+	result = intToStr(1234567890, 2);
 	assertTrue (result == "1001001100101100000001011010010");
-	assertTrue (intToStr(1234567890, 2, result, true));
+	result.clear();
+	result = intToStr(1234567890, 2, true);
 	assertTrue (result == "1001001100101100000001011010010");
-	assertTrue (intToStr(1234567890, 2, result, true, 35, '0'));
+	result.clear();
+	result = intToStr(1234567890, 2, true, 35, '0');
 	assertTrue (result == "00001001001100101100000001011010010");
-	assertTrue (uIntToStr(0xFF, 2, result));
+	result.clear();
+	result = uIntToStr(0xFF, 2);
 	assertTrue (result == "11111111");
-	assertTrue (uIntToStr(0x0F, 2, result, false, 8, '0'));
+	result.clear();
+	result = uIntToStr(0x0F, 2, false, 8, '0');
 	assertTrue (result == "00001111");
-	assertTrue (uIntToStr(0x0F, 2, result));
+	result.clear();
+	result = uIntToStr(0x0F, 2);
 	assertTrue (result == "1111");
-	assertTrue (uIntToStr(0xF0, 2, result));
+	result.clear();
+	result = uIntToStr(0xF0, 2);
 	assertTrue (result == "11110000");
-	assertTrue (uIntToStr(0xFFFF, 2, result));
+	result.clear();
+	result = uIntToStr(0xFFFF, 2);
 	assertTrue (result == "1111111111111111");
-	assertTrue (uIntToStr(0xFF00, 2, result));
+	result.clear();
+	result = uIntToStr(0xFF00, 2);
 	assertTrue (result == "1111111100000000");
-	assertTrue (uIntToStr(0xFFFFFFFF, 2, result));
+	result.clear();
+	result = uIntToStr(0xFFFFFFFF, 2);
 	assertTrue (result == "11111111111111111111111111111111");
-	assertTrue (uIntToStr(0xFF00FF00, 2, result));
+	result.clear();
+	result = uIntToStr(0xFF00FF00, 2);
 	assertTrue (result == "11111111000000001111111100000000");
-	assertTrue (uIntToStr(0xF0F0F0F0, 2, result));
+	result.clear();
+	result = uIntToStr(0xF0F0F0F0, 2);
 	assertTrue (result == "11110000111100001111000011110000");
+	result.clear();
 #if defined(POCO_HAVE_INT64)
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 2, result));
+	result = uIntToStr(0xFFFFFFFFFFFFFFFF, 2);
 	assertTrue (result == "1111111111111111111111111111111111111111111111111111111111111111");
-	assertTrue (uIntToStr(0xFF00000FF00000FF, 2, result));
+	result.clear();
+	result = uIntToStr(0xFF00000FF00000FF, 2);
 	assertTrue (result == "1111111100000000000000000000111111110000000000000000000011111111");
+	result.clear();
 #endif
 
 	// octal
-	assertTrue (uIntToStr(1234567890, 010, result));
+	result = uIntToStr(1234567890, 010);
 	assertTrue (result == "11145401322");
-	assertTrue (uIntToStr(1234567890, 010, result, true));
+	result.clear();
+	result = uIntToStr(1234567890, 010, true);
 	assertTrue (result == "011145401322");
-	assertTrue (uIntToStr(1234567890, 010, result, true, 15, '0'));
+	result.clear();
+	result = uIntToStr(1234567890, 010, true, 15, '0');
 	assertTrue (result == "000011145401322");
-	assertTrue (uIntToStr(012345670, 010, result, true));
+	result.clear();
+	result = uIntToStr(012345670, 010, true);
 	assertTrue (result == "012345670");
-	assertTrue (uIntToStr(012345670, 010, result));
+	result.clear();
+	result = uIntToStr(012345670, 010);
 	assertTrue (result == "12345670");
+	result.clear();
 
 	// hexadecimal
-	assertTrue (uIntToStr(0, 0x10, result, true));
+	result = uIntToStr(0, 0x10, true);
 	assertTrue (result == "0x0");
-	assertTrue (uIntToStr(0, 0x10, result, true, 4, '0'));
+	result.clear();
+	result = uIntToStr(0, 0x10, true, 4, '0');
 	assertTrue (result == "0x00");
-	assertTrue (uIntToStr(0, 0x10, result, false, 4, '0'));
+	result.clear();
+	result = uIntToStr(0, 0x10, false, 4, '0');
 	assertTrue (result == "0000");
-	assertTrue (uIntToStr(1234567890, 0x10, result));
+	result.clear();
+	result = uIntToStr(1234567890, 0x10);
 	assertTrue (result == "499602D2");
-	assertTrue (uIntToStr(1234567890, 0x10, result, true));
+	result.clear();
+	result = uIntToStr(1234567890, 0x10, true);
 	assertTrue (result == "0x499602D2");
-	assertTrue (uIntToStr(1234567890, 0x10, result, true, 15, '0'));
+	result.clear();
+	result = uIntToStr(1234567890, 0x10, true, 15, '0');
 	assertTrue (result == "0x00000499602D2");
-	assertTrue (uIntToStr(0x1234567890ABCDEF, 0x10, result, true));
+	result.clear();
+	result = uIntToStr(0x1234567890ABCDEF, 0x10, true);
 	assertTrue (result == "0x1234567890ABCDEF");
-	assertTrue (uIntToStr(0xDEADBEEF, 0x10, result));
+	result.clear();
+	result = uIntToStr(0xDEADBEEF, 0x10);
 	assertTrue (result == "DEADBEEF");
+	result.clear();
 #if defined(POCO_HAVE_INT64)
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, result));
+	result = uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10);
 	assertTrue (result == "FFFFFFFFFFFFFFFF");
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true));
+	result.clear();
+	result = uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, true);
 	assertTrue (result == "0xFFFFFFFFFFFFFFFF");
+	result.clear();
 #endif
 
 	try
@@ -1110,6 +1190,182 @@ void StringTest::testFloatToString()
 	assertTrue (doubleToStr(str, ival, 1, 15, ',') == "1,234,567,890.0");
 	ival = -123456789;
 	assertTrue (doubleToStr(str, ival, 1, 14, ',') == "-123,456,789.0");
+}
+
+
+void StringTest::testNumericStringLimit()
+{
+	char c = 0, t = -1;
+	assertTrue(!isIntOverflow<char>(c));
+	assertTrue(safeIntCast<char>(c, t) == c);
+	assertTrue(t == c);
+
+	short s = SHRT_MAX;
+	assertTrue(isIntOverflow<char>(s));
+	try
+	{
+		safeIntCast(s, t);
+		fail("cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	s = SHRT_MIN;
+	assertTrue(isIntOverflow<char>(s));
+	try
+	{
+		safeIntCast(s, t);
+		fail("short => char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	signed char sc = 0, st = -1;
+	assertTrue(!isIntOverflow<signed char>(sc));
+	assertTrue(safeIntCast<char>(sc, st) == sc);
+	assertTrue(st == sc);
+
+	short ss = SHRT_MAX;
+	assertTrue(isIntOverflow<signed char>(ss));
+	assertTrue(isIntOverflow<char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("short => signed char  cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	ss = SHRT_MIN;
+	assertTrue(isIntOverflow<signed char>(ss));
+	assertTrue(isIntOverflow<char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("short => signed char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	assertTrue(safeIntCast<signed char>(sc, st) == c);
+	assertTrue(st == sc);
+
+	unsigned char uc = 0, ut = -1;
+	assertTrue(!isIntOverflow<unsigned char>(uc));
+	assertTrue(safeIntCast<char>(uc, ut) == uc);
+	assertTrue(ut == uc);
+
+	ss = SHRT_MAX;
+	assertTrue(isIntOverflow<unsigned char>(ss));
+	try
+	{
+		safeIntCast(ss, st);
+		fail("cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	ss = -1;
+	assertTrue(isIntOverflow<unsigned char>(ss));
+	try
+	{
+		safeIntCast(ss, uc);
+		fail("unsigned short => unsigned char cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	int i = 0;
+	assertTrue(!isIntOverflow<int>(i));
+	assertTrue(!isIntOverflow<unsigned>(i));
+	i = -1;
+	unsigned int ti = -1;
+	assertTrue(isIntOverflow<unsigned>(i));
+	try
+	{
+		safeIntCast(i, ti);
+		fail("unsigned int => int cast must fail");
+	}
+	catch(Poco::BadCastException&){}
+
+	if (sizeof(long) > sizeof(int))
+	{
+		long l = LONG_MAX;
+		assertTrue(isIntOverflow<int>(l));
+		l = -1L;
+		assertTrue(isIntOverflow<unsigned>(l));
+		i = -1;
+		assertTrue(!isIntOverflow<long>(i));
+		long tl = 0;
+		assertTrue(safeIntCast(i, tl) == i);
+		unsigned long ul = ULONG_MAX, tul = 0;
+		assertTrue(isIntOverflow<long>(ul));
+		try
+		{
+			safeIntCast(ul, tl);
+			fail("unsigned long => long cast must fail");
+		}
+		catch(Poco::BadCastException&){}
+		assertTrue(!isIntOverflow<unsigned long>(ul));
+		tl = 0;
+		assertTrue(safeIntCast(ul, tul) == ul);
+		l = LONG_MIN;
+		assertTrue(isIntOverflow<unsigned long>(l));
+		try
+		{
+			safeIntCast(l, ul);
+			fail("unsigned long => long cast must fail");
+		}
+		catch(Poco::BadCastException&){}
+		ul = LONG_MAX;
+		assertTrue(!isIntOverflow<long>(ul));
+		assertTrue(safeIntCast(ul, l) == ul);
+	}
+
+	numericStringLimitSameSign<unsigned short, unsigned char>();
+	numericStringLimitSameSign<short, char>();
+	numericStringLimitSameSign<unsigned int, unsigned short>();
+	numericStringLimitSameSign<int, short>();
+
+	if (sizeof(long) > sizeof(int))
+	{
+		numericStringLimitSameSign<unsigned long, unsigned int>();
+		numericStringLimitSameSign<long, int>();
+	}
+
+	numericStringLowerLimit<short, char>();
+	numericStringLowerLimit<int, short>();
+
+	if (sizeof(long) > sizeof(int))
+	{
+		numericStringLowerLimit<int64_t, int32_t>();
+	}
+
+#ifdef POCO_ENABLE_CPP11
+	assertTrue(!isIntOverflow<int8_t>(0));
+	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::max()));
+	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::min()));
+	assertTrue(!isIntOverflow<uint8_t>(0));
+	assertTrue(isIntOverflow<uint8_t>(std::numeric_limits<int16_t>::max()));
+	assertTrue(isIntOverflow<uint8_t>(-1));
+	assertTrue(!isIntOverflow<int32_t>(0));
+	assertTrue(isIntOverflow<int32_t>(std::numeric_limits<int64_t>::max()));
+	assertTrue(!isIntOverflow<uint32_t>(0));
+	assertTrue(isIntOverflow<uint32_t>(-1));
+	assertTrue(isIntOverflow<uint32_t>(-1L));
+	assertTrue(isIntOverflow<uint32_t>(-1LL));
+	assertTrue(!isIntOverflow<int64_t>(-1));
+	assertTrue(isIntOverflow<int64_t>(std::numeric_limits<uint64_t>::max()));
+	assertTrue(!isIntOverflow<uint64_t>(std::numeric_limits<uint64_t>::max()));
+	assertTrue(isIntOverflow<uint64_t>(std::numeric_limits<int64_t>::min()));
+	assertTrue(!isIntOverflow<uint64_t>(std::numeric_limits<uint64_t>::min()));
+	assertTrue(!isIntOverflow<int64_t>(std::numeric_limits<int64_t>::max()));
+
+	numericStringLimitSameSign<uint16_t, uint8_t>();
+	numericStringLimitSameSign<int16_t, int8_t>();
+	numericStringLimitSameSign<uint32_t, uint16_t>();
+	numericStringLimitSameSign<int32_t, int16_t>();
+	numericStringLimitSameSign<uint64_t, uint32_t>();
+	numericStringLimitSameSign<int64_t, int32_t>();
+
+	numericStringLowerLimit<int16_t, int8_t>();
+	numericStringLowerLimit<int32_t, int16_t>();
+	numericStringLowerLimit<int64_t, int32_t>();
+#endif
 }
 
 
@@ -1293,6 +1549,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testStringToFloat);
 	CppUnit_addTest(pSuite, StringTest, testStringToDouble);
 	CppUnit_addTest(pSuite, StringTest, testNumericStringPadding);
+	CppUnit_addTest(pSuite, StringTest, testNumericStringLimit);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
 	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);

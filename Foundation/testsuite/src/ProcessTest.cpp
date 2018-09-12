@@ -15,6 +15,7 @@
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
 #include "Poco/Thread.h"
+#include "Poco/Path.h"
 #include <csignal>
 
 
@@ -23,6 +24,7 @@ using Poco::ProcessHandle;
 using Poco::Pipe;
 using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
+using Poco::Path;
 
 
 ProcessTest::ProcessTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -35,22 +37,23 @@ ProcessTest::~ProcessTest()
 }
 
 
+std::string ProcessTest::execName()
+{
+	std::string name = Path(Path::self()).makeParent().toString();
+	name.append("TestApp");
+#if defined(_DEBUG)
+	name.append(1, 'd');
+#endif
+	return name;
+}
+
+
 void ProcessTest::testLaunch()
 {
-	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#elif defined(_WIN32_WCE)
-	cmd = "\\";
-	cmd += name;
-	cmd += ".EXE";
-#else
-	cmd = name;
+	std::string cmd = execName();
+#if defined(_WIN32_WCE)
+-	cmd += ".EXE";
 #endif
-
 	std::vector<std::string> args;
 	args.push_back("arg1");
 	args.push_back("arg2");
@@ -64,20 +67,10 @@ void ProcessTest::testLaunch()
 void ProcessTest::testLaunchRedirectIn()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
-
 	std::vector<std::string> args;
 	args.push_back("-count");
 	Pipe inPipe;
-	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
+	ProcessHandle ph = Process::launch(execName(), args, &inPipe, 0, 0);
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(100, 'x');
 	ostr.close();
@@ -90,20 +83,10 @@ void ProcessTest::testLaunchRedirectIn()
 void ProcessTest::testLaunchRedirectOut()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
-
 	std::vector<std::string> args;
 	args.push_back("-hello");
 	Pipe outPipe;
-	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0);
+	ProcessHandle ph = Process::launch(execName(), args, 0, &outPipe, 0);
 	PipeInputStream istr(outPipe);
 	std::string s;
 	int c = istr.get();
@@ -118,22 +101,12 @@ void ProcessTest::testLaunchRedirectOut()
 void ProcessTest::testLaunchEnv()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
-
 	std::vector<std::string> args;
 	args.push_back("-env");
 	Pipe outPipe;
 	Process::Env env;
 	env["TESTENV"] = "test";
-	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0, env);
+	ProcessHandle ph = Process::launch(execName(), args, 0, &outPipe, 0, env);
 	PipeInputStream istr(outPipe);
 	std::string s;
 	int c = istr.get();
@@ -148,9 +121,6 @@ void ProcessTest::testLaunchEnv()
 void ProcessTest::testLaunchArgs()
 {
 #if defined (_WIN32) && !defined(_WIN32_WCE)
-	std::string name("TestApp");
-	std::string cmd = name;
-
 	std::vector<std::string> args;
 	args.push_back("-echo-args");
 	args.push_back("simple");
@@ -167,7 +137,7 @@ void ProcessTest::testLaunchArgs()
 	args.push_back("c:\\program files\\ends with backslash\\");
 	args.push_back("\"already quoted \\\" \\\\\"");
 	Pipe outPipe;
-	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0);
+	ProcessHandle ph = Process::launch(execName(), args, 0, &outPipe, 0);
 	PipeInputStream istr(outPipe);
 	std::string receivedArg;
 	int c = istr.get();
@@ -201,20 +171,10 @@ void ProcessTest::testLaunchArgs()
 void ProcessTest::testIsRunning()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
-
 	std::vector<std::string> args;
 	args.push_back("-count");
 	Pipe inPipe;
-	ProcessHandle ph = Process::launch(cmd, args, &inPipe, 0, 0);
+	ProcessHandle ph = Process::launch(execName(), args, &inPipe, 0, 0);
 	Process::PID id = ph.id();
 	assertTrue (Process::isRunning(ph));
 	assertTrue (Process::isRunning(id));
@@ -231,18 +191,8 @@ void ProcessTest::testIsRunning()
 void ProcessTest::testIsRunningAllowsForTermination()
 {
 #if !defined(_WIN32_WCE)
-	std::string name("TestApp");
-	std::string cmd;
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
-	cmd += name;
-#else
-	cmd = name;
-#endif
-
 	std::vector<std::string> args;
-	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
+	ProcessHandle ph = Process::launch(execName(), args, 0, 0, 0);
 	while (Process::isRunning(ph))
 		Poco::Thread::sleep(100);
 #endif // !defined(_WIN32_WCE)
@@ -252,15 +202,9 @@ void ProcessTest::testIsRunningAllowsForTermination()
 void ProcessTest::testSignalExitCode()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	std::string name("TestApp");
-	std::string cmd;
-
-	cmd = "./";
-	cmd += name;
-
 	std::vector<std::string> args;
 	args.push_back("-raise-int");
-	ProcessHandle ph = Process::launch(cmd, args, 0, 0, 0);
+	ProcessHandle ph = Process::launch(execName(), args, 0, 0, 0);
 	int rc = ph.wait();
 	assertTrue (rc == -SIGINT);
 #endif // defined(POCO_OS_FAMILY_UNIX)

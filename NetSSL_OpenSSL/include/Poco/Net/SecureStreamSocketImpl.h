@@ -61,7 +61,7 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
-	void bind(const SocketAddress& address, bool reuseAddress);
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server

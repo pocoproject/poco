@@ -1579,7 +1579,6 @@ void JSONTest::testStringifyPreserveOrder()
 	std::ostringstream ostr;
 
 	Stringifier::condense(result, ostr);
-	std::cout << ostr.str() << std::endl;
 	assertTrue (ostr.str() == "{\"Simpsons\":{\"husband\":{\"name\":\"Homer\",\"age\":38},\"wife\":{\"name\":\"Marge\",\"age\":36},"
 						"\"children\":[\"Bart\",\"Lisa\",\"Maggie\"],"
 						"\"address\":{\"number\":742,\"street\":\"Evergreen Terrace\",\"town\":\"Springfield\"}}}");
@@ -1666,7 +1665,12 @@ void JSONTest::testStringifyPreserveOrder()
 						"}");
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
+	assertTrue(ds.toString() == "{ \"Simpsons\" : { \"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" }, "
+		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+		"\"husband\" : { \"age\" : 38, \"name\" : \"Homer\" }, "
+		"\"wife\" : { \"age\" : 36, \"name\" : \"Marge\" } } }");
 	assertTrue (ds["Simpsons"].isStruct());
+	assertFalse(ds["Simpsons"].isOrdered());
 	assertTrue (ds["Simpsons"]["husband"].isStruct());
 	assertTrue (ds["Simpsons"]["husband"]["name"] == "Homer");
 	assertTrue (ds["Simpsons"]["husband"]["age"] == 38);
@@ -1684,6 +1688,17 @@ void JSONTest::testStringifyPreserveOrder()
 	assertTrue (ds["Simpsons"]["address"]["number"] == 742);
 	assertTrue (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
 	assertTrue (ds["Simpsons"]["address"]["town"] == "Springfield");
+
+#ifdef POCO_ENABLE_CPP11
+	Poco::OrderedDynamicStruct ods = *result.extract<Object::Ptr>();
+	assertTrue(ods["Simpsons"].isStruct());
+	assertTrue(ods["Simpsons"].isOrdered());
+	assertTrue(ods.toString() == "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\", \"age\" : 38 }, "
+		"\"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
+		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+		"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", "
+		"\"town\" : \"Springfield\" } } }");
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -1930,26 +1945,29 @@ void JSONTest::testEscape0()
 
 void JSONTest::testNonEscapeUnicode()
 {
-	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
+	std::string chinese("{\"arr\":[{ \"name\" : \"\\u4e2d\" }]}");
 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
 	Var result = parser.parse(chinese);
 
 	assertTrue (result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(false);
 
 	std::stringstream ss;
 	object->stringify(ss);
-	assertTrue (ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
+	assertTrue (ss.str().compare("{\"arr\":[{\"name\":\"\xE4\xB8\xAD\"}]}") == 0);
 
-	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
-		'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
+	const unsigned char utf8Chars[]   = {'{', '"', 'a', 'r', 'r', '"', ':', '[', '{', '"', 'n', 'a', 'm', 'e', '"', ':',
+										 '"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', ']', '}', 0};
 	std::string utf8Text((const char*) utf8Chars);
 	parser.reset();
 	result = parser.parse(utf8Text);
 	object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(false);
+
 	ss.str(""); object->stringify(ss);
-	assertTrue (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
+	assertTrue (ss.str() == "{\"arr\":[{\"name\":\"g\xC3\xBCnter\"}]}");
 
 	Poco::JSON::Object obj1;
 	std::string shortEscapeStr("String with \t");

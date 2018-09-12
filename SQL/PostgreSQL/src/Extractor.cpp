@@ -41,7 +41,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	int tempVal;
+	int tempVal = 0;
 
 	if	(	  isColumnNull(outputParameter)
 		 || ! Poco::NumberParser::tryParse(outputParameter.pData(), tempVal)
@@ -50,7 +50,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 		return false;
 	}
 
-	val = tempVal;
+	val = static_cast<Int8>(tempVal);
 
 	return true;
 }
@@ -60,7 +60,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	unsigned int tempVal;
+	unsigned int tempVal = 0;
 
 	if	(	  isColumnNull(outputParameter)
 		 || ! Poco::NumberParser::tryParseUnsigned(outputParameter.pData(), tempVal)
@@ -69,7 +69,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 		return false;
 	}
 
-	val = tempVal;
+	val = static_cast<Int8>(tempVal);
 
 	return true;
 }
@@ -79,7 +79,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	int tempVal;
+	int tempVal = 0;
 
 	if	(	isColumnNull(outputParameter)
 		 || ! Poco::NumberParser::tryParse(outputParameter.pData(), tempVal)
@@ -88,7 +88,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 		return false;
 	}
 
-	val = tempVal;
+	val = static_cast<Int8>(tempVal);
 
 	return true;
 }
@@ -98,7 +98,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	unsigned int tempVal;
+	unsigned int tempVal = 0;
 
 	if	(	isColumnNull(outputParameter)
 		 || ! Poco::NumberParser::tryParseUnsigned(outputParameter.pData(), tempVal)
@@ -107,7 +107,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 		return false;
 	}
 
-	val = tempVal;
+	val = static_cast<Int8>(tempVal);
 
 	return true;
 }
@@ -178,7 +178,7 @@ bool Extractor::extract(std::size_t pos, long& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	Poco::Int64 tempVal;
+	Poco::Int64 tempVal = 0;
 
 	if (isColumnNull(outputParameter) || !Poco::NumberParser::tryParse64(outputParameter.pData(), tempVal)
 		)
@@ -196,7 +196,7 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	Poco::UInt64 tempVal;
+	Poco::UInt64 tempVal = 0;
 
 	if	(	isColumnNull(outputParameter)
 		 || ! Poco::NumberParser::tryParseUnsigned64(outputParameter.pData(), tempVal)
@@ -238,7 +238,7 @@ bool Extractor::extract(std::size_t pos, float& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
 
-	double tempVal;
+	double tempVal = 0.0;
 
 	if	(	isColumnNull(outputParameter)
 		 || ! Poco::NumberParser::tryParseFloat(outputParameter.pData(), tempVal)
@@ -331,7 +331,7 @@ bool Extractor::extract(std::size_t pos, Poco::SQL::BLOB& val)
 			unsigned int binaryBuffer = 0;
 			if (Poco::NumberParser::tryParseHex(buffer, binaryBuffer))
 			{
-				unsigned char finalBinaryBuffer = binaryBuffer; // downsize
+				UInt8 finalBinaryBuffer = static_cast<UInt8>(binaryBuffer); // downsize
 				val.appendRaw(&finalBinaryBuffer, 1);
 			}
 		}
@@ -442,7 +442,7 @@ bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 }
 
 
-bool Extractor::isNull(std::size_t col, std::size_t row)
+bool Extractor::isNull(std::size_t col, std::size_t /*row*/)
 {
 	OutputParameter outputParameter = extractPreamble(col);
 

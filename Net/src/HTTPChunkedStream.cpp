@@ -152,7 +152,7 @@ HTTPChunkedInputStream::~HTTPChunkedInputStream()
 }
 
 
-void* HTTPChunkedInputStream::operator new(std::size_t size)
+void* HTTPChunkedInputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }
@@ -191,7 +191,7 @@ HTTPChunkedOutputStream::~HTTPChunkedOutputStream()
 }
 
 
-void* HTTPChunkedOutputStream::operator new(std::size_t size)
+void* HTTPChunkedOutputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }

@@ -330,7 +330,7 @@ Token::Class IdentifierToken::tokenClass() const
 }
 
 
-bool IdentifierToken::start(char c, std::istream& istr)
+bool IdentifierToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return (c >= 'A' && c <= 'Z') ||
@@ -379,7 +379,7 @@ Token::Class StringLiteralToken::tokenClass() const
 }
 
 
-bool StringLiteralToken::start(char c, std::istream& istr)
+bool StringLiteralToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return c == '"';
@@ -438,7 +438,7 @@ Token::Class CharLiteralToken::tokenClass() const
 }
 
 
-bool CharLiteralToken::start(char c, std::istream& istr)
+bool CharLiteralToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return c == '\'';
@@ -552,7 +552,7 @@ void NumberLiteralToken::finish(std::istream& istr)
 	else
 	{
 		_isFloat = true;
-		_value += istr.get();
+		_value += static_cast<char>(istr.get());
 		next = istr.peek();
 	}
 	while (next >= '0' && next <= '9')
@@ -691,7 +691,7 @@ Token::Class PreprocessorToken::tokenClass() const
 }
 
 
-bool PreprocessorToken::start(char c, std::istream& istr)
+bool PreprocessorToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return c == '#';

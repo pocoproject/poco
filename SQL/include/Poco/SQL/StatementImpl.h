@@ -254,7 +254,10 @@ protected:
 	void setTotalRowCount(std::size_t totalRowCount);
 		/// Explicitly sets the total row count.
 
-	void makeExtractors(std::size_t count);
+	virtual bool canMakeExtractors();
+		/// Returns true if extractors can be created.
+
+	virtual void makeExtractors(std::size_t count);
 		/// Determines the type of the internal extraction container and
 		/// calls the extraction creation function (addInternalExtract)
 		/// with appropriate data type and container type arguments.
@@ -663,7 +666,7 @@ inline void StatementImpl::resetBulk()
 {
 	_bulkExtraction = BULK_UNDEFINED;
 	_bulkBinding = BULK_UNDEFINED;\
-	setExtractionLimit(Limit(Limit::LIMIT_UNLIMITED, false, false));
+	setExtractionLimit(Limit(static_cast<Limit::SizeT>(Limit::LIMIT_UNLIMITED), false, false));
 }
 
 

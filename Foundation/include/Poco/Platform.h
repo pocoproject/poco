@@ -137,7 +137,8 @@
 #define POCO_ARCH_SH      0x0d
 #define POCO_ARCH_NIOS2   0x0e
 #define POCO_ARCH_AARCH64 0x0f
-
+#define POCO_ARCH_ARM64   0x0f
+#define POCO_ARCH_RISCV64 0x10
 
 #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
 	#define POCO_ARCH POCO_ARCH_ALPHA
@@ -227,16 +228,19 @@
 #elif defined(__AARCH64EB__)
 	#define POCO_ARCH POCO_ARCH_AARCH64
 	#define POCO_ARCH_BIG_ENDIAN 1
+#elif defined(__riscv) && (__riscv_xlen == 64)
+	#define POCO_ARCH POCO_ARCH_RISCV64
+	#define POCO_ARCH_LITTLE_ENDIAN 1
 #endif
 
 
-#if defined(_MSC_VER)
-	#define POCO_COMPILER_MSVC
-#elif defined(__clang__)
+#if defined(__clang__)
 	#define POCO_COMPILER_CLANG
 	#if defined(__apple_build_version__)
 		#define POCO_COMPILER_APPLECLANG
 	#endif
+#elif defined(_MSC_VER)
+	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
 #elif defined (__MINGW32__) || defined (__MINGW64__)

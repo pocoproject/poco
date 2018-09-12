@@ -38,7 +38,7 @@ void LogStreamTest::testLogStream()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
 
 	LogStream ls(root);
 

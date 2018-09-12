@@ -190,7 +190,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int AutoDetectStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+int AutoDetectStreamBuf::writeToDevice(const char* /*buffer*/, std::streamsize /*length*/)
 {
 	return -1; // not supported
 }

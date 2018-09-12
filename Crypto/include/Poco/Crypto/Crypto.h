@@ -26,6 +26,10 @@
 #endif
 
 
+#define POCO_EXTERNAL_OPENSSL_DEFAULT 1
+#define POCO_EXTERNAL_OPENSSL_SLPRO 2
+
+
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
 
@@ -113,6 +117,19 @@ enum RSAPaddingMode
 			#if !defined (_DLL) && (POCO_MSVS_VERSION >= 2015)
 				#pragma comment(lib, "legacy_stdio_definitions.lib")
 				#pragma comment(lib, "legacy_stdio_wide_specifiers.lib")
+			#endif
+		#elif defined(POCO_EXTERNAL_OPENSSL)
+			#if POCO_EXTERNAL_OPENSSL == POCO_EXTERNAL_OPENSSL_SLPRO
+				#if defined(POCO_DLL)
+					#pragma comment(lib, "libeay32.lib")
+					#pragma comment(lib, "ssleay32.lib")
+			  	#else
+					#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
+					#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
+				#endif
+			#elif POCO_EXTERNAL_OPENSSL == POCO_EXTERNAL_OPENSSL_DEFAULT
+				#pragma comment(lib, "libeay32.lib")
+				#pragma comment(lib, "ssleay32.lib")
 			#endif
 		#endif // POCO_INTERNAL_OPENSSL_MSVC_VER
 		#if !defined(Crypto_EXPORTS)

@@ -20,6 +20,11 @@
 #include <set>
 
 
+#ifndef MAX_PATH
+    #define MAX_PATH 260
+#endif
+
+
 using Poco::File;
 using Poco::TemporaryFile;
 using Poco::Path;
@@ -541,7 +546,7 @@ void FileTest::testLongPath()
 	assertTrue (d.isDirectory());
 
 	Poco::File f(p.toString());
-	f.remove(true);	
+	f.remove(true);
 #endif
 }
 

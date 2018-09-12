@@ -11,6 +11,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Delegate.h"
 #include "Poco/Thread.h"
+#include "Poco/Environment.h"
 #include "RedisTest.h"
 #include "Poco/Redis/AsyncReader.h"
 #include "Poco/Redis/Command.h"
@@ -35,6 +36,8 @@ RedisTest::RedisTest(const std::string& name):
 #if POCO_OS == POCO_OS_ANDROID
 	_host = "10.0.2.2";
 #endif
+	if(Poco::Environment::has("REDIS_HOST"))
+		_host = Poco::Environment::get("REDIS_HOST");
 	if (!_connected)
 	{
 		try

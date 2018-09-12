@@ -192,13 +192,19 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 }
 
 
-void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
 	poco_check_ptr (_pSocket);
 
-	_pSocket->bind(address, reuseAddress);
+	_pSocket->bind(address, reuseAddress, reusePort);
 }
 
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	poco_check_ptr(_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, ipV6Only);
+}
 
 void SecureSocketImpl::listen(int backlog)
 {
@@ -259,7 +265,7 @@ void SecureSocketImpl::close()
 }
 
 
-int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
+int SecureSocketImpl::sendBytes(const void* buffer, int length, int /*flags*/)
 {
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);
@@ -289,7 +295,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
-int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
+int SecureSocketImpl::receiveBytes(void* buffer, int length, int /*flags*/)
 {
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);

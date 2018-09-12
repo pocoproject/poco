@@ -302,7 +302,7 @@ inline OutputParameter::OutputParameter(Poco::SQL::MetaColumn::ColumnDataType aF
 
 inline OutputParameter::OutputParameter()
     : _fieldType         (Poco::SQL::MetaColumn::FDT_UNKNOWN),
-      _internalFieldType (-1),
+      _internalFieldType (static_cast<Oid>(-1)),
       _rowNumber         (0),
       _pData             (0),
       _size              (0),

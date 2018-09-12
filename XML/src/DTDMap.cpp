@@ -48,13 +48,13 @@ Node* DTDMap::getNamedItem(const XMLString& name) const
 }
 
 
-Node* DTDMap::setNamedItem(Node* arg)
+Node* DTDMap::setNamedItem(Node* /*arg*/)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node* DTDMap::removeNamedItem(const XMLString& name)
+Node* DTDMap::removeNamedItem(const XMLString& /*name*/)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
@@ -90,19 +90,19 @@ unsigned long DTDMap::length() const
 }
 
 
-Node* DTDMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
+Node* DTDMap::getNamedItemNS(const XMLString& /*namespaceURI*/, const XMLString& /*localName*/) const
 {
 	return 0;
 }
 
 
-Node* DTDMap::setNamedItemNS(Node* arg)
+Node* DTDMap::setNamedItemNS(Node* /*arg*/)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }
 
 
-Node* DTDMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& localName)
+Node* DTDMap::removeNamedItemNS(const XMLString& /*namespaceURI*/, const XMLString& /*localName*/)
 {
 	throw DOMException(DOMException::NO_MODIFICATION_ALLOWED_ERR);
 }

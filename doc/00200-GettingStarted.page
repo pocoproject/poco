@@ -125,6 +125,7 @@ On Windows, there are three options:
 
   - Use POCO pre-built OpenSSL binaries (simplest and recommended)
   - Build OpenSSL using scripts from POCO distribution package
+  - Build OpenSSL using MSYS2 for MinGW
   - Use a third-party pre-built OpenSSL
 
 !!! POCO pre-built OpenSSL binaries
@@ -174,6 +175,46 @@ binaries can be linked from EXEs and DLLs built with VS 2008-2017.
 
 Pre-generated POCO Visual Studio projects are configured to use headers and
 libraries from VS_120 directory.
+
+!!! Build OpenSSL using MSYS2 for MinGW
+
+MSYS2 is a unix-like terminal. To build OpenSSL from sources using MSYS2, download and install MSYS2 binaries
+from https://www.msys2.org.
+
+MSYS2 uses special paths for Windows drive letters, eg. '/e' instead of 'E:', '/c' instead of 'C:', etc.
+
+Install 'build-essential' and git:
+
+    $ pacman -Sy build-essential git
+
+Set environment variable 'PATH':
+
+    $ export PATH=$PATH:/%PATH_TO_COMPILER_BIN%
+
+Where %PATH_TO_COMPILER_BIN% type path to compiler directory with binaries, for example: '/e/compilers/mingw-w64-8.1.0-x64'.
+
+Clone the official OpenSSL repository (https://github.com/openssl/openssl) - best to use stable branch, eg. 'OpenSSL_1_1_0-stable':
+
+    $ git clone -b OpenSSL_1_1_0-stable https://github.com/openssl/openssl
+
+Enter the OpenSSL directory:
+
+    $ cd openssl
+
+Configure OpenSSL:
+
+    $ ./configure mingw shared enable-capieng --prefix=%INSTALL_PATH%
+
+Where %INSTALL_PATH% type full installation path, there will be put binaries, libraries, docs and etc.
+For x64 library version, use 'mingw64' instead of 'mingw'.
+For static library version, use 'no-shared' instead of 'shared'.
+
+Build:
+
+    $ make install -j4
+
+The above command will compile the OpenSSL sources and install the files.
+
 
 !!! Use a third-party pre-built OpenSSL
 
@@ -228,6 +269,90 @@ the package management system of your choice to install the necessary
 files. Alternatively, you can of course build MySQL yourself from
 source.
 
+
+!!Building using CMake
+
+As an alternative to the platform specific Makefiles and Solutions, CMake can be used
+to do build POCO C++ Libraries on any platform with any compiler. CMake is a meta build system and it 
+generate native makefiles and workspaces that can be used in the compiler environment of 
+your choice. For a quick overview see http://cgold.readthedocs.io/en/latest/overview/cmake-can.html
+
+POCO C++ Libraries requires CMake 3.2 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
+
+CMake supports out of source builds and this is the recommended way to build POCO C++ Libraries using CMake.
+
+Assuming the POCO C++ Libraries source is located in /path/to/poco directory and you like to build POCO C++ Libraries just type the 
+following commands (Command parameters are all the same on any platform).
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build
+    $ cmake --build /path/to/poco-build --target all
+
+This will build POCO C++ Libraries in a subdirectory <*poco-build*>. All files produced during build are located in this directory.
+
+POCO C++ Libraries allows you to set some build time options. As an example: to disable the SevenZip support
+type the following command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DENABLE_SEVENZIP=OFF
+    $ cmake --build /path/to/poco-build --target all
+
+Similar options are available for other components. To see and enable or disable available options execute following command:
+
+    $ cmake-gui /path/to/poco-build
+
+or for console only:
+
+    $ ccmake /path/to/poco-build
+
+POCO C++ Libraries options are prefixed with <*POCO_*>.
+
+To use POCO C++ Libraries in your cmake project, add following line in your project for example to use crypto:
+
+    find_package(Poco REQUIRED PocoCrypto)
+    ....
+    target_link_libraries(yourTargetName ... Poco::Crypto)
+
+If you get an error like 'By not providing "FindPoco.cmake"', then you should set CMAKE_PREFIX_PATH to the installation directory of your POCO C++ Libraries. For example: 
+
+    $ cmake -H/path/to/yourProject -B/path/to/yourProject-build -DCMAKE_PREFIX_PATH=/path/to/installationOf/poco
+    
+Some other Hints:
+
+To use the compiler of your choice for example clang compiler, execute following cmake command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_C_COMPILER=/path/to/clang -DCMAKE_CXX_COMPILER=/path/to/clang++
+    $ cmake --build /path/to/poco-build --target all
+    
+To cross compile POCO C++ Libraries for another architecture/device you should have a <*cmake toolchain file*> and execute following command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchainfile
+    $ cmake --build /path/to/poco-build --target all    
+
+See https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html for more information.
+
+For a faster build, use ninja as build system. See https://ninja-build.org/
+For example on Ubuntu execute following commands:
+
+    $ sudo apt-get install ninja-build
+    
+This install <*ninja*> command. To use ninja-build execute following cmake commands:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -GNinja
+    $ cmake --build /path/to/poco-build --target all
+
+See https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html for other generators.
+
+To enable verbose output from Makefile builds, execute following cmake commands:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_VERBOSE_MAKEFILE=ON
+    $ cmake --build /path/to/poco-build --target all
+
+
+Some more infos about cmake see:
+
+$ cmake --help-full
+https://cmake.org/cmake/help/latest/
+http://cgold.readthedocs.io/en/latest/index.html
+    
 
 !!Building On Windows
 
@@ -355,54 +480,6 @@ available:
 
     $ ./configure --omit=NetSSL_OpenSSL,Crypto,Data/ODBC,Data/MySQL
 ----
-
-!!Building using CMake
-
-As an alternative to the platform specific Makefiles and Solutions, CMake can be used
-to do build Poco. CMake is a cross platform Makefile generator that also supports
-Microsoft Visual Studio and Apple Xcode.
-Poco requires CMake 3.2 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
-
-CMake supports out of source builds and this is the recommended way to build Poco using CMake.
-
-Assuming you are currently in the Poco source directory on a Unix machine
-and you like to build Poco with the generated Makefiles just type the following commands.
-
-    $ mkdir cmake_build
-    $ cd cmake_build
-    $ cmake ..
-    $ make
-
-This will build Poco in a subdirectory <*cmake_build*>. All files produced during build are located in this directory.
-
-CMake allows you to set some build time options. As an example: to disable the SevenZip support
-type the following command:
-
-    $ cmake -DPOCO_ENABLE_SEVENZIP=OFF ..
-
-Similar options are available for other components (see: CMakeLists.txt).
-
-A word on OpenSSL, which is needed for Crypto and NetSSL_OpenSSL libraries:
-
-On Linux, OpenSSL headers and libraries are expected to be in their usual places and CMake buid system will look
-for them and adjust settings accordingly.
-
-On Windows, there are two ways to provide OpenSSL:
-
-  - pre-built POCO OpenSSL binaries and accompanying headers
-  - system-installed OpenSSL binaries and accompanying headers
-
-The discovery goes as follows:
-
-  1) If %POCO_BASE%/openssl/VS_120 directory is found, headers and binaries from that location will be used; please
-     see "Build OpenSSL using scripts from POCO distribution package" on how to build your own or get POCO pre-built
-     OpenSSL binaries. This behavior can be disabled by specifying POCO_DISABLE_INTERNAL_OPENSSL=ON.
-
-  2) If %POCO_BASE%/openssl/VS_120 directory is not found, or POCO_DISABLE_INTERNAL_OPENSSL=ON was specified, CMake will
-     attempt to find the system-installed OpenSSL. If it is found, it will be used.
-
-  3) IF OpenSSL is not discovered through steps 1) or 2), Cypto and NetSSL_OpenSSL will not be built.
-
 
 !!!Tutorials And Sample Code
 

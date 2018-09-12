@@ -24,6 +24,7 @@
 #include "Poco/String.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/WeakRefPtr.h"
 #include <map>
 #include <list>
 #include <utility>
@@ -36,7 +37,7 @@ namespace SQL {
 class RecordSet;
 
 
-class Poco_SQL_API RowFilter: public RefCountedObject
+class Poco_SQL_API RowFilter: public WeakRefCountedObject
 	/// RowFilter class provides row filtering functionality.
 	/// A filter contains a set of criteria (field name, value and
 	/// logical operation) for row filtering.
@@ -69,6 +70,7 @@ public:
 
 	typedef bool (*CompT)(const Poco::Dynamic::Var&, const Poco::Dynamic::Var&);
 	typedef AutoPtr<RowFilter> Ptr;
+	typedef WeakRefPtr<RowFilter> WeakPtr;
 	typedef std::map<std::string, Comparison> Comparisons;
 	typedef Tuple<Poco::Dynamic::Var, Comparison, LogicOperator> ComparisonEntry;
 	typedef std::multimap<std::string, ComparisonEntry> ComparisonMap;
@@ -174,7 +176,7 @@ private:
 	Comparisons        _comparisons;
 	ComparisonMap      _comparisonMap;
 	mutable RecordSet* _pRecordSet;
-	Ptr                _pParent;
+	WeakPtr            _pParent;
 	FilterMap          _filterMap;
 	bool               _not;
 

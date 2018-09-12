@@ -197,13 +197,13 @@ void PartialStreamBuf::close()
 }
 
 
-PartialIOS::PartialIOS(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, const std::string& pre, const std::string& post, bool initStream): _buf(istr, start, end, pre, post, initStream)
+PartialIOS::PartialIOS(std::istream& istr, std::ios::pos_type start, std::ios::pos_type to, const std::string& pre, const std::string& post, bool initStream): _buf(istr, start, to, pre, post, initStream)
 {
 	poco_ios_init(&_buf);
 }
 
 
-PartialIOS::PartialIOS(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream): _buf(ostr, start, end, initStream)
+PartialIOS::PartialIOS(std::ostream& ostr, std::size_t start, std::size_t to, bool initStream): _buf(ostr, start, to, initStream)
 {
 	poco_ios_init(&_buf);
 }
@@ -220,8 +220,8 @@ PartialStreamBuf* PartialIOS::rdbuf()
 }
 
 
-PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, bool initStream, const std::string& pre, const std::string& post):
-	PartialIOS(istr, start, end, pre, post, initStream),
+PartialInputStream::PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type to, bool initStream, const std::string& pre, const std::string& post):
+	PartialIOS(istr, start, to, pre, post, initStream),
 	std::istream(&_buf)
 {
 }
@@ -232,8 +232,8 @@ PartialInputStream::~PartialInputStream()
 }
 
 
-PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream):
-	PartialIOS(ostr, start, end, initStream),
+PartialOutputStream::PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t to, bool initStream):
+	PartialIOS(ostr, start, to, initStream),
 	std::ostream(&_buf)
 {
 }

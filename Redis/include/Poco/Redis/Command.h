@@ -252,6 +252,9 @@ public:
 
 	static Command rpush(const std::string& list, const StringVec& value, bool create = true);
 		/// Creates and returns a RPUSH or RPUSHX (when create is false) command.
+
+	static Command ping();
+		/// Creates and returns a PING command.
 };
 
 

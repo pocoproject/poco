@@ -237,6 +237,17 @@ void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 }
 
 
+void Context::usePrivateKey(const Poco::Crypto::EVPPKey& pkey)
+{
+	int errCode = SSL_CTX_use_PrivateKey(_pSSLContext, const_cast<EVP_PKEY*>(static_cast<const EVP_PKEY*>(pkey)));
+	if (errCode != 1)
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot set private key for Context", msg);
+	}
+}
+
+
 void Context::enableSessionCache(bool flag)
 {
 	if (flag)
@@ -363,6 +374,12 @@ void Context::disableProtocols(int protocols)
 		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TLSv1_2);
 #endif
 	}
+	if (protocols & PROTO_TLSV1_3)
+	{
+#if defined(SSL_OP_NO_TLSv1_3)
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_NO_TLSv1_3);
+#endif
+	}
 }
 
 
@@ -424,6 +441,14 @@ void Context::createSSLContext()
             break;
         case TLSV1_2_SERVER_USE:
             _pSSLContext = SSL_CTX_new(TLSv1_2_server_method());
+            break;
+#endif
+#if defined(SSL_OP_NO_TLSv1_3) && !defined(OPENSSL_NO_TLS1)
+        case TLSV1_3_CLIENT_USE:
+            _pSSLContext = SSL_CTX_new(TLS_client_method());
+            break;
+        case TLSV1_3_SERVER_USE:
+            _pSSLContext = SSL_CTX_new(TLS_server_method());
             break;
 #endif
 		default:

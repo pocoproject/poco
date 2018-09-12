@@ -57,6 +57,7 @@ const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
+const std::string SSLManager::CFG_REQUIRE_TLSV1_3("requireTLSv1_3");
 const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
 const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
 const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
@@ -220,7 +221,7 @@ int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 }
 
 
-int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, void* userData)
+int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int /*flag*/, void* /*userData*/)
 {
 	std::string pwd;
 	SSLManager::instance().PrivateKeyPassphraseRequired.notify(&SSLManager::instance(), pwd);
@@ -278,6 +279,7 @@ void SSLManager::initDefaultContext(bool server)
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
+	bool requireTLSv1_3 = config.getBool(prefix + CFG_REQUIRE_TLSV1_3, false);
 
 	params.dhParamsFile = config.getString(prefix + CFG_DH_PARAMS_FILE, "");
 	params.ecdhCurve    = config.getString(prefix + CFG_ECDH_CURVE, "");
@@ -286,7 +288,9 @@ void SSLManager::initDefaultContext(bool server)
 	
 	if (server)
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_SERVER_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_SERVER_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_SERVER_USE;
@@ -298,7 +302,9 @@ void SSLManager::initDefaultContext(bool server)
 	}
 	else
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_CLIENT_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_CLIENT_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_CLIENT_USE;
@@ -324,6 +330,8 @@ void SSLManager::initDefaultContext(bool server)
 			disabledProtocols |= Context::PROTO_TLSV1_1;
 		else if (*it == "tlsv1_2")
 			disabledProtocols |= Context::PROTO_TLSV1_2;
+		else if (*it == "tlsv1_3")
+			disabledProtocols |= Context::PROTO_TLSV1_3;
 	}
 	if (server)
 		_ptrDefaultServerContext->disableProtocols(disabledProtocols);

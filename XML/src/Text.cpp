@@ -71,7 +71,7 @@ XMLString Text::innerText() const
 }
 
 
-Node* Text::copyNode(bool deep, Document* pOwnerDocument) const
+Node* Text::copyNode(bool /*deep*/, Document* pOwnerDocument) const
 {
 	return new Text(pOwnerDocument, *this);
 }

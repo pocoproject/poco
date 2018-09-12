@@ -109,16 +109,17 @@ void ODBCStatementImpl::compileImpl()
 	
 	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT, _insertHint);
 	
-	makeInternalExtractors();
-	doPrepare();
-
 	_canCompile = false;
 }
 
-
-void ODBCStatementImpl::makeInternalExtractors()
+bool ODBCStatementImpl::canMakeExtractors()
 {
-	if (hasData() && !extractions().size())
+	return StatementImpl::canMakeExtractors() && session().getFeature("makeExtractorsBeforeExecute");
+}
+
+void ODBCStatementImpl::makeExtractors(std::size_t count)
+{
+	if (hasData() && extractions().empty())
 	{
 		try
 		{
@@ -130,7 +131,7 @@ void ODBCStatementImpl::makeInternalExtractors()
 			throw;
 		}
 
-		makeExtractors(columnsReturned());
+		StatementImpl::makeExtractors(count);
 		fixupExtraction();
 	}
 }
@@ -138,6 +139,7 @@ void ODBCStatementImpl::makeInternalExtractors()
 
 bool ODBCStatementImpl::addPreparator(bool addAlways)
 {
+	_prepared = false;
 	Preparator* prep = 0;
 	if (0 == _preparations.size())
 	{
@@ -169,7 +171,7 @@ bool ODBCStatementImpl::addPreparator(bool addAlways)
 
 void ODBCStatementImpl::doPrepare()
 {
-	if (session().getFeature("autoExtract") && hasData())
+	if (!_prepared && session().getFeature("autoExtract") && hasData())
 	{
 		std::size_t curDataSet = currentDataSet();
 		poco_check_ptr (_preparations[curDataSet]);
@@ -320,8 +322,8 @@ bool ODBCStatementImpl::hasNext()
 {
 	if (hasData())
 	{
-		if (!extractions().size())
-			makeInternalExtractors();
+		if (extractions().empty())
+			makeExtractors(columnsReturned());
 
 		if (!_prepared) doPrepare();
 
@@ -349,7 +351,7 @@ bool ODBCStatementImpl::hasNext()
 						if (!addPreparator(false)) // skip the result set if it has no columns
 							continue;
 						fillColumns(currentDataSet() + 1);
-						makeExtractors(_preparations.back()->columns(), static_cast<Position::Type>(currentDataSet() + 1));
+						StatementImpl::makeExtractors(_preparations.back()->columns(), static_cast<Position::Type>(currentDataSet() + 1));
 						activateNextDataSet();
 					}
 					else return false;
@@ -359,8 +361,8 @@ bool ODBCStatementImpl::hasNext()
 				makeStep();
 			} while (!nextRowReady());
 		}
-		else if (Utility::isError(_nextResponse))
-			checkError(_nextResponse, "SQLFetch()");
+		else if (Utility::isError(static_cast<SQLRETURN>(_nextResponse)))
+			checkError(static_cast<SQLRETURN>(_nextResponse), "SQLFetch()");
 
 		return true;
 	}
@@ -373,7 +375,7 @@ void ODBCStatementImpl::makeStep()
 {
 	_extractors[currentDataSet()]->reset();
 	_nextResponse = SQLFetch(_stmt);
-	checkError(_nextResponse);
+	checkError(static_cast<SQLRETURN>(_nextResponse));
 	_stepCalled = true;
 }
 
@@ -472,10 +474,23 @@ void ODBCStatementImpl::fillColumns(size_t dataSetPos)
 
 bool ODBCStatementImpl::isStoredProcedure() const 	
 { 	
+	static const std::set<std::string> tagsProc = { "exec " };
+	static const std::set<std::string> tagsNonProc = { "select ", "insert ", "update ", "delete ", "create ", "drop ", "alter ", "truncate " };
+
 	std::string str = toString(); 	
 	if (trimInPlace(str).size() < 2) return false; 	
 
-	return ('{' == str[0] && '}' == str[str.size()-1]); 	
+	if ('{' == str.front() && '}' == str.back()) return true;
+
+	for (const std::string& tag : tagsProc)
+		if (icompare(str, tag.length(), tag) == 0)
+			return true;
+
+	for (const std::string& tag : tagsNonProc)
+		if (icompare(str, tag.length(), tag) == 0)
+			return false;
+
+	return true;
 }
 
 

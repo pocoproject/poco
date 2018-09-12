@@ -241,7 +241,10 @@ public:
 		/// Returns the full command path used to invoke the application.
 
 	LayeredConfiguration& config() const;
-		/// Returns the application's configuration.
+		/// Returns the application's configuration reference.
+
+	LayeredConfiguration::Ptr configPtr() const;
+		/// Returns the application's configuration smart pointer.
 
 	Poco::Logger& logger() const;
 		/// Returns the application's logger.
@@ -373,20 +376,21 @@ private:
 	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
 	bool findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
-	typedef Poco::AutoPtr<LayeredConfiguration> ConfigPtr;
+	typedef LayeredConfiguration::Ptr ConfigPtr;
+	typedef Poco::Logger::Ptr LoggerPtr;
 
-	ConfigPtr       _pConfig;
-	SubsystemVec    _subsystems;
-	bool            _initialized;
-	std::string     _command;
-	ArgVec          _argv;
-	ArgVec          _unprocessedArgs;
-	OptionSet       _options;
-	bool            _unixOptions;
-	Poco::Logger*   _pLogger;
-	Poco::Timestamp _startTime;
-	bool            _stopOptionsProcessing;
-	int             _loadedConfigs;
+	ConfigPtr         _pConfig;
+	SubsystemVec      _subsystems;
+	bool              _initialized;
+	std::string       _command;
+	ArgVec            _argv;
+	ArgVec            _unprocessedArgs;
+	OptionSet         _options;
+	bool              _unixOptions;
+	Logger*           _pLogger;
+	Poco::Timestamp   _startTime;
+	bool              _stopOptionsProcessing;
+	int               _loadedConfigs;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;
@@ -429,7 +433,14 @@ inline bool Application::initialized() const
 
 inline LayeredConfiguration& Application::config() const
 {
+	poco_assert(!_pConfig.isNull());
 	return *const_cast<LayeredConfiguration*>(_pConfig.get());
+}
+
+
+inline LayeredConfiguration::Ptr Application::configPtr() const
+{
+	return _pConfig;
 }
 
 
@@ -495,7 +506,8 @@ inline Poco::Timespan Application::uptime() const
 			return Poco::Util::Application::EXIT_CONFIG;\
 		}									\
 		return pApp->run();					\
-	}
+	}										\
+	POCO_WMAIN_WRAPPER()
 #elif defined(POCO_VXWORKS)
 	#define POCO_APP_MAIN(App) \
 	int pocoAppMain(const char* appName, ...) \
