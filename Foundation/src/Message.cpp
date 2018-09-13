@@ -92,6 +92,7 @@ Message::Message(Message&& msg) :
 	_prio(std::move(msg._prio)),
 	_time(std::move(msg._time)),
 	_tid(std::move(msg._tid)),
+	_ostid(std::move(msg._ostid)),
 	_thread(std::move(msg._thread)),
 	_pid(std::move(msg._pid)),
 	_file(std::move(msg._file)),
@@ -132,7 +133,7 @@ void Message::init()
 #if !defined(POCO_VXWORKS)
 	_pid = Process::id();
 #endif
-	_ostid = (IntPtr)Thread::currentTid();
+	_ostid = (IntPtr)Thread::currentOsTid();
 	Thread* pThread = Thread::current();
 	if (pThread)
 	{
@@ -162,6 +163,7 @@ Message& Message::operator = (Message&& msg)
 		_prio = std::move(msg._prio);
 		_time = std::move(msg._time);
 		_tid = std::move(msg._tid);
+		_ostid = std::move(msg._ostid);
 		_thread = std::move(msg._thread);
 		_pid = std::move(msg._pid);
 		_file = std::move(msg._file);
@@ -182,6 +184,7 @@ void Message::swap(Message& msg)
 	swap(_prio, msg._prio);
 	swap(_time, msg._time);
 	swap(_tid, msg._tid);
+	swap(_ostid, msg._ostid);
 	swap(_thread, msg._thread);
 	swap(_pid, msg._pid);
 	swap(_file, msg._file);
