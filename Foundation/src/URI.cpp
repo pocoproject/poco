@@ -696,16 +696,30 @@ unsigned short URI::getWellKnownPort() const
 		return 22;
 	else if (_scheme == "telnet")
 		return 23;
+	else if (_scheme == "smtp")
+		return 25;
+	else if (_scheme == "dns")
+		return 53;
 	else if (_scheme == "http" || _scheme == "ws")
 		return 80;
 	else if (_scheme == "nntp")
 		return 119;
+	else if (_scheme == "imap")
+		return 143;
 	else if (_scheme == "ldap")
 		return 389;
 	else if (_scheme == "https" || _scheme == "wss")
 		return 443;
+	else if (_scheme == "smtps")
+		return 465;
 	else if (_scheme == "rtsp")
 		return 554;
+	else if (_scheme == "ldaps")
+		return 636;
+	else if (_scheme == "dnss")
+		return 853;
+	else if (_scheme == "imaps")
+		return 993;
 	else if (_scheme == "sip")
 		return 5060;
 	else if (_scheme == "sips")
