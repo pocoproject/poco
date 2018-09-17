@@ -243,8 +243,9 @@
 	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
 	#define POCO_COMPILER_GCC
-#elif defined (__MINGW32__) || defined (__MINGW64__)
-	#define POCO_COMPILER_MINGW
+	#if defined (__MINGW32__) || defined (__MINGW64__)
+		#define POCO_COMPILER_MINGW
+	#endif
 #elif defined (__INTEL_COMPILER) || defined(__ICC) || defined(__ECC) || defined(__ICL)
 	#define POCO_COMPILER_INTEL
 #elif defined (__SUNPRO_CC)
@@ -268,7 +269,7 @@
 #endif
 
 
-#ifdef __GNUC__
+#if defined(POCO_COMPILER_GCC) || defined(POCO_COMPILER_CLANG)
 #define POCO_UNUSED __attribute__((unused))
 #else
 #define POCO_UNUSED

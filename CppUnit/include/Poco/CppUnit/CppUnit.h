@@ -7,6 +7,9 @@
 #define Poco_CppUnit__CppUnitINCLUDED
 
 
+#include "Poco/Platform.h"
+
+
 //
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
 //
@@ -25,7 +28,7 @@
 // CppUnit_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(CppUnit_EXPORTS)
 		#define CppUnit_API __declspec(dllexport)
 	#else
@@ -45,7 +48,7 @@
 //
 // Automatically link CppUnit library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if defined(POCO_DLL)
 		#if defined(_DEBUG)
 			#define POCO_LIB_SUFFIX "d.lib"
@@ -73,7 +76,7 @@
 
 
 // Turn off some annoying warnings
-#ifdef _MSC_VER
+#ifdef POCO_COMPILER_MSVC
 	#pragma warning(disable:4786)  // identifier truncation warning
 	#pragma warning(disable:4503)  // decorated name length exceeded - mainly a problem with STLPort
 	#pragma warning(disable:4018)  // signed/unsigned comparison

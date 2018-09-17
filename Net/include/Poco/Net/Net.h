@@ -31,7 +31,7 @@
 // Net_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(Net_EXPORTS)
 		#define Net_API __declspec(dllexport)
 	#else
@@ -52,7 +52,7 @@
 //
 // Automatically link Net library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Net_EXPORTS)
 		#pragma comment(lib, "PocoNet" POCO_LIB_SUFFIX)
 	#endif
@@ -105,9 +105,8 @@ void Net_API uninitializeNetwork();
 			#endif
 		#endif // Net_EXPORTS
 	#else // __GNUC__
-		#define POCO_NET_FORCE_SYMBOL(s) extern "C" const struct NetworkInitializer s;
+		extern "C" const struct NetworkInitializer pocoNetworkInitializer;
 	#endif // !__GNUC__
-	POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif // POCO_OS_FAMILY_WINDOWS
 
 
