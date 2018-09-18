@@ -25,6 +25,7 @@ public:
 	virtual ~IniFileConfigurationTest();
 
 	void testLoad();
+	void testSave();
 	void testCaseInsensitiveRemove();
 
 	void setUp();
