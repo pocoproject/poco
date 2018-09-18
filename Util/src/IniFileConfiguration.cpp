@@ -22,6 +22,7 @@
 #include "Poco/String.h"
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/Ascii.h"
 #include <set>
 
@@ -77,8 +78,37 @@ void IniFileConfiguration::load(const std::string& path)
 		throw Poco::OpenFileException(path);
 }
 
+void IniFileConfiguration::save(std::ostream& ostr) 
+{
+  std::string curSection;
+  for (std::map<std::string, std::string, ICompare>::iterator it = _map.begin(); it != _map.end(); ++it) 
+  {
+    Poco::StringTokenizer st(it->first, ".", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+    if (st.count() > 1) 
+    {
+      if (curSection != st[0]) 
+      {
+        curSection = st[0];
+        ostr << "\n[" << curSection << "]\n";
+      }
+      ostr << st[1];
+    } 
+    else 
+    {
+      ostr << st[0];
+    }
+    ostr << '=' << it->second << '\n';
+  }
+}
 
-bool IniFileConfiguration::getRaw(const std::string& key, std::string& value) const
+void IniFileConfiguration::save(const std::string& path) 
+{
+  Poco::FileOutputStream fos(path);
+  (fos.good()) ? save(fos) : throw Poco::OpenFileException(path);
+}
+
+
+  bool IniFileConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	IStringMap::const_iterator it = _map.find(key);
 	if (it != _map.end())
