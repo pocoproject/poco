@@ -106,7 +106,7 @@ void IniFileConfigurationTest::testSave()
 		"\t   \n"
 		"Prop2 = value6";
 		
-	std::istringstream istr(iniFile);	
+	std::istringstream istr(iniFile);
 	AutoPtr<IniFileConfiguration> pConfTmp = new IniFileConfiguration(istr);
 	std::stringstream ss;
 	pConfTmp->save(ss);
@@ -205,7 +205,7 @@ CppUnit::Test* IniFileConfigurationTest::suite()
 	AbstractConfigurationTest_addTests(pSuite, IniFileConfigurationTest);
 	CppUnit_addTest(pSuite, IniFileConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, IniFileConfigurationTest, testCaseInsensitiveRemove);
-  CppUnit_addTest(pSuite, IniFileConfigurationTest, testSave);
+	CppUnit_addTest(pSuite, IniFileConfigurationTest, testSave);
 
 	return pSuite;
 }

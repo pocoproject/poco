@@ -80,31 +80,31 @@ void IniFileConfiguration::load(const std::string& path)
 
 void IniFileConfiguration::save(std::ostream& ostr) 
 {
-  std::string curSection;
-  for (std::map<std::string, std::string, ICompare>::iterator it = _map.begin(); it != _map.end(); ++it) 
-  {
-    Poco::StringTokenizer st(it->first, ".", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-    if (st.count() > 1) 
-    {
-      if (curSection != st[0]) 
-      {
-        curSection = st[0];
-        ostr << "\n[" << curSection << "]\n";
-      }
-      ostr << st[1];
-    } 
-    else 
-    {
-      ostr << st[0];
-    }
-    ostr << '=' << it->second << '\n';
-  }
+	std::string curSection;
+	for (std::map<std::string, std::string, ICompare>::iterator it = _map.begin(); it != _map.end(); ++it) 
+	{
+		Poco::StringTokenizer st(it->first, ".", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
+		if (st.count() > 1) 
+		{
+			if (curSection != st[0]) 
+			{
+				curSection = st[0];
+				ostr << "\n[" << curSection << "]\n";
+			}
+			ostr << st[1];
+		} 
+		else 
+		{
+			ostr << st[0];
+		}
+		ostr << '=' << it->second << '\n';
+	}
 }
 
 void IniFileConfiguration::save(const std::string& path) 
 {
-  Poco::FileOutputStream fos(path);
-  (fos.good()) ? save(fos) : throw Poco::OpenFileException(path);
+	Poco::FileOutputStream fos(path);
+	(fos.good()) ? save(fos) : throw Poco::OpenFileException(path);
 }
 
 
