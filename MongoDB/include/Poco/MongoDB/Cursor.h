@@ -23,7 +23,6 @@
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/ResponseMessage.h"
 
-
 namespace Poco {
 namespace MongoDB {
 
@@ -37,6 +36,9 @@ public:
 
 	Cursor(const std::string& fullCollectionName, QueryRequest::Flags flags = QueryRequest::QUERY_DEFAULT);
 		/// Creates a Cursor for the given database and collection ("database.collection"), using the specified flags.
+
+    Cursor(const Document& aggregationResponse);
+        /// Creates a Cursor for the given agregation query response.
 
 	virtual ~Cursor();
 		/// Destroys the Cursor.
