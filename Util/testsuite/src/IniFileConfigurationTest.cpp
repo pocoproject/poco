@@ -89,8 +89,9 @@ void IniFileConfigurationTest::testLoad()
 	assertTrue (std::find(keys.begin(), keys.end(), "Prop1") == keys.end());
 }
 
-void IniFileConfigurationTest::testSave() {
-  static const std::string iniFile =
+void IniFileConfigurationTest::testSave() 
+{
+	static const std::string iniFile =
 		"; comment\n"
 		"  ; comment  \n"
 		"prop1=value1\n"
@@ -106,10 +107,10 @@ void IniFileConfigurationTest::testSave() {
 		"Prop2 = value6";
 		
 	std::istringstream istr(iniFile);	
-	AutoPtr<IniFileConfiguration> pConf1 = new IniFileConfiguration(istr);
-  std::stringstream ss;
-  pConf1->save(ss);
-  AutoPtr<IniFileConfiguration> pConf = new IniFileConfiguration(ss);
+	AutoPtr<IniFileConfiguration> pConfTmp = new IniFileConfiguration(istr);
+	std::stringstream ss;
+	pConfTmp->save(ss);
+	AutoPtr<IniFileConfiguration> pConf = new IniFileConfiguration(ss);
 	
 	assertTrue (pConf->getString("prop1") == "value1");
 	assertTrue (pConf->getString("prop2") == "value2");

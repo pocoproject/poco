@@ -69,7 +69,7 @@ public:
 		/// Loads the configuration data from the given file, which
 		/// must be in initialization file format.
 
-  void save(std::ostream& ostr);
+	void save(std::ostream& ostr);
 		/// Saves the configuration data to the given stream, which
 		/// must be in initialization file format.
 		
