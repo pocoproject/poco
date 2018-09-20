@@ -65,6 +65,7 @@ void ZipTest::testSkipSingleFile()
 	const std::string& POCO_UNUSED fileName = hdr.getFileName();
 }
 
+
 void ZipTest::testCrcAndSizeAfterDataEncapsulated()
 {
 	// touch empty.txt

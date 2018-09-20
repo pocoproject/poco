@@ -160,6 +160,7 @@ void ZipUtil::sync(std::istream& in)
 	}
 }
 
+
 void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 {
 	std::streampos start = in.tellg();
