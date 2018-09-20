@@ -34,6 +34,7 @@ public:
 	void testDecompressFlatVuln();
 	void testCrcAndSizeAfterData();
 	void testCrcAndSizeAfterDataWithArchive();
+	void testCrcAndSizeAfterDataEncapsulated();
 
 	static const Poco::UInt64 KB = 1024;
 	static const Poco::UInt64 MB = 1024*KB;
