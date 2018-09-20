@@ -65,6 +65,34 @@ void ZipTest::testSkipSingleFile()
 	const std::string& POCO_UNUSED fileName = hdr.getFileName();
 }
 
+void ZipTest::testCrcAndSizeAfterDataEncapsulated()
+{
+	// touch empty.txt
+	// zip -fd foo.zip empty.txt
+	// zip -fd encapsulated.zip foo.zip
+	std::string testFile = getTestFile("data", "encapsulated.zip");
+	Poco::FileInputStream inp(testFile);
+	assertTrue(inp.good());
+
+	ZipArchive arch(inp);
+	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("foo.zip");
+	assertTrue(it != arch.headerEnd());
+	inp.clear(); // inp eof(), should clear
+
+	ZipInputStream zipin(inp, it->second);
+	std::ostringstream out(std::ios::binary);
+	Poco::StreamCopier::copyStream(zipin, out);
+
+	std::string result = out.str();
+	// sub zip
+	std::istringstream istr(result);
+	ZipArchive subArch(istr);
+	it = subArch.findHeader("empty.txt");
+	assertTrue(it != subArch.headerEnd());
+	assertTrue(it->second.getCompressedSize() == 0);
+	assertTrue(it->second.getUncompressedSize() == 0);
+}
+
 
 void ZipTest::testDecompressSingleFile()
 {
@@ -325,6 +353,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDecompressFlatVuln);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterData);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataWithArchive);
+	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataEncapsulated);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
 	CppUnit_addTest(pSuite, ZipTest, testValidPath);
 

@@ -54,6 +54,9 @@ public:
 	static void sync(std::istream& in);
 		/// Searches the next valid header in the input stream, stops right before it
 
+	static void syncDataDescriptor(std::istream& in, bool force64);
+		/// Searches the next data descriptor
+
 	static void verifyZipEntryFileName(const std::string& zipPath);
 		/// Verifies that the name of the ZipEntry is a valid path
 
