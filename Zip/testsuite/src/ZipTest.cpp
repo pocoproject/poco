@@ -17,16 +17,17 @@
 #include "Poco/Zip/ZipCommon.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/File.h"
+#include "Poco/FileStream.h"
 #include "Poco/URI.h"
 #include "Poco/Path.h"
 #include "Poco/Delegate.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Environment.h"
 #include "Poco/CppUnit/TestCaller.h"
 #include "Poco/CppUnit/TestSuite.h"
 #undef min
 #include <algorithm>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
 
@@ -46,7 +47,7 @@ ZipTest::~ZipTest()
 void ZipTest::testSkipSingleFile()
 {
 	std::string testFile = getTestFile("data", "test.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	SkipCallback skip;
 	ZipLocalFileHeader hdr(inp, false, skip);
@@ -65,10 +66,39 @@ void ZipTest::testSkipSingleFile()
 }
 
 
+void ZipTest::testCrcAndSizeAfterDataEncapsulated()
+{
+	// touch empty.txt
+	// zip -fd foo.zip empty.txt
+	// zip -fd encapsulated.zip foo.zip
+	std::string testFile = getTestFile("data", "encapsulated.zip");
+	Poco::FileInputStream inp(testFile);
+	assertTrue(inp.good());
+
+	ZipArchive arch(inp);
+	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("foo.zip");
+	assertTrue(it != arch.headerEnd());
+	inp.clear(); // inp eof(), should clear
+
+	ZipInputStream zipin(inp, it->second);
+	std::ostringstream out(std::ios::binary);
+	Poco::StreamCopier::copyStream(zipin, out);
+
+	std::string result = out.str();
+	// sub zip
+	std::istringstream istr(result);
+	ZipArchive subArch(istr);
+	it = subArch.findHeader("empty.txt");
+	assertTrue(it != subArch.headerEnd());
+	assertTrue(it->second.getCompressedSize() == 0);
+	assertTrue(it->second.getUncompressedSize() == 0);
+}
+
+
 void ZipTest::testDecompressSingleFile()
 {
 	std::string testFile = getTestFile("data", "test.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	ZipArchive arch(inp);
 	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("testfile.txt");
@@ -83,7 +113,7 @@ void ZipTest::testDecompressSingleFile()
 void ZipTest::testDecompressSingleFileInDir()
 {
 	std::string testFile = getTestFile("data","test.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	ZipArchive arch(inp);
 	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("testdir/testfile.txt");
@@ -98,7 +128,7 @@ void ZipTest::testDecompressSingleFileInDir()
 void ZipTest::testCrcAndSizeAfterData()
 {
 	std::string testFile = getTestFile("data", "data.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	Decompress dec(inp, Poco::Path::temp());
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
@@ -112,7 +142,7 @@ void ZipTest::testCrcAndSizeAfterData()
 void ZipTest::testCrcAndSizeAfterDataWithArchive()
 {
 	std::string testFile = getTestFile("data", "data.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	Poco::Zip::ZipArchive zip(inp);
 	inp.clear();
@@ -124,7 +154,7 @@ void ZipTest::testCrcAndSizeAfterDataWithArchive()
 		Poco::Path path(it->second.getFileName());
 		if (path.isFile())
 		{
-			std::ofstream os(Poco::Path::temp() + "test.dat");
+			Poco::FileOutputStream os(Poco::Path::temp() + "test.dat");
 			Poco::StreamCopier::copyStream(zipis,os);
 		}
 	}
@@ -159,7 +189,7 @@ std::string ZipTest::getTestFile(const std::string& directory, const std::string
 void ZipTest::testDecompress()
 {
 	std::string testFile = getTestFile("data", "test.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	Decompress dec(inp, Poco::Path::temp());
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
@@ -173,7 +203,7 @@ void ZipTest::testDecompress()
 void ZipTest::testDecompressFlat()
 {
 	std::string testFile = getTestFile("data", "test.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	Decompress dec(inp, Poco::Path::temp(), true);
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
@@ -187,7 +217,7 @@ void ZipTest::testDecompressFlat()
 void ZipTest::testDecompressVuln()
 {
 	std::string testFile = getTestFile("data", "vuln.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	Decompress dec(inp, Poco::Path::temp());
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
@@ -201,7 +231,7 @@ void ZipTest::testDecompressVuln()
 void ZipTest::testDecompressFlatVuln()
 {
 	std::string testFile = getTestFile("data", "vuln.zip");
-	std::ifstream inp(testFile.c_str(), std::ios::binary);
+	Poco::FileInputStream inp(testFile);
 	assertTrue (inp.good());
 	Decompress dec(inp, Poco::Path::temp(), true);
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
@@ -214,7 +244,7 @@ void ZipTest::testDecompressFlatVuln()
 
 void ZipTest::verifyDataFile(const std::string& path, Poco::UInt64 size)
 {
-	std::ifstream in(path.c_str(), std::ios::binary);
+	Poco::FileInputStream in(path);
 	assertTrue ( ! in.fail() );
 	Poco::Buffer<char> buffer1(MB);
 	Poco::Buffer<char> buffer2(MB);
@@ -247,7 +277,7 @@ void ZipTest::testDecompressZip64()
 		if(file.exists())
 			file.remove();
 	}
-	std::ifstream in(Poco::Path::temp() + "zip64.zip", std::ios::binary);
+	Poco::FileInputStream in(Poco::Path::temp() + "zip64.zip");
 	Decompress c(in, Poco::Path::temp());
 	c.decompressAllFiles();
 	for(std::map<std::string, Poco::UInt64>::const_iterator it = files.begin(); it != files.end(); it++)
@@ -324,6 +354,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDecompressFlatVuln);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterData);
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataWithArchive);
+	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataEncapsulated);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
 	CppUnit_addTest(pSuite, ZipTest, testValidPath);
 
