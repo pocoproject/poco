@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.2.0)
 
+option(HUNTER_ENABLED "Enable Hunter package manager" NO)
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.20.31.tar.gz"
+    SHA1 "65c8f2292566aedb2fe10e08e09c74dda8e5d07a"
+    LOCAL
+)
+
 project(Poco)
 
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
@@ -70,9 +78,12 @@ endif()
 include(PocoMacros)
 
 if(ENABLE_CRYPTO OR ENABLE_NETSSL)
+	hunter_add_package(OpenSSL)
 	find_package(OpenSSL REQUIRED)
 else()
-	find_package(OpenSSL)
+	if(NOT HUNTER_ENABLED)
+		find_package(OpenSSL)
+	endif()
 endif()
 
 if(OPENSSL_FOUND)
@@ -83,14 +94,18 @@ else()
 	option(ENABLE_CRYPTO "Enable Crypto" OFF)
 endif()
 
-if(ENABLE_APACHECONNECTOR)
-    find_package(APR REQUIRED)
+if(NOT HUNTER_ENABLED)
+    if(ENABLE_APACHECONNECTOR)
+        find_package(APR REQUIRED)
 	find_package(APRUTIL REQUIRED)
 	find_package(Apache2 REQUIRED)
-else()
-    find_package(APR)
+    else()
+        find_package(APR)
 	find_package(APRUTIL)
 	find_package(Apache2)
+    endif()
+else()
+    message(WARNING "There is no APR and Apache2 build in hunter yet. Apache-connector support is switched off.")
 endif()
 
 if(APR_FOUND AND APRUTIL_FOUND AND APACHE2_FOUND AND
@@ -101,9 +116,12 @@ else()
 endif()
 
 if(ENABLE_DATA_MYSQL)
+  hunter_add_package(MySQL-client)
   find_package(MySQL REQUIRED)
 else()
-  find_package(MySQL)
+  if(NOT HUNTER_ENABLED)
+    find_package(MySQL)
+  endif()
 endif()
 
 if(MYSQL_FOUND)
@@ -115,9 +133,12 @@ else()
 endif()
 
 if(ENABLE_DATA_POSTGRESQL)
+    hunter_add_package(PostgreSQL)
     find_package(PostgreSQL REQUIRED)
 else()
-    find_package(PostgreSQL)
+    if(NOT HUNTER_ENABLED)
+      find_package(PostgreSQL)
+    endif()
 endif()
  
 if(PostgreSQL_FOUND)
@@ -128,10 +149,14 @@ else()
     option(ENABLE_DATA_POSTGRESQL "Enable SQL PosgreSQL" OFF)
 endif()
 
-if(ENABLE_DATA_ODBC)
-  find_package(ODBC REQUIRED)
+if(NOT HUNTER_ENABLED)
+  if(ENABLE_DATA_ODBC)
+    find_package(ODBC REQUIRED)
+  else()
+    find_package(ODBC)
+  endif()
 else()
-  find_package(ODBC)
+ message(WARNING "There is no ODBC build in hunter yet. ODBC-data support is switched off.")
 endif()
 
 if(ODBC_FOUND)
