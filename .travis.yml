@@ -11,7 +11,8 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 libc++-dev ninja-build sloccount cppcheck; fi
-
+  - git submodule update --init --recursive --remote gradle
+  
 services:
   - mongodb
   - redis-server
@@ -35,6 +36,15 @@ before_script:
 
 matrix:
   include:
+    - env:    test="Gradle"
+      os: osx
+      compiler: clang
+      script:
+        - brew install mysql
+        - brew install unixodbc
+        - chmod 777 ./gradle/bin/gradle
+        - ./gradle/bin/gradle --console=plain -g travis -c settings.gradle poco check -Ptest=-all
+
     - env:    TEST_NAME="android API level 19"
       language: android
       jdk: openjdk8
