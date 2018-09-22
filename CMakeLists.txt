@@ -161,10 +161,8 @@ option(ENABLE_TESTS
 option(POCO_STATIC
   "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
 if(POCO_STATIC)
-    message(STATUS "Building static libraries")
     option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 else()
-    message(STATUS "Building dynamic libraries")
     option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 endif()
 
@@ -439,6 +437,11 @@ install(
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "${PROJECT_NAME} package version: ${PROJECT_VERSION}")
+if(BUILD_SHARED_LIBS)
+	message(STATUS "Building dynamic libraries")
+else()
+	message(STATUS "Building static libraries")
+endif()
 message(STATUS "[cmake] Installation target path: ${CMAKE_INSTALL_PREFIX}")
 if(CMAKE_TOOLCHAIN_FILE)
 	message(STATUS "[cmake] Use toolchain file:     ${CMAKE_TOOLCHAIN_FILE}")
