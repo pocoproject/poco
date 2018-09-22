@@ -16,7 +16,7 @@ model {
 				}
 			}
 		}
-		TestLib(NativeLibrarySpec) {
+		TestLibrary(NativeLibrarySpec) {
 			sources {
 				cpp {
 					source {
@@ -24,7 +24,6 @@ model {
 						include 'TestLibrary.cpp'
 						include 'TestPlugin.cpp'
 					}
-					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 				}
 			}
@@ -36,7 +35,6 @@ model {
 						srcDir 'src'
 						include 'TestApp.cpp'
 					}
-					lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
 					lib library: 'TestLib', linkage: 'shared'
 				}
@@ -69,6 +67,8 @@ model {
     binaries {                                               
         withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
+			lib library: 'TestLibrary', linkage: 'shared'
+			
  			if (toolChain in VisualCpp) {
 				if (buildType == buildTypes.debug) {
 					cCompiler.args "/MDd"
@@ -85,8 +85,20 @@ model {
 			}
        }
 	}
-
 }
+/*
+tasks.withType(RunTestExecutable) {
+	String PATH = System.getenv("PATH")
+	if (name.contains('Win32')) {
+		PATH = "$projectDir\\bin;$PATH"
+	} else
+	if (name.contains('Win64')) {
+		PATH = "$projectDir\\bin64;$PATH"
+	}
+	environment "Path", "$PATH"
+}
+*/
+
 task testsuite { dependsOn "assemble" }
 
 
