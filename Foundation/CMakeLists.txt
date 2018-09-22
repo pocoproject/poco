@@ -204,6 +204,9 @@ POCO_INSTALL(Foundation)
 POCO_GENERATE_PACKAGE(Foundation)
 
 if (ENABLE_TESTS)
+	if(POCO_STATIC)
+	  set_property(TARGET Foundation PROPERTY POSITION_INDEPENDENT_CODE ON) # This is needed to build TestLibrary.so as shared.
+	endif()
 	add_subdirectory(samples)
 	add_subdirectory(testsuite)
 endif ()
