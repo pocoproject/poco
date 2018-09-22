@@ -15,9 +15,11 @@ target_include_directories(mod_poco
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+	PRIVATE
+		${APACHE2_INCLUDE_DIRS}
+		${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_link_libraries(mod_poco PUBLIC Poco::Util Poco::Net)
+target_link_libraries(mod_poco PUBLIC Poco::Util Poco::Net Apache::Apr Apache::Aprutil)
 
 if (ENABLE_TESTS)
   add_subdirectory(samples)

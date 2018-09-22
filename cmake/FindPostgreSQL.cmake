@@ -15,7 +15,7 @@
 #   PostgreSQL_LIBRARIES - the PostgreSQL libraries needed for linking
 #   PostgreSQL_INCLUDE_DIRS - the directories of the PostgreSQL headers
 #   PostgreSQL_LIBRARY_DIRS  - the link directories for PostgreSQL libraries
-#   PostgreSQL_VERSION_STRING - the version of PostgreSQL found (since CMake 2.8.8)
+#   PostgreSQL_VERSION - the version of PostgreSQL found (since CMake 2.8.8)
 
 # ----------------------------------------------------------------------------
 # History:
@@ -38,6 +38,7 @@
 #
 # ----------------------------------------------------------------------------
 # You may need to manually set:
+#  PostgreSQL_ROOT_DIR     - that points to the root of where you have installed PostgreSQL
 #  PostgreSQL_INCLUDE_DIR  - the path to where the PostgreSQL include files are.
 #  PostgreSQL_LIBRARY_DIR  - The path to where the PostgreSQL library files are.
 # If FindPostgreSQL.cmake cannot find the include files or the library files.
@@ -59,7 +60,7 @@
 # 2) Use CMAKE_INCLUDE_PATH to set a path to <Your Path>/PostgreSQL<-version>. This will allow find_path()
 #    to locate PostgreSQL_INCLUDE_DIR by utilizing the PATH_SUFFIXES option. e.g. In your CMakeLists.txt file
 #    set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "<Your Path>/include")
-# 3) Set an environment variable called ${PostgreSQL_ROOT} that points to the root of where you have
+# 3) Set an environment variable called ${PostgreSQL_ROOT} / ${PostgreSQL_ROOT_DIR} that points to the root of where you have
 #    installed PostgreSQL, e.g. <Your Path>.
 #
 # ----------------------------------------------------------------------------
@@ -78,6 +79,7 @@ set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
 set( PostgreSQL_ROOT_DIRECTORIES
    ENV PostgreSQL_ROOT
    ${PostgreSQL_ROOT}
+   ${PostgreSQL_ROOT_DIR}
 )
 foreach(suffix ${PostgreSQL_KNOWN_VERSIONS})
   if(WIN32)
@@ -171,7 +173,7 @@ if (PostgreSQL_INCLUDE_DIR)
            REGEX "^#define[\t ]+PG_VERSION[\t ]+\".*\"")
       if(pgsql_version_str)
         string(REGEX REPLACE "^#define[\t ]+PG_VERSION[\t ]+\"([^\"]*)\".*"
-               "\\1" PostgreSQL_VERSION_STRING "${pgsql_version_str}")
+			   "\\1" PostgreSQL_VERSION "${pgsql_version_str}")
         break()
       endif()
     endif()
@@ -183,7 +185,7 @@ endif()
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PostgreSQL
                                   REQUIRED_VARS PostgreSQL_LIBRARY PostgreSQL_INCLUDE_DIR #PostgreSQL_TYPE_INCLUDE_DIR
-                                  VERSION_VAR PostgreSQL_VERSION_STRING)
+								  VERSION_VAR PostgreSQL_VERSION)
 set(PostgreSQL_FOUND  ${POSTGRESQL_FOUND})
 
 # Now try to get the include and library path.
@@ -191,6 +193,14 @@ if(PostgreSQL_FOUND)
   set(PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIR} ) #${PostgreSQL_TYPE_INCLUDE_DIR} )
   set(PostgreSQL_LIBRARY_DIRS ${PostgreSQL_LIBRARY_DIR} )
   set(PostgreSQL_LIBRARIES ${PostgreSQL_LIBRARY})
+endif()
+
+if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::client)
+  add_library(PostgreSQL::client UNKNOWN IMPORTED)
+  set_target_properties(PostgreSQL::client PROPERTIES
+	IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
+	INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIR}"
+  )
 endif()
 
 mark_as_advanced(PostgreSQL_INCLUDE_DIR PostgreSQL_LIBRARY ) #PostgreSQL_TYPE_INCLUDE_DIR

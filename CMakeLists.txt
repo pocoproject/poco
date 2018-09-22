@@ -82,13 +82,15 @@ endif()
 
 if(ENABLE_APACHECONNECTOR)
     find_package(APR REQUIRED)
-    find_package(Apache2 REQUIRED)
+	find_package(APRUTIL REQUIRED)
+	find_package(Apache2 REQUIRED)
 else()
     find_package(APR)
-    find_package(Apache2)    
+	find_package(APRUTIL)
+	find_package(Apache2)
 endif()
 
-if(APRUTIL_FOUND AND APACHE_FOUND AND 
+if(APR_FOUND AND APRUTIL_FOUND AND APACHE2_FOUND AND
     EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
     option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 else()
@@ -365,7 +367,6 @@ endif()
 
 if(APRUTIL_FOUND AND APACHE_FOUND AND 
     EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
-    include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" ) # TODO(Bjoe) use target_include_directories or target_link_libraries
     add_subdirectory(ApacheConnector)
     list(APPEND Poco_COMPONENTS "ApacheConnector")
 endif()

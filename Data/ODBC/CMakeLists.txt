@@ -15,14 +15,14 @@ set_target_properties(DataODBC
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries(DataODBC PUBLIC Poco::Data ${ODBC_LIBRARIES})
+target_link_libraries(DataODBC PUBLIC Poco::Data odbc::odbc)
 target_include_directories(DataODBC
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(DataODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE)
+target_compile_definitions(DataODBC PUBLIC THREADSAFE)
 
 POCO_INSTALL(DataODBC)
 POCO_GENERATE_PACKAGE(DataODBC)
