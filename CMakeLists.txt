@@ -12,8 +12,6 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_
 set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
 
-message(STATUS "Poco package version: ${PROJECT_VERSION}")
-
 # Put the libaries and binaries that get built into directories at the
 # top of the build tree rather than in hard-to-find leaf
 # directories. This simplifies manual testing and the use of the build
@@ -61,7 +59,6 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
-message(STATUS "Setting Poco build type - ${CMAKE_BUILD_TYPE}")
 
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
@@ -103,10 +100,10 @@ endif()
 
 if(MYSQL_FOUND)
   option(ENABLE_DATA "Enable Data" ON)
-  option(ENABLE_DATA_MYSQL "Enable Data MySQL" ON)
+  option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" ON)
 else()
   option(ENABLE_DATA "Enable Data" OFF)
-  option(ENABLE_DATA_MYSQL "Enable Data MySQL" OFF)
+  option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" OFF)
 endif()
 
 if(ENABLE_DATA_POSTGRESQL)
@@ -441,12 +438,23 @@ install(
 )
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
-message(STATUS "Installation target path: ${CMAKE_INSTALL_PREFIX}")
-
+message(STATUS "${PROJECT_NAME} package version: ${PROJECT_VERSION}")
+message(STATUS "[cmake] Installation target path: ${CMAKE_INSTALL_PREFIX}")
+if(CMAKE_TOOLCHAIN_FILE)
+	message(STATUS "[cmake] Use toolchain file:     ${CMAKE_TOOLCHAIN_FILE}")
+endif()
+message(STATUS "[cmake] Bulid for OS type:      ${CMAKE_SYSTEM_NAME}")
+message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
-message(STATUS "[cmake] build type:             ${CMAKE_BUILD_TYPE}")
-message(STATUS "[cmake] build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
-message(STATUS "[cmake] build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
+message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
+if(NOT DISABLE_CPP14)
+	message(STATUS "Build with C++14 support")
+elseif(NOT DISABLE_CPP11)
+	message(STATUS "Build with C++11 support")
+endif()
 
 foreach(component ${Poco_COMPONENTS})
     message(STATUS "Building: ${component}")
