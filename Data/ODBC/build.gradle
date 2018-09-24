@@ -59,6 +59,9 @@ model {
 			if (toolChain in Gcc) {
 				cppCompiler.define	"POCO_UNIXODBC"
 			}
+			if (toolChain in Clang) {
+				cppCompiler.define	"POCO_UNIXODBC"
+			}
 		}
 		withType(SharedLibraryBinarySpec) {
 			if (toolChain in VisualCpp) {
