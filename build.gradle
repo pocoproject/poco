@@ -256,7 +256,7 @@ subprojects {
 		repositories {
 			libs(PrebuiltLibraries) {
 				WS2_32 {
-					headers.srcDir  = new File(WDKHome + "/Include/" + WDKVers + "/um/x86")
+					headers.srcDir  = new File("$WDKHome" + "/Include/" + "$WDKVers" + "/um/x86")
 					binaries.withType(StaticLibraryBinary) {
 						if (targetPlatform.operatingSystem.windows) {
 							staticLibraryFile = makePreBuildLibrary("WS2_32", targetPlatform)
