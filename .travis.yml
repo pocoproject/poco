@@ -43,14 +43,14 @@ matrix:
         - brew install mysql
         - brew install unixodbc
         - chmod 777 ./gradle/bin/gradle
-        - ./gradle/bin/gradle --console=plain -g travis -c settings.gradle poco check -Ptest=-all
+        - ./gradle/bin/gradle --console=plain -g travis -c travis/settings.gradle poco check -Ptest=-all
 
     - env:    TEST_NAME="Gradle"
       os: linux
       compiler: gcc
       script:
         - chmod 777 ./gradle/bin/gradle
-        - ./gradle/bin/gradle --console=plain -g travis -c settings.gradle poco check -Ptest=-all
+        - ./gradle/bin/gradle --console=plain -g travis -c travis/settings.gradle poco check -Ptest=-all
 
     - env:    TEST_NAME="android API level 19"
       language: android
