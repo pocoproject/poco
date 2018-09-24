@@ -29,6 +29,7 @@ pkg_check_modules(PC_APR QUIET apr-1)
 find_path(APR_INCLUDE_DIR apr.h
 	HINTS
 		${APR_ROOT_DIR}/include
+		${APR_ROOT_INCLUDE_DIRS}
 	PATHS
 		${PC_APR_INCLUDE_DIRS}
 		/usr/local/include
@@ -42,6 +43,7 @@ find_library(APR_LIBRARY
   NAMES apr-1 ${APR_NAMES}
   HINTS
 	${APR_ROOT_DIR}/lib
+	${APR_ROOT_LIBRARY_DIRS}
   PATHS
 	${PC_APR_LIBRARY_DIRS}
 	/usr/lib

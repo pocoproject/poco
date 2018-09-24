@@ -29,6 +29,7 @@ SET(BINDIR32 $ENV{${BINDIR32_ENV_NAME}})
 find_path(MYSQL_INCLUDE_DIR mysql.h
 	HINTS
 		${MYSQL_ROOT_DIR}/include
+		${MYSQL_ROOT_INCLUDE_DIRS}
 	PATHS
 		${PC_MYSQL_INCLUDE_DIRS}
 		${PC_MARIADB_INCLUDE_DIRS}
@@ -59,6 +60,7 @@ if (WIN32)
 	find_library(MYSQL_LIBRARY NAMES mysqlclient
 				 HINTS
 					${MYSQL_ROOT_DIR}/lib/${libsuffixDist}
+					${MYSQL_ROOT_LIBRARY_DIRS}
 				 PATHS
 					 ${PC_MYSQL_LIBRARY_DIRS}
 					 ${PC_MARIADB_LIBRARY_DIRS}
@@ -73,6 +75,7 @@ else()
 	find_library(MYSQL_LIBRARY NAMES mysqlclient mysqlclient_r mariadbclient
 				 HINTS
 					${MYSQL_ROOT_DIR}/lib
+					${MYSQL_ROOT_LIBRARY_DIRS}
 				 PATHS
 					 ${PC_MYSQL_LIBRARY_DIRS}
 					 ${PC_MARIADB_LIBRARY_DIRS}

@@ -23,7 +23,7 @@ pkg_check_modules(PC_APACHE2 QUIET apache2)
 find_path(APACHE2_INCLUDE_DIR httpd.h
 	HINTS
 		${APACHE2_ROOT_DIR}/include/apache2
-		${APACHE2_ROOT_DIR}
+		${APACHE2_ROOT_INCLUDE_DIRS}
 	PATHS
 		${PC_APACHE2_INCLUDE_DIRS}
 		/usr/local/include/apache2

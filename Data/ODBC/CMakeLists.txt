@@ -15,7 +15,7 @@ set_target_properties(DataODBC
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries(DataODBC PUBLIC Poco::Data odbc::odbc)
+target_link_libraries(DataODBC PUBLIC Poco::Data ODBC::ODBC)
 target_include_directories(DataODBC
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

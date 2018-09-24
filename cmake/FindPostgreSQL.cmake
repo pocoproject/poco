@@ -113,6 +113,8 @@ endif()
 #
 find_path(PostgreSQL_INCLUDE_DIR
   NAMES libpq-fe.h
+  HINTS
+	${PostgreSQL_ROOT_INCLUDE_DIRS}
   PATHS
    # Look in other places.
    ${PostgreSQL_ROOT_DIRECTORIES}
@@ -152,6 +154,8 @@ endif()
 
 find_library(PostgreSQL_LIBRARY
  NAMES ${PostgreSQL_LIBRARY_TO_FIND}
+ HINTS
+   ${PostgreSQL_ROOT_LIBRARY_DIRS}
  PATHS
    ${PostgreSQL_ROOT_DIRECTORIES}
  PATH_SUFFIXES

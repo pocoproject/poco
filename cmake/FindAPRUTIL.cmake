@@ -25,6 +25,7 @@ pkg_check_modules(PC_APRUTIL QUIET apr-util-1)
 find_path(APRUTIL_INCLUDE_DIR apu.h
 	HINTS
 		${APRUTIL_ROOT_DIR}/include
+		${APRUTIL_ROOT_INCLUDE_DIRS}
 	PATHS
 		${PC_APRUTIL_INCLUDE_DIRS}
 		/usr/local/include
@@ -38,6 +39,7 @@ find_library(APRUTIL_LIBRARY
   NAMES aprutil-1 ${APRUTIL_NAMES}
   HINTS
 	${APRUTIL_ROOT_DIR}/lib
+	${APRUTIL_ROOT_LIBRARY_DIRS}
   PATHS
 	${PC_APRUTIL_LIBRARY_DIRS}
 	/usr/lib
