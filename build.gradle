@@ -420,7 +420,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir = new File("$openSSLBrewHome/include")
 								dllName = 'libssl.dylib'
 								linkName = 'libssl.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
