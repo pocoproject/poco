@@ -959,7 +959,7 @@ def report(os, Directory, Module) {
 		args "-targetdir:coverage/${Module}"
 //		args "-sourcedirs:XML/src;XML/include;CppUnit/src;CppUnit/include;Foundation/src;Foundation/include"
 
-		File targetnew File("le("coverage/${Module}")
+		File targetnew = new File("le("coverage/${Module}")
 		inputs.files(new File(targetDir,"${Module}TestSuite.xml"))
 
 		onlyIf(new Spec<Exec>() {
