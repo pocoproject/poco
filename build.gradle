@@ -256,7 +256,7 @@ subprojects {
 		repositories {
 			libs(PrebuiltLibraries) {
 				WS2_32 {
-					headers.srcDir WDKHome + "/Include/" + WDKVers + "/um/x86"
+					headers.srcDir  = new File(WDKHome + "/Include/" + WDKVers + "/um/x86")
 					binaries.withType(StaticLibraryBinary) {
 						if (targetPlatform.operatingSystem.windows) {
 							staticLibraryFile = makePreBuildLibrary("WS2_32", targetPlatform)
@@ -269,15 +269,15 @@ subprojects {
 						def libName = "foobar"
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-					           	headers.srcDir "$openSSLWindowsHome/include"
+					           	headers.srcDir  = new File("$openSSLWindowsHome/include")
 								libName = 'libcryptod.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win32/lib/debug/$libName")
 							} else if (targetPlatform.name == 'win64') {
-					           	headers.srcDir "$openSSLWindowsHome/include"
+					           	headers.srcDir  = new File("$openSSLWindowsHome/include")
 								libName = 'libcryptod.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir  = new File("$openSSLBrewHome/include")
 								libName = 'libcrypto.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -294,7 +294,7 @@ subprojects {
 								libName = 'libcrypto.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir  = new File("$openSSLBrewHome/include")
 								libName = 'libcrypto.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -321,13 +321,13 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/debug/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/debug/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir  = new File("$openSSLBrewHome/include")
 								dllName = 'libcrypto.dylib'
 								linkName = 'libcrypto.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-					           	headers.srcDir =new File("$openSSL64LinuxInc/include")
+					           	headers.srcDir = new File("$openSSL64LinuxInc/include")
 								dllName = 'libcrypto.so'
 								linkName = 'libcrypto.a'
 								sharedLibraryFile	 = new File("$openSSL64LinuxLib/$dllName")
@@ -346,7 +346,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir  = new File("$openSSLBrewHome/include")
 								dllName = 'libcrypto.dylib'
 								linkName = 'libcrypto.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
@@ -368,15 +368,15 @@ subprojects {
 						def libName
 						if (buildType == buildTypes.debug) {
 							if (targetPlatform.name == 'win32') {
-					           	headers.srcDir "$openSSLWindowsHome/include"
+					           	headers.srcDir  = new File("$openSSLWindowsHome/include")
 								libName = 'libssld.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win32/lib/debug/$libName")
 							} else if (targetPlatform.name == 'win64') {
-					           	headers.srcDir "$openSSLWindowsHome/include"
+					           	headers.srcDir  = new File("$openSSLWindowsHome/include")
 								libName = 'libssl.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/debug/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir  = new File("$openSSLBrewHome/include")
 								libName = 'libssl.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -393,7 +393,7 @@ subprojects {
 								libName = 'libssl.lib'
 								staticLibraryFile = new File("$openSSLWindowsHome/win64/lib/release/$libName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir  = new File("$openSSLBrewHome/include")
 								libName = 'libssl.a'
 								staticLibraryFile = new File("$openSSLBrewHome/lib/$libName")
 							} else if (targetPlatform.operatingSystem.linux) {
@@ -444,7 +444,7 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLWindowsHome/win64/bin/release/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLWindowsHome/win64/bin/release/$linkName")
 							} else if (targetPlatform.operatingSystem.macOsX) {
-								headers.srcDir "$openSSLBrewHome/include"
+								headers.srcDir = new File("$openSSLBrewHome/include")
 								dllName = 'libssl.dylib'
 								linkName = 'libssl.dylib'
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
