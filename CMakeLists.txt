@@ -117,7 +117,7 @@ else()
     find_package(PostgreSQL)
 endif()
  
-if(POSTGRESQL_FOUND)
+if(PostgreSQL_FOUND)
     option(ENABLE_DATA "Enable SQL" ON)
     option(ENABLE_DATA_POSTGRESQL "Enable SQL PosgreSQL" ON)
 else()
