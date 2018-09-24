@@ -426,12 +426,11 @@ subprojects {
 								sharedLibraryFile	 = new File("$openSSLBrewHome/lib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSLBrewHome/lib/$linkName")
 							} else if (targetPlatform.operatingSystem.linux) {
-                               	def File openSSL64LinuxLibFile = new File("$openSSL64LinuxLib")
 					           	headers.srcDir "$openSSL64LinuxInc/include"
 								dllName  = "libssl.so"
 								linkName = "libssl.a"
-								sharedLibraryFile	 = new File(openSSL64LinuxLibFile, dllName)
-								sharedLibraryLinkFile = new File(openSSL64LinuxLibFile, linkName)
+								sharedLibraryFile	 = new File("$openSSL64LinuxLib", dllName)
+								sharedLibraryLinkFile = new File("$openSSL64LinuxLib", linkName)
 							}
 						} else if (buildType == buildTypes.release) {
 							if (targetPlatform.name == 'win32') {
