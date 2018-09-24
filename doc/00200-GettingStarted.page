@@ -395,6 +395,55 @@ or for console only:
 
 POCO C++ Libraries options are prefixed with <*ENABLE_*>. (This will be changed in POCO 2.x.x to <*POCO_*>)
 
+!!!Third-party library location
+
+If a third-party library is not installed in a default location, cmake will fail to run.
+There exists following parameters to set additional search paths for cmake to find third-party libraries:
+
+To find PostgreSQL:
+  * PostgreSQL_ROOT_DIR                                  - Set root installation path where to find include path and libraries of PostgreSQL
+  or
+  * PostgreSQL_ROOT_INCLUDE_DIRS                - Set include paths where to find PostgreSQL headers
+  * PostgreSQL_ROOT_LIBRARY_DIRS                 - Set library paths where to find PostgreSQL libraries
+  
+To find ODBC:
+  * ODBC_ROOT_DIR                                            - Set root installation path where to find include path and libraries of ODBC
+  or
+  * ODBC_ROOT_INCLUDE_DIRS                           - Set include paths where to find ODBC headers
+  * ODBC_ROOT_LIBRARY_DIRS                            - Set library paths where to find ODBC libraries
+  
+To find MySQL or MariaDB:
+  * MYSQL_ROOT_DIR                                            - Set root installation path where to find include path and libraries of MySQL or MariaDB
+  or
+  * MYSQL_ROOT_INCLUDE_DIRS                          - Set include paths where to find MySQL or MariaDB headers
+  * MYSQL_ROOT_LIBRARY_DIRS                           - Set library paths where to find MySQL or MariaDB libraries
+  
+  * APRUTIL_ROOT_DIR                                         - Set root installation path where to find include path and libraries of apr util
+  or
+  * APRUTIL_ROOT_INCLUDE_DIRS                       - Set include paths where to find apr util headers
+  * APRUTIL_ROOT_LIBRARY_DIRS                        - Set library paths where to find apr util libraries
+  
+  * APR_ROOT_DIR                                                 - Set root installation path where to find include path and libraries of apr
+  or
+  * APR_ROOT_INCLUDE_DIRS                                - Set include paths where to find apr headers
+  * APR_ROOT_LIBRARY_DIRS                                - Set library paths where to find apr libraries
+  
+  * APACHE2_ROOT_DIR                                        - Set root installation path where to find include path and libraries of apache2
+  or
+  * APACHE2_ROOT_INCLUDE_DIRS                        - Set include paths where to find apache2 headers
+
+  
+For example set installation path of MySQL:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DMYSQL_ROOT_DIR=/usr/local/mysql
+    $ cmake --build /path/to/poco-build
+or
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DMYSQL_ROOT_INCLUDE_DIRS=/usr/local/mysql/include/mysql -DMYSQL_ROOT_LIBRARY_DIRS=/usr/local/lib/mysql
+    $ cmake --build /path/to/poco-build
+
+
+    
+
 !!!How to use POCO in your cmake project:
 
 To use POCO C++ Libraries in your cmake project, add following line in your project for example to use crypto:
