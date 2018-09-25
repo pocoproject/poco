@@ -152,6 +152,7 @@ To decompress single files you must first parse a Zip file, and then decompress 
     ZipArchive arch(inp);
     ZipArchive::FileHeaders::const_iterator it = arch.findHeader("data/hello.txt");
     poco_assert (it != arch.headerEnd());
+    inp.clear();
     ZipInputStream zipin (inp, it->second);
     std::ostringstream out(std::ios::binary);
     Poco::StreamCopier::copyStream(zipin, out);
