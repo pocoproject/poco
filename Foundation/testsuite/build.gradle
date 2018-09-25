@@ -35,8 +35,6 @@ model {
 						srcDir 'src'
 						include 'TestApp.cpp'
 					}
-					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-					lib library: 'TestLib', linkage: 'shared'
 				}
 			}
 		}
