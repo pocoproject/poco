@@ -630,7 +630,18 @@ subprojects {
 					linker.args '/OPT:ICF' 
 					linker.args '/NOLOGO' 
 					linker.args '/SUBSYSTEM:CONSOLE'
-				} else {
+				} else
+				if (toolChain in Gcc) {
+					cCompiler.define "_XOPEN_SOURCE=600"
+					cCompiler.define "_REENTRANT"
+					cCompiler.define "_THREAD_SAFE"
+					cCompiler.define "_FILE_OFFSET_BITS=64"
+					cCompiler.define "_LARGEFILE64_SOURCE"
+					cCompiler.define "POCO_HAVE_FD_EPOLL"
+					cCompiler.define "POCO_HAVE_ADDRINFO"
+					cCompiler.define "POCO_HAVE_LIBRESOLV"
+					cCompiler.args "-std=c++11"
+
 					cppCompiler.define "_XOPEN_SOURCE=600"
 					cppCompiler.define "_REENTRANT"
 					cppCompiler.define "_THREAD_SAFE"
@@ -640,11 +651,35 @@ subprojects {
 					cppCompiler.define "POCO_HAVE_ADDRINFO"
 					cppCompiler.define "POCO_HAVE_LIBRESOLV"
 					cppCompiler.args "-std=c++11"
-					cppCompiler.args "-fPIC"
 
 					linker.args "-lrt"
 					linker.args "-ldl"
 					linker.args "-lpthread"
+				} else
+				if (toolChain in Clang) {			// supposed to be for Darwin OSX
+					cCompiler.define "POCO_HAVE_IPv6"
+					cCompiler.define "POCO_NO_STAT64"
+					cCompiler.args "-std=c99"
+					cCompiler.args "-fasm-blocks"
+					cCompiler.args "-stdlib=libc++"
+
+					cppCompiler.define "POCO_HAVE_IPv6"
+					cppCompiler.define "POCO_NO_STAT64"
+					cppCompiler.args "-std=c++11"
+					cppCompiler.args "-fasm-blocks"
+					cppCompiler.args "-stdlib=libc++"
+					
+					if (buildType == buildTypes.debug) {
+						cCompiler.args 		'-O0 -g -gdwarf-2'
+						cppCompiler.args 	'-O0 -g -gdwarf-2'
+					} else 
+					if (buildType == buildTypes.release) {
+						cCompiler.args '-O'
+						cppCompiler.args '-O'
+					}
+					
+					linker.args "-stdlib=libc++"
+					linker.args "-ldl"
 				}
 			}
 			withType(SharedLibraryBinarySpec) {
@@ -662,10 +697,15 @@ subprojects {
 						cppCompiler.args "/MD"
 					}
 				} else {
+					cppCompiler.args "-fPIC"
+					cCompiler.args   "-fPIC"
 					if (targetPlatform == platforms.linux32) {
 					    linker.args "-Wl,-rpath,$rootDir/lib"   //FIXME
                     } else
 					if (targetPlatform == platforms.linux64) {
+					    linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
+                    } else
+					if (targetPlatform == platforms.macos) {
 					    linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
                     }
 				}
@@ -709,6 +749,9 @@ subprojects {
 					    linker.args "-Wl,-rpath,$rootDir/lib"   //FIXME
                     } else
 					if (targetPlatform == platforms.linux64) {
+					    linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
+                    } else
+					if (targetPlatform == platforms.macos) {
 					    linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
                     }
 				}
