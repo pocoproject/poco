@@ -393,7 +393,7 @@ void Context::preferServerCiphers()
 
 void Context::createSSLContext()
 {
-	if (SSLManager::isFIPSEnabled())
+	if (_usage == (CLIENT_USE || SERVER_USE) && SSLManager::isFIPSEnabled())
 	{
 		_pSSLContext = SSL_CTX_new(TLSv1_method());
 	}
