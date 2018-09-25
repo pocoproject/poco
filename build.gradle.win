@@ -174,7 +174,6 @@ File toStatic(File staticFile, Platform platform) {
 	return new File(parent, name);
 }
 File toPDB(File binaryFile) {
-	println 'prefixByPoco=' + binaryFile
 	String name = binaryFile.getName()
 	File parent = binaryFile.getParentFile()
 	int extensionSeparator = name.lastIndexOf('.')
