@@ -572,22 +572,6 @@ subprojects {
 					cppCompiler.define 'NDEBUG'
 				}
 			
-				if (toolChain in Gcc) {
-					cppCompiler.define "_XOPEN_SOURCE=600"
-					cppCompiler.define "_REENTRANT"
-					cppCompiler.define "_THREAD_SAFE"
-					cppCompiler.define "_FILE_OFFSET_BITS=64"
-					cppCompiler.define "_LARGEFILE64_SOURCE"
-					cppCompiler.define "POCO_HAVE_FD_EPOLL"
-					cppCompiler.define "POCO_HAVE_ADDRINFO"
-					cppCompiler.define "POCO_HAVE_LIBRESOLV"
-					cppCompiler.args "-std=c++11"
-					cppCompiler.args "-fPIC"
-
-					linker.args "-lrt"
-					linker.args "-ldl"
-					linker.args "-lpthread"
-				}
 				if (toolChain in VisualCpp) {
 					if (targetPlatform == platforms.win64) {
 						linker.args '/MACHINE:X64'
@@ -646,6 +630,21 @@ subprojects {
 					linker.args '/OPT:ICF' 
 					linker.args '/NOLOGO' 
 					linker.args '/SUBSYSTEM:CONSOLE'
+				} else {
+					cppCompiler.define "_XOPEN_SOURCE=600"
+					cppCompiler.define "_REENTRANT"
+					cppCompiler.define "_THREAD_SAFE"
+					cppCompiler.define "_FILE_OFFSET_BITS=64"
+					cppCompiler.define "_LARGEFILE64_SOURCE"
+					cppCompiler.define "POCO_HAVE_FD_EPOLL"
+					cppCompiler.define "POCO_HAVE_ADDRINFO"
+					cppCompiler.define "POCO_HAVE_LIBRESOLV"
+					cppCompiler.args "-std=c++11"
+					cppCompiler.args "-fPIC"
+
+					linker.args "-lrt"
+					linker.args "-ldl"
+					linker.args "-lpthread"
 				}
 			}
 			withType(SharedLibraryBinarySpec) {
@@ -662,8 +661,7 @@ subprojects {
 						cCompiler.args "/MD"
 						cppCompiler.args "/MD"
 					}
-				}
-				if (toolChain in Gcc) {
+				} else {
 					if (targetPlatform == platforms.linux32) {
 					    linker.args "-Wl,-rpath,$rootDir/lib"   //FIXME
                     } else
@@ -690,8 +688,7 @@ subprojects {
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
 					}
-				}
-				if (toolChain in Gcc) {
+				} else {
 					linker.args "-Wl,-rpath,$rootDir/lib64"   //FIXME
 				}
 			}
@@ -707,8 +704,7 @@ subprojects {
 					} else {
 						throw new GradleException("Unknown buildType" + buildType)
 					}
-				}
-				if (toolChain in Gcc) {
+				} else {
 					if (targetPlatform == platforms.linux32) {
 					    linker.args "-Wl,-rpath,$rootDir/lib"   //FIXME
                     } else
