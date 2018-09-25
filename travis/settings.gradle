@@ -1,6 +1,6 @@
 def os = org.gradle.internal.os.OperatingSystem.current()
 rootProject.name = 'Poco'
-rootProject.dir = '..'
+rootProject.dir = new File('../')
 
 include 'CppUnit'
 include 'Encodings'
