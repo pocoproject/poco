@@ -670,12 +670,12 @@ subprojects {
 					cppCompiler.args "-stdlib=libc++"
 					
 					if (buildType == buildTypes.debug) {
-						cCompiler.args 		'-O0 -g -gdwarf-2'
-						cppCompiler.args 	'-O0 -g -gdwarf-2'
+						cCompiler.args 		('-O0', '-g',  '-gdwarf-2')
+						cppCompiler.args 	('-O0', '-g',  '-gdwarf-2')
 					} else 
 					if (buildType == buildTypes.release) {
-						cCompiler.args '-O'
-						cppCompiler.args '-O'
+						cCompiler.args 		'-Os'
+						cppCompiler.args 	'-O2'
 					}
 					
 					linker.args "-stdlib=libc++"
