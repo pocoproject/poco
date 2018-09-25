@@ -22,6 +22,11 @@ include(FindPackageHandleStandardArgs)
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_ODBC QUIET odbc)
 
+if(WIN32)
+	get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
+	get_filename_component(kit81_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot81]" REALPATH)
+endif()
+
 find_path(ODBC_INCLUDE_DIR
 	NAMES sql.h
 	HINTS
@@ -37,6 +42,8 @@ find_path(ODBC_INCLUDE_DIR
 		"C:/Program Files/Microsoft SDKs/Windows/v7.0/include"
 		"C:/Program Files/Microsoft SDKs/Windows/v6.0a/include"
 		"C:/ODBC/include"
+		"${kit_dir}/Include/um"
+		"${kit81_dir}/Include/um"
 	PATH_SUFFIXES
 		odbc
 		iodbc
@@ -62,6 +69,10 @@ find_library(ODBC_LIBRARY
 		"C:/Program Files/ODBC/lib"
 		"C:/ODBC/lib/debug"
 		"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"
+		"${kit81_dir}/Lib/winv6.3/um/x64"
+		"${kit_dir}/Lib/win8/um/x64"
+		"${kit81_dir}/Lib/winv6.3/um/x86"
+		"${kit_dir}/Lib/win8/um/x86"
 	PATH_SUFIXES
 		odbc
 	DOC "Specify the ODBC driver manager library here."
