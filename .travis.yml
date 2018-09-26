@@ -51,6 +51,7 @@ matrix:
       script:
         - chmod 777 ./gradle/bin/gradle
         - ./gradle/bin/gradle --console=plain -g travis -c travis/settings.gradle poco check -Ptest=-all
+        - cat Crypto/guild/tmp/linkCryptoLinux64DebugSharedLibrary/*
 
     - env:    TEST_NAME="android API level 19"
       language: android

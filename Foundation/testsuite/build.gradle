@@ -59,10 +59,12 @@ model {
 	}
 	testSuites {
 		FoundationTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
-			testing $.components.TestSuite 
+			testing $.components.TestSuite
 		}
 	}
-    binaries {                                               
+    binaries {
+		all {
+		}
         withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			lib library: 'TestLibrary', linkage: 'shared'
