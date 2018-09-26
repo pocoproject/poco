@@ -329,7 +329,7 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.linux) {
 					           	headers.srcDir new File("$openSSL64LinuxInc/include")
 								dllName = 'libcrypto.so'
-								linkName = 'libcrypto.a'
+								linkName = 'libcrypto.so'
 								sharedLibraryFile	 new File("$openSSL64LinuxLib/$dllName")
 								sharedLibraryLinkFile new File("$openSSL64LinuxLib/$linkName")
 							}
@@ -354,7 +354,7 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.linux) {
 					           	headers.srcDir new File("$openSSL64LinuxInc/include")
 								dllName = 'libcrypto.so'
-								linkName = 'libcrypto.a'
+								linkName = 'libcrypto.so'
 								sharedLibraryFile	 new File("$openSSL64LinuxLib/$dllName")
 								sharedLibraryLinkFile new File("$openSSL64LinuxLib/$linkName")
 							}
@@ -428,7 +428,7 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.linux) {
 					           	headers.srcDir new File("$openSSL64LinuxInc/include")
 								dllName  = "libssl.so"
-								linkName = "libssl.a"
+								linkName = "libssl.so"
 								sharedLibraryFile	 new File("$openSSL64LinuxLib", dllName)
 								sharedLibraryLinkFile new File("$openSSL64LinuxLib", linkName)
 							}
@@ -452,7 +452,7 @@ subprojects {
 							} else if (targetPlatform.operatingSystem.linux) {
 					           	headers.srcDir new File("$openSSL64LinuxInc/include")
 								dllName = 'libssl.so'
-								linkName = 'libssl.a'
+								linkName = 'libssl.so'
 								sharedLibraryFile	 new File("$openSSL64LinuxLib/$dllName")
 								sharedLibraryLinkFile = new File("$openSSL64LinuxLib/$linkName")
 							}
