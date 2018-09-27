@@ -36,6 +36,7 @@ before_script:
 
 matrix:
   include:
+<<<<<<< HEAD
     - env:    TEST_NAME="Gradle"
       os: osx
       compiler: clang
@@ -52,6 +53,16 @@ matrix:
         - chmod 777 ./gradle/bin/gradle
         - ./gradle/bin/gradle --console=plain -g travis -c travis/settings.gradle poco check -Ptest=-all
         - cat Crypto/guild/tmp/linkCryptoLinux64DebugSharedLibrary/*
+=======
+#    - env:    TEST_NAME="Gradle"
+#      os: osx
+#      compiler: clang
+#      script:
+#        - brew install mysql
+#        - brew install unixodbc
+#        - chmod 777 ./gradle/bin/gradle
+#        - ./gradle/bin/gradle --console=plain -g travis -c settings.gradle poco check -Ptest=-all
+>>>>>>> refs/remotes/origin/poco-1.9.1
 
     - env:    TEST_NAME="android API level 19"
       language: android

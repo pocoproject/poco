@@ -11,7 +11,7 @@ POCO Zip adds support for parsing and creating Zip files. It offers the followin
 !!Restrictions
   * POCO Zip does not support the DEFLATE64 algorithm.
   * encrypted files are not supported
-  
+
 !!!Main Classes
 Most users will work with two common classes: <*Compress*> and <*Decompress*>
 
@@ -23,31 +23,31 @@ Creating a Zip file is a basically a three-step process:
      Compress(std::ostream& out, bool seekableOut);
 ----
   * Add entries: either add single files or directory entries
-  
-    void addFile(std::istream& input, 
-                 const Poco::DateTime& lastModifiedAt, 
-                 const Poco::Path& fileName, 
-                 ZipCommon::CompressionMethod cm = ZipCommon::CM_DEFLATE, 
+
+    void addFile(std::istream& input,
+                 const Poco::DateTime& lastModifiedAt,
+                 const Poco::Path& fileName,
+                 ZipCommon::CompressionMethod cm = ZipCommon::CM_DEFLATE,
                  ZipCommon::CompressionLevel cl = ZipCommon::CL_MAXIMUM);
         /// Adds a single file to the Zip File. fileName must not be a directory name.
 
-    void addFile(const Poco::Path& file, 
-                 const Poco::Path& fileName, 
-                 ZipCommon::CompressionMethod cm = ZipCommon::CM_DEFLATE, 
+    void addFile(const Poco::Path& file,
+                 const Poco::Path& fileName,
+                 ZipCommon::CompressionMethod cm = ZipCommon::CM_DEFLATE,
                  ZipCommon::CompressionLevel cl = ZipCommon::CL_MAXIMUM);
         /// Adds a single file to the Zip File. fileName must not be a directory name. The file must exist physically!
 
     void addDirectory(const Poco::Path& entryName, const Poco::DateTime& lastModifiedAt);
         /// Adds a directory entry excluding all children to the Zip file, entryName must not be empty.
 
-    void addRecursive(const Poco::Path& entry, 
-                      ZipCommon::CompressionLevel cl = ZipCommon::CL_MAXIMUM, 
-                      bool excludeRoot = true, 
+    void addRecursive(const Poco::Path& entry,
+                      ZipCommon::CompressionLevel cl = ZipCommon::CL_MAXIMUM,
+                      bool excludeRoot = true,
                       const Poco::Path& name = Poco::Path());
         /// Adds a directory entry recursively to the zip file, set excludeRoot to false to exclude the parent directory.
         /// The name specifies under which path the entries are added in the Zip file.
 ----
-Note that one must always define a name when adding a file entry, otherwise the compresser can not decide if the file should be added with an absolute or a relative path. 
+Note that one must always define a name when adding a file entry, otherwise the compresser can not decide if the file should be added with an absolute or a relative path.
 Assume you are adding the file <*c:\\data\\hello.txt*> twice to a Zip:
 
     // MUST use binary!
@@ -96,7 +96,7 @@ To get notified about the entries that are added during <*addRecursive*> registe
     Poco::FIFOEvent<const ZipLocalFileHeader> EDone;
 ----
   * Closing the Zip file: It is mandatory to manually close Compress objects. This guarantees that the Zip directory is written, thus creating a valid Zip file. It is safe to call <*close*> multiple times, only the first call takes effect.
-  
+
     ZipArchive close();
 ----
 <*close*> returns a ZipArchive which describes all entries inside a Zip file.
@@ -110,7 +110,7 @@ The following sample code shows how all entries can be extracted from a Zip file
     std::ifstream inp("test.zip", std::ios::binary);
     poco_assert (inp);
     // decompress to current working dir
-    Decompress dec(inp, Poco::Path()); 
+    Decompress dec(inp, Poco::Path());
     // if an error happens invoke the ZipTest::onDecompressError method
     dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &ZipTest::onDecompressError);
     dec.decompressAllFiles();
@@ -152,7 +152,8 @@ To decompress single files you must first parse a Zip file, and then decompress 
     ZipArchive arch(inp);
     ZipArchive::FileHeaders::const_iterator it = arch.findHeader("data/hello.txt");
     poco_assert (it != arch.headerEnd());
-    ZipInputStream zipin (inp, it->second);
+    inp.clear();
+    ZipInputStream zipin(inp, it->second);
     std::ostringstream out(std::ios::binary);
     Poco::StreamCopier::copyStream(zipin, out);
 ----
