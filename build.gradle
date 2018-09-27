@@ -50,7 +50,7 @@ File prefixByPoco(File binaryFile) {
 			if (name.charAt(extensionSeparator - 1) == 'd')
 				debug = 'd'
 		}
-		return new File(parent, prefix + "TestLibrary" + debug + suffix)
+		return new File(parent, "TestLibrary" + debug + suffix)
 	}
 		
 	return new File(parent, prefix + "Poco" + name);
