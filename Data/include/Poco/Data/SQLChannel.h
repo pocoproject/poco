@@ -36,25 +36,25 @@ namespace Data {
 class Data_API SQLChannel: public Poco::Channel
 	/// This Channel implements logging to a SQL database.
 	/// The channel is dependent on the schema. The DDL for
-	/// table creation (subject to target DDL dialect dependent 
+	/// table creation (subject to target DDL dialect dependent
 	/// modifications) is:
 	///
-	/// "CREATE TABLE T_POCO_LOG (Source VARCHAR, 
-	///		Name VARCHAR, 
-	///		ProcessId INTEGER, 
-	///		Thread VARCHAR, 
-	///		ThreadId INTEGER, 
-	///		Priority INTEGER, 
-	///		Text VARCHAR, 
+	/// "CREATE TABLE T_POCO_LOG (Source VARCHAR,
+	///		Name VARCHAR,
+	///		ProcessId INTEGER,
+	///		Thread VARCHAR,
+	///		ThreadId INTEGER,
+	///		Priority INTEGER,
+	///		Text VARCHAR,
 	///		DateTime DATE)"
 	///
-	/// The table name is configurable through "table" property. 
-	/// Other than DateTime filed name used for optiona time-based archiving purposes, currently the 
+	/// The table name is configurable through "table" property.
+	/// Other than DateTime filed name used for optional time-based archiving purposes, currently the
 	/// field names are not mandated. However, it is recomended to use names as specified above.
-	/// 
-	/// To provide as non-intrusive operation as possbile, the log entries are cached and 
-	/// inserted into the target database asynchronously by default . The blocking, however, will occur 
-	/// before the next entry insertion with default timeout of 1 second. The default settings can be 
+	///
+	/// To provide as non-intrusive operation as possbile, the log entries are cached and
+	/// inserted into the target database asynchronously by default. The blocking, however, will occur
+	/// before the next entry insertion with default timeout of 1 second. The default settings can be
 	/// overriden (see async, timeout and throw properties for details).
 	/// If throw property is false, insertion timeouts are ignored, otherwise a TimeoutException is thrown.
 	/// To force insertion of every entry, set timeout to 0. This setting, however, introduces
@@ -64,29 +64,27 @@ public:
 	SQLChannel();
 		/// Creates SQLChannel.
 
-	SQLChannel(const std::string& connector, 
+	SQLChannel(const std::string& connector,
 		const std::string& connect,
 		const std::string& name = "-");
 		/// Creates a SQLChannel with the given connector, connect string, timeout, table and name.
 		/// The connector must be already registered.
-	
+
 	void open();
 		/// Opens the SQLChannel.
-		
+
 	void close();
 		/// Closes the SQLChannel.
-		
+
 	void log(const Message& msg);
-		/// Sends the message's text to the syslog service.
-		
+		/// Writes the log message to the database.
+
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
 		///     * name:      The name used to identify the source of log messages.
 		///                  Defaults to "-".
-		///
-		///     * target:    The target data storage type ("SQLite", "ODBC", ...).
 		///
 		///     * connector: The target data storage connector name.
 		///
@@ -105,7 +103,7 @@ public:
 		///     * async:     Indicates asynchronous execution. When excuting asynchronously,
 		///                  messages are sent to the target using asyncronous execution.
 		///                  However, prior to the next message being processed and sent to
-		///                  the target, the previous operation must have been either completed 
+		///                  the target, the previous operation must have been either completed
 		///                  or timed out (see timeout and throw properties for details on
 		///                  how abnormal conditos are handled).
 		///
@@ -117,7 +115,7 @@ public:
 		///                  Setting this property to false may result in log entries being lost.
 		///                  True values are (case insensitive) "true", "t", "yes", "y".
 		///                  Anything else yields false.
-		
+
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
@@ -175,7 +173,7 @@ private:
 	int          _timeout;
 	bool         _throw;
 	bool         _async;
-	
+
 	// members for log entry cache (needed for async mode)
 	std::string _source;
 	long        _pid;
@@ -195,9 +193,9 @@ private:
 
 inline std::size_t SQLChannel::wait()
 {
-	if (_async && _pLogStatement) 
+	if (_async && _pLogStatement)
 		return _pLogStatement->wait(_timeout);
-	
+
 	return 0;
 }
 
