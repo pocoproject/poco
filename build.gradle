@@ -34,12 +34,25 @@ File appendStaticSuffix(File binaryFile) {
 }
 File prefixByPoco(File binaryFile) {
 	String name = binaryFile.getName()
-	String prefix = ''
+	String prefix = ""
 	if (name.startsWith('lib')) {
 		prefix = 'lib'
 		name = name.substring(3)
 	}
 	File parent = binaryFile.getParentFile()
+	
+	if (name.contains("TestLibrary")) {			// TestLibrary[64][d].dll ==> TestLibrary[d].dll
+		String suffix = ""
+		String debug= ""
+		int extensionSeparator = name.lastIndexOf('.')
+		if (extensionSeparator != -1) {
+			suffix = name.substring(extensionSeparator);
+			if (name.charAt(extensionSeparator - 1) == 'd')
+				debug = 'd'
+		}
+		return new File(parent, prefix + "TestLibrary" + debug + suffix)
+	}
+		
 	return new File(parent, prefix + "Poco" + name);
 }
 File suffixByArch(File binaryFile, Platform platform) {
