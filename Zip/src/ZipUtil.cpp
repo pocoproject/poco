@@ -161,6 +161,70 @@ void ZipUtil::sync(std::istream& in)
 }
 
 
+void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
+{
+	std::streampos start = in.tellg();
+	const int eof = std::char_traits<char>::eof();
+
+	int c = in.get();
+	do
+	{
+		while (c != eof && c != ZipDataInfo::HEADER[0]) { c = in.get(); }
+
+		if (c == eof) return;
+
+		bool match = true;
+		for (int i = 1; i < 4 && match; i++)
+		{
+			c = in.get();
+			if (c != ZipDataInfo::HEADER[i]) match = false;
+		}
+
+		if (match)
+		{
+			std::streampos end = in.tellg();
+
+			if (force64)
+			{
+				ZipDataInfo64 nfo(in, true);
+				if (nfo.isValid())
+				{
+					if (end - start == nfo.getCompressedSize() + 4)
+					{
+						in.seekg(-static_cast<int>(ZipDataInfo64::getFullHeaderSize()), std::ios::cur);
+						if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
+						break;
+					}
+					else
+					{
+						in.seekg(-static_cast<int>(ZipDataInfo64::getFullHeaderSize()) + 4, std::ios::cur);
+						if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
+					}
+				}
+			}
+			else
+			{
+				ZipDataInfo nfo(in, true);
+				if (nfo.isValid())
+				{
+					if (end - start == nfo.getCompressedSize() + 4)
+					{
+						in.seekg(-static_cast<int>(ZipDataInfo::getFullHeaderSize()), std::ios::cur);
+						if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
+						break;
+					}
+					else
+					{
+						in.seekg(-static_cast<int>(ZipDataInfo::getFullHeaderSize()) + 4, std::ios::cur);
+						if (!in.good()) throw Poco::IOException("Failed to seek on input stream");
+					}
+				}
+			}
+		}
+	} while (c != eof);
+}
+
+
 void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 {
 	if (fn.find("\\") != std::string::npos)
