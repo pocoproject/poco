@@ -5,12 +5,12 @@ model {
 		withType(NativeComponentSpec) {
 			binaries.withType(NativeBinarySpec) {
 				if (buildType == buildTypes.debug) {
-					if (it instanceof NativeExecutableBinarySpec) {
+					if (it instanceof NativeExecutablecSpec) {
 						executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
 					}
 				} else
 				if (buildType == buildTypes.release) {
-					if (it instanceof NativeExecutableBinarySpec) {
+					if (it instanceof NativeExecutablecSpec) {
 						executable.file = toLocalBin(executable.file, targetPlatform)
 					} 
 				}
@@ -63,8 +63,6 @@ model {
 		}
 	}
     binaries {
-		all {
-		}
         withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			lib library: 'TestLibrary', linkage: 'shared'
@@ -86,19 +84,6 @@ model {
        }
 	}
 }
-/*
-tasks.withType(RunTestExecutable) {
-	String PATH = System.getenv("PATH")
-	if (name.contains('Win32')) {
-		PATH = "$projectDir\\bin;$PATH"
-	} else
-	if (name.contains('Win64')) {
-		PATH = "$projectDir\\bin64;$PATH"
-	}
-	environment "Path", "$PATH"
-}
-*/
-
 task testsuite { dependsOn "assemble" }
 
 
