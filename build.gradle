@@ -791,55 +791,46 @@ subprojects {
 
 		String CPPUNIT_IGNORE = "";
 		if (name.contains('Win32') || name.contains('Win64')) {
-		    CPPUNIT_IGNORE =' class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ICMPClientTest>.testPing';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ICMPClientTest>.testBigPing';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
-
-	    	//FIXME Those tests below should work
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testLaunch';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
-	    	CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
+			CPPUNIT_IGNORE =  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testSendToReceiveFromIPv4';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testPing';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ICMPClientTest>.testBigPing';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
+	
+			//FIXME Those tests below should work
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunch';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
+			CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
     
-    		//FIXME won't work until SharedLibraries be properly generated
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary1';
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary2';
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class SharedLibraryTest>.testSharedLibrary3';
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader2';
-    		CPPUNIT_IGNORE+=' class CppUnit::TestCaller<class ClassLoaderTest>.testClassLoader3';
-	    }
+	    } else
 		if (name.contains('Linux32') || name.contains('Linux64')) {
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI8PathTestEE.testExpand';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI13RawSocketTestEE.testEchoIPv4';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI13RawSocketTestEE.testSendToReceiveFromIPv4';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI14ICMPClientTestEE.testPing';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI14ICMPClientTestEE.testBigPing';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI22HTTPSClientSessionTestEE.testProxy';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI22HTTPSStreamFactoryTestEE.testProxy';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI9TimerTestEE.testTimer';
+            CPPUNIT_IGNORE+='  N7CppUnit10TestCallerI8PathTestEE.testExpand';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI13RawSocketTestEE.testEchoIPv4';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI13RawSocketTestEE.testSendToReceiveFromIPv4';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI14ICMPClientTestEE.testPing';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI14ICMPClientTestEE.testBigPing';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI22HTTPSClientSessionTestEE.testProxy';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI22HTTPSStreamFactoryTestEE.testProxy';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI19MulticastSocketTestEE.testMulticast';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI13NTPClientTestEE.testTimeSync';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI9TimerTestEE.testTimer';
 
-    		//FIXME won't work until SharedLibraries be properly generated
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary1';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary2';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI17SharedLibraryTestEE.testSharedLibrary3';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI15ClassLoaderTestEE.testClassLoader2';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI15ClassLoaderTestEE.testClassLoader3';
 
 	    	//FIXME Those tests below should work
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI11ProcessTestEE.testLaunch';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI11ProcessTestEE.testLaunchRedirectIn';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI11ProcessTestEE.testLaunchRedirectOut';
-            CPPUNIT_IGNORE+=' N7CppUnit10TestCallerI11ProcessTestEE.testLaunchEnv';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testLaunch';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testLaunchRedirectIn';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testLaunchRedirectOut';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testLaunchEnv';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testLaunchArgs';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testIsRunning';
+            CPPUNIT_IGNORE+=', N7CppUnit10TestCallerI11ProcessTestEE.testIsRunningAllowsForTermination';
 		}
         CPPUNIT_IGNORE+=' ';
 
