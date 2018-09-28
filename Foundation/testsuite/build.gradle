@@ -2,20 +2,22 @@ import org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
 
 model {
 	components {
+/*
 		withType(NativeComponentSpec) {
 			binaries.withType(NativeBinarySpec) {
 				if (buildType == buildTypes.debug) {
-					if (it instanceof NativeExecutablecSpec) {
+					if (it instanceof NativeExecutableBinarySpec) {
 						executable.file = toLocalBin(appendDebugSuffix(executable.file), targetPlatform)
 					}
 				} else
 				if (buildType == buildTypes.release) {
-					if (it instanceof NativeExecutablecSpec) {
+					if (it instanceof NativeExecutableBinarySpec) {
 						executable.file = toLocalBin(executable.file, targetPlatform)
 					} 
 				}
 			}
 		}
+*/
 		TestLibrary(NativeLibrarySpec) {
 			sources {
 				cpp {
