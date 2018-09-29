@@ -120,9 +120,9 @@ int Base64DecoderBuf::readFromDevice()
 			if (_pInEncoding[buffer[3]] == 0xFF) throw DataFormatException();
 		}
 
-		_group[0] = (_pInEncoding[buffer[0]] << 2) | (_pInEncoding[buffer[1]] >> 4);
-		_group[1] = ((_pInEncoding[buffer[1]] & 0x0F) << 4) | (_pInEncoding[buffer[2]] >> 2);
-		_group[2] = (_pInEncoding[buffer[2]] << 6) | _pInEncoding[buffer[3]];
+		_group[0] = (_pInEncoding[buffer[0]] << 2) | ((_pInEncoding[buffer[1]] >> 4) & 0x03);
+		_group[1] = ((_pInEncoding[buffer[1]] << 4) & 0xF0) | ((_pInEncoding[buffer[2]]>> 2)&0x0f) ;
+		_group[2] = ((_pInEncoding[buffer[2]] << 6)&0xC0) | (_pInEncoding[buffer[3]] & 0x3f);
 
 		if (buffer[2] == '=')
 			_groupLength = 1;

@@ -87,11 +87,11 @@ int Base64EncoderBuf::writeToDevice(char c)
 	if (_groupLength == 3)
 	{
 		unsigned char idx;
-		idx = _group[0] >> 2;
+		idx = (0xfc&_group[0]) >> 2;
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
-		idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
+		idx = ((_group[0] & 0x03) << 4) | ((_group[1]&0xf0) >> 4);
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
-		idx = ((_group[1] & 0x0F) << 2) | (_group[2] >> 6);
+		idx = ((_group[1] & 0x0F) << 2) | ((_group[2]&0xc0) >> 6);
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
 		idx = _group[2] & 0x3F;
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
@@ -117,9 +117,9 @@ int Base64EncoderBuf::close()
 	{
 		_group[1] = 0;
 		unsigned char idx;
-		idx = _group[0] >> 2;
+		idx = (0xfc&_group[0]) >> 2;
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
-		idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
+		idx = ((_group[0] & 0x03) << 4) | ((_group[1]&0xf0) >> 4);
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
 		if (!(_options & BASE64_NO_PADDING))
 		{
@@ -131,11 +131,11 @@ int Base64EncoderBuf::close()
 	{
 		_group[2] = 0;
 		unsigned char idx;
-		idx = _group[0] >> 2;
+		idx = (0xfc&_group[0]) >> 2;
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
-		idx = ((_group[0] & 0x03) << 4) | (_group[1] >> 4);
+		idx = ((_group[0] & 0x03) << 4) | ((_group[1]&0xf0) >> 4);
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
-		idx = ((_group[1] & 0x0F) << 2) | (_group[2] >> 6);
+		idx = ((_group[1] & 0x0F) << 2) |  ((_group[2]&0xc0) >> 6);
 		if (_buf.sputc(_pOutEncoding[idx]) == eof) return eof;
 		if (!(_options & BASE64_NO_PADDING))
 		{
