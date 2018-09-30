@@ -134,7 +134,7 @@ tasks.withType(RunTestExecutable) {
 
 	println "testAppDir=" + testAppDir
 	
-	PATH = testAppDir +  ";$PATH"
+	PATH = testAppDir +  ":$PATH"
 	environment "Path", "$PATH"
 	environment "POCO_BASE", "$rootDir"
 	
