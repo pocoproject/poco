@@ -88,4 +88,56 @@ model {
 }
 task testsuite { dependsOn "assemble" }
 
+tasks.withType(RunTestExecutable) {
+	String PATH = System.getenv("PATH")
+	String testAppDir = project.buildDir
+	
+	if (name.contains('Win32')) {
+		testAppDir += "/exe" + "/testApp"
+		PATH = "$rootDir\\bin;$PATH"
+		PATH = "$rootDir\\openssl\\build\\win32\\bin\\release;$PATH"
+		PATH = "$rootDir\\openssl\\build\\win32\\bin\\debug;$PATH"
+		PATH = "$mysql32Home".replace('/','\\') + "\\bin;$PATH"
+		PATH = "$postgres32Home".replace('/','\\') + "\\bin;$PATH"
+		
+		testAppDir += "\\win32"
+	} else
+	if (name.contains('Win64')) {
+		testAppDir += "\\exe" + "\\testApp"
+		PATH = "$rootDir\\bin64;$PATH"
+		PATH = "$rootDir\\openssl\\build\\win64\\bin\\release;$PATH"
+		PATH = "$rootDir\\openssl\\build\\win64\\bin\\debug;$PATH"
+		PATH = "$mysql64Home".replace('/','\\') + "\\bin;$PATH"
+		PATH = "$postgres64Home".replace('/','\\') + "\\bin;$PATH"
 
+		testAppDir += "\\win64"
+	} else
+	if (name.contains('Linux32')) {
+		testAppDir += "/exe" + "/testApp"
+		testAppDir += "/linux32"
+		
+	} else
+	if (name.contains('Linux64')) {
+		testAppDir += "/exe" + "/testApp"
+		testAppDir += "/linux64"
+		
+	} else
+	if (name.contains('MacOsx')) {
+		testAppDir += "/exe" + "/testApp"
+	}
+	
+	if (name.contains("Debug"))
+		testAppDir += "/debug"
+	else
+	if (name.contains("Release"))
+		testAppDir += "/release"
+
+	println "testAppDir=" + testAppDir
+	
+	PATH = testAppDir +  ";$PATH"
+	environment "Path", "$PATH"
+	environment "POCO_BASE", "$rootDir"
+	
+	args test
+	
+}
