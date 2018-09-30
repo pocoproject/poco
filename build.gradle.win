@@ -893,15 +893,6 @@ subprojects {
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
 
-		//FIXME Those tests below should work
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunch';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
-
 		environment "CPPUNIT_IGNORE", "\"$CPPUNIT_IGNORE\""
 
 		environment "POCO_BASE", "$rootDir"
