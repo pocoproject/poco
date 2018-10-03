@@ -62,6 +62,12 @@ model {
 	testSuites {
 		FoundationTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite
+            binaries.all {
+                println "Task ${tasks.run.name} is associated with platform ${targetPlatform.name}"
+				String PATH = System.getenv("PATH")
+				String testAppDir = project.buildDir
+				println "FoundationTestSuite:testAppDir=" + testAppDir
+            }
 		}
 	}
     binaries {
@@ -94,23 +100,23 @@ tasks.withType(RunTestExecutable) {
 	
 	if (name.contains('Win32')) {
 		testAppDir += "/exe" + "/testApp"
-		PATH = "$rootDir\\bin;$PATH"
-		PATH = "$rootDir\\openssl\\build\\win32\\bin\\release;$PATH"
-		PATH = "$rootDir\\openssl\\build\\win32\\bin\\debug;$PATH"
-		PATH = "$mysql32Home".replace('/','\\') + "\\bin;$PATH"
-		PATH = "$postgres32Home".replace('/','\\') + "\\bin;$PATH"
+		PATH = "$rootDir/bin;$PATH"
+		PATH = "$rootDir/openssl/build/win32/bin/release;$PATH"
+		PATH = "$rootDir/openssl/build/win32/bin/debug;$PATH"
+		PATH = "$mysql32Home" + "/bin;$PATH"
+		PATH = "$postgres32Home" + "/bin;$PATH"
 		
-		testAppDir += "\\win32"
+		testAppDir += "/win32"
 	} else
 	if (name.contains('Win64')) {
-		testAppDir += "\\exe" + "\\testApp"
-		PATH = "$rootDir\\bin64;$PATH"
-		PATH = "$rootDir\\openssl\\build\\win64\\bin\\release;$PATH"
-		PATH = "$rootDir\\openssl\\build\\win64\\bin\\debug;$PATH"
-		PATH = "$mysql64Home".replace('/','\\') + "\\bin;$PATH"
-		PATH = "$postgres64Home".replace('/','\\') + "\\bin;$PATH"
+		testAppDir += "/exe" + "/testApp"
+		PATH = "$rootDir/bin64;$PATH"
+		PATH = "$rootDir/openssl/build/win64/bin/release;$PATH"
+		PATH = "$rootDir/openssl/build/win64/bin/debug;$PATH"
+		PATH = "$mysql64Home" + "/bin;$PATH"
+		PATH = "$postgres64Home" + "/bin;$PATH"
 
-		testAppDir += "\\win64"
+		testAppDir += "/win64"
 	} else
 	if (name.contains('Linux32')) {
 		testAppDir += "/exe" + "/testApp"
@@ -132,9 +138,12 @@ tasks.withType(RunTestExecutable) {
 	if (name.contains("Release"))
 		testAppDir += "/release"
 
+	if (name.contains('Win')) 
+		testAppDir = testAppDir.replace('/', '\\')
+		
 	println "testAppDir=" + testAppDir
 	
-	PATH = testAppDir +  ":$PATH"
+	PATH = testAppDir +  File.pathSeparator + "$PATH"
 	environment "Path", "$PATH"
 	environment "POCO_BASE", "$rootDir"
 	
