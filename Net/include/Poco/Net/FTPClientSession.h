@@ -306,7 +306,10 @@ public:
 		/// Returns true if the session is FTPS.
 		
 	const std::string& welcomeMessage();
-	/// Returns welcome message.
+		/// Returns welcome message.
+	
+	void setActiveDataPort(Poco::UInt16 port);
+		/// Set port to use for active connections
 	
 protected:
 	virtual void receiveServerReadyReply();
@@ -352,6 +355,7 @@ private:
 	
 	std::string    _host;
 	Poco::UInt16   _port = 0;
+	Poco::UInt16   _activeDataPort = 0;
 	bool	   _passiveMode = true;
 	FileType       _fileType = TYPE_BINARY;
 	bool	   _supports1738 = true;
