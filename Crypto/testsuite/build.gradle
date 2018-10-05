@@ -51,7 +51,8 @@ model {
 					PATH = "$rootDir/openssl/build/win64/bin/debug;$PATH"
 				}
 				tasks.run.environment "Path", PATH
-*/			}
+			}
+*/
 		}
 	}
     binaries {                                               
