@@ -43,6 +43,17 @@ model {
 	testSuites {
 		PostgreSQLTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
+			binaries.all {	
+				String PATH = tasks.run.environment.get("Path")
+				if (targetPlatform.name.equals("win32")) {
+					PATH = "$postgres32Home" + "/bin;$PATH"
+					
+				} else
+				if (targetPlatform.name.equals("win64")) {
+					PATH = "$postgres64Home" + "/bin;$PATH"
+				}
+				tasks.run.environment "Path", PATH
+			}
 		}
 	}
     binaries {

@@ -62,12 +62,27 @@ model {
 	testSuites {
 		FoundationTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite
-            binaries.all {
+			binaries.all {	
                 println "Task ${tasks.run.name} is associated with platform ${targetPlatform.name}"
-				String PATH = System.getenv("PATH")
+				String PATH = tasks.run.environment.get("Path")
+
 				String testAppDir = project.buildDir
-				println "FoundationTestSuite:testAppDir=" + testAppDir
-            }
+				testAppDir += "/exe" + "/testApp"
+				testAppDir += "/" + targetPlatform.name
+				if (buildType == buildTypes.debug)
+					testAppDir += "/debug"
+				else
+				if (buildType == buildTypes.release)
+					testAppDir += "/release"
+				
+
+				if (targetPlatform.name.startsWith("win")) 
+					testAppDir = testAppDir.replace('/', '\\')
+					
+		
+				PATH = testAppDir + File.pathSeparator + PATH
+				tasks.run.environment "Path", PATH
+			}
 		}
 	}
     binaries {
@@ -95,58 +110,6 @@ model {
 task testsuite { dependsOn "assemble" }
 
 tasks.withType(RunTestExecutable) {
-	String PATH = System.getenv("PATH")
-	String testAppDir = project.buildDir
-	
-	if (name.contains('Win32')) {
-		testAppDir += "/exe" + "/testApp"
-		PATH = "$rootDir/bin;$PATH"
-		PATH = "$rootDir/openssl/build/win32/bin/release;$PATH"
-		PATH = "$rootDir/openssl/build/win32/bin/debug;$PATH"
-		PATH = "$mysql32Home" + "/bin;$PATH"
-		PATH = "$postgres32Home" + "/bin;$PATH"
-		
-		testAppDir += "/win32"
-	} else
-	if (name.contains('Win64')) {
-		testAppDir += "/exe" + "/testApp"
-		PATH = "$rootDir/bin64;$PATH"
-		PATH = "$rootDir/openssl/build/win64/bin/release;$PATH"
-		PATH = "$rootDir/openssl/build/win64/bin/debug;$PATH"
-		PATH = "$mysql64Home" + "/bin;$PATH"
-		PATH = "$postgres64Home" + "/bin;$PATH"
-
-		testAppDir += "/win64"
-	} else
-	if (name.contains('Linux32')) {
-		testAppDir += "/exe" + "/testApp"
-		testAppDir += "/linux32"
-		
-	} else
-	if (name.contains('Linux64')) {
-		testAppDir += "/exe" + "/testApp"
-		testAppDir += "/linux64"
-		
-	} else
-	if (name.contains('MacOsx')) {
-		testAppDir += "/exe" + "/testApp"
-	}
-	
-	if (name.contains("Debug"))
-		testAppDir += "/debug"
-	else
-	if (name.contains("Release"))
-		testAppDir += "/release"
-
-	if (name.contains('Win')) 
-		testAppDir = testAppDir.replace('/', '\\')
-		
-	println "testAppDir=" + testAppDir
-	
-	PATH = testAppDir +  File.pathSeparator + "$PATH"
-	environment "Path", "$PATH"
 	environment "POCO_BASE", "$rootDir"
-	
 	args test
-	
 }

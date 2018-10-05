@@ -42,6 +42,17 @@ model {
 	testSuites {
 		MySQLTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
+			binaries.all {	
+				String PATH = tasks.run.environment.get("Path")
+				if (targetPlatform.name.equals("win32")) {
+					PATH = "$mysql32Home" + "/bin;$PATH"
+					
+				} else
+				if (targetPlatform.name.equals("win64")) {
+					PATH = "$mysql64Home" + "/bin;$PATH"
+				}
+				tasks.run.environment "Path", PATH
+			}
 		}
 	}
     binaries {

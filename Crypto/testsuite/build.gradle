@@ -39,6 +39,19 @@ model {
 	testSuites {
 		CryptoTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
+/*
+			binaries.all {	
+				String PATH = tasks.run.environment.get("Path")
+				if (targetPlatform.name.equals("win32")) {
+					PATH = "$rootDir/openssl/build/win32/bin/release;$PATH"
+					PATH = "$rootDir/openssl/build/win32/bin/debug;$PATH"
+				} else
+				if (targetPlatform.name.equals("win64")) {
+					PATH = "$rootDir/openssl/build/win64/bin/release;$PATH"
+					PATH = "$rootDir/openssl/build/win64/bin/debug;$PATH"
+				}
+				tasks.run.environment "Path", PATH
+*/			}
 		}
 	}
     binaries {                                               
