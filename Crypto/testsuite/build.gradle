@@ -39,7 +39,6 @@ model {
 	testSuites {
 		CryptoTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite 
-/*
 			binaries.all {	
 				String PATH = tasks.run.environment.get("Path")
 				if (targetPlatform.name.equals("win32")) {
@@ -52,7 +51,6 @@ model {
 				}
 				tasks.run.environment "Path", PATH
 			}
-*/
 		}
 	}
     binaries {                                               
