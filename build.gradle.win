@@ -174,7 +174,6 @@ File toStatic(File staticFile, Platform platform) {
 	return new File(parent, name);
 }
 File toPDB(File binaryFile) {
-	println 'prefixByPoco=' + binaryFile
 	String name = binaryFile.getName()
 	File parent = binaryFile.getParentFile()
 	int extensionSeparator = name.lastIndexOf('.')
@@ -861,29 +860,25 @@ subprojects {
 				if (toolChain in Gcc) {
 				}
 			}
+			withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
+				tasks.run.environment "POCO_BASE", "$rootDir"
+				
+				String PATH = tasks.run.environment.get("Path")
+				
+				if (targetPlatform.name.equals("win32")) {
+					PATH = "$rootDir/bin;$PATH"
+				} else
+				if (targetPlatform.name.equals("win64")) {
+					PATH = "$rootDir/bin64;$PATH"
+				}
+				if (targetPlatform.name.startsWith("win")) 
+					PATH = PATH.replace('/', '\\')
+					
+				tasks.run.environment "Path", PATH
+			}
 		}
 	}
 	tasks.withType(RunTestExecutable) {
-		String PATH = System.getenv("PATH")
-		String name = getName();
-		if (name.contains('Win32')) {
-			PATH = "$rootDir\\bin;$PATH"
-			PATH = "$rootDir\\openssl\\build\\win32\\bin\\release;$PATH"
-			PATH = "$rootDir\\openssl\\build\\win32\\bin\\debug;$PATH"
-			PATH = "$mysql32Home".replace('/','\\') + "\\bin;$PATH"
-			PATH = "$postgres32Home".replace('/','\\') + "\\bin;$PATH"
-
-		} else
-		if (name.contains('Win64')) {
-			PATH = "$rootDir\\bin64;$PATH"
-			PATH = "$rootDir\\openssl\\build\\win64\\bin\\release;$PATH"
-			PATH = "$rootDir\\openssl\\build\\win64\\bin\\debug;$PATH"
-			PATH = "$mysql64Home".replace('/','\\') + "\\bin;$PATH"
-			PATH = "$postgres64Home".replace('/','\\') + "\\bin;$PATH"
-		}
-
-		environment "Path", "$PATH"
-
 		String CPPUNIT_IGNORE;
 		CPPUNIT_IGNORE =  'class CppUnit::TestCaller<class NTPClientTest>.testTimeSync';
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class RawSocketTest>.testEchoIPv4';
@@ -894,23 +889,11 @@ subprojects {
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy';
 		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class TCPServerTest>.testReuseSocket';
 
-		//FIXME Those tests below should work
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunch';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectIn';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchRedirectOut';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchEnv';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testLaunchArgs';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunning';
-		CPPUNIT_IGNORE+=', class CppUnit::TestCaller<class ProcessTest>.testIsRunningAllowsForTermination';
-
 		environment "CPPUNIT_IGNORE", "\"$CPPUNIT_IGNORE\""
-
-		environment "POCO_BASE", "$rootDir"
 
 		args test
 	}
 }
-
 tasks.withType(CppCompile) {
 	maxParallelForks = 2
 }

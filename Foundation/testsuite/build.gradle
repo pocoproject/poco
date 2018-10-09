@@ -2,6 +2,7 @@ import org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec
 
 model {
 	components {
+/*
 		withType(NativeComponentSpec) {
 			binaries.withType(NativeBinarySpec) {
 				if (buildType == buildTypes.debug) {
@@ -16,6 +17,7 @@ model {
 				}
 			}
 		}
+*/
 		TestLibrary(NativeLibrarySpec) {
 			sources {
 				cpp {
@@ -35,8 +37,6 @@ model {
 						srcDir 'src'
 						include 'TestApp.cpp'
 					}
-					lib project: ':Foundation', library: 'Foundation', linkage: 'shared'
-					lib library: 'TestLib', linkage: 'shared'
 				}
 			}
 		}
@@ -61,10 +61,31 @@ model {
 	}
 	testSuites {
 		FoundationTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
-			testing $.components.TestSuite 
+			testing $.components.TestSuite
+			binaries.all {	
+                println "Task ${tasks.run.name} is associated with platform ${targetPlatform.name}"
+				String PATH = tasks.run.environment.get("Path")
+
+				String testAppDir = project.buildDir
+				testAppDir += "/exe" + "/testApp"
+				testAppDir += "/" + targetPlatform.name
+				if (buildType == buildTypes.debug)
+					testAppDir += "/debug"
+				else
+				if (buildType == buildTypes.release)
+					testAppDir += "/release"
+				
+
+				if (targetPlatform.name.startsWith("win")) 
+					testAppDir = testAppDir.replace('/', '\\')
+					
+		
+				PATH = testAppDir + File.pathSeparator + PATH
+				tasks.run.environment "Path", PATH
+			}
 		}
 	}
-    binaries {                                               
+    binaries {
         withType(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteBinarySpec) {
  			lib project: ':CppUnit', library: 'CppUnit', linkage: 'shared'
 			lib library: 'TestLibrary', linkage: 'shared'
@@ -86,19 +107,9 @@ model {
        }
 	}
 }
-/*
-tasks.withType(RunTestExecutable) {
-	String PATH = System.getenv("PATH")
-	if (name.contains('Win32')) {
-		PATH = "$projectDir\\bin;$PATH"
-	} else
-	if (name.contains('Win64')) {
-		PATH = "$projectDir\\bin64;$PATH"
-	}
-	environment "Path", "$PATH"
-}
-*/
-
 task testsuite { dependsOn "assemble" }
 
-
+tasks.withType(RunTestExecutable) {
+	environment "POCO_BASE", "$rootDir"
+	args test
+}
