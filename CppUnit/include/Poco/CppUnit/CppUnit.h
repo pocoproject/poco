@@ -7,8 +7,6 @@
 #define Poco_CppUnit__CppUnitINCLUDED
 
 
-#include "Poco/Platform.h"
-
 
 //
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
