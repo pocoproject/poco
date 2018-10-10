@@ -63,8 +63,12 @@ model {
 		FoundationTestSuite(org.gradle.nativeplatform.test.cppunit.CppUnitTestSuiteSpec) {
 			testing $.components.TestSuite
 			binaries.all {	
-                println "Task ${tasks.run.name} is associated with platform ${targetPlatform.name}"
-				String PATH = tasks.run.environment.get("Path")
+                println "---Task ${tasks.run.name} is associated with platform ${targetPlatform.name}"
+				
+				String PATH = tasks.run.environment.get("PATH")
+				String Path = tasks.run.environment.get("Path")
+				println "===PATH=" + PATH
+				println ">>>Path=" + Path
 
 				String testAppDir = project.buildDir
 				testAppDir += "/exe" + "/testApp"
@@ -80,8 +84,10 @@ model {
 					testAppDir = testAppDir.replace('/', '\\')
 					
 		
-				PATH = testAppDir + File.pathSeparator + PATH
-				tasks.run.environment "Path", PATH
+				Path = testAppDir + File.pathSeparator + Path
+				println "===" + Path
+				println ""
+				tasks.run.environment "Path", Path
 			}
 		}
 	}
