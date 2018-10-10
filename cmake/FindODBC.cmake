@@ -66,6 +66,7 @@ find_library(ODBC_LIBRARY
 		/usr/lib
 		/usr/local/lib
 		/usr/local/odbc/lib
+		/usr/local/iodbc/lib
 		"C:/Program Files/ODBC/lib"
 		"C:/ODBC/lib/debug"
 		"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"
@@ -86,8 +87,6 @@ endif()
 # List additional libraries required to use ODBC library
 if(WIN32 AND MSVC OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
   set(_odbc_required_libs_names odbccp32;ws2_32)
-elseif(MINGW)
-  set(_odbc_required_libs_names odbccp32)
 endif()
 foreach(_lib_name IN LISTS _odbc_required_libs_names)
 	find_library(_lib_path
@@ -100,6 +99,7 @@ foreach(_lib_name IN LISTS _odbc_required_libs_names)
 			/usr/lib
 			/usr/local/lib
 			/usr/local/odbc/lib
+			/usr/local/iodbc/lib
 			"C:/Program Files/ODBC/lib"
 			"C:/ODBC/lib/debug"
 			"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"
