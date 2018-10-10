@@ -16,7 +16,7 @@ set_target_properties(SQLMySQL
     DEFINE_SYMBOL MySQL_EXPORTS
     )
 
-target_link_libraries(SQLMySQL PUBLIC Poco::SQL ${MYSQL_LIB}) # TODO(Bjoe) Use namespace target
+target_link_libraries(SQLMySQL PUBLIC Poco::SQL MySQL::client)
 target_include_directories(SQLMySQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -26,7 +26,7 @@ target_include_directories(SQLMySQL
 target_compile_definitions(SQLMySQL PUBLIC THREADSAFE NO_TCL)
 
 if(MINGW) # MinGW supports 'mariadb-connector-c' only with OpenSSL
-	target_link_libraries(SQLMySQL PUBLIC ws2_32 ${OPENSSL_LIBRARIES})
+	target_link_libraries(SQLMySQL PUBLIC ws2_32 OpenSSL::SSL)
 endif()
 
 POCO_INSTALL(SQLMySQL)
