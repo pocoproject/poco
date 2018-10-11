@@ -15,12 +15,13 @@ set_target_properties(DataPostgreSQL
     DEFINE_SYMBOL PostgreSQL_EXPORTS
     )
 
-target_link_libraries(DataPostgreSQL PUBLIC Poco::Data ${PostgreSQL_LIBRARIES})
+target_link_libraries(DataPostgreSQL PUBLIC Poco::Data PostgreSQL::client)
 target_include_directories(DataPostgreSQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 POCO_INSTALL(DataPostgreSQL)
