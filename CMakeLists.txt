@@ -36,18 +36,19 @@ endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
 option(DISABLE_CPP14 "Disable C++14 if available" OFF)
 
-if (DISABLE_CPP14)
-    add_definitions(-DPOCO_DISABLE_CPP14)
-else()
+if(NOT DISABLE_CPP14)
   # C++14 compiler flags
   include(CXX1x)
   check_for_cxx14_compiler(CXX14_COMPILER)
 
   # If a C++14 compiler is available, then set the appropriate flags
   if(CXX14_COMPILER)
-    enable_cxx14()
+    set (CMAKE_CXX_STANDARD 14)
   endif()
 endif()
 
