@@ -26,7 +26,7 @@
 // CppUnit_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
+#if defined(_WIN32) && defined(_MSC_VER) && defined(POCO_DLL)
 	#if defined(CppUnit_EXPORTS)
 		#define CppUnit_API __declspec(dllexport)
 	#else
@@ -43,38 +43,10 @@
 	#endif
 #endif
 
-//
-// Automatically link CppUnit library.
-//
-#if defined(POCO_COMPILER_MSVC)
-	#if defined(POCO_DLL)
-		#if defined(_DEBUG)
-			#define POCO_LIB_SUFFIX "d.lib"
-		#else
-			#define POCO_LIB_SUFFIX ".lib"
-		#endif
-	#elif defined(_DLL)
-		#if defined(_DEBUG)
-			#define POCO_LIB_SUFFIX "mdd.lib"
-		#else
-			#define POCO_LIB_SUFFIX "md.lib"
-		#endif
-	#else
-		#if defined(_DEBUG)
-			#define POCO_LIB_SUFFIX "mtd.lib"
-		#else
-			#define POCO_LIB_SUFFIX "mt.lib"
-		#endif
-	#endif
-
-	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(CppUnit_EXPORTS)
-		#pragma comment(lib, "PocoCppUnit" POCO_LIB_SUFFIX)
-	#endif
-#endif
 
 
 // Turn off some annoying warnings
-#ifdef POCO_COMPILER_MSVC
+#ifdef _MSC_VER
 	#pragma warning(disable:4786)  // identifier truncation warning
 	#pragma warning(disable:4503)  // decorated name length exceeded - mainly a problem with STLPort
 	#pragma warning(disable:4018)  // signed/unsigned comparison
