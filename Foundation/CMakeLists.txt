@@ -111,7 +111,10 @@ target_compile_definitions(Foundation
     $<$<NOT:$<BOOL:${POCO_DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
     POCO_ENABLE_CPP11
 )
-target_compile_features(Foundation PUBLIC cxx_std_11 $<$<NOT:$<BOOL:${POCO_DISABLE_CPP14}>>:cxx_std_17>)
+target_compile_features(Foundation PUBLIC cxx_defaulted_move_initializers)
+if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER 3.7)
+  target_compile_features(Foundation PUBLIC cxx_std_14)
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(Foundation
