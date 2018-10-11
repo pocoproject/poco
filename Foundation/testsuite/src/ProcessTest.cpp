@@ -22,10 +22,6 @@ using Poco::Pipe;
 using Poco::PipeInputStream;
 using Poco::PipeOutputStream;
 
-static const std::string testApp("TestApp");
-static const std::string testAppd("TestAppd");
-static std::string cmd;
-
 
 ProcessTest::ProcessTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -39,19 +35,47 @@ ProcessTest::~ProcessTest()
 
 void ProcessTest::testLaunch()
 {
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#elif defined(_WIN32_WCE)
+	cmd = "\\";
+	cmd += name;
+	cmd += ".EXE";
+#else
+	cmd = name;
+#endif
+
 	std::vector<std::string> args;
 	args.push_back("arg1");
 	args.push_back("arg2");
 	args.push_back("arg3");
 	ProcessHandle ph = Process::launch(cmd, args);
 	int rc = ph.wait();
-	assertTrue(rc == 3);
+	assertTrue (rc == 3);
 }
 
 
 void ProcessTest::testLaunchRedirectIn()
 {
 #if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
 	std::vector<std::string> args;
 	args.push_back("-count");
 	Pipe inPipe;
@@ -68,6 +92,18 @@ void ProcessTest::testLaunchRedirectIn()
 void ProcessTest::testLaunchRedirectOut()
 {
 #if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
 	std::vector<std::string> args;
 	args.push_back("-hello");
 	Pipe outPipe;
@@ -86,6 +122,18 @@ void ProcessTest::testLaunchRedirectOut()
 void ProcessTest::testLaunchEnv()
 {
 #if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
 	std::vector<std::string> args;
 	args.push_back("-env");
 	Pipe outPipe;
@@ -106,6 +154,12 @@ void ProcessTest::testLaunchEnv()
 void ProcessTest::testLaunchArgs()
 {
 #if defined (_WIN32) && !defined(_WIN32_WCE)
+	std::string name("TestApp");
+#if defined(_DEBUG)
+	name += 'd';
+#endif
+	std::string cmd = name;
+
 	std::vector<std::string> args;
 	args.push_back("-echo-args");
 	args.push_back("simple");
@@ -156,6 +210,18 @@ void ProcessTest::testLaunchArgs()
 void ProcessTest::testIsRunning()
 {
 #if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
 	std::vector<std::string> args;
 	args.push_back("-count");
 	Pipe inPipe;
@@ -175,23 +241,6 @@ void ProcessTest::testIsRunning()
 
 void ProcessTest::setUp()
 {
-	const std::string* test;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
-	test = &testAppd;
-#else
-	test = &testApp;
-#endif
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	cmd += *test;
-#elif defined(_WIN32_WCE)
-	cmd = "\\";
-	cmd += *test;
-	cmd += ".EXE";
-#else
-	cmd = *test;
-	cmd += ".exe";
-#endif
 }
 
 
