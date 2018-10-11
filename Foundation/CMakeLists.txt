@@ -105,6 +105,15 @@ target_include_directories(Foundation
 target_compile_definitions(Foundation
   PUBLIC
     $<$<CONFIG:Debug>:_DEBUG>
+    $<$<BOOL:${DISABLE_CPP14}>:POCO_DISABLE_CPP14>
+    $<$<NOT:$<BOOL:${DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
+    $<$<BOOL:${DISABLE_CPP11}>:POCO_DISABLE_CPP11>
+    $<$<NOT:$<BOOL:${DISABLE_CPP11}>>:POCO_ENABLE_CPP11>
+)
+target_compile_features(Foundation
+  PUBLIC
+    $<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_std_11>
+    $<$<NOT:$<BOOL:${DISABLE_CPP14}>>:cxx_std_17>
 )
 
 if(NOT BUILD_SHARED_LIBS)

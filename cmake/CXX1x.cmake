@@ -42,13 +42,6 @@ macro(check_for_cxx11_compiler _VAR)
     endif()
 endmacro()
 
-# Sets the appropriate flag to enable C++11 support
-macro(enable_cxx11)
-    set (CMAKE_CXX_STANDARD 11)
-    set (CMAKE_CXX_STANDARD_REQUIRED ON)
-    add_definitions(-DPOCO_ENABLE_CPP11)
-endmacro()
-
 # Determines whether the compiler supports C++14
 macro(check_for_cxx14_compiler _VAR)
     message(STATUS "Checking for C++14 compiler")
@@ -71,11 +64,4 @@ macro(check_for_cxx14_compiler _VAR)
     else()
         message(STATUS "Checking for C++14 compiler - unavailable")
     endif()
-endmacro()
-
-# Sets the appropriate flag to enable C++14 support
-macro(enable_cxx14)
-    set (CMAKE_CXX_STANDARD 14)
-    set (CMAKE_CXX_STANDARD_REQUIRED ON)
-    add_definitions(-DPOCO_ENABLE_CPP14)
 endmacro()
