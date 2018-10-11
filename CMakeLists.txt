@@ -39,16 +39,18 @@ endif()
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(DISABLE_CPP14 "Disable C++14 if available" OFF)
+option(POCO_DISABLE_CPP14 "Disable C++14 if not available" OFF)
 
-if(NOT DISABLE_CPP14)
+if(NOT POCO_DISABLE_CPP14)
   # C++14 compiler flags
   include(CXX1x)
   check_for_cxx14_compiler(CXX14_COMPILER)
 
   # If a C++14 compiler is available, then set the appropriate flags
   if(CXX14_COMPILER)
-    set (CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 14)
+  else()
+    set(POCO_DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
   endif()
 endif()
 
