@@ -112,9 +112,11 @@ target_compile_definitions(Foundation
 )
 target_compile_features(Foundation
   PUBLIC
-    $<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_std_11>
-    $<$<NOT:$<BOOL:${DISABLE_CPP14}>>:cxx_std_17>
+    $<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_defaulted_move_initializers>
 )
+if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER 3.7)
+  target_compile_features(Foundation PUBLIC cxx_std_14)
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(Foundation
