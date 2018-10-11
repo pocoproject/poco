@@ -56,6 +56,12 @@ else()
   set(REQUIRED_INCLUDE_DIR ODBC_INCLUDE_DIR)
 endif()
 
+if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(WIN_ARCH x64)
+elseif(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+  set(WIN_ARCH x86)
+endif()
+
 find_library(ODBC_LIBRARY
 	NAMES unixodbc iodbc odbc odbc32
 	HINTS
@@ -70,12 +76,11 @@ find_library(ODBC_LIBRARY
 		"C:/Program Files/ODBC/lib"
 		"C:/ODBC/lib/debug"
 		"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib"
-		"${kit81_dir}/Lib/winv6.3/um/x64"
-		"${kit_dir}/Lib/win8/um/x64"
-		"${kit81_dir}/Lib/winv6.3/um/x86"
-		"${kit_dir}/Lib/win8/um/x86"
+		"${kit81_dir}/Lib/winv6.3/um"
+		"${kit_dir}/Lib/win8/um"
 	PATH_SUFIXES
 		odbc
+		${WIN_ARCH}
 	DOC "Specify the ODBC driver manager library here."
 )
 
