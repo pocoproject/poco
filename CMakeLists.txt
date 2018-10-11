@@ -30,8 +30,8 @@ endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
-option(DISABLE_CPP11 "Disable C++11 if available" OFF)
-option(DISABLE_CPP14 "Disable C++14 if available" OFF)
+option(DISABLE_CPP11 "Disable C++11 if not available" OFF)
+option(DISABLE_CPP14 "Disable C++14 if not available" OFF)
 
 if(NOT DISABLE_CPP11 OR NOT DISABLE_CPP14)
     # C++11/14 compiler flags
@@ -48,11 +48,11 @@ if(NOT DISABLE_CPP11 OR NOT DISABLE_CPP14)
         if(CXX14_COMPILER)
 	    set(CMAKE_CXX_STANDARD 14)
 	else()
-	    set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if available" FORCE)
+	    set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
 	endif()
     else()
-	set(DISABLE_CPP11 ON CACHE BOOL "Disable C++11 if available" FORCE)
-	set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if available" FORCE)
+	set(DISABLE_CPP11 ON CACHE BOOL "Disable C++11 if not available" FORCE)
+	set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
     endif()
 endif()
 
