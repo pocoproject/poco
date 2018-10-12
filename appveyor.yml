@@ -421,27 +421,27 @@ build_script:
         if ($env:platform -eq "Win32")
         {
             $openssl = $env:OPENSSL32
-	    if ($env:vsver -eq "140")
-	    {
-		$generator = '"Visual Studio 14 2015"'
-	    }
-	    if ($env:vsver -eq "150")
-	    {
-		$generator = '"Visual Studio 15 2017"'
-	    }
+            if ($env:vsver -eq "140")
+            {
+                $generator = '"Visual Studio 14 2015"'
+            }
+            if ($env:vsver -eq "150")
+            {
+                $generator = '"Visual Studio 15 2017"'
+            }
         }
         if ($env:platform -eq "x64")
         {
             $openssl = $env:OPENSSL64
-	    if ($env:vsver -eq "140")
-	    {
-		$generator = '"Visual Studio 14 2015 Win64"'
-	    }
-	    if ($env:vsver -eq "150")
-	    {
-		$generator = '"Visual Studio 15 2017 Win64"'
-	    }
-	}
+            if ($env:vsver -eq "140")
+            {
+                $generator = '"Visual Studio 14 2015 Win64"'
+            }
+            if ($env:vsver -eq "150")
+            {
+                $generator = '"Visual Studio 15 2017 Win64"'
+            }
+        }
         $defs = "-H."
         $defs+=" -Bbuild-cmake"
         $defs+=" -G" + $generator;
