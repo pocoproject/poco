@@ -5,5 +5,5 @@ install:
 
 build_script:
   - set PATH=C:\Program Files\CMake\bin;C:\ProgramData\chocolatey\bin;%PATH%
-  - cmake -H. -Bcmake-build -G"Visual Studio 14 2015 Win64" -DODBC_ROOT_DIR="C:/Program Files/Microsoft SDKs/Windows/v7.0" -DENABLE_DATA_MYSQL=OFF
+  - cmake -H. -Bcmake-build -G"Visual Studio 14 2015 Win64" -DODBC_ROOT_LIBRARY_DIRS="C:/Program Files/Microsoft SDKs/Windows/v7.0/Lib/x64" -DODBC_ROOT_INCLUDE_DIRS="C:/Program Files/Microsoft SDKs/Windows/v7.0/Include" -DENABLE_DATA_MYSQL=OFF
   - cmake --build cmake-build
