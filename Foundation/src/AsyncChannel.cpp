@@ -93,7 +93,7 @@ void AsyncChannel::close()
 {
 	if (_thread.isRunning())
 	{
-		while (!_queue.empty()) Thread::sleep(100);
+		while (_thread.isRunning() && !_queue.empty()) Thread::sleep(100);
 		
 		do
 		{
