@@ -25,6 +25,9 @@ target_include_directories(SQLMySQL
     )
 target_compile_definitions(SQLMySQL PUBLIC THREADSAFE NO_TCL)
 
+if(WIN32)
+  target_compile_definitions(SQLMySQL PUBLIC __LCC__)  #__LCC__ define used by MySQL.h
+endif()
 if(MINGW) # MinGW supports 'mariadb-connector-c' only with OpenSSL
 	target_link_libraries(SQLMySQL PUBLIC ws2_32 OpenSSL::SSL)
 endif()

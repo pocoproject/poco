@@ -123,7 +123,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(WIN32)
-  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
+  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE)
   target_link_libraries(Foundation PUBLIC iphlpapi)
 endif(WIN32)
 
