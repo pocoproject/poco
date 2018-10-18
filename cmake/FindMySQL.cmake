@@ -40,14 +40,18 @@ find_path(MYSQL_INCLUDE_DIR mysql.h
 		$ENV{MYSQL_INCLUDE_DIR}
 		$ENV{MYSQL_DIR}/include
 		$ENV{ProgramFiles}/MySQL/*/include
-		${BINDIR32}/MySQL/include
+		${BINDIR32}/MySQL/*/include
 		$ENV{SystemDrive}/MySQL/*/include
+		$ENV{MARIADB_INCLUDE_DIR}
+		$ENV{MARIADB_DIR}/include
+		${MARIADB_INCLUDE_DIR}
+		${MARIADB_DIR}/include
 	PATH_SUFFIXES
 		mysql
 		mariadb
 )
 
-if (WIN32)
+if (MSVC)
 	if (CMAKE_BUILD_TYPE STREQUAL Debug)
 		set(libsuffixDist debug)
 		set(libsuffixBuild Debug)
@@ -59,17 +63,23 @@ if (WIN32)
 
 	find_library(MYSQL_LIBRARY NAMES mysqlclient
 				 HINTS
-					${MYSQL_ROOT_DIR}/lib/${libsuffixDist}
+					${MYSQL_ROOT_DIR}/lib
 					${MYSQL_ROOT_LIBRARY_DIRS}
 				 PATHS
 					 ${PC_MYSQL_LIBRARY_DIRS}
 					 ${PC_MARIADB_LIBRARY_DIRS}
-					 $ENV{MYSQL_DIR}/lib/${libsuffixDist}
-					 $ENV{MYSQL_DIR}/libmysql/${libsuffixBuild}
-					 $ENV{MYSQL_DIR}/client/${libsuffixBuild}
-					 $ENV{ProgramFiles}/MySQL/*/lib/${libsuffixDist}
-					 ${BINDIR32}/MySQL/lib
-					 $ENV{SystemDrive}/MySQL/*/lib/${libsuffixDist}
+					 $ENV{MYSQL_DIR}/lib
+					 $ENV{MYSQL_DIR}/libmysql
+					 $ENV{MYSQL_DIR}/client
+					 $ENV{ProgramFiles}/MySQL/*/lib
+					 ${BINDIR32}/MySQL/*/lib
+					 $ENV{SystemDrive}/MySQL/*/lib
+				 PATH_SUFFIXES
+				 	vs12
+				 	vs11
+				 	vs10
+				 	${libsuffixDist}
+				 	${libsuffixBuild}
 	)
 else()
 	find_library(MYSQL_LIBRARY NAMES mysqlclient mysqlclient_r mariadbclient
@@ -85,6 +95,7 @@ else()
 					 /opt/mysql/mysql/lib
 					 $ENV{MYSQL_DIR}/libmysql_r/.libs
 					 $ENV{MYSQL_DIR}/lib
+					 ${MYSQL_DIR}/lib
 				 PATH_SUFFIXES
 					mysql
 					mariadb
