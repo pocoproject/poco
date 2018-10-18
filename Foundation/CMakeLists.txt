@@ -107,7 +107,13 @@ target_include_directories(Foundation
 target_compile_definitions(Foundation
   PUBLIC
     $<$<CONFIG:Debug>:_DEBUG>
+    $<$<BOOL:${POCO_DISABLE_CPP14}>:POCO_DISABLE_CPP14>
+    $<$<NOT:$<BOOL:${POCO_DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
 )
+target_compile_features(Foundation PUBLIC cxx_defaulted_move_initializers)
+if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER 3.7)
+  target_compile_features(Foundation PUBLIC cxx_std_14)
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(Foundation
@@ -117,7 +123,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(WIN32)
-  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
+  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE)
   target_link_libraries(Foundation PUBLIC iphlpapi)
 endif(WIN32)
 
