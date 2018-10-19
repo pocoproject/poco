@@ -42,7 +42,6 @@ void ProcessTest::testLaunch()
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
 	cmd += name;
 #elif defined(_WIN32_WCE)
 	cmd = "\\";
@@ -72,7 +71,6 @@ void ProcessTest::testLaunchRedirectIn()
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
 	cmd += name;
 #else
 	cmd = name;
@@ -101,7 +99,6 @@ void ProcessTest::testLaunchRedirectOut()
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
 	cmd += name;
 #else
 	cmd = name;
@@ -132,7 +129,6 @@ void ProcessTest::testLaunchEnv()
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
 	cmd += name;
 #else
 	cmd = name;
@@ -221,7 +217,6 @@ void ProcessTest::testIsRunning()
 #endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
 	cmd += name;
 #else
 	cmd = name;
