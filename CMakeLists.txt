@@ -30,29 +30,29 @@ endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
-option(DISABLE_CPP11 "Disable C++11 if available" OFF)
-option(DISABLE_CPP14 "Disable C++14 if available" OFF)
+option(DISABLE_CPP11 "Disable C++11 if not available" OFF)
+option(DISABLE_CPP14 "Disable C++14 if not available" OFF)
 
-if (DISABLE_CPP11 OR DISABLE_CPP14)
-    add_definitions(-DPOCO_DISABLE_CPP11)
-
-    if (DISABLE_CPP14)
-        add_definitions(-DPOCO_DISABLE_CPP14)
-    endif()
-else()
+if(NOT DISABLE_CPP11 OR NOT DISABLE_CPP14)
     # C++11/14 compiler flags
     include(CXX1x)
     check_for_cxx11_compiler(CXX11_COMPILER)
 
     # If a C++11 compiler is available, then set the appropriate flags
     if(CXX11_COMPILER)
-        enable_cxx11()
-        check_for_cxx14_compiler(CXX14_COMPILER)
+	set (CMAKE_CXX_STANDARD 11)
+	set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
+        check_for_cxx14_compiler(CXX14_COMPILER)
         # If a C++14 compiler is available, then set the appropriate flags
         if(CXX14_COMPILER)
-            enable_cxx14()
-        endif()
+	    set(CMAKE_CXX_STANDARD 14)
+	else()
+	    set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
+	endif()
+    else()
+	set(DISABLE_CPP11 ON CACHE BOOL "Disable C++11 if not available" FORCE)
+	set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
     endif()
 endif()
 

@@ -24,6 +24,10 @@ target_include_directories(DataMySQL
     )
 target_compile_definitions(DataMySQL PUBLIC THREADSAFE NO_TCL)
 
+if(WIN32)
+  target_compile_definitions(DataMySQL PUBLIC __LCC__)  #__LCC__ define used by MySQL.h
+endif()
+
 POCO_INSTALL(DataMySQL)
 POCO_GENERATE_PACKAGE(DataMySQL)
 
