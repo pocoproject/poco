@@ -64,10 +64,11 @@ model {
 			testing $.components.TestSuite
 			binaries.all {	
 				
-				String PATH = tasks.run.environment.get("PATH")
-				String Path = tasks.run.environment.get("Path")
-				println "===PATH=" + PATH
-				println ">>>Path=" + Path
+				String PATH = ""
+				if (targetPlatform.name.startsWith("win")) 
+					PATH = tasks.run.environment.get("Path")
+				else
+					PATH = tasks.run.environment.get("PATH")
 
 				String testAppDir = project.buildDir
 				testAppDir += "/exe" + "/testApp"
@@ -86,7 +87,10 @@ model {
 				PATH = testAppDir + File.pathSeparator + PATH
 				println "===" + PATH
 				println ""
-				tasks.run.environment "PATH", PATH
+				if (targetPlatform.name.startsWith("win")) 
+					tasks.run.environment "Path", PATH
+				else
+					tasks.run.environment "PATH", PATH
 			}
 		}
 	}
