@@ -71,9 +71,9 @@ environment:
 #    - builder: cygwin
 #      vsver: 150
 
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
+#    - builder: msbuild
+#      vsver: 140
+#      linkmode: shared
 
 #    - builder: msbuild
 #      vsver: 140
@@ -604,7 +604,7 @@ test_script:
 
           $cmd='ctest -C Debug -VV -E SQL*';
           Write-Host -ForegroundColor Yellow $cmd
-          $cmd
+          ctest -C Debug -VV -E SQL*
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
