@@ -84,4 +84,10 @@ int ThreadImpl::getAffinityImpl() const
 }
 
 
+long ThreadImpl::currentOsTidImpl()
+{
+	return taskIdSelf();
+}
+
+
 } // namespace Poco

@@ -27,6 +27,12 @@
 
 
 //
+// Include platform-specific definitions
+//
+#include "Poco/Platform.h"
+
+
+//
 // Ensure that POCO_DLL is default unless POCO_STATIC is defined
 //
 #if defined(_WIN32) && defined(_DLL)
@@ -44,7 +50,7 @@
 // Foundation_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(_WIN32_WCE)) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(Foundation_EXPORTS)
 		#define Foundation_API __declspec(dllexport)
 	#else
@@ -65,7 +71,7 @@
 //
 // Automatically link Foundation library.
 //
-#if defined(_MSC_VER)
+#ifdef POCO_COMPILER_MSVC
 	#if defined(POCO_DLL)
 		#if defined(_DEBUG)
 			#define POCO_LIB_SUFFIX "d.lib"
@@ -92,10 +98,6 @@
 #endif
 
 
-//
-// Include platform-specific definitions
-//
-#include "Poco/Platform.h"
 #if defined(_WIN32)
 	#include "Poco/Platform_WIN32.h"
 #elif defined(POCO_VXWORKS)
@@ -133,13 +135,11 @@
 //
 #if defined(POCO_NO_DEPRECATED)
 #define POCO_DEPRECATED
-#elif defined(_GNUC_)
+#elif defined(POCO_COMPILER_GCC)
 #define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(__clang__)
+#elif defined(POCO_COMPILER_CLANG)
 #define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(__MINGW32__)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
+#elif defined(POCO_COMPILER_MSVC)
 #define POCO_DEPRECATED __declspec(deprecated)
 #else
 #define POCO_DEPRECATED

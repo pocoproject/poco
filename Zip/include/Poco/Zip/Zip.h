@@ -31,7 +31,7 @@
 // Zip_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(Zip_EXPORTS)
 		#define Zip_API __declspec(dllexport)
 	#else
@@ -52,7 +52,7 @@
 //
 // Automatically link Zip library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Zip_EXPORTS)
 		#pragma comment(lib, "PocoZip" POCO_LIB_SUFFIX)
 	#endif

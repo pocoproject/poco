@@ -16,14 +16,14 @@ set_target_properties(SQLODBC
     DEFINE_SYMBOL ODBC_EXPORTS
     )
 
-target_link_libraries(SQLODBC PUBLIC Poco::SQL ${ODBC_LIBRARIES}) # TODO(Bjoe) Use namespace target
+target_link_libraries(SQLODBC PUBLIC Poco::SQL ODBC::ODBC)
 target_include_directories(SQLODBC
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
-target_compile_definitions(SQLODBC PUBLIC ${ODBC_CFLAGS} THREADSAFE)
+target_compile_definitions(SQLODBC PUBLIC THREADSAFE)
 
 POCO_INSTALL(SQLODBC)
 POCO_GENERATE_PACKAGE(SQLODBC)

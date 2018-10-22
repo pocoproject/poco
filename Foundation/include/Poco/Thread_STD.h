@@ -84,6 +84,7 @@ public:
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
+	static long currentOsTidImpl();
 
 protected:
 	static void* runnableEntry(void* pThread);

@@ -71,16 +71,16 @@ public:
 		const std::string& name = "-");
 		/// Creates a SQLChannel with the given connector, connect string, timeout, table and name.
 		/// The connector must be already registered.
-	
+
 	void open();
 		/// Opens the SQLChannel.
-		
+
 	void close();
 		/// Closes the SQLChannel.
-		
+
 	void log(const Message& msg);
 		/// Sends the message's text to the syslog service.
-		
+
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given value.
 		///
@@ -88,9 +88,7 @@ public:
 		///     * name:      The name used to identify the source of log messages.
 		///                  Defaults to "-".
 		///
-		///     * target:    The target data storage type ("SQLite", "ODBC", ...).
-		///
-		///     * connector: The target data storage connector name.
+		///     * connector: The target data storage connector name ("SQLite", "ODBC", ...).
 		///
 		///     * connect:   The target data storage connection string.
 		///
@@ -177,7 +175,7 @@ private:
 	int          _timeout;
 	bool         _throw;
 	bool         _async;
-	
+
 	// members for log entry cache (needed for async mode)
 	std::string _source;
 	long        _pid;
@@ -199,7 +197,7 @@ inline std::size_t SQLChannel::wait()
 {
 	if (_async && _pLogStatement)
 		return _pLogStatement->wait(_timeout);
-	
+
 	return 0;
 }
 
