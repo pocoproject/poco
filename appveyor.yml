@@ -604,7 +604,7 @@ test_script:
 
           $cmd='ctest -C Debug -VV -E SQL*';
           Write-Host -ForegroundColor Yellow $cmd
-          ctest -C Debug -VV -E SQL*
+          iex "& $cmd"
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'
