@@ -418,7 +418,7 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 }
 
 
-void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
+void MailMessage::writePart(MultipartWriter& writer, const Part& part)
 {
 	MessageHeader partHeader(part.pSource->headers());
 	MediaType mediaType(part.pSource->mediaType());
@@ -444,7 +444,7 @@ void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
 }
 
 
-void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding) const
+void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding)
 {
 	switch (encoding)
 	{
@@ -689,6 +689,59 @@ PartSource* MailMessage::createPartStore(const std::string& content, const std::
 {
 	if (!_pStoreFactory) return new StringPartSource(content, mediaType, filename);
 	else return _pStoreFactory->createPartStore(content, mediaType, filename);
+}
+
+
+MultipartSource::MultipartSource(const std::string contentType):
+	PartSource(contentTypeWithBoundary(contentType))
+{
+}
+
+
+MultipartSource::~MultipartSource()
+{
+	for (MailMessage::PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
+	{
+		delete it->pSource;
+	}
+}
+
+
+void MultipartSource::addPart(const std::string& name,
+	PartSource* pSource,
+	MailMessage::ContentDisposition disposition,
+	MailMessage::ContentTransferEncoding encoding)
+{
+	MailMessage::Part part;
+	part.name        = name;
+	part.pSource     = pSource;
+	part.disposition = disposition;
+	part.encoding    = encoding;
+	_parts.push_back(part);
+}
+
+
+std::istream& MultipartSource::stream()
+{
+	MediaType mt(mediaType());
+	std::string boundary = mt.getParameter("boundary");
+
+	MultipartWriter writer(_content, boundary);
+	for (MailMessage::PartVec::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
+	{
+		MailMessage::writePart(writer, *it);
+	}
+	writer.close();
+
+	return _content;
+}
+
+
+std::string MultipartSource::contentTypeWithBoundary(const std::string& contentType)
+{
+	MediaType mediaType(contentType);
+	mediaType.setParameter("boundary", MultipartWriter::createBoundary());
+	return mediaType.toString();
 }
 
 
