@@ -104,8 +104,8 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
+	sockaddr_storage buffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	poco_socket_t sd;
 	do
@@ -502,8 +502,8 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 
 int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
-	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
+	sockaddr_storage abuffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
 	poco_socklen_t* pSALen = &saLen;
 	int rc = receiveFrom(buffer, length, &pSA, &pSALen, flags);
@@ -541,8 +541,8 @@ int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** ppSA, po
 
 int SocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags)
 {
-	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
+	sockaddr_storage abuffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
 	poco_socklen_t* pSALen = &saLen;
 	int rc = receiveFrom(buffers, &pSA, &pSALen, flags);
@@ -846,8 +846,8 @@ SocketAddress SocketImpl::address()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 	
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
+	sockaddr_storage buffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	int rc = ::getsockname(_sockfd, pSA, &saLen);
 	if (rc == 0)
@@ -862,8 +862,8 @@ SocketAddress SocketImpl::peerAddress()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 	
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
+	sockaddr_storage buffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	int rc = ::getpeername(_sockfd, pSA, &saLen);
 	if (rc == 0)
