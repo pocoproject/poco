@@ -389,6 +389,8 @@ build_script:
 
       if ($env:builder -eq "cmake")
       {
+        if ($env:platform -eq "Win32")
+        {
             if ($env:vsver -eq "140")
             {
                 $generator = '"Visual Studio 14 2015"'
@@ -397,6 +399,9 @@ build_script:
             {
                 $generator = '"Visual Studio 15 2017"'
             }
+        }
+        if ($env:platform -eq "x64")
+        {
             if ($env:vsver -eq "140")
             {
                 $generator = '"Visual Studio 14 2015 Win64"'
