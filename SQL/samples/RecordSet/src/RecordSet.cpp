@@ -28,6 +28,9 @@ using Poco::SQL::RecordSet;
 
 int main(int argc, char** argv)
 {
+	// register SQLite connector
+	Poco::SQL::SQLite::Connector::registerConnector();		
+
 	// create a session
 	Session session("SQLite", "sample.db");
 
