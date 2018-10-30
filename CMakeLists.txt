@@ -61,6 +61,17 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
+# allow disabling of internally built OpenSSL# (see below for details)
+# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
+# the internal OpenSSL build will be used
+option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
+
+if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
+     # Overule FindOpenSSL from cmake to use FindOpenSSL from poco. Because empedded openssl has some non standard lib path.
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/embeddOpenSSL") 
+    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
+endif()
+
 if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW))
 	find_package(OpenSSL REQUIRED)
 else()
@@ -152,15 +163,6 @@ option(POCO_ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
 option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
 option(POCO_ENABLE_CPPUNIT "Enable CppUnit" ON)
-
-# allow disabling of internally built OpenSSL# (see below for details)
-# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
-# the internal OpenSSL build will be used
-option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
-
-if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
-endif()
 
 if(WIN32)
     option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)

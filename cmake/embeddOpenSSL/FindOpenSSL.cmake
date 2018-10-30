@@ -1,4 +1,5 @@
-# TODO(Bjoe) This is taken from cmake 3.11. For poco we need some changes here to use openssl embedded stuff for Windows
+# This FindOpenSSL is taken from cmake 3.11. For poco we need some changes here to use openssl embedded stuff for Windows
+#
 # Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
 # file Copyright.txt or https://cmake.org/licensing for details.
 
@@ -208,7 +209,7 @@ if(WIN32 AND NOT CYGWIN)
     set(SSL_EAY_LIBRARY_DEBUG "${SSL_EAY_DEBUG}")
     set(SSL_EAY_LIBRARY_RELEASE "${SSL_EAY_RELEASE}")
 
-    include(${CMAKE_CURRENT_LIST_DIR}/SelectLibraryConfigurations.cmake)
+    include(SelectLibraryConfigurations.cmake)
     select_library_configurations(LIB_EAY)
     select_library_configurations(SSL_EAY)
 
@@ -376,7 +377,7 @@ if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
   endif ()
 endif ()
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+include(FindPackageHandleStandardArgs.cmake)
 
 set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} )
 
