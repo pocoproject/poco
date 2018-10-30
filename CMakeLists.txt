@@ -407,7 +407,6 @@ if(POCO_ENABLE_ZIP)
 endif()
 
 if(APRUTIL_FOUND AND APACHE_FOUND AND POCO_ENABLE_APACHECONNECTOR)
-    include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" ) # TODO(BJoe) Use namespace target in target_link_libraries()
     add_subdirectory(ApacheConnector)
     list(APPEND Poco_COMPONENTS "ApacheConnector")
 endif()
