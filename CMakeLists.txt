@@ -66,7 +66,21 @@ include(PocoMacros)
 # the internal OpenSSL build will be used
 option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
 
-if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
+if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/openssl/build")
+      message(WARNING "Use internal OpenSSL binaries but ${PROJECT_SOURCE_DIR}/openssl/build doesn't exists. Try to checkout ...")
+      find_package(Git REQUIRED)
+      execute_process(
+          COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote openssl 
+          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} 
+          RESULT_VARIABLE EXITCODE)
+      if(NOT "${EXITCODE}" STREQUAL "0")
+        message(FATAL_ERROR "Checkout ${PROJECT_SOURCE_DIR}/openssl FAILED!")
+      endif()
+    endif()
+    if(POCO_VERBOSE_MESSAGES)
+      message(STATUS "Use internal OpenSSL binaries from ${PROJECT_SOURCE_DIR}/openssl/build")
+    endif()
      # Overule FindOpenSSL from cmake to use FindOpenSSL from poco. Because empedded openssl has some non standard lib path.
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/embeddOpenSSL") 
     set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")

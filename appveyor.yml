@@ -571,7 +571,7 @@ test_script:
           ctest --config RelWithDebInfo -N
           Write-Host -ForegroundColor Yellow $line;
 
-          $cmd='ctest -C Debug -VV -E SQL*';
+          $cmd='ctest -C Debug --output-on-failure -E SQL*';
           Write-Host -ForegroundColor Yellow $cmd
           iex "& $cmd"
           popd
