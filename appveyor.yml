@@ -71,9 +71,9 @@ environment:
 #    - builder: cygwin
 #      vsver: 150
 
-    - builder: msbuild
-      vsver: 140
-      linkmode: shared
+## TODO(BJoe) Comment in!    - builder: msbuild
+## TODO(BJoe) Comment in!      vsver: 140
+## TODO(BJoe) Comment in!      linkmode: shared
 
 #    - builder: msbuild
 #      vsver: 140

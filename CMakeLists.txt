@@ -61,29 +61,59 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-# allow disabling of internally built OpenSSL# (see below for details)
-# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
-# the internal OpenSSL build will be used
-option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
 
-if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/openssl/build")
-      message(WARNING "Use internal OpenSSL binaries but ${PROJECT_SOURCE_DIR}/openssl/build doesn't exists. Try to checkout ...")
-      find_package(Git REQUIRED)
-      execute_process(
-          COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote openssl 
-          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} 
-          RESULT_VARIABLE EXITCODE)
-      if(NOT "${EXITCODE}" STREQUAL "0")
-        message(FATAL_ERROR "Checkout ${PROJECT_SOURCE_DIR}/openssl FAILED!")
-      endif()
+if(MSVC)
+    option(POCO_MT
+      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
+
+    option(POCO_ENABLE_MSVC_MP
+      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
+
+
+    # allow disabling of internally built OpenSSL# (see below for details)
+    # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
+    # the internal OpenSSL build will be used
+    option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
+
+    
+    if(NOT POCO_DISABLE_INTERNAL_OPENSSL)
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/openssl/build")
+          message(WARNING "Use internal OpenSSL binaries but ${PROJECT_SOURCE_DIR}/openssl/build doesn't exists. Try to checkout ...")
+          find_package(Git REQUIRED)
+          execute_process(
+              COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote openssl 
+              WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} 
+              RESULT_VARIABLE EXITCODE)
+          if(NOT "${EXITCODE}" STREQUAL "0")
+            message(FATAL_ERROR "Checkout ${PROJECT_SOURCE_DIR}/openssl FAILED!")
+          endif()
+        endif()
+        if(POCO_VERBOSE_MESSAGES)
+          message(STATUS "Use internal OpenSSL binaries from ${PROJECT_SOURCE_DIR}/openssl/build")
+        endif()
+        # Overule FindOpenSSL from cmake to use FindOpenSSL from poco. Because empedded openssl has some non standard lib path.
+        #list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/embeddOpenSSL") 
+        if( "${CMAKE_SIZEOF_VOID_P}" STREQUAL "8" )
+            set(_OPENSSL_MSVC_ARCH_SUFFIX "64")
+        else()
+            set(_OPENSSL_MSVC_ARCH_SUFFIX "32")
+        endif()
+
+        set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
+        if(OPENSSL_USE_STATIC_LIBS)
+          list(APPEND CMAKE_LIBRARY_PATH 
+                  "${OPENSSL_ROOT_DIR}/win${_OPENSSL_MSVC_ARCH_SUFFIX}/lib/debug"
+                  "${OPENSSL_ROOT_DIR}/win${_OPENSSL_MSVC_ARCH_SUFFIX}/lib/release")
+        else()
+          list(APPEND CMAKE_LIBRARY_PATH 
+                  "${OPENSSL_ROOT_DIR}/win${_OPENSSL_MSVC_ARCH_SUFFIX}/bin/debug"
+                  "${OPENSSL_ROOT_DIR}/win${_OPENSSL_MSVC_ARCH_SUFFIX}/bin/release")
+        endif()
     endif()
-    if(POCO_VERBOSE_MESSAGES)
-      message(STATUS "Use internal OpenSSL binaries from ${PROJECT_SOURCE_DIR}/openssl/build")
-    endif()
-     # Overule FindOpenSSL from cmake to use FindOpenSSL from poco. Because empedded openssl has some non standard lib path.
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/embeddOpenSSL") 
-    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
+endif()
+
+if(WIN32)
+    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)
 endif()
 
 if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW))
@@ -178,12 +208,6 @@ option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
 option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
 option(POCO_ENABLE_CPPUNIT "Enable CppUnit" ON)
 
-if(WIN32)
-    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)
-else()
-    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" OFF)
-endif()
-
 option(POCO_ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
@@ -204,15 +228,6 @@ endif()
 
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
-
-if(MSVC)
-    option(POCO_MT
-      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
-
-    option(POCO_ENABLE_MSVC_MP
-      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
-endif()
-
 
 if(POCO_ENABLE_TESTS)
   option(POCO_ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
