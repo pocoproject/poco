@@ -417,7 +417,7 @@ build_script:
         $defs+=" -DCMAKE_BUILD_TYPE=Debug";
         $defs+=" -DPOCO_ENABLE_PDF=OFF";
         $defs+=" -DPOCO_ENABLE_NETSSL=ON";
-        $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
+        $defs+=" -DPOCO_ENABLE_NETSSL_WIN=OFF"; ## TODO(BJoe) change to ON
         $defs+=" -DPOCO_ENABLE_SQL_MYSQL=OFF";
         $defs+=" -DPOCO_ENABLE_REDIS=OFF";
         $defs+=" -DPOCO_ENABLE_SAMPLES=ON";
