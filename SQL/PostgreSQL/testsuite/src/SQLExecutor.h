@@ -54,6 +54,7 @@ public:
 	void insertSingleBulk();
 	void insertSingleBulkVec();
     void insertBulkCopyIn();
+    void insertComplexBulkCopyIn();
 
 	void limits();
 	void limitOnce();

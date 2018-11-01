@@ -49,6 +49,7 @@ public:
 	void testInsertSingleBulk();
 	void testInsertSingleBulkVec();
 	void testInsertBulkCopyIn();
+	void testInsertComplexBulkCopyIn();
 
 	void testLimit();
 	void testLimitOnce();

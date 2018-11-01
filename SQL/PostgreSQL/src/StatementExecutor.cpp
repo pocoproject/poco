@@ -219,6 +219,17 @@ void StatementExecutor::bindParams(const InputParameterVector& anInputParameterV
 }
 
 
+void StatementExecutor::bindBulkParams(const InputParameterVector& anInputBulkParameterVector)
+{
+	if (! _sessionHandle.isConnected()) throw NotConnectedException();
+
+	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
+
+	// Just record the input vector for later execution
+	_inputBulkParameterVector = anInputBulkParameterVector;
+}
+
+
 void StatementExecutor::execute()
 {
 	if (! _sessionHandle.isConnected()) throw NotConnectedException();
@@ -276,8 +287,29 @@ void StatementExecutor::execute()
 
 	// Don't setup to auto clear the result (ptrPGResult).  It is required to retrieve the results later.
 
-	if (!ptrPGResult || (PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK &&
-		PQresultStatus(ptrPGResult) != PGRES_TUPLES_OK))
+    if (!ptrPGResult || (PQresultStatus(ptrPGResult) == PGRES_COPY_IN))
+    {
+        InputParameterVector::const_iterator cItr		= _inputBulkParameterVector.begin();
+        InputParameterVector::const_iterator cItrEnd	= _inputBulkParameterVector.end();
+
+        for (; cItr != cItrEnd; ++cItr) {
+            const char *bulkBuffer = static_cast<const char*>(cItr->pInternalRepresentation());
+            if (PQputCopyData(_sessionHandle, bulkBuffer, strlen(bulkBuffer)) != 1)
+            {
+                ptrPGResult = PQgetResult(_sessionHandle);
+            }
+        }
+
+        if (PQputCopyEnd(_sessionHandle, nullptr) != 1)
+        {
+            ptrPGResult = PQgetResult(_sessionHandle);
+        }
+    }
+
+
+    if (!ptrPGResult || (PQresultStatus(ptrPGResult) != PGRES_COMMAND_OK &&
+		PQresultStatus(ptrPGResult) != PGRES_TUPLES_OK &&
+        PQresultStatus(ptrPGResult) != PGRES_COPY_IN))
 	{
 		PQResultClear resultClearer(ptrPGResult);
 

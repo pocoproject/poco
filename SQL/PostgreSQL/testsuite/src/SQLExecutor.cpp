@@ -24,6 +24,7 @@
 #include "Poco/SQL/StatementImpl.h"
 #include "Poco/SQL/RecordSet.h"
 #include "Poco/SQL/Transaction.h"
+#include "Poco/SQL/PostgreSQL/Binder.h"
 #include "Poco/SQL/PostgreSQL/PostgreSQLException.h"
 #include "Poco/SQL/BulkBinding.h"
 
@@ -781,6 +782,71 @@ void SQLExecutor::insertBulkCopyIn()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (count == ((0+99)*100/2));
+}
+
+
+namespace Poco {
+    namespace SQL {
+
+
+        template <>
+        class TypeHandler<std::vector<Person>>
+        {
+        public:
+            static void bind(std::size_t pos, const std::vector<Person>& obj, PostgreSQL::Binder::Ptr pBinder, AbstractBinder::Direction dir)
+            {
+                pBinder->bind(pos, obj, dir);
+            }
+
+            static void prepare(std::size_t pos, const Person& obj, AbstractPreparator::Ptr pPrepare)
+            {
+
+            }
+
+            static std::size_t size()
+            {
+                return 1;
+            }
+
+            static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor::Ptr pExt)
+            {
+
+            }
+
+        private:
+            TypeHandler();
+            ~TypeHandler();
+            TypeHandler(const TypeHandler&);
+            TypeHandler& operator=(const TypeHandler&);
+        };
+
+
+    } } // namespace Poco::SQL
+
+
+void SQLExecutor::insertComplexBulkCopyIn()
+{
+    std::string funct = "insertComplexBulkCopyIn()";
+
+    std::vector<Person> people;
+    people.push_back(Person("LN1", "FN1", "ADDR1", 1));
+    people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+
+    try { *_pSession << "COPY Person(LastName, FirstName, Address, Age) FROM STDIN;", use(people, bulk), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+    int count = 0;
+    try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+    assertTrue (count == 2);
+
+    std::vector<Person> result;
+    try { *_pSession << "SELECT * FROM Person", into(result), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+    assertTrue (result == people);
 }
 
 

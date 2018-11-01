@@ -59,6 +59,7 @@ namespace PostgreSQL {
 SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout):
 	Poco::SQL::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout)
 {
+	setFeature("bulk", true);
 	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	open();

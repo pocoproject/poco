@@ -22,6 +22,7 @@ namespace PostgreSQL {
 PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl): Poco::SQL::StatementImpl(aSessionImpl),
 	_statementExecutor(aSessionImpl.handle()),
 	_pBinder(new Binder),
+	_pBulkBinder(new Binder),
 	_pExtractor(new Extractor (_statementExecutor)),
 	_hasNext(NEXT_DONTKNOW)
 {
@@ -142,6 +143,9 @@ void PostgreSQLStatementImpl::bindImpl()
 
 	for (; it != itEnd && (*it)->canBind(); ++it)
 	{
+        if ((*it)->isBulk())
+            (*it)->setBinder(_pBulkBinder);
+
 		(*it)->bind(position);
 		position += (*it)->numOfColumnsHandled();
 	}
@@ -149,6 +153,7 @@ void PostgreSQLStatementImpl::bindImpl()
 	_pBinder->updateBindVectorToCurrentValues();
 
 	_statementExecutor.bindParams(_pBinder->bindVector());
+    _statementExecutor.bindBulkParams(_pBulkBinder->bindVector());
 
 	_statementExecutor.execute();
 

@@ -59,6 +59,10 @@ public:
 		/// Binds the params - REQUIRED if the statement has input parameters/placeholders
 		/// Pointer and list elements must stay valid for the lifetime of the StatementExecutor!
 
+	void bindBulkParams(const InputParameterVector& anInputBulkParameterVector);
+	/// Binds the params ONLY for COPY IN feature of PostgreSQL
+	/// Pointer and list elements must stay valid for the lifetime of the StatementExecutor!
+
 	void execute();
 		/// Executes the statement.
 
@@ -97,6 +101,8 @@ private:
 	std::string    _preparedStatementName;	// UUID based to allow multiple prepared statements per transaction.
 	std::size_t    _countPlaceholdersInSQLStatement;
 	ColVec         _resultColumns;
+
+    InputParameterVector _inputBulkParameterVector;
 
 	InputParameterVector  _inputParameterVector;
 	OutputParameterVector _outputParameterVector;

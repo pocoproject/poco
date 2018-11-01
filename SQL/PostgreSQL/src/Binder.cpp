@@ -328,9 +328,10 @@ void Binder::realBind(std::size_t aPosition, Poco::SQL::MetaColumn::ColumnDataTy
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::Int8>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -346,9 +347,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int8>& /*val*/, Dir
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::UInt8>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -364,9 +366,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt8>& /*val*/, Di
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::Int16>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -382,9 +385,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int16>& /*val*/, Di
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::UInt16>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -400,9 +404,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt16>& /*val*/, D
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::Int32>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -418,9 +423,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int32>& /*val*/, Di
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::UInt32>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -436,9 +442,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt32>& /*val*/, D
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::Int64>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -454,9 +461,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int64>& /*val*/, Di
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::UInt64>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -474,7 +482,7 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt64>& /*val*/, D
 
 void Binder::bind(std::size_t /*pos*/, const std::vector<bool>& /*val*/, Direction /*dir*/)
 {
-	throw NotImplementedException();
+    throw NotImplementedException();
 }
 
 
@@ -490,9 +498,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<bool>& /*val*/, Direction
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<float>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -508,9 +517,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<float>& /*val*/, Directio
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<double>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<double>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -526,9 +536,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<double>& /*val*/, Directi
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<char>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -544,9 +555,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<char>& /*val*/, Direction
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::SQL::BLOB>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::BLOB>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -562,9 +574,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::BLOB>& /*val*/
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::SQL::CLOB>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::CLOB>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -580,9 +593,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::CLOB>& /*val*/
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::DateTime>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::DateTime>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -598,9 +612,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::DateTime>& /*val*/,
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::SQL::Date>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::Date>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -616,9 +631,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::Date>& /*val*/
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::SQL::Time>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::Time>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 
@@ -652,9 +668,10 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::NullData>& /*v
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<std::string>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+    realVectorBind(pos, val);
 }
 
 

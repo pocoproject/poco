@@ -89,6 +89,9 @@ private:
 
 	StatementExecutor _statementExecutor;
 	Binder::Ptr       _pBinder;
+	Binder::Ptr		  _pBulkBinder;
+	// Need for COPY queries
+
 	Extractor::Ptr    _pExtractor;
 	NextState         _hasNext;
 };
