@@ -25,6 +25,7 @@
 #include "Poco/SQL/RecordSet.h"
 #include "Poco/SQL/Transaction.h"
 #include "Poco/SQL/PostgreSQL/PostgreSQLException.h"
+#include "Poco/SQL/BulkBinding.h"
 
 #include <iostream>
 #include <limits>
@@ -714,7 +715,7 @@ void SQLExecutor::floats()
 
 void SQLExecutor::doubles()
 {
-	std::string funct = "floats()";
+	std::string funct = "doubles()";
 	double data = 1.5;
 	double ret = 0.0;
 
@@ -744,6 +745,30 @@ void SQLExecutor::insertSingleBulkVec()
 		data.push_back(x);
 
 	Statement stmt((*_pSession << "INSERT INTO Strings VALUES ($1)", use(data)));
+	stmt.execute();
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assertTrue (count == 100);
+	try { *_pSession << "SELECT SUM(str) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == ((0+99)*100/2));
+}
+
+
+void SQLExecutor::insertBulkCopyIn()
+{
+	std::string funct = "insertBulkCopyIn()";
+	std::vector<int> data;
+
+	for (int x = 0; x < 100; ++x)
+		data.push_back(x);
+
+	Statement stmt((*_pSession << "COPY Strings(str) FROM STDIN;", use(data, bulk)));
 	stmt.execute();
 
 	int count = 0;

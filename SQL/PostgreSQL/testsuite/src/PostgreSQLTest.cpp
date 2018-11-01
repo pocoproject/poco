@@ -367,6 +367,14 @@ void PostgreSQLTest::testInsertSingleBulkVec()
 	_pExecutor->insertSingleBulkVec();
 }
 
+void PostgreSQLTest::testInsertBulkCopyIn()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateIntsTable();
+	_pExecutor->insertBulkCopyIn();
+}
+
 
 void PostgreSQLTest::testLimit()
 {
@@ -1060,12 +1068,13 @@ CppUnit::Test* PostgreSQLTest::suite()
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBarebonePostgreSQL);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccess);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testComplexType);
-	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccessVector);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccessVector);	
 	CppUnit_addTest(pSuite, PostgreSQLTest, testComplexTypeVector);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertVector);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertEmptyVector);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertSingleBulk);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertSingleBulkVec);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertBulkCopyIn);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testLimit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testLimitOnce);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testLimitPrepare);
