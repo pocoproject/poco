@@ -61,6 +61,18 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
+if(POCO_STATIC)
+	message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
+	if(POCO_VERBOSE_MESSAGES)
+		message(STATUS "Building static libraries")
+	endif()
+	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+	if(POCO_VERBOSE_MESSAGES)
+		message(STATUS "Building dynamic libraries")
+	endif()
+	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
 if(MSVC)
     option(POCO_MT
@@ -76,7 +88,7 @@ if(MSVC)
     option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
 
     
-    if(NOT POCO_DISABLE_INTERNAL_OPENSSL)
+    if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW)))
       include(UseEmbeddedOpenSSL)
     endif()
 endif()
@@ -182,19 +194,6 @@ option(POCO_ENABLE_TESTS
 
 option(POCO_ENABLE_SAMPLES
   "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
-if(POCO_STATIC)
-    message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
-    if(POCO_VERBOSE_MESSAGES)
-	message(STATUS "Building static libraries")
-    endif()
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-    if(POCO_VERBOSE_MESSAGES)
-	message(STATUS "Building dynamic libraries")
-    endif()
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
-
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
