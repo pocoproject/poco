@@ -800,7 +800,7 @@ namespace Poco {
 
             static void prepare(std::size_t pos, const Person& obj, AbstractPreparator::Ptr pPrepare)
             {
-
+                throw NotImplementedException();
             }
 
             static std::size_t size()
@@ -810,7 +810,7 @@ namespace Poco {
 
             static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor::Ptr pExt)
             {
-
+                throw NotImplementedException();
             }
 
         private:
@@ -829,8 +829,10 @@ void SQLExecutor::insertComplexBulkCopyIn()
     std::string funct = "insertComplexBulkCopyIn()";
 
     std::vector<Person> people;
-    people.push_back(Person("LN1", "FN1", "ADDR1", 1));
-    people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+    for (int i = 0; i < 15000; ++i) {
+        people.push_back(Person("LN1", "FN1", "ADDR1", 1));
+        people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+    }
 
     try { *_pSession << "COPY Person(LastName, FirstName, Address, Age) FROM STDIN;", use(people, bulk), now; }
     catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
@@ -840,7 +842,7 @@ void SQLExecutor::insertComplexBulkCopyIn()
     try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
     catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
     catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
-    assertTrue (count == 2);
+    assertTrue (count == 30000);
 
     std::vector<Person> result;
     try { *_pSession << "SELECT * FROM Person", into(result), now; }
