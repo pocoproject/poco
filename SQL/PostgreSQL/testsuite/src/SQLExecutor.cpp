@@ -821,7 +821,7 @@ namespace Poco {
         };
 
 
-    } } // namespace Poco::SQL
+} } // namespace Poco::SQL
 
 
 void SQLExecutor::insertComplexBulkCopyIn()
@@ -845,6 +845,140 @@ void SQLExecutor::insertComplexBulkCopyIn()
     assertTrue (count == 30000);
 
     std::vector<Person> result;
+    try { *_pSession << "SELECT * FROM Person", into(result), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+    assertTrue (result == people);
+}
+
+
+namespace Poco {
+    namespace SQL {
+
+
+        template <>
+        class TypeHandler<std::list<Person>>
+        {
+        public:
+            static void bind(std::size_t pos, const std::list<Person>& obj, PostgreSQL::Binder::Ptr pBinder, AbstractBinder::Direction dir)
+            {
+                pBinder->bind(pos, obj, dir);
+            }
+
+            static void prepare(std::size_t pos, const Person& obj, AbstractPreparator::Ptr pPrepare)
+            {
+                throw NotImplementedException();
+            }
+
+            static std::size_t size()
+            {
+                return 1;
+            }
+
+            static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor::Ptr pExt)
+            {
+                throw NotImplementedException();
+            }
+
+        private:
+            TypeHandler();
+            ~TypeHandler();
+            TypeHandler(const TypeHandler&);
+            TypeHandler& operator=(const TypeHandler&);
+        };
+
+
+} } // namespace Poco::SQL
+
+
+void SQLExecutor::insertComplexListBulkCopyIn()
+{
+    std::string funct = "insertComplexListBulkCopyIn()";
+
+    std::list<Person> people;
+    for (int i = 0; i < 15000; ++i) {
+        people.push_back(Person("LN1", "FN1", "ADDR1", 1));
+        people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+    }
+
+    try { *_pSession << "COPY Person(LastName, FirstName, Address, Age) FROM STDIN;", use(people, bulk), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+    int count = 0;
+    try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+    assertTrue (count == 30000);
+
+    std::list<Person> result;
+    try { *_pSession << "SELECT * FROM Person", into(result), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+    assertTrue (result == people);
+}
+
+
+namespace Poco {
+    namespace SQL {
+
+
+        template <>
+        class TypeHandler<std::deque<Person>>
+        {
+        public:
+            static void bind(std::size_t pos, const std::deque<Person>& obj, PostgreSQL::Binder::Ptr pBinder, AbstractBinder::Direction dir)
+            {
+                pBinder->bind(pos, obj, dir);
+            }
+
+            static void prepare(std::size_t pos, const Person& obj, AbstractPreparator::Ptr pPrepare)
+            {
+                throw NotImplementedException();
+            }
+
+            static std::size_t size()
+            {
+                return 1;
+            }
+
+            static void extract(std::size_t pos, Person& obj, const Person& defVal, AbstractExtractor::Ptr pExt)
+            {
+                throw NotImplementedException();
+            }
+
+        private:
+            TypeHandler();
+            ~TypeHandler();
+            TypeHandler(const TypeHandler&);
+            TypeHandler& operator=(const TypeHandler&);
+        };
+
+
+} } // namespace Poco::SQL
+
+
+void SQLExecutor::insertComplexDequeBulkCopyIn()
+{
+    std::string funct = "insertComplexListBulkCopyIn()";
+
+    std::deque<Person> people;
+    for (int i = 0; i < 15000; ++i) {
+        people.push_back(Person("LN1", "FN1", "ADDR1", 1));
+        people.push_back(Person("LN2", "FN2", "ADDR2", 2));
+    }
+
+    try { *_pSession << "COPY Person(LastName, FirstName, Address, Age) FROM STDIN;", use(people, bulk), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+    int count = 0;
+    try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+    catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+    catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+    assertTrue (count == 30000);
+
+    std::deque<Person> result;
     try { *_pSession << "SELECT * FROM Person", into(result), now; }
     catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
     catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }

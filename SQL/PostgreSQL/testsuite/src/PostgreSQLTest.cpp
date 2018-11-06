@@ -386,6 +386,24 @@ void PostgreSQLTest::testInsertComplexBulkCopyIn()
 }
 
 
+void PostgreSQLTest::testInsertComplexListBulkCopyIn()
+{
+    if (!_pSession) fail ("Test not available.");
+
+    recreatePersonTable();
+    _pExecutor->insertComplexListBulkCopyIn();
+}
+
+
+void PostgreSQLTest::testInsertComplexDequeBulkCopyIn()
+{
+    if (!_pSession) fail ("Test not available.");
+
+    recreatePersonTable();
+    _pExecutor->insertComplexDequeBulkCopyIn();
+}
+
+
 void PostgreSQLTest::testLimit()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1086,6 +1104,8 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertSingleBulkVec);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInsertBulkCopyIn);
     CppUnit_addTest(pSuite, PostgreSQLTest, testInsertComplexBulkCopyIn);
+    CppUnit_addTest(pSuite, PostgreSQLTest, testInsertComplexListBulkCopyIn);
+    CppUnit_addTest(pSuite, PostgreSQLTest, testInsertComplexDequeBulkCopyIn);
     CppUnit_addTest(pSuite, PostgreSQLTest, testLimit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testLimitOnce);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testLimitPrepare);

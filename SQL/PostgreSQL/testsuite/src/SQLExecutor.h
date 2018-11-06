@@ -55,6 +55,8 @@ public:
 	void insertSingleBulkVec();
     void insertBulkCopyIn();
     void insertComplexBulkCopyIn();
+    void insertComplexListBulkCopyIn();
+    void insertComplexDequeBulkCopyIn();
 
 	void limits();
 	void limitOnce();

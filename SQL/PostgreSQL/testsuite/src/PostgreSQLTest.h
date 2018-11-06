@@ -50,6 +50,8 @@ public:
 	void testInsertSingleBulkVec();
 	void testInsertBulkCopyIn();
 	void testInsertComplexBulkCopyIn();
+	void testInsertComplexListBulkCopyIn();
+    void testInsertComplexDequeBulkCopyIn();
 
 	void testLimit();
 	void testLimitOnce();
