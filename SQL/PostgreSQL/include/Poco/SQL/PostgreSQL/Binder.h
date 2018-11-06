@@ -233,19 +233,33 @@ public:
     void bind(std::size_t pos, const std::vector<T>& val, Direction dir = PD_IN)
     {
         poco_assert(dir == PD_IN);
-        realVectorBind(pos, val);
+
+		typename std::vector<T>::iterator first = const_cast<std::vector<T> &>(val).begin();
+		typename std::vector<T>::iterator last = const_cast<std::vector<T> &>(val).end();
+
+		realContainerBind<typename std::vector<T>::iterator, T>(pos, first, last);
     }
 
     template <class T>
     void bind(std::size_t pos, const std::deque<T>& val, Direction dir = PD_IN)
     {
-        throw NotImplementedException();
+        poco_assert(dir == PD_IN);
+
+        typename std::deque<T>::iterator first = const_cast<std::deque<T> &>(val).begin();
+        typename std::deque<T>::iterator last = const_cast<std::deque<T> &>(val).end();
+
+        realContainerBind<typename std::deque<T>::iterator, T>(pos, first, last);
     }
 
     template <class T>
     void bind(std::size_t pos, const std::list<T>& val, Direction dir = PD_IN)
     {
-        throw NotImplementedException();
+        poco_assert(dir == PD_IN);
+
+        typename std::list<T>::iterator first = const_cast<std::list<T> &>(val).begin();
+        typename std::list<T>::iterator last = const_cast<std::list<T> &>(val).end();
+
+        realContainerBind<typename std::list<T>::iterator, T>(pos, first, last);
     }
 
 	std::size_t size() const;
@@ -271,24 +285,23 @@ private:
 	void realBind(std::size_t aPosition, Poco::SQL::MetaColumn::ColumnDataType aFieldType, const void* aBufferPtr, std::size_t aLength);
 		/// Common bind implementation
 
-    template <class T>
-    void realVectorBind(std::size_t pos, const std::vector<T>& val)
+    template <class Iterator, class T>
+    void realContainerBind(std::size_t pos, Iterator first, Iterator last)
     {
         try
         {
-            std::string preparedString;
-            typename std::vector<T>::iterator it = const_cast<std::vector<T> &>(val).begin();
-            typename std::vector<T>::iterator itEnd = const_cast<std::vector<T> &>(val).end();
+            std::string preparedString = "";
+            Iterator begin = first;
 
-            for (; it != itEnd; ++it) {
-                if (it != val.begin())
+            for (; first != last; ++first) {
+                if (first != begin)
                     preparedString.append(1, '\n');
 
                 Binder::Ptr tmpBinder = new Binder();
 
                 std::size_t pos = 0;
 
-                AbstractBinding::Ptr tmpBind = new Binding<T>(*it);
+                AbstractBinding::Ptr tmpBind = new Binding<T>(*first);
                 tmpBind->setBinder(tmpBinder);
                 tmpBind->bind(pos);
                 tmpBinder->updateBindVectorToCurrentValues();

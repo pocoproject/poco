@@ -331,152 +331,240 @@ void Binder::realBind(std::size_t aPosition, Poco::SQL::MetaColumn::ColumnDataTy
 void Binder::bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::Int8>::iterator first = const_cast<std::vector<Poco::Int8> &>(val).begin();
+	std::vector<Poco::Int8>::iterator last = const_cast<std::vector<Poco::Int8> &>(val).end();
+    realContainerBind<std::vector<Poco::Int8>::iterator, Poco::Int8>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::Int8>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::Int8>::iterator first = const_cast<std::deque<Poco::Int8> &>(val).begin();
+    std::deque<Poco::Int8>::iterator last = const_cast<std::deque<Poco::Int8> &>(val).end();
+    realContainerBind<std::deque<Poco::Int8>::iterator, Poco::Int8>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int8>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::Int8>::iterator first = const_cast<std::list<Poco::Int8> &>(val).begin();
+    std::list<Poco::Int8>::iterator last = const_cast<std::list<Poco::Int8> &>(val).end();
+    realContainerBind<std::list<Poco::Int8>::iterator, Poco::Int8>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+	std::vector<Poco::UInt8>::iterator first = const_cast<std::vector<Poco::UInt8> &>(val).begin();
+	std::vector<Poco::UInt8>::iterator last = const_cast<std::vector<Poco::UInt8> &>(val).end();
+	realContainerBind<std::vector<Poco::UInt8>::iterator, Poco::UInt8>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::UInt8>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::UInt8>::iterator first = const_cast<std::deque<Poco::UInt8> &>(val).begin();
+    std::deque<Poco::UInt8>::iterator last = const_cast<std::deque<Poco::UInt8> &>(val).end();
+    realContainerBind<std::deque<Poco::UInt8>::iterator, Poco::UInt8>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt8>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::UInt8>::iterator first = const_cast<std::list<Poco::UInt8> &>(val).begin();
+    std::list<Poco::UInt8>::iterator last = const_cast<std::list<Poco::UInt8> &>(val).end();
+    realContainerBind<std::list<Poco::UInt8>::iterator, Poco::UInt8>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::Int16>::iterator first = const_cast<std::vector<Poco::Int16> &>(val).begin();
+    std::vector<Poco::Int16>::iterator last = const_cast<std::vector<Poco::Int16> &>(val).end();
+    realContainerBind<std::vector<Poco::Int16>::iterator, Poco::Int16>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::Int16>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::Int16>::iterator first = const_cast<std::deque<Poco::Int16> &>(val).begin();
+    std::deque<Poco::Int16>::iterator last = const_cast<std::deque<Poco::Int16> &>(val).end();
+    realContainerBind<std::deque<Poco::Int16>::iterator, Poco::Int16>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int16>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::Int16>::iterator first = const_cast<std::list<Poco::Int16> &>(val).begin();
+    std::list<Poco::Int16>::iterator last = const_cast<std::list<Poco::Int16> &>(val).end();
+    realContainerBind<std::list<Poco::Int16>::iterator, Poco::Int16>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::UInt16>::iterator first = const_cast<std::vector<Poco::UInt16> &>(val).begin();
+    std::vector<Poco::UInt16>::iterator last = const_cast<std::vector<Poco::UInt16> &>(val).end();
+    realContainerBind<std::vector<Poco::UInt16>::iterator, Poco::UInt16>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::UInt16>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::UInt16>::iterator first = const_cast<std::deque<Poco::UInt16> &>(val).begin();
+    std::deque<Poco::UInt16>::iterator last = const_cast<std::deque<Poco::UInt16> &>(val).end();
+    realContainerBind<std::deque<Poco::UInt16>::iterator, Poco::UInt16>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt16>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::UInt16>::iterator first = const_cast<std::list<Poco::UInt16> &>(val).begin();
+    std::list<Poco::UInt16>::iterator last = const_cast<std::list<Poco::UInt16> &>(val).end();
+    realContainerBind<std::list<Poco::UInt16>::iterator, Poco::UInt16>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::Int32>::iterator first = const_cast<std::vector<Poco::Int32> &>(val).begin();
+    std::vector<Poco::Int32>::iterator last = const_cast<std::vector<Poco::Int32> &>(val).end();
+    realContainerBind<std::vector<Poco::Int32>::iterator, Poco::Int32>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::Int32>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::Int32>::iterator first = const_cast<std::deque<Poco::Int32> &>(val).begin();
+    std::deque<Poco::Int32>::iterator last = const_cast<std::deque<Poco::Int32> &>(val).end();
+    realContainerBind<std::deque<Poco::Int32>::iterator, Poco::Int32>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int32>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::Int32>::iterator first = const_cast<std::list<Poco::Int32> &>(val).begin();
+    std::list<Poco::Int32>::iterator last = const_cast<std::list<Poco::Int32> &>(val).end();
+    realContainerBind<std::list<Poco::Int32>::iterator, Poco::Int32>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::UInt32>::iterator first = const_cast<std::vector<Poco::UInt32> &>(val).begin();
+    std::vector<Poco::UInt32>::iterator last = const_cast<std::vector<Poco::UInt32> &>(val).end();
+    realContainerBind<std::vector<Poco::UInt32>::iterator, Poco::UInt32>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::UInt32>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::UInt32>::iterator first = const_cast<std::deque<Poco::UInt32> &>(val).begin();
+    std::deque<Poco::UInt32>::iterator last = const_cast<std::deque<Poco::UInt32> &>(val).end();
+    realContainerBind<std::deque<Poco::UInt32>::iterator, Poco::UInt32>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt32>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::UInt32>::iterator first = const_cast<std::list<Poco::UInt32> &>(val).begin();
+    std::list<Poco::UInt32>::iterator last = const_cast<std::list<Poco::UInt32> &>(val).end();
+    realContainerBind<std::list<Poco::UInt32>::iterator, Poco::UInt32>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::Int64>::iterator first = const_cast<std::vector<Poco::Int64> &>(val).begin();
+    std::vector<Poco::Int64>::iterator last = const_cast<std::vector<Poco::Int64> &>(val).end();
+    realContainerBind<std::vector<Poco::Int64>::iterator, Poco::Int64>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::Int64>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::Int64>::iterator first = const_cast<std::deque<Poco::Int64> &>(val).begin();
+    std::deque<Poco::Int64>::iterator last = const_cast<std::deque<Poco::Int64> &>(val).end();
+    realContainerBind<std::deque<Poco::Int64>::iterator, Poco::Int64>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Int64>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::Int64>::iterator first = const_cast<std::list<Poco::Int64> &>(val).begin();
+    std::list<Poco::Int64>::iterator last = const_cast<std::list<Poco::Int64> &>(val).end();
+    realContainerBind<std::list<Poco::Int64>::iterator, Poco::Int64>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::UInt64>::iterator first = const_cast<std::vector<Poco::UInt64> &>(val).begin();
+    std::vector<Poco::UInt64>::iterator last = const_cast<std::vector<Poco::UInt64> &>(val).end();
+    realContainerBind<std::vector<Poco::UInt64>::iterator, Poco::UInt64>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::UInt64>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::UInt64>::iterator first = const_cast<std::deque<Poco::UInt64> &>(val).begin();
+    std::deque<Poco::UInt64>::iterator last = const_cast<std::deque<Poco::UInt64> &>(val).end();
+    realContainerBind<std::deque<Poco::UInt64>::iterator, Poco::UInt64>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::UInt64>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::UInt64>::iterator first = const_cast<std::list<Poco::UInt64> &>(val).begin();
+    std::list<Poco::UInt64>::iterator last = const_cast<std::list<Poco::UInt64> &>(val).end();
+    realContainerBind<std::list<Poco::UInt64>::iterator, Poco::UInt64>(pos, first, last);
 }
 
 
@@ -501,152 +589,240 @@ void Binder::bind(std::size_t /*pos*/, const std::list<bool>& /*val*/, Direction
 void Binder::bind(std::size_t pos, const std::vector<float>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<float>::iterator first = const_cast<std::vector<float> &>(val).begin();
+    std::vector<float>::iterator last = const_cast<std::vector<float> &>(val).end();
+    realContainerBind<std::vector<float>::iterator, float>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<float>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<float>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<float>::iterator first = const_cast<std::deque<float> &>(val).begin();
+    std::deque<float>::iterator last = const_cast<std::deque<float> &>(val).end();
+    realContainerBind<std::deque<float>::iterator, float>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<float>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<float>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<float>::iterator first = const_cast<std::list<float> &>(val).begin();
+    std::list<float>::iterator last = const_cast<std::list<float> &>(val).end();
+    realContainerBind<std::list<float>::iterator, float>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<double>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<double>::iterator first = const_cast<std::vector<double> &>(val).begin();
+    std::vector<double>::iterator last = const_cast<std::vector<double> &>(val).end();
+    realContainerBind<std::vector<double>::iterator, double>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<double>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<double>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<double>::iterator first = const_cast<std::deque<double> &>(val).begin();
+    std::deque<double>::iterator last = const_cast<std::deque<double> &>(val).end();
+    realContainerBind<std::deque<double>::iterator, double>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<double>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<double>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<double>::iterator first = const_cast<std::list<double> &>(val).begin();
+    std::list<double>::iterator last = const_cast<std::list<double> &>(val).end();
+    realContainerBind<std::list<double>::iterator, double>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<char>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<char>::iterator first = const_cast<std::vector<char> &>(val).begin();
+    std::vector<char>::iterator last = const_cast<std::vector<char> &>(val).end();
+    realContainerBind<std::vector<char>::iterator, char>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<char>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<char>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<char>::iterator first = const_cast<std::deque<char> &>(val).begin();
+    std::deque<char>::iterator last = const_cast<std::deque<char> &>(val).end();
+    realContainerBind<std::deque<char>::iterator, char>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<char>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<char>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<char>::iterator first = const_cast<std::list<char> &>(val).begin();
+    std::list<char>::iterator last = const_cast<std::list<char> &>(val).end();
+    realContainerBind<std::list<char>::iterator, char>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::BLOB>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::SQL::BLOB>::iterator first = const_cast<std::vector<Poco::SQL::BLOB> &>(val).begin();
+    std::vector<Poco::SQL::BLOB>::iterator last = const_cast<std::vector<Poco::SQL::BLOB> &>(val).end();
+    realContainerBind<std::vector<Poco::SQL::BLOB>::iterator, Poco::SQL::BLOB>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::SQL::BLOB>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::SQL::BLOB>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::SQL::BLOB>::iterator first = const_cast<std::deque<Poco::SQL::BLOB> &>(val).begin();
+    std::deque<Poco::SQL::BLOB>::iterator last = const_cast<std::deque<Poco::SQL::BLOB> &>(val).end();
+    realContainerBind<std::deque<Poco::SQL::BLOB>::iterator, Poco::SQL::BLOB>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::BLOB>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::SQL::BLOB>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::SQL::BLOB>::iterator first = const_cast<std::list<Poco::SQL::BLOB> &>(val).begin();
+    std::list<Poco::SQL::BLOB>::iterator last = const_cast<std::list<Poco::SQL::BLOB> &>(val).end();
+    realContainerBind<std::list<Poco::SQL::BLOB>::iterator, Poco::SQL::BLOB>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::CLOB>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::SQL::CLOB>::iterator first = const_cast<std::vector<Poco::SQL::CLOB> &>(val).begin();
+    std::vector<Poco::SQL::CLOB>::iterator last = const_cast<std::vector<Poco::SQL::CLOB> &>(val).end();
+    realContainerBind<std::vector<Poco::SQL::CLOB>::iterator, Poco::SQL::CLOB>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::SQL::CLOB>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::SQL::CLOB>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::SQL::CLOB>::iterator first = const_cast<std::deque<Poco::SQL::CLOB> &>(val).begin();
+    std::deque<Poco::SQL::CLOB>::iterator last = const_cast<std::deque<Poco::SQL::CLOB> &>(val).end();
+    realContainerBind<std::deque<Poco::SQL::CLOB>::iterator, Poco::SQL::CLOB>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::CLOB>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::SQL::CLOB>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::SQL::CLOB>::iterator first = const_cast<std::list<Poco::SQL::CLOB> &>(val).begin();
+    std::list<Poco::SQL::CLOB>::iterator last = const_cast<std::list<Poco::SQL::CLOB> &>(val).end();
+    realContainerBind<std::list<Poco::SQL::CLOB>::iterator, Poco::SQL::CLOB>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::DateTime>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::DateTime>::iterator first = const_cast<std::vector<Poco::DateTime> &>(val).begin();
+    std::vector<Poco::DateTime>::iterator last = const_cast<std::vector<Poco::DateTime> &>(val).end();
+    realContainerBind<std::vector<Poco::DateTime>::iterator, Poco::DateTime>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::DateTime>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::DateTime>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::DateTime>::iterator first = const_cast<std::deque<Poco::DateTime> &>(val).begin();
+    std::deque<Poco::DateTime>::iterator last = const_cast<std::deque<Poco::DateTime> &>(val).end();
+    realContainerBind<std::deque<Poco::DateTime>::iterator, Poco::DateTime>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::DateTime>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::DateTime>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::DateTime>::iterator first = const_cast<std::list<Poco::DateTime> &>(val).begin();
+    std::list<Poco::DateTime>::iterator last = const_cast<std::list<Poco::DateTime> &>(val).end();
+    realContainerBind<std::list<Poco::DateTime>::iterator, Poco::DateTime>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::Date>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::SQL::Date>::iterator first = const_cast<std::vector<Poco::SQL::Date> &>(val).begin();
+    std::vector<Poco::SQL::Date>::iterator last = const_cast<std::vector<Poco::SQL::Date> &>(val).end();
+    realContainerBind<std::vector<Poco::SQL::Date>::iterator, Poco::SQL::Date>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::SQL::Date>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::SQL::Date>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::SQL::Date>::iterator first = const_cast<std::deque<Poco::SQL::Date> &>(val).begin();
+    std::deque<Poco::SQL::Date>::iterator last = const_cast<std::deque<Poco::SQL::Date> &>(val).end();
+    realContainerBind<std::deque<Poco::SQL::Date>::iterator, Poco::SQL::Date>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::Date>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::SQL::Date>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::SQL::Date>::iterator first = const_cast<std::list<Poco::SQL::Date> &>(val).begin();
+    std::list<Poco::SQL::Date>::iterator last = const_cast<std::list<Poco::SQL::Date> &>(val).end();
+    realContainerBind<std::list<Poco::SQL::Date>::iterator, Poco::SQL::Date>(pos, first, last);
 }
 
 
 void Binder::bind(std::size_t pos, const std::vector<Poco::SQL::Time>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<Poco::SQL::Time>::iterator first = const_cast<std::vector<Poco::SQL::Time> &>(val).begin();
+    std::vector<Poco::SQL::Time>::iterator last = const_cast<std::vector<Poco::SQL::Time> &>(val).end();
+    realContainerBind<std::vector<Poco::SQL::Time>::iterator, Poco::SQL::Time>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::SQL::Time>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<Poco::SQL::Time>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<Poco::SQL::Time>::iterator first = const_cast<std::deque<Poco::SQL::Time> &>(val).begin();
+    std::deque<Poco::SQL::Time>::iterator last = const_cast<std::deque<Poco::SQL::Time> &>(val).end();
+    realContainerBind<std::deque<Poco::SQL::Time>::iterator, Poco::SQL::Time>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::Time>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<Poco::SQL::Time>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<Poco::SQL::Time>::iterator first = const_cast<std::list<Poco::SQL::Time> &>(val).begin();
+    std::list<Poco::SQL::Time>::iterator last = const_cast<std::list<Poco::SQL::Time> &>(val).end();
+    realContainerBind<std::list<Poco::SQL::Time>::iterator, Poco::SQL::Time>(pos, first, last);
 }
 
 
@@ -658,7 +834,7 @@ void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::SQL::NullData>& /
 
 void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::SQL::NullData>& /*val*/, Direction /*dir*/, const std::type_info&)
 {
-	throw NotImplementedException();
+    throw NotImplementedException();
 }
 
 
@@ -671,19 +847,30 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::SQL::NullData>& /*v
 void Binder::bind(std::size_t pos, const std::vector<std::string>& val, Direction dir)
 {
     poco_assert(dir == PD_IN);
-    realVectorBind(pos, val);
+
+    std::vector<std::string>::iterator first = const_cast<std::vector<std::string> &>(val).begin();
+    std::vector<std::string>::iterator last = const_cast<std::vector<std::string> &>(val).end();
+    realContainerBind<std::vector<std::string>::iterator, std::string>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<std::string>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::deque<std::string>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::deque<std::string>::iterator first = const_cast<std::deque<std::string> &>(val).begin();
+    std::deque<std::string>::iterator last = const_cast<std::deque<std::string> &>(val).end();
+    realContainerBind<std::deque<std::string>::iterator, std::string>(pos, first, last);
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<std::string>& /*val*/, Direction /*dir*/)
+void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction dir)
 {
-	throw NotImplementedException();
+    poco_assert(dir == PD_IN);
+
+    std::list<std::string>::iterator first = const_cast<std::list<std::string> &>(val).begin();
+    std::list<std::string>::iterator last = const_cast<std::list<std::string> &>(val).end();
+    realContainerBind<std::list<std::string>::iterator, std::string>(pos, first, last);
 }
 
 
