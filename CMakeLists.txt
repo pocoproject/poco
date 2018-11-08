@@ -154,6 +154,19 @@ option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
 option(POCO_ENABLE_CPPUNIT "Enable CppUnit" ON)
 
 # allow disabling of internally built OpenSSL# (see below for details)
+if(POCO_STATIC)
+    message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
+    if(POCO_VERBOSE_MESSAGES)
+	message(STATUS "Building static libraries")
+    endif()
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+    if(POCO_VERBOSE_MESSAGES)
+	message(STATUS "Building dynamic libraries")
+    endif()
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
+
 # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
 # the internal OpenSSL build will be used
 option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
@@ -192,18 +205,6 @@ option(POCO_ENABLE_TESTS
 
 option(POCO_ENABLE_SAMPLES
   "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
-if(POCO_STATIC)
-    message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
-    if(POCO_VERBOSE_MESSAGES)
-	message(STATUS "Building static libraries")
-    endif()
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-    if(POCO_VERBOSE_MESSAGES)
-	message(STATUS "Building dynamic libraries")
-    endif()
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
 
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
