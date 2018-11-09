@@ -51,7 +51,7 @@ public:
 	void testInsertBulkCopyIn();
 	void testInsertComplexBulkCopyIn();
 	void testInsertComplexListBulkCopyIn();
-    void testInsertComplexDequeBulkCopyIn();
+	void testInsertComplexDequeBulkCopyIn();
 
 	void testLimit();
 	void testLimitOnce();

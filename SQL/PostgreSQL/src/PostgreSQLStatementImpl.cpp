@@ -143,8 +143,8 @@ void PostgreSQLStatementImpl::bindImpl()
 
 	for (; it != itEnd && (*it)->canBind(); ++it)
 	{
-        if ((*it)->isBulk())
-            (*it)->setBinder(_pBulkBinder);
+		if ((*it)->isBulk())
+			(*it)->setBinder(_pBulkBinder);
 
 		(*it)->bind(position);
 		position += (*it)->numOfColumnsHandled();
@@ -153,7 +153,7 @@ void PostgreSQLStatementImpl::bindImpl()
 	_pBinder->updateBindVectorToCurrentValues();
 
 	_statementExecutor.bindParams(_pBinder->bindVector());
-    _statementExecutor.bindBulkParams(_pBulkBinder->bindVector());
+	_statementExecutor.bindBulkParams(_pBulkBinder->bindVector());
 
 	_statementExecutor.execute();
 

@@ -230,37 +230,37 @@ public:
 	virtual void bind(std::size_t pos, const std::list<std::string>& val, Direction dir = PD_IN);
 
 	template <class T>
-    void bind(std::size_t pos, const std::vector<T>& val, Direction dir = PD_IN)
-    {
-        poco_assert(dir == PD_IN);
+	void bind(std::size_t pos, const std::vector<T>& val, Direction dir = PD_IN)
+	{
+		poco_assert(dir == PD_IN);
 
 		typename std::vector<T>::iterator first = const_cast<std::vector<T> &>(val).begin();
 		typename std::vector<T>::iterator last = const_cast<std::vector<T> &>(val).end();
 
 		realContainerBind<typename std::vector<T>::iterator, T>(pos, first, last);
-    }
+	}
 
-    template <class T>
-    void bind(std::size_t pos, const std::deque<T>& val, Direction dir = PD_IN)
-    {
-        poco_assert(dir == PD_IN);
+	template <class T>
+	void bind(std::size_t pos, const std::deque<T>& val, Direction dir = PD_IN)
+	{
+		poco_assert(dir == PD_IN);
 
-        typename std::deque<T>::iterator first = const_cast<std::deque<T> &>(val).begin();
-        typename std::deque<T>::iterator last = const_cast<std::deque<T> &>(val).end();
+		typename std::deque<T>::iterator first = const_cast<std::deque<T> &>(val).begin();
+		typename std::deque<T>::iterator last = const_cast<std::deque<T> &>(val).end();
 
-        realContainerBind<typename std::deque<T>::iterator, T>(pos, first, last);
-    }
+		realContainerBind<typename std::deque<T>::iterator, T>(pos, first, last);
+	}
 
-    template <class T>
-    void bind(std::size_t pos, const std::list<T>& val, Direction dir = PD_IN)
-    {
-        poco_assert(dir == PD_IN);
+	template <class T>
+	void bind(std::size_t pos, const std::list<T>& val, Direction dir = PD_IN)
+	{
+		poco_assert(dir == PD_IN);
 
-        typename std::list<T>::iterator first = const_cast<std::list<T> &>(val).begin();
-        typename std::list<T>::iterator last = const_cast<std::list<T> &>(val).end();
+		typename std::list<T>::iterator first = const_cast<std::list<T> &>(val).begin();
+		typename std::list<T>::iterator last = const_cast<std::list<T> &>(val).end();
 
-        realContainerBind<typename std::list<T>::iterator, T>(pos, first, last);
-    }
+		realContainerBind<typename std::list<T>::iterator, T>(pos, first, last);
+	}
 
 	std::size_t size() const;
 		/// Return count of bound parameters
@@ -285,55 +285,55 @@ private:
 	void realBind(std::size_t aPosition, Poco::SQL::MetaColumn::ColumnDataType aFieldType, const void* aBufferPtr, std::size_t aLength);
 		/// Common bind implementation
 
-    template <class Iterator, class T>
-    void realContainerBind(std::size_t pos, Iterator first, Iterator last)
-    {
-        try
-        {
-            std::string preparedString = "";
-            Iterator begin = first;
+	template <class Iterator, class T>
+	void realContainerBind(std::size_t pos, Iterator first, Iterator last)
+	{
+		try
+		{
+			std::string preparedString = "";
+			Iterator begin = first;
 
-            for (; first != last; ++first) {
-                if (first != begin)
-                    preparedString.append(1, '\n');
+			for (; first != last; ++first) {
+				if (first != begin)
+					preparedString.append(1, '\n');
 
-                Binder::Ptr tmpBinder = new Binder();
+				Binder::Ptr tmpBinder = new Binder();
 
-                std::size_t pos = 0;
+				std::size_t pos = 0;
 
-                AbstractBinding::Ptr tmpBind = new Binding<T>(*first);
-                tmpBind->setBinder(tmpBinder);
-                tmpBind->bind(pos);
-                tmpBinder->updateBindVectorToCurrentValues();
+				AbstractBinding::Ptr tmpBind = new Binding<T>(*first);
+				tmpBind->setBinder(tmpBinder);
+				tmpBind->bind(pos);
+				tmpBinder->updateBindVectorToCurrentValues();
 
-                InputParameterVector params = tmpBinder->bindVector();
+				InputParameterVector params = tmpBinder->bindVector();
 
-                InputParameterVector::const_iterator paramsIt = params.cbegin();
-                InputParameterVector::const_iterator ParamsItEnd = params.cend();
+				InputParameterVector::const_iterator paramsIt = params.cbegin();
+				InputParameterVector::const_iterator ParamsItEnd = params.cend();
 
-                for (; paramsIt != ParamsItEnd; ++paramsIt) {
-                    if (paramsIt != params.cbegin())
-                        preparedString.append(1, '\t');
+				for (; paramsIt != ParamsItEnd; ++paramsIt) {
+					if (paramsIt != params.cbegin())
+						preparedString.append(1, '\t');
 
-                    preparedString.append(static_cast<const char*>(paramsIt->pInternalRepresentation()));
-                }
-            }
+					preparedString.append(static_cast<const char*>(paramsIt->pInternalRepresentation()));
+				}
+			}
 
-            InputParameter inputParameter(Poco::SQL::MetaColumn::FDT_STRING, nullptr, 0);
-            inputParameter.setStringVersionRepresentation(preparedString);
+			InputParameter inputParameter(Poco::SQL::MetaColumn::FDT_STRING, nullptr, 0);
+			inputParameter.setStringVersionRepresentation(preparedString);
 
-            if (pos >= _bindVector.size())
-            {
-                _bindVector.resize(pos + 1);
-            }
+			if (pos >= _bindVector.size())
+			{
+				_bindVector.resize(pos + 1);
+			}
 
-            _bindVector[pos] = inputParameter;
-        }
-        catch (std::bad_alloc&)
-        {
-            PostgreSQLException("Memory allocation error while binding");
-        }
-    }
+			_bindVector[pos] = inputParameter;
+		}
+		catch (std::bad_alloc&)
+		{
+			PostgreSQLException("Memory allocation error while binding");
+		}
+	}
 
 private:
 
