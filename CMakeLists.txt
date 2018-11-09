@@ -61,20 +61,6 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW))
-	find_package(OpenSSL REQUIRED)
-else()
-	find_package(OpenSSL)
-endif()
-
-if(OPENSSL_FOUND)
-	option(POCO_ENABLE_NETSSL "Enable NetSSL" ON)
-	option(POCO_ENABLE_CRYPTO "Enable Crypto" ON)
-else()
-	option(POCO_ENABLE_NETSSL "Enable NetSSL" OFF)
-	option(POCO_ENABLE_CRYPTO "Enable Crypto" OFF)
-endif()
-
 if(POCO_ENABLE_APACHECONNECTOR)
     find_package(APR REQUIRED)
     find_package(Apache2 REQUIRED)
@@ -193,6 +179,20 @@ if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE
 	endforeach()
 	list(APPEND OPENSSL_ROOT_DIR ${INTERNAL_OPENSSL_LIBRARIES})
 endif(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
+
+if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW))
+	find_package(OpenSSL REQUIRED)
+else()
+	find_package(OpenSSL)
+endif()
+
+if(OPENSSL_FOUND)
+	option(POCO_ENABLE_NETSSL "Enable NetSSL" ON)
+	option(POCO_ENABLE_CRYPTO "Enable Crypto" ON)
+else()
+	option(POCO_ENABLE_NETSSL "Enable NetSSL" OFF)
+	option(POCO_ENABLE_CRYPTO "Enable Crypto" OFF)
+endif()
 
 if(WIN32)
     option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)
