@@ -44,8 +44,9 @@ const std::string SessionImpl::MYSQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) : 
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
+	_connector("MySQL"),
 	_handle(0),
 	_connected(false),
 	_inTransaction(false)
@@ -70,7 +71,7 @@ void SessionImpl::open(const std::string& connect)
 	poco_assert_dbg (!connectionString().empty());
 
 	_handle.init();
-	
+
 	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 	_handle.options(MYSQL_OPT_CONNECT_TIMEOUT, timeout);
 
@@ -88,7 +89,7 @@ void SessionImpl::open(const std::string& connect)
 	options["character-set"] = "utf8";
 
 	const std::string& connString = connectionString();
-	for (std::string::const_iterator start = connString.begin();;) 
+	for (std::string::const_iterator start = connString.begin();;)
 	{
 		std::string::const_iterator finish = std::find(start, connString.end(), ';');
 		std::string::const_iterator middle = std::find(start, finish, '=');
@@ -101,7 +102,7 @@ void SessionImpl::open(const std::string& connect)
 		if ((finish == connString.end()) || (finish + 1 == connString.end())) break;
 
 		start = finish + 1;
-	} 
+	}
 
 	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
@@ -139,30 +140,30 @@ void SessionImpl::open(const std::string& connect)
 		_handle.options(MYSQL_SET_CHARSET_NAME, options["character-set"].c_str());
 
 	// Real connect
-	_handle.connect(options["host"].c_str(), 
-			options["user"].c_str(), 
-			options["password"].c_str(), 
-			db, 
+	_handle.connect(options["host"].c_str(),
+			options["user"].c_str(),
+			options["password"].c_str(),
+			db,
 			port);
 
-	addFeature("autoCommit", 
-		&SessionImpl::autoCommit, 
+	addFeature("autoCommit",
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
 	_connected = true;
 }
-	
+
 
 SessionImpl::~SessionImpl()
 {
 	close();
 }
-	
+
 
 Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	return new MySQLStatementImpl(*this);
-}	
+}
 
 
 void SessionImpl::begin()
@@ -182,7 +183,7 @@ void SessionImpl::commit()
 	_handle.commit();
 	_inTransaction = false;
 }
-	
+
 
 void SessionImpl::rollback()
 {
@@ -254,7 +255,7 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 		Session::TRANSACTION_REPEATABLE_READ == ti ||
 		Session::TRANSACTION_SERIALIZABLE == ti;
 }
-	
+
 
 void SessionImpl::close()
 {
