@@ -1939,13 +1939,13 @@ void SQLiteTest::testInternalExtraction()
 	assertTrue (3 == rset2.columnCount());
 	assertTrue (4 == rset2.rowCount());
 
-	Int32 a = rset.value<Int64>(0,2);
+	Int32 a = static_cast<Int32>(rset.value<Int64>(0,2));
 	assertTrue (3 == a);
 
 	int c = rset2.value(0);
 	assertTrue (1 == c);
 
-	Int32 b = rset2.value<Int64>("InT0",2);
+	Int32 b = static_cast<Int32>(rset2.value<Int64>("InT0",2));
 	assertTrue (3 == b);
 
 	double d = rset.value<double>(1,0);
@@ -2517,7 +2517,7 @@ void SQLiteTest::testBindingCount()
 	tmp << "CREATE TABLE Ints (int0 INTEGER, int1 INTEGER, int2 INTEGER)", now;
 
 	try { tmp << "INSERT INTO Ints VALUES (?,?,?)", bind(42), bind(42), now; fail("must fail"); }
-	catch (ParameterCountMismatchException& ex) { }
+	catch (ParameterCountMismatchException&) { }
 }
 
 
@@ -2880,6 +2880,7 @@ void SQLiteTest::testNotifier()
 	session << "INSERT INTO PERSON VALUES('Simpson', 'Homer', 'Springfield', 42)", now;
 	assertTrue (_insertCounter == 3);
 	assertTrue (notifier.getRow() == 3);
+	assertTrue (notifier.getTable() == "Person");
 
 	session << "UPDATE PERSON SET Age = 11 WHERE FirstName = 'Bart'", now;
 	assertTrue (_updateCounter == 1);
@@ -2935,7 +2936,7 @@ void SQLiteTest::testNotifier()
 void SQLiteTest::onInsert(const void* pSender)
 {
 	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
-	std::cout << "onInsert, row:" << pN->getRow() << std::endl;
+	std::cout << "onInsert, table:" << pN->getTable() << ", row:" << pN->getRow() << std::endl;
 	++_insertCounter;
 }
 
@@ -2943,7 +2944,7 @@ void SQLiteTest::onInsert(const void* pSender)
 void SQLiteTest::onUpdate(const void* pSender)
 {
 	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
-	std::cout << "onUpdate, row:" << pN->getRow() << std::endl;
+	std::cout << "onUpdate, table:" << pN->getTable() << ", row:" << pN->getRow() << std::endl;
 	++_updateCounter;
 }
 
@@ -2951,7 +2952,7 @@ void SQLiteTest::onUpdate(const void* pSender)
 void SQLiteTest::onDelete(const void* pSender)
 {
 	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
-	std::cout << "onDelete, row:" << pN->getRow() << std::endl;
+	std::cout << "onDelete, table:" << pN->getTable() << ", row:" << pN->getRow() << std::endl;
 	++_deleteCounter;
 }
 
@@ -2959,7 +2960,7 @@ void SQLiteTest::onDelete(const void* pSender)
 void SQLiteTest::onCommit(const void* pSender)
 {
 	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
-	std::cout << "onCommit, row:" << pN->getRow() << std::endl;
+	std::cout << "onCommit, table:" << pN->getTable() << ", row:" << pN->getRow() << std::endl;
 	++_commitCounter;
 }
 
@@ -2967,7 +2968,7 @@ void SQLiteTest::onCommit(const void* pSender)
 void SQLiteTest::onRollback(const void* pSender)
 {
 	Notifier* pN = reinterpret_cast<Notifier*>(const_cast<void*>(pSender));
-	std::cout << "onRollback, row:" << pN->getRow() << std::endl;
+	std::cout << "onRollback, table:" << pN->getTable() << ", row:" << pN->getRow() << std::endl;
 	++_rollbackCounter;
 }
 
