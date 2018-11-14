@@ -257,6 +257,13 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 }
 
 
+void SessionImpl::resetConnection()
+{
+	if (_connected)
+		_handle.resetConnection();
+}
+
+
 void SessionImpl::close()
 {
 	if (_connected)

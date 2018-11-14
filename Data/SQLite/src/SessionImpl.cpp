@@ -190,6 +190,12 @@ void SessionImpl::close()
 }
 
 
+void SessionImpl::resetConnection()
+{
+
+}
+
+
 bool SessionImpl::isConnected() const
 {
 	return _connected;

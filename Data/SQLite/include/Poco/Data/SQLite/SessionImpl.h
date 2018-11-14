@@ -68,6 +68,9 @@ public:
 	void close();
 		/// Closes the session.
 
+	void resetConnection();
+		/// Do nothing
+
 	bool isConnected() const;
 		/// Returns true if connected, false otherwise.
 

@@ -176,4 +176,11 @@ void SessionHandle::rollback()
 }
 
 
+void SessionHandle::resetConnection()
+{
+	if (mysql_reset_connection(_pHandle) != 0)
+		throw TransactionException("Reset connection failed.", _pHandle);
+}
+
+
 }}} // Poco::Data::MySQL
