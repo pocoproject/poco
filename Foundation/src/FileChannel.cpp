@@ -85,23 +85,8 @@ FileChannel::~FileChannel()
 void FileChannel::open()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
-	if (!_pFile)
-	{
-		_pFile = new LogFile(_path);
-		if (_rotateOnOpen && _pFile->size() > 0)
-		{
-			try
-			{
-				_pFile = _pArchiveStrategy->archive(_pFile);
-				purge();
-			}
-			catch (...)
-			{
-				_pFile = new LogFile(_path);
-			}
-		}
-	}
+
+	unsafeOpen();
 }
 
 
@@ -116,9 +101,9 @@ void FileChannel::close()
 
 void FileChannel::log(const Message& msg)
 {
-	open();
-
 	FastMutex::ScopedLock lock(_mutex);
+
+	unsafeOpen();
 
 	if (_pRotateStrategy && _pArchiveStrategy && _pRotateStrategy->mustRotate(_pFile))
 	{
@@ -139,7 +124,7 @@ void FileChannel::log(const Message& msg)
 	_pFile->write(msg.getText(), _flush);
 }
 
-	
+
 void FileChannel::setProperty(const std::string& name, const std::string& value)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -208,7 +193,7 @@ Timestamp FileChannel::creationDate() const
 		return 0;
 }
 
-	
+
 UInt64 FileChannel::size() const
 {
 	if (_pFile)
@@ -234,7 +219,7 @@ void FileChannel::setRotation(const std::string& rotation)
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
-	
+
 	RotateStrategy* pStrategy = 0;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
@@ -358,6 +343,27 @@ void FileChannel::purge()
 }
 
 
+void FileChannel::unsafeOpen()
+{
+	if (!_pFile)
+	{
+		_pFile = new LogFile(_path);
+		if (_rotateOnOpen && _pFile->size() > 0)
+		{
+			try
+			{
+				_pFile = _pArchiveStrategy->archive(_pFile);
+				purge();
+			}
+			catch (...)
+			{
+				_pFile = new LogFile(_path);
+			}
+		}
+	}
+}
+
+
 bool FileChannel::setNoPurge(const std::string& value)
 {
 	if (value.empty() || 0 == icompare(value, "none"))
@@ -385,7 +391,7 @@ int FileChannel::extractDigit(const std::string& value, std::string::const_itera
 	}
 
 	if (digit == 0)
-		throw InvalidArgumentException("Zero is not valid purge age.");	
+		throw InvalidArgumentException("Zero is not valid purge age.");
 
 	if (nextToDigit) *nextToDigit = it;
 	return digit;

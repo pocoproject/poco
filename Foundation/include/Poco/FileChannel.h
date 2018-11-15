@@ -175,13 +175,13 @@ public:
 
 	void open();
 		/// Opens the FileChannel and creates the log file if necessary.
-		
+
 	void close();
 		/// Closes the FileChannel.
 
 	void log(const Message& msg);
 		/// Logs the given message to the file.
-		
+
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given name.
 		///
@@ -215,7 +215,7 @@ public:
 
 	Timestamp creationDate() const;
 		/// Returns the log file's creation date.
-		
+
 	UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
@@ -242,6 +242,7 @@ protected:
 	void setFlush(const std::string& flush);
 	void setRotateOnOpen(const std::string& rotateOnOpen);
 	void purge();
+	void unsafeOpen();
 
 private:
 	bool setNoPurge(const std::string& value);
