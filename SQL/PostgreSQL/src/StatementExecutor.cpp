@@ -292,7 +292,8 @@ void StatementExecutor::execute()
 		InputParameterVector::const_iterator cItr		= _inputBulkParameterVector.begin();
 		InputParameterVector::const_iterator cItrEnd	= _inputBulkParameterVector.end();
 
-		for (; cItr != cItrEnd; ++cItr) {
+		for (; cItr != cItrEnd; ++cItr)
+		{
 			const char *bulkBuffer = static_cast<const char*>(cItr->pInternalRepresentation());
 			if (PQputCopyData(_sessionHandle, bulkBuffer, strlen(bulkBuffer)) != 1)
 			{

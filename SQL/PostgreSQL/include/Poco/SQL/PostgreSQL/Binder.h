@@ -293,7 +293,8 @@ private:
 			std::string preparedString = "";
 			Iterator begin = first;
 
-			for (; first != last; ++first) {
+			for (; first != last; ++first)
+			{
 				if (first != begin)
 					preparedString.append(1, '\n');
 
@@ -311,7 +312,8 @@ private:
 				InputParameterVector::const_iterator paramsIt = params.cbegin();
 				InputParameterVector::const_iterator ParamsItEnd = params.cend();
 
-				for (; paramsIt != ParamsItEnd; ++paramsIt) {
+				for (; paramsIt != ParamsItEnd; ++paramsIt)
+				{
 					if (paramsIt != params.cbegin())
 						preparedString.append(1, '\t');
 
