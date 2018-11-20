@@ -190,7 +190,7 @@ void SessionImpl::close()
 }
 
 
-void SessionImpl::resetConnection()
+void SessionImpl::reset()
 {
 
 }

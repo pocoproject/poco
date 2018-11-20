@@ -148,9 +148,9 @@ void PooledSessionImpl::close()
 }
 
 
-void PooledSessionImpl::resetConnection()
+void PooledSessionImpl::reset()
 {
-	access()->resetConnection();
+	access()->reset();
 }
 
 

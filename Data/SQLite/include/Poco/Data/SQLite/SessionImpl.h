@@ -68,7 +68,7 @@ public:
 	void close();
 		/// Closes the session.
 
-	void resetConnection();
+	void reset();
 		/// Do nothing
 
 	bool isConnected() const;
