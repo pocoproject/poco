@@ -150,6 +150,10 @@ void SessionImpl::close()
 	}
 }
 
+void SessionImpl::reset()
+{
+}
+
 
 bool SessionImpl::isConnected() const
 {
