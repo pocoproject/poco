@@ -178,7 +178,11 @@ void SessionHandle::rollback()
 
 void SessionHandle::reset()
 {
+#if ((defined (MYSQL_VERSION_ID)) && (MYSQL_VERSION_ID >= 50700)) || ((defined (MARIADB_PACKAGE_VERSION_ID)) && (MARIADB_PACKAGE_VERSION_ID >= 30000))
+	if (mysql_reset_connection(_pHandle) != 0)
+#else
 	if (mysql_refresh(_pHandle, REFRESH_TABLES | REFRESH_STATUS | REFRESH_THREADS | REFRESH_READ_LOCK) != 0)
+#endif
 		throw TransactionException("Reset connection failed.", _pHandle);
 }
 
