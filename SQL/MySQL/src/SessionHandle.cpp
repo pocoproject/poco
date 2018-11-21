@@ -178,7 +178,7 @@ void SessionHandle::rollback()
 
 void SessionHandle::reset()
 {
-	if (mysql_reset_connection(_pHandle) != 0)
+	if (mysql_refresh(_pHandle, REFRESH_TABLES | REFRESH_STATUS | REFRESH_THREADS | REFRESH_READ_LOCK) != 0)
 		throw TransactionException("Reset connection failed.", _pHandle);
 }
 
