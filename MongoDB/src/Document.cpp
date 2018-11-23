@@ -198,7 +198,7 @@ void Document::write(BinaryWriter& writer)
 	else
 	{
 		std::stringstream sstream;
-		Poco::BinaryWriter tempWriter(sstream);
+		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
 		{
 			tempWriter << static_cast<unsigned char>((*it)->type());
