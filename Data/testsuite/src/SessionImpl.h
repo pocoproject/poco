@@ -45,6 +45,9 @@ public:
 	void close();
 		/// Closes the session.
 
+	void reset();
+		/// Reset connection with dababase and clears session state, but without disconnecting
+
 	bool isConnected() const;
 		/// Returns true if session is connected to the database, 
 		/// false otherwise.

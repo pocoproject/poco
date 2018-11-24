@@ -387,6 +387,12 @@ void SessionImpl::rollback()
 }
 
 
+void SessionImpl::reset()
+{
+
+}
+
+
 void SessionImpl::close()
 {
 	if (!isConnected()) return;

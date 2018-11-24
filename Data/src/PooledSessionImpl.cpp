@@ -148,6 +148,12 @@ void PooledSessionImpl::close()
 }
 
 
+void PooledSessionImpl::reset()
+{
+	access()->reset();
+}
+
+
 const std::string& PooledSessionImpl::connectorName() const
 {
 	return access()->connectorName();

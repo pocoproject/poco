@@ -49,6 +49,10 @@ void SessionImpl::close()
 	_connected = false;
 }
 
+void SessionImpl::reset()
+{
+}
+
 
 bool SessionImpl::isConnected() const
 {

@@ -92,6 +92,9 @@ public:
 	void reconnect();
 		/// Closes the connection and opens it again.
 
+	virtual void reset() = 0;
+		/// Reset connection with dababase and clears session state, but without disconnecting
+
 	virtual void begin() = 0;
 		/// Starts a transaction.
 
