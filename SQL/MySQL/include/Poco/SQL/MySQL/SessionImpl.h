@@ -66,6 +66,9 @@ public:
 
 	void close();
 		/// Closes the connection.
+
+	void reset();
+		/// Reset connection with dababase and clears session state, but without disconnecting
 		
 	bool isConnected() const;
 		/// Returns true if connected, false otherwise.

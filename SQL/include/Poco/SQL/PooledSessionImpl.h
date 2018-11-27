@@ -51,6 +51,7 @@ public:
 	void rollback();
 	void open(const std::string& connect = "");
 	void close();
+	void reset();
 	bool isConnected() const;
 	void setConnectionTimeout(std::size_t timeout);
 	std::size_t getConnectionTimeout() const;
