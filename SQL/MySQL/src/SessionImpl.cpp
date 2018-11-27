@@ -267,6 +267,13 @@ void SessionImpl::close()
 }
 
 
+void SessionImpl::reset()
+{
+	if (_connected)
+		_handle.reset();
+}
+
+
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
 	_handle.options(MYSQL_OPT_READ_TIMEOUT, static_cast<unsigned int>(timeout));

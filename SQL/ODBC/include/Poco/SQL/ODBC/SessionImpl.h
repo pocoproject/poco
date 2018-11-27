@@ -101,6 +101,9 @@ public:
 	void rollback();
 		/// Aborts a transaction
 
+	void reset();
+		/// Do nothing
+
 	bool isTransaction() const;
 		/// Returns true iff a transaction is in progress.
 
