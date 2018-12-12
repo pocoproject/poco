@@ -19,7 +19,6 @@
 #include "Poco/Net/NetException.h"
 #include <sstream>
 
-#include <iostream>
 
 using Poco::Net::HTMLForm;
 using Poco::Net::PartSource;
