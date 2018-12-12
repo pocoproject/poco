@@ -47,6 +47,12 @@ class Net_API HTMLForm: public NameValueCollection
 	/// form fields programmatically. The default limit is 100.
 {
 public:
+	enum Options
+	{
+		OPT_USE_CONTENT_LENGTH = 0x01
+			/// Don't use Chunked Transfer-Encoding for multipart requests.
+	};
+
 	HTMLForm();
 		/// Creates an empty HTMLForm and sets the
 		/// encoding to "application/x-www-form-urlencoded".
@@ -138,7 +144,7 @@ public:
 		/// Note that read() does not clear the form before
 		/// reading the new values.
 		
-	void prepareSubmit(HTTPRequest& request);
+	void prepareSubmit(HTTPRequest& request, int options = 0);
 		/// Fills out the request object for submitting the form.
 		///
 		/// If the request method is GET, the encoded form is appended to the
@@ -151,7 +157,12 @@ public:
 		///    - the content transfer encoding is set to identity encoding
 		/// Otherwise, if the request's HTTP version is HTTP/1.1:
 		///    - the request's persistent connection state is left unchanged
-		///    - the content transfer encoding is set to chunked
+		///    - the content transfer encoding is set to chunked, unless
+		///      the OPT_USE_CONTENT_LENGTH is given in options
+		///
+		/// Note: Not using chunked transfer encoding for multipart forms
+		/// degrades performance, as the request content must be generated
+		/// twice, first to determine its size, then to actually send it.
 
 	std::streamsize calculateContentLength();
 		/// Calculate the content length for the form.
@@ -251,7 +262,6 @@ private:
 //
 // inlines
 //
-
 inline const std::string& HTMLForm::getEncoding() const
 {
 	return _encoding;
