@@ -7,12 +7,19 @@ option(POCO_VERBOSE_MESSAGES "Enable informational messages during configure" ON
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 # Read the version information from the VERSION file
 file (STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION )
-string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
-string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+.*" "\\1" CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
-string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION})
+string(REGEX REPLACE "([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION})
+string(REGEX REPLACE "[0-9]+\\.([0-9])+\\.[0-9]+.*" "\\1" PACKAGE_VERSION_MINOR ${PACKAGE_VERSION})
+string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" PACKAGE_VERSION_PATCH ${PACKAGE_VERSION})
 
-set(PROJECT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(PROJECT_VERSION ${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_PATCH})
 set(RELEASE_NAME "Unstable-trunk")
+
+option(ENABLE_PACKAGE "Enable CPack Package Install" ON)
+if(ENABLE_PACKAGE)
+    set(CPACK_PACKAGE_VERSION_MAJOR ${PACKAGE_VERSION_MAJOR})
+    set(CPACK_PACKAGE_VERSION_MINOR ${PACKAGE_VERSION_MINOR})
+    set(CPACK_PACKAGE_VERSION_PATCH ${PACKAGE_VERSION_PATCH})
+endif()
 
 if(POCO_VERBOSE_MESSAGES)
     message(STATUS "Poco package version: ${PROJECT_VERSION}")
@@ -473,15 +480,17 @@ add_custom_target(uninstall
 #############################################################
 # Enable packaging
 
-include(InstallRequiredSystemLibraries)
+if(ENABLE_PACKAGE)
+    include(InstallRequiredSystemLibraries)
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
-set(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
+    set(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
+    set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
 
-include(CPack)
+    include(CPack)
+endif()
 
 #############################################################
 # cmake config files
