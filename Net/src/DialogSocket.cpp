@@ -161,7 +161,7 @@ int DialogSocket::receiveStatusMessage(std::string& message)
 		while (status <= 0)
 		{
 			message += '\n';
-			status = receiveStatusLine(message, MAX_LINE_LENGTH);
+			status = receiveStatusLine(message, message.length() + MAX_LINE_LENGTH);
 		}
 	}
 	return status;
