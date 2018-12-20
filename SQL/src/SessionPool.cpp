@@ -1,7 +1,7 @@
 //
 // SessionPool.cpp
 //
-// Library: Data
+// Library: SQL
 // Package: SessionPooling
 // Module:  SessionPool
 //

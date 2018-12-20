@@ -1,7 +1,7 @@
 //
 // PooledSessionHolder.cpp
 //
-// Library: Data
+// Library: SQL
 // Package: SessionPooling
 // Module:  PooledSessionHolder
 //

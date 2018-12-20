@@ -1,7 +1,7 @@
 //
 // Binder.h
 //
-// Library: Data/SQLite
+// Library: SQL/SQLite
 // Package: SQLite
 // Module:  Binder
 //

@@ -1,7 +1,7 @@
 //
 // SQLiteException.cpp
 //
-// Library: Data/SQLite
+// Library: SQL/SQLite
 // Package: SQLite
 // Module:  SQLiteException
 //
