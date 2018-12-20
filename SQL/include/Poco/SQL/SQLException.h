@@ -1,8 +1,8 @@
 //
 // SQLException.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  SQLException
 //
 // Definition of the SQLException class.

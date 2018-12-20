@@ -1,8 +1,8 @@
 //
 // AutoTransaction.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AutoTransaction
 //
 // Forward header for the Transaction class.

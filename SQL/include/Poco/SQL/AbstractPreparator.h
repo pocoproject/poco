@@ -1,8 +1,8 @@
 //
 // AbstractPreparator.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AbstractPreparator
 //
 // Definition of the AbstractPreparator class.

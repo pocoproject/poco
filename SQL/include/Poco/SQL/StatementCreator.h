@@ -1,8 +1,8 @@
 //
 // StatementCreator.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  StatementCreator
 //
 // Definition of the StatementCreator class.
