@@ -25,7 +25,7 @@ target_link_libraries(Crypto-testrunner PUBLIC Poco::NetSSL Poco::XML Poco::CppU
 
 if(NOT "${INTERNAL_OPENSSL_PATH}" STREQUAL "")
   message(STATUS "---${INTERNAL_OPENSSL_PATH}")
-	set_tests_properties(Crypto PROPERTIES  ENVIRONMENT ${INTERNAL_OPENSSL_PATH})
+	set_tests_properties(Crypto PROPERTIES  ENVIRONMENT "${INTERNAL_OPENSSL_PATH}")
 endif()
 
 if(UNIX AND NOT ANDROID)

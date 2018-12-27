@@ -31,5 +31,5 @@ target_link_libraries(NetSSL-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML
 
 if(NOT "${INTERNAL_OPENSSL_PATH}" STREQUAL "")
   message(STATUS "---${INTERNAL_OPENSSL_PATH}")
-	set_tests_properties(NetSSL PROPERTIES  ENVIRONMENT ${INTERNAL_OPENSSL_PATH})
+	set_tests_properties(NetSSL PROPERTIES  ENVIRONMENT "${INTERNAL_OPENSSL_PATH}")
 endif()
