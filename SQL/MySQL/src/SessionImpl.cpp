@@ -46,6 +46,7 @@ const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::SQL::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
+	_connector("MySQL"),
 	_handle(0),
 	_connected(false),
 	_inTransaction(false)
@@ -70,7 +71,7 @@ void SessionImpl::open(const std::string& connect)
 	poco_assert_dbg (!connectionString().empty());
 
 	_handle.init();
-	
+
 	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 	_handle.options(MYSQL_OPT_CONNECT_TIMEOUT, timeout);
 
@@ -254,7 +255,7 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 		Session::TRANSACTION_REPEATABLE_READ == ti ||
 		Session::TRANSACTION_SERIALIZABLE == ti;
 }
-	
+
 
 void SessionImpl::close()
 {
@@ -263,6 +264,13 @@ void SessionImpl::close()
 		_handle.close();
 		_connected = false;
 	}
+}
+
+
+void SessionImpl::reset()
+{
+	if (_connected)
+		_handle.reset();
 }
 
 
