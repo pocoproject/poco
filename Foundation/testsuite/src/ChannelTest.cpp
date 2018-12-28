@@ -69,16 +69,16 @@ void ChannelTest::testSplitter()
 
 void ChannelTest::testAsync()
 {
-/*	AutoPtr<TestChannel> pChannel = new TestChannel;
-#if POCO_OS != POCO_OS_WINDOWS_CE
-	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel); // FIXME It is crashing here on windows!
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+#ifndef POCO_OS_FAMILY_WINDOWS
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel); // FIXME It is crashing here on Windows!
 	pAsync->open();
 	Message msg;
 	pAsync->log(msg);
 	pAsync->log(msg);
 	pAsync->close();
 	assertTrue (pChannel->list().size() == 2);
-#endif*/
+#endif
 }
 
 
