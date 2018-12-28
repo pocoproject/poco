@@ -28,9 +28,7 @@ if(ANDROID)
 	   COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;${CMAKE_BINARY_DIR}/bin/TestApp;${CMAKE_BINARY_DIR}/bin/TestLibrary$<$<CONFIG:Debug>:d>.so" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Foundation-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
 else()
 	add_test(NAME Foundation WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND Foundation-testrunner -all)
-	if(WIN32)
-		set_tests_properties(Foundation PROPERTIES ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
-	elseif(UNIX)
+	if(UNIX)
 		set_tests_properties(Foundation PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
 	endif()
     # The test is run in the runtime directory. So the test data is copied there too
