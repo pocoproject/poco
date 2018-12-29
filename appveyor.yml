@@ -417,7 +417,7 @@ build_script:
         $defs+=" -DCMAKE_BUILD_TYPE=Debug";
         $defs+=" -DPOCO_ENABLE_PDF=OFF";
         $defs+=" -DPOCO_ENABLE_NETSSL=ON";
-        $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
+        $defs+=" -DPOCO_ENABLE_NETSSL_WIN=OFF"; # TODO(BJoe) Switch on
         $defs+=" -DPOCO_ENABLE_SQL_MYSQL=OFF";
         $defs+=" -DPOCO_ENABLE_REDIS=OFF";
         $defs+=" -DPOCO_ENABLE_SAMPLES=ON";
@@ -456,7 +456,6 @@ before_test:
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class PathTest>.testFind,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,';
-      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ChannelTest>.testAsync>,';
 
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
