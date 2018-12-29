@@ -273,9 +273,6 @@ endif()
 
 if(POCO_ENABLE_NETSSL_WIN)
     set(POCO_ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-    if(POCO_ENABLE_TESTS)
-	set(POCO_ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-    endif()
 endif()
 
 if(POCO_ENABLE_NETSSL)
