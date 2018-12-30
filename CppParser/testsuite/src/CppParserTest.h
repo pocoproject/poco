@@ -26,11 +26,15 @@ public:
 
 	void testParseDir();
 	void testExtractName();
+	void testNumberLiterals();
 
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
+
+protected:
+	void testNumberLiteral(const std::string& literal);
 
 private:
 };
