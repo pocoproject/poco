@@ -91,7 +91,7 @@ void Utility::detectPrefixAndIncludes(const std::string& origHFile, std::vector<
 			++itTmp;
 			std::string defValue = *itTmp;
 			istr >> x;
-			// now find the corresponsing #define
+			// now find the corresponding #define
 			while (x.find(defValue) == std::string::npos)
 				istr >> x;
 			 //now parse until a class def is found without a ; at the end

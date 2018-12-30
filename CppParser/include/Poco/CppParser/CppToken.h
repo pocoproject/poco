@@ -244,7 +244,6 @@ public:
 	Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-
 	int asInteger() const;
 	double asFloat() const;
 
