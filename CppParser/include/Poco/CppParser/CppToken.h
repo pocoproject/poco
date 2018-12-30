@@ -247,6 +247,12 @@ public:
 	int asInteger() const;
 	double asFloat() const;
 	
+protected:
+	void finishHex(std::istream& istr, int next);
+	void finishBin(std::istream& istr, int next);
+	void finishExp(std::istream& istr, int next);
+	void finishSuffix(std::istream& istr, int next);
+
 private:
 	bool _isFloat;
 };
