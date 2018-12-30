@@ -144,20 +144,27 @@ protected:
 		Application::defineOptions(options);
 
 		options.addOption(
-			Option("help", "h", "display help information on command line arguments")
+			Option("help", "h", "Display help information on command line arguments.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleHelp)));
 
 		options.addOption(
-			Option("config-file", "f", "load configuration data from a file")
+			Option("config", "f", "Load configuration data from a file.")
 				.required(false)
 				.repeatable(true)
 				.argument("file")
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleConfig)));
 
 		options.addOption(
-			Option("eclipse", "e", "write Eclipse TOC file")
+			Option("define", "D", "Define a configuration property.")
+				.required(false)
+				.repeatable(true)
+				.argument("name=value")
+				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleDefine)));
+
+		options.addOption(
+			Option("eclipse", "e", "Write Eclipse TOC file.")
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<PocoDocApp>(this, &PocoDocApp::handleEclipse)));
@@ -168,6 +175,25 @@ protected:
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
+	}
+
+	void handleDefine(const std::string& name, const std::string& value)
+	{
+		defineProperty(value);
+	}
+
+	void defineProperty(const std::string& def)
+	{
+		std::string name;
+		std::string value;
+		std::string::size_type pos = def.find('=');
+		if (pos != std::string::npos)
+		{
+			name.assign(def, 0, pos);
+			value.assign(def, pos + 1, def.length() - pos);
+		}
+		else name = def;
+		config().setString(name, value);
 	}
 
 	void handleEclipse(const std::string& name, const std::string& value)
@@ -185,7 +211,7 @@ protected:
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
 		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("Applied Informatics' super duper documentation builder.");
+		helpFormatter.setHeader("POCO C++ Libraries documentation builder.");
 		helpFormatter.format(std::cout);
 	}
 
@@ -254,6 +280,11 @@ protected:
 
 		logger().debug("exec " + exec);
 		logger().debug("path " + path);
+        for (int no = 0; no < args.size(); ++no)
+        {
+            logger().debug("arg " + args[no]);
+        }
+
 
 		if (usePipe)
 		{
@@ -272,7 +303,11 @@ protected:
 	void parse(const std::string& file)
 	{
 		logger().information("Preprocessing " + file);
+#ifndef POCO_ENABLE_CPP11
+		std::auto_ptr<Preprocessor> pPreProc(preprocess(file));
+#else
 		std::unique_ptr<Preprocessor> pPreProc(preprocess(file));
+#endif // POCO_ENABLE_CPP11
 		logger().information("Parsing " + file);
 		if (pPreProc->stream().good())
 		{
