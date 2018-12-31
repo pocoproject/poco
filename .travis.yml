@@ -246,7 +246,7 @@ matrix:
         - export POCO_BASE=`pwd`
         - type cmake
         - type ctest
-        - cmake -Hpoco -Bcmake-build --config Debug -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON .. && cmake --build cmake-build -- -j2 && sudo /usr/local/cmake-3.9.2/bin/ctest -VV
+        - cmake -H$POCO_BASE -Bcmake-build --config Debug -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON && cmake --build cmake-build -- -j2 && sudo /usr/local/cmake-3.9.2/bin/ctest -VV
 
 
     - env:    test="4.0 x86 (make) bundled"
