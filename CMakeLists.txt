@@ -61,6 +61,42 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
+if(POCO_STATIC)
+	message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
+	if(POCO_VERBOSE_MESSAGES)
+		message(STATUS "Building static libraries")
+	endif()
+	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+	if(POCO_VERBOSE_MESSAGES)
+		message(STATUS "Building dynamic libraries")
+	endif()
+	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
+
+if(MSVC)
+    option(POCO_MT
+      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
+
+    option(POCO_ENABLE_MSVC_MP
+      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
+
+
+    # allow disabling of internally built OpenSSL# (see below for details)
+    # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
+    # the internal OpenSSL build will be used
+    option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
+
+    
+    if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW)))
+      include(UseEmbeddedOpenSSL)
+    endif()
+endif()
+
+if(WIN32)
+    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)
+endif()
+
 if(POCO_ENABLE_NETSSL OR POCO_ENABLE_CRYPTO OR (POCO_ENABLE_SQL_MYSQL AND MINGW))
 	find_package(OpenSSL REQUIRED)
 else()
@@ -153,69 +189,13 @@ option(POCO_ENABLE_WSTRING "Enable std::wstring support" ON)
 option(POCO_ENABLE_FPENVIRONMENT "Enable floating-point support" ON)
 option(POCO_ENABLE_CPPUNIT "Enable CppUnit" ON)
 
-# allow disabling of internally built OpenSSL# (see below for details)
-# if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
-# the internal OpenSSL build will be used
-option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
-
-if(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-    set(OPENSSL_ROOT_DIR "${PROJECT_SOURCE_DIR}/openssl/build/")
-    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
-	set(_MSVC_ARCH "64")
-    else()
-	set(_MSVC_ARCH "32")
-    endif()
-    if(BUILD_SHARED_LIBS)
-	set(_LIB_DIR "bin")
-    else()
-	set(OPENSSL_MSVC_STATIC_RT TRUE)
-	set(_LIB_DIR "lib")
-	endif()
-	set(INTERNAL_OPENSSL_LIBRARY_DIR "${PROJECT_SOURCE_DIR}/openssl/build/win${_MSVC_ARCH}/${_LIB_DIR}")
-	set(INTERNAL_OPENSSL_LIBRARIES "${INTERNAL_OPENSSL_LIBRARY_DIR}/debug/")
-	list(APPEND INTERNAL_OPENSSL_LIBRARIES "${INTERNAL_OPENSSL_LIBRARY_DIR}/release/")
-	foreach(_OSSL_PATH ${INTERNAL_OPENSSL_LIBRARIES})
-		string(REPLACE "/" "\\" _OSSL_PATH ${_OSSL_PATH})
-		string(APPEND INTERNAL_OPENSSL_PATH ${_OSSL_PATH} "\;")
-	endforeach()
-	list(APPEND OPENSSL_ROOT_DIR ${INTERNAL_OPENSSL_LIBRARIES})
-endif(MSVC AND (EXISTS "${PROJECT_SOURCE_DIR}/openssl/build/") AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-
-if(WIN32)
-    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" ON)
-else()
-    option(POCO_ENABLE_NETSSL_WIN "NetSSL Windows" OFF)
-endif()
-
 option(POCO_ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
 option(POCO_ENABLE_SAMPLES
   "Set to OFF|ON (default is OFF) to control build of POCO samples" OFF)
-if(POCO_STATIC)
-    message(DEPRECATION "POCO_STATIC is deprecated and will be removed! Use BUILD_SHARED_LIBS instead")
-    if(POCO_VERBOSE_MESSAGES)
-	message(STATUS "Building static libraries")
-    endif()
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-    if(POCO_VERBOSE_MESSAGES)
-	message(STATUS "Building dynamic libraries")
-    endif()
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
-
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
-
-if(MSVC)
-    option(POCO_MT
-      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
-
-    option(POCO_ENABLE_MSVC_MP
-      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
-endif()
-
 
 if(POCO_ENABLE_TESTS)
   option(POCO_ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
@@ -293,9 +273,6 @@ endif()
 
 if(POCO_ENABLE_NETSSL_WIN)
     set(POCO_ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-    if(POCO_ENABLE_TESTS)
-	set(POCO_ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-    endif()
 endif()
 
 if(POCO_ENABLE_NETSSL)
@@ -400,9 +377,6 @@ if(WIN32 AND POCO_ENABLE_NETSSL_WIN)
 endif(WIN32 AND POCO_ENABLE_NETSSL_WIN)
 
 if(OPENSSL_FOUND)
-    if(MSVC)
-        list(APPEND OPENSSL_LIBRARIES ws2_32 Crypt32) # TODO(BJoe) Is this really needed?
-    endif()
     if(POCO_ENABLE_CRYPTO)
 	 add_subdirectory(Crypto)
 	 list(APPEND Poco_COMPONENTS "Crypto")
@@ -429,7 +403,6 @@ if(POCO_ENABLE_ZIP)
 endif()
 
 if(APRUTIL_FOUND AND APACHE_FOUND AND POCO_ENABLE_APACHECONNECTOR)
-    include_directories( "${APACHE_INCLUDE_DIR}" "${APRUTIL_INCLUDE_DIR}" ) # TODO(BJoe) Use namespace target in target_link_libraries()
     add_subdirectory(ApacheConnector)
     list(APPEND Poco_COMPONENTS "ApacheConnector")
 endif()

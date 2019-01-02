@@ -242,11 +242,11 @@ matrix:
         - export CC="gcc-4.9"
         - export CXX="g++-4.9"
         - $CXX --version
-        - source ./travis/ignored.sh
-        - export POCO_BASE=`pwd`
         - type cmake
         - type ctest
-        - mkdir cmake-build && cd cmake-build && cmake --config Debug -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON .. && make -s -j2 && sudo /usr/local/cmake-3.9.2/bin/ctest -VV && cd ..
+        - source ./travis/ignored.sh
+        - export POCO_BASE=`pwd`
+        - cmake -H. -Bcmake-build -GNinja -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON && cmake --build cmake-build && cd cmake-build && sudo /usr/local/cmake-3.9.2/bin/ctest -VV && cd ..
 
 
     - env:    test="4.0 x86 (make) bundled"
