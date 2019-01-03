@@ -1,8 +1,6 @@
 //
 // NamedEvent_Android.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedEvent_Android.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent

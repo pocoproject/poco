@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 14.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetSSL_OpenSSL", "NetSSL_OpenSSL_vs140.vcxproj", "{5AECC55E-A469-11DA-8DA6-005056C00008}"
 EndProject

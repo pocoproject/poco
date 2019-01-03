@@ -1,8 +1,6 @@
 //
 // SocketNotifier.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketNotifier.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketNotifier
@@ -46,10 +44,10 @@ public:
 		/// Creates the SocketNotifier for the given socket.
 		
 	void addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
-		/// Adds the given observer. 
+		/// Adds the given observer.
 		
 	void removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
-		/// Removes the given observer. 
+		/// Removes the given observer.
 		
 	bool hasObserver(const Poco::AbstractObserver& observer) const;
 		/// Returns true if the given observer is registered.
@@ -72,10 +70,13 @@ protected:
 
 private:
 	typedef std::multiset<SocketNotification*> EventSet;
+	typedef Poco::FastMutex                    MutexType;
+	typedef MutexType::ScopedLock              ScopedLock;
 
 	EventSet                 _events;
 	Poco::NotificationCenter _nc;
 	Socket                   _socket;
+	MutexType                _mutex;
 };
 
 
@@ -84,6 +85,7 @@ private:
 //
 inline bool SocketNotifier::accepts(SocketNotification* pNotification)
 {
+	ScopedLock l(_mutex);
 	return _events.find(pNotification) != _events.end();
 }
 

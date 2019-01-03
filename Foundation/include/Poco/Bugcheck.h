@@ -1,8 +1,6 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Bugcheck
@@ -22,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include <string>
+#include <cstdlib>
 #if defined(_DEBUG)
 #	include <iostream>
 #endif
@@ -33,8 +32,8 @@ namespace Poco {
 class Foundation_API Bugcheck
 	/// This class provides some static methods that are
 	/// used by the
-	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(), 
-	/// poco_bugcheck() and poco_unexpected() macros. 
+	/// poco_assert_dbg(), poco_assert(), poco_check_ptr(),
+	/// poco_bugcheck() and poco_unexpected() macros.
 	/// You should not invoke these methods
 	/// directly. Use the macros instead, as they
 	/// automatically provide useful context information.
@@ -81,6 +80,28 @@ protected:
 //
 // useful macros (these automatically supply line number and file name)
 //
+#if defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+
+// Short-circuit these macros when under static analysis.
+// Ideally, static analysis tools should understand and reason correctly about
+// noreturn methods such as Bugcheck::bugcheck(). In practice, they don't.
+// Help them by turning these macros into std::abort() as described here:
+// https://developer.klocwork.com/documentation/en/insight/10-1/tuning-cc-analysis#Usingthe__KLOCWORK__macro
+
+#include <cstdlib> // for abort
+#define poco_assert_dbg(cond)           do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert_msg_dbg(cond, text) do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert(cond)               do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert_msg(cond, text)     do { if (!(cond)) std::abort(); } while (0)
+#define poco_check_ptr(ptr)             do { if (!(ptr)) std::abort(); } while (0)
+#define poco_bugcheck()                 do { std::abort(); } while (0)
+#define poco_bugcheck_msg(msg)          do { std::abort(); } while (0)
+
+
+#else // defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+
 #if defined(_DEBUG)
 	#define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
@@ -111,6 +132,9 @@ protected:
 
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
+
+
+#endif // defined(__KLOCWORK__) || defined(__clang_analyzer__)
 
 
 #define poco_unexpected() \
@@ -162,7 +186,7 @@ struct POCO_STATIC_ASSERTION_FAILURE<true>
 };
 
 
-template <int x> 
+template <int x>
 struct poco_static_assert_test
 {
 };

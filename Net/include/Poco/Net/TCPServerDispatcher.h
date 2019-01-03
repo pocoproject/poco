@@ -1,8 +1,6 @@
 //
 // TCPServerDispatcher.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/TCPServerDispatcher.h#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerDispatcher
@@ -102,14 +100,38 @@ private:
 	TCPServerDispatcher(const TCPServerDispatcher&);
 	TCPServerDispatcher& operator = (const TCPServerDispatcher&);
 
-	int _rc;
+	class ThreadCountWatcher
+	{
+	public:
+		ThreadCountWatcher(TCPServerDispatcher* pDisp) : _pDisp(pDisp)
+		{
+		}
+
+		~ThreadCountWatcher()
+		{
+			FastMutex::ScopedLock lock(_pDisp->_mutex);
+			if (_pDisp->_currentThreads > 1 && _pDisp->_queue.empty())
+			{
+				--_pDisp->_currentThreads;
+			}
+		}
+
+		private:
+			ThreadCountWatcher();
+			ThreadCountWatcher(const ThreadCountWatcher&);
+			ThreadCountWatcher& operator=(const ThreadCountWatcher&);
+
+			TCPServerDispatcher* _pDisp;
+	};
+
+	std::atomic<int> _rc;
 	TCPServerParams::Ptr _pParams;
-	int  _currentThreads;
-	int  _totalConnections;
-	int  _currentConnections;
-	int  _maxConcurrentConnections;
-	int  _refusedConnections;
-	bool _stopped;
+	std::atomic<int>  _currentThreads;
+	std::atomic<int>  _totalConnections;
+	std::atomic<int>  _currentConnections;
+	std::atomic<int>  _maxConcurrentConnections;
+	std::atomic<int>  _refusedConnections;
+	std::atomic<bool> _stopped;
 	Poco::NotificationQueue         _queue;
 	TCPServerConnectionFactory::Ptr _pConnectionFactory;
 	Poco::ThreadPool&               _threadPool;

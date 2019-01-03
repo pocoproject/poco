@@ -1,8 +1,6 @@
 //
 // SignalHandler.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SignalHandler.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  SignalHandler
@@ -38,7 +36,7 @@ class Foundation_API SignalHandler
 	///
 	/// The class provides a signal handler (installed with
 	/// installHandlers()) that translates certain POSIX
-	/// signals (SIGILL, SIGBUS, SIGSEGV, SIGSYS) into 
+	/// signals (SIGILL, SIGBUS, SIGSEGV, SIGSYS) into
 	/// C++ exceptions.
 	///
 	/// Internally, a stack of sigjmp_buf structs is maintained for
@@ -83,8 +81,8 @@ public:
 		/// Returns the top-most sigjmp_buf for the current thread.
 
 	static void throwSignalException(int sig);
-		/// Throws a SignalException with a textual description  
-		/// of the given signal as argument. 
+		/// Throws a SignalException with a textual description
+		/// of the given signal as argument.
 	
 	static void install();
 		/// Installs signal handlers for SIGILL, SIGBUS, SIGSEGV

@@ -1,8 +1,6 @@
 //
 // TimedNotificationQueueTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TimedNotificationQueueTest.cpp#1 $
-//
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,12 +21,12 @@ using Poco::Notification;
 using Poco::Timestamp;
 
 
-namespace 
+namespace
 {
 	class QTestNotification: public Notification
 	{
 	public:
-		QTestNotification(const std::string& rData): _data(rData)
+		QTestNotification(const std::string& data): _data(data)
 		{
 		}
 		~QTestNotification()
@@ -58,17 +56,17 @@ TimedNotificationQueueTest::~TimedNotificationQueueTest()
 void TimedNotificationQueueTest::testDequeue()
 {
 	TimedNotificationQueue queue;
-	assert (queue.empty());
-	assert (queue.size() == 0);
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
 	Notification* pNf = queue.dequeueNotification();
 	assertNullPtr(pNf);
 	queue.enqueueNotification(new Notification, Timestamp());
-	assert (!queue.empty());
-	assert (queue.size() == 1);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 1);
 	pNf = queue.dequeueNotification();
 	assertNotNullPtr(pNf);
-	assert (queue.empty());
-	assert (queue.size() == 0);
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
 	pNf->release();
 	
 	Poco::Clock ts1;
@@ -84,55 +82,55 @@ void TimedNotificationQueueTest::testDequeue()
 	queue.enqueueNotification(new QTestNotification("fourth"), ts4);
 	queue.enqueueNotification(new QTestNotification("third"), ts3);
 	queue.enqueueNotification(new QTestNotification("second"), ts2);
-	assert (!queue.empty());
-	assert (queue.size() == 4);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 4);
 	QTestNotification* pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "first");
+	assertTrue (pTNf->data() == "first");
 	pTNf->release();
-	assert (ts1.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 3);
+	assertTrue (ts1.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 3);
 	
 	pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "second");
+	assertTrue (pTNf->data() == "second");
 	pTNf->release();
-	assert (ts2.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 2);
+	assertTrue (ts2.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 2);
 	
 	pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "third");
+	assertTrue (pTNf->data() == "third");
 	pTNf->release();
-	assert (ts3.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 1);
+	assertTrue (ts3.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 1);
 	
 	pTNf = 0;
-	while (!pTNf) 
+	while (!pTNf)
 	{
 		pTNf = dynamic_cast<QTestNotification*>(queue.dequeueNotification());
 	}
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "fourth");
+	assertTrue (pTNf->data() == "fourth");
 	pTNf->release();
-	assert (ts4.elapsed() >= 0);
-	assert (queue.empty());
-	assert (queue.size() == 0);
+	assertTrue (ts4.elapsed() >= 0);
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
 
 	pNf = queue.dequeueNotification();
 	assertNullPtr(pNf);
@@ -156,39 +154,39 @@ void TimedNotificationQueueTest::testWaitDequeue()
 	queue.enqueueNotification(new QTestNotification("fourth"), ts4);
 	queue.enqueueNotification(new QTestNotification("third"), ts3);
 	queue.enqueueNotification(new QTestNotification("second"), ts2);
-	assert (!queue.empty());
-	assert (queue.size() == 4);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 4);
 	QTestNotification* pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification());
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "first");
+	assertTrue (pTNf->data() == "first");
 	pTNf->release();
-	assert (ts1.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 3);
+	assertTrue (ts1.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 3);
 	
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification());
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "second");
+	assertTrue (pTNf->data() == "second");
 	pTNf->release();
-	assert (ts2.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 2);
+	assertTrue (ts2.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 2);
 	
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification());
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "third");
+	assertTrue (pTNf->data() == "third");
 	pTNf->release();
-	assert (ts3.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 1);
+	assertTrue (ts3.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 1);
 	
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification());
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "fourth");
+	assertTrue (pTNf->data() == "fourth");
 	pTNf->release();
-	assert (ts4.elapsed() >= 0);
-	assert (queue.empty());
-	assert (queue.size() == 0);
+	assertTrue (ts4.elapsed() >= 0);
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
 }
 
 
@@ -209,43 +207,43 @@ void TimedNotificationQueueTest::testWaitDequeueTimeout()
 	queue.enqueueNotification(new QTestNotification("fourth"), ts4);
 	queue.enqueueNotification(new QTestNotification("third"), ts3);
 	queue.enqueueNotification(new QTestNotification("second"), ts2);
-	assert (!queue.empty());
-	assert (queue.size() == 4);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 4);
 	QTestNotification* pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification(10));
 	assertNullPtr(pTNf);
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification(20));
 	assertNullPtr(pTNf);
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification(200));
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "first");
+	assertTrue (pTNf->data() == "first");
 	pTNf->release();
-	assert (ts1.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 3);
+	assertTrue (ts1.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 3);
 	
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification(220));
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "second");
+	assertTrue (pTNf->data() == "second");
 	pTNf->release();
-	assert (ts2.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 2);
+	assertTrue (ts2.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 2);
 	
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification(220));
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "third");
+	assertTrue (pTNf->data() == "third");
 	pTNf->release();
-	assert (ts3.elapsed() >= 0);
-	assert (!queue.empty());
-	assert (queue.size() == 1);
+	assertTrue (ts3.elapsed() >= 0);
+	assertTrue (!queue.empty());
+	assertTrue (queue.size() == 1);
 	
 	pTNf = dynamic_cast<QTestNotification*>(queue.waitDequeueNotification(220));
 	assertNotNullPtr(pTNf);
-	assert (pTNf->data() == "fourth");
+	assertTrue (pTNf->data() == "fourth");
 	pTNf->release();
-	assert (ts1.elapsed() >= 0);
-	assert (queue.empty());
-	assert (queue.size() == 0);
+	assertTrue (ts1.elapsed() >= 0);
+	assertTrue (queue.empty());
+	assertTrue (queue.size() == 0);
 }
 
 

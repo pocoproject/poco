@@ -1,8 +1,6 @@
 //
 // TimerTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/TimerTest.h#1 $
-//
 // Definition of the TimerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -35,6 +33,8 @@ public:
 	void testScheduleIntervalTimestamp();
 	void testScheduleIntervalClock();
 	void testCancel();
+	void testCancelAllStop();
+	void testCancelAllWaitStop();
 
 	void setUp();
 	void tearDown();

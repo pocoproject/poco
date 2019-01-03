@@ -1,8 +1,6 @@
 //
 // AttributesParserTest.cpp
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/AttributesParserTest.cpp#1 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -38,7 +36,7 @@ void AttributesParserTest::testParser1()
 	std::istringstream istr("");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.begin() == attrs.end());
+	assertTrue (attrs.begin() == attrs.end());
 }
 
 
@@ -48,7 +46,7 @@ void AttributesParserTest::testParser2()
 	std::istringstream istr("name=value");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.getString("name") == "value");
+	assertTrue (attrs.getString("name") == "value");
 }
 
 
@@ -58,8 +56,8 @@ void AttributesParserTest::testParser3()
 	std::istringstream istr("name=value, name2=100");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.getString("name") == "value");
-	assert (attrs.getInt("name2") == 100);
+	assertTrue (attrs.getString("name") == "value");
+	assertTrue (attrs.getInt("name2") == 100);
 }
 
 
@@ -69,9 +67,9 @@ void AttributesParserTest::testParser4()
 	std::istringstream istr("name=value, name2=100, name3");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.getString("name") == "value");
-	assert (attrs.getInt("name2") == 100);
-	assert (attrs.getBool("name3"));
+	assertTrue (attrs.getString("name") == "value");
+	assertTrue (attrs.getInt("name2") == 100);
+	assertTrue (attrs.getBool("name3"));
 }
 
 
@@ -81,9 +79,9 @@ void AttributesParserTest::testParser5()
 	std::istringstream istr("name.a=value, name.b=100, name.c");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.getString("name.a") == "value");
-	assert (attrs.getInt("name.b") == 100);
-	assert (attrs.getBool("name.c"));
+	assertTrue (attrs.getString("name.a") == "value");
+	assertTrue (attrs.getInt("name.b") == 100);
+	assertTrue (attrs.getBool("name.c"));
 }
 
 
@@ -93,9 +91,9 @@ void AttributesParserTest::testParser6()
 	std::istringstream istr("name = {a=value, b=100, c}");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.getString("name.a") == "value");
-	assert (attrs.getInt("name.b") == 100);
-	assert (attrs.getBool("name.c"));
+	assertTrue (attrs.getString("name.a") == "value");
+	assertTrue (attrs.getInt("name.b") == 100);
+	assertTrue (attrs.getBool("name.c"));
 }
 
 
@@ -105,10 +103,10 @@ void AttributesParserTest::testParser7()
 	std::istringstream istr("name = {a=value, b=100, c}, name2=\"foo\"");
 	AttributesParser parser(attrs, istr);
 	parser.parse();
-	assert (attrs.getString("name.a") == "value");
-	assert (attrs.getInt("name.b") == 100);
-	assert (attrs.getBool("name.c"));
-	assert (attrs.getString("name2") == "foo");
+	assertTrue (attrs.getString("name.a") == "value");
+	assertTrue (attrs.getInt("name.b") == 100);
+	assertTrue (attrs.getBool("name.c"));
+	assertTrue (attrs.getString("name2") == "foo");
 }
 
 

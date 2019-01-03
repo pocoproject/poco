@@ -1,8 +1,6 @@
 //
 // Timespan.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timespan.cpp#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timespan
@@ -54,11 +52,6 @@ Timespan::Timespan(int otherDays, int otherHours, int otherMinutes, int otherSec
 
 Timespan::Timespan(const Timespan& timespan):
 	_span(timespan._span)
-{
-}
-
-
-Timespan::~Timespan()
 {
 }
 

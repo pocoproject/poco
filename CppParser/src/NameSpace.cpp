@@ -1,8 +1,6 @@
 //
 // Namespace.cpp
 //
-// $Id: //poco/1.4/CppParser/src/NameSpace.cpp#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Namespace
@@ -110,7 +108,7 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 	bool currentNSInserted = true;
 
 	
-	if (head.empty()) 
+	if (head.empty())
 	{
 		alreadyVisited.insert(this);
 		return root()->lookup(tail, alreadyVisited);
@@ -136,9 +134,9 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 			pSymbol = lookup(itAlias->second, alreadyVisited);
 		else
 		{
-			for (NameSpaceVec::const_iterator it = _importedNameSpaces.begin(); !pSymbol && it != _importedNameSpaces.end(); ++it)
+			for (NameSpaceVec::const_iterator itns = _importedNameSpaces.begin(); !pSymbol && itns != _importedNameSpaces.end(); ++itns)
 			{
-				Symbol* pNS = lookup(*it, alreadyVisited);
+				Symbol* pNS = lookup(*itns, alreadyVisited);
 				if (pNS && pNS->kind() == Symbol::SYM_NAMESPACE)
 				{
 					pSymbol = static_cast<NameSpace*>(pNS)->lookup(name, alreadyVisited);
@@ -222,7 +220,7 @@ void NameSpace::splitName(const std::string& name, std::string& head, std::strin
 		head.assign(name, 0, pos);
 		pos += 2;
 		poco_assert (pos < name.length());
-		tail.assign(name, pos, name.length() - pos); 
+		tail.assign(name, pos, name.length() - pos);
 	}
 	else head = name;
 }

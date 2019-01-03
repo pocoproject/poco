@@ -1,8 +1,6 @@
 //
 // Task.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Task.cpp#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -88,6 +86,13 @@ void Task::run()
 bool Task::sleep(long milliseconds)
 {
 	return _cancelEvent.tryWait(milliseconds);
+}
+
+
+bool Task::yield()
+{
+	Thread::yield();
+	return isCancelled();
 }
 
 

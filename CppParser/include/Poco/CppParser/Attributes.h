@@ -1,8 +1,6 @@
 //
 // Attributes.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Attributes.h#2 $
-//
 // Library: CppParser
 // Package: Attributes
 // Module:  Attributes
@@ -76,7 +74,7 @@ public:
 	bool getBool(const std::string& name) const;
 		/// Returns the attribute's value as a boolean.
 		/// The returned value is 'true', iff the stored value is not "false".
-		/// 
+		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
 
 	bool getBool(const std::string& name, bool defaultValue) const;

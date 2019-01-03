@@ -1,8 +1,6 @@
 //
 // download.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/samples/download/src/download.cpp#1 $
-//
 // This sample demonstrates the URIStreamOpener class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -76,7 +74,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	// Note: we must create the passphrase handler prior Context 
+	// Note: we must create the passphrase handler prior Context
 	SharedPtr<InvalidCertificateHandler> ptrCert = new ConsoleCertificateHandler(false); // ask the user via console
 	Context::Ptr ptrContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 	SSLManager::instance().initializeClient(0, ptrCert, ptrContext);
@@ -84,7 +82,7 @@ int main(int argc, char** argv)
 	try
 	{
 		URI uri(argv[1]);
-		std::auto_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
+		std::unique_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
 		StreamCopier::copyStream(*pStr.get(), std::cout);
 	}
 	catch (Exception& exc)

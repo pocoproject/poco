@@ -1,8 +1,6 @@
 //
 // PartStore.cpp
 //
-// $Id: //poco/1.4/Net/src/PartStore.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  PartStore
@@ -29,7 +27,7 @@ namespace Net {
 //
 
 
-PartStore::PartStore(const std::string& rMediaType): PartSource(rMediaType)
+PartStore::PartStore(const std::string& mediaType): PartSource(mediaType)
 {
 }
 
@@ -44,9 +42,9 @@ PartStore::~PartStore()
 //
 
 
-FilePartStore::FilePartStore(const std::string& content, const std::string& rMediaType, const std::string& rFilename):
-	PartStore(rMediaType),
-	_filename(rFilename),
+FilePartStore::FilePartStore(const std::string& content, const std::string& mediaType, const std::string& filename):
+	PartStore(mediaType),
+	_filename(filename),
 	_path(TemporaryFile::tempName()),
 	_fstr(_path)
 {

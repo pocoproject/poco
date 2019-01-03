@@ -1,0 +1,75 @@
+#
+# Linux
+#
+# Make settings for emscripten
+#
+#
+
+#
+# General Settings
+#
+LINKMODE ?= SHARED
+POCO_TARGET_OSNAME = emscripten
+POCO_TARGET_OSARCH = asmjs
+CROSS_COMPILE      = em
+
+#
+# Define Tools
+#
+CC      = ${CROSS_COMPILE}cc
+CXX     = ${CROSS_COMPILE}++
+LINK    = $(CXX)
+LIB     = ${CROSS_COMPILE}ar rc
+RANLIB  = ${CROSS_COMPILE}ranlib
+SHLIB   = $(CXX) -shared -Wl,-soname,$(notdir $@) -o $@
+SHLIBLN = $(POCO_BASE)/build/script/shlibln
+# em++ strips by default, there is no default strip command
+STRIP   = /bin/true
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
+SHELL   = sh
+RM      = rm -rf
+CP      = cp
+MKDIR   = mkdir -p
+
+#
+# Extension for Shared Libraries
+#
+SHAREDLIBEXT     = .so.$(target_version)
+SHAREDLIBLINKEXT = .so
+
+BINEXT          = .html
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS          = -s USE_PTHREADS=1
+CFLAGS32        =
+CFLAGS64        =
+CXXFLAGS        = -Wall -Wno-sign-compare -s USE_PTHREADS=1
+CXXFLAGS32      =
+CXXFLAGS64      =
+LINKFLAGS       = -s USE_PTHREADS=1
+LINKFLAGS32     =
+LINKFLAGS64     =
+STATICOPT_CC    =
+STATICOPT_CXX   =
+STATICOPT_LINK  =
+SHAREDOPT_CC    = -fPIC
+SHAREDOPT_CXX   = -fPIC
+SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
+DEBUGOPT_CC     = -g -D_DEBUG
+DEBUGOPT_CXX    = -g -D_DEBUG
+DEBUGOPT_LINK   = -g
+RELEASEOPT_CC   = -O2 -DNDEBUG
+RELEASEOPT_CXX  = -O2 -DNDEBUG
+RELEASEOPT_LINK = -O2
+
+#
+# System Specific Flags
+#
+SYSFLAGS = -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -DPOCO_HAVE_FD_EPOLL
+
+#
+# System Specific Libraries
+#
+SYSLIBS  = -lpthread -ldl -lrt

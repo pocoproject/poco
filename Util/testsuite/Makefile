@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Util/testsuite/Makefile#1 $
-#
 # Makefile for Poco Util testsuite
 #
 
@@ -13,7 +11,7 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	HelpFormatterTest IniFileConfigurationTest LayeredConfigurationTest \
 	LoggingConfiguratorTest MapConfigurationTest \
 	OptionProcessorTest OptionSetTest OptionTest \
-	OptionsTestSuite PropertyFileConfigurationTest \
+	OptionsTestSuite PropertyFileConfigurationTest PropertyListConfigurationTest \
 	SystemConfigurationTest UtilTestSuite XMLConfigurationTest \
 	FilesystemConfigurationTest ValidatorTest \
 	TimerTestSuite TimerTest \

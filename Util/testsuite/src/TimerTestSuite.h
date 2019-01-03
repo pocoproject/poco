@@ -1,8 +1,6 @@
 //
 // TimerTestSuite.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/TimerTestSuite.h#1 $
-//
 // Definition of the TimerTestSuite class.
 //
 // Copyright (c) 2009, Applied Informatics Software Engineering GmbH.

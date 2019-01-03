@@ -1,8 +1,6 @@
 //
 // MemoryPoolTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/MemoryPoolTest.h#1 $
-//
 // Definition of the MemoryPoolTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -27,6 +25,8 @@ public:
 	~MemoryPoolTest();
 
 	void testMemoryPool();
+	void testFastMemoryPool();
+	void memoryPoolBenchmark();
 
 	void setUp();
 	void tearDown();

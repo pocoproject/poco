@@ -1,8 +1,6 @@
 //
 // Outline.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Outline.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Outline

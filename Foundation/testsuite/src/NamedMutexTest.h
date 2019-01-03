@@ -1,8 +1,6 @@
 //
 // NamedMutexTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedMutexTest.h#1 $
-//
 // Definition of the NamedMutexTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -23,11 +21,13 @@
 class NamedMutexTest: public CppUnit::TestCase
 {
 public:
+#if POCO != POCO_OS_CYGWIN
 	NamedMutexTest(const std::string& name);
 	~NamedMutexTest();
 
 	void testLock();
 	void testTryLock();
+#endif
 	
 	void setUp();
 	void tearDown();

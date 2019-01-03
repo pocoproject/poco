@@ -1,8 +1,6 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/Main/PDF/testsuite/src/Driver.cpp#1 $
-//
 // Console-based test driver for Poco PDF.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

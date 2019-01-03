@@ -1,8 +1,6 @@
 //
 // SharedMemory.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedMemory.h#2 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  SharedMemory
@@ -48,7 +46,7 @@ public:
 	};
 
 	SharedMemory();
-		/// Default constructor creates an unmapped SharedMemory object. 
+		/// Default constructor creates an unmapped SharedMemory object.
 		/// No clients can connect to an unmapped SharedMemory object.
 
 	SharedMemory(const std::string& name, std::size_t size, AccessMode mode, const void* addrHint = 0, bool server = true);
@@ -91,7 +89,7 @@ public:
 		/// Will be NULL for illegal segments.
 
 	char* end() const;
-		/// Returns the one-past-end end address of the shared memory segment. 
+		/// Returns the one-past-end end address of the shared memory segment.
 		/// Will be NULL for illegal segments.
 
 private:

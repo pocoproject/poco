@@ -1,8 +1,6 @@
 //
 // HTMLForm.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTMLForm.h#3 $
-//
 // Library: Net
 // Package: HTML
 // Module:  HTMLForm
@@ -21,7 +19,8 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/PartSource.h"
 #include <ostream>
 #include <istream>
 #include <vector>
@@ -48,6 +47,12 @@ class Net_API HTMLForm: public NameValueCollection
 	/// form fields programmatically. The default limit is 100.
 {
 public:
+	enum Options
+	{
+		OPT_USE_CONTENT_LENGTH = 0x01
+			/// Don't use Chunked Transfer-Encoding for multipart requests.
+	};
+
 	HTMLForm();
 		/// Creates an empty HTMLForm and sets the
 		/// encoding to "application/x-www-form-urlencoded".
@@ -139,7 +144,7 @@ public:
 		/// Note that read() does not clear the form before
 		/// reading the new values.
 		
-	void prepareSubmit(HTTPRequest& request);
+	void prepareSubmit(HTTPRequest& request, int options = 0);
 		/// Fills out the request object for submitting the form.
 		///
 		/// If the request method is GET, the encoded form is appended to the
@@ -152,7 +157,12 @@ public:
 		///    - the content transfer encoding is set to identity encoding
 		/// Otherwise, if the request's HTTP version is HTTP/1.1:
 		///    - the request's persistent connection state is left unchanged
-		///    - the content transfer encoding is set to chunked
+		///    - the content transfer encoding is set to chunked, unless
+		///      the OPT_USE_CONTENT_LENGTH is given in options
+		///
+		/// Note: Not using chunked transfer encoding for multipart forms
+		/// degrades performance, as the request content must be generated
+		/// twice, first to determine its size, then to actually send it.
 
 	std::streamsize calculateContentLength();
 		/// Calculate the content length for the form.
@@ -184,11 +194,46 @@ public:
 		/// Specify 0 for unlimited (not recommended).
 		///
 		/// The default limit is 100.
+		
+	void setValueLengthLimit(int limit);
+		/// Sets the maximum size for form field values
+		/// stored as strings.
+		
+	int getValueLengthLimit() const;
+		/// Returns the maximum size for form field values
+		/// stored as strings.
+
+	class Part
+	{
+	public:
+		Part(const std::string name, PartSource* pSource);
+		Part(Part&& other);
+
+		~Part();
+		const std::string& name() const;
+		const PartSource* source() const;
+		const MessageHeader& headers() const;
+		const std::string& filename() const;
+		const std::string& mediaType() const;
+		std::istream& stream();
+
+	private:
+		Part();
+		Part(const Part&);
+		Part& operator =(const Part&);
+
+		std::string _name;
+		PartSource* _pSource;
+	};
+
+	typedef std::vector<Part> PartVec;
+
+	const PartVec& getPartList() const;
 
 	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
 	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
-
 	static const int         UNKNOWN_CONTENT_LENGTH;
+	
 protected:
 	void readUrl(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
@@ -201,18 +246,13 @@ private:
 
 	enum Limits
 	{
-		DFL_FIELD_LIMIT = 100
+		DFL_FIELD_LIMIT = 100,
+		MAX_NAME_LENGTH  = 1024,
+		DFL_MAX_VALUE_LENGTH = 256*1024
 	};
-
-	struct Part
-	{
-		std::string name;
-		PartSource* pSource;
-	};
-	
-	typedef std::vector<Part> PartVec;
 	
 	int         _fieldLimit;
+	int         _valueLengthLimit;
 	std::string _encoding;
 	std::string _boundary;
 	PartVec     _parts;
@@ -237,6 +277,56 @@ inline const std::string& HTMLForm::boundary() const
 inline int HTMLForm::getFieldLimit() const
 {
 	return _fieldLimit;
+}
+
+
+inline int HTMLForm::getValueLengthLimit() const
+{
+	return _valueLengthLimit;
+}
+
+
+inline const HTMLForm::PartVec& HTMLForm::getPartList() const
+{
+	return _parts;
+}
+
+
+// HTMLForm::Part
+
+inline const std::string& HTMLForm::Part::name() const
+{
+	return _name;
+}
+
+
+inline const PartSource* HTMLForm::Part::source() const
+{
+	return _pSource;
+}
+
+
+inline const MessageHeader& HTMLForm::Part::headers() const
+{
+	return _pSource->headers();
+}
+
+
+inline const std::string& HTMLForm::Part::filename() const
+{
+	return _pSource->filename();
+}
+
+
+inline const std::string& HTMLForm::Part::mediaType() const
+{
+	return _pSource->mediaType();
+}
+
+
+inline std::istream& HTMLForm::Part::stream()
+{
+	return _pSource->stream();
 }
 
 

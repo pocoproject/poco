@@ -1,8 +1,6 @@
 //
 // HTTPBufferAllocator.cpp
 //
-// $Id: //poco/Main/template/class.cpp#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPBufferAllocator

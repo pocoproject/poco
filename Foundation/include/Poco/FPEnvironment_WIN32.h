@@ -1,8 +1,6 @@
 //
 // FPEnvironment_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -101,8 +99,9 @@ private:
 inline bool FPEnvironmentImpl::isInfiniteImpl(float value)
 {
 #ifdef __MINGW32__
-        return isfinite(value) == 0;
+	return isfinite(value) == 0;
 #else
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 #endif
 }
@@ -111,9 +110,10 @@ inline bool FPEnvironmentImpl::isInfiniteImpl(float value)
 inline bool FPEnvironmentImpl::isInfiniteImpl(double value)
 {
 #ifdef __MINGW32__
-        return isfinite(value) == 0;
+	return isfinite(value) == 0;
 #else
-        return _finite(value) == 0;
+	if (_isnan(value) != 0) return false;
+	return _finite(value) == 0;
 #endif
 }
 
@@ -121,9 +121,10 @@ inline bool FPEnvironmentImpl::isInfiniteImpl(double value)
 inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 {
 #ifdef __MINGW32__
-        return isfinite(value) == 0;
+	return isfinite(value) == 0;
 #else
-        return _finite(value) == 0;
+	if (_isnan(static_cast<double>(value)) != 0) return false;
+	return _finite(static_cast<double>(value)) == 0;
 #endif
 }
 
@@ -131,9 +132,9 @@ inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 inline bool FPEnvironmentImpl::isNaNImpl(float value)
 {
 #ifdef __MINGW32__
-        return isnan(value) != 0;
+	return isnan(value) != 0;
 #else
-        return _isnan(value) != 0;
+	return _isnan(value) != 0;
 #endif
 }
 
@@ -141,9 +142,9 @@ inline bool FPEnvironmentImpl::isNaNImpl(float value)
 inline bool FPEnvironmentImpl::isNaNImpl(double value)
 {
 #ifdef __MINGW32__
-        return isnan(value) != 0;
+	return isnan(value) != 0;
 #else
-        return _isnan(value) != 0;
+	return _isnan(value) != 0;
 #endif
 }
 
@@ -151,9 +152,9 @@ inline bool FPEnvironmentImpl::isNaNImpl(double value)
 inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 {
 #ifdef __MINGW32__
-        return isnan(value) != 0;
+	return isnan(value) != 0;
 #else
-        return _isnan(value) != 0;
+	return _isnan(static_cast<double>(value)) != 0;
 #endif
 }
 
@@ -161,9 +162,9 @@ inline bool FPEnvironmentImpl::isNaNImpl(long double value)
 inline float FPEnvironmentImpl::copySignImpl(float target, float source)
 {
 #ifdef __MINGW32__
-        return float(copysign(target, source));
+	return float(copysign(target, source));
 #else
-        return float(_copysign(target, source));
+	return float(_copysign(target, source));
 #endif
 }
 
@@ -171,9 +172,9 @@ inline float FPEnvironmentImpl::copySignImpl(float target, float source)
 inline double FPEnvironmentImpl::copySignImpl(double target, double source)
 {
 #ifdef __MINGW32__
-        return copysign(target, source);
+	return copysign(target, source);
 #else
-        return _copysign(target, source);
+	return _copysign(target, source);
 #endif
 }
 

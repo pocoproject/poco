@@ -1,8 +1,6 @@
 //
 // DocWriter.h
 //
-// $Id: //poco/1.7/PocoDoc/src/DocWriter.h#2 $
-//
 // Definition of the DocWriter class.
 //
 // Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
@@ -187,12 +185,14 @@ protected:
 	static const std::string& tr(const std::string& id);
 	static void loadStrings(const std::string& language);
 	static void loadString(const std::string& id, const std::string& def, const std::string& language);
+	static std::string projectURI(const std::string& id);
 
 	static Poco::Logger& logger();
-	
+
 	static const std::string RFC_URI;
+	static const std::string GITHUB_POCO_URI;
 	
-private:	
+private:
 	bool _prettifyCode;
 	bool _noFrames;
 	bool _htmlMode;
@@ -204,7 +204,7 @@ private:
 	bool _pendingLine;
 	int  _indent;
 	int  _titleId;
-	
+
 	static std::string _language;
 	static StringMap   _strings;
 	

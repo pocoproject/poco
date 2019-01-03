@@ -1,8 +1,6 @@
 //
 // CountingStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/CountingStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  CountingStream
@@ -20,31 +18,31 @@
 namespace Poco {
 
 
-CountingStreamBuf::CountingStreamBuf(): 
-	_pIstr(0), 
-	_pOstr(0), 
-	_chars(0), 
-	_lines(0), 
+CountingStreamBuf::CountingStreamBuf():
+	_pIstr(0),
+	_pOstr(0),
+	_chars(0),
+	_lines(0),
 	_pos(0)
 {
 }
 
 
-CountingStreamBuf::CountingStreamBuf(std::istream& istr): 
-	_pIstr(&istr), 
-	_pOstr(0), 
-	_chars(0), 
-	_lines(0), 
+CountingStreamBuf::CountingStreamBuf(std::istream& istr):
+	_pIstr(&istr),
+	_pOstr(0),
+	_chars(0),
+	_lines(0),
 	_pos(0)
 {
 }
 
 
-CountingStreamBuf::CountingStreamBuf(std::ostream& ostr): 
-	_pIstr(0), 
-	_pOstr(&ostr), 
-	_chars(0), 
-	_lines(0), 
+CountingStreamBuf::CountingStreamBuf(std::ostream& ostr):
+	_pIstr(0),
+	_pOstr(&ostr),
+	_chars(0),
+	_lines(0),
 	_pos(0)
 {
 }
@@ -96,19 +94,19 @@ void CountingStreamBuf::setCurrentLineNumber(int line)
 }
 
 
-void CountingStreamBuf::addChars(int charsToAdd)
+void CountingStreamBuf::addChars(std::streamsize charsToAdd)
 {
 	_chars += charsToAdd;
 }
 
 		
-void CountingStreamBuf::addLines(int linesToAdd)
+void CountingStreamBuf::addLines(std::streamsize linesToAdd)
 {
 	_lines += linesToAdd;
 }
 
 		
-void CountingStreamBuf::addPos(int posToAdd)
+void CountingStreamBuf::addPos(std::streamsize posToAdd)
 {
 	_pos += posToAdd;
 }
@@ -143,25 +141,25 @@ void CountingIOS::reset()
 }
 
 
-void CountingIOS::setCurrentLineNumber(int line)
+void CountingIOS::setCurrentLineNumber(std::streamsize line)
 {
 	_buf.setCurrentLineNumber(line);
 }
 
 
-void CountingIOS::addChars(int charsToAdd)
+void CountingIOS::addChars(std::streamsize charsToAdd)
 {
 	_buf.addChars(charsToAdd);
 }
 
 		
-void CountingIOS::addLines(int linesToAdd)
+void CountingIOS::addLines(std::streamsize linesToAdd)
 {
 	_buf.addLines(linesToAdd);
 }
 
 		
-void CountingIOS::addPos(int posToAdd)
+void CountingIOS::addPos(std::streamsize posToAdd)
 {
 	_buf.addPos(posToAdd);
 }

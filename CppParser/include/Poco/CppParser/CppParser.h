@@ -1,8 +1,6 @@
 //
 // CppParser.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/CppParser.h#2 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  CppParser
@@ -30,10 +28,10 @@
 // from a DLL simpler. All files within this DLL are compiled with the CppParser_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// CppParser_API functions as being imported from a DLL, wheras this DLL sees symbols
+// CppParser_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
+#if (defined(POCO_COMPILER_MSVC) || POCO_OS == POCO_OS_CYGWIN) && defined(POCO_DLL)
 	#if defined(CppParser_EXPORTS)
 		#define CppParser_API __declspec(dllexport)
 	#else
@@ -50,7 +48,7 @@
 //
 // Automatically link CppParser library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(CppParser_EXPORTS)
 		#pragma comment(lib, "PocoCppParser" POCO_LIB_SUFFIX)
 	#endif

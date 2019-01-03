@@ -1,8 +1,6 @@
 //
 // Debugger.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Debugger.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Debugger
@@ -15,6 +13,7 @@
 
 
 #include "Poco/Debugger.h"
+#include "Poco/NestedDiagnosticContext.h"
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
@@ -23,11 +22,8 @@
 #elif defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	#include <unistd.h>
 	#include <signal.h>
-#elif defined(POCO_OS_FAMILY_VMS)
-	#include <lib$routines.h>
-	#include <ssdef.h>
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
 #endif
 
@@ -62,8 +58,6 @@ bool Debugger::isAvailable()
 		return false;
 	#elif defined(POCO_OS_FAMILY_UNIX)
 		return std::getenv("POCO_ENABLE_DEBUGGER") ? true : false;
-	#elif defined(POCO_OS_FAMILY_VMS)
-		return true;
 	#endif
 #else
 	return false;
@@ -71,29 +65,26 @@ bool Debugger::isAvailable()
 }
 
 
-void Debugger::message(const std::string& msg)
+void Debugger::message(const std::string& msg, bool backTrace)
 {
 #if defined(_DEBUG)
 	std::fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
-	std::fputs(msg.c_str(), stderr);
+	std::string lmsg = msg;
+	if (backTrace) lmsg.append(1, '\n').append(NDC::backtrace(5, 1));
+	std::fputs(lmsg.c_str(), stderr);
 	std::fputs("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n", stderr);
-	#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	if (isAvailable())
 	{
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+		#if !defined(POCO_NO_WSTRING)
 		std::wstring umsg;
 		UnicodeConverter::toUTF16(msg, umsg);
 		umsg += '\n';
 		OutputDebugStringW(umsg.c_str());
-#else
-		OutputDebugStringA(msg.c_str());
-		OutputDebugStringA("\n");
-#endif
+		#endif // POCO_NO_WSTRING
 	}
-	#elif defined(POCO_OS_FAMILY_UNIX)
-	#elif defined(POCO_OS_FAMILY_VMS)
-	#endif
-#endif
+#endif // POCO_OS_FAMILY_*
+#endif // _DEBUG
 }
 
 
@@ -123,11 +114,6 @@ void Debugger::enter()
 	if (isAvailable())
 	{
 		kill(getpid(), SIGINT);
-	}
-	#elif defined(POCO_OS_FAMILY_VMS)
-	{
-		const char* cmd = "\012SHOW CALLS";
-		lib$signal(SS$_DEBUG, 1, cmd);
 	}
 	#endif
 #endif

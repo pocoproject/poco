@@ -1,8 +1,6 @@
 //
 // MediaType.cpp
 //
-// $Id: //poco/1.4/Net/src/MediaType.cpp#2 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MediaType
@@ -160,7 +158,7 @@ bool MediaType::matchesRange(const MediaType& mediaType) const
 
 bool MediaType::matchesRange(const std::string& type, const std::string& subType) const
 {
-	if (_type == "*" || type == "*" || icompare(_type, type) == 0) 
+	if (_type == "*" || type == "*" || icompare(_type, type) == 0)
 	{
 		return _subType == "*" || subType == "*" || icompare(_subType, subType) == 0;
 	}

@@ -1,8 +1,6 @@
 //
 // DynamicAny.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/DynamicAny.h#2 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Var

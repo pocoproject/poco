@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_doc_png.c
+ * << Haru Free PDF Library >> -- hpdf_doc_png.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -23,6 +26,46 @@ static HPDF_Image
 LoadPngImageFromStream (HPDF_Doc      pdf,
                         HPDF_Stream   imagedata,
                         HPDF_BOOL     delayed_loading);
+
+HPDF_EXPORT(HPDF_Image)
+HPDF_LoadPngImageFromMem  (HPDF_Doc     pdf,
+                    const HPDF_BYTE    *buffer,
+                          HPDF_UINT     size)
+{
+	HPDF_Stream imagedata;
+	HPDF_Image image;
+
+	HPDF_PTRACE ((" HPDF_LoadPngImageFromFile\n"));
+
+	if (!HPDF_HasDoc (pdf)) {
+		return NULL;
+	}
+
+	/* create file stream */
+	imagedata = HPDF_MemStream_New (pdf->mmgr, size);
+
+	if (!HPDF_Stream_Validate (imagedata)) {
+		HPDF_RaiseError (&pdf->error, HPDF_INVALID_STREAM, 0);
+		return NULL;
+	}
+
+	if (HPDF_Stream_Write (imagedata, buffer, size) != HPDF_OK) {
+		HPDF_Stream_Free (imagedata);
+		return NULL;
+	}
+
+	image = LoadPngImageFromStream (pdf, imagedata, HPDF_FALSE);
+
+	/* destroy file stream */
+	HPDF_Stream_Free (imagedata);
+
+	if (!image) {
+		HPDF_CheckError (&pdf->error);
+	}
+
+	return image;
+
+}
 
 
 HPDF_EXPORT(HPDF_Image)
@@ -81,8 +124,10 @@ HPDF_LoadPngImageFromFile2  (HPDF_Doc     pdf,
     if (imagedata)
         HPDF_Stream_Free (imagedata);
 
-    if (!image)
+    if (!image) {
         HPDF_CheckError (&pdf->error);
+        return NULL;
+    }
 
     /* add file-name to image dictionary as a hidden entry.
      * it is used when the image data is needed.
@@ -103,7 +148,7 @@ HPDF_LoadPngImageFromFile2  (HPDF_Doc     pdf,
     return image;
 }
 
-#ifndef HPDF_NOPNGLIB
+#ifndef LIBHPDF_HAVE_NOPNGLIB
 static HPDF_Image
 LoadPngImageFromStream (HPDF_Doc      pdf,
                         HPDF_Stream   imagedata,
@@ -129,9 +174,11 @@ LoadPngImageFromStream (HPDF_Doc      pdf,
                         HPDF_BOOL     delayed_loading)
 {
     HPDF_SetError (&pdf->error, HPDF_UNSUPPORTED_FUNC, 0);
+    HPDF_UNUSED (delayed_loading);
+    HPDF_UNUSED (imagedata);
 
     return NULL;
 }
 
-#endif /* HPDF_NOPNGLIB */
+#endif /* LIBHPDF_HAVE_NOPNGLIB */
 

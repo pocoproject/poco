@@ -96,7 +96,7 @@ class DoubleToStringConverter {
   // Example with max_leading_padding_zeroes_in_precision_mode = 6.
   //   ToPrecision(0.0000012345, 2) -> "0.0000012"
   //   ToPrecision(0.00000012345, 2) -> "1.2e-7"
-  // Similarily the converter may add up to
+  // Similarly the converter may add up to
   // max_trailing_padding_zeroes_in_precision_mode in precision mode to avoid
   // returning an exponential representation. A zero added by the
   // EMIT_TRAILING_ZERO_AFTER_POINT flag is counted for this limit.
@@ -242,7 +242,7 @@ class DoubleToStringConverter {
   // Example with max_leading_padding_zeroes_in_precision_mode = 6.
   //   ToPrecision(0.0000012345, 2) -> "0.0000012"
   //   ToPrecision(0.00000012345, 2) -> "1.2e-7"
-  // Similarily the converter may add up to
+  // Similarly the converter may add up to
   // max_trailing_padding_zeroes_in_precision_mode in precision mode to avoid
   // returning an exponential representation. A zero added by the
   // EMIT_TRAILING_ZERO_AFTER_POINT flag is counted for this limit.
@@ -502,7 +502,7 @@ class StringToDoubleConverter {
   // in the 'processed_characters_count'. Trailing junk is never included.
   double StringToDouble(const char* buffer,
                         int length,
-                        int* processed_characters_count) {
+                        int* processed_characters_count) const {
     return StringToIeee(buffer, length, processed_characters_count, true);
   }
 
@@ -511,7 +511,7 @@ class StringToDoubleConverter {
   // due to potential double-rounding.
   float StringToFloat(const char* buffer,
                       int length,
-                      int* processed_characters_count) {
+                      int* processed_characters_count) const {
     return static_cast<float>(StringToIeee(buffer, length,
                                            processed_characters_count, false));
   }
@@ -526,7 +526,7 @@ class StringToDoubleConverter {
   double StringToIeee(const char* buffer,
                       int length,
                       int* processed_characters_count,
-                      bool read_as_double);
+                      bool read_as_double) const;
 
   DISALLOW_IMPLICIT_CONSTRUCTORS(StringToDoubleConverter);
 };

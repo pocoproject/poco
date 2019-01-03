@@ -1,8 +1,6 @@
 //
 // Font.cpp
 //
-// $Id: //poco/Main/PDF/src/Font.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Font

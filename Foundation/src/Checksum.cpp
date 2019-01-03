@@ -1,8 +1,6 @@
 //
 // Checksum.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Checksum.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Checksum
@@ -15,45 +13,29 @@
 
 
 #include "Poco/Checksum.h"
-#if defined(POCO_UNBUNDLED)
-#include <zlib.h>
-#else
-#include "Poco/zlib.h"
-#endif
+#include "Poco/Checksum32.h"
+#include "Poco/Checksum64.h"
 
 
 namespace Poco {
 
 
-Checksum::Checksum():
-	_type(TYPE_CRC32),
-	_value(crc32(0L, Z_NULL, 0))
+Checksum::Checksum(): _pImpl(new Checksum32)
 {
 }
 
 
-Checksum::Checksum(Type t):
-	_type(t),
-	_value(0)
+Checksum::Checksum(Type t) :
+	_pImpl(t == TYPE_CRC64 ?
+		(ChecksumImpl*)new Checksum64() :
+		(ChecksumImpl*)new Checksum32(static_cast<ChecksumImpl::Type>(t)))
 {
-	if (t == TYPE_CRC32)
-		_value = crc32(0L, Z_NULL, 0);
-	else
-		_value = adler32(0L, Z_NULL, 0);
 }
 
 
 Checksum::~Checksum()
 {
-}
-
-
-void Checksum::update(const char* data, unsigned length)
-{
-	if (_type == TYPE_ADLER32)
-		_value = adler32(_value, reinterpret_cast<const Bytef*>(data), length);
-	else
-		_value = crc32(_value, reinterpret_cast<const Bytef*>(data), length);
+	delete _pImpl;
 }
 
 

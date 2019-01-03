@@ -1,8 +1,6 @@
 //
 // BuiltIn.cpp
 //
-// $Id: //poco/1.4/CppParser/src/BuiltIn.cpp#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  BuiltIn

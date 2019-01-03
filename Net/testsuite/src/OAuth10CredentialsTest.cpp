@@ -1,8 +1,6 @@
 //
 // OAuth10CredentialsTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -45,7 +43,7 @@ void OAuth10CredentialsTest::testCallback()
 	//
 	// POST /oauth/request_token HTTP/1.1
 	// Host: api.twitter.com
-	// Authorization: 
+	// Authorization:
 	//         OAuth oauth_callback="http%3A%2F%2Flocalhost%2Fsign-in-with-twitter%2F",
 	//               oauth_consumer_key="cChZNFj6T5R0TigYB9yd1w",
 	//               oauth_nonce="ea9ec8429b68d6b77cd5600adbbb0456",
@@ -64,7 +62,7 @@ void OAuth10CredentialsTest::testCallback()
 	creds.authenticate(request, uri);
 
 	std::string auth = request.get("Authorization");	
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" oauth_consumer_key=\"cChZNFj6T5R0TigYB9yd1w\","
 		" oauth_nonce=\"ea9ec8429b68d6b77cd5600adbbb0456\","
 		" oauth_signature=\"F1Li3tvehgcraF8DMJ7OyxO4w9Y%3D\","
@@ -79,27 +77,27 @@ void OAuth10CredentialsTest::testParams()
 {
 	// Note: Request taken from <https://dev.twitter.com/oauth/overview/authorizing-requests>
 	// and <https://dev.twitter.com/oauth/overview/creating-signatures>.
-	// 
+	//
 	// POST /1/statuses/update.json?include_entities=true HTTP/1.1
 	// Content-Type: application/x-www-form-urlencoded
-	// Authorization: 
-	//         OAuth oauth_consumer_key="xvz1evFS4wEEPTGEFPHBog", 
-	//               oauth_nonce="kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg", 
-	//               oauth_signature="tnnArxj06cWHq44gCs1OSKk%2FjLY%3D", 
-	//               oauth_signature_method="HMAC-SHA1", 
-	//               oauth_timestamp="1318622958", 
-	//               oauth_token="370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb", 
+	// Authorization:
+	//         OAuth oauth_consumer_key="xvz1evFS4wEEPTGEFPHBog",
+	//               oauth_nonce="kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg",
+	//               oauth_signature="tnnArxj06cWHq44gCs1OSKk%2FjLY%3D",
+	//               oauth_signature_method="HMAC-SHA1",
+	//               oauth_timestamp="1318622958",
+	//               oauth_token="370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb",
 	//               oauth_version="1.0"
 	// Content-Length: 76
 	// Host: api.twitter.com
-	// 
+	//
 	// status=Hello%20Ladies%20%2b%20Gentlemen%2c%20a%20signed%20OAuth%20request%21
 
 	URI uri("https://api.twitter.com/1/statuses/update.json?include_entities=true");
 	OAuth10Credentials creds(
-		"xvz1evFS4wEEPTGEFPHBog", 
-		"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw", 
-		"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb", 
+		"xvz1evFS4wEEPTGEFPHBog",
+		"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw",
+		"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb",
 		"LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"
 	);
 	creds.nonceAndTimestampForTesting("kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg", "1318622958");
@@ -112,7 +110,7 @@ void OAuth10CredentialsTest::testParams()
 	creds.authenticate(request, uri, params);
 	
 	std::string auth = request.get("Authorization");
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\","
 		" oauth_nonce=\"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg\","
 		" oauth_signature=\"tnnArxj06cWHq44gCs1OSKk%2FjLY%3D\","
@@ -130,25 +128,25 @@ void OAuth10CredentialsTest::testRealm()
 	//
 	// POST /1/statuses/update.json?include_entities=true HTTP/1.1
 	// Content-Type: application/x-www-form-urlencoded
-	// Authorization: 
+	// Authorization:
 	//         OAuth realm="Twitter API"
-	//               oauth_consumer_key="xvz1evFS4wEEPTGEFPHBog", 
-	//               oauth_nonce="kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg", 
-	//               oauth_signature="tnnArxj06cWHq44gCs1OSKk%2FjLY%3D", 
-	//               oauth_signature_method="HMAC-SHA1", 
-	//               oauth_timestamp="1318622958", 
-	//               oauth_token="370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb", 
+	//               oauth_consumer_key="xvz1evFS4wEEPTGEFPHBog",
+	//               oauth_nonce="kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg",
+	//               oauth_signature="tnnArxj06cWHq44gCs1OSKk%2FjLY%3D",
+	//               oauth_signature_method="HMAC-SHA1",
+	//               oauth_timestamp="1318622958",
+	//               oauth_token="370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb",
 	//               oauth_version="1.0"
 	// Content-Length: 76
 	// Host: api.twitter.com
-	// 
+	//
 	// status=Hello%20Ladies%20%2b%20Gentlemen%2c%20a%20signed%20OAuth%20request%21
 
 	URI uri("https://api.twitter.com/1/statuses/update.json?include_entities=true");
 	OAuth10Credentials creds(
-		"xvz1evFS4wEEPTGEFPHBog", 
-		"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw", 
-		"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb", 
+		"xvz1evFS4wEEPTGEFPHBog",
+		"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw",
+		"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb",
 		"LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"
 	);
 	creds.setRealm("Twitter API");
@@ -162,7 +160,7 @@ void OAuth10CredentialsTest::testRealm()
 	creds.authenticate(request, uri, params);
 	
 	std::string auth = request.get("Authorization");
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" realm=\"Twitter API\","
 		" oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\","
 		" oauth_nonce=\"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg\","
@@ -185,7 +183,7 @@ void OAuth10CredentialsTest::testPlaintext()
 
 	std::string auth = request.get("Authorization");	
 	
-	assert (auth == "OAuth"
+	assertTrue (auth == "OAuth"
 		" oauth_consumer_key=\"consumerKey\","
 		" oauth_signature=\"consumerSecret%26\","
 		" oauth_signature_method=\"PLAINTEXT\","
@@ -208,8 +206,8 @@ void OAuth10CredentialsTest::testVerify()
 		" oauth_version=\"1.0\"");
 	
 	OAuth10Credentials creds(request);
-	assert (creds.getConsumerKey() == "xvz1evFS4wEEPTGEFPHBog");
-	assert (creds.getToken() == "370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb");
+	assertTrue (creds.getConsumerKey() == "xvz1evFS4wEEPTGEFPHBog");
+	assertTrue (creds.getToken() == "370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb");
 	creds.setConsumerSecret("kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw");
 	creds.setTokenSecret("LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE");
 	
@@ -217,7 +215,7 @@ void OAuth10CredentialsTest::testVerify()
 	params.read(uri.getRawQuery());
 	params.read("status=Hello%20Ladies%20%2b%20Gentlemen%2c%20a%20signed%20OAuth%20request%21");
 	
-	assert (creds.verify(request, uri, params));
+	assertTrue (creds.verify(request, uri, params));
 }
 
 
@@ -233,11 +231,11 @@ void OAuth10CredentialsTest::testVerifyPlaintext()
 		" oauth_version=\"1.0\"");
 	
 	OAuth10Credentials creds(request);
-	assert (creds.getConsumerKey() == "consumerKey");
+	assertTrue (creds.getConsumerKey() == "consumerKey");
 	creds.setConsumerSecret("consumerSecret");
 	
-	assert (creds.verify(request, uri));
-	assert (creds.getCallback() == "http://localhost/sign-in-with-twitter/");
+	assertTrue (creds.verify(request, uri));
+	assertTrue (creds.getCallback() == "http://localhost/sign-in-with-twitter/");
 }
 
 

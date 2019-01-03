@@ -1,8 +1,6 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketReactor.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketReactor
@@ -22,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timespan.h"
 #include "Poco/Observer.h"
@@ -62,7 +61,7 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// is no base class for event handlers) can be registered
 	/// with the addEventHandler() method and deregistered with
 	/// the removeEventHandler() method.
-	/// 
+	///
 	/// An event handler is always registered for a certain socket,
 	/// which is given in the call to addEventHandler(). Any method
 	/// of the event handler class can be registered to handle the
@@ -75,9 +74,9 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// If an event is detected, the corresponding event handler
 	/// is invoked. There are five event types (and corresponding
 	/// notification classes) defined: ReadableNotification, WritableNotification,
-	/// ErrorNotification, TimeoutNotification, IdleNotification and 
+	/// ErrorNotification, TimeoutNotification, IdleNotification and
 	/// ShutdownNotification.
-	/// 
+	///
 	/// The ReadableNotification will be dispatched if a socket becomes
 	/// readable. The WritableNotification will be dispatched if a socket
 	/// becomes writable. The ErrorNotification will be dispatched if
@@ -97,13 +96,13 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// called repeatedly in a loop, it is recommended to do a
 	/// short sleep or yield in the event handler.
 	///
-	/// Finally, when the SocketReactor is about to shut down (as a result 
+	/// Finally, when the SocketReactor is about to shut down (as a result
 	/// of stop() being called), it dispatches a ShutdownNotification
 	/// to all event handlers. This is done in the onShutdown() method
 	/// which can be overridded by subclasses to perform custom
 	/// shutdown processing.
 	///
-	/// The SocketReactor is implemented so that it can 
+	/// The SocketReactor is implemented so that it can
 	/// run in its own thread. It is also possible to run
 	/// multiple SocketReactors in parallel, as long as
 	/// they work on different sockets.
@@ -137,9 +136,9 @@ public:
 		/// Wakes up idle reactor.
 
 	void setTimeout(const Poco::Timespan& timeout);
-		/// Sets the timeout. 
+		/// Sets the timeout.
 		///
-		/// If no other event occurs for the given timeout 
+		/// If no other event occurs for the given timeout
 		/// interval, a timeout event is sent to all event listeners.
 		///
 		/// The default timeout is 250 milliseconds;
@@ -166,6 +165,9 @@ public:
 		/// Usage:
 		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.removeEventHandler(obs);
+
+	bool has(const Socket& socket) const;
+		/// Returns true if socket is registered with this rector.
 
 protected:
 	virtual void onTimeout();
@@ -207,26 +209,35 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
 	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
+	typedef Poco::FastMutex                   MutexType;
+	typedef MutexType::ScopedLock             ScopedLock;
 
+	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
+	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	enum
 	{
 		DEFAULT_TIMEOUT = 250000
 	};
 
-	bool            _stop;
-	Poco::Timespan  _timeout;
-	EventHandlerMap _handlers;
-	NotificationPtr _pReadableNotification;
-	NotificationPtr _pWritableNotification;
-	NotificationPtr _pErrorNotification;
-	NotificationPtr _pTimeoutNotification;
-	NotificationPtr _pIdleNotification;
-	NotificationPtr _pShutdownNotification;
-	Poco::FastMutex _mutex;
-	Poco::Thread*   _pThread;
-	
+#ifdef POCO_ENABLE_CPP11
+	std::atomic<bool> _stop;
+#else
+	bool              _stop;
+#endif
+	Poco::Timespan    _timeout;
+	EventHandlerMap   _handlers;
+	PollSet           _pollSet;
+	NotificationPtr   _pReadableNotification;
+	NotificationPtr   _pWritableNotification;
+	NotificationPtr   _pErrorNotification;
+	NotificationPtr   _pTimeoutNotification;
+	NotificationPtr   _pIdleNotification;
+	NotificationPtr   _pShutdownNotification;
+	MutexType         _mutex;
+	Poco::Thread*     _pThread;
+
 	friend class SocketNotifier;
 };
 

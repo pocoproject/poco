@@ -1,12 +1,13 @@
 //
 // CppUnit.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/CppUnit.h#1 $
-//
 
 
 #ifndef Poco_CppUnit__CppUnitINCLUDED
 #define Poco_CppUnit__CppUnitINCLUDED
+
+
+#include "Poco/Platform.h"
 
 
 //
@@ -24,10 +25,10 @@
 // from a DLL simpler. All files within this DLL are compiled with the Poco_CppUnitEXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// CppUnit_API functions as being imported from a DLL, wheras this DLL sees symbols
+// CppUnit_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(CppUnit_EXPORTS)
 		#define CppUnit_API __declspec(dllexport)
 	#else
@@ -47,7 +48,7 @@
 //
 // Automatically link CppUnit library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if defined(POCO_DLL)
 		#if defined(_DEBUG)
 			#define POCO_LIB_SUFFIX "d.lib"
@@ -75,13 +76,13 @@
 
 
 // Turn off some annoying warnings
-#ifdef _MSC_VER
+#ifdef POCO_COMPILER_MSVC
 	#pragma warning(disable:4786)  // identifier truncation warning
 	#pragma warning(disable:4503)  // decorated name length exceeded - mainly a problem with STLPort
 	#pragma warning(disable:4018)  // signed/unsigned comparison
 	#pragma warning(disable:4284)  // return type for operator -> is not UDT
-	#pragma warning(disable:4251)  // ... needs to have dll-interface warning 
-	#pragma warning(disable:4273) 
+	#pragma warning(disable:4251)  // ... needs to have dll-interface warning
+	#pragma warning(disable:4273)
 	#pragma warning(disable:4275)  // ... non dll-interface class used as base for dll-interface class
 #endif
 

@@ -1,8 +1,6 @@
 //
 // CodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/CodeWriter.cpp#3 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -21,9 +19,9 @@ using Poco::Path;
 using Poco::StringTokenizer;
 
 
-CodeWriter::CodeWriter(const Page& rPage, const std::string& rClazz):
-	_page(rPage),
-	_class(rClazz)
+CodeWriter::CodeWriter(const Page& page, const std::string& clazz):
+	_page(page),
+	_class(clazz)
 {
 }
 
@@ -313,6 +311,7 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 {
 	std::string contentType(_page.get("page.contentType", "text/html"));
 	std::string contentLang(_page.get("page.contentLanguage", ""));
+	std::string cacheControl(_page.get("page.cacheControl", ""));
 	bool buffered(_page.getBool("page.buffered", false));
 	bool chunked(_page.getBool("page.chunked", !buffered));
 	bool compressed(_page.getBool("page.compressed", false));
@@ -335,6 +334,10 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 		ostr << "\tbool _compressResponse(request.hasToken(\"Accept-Encoding\", \"gzip\"));\n"
 		     << "\tif (_compressResponse) response.set(\"Content-Encoding\", \"gzip\");\n";
 	}
+	if (!cacheControl.empty())
+	{
+		ostr << "\tresponse.set(\"Cache-Control\", \"" << cacheControl << "\");\n";
+	}
 	ostr << "\n";
 }
 
@@ -351,7 +354,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 	if (buffered)
 	{
 		ostr << "\tstd::stringstream responseStream;\n";
-		ostr << _page.handler().str();
+		ostr << cleanupHandler(_page.handler().str());
 		if (!chunked)
 		{
 			ostr << "\tresponse.setContentLength(static_cast<int>(responseStream.tellp()));\n";
@@ -363,13 +366,31 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		ostr << "\tstd::ostream& _responseStream = response.send();\n"
 		     << "\tPoco::DeflatingOutputStream _gzipStream(_responseStream, Poco::DeflatingStreamBuf::STREAM_GZIP, " << compressionLevel << ");\n"
 		     << "\tstd::ostream& responseStream = _compressResponse ? _gzipStream : _responseStream;\n";
-		ostr << _page.handler().str();
+		ostr << cleanupHandler(_page.handler().str());
 		ostr << "\tif (_compressResponse) _gzipStream.close();\n";
 	}
 	else
 	{
 		ostr << "\tstd::ostream& responseStream = response.send();\n";
-		ostr << _page.handler().str();
+		ostr << cleanupHandler(_page.handler().str());
 	}
+}
+
+
+std::string CodeWriter::cleanupHandler(std::string handler)
+{
+	static const std::string EMPTY_WRITE("\tresponseStream << \"\";\n");
+	static const std::string NEWLINE_WRITE("\tresponseStream << \"\\n\";\n");
+	static const std::string DOUBLE_NEWLINE_WRITE("\tresponseStream << \"\\n\";\n\tresponseStream << \"\\n\";\n");
+	static const std::string EMPTY;
+	
+	// remove empty writes
+	Poco::replaceInPlace(handler, EMPTY_WRITE, EMPTY);
+	// remove consecutive newlines
+	while (handler.find(DOUBLE_NEWLINE_WRITE) != std::string::npos)
+	{
+		Poco::replaceInPlace(handler, DOUBLE_NEWLINE_WRITE, NEWLINE_WRITE);
+	}
+	return handler;
 }
 

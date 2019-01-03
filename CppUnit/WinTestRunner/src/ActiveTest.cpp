@@ -1,8 +1,6 @@
 //
 // ActiveTest.cpp
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/ActiveTest.cpp#1 $
-//
 
 
 #include <afxwin.h>

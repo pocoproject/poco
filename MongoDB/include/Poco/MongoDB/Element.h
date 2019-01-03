@@ -1,8 +1,6 @@
 //
 // Element.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  Element
@@ -42,19 +40,19 @@ namespace MongoDB {
 
 
 class MongoDB_API Element
-	/// Represents an element of a Document or an Array
+	/// Represents an Element of a Document or an Array.
 {
 public:
 	typedef Poco::SharedPtr<Element> Ptr;
 
-	Element(const std::string& name);
-		/// Constructor
+	explicit Element(const std::string& name);
+		/// Creates the Element with the given name.
 
 	virtual ~Element();
 		/// Destructor
 
-	std::string name() const;
-		/// Returns the name of the element
+	const std::string& name() const;
+		/// Returns the name of the element.
 
 	virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
@@ -71,7 +69,10 @@ private:
 };
 
 
-inline std::string Element::name() const
+//
+// inlines
+//
+inline const std::string& Element::name() const
 {
 	return _name;
 }
@@ -93,7 +94,7 @@ struct ElementTraits<double>
 {
 	enum { TypeId = 0x01 };
 
-	static std::string toString(const double& value, int indent = 0)
+	static std::string toString(const double& value, int /*indent*/ = 0)
 	{
 		return Poco::NumberFormatter::format(value);
 	}
@@ -108,7 +109,7 @@ struct ElementTraits<std::string>
 {
 	enum { TypeId = 0x02 };
 
-	static std::string toString(const std::string& value, int indent = 0)
+	static std::string toString(const std::string& value, int /*indent*/ = 0)
 	{
 		std::string result;
 		result.append(1, '"');
@@ -144,7 +145,7 @@ struct ElementTraits<bool>
 {
 	enum { TypeId = 0x08 };
 
-	static std::string toString(const bool& value, int indent = 0)
+	static std::string toString(const bool& value, int /*indent*/ = 0)
 	{
 		return value ? "true" : "false";
 	}
@@ -176,7 +177,7 @@ struct ElementTraits<Int32>
 	enum { TypeId = 0x10 };
 
 
-	static std::string toString(const Int32& value, int indent = 0)
+	static std::string toString(const Int32& value, int /*indent*/ = 0)
 	{
 		return Poco::NumberFormatter::format(value);
 	}
@@ -190,7 +191,7 @@ struct ElementTraits<Timestamp>
 {
 	enum { TypeId = 0x09 };
 
-	static std::string toString(const Timestamp& value, int indent = 0)
+	static std::string toString(const Timestamp& value, int /*indent*/ = 0)
 	{
 		std::string result;
 		result.append(1, '"');
@@ -228,7 +229,7 @@ struct ElementTraits<NullValue>
 {
 	enum { TypeId = 0x0A };
 
-	static std::string toString(const NullValue& value, int indent = 0)
+	static std::string toString(const NullValue& /*value*/, int /*indent*/ = 0)
 	{
 		return "null";
 	}
@@ -236,14 +237,62 @@ struct ElementTraits<NullValue>
 
 
 template<>
-inline void BSONReader::read<NullValue>(NullValue& to)
+inline void BSONReader::read<NullValue>(NullValue& /*to*/)
 {
 }
 
 
 template<>
-inline void BSONWriter::write<NullValue>(NullValue& from)
+inline void BSONWriter::write<NullValue>(NullValue& /*from*/)
 {
+}
+
+
+struct BSONTimestamp
+{
+	Poco::Timestamp ts;
+	Poco::Int32 inc;
+};
+
+
+// BSON Timestamp
+// spec: int64
+template<>
+struct ElementTraits<BSONTimestamp>
+{
+	enum { TypeId = 0x11 };
+
+	static std::string toString(const BSONTimestamp& value, int /*indent*/ = 0)
+	{
+		std::string result;
+		result.append(1, '"');
+		result.append(DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z"));
+		result.append(1, ' ');
+		result.append(NumberFormatter::format(value.inc));
+		result.append(1, '"');
+		return result;
+	}
+};
+
+
+template<>
+inline void BSONReader::read<BSONTimestamp>(BSONTimestamp& to)
+{
+	Poco::Int64 value;
+	_reader >> value;
+	to.inc = value & 0xffffffff;
+	value >>= 32;
+	to.ts = Timestamp::fromEpochTime(static_cast<std::time_t>(value));
+}
+
+
+template<>
+inline void BSONWriter::write<BSONTimestamp>(BSONTimestamp& from)
+{
+	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
+	value <<= 32;
+	value += from.inc;
+	_writer << value;
 }
 
 
@@ -254,7 +303,7 @@ struct ElementTraits<Int64>
 {
 	enum { TypeId = 0x12 };
 
-	static std::string toString(const Int64& value, int indent = 0)
+	static std::string toString(const Int64& value, int /*indent*/ = 0)
 	{
 		return NumberFormatter::format(value);
 	}
@@ -262,10 +311,12 @@ struct ElementTraits<Int64>
 
 
 template<typename T>
-class ConcreteElement : public Element
+class ConcreteElement: public Element
 {
 public:
-	ConcreteElement(const std::string& name, const T& init) : Element(name), _value(init)
+	ConcreteElement(const std::string& name, const T& init):
+		Element(name),
+		_value(init)
 	{
 	}
 
@@ -309,4 +360,4 @@ private:
 } } // namespace Poco::MongoDB
 
 
-#endif //  MongoDB_Element_INCLUDED
+#endif // MongoDB_Element_INCLUDED

@@ -1,8 +1,6 @@
 //
 // Tokenizer.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Tokenizer.cpp#1 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  Tokenizer

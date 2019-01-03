@@ -1,8 +1,6 @@
 //
 // XMLString.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLString.cpp#1 $
-//
 // Library: XML
 // Package: XML
 // Module:  XMLString

@@ -1,8 +1,6 @@
 //
 // StreamChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/StreamChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  StreamChannel
@@ -34,7 +32,6 @@ StreamChannel::~StreamChannel()
 void StreamChannel::log(const Message& msg)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
 	_str << msg.getText() << std::endl;
 }
 

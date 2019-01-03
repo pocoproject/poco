@@ -1,8 +1,6 @@
 //
 // Var.cpp
 //
-// $Id: //poco/svn/Foundation/src/Var.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Var
@@ -16,6 +14,7 @@
 
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/NumberParser.h"
 #include <algorithm>
 #include <cctype>
 #include <vector>
@@ -36,7 +35,7 @@ Var::Var()
 
 
 Var::Var(const char* pVal)
-#ifdef POCO_NO_SOO 
+#ifdef POCO_NO_SOO
 	: _pHolder(new VarHolderImpl<std::string>(pVal))
 {
 }
@@ -339,6 +338,19 @@ void Var::empty()
 }
 
 
+void Var::clear()
+{
+#ifdef POCO_NO_SOO
+	delete _pHolder;
+	_pHolder = 0;
+#else
+	if (_placeholder.isLocal()) this->~Var();
+	else delete content();
+	_placeholder.erase();
+#endif
+}
+
+
 Var& Var::getAt(std::size_t n)
 {
 	if (isVector())
@@ -351,8 +363,16 @@ Var& Var::getAt(std::size_t n)
 		return holderImpl<std::deque<Var>,
 			InvalidAccessException>("Not a deque.")->operator[](n);
 	else if (isStruct())
-		return structIndexOperator(holderImpl<Struct<int>,
-			InvalidAccessException>("Not a struct."), static_cast<int>(n));
+	{
+#ifdef POCO_ENABLE_CPP11
+		if (isOrdered())
+			return structIndexOperator(holderImpl<Struct<int, OrderedMap<int, Var>, OrderedSet<int> >,
+				InvalidAccessException>("Not a struct."), static_cast<int>(n));
+		else
+#endif // POCO_ENABLE_CPP11
+			return structIndexOperator(holderImpl<Struct<int, std::map<int, Var>, std::set<int> >,
+				InvalidAccessException>("Not a struct."), static_cast<int>(n));
+	}
 	else if (!isString() && !isEmpty() && (n == 0))
 		return *this;
 	
@@ -374,8 +394,17 @@ char& Var::at(std::size_t n)
 
 Var& Var::getAt(const std::string& name)
 {
-	return holderImpl<DynamicStruct,
-		InvalidAccessException>("Not a struct.")->operator[](name);
+	if (isStruct())
+	{
+#ifdef POCO_ENABLE_CPP11
+		if (isOrdered())
+			return structIndexOperator(holderImpl<OrderedDynamicStruct, InvalidAccessException>("Not a struct."), name);
+		else
+#endif // POCO_ENABLE_CPP11
+			return structIndexOperator(holderImpl<DynamicStruct, InvalidAccessException>("Not a struct."), name);
+	}
+
+	throw InvalidAccessException("Not a struct.");
 }
 
 
@@ -404,7 +433,55 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 		case '"':
 			return parseJSONString(val, pos);
 		default:
-			return parseString(val, pos);
+		{
+			std::string str = parseString(val, pos);
+			if (str == "false") return false;
+			if (str == "true") return true;
+			bool isNumber = false;
+			bool isSigned = false;
+			int separators = 0;
+			int frac = 0;
+			int index = 0;
+			size_t size = str.size();
+			for (size_t i = 0; i < size ; ++i)
+			{
+				int ch = str[i];
+				if ((ch == '-' || ch == '+') && index == 0)
+				{
+					if (ch == '-') isSigned = true;
+				}
+				else if (Ascii::isDigit(ch))
+				{
+					isNumber |= true;
+				}
+				else if (ch == '.' || ch == ',')
+				{
+					frac = ch;
+					++separators;
+					if (separators > 1) return str;
+				}
+				else return str;
+				++index;
+			}
+
+			if (frac && isNumber)
+			{
+				const double number = NumberParser::parseFloat(str, static_cast<char>(frac));
+				return Var(number);
+			}
+			else if (frac == 0 && isNumber && isSigned)
+			{
+				const Poco::Int64 number = NumberParser::parse64(str);
+				return number;
+			}
+			else if (frac == 0 && isNumber && !isSigned)
+			{
+				const Poco::UInt64 number = NumberParser::parseUnsigned64(str);
+				return number;
+			}
+
+			return str;
+		}
 		}
 	}
 	std::string empty;
@@ -414,7 +491,7 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 
 Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '{');
+	poco_assert_dbg (pos < val.size() && val[pos] == '{');
 	++pos;
 	skipWhiteSpace(val, pos);
 	DynamicStruct aStruct;
@@ -423,7 +500,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		std::string key = parseString(val, pos);
 		skipWhiteSpace(val, pos);
 		if (val[pos] != ':')
-			throw DataFormatException("Incorrect object, must contain: key : value pairs"); 
+			throw DataFormatException("Incorrect object, must contain: key : value pairs");
 		++pos; // skip past :
 		Var value = parse(val, pos);
 		aStruct.insert(key, value);
@@ -435,7 +512,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		}
 	}
 	if (val[pos] != '}')
-		throw DataFormatException("Unterminated object"); 
+		throw DataFormatException("Unterminated object");
 	++pos;
 	return aStruct;
 }
@@ -443,7 +520,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 
 Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '[');
+	poco_assert_dbg (pos < val.size() && val[pos] == '[');
 	++pos;
 	skipWhiteSpace(val, pos);
 	std::vector<Var> result;
@@ -458,7 +535,7 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 		}
 	}
 	if (val[pos] != ']')
-		throw DataFormatException("Unterminated array"); 
+		throw DataFormatException("Unterminated array");
 	++pos;
 	return result;
 }
@@ -466,6 +543,7 @@ Var Var::parseArray(const std::string& val, std::string::size_type& pos)
 
 std::string Var::parseString(const std::string& val, std::string::size_type& pos)
 {
+	poco_assert_dbg (pos < val.size());
 	if (val[pos] == '"')
 	{
 		return parseJSONString(val, pos);
@@ -473,8 +551,8 @@ std::string Var::parseString(const std::string& val, std::string::size_type& pos
 	else
 	{
 		std::string result;
-		while (pos < val.size() 
-			&& !Poco::Ascii::isSpace(val[pos]) 
+		while (pos < val.size()
+			&& !Poco::Ascii::isSpace(val[pos])
 			&& val[pos] != ','
 			&& val[pos] != ']'
 			&& val[pos] != '}')
@@ -488,7 +566,7 @@ std::string Var::parseString(const std::string& val, std::string::size_type& pos
 
 std::string Var::parseJSONString(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (val[pos] == '"');
+	poco_assert_dbg (pos < val.size() && val[pos] == '"');
 	++pos;
 	std::string result;
 	bool done = false;
@@ -508,19 +586,19 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 				{
 				case 'b':
 					result += '\b';
-					break; 
+					break;
 				case 'f':
 					result += '\f';
-					break; 
+					break;
 				case 'n':
 					result += '\n';
-					break; 
+					break;
 				case 'r':
 					result += '\r';
-					break; 
+					break;
 				case 't':
 					result += '\t';
-					break; 
+					break;
 				default:
 					result += val[pos];
 					break;
@@ -545,7 +623,8 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 
 void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 {
-	while (std::isspace(val[pos]))
+	poco_assert_dbg (pos < val.size());
+	while (std::isspace(val[pos]) && pos < val.size())
 		++pos;
 }
 
@@ -557,11 +636,11 @@ std::string Var::toString(const Var& any)
 	return res;
 }
 
-
+/*
 Var& Var::structIndexOperator(VarHolderImpl<Struct<int> >* pStr, int n) const
 {
 	return pStr->operator[](n);
 }
-
+*/
 
 } } // namespace Poco::Dynamic

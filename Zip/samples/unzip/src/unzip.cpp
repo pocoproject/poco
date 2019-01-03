@@ -1,8 +1,6 @@
 //
 // unzip.cpp
 //
-// $Id: //poco/1.4/Zip/samples/unzip/src/unzip.cpp#1 $
-//
 // This sample demonstrates the Decompress class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // CipherKeyImpl.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKeyImpl.h#3 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKeyImpl
@@ -35,7 +33,7 @@ namespace Poco {
 namespace Crypto {
 
 
-class CipherKeyImpl: public RefCountedObject
+class Crypto_API CipherKeyImpl: public RefCountedObject
 	/// An implementation of the CipherKey class for OpenSSL's crypto library.
 {
 public:
@@ -50,7 +48,10 @@ public:
 		MODE_ECB,			/// Electronic codebook (plain concatenation)
 		MODE_CBC,			/// Cipher block chaining (default)
 		MODE_CFB,			/// Cipher feedback
-		MODE_OFB			/// Output feedback
+		MODE_OFB,			/// Output feedback
+		MODE_CTR,           /// Counter mode
+		MODE_GCM,           /// Galois/Counter mode
+		MODE_CCM            /// Counter with CBC-MAC
 	};
 
 	CipherKeyImpl(const std::string& name,
@@ -62,11 +63,10 @@ public:
 		/// the given cipher name, passphrase, salt value
 		/// and iteration count.
 
-	CipherKeyImpl(const std::string& name, 
-		const ByteVec& key, 
-		const ByteVec& iv
-	);
-		/// Creates a new CipherKeyImpl object, using the 
+	CipherKeyImpl(const std::string& name,
+		const ByteVec& key,
+		const ByteVec& iv);
+		/// Creates a new CipherKeyImpl object, using the
 		/// given cipher name, key and initialization vector.
 
 	CipherKeyImpl(const std::string& name);
@@ -121,9 +121,9 @@ private:
 private:
 	const EVP_CIPHER*  _pCipher;
 	const EVP_MD*      _pDigest;
-	std::string	       _name;
-	ByteVec		       _key;
-	ByteVec		       _iv;
+	std::string        _name;
+	ByteVec            _key;
+	ByteVec            _iv;
 	OpenSSLInitializer _openSSLInitializer;
 };
 
@@ -153,13 +153,6 @@ inline void CipherKeyImpl::setKey(const ByteVec& key)
 inline const CipherKeyImpl::ByteVec& CipherKeyImpl::getIV() const
 {
 	return _iv;
-}
-
-
-inline void CipherKeyImpl::setIV(const ByteVec& iv)
-{
-	poco_assert(iv.size() == static_cast<ByteVec::size_type>(ivSize()));
-	_iv = iv;
 }
 
 

@@ -1,0 +1,2 @@
+which_openssl := $(shell which openssl)
+$(info $(shell $(which_openssl) version -a))

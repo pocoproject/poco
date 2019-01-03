@@ -1,8 +1,6 @@
 //
 // Latin1Encoding.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Latin1Encoding.h#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  Latin1Encoding

@@ -1,8 +1,6 @@
 //
 // Twitter.h
 //
-// $Id: //poco/1.4/Net/samples/TwitterClient/src/Twitter.h#2 $
-//
 // A C++ implementation of a Twitter client based on the POCO Net library.
 //
 // Copyright (c) 2009-2013, Applied Informatics Software Engineering GmbH.
@@ -25,7 +23,7 @@
 class Twitter
 	/// A simple implementation of a Twitter API client
 	/// (see <http://dev.twitter.com> for more information).
-	/// 
+	///
 	/// Currently, only the update message is supported.
 {
 public:

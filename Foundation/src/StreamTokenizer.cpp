@@ -1,8 +1,6 @@
 //
 // StreamTokenizer.cpp
 //
-// $Id: //poco/1.4/Foundation/src/StreamTokenizer.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamTokenizer
@@ -80,7 +78,7 @@ const Token* StreamTokenizer::next()
 		if (ti->start((char) first, *_pIstr))
 		{
 			ti->finish(*_pIstr);
-			if (ti->ignored()) 
+			if (ti->ignored())
 			{
 				first = _pIstr->get();
 				it = _tokens.begin();

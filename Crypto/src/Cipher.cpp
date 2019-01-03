@@ -1,8 +1,6 @@
 //
 // Cipher.cpp
 //
-// $Id: //poco/1.4/Crypto/src/Cipher.cpp#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  Cipher

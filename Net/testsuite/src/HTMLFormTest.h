@@ -1,8 +1,6 @@
 //
 // HTMLFormTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTMLFormTest.h#2 $
-//
 // Definition of the HTMLFormTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -38,6 +36,7 @@ public:
 	void testSubmit2();
 	void testSubmit3();
 	void testSubmit4();
+	void testSubmit5();
 	void testFieldLimitUrl();
 	void testFieldLimitMultipart();
 

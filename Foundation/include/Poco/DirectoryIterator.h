@@ -1,8 +1,6 @@
 //
 // DirectoryIterator.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryIterator.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator
@@ -42,7 +40,7 @@ class Foundation_API DirectoryIterator
 	///     even is the original iterator has been advanced
 	///     (all copies of an iterator share their state with
 	///     the original iterator)
-	///   * because of this you should only use the prefix 
+	///   * because of this you should only use the prefix
 	///     increment operator
 {
 public:

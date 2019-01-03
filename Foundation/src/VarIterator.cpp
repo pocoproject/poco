@@ -1,8 +1,6 @@
 //
 // VarIterator.cpp
 //
-// $Id: //poco/Main/Data/src/VarIterator.cpp#1 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarIterator
@@ -16,7 +14,7 @@
 
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/Dynamic/Struct.h"
+//#include "Poco/Dynamic/Struct.h"
 #undef min
 #undef max
 #include <limits>
@@ -29,7 +27,7 @@ namespace Dynamic {
 const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-VarIterator::VarIterator(Var* pVar, bool positionEnd): 
+VarIterator::VarIterator(Var* pVar, bool positionEnd):
 	_pVar(pVar),
 	_position(positionEnd ? POSITION_END : 0)
 {

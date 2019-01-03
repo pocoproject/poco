@@ -35,7 +35,7 @@ Building the library
 
 1. Go to 'msvc80' directory
 2. Open 'wcelibcex_lib.sln' project in Visual C++ 2005 IDE
-3. From the main toolbar, select prefered 'Solution Configuration'
+3. From the main toolbar, select preferred 'Solution Configuration'
    and 'Solution Platform'
 4. Run Build -> Build Solution
-5. If no errors occured, the library is ready to use
+5. If no errors occurred, the library is ready to use

@@ -1,8 +1,6 @@
 //
 // NameValueCollection.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NameValueCollection.h#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  NameValueCollection
@@ -36,7 +34,7 @@ class Net_API NameValueCollection
 	///
 	/// The name is case-insensitive.
 	///
-	/// There can be more than one name-value pair with the 
+	/// There can be more than one name-value pair with the
 	/// same name.
 {
 public:
@@ -92,7 +90,7 @@ public:
 		/// the name-value pair collection.
 		
 	ConstIterator end() const;
-		/// Returns an iterator pointing to the end of 
+		/// Returns an iterator pointing to the end of
 		/// the name-value pair collection.
 		
 	bool empty() const;

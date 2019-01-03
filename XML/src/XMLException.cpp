@@ -1,8 +1,6 @@
 //
 // XMLException.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLException.cpp#1 $
-//
 // Library: XML
 // Package: XML
 // Module:  XMLException

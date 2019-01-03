@@ -1,8 +1,6 @@
 //
 // Parser.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Parser.cpp#2 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  Parser
@@ -163,7 +161,7 @@ void Parser::parse()
 		std::string m(exc.message());
 		std::string where(_currentPath);
 		where.append("(");
-		where.append(NumberFormatter::format(_istr.getCurrentLineNumber()));
+		where.append(NumberFormatter::format(static_cast<int>(_istr.getCurrentLineNumber())));
 		where.append(")");
 		throw SyntaxException(m, where);
 	}
@@ -215,7 +213,12 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		std::string name = pNext->tokenString();
 		pNext = next();
 		expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
-		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(name));
+		
+		std::string fullName = currentNameSpace()->fullName();
+		if (!fullName.empty()) fullName += "::";
+		fullName += name;
+		
+		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(fullName));
 		bool undefined = (pNS == 0);
 		if (undefined) pNS = new NameSpace(name, currentNameSpace());
 		pushNameSpace(pNS, -1, undefined);
@@ -370,7 +373,7 @@ const Token* Parser::parseBaseClassList(const Token* pNext, Struct* pClass)
 }
 
 
-const Token* Parser::parseClassMembers(const Token* pNext, Struct* pClass)
+const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
 	
@@ -625,7 +628,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 	expectOperator(pNext, OperatorToken::OP_CLOSPARENT, ")");
 	pNext = next();
 	while (pNext->is(Poco::Token::IDENTIFIER_TOKEN) || pNext->is(Poco::Token::KEYWORD_TOKEN))
-	{ 
+	{
 		if (isKeyword(pNext, IdentifierToken::KW_CONST))
 		{
 			if (pFunc) pFunc->makeConst();
@@ -633,7 +636,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 		}
 		if (isKeyword(pNext, IdentifierToken::KW_THROW))
 		{
-			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) && 
+			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) &&
 				   !isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
 				pNext = next();
 		}

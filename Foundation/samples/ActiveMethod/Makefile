@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/samples/ActiveMethod/Makefile#1 $
-#
 # Makefile for Poco ActiveMethod
 #
 

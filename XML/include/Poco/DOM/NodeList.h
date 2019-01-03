@@ -1,8 +1,6 @@
 //
 // NodeList.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/NodeList.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -36,10 +34,10 @@ class XML_API NodeList: public DOMObject
 	/// collection of nodes, without defining or constraining how this
 	/// collection is implemented.
 	///
-	/// The items in the NodeList are accessible via an integral index, 
+	/// The items in the NodeList are accessible via an integral index,
 	/// starting from 0.
 	///
-	/// A NodeList returned from a method must be released with a call to 
+	/// A NodeList returned from a method must be released with a call to
 	/// release() when no longer needed.
 {
 public:

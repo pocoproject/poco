@@ -1,8 +1,6 @@
 //
 // Debugger.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Debugger.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Debugger
@@ -41,10 +39,8 @@ public:
 		/// function.
 		/// On Unix, this function returns true if the environment
 		/// variable POCO_ENABLE_DEBUGGER is set.
-		/// On OpenVMS, this function always returns true in debug,
-		/// mode, false otherwise.
 
-	static void message(const std::string& msg);
+	static void message(const std::string& msg, bool backTrace = true);
 		/// Writes a message to the debugger log, if available, otherwise to
 		/// standard error output.
 
@@ -56,7 +52,6 @@ public:
 		/// Breaks into the debugger, if it is available.
 		/// On Windows, this is done using the DebugBreak() function.
 		/// On Unix, the SIGINT signal is raised.
-		/// On OpenVMS, the SS$_DEBUG signal is raised.
 
 	static void enter(const std::string& msg);
 		/// Writes a debug message to the debugger log and breaks into it.

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/samples/HTTPLoadTest/Makefile#1 $
-#
 # Makefile for Poco HTTPLoadTest
 #
 

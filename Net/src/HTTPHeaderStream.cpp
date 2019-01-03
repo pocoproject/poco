@@ -1,8 +1,6 @@
 //
 // HTTPHeaderStream.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPHeaderStream.cpp#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPHeaderStream
@@ -119,7 +117,7 @@ HTTPHeaderInputStream::~HTTPHeaderInputStream()
 }
 
 
-void* HTTPHeaderInputStream::operator new(std::size_t size)
+void* HTTPHeaderInputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }
@@ -158,7 +156,7 @@ HTTPHeaderOutputStream::~HTTPHeaderOutputStream()
 }
 
 
-void* HTTPHeaderOutputStream::operator new(std::size_t size)
+void* HTTPHeaderOutputStream::operator new(std::size_t /*size*/)
 {
 	return _pool.get();
 }

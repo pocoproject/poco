@@ -1,8 +1,6 @@
 //
 // RemoteSyslogListener.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogListener.cpp#4 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogListener
@@ -43,15 +41,15 @@ namespace Net {
 class MessageNotification: public Poco::Notification
 {
 public:
-	MessageNotification(const char* buffer, std::size_t length, const Poco::Net::SocketAddress& rSourceAddress):
+	MessageNotification(const char* buffer, std::size_t length, const Poco::Net::SocketAddress& sourceAddress):
 		_message(buffer, length),
-		_sourceAddress(rSourceAddress)
+		_sourceAddress(sourceAddress)
 	{
 	}
 
-	MessageNotification(const std::string& rMessage, const Poco::Net::SocketAddress& rSourceAddress):
-		_message(rMessage),
-		_sourceAddress(rSourceAddress)
+	MessageNotification(const std::string& message, const Poco::Net::SocketAddress& sourceAddress):
+		_message(message),
+		_sourceAddress(sourceAddress)
 	{
 	}
 		
@@ -180,6 +178,12 @@ private:
 		/// Parses until it encounters the next space char, returns the string from pos, excluding space
 		/// pos will point past the space char
 
+	static std::string parseStructuredData(const std::string& line, std::size_t& pos);
+		/// Parses the structured data field.
+
+	static std::string parseStructuredDataToken(const std::string& line, std::size_t& pos);
+	/// Parses a token from the structured data field.
+
 private:
 	Poco::NotificationQueue& _queue;
 	bool                     _stopped;
@@ -286,7 +290,7 @@ void SyslogParser::parsePrio(const std::string& line, std::size_t& pos, RemoteSy
 }
 
 
-void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message)
+void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility /*fac*/, std::size_t& pos, Poco::Message& message)
 {
 	Poco::Message::Priority prio = convert(severity);
 	// rest of the unparsed header is:
@@ -297,6 +301,7 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 	std::string appName(parseUntilSpace(line, pos));
 	std::string procId(parseUntilSpace(line, pos));
 	std::string msgId(parseUntilSpace(line, pos));
+	std::string sd(parseStructuredData(line, pos));
 	std::string messageText(line.substr(pos));
 	pos = line.size();
 	Poco::DateTime date;
@@ -305,6 +310,7 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 	Poco::Message logEntry(msgId, messageText, prio);
 	logEntry[RemoteSyslogListener::LOG_PROP_HOST] = hostName;
 	logEntry[RemoteSyslogListener::LOG_PROP_APP] = appName;
+	logEntry[RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA] = sd;
 	
 	if (hasDate)
 		logEntry.setTime(date.timestamp());
@@ -315,7 +321,7 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 }
 
 
-void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message)
+void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility /*fac*/, std::size_t& pos, Poco::Message& message)
 {
 	Poco::Message::Priority prio = convert(severity);
 	// rest of the unparsed header is:
@@ -395,6 +401,67 @@ std::string SyslogParser::parseUntilSpace(const std::string& line, std::size_t& 
 }
 
 
+std::string SyslogParser::parseStructuredData(const std::string& line, std::size_t& pos)
+{
+	std::string sd;
+	if (pos < line.size())
+	{
+		if (line[pos] == '-') 
+		{
+			++pos;
+		}
+		else if (line[pos] == '[')
+		{
+			std::string tok = parseStructuredDataToken(line, pos);
+			while (tok == "[")
+			{
+				sd += tok;
+				tok = parseStructuredDataToken(line, pos);
+				while (tok != "]" && !tok.empty())
+				{
+					sd += tok;
+					tok = parseStructuredDataToken(line, pos);
+				}
+				sd += tok;
+				if (pos < line.size() && line[pos] == '[') tok = parseStructuredDataToken(line, pos);
+			}
+		}
+		if (pos < line.size() && Poco::Ascii::isSpace(line[pos])) ++pos;
+	}
+	return sd;
+}
+
+
+std::string SyslogParser::parseStructuredDataToken(const std::string& line, std::size_t& pos)
+{
+	std::string tok;
+	if (pos < line.size())
+	{
+		if (Poco::Ascii::isSpace(line[pos]) || line[pos] == '=' || line[pos] == '[' || line[pos] == ']')
+		{
+			tok += line[pos++];
+		}
+		else if (line[pos] == '"')
+		{
+			tok += line[pos++];
+			while (pos < line.size() && line[pos] != '"')
+			{
+				tok += line[pos++];
+			}
+			tok += '"';
+			if (pos < line.size()) pos++;
+		}
+		else
+		{
+			while (pos < line.size() && !Poco::Ascii::isSpace(line[pos]) && line[pos] != '=')
+			{
+				tok += line[pos++];
+			}
+		}
+	}
+	return tok;
+}
+
 Poco::Message::Priority SyslogParser::convert(RemoteSyslogChannel::Severity severity)
 {
 	switch (severity)
@@ -430,6 +497,7 @@ const std::string RemoteSyslogListener::PROP_THREADS("threads");
 
 const std::string RemoteSyslogListener::LOG_PROP_APP("app");
 const std::string RemoteSyslogListener::LOG_PROP_HOST("host");
+const std::string RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA("structured-data");
 
 
 RemoteSyslogListener::RemoteSyslogListener():
@@ -496,7 +564,7 @@ void RemoteSyslogListener::setProperty(const std::string& name, const std::strin
 		else
 			throw Poco::InvalidArgumentException("Invalid number of threads", value);
 	}
-	else 
+	else
 	{
 		SplitterChannel::setProperty(name, value);
 	}

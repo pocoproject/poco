@@ -1,8 +1,6 @@
 //
 // HTTPStreamFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPStreamFactory.h#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPStreamFactory
@@ -62,7 +60,7 @@ public:
 		/// location is automatically resolved, as long
 		/// as the redirect location is still accessible
 		/// via the HTTP protocol. If a redirection to
-		/// a non http://... URI is received, a 
+		/// a non http://... URI is received, a
 		/// UnsupportedRedirectException exception is thrown.
 		/// The offending URI can then be obtained via the message()
 		/// method of UnsupportedRedirectException.

@@ -1,8 +1,6 @@
 //
 // DateTimeParserTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeParserTest.h#2 $
-//
 // Definition of the DateTimeParserTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -46,6 +44,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void testBad(const std::string& fmt, const std::string& dateStr, int tzd);
 };
 
 

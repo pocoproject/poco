@@ -1,8 +1,6 @@
 //
 // ByteOrderTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ByteOrderTest.h#1 $
-//
 // Definition of the ByteOrderTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

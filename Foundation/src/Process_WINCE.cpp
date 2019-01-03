@@ -1,8 +1,6 @@
 //
 // Process_WINCE.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Process_WINCE.cpp#4 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process
@@ -80,7 +78,7 @@ int ProcessHandleImpl::wait() const
 //
 ProcessImpl::PIDImpl ProcessImpl::idImpl()
 {
-	return GetCurrentProcessId(); 
+	return GetCurrentProcessId();
 }
 
 
@@ -125,15 +123,15 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 	PROCESS_INFORMATION processInfo;
 	BOOL rc = CreateProcessW(
-		ucommand.c_str(), 
-		const_cast<wchar_t*>(ucommandLine.c_str()), 
-		NULL, 
-		NULL, 
-		FALSE, 
-		0, 
-		NULL, 
-		NULL, 
-		NULL/*&startupInfo*/, 
+		ucommand.c_str(),
+		const_cast<wchar_t*>(ucommandLine.c_str()),
+		NULL,
+		NULL,
+		FALSE,
+		0,
+		NULL,
+		NULL,
+		NULL/*&startupInfo*/,
 		&processInfo
 	);
 
@@ -148,7 +146,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 {
-	if (handle.process()) 
+	if (handle.process())
 	{
 		if (TerminateProcess(handle.process(), 0) == 0)
 		{
@@ -178,7 +176,7 @@ void ProcessImpl::killImpl(PIDImpl pid)
 		{
 		case ERROR_ACCESS_DENIED:
 			throw NoPermissionException("cannot kill process");
-		case ERROR_NOT_FOUND: 
+		case ERROR_NOT_FOUND:
 			throw NotFoundException("cannot kill process");
 		default:
 			throw SystemException("cannot kill process");
@@ -187,7 +185,7 @@ void ProcessImpl::killImpl(PIDImpl pid)
 }
 
 
-bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle) 
+bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
 	bool result = true;
 	DWORD exitCode;
@@ -197,7 +195,7 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid) 
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	bool result = true;

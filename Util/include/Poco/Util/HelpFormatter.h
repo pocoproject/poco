@@ -1,8 +1,6 @@
 //
 // HelpFormatter.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/HelpFormatter.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  HelpFormatter
@@ -38,7 +36,7 @@ class Util_API HelpFormatter
 public:
 	HelpFormatter(const OptionSet& options);
 		/// Creates the HelpFormatter, using the given
-		/// options. 
+		/// options.
 		///
 		/// The HelpFormatter just stores a reference
 		/// to the given OptionSet, so the OptionSet must not
@@ -90,7 +88,7 @@ public:
 		
 	void setAutoIndent();
 		/// Sets the indentation for description continuation lines so that
-		/// the description text is left-aligned. 
+		/// the description text is left-aligned.
 
 	void setUnixStyle(bool flag);
 		/// Enables Unix-style options. Both short and long option names

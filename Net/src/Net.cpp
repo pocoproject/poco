@@ -1,8 +1,6 @@
 //
 // Net.cpp
 //
-// $Id: //poco/1.4/Net/src/Net.cpp#10 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  NetCore

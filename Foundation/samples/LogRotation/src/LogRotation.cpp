@@ -1,8 +1,6 @@
 //
 // LogRotation.cpp
 //
-// $Id: LogRotation.cpp 580 2008-06-01 20:56:01Z ryppka $
-//
 // This class demonstrates the Log rotation feature.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -40,8 +38,8 @@ int main (int, char**)
 {
 	AutoPtr<SplitterChannel> splitterChannel(new SplitterChannel());
 
-	AutoPtr<Channel> consoleChannel(new ConsoleChannel());
-	AutoPtr<Channel> fileChannel(new FileChannel("test.log"));
+	Channel::Ptr consoleChannel(new ConsoleChannel());
+	Channel::Ptr fileChannel(new FileChannel("test.log"));
 	AutoPtr<FileChannel> rotatedFileChannel(new FileChannel("rotated.log"));
 
 	rotatedFileChannel->setProperty("rotation", "100");
@@ -53,7 +51,7 @@ int main (int, char**)
 
 
 	AutoPtr<Formatter> formatter(new PatternFormatter("%h-%M-%S.%i: %t"));
-	AutoPtr<Channel> formattingChannel(new FormattingChannel(formatter, splitterChannel));
+	Channel::Ptr formattingChannel(new FormattingChannel(formatter, splitterChannel));
 
 	Logger& logger = Logger::create("TestLog", formattingChannel, Message::PRIO_TRACE);
 

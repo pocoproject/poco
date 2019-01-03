@@ -1,8 +1,6 @@
 //
 // Encoder.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Encoder.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Encoder

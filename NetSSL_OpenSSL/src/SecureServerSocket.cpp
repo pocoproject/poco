@@ -1,8 +1,6 @@
 //
 // SecureServerSocket.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureServerSocket.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureServerSocket
@@ -28,7 +26,7 @@ namespace Poco {
 namespace Net {
 
 
-SecureServerSocket::SecureServerSocket(): 
+SecureServerSocket::SecureServerSocket():
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
 }
@@ -40,7 +38,7 @@ SecureServerSocket::SecureServerSocket(Context::Ptr pContext):
 }
 
 
-SecureServerSocket::SecureServerSocket(const Socket& socket): 
+SecureServerSocket::SecureServerSocket(const Socket& socket):
 	ServerSocket(socket)
 {
 	if (!dynamic_cast<SecureServerSocketImpl*>(impl()))
@@ -48,37 +46,37 @@ SecureServerSocket::SecureServerSocket(const Socket& socket):
 }
 
 
-SecureServerSocket::SecureServerSocket(const SocketAddress& rAddress, int backlog): 
+SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog):
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
-	impl()->bind(rAddress, true);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 
 
-SecureServerSocket::SecureServerSocket(const SocketAddress& rAddress, int backlog, Context::Ptr pContext): 
+SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog, Context::Ptr pContext):
 	ServerSocket(new SecureServerSocketImpl(pContext), true)
 {
-	impl()->bind(rAddress, true);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 
 
-SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog): 
+SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog):
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
 	IPAddress wildcardAddr;
-	SocketAddress socketAddress(wildcardAddr, port);
-	impl()->bind(socketAddress, true);
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 
-SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog, Context::Ptr pContext): 
+SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog, Context::Ptr pContext):
 	ServerSocket(new SecureServerSocketImpl(pContext), true)
 {
 	IPAddress wildcardAddr;
-	SocketAddress socketAddress(wildcardAddr, port);
-	impl()->bind(socketAddress, true);
+	SocketAddress address(wildcardAddr, port);
+	impl()->bind(address, true);
 	impl()->listen(backlog);
 }
 

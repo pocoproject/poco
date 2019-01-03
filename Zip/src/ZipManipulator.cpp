@@ -1,8 +1,6 @@
 //
 // ZipManipulator.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipManipulator.cpp#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  ZipManipulator
@@ -66,7 +64,7 @@ void ZipManipulator::renameFile(const std::string& zipPath, const std::string& n
 {
 	const ZipLocalFileHeader& entry = getForChange(zipPath);
 	// checked later in Compress too but the earlier one gets the error the better
-	std::string fn = ZipUtil::validZipEntryFileName(newZipPath); 
+	std::string fn = ZipUtil::validZipEntryFileName(newZipPath);
 	addOperation(zipPath, new Rename(entry, fn));
 }
 
@@ -111,7 +109,7 @@ const ZipLocalFileHeader& ZipManipulator::getForChange(const std::string& zipPat
 {
 	ZipArchive::FileHeaders::const_iterator it = _in->findHeader(zipPath);
 	if (it == _in->headerEnd())
-		throw ZipManipulationException("entry not found: " + zipPath);
+		throw ZipManipulationException("Entry not found: " + zipPath);
 
 	if (_changes.find(zipPath) != _changes.end())
 		throw ZipManipulationException("A change request exists already for entry " + zipPath);

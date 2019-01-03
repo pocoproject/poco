@@ -1,8 +1,6 @@
 //
 // Exception.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Exception.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -44,7 +42,7 @@ public:
 
 	Exception(const Exception& exc);
 		/// Copy constructor.
-		
+
 	~Exception() throw();
 		/// Destroys the exception and deletes the nested exception.
 
@@ -53,25 +51,25 @@ public:
 
 	virtual const char* name() const throw();
 		/// Returns a static string describing the exception.
-		
+
 	virtual const char* className() const throw();
 		/// Returns the name of the exception class.
-		
+
 	virtual const char* what() const throw();
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.
-		
+
 	const Exception* nested() const;
 		/// Returns a pointer to the nested exception, or
 		/// null if no nested exception exists.
-			
+
 	const std::string& message() const;
 		/// Returns the message text.
-			
+
 	int code() const;
 		/// Returns the exception code if defined.
-		
+
 	std::string displayText() const;
 		/// Returns a string consisting of the
 		/// message name and the message text.
@@ -81,7 +79,7 @@ public:
 		///
 		/// The copy can later be thrown again by
 		/// invoking rethrow() on it.
-		
+
 	virtual void rethrow() const;
 		/// (Re)Throws the exception.
 		///
@@ -98,11 +96,26 @@ protected:
 
 	void extendedMessage(const std::string& arg);
 		/// Sets the extended message for the exception.
-		
+
+	void addBacktrace();
+		/// Appends backtrace (if available) to the
+		/// message.
+
 private:
-	std::string _msg;
-	Exception*  _pNested;
-	int			_code;
+	std::string& msg() const
+	{
+		if (_msg.find(name()) == std::string::npos)
+		{
+			std::string s(name());
+			s.append(": ");
+			_msg.insert(0, s);
+		}
+		return _msg;
+	}
+
+	mutable std::string _msg;
+	Exception*          _pNested;
+	int                 _code;
 };
 
 
@@ -254,7 +267,10 @@ POCO_DECLARE_EXCEPTION(Foundation_API, CreateFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OpenFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, WriteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ReadFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, DirectoryNotEmptyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnknownURISchemeException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, TooManyURIRedirectsException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, URISyntaxException, SyntaxException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, ApplicationException, Exception)
 POCO_DECLARE_EXCEPTION(Foundation_API, BadCastException, RuntimeException)

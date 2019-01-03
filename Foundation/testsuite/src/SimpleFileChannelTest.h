@@ -1,8 +1,6 @@
 //
 // SimpleFileChannelTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SimpleFileChannelTest.h#1 $
-//
 // Definition of the SimpleFileChannelTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // DOMException.cpp
 //
-// $Id: //poco/1.4/XML/src/DOMException.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -43,9 +41,9 @@ const std::string DOMException::MESSAGES[_NUMBER_OF_MESSAGES] =
 };
 
 
-DOMException::DOMException(unsigned short exceptionCode):
-	XMLException(message(exceptionCode)),
-	_code(exceptionCode)
+DOMException::DOMException(unsigned short code):
+	XMLException(message(code)),
+	_code(code)
 {
 }
 

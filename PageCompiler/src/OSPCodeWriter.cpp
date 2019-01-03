@@ -1,8 +1,6 @@
 //
 // OSPCodeWriter.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/OSPCodeWriter.cpp#3 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -15,8 +13,8 @@
 #include "Poco/NumberParser.h"
 
 
-OSPCodeWriter::OSPCodeWriter(const Page& rPage, const std::string& rClazz):
-	CodeWriter(rPage, rClazz)
+OSPCodeWriter::OSPCodeWriter(const Page& page, const std::string& clazz):
+	CodeWriter(page, clazz)
 {
 }
 

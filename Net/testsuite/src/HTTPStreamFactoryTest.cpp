@@ -1,8 +1,6 @@
 //
 // HTTPStreamFactoryTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPStreamFactoryTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -44,12 +42,12 @@ void HTTPStreamFactoryTest::testNoRedirect()
 {
 	HTTPTestServer server;
 	HTTPStreamFactory factory;
-	URI uri("http://localhost/large");
+	URI uri("http://127.0.0.1/large");
 	uri.setPort(server.port());
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
+	std::unique_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
@@ -57,12 +55,12 @@ void HTTPStreamFactoryTest::testEmptyPath()
 {
 	HTTPTestServer server;
 	HTTPStreamFactory factory;
-	URI uri("http://localhost");
+	URI uri("http://127.0.0.1");
 	uri.setPort(server.port());
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
+	std::unique_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::SMALL_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::SMALL_BODY);
 }
 
 
@@ -71,24 +69,24 @@ void HTTPStreamFactoryTest::testRedirect()
 	HTTPTestServer server;
 	Poco::URIStreamOpener opener;
 	opener.registerStreamFactory("http", new HTTPStreamFactory);
-	URI uri("http://localhost/redirect");
+	URI uri("http://127.0.0.1/redirect");
 	uri.setPort(server.port());
-	std::auto_ptr<std::istream> pStr(opener.open(uri));
+	std::unique_ptr<std::istream> pStr(opener.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
 void HTTPStreamFactoryTest::testProxy()
 {
 	HTTPTestServer server;
-	HTTPStreamFactory factory("localhost", server.port());
+	HTTPStreamFactory factory("127.0.0.1", server.port());
 	URI uri("http://www.somehost.com/large");
-	std::auto_ptr<std::istream> pStr(factory.open(uri));
+	std::unique_ptr<std::istream> pStr(factory.open(uri));
 	std::ostringstream ostr;
 	StreamCopier::copyStream(*pStr.get(), ostr);
-	assert (ostr.str() == HTTPTestServer::LARGE_BODY);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
 }
 
 
@@ -96,7 +94,7 @@ void HTTPStreamFactoryTest::testError()
 {
 	HTTPTestServer server;
 	HTTPStreamFactory factory;
-	URI uri("http://localhost/notfound");
+	URI uri("http://127.0.0.1/notfound");
 	uri.setPort(server.port());
 	try
 	{

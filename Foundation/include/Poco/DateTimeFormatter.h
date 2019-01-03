@@ -1,8 +1,6 @@
 //
 // DateTimeFormatter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DateTimeFormatter.h#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTimeFormatter
@@ -33,7 +31,7 @@ class Timespan;
 
 
 class Foundation_API DateTimeFormatter
-	/// This class converts dates and times into strings, supporting a  
+	/// This class converts dates and times into strings, supporting a
 	/// variety of standard and custom formats.
 	///
 	/// There are two kind of static member functions:
@@ -45,7 +43,7 @@ class Foundation_API DateTimeFormatter
 public:
 	enum
 	{
-		UTC = 0xFFFF /// Special value for timeZoneDifferential denoting UTC. 
+		UTC = 0xFFFF /// Special value for timeZoneDifferential denoting UTC.
 	};
 
 	static std::string format(const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential = UTC);

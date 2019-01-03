@@ -1,8 +1,6 @@
 //
 // RawSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/RawSocket.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  RawSocket
@@ -75,9 +73,23 @@ public:
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
-		/// socket. 
+		/// socket.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// Calls to connect() cannot come before calls to bind().
+
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 		///
 		/// Calls to connect() cannot come before calls to bind().

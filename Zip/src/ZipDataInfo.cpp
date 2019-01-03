@@ -1,8 +1,6 @@
 //
 // ZipDataInfo.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipDataInfo.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ZipDataInfo
@@ -15,6 +13,7 @@
 
 
 #include "Poco/Zip/ZipDataInfo.h"
+#include "Poco/Exception.h"
 #include <istream>
 #include <cstring>
 
@@ -47,10 +46,11 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 	else
 	{
 		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
-		if ((!in) || (in.gcount() != ZipCommon::HEADER_SIZE))
-			return;
+		if (in.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read data info header");
+		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad data info header");
 	}
-	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
 	// now copy the rest of the header
 	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	_valid = (!in.eof() && in.good());
@@ -60,7 +60,6 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 ZipDataInfo::~ZipDataInfo()
 {
 }
-
 
 
 const char ZipDataInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
@@ -87,10 +86,12 @@ ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
 	else
 	{
 		in.read(_rawInfo, ZipCommon::HEADER_SIZE);
-		if ((!in) || (in.gcount() != ZipCommon::HEADER_SIZE))
-			return;
+		if (in.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read data info header");
+		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad data info header");
 	}
-	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
+
 	// now copy the rest of the header
 	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	_valid = (!in.eof() && in.good());

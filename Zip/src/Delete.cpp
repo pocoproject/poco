@@ -1,8 +1,6 @@
 //
 // Delete.cpp
 //
-// $Id: //poco/1.4/Zip/src/Delete.cpp#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  Delete
@@ -27,7 +25,7 @@ Delete::Delete(const ZipLocalFileHeader& hdr):
 }
 
 
-void Delete::execute(Compress& c, std::istream& input)
+void Delete::execute(Compress& /*c*/, std::istream& /*input*/)
 {
 	// due to absolute positioning in compress we don't need to do anything
 }

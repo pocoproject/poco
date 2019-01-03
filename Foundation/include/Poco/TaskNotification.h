@@ -1,8 +1,6 @@
 //
 // TaskNotification.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/TaskNotification.h#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks

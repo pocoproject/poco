@@ -1,8 +1,6 @@
 //
 // Add.cpp
 //
-// $Id: //poco/1.4/Zip/src/Add.cpp#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  Add
@@ -31,7 +29,7 @@ Add::Add(const std::string& zipPath, const std::string& localPath, ZipCommon::Co
 }
 
 
-void Add::execute(Compress& c, std::istream& input)
+void Add::execute(Compress& c, std::istream& /*input*/)
 {
 	c.addFile(Poco::Path(_localPath), Poco::Path(_zipPath), _cm, _cl);
 }

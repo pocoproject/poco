@@ -1,8 +1,6 @@
 //
 // MediaType.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MediaType.h#2 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MediaType

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/PDF/samples/Image/Makefile#1 $
-#
 # Makefile for Poco PDF Image sample
 #
 
@@ -12,6 +10,6 @@ objects = Image
 
 target         = Image
 target_version = 1
-target_libs    = PocoPDF PocoFoundation
+target_libs    = PocoPDF PocoUtil PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

@@ -1,8 +1,6 @@
 //
 // CipherKey.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherKey.h#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKey
@@ -40,7 +38,7 @@ class Crypto_API CipherKey
 	/// file.
 	///
 	/// To create a key using a human-readable password
-	/// string, use the following code. We create a AES Cipher and 
+	/// string, use the following code. We create a AES Cipher and
 	/// use a salt value to make the key more robust:
 	///
 	///     std::string password = "secret";
@@ -70,22 +68,26 @@ public:
 			/// an iteration count of at least 1000.
 	};
 
-	CipherKey(const std::string& name, 
-		const std::string& passphrase, 
+	CipherKey(const std::string& name,
+		const std::string& passphrase,
 		const std::string& salt = "",
 		int iterationCount = DEFAULT_ITERATION_COUNT,
 		const std::string& digest = "md5");
 		/// Creates a new CipherKeyImpl object using the given
 		/// cipher name, passphrase, salt value, iteration count and digest.
 
-	CipherKey(const std::string& name, 
-		const ByteVec& key, 
+	CipherKey(const std::string& name,
+		const ByteVec& key,
 		const ByteVec& iv);
 		/// Creates a new CipherKeyImpl object using the given cipher
-		/// name, key and initialization vector.
+		/// name, key and initialization vector (IV).
+		///
+		/// The size of the IV must match the cipher's expected
+		/// IV size (see ivSize()), except for GCM mode, which allows
+		/// a custom IV size.
 
 	CipherKey(const std::string& name);
-		/// Creates a new CipherKeyImpl object. Autoinitializes key and 
+		/// Creates a new CipherKeyImpl object. Autoinitializes key and
 		/// initialization vector.
 
 	~CipherKey();
@@ -117,6 +119,10 @@ public:
 
 	void setIV(const ByteVec& iv);
 		/// Sets the initialization vector (IV) for the Cipher.
+		///
+		/// The size of the vector must match the cipher's expected
+		/// IV size (see ivSize()), except for GCM mode, which allows
+		/// a custom IV size.
 
 	CipherKeyImpl::Ptr impl();
 		/// Returns the impl object

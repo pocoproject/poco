@@ -1,8 +1,6 @@
 //
 // Channel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Channel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Channel
@@ -24,6 +22,7 @@
 #include "Poco/Configurable.h"
 #include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -40,18 +39,20 @@ class Foundation_API Channel: public Configurable, public RefCountedObject
 	/// of getProperty() and setProperty().
 {
 public:
+	typedef AutoPtr<Channel> Ptr;
+
 	Channel();
 		/// Creates the channel and initializes
 		/// the reference count to one.
 
 	virtual void open();
-		/// Does whatever is necessary to open the channel. 
+		/// Does whatever is necessary to open the channel.
 		/// The default implementation does nothing.
 		
 	virtual void close();
 		/// Does whatever is necessary to close the channel.
 		/// The default implementation does nothing.
-		
+
 	virtual void log(const Message& msg) = 0;
 		/// Logs the given message to the channel. Must be
 		/// overridden by subclasses.
@@ -64,10 +65,10 @@ public:
 
 	std::string getProperty(const std::string& name) const;
 		/// Throws a PropertyNotSupportedException.
-		
+
 protected:
 	virtual ~Channel();
-	
+
 private:
 	Channel(const Channel&);
 	Channel& operator = (const Channel&);

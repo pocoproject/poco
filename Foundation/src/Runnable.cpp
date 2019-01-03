@@ -1,8 +1,6 @@
 //
 // Runnable.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Runnable.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread

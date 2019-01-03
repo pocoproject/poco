@@ -1,8 +1,6 @@
 //
 // Timer.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timer.cpp#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Timer
@@ -23,8 +21,8 @@
 namespace Poco {
 
 
-Timer::Timer(long startInterval, long periodicInterval): 
-	_startInterval(startInterval), 
+Timer::Timer(long startInterval, long periodicInterval):
+	_startInterval(startInterval),
 	_periodicInterval(periodicInterval),
 	_skipped(0),
 	_pCallback(0)
@@ -230,7 +228,7 @@ AbstractTimerCallback::AbstractTimerCallback()
 }
 
 
-AbstractTimerCallback::AbstractTimerCallback(const AbstractTimerCallback& callback)
+AbstractTimerCallback::AbstractTimerCallback(const AbstractTimerCallback& /*callback*/)
 {
 }
 
@@ -240,7 +238,7 @@ AbstractTimerCallback::~AbstractTimerCallback()
 }
 
 
-AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCallback& callback)
+AbstractTimerCallback& AbstractTimerCallback::operator = (const AbstractTimerCallback& /*callback*/)
 {
 	return *this;
 }

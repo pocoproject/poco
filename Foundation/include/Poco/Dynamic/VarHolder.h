@@ -1,8 +1,6 @@
 //
 // VarHolder.h
 //
-// $Id: //poco/svn/Foundation/include/Poco/VarHolder.h#3 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarHolder
@@ -59,25 +57,25 @@ bool Foundation_API isJSONString(const Var& any);
 
 
 void Foundation_API appendJSONKey(std::string& val, const Var& any);
-	/// Converts the any to a JSON key (i.e. wraps it into double quotes 
+	/// Converts the any to a JSON key (i.e. wraps it into double quotes
 	/// regardless of the underlying type) and appends it to val.
 
 
 void Foundation_API appendJSONString(std::string& val, const Var& any);
-	/// Converts the any to a JSON string (i.e. wraps it into double quotes) 
+	/// Converts the any to a JSON string (i.e. wraps it into double quotes)
 	/// regardless of the underlying type) and appends it to val.
 
 
 void Foundation_API appendJSONValue(std::string& val, const Var& any);
-	/// Converts the any to a JSON value (if underlying type qualifies 
-	/// as string - see isJSONString() - , it is wrapped into double quotes) 
+	/// Converts the any to a JSON value (if underlying type qualifies
+	/// as string - see isJSONString() - , it is wrapped into double quotes)
 	/// and appends it to val
 
 
 template <typename C>
 void containerToJSON(C& cont, std::string& val)
 {
-	// Serialize in JSON format. Note: although this is a vector<T>, the code only 
+	// Serialize in JSON format. Note: although this is a vector<T>, the code only
 	// supports vector<Var>. Total specialization is not possible
 	// because of the cyclic dependency between Var and VarHolder
 
@@ -92,7 +90,6 @@ void containerToJSON(C& cont, std::string& val)
 	}
 	for (; it != itEnd; ++it)
 	{
-		
 		val.append(", ");
 		appendJSONValue(val, *it);
 	}
@@ -104,11 +101,11 @@ void containerToJSON(C& cont, std::string& val)
 
 
 class Foundation_API VarHolder
-	/// Interface for a data holder used by the Var class. 
+	/// Interface for a data holder used by the Var class.
 	/// Provides methods to convert between data types.
 	/// Only data types for which VarHolder specialization exists are supported.
-	/// 
-	/// Provided are specializations for all C++ built-in types with addition of 
+	///
+	/// Provided are specializations for all C++ built-in types with addition of
 	/// std::string, Poco::UTF16String, DateTime, LocalDateTime, Timestamp, std::vector<Var> and DynamicStruct.
 	///
 	/// Additional types can be supported by adding specializations. When implementing specializations,
@@ -128,7 +125,7 @@ public:
 	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = 0) const = 0;
 		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
-		/// If small object optimization is enabled (i.e. if 
+		/// If small object optimization is enabled (i.e. if
 		/// POCO_NO_SOO is not defined), VarHolder will be
 		/// instantiated in-place if it's size is smaller
 		/// than POCO_SMALL_OBJECT_SIZE.
@@ -234,6 +231,10 @@ public:
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to support the diagnostic.
 
+	virtual bool isOrdered() const;
+		/// Returns false. Must be properly overriden in a type
+		/// specialization in order to support the diagnostic.
+
 	virtual bool isInteger() const;
 		/// Returns false. Must be properly overriden in a type
 		/// specialization in order to support the diagnostic.
@@ -277,9 +278,9 @@ protected:
 	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
 		/// Instantiates value holder wrapper. If size of the wrapper is
 		/// larger than POCO_SMALL_OBJECT_SIZE, holder is instantiated on
-		/// the heap, otherwise it is instantiated in-place (in the 
+		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
-		/// 
+		///
 		/// Called from clone() member function of the implementation when
 		/// small object optimization is enabled.
 	{
@@ -307,7 +308,7 @@ protected:
 	void convertToSmaller(const F& from, T& to) const
 		/// This function is meant to convert signed numeric values from
 		/// larger to smaller type. It checks the upper and lower bound and
-		/// if from value is within limits of type T (i.e. check calls do not throw), 
+		/// if from value is within limits of type T (i.e. check calls do not throw),
 		/// it is converted.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -317,13 +318,13 @@ protected:
 
 		if (std::numeric_limits<F>::is_integer)
 		{
-			checkUpperLimit<F,T>(from); 
+			checkUpperLimit<F,T>(from);
 			checkLowerLimit<F,T>(from);
 		}
 		else
 		{
-			checkUpperLimitFloat<F,T>(from); 
-			checkLowerLimitFloat<F,T>(from); 
+			checkUpperLimitFloat<F,T>(from);
+			checkLowerLimitFloat<F,T>(from);
 		}
 		
 		to = static_cast<T>(from);
@@ -332,8 +333,8 @@ protected:
 	template <typename F, typename T>
 	void convertToSmallerUnsigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types,
-		/// from larger to smaller type. Since lower limit is always 0 for unsigned types, 
-		/// only the upper limit is checked, thus saving some cycles compared to the signed 
+		/// from larger to smaller type. Since lower limit is always 0 for unsigned types,
+		/// only the upper limit is checked, thus saving some cycles compared to the signed
 		/// version of the function. If the value to be converted is smaller than
 		/// the maximum value for the target type, the conversion is performed.
 	{
@@ -342,15 +343,15 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (!std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
 	template <typename F, typename T>
 	void convertSignedToUnsigned(const F& from, T& to) const
 		/// This function is meant for converting signed integral data types to
-		/// unsigned data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// unsigned data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -360,15 +361,15 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
 	template <typename F, typename T>
 	void convertSignedFloatToUnsigned(const F& from, T& to) const
 		/// This function is meant for converting floating point data types to
-		/// unsigned integral data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// unsigned integral data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -379,15 +380,15 @@ protected:
 
 		if (from < 0)
 			throw RangeException("Value too small.");
-		checkUpperLimitFloat<F,T>(from); 
+		checkUpperLimitFloat<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
 	template <typename F, typename T>
 	void convertUnsignedToSigned(const F& from, T& to) const
 		/// This function is meant for converting unsigned integral data types to
-		/// unsigned data types. Negative values can not be converted and if one is 
-		/// encountered, RangeException is thrown. 
+		/// signed integral data types. Negative values can not be converted and if one
+		/// is encountered, RangeException is thrown.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		poco_static_assert (std::numeric_limits<F>::is_specialized);
@@ -395,25 +396,52 @@ protected:
 		poco_static_assert (!std::numeric_limits<F>::is_signed);
 		poco_static_assert (std::numeric_limits<T>::is_signed);
 
-		checkUpperLimit<F,T>(from); 
+		checkUpperLimit<F,T>(from);
 		to = static_cast<T>(from);
 	}
 
 private:
-	template <typename F, typename T>
-	void checkUpperLimit(const F& from) const
-	{
-		if ((sizeof(T) < sizeof(F)) &&
-			(from > static_cast<F>(std::numeric_limits<T>::max())))
+
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4127 )
+#pragma warning( disable : 4018 )
+#endif
+
+		template <typename F, typename T>
+		void POCO_UNUSED checkUpperLimit(const F& from) const
 		{
-			throw RangeException("Value too large.");
+			// casting to type of smaller size AND
+			// 'from' is greater than 'T' max value
+			if ((sizeof(T) < sizeof(F)) &&
+				(from > static_cast<F>(std::numeric_limits<T>::max())))
+			{
+				throw RangeException("Value too large.");
+			}
+			// casting to type of equal/bigger size AND
+			// 'F' is signed AND
+			// 'T' is unsigned AND
+			// 'from' is negative
+			else if (std::numeric_limits<F>::is_signed &&
+					!std::numeric_limits<T>::is_signed && from < 0)
+			{
+				throw RangeException("Value too small.");
+			}
+			// casting to type of equal/bigger size AND
+			// 'F' is unsigned AND
+			// 'T' is signed AND
+			// 'from' is greater than 'T' max value
+			else if (!std::numeric_limits<F>::is_signed &&
+					  std::numeric_limits<T>::is_signed &&
+					  static_cast<Poco::UInt64>(from) > std::numeric_limits<T>::max())
+			{
+				throw RangeException("Value too large.");
+			}
 		}
-		else
-		if (static_cast<T>(from) > std::numeric_limits<T>::max()) 
-		{
-			throw RangeException("Value too large.");
-		}
-	}
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 	template <typename F, typename T>
 	void checkUpperLimitFloat(const F& from) const
@@ -425,14 +453,14 @@ private:
 	template <typename F, typename T>
 	void checkLowerLimitFloat(const F& from) const
 	{
-		if (from < -std::numeric_limits<T>::max()) 
+		if (from < -std::numeric_limits<T>::max())
 			throw RangeException("Value too small.");
 	}
 
 	template <typename F, typename T>
 	void checkLowerLimit(const F& from) const
 	{
-		if (from < std::numeric_limits<T>::min()) 
+		if (from < std::numeric_limits<T>::min())
 			throw RangeException("Value too small.");
 	}
 };
@@ -508,7 +536,9 @@ inline void VarHolder::convert(Timestamp& /*val*/) const
 	throw BadCastException("Can not convert to Timestamp");
 }
 
+
 #ifndef POCO_LONG_IS_64_BIT
+
 
 inline void VarHolder::convert(long& val) const
 {
@@ -525,7 +555,9 @@ inline void VarHolder::convert(unsigned long& val) const
 	val = tmp;
 }
 
+
 #endif
+
 
 inline void VarHolder::convert(bool& /*val*/) const
 {
@@ -592,6 +624,13 @@ inline bool VarHolder::isStruct() const
 	return false;
 }
 
+
+inline bool VarHolder::isOrdered() const
+{
+	return false;
+}
+
+
 inline bool VarHolder::isInteger() const
 {
 	return false;
@@ -639,15 +678,16 @@ inline bool VarHolder::isDateTime() const
 	return false;
 }
 
+
 inline std::size_t VarHolder::size() const
 {
 	return 1u;
 }
 
 
-template <typename T>
+template <typename T, class Enable>
 class VarHolderImpl: public VarHolder
-	/// Template based implementation of a VarHolder. 
+	/// Template based implementation of a VarHolder.
 	/// This class provides type storage for user-defined types
 	/// that do not have VarHolderImpl specialization.
 	///
@@ -2040,7 +2080,7 @@ public:
 
 	void convert(bool& val) const
 	{
-		val = !(_val <= std::numeric_limits<float>::min() && 
+		val = !(_val <= std::numeric_limits<float>::min() &&
 			_val >= -1 * std::numeric_limits<float>::min());
 	}
 
@@ -2179,7 +2219,7 @@ public:
 
 	void convert(bool& val) const
 	{
-		val = !(_val <= std::numeric_limits<double>::min() && 
+		val = !(_val <= std::numeric_limits<double>::min() &&
 			_val >= -1 * std::numeric_limits<double>::min());
 	}
 
@@ -2767,11 +2807,14 @@ private:
 };
 
 
-#ifndef POCO_LONG_IS_64_BIT
-
-
-template <>
-class VarHolderImpl<long>: public VarHolder
+template <typename T>
+class VarHolderImpl<T,
+	typename std::enable_if<
+		 std::is_same<T, long       >::value &&
+		!std::is_same<T, Poco::Int64>::value &&
+		!std::is_same<T, Poco::Int32>::value
+	>::type
+>: public VarHolder
 {
 public:
 	VarHolderImpl(long val): _val(val)
@@ -2851,7 +2894,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val = NumberFormatter::format(_val);
+		val = NumberFormatter::format(static_cast<Int64 >(_val));
 	}
 
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
@@ -2908,8 +2951,14 @@ private:
 };
 
 
-template <>
-class VarHolderImpl<unsigned long>: public VarHolder
+template <typename T>
+class VarHolderImpl<T,
+	typename std::enable_if<
+		 std::is_same<T, unsigned long>::value &&
+		!std::is_same<T, Poco::UInt64 >::value &&
+		!std::is_same<T, Poco::UInt32 >::value
+		>::type
+>: public VarHolder
 {
 public:
 	VarHolderImpl(unsigned long val): _val(val)
@@ -2989,7 +3038,7 @@ public:
 
 	void convert(std::string& val) const
 	{
-		val = NumberFormatter::format(_val);
+		val = NumberFormatter::format(static_cast<UInt64>(_val));
 	}
 
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
@@ -3044,9 +3093,6 @@ private:
 
 	unsigned long _val;
 };
-
-
-#endif // 64bit
 
 
 template <typename T>

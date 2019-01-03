@@ -1,8 +1,6 @@
 //
 // HTTPDigestCredentials.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPDigestCredentials.cpp#5 $
-//
 // Library: Net
 // Package: HTTP
 // Module:	HTTPDigestCredentials
@@ -41,11 +39,11 @@ namespace
 		engine.update(a);
 		engine.update(':');
 		engine.update(b);
-		if (!c.empty()) 
+		if (!c.empty())
 		{
 			engine.update(':');
 			engine.update(c);
-			if (!d.empty()) 
+			if (!d.empty())
 			{
 				engine.update(':');
 				engine.update(d);
@@ -188,7 +186,7 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 
 	const std::string& algorithm = responseAuthParams.get(ALGORITHM_PARAM, DEFAULT_ALGORITHM);
 
-	if (icompare(algorithm, DEFAULT_ALGORITHM) != 0) 
+	if (icompare(algorithm, DEFAULT_ALGORITHM) != 0)
 		throw NotImplementedException("Unsupported digest algorithm", algorithm);
 
 	const std::string& nonce = responseAuthParams.get(NONCE_PARAM);
@@ -199,7 +197,7 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 	_requestAuthParams.set(USERNAME_PARAM, _username);
 	_requestAuthParams.set(NONCE_PARAM, nonce);
 	_requestAuthParams.setRealm(realm);
-	if (responseAuthParams.has(OPAQUE_PARAM)) 
+	if (responseAuthParams.has(OPAQUE_PARAM))
 	{
 		_requestAuthParams.set(OPAQUE_PARAM, responseAuthParams.get(OPAQUE_PARAM));
 	}
@@ -207,7 +205,7 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 	if (qop.empty())
 	{
 		updateAuthParams(request);
-	} 
+	}
 	else
 	{
 		Poco::StringTokenizer tok(qop, ",", Poco::StringTokenizer::TOK_TRIM);
@@ -223,9 +221,9 @@ void HTTPDigestCredentials::createAuthParams(const HTTPRequest& request, const H
 				break;
 			}
 		}
-		if (!qopSupported) 
+		if (!qopSupported)
 			throw NotImplementedException("Unsupported QoP requested", qop);
-	} 
+	}
 }
 
 
@@ -245,7 +243,7 @@ void HTTPDigestCredentials::updateAuthParams(const HTTPRequest& request)
 
 		_requestAuthParams.set(RESPONSE_PARAM, digest(engine, ha1, nonce, ha2));
 	}
-	else if (icompare(qop, AUTH_PARAM) == 0) 
+	else if (icompare(qop, AUTH_PARAM) == 0)
 	{
 		const std::string& cnonce = _requestAuthParams.get(CNONCE_PARAM);
 
@@ -279,7 +277,7 @@ bool HTTPDigestCredentials::verifyAuthParams(const HTTPRequest& request, const H
 		const std::string ha2 = digest(engine, request.getMethod(), request.getURI());
 		response = digest(engine, ha1, nonce, ha2);
 	}
-	else if (icompare(qop, AUTH_PARAM) == 0) 
+	else if (icompare(qop, AUTH_PARAM) == 0)
 	{
 		const std::string& cnonce = params.get(CNONCE_PARAM);
 		const std::string& nc = params.get(NC_PARAM);
@@ -295,7 +293,7 @@ int HTTPDigestCredentials::updateNonceCounter(const std::string& nonce)
 {
 	NonceCounterMap::iterator iter = _nc.find(nonce);
 
-	if (iter == _nc.end()) 
+	if (iter == _nc.end())
 	{
 		iter = _nc.insert(NonceCounterMap::value_type(nonce, 0)).first;
 	}

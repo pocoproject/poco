@@ -1,8 +1,6 @@
 //
 // EventArgs.cpp
 //
-// $Id: //poco/1.4/Foundation/src/EventArgs.cpp#1 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  EventArgs

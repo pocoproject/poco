@@ -1,8 +1,6 @@
 //
 // OAuth20CredentialsTest.h
 //
-// $Id$
-//
 // Definition of the OAuth20CredentialsTest class.
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.

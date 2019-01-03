@@ -1,8 +1,6 @@
 //
 // OAuth20Credentials.h
 //
-// $Id$
-//
 // Library: Net
 // Package: OAuth
 // Module:	OAuth20Credentials
@@ -32,7 +30,7 @@ class HTTPRequest;
 
 class Net_API OAuth20Credentials
 	/// This class implements OAuth 2.0 authentication for HTTP requests,
-	/// via Bearer tokens in the Authorization header, 
+	/// via Bearer tokens in the Authorization header,
 	/// according to RFC 6749 and RFC 6750.
 	///
 	/// To add an Authorization header containing a bearer token
@@ -44,7 +42,7 @@ class Net_API OAuth20Credentials
 	/// object containing a "Bearer" Authorization header and
 	/// calling getBearerToken().
 	///
-	/// The authorization header scheme can be changed from 
+	/// The authorization header scheme can be changed from
 	/// "Bearer" to a custom value. For example, GitHub uses
 	/// the "token" scheme.
 {

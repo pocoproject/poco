@@ -1,15 +1,13 @@
 //
 // DirectoryIterator_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryIterator_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator
 //
 // Definition of the DirectoryIteratorImpl class for WIN32.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -40,9 +38,9 @@ public:
 	const std::string& next();
 	
 private:
-	HANDLE          _fh;
-	WIN32_FIND_DATA _fd;
-	std::string     _current;
+	HANDLE           _fh;
+	WIN32_FIND_DATAW _fd;
+	std::string      _current;
 	int _rc;
 };
 

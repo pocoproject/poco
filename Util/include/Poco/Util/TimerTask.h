@@ -1,8 +1,6 @@
 //
 // TimerTask.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/TimerTask.h#1 $
-//
 // Library: Util
 // Package: Timer
 // Module:  TimerTask
@@ -32,7 +30,7 @@ namespace Util {
 
 
 class Util_API TimerTask: public Poco::RefCountedObject, public Poco::Runnable
-	/// A task that can be scheduled for one-time or 
+	/// A task that can be scheduled for one-time or
 	/// repeated execution by a Timer.
 	///
 	/// This is an abstract class. Subclasses must override the run() member
@@ -46,10 +44,10 @@ public:
 		
 	void cancel();
 		/// Cancels the execution of the timer.
-		/// If the task has been scheduled for one-time execution and has 
-		/// not yet run, or has not yet been scheduled, it will never run. 
-		/// If the task has been scheduled for repeated execution, it will never 
-		/// run again. If the task is running when this call occurs, the task 
+		/// If the task has been scheduled for one-time execution and has
+		/// not yet run, or has not yet been scheduled, it will never run.
+		/// If the task has been scheduled for repeated execution, it will never
+		/// run again. If the task is running when this call occurs, the task
 		/// will run to completion, but will never run again.
 		///
 		/// Warning: A TimerTask that has been cancelled must not be scheduled again.

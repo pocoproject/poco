@@ -1,8 +1,6 @@
 //
 // PDFException.cpp
 //
-// $Id: //poco/Main/PDF/src/PDFException.cpp#8 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  PDFException
@@ -24,7 +22,7 @@ namespace Poco {
 namespace PDF {
 
 
-void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data)
+void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* /*user_data*/)
 {
 	switch (error_no)
 	{

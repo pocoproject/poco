@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="App">
+      <UniqueIdentifier>{bc55ab4f-7576-4e93-bab0-4be036d19109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Header Files">
+      <UniqueIdentifier>{12d7477f-9904-4d45-a7d1-f44ab1ba2799}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App\Source Files">
+      <UniqueIdentifier>{0dd90f19-25fe-481f-8b45-d71ebc3048aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DocWriter">
+      <UniqueIdentifier>{76f22b3e-c3a3-44fa-b294-0861798b3701}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DocWriter\Header Files">
+      <UniqueIdentifier>{cac31020-1d11-4a16-8080-f1091a224d00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DocWriter\Source Files">
+      <UniqueIdentifier>{88bb49a9-7512-4fbb-b16a-7e1c703eacc1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\PocoDoc.cpp">
+      <Filter>App\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DocWriter.cpp">
+      <Filter>DocWriter\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\DocWriter.h">
+      <Filter>DocWriter\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

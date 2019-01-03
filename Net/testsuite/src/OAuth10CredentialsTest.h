@@ -1,8 +1,6 @@
 //
 // OAuth10CredentialsTest.h
 //
-// $Id$
-//
 // Definition of the OAuth10CredentialsTest class.
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.

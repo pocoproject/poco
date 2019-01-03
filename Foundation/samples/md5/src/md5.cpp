@@ -1,8 +1,6 @@
 //
 // md5.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/md5/src/md5.cpp#1 $
-//
 // This sample demonstrates the DigestEngine, DigestOutputStream and
 // MD5Engine classes.
 //

@@ -1,8 +1,6 @@
 //
 // Variable.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Variable.cpp#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Variable

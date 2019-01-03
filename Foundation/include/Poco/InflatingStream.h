@@ -1,8 +1,6 @@
 //
 // InflatingStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/InflatingStream.h#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  ZLibStream
@@ -75,7 +73,7 @@ public:
 		/// Destroys the InflatingStreamBuf.
 		
 	int close();
-		/// Finishes up the stream. 
+		/// Finishes up the stream.
 		///
 		/// Must be called when inflating to an output stream.
 		
@@ -88,7 +86,7 @@ protected:
 	int sync();
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE  = 1024,
 		INFLATE_BUFFER_SIZE = 32768
@@ -122,11 +120,11 @@ public:
 		/// of the windowBits parameter.
 
 	InflatingIOS(std::istream& istr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
-		/// Creates an InflatingIOS for expanding the compressed data read from 
+		/// Creates an InflatingIOS for expanding the compressed data read from
 		/// the given input stream.
 
 	InflatingIOS(std::istream& istr, int windowBits);
-		/// Creates an InflatingIOS for expanding the compressed data read from 
+		/// Creates an InflatingIOS for expanding the compressed data read from
 		/// the given input stream.
 		///
 		/// Please refer to the zlib documentation of inflateInit2() for a description
@@ -143,7 +141,7 @@ protected:
 };
 
 
-class Foundation_API InflatingOutputStream: public InflatingIOS, public std::ostream
+class Foundation_API InflatingOutputStream: public std::ostream, public InflatingIOS
 	/// This stream decompresses all data passing through it
 	/// using zlib's inflate algorithm.
 	///
@@ -166,14 +164,14 @@ public:
 		/// Destroys the InflatingOutputStream.
 		
 	int close();
-		/// Finishes up the stream. 
+		/// Finishes up the stream.
 		///
 		/// Must be called to ensure all data is properly written to
 		/// the target output stream.
 };
 
 
-class Foundation_API InflatingInputStream: public InflatingIOS, public std::istream
+class Foundation_API InflatingInputStream: public std::istream, public InflatingIOS
 	/// This stream decompresses all data passing through it
 	/// using zlib's inflate algorithm.
 	/// Example:
@@ -188,11 +186,11 @@ class Foundation_API InflatingInputStream: public InflatingIOS, public std::istr
 {
 public:
 	InflatingInputStream(std::istream& istr, InflatingStreamBuf::StreamType type = InflatingStreamBuf::STREAM_ZLIB);
-		/// Creates an InflatingInputStream for expanding the compressed data read from 
+		/// Creates an InflatingInputStream for expanding the compressed data read from
 		/// the given input stream.
 
 	InflatingInputStream(std::istream& istr, int windowBits);
-		/// Creates an InflatingInputStream for expanding the compressed data read from 
+		/// Creates an InflatingInputStream for expanding the compressed data read from
 		/// the given input stream.
 		///
 		/// Please refer to the zlib documentation of inflateInit2() for a description

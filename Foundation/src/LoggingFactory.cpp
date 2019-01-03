@@ -1,8 +1,6 @@
 //
 // LoggingFactory.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LoggingFactory.cpp#3 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LoggingFactory
@@ -19,15 +17,13 @@
 #include "Poco/AsyncChannel.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/FileChannel.h"
+#include "Poco/SimpleFileChannel.h"
 #include "Poco/FormattingChannel.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/NullChannel.h"
 #include "Poco/EventChannel.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOGCHANNEL)
 #include "Poco/SyslogChannel.h"
-#endif
-#if defined(POCO_OS_FAMILY_VMS)
-#include "Poco/OpcomChannel.h"
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 #include "Poco/EventLogChannel.h"
@@ -49,26 +45,26 @@ LoggingFactory::~LoggingFactory()
 {
 }
 
-		
+
 void LoggingFactory::registerChannelClass(const std::string& className, ChannelInstantiator* pFactory)
 {
 	_channelFactory.registerClass(className, pFactory);
 }
 
-	
+
 void LoggingFactory::registerFormatterClass(const std::string& className, FormatterFactory* pFactory)
 {
 	_formatterFactory.registerClass(className, pFactory);
 }
 
 
-Channel* LoggingFactory::createChannel(const std::string& className) const
+Channel::Ptr LoggingFactory::createChannel(const std::string& className) const
 {
 	return _channelFactory.createInstance(className);
 }
 
-	
-Formatter* LoggingFactory::createFormatter(const std::string& className) const
+
+Formatter::Ptr LoggingFactory::createFormatter(const std::string& className) const
 {
 	return _formatterFactory.createInstance(className);
 }
@@ -96,8 +92,10 @@ void LoggingFactory::registerBuiltins()
 	_channelFactory.registerClass("ConsoleChannel", new Instantiator<ConsoleChannel, Channel>);
 	_channelFactory.registerClass("ColorConsoleChannel", new Instantiator<ColorConsoleChannel, Channel>);
 #endif
+
 #ifndef POCO_NO_FILECHANNEL
 	_channelFactory.registerClass("FileChannel", new Instantiator<FileChannel, Channel>);
+	_channelFactory.registerClass("SimpleFileChannel", new Instantiator<SimpleFileChannel, Channel>);
 #endif
 	_channelFactory.registerClass("FormattingChannel", new Instantiator<FormattingChannel, Channel>);
 #ifndef POCO_NO_SPLITTERCHANNEL
@@ -111,9 +109,7 @@ void LoggingFactory::registerBuiltins()
 	_channelFactory.registerClass("SyslogChannel", new Instantiator<SyslogChannel, Channel>);
 #endif
 #endif
-#if defined(POCO_OS_FAMILY_VMS)
-	_channelFactory.registerClass("OpcomChannel", new Instantiator<OpcomChannel, Channel>);
-#endif
+
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
 	_channelFactory.registerClass("EventLogChannel", new Instantiator<EventLogChannel, Channel>);
 #endif

@@ -1,8 +1,6 @@
 //
 // PrivateKeyPassphraseHandler.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/PrivateKeyPassphraseHandler.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  PrivateKeyPassphraseHandler
@@ -31,9 +29,9 @@ class NetSSL_API PrivateKeyPassphraseHandler
 	/// A passphrase handler is needed whenever the private key of a certificate is loaded and the certificate is protected
 	/// by a passphrase. The PrivateKeyPassphraseHandler's task is to provide that passphrase.
 	/// One can install one's own PrivateKeyPassphraseHandler by implementing this interface. Note that
-	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API 
+	/// in the implementation file of the subclass the following code must be present (assuming you use the namespace My_API
 	/// and the name of your handler class is MyGuiHandler):
-	///    
+	///
 	///    #include "Poco/Net/PrivateKeyFactory.h"
 	///    ...
 	///    POCO_REGISTER_KEYFACTORY(My_API, MyGuiHandler)
@@ -44,7 +42,7 @@ class NetSSL_API PrivateKeyPassphraseHandler
 	///
 	/// or in case one's application extends Poco::Util::Application one can use an XML configuration and put the following entry
 	/// under the path openSSL.privateKeyPassphraseHandler:
-	///    
+	///
 	///    <privateKeyPassphraseHandler>
 	///        <name>MyGuiHandler</name>
 	///        <options>

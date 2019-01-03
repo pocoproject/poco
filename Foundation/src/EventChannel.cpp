@@ -1,8 +1,6 @@
 //
 // EventChannel.cpp
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Logging
 // Module:  EventChannel

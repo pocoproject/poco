@@ -1,8 +1,6 @@
 //
 // PipeStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PipeStream.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  PipeStream
@@ -50,7 +48,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};

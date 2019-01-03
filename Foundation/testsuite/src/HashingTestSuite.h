@@ -1,8 +1,6 @@
 //
 // HashingTestSuite.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/HashingTestSuite.h#1 $
-//
 // Definition of the HashingTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

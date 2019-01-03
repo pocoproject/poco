@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "Ping")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoNet PocoUtil PocoJSON PocoXML PocoFoundation )
+add_executable(Ping src/Ping.cpp)
+target_link_libraries(Ping PUBLIC Poco::Net Poco::Util Poco::JSON)

@@ -1,8 +1,6 @@
 //
 // DOMSerializer.cpp
 //
-// $Id: //poco/1.4/XML/src/DOMSerializer.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMSerializer
@@ -108,7 +106,7 @@ ErrorHandler* DOMSerializer::getErrorHandler() const
 }
 
 
-void DOMSerializer::setFeature(const XMLString& featureId, bool state)
+void DOMSerializer::setFeature(const XMLString& featureId, bool /*state*/)
 {
 	if (featureId == XMLReader::FEATURE_NAMESPACES)
 		throw SAXNotSupportedException(fromXMLString(XMLReader::FEATURE_NAMESPACES));
@@ -130,7 +128,7 @@ bool DOMSerializer::getFeature(const XMLString& featureId) const
 }
 
 
-void DOMSerializer::setProperty(const XMLString& propertyId, const XMLString& value)
+void DOMSerializer::setProperty(const XMLString& propertyId, const XMLString& /*value*/)
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER || propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
 		throw SAXNotSupportedException(std::string("property does not take a string value: ") + fromXMLString(propertyId));
@@ -167,19 +165,19 @@ void DOMSerializer::serialize(const Node* pNode)
 }
 
 
-void DOMSerializer::parse(InputSource* pSource)
+void DOMSerializer::parse(InputSource* /*pSource*/)
 {
 	throw XMLException("The DOMSerializer cannot parse an InputSource");
 }
 
 
-void DOMSerializer::parse(const XMLString& systemId)
+void DOMSerializer::parse(const XMLString& /*systemId*/)
 {
 	throw XMLException("The DOMSerializer cannot parse from a system identifier");
 }
 
 
-void DOMSerializer::parseMemoryNP(const char* xml, std::size_t size)
+void DOMSerializer::parseMemoryNP(const char* /*xml*/, std::size_t /*size*/)
 {
 	throw XMLException("The DOMSerializer cannot parse from memory");
 }
@@ -200,25 +198,25 @@ void DOMSerializer::handleNode(const Node* pNode) const
 	switch (pNode->nodeType())
 	{
 	case Node::ELEMENT_NODE:
-		handleElement(static_cast<const Element*>(pNode)); 
+		handleElement(static_cast<const Element*>(pNode));
 		break;
 	case Node::TEXT_NODE:
-		handleCharacterData(static_cast<const Text*>(pNode)); 
+		handleCharacterData(static_cast<const Text*>(pNode));
 		break;
 	case Node::CDATA_SECTION_NODE:
-		handleCDATASection(static_cast<const CDATASection*>(pNode)); 
+		handleCDATASection(static_cast<const CDATASection*>(pNode));
 		break;
 	case Node::ENTITY_NODE:
 		handleEntity(static_cast<const Entity*>(pNode));
 		break;
 	case Node::PROCESSING_INSTRUCTION_NODE:
-		handlePI(static_cast<const ProcessingInstruction*>(pNode)); 
+		handlePI(static_cast<const ProcessingInstruction*>(pNode));
 		break;
 	case Node::COMMENT_NODE:
-		handleComment(static_cast<const Comment*>(pNode)); 
+		handleComment(static_cast<const Comment*>(pNode));
 		break;
 	case Node::DOCUMENT_NODE:
-		handleDocument(static_cast<const Document*>(pNode)); 
+		handleDocument(static_cast<const Document*>(pNode));
 		break;
 	case Node::DOCUMENT_TYPE_NODE:
 		handleDocumentType(static_cast<const DocumentType*>(pNode));
@@ -235,7 +233,7 @@ void DOMSerializer::handleNode(const Node* pNode) const
 
 void DOMSerializer::handleElement(const Element* pElement) const
 {
-	if (_pContentHandler) 
+	if (_pContentHandler)
 	{
 		AutoPtr<NamedNodeMap> pAttrs = pElement->attributes();
 		AttributesImpl saxAttrs;

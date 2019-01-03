@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_error.c
+ * << Haru Free PDF Library >> -- hpdf_error.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -16,6 +19,7 @@
 #include "hpdf_utils.h"
 #include "hpdf_error.h"
 #include "hpdf_consts.h"
+#include "hpdf.h"
 
 #ifndef HPDF_STDCALL
 #ifdef HPDF_DLL_MAKE
@@ -80,7 +84,7 @@ HPDF_SetError  (HPDF_Error   error,
 }
 
 
-HPDF_STATUS
+HPDF_EXPORT(HPDF_STATUS)
 HPDF_CheckError  (HPDF_Error   error)
 {
     HPDF_PTRACE((" HPDF_CheckError: error_no=0x%04X detail_no=0x%04X\n",

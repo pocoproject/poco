@@ -1,8 +1,6 @@
 //
 // TaskManager.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TaskManager.cpp#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -55,6 +53,32 @@ void TaskManager::start(Task* pTask, int cpu)
 	}
 	catch (...)
 	{
+		// Make sure that we don't act like we own the task since
+		// we never started it.  If we leave the task on our task
+		// list, the size of the list is incorrect.
+		_taskList.pop_back();
+		throw;
+	}
+}
+
+
+void TaskManager::startSync(Task* pTask)
+{
+	TaskPtr pAutoTask(pTask); // take ownership immediately
+	ScopedLockWithUnlock<FastMutex> lock(_mutex);
+
+	pAutoTask->setOwner(this);
+	pAutoTask->setState(Task::TASK_STARTING);
+	_taskList.push_back(pAutoTask);
+	lock.unlock();
+	try
+	{
+		pAutoTask->run();
+	}
+	catch (...)
+	{
+		FastMutex::ScopedLock miniLock(_mutex);
+
 		// Make sure that we don't act like we own the task since
 		// we never started it.  If we leave the task on our task
 		// list, the size of the list is incorrect.
@@ -134,17 +158,21 @@ void TaskManager::taskCancelled(Task* pTask)
 
 void TaskManager::taskFinished(Task* pTask)
 {
-	_nc.postNotification(new TaskFinishedNotification(pTask));
+	TaskPtr currentTask;
+	ScopedLockWithUnlock<FastMutex> lock(_mutex);
 	
-	FastMutex::ScopedLock lock(_mutex);
 	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
 	{
 		if (*it == pTask)
 		{
+			currentTask = *it;
 			_taskList.erase(it);
 			break;
 		}
 	}
+	lock.unlock();
+
+	_nc.postNotification(new TaskFinishedNotification(pTask));
 }
 
 

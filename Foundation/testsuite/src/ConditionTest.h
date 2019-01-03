@@ -1,8 +1,6 @@
 //
 // ConditionTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ConditionTest.h#1 $
-//
 // Definition of the ConditionTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

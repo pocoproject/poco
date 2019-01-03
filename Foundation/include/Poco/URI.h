@@ -1,8 +1,6 @@
 //
 // URI.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/URI.h#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  URI
@@ -33,7 +31,7 @@ class Path;
 
 class Foundation_API URI
 	/// A Uniform Resource Identifier, as specified in RFC 3986.
-	/// 
+	///
 	/// The URI class provides methods for building URIs from their
 	/// parts, as well as for splitting URIs into their parts.
 	/// Furthermore, the class provides methods for resolving
@@ -114,7 +112,7 @@ public:
 	std::string toString() const;
 		/// Returns a string representation of the URI.
 		///
-		/// Characters in the path, query and fragment parts will be 
+		/// Characters in the path, query and fragment parts will be
 		/// percent-encoded as necessary.
 	
 	const std::string& getScheme() const;
@@ -152,7 +150,7 @@ public:
 		
 	std::string getAuthority() const;
 		/// Returns the authority part (userInfo, host and port)
-		/// of the URI. 
+		/// of the URI.
 		///
 		/// If the port number is a well-known port
 		/// number for the given scheme (e.g., 80 for http), it
@@ -171,8 +169,8 @@ public:
 	std::string getQuery() const;
 		/// Returns the decoded query part of the URI.
 		///
-		/// Note that encoded ampersand characters ('&', "%26") 
-		/// will be decoded, which could cause ambiguities if the query 
+		/// Note that encoded ampersand characters ('&', "%26")
+		/// will be decoded, which could cause ambiguities if the query
 		/// string contains multiple parameters and a parameter name
 		/// or value contains an ampersand as well.
 		/// In such a case it's better to use getRawQuery() or
@@ -188,16 +186,16 @@ public:
 		/// characters in the query will not be encoded. This could
 		/// lead to ambiguity issues if the query string contains multiple
 		/// name-value parameters separated by ampersand, and if any
-		/// name or value also contains an ampersand. In such a 
+		/// name or value also contains an ampersand. In such a
 		/// case, it's better to use setRawQuery() with a properly
 		/// percent-encoded query string, or use addQueryParameter()
-		/// or setQueryParameters(), which take care of appropriate 
+		/// or setQueryParameters(), which take care of appropriate
 		/// percent encoding of parameter names and values.
 
 	void addQueryParameter(const std::string& param, const std::string& val = "");
 		/// Adds "param=val" to the query; "param" may not be empty.
 		/// If val is empty, only '=' is appended to the parameter.
-		/// 
+		///
 		/// In addition to regular encoding, function also encodes '&' and '=',
 		/// if found in param or val.
 
@@ -273,8 +271,8 @@ public:
 	void normalize();
 		/// Normalizes the URI by removing all but leading . and .. segments from the path.
 		///
-		/// If the first path segment in a relative path contains a colon (:), 
-		/// such as in a Windows path containing a drive letter, a dot segment (./) 
+		/// If the first path segment in a relative path contains a colon (:),
+		/// such as in a Windows path containing a drive letter, a dot segment (./)
 		/// is prepended in accordance with section 3.3 of RFC 3986.
 	
 	void getPathSegments(std::vector<std::string>& segments);
@@ -342,6 +340,7 @@ protected:
 
 	static const std::string RESERVED_PATH;
 	static const std::string RESERVED_QUERY;
+	static const std::string RESERVED_QUERY_PARAM;
 	static const std::string RESERVED_FRAGMENT;
 	static const std::string ILLEGAL;
 	

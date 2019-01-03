@@ -1,8 +1,6 @@
 //
 // FIFOStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FIFOStrategy.h#3 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  FIFOStragegy
@@ -27,9 +25,9 @@ namespace Poco {
 
 
 //@ deprecated
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
-	/// Note: As of release 1.4.2, DefaultStrategy already 
+	/// Note: As of release 1.4.2, DefaultStrategy already
 	/// implements FIFO behavior, so this class is provided
 	/// for backwards compatibility only.
 {

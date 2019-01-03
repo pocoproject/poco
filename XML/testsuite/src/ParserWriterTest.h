@@ -1,8 +1,6 @@
 //
 // ParserWriterTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/ParserWriterTest.h#1 $
-//
 // Definition of the ParserWriterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

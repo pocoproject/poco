@@ -1,8 +1,6 @@
 //
 // TaskManagerTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TaskManagerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -51,7 +49,7 @@ namespace
 	class TestTask: public Task
 	{
 	public:
-		TestTask(): 
+		TestTask():
 			Task("TestTask"),
 			_fail(false)
 		{
@@ -98,6 +96,21 @@ namespace
 		}
 	};
 	
+	class IncludingTask: public Task
+	{
+	public:
+		IncludingTask(): Task("IncludingTask")
+		{
+		}
+
+		void runTask()
+		{
+			setProgress(0.5);
+			getOwner()->startSync(new SimpleTask);
+			setProgress(1.0);
+		}
+	};
+
 	class TaskObserver
 	{
 	public:
@@ -183,7 +196,7 @@ namespace
 	class CustomNotificationTask: public Task
 	{
 	public:
-		CustomNotificationTask(const T& t): 
+		CustomNotificationTask(const T& t):
 			Task("CustomNotificationTask"),
 			_custom(t)
 		{
@@ -209,7 +222,7 @@ namespace
 	class CustomTaskObserver
 	{
 	public:
-		CustomTaskObserver(const C& rCustom): _custom(rCustom)
+		CustomTaskObserver(const C& custom): _custom(custom)
 		{
 		}
 		
@@ -230,6 +243,47 @@ namespace
 
 	private:
 		C _custom;
+	};
+
+	class SimpleTaskQueue
+	{
+	public:
+		SimpleTaskQueue(TaskManager& tm): _tm(tm)
+		{
+			_tm.addObserver(Observer<SimpleTaskQueue, TaskFinishedNotification>(*this, &SimpleTaskQueue::taskFinished));
+		}
+
+		void enqueue(Task* pTask)
+		{
+			_tasks.push_back(pTask);
+		}
+
+		void startQueue()
+		{
+			if (_tm.count() == 0 && _tasks.size())
+			{
+				Task* pTask = _tasks.back();
+				// not thread-safe
+				_tasks.pop_back();
+				_tm.start(pTask);
+			}
+		}
+
+		void taskFinished(TaskFinishedNotification* pNf)
+		{
+			if (_tasks.size())
+			{
+				Task* pTask = _tasks.back();
+				// not thread-safe
+				_tasks.pop_back();
+				_tm.startSync(pTask);
+			}
+			pNf->release();
+		}
+
+	private:
+		std::vector<Task*> _tasks;
+		TaskManager& _tm;
 	};
 }
 
@@ -255,27 +309,27 @@ void TaskManagerTest::testFinish()
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
-	assert (pTT->progress() == 0);
+	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
 	while (pTT->progress() != 0.5) Thread::sleep(50);
-	assert (to.progress() == 0.5);
-	assert (to.started());
-	assert (pTT->state() == Task::TASK_RUNNING);
+	assertTrue (to.progress() == 0.5);
+	assertTrue (to.started());
+	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	TaskManager::TaskList list = tm.taskList();
-	assert (list.size() == 1);
-	assert (tm.count() == 1);
+	assertTrue (list.size() == 1);
+	assertTrue (tm.count() == 1);
 	pTT->cont();
 	while (pTT->progress() != 1.0) Thread::sleep(50);
 	pTT->cont();
 	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
-	assert (pTT->state() == Task::TASK_FINISHED);
+	assertTrue (pTT->state() == Task::TASK_FINISHED);
 	while (!to.finished()) Thread::sleep(50);
-	assert (to.finished());
+	assertTrue (to.finished());
 	while (tm.count() == 1) Thread::sleep(50);
 	list = tm.taskList();
-	assert (list.empty());
-	assert (!to.error());
+	assertTrue (list.empty());
+	assertTrue (!to.error());
 }
 
 
@@ -290,26 +344,26 @@ void TaskManagerTest::testCancel()
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
-	assert (pTT->progress() == 0);
+	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
 	while (pTT->progress() != 0.5) Thread::sleep(50);
-	assert (to.progress() == 0.5);
-	assert (to.started());
-	assert (pTT->state() == Task::TASK_RUNNING);
+	assertTrue (to.progress() == 0.5);
+	assertTrue (to.started());
+	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	TaskManager::TaskList list = tm.taskList();
-	assert (list.size() == 1);
-	assert (tm.count() == 1);
+	assertTrue (list.size() == 1);
+	assertTrue (tm.count() == 1);
 	tm.cancelAll();
-	assert (to.cancelled());
+	assertTrue (to.cancelled());
 	pTT->cont();
 	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
-	assert (pTT->state() == Task::TASK_FINISHED);
-	assert (to.finished());
+	assertTrue (pTT->state() == Task::TASK_FINISHED);
+	assertTrue (to.finished());
 	while (tm.count() == 1) Thread::sleep(50);
 	list = tm.taskList();
-	assert (list.empty());
-	assert (!to.error());
+	assertTrue (list.empty());
+	assertTrue (!to.error());
 }
 
 
@@ -324,25 +378,25 @@ void TaskManagerTest::testError()
 	tm.addObserver(Observer<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
-	assert (pTT->progress() == 0);
+	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
 	while (pTT->progress() != 0.5) Thread::sleep(50);
-	assert (to.progress() == 0.5);
-	assert (to.started());
-	assert (pTT->state() == Task::TASK_RUNNING);
+	assertTrue (to.progress() == 0.5);
+	assertTrue (to.started());
+	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	TaskManager::TaskList list = tm.taskList();
-	assert (list.size() == 1);
-	assert (tm.count() == 1);
+	assertTrue (list.size() == 1);
+	assertTrue (tm.count() == 1);
 	pTT->fail();
 	pTT->cont();
 	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
-	assert (pTT->state() == Task::TASK_FINISHED);
-	assert (to.finished());
-	assert (to.error() != 0);
+	assertTrue (pTT->state() == Task::TASK_FINISHED);
+	assertTrue (to.finished());
+	assertTrue (to.error() != 0);
 	while (tm.count() == 1) Thread::sleep(50);
 	list = tm.taskList();
-	assert (list.empty());
+	assertTrue (list.empty());
 }
 
 
@@ -357,12 +411,12 @@ void TaskManagerTest::testCustom()
 	
 	AutoPtr<CustomNotificationTask<int> > pCNT1 = new CustomNotificationTask<int>(0);
 	tm.start(pCNT1.duplicate());
-	assert (ti.custom() == 0);
+	assertTrue (ti.custom() == 0);
 	
 	for (int i = 1; i < 10; ++i)
 	{
 		pCNT1->setCustom(i);
-		assert (ti.custom() == i);
+		assertTrue (ti.custom() == i);
 	}
 
 	CustomTaskObserver<std::string> ts("");
@@ -372,11 +426,11 @@ void TaskManagerTest::testCustom()
 	
 	AutoPtr<CustomNotificationTask<std::string> > pCNT2 = new CustomNotificationTask<std::string>("");
 	tm.start(pCNT2.duplicate());
-	assert (tm.taskList().size() == 2);
-	assert (ts.custom() == "");
+	assertTrue (tm.taskList().size() == 2);
+	assertTrue (ts.custom() == "");
 	std::string str("notify me");
 	pCNT2->setCustom(str);
-	assert (ts.custom() == str);
+	assertTrue (ts.custom() == str);
 	
 	S s;
 	s.i = 0;
@@ -390,14 +444,14 @@ void TaskManagerTest::testCustom()
 	
 	AutoPtr<CustomNotificationTask<S*> > pCNT3 = new CustomNotificationTask<S*>(&s);
 	tm.start(pCNT3.duplicate());
-	assert (tm.taskList().size() == 3);
-	assert (ptst.custom()->i == 0);
-	assert (ptst.custom()->str == "");
+	assertTrue (tm.taskList().size() == 3);
+	assertTrue (ptst.custom()->i == 0);
+	assertTrue (ptst.custom()->str == "");
 	s.i = 123;
 	s.str = "123";
 	pCNT3->setCustom(&s);
-	assert (ptst.custom()->i == 123);
-	assert (ptst.custom()->str == "123");
+	assertTrue (ptst.custom()->i == 123);
+	assertTrue (ptst.custom()->str == "123");
 
 	s.i = 0;
 	s.str = "";
@@ -410,22 +464,22 @@ void TaskManagerTest::testCustom()
 	
 	AutoPtr<CustomNotificationTask<S> > pCNT4 = new CustomNotificationTask<S>(s);
 	tm.start(pCNT4.duplicate());
-	assert (tm.taskList().size() == 4);
-	assert (tst.custom().i == 0);
-	assert (tst.custom().str == "");
+	assertTrue (tm.taskList().size() == 4);
+	assertTrue (tst.custom().i == 0);
+	assertTrue (tst.custom().str == "");
 	s.i = 123;
 	s.str = "123";
 	pCNT4->setCustom(s);
-	assert (tst.custom().i == 123);
-	assert (tst.custom().str == "123");
+	assertTrue (tst.custom().i == 123);
+	assertTrue (tst.custom().str == "123");
 	
 	AutoPtr<SimpleTask> pST = new SimpleTask;
 	tm.start(pST.duplicate());
-	assert (tm.taskList().size() == 5);
+	assertTrue (tm.taskList().size() == 5);
 
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(50);
-	assert (tm.count() == 0);
+	assertTrue (tm.count() == 0);
 }
 
 
@@ -437,11 +491,68 @@ void TaskManagerTest::testMultiTasks()
 	tm.start(new SimpleTask);
 	
 	TaskManager::TaskList list = tm.taskList();
-	assert (list.size() == 3);
+	assertTrue (list.size() == 3);
 	
 	tm.cancelAll();
 	while (tm.count() > 0) Thread::sleep(100);
-	assert (tm.count() == 0);
+	assertTrue (tm.count() == 0);
+}
+
+
+void TaskManagerTest::testTaskInclusion()
+{
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+	IncludingTask* pTask = new IncludingTask;
+
+	pTask->duplicate();
+
+	tm.start(pTask);
+	// wait for the included task to be started
+	while (pTask->progress() < 0.5)
+	{
+		Thread::sleep(100);
+	}
+	Thread::sleep(100);
+	assertTrue (tm.count() == 2);
+
+	tm.cancelAll();
+	while (tm.count() > 0) Thread::sleep(100);
+	assertTrue (tm.count() == 0);
+}
+
+
+void TaskManagerTest::testTaskQueue()
+{
+	TaskManager tm(ThreadPool::TAP_UNIFORM_DISTRIBUTION);
+	SimpleTaskQueue tq(tm);
+
+	Task* pT1 = new SimpleTask;
+	Task* pT2 = new SimpleTask;
+	Task* pT3 = new SimpleTask;
+	tq.enqueue(pT1);
+	tq.enqueue(pT2);
+	tq.startQueue();
+
+	assertTrue (tm.count() == 1);
+	Thread::sleep(500);
+	assertTrue (pT1->state() == Task::TASK_RUNNING);
+	assertTrue (pT2->state() == Task::TASK_IDLE);
+
+	tq.enqueue(pT3);
+	pT1->cancel();
+	Thread::sleep(500);
+	assertTrue (tm.count() == 1);
+	assertTrue (pT2->state() == Task::TASK_RUNNING);
+	assertTrue (pT3->state() == Task::TASK_IDLE);
+
+	pT2->cancel();
+	Thread::sleep(500);
+	assertTrue (tm.count() == 1);
+	assertTrue (pT3->state() == Task::TASK_RUNNING);
+
+	tm.cancelAll();
+	while (tm.count() > 0) Thread::sleep(100);
+	assertTrue (tm.count() == 0);
 }
 
 
@@ -455,8 +566,8 @@ void TaskManagerTest::testCustomThreadPool()
 	{
 		tm.start(new SimpleTask);
 	}
-	assert (tp.allocated() == tp.capacity());
-	assert (tm.count() == tp.allocated());
+	assertTrue (tp.allocated() == tp.capacity());
+	assertTrue (tm.count() == tp.allocated());
 
 	// the next one should fail
 	try
@@ -472,7 +583,7 @@ void TaskManagerTest::testCustomThreadPool()
 		failmsg("wrong exception thrown");
 	}
 
-	assert (tm.count() == tp.allocated());
+	assertTrue (tm.count() == tp.allocated());
 	
 	tp.joinAll();
 }

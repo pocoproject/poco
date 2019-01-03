@@ -1,8 +1,6 @@
 //
 // Pipe.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Pipe.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Pipe
@@ -37,7 +35,7 @@ class Foundation_API Pipe
 	/// that data only flows in one direction.
 	/// Pipes have a read-end and a write-end. One process writes to
 	/// the pipe and another process reads the data written by
-	/// its peer. 
+	/// its peer.
 	/// Read and write operations are always synchronous. A read will
 	/// block until data is available and a write will block until
 	/// the reader reads the data.

@@ -1,8 +1,6 @@
 //
 // AbstractHTTPRequestHandler.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/AbstractHTTPRequestHandler.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  AbstractHTTPRequestHandler
@@ -32,7 +30,7 @@ class HTMLForm;
 
 
 class Net_API AbstractHTTPRequestHandler: public HTTPRequestHandler
-	/// The abstract base class for AbstractHTTPRequestHandlers 
+	/// The abstract base class for AbstractHTTPRequestHandlers
 	/// created by HTTPServer.
 	///
 	/// Derived classes must override the run() method.
@@ -43,7 +41,7 @@ class Net_API AbstractHTTPRequestHandler: public HTTPRequestHandler
 	/// HTMLForm object is created for use by subclasses.
 	///
 	/// The run() method must perform the complete handling
-	/// of the HTTP request connection. As soon as the run() 
+	/// of the HTTP request connection. As soon as the run()
 	/// method returns, the request handler object is destroyed.
 	///
 	/// A new AbstractHTTPRequestHandler object will be created for

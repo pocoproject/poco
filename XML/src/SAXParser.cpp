@@ -1,8 +1,6 @@
 //
 // SAXParser.cpp
 //
-// $Id: //poco/1.4/XML/src/SAXParser.cpp#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX
@@ -151,7 +149,7 @@ bool SAXParser::getFeature(const XMLString& featureId) const
 }
 
 
-void SAXParser::setProperty(const XMLString& propertyId, const XMLString& value)
+void SAXParser::setProperty(const XMLString& propertyId, const XMLString& /*value*/)
 {
 	if (propertyId == XMLReader::PROPERTY_DECLARATION_HANDLER || propertyId == XMLReader::PROPERTY_LEXICAL_HANDLER)
 		throw SAXNotSupportedException(std::string("property does not take a string value: ") + fromXMLString(propertyId));

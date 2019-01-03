@@ -1,8 +1,6 @@
 //
 // FPEnvironment.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -25,10 +23,12 @@
 
 #if defined(POCO_NO_FPENVIRONMENT)
 #include "Poco/FPEnvironment_DUMMY.h"
-#elif defined(__osf__) || defined(__VMS)
+#elif defined(__osf__)
 #include "Poco/FPEnvironment_DEC.h"
 #elif defined(sun) || defined(__sun)
 #include "Poco/FPEnvironment_SUN.h"
+#elif defined(__QNX__)
+#include "Poco/FPEnvironment_QNX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/FPEnvironment_C99.h"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
@@ -48,7 +48,7 @@ class Foundation_API FPEnvironment: private FPEnvironmentImpl
 	/// mode and floating-point flags).
 	/// The class also provides various static
 	/// methods to query certain properties
-	/// of a floating-point number. 
+	/// of a floating-point number.
 {
 public:
 	enum RoundingMode
@@ -82,7 +82,7 @@ public:
 	~FPEnvironment();
 		/// Restores the previous environment (unless
 		/// keepCurrent() has been called previously)
-		
+
 	FPEnvironment& operator = (const FPEnvironment& env);
 		/// Assignment operator
 
@@ -95,10 +95,10 @@ public:
 
 	static bool isFlag(Flag flag);
 		/// Returns true iff the given flag is set.
-		
+
 	static void setRoundingMode(RoundingMode mode);
 		/// Sets the rounding mode.
-		
+
 	static RoundingMode getRoundingMode();
 		/// Returns the current rounding mode.
 
@@ -140,13 +140,13 @@ inline void FPEnvironment::setRoundingMode(RoundingMode mode)
 	setRoundingModeImpl(RoundingModeImpl(mode));
 }
 
-	
+
 inline FPEnvironment::RoundingMode FPEnvironment::getRoundingMode()
 {
 	return RoundingMode(getRoundingModeImpl());
 }
 
-	
+
 inline bool FPEnvironment::isInfinite(float value)
 {
 	return isInfiniteImpl(value);

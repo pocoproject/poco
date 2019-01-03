@@ -1,8 +1,6 @@
 //
 // Ascii.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Ascii.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Ascii
@@ -20,7 +18,7 @@
 namespace Poco {
 
 
-const int Ascii::CHARACTER_PROPERTIES[128] = 
+const int Ascii::CHARACTER_PROPERTIES[128] =
 {
 	/* 00 . */ ACP_CONTROL,
 	/* 01 . */ ACP_CONTROL,

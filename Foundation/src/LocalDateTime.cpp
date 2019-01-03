@@ -1,8 +1,6 @@
 //
 // LocalDateTime.cpp
 //
-// $Id: //poco/1.4/Foundation/src/LocalDateTime.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  LocalDateTime
@@ -19,7 +17,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
-#include <ctime>
+#include <time.h>
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif

@@ -1,8 +1,6 @@
 //
 // RWLock_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RWLock_WIN32.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  RWLock
@@ -188,7 +186,7 @@ DWORD RWLockImpl::tryReadLockOnce()
 	HANDLE h[2];
 	h[0] = _mutex;
 	h[1] = _readEvent;
-	DWORD result = WaitForMultipleObjects(2, h, TRUE, 1); 
+	DWORD result = WaitForMultipleObjects(2, h, TRUE, 1);
 	switch (result)
 	{
 	case WAIT_OBJECT_0:

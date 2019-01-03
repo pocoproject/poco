@@ -1,8 +1,6 @@
 //
 // KeyFileHandler.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  KeyFileHandler
@@ -29,7 +27,7 @@ namespace Net {
 
 
 class NetSSL_Win_API KeyFileHandler: public PrivateKeyPassphraseHandler
-	/// An implementation of PrivateKeyPassphraseHandler that 
+	/// An implementation of PrivateKeyPassphraseHandler that
 	/// reads the key for a certificate from a configuration file
 	/// under the path "openSSL.privateKeyPassphraseHandler.options.password".
 {

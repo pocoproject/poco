@@ -1,8 +1,6 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#2 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogChannel
@@ -36,6 +34,7 @@ const std::string RemoteSyslogChannel::PROP_FACILITY("facility");
 const std::string RemoteSyslogChannel::PROP_FORMAT("format");
 const std::string RemoteSyslogChannel::PROP_LOGHOST("loghost");
 const std::string RemoteSyslogChannel::PROP_HOST("host");
+const std::string RemoteSyslogChannel::STRUCTURED_DATA("structured-data");
 
 
 RemoteSyslogChannel::RemoteSyslogChannel():
@@ -109,7 +108,7 @@ void RemoteSyslogChannel::close()
 	}
 }
 
-	
+
 void RemoteSyslogChannel::log(const Message& msg)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
@@ -136,9 +135,18 @@ void RemoteSyslogChannel::log(const Message& msg)
 		m += ' ';
 		m += _name;
 		m += ' ';
-		Poco::NumberFormatter::append(m, msg.getPid());
+		Poco::NumberFormatter::append(m, static_cast<Poco::UInt64>(msg.getPid()));
 		m += ' ';
 		m += msg.getSource();
+		m += ' ';
+		if (msg.has(STRUCTURED_DATA))
+		{
+			m += msg.get(STRUCTURED_DATA);
+		}
+		else
+		{
+			m += "-";
+		}
 	}
 	m += ' ';
 	m += msg.getText();
@@ -146,7 +154,7 @@ void RemoteSyslogChannel::log(const Message& msg)
 	_socket.sendTo(m.data(), static_cast<int>(m.size()), _socketAddress);
 }
 
-	
+
 void RemoteSyslogChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == PROP_NAME)

@@ -1,8 +1,6 @@
 //
 // ZipArchiveInfo.cpp
 //
-// $Id: //poco/1.4/Zip/src/ZipArchiveInfo.cpp#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:	ZipArchiveInfo
@@ -59,12 +57,16 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	if (!assumeHeaderRead)
 	{
 		inp.read(_rawInfo, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read archive info header");
+		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad archive info header");
 	}
 	else
 	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
 	}
-	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
+		
 	// read the rest of the header
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
 	Poco::UInt16 len = getZipCommentSize();
@@ -136,12 +138,16 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	if (!assumeHeaderRead)
 	{
 		inp.read(_rawInfo, ZipCommon::HEADER_SIZE);
+		if (inp.gcount() != ZipCommon::HEADER_SIZE)
+			throw Poco::IOException("Failed to read archive info header");
+		if (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) != 0)
+			throw Poco::DataFormatException("Bad archive info header");
 	}
 	else
 	{
 		std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
 	}
-	poco_assert (std::memcmp(_rawInfo, HEADER, ZipCommon::HEADER_SIZE) == 0);
+
 	std::memset(_rawInfo + ZipCommon::HEADER_SIZE, 0, FULL_HEADER_SIZE - ZipCommon::HEADER_SIZE);
 
 	// read the rest of the header
@@ -149,12 +155,12 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, RECORDSIZE_SIZE);
 	offset += RECORDSIZE_SIZE;
 	Poco::UInt64 len = ZipUtil::get64BitValue(_rawInfo, RECORDSIZE_POS);
-	if (len <= FULL_HEADER_SIZE - offset) 
+	if (len <= FULL_HEADER_SIZE - offset)
 	{
 		inp.read(_rawInfo + offset, len);
 		ZipUtil::set64BitValue(FULL_HEADER_SIZE - offset, _rawInfo, RECORDSIZE_POS);
-	} 
-	else 
+	}
+	else
 	{
 		inp.read(_rawInfo + offset, FULL_HEADER_SIZE - offset);
 		len -= (FULL_HEADER_SIZE - offset);
@@ -164,7 +170,11 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 		ZipUtil::set64BitValue(FULL_HEADER_SIZE + len - offset, _rawInfo, RECORDSIZE_POS);
 	}
 	inp.read(_locInfo, FULL_LOCATOR_SIZE);
-	poco_assert (std::memcmp(_locInfo, LOCATOR_HEADER, ZipCommon::HEADER_SIZE) == 0);
+	if (inp.gcount() != FULL_LOCATOR_SIZE)
+		throw Poco::IOException("Failed to read locator");
+	if (std::memcmp(_locInfo, LOCATOR_HEADER, ZipCommon::HEADER_SIZE) != 0)
+		throw Poco::DataFormatException("Bad locator header");
+
 }
 
 

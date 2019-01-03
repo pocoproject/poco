@@ -1,8 +1,6 @@
 //
 // PipeStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/PipeStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  PipeStream
@@ -25,7 +23,7 @@ namespace Poco {
 //
 
 
-PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode): 
+PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, mode),
 	_pipe(pipe)
 {

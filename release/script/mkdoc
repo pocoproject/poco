@@ -1,7 +1,5 @@
 #!/bin/bash
 #
-# $Id: //poco/1.4/release/script/mkdoc#2 $
-#
 # mkdoc
 #
 # Create reference documentation for a POCO release.
@@ -33,7 +31,7 @@ fi
 
 spec=""
 docConfig=$POCO_BASE/PocoDoc/cfg/mkdoc-poco.xml
-while [ "$1" != "" ] ; 
+while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-C" ] ; then
 		shift

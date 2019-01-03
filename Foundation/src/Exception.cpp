@@ -1,8 +1,6 @@
 //
 // Exception.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Exception.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Exception
@@ -15,6 +13,7 @@
 
 
 #include "Poco/Exception.h"
+#include "Poco/NestedDiagnosticContext.h"
 #include <typeinfo>
 
 
@@ -23,26 +22,39 @@ namespace Poco {
 
 Exception::Exception(int otherCode): _pNested(0), _code(otherCode)
 {
+	addBacktrace();
 }
 
 
-Exception::Exception(const std::string& msg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
+Exception::Exception(const std::string& msg, int otherCode):
+	_msg(msg),
+	_pNested(0),
+	_code(otherCode)
 {
+	addBacktrace();
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int otherCode): _msg(msg), _pNested(0), _code(otherCode)
+Exception::Exception(const std::string& msg, const std::string& arg, int otherCode):
+	_msg(msg),
+	_pNested(0),
+	_code(otherCode)
 {
 	if (!arg.empty())
 	{
 		_msg.append(": ");
 		_msg.append(arg);
 	}
+	addBacktrace();
 }
 
 
-Exception::Exception(const std::string& msg, const Exception& nestedException, int otherCode): _msg(msg), _pNested(nestedException.clone()), _code(otherCode)
+Exception::Exception(const std::string& msg, const Exception& nestedException, int otherCode):
+	_msg(msg),
+	_pNested(nestedException.clone()),
+	_code(otherCode)
 {
+	addBacktrace();
 }
 
 
@@ -54,7 +66,7 @@ Exception::Exception(const Exception& exc):
 	_pNested = exc._pNested ? exc._pNested->clone() : 0;
 }
 
-	
+
 Exception::~Exception() throw()
 {
 	delete _pNested;
@@ -86,21 +98,18 @@ const char* Exception::className() const throw()
 	return typeid(*this).name();
 }
 
-	
+
 const char* Exception::what() const throw()
 {
-	return name();
+	return msg().c_str();//name();
 }
 
-	
+
 std::string Exception::displayText() const
 {
-	std::string txt = name();
-	if (!_msg.empty())
-	{
-		txt.append(": ");
-		txt.append(_msg);
-	}
+	std::string txt;
+	if (!_msg.empty()) txt.append(msg());
+	else txt = name();
 	return txt;
 }
 
@@ -112,6 +121,17 @@ void Exception::extendedMessage(const std::string& arg)
 		if (!_msg.empty()) _msg.append(": ");
 		_msg.append(arg);
 	}
+}
+
+
+void Exception::addBacktrace()
+{
+#ifdef POCO_EXCEPTION_BACKTRACE
+	if (NDC::hasBacktrace())
+	{
+		_msg.append(1, '\n').append(NDC::backtrace(2, 3));
+	}
+#endif
 }
 
 
@@ -178,10 +198,13 @@ POCO_IMPLEMENT_EXCEPTION(CreateFileException, FileException, "Cannot create file
 POCO_IMPLEMENT_EXCEPTION(OpenFileException, FileException, "Cannot open file")
 POCO_IMPLEMENT_EXCEPTION(WriteFileException, FileException, "Cannot write file")
 POCO_IMPLEMENT_EXCEPTION(ReadFileException, FileException, "Cannot read file")
+POCO_IMPLEMENT_EXCEPTION(DirectoryNotEmptyException, FileException, "Directory not empty")
 POCO_IMPLEMENT_EXCEPTION(UnknownURISchemeException, RuntimeException, "Unknown URI scheme")
-
+POCO_IMPLEMENT_EXCEPTION(TooManyURIRedirectsException, RuntimeException, "Too many URI redirects")
+POCO_IMPLEMENT_EXCEPTION(URISyntaxException, SyntaxException, "Bad URI syntax")
 
 POCO_IMPLEMENT_EXCEPTION(ApplicationException, Exception, "Application exception")
 POCO_IMPLEMENT_EXCEPTION(BadCastException, RuntimeException, "Bad cast exception")
+
 
 } // namespace Poco

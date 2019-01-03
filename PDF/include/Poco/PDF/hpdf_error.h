@@ -1,9 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_error.h
+ * << Haru Free PDF Library >> -- hpdf_error.h
  *
- * URL http://libharu.sourceforge.net/
+ * URL: http://libharu.org
  *
- * Copyright (c) 1999-2006 Takeshi Kanno
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -141,6 +142,11 @@ extern "C" {
 #define HPDF_EXT_GSTATE_OUT_OF_RANGE              0x1080
 #define HPDF_INVALID_EXT_GSTATE                   0x1081
 #define HPDF_EXT_GSTATE_READ_ONLY                 0x1082
+#define HPDF_INVALID_U3D_DATA                     0x1083
+#define HPDF_NAME_CANNOT_GET_NAMES                0x1084
+#define HPDF_INVALID_ICC_COMPONENT_NUM            0x1085
+
+/*---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
 /*----- HPDF_Error ----------------------------------------------------------*/
@@ -182,10 +188,6 @@ HPDF_STATUS
 HPDF_SetError  (HPDF_Error   error,
                 HPDF_STATUS  error_no,
                 HPDF_STATUS  detail_no);
-
-
-HPDF_STATUS
-HPDF_CheckError  (HPDF_Error   error);
 
 
 HPDF_STATUS

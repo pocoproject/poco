@@ -1,8 +1,6 @@
 //
 // SocketDefs.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketDefs.h#6 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketDefs
@@ -20,6 +18,9 @@
 #define Net_SocketDefs_INCLUDED
 
 
+#include <vector>
+
+
 #define POCO_ENOERR 0
 
 
@@ -27,6 +28,7 @@
 	#include "Poco/UnWindows.h"
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
+	#include <ws2def.h>
 	#define POCO_INVALID_SOCKET  INVALID_SOCKET
 	#define poco_socket_t        SOCKET
 	#define poco_socklen_t       int
@@ -129,27 +131,24 @@
 	#define POCO_TRY_AGAIN       TRY_AGAIN
 	#define POCO_NO_RECOVERY     NO_RECOVERY
 	#define POCO_NO_DATA         NO_DATA
-#elif defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_VMS)
+#elif defined(POCO_OS_FAMILY_UNIX)
 	#include <unistd.h>
 	#include <errno.h>
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <sys/un.h>
+	#include <sys/uio.h>
 	#include <fcntl.h>
 	#if POCO_OS != POCO_OS_HPUX
 		#include <sys/select.h>
 	#endif
 	#include <sys/ioctl.h>
-	#if defined(POCO_OS_FAMILY_VMS)
-		#include <inet.h>
-	#else
-		#include <arpa/inet.h>
-	#endif
+	#include <arpa/inet.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
 	#include <netdb.h>
 	#if defined(POCO_OS_FAMILY_UNIX)
-		#if (POCO_OS == POCO_OS_LINUX)
+		#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID)
 			// Net/src/NetworkInterface.cpp changed #include <linux/if.h> to #include <net/if.h>
 			// no more conflict, can use #include <net/if.h> here
 			#include <net/if.h>
@@ -356,6 +355,14 @@
 namespace Poco {
 namespace Net {
 
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	typedef WSABUF SocketBuf;
+#elif defined(POCO_OS_FAMILY_UNIX) // TODO: may need more refinement
+	typedef iovec SocketBuf;
+#endif
+
+typedef std::vector<SocketBuf> SocketBufVec;
 
 struct AddressFamily
 	/// AddressFamily::Family replaces the previously used IPAddress::Family

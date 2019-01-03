@@ -1,8 +1,6 @@
 //
 // WinCEDriver.cpp
 //
-// $Id$
-//
 // Console-based test driver for Windows CE.
 //
 // Copyright (c) 2004-2010, Applied Informatics Software Engineering GmbH.

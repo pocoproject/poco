@@ -1,8 +1,6 @@
 //
 // ConsoleChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ConsoleChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  ConsoleChannel
@@ -36,7 +34,7 @@ class Foundation_API ConsoleChannel: public Channel
 	/// by a newline.
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is contained 
+	/// appropriate Formatter to control what is contained
 	/// in the text.
 	///
 	/// Similar to StreamChannel, except that a static
@@ -45,6 +43,8 @@ class Foundation_API ConsoleChannel: public Channel
 	/// same stream.
 {
 public:
+	typedef AutoPtr<ConsoleChannel> Ptr;
+
 	ConsoleChannel();
 		/// Creates the channel and attaches std::clog.
 		
@@ -77,7 +77,7 @@ class Foundation_API ColorConsoleChannel: public Channel
 	/// property to true (default). Furthermore, colors can be
 	/// configured by setting the following properties
 	/// (default values are given in parenthesis):
-	/// 
+	///
 	///   * traceColor (gray)
 	///   * debugColor (gray)
 	///   * informationColor (default)
@@ -88,7 +88,7 @@ class Foundation_API ColorConsoleChannel: public Channel
 	///   * fatalColor (lightRed)
 	///
 	/// The following color values are supported:
-	/// 
+	///
 	///   * default
 	///   * black
 	///   * red
@@ -108,7 +108,7 @@ class Foundation_API ColorConsoleChannel: public Channel
 	///   * white
 	///
 	/// Chain this channel to a FormattingChannel with an
-	/// appropriate Formatter to control what is contained 
+	/// appropriate Formatter to control what is contained
 	/// in the text.
 	///
 	/// Similar to StreamChannel, except that a static
@@ -127,8 +127,8 @@ public:
 		/// Logs the given message to the channel's stream.
 	
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets the property with the given name. 
-		/// 
+		/// Sets the property with the given name.
+		///
 		/// The following properties are supported:
 		///   * enableColors:      Enable or disable colors.
 		///   * traceColor:        Specify color for trace messages.
@@ -175,9 +175,9 @@ protected:
 	void initColors();
 
 private:
-	std::ostream& _str;
-	bool _enableColors;
-	Color _colors[9];
+	std::ostream&    _str;
+	bool             _enableColors;
+	Color            _colors[9];
 	static FastMutex _mutex;
 	static const std::string CSI;
 };

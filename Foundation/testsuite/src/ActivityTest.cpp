@@ -1,8 +1,6 @@
 //
 // ActivityTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActivityTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -26,7 +24,7 @@ namespace
 	class ActiveObject
 	{
 	public:
-		ActiveObject(): 
+		ActiveObject():
 			_activity(this, &ActiveObject::run),
 			_count(0)
 		{
@@ -49,7 +47,7 @@ namespace
 	protected:
 		void run()
 		{
-			while (!_activity.isStopped()) 
+			while (!_activity.isStopped())
 				++_count;
 		}
 
@@ -58,7 +56,7 @@ namespace
 		Poco::UInt64           _count;
 	};
 }
- 
+
 
 ActivityTest::ActivityTest(const std::string& rName): CppUnit::TestCase(rName)
 {
@@ -73,14 +71,14 @@ ActivityTest::~ActivityTest()
 void ActivityTest::testActivity()
 {
 	ActiveObject activeObj;
-	assert (activeObj.activity().isStopped());
+	assertTrue (activeObj.activity().isStopped());
 	activeObj.activity().start();
-	assert (!activeObj.activity().isStopped());
+	assertTrue (!activeObj.activity().isStopped());
 	Thread::sleep(1000);
-	assert (activeObj.activity().isRunning());
+	assertTrue (activeObj.activity().isRunning());
 	activeObj.activity().stop();
 	activeObj.activity().wait();
-	assert (activeObj.count() > 0);
+	assertTrue (activeObj.count() > 0);
 }
 
 

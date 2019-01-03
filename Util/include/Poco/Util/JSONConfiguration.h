@@ -1,8 +1,6 @@
 //
 // JSONConfiguration.h
 //
-// $Id$
-//
 // Library: Util
 // Package: Util
 // Module:  JSONConfiguration

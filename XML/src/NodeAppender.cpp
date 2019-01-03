@@ -1,8 +1,6 @@
 //
 // NodeAppender.cpp
 //
-// $Id: //poco/1.4/XML/src/NodeAppender.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  NodeAppender
@@ -69,7 +67,7 @@ void NodeAppender::appendChild(Node* newChild)
 	{
 		AbstractNode* pAN = static_cast<AbstractNode*>(newChild);
 		pAN->duplicate();
-		if (pAN->_pParent) 
+		if (pAN->_pParent)
 			pAN->_pParent->removeChild(pAN);
 		pAN->_pParent = _pParent;
 		if (_pLast)

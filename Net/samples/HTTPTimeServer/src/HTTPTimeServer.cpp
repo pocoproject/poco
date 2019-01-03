@@ -1,8 +1,6 @@
 //
 // HTTPTimeServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/HTTPTimeServer/src/HTTPTimeServer.cpp#1 $
-//
 // This sample demonstrates the HTTPServer and related classes.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -54,7 +52,7 @@ class TimeRequestHandler: public HTTPRequestHandler
 	/// Return a HTML document with the current date and time.
 {
 public:
-	TimeRequestHandler(const std::string& format): 
+	TimeRequestHandler(const std::string& format):
 		_format(format)
 	{
 	}

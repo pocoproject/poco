@@ -1,8 +1,6 @@
 //
 // ActiveStarter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ActiveStarter.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects
@@ -30,7 +28,7 @@ namespace Poco {
 
 template <class OwnerType>
 class ActiveStarter
-	/// The default implementation of the StarterType 
+	/// The default implementation of the StarterType
 	/// policy for ActiveMethod. It starts the method
 	/// in its own thread, obtained from the default
 	/// thread pool.

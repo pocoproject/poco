@@ -1,8 +1,6 @@
 //
 // WinRegistryConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/WinRegistryConfiguration.cpp#3 $
-//
 // Library: Util
 // Package: Windows
 // Module:  WinRegistryConfiguration
@@ -122,7 +120,7 @@ void WinRegistryConfiguration::enumerate(const std::string& key, Keys& range) co
 }
 
 
-void WinRegistryConfiguration::removeRaw(const std::string& key)
+void WinRegistryConfiguration::removeRaw(const std::string& /*key*/)
 {
 	throw Poco::NotImplementedException("Removing a key in a WinRegistryConfiguration");
 }

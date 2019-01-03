@@ -1,8 +1,6 @@
 //
 // SocketStream.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketStream.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  SocketStream
@@ -55,7 +53,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};

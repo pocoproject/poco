@@ -88,12 +88,12 @@ int main(int argc, char* argv[])
 			}
 			}
 		}
-	} 
+	}
 	catch (const ios_base::failure&)
 	{
 		cerr << "io failure" << endl;
 		return 1;
-	} 
+	}
 	catch (const Poco::Exception& e)
 	{
 		cerr << e.displayText() << endl;

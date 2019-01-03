@@ -1,8 +1,6 @@
 //
 // IniFileConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/IniFileConfiguration.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  IniFileConfiguration
@@ -64,11 +62,11 @@ public:
 		/// from the given file, which must be in initialization file format.
 		
 	void load(std::istream& istr);
-		/// Loads the configuration data from the given stream, which 
+		/// Loads the configuration data from the given stream, which
 		/// must be in initialization file format.
 		
 	void load(const std::string& path);
-		/// Loads the configuration data from the given file, which 
+		/// Loads the configuration data from the given file, which
 		/// must be in initialization file format.
 
 protected:

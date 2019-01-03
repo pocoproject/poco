@@ -1,8 +1,6 @@
 //
 // UTF16Encoding.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UTF16Encoding.h#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UTF16Encoding
@@ -32,7 +30,7 @@ class Foundation_API UTF16Encoding: public TextEncoding
 	///
 	/// When converting from UTF-16 to Unicode, surrogates are
 	/// reported as they are - in other words, surrogate pairs
-	/// are not combined into one Unicode character. 
+	/// are not combined into one Unicode character.
 	/// When converting from Unicode to UTF-16, however, characters
 	/// outside the 16-bit range are converted into a low and
 	/// high surrogate.

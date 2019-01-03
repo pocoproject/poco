@@ -1,8 +1,6 @@
 //
 // LineEndingConverter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LineEndingConverter.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  LineEndingConverter
@@ -43,7 +41,7 @@ public:
 
 class Foundation_API LineEndingConverterStreamBuf: public UnbufferedStreamBuf
 	/// This stream buffer performs line ending conversion
-	/// on text streams. The converter can convert from and to 
+	/// on text streams. The converter can convert from and to
 	/// the Unix (LF), Mac (CR) and DOS/Windows/Network (CF-LF) endings.
 	///
 	/// Any newline sequence in the source will be replaced by the
@@ -92,7 +90,7 @@ private:
 class Foundation_API LineEndingConverterIOS: public virtual std::ios
 	/// The base class for InputLineEndingConverter and OutputLineEndingConverter.
 	///
-	/// This class provides common methods and is also needed to ensure 
+	/// This class provides common methods and is also needed to ensure
 	/// the correct initialization order of the stream buffer and base classes.
 {
 public:
@@ -135,7 +133,7 @@ protected:
 
 class Foundation_API InputLineEndingConverter: public LineEndingConverterIOS, public std::istream
 	/// InputLineEndingConverter performs line ending conversion
-	/// on text input streams. The converter can convert from and to 
+	/// on text input streams. The converter can convert from and to
 	/// the Unix (LF), Mac (CR) and DOS/Windows/Network (CF-LF) endings.
 	///
 	/// Any newline sequence in the source will be replaced by the
@@ -157,7 +155,7 @@ public:
 
 class Foundation_API OutputLineEndingConverter: public LineEndingConverterIOS, public std::ostream
 	/// OutputLineEndingConverter performs line ending conversion
-	/// on text output streams. The converter can convert from and to 
+	/// on text output streams. The converter can convert from and to
 	/// the Unix (LF), Mac (CR) and DOS/Windows/Network (CF-LF) endings.
 	///
 	/// Any newline sequence in the source will be replaced by the

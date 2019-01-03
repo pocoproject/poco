@@ -1,8 +1,6 @@
 //
 // Net.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/Net.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  Net
@@ -30,10 +28,10 @@
 // from a DLL simpler. All files within this DLL are compiled with the Net_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// Net_API functions as being imported from a DLL, wheras this DLL sees symbols
+// Net_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && defined(POCO_DLL)
+#if defined(POCO_COMPILER_MSVC) && defined(POCO_DLL)
 	#if defined(Net_EXPORTS)
 		#define Net_API __declspec(dllexport)
 	#else
@@ -54,7 +52,7 @@
 //
 // Automatically link Net library.
 //
-#if defined(_MSC_VER)
+#if defined(POCO_COMPILER_MSVC)
 	#if !defined(POCO_NO_AUTOMATIC_LIBS) && !defined(Net_EXPORTS)
 		#pragma comment(lib, "PocoNet" POCO_LIB_SUFFIX)
 	#endif
@@ -90,33 +88,32 @@ void Net_API uninitializeNetwork();
 // Automate network initialization (only relevant on Windows).
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT) && !defined(__GNUC__)
-
-extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
-
-#if defined(Net_EXPORTS)
-	#if defined(_WIN64) || defined(_WIN32_WCE)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
-	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
-	#endif
-#else  // !Net_EXPORTS
-	#if defined(_WIN64) || defined(_WIN32_WCE)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
-	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
-	#endif
-#endif // Net_EXPORTS
-
-POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
-
+#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
+	#if !defined(__GNUC__)
+		extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
+		#if defined(Net_EXPORTS)
+			#if defined(_WIN64) || (defined(_WIN32_WCE) && !defined(x86))
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
+			#elif defined(_WIN32)
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
+			#endif
+		#else  // !Net_EXPORTS
+			#if defined(_WIN64) || (defined(_WIN32_WCE) && !defined(x86))
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
+			#elif defined(_WIN32)
+				#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
+			#endif
+		#endif // Net_EXPORTS
+	#else // __GNUC__
+		extern "C" const struct NetworkInitializer pocoNetworkInitializer;
+	#endif // !__GNUC__
 #endif // POCO_OS_FAMILY_WINDOWS
 
 
 //
 // Define POCO_NET_HAS_INTERFACE for platforms that have network interface detection implemented.
 //
-#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || POCO_OS == (POCO_OS_ANDROID) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 	#define POCO_NET_HAS_INTERFACE
 #endif
 

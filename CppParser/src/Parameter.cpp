@@ -1,8 +1,6 @@
 //
 // Parameter.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Parameter.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Parameter
@@ -30,7 +28,7 @@ namespace CppParser {
 int Parameter::_count(0);
 
 
-Parameter::Parameter(const std::string& decl, Function* pFunction):
+Parameter::Parameter(const std::string& decl, Function* /*pFunction*/):
 	Decl(handleDecl(decl), 0), // handle init values
 	_type(),
 	_isRef(false),

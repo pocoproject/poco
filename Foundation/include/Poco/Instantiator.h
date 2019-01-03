@@ -1,8 +1,6 @@
 //
 // Instantiator.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Instantiator.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Instantiator
@@ -53,8 +51,8 @@ private:
 
 template <class C, class Base>
 class Instantiator: public AbstractInstantiator<Base>
-	/// A template class for the easy instantiation of 
-	/// instantiators. 
+	/// A template class for the easy instantiation of
+	/// instantiators.
 	///
 	/// For the Instantiator to work, the class of which
 	/// instances are to be instantiated must have a no-argument

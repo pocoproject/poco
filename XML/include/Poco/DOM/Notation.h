@@ -1,8 +1,6 @@
 //
 // Notation.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/Notation.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -32,15 +30,15 @@ namespace XML {
 class XML_API Notation: public AbstractNode
 	/// This interface represents a notation declared in the DTD. A notation either
 	/// declares, by name, the format of an unparsed entity (see section 4.7 of
-	/// the XML 1.0 specification <http://www.w3.org/TR/2004/REC-xml-20040204/>), 
+	/// the XML 1.0 specification <http://www.w3.org/TR/2004/REC-xml-20040204/>),
 	/// or is used for formal declaration of processing
 	/// instruction targets (see section 2.6 of the XML 1.0 specification).
 	/// The nodeName attribute inherited from Node is set to the declared name of
 	/// the notation.
-	/// 
+	///
 	/// The DOM Level 1 does not support editing Notation nodes; they are therefore
 	/// readonly.
-	/// 
+	///
 	/// A Notation node does not have any parent.
 {
 public:

@@ -1,8 +1,6 @@
 //
 // Socket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/Socket.h#2 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  Socket
@@ -37,6 +35,8 @@ class Net_API Socket
 	/// It provides operations common to all socket types.
 {
 public:
+	typedef SocketBufVec BufVec;
+
 	enum SelectMode
 		/// The mode argument to poll() and select().
 	{
@@ -91,7 +91,7 @@ public:
 		/// Closes the socket.
 
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
-		/// Determines the status of one or more sockets, 
+		/// Determines the status of one or more sockets,
 		/// using a call to select().
 		///
 		/// ReadList contains the list of sockets which should be
@@ -105,7 +105,7 @@ public:
 		///
 		/// Returns the number of sockets ready.
 		///
-		/// After return, 
+		/// After return,
 		///   * readList contains those sockets ready for reading,
 		///   * writeList contains those sockets ready for writing,
 		///   * exceptList contains those sockets with a pending error.
@@ -121,9 +121,9 @@ public:
 		/// of all sockets in all list.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
-		/// Determines the status of the socket, using a 
+		/// Determines the status of the socket, using a
 		/// call to poll() or select().
-		/// 
+		///
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
 		///
@@ -198,23 +198,23 @@ public:
 		/// to the given time value.
 
 	void getOption(int level, int option, int& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, unsigned& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, unsigned char& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void getOption(int level, int option, Poco::Timespan& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 	
 	void getOption(int level, int option, IPAddress& value) const;
-		/// Returns the value of the socket option 
+		/// Returns the value of the socket option
 		/// specified by level and option.
 
 	void setLinger(bool on, int seconds);
@@ -264,7 +264,7 @@ public:
 
 	bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of 
+		/// This method will only work if the blocking modes of
 		/// the socket are changed via the setBlocking method!
 
 	SocketAddress address() const;
@@ -295,6 +295,44 @@ public:
 		/// a few situations where calling this method after creation
 		/// of the Socket object makes sense. One example is setting
 		/// a socket option before calling bind() on a ServerSocket.
+
+	static SocketBuf makeBuffer(void* buffer, std::size_t length);
+		/// Creates and returns buffer. Suitable for creating
+		/// the appropriate buffer for the platform.
+
+	static SocketBufVec makeBufVec(std::size_t size, std::size_t bufLen);
+		/// Creates and returns a vector of requested size, with
+		/// allocated buffers and lengths set accordingly.
+		/// This utility function works well when all buffers are
+		/// of same size.
+
+	static void destroyBufVec(SocketBufVec& buf);
+		/// Releases the memory pointed to by vector members
+		/// and shrinks the vector to size 0.
+		/// The vector must be created by makeBufVec(size_t, size_t).
+
+	static SocketBufVec makeBufVec(const std::vector<char*>& vec);
+		/// Creates and returns a vector of requested size, with
+		/// buffers pointing to the supplied data (so, `vec` must
+		/// remain available at the time of use) and lengths set
+		/// accordingly.
+		/// Notes:
+		///   - data length is determined using `strlen`, so this
+		///     function is not meant to be used with binary data.
+		///
+		///   - if the returned buffer is used for read operations
+		///     (ie. operations that write to the bufer), pointing
+		///     to string literals will result in undefined behavior,
+		///     in best case an I/O error and subsequent exception
+
+	static SocketBufVec makeBufVec(const std::vector<std::string>& vec);
+		/// Creates and returns a vector of requested size, with
+		/// buffers pointing to the supplied data (so, `vec` must
+		/// remain available at the time of use) and lengths set
+		/// accordingly.
+		/// Note:: this function is not suitable for creation
+		/// of buffers used for writing (ie. reading from socket
+		/// into buffers).
 
 protected:
 	Socket(SocketImpl* pImpl);

@@ -1,8 +1,6 @@
 //
 // AsyncChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AsyncChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  AsyncChannel
@@ -33,7 +31,7 @@ public:
 		_msg(msg)
 	{
 	}
-	
+
 	~MessageNotification()
 	{
 	}
@@ -42,17 +40,16 @@ public:
 	{
 		return _msg;
 	}
-	
+
 private:
 	Message _msg;
 };
 
 
-AsyncChannel::AsyncChannel(Channel* pChannel, Thread::Priority prio): 
+AsyncChannel::AsyncChannel(Channel::Ptr pChannel, Thread::Priority prio): 
 	_pChannel(pChannel), 
 	_thread("AsyncChannel")
 {
-	if (_pChannel) _pChannel->duplicate();
 	_thread.setPriority(prio);
 }
 
@@ -62,7 +59,6 @@ AsyncChannel::~AsyncChannel()
 	try
 	{
 		close();
-		if (_pChannel) _pChannel->release();
 	}
 	catch (...)
 	{
@@ -71,17 +67,15 @@ AsyncChannel::~AsyncChannel()
 }
 
 
-void AsyncChannel::setChannel(Channel* pChannel)
+void AsyncChannel::setChannel(Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_channelMutex);
 	
-	if (_pChannel) _pChannel->release();
 	_pChannel = pChannel;
-	if (_pChannel) _pChannel->duplicate();
 }
 
 
-Channel* AsyncChannel::getChannel() const
+Channel::Ptr AsyncChannel::getChannel() const
 {
 	return _pChannel;
 }
@@ -91,8 +85,7 @@ void AsyncChannel::open()
 {
 	FastMutex::ScopedLock lock(_threadMutex);
 
-	if (!_thread.isRunning())
-		_thread.start(*this);
+	if (!_thread.isRunning()) _thread.start(*this);
 }
 
 
@@ -102,9 +95,9 @@ void AsyncChannel::close()
 	{
 		while (!_queue.empty()) Thread::sleep(100);
 		
-		do 
+		do
 		{
-			_queue.wakeUpAll(); 
+			_queue.wakeUpAll();
 		}
 		while (!_thread.tryJoin(100));
 	}

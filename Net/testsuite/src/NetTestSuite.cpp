@@ -1,8 +1,6 @@
 //
 // NetTestSuite.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/NetTestSuite.cpp#2 $
-//
 // Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -17,6 +15,7 @@
 #include "HTTPTestSuite.h"
 #include "HTTPClientTestSuite.h"
 #include "TCPServerTestSuite.h"
+#include "UDPServerTestSuite.h"
 #include "HTTPServerTestSuite.h"
 #include "HTMLTestSuite.h"
 #include "ReactorTestSuite.h"
@@ -39,6 +38,7 @@ CppUnit::Test* NetTestSuite::suite()
 	pSuite->addTest(HTTPTestSuite::suite());
 	pSuite->addTest(HTTPClientTestSuite::suite());
 	pSuite->addTest(TCPServerTestSuite::suite());
+	pSuite->addTest(UDPServerTestSuite::suite());
 	pSuite->addTest(HTTPServerTestSuite::suite());
 	pSuite->addTest(HTMLTestSuite::suite());
 	pSuite->addTest(ReactorTestSuite::suite());

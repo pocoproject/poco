@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/template/sample.make#4 $
-#
 # Makefile for Poco download
 #
 

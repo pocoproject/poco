@@ -1,8 +1,6 @@
 //
 // CipherFactory.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherFactory.cpp#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherFactory

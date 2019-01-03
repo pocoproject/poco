@@ -1,8 +1,6 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureStreamSocketImpl.cpp#6 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureStreamSocketImpl
@@ -52,7 +50,7 @@ SecureStreamSocketImpl::~SecureStreamSocketImpl()
 }
 
 
-SocketImpl* SecureStreamSocketImpl::acceptConnection(SocketAddress& clientAddr)
+SocketImpl* SecureStreamSocketImpl::acceptConnection(SocketAddress& /*clientAddr*/)
 {
 	throw Poco::InvalidAccessException("Cannot acceptConnection() on a SecureStreamSocketImpl");
 }
@@ -64,23 +62,23 @@ void SecureStreamSocketImpl::acceptSSL()
 }
 
 
-void SecureStreamSocketImpl::connect(const SocketAddress& rAddress)
+void SecureStreamSocketImpl::connect(const SocketAddress& address)
 {
-	_impl.connect(rAddress, !_lazyHandshake);
+	_impl.connect(address, !_lazyHandshake);
 	reset(_impl.sockfd());
 }
 
 
-void SecureStreamSocketImpl::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
+void SecureStreamSocketImpl::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
-	_impl.connect(rAddress, timeout, !_lazyHandshake);
+	_impl.connect(address, timeout, !_lazyHandshake);
 	reset(_impl.sockfd());
 }
 	
 
-void SecureStreamSocketImpl::connectNB(const SocketAddress& rAddress)
+void SecureStreamSocketImpl::connectNB(const SocketAddress& address)
 {
-	_impl.connectNB(rAddress);
+	_impl.connectNB(address);
 	reset(_impl.sockfd());
 }
 
@@ -91,13 +89,14 @@ void SecureStreamSocketImpl::connectSSL()
 }
 	
 
-void SecureStreamSocketImpl::bind(const SocketAddress& rAddress, bool reuseAddress)
+void SecureStreamSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
-	throw Poco::InvalidAccessException("Cannot bind() a SecureStreamSocketImpl");
+	_impl.bind(address, reuseAddress, reusePort);
+	reset(_impl.sockfd());
 }
 
 	
-void SecureStreamSocketImpl::listen(int backlog)
+void SecureStreamSocketImpl::listen(int /*backlog*/)
 {
 	throw Poco::InvalidAccessException("Cannot listen() on a SecureStreamSocketImpl");
 }
@@ -129,19 +128,19 @@ int SecureStreamSocketImpl::receiveBytes(void* buffer, int length, int flags)
 }
 
 
-int SecureStreamSocketImpl::sendTo(const void* buffer, int length, const SocketAddress& rAddress, int flags)
+int SecureStreamSocketImpl::sendTo(const void* /*buffer*/, int /*length*/, const SocketAddress& /*address*/, int /*flags*/)
 {
 	throw Poco::InvalidAccessException("Cannot sendTo() on a SecureStreamSocketImpl");
 }
 
 
-int SecureStreamSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& rAddress, int flags)
+int SecureStreamSocketImpl::receiveFrom(void* /*buffer*/, int /*length*/, SocketAddress& /*address*/, int /*flags*/)
 {
 	throw Poco::InvalidAccessException("Cannot receiveFrom() on a SecureStreamSocketImpl");
 }
 
 
-void SecureStreamSocketImpl::sendUrgent(unsigned char data)
+void SecureStreamSocketImpl::sendUrgent(unsigned char /*data*/)
 {
 	throw Poco::InvalidAccessException("Cannot sendUrgent() on a SecureStreamSocketImpl");
 }

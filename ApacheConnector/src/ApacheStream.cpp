@@ -1,8 +1,6 @@
 //
 // ApacheStream.h
 //
-// $Id: //poco/1.4/ApacheConnector/src/ApacheStream.cpp#2 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -23,7 +21,7 @@ using Poco::BufferedStreamBuf;
 //
 
 
-ApacheStreamBuf::ApacheStreamBuf(ApacheRequestRec* pApacheRequest, bool haveData): 
+ApacheStreamBuf::ApacheStreamBuf(ApacheRequestRec* pApacheRequest, bool haveData):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in | std::ios::out),
 	_pApacheRequest(pApacheRequest),
 	_haveData(haveData)

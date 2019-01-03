@@ -1,8 +1,6 @@
 //
 // ArchiveEntry.h
 //
-// $Id$
-//
 // Library: SevenZip
 // Package: Archive
 // Module:  ArchiveEntry

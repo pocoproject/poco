@@ -1,8 +1,6 @@
 //
 // Environment.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment
@@ -15,25 +13,20 @@
 
 
 #include "Poco/Environment.h"
-#include "Poco/Version.h"
 #include <cstdlib>
 #include <cstdio> // sprintf()
 
 
-#if defined(POCO_OS_FAMILY_VMS)
-#include "Environment_VMS.cpp"
-#elif defined(POCO_VXWORKS)
+#if defined(POCO_VXWORKS)
 #include "Environment_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Environment_UNIX.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Environment_WINCE.cpp"
 #else
-#include "Environment_WIN32U.cpp"
-#endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Environment_WIN32.cpp"
+#endif
 #endif
 
 
@@ -54,13 +47,13 @@ std::string Environment::get(const std::string& name, const std::string& default
 		return defaultValue;
 }
 
-	
+
 bool Environment::has(const std::string& name)
 {
 	return EnvironmentImpl::hasImpl(name);
 }
 
-	
+
 void Environment::set(const std::string& name, const std::string& value)
 {
 	EnvironmentImpl::setImpl(name, value);
@@ -78,18 +71,18 @@ std::string Environment::osDisplayName()
 	return EnvironmentImpl::osDisplayNameImpl();
 }
 
-	
+
 std::string Environment::osVersion()
 {
 	return EnvironmentImpl::osVersionImpl();
 }
 
-	
+
 std::string Environment::osArchitecture()
 {
 	return EnvironmentImpl::osArchitectureImpl();
 }
-	
+
 
 std::string Environment::nodeName()
 {
@@ -128,6 +121,38 @@ unsigned Environment::processorCount()
 Poco::UInt32 Environment::libraryVersion()
 {
 	return POCO_VERSION;
+}
+
+
+Poco::Int32 Environment::os()
+{
+	return POCO_OS;
+}
+
+
+Poco::Int32 Environment::arch()
+{
+	return POCO_ARCH;
+}
+
+
+bool Environment::isUnix()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	return true;
+#else
+	return false;
+#endif
+}
+
+
+bool Environment::isWindows()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	return true;
+#else
+	return false;
+#endif
 }
 
 

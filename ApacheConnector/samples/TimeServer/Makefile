@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/ApacheConnector/samples/TimeServer/Makefile#1 $
-#
 # Makefile for Poco ApacheConnector sample
 #
 

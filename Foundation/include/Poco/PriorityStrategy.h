@@ -1,8 +1,6 @@
 //
 // PriorityStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PriorityStrategy.h#2 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  PrioritytStrategy
@@ -28,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class PriorityStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// NotificationStrategy for PriorityEvent.
 	///

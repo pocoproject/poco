@@ -1,7 +1,5 @@
 //
-// Path_WIN32U.cpp
-//
-// $Id: //poco/1.4/Foundation/src/Path_WINCE.cpp#1 $
+// Path_WIN32.cpp
 //
 // Library: Foundation
 // Package: Filesystem
@@ -31,35 +29,36 @@ std::string PathImpl::currentImpl()
 	return("\\");
 }
 
+
 std::string PathImpl::homeImpl()
 {
 	return("\\");
 }
+
 
 std::string PathImpl::configHomeImpl()
 {
   return homeImpl();
 }
 
+
 std::string PathImpl::dataHomeImpl()
 {
   return homeImpl();
 }
+
 
 std::string PathImpl::cacheHomeImpl()
 {
   return homeImpl();
 }
 
-std::string PathImpl::tempHomeImpl()
-{
-  return tempImpl();
-}
 
 std::string PathImpl::configImpl()
 {
   return("\\");
 }
+
 
 std::string PathImpl::systemImpl()
 {
@@ -70,6 +69,23 @@ std::string PathImpl::systemImpl()
 std::string PathImpl::nullImpl()
 {
 	return "NUL:";
+}
+
+
+std::string PathImpl::selfImpl()
+{
+	Buffer<wchar_t> buffer(MAX_PATH_LEN);
+	DWORD n = GetModuleFileNameW(NULL, buffer.begin(), static_cast<DWORD>(buffer.size()));
+	DWORD err = GetLastError();
+	if (n > 0)
+	{
+		if (err == ERROR_INSUFFICIENT_BUFFER)
+			throw SystemException("Buffer too small to get executable name.");
+		std::string result;
+		UnicodeConverter::toUTF8(buffer.begin(), result);
+		return result;
+	}
+	throw SystemException("Cannot get executable name.");
 }
 
 
@@ -134,7 +150,7 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 					roots.push_back(root);
 				}
 			}
-		} 
+		}
 		while (FindNextFileW(hFind, &fd));
 		FindClose(hFind);
 	}

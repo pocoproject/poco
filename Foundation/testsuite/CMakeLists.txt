@@ -1,8 +1,6 @@
-set(TESTUNIT "${LIBNAME}-testrunner")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-file(GLOB SRCS_G_REMOVE 
+file(GLOB SRCS_G_REMOVE
     src/TestApp.cpp
     src/TestApp_WINCE.cpp
     src/TestLibrary.cpp
@@ -24,38 +22,46 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
     src/WinCEDriver.cpp
 )
 
-add_executable( ${TESTUNIT} ${TEST_SRCS} )
-add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND ${TESTUNIT} -all)
-set_tests_properties(${LIBNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=.") # The SharedLibaryTest has to look for shared libraries in the working directory
-
-target_link_libraries( ${TESTUNIT} PocoFoundation PocoCppUnit )
-if(UNIX)
-    target_link_libraries( ${TESTUNIT} pthread)
-endif(UNIX)
-
-# The test is run in the runtime directory. So the test data is copied there too
-add_custom_command(TARGET ${TESTUNIT} POST_BUILD
+add_executable(Foundation-testrunner ${TEST_SRCS} )
+if(ANDROID)
+	add_test(NAME Foundation WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+	   COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;${CMAKE_BINARY_DIR}/bin/TestApp;${CMAKE_BINARY_DIR}/bin/TestLibrary$<$<CONFIG:Debug>:d>.so" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Foundation-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
+else()
+	add_test(NAME Foundation WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND Foundation-testrunner -all)
+	if(UNIX)
+		set_tests_properties(Foundation PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The SharedLibaryTest has to look for shared libraries in the working directory
+	endif()
+    # The test is run in the runtime directory. So the test data is copied there too
+	add_custom_command(TARGET Foundation-testrunner POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data )
+endif()
+
+target_link_libraries(Foundation-testrunner PUBLIC Poco::Foundation Poco::CppUnit)
+if(UNIX AND NOT ANDROID)
+	target_link_libraries(Foundation-testrunner PUBLIC pthread)
+endif(UNIX AND NOT ANDROID)
+
+if(POCO_ENABLE_LONG_RUNNING_TESTS)
+  target_compile_definitions(Foundation-testrunner PRIVATE ENABLE_LONG_RUNNING_TESTS)
+endif(POCO_ENABLE_LONG_RUNNING_TESTS)
 
 # TestApp
 if(WINCE)
 add_executable( TestApp src/TestApp_WINCE.cpp )
-set_target_properties(TestApp PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
+	set_target_properties(TestApp PROPERTIES LINK_FLAGS "/ENTRY:wmainCRTStartup")
 else()
-add_executable( TestApp src/TestApp.cpp )
+	add_executable( TestApp src/TestApp.cpp )
 endif()
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests
-set_target_properties( TestApp PROPERTIES DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+set_target_properties( TestApp PROPERTIES DEBUG_POSTFIX "d")
 set_target_properties( TestApp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-target_link_libraries( TestApp PocoFoundation)
+target_link_libraries( TestApp PUBLIC Poco::Foundation )
 
-if(NOT POCO_STATIC)
 # TestLibrary
 add_library( TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h )
 # The test requires the library named TestLibrary. By default it is prefixed with lib.
-set_target_properties( TestLibrary PROPERTIES PREFIX "" DEBUG_POSTFIX "") # don't use DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
-set_target_properties( TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
-target_link_libraries( TestLibrary PocoFoundation)
+set_target_properties( TestLibrary PROPERTIES PREFIX "")
+set_target_properties(TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} )
+target_link_libraries(TestLibrary PUBLIC Poco::Foundation )
 
-endif()
-
+add_dependencies(Foundation-testrunner TestApp TestLibrary)

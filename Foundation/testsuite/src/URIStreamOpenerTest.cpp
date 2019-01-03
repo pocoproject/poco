@@ -1,8 +1,6 @@
 //
 // URIStreamOpenerTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/URIStreamOpenerTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -61,7 +59,7 @@ void URIStreamOpenerTest::testStreamOpenerFile()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
 	
@@ -72,8 +70,8 @@ void URIStreamOpenerTest::testStreamOpenerFile()
 	
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 }
 
@@ -83,7 +81,7 @@ void URIStreamOpenerTest::testStreamOpenerRelative()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
 	
@@ -92,8 +90,8 @@ void URIStreamOpenerTest::testStreamOpenerRelative()
 	
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 }
 
@@ -103,7 +101,7 @@ void URIStreamOpenerTest::testStreamOpenerURI()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
 	
@@ -114,8 +112,8 @@ void URIStreamOpenerTest::testStreamOpenerURI()
 	
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString);
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 }
 
@@ -125,7 +123,7 @@ void URIStreamOpenerTest::testStreamOpenerURIResolve()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
 	
@@ -140,8 +138,8 @@ void URIStreamOpenerTest::testStreamOpenerURIResolve()
 	
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString, p.getFileName());
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 }
 
@@ -151,14 +149,14 @@ void URIStreamOpenerTest::testStreamOpenerPath()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
 		
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(path);
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 }
 
@@ -168,7 +166,7 @@ void URIStreamOpenerTest::testStreamOpenerPathResolve()
 	TemporaryFile tempFile;
 	std::string path = tempFile.path();
 	std::ofstream ostr(path.c_str());
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!" << std::endl;
 	ostr.close();
 	
@@ -178,8 +176,8 @@ void URIStreamOpenerTest::testStreamOpenerPathResolve()
 		
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(base, p.getFileName());
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 }
 
@@ -187,16 +185,16 @@ void URIStreamOpenerTest::testStreamOpenerPathResolve()
 void URIStreamOpenerTest::testRegisterUnregister()
 {
 	URIStreamOpener opener;
-	assert (!opener.supportsScheme("string"));
+	assertTrue (!opener.supportsScheme("string"));
 	opener.registerStreamFactory("string", new StringStreamFactory);
-	assert (opener.supportsScheme("string"));
+	assertTrue (opener.supportsScheme("string"));
 	URI uri("string:foobar");
 	std::istream* istr = opener.open(uri);
-	assert (istr != 0);
-	assert (istr->good());
+	assertTrue (istr != 0);
+	assertTrue (istr->good());
 	delete istr;
 	opener.unregisterStreamFactory("string");
-	assert (!opener.supportsScheme("string"));
+	assertTrue (!opener.supportsScheme("string"));
 }
 
 

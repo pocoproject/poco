@@ -1,8 +1,6 @@
 //
 // AttributesTestSuite.h
 //
-// $Id: //poco/1.3/CppParser/testsuite/src/AttributesTestSuite.h#1 $
-//
 // Definition of the AttributesTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

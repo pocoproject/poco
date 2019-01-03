@@ -1,8 +1,6 @@
 //
 // HashStatistic.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/HashStatistic.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  HashStatistic
@@ -33,10 +31,10 @@ class Foundation_API HashStatistic
 {
 public:
 	HashStatistic(
-		UInt32 tableSize, 
-		UInt32 numEntries, 
-		UInt32 numZeroEntries, 
-		UInt32 maxEntry, 
+		UInt32 tableSize,
+		UInt32 numEntries,
+		UInt32 numZeroEntries,
+		UInt32 maxEntry,
 		std::vector<UInt32> details = std::vector<UInt32>());
 		/// Creates the HashStatistic.
 

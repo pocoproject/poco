@@ -1,8 +1,6 @@
 //
 // ScopedLock.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ScopedLock.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex
@@ -35,7 +33,7 @@ class ScopedLock
 	/// The destructor unlocks the mutex.
 {
 public:
-	explicit ScopedLock(M& mutex): _mutex(mutex)
+	explicit ScopedLock(M& mtx): _mutex(mtx)
 	{
 		_mutex.lock();
 	}

@@ -1,8 +1,6 @@
 //
 // File_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_VX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -242,7 +240,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0) 
+	if (fstat(sd, &st) != 0)
 	{
 		close(sd);
 		handleLastErrorImpl(_path);
@@ -261,7 +259,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		int n;
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n) 
+			if (write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -284,6 +282,12 @@ void FileImpl::renameToImpl(const std::string& path)
 
 	if (rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);
+}
+
+
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	throw Poco::NotImplementedException("File::linkTo() is not available on this platform");
 }
 
 
@@ -324,7 +328,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str()) != 0) 
+	if (mkdir(_path.c_str()) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }
@@ -389,7 +393,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ENOSPC:
 		throw FileException("no space left on device", path);
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path);
+		throw DirectoryNotEmptyException(path);
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path);
 	case ENFILE:

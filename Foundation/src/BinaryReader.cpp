@@ -1,8 +1,6 @@
 //
 // BinaryReader.cpp
 //
-// $Id: //poco/1.4/Foundation/src/BinaryReader.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  BinaryReaderWriter
@@ -101,6 +99,9 @@ BinaryReader& BinaryReader::operator >> (unsigned int& value)
 }
 
 
+#ifndef POCO_LONG_IS_64_BIT
+
+
 BinaryReader& BinaryReader::operator >> (long& value)
 {
 #if defined(POCO_LONG_IS_64_BIT)
@@ -121,6 +122,9 @@ BinaryReader& BinaryReader::operator >> (unsigned long& value)
 }
 
 
+#endif // POCO_LONG_IS_64_BIT
+
+
 BinaryReader& BinaryReader::operator >> (float& value)
 {
 	return read(value, _flipBytes);
@@ -133,9 +137,6 @@ BinaryReader& BinaryReader::operator >> (double& value)
 }
 
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
-
-
 BinaryReader& BinaryReader::operator >> (Int64& value)
 {
 	return read(value, _flipBytes);
@@ -146,9 +147,6 @@ BinaryReader& BinaryReader::operator >> (UInt64& value)
 {
 	return read(value, _flipBytes);
 }
-
-
-#endif
 
 
 BinaryReader& BinaryReader::operator >> (std::string& value)

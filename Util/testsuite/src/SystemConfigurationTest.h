@@ -1,8 +1,6 @@
 //
 // SystemConfigurationTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/SystemConfigurationTest.h#1 $
-//
 // Definition of the SystemConfigurationTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

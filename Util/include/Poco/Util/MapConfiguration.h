@@ -1,8 +1,6 @@
 //
 // MapConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/MapConfiguration.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  MapConfiguration
@@ -55,7 +53,7 @@ protected:
 	iterator begin() const;
 	iterator end() const;
 
-private:	
+private:
 	StringMap _map;
 };
 

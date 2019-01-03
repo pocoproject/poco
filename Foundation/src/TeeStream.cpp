@@ -1,8 +1,6 @@
 //
 // TeeStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TeeStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  TeeStream
@@ -20,19 +18,19 @@
 namespace Poco {
 
 
-TeeStreamBuf::TeeStreamBuf(): 
+TeeStreamBuf::TeeStreamBuf():
 	_pIstr(0)
 {
 }
 
 
-TeeStreamBuf::TeeStreamBuf(std::istream& istr): 
+TeeStreamBuf::TeeStreamBuf(std::istream& istr):
 	_pIstr(&istr)
 {
 }
 
 
-TeeStreamBuf::TeeStreamBuf(std::ostream& ostr): 
+TeeStreamBuf::TeeStreamBuf(std::ostream& ostr):
 	_pIstr(0)
 {
 	_streams.push_back(&ostr);

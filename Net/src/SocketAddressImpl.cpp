@@ -1,8 +1,6 @@
 //
 // SocketAddressImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketAddressImpl.cpp#5 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketAddressImpl
@@ -53,19 +51,19 @@ IPv4SocketAddressImpl::IPv4SocketAddressImpl()
 }
 
 
-IPv4SocketAddressImpl::IPv4SocketAddressImpl(const struct sockaddr_in* pAddr)
+IPv4SocketAddressImpl::IPv4SocketAddressImpl(const struct sockaddr_in* addr)
 {
-	std::memcpy(&_addr, pAddr, sizeof(_addr));
+	std::memcpy(&_addr, addr, sizeof(_addr));
 }
 
 
-IPv4SocketAddressImpl::IPv4SocketAddressImpl(const void* pAddr, UInt16 socketPort)
+IPv4SocketAddressImpl::IPv4SocketAddressImpl(const void* addr, UInt16 port)
 {
 	std::memset(&_addr, 0, sizeof(_addr));
 	_addr.sin_family = AF_INET;
 	poco_set_sin_len(&_addr);
-	std::memcpy(&_addr.sin_addr, pAddr, sizeof(_addr.sin_addr));
-	_addr.sin_port = socketPort;
+	std::memcpy(&_addr.sin_addr, addr, sizeof(_addr.sin_addr));
+	_addr.sin_port = port;
 }
 
 
@@ -87,29 +85,29 @@ std::string IPv4SocketAddressImpl::toString() const
 //
 
 
-IPv6SocketAddressImpl::IPv6SocketAddressImpl(const struct sockaddr_in6* pAddr)
+IPv6SocketAddressImpl::IPv6SocketAddressImpl(const struct sockaddr_in6* addr)
 {
-	std::memcpy(&_addr, pAddr, sizeof(_addr));
+	std::memcpy(&_addr, addr, sizeof(_addr));
 }
 
 
-IPv6SocketAddressImpl::IPv6SocketAddressImpl(const void* pAddr, UInt16 socketPort)
+IPv6SocketAddressImpl::IPv6SocketAddressImpl(const void* addr, UInt16 port)
 {
 	std::memset(&_addr, 0, sizeof(_addr));
 	_addr.sin6_family = AF_INET6;
 	poco_set_sin6_len(&_addr);
-	std::memcpy(&_addr.sin6_addr, pAddr, sizeof(_addr.sin6_addr));
-	_addr.sin6_port = socketPort;
+	std::memcpy(&_addr.sin6_addr, addr, sizeof(_addr.sin6_addr));
+	_addr.sin6_port = port;
 }
 
 
-IPv6SocketAddressImpl::IPv6SocketAddressImpl(const void* pAddr, UInt16 socketPort, UInt32 scope)
+IPv6SocketAddressImpl::IPv6SocketAddressImpl(const void* addr, UInt16 port, UInt32 scope)
 {
 	std::memset(&_addr, 0, sizeof(_addr));
 	_addr.sin6_family = AF_INET6;
 	poco_set_sin6_len(&_addr);
-	std::memcpy(&_addr.sin6_addr, pAddr, sizeof(_addr.sin6_addr));
-	_addr.sin6_port = socketPort;
+	std::memcpy(&_addr.sin6_addr, addr, sizeof(_addr.sin6_addr));
+	_addr.sin6_port = port;
 	_addr.sin6_scope_id = scope;
 }
 
@@ -137,19 +135,27 @@ std::string IPv6SocketAddressImpl::toString() const
 //
 
 
-LocalSocketAddressImpl::LocalSocketAddressImpl(const struct sockaddr_un* pAddr)
+LocalSocketAddressImpl::LocalSocketAddressImpl(const struct sockaddr_un* addr, poco_socklen_t length)
 {
 	_pAddr = new sockaddr_un;
-	std::memcpy(_pAddr, pAddr, sizeof(struct sockaddr_un));
+	std::memcpy(_pAddr, addr, sizeof(struct sockaddr_un));
+	_addressLength = length ? length : sizeof(struct sockaddr_un);
 }
 
 
-LocalSocketAddressImpl::LocalSocketAddressImpl(const char* pPath)
+LocalSocketAddressImpl::LocalSocketAddressImpl(const std::string& path)
 {
+	poco_assert(path.length() < sizeof(_pAddr->sun_path) && !path.empty());
+
 	_pAddr = new sockaddr_un;
-	poco_set_sun_len(_pAddr, std::strlen(pPath) + sizeof(struct sockaddr_un) - sizeof(_pAddr->sun_path) + 1);
+	std::memset(_pAddr, 0, sizeof(struct sockaddr_un));
+
 	_pAddr->sun_family = AF_UNIX;
-	std::strcpy(_pAddr->sun_path, pPath);
+	std::memcpy(_pAddr->sun_path, path.data(), path.size());
+
+	_addressLength = path.size() + offsetof(struct sockaddr_un, sun_path);
+	if (path[0] != 0) _addressLength++;
+	poco_set_sun_len(_pAddr, _addressLength);
 }
 
 
@@ -161,8 +167,9 @@ LocalSocketAddressImpl::~LocalSocketAddressImpl()
 
 std::string LocalSocketAddressImpl::toString() const
 {
-	std::string result(path());
-	return result;
+	std::size_t len = _addressLength - offsetof(struct sockaddr_un, sun_path);
+	if (path()[0] != 0) len--;
+	return std::string(path(), len);
 }
 
 

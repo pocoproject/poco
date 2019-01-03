@@ -1,8 +1,6 @@
 //
 // Application.cpp
 //
-// $Id: //poco/1.4/Util/src/Application.cpp#6 $
-//
 // Library: Util
 // Package: Application
 // Module:  Application
@@ -43,9 +41,7 @@
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 using Poco::Logger;
@@ -100,10 +96,10 @@ Application::~Application()
 void Application::setup()
 {
 	poco_assert (_pInstance == 0);
-	
-	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false, false);
-	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true, false);
-	
+
+	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false);
+	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true);
+
 	addSubsystem(new LoggingSubsystem);
 	
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -138,7 +134,7 @@ void Application::init(int argc, char* pArgv[])
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if defined (POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_WSTRING)
 void Application::init(int argc, wchar_t* argv[])
 {
 	std::vector<std::string> args;
@@ -170,7 +166,6 @@ void Application::init()
 	_pConfig->setString("application.dir", appPath.parent().toString());
 	_pConfig->setString("application.configDir", Path::configHome() + appPath.getBaseName() + Path::separator());
 	_pConfig->setString("application.cacheDir", Path::cacheHome() + appPath.getBaseName() + Path::separator());
-	_pConfig->setString("application.tempDir", Path::tempHome() + appPath.getBaseName() + Path::separator());
 	_pConfig->setString("application.dataDir", Path::dataHome() + appPath.getBaseName() + Path::separator());
 	processOptions();
 }
@@ -231,27 +226,27 @@ int Application::loadConfiguration(int priority)
 	Path confPath;
 	if (findAppConfigFile(appPath.getBaseName(), "properties", confPath))
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "ini", confPath))
 	{
-		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "json", confPath))
 	{
-		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	if (findAppConfigFile(appPath.getBaseName(), "xml", confPath))
 	{
-		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
@@ -274,27 +269,27 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
 	else if (icompare(ext, "ini") == 0)
 	{
-		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new IniFileConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_JSONCONFIGURATION
 	else if (icompare(ext, "json") == 0)
 	{
-		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new JSONConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 	else if (icompare(ext, "xml") == 0)
 	{
-		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false, false);
+		_pConfig->add(new XMLConfiguration(confPath.toString()), priority, false);
 		++n;
 	}
 #endif
@@ -357,7 +352,7 @@ int Application::run()
 }
 
 
-int Application::main(const ArgVec& args)
+int Application::main(const ArgVec& /*args*/)
 {
 	return EXIT_OK;
 }
@@ -443,7 +438,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 		appPath.makeAbsolute();
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
-	#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+	#if !defined(POCO_NO_WSTRING)
 		wchar_t path[1024];
 		int n = GetModuleFileNameW(0, path, sizeof(path)/sizeof(wchar_t));
 		if (n > 0)

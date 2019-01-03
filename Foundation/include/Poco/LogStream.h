@@ -1,8 +1,6 @@
 //
 // LogStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LogStream.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  LogStream

@@ -1,8 +1,6 @@
 //
 // UTF8StringTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/UTF8StringTest.h#1 $
-//
 // Definition of the UTF8StringTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
@@ -28,6 +26,9 @@ public:
 
 	void testCompare();
 	void testTransform();
+
+	void testEscape();
+	void testUnescape();
 
 	void setUp();
 	void tearDown();

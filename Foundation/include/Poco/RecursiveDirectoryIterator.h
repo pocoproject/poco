@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIterator.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -59,7 +57,7 @@ class RecursiveDirectoryIterator
 	///     * SiblingsFirstRecursiveDirectoryIterator.
 	///
 	/// The depth of traversal can be limited by constructor
-	/// parameter maxTraversalDepth (which sets the infinite depth by default).
+	/// parameter maxDepth (which sets the infinite depth by default).
 {
 public:
 	typedef RecursiveDirectoryIterator<TTravStr> MyType;
@@ -75,9 +73,9 @@ public:
 	{
 	}
 
-	RecursiveDirectoryIterator(const std::string& rPath, UInt16 maxTraversalDepth = D_INFINITE)
+	RecursiveDirectoryIterator(const std::string& path, UInt16 maxDepth = D_INFINITE)
 		/// Creates a recursive directory iterator for the given path.
-		: _pImpl(new ImplType(rPath, maxTraversalDepth)), _path(Path(_pImpl->get())), _file(_path)
+		: _pImpl(new ImplType(path, maxDepth)), _path(Path(_pImpl->get())), _file(_path)
 	{
 	}
 
@@ -87,22 +85,22 @@ public:
 	{
 	}
 
-	RecursiveDirectoryIterator(const DirectoryIterator& iterator, UInt16 maxTraversalDepth = D_INFINITE):
+	RecursiveDirectoryIterator(const DirectoryIterator& iterator, UInt16 maxDepth = D_INFINITE):
 		/// Creates a recursive directory iterator for the path of
 		/// non-recursive directory iterator.
-		_pImpl(new ImplType(iterator->path(), maxTraversalDepth)), _path(Path(_pImpl->get())), _file(_path)
+		_pImpl(new ImplType(iterator->path(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
 	{
 	}
 
-	RecursiveDirectoryIterator(const File& file, UInt16 maxTraversalDepth = D_INFINITE):
+	RecursiveDirectoryIterator(const File& file, UInt16 maxDepth = D_INFINITE):
 		/// Creates a recursive directory iterator for the given path.
-		_pImpl(new ImplType(file.path(), maxTraversalDepth)), _path(Path(_pImpl->get())), _file(_path)
+		_pImpl(new ImplType(file.path(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
 	{
 	}
 
-	RecursiveDirectoryIterator(const Path& rPath, UInt16 maxTraversalDepth = D_INFINITE):
+	RecursiveDirectoryIterator(const Path& path, UInt16 maxDepth = D_INFINITE):
 		/// Creates a recursive directory iterator for the given path.
-		_pImpl(new ImplType(rPath.toString(), maxTraversalDepth)), _path(Path(_pImpl->get())), _file(_path)
+		_pImpl(new ImplType(path.toString(), maxDepth)), _path(Path(_pImpl->get())), _file(_path)
 	{
 	}
 
@@ -137,6 +135,18 @@ public:
 		return _pImpl->maxDepth();
 	}
 
+	template <typename T>
+	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
+		/// Binds the event to the given method.
+		///
+		/// The callback method will be called if the Traverse class fails
+		/// to read a directory. 
+		///
+		/// Usage:
+		///     onError(*this, &MyClass::myCallback);
+	{
+		_pImpl->template onError<T>(obj, pCB);
+	}
 
 	MyType& operator = (const MyType& it)
 	{
@@ -163,21 +173,21 @@ public:
 	}
 
 
-	MyType& operator = (const Path& rPath)
+	MyType& operator = (const Path& path)
 	{
 		if (_pImpl)
 			_pImpl->release();
-		_pImpl = new ImplType(rPath.toString());
+		_pImpl = new ImplType(path.toString());
 		_path = Path(_pImpl->get());
 		_file = _path;
 		return *this;
 	}
 
-	MyType& operator = (const std::string& rPath)
+	MyType& operator = (const std::string& path)
 	{
 		if (_pImpl)
 			_pImpl->release();
-		_pImpl = new ImplType(rPath);
+		_pImpl = new ImplType(path);
 		_path = Path(_pImpl->get());
 		_file = _path;
 		return *this;

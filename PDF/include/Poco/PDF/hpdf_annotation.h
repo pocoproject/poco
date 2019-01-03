@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_annotation.h
+ * << Haru Free PDF Library >> -- hpdf_annotation.h
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -47,21 +50,39 @@ HPDF_URILinkAnnot_New  (HPDF_MMgr          mmgr,
 
 
 HPDF_Annotation
-HPDF_TextAnnot_New  (HPDF_MMgr        mmgr,
-                     HPDF_Xref        xref,
-                     HPDF_Rect        rect,
-                     const char  *text,
-                     HPDF_Encoder     encoder);
+HPDF_3DAnnot_New  (HPDF_MMgr        mmgr,
+                   HPDF_Xref        xref,
+                   HPDF_Rect        rect,
+                   HPDF_U3D u3d);
 
+HPDF_Annotation
+HPDF_MarkupAnnot_New    (HPDF_MMgr        mmgr,
+						 HPDF_Xref        xref,
+						 HPDF_Rect        rect,
+						 const char      *text,
+						 HPDF_Encoder     encoder,
+					 	 HPDF_AnnotType  subtype);
 
-HPDF_STATUS
-HPDF_Annotation_SetBorderStyle  (HPDF_Annotation  annot,
-                                 HPDF_BSSubtype   subtype,
-                                 HPDF_REAL        width,
-                                 HPDF_UINT16      dash_on,
-                                 HPDF_UINT16      dash_off,
-                                 HPDF_UINT16      dash_phase);
+HPDF_Annotation
+HPDF_PopupAnnot_New (HPDF_MMgr         mmgr,
+                     HPDF_Xref         xref,
+                     HPDF_Rect         rect,
+					 HPDF_Annotation   parent);
 
+HPDF_Annotation
+HPDF_StampAnnot_New (HPDF_MMgr         mmgr,
+                     HPDF_Xref         xref,
+                     HPDF_Rect         rect,
+					 HPDF_StampAnnotName name,
+					 const char*	   text,
+					 HPDF_Encoder	   encoder);
+
+HPDF_Annotation
+HPDF_ProjectionAnnot_New (HPDF_MMgr         mmgr,
+						  HPDF_Xref         xref,
+						  HPDF_Rect         rect,
+						  const char*       text,
+						  HPDF_Encoder       encoder);
 
 HPDF_BOOL
 HPDF_Annotation_Validate (HPDF_Annotation  annot);

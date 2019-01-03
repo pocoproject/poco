@@ -1,8 +1,6 @@
 //
 // KeyFileHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/KeyFileHandler.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  KeyFileHandler
@@ -39,7 +37,7 @@ KeyFileHandler::~KeyFileHandler()
 }
 
 
-void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& privateKey)
+void KeyFileHandler::onPrivateKeyRequested(const void* /*pSender*/, std::string& privateKey)
 {
 	try
 	{

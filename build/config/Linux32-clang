@@ -1,0 +1,23 @@
+#
+# Linux
+#
+# Make settings for crossbuilding Poco Linux x86 on a Linux x86_64 OS.
+#
+#
+
+include $(POCO_BASE)/build/config/Linux-clang
+
+#
+# Crossbuild Settings
+#
+POCO_TARGET_OSNAME  = Linux
+POCO_TARGET_OSARCH  = x86
+
+#
+# Compiler and Linker Flags
+#
+CFLAGS64        += --target=i386-pc-linux
+CXXFLAGS64      += --target=i386-pc-linux
+SHLIBFLAGS64    += --target=i386-pc-linux
+LINKFLAGS64     += --target=i386-pc-linux
+

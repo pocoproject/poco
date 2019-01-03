@@ -10,7 +10,7 @@ is not officially supported and may or may not work.
 Starting with release 1.4.0 the POCO C++ Libraries support new
 build configurations for Visual Studio. Furthermore, Visual Studio 2010
 and 64-bit (x64) builds are now supported in addition to Visual Studio 2008,
-2005 and .NET 2003, as previously supported. 
+2005 and .NET 2003, as previously supported.
 64-bit (x64) builds are only supported with Visual
 Studio 2008 and Visual Studio 2010.
 

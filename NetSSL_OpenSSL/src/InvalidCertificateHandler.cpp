@@ -1,8 +1,6 @@
 //
 // InvalidCertificateHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/InvalidCertificateHandler.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  InvalidCertificateHandler

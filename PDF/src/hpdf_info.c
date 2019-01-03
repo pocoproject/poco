@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_info.c
+ * << Haru Free PDF Library >> -- hpdf_info.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -16,7 +19,7 @@
 #include "hpdf_utils.h"
 #include "hpdf_info.h"
 
-static const char  *HPDF_INFO_ATTR_NAMES[] = {
+static const char * const HPDF_INFO_ATTR_NAMES[] = {
     "CreationDate",
     "ModDate",
     "Author",
@@ -25,6 +28,8 @@ static const char  *HPDF_INFO_ATTR_NAMES[] = {
     "Title",
     "Subject",
     "Keywords",
+    "Trapped",
+    "GTS_PDFXVersion",
     NULL
 };
 
@@ -57,6 +62,9 @@ HPDF_Info_SetInfoAttr (HPDF_Dict        info,
     if (type <= HPDF_INFO_MOD_DATE)
         return HPDF_SetError (info->error, HPDF_INVALID_PARAMETER, 0);
 
+    if (type == HPDF_INFO_TRAPPED)
+        return HPDF_Dict_AddName(info, name, value);
+
     return HPDF_Dict_Add (info, name, HPDF_String_New (info->mmgr, value,
             encoder));
 }
@@ -79,7 +87,7 @@ HPDF_Info_GetInfoAttr (HPDF_Dict      info,
     if (!s)
         return NULL;
     else
-        return s->value;
+        return (const char *)(s->value);
 }
 
 
@@ -141,7 +149,7 @@ HPDF_Info_SetInfoDateAttr (HPDF_Dict      info,
             return HPDF_SetError (info->error, HPDF_INVALID_DATE_TIME, 0);
     }
 
-    ptmp = HPDF_MemCpy (tmp, "D:", 2);
+    ptmp = (char *)HPDF_MemCpy ((HPDF_BYTE *)tmp, (HPDF_BYTE *)"D:", 2);
     ptmp = HPDF_IToA2 (ptmp, value.year, 5);
     ptmp = HPDF_IToA2 (ptmp, value.month, 3);
     ptmp = HPDF_IToA2 (ptmp, value.day, 3);

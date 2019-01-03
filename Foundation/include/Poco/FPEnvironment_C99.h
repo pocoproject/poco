@@ -1,8 +1,6 @@
 //
 // FPEnvironment_C99.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_C99.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -33,18 +31,54 @@ class FPEnvironmentImpl
 protected:
 	enum RoundingModeImpl
 	{
+#if defined(FE_DOWNWARD)
 		FP_ROUND_DOWNWARD_IMPL   = FE_DOWNWARD,
+#else
+		FP_ROUND_DOWNWARD_IMPL   = 0,
+#endif
+#if defined(FE_UPWARD)
 		FP_ROUND_UPWARD_IMPL     = FE_UPWARD,
+#else
+		FP_ROUND_UPWARD_IMPL     = 0,
+#endif
+#if defined(FE_TONEAREST)
 		FP_ROUND_TONEAREST_IMPL  = FE_TONEAREST,
+#else
+		FP_ROUND_TONEAREST_IMPL  = 0,
+#endif
+#if defined(FE_TOWARDZERO)
 		FP_ROUND_TOWARDZERO_IMPL = FE_TOWARDZERO
+#else
+		FP_ROUND_TOWARDZERO_IMPL = 0
+#endif
 	};
 	enum FlagImpl
 	{
+#if defined(FE_DIVBYZERO)
 		FP_DIVIDE_BY_ZERO_IMPL = FE_DIVBYZERO,
+#else
+		FP_DIVIDE_BY_ZERO_IMPL = 0,
+#endif
+#if defined(FE_INEXACT)
 		FP_INEXACT_IMPL        = FE_INEXACT,
+#else
+		FP_INEXACT_IMPL        = 0,
+#endif
+#if defined(FE_OVERFLOW)
 		FP_OVERFLOW_IMPL       = FE_OVERFLOW,
+#else
+		FP_OVERFLOW_IMPL       = 0,
+#endif
+#if defined(FE_UNDERFLOW)
 		FP_UNDERFLOW_IMPL      = FE_UNDERFLOW,
+#else
+		FP_UNDERFLOW_IMPL      = 0,
+#endif
+#if defined(FE_INVALID)
 		FP_INVALID_IMPL        = FE_INVALID
+#else
+		FP_INVALID_IMPL        = 0
+#endif
 	};
 	FPEnvironmentImpl();
 	FPEnvironmentImpl(const FPEnvironmentImpl& env);

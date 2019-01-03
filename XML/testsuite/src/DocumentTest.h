@@ -1,8 +1,6 @@
 //
 // DocumentTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/DocumentTest.h#1 $
-//
 // Definition of the DocumentTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

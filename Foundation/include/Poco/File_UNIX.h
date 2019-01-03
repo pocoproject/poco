@@ -1,8 +1,6 @@
 //
 // File_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/File_UNIX.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -21,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Timestamp.h"
 
 
 namespace Poco {
@@ -55,6 +54,7 @@ protected:
 	void setExecutableImpl(bool flag = true);		
 	void copyToImpl(const std::string& path) const;
 	void renameToImpl(const std::string& path);
+	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
 	bool createFileImpl();
 	bool createDirectoryImpl();

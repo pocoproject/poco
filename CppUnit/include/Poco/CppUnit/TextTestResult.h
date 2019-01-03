@@ -1,8 +1,6 @@
 //
 // TextTestResult.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TextTestResult.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_TextTestResult_INCLUDED

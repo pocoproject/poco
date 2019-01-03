@@ -1,8 +1,6 @@
 //
 // HTTPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPServerConnection.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerConnection
@@ -31,8 +29,8 @@ namespace Poco {
 namespace Net {
 
 
-HTTPServerConnection::HTTPServerConnection(const StreamSocket& rSocket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
-	TCPServerConnection(rSocket),
+HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
+	TCPServerConnection(socket),
 	_pParams(pParams),
 	_pFactory(pFactory),
 	_stopped(false)
@@ -78,7 +76,7 @@ void HTTPServerConnection::run()
 					response.set("Server", server);
 				try
 				{
-					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
 					if (pHandler.get())
 					{
 						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)

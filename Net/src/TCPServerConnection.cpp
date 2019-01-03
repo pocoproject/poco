@@ -1,8 +1,6 @@
 //
 // TCPServerConnection.cpp
 //
-// $Id: //poco/1.4/Net/src/TCPServerConnection.cpp#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerConnection
@@ -27,8 +25,8 @@ namespace Poco {
 namespace Net {
 
 
-TCPServerConnection::TCPServerConnection(const StreamSocket& rSocket):
-	_socket(rSocket)
+TCPServerConnection::TCPServerConnection(const StreamSocket& socket):
+	_socket(socket)
 {
 }
 

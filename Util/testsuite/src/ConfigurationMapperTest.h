@@ -1,8 +1,6 @@
 //
 // ConfigurationMapperTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/ConfigurationMapperTest.h#1 $
-//
 // Definition of the ConfigurationMapperTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -37,7 +35,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
-	virtual Poco::Util::AbstractConfiguration* allocConfiguration() const;
+	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const;
 };
 
 

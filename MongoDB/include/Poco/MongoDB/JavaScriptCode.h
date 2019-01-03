@@ -1,8 +1,6 @@
 //
 // JavaScriptCode.h
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  JavaScriptCode
@@ -32,31 +30,34 @@ namespace MongoDB {
 
 
 class MongoDB_API JavaScriptCode
-	/// Represents JavaScript type in BSON
+	/// Represents JavaScript type in BSON.
 {
 public:
 	typedef SharedPtr<JavaScriptCode> Ptr;
 
 	JavaScriptCode();
-		/// Constructor
+		/// Creates an empty JavaScriptCode object.
 
 	virtual ~JavaScriptCode();
-		/// Destructor
+		/// Destroys the JavaScriptCode.
 
-	void setCode(const std::string& s);
-		/// Set the code
+	void setCode(const std::string& code);
+		/// Sets the JavaScript code.
 
 	std::string getCode() const;
-		/// Get the code
+		/// Returns the JavaScript code.
 
 private:
 	std::string _code;
 };
 
 
-inline void JavaScriptCode::setCode(const std::string& s)
+//
+// inlines
+//
+inline void JavaScriptCode::setCode(const std::string& code)
 {
-	_code = s;
+	_code = code;
 }
 
 
@@ -65,6 +66,7 @@ inline std::string JavaScriptCode::getCode() const
 	return _code;
 }
 
+
 // BSON JavaScript code
 // spec: string
 template<>
@@ -72,7 +74,7 @@ struct ElementTraits<JavaScriptCode::Ptr>
 {
 	enum { TypeId = 0x0D };
 
-	static std::string toString(const JavaScriptCode::Ptr& value, int indent = 0)
+	static std::string toString(const JavaScriptCode::Ptr& value, int /*indent*/ = 0)
 	{
 		return value.isNull() ? "" : value->getCode();
 	}
@@ -100,4 +102,4 @@ inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
 } } // namespace Poco::MongoDB
 
 
-#endif //  MongoDB_JavaScriptCode_INCLUDED
+#endif // MongoDB_JavaScriptCode_INCLUDED

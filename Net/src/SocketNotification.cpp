@@ -1,8 +1,6 @@
 //
 // SocketNotification.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketNotification.cpp#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketNotification
@@ -32,13 +30,13 @@ SocketNotification::~SocketNotification()
 }
 
 	
-void SocketNotification::setSocket(const Socket& rSocket)
+void SocketNotification::setSocket(const Socket& socket)
 {
-	_socket = rSocket;
+	_socket = socket;
 }
 
 
-ReadableNotification::ReadableNotification(SocketReactor* pReactor): 
+ReadableNotification::ReadableNotification(SocketReactor* pReactor):
 	SocketNotification(pReactor)
 {
 }
@@ -49,7 +47,7 @@ ReadableNotification::~ReadableNotification()
 }
 
 
-WritableNotification::WritableNotification(SocketReactor* pReactor): 
+WritableNotification::WritableNotification(SocketReactor* pReactor):
 	SocketNotification(pReactor)
 {
 }
@@ -60,7 +58,7 @@ WritableNotification::~WritableNotification()
 }
 
 
-ErrorNotification::ErrorNotification(SocketReactor* pReactor): 
+ErrorNotification::ErrorNotification(SocketReactor* pReactor):
 	SocketNotification(pReactor)
 {
 }
@@ -71,7 +69,7 @@ ErrorNotification::~ErrorNotification()
 }
 
 
-TimeoutNotification::TimeoutNotification(SocketReactor* pReactor): 
+TimeoutNotification::TimeoutNotification(SocketReactor* pReactor):
 	SocketNotification(pReactor)
 {
 }
@@ -82,7 +80,7 @@ TimeoutNotification::~TimeoutNotification()
 }
 
 
-IdleNotification::IdleNotification(SocketReactor* pReactor): 
+IdleNotification::IdleNotification(SocketReactor* pReactor):
 	SocketNotification(pReactor)
 {
 }
@@ -93,7 +91,7 @@ IdleNotification::~IdleNotification()
 }
 
 
-ShutdownNotification::ShutdownNotification(SocketReactor* pReactor): 
+ShutdownNotification::ShutdownNotification(SocketReactor* pReactor):
 	SocketNotification(pReactor)
 {
 }

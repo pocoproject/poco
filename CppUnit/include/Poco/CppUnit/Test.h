@@ -1,8 +1,6 @@
 //
 // Test.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/Test.h#1 $
-//
 
 
 #ifndef Poco_CppUnit_Test_INCLUDED
@@ -11,6 +9,7 @@
 
 #include "Poco/CppUnit/CppUnit.h"
 #include <string>
+#include <vector>
 
 
 namespace CppUnit {
@@ -31,6 +30,11 @@ public:
 	virtual void run(TestResult* result) = 0;
 	virtual int countTestCases() = 0;
 	virtual std::string toString() = 0;
+
+	void addSetup(const std::vector<std::string>& setup);
+
+protected:
+	std::vector<std::string>	_setup;
 };
 
 
@@ -40,7 +44,7 @@ inline Test::~Test()
 
 
 // Runs a test and collects its result in a TestResult instance.
-inline void Test::run(TestResult *result)
+inline void Test::run(TestResult* /*result*/)
 {
 }
 
@@ -48,7 +52,7 @@ inline void Test::run(TestResult *result)
 // Counts the number of test cases that will be run by this test.
 inline int Test::countTestCases()
 {
-	return 0; 
+	return 0;
 }
 
 
@@ -58,6 +62,11 @@ inline std::string Test::toString()
 	return "";
 }
 
+
+inline void Test::addSetup(const std::vector<std::string>& setup)
+{
+	_setup = setup;
+}
 
 } // namespace CppUnit
 

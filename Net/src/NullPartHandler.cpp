@@ -1,8 +1,6 @@
 //
 // NullPartHandler.cpp
 //
-// $Id: //poco/1.4/Net/src/NullPartHandler.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  NullPartHandler
@@ -38,7 +36,7 @@ NullPartHandler::~NullPartHandler()
 }
 
 
-void NullPartHandler::handlePart(const MessageHeader& header, std::istream& stream)
+void NullPartHandler::handlePart(const MessageHeader& /*header*/, std::istream& stream)
 {
 	NullOutputStream ostr;
 	StreamCopier::copyStream(stream, ostr);

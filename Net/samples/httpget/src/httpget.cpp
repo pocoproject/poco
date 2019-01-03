@@ -1,8 +1,6 @@
 //
 // httpget.cpp
 //
-// $Id: //poco/1.4/Net/samples/httpget/src/httpget.cpp#3 $
-//
 // This sample demonstrates the HTTPClientSession and the HTTPCredentials classes.
 //
 // Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.

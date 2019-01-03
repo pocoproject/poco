@@ -1,8 +1,6 @@
 //
 // InvalidCertificateHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/InvalidCertificateHandler.cpp#1 $
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  InvalidCertificateHandler

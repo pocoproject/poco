@@ -1,8 +1,6 @@
 //
 // HashTable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/HashTable.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  HashTable
@@ -53,9 +51,9 @@ public:
 	typedef typename HashEntryMap::const_iterator ConstIterator;
 	typedef typename HashEntryMap::iterator Iterator;
 
-	HashTable(UInt32 initialSize = 251): 
-		_entries(0), 
-		_size(0), 
+	HashTable(UInt32 initialSize = 251):
+		_entries(0),
+		_size(0),
 		_maxCapacity(initialSize)
 		/// Creates the HashTable.
 	{
@@ -334,14 +332,14 @@ public:
 		{
 			if (_entries[i])
 			{
-				UInt32 entrySize = (UInt32)_entries[i]->size();
-				poco_assert_dbg(entrySize != 0);
-				if (entrySize > maxEntriesPerHash)
-					maxEntriesPerHash = entrySize;
+				UInt32 size = (UInt32)_entries[i]->size();
+				poco_assert_dbg(size != 0);
+				if (size > maxEntriesPerHash)
+					maxEntriesPerHash = size;
 				if (details)
-					detailedEntriesPerHash.push_back(entrySize);
+					detailedEntriesPerHash.push_back(size);
 	#ifdef _DEBUG
-				totalSize += entrySize;
+				totalSize += size;
 	#endif
 			}
 			else

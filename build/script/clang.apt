@@ -1,0 +1,23 @@
+# http://llvm.org/apt/
+
+# sudo bash -c "cat >> /etc/apt/sources.list" << LLVMAPT
+# LLVM
+# deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty main
+# deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty main
+# 4.0
+deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty-4.0 main
+deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-4.0 main
+# 5.0
+deb http://llvm.org/apt/trusty/     llvm-toolchain-trusty-5.0 main
+deb-src http://llvm.org/apt/trusty/ llvm-toolchain-trusty-5.0 main
+
+# LLVMAPT
+
+# wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -
+
+# sudo apt-get update -y
+# sudo apt-get install -y clang-3.6 lldb-3.6 libc++-dev libc++abi-dev
+# sudo apt-get install -y clang-3.7 lldb-3.7 libc++-dev libc++abi-dev
+# sudo apt-get install -y clang-3.8 lldb-3.8 libc++-dev libc++abi-dev
+# sudo apt-get install -y clang-3.9 lldb-3.9 libc++-dev libc++abi-dev
+# sudo apt-get install -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev

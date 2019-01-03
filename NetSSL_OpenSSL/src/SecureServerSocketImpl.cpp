@@ -1,8 +1,6 @@
 //
 // SecureServerSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureServerSocketImpl.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureServerSocketImpl
@@ -46,31 +44,36 @@ SocketImpl* SecureServerSocketImpl::acceptConnection(SocketAddress& clientAddr)
 }
 
 
-void SecureServerSocketImpl::connect(const SocketAddress& rAddress)
+void SecureServerSocketImpl::connect(const SocketAddress& /*address*/)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
 }
 
 
-void SecureServerSocketImpl::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
-{
-	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
-}
-	
-
-void SecureServerSocketImpl::connectNB(const SocketAddress& rAddress)
+void SecureServerSocketImpl::connect(const SocketAddress& /*address*/, const Poco::Timespan& /*timeout*/)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
 }
 	
 
-void SecureServerSocketImpl::bind(const SocketAddress& rAddress, bool reuseAddress)
+void SecureServerSocketImpl::connectNB(const SocketAddress& /*address*/)
 {
-	_impl.bind(rAddress, reuseAddress);
+	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
+}
+	
+
+void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	_impl.bind(address, reuseAddress, reusePort);
 	reset(_impl.sockfd());
 }
 
-	
+void SecureServerSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	_impl.bind6(address, reuseAddress, ipV6Only);
+	reset(_impl.sockfd());
+}
+
 void SecureServerSocketImpl::listen(int backlog)
 {
 	_impl.listen(backlog);
@@ -85,31 +88,31 @@ void SecureServerSocketImpl::close()
 }
 	
 
-int SecureServerSocketImpl::sendBytes(const void* buffer, int length, int flags)
+int SecureServerSocketImpl::sendBytes(const void* /*buffer*/, int /*length*/, int /*flags*/)
 {
 	throw Poco::InvalidAccessException("Cannot sendBytes() on a SecureServerSocket");
 }
 
 
-int SecureServerSocketImpl::receiveBytes(void* buffer, int length, int flags)
+int SecureServerSocketImpl::receiveBytes(void* /*buffer*/, int /*length*/, int /*flags*/)
 {
 	throw Poco::InvalidAccessException("Cannot receiveBytes() on a SecureServerSocket");
 }
 
 
-int SecureServerSocketImpl::sendTo(const void* buffer, int length, const SocketAddress& rAddress, int flags)
+int SecureServerSocketImpl::sendTo(const void* /*buffer*/, int /*length*/, const SocketAddress& /*address*/, int /*flags*/)
 {
 	throw Poco::InvalidAccessException("Cannot sendTo() on a SecureServerSocket");
 }
 
 
-int SecureServerSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& rAddress, int flags)
+int SecureServerSocketImpl::receiveFrom(void* /*buffer*/, int /*length*/, SocketAddress& /*address*/, int /*flags*/)
 {
 	throw Poco::InvalidAccessException("Cannot receiveFrom() on a SecureServerSocket");
 }
 
 
-void SecureServerSocketImpl::sendUrgent(unsigned char data)
+void SecureServerSocketImpl::sendUrgent(unsigned char /*data*/)
 {
 	throw Poco::InvalidAccessException("Cannot sendUrgent() on a SecureServerSocket");
 }

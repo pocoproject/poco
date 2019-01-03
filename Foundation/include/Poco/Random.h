@@ -1,8 +1,6 @@
 //
 // Random.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Random.h#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  Random
@@ -16,7 +14,7 @@
 //
 //
 // Based on the FreeBSD random number generator.
-// src/lib/libc/stdlib/random.c,v 1.25 
+// src/lib/libc/stdlib/random.c,v 1.25
 //
 // Copyright (c) 1983, 1993
 // The Regents of the University of California.  All rights reserved.

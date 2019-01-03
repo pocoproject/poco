@@ -1,8 +1,6 @@
 //
 // SimpleFileChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SimpleFileChannel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  SimpleFileChannel
@@ -32,7 +30,7 @@ const std::string SimpleFileChannel::PROP_ROTATION      = "rotation";
 const std::string SimpleFileChannel::PROP_FLUSH         = "flush";
 
 
-SimpleFileChannel::SimpleFileChannel(): 
+SimpleFileChannel::SimpleFileChannel():
 	_limit(0),
 	_flush(true),
 	_pFile(0)

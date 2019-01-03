@@ -1,13 +1,9 @@
 //
 // RequestMessage.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  RequestMessage
-//
-// Implementation of the RequestMessage class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -25,7 +21,8 @@ namespace Poco {
 namespace MongoDB {
 
 
-RequestMessage::RequestMessage(MessageHeader::OpCode opcode) : Message(opcode)
+RequestMessage::RequestMessage(MessageHeader::OpCode opcode):
+	Message(opcode)
 {
 }
 
@@ -38,7 +35,7 @@ RequestMessage::~RequestMessage()
 void RequestMessage::send(std::ostream& ostr)
 {
 	std::stringstream ss;
-	BinaryWriter requestWriter(ss);
+	BinaryWriter requestWriter(ss, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 	buildRequest(requestWriter);
 	requestWriter.flush();
 

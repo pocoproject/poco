@@ -1,8 +1,6 @@
 //
 // Option.cpp
 //
-// $Id: //poco/1.4/Util/src/Option.cpp#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  Option
@@ -17,7 +15,6 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionException.h"
 #include "Poco/Util/Validator.h"
-#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/String.h"
 #include <algorithm>
 
@@ -29,9 +26,9 @@ namespace Poco {
 namespace Util {
 
 
-Option::Option(): 
-	_required(false), 
-	_repeatable(false), 
+Option::Option():
+	_required(false),
+	_repeatable(false),
 	_argRequired(false),
 	_pValidator(0),
 	_pCallback(0),
@@ -56,13 +53,12 @@ Option::Option(const Option& option):
 {
 	if (_pValidator) _pValidator->duplicate();
 	if (_pCallback) _pCallback = _pCallback->clone();
-	if (_pConfig) _pConfig->duplicate();
 }
 
 
-Option::Option(const std::string& rFullName, const std::string& rShortName):
-	_shortName(rShortName),
-	_fullName(rFullName),
+Option::Option(const std::string& fullName, const std::string& shortName):
+	_shortName(shortName),
+	_fullName(fullName),
 	_required(false),
 	_repeatable(false),
 	_argRequired(false),
@@ -73,11 +69,11 @@ Option::Option(const std::string& rFullName, const std::string& rShortName):
 }
 
 
-Option::Option(const std::string& rFullName, const std::string& rShortName, const std::string& rDescription, bool isRequired):
-	_shortName(rShortName),
-	_fullName(rFullName),
-	_description(rDescription),
-	_required(isRequired),
+Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required):
+	_shortName(shortName),
+	_fullName(fullName),
+	_description(description),
+	_required(required),
 	_repeatable(false),
 	_argRequired(false),
 	_pValidator(0),
@@ -87,11 +83,11 @@ Option::Option(const std::string& rFullName, const std::string& rShortName, cons
 }
 
 
-Option::Option(const std::string& rFullName, const std::string& rShortName, const std::string& rDescription, bool isRequired, const std::string& argName, bool argRequired):
-	_shortName(rShortName),
-	_fullName(rFullName),
-	_description(rDescription),
-	_required(isRequired),
+Option::Option(const std::string& fullName, const std::string& shortName, const std::string& description, bool required, const std::string& argName, bool argRequired):
+	_shortName(shortName),
+	_fullName(fullName),
+	_description(description),
+	_required(required),
 	_repeatable(false),
 	_argName(argName),
 	_argRequired(argRequired),
@@ -105,7 +101,6 @@ Option::Option(const std::string& rFullName, const std::string& rShortName, cons
 Option::~Option()
 {
 	if (_pValidator) _pValidator->release();
-	if (_pConfig) _pConfig->release();
 	delete _pCallback;
 }
 
@@ -137,7 +132,7 @@ void Option::swap(Option& option)
 	std::swap(_pConfig, option._pConfig);
 }
 
-	
+
 Option& Option::shortName(const std::string& name)
 {
 	_shortName = name;
@@ -189,9 +184,9 @@ Option& Option::noArgument()
 }
 
 
-Option& Option::group(const std::string& rGroup)
+Option& Option::group(const std::string& group)
 {
-	_group = rGroup;
+	_group = group;
 	return *this;
 }
 
@@ -205,9 +200,7 @@ Option& Option::binding(const std::string& propertyName)
 Option& Option::binding(const std::string& propertyName, AbstractConfiguration* pConfig)
 {
 	_binding = propertyName;
-	if (_pConfig) _pConfig->release();
 	_pConfig = pConfig;
-	if (_pConfig) _pConfig->duplicate();
 	return *this;
 }
 
@@ -229,7 +222,7 @@ Option& Option::validator(Validator* pValidator)
 
 bool Option::matchesShort(const std::string& option) const
 {
-	return option.length() > 0 
+	return option.length() > 0
 		&& !_shortName.empty() && option.compare(0, _shortName.length(), _shortName) == 0;
 }
 
@@ -247,7 +240,7 @@ bool Option::matchesPartial(const std::string& option) const
 {
 	std::string::size_type pos = option.find_first_of(":=");
 	std::string::size_type len = pos == std::string::npos ? option.length() : pos;
-	return option.length() > 0 
+	return option.length() > 0
 		&& icompare(option, 0, len, _fullName, 0, len) == 0;
 }
 

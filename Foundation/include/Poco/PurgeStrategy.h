@@ -1,8 +1,6 @@
 //
 // PurgeStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PurgeStrategy.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel
@@ -41,7 +39,7 @@ public:
 		/// Purges archived log files. The path to the
 		/// current "hot" log file is given.
 		/// To find archived log files, look for files
-		/// with a name consisting of the given path 
+		/// with a name consisting of the given path
 		/// plus any suffix (e.g., .1, .20050929081500, .1.gz).
 		/// A list of archived files can be obtained by calling
 		/// the list() method.

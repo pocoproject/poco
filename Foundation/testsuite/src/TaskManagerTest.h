@@ -1,8 +1,6 @@
 //
 // TaskManagerTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TaskManagerTest.h#1 $
-//
 // Definition of the TaskManagerTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -37,6 +35,8 @@ public:
 	void testError();
 	void testCustom();
 	void testMultiTasks();
+	void testTaskInclusion();
+	void testTaskQueue();
 	void testCustomThreadPool();
 
 	void setUp();

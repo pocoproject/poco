@@ -1,8 +1,6 @@
 //
 // TCPServerConnectionFactory.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/TCPServerConnectionFactory.h#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerConnectionFactory

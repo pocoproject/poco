@@ -1,8 +1,6 @@
 //
 // uuidgen.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/uuidgen/src/uuidgen.cpp#1 $
-//
 // This sample demonstrates the UUIDGenerator and UUID classes.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

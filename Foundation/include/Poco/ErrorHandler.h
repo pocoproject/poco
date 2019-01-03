@@ -1,8 +1,6 @@
 //
 // ErrorHandler.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ErrorHandler.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ErrorHandler
@@ -34,7 +32,7 @@ class Foundation_API ErrorHandler
 	/// An unhandled exception that causes a thread to terminate is usually
 	/// silently ignored, since the class library cannot do anything meaningful
 	/// about it.
-	/// 
+	///
 	/// The Thread class provides the possibility to register a
 	/// global ErrorHandler that is invoked whenever a thread has
 	/// been terminated by an unhandled exception.

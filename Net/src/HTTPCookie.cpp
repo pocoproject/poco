@@ -1,8 +1,6 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCookie.cpp#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPCookie
@@ -216,7 +214,7 @@ void HTTPCookie::setSecure(bool secure)
 }
 
 
-void HTTPCookie::setMaxAge(int maxAge) 
+void HTTPCookie::setMaxAge(int maxAge)
 {
 	_maxAge = maxAge;
 }

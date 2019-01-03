@@ -1,8 +1,6 @@
 //
 // ProcessingInstruction.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/ProcessingInstruction.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -41,12 +39,12 @@ public:
 		/// the markup that begins the processing instruction.
 
 	const XMLString& data() const;
-		/// Returns the content of this processing instruction. This is from the first non 
+		/// Returns the content of this processing instruction. This is from the first non
 		/// white space character after the target to the character immediately preceding
 		/// the ?>.
 
 	const XMLString& getData() const;
-		/// Returns the content of this processing instruction. This is from the first non 
+		/// Returns the content of this processing instruction. This is from the first non
 		/// white space character after the target to the character immediately preceding
 		/// the ?>.
 

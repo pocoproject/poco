@@ -1,8 +1,6 @@
 //
 // FilesystemConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/FilesystemConfiguration.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  FilesystemConfiguration
@@ -40,7 +38,7 @@ class Util_API FilesystemConfiguration: public AbstractConfiguration
 	/// All changes to properties are immediately persisted in the filesystem.
 	///
 	/// For example, a configuration consisting of the properties
-	/// 
+	///
 	///   logging.loggers.root.channel.class = ConsoleChannel
 	///   logging.loggers.app.name = Application
 	///   logging.loggers.app.channel = c1
@@ -65,7 +63,7 @@ class Util_API FilesystemConfiguration: public AbstractConfiguration
 	///                         class/
 	///                               data ("PatternFormatter")
 	///                         pattern/
-	///                                 data ("[%p] %t")                      
+	///                                 data ("[%p] %t")
 {
 public:
 	FilesystemConfiguration(const std::string& path);

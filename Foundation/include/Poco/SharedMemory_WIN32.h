@@ -1,8 +1,6 @@
 //
 // SharedMemoryImpl.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedMemory_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  SharedMemoryImpl

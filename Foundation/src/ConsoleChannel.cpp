@@ -1,8 +1,6 @@
 //
 // ConsoleChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ConsoleChannel.cpp#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  ConsoleChannel
@@ -54,7 +52,7 @@ FastMutex ColorConsoleChannel::_mutex;
 const std::string ColorConsoleChannel::CSI("\033[");
 
 
-ColorConsoleChannel::ColorConsoleChannel(): 
+ColorConsoleChannel::ColorConsoleChannel():
 	_str(std::clog),
 	_enableColors(true)
 {
@@ -62,7 +60,7 @@ ColorConsoleChannel::ColorConsoleChannel():
 }
 
 
-ColorConsoleChannel::ColorConsoleChannel(std::ostream& str): 
+ColorConsoleChannel::ColorConsoleChannel(std::ostream& str):
 	_str(str),
 	_enableColors(true)
 {

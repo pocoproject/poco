@@ -41,8 +41,8 @@ for /f %%C in ('findstr /R "." components') do (
           echo.
           echo.
           echo ****************************************
-          echo *** %%C                               
-          echo **************************************** 
+          echo *** %%C
+          echo ****************************************
           echo.
 
 		  set /a runs=!runs! + 1

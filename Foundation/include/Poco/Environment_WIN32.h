@@ -1,15 +1,13 @@
 //
 // Environment_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Environment_WIN32.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment
 //
 // Definition of the EnvironmentImpl class for WIN32.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -34,7 +32,7 @@ public:
 	static std::string getImpl(const std::string& name);	
 	static bool hasImpl(const std::string& name);	
 	static void setImpl(const std::string& name, const std::string& value);
-	static std::string osNameImpl();
+	static std::string osNameImpl();	
 	static std::string osDisplayNameImpl();
 	static std::string osVersionImpl();
 	static std::string osArchitectureImpl();

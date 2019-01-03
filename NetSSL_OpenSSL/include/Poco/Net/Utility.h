@@ -1,8 +1,6 @@
 //
 // Utility.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/Utility.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Utility

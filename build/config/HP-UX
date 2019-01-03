@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/HP-UX#2 $
-#
 # HP-UX
 #
 # Make settings for HP-UX 11.11/aCC 03.30 (and later)
@@ -21,8 +19,8 @@ LIB     = ar -cr
 RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -b -Wl,+h$(notdir $@) -o $@ -Wl,+s
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-DEP     = $(POCO_BASE)/build/script/makedepend.aCC 
-STRIP   = 
+DEP     = $(POCO_BASE)/build/script/makedepend.aCC
+STRIP   =
 SHELL   = sh
 RM      = rm -rf
 CP      = cp

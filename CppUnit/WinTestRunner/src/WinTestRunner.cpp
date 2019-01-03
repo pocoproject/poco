@@ -1,8 +1,6 @@
 //
 // WinTestRunner.cpp
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/WinTestRunner.cpp#1 $
-//
 
 
 #include "WinTestRunner/WinTestRunner.h"

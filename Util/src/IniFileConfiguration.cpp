@@ -1,8 +1,6 @@
 //
 // IniFileConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/IniFileConfiguration.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  IniFileConfiguration
@@ -150,7 +148,7 @@ bool IniFileConfiguration::ICompare::operator () (const std::string& s1, const s
 
 void IniFileConfiguration::parseLine(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof(); 
+	static const int eof = std::char_traits<char>::eof();
 
 	int c = istr.get();
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();

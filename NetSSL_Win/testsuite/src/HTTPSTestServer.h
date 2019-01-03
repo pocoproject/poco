@@ -1,8 +1,6 @@
 //
 // HTTPSTestServer.h
 //
-// $Id: //poco/1.4/NetSSL_Win/testsuite/src/HTTPSTestServer.h#1 $
-//
 // Definition of the HTTPSTestServer class.
 //
 // Copyright (c) 2006-2014, Applied Informatics Software Engineering GmbH.

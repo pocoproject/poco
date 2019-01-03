@@ -1,8 +1,6 @@
 //
 // HTTPSessionFactory.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSessionFactory.cpp#1 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPSessionFactory
@@ -35,9 +33,9 @@ HTTPSessionFactory::HTTPSessionFactory():
 }
 
 
-HTTPSessionFactory::HTTPSessionFactory(const std::string& rProxyHost, Poco::UInt16 port):
-	_proxyHost(rProxyHost),
-	_proxyPort(port)
+HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt16 proxyPort):
+	_proxyHost(proxyHost),
+	_proxyPort(proxyPort)
 {
 }
 
@@ -57,7 +55,7 @@ void HTTPSessionFactory::registerProtocol(const std::string& protocol, HTTPSessi
 
 	FastMutex::ScopedLock lock(_mutex);
 	std::pair<Instantiators::iterator, bool> tmp = _instantiators.insert(make_pair(protocol, InstantiatorInfo(pSessionInstantiator)));
-	if (!tmp.second) 
+	if (!tmp.second)
 	{
 		++tmp.first->second.cnt;
 		delete pSessionInstantiator;

@@ -1,8 +1,6 @@
 //
 // Pair.h
 //
-// $Id: //poco/Main/Foundation/include/Poco/Dynamic/Pair.h#9 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  Pair
@@ -59,7 +57,7 @@ public:
 	}
 
 	template <typename T>
-	Pair(const K& rFirst, const T& rSecond): _data(std::make_pair(rFirst, rSecond))
+	Pair(const K& first, const T& second): _data(std::make_pair(first, second))
 		/// Creates pair from two values.
 	{
 	}

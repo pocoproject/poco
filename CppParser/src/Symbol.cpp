@@ -1,8 +1,6 @@
 //
 // Symbol.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Symbol.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Symbol

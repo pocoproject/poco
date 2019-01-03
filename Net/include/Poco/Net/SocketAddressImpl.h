@@ -1,8 +1,6 @@
 //
 // SocketAddressImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketAddressImpl.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  SocketAddressImpl
@@ -23,9 +21,6 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/IPAddress.h"
-#ifndef POCO_HAVE_ALIGNMENT
-#include "Poco/RefCountedObject.h"
-#endif
 
 
 namespace Poco {
@@ -34,9 +29,6 @@ namespace Impl {
 
 
 class Net_API SocketAddressImpl
-#ifndef POCO_HAVE_ALIGNMENT
-	: public Poco::RefCountedObject
-#endif
 {
 public:
 	typedef AddressFamily::Family Family;
@@ -190,20 +182,21 @@ inline SocketAddressImpl::Family IPv6SocketAddressImpl::family() const
 class Net_API LocalSocketAddressImpl: public SocketAddressImpl
 {
 public:
-	LocalSocketAddressImpl(const struct sockaddr_un* addr);
-	LocalSocketAddressImpl(const char* path);
+	LocalSocketAddressImpl(const struct sockaddr_un* addr, poco_socklen_t length = 0);
+	LocalSocketAddressImpl(const std::string& path);
 	~LocalSocketAddressImpl();
 	IPAddress host() const;
 	UInt16 port() const;
 	poco_socklen_t length() const;
 	const struct sockaddr* addr() const;
-	int af() const;	
+	int af() const;
 	Family family() const;
 	const char* path() const;
 	std::string toString() const;
 
 private:
 	struct sockaddr_un* _pAddr;
+	poco_socklen_t _addressLength;
 		// Note: We allocate struct sockaddr_un on the heap, otherwise we would
 		// waste a lot of memory due to small object optimization in SocketAddress.
 };
@@ -227,7 +220,7 @@ inline UInt16 LocalSocketAddressImpl::port() const
 
 inline poco_socklen_t LocalSocketAddressImpl::length() const
 {
-	return sizeof(struct sockaddr_un);
+	return _addressLength;
 }
 
 

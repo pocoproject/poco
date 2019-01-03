@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIteratorStategies.cpp
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -23,8 +21,8 @@ namespace Poco {
 //
 // TraverseBase
 //
-TraverseBase::TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-	: _depthDeterminer(depthDeterminer), _maxDepth(maxDepth)
+TraverseBase::TraverseBase(DepthFunPtr depthDeterminer, UInt16 maxDepth): _depthDeterminer(depthDeterminer), 
+	_maxDepth(maxDepth)
 {
 }
 
@@ -51,8 +49,8 @@ bool TraverseBase::isDirectory(Poco::File& file)
 //
 // ChildrenFirstTraverse
 //
-ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth)
-	: TraverseBase(depthDeterminer, maxDepth)
+ChildrenFirstTraverse::ChildrenFirstTraverse(DepthFunPtr depthDeterminer, UInt16 maxDepth):
+	TraverseBase(depthDeterminer, maxDepth)
 {
 }
 
@@ -63,16 +61,11 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	poco_check_ptr(isFinished);
 	poco_assert(!(*isFinished));
 
-	std::stack<DirectoryIterator> it;
-
-	//_depthDeterminer(it);
-
 	// go deeper into not empty directory
 	// (if depth limit allows)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
 	if (!isDepthLimitReached && isDirectory(*itStack->top()))
 	{
-		// check the dir is iterable
 		try
 		{
 			DirectoryIterator child_it(itStack->top().path());
@@ -85,6 +78,8 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 		}
 		catch (...)
 		{
+			// Failed to iterate child dir.
+			traverseError.notify(this, itStack->top()->path());
 		}
 	}
 
@@ -147,24 +142,23 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 		{
 			std::string dir = _dirsStack.top().front();
 			_dirsStack.top().pop();
-			DirectoryIterator child_it;
-			
-			// check the dir is iterable
+
 			try
 			{
-				child_it = dir;
+				DirectoryIterator child_it(dir);
+
+				// check if directory is empty
+				if (child_it != _itEnd)
+				{
+					itStack->push(child_it);
+					_dirsStack.push(std::queue<std::string>());
+					return child_it->path();
+				}
 			}
 			catch (...)
 			{
-				continue;
-			}
-
-			// check if directory is empty
-			if (child_it != _itEnd)
-			{
-				itStack->push(child_it);
-				_dirsStack.push(std::queue<std::string>());
-				return child_it->path();
+				// Failed to iterate child dir.
+				traverseError.notify(this, dir);
 			}
 		}
 

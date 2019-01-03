@@ -1,8 +1,6 @@
 //
 // Platform_POSIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Platform_POSIX.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Platform
@@ -49,6 +47,26 @@
 //
 #if defined(__QNXNTO__)
 	#define POCO_NO_SYSLOGCHANNEL
+#endif
+
+
+//
+// C++14 support
+//
+
+// Enable C++14 support for AppleClang 503.x (Clang 3.4)
+#if defined(__clang__) && defined(__apple_build_version__) && (__apple_build_version__ >= 5030038) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
+#endif
+
+// Enable C++14 support for Clang 3.4
+#if defined(__clang__) && !defined(__apple_build_version__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 4)) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
+#endif
+
+// Enable C++14 support for GCC 4.9.2
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 9 || (__GNUC_MINOR__ == 9 && __GNUC_PATCHLEVEL__ >= 2)))) && !defined(POCO_ENABLE_CPP14) && !defined(POCO_DISABLE_CPP14)
+	#define POCO_ENABLE_CPP14
 #endif
 
 

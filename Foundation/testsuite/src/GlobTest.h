@@ -1,8 +1,6 @@
 //
 // GlobTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/GlobTest.h#1 $
-//
 // Definition of the GlobTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // OptionSet.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionSet.cpp#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionSet

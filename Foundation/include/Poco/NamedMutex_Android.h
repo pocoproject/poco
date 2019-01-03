@@ -1,8 +1,6 @@
 //
 // NamedMutex_Android.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedMutex_Android.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex

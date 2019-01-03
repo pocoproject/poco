@@ -1,8 +1,6 @@
 //
 // Font.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Font.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Font

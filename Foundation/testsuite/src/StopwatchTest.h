@@ -1,8 +1,6 @@
 //
 // StopwatchTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StopwatchTest.h#1 $
-//
 // Definition of the StopwatchTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

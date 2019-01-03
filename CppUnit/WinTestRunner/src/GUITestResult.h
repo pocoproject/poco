@@ -1,8 +1,6 @@
 //
 // GUITestResult.h
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/GUITestResult.h#1 $
-//
 
 
 #ifndef GuiTestResult_INCLUDED
@@ -58,7 +56,7 @@ private:
 
 
 // Construct with lightweight synchronization
-inline GUITestResult::GUITestResult(TestRunnerDlg* runner): _runner(runner) 
+inline GUITestResult::GUITestResult(TestRunnerDlg* runner): _runner(runner)
 {
 	setSynchronizationObject(new LightweightSynchronizationObject());
 }
@@ -73,7 +71,7 @@ inline GUITestResult::~GUITestResult()
 // Override without protection to prevent deadlock
 inline void GUITestResult::stop()
 {
-	_stop = true; 
+	_stop = true;
 }
 
 

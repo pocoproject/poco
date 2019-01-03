@@ -1,8 +1,6 @@
 //
 // StringPartSource.cpp
 //
-// $Id: //poco/1.4/Net/src/StringPartSource.cpp#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  StringPartSource
@@ -28,17 +26,17 @@ StringPartSource::StringPartSource(const std::string& str):
 }
 
 
-StringPartSource::StringPartSource(const std::string& str, const std::string& rMediaType):
-	PartSource(rMediaType),
+StringPartSource::StringPartSource(const std::string& str, const std::string& mediaType):
+	PartSource(mediaType),
 	_istr(str)
 {
 }
 
 
-StringPartSource::StringPartSource(const std::string& str, const std::string& rMediaType, const std::string& rFilename):
-	PartSource(rMediaType),
+StringPartSource::StringPartSource(const std::string& str, const std::string& mediaType, const std::string& filename):
+	PartSource(mediaType),
 	_istr(str),
-	_filename(rFilename)
+	_filename(filename)
 {
 }
 

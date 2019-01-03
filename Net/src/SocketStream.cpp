@@ -1,8 +1,6 @@
 //
 // SocketStream.cpp
 //
-// $Id: //poco/1.4/Net/src/SocketStream.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  SocketStream
@@ -32,12 +30,12 @@ namespace Net {
 //
 
 
-SocketStreamBuf::SocketStreamBuf(const Socket& socket): 
+SocketStreamBuf::SocketStreamBuf(const Socket& socket):
 	BufferedBidirectionalStreamBuf(STREAM_BUFFER_SIZE, std::ios::in | std::ios::out),
 	_pImpl(dynamic_cast<StreamSocketImpl*>(socket.impl()))
 {
 	if (_pImpl)
-		_pImpl->duplicate(); 
+		_pImpl->duplicate();
 	else
 		throw InvalidArgumentException("Invalid or null SocketImpl passed to SocketStreamBuf");
 }
@@ -66,8 +64,8 @@ int SocketStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 //
 
 
-SocketIOS::SocketIOS(const Socket& rSocket):
-	_buf(rSocket)
+SocketIOS::SocketIOS(const Socket& socket):
+	_buf(socket)
 {
 	poco_ios_init(&_buf);
 }
@@ -109,8 +107,8 @@ StreamSocket SocketIOS::socket() const
 //
 
 
-SocketOutputStream::SocketOutputStream(const Socket& rSocket):
-	SocketIOS(rSocket),
+SocketOutputStream::SocketOutputStream(const Socket& socket):
+	SocketIOS(socket),
 	std::ostream(&_buf)
 {
 }
@@ -126,8 +124,8 @@ SocketOutputStream::~SocketOutputStream()
 //
 
 
-SocketInputStream::SocketInputStream(const Socket& rSocket):
-	SocketIOS(rSocket),
+SocketInputStream::SocketInputStream(const Socket& socket):
+	SocketIOS(socket),
 	std::istream(&_buf)
 {
 }
@@ -143,8 +141,8 @@ SocketInputStream::~SocketInputStream()
 //
 
 
-SocketStream::SocketStream(const Socket& rSocket):
-	SocketIOS(rSocket),
+SocketStream::SocketStream(const Socket& socket):
+	SocketIOS(socket),
 	std::iostream(&_buf)
 {
 }

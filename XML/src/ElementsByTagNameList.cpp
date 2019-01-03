@@ -1,8 +1,6 @@
 //
 // ElementsByTagNameList.cpp
 //
-// $Id: //poco/1.4/XML/src/ElementsByTagNameList.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

@@ -1,8 +1,6 @@
 //
 // NodeList.cpp
 //
-// $Id: //poco/1.4/XML/src/NodeList.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

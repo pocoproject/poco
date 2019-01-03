@@ -1,8 +1,6 @@
 //
 // EventException.cpp
 //
-// $Id: //poco/1.4/XML/src/EventException.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMEvents
@@ -22,8 +20,8 @@ namespace Poco {
 namespace XML {
 
 
-EventException::EventException(int exceptionCode):
-	XMLException("Unspecified event type")
+EventException::EventException(int code):
+	XMLException("Unspecified event type", code)
 {
 }
 

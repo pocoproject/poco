@@ -1,8 +1,6 @@
 //
 // AttrMap.cpp
 //
-// $Id: //poco/1.4/XML/src/AttrMap.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -79,7 +77,7 @@ unsigned long AttrMap::length() const
 {
 	unsigned long result = 0;
 	AbstractNode* pAttr = _pElement->_pFirstAttr;
-	while (pAttr) 
+	while (pAttr)
 	{
 		pAttr = static_cast<AbstractNode*>(pAttr->nextSibling());
 		++result;

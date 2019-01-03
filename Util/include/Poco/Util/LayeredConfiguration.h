@@ -1,8 +1,6 @@
 //
 // LayeredConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/LayeredConfiguration.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  LayeredConfiguration
@@ -37,8 +35,8 @@ class Util_API LayeredConfiguration: public AbstractConfiguration
 	/// all added configurations are searched, in order of their priority.
 	/// Configurations with lower priority values have precedence.
 	///
-	/// When setting a property, the property is always written to the first writeable 
-	/// configuration (see addWriteable()). 
+	/// When setting a property, the property is always written to the first writeable
+	/// configuration (see addWriteable()).
 	/// If no writeable configuration has been added to the LayeredConfiguration, and an
 	/// attempt is made to set a property, a RuntimeException is thrown.
 	///
@@ -49,78 +47,60 @@ class Util_API LayeredConfiguration: public AbstractConfiguration
 	/// If no priority is specified, a priority of 0 is assumed.
 {
 public:
+	typedef Poco::AutoPtr<LayeredConfiguration> Ptr;
+
 	LayeredConfiguration();
 		/// Creates the LayeredConfiguration.
-		
-	void add(AbstractConfiguration* pConfig);
-		/// Adds a read-only configuration to the back of the LayeredConfiguration.
-		/// The LayeredConfiguration does not take ownership of the given
-		/// configuration. In other words, the configuration's reference
-		/// count is incremented.
 
-	void add(AbstractConfiguration* pConfig, bool shared);
+	void add(AbstractConfiguration::Ptr pConfig);
 		/// Adds a read-only configuration to the back of the LayeredConfiguration.
-		/// If shared is false, the LayeredConfiguration takes ownership
-		/// of the given configuration (and the configuration's reference
-		/// count remains unchanged).
+		/// The LayeredConfiguration takes shared ownership of the given configuration.
 
-	void add(AbstractConfiguration* pConfig, int priority);
+	void add(AbstractConfiguration::Ptr pConfig, const std::string& label);
+		/// Adds a read-only configuration with the given label to the back of the LayeredConfiguration.
+		/// The LayeredConfiguration takes shared ownership of the given configuration.
+
+	void add(AbstractConfiguration::Ptr pConfig, int priority);
 		/// Adds a read-only configuration to the LayeredConfiguration.
-		/// The LayeredConfiguration does not take ownership of the given
-		/// configuration. In other words, the configuration's reference
-		/// count is incremented.
+		/// The LayeredConfiguration takes shared ownership of the given configuration.
 
-	void add(AbstractConfiguration* pConfig, int priority, bool shared);
-		/// Adds a read-only configuration the LayeredConfiguration.
-		/// If shared is false, the LayeredConfiguration takes ownership
-		/// of the given configuration (and the configuration's reference
-		/// count remains unchanged).
+	void add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority);
+		/// Adds a read-only configuration with the given label to the LayeredConfiguration.
+		/// The LayeredConfiguration takes shared ownership of the given configuration.
 
-	void add(AbstractConfiguration* pConfig, int priority, bool writeable, bool shared);
+	void add(AbstractConfiguration::Ptr pConfig, int priority, bool writeable);
 		/// Adds a configuration to the LayeredConfiguration.
-		/// If shared is false, the LayeredConfiguration takes ownership
-		/// of the given configuration (and the configuration's reference
-		/// count remains unchanged).
+		/// The LayeredConfiguration takes shared ownership of the given configuration.
 
-	void addWriteable(AbstractConfiguration* pConfig, int priority);
+	void add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority, bool writeable);
+		/// Adds a configuration with the given label to the LayeredConfiguration.
+		/// The LayeredConfiguration takes shared ownership of the given configuration.
+
+	void addWriteable(AbstractConfiguration::Ptr pConfig, int priority);
 		/// Adds a writeable configuration to the LayeredConfiguration.
 		/// The LayeredConfiguration does not take ownership of the given
 		/// configuration. In other words, the configuration's reference
 		/// count is incremented.
 
-	void addWriteable(AbstractConfiguration* pConfig, int priority, bool shared);
-		/// Adds a writeable configuration to the LayeredConfiguration.
-		/// If shared is false, the LayeredConfiguration takes ownership
-		/// of the given configuration (and the configuration's reference
-		/// count remains unchanged).
+	AbstractConfiguration::Ptr find(const std::string& label) const;
+		/// Finds and returns the configuration with the given label.
+		///
+		/// Returns null if no such configuration can be found.
 
-	//@ deprecated
-	void addFront(AbstractConfiguration* pConfig);
-		/// Adds a read-only configuration to the front of the LayeredConfiguration.
-		/// The LayeredConfiguration does not take ownership of the given
-		/// configuration. In other words, the configuration's reference
-		/// count is incremented.
-
-	//@ deprecated
-	void addFront(AbstractConfiguration* pConfig, bool shared);
-		/// Adds a read-only configuration to the front of the LayeredConfiguration.
-		/// If shared is true, the LayeredConfiguration takes ownership
-		/// of the given configuration.
-		
-	void removeConfiguration(AbstractConfiguration* pConfig);
+	void removeConfiguration(AbstractConfiguration::Ptr pConfig);
 		/// Removes the given configuration from the LayeredConfiguration.
 		///
 		/// Does nothing if the given configuration is not part of the
 		/// LayeredConfiguration.
-		
+
 protected:
-	typedef Poco::AutoPtr<AbstractConfiguration> ConfigPtr;
-	
 	struct ConfigItem
 	{
-		ConfigPtr pConfig;
-		int       priority;
-		bool      writeable;
+		typedef AbstractConfiguration::Ptr ACPtr;
+		ACPtr       pConfig;
+		int         priority;
+		bool        writeable;
+		std::string label;
 	};
 
 	bool getRaw(const std::string& key, std::string& value) const;

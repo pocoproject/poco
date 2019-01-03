@@ -1,8 +1,6 @@
 //
 // MailRecipient.cpp
 //
-// $Id: //poco/1.4/Net/src/MailRecipient.cpp#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailRecipient
@@ -27,12 +25,22 @@ MailRecipient::MailRecipient():
 {
 }
 
-	
+
 MailRecipient::MailRecipient(const MailRecipient& recipient):
 	_address(recipient._address),
 	_realName(recipient._realName),
 	_type(recipient._type)
 {
+}
+
+
+MailRecipient::MailRecipient(MailRecipient&& recipient) :
+	_address(std::move(recipient._address)),
+	_realName(std::move(recipient._realName)),
+	_type(recipient._type)
+{
+	recipient._address.clear();
+	recipient._realName.clear();
 }
 
 	
@@ -55,13 +63,27 @@ MailRecipient::~MailRecipient()
 {
 }
 
-	
+
 MailRecipient& MailRecipient::operator = (const MailRecipient& recipient)
 {
 	if (this != &recipient)
 	{
 		MailRecipient tmp(recipient);
 		swap(tmp);
+	}
+	return *this;
+}
+
+
+MailRecipient& MailRecipient::operator = (MailRecipient&& recipient)
+{
+	if (this != &recipient)
+	{
+		_address = std::move(recipient._address);
+		recipient._address.clear();
+		_realName = std::move(recipient._realName);
+		recipient._realName.clear();
+		_type = recipient._type;
 	}
 	return *this;
 }

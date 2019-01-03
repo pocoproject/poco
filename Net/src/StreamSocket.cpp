@@ -1,8 +1,6 @@
 //
 // StreamSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/StreamSocket.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  StreamSocket
@@ -35,9 +33,9 @@ StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
 }
 
 
-StreamSocket::StreamSocket(const SocketAddress& rAddress): Socket(new StreamSocketImpl(rAddress.family()))
+StreamSocket::StreamSocket(const SocketAddress& address): Socket(new StreamSocketImpl(address.family()))
 {
-	connect(rAddress);
+	connect(address);
 }
 
 
@@ -75,21 +73,27 @@ StreamSocket& StreamSocket::operator = (const Socket& socket)
 }
 
 
-void StreamSocket::connect(const SocketAddress& rAddress)
+void StreamSocket::bind(const SocketAddress& address, bool reuseAddress)
 {
-	impl()->connect(rAddress);
+	impl()->bind(address, reuseAddress);
 }
 
 
-void StreamSocket::connect(const SocketAddress& rAddress, const Poco::Timespan& timeout)
+void StreamSocket::connect(const SocketAddress& address)
 {
-	impl()->connect(rAddress, timeout);
+	impl()->connect(address);
 }
 
 
-void StreamSocket::connectNB(const SocketAddress& rAddress)
+void StreamSocket::connect(const SocketAddress& address, const Poco::Timespan& timeout)
 {
-	impl()->connectNB(rAddress);
+	impl()->connect(address, timeout);
+}
+
+
+void StreamSocket::connectNB(const SocketAddress& address)
+{
+	impl()->connectNB(address);
 }
 
 
@@ -104,7 +108,7 @@ void StreamSocket::shutdownSend()
 	impl()->shutdownSend();
 }
 
-	
+
 void StreamSocket::shutdown()
 {
 	impl()->shutdown();
@@ -114,6 +118,12 @@ void StreamSocket::shutdown()
 int StreamSocket::sendBytes(const void* buffer, int length, int flags)
 {
 	return impl()->sendBytes(buffer, length, flags);
+}
+
+
+int StreamSocket::sendBytes(const SocketBufVec& buffers, int flags)
+{
+	return impl()->sendBytes(buffers, flags);
 }
 
 
@@ -130,6 +140,18 @@ int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
 int StreamSocket::receiveBytes(void* buffer, int length, int flags)
 {
 	return impl()->receiveBytes(buffer, length, flags);
+}
+
+
+int StreamSocket::receiveBytes(SocketBufVec& buffers, int flags)
+{
+	return impl()->receiveBytes(buffers, flags);
+}
+
+
+int StreamSocket::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::Timespan& timeout)
+{
+	return impl()->receiveBytes(buffer, flags, timeout);
 }
 
 

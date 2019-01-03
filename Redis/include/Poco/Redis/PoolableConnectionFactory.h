@@ -1,15 +1,13 @@
 //
 // PoolableConnectionFactory.h
 //
-// $Id$
-//
 // Library: Redis
 // Package: Redis
 // Module:  PoolableConnectionFactory
 //
 // Definition of the PoolableConnectionFactory class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2015, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -33,24 +31,24 @@ class PoolableObjectFactory<Redis::Client, Redis::Client::Ptr>
 	/// are created with the given address.
 {
 public:
-	PoolableObjectFactory(Net::SocketAddress& address)
-		: _address(address)
+	PoolableObjectFactory(Net::SocketAddress& address):
+        _address(address)
 	{
 	}
 
-	PoolableObjectFactory(const std::string& address)
-		: _address(address)
+	PoolableObjectFactory(const std::string& address):
+        _address(address)
 	{
 	}
 
 	Redis::Client::Ptr createObject()
 	{
-		return new Redis::Client(_address);
+        return new Redis::Client(_address);
 	}
 
 	bool validateObject(Redis::Client::Ptr pObject)
 	{
-		return true;
+        return true;
 	}
 
 	void activateObject(Redis::Client::Ptr pObject)
@@ -79,14 +77,21 @@ class PooledConnection
 public:
 	PooledConnection(ObjectPool<Client, Client::Ptr>& pool, long timeoutMilliseconds = 0) : _pool(pool)
 	{
+#if POCO_VERSION >= 0x01080000
 		_client = _pool.borrowObject(timeoutMilliseconds);
+#else
+		_client = _pool.borrowObject();
+#endif
 	}
 
 	virtual ~PooledConnection()
 	{
 		try
 		{
-			_pool.returnObject(_client);
+            if (_client)
+            {
+                _pool.returnObject(_client);
+            }
 		}
 		catch (...)
 		{
@@ -94,7 +99,7 @@ public:
 		}
 	}
 
-	operator Client::Ptr ()
+	operator Client::Ptr()
 	{
 		return _client;
 	}
@@ -105,7 +110,7 @@ private:
 };
 
 
-} // namespace Redis
-} // namespace Poco
+} } // namespace Poco::Redis
+
 
 #endif // Redis_PoolableConnectionFactory_INCLUDED

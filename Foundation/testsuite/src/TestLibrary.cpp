@@ -1,8 +1,6 @@
 //
 // TestLibrary.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TestLibrary.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -87,7 +85,7 @@ void pocoInitializeLibrary()
 
 void pocoUninitializeLibrary()
 {
-	std::cout << "TestLibrary uninitialzing" << std::endl;
+	std::cout << "TestLibrary uninitializing" << std::endl;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // Subsystem.cpp
 //
-// $Id: //poco/1.4/Util/src/Subsystem.cpp#1 $
-//
 // Library: Util
 // Package: Application
 // Module:  Subsystem
@@ -38,7 +36,7 @@ void Subsystem::reinitialize(Application& app)
 }
 
 
-void Subsystem::defineOptions(OptionSet& options)
+void Subsystem::defineOptions(OptionSet& /*options*/)
 {
 }
 

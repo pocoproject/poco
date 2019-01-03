@@ -1,8 +1,6 @@
 //
 // CipherFactory.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CipherFactory.h#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherFactory
@@ -44,8 +42,8 @@ public:
 		/// Destroys the CipherFactory.
 
 	Cipher* createCipher(const CipherKey& key);
-		/// Creates a Cipher object for the given Cipher name. Valid cipher 
-		/// names depend on the OpenSSL version the library is linked with;  
+		/// Creates a Cipher object for the given Cipher name. Valid cipher
+		/// names depend on the OpenSSL version the library is linked with;
 		/// see the output of
 		///
 		///     openssl enc --help

@@ -1,8 +1,6 @@
 //
 // AndroidLogChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AndroidLogChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  AndroidLogChannel

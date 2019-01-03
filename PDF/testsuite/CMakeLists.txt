@@ -1,5 +1,3 @@
-set(TESTUNIT "${LIBNAME}-testrunner")
-
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO( TEST_SRCS ${SRCS_G})
@@ -12,6 +10,11 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
     src/WinDriver.cpp
 )
 
-add_executable( ${TESTUNIT} ${TEST_SRCS} )
-add_test(NAME ${LIBNAME} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND ${TESTUNIT} -all)
-target_link_libraries( ${TESTUNIT}  PocoPDF PocoFoundation PocoCppUnit )
+add_executable(PDF-testrunner ${TEST_SRCS} )
+if(ANDROID)
+	add_test(NAME PDF WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+			COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/PDF-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake)
+else()
+	add_test(NAME PDF WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND PDF-testrunner -all)
+endif()
+target_link_libraries(PDF-testrunner PUBLIC Poco::PDF Poco::CppUnit)

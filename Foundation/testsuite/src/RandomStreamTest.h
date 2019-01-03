@@ -1,8 +1,6 @@
 //
 // RandomStreamTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/RandomStreamTest.h#1 $
-//
 // Definition of the RandomStreamTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

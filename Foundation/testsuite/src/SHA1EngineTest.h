@@ -1,8 +1,6 @@
 //
 // SHA1EngineTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SHA1EngineTest.h#1 $
-//
 // Definition of the SHA1EngineTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

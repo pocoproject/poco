@@ -1,8 +1,6 @@
 //
 // VarTest.cpp
 //
-// $Id: //poco/svn/Foundation/testsuite/src/VarTest.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -20,7 +18,6 @@
 #include "Poco/Dynamic/Pair.h"
 #include <map>
 #include <utility>
-
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
@@ -73,7 +70,7 @@ void VarTest::testInt8()
 	Poco::Int8 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::Int8));
+	assertTrue (a1.type() == typeid(Poco::Int8));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -101,58 +98,68 @@ void VarTest::testInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	Int8 value = a1.extract<Int8>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
 		Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
-	catch (Poco::BadCastException&)
+	catch (Poco::BadCastException&) { }
+
+	try
 	{
+		Poco::UInt8 usrc = 200;
+		a1 = usrc;
+		src = a1;
+		fail("out of range - must throw");
+	}
+	catch (Poco::RangeException&)
+	{
+		a1 = src;
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -161,7 +168,7 @@ void VarTest::testInt16()
 	Poco::Int16 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::Int16));
+	assertTrue (a1.type() == typeid(Poco::Int16));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -189,32 +196,33 @@ void VarTest::testInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	Int16 value = a1.extract<Int16>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -226,21 +234,21 @@ void VarTest::testInt16()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -249,7 +257,7 @@ void VarTest::testInt32()
 	Poco::Int32 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::Int32));
+	assertTrue (a1.type() == typeid(Poco::Int32));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -277,32 +285,33 @@ void VarTest::testInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	Int32 value = a1.extract<Int32>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -314,21 +323,21 @@ void VarTest::testInt32()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -337,7 +346,7 @@ void VarTest::testInt64()
 	Poco::Int64 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::Int64));
+	assertTrue (a1.type() == typeid(Poco::Int64));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -365,32 +374,33 @@ void VarTest::testInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	Int64 value = a1.extract<Int64>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -402,21 +412,21 @@ void VarTest::testInt64()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -425,7 +435,7 @@ void VarTest::testUInt8()
 	Poco::UInt8 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::UInt8));
+	assertTrue (a1.type() == typeid(Poco::UInt8));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -453,32 +463,33 @@ void VarTest::testUInt8()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	UInt8 value = a1.extract<UInt8>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -490,21 +501,21 @@ void VarTest::testUInt8()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -513,7 +524,7 @@ void VarTest::testUInt16()
 	Poco::UInt16 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::UInt16));
+	assertTrue (a1.type() == typeid(Poco::UInt16));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -541,32 +552,32 @@ void VarTest::testUInt16()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	UInt16 value = a1.extract<UInt16>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -578,21 +589,21 @@ void VarTest::testUInt16()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -601,7 +612,7 @@ void VarTest::testUInt32()
 	Poco::UInt32 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::UInt32));
+	assertTrue (a1.type() == typeid(Poco::UInt32));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -629,32 +640,32 @@ void VarTest::testUInt32()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	UInt32 value = a1.extract<UInt32>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -666,21 +677,21 @@ void VarTest::testUInt32()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -689,7 +700,7 @@ void VarTest::testUInt64()
 	Poco::UInt64 src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(Poco::UInt64));
+	assertTrue (a1.type() == typeid(Poco::UInt64));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -717,32 +728,32 @@ void VarTest::testUInt64()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	UInt64 value = a1.extract<UInt64>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -754,21 +765,21 @@ void VarTest::testUInt64()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 }
 
 
@@ -777,7 +788,7 @@ void VarTest::testBool()
 	bool src = true;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(bool));
+	assertTrue (a1.type() == typeid(bool));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -805,32 +816,32 @@ void VarTest::testBool()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 1);
-	assert (s15 == 1);
-	assert (s1 == "true");
-	assert (s2 == 1);
-	assert (s3 == 1);
-	assert (s4 == 1);
-	assert (s5 == 1);
-	assert (s6 == 1);
-	assert (s7 == 1);
-	assert (s8 == 1);
-	assert (s9 == 1);
-	assert (s10 == 1.0f);
-	assert (s11 == 1.0);
-	assert (s12);
-	assert (s13 == '\x1');
+	assertTrue (s14 == 1);
+	assertTrue (s15 == 1);
+	assertTrue (s1 == "true");
+	assertTrue (s2 == 1);
+	assertTrue (s3 == 1);
+	assertTrue (s4 == 1);
+	assertTrue (s5 == 1);
+	assertTrue (s6 == 1);
+	assertTrue (s7 == 1);
+	assertTrue (s8 == 1);
+	assertTrue (s9 == 1);
+	assertTrue (s10 == 1.0f);
+	assertTrue (s11 == 1.0);
+	assertTrue (s12);
+	assertTrue (s13 == '\x1');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	bool value = a1.extract<bool>();
-	assert (value);
+	assertTrue (value);
 
 	try
 	{
@@ -848,7 +859,7 @@ void VarTest::testChar()
 	char src = ' ';
 	Var a1 = src;
 
-	assert (a1.type() == typeid(char));
+	assertTrue (a1.type() == typeid(char));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -876,32 +887,32 @@ void VarTest::testChar()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == " ");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == " ");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	char value = a1.extract<char>();
-	assert (value == ' ');
+	assertTrue (value == ' ');
 
 	try
 	{
@@ -922,7 +933,7 @@ void VarTest::testFloat()
 	float src = 32.0f;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(float));
+	assertTrue (a1.type() == typeid(float));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -950,32 +961,32 @@ void VarTest::testFloat()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	float value = a1.extract<float>();
-	assert (value == 32.0f);
+	assertTrue (value == 32.0f);
 
 	try
 	{
@@ -987,21 +998,21 @@ void VarTest::testFloat()
 	}
 
 	Var a3 = a1 + 1.0f;
-	assert (a3 == 33.0f);
+	assertTrue (a3 == 33.0f);
 	a3 = a1 - 1.0f;
-	assert (a3 == 31.0f);
+	assertTrue (a3 == 31.0f);
 	a3 += 1.0f;
-	assert (a3 == 32.0f);
+	assertTrue (a3 == 32.0f);
 	a3 -= 1.0f;
-	assert (a3 == 31.0f);
+	assertTrue (a3 == 31.0f);
 	a3 = a1 / 2.0f;
-	assert (a3 == 16.0f);
+	assertTrue (a3 == 16.0f);
 	a3 = a1 * 2.0f;
-	assert (a3 == 64.0f);
+	assertTrue (a3 == 64.0f);
 	a3 /= 2.0f;
-	assert (a3 == 32.0f);
+	assertTrue (a3 == 32.0f);
 	a3 *= 2.0f;
-	assert (a3 == 64.0f);
+	assertTrue (a3 == 64.0f);
 }
 
 
@@ -1014,7 +1025,7 @@ void VarTest::testDouble()
 	double src = 32.0;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(double));
+	assertTrue (a1.type() == typeid(double));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -1042,32 +1053,32 @@ void VarTest::testDouble()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	double value = a1.extract<double>();
-	assert (value == 32.0);
+	assertTrue (value == 32.0);
 
 	try
 	{
@@ -1080,21 +1091,21 @@ void VarTest::testDouble()
 
 
 	Var a3 = a1 + 1.0;
-	assert (a3 == 33.0);
+	assertTrue (a3 == 33.0);
 	a3 = a1 - 1.0;
-	assert (a3 == 31.0);
+	assertTrue (a3 == 31.0);
 	a3 += 1.0;
-	assert (a3 == 32.0);
+	assertTrue (a3 == 32.0);
 	a3 -= 1.0;
-	assert (a3 == 31.0);
+	assertTrue (a3 == 31.0);
 	a3 = a1 / 2.0;
-	assert (a3 == 16.0);
+	assertTrue (a3 == 16.0);
 	a3 = a1 * 2.0;
-	assert (a3 == 64.0);
+	assertTrue (a3 == 64.0);
 	a3 /= 2.0;
-	assert (a3 == 32.0);
+	assertTrue (a3 == 32.0);
 	a3 *= 2.0;
-	assert (a3 == 64.0);
+	assertTrue (a3 == 64.0);
 }
 
 
@@ -1102,7 +1113,7 @@ void VarTest::testString()
 {
 	Var a1("32");
 
-	assert (a1.type() == typeid(std::string));
+	assertTrue (a1.type() == typeid(std::string));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -1130,28 +1141,28 @@ void VarTest::testString()
 	a1.convert(s11);
 	a1.convert(s12);
 	a1.convert(s13);
-	long s14;
-	unsigned long s15;
+	Int64 s14;
+	UInt64 s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == '3');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == '3');
 
 	const std::string& value = a1.extract<std::string>();
-	assert (value == "32");
+	assertTrue (value == "32");
 
 	try
 	{
@@ -1165,29 +1176,30 @@ void VarTest::testString()
 	Var a4(123);
 	std::string s("456");
 	Var a5 = a4 + s;
-	assert (a5 == "123456");
+	assertTrue (a5 == "123456");
 	a4 += s;
-	assert (a4 == "123456");
+	assertTrue (a4 == "123456");
 	Var a6 = a4 + "789";
-	assert (a6 == "123456789");
+	assertTrue (a6 == "123456789");
 	a4 += "789";
-	assert (a4 == "123456789");
+	assertTrue (a4 == "123456789");
 
 	a4 = "";
-	assert(!a4);
+	assertTrue (!a4);
 	a4 = "0";
-	assert(!a4);
+	assertTrue (!a4);
 	a4 = "FaLsE";
-	assert(!a4);
+	assertTrue (!a4);
 }
 
 
 void VarTest::testLong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	long src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(long));
+	assertTrue (a1.type() == typeid(long));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -1219,28 +1231,28 @@ void VarTest::testLong()
 	unsigned long s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	long value = a1.extract<long>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -1252,30 +1264,32 @@ void VarTest::testLong()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
 void VarTest::testULong()
 {
+#ifndef POCO_LONG_IS_64_BIT
 	unsigned long src = 32;
 	Var a1 = src;
 
-	assert (a1.type() == typeid(unsigned long));
+	assertTrue (a1.type() == typeid(unsigned long));
 
 	std::string s1;
 	Poco::Int8 s2;
@@ -1307,28 +1321,28 @@ void VarTest::testULong()
 	unsigned long s15;
 	a1.convert(s14);
 	a1.convert(s15);
-	assert (s14 == 32);
-	assert (s15 == 32);
-	assert (s1 == "32");
-	assert (s2 == 32);
-	assert (s3 == 32);
-	assert (s4 == 32);
-	assert (s5 == 32);
-	assert (s6 == 32);
-	assert (s7 == 32);
-	assert (s8 == 32);
-	assert (s9 == 32);
-	assert (s10 == 32.0f);
-	assert (s11 == 32.0);
-	assert (s12);
-	assert (s13 == ' ');
+	assertTrue (s14 == 32);
+	assertTrue (s15 == 32);
+	assertTrue (s1 == "32");
+	assertTrue (s2 == 32);
+	assertTrue (s3 == 32);
+	assertTrue (s4 == 32);
+	assertTrue (s5 == 32);
+	assertTrue (s6 == 32);
+	assertTrue (s7 == 32);
+	assertTrue (s8 == 32);
+	assertTrue (s9 == 32);
+	assertTrue (s10 == 32.0f);
+	assertTrue (s11 == 32.0);
+	assertTrue (s12);
+	assertTrue (s13 == ' ');
 	Var a2(a1);
 	std::string t2;
 	a2.convert(t2);
-	assert (s1 == t2);
+	assertTrue (s1 == t2);
 
 	unsigned long value = a1.extract<unsigned long>();
-	assert (value == 32);
+	assertTrue (value == 32);
 
 	try
 	{
@@ -1340,36 +1354,37 @@ void VarTest::testULong()
 	}
 
 	Var a3 = a1 + 1;
-	assert (a3 == 33);
+	assertTrue (a3 == 33);
 	a3 = a1 - 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 += 1;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 -= 1;
-	assert (a3 == 31);
+	assertTrue (a3 == 31);
 	a3 = a1 / 2;
-	assert (a3 == 16);
+	assertTrue (a3 == 16);
 	a3 = a1 * 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
 	a3 /= 2;
-	assert (a3 == 32);
+	assertTrue (a3 == 32);
 	a3 *= 2;
-	assert (a3 == 64);
+	assertTrue (a3 == 64);
+#endif // POCO_LONG_IS_64_BIT
 }
 
 
 void VarTest::testUDT()
 {
 	Dummy d0;
-	assert (d0 == 0);
+	assertTrue (d0 == 0);
 
 	Dummy d(1);
 	Var da = d;
-	assert (da.extract<Dummy>() == 1);
+	assertTrue (da.extract<Dummy>() == 1);
 
 	Dummy d1 = d;
 	Var da1 = d1;
-	assert (da1.extract<Dummy>() == 1);
+	assertTrue (da1.extract<Dummy>() == 1);
 
 	try
 	{
@@ -1384,35 +1399,35 @@ void VarTest::testConversionOperator()
 {
 	Var any("42");
 	int i = any;
-	assert (i == 42);
-	assert (any == i);
+	assertTrue (i == 42);
+	assertTrue (any == i);
 
 	any = 123;
 	std::string s1 = any.convert<std::string>();
-	assert (s1 == "123");
-	assert (s1 == any);
-	assert (any == s1);
-	assert ("123" == any);
+	assertTrue (s1 == "123");
+	assertTrue (s1 == any);
+	assertTrue (any == s1);
+	assertTrue ("123" == any);
 
 	any = 321;
 	s1 = any.convert<std::string>();
-	assert (s1 == "321");
+	assertTrue (s1 == "321");
 
 	any = "456";
-	assert (any == "456");
-	assert ("456" == any);
+	assertTrue (any == "456");
+	assertTrue ("456" == any);
 
 	any = 789;
 	std::string s2 = any.convert<std::string>();
-	assert (s2 == "789");
-	assert (s2 == any);
-	assert (any == s2);
-	assert ("789" == any);
+	assertTrue (s2 == "789");
+	assertTrue (s2 == any);
+	assertTrue (any == s2);
+	assertTrue ("789" == any);
 
 	Var any2 = "1.5";
 	double d = any2;
-	assert (d == 1.5);
-	assert (any2 == d);
+	assertTrue (d == 1.5);
+	assertTrue (any2 == d);
 }
 
 
@@ -1420,113 +1435,117 @@ void VarTest::testComparisonOperators()
 {
 	Var any1 = 1;
 	Var any2 = "1";
-	assert (any1 == any2);
-	assert (any1 == 1);
-	assert (1 == any1);
-	assert (any1 == "1");
-	assert ("1" == any1);
-	assert (any1 <= 1);
-	assert (1 >= any1);
-	assert (any1 <= 2);
-	assert (2 >= any1);
-	assert (any1 < 2);
-	assert (2 > any1);
-	assert (any1 > 0);
-	assert (0 < any1);
-	assert (any1 >= 1);
-	assert (1 <= any1);
-	assert (any1 >= 0);
-	assert (0 <= any1);
+	assertTrue (any1 == any2);
+	assertTrue (any1 == 1);
+	assertTrue (1 == any1);
+	assertTrue (any1 == "1");
+	assertTrue ("1" == any1);
+	assertTrue (any1 <= 1);
+	assertTrue (1 >= any1);
+	assertTrue (any1 <= 2);
+	assertTrue (2 >= any1);
+	assertTrue (any1 < 2);
+	assertTrue (2 > any1);
+	assertTrue (any1 > 0);
+	assertTrue (0 < any1);
+	assertTrue (any1 >= 1);
+	assertTrue (1 <= any1);
+	assertTrue (any1 >= 0);
+	assertTrue (0 <= any1);
+
+#if !defined(POCO_LONG_IS_64_BIT)
 
 	any1 = 1L;
-	assert (any1 == any2);
-	assert (any1 == 1L);
-	assert (1L == any1);
-	assert (any1 == "1");
-	assert ("1" == any1);
-	assert (any1 != 2L);
-	assert (2L != any1);
-	assert (any1 != "2");
-	assert ("2" != any1);
-	assert (any1 <= 1L);
-	assert (1L >= any1);
-	assert (any1 <= 2L);
-	assert (2L >= any1);
-	assert (any1 < 2L);
-	assert (2L > any1);
-	assert (any1 > 0);
-	assert (0 < any1);
-	assert (any1 >= 1L);
-	assert (1L <= any1);
-	assert (any1 >= 0);
-	assert (0 <= any1);
+	assertTrue (any1 == any2);
+	assertTrue (any1 == 1L);
+	assertTrue (1L == any1);
+	assertTrue (any1 == "1");
+	assertTrue ("1" == any1);
+	assertTrue (any1 != 2L);
+	assertTrue (2L != any1);
+	assertTrue (any1 != "2");
+	assertTrue ("2" != any1);
+	assertTrue (any1 <= 1L);
+	assertTrue (1L >= any1);
+	assertTrue (any1 <= 2L);
+	assertTrue (2L >= any1);
+	assertTrue (any1 < 2L);
+	assertTrue (2L > any1);
+	assertTrue (any1 > 0);
+	assertTrue (0 < any1);
+	assertTrue (any1 >= 1L);
+	assertTrue (1L <= any1);
+	assertTrue (any1 >= 0);
+	assertTrue (0 <= any1);
+
+#endif // !defined(POCO_LONG_IS_64_BIT)
 
 	any1 = 0x31;
-	assert (any1 == '1');
-	assert ('1' == any1);
-	assert (any1 <= '1');
-	assert ('1' >= any1);
-	assert (any1 <= '2');
-	assert ('2' >= any1);
-	assert (any1 < '2');
-	assert ('2' > any1);
-	assert (any1 > 0);
-	assert (0 < any1);
-	assert (any1 >= '1');
-	assert ('1' <= any1);
-	assert (any1 >= 0);
-	assert (0 <= any1);
+	assertTrue (any1 == '1');
+	assertTrue ('1' == any1);
+	assertTrue (any1 <= '1');
+	assertTrue ('1' >= any1);
+	assertTrue (any1 <= '2');
+	assertTrue ('2' >= any1);
+	assertTrue (any1 < '2');
+	assertTrue ('2' > any1);
+	assertTrue (any1 > 0);
+	assertTrue (0 < any1);
+	assertTrue (any1 >= '1');
+	assertTrue ('1' <= any1);
+	assertTrue (any1 >= 0);
+	assertTrue (0 <= any1);
 
 	any1 = "2";
-	assert (any1 != any2);
-	assert (any1 != 1);
-	assert (1 != any1);
-	assert (any1 != "1");
-	assert ("1" != any1);
+	assertTrue (any1 != any2);
+	assertTrue (any1 != 1);
+	assertTrue (1 != any1);
+	assertTrue (any1 != "1");
+	assertTrue ("1" != any1);
 
 	any1 = 1.5;
-	assert (any1 == 1.5);
-	assert (1.5 == any1);
-	assert (any1 == "1.5");
-	assert ("1.5" == any1);
-	assert (any1 != 2.5);
-	assert (2.5 != any1);
-	assert (any1 != "2.5");
-	assert ("2.5" != any1);
-	assert (any1 <= 1.5);
-	assert (1.5 >= any1);
-	assert (any1 <= 2.5);
-	assert (2.5 >= any1);
-	assert (any1 < 2.5);
-	assert (2.5 > any1);
-	assert (any1 > 0);
-	assert (0 < any1);
-	assert (any1 >= 1.5);
-	assert (1.5 <= any1);
-	assert (any1 >= 0);
-	assert (0 <= any1);
+	assertTrue (any1 == 1.5);
+	assertTrue (1.5 == any1);
+	assertTrue (any1 == "1.5");
+	assertTrue ("1.5" == any1);
+	assertTrue (any1 != 2.5);
+	assertTrue (2.5 != any1);
+	assertTrue (any1 != "2.5");
+	assertTrue ("2.5" != any1);
+	assertTrue (any1 <= 1.5);
+	assertTrue (1.5 >= any1);
+	assertTrue (any1 <= 2.5);
+	assertTrue (2.5 >= any1);
+	assertTrue (any1 < 2.5);
+	assertTrue (2.5 > any1);
+	assertTrue (any1 > 0);
+	assertTrue (0 < any1);
+	assertTrue (any1 >= 1.5);
+	assertTrue (1.5 <= any1);
+	assertTrue (any1 >= 0);
+	assertTrue (0 <= any1);
 
 	any1 = 1.5f;
-	assert (any1 == 1.5f);
-	assert (1.5f == any1);
-	assert (any1 == "1.5");
-	assert ("1.5" == any1);
-	assert (any1 != 2.5f);
-	assert (2.5f != any1);
-	assert (any1 != "2.5");
-	assert ("2.5" != any1);
-	assert (any1 <= 1.5f);
-	assert (1.5f >= any1);
-	assert (any1 <= 2.5f);
-	assert (2.5f >= any1);
-	assert (any1 < 2.5f);
-	assert (2.5f > any1);
-	assert (any1 > 0);
-	assert (0 < any1);
-	assert (any1 >= 1.5f);
-	assert (1.5f <= any1);
-	assert (any1 >= 0);
-	assert (0 <= any1);
+	assertTrue (any1 == 1.5f);
+	assertTrue (1.5f == any1);
+	assertTrue (any1 == "1.5");
+	assertTrue ("1.5" == any1);
+	assertTrue (any1 != 2.5f);
+	assertTrue (2.5f != any1);
+	assertTrue (any1 != "2.5");
+	assertTrue ("2.5" != any1);
+	assertTrue (any1 <= 1.5f);
+	assertTrue (1.5f >= any1);
+	assertTrue (any1 <= 2.5f);
+	assertTrue (2.5f >= any1);
+	assertTrue (any1 < 2.5f);
+	assertTrue (2.5f > any1);
+	assertTrue (any1 > 0);
+	assertTrue (0 < any1);
+	assertTrue (any1 >= 1.5f);
+	assertTrue (1.5f <= any1);
+	assertTrue (any1 >= 0);
+	assertTrue (0 <= any1);
 }
 
 
@@ -1535,77 +1554,77 @@ void VarTest::testArithmeticOperators()
 	Var any1 = 1;
 	Var any2 = 2;
 	Var any3 = any1 + any2;
-	assert (any3 == 3);
+	assertTrue (any3 == 3);
 	int i = 1;
 	i += any1;
-	assert (2 == i);
+	assertTrue (2 == i);
 
 	any1 = 3;
-	assert ((5 - any1) == 2);
+	assertTrue ((5 - any1) == 2);
 	any2 = 5;
 	any3 = any2 - any1;
-	assert (any3 == 2);
+	assertTrue (any3 == 2);
 	any3 -= 1;
-	assert (any3 == 1);
+	assertTrue (any3 == 1);
 	i = 5;
 	i -= any1;
-	assert (2 == i);
+	assertTrue (2 == i);
 
 	any1 = 3;
-	assert ((5 * any1) == 15);
+	assertTrue ((5 * any1) == 15);
 	any2 = 5;
 	any3 = any1 * any2;
-	assert (any3 == 15);
+	assertTrue (any3 == 15);
 	any3 *= 3;
-	assert (any3 == 45);
+	assertTrue (any3 == 45);
 	i = 5;
 	i *= any1;
-	assert (15 == i);
+	assertTrue (15 == i);
 
 	any1 = 3;
-	assert ((9 / any1) == 3);
+	assertTrue ((9 / any1) == 3);
 	any2 = 9;
 	any3 = any2 / any1;
-	assert (any3 == 3);
+	assertTrue (any3 == 3);
 	any3 /= 3;
-	assert (any3 == 1);
+	assertTrue (any3 == 1);
 	i = 9;
 	i /= any1;
-	assert (3 == i);
+	assertTrue (3 == i);
 
 	any1 = 1.0f;
 	any2 = .5f;
 	any3 = .0f;
 	any3 = any1 + any2;
-	assert (any3 == 1.5f);
+	assertTrue (any3 == 1.5f);
 	any3 += .5f;
-	assert (any3 == 2.0f);
+	assertTrue (any3 == 2.0f);
 
 	any1 = 1.0;
 	any2 = .5;
 	any3 = 0.0;
 	any3 = any1 + any2;
-	assert (any3 == 1.5);
+	assertTrue (any3 == 1.5);
 	any3 += .5;
-	assert (any3 == 2.0);
+	assertTrue (any3 == 2.0);
 
 	any1 = 1;
 	any2 = "2";
 	any3 = any1 + any2;
-	assert (any3 == 3);
+	assertTrue (any3 == 3);
 	any2 = "4";
 	any3 += any2;
-	assert (any3 == 7);
-	assert (1 + any3 == 8);
+	assertTrue (any3 == 7);
+	assertTrue (1 + any3 == 8);
 
 	any1 = "123";
 	any2 = "456";
 	any3 = any1 + any2;
-	assert (any3 == "123456");
+	assertTrue (any3 == "123456");
 	any2 = "789";
 	any3 += any2;
-	assert (any3 == "123456789");
-	assert (("xyz" + any3) == "xyz123456789");
+	assertTrue (any3 == "123456789");
+	assertTrue (("xyz" + any3) == "xyz123456789");
 
 	try	{ any3 = any1 - any2; fail ("must fail"); }
 	catch (InvalidArgumentException&){}
@@ -1627,13 +1646,13 @@ void VarTest::testArithmeticOperators()
 
 	any1 = 10;
 
-	assert (any1++ == 10);
-	assert (any1 == 11);
-	assert (++any1 == 12);
+	assertTrue (any1++ == 10);
+	assertTrue (any1 == 11);
+	assertTrue (++any1 == 12);
 
-	assert (any1-- == 12);
-	assert (any1 == 11);
-	assert (--any1 == 10);
+	assertTrue (any1-- == 12);
+	assertTrue (any1 == 11);
+	assertTrue (--any1 == 10);
 
 	any1 = 1.23;
 
@@ -1736,8 +1755,8 @@ void VarTest::testCtor()
 
 	a3 = a1;
 
-	assert (a2 == 42);
-	assert (a3 == 42);
+	assertTrue (a2 == 42);
+	assertTrue (a3 == 42);
 }
 
 
@@ -1781,24 +1800,24 @@ void VarTest::testIsStruct()
 	Var d17(s17);
 	Var d18(s18);
 
-	assert (!d1.isStruct());
-	assert (!d2.isStruct());
-	assert (!d3.isStruct());
-	assert (!d4.isStruct());
-	assert (!d5.isStruct());
-	assert (!d6.isStruct());
-	assert (!d7.isStruct());
-	assert (!d8.isStruct());
-	assert (!d9.isStruct());
-	assert (!d10.isStruct());
-	assert (!d11.isStruct());
-	assert (!d12.isStruct());
-	assert (!d13.isStruct());
-	assert (!d14.isStruct());
-	assert (!d15.isStruct());
-	assert (!d16.isStruct());
-	assert (d17.isStruct());
-	assert (d18.isStruct());
+	assertTrue (!d1.isStruct());
+	assertTrue (!d2.isStruct());
+	assertTrue (!d3.isStruct());
+	assertTrue (!d4.isStruct());
+	assertTrue (!d5.isStruct());
+	assertTrue (!d6.isStruct());
+	assertTrue (!d7.isStruct());
+	assertTrue (!d8.isStruct());
+	assertTrue (!d9.isStruct());
+	assertTrue (!d10.isStruct());
+	assertTrue (!d11.isStruct());
+	assertTrue (!d12.isStruct());
+	assertTrue (!d13.isStruct());
+	assertTrue (!d14.isStruct());
+	assertTrue (!d15.isStruct());
+	assertTrue (!d16.isStruct());
+	assertTrue (d17.isStruct());
+	assertTrue (d18.isStruct());
 }
 
 
@@ -1817,8 +1836,8 @@ void VarTest::testIsArray()
 	double s11(13.555);
 	bool s12(true);
 	char s13('c');
-	long s14(232323);
-	unsigned long s15(21233232u);
+	Int64 s14(232323);
+	UInt64 s15(21233232u);
 	std::vector<Var> s16;
 	DynamicStruct s17;
 
@@ -1841,24 +1860,24 @@ void VarTest::testIsArray()
 	Var d16(s16);
 	Var d17(s17);
 
-	assert (!d0.isArray());
-	assert (!d1.isArray());
-	assert (!d2.isArray());
-	assert (!d3.isArray());
-	assert (!d4.isArray());
-	assert (!d5.isArray());
-	assert (!d6.isArray());
-	assert (!d7.isArray());
-	assert (!d8.isArray());
-	assert (!d9.isArray());
-	assert (!d10.isArray());
-	assert (!d11.isArray());
-	assert (!d12.isArray());
-	assert (!d13.isArray());
-	assert (!d14.isArray());
-	assert (!d15.isArray());
-	assert (d16.isArray());
-	assert (!d17.isArray());
+	assertTrue (!d0.isArray());
+	assertTrue (!d1.isArray());
+	assertTrue (!d2.isArray());
+	assertTrue (!d3.isArray());
+	assertTrue (!d4.isArray());
+	assertTrue (!d5.isArray());
+	assertTrue (!d6.isArray());
+	assertTrue (!d7.isArray());
+	assertTrue (!d8.isArray());
+	assertTrue (!d9.isArray());
+	assertTrue (!d10.isArray());
+	assertTrue (!d11.isArray());
+	assertTrue (!d12.isArray());
+	assertTrue (!d13.isArray());
+	assertTrue (!d14.isArray());
+	assertTrue (!d15.isArray());
+	assertTrue (d16.isArray());
+	assertTrue (!d17.isArray());
 }
 
 
@@ -1942,20 +1961,50 @@ void VarTest::testArrayIdxOperator()
 void VarTest::testDynamicStructBasics()
 {
 	DynamicStruct aStruct;
-	assert (aStruct.empty());
-	assert (aStruct.size() == 0);
-	assert (aStruct.members().empty());
+	assertTrue (aStruct.empty());
+	assertTrue (aStruct.size() == 0);
+	assertTrue (aStruct.members().empty());
 
 	aStruct.insert("First Name", "Little");
-	assert (!aStruct.empty());
-	assert (aStruct.size() == 1);
-	assert (*(aStruct.members().begin()) == "First Name");
-	assert (aStruct["First Name"] == "Little");
+	assertTrue (!aStruct.empty());
+	assertTrue (aStruct.size() == 1);
+	assertTrue (*(aStruct.members().begin()) == "First Name");
+	assertTrue (aStruct["First Name"] == "Little");
 	aStruct.insert("Last Name", "POCO");
-	assert (aStruct.members().size() == 2);
+	assertTrue (aStruct.members().size() == 2);
 	aStruct.erase("First Name");
-	assert (aStruct.size() == 1);
-	assert (*(aStruct.members().begin()) == "Last Name");
+	assertTrue (aStruct.size() == 1);
+	assertTrue (*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assertTrue (aStruct.size() == 0);
+}
+
+
+void VarTest::testOrderedDynamicStructBasics()
+{
+#ifdef POCO_ENABLE_CPP11
+	OrderedDynamicStruct aStruct;
+	assertTrue(aStruct.empty());
+	assertTrue(aStruct.size() == 0);
+	assertTrue(aStruct.members().empty());
+
+	aStruct.insert("First Name", "Little");
+	assertTrue(!aStruct.empty());
+	assertTrue(aStruct.size() == 1);
+	assertTrue(*(aStruct.members().begin()) == "First Name");
+	assertTrue(aStruct["First Name"] == "Little");
+	aStruct.insert("Last Name", "POCO");
+	assertTrue(aStruct.members().size() == 2);
+	aStruct.erase("First Name");
+	assertTrue(aStruct.size() == 1);
+	assertTrue(*(aStruct.members().begin()) == "Last Name");
+	aStruct.insert("Age", 1);
+	assertTrue(aStruct["Age"] == 1);
+	assertTrue(aStruct.members().size() == 2);
+	assertTrue(*(aStruct.members().begin()) == "Last Name");
+	aStruct.clear();
+	assertTrue(aStruct.size() == 0);
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -1965,10 +2014,10 @@ void VarTest::testDynamicStructString()
 	aStruct["First Name"] = "Junior";
 	aStruct["Last Name"] = "POCO";
 	Var a1(aStruct);
-	assert (a1["First Name"] == "Junior");
-	assert (a1["Last Name"] == "POCO");
+	assertTrue (a1["First Name"] == "Junior");
+	assertTrue (a1["Last Name"] == "POCO");
 	a1["First Name"] = "Senior";
-	assert (a1["First Name"] == "Senior");
+	assertTrue (a1["First Name"] == "Senior");
 	testGetIdxMustThrow(a1, 0);
 
 	Struct<std::string> s1;
@@ -1977,9 +2026,9 @@ void VarTest::testDynamicStructString()
 	s1["3"] = 3;
 
 	Struct<std::string> s2(s1);
-	assert (s2["1"] == 1);
-	assert (s2["2"] == 2);
-	assert (s2["3"] == 3);
+	assertTrue (s2["1"] == 1);
+	assertTrue (s2["2"] == 2);
+	assertTrue (s2["3"] == 3);
 
 	std::map<std::string, int> m1;
 	m1["1"] = 1;
@@ -1987,9 +2036,48 @@ void VarTest::testDynamicStructString()
 	m1["3"] = 3;
 
 	Struct<std::string> m2(m1);
-	assert (m2["1"] == 1);
-	assert (m2["2"] == 2);
-	assert (m2["3"] == 3);
+	assertTrue (m2["1"] == 1);
+	assertTrue (m2["2"] == 2);
+	assertTrue (m2["3"] == 3);
+}
+
+
+void VarTest::testOrderedDynamicStructString()
+{
+#ifdef POCO_ENABLE_CPP11
+	OrderedDynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	Var a1(aStruct);
+	assertTrue(a1["First Name"] == "Junior");
+	assertTrue(a1["Last Name"] == "POCO");
+	a1["First Name"] = "Senior";
+	assertTrue(a1["First Name"] == "Senior");
+	testGetIdxMustThrow(a1, 0);
+
+	typedef Struct<std::string, OrderedMap<std::string, Var>, OrderedSet<std::string> > OrderedStruct;
+	OrderedStruct s1;
+	s1["1"] = 1;
+	s1["2"] = 2;
+	s1["3"] = 3;
+
+	OrderedStruct s2(s1);
+	assertTrue(s2["1"] == 1);
+	assertTrue(s2["2"] == 2);
+	assertTrue(s2["3"] == 3);
+
+	OrderedMap<std::string, int> m1;
+	m1["2"] = 2;
+	m1["1"] = 1;
+	m1["3"] = 3;
+	assertTrue (m1.begin()->first == "2");
+	assertTrue(m1.begin()->second == 2);
+
+	OrderedStruct m2(m1);
+	assertTrue(m2["1"] == 1);
+	assertTrue(m2["2"] == 2);
+	assertTrue(m2["3"] == 3);
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2000,11 +2088,11 @@ void VarTest::testDynamicStructInt()
 	aStruct[1] = "POCO";
 	aStruct[2] = 10;
 	Var a1(aStruct);
-	assert (a1[0]== "Junior");
-	assert (a1[1]== "POCO");
-	assert (a1[2]== 10);
+	assertTrue (a1[0]== "Junior");
+	assertTrue (a1[1]== "POCO");
+	assertTrue (a1[2]== 10);
 	a1[0] = "Senior";
-	assert (a1[0] == "Senior");
+	assertTrue (a1[0] == "Senior");
 
 	Struct<int> s1;
 	s1[1] = "1";
@@ -2012,9 +2100,9 @@ void VarTest::testDynamicStructInt()
 	s1[3] = "3";
 
 	Struct<int> s2(s1);
-	assert (s2[1] == "1");
-	assert (s2[2] == "2");
-	assert (s2[3] == "3");
+	assertTrue (s2[1] == "1");
+	assertTrue (s2[2] == "2");
+	assertTrue (s2[3] == "3");
 
 	std::map<int, std::string> m1;
 	m1[1] = "1";
@@ -2022,16 +2110,57 @@ void VarTest::testDynamicStructInt()
 	m1[3] = "3";
 
 	Struct<int> m2(m1);
-	assert (m2[1] == "1");
-	assert (m2[2] == "2");
-	assert (m2[3] == "3");
+	assertTrue (m2[1] == "1");
+	assertTrue (m2[2] == "2");
+	assertTrue (m2[3] == "3");
+}
+
+
+void VarTest::testOrderedDynamicStructInt()
+{
+#ifdef POCO_ENABLE_CPP11
+	typedef Struct<int, OrderedMap<int, Var>, OrderedSet<int> > OrderedStruct;
+	OrderedStruct aStruct;
+	aStruct[0] = "POCO";
+	aStruct[1] = "Junior";
+	aStruct[2] = 100;
+	aStruct[3] = 10;
+
+	Var a1(aStruct);
+	assertTrue(a1[0] == "POCO");
+	assertTrue(a1[1] == "Junior");
+	assertTrue(a1[2] == 100);
+	assertTrue(a1[3] == 10);
+	a1[0] = "Senior";
+	assertTrue(a1[0] == "Senior");
+
+	OrderedStruct s1;
+	s1[1] = "1";
+	s1[2] = "2";
+	s1[3] = "3";
+
+	OrderedStruct s2(s1);
+	assertTrue(s2[1] == "1");
+	assertTrue(s2[2] == "2");
+	assertTrue(s2[3] == "3");
+
+	OrderedMap<int, std::string> m1;
+	m1[1] = "2";
+	m1[2] = "1";
+	m1[3] = "3";
+
+	OrderedStruct m2(m1);
+	assertTrue(m2[1] == "2");
+	assertTrue(m2[2] == "1");
+	assertTrue(m2[3] == "3");
+#endif // POCO_ENABLE_CPP11
 }
 
 
 void VarTest::testDynamicPair()
 {
 	Pair<int> aPair;
-	assert (0 == aPair.first());
+	assertTrue (0 == aPair.first());
 	try
 	{
 		std::string s = aPair.second().convert<std::string>();
@@ -2040,38 +2169,38 @@ void VarTest::testDynamicPair()
 	catch (InvalidAccessException&) { }
 
 	Var va(aPair);
-	assert ("{ \"0\" : null }" == va.convert<std::string>());
-	assert (aPair.toString() == va.convert<std::string>());
+	assertTrue ("{ \"0\" : null }" == va.convert<std::string>());
+	assertTrue (aPair.toString() == va.convert<std::string>());
 
 	aPair = Pair<int>(4, "123");
-	assert ("123" == aPair.second());
+	assertTrue ("123" == aPair.second());
 
 	va = aPair;
-	assert ("{ \"4\" : \"123\" }" == va.convert<std::string>());
-	assert (aPair.toString() == va.convert<std::string>());
+	assertTrue ("{ \"4\" : \"123\" }" == va.convert<std::string>());
+	assertTrue (aPair.toString() == va.convert<std::string>());
 
 	int i = 1;
 	std::string s = "2";
 	Pair<int> iPair(i, s);
-	assert (1 == iPair.first());
-	assert ("2" == iPair.second());
+	assertTrue (1 == iPair.first());
+	assertTrue ("2" == iPair.second());
 
 	Pair<std::string> sPair(s, i);
-	assert ("2" == sPair.first());
-	assert (1 == sPair.second());
+	assertTrue ("2" == sPair.first());
+	assertTrue (1 == sPair.second());
 
 	std::pair<int, std::string> p = std::make_pair(i, s);
 	Pair<int> pPair(p);
-	assert (1 == pPair.first());
-	assert ("2" == pPair.second());
+	assertTrue (1 == pPair.first());
+	assertTrue ("2" == pPair.second());
 
 	Var vp(pPair);
-	assert ("{ \"1\" : \"2\" }" == vp.convert<std::string>());
-	assert (pPair.toString() == vp.convert<std::string>());
+	assertTrue ("{ \"1\" : \"2\" }" == vp.convert<std::string>());
+	assertTrue (pPair.toString() == vp.convert<std::string>());
 
 	Var vs(sPair);
-	assert ("{ \"2\" : 1 }" == vs.convert<std::string>());
-	assert (sPair.toString() == vs.convert<std::string>());
+	assertTrue ("{ \"2\" : 1 }" == vs.convert<std::string>());
+	assertTrue (sPair.toString() == vs.convert<std::string>());
 }
 
 
@@ -2085,7 +2214,7 @@ void VarTest::testArrayToString()
 	Var a1(s16);
 	std::string res = a1.convert<std::string>();
 	std::string expected("[ \"string\", 23 ]");
-	assert (res == expected);
+	assertTrue (res == expected);
 }
 
 
@@ -2099,7 +2228,7 @@ void VarTest::testArrayToStringEscape()
 	Var a1(s16);
 	std::string res = a1.convert<std::string>();
 	std::string expected("[ \"\\\"quoted string\\\"\", 23 ]");
-	assert (res == expected);
+	assertTrue (res == expected);
 }
 
 
@@ -2112,8 +2241,24 @@ void VarTest::testStructToString()
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
 	std::string expected = "{ \"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\" }";
-	assert (res == expected);
-	assert (aStruct.toString() == res);
+	assertTrue (res == expected);
+	assertTrue (aStruct.toString() == res);
+}
+
+
+void VarTest::testOrderedStructToString()
+{
+#ifdef POCO_ENABLE_CPP11
+	OrderedDynamicStruct aStruct;
+	aStruct["First Name"] = "Junior";
+	aStruct["Last Name"] = "POCO";
+	aStruct["Age"] = 1;
+	Var a1(aStruct);
+	std::string res = a1.convert<std::string>();
+	std::string expected = "{ \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\", \"Age\" : 1 }";
+	assertTrue(res == expected);
+	assertTrue(aStruct.toString() == res);
+#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2124,8 +2269,8 @@ void VarTest::testStructToStringEscape()
 	Var a1(aStruct);
 	std::string res = a1.convert<std::string>();
 	std::string expected = "{ \"Value\" : \"Value with \\\" and \\n\" }";
-	assert (res == expected);
-	assert (aStruct.toString() == res);
+	assertTrue (res == expected);
+	assertTrue (aStruct.toString() == res);
 }
 
 
@@ -2158,8 +2303,8 @@ void VarTest::testArrayOfStructsToString()
 								"{ \"Age\" : 100, \"First Name\" : \"Senior\", \"Last Name\" : \"POCO\" } "
 								"] ] ]";
 
-	assert (res == expected);
-	assert (a1.toString() == res);
+	assertTrue (res == expected);
+	assertTrue (a1.toString() == res);
 }
 
 
@@ -2185,8 +2330,8 @@ void VarTest::testStructWithArraysToString()
 	std::string expected = "{ \"Address\" : { \"Country\" : \"Carinthia\", \"Number\" : 4, \"Street\" : \"Unknown\" }, "
 								"\"Age\" : 1, \"First Name\" : \"Junior\", \"Last Name\" : [ \"string\", 23 ] }";
 
-	assert (res == expected);
-	assert (aStruct.toString() == res);
+	assertTrue (res == expected);
+	assertTrue (aStruct.toString() == res);
 }
 
 
@@ -2195,21 +2340,21 @@ void VarTest::testJSONDeserializeString()
 	Var a("test");
 	std::string tst = Var::toString(a);
 	Var b = Var::parse(tst);
-	assert (b.convert<std::string>() == "test");
+	assertTrue (b.convert<std::string>() == "test");
 
 	Var c('c');
 	tst = Var::toString(c);
 	Var b2 = Var::parse(tst);
 	char cc = b2.convert<char>();
-	assert (cc == 'c');
+	assertTrue (cc == 'c');
 
-	tst = "{ \"a\" : 1, \"b\" : 2 \n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\" \n}";
 	a = Var::parse(tst);
-	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
+	assertTrue (a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 
-	tst = "{ \"a\" : 1, \"b\" : 2\n}";
+	tst = "{ \"a\" : \"1\", \"b\" : \"2\"\n}";
 	a = Var::parse(tst);
-	assert(a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
+	assertTrue (a.toString() == "{ \"a\" : \"1\", \"b\" : \"2\" }");
 }
 
 
@@ -2238,13 +2383,13 @@ void VarTest::testJSONDeserializePrimitives()
 	Var ab = Var::parse(sb);
 	Var af = Var::parse(sf);
 	Var ad = Var::parse(sd);
-	assert (a8 == i8);
-	assert (a16 == u16);
-	assert (a32 == i32);
-	assert (a64 == u64);
-	assert (ab == b);
-	assert (af == f);
-	assert (ad == d);
+	assertTrue (a8 == i8);
+	assertTrue (a16 == u16);
+	assertTrue (a32 == i32);
+	assertTrue (a64 == u64);
+	assertTrue (ab == b);
+	assertTrue (af == f);
+	assertTrue (ad == d);
 }
 
 
@@ -2273,15 +2418,15 @@ void VarTest::testJSONDeserializeArray()
 
 	std::string sVec = Var::toString(aVec);
 	Var a = Var::parse(sVec);
-	assert (a[0] == i8);
-	assert (a[1] == u16);
-	assert (a[2] == i32);
-	assert (a[3] == u64);
-	assert (a[4] == b);
-	assert (a[5] == f);
-	assert (a[6] == d);
-	assert (a[7] == s);
-	assert (a[8] == c);
+	assertTrue (a[0] == i8);
+	assertTrue (a[1] == u16);
+	assertTrue (a[2] == i32);
+	assertTrue (a[3] == u64);
+	assertTrue (a[4] == b);
+	assertTrue (a[5] == f);
+	assertTrue (a[6] == d);
+	assertTrue (a[7] == s);
+	assertTrue (a[8] == c);
 }
 
 
@@ -2322,29 +2467,29 @@ void VarTest::testJSONDeserializeComplex()
 
 	std::string sStr = Var::toString(aStr);
 	Var a = Var::parse(sStr);
-	assert (a.isStruct());
-	assert (aStr["i8"] == i8);
-	assert (aStr["u16"] == u16);
-	assert (aStr["i32"] == i32);
-	assert (aStr["u64"] == u64);
-	assert (aStr["b"] == b);
-	assert (aStr["f"] == f);
-	assert (aStr["d"] == d);
-	assert (aStr["s"] == s);
-	assert (aStr["c"] == c);
+	assertTrue (a.isStruct());
+	assertTrue (aStr["i8"] == i8);
+	assertTrue (aStr["u16"] == u16);
+	assertTrue (aStr["i32"] == i32);
+	assertTrue (aStr["u64"] == u64);
+	assertTrue (aStr["b"] == b);
+	assertTrue (aStr["f"] == f);
+	assertTrue (aStr["d"] == d);
+	assertTrue (aStr["s"] == s);
+	assertTrue (aStr["c"] == c);
 	Var vecRet = a["vec"];
-	assert (vecRet.isArray());
-	assert (vecRet[0] == i8);
-	assert (vecRet[1] == u16);
-	assert (vecRet[2] == i32);
-	assert (vecRet[3] == u64);
-	assert (vecRet[4] == b);
-	assert (vecRet[5] == f);
-	assert (vecRet[6] == d);
-	assert (vecRet[7] == s);
-	assert (vecRet[8] == c);
+	assertTrue (vecRet.isArray());
+	assertTrue (vecRet[0] == i8);
+	assertTrue (vecRet[1] == u16);
+	assertTrue (vecRet[2] == i32);
+	assertTrue (vecRet[3] == u64);
+	assertTrue (vecRet[4] == b);
+	assertTrue (vecRet[5] == f);
+	assertTrue (vecRet[6] == d);
+	assertTrue (vecRet[7] == s);
+	assertTrue (vecRet[8] == c);
 	Var strRet = vecRet[9];
-	assert (strRet.isStruct());
+	assertTrue (strRet.isStruct());
 }
 
 
@@ -2373,15 +2518,43 @@ void VarTest::testJSONDeserializeStruct()
 
 	std::string sStr = Var::toString(aStr);
 	Var a = Var::parse(sStr);
-	assert (aStr["i8"] == i8);
-	assert (aStr["u16"] == u16);
-	assert (aStr["i32"] == i32);
-	assert (aStr["u64"] == u64);
-	assert (aStr["b"] == b);
-	assert (aStr["f"] == f);
-	assert (aStr["d"] == d);
-	assert (aStr["s"] == s);
-	assert (aStr["c"] == c);
+	assertTrue (a["i8"] == i8);
+	assertTrue (a["u16"] == u16);
+	assertTrue (a["i32"] == i32);
+	assertTrue (a["u64"] == u64);
+	assertTrue (a["b"] == b);
+	assertTrue (a["f"] == f);
+	assertTrue (a["d"] == d);
+	assertTrue (a["s"] == s);
+	assertTrue (a["c"] == c);
+}
+
+
+void VarTest::testJSONRoundtripStruct()
+{
+	Poco::Int64 i64(-1234567890);
+	Poco::UInt64 u64(1234567890);
+	u64 *= u64;
+	bool b = false;
+	double d = 3.1415;
+	std::string s("test string");
+	DynamicStruct aStr;
+	aStr["i64"] = i64;
+	aStr["u64"] = u64;
+	aStr["b"] = b;
+	aStr["d"] = d;
+	aStr["s"] = s;
+
+	std::string sStr = Var::toString(aStr);
+	Var a = Var::parse(sStr);
+	assertTrue (a["i64"].isInteger());
+	assertTrue (!a["u64"].isSigned());
+	assertTrue (a["b"].isBoolean());
+	assertTrue (a["d"].isNumeric());
+	assertTrue (a["s"].isString());
+
+	std::string serialized = Var::toString(a);
+	assertTrue (sStr == serialized);
 }
 
 
@@ -2392,26 +2565,26 @@ void VarTest::testDate()
 	Poco::Timestamp tsNow = dtNow.timestamp();
 	Poco::LocalDateTime ldtNow(dtNow.timestamp());
 	Var dt(dtNow);
-	assert(dt.isDate());
-	assert(dt.isTime());
-	assert(dt.isDateTime());
+	assertTrue (dt.isDate());
+	assertTrue (dt.isTime());
+	assertTrue (dt.isDateTime());
 	Var ts(tsNow);
-	assert(ts.isDate());
-	assert(ts.isTime());
-	assert(ts.isDateTime());
+	assertTrue (ts.isDate());
+	assertTrue (ts.isTime());
+	assertTrue (ts.isDateTime());
 	Var ldt(ldtNow);
-	assert(ldt.isDate());
-	assert(ldt.isTime());
-	assert(ldt.isDateTime());
+	assertTrue (ldt.isDate());
+	assertTrue (ldt.isTime());
+	assertTrue (ldt.isDateTime());
 	Var dtStr(dt.convert<std::string>());
 	Var tsStr(ts.convert<std::string>());
 	Var ldtStr(ldt.convert<std::string>());
 	DateTime dtRes = dtStr.convert<DateTime>();
 	LocalDateTime ldtRes = ldtStr.convert<LocalDateTime>();
 	Timestamp tsRes = tsStr.convert<Timestamp>();
-	assert (dtNow == dtRes);
-	assert (ldtNow == ldtRes);
-	assert (tsNow == tsRes);
+	assertTrue (dtNow == dtRes);
+	assertTrue (ldtNow == ldtRes);
+	assertTrue (tsNow == tsRes);
 }
 
 
@@ -2441,7 +2614,7 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 		const Var& c1 = a1;
 		const Var& cval1 = c1[n];
 		fail("bad const cast - must throw");
-		assert (cval1 == c1); // silence the compiler
+		assertTrue (cval1 == c1); // silence the compiler
 	}
 	catch (Poco::InvalidAccessException&)
 	{
@@ -2455,42 +2628,42 @@ void VarTest::testGetIdxMustThrow(Var& a1, std::vector<Var>::size_type n)
 void VarTest::testEmpty()
 {
 	Var da;
-	assert (da.isEmpty());
-	assert (da.type() == typeid(void));
-	assert (!da.isArray());
-	assert (!da.isInteger());
-	assert (!da.isNumeric());
-	assert (!da.isSigned());
-	assert (!da.isString());
-	assert (da == da);
-	assert (!(da != da));
+	assertTrue (da.isEmpty());
+	assertTrue (da.type() == typeid(void));
+	assertTrue (!da.isArray());
+	assertTrue (!da.isInteger());
+	assertTrue (!da.isNumeric());
+	assertTrue (!da.isSigned());
+	assertTrue (!da.isString());
+	assertTrue (da == da);
+	assertTrue (!(da != da));
 
-	assert (da != Var(1));
-	assert (!(da == Var(1)));
-	assert (Var(1) != da);
-	assert (!(Var(1) == da));
+	assertTrue (da != Var(1));
+	assertTrue (!(da == Var(1)));
+	assertTrue (Var(1) != da);
+	assertTrue (!(Var(1) == da));
 
 	da = "123";
 	int i = da.convert<int>();
-	assert (123 == i);
+	assertTrue (123 == i);
 	std::string s = da.extract<std::string>();
-	assert ("123" == s);
-	assert (!da.isEmpty());
+	assertTrue ("123" == s);
+	assertTrue (!da.isEmpty());
 	da.empty();
-	assert (da.isEmpty());
-	assert (da.type() == typeid(void));
-	assert (!da.isArray());
-	assert (!da.isInteger());
-	assert (!da.isNumeric());
-	assert (!da.isSigned());
-	assert (!da.isString());
-	assert (da == da);
-	assert (!(da != da));
+	assertTrue (da.isEmpty());
+	assertTrue (da.type() == typeid(void));
+	assertTrue (!da.isArray());
+	assertTrue (!da.isInteger());
+	assertTrue (!da.isNumeric());
+	assertTrue (!da.isSigned());
+	assertTrue (!da.isString());
+	assertTrue (da == da);
+	assertTrue (!(da != da));
 
-	assert (da != "");
-	assert ("" != da);
-	assert (!(da == ""));
-	assert (!("" == da));
+	assertTrue (da != "");
+	assertTrue ("" != da);
+	assertTrue (!(da == ""));
+	assertTrue (!("" == da));
 
 	testEmptyComparisons<unsigned char>();
 	testEmptyComparisons<char>();
@@ -2502,7 +2675,7 @@ void VarTest::testEmpty()
 	testEmptyComparisons<Poco::Int32>();
 	testEmptyComparisons<Poco::UInt64>();
 	testEmptyComparisons<Poco::Int64>();
-#ifdef POCO_LONG_IS_64_BIT
+#ifndef POCO_LONG_IS_64_BIT
 	testEmptyComparisons<unsigned long>();
 	testEmptyComparisons<long>();
 #endif
@@ -2511,13 +2684,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int j = da;
+		int i = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int j = da.extract<int>();
+		int i = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }
@@ -2526,61 +2699,61 @@ void VarTest::testEmpty()
 void VarTest::testIterator()
 {
 	Var da;
-	assert (da.isEmpty());
-	assert (da.begin() == da.end());
+	assertTrue (da.isEmpty());
+	assertTrue (da.begin() == da.end());
 
 	da = 1;
-	assert (!da.isEmpty());
-	assert (da == 1);
-	assert (da[0] == 1);
+	assertTrue (!da.isEmpty());
+	assertTrue (da == 1);
+	assertTrue (da[0] == 1);
 	try
 	{
 		da[1] = 2;
 	}
 	catch (RangeException&) {}
-	assert (da.begin() != da.end());
+	assertTrue (da.begin() != da.end());
 
 	Var::Iterator it = da.begin();
 	Var::Iterator end = da.end();
-	assert (it != end);
-	assert (++it == end);
-	assert (--it == da.begin());
+	assertTrue (it != end);
+	assertTrue (++it == end);
+	assertTrue (--it == da.begin());
 	it++;
-	assert (it == end);
+	assertTrue (it == end);
 	try
 	{
 		++it;
 		fail ("must fail");
 	}
 	catch (RangeException&) {}
-	assert (it == end);
+	assertTrue (it == end);
 
 	da = "abc";
-	assert (da.size() == 3);
-	assert (!da.isArray());
-	assert (da.isString());
-	//assert (da[0] == 'a');
-	assert (da.at(0) == 'a');
-	//assert (da[1] = 'b');
-	assert (da.at(1) == 'b');
-	//assert (da[2] = 'c');
-	assert (da.at(2) == 'c');
+	assertTrue (da.size() == 3);
+	assertTrue (!da.isArray());
+	assertTrue (da.isString());
+	//assertTrue (da[0] == 'a');
+	assertTrue (da.at(0) == 'a');
+	//assertTrue (da[1] = 'b');
+	assertTrue (da.at(1) == 'b');
+	//assertTrue (da[2] = 'c');
+	assertTrue (da.at(2) == 'c');
 
 	da.at(0) = 'b';
-	assert (da.at(0) == 'b');
+	assertTrue (da.at(0) == 'b');
 	// TODO: allow treatment of strings like arrays
 	//da[1] = 'c';
 	da.at(1) = 'c';
-	assert (da.at(1) == 'c');
+	assertTrue (da.at(1) == 'c');
 	//da[2] = 'a';
 	da.at(2) = 'a';
-	assert (da.at(2) == 'a');
+	assertTrue (da.at(2) == 'a');
 
 	it = da.begin();
 	end = da.end();
-	assert (it != end);
-	assert (++it != end);
-	assert (--it == da.begin());
+	assertTrue (it != end);
+	assertTrue (++it != end);
+	assertTrue (--it == da.begin());
 
 	testContainerIterator<std::vector<Var> >();
 	testContainerIterator<std::list<Var> >();
@@ -2629,11 +2802,15 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testArrayIdxOperator);
 	CppUnit_addTest(pSuite, VarTest, testDynamicPair);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructBasics);
+	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructBasics);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructString);
+	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructString);
 	CppUnit_addTest(pSuite, VarTest, testDynamicStructInt);
+	CppUnit_addTest(pSuite, VarTest, testOrderedDynamicStructInt);
 	CppUnit_addTest(pSuite, VarTest, testArrayToString);
 	CppUnit_addTest(pSuite, VarTest, testArrayToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testStructToString);
+	CppUnit_addTest(pSuite, VarTest, testOrderedStructToString);
 	CppUnit_addTest(pSuite, VarTest, testStructToStringEscape);
 	CppUnit_addTest(pSuite, VarTest, testArrayOfStructsToString);
 	CppUnit_addTest(pSuite, VarTest, testStructWithArraysToString);
@@ -2642,6 +2819,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeArray);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
+	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);

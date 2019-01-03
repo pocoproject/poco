@@ -1,8 +1,6 @@
 //
 // HTTPRequestHandler.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPRequestHandler.cpp#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPRequestHandler

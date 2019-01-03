@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/SunOS-SunForte#2 $
-#
 # SunOS
 #
 # Build settings for SunOS 5.9/Forte C++ 5.4
@@ -21,7 +19,7 @@ LIB     = $(CXX) -xar -o $@
 RANLIB  = ranlib
 SHLIB   = $(CXX) $(LINKFLAGS) -G -o $@ -h$(notdir $@)
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
-STRIP   = 
+STRIP   =
 DEP     = $(POCO_BASE)/build/script/makedepend.SunCC
 SHELL   = sh
 RM      = rm -rf

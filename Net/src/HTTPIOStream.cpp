@@ -1,8 +1,6 @@
 //
 // HTTPIOStream.cpp
 //
-// $Id: //poco/Main/template/class.cpp#5 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPIOStream

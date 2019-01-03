@@ -1,8 +1,6 @@
 //
 // HTTPSSessionInstantiator.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/HTTPSSessionInstantiator.cpp#2 $
-//
 // Library: NetSSL_Win
 // Package: HTTPSClient
 // Module:  HTTPSSessionInstantiator

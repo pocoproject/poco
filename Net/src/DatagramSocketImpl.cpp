@@ -1,8 +1,6 @@
 //
 // DatagramSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/DatagramSocketImpl.cpp#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  DatagramSocketImpl
@@ -45,8 +43,8 @@ DatagramSocketImpl::DatagramSocketImpl(SocketAddress::Family family)
 	else throw InvalidArgumentException("Invalid or unsupported address family passed to DatagramSocketImpl");
 }
 
-	
-DatagramSocketImpl::DatagramSocketImpl(poco_socket_t socketfd): SocketImpl(socketfd)
+
+DatagramSocketImpl::DatagramSocketImpl(poco_socket_t sockfd): SocketImpl(sockfd)
 {
 }
 

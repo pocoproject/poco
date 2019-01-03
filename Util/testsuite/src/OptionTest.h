@@ -1,8 +1,6 @@
 //
 // OptionTest.h
 //
-// $Id: //poco/1.4/Util/testsuite/src/OptionTest.h#1 $
-//
 // Definition of the OptionTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // FileStream_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FileStream_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  FileStream

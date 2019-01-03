@@ -1,8 +1,6 @@
 //
 // XMLWriter.cpp
 //
-// $Id: //poco/1.4/XML/src/XMLWriter.cpp#5 $
-//
 // Library: XML
 // Package: XML
 // Module:  XMLWriter
@@ -144,7 +142,7 @@ XMLWriter::~XMLWriter()
 }
 
 
-void XMLWriter::setDocumentLocator(const Locator* loc)
+void XMLWriter::setDocumentLocator(const Locator* /*loc*/)
 {
 }
 
@@ -252,7 +250,7 @@ void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& loc
 
 void XMLWriter::startElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
-	if (_depth == 0 && !_inFragment && _elementCount > 1) 
+	if (_depth == 0 && !_inFragment && _elementCount > 1)
 		throw XMLException("Not well-formed. Second root element found", nameToString(localName, qname));
 	
 	if (_unclosedStartTag) closeStartTag();
@@ -426,13 +424,13 @@ void XMLWriter::startPrefixMapping(const XMLString& prefix, const XMLString& nam
 }
 
 
-void XMLWriter::endPrefixMapping(const XMLString& prefix)
+void XMLWriter::endPrefixMapping(const XMLString& /*prefix*/)
 {
 	// Note: prefix removed by popContext() at element closing tag
 }
 
 
-void XMLWriter::skippedEntity(const XMLString& name)
+void XMLWriter::skippedEntity(const XMLString& /*name*/)
 {
 }
 
@@ -504,12 +502,12 @@ void XMLWriter::endDTD()
 }
 
 
-void XMLWriter::startEntity(const XMLString& name)
+void XMLWriter::startEntity(const XMLString& /*name*/)
 {
 }
 
 
-void XMLWriter::endEntity(const XMLString& name)
+void XMLWriter::endEntity(const XMLString& /*name*/)
 {
 }
 
@@ -706,20 +704,20 @@ void XMLWriter::closeStartTag()
 }
 
 
-void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
+void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString& /*localName*/, const XMLString& qname, const Attributes& attributes)
 {
 	std::map<XMLString, std::set<XMLString> > usedNamespaces;
 	bool defaultNameSpaceUsed = false;
-	XMLString defaultNamespaceURI = _namespaces.getURI(std::string());
+	XMLString defaultNamespaceURI = _namespaces.getURI(XMLString());
 	XMLString local;
-	XMLString prefixString;
+	XMLString prefix;
 	XMLString elementNamespaceURI = namespaceURI;
-	Name::split(qname, prefixString, local);
+	Name::split(qname, prefix, local);
 	if (elementNamespaceURI.empty())
-		elementNamespaceURI = _namespaces.getURI(prefixString);
+		elementNamespaceURI = _namespaces.getURI(prefix);
 	if (!elementNamespaceURI.empty())
 	{
-		usedNamespaces[prefixString].insert(elementNamespaceURI);
+		usedNamespaces[prefix].insert(elementNamespaceURI);
 		if (!defaultNamespaceURI.empty() && elementNamespaceURI == defaultNamespaceURI)
 			defaultNameSpaceUsed = true;
 	}
@@ -733,7 +731,7 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		XMLString attributeLocal;
 		Name::split(attributeQName, attributePrefix, attributeLocal);
 		if (attributeNamespaceURI.empty())
-			attributeNamespaceURI = _namespaces.getURI(prefixString);
+			attributeNamespaceURI = _namespaces.getURI(prefix);
 		if (!attributeNamespaceURI.empty())
 		{
 			usedNamespaces[attributePrefix].insert(attributeNamespaceURI);
@@ -745,15 +743,15 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 		const std::set<XMLString> namespaceURIs = it->second;
 		for (std::set<XMLString>::const_iterator itURI = namespaceURIs.begin(); itURI != namespaceURIs.end(); ++itURI)
 		{
-			XMLString prefix = it->first;
-			if (prefix.empty()) 
-				prefix = _namespaces.getPrefix(*itURI);
-			if (prefix.empty() && !_namespaces.isMapped(*itURI))
+			XMLString prefix2 = it->first;
+			if (prefix2.empty())
+				prefix2 = _namespaces.getPrefix(*itURI);
+			if (prefix2.empty() && !_namespaces.isMapped(*itURI))
 			{
 				if (defaultNameSpaceUsed)
 				{
 					if (*itURI != defaultNamespaceURI)
-						prefix = uniquePrefix();
+						prefix2 = uniquePrefix();
 				}
 				else
 				{
@@ -762,10 +760,10 @@ void XMLWriter::declareNamespaces(const XMLString& namespaceURI, const XMLString
 				}
 
 			}
-			const XMLString& uri = _namespaces.getURI(prefix);
-			if ((uri.empty() || uri != *itURI) && !itURI->empty()) 
+			const XMLString& uri = _namespaces.getURI(prefix2);
+			if ((uri.empty() || uri != *itURI) && !itURI->empty())
 			{
-				_namespaces.declarePrefix(prefix, *itURI);
+				_namespaces.declarePrefix(prefix2, *itURI);
 			}
 		}
 	}
@@ -841,7 +839,7 @@ void XMLWriter::addNamespaceAttributes(CanonicalAttributeMap& attributeMap)
 }
 
 
-void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI)
+void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attributes, const XMLString& /*elementNamespaceURI*/)
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
@@ -866,7 +864,7 @@ void XMLWriter::addAttributes(AttributeMap& attributeMap, const Attributes& attr
 }
 
 
-void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attributes& attributes, const XMLString& elementNamespaceURI)
+void XMLWriter::addAttributes(CanonicalAttributeMap& attributeMap, const Attributes& attributes, const XMLString& /*elementNamespaceURI*/)
 {
 	for (int i = 0; i < attributes.getLength(); i++)
 	{
@@ -928,7 +926,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -967,7 +965,7 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 			default:
 				if (c >= 0 && c < 32)
 					throw XMLException("Invalid character token.");
-				else 
+				else
 					writeXML(c);
 			}
 		}
@@ -1007,8 +1005,8 @@ void XMLWriter::writeName(const XMLString& prefix, const XMLString& localName)
 	}
 	else
 	{
-		writeXML(prefix); 
-		writeMarkup(MARKUP_COLON); 
+		writeXML(prefix);
+		writeMarkup(MARKUP_COLON);
 		writeXML(localName);
 	}
 }
@@ -1027,9 +1025,9 @@ void XMLWriter::writeIndent() const
 }
 
 
-void XMLWriter::writeIndent(int indent) const
+void XMLWriter::writeIndent(int depth) const
 {
-	for (int i = 0; i < indent; ++i)
+	for (int i = 0; i < depth; ++i)
 		writeMarkup(_indent);
 }
 

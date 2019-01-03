@@ -1,8 +1,6 @@
 //
 // ExpireLRUCacheTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ExpireLRUCacheTest.h#1 $
-//
 // Tests for ExpireLRUCache
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

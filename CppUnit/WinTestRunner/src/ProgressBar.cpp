@@ -1,8 +1,6 @@
 //
 // ProgressBar.cpp
 //
-// $Id: //poco/1.4/CppUnit/WinTestRunner/src/ProgressBar.cpp#1 $
-//
 
 
 #include "ProgressBar.h"

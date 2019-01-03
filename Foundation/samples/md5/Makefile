@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Foundation/samples/md5/Makefile#1 $
-#
 # Makefile for Poco md5
 #
 
