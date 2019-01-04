@@ -97,7 +97,10 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
+if (POCO_UNBUNDLED)
+    target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ZLIB::ZLIB)
+endif (POCO_UNBUNDLED)
+
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
