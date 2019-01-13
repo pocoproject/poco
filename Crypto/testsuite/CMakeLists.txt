@@ -23,9 +23,9 @@ else()
 endif()
 target_link_libraries(Crypto-testrunner PUBLIC Poco::NetSSL Poco::XML Poco::CppUnit)
 
-if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-	set_tests_properties(Crypto PROPERTIES  ENVIRONMENT "PATH=%PATH%\;${INTERNAL_OPENSSL_PATH}")
-endif(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
+if(NOT "${INTERNAL_OPENSSL_PATH}" STREQUAL "")
+	set_tests_properties(Crypto PROPERTIES  ENVIRONMENT "${INTERNAL_OPENSSL_PATH}")
+endif()
 
 if(UNIX AND NOT ANDROID)
     target_link_libraries(Crypto-testrunner PUBLIC pthread)
