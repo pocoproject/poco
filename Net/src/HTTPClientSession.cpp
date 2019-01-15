@@ -414,13 +414,14 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 		_reconnect = false;
 		return rc;
 	}
-	catch (NetException&)
+	catch (IOException&)
 	{
 		if (_reconnect)
 		{
 			close();
 			reconnect();
 			int rc = HTTPSession::write(buffer, length);
+			clearException();
 			_reconnect = false;
 			return rc;
 		}
