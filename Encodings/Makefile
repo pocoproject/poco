@@ -31,7 +31,14 @@ objects = \
 	Windows932Encoding \
 	Windows936Encoding \
 	Windows949Encoding \
-	Windows950Encoding
+	Windows950Encoding \
+	MacRomanEncoding \
+	MacCentralEurRomanEncoding \
+	MacCyrillicEncoding \
+	MacChineseTradEncoding \
+	MacChineseSimpEncoding \
+	MacJapaneseEncoding \
+	MacKoreanEncoding
 
 target         = PocoEncodings
 target_version = $(LIBVERSION)
