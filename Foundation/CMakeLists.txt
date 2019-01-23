@@ -98,7 +98,7 @@ set_target_properties(Foundation
 	)
 
 if (POCO_UNBUNDLED)
-    target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ZLIB::ZLIB)
+    target_link_libraries(Foundation PUBLIC ${PCRE_NAMES} ZLIB::ZLIB)
 endif (POCO_UNBUNDLED)
 
 target_include_directories(Foundation
