@@ -70,37 +70,37 @@ if not defined VCINSTALLDIR (
   ) else (
     if %VS_VERSION%==vs100 (
       if %PLATFORM%==x64 (
-        call "%VS100COMNTOOLS%%VS_VARSALL%" x86_amd64
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
       ) else (
-        call "%VS100COMNTOOLS%%VS_VARSALL%" x86
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86 8.1
       )
     ) else (
       if %VS_VERSION%==vs110 (
         if %PLATFORM%==x64 (
-          call "%VS110COMNTOOLS%%VS_VARSALL%" x86_amd64
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
         ) else (
-          call "%VS110COMNTOOLS%%VS_VARSALL%" x86
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86 8.1
         )
       ) else (
         if %VS_VERSION%==vs120 (
           if %PLATFORM%==x64 (
-            call "%VS120COMNTOOLS%%VS_VARSALL%" x86_amd64
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
           ) else (
-            call "%VS120COMNTOOLS%%VS_VARSALL%" x86
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86 8.1
           )
         ) else (
           if %VS_VERSION%==vs140 (
             if %PLATFORM%==x64 (
-              call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
             ) else (
-              call "%VS140COMNTOOLS%%VS_VARSALL%" x86
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86 8.1
             )
           ) else (
             if %VS_VERSION%==vs150 (
               if %PLATFORM%==x64 (
-                call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
               ) else (
-                call "%VS150COMNTOOLS%%VS_VARSALL%" x86
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86 8.1
               )
             )
           )
