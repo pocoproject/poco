@@ -115,7 +115,7 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 	case EVP_CIPH_OFB_MODE:
 		return MODE_OFB;
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 	case EVP_CIPH_CTR_MODE:
 		return MODE_CTR;
 
