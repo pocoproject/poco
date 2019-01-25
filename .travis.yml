@@ -97,6 +97,7 @@ matrix:
         - mkdir -p /usr/local/android-sdk/licenses
         - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > /usr/local/android-sdk/licenses/android-sdk-license
         - echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> /usr/local/android-sdk/licenses/android-sdk-license
+        - echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" >> /usr/local/android-sdk/licenses/android-sdk-license
         # Install NDK and cmake via android sdkmanager.
         - /usr/local/android-sdk/tools/bin/sdkmanager --update > /dev/null
         - /usr/local/android-sdk/tools/bin/sdkmanager "emulator" "ndk-bundle" "cmake;3.6.4111459" > /dev/null
@@ -114,7 +115,7 @@ matrix:
         # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
 
         # Using the ninja build command. Is much faster then make build command.
-        - /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -H. -Bcmake-build -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_LONG_RUNNING_TESTS=OFF -DPOCO_OLD_REDIS_VERSION=ON && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build cmake-build --target all && cd cmake-build &&travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest -E Foundation --output-on-failure
+        - /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -H. -Bcmake-build -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DPOCO_ENABLE_APACHECONNECTOR=OFF -DPOCO_ENABLE_NETSSL=OFF -DPOCO_ENABLE_CRYPTO=OFF -DPOCO_ENABLE_SQL_MYSQL=OFF -DPOCO_ENABLE_SQL_POSTGRESQL=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_LONG_RUNNING_TESTS=OFF -DPOCO_OLD_REDIS_VERSION=ON && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build cmake-build --target all && cd cmake-build &&travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest -E Foundation --output-on-failure
 
     - env:    test="android API level 24"
       language: android
@@ -144,6 +145,7 @@ matrix:
         - mkdir -p /usr/local/android-sdk/licenses
         - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > /usr/local/android-sdk/licenses/android-sdk-license
         - echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> /usr/local/android-sdk/licenses/android-sdk-license
+        - echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" >> /usr/local/android-sdk/licenses/android-sdk-license
         # Install NDK and cmake via android sdkmanager.
         - /usr/local/android-sdk/tools/bin/sdkmanager --update > /dev/null
         - /usr/local/android-sdk/tools/bin/sdkmanager "emulator" "ndk-bundle" "cmake;3.6.4111459" > /dev/null
@@ -161,7 +163,7 @@ matrix:
         # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
 
         # Using the ninja build command. Is much faster then make build command.
-        - /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -H. -Bcmake-build -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_LONG_RUNNING_TESTS=OFF -DPOCO_OLD_REDIS_VERSION=ON && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build cmake-build --target all && cd cmake-build && travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest -E Foundation --output-on-failure
+        - /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -H. -Bcmake-build -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DPOCO_ENABLE_APACHECONNECTOR=OFF -DPOCO_ENABLE_NETSSL=OFF -DPOCO_ENABLE_CRYPTO=OFF -DPOCO_ENABLE_SQL_MYSQL=OFF -DPOCO_ENABLE_SQL_POSTGRESQL=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_LONG_RUNNING_TESTS=OFF -DPOCO_OLD_REDIS_VERSION=ON && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build cmake-build --target all && cd cmake-build && travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest -E Foundation --output-on-failure
 
     - env:    test="x86 (make) bundled"
       os: osx
