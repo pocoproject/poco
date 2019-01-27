@@ -164,7 +164,7 @@ void PatternFormatter::parsePattern()
 				else
 				{
 					act.key = *it;
-					if ((it + 1) != end && *(it + 1) == '[')
+					if (*it == 'v' && (it + 1) != end && *(it + 1) == '[')
 					{
 						it += 2;
 						std::string number;
