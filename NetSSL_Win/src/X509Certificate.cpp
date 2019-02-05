@@ -397,7 +397,6 @@ void X509Certificate::importCertificate(const std::string& certPath)
 	Poco::File certFile(certPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(certPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("certificate file too large", certPath);
 	if (size < 32) throw Poco::DataFormatException("certificate file too small", certPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(certPath);
