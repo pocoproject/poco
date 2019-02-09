@@ -238,6 +238,8 @@ protected:
 			}
 			if (include)
 				files.insert(*it);
+			else
+				logger().debug("excluded " + *it);
 		}
 	}
 
