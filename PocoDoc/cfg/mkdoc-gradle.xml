@@ -18,9 +18,10 @@
 				CppUnitException.h,
 				Constants.h,
 				inffast.h,
+				Binder.h,
 				PDF/include/*.h,
 				CppParser/include/*.h,
-				Data/include/*.h
+				Data/include/*.h,
 				Data/*/include/*.h
 			</exclude>
 		</files>
