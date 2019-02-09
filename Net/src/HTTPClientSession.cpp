@@ -253,8 +253,9 @@ void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 
 std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
-	clearException();
+	_pRequestStream = 0;
 	_pResponseStream = 0;
+	clearException();
 	_responseReceived = false;
 
 	bool keepAlive = getKeepAlive();
@@ -414,13 +415,14 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 		_reconnect = false;
 		return rc;
 	}
-	catch (NetException&)
+	catch (IOException&)
 	{
 		if (_reconnect)
 		{
 			close();
 			reconnect();
 			int rc = HTTPSession::write(buffer, length);
+			clearException();
 			_reconnect = false;
 			return rc;
 		}
