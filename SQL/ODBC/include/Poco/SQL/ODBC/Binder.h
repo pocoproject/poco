@@ -31,9 +31,6 @@
 #include <deque>
 #include <list>
 #include <map>
-#ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
-#endif
 #include <sqlext.h>
 
 
