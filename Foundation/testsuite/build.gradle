@@ -85,8 +85,6 @@ model {
 					
 		
 				PATH = testAppDir + File.pathSeparator + PATH
-				println "===" + PATH
-				println ""
 				if (targetPlatform.name.startsWith("win")) 
 					tasks.run.environment "Path", PATH
 				else
@@ -107,8 +105,6 @@ model {
 				if (buildType == buildTypes.release) {
 					cCompiler.args "/MD"
 					cppCompiler.args "/MD"
-				} else {
-					throw new GradleException("Unknown buildType" + buildType)
 				}
 			}
 			if (toolChain in Gcc) {
