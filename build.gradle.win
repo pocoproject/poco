@@ -926,7 +926,7 @@ task pocoDoc(type: Exec) {
 	dependsOn ':PocoDoc::assemble'
 	dependsOn PocoDocIni
 	if (os.windows) {
-		environment "Path", "$rootDir\\bin;$Path"
+		environment "Path", "$rootDir\\bin;$environment.Path"
 		println environment.Path
 		
 		executable "PocoDoc/bin/PocoDoc.exe"
