@@ -43,11 +43,13 @@ public:
 	typedef std::map<Poco::UInt16, ZipArchiveInfo> DirectoryInfos;
 	typedef std::map<Poco::UInt32, ZipArchiveInfo64> DirectoryInfos64;
 
-	ZipArchive(std::istream& in);
+	ZipArchive(std::istream& in, bool ignoreDuplicatedEntries=false);
 		/// Creates the ZipArchive from a file. Note that the in stream will be in state failed after the constructor is finished
+		/// Should the ZIP archive header contain duplicated entries, an assert Exception will be thrown if ignoreDuplicatedEntries is FALSE. If TRUE, no assertion is executed and only the first entry will be kept.
 
-	ZipArchive(std::istream& in, ParseCallback& callback);
+	ZipArchive(std::istream& in, ParseCallback& callback, bool ignoreDuplicatedEntries=false);
 		/// Creates the ZipArchive from a file or network stream. Note that the in stream will be in state failed after the constructor is finished
+		/// Should the ZIP archive header contain duplicated entries, an assert Exception will be thrown if ignoreDuplicatedEntries is FALSE. If TRUE, no assertion is executed and only the first entry will be kept.
 
 	~ZipArchive();
 		/// Destroys the ZipArchive.
@@ -65,7 +67,7 @@ public:
 	const std::string& getZipComment() const;
 
 private:
-	void parse(std::istream& in, ParseCallback& pc);
+	void parse(std::istream& in, ParseCallback& pc, bool ignoreDuplicatedEntries);
 
 	ZipArchive(const FileHeaders& entries, const FileInfos& infos, const DirectoryInfos& dirs, const DirectoryInfos64& dirs64 );
 

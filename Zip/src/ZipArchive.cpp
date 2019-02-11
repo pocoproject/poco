@@ -25,7 +25,7 @@ namespace Zip {
 const std::string ZipArchive::EMPTY_COMMENT;
 
 
-ZipArchive::ZipArchive(std::istream& in):
+ZipArchive::ZipArchive(std::istream& in, bool ignoreDuplicatedEntries):
 	_entries(),
 	_infos(),
 	_disks(),
@@ -33,7 +33,7 @@ ZipArchive::ZipArchive(std::istream& in):
 {
 	poco_assert_dbg (in);
 	SkipCallback skip;
-	parse(in, skip);
+	parse(in, skip, ignoreDuplicatedEntries);
 }
 
 
@@ -46,14 +46,14 @@ ZipArchive::ZipArchive(const FileHeaders& entries, const FileInfos& infos, const
 }
 
 
-ZipArchive::ZipArchive(std::istream& in, ParseCallback& pc):
+ZipArchive::ZipArchive(std::istream& in, ParseCallback& pc, bool ignoreDuplicatedEntries):
 	_entries(),
 	_infos(),
 	_disks(),
 	_disks64()
 {
 	poco_assert_dbg (in);
-	parse(in, pc);
+	parse(in, pc, ignoreDuplicatedEntries);
 }
 
 
@@ -62,7 +62,7 @@ ZipArchive::~ZipArchive()
 }
 
 
-void ZipArchive::parse(std::istream& in, ParseCallback& pc)
+void ZipArchive::parse(std::istream& in, ParseCallback& pc, bool ignoreDuplicatedEntries)
 {
 	// read 4 bytes
 	bool haveSynced = false;
@@ -75,7 +75,12 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		if (std::memcmp(header, ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipLocalFileHeader entry(in, true, pc);
-			poco_assert (_entries.insert(std::make_pair(entry.getFileName(), entry)).second);
+			if (ignoreDuplicatedEntries)
+			{
+				_entries.insert(std::make_pair(entry.getFileName(), entry));
+			} else {
+				poco_assert (_entries.insert(std::make_pair(entry.getFileName(), entry)).second);
+			}
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
@@ -86,19 +91,34 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 			{
 				it->second.setStartPos(info.getOffset());
 			}
-			poco_assert (_infos.insert(std::make_pair(info.getFileName(), info)).second);
+			if (ignoreDuplicatedEntries)
+			{
+				_infos.insert(std::make_pair(info.getFileName(), info));
+			} else {
+				poco_assert (_infos.insert(std::make_pair(info.getFileName(), info)).second);
+			}
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo nfo(in, true);
-			poco_assert (_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			if (ignoreDuplicatedEntries)
+			{
+				_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo));
+			} else {
+				poco_assert (_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			}
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo64::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo64 nfo(in, true);
-			poco_assert (_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			if (ignoreDuplicatedEntries)
+			{
+				_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo));
+			} else {
+				poco_assert (_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			}
 			haveSynced = false;
 		}
 		else
