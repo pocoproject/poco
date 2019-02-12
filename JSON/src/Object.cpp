@@ -113,32 +113,33 @@ Var Object::get(const std::string& key) const
 	{
 		return it->second;
 	}
-
-	return Var();
+	throw NotFoundException(key);
 }
 
 
 Array::Ptr Object::getArray(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
-	if ((it != _values.end()) && (it->second.type() == typeid(Array::Ptr)))
+	if ((it != _values.end()))
 	{
-		return it->second.extract<Array::Ptr>();
+		if((it->second.type() == typeid(Array::Ptr)))
+			return it->second.extract<Array::Ptr>();
+		throw BadCastException(key);
 	}
-
-	return 0;
+	throw NotFoundException(key);
 }
 
 
 Object::Ptr Object::getObject(const std::string& key) const
 {
 	ValueMap::const_iterator it = _values.find(key);
-	if ((it != _values.end()) && (it->second.type() == typeid(Object::Ptr)))
+	if ((it != _values.end()))
 	{
-		return it->second.extract<Object::Ptr>();
+		if((it->second.type() == typeid(Object::Ptr)))
+			return it->second.extract<Object::Ptr>();		
+		throw BadCastException(key);
 	}
-
-	return 0;
+	throw NotFoundException(key);
 }
 
 
