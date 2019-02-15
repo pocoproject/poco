@@ -205,7 +205,7 @@ void SocketImpl::connectNB(const SocketAddress& address)
 
 void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
-	bind(address, reuseAddress, true);
+	bind(address, reuseAddress, reuseAddress);
 }
 
 
