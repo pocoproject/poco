@@ -6,4 +6,4 @@
 [submodule "gradle"]
 	path = gradle
 	url = https://github.com/pocoproject/gradle.git
-	branch = Gradle-4.9
+	branch = gradle-4.9
