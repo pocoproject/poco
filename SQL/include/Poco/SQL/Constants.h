@@ -1,8 +1,8 @@
 //
 // SQL.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Constants
 //
 // Constant definitions for the Poco Data library.

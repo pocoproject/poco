@@ -1,8 +1,8 @@
 //
 // Connector.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Connector
 //
 // Definition of the Connector class.

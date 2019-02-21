@@ -1,8 +1,8 @@
 //
 // SQLException.cpp
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  SQLException
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

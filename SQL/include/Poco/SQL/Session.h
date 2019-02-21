@@ -1,8 +1,8 @@
 //
 // Session.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Session
 //
 // Definition of the Session class.

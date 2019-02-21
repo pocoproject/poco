@@ -1,8 +1,8 @@
 //
 // SessionImpl.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  SessionImpl
 //
 // Definition of the SessionImpl class.

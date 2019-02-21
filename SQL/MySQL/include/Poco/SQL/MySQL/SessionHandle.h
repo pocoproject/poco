@@ -1,7 +1,7 @@
 //
 // SesssionHandle.h
 //
-// Library: Data/MySQL
+// Library: SQL/MySQL
 // Package: MySQL
 // Module:  SessionHandle
 //

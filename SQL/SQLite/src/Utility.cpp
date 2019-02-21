@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// Library: Data/SQLite
+// Library: SQL/SQLite
 // Package: SQLite
 // Module:  Utility
 //

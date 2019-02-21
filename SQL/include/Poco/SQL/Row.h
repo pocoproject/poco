@@ -1,8 +1,8 @@
 //
 // Row.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Row
 //
 // Definition of the Row class.

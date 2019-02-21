@@ -1,7 +1,7 @@
 //
 // Utility.cpp
 //
-// Library: Data/ODBC
+// Library: SQL/ODBC
 // Package: ODBC
 // Module:  Utility
 //

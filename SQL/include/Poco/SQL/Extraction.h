@@ -1,8 +1,8 @@
 //
 // Extraction.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Extraction
 //
 // Definition of the Extraction class.

@@ -1,8 +1,8 @@
 //
 // Column.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Column
 //
 // Definition of the Column class.

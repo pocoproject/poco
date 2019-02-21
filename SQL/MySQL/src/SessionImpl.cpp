@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// Library: Data/MySQL
+// Library: SQL/MySQL
 // Package: MySQL
 // Module:  SessionImpl
 //

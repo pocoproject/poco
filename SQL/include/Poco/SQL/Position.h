@@ -1,8 +1,8 @@
 //
 // PositionExtraction.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Position
 //
 // Definition of the PositionExtraction class.
