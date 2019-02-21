@@ -252,6 +252,45 @@ inline std::string TestCase::toString()
 #define assertNotNullPtr(ptr) \
 	(this->assertNotNull((ptr), #ptr, __LINE__, __FILE__))
 
+#define assertThrow(statement, exception) \
+	({\
+		bool thrownExpected = false; \
+		bool noThrow = true; \
+		try\
+		{ \
+			statement; \
+		}\
+		catch (const exception &) \
+		{\
+			thrownExpected = true; \
+			noThrow = false; \
+		}\
+		catch ( ... ) \
+		{\
+			noThrow = false;\
+		} \
+		this->assertImplementation(!noThrow, "The statement " #statement " throws nothing. "\
+									"Excpected the exception " #exception, __LINE__, __FILE__);\
+		this->assertImplementation(thrownExpected, "The statement " #statement " throws another type of exception. "\
+									"Excpected the exception " #exception, __LINE__, __FILE__);\
+	})
+
+#define assertNoThrow(statement) \
+	({ \
+		bool thrown = false; \
+		try\
+		{\
+			statement; \
+		}\
+		catch ( ... )\
+		{\
+			thrown = true; \
+		} \
+		this->assertImplementation(!thrown, "Excpected no throw the exception in statement: "s + (#statement), \
+									__LINE__, __FILE__);\
+	} \
+	)
+
 #define failmsg(msg) \
 	(this->fail(msg, __LINE__, __FILE__))
 
