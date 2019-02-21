@@ -17,6 +17,7 @@
 #ifndef Foundation_Timespan_INCLUDED
 #define Foundation_Timespan_INCLUDED
 
+#include <chrono>
 
 #include "Poco/Foundation.h"
 #include "Poco/Timestamp.h"
@@ -47,6 +48,11 @@ public:
 	Timespan(const Timespan& timespan);
 		/// Creates a Timespan from another one.
 
+	template <class T, class Period>
+	Timespan(const std::chrono::duration<T, Period> & dtime) :
+		_span(std::chrono::duration_cast<std::chrono::microseconds>(dtime).count()) {}
+		/// Creates a Timespan from std::chrono::duration
+
 	~Timespan();
 		/// Destroys the Timespan.
 
@@ -62,6 +68,13 @@ public:
 	Timespan& assign(long seconds, long microseconds);
 		/// Assigns a new span. Useful for assigning
 		/// from a struct timeval.
+
+	template <class T, class Period>
+	Timespan& assign(const std::chrono::duration<T, Period> & dtime)
+	{
+		_span = std::chrono::duration_cast<std::chrono::microseconds>(dtime).count();
+		return *this;
+	}
 
 	void swap(Timespan& timespan);
 		/// Swaps the Timespan with another one.
