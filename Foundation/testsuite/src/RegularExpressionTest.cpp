@@ -253,14 +253,7 @@ void RegularExpressionTest::testSubst4()
 
 void RegularExpressionTest::testError()
 {
-	try
-	{
-		RegularExpression re("(0-9]");
-		failmsg("bad regexp - must throw exception");
-	}
-	catch (RegularExpressionException&)
-	{
-	}
+	assertThrow(RegularExpression re("(0-9]"), RegularExpressionException);
 }
 
 void RegularExpressionTest::testGroup()

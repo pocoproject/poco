@@ -51,31 +51,8 @@ void ClassLoaderTest::testClassLoader1()
 	
 	assertTrue (!cl.isLibraryLoaded(path));
 	
-	try
-	{
-		const ClassLoader<TestPlugin>::Meta& meta = cl.classFor("PluginA");
-		fail("not found - must throw exception");
-	}
-	catch (NotFoundException&)
-	{
-	}
-	catch (...)
-	{
-		failmsg("wrong exception");
-	}
-
-	try
-	{
-		const ClassLoader<TestPlugin>::Manif& manif = cl.manifestFor(path);
-		fail("not found - must throw exception");
-	}
-	catch (NotFoundException&)
-	{
-	}
-	catch (...)
-	{
-		failmsg("wrong exception");
-	}
+	assertThrow(const ClassLoader<TestPlugin>::Meta& meta = cl.classFor("PluginA"), NotFoundException);
+	assertThrow(const ClassLoader<TestPlugin>::Manif& manif = cl.manifestFor(path), NotFoundException);
 }
 
 
@@ -124,34 +101,13 @@ void ClassLoaderTest::testClassLoader2()
 	TestPlugin& pluginC = cl.instance("PluginC");
 	assertTrue (pluginC.name() == "PluginC");
 	
-	try
-	{
-		TestPlugin& plgB = cl.instance("PluginB");
-		fail("not a singleton - must throw");
-	}
-	catch (InvalidAccessException&)
-	{
-	}
-	
-	try
-	{
-		TestPlugin* pPluginC = cl.create("PluginC");
-		fail("cannot create a singleton - must throw");
-	}
-	catch (InvalidAccessException&)
-	{
-	}
-
-	try
-	{
+	assertThrow(TestPlugin& plgB = cl.instance("PluginB"), InvalidAccessException);
+	assertThrow(TestPlugin* pPluginC = cl.create("PluginC"), InvalidAccessException);
+	assertThrow({
 		const AbstractMetaObject<TestPlugin>& meta = cl.classFor("PluginC");
 		meta.autoDelete(&(meta.instance()));
-		fail("cannot take ownership of a singleton - must throw");
-	}
-	catch (InvalidAccessException&)
-	{
-	}
-	
+	}, InvalidAccessException);
+
 	const AbstractMetaObject<TestPlugin>& meta1 = cl.classFor("PluginC");
 	assertTrue (meta1.isAutoDelete(&(meta1.instance())));
 

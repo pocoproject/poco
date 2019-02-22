@@ -60,15 +60,7 @@ void LoggingRegistryTest::testRegister()
 	assertTrue (pF1 == pF);
 	pF = reg.formatterForName("f2");
 	assertTrue (pF2 == pF);
-
-	try
-	{
-		pC = reg.channelForName("c3");
-		fail("not found - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	assertThrow(pC = reg.channelForName("c3"), Poco::NotFoundException);
 }
 
 
@@ -126,23 +118,8 @@ void LoggingRegistryTest::testUnregister()
 	reg.unregisterChannel("c1");
 	reg.unregisterFormatter("f2");
 
-	try
-	{
-		Channel::Ptr pC = reg.channelForName("c1");
-		fail("unregistered - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
-
-	try
-	{
-		Formatter::Ptr pF = reg.formatterForName("f2");
-		fail("unregistered - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	assertThrow(Channel::Ptr pC = reg.channelForName("c1"), Poco::NotFoundException); // unregistered
+	assertThrow(Formatter::Ptr pF = reg.formatterForName("f2"), Poco::NotFoundException); // unregistered
 }
 
 

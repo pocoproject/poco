@@ -245,11 +245,7 @@ void BinaryReaderWriterTest::testWrappers()
 	assertTrue (reader.available() == 0);
 
 	reader.setExceptions(std::istream::eofbit);
-	try
-	{
-		reader >> i;
-		fail ("must throw on EOF");
-	} catch(std::exception&) { }
+	assertThrow(reader >> i, std::exception);
 }
 
 

@@ -41,18 +41,8 @@ void HashTableTest::testInsert()
 
 	assertTrue (hashTable.get(s1, retVal));
 	assertTrue (retVal == 13);
-	try
-	{
-		hashTable.insert(s1, 22);
-		failmsg ("duplicate insert must fail");
-	}
-	catch (Exception&){}
-	try
-	{
-		hashTable.get(s2);
-		failmsg ("getting a non inserted item must fail");
-	}
-	catch (Exception&){}
+	assertThrow(hashTable.insert(s1, 22), Exception); // duplicate insert must fail
+	assertThrow(hashTable.get(s2), Exception); // getting a non inserted item must fail
 
 	assertTrue (!hashTable.exists(s2));
 	hashTable.insert(s2, 13);

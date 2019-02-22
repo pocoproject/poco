@@ -185,16 +185,12 @@ void HashMapTest::testIndex()
 	assertTrue (hm[1] == 2);
 	assertTrue (hm[2] == 4);
 	assertTrue (hm[3] == 6);
-	
-	try
-	{
+
+	// no such key
+	assertThrow({
 		const IntMap& im = hm;
 		int x = im[4];
-		fail("no such key - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	}, Poco::NotFoundException);
 }
 
 

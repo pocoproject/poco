@@ -75,27 +75,13 @@ void DynamicFactoryTest::testDynamicFactoryAutoPtr()
 	assertNotNull(a.get());
 	assertNotNull(b.get());
 
-	try
-	{
-		dynFactory.registerClass<A>("A");
-		fail("already registered - must throw");
-	}
-	catch (Poco::ExistsException&)
-	{
-	}
+	assertThrow(dynFactory.registerClass<A>("A"), Poco::ExistsException); // already registered
 
 	dynFactory.unregisterClass("B");
 	assert (dynFactory.isClass("A"));
 	assert (!dynFactory.isClass("B"));
 
-	try
-	{
-		AutoPtr<B> b(dynFactory.createInstance("B").cast<B>());
-		fail("unregistered - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	assertThrow(AutoPtr<B> b(dynFactory.createInstance("B").cast<B>()), Poco::NotFoundException);
 }
 
 
@@ -117,27 +103,14 @@ void DynamicFactoryTest::testDynamicFactoryPtr()
 	assertNotNull(a.get());
 	assertNotNull(b.get());
 
-	try
-	{
-		dynFactory.registerClass<A>("A");
-		fail("already registered - must throw");
-	}
-	catch (Poco::ExistsException&)
-	{
-	}
+	assertThrow(dynFactory.registerClass<A>("A"), Poco::ExistsException); // already registered
 
 	dynFactory.unregisterClass("B");
 	assertTrue (dynFactory.isClass("A"));
 	assertTrue (!dynFactory.isClass("B"));
-	
-	try
-	{
-		std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B")));
-		fail("unregistered - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+
+	// Unregistered
+	assertThrow(std::unique_ptr<B> b(dynamic_cast<B*>(dynFactory.createInstance("B"))), Poco::NotFoundException);
 }
 
 

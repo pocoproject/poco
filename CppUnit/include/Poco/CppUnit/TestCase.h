@@ -286,7 +286,7 @@ inline std::string TestCase::toString()
 		{\
 			thrown = true; \
 		} \
-		this->assertImplementation(!thrown, "Excpected no throw the exception in statement: "s + (#statement), \
+		this->assertImplementation(!thrown, "Excpected no throw the exception in statement: " (#statement), \
 									__LINE__, __FILE__);\
 	} \
 	)

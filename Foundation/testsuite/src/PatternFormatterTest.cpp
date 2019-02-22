@@ -98,15 +98,8 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.setProperty("priorityNames", "FAT, CRI, ERR, WRN, NTC, INF, DBG, TRC");
 	fmt.format(msg, result);
 	assertTrue (result == "ERR");
-	
-	try
-	{
-		fmt.setProperty("priorityNames", "FAT, CRI,");
-		fail("invalid value, must throw");
-	}
-	catch (Poco::SyntaxException&)
-	{
-	}
+
+	assertThrow(fmt.setProperty("priorityNames", "FAT, CRI,"), Poco::SyntaxException);
 }
 
 

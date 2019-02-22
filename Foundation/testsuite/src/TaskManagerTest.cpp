@@ -570,19 +570,7 @@ void TaskManagerTest::testCustomThreadPool()
 	assertTrue (tm.count() == tp.allocated());
 
 	// the next one should fail
-	try
-	{
-		tm.start(new SimpleTask);
-		failmsg("thread pool exhausted - must throw exception");
-	}
-	catch (NoThreadAvailableException const&)
-	{
-	}
-	catch (...)
-	{
-		failmsg("wrong exception thrown");
-	}
-
+	assertThrow(tm.start(new SimpleTask), NoThreadAvailableException);
 	assertTrue (tm.count() == tp.allocated());
 	
 	tp.joinAll();

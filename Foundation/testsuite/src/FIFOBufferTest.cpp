@@ -151,21 +151,8 @@ void FIFOBufferTest::testEOFAndError()
 	assertTrue (5 == f.used());
 	f.setError();
 	assertTrue (0 == f.write(b));
-	
-	try
-	{
-		f.copy(b.begin(), 5);
-		fail ("must throw InvalidAccessException");
-	}
-	catch (InvalidAccessException&) { }
-
-	try
-	{
-		f.advance(5);
-		fail ("must throw InvalidAccessException");
-	}
-	catch (InvalidAccessException&) { }
-	
+	assertThrow(f.copy(b.begin(), 5), InvalidAccessException);
+	assertThrow(f.advance(5), InvalidAccessException);
 	assertTrue (1 == _notToWritable);
 	assertTrue (2 == _writableToNot);
 	assertTrue (2 == _notToReadable);
@@ -237,8 +224,7 @@ void FIFOBufferTest::testChar()
 	assertTrue ('7' == f[2]);
 	assertTrue ('8' == f[3]);
 	assertTrue ('9' == f[4]);
-	try { T i = f[10]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[10], InvalidAccessException);
 
 	v.clear();
 	for (T c = 'a'; c < 'a' + 10; ++c)
@@ -265,8 +251,7 @@ void FIFOBufferTest::testChar()
 	assertTrue ('h' == f[12]);
 	assertTrue ('i' == f[13]);
 	assertTrue ('j' == f[14]);
-	try { T i = f[15]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[15], InvalidAccessException);
 
 	f.read(b, 10);
 	assertTrue (20 == f.size());
@@ -277,8 +262,7 @@ void FIFOBufferTest::testChar()
 	assertTrue ('h' == f[2]);
 	assertTrue ('i' == f[3]);
 	assertTrue ('j' == f[4]);
-	try { T i = f[5]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[5], InvalidAccessException);
 
 	assertTrue (1 == _notToReadable);
 	assertTrue (0 == _readableToNot);
@@ -293,8 +277,7 @@ void FIFOBufferTest::testChar()
 	assertTrue (5 == b.size());
 	assertTrue (20 == f.size());
 	assertTrue (0 == f.used());
-	try { T i = f[0]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[0], InvalidAccessException);
 	assertTrue (f.isEmpty());
 
 	assertTrue (1 == _notToReadable);
@@ -456,11 +439,7 @@ void FIFOBufferTest::testChar()
 	assertTrue (1 == _writableToNot);
 
 	const char arr[3] = {'4', '5', '6' };
-	try
-	{
-		f.copy(&arr[0], 8);
-		fail("must fail");
-	} catch (InvalidAccessException&) { }
+	assertThrow(f.copy(&arr[0], 8), InvalidAccessException);
 
 	f.copy(&arr[0], 3);
 	assertTrue (7 == _notToReadable);
@@ -483,11 +462,7 @@ void FIFOBufferTest::testChar()
 	assertTrue (10 == f.used());
 	assertTrue (0 == f.available());
 
-	try
-	{
-		f.copy(&arr[0], 1);
-		fail("must fail");
-	} catch (InvalidAccessException&) { }
+	assertThrow(f.copy(&arr[0], 1), InvalidAccessException);
 
 	f.drain(1);
 	assertTrue (7 == _notToReadable);
@@ -564,8 +539,7 @@ void FIFOBufferTest::testInt()
 	assertTrue (7 == f[2]);
 	assertTrue (8 == f[3]);
 	assertTrue (9 == f[4]);
-	try { T i = f[10]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[10], InvalidAccessException);
 
 	v.clear();
 	for (T c = 10; c < 20; ++c)
@@ -592,8 +566,7 @@ void FIFOBufferTest::testInt()
 	assertTrue (17 == f[12]);
 	assertTrue (18 == f[13]);
 	assertTrue (19 == f[14]);
-	try { T i = f[15]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[15], InvalidAccessException);
 
 	f.read(b, 10);
 	assertTrue (20 == f.size());
@@ -604,15 +577,13 @@ void FIFOBufferTest::testInt()
 	assertTrue (17 == f[2]);
 	assertTrue (18 == f[3]);
 	assertTrue (19 == f[4]);
-	try { T i = f[5]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[5], InvalidAccessException);
 
 	f.read(b, 6);
 	assertTrue (5 == b.size());
 	assertTrue (20 == f.size());
 	assertTrue (0 == f.used());
-	try { T i = f[0]; fail ("must fail"); }
-	catch (InvalidAccessException&) { }
+	assertThrow(T i = f[0], InvalidAccessException);
 
 	assertTrue (f.isEmpty());
 

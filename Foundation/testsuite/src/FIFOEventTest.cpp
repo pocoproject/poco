@@ -208,15 +208,10 @@ void FIFOEventTest::testFIFOOrder()
 	Simple += delegate(&o2, &DummyDelegate::onSimple2);
 	Simple += delegate(&o1, &DummyDelegate::onSimple);
 
-	try
-	{
+	assertThrow({
 		tmp = 0;
 		Simple.notify(this, tmp);
-		failmsg ("Notify should not work");
-	}
-	catch (Poco::InvalidArgumentException&)
-	{
-	}
+	}, Poco::InvalidArgumentException);
 }
 
 void FIFOEventTest::testFIFOOrderExpire()
@@ -256,17 +251,10 @@ void FIFOEventTest::testFIFOOrderExpire()
 	Simple += delegate(&o2, &DummyDelegate::onSimple2, 5000);
 	Simple += delegate(&o1, &DummyDelegate::onSimple);
 	
-	try
-	{
+	assertThrow({
 		tmp = 0;
 		Simple.notify(this, tmp);
-		failmsg ("Notify should not work");
-	}
-	catch (Poco::InvalidArgumentException&)
-	{
-		
-	}
-
+	}, Poco::InvalidArgumentException);
 }
 
 void FIFOEventTest::testExpire()

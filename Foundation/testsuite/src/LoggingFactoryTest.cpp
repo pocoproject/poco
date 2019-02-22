@@ -96,27 +96,11 @@ void LoggingFactoryTest::testBuiltins()
 
 	Channel::Ptr pSplitterChannel = fact.createChannel("SplitterChannel");
 	assertTrue (!pSplitterChannel.cast<SplitterChannel>().isNull());
-
-	try
-	{
-		Channel::Ptr pUnknownChannel = fact.createChannel("UnknownChannel");
-		fail("unknown class - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	assertThrow(Channel::Ptr pUnknownChannel = fact.createChannel("UnknownChannel"), Poco::NotFoundException);
 
 	Formatter::Ptr pPatternFormatter = fact.createFormatter("PatternFormatter");
 	assertTrue (!pPatternFormatter.isNull());
-
-	try
-	{
-		Formatter::Ptr pUnknownFormatter = fact.createFormatter("UnknownFormatter");
-		fail("unknown class - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	assertThrow(Formatter::Ptr pUnknownFormatter = fact.createFormatter("UnknownFormatter"), Poco::NotFoundException);
 }
 
 

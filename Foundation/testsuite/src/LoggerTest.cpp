@@ -146,22 +146,8 @@ void LoggerTest::testLogger()
 	assertTrue (root.getLevel() == Message::PRIO_FATAL);
 	root.setLevel("8");
 	assertTrue (root.getLevel() == Message::PRIO_TRACE);
-	try
-	{
-		root.setLevel("0");
-		assertTrue (0);
-	}
-	catch(Poco::InvalidArgumentException&)
-	{
-	}
-	try
-	{
-		root.setLevel("9");
-		assertTrue (0);
-	}
-	catch(Poco::InvalidArgumentException&)
-	{
-	}
+	assertThrow(root.setLevel("0"), Poco::InvalidArgumentException);
+	assertThrow(root.setLevel("9"), Poco::InvalidArgumentException);
 }
 
 

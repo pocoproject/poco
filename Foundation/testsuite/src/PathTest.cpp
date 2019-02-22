@@ -828,25 +828,10 @@ void PathTest::testParseWindows4()
 	assertTrue (p.isDirectory());
 	assertTrue (!p.isFile());
 	assertTrue (p.toString(Path::PATH_WINDOWS) == "c:\\WinNT\\");
-	
-	try
-	{
-		p.parse("~:\\", Path::PATH_WINDOWS);
-		fail("bad path - must throw exception");
-	}
-	catch (PathSyntaxException&)
-	{
-	}
-	
-	try
-	{
-		p.parse("c:file.txt", Path::PATH_WINDOWS);
-		fail("bad path - must throw exception");
-	}
-	catch (PathSyntaxException&)
-	{
-	}
-	
+
+	assertThrow(p.parse("~:\\", Path::PATH_WINDOWS), PathSyntaxException);
+	assertThrow(p.parse("c:file.txt", Path::PATH_WINDOWS), PathSyntaxException);
+
 	p.parse("a\\b\\c\\d", Path::PATH_WINDOWS);
 	assertTrue (p.isRelative());
 	assertTrue (!p.isAbsolute());
@@ -988,25 +973,10 @@ void PathTest::testParseVMS2()
 	assertTrue (p.isDirectory());
 	assertTrue (!p.isFile());
 	assertTrue (p.toString(Path::PATH_VMS) == "[foo.bar.foo]");
-	
-	try
-	{
-		p.parse("[foo.bar][.foo]", Path::PATH_VMS);
-		failmsg("bad path - must throw exception");
-	}
-	catch (PathSyntaxException&)
-	{
-	}
 
-	try
-	{
-		p.parse("[.foo.bar][foo]", Path::PATH_VMS);
-		failmsg("bad path - must throw exception");
-	}
-	catch (PathSyntaxException&)
-	{
-	}
-	
+	assertThrow(p.parse("[foo.bar][.foo]", Path::PATH_VMS), PathSyntaxException);
+	assertThrow(p.parse("[.foo.bar][foo]", Path::PATH_VMS), PathSyntaxException);
+
 	p.parse("[-]", Path::PATH_VMS);
 	assertTrue (p.isRelative());
 	assertTrue (!p.isAbsolute());
@@ -1491,34 +1461,10 @@ void PathTest::testRobustness()
 			char c = r.nextChar();
 			if (c != 0) s += c;
 		}
-		try
-		{
-			Path p(s, Path::PATH_WINDOWS);
-		}
-		catch (PathSyntaxException&)
-		{
-		}
-		try
-		{
-			Path p(s, Path::PATH_UNIX);
-		}
-		catch (PathSyntaxException&)
-		{
-		}
-		try
-		{
-			Path p(s, Path::PATH_VMS);
-		}
-		catch (PathSyntaxException&)
-		{
-		}
-		try
-		{
-			Path p(s, Path::PATH_GUESS);
-		}
-		catch (PathSyntaxException&)
-		{
-		}
+		assertThrow(Path p(s, Path::PATH_WINDOWS), PathSyntaxException);
+		assertThrow(Path p(s, Path::PATH_UNIX), PathSyntaxException);
+		assertThrow(Path p(s, Path::PATH_VMS), PathSyntaxException);
+		assertThrow(Path p(s, Path::PATH_GUESS), PathSyntaxException);
 	}
 }
 

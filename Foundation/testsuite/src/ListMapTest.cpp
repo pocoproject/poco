@@ -218,16 +218,11 @@ void ListMapTest::testIntIndex()
 	assertTrue (hm[1] == 2);
 	assertTrue (hm[2] == 4);
 	assertTrue (hm[3] == 6);
-	
-	try
-	{
+
+	assertThrow({
 		const IntMap& im = hm;
 		int x = im[4];
-		fail("no such key - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	}, Poco::NotFoundException);
 }
 
 
@@ -245,15 +240,10 @@ void ListMapTest::testStringIndex()
 	assertTrue (hm["Index2"] == "value4");
 	assertTrue (hm["inDeX3"] == "value6");
 	
-	try
-	{
+	assertThrow({
 		const StringMap& im = hm;
 		std::string x = im["index4"];
-		fail("no such key - must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	}, Poco::NotFoundException);
 }
 
 

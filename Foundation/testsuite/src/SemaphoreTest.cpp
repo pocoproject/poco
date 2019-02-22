@@ -83,18 +83,8 @@ void SemaphoreTest::testInitZero()
 	assertTrue (!r.tryWait(10));
 	r.set();
 	r.wait();
-	try
-	{
-		r.wait(100);
-		failmsg("must timeout");
-	}
-	catch (TimeoutException&)
-	{
-	}
-	catch (...)
-	{
-		failmsg("wrong exception");
-	}
+	assertThrow(r.wait(100), TimeoutException); // must timeout
+
 	r.set();
 	r.set();
 	assertTrue (r.tryWait(0));

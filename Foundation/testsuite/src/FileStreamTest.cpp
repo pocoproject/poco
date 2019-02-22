@@ -114,15 +114,8 @@ void FileStreamTest::testOpenModeIn()
 	Poco::File f("nonexistent.txt");
 	if (f.exists())
 		f.remove();
-	
-	try
-	{	
-		Poco::FileInputStream istr("nonexistent.txt");
-		fail("nonexistent file - must throw");
-	}
-	catch (Poco::Exception&)
-	{
-	}
+
+	assertThrow(Poco::FileInputStream istr("nonexistent.txt");, Poco::Exception);
 
 	f.createFile();
 	Poco::FileInputStream istr("nonexistent.txt");

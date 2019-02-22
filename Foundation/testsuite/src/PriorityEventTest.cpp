@@ -249,15 +249,11 @@ void PriorityEventTest::testPriorityOrder()
 	Simple += PriorityDelegate<DummyDelegate, int>(&o2, &DummyDelegate::onSimple2, 0);
 	Simple += PriorityDelegate<DummyDelegate, int>(&o1, &DummyDelegate::onSimple, 1);
 
-	try
-	{
+	//Notify should not work
+	assertThrow({
 		tmp = 0;
 		Simple.notify(this, tmp);
-		failmsg ("Notify should not work");
-	}
-	catch (Poco::InvalidArgumentException&)
-	{
-	}
+	}, Poco::InvalidArgumentException);
 
 	Simple -= PriorityDelegate<DummyDelegate, int>(&o2, &DummyDelegate::onSimple2, 0);
 	Simple -= PriorityDelegate<DummyDelegate, int>(&o1, &DummyDelegate::onSimple, 1);
@@ -301,15 +297,11 @@ void PriorityEventTest::testPriorityOrderExpire()
 	Simple += priorityDelegate(&o2, &DummyDelegate::onSimple2, 0, 500000);
 	Simple += priorityDelegate(&o1, &DummyDelegate::onSimple, 1);
 
-	try
-	{
+	// Notify should not work
+	assertThrow({
 		tmp = 0;
 		Simple.notify(this, tmp);
-		failmsg ("Notify should not work");
-	}
-	catch (Poco::InvalidArgumentException&)
-	{
-	}
+	}, Poco::InvalidArgumentException);
 
 	Simple -= priorityDelegate(&o2, &DummyDelegate::onSimple2, 0, 500000);
 	Simple -= priorityDelegate(&o1, &DummyDelegate::onSimple, 1);
