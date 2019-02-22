@@ -15,7 +15,6 @@
 
 
 using Poco::Timespan;
-using namespace std::chrono_literals;
 
 
 TimespanTest::TimespanTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -72,7 +71,7 @@ void TimespanTest::testConversions()
 	assertTrue (ts.hours() == 12);
 	assertTrue (ts.days() == 1);
 
-	ts.assign(1h);
+	ts.assign(std::chrono::hours(1));
 	assertTrue(ts.hours() == 1);
 	assertTrue(ts.minutes() == 0);
 }
