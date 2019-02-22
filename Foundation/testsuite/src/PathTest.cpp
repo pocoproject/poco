@@ -1461,10 +1461,34 @@ void PathTest::testRobustness()
 			char c = r.nextChar();
 			if (c != 0) s += c;
 		}
-		assertThrow(Path p(s, Path::PATH_WINDOWS), PathSyntaxException);
-		assertThrow(Path p(s, Path::PATH_UNIX), PathSyntaxException);
-		assertThrow(Path p(s, Path::PATH_VMS), PathSyntaxException);
-		assertThrow(Path p(s, Path::PATH_GUESS), PathSyntaxException);
+		try
+		{
+			Path p(s, Path::PATH_WINDOWS);
+		}
+		catch (PathSyntaxException&)
+		{
+		}
+		try
+		{
+			Path p(s, Path::PATH_UNIX);
+		}
+		catch (PathSyntaxException&)
+		{
+		}
+		try
+		{
+			Path p(s, Path::PATH_VMS);
+		}
+		catch (PathSyntaxException&)
+		{
+		}
+		try
+		{
+			Path p(s, Path::PATH_GUESS);
+		}
+		catch (PathSyntaxException&)
+		{
+		}
 	}
 }
 
