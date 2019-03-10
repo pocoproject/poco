@@ -165,7 +165,7 @@ void HTTPClientSession::setProxyUsername(const std::string& username)
 {
 	_proxyConfig.username = username;
 }
-	
+
 
 void HTTPClientSession::setProxyPassword(const std::string& password)
 {
@@ -193,8 +193,9 @@ void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 
 std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
-	clearException();
+	_pRequestStream = 0;
 	_pResponseStream = 0;
+	clearException();
 	_responseReceived = false;
 
 	bool keepAlive = getKeepAlive();
@@ -247,7 +248,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		{
 			_pRequestStream = new HTTPOutputStream(*this);
 			request.write(*_pRequestStream);
-		}	
+		}
 		_lastRequest.update();
 		return *_pRequestStream;
 	}
@@ -301,7 +302,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 #endif
 	else
 		_pResponseStream = new HTTPInputStream(*this);
-		
+
 	return *_pResponseStream;
 }
 
@@ -354,13 +355,14 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 		_reconnect = false;
 		return rc;
 	}
-	catch (NetException&)
+	catch (IOException&)
 	{
 		if (_reconnect)
 		{
 			close();
 			reconnect();
 			int rc = HTTPSession::write(buffer, length);
+			clearException();
 			_reconnect = false;
 			return rc;
 		}

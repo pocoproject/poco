@@ -113,7 +113,7 @@ namespace
 			(dir == DIR_ENCRYPT) ? 1 : 0);
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -161,7 +161,7 @@ namespace
 	std::string CryptoTransformImpl::getTag(std::size_t tagSize)
 	{
 		std::string tag;
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		Poco::Buffer<char> buffer(tagSize);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_GET_TAG, tagSize, buffer.begin());
@@ -179,7 +179,7 @@ namespace
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_TAG, tag.size(), const_cast<char*>(tag.data()));
-#elif OPENSSL_VERSION_NUMBER >= 0x10000000L
+#elif OPENSSL_VERSION_NUMBER >= 0x10001000L
 		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_TAG, tag.size(), const_cast<char*>(tag.data()));
 #else
 		int rc = 0;
