@@ -193,9 +193,31 @@ void ParserImpl::handle()
 				{
 					Poco::Int64 val;
 					if (NumberParser::tryParse64(str, val))
-						_pHandler->value(val);
+					{
+						// if number is 32-bit, then handle as such
+						if (val > std::numeric_limits<int>::max()
+						 || val < std::numeric_limits<int>::min())
+						{
+							_pHandler->value(val);
+						}
+						else
+						{
+							_pHandler->value(static_cast<int>(val));
+						}
+					}
 					else
-						_pHandler->value(NumberParser::parseUnsigned64(str));
+					{
+						UInt64 uval = NumberParser::parseUnsigned64(str);
+						// if number is 32-bit, then handle as such
+						if (uval > std::numeric_limits<unsigned>::max())
+						{
+							_pHandler->value(uval);
+						}
+						else
+						{
+							_pHandler->value(static_cast<unsigned>(uval));
+						}
+					}
 				}
 			}
 			break;
@@ -233,7 +255,6 @@ bool ParserImpl::checkError()
 	if (err) throw Poco::JSON::JSONException(err);
 	return true;
 }
-
 
 
 } } // namespace Poco::JSON

@@ -25,6 +25,7 @@
 #include "Poco/JSON/PrintHandler.h"
 #include "Poco/JSON/Template.h"
 #include <sstream>
+#include <typeinfo>
 
 
 class JSONTest: public CppUnit::TestCase
@@ -116,6 +117,7 @@ private:
 		assertTrue (test.isNumeric());
 		T value = test;
 		assertTrue (value == number);
+		assertTrue (test.type().hash_code() != typeid(Poco::Int64).hash_code());
 
 		Poco::DynamicStruct ds = *object;
 		assertTrue (!ds["test"].isEmpty());
