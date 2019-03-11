@@ -846,6 +846,12 @@ subprojects {
 			}
 			withType(NativeExecutableBinarySpec) {
 				if (toolChain in VisualCpp) {
+/*
+					println "TOOLCHAIN     =" + toolChain
+					println "TOOLCHAIN URCT=" + toolChain.ucrtDir
+					println "TOOLCHAIN INST=" + toolChain.installDir
+					println "TOOLCHAIN WSDK=" + toolChain.windowsSdkDir
+*/
 					if (buildType == buildTypes.debug) {
 						cCompiler.args "/MDd"
 						cppCompiler.args "/MDd"
@@ -899,22 +905,58 @@ tasks.withType(CppCompile) {
 }
 
 task PocoDocIni {
+	def String includes = "-I${postgres32Home}/include"
+	includes += ",-I${mysql32Home}/include"
+	includes += ",-ICppParser/include"
+	includes += ",-ICppUnit/include"
+	includes += ",-ICrypto/include"
+	includes += ",-IEncodings/include"
+	includes += ",-IData/include"
+	includes += ",-IData/include"
+	includes += ",-IData/MySQL/include"
+	includes += ",-IData/ODBC/include"
+	includes += ",-IData/PostgreSQL/include"
+	includes += ",-IData/SQLite/include"
+	includes += ",-IData/SQLite/src"
+	includes += ",-IFoundation/include"
+	includes += ",-IJSON/include"
+	includes += ",-IMongoDB/include"
+	includes += ",-INet/include"
+	includes += ",-INetSSL_OpenSSL/include"
+	includes += ",-INetSSL_Win/include"
+	includes += ",-IRedis/include"
+	includes += ",-IUtil/include"
+	includes += ",-IXML/include"
+	includes += ",-IZip/include"
+	includes += ",-ISevenZip/include"
+	includes += ",-IPDF/include"
+
     def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
     file.createNewFile()
-    file.text = """
+	file.text = "Includes=${includes}"
+    file.text += """
 PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-${version}-all-doc
 PocoDoc.version=${version}-all
 """
 	if (os.windows) {
+		def String VCHome  = VCHome + "\\Tools\\MSVC\\$VCSerial"
+		def String CLPath  = VCHome + "\\bin\\Hostx86\\x86"
 		def	String javaVCH = VCHome.replace('\\','/')
 		def	String javaCLP = CLPath.replace('\\','/')
 		def	String javaWDK = WDKHome + "/Include/" + WDKVers
 		javaWDK = javaWDK.replace('\\','/')
 		
- 		file.text += """
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IEncodings/include,-IData/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
+/*
+		if (toolChain in VisualCpp) {
+			println "TOOLCHAIN     =" + toolChain
+			println "TOOLCHAIN URCT=" + toolChain.ucrtDir
+			println "TOOLCHAIN INST=" + toolChain.installDir
+			println "TOOLCHAIN WSDK=" + toolChain.windowsSdkDir
+		}
+*/
+		file.text += """
 VCH=${javaVCH}
 WDK=${javaWDK}
 CLP=${javaCLP}
@@ -926,7 +968,7 @@ task pocoDoc(type: Exec) {
 	dependsOn ':PocoDoc::assemble'
 	dependsOn PocoDocIni
 	if (os.windows) {
-		environment "Path", "$rootDir\\bin;$environment.Path"
+		environment "Path", "$rootDir\\bin;$environment.Path"
 		println environment.Path
 		
 		executable "PocoDoc/bin/PocoDoc.exe"
