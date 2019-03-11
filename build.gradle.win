@@ -931,15 +931,12 @@ task PocoDocIni {
 	includes += ",-ISevenZip/include"
 	includes += ",-IPDF/include"
 
-    def file = new File("$rootDir/PocoDoc/PocoDoc.ini")
-    file.createNewFile()
-	file.text = "Includes=${includes}"
-    file.text += """
-PocoBuild=$rootDir
-PocoBase=$rootDir
-PocoDoc.output=releases/poco-${version}-all-doc
-PocoDoc.version=${version}-all
-"""
+    def file = new File("$rootDir/PocoDoc/PocoDoc.ini");file.createNewFile()
+	file << "Includes=${includes}"
+    file << '\n' << "PocoBuild=$rootDir"
+    file << '\n' << "PocoBase=$rootDir"
+    file << '\n' << "PocoDoc.output=releases/poco-${version}-all-doc"
+    file << '\n' << "PocoDoc.version=${version}-all"
 	if (os.windows) {
 		def String VCHome  = VCHome + "\\Tools\\MSVC\\$VCSerial"
 		def String CLPath  = VCHome + "\\bin\\Hostx86\\x86"
@@ -956,11 +953,9 @@ PocoDoc.version=${version}-all
 			println "TOOLCHAIN WSDK=" + toolChain.windowsSdkDir
 		}
 */
-		file.text += """
-VCH=${javaVCH}
-WDK=${javaWDK}
-CLP=${javaCLP}
-"""
+		file << '\n' << "VCH=${javaVCH}"
+		file << '\n' << "WDK=${javaWDK}"
+		file << '\n' << "CLP=${javaCLP}"
 	} else {
 	}
 }
