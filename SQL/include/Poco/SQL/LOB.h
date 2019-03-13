@@ -1,8 +1,8 @@
 //
 // LOB.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  LOB
 //
 // Definition of the LOB class.

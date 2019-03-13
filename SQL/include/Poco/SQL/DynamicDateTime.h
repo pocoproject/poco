@@ -1,8 +1,8 @@
 //
 // DynamicDateTime.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  DynamicDateTime
 //
 // Definition of the Date and Time cast operators for Poco::Dynamic::Var.

@@ -1,7 +1,7 @@
 //
 // ArchiveStrategy.cpp
 //
-// Library: Data
+// Library: SQL
 // Package: Logging
 // Module:  ArchiveStrategy
 //

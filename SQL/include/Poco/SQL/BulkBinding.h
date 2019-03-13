@@ -1,8 +1,8 @@
 //
 // BulkBinding.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  BulkBinding
 //
 // Definition of the BulkBinding class.

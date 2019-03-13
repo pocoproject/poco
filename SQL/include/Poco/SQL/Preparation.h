@@ -1,8 +1,8 @@
 //
 // Preparation.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Preparation
 //
 // Definition of the Preparation class.

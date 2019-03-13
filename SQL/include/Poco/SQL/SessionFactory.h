@@ -1,8 +1,8 @@
 //
 // SessionFactory.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  SessionFactory
 //
 // Definition of the SessionFactory class.

@@ -1,8 +1,8 @@
 //
 // Date.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Date
 //
 // Definition of the Date class.

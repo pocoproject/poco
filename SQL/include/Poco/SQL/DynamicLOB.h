@@ -1,8 +1,8 @@
 //
 // DynamicLOB.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  DynamicLOB
 //
 // Definition of the Poco::Dynamic::Var LOB cast operators.
