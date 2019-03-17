@@ -37,7 +37,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashSetTest HashMapTest SharedMemoryTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
-	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest \
+	MemoryStreamTest DataURIStreamTest ObjectPoolTest DirectoryWatcherTest \
 	DirectoryIteratorsTest FIFOBufferTestSuite FIFOBufferTest
 
 target         = testrunner

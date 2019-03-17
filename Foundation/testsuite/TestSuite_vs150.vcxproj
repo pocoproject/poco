@@ -325,6 +325,7 @@
     <ClCompile Include="src\CoreTestSuite.cpp"/>
     <ClCompile Include="src\CountingStreamTest.cpp"/>
     <ClCompile Include="src\CryptTestSuite.cpp"/>
+    <ClCompile Include="src\DataURIStreamTest.cpp"/>
     <ClCompile Include="src\DateTimeFormatterTest.cpp"/>
     <ClCompile Include="src\DateTimeParserTest.cpp"/>
     <ClCompile Include="src\DateTimeTest.cpp"/>
@@ -470,6 +471,7 @@
     <ClInclude Include="src\CoreTestSuite.h"/>
     <ClInclude Include="src\CountingStreamTest.h"/>
     <ClInclude Include="src\CryptTestSuite.h"/>
+    <ClInclude Include="src\DataURIStreamTest.h"/>
     <ClInclude Include="src\DateTimeFormatterTest.h"/>
     <ClInclude Include="src\DateTimeParserTest.h"/>
     <ClInclude Include="src\DateTimeTest.h"/>

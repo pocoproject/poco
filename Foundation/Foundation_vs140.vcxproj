@@ -317,6 +317,8 @@
     <ClCompile Include="src\ConsoleChannel.cpp" />
     <ClCompile Include="src\CountingStream.cpp" />
     <ClCompile Include="src\crc32.c" />
+    <ClCompile Include="src\DataURIStream.cpp" />
+    <ClCompile Include="src\DataURIStreamFactory.cpp" />
     <ClCompile Include="src\DateTime.cpp" />
     <ClCompile Include="src\DateTimeFormat.cpp" />
     <ClCompile Include="src\DateTimeFormatter.cpp" />
@@ -907,6 +909,8 @@
     <ClInclude Include="include\Poco\Configurable.h" />
     <ClInclude Include="include\Poco\ConsoleChannel.h" />
     <ClInclude Include="include\Poco\CountingStream.h" />
+    <ClInclude Include="include\Poco\DataURIStream.h" />
+    <ClInclude Include="include\Poco\DataURIStreamFactory.h" />
     <ClInclude Include="include\Poco\DateTime.h" />
     <ClInclude Include="include\Poco\DateTimeFormat.h" />
     <ClInclude Include="include\Poco\DateTimeFormatter.h" />

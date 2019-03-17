@@ -300,6 +300,9 @@
     <ClCompile Include="src\CountingStream.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DataURIStream.cpp">
+      <Filter>Streams\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\DeflatingStream.cpp">
       <Filter>Streams\Source Files</Filter>
     </ClCompile>
@@ -849,6 +852,9 @@
     <ClCompile Include="src\Windows1252Encoding.cpp">
       <Filter>Text\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DataURIStreamFactory.cpp">
+      <Filter>URI\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\FileStreamFactory.cpp">
       <Filter>URI\Source Files</Filter>
     </ClCompile>
@@ -1095,6 +1101,9 @@
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\CountingStream.h">
+      <Filter>Streams\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DataURIStream.h">
       <Filter>Streams\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\DeflatingStream.h">
@@ -1642,6 +1651,9 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Windows1252Encoding.h">
       <Filter>Text\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DataURIStreamFactory.h">
+      <Filter>URI\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\FileStreamFactory.h">
       <Filter>URI\Header Files</Filter>
