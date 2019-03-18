@@ -169,7 +169,7 @@ void HTTPNTLMCredentials::splitUsername(const std::string& usernameAndDomain, st
 	if (pos != std::string::npos)
 	{
 		domain.assign(usernameAndDomain, 0, pos);
-		username.assign(usernameAndDomain, pos + 1);
+		username.assign(usernameAndDomain, pos + 1, std::string::npos);
 		return;
 	}
 	else
@@ -178,7 +178,7 @@ void HTTPNTLMCredentials::splitUsername(const std::string& usernameAndDomain, st
 		if (pos != std::string::npos)
 		{
 			username.assign(usernameAndDomain, 0, pos);
-			domain.assign(usernameAndDomain, pos + 1);
+			domain.assign(usernameAndDomain, pos + 1, std::string::npos);
 			return;
 		}
 	}
