@@ -91,7 +91,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">TestSuited</TargetName>
@@ -343,6 +343,7 @@
     <ClInclude Include="src\HTTPResponseTest.h"/>
     <ClInclude Include="src\HTTPTestServer.h"/>
     <ClInclude Include="src\HTTPTestSuite.h"/>
+    <ClInclude Include="src\NTLMCredentialsTest.h"/>
     <ClInclude Include="src\TCPServerTest.h"/>
     <ClInclude Include="src\TCPServerTestSuite.h"/>
     <ClInclude Include="src\HTTPServerTest.h"/>
@@ -409,6 +410,7 @@
     <ClCompile Include="src\HTTPResponseTest.cpp"/>
     <ClCompile Include="src\HTTPTestServer.cpp"/>
     <ClCompile Include="src\HTTPTestSuite.cpp"/>
+    <ClCompile Include="src\NTLMCredentialsTest.cpp"/>
     <ClCompile Include="src\TCPServerTest.cpp"/>
     <ClCompile Include="src\TCPServerTestSuite.cpp"/>
     <ClCompile Include="src\HTTPServerTest.cpp"/>

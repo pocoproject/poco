@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
+    <_ProjectFileVersion>14.0.25420.1</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">TestSuited</TargetName>
@@ -343,6 +343,7 @@
     <ClInclude Include="src\NetCoreTestSuite.h"/>
     <ClInclude Include="src\NetTestSuite.h"/>
     <ClInclude Include="src\NetworkInterfaceTest.h"/>
+    <ClInclude Include="src\NTLMCredentialsTest.h"/>
     <ClInclude Include="src\NTPClientTest.h"/>
     <ClInclude Include="src\NTPClientTestSuite.h"/>
     <ClInclude Include="src\OAuth10CredentialsTest.h"/>
@@ -409,6 +410,7 @@
     <ClCompile Include="src\NetCoreTestSuite.cpp"/>
     <ClCompile Include="src\NetTestSuite.cpp"/>
     <ClCompile Include="src\NetworkInterfaceTest.cpp"/>
+    <ClCompile Include="src\NTLMCredentialsTest.cpp"/>
     <ClCompile Include="src\NTPClientTest.cpp"/>
     <ClCompile Include="src\NTPClientTestSuite.cpp"/>
     <ClCompile Include="src\OAuth10CredentialsTest.cpp"/>

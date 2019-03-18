@@ -343,6 +343,7 @@
     <ClInclude Include="src\HTTPResponseTest.h"/>
     <ClInclude Include="src\HTTPTestServer.h"/>
     <ClInclude Include="src\HTTPTestSuite.h"/>
+    <ClInclude Include="src\NTLMCredentialsTest.h"/>
     <ClInclude Include="src\TCPServerTest.h"/>
     <ClInclude Include="src\TCPServerTestSuite.h"/>
     <ClInclude Include="src\HTTPServerTest.h"/>
@@ -409,6 +410,7 @@
     <ClCompile Include="src\HTTPResponseTest.cpp"/>
     <ClCompile Include="src\HTTPTestServer.cpp"/>
     <ClCompile Include="src\HTTPTestSuite.cpp"/>
+    <ClCompile Include="src\NTLMCredentialsTest.cpp"/>
     <ClCompile Include="src\TCPServerTest.cpp"/>
     <ClCompile Include="src\TCPServerTestSuite.cpp"/>
     <ClCompile Include="src\HTTPServerTest.cpp"/>
