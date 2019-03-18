@@ -27,7 +27,8 @@ objects = \
 	WebSocketTest WebSocketTestSuite \
 	SyslogTest \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
-	PollSetTest UDPServerTest UDPServerTestSuite
+	PollSetTest UDPServerTest UDPServerTestSuite \
+	NTLMCredentialsTest
 
 target         = testrunner
 target_version = 1

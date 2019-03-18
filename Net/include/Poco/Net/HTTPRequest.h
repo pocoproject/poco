@@ -38,19 +38,25 @@ class Net_API HTTPRequest: public HTTPMessage
 public:
 	HTTPRequest();
 		/// Creates a GET / HTTP/1.0 HTTP request.
-		
-	HTTPRequest(const std::string& version);
+
+	explicit HTTPRequest(const std::string& version);
 		/// Creates a GET / HTTP/1.x request with
 		/// the given version (HTTP/1.0 or HTTP/1.1).
-		
+
 	HTTPRequest(const std::string& method, const std::string& uri);
 		/// Creates a HTTP/1.0 request with the given method and URI.
 
 	HTTPRequest(const std::string& method, const std::string& uri, const std::string& version);
 		/// Creates a HTTP request with the given method, URI and version.
 
+	HTTPRequest(const HTTPRequest& other);
+		/// Creates a HTTP request by copying another one.
+
 	virtual ~HTTPRequest();
 		/// Destroys the HTTPRequest.
+
+	HTTPRequest& operator = (const HTTPRequest&);
+		/// Assignment operator.
 
 	void setMethod(const std::string& method);
 		/// Sets the method.
@@ -60,20 +66,20 @@ public:
 
 	void setURI(const std::string& uri);
 		/// Sets the request URI.
-		
+
 	const std::string& getURI() const;
 		/// Returns the request URI.
-		
+
 	void setHost(const std::string& host);
 		/// Sets the value of the Host header field.
-		
+
 	void setHost(const std::string& host, Poco::UInt16 port);
 		/// Sets the value of the Host header field.
 		///
 		/// If the given port number is a non-standard
 		/// port number (other than 80 or 443), it is
 		/// included in the Host header field.
-		
+
 	const std::string& getHost() const;
 		/// Returns the value of the Host header field.
 		///
@@ -83,7 +89,7 @@ public:
 	void setCookies(const NameValueCollection& cookies);
 		/// Adds a Cookie header with the names and
 		/// values from cookies.
-		
+
 	void getCookies(NameValueCollection& cookies) const;
 		/// Fills cookies with the cookies extracted
 		/// from the Cookie headers in the request.
@@ -91,17 +97,20 @@ public:
 	bool hasCredentials() const;
 		/// Returns true iff the request contains authentication
 		/// information in the form of an Authorization header.
-		
+
 	void getCredentials(std::string& scheme, std::string& authInfo) const;
 		/// Returns the authentication scheme and additional authentication
 		/// information contained in this request.
 		///
 		/// Throws a NotAuthenticatedException if no authentication information
 		/// is contained in the request.
-		
+
 	void setCredentials(const std::string& scheme, const std::string& authInfo);
 		/// Sets the authentication scheme and information for
 		/// this request.
+
+	void removeCredentials();
+		/// Removes any credentials from the request.
 
 	bool getExpectContinue() const;
 		/// Returns true if the request contains an
@@ -110,21 +119,24 @@ public:
 	void setExpectContinue(bool expectContinue);
 		/// Adds a "Expect: 100-continue" header to the request if
 		/// expectContinue is true, otherwise removes the Expect header.
-		
+
 	bool hasProxyCredentials() const;
 		/// Returns true iff the request contains proxy authentication
 		/// information in the form of an Proxy-Authorization header.
-		
+
 	void getProxyCredentials(std::string& scheme, std::string& authInfo) const;
 		/// Returns the proxy authentication scheme and additional proxy authentication
 		/// information contained in this request.
 		///
 		/// Throws a NotAuthenticatedException if no proxy authentication information
 		/// is contained in the request.
-		
+
 	void setProxyCredentials(const std::string& scheme, const std::string& authInfo);
 		/// Sets the proxy authentication scheme and information for
 		/// this request.
+
+	void removeProxyCredentials();
+		/// Removes any proxy credentials from the request.
 
 	void write(std::ostream& ostr) const;
 		/// Writes the HTTP request to the given
@@ -133,7 +145,7 @@ public:
 	void read(std::istream& istr);
 		/// Reads the HTTP request from the
 		/// given input stream.
-		
+
 	static const std::string HTTP_GET;
 	static const std::string HTTP_HEAD;
 	static const std::string HTTP_PUT;
@@ -143,7 +155,7 @@ public:
 	static const std::string HTTP_TRACE;
 	static const std::string HTTP_CONNECT;
 	static const std::string HTTP_PATCH;
-	
+
 	static const std::string HOST;
 	static const std::string COOKIE;
 	static const std::string AUTHORIZATION;
@@ -158,7 +170,7 @@ protected:
 		///
 		/// Throws a NotAuthenticatedException if no authentication information
 		/// is contained in the request.
-		
+
 	void setCredentials(const std::string& header, const std::string& scheme, const std::string& authInfo);
 		/// Writes the authentication scheme and information for
 		/// this request to the given header.
@@ -170,12 +182,9 @@ private:
 		MAX_URI_LENGTH     = 16384,
 		MAX_VERSION_LENGTH = 8
 	};
-	
+
 	std::string _method;
 	std::string _uri;
-	
-	HTTPRequest(const HTTPRequest&);
-	HTTPRequest& operator = (const HTTPRequest&);
 };
 
 

@@ -39,22 +39,22 @@ class Net_API HTTPMessage: public MessageHeader
 public:
 	void setVersion(const std::string& version);
 		/// Sets the HTTP version for this message.
-		
+
 	const std::string& getVersion() const;
 		/// Returns the HTTP version for this message.
-		
+
 	void setContentLength(std::streamsize length);
 		/// Sets the Content-Length header.
 		///
 		/// If length is UNKNOWN_CONTENT_LENGTH, removes
 		/// the Content-Length header.
-		
+
 	std::streamsize getContentLength() const;
 		/// Returns the content length for this message,
 		/// which may be UNKNOWN_CONTENT_LENGTH if
 		/// no Content-Length header is present.
 
-#if defined(POCO_HAVE_INT64)	
+#if defined(POCO_HAVE_INT64)
 	void setContentLength64(Poco::Int64 length);
 		/// Sets the Content-Length header.
 		///
@@ -89,30 +89,30 @@ public:
 		/// Normally, this is the value of the Transfer-Encoding
 		/// header field. If no such field is present,
 		/// returns IDENTITY_TRANSFER_CODING.
-		
+
 	void setChunkedTransferEncoding(bool flag);
 		/// If flag is true, sets the Transfer-Encoding header to
 		/// chunked. Otherwise, removes the Transfer-Encoding
 		/// header.
-		
+
 	bool getChunkedTransferEncoding() const;
 		/// Returns true if the Transfer-Encoding header is set
 		/// and its value is chunked.
-		
+
 	void setContentType(const std::string& mediaType);
 		/// Sets the content type for this message.
 		///
 		/// Specify NO_CONTENT_TYPE to remove the
 		/// Content-Type header.
-		
-	void setContentType(const MediaType& mediaType);	
+
+	void setContentType(const MediaType& mediaType);
 		/// Sets the content type for this message.
-		
+
 	const std::string& getContentType() const;
 		/// Returns the content type for this message.
 		///
-		/// If no Content-Type header is present, 
-		/// returns UNKNOWN_CONTENT_TYPE.	
+		/// If no Content-Type header is present,
+		/// returns UNKNOWN_CONTENT_TYPE.
 
 	void setKeepAlive(bool keepAlive);
 		/// Sets the value of the Connection header field.
@@ -134,12 +134,13 @@ public:
 
 	static const int         UNKNOWN_CONTENT_LENGTH;
 	static const std::string UNKNOWN_CONTENT_TYPE;
-	
+
 	static const std::string CONTENT_LENGTH;
 	static const std::string CONTENT_TYPE;
 	static const std::string TRANSFER_ENCODING;
 	static const std::string CONNECTION;
-	
+	static const std::string PROXY_CONNECTION;
+
 	static const std::string CONNECTION_KEEP_ALIVE;
 	static const std::string CONNECTION_CLOSE;
 
@@ -153,13 +154,16 @@ protected:
 		/// Creates the HTTPMessage and sets
 		/// the version.
 
+	HTTPMessage(const HTTPMessage& other);
+		/// Copy constructor.
+
+	HTTPMessage& operator = (const HTTPMessage& other);
+		/// Assignment operator.
+
 	virtual ~HTTPMessage();
 		/// Destroys the HTTPMessage.
-	
+
 private:
-	HTTPMessage(const HTTPMessage&);
-	HTTPMessage& operator = (const HTTPMessage&);
-	
 	std::string _version;
 };
 

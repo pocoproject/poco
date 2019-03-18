@@ -44,7 +44,7 @@ void HTTPCredentialsTest::testBasicCredentials()
 {
 	HTTPRequest request;
 	assertTrue (!request.hasCredentials());
-	
+
 	HTTPBasicCredentials cred("user", "secret");
 	cred.authenticate(request);
 	assertTrue (request.hasCredentials());
@@ -53,7 +53,7 @@ void HTTPCredentialsTest::testBasicCredentials()
 	request.getCredentials(scheme, info);
 	assertTrue (scheme == "Basic");
 	assertTrue (info == "dXNlcjpzZWNyZXQ=");
-	
+
 	HTTPBasicCredentials cred2(request);
 	assertTrue (cred2.getUsername() == "user");
 	assertTrue (cred2.getPassword() == "secret");
@@ -64,7 +64,7 @@ void HTTPCredentialsTest::testProxyBasicCredentials()
 {
 	HTTPRequest request;
 	assertTrue (!request.hasProxyCredentials());
-	
+
 	HTTPBasicCredentials cred("user", "secret");
 	cred.proxyAuthenticate(request);
 	assertTrue (request.hasProxyCredentials());
@@ -79,7 +79,7 @@ void HTTPCredentialsTest::testProxyBasicCredentials()
 void HTTPCredentialsTest::testBadCredentials()
 {
 	HTTPRequest request;
-	
+
 	std::string scheme;
 	std::string info;
 	try
@@ -90,12 +90,12 @@ void HTTPCredentialsTest::testBadCredentials()
 	catch (NotAuthenticatedException&)
 	{
 	}
-	
+
 	request.setCredentials("Test", "SomeData");
 	request.getCredentials(scheme, info);
 	assertTrue (scheme == "Test");
 	assertTrue (info == "SomeData");
-	
+
 	try
 	{
 		HTTPBasicCredentials cred(request);
@@ -111,7 +111,7 @@ void HTTPCredentialsTest::testAuthenticationParams()
 {
 	const std::string authInfo("nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"40e4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
 	HTTPAuthenticationParams params(authInfo);
-	
+
 	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
 	assertTrue (params["realm"] == "TestDigest");
 	assertTrue (params["response"] == "40e4889cfbd0e561f71e3107a2863bc4");
@@ -119,7 +119,7 @@ void HTTPCredentialsTest::testAuthenticationParams()
 	assertTrue (params["username"] == "user");
 	assertTrue (params.size() == 5);
 	assertTrue (params.toString() == authInfo);
-	
+
 	params.clear();
 	HTTPRequest request;
 	request.set("Authorization", "Digest " + authInfo);
@@ -134,22 +134,29 @@ void HTTPCredentialsTest::testAuthenticationParams()
 
 	params.clear();
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
 	params.fromResponse(response);
-	
+
 	assertTrue (params["realm"] == "TestDigest");
 	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
 	assertTrue (params.size() == 2);
+
+	params.clear();
+	response.set("WWW-Authenticate", "NTLM TlRMTVNTUAACAAAADAAMADAAAAABAoEAASNFZ4mrze8AAAAAAAAAAGIAYgA8AAAARABPAE0AQQBJAE4AAgAMAEQATwBNAEEASQBOAAEADABTAEUAUgBWAEUAUgAEABQAZABvAG0AYQBpAG4ALgBjAG8AbQADACIAcwBlAHIAdgBlAHIALgBkAG8AbQBhAGkAbgAuAGMAbwBtAAAAAAA");
+	params.fromResponse(response);
+
+	assertTrue (params["NTLM"] == "TlRMTVNTUAACAAAADAAMADAAAAABAoEAASNFZ4mrze8AAAAAAAAAAGIAYgA8AAAARABPAE0AQQBJAE4AAgAMAEQATwBNAEEASQBOAAEADABTAEUAUgBWAEUAUgAEABQAZABvAG0AYQBpAG4ALgBjAG8AbQADACIAcwBlAHIAdgBlAHIALgBkAG8AbQBhAGkAbgAuAGMAbwBtAAAAAAA");
+	assertTrue (params.size() == 1);
 }
 
 
 void HTTPCredentialsTest::testAuthenticationParamsMultipleHeaders()
 {
 	HTTPResponse response;
-	response.add("WWW-Authenticate", "Unsupported realm=\"TestUnsupported\"");	
-	response.add("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	response.add("WWW-Authenticate", "Unsupported realm=\"TestUnsupported\"");
+	response.add("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
 	HTTPAuthenticationParams params(response);
-	
+
 	assertTrue (params["realm"] == "TestDigest");
 	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
 	assertTrue (params.size() == 2);
@@ -161,7 +168,7 @@ void HTTPCredentialsTest::testDigestCredentials()
 	HTTPDigestCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
 	creds.authenticate(request, response);
 	std::string auth = request.get("Authorization");
 	assertTrue (auth == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
@@ -173,9 +180,9 @@ void HTTPCredentialsTest::testDigestCredentialsQoP()
 	HTTPDigestCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\"");	
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\"");
 	creds.authenticate(request, response);
-	
+
 	HTTPAuthenticationParams params(request);
 	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
 	assertTrue (params["realm"] == "TestDigest");
@@ -187,12 +194,12 @@ void HTTPCredentialsTest::testDigestCredentialsQoP()
 	assertTrue (params["nc"] == "00000001");
 	assertTrue (params["qop"] == "auth");
 	assertTrue (params.size() == 9);
-	
+
 	std::string cnonce = params["cnonce"];
 	std::string aresp = params["response"];
-	
+
 	params.clear();
-	
+
 	creds.updateAuthInfo(request);
 	params.fromRequest(request);
 	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
@@ -213,8 +220,8 @@ void HTTPCredentialsTest::testCredentialsBasic()
 	HTTPCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/basic/");
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Basic realm=\"TestBasic\"");	
-	creds.authenticate(request, response);	
+	response.set("WWW-Authenticate", "Basic realm=\"TestBasic\"");
+	creds.authenticate(request, response);
 	assertTrue (request.get("Authorization") == "Basic dXNlcjpzM2NyM3Q=");
 }
 
@@ -224,8 +231,8 @@ void HTTPCredentialsTest::testProxyCredentialsBasic()
 	HTTPCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/basic/");
 	HTTPResponse response;
-	response.set("Proxy-Authenticate", "Basic realm=\"TestBasic\"");	
-	creds.proxyAuthenticate(request, response);	
+	response.set("Proxy-Authenticate", "Basic realm=\"TestBasic\"");
+	creds.proxyAuthenticate(request, response);
 	assertTrue (request.get("Proxy-Authorization") == "Basic dXNlcjpzM2NyM3Q=");
 }
 
@@ -235,7 +242,7 @@ void HTTPCredentialsTest::testCredentialsDigest()
 	HTTPCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
 	creds.authenticate(request, response);
 	std::string auth = request.get("Authorization");
 	assertTrue (auth == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
@@ -247,8 +254,8 @@ void HTTPCredentialsTest::testCredentialsDigestMultipleHeaders()
 	HTTPCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.add("WWW-Authenticate", "Unsupported realm=\"TestUnsupported\"");	
-	response.add("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	response.add("WWW-Authenticate", "Unsupported realm=\"TestUnsupported\"");
+	response.add("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
 	creds.authenticate(request, response);
 	std::string auth = request.get("Authorization");
 	assertTrue (auth == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
@@ -260,8 +267,8 @@ void HTTPCredentialsTest::testProxyCredentialsDigest()
 	HTTPCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.set("Proxy-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
-	creds.proxyAuthenticate(request, response);	
+	response.set("Proxy-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
+	creds.proxyAuthenticate(request, response);
 	assertTrue (request.get("Proxy-Authorization") == "Digest username=\"user\", nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", uri=\"/digest/\", response=\"40e4889cfbd0e561f71e3107a2863bc4\"");
 }
 
@@ -282,10 +289,10 @@ void HTTPCredentialsTest::testVerifyAuthInfo()
 	HTTPDigestCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");	
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\"");
 	creds.authenticate(request, response);
 	assertTrue (creds.verifyAuthInfo(request));
-	
+
 	request.set("Authorization", "Digest nonce=\"212573bb90170538efad012978ab811f%lu\", realm=\"TestDigest\", response=\"xxe4889cfbd0e561f71e3107a2863bc4\", uri=\"/digest/\", username=\"user\"");
 	assertTrue (!creds.verifyAuthInfo(request));
 }
@@ -296,10 +303,10 @@ void HTTPCredentialsTest::testVerifyAuthInfoQoP()
 	HTTPDigestCredentials creds("user", "s3cr3t");
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
 	HTTPResponse response;
-	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\"");	
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\"");
 	creds.authenticate(request, response);
 	assertTrue (creds.verifyAuthInfo(request));
-	
+
 	request.set("Authorization", "Digest cnonce=\"f9c80ffd1c3bc4ee47ed92b704ba75a4\", nc=00000001, nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth\", realm=\"TestDigest\", response=\"ff0e90b9aa019120ea0ed6e23ce95d9a\", uri=\"/digest/\", username=\"user\"");
 	assertTrue (!creds.verifyAuthInfo(request));
 }

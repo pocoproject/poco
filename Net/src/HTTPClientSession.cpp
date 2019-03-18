@@ -19,7 +19,7 @@
 #include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPChunkedStream.h"
-#include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
@@ -45,7 +45,8 @@ HTTPClientSession::HTTPClientSession():
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -58,7 +59,8 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -71,7 +73,8 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -84,7 +87,8 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -97,7 +101,8 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
 }
 
@@ -195,8 +200,6 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
 	_pRequestStream = 0;
 	_pResponseStream = 0;
-	clearException();
-	_responseReceived = false;
 
 	bool keepAlive = getKeepAlive();
 	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
@@ -207,56 +210,76 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	try
 	{
 		if (!connected())
+		{
+			_ntlmProxyAuthenticated = false;
 			reconnect();
+		}
 		if (!keepAlive)
+		{
 			request.setKeepAlive(false);
+		}
 		if (!request.has(HTTPRequest::HOST) && !_host.empty())
+		{
 			request.setHost(_host, _port);
+		}
 		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
-			request.setURI(proxyRequestPrefix() + request.getURI());
+			std::string prefix = proxyRequestPrefix();
+			if (!prefix.empty() && request.getURI().compare(0, 7, "http://") != 0 && request.getURI().compare(0, 8, "https://") != 0)
+				request.setURI(prefix + request.getURI());
+			if (keepAlive) request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
 			proxyAuthenticate(request);
 		}
 		_reconnect = keepAlive;
-		_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
-		const std::string& method = request.getMethod();
-		if (request.getChunkedTransferEncoding())
-		{
-			HTTPHeaderOutputStream hos(*this);
-			request.write(hos);
-			_pRequestStream = new HTTPChunkedOutputStream(*this);
-		}
-		else if (request.hasContentLength())
-		{
-			Poco::CountingOutputStream cs;
-			request.write(cs);
-#if POCO_HAVE_INT64
-			_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength64() + cs.chars());
-#else
-			_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
-#endif
-			request.write(*_pRequestStream);
-		}
-		else if ((method != HTTPRequest::HTTP_PUT && method != HTTPRequest::HTTP_POST && method != HTTPRequest::HTTP_PATCH) || request.has(HTTPRequest::UPGRADE))
-		{
-			Poco::CountingOutputStream cs;
-			request.write(cs);
-			_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
-			request.write(*_pRequestStream);
-		}
-		else
-		{
-			_pRequestStream = new HTTPOutputStream(*this);
-			request.write(*_pRequestStream);
-		}
-		_lastRequest.update();
-		return *_pRequestStream;
+		return sendRequestImpl(request);
 	}
 	catch (Exception&)
 	{
 		close();
 		throw;
 	}
+}
+
+
+std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
+{
+	_pRequestStream = 0;
+	_pResponseStream = 0;
+	clearException();
+	_responseReceived = false;
+	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+	const std::string& method = request.getMethod();
+	if (request.getChunkedTransferEncoding())
+	{
+		HTTPHeaderOutputStream hos(*this);
+		request.write(hos);
+		_pRequestStream = new HTTPChunkedOutputStream(*this);
+	}
+	else if (request.hasContentLength())
+	{
+		Poco::CountingOutputStream cs;
+		request.write(cs);
+#if POCO_HAVE_INT64
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength64() + cs.chars());
+#else
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, request.getContentLength() + cs.chars());
+#endif
+		request.write(*_pRequestStream);
+	}
+	else if ((method != HTTPRequest::HTTP_PUT && method != HTTPRequest::HTTP_POST && method != HTTPRequest::HTTP_PATCH) || request.has(HTTPRequest::UPGRADE))
+	{
+		Poco::CountingOutputStream cs;
+		request.write(cs);
+		_pRequestStream = new HTTPFixedLengthOutputStream(*this, cs.chars());
+		request.write(*_pRequestStream);
+	}
+	else
+	{
+		_pRequestStream = new HTTPOutputStream(*this);
+		request.write(*_pRequestStream);
+	}
+	_lastRequest.update();
+	return *_pRequestStream;
 }
 
 
@@ -409,17 +432,86 @@ bool HTTPClientSession::mustReconnect() const
 
 void HTTPClientSession::proxyAuthenticate(HTTPRequest& request)
 {
-	proxyAuthenticateImpl(request);
+	proxyAuthenticateImpl(request, _proxyConfig);
 }
 
 
-void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request)
+void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyConfig& proxyConfig)
 {
-	if (!_proxyConfig.username.empty())
+	switch (proxyConfig.authMethod)
 	{
-		HTTPBasicCredentials creds(_proxyConfig.username, _proxyConfig.password);
-		creds.proxyAuthenticate(request);
+	case PROXY_AUTH_NONE:
+		break;
+
+	case PROXY_AUTH_HTTP_BASIC:
+		_proxyBasicCreds.setUsername(proxyConfig.username);
+		_proxyBasicCreds.setPassword(proxyConfig.password);
+		_proxyBasicCreds.proxyAuthenticate(request);
+		break;
+
+	case PROXY_AUTH_HTTP_DIGEST:
+		if (HTTPCredentials::hasDigestCredentials(request))
+		{
+			_proxyDigestCreds.updateProxyAuthInfo(request);
+		}
+		else
+		{
+			_proxyDigestCreds.setUsername(proxyConfig.username);
+			_proxyDigestCreds.setPassword(proxyConfig.password);
+			proxyAuthenticateDigest(request);
+		}
+
+	case PROXY_AUTH_NTLM:
+		if (_ntlmProxyAuthenticated)
+		{
+			_proxyNTLMCreds.updateProxyAuthInfo(request);
+		}
+		else
+		{
+			_proxyNTLMCreds.setUsername(proxyConfig.username);
+			_proxyNTLMCreds.setPassword(proxyConfig.password);
+			proxyAuthenticateNTLM(request);
+			_ntlmProxyAuthenticated = true;
+		}
 	}
+}
+
+
+void HTTPClientSession::proxyAuthenticateDigest(HTTPRequest& request)
+{
+	HTTPResponse response;
+	request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
+	sendChallengeRequest(request, response);
+	_proxyDigestCreds.proxyAuthenticate(request, response);
+}
+
+
+void HTTPClientSession::proxyAuthenticateNTLM(HTTPRequest& request)
+{
+	HTTPResponse response;
+	request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
+	_proxyNTLMCreds.proxyAuthenticate(request, std::string());
+	sendChallengeRequest(request, response);
+	_proxyNTLMCreds.proxyAuthenticate(request, response);
+}
+
+
+void HTTPClientSession::sendChallengeRequest(const HTTPRequest& request, HTTPResponse& response)
+{
+	if (!connected())
+	{
+		reconnect();
+	}
+
+	HTTPRequest challengeRequest(request);
+	if (challengeRequest.hasContentLength())
+	{
+		challengeRequest.setContentLength(0);
+	}
+
+	sendRequestImpl(challengeRequest);
+	std::istream& istr = receiveResponse(response);
+	while (istr.good()) istr.get();
 }
 
 
@@ -433,9 +525,9 @@ StreamSocket HTTPClientSession::proxyConnect()
 	NumberFormatter::append(targetAddress, _port);
 	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress, HTTPMessage::HTTP_1_1);
 	HTTPResponse proxyResponse;
-	proxyRequest.set("Proxy-Connection", "keep-alive");
-	proxyRequest.set("Host", getHost());
-	proxyAuthenticateImpl(proxyRequest);
+	proxyRequest.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
+	proxyRequest.set(HTTPRequest::HOST, getHost());
+	proxySession.proxyAuthenticateImpl(proxyRequest, _proxyConfig);
 	proxySession.setKeepAlive(true);
 	proxySession.sendRequest(proxyRequest);
 	proxySession.receiveResponse(proxyResponse);
