@@ -129,7 +129,7 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 		Poco::Base64Decoder debase64(istr);
 		std::vector<unsigned char> buffer(responseAuthParams.size());
 		debase64.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
-		std::size_t size = debase64.gcount();
+		std::size_t size = static_cast<std::size_t>(debase64.gcount());
 
 		Poco::Net::NTLMCredentials::ChallengeMessage challengeMsg;
 		if (NTLMCredentials::parseChallengeMessage(&buffer[0], size, challengeMsg))

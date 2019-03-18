@@ -176,8 +176,8 @@ std::vector<unsigned char> NTLMCredentials::formatNegotiateMessage(const Negotia
 	if (!utf16Domain.empty()) flags |= NTLM_FLAG_DOMAIN_SUPPLIED;
 	if (!utf16Workstation.empty()) flags |= NTLM_FLAG_WORKST_SUPPLIED;
 
-	BufferDesc domainDesc(utf16Domain.size(), 8 + 4 + 4 + 8);
-	BufferDesc workstDesc(utf16Workstation.size(), domainDesc.offset + domainDesc.length);
+	BufferDesc domainDesc(static_cast<Poco::UInt16>(utf16Domain.size()), 8 + 4 + 4 + 8);
+	BufferDesc workstDesc(static_cast<Poco::UInt16>(utf16Workstation.size()), domainDesc.offset + domainDesc.length);
 
 	std::vector<unsigned char> buffer(size);
 	Poco::MemoryOutputStream bufferStream(reinterpret_cast<char*>(&buffer[0]), buffer.size());
@@ -285,11 +285,11 @@ std::vector<unsigned char> NTLMCredentials::formatAuthenticateMessage(const Auth
 
 	Poco::UInt32 flags = message.flags | NTLM_FLAG_NEGOTIATE_UNICODE;
 
-	BufferDesc lmDesc(message.lmResponse.size(), 64);
-	BufferDesc ntlmDesc(message.ntlmResponse.size(), lmDesc.offset + lmDesc.length);
-	BufferDesc targetDesc(utf16Target.size(), ntlmDesc.offset + ntlmDesc.length);
-	BufferDesc usernameDesc(utf16Username.size(), targetDesc.offset + targetDesc.length);
-	BufferDesc workstDesc(utf16Workstation.size(), usernameDesc.offset + usernameDesc.length);
+	BufferDesc lmDesc(static_cast<Poco::UInt16>(message.lmResponse.size()), 64);
+	BufferDesc ntlmDesc(static_cast<Poco::UInt16>(message.ntlmResponse.size()), lmDesc.offset + lmDesc.length);
+	BufferDesc targetDesc(static_cast<Poco::UInt16>(utf16Target.size()), ntlmDesc.offset + ntlmDesc.length);
+	BufferDesc usernameDesc(static_cast<Poco::UInt16>(utf16Username.size()), targetDesc.offset + targetDesc.length);
+	BufferDesc workstDesc(static_cast<Poco::UInt16>(utf16Workstation.size()), usernameDesc.offset + usernameDesc.length);
 	BufferDesc sessionKeyDesc(0, workstDesc.offset + workstDesc.length);
 
 	std::vector<unsigned char> buffer(size);
