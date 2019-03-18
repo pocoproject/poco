@@ -329,10 +329,12 @@
     <ClInclude Include="include\Poco\Net\HTTPFixedLengthStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPHeaderStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPMessage.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPNTLMCredentials.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequest.h"/>
     <ClInclude Include="include\Poco\Net\HTTPResponse.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSession.h"/>
     <ClInclude Include="include\Poco\Net\HTTPStream.h"/>
+    <ClInclude Include="include\Poco\Net\NTLMCredentials.h"/>
     <ClInclude Include="include\Poco\Net\TCPServer.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerConnection.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerConnectionFactory.h"/>
@@ -442,10 +444,12 @@
     <ClCompile Include="src\HTTPFixedLengthStream.cpp"/>
     <ClCompile Include="src\HTTPHeaderStream.cpp"/>
     <ClCompile Include="src\HTTPMessage.cpp"/>
+    <ClCompile Include="src\HTTPNTLMCredentials.cpp"/>
     <ClCompile Include="src\HTTPRequest.cpp"/>
     <ClCompile Include="src\HTTPResponse.cpp"/>
     <ClCompile Include="src\HTTPSession.cpp"/>
     <ClCompile Include="src\HTTPStream.cpp"/>
+    <ClCompile Include="src\NTLMCredentials.cpp"/>
     <ClCompile Include="src\TCPServer.cpp"/>
     <ClCompile Include="src\TCPServerConnection.cpp"/>
     <ClCompile Include="src\TCPServerConnectionFactory.cpp"/>

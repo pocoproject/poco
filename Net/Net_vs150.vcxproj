@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>15.0.27625.0</_ProjectFileVersion>
+    <_ProjectFileVersion>15.0.28127.55</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoNetd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetMDd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetMTd</TargetName>
@@ -302,6 +302,7 @@
     <ClInclude Include="include\Poco\Net\HTTPHeaderStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPIOStream.h"/>
     <ClInclude Include="include\Poco\Net\HTTPMessage.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPNTLMCredentials.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequest.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequestHandler.h"/>
     <ClInclude Include="include\Poco\Net\HTTPRequestHandlerFactory.h"/>
@@ -342,6 +343,7 @@
     <ClInclude Include="include\Poco\Net\Net.h"/>
     <ClInclude Include="include\Poco\Net\NetException.h"/>
     <ClInclude Include="include\Poco\Net\NetworkInterface.h"/>
+    <ClInclude Include="include\Poco\Net\NTLMCredentials.h"/>
     <ClInclude Include="include\Poco\Net\NTPClient.h"/>
     <ClInclude Include="include\Poco\Net\NTPEventArgs.h"/>
     <ClInclude Include="include\Poco\Net\NTPPacket.h"/>
@@ -416,6 +418,7 @@
     <ClCompile Include="src\HTTPHeaderStream.cpp"/>
     <ClCompile Include="src\HTTPIOStream.cpp"/>
     <ClCompile Include="src\HTTPMessage.cpp"/>
+    <ClCompile Include="src\HTTPNTLMCredentials.cpp"/>
     <ClCompile Include="src\HTTPRequest.cpp"/>
     <ClCompile Include="src\HTTPRequestHandler.cpp"/>
     <ClCompile Include="src\HTTPRequestHandlerFactory.cpp"/>
@@ -455,6 +458,7 @@
     <ClCompile Include="src\Net.cpp"/>
     <ClCompile Include="src\NetException.cpp"/>
     <ClCompile Include="src\NetworkInterface.cpp"/>
+    <ClCompile Include="src\NTLMCredentials.cpp"/>
     <ClCompile Include="src\NTPClient.cpp"/>
     <ClCompile Include="src\NTPEventArgs.cpp"/>
     <ClCompile Include="src\NTPPacket.cpp"/>
