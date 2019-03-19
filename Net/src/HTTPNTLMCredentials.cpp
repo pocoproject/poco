@@ -17,6 +17,7 @@
 #include "Poco/Net/HTTPAuthenticationParams.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/DateTime.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
@@ -115,25 +116,19 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 		std::string username;
 		splitUsername(_username, username, negotiateMsg.domain);
 		std::vector<unsigned char> negotiateBuf = NTLMCredentials::formatNegotiateMessage(negotiateMsg);
-
-		std::ostringstream ostr;
-		Poco::Base64Encoder base64(ostr);
-		base64.rdbuf()->setLineLength(0);
-		base64.write(reinterpret_cast<const char*>(&negotiateBuf[0]), negotiateBuf.size());
-		base64.close();
-		return ostr.str();
+		return toBase64(negotiateBuf);
 	}
 	else
 	{
-		Poco::MemoryInputStream istr(responseAuthParams.data(), responseAuthParams.size());
-		Poco::Base64Decoder debase64(istr);
-		std::vector<unsigned char> buffer(responseAuthParams.size());
-		debase64.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
-		std::size_t size = static_cast<std::size_t>(debase64.gcount());
-
-		Poco::Net::NTLMCredentials::ChallengeMessage challengeMsg;
-		if (NTLMCredentials::parseChallengeMessage(&buffer[0], size, challengeMsg))
+		std::vector<unsigned char> buffer = fromBase64(responseAuthParams);
+		NTLMCredentials::ChallengeMessage challengeMsg;
+		if (NTLMCredentials::parseChallengeMessage(&buffer[0], buffer.size(), challengeMsg))
 		{
+			if ((challengeMsg.flags & NTLMCredentials::NTLM_FLAG_NEGOTIATE_NTLM2_KEY) == 0)
+			{
+				throw HTTPException("Proxy does not support NTLMv2 authentication");
+			}
+
 			std::string username;
 			std::string domain;
 			splitUsername(_username, username, domain);
@@ -143,22 +138,18 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 			authenticateMsg.target = challengeMsg.target;
 			authenticateMsg.username = username;
 
-			std::vector<unsigned char> nonce = NTLMCredentials::createNonce();
+			std::vector<unsigned char> lmNonce = NTLMCredentials::createNonce();
+			std::vector<unsigned char> ntlmNonce = NTLMCredentials::createNonce();
 			Poco::UInt64 timestamp = NTLMCredentials::createTimestamp();
 			std::vector<unsigned char> ntlm2Hash = NTLMCredentials::createNTLMv2Hash(username, challengeMsg.target, _password);
-			authenticateMsg.lmResponse = NTLMCredentials::createLMv2Response(ntlm2Hash, challengeMsg.challenge, nonce);
-			authenticateMsg.ntlmResponse = Poco::Net::NTLMCredentials::createNTLMv2Response(ntlm2Hash, challengeMsg.challenge, nonce, challengeMsg.targetInfo, timestamp);
 
-			std::vector<unsigned char> authenticateBuf = Poco::Net::NTLMCredentials::formatAuthenticateMessage(authenticateMsg);
+			authenticateMsg.lmResponse = NTLMCredentials::createLMv2Response(ntlm2Hash, challengeMsg.challenge, lmNonce);
+			authenticateMsg.ntlmResponse = NTLMCredentials::createNTLMv2Response(ntlm2Hash, challengeMsg.challenge, ntlmNonce, challengeMsg.targetInfo, timestamp);
 
-			std::ostringstream ostr;
-			Poco::Base64Encoder base64(ostr);
-			base64.rdbuf()->setLineLength(0);
-			base64.write(reinterpret_cast<const char*>(&authenticateBuf[0]), authenticateBuf.size());
-			base64.close();
-			return ostr.str();
+			std::vector<unsigned char> authenticateBuf = NTLMCredentials::formatAuthenticateMessage(authenticateMsg);
+			return toBase64(authenticateBuf);
 		}
-		else throw Poco::InvalidArgumentException("Invalid NTLM challenge");
+		else throw HTTPException("Invalid NTLM challenge");
 	}
 }
 
@@ -185,6 +176,27 @@ void HTTPNTLMCredentials::splitUsername(const std::string& usernameAndDomain, st
 	username = usernameAndDomain;
 }
 
+
+std::string HTTPNTLMCredentials::toBase64(const std::vector<unsigned char>& buffer)
+{
+	std::ostringstream ostr;
+	Poco::Base64Encoder base64(ostr);
+	base64.rdbuf()->setLineLength(0);
+	base64.write(reinterpret_cast<const char*>(&buffer[0]), buffer.size());
+	base64.close();
+	return ostr.str();
+}
+
+
+std::vector<unsigned char> HTTPNTLMCredentials::fromBase64(const std::string& base64)
+{
+	Poco::MemoryInputStream istr(base64.data(), base64.size());
+	Poco::Base64Decoder debase64(istr);
+	std::vector<unsigned char> buffer(base64.size());
+	debase64.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+	buffer.resize(static_cast<std::size_t>(debase64.gcount()));
+	return buffer;
+}
 
 
 } } // namespace Poco::Net
