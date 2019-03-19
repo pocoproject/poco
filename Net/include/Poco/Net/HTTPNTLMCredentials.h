@@ -19,6 +19,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include <vector>
 
 
 namespace Poco {
