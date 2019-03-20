@@ -126,7 +126,10 @@ set_target_properties(PDF
     DEFINE_SYMBOL PDF_EXPORTS
     )
 
-target_link_libraries(PDF PUBLIC ${ZLIB_LIBRARIES} Poco::XML Poco::Util)
+if (POCO_UNBUNDLED)
+    target_link_libraries(Foundation PUBLIC ZLIB::ZLIB)
+endif (POCO_UNBUNDLED)
+target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
