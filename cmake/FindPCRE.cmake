@@ -5,29 +5,58 @@
 #  PCRE_INCLUDE_DIRS - where to find pcre.h, etc.
 #  PCRE_LIBRARIES    - List of libraries when using pcre.
 #  PCRE_FOUND        - True if pcre found.
+include(FindPackageHandleStandardArgs)
 
+find_package(PkgConfig QUIET)
+pkg_check_modules(PC_PCRE QUIET pcre)
 
-IF (PCRE_INCLUDE_DIRS)
-  # Already in cache, be silent
-  SET(PCRE_FIND_QUIETLY TRUE)
-ENDIF (PCRE_INCLUDE_DIRS)
+find_path(PCRE_INCLUDE_DIR
+  NAMES pcre.h
+  HINTS
+        ${PCRE_ROOT_DIR}/include
+        ${PCRE_ROOT_INCLUDE_DIRS}
+  PATHS 
+        ${PC_PCRE_INCLUDE_DIRS}
+  DOC "Specify the include directory containing pcre.h"
+)
 
-FIND_PATH(PCRE_INCLUDE_DIR pcre.h)
+find_library(PCRE_LIBRARY
+  NAMES pcre
+  HINTS
+        ${PCRE_ROOT_DIR}/lib
+        ${PCRE_ROOT_LIBRARY_DIRS}
+  PATHS
+        ${PC_PCRE_LIBRARY_DIRS}
+  DOC "Specify the lib directory containing pcre"
+)
 
-SET(PCRE_NAMES pcre)
-FIND_LIBRARY(PCRE_LIBRARY NAMES ${PCRE_NAMES} )
+set(PCRE_VERSION ${PC_PCRE_VERSION})
 
-# handle the QUIETLY and REQUIRED arguments and set PCRE_FOUND to TRUE if
-# all listed variables are TRUE
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(PCRE DEFAULT_MSG PCRE_LIBRARY PCRE_INCLUDE_DIR)
+find_package_handle_standard_args(PCRE
+  FOUND_VAR PCRE_FOUND
+  REQUIRED_VARS
+    PCRE_LIBRARY
+    PCRE_INCLUDE_DIR
+  VERSION_VAR PCRE_VERSION
+)
 
-IF(PCRE_FOUND)
-  SET( PCRE_LIBRARIES ${PCRE_LIBRARY} )
-  SET( PCRE_INCLUDE_DIRS ${PCRE_INCLUDE_DIR} )
-ELSE(PCRE_FOUND)
-  SET( PCRE_LIBRARIES )
-  SET( PCRE_INCLUDE_DIRS )
-ENDIF(PCRE_FOUND)
+if(PCRE_FOUND)
+  set(PCRE_LIBRARIES ${PCRE_LIBRARY})
+  set(PCRE_INCLUDE_DIRS ${PCRE_INCLUDE_DIR})
+  set(PCRE_DEFINITIONS ${PC_PCRE_CFLAGS_OTHER})
+endif()
+
+if(PCRE_FOUND AND NOT TARGET Pcre::Pcre)
+  add_library(Pcre::Pcre UNKNOWN IMPORTED)
+  set_target_properties(Pcre::Pcre PROPERTIES
+    IMPORTED_LOCATION "${PCRE_LIBRARY}"
+    INTERFACE_COMPILE_OPTIONS "${PC_PCRE_CFLAGS_OTHER}"
+    INTERFACE_INCLUDE_DIRECTORIES "${PCRE_INCLUDE_DIR}"
+  )
+endif()
 
 MARK_AS_ADVANCED( PCRE_LIBRARIES PCRE_INCLUDE_DIRS )
+mark_as_advanced(
+  PCRE_INCLUDE_DIR
+  PCRE_LIBRARY
+)
