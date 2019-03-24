@@ -1,10 +1,56 @@
-#
-# - Find pcre
-# Find the native PCRE includes and library
-#
-#  PCRE_INCLUDE_DIRS - where to find pcre.h, etc.
-#  PCRE_LIBRARIES    - List of libraries when using pcre.
-#  PCRE_FOUND        - True if pcre found.
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file Copyright.txt or https://cmake.org/licensing for details.
+
+#[=======================================================================[.rst:
+FindPCRE
+-------
+
+Finds the PCRE library.
+
+Imported Targets
+^^^^^^^^^^^^^^^^
+
+This module provides the following imported targets, if found:
+
+``Pcre::Pcre``
+  The PCRE library
+
+Result Variables
+^^^^^^^^^^^^^^^^
+
+This will define the following variables:
+
+``PCRE_FOUND``
+  True if the system has the PCRE library.
+``PCRE_VERSION``
+  The version of the PCRE library which was found.
+``PCRE_INCLUDE_DIRS``
+  Include directories needed to use PCRE.
+``PCRE_LIBRARIES``
+  Libraries needed to link to PCRE.
+
+Cache Variables
+^^^^^^^^^^^^^^^
+
+The following cache variables may also be set:
+
+``PCRE_INCLUDE_DIR``
+  The directory containing ``foo.h``.
+``PCRE_LIBRARY``
+  The path to the PCRE library.
+
+Hints
+^^^^^
+
+``PCRE_ROOT_DIR``
+  The path to the root directory of a PCRE installation.
+``PCRE_ROOT_INCLUDE_DIRS``
+  The path to the include directory of a PCRE installation.
+``PCRE_ROOT_LIBRARY_DIRS``
+  The path to the library directory of a PCRE installation.
+
+#]=======================================================================]#
+
 include(FindPackageHandleStandardArgs)
 
 find_package(PkgConfig QUIET)
@@ -55,7 +101,6 @@ if(PCRE_FOUND AND NOT TARGET Pcre::Pcre)
   )
 endif()
 
-MARK_AS_ADVANCED( PCRE_LIBRARIES PCRE_INCLUDE_DIRS )
 mark_as_advanced(
   PCRE_INCLUDE_DIR
   PCRE_LIBRARY

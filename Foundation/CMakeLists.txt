@@ -40,7 +40,7 @@ if (POCO_UNBUNDLED)
 		src/pcre_ucd.c
 		src/pcre_tables.c
 	)
-
+	
 else()
 	# pcre
 	POCO_SOURCES( SRCS pcre
@@ -99,6 +99,7 @@ set_target_properties(Foundation
 
 if (POCO_UNBUNDLED)
     target_link_libraries(Foundation PUBLIC Pcre::Pcre ZLIB::ZLIB)
+    target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif (POCO_UNBUNDLED)
 
 target_include_directories(Foundation
@@ -232,11 +233,6 @@ if ((${CMAKE_CXX_COMPILER_ID} MATCHES "XL") AND (${CMAKE_SYSTEM} MATCHES "AIX"))
 		-qsuppress=1540-0095
 		-qsuppress=1500-030
 	)
-endif()
-
-if(POCO_UNBUNDLED)
-	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif()
 
 if (NOT POCO_ENABLE_WSTRING)

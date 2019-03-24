@@ -486,6 +486,11 @@ install(
         Devel
 )
 
+if(POCO_UNBUNDLED)
+    install(FILES cmake/FindPCRE.cmake
+            DESTINATION "${PocoConfigPackageLocation}")
+endif()
+
 # Install pkg-config files
 install(FILES ${POCO_PKG_CONFIG_FILES}
         DESTINATION lib${LIB_SUFFIX}/pkgconfig)
