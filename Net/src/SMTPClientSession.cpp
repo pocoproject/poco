@@ -239,6 +239,10 @@ void SMTPClientSession::loginUsingXOAUTH2(const std::string& username, const std
 
 void SMTPClientSession::loginUsingNTLM(const std::string& username, const std::string& password)
 {
+	// Implementation is based on:
+	// [MS-SMTPNTLM]: NT LAN Manager (NTLM) Authentication: Simple Mail Transfer Protocol (SMTP) Extension
+	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smtpntlm/50c668f6-5ffc-4616-96df-b5a3f4b3311d
+
 	NTLMCredentials::NegotiateMessage negotiateMsg;
 	std::string user;
 	std::string domain;
