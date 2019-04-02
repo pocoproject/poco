@@ -101,9 +101,6 @@ private:
 	HTTPNTLMCredentials& operator = (const HTTPNTLMCredentials&);
 
 	std::string createNTLMMessage(const std::string& ntlmChallengeBase64);
-	static void splitUsername(const std::string& usernameAndDomain, std::string& username, std::string& domain);
-	static std::string toBase64(const std::vector<unsigned char>& buffer);
-	static std::vector<unsigned char> fromBase64(const std::string& base64);
 
 	std::string _username;
 	std::string _password;

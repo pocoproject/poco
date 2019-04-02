@@ -25,6 +25,9 @@
 #include "Poco/Random.h"
 #include "Poco/Timestamp.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/Base64Decoder.h"
+#include <sstream>
 #include <cstring>
 
 
@@ -323,6 +326,51 @@ void NTLMCredentials::readBufferDesc(Poco::BinaryReader& reader, BufferDesc& des
 void NTLMCredentials::writeBufferDesc(Poco::BinaryWriter& writer, const BufferDesc& desc)
 {
 	writer << desc.length << desc.reserved << desc.offset;
+}
+
+
+void NTLMCredentials::splitUsername(const std::string& usernameAndDomain, std::string& username, std::string& domain)
+{
+	std::string::size_type pos = usernameAndDomain.find('\\');
+	if (pos != std::string::npos)
+	{
+		domain.assign(usernameAndDomain, 0, pos);
+		username.assign(usernameAndDomain, pos + 1, std::string::npos);
+		return;
+	}
+	else
+	{
+		pos = usernameAndDomain.find('@');
+		if (pos != std::string::npos)
+		{
+			username.assign(usernameAndDomain, 0, pos);
+			domain.assign(usernameAndDomain, pos + 1, std::string::npos);
+			return;
+		}
+	}
+	username = usernameAndDomain;
+}
+
+
+std::string NTLMCredentials::toBase64(const std::vector<unsigned char>& buffer)
+{
+	std::ostringstream ostr;
+	Poco::Base64Encoder base64(ostr);
+	base64.rdbuf()->setLineLength(0);
+	base64.write(reinterpret_cast<const char*>(&buffer[0]), buffer.size());
+	base64.close();
+	return ostr.str();
+}
+
+
+std::vector<unsigned char> NTLMCredentials::fromBase64(const std::string& base64)
+{
+	Poco::MemoryInputStream istr(base64.data(), base64.size());
+	Poco::Base64Decoder debase64(istr);
+	std::vector<unsigned char> buffer(base64.size());
+	debase64.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
+	buffer.resize(static_cast<std::size_t>(debase64.gcount()));
+	return buffer;
 }
 
 

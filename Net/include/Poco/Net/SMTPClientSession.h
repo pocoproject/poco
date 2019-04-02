@@ -51,7 +51,8 @@ public:
 		AUTH_CRAM_SHA1,
 		AUTH_LOGIN,
 		AUTH_PLAIN,
-		AUTH_XOAUTH2 
+		AUTH_XOAUTH2,
+		AUTH_NTLM
 	};
 
 	explicit SMTPClientSession(const StreamSocket& socket);
@@ -68,7 +69,7 @@ public:
 
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket read operations.
-		
+
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket read operations.
 
@@ -92,7 +93,7 @@ public:
 	void login(LoginMethod loginMethod, const std::string& username, const std::string& password);
 		/// Logs in to the SMTP server using the given authentication method and the given
 		/// credentials.
-		
+
 	void open();
 		/// Reads the initial response from the SMTP server.
 		///
@@ -103,7 +104,7 @@ public:
 		/// Does nothing if called more than once.
 
 	void close();
-		/// Sends a QUIT command and closes the connection to the server.	
+		/// Sends a QUIT command and closes the connection to the server.
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
@@ -169,7 +170,7 @@ protected:
 	};
 	enum
 	{
-		DEFAULT_TIMEOUT = 30000000 // 30 seconds default timeout for socket operations	
+		DEFAULT_TIMEOUT = 30000000 // 30 seconds default timeout for socket operations
 	};
 
 	static bool isPositiveCompletion(int status);
@@ -184,6 +185,7 @@ protected:
 	void loginUsingLogin(const std::string& username, const std::string& password);
 	void loginUsingPlain(const std::string& username, const std::string& password);
 	void loginUsingXOAUTH2(const std::string& username, const std::string& password);
+	void loginUsingNTLM(const std::string& username, const std::string& password);
 	DialogSocket& socket();
 
 private:

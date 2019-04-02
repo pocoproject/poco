@@ -21,10 +21,6 @@
 #include "Poco/DateTime.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
-#include "Poco/Base64Encoder.h"
-#include "Poco/Base64Decoder.h"
-#include "Poco/MemoryStream.h"
-#include <sstream>
 
 
 namespace Poco {
@@ -114,13 +110,13 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 	{
 		NTLMCredentials::NegotiateMessage negotiateMsg;
 		std::string username;
-		splitUsername(_username, username, negotiateMsg.domain);
+		NTLMCredentials::splitUsername(_username, username, negotiateMsg.domain);
 		std::vector<unsigned char> negotiateBuf = NTLMCredentials::formatNegotiateMessage(negotiateMsg);
-		return toBase64(negotiateBuf);
+		return NTLMCredentials::toBase64(negotiateBuf);
 	}
 	else
 	{
-		std::vector<unsigned char> buffer = fromBase64(responseAuthParams);
+		std::vector<unsigned char> buffer = NTLMCredentials::fromBase64(responseAuthParams);
 		NTLMCredentials::ChallengeMessage challengeMsg;
 		if (NTLMCredentials::parseChallengeMessage(&buffer[0], buffer.size(), challengeMsg))
 		{
@@ -131,7 +127,7 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 
 			std::string username;
 			std::string domain;
-			splitUsername(_username, username, domain);
+			NTLMCredentials::splitUsername(_username, username, domain);
 
 			NTLMCredentials::AuthenticateMessage authenticateMsg;
 			authenticateMsg.flags = challengeMsg.flags;
@@ -147,55 +143,10 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 			authenticateMsg.ntlmResponse = NTLMCredentials::createNTLMv2Response(ntlm2Hash, challengeMsg.challenge, ntlmNonce, challengeMsg.targetInfo, timestamp);
 
 			std::vector<unsigned char> authenticateBuf = NTLMCredentials::formatAuthenticateMessage(authenticateMsg);
-			return toBase64(authenticateBuf);
+			return NTLMCredentials::toBase64(authenticateBuf);
 		}
 		else throw HTTPException("Invalid NTLM challenge");
 	}
-}
-
-
-void HTTPNTLMCredentials::splitUsername(const std::string& usernameAndDomain, std::string& username, std::string& domain)
-{
-	std::string::size_type pos = usernameAndDomain.find('\\');
-	if (pos != std::string::npos)
-	{
-		domain.assign(usernameAndDomain, 0, pos);
-		username.assign(usernameAndDomain, pos + 1, std::string::npos);
-		return;
-	}
-	else
-	{
-		pos = usernameAndDomain.find('@');
-		if (pos != std::string::npos)
-		{
-			username.assign(usernameAndDomain, 0, pos);
-			domain.assign(usernameAndDomain, pos + 1, std::string::npos);
-			return;
-		}
-	}
-	username = usernameAndDomain;
-}
-
-
-std::string HTTPNTLMCredentials::toBase64(const std::vector<unsigned char>& buffer)
-{
-	std::ostringstream ostr;
-	Poco::Base64Encoder base64(ostr);
-	base64.rdbuf()->setLineLength(0);
-	base64.write(reinterpret_cast<const char*>(&buffer[0]), buffer.size());
-	base64.close();
-	return ostr.str();
-}
-
-
-std::vector<unsigned char> HTTPNTLMCredentials::fromBase64(const std::string& base64)
-{
-	Poco::MemoryInputStream istr(base64.data(), base64.size());
-	Poco::Base64Decoder debase64(istr);
-	std::vector<unsigned char> buffer(base64.size());
-	debase64.read(reinterpret_cast<char*>(&buffer[0]), buffer.size());
-	buffer.resize(static_cast<std::size_t>(debase64.gcount()));
-	return buffer;
 }
 
 

@@ -160,6 +160,16 @@ public:
 	static void writeBufferDesc(Poco::BinaryWriter& writer, const BufferDesc& desc);
 		/// Writes a buffer descriptor.
 
+	static void splitUsername(const std::string& usernameAndDomain, std::string& username, std::string& domain);
+		/// Splits a username containing a domain into plain username and domain.
+		/// Supported formats are <DOMAIN>\<username> and <username>@<DOMAIN>.
+
+	static std::string toBase64(const std::vector<unsigned char>& buffer);
+		/// Converts the buffer to a base64-encoded string.
+
+	static std::vector<unsigned char> fromBase64(const std::string& base64);
+		/// Decodes the given base64-encoded string.
+
 	static const std::string NTLMSSP;
 		/// Message signature string.
 };
