@@ -111,7 +111,7 @@ target_compile_definitions(Foundation
     $<$<NOT:$<BOOL:${POCO_DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
 )
 target_compile_features(Foundation PUBLIC cxx_defaulted_move_initializers)
-if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER 3.7)
+if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER "3.8")
   target_compile_features(Foundation PUBLIC cxx_std_14)
 endif()
 
