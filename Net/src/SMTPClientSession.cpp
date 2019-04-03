@@ -254,7 +254,8 @@ void SMTPClientSession::loginUsingNTLM(const std::string& username, const std::s
 	int status = sendCommand("AUTH NTLM", NTLMCredentials::toBase64(negotiateBuf), response);
 	if (status == 334)
 	{
-		std::vector<unsigned char> buffer = NTLMCredentials::fromBase64(response);
+		std::vector<unsigned char> buffer = NTLMCredentials::fromBase64(response.substr(4));
+		if (buffer.empty()) throw SMTPException("Invalid NTLM challenge");
 		NTLMCredentials::ChallengeMessage challengeMsg;
 		if (NTLMCredentials::parseChallengeMessage(&buffer[0], buffer.size(), challengeMsg))
 		{

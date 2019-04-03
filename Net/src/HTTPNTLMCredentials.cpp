@@ -117,6 +117,7 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 	else
 	{
 		std::vector<unsigned char> buffer = NTLMCredentials::fromBase64(responseAuthParams);
+		if (buffer.empty()) throw HTTPException("Invalid NTLM challenge");
 		NTLMCredentials::ChallengeMessage challengeMsg;
 		if (NTLMCredentials::parseChallengeMessage(&buffer[0], buffer.size(), challengeMsg))
 		{
