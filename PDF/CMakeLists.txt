@@ -127,7 +127,7 @@ set_target_properties(PDF
     )
 
 if (POCO_UNBUNDLED)
-    target_link_libraries(Foundation PUBLIC ZLIB::ZLIB)
+    target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
     target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
 endif (POCO_UNBUNDLED)
 target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
