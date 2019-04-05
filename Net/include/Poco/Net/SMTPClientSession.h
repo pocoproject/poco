@@ -51,7 +51,8 @@ public:
 		AUTH_CRAM_SHA1,
 		AUTH_LOGIN,
 		AUTH_PLAIN,
-		AUTH_XOAUTH2
+		AUTH_XOAUTH2,
+		AUTH_NTLM
 	};
 
 	explicit SMTPClientSession(const StreamSocket& socket);
@@ -184,6 +185,7 @@ protected:
 	void loginUsingLogin(const std::string& username, const std::string& password);
 	void loginUsingPlain(const std::string& username, const std::string& password);
 	void loginUsingXOAUTH2(const std::string& username, const std::string& password);
+	void loginUsingNTLM(const std::string& username, const std::string& password);
 	DialogSocket& socket();
 
 private:

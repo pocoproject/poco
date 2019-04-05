@@ -74,8 +74,28 @@ HTTPRequest::HTTPRequest(const std::string& method, const std::string& uri, cons
 }
 
 
+HTTPRequest::HTTPRequest(const HTTPRequest& other):
+	HTTPMessage(other),
+	_method(other._method),
+	_uri(other._uri)
+{
+}
+
+
 HTTPRequest::~HTTPRequest()
 {
+}
+
+
+HTTPRequest& HTTPRequest::operator = (const HTTPRequest& other)
+{
+	if (this != &other)
+	{
+		HTTPMessage::operator = (other);
+		_method = other._method;
+		_uri = other._uri;
+	}
+	return *this;
 }
 
 
@@ -172,6 +192,12 @@ void HTTPRequest::setCredentials(const std::string& scheme, const std::string& a
 }
 
 
+void HTTPRequest::removeCredentials()
+{
+	erase(AUTHORIZATION);
+}
+
+
 bool HTTPRequest::hasProxyCredentials() const
 {
 	return has(PROXY_AUTHORIZATION);
@@ -187,6 +213,12 @@ void HTTPRequest::getProxyCredentials(std::string& scheme, std::string& authInfo
 void HTTPRequest::setProxyCredentials(const std::string& scheme, const std::string& authInfo)
 {
 	setCredentials(PROXY_AUTHORIZATION, scheme, authInfo);
+}
+
+
+void HTTPRequest::removeProxyCredentials()
+{
+	erase(PROXY_AUTHORIZATION);
 }
 
 

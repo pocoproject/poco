@@ -20,6 +20,9 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPDigestCredentials.h"
+#include "Poco/Net/HTTPNTLMCredentials.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/SharedPtr.h"
 #include <istream>
@@ -62,11 +65,20 @@ class Net_API HTTPClientSession: public HTTPSession
 	/// set up a session through a proxy.
 {
 public:
+	enum ProxyAuthentication
+	{
+		PROXY_AUTH_NONE,        /// No proxy authentication
+		PROXY_AUTH_HTTP_BASIC,  /// HTTP Basic proxy authentication (default, if username and password are supplied)
+		PROXY_AUTH_HTTP_DIGEST, /// HTTP Digest proxy authentication
+		PROXY_AUTH_NTLM         /// NTLMv2 proxy authentication
+	};
+
 	struct ProxyConfig
 		/// HTTP proxy server configuration.
 	{
 		ProxyConfig():
-			port(HTTP_PORT)
+			port(HTTP_PORT),
+			authMethod(PROXY_AUTH_HTTP_BASIC)
 		{
 		}
 
@@ -82,6 +94,9 @@ public:
 			/// A regular expression defining hosts for which the proxy should be bypassed,
 			/// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
 			/// string to disable proxy bypassing.
+
+		ProxyAuthentication authMethod;
+			/// The authentication method to use - HTTP Basic or NTLM.
 	};
 
 	HTTPClientSession();
@@ -126,7 +141,7 @@ public:
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
-        void setSourceAddress(const SocketAddress& address);
+ 	void setSourceAddress(const SocketAddress& address);
 		/// Sets the source IP address and source port for the HTTPClientSession
 		/// socket.
 		///
@@ -144,13 +159,13 @@ public:
 		/// can be used on the source side of the socket.
 		///
 
-        const SocketAddress& getSourceAddress();
+	const SocketAddress& getSourceAddress();
 		/// Returns the last source address set with setSourceAddress
 
-        const SocketAddress& getSourceAddress4();
+	const SocketAddress& getSourceAddress4();
 		/// Returns the last IPv4 source address set with setSourceAddress
 
-        const SocketAddress& getSourceAddress6();
+	const SocketAddress& getSourceAddress6();
 		/// Returns the last IPV6 source address set with setSourceAddress
 
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
@@ -273,6 +288,14 @@ public:
 		/// This method should only be called if the request contains
 		/// a "Expect: 100-continue" header.
 
+	void flushRequest();
+		/// Flushes the request stream.
+		///
+		/// Normally this method does not need to be called.
+		/// It can be used to ensure the request has been
+		/// fully sent if receiveResponse() is not called, e.g.,
+		/// because the underlying socket will be detached.
+
 	void reset();
 		/// Resets the session and closes the socket.
 		///
@@ -305,6 +328,9 @@ protected:
 	int write(const char* buffer, std::streamsize length);
 		/// Tries to re-connect if keep-alive is on.
 	
+	std::ostream& sendRequestImpl(const HTTPRequest& request);
+		/// Sends the given HTTPRequest over an existing connection.
+
 	virtual std::string proxyRequestPrefix() const;
 		/// Returns the prefix prepended to the URI for proxy requests
 		/// (e.g., "http://myhost.com").
@@ -316,10 +342,20 @@ protected:
 		/// Sets the proxy credentials (Proxy-Authorization header), if
 		/// proxy username and password have been set.
 
-	void proxyAuthenticateImpl(HTTPRequest& request);
+	void proxyAuthenticateImpl(HTTPRequest& request, const ProxyConfig& proxyConfig);
 		/// Sets the proxy credentials (Proxy-Authorization header), if
 		/// proxy username and password have been set.
 		
+	void proxyAuthenticateDigest(HTTPRequest& request);
+		/// Initiates a HTTP Digest authentication handshake with the proxy.
+
+	void proxyAuthenticateNTLM(HTTPRequest& request);
+		/// Initiates a HTTP NTLM authentication handshake with the proxy.
+
+	void sendChallengeRequest(const HTTPRequest& request, HTTPResponse& response);
+		/// Sends a probe request for Digest and NTLM authentication
+		/// to obtain the server challenge.
+
 	StreamSocket proxyConnect();
 		/// Sends a CONNECT request to the proxy server and returns
 		/// a StreamSocket for the resulting connection.
@@ -343,6 +379,10 @@ private:
 	bool            _responseReceived;
 	Poco::SharedPtr<std::ostream> _pRequestStream;
 	Poco::SharedPtr<std::istream> _pResponseStream;
+	HTTPBasicCredentials  _proxyBasicCreds;
+	HTTPDigestCredentials _proxyDigestCreds;
+	HTTPNTLMCredentials   _proxyNTLMCreds;
+	bool            _ntlmProxyAuthenticated;
 
 	static ProxyConfig _globalProxyConfig;
 	
