@@ -258,6 +258,14 @@ public:
 		/// This method should only be called if the request contains
 		/// a "Expect: 100-continue" header.
 
+	void flushRequest();
+		/// Flushes the request stream.
+		///
+		/// Normally this method does not need to be called.
+		/// It can be used to ensure the request has been
+		/// fully sent if receiveResponse() is not called, e.g.,
+		/// because the underlying socket will be detached.
+
 	void reset();
 		/// Resets the session and closes the socket.
 		///
