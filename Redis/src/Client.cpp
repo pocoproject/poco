@@ -73,7 +73,7 @@ void Client::connect()
 	poco_assert(! _input);
 	poco_assert(! _output);
 
-	_socket.connect(_address);
+	_socket = Net::StreamSocket(_address);
 	_input = new RedisInputStream(_socket);
 	_output = new RedisOutputStream(_socket);
 }
@@ -105,6 +105,7 @@ void Client::connect(const Timespan& timeout)
 	poco_assert(! _input);
 	poco_assert(! _output);
 
+	_socket = Net::StreamSocket();
 	_socket.connect(_address, timeout);
 	_input = new RedisInputStream(_socket);
 	_output = new RedisOutputStream(_socket);
@@ -166,6 +167,11 @@ RedisType::Ptr Client::readReply()
 	poco_assert(_input);
 
 	int c = _input->get();
+	if (c == -1)
+	{
+		disconnect();
+		throw RedisException("Lost connection to Redis server");
+	}
 	RedisType::Ptr result = RedisType::createRedisType(c);
 	if (result.isNull())
 	{

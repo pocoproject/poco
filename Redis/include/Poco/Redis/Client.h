@@ -133,7 +133,7 @@ public:
 		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
 	{
-		T result;
+		T result = T();
 		writeCommand(command, true);
 		readReply(result);
 		return result;
