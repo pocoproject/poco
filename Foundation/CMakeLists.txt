@@ -40,7 +40,7 @@ if (POCO_UNBUNDLED)
 		src/pcre_ucd.c
 		src/pcre_tables.c
 	)
-	
+
 else()
 	# pcre
 	POCO_SOURCES( SRCS pcre
