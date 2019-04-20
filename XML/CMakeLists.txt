@@ -35,7 +35,7 @@ set_target_properties( XML
     DEFINE_SYMBOL XML_EXPORTS
     )
 
-target_link_libraries(XML PUBLIC ${EXPAT_LIBRARIES} Poco::Foundation)
+target_link_libraries(XML PUBLIC Poco::Foundation)
 target_include_directories(XML
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -44,7 +44,7 @@ target_include_directories(XML
     )
 
 if (POCO_UNBUNDLED)
-	target_include_directories(XML PUBLIC "${EXPAT_INCLUDE_DIRS}")
+	target_link_libraries(XML PUBLIC EXPAT::EXPAT)
 	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
 else()
 	if(WIN32)

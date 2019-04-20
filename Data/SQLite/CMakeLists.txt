@@ -28,7 +28,7 @@ set_target_properties(DataSQLite
     OUTPUT_NAME PocoDataSQLite
     DEFINE_SYMBOL SQLite_EXPORTS
     )
-target_link_libraries(DataSQLite PUBLIC Poco::Data ${SQLITE3_LIBRARIES})
+target_link_libraries(DataSQLite PUBLIC Poco::Data)
 target_include_directories(DataSQLite
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -37,7 +37,7 @@ target_include_directories(DataSQLite
     )
 
 if(POCO_UNBUNDLED)
-	target_include_directories(DataSQLite PUBLIC "${SQLITE3_INCLUDE_DIRS}")
+        target_link_libraries(DataSQLite PUBLIC SQLite::SQLite3)
 	target_compile_definitions(DataSQLite PUBLIC POCO_UNBUNDLED)
 else()
 	if(WINCE)

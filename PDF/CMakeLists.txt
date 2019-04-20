@@ -125,7 +125,11 @@ set_target_properties(PDF
     DEFINE_SYMBOL PDF_EXPORTS
     )
 
-target_link_libraries(PDF PUBLIC ${ZLIB_LIBRARIES} Poco::XML Poco::Util)
+if (POCO_UNBUNDLED)
+    target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
+    target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+endif (POCO_UNBUNDLED)
+target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -133,9 +137,6 @@ target_include_directories(PDF
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
-if (POCO_UNBUNDLED)
-    target_include_directories(PDF PUBLIC "${ZLIB_INCLUDE_DIRS}")
-    target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
 endif()
 
 POCO_INSTALL(PDF)

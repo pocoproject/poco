@@ -94,7 +94,11 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
+if (POCO_UNBUNDLED)
+    target_link_libraries(Foundation PUBLIC Pcre::Pcre ZLIB::ZLIB)
+    target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+endif (POCO_UNBUNDLED)
+
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -207,11 +211,6 @@ if (ANDROID)
 			POCO_NO_SHAREDMEMORY
 	)
 	target_link_libraries(Foundation PUBLIC log)
-endif()
-
-if(POCO_UNBUNDLED)
-	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif()
 
 POCO_INSTALL(Foundation)

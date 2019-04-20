@@ -24,8 +24,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Append our module directory to CMake
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-if(${CMAKE_VERSION} VERSION_LESS "3.4")
+if(CMAKE_VERSION VERSION_LESS "3.4")
 	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/V33)
+endif()
+if(CMAKE_VERSION VERSION_LESS "3.10")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/V39)
+endif()
+if(CMAKE_VERSION VERSION_LESS "3.14")
+	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/V313)
 endif()
 #################################################################################
 # Setup C/C++ compiler options
@@ -435,6 +441,15 @@ install(
     COMPONENT
         Devel
 )
+
+if(POCO_UNBUNDLED)
+    install(FILES cmake/FindPCRE.cmake
+            DESTINATION "${PocoConfigPackageLocation}")
+    install(FILES cmake/V39/FindEXPAT.cmake
+            DESTINATION "${PocoConfigPackageLocation}/V39")
+    install(FILES cmake/V313/FindSQLite3.cmake 
+            DESTINATION "${PocoConfigPackageLocation}/V313")
+endif()
 
 message(STATUS "CMake ${CMAKE_VERSION} successfully configured ${PROJECT_NAME} using ${CMAKE_GENERATOR} generator")
 message(STATUS "${PROJECT_NAME} package version: ${PROJECT_VERSION}")
