@@ -47,6 +47,14 @@ namespace{
 Poco::Timestamp::TimeVal timespec2Microsecs(const struct timespec &ts) {
 	return ts.tv_sec * 1000000L + ts.tv_nsec / 1000L;
 }
+
+#if defined(_AIX) && defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700
+// on AIX struct timespec is not the same as struct st_timespec
+Poco::Timestamp::TimeVal timespec2Microsecs(const struct st_timespec &ts) {
+	return ts.tv_sec * 1000000L + ts.tv_nsec / 1000;
+}
+#endif // defined(_AIX) && defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 700
+
 } // namespace
 
 namespace Poco {
