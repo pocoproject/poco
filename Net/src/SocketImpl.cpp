@@ -708,7 +708,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	return rc > 0;
 
 #else
-
+	if (sockfd >= FD_SETSIZE) throw InvalidSocketException();
+	
 	fd_set fdRead;
 	fd_set fdWrite;
 	fd_set fdExcept;
