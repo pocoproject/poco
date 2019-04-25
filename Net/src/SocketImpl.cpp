@@ -708,6 +708,8 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	return rc > 0;
 
 #else
+	//select() can monitor only file descriptors numbers that are less than FD_SETSIZE
+	//otherwise it can cause stack corruption (known issue)
 	if (sockfd >= FD_SETSIZE) throw InvalidSocketException();
 	
 	fd_set fdRead;
