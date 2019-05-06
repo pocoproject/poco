@@ -39,6 +39,7 @@ public:
 	
 	pid_t id() const;
 	int wait() const;
+	int tryWait() const;
 	
 private:
 	pid_t _pid;

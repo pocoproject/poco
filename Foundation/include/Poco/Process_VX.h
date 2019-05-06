@@ -41,6 +41,7 @@ public:
 	
 	int id() const;
 	int wait() const;
+	int tryWait() const;
 	
 private:
 	int _pid;

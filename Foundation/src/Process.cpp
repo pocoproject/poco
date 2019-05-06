@@ -111,6 +111,10 @@ int ProcessHandle::wait() const
 	return _pImpl->wait();
 }
 
+int ProcessHandle::tryWait() const
+{
+	return _pImpl->tryWait();
+}
 
 //
 // Process
@@ -167,6 +171,10 @@ int Process::wait(const ProcessHandle& handle)
 	return handle.wait();
 }
 
+int Process::tryWait(const ProcessHandle& handle)
+{
+	return handle.tryWait();
+}
 
 void Process::kill(ProcessHandle& handle)
 {
@@ -183,6 +191,7 @@ bool Process::isRunning(const ProcessHandle& handle)
 {
 	return isRunningImpl(*handle._pImpl);
 }
+
 bool Process::isRunning(PID pid)
 {
 	return isRunningImpl(pid);

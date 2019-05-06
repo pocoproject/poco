@@ -66,9 +66,30 @@ int ProcessHandleImpl::wait() const
 	while (rc < 0 && errno == EINTR);
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	return WEXITSTATUS(status);
+	if (WIFEXITED(status)) // normal termination
+		return WEXITSTATUS(status);
+	else // termination by a signal
+		return 256 + WTERMSIG(status);
 }
 
+int ProcessHandleImpl::tryWait() const
+{
+	int status;
+	int rc;
+	do
+	{
+		rc = waitpid(_pid, &status, 0);
+	}
+	while (rc < 0 && errno == EINTR);
+	if (rc == 0)
+		return -1;
+	if (rc != _pid)
+		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+	if (WIFEXITED(status)) // normal termination
+		return WEXITSTATUS(status);
+	else // termination by a signal
+		return 256 + WTERMSIG(status);
+}
 
 //
 // ProcessImpl

@@ -72,6 +72,16 @@ int ProcessHandleImpl::wait() const
 	return exitCode;
 }
 
+int ProcessHandleImpl::tryWait() const
+{
+	DWORD exitCode;
+	if (GetExitCodeProcess(_hProcess, &exitCode) == 0)
+		throw SystemException("Cannot get exit code for process", NumberFormatter::format(_pid));
+    if (exitCode == STILL_ACTIVE)
+        return -1;
+    else
+        return exitCode;
+}
 
 //
 // ProcessImpl

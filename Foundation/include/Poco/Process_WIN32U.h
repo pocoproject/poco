@@ -40,6 +40,7 @@ public:
 	UInt32 id() const;
 	HANDLE process() const;
 	int wait() const;
+	int tryWait() const;
 	void closeHandle();
 
 private:
