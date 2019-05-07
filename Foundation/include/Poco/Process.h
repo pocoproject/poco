@@ -71,7 +71,7 @@ public:
 	int tryWait() const;
 		/// Checks that process is terminated
 		/// and returns the exit code of the process.
-		/// If the process ai still running, returns -1.
+		/// If the process is still running, returns -1.
 
 protected:
 	ProcessHandle(ProcessHandleImpl* pImpl);
