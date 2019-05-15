@@ -103,6 +103,14 @@ public:
 	const std::string& getPassword() const;
 		/// Returns the password.
 
+	void setHost(const std::string& host);
+		/// Sets the target host. Only used for SSPI-based NTLM authentication using
+		/// the credentials of the currently logged-in user on Windows.
+
+	const std::string& getHost() const;
+		/// Returns the target host. Only used for SSPI-based NTLM authentication using
+		/// the credentials of the currently logged-in user on Windows.
+
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
 		/// Inspects WWW-Authenticate header of the response, initializes
 		/// the internal state (in case of digest authentication) and
@@ -193,6 +201,18 @@ inline void HTTPCredentials::setPassword(const std::string& password)
 inline const std::string& HTTPCredentials::getPassword() const
 {
 	return _digest.getPassword();
+}
+
+
+inline void HTTPCredentials::setHost(const std::string& host)
+{
+	_ntlm.setHost(host);
+}
+
+
+inline const std::string& HTTPCredentials::getHost() const
+{
+	return _ntlm.getHost();
 }
 
 

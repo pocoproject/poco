@@ -192,6 +192,7 @@ private:
 	void sendCommands(const MailMessage& message, const Recipients* pRecipients = 0);
 	void transportMessage(const MailMessage& message);
 
+	std::string  _host;
 	DialogSocket _socket;
 	bool         _isOpen;
 };
