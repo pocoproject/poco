@@ -30,10 +30,6 @@ namespace Poco {
 namespace Net {
 
 
-const std::string SSPINTLMCredentials::SERVICE_HTTP("HTTP");
-const std::string SSPINTLMCredentials::SERVICE_SMTP("SMTP");
-
-
 struct NTLMContextImpl
 {
 	NTLMContextImpl():
@@ -73,7 +69,7 @@ public:
 	{
 		PSecPkgInfoW pSecPkgInfo;
 		SECURITY_STATUS status = _pSecFunTable->QuerySecurityPackageInfoW(L"NTLM", &pSecPkgInfo);
-		if (status == SEC_E_OK) 
+		if (status == SEC_E_OK)
 		{
 			_pSecFunTable->FreeContextBuffer(pSecPkgInfo);
 			return true;
@@ -95,14 +91,14 @@ public:
 
 		TimeStamp expiry;
 		status = _pSecFunTable->AcquireCredentialsHandleW(
-			NULL, 
-			L"NTLM", 
-			SECPKG_CRED_OUTBOUND, 
-			NULL, 
-			NULL, 
-			NULL, 
-			NULL, 
-			&pContext->_pImpl->credentials, 
+			NULL,
+			L"NTLM",
+			SECPKG_CRED_OUTBOUND,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			&pContext->_pImpl->credentials,
 			&expiry);
 
 		if (status != SEC_E_OK) throw Poco::SystemException("Failed to acquire NTLM credentials", status);
@@ -132,13 +128,13 @@ public:
 		unsigned long attrs;
 		TimeStamp expiry;
 		SECURITY_STATUS status = _pSecFunTable->InitializeSecurityContextW(
-			&context._pImpl->credentials, 
-			NULL, 
-			const_cast<SEC_WCHAR*>(context._pImpl->spn.c_str()), 
-			0, 
-			0, 
-			SECURITY_NETWORK_DREP, 
-			NULL, 
+			&context._pImpl->credentials,
+			NULL,
+			const_cast<SEC_WCHAR*>(context._pImpl->spn.c_str()),
+			0,
+			0,
+			SECURITY_NETWORK_DREP,
+			NULL,
 			0,
 			&context._pImpl->context,
 			&msgBufferDesc,
@@ -209,11 +205,11 @@ public:
 
 	void clearNTLMContext(NTLMContext& ctx)
 	{
-		if (SecIsValidHandle(&ctx._pImpl->context)) 
+		if (SecIsValidHandle(&ctx._pImpl->context))
 		{
 			_pSecFunTable->DeleteSecurityContext(&ctx._pImpl->context);
 		}
-		if (SecIsValidHandle(&ctx._pImpl->credentials)) 
+		if (SecIsValidHandle(&ctx._pImpl->credentials))
 		{
 			_pSecFunTable->FreeCredentialsHandle(&ctx._pImpl->credentials);
 		}
@@ -229,7 +225,7 @@ private:
 };
 
 
-namespace 
+namespace
 {
 	static Poco::SingletonHolder<SSPINTLMProvider> sspintlmProviderHolder;
 }
@@ -241,6 +237,20 @@ SSPINTLMProvider& SSPINTLMProvider::instance()
 }
 
 
+} } // namespace Poco::Net
+
+
+#endif // POCO_OS == POCO_OS_WINDOWS_NT
+
+
+namespace Poco {
+namespace Net {
+
+
+const std::string SSPINTLMCredentials::SERVICE_HTTP("HTTP");
+const std::string SSPINTLMCredentials::SERVICE_SMTP("SMTP");
+
+
 NTLMContext::NTLMContext(NTLMContextImpl* pImpl):
 	_pImpl(pImpl)
 {
@@ -249,12 +259,11 @@ NTLMContext::NTLMContext(NTLMContextImpl* pImpl):
 
 NTLMContext::~NTLMContext()
 {
+#if POCO_OS == POCO_OS_WINDOWS_NT
 	SSPINTLMProvider::instance().clearNTLMContext(*this);
 	delete _pImpl;
+#endif
 }
-
-
-#endif // POCO_OS == POCO_OS_WINDOWS_NT
 
 
 bool SSPINTLMCredentials::available()
