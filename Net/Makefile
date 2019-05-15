@@ -33,7 +33,7 @@ objects = \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials \
 	PollSet UDPClient UDPServerParams \
-	NTLMCredentials HTTPNTLMCredentials
+	NTLMCredentials SSPINTLMCredentials HTTPNTLMCredentials
 
 target         = PocoNet
 target_version = $(LIBVERSION)

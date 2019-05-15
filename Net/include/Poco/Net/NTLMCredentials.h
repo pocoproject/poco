@@ -2,7 +2,7 @@
 // NTLMCredentials.h
 //
 // Library: Net
-// Package: HTTP
+// Package: NTLM
 // Module:	NTLMCredentials
 //
 // Definition of the NTLMCredentials class.
@@ -152,7 +152,7 @@ public:
 		/// Returns true if the message was parsed successfully, otherwise false.
 
 	static std::vector<unsigned char> formatAuthenticateMessage(const AuthenticateMessage& message);
-		/// Creates the NTLM Type 1 Authenticate message used for initiating NTLM authentication from the client.
+		/// Creates the NTLM Type 3 Authenticate message used for sending the response to the challenge.
 
 	static void readBufferDesc(Poco::BinaryReader& reader, BufferDesc& desc);
 		/// Reads a buffer descriptor.

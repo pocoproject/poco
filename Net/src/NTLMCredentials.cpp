@@ -2,7 +2,7 @@
 // NTLMCredentials.cpp
 //
 // Library: Net
-// Package: HTTP
+// Package: NTLM
 // Module:	NTLMCredentials
 //
 // Copyright (c) 2019, Applied Informatics Software Engineering GmbH.
@@ -138,7 +138,10 @@ std::vector<unsigned char> NTLMCredentials::createNTLMv2Response(const std::vect
 	writer << timestamp;
 	writer.writeRaw(reinterpret_cast<const char*>(&nonce[0]), nonce.size());
 	writer << Poco::UInt32(0);
-	writer.writeRaw(reinterpret_cast<const char*>(&targetInfo[0]), targetInfo.size());
+	if (targetInfo.size() > 0)
+	{
+		writer.writeRaw(reinterpret_cast<const char*>(&targetInfo[0]), targetInfo.size());
+	}
 	writer << Poco::UInt32(0);
 
 	poco_assert_dbg (blobStream.charsWritten() == blob.size() - 16);

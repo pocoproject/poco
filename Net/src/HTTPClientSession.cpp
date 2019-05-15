@@ -540,6 +540,7 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyC
 		{
 			_proxyNTLMCreds.setUsername(proxyConfig.username);
 			_proxyNTLMCreds.setPassword(proxyConfig.password);
+			_proxyNTLMCreds.setHost(proxyConfig.host);
 			proxyAuthenticateNTLM(request);
 			_ntlmProxyAuthenticated = true;
 		}

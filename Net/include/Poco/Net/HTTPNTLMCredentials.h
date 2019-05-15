@@ -19,6 +19,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SSPINTLMCredentials.h"
 #include <vector>
 
 
@@ -42,6 +43,9 @@ public:
 	HTTPNTLMCredentials(const std::string& username, const std::string& password);
 		/// Creates a HTTPNTLMCredentials object with the given username and password.
 
+	HTTPNTLMCredentials(const std::string& username, const std::string& password, const std::string& host);
+		/// Creates a HTTPNTLMCredentials object with the given username, password and target host.
+
 	~HTTPNTLMCredentials();
 		/// Destroys the HTTPNTLMCredentials.
 
@@ -59,6 +63,14 @@ public:
 
 	const std::string& getPassword() const;
 		/// Returns the password.
+
+	void setHost(const std::string& host);
+		/// Sets the target host.\
+		///
+		/// Used for SSPI-based NTLM authentication only.
+
+	const std::string& getHost() const;
+		/// Returns the target host.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
 		/// Parses WWW-Authenticate header of the HTTPResponse, initializes
@@ -101,9 +113,12 @@ private:
 	HTTPNTLMCredentials& operator = (const HTTPNTLMCredentials&);
 
 	std::string createNTLMMessage(const std::string& ntlmChallengeBase64);
+	bool useSSPINTLM() const;
 
 	std::string _username;
 	std::string _password;
+	std::string _host;
+	Poco::SharedPtr<NTLMContext> _pNTLMContext;
 };
 
 
@@ -119,6 +134,18 @@ inline const std::string& HTTPNTLMCredentials::getUsername() const
 inline const std::string& HTTPNTLMCredentials::getPassword() const
 {
 	return _password;
+}
+
+
+inline const std::string& HTTPNTLMCredentials::getHost() const
+{
+	return _host;
+}
+
+
+inline bool HTTPNTLMCredentials::useSSPINTLM() const
+{
+	return _username.empty() && _password.empty() && SSPINTLMCredentials::available();
 }
 
 

@@ -67,6 +67,7 @@ void HTTPCredentials::fromURI(const URI& uri)
 	extractCredentials(uri, username, password);
 	setUsername(username);
 	setPassword(password);
+	setHost(uri.getHost());
 	_digest.reset();
 }
 
@@ -89,6 +90,10 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 		{
 			_ntlm.setUsername(_digest.getUsername());
 			_ntlm.setPassword(_digest.getPassword());
+			if (_ntlm.getHost().empty())
+			{
+				_ntlm.setHost(request.getHost());
+			}
 			_ntlm.authenticate(request, iter->second.substr(5));
 			return;
 		}
