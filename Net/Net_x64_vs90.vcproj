@@ -186,7 +186,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoNetMTd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoNetmtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -201,7 +201,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetMTd.lib"
+				OutputFile="..\lib64\PocoNetmtd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -260,7 +260,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetMT.lib"
+				OutputFile="..\lib64\PocoNetmt.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -303,7 +303,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib64\PocoNetMDd.pdb"
+				ProgramDataBaseFileName="..\lib64\PocoNetmdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -318,7 +318,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetMDd.lib"
+				OutputFile="..\lib64\PocoNetmdd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -377,7 +377,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib64\PocoNetMD.lib"
+				OutputFile="..\lib64\PocoNetmd.lib"
 				TargetMachine="17"/>
 			<Tool
 				Name="VCALinkTool"/>
@@ -593,6 +593,8 @@
 				<File
 					RelativePath=".\include\Poco\Net\HTTPMessage.h"/>
 				<File
+					RelativePath=".\include\Poco\Net\HTTPNTLMCredentials.h"/>
+				<File
 					RelativePath=".\include\Poco\Net\HTTPRequest.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\HTTPResponse.h"/>
@@ -623,6 +625,8 @@
 					RelativePath=".\src\HTTPHeaderStream.cpp"/>
 				<File
 					RelativePath=".\src\HTTPMessage.cpp"/>
+				<File
+					RelativePath=".\src\HTTPNTLMCredentials.cpp"/>
 				<File
 					RelativePath=".\src\HTTPRequest.cpp"/>
 				<File
@@ -974,6 +978,23 @@
 					RelativePath=".\include\Poco\Net\UDPServerParams.h"/>
 				<File
 					RelativePath=".\include\Poco\Net\UDPSocketReader.h"/>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="NTLM">
+			<Filter
+				Name="Header Files">
+				<File
+					RelativePath=".\include\Poco\Net\NTLMCredentials.h"/>
+				<File
+					RelativePath=".\include\Poco\Net\SSPINTLMCredentials.h"/>
+			</Filter>
+			<Filter
+				Name="Source Files">
+				<File
+					RelativePath=".\src\NTLMCredentials.cpp"/>
+				<File
+					RelativePath=".\src\SSPINTLMCredentials.cpp"/>
 			</Filter>
 		</Filter>
 		<File
