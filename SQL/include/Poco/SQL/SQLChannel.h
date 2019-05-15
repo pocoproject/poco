@@ -1,7 +1,7 @@
 //
 // SQLChannel.h
 //
-// Library: Data
+// Library: SQL
 // Package: Logging
 // Module:  SQLChannel
 //

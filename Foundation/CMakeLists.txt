@@ -97,7 +97,11 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 	)
 
-target_link_libraries(Foundation PUBLIC ${PCRE_LIBRARIES} ${ZLIB_LIBRARIES})
+if (POCO_UNBUNDLED)
+    target_link_libraries(Foundation PUBLIC Pcre::Pcre ZLIB::ZLIB)
+    target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
+endif (POCO_UNBUNDLED)
+
 target_include_directories(Foundation
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -107,7 +111,13 @@ target_include_directories(Foundation
 target_compile_definitions(Foundation
   PUBLIC
     $<$<CONFIG:Debug>:_DEBUG>
+    $<$<BOOL:${POCO_DISABLE_CPP14}>:POCO_DISABLE_CPP14>
+    $<$<NOT:$<BOOL:${POCO_DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
 )
+target_compile_features(Foundation PUBLIC cxx_defaulted_move_initializers)
+if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER "3.8")
+  target_compile_features(Foundation PUBLIC cxx_std_14)
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(Foundation
@@ -117,7 +127,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(WIN32)
-  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE __LCC__)  #__LCC__ define used by MySQL.h
+  target_compile_definitions(Foundation PUBLIC UNICODE _UNICODE)
   target_link_libraries(Foundation PUBLIC iphlpapi)
 endif(WIN32)
 
@@ -223,11 +233,6 @@ if ((${CMAKE_CXX_COMPILER_ID} MATCHES "XL") AND (${CMAKE_SYSTEM} MATCHES "AIX"))
 		-qsuppress=1540-0095
 		-qsuppress=1500-030
 	)
-endif()
-
-if(POCO_UNBUNDLED)
-	target_include_directories(Foundation PUBLIC "${PCRE_INCLUDE_DIRS}" "${ZLIB_INCLUDE_DIRS}")
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
 endif()
 
 if (NOT POCO_ENABLE_WSTRING)

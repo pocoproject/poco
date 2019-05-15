@@ -1,8 +1,8 @@
 //
 // LOBStream.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  LOBStream
 //
 // Definition of the LOBStream class.

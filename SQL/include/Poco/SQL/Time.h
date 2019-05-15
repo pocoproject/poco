@@ -1,8 +1,8 @@
 //
 // Time.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Time
 //
 // Definition of the Time class.

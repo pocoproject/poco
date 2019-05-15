@@ -1,8 +1,8 @@
 //
 // RecordSet.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  RecordSet
 //
 // Definition of the RecordSet class.

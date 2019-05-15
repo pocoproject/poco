@@ -1,8 +1,8 @@
 //
 // SessionImpl.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  SessionImpl
 //
 // Definition of the SessionImpl class.
@@ -73,6 +73,9 @@ public:
 
 	virtual void close() = 0;
 		/// Closes the connection.
+
+	virtual void reset() = 0;
+		/// Reset connection with dababase and clears session state, but without disconnecting
 
 	virtual bool isConnected() const = 0;
 		/// Returns true if session is connected, false otherwise.

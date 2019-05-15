@@ -46,7 +46,12 @@ void SessionImpl::open(const std::string& connectionString)
 
 void SessionImpl::close()
 {
-	_connected = false;
+    _connected = false;
+}
+
+
+void SessionImpl::reset()
+{
 }
 
 

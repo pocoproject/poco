@@ -301,6 +301,7 @@ void HTMLFormTest::testSubmit2()
 	HTTPRequest req("POST", "/form.cgi");
 	form.prepareSubmit(req);
 	assertTrue (req.getContentType() == HTMLForm::ENCODING_URL);
+	assertTrue (req.getContentLength() == 64);
 }
 
 
@@ -335,6 +336,25 @@ void HTMLFormTest::testSubmit4()
 	form.prepareSubmit(req);
 
 	assertTrue (req.getURI() == "/form.cgi?field1=value1&field1=value%202&field1=value%3D3&field1=value%264");
+}
+
+
+void HTMLFormTest::testSubmit5()
+{
+	HTMLForm form(HTMLForm::ENCODING_MULTIPART);
+	form.set("field1", "value1");
+	form.set("field2", "value 2");
+	form.set("field3", "value=3");
+	form.set("field4", "value&4");
+
+	HTTPRequest req("POST", "/form.cgi", HTTPMessage::HTTP_1_1);
+	form.prepareSubmit(req, HTMLForm::OPT_USE_CONTENT_LENGTH);
+	std::string expCT(HTMLForm::ENCODING_MULTIPART);
+	expCT.append("; boundary=\"");
+	expCT.append(form.boundary());
+	expCT.append("\"");
+	assertTrue (req.getContentType() == expCT);
+	assertTrue (req.getContentLength() == 403);
 }
 
 
@@ -423,6 +443,7 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit3);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit4);
+	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit5);
 	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitUrl);
 	CppUnit_addTest(pSuite, HTMLFormTest, testFieldLimitMultipart);
 

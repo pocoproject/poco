@@ -1,8 +1,8 @@
 //
 // AbstractBinder.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AbstractBinder
 //
 // Definition of the AbstractBinder class.

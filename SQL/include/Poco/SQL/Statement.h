@@ -1,8 +1,8 @@
 //
 // Statement.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Statement
 //
 // Definition of the Statement class.

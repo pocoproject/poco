@@ -15,7 +15,7 @@ set_target_properties(SQLPostgreSQL
     DEFINE_SYMBOL PostgreSQL_EXPORTS
     )
 
-target_link_libraries(SQLPostgreSQL PUBLIC Poco::SQL ${PostgreSQL_LIBRARIES})
+target_link_libraries(SQLPostgreSQL PUBLIC Poco::SQL PostgreSQL::client)
 target_include_directories(SQLPostgreSQL
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

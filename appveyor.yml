@@ -1,7 +1,7 @@
 version: build {branch}-{build}
 
 cache:
-  - C:\mysql-5.7.21-win32
+  - C:\mysql-5.7.26-win32
   - C:\ProgramData\chocolatey
   - C:\OpenSSL-Win32
   - C:\OpenSSL-Win64
@@ -55,9 +55,9 @@ configuration:
 
 environment:
   bundling:     bundled
-  MYSQL32URL:   http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.23-win32.zip
-  MYSQL32ZIP:   mysql-5.7.23-win32.zip
-  MYSQL32:      C:\mysql-5.7.23-win32
+  MYSQL32URL:   http://cdn.mysql.com//Downloads/MySQL-5.7/mysql-5.7.26-win32.zip
+  MYSQL32ZIP:   mysql-5.7.26-win32.zip
+  MYSQL32:      C:\mysql-5.7.26-win32
   MYSQL64:      C:\Program Files\MySql\MySQL Server 5.7
   POSTGRES32:   C:\Program Files (x86)\PostgreSQL\9.6
   POSTGRES64:   C:\Program Files\PostgreSQL\9.6
@@ -175,35 +175,6 @@ install:
 # -------------------------------------------------------------------------------------------
 
 
-# -------------------------------------------------------------------------------------------
-# OpenSSL-Win32 & OpenSSL-Win64
-# Download & use OpenSSL from  Shining Light Productions for CMake
-# until CMake use implicitly the embedded openssl from the Poco repo. See issue #1093
-# -------------------------------------------------------------------------------------------
-  - ps: |
-       if ($env:builder -eq "cmake")
-       {
-         if ($env:platform -eq "Win32")
-         {
-             $openssl     = $env:OPENSSL32
-             $opensslexe  = $env:OPENSSL32EXE
-         }
-         if ($env:platform -eq "x64")
-         {
-             $openssl     = $env:OPENSSL64
-             $opensslexe  = $env:OPENSSL64EXE
-         }
-         $opensslurl  = $env:OPENSSLURL + "/" + $opensslexe
-
-         if (Test-Path $openssl) {
-           Write-Host "using $openssl from cache" -ForegroundColor Yellow
-         } else {
-           Write-Host "downloading $openssl" -ForegroundColor Cyan
-           Start-FileDownload $opensslurl
-           Write-Host "installing  $openssl" -ForegroundColor Green
-           Start-Process $opensslexe -Args "/silent /verysilent /sp- /suppressmsgboxes" -Wait
-         }
-       }
 # -------------------------------------------------------------------------------------------
 #  MySQL 32 bit is not available by default on AppVeyor
 # -------------------------------------------------------------------------------------------
@@ -420,24 +391,29 @@ build_script:
       {
         if ($env:platform -eq "Win32")
         {
-            $openssl = $env:OPENSSL32
+            if ($env:vsver -eq "140")
+            {
+                $generator = '"Visual Studio 14 2015"'
+            }
+            if ($env:vsver -eq "150")
+            {
+                $generator = '"Visual Studio 15 2017"'
+            }
         }
         if ($env:platform -eq "x64")
         {
-            $openssl = $env:OPENSSL64
-        }
-        if ($env:vsver -eq "140")
-        {
-            $generator = '"Visual Studio 14 2015"'
-        }
-        if ($env:vsver -eq "150")
-        {
-            $generator = '"Visual Studio 15 2017"'
+            if ($env:vsver -eq "140")
+            {
+                $generator = '"Visual Studio 14 2015 Win64"'
+            }
+            if ($env:vsver -eq "150")
+            {
+                $generator = '"Visual Studio 15 2017 Win64"'
+            }
         }
         $defs = "-H."
         $defs+=" -Bbuild-cmake"
         $defs+=" -G" + $generator;
-        $defs+=" -DCMAKE_BUILD_TYPE=Debug";
         $defs+=" -DPOCO_ENABLE_PDF=OFF";
         $defs+=" -DPOCO_ENABLE_NETSSL=ON";
         $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
@@ -450,8 +426,8 @@ build_script:
         gc cout; gc cerr;
         try {
           $ErrorActionPreference = 'Continue';
-          Write-Host -ForegroundColor Yellow cmake `-`-build build-cmake
-          cmake `-`-build build-cmake
+          Write-Host -ForegroundColor Yellow cmake `-`-build build-cmake --config Debug
+          cmake `-`-build build-cmake --config Debug
         } catch {
           Write-Warning "Oops: $_"
         }
@@ -479,9 +455,7 @@ before_test:
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class PathTest>.testFind,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,';
       $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,';
-      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,';
-      $CPPUNIT_IGNORE+='class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,';     
-      
+
       set-item -force -path "ENV:CPPUNIT_IGNORE"  -value $CPPUNIT_IGNORE
       Write-Host -ForegroundColor Yellow 'CPPUNIT_IGNORE'
       Write-Host -ForegroundColor Yellow $line;
@@ -591,12 +565,12 @@ test_script:
         {
           pushd build-cmake;
           Write-Host -ForegroundColor Yellow $line;
-          ctest --config RelWithDebInfo -N
+          ctest --config Debug -N
           Write-Host -ForegroundColor Yellow $line;
 
-          $cmd='ctest -C Debug -VV -E SQL*';
+          $cmd='ctest -C Debug --output-on-failure -E SQL*';
           Write-Host -ForegroundColor Yellow $cmd
-          $cmd
+          iex "& $cmd"
           popd
         }
         Write-Host $runs' runs, ' $fails' fails'

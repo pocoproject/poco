@@ -1,8 +1,8 @@
 //
 // StatementCreator.cpp
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  StatementCreator
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

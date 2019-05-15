@@ -1,8 +1,8 @@
 //
 // Limit.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Limit
 //
 // Definition of the Limit class.

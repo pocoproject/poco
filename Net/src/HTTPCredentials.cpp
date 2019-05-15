@@ -85,6 +85,13 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 			_digest.authenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
 			return;
 		}
+		else if (isNTLMCredentials(iter->second))
+		{
+			_ntlm.setUsername(_digest.getUsername());
+			_ntlm.setPassword(_digest.getPassword());
+			_ntlm.authenticate(request, iter->second.substr(5));
+			return;
+		}
 	}
 }
 
@@ -103,6 +110,10 @@ void HTTPCredentials::updateAuthInfo(HTTPRequest& request)
 		{
 			_digest.updateAuthInfo(request);
 		}
+		else if (isNTLMCredentials(authorization))
+		{
+			_ntlm.updateAuthInfo(request);
+		}
 	}
 }
 
@@ -119,6 +130,13 @@ void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse
 		else if (isDigestCredentials(iter->second))
 		{
 			_digest.proxyAuthenticate(request, HTTPAuthenticationParams(iter->second.substr(7)));
+			return;
+		}
+		else if (isNTLMCredentials(iter->second))
+		{
+			_ntlm.setUsername(_digest.getUsername());
+			_ntlm.setPassword(_digest.getPassword());
+			_ntlm.proxyAuthenticate(request, iter->second.substr(5));
 			return;
 		}
 	}
@@ -139,6 +157,10 @@ void HTTPCredentials::updateProxyAuthInfo(HTTPRequest& request)
 		{
 			_digest.updateProxyAuthInfo(request);
 		}
+		else if (isNTLMCredentials(authorization))
+		{
+			_ntlm.updateProxyAuthInfo(request);
+		}
 	}
 }
 
@@ -155,6 +177,12 @@ bool HTTPCredentials::isDigestCredentials(const std::string& header)
 }
 
 
+bool HTTPCredentials::isNTLMCredentials(const std::string& header)
+{
+	return icompare(header, 0, 4, "NTLM") == 0 && (header.size() > 5 ? Poco::Ascii::isSpace(header[5]) : true);
+}
+
+
 bool HTTPCredentials::hasBasicCredentials(const HTTPRequest& request)
 {
 	return request.has(HTTPRequest::AUTHORIZATION) && isBasicCredentials(request.get(HTTPRequest::AUTHORIZATION));
@@ -167,6 +195,12 @@ bool HTTPCredentials::hasDigestCredentials(const HTTPRequest& request)
 }
 
 
+bool HTTPCredentials::hasNTLMCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::AUTHORIZATION) && isNTLMCredentials(request.get(HTTPRequest::AUTHORIZATION));
+}
+
+
 bool HTTPCredentials::hasProxyBasicCredentials(const HTTPRequest& request)
 {
 	return request.has(HTTPRequest::PROXY_AUTHORIZATION) && isBasicCredentials(request.get(HTTPRequest::PROXY_AUTHORIZATION));
@@ -176,6 +210,12 @@ bool HTTPCredentials::hasProxyBasicCredentials(const HTTPRequest& request)
 bool HTTPCredentials::hasProxyDigestCredentials(const HTTPRequest& request)
 {
 	return request.has(HTTPRequest::PROXY_AUTHORIZATION) && isDigestCredentials(request.get(HTTPRequest::PROXY_AUTHORIZATION));
+}
+
+
+bool HTTPCredentials::hasProxyNTLMCredentials(const HTTPRequest& request)
+{
+	return request.has(HTTPRequest::PROXY_AUTHORIZATION) && isNTLMCredentials(request.get(HTTPRequest::PROXY_AUTHORIZATION));
 }
 
 

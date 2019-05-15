@@ -212,7 +212,7 @@ void HTMLForm::read(const std::string& queryString)
 }
 
 
-void HTMLForm::prepareSubmit(HTTPRequest& request)
+void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 {
 	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
@@ -238,11 +238,11 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 			request.setKeepAlive(false);
 			request.setChunkedTransferEncoding(false);
 		}
-		else if (_encoding != ENCODING_URL)
+		else if (_encoding != ENCODING_URL && (options & OPT_USE_CONTENT_LENGTH) == 0)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
-		if (!request.getChunkedTransferEncoding())
+		if (!request.getChunkedTransferEncoding() && !request.hasContentLength())
  		{
  			request.setContentLength(calculateContentLength());
  		}

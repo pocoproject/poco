@@ -33,6 +33,9 @@ class HTTPResponse;
 class Net_API HTTPAuthenticationParams: public NameValueCollection
 	/// Collection of name-value pairs of HTTP authentication header (i.e.
 	/// "realm", "qop", "nonce" in case of digest authentication header).
+	///
+	/// For NTLM, the base64-encoded NTLM message is available from
+	/// the "NTLM" property.
 {
 public:
 	HTTPAuthenticationParams();
@@ -89,6 +92,7 @@ public:
 		/// request or response authentication header.
 
 	static const std::string REALM;
+	static const std::string NTLM;
 	static const std::string WWW_AUTHENTICATE;
 	static const std::string PROXY_AUTHENTICATE;
 

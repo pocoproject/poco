@@ -1,8 +1,8 @@
 //
 // BulkExtraction.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  BulkExtraction
 //
 // Definition of the BulkExtraction class.

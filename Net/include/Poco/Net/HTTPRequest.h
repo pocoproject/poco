@@ -39,7 +39,7 @@ public:
 	HTTPRequest();
 		/// Creates a GET / HTTP/1.0 HTTP request.
 		
-	HTTPRequest(const std::string& version);
+	explicit HTTPRequest(const std::string& version);
 		/// Creates a GET / HTTP/1.x request with
 		/// the given version (HTTP/1.0 or HTTP/1.1).
 		
@@ -49,8 +49,14 @@ public:
 	HTTPRequest(const std::string& method, const std::string& uri, const std::string& version);
 		/// Creates a HTTP request with the given method, URI and version.
 
+	HTTPRequest(const HTTPRequest& other);
+		/// Creates a HTTP request by copying another one.
+
 	virtual ~HTTPRequest();
 		/// Destroys the HTTPRequest.
+
+	HTTPRequest& operator = (const HTTPRequest&);
+		/// Assignment operator.
 
 	void setMethod(const std::string& method);
 		/// Sets the method.
@@ -103,6 +109,9 @@ public:
 		/// Sets the authentication scheme and information for
 		/// this request.
 		
+	void removeCredentials();
+		/// Removes any credentials from the request.
+
 	bool getExpectContinue() const;
 		/// Returns true if the request contains an
 		/// "Expect: 100-continue" header.
@@ -125,6 +134,9 @@ public:
 	void setProxyCredentials(const std::string& scheme, const std::string& authInfo);
 		/// Sets the proxy authentication scheme and information for
 		/// this request.
+
+	void removeProxyCredentials();
+		/// Removes any proxy credentials from the request.
 
 	void write(std::ostream& ostr) const;
 		/// Writes the HTTP request to the given
@@ -173,9 +185,6 @@ private:
 	
 	std::string _method;
 	std::string _uri;
-	
-	HTTPRequest(const HTTPRequest&);
-	HTTPRequest& operator = (const HTTPRequest&);
 };
 
 

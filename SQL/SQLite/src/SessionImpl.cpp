@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// Library: Data/SQLite
+// Library: SQL/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //
@@ -213,6 +213,11 @@ void SessionImpl::close()
 	}
 
 	_connected = false;
+}
+
+
+void SessionImpl::reset()
+{
 }
 
 

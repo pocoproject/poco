@@ -1,7 +1,7 @@
 //
 // Extractor.cpp
 //
-// Library: Data/ODBC
+// Library: SQL/ODBC
 // Package: ODBC
 // Module:  Extractor
 //

@@ -1,8 +1,8 @@
 //
 // Binding.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Binding
 //
 // Definition of the Binding class.

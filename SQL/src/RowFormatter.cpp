@@ -1,8 +1,8 @@
 //
 // RowFormatter.cpp
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  RowFormatter
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

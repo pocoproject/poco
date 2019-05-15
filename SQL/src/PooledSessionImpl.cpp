@@ -1,7 +1,7 @@
 //
 // PooledSessionImpl.cpp
 //
-// Library: Data
+// Library: SQL
 // Package: SessionPooling
 // Module:  PooledSessionImpl
 //
@@ -154,6 +154,12 @@ void PooledSessionImpl::close()
 		}
 		putBack();
 	}
+}
+
+
+void PooledSessionImpl::reset()
+{
+	access()->reset();
 }
 
 

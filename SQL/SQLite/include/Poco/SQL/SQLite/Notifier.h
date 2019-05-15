@@ -1,7 +1,7 @@
 //
 // Notifier.h
 //
-// Library: Data/SQLite
+// Library: SQL/SQLite
 // Package: SQLite
 // Module:  Notifier
 //

@@ -7,7 +7,7 @@
 
 **A:** It depends on what exactly [xyz] is. POCO community is more than happy to help newcomers and experienced C++ programmers alike. There are, however, certain limitations as to how far we are willing to go as well as expectations we have for people asking questions:
 
-  - First and foremost, read the relevant [documentation](http://pocoproject.org/documentation/index.html)
+  - First and foremost, read the relevant [documentation](http://pocoproject.org/documentation.html)
 
   - Please be patient and respectful; we answer questions free of charge and our time is at least as valuable as yours.
 
