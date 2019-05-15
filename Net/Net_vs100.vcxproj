@@ -95,11 +95,11 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">..\lib\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">obj\Net\$(Configuration)\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoNetd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetMDd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetMTd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetmtd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoNet</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoNetMD</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoNetMT</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoNetmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoNetmt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>
@@ -192,8 +192,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\PocoNetMTd.lib</OutputFile>
+      <OutputFile>..\lib\PocoNetmtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -219,8 +218,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\PocoNetMT.lib</OutputFile>
+      <OutputFile>..\lib\PocoNetmt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
@@ -237,7 +235,7 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib\PocoNetMDd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\PocoNetmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
@@ -245,8 +243,7 @@
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\PocoNetMDd.lib</OutputFile>
+      <OutputFile>..\lib\PocoNetmdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -274,7 +271,7 @@
     </ClCompile>
     <Lib>
       <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\lib\PocoNetMD.lib</OutputFile>
+      <OutputFile>..\lib\PocoNetmd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -331,7 +328,6 @@
     <ClInclude Include="include\Poco\Net\HTTPResponse.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSession.h"/>
     <ClInclude Include="include\Poco\Net\HTTPStream.h"/>
-    <ClInclude Include="include\Poco\Net\NTLMCredentials.h"/>
     <ClInclude Include="include\Poco\Net\TCPServer.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerConnection.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerConnectionFactory.h"/>
@@ -393,6 +389,8 @@
     <ClInclude Include="include\Poco\Net\UDPServer.h"/>
     <ClInclude Include="include\Poco\Net\UDPServerParams.h"/>
     <ClInclude Include="include\Poco\Net\UDPSocketReader.h"/>
+    <ClInclude Include="include\Poco\Net\NTLMCredentials.h"/>
+    <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp"/>
@@ -446,7 +444,6 @@
     <ClCompile Include="src\HTTPResponse.cpp"/>
     <ClCompile Include="src\HTTPSession.cpp"/>
     <ClCompile Include="src\HTTPStream.cpp"/>
-    <ClCompile Include="src\NTLMCredentials.cpp"/>
     <ClCompile Include="src\TCPServer.cpp"/>
     <ClCompile Include="src\TCPServerConnection.cpp"/>
     <ClCompile Include="src\TCPServerConnectionFactory.cpp"/>
@@ -499,6 +496,8 @@
     <ClCompile Include="src\OAuth20Credentials.cpp"/>
     <ClCompile Include="src\UDPClient.cpp"/>
     <ClCompile Include="src\UDPServerParams.cpp"/>
+    <ClCompile Include="src\NTLMCredentials.cpp"/>
+    <ClCompile Include="src\SSPINTLMCredentials.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">

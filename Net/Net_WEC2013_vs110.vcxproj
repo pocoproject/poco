@@ -54,7 +54,6 @@
     <ClInclude Include="include\Poco\Net\HTTPResponse.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSession.h"/>
     <ClInclude Include="include\Poco\Net\HTTPStream.h"/>
-    <ClInclude Include="include\Poco\Net\NTLMCredentials.h"/>
     <ClInclude Include="include\Poco\Net\TCPServer.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerConnection.h"/>
     <ClInclude Include="include\Poco\Net\TCPServerConnectionFactory.h"/>
@@ -116,6 +115,8 @@
     <ClInclude Include="include\Poco\Net\UDPServer.h"/>
     <ClInclude Include="include\Poco\Net\UDPServerParams.h"/>
     <ClInclude Include="include\Poco\Net\UDPSocketReader.h"/>
+    <ClInclude Include="include\Poco\Net\NTLMCredentials.h"/>
+    <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>Net</ProjectName>
@@ -133,11 +134,11 @@
   <PropertyGroup>
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|SDK_AM335X_SK_WEC2013_V300'">PocoNetd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoNetMDd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoNetMTd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoNetmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoNetmtd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|SDK_AM335X_SK_WEC2013_V300'">PocoNet</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoNetMD</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoNetMT</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|SDK_AM335X_SK_WEC2013_V300'">PocoNetmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|SDK_AM335X_SK_WEC2013_V300'">PocoNetmt</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup/>
   <ItemGroup>
@@ -192,7 +193,6 @@
     <ClCompile Include="src\HTTPResponse.cpp"/>
     <ClCompile Include="src\HTTPSession.cpp"/>
     <ClCompile Include="src\HTTPStream.cpp"/>
-    <ClCompile Include="src\NTLMCredentials.cpp"/>
     <ClCompile Include="src\TCPServer.cpp"/>
     <ClCompile Include="src\TCPServerConnection.cpp"/>
     <ClCompile Include="src\TCPServerConnectionFactory.cpp"/>
@@ -245,6 +245,8 @@
     <ClCompile Include="src\OAuth20Credentials.cpp"/>
     <ClCompile Include="src\UDPClient.cpp"/>
     <ClCompile Include="src\UDPServerParams.cpp"/>
+    <ClCompile Include="src\NTLMCredentials.cpp"/>
+    <ClCompile Include="src\SSPINTLMCredentials.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc"/>
