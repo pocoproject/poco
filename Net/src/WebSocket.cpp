@@ -44,7 +44,7 @@ WebSocket::WebSocket(HTTPServerRequest& request, HTTPServerResponse& response):
 {
 }
 
-	
+
 WebSocket::WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response):
 	StreamSocket(connect(cs, request, response, _defaultCreds))
 {
@@ -111,7 +111,7 @@ int WebSocket::receiveFrame(void* buffer, int length, int& flags)
 	return n;
 }
 
-	
+
 int WebSocket::receiveFrame(Poco::Buffer<char>& buffer, int& flags)
 {
 	int n = static_cast<WebSocketImpl*>(impl())->receiveBytes(buffer, 0);
@@ -126,6 +126,18 @@ WebSocket::Mode WebSocket::mode() const
 }
 
 
+void WebSocket::setMaxPayloadSize(int maxPayloadSize)
+{
+	static_cast<WebSocketImpl*>(impl())->setMaxPayloadSize(maxPayloadSize);
+}
+
+
+int WebSocket::getMaxPayloadSize() const
+{
+	return static_cast<WebSocketImpl*>(impl())->getMaxPayloadSize();
+}
+
+
 WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse& response)
 {
 	if (request.hasToken("Connection", "upgrade") && icompare(request.get("Upgrade", ""), "websocket") == 0)
@@ -136,14 +148,14 @@ WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse&
 		std::string key = request.get("Sec-WebSocket-Key", "");
 		Poco::trimInPlace(key);
 		if (key.empty()) throw WebSocketException("Missing Sec-WebSocket-Key in handshake request", WS_ERR_HANDSHAKE_NO_KEY);
-		
+
 		response.setStatusAndReason(HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
 		response.set("Upgrade", "websocket");
 		response.set("Connection", "Upgrade");
 		response.set("Sec-WebSocket-Accept", computeAccept(key));
 		response.setContentLength(0);
 		response.send().flush();
-		
+
 		HTTPServerRequestImpl& requestImpl = static_cast<HTTPServerRequestImpl&>(request);
 		return new WebSocketImpl(static_cast<StreamSocketImpl*>(requestImpl.detachSocket().impl()), requestImpl.session(), false);
 	}

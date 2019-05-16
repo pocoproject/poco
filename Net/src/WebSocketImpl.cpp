@@ -21,6 +21,7 @@
 #include "Poco/BinaryReader.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Format.h"
+#include <limits>
 #include <cstring>
 
 
@@ -31,6 +32,7 @@ namespace Net {
 WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload):
 	StreamSocketImpl(pStreamSocketImpl->sockfd()),
 	_pStreamSocketImpl(pStreamSocketImpl),
+	_maxPayloadSize(std::numeric_limits<int>::max()),
 	_buffer(0),
 	_bufferOffset(0),
 	_frameFlags(0),
@@ -134,6 +136,7 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt64 l;
 		reader >> l;
+		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = static_cast<int>(l);
 	}
 	else if (lengthByte == 126)
@@ -148,10 +151,12 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt16 l;
 		reader >> l;
+		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = static_cast<int>(l);
 	}
 	else
 	{
+		if (lengthByte > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = lengthByte;
 	}
 
@@ -166,6 +171,14 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 	}
 
 	return payloadLength;
+}
+
+
+void WebSocketImpl::setMaxPayloadSize(int maxPayloadSize)
+{
+	poco_assert (maxPayloadSize > 0);
+
+	_maxPayloadSize = maxPayloadSize;
 }
 
 
@@ -205,7 +218,7 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 	int payloadLength = receiveHeader(mask, useMask);
 	if (payloadLength <= 0)
 		return payloadLength;
-	int oldSize = static_cast<int>(buffer.size());
+	std::size_t oldSize = buffer.size();
 	buffer.resize(oldSize + payloadLength);
 	return receivePayload(buffer.begin() + oldSize, payloadLength, mask, useMask);
 }
