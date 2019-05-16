@@ -118,7 +118,7 @@ public:
 		SecBuffer msgBuffer;
 		msgBuffer.BufferType = SECBUFFER_TOKEN;
 		msgBuffer.pvBuffer   = &buffer[0];
-		msgBuffer.cbBuffer   = buffer.size();
+		msgBuffer.cbBuffer   = static_cast<unsigned long>(buffer.size());
 
 		SecBufferDesc msgBufferDesc;
 		msgBufferDesc.ulVersion = SECBUFFER_VERSION;
@@ -161,7 +161,7 @@ public:
 		SecBuffer responseBuffer;
 		responseBuffer.BufferType = SECBUFFER_TOKEN;
 		responseBuffer.pvBuffer   = &response[0];
-		responseBuffer.cbBuffer   = response.size();
+		responseBuffer.cbBuffer   = static_cast<unsigned long>(response.size());
 
 		SecBufferDesc responseBufferDesc;
 		responseBufferDesc.ulVersion = SECBUFFER_VERSION;
@@ -171,7 +171,7 @@ public:
 		SecBuffer challengeBuffer;
 		challengeBuffer.BufferType = SECBUFFER_TOKEN;
 		challengeBuffer.pvBuffer   = const_cast<unsigned char*>(&challenge[0]);
-		challengeBuffer.cbBuffer   = challenge.size();
+		challengeBuffer.cbBuffer   = static_cast<unsigned long>(challenge.size());
 
 		SecBufferDesc challengeBufferDesc;
 		challengeBufferDesc.ulVersion = SECBUFFER_VERSION;
