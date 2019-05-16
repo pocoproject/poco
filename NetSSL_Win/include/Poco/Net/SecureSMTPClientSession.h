@@ -59,7 +59,7 @@ public:
 		/// Destroys the SMTPClientSession.
 
 	bool startTLS();
-		/// Sends a STARTTLS command and, if successful, 
+		/// Sends a STARTTLS command and, if successful,
 		/// creates a secure SSL/TLS connection over the
 		/// existing socket connection.
 		///
@@ -71,7 +71,7 @@ public:
 		/// false otherwise.
 
 	bool startTLS(Context::Ptr pContext);
-		/// Sends a STARTTLS command and, if successful, 
+		/// Sends a STARTTLS command and, if successful,
 		/// creates a secure SSL/TLS connection over the
 		/// existing socket connection.
 		///
@@ -84,9 +84,6 @@ public:
 		///
 		/// Returns true if the STARTTLS command was successful,
 		/// false otherwise.
-		
-private:
-	std::string _host;
 };
 
 
