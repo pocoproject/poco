@@ -243,6 +243,11 @@ public:
 		/// A WebSocketException will also be thrown if a malformed
 		/// or incomplete frame is received.
 		///
+		/// If this method is used, a reasonable maximum payload size should
+		/// be set with setMaxPayloadSize() to prevent a potential
+		/// DoS attack (memory exhaustion) by sending a WebSocket frame
+		/// header with a huge payload size.
+		///
 		/// Returns the number of bytes received.
 		/// A return value of 0 means that the peer has
 		/// shut down or closed the connection.
