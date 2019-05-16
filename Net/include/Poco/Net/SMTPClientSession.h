@@ -187,6 +187,7 @@ protected:
 	void loginUsingXOAUTH2(const std::string& username, const std::string& password);
 	void loginUsingNTLM(const std::string& username, const std::string& password);
 	DialogSocket& socket();
+	const std::string& host() const;
 
 private:
 	void sendCommands(const MailMessage& message, const Recipients* pRecipients = 0);
@@ -228,6 +229,12 @@ inline bool SMTPClientSession::isPermanentNegative(int status)
 inline DialogSocket& SMTPClientSession::socket()
 {
 	return _socket;
+}
+
+
+inline const std::string& SMTPClientSession::host() const
+{
+	return _host;
 }
 
 
