@@ -228,7 +228,7 @@ public:
 		///
 		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
 		/// is stored in flags.
-		
+
 	int receiveFrame(Poco::Buffer<char>& buffer, int& flags);
 		/// Receives a frame from the socket and stores it
 		/// after any previous content in buffer.
@@ -242,6 +242,11 @@ public:
 		///
 		/// A WebSocketException will also be thrown if a malformed
 		/// or incomplete frame is received.
+		///
+		/// If this method is used, a reasonable maximum payload size should
+		/// be set with setMaxPayloadSize() to prevent a potential
+		/// DoS attack (memory exhaustion) by sending a WebSocket frame
+		/// header with a huge payload size.
 		///
 		/// Returns the number of bytes received.
 		/// A return value of 0 means that the peer has
