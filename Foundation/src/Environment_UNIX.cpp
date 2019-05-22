@@ -61,7 +61,7 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 	std::string var = name;
 	var.append("=");
 	var.append(value);
-	_map[name] = var;
+	std::swap(_map[name],var);
 	if (putenv((char*) _map[name].c_str()))
 	{
 		std::string msg = "cannot set environment variable: ";
