@@ -78,7 +78,7 @@ int ProcessHandleImpl::tryWait() const
 	int rc;
 	do
 	{
-		rc = waitpid(_pid, &status, 0);
+		rc = waitpid(_pid, &status, WNOHANG);
 	}
 	while (rc < 0 && errno == EINTR);
 	if (rc == 0)
