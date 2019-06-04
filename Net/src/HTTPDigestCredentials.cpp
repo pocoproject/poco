@@ -55,7 +55,7 @@ namespace
 		}
 		return Poco::DigestEngine::digestToHex(engine.digest());
 	}
-	
+
 	std::string formatNonceCounter(int counter)
 	{
 		return Poco::NumberFormatter::formatHex(counter, 8);
@@ -89,7 +89,7 @@ HTTPDigestCredentials::HTTPDigestCredentials()
 {
 }
 
-	
+
 HTTPDigestCredentials::HTTPDigestCredentials(const std::string& username, const std::string& password):
 	_username(username),
 	_password(password)
@@ -113,11 +113,18 @@ void HTTPDigestCredentials::setUsername(const std::string& username)
 {
 	_username = username;
 }
-	
+
 
 void HTTPDigestCredentials::setPassword(const std::string& password)
 {
 	_password = password;
+}
+
+
+void HTTPDigestCredentials::clear()
+{
+	_username.clear();
+	_password.clear();
 }
 
 

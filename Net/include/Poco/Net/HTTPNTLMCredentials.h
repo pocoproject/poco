@@ -51,6 +51,10 @@ public:
 
 	void reset();
 		/// Resets the HTTPNTLMCredentials object to a clean state.
+		/// Does not clear username and password.
+
+	void clear();
+		/// Clears username, password and host.
 
 	void setUsername(const std::string& username);
 		/// Sets the username.
@@ -63,6 +67,9 @@ public:
 
 	const std::string& getPassword() const;
 		/// Returns the password.
+
+	bool empty() const;
+		/// Returns true if both username and password are empty, otherwise false.
 
 	void setHost(const std::string& host);
 		/// Sets the target host.\
@@ -146,6 +153,12 @@ inline const std::string& HTTPNTLMCredentials::getHost() const
 inline bool HTTPNTLMCredentials::useSSPINTLM() const
 {
 	return _username.empty() && _password.empty() && SSPINTLMCredentials::available();
+}
+
+
+inline bool HTTPNTLMCredentials::empty() const
+{
+	return _username.empty() && _password.empty();
 }
 
 
