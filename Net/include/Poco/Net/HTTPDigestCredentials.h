@@ -52,6 +52,10 @@ public:
 
 	void reset();
 		/// Resets the HTTPDigestCredentials object to a clean state.
+		/// Does not clear username and password.
+
+	void clear();
+		/// Clears both username and password.
 
 	void setUsername(const std::string& username);
 		/// Sets the username.
@@ -64,6 +68,9 @@ public:
 
 	const std::string& getPassword() const;
 		/// Returns the password.
+
+	bool empty() const;
+		/// Returns true if both username and password are empty, otherwise false.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
 		/// Parses WWW-Authenticate header of the HTTPResponse, initializes
@@ -110,7 +117,7 @@ public:
 
 	bool verifyAuthParams(const HTTPRequest& request, const HTTPAuthenticationParams& params) const;
 		/// Verifies the digest authentication information in the given HTTPRequest
-		/// and HTTPAuthenticationParams by recomputing the response and comparing 
+		/// and HTTPAuthenticationParams by recomputing the response and comparing
 		/// it with what's in the request.
 
 	static std::string createNonce();
@@ -125,7 +132,7 @@ private:
 	void createAuthParams(const HTTPRequest& request, const HTTPAuthenticationParams& responseAuthParams);
 	void updateAuthParams(const HTTPRequest& request);
 	int updateNonceCounter(const std::string& nonce);
-	
+
 	static const std::string DEFAULT_ALGORITHM;
 	static const std::string DEFAULT_QOP;
 	static const std::string NONCE_PARAM;
@@ -146,7 +153,7 @@ private:
 	std::string _password;
 	HTTPAuthenticationParams _requestAuthParams;
 	NonceCounterMap _nc;
-	
+
 	static int _nonceCounter;
 	static Poco::FastMutex _nonceMutex;
 };
@@ -164,6 +171,12 @@ inline const std::string& HTTPDigestCredentials::getUsername() const
 inline const std::string& HTTPDigestCredentials::getPassword() const
 {
 	return _password;
+}
+
+
+inline bool HTTPDigestCredentials::empty() const
+{
+	return _username.empty() && _password.empty();
 }
 
 

@@ -91,6 +91,9 @@ public:
 		/// and password of the credentials object.
 		/// Does nothing if URI has no user info part.
 
+	void clear();
+		/// Clears username, password and host.
+
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
@@ -110,6 +113,9 @@ public:
 	const std::string& getHost() const;
 		/// Returns the target host. Only used for SSPI-based NTLM authentication using
 		/// the credentials of the currently logged-in user on Windows.
+
+	bool empty() const;
+		/// Returns true if both username and password are empty, otherwise false.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
 		/// Inspects WWW-Authenticate header of the response, initializes
@@ -213,6 +219,12 @@ inline void HTTPCredentials::setHost(const std::string& host)
 inline const std::string& HTTPCredentials::getHost() const
 {
 	return _ntlm.getHost();
+}
+
+
+inline bool HTTPCredentials::empty() const
+{
+	return _digest.empty();
 }
 
 
