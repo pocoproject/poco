@@ -119,15 +119,30 @@ enum RSAPaddingMode
 		#elif defined(POCO_EXTERNAL_OPENSSL)
 			#if POCO_EXTERNAL_OPENSSL == POCO_EXTERNAL_OPENSSL_SLPRO
 				#if defined(POCO_DLL)
-					#pragma comment(lib, "libeay32.lib")
-					#pragma comment(lib, "ssleay32.lib")
+					#if OPENSSL_VERSION_PREREQ(1,1)
+						#pragma comment(lib, "libcrypto.lib")
+						#pragma comment(lib, "libssl.lib")
+					#else
+						#pragma comment(lib, "libeay32.lib")
+						#pragma comment(lib, "ssleay32.lib")
+					#endif
 			  	#else
-					#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
-					#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
+					#if OPENSSL_VERSION_PREREQ(1,1)
+						#pragma comment(lib, "libcrypto" POCO_LIB_SUFFIX)
+						#pragma comment(lib, "libssl" POCO_LIB_SUFFIX)
+					#else
+						#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
+						#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
+#endif
 				#endif
 			#elif POCO_EXTERNAL_OPENSSL == POCO_EXTERNAL_OPENSSL_DEFAULT
-				#pragma comment(lib, "libeay32.lib")
-				#pragma comment(lib, "ssleay32.lib")
+				#if OPENSSL_VERSION_PREREQ(1,1)
+					#pragma comment(lib, "libcrypto.lib")
+					#pragma comment(lib, "libssl.lib")
+				#else
+					#pragma comment(lib, "libeay32.lib")
+					#pragma comment(lib, "ssleay32.lib")
+				#endif
 			#endif
 		#endif // POCO_INTERNAL_OPENSSL_MSVC_VER
 		#if !defined(Crypto_EXPORTS)
