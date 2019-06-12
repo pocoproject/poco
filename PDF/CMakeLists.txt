@@ -137,8 +137,6 @@ target_include_directories(PDF
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
-endif()
-
 POCO_INSTALL(PDF)
 POCO_GENERATE_PACKAGE(PDF)
 
