@@ -157,6 +157,9 @@ macro(POCO_SOURCES_AUTO_PLAT out platform)
             POCO_SOURCES_PLAT( ${out} Unknown ${platform} ${f})
         endif()
     endforeach()
+	if(MSVC)
+		list(APPEND ${out} ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+	endif()
 endmacro()
 
 
