@@ -10,7 +10,13 @@ config.h by the "configure" script. In environments that use CMake,
 config-cmake.in is converted into config.h. If you are going to build PCRE "by
 hand" without using "configure" or CMake, you should copy the distributed
 config.h.generic to config.h, and edit the macro definitions to be the way you
-need them.
+need them. You must then add -DHAVE_CONFIG_H to all of your compile commands,
+so that config.h is included at the start of every source.
+
+Alternatively, you can avoid editing by using -D on the compiler command line
+to set the macro values. In this case, you do not have to set -DHAVE_CONFIG_H,
+but if you do, default values will be taken from config.h for non-boolean
+macros that are not defined on the command line.
 
 Boolean macros such as HAVE_STDLIB_H and SUPPORT_PCRE8 should either be defined
 (conventionally to 1) for TRUE, and not defined at all for FALSE. All such
@@ -283,7 +289,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_NAME "PCRE"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE 8.40"
+#define PACKAGE_STRING "PCRE 8.43"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre"
@@ -292,7 +298,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "8.40"
+#define PACKAGE_VERSION "8.43"
 
 /* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
    parentheses (of any kind) in a pattern. This limits the amount of system
@@ -394,7 +400,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* #undef SUPPORT_VALGRIND */
 
 /* Version number of package */
-#define VERSION "8.40"
+#define VERSION "8.43"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
