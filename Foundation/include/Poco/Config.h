@@ -18,6 +18,10 @@
 #define Foundation_Config_INCLUDED
 
 
+// Disable SignalHandler
+#define POCO_NO_SIGNAL_HANDLER
+
+
 // Define to disable implicit linking
 // #define POCO_NO_AUTOMATIC_LIBS
 
