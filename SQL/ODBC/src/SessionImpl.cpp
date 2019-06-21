@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// Library: Data/ODBC
+// Library: SQL/ODBC
 // Package: ODBC
 // Module:  SessionImpl
 //
@@ -395,6 +395,12 @@ void SessionImpl::rollback()
 		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_ROLLBACK));
 
 	_inTransaction = false;
+}
+
+
+void SessionImpl::reset()
+{
+
 }
 
 

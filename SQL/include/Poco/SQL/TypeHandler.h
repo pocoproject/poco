@@ -1,8 +1,8 @@
 //
 // TypeHandler.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  TypeHandler
 //
 // Definition of the TypeHandler class.

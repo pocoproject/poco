@@ -1,8 +1,8 @@
 //
 // AbstractPreparation.cpp
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AbstractPreparation
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,8 @@
 //
 // RowIterator.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  RowIterator
 //
 // Definition of the RowIterator class.

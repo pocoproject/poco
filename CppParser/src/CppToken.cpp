@@ -513,23 +513,18 @@ void NumberLiteralToken::finish(std::istream& istr)
 	_isFloat = false;
 	if (_value[0] != '.') // starts with digit
 	{
-		if (next == 'x')
+		if (_value[0] == '0')
 		{
-			_value += (char) istr.get();
-			next = istr.peek();
-			while (std::isxdigit(next))
+			if (next == 'x' || next == 'X')
 			{
-				_value += (char) istr.get();
-				next = istr.peek();
+				return finishHex(istr, next);
 			}
-			while (next == 'L' || next == 'l' || next == 'U' || next == 'u')
+			else if (next == 'b' || next == 'B')
 			{
-				_value += (char) istr.get();
-				next = istr.peek();
+				return finishBin(istr, next);
 			}
-			return;
 		}
-		while (next >= '0' && next <= '9')
+		while ((next >= '0' && next <= '9') || next == '\'')
 		{
 			_value += (char) istr.get();
 			next = istr.peek();
@@ -552,7 +547,7 @@ void NumberLiteralToken::finish(std::istream& istr)
 	else
 	{
 		_isFloat = true;
-		_value += static_cast<char>(istr.get());
+		_value += istr.get();
 		next = istr.peek();
 	}
 	while (next >= '0' && next <= '9')
@@ -563,6 +558,56 @@ void NumberLiteralToken::finish(std::istream& istr)
 	if (next == 'e' || next == 'E')
 	{
 		_isFloat = true;
+		finishExp(istr, next);
+	}
+	finishSuffix(istr, next);
+}
+
+
+void NumberLiteralToken::finishHex(std::istream& istr, int next)
+{
+	_value += (char) istr.get();
+	next = istr.peek();
+	while (std::isxdigit(next) || next == '\'')
+	{
+		_value += (char) istr.get();
+		next = istr.peek();
+	}
+	if (next == '.')
+	{
+		_isFloat = true;
+		_value += (char) istr.get();
+		next = istr.peek();
+		while (std::isxdigit(next) || next == '\'')
+		{
+			_value += (char) istr.get();
+			next = istr.peek();
+		}
+	}
+	if (next == 'p' || next == 'P')
+	{
+		finishExp(istr, next);
+	}
+	finishSuffix(istr, next);
+}
+
+
+void NumberLiteralToken::finishBin(std::istream& istr, int next)
+{
+	_value += (char) istr.get();
+	next = istr.peek();
+	while (next == '0' || next == '1' || next == '\'')
+	{
+		_value += (char) istr.get();
+		next = istr.peek();
+	}
+	finishSuffix(istr, next);
+}
+
+
+void NumberLiteralToken::finishExp(std::istream& istr, int next)
+{
+	_isFloat = true;
 		_value += (char) istr.get();
 		next = istr.peek();
 		if (next == '+' || next == '-')
@@ -584,6 +629,10 @@ void NumberLiteralToken::finish(std::istream& istr)
 			syntaxError("digit", s);
 		}
 	}
+
+
+void NumberLiteralToken::finishSuffix(std::istream& istr, int next)
+{
 	if (_isFloat)
 	{
 		if (next == 'L' || next == 'l' || next == 'F' || next == 'f')
@@ -603,7 +652,6 @@ void NumberLiteralToken::finish(std::istream& istr)
 int NumberLiteralToken::asInteger() const
 {
 	return static_cast<int>(std::strtol(_value.c_str(), 0, 0));
-	
 }
 
 

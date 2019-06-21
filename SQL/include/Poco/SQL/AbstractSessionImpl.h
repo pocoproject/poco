@@ -1,8 +1,8 @@
 //
 // AbstractSessionImpl.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AbstractSessionImpl
 //
 // Definition of the AbstractSessionImpl class.

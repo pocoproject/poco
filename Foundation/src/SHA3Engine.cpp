@@ -216,9 +216,27 @@ void KeccakP1600Round(UInt64 *state, unsigned int indexRound)
 	iota(state, indexRound);
 }
 
+static void fromBytesToWords(UInt64 *stateAsWords, const unsigned char *state)
+{
+	unsigned int i, j;
+	for (i = 0; i < 25; i++) {
+		stateAsWords[i] = 0;
+		for (j = 0; j < (64 / 8); j++)
+			stateAsWords[i] |= (UInt64)(state[i*(64 / 8) + j]) << (8 * j);
+	}
+}
+
 void KeccakP1600OnWords(UInt64 *state, unsigned int nrRounds)
 {
 	for (unsigned int i = (24 - nrRounds); i < 24; i++) KeccakP1600Round(state, i);
+}
+
+static void fromWordsToBytes(unsigned char *state, const UInt64 *stateAsWords)
+{
+	unsigned int i, j;
+	for (i = 0; i < 25; i++)
+		for (j = 0; j < (64 / 8); j++)
+			state[i*(64 / 8) + j] = (unsigned char)((stateAsWords[i] >> (8 * j)) & 0xFF);
 }
 
 void KeccakP1600_Permute_24rounds(void *state)

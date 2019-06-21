@@ -1,7 +1,7 @@
 //
 // PooledSessionHolder.h
 //
-// Library: Data
+// Library: SQL
 // Package: SessionPooling
 // Module:  PooledSessionHolder
 //

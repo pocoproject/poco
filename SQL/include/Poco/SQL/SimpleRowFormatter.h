@@ -1,8 +1,8 @@
 //
 // RowFormatter.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  SimpleRowFormatter
 //
 // Definition of the RowFormatter class.

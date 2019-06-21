@@ -25,14 +25,11 @@ target_include_directories(Crypto
     )
 
 if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL)
-    target_compile_definitions(Crypto PUBLIC POCO_EXTERNAL_OPENSSL)	
+    target_compile_definitions(Crypto PUBLIC POCO_EXTERNAL_OPENSSL)
+	if(OPENSSL_USE_STATIC_LIBS)
+		target_link_libraries(Crypto PUBLIC ws2_32.lib Crypt32.lib)
+	endif()
 endif()
-
-if(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
-	add_custom_command(TARGET Crypto PRE_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${INTERNAL_OPENSSL_LIBRARY_DIR} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-		COMMENT "Copying OpenSSL binaries" VERBATIM)
-endif(MSVC AND NOT POCO_DISABLE_INTERNAL_OPENSSL)
 
 POCO_INSTALL(Crypto)
 POCO_GENERATE_PACKAGE(Crypto)

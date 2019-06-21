@@ -1,8 +1,8 @@
 //
 // MetaColumn.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  MetaColumn
 //
 // Definition of the MetaColumn class.

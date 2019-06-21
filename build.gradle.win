@@ -827,8 +827,34 @@ PocoDoc.version=${version}-all
 		def	String javaWDK = WDKHome + "/Include/" + WDKVers
 		javaWDK = javaWDK.replace('\\','/')
 		
+		def String includes  = "/I${postgres32Home}/include"
+		includes += ",/I${mysql32Home}/include"
+		includes += ",/ICppUnit/include"
+		includes += ",/ICppParser/include"
+		includes += ",/IFoundation/include"
+		includes += ",/ICrypto/include"
+		includes += ",/IData/include"
+		includes += ",/IEncodings/include"
+		includes += ",/ISQL/include"
+		includes += ",/ISQL/MySQL/include"
+		includes += ",/ISQL/ODBC/include"
+		includes += ",/ISQL/PostgreSQL/include"
+		includes += ",/ISQL/SQLite/include"
+		includes += ",/ISQL/SQLite/src"
+		includes += ",/IJSON/include"
+		includes += ",/IMongoDB/include"
+		includes += ",/INet/include"
+		includes += ",/INetSSL_OpenSSL/include"
+		includes += ",/INetSSL_Win/include"
+		includes += ",/IRedis/include"
+		includes += ",/IUtil/include"
+		includes += ",/IXML/include"
+		includes += ",/IZip/include"
+		includes += ",/ISevenZip/include"
+		includes += ",/IPDF/include"
+		
  		file.text += """
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
+Includes=${includes}
 VCH=${javaVCH}
 WDK=${javaWDK}
 CLP=${javaCLP}
@@ -840,8 +866,7 @@ task pocoDoc(type: Exec) {
 	dependsOn ':PocoDoc::assemble'
 	dependsOn PocoDocIni
 	if (os.windows) {
-		environment "Path", "$rootDir\\bin;$Path"
-		println environment.Path
+		environment "Path", "$rootDir\\bin;$rootDir\\bin64;$environment.Path"
 		
 		executable "PocoDoc/bin/PocoDoc.exe"
 		args "/config=$rootDir/PocoDoc/cfg/mkdoc-gradle.xml"

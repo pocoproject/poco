@@ -1,8 +1,8 @@
 //
 // Bulk.cpp
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Bulk
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

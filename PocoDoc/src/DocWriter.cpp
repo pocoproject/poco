@@ -45,6 +45,7 @@ using namespace Poco::CppParser;
 
 std::string DocWriter::_language;
 DocWriter::StringMap DocWriter::_strings;
+Poco::Logger* DocWriter::_pLogger(0);
 const std::string DocWriter::RFC_URI("https://www.ietf.org/rfc/rfc");
 const std::string DocWriter::GITHUB_POCO_URI("https://github.com/pocoproject/poco");
 
@@ -59,9 +60,10 @@ DocWriter::DocWriter(const NameSpace::SymbolTable& symbols, const std::string& p
 	_pNameSpace(0),
 	_pendingLine(false),
 	_indent(0),
-	_titleId(0),
-	_logger(Poco::Logger::get("DocWriter"))
+	_titleId(0)
 {
+	_pLogger = &Poco::Logger::get("DocWriter");
+	
 	Application& app = Application::instance();
 	_language = app.config().getString("PocoDoc.language", "EN");
 
