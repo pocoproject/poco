@@ -33,7 +33,7 @@
 #if defined(POCO_UNBUNDLED)
 #include <expat.h>
 #else
-#include <Poco/XML/expat.h>
+#include "Poco/XML/expat.h"
 #endif
 #include <map>
 #include <vector>
@@ -136,12 +136,12 @@ public:
 			_e(e)
 		{
 		}
-		
+
 		value_type operator * () const
 		{
 			return _e;
 		}
-		
+
 		Iterator& operator ++ ()
 		{
 			_e = _parser->next();
@@ -169,7 +169,7 @@ public:
 	{
 		return Iterator(this, next());
 	}
-	
+
 	Iterator end()
 	{
 		return Iterator(this, EV_EOF);
