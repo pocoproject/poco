@@ -84,6 +84,9 @@ public:
 	static Command get(const std::string& key);
 		/// Creates and returns an GET command.
 
+	static Command exists(const std::string& key);
+		/// Creates and returns an EXISTS command.
+
 	static Command hdel(const std::string& hash, const std::string& field);
 		/// Creates and returns an HDEL command.
 
@@ -252,6 +255,21 @@ public:
 
 	static Command rpush(const std::string& list, const StringVec& value, bool create = true);
 		/// Creates and returns a RPUSH or RPUSHX (when create is false) command.
+
+	static Command expire(const std::string& key, Int64 seconds);
+		/// Creates and returns an EXPIRE command.
+
+	static Command ping();
+		/// Creates and returns a PING command.
+
+	static Command multi();
+		/// Creates and returns a MULTI command.
+
+	static Command exec();
+		/// Creates and returns a EXEC command.
+
+	static Command discard();
+		/// Creates and returns a DISCARD command.
 };
 
 

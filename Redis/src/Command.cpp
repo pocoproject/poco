@@ -119,6 +119,16 @@ Command Command::get(const std::string& key)
 }
 
 
+Command Command::exists(const std::string& key)
+{
+	Command cmd("EXISTS");
+
+	cmd << key;
+
+	return cmd;
+}
+
+
 Command Command::hdel(const std::string& hash, const std::string& field)
 {
 	Command cmd("HDEL");
@@ -678,6 +688,48 @@ Command Command::rpush(const std::string& list, const StringVec& values, bool cr
 	Command cmd(create ? "RPUSH" : "RPUSHX");
 
 	cmd << list << values;
+
+	return cmd;
+}
+
+
+Command Command::expire(const std::string& key, Int64 seconds)
+{
+	Command cmd("EXPIRE");
+
+	cmd << key << NumberFormatter::format(seconds);
+
+	return cmd;
+}
+
+
+Command Command::ping()
+{
+	Command cmd("PING");
+
+	return cmd;
+}
+
+
+Command Command::multi()
+{
+	Command cmd("MULTI");
+
+	return cmd;
+}
+
+
+Command Command::exec()
+{
+	Command cmd("EXEC");
+
+	return cmd;
+}
+
+
+Command Command::discard()
+{
+	Command cmd("DISCARD");
 
 	return cmd;
 }
