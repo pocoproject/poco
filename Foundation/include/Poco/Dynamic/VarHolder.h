@@ -433,7 +433,7 @@ private:
 			// 'from' is greater than 'T' max value
 			else if (!std::numeric_limits<F>::is_signed &&
 					  std::numeric_limits<T>::is_signed &&
-					  static_cast<Poco::UInt64>(from) > std::numeric_limits<T>::max())
+					  static_cast<Poco::UInt64>(from) > static_cast<Poco::UInt64>(std::numeric_limits<T>::max()))
 			{
 				throw RangeException("Value too large.");
 			}
