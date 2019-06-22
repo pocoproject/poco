@@ -153,7 +153,7 @@ WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse&
 		response.set("Upgrade", "websocket");
 		response.set("Connection", "Upgrade");
 		response.set("Sec-WebSocket-Accept", computeAccept(key));
-		response.setContentLength(0);
+		response.setContentLength(HTTPResponse::UNKNOWN_CONTENT_LENGTH);
 		response.send().flush();
 
 		HTTPServerRequestImpl& requestImpl = static_cast<HTTPServerRequestImpl&>(request);

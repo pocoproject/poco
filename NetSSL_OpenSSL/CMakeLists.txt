@@ -23,6 +23,10 @@ target_include_directories(NetSSL
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
+if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL AND OPENSSL_USE_STATIC_LIBS)
+	target_link_libraries(NetSSL PUBLIC ws2_32.lib Crypt32.lib)
+endif()
+
 POCO_INSTALL(NetSSL)
 POCO_GENERATE_PACKAGE(NetSSL)
 
