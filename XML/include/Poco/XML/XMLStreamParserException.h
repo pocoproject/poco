@@ -18,7 +18,7 @@
 #define XML_XMLStreamParserException_INCLUDED
 
 
-#include <Poco/XML/XMLException.h>
+#include "Poco/XML/XMLException.h"
 
 
 namespace Poco {
