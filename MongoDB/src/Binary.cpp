@@ -50,7 +50,7 @@ Binary::Binary(const std::string& data, unsigned char subtype):
 {
 }
 
-	
+
 Binary::Binary(const void* data, Poco::Int32 size, unsigned char subtype):
 	_buffer(reinterpret_cast<const unsigned char*>(data), size),
 	_subtype(subtype)
@@ -69,6 +69,7 @@ std::string Binary::toString(int /*indent*/) const
 	Base64Encoder encoder(oss);
 	MemoryInputStream mis((const char*) _buffer.begin(), _buffer.size());
 	StreamCopier::copyStream(mis, encoder);
+	encoder.close();
 	return oss.str();
 }
 
