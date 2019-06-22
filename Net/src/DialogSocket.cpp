@@ -31,7 +31,7 @@ DialogSocket::DialogSocket():
 }
 
 
-DialogSocket::DialogSocket(const SocketAddress& address): 
+DialogSocket::DialogSocket(const SocketAddress& address):
 	StreamSocket(address),
 	_pBuffer(0),
 	_pNext(0),
@@ -41,7 +41,7 @@ DialogSocket::DialogSocket(const SocketAddress& address):
 }
 
 
-DialogSocket::DialogSocket(const Socket& socket): 
+DialogSocket::DialogSocket(const Socket& socket):
 	StreamSocket(socket),
 	_pBuffer(0),
 	_pNext(0),
@@ -161,7 +161,7 @@ int DialogSocket::receiveStatusMessage(std::string& message)
 		while (status <= 0)
 		{
 			message += '\n';
-			status = receiveStatusLine(message, MAX_LINE_LENGTH);
+			status = receiveStatusLine(message, message.length() + MAX_LINE_LENGTH);
 		}
 	}
 	return status;
