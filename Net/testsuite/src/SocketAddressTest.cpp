@@ -68,7 +68,7 @@ void SocketAddressTest::testSocketAddress()
 	}
 
 	SocketAddress sa4("pocoproject.org", 80);
-	assert (sa4.host().toString() == "162.209.7.4");
+	assert (sa4.host().toString() == "104.130.199.50");
 	assert (sa4.port() == 80);
 
 	try
@@ -117,18 +117,18 @@ void SocketAddressTest::testSocketAddress()
 	catch (InvalidArgumentException&)
 	{
 	}
-	
+
 	SocketAddress sa10("www6.pocoproject.org", 80);
-	assert (sa10.host().toString() == "162.209.7.4" || sa10.host().toString() == "[2001:4801:7819:74:be76:4eff:fe10:6b73]");
-	
+	assert (sa10.host().toString() == "104.130.199.50" || sa10.host().toString() == "2001:4801:7828:101:be76:4eff:fe10:1455");
+
 	SocketAddress sa11(SocketAddress::IPv4, "www6.pocoproject.org", 80);
-	assert (sa11.host().toString() == "162.209.7.4");
+	assert (sa11.host().toString() == "104.130.199.50");
 
 #ifdef POCO_HAVE_IPv6
 	try
 	{
 		SocketAddress sa12(SocketAddress::IPv6, "www6.pocoproject.org", 80);
-		assert (sa12.host().toString() == "2001:4801:7819:74:be76:4eff:fe10:6b73");
+		assert (sa12.host().toString() == "2001:4801:7828:101:be76:4eff:fe10:1455");
 	}
 	catch (AddressFamilyMismatchException&)
 	{
@@ -159,14 +159,14 @@ void SocketAddressTest::testSocketAddress6()
 	assert (sa1.af() == AF_INET6);
 	assert (sa1.family() == SocketAddress::IPv6);
 	assert (sa1.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
-	assert (sa1.port() == 100);	
+	assert (sa1.port() == 100);
 	assert (sa1.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
 
 	SocketAddress sa2("[FE80::E6CE:8FFF:FE4A:EDD0]:100");
 	assert (sa2.af() == AF_INET6);
 	assert (sa2.family() == SocketAddress::IPv6);
 	assert (sa2.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
-	assert (sa2.port() == 100);	
+	assert (sa2.port() == 100);
 	assert (sa2.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
 #endif
 }
@@ -179,11 +179,11 @@ void SocketAddressTest::testSocketAddressUnixLocal()
 	assert (sa1.af() == AF_UNIX);
 	assert (sa1.family() == SocketAddress::UNIX_LOCAL);
 	assert (sa1.toString() == "/tmp/sock1");
-	
+
 	SocketAddress sa2(SocketAddress::UNIX_LOCAL, "/tmp/sock2");
 	assert (sa1 != sa2);
 	assert (sa1 < sa2);
-	
+
 	SocketAddress sa3(SocketAddress::UNIX_LOCAL, "/tmp/sock1");
 	assert (sa1 == sa3);
 	assert (!(sa1 < sa3));
