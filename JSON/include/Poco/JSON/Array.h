@@ -34,10 +34,10 @@ class Object;
 
 class JSON_API Array
 	/// Represents a JSON array. Array provides a representation
-	/// based on shared pointers and optimized for performance. It is possible to 
+	/// based on shared pointers and optimized for performance. It is possible to
 	/// convert Array to Poco::Dynamic::Array. Conversion requires copying and therefore
 	/// has performance penalty; the benefit is in improved syntax, eg:
-	/// 
+	///
 	///    // use pointers to avoid copying
 	///    using namespace Poco::JSON;
 	///    std::string json = "[ {\"test\" : 0}, { \"test1\" : [1, 2, 3], \"test2\" : 4 } ]";
@@ -49,7 +49,7 @@ class JSON_API Array
 	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
 	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
 	///    i = result = subArr->get(0); // i == 1;
-	/// 
+	///
 	///    // copy/convert to Poco::Dynamic::Array
 	///    Poco::Dynamic::Array da = *arr;
 	///    i = da[0]["test"];     // i == 0
@@ -102,7 +102,7 @@ public:
 		/// Returns the end iterator for values.
 
 	Dynamic::Var get(unsigned int index) const;
-		/// Retrieves the element at the given index. 
+		/// Retrieves the element at the given index.
 		/// Will return an empty value when the element doesn't exist.
 
 	Array::Ptr getArray(unsigned int index) const;
@@ -216,7 +216,7 @@ private:
 
 inline void Array::setEscapeUnicode(bool escape)
 {
-	_escapeUnicode = true;
+	_escapeUnicode = escape;
 }
 
 

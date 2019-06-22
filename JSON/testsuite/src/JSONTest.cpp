@@ -1938,26 +1938,29 @@ void JSONTest::testEscape0()
 
 void JSONTest::testNonEscapeUnicode()
 {
-	std::string chinese("{ \"name\" : \"\\u4e2d\" }");
+	std::string chinese("{\"arr\":[{ \"name\" : \"\\u4e2d\" }]}");
 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
 	Var result = parser.parse(chinese);
 
 	assert(result.type() == typeid(Object::Ptr));
 
 	Object::Ptr object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(false);
 
 	std::stringstream ss;
 	object->stringify(ss);
-	assert(ss.str().compare("{\"name\":\"\xE4\xB8\xAD\"}") == 0);
+	assert (ss.str().compare("{\"arr\":[{\"name\":\"\xE4\xB8\xAD\"}]}") == 0);
 
-	const unsigned char utf8Chars[]   = {'{', '"', 'n', 'a', 'm', 'e', '"', ':',
-		'"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', 0};
+	const unsigned char utf8Chars[]   = {'{', '"', 'a', 'r', 'r', '"', ':', '[', '{', '"', 'n', 'a', 'm', 'e', '"', ':',
+										 '"', 'g', 0xC3, 0xBC, 'n', 't', 'e', 'r', '"', '}', ']', '}', 0};
 	std::string utf8Text((const char*) utf8Chars);
 	parser.reset();
 	result = parser.parse(utf8Text);
 	object = result.extract<Object::Ptr>();
+	object->setEscapeUnicode(false);
+
 	ss.str(""); object->stringify(ss);
-	assert (ss.str() == "{\"name\":\"g\xC3\xBCnter\"}");
+	assert (ss.str() == "{\"arr\":[{\"name\":\"g\xC3\xBCnter\"}]}");
 
 	Poco::JSON::Object obj1;
 	std::string shortEscapeStr("String with \t");
