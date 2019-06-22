@@ -38,14 +38,14 @@ class Net_API WebSocketImpl: public StreamSocketImpl
 public:
 	WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload);
 		/// Creates a WebSocketImpl.
-	
+
 	// StreamSocketImpl
 	virtual int sendBytes(const void* buffer, int length, int flags);
 		/// Sends a WebSocket protocol frame.
-		
+
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
-		
+
 	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags);
 		/// Receives a WebSocket protocol frame.
 
@@ -67,7 +67,7 @@ public:
 	virtual void sendUrgent(unsigned char data);
 	virtual int available();
 	virtual bool secure() const;
-	virtual void setSendTimeout(const Poco::Timespan& timeout); 
+	virtual void setSendTimeout(const Poco::Timespan& timeout);
 	virtual Poco::Timespan getSendTimeout();
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
 	virtual Poco::Timespan getReceiveTimeout();
@@ -75,9 +75,19 @@ public:
 	// Internal
 	int frameFlags() const;
 		/// Returns the frame flags of the most recently received frame.
-		
+
 	bool mustMaskPayload() const;
 		/// Returns true if the payload must be masked.
+
+	void setMaxPayloadSize(int maxPayloadSize);
+		/// Sets the maximum payload size for receiveFrame().
+		///
+		/// The default is std::numeric_limits<int>::max().
+
+	int getMaxPayloadSize() const;
+		/// Returns the maximum payload size for receiveFrame().
+		///
+		/// The default is std::numeric_limits<int>::max().
 
 protected:
 	enum
@@ -85,7 +95,7 @@ protected:
 		FRAME_FLAG_MASK   = 0x80,
 		MAX_HEADER_LENGTH = 14
 	};
-	
+
 	int receiveHeader(char mask[4], bool& useMask);
 	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
 	int receiveNBytes(void* buffer, int bytes);
@@ -94,8 +104,9 @@ protected:
 
 private:
 	WebSocketImpl();
-	
+
 	StreamSocketImpl* _pStreamSocketImpl;
+	int _maxPayloadSize;
 	Poco::Buffer<char> _buffer;
 	int _bufferOffset;
 	int _frameFlags;
@@ -116,6 +127,12 @@ inline int WebSocketImpl::frameFlags() const
 inline bool WebSocketImpl::mustMaskPayload() const
 {
 	return _mustMaskPayload;
+}
+
+
+inline int WebSocketImpl::getMaxPayloadSize() const
+{
+	return _maxPayloadSize;
 }
 
 
