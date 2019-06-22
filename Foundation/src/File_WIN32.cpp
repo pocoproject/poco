@@ -165,7 +165,7 @@ bool FileImpl::isLinkImpl() const
 {
 	poco_assert (!_path.empty());
 
-	DWORD attr = GetFileAttributes(_upath.c_str());
+	DWORD attr = GetFileAttributes(_path.c_str());
 	if (attr == INVALID_FILE_ATTRIBUTES)
 		handleLastErrorImpl(_path);
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0 && (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
