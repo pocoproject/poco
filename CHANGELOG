@@ -1,5 +1,36 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.9.1 (2019-06-24)
+==========================
+
+- fixed GH #2220: Encoding/DoubleByteEncoding.cpp fails to compile with VS2008 and _DEBUG
+- fixed GH #2277: SQLite null pointer dereference occurs when exception is being thrown
+- fixed GH #2313: PollSet behaves differently on windows
+- fixed GH #2316: cmake can't find MySQL and ODBC libraries
+- fixed GH #2336: Omit ContentLength in WebSocket accept response
+- fixed GH #2358: Don't include <openssl/fips.h> for later OpenSSL
+- fixed GH #2364: Stringify escapes every unicode symbol when object contain an array
+- fixed GH #2380: Calling Poco::Net::X509Certificate::addChainCertificate() leads to double free.
+- fixed GH #2492: Net::Socket::address() crash on Android
+- fixed GH #2549: Fix keepAlive in http client session
+- fixed GH #2570: DialogSocket: receiveStatusMessage() - line length limit applies to entire multi-line message
+- fixed GH #2583: Crypto library does not build with OpenSSL 1.0.0
+- fixed GH #2583: Crypto library does not build with OpenSSL 1.0.0 (backport)
+- fixed GH #2655: MongoDB Binary element to string - bug
+- fixed GH #2661: Poco::Zip::ZipArchive cannot load new tomcat.zip file
+- fixed GH #2700: Invalid read of memory in Poco::Environment::set which may cause crashes.
+- fixed GH #2712: File_WIN32.cpp(168): error C2065: “_upath”:Undeclared identifier
+- Added support for building with different OpenSSL distributions on Windows.
+  See the POCO_EXTERNAL_OPENSSL macro defined in Foundation/include/Poco/Config.h
+  for options.
+- Added Poco::Net::HTTPClientSession::flushRequest()
+- Added Poco::Net::WebSocket::setMaxPayloadSize() and Poco::Net::WebSocket::getMaxPayloadSize()
+  to specify a maximum acceptable payload size for Poco::Net::WebSocket::receiveFrame().
+- Redis: added support for additional commands (exists, expire, ping, multi, exec, discard)
+- Redis: added Poco::Redis::Client::isConnected()
+- Upgraded bundled PCRE to version 8.43
+- Upgraded bundled SQLite to version 3.28.0
+
 
 Release 1.9.0 (2018-03-07)
 ==========================
