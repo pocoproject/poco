@@ -85,6 +85,8 @@ public:
 
 	bool isEncrypted() const;
 
+	bool hasSupportedCompressionMethod() const;
+
 	const Poco::DateTime& lastModifiedAt() const;
 
 	Poco::UInt32 getCRC() const;
@@ -364,6 +366,13 @@ inline bool ZipLocalFileHeader::isEncrypted() const
 {
 	// bit 0 indicates encryption
 	return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0001) != 0);
+}
+
+
+inline bool ZipLocalFileHeader::hasSupportedCompressionMethod() const
+{
+	ZipCommon::CompressionMethod method = getCompressionMethod();
+	return method == ZipCommon::CM_DEFLATE || method == ZipCommon::CM_STORE;
 }
 
 

@@ -22,6 +22,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Delegate.h"
 #include "Poco/FileStream.h"
+#include "Poco/Format.h"
 
 
 namespace Poco {
@@ -107,7 +108,14 @@ bool Decompress::handleZipEntry(std::istream& zipStream, const ZipLocalFileHeade
 		}
 
 		if (!ZipCommon::isValidPath(fileName))
+		{
 			throw ZipException("Illegal entry name", fileName);
+		}
+
+		if (!hdr.hasSupportedCompressionMethod())
+		{
+			throw ZipException(Poco::format("Unsupported compression method (%d)", static_cast<int>(hdr.getCompressionMethod())), fileName);
+		}
 
 		Poco::Path file(fileName);
 		file.makeFile();

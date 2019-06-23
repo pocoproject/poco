@@ -21,6 +21,7 @@
 #include "Poco/Exception.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
+#include "Poco/Format.h"
 #if defined(POCO_UNBUNDLED)
 #include <zlib.h>
 #else
@@ -80,7 +81,6 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 			_ptrBuf = new PartialInputStream(istr, start, end, reposition);
 		}
 	}
-	else throw Poco::NotImplementedException("Unsupported compression method");
 }
 
 
@@ -299,6 +299,10 @@ ZipStreamBuf* ZipIOS::rdbuf()
 
 ZipInputStream::ZipInputStream(std::istream& istr, const ZipLocalFileHeader& fileEntry, bool reposition): ZipIOS(istr, fileEntry, reposition), std::istream(&_buf)
 {
+	if (!fileEntry.hasSupportedCompressionMethod())
+	{
+		throw ZipException(Poco::format("Unsupported compression method (%d)", static_cast<int>(fileEntry.getCompressionMethod())), fileEntry.getFileName());
+	}
 }
 
 
