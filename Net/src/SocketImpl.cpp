@@ -509,8 +509,11 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	do
 	{
 		Poco::Timestamp start;
+#ifdef _WIN32
+		rc = WSAPoll(&pollBuf, 1, static_cast<INT>(remainingTime.totalMilliseconds()));
+#else
 		rc = ::poll(&pollBuf, 1, remainingTime.totalMilliseconds());
-
+#endif
 		if (rc < 0 && lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;
