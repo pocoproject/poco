@@ -4,7 +4,7 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs_version   150 | 140 | 120 | 110 | 100 | 90]
+#              [-vs_version   160 | 150 | 140 | 120 | 110 | 100 | 90]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -23,7 +23,7 @@ Param
   [string] $poco_base,
 
   [Parameter()]
-  [ValidateSet(90, 100, 110, 120, 140, 150)]
+  [ValidateSet(90, 100, 110, 120, 140, 150, 160)]
   [int] $vs_version,
 
   [Parameter()]
@@ -78,7 +78,8 @@ function Set-Environment
 
   if ($vs_version -eq 0)
   {
-    if     ($Env:VS150COMNTOOLS -ne '') { $script:vs_version = 150 }
+    if     ($Env:VS160COMNTOOLS -ne '') { $script:vs_version = 160 }
+    elseif ($Env:VS150COMNTOOLS -ne '') { $script:vs_version = 150 }
     elseif ($Env:VS140COMNTOOLS -ne '') { $script:vs_version = 140 }
     elseif ($Env:VS120COMNTOOLS -ne '') { $script:vs_version = 120 }
     elseif ($Env:VS110COMNTOOLS -ne '') { $script:vs_version = 110 }
@@ -120,7 +121,12 @@ function Set-Environment
   $CommandArg = ''
   if ($platform -eq 'x64') { $CommandArg = "amd64" }
   else                     { $CommandArg = "x86" }
-  if ($vs_version -ge 150)
+  if ($vs_version -ge 160)
+  {
+    $Command = "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
+    $script:msbuild_exe = "$($vsdir)\..\..\MSBuild\Current\Bin\MSBuild.exe"
+  }
+  elseif ($vs_version -ge 150)
   {
     $Command = "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
     $script:msbuild_exe = "$($vsdir)\..\..\MSBuild\15.0\Bin\MSBuild.exe"
@@ -149,7 +155,7 @@ function Process-Input
     Write-Host 'Usage:'
     Write-Host '------'
     Write-Host 'buildwin.ps1 [-poco_base    dir]'
-    Write-Host '             [-vs_version   150 | 140 | 120 | 110 | 100 | 90]'
+    Write-Host '             [-vs_version   160 | 150 | 140 | 120 | 110 | 100 | 90]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
