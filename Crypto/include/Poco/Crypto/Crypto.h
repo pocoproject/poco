@@ -20,18 +20,18 @@
 #define Crypto_Crypto_INCLUDED
 
 
-#if defined(__APPLE__)
-// OS X 10.7 deprecates some OpenSSL functions
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
-#endif
-
-
 #define POCO_EXTERNAL_OPENSSL_DEFAULT 1
 #define POCO_EXTERNAL_OPENSSL_SLPRO 2
 
 
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
+
+
+#ifndef OPENSSL_VERSION_PREREQ
+#define OPENSSL_VERSION_PREREQ(maj, min) \
+	((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
+#endif
 
 
 enum RSAPaddingMode
