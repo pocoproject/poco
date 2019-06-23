@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 14
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MySQL", "MySQL_vs140.vcxproj", "{73E19FDE-1570-488C-B3DB-72A60FADD408}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_vs140.vcxproj", "{4D6E42AE-EB6A-47EB-A186-B8A183FABCF7}"

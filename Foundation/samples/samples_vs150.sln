@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ActiveMethod", "ActiveMethod\ActiveMethod_vs150.vcxproj", "{F8B51F16-52AE-3D43-B55B-BD62ED422C2F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Activity", "Activity\Activity_vs150.vcxproj", "{479B938E-57EA-3332-AFD3-E7285DE4EB28}"

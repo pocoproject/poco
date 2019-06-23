@@ -3886,14 +3886,12 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|Digi JumpStart (ARMV4I)"
-				ExcludedFromBuild="true">
+				Name="debug_shared|Digi JumpStart (ARMV4I)">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|Digi JumpStart (ARMV4I)"
-				ExcludedFromBuild="true">
+				Name="release_shared|Digi JumpStart (ARMV4I)">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zip", "zip\zip_vs150.vcxproj", "{7F3AD0E5-A150-3AE7-9041-9086C45020C0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unzip", "unzip\unzip_vs150.vcxproj", "{9FE5275A-E14A-30C2-9C5B-AEBDE780608F}"

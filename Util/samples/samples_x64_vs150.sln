@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pkill", "pkill\pkill_x64_vs150.vcxproj", "{63EDD785-29E1-3073-87EB-3CE788A4A1DE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleApp", "SampleApp\SampleApp_x64_vs150.vcxproj", "{C3F12C11-469F-3FB6-8C95-8638F78FF7C0}"

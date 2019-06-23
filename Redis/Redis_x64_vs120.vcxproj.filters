@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{ccc8ed4d-5024-46de-9a7b-f8f3ccd67864}</UniqueIdentifier>
+      <UniqueIdentifier>{d0877678-bd17-445c-acc9-a0f203c46426}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{de5467c5-c688-4d45-b854-f6bdecc06624}</UniqueIdentifier>
+      <UniqueIdentifier>{b1bbf8d0-1329-4b35-9a79-3a00a1a03a2a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -35,6 +35,9 @@
     </ClCompile>
     <ClCompile Include="src\Type.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Poco\Redis\RedisEventArgs.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,5 +71,8 @@
     <ClInclude Include="include\Poco\Redis\Type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

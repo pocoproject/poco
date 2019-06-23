@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="CppParser">
-      <UniqueIdentifier>{4187737f-2ab8-4d4c-bf80-5e4ca0ec952d}</UniqueIdentifier>
+      <UniqueIdentifier>{5bb7de66-7748-48cf-9742-146dfebaa00e}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Header Files">
-      <UniqueIdentifier>{37dfce6d-40b8-4e52-b0a1-0833099faadc}</UniqueIdentifier>
+      <UniqueIdentifier>{45e5765a-bd06-4ce7-8a59-7d535f16746c}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Source Files">
-      <UniqueIdentifier>{8783dc43-2f76-4939-9b5d-986d8c716d39}</UniqueIdentifier>
+      <UniqueIdentifier>{486fb907-2562-4d9d-a243-be73adb86c09}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table">
-      <UniqueIdentifier>{776ef0ed-d9c8-4402-aa52-1f7ef690c561}</UniqueIdentifier>
+      <UniqueIdentifier>{09c3bfe1-796a-4837-a8e9-eaca51b35415}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table\Header Files">
-      <UniqueIdentifier>{3ac2363c-a383-4707-8b43-da139157d83d}</UniqueIdentifier>
+      <UniqueIdentifier>{27d005ce-4457-4583-ac6e-80f506c56dc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Symbol Table\Source Files">
-      <UniqueIdentifier>{bf9ef9f5-e569-40af-9622-2e03f79a7c00}</UniqueIdentifier>
+      <UniqueIdentifier>{c504d43c-1679-4182-935f-a0806646faad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes">
-      <UniqueIdentifier>{7fdc8b81-eb2c-4682-a623-eb0a5c7bae53}</UniqueIdentifier>
+      <UniqueIdentifier>{56421158-514e-42df-a819-b81d75ef6436}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Header Files">
-      <UniqueIdentifier>{1e3dc571-a898-46ab-96f9-09c089b6aa4d}</UniqueIdentifier>
+      <UniqueIdentifier>{f24940ad-e8bf-4d51-8bd1-5d66bb0dccd9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Source Files">
-      <UniqueIdentifier>{9b93d5b7-ac44-48f2-84e7-6a680559483b}</UniqueIdentifier>
+      <UniqueIdentifier>{31a66cd7-d3ab-4069-bd38-1f340498564f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -137,5 +137,8 @@
     <ClCompile Include="src\AttributesParser.cpp">
       <Filter>Attributes\Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>
