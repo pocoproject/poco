@@ -330,12 +330,17 @@ protected:
 		}
 		else if (tool == "vs140")
 		{
-			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 2015\r\n";
+			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 14\r\n";
 			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
 		}
 		else if (tool == "vs150")
 		{
-			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 2017\r\n";
+			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio 15\r\n";
+			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
+		}
+		else if (tool == "vs160")
+		{
+			solutionStream << "Microsoft Visual Studio Solution File, Format Version 12.00\r\n# Visual Studio Version 16\r\n";
 			generateSolution80(solutionStream, solutionPath, solutionGUID, projectConfig, templateProps, platform, tool);
 		}
 	}
@@ -625,6 +630,18 @@ protected:
 		}
 	}
 
+	void fix2019Project(Poco::AutoPtr<Poco::XML::Document> pProjectDoc, const std::set<std::string>& configSet, const std::string& platform, const Poco::Util::AbstractConfiguration& projectProps, const Poco::Util::AbstractConfiguration& templateProps)
+	{
+		fix2010Project(pProjectDoc, configSet, platform, projectProps, templateProps);
+		Poco::AutoPtr<Poco::XML::NodeList> pConfigurationTypeList = pProjectDoc->getElementsByTagName("ConfigurationType");
+		for (unsigned long i = 0; i < pConfigurationTypeList->length(); i++)
+		{
+			Poco::XML::Element* pConfigurationTypeElem = static_cast<Poco::XML::Element*>(pConfigurationTypeList->item(i));
+			removeElement(pConfigurationTypeElem->parentNode(), "PlatformToolset");
+			appendElement(pConfigurationTypeElem->parentNode(), "PlatformToolset", "v142");
+		}
+	}
+
 	void appendElement(Poco::XML::Node* pParentNode, const std::string& elemName, const std::string& text)
 	{
 		Poco::AutoPtr<Poco::XML::Element> pElement = pParentNode->ownerDocument()->createElement(elemName);
@@ -885,6 +902,16 @@ protected:
 								logger().information("Fixing Visual Studio 2017 project file: " + vcxprojPath.toString());
 								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
 								fix2017Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
+								writeProject(pProjectDoc, vcxprojPath.toString());
+							}
+						}
+						if (config().getBool("progen.postprocess." + postprocess + ".fix2019ProjectFile", false))
+						{
+							if (projectFile.exists())
+							{
+								logger().information("Fixing Visual Studio 2019 project file: " + vcxprojPath.toString());
+								Poco::AutoPtr<Poco::XML::Document> pProjectDoc = domParser.parse(vcxprojPath.toString());
+								fix2019Project(pProjectDoc, configSet, pTemplateProps->getString("project.platform", platform), *pProps, *pTemplateProps);
 								writeProject(pProjectDoc, vcxprojPath.toString());
 							}
 						}
