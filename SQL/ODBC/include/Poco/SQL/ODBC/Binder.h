@@ -926,7 +926,8 @@ private:
 	{
 		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
 		{
-			copyValue(*out, *it, static_cast<SQLINTEGER>(bufSize));
+			const T& itemValueRef = *it;
+			copyValue(*out, itemValueRef, static_cast<SQLINTEGER>(bufSize));
 			next(out, static_cast<SQLINTEGER>(bufSize));
 		}
 	}
