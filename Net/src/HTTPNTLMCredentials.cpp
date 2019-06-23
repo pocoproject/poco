@@ -52,6 +52,14 @@ void HTTPNTLMCredentials::reset()
 }
 
 
+void HTTPNTLMCredentials::clear()
+{
+	_username.clear();
+	_password.clear();
+	_host.clear();
+}
+
+
 void HTTPNTLMCredentials::setUsername(const std::string& username)
 {
 	_username = username;
@@ -169,7 +177,7 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 			}
 			else throw HTTPException("Invalid NTLM challenge");
 		}
-		return NTLMCredentials::toBase64(authenticateBuf);		
+		return NTLMCredentials::toBase64(authenticateBuf);
 	}
 }
 

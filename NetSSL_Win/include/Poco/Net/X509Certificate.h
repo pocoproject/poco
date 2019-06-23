@@ -22,7 +22,7 @@
 #include "Poco/DateTime.h"
 #include <set>
 #include <istream>
-#include <Poco/UnWindows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
 
 
@@ -43,9 +43,9 @@ public:
 		NID_LOCALITY_NAME,
 		NID_STATE_OR_PROVINCE,
 		NID_ORGANIZATION_NAME,
-		NID_ORGANIZATION_UNIT_NAME	
+		NID_ORGANIZATION_UNIT_NAME
 	};
-	
+
 	explicit X509Certificate(const std::string& certPath);
 		/// Creates the X509Certificate object by reading
 		/// a certificate in PEM or DER format from a file.
@@ -86,12 +86,12 @@ public:
 
 	const std::string& issuerName() const;
 		/// Returns the certificate issuer's distinguished name.
-		
+
 	std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate issuer's
 		/// distinguished name.
-		
+
 	const std::string& subjectName() const;
 		/// Returns the certificate subject's distinguished name.
 
@@ -99,21 +99,21 @@ public:
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate subject's
 		/// distinguished name.
-		
+
 	std::string commonName() const;
 		/// Returns the common name stored in the certificate
 		/// subject's distinguished name.
-		
+
 	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
-		
+
 	Poco::DateTime validFrom() const;
 		/// Returns the date and time the certificate is valid from.
-		
+
 	Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
-		
+
 	bool issuedBy(const X509Certificate& issuerCertificate) const;
 		/// Checks whether the certificate has been issued by
 		/// the issuer given by issuerCertificate. This can be
@@ -133,7 +133,7 @@ public:
 		/// of the host.
 		///
 		/// Returns true if verification succeeded, or false otherwise.
-		
+
 	static bool verify(const Poco::Net::X509Certificate& cert, const std::string& hostName);
 		/// Verifies the validity of the certificate against the host name.
 		///
@@ -149,7 +149,7 @@ public:
 protected:
 	void init();
 		/// Extracts issuer and subject name from the certificate.
-	
+
 	static void* nid2oid(NID nid);
 		/// Returns the OID for the given NID.
 

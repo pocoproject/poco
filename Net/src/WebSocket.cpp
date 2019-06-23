@@ -184,24 +184,28 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 	}
 	else if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED)
 	{
-		Poco::NullOutputStream null;
-		Poco::StreamCopier::copyStream(istr, null);
-		credentials.authenticate(request, response);
-		if (!cs.getProxyHost().empty() && !cs.secure())
+		if (!credentials.empty())
 		{
-			cs.reset();
-			cs.proxyTunnel();
+			Poco::NullOutputStream null;
+			Poco::StreamCopier::copyStream(istr, null);
+			credentials.authenticate(request, response);
+			if (!cs.getProxyHost().empty() && !cs.secure())
+			{
+				cs.reset();
+				cs.proxyTunnel();
+			}
+			cs.sendRequest(request);
+			cs.receiveResponse(response);
+			if (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS)
+			{
+				return completeHandshake(cs, response, key);
+			}
+			else if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED)
+			{
+				throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
+			}
 		}
-		cs.sendRequest(request);
-		cs.receiveResponse(response);
-		if (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS)
-		{
-			return completeHandshake(cs, response, key);
-		}
-		else if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED)
-		{
-			throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
-		}
+		else throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
 	}
 	if (response.getStatus() == HTTPResponse::HTTP_OK)
 	{

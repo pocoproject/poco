@@ -47,6 +47,13 @@ HTTPCredentials::~HTTPCredentials()
 }
 
 
+void HTTPCredentials::clear()
+{
+	_digest.clear();
+	_ntlm.clear();
+}
+
+
 void HTTPCredentials::fromUserInfo(const std::string& userInfo)
 {
 	std::string username;

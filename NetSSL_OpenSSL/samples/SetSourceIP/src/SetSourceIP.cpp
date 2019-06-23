@@ -1,4 +1,3 @@
-
 //
 // SetSourceIP.cpp
 //
@@ -11,28 +10,28 @@
 //
 
 
-#include <Poco/Net/SSLManager.h>
-#include <Poco/Net/RejectCertificateHandler.h>
-#include <Poco/Net/KeyConsoleHandler.h>
-#include <Poco/Net/ConsoleCertificateHandler.h>
-#include <Poco/Net/Context.h>
-#include <Poco/Net/HTTPSClientSession.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/Net/SecureStreamSocket.h>
-#include <Poco/Net/SocketImpl.h>
-#include <Poco/Path.h>
-#include <Poco/URI.h>
-#include <Poco/Exception.h>
-#include <Poco/SharedPtr.h>
-
-
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/RejectCertificateHandler.h"
+#include "Poco/Net/KeyConsoleHandler.h"
+#include "Poco/Net/ConsoleCertificateHandler.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/SecureStreamSocket.h"
+#include "Poco/Net/SocketImpl.h"
+#include "Poco/Path.h"
+#include "Poco/URI.h"
+#include "Poco/Exception.h"
+#include "Poco/SharedPtr.h"
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <map>
 
+
 Poco::Path programName;
+
 
 void usage(std::string errorMessage)
 {
