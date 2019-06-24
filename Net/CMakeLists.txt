@@ -9,13 +9,19 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 # Windows and WindowsCE need additional libraries
 if(WIN32)
     if(WINCE)
         set(SYSLIBS ${SYSLIBS} "ws2.lib" "iphlpapi.lib")
-    else()    
+    else()
         set(SYSLIBS ${SYSLIBS} "ws2_32.lib" "iphlpapi.lib")
-    endif()    
+    endif()
 endif(WIN32)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )
