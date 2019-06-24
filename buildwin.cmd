@@ -109,9 +109,9 @@ if not defined VCINSTALLDIR (
             ) else (
               if %VS_VERSION%==vs160 (
                 if %PLATFORM%==x64 (
-                  call "%VS160COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
+                  call "%VS160COMNTOOLS%%VS_VARSALL%" x86_amd64
                 ) else (
-                  call "%VS160COMNTOOLS%%VS_VARSALL%" x86 8.1
+                  call "%VS160COMNTOOLS%%VS_VARSALL%" x86
                 )
               )
             )
@@ -547,7 +547,7 @@ exit /b 1
 echo Usage:
 echo ------
 echo buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL]
-echo VS_VERSION:    "90|100|110|120|140|150"
+echo VS_VERSION:    "90|100|110|120|140|150|160"
 echo ACTION:        "build|rebuild|clean"
 echo LINKMODE:      "static_mt|static_md|shared|all"
 echo CONFIGURATION: "release|debug|both"
