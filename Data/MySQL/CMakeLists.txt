@@ -12,7 +12,7 @@ POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 # Version Resource
 if(MSVC AND NOT POCO_STATIC)
     source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
-    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND MYSQL_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
 add_definitions(-DTHREADSAFE -DNO_TCL)
