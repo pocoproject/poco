@@ -6,6 +6,12 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(Net ${SRCS} )
 add_library(Poco::Net ALIAS Net)
 set_target_properties( Net
@@ -21,9 +27,9 @@ if(WIN32)
     target_link_libraries(Net PUBLIC "iphlpapi.lib")
     if(WINCE)
         target_link_libraries(Net PUBLIC "ws2.lib")
-    else()    
+    else()
         target_link_libraries(Net PUBLIC "ws2_32.lib")
-    endif()    
+    endif()
 endif(WIN32)
 
 target_include_directories(Net

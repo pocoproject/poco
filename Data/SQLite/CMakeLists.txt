@@ -19,6 +19,12 @@ else()
     )
 endif()
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SQLITE_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(DataSQLite ${SQLITE_SRCS} )
 
 add_library(Poco::DataSQLite ALIAS DataSQLite)

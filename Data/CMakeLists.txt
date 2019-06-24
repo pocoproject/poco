@@ -11,6 +11,11 @@ if(MSVC AND NOT(MSVC_VERSION LESS 1400))
         PROPERTIES COMPILE_FLAGS "/bigobj")
 endif()
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
 
 add_library(Data ${SRCS} )
 add_library(Poco::Data ALIAS Data)

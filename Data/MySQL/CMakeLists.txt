@@ -6,6 +6,12 @@ POCO_SOURCES_AUTO( MYSQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND MYSQL_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(DataMySQL ${MYSQL_SRCS} )
 add_library(Poco::DataMySQL ALIAS DataMySQL)
 set_target_properties(DataMySQL
