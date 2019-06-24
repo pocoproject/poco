@@ -12,6 +12,7 @@
 //
 
 
+#define NOMINMAX
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
@@ -23,9 +24,6 @@
 #include "Poco/Format.h"
 #include <limits>
 #include <cstring>
-
-
-#undef max
 
 
 namespace Poco {
@@ -209,7 +207,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 	if (payloadLength <= 0)
 		return payloadLength;
 	if (payloadLength > length)
-		throw WebSocketException(Poco::format("Insufficient buffer for payload size %hu", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		throw WebSocketException(Poco::format("Insufficient buffer for payload size %d", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 	return receivePayload(reinterpret_cast<char*>(buffer), payloadLength, mask, useMask);
 }
 
@@ -247,7 +245,7 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 
 int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 	{
 		if (bytes < n) n = bytes;
@@ -391,7 +389,7 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 
 int WebSocketImpl::available()
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 		return n + _pStreamSocketImpl->available();
 	else
