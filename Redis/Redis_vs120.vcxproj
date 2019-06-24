@@ -276,7 +276,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\Poco\Redis\RedisEventArgs.cpp"/>
     <ClCompile Include="src\Array.cpp"/>
     <ClCompile Include="src\AsyncReader.cpp"/>
     <ClCompile Include="src\Client.cpp"/>
@@ -296,15 +295,14 @@
     <ClInclude Include="include\Poco\Redis\Exception.h"/>
     <ClInclude Include="include\Poco\Redis\PoolableConnectionFactory.h"/>
     <ClInclude Include="include\Poco\Redis\Redis.h"/>
+    <ClInclude Include="include\Poco\Redis\RedisEventArgs.h"/>
     <ClInclude Include="include\Poco\Redis\RedisStream.h"/>
     <ClInclude Include="include\Poco\Redis\Type.h"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ResourceCompile>
