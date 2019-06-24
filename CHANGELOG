@@ -29,6 +29,7 @@ Release 1.9.1 (2019-06-24)
 - fixed GH #2380: Calling Poco::Net::X509Certificate::addChainCertificate() leads to double free.
 - fixed GH #2492: Net::Socket::address() crash on Android
 - fixed GH #2549: Fix keepAlive in http client session
+- fixed GH #2565: HTMLForm: optional enforcement of Content-Length instead of Chunked Transfer-Encoding
 - fixed GH #2570: DialogSocket: receiveStatusMessage() - line length limit applies to entire multi-line message
 - fixed GH #2583: Crypto library does not build with OpenSSL 1.0.0
 - fixed GH #2655: MongoDB Binary element to string - bug
@@ -36,7 +37,6 @@ Release 1.9.1 (2019-06-24)
 - fixed GH #2700: Invalid read of memory in Poco::Environment::set which may cause crashes.
 - fixed GH #2712: File_WIN32.cpp(168): error C2065: “_upath”:Undeclared identifier
 - fixed GH #2723: Access violation when trying to decompress .zip file with unsupported compression method.
-- fixed GH #2565: HTMLForm: optional enforcement of Content-Length instead of Chunked Transfer-Encoding
 
 
 Release 1.9.0 (2018-03-07)
