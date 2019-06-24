@@ -36,7 +36,7 @@ class Net_API HTTPBasicCredentials
 public:
 	HTTPBasicCredentials();
 		/// Creates an empty HTTPBasicCredentials object.
-		
+
 	HTTPBasicCredentials(const std::string& username, const std::string& password);
 		/// Creates a HTTPBasicCredentials object with the given username and password.
 
@@ -55,18 +55,24 @@ public:
 	~HTTPBasicCredentials();
 		/// Destroys the HTTPBasicCredentials.
 
+	void clear();
+		/// Clears both username and password.
+
 	void setUsername(const std::string& username);
 		/// Sets the username.
-		
+
 	const std::string& getUsername() const;
 		/// Returns the username.
-		
+
 	void setPassword(const std::string& password);
 		/// Sets the password.
-		
+
 	const std::string& getPassword() const;
 		/// Returns the password.
-		
+
+	bool empty() const;
+		/// Returns true if both username and password are empty, otherwise false.
+
 	void authenticate(HTTPRequest& request) const;
 		/// Adds authentication information to the given HTTPRequest.
 
@@ -84,7 +90,7 @@ protected:
 private:
 	HTTPBasicCredentials(const HTTPBasicCredentials&);
 	HTTPBasicCredentials& operator = (const HTTPBasicCredentials&);
-	
+
 	std::string _username;
 	std::string _password;
 };
@@ -102,6 +108,12 @@ inline const std::string& HTTPBasicCredentials::getUsername() const
 inline const std::string& HTTPBasicCredentials::getPassword() const
 {
 	return _password;
+}
+
+
+inline bool HTTPBasicCredentials::empty() const
+{
+	return _username.empty() && _password.empty();
 }
 
 
