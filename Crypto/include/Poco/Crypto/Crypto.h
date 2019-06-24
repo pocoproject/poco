@@ -90,7 +90,7 @@ enum RSAPaddingMode
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
 		#if defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
 			#if defined(POCO_EXTERNAL_OPENSSL)
-				#pragma warning "External OpenSSL defined but internal headers used - possible mismatch!"
+				#pragma message("External OpenSSL defined but internal headers used - possible mismatch!")
 			#endif // POCO_EXTERNAL_OPENSSL
 			#if !defined(_DEBUG)
 				#define POCO_DEBUG_SUFFIX ""
