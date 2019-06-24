@@ -62,7 +62,7 @@ Param
 
 function Add-Env-Var([string] $lib, [string] $var)
 {
-  if ((${Env:$var} -eq $null) -or (-not ${Env:$var}.Contains(${Env:$lib_$var"})))
+  if ((${Env:$var} -eq $null) -or (-not ${Env:$var}.Contains(${Env:$lib_$var})))
   {
     $libvar = "$lib" + "_" + "$var"
     $envvar = [Environment]::GetEnvironmentVariable($libvar, "Process")
