@@ -1,6 +1,46 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.9.1
+
+!!Summary of Changes
+
+  - Added support for building with different OpenSSL distributions on Windows.
+    See the POCO_EXTERNAL_OPENSSL macro defined in Foundation/include/Poco/Config.h
+    for options.
+  - Added Poco::Net::HTTPClientSession::flushRequest()
+  - Added Poco::Net::WebSocket::setMaxPayloadSize() and Poco::Net::WebSocket::getMaxPayloadSize()
+    to specify a maximum acceptable payload size for Poco::Net::WebSocket::receiveFrame().
+  - Poco::Net::WebSocket: don't attempt to send empty credentials in response to 401 response.
+  - Redis: added support for additional commands (exists, expire, ping, multi, exec, discard)
+  - Redis: added Poco::Redis::Client::isConnected()
+  - Upgraded bundled PCRE to version 8.43
+  - Upgraded bundled SQLite to version 3.28.0
+  - Added project/solution files for Visual Studio 2019
+  - Fixed Visual Studio project files (version information from DLLVersion.rc not included in DLLs)
+  - Include version resource in DLLs built with CMake
+  - Added HTTP*Credentials::empty() and HTTPCredentials::clear()
+  - fixed GH #2220: Encoding/DoubleByteEncoding.cpp fails to compile with VS2008 and _DEBUG
+  - fixed GH #2243: DLLVersion.rc is excluded from build, missing detail information in properties of *.dll
+  - fixed GH #2277: SQLite null pointer dereference occurs when exception is being thrown
+  - fixed GH #2313: PollSet behaves differently on windows
+  - fixed GH #2316: cmake can't find MySQL and ODBC libraries
+  - fixed GH #2336: Omit ContentLength in WebSocket accept response
+  - fixed GH #2358: Don't include <openssl/fips.h> for later OpenSSL
+  - fixed GH #2364: Stringify escapes every unicode symbol when object contain an array
+  - fixed GH #2380: Calling Poco::Net::X509Certificate::addChainCertificate() leads to double free.
+  - fixed GH #2492: Net::Socket::address() crash on Android
+  - fixed GH #2549: Fix keepAlive in http client session
+  - fixed GH #2565: HTMLForm: optional enforcement of Content-Length instead of Chunked Transfer-Encoding
+  - fixed GH #2570: DialogSocket: receiveStatusMessage() - line length limit applies to entire multi-line message
+  - fixed GH #2583: Crypto library does not build with OpenSSL 1.0.0
+  - fixed GH #2655: MongoDB Binary element to string - bug
+  - fixed GH #2661: Poco::Zip::ZipArchive cannot load new tomcat.zip file
+  - fixed GH #2700: Invalid read of memory in Poco::Environment::set which may cause crashes.
+  - fixed GH #2712: File_WIN32.cpp(168): error C2065: “_upath”:Undeclared identifier
+  - fixed GH #2723: Access violation when trying to decompress .zip file with unsupported compression method.
+
+
 !!!Release 1.9.0
 
 !!Summary of Changes

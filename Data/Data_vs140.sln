@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 14
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Data", "Data_vs140.vcxproj", "{240E83C3-368D-11DB-9FBC-00123FC423B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_vs140.vcxproj", "{1813A463-E349-4FEA-8A8E-4A41E41C0DC7}"

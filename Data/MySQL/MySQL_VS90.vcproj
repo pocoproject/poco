@@ -440,10 +440,43 @@
 			<File
 				RelativePath=".\include\Poco\Data\MySQL\Utility.h"/>
 		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"/>
+		<File
+			RelativePath="..\..\DLLVersion.rc">
+			<FileConfiguration
+				Name="debug_shared|Win32">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_shared|Win32">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_mt|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_mt|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_md|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_md|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+		</File>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

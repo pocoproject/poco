@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{a38ebf2a-7201-459f-9529-982e658330a2}</UniqueIdentifier>
+      <UniqueIdentifier>{9b35eb85-8f87-4033-bd81-7d3699f1d129}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{47576743-6de7-4ab2-a8e8-b4006575ca04}</UniqueIdentifier>
+      <UniqueIdentifier>{aa14cb81-e799-49ee-be52-a15dbb9bcfee}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,9 +36,6 @@
     <ClCompile Include="src\Type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\Poco\Redis\RedisEventArgs.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Redis\Array.h">
@@ -65,11 +62,17 @@
     <ClInclude Include="include\Poco\Redis\Redis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Redis\RedisEventArgs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\Redis\RedisStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\Redis\Type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

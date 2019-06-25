@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 14
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dict", "dict\dict_vs140.vcxproj", "{90F24341-F59F-385F-A8D6-66AB377FF033}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "download", "download\download_vs140.vcxproj", "{D853F3D6-0D6F-3E8E-82C7-4216D7A21C4D}"

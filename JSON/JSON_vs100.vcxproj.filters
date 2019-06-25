@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{b68acee8-936e-46b7-8bae-b6afb9614f0d}</UniqueIdentifier>
+      <UniqueIdentifier>{8e3de8bd-0770-4d62-8587-3e3fbe9e76cf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{aaf1301e-6eff-4b31-a03b-2da5d2b3b111}</UniqueIdentifier>
+      <UniqueIdentifier>{6b29efff-a202-45d0-800a-c2bfb561a0da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -92,5 +92,8 @@
     <ClInclude Include="include\Poco\JSON\TemplateCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

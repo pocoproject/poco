@@ -52,7 +52,7 @@ ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	if (getHostSystem() == ZipCommon::HS_UNIX)
 		setUnixAttributes();
 
-	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.	   
+	_rawInfo[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.
 
 	if (header.searchCRCAndSizesAfterData())
 		_rawInfo[GENERAL_PURPOSE_POS] |= 0x08;
@@ -126,8 +126,7 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 				ptr += 2;
 				if (id == ZipCommon::ZIP64_EXTRA_ID)
 				{
-					poco_assert(size >= 8);
-					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					if (size >= 8 && getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
 						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
 						size -= 8;

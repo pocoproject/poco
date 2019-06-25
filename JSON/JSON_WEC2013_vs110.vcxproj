@@ -54,6 +54,9 @@
     <ClInclude Include="include\Poco\JSON\Template.h"/>
     <ClInclude Include="include\Poco\JSON\TemplateCache.h"/>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc"/>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
 </Project>

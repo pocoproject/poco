@@ -12,6 +12,7 @@
 //
 
 
+#define NOMINMAX
 #include "Poco/Net/WebSocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
@@ -21,6 +22,7 @@
 #include "Poco/BinaryReader.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Format.h"
+#include <limits>
 #include <cstring>
 
 
@@ -31,6 +33,7 @@ namespace Net {
 WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload):
 	StreamSocketImpl(pStreamSocketImpl->sockfd()),
 	_pStreamSocketImpl(pStreamSocketImpl),
+	_maxPayloadSize(std::numeric_limits<int>::max()),
 	_buffer(0),
 	_bufferOffset(0),
 	_frameFlags(0),
@@ -134,6 +137,7 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt64 l;
 		reader >> l;
+		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = static_cast<int>(l);
 	}
 	else if (lengthByte == 126)
@@ -148,10 +152,12 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt16 l;
 		reader >> l;
+		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = static_cast<int>(l);
 	}
 	else
 	{
+		if (lengthByte > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		payloadLength = lengthByte;
 	}
 
@@ -166,6 +172,14 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 	}
 
 	return payloadLength;
+}
+
+
+void WebSocketImpl::setMaxPayloadSize(int maxPayloadSize)
+{
+	poco_assert (maxPayloadSize > 0);
+
+	_maxPayloadSize = maxPayloadSize;
 }
 
 
@@ -193,7 +207,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 	if (payloadLength <= 0)
 		return payloadLength;
 	if (payloadLength > length)
-		throw WebSocketException(Poco::format("Insufficient buffer for payload size %hu", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		throw WebSocketException(Poco::format("Insufficient buffer for payload size %d", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 	return receivePayload(reinterpret_cast<char*>(buffer), payloadLength, mask, useMask);
 }
 
@@ -205,7 +219,7 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int)
 	int payloadLength = receiveHeader(mask, useMask);
 	if (payloadLength <= 0)
 		return payloadLength;
-	int oldSize = buffer.size();
+	std::size_t oldSize = buffer.size();
 	buffer.resize(oldSize + payloadLength);
 	return receivePayload(buffer.begin() + oldSize, payloadLength, mask, useMask);
 }
@@ -231,7 +245,7 @@ int WebSocketImpl::receiveNBytes(void* buffer, int bytes)
 
 int WebSocketImpl::receiveSomeBytes(char* buffer, int bytes)
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 	{
 		if (bytes < n) n = bytes;
@@ -375,7 +389,7 @@ Poco::Timespan WebSocketImpl::getReceiveTimeout()
 
 int WebSocketImpl::available()
 {
-	int n = _buffer.size() - _bufferOffset;
+	int n = static_cast<int>(_buffer.size()) - _bufferOffset;
 	if (n > 0)
 		return n + _pStreamSocketImpl->available();
 	else

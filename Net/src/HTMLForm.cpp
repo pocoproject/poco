@@ -54,11 +54,11 @@ public:
 	{
 	}
 
-	bool isValid() const 
+	bool isValid() const
 	{
 		return _valid;
 	}
-	
+
 	void setValid(bool v)
 	{
 		_valid = v;
@@ -76,7 +76,7 @@ HTMLForm::HTMLForm():
 {
 }
 
-	
+
 HTMLForm::HTMLForm(const std::string& encoding):
 	_fieldLimit(DFL_FIELD_LIMIT),
 	_valueLengthLimit(DFL_MAX_VALUE_LENGTH),
@@ -108,7 +108,7 @@ HTMLForm::HTMLForm(const HTTPRequest& request):
 	load(request);
 }
 
-	
+
 HTMLForm::~HTMLForm()
 {
 	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
@@ -151,7 +151,7 @@ void HTMLForm::load(const HTTPRequest& request, std::istream& requestBody, PartH
 	{
 		std::string mediaType;
 		NameValueCollection params;
-		MessageHeader::splitParameters(request.getContentType(), mediaType, params); 
+		MessageHeader::splitParameters(request.getContentType(), mediaType, params);
 		_encoding = mediaType;
 		if (_encoding == ENCODING_MULTIPART)
 		{
@@ -203,7 +203,7 @@ void HTMLForm::read(const std::string& queryString)
 }
 
 
-void HTMLForm::prepareSubmit(HTTPRequest& request)
+void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 {
 	if (request.getMethod() == HTTPRequest::HTTP_POST || request.getMethod() == HTTPRequest::HTTP_PUT)
 	{
@@ -229,11 +229,11 @@ void HTMLForm::prepareSubmit(HTTPRequest& request)
 			request.setKeepAlive(false);
 			request.setChunkedTransferEncoding(false);
 		}
-		else if (_encoding != ENCODING_URL)
+		else if (_encoding != ENCODING_URL && (options & OPT_USE_CONTENT_LENGTH) == 0)
 		{
 			request.setChunkedTransferEncoding(true);
 		}
-		if (!request.getChunkedTransferEncoding())
+		if (!request.getChunkedTransferEncoding() && !request.hasContentLength())
  		{
  			request.setContentLength(calculateContentLength());
  		}
@@ -413,7 +413,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 		header.set("Content-Disposition", disp);
 		writer.nextPart(header);
 		ostr << it->second;
-	}	
+	}
 	for (PartVec::iterator ita = _parts.begin(); ita != _parts.end(); ++ita)
 	{
 		MessageHeader header(ita->pSource->headers());
@@ -452,7 +452,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 void HTMLForm::setFieldLimit(int limit)
 {
 	poco_assert (limit >= 0);
-	
+
 	_fieldLimit = limit;
 }
 
@@ -460,7 +460,7 @@ void HTMLForm::setFieldLimit(int limit)
 void HTMLForm::setValueLengthLimit(int limit)
 {
 	poco_assert (limit >= 0);
-	
+
 	_valueLengthLimit = limit;
 }
 

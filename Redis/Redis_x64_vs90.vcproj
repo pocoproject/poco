@@ -433,12 +433,49 @@
 			<File
 				RelativePath=".\include\Poco\Redis\Redis.h"/>
 			<File
-				RelativePath=".\include\Poco\Redis\RedisEventArgs.cpp"/>
+				RelativePath=".\include\Poco\Redis\RedisEventArgs.h"/>
 			<File
 				RelativePath=".\include\Poco\Redis\RedisStream.h"/>
 			<File
 				RelativePath=".\include\Poco\Redis\Type.h"/>
 		</Filter>
+		<File
+			RelativePath="..\DLLVersion.rc">
+			<FileConfiguration
+				Name="debug_shared|x64">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_shared|x64">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_mt|x64"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_mt|x64"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_md|x64"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_md|x64"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+		</File>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

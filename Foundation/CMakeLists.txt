@@ -26,6 +26,12 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
 	)
 endif()
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 # Messages
 POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 

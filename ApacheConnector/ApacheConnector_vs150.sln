@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApacheConnector", "ApacheConnector_vs150.vcxproj", "{9866EE28-0612-4746-BD35-3B15B0AF7267}"
 EndProject
 Global

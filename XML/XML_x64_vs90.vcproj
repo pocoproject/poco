@@ -871,14 +871,12 @@
 		<File
 			RelativePath="..\DLLVersion.rc">
 			<FileConfiguration
-				Name="debug_shared|x64"
-				ExcludedFromBuild="true">
+				Name="debug_shared|x64">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="release_shared|x64"
-				ExcludedFromBuild="true">
+				Name="release_shared|x64">
 				<Tool
 					Name="VCResourceCompilerTool"/>
 			</FileConfiguration>

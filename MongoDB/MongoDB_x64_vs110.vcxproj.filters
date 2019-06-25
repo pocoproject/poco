@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{96bf86ab-b03b-44ab-8485-24dd982aab5b}</UniqueIdentifier>
+      <UniqueIdentifier>{cf7bba7b-0f46-4224-979a-74d892a929b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{57773056-4290-46dc-a381-5fff36a0d3c9}</UniqueIdentifier>
+      <UniqueIdentifier>{a606ee4a-12da-45b3-8da8-ab5a0da2da80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -149,5 +149,8 @@
     <ClInclude Include="include\Poco\MongoDB\UpdateRequest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

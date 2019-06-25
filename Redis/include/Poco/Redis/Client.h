@@ -116,6 +116,9 @@ public:
 	void disconnect();
 		/// Disconnects from the Redis server.
 
+	bool isConnected() const;
+		/// Returns true iff the Client is connected to a Redis server.
+
 	template<typename T>
 	T execute(const Array& command)
 		/// Sends the Redis Command to the server. It gets the reply
@@ -130,7 +133,7 @@ public:
 		/// Array and void. When the reply is an Error, it will throw
 		/// a RedisException.
 	{
-		T result;
+		T result = T();
 		writeCommand(command, true);
 		readReply(result);
 		return result;

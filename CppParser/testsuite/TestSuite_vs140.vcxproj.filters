@@ -2,37 +2,37 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="CppParser">
-      <UniqueIdentifier>{5e96a7fb-058a-4446-b7f7-f0b1e78d4e9d}</UniqueIdentifier>
+      <UniqueIdentifier>{f7e8f518-6000-447a-a7ef-5c7938a4ceb9}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Header Files">
-      <UniqueIdentifier>{7cdceeb8-944a-4ec2-8679-11857de12c14}</UniqueIdentifier>
+      <UniqueIdentifier>{3a3977e6-a77e-4d86-b743-2c3d4c66755c}</UniqueIdentifier>
     </Filter>
     <Filter Include="CppParser\Source Files">
-      <UniqueIdentifier>{e2e67513-76a7-4ffb-a741-1b5a4d5373e1}</UniqueIdentifier>
+      <UniqueIdentifier>{3b4d2bb9-0ff8-4c63-8834-c18287c6e88c}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{04b37544-d763-45e6-9b01-d7f833a98514}</UniqueIdentifier>
+      <UniqueIdentifier>{4a483c22-5d29-4cc4-9ce7-e6f30ed727cc}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{4846a906-d269-4504-b5ce-ffe6751237e6}</UniqueIdentifier>
+      <UniqueIdentifier>{1fd9473b-e46e-4642-b0eb-dc8853cfcc91}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{25be8be6-c833-465d-a97f-f2ca5e361410}</UniqueIdentifier>
+      <UniqueIdentifier>{2efb7ecb-a666-4d12-b478-1625371c4d1b}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{4a3b344d-db0d-4279-b0a4-1f5133749cd9}</UniqueIdentifier>
+      <UniqueIdentifier>{8888da02-e9b0-40af-a0fb-e0847d7bb1e3}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{fc844caa-c672-449a-8cf3-fad58c0193b2}</UniqueIdentifier>
+      <UniqueIdentifier>{084ecadf-929e-4cbc-98b7-848b02fb312c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes">
-      <UniqueIdentifier>{f5ee004c-5814-4e28-889b-428232659882}</UniqueIdentifier>
+      <UniqueIdentifier>{af54d8d2-93f2-40f6-b54d-55f3fa3df053}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Header Files">
-      <UniqueIdentifier>{de5e9095-3d09-43ae-85e1-f10c7677dd6c}</UniqueIdentifier>
+      <UniqueIdentifier>{14b505c8-2f56-4cf2-bf37-3cb1c2ceb212}</UniqueIdentifier>
     </Filter>
     <Filter Include="Attributes\Source Files">
-      <UniqueIdentifier>{82eb6151-6da4-4a93-825d-ed6be5cc361b}</UniqueIdentifier>
+      <UniqueIdentifier>{544d4a19-85f6-4ac0-829c-280a5da78946}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

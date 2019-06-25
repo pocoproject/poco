@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">TestSuited</TargetName>
@@ -305,22 +305,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\CryptoTest.h"/>
+    <ClInclude Include="src\CryptoTestSuite.h"/>
     <ClInclude Include="src\DigestEngineTest.h"/>
     <ClInclude Include="src\ECTest.h"/>
     <ClInclude Include="src\EVPTest.h"/>
     <ClInclude Include="src\PKCS12ContainerTest.h"/>
     <ClInclude Include="src\RSATest.h"/>
-    <ClInclude Include="src\CryptoTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CryptoTest.cpp"/>
+    <ClCompile Include="src\CryptoTestSuite.cpp"/>
     <ClCompile Include="src\DigestEngineTest.cpp"/>
+    <ClCompile Include="src\Driver.cpp"/>
     <ClCompile Include="src\ECTest.cpp"/>
     <ClCompile Include="src\EVPTest.cpp"/>
     <ClCompile Include="src\PKCS12ContainerTest.cpp"/>
     <ClCompile Include="src\RSATest.cpp"/>
-    <ClCompile Include="src\CryptoTestSuite.cpp"/>
-    <ClCompile Include="src\Driver.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

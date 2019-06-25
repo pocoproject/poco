@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 14
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "download", "download\download_x64_vs140.vcxproj", "{D853F3D6-0D6F-3E8E-82C7-4216D7A21C4D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HTTPSTimeServer", "HTTPSTimeServer\HTTPSTimeServer_x64_vs140.vcxproj", "{F8DE5054-3EC1-3FB4-9FE6-38EE974745A9}"

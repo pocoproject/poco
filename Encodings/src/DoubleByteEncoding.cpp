@@ -12,6 +12,16 @@
 //
 
 
+// Workaround for an issue with the Visual C++ 2008 STL
+// implementation. If iterator debugging is enabled (default
+// if _DEBUG is #define'd), std::lower_bound() will fail
+// to compile.
+// See also: <https://github.com/pocoproject/poco/issues/2220>
+#if defined(_MSC_VER) && defined(_DEBUG) && _MSC_VER <= 1500
+#define _HAS_ITERATOR_DEBUGGING 0
+#endif
+
+
 #include "Poco/DoubleByteEncoding.h"
 #include "Poco/String.h"
 #include <algorithm>

@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Binding", "Binding\Binding_x64_vs150.vcxproj", "{0F0DF069-83D1-378D-A949-8DF9A883B627}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RecordSet", "RecordSet\RecordSet_x64_vs150.vcxproj", "{FEE20DCE-B9E3-30AB-A40C-B6A324997328}"

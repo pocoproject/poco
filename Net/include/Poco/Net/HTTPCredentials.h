@@ -37,13 +37,13 @@ class HTTPResponse;
 
 class Net_API HTTPCredentials
 	/// This is a utility class for working with HTTP
-	/// authentication (basic or digest) in HTTPRequest objects.
+	/// authentication (Basic or Digest) in HTTPRequest objects.
 	///
 	/// Usage is as follows:
 	/// First, create a HTTPCredentials object containing
 	/// the username and password.
 	///     Poco::Net::HTTPCredentials creds("user", "s3cr3t");
-	/// 
+	///
 	/// Second, send the HTTP request with Poco::Net::HTTPClientSession.
 	///     Poco::Net::HTTPClientSession session("pocoproject.org");
 	///     Poco::Net::HTTPRequest request(HTTPRequest::HTTP_GET, "/index.html", HTTPMessage::HTTP_1_1);
@@ -51,7 +51,7 @@ class Net_API HTTPCredentials
 	///     Poco::Net::HTTPResponse;
 	///     std::istream& istr = session.receiveResponse(response);
 	///
-	/// If the server responds with a 401 status, authenticate the 
+	/// If the server responds with a 401 status, authenticate the
 	/// request and resend it:
 	///     if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED)
 	///     {
@@ -61,7 +61,7 @@ class Net_API HTTPCredentials
 	///     }
 	///
 	/// To perform multiple authenticated requests, call updateAuthInfo()
-	/// instead of authenticate() on subsequent requests.	
+	/// instead of authenticate() on subsequent requests.
 	///     creds.updateAuthInfo(request);
 	///     session.sendRequest(request);
 	///     ...
@@ -90,6 +90,9 @@ public:
 		/// and password of the credentials object.
 		/// Does nothing if URI has no user info part.
 
+	void clear();
+		/// Clears username, password and host.
+
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
@@ -101,6 +104,9 @@ public:
 
 	const std::string& getPassword() const;
 		/// Returns the password.
+
+	bool empty() const;
+		/// Returns true if both username and password are empty, otherwise false.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
 		/// Inspects WWW-Authenticate header of the response, initializes
@@ -133,16 +139,19 @@ public:
 		/// Returns true if authentication header is for Digest authentication.
 
 	static bool hasBasicCredentials(const HTTPRequest& request);
-		/// Returns true if Authorization with Basic credentials header is present in the request.
+		/// Returns true if an Authorization header with Basic credentials is present in the request.
 
 	static bool hasDigestCredentials(const HTTPRequest& request);
-		/// Returns true if Authorization with Digest credentials header is present in the request.
+		/// Returns true if an Authorization header with Digest credentials is present in the request.
+
+	static bool hasNTLMCredentials(const HTTPRequest& request);
+		/// Returns true if an Authorization header with NTLM credentials is present in the request.
 
 	static bool hasProxyBasicCredentials(const HTTPRequest& request);
-		/// Returns true if Authorization with Basic credentials header is present in the request.
+		/// Returns true if a Proxy-Authorization header with Basic credentials is present in the request.
 
 	static bool hasProxyDigestCredentials(const HTTPRequest& request);
-		/// Returns true if Authorization with Digest credentials header is present in the request.
+		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
 
 	static void extractCredentials(const std::string& userInfo, std::string& username, std::string& password);
 		/// Extracts username and password from user:password information string.
@@ -172,7 +181,7 @@ inline const std::string& HTTPCredentials::getUsername() const
 	return _digest.getUsername();
 }
 
-	
+
 inline void HTTPCredentials::setPassword(const std::string& password)
 {
 	_digest.setPassword(password);
@@ -182,6 +191,12 @@ inline void HTTPCredentials::setPassword(const std::string& password)
 inline const std::string& HTTPCredentials::getPassword() const
 {
 	return _digest.getPassword();
+}
+
+
+inline bool HTTPCredentials::empty() const
+{
+	return _digest.empty();
 }
 
 

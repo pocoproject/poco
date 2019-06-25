@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{131bbff3-ce37-4e9a-bcb3-7e4a6b2fb9db}</UniqueIdentifier>
+      <UniqueIdentifier>{c1c73bfe-9077-4fe5-9f79-9bd2e86e74ee}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{976005e0-4028-4af1-b98a-d781aa38d826}</UniqueIdentifier>
+      <UniqueIdentifier>{26f2b8f3-4ccd-44b2-a821-8e515c4b0df2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -22,39 +22,39 @@ namespace Poco {
 namespace Redis {
 
 
-Client::Client(): 
-	_address(), 
-	_socket(), 
-	_input(0), 
+Client::Client():
+	_address(),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 }
 
 
 Client::Client(const std::string& hostAndPort):
-	_address(hostAndPort), 
-	_socket(), 
-	_input(0), 
+	_address(hostAndPort),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const std::string& host, int port): 
-	_address(host, port), 
-	_socket(), 
-	_input(0), 
+Client::Client(const std::string& host, int port):
+	_address(host, port),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 	connect();
 }
 
 
-Client::Client(const Net::SocketAddress& addrs): 
-	_address(addrs), 
-	_socket(), 
-	_input(0), 
+Client::Client(const Net::SocketAddress& addrs):
+	_address(addrs),
+	_socket(),
+	_input(0),
 	_output(0)
 {
 	connect();
@@ -73,7 +73,7 @@ void Client::connect()
 	poco_assert(! _input);
 	poco_assert(! _output);
 
-	_socket.connect(_address);
+	_socket = Net::StreamSocket(_address);
 	_input = new RedisInputStream(_socket);
 	_output = new RedisOutputStream(_socket);
 }
@@ -105,6 +105,7 @@ void Client::connect(const Timespan& timeout)
 	poco_assert(! _input);
 	poco_assert(! _output);
 
+	_socket = Net::StreamSocket();
 	_socket.connect(_address, timeout);
 	_input = new RedisInputStream(_socket);
 	_output = new RedisOutputStream(_socket);
@@ -144,6 +145,12 @@ void Client::disconnect()
 }
 
 
+bool Client::isConnected() const
+{
+	return _input != 0;
+}
+
+
 void Client::writeCommand(const Array& command, bool doFlush)
 {
 	poco_assert(_output);
@@ -160,6 +167,11 @@ RedisType::Ptr Client::readReply()
 	poco_assert(_input);
 
 	int c = _input->get();
+	if (c == -1)
+	{
+		disconnect();
+		throw RedisException("Lost connection to Redis server");
+	}
 	RedisType::Ptr result = RedisType::createRedisType(c);
 	if (result.isNull())
 	{

@@ -72,7 +72,8 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
-		poco_socket_t fd = socket.impl()->sockfd();
+		SocketImpl* sockImpl = socket.impl();
+		poco_socket_t fd = sockImpl->sockfd();
 		struct epoll_event ev;
 		ev.events = 0;
 		if (mode & PollSet::POLL_READ)
@@ -83,9 +84,15 @@ public:
 			ev.events |= EPOLLERR;
 		ev.data.ptr = socket.impl();
 		int err = epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
-		if (err) SocketImpl::error();
 
-		_socketMap[socket.impl()] = socket;
+		if (err)
+		{
+			if (errno == EEXIST) update(socket, mode);
+			else SocketImpl::error();
+		}
+
+		if (_socketMap.find(sockImpl) == _socketMap.end())
+			_socketMap[sockImpl] = socket;
 	}
 
 	void remove(const Socket& socket)
@@ -320,6 +327,10 @@ public:
 							result[its->second] |= PollSet::POLL_WRITE;
 						if (it->revents & POLLERR)
 							result[its->second] |= PollSet::POLL_ERROR;
+#ifdef _WIN32
+						if (it->revents & POLLHUP)
+							result[its->second] |= PollSet::POLL_READ;
+#endif
 					}
 					it->revents = 0;
 				}

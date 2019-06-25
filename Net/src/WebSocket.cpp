@@ -44,7 +44,7 @@ WebSocket::WebSocket(HTTPServerRequest& request, HTTPServerResponse& response):
 {
 }
 
-	
+
 WebSocket::WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response):
 	StreamSocket(connect(cs, request, response, _defaultCreds))
 {
@@ -57,7 +57,7 @@ WebSocket::WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& 
 }
 
 
-WebSocket::WebSocket(const Socket& socket): 
+WebSocket::WebSocket(const Socket& socket):
 	StreamSocket(socket)
 {
 	if (!dynamic_cast<WebSocketImpl*>(impl()))
@@ -111,7 +111,7 @@ int WebSocket::receiveFrame(void* buffer, int length, int& flags)
 	return n;
 }
 
-	
+
 int WebSocket::receiveFrame(Poco::Buffer<char>& buffer, int& flags)
 {
 	int n = static_cast<WebSocketImpl*>(impl())->receiveBytes(buffer, 0);
@@ -126,6 +126,18 @@ WebSocket::Mode WebSocket::mode() const
 }
 
 
+void WebSocket::setMaxPayloadSize(int maxPayloadSize)
+{
+	static_cast<WebSocketImpl*>(impl())->setMaxPayloadSize(maxPayloadSize);
+}
+
+
+int WebSocket::getMaxPayloadSize() const
+{
+	return static_cast<WebSocketImpl*>(impl())->getMaxPayloadSize();
+}
+
+
 WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse& response)
 {
 	if (request.hasToken("Connection", "upgrade") && icompare(request.get("Upgrade", ""), "websocket") == 0)
@@ -136,14 +148,14 @@ WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse&
 		std::string key = request.get("Sec-WebSocket-Key", "");
 		Poco::trimInPlace(key);
 		if (key.empty()) throw WebSocketException("Missing Sec-WebSocket-Key in handshake request", WS_ERR_HANDSHAKE_NO_KEY);
-		
+
 		response.setStatusAndReason(HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
 		response.set("Upgrade", "websocket");
 		response.set("Connection", "Upgrade");
 		response.set("Sec-WebSocket-Accept", computeAccept(key));
-		response.setContentLength(0);
+		response.setContentLength(HTTPResponse::UNKNOWN_CONTENT_LENGTH);
 		response.send().flush();
-		
+
 		HTTPServerRequestImpl& requestImpl = static_cast<HTTPServerRequestImpl&>(request);
 		return new WebSocketImpl(static_cast<StreamSocketImpl*>(requestImpl.detachSocket().impl()), requestImpl.session(), false);
 	}
@@ -172,24 +184,28 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 	}
 	else if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED)
 	{
-		Poco::NullOutputStream null;
-		Poco::StreamCopier::copyStream(istr, null);
-		credentials.authenticate(request, response);
-		if (!cs.getProxyHost().empty() && !cs.secure())
+		if (!credentials.empty())
 		{
-			cs.reset();
-			cs.proxyTunnel();
+			Poco::NullOutputStream null;
+			Poco::StreamCopier::copyStream(istr, null);
+			credentials.authenticate(request, response);
+			if (!cs.getProxyHost().empty() && !cs.secure())
+			{
+				cs.reset();
+				cs.proxyTunnel();
+			}
+			cs.sendRequest(request);
+			cs.receiveResponse(response);
+			if (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS)
+			{
+				return completeHandshake(cs, response, key);
+			}
+			else if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED)
+			{
+				throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
+			}
 		}
-		cs.sendRequest(request);
-		cs.receiveResponse(response);
-		if (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS)
-		{
-			return completeHandshake(cs, response, key);
-		}
-		else if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED)
-		{
-			throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
-		}
+		else throw WebSocketException("Not authorized", WS_ERR_UNAUTHORIZED);
 	}
 	if (response.getStatus() == HTTPResponse::HTTP_OK)
 	{
@@ -205,7 +221,7 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 WebSocketImpl* WebSocket::completeHandshake(HTTPClientSession& cs, HTTPResponse& response, const std::string& key)
 {
 	std::string connection = response.get("Connection", "");
-	if (Poco::icompare(connection, "Upgrade") != 0) 
+	if (Poco::icompare(connection, "Upgrade") != 0)
 		throw WebSocketException("No Connection: Upgrade header in handshake response", WS_ERR_NO_HANDSHAKE);
 	std::string upgrade = response.get("Upgrade", "");
 	if (Poco::icompare(upgrade, "websocket") != 0)

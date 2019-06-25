@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoRedis64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoRedismdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoRedismtd</TargetName>
@@ -284,7 +284,6 @@
     <ClCompile Include="src\RedisEventArgs.cpp"/>
     <ClCompile Include="src\RedisStream.cpp"/>
     <ClCompile Include="src\Type.cpp"/>
-    <ClCompile Include="include\Poco\Redis\RedisEventArgs.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Redis\Array.h"/>
@@ -295,8 +294,17 @@
     <ClInclude Include="include\Poco\Redis\Exception.h"/>
     <ClInclude Include="include\Poco\Redis\PoolableConnectionFactory.h"/>
     <ClInclude Include="include\Poco\Redis\Redis.h"/>
+    <ClInclude Include="include\Poco\Redis\RedisEventArgs.h"/>
     <ClInclude Include="include\Poco\Redis\RedisStream.h"/>
     <ClInclude Include="include\Poco\Redis\Type.h"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ExcludedFromBuild>
+    </ResourceCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>

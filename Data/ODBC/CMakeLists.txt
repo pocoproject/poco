@@ -9,6 +9,12 @@ POCO_SOURCES_AUTO( ODBC_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND ODBC_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${ODBC_SRCS} )

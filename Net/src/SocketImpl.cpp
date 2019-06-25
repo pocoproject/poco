@@ -18,10 +18,25 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
+
+
+#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
+#ifndef POCO_HAVE_FD_POLL
+#define POCO_HAVE_FD_POLL 1
+#endif
+#elif defined(POCO_OS_FAMILY_BSD)
+#ifndef POCO_HAVE_FD_POLL
+#define POCO_HAVE_FD_POLL 1
+#endif
+#endif
+
+
 #if defined(POCO_HAVE_FD_EPOLL)
 #include <sys/epoll.h>
 #elif defined(POCO_HAVE_FD_POLL)
+#ifndef _WIN32
 #include <poll.h>
+#endif
 #endif
 
 
@@ -89,8 +104,8 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
+	sockaddr_storage buffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	poco_socket_t sd;
 	do
@@ -189,7 +204,7 @@ void SocketImpl::connectNB(const SocketAddress& address)
 
 void SocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
-    bind(address, reuseAddress, true);
+	bind(address, reuseAddress, reuseAddress);
 }
 
 
@@ -375,8 +390,8 @@ int SocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, in
 		}
 	}
 	
-	char abuffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(abuffer);
+	sockaddr_storage abuffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&abuffer);
 	poco_socklen_t saLen = sizeof(abuffer);
 	int rc;
 	do
@@ -414,7 +429,7 @@ void SocketImpl::sendUrgent(unsigned char data)
 
 int SocketImpl::available()
 {
-	int result;
+	int result = 0;
 	ioctl(FIONREAD, result);
 	return result;
 }
@@ -494,8 +509,11 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	do
 	{
 		Poco::Timestamp start;
+#ifdef _WIN32
+		rc = WSAPoll(&pollBuf, 1, static_cast<INT>(remainingTime.totalMilliseconds()));
+#else
 		rc = ::poll(&pollBuf, 1, remainingTime.totalMilliseconds());
-
+#endif
 		if (rc < 0 && lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;
@@ -649,9 +667,9 @@ Poco::Timespan SocketImpl::getReceiveTimeout()
 SocketAddress SocketImpl::address()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
+
+	sockaddr_storage buffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	int rc = ::getsockname(_sockfd, pSA, &saLen);
 	if (rc == 0)
@@ -661,18 +679,18 @@ SocketAddress SocketImpl::address()
 	return SocketAddress();
 }
 
-	
+
 SocketAddress SocketImpl::peerAddress()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
-	char buffer[SocketAddress::MAX_ADDRESS_LENGTH];
-	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buffer);
+
+	sockaddr_storage buffer;
+	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	int rc = ::getpeername(_sockfd, pSA, &saLen);
 	if (rc == 0)
 		return SocketAddress(pSA, saLen);
-	else 
+	else
 		error();
 	return SocketAddress();
 }
@@ -707,18 +725,18 @@ void SocketImpl::setOption(int level, int option, const Poco::Timespan& value)
 	struct timeval tv;
 	tv.tv_sec  = (long) value.totalSeconds();
 	tv.tv_usec = (long) value.useconds();
-	
+
 	setRawOption(level, option, &tv, sizeof(tv));
 }
 
-	
+
 void SocketImpl::setRawOption(int level, int option, const void* value, poco_socklen_t length)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
 #if defined(POCO_VXWORKS)
 	int rc = ::setsockopt(_sockfd, level, option, (char*) value, length);
-#else	
+#else
 	int rc = ::setsockopt(_sockfd, level, option, reinterpret_cast<const char*>(value), length);
 #endif
 	if (rc == -1) error();
@@ -767,7 +785,7 @@ void SocketImpl::getOption(int level, int option, IPAddress& value)
 void SocketImpl::getRawOption(int level, int option, void* value, poco_socklen_t& length)
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
-	
+
 	int rc = ::getsockopt(_sockfd, level, option, reinterpret_cast<char*>(value), &length);
 	if (rc == -1) error();
 }
@@ -781,7 +799,7 @@ void SocketImpl::setLinger(bool on, int seconds)
 	setRawOption(SOL_SOCKET, SO_LINGER, &l, sizeof(l));
 }
 
-	
+
 void SocketImpl::getLinger(bool& on, int& seconds)
 {
 	struct linger l;
@@ -888,7 +906,7 @@ void SocketImpl::setBroadcast(bool flag)
 	setOption(SOL_SOCKET, SO_BROADCAST, value);
 }
 
-	
+
 bool SocketImpl::getBroadcast()
 {
 	int value(0);
@@ -939,7 +957,7 @@ void SocketImpl::initSocket(int af, int type, int proto)
 	// will crash the process. This only happens on UNIX, and not Linux.
 	//
 	// In order to have POCO sockets behave the same across platforms, it is
-	// best to just ignore SIGPIPE all together.
+	// best to just ignore SIGPIPE altogether.
 	setOption(SOL_SOCKET, SO_NOSIGPIPE, 1);
 #endif
 }
@@ -987,7 +1005,7 @@ int SocketImpl::fcntl(poco_fcntl_request_t request, long arg)
 	return rc;
 }
 #endif
- 
+
 
 void SocketImpl::reset(poco_socket_t aSocket)
 {

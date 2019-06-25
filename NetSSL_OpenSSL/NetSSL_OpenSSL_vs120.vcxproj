@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoNetSSLd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoNetSSLmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoNetSSLmtd</TargetName>
@@ -284,6 +284,9 @@
     <ClInclude Include="include\Poco\Net\CertificateHandlerFactoryMgr.h"/>
     <ClInclude Include="include\Poco\Net\ConsoleCertificateHandler.h"/>
     <ClInclude Include="include\Poco\Net\Context.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPSClientSession.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPSSessionInstantiator.h"/>
+    <ClInclude Include="include\Poco\Net\HTTPSStreamFactory.h"/>
     <ClInclude Include="include\Poco\Net\InvalidCertificateHandler.h"/>
     <ClInclude Include="include\Poco\Net\KeyConsoleHandler.h"/>
     <ClInclude Include="include\Poco\Net\KeyFileHandler.h"/>
@@ -292,21 +295,18 @@
     <ClInclude Include="include\Poco\Net\PrivateKeyFactoryMgr.h"/>
     <ClInclude Include="include\Poco\Net\PrivateKeyPassphraseHandler.h"/>
     <ClInclude Include="include\Poco\Net\RejectCertificateHandler.h"/>
+    <ClInclude Include="include\Poco\Net\SecureServerSocket.h"/>
+    <ClInclude Include="include\Poco\Net\SecureServerSocketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\SecureSMTPClientSession.h"/>
+    <ClInclude Include="include\Poco\Net\SecureSocketImpl.h"/>
+    <ClInclude Include="include\Poco\Net\SecureStreamSocket.h"/>
+    <ClInclude Include="include\Poco\Net\SecureStreamSocketImpl.h"/>
     <ClInclude Include="include\Poco\Net\Session.h"/>
     <ClInclude Include="include\Poco\Net\SSLException.h"/>
     <ClInclude Include="include\Poco\Net\SSLManager.h"/>
     <ClInclude Include="include\Poco\Net\Utility.h"/>
     <ClInclude Include="include\Poco\Net\VerificationErrorArgs.h"/>
     <ClInclude Include="include\Poco\Net\X509Certificate.h"/>
-    <ClInclude Include="include\Poco\Net\HTTPSClientSession.h"/>
-    <ClInclude Include="include\Poco\Net\HTTPSSessionInstantiator.h"/>
-    <ClInclude Include="include\Poco\Net\HTTPSStreamFactory.h"/>
-    <ClInclude Include="include\Poco\Net\SecureServerSocket.h"/>
-    <ClInclude Include="include\Poco\Net\SecureServerSocketImpl.h"/>
-    <ClInclude Include="include\Poco\Net\SecureSocketImpl.h"/>
-    <ClInclude Include="include\Poco\Net\SecureStreamSocket.h"/>
-    <ClInclude Include="include\Poco\Net\SecureStreamSocketImpl.h"/>
-    <ClInclude Include="include\Poco\Net\SecureSMTPClientSession.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AcceptCertificateHandler.cpp"/>
@@ -314,6 +314,9 @@
     <ClCompile Include="src\CertificateHandlerFactoryMgr.cpp"/>
     <ClCompile Include="src\ConsoleCertificateHandler.cpp"/>
     <ClCompile Include="src\Context.cpp"/>
+    <ClCompile Include="src\HTTPSClientSession.cpp"/>
+    <ClCompile Include="src\HTTPSSessionInstantiator.cpp"/>
+    <ClCompile Include="src\HTTPSStreamFactory.cpp"/>
     <ClCompile Include="src\InvalidCertificateHandler.cpp"/>
     <ClCompile Include="src\KeyConsoleHandler.cpp"/>
     <ClCompile Include="src\KeyFileHandler.cpp"/>
@@ -321,28 +324,23 @@
     <ClCompile Include="src\PrivateKeyFactoryMgr.cpp"/>
     <ClCompile Include="src\PrivateKeyPassphraseHandler.cpp"/>
     <ClCompile Include="src\RejectCertificateHandler.cpp"/>
+    <ClCompile Include="src\SecureServerSocket.cpp"/>
+    <ClCompile Include="src\SecureServerSocketImpl.cpp"/>
+    <ClCompile Include="src\SecureSMTPClientSession.cpp"/>
+    <ClCompile Include="src\SecureSocketImpl.cpp"/>
+    <ClCompile Include="src\SecureStreamSocket.cpp"/>
+    <ClCompile Include="src\SecureStreamSocketImpl.cpp"/>
     <ClCompile Include="src\Session.cpp"/>
     <ClCompile Include="src\SSLException.cpp"/>
     <ClCompile Include="src\SSLManager.cpp"/>
     <ClCompile Include="src\Utility.cpp"/>
     <ClCompile Include="src\VerificationErrorArgs.cpp"/>
     <ClCompile Include="src\X509Certificate.cpp"/>
-    <ClCompile Include="src\HTTPSClientSession.cpp"/>
-    <ClCompile Include="src\HTTPSSessionInstantiator.cpp"/>
-    <ClCompile Include="src\HTTPSStreamFactory.cpp"/>
-    <ClCompile Include="src\SecureServerSocket.cpp"/>
-    <ClCompile Include="src\SecureServerSocketImpl.cpp"/>
-    <ClCompile Include="src\SecureSocketImpl.cpp"/>
-    <ClCompile Include="src\SecureStreamSocket.cpp"/>
-    <ClCompile Include="src\SecureStreamSocketImpl.cpp"/>
-    <ClCompile Include="src\SecureSMTPClientSession.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\DLLVersion.rc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
     </ResourceCompile>

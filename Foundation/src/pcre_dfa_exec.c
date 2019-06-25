@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language (but see
 below for why this module is different).
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2014 University of Cambridge
+           Copyright (c) 1997-2017 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -2286,12 +2286,14 @@ for (;;)
       case OP_NOTI:
       if (clen > 0)
         {
-        unsigned int otherd;
+        pcre_uint32 otherd;
 #ifdef SUPPORT_UTF
         if (utf && d >= 128)
           {
 #ifdef SUPPORT_UCP
           otherd = UCD_OTHERCASE(d);
+#else
+          otherd = d;
 #endif  /* SUPPORT_UCP */
           }
         else

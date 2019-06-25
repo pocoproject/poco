@@ -11,6 +11,12 @@ POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h" )
 POCO_HEADERS_AUTO( WIN_SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 # TODO: Is this flag always required?
 add_definitions("-D_AFXDLL")
 #TODO: Use instead of the flag above: find_package(MFC)

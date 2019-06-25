@@ -583,6 +583,43 @@
 					RelativePath=".\src\SQLChannel.cpp"/>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath="..\DLLVersion.rc">
+			<FileConfiguration
+				Name="debug_shared|Win32">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_shared|Win32">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_mt|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_mt|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_md|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_md|Win32"
+				ExcludedFromBuild="true">
+				<Tool
+					Name="VCResourceCompilerTool"/>
+			</FileConfiguration>
+		</File>
 	</Files>
 	<Globals/>
 </VisualStudioProject>

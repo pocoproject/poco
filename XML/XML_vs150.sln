@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2017
+# Visual Studio 15
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XML", "XML_vs150.vcxproj", "{9E211743-85FE-4977-82F3-4F04B40C912D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSuite", "testsuite\TestSuite_vs150.vcxproj", "{C9ACF028-17A1-44C2-8C09-DFD3BD9E7D45}"

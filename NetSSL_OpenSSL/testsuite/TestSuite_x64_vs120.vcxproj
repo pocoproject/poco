@@ -85,7 +85,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
-    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">TestSuited</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">TestSuited</TargetName>
@@ -304,27 +304,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\HTTPSClientSessionTest.h"/>
+    <ClInclude Include="src\HTTPSClientTestSuite.h"/>
+    <ClInclude Include="src\HTTPSServerTest.h"/>
+    <ClInclude Include="src\HTTPSServerTestSuite.h"/>
+    <ClInclude Include="src\HTTPSStreamFactoryTest.h"/>
     <ClInclude Include="src\HTTPSTestServer.h"/>
     <ClInclude Include="src\NetSSLTestSuite.h"/>
     <ClInclude Include="src\TCPServerTest.h"/>
     <ClInclude Include="src\TCPServerTestSuite.h"/>
-    <ClInclude Include="src\HTTPSServerTest.h"/>
-    <ClInclude Include="src\HTTPSServerTestSuite.h"/>
-    <ClInclude Include="src\HTTPSClientSessionTest.h"/>
-    <ClInclude Include="src\HTTPSClientTestSuite.h"/>
-    <ClInclude Include="src\HTTPSStreamFactoryTest.h"/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\HTTPSTestServer.cpp"/>
-    <ClCompile Include="src\NetSSLTestSuite.cpp"/>
     <ClCompile Include="src\Driver.cpp"/>
-    <ClCompile Include="src\TCPServerTest.cpp"/>
-    <ClCompile Include="src\TCPServerTestSuite.cpp"/>
-    <ClCompile Include="src\HTTPSServerTest.cpp"/>
-    <ClCompile Include="src\HTTPSServerTestSuite.cpp"/>
     <ClCompile Include="src\HTTPSClientSessionTest.cpp"/>
     <ClCompile Include="src\HTTPSClientTestSuite.cpp"/>
+    <ClCompile Include="src\HTTPSServerTest.cpp"/>
+    <ClCompile Include="src\HTTPSServerTestSuite.cpp"/>
     <ClCompile Include="src\HTTPSStreamFactoryTest.cpp"/>
+    <ClCompile Include="src\HTTPSTestServer.cpp"/>
+    <ClCompile Include="src\NetSSLTestSuite.cpp"/>
+    <ClCompile Include="src\TCPServerTest.cpp"/>
+    <ClCompile Include="src\TCPServerTestSuite.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
   <ImportGroup Label="ExtensionTargets"/>
