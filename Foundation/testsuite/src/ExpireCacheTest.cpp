@@ -183,7 +183,7 @@ void ExpireCacheTest::testExpireWithHas()
 	aCache.add(1, 2); // 1
 	assertTrue (aCache.has(1));
 	Thread::sleep(DURWAIT);
-	assert (!aCache.has(1));
+	assertTrue (!aCache.has(1));
 }
 
 
