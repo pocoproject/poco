@@ -1,6 +1,13 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.9.2
+
+!!Summary of Changes
+
+  - fixed GH #2737: Bundles vulnerable copy of Expat — please upgrade to Expat 2.2.7
+
+
 !!!Release 1.9.1
 
 !!Summary of Changes
