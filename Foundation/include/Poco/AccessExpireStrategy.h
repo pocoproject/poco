@@ -31,7 +31,7 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue
 >
@@ -55,11 +55,14 @@ public:
 		typename ExpireStrategy<TKey, TValue>::Iterator it = this->_keys.find(key);
 		if (it != this->_keys.end())
 		{
-			this->_keyIndex.erase(it->second);
-			Timestamp now;
-			typename ExpireStrategy<TKey, TValue>::IndexIterator itIdx =
-				this->_keyIndex.insert(typename ExpireStrategy<TKey, TValue>::TimeIndex::value_type(now, key));
-			it->second = itIdx;
+			if (!it->second->first.isElapsed(this->_expireTime)) // don't extend if already expired
+			{
+				this->_keyIndex.erase(it->second);
+				Timestamp now;
+				typename ExpireStrategy<TKey, TValue>::IndexIterator itIdx =
+					this->_keyIndex.insert(typename ExpireStrategy<TKey, TValue>::TimeIndex::value_type(now, key));
+				it->second = itIdx;
+			}
 		}
 	}
 };
