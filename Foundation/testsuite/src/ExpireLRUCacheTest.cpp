@@ -303,6 +303,20 @@ void ExpireLRUCacheTest::testDuplicateAdd()
 }
 
 
+void ExpireLRUCacheTest::testAccessExpireGet()
+{
+	ExpireLRUCache<int, int> aCache(3, DURSLEEP);
+	aCache.add(1, 2); // 1
+	assertTrue (aCache.has(1));
+	SharedPtr<int> tmp = aCache.get(1);
+	assertTrue (!tmp.isNull());
+	assertTrue (*tmp == 2);
+	Thread::sleep(DURWAIT);
+	tmp = aCache.get(1);
+	assertTrue (tmp.isNull());
+}
+
+
 void ExpireLRUCacheTest::setUp()
 {
 }
@@ -326,6 +340,7 @@ CppUnit::Test* ExpireLRUCacheTest::suite()
 	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testCacheSize2);
 	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testCacheSizeN);
 	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testDuplicateAdd);
+	CppUnit_addTest(pSuite, ExpireLRUCacheTest, testAccessExpireGet);
 
 	return pSuite;
 }
