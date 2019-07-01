@@ -3,6 +3,7 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.9.2 (2019-07-02)
 ==========================
 
+- fixed GH #2736: Error using CMake gui - latest version
 - fixed GH #2737: Bundles vulnerable copy of Expat — please upgrade to Expat 2.2.7
 
 

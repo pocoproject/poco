@@ -5,6 +5,7 @@ AAAIntroduction
 
 !!Summary of Changes
 
+  - fixed GH #2736: Error using CMake gui - latest version
   - fixed GH #2737: Bundles vulnerable copy of Expat — please upgrade to Expat 2.2.7
 
 
