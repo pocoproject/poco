@@ -29,8 +29,8 @@ public:
 	void testExpireN();
 	void testAccessExpireN();
 	void testExpireWithHas();
+	void testAccessExpireGet();
 
-	
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();

@@ -183,7 +183,22 @@ void ExpireCacheTest::testExpireWithHas()
 	aCache.add(1, 2); // 1
 	assertTrue (aCache.has(1));
 	Thread::sleep(DURWAIT);
-	assertTrue (!aCache.has(1));
+	assert (!aCache.has(1));
+}
+
+
+void ExpireCacheTest::testAccessExpireGet()
+{
+	AccessExpireCache<int, int> aCache(DURSLEEP);
+	aCache.add(1, 2); // 1
+	assertTrue (aCache.has(1));
+	SharedPtr<int> tmp = aCache.get(1);
+	assertTrue (!tmp.isNull());
+	assertTrue (*tmp == 2);
+	assertTrue (aCache.size() == 1);
+	Thread::sleep(DURWAIT);
+	tmp = aCache.get(1);
+	assertTrue (tmp.isNull());
 }
 
 
@@ -207,6 +222,7 @@ CppUnit::Test* ExpireCacheTest::suite()
 	CppUnit_addTest(pSuite, ExpireCacheTest, testDuplicateAdd);
 	CppUnit_addTest(pSuite, ExpireCacheTest, testAccessExpireN);
 	CppUnit_addTest(pSuite, ExpireCacheTest, testExpireWithHas);
+	CppUnit_addTest(pSuite, ExpireCacheTest, testAccessExpireGet);
 
 	return pSuite;
 }
