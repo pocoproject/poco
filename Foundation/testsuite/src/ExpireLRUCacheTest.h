@@ -32,7 +32,8 @@ public:
 	void testCacheSize2();
 	void testCacheSizeN();
 	void testDuplicateAdd();
-	
+	void testAccessExpireGet();
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();
