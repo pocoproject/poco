@@ -23,8 +23,8 @@ namespace Poco {
 
 
 WindowsConsoleChannel::WindowsConsoleChannel():
-	_isFile(false),
-	_hConsole(INVALID_HANDLE_VALUE)
+	_hConsole(INVALID_HANDLE_VALUE),
+	_isFile(false)
 {
 	_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	// check whether the console has been redirected
@@ -60,8 +60,8 @@ void WindowsConsoleChannel::log(const Message& msg)
 
 WindowsColorConsoleChannel::WindowsColorConsoleChannel():
 	_enableColors(true),
-	_isFile(false),
-	_hConsole(INVALID_HANDLE_VALUE)
+	_hConsole(INVALID_HANDLE_VALUE),
+	_isFile(false)
 {
 	_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	// check whether the console has been redirected
