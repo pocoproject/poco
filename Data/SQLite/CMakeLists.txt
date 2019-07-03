@@ -7,6 +7,7 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SQLITE_SRCS ${HDRS_G})
 
 if (POCO_UNBUNDLED)
+    hunter_add_package(sqlite3)
 	find_package(SQLite3 REQUIRED)
 else()
     # sqlite3

@@ -35,7 +35,9 @@ POCO_MESSAGES( SRCS Logging src/pocomsg.mc)
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
 if (POCO_UNBUNDLED)
+    hunter_add_package(libpcre)
 	find_package(PCRE REQUIRED)
+	hunter_add_package(ZLIB)
 	find_package(ZLIB REQUIRED)
 
 	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
