@@ -16,7 +16,7 @@ rem
 rem Usage:
 rem ------
 rem buildwin VS_VERSION [ACTION] [LINKMODE] [CONFIGURATION] [PLATFORM] [SAMPLES] [TESTS] [TOOL] [ENV] [VERBOSITY [LOGGER] ]
-rem VS_VERSION:    90|100|110|120|140|150
+rem VS_VERSION:    90|100|110|120|140|150|160
 rem ACTION:        build|rebuild|clean
 rem LINKMODE:      static_mt|static_md|shared|all
 rem CONFIGURATION: release|debug|both
@@ -33,17 +33,24 @@ rem VS_VERSION is required argument. Default is build all.
 set POCO_BASE=%CD%
 set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 
-rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150}
+rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150 | 160}
 if "%1"=="" goto usage
+
 set vswhere='build\exe\vswhere.exe -property installationPath'
-for /f "delims=" %%a in (%vswhere%) do @set VS150COMNTOOLS=%%a
-set VS150COMNTOOLS=%VS150COMNTOOLS%\Common7\Tools\
+for /f "delims=" %%a in (%vswhere%) do @set "VSCOMNTOOLS=%%a"
 
 set VS_VERSION=vs%1
-if %VS_VERSION%==vs150 (
+
+if %VS_VERSION%==vs160 (
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
+  set "VS160COMNTOOLS=%VSCOMNTOOLS%\Common7\Tools\"
 ) else (
-  set VS_VARSALL=..\..\VC\vcvarsall.bat
+  if %VS_VERSION%==vs150 (
+    set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
+    set "VS150COMNTOOLS=%VSCOMNTOOLS%\Common7\Tools\"
+  ) else (
+    set VS_VARSALL=..\..\VC\vcvarsall.bat
+  )
 )
 
 shift /1
@@ -95,44 +102,52 @@ if "%TESTS%"=="" (set TESTS=notests)
 if not defined VCINSTALLDIR (
   if %VS_VERSION%==vs90 (
     if %PLATFORM%==x64 (
-      call "%VS90COMNTOOLS%%VS_VARSALL%" x86_amd64
+      call "%VS90COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
     ) else (
-      call "%VS90COMNTOOLS%%VS_VARSALL%" x86
+      call "%VS90COMNTOOLS%%VS_VARSALL%" x86 8.1
     )
   ) else (
     if %VS_VERSION%==vs100 (
       if %PLATFORM%==x64 (
-        call "%VS100COMNTOOLS%%VS_VARSALL%" x86_amd64
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
       ) else (
-        call "%VS100COMNTOOLS%%VS_VARSALL%" x86
+        call "%VS100COMNTOOLS%%VS_VARSALL%" x86 8.1
       )
     ) else (
       if %VS_VERSION%==vs110 (
         if %PLATFORM%==x64 (
-          call "%VS110COMNTOOLS%%VS_VARSALL%" x86_amd64
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
         ) else (
-          call "%VS110COMNTOOLS%%VS_VARSALL%" x86
+          call "%VS110COMNTOOLS%%VS_VARSALL%" x86 8.1
         )
       ) else (
         if %VS_VERSION%==vs120 (
           if %PLATFORM%==x64 (
-            call "%VS120COMNTOOLS%%VS_VARSALL%" x86_amd64
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
           ) else (
-            call "%VS120COMNTOOLS%%VS_VARSALL%" x86
+            call "%VS120COMNTOOLS%%VS_VARSALL%" x86 8.1
           )
         ) else (
           if %VS_VERSION%==vs140 (
             if %PLATFORM%==x64 (
-              call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
             ) else (
-              call "%VS140COMNTOOLS%%VS_VARSALL%" x86
+              call "%VS140COMNTOOLS%%VS_VARSALL%" x86 8.1
             )
           ) else (
             if %VS_VERSION%==vs150 (
               if %PLATFORM%==x64 (
-                call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
               ) else (
-                call "%VS150COMNTOOLS%%VS_VARSALL%" x86
+                call "%VS150COMNTOOLS%%VS_VARSALL%" x86 8.1
+              )
+            ) else (
+              if %VS_VERSION%==vs160 (
+                if %PLATFORM%==x64 (
+                  call "%VS160COMNTOOLS%%VS_VARSALL%" x86_amd64 8.1
+                ) else (
+                  call "%VS160COMNTOOLS%%VS_VARSALL%" x86 8.1
+                )
               )
             )
           )
@@ -155,6 +170,7 @@ if %VS_VERSION%==vs110 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs120 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs140 (set VCPROJ_EXT=vcxproj)
 if %VS_VERSION%==vs150 (set VCPROJ_EXT=vcxproj)
+if %VS_VERSION%==vs160 (set VCPROJ_EXT=vcxproj)
 
 
 rem ENV      	env|noenv
@@ -182,6 +198,7 @@ if "%VS_VERSION%"=="vs110" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs120" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs140" (set BUILD_TOOL=msbuild)
 if "%VS_VERSION%"=="vs150" (set BUILD_TOOL=msbuild)
+if "%VS_VERSION%"=="vs160" (set BUILD_TOOL=msbuild)
 :use_custom
 if "%BUILD_TOOL%"=="msbuild" (
   if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
@@ -217,6 +234,7 @@ if "%VS_VERSION%"=="vs110" (goto msbuildok)
 if "%VS_VERSION%"=="vs120" (goto msbuildok)
 if "%VS_VERSION%"=="vs140" (goto msbuildok)
 if "%VS_VERSION%"=="vs150" (goto msbuildok)
+if "%VS_VERSION%"=="vs160" (goto msbuildok)
 if "%BUILD_TOOL%"=="msbuild" (
   echo "Cannot use msbuild with Visual Studio 2008 or earlier."
   exit /b 2
@@ -235,6 +253,7 @@ if %VS_VERSION%==vs110 (set EXTRASW=/m /p:VisualStudioVersion=11.0)
 if %VS_VERSION%==vs120 (set EXTRASW=/m /p:VisualStudioVersion=12.0)
 if %VS_VERSION%==vs140 (set EXTRASW=/m /p:VisualStudioVersion=14.0)
 if %VS_VERSION%==vs150 (set EXTRASW=/m /p:VisualStudioVersion=15.0)
+if %VS_VERSION%==vs160 (set EXTRASW=/m /p:VisualStudioVersion=16.0)
 )
 
 set DEBUG_SHARED=0
