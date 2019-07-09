@@ -36,10 +36,16 @@ set PATH=%POCO_BASE%\bin64;%POCO_BASE%\bin;%PATH%
 rem VS_VERSION {90 | 100 | 110 | 120 | 140 | 150 | 160}
 if "%1"=="" goto usage
 
-set vswhere='build\exe\vswhere.exe -property installationPath'
-for /f "delims=" %%a in (%vswhere%) do @set "VSCOMNTOOLS=%%a"
-
+rem -version ^^[16.0^^,17.0^^)
 set VS_VERSION=vs%1
+if %VS_VERSION%==vs160 (
+  set "VSWHERE='build\exe\vswhere.exe  -property installationPath -version ^[16.0^,17.0^)'"
+) else (
+if %VS_VERSION%==vs150 (
+  set "VSWHERE='build\exe\vswhere.exe  -property installationPath -version ^[15.0^,16.0^)'"
+)
+)
+for /f " delims=" %%a in (%VSWHERE%) do @set "VSCOMNTOOLS=%%a"
 
 if %VS_VERSION%==vs160 (
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
