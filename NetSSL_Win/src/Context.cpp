@@ -335,18 +335,56 @@ DWORD Context::proto() const
 	switch (_usage)
 	{
 	case Context::CLIENT_USE:
-		return SP_PROT_SSL3_CLIENT | SP_PROT_TLS1_CLIENT;
+		return SP_PROT_SSL3_CLIENT 
+			| SP_PROT_TLS1_CLIENT
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_CLIENT
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_CLIENT
+#endif
+			;
 	case Context::SERVER_USE:
-		return SP_PROT_SSL3_SERVER | SP_PROT_TLS1_SERVER;
+		return SP_PROT_SSL3_SERVER 
+			| SP_PROT_TLS1_SERVER
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_SERVER
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_SERVER
+#endif
+			;
 	case Context::TLSV1_CLIENT_USE:
-		return SP_PROT_TLS1_CLIENT;
+		return SP_PROT_TLS1_CLIENT
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_CLIENT
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_CLIENT
+#endif
+			;
 	case Context::TLSV1_SERVER_USE:
-		return SP_PROT_TLS1_SERVER;
+		return SP_PROT_TLS1_SERVER
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_SERVER
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_SERVER
+#endif
+			;
 #if defined(SP_PROT_TLS1_1)
 	case Context::TLSV1_1_CLIENT_USE:
-		return SP_PROT_TLS1_1_CLIENT;
+		return SP_PROT_TLS1_1_CLIENT
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_CLIENT
+#endif
+			;
 	case Context::TLSV1_1_SERVER_USE:
-		return SP_PROT_TLS1_1_SERVER;
+		return SP_PROT_TLS1_1_SERVER
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_SERVER
+#endif
+			;
 #endif
 #if defined(SP_PROT_TLS1_2)
 	case Context::TLSV1_2_CLIENT_USE:
