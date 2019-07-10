@@ -165,16 +165,16 @@ matrix:
         # Using the ninja build command. Is much faster then make build command.
         - /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -H. -Bcmake-build -G'Android Gradle - Ninja' -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/usr/local/android-sdk/cmake/3.6.4111459/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DPOCO_ENABLE_APACHECONNECTOR=OFF -DPOCO_ENABLE_NETSSL=OFF -DPOCO_ENABLE_CRYPTO=OFF -DPOCO_ENABLE_SQL_MYSQL=OFF -DPOCO_ENABLE_SQL_POSTGRESQL=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_LONG_RUNNING_TESTS=OFF -DPOCO_OLD_REDIS_VERSION=ON && /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake --build cmake-build --target all && cd cmake-build && travis_wait 30 /usr/local/android-sdk/cmake/3.6.4111459/bin/ctest -E Foundation --output-on-failure
 
-    - env:    test="x86 (make) bundled"
-      os: osx
-      compiler: clang
-      script:
-        - export CC="clang"
-        - export CXX="clang++"
-        - $CXX --version
-        - $CXX -x c++ /dev/null -dM -E
-        - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && export OSARCH=i386 && sudo -s ./travis/OSX/runtests.sh
+#    - env:    test="x86 (make) bundled"
+#      os: osx
+#      compiler: clang
+#      script:
+#        - export CC="clang"
+#        - export CXX="clang++"
+#        - $CXX --version
+#        - $CXX -x c++ /dev/null -dM -E
+#        - ./configure --config=Darwin32-clang-libc++ --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
+#        - make all -s -j2 && sudo make install && export OSARCH=i386 && sudo -s ./travis/OSX/runtests.sh
 
     - env:    test="x64 (make) bundled"
       os: osx
@@ -187,15 +187,15 @@ matrix:
         - ./configure --config=Darwin64-clang-libc++ --everything --omit=PDF,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
         - make all -s -j2 && sudo make install && sudo -s ./travis/OSX/runtests.sh
 
-    - env:    test="5.4 x86 (make) bundled"
-      compiler: gcc
-      script:
-        - sudo apt-get install -qq -y g++-5-multilib
-        - export CC="gcc-5"
-        - export CXX="g++-5"
-        - $CXX --version
-        - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && export OSARCH=x86 && sudo -s ./travis/Linux/runtests.sh
+ #   - env:    test="5.4 x86 (make) bundled"
+ #     compiler: gcc
+ #     script:
+ #       - sudo apt-get install -qq -y g++-5-multilib
+ #       - export CC="gcc-5"
+ #       - export CXX="g++-5"
+ #       - $CXX --version
+ #       - ./configure --config=Linux32-gcc --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
+ #       - make all -s -j2 && sudo make install && export OSARCH=x86 && sudo -s ./travis/Linux/runtests.sh
 
     - env:    test="5.4 x64 (make) bundled"
       compiler: gcc
@@ -251,17 +251,17 @@ matrix:
         - cmake -H. -Bcmake-build -GNinja -DCMAKE_BUILD_TYPE=Debug -DPOCO_ENABLE_PDF=OFF -DPOCO_ENABLE_TESTS=ON -DPOCO_ENABLE_SAMPLES=ON && cmake --build cmake-build && cd cmake-build && sudo /usr/local/cmake-3.9.2/bin/ctest -VV && cd ..
 
 
-    - env:    test="4.0 x86 (make) bundled"
-      compiler: clang
-      script:
-        - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
-        - sudo apt-get install -qq -y g++-5-multilib
-        - export CLANG_VERSTION="-4.0"
-        - export CC="clang-4.0"
-        - export CXX="clang++-4.0"
-        - $CXX --version
-        - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
-        - make all -s -j2 && sudo make install && export OSARCH=x86 && sudo -s ./travis/Linux/runtests.sh
+#    - env:    test="4.0 x86 (make) bundled"
+#      compiler: clang
+#      script:
+#        - sudo apt-get install -qq -y clang-4.0 lldb-4.0 libc++-dev libc++abi-dev
+#        - sudo apt-get install -qq -y g++-5-multilib
+#        - export CLANG_VERSTION="-4.0"
+#        - export CC="clang-4.0"
+#        - export CXX="clang++-4.0"
+#        - $CXX --version
+#        - ./configure --config=Linux32-clang --everything --omit=PDF,Crypto,NetSSL_OpenSSL,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL
+#        - make all -s -j2 && sudo make install && export OSARCH=x86 && sudo -s ./travis/Linux/runtests.sh
 
     - env:    test="4.0 x64 (make) bundled"
       compiler: clang
