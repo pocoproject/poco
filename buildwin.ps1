@@ -4,8 +4,7 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs_version   150 | 140]
-#              [-vs_flavor    Community | Professional | Enterprise]
+#              [-vs           140 | 150 | 160]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -14,6 +13,8 @@
 #              [-tests]
 #              [-omit         "Lib1X;LibY;LibZ;..."]
 #              [-tool         msbuild | devenv]
+#              [-useenv       env | noenv]
+#              [-verbosity    m[inimal] | q[uiet] | n[ormal] | d[etailed] | diag[nostic]]
 #              [-openssl_base dir]
 #              [-mysql_base   dir]
 
@@ -24,12 +25,8 @@ Param
   [string] $poco_base,
 
   [Parameter()]
-  [ValidateSet(140, 150)]
-  [int] $vs_version,
-
-  [Parameter()]
-  [ValidateSet('Community' , 'Professional' , 'Enterprise')]
-  [string] $vs_flavor = 'Community',
+  [ValidateSet(140, 150, 160)]
+  [int] $vs = 140,
 
   [Parameter()]
   [ValidateSet('build', 'rebuild', 'clean')]
@@ -56,6 +53,14 @@ Param
   [string] $tool = 'msbuild',
 
   [Parameter()]
+  [ValidateSet('env', 'noenv')]
+  [string] $useenv = 'env',
+
+  [Parameter()]
+  [ValidateSet('quiet', 'm[inimal]', 'n[ormal]', 'd[etailed]', 'diag[nostic]')]
+  [string] $verbosity = 'minimal',
+
+  [Parameter()]
   [string] $openssl_base,
 
   [Parameter()]
@@ -64,6 +69,42 @@ Param
   [switch] $help
 )
 
+function Add-VSCOMNTOOLS([int] $vsver)
+{
+  if ($vsver -ge 150)
+	{
+		$vssetup= $([Environment]::GetFolderPath("MyDocuments"))
+		$vssetup= Join-Path $vssetup "WindowsPowerShell"
+		$vssetup= Join-Path $vssetup "Modules"
+		$vssetup= Join-Path $vssetup "VSSetup"
+		if (-not (Test-Path $vssetup))
+		{
+			Install-Module VSSetup -Scope CurrentUser -Force
+		}
+		if ($vsver -eq 150)
+		{
+			$range='[15.0,16.0)'
+		}
+		if ($vsver -eq 160)
+		{
+			$range='[16.0,17.0)'
+		}
+		
+		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
+		$vscomntools = $installationPath.psobject.properties.Value;
+		if ($vsver -eq 150)
+		{
+			set-item -force -path "ENV:VS150COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
+			Write-Host "`nVS150COMNTOOLS=$env:VS150COMNTOOLS" -ForegroundColor Yellow
+		}
+		if ($vsver -eq 160)
+		{
+			set-item -force -path "ENV:VS160COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
+			Write-Host "`nVS160COMNTOOLS=$env:VS160COMNTOOLS" -ForegroundColor Yellow
+		}
+		
+	}
+}
 
 function Add-Env-Var([string] $lib, [string] $var)
 {
@@ -81,15 +122,10 @@ function Set-Environment
 {
   if ($poco_base -eq '') { $script:poco_base = Get-Location }
 
-  if ($vs_version -eq 0)
+  switch ( $vs )
   {
-    if     ($Env:VS150COMNTOOLS -ne '') { $script:vs_version = 150 }
-    elseif ($Env:VS140COMNTOOLS -ne '') { $script:vs_version = 140 }
-    else
-    {
-      Write-Host 'Visual Studio not found, exiting.'
-      Exit 1
-    }
+    140 { }
+	default { Add-VSCOMNTOOLS $vs }
   }
 
   if (-Not $Env:PATH.Contains("$Env:POCO_BASE\bin64;$Env:POCO_BASE\bin;"))
@@ -115,27 +151,28 @@ function Set-Environment
     Add-Env-Var "MYSQL" "LIB"
   }
 
-  $vsct = "VS$($vs_version)COMNTOOLS"
+  $vsct = "VS$($vs)COMNTOOLS"
   $vsdir = ''
-  if ($vs_version -eq 150)
-  {
-    if (-not (Test-Path Env:$vsct)) { Set-Item -path Env:$vsct -value "C:\Program Files (x86)\Microsoft Visual Studio\2017\$($vs_flavor)\Common7\Tools" }
-  }
   $vsdir = (Get-Item Env:$vsct).Value
   $Command = ''
   $CommandArg = ''
   if ($platform -eq 'x64') { $CommandArg = "amd64" }
   else                     { $CommandArg = "x86" }
-  if ($vs_version -ge 150)
+  if ($vs -eq 150)
   {
     $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
     $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\15.0\Bin\MSBuild.exe"
+  } else {
+  if ($vs -eq 160)
+  {
+    $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
+    $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\Current\Bin\MSBuild.exe"
   }
   else
   {
     $Command = Resolve-Path "$($vsdir)\..\..\VC\vcvarsall.bat"
     $script:msbuild_exe = "MSBuild.exe"
-  }
+  }}
 
   $tempFile = [IO.Path]::GetTempFileName()
   cmd /c " `"$Command`" $CommandArg && set > `"$tempFile`" "
@@ -155,9 +192,8 @@ function Process-Input
   {
     Write-Host 'Usage:'
     Write-Host '------'
-    Write-Host 'buildwin.ps1 [-poco_base    dir]'
-    Write-Host '             [-vs_version   150 | 140]'
-    Write-Host '             [-vs_flavor    Community | Professional | Enterprise]'
+    Write-Host 'buildwin.ps1 [-poco_base    <dir>]'
+    Write-Host '             [-vs           140 | 150 | 160]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
@@ -166,8 +202,10 @@ function Process-Input
     Write-Host '             [-tests]'
     Write-Host '             [-omit         "Lib1X;LibY;LibZ;..."]'
     Write-Host '             [-tool         msbuild | devenv]'
-    Write-Host '             [-openssl_base dir]'
-    Write-Host '             [-mysql_base   dir]'
+    Write-Host '             [-useenv       env | noenv]'
+    Write-Host '             [-verbosity    minimal | quiet | normal | detailed | diagnostic'
+    Write-Host '             [-openssl_base <dir>]'
+    Write-Host '             [-mysql_base   <dir>]'
 
     Exit
   }
@@ -178,7 +216,7 @@ function Process-Input
     Write-Host "Build configuration:"
     Write-Host "--------------------"
     Write-Host "Poco Base:     $poco_base"
-    Write-Host "Version:       $vs_version"
+    Write-Host "Version:       $vs"
     Write-Host "Action:        $action"
     Write-Host "Link Mode:     $linkmode"
     Write-Host "Configuration: $config"
@@ -186,11 +224,6 @@ function Process-Input
     Write-Host "Tests:         $tests"
     Write-Host "Samples:       $samples"
     Write-Host "Build Tool:    $tool"
-
-    if ($vs_version -eq 150)
-    {
-      Write-Host "VS flavor:     $vs_flavor"
-    }
 
     if ($omit -ne '')
     {
@@ -221,7 +254,7 @@ function Exec-MSBuild([string] $vsProject, [string] $projectConfig)
     return
   }
 
-  $cmd = "&`"$script:msbuild_exe`" $vsProject /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=true"
+  $cmd = "&`"$script:msbuild_exe`" $vsProject /nologo /m /t:$action /p:Configuration=$projectConfig /p:BuildProjectReferences=false /p:Platform=$platform /p:useenv=$useenv /v:$verbosity"
   Write-Host $cmd
   Invoke-Expression $cmd
   if ($LastExitCode -ne 0) { Exit $LastExitCode }
@@ -368,7 +401,7 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
     $componentDir = $_.Replace("/", "\")
     $componentArr = $_.split('/')
     $componentName = $componentArr[$componentArr.Length - 1]
-    $suffix = "_vs$vs_version"
+    $suffix = "_vs$vs"
 
     $omitArray = @()
     $omit.Split(',;') | ForEach {
@@ -452,7 +485,7 @@ function Build
 {
   Process-Input
 
-  if ($vs_version -lt 100) { $extension = 'vcproj'  }
+  if ($vs -lt 100) { $extension = 'vcproj'  }
   else                     { $extension = 'vcxproj' }
 
   $platformName = ''
