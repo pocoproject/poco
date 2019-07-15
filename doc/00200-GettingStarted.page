@@ -285,9 +285,113 @@ Assuming the POCO C++ Libraries source is located in /path/to/poco directory and
 following commands (Command parameters are all the same on any platform).
 
     $ cmake -H/path/to/poco -B/path/to/poco-build
-    $ cmake --build /path/to/poco-build --target all
+    $ cmake --build /path/to/poco-build
 
 This will build POCO C++ Libraries in a subdirectory <*poco-build*>. All files produced during build are located in this directory.
+
+
+!!!Some cmake basic parameters:
+
+For Makefile (default on Unix systems) and Ninja based build system (and all other single-configuration generators), there exists following build types:
+ * Debug
+ * Release
+ * RelWithDebInfo        (Release build with Debug infos)
+ * MinSizeRel            (Release build with size optimisation)
+
+As default, POCO is build RelWithDebInfo. See cmake output like:
+   
+   ...
+   -- [cmake] Build type:             RelWithDebInfo
+   ...
+   
+You can change this with following parameter: <*CMAKE_BUILD_TYPE=....*>
+
+For example to build with debug symbols:
+
+   $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_BUILD_TYPE=Debug
+   $ cmake --build /path/to/poco-build
+
+For more infos see https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+
+For multi-configuration generators, (like Visual Studio and Xcode), CMAKE_BUILD_TYPE is ignored!
+
+For these you should set build type at build time:
+
+For example to build with debug symbols:
+
+   $ cmake -H/path/to/poco -B/path/to/poco-build
+   $ cmake --build /path/to/poco-build --config Debug
+   
+
+Installation path of Poco is as defaults to /usr/local on UNIX and c:/Program Files/Poco on Windows.
+
+You can change the path with following parameter: <*CMAKE_INSTALL_PREFIX=....*>
+
+For example to install in /usr:
+
+   $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_INSTALL_PREFIX=/usr
+   $ cmake --build /path/to/poco-build --install
+
+This will install the poco libs in /usr/lib and the binaries in /usr/bin etc.
+
+See also cmake output like:
+
+   ....
+   -- [cmake] Installation target path: /usr/local
+   ....
+
+For more infos see https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html?highlight=cmake_install_prefix
+
+
+To set libraries type, you can use following parameter: <*BUILD_SHARED_LIBS=[ON/OFF]*>
+
+   $ cmake -H/path/to/poco -B/path/to/poco-build -DBUILD_SHARED_LIBS=OFF
+   $ cmake --build /path/to/poco-build
+
+As default, Poco build dynamic libraries, see cmake output like:
+   ...
+   -- Building dynamic libraries
+   ...
+
+
+To set some additional compiler flags, you can use following parameters:
+
+ * CMAKE_C_FLAGS         For C compiler
+ * CMAKE_CXX_FLAGS       For C++ compiler
+ 
+For example:
+
+   $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_CXX_FLAGS=-fstack-protector
+   $ cmake --build /path/to/poco-build
+    
+For default compile flags, see cmake output like:
+   ...
+   -- [cmake] Build with cxx flags:   -O2 -g -DNDEBUG
+   -- [cmake] Build with c flags:     -O2 -g -DNDEBUG
+   ...
+
+For more infos see https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_FLAGS.html#variable:CMAKE_%3CLANG%3E_FLAGS
+
+
+To use the compiler of your choice, you can use following paramters:
+
+  * CMAKE_C_COMPILER           C compiler
+  * CMAKE_CXX_COMPILER         C++ compiler
+  
+For example to use the clang compiler, execute following cmake command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_C_COMPILER=/path/to/clang -DCMAKE_CXX_COMPILER=/path/to/clang++
+    $ cmake --build /path/to/poco-build
+    
+To cross compile POCO C++ Libraries for another architecture/device you should have a <*cmake toolchain file*> and execute following command:
+
+    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchainfile
+    $ cmake --build /path/to/poco-build   
+
+See https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html for more information.
+
+
+!!!Poco special build parameters:
 
 POCO C++ Libraries allows you to set some build time options. As an example: to disable the SevenZip support
 type the following command:
@@ -317,18 +421,6 @@ If you get an error like 'By not providing "FindPoco.cmake"', then you should se
     
 Some other Hints:
 
-To use the compiler of your choice for example clang compiler, execute following cmake command:
-
-    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_C_COMPILER=/path/to/clang -DCMAKE_CXX_COMPILER=/path/to/clang++
-    $ cmake --build /path/to/poco-build --target all
-    
-To cross compile POCO C++ Libraries for another architecture/device you should have a <*cmake toolchain file*> and execute following command:
-
-    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchainfile
-    $ cmake --build /path/to/poco-build --target all    
-
-See https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html for more information.
-
 For a faster build, use ninja as build system. See https://ninja-build.org/
 For example on Ubuntu execute following commands:
 
@@ -337,14 +429,14 @@ For example on Ubuntu execute following commands:
 This install <*ninja*> command. To use ninja-build execute following cmake commands:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -GNinja
-    $ cmake --build /path/to/poco-build --target all
+    $ cmake --build /path/to/poco-build
 
 See https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html for other generators.
 
 To enable verbose output from Makefile builds, execute following cmake commands:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_VERBOSE_MAKEFILE=ON
-    $ cmake --build /path/to/poco-build --target all
+    $ cmake --build /path/to/poco-build
 
 
 Some more infos about cmake see:
