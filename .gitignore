@@ -132,3 +132,4 @@ cmake-build/
 *.bak
 stage/
 releases/
+/.metadata/

@@ -1,10 +1,16 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.9.3 (2019-07-16)
+==========================
+
+- fixed GH #2742: Support of vs150 & vs160 with the official Microsoft localization executable, vswhere.exe, installed by MSVC starting from VS2017
+
+
 Release 1.9.2 (2019-07-02)
 ==========================
 
 - fixed GH #2736: Error using CMake gui - latest version
-- fixed GH #2737: Bundles vulnerable copy of Expat — please upgrade to Expat 2.2.7
+- fixed GH #2737: Bundles vulnerable copy of Expat â€” please upgrade to Expat 2.2.7
 - fixed GH #2738: Poco::AccessExpireStrategy::onGet() must not extend expiration time after expiration
 
 
@@ -43,7 +49,7 @@ Release 1.9.1 (2019-06-24)
 - fixed GH #2655: MongoDB Binary element to string - bug
 - fixed GH #2661: Poco::Zip::ZipArchive cannot load new tomcat.zip file
 - fixed GH #2700: Invalid read of memory in Poco::Environment::set which may cause crashes.
-- fixed GH #2712: File_WIN32.cpp(168): error C2065: “_upath”:Undeclared identifier
+- fixed GH #2712: File_WIN32.cpp(168): error C2065: â€œ_upathâ€�:Undeclared identifier
 - fixed GH #2723: Access violation when trying to decompress .zip file with unsupported compression method.
 
 
