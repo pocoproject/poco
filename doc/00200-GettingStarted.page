@@ -273,6 +273,15 @@ For example to build with debug symbols:
 
 For more infos see https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
 
+For multi-configuration generators, (like Visual Studio and Xcode), CMAKE_BUILD_TYPE is ignored!
+
+For these you should set build type at build time:
+
+For example to build with debug symbols:
+
+   $ cmake -H/path/to/poco -B/path/to/poco-build
+   $ cmake --build /path/to/poco-build --config Debug
+   
 
 Installation path of Poco is as defaults to /usr/local on UNIX and c:/Program Files/Poco on Windows.
 
