@@ -39,13 +39,16 @@ if "%1"=="" goto usage
 rem -version ^^[16.0^^,17.0^^)
 set VS_VERSION=vs%1
 if %VS_VERSION%==vs160 (
-  set "VSWHERE='build\exe\vswhere.exe  -property installationPath -version ^[16.0^,17.0^)'"
+rem  should be set "VSWHERE='%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe  -property installationPath -version ^[16.0^,17.0^)'"
+  set "VSWHERE='C:\PROGRA~2\MICROS~1\Installer\vswhere.exe  -latest -property installationPath -version ^[16.0^,17.0^)'"
 ) else (
 if %VS_VERSION%==vs150 (
-  set "VSWHERE='build\exe\vswhere.exe  -property installationPath -version ^[15.0^,16.0^)'"
-))
-
+  set "VSWHERE='C:\PROGRA~2\MICROS~1\Installer\vswhere.exe  -latest -property installationPath -version ^[15.0^,16.0^)'"
+)
+)
 for /f " delims=" %%a in (%VSWHERE%) do @set "VSCOMNTOOLS=%%a"
+
+echo ============= %VSCOMNTOOLS% =============
 
 if %VS_VERSION%==vs160 (
   set VS_VARSALL=..\..\VC\Auxiliary\Build\vcvarsall.bat
@@ -209,7 +212,7 @@ if "%VS_VERSION%"=="vs160" (set BUILD_TOOL=msbuild)
 if "%BUILD_TOOL%"=="msbuild" (
   if "%PLATFORM%"=="Win32" (set PLATFORMSW=/p:Platform=Win32) else (
   if "%PLATFORM%"=="x86"   (set PLATFORMSW=/p:Platform=Win32) else (
-  if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64))
+  if "%PLATFORM%"=="x64"   (set PLATFORMSW=/p:Platform=x64)))
 
   set ACTIONSW=/t:
   set CONFIGSW=/p:Configuration=
@@ -417,8 +420,8 @@ echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 echo.
 
 if %DEBUG_SHARED%==1 (
-  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared !PLATFORMSW! !PROJECT_FILE!
-  !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared !PLATFORMSW! !PROJECT_FILE!
+  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE!
+  !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
   echo. && echo.
   if %TESTS%==tests (
@@ -437,7 +440,7 @@ if %DEBUG_SHARED%==1 (
   )
 )
 if %RELEASE_SHARED%==1 (
-  echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE!
+  echo   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE!
 
   !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !PROJECT_FILE!
   if ERRORLEVEL 1 exit /b 1
@@ -563,37 +566,31 @@ for /f %%G in ('findstr /R "." components') do (
     set SOLUTION_FILE=samples%PLATFORM_SUFFIX%_%VS_VERSION%.sln
 
     if %DEBUG_SHARED%==1 (
-      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_shared %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %RELEASE_SHARED%==1 (
-      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_shared %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %DEBUG_STATIC_MT%==1 (
-      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_mt %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %RELEASE_STATIC_MT%==1 (
-      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_mt %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %DEBUG_STATIC_MD%==1 (
-     echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !SOLUTION_FILE!
-     !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !SOLUTION_FILE!
+      !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%debug_static_md %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
     )
     if %RELEASE_STATIC_MD%==1 (
-      echo !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !SOLUTION_FILE!
       !BUILD_TOOL! !BUILD_TOOL_FLAGS! !USEENVP! %EXTRASW% %ACTIONSW%%ACTION% %CONFIGSW%release_static_md %PLATFORMSW% !SOLUTION_FILE!
       if ERRORLEVEL 1 goto buildfailed
       echo. && echo.
