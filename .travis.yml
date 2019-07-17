@@ -277,10 +277,10 @@ matrix:
     - env:    test="5.0 x64 (make) bundled"
       compiler: clang
       script:
-        - sudo apt-get install -qq -y clang-5.0 lldb-5.0 libc++-dev libc++abi-dev
-        - export CLANG_VERSTION="-5.0"
-        - export CC="clang-5.0"
-        - export CXX="clang++-5.0"
+        - sudo apt-get install -qq -y clang-6.0 lldb-6.0 libc++-dev libc++abi-dev
+        - export CLANG_VERSTION="-6.0"
+        - export CC="clang-6.0"
+        - export CXX="clang++-6.0"
         - $CXX --version
         - ./configure --config=Linux64-clang --everything --omit=PDF
         - make all -s -j2 && sudo make install && sudo -s ./travis/Linux/runtests.sh
