@@ -32,7 +32,7 @@ services:
   - postgresql
   - mysql
 
-dist: trusty
+dist: xenai
 sudo: enabled
 
 addons:
