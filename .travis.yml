@@ -274,7 +274,7 @@ matrix:
         - ./configure --config=Linux64-clang --everything --omit=PDF
         - make all -s -j2 && sudo make install && sudo -s ./travis/Linux/runtests.sh
 
-    - env:    test="5.0 x64 (make) bundled"
+    - env:    test="6.0 x64 (make) bundled"
       compiler: clang
       script:
         - sudo apt-get install -qq -y clang-6.0 lldb-6.0 libc++-dev libc++abi-dev
