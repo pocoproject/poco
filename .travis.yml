@@ -285,13 +285,13 @@ matrix:
         - ./configure --config=Linux64-clang --everything --omit=PDF
         - make all -s -j2 && sudo make install && sudo -s ./travis/Linux/runtests.sh
 
-    #- env:    test="arm-linux-gnueabi-g++ (make)"
-    #  compiler: gcc
-    #  script:
-    #    - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf
-    #    - arm-linux-gnueabi-g++ --version
-    #    - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
-    #    - ./configure --omit=PDF,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+    - env:    test="arm-linux-gnueabi-g++ (make)"
+      compiler: gcc
+      script:
+        - sudo apt-get install -qq -y g++-arm-linux-gnueabi g++-arm-linux-gnueabihf
+        - arm-linux-gnueabi-g++ --version
+        - arm-linux-gnueabi-g++ -x c++ /dev/null -dM -E
+        - ./configure --omit=PDF,SQL/ODBC,SQL/MySQL,SQL/PostgreSQL,Crypto,NetSSL,PageCompiler && make -s -j2  CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
     #- env:    test="(CMake)"
     #  compiler: clang
