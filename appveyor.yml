@@ -419,7 +419,7 @@ build_script:
         $defs+=" -DPOCO_ENABLE_PDF=OFF";
         $defs+=" -DPOCO_ENABLE_NETSSL=ON";
         $defs+=" -DPOCO_ENABLE_NETSSL_WIN=ON";
-        $defs+=" -DPOCO_ENABLE_SQL_MYSQL=ON";
+        $defs+=" -DPOCO_ENABLE_SQL_MYSQL=OFF";
         $defs+=" -DPOCO_ENABLE_REDIS=OFF";
         $defs+=" -DPOCO_ENABLE_SAMPLES=ON";
         $defs+=" -DPOCO_ENABLE_TESTS=ON";
