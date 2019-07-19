@@ -104,8 +104,7 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	{
 		std::memcpy(frame.begin() + ostr.charsWritten(), buffer, length);
 	}
-	_pStreamSocketImpl->sendBytes(frame.begin(), length + static_cast<int>(ostr.charsWritten()));
-	return length;
+	return _pStreamSocketImpl->sendBytes(frame.begin(), length + static_cast<int>(ostr.charsWritten()));
 }
 
 
