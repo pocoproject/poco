@@ -1,6 +1,14 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.9.3
+
+!!Summary of Changes
+
+  - fixed GH #2742: Support of vs150 & vs160 with the official Microsoft localization executable, vswhere.exe, installed by MSVC starting from VS2017
+  - fixed GH #2661: Poco::Zip::ZipArchive cannot load new tomcat.zip file (additional fix)
+
+
 !!!Release 1.9.2
 
 !!Summary of Changes
