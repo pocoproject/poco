@@ -126,7 +126,7 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
         std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
     }
 
-        // read the rest of the header
+    // read the rest of the header
     inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
     poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
     poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
@@ -139,7 +139,7 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     	inp.read(buf.begin(), len);
     	_fileName = std::string(buf.begin(), len);
 	}
-	
+
     if (!searchCRCAndSizesAfterData())
     {
         _crc32 = getCRCFromHeader();
@@ -165,8 +165,7 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 				if (id == ZipCommon::ZIP64_EXTRA_ID)
 				{
 					_forceZip64 = true;
-					poco_assert(size >= 8);
-					if (getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					if (size >= 8 && getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
 						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
 						size -= 8;
