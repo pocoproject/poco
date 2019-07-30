@@ -119,7 +119,7 @@ if(ENABLE_DATA_POSTGRESQL)
 else()
     find_package(PostgreSQL)
 endif()
- 
+
 if(PostgreSQL_FOUND)
     option(ENABLE_DATA "Enable SQL" ON)
     option(ENABLE_DATA_POSTGRESQL "Enable SQL PosgreSQL" ON)
@@ -154,6 +154,7 @@ option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+option(ENABLE_JWT "Enable JWT" OFF)
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
@@ -227,7 +228,7 @@ endif()
 
 if(ENABLE_PAGECOMPILER)
     set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
-    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)    
+    set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
 if(ENABLE_MONGODB OR ENABLE_REDIS)
@@ -269,6 +270,11 @@ if(ENABLE_NET AND ENABLE_TESTS)
     set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
+if(ENABLE_JWT)
+	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
+    set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+endif()
+
 if(ENABLE_PDF)
     set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
     set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
@@ -282,7 +288,7 @@ endif()
 
 if(ENABLE_SEVENZIP OR ENABLE_ZIP)
     set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-    set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)    
+    set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 if(ENABLE_UTIL AND ENABLE_TESTS)
@@ -314,6 +320,11 @@ endif()
 if(ENABLE_NET)
     add_subdirectory(Net)
     list(APPEND Poco_COMPONENTS "Net")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/JWT AND ENABLE_JWT)
+    add_subdirectory(JWT)
+    list(APPEND Poco_COMPONENTS "JWT")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/MongoDB AND ENABLE_MONGODB)
@@ -366,7 +377,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP)
     list(APPEND Poco_COMPONENTS "Zip")
 endif()
 
-if(APRUTIL_FOUND AND APACHE_FOUND AND 
+if(APRUTIL_FOUND AND APACHE_FOUND AND
     EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
     add_subdirectory(ApacheConnector)
     list(APPEND Poco_COMPONENTS "ApacheConnector")
@@ -447,7 +458,7 @@ if(POCO_UNBUNDLED)
             DESTINATION "${PocoConfigPackageLocation}")
     install(FILES cmake/V39/FindEXPAT.cmake
             DESTINATION "${PocoConfigPackageLocation}/V39")
-    install(FILES cmake/V313/FindSQLite3.cmake 
+    install(FILES cmake/V313/FindSQLite3.cmake
             DESTINATION "${PocoConfigPackageLocation}/V313")
 endif()
 

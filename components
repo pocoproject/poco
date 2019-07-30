@@ -16,6 +16,7 @@ Data/PostgreSQL
 Zip
 PageCompiler
 PageCompiler/File2Page
+JWT
 PDF
 CppParser
 MongoDB
