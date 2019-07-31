@@ -55,7 +55,7 @@ matrix:
 
     - env:    TEST_NAME="android API level 19"
       language: android
-      jdk: openjdk8
+      jdk: openjdk9
       android:
         components:
           - tools
@@ -104,7 +104,7 @@ matrix:
 
     - env:    TEST_NAME="android API level 24"
       language: android
-      jdk: openjdk8
+      jdk: openjdk9
       android:
         components:
           - tools
