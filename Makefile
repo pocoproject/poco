@@ -78,7 +78,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page CppParser PDF MongoDB Redis
+COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit
@@ -315,6 +315,16 @@ PageCompiler/File2Page-libexec:  Net-libexec Util-libexec XML-libexec Foundation
 
 PageCompiler/File2Page-clean:
 	$(MAKE) -C $(POCO_BASE)/PageCompiler/File2Page clean
+
+JWT-libexec:  Foundation-libexec JSON-libexec Crypto-libexec
+	$(MAKE) -C $(POCO_BASE)/JWT
+
+JWT-tests: JWT-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/JWT/testsuite
+
+JWT-clean:
+	$(MAKE) -C $(POCO_BASE)/JWT clean
+	$(MAKE) -C $(POCO_BASE)/JWT/testsuite clean
 
 CppParser-libexec:  Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/CppParser
