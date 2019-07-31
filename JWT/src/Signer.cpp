@@ -132,6 +132,8 @@ class HMACAlgorithm: public Algorithm
 public:
 	Poco::DigestEngine::Digest sign(const Signer& signer, const std::string& header, const std::string& payload)
 	{
+		if (signer.getHMACKey().empty()) throw SignatureGenerationException("No HMAC key available");
+
 		Poco::HMACEngine<Engine> hmac(signer.getHMACKey());
 		hmac.update(header);
 		hmac.update('.');
