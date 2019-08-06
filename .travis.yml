@@ -75,8 +75,8 @@ matrix:
       script:
         # Using the ninja build command. Is much faster then make build command.
         - /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake -H. -Bcmake-build -GNinja -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/opt/android-sdk/cmake/3.10.2.4988404/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_APACHECONNECTOR=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON &&
-          /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all &&
-          cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure
+          /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
+          #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
 
     - env:    TEST_NAME="android API level 24 arm64-v8a"
       addons:
@@ -100,8 +100,8 @@ matrix:
       script:
         # Using the ninja build command. Is much faster then make build command.
         - /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake -H. -Bcmake-build -GNinja -DANDROID_ABI=arm64-v8a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-24 -DCMAKE_MAKE_PROGRAM=/opt/android-sdk/cmake/3.10.2.4988404/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_APACHECONNECTOR=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON &&
-          /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all &&
-          cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure
+          /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
+          #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
 
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
