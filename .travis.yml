@@ -68,7 +68,7 @@ matrix:
   fast_finish: true
 
   include:
-    - env:    TEST_NAME="android API level 19"
+    - env:    test="android API level 19 armeabi-v7a"
       addons:
         apt:
           packages:
@@ -112,7 +112,7 @@ matrix:
           /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
           #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
 
-    - env:    TEST_NAME="android API level 24 arm64-v8a"
+    - env:    test="android API level 24 arm64-v8a"
       addons:
         apt:
           packages:
