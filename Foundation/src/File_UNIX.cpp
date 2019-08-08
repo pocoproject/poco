@@ -23,7 +23,7 @@
 #if defined(POCO_OS_FAMILY_BSD)
 #include <sys/param.h>
 #include <sys/mount.h>
-#elif (POCO_OS == POCO_OS_SOLARIS)
+#elif ((POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX))
 #include <sys/statvfs.h>
 #else
 #include <sys/statfs.h>
@@ -35,7 +35,7 @@
 #include <utime.h>
 #include <cstring>
 
-#if (POCO_OS == POCO_OS_SOLARIS)
+#if ((POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX))
 #define STATFSFN statvfs
 #define STATFSSTRUCT statvfs
 #else
