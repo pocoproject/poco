@@ -35,17 +35,25 @@
 
 namespace Poco {
 
+void PathImpl::extendPath(std::string &path, const std::string &extensionPath)
+{
+	if (path.size() > 0 && path.back() != '/')
+	{
+		path += extensionPath;
+	}
+}
 
 std::string PathImpl::currentImpl()
 {
-	std::string path;
+	std::string path; 
 	char cwd[PATH_MAX];
 	if (getcwd(cwd, sizeof(cwd)))
 		path = cwd;
 	else
 		throw SystemException("cannot get current directory");
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] != '/') path.append("/");
+
+	extendPath(path);
+
 	return path;
 }
 
@@ -71,8 +79,8 @@ std::string PathImpl::homeImpl()
 			if (EnvironmentImpl::hasImpl("HOME"))
 				path = EnvironmentImpl::getImpl("HOME");
 	}
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] != '/') path.append("/");
+
+	extendPath(path);
 	return path;
 #endif
 }
@@ -84,9 +92,7 @@ std::string PathImpl::configHomeImpl()
 	return PathImpl::homeImpl();
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/')
-		path.append("Library/Preferences/");
+	extendPath(path, "Library/Preferences/");
 	return path;
 #else
 	std::string path;
@@ -96,10 +102,7 @@ std::string PathImpl::configHomeImpl()
 		return path;
 
 	path = PathImpl::homeImpl();
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/')
-		path.append(".config/");
-
+	extendPath(path, ".config/");
 	return path;
 #endif
 }
@@ -111,9 +114,7 @@ std::string PathImpl::dataHomeImpl()
 	return PathImpl::homeImpl();
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/')
-		path.append("Library/Application Support/");
+	extendPath(path, "Library/Application Support/");
 	return path;
 #else
 	std::string path;
@@ -123,10 +124,7 @@ std::string PathImpl::dataHomeImpl()
 		return path;
 
 	path = PathImpl::homeImpl();
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/')
-		path.append(".local/share/");
-
+	extendPath(path, ".local/share/");
 	return path;
 #endif
 }
@@ -138,9 +136,7 @@ std::string PathImpl::cacheHomeImpl()
 	return PathImpl::tempImpl();
 #elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/')
-		path.append("Library/Caches/");
+	extendPath(path, "Library/Caches/");
 	return path;
 #else
 	std::string path;
@@ -150,10 +146,7 @@ std::string PathImpl::cacheHomeImpl()
 		return path;
 
 	path = PathImpl::homeImpl();
-	std::string::size_type n = path.size();
-	if (n > 0 && path[n - 1] == '/')
-		path.append(".cache/");
-
+	extendPath(path, ".cache/");
 	return path;
 #endif
 }
@@ -193,12 +186,11 @@ std::string PathImpl::selfImpl()
 std::string PathImpl::tempImpl()
 {
 	std::string path;
-	char* tmp = getenv("TMPDIR");
+	const char* tmp = getenv("TMPDIR");
 	if (tmp)
 	{
 		path = tmp;
-		std::string::size_type n = path.size();
-		if (n > 0 && path[n - 1] != '/') path.append("/");
+		extendPath(path);
 	}
 	else
 	{
@@ -234,8 +226,8 @@ std::string PathImpl::nullImpl()
 std::string PathImpl::expandImpl(const std::string& path)
 {
 	std::string result;
-	std::string::const_iterator it  = path.begin();
-	std::string::const_iterator end = path.end();
+	std::string::const_iterator it = path.cbegin();
+	std::string::const_iterator end = path.cend();
 	if (it != end && *it == '~')
 	{
 		++it;
@@ -245,9 +237,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 			if (homeEnv)
 			{
 				result += homeEnv;
-				std::string::size_type resultSize = result.size();
-				if (resultSize > 0 && result[resultSize - 1] != '/')
-					result.append("/");
+				extendPath(result);
 			}
 			else
 			{
@@ -281,7 +271,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 			{
 				while (it != end && (Ascii::isAlphaNumeric(*it) || *it == '_')) var += *it++;
 			}
-			char* val = getenv(var.c_str());
+			const char* val = getenv(var.c_str());
 			if (val) result += val;
 		}
 		else result += *it++;

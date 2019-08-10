@@ -22,6 +22,13 @@
 
 namespace Poco {
 
+void PathImpl::extendPath(std::string &path, const std::string &extensionPath)
+{
+	if (path.size() > 0 && path.back() != '\\')
+	{
+		path += extensionPath;
+	}
+}
 
 std::string PathImpl::currentImpl()
 {
@@ -30,12 +37,11 @@ std::string PathImpl::currentImpl()
 	if (len > 0)
 	{
 		Buffer<wchar_t> buffer(len);
-		DWORD n = GetCurrentDirectoryW(len, buffer.begin());
+		const DWORD n = GetCurrentDirectoryW(len, buffer.begin());
 		if (n > 0 && n <= len)
 		{
 			UnicodeConverter::toUTF8(buffer.begin(), result);
-			if (result[result.size() - 1] != '\\')
-				result.append("\\");
+			extendPath(result);
 			return result;
 		}
 	}
@@ -53,7 +59,7 @@ std::string PathImpl::systemImpl()
 		if (n <= 0) throw SystemException("Cannot get system directory long path name");
 		std::string result;
 		UnicodeConverter::toUTF8(buffer.begin(), result);
-		if (result[result.size() - 1] != '\\') result.append("\\");
+		extendPath(result);
 		return result;
 	}
 	throw SystemException("Cannot get temporary directory path");
@@ -77,9 +83,7 @@ std::string PathImpl::homeImpl()
 		result = systemImpl();
 	}
 
-	std::string::size_type n = result.size();
-	if (n > 0 && result[n - 1] != '\\')
-		result.append("\\");
+	extendPath(result);
 	return result;
 }
 
@@ -98,9 +102,7 @@ std::string PathImpl::configHomeImpl()
 		result = homeImpl();
 	}
 
-	std::string::size_type n = result.size();
-	if (n > 0 && result[n - 1] != '\\')
-		result.append("\\");
+	extendPath(result);
 	return result;
 }
 
@@ -119,9 +121,7 @@ std::string PathImpl::dataHomeImpl()
 		result = configHomeImpl();
 	}
 
-	std::string::size_type n = result.size();
-	if (n > 0 && result[n - 1] != '\\')
-		result.append("\\");
+	extendPath(result);
 	return result;
 }
 
@@ -135,8 +135,8 @@ std::string PathImpl::cacheHomeImpl()
 std::string PathImpl::selfImpl()
 {
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
-	DWORD n = GetModuleFileNameW(NULL, buffer.begin(), static_cast<DWORD>(buffer.size()));
-	DWORD err = GetLastError();
+	const DWORD n = GetModuleFileNameW(NULL, buffer.begin(), static_cast<DWORD>(buffer.size()));
+	const DWORD err = GetLastError();
 	if (n > 0)
 	{
 		if (err == ERROR_INSUFFICIENT_BUFFER)
@@ -159,8 +159,7 @@ std::string PathImpl::tempImpl()
 		if (n <= 0) throw SystemException("Cannot get temporary directory long path name");
 		std::string result;
 		UnicodeConverter::toUTF8(buffer.begin(), result);
-		if (result[result.size() - 1] != '\\')
-			result.append("\\");
+		extendPath(result);
 		return result;
 	}
 	throw SystemException("Cannot get temporary directory path");
@@ -181,9 +180,7 @@ std::string PathImpl::configImpl()
 		result = systemImpl();
 	}
 
-	std::string::size_type n = result.size();
-	if (n > 0 && result[n - 1] != '\\')
-		result.append("\\");
+	extendPath(result);
 	return result;
 }
 
@@ -199,7 +196,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 	std::wstring upath;
 	UnicodeConverter::toUTF16(path, upath);
 	Buffer<wchar_t> buffer(MAX_PATH_LEN);
-	DWORD n = ExpandEnvironmentStringsW(upath.c_str(), buffer.begin(), static_cast<DWORD>(buffer.size()));
+	const DWORD n = ExpandEnvironmentStringsW(upath.c_str(), buffer.begin(), static_cast<DWORD>(buffer.size()));
 	if (n > 0 && n < buffer.size() - 1)
 	{
 		buffer[n + 1] = 0;
@@ -216,9 +213,9 @@ void PathImpl::listRootsImpl(std::vector<std::string>& roots)
 	roots.clear();
 	const int bufferSize = 128;
 	wchar_t buffer[bufferSize];
-	DWORD n = GetLogicalDriveStringsW(bufferSize - 1, buffer);
-	wchar_t* it  = buffer;
-	wchar_t* end = buffer + (n > bufferSize ? bufferSize : n);
+	const DWORD n = GetLogicalDriveStringsW(bufferSize - 1, buffer);
+	const wchar_t* it  = buffer;
+	const wchar_t* end = buffer + (n > bufferSize ? bufferSize : n);
 	while (it < end)
 	{
 		std::wstring udev;

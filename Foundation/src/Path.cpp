@@ -656,7 +656,7 @@ bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, con
 	{
 #if defined(WIN32)
 		std::string cleanPath(*it);
-		if (cleanPath.size() > 1 && cleanPath[0] == '"' && cleanPath[cleanPath.size() - 1] == '"')
+		if (cleanPath.size() > 1 && cleanPath.front() == '"' && cleanPath.back() == '"')
 		{
 			cleanPath = cleanPath.substr(1, cleanPath.size() - 2);
 		}

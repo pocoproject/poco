@@ -117,7 +117,7 @@ static bool argNeedsEscaping(const std::string& arg)
 	// Assume args that start and end with quotes are already quoted and do not require further quoting.
 	// There is probably code out there written before launch() escaped the arguments that does its own
 	// escaping of arguments. This ensures we do not interfere with those arguments.
-	bool isAlreadyQuoted = arg.size() > 1 && '\"' == arg[0] && '\"' == arg[arg.size() - 1];
+	bool isAlreadyQuoted = arg.size() > 1 && '\"' == arg.front() && '\"' == arg.back();
 	return containsQuotableChar && !isAlreadyQuoted;
 }
 

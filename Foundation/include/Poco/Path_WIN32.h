@@ -27,6 +27,8 @@ namespace Poco {
 
 class Foundation_API PathImpl
 {
+private:
+	static void extendPath(std::string &path, const std::string &extensionPath = "\\");
 public:
 	static std::string currentImpl();
 	static std::string homeImpl();

@@ -146,7 +146,7 @@ std::string TemporaryFile::tempName(const std::string& tempDir)
 	unsigned long n = count++;
 	mutex.unlock();
 	name << (tempDir.empty() ? Path::temp() : tempDir);
-	if (name.str().at(name.str().size() - 1) != Path::separator())
+	if (name.str().back() != Path::separator())
 	{
 		name << Path::separator();
 	}
