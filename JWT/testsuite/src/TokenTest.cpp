@@ -12,7 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/JWT/Token.h"
-#include <iostream>
+
 
 using namespace Poco::JWT;
 
