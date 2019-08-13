@@ -136,7 +136,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(WIN32)
-	target_compile_definitions(Foundation PUBLIC POCO_NO_AUTOMATIC_LIBS POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
+	target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
 	target_link_libraries(Foundation PUBLIC iphlpapi)
 endif()
 
