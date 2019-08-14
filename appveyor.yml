@@ -41,7 +41,7 @@ image:
 
 
 platform:
-  - Win32
+# - Win32
   - x64
 
 # -------------------------------------------------------------------------------------------
@@ -411,6 +411,8 @@ build_script:
                 $generator = '"Visual Studio 15 2017 Win64"'
             }
         }
+        # Visual Studio projects are multi-configuration build system, this means CMAKE_BUILD_TYPE is ignored!
+        # Use --config Debug or --config Release at build time. See below.
         $defs = "-H."
         $defs+=" -Bbuild-cmake"
         $defs+=" -G" + $generator;

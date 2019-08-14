@@ -49,7 +49,7 @@ class Net_API HTTPCredentials
 	///     Poco::Net::HTTPClientSession session("pocoproject.org");
 	///     Poco::Net::HTTPRequest request(HTTPRequest::HTTP_GET, "/index.html", HTTPMessage::HTTP_1_1);
 	///     session.sendRequest(request);
-	///     Poco::Net::HTTPResponse;
+	///     Poco::Net::HTTPResponse response;
 	///     std::istream& istr = session.receiveResponse(response);
 	///
 	/// If the server responds with a 401 status, authenticate the

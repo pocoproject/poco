@@ -16,6 +16,12 @@ if(MINGW)
         PROPERTIES COMPILE_FLAGS "-Wa,-mbig-obj")
 endif()
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(SQL ${SRCS} )
 add_library(Poco::SQL ALIAS SQL)
 set_target_properties(SQL

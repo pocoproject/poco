@@ -6,6 +6,12 @@ POCO_SOURCES_AUTO( POSTGRESQL_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( POSTGRESQL_SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND POSTGRESQL_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(SQLPostgreSQL ${POSTGRESQL_SRCS} )
 add_library(Poco::SQLPostgreSQL ALIAS SQLPostgreSQL)
 set_target_properties(SQLPostgreSQL
