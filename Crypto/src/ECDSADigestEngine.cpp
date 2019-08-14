@@ -113,7 +113,7 @@ ECDSASignature::ECDSASignature(const ByteVec& derSignature)
 	poco_assert (!derSignature.empty());
 
 	const unsigned char* p = &derSignature[0];
-	_pSig = d2i_ECDSA_SIG(0, &p, derSignature.size());
+	_pSig = d2i_ECDSA_SIG(0, &p, static_cast<long>(derSignature.size()));
 	if (!_pSig)
 		throw OpenSSLException();
 }
@@ -130,8 +130,8 @@ ECDSASignature::ECDSASignature(const ByteVec& rawR, const ByteVec& rawS):
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		ECDSA_SIG_set0(_pSig,
-			BN_bin2bn(&rawR[0], rawR.size(), 0),
-			BN_bin2bn(&rawS[0], rawS.size(), 0));
+			BN_bin2bn(&rawR[0], static_cast<long>(rawR.size()), 0),
+			BN_bin2bn(&rawS[0], static_cast<long>(rawS.size()), 0));
 		const BIGNUM* pR = 0;
 		const BIGNUM* pS = 0;
 		ECDSA_SIG_get0(_pSig, &pR, &pS);

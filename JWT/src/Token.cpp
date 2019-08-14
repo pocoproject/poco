@@ -166,7 +166,7 @@ void Token::setTimestamp(const std::string& claim, const Poco::Timestamp& ts)
 Poco::Timestamp Token::getTimestamp(const std::string& claim) const
 {
 	double epochSeconds = _pPayload->optValue(claim, 0.0);
-	Poco::Timestamp::TimeVal tv = epochSeconds*Poco::Timestamp::resolution();
+	Poco::Timestamp::TimeVal tv = static_cast<Poco::Timestamp::TimeVal>(epochSeconds*Poco::Timestamp::resolution());
 	return Poco::Timestamp(tv);
 }
 
