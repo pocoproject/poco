@@ -20,18 +20,23 @@
 #define Crypto_Crypto_INCLUDED
 
 
-#if defined(__APPLE__)
-// OS X 10.7 deprecates some OpenSSL functions
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
-#endif
-
-
 #define POCO_EXTERNAL_OPENSSL_DEFAULT 1
 #define POCO_EXTERNAL_OPENSSL_SLPRO 2
 
 
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
+
+
+#ifndef OPENSSL_VERSION_PREREQ
+	#if defined(OPENSSL_VERSION_MAJOR) && defined(OPENSSL_VERSION_MINOR)
+		#define OPENSSL_VERSION_PREREQ(maj, min) \
+			((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
+	#else
+		#define OPENSSL_VERSION_PREREQ(maj, min) \
+			(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20)))
+	#endif
+#endif
 
 
 enum RSAPaddingMode
@@ -90,7 +95,7 @@ enum RSAPaddingMode
 	#if !defined(POCO_NO_AUTOMATIC_LIBS)
 		#if defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
 			#if defined(POCO_EXTERNAL_OPENSSL)
-				#pragma warning "External OpenSSL defined but internal headers used - possible mismatch!"
+				#pragma message("External OpenSSL defined but internal headers used - possible mismatch!")
 			#endif // POCO_EXTERNAL_OPENSSL
 			#if !defined(_DEBUG)
 				#define POCO_DEBUG_SUFFIX ""
@@ -130,8 +135,13 @@ enum RSAPaddingMode
 					#endif
 			  	#else
 					#if OPENSSL_VERSION_PREREQ(1,1)
-						#pragma comment(lib, "libcrypto" POCO_LIB_SUFFIX)
-						#pragma comment(lib, "libssl" POCO_LIB_SUFFIX)
+						#if defined(_WIN64)
+							#pragma comment(lib, "libcrypto64" POCO_LIB_SUFFIX)
+							#pragma comment(lib, "libssl64" POCO_LIB_SUFFIX)
+						#else
+							#pragma comment(lib, "libcrypto32" POCO_LIB_SUFFIX)
+							#pragma comment(lib, "libssl32" POCO_LIB_SUFFIX)
+						#endif
 					#else
 						#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
 						#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
@@ -163,7 +173,7 @@ void Crypto_API initializeCrypto();
 	/// libraries, by calling OpenSSLInitializer::initialize().
 	///
 	/// Should be called before using any class from the Crypto library.
-	/// The Crypto library will be initialized automatically, through  
+	/// The Crypto library will be initialized automatically, through
 	/// OpenSSLInitializer instances held by various Crypto classes
 	/// (Cipher, CipherKey, RSAKey, X509Certificate).
 	/// However, it is recommended to call initializeCrypto()
@@ -172,10 +182,10 @@ void Crypto_API initializeCrypto();
 	/// Can be called multiple times; however, for every call to
 	/// initializeCrypto(), a matching call to uninitializeCrypto()
 	/// must be performed.
-	
+
 
 void Crypto_API uninitializeCrypto();
-	/// Uninitializes the Crypto library by calling 
+	/// Uninitializes the Crypto library by calling
 	/// OpenSSLInitializer::uninitialize().
 
 
