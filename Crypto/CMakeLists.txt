@@ -26,7 +26,8 @@ target_include_directories(Crypto
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
 if(MSVC AND OPENSSL_USE_STATIC_LIBS)
