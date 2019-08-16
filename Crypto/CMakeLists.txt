@@ -30,8 +30,11 @@ target_include_directories(Crypto
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
-if(MSVC AND OPENSSL_USE_STATIC_LIBS)
-	target_link_libraries(Crypto PUBLIC ws2_32.lib Crypt32.lib)
+if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL)
+    target_compile_definitions(Crypto PUBLIC POCO_EXTERNAL_OPENSSL)
+	if(OPENSSL_USE_STATIC_LIBS)
+		target_link_libraries(Crypto PUBLIC ws2_32.lib Crypt32.lib)
+	endif()
 endif()
 
 POCO_INSTALL(Crypto)
