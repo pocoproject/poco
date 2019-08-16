@@ -69,6 +69,25 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
+option(POCO_STATIC
+  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
+if(POCO_STATIC)
+    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
+
+if(MSVC)
+    option(POCO_MT
+      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
+
+    option(ENABLE_MSVC_MP
+      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
+endif()
+
+option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
+
 if(ENABLE_CRYPTO OR ENABLE_NETSSL OR ENABLE_JWT)
 	find_package(OpenSSL REQUIRED)
 else()
@@ -155,7 +174,7 @@ option(ENABLE_REDIS "Enable Redis" ON)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_UTIL "Enable Util" ON)
 option(ENABLE_NET "Enable Net" ON)
-option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+
 option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_ZIP "Enable Zip" ON)
 option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
@@ -163,30 +182,11 @@ option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 
-option(FORCE_OPENSSL "Force usage of OpenSSL even under windows" OFF)
-
 option(ENABLE_TESTS
   "Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
-option(POCO_STATIC
-  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
-if(POCO_STATIC)
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
-
 option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
-
-if(MSVC)
-    option(POCO_MT
-      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
-
-    option(ENABLE_MSVC_MP
-      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
-endif()
-
 
 if(ENABLE_TESTS)
   option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
@@ -271,11 +271,6 @@ if(ENABLE_NET AND ENABLE_TESTS)
     set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
-if(ENABLE_JWT)
-	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
-    set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
-endif()
-
 if(ENABLE_PDF)
     set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
     set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
@@ -295,6 +290,11 @@ endif()
 if(ENABLE_UTIL AND ENABLE_TESTS)
     set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
     set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
+if(ENABLE_JWT)
+	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
+    set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
 endif()
 
 add_subdirectory(Foundation)
@@ -323,11 +323,6 @@ if(ENABLE_NET)
     list(APPEND Poco_COMPONENTS "Net")
 endif()
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/JWT AND ENABLE_JWT)
-    add_subdirectory(JWT)
-    list(APPEND Poco_COMPONENTS "JWT")
-endif()
-
 if(EXISTS ${PROJECT_SOURCE_DIR}/MongoDB AND ENABLE_MONGODB)
     add_subdirectory(MongoDB)
     list(APPEND Poco_COMPONENTS "MongoDB")
@@ -343,6 +338,10 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/PDF AND ENABLE_PDF)
     list(APPEND Poco_COMPONENTS "PDF")
 endif()
 
+if(EXISTS ${PROJECT_SOURCE_DIR}/JWT AND ENABLE_JWT)
+    add_subdirectory(JWT)
+    list(APPEND Poco_COMPONENTS "JWT")
+endif()
 
 #NetSSL
 
