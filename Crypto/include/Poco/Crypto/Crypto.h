@@ -29,8 +29,13 @@
 
 
 #ifndef OPENSSL_VERSION_PREREQ
-#define OPENSSL_VERSION_PREREQ(maj, min) \
-	((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
+	#if defined(OPENSSL_VERSION_MAJOR) && defined(OPENSSL_VERSION_MINOR)
+		#define OPENSSL_VERSION_PREREQ(maj, min) \
+			((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
+	#else
+		#define OPENSSL_VERSION_PREREQ(maj, min) \
+			(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20)))
+	#endif
 #endif
 
 
@@ -130,8 +135,13 @@ enum RSAPaddingMode
 					#endif
 			  	#else
 					#if OPENSSL_VERSION_PREREQ(1,1)
-						#pragma comment(lib, "libcrypto" POCO_LIB_SUFFIX)
-						#pragma comment(lib, "libssl" POCO_LIB_SUFFIX)
+						#if defined(_WIN64)
+							#pragma comment(lib, "libcrypto64" POCO_LIB_SUFFIX)
+							#pragma comment(lib, "libssl64" POCO_LIB_SUFFIX)
+						#else
+							#pragma comment(lib, "libcrypto32" POCO_LIB_SUFFIX)
+							#pragma comment(lib, "libssl32" POCO_LIB_SUFFIX)
+						#endif
 					#else
 						#pragma comment(lib, "libeay32" POCO_LIB_SUFFIX)
 						#pragma comment(lib, "ssleay32" POCO_LIB_SUFFIX)
