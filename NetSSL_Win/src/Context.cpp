@@ -39,7 +39,7 @@ const std::string Context::CERT_STORE_USERDS("USERDS");
 
 
 Context::Context(Usage usage,
-		const std::string& certNameOrPath, 
+		const std::string& certNameOrPath,
 		VerificationMode verMode,
 		int options,
 		const std::string& certStore):
@@ -193,7 +193,6 @@ void Context::importCertificate()
 	Poco::File certFile(_certNameOrPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(_certNameOrPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certNameOrPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(_certNameOrPath);
 	istr.read(buffer.begin(), buffer.size());
@@ -208,7 +207,7 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 	SSLManager::instance().PrivateKeyPassphraseRequired.notify(&SSLManager::instance(), password);
 	std::wstring wpassword;
 	Poco::UnicodeConverter::toUTF16(password, wpassword);
-	
+
 	// clear UTF-8 password
 	std::fill(const_cast<char*>(password.data()), const_cast<char*>(password.data() + password.size()), 'X');
 
@@ -217,7 +216,7 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 	blob.pbData = reinterpret_cast<BYTE*>(const_cast<char*>(pBuffer));
 
 	HCERTSTORE hTempStore =  PFXImportCertStore(&blob, wpassword.data(), PKCS12_ALLOW_OVERWRITE_KEY | PKCS12_INCLUDE_EXTENDED_PROPERTIES);
-	
+
 	// clear UTF-16 password
 	std::fill(const_cast<wchar_t*>(wpassword.data()), const_cast<wchar_t*>(wpassword.data() + password.size()), L'X');
 
@@ -302,7 +301,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 		if (!_extendedCertificateVerification)
 			schannelCred.dwFlags |= SCH_CRED_NO_SERVERNAME_CHECK;
 	}
-	
+
 #if defined(SCH_USE_STRONG_CRYPTO)
 	if (_options & Context::OPT_USE_STRONG_CRYPTO)
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
@@ -315,7 +314,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
 										NULL,
 										UNISP_NAME_W,
-										isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND, 
+										isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
 										NULL,
 										&schannelCred,
 										NULL,
@@ -335,7 +334,7 @@ DWORD Context::proto() const
 	switch (_usage)
 	{
 	case Context::CLIENT_USE:
-		return SP_PROT_SSL3_CLIENT 
+		return SP_PROT_SSL3_CLIENT
 			| SP_PROT_TLS1_CLIENT
 #if defined(SP_PROT_TLS1_1)
 			| SP_PROT_TLS1_1_CLIENT
@@ -345,7 +344,7 @@ DWORD Context::proto() const
 #endif
 			;
 	case Context::SERVER_USE:
-		return SP_PROT_SSL3_SERVER 
+		return SP_PROT_SSL3_SERVER
 			| SP_PROT_TLS1_SERVER
 #if defined(SP_PROT_TLS1_1)
 			| SP_PROT_TLS1_1_SERVER
