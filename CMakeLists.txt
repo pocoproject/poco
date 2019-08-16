@@ -83,6 +83,17 @@ if(MSVC)
 
     option(ENABLE_MSVC_MP
       "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
+
+
+    # allow disabling of internally built OpenSSL# (see below for details)
+    # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
+    # the internal OpenSSL build will be used
+    option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
+
+    
+    if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (ENABLE_NETSSL OR ENABLE_CRYPTO OR (ENABLE_DATA_MYSQL AND MINGW)))
+      include(UseEmbeddedOpenSSL)
+    endif()
 endif()
 
 option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
