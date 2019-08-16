@@ -14,6 +14,7 @@
 
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
@@ -132,7 +133,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		(SQLUSMALLINT) pos + 1, 
 		toODBCDirection(dir), 
 		SQL_C_CHAR, 
-		SQL_LONGVARCHAR, 
+		Connector::stringBoundToLongVarChar() ? SQL_LONGVARCHAR : SQL_VARCHAR, 
 		(SQLUINTEGER) colSize,
 		0,
 		pVal, 
