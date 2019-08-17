@@ -31,7 +31,7 @@ protected:
 	enum Flags
 	{
 		SHLIB_GLOBAL_IMPL = 1,
-		SHLIB_LOCAL_IMPL  = 2  
+		SHLIB_LOCAL_IMPL  = 2
 	};
 
 	SharedLibraryImpl();
@@ -42,6 +42,7 @@ protected:
 	void* findSymbolImpl(const std::string& name);
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
+	static bool setSearchPathImpl(const std::string& path);
 
 private:
 	std::string _path;

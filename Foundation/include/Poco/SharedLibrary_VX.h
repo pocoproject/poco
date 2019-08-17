@@ -37,6 +37,7 @@ protected:
 	void* findSymbolImpl(const std::string& name);
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
+	static bool setSearchPathImpl(const std::string& path);
 
 private:
 	std::string _path;

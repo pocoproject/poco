@@ -68,7 +68,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _handle != 0; 
+	return _handle != 0;
 }
 
 
@@ -102,6 +102,18 @@ std::string SharedLibraryImpl::suffixImpl()
 	return "d.dll";
 #else
 	return ".dll";
+#endif
+}
+
+
+bool SharedLibraryImpl::setSearchPathImpl(const std::string& path)
+{
+#if _WIN32_WINNT >= 0x0502
+	std::wstring wpath;
+	Poco::UnicodeConverter::toUTF16(path, wpath);
+	return SetDllDirectoryW(wpath.c_str()) != 0;
+#else
+	return false;
 #endif
 }
 

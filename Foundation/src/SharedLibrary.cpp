@@ -106,4 +106,10 @@ std::string SharedLibrary::suffix()
 }
 
 
+bool SharedLibrary::setSearchPath(const std::string& path)
+{
+	return setSearchPathImpl(path);
+}
+
+
 } // namespace Poco
