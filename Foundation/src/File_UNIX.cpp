@@ -35,7 +35,7 @@
 #include <utime.h>
 #include <cstring>
 
-#if (POCO_OS == POCO_OS_SOLARIS)
+#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 #define STATFSFN statvfs
 #define STATFSSTRUCT statvfs
 #else
