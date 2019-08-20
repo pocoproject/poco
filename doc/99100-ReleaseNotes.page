@@ -15,6 +15,7 @@ AAAIntroduction
   - Windows required minimum version is now Windows XP SP2
   - upgraded bundled SQLite to 3.29.0
   - CppParser now supports type aliases defined with using keyword.
+  - PageCompiler: added support for adding Content-Security-Policy and Cache-Control headers.
 
 
 !!!Release 1.9.2

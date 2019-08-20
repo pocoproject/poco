@@ -16,8 +16,8 @@ current date and time.
         #include "Poco/DateTime.h"
         #include "Poco/DateTimeFormatter.h"
         #include "Poco/DateTimeFormat.h"
-
-
+        
+        
         using Poco::DateTime;
         using Poco::DateTimeFormatter;
         using Poco::DateTimeFormat;
@@ -244,6 +244,10 @@ Allows to specify a language tag (e.g., "en") that will be sent in the
 response Content-Language header if the client sends an Accept-Language
 header in the request.
 
+!contentSecurityPolicy
+
+Allows to specify the value of the HTTP Content-Security-Policy header.
+
 !chunked
 
 Allows you to specify whether the response is sent using chunked transfer encoding.
@@ -271,6 +275,11 @@ If response buffering is enabled, everything written to the response stream
 is actually written to a string stream (<[std::ostringstream]>).
 Sending of the HTTP response back to the client is deferred to
 when the page is complete.
+
+!cacheControl
+
+If set to a non-empty string (e.g., "no-cache, no-store"), adds a "Cache-Control"
+header to the response with the given argument as value.
 
 !session (OSP only)
 

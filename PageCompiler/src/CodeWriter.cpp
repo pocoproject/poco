@@ -36,13 +36,13 @@ void CodeWriter::writeHeader(std::ostream& ostr, const std::string& headerFileNa
 	beginGuard(ostr, headerFileName);
 	writeHeaderIncludes(ostr);
 	ostr << "\n\n";
-	
+
 	std::string decls(_page.headerDecls().str());
 	if (!decls.empty())
 	{
 		ostr << decls << "\n\n";
 	}
-	
+
 	beginNamespace(ostr);
 	writeHandlerClass(ostr);
 	writeFactoryClass(ostr);
@@ -73,13 +73,13 @@ void CodeWriter::writeImpl(std::ostream& ostr, const std::string& headerFileName
 	}
 
 	beginNamespace(ostr);
-	
+
 	std::string path = _page.get("page.path", "");
 	if (!path.empty())
 	{
 		ostr << "\tconst std::string " << _class << "::PATH(\"" << path << "\");\n\n\n";
 	}
-	
+
 	writeConstructor(ostr);
 	writeHandler(ostr);
 	writeFactory(ostr);
@@ -124,7 +124,7 @@ void CodeWriter::beginGuard(std::ostream& ostr, const std::string& headerFileNam
 	std::string guard(p.getBaseName());
 	Poco::translateInPlace(guard, ".-", "__");
 	guard += "_INCLUDED";
-	
+
 	ostr << "#ifndef " << guard << "\n";
 	ostr << "#define " << guard << "\n";
 	ostr << "\n\n";
@@ -157,13 +157,13 @@ void CodeWriter::handlerClass(std::ostream& ostr, const std::string& base, const
 	}
 	ostr << "\tvoid handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);\n";
 	writeHandlerMembers(ostr);
-	
+
 	std::string path = _page.get("page.path", "");
 	if (!path.empty())
 	{
 		ostr << "\n\tstatic const std::string PATH;\n";
 	}
-	
+
 	ostr << "};\n";
 }
 
@@ -311,12 +311,14 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 {
 	std::string contentType(_page.get("page.contentType", "text/html"));
 	std::string contentLang(_page.get("page.contentLanguage", ""));
+	std::string contentSecurityPolicy(_page.get("page.contentSecurityPolicy", ""));
+	std::string cacheControl(_page.get("page.cacheControl", ""));
 	bool buffered(_page.getBool("page.buffered", false));
 	bool chunked(_page.getBool("page.chunked", !buffered));
 	bool compressed(_page.getBool("page.compressed", false));
 	if (buffered) compressed = false;
 	if (compressed) chunked = true;
-	
+
 	if (chunked)
 	{
 		ostr << "\tresponse.setChunkedTransferEncoding(true);\n";
@@ -328,10 +330,18 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 		ostr << "\tif (request.has(\"Accept-Language\"))\n"
 			 << "\t\tresponse.set(\"Content-Language\", \"" << contentLang << "\");\n";
 	}
+	if (!contentSecurityPolicy.empty())
+	{
+		ostr << "\tresponse.set(\"Content-Secure-Policy\", \"" << contentSecurityPolicy << "\");\n";
+	}
 	if (compressed)
 	{
 		ostr << "\tbool _compressResponse(request.hasToken(\"Accept-Encoding\", \"gzip\"));\n"
 		     << "\tif (_compressResponse) response.set(\"Content-Encoding\", \"gzip\");\n";
+	}
+	if (!cacheControl.empty())
+	{
+		ostr << "\tresponse.set(\"Cache-Control\", \"" << cacheControl << "\");\n";
 	}
 	ostr << "\n";
 }
@@ -345,7 +355,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 	int compressionLevel(_page.getInt("page.compressionLevel", 1));
 	if (buffered) compressed = false;
 	if (compressed) chunked = true;
-	
+
 	if (buffered)
 	{
 		ostr << "\tstd::stringstream responseStream;\n";
@@ -354,7 +364,7 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		{
 			ostr << "\tresponse.setContentLength(static_cast<int>(responseStream.tellp()));\n";
 		}
-		ostr << "\tPoco::StreamCopier::copyStream(responseStream, response.send());\n";		
+		ostr << "\tPoco::StreamCopier::copyStream(responseStream, response.send());\n";
 	}
 	else if (compressed)
 	{
@@ -378,7 +388,7 @@ std::string CodeWriter::cleanupHandler(std::string handler)
 	static const std::string NEWLINE_WRITE("\tresponseStream << \"\\n\";\n");
 	static const std::string DOUBLE_NEWLINE_WRITE("\tresponseStream << \"\\n\";\n\tresponseStream << \"\\n\";\n");
 	static const std::string EMPTY;
-	
+
 	// remove empty writes
 	Poco::replaceInPlace(handler, EMPTY_WRITE, EMPTY);
 	// remove consecutive newlines
