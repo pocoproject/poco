@@ -1,5 +1,21 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.9.3 (2019-08-20)
+==========================
+
+- fixed GH #2603: Remove incorrect upper size limits for SSL certificates in NetSSL_Win
+- fixed GH #2661: Poco::Zip::ZipArchive cannot load new tomcat.zip file (additional fix)
+- fixed GH #2742: Support of vs150 & vs160 with the official Microsoft localization executable,
+  vswhere.exe, installed by MSVC starting from VS2017
+- Data/ODBC: make binding of std::string configurable (SQL_LONGVARCHAR - default or SQL_VARCHAR)
+  through a global setting (Poco::Data::ODBC::Connector::bindStringToLongVarChar()).
+- added Poco::SharedLibrary::setSearchPath() (currently implemented on Windows only)
+- Windows required minimum version is now Windows XP SP2
+- upgraded bundled SQLite to 3.29.0
+- CppParser now supports type aliases defined with using keyword.
+- PageCompiler: added support for adding Content-Security-Policy and Cache-Control headers.
+
+
 Release 1.9.2 (2019-07-02)
 ==========================
 
@@ -43,7 +59,7 @@ Release 1.9.1 (2019-06-24)
 - fixed GH #2655: MongoDB Binary element to string - bug
 - fixed GH #2661: Poco::Zip::ZipArchive cannot load new tomcat.zip file
 - fixed GH #2700: Invalid read of memory in Poco::Environment::set which may cause crashes.
-- fixed GH #2712: File_WIN32.cpp(168): error C2065: “_upath”:Undeclared identifier
+- fixed GH #2712: File_WIN32.cpp(168): error C2065: "_upath":Undeclared identifier
 - fixed GH #2723: Access violation when trying to decompress .zip file with unsupported compression method.
 
 

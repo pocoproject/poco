@@ -58,11 +58,11 @@
 
 #if !defined(_WIN32_WCE)
 #if defined(_WIN32_WINNT)
-	#if (_WIN32_WINNT < 0x0501)
+	#if (_WIN32_WINNT < 0x0502)
 		#error Unsupported Windows version.
 	#endif
 #elif defined(NTDDI_VERSION)
-	#if (NTDDI_VERSION < 0x05010100)
+	#if (NTDDI_VERSION < 0x05020000)
 		#error Unsupported Windows version.
 	#endif
 #elif !defined(_WIN32_WINNT)
@@ -73,8 +73,8 @@
 	// best to determine the appropriate values
 	// and may redefine these. See Platform_WIN32.h
 	// for details.
-	#define _WIN32_WINNT 0x0501
-	#define NTDDI_VERSION 0x05010100
+	#define _WIN32_WINNT 0x0502
+	#define NTDDI_VERSION 0x05020000
 #endif
 #endif
 

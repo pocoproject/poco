@@ -29,7 +29,7 @@ namespace Net {
 
 class NetSSL_Win_API SecureSMTPClientSession: public SMTPClientSession
 	/// This class implements an Simple Mail
-	/// Transfer Procotol (SMTP, RFC 2821)
+	/// Transfer Protocol (SMTP, RFC 2821)
 	/// client for sending e-mail messages that
 	/// supports the STARTTLS command for secure
 	/// connections.
@@ -59,7 +59,7 @@ public:
 		/// Destroys the SMTPClientSession.
 
 	bool startTLS();
-		/// Sends a STARTTLS command and, if successful, 
+		/// Sends a STARTTLS command and, if successful,
 		/// creates a secure SSL/TLS connection over the
 		/// existing socket connection.
 		///
@@ -71,7 +71,7 @@ public:
 		/// false otherwise.
 
 	bool startTLS(Context::Ptr pContext);
-		/// Sends a STARTTLS command and, if successful, 
+		/// Sends a STARTTLS command and, if successful,
 		/// creates a secure SSL/TLS connection over the
 		/// existing socket connection.
 		///

@@ -23,6 +23,7 @@ namespace ODBC {
 
 
 const std::string Connector::KEY("ODBC");
+bool Connector::_bindStringToLongVarChar(true);
 
 
 Connector::Connector()
@@ -51,6 +52,12 @@ void Connector::registerConnector()
 void Connector::unregisterConnector()
 {
 	Poco::Data::SessionFactory::instance().remove(KEY);
+}
+
+
+void Connector::bindStringToLongVarChar(bool flag)
+{
+	_bindStringToLongVarChar = flag;
 }
 
 

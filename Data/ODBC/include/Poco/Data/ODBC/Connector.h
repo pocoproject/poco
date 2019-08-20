@@ -52,6 +52,26 @@ public:
 
 	static void unregisterConnector();
 		/// Unregisters the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory
+
+	static void bindStringToLongVarChar(bool flag = true);
+		/// If set to true (default), std::string is bound to SQL_LONGVARCHAR.
+		///
+		/// This can cause issues with SQL Server, resulting in an error
+		/// ("The data types varchar and text are incompatible in the equal to operator")
+		/// when comparing against a VARCHAR. 
+		///
+		/// Set this to false to bind std::string to SQL_VARCHAR.
+		///
+		/// NOTE: This is a global setting, affecting all sessions.
+		/// This setting should not be changed after the first Session has
+		/// been created.
+
+	static bool stringBoundToLongVarChar();
+		/// Returns true if std::string is bound to SQL_LONGVARCHAR,
+		/// otherwise false (bound to SQL_VARCHAR).
+
+private:
+	static bool _bindStringToLongVarChar;
 };
 
 
@@ -61,6 +81,12 @@ public:
 inline const std::string& Connector::name() const
 {
 	return KEY;
+}
+
+
+inline bool Connector::stringBoundToLongVarChar()
+{
+	return _bindStringToLongVarChar;
 }
 
 

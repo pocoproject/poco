@@ -119,12 +119,12 @@
 		#endif
 		#define _WIN32_WINNT WINVER
 	#elif !defined(_WIN32_WINNT)
-		// last resort = Win XP, SP1 is minimum supported
-		#define _WIN32_WINNT 0x0501
+		// last resort = Win XP, SP2 is minimum supported
+		#define _WIN32_WINNT 0x0502
 		#ifdef NTDDI_VERSION
 			#undef NTDDI_VERSION
 		#endif
-		#define NTDDI_VERSION 0x05010100
+		#define NTDDI_VERSION 0x05020000
 	#endif
 #endif // POCO_FORCE_MIN_WINDOWS_OS_SUPPORT
 

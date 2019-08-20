@@ -74,7 +74,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _handle != 0; 
+	return _handle != 0;
 }
 
 
@@ -124,6 +124,12 @@ std::string SharedLibraryImpl::suffixImpl()
 		return ".so";
 	#endif
 #endif
+}
+
+
+bool SharedLibraryImpl::setSearchPathImpl(const std::string&)
+{
+	return false;
 }
 
 
