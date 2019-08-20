@@ -16,8 +16,8 @@ current date and time.
         #include "Poco/DateTime.h"
         #include "Poco/DateTimeFormatter.h"
         #include "Poco/DateTimeFormat.h"
-
-
+        
+        
         using Poco::DateTime;
         using Poco::DateTimeFormatter;
         using Poco::DateTimeFormat;
@@ -243,6 +243,10 @@ Allows you to specify the MIME content type for the page. Defaults to text/html.
 Allows to specify a language tag (e.g., "en") that will be sent in the
 response Content-Language header if the client sends an Accept-Language
 header in the request.
+
+!contentSecurityPolicy
+
+Allows to specify the value of the HTTP Content-Security-Policy header.
 
 !chunked
 
