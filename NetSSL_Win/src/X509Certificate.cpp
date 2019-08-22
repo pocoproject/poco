@@ -366,7 +366,7 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	Poco::UnicodeConverter::convert(certStoreName, wcertStore);
 	HCERTSTORE hCertStore;
 	if (useMachineStore)
-		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStoreName.c_str());
+		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStoreName.c_str());
 	else
 		hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
 
