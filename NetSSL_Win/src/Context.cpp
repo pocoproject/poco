@@ -167,7 +167,7 @@ void Context::loadCertificate()
 	if (!_hCertStore)
 	{
 		if (_options & OPT_USE_MACHINE_STORE)
-			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, _certStoreName.c_str());
+			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStore.c_str());
 		else
 			_hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
 	}
