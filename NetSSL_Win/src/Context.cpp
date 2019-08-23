@@ -307,7 +307,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = _hCollectionCertStore;
+	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : NULL;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
