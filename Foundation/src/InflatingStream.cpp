@@ -20,7 +20,7 @@
 namespace Poco {
 
 
-InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type): 
+InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
 	_pOstr(0),
@@ -45,15 +45,15 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
-	if (rc != Z_OK) 
+	if (rc != Z_OK)
 	{
 		delete [] _buffer;
-		throw IOException(zError(rc)); 
+		throw IOException(zError(rc));
 	}
 }
 
 
-InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits): 
+InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
 	_pOstr(0),
@@ -71,15 +71,15 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, windowBits);
-	if (rc != Z_OK) 
+	if (rc != Z_OK)
 	{
 		delete [] _buffer;
-		throw IOException(zError(rc)); 
+		throw IOException(zError(rc));
 	}
 }
 
 
-InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type): 
+InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_pIstr(0),
 	_pOstr(&ostr),
@@ -97,7 +97,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, 15 + (type == STREAM_GZIP ? 16 : 0));
-	if (rc != Z_OK) 
+	if (rc != Z_OK)
 	{
 		delete [] _buffer;
 		throw IOException(zError(rc));
@@ -105,7 +105,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 }
 
 
-InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits): 
+InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_pIstr(0),
 	_pOstr(&ostr),
@@ -123,7 +123,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	_buffer = new char[INFLATE_BUFFER_SIZE];
 
 	int rc = inflateInit2(&_zstr, windowBits);
-	if (rc != Z_OK) 
+	if (rc != Z_OK)
 	{
 		delete [] _buffer;
 		throw IOException(zError(rc));
@@ -214,7 +214,7 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			{
 				_zstr.next_in  = (unsigned char*) _buffer;
 				_zstr.avail_in = n;
-			} 
+			}
 			else return static_cast<int>(length) - _zstr.avail_out;
 		}
 	}
@@ -224,7 +224,7 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (length == 0 || !_pOstr) return 0;
-	
+
 	_zstr.next_in   = (unsigned char*) buffer;
 	_zstr.avail_in  = static_cast<unsigned>(length);
 	_zstr.next_out  = (unsigned char*) _buffer;
@@ -235,21 +235,21 @@ int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 		if (rc == Z_STREAM_END)
 		{
 			_pOstr->write(_buffer, INFLATE_BUFFER_SIZE - _zstr.avail_out);
-			if (!_pOstr->good()) throw IOException(zError(rc));
+			if (!_pOstr->good()) throw IOException("Failed writing inflated data to output stream");
 			break;
 		}
-		if (rc != Z_OK) throw IOException(zError(rc)); 
+		if (rc != Z_OK) throw IOException(zError(rc));
 		if (_zstr.avail_out == 0)
 		{
 			_pOstr->write(_buffer, INFLATE_BUFFER_SIZE);
-			if (!_pOstr->good()) throw IOException(zError(rc));
+			if (!_pOstr->good()) throw IOException("Failed writing inflated data to output stream");
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = INFLATE_BUFFER_SIZE;
 		}
 		if (_zstr.avail_in == 0)
 		{
 			_pOstr->write(_buffer, INFLATE_BUFFER_SIZE - _zstr.avail_out);
-			if (!_pOstr->good()) throw IOException(zError(rc)); 
+			if (!_pOstr->good()) throw IOException("Failed writing inflated data to output stream");
 			_zstr.next_out  = (unsigned char*) _buffer;
 			_zstr.avail_out = INFLATE_BUFFER_SIZE;
 			break;
