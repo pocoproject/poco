@@ -284,7 +284,9 @@ add_custom_target(uninstall
 #############################################################
 # Enable packaging
 
-include(InstallRequiredSystemLibraries)
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+  include(InstallRequiredSystemLibraries)
+endif()
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
 set(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
