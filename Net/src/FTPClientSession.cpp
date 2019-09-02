@@ -441,6 +441,8 @@ StreamSocket FTPClientSession::passiveDataConnection(const std::string& command,
 	SocketAddress sa(sendPassiveCommand());
 	StreamSocket sock;
 	sock.connect(sa, _timeout);
+	sock.setReceiveTimeout(_timeout);
+	sock.setSendTimeout(_timeout);
 	std::string response;
 	int status = sendCommand(command, arg, response);
 	if (!isPositivePreliminary(status)) 
