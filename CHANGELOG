@@ -1,5 +1,12 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.9.4 (2019-09-XX)
+==========================
+
+- fixed GH #2784: Upgrade bundled expat XML parser library to release 2.2.8,
+  which fixes CVE-2019-15903.
+
+
 Release 1.9.3 (2019-08-20)
 ==========================
 

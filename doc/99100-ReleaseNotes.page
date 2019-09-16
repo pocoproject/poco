@@ -1,6 +1,14 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.9.4
+
+!!Summary of Changes
+
+  - fixed GH #2784: Upgrade bundled expat XML parser library to release 2.2.8,
+    which fixes CVE-2019-15903.
+
+
 !!!Release 1.9.3
 
 !!Summary of Changes
