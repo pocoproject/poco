@@ -42,7 +42,7 @@
 #  include <stdbool.h>
 #endif
 
-#ifdef _WIN32
+#ifdef EXPAT_WIN32
 #  include "winconfig.h"
 #else
 #  ifdef HAVE_EXPAT_CONFIG_H
