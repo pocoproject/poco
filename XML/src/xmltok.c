@@ -50,7 +50,7 @@
 #  endif
 #endif /* ndef _WIN32 */
 
-#include "expat_external.h"
+#include "Poco/XML/expat_external.h"
 #include "internal.h"
 #include "xmltok.h"
 #include "nametab.h"
