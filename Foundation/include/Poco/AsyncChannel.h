@@ -50,14 +50,14 @@ public:
 	void setChannel(Channel::Ptr pChannel);
 		/// Connects the AsyncChannel to the given target channel.
 		/// All messages will be forwarded to this channel.
-		
+
 	Channel::Ptr getChannel() const;
 		/// Returns the target channel.
 
 	void open();
 		/// Opens the channel and creates the
 		/// background logging thread.
-		
+
 	void close();
 		/// Closes the channel and stops the background
 		/// logging thread.
@@ -65,6 +65,9 @@ public:
 	void log(const Message& msg);
 		/// Queues the message for processing by the
 		/// background thread.
+
+	void setBufferSize(const std::string& sizeStr);
+		/// Set maximum number of Notifications in the buffer
 
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.
@@ -87,13 +90,16 @@ protected:
 	~AsyncChannel();
 	void run();
 	void setPriority(const std::string& value);
-		
+
 private:
 	Channel::Ptr      _pChannel;
 	Thread            _thread;
 	FastMutex         _threadMutex;
 	FastMutex         _channelMutex;
 	NotificationQueue _queue;
+	UInt32            _bufferSize;
+	UInt32            _dropCount;
+	static const UInt32 BUFFER_SIZE_NONE;
 };
 
 
