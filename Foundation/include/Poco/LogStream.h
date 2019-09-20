@@ -37,7 +37,7 @@ class Foundation_API LogStreamBuf: public UnbufferedStreamBuf
 	/// priority.
 {
 public:
-	LogStreamBuf(Logger& logger, Message::Priority priority);
+	LogStreamBuf(Logger& logger, Message::Priority priority, std::size_t initSize);
 		/// Creates the LogStream.
 
 	~LogStreamBuf();
@@ -51,6 +51,8 @@ public:
 
 	Logger& logger() const;
 		/// Returns a reference to the Logger.
+
+	void reserve(std::size_t n);
 
 private:
 	int writeToDevice(char c);
@@ -69,7 +71,7 @@ class Foundation_API LogIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	LogIOS(Logger& logger, Message::Priority priority);
+	LogIOS(Logger& logger, Message::Priority priority, std::size_t initBufSize);
 	~LogIOS();
 	LogStreamBuf* rdbuf();
 
@@ -93,10 +95,12 @@ class Foundation_API LogStream: public LogIOS, public std::ostream
 	///     ls.error() << "Some error message" << std::endl;
 {
 public:
-	LogStream(Logger& logger, Message::Priority priority = Message::PRIO_INFORMATION);
+	static const std::size_t DEFAULT_INIT_BUF_SIZE = 200;
+
+	LogStream(Logger& logger, Message::Priority priority = Message::PRIO_INFORMATION, std::size_t initBufSize = DEFAULT_INIT_BUF_SIZE);
 		/// Creates the LogStream, using the given logger and priority.
 
-	LogStream(const std::string& loggerName, Message::Priority priority = Message::PRIO_INFORMATION);
+	LogStream(const std::string& loggerName, Message::Priority priority = Message::PRIO_INFORMATION, std::size_t initBufSize = DEFAULT_INIT_BUF_SIZE);
 		/// Creates the LogStream, using the logger identified
 		/// by loggerName, and sets the priority.
 		
