@@ -27,6 +27,19 @@
 namespace Poco {
 
 
+#define poco_stream(logStream, prio) \
+    logStream.rdbuf()->logger().is(prio) && logStream.priority(prio)
+
+#define poco_stream_fatal(logStream) poco_stream(logStream, ::Poco::Message::PRIO_FATAL)
+#define poco_stream_critical(logStream) poco_stream(logStream, ::Poco::Message::PRIO_CRITICAL)
+#define poco_stream_error(logStream) poco_stream(logStream, ::Poco::Message::PRIO_ERROR)
+#define poco_stream_warning(logStream) poco_stream(logStream, ::Poco::Message::PRIO_WARNING)
+#define poco_stream_notice(logStream) poco_stream(logStream, ::Poco::Message::PRIO_NOTICE)
+#define poco_stream_information(logStream) poco_stream(logStream, ::Poco::Message::PRIO_INFORMATION)
+#define poco_stream_debug(logStream) poco_stream(logStream, ::Poco::Message::PRIO_DEBUG)
+#define poco_stream_trace(logStream) poco_stream(logStream, ::Poco::Message::PRIO_TRACE)
+
+
 class Foundation_API LogStreamBuf: public UnbufferedStreamBuf
 	/// This class implements a streambuf interface
 	/// to a Logger.
