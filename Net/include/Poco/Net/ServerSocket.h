@@ -90,7 +90,7 @@ public:
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
 		///
-		/// If reuseAddress is true, sets the SO_REUSEPORT
+		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 
 	virtual void bind(Poco::UInt16 port, bool reuseAddress = false);
