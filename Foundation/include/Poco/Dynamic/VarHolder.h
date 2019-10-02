@@ -416,9 +416,14 @@ private:
 			throw RangeException("Value too large.");
 		}
 		else
-		if (from > std::numeric_limits<T>::max())
+		if ((sizeof(T) == sizeof(F)) &&
+			!std::numeric_limits<F>::is_signed &&
+			std::numeric_limits<T>::is_signed)
 		{
-			throw RangeException("Value too large.");
+			if (from > static_cast<F>(std::numeric_limits<T>::max()))
+			{
+				throw RangeException("Value too large.");
+			}
 		}
 	}
 
