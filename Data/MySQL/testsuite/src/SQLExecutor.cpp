@@ -24,6 +24,7 @@
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/MySQLException.h"
+#include "Poco/Data/SessionPool.h"
 
 #ifdef _WIN32
 #include <Winsock2.h>
@@ -1459,6 +1460,34 @@ void SQLExecutor::tupleVector()
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	assertTrue (ret == v);
+}
+
+
+void SQLExecutor::sessionPoolAndUnicode(const std::string& connString)
+{
+	std::string funct = "unicode()";
+	std::string text = "ěščřžťďůň";
+	std::string text2;
+
+	// Test uses session from SessionPool instead of _pSession to prove session
+	// obtained and returned into pool is valid.
+
+	// Min/Max 1 session - ensures that when get() is called, same session should be returned
+	Poco::SharedPtr<Poco::Data::SessionPool> sp = new Poco::Data::SessionPool(MySQL::Connector::KEY, connString, 1, 1);
+
+	{
+		auto session = sp->get();
+		try { session << "INSERT INTO Strings VALUES (?)", use(text), now; }
+		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	} // parentheses to ensure session is returned into pool
+
+	auto session = sp->get();
+	try { session << "SELECT str FROM Strings", into(text2), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	assertTrue (text == text2);
 }
 
 

@@ -23,6 +23,7 @@
 #include "Poco/Data/MySQL/MySQLException.h"
 #include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/SessionPool.h"
 #include <iostream>
 
 using namespace Poco::Data;
@@ -420,6 +421,15 @@ void MySQLTest::testDateTime()
 	_pExecutor->date();
 	recreatePersonTimeTable();
 	_pExecutor->time();
+}
+
+
+void MySQLTest::testSessionPoolAndUnicode()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateStringsTable();
+	_pExecutor->sessionPoolAndUnicode(_dbConnString);
 }
 
 
@@ -897,6 +907,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testSingleSelect);
 	CppUnit_addTest(pSuite, MySQLTest, testEmptyDB);
 	CppUnit_addTest(pSuite, MySQLTest, testDateTime);
+	CppUnit_addTest(pSuite, MySQLTest, testSessionPoolAndUnicode);
 	//CppUnit_addTest(pSuite, MySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, MySQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);

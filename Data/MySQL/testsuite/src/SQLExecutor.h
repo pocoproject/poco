@@ -89,6 +89,8 @@ public:
 	void tuples();
 	void tupleVector();
 
+	void sessionPoolAndUnicode(const std::string& connString);
+
 	void internalExtraction();
 	void doNull();
 
