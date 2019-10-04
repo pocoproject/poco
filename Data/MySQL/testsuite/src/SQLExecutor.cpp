@@ -1476,14 +1476,14 @@ void SQLExecutor::sessionPoolAndUnicode(const std::string& connString)
 	Poco::SharedPtr<Poco::Data::SessionPool> sp = new Poco::Data::SessionPool(MySQL::Connector::KEY, connString, 1, 1);
 
 	{
-		auto session = sp->get();
+		Poco::Data::Session session = sp->get();
 		try { session << "INSERT INTO Strings VALUES (?)", use(text), now; }
 		catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 		catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 	} // parentheses to ensure session is returned into pool
 
-	auto session = sp->get();
-	try { session << "SELECT str FROM Strings", into(text2), now; }
+	Poco::Data::Session session2 = sp->get();
+	try { session2 << "SELECT str FROM Strings", into(text2), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
