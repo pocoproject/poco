@@ -11,8 +11,8 @@ POCO_HEADERS_AUTO( SQLITE_SRCS ${HDRS_G})
 
 # Version Resource
 if(MSVC AND NOT POCO_STATIC)
-    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
-    list(APPEND SQLITE_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SQLITE_SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
 if (POCO_UNBUNDLED)

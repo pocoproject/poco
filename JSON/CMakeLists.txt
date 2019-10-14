@@ -19,8 +19,8 @@ endif()
 
 # Version Resource
 if(MSVC AND NOT POCO_STATIC)
-    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
-    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${SRCS} )

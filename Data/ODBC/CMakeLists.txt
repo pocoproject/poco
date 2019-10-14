@@ -11,8 +11,8 @@ POCO_HEADERS_AUTO( ODBC_SRCS ${HDRS_G})
 
 # Version Resource
 if(MSVC AND NOT POCO_STATIC)
-    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
-    list(APPEND ODBC_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND ODBC_SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
 add_definitions( ${ODBC_CFLAGS} -DTHREADSAFE)
