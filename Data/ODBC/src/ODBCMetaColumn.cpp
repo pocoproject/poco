@@ -21,14 +21,14 @@ namespace Data {
 namespace ODBC {
 
 
-ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) : 
+ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) :
 	MetaColumn(position),
 	_rStmt(rStmt)
 {
 	init();
 }
 
-	
+
 ODBCMetaColumn::~ODBCMetaColumn()
 {
 }
@@ -43,14 +43,14 @@ void ODBCMetaColumn::getDescription()
 	_columnDesc.decimalDigits = 0;
 	_columnDesc.isNullable = 0;
 
-	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt, 
+	if (Utility::isError(Poco::Data::ODBC::SQLDescribeCol(_rStmt,
 		(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
-		_columnDesc.name, 
+		_columnDesc.name,
 		NAME_BUFFER_LENGTH,
-		&_columnDesc.nameBufferLength, 
+		&_columnDesc.nameBufferLength,
 		&_columnDesc.dataType,
-		&_columnDesc.size, 
-		&_columnDesc.decimalDigits, 
+		&_columnDesc.size,
+		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
 		throw StatementException(_rStmt);
@@ -136,29 +136,38 @@ void ODBCMetaColumn::init()
 	case SQL_DECIMAL:
 		// Oracle has no INTEGER type - it's essentially NUMBER with 38 whole and
 		// 0 fractional digits. It also does not recognize SQL_BIGINT type,
-		// so the workaround here is to hardcode it to 32 bit integer
-		if (0 == _columnDesc.decimalDigits) setType(MetaColumn::FDT_INT32);
-		else setType(MetaColumn::FDT_DOUBLE);
+		// so the workaround here is to hardcode it to 32 or 64 bit integer
+		if (0 == _columnDesc.decimalDigits)
+		{
+			if (_columnDesc.size > 9)
+				setType(MetaColumn::FDT_INT64);
+			else
+				setType(MetaColumn::FDT_INT32);
+		}
+		else
+		{
+			setType(MetaColumn::FDT_DOUBLE);
+		}
 		break;
 
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
-	
+
 	case SQL_BINARY:
 	case SQL_VARBINARY:
 	case SQL_LONGVARBINARY:
 	case -98:// IBM DB2 non-standard type
 		setType(MetaColumn::FDT_BLOB); break;
-	
+
 	case SQL_TYPE_DATE:
 		setType(MetaColumn::FDT_DATE); break;
-	
+
 	case SQL_TYPE_TIME:
 		setType(MetaColumn::FDT_TIME); break;
-	
+
 	case SQL_TYPE_TIMESTAMP:
 		setType(MetaColumn::FDT_TIMESTAMP); break;
-	
+
 	default:
 		throw DataFormatException("Unsupported data type.");
 	}
