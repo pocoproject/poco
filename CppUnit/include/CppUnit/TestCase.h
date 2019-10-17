@@ -172,9 +172,9 @@ private:
 
 // Constructs a test case
 inline TestCase::TestCase(const std::string& name, Test::Type testType)
-	: _type(testType)
-	, _name (name)
+	: _name (name)
 {
+	_type = testType;
 }
 
 

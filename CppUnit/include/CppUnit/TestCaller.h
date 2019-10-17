@@ -54,10 +54,10 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& name, TestMethod test, Test::Type testType): 
+	TestCaller(const std::string& name, TestMethod test, Test::Type testType = Test::Type::Normal): 
 		TestCase(name, testType), 
 		_test(test),
-		_fixture(new Fixture(name)),
+		_fixture(new Fixture(name))
 	{
 	}
 
