@@ -35,7 +35,7 @@ TestRunner::~TestRunner()
 void TestRunner::printBanner()
 {
     _ostr 
-		<< "Usage: driver [-all] [-print] [-wait] [name] ..." << std::endl
+		<< "Usage: driver [-all [-long]] [-print] [-wait] [name] ..." << std::endl
 		<< "       where name is the name of a test case class" << std::endl;
 }
 
@@ -48,7 +48,9 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	bool all     = false;
 	bool wait    = false;
 	bool printed = false;
+	bool long_running = false;
 
+	std::vector<Test*> tests;
 	for (int i = 1; i < args.size(); i++) 
 	{
 		const std::string& arg = args[i];
@@ -60,6 +62,11 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		else if (arg == "-all")
 		{
 			all = true;
+			continue;
+		}
+		else if (arg == "-long")
+		{
+			long_running = true;
 			continue;
 		}
 		else if (arg == "-print")
@@ -89,9 +96,8 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 			if (testToRun)
 			{
-				if (!run(testToRun)) success = false;
+				tests.push_back(testToRun);
 			}
-			numberOfTests++;
 
 			if (!testToRun) 
 			{
@@ -103,11 +109,17 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 	if (all)
 	{
+		tests.clear();
 		for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it) 
 		{
-			if (!run(it->second)) success = false;
-			numberOfTests++;
+			tests.push_back(it->second);
 		}
+	}
+
+	for (auto testToRun : tests) {
+		if(testToRun->_type == Test::Type::Long && !long_running) continue;
+		if (!run(testToRun)) success = false;
+		numberOfTests++;
 	}
 	
 	if (numberOfTests == 0 && !printed) 

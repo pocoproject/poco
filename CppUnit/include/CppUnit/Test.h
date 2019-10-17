@@ -29,6 +29,13 @@ public:
 	virtual void run(TestResult* result) = 0;
 	virtual int countTestCases() = 0;
 	virtual std::string toString() = 0;
+public:
+	enum class Type {
+		Normal,
+		Long
+	};
+public:
+	Type _type = Type::Normal;
 };
 
 

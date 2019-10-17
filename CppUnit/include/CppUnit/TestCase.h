@@ -86,7 +86,7 @@ class CppUnit_API TestCase: public Test
     REFERENCEOBJECT (TestCase)
 
 public:
-	TestCase(const std::string& Name);
+	TestCase(const std::string& Name, Test::Type testType = Test::Type::Normal);
 	~TestCase();
 
 	virtual void run(TestResult* result);
@@ -171,7 +171,9 @@ private:
 
 
 // Constructs a test case
-inline TestCase::TestCase(const std::string& name): _name (name)
+inline TestCase::TestCase(const std::string& name, Test::Type testType = Test::Type::Normal)
+	: _type(testType)
+	, _name (name)
 {
 }
 

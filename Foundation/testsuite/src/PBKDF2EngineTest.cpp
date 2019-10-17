@@ -128,7 +128,7 @@ CppUnit::Test* PBKDF2EngineTest::suite()
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2a);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2b);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2c);
-	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2d);
+	CppUnit_addLongTest(pSuite, PBKDF2EngineTest, testPBKDF2d);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2e);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2f);
 

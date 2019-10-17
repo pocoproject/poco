@@ -54,10 +54,10 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& name, TestMethod test): 
-		TestCase(name), 
+	TestCaller(const std::string& name, TestMethod test, Test::Type testType): 
+		TestCase(name, testType), 
 		_test(test),
-		_fixture(new Fixture(name))
+		_fixture(new Fixture(name)),
 	{
 	}
 
@@ -92,6 +92,9 @@ private:
 
 #define CppUnit_addTest(suite, cls, mth) \
 	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth))
+
+#define CppUnit_addLongTest(suite, cls, mth) \
+	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth, CppUnit::Test::Type::Long))
 
 
 #endif // CppUnit_TestCaller_INCLUDED
