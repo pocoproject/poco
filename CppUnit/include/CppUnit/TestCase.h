@@ -171,7 +171,7 @@ private:
 
 
 // Constructs a test case
-inline TestCase::TestCase(const std::string& name, Test::Type testType = Test::Type::Normal)
+inline TestCase::TestCase(const std::string& name, Test::Type testType)
 	: _type(testType)
 	, _name (name)
 {
