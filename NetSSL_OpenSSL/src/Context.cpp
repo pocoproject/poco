@@ -584,8 +584,16 @@ void Context::initDH(const std::string& dhParamsFile)
 
 void Context::initECDH(const std::string& curve)
 {
-#if OPENSSL_VERSION_NUMBER >= 0x0090800fL
 #ifndef OPENSSL_NO_ECDH
+#if OPENSSL_VERSION_NUMBER >= 0x10100003L
+
+	const std::string &groups( curve.empty() ? "X448:X25519:P-521:P-384:P-256" : curve );
+	if (SSL_CTX_set1_groups_list(_pSSLContext, curve.c_str()) == 0)
+	{
+		throw SSLContextException("Cannot set ECDH groups", groups);
+	}
+	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
+#elif OPENSSL_VERSION_NUMBER >= 0x0090800fL
 	int nid = 0;
 	if (!curve.empty())
 	{

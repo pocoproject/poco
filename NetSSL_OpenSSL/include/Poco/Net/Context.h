@@ -165,9 +165,17 @@ public:
 			/// If empty, the default parameters are used.
 
 		std::string ecdhCurve;
-			/// Specifies the name of the curve to use for ECDH, based
-			/// on the curve names specified in RFC 4492.
-			/// Defaults to "prime256v1".
+			/// OpenSSL 1.0 and earlier:
+			///   Specifies the name of the curve to use for ECDH, based
+			///   on the curve names specified in RFC 4492.
+			///   Defaults to "prime256v1".
+			/// OpenSSL 1.1 and later:
+			///   Specifies the colon-separated list of groups
+			///   (some of which can be curves) to be used for ECDH
+			////  and other TLSv1.3 ephemeral key negotiation, based
+			///   on the group names defined by OpenSSL, such as
+			///   "X448:X25519:P-521:P-384:P-256:ffdhe2048:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192"
+			///   Defaults to "X448:X25519:P-521:P-384:P-256".
 	};
 
 	Context(Usage usage, const Params& params);
