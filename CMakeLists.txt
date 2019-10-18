@@ -175,6 +175,7 @@ else()
 endif()
 
 # Allow enabling and disabling components
+option(ENABLE_FOUNDATION "Enable Foundation, required for all components except CppUnit" ON)
 option(ENABLE_ENCODINGS "Enable Encodings" ON)
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_XML "Enable XML" ON)
@@ -308,7 +309,9 @@ if(ENABLE_JWT)
     set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
 endif()
 
-add_subdirectory(Foundation)
+if(ENABLE_FOUNDATION)
+    add_subdirectory(Foundation)
+endif()
 if(ENABLE_ENCODINGS)
     add_subdirectory(Encodings)
     list(APPEND Poco_COMPONENTS "Encodings")
