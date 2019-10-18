@@ -141,7 +141,6 @@ else(POCO_STATIC)
 endif(POCO_STATIC)
 
 if(ENABLE_TESTS)
-  option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
   include(CTest)
   enable_testing()
   message(STATUS "Building with unittests & samples")

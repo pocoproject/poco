@@ -119,7 +119,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
 	{
 		Test* testToRun = *it;
-		if(testToRun->getType() == Test::Type::Long && !long_running) continue;
+		if(testToRun->getType() == Test::Long && !long_running) continue;
 		if (!run(testToRun)) success = false;
 		numberOfTests++;
 	}

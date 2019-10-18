@@ -41,10 +41,6 @@ if(UNIX AND NOT ANDROID)
     target_link_libraries( ${TESTUNIT} pthread)
 endif(UNIX AND NOT ANDROID)
 
-if(ENABLE_LONG_RUNNING_TESTS)
-  target_compile_definitions( ${TESTUNIT} PRIVATE ENABLE_LONG_RUNNING_TESTS)
-endif(ENABLE_LONG_RUNNING_TESTS)
-
 # TestApp
 if(WINCE)
 add_executable( TestApp src/TestApp_WINCE.cpp )
