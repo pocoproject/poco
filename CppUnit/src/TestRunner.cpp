@@ -197,26 +197,26 @@ Test* TestRunner::find(const std::string& name, Test* pTest, const std::string& 
 
 int TestRunner::collectAllTestCases(Test* pTest, std::vector<Test*>& testcases)
 {
+	int added = 0;
 	if (pTest->getType() == Test::Suite)
 	{
 		TestSuite* pSuite = dynamic_cast<TestSuite*>(pTest);
 		
 		if (pSuite)
 		{
-			int added = 0;
 			const std::vector<Test*>& tests = pSuite->tests();
 			for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
 			{
 				added += collectAllTestCases(*it, testcases);
 			}
-			return added;
 		}
 	}
 	else
 	{
 		testcases.push_back(pTest);
-		return 1;
+		added = 1;
 	}
+	return added;
 }
 
 
