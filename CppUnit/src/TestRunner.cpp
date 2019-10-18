@@ -35,7 +35,7 @@ TestRunner::~TestRunner()
 void TestRunner::printBanner()
 {
     _ostr 
-		<< "Usage: driver [-all [-long]] [-print] [-wait] [name] ..." << std::endl
+		<< "Usage: driver [-all] [-long] [-print] [-wait] [name] ..." << std::endl
 		<< "       where name is the name of a test case class" << std::endl;
 }
 
@@ -96,7 +96,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 			if (testToRun)
 			{
-				tests.push_back(testToRun);
+				collectAllTestCases(testToRun, tests);
 			}
 
 			if (!testToRun) 
@@ -112,7 +112,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		tests.clear();
 		for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it) 
 		{
-			tests.push_back(it->second);
+			collectAllTestCases(it->second, tests);
 		}
 	}
 
@@ -191,6 +191,31 @@ Test* TestRunner::find(const std::string& name, Test* pTest, const std::string& 
 			}
 		}
 		return 0;
+	}
+}
+
+
+int TestRunner::collectAllTestCases(Test* pTest, std::vector<Test*>& testcases)
+{
+	if (pTest->getType() == Test::Suite)
+	{
+		TestSuite* pSuite = dynamic_cast<TestSuite*>(pTest);
+		
+		if (pSuite)
+		{
+			int added = 0;
+			const std::vector<Test*>& tests = pSuite->tests();
+			for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
+			{
+				added += collectAllTestCases(*it, testcases);
+			}
+			return added;
+		}
+	}
+	else
+	{
+		testcases.push_back(pTest);
+		return 1;
 	}
 }
 

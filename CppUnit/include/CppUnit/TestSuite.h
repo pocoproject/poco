@@ -86,7 +86,7 @@ inline std::string TestSuite::toString() const
 // Returns the type of the test, see Test::Type
 inline Test::Type TestSuite::getType() const
 {
-	return Test::Type::Normal;
+	return Test::Suite;
 }
 
 // Returns all tests

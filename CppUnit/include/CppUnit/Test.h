@@ -26,8 +26,9 @@ class CppUnit_API Test
 {
 public:
 	enum Type {
-		Normal, // Normal tests are always run
-		Long // Long tests are run only if the -long option is specified
+		Suite, // Only set on CppUnit::TestSuite
+		Normal, // Default TestCase always run
+		Long // Such TestCase will only be run if the `-long` command line argument is set
 	};
 
 public:
@@ -66,7 +67,7 @@ inline std::string Test::toString() const
 // Returns the type of the test, see Test::Type
 inline Test::Type Test::getType() const
 {
-	return Test::Type::Normal;
+	return Test::Normal;
 }
 
 } // namespace CppUnit

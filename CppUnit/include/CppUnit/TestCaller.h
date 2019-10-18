@@ -94,7 +94,7 @@ private:
 	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth))
 
 #define CppUnit_addLongTest(suite, cls, mth) \
-	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth, CppUnit::Test::Type::Long))
+	suite->addTest(new CppUnit::TestCaller<cls>(#mth, &cls::mth, CppUnit::Test::Long))
 
 
 #endif // CppUnit_TestCaller_INCLUDED
