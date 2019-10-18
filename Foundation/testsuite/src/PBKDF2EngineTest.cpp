@@ -74,14 +74,12 @@ void PBKDF2EngineTest::testPBKDF2c()
 void PBKDF2EngineTest::testPBKDF2d()
 {
 	// test vector 4 from RFC 6070
-#if defined(ENABLE_LONG_RUNNING_TESTS)
 	std::string p("password");
 	std::string s("salt");
 	PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(s, 16777216, 20);
 	pbkdf2.update(p);
 	std::string dk = DigestEngine::digestToHex(pbkdf2.digest());
 	assertTrue (dk == "eefe3d61cd4da4e4e9945b3d6ba2158c2634e984");
-#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 
@@ -128,7 +126,7 @@ CppUnit::Test* PBKDF2EngineTest::suite()
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2a);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2b);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2c);
-	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2d);
+	CppUnit_addLongTest(pSuite, PBKDF2EngineTest, testPBKDF2d);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2e);
 	CppUnit_addTest(pSuite, PBKDF2EngineTest, testPBKDF2f);
 
