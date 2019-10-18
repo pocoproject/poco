@@ -117,7 +117,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	}
 
 	for (auto testToRun : tests) {
-		if(testToRun->_type == Test::Type::Long && !long_running) continue;
+		if(testToRun->getType() == Test::Type::Long && !long_running) continue;
 		if (!run(testToRun)) success = false;
 		numberOfTests++;
 	}
