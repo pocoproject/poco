@@ -585,10 +585,19 @@ void Context::initDH(const std::string& dhParamsFile)
 void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
-#if OPENSSL_VERSION_NUMBER >= 0x10100003L
-
-	const std::string &groups( curve.empty() ? "X448:X25519:P-521:P-384:P-256" : curve );
-	if (SSL_CTX_set1_groups_list(_pSSLContext, curve.c_str()) == 0)
+#if OPENSSL_VERSION_NUMBER >= 0x1000200fL
+	const std::string &groups( curve.empty() ?
+#if   OPENSSL_VERSION_NUMBER >= 0x1010100fL
+				   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
+#elif OPENSSL_VERSION_NUMBER >= 0x1010000fL
+	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
+	// it did support X25519 (ECDH using Curve25516).
+				   "X25519:P-521:P-384:P-256"
+#else
+				   "P-521:P-384:P-256"
+#endif
+				   : curve );
+	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
 	{
 		throw SSLContextException("Cannot set ECDH groups", groups);
 	}
