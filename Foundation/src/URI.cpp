@@ -55,7 +55,6 @@ URI::URI(const std::string& scheme, const std::string& pathEtc):
 	_port(0)
 {
 	toLowerInPlace(_scheme);
-	_port = getWellKnownPort();
 	std::string::const_iterator beg = pathEtc.begin();
 	std::string::const_iterator end = pathEtc.end();
 	parsePathEtc(beg, end);
@@ -242,8 +241,6 @@ void URI::setScheme(const std::string& scheme)
 {
 	_scheme = scheme;
 	toLowerInPlace(_scheme);
-	if (_port == 0)
-		_port = getWellKnownPort();
 }
 
 	
@@ -817,9 +814,9 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 			else
 				throw URISyntaxException("bad or invalid port number", port);
 		}
-		else _port = getWellKnownPort();
+		else _port = 0;
 	}
-	else _port = getWellKnownPort();
+	else _port = 0;
 	_host = host;
 	toLowerInPlace(_host);
 }

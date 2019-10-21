@@ -145,6 +145,12 @@ public:
 		/// the given scheme is returned if it is known.
 		/// Otherwise, 0 is returned.
 		
+	unsigned short getRawPort() const;
+		/// Returns the parsed port number part of the URI.
+		///
+		/// If no port number (0) has been specified,
+		/// 0 is returned.
+
 	void setPort(unsigned short port);
 		/// Sets the port number part of the URI.
 		
@@ -375,6 +381,10 @@ inline const std::string& URI::getHost() const
 	return _host;
 }
 
+inline unsigned short URI::getRawPort() const
+{
+	return _port;
+}
 	
 inline const std::string& URI::getPath() const
 {
