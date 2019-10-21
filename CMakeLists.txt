@@ -175,7 +175,7 @@ else()
 endif()
 
 # Allow enabling and disabling components
-option(ENABLE_FOUNDATION "Enable Foundation, required for all components except CppUnit" ON)
+option(ENABLE_FOUNDATION "Enable Foundation, required by all components except CppUnit" ON)
 option(ENABLE_ENCODINGS "Enable Encodings" ON)
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_XML "Enable XML" ON)
