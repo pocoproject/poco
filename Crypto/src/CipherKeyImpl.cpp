@@ -121,11 +121,6 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 
 	case EVP_CIPH_GCM_MODE:
 		return MODE_GCM;
-	//Changed for port OpenSSL -> BoringSSL
-	#if defined(OPENSSL_IS_BORINGSSL)
-	   case EVP_CIPH_CCM_MODE:
-	       return MODE_CCM;
-	#endif
 #endif
 	}
 	throw Poco::IllegalStateException("Unexpected value of EVP_CIPHER_mode()");
