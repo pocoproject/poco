@@ -16,6 +16,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/URI.h"
+#include "Poco/HTTPURI.h"
 #include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
 #include "HTTPSTestServer.h"
@@ -128,6 +129,24 @@ void HTTPSStreamFactoryTest::testError()
 	}
 }
 
+void HTTPSStreamFactoryTest::testUriHeaders()
+{
+   HTTPSTestServer server;
+   HTTPSStreamFactory factory;
+   Poco::HTTPURI uri("http://127.0.0.1/large");
+   uri.setPort(server.port());
+   uri.addHeader("Accept", "image/*");
+   uri.addHeader("User-Agent", "fakeAgent,1.0");
+
+#ifndef POCO_ENABLE_CPP11
+   std::auto_ptr<std::istream> pStr(factory.open(uri));
+#else
+   std::unique_ptr<std::istream> pStr(factory.open(uri));
+#endif // POCO_ENABLE_CPP11
+   std::ostringstream ostr;
+   StreamCopier::copyStream(*pStr.get(), ostr);
+   assert(ostr.str() == HTTPSTestServer::LARGE_BODY);
+}
 
 void HTTPSStreamFactoryTest::setUp()
 {
@@ -148,6 +167,7 @@ CppUnit::Test* HTTPSStreamFactoryTest::suite()
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testRedirect);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testError);
+	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testUriHeaders);
 
 	return pSuite;
 }

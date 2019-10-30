@@ -29,6 +29,7 @@ public:
 	void testRedirect();
 	void testProxy();
 	void testError();
+	void testUriHeaders();
 
 	void setUp();
 	void tearDown();

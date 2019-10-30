@@ -20,6 +20,7 @@
 #include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/URI.h"
+#include "Poco/HTTPURI.h"
 #include "Poco/URIStreamOpener.h"
 #include "Poco/UnbufferedStreamBuf.h"
 #include "Poco/NullStream.h"
@@ -114,13 +115,22 @@ std::istream* HTTPStreamFactory::open(const URI& uri)
 				HTTPCredentials cred(username, password);
 				cred.authenticate(req, res);
 			}
-			
-			req.set("User-Agent", Poco::format("poco/%d.%d.%d", 
+
+			req.set("User-Agent", Poco::format("poco/%d.%d.%d",
 				(POCO_VERSION >> 24) & 0xFF,
 				(POCO_VERSION >> 16) & 0xFF,
 				(POCO_VERSION >> 8) & 0xFF));
 			req.set("Accept", "*/*");
-			
+
+			HTTPURI* extendedUri = dynamic_cast<HTTPURI*>((URI*)&uri);
+			if (extendedUri)
+			{
+				for(HTTPURI::Headers::const_iterator i = extendedUri->getHeaders().begin(); i != extendedUri->getHeaders().end(); ++i)
+				{
+				   req.set(i->first, i->second);
+				}
+			}
+         			
 			pSession->sendRequest(req);
 			std::istream& rs = pSession->receiveResponse(res);
 			bool moved = (res.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY || 
