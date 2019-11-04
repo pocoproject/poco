@@ -72,7 +72,7 @@ public:
 		/// Returns true if both username and password are empty, otherwise false.
 
 	void setHost(const std::string& host);
-		/// Sets the target host.\
+		/// Sets the target host.
 		///
 		/// Used for SSPI-based NTLM authentication only.
 
