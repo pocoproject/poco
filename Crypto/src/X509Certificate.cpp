@@ -22,7 +22,7 @@
 #include <openssl/pem.h>
 #ifdef _WIN32
 // fix for WIN32 header conflict
-#undef X509_NAME 
+#undef X509_NAME
 #endif
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
@@ -66,7 +66,7 @@ X509Certificate::X509Certificate(X509* pCert, bool shared):
 	_pCert(pCert)
 {
 	poco_check_ptr(_pCert);
-	
+
 	if (shared)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
@@ -160,7 +160,7 @@ void X509Certificate::save(std::ostream& stream) const
 	if (!pBIO) throw Poco::IOException("Cannot create BIO for writing certificate");
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+		if (!PEM_write_bio_X509(pBIO, _pCert))
 			throw Poco::IOException("Failed to write certificate to stream");
 
 		char *pData;
@@ -188,7 +188,7 @@ void X509Certificate::save(const std::string& path) const
 	}
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert)) 
+		if (!PEM_write_bio_X509(pBIO, _pCert))
 			throw Poco::WriteFileException("Failed to write certificate to file", path);
 	}
 	catch (...)
@@ -253,7 +253,7 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear(); 
+	domainNames.clear();
 	if (STACK_OF(GENERAL_NAME)* names = static_cast<STACK_OF(GENERAL_NAME)*>(X509_get_ext_d2i(_pCert, NID_subject_alt_name, 0, 0)))
 	{
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
@@ -261,14 +261,14 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
 			if (name->type == GEN_DNS)
 			{
-				const char* data = reinterpret_cast<char*>(ASN1_STRING_get0_data(name->d.ia5));
+				const char* data = reinterpret_cast<const char*>(ASN1_STRING_get0_data(name->d.ia5));
 				std::size_t len = ASN1_STRING_length(name->d.ia5);
 				domainNames.insert(std::string(data, len));
 			}
 		}
 		GENERAL_NAMES_free(names);
 	}
- 
+
 	cmnName = commonName();
 	if (!cmnName.empty() && domainNames.empty())
 	{
@@ -285,7 +285,7 @@ Poco::DateTime X509Certificate::validFrom() const
 	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
 }
 
-	
+
 Poco::DateTime X509Certificate::expiresOn() const
 {
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
