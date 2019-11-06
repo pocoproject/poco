@@ -970,6 +970,9 @@ void SecureSocketImpl::performClientHandshakeLoopCondReceive()
 	performClientHandshakeLoopInit();
 	if (_needData)
 	{
+		if (_recvBuffer.capacity() != IO_BUFFER_SIZE)
+			_recvBuffer.setCapacity(IO_BUFFER_SIZE);
+
 		performClientHandshakeLoopReceive();
 	}
 	else _needData = true;
