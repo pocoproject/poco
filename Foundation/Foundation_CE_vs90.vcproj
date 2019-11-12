@@ -3691,6 +3691,8 @@
 				<File
 					RelativePath=".\src\URI.cpp"/>
 				<File
+					RelativePath=".\src\HTTPURI.cpp"/>
+				<File
 					RelativePath=".\src\URIStreamFactory.cpp"/>
 				<File
 					RelativePath=".\src\URIStreamOpener.cpp"/>

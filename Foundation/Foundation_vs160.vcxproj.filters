@@ -873,6 +873,9 @@
     <ClCompile Include="src\URI.cpp">
       <Filter>URI\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\HTTPURI.cpp">
+      <Filter>URI\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\URIStreamFactory.cpp">
       <Filter>URI\Source Files</Filter>
     </ClCompile>
@@ -905,9 +908,6 @@
     </ClCompile>
     <ClCompile Include="src\VarIterator.cpp">
       <Filter>Dynamic\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HTTPURI.cpp">
-      <Filter>URI\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1679,6 +1679,9 @@
     <ClInclude Include="include\Poco\URI.h">
       <Filter>URI\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\HTTPURI.h">
+      <Filter>URI\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\Poco\URIStreamFactory.h">
       <Filter>URI\Header Files</Filter>
     </ClInclude>
@@ -1855,9 +1858,6 @@
     </ClInclude>
     <ClInclude Include="include\Poco\Dynamic\VarIterator.h">
       <Filter>Dynamic\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\HTTPURI.h">
-      <Filter>URI\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
