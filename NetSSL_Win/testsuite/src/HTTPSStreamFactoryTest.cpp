@@ -133,7 +133,7 @@ void HTTPSStreamFactoryTest::testUriHeaders()
 {
    HTTPSTestServer server;
    HTTPSStreamFactory factory;
-   Poco::HTTPURI uri("http://127.0.0.1/large");
+   Poco::HTTPURI uri("https://127.0.0.1/large");
    uri.setPort(server.port());
    uri.addHeader("Accept", "image/*");
    uri.addHeader("User-Agent", "fakeAgent,1.0");
