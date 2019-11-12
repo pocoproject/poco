@@ -127,15 +127,6 @@ void HTTPURI::addHeader(const std::string& headerName, const std::string& header
 	_headers.push_back(std::make_pair(headerName, headerValue));
 }
 
-void HTTPURI::removeHeader(const std::string& headerName)
-{
-	_headers.erase(std::remove_if(  _headers.begin(), _headers.end(),
-									[&](const std::pair<std::string, std::string>& x) { 
-										return x.first == headerName;
-									}), 
-								    _headers.end());
-}
-
 const HTTPURI::Headers & HTTPURI::getHeaders()
 {
 	return _headers;

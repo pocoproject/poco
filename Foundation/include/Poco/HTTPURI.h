@@ -90,10 +90,11 @@ public:
 		/// Clears all parts of the URI.
 		
 	void addHeader(const std::string& headerName, const std::string& headerValue);
-	
-	void removeHeader(const std::string& headerName);
+		/// Add header to URI
 	
 	const Headers & getHeaders();
+		/// Obtain all headers contained in this HTTPURI
+		
 private:
 	Headers	_headers;
 };
