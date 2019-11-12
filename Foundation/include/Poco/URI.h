@@ -89,7 +89,7 @@ public:
 		/// The path will be made absolute, and a file:// URI
 		/// will be built from it.
 
-	~URI();
+	virtual ~URI();
 		/// Destroys the URI.
 	
 	URI& operator = (const URI& uri);

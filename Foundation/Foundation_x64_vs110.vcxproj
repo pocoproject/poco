@@ -904,6 +904,7 @@
     <ClCompile Include="src\Windows1252Encoding.cpp"/>
     <ClCompile Include="src\FileStreamFactory.cpp"/>
     <ClCompile Include="src\URI.cpp"/>
+	<ClCompile Include="src\HTTPURI.cpp" />
     <ClCompile Include="src\URIStreamFactory.cpp"/>
     <ClCompile Include="src\URIStreamOpener.cpp"/>
     <ClCompile Include="src\Task.cpp"/>
@@ -1173,6 +1174,7 @@
     <ClInclude Include="include\Poco\Windows1252Encoding.h"/>
     <ClInclude Include="include\Poco\FileStreamFactory.h"/>
     <ClInclude Include="include\Poco\URI.h"/>
+    <ClInclude Include="include\Poco\HTTPURI.h"/>
     <ClInclude Include="include\Poco\URIStreamFactory.h"/>
     <ClInclude Include="include\Poco\URIStreamOpener.h"/>
     <ClInclude Include="include\Poco\Task.h"/>

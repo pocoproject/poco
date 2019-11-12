@@ -900,6 +900,7 @@
     <ClCompile Include="src\Unicode.cpp"/>
     <ClCompile Include="src\UnicodeConverter.cpp"/>
     <ClCompile Include="src\URI.cpp"/>
+	<ClCompile Include="src\HTTPURI.cpp" />
     <ClCompile Include="src\URIStreamFactory.cpp"/>
     <ClCompile Include="src\URIStreamOpener.cpp"/>
     <ClCompile Include="src\UTF16Encoding.cpp"/>
@@ -1204,6 +1205,7 @@
     <ClInclude Include="include\Poco\UniqueExpireStrategy.h"/>
     <ClInclude Include="include\Poco\UnWindows.h"/>
     <ClInclude Include="include\Poco\URI.h"/>
+    <ClInclude Include="include\Poco\HTTPURI.h"/>
     <ClInclude Include="include\Poco\URIStreamFactory.h"/>
     <ClInclude Include="include\Poco\URIStreamOpener.h"/>
     <ClInclude Include="include\Poco\UTF16Encoding.h"/>
