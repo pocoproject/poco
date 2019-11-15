@@ -10,6 +10,7 @@
 
 #include "WindowsTestSuite.h"
 #include "WinRegistryTest.h"
+#include "WinServiceTest.h"
 #include "WinConfigurationTest.h"
 
 
@@ -18,6 +19,7 @@ CppUnit::Test* WindowsTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("WindowsTestSuite");
 
 	pSuite->addTest(WinRegistryTest::suite());
+	pSuite->addTest(WinServiceTest::suite());
 	pSuite->addTest(WinConfigurationTest::suite());
 
 	return pSuite;

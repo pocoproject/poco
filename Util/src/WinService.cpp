@@ -45,11 +45,20 @@ WinService::WinService(const std::string& name):
 	if (!_scmHandle) throw SystemException("cannot open Service Control Manager");
 }
 
+WinService::WinService(SC_HANDLE scmHandle, const std::string& name):
+	_scmHandle(scmHandle),
+	_name(name),
+	_svcHandle(0)
+{
+}
+
 
 WinService::~WinService()
 {
 	close();
-	CloseServiceHandle(_scmHandle);
+	if (_scmHandle) {
+		CloseServiceHandle(_scmHandle);
+	}
 }
 
 

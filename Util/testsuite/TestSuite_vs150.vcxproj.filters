@@ -141,6 +141,9 @@
     <ClInclude Include="src\PropertyListConfigurationTest.h">
       <Filter>Configuration\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\WinServiceTest.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UtilTestSuite.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="src\PropertyListConfigurationTest.cpp">
       <Filter>Configuration\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinServiceTest.cpp">
+      <Filter>Windows\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
