@@ -168,6 +168,12 @@ void NameSpace::typeDefs(SymbolTable& table) const
 }
 
 	
+void NameSpace::typeAliases(SymbolTable& table) const
+{
+	extract(Symbol::SYM_TYPEALIAS, table);
+}
+
+
 void NameSpace::enums(SymbolTable& table) const
 {
 	extract(Symbol::SYM_ENUM, table);

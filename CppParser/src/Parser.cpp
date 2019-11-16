@@ -161,7 +161,7 @@ void Parser::parse()
 		std::string m(exc.message());
 		std::string where(_currentPath);
 		where.append("(");
-		where.append(NumberFormatter::format(static_cast<int>(_istr.getCurrentLineNumber())));
+		where.append(NumberFormatter::format(_istr.getCurrentLineNumber()));
 		where.append(")");
 		throw SyntaxException(m, where);
 	}
@@ -493,6 +493,8 @@ const Token* Parser::parseUsing(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_USING));
 	
+	_pCurrentSymbol = 0;
+	int line = _istr.getCurrentLineNumber();
 	pNext = next();
 	if (isKeyword(pNext, IdentifierToken::KW_NAMESPACE))
 	{
@@ -511,13 +513,32 @@ const Token* Parser::parseUsing(const Token* pNext)
 		{
 			std::string id;
 			pNext = parseIdentifier(pNext, id);
-			currentNameSpace()->importSymbol(id);
+			if (isOperator(pNext, OperatorToken::OP_ASSIGN))
+			{
+				pNext = next();
+				std::string decl("using ");
+				decl += id;
+				decl += " = ";
+				while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
+				{
+					append(decl, pNext);
+					pNext = next();
+				}
+				TypeAlias* pTypeAlias = new TypeAlias(decl, currentNameSpace());
+				addSymbol(pTypeAlias, line);
+			}
+			else
+			{
+				currentNameSpace()->importSymbol(id);
+			}
 		}	
 	}
 
 	if (!isOperator(pNext, OperatorToken::OP_SEMICOLON))
 		syntaxError("semicolon");
-	return next();
+	pNext = next();
+	_pCurrentSymbol = 0;
+	return pNext;
 }
 
 

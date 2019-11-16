@@ -108,7 +108,12 @@ bool Parameter::vectorType(const std::string& type, NameSpace* pNS)
 			if (pSym->kind() == Symbol::SYM_TYPEDEF)
 			{
 				TypeDef* pType = static_cast<TypeDef*>(pSym);
-				ret = pType->declaration().find("vector") != std::string::npos;
+				ret = pType->baseType().find("vector") != std::string::npos;
+			}
+			else if (pSym->kind() == Symbol::SYM_TYPEALIAS)
+			{
+				TypeAlias* pType = static_cast<TypeAlias*>(pSym);
+				ret = pType->baseType().find("vector") != std::string::npos;
 			}
 		}
 	}
