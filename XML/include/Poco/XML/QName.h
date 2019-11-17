@@ -48,10 +48,10 @@ public:
 
 	const std::string& localName() const;
 		/// Returns the local part of the name.
-		
+
 	const std::string& prefix() const;
 		/// Returns the namespace prefix of the name.
-		
+
 	std::string& namespaceURI();
 		/// Returns the namespace URI part of the name.
 
@@ -63,22 +63,11 @@ public:
 
 	std::string toString() const;
 		/// Returns a printable representation in the [<namespace>#]<name> form.
-	
+
 public:
-	friend bool operator < (const QName& x, const QName& y)
-	{
-		return x._ns < y._ns || (x._ns == y._ns && x._name < y._name);
-	}
-
-	friend bool operator == (const QName& x, const QName& y)
-	{
-		return x._ns == y._ns && x._name == y._name;
-	}
-
-	friend bool operator != (const QName& x, const QName& y)
-	{
-		return !(x == y);
-	}
+	friend bool operator < (const QName& x, const QName& y);
+	friend bool operator == (const QName& x, const QName& y);
+	friend bool operator != (const QName& x, const QName& y);
 
 private:
 	std::string _ns;
@@ -127,6 +116,24 @@ inline std::string& QName::prefix()
 
 
 XML_API std::ostream& operator << (std::ostream&, const QName&);
+
+
+inline bool operator < (const QName& x, const QName& y)
+{
+	return x._ns < y._ns || (x._ns == y._ns && x._name < y._name);
+}
+
+
+inline bool operator == (const QName& x, const QName& y)
+{
+	return x._ns == y._ns && x._name == y._name;
+}
+
+
+inline bool operator != (const QName& x, const QName& y)
+{
+	return !(x == y);
+}
 
 
 } } // namespace Poco::XML
