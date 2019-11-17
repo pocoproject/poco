@@ -1,8 +1,8 @@
 //
 // StatementImpl.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  StatementImpl
 //
 // Definition of the StatementImpl class.

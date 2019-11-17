@@ -19,6 +19,12 @@ else()
     )
 endif()
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SQLITE_SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(SQLSQLite ${SQLITE_SRCS} )
 add_library(Poco::SQLSQLite ALIAS SQLSQLite)
 set_target_properties(SQLSQLite
@@ -28,7 +34,7 @@ set_target_properties(SQLSQLite
     DEFINE_SYMBOL SQLite_EXPORTS
     )
 
-target_link_libraries(SQLSQLite PUBLIC Poco::SQL ${SQLITE3_LIBRARIES}) # TODO(BJoe) Use namespace target
+target_link_libraries(SQLSQLite PUBLIC Poco::SQL)
 target_include_directories(SQLSQLite
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -37,14 +43,14 @@ target_include_directories(SQLSQLite
     )
 
 if(POCO_UNBUNDLED)
-	target_include_directories(SQLSQLite PUBLIC "${SQLITE3_INCLUDE_DIRS}")
+	target_link_libraries(SQLSQLite PUBLIC SQLite::SQLite3)
 	target_compile_definitions(SQLSQLite PUBLIC POCO_UNBUNDLED)
 else()
 	if(WINCE)
 	    target_compile_definitions(SQLSQLite PRIVATE SQLITE_MSVC_LOCALTIME_API)
 	endif(WINCE)
-	target_compile_definitions(SQLSQLite PRIVATE 
-	    SQLITE_THREADSAFE=1 
+	target_compile_definitions(SQLSQLite PRIVATE
+	    SQLITE_THREADSAFE=1
 	    SQLITE_DISABLE_LFS
 	    SQLITE_OMIT_UTF16
 	    SQLITE_OMIT_PROGRESS_CALLBACK

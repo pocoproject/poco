@@ -140,8 +140,28 @@ HTTPResponse::HTTPResponse(const std::string& version, HTTPStatus status):
 }
 
 
+HTTPResponse::HTTPResponse(const HTTPResponse& other):
+	HTTPMessage(other),
+	_status(other._status),
+	_reason(other._reason)
+{
+}
+
+
 HTTPResponse::~HTTPResponse()
 {
+}
+
+
+HTTPResponse& HTTPResponse::operator = (const HTTPResponse& other)
+{
+	if (this != &other)
+	{
+		HTTPMessage::operator = (other);
+		_status = other._status;
+		_reason = other._reason;
+	}
+	return *this;
 }
 
 

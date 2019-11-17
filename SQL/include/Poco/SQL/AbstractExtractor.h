@@ -1,8 +1,8 @@
 //
 // AbstractExtractor.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AbstractExtractor
 //
 // Definition of the AbstractExtractor class.

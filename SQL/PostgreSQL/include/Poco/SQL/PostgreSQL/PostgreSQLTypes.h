@@ -1,7 +1,7 @@
 //
 // PostgreSQLTypes.h
 //
-// Library: Data/PostgreSQL
+// Library: SQL/PostgreSQL
 // Package: PostgreSQL
 // Module: PostgreSQLTypes
 //

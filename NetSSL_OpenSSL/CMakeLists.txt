@@ -6,6 +6,12 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(NetSSL ${SRCS} )
 add_library(Poco::NetSSL ALIAS NetSSL)
 set_target_properties( NetSSL
@@ -22,6 +28,10 @@ target_include_directories(NetSSL
         $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
+
+if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL AND OPENSSL_USE_STATIC_LIBS)
+	target_link_libraries(NetSSL PUBLIC ws2_32.lib Crypt32.lib)
+endif()
 
 POCO_INSTALL(NetSSL)
 POCO_GENERATE_PACKAGE(NetSSL)

@@ -21,6 +21,8 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Environment.h"
 #include "Poco/Net/NetworkInterface.h"
+#include "Poco/Net/NTLMCredentials.h"
+#include "Poco/Environment.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
@@ -236,6 +238,57 @@ void SMTPClientSession::loginUsingXOAUTH2(const std::string& username, const std
 }
 
 
+void SMTPClientSession::loginUsingNTLM(const std::string& username, const std::string& password)
+{
+	// Implementation is based on:
+	// [MS-SMTPNTLM]: NT LAN Manager (NTLM) Authentication: Simple Mail Transfer Protocol (SMTP) Extension
+	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smtpntlm/50c668f6-5ffc-4616-96df-b5a3f4b3311d
+
+	NTLMCredentials::NegotiateMessage negotiateMsg;
+	std::string user;
+	std::string domain;
+	NTLMCredentials::splitUsername(username, user, domain);
+	negotiateMsg.domain = domain;
+	std::vector<unsigned char> negotiateBuf = NTLMCredentials::formatNegotiateMessage(negotiateMsg);
+
+	std::string response;
+	int status = sendCommand("AUTH NTLM", NTLMCredentials::toBase64(negotiateBuf), response);
+	if (status == 334)
+	{
+		std::vector<unsigned char> buffer = NTLMCredentials::fromBase64(response.substr(4));
+		if (buffer.empty()) throw SMTPException("Invalid NTLM challenge");
+		NTLMCredentials::ChallengeMessage challengeMsg;
+		if (NTLMCredentials::parseChallengeMessage(&buffer[0], buffer.size(), challengeMsg))
+		{
+			if ((challengeMsg.flags & NTLMCredentials::NTLM_FLAG_NEGOTIATE_NTLM2_KEY) == 0)
+			{
+				throw SMTPException("Server does not support NTLMv2 authentication");
+			}
+
+			NTLMCredentials::AuthenticateMessage authenticateMsg;
+			authenticateMsg.flags = challengeMsg.flags;
+			authenticateMsg.target = challengeMsg.target;
+			authenticateMsg.username = user;
+
+			std::vector<unsigned char> lmNonce = NTLMCredentials::createNonce();
+			std::vector<unsigned char> ntlmNonce = NTLMCredentials::createNonce();
+			Poco::UInt64 timestamp = NTLMCredentials::createTimestamp();
+			std::vector<unsigned char> ntlm2Hash = NTLMCredentials::createNTLMv2Hash(user, challengeMsg.target, password);
+
+			authenticateMsg.lmResponse = NTLMCredentials::createLMv2Response(ntlm2Hash, challengeMsg.challenge, lmNonce);
+			authenticateMsg.ntlmResponse = NTLMCredentials::createNTLMv2Response(ntlm2Hash, challengeMsg.challenge, ntlmNonce, challengeMsg.targetInfo, timestamp);
+
+			std::vector<unsigned char> authenticateBuf = NTLMCredentials::formatAuthenticateMessage(authenticateMsg);
+
+			status = sendCommand(NTLMCredentials::toBase64(authenticateBuf), response);
+			if (status != 235) throw SMTPException("NTLM authentication failed", response, status);
+		}
+		else throw SMTPException("Invalid NTLM challenge");
+	}
+	else throw SMTPException("Server does not support NTLM authentication");
+}
+
+
 void SMTPClientSession::login(LoginMethod loginMethod, const std::string& username, const std::string& password)
 {
 	login(Environment::nodeName(), loginMethod, username, password);
@@ -286,6 +339,14 @@ void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMeth
 			loginUsingXOAUTH2(username, password);
 		}
 		else throw SMTPException("The mail service does not support XOAUTH2 authentication", response);
+	}
+	else if (loginMethod == AUTH_NTLM)
+	{
+		if (response.find("NTLM", 0) != std::string::npos)
+		{
+			loginUsingNTLM(username, password);
+		}
+		else throw SMTPException("The mail service does not support NTLM authentication", response);
 	}
 	else if (loginMethod != AUTH_NONE)
 	{

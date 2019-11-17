@@ -1,8 +1,8 @@
 //
 // Range.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Range
 //
 // Definition of the Range class.

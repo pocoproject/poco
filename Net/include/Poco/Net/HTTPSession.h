@@ -165,7 +165,7 @@ protected:
 		/// Connects the underlying socket to the given address
 		/// and sets the socket's receive timeout.	
 
-        virtual void connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress);
+	virtual void connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress);
 		/// Connects the underlying socket to the given address,
 		/// sets the socket's receive timeout
 		/// and sets the source IP address of the underlying socket

@@ -812,7 +812,7 @@ PocoBuild=$rootDir
 PocoBase=$rootDir
 PocoDoc.output=releases/poco-${version}-all-doc
 PocoDoc.version=${version}-all
-Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-IData/include,-IData/include,-IData/MySQL/include,-IData/ODBC/include,-IData/PostgreSQL/include,-IData/SQLite/include, -IData/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
+Includes=-I${postgres32Home}/include,-I${mysql32Home}/include,-ICppParser/include,-ICppUnit/include,-ICrypto/include,-ISQL/include,-IData/include,-ISQL/MySQL/include,-ISQL/ODBC/include,-ISQL/PostgreSQL/include,-ISQL/SQLite/include, -ISQL/SQLite/src,-IFoundation/include,-IJSON/include,-IMongoDB/include,-INet/include,-INetSSL_OpenSSL/include,-INetSSL_Win/include,-IRedis/include,-IUtil/include,-IXML/include,-IZip/include,-ISevenZip/include,-IPDF/include
 """
 	if (os.windows) {
 		def	String javaVCH = VCHome.replace('\\','/')

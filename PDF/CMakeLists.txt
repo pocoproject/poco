@@ -114,6 +114,12 @@ POCO_SOURCES( SRCS libpng
     src/pngwutil.c
 )
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 #TODO: Can we put this with the below includes? PRIVAT eg.
 include_directories( "include/Poco/PDF" ) # zip src
 
@@ -126,7 +132,11 @@ set_target_properties(PDF
     DEFINE_SYMBOL PDF_EXPORTS
     )
 
-target_link_libraries(PDF PUBLIC ${ZLIB_LIBRARIES} Poco::XML Poco::Util)
+if (POCO_UNBUNDLED)
+    target_link_libraries(PDF PUBLIC ZLIB::ZLIB)
+    target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
+endif (POCO_UNBUNDLED)
+target_link_libraries(PDF PUBLIC Poco::XML Poco::Util)
 target_include_directories(PDF
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -136,11 +146,6 @@ target_include_directories(PDF
 
 if(MINGW)
     target_compile_definitions(PDF PRIVATE HPDF_DLL_MAKE_CDECL)
-endif()
-
-if (POCO_UNBUNDLED)
-    target_include_directories(PDF PUBLIC "${ZLIB_INCLUDE_DIRS}")
-    target_compile_definitions(PDF PUBLIC POCO_UNBUNDLED)
 endif()
 
 POCO_INSTALL(PDF)

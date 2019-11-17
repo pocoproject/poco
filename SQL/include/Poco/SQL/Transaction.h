@@ -1,8 +1,8 @@
 //
 // Transaction.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  Transaction
 //
 // Definition of the Transaction class.

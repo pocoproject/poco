@@ -1,7 +1,7 @@
 //
 // SessionPoolContainer.h
 //
-// Library: Data
+// Library: SQL
 // Package: SessionPooling
 // Module:  SessionPoolContainer
 //

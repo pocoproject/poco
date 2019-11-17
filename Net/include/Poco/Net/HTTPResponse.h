@@ -122,16 +122,22 @@ public:
 		/// Creates the HTTPResponse with the given version, status
 		/// and reason phrase.
 		
-	HTTPResponse(HTTPStatus status);
+	explicit HTTPResponse(HTTPStatus status);
 		/// Creates the HTTPResponse with the given status
-		/// an an appropriate reason phrase.
+		/// and an appropriate reason phrase.
 
 	HTTPResponse(const std::string& version, HTTPStatus status);
 		/// Creates the HTTPResponse with the given version, status
-		/// an an appropriate reason phrase.
+		/// and an appropriate reason phrase.
+
+	HTTPResponse(const HTTPResponse& other);
+		/// Creates the HTTPResponse by copying another one.
 
 	virtual ~HTTPResponse();
 		/// Destroys the HTTPResponse.
+
+	HTTPResponse& operator = (const HTTPResponse& other);
+		/// Assignment operator.
 
 	void setStatus(HTTPStatus status);
 		/// Sets the HTTP status code.
@@ -268,9 +274,6 @@ private:
 	
 	HTTPStatus  _status;
 	std::string _reason;
-	
-	HTTPResponse(const HTTPResponse&);
-	HTTPResponse& operator = (const HTTPResponse&);
 };
 
 

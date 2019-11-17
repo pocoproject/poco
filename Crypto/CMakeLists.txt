@@ -6,6 +6,12 @@ POCO_SOURCES_AUTO( SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( SRCS ${HDRS_G})
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(Crypto ${SRCS} )
 add_library(Poco::Crypto ALIAS Crypto)
 set_target_properties(Crypto
@@ -25,7 +31,10 @@ target_include_directories(Crypto
     )
 
 if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL)
-    target_compile_definitions(Crypto PUBLIC POCO_EXTERNAL_OPENSSL)	
+    target_compile_definitions(Crypto PUBLIC POCO_EXTERNAL_OPENSSL)
+	if(OPENSSL_USE_STATIC_LIBS)
+		target_link_libraries(Crypto PUBLIC ws2_32.lib Crypt32.lib)
+	endif()
 endif()
 
 POCO_INSTALL(Crypto)

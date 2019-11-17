@@ -38,6 +38,7 @@ const std::string HTTPMessage::CONTENT_LENGTH             = "Content-Length";
 const std::string HTTPMessage::CONTENT_TYPE               = "Content-Type";
 const std::string HTTPMessage::TRANSFER_ENCODING          = "Transfer-Encoding";
 const std::string HTTPMessage::CONNECTION                 = "Connection";
+const std::string HTTPMessage::PROXY_CONNECTION           = "Proxy-Connection";
 const std::string HTTPMessage::CONNECTION_KEEP_ALIVE      = "Keep-Alive";
 const std::string HTTPMessage::CONNECTION_CLOSE           = "Close";
 const std::string HTTPMessage::EMPTY;
@@ -55,8 +56,26 @@ HTTPMessage::HTTPMessage(const std::string& version):
 }
 
 
+HTTPMessage::HTTPMessage(const HTTPMessage& other):
+	MessageHeader(other),
+	_version(other._version)
+{
+}
+
+
 HTTPMessage::~HTTPMessage()
 {
+}
+
+
+HTTPMessage& HTTPMessage::operator = (const HTTPMessage& other)
+{
+	if (this != &other)
+	{
+		MessageHeader::operator = (other);
+		_version = other._version;
+	}
+	return *this;
 }
 
 

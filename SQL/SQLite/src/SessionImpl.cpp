@@ -1,7 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// Library: Data/SQLite
+// Library: SQL/SQLite
 // Package: SQLite
 // Module:  SessionImpl
 //

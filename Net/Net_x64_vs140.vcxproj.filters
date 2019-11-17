@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="NetCore">
-	  <UniqueIdentifier>{c94a716b-53e1-4386-9dd9-c34b92252f38}</UniqueIdentifier>
+      <UniqueIdentifier>{c94a716b-53e1-4386-9dd9-c34b92252f38}</UniqueIdentifier>
     </Filter>
     <Filter Include="NetCore\Header Files">
       <UniqueIdentifier>{c19f980f-ac2d-438a-bd97-e0b5e5fa3fab}</UniqueIdentifier>
@@ -153,6 +153,15 @@
     </Filter>
     <Filter Include="UDP\Header Files">
       <UniqueIdentifier>{828714c4-311d-4f1d-a8b7-055e63091653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTLM">
+      <UniqueIdentifier>{d3a8a0c8-9a27-451c-bfcd-6b7e4073e27b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTLM\Header Files">
+      <UniqueIdentifier>{3e88da3b-8e4f-46f9-b3c2-1cec6ea4091d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NTLM\Source Files">
+      <UniqueIdentifier>{c70b5e46-03ca-49e3-885d-87dadff67111}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -492,6 +501,16 @@
     <ClInclude Include="include\Poco\Net\UDPSocketReader.h">
       <Filter>UDP\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\PollSet.h" />
+    <ClInclude Include="include\Poco\Net\HTTPNTLMCredentials.h">
+      <Filter>HTTP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\NTLMCredentials.h">
+      <Filter>NTLM\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h">
+      <Filter>NTLM\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp">
@@ -796,6 +815,16 @@
     </ClCompile>
     <ClCompile Include="src\UDPServerParams.cpp">
       <Filter>UDP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PollSet.cpp" />
+    <ClCompile Include="src\NTLMCredentials.cpp">
+      <Filter>NTLM\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SSPINTLMCredentials.cpp">
+      <Filter>NTLM\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HTTPNTLMCredentials.cpp">
+      <Filter>HTTP\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

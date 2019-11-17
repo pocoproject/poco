@@ -1,7 +1,7 @@
 //
 // Extractor.h
 //
-// Library: Data/PostgreSQL
+// Library: SQL/PostgreSQL
 // Package: PostgreSQL
 // Module:  Extractor
 //

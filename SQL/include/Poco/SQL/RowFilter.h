@@ -1,8 +1,8 @@
 //
 // RowFilter.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  RowFilter
 //
 // Definition of the RowFilter class.

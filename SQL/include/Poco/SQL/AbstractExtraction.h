@@ -1,8 +1,8 @@
 //
 // AbstractExtraction.h
 //
-// Library: Data
-// Package: DataCore
+// Library: SQL
+// Package: SQLCore
 // Module:  AbstractExtraction
 //
 // Definition of the AbstractExtraction class.

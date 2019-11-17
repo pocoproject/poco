@@ -47,6 +47,12 @@ POCO_SOURCES( SRCS 7z
 #    src/XzIn.c
 )
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(SevenZip ${SRCS} )
 add_library(Poco::SevenZip ALIAS SevenZip)
 set_target_properties(SevenZip

@@ -32,7 +32,8 @@ objects = \
 	RemoteSyslogChannel RemoteSyslogListener SMTPChannel \
 	WebSocket WebSocketImpl \
 	OAuth10Credentials OAuth20Credentials \
-	PollSet UDPClient UDPServerParams
+	PollSet UDPClient UDPServerParams \
+	NTLMCredentials SSPINTLMCredentials HTTPNTLMCredentials
 
 target         = PocoNet
 target_version = $(LIBVERSION)

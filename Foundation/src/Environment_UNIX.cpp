@@ -61,7 +61,7 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 	std::string var = name;
 	var.append("=");
 	var.append(value);
-	_map[name] = var;
+	std::swap(_map[name], var);
 	if (putenv((char*) _map[name].c_str()))
 	{
 		std::string msg = "cannot set environment variable: ";
@@ -221,7 +221,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 			if (std::sscanf(buffer, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &id[0], &id[1], &id[2], &id[3], &id[4], &id[5]) == 6)
 				return;
 		}
-	}	
+	}
 
 	// if that did not work, search active interfaces
 	int sock = socket(PF_INET, SOCK_DGRAM, 0);
@@ -258,7 +258,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	}
 	for (const char* ptr = buf; ptr < buf + ifc.ifc_len;)
 	{
-		const struct ifreq* ifr = reinterpret_cast<const struct ifreq*>(ptr);		
+		const struct ifreq* ifr = reinterpret_cast<const struct ifreq*>(ptr);
 		int rc = ioctl(sock, SIOCGIFHWADDR, ifr);
 		if (rc != -1)
 		{
