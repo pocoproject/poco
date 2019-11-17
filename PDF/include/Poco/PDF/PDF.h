@@ -50,7 +50,7 @@
 
 
 #if !defined(PDF_API)
-	#if defined (__GNUC__) && (__GNUC__ >= 4)
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
 		#define PDF_API __attribute__ ((visibility ("default")))
 	#else
 		#define PDF_API
