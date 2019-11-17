@@ -20,8 +20,10 @@
 				inffast.h,
 				PDF/include/*.h,
 				CppParser/include/*.h,
-				Data/include/*.h
-				Data/*/include/*.h
+				Data/include/*.h,
+				Data/*/include/*.h,
+				Data/*/*/include/*.h,
+				ratio
 			</exclude>
 		</files>
 		<pages>
