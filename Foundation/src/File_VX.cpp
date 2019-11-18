@@ -286,6 +286,11 @@ void FileImpl::renameToImpl(const std::string& path, bool failOnOverwrite)
 {
 	poco_assert (!_path.empty());
 
+	struct stat st;
+
+	if (stat(path.c_str(), &st) == 0)
+		throw FileExistsException(path, EEXIST);		
+
 	if (rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);
 }
