@@ -52,8 +52,8 @@ protected:
 	void setSizeImpl(FileSizeImpl size);
 	void setWriteableImpl(bool flag = true);
 	void setExecutableImpl(bool flag = true);
-	void copyToImpl(const std::string& path) const;
-	void renameToImpl(const std::string& path);
+	void copyToImpl(const std::string& path, bool failOnOverwrite = false) const;
+	void renameToImpl(const std::string& path, bool failOnOverwrite = false);
 	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
 	bool createFileImpl();

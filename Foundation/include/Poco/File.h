@@ -183,18 +183,24 @@ public:
 		///
 		/// Does nothing on Windows.
 
-	void copyTo(const std::string& path) const;
+	void copyTo(const std::string& path, bool failOnOverwrite = false) const;
 		/// Copies the file (or directory) to the given path.
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
+		/// If failOnOverwrite is set the Method throws an FileExists Exception
+		/// if the File already exists.
 
-	void moveTo(const std::string& path);
+	void moveTo(const std::string& path, bool failOnOverwrite = false);
 		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
+		/// If failOnOverwrite is set the Method throws an FileExists Exception
+		/// if the File already exists.
 
-	void renameTo(const std::string& path);
+	void renameTo(const std::string& path, bool failOnOverwrite = false);
 		/// Renames the file to the new name.
+		/// If failOnOverwrite is set the Method throws an FileExists Exception
+		/// if the File already exists.
 
 	void linkTo(const std::string& path, LinkType type = LINK_SYMBOLIC) const;
 		/// Creates a link (symbolic or hard, depending on type argument)
@@ -253,7 +259,7 @@ public:
 		/// exception for the last file-related error.
 
 protected:
-	void copyDirectory(const std::string& path) const;
+	void copyDirectory(const std::string& path, bool failOnOverwrite = false) const;
 		/// Copies a directory. Used internally by copyTo().
 };
 

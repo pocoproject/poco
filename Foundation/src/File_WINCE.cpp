@@ -277,18 +277,18 @@ void FileImpl::setExecutableImpl(bool flag)
 }
 
 
-void FileImpl::copyToImpl(const std::string& path) const
+void FileImpl::copyToImpl(const std::string& path, bool failOnOverwrite) const
 {
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
 	convertPath(path, upath);
-	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) == 0)
+	if (CopyFileW(_upath.c_str(), upath.c_str(), failOnOverwrite) == 0)
 		handleLastErrorImpl(_path);
 }
 
 
-void FileImpl::renameToImpl(const std::string& path)
+void FileImpl::renameToImpl(const std::string& path, bool failOnOverwrite)
 {
 	poco_assert (!_path.empty());
 
