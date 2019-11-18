@@ -288,7 +288,7 @@ void FileImpl::renameToImpl(const std::string& path, bool failOnOverwrite)
 
 	struct stat st;
 
-	if (stat(path.c_str(), &st) == 0)
+	if (stat(path.c_str(), &st) == 0 && failOnOverwrite)
 		throw FileExistsException(path, EEXIST);		
 
 	if (rename(_path.c_str(), path.c_str()) != 0)
