@@ -352,7 +352,7 @@ void WinRegistryKey::deleteKey()
 		std::string subKey(_subKey);
 		subKey += "\\";
 		subKey += *it;
-		WinRegistryKey subRegKey(_hRootKey, subKey);
+		WinRegistryKey subRegKey(_hRootKey, subKey, _readOnly, _extraSam);
 		subRegKey.deleteKey();
 	}
 
