@@ -95,6 +95,9 @@ public:
 
 	bool isRunning() const;
 		/// Returns true if the service is currently running.
+
+	bool isStopped() const;
+		/// Returns true if the service is currently stopped.
 		
 	void start();
 		/// Starts the service.

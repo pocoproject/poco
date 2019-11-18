@@ -164,6 +164,15 @@ bool WinService::isRunning() const
 	return ss.dwCurrentState == SERVICE_RUNNING;
 }
 
+bool WinService::isStopped() const 
+{
+	open();
+	SERVICE_STATUS ss;
+	if (!QueryServiceStatus(_svcHandle, &ss))
+		throw SystemException("cannot query service status", _name);
+	return ss.dwCurrentState == SERVICE_STOPPED;
+}
+
 	
 void WinService::start()
 {

@@ -4,6 +4,7 @@
 
 #include "Poco/Util/Util.h"
 #include "CppUnit/TestCase.h"
+#include "Poco/Util/WinService.h"
 
 
 class WinServiceTest : public CppUnit::TestCase {
@@ -12,6 +13,7 @@ public:
 	~WinServiceTest();
 
 	void testServiceCouldCreatedWithExistingConnection();
+	void testServiceReturnsTrueIfStopped();
 
 	void setUp();
 	void tearDown();
@@ -19,6 +21,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	Poco::Util::WinService spoolerService_{ "Spooler" };
 };
 
 
