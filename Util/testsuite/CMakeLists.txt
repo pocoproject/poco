@@ -9,6 +9,7 @@ POCO_HEADERS_AUTO( TEST_SRCS ${HDRS_G})
 POCO_SOURCES_AUTO_PLAT( TEST_SRCS WIN32
     src/WinConfigurationTest.cpp
     src/WinRegistryTest.cpp
+    src/WinServiceTest.cpp
     src/WindowsTestSuite.cpp
 )
 
