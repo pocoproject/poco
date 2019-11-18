@@ -138,6 +138,9 @@
     <ClInclude Include="src\TimerTestSuite.h">
       <Filter>Timer\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\WinServiceTest.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UtilTestSuite.cpp">
@@ -217,6 +220,9 @@
     </ClCompile>
     <ClCompile Include="src\TimerTestSuite.cpp">
       <Filter>Timer\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinServiceTest.cpp">
+      <Filter>Windows\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

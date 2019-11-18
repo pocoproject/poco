@@ -52,6 +52,13 @@ public:
 	WinService(const std::string& name);
 		/// Creates the WinService, using the given service name.
 
+
+	WinService(SC_HANDLE scmHandle, const std::string& name);
+		/// Creates the WinService, using the given connection to
+		/// a Windows Service Manager and the given service name.
+		///
+		/// The class will close the given scmHandle on destruction
+
 	~WinService();
 		/// Destroys the WinService.
 
