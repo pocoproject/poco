@@ -139,6 +139,8 @@ public:
 
 	void setFailureActions(FailureActionVector failureActions, const std::string& command = "", const std::string& rebootMessage = "");
 		/// Sets the Failure Actions for the service.
+		/// If one of the Actions is SVC_RUN_COMMAND the command Parameter is added.
+		/// If one of the Actions is SVC_REBOOT the Reboot Message is set.
 
 	FailureActionTypeVector getFailureActions() const;
 		/// Returns the Failure Actions for the service.

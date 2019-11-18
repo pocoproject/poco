@@ -30,7 +30,7 @@ void WinServiceTest::testServiceReturnsTrueIfStopped() {
 }
 
 void WinServiceTest::testServiceReturnsFailureActionConfigured() {
-	auto failureActions = spoolerService_.getFailureAction();
+	auto failureActions = spoolerService_.getFailureActions();
 	assertEqual(3, failureActions.size());
 
 	assertEqual(WinService::SVC_RESTART, failureActions[0]);
