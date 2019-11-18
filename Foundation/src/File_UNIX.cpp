@@ -380,7 +380,7 @@ void FileImpl::copyToImpl(const std::string& path, bool failOnOverwrite) const
 }
 
 
-void FileImpl::renameToImpl(const std::string& path, bool failOnOverwrite = false)
+void FileImpl::renameToImpl(const std::string& path, bool failOnOverwrite)
 {
 	poco_assert (!_path.empty());
 
