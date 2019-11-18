@@ -132,6 +132,9 @@
     <ClInclude Include="src\WinRegistryTest.h">
       <Filter>Windows\Header Files</Filter>
     </ClInclude>
+	<ClInclude Include="src\WinServiceTest.h">
+      <Filter>Windows\Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\TimerTest.h">
       <Filter>Timer\Header Files</Filter>
     </ClInclude>
@@ -213,6 +216,9 @@
       <Filter>Windows\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\WinRegistryTest.cpp">
+      <Filter>Windows\Source Files</Filter>
+    </ClCompile>
+	<ClCompile Include="src\WinServiceTest.cpp">
       <Filter>Windows\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TimerTest.cpp">

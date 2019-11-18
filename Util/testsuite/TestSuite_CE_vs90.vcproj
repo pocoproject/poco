@@ -594,6 +594,8 @@
 					RelativePath=".\src\WindowsTestSuite.h"/>
 				<File
 					RelativePath=".\src\WinRegistryTest.h"/>
+				<File
+					RelativePath=".\src\WinServiceTest.h"/>
 			</Filter>
 			<Filter
 				Name="Source Files">
@@ -603,6 +605,8 @@
 					RelativePath=".\src\WindowsTestSuite.cpp"/>
 				<File
 					RelativePath=".\src\WinRegistryTest.cpp"/>
+				<File
+					RelativePath=".\src\WinServiceTest.cpp"/>
 			</Filter>
 		</Filter>
 		<Filter
