@@ -329,7 +329,7 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 	delete[] actions;
 }
 
-WinService::FailureActionTypeVector WinService::getFailureAction() const {
+WinService::FailureActionTypeVector WinService::getFailureActions() const {
 	open();
 	int size = 4096;
 	DWORD bytesNeeded;

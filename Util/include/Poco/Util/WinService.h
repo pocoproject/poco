@@ -140,7 +140,7 @@ public:
 	void setFailureActions(FailureActionVector failureActions, const std::string& command = "", const std::string& rebootMessage = "");
 		/// Sets the Failure Actions for the service.
 
-	FailureActionTypeVector getFailureAction() const;
+	FailureActionTypeVector getFailureActions() const;
 		/// Returns the Failure Actions for the service.
 		
 	void setDescription(const std::string& description);
