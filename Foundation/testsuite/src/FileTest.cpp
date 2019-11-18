@@ -516,10 +516,7 @@ void FileTest::testCopyDirectoryFailIfExists()
 	std::ofstream ostr2(pf2.toString().c_str());
 	ostr2 << "Hello, world!" << std::endl;
 	ostr2.close();
-
-
-
-
+	   	 
 	Path pd2("destination");
 	File fd2(pd2);
 	try {
