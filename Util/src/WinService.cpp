@@ -332,7 +332,7 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 WinService::FailureActionTypeVector WinService::getFailureAction() const {
 	open();
 	int size = 4096;
-	DWORD_PTR bytesNeeded;
+	DWORD bytesNeeded;
 	POCO_LPSERVICE_FAILURE_ACTION pSvcFailureAction = (POCO_LPSERVICE_FAILURE_ACTION)LocalAlloc(LPTR, size);
 	if (!pSvcFailureAction) throw OutOfMemoryException("cannot allocate service failure action buffer");
 	try {
