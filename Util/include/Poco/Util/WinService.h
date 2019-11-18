@@ -20,12 +20,15 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/UnWindows.h"
+#include <vector>
 
 
 #if defined(POCO_WIN32_UTF8)
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGW
+#define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSW
 #else
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGA
+#define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSA
 #endif
 
 
@@ -49,6 +52,15 @@ public:
 		SVC_DISABLED
 	};
 	
+	enum FailureAction 
+	{
+		SVC_NONE,
+		SVC_REBOOT,
+		SVC_RESTART,
+		SVC_RUN_COMMAND
+	};
+	typedef std::vector<FailureAction> FailureActionVector;
+
 	WinService(const std::string& name);
 		/// Creates the WinService, using the given service name.
 
@@ -116,6 +128,9 @@ public:
 		
 	Startup getStartup() const;
 		/// Returns the startup mode for the service.
+
+	FailureActionVector getFailureAction() const;
+		/// Returns the Failure Actions for the service.
 		
 	void setDescription(const std::string& description);
 		/// Sets the service description in the registry.

@@ -14,6 +14,7 @@ public:
 
 	void testServiceCouldCreatedWithExistingConnection();
 	void testServiceReturnsTrueIfStopped();
+	void testServiceReturnsFailureActionConfigured();
 
 	void setUp();
 	void tearDown();

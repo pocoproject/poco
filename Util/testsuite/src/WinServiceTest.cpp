@@ -29,6 +29,15 @@ void WinServiceTest::testServiceReturnsTrueIfStopped() {
 	assertTrue(spoolerService_.isStopped());
 }
 
+void WinServiceTest::testServiceReturnsFailureActionConfigured() {
+	auto failureActions = spoolerService_.getFailureAction();
+	assertEqual(3, failureActions.size());
+
+	assertEqual(WinService::SVC_RESTART, failureActions[0]);
+	assertEqual(WinService::SVC_RESTART, failureActions[1]);
+	assertEqual(WinService::SVC_NONE, failureActions[2]);
+}
+
 
 void WinServiceTest::setUp() {
 }
@@ -47,6 +56,7 @@ CppUnit::Test* WinServiceTest::suite() {
 
 	CppUnit_addTest(pSuite, WinServiceTest, testServiceCouldCreatedWithExistingConnection);
 	CppUnit_addTest(pSuite, WinServiceTest, testServiceReturnsTrueIfStopped);
+	CppUnit_addTest(pSuite, WinServiceTest, testServiceReturnsFailureActionConfigured);
 
 	return pSuite;
 }

@@ -255,6 +255,58 @@ WinService::Startup WinService::getStartup() const
 	return result;
 }
 
+WinService::FailureActionVector WinService::getFailureAction() const {
+	open();
+	int size = 4096;
+	DWORD_PTR bytesNeeded;
+	POCO_LPSERVICE_FAILURE_ACTION pSvcFailureAction = (POCO_LPSERVICE_FAILURE_ACTION)LocalAlloc(LPTR, size);
+	if (!pSvcFailureAction) throw OutOfMemoryException("cannot allocate service failure action buffer");
+	try {
+#if defined(POCO_WIN32_UTF8)
+		while (!QueryServiceConfig2W(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, (LPBYTE)pSvcFailureAction, size, &bytesNeeded))
+#else
+		while (!QueryServiceConfig2A(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, (LPBYTE)pSvcFailureAction, size, &bytesNeeded))
+#endif
+		{
+			if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+				LocalFree(pSvcFailureAction);
+				size = bytesNeeded;
+				pSvcFailureAction = (POCO_LPSERVICE_FAILURE_ACTION)LocalAlloc(LPTR, size);
+			} else throw SystemException("cannot query service configuration", _name);
+		}
+	}
+	catch (...) 
+	{
+		LocalFree(pSvcFailureAction);
+		throw;
+	}
+	FailureActionVector result(3, SVC_NONE);
+	for (auto i = 0; i < pSvcFailureAction->cActions; i++) 
+	{
+		switch (pSvcFailureAction->lpsaActions->Type) 
+		{
+		case SC_ACTION_NONE:
+			result[i] = SVC_NONE;
+			break;
+		case SC_ACTION_RESTART:
+			result[i] = SVC_RESTART;
+			break;
+		case SC_ACTION_REBOOT:
+			result[i] = SVC_REBOOT;
+			break;
+		case SC_ACTION_RUN_COMMAND:
+			result[i] = SVC_RUN_COMMAND;
+			break;
+		default:
+			result[i] = SVC_NONE;
+		}
+		++pSvcFailureAction->lpsaActions;
+	}
+
+	LocalFree(pSvcFailureAction);
+	return result;
+}
+
 
 void WinService::setDescription(const std::string& description)
 {
