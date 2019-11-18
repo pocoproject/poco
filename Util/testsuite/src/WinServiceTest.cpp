@@ -47,7 +47,6 @@ void WinServiceTest::tearDown() {
 	if (spoolerService_.isStopped()) {
 		spoolerService_.start();
 	}
-	
 }
 
 

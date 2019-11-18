@@ -255,7 +255,81 @@ WinService::Startup WinService::getStartup() const
 	return result;
 }
 
-WinService::FailureActionVector WinService::getFailureAction() const {
+void WinService::setFailureActions(FailureActionVector failureActions, const std::string& command, const std::string& rebootMessage)
+{
+	open();
+	auto actions = new SC_ACTION[3];
+#if defined(POCO_WIN32_UTF8)
+	SERVICE_FAILURE_ACTIONSW ac;
+	
+	std::wstring urebootMessage;
+	Poco::UnicodeConverter::toUTF16(rebootMessage, urebootMessage);
+	std::vector<wchar_t> rebootMessageVector{ urebootMessage.begin(), urebootMessage.end() };
+	rebootMessageVector.push_back('\0');
+	
+	std::wstring uComamnd;
+	Poco::UnicodeConverter::toUTF16(command, uComamnd);
+	std::vector<wchar_t> commandVector{ uComamnd.begin(), uComamnd.end() };
+	commandVector.push_back('\0');
+#else
+	SERVICE_FAILURE_ACTIONSA ac;
+
+	std::vector<char> rebootMessageVector{ rebootMessage.begin(), rebootMessage.end() };
+	rebootMessageVector.push_back('\0');
+
+	std::vector<char> commandVector{ command.begin(), command.end() };
+	commandVector.push_back('\0');
+#endif
+	for (auto i = 0; i < 3; i++) 		
+	{
+		switch (failureActions[i].type) 
+		{
+		case SVC_REBOOT:
+			actions[i].Type = SC_ACTION_REBOOT;
+			actions[i].Delay = failureActions[i].delay;
+#if defined(POCO_WIN32_UTF8)
+			ac.lpRebootMsg = &rebootMessageVector[0];
+#else
+			ac.lpRebootMsg = &rebootMessageVector[0];
+#endif
+			break;
+		case SVC_RESTART:
+			actions[i].Type = SC_ACTION_RESTART;
+			actions[i].Delay = failureActions[i].delay;
+			break;
+		case SVC_RUN_COMMAND:
+			actions[i].Type = SC_ACTION_RUN_COMMAND;
+			actions[i].Delay = failureActions[i].delay;
+#if defined(POCO_WIN32_UTF8)
+			ac.lpCommand = &commandVector[0];
+#else
+			ac.lpCommand = &commandVector[0];
+#endif
+			break;
+		default:
+			actions[i].Type = SC_ACTION_NONE;
+			actions[i].Delay = 0;
+			break;
+		}
+	}
+
+	ac.dwResetPeriod = 0;
+	ac.cActions = 3;
+	ac.lpsaActions = actions;
+
+#if defined(POCO_WIN32_UTF8)
+	if (!ChangeServiceConfig2W(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, &ac))
+#else
+	if (!ChangeServiceConfig2A(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, &ac))
+#endif
+	{
+		delete[] actions;
+		throw SystemException("cannot configure service", _name);
+	}
+	delete[] actions;
+}
+
+WinService::FailureActionTypeVector WinService::getFailureAction() const {
 	open();
 	int size = 4096;
 	DWORD_PTR bytesNeeded;
@@ -280,7 +354,7 @@ WinService::FailureActionVector WinService::getFailureAction() const {
 		LocalFree(pSvcFailureAction);
 		throw;
 	}
-	FailureActionVector result(3, SVC_NONE);
+	FailureActionTypeVector result(3, SVC_NONE);
 	for (auto i = 0; i < pSvcFailureAction->cActions; i++) 
 	{
 		switch (pSvcFailureAction->lpsaActions->Type) 

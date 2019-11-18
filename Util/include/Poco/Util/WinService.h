@@ -52,14 +52,22 @@ public:
 		SVC_DISABLED
 	};
 	
-	enum FailureAction 
+	enum FailureActionType 
 	{
 		SVC_NONE,
 		SVC_REBOOT,
 		SVC_RESTART,
 		SVC_RUN_COMMAND
 	};
+
+	struct FailureAction {
+		FailureActionType type;
+		int delay;
+	};
+
 	typedef std::vector<FailureAction> FailureActionVector;
+	typedef std::vector<FailureActionType> FailureActionTypeVector;
+
 
 	WinService(const std::string& name);
 		/// Creates the WinService, using the given service name.
@@ -129,7 +137,10 @@ public:
 	Startup getStartup() const;
 		/// Returns the startup mode for the service.
 
-	FailureActionVector getFailureAction() const;
+	void setFailureActions(FailureActionVector failureActions, const std::string& command = "", const std::string& rebootMessage = "");
+		/// Sets the Failure Actions for the service.
+
+	FailureActionTypeVector getFailureAction() const;
 		/// Returns the Failure Actions for the service.
 		
 	void setDescription(const std::string& description);
