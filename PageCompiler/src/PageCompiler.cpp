@@ -58,7 +58,8 @@ public:
 		_helpRequested(false),
 		_generateOSPCode(false),
 		_generateApacheCode(false),
-		_emitLineDirectives(true)
+		_emitLineDirectives(true),
+		_escape(false)
 	{
 	}
 
@@ -141,6 +142,12 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
+
+		options.addOption(
+			Option("escape", "e", "Escape special HTML characters (<, >, \", &) in <%= %> expressions.")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleEscape)));
 	}
 
 	void handleHelp(const std::string& name, const std::string& value)
@@ -194,6 +201,11 @@ protected:
 	void handleNoLine(const std::string& name, const std::string& value)
 	{
 		_emitLineDirectives = false;
+	}
+
+	void handleEscape(const std::string& name, const std::string& value)
+	{
+		_escape = true;
 	}
 
 	void displayHelp()
@@ -329,6 +341,12 @@ protected:
 	void compile(const std::string& path)
 	{
 		Page page;
+
+		if (_escape)
+		{
+			page.set("page.escape", "true");
+		}
+
 		std::string clazz;
 		parse(path, page, clazz);
 		write(path, page, clazz);
@@ -365,6 +383,7 @@ private:
 	bool _generateOSPCode;
 	bool _generateApacheCode;
 	bool _emitLineDirectives;
+	bool _escape;
 	std::string _outputDir;
 	std::string _headerOutputDir;
 	std::string _headerPrefix;

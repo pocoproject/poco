@@ -81,7 +81,12 @@ void Net_API uninitializeNetwork();
 	/// (Windows only, no-op elsewhere)
 
 
-}} // namespace Poco::Net
+std::string htmlize(const std::string& str);
+	/// Returns a copy of html with reserved HTML
+	/// characters (<, >, ", &) propery escaped.
+
+
+} } // namespace Poco::Net
 
 
 //

@@ -55,6 +55,10 @@ void CodeWriter::writeImpl(std::ostream& ostr, const std::string& headerFileName
 {
 	ostr << "#include \"" << headerFileName << "\"\n";
 	writeImplIncludes(ostr);
+	if (_page.getBool("page.escape", false))
+	{
+		ostr << "#include \"Poco/Net/EscapeHTMLStream.h\"\n";
+	}
 	if (_page.getBool("page.compressed", false))
 	{
 		ostr << "#include \"Poco/DeflatingStream.h\"\n";
@@ -349,6 +353,7 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 
 void CodeWriter::writeContent(std::ostream& ostr)
 {
+	bool escape(_page.getBool("page.escape", false));
 	bool buffered(_page.getBool("page.buffered", false));
 	bool chunked(_page.getBool("page.chunked", !buffered));
 	bool compressed(_page.getBool("page.compressed", false));
@@ -359,6 +364,10 @@ void CodeWriter::writeContent(std::ostream& ostr)
 	if (buffered)
 	{
 		ostr << "\tstd::stringstream responseStream;\n";
+		if (escape)
+		{
+			ostr << "\tPoco::Net::EscapeHTMLOutputStream _escapeStream(responseStream);\n";
+		}
 		ostr << cleanupHandler(_page.handler().str());
 		if (!chunked)
 		{
@@ -371,12 +380,20 @@ void CodeWriter::writeContent(std::ostream& ostr)
 		ostr << "\tstd::ostream& _responseStream = response.send();\n"
 		     << "\tPoco::DeflatingOutputStream _gzipStream(_responseStream, Poco::DeflatingStreamBuf::STREAM_GZIP, " << compressionLevel << ");\n"
 		     << "\tstd::ostream& responseStream = _compressResponse ? _gzipStream : _responseStream;\n";
+		if (escape)
+		{
+			ostr << "\tPoco::Net::EscapeHTMLOutputStream _escapeStream(responseStream);\n";
+		}
 		ostr << cleanupHandler(_page.handler().str());
 		ostr << "\tif (_compressResponse) _gzipStream.close();\n";
 	}
 	else
 	{
 		ostr << "\tstd::ostream& responseStream = response.send();\n";
+		if (escape)
+		{
+			ostr << "\tPoco::Net::EscapeHTMLOutputStream _escapeStream(responseStream);\n";
+		}
 		ostr << cleanupHandler(_page.handler().str());
 	}
 }
