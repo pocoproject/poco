@@ -20,12 +20,15 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/UnWindows.h"
+#include <vector>
 
 
 #if defined(POCO_WIN32_UTF8)
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGW
+#define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSW
 #else
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGA
+#define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSA
 #endif
 
 
@@ -49,8 +52,32 @@ public:
 		SVC_DISABLED
 	};
 	
+	enum FailureActionType 
+	{
+		SVC_NONE,
+		SVC_REBOOT,
+		SVC_RESTART,
+		SVC_RUN_COMMAND
+	};
+
+	struct FailureAction {
+		FailureActionType type;
+		int delay;
+	};
+
+	typedef std::vector<FailureAction> FailureActionVector;
+	typedef std::vector<FailureActionType> FailureActionTypeVector;
+
+
 	WinService(const std::string& name);
 		/// Creates the WinService, using the given service name.
+
+
+	WinService(SC_HANDLE scmHandle, const std::string& name);
+		/// Creates the WinService, using the given connection to
+		/// a Windows Service Manager and the given service name.
+		///
+		/// The class will close the given scmHandle on destruction
 
 	~WinService();
 		/// Destroys the WinService.
@@ -88,6 +115,9 @@ public:
 
 	bool isRunning() const;
 		/// Returns true if the service is currently running.
+
+	bool isStopped() const;
+		/// Returns true if the service is currently stopped.
 		
 	void start();
 		/// Starts the service.
@@ -106,6 +136,14 @@ public:
 		
 	Startup getStartup() const;
 		/// Returns the startup mode for the service.
+
+	void setFailureActions(FailureActionVector failureActions, const std::string& command = "", const std::string& rebootMessage = "");
+		/// Sets the Failure Actions for the service.
+		/// If one of the Actions is SVC_RUN_COMMAND the command Parameter is added.
+		/// If one of the Actions is SVC_REBOOT the Reboot Message is set.
+
+	FailureActionTypeVector getFailureActions() const;
+		/// Returns the Failure Actions for the service.
 		
 	void setDescription(const std::string& description);
 		/// Sets the service description in the registry.

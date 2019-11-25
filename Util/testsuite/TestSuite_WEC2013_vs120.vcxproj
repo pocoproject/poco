@@ -25,6 +25,7 @@
     <ClInclude Include="src\WinConfigurationTest.h"/>
     <ClInclude Include="src\WindowsTestSuite.h"/>
     <ClInclude Include="src\WinRegistryTest.h"/>
+    <ClInclude Include="src\WinServiceTest.h"/>
     <ClInclude Include="src\XMLConfigurationTest.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -76,6 +77,7 @@
     <ClCompile Include="src\WinConfigurationTest.cpp"/>
     <ClCompile Include="src\WindowsTestSuite.cpp"/>
     <ClCompile Include="src\WinRegistryTest.cpp"/>
+    <ClCompile Include="src\WinServiceTest.cpp"/>
     <ClCompile Include="src\XMLConfigurationTest.cpp"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>

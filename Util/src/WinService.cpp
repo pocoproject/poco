@@ -47,6 +47,13 @@ WinService::WinService(const std::string& name):
 	if (!_scmHandle) throw SystemException("cannot open Service Control Manager");
 }
 
+WinService::WinService(SC_HANDLE scmHandle, const std::string& name):
+	_scmHandle(scmHandle),
+	_name(name),
+	_svcHandle(0)
+{
+	if (!_scmHandle) throw SystemException("Service Control Manager not connected");
+}
 
 WinService::~WinService()
 {
@@ -157,6 +164,15 @@ bool WinService::isRunning() const
 	return ss.dwCurrentState == SERVICE_RUNNING;
 }
 
+bool WinService::isStopped() const 
+{
+	open();
+	SERVICE_STATUS ss;
+	if (!QueryServiceStatus(_svcHandle, &ss))
+		throw SystemException("cannot query service status", _name);
+	return ss.dwCurrentState == SERVICE_STOPPED;
+}
+
 	
 void WinService::start()
 {
@@ -236,6 +252,132 @@ WinService::Startup WinService::getStartup() const
 		result = SVC_MANUAL_START;
 	}
 	LocalFree(pSvcConfig);
+	return result;
+}
+
+void WinService::setFailureActions(FailureActionVector failureActions, const std::string& command, const std::string& rebootMessage)
+{
+	open();
+	auto actions = new SC_ACTION[3];
+#if defined(POCO_WIN32_UTF8)
+	SERVICE_FAILURE_ACTIONSW ac;
+	
+	std::wstring urebootMessage;
+	Poco::UnicodeConverter::toUTF16(rebootMessage, urebootMessage);
+	std::vector<wchar_t> rebootMessageVector{ urebootMessage.begin(), urebootMessage.end() };
+	rebootMessageVector.push_back('\0');
+	
+	std::wstring uComamnd;
+	Poco::UnicodeConverter::toUTF16(command, uComamnd);
+	std::vector<wchar_t> commandVector{ uComamnd.begin(), uComamnd.end() };
+	commandVector.push_back('\0');
+#else
+	SERVICE_FAILURE_ACTIONSA ac;
+
+	std::vector<char> rebootMessageVector{ rebootMessage.begin(), rebootMessage.end() };
+	rebootMessageVector.push_back('\0');
+
+	std::vector<char> commandVector{ command.begin(), command.end() };
+	commandVector.push_back('\0');
+#endif
+	for (auto i = 0; i < 3; i++) 		
+	{
+		switch (failureActions[i].type) 
+		{
+		case SVC_REBOOT:
+			actions[i].Type = SC_ACTION_REBOOT;
+			actions[i].Delay = failureActions[i].delay;
+#if defined(POCO_WIN32_UTF8)
+			ac.lpRebootMsg = &rebootMessageVector[0];
+#else
+			ac.lpRebootMsg = &rebootMessageVector[0];
+#endif
+			break;
+		case SVC_RESTART:
+			actions[i].Type = SC_ACTION_RESTART;
+			actions[i].Delay = failureActions[i].delay;
+			break;
+		case SVC_RUN_COMMAND:
+			actions[i].Type = SC_ACTION_RUN_COMMAND;
+			actions[i].Delay = failureActions[i].delay;
+#if defined(POCO_WIN32_UTF8)
+			ac.lpCommand = &commandVector[0];
+#else
+			ac.lpCommand = &commandVector[0];
+#endif
+			break;
+		default:
+			actions[i].Type = SC_ACTION_NONE;
+			actions[i].Delay = 0;
+			break;
+		}
+	}
+
+	ac.dwResetPeriod = 0;
+	ac.cActions = 3;
+	ac.lpsaActions = actions;
+
+#if defined(POCO_WIN32_UTF8)
+	if (!ChangeServiceConfig2W(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, &ac))
+#else
+	if (!ChangeServiceConfig2A(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, &ac))
+#endif
+	{
+		delete[] actions;
+		throw SystemException("cannot configure service", _name);
+	}
+	delete[] actions;
+}
+
+WinService::FailureActionTypeVector WinService::getFailureActions() const {
+	open();
+	int size = 4096;
+	DWORD bytesNeeded;
+	POCO_LPSERVICE_FAILURE_ACTION pSvcFailureAction = (POCO_LPSERVICE_FAILURE_ACTION)LocalAlloc(LPTR, size);
+	if (!pSvcFailureAction) throw OutOfMemoryException("cannot allocate service failure action buffer");
+	try {
+#if defined(POCO_WIN32_UTF8)
+		while (!QueryServiceConfig2W(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, (LPBYTE)pSvcFailureAction, size, &bytesNeeded))
+#else
+		while (!QueryServiceConfig2A(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, (LPBYTE)pSvcFailureAction, size, &bytesNeeded))
+#endif
+		{
+			if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+				LocalFree(pSvcFailureAction);
+				size = bytesNeeded;
+				pSvcFailureAction = (POCO_LPSERVICE_FAILURE_ACTION)LocalAlloc(LPTR, size);
+			} else throw SystemException("cannot query service configuration", _name);
+		}
+	}
+	catch (...) 
+	{
+		LocalFree(pSvcFailureAction);
+		throw;
+	}
+	FailureActionTypeVector result(3, SVC_NONE);
+	for (auto i = 0; i < pSvcFailureAction->cActions; i++) 
+	{
+		switch (pSvcFailureAction->lpsaActions->Type) 
+		{
+		case SC_ACTION_NONE:
+			result[i] = SVC_NONE;
+			break;
+		case SC_ACTION_RESTART:
+			result[i] = SVC_RESTART;
+			break;
+		case SC_ACTION_REBOOT:
+			result[i] = SVC_REBOOT;
+			break;
+		case SC_ACTION_RUN_COMMAND:
+			result[i] = SVC_RUN_COMMAND;
+			break;
+		default:
+			result[i] = SVC_NONE;
+		}
+		++pSvcFailureAction->lpsaActions;
+	}
+
+	LocalFree(pSvcFailureAction);
 	return result;
 }
 

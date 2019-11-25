@@ -335,6 +335,7 @@
     <ClInclude Include="src\WinConfigurationTest.h"/>
     <ClInclude Include="src\WindowsTestSuite.h"/>
     <ClInclude Include="src\WinRegistryTest.h"/>
+    <ClInclude Include="src\WinServiceTest.h"/>
     <ClInclude Include="src\TimerTest.h"/>
     <ClInclude Include="src\TimerTestSuite.h"/>
   </ItemGroup>
@@ -363,6 +364,7 @@
     <ClCompile Include="src\WinConfigurationTest.cpp"/>
     <ClCompile Include="src\WindowsTestSuite.cpp"/>
     <ClCompile Include="src\WinRegistryTest.cpp"/>
+    <ClCompile Include="src\WinServiceTest.cpp"/>
     <ClCompile Include="src\TimerTest.cpp"/>
     <ClCompile Include="src\TimerTestSuite.cpp"/>
   </ItemGroup>
