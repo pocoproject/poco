@@ -87,14 +87,16 @@ class CppUnit_API TestCase: public Test
     REFERENCEOBJECT (TestCase)
 
 public:
-	TestCase(const std::string& Name);
+	TestCase(const std::string& Name, Test::Type testType = Test::Normal);
 	~TestCase();
 
 	virtual void run(TestResult* result);
 	virtual TestResult* run();
-	virtual int countTestCases();
+	virtual int countTestCases() const;
+	virtual std::string toString() const;
+	virtual Test::Type getType() const;
+	void setType(Test::Type testType);
 	const std::string& name() const;
-	std::string toString();
 
 	virtual void setUp();
 	virtual void setUp(const std::vector<std::string>& setup);
@@ -169,12 +171,15 @@ protected:
 
 private:
 	const std::string _name;
+	Test::Type _type;
 };
 
 
 // Constructs a test case
-inline TestCase::TestCase(const std::string& name): _name (name)
+inline TestCase::TestCase(const std::string& name, Test::Type testType)
+	: _name (name)
 {
+	setType(testType);
 }
 
 
@@ -185,7 +190,7 @@ inline TestCase::~TestCase()
 
 
 // Returns a count of all the tests executed
-inline int TestCase::countTestCases()
+inline int TestCase::countTestCases() const
 {
 	return 1; 
 }
@@ -217,12 +222,23 @@ inline void TestCase::tearDown()
 
 
 // Returns the name of the test case instance
-inline std::string TestCase::toString()
+inline std::string TestCase::toString() const
 {
 	const std::type_info& thisClass = typeid(*this); 
 	return std::string(thisClass.name()) + "." + name(); 
 }
 
+// Returns the type of the test, see Test::Type
+inline Test::Type TestCase::getType() const
+{
+	return _type;
+}
+
+// Set the type of the test, see Test::Type
+inline void TestCase::setType(Test::Type testType)
+{
+	_type = testType;
+}
 
 // A set of macros which allow us to get the line number
 // and file name at the point of an error.

@@ -131,7 +131,6 @@ RWLockTest::~RWLockTest()
 
 void RWLockTest::testLock()
 {
-#if defined(ENABLE_LONG_RUNNING_TESTS)
 	RWLock lock;
 	int counter = 0;
 	RWLockRunnable r1(lock, counter);
@@ -160,13 +159,11 @@ void RWLockTest::testLock()
 	assertTrue (r3.ok());
 	assertTrue (r4.ok());
 	assertTrue (r5.ok());
-#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 
 void RWLockTest::testTryLock()
 {
-#if defined(ENABLE_LONG_RUNNING_TESTS)
 	RWLock lock;
 	int counter = 0;
 	RWTryLockRunnable r1(lock, counter);
@@ -195,7 +192,6 @@ void RWLockTest::testTryLock()
 	assertTrue (r3.ok());
 	assertTrue (r4.ok());
 	assertTrue (r5.ok());
-#endif // defined(ENABLE_LONG_RUNNING_TESTS)
 }
 
 
@@ -213,8 +209,8 @@ CppUnit::Test* RWLockTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("RWLockTest");
 
-	CppUnit_addTest(pSuite, RWLockTest, testLock);
-	CppUnit_addTest(pSuite, RWLockTest, testTryLock);
+	CppUnit_addLongTest(pSuite, RWLockTest, testLock);
+	CppUnit_addLongTest(pSuite, RWLockTest, testTryLock);
 
 	return pSuite;
 }

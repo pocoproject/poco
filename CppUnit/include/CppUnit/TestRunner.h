@@ -33,7 +33,7 @@ class Test;
  *
  * Here is the synopsis:
  *
- * TestRunner [-all] [-print] [-wait] ExampleTestCase
+ * TestRunner [-all] [-long] [-print] [-wait] ExampleTestCase
  *
  */
 class CppUnit_API TestRunner
@@ -54,6 +54,7 @@ protected:
 	void printBanner();
 	void print(const std::string& name, Test* pTest, int indent);
 	Test* find(const std::string& name, Test* pTest, const std::string& testName);
+	int collectAllTestCases(Test* pTest, std::vector<Test*>& tests);
 
 private:
 	std::ostream& _ostr;

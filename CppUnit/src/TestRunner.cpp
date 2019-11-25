@@ -35,7 +35,7 @@ TestRunner::~TestRunner()
 void TestRunner::printBanner()
 {
     _ostr 
-		<< "Usage: driver [-all] [-print] [-wait] [name] ..." << std::endl
+		<< "Usage: driver [-all] [-long] [-print] [-wait] [name] ..." << std::endl
 		<< "       where name is the name of a test case class" << std::endl;
 }
 
@@ -48,8 +48,11 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	bool all     = false;
 	bool wait    = false;
 	bool printed = false;
+	bool long_running = false;
+ 	
 	std::vector<std::string>	setup;
 
+	std::vector<Test*> tests;
 	for (int i = 1; i < args.size(); i++) 
 	{
 		const std::string& arg = args[i];
@@ -61,6 +64,11 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		else if (arg == "-all")
 		{
 			all = true;
+			continue;
+		}
+		else if (arg == "-long")
+		{
+			long_running = true;
 			continue;
 		}
 		else if (arg == "-print")
@@ -96,11 +104,8 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 			if (testToRun)
 			{
-				if (setup.size() > 0)
-					testToRun->addSetup(setup);
-				if (!run(testToRun)) success = false;
+				collectAllTestCases(testToRun, tests);
 			}
-			numberOfTests++;
 
 			if (!testToRun) 
 			{
@@ -112,15 +117,24 @@ bool TestRunner::run(const std::vector<std::string>& args)
 
 	if (all)
 	{
+		tests.clear();
 		for (Mappings::iterator it = _mappings.begin(); it != _mappings.end(); ++it) 
 		{
-			if (setup.size() > 0)
-				it->second->addSetup(setup);
-			if (!run(it->second)) success = false;
-			numberOfTests++;
+			collectAllTestCases(it->second, tests);
 		}
 	}
 	
+	for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
+	{
+		Test* testToRun = *it;
+		if(testToRun->getType() == Test::Long && !long_running)
+			continue;
+		if (setup.size() > 0)
+			testToRun->addSetup(setup);
+		if (!run(testToRun)) success = false;
+		numberOfTests++;
+	}
+
 	if (numberOfTests == 0 && !printed) 
 	{
 		printBanner();
@@ -191,6 +205,31 @@ Test* TestRunner::find(const std::string& name, Test* pTest, const std::string& 
 		}
 		return 0;
 	}
+}
+
+
+int TestRunner::collectAllTestCases(Test* pTest, std::vector<Test*>& testcases)
+{
+	int added = 0;
+	if (pTest->getType() == Test::Suite)
+	{
+		TestSuite* pSuite = dynamic_cast<TestSuite*>(pTest);
+		
+		if (pSuite)
+		{
+			const std::vector<Test*>& tests = pSuite->tests();
+			for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
+			{
+				added += collectAllTestCases(*it, testcases);
+			}
+		}
+	}
+	else
+	{
+		testcases.push_back(pTest);
+		added = 1;
+	}
+	return added;
 }
 
 

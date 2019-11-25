@@ -200,7 +200,6 @@ option(POCO_UNBUNDLED
   "Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
 
 if(ENABLE_TESTS)
-  option(ENABLE_LONG_RUNNING_TESTS "Enable long running test" ON)
   include(CTest)
   enable_testing()
   message(STATUS "Building with unittests & samples")
