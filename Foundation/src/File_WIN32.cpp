@@ -292,7 +292,7 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
-	if (CopyFileA(_path.c_str(), path.c_str(), options) == 0)
+	if (CopyFileA(_path.c_str(), path.c_str(), options == 1) == 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -301,7 +301,7 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 {
 	poco_assert (!_path.empty());
 
-	if (options) {
+	if (options == 1) {
 		if (MoveFileExA(_path.c_str(), path.c_str(), NULL) == 0)
 			handleLastErrorImpl(_path);
 	} else {
