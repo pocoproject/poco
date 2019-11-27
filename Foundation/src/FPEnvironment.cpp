@@ -25,7 +25,7 @@
 #include "FPEnvironment_SUN.cpp"
 #elif defined(__QNX__)
 #include "FPEnvironment_QNX.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
+#elif defined(POCO_OS_FAMILY_UNIX) || defined(__MINGW__) || defined(__MINGW32__)
 #include "FPEnvironment_C99.cpp"
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "FPEnvironment_WIN32.cpp"
