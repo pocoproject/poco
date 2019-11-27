@@ -73,7 +73,7 @@ public:
 	enum Options
 		/// Options for File Copy/Movement
 	{
-		OPT_FAIL_ON_OVERWRITE = 0x01
+		OPT_FAIL_ON_OVERWRITE = OPT_FAIL_ON_OVERWRITE_IMPL
 	};
 
 	File();
