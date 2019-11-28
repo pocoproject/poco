@@ -58,6 +58,8 @@ public:
 	Poco::Net::HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response
 
+	bool secure() const { return true; };
+
 protected:
 	void setResponse(ApacheServerResponse* pResponse);
 
