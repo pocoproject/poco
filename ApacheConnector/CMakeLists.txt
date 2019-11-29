@@ -19,7 +19,7 @@ set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
     DEFINE_SYMBOL ApacheHandlers_EXPORTS)
-target_link_libraries( "${LIBNAME}" )
+target_link_libraries("${LIBNAME}" Net Util XML JSON Foundation ${APRUTIL_LIBRARY} ${APR_LIBRARY} ${APACHE_LIBRARY})
 target_include_directories( "${LIBNAME}"
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
