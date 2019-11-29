@@ -151,7 +151,7 @@ namespace
 	int CryptoTransformImpl::setPadding(int padding)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		return EVP_CIPHER_CTX_block_size(_pContext);
+		return EVP_CIPHER_CTX_set_padding(_pContext, padding);
 #else
 		return EVP_CIPHER_CTX_set_padding(&_context, padding);
 #endif
