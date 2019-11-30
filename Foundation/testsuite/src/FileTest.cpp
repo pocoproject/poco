@@ -390,7 +390,7 @@ void FileTest::testCopyFailIfDestinationFileExists()
 	TemporaryFile f2;
 	f2.createFile();
 	try {
-		f1.setReadOnly().copyTo(f2.path(), true);
+		f1.setReadOnly().copyTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exist - must throw exception");
 	} catch (Exception&) {
 	}
@@ -423,7 +423,7 @@ void FileTest::testMoveFailIfDestinationFileExists() {
 	TemporaryFile f2;
 	f2.createFile();
 	try {
-		f1.moveTo(f2.path(), true);
+		f1.moveTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exist - must throw exception");
 	} catch (Exception&) {
 	}
@@ -529,7 +529,7 @@ void FileTest::testCopyDirectoryFailIfExists()
 	fd3.createDirectories();
 
 	try {
-		fd1.copyTo("testdir", true);
+		fd1.copyTo("testdir", File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("Destination Directory exists - must throw exception");
 	} catch (Exception&) {
 	}
@@ -565,7 +565,7 @@ void FileTest::testRenameFailIfExists() {
 	f2.createFile();
 
 	try {
-		f1.renameTo(f2.path(), true);
+		f1.renameTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exists - must throw exception");
 	} catch (Exception&) {
 	}

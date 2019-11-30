@@ -208,7 +208,7 @@ File& File::setExecutable(bool flag)
 }
 
 
-void File::copyTo(const std::string& path, bool failOnOverwrite) const
+void File::copyTo(const std::string& path, int options) const
 {
 	Path src(getPathImpl());
 	Path dest(path);
@@ -219,13 +219,13 @@ void File::copyTo(const std::string& path, bool failOnOverwrite) const
 		dest.setFileName(src.getFileName());
 	}
 	if (isDirectory())
-		copyDirectory(dest.toString(), failOnOverwrite);
+		copyDirectory(dest.toString(), options);
 	else
-		copyToImpl(dest.toString(), failOnOverwrite);
+		copyToImpl(dest.toString(), options);
 }
 
 
-void File::copyDirectory(const std::string& path, bool failOnOverwrite) const
+void File::copyDirectory(const std::string& path, int options) const
 {
 	File target(path);
 	target.createDirectories();
@@ -236,22 +236,22 @@ void File::copyDirectory(const std::string& path, bool failOnOverwrite) const
 	DirectoryIterator end;
 	for (; it != end; ++it)
 	{
-		it->copyTo(path, failOnOverwrite);
+		it->copyTo(path, options);
 	}
 }
 
 
-void File::moveTo(const std::string& path, bool failOnOverwrite)
+void File::moveTo(const std::string& path, int options)
 {
-	copyTo(path, failOnOverwrite);
+	copyTo(path, options);
 	remove(true);
 	setPathImpl(path);
 }
 
 
-void File::renameTo(const std::string& path, bool failOnOverwrite)
+void File::renameTo(const std::string& path, int options)
 {
-	renameToImpl(path, failOnOverwrite);
+	renameToImpl(path, options);
 	setPathImpl(path);
 }
 

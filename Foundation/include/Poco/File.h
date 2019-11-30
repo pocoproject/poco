@@ -70,6 +70,12 @@ public:
 		LINK_SYMBOLIC = 1  /// symbolic link
 	};
 
+	enum Options
+		/// Options for File Copy/Movement
+	{
+		OPT_FAIL_ON_OVERWRITE = OPT_FAIL_ON_OVERWRITE_IMPL
+	};
+
 	File();
 		/// Creates the file.
 
@@ -183,23 +189,23 @@ public:
 		///
 		/// Does nothing on Windows.
 
-	void copyTo(const std::string& path, bool failOnOverwrite = false) const;
+	void copyTo(const std::string& path, int options = 0) const;
 		/// Copies the file (or directory) to the given path.
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
-		/// If failOnOverwrite is set the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
 		/// if the File already exists.
 
-	void moveTo(const std::string& path, bool failOnOverwrite = false);
+	void moveTo(const std::string& path, int options = 0);
 		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
-		/// If failOnOverwrite is set the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
 		/// if the File already exists.
 
-	void renameTo(const std::string& path, bool failOnOverwrite = false);
+	void renameTo(const std::string& path, int options = 0);
 		/// Renames the file to the new name.
-		/// If failOnOverwrite is set the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
 		/// if the File already exists.
 
 	void linkTo(const std::string& path, LinkType type = LINK_SYMBOLIC) const;
@@ -259,7 +265,7 @@ public:
 		/// exception for the last file-related error.
 
 protected:
-	void copyDirectory(const std::string& path, bool failOnOverwrite = false) const;
+	void copyDirectory(const std::string& path, int options = 0) const;
 		/// Copies a directory. Used internally by copyTo().
 };
 
