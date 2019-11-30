@@ -570,7 +570,12 @@ void FileTest::testRenameFailIfExists() {
 	} catch (Exception&) {
 	}
 
-	f1.remove();
+	f1.renameTo(f2.path());
+
+	assertTrue(f2.exists());
+	assertTrue(f1.exists());
+	assertTrue(f1 == f2);
+
 	f2.remove();
 }
 
