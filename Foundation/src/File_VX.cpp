@@ -248,7 +248,7 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 	const long blockSize = st.st_blksize;
 
 	int dd;
-	if (options == 1) {
+	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
 		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode & S_IRWXU);
 	} else {
 		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode & S_IRWXU);
@@ -288,7 +288,7 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 
 	struct stat st;
 
-	if (stat(path.c_str(), &st) == 0 && options == 1)
+	if (stat(path.c_str(), &st) == 0 && (options &OPT_FAIL_ON_OVERWRITE_IMPL))
 		throw FileExistsException(path, EEXIST);		
 
 	if (rename(_path.c_str(), path.c_str()) != 0)

@@ -27,6 +27,11 @@ namespace Poco {
 class FileImpl
 {
 protected:
+
+	enum Options {
+		OPT_FAIL_ON_OVERWRITE_IMPL = 0x01
+	};
+
 	typedef UInt64 FileSizeImpl;
 
 	FileImpl();
