@@ -125,7 +125,7 @@
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XML_STATIC;XML_NS;XML_DTD;HAVE_EXPAT_CONFIG_H;XML_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -136,7 +136,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Link>
       <OutputFile>..\bin\PocoXMLd.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -167,7 +167,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Link>
       <OutputFile>..\bin\PocoXML.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -186,7 +186,7 @@
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;XML_STATIC;XML_NS;XML_DTD;HAVE_EXPAT_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -198,7 +198,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib\PocoXMLMTd.lib</OutputFile>
     </Lib>
@@ -222,7 +222,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib\PocoXMLMT.lib</OutputFile>
     </Lib>
@@ -233,7 +233,7 @@
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;XML_STATIC;XML_NS;XML_DTD;HAVE_EXPAT_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -245,7 +245,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib\PocoXMLMDd.lib</OutputFile>
     </Lib>
@@ -270,7 +270,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib\PocoXMLMD.lib</OutputFile>
     </Lib>
@@ -444,7 +444,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <ClCompile Include="src\xmltok.c"/>
     <ClCompile Include="src\xmltok_impl.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
@@ -453,7 +453,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <ClCompile Include="src\xmltok_ns.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">true</ExcludedFromBuild>
@@ -461,7 +461,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <ClCompile Include="src\XMLWriter.cpp"/>
   </ItemGroup>
   <ItemGroup>

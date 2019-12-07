@@ -130,7 +130,7 @@ exit 0</Command>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;THREADSAFE;__LCC__;MySQL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -141,7 +141,7 @@ exit 0</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Link>
       <OutputFile>..\..\bin\PocoDataMySQLd.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -177,7 +177,7 @@ exit 0</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Link>
       <OutputFile>..\..\bin\PocoDataMySQL.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -201,7 +201,7 @@ exit 0</Command>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -213,7 +213,7 @@ exit 0</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\..\lib\PocoDataMySQLMTd.lib</OutputFile>
     </Lib>
@@ -242,7 +242,7 @@ exit 0</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\..\lib\PocoDataMySQLMT.lib</OutputFile>
     </Lib>
@@ -258,7 +258,7 @@ exit 0</Command>
       <AdditionalIncludeDirectories>.\include;..\..\Foundation\include;..\..\Data\include;..\..\mysql\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;THREADSAFE;__LCC__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -270,7 +270,7 @@ exit 0</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\..\lib\PocoDataMySQLMDd.lib</OutputFile>
     </Lib>
@@ -300,7 +300,7 @@ exit 0</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\..\lib\PocoDataMySQLMD.lib</OutputFile>
     </Lib>

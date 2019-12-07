@@ -125,7 +125,7 @@
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JSON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -136,7 +136,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Link>
       <OutputFile>..\bin64\PocoJSON64d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -167,7 +167,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Link>
       <OutputFile>..\bin64\PocoJSON64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -186,7 +186,7 @@
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -198,7 +198,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoJSONMTd.lib</OutputFile>
       <TargetMachine>MachineX64</TargetMachine>
@@ -223,7 +223,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoJSONMT.lib</OutputFile>
       <TargetMachine>MachineX64</TargetMachine>
@@ -235,7 +235,7 @@
       <AdditionalIncludeDirectories>.\include;..\Foundation\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;POCO_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <MinimalRebuild>true</MinimalRebuild>
+      
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -247,7 +247,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoJSONMDd.lib</OutputFile>
       <TargetMachine>MachineX64</TargetMachine>
@@ -272,7 +272,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <Lib>
       <OutputFile>..\lib64\PocoJSONMD.lib</OutputFile>
       <TargetMachine>MachineX64</TargetMachine>
@@ -299,7 +299,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">CompileAsCpp</CompileAs>
       <ForceConformanceInForLoopScope Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">true</ForceConformanceInForLoopScope>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">CompileAsCpp</CompileAs>
-    </ClCompile>
+     <MultiProcessorCompilation>true</MultiProcessorCompilation></ClCompile>
     <ClCompile Include="src\PrintHandler.cpp"/>
     <ClCompile Include="src\Query.cpp"/>
     <ClCompile Include="src\Stringifier.cpp"/>
