@@ -21,6 +21,7 @@ ProGen\bin\static_md\progen.exe  /platform=Win32 %POCO_BASE%\PDF\PDF.progen
 ProGen\bin\static_md\progen.exe  /platform=Win32 %POCO_BASE%\CppParser\CppParser.progen
 ProGen\bin\static_md\progen.exe  /platform=Win32 %POCO_BASE%\MongoDB\MongoDB.progen
 ProGen\bin\static_md\progen.exe  /platform=Win32 %POCO_BASE%\Redis\Redis.progen
+ProGen\bin\static_md\progen.exe  /platform=Win32 %POCO_BASE%\PocoDoc\PocoDoc.progen
 ProGen\bin\static_md\progen.exe  /platform=Win32 %POCO_BASE%\ProGen\ProGen.progen
 
 
