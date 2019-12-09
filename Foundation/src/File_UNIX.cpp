@@ -326,7 +326,7 @@ void FileImpl::setExecutableImpl(bool flag)
 }
 
 
-void FileImpl::copyToImpl(const std::string& path) const
+void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
@@ -340,8 +340,12 @@ void FileImpl::copyToImpl(const std::string& path) const
 		handleLastErrorImpl(_path);
 	}
 	const long blockSize = st.st_blksize;
-
-	int dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
+	int dd;
+	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
+		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode); 
+	} else {
+		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
+	}
 	if (dd == -1)
 	{
 		close(sd);
@@ -376,9 +380,14 @@ void FileImpl::copyToImpl(const std::string& path) const
 }
 
 
-void FileImpl::renameToImpl(const std::string& path)
+void FileImpl::renameToImpl(const std::string& path, int options)
 {
 	poco_assert (!_path.empty());
+
+	struct stat st;
+
+	if (stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
+		throw FileExistsException(path, EEXIST);		
 
 	if (rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);

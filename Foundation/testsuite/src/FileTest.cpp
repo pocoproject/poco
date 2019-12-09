@@ -380,6 +380,23 @@ void FileTest::testCopy()
 	f1.setWriteable().remove();
 }
 
+void FileTest::testCopyFailIfDestinationFileExists() 	
+{
+	std::ofstream ostr("testfile.dat");
+	ostr << "Hello, world!" << std::endl;
+	ostr.close();
+
+	File f1("testfile.dat");
+	TemporaryFile f2;
+	f2.createFile();
+	try {
+		f1.setReadOnly().copyTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
+		failmsg("file exist - must throw exception");
+	} catch (Exception&) {
+	}
+	f1.setWriteable().remove();
+}
+
 
 void FileTest::testMove()
 {
@@ -397,6 +414,21 @@ void FileTest::testMove()
 	assertTrue (f1 == f2);
 }
 
+void FileTest::testMoveFailIfDestinationFileExists() {
+	std::ofstream ostr("testfile.dat");
+	ostr << "Hello, world!" << std::endl;
+	ostr.close();
+
+	File f1("testfile.dat");
+	TemporaryFile f2;
+	f2.createFile();
+	try {
+		f1.moveTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
+		failmsg("file exist - must throw exception");
+	} catch (Exception&) {
+	}
+	f1.setWriteable().remove();
+}
 
 void FileTest::testCopyDirectory()
 {
@@ -467,6 +499,44 @@ void FileTest::testCopyDirectory()
 	fd3.remove(true);
 }
 
+void FileTest::testCopyDirectoryFailIfExists() 
+{
+	Path pd1("testdir");
+	File fd1(pd1);
+	try {
+		fd1.remove(true);
+	} catch (...) {
+	}
+	fd1.createDirectories();
+	Path pf1(pd1, "testfile1.dat");
+	std::ofstream ostr1(pf1.toString().c_str());
+	ostr1 << "Hello, world!" << std::endl;
+	ostr1.close();
+	Path pf2(pd1, "testfile2.dat");
+	std::ofstream ostr2(pf2.toString().c_str());
+	ostr2 << "Hello, world!" << std::endl;
+	ostr2.close();
+	   	 
+	Path pd2("destination");
+	File fd2(pd2);
+	try {
+		fd2.remove(true);
+	} catch (...) {
+	}
+	fd2.createDirectories();
+	Path pd3(pd2, "testdir");
+	File fd3(pd3);
+	fd3.createDirectories();
+
+	try {
+		fd1.copyTo("testdir", File::OPT_FAIL_ON_OVERWRITE);
+		failmsg("Destination Directory exists - must throw exception");
+	} catch (Exception&) {
+	}
+
+	fd1.remove(true);
+	fd2.remove(true);
+}
 
 void FileTest::testRename()
 {
@@ -484,6 +554,32 @@ void FileTest::testRename()
 
 	f2.remove();
 }
+
+void FileTest::testRenameFailIfExists() {
+	std::ofstream ostr("testfile.dat");
+	ostr << "Hello, world!" << std::endl;
+	ostr.close();
+
+	File f1("testfile.dat");
+	File f2("testfile2.dat");
+	f2.createFile();
+
+	try {
+		f1.renameTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
+		failmsg("file exists - must throw exception");
+	} catch (Exception&) {
+	}
+
+	f1.renameTo(f2.path());
+
+	assertTrue(f2.exists());
+	assertTrue(f1.exists());
+	assertTrue(f1 == f2);
+
+	f2.remove();
+}
+
+
 
 
 void FileTest::testLongPath()
@@ -549,9 +645,13 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testSize);
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
+	CppUnit_addTest(pSuite, FileTest, testCopyFailIfDestinationFileExists);
 	CppUnit_addTest(pSuite, FileTest, testMove);
+	CppUnit_addTest(pSuite, FileTest, testMoveFailIfDestinationFileExists);
 	CppUnit_addTest(pSuite, FileTest, testCopyDirectory);
+	CppUnit_addTest(pSuite, FileTest, testCopyDirectoryFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRename);
+	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 
