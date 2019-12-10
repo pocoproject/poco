@@ -27,7 +27,7 @@ target_include_directories( "${LIBNAME}"
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
-install(TARGETS ${LIBNAME})
+install(TARGETS ${LIBNAME} LIBRARY DESTINATION bin LIBRARY DESTINATION lib)
 
 if (ENABLE_TESTS)
   add_subdirectory(samples)
