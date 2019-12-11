@@ -173,6 +173,13 @@ bool WinService::isStopped() const
 	return ss.dwCurrentState == SERVICE_STOPPED;
 }
 
+void WinService::startWithoutWait() 
+{
+	open();
+	if (!StartService(_svcHandle, 0, NULL))
+		throw SystemException("cannot start service", _name);
+}
+
 void WinService::start(int timeout)
 {
 	open();
@@ -193,6 +200,14 @@ void WinService::start(int timeout)
 	else if (svcStatus.dwCurrentState != SERVICE_RUNNING)
 		throw SystemException("service failed to start within a reasonable time", _name);
  }
+
+void WinService::stopWithoutWait() 
+{
+	open();
+	SERVICE_STATUS svcStatus;
+	if (!ControlService(_svcHandle, SERVICE_CONTROL_STOP, &svcStatus))
+		throw SystemException("cannot stop service", _name);
+}
 
 
 void WinService::stop(int timeout)

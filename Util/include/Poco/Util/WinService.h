@@ -119,15 +119,32 @@ public:
 	bool isStopped() const;
 		/// Returns true if the service is currently stopped.
 
+
+	void startWithoutWait();
+		/// Starts the service.
+		/// Does nothing if the service is already running
+		///
+		/// Throws a NotFoundException if the service has not been registered.
+		/// Did not wait until the Service is started.
+
 	void start(int timeout = START_STOP_TIMEOUT);
 		/// Starts the service.
 		/// Does nothing if the service is already running.
+		/// Waits until the Service was started successfully or the timeout is passed.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
+
+	void stopWithoutWait();
+		/// Starts the service.
+		/// Does nothing if the service is already running
+		///
+		/// Throws a NotFoundException if the service has not been registered.
+		/// Did not wait until the Service is stopped.
 
 	void stop(int timeout = START_STOP_TIMEOUT);
 		/// Stops the service.
 		/// Does nothing if the service is not running.
+		/// Waits until the Service was stopped successfully or the timeout is passed.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
