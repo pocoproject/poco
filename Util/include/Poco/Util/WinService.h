@@ -118,14 +118,14 @@ public:
 
 	bool isStopped() const;
 		/// Returns true if the service is currently stopped.
-		
-	void start();
+
+	void start(int timeout = START_STOP_TIMEOUT);
 		/// Starts the service.
 		/// Does nothing if the service is already running.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
-	void stop();
+	void stop(int timeout = START_STOP_TIMEOUT);
 		/// Stops the service.
 		/// Does nothing if the service is not running.
 		///
@@ -151,7 +151,7 @@ public:
 	std::string getDescription() const;
 		/// Returns the service description from the registry.
 
-	static const int STARTUP_TIMEOUT;
+	static const int START_STOP_TIMEOUT;
 
 protected:
 	static const std::string REGISTRY_KEY;

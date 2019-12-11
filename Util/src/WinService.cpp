@@ -34,7 +34,7 @@ namespace Poco {
 namespace Util {
 
 
-const int WinService::STARTUP_TIMEOUT = 30000;
+const int WinService::START_STOP_TIMEOUT = 30000;
 const std::string WinService::REGISTRY_KEY("SYSTEM\\CurrentControlSet\\Services\\");
 const std::string WinService::REGISTRY_DESCRIPTION("Description");
 
@@ -173,8 +173,7 @@ bool WinService::isStopped() const
 	return ss.dwCurrentState == SERVICE_STOPPED;
 }
 
-	
-void WinService::start()
+void WinService::start(int timeout)
 {
 	open();
 	if (!StartService(_svcHandle, 0, NULL))
@@ -182,7 +181,7 @@ void WinService::start()
 
 	SERVICE_STATUS svcStatus;
 	long msecs = 0;
-	while (msecs < STARTUP_TIMEOUT)
+	while (msecs < timeout)
 	{
 		if (!QueryServiceStatus(_svcHandle, &svcStatus)) break;
 		if (svcStatus.dwCurrentState != SERVICE_START_PENDING) break;
@@ -196,12 +195,25 @@ void WinService::start()
  }
 
 
-void WinService::stop()
+void WinService::stop(int timeout)
 {
 	open();
 	SERVICE_STATUS svcStatus;
 	if (!ControlService(_svcHandle, SERVICE_CONTROL_STOP, &svcStatus))
 		throw SystemException("cannot stop service", _name);
+
+	long msecs = 0;
+	while (msecs < timeout) 
+	{
+		if (!QueryServiceStatus(_svcHandle, &svcStatus)) break;
+		if (svcStatus.dwCurrentState != SERVICE_STOP_PENDING) break;
+		Thread::sleep(250);
+		msecs += 250;
+	}
+	if (!QueryServiceStatus(_svcHandle, &svcStatus))
+		throw SystemException("cannot query status of stopping service", _name);
+	else if (svcStatus.dwCurrentState != SERVICE_STOPPED)
+		throw SystemException("service failed to stop within a reasonable time", _name);
 }
 
 
