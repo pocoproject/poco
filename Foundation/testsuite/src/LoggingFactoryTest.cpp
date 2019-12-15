@@ -49,7 +49,7 @@ namespace
 		{
 		}
 	};
-	
+
 	class CustomFormatter: public Formatter
 	{
 		void format(const Message& msg, std::string& text)
@@ -72,7 +72,7 @@ LoggingFactoryTest::~LoggingFactoryTest()
 void LoggingFactoryTest::testBuiltins()
 {
 	LoggingFactory& fact = LoggingFactory::defaultFactory();
-	
+
 	AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
 #if defined(_WIN32) && !defined(_WIN32_WCE)
 	assertTrue (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
@@ -82,10 +82,10 @@ void LoggingFactoryTest::testBuiltins()
 
 	AutoPtr<Channel> pFileChannel = fact.createChannel("FileChannel");
 	assertTrue (dynamic_cast<FileChannel*>(pFileChannel.get()) != 0);
-	
+
 	AutoPtr<Channel> pSplitterChannel = fact.createChannel("SplitterChannel");
 	assertTrue (dynamic_cast<SplitterChannel*>(pSplitterChannel.get()) != 0);
-	
+
 	try
 	{
 		AutoPtr<Channel> pUnknownChannel = fact.createChannel("UnknownChannel");
@@ -94,10 +94,10 @@ void LoggingFactoryTest::testBuiltins()
 	catch (Poco::NotFoundException&)
 	{
 	}
-	
+
 	AutoPtr<Formatter> pPatternFormatter = fact.createFormatter("PatternFormatter");
 	assertTrue (dynamic_cast<PatternFormatter*>(pPatternFormatter.get()) != 0);
-	
+
 	try
 	{
 		AutoPtr<Formatter> pUnknownFormatter = fact.createFormatter("UnknownFormatter");
@@ -111,11 +111,7 @@ void LoggingFactoryTest::testBuiltins()
 
 void LoggingFactoryTest::testCustom()
 {
-#ifndef POCO_ENABLE_CPP11
-	std::auto_ptr<LoggingFactory> fact(new LoggingFactory);
-#else
 	std::unique_ptr<LoggingFactory> fact(new LoggingFactory);
-#endif // POCO_ENABLE_CPP11
 
 	fact->registerChannelClass("CustomChannel", new Instantiator<CustomChannel, Channel>);
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);

@@ -54,8 +54,8 @@ class TestCaller: public TestCase
 	typedef void (Fixture::*TestMethod)();
 
 public:
-	TestCaller(const std::string& name, TestMethod test, Test::Type testType = Test::Normal): 
-		TestCase(name, testType), 
+	TestCaller(const std::string& name, TestMethod test, Test::Type testType = Test::Normal):
+		TestCase(name, testType),
 		_test(test),
 		_fixture(new Fixture(name))
 	{
@@ -81,11 +81,7 @@ protected:
 
 private:
 	TestMethod             _test;
-#ifndef POCO_ENABLE_CPP11
-	std::auto_ptr<Fixture> _fixture;
-#else
 	std::unique_ptr<Fixture> _fixture;
-#endif // POCO_ENABLE_CPP11
 };
 
 

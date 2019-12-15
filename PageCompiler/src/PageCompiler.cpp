@@ -295,11 +295,7 @@ protected:
 			p.setBaseName(clazz);
 		}
 
-#ifndef POCO_ENABLE_CPP11
-		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
-#else
 		std::unique_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
-#endif
 
 		if (!_outputDir.empty())
 		{

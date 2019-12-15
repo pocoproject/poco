@@ -58,11 +58,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::string::size_type frac = str.length() - decSepPos - 1;
 
 	std::string::size_type ePos = str.find_first_of("eE");
-#ifdef POCO_ENABLE_CPP11
 	std::unique_ptr<std::string> eStr;
-#else
-	std::auto_ptr<std::string> eStr;
-#endif
 	if (ePos != std::string::npos)
 	{
 		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));
@@ -201,7 +197,7 @@ std::string& floatToStr(std::string& str, float value, int precision, int width,
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	floatToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
 	str = buffer;
-	
+
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
 		replaceInPlace(str, '.', decSep);
 
@@ -219,7 +215,7 @@ std::string& floatToFixedStr(std::string& str, float value, int precision, int w
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	floatToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
 	str = buffer;
-	
+
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
 		replaceInPlace(str, '.', decSep);
 
@@ -263,9 +259,9 @@ std::string& doubleToStr(std::string& str, double value, int precision, int widt
 
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
-		
+
 	str = buffer;
-	
+
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
 		replaceInPlace(str, '.', decSep);
 
@@ -282,9 +278,9 @@ std::string& doubleToFixedStr(std::string& str, double value, int precision, int
 
 	char buffer[POCO_MAX_FLT_STRING_LEN];
 	doubleToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
-		
+
 	str = buffer;
-	
+
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
 		replaceInPlace(str, '.', decSep);
 
