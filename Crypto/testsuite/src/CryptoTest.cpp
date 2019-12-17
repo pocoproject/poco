@@ -54,6 +54,27 @@ static const std::string APPINF_PEM(
 	"-----END CERTIFICATE-----\n"
 );
 
+static const std::string UTF8_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIDEzCCArigAwIBAgIQAKegojl/YLNUPqTyCnQ4LzAKBggqhkjOPQQDAjB0MQsw\n"
+	"CQYDVQQGEwJDSDEQMA4GA1UECgwHU2llbWVuczEUMBIGA1UECwwLQlQgRGl2aXNp\n"
+	"b24xPTA7BgNVBAMMNEt1cnpSUzFNUDIyc3ByaW50NTlwcmVWVlMgcHJvamVjdCBp\n"
+	"bnRlcm1lZGlhdGUgQ0EgRUMwHhcNMTkxMTI3MDAwMDAwWhcNMjQxMTI4MTkzMzQw\n"
+	"WjCCAQMxJDAiBgNVBAUTG1BJRDpQWEM1LkUwMDMgU046MTQwMDA0RDhFMjELMAkG\n"
+	"A1UEBhMCQ0gxEDAOBgNVBAoMB1NpZW1lbnMxFzAVBgNVBAsMDlNJIEJQIERpdmlz\n"
+	"aW9uMQwwCgYDVQQIDANadWcxHjAcBgNVBAcMFVrDpGhsZXJ3ZWcgNyBSb29tIDU0\n"
+	"NDEnMCUGCSqGSIb3DQEJARYYcmljaGFyZC5rdXJ6QHNpZW1lbnMuY29tMRgwFgYD\n"
+	"VQQLDA9TU0wgQ2VydGlmaWNhdGUxMjAwBgNVBAMMKUt1cnpSUzFNUDIyc3ByaW50\n"
+	"NTlwcmVWVlMuS3VyUFhDNUJOUjM3NjUyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD\n"
+	"QgAEJjy+wx/mN9FbW3/IoOAOXdbfQvF1gF8wNasHUeLdn1UsCABnaAZTytqX7gMD\n"
+	"Y5HS32SIvdULYwsy6Dn3CO5tVKOBmjCBlzAOBgNVHQ8BAf8EBAMCA6gwIAYDVR0l\n"
+	"AQH/BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMAwGA1UdEwEB/wQCMAAwHQYDVR0O\n"
+	"BBYEFIbtuXQJoVh7FlYiWZeWT2ooEQRNMB8GA1UdIwQYMBaAFOtUSuT1OYK7bNS4\n"
+	"Mqz0UGPoGavuMBUGA1UdEQQOMAyHBAqqt7SHBMCo/AEwCgYIKoZIzj0EAwIDSQAw\n"
+	"RgIhANBQnB1HFLHp7t8oZbLYsm8nWI0hshmVQupXV9oFwb4qAiEAg5UqSDnvAax3\n"
+	"LWWgnAZJkUS0AEQXu4Rx9ZiP7wBdFtA=\n"
+	"-----END CERTIFICATE-----\n"
+);
 
 CryptoTest::CryptoTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -99,7 +120,7 @@ void CryptoTest::testEncryptDecryptWithSalt()
 {
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "simplepwd", "Too much salt"));
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(CipherKey("aes256", "simplepwd", "Too much salt"));
-	
+
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
 	{
 		std::string in(n, 'x');
@@ -192,7 +213,7 @@ void CryptoTest::testEncryptDecryptDESECB()
 void CryptoTest::testEncryptDecryptGCM()
 {
 	CipherKey key("aes-256-gcm");
-	
+
 	CipherKey::ByteVec iv(20, 213);
 	key.setIV(iv);
 
@@ -224,7 +245,7 @@ void CryptoTest::testEncryptDecryptGCM()
 void CryptoTest::testPassword()
 {
 	CipherKey key("aes256", "password", "salt");
-	
+
 	std::ostringstream keyStream;
 	Poco::Base64Encoder base64KeyEnc(keyStream);
 	base64KeyEnc.write(reinterpret_cast<const char*>(&key.getKey()[0]), key.keySize());
@@ -293,7 +314,7 @@ void CryptoTest::testStreams()
 	EncryptingOutputStream encryptor(sstr, *pCipher);
 	encryptor << SECRET_MESSAGE;
 	encryptor.close();
-	
+
 	DecryptingInputStream decryptor(sstr, *pCipher);
 	std::string result;
 	Poco::StreamCopier::copyToString(decryptor, result);
@@ -317,7 +338,7 @@ void CryptoTest::testCertificate()
 {
 	std::istringstream certStream(APPINF_PEM);
 	X509Certificate cert(certStream);
-	
+
 	std::string subjectName(cert.subjectName());
 	std::string issuerName(cert.issuerName());
 	std::string commonName(cert.commonName());
@@ -326,8 +347,8 @@ void CryptoTest::testCertificate()
 	std::string stateOrProvince(cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE));
 	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
 	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
-	
-	assertTrue (subjectName == "/CN=appinf.com/O=Applied Informatics Software Engineering GmbH/OU=Development/ST=Carinthia/C=AT/L=St. Jakob im Rosental/emailAddress=guenter.obiltschnig@appinf.com");
+
+	assertTrue (subjectName == "CN=appinf.com,O=Applied Informatics Software Engineering GmbH,OU=Development,ST=Carinthia,C=AT,L=St. Jakob im Rosental,emailAddress=guenter.obiltschnig@appinf.com");
 	assertTrue (issuerName == subjectName);
 	assertTrue (commonName == "appinf.com");
 	assertTrue (country == "AT");
@@ -335,13 +356,41 @@ void CryptoTest::testCertificate()
 	assertTrue (stateOrProvince == "Carinthia");
 	assertTrue (organizationName == "Applied Informatics Software Engineering GmbH");
 	assertTrue (organizationUnitName == "Development");
-	
+
 	// fails with recent OpenSSL versions:
-	// assertTrue (cert.issuedBy(cert));
-	
+	// assert (cert.issuedBy(cert));
+
 	std::istringstream otherCertStream(APPINF_PEM);
 	X509Certificate otherCert(otherCertStream);
-	
+
+	assertTrue (cert.equals(otherCert));
+}
+
+void CryptoTest::testCertificateUTF8()
+{
+	std::istringstream certStream(UTF8_PEM);
+	X509Certificate cert(certStream);
+
+	std::string subjectName(cert.subjectName());
+	std::string issuerName(cert.issuerName());
+	std::string commonName(cert.commonName());
+	std::string country(cert.subjectName(X509Certificate::NID_COUNTRY));
+	std::string localityName(cert.subjectName(X509Certificate::NID_LOCALITY_NAME));
+	std::string stateOrProvince(cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE));
+	std::string organizationName(cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME));
+	std::string organizationUnitName(cert.subjectName(X509Certificate::NID_ORGANIZATION_UNIT_NAME));
+
+	assertTrue (subjectName == "serialNumber=PID:PXC5.E003 SN:140004D8E2,C=CH,O=Siemens,OU=SI BP Division,ST=Zug,L=Zählerweg 7 Room 544,emailAddress=richard.kurz@siemens.com,OU=SSL Certificate,CN=KurzRS1MP22sprint59preVVS.KurPXC5BNR37652");
+	assertTrue (commonName == "KurzRS1MP22sprint59preVVS.KurPXC5BNR37652");
+	assertTrue (country == "CH");
+	assertTrue (localityName == "Zählerweg 7 Room 544");
+	assertTrue (stateOrProvince == "Zug");
+	assertTrue (organizationName == "Siemens");
+	assertTrue (organizationUnitName == "SI BP Division");
+
+	std::istringstream otherCertStream(UTF8_PEM);
+	X509Certificate otherCert(otherCertStream);
+
 	assertTrue (cert.equals(otherCert));
 }
 
@@ -371,6 +420,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testDecryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 
 	return pSuite;
 }
