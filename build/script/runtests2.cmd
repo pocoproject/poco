@@ -30,7 +30,8 @@ if "%1" =="-d" (
   shift
 )
 
-set PATH=%CD%\%BINDIR%;%PATH
+set PATH=%CD%\%BINDIR%;%PATH%
+echo PATH=%PATH%
 
 if not "%1" == "" (
   set TESTCOMPONENTS="%1"
