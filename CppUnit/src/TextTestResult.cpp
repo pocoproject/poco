@@ -48,7 +48,6 @@ void TextTestResult::setup()
 			std::string test;
 			while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
 			if (!test.empty()) _ignored.insert(test);
-			_ostr << "ignored: " << test << std::endl;
 		}
 	}
 #endif
@@ -94,7 +93,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 {
 	if (testErrors() != 0) 
 	{
-		stream << "\n";
+		stream << std::endl;
 
 		if (testErrors() == 1)
 			stream << "There was " << testErrors() << " error: " << std::endl;
@@ -109,8 +108,8 @@ void TextTestResult::printErrors(std::ostream& stream)
 
 			stream << std::setw(2) << i
 			       << ": "
-			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
+			       << failure->failedTest()->toString() << std::endl
+			       << "    \"" << (e ? e->what() : "") << "\"" << std::endl
 			       << "    in \"" 
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
@@ -131,7 +130,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 					stream << " data line " << e->data1LineNumber();
 				}
 			}
-			stream << "\n";
+			stream << std::endl;
 			i++;
 		}
 	}
@@ -157,8 +156,8 @@ void TextTestResult::printFailures(std::ostream& stream)
 
 			stream << std::setw(2) << i
 			       << ": "
-			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
+			       << failure->failedTest()->toString() << std::endl
+			       << "    \"" << (e ? e->what() : "") << "\"" << std::endl
 			       << "    in \"" 
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
@@ -180,7 +179,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 					stream << " data line " << e->data1LineNumber();
 				}
 			}
-			stream << "\n";
+			stream << std::endl;
 			i++;
 		}
 	}
