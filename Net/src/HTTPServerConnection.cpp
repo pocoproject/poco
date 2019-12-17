@@ -36,7 +36,7 @@ HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServe
 	_stopped(false)
 {
 	poco_check_ptr (pFactory);
-	
+
 	_pFactory->serverStopped += Poco::delegate(this, &HTTPServerConnection::onServerStopped);
 }
 
@@ -67,7 +67,7 @@ void HTTPServerConnection::run()
 			{
 				HTTPServerResponseImpl response(session);
 				HTTPServerRequestImpl request(response, session, _pParams);
-			
+
 				Poco::Timestamp now;
 				response.setDate(now);
 				response.setVersion(request.getVersion());
@@ -76,16 +76,12 @@ void HTTPServerConnection::run()
 					response.set("Server", server);
 				try
 				{
-#ifndef POCO_ENABLE_CPP11
-					std::auto_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-#else
 					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-#endif
 					if (pHandler.get())
 					{
 						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
 							response.sendContinue();
-					
+
 						pHandler->handleRequest(request, response);
 						session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
 					}
