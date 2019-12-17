@@ -86,7 +86,7 @@ void TextTestResult::addFailure(Test* test, CppUnitException* e)
 void TextTestResult::startTest(Test* test)
 {
 	TestResult::startTest(test);
-	_ostr << "\n" << shortName(test->toString()) << ": ";
+	_ostr << shortName(test->toString()) << ": ";
 }
 
 
@@ -197,7 +197,6 @@ void TextTestResult::print(std::ostream& stream)
 
 void TextTestResult::printHeader(std::ostream& stream)
 {
-	stream << "\n\n";
 	if (wasSuccessful())
 		stream << "OK (" 
 		          << runTests() << " tests)" 
