@@ -31,7 +31,7 @@ if "%1" =="-d" (
 )
 
 set PATH=%POCO_BASE%\%BINDIR%;%PATH%
-set IGNORE=-ignore %POCO_BASE%\cppignore.txt
+set IGNORE=-ignore %POCO_BASE%\cppignore.win
 
 if not "%1" == "" (
   set TESTCOMPONENTS="%1"
