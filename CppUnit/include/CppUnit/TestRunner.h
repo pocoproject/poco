@@ -50,7 +50,7 @@ public:
 	void addTest(const std::string& name, Test* test);
 
 protected:
-	bool run(Test* test);
+	bool run(Test* test, const std::string& ignore);
 	void printBanner();
 	void print(const std::string& name, Test* pTest, int indent);
 	Test* find(const std::string& name, Test* pTest, const std::string& testName);

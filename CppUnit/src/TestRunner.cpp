@@ -8,6 +8,7 @@
 #include "CppUnit/TestSuite.h"
 #include "CppUnit/TextTestResult.h"
 #include <iostream>
+#include <fstream>
 
 
 namespace CppUnit {
@@ -35,7 +36,7 @@ TestRunner::~TestRunner()
 void TestRunner::printBanner()
 {
     _ostr 
-		<< "Usage: driver [-all] [-long] [-print] [-wait] [name] ..." << std::endl
+		<< "Usage: driver [-all] [-ignore <file> ] [-long] [-print] [-wait] [name] ..." << std::endl
 		<< "       where name is the name of a test case class" << std::endl;
 }
 
@@ -49,7 +50,8 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	bool wait    = false;
 	bool printed = false;
 	bool long_running = false;
- 	
+	std::string ignore;
+
 	std::vector<std::string>	setup;
 
 	std::vector<Test*> tests;
@@ -69,6 +71,11 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		else if (arg == "-long")
 		{
 			long_running = true;
+			continue;
+		}
+		else if (arg == "-ignore")
+		{
+			ignore = args[++i];
 			continue;
 		}
 		else if (arg == "-print")
@@ -114,7 +121,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			}
 		}
 	}
-
+	std::cout << "ignore file:" << ignore << std::endl;
 	if (all)
 	{
 		tests.clear();
@@ -131,7 +138,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 			continue;
 		if (setup.size() > 0)
 			testToRun->addSetup(setup);
-		if (!run(testToRun)) success = false;
+		if (!run(testToRun, ignore)) success = false;
 		numberOfTests++;
 	}
 
@@ -151,9 +158,9 @@ bool TestRunner::run(const std::vector<std::string>& args)
 }
 
 
-bool TestRunner::run(Test* test)
+bool TestRunner::run(Test* test, const std::string& ignore)
 {
-	TextTestResult result(_ostr);
+	TextTestResult result(_ostr, ignore);
 
 	test->run(&result);
 	_ostr << result << std::endl;

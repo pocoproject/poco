@@ -8,17 +8,47 @@
 #include "CppUnit/Test.h"
 #include "CppUnit/estring.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <iomanip>
 #include <cstdlib>
 #include <cctype>
+#include <exception>
+
 
 
 namespace CppUnit {
 
-
-TextTestResult::TextTestResult():
+	TextTestResult::TextTestResult() :
+		_ostr(std::cout)
+	{
+	}
+TextTestResult::TextTestResult(const std::string& ignore):
 	_ostr(std::cout)
 {
+	if (!ignore.empty())
+	{
+		try {
+			std::ifstream ifs(ignore);
+			if (ifs.is_open()) {
+				char line[256];
+				while (ifs.getline(line, sizeof(line)))
+				{
+					if (line[0] == '#')
+						continue;
+					std::string ignored(line);
+					std::string::const_iterator it = ignored.begin();
+					std::string::const_iterator end = ignored.end();
+					ignoring(ignored);
+				}
+				ifs.close();
+			}
+		}
+		catch (std::exception e) {
+			std::cout << e.what() << std::endl;
+		}
+
+	}
 	setup();
 }
 
@@ -26,10 +56,45 @@ TextTestResult::TextTestResult():
 TextTestResult::TextTestResult(std::ostream& ostr):
 	_ostr(ostr)
 {
+}
+TextTestResult::TextTestResult(std::ostream& ostr, const std::string& ignore) :
+	_ostr(ostr)
+{
+	if (!ignore.empty())
+	{
+		std::ifstream ifs(ignore);
+		if (ifs.is_open()) {
+			char line[256];
+			while (ifs.getline(line, sizeof(line)))
+			{
+				if (line[0] == '#')
+					continue;
+				std::string ignored(line);
+				std::string::const_iterator it = ignored.begin();
+				std::string::const_iterator end = ignored.end();
+				ignoring(ignored);
+			}
+			ifs.close();
+		}
+	}
 	setup();
 }
 
+void TextTestResult::ignoring(const std::string ignore)
+{
+	std::string::const_iterator it = ignore.begin();
+	std::string::const_iterator end = ignore.end();
+	for (;;)
+	{
+		while (it != end && (std::isspace(*it) || *it == '"' || *it == ',' || *it == '\'')) ++it;
+		if (it == end)
+			break;
 
+		std::string test;
+		while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
+		if (!test.empty()) _ignored.insert(test.erase(test.find_last_not_of(" \n\r\t") + 1));
+	}
+}
 void TextTestResult::setup()
 {
 #if !defined(_WIN32_WCE)
@@ -39,17 +104,9 @@ void TextTestResult::setup()
 		std::string ignored = env;
 		std::string::const_iterator it = ignored.begin();
 		std::string::const_iterator end = ignored.end();
-		for (;;)
-		{
-			while (it != end && (std::isspace(*it) || *it == '"' || *it == ',' || *it == '\'')) ++it;
-			if (it == end)
-				break;
-
-			std::string test;
-			while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
-			if (!test.empty()) _ignored.insert(test);
-		}
+		ignoring(ignored);
 	}
+
 #endif
 }
 
@@ -196,18 +253,11 @@ void TextTestResult::print(std::ostream& stream)
 
 void TextTestResult::printHeader(std::ostream& stream)
 {
-	if (wasSuccessful())
-		stream << "OK (" 
-		          << runTests() << " tests)" 
-		          << std::endl;
-	else
+	if (!wasSuccessful())
 		stream << "!!!FAILURES!!!" << std::endl
-		          << "Runs: "
-		          << runTests ()
-		          << "   Failures: "
-		          << testFailures ()
-		          << "   Errors: "
-		          << testErrors ()
+		          << "Runs: "			<< runTests()
+		          << "   Failures: "	<< testFailures()
+		          << "   Errors: "		<< testErrors()
 		          << std::endl;
 }
 
