@@ -111,27 +111,20 @@ matrix:
           /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
           #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
 
-    - env:    TEST_NAME="gcc (make)"
-      compiler: gcc
-      script:
-        - ./configure --everything --omit=PDF && make all -s -j2 && sudo make install
-        - sudo -s ./travis/runtests.sh
-
     - env:    TEST_NAME="clang (make)"
       compiler: clang
       script:
         - ./configure --everything --omit=PDF --config=Linux-clang && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
-    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
-      script:
-        - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make all -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
+#    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
+#      script:
+#        - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make all -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
 
-    - env:    TEST_NAME="gcc (CMake)"
+    - env:    TEST_NAME="gcc-5.4.0 (CMake)"
       compiler: gcc
       script:
-        # disable tests, gcc-4.6 gets an internal compiler error
-        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=OFF && cmake --build cmake-build --target all
+        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
 
     - env:    TEST_NAME="gcc-4.8 (CMake)"
       compiler: gcc
