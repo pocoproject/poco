@@ -4,7 +4,7 @@ rem $Id$
 rem
 rem A script for running the POCO testsuites.
 rem
-rem usage: runtests2 [64] [-d ] [component [test]]
+rem usage: runtests2 [-64] [-d ] [component [test]]
 rem
 rem component   : the component under test
 rem test        : the test as part of the component
@@ -21,7 +21,7 @@ set TESTRUNNERARGS=-all
 set TESTCOMPONENTS='C:\Windows\System32\findstr.exe /R "." components'
 set BINDIR=bin
 
-if "%1"=="64" (
+if "%1"=="-64" (
   set BINDIR=bin64
   shift
 )
