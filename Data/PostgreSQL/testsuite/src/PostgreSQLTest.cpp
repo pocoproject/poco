@@ -66,6 +66,10 @@ std::string PostgreSQLTest::getPass(){
 	{
 		return "Password12!";
 	}
+	else if (Environment::has("JENKINS_HOME"))
+	{
+		return "postgres";
+	}
 	else
 	{
 		return "poco";
