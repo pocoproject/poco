@@ -3,8 +3,3 @@
 	url = https://github.com/pocoproject/openssl
 	branch = develop
 
-[submodule "gradle"]
-	path = gradle
-	url = https://github.com/pocoproject/gradle
-	branch = gradle-5.2
-	
