@@ -25,6 +25,12 @@ else()
     )
 endif (POCO_UNBUNDLED)
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(XML ${SRCS} )
 
 add_library(Poco::XML ALIAS XML)

@@ -12,6 +12,12 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
     src/WinService.cpp
 )
 
+# Version Resource
+if(MSVC AND NOT POCO_STATIC)
+    source_group("Resources" FILES ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+    list(APPEND SRCS ${CMAKE_SOURCE_DIR}/DLLVersion.rc)
+endif()
+
 add_library(Util ${SRCS} )
 add_library(Poco::Util ALIAS Util)
 set_target_properties(Util

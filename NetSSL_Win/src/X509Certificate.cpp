@@ -366,7 +366,7 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	Poco::UnicodeConverter::convert(certStoreName, wcertStore);
 	HCERTSTORE hCertStore;
 	if (useMachineStore)
-		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStoreName.c_str());
+		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStore.c_str());
 	else
 		hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
 
@@ -397,7 +397,6 @@ void X509Certificate::importCertificate(const std::string& certPath)
 	Poco::File certFile(certPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(certPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("certificate file too large", certPath);
 	if (size < 32) throw Poco::DataFormatException("certificate file too small", certPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(certPath);
