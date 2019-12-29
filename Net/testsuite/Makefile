@@ -28,8 +28,9 @@ objects = \
 	SyslogTest \
 	OAuth10CredentialsTest OAuth20CredentialsTest OAuthTestSuite \
 	PollSetTest UDPServerTest UDPServerTestSuite \
-	NTLMCredentialsTest
-
+	NTLMCredentialsTest \
+	SocketConnectorTest
+	
 target         = testrunner
 target_version = 1
 target_libs    = PocoNet PocoFoundation CppUnit
