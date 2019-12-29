@@ -13,6 +13,7 @@
 #include "SocketAddressTest.h"
 #include "DNSTest.h"
 #include "NetworkInterfaceTest.h"
+#include "SocketConnectorTest.h"
 
 
 CppUnit::Test* NetCoreTestSuite::suite()
@@ -22,6 +23,7 @@ CppUnit::Test* NetCoreTestSuite::suite()
 	pSuite->addTest(IPAddressTest::suite());
 	pSuite->addTest(SocketAddressTest::suite());
 	pSuite->addTest(DNSTest::suite());
+	pSuite->addTest(SocketConnectorTest::suite());
 #ifdef POCO_NET_HAS_INTERFACE
 	pSuite->addTest(NetworkInterfaceTest::suite());
 #endif // POCO_NET_HAS_INTERFACE
