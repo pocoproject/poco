@@ -25,6 +25,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -92,6 +93,7 @@ public:
 	virtual ~SocketConnector()
 		/// Destroys the SocketConnector.
 	{
+		Mutex::ScopedLock lock(_mutex);
 		try
 		{
 			unregisterConnector();
@@ -134,6 +136,7 @@ public:
 
 	void onReadable(ReadableNotification* pNotification)
 	{
+		Mutex::ScopedLock lock(_mutex);
 		pNotification->release();
 		int err = _socket.impl()->socketError(); 
 		if (err)
@@ -149,6 +152,7 @@ public:
 	
 	void onWritable(WritableNotification* pNotification)
 	{
+		Mutex::ScopedLock lock(_mutex);
 		pNotification->release();
 		onConnect();
 	}
@@ -162,6 +166,7 @@ public:
 	
 	void onError(ErrorNotification* pNotification)
 	{
+		Mutex::ScopedLock lock(_mutex);
 		pNotification->release();
 		onError(_socket.impl()->socketError());
 		unregisterConnector();
@@ -205,6 +210,7 @@ private:
 
 	StreamSocket   _socket;
 	SocketReactor* _pReactor;
+	Mutex _mutex;
 };
 
 
