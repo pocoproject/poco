@@ -33,11 +33,11 @@ public:
 
 	virtual ~TestDecorator();
 
-	int countTestCases();
+	int countTestCases() const;
 
 	void run(TestResult* result);
 
-	std::string toString();
+	std::string toString() const;
 
 protected:
 	Test* _test;
