@@ -49,7 +49,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	bool all     = false;
 	bool wait    = false;
 	bool printed = false;
-	bool long_running = false;
+	bool longRunning = false;
 	std::string ignore;
 
 	std::vector<std::string>	setup;
@@ -70,7 +70,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 		}
 		else if (arg == "-long")
 		{
-			long_running = true;
+			longRunning = true;
 			continue;
 		}
 		else if (arg == "-ignore")
@@ -134,7 +134,7 @@ bool TestRunner::run(const std::vector<std::string>& args)
 	for (std::vector<Test*>::const_iterator it = tests.begin(); it != tests.end(); ++it)
 	{
 		Test* testToRun = *it;
-		if(testToRun->getType() == Test::Long && !long_running)
+		if(testToRun->getType() == Test::Long && !longRunning)
 			continue;
 		if (setup.size() > 0)
 			testToRun->addSetup(setup);
