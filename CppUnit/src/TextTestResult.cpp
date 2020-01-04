@@ -16,21 +16,25 @@
 #include <exception>
 
 
-
 namespace CppUnit {
 
-	TextTestResult::TextTestResult() :
-		_ostr(std::cout)
-	{
-	}
+
+TextTestResult::TextTestResult() :
+	_ostr(std::cout)
+{
+}
+
+
 TextTestResult::TextTestResult(const std::string& ignore):
 	_ostr(std::cout)
 {
 	if (!ignore.empty())
 	{
-		try {
+		try
+		{
 			std::ifstream ifs(ignore);
-			if (ifs.is_open()) {
+			if (ifs.is_open())
+			{
 				char line[256];
 				while (ifs.getline(line, sizeof(line)))
 				{
@@ -44,7 +48,8 @@ TextTestResult::TextTestResult(const std::string& ignore):
 				ifs.close();
 			}
 		}
-		catch (std::exception e) {
+		catch (std::exception e)
+		{
 			std::cout << e.what() << std::endl;
 		}
 
@@ -57,13 +62,16 @@ TextTestResult::TextTestResult(std::ostream& ostr):
 	_ostr(ostr)
 {
 }
+
+
 TextTestResult::TextTestResult(std::ostream& ostr, const std::string& ignore) :
 	_ostr(ostr)
 {
 	if (!ignore.empty())
 	{
 		std::ifstream ifs(ignore);
-		if (ifs.is_open()) {
+		if (ifs.is_open())
+		{
 			char line[256];
 			while (ifs.getline(line, sizeof(line)))
 			{
@@ -80,6 +88,7 @@ TextTestResult::TextTestResult(std::ostream& ostr, const std::string& ignore) :
 	setup();
 }
 
+
 void TextTestResult::ignoring(const std::string ignore)
 {
 	std::string::const_iterator it = ignore.begin();
@@ -95,6 +104,8 @@ void TextTestResult::ignoring(const std::string ignore)
 		if (!test.empty()) _ignored.insert(test.erase(test.find_last_not_of(" \n\r\t") + 1));
 	}
 }
+
+
 void TextTestResult::setup()
 {
 #if !defined(_WIN32_WCE)
@@ -142,15 +153,15 @@ void TextTestResult::addFailure(Test* test, CppUnitException* e)
 void TextTestResult::startTest(Test* test)
 {
 	TestResult::startTest(test);
-	_ostr << shortName(test->toString()) << ": ";
+	_ostr << "\n" << shortName(test->toString()) << ": ";
 }
 
 
 void TextTestResult::printErrors(std::ostream& stream)
 {
-	if (testErrors() != 0) 
+	if (testErrors() != 0)
 	{
-		stream << std::endl;
+		stream << "\n";
 
 		if (testErrors() == 1)
 			stream << "There was " << testErrors() << " error: " << std::endl;
@@ -165,9 +176,9 @@ void TextTestResult::printErrors(std::ostream& stream)
 
 			stream << std::setw(2) << i
 			       << ": "
-			       << failure->failedTest()->toString() << std::endl
-			       << "    \"" << (e ? e->what() : "") << "\"" << std::endl
-			       << "    in \"" 
+			       << failure->failedTest()->toString() << "\n"
+			       << "    \"" << (e ? e->what() : "") << "\"\n"
+			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
 			if (e == 0)
@@ -213,9 +224,9 @@ void TextTestResult::printFailures(std::ostream& stream)
 
 			stream << std::setw(2) << i
 			       << ": "
-			       << failure->failedTest()->toString() << std::endl
-			       << "    \"" << (e ? e->what() : "") << "\"" << std::endl
-			       << "    in \"" 
+			       << failure->failedTest()->toString() << "\n"
+			       << "    \"" << (e ? e->what() : "") << "\"\n"
+			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
 			if (e == 0)
@@ -227,7 +238,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 				stream << e->lineNumber();
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
-					stream << " data lines " 
+					stream << " data lines "
 					       << e->data1LineNumber()
                            << ", " << e->data2LineNumber();
 				}
@@ -253,11 +264,19 @@ void TextTestResult::print(std::ostream& stream)
 
 void TextTestResult::printHeader(std::ostream& stream)
 {
-	if (!wasSuccessful())
-		stream << "!!!FAILURES!!!" << std::endl
-		          << "Runs: "			<< runTests()
-		          << "   Failures: "	<< testFailures()
-		          << "   Errors: "		<< testErrors()
+	stream << "\n\n";
+	if (wasSuccessful())
+		stream << "OK ("
+		          << runTests() << " tests)"
+		          << std::endl;
+	else
+		stream << "!!!FAILURES!!!" << "\n"
+		          << "Runs: "
+		          << runTests ()
+		          << "   Failures: "
+		          << testFailures ()
+		          << "   Errors: "
+		          << testErrors ()
 		          << std::endl;
 }
 
