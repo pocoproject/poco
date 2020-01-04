@@ -70,11 +70,11 @@ void HTTPCookieTest::testCookie()
 
 	cookie.setVersion(1);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; secure; Version=\"1\"");
-	
+
 	cookie.setSecure(false);
 	cookie.setMaxAge(100);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; Version=\"1\"");
-	
+
 	cookie.setHttpOnly(true);
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
 
@@ -83,7 +83,17 @@ void HTTPCookieTest::testCookie()
 	cookie.setPriority("Medium");
 	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"Medium\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
 	cookie.setPriority("High");
-	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"High\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");	
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Priority=\"High\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
+
+	cookie.setPriority("");
+	cookie.setSameSite(HTTPCookie::SAME_SITE_NONE);
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; SameSite=None; HttpOnly; Version=\"1\"");
+	cookie.setSameSite(HTTPCookie::SAME_SITE_LAX);
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; SameSite=Lax; HttpOnly; Version=\"1\"");
+	cookie.setSameSite(HTTPCookie::SAME_SITE_STRICT);
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; SameSite=Strict; HttpOnly; Version=\"1\"");
+	cookie.setSameSite(HTTPCookie::SAME_SITE_NOT_SPECIFIED);
+	assert (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Max-Age=\"100\"; HttpOnly; Version=\"1\"");
 }
 
 
