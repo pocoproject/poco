@@ -59,8 +59,8 @@ void ChannelTest::testSplitter()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	AutoPtr<SplitterChannel> pSplitter = new SplitterChannel;
-	pSplitter->addChannel(pChannel.get());
-	pSplitter->addChannel(pChannel.get());
+	pSplitter->addChannel(pChannel);
+	pSplitter->addChannel(pChannel);
 	Message msg;
 	pSplitter->log(msg);
 	assertTrue (pChannel->list().size() == 2);
