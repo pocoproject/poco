@@ -175,6 +175,7 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::UInt64>&
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 void AbstractPreparator::prepare(std::size_t pos, const std::vector<long>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");
@@ -191,6 +192,7 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<long>& val)
 {
 	throw NotImplementedException("std::list preparator must be implemented.");
 }
+#endif
 
 
 void AbstractPreparator::prepare(std::size_t pos, const std::vector<bool>& val)

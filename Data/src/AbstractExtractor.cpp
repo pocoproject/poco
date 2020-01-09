@@ -174,6 +174,7 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<Poco::UInt64>& val)
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 bool AbstractExtractor::extract(std::size_t pos, std::vector<long>& val)
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");
@@ -190,6 +191,7 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<long>& val)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
+#endif
 
 
 bool AbstractExtractor::extract(std::size_t pos, std::vector<bool>& val)
