@@ -2123,6 +2123,9 @@ inline bool operator != (const char* other, const Var& da)
 }
 
 
+#ifndef POCO_INT64_IS_LONG
+
+
 inline long operator + (const long& other, const Var& da)
 	/// Addition operator for adding Var to long
 {
@@ -2329,6 +2332,9 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 	if (da.isEmpty()) return false;
 	return other >= da.convert<unsigned long>();
 }
+
+
+#endif // POCO_INT64_IS_LONG
 
 
 } // namespace Dynamic

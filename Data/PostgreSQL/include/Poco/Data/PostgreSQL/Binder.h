@@ -70,15 +70,13 @@ public:
 	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir = PD_IN);
 		/// Binds an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
-
+#ifndef POCO_INT64_IS_LONG
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN);
 		/// Binds a long.
 
 	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN);
 		/// Binds an unsigned long.
-
-#endif // POCO_LONG_IS_64_BIT
+#endif
 
 	virtual void bind(std::size_t pos, const bool& val, Direction dir = PD_IN);
 		/// Binds a boolean.

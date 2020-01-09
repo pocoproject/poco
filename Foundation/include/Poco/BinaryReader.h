@@ -76,8 +76,8 @@ public:
 	BinaryReader& operator >> (double& value);
 
 #if defined(POCO_HAVE_INT64)
-	BinaryReader& operator >> (Int64& value);
-	BinaryReader& operator >> (UInt64& value);
+	BinaryReader& operator >> (long long& value);
+	BinaryReader& operator >> (unsigned long long& value);
 #endif
 
 	BinaryReader& operator >> (std::string& value);

@@ -81,8 +81,8 @@ public:
 	BinaryWriter& operator << (double value);
 
 #if defined(POCO_HAVE_INT64)
-	BinaryWriter& operator << (Int64 value);
-	BinaryWriter& operator << (UInt64 value);
+	BinaryWriter& operator << (long long value);
+	BinaryWriter& operator << (unsigned long long value);
 #endif
 
 	BinaryWriter& operator << (const std::string& value);

@@ -59,7 +59,7 @@ public:
 		/// Creates the AbstractSessionImpl.
 		/// 
 		/// Adds "storage" property and sets the default internal storage container 
-		/// type to std::vector.
+		/// type to std::deque.
 		/// The storage is created by statements automatically whenever a query 
 		/// returning results is executed but external storage is provided by the user.
 		/// Storage type can be reconfigured at runtime both globally (for the

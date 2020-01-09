@@ -173,6 +173,7 @@ public:
 	void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir);
 		/// Binds an UInt64 list.
 
+#ifndef POCO_INT64_IS_LONG
 	void bind(std::size_t pos, const long& val, Direction dir);
 		/// Binds a long.
 
@@ -187,6 +188,7 @@ public:
 
 	void bind(std::size_t pos, const std::list<long>& val, Direction dir);
 		/// Binds a long list.
+#endif
 
 	void bind(std::size_t pos, const bool& val, Direction dir);
 		/// Binds a boolean.
@@ -1213,6 +1215,7 @@ inline void Binder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Di
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 inline void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 	bindImpl(pos, val, SQL_C_SLONG, dir);
@@ -1241,6 +1244,7 @@ inline void Binder::bind(std::size_t pos, const std::list<long>& val, Direction 
 {
 	bindImplContainer(pos, val, SQL_C_SLONG, dir);
 }
+#endif
 
 
 inline void Binder::bind(std::size_t pos, const float& val, Direction dir)

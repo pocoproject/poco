@@ -91,6 +91,7 @@ void Binder::bind(std::size_t pos, const Poco::UInt64& val, Direction dir)
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
@@ -103,6 +104,7 @@ void Binder::bind(std::size_t pos, const unsigned long& val, Direction dir)
 	poco_assert(dir == PD_IN);
 	realBind(pos, MYSQL_TYPE_LONG, &val, 0, true);
 }
+#endif // POCO_LONG_IS_64_BIT
 
 
 void Binder::bind(std::size_t pos, const bool& val, Direction dir)

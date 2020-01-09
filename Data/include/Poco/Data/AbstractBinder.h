@@ -165,6 +165,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN);
 		/// Binds an UInt64 list.
 
+#ifndef POCO_INT64_IS_LONG
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN) = 0;
 		/// Binds a long.
 
@@ -179,6 +180,7 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<long>& val, Direction dir = PD_IN);
 		/// Binds a long list.
+#endif
 
 	virtual void bind(std::size_t pos, const bool& val, Direction dir = PD_IN) = 0;
 		/// Binds a boolean.

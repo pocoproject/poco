@@ -25,15 +25,15 @@
 namespace Poco {
 
 
-using Int8 = std::int8_t;
-using UInt8 = std::uint8_t;
-using Int16 = std::int16_t;
-using UInt16 = std::uint16_t;
-using Int32 = std::int32_t;
-using UInt32 = std::uint32_t;
-using Int64 = std::int64_t;
-using UInt64 = std::uint64_t;
-using IntPtr = std::intptr_t;
+using Int8    = std::int8_t;
+using UInt8   = std::uint8_t;
+using Int16   = std::int16_t;
+using UInt16  = std::uint16_t;
+using Int32   = std::int32_t;
+using UInt32  = std::uint32_t;
+using Int64   = std::int64_t;
+using UInt64  = std::uint64_t;
+using IntPtr  = std::intptr_t;
 using UIntPtr = std::uintptr_t;
 
 
@@ -49,17 +49,10 @@ using UIntPtr = std::uintptr_t;
 		#if defined(__LP64__)
 			#define POCO_PTR_IS_64_BIT 1
 			#define POCO_LONG_IS_64_BIT 1
+			#if POCO_OS == POCO_OS_LINUX
+				#define POCO_INT64_IS_LONG 1
+			#endif
 		#endif
-	#endif
-	#define POCO_HAVE_INT64 1
-#elif defined(__DECCXX)
-	#define POCO_PTR_IS_64_BIT 1
-	#define POCO_LONG_IS_64_BIT 1
-	#define POCO_HAVE_INT64 1
-#elif defined(__HP_aCC)
-	#if defined(__LP64__)
-		#define POCO_PTR_IS_64_BIT 1
-		#define POCO_LONG_IS_64_BIT 1
 	#endif
 	#define POCO_HAVE_INT64 1
 #elif defined(__SUNPRO_CC)

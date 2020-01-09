@@ -215,11 +215,11 @@ BinaryWriter& BinaryWriter::operator << (double value)
 #if defined(POCO_HAVE_INT64)
 
 
-BinaryWriter& BinaryWriter::operator << (Int64 value)
+BinaryWriter& BinaryWriter::operator << (long long value)
 {
 	if (_flipBytes)
 	{
-		Int64 fValue = ByteOrder::flipBytes(value);
+		Int64 fValue = ByteOrder::flipBytes(static_cast<Int64>(value));
 		_ostr.write((const char*) &fValue, sizeof(fValue));
 	}
 	else
@@ -230,11 +230,11 @@ BinaryWriter& BinaryWriter::operator << (Int64 value)
 }
 
 
-BinaryWriter& BinaryWriter::operator << (UInt64 value)
+BinaryWriter& BinaryWriter::operator << (unsigned long long value)
 {
 	if (_flipBytes)
 	{
-		UInt64 fValue = ByteOrder::flipBytes(value);
+		UInt64 fValue = ByteOrder::flipBytes(static_cast<UInt64>(value));
 		_ostr.write((const char*) &fValue, sizeof(fValue));
 	}
 	else

@@ -173,7 +173,7 @@ BinaryReader& BinaryReader::operator >> (double& value)
 #if defined(POCO_HAVE_INT64)
 
 
-BinaryReader& BinaryReader::operator >> (Int64& value)
+BinaryReader& BinaryReader::operator >> (long long& value)
 {
 	_istr.read((char*) &value, sizeof(value));
 	if (_flipBytes) value = ByteOrder::flipBytes(value);
@@ -181,7 +181,7 @@ BinaryReader& BinaryReader::operator >> (Int64& value)
 }
 
 
-BinaryReader& BinaryReader::operator >> (UInt64& value)
+BinaryReader& BinaryReader::operator >> (unsigned long long& value)
 {
 	_istr.read((char*) &value, sizeof(value));
 	if (_flipBytes) value = ByteOrder::flipBytes(value);

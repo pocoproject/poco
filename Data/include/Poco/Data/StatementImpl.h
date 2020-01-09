@@ -243,11 +243,11 @@ protected:
 		///    session is queried for container type setting. If the
 		///    session container type setting is found, it is used.
 		/// 3. If neither session nor statement have the internal
-		///    container type set, std::vector is used.
+		///    container type set, std::deque is used.
 		///
 		/// Supported internal extraction container types are:
-		/// - std::vector (default)
-		/// - std::deque
+		/// - std::deque (default)
+		/// - std::vector
 		/// - std::list
 
 	SessionImpl& session();

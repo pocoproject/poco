@@ -56,6 +56,7 @@ void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir)
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 void Binder::bind(std::size_t pos, const long &val, Direction dir)
 {
 	long tmp = static_cast<long>(val);
@@ -69,6 +70,7 @@ void Binder::bind(std::size_t pos, const unsigned long &val, Direction dir)
 	int rc = sqlite3_bind_int(_pStmt, (int) pos, tmp);
 	checkReturn(rc);
 }
+#endif
 
 
 void Binder::bind(std::size_t pos, const double &val, Direction dir)

@@ -80,6 +80,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val);
@@ -90,6 +91,7 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 {
 	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val, true);
 }
+#endif
 
 
 bool Extractor::extract(std::size_t pos, bool& val)
@@ -399,6 +401,7 @@ bool Extractor::extract(std::size_t , std::list<Poco::UInt64>& )
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t , std::vector<long>& )
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");
@@ -415,6 +418,7 @@ bool Extractor::extract(std::size_t , std::list<long>& )
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
+#endif
 
 
 bool Extractor::extract(std::size_t , std::vector<bool>& )

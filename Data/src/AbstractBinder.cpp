@@ -180,6 +180,7 @@ void AbstractBinder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, D
 }
 
 
+#ifndef POCO_INT64_IS_LONG
 void AbstractBinder::bind(std::size_t pos, const std::vector<long>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
@@ -196,6 +197,7 @@ void AbstractBinder::bind(std::size_t pos, const std::list<long>& val, Direction
 {
 	throw NotImplementedException("std::list binder must be implemented.");
 }
+#endif
 
 
 void AbstractBinder::bind(std::size_t pos, const std::vector<bool>& val, Direction dir)
@@ -462,7 +464,7 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 		bind(pos, RefAnyCast<BLOB>(val), dir);
 	else if (type == typeid(void))
 		bind(pos, Keywords::null, dir);
-	else if (type == typeid(long))
+	else if(type == typeid(long))
 		bind(pos, RefAnyCast<long>(val), dir);
 	else
 		throw UnknownTypeException(std::string(val.type().name()));
