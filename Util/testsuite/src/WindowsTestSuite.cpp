@@ -20,7 +20,9 @@ CppUnit::Test* WindowsTestSuite::suite()
 
 	pSuite->addTest(WinRegistryTest::suite());
 	pSuite->addTest(WinConfigurationTest::suite());
+#ifdef ENABLE_WINSERVICE_TEST
 	pSuite->addTest(WinServiceTest::suite());
+#endif
 
 	return pSuite;
 }

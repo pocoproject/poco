@@ -29,7 +29,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch> > 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch>> 
 class BasicBufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of a buffered streambuf
 	/// that greatly simplifies the implementation of
@@ -59,13 +59,20 @@ public:
 		_pBuffer(Allocator::allocate(_bufsize)),
 		_mode(mode)
 	{
-		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);
+		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);	
 		this->setp(_pBuffer, _pBuffer + _bufsize);
 	}
 
 	~BasicBufferedStreamBuf()
 	{
-		Allocator::deallocate(_pBuffer, _bufsize);
+		try
+		{
+			Allocator::deallocate(_pBuffer, _bufsize);
+		} 
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	virtual int_type overflow(int_type c)
@@ -162,9 +169,9 @@ private:
 // instantiations in different libraries.
 //
 #if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
-template class Foundation_API BasicBufferedStreamBuf<char, std::char_traits<char> >;
+template class Foundation_API BasicBufferedStreamBuf<char, std::char_traits<char>>;
 #endif
-typedef BasicBufferedStreamBuf<char, std::char_traits<char> > BufferedStreamBuf;
+typedef BasicBufferedStreamBuf<char, std::char_traits<char>> BufferedStreamBuf;
 
 
 } // namespace Poco

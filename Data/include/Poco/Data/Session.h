@@ -176,8 +176,14 @@ public:
 	Session(const Session&);
 		/// Creates a session by copying another one.
 
+	Session(Session&&) noexcept;
+		/// Creates a session by moving another one.
+
 	Session& operator = (const Session&);
 		/// Assignment operator.
+
+	Session& operator = (Session&&) noexcept;
+		/// Move assignment.
 
 	~Session();
 		/// Destroys the Session.

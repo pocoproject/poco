@@ -57,7 +57,7 @@ class Data_API AbstractPreparator
 	/// after SQL execution (e.g. SQLite) do not need this functionality at all.
 {
 public:
-	typedef SharedPtr<AbstractPreparator> Ptr;
+	using Ptr = SharedPtr<AbstractPreparator>;
 
 	AbstractPreparator(Poco::UInt32 length = 1u);
 		/// Creates the AbstractPreparator.

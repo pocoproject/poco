@@ -55,7 +55,7 @@ public:
 	void setConnectionTimeout(std::size_t timeout);
 	std::size_t getConnectionTimeout() const;
 	bool canTransact() const;
-	bool isTransaction()const ;
+	bool isTransaction() const;
 	void setTransactionIsolation(Poco::UInt32);
 	Poco::UInt32 getTransactionIsolation() const;
 	bool hasTransactionIsolation(Poco::UInt32) const;

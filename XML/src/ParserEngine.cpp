@@ -603,9 +603,9 @@ void ParserEngine::popContext()
 
 void ParserEngine::resetContext()
 {
-	for (ContextStack::iterator it = _context.begin(); it != _context.end(); ++it)
+	for (auto p: _context)
 	{
-		delete *it;
+		delete p;
 	}
 	_context.clear();
 }

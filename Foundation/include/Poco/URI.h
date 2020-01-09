@@ -51,7 +51,7 @@ class Foundation_API URI
 	/// setQuery(), setRawQuery(), getQuery() and getRawQuery() for more information.
 {
 public:
-	typedef std::vector<std::pair<std::string, std::string> > QueryParameters;
+	using QueryParameters = std::vector<std::pair<std::string, std::string>>;
 
 	URI();
 		/// Creates an empty URI.
@@ -78,6 +78,9 @@ public:
 
 	URI(const URI& uri);
 		/// Copy constructor. Creates an URI from another one.
+
+	URI(URI&& uri) noexcept;
+		/// Move constructor.
 		
 	URI(const URI& baseURI, const std::string& relativeURI);
 		/// Creates an URI from a base URI and a relative URI, according to
@@ -94,7 +97,10 @@ public:
 	
 	URI& operator = (const URI& uri);
 		/// Assignment operator.
-		
+
+	URI& operator = (URI&& uri) noexcept;
+		/// Move assignment.	
+
 	URI& operator = (const std::string& uri);
 		/// Parses and assigns an URI from the given string. Throws a
 		/// SyntaxException if the uri is not valid.

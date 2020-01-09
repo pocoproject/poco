@@ -25,7 +25,7 @@
 namespace Poco {
 
 
-template <class Value, class HashFunc = Hash<Value> >
+template <class Value, class HashFunc = Hash<Value>>
 class HashSet
 	/// This class implements a set using a LinearHashTable.
 	///

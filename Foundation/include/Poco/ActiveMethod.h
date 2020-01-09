@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <class ResultType, class ArgType, class OwnerType, class StarterType = ActiveStarter<OwnerType> >
+template <class ResultType, class ArgType, class OwnerType, class StarterType = ActiveStarter<OwnerType>>
 class ActiveMethod
 	/// An active method is a method that, when called, executes
 	/// in its own thread. ActiveMethod's take exactly one

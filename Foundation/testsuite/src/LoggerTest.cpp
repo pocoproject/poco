@@ -36,7 +36,8 @@ void LoggerTest::testLogger()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
+
 	assertTrue (root.getLevel() == Message::PRIO_INFORMATION);
 	assertTrue (root.is(Message::PRIO_INFORMATION));
 	assertTrue (root.fatal());
@@ -106,14 +107,14 @@ void LoggerTest::testLogger()
 	assertTrue (logger22.getLevel() == Message::PRIO_WARNING);
 	
 	AutoPtr<TestChannel> pChannel2 = new TestChannel;
-	Logger::setChannel("Logger2", pChannel2.get());
-	assertTrue (pChannel  == root.getChannel());
-	assertTrue (pChannel  == logger1.getChannel());
-	assertTrue (pChannel  == logger11.getChannel());
-	assertTrue (pChannel  == logger12.getChannel());
-	assertTrue (pChannel2 == logger2.getChannel());
-	assertTrue (pChannel2 == logger21.getChannel());
-	assertTrue (pChannel2 == logger22.getChannel());
+	Logger::setChannel("Logger2", pChannel2);
+	assertTrue (pChannel.get()  == root.getChannel().get());
+	assertTrue (pChannel.get()  == logger1.getChannel().get());
+	assertTrue (pChannel.get()  == logger11.getChannel().get());
+	assertTrue (pChannel.get()  == logger12.getChannel().get());
+	assertTrue (pChannel2.get() == logger2.getChannel().get());
+	assertTrue (pChannel2.get() == logger21.getChannel().get());
+	assertTrue (pChannel2.get() == logger22.getChannel().get());
 	
 	root.setLevel(Message::PRIO_TRACE);
 	pChannel->list().clear();
@@ -191,7 +192,7 @@ void LoggerTest::testFormatAny()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
 
 	root.error("%s%s", std::string("foo"), std::string("bar"));
 	assertTrue (pChannel->getLastMessage().getText() == "foobar");
@@ -231,6 +232,21 @@ void LoggerTest::testFormatAny()
 
 	root.error("%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 	assertTrue (pChannel->getLastMessage().getText() == "12345678910");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+	assertTrue (pChannel->getLastMessage().getText() == "1234567891011");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+	assertTrue (pChannel->getLastMessage().getText() == "123456789101112");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+	assertTrue (pChannel->getLastMessage().getText() == "12345678910111213");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+	assertTrue (pChannel->getLastMessage().getText() == "1234567891011121314");
+
+	root.error("%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+	assertTrue (pChannel->getLastMessage().getText() == "123456789101112131415");
 }
 
 
@@ -238,7 +254,7 @@ void LoggerTest::testDump()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
 	Logger& root = Logger::root();
-	root.setChannel(pChannel.get());
+	root.setChannel(pChannel);
 	root.setLevel(Message::PRIO_INFORMATION);
 	
 	char buffer1[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};

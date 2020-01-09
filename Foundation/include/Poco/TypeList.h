@@ -222,7 +222,7 @@ struct TypeGetter;
 
 
 template <int N, class Head, class Tail> 
-struct TypeGetter<N, TypeList<Head, Tail> >
+struct TypeGetter<N, TypeList<Head, Tail>>
 {
 	typedef typename TypeGetter<N-1, Tail>::HeadType HeadType;
 	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
@@ -230,7 +230,7 @@ struct TypeGetter<N, TypeList<Head, Tail> >
 
 
 template <class Head, class Tail> 
-struct TypeGetter<0, TypeList<Head, Tail> >
+struct TypeGetter<0, TypeList<Head, Tail>>
 {
 	typedef typename TypeList<Head, Tail>::HeadType HeadType;
 	typedef typename TypeWrapper<HeadType>::CONSTTYPE ConstHeadType;
@@ -305,7 +305,7 @@ struct TypeAppender<NullTypeList, T>
 
 
 template <class Head, class Tail>
-struct TypeAppender<NullTypeList, TypeList<Head, Tail> >
+struct TypeAppender<NullTypeList, TypeList<Head, Tail>>
 {
 	typedef TypeList<Head, Tail> HeadType;
 };
@@ -320,7 +320,7 @@ struct TypeAppender<TypeList<Head, Tail>, T>
 
 template <class Head, class T> 
 struct TypeOneEraser;
-	/// TypeOneEraser erases the first occurence of the type T in Head.
+	/// TypeOneEraser erases the first occurrence of the type T in Head.
 	/// Usage:
 	///
 	/// typedef TypeListType<char, int, float>::HeadType Type3;
@@ -352,7 +352,7 @@ struct TypeOneEraser<TypeList<Head, Tail>, T>
 
 template <class Head, class T> 
 struct TypeAllEraser;
-	/// TypeAllEraser erases all the occurences of the type T in Head.
+	/// TypeAllEraser erases all the occurrences of the type T in Head.
 	/// Usage:
 	///
 	/// typedef TypeListType<char, int, float, int>::HeadType Type4;
@@ -384,7 +384,7 @@ struct TypeAllEraser<TypeList<Head, Tail>, T>
 
 template <class Head> 
 struct TypeDuplicateEraser;
-	/// TypeDuplicateEraser erases all but the first occurence of the type T in Head.
+	/// TypeDuplicateEraser erases all but the first occurrence of the type T in Head.
 	/// Usage:
 	///
 	/// typedef TypeListType<char, int, float, int>::HeadType Type4;
@@ -401,7 +401,7 @@ struct TypeDuplicateEraser<NullTypeList>
 
 
 template <class Head, class Tail>
-struct TypeDuplicateEraser<TypeList<Head, Tail> >
+struct TypeDuplicateEraser<TypeList<Head, Tail>>
 {
 private:
 	typedef typename TypeDuplicateEraser<Tail>::HeadType L1;
@@ -413,7 +413,7 @@ public:
 
 template <class Head, class T, class R>
 struct TypeOneReplacer;
-	/// TypeOneReplacer replaces the first occurence 
+	/// TypeOneReplacer replaces the first occurrence
 	/// of the type T in Head with type R.
 	/// Usage:
 	///
@@ -446,7 +446,7 @@ struct TypeOneReplacer<TypeList<Head, Tail>, T, R>
 
 template <class Head, class T, class R>
 struct TypeAllReplacer;
-	/// TypeAllReplacer replaces all the occurences 
+	/// TypeAllReplacer replaces all the occurrences
 	/// of the type T in Head with type R.
 	/// Usage:
 	///

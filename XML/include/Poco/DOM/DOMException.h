@@ -65,15 +65,15 @@ public:
 	DOMException(const DOMException& exc);
 		/// Creates a DOMException by copying another one.
 		
-	~DOMException() throw();
+	~DOMException() noexcept;
 		/// Destroys the DOMException.
 		
 	DOMException& operator = (const DOMException& exc);
 
-	const char* name() const throw();
+	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const throw();
+	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
 	Poco::Exception* clone() const;

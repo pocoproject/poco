@@ -14,6 +14,7 @@
 
 #include "Poco/Task.h"
 #include "Poco/TaskManager.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
 
 
@@ -25,7 +26,7 @@ Task::Task(const std::string& name):
 	_pOwner(0),
 	_progress(0),
 	_state(TASK_IDLE),
-	_cancelEvent(false)
+	_cancelEvent(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -86,6 +87,13 @@ void Task::run()
 bool Task::sleep(long milliseconds)
 {
 	return _cancelEvent.tryWait(milliseconds);
+}
+
+
+bool Task::yield()
+{
+	Thread::yield();
+	return isCancelled();
 }
 
 

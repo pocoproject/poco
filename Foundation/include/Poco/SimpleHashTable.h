@@ -32,11 +32,11 @@ namespace Poco {
 
 
 //@ deprecated
-template <class Key, class Value, class KeyHashFunction = HashFunction<Key> >
+template <class Key, class Value, class KeyHashFunction = HashFunction<Key>>
 class SimpleHashTable
 	/// A SimpleHashTable stores a key value pair that can be looked up via a hashed key.
 	///
-	/// In comparision to a HashTable, this class handles collisions by sequentially searching the next
+	/// In comparison to a HashTable, this class handles collisions by sequentially searching the next
 	/// free location. This also means that the maximum size of this table is limited, i.e. if the hash table
 	/// is full, it will throw an exception and that this class does not support remove operations.
 	/// On the plus side it is faster than the HashTable.
@@ -66,10 +66,10 @@ public:
 		_capacity(ht._capacity)
 	{
 		_entries.reserve(ht._capacity);
-		for (typename HashTableVector::iterator it = ht._entries.begin(); it != ht._entries.end(); ++it)
+		for (auto p: ht._entries.end())
 		{
-			if (*it) 
-				_entries.push_back(new HashEntry(*it));
+			if (p) 
+				_entries.push_back(new HashEntry(p));
 			else
 				_entries.push_back(0);
 		}
@@ -101,10 +101,10 @@ public:
 
 	void clear()
 	{
-		for (typename HashTableVector::iterator it = _entries.begin(); it != _entries.end(); ++it)
+		for (auto& p: _entries)
 		{
-			delete *it;
-			*it = 0;
+			delete p;
+			p = 0;
 		}
 		_size = 0;
 	}
@@ -339,11 +339,11 @@ public:
 		{
 			SimpleHashTable tmp(newSize);
 			swap(tmp);
-			for (typename HashTableVector::const_iterator it = tmp._entries.begin(); it != tmp._entries.end(); ++it)
+			for (const auto& p: tmp._entries)
 			{
-				if (*it)
+				if (p)
 				{
-					insertRaw((*it)->key, hash((*it)->key), (*it)->value);
+					insertRaw(p->key, hash(p->key), p->value);
 				}
 			}
 		}

@@ -36,11 +36,11 @@ class Data_API RowIterator
 	/// RowIterator class.
 {
 public:
-	typedef std::bidirectional_iterator_tag iterator_category;
-	typedef Row                             value_type;
-	typedef std::ptrdiff_t                  difference_type;
-	typedef Row*                            pointer;
-	typedef Row&                            reference;
+	using iterator_category = std::bidirectional_iterator_tag;
+	using value_type = Row;
+	using difference_type = std::ptrdiff_t;
+	using pointer = Row*;
+	using reference = Row&;
 
 	static const std::size_t POSITION_END;
 		/// End position indicator.
@@ -53,11 +53,17 @@ public:
 	RowIterator(const RowIterator& other);
 		/// Creates a copy of other RowIterator.
 
+	RowIterator(RowIterator&& other) noexcept;
+		/// Move constructor.
+
 	~RowIterator();
 		/// Destroys the RowIterator.
 
 	RowIterator& operator = (const RowIterator& other);
 		/// Assigns the other RowIterator.
+
+	RowIterator& operator = (RowIterator&& other) noexcept;
+		/// Move assignment.
 
 	bool operator == (const RowIterator& other) const;
 		/// Equality operator.

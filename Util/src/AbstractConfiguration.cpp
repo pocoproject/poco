@@ -336,15 +336,15 @@ void AbstractConfiguration::keys(const std::string& key, Keys& range) const
 }
 
 
-const AbstractConfiguration* AbstractConfiguration::createView(const std::string& prefix) const
+const AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& prefix) const
 {
-	return new ConfigurationView(prefix, const_cast<AbstractConfiguration*>(this));
+	return new ConfigurationView(prefix, AbstractConfiguration::Ptr(const_cast<AbstractConfiguration*>(this), true));
 }
 
 
-AbstractConfiguration* AbstractConfiguration::createView(const std::string& prefix)
+AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& prefix)
 {
-	return new ConfigurationView(prefix, this);
+	return new ConfigurationView(prefix, AbstractConfiguration::Ptr(this, true));
 }
 
 

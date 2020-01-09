@@ -24,11 +24,14 @@
 #ifndef Foundation_Array_INCLUDED
 #define Foundation_Array_INCLUDED
 
+
 #include "Poco/Exception.h"
 #include "Poco/Bugcheck.h"
 #include <algorithm>
 
+
 namespace Poco {
+
 
 template<class T, std::size_t N>
 class Array 
@@ -37,9 +40,7 @@ class Array
 	/// This implementation is based on the idea of Nicolai Josuttis.
 	/// His original implementation can be found at http://www.josuttis.com/cppcode/array.html . 
 {
-
 public:
-
 	typedef T				value_type;
 	typedef T*				iterator;
 	typedef const T*		const_iterator;
@@ -158,7 +159,8 @@ public:
 
 	enum { static_size = N };
 
-	void swap (Array<T,N>& y) {
+	void swap (Array<T,N>& y) 
+	{
 		std::swap_ranges(begin(),end(),y.begin());
 	}
 
@@ -173,7 +175,8 @@ public:
 		return elems;
 	}
 
-	T* c_array(){ 
+	T* c_array()
+	{ 
 		/// Use array as C array (direct read/write access to data)
 		return elems;
 	}
@@ -193,11 +196,11 @@ public:
 	}
 
 public:
-
 	T elems[N];	
 		/// Fixed-size array of elements of type T, public specifier used to make this class a aggregate.
 
 };
+
 
 // comparisons
 template<class T, std::size_t N>
@@ -206,11 +209,13 @@ bool operator== (const Array<T,N>& x, const Array<T,N>& y)
 	return std::equal(x.begin(), x.end(), y.begin());
 }
 
+
 template<class T, std::size_t N>
 bool operator< (const Array<T,N>& x, const Array<T,N>& y) 
 {
 	return std::lexicographical_compare(x.begin(),x.end(),y.begin(),y.end());
 }
+
 
 template<class T, std::size_t N>
 bool operator!= (const Array<T,N>& x, const Array<T,N>& y) 
@@ -218,11 +223,13 @@ bool operator!= (const Array<T,N>& x, const Array<T,N>& y)
 	return !(x==y);
 }
 
+
 template<class T, std::size_t N>
 bool operator> (const Array<T,N>& x, const Array<T,N>& y) 
 {
 	return y<x;
 }
+
 
 template<class T, std::size_t N>
 bool operator<= (const Array<T,N>& x, const Array<T,N>& y) 
@@ -230,11 +237,13 @@ bool operator<= (const Array<T,N>& x, const Array<T,N>& y)
 	return !(y<x);
 }
 
+
 template<class T, std::size_t N>
 bool operator>= (const Array<T,N>& x, const Array<T,N>& y) 
 {
 	return !(x<y);
 }
+
 
 template<class T, std::size_t N>
 inline void swap (Array<T,N>& x, Array<T,N>& y) 
@@ -243,7 +252,9 @@ inline void swap (Array<T,N>& x, Array<T,N>& y)
 	x.swap(y);
 }
 
+
 }// namespace Poco
+
 
 #endif // Foundation_Array_INCLUDED
 

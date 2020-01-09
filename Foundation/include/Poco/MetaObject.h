@@ -44,9 +44,9 @@ public:
 
 	virtual ~AbstractMetaObject()
 	{
-		for (typename ObjectSet::iterator it = _deleteSet.begin(); it != _deleteSet.end(); ++it)
+		for (auto p: _deleteSet)
 		{
-			delete *it;
+			delete p;
 		}
 	}
 

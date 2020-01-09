@@ -26,7 +26,7 @@ namespace Poco {
 namespace Data {
 
 
-typedef Transaction AutoTransaction;
+using AutoTransaction = Transaction;
 
 
 } } // namespace Poco::Data

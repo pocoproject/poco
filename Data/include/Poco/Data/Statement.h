@@ -74,10 +74,10 @@ class Data_API Statement
 public:
 	typedef void (*Manipulator)(Statement&);
 
-	typedef ActiveResult<std::size_t>                      Result;
-	typedef SharedPtr<Result>                              ResultPtr;
-	typedef ActiveMethod<std::size_t, bool, StatementImpl> AsyncExecMethod;
-	typedef SharedPtr<AsyncExecMethod>                     AsyncExecMethodPtr;
+	using Result = ActiveResult<std::size_t>;
+	using ResultPtr = SharedPtr<Result>;
+	using AsyncExecMethod = ActiveMethod<std::size_t, bool, StatementImpl>;
+	using AsyncExecMethodPtr = SharedPtr<AsyncExecMethod>;
 
 	static const int WAIT_FOREVER = -1;
 
@@ -115,8 +115,14 @@ public:
 		/// synchronized prior to copy operation (i.e. is copied while executing),
 		/// this constructor shall synchronize it.
 
+	Statement(Statement&& other) noexcept;
+		/// Move constructor.
+
 	Statement& operator = (const Statement& stmt);
 		/// Assignment operator.
+
+	Statement& operator = (Statement&& stmt) noexcept;
+		/// Move assignment.
 
 	void swap(Statement& other);
 		/// Swaps the statement with another one.
@@ -379,7 +385,7 @@ public:
 		/// Statement takes the ownership of the formatter.
 
 protected:
-	typedef StatementImpl::Ptr ImplPtr;
+	using ImplPtr = StatementImpl::Ptr;
 
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
@@ -406,7 +412,6 @@ protected:
 		/// Returns the underlying session.
 
 private:
-
 	const Result& doAsyncExec(bool reset = true);
 		/// Asynchronously executes the statement.
 

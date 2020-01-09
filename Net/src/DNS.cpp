@@ -217,9 +217,9 @@ std::string DNS::hostName()
 
 bool DNS::isIDN(const std::string& hostname)
 {
-	for (std::string::const_iterator it = hostname.begin(); it != hostname.end(); ++it)
+	for (auto ch: hostname)
 	{
-		if (static_cast<unsigned char>(*it) >= 0x80) return true;
+		if (static_cast<unsigned char>(ch) >= 0x80) return true;
 	}
 	return false;
 }

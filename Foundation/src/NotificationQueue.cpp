@@ -148,9 +148,9 @@ void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void NotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	for (auto p: _waitQueue)
 	{
-		(*it)->nfAvailable.set();
+		p->nfAvailable.set();
 	}
 	_waitQueue.clear();
 }
@@ -174,6 +174,19 @@ void NotificationQueue::clear()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	_nfQueue.clear();	
+}
+
+
+bool NotificationQueue::remove(Notification::Ptr pNotification)
+{
+	FastMutex::ScopedLock lock(_mutex);
+	NfQueue::iterator it = std::find(_nfQueue.begin(), _nfQueue.end(), pNotification);
+	if (it == _nfQueue.end())
+	{
+		return false;
+	}
+	_nfQueue.erase(it);
+	return true;
 }
 
 

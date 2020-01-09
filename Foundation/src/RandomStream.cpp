@@ -88,7 +88,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 			for (DigestEngine::Digest::const_iterator it = d.begin(); it != d.end() && n < length; ++it, ++n)
 			{
 				engine.update(*it);
-				*buffer++ = *it++;
+				*buffer++ = *it;
 			}
 		}
 	}

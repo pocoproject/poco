@@ -13,7 +13,6 @@
 
 
 #include "Poco/FormattingChannel.h"
-#include "Poco/Formatter.h"
 #include "Poco/Message.h"
 #include "Poco/LoggingRegistry.h"
 
@@ -28,53 +27,44 @@ FormattingChannel::FormattingChannel():
 }
 
 
-FormattingChannel::FormattingChannel(Formatter* pFormatter): 
+FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter):
 	_pFormatter(pFormatter), 
 	_pChannel(0)
 {
-	if (_pFormatter) _pFormatter->duplicate();
 }
 
 
-FormattingChannel::FormattingChannel(Formatter* pFormatter, Channel* pChannel): 
+FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel): 
 	_pFormatter(pFormatter), 
 	_pChannel(pChannel)
 {
-	if (_pFormatter) _pFormatter->duplicate();
-	if (_pChannel)   _pChannel->duplicate();
 }
 
 
 FormattingChannel::~FormattingChannel()
 {
-	if (_pChannel)   _pChannel->release();
-	if (_pFormatter) _pFormatter->release();
 }
 
 
-void FormattingChannel::setFormatter(Formatter* pFormatter)
+void FormattingChannel::setFormatter(Formatter::Ptr pFormatter)
 {
-	if (_pFormatter) _pFormatter->release();
 	_pFormatter = pFormatter;
-	if (_pFormatter) _pFormatter->duplicate();
 }
 
 
-Formatter* FormattingChannel::getFormatter() const
+Formatter::Ptr FormattingChannel::getFormatter() const
 {
 	return _pFormatter;
 }
 
 
-void FormattingChannel::setChannel(Channel* pChannel)
+void FormattingChannel::setChannel(Channel::Ptr pChannel)
 {
-	if (_pChannel) _pChannel->release();
 	_pChannel = pChannel;
-	if (_pChannel) _pChannel->duplicate();
 }
 
 
-Channel* FormattingChannel::getChannel() const
+Channel::Ptr FormattingChannel::getChannel() const
 {
 	return _pChannel;
 }

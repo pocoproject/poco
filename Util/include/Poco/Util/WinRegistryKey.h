@@ -34,8 +34,8 @@ class Util_API WinRegistryKey
 	/// This class is only available on Windows platforms.
 {
 public:
-	typedef std::vector<std::string> Keys;
-	typedef std::vector<std::string> Values;
+	using Keys = std::vector<std::string>;
+	using Values = std::vector<std::string>;
 
 	enum Type
 	{

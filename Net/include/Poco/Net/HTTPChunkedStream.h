@@ -38,7 +38,7 @@ class Net_API HTTPChunkedStreamBuf: public HTTPBasicStreamBuf
 	/// HTTP message bodies in chunked transfer coding.
 {
 public:
-	typedef HTTPBasicStreamBuf::openmode openmode;
+	using openmode = HTTPBasicStreamBuf::openmode;
 
 	HTTPChunkedStreamBuf(HTTPSession& session, openmode mode);
 	~HTTPChunkedStreamBuf();

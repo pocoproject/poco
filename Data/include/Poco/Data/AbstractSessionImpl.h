@@ -59,7 +59,7 @@ public:
 		/// Creates the AbstractSessionImpl.
 		/// 
 		/// Adds "storage" property and sets the default internal storage container 
-		/// type to std::deque.
+		/// type to std::vector.
 		/// The storage is created by statements automatically whenever a query 
 		/// returning results is executed but external storage is provided by the user.
 		/// Storage type can be reconfigured at runtime both globally (for the
@@ -296,8 +296,8 @@ private:
 		PropertyGetter getter;
 	};
 	
-	typedef std::map<std::string, Feature>  FeatureMap;
-	typedef std::map<std::string, Property> PropertyMap;
+	using FeatureMap = std::map<std::string, Feature>;
+	using PropertyMap = std::map<std::string, Property>;
 	
 	FeatureMap  _features;
 	PropertyMap _properties;

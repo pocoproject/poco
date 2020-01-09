@@ -670,6 +670,7 @@ inline bool VarHolder::isDateTime() const
 	return false;
 }
 
+
 inline std::size_t VarHolder::size() const
 {
 	return 1u;
@@ -3576,7 +3577,7 @@ private:
 
 
 template <typename T>
-class VarHolderImpl<std::vector<T> >: public VarHolder
+class VarHolderImpl<std::vector<T>>: public VarHolder
 {
 public:
 	VarHolderImpl(const std::vector<T>& val): _val(val)
@@ -3641,7 +3642,7 @@ private:
 
 
 template <typename T>
-class VarHolderImpl<std::list<T> >: public VarHolder
+class VarHolderImpl<std::list<T>>: public VarHolder
 {
 public:
 	VarHolderImpl(const std::list<T>& val): _val(val)
@@ -3716,7 +3717,7 @@ private:
 
 
 template <typename T>
-class VarHolderImpl<std::deque<T> >: public VarHolder
+class VarHolderImpl<std::deque<T>>: public VarHolder
 {
 public:
 	VarHolderImpl(const std::deque<T>& val): _val(val)

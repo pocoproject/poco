@@ -143,7 +143,7 @@ inline char decimalSeparator()
 	/// default '.' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
+	return std::use_facet<std::numpunct<char>>(std::locale()).decimal_point();
 #else
 	return '.';
 #endif
@@ -155,7 +155,7 @@ inline char thousandSeparator()
 	/// default ',' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
+	return std::use_facet<std::numpunct<char>>(std::locale()).thousands_sep();
 #else
 	return ',';
 #endif

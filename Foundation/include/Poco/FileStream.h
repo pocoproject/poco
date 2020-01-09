@@ -44,8 +44,7 @@ class Foundation_API FileIOS: public virtual std::ios
 	/// Use an InputLineEndingConverter or OutputLineEndingConverter
 	/// if you require CR-LF translation.
 	///
-	/// On Windows platforms, if POCO_WIN32_UTF8 is #define'd,
-	/// UTF-8 encoded Unicode paths are correctly handled.
+	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
 	FileIOS(std::ios::openmode defaultMode);
@@ -86,8 +85,7 @@ class Foundation_API FileInputStream: public FileIOS, public std::istream
 	/// was specified.
 	/// Use an InputLineEndingConverter if you require CR-LF translation.
 	///
-	/// On Windows platforms, if POCO_WIN32_UTF8 is #define'd,
-	/// UTF-8 encoded Unicode paths are correctly handled.
+	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
 	FileInputStream();
@@ -117,8 +115,7 @@ class Foundation_API FileOutputStream: public FileIOS, public std::ostream
 	/// was specified.
 	/// Use an OutputLineEndingConverter if you require CR-LF translation.
 	///
-	/// On Windows platforms, if POCO_WIN32_UTF8 is #define'd,
-	/// UTF-8 encoded Unicode paths are correctly handled.
+	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
 	FileOutputStream();
@@ -154,8 +151,7 @@ class Foundation_API FileStream: public FileIOS, public std::iostream
 	/// read position and the write position simultaneously to the
 	/// same value.
 	///
-	/// On Windows platforms, if POCO_WIN32_UTF8 is #define'd,
-	/// UTF-8 encoded Unicode paths are correctly handled.
+	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
 	FileStream();

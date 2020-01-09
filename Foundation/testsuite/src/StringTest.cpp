@@ -1265,7 +1265,6 @@ void StringTest::testNumericStringLimit()
 		numericStringLowerLimit<Poco::Int64, Poco::Int32>();
 	}
 
-#ifdef POCO_ENABLE_CPP11
 	assertTrue(!isIntOverflow<int8_t>(0));
 	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::max()));
 	assertTrue(isIntOverflow<int8_t>(std::numeric_limits<int16_t>::min()));
@@ -1295,7 +1294,6 @@ void StringTest::testNumericStringLimit()
 	numericStringLowerLimit<int16_t, int8_t>();
 	numericStringLowerLimit<int32_t, int16_t>();
 	numericStringLowerLimit<int64_t, int32_t>();
-#endif
 }
 
 

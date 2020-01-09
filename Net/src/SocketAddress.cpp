@@ -295,11 +295,11 @@ void SocketAddress::init(Family fam, const std::string& hostAddress, Poco::UInt1
 		HostEntry::AddressList addresses = he.addresses();
 		if (addresses.size() > 0)
 		{
-			for (HostEntry::AddressList::const_iterator it = addresses.begin(); it != addresses.end(); ++it)
+			for (const auto& addr: addresses)
 			{
-				if (it->family() == fam)
+				if (addr.family() == fam)
 				{
-					init(*it, portNumber);
+					init(addr, portNumber);
 					return;
 				}
 			}

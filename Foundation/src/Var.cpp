@@ -363,13 +363,11 @@ Var& Var::getAt(std::size_t n)
 			InvalidAccessException>("Not a deque.")->operator[](n);
 	else if (isStruct())
 	{
-#ifdef POCO_ENABLE_CPP11
 		if (isOrdered())
-			return structIndexOperator(holderImpl<Struct<int, OrderedMap<int, Var>, OrderedSet<int> >,
+			return structIndexOperator(holderImpl<Struct<int, OrderedMap<int, Var>, OrderedSet<int>>,
 				InvalidAccessException>("Not a struct."), static_cast<int>(n));
 		else
-#endif // POCO_ENABLE_CPP11
-			return structIndexOperator(holderImpl<Struct<int, std::map<int, Var>, std::set<int> >,
+			return structIndexOperator(holderImpl<Struct<int, std::map<int, Var>, std::set<int>>,
 				InvalidAccessException>("Not a struct."), static_cast<int>(n));
 	}
 	else if (!isString() && !isEmpty() && (n == 0))
@@ -395,11 +393,9 @@ Var& Var::getAt(const std::string& name)
 {
 	if (isStruct())
 	{
-#ifdef POCO_ENABLE_CPP11
 		if (isOrdered())
 			return structIndexOperator(holderImpl<OrderedDynamicStruct, InvalidAccessException>("Not a struct."), name);
 		else
-#endif // POCO_ENABLE_CPP11
 			return structIndexOperator(holderImpl<DynamicStruct, InvalidAccessException>("Not a struct."), name);
 	}
 
@@ -644,7 +640,7 @@ std::string Var::toString(const Var& any)
 }
 
 /*
-Var& Var::structIndexOperator(VarHolderImpl<Struct<int> >* pStr, int n) const
+Var& Var::structIndexOperator(VarHolderImpl<Struct<int>>* pStr, int n) const
 {
 	return pStr->operator[](n);
 }

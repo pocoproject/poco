@@ -35,7 +35,7 @@ class Net_API Socket
 	/// It provides operations common to all socket types.
 {
 public:
-	typedef SocketBufVec BufVec;
+	using BufVec = SocketBufVec;
 
 	enum SelectMode
 		/// The mode argument to poll() and select().
@@ -45,7 +45,7 @@ public:
 		SELECT_ERROR = 4
 	};
 	
-	typedef std::vector<Socket> SocketList;
+	using SocketList = std::vector<Socket>;
 
 	Socket();
 		/// Creates an uninitialized socket.

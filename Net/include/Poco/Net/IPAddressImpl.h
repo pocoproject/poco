@@ -32,7 +32,7 @@ namespace Impl {
 class IPAddressImpl : public Poco::RefCountedObject
 {
 public:
-	typedef AddressFamily::Family Family;
+	using Family = AddressFamily::Family;
 	
 	virtual ~IPAddressImpl();
 

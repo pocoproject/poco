@@ -37,13 +37,13 @@ public:
 	{
 		try
 		{
-			for (std::set<std::string>::iterator it = _files.begin(); it != _files.end(); ++it)
+			for (auto& f: _files)
 			{
 				try
 				{
-					File f(*it);
-					if (f.exists())
-						f.remove(true);
+					File file(f);
+					if (file.exists())
+						file.remove(true);
 				}
 				catch (Exception&)
 				{

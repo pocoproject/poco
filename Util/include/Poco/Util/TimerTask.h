@@ -37,7 +37,7 @@ class Util_API TimerTask: public Poco::RefCountedObject, public Poco::Runnable
 	/// function to implement the actual task logic.
 {
 public:
-	typedef Poco::AutoPtr<TimerTask> Ptr;
+	using Ptr = Poco::AutoPtr<TimerTask>;
 	
 	TimerTask();
 		/// Creates the TimerTask.

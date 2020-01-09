@@ -42,7 +42,7 @@ public:
 
 	virtual void render(const Var& data, std::ostream& out) const = 0;
 
-	typedef std::vector<SharedPtr<Part> > VectorParts;
+	typedef std::vector<SharedPtr<Part>> VectorParts;
 };
 
 
@@ -99,9 +99,9 @@ public:
 
 	void render(const Var& data, std::ostream& out) const
 	{
-		for (VectorParts::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
+		for (const auto& p: _parts)
 		{
-			(*it)->render(data, out);
+			p->render(data, out);
 		}
 	}
 
@@ -246,7 +246,7 @@ public:
 	void render(const Var& data, std::ostream& out) const
 	{
 		int count = 0;
-		for (std::vector<SharedPtr<LogicQuery> >::const_iterator it = _queries.begin(); it != _queries.end(); ++it, ++count)
+		for (auto it = _queries.begin(); it != _queries.end(); ++it, ++count)
 		{
 			if ((*it)->apply(data) && _parts.size() > count)
 			{
@@ -257,7 +257,7 @@ public:
 	}
 
 private:
-	std::vector<SharedPtr<LogicQuery> > _queries;
+	std::vector<SharedPtr<LogicQuery>> _queries;
 };
 
 

@@ -210,9 +210,9 @@ MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 
 MailMessage::~MailMessage()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (auto& part: _parts)
 	{
-		delete it->pSource;
+		delete part.pSource;
 	}
 }
 
@@ -410,9 +410,9 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 	writeHeader(header, ostr);
 	
 	MultipartWriter writer(ostr, _boundary);
-	for (PartVec::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (const auto& part: _parts)
 	{
-		writePart(writer, *it);
+		writePart(writer, part);
 	}
 	writer.close();
 }
@@ -543,15 +543,15 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 	std::string cc;
 	std::string bcc;
 	
-	for (Recipients::const_iterator it = _recipients.begin(); it != _recipients.end(); ++it)
+	for (const auto& rec: _recipients)
 	{
-		switch (it->getType())
+		switch (rec.getType())
 		{
 		case MailRecipient::PRIMARY_RECIPIENT:
-			appendRecipient(*it, to);
+			appendRecipient(rec, to);
 			break;
 		case MailRecipient::CC_RECIPIENT:
-			appendRecipient(*it, cc);
+			appendRecipient(rec, cc);
 			break;
 		case MailRecipient::BCC_RECIPIENT:
 			break;
@@ -613,9 +613,9 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
 {
 	bool containsNonASCII = false;
-	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	for (auto ch: text)
 	{
-		if (static_cast<unsigned char>(*it) > 127)
+		if (static_cast<unsigned char>(ch) > 127)
 		{
 			containsNonASCII = true;
 			break;
@@ -625,7 +625,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 	
 	std::string encodedText;
 	std::string::size_type lineLength = 0;
-	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	for (auto ch: text)
 	{
 		if (lineLength == 0)
 		{
@@ -634,7 +634,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 			encodedText += "?q?";
 			lineLength += charset.length() + 5;
 		}
-		switch (*it)
+		switch (ch)
 		{
 		case ' ':
 			encodedText += '_';
@@ -655,23 +655,23 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 		case '.':
 		case '@':
 			encodedText += '=';
-			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
 			lineLength += 3;
 			break;
 		default:
-			if (*it > 32 && *it < 127)
+			if (ch > 32 && ch < 127)
 			{
-				encodedText += *it;
+				encodedText += ch;
 				lineLength++;
 			}
 			else
 			{
 				encodedText += '=';
-				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
 				lineLength += 3;
 			}
 		}
-		if ((lineLength >= 64 && (*it == ' ' || *it == '\t' || *it == '\r' || *it == '\n')) || lineLength >= 72)
+		if ((lineLength >= 64 && (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')) || lineLength >= 72)
 		{
 			encodedText += "?=\r\n ";
 			lineLength = 0;
@@ -700,9 +700,9 @@ MultipartSource::MultipartSource(const std::string contentType):
 
 MultipartSource::~MultipartSource()
 {
-	for (MailMessage::PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (auto& part: _parts)
 	{
-		delete it->pSource;
+		delete part.pSource;
 	}
 }
 
@@ -727,9 +727,9 @@ std::istream& MultipartSource::stream()
 	std::string boundary = mt.getParameter("boundary");
 
 	MultipartWriter writer(_content, boundary);
-	for (MailMessage::PartVec::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (const auto& part: _parts)
 	{
-		MailMessage::writePart(writer, *it);
+		MailMessage::writePart(writer, part);
 	}
 	writer.close();
 

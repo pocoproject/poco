@@ -131,9 +131,9 @@ Path TemplateCache::resolvePath(const Path& path) const
 	if (path.isAbsolute())
 		return path;
 
-	for (std::vector<Path>::const_iterator it = _includePaths.begin(); it != _includePaths.end(); ++it)
+	for (const auto& p: _includePaths)
 	{
-		Path templatePath(*it, path);
+		Path templatePath(p, path);
 
 		File templateFile(templatePath);
 		if (templateFile.exists())

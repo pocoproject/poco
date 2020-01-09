@@ -43,9 +43,9 @@ class Data_API AbstractExtraction
 	/// retrieved via an AbstractExtractor.
 {
 public:
-	typedef SharedPtr<AbstractExtraction> Ptr;
-	typedef SharedPtr<AbstractExtractor>  ExtractorPtr;
-	typedef SharedPtr<AbstractPreparator> PreparatorPtr;
+	using Ptr = SharedPtr<AbstractExtraction>;
+	using ExtractorPtr = SharedPtr<AbstractExtractor>;
+	using PreparatorPtr = SharedPtr<AbstractPreparator>;
 
 	AbstractExtraction(Poco::UInt32 limit = Limit::LIMIT_UNLIMITED,
 		Poco::UInt32 position = 0, bool bulk = false);
@@ -172,12 +172,12 @@ private:
 };
 
 
-typedef std::vector<AbstractExtraction::Ptr> AbstractExtractionVec;
-typedef std::vector<AbstractExtractionVec>   AbstractExtractionVecVec;
-typedef std::deque<AbstractExtraction::Ptr>  AbstractExtractionDeq;
-typedef std::vector<AbstractExtractionDeq>   AbstractExtractionDeqVec;
-typedef std::list<AbstractExtraction::Ptr>   AbstractExtractionLst;
-typedef std::vector<AbstractExtractionLst>   AbstractExtractionLstVec;
+using AbstractExtractionVec = std::vector<AbstractExtraction::Ptr>;
+using AbstractExtractionVecVec = std::vector<AbstractExtractionVec>;
+using AbstractExtractionDeq = std::deque<AbstractExtraction::Ptr>;
+using AbstractExtractionDeqVec = std::vector<AbstractExtractionDeq>;
+using AbstractExtractionLst = std::list<AbstractExtraction::Ptr>;
+using AbstractExtractionLstVec = std::vector<AbstractExtractionLst>;
 
 
 //

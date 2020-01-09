@@ -57,6 +57,14 @@ Name::Name(const Name& name):
 {
 }
 
+
+Name::Name(Name&& name) noexcept:
+	_qname(std::move(name._qname)),
+	_namespaceURI(std::move(name._namespaceURI)),
+	_localName(std::move(name._localName))
+{
+}
+
 	
 Name::~Name()
 {
@@ -71,6 +79,16 @@ Name& Name::operator = (const Name& name)
 		_namespaceURI = name._namespaceURI;
 		_localName    = name._localName;
 	}
+	return *this;
+}
+
+
+Name& Name::operator = (Name&& name) noexcept
+{
+	_qname        = std::move(name._qname);
+	_namespaceURI = std::move(name._namespaceURI);
+	_localName    = std::move(name._localName);
+
 	return *this;
 }
 

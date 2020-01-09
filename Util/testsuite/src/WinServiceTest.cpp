@@ -2,35 +2,46 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 
+
 using Poco::Util::WinService;
 
 
-WinServiceTest::WinServiceTest(const std::string& name) : CppUnit::TestCase(name) {
+WinServiceTest::WinServiceTest(const std::string& name) : CppUnit::TestCase(name) 
+{
 }
 
 
-WinServiceTest::~WinServiceTest() {
+WinServiceTest::~WinServiceTest() 
+{
 }
 
 
-void WinServiceTest::testServiceCouldCreatedWithExistingConnection() {
-
+void WinServiceTest::testServiceCouldCreatedWithExistingConnection() 
+{
 	SC_HANDLE scmHandle = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 
 	assertTrue(scmHandle);
 
-	WinService spoolerService{ scmHandle, "Spooler" };
+	WinService spoolerService{scmHandle, "Spooler"};
 
 	assertTrue(spoolerService.isRegistered());	
 }
 
-void WinServiceTest::testServiceReturnsTrueIfStopped() {
-	spoolerService_.stop();
-	assertTrue(spoolerService_.isStopped());
+
+void WinServiceTest::testServiceReturnsTrueIfStopped()
+{
+	WinService spoolerService{"Spooler"};
+
+	spoolerService.stop();
+	assertTrue(spoolerService.isStopped());
 }
 
-void WinServiceTest::testServiceReturnsFailureActionConfigured() {
-	auto failureActions = spoolerService_.getFailureActions();
+
+void WinServiceTest::testServiceReturnsFailureActionConfigured() 
+{
+	WinService spoolerService{"Spooler"};
+
+	auto failureActions = spoolerService.getFailureActions();
 	assertEqual(3, failureActions.size());
 
 	assertEqual(WinService::SVC_RESTART, failureActions[0]);
@@ -39,13 +50,24 @@ void WinServiceTest::testServiceReturnsFailureActionConfigured() {
 }
 
 
-void WinServiceTest::setUp() {
+void WinServiceTest::setUp() 
+{
 }
 
 
-void WinServiceTest::tearDown() {
-	if (spoolerService_.isStopped()) {
-		spoolerService_.start();
+void WinServiceTest::tearDown() 
+{
+	try
+	{
+		WinService spoolerService{"Spooler"};
+
+		if (spoolerService.isStopped())
+		{
+			spoolerService.start();
+		}
+	}
+	catch (...)
+	{
 	}
 }
 

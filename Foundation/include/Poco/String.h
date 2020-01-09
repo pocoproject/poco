@@ -686,7 +686,7 @@ struct i_char_traits : public std::char_traits<charT>
 };
 
 
-typedef std::basic_string<char, i_char_traits<char> > istring;
+typedef std::basic_string<char, i_char_traits<char>> istring;
 	/// Case-insensitive std::string counterpart.
 
 

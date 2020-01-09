@@ -41,6 +41,7 @@ public:
 	enum Style
 	{
 		PATH_UNIX,    /// Unix-style path
+		PATH_URI = PATH_UNIX, /// URI-style path, same as Unix-style
 		PATH_WINDOWS, /// Windows-style path
 		PATH_VMS,     /// VMS-style path
 		PATH_NATIVE,  /// The current platform's native style
@@ -70,6 +71,9 @@ public:
 	Path(const Path& path);
 		/// Copy constructor
 
+	Path(Path&& path) noexcept;
+		/// Move constructor.
+
 	Path(const Path& parent, const std::string& fileName);
 		/// Creates a path from a parent path and a filename.
 		/// The parent path is expected to reference a directory.
@@ -88,6 +92,9 @@ public:
 		
 	Path& operator = (const Path& path);
 		/// Assignment operator.
+
+	Path& operator = (Path&& path) noexcept;
+		/// Move assignment.
 		
 	Path& operator = (const std::string& path);
 		/// Assigns a string containing a path in native format.
@@ -168,7 +175,7 @@ public:
 		/// Appends the given path.
 		
 	Path& resolve(const Path& path);
-		/// Resolves the given path agains the current one.
+		/// Resolves the given path against the current one.
 		///
 		/// If the given path is absolute, it replaces the current one.
 		/// Otherwise, the relative path is appended to the current path.
@@ -353,8 +360,7 @@ public:
 		/// Otherwise false is returned and the path argument remains unchanged.
 		
 	static std::string transcode(const std::string& path);
-		/// On Windows, if POCO has been compiled with Windows UTF-8 support 
-		/// (POCO_WIN32_UTF8), this function converts a string (usually containing a path) 
+		/// On Windows, this function converts a string (usually containing a path) 
 		/// encoded in UTF-8 into a string encoded in the current Windows code page.
 		/// 
 		/// This function should be used for every string passed as a file name to

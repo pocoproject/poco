@@ -67,9 +67,9 @@ void TaskManager::cancelAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	for (TaskList::iterator it = _taskList.begin(); it != _taskList.end(); ++it)
+	for (auto& pTask: _taskList)
 	{
-		(*it)->cancel();
+		pTask->cancel();
 	}
 }
 

@@ -33,7 +33,7 @@ class ActiveRunnableBase: public Runnable, public RefCountedObject
 	/// The base class for all ActiveRunnable instantiations.
 {
 public:
-	typedef AutoPtr<ActiveRunnableBase> Ptr;
+	using Ptr = AutoPtr<ActiveRunnableBase>;
 };
 
 

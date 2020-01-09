@@ -69,9 +69,9 @@ class Data_API RecordSet: private Statement
 	/// a limit for the Statement.
 {
 public:
-	typedef std::map<std::size_t, Row*> RowMap;
-	typedef const RowIterator           ConstIterator;
-	typedef RowIterator                 Iterator;
+	using RowMap = std::map<std::size_t, Row*>;
+	using ConstIterator = const RowIterator;
+	using Iterator = RowIterator;
 
 	using Statement::isNull;
 	using Statement::subTotalRowCount;
@@ -107,14 +107,23 @@ public:
 	RecordSet(const RecordSet& other);
 		/// Copy-creates the recordset.
 
+	RecordSet(RecordSet&& other) noexcept;
+		/// Move-creates the recordset.
+
 	~RecordSet();
 		/// Destroys the RecordSet.
 
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Assigns the row formatter to the statement and all recordset rows.
 
-	Statement& operator = (const Statement& stmt);
+	RecordSet& operator = (const Statement& stmt);
 		/// Assignment operator.
+
+	RecordSet& operator = (const RecordSet& other);
+		/// Assignment operator.
+
+	RecordSet& operator = (RecordSet&& other) noexcept;
+		/// Move assignment.
 
 	std::size_t rowCount() const;
 		/// Returns the number of rows in the RecordSet.
@@ -159,12 +168,12 @@ public:
 	{
 		if (isBulkExtraction())
 		{
-			typedef InternalBulkExtraction<C> E;
+			using E = InternalBulkExtraction<C>;
 			return columnImpl<C,E>(name);
 		}
 		else
 		{
-			typedef InternalExtraction<C> E;
+			using E = InternalExtraction<C>;
 			return columnImpl<C,E>(name);
 		}
 	}
@@ -175,12 +184,12 @@ public:
 	{
 		if (isBulkExtraction())
 		{
-			typedef InternalBulkExtraction<C> E;
+			using E = InternalBulkExtraction<C>;
 			return columnImpl<C,E>(pos);
 		}
 		else
 		{
-			typedef InternalExtraction<C> E;
+			using E = InternalExtraction<C>;
 			return columnImpl<C,E>(pos);
 		}
 	}
@@ -200,18 +209,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef typename std::vector<T> C;
+				using C = typename std::vector<T>;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef typename std::list<T> C;
+				using C = typename std::list<T>;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef typename std::deque<T> C;
+				using C = typename std::deque<T>;
 				return column<C>(col).value(row);
 			}
 			default:
@@ -230,18 +239,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef typename std::vector<T> C;
+				using C = typename std::vector<T>;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef typename std::list<T> C;
+				using C = typename std::list<T>;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef typename std::deque<T> C;
+				using C = typename std::deque<T>;
 				return column<C>(name).value(row);
 			}
 			default:
@@ -404,8 +413,8 @@ private:
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
+		using T = typename C::value_type;
+		using ExtractionVecPtr = const E*;
 
 		bool typeFound = false;
 
@@ -443,8 +452,8 @@ private:
 	const Column<C>& columnImpl(std::size_t pos) const
 		/// Returns the reference to column at specified position.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
+		using T = typename C::value_type;
+		using ExtractionVecPtr = const E*;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
@@ -532,9 +541,16 @@ inline std::size_t RecordSet::columnCount() const
 }
 
 
-inline Statement& RecordSet::operator = (const Statement& stmt)
+inline RecordSet& RecordSet::operator = (const Statement& stmt)
 {
 	reset(stmt);
+	return *this;
+}
+
+
+inline RecordSet& RecordSet::operator = (const RecordSet& other)
+{
+	reset(other);
 	return *this;
 }
 

@@ -29,31 +29,31 @@ LoggingRegistry::~LoggingRegistry()
 }
 
 
-Channel* LoggingRegistry::channelForName(const std::string& name) const
+Channel::Ptr LoggingRegistry::channelForName(const std::string& name) const
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
 	ChannelMap::const_iterator it = _channelMap.find(name);
 	if (it != _channelMap.end())
-		return const_cast<Channel*>(it->second.get());
+		return it->second;
 	else
 		throw NotFoundException("logging channel", name);
 }
 
 
-Formatter* LoggingRegistry::formatterForName(const std::string& name) const
+Formatter::Ptr LoggingRegistry::formatterForName(const std::string& name) const
 {
 	FastMutex::ScopedLock lock(_mutex);
 
 	FormatterMap::const_iterator it = _formatterMap.find(name);
 	if (it != _formatterMap.end())
-		return const_cast<Formatter*>(it->second.get());
+		return it->second;
 	else
 		throw NotFoundException("logging formatter", name);
 }
 
 
-void LoggingRegistry::registerChannel(const std::string& name, Channel* pChannel)
+void LoggingRegistry::registerChannel(const std::string& name, Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
@@ -61,7 +61,7 @@ void LoggingRegistry::registerChannel(const std::string& name, Channel* pChannel
 }
 
 	
-void LoggingRegistry::registerFormatter(const std::string& name, Formatter* pFormatter)
+void LoggingRegistry::registerFormatter(const std::string& name, Formatter::Ptr pFormatter)
 {
 	FastMutex::ScopedLock lock(_mutex);
 

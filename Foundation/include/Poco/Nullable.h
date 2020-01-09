@@ -90,6 +90,15 @@ public:
 	{
 	}
 
+	Nullable(Nullable&& other) noexcept:
+		/// Creates a Nullable by moving another one.
+		_value(std::move(other._value)),
+		_isNull(other._isNull),
+		_null()
+	{
+		other.isNull = true;
+	}
+
 	~Nullable()
 		/// Destroys the Nullable.
 	{
@@ -128,6 +137,15 @@ public:
 		/// Assigns another Nullable.
 	{
 		return assign(other);
+	}
+
+	Nullable& operator = (Nullable&& other) noexcept
+		/// Moves another Nullable.
+	{
+		_isNull = other._isNull;
+		_value = std::move(other._value);
+		other._isNull = true;
+		return *this;
 	}
 
 	Nullable& operator = (NullType)
@@ -247,7 +265,6 @@ public:
 	operator NullType& ()
 		/// Get reference to the value
 	{
-
 		return _null;
 	}
 

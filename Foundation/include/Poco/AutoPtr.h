@@ -61,7 +61,7 @@ class AutoPtr
 	/// Note that AutoPtr allows casting of its encapsulated data types.
 {
 public:
-	AutoPtr(): _ptr(0)
+	AutoPtr(): _ptr(nullptr)
 	{
 	}
 
@@ -77,6 +77,11 @@ public:
 	AutoPtr(const AutoPtr& ptr): _ptr(ptr._ptr)
 	{
 		if (_ptr) _ptr->duplicate();
+	}
+
+	AutoPtr(AutoPtr&& ptr) noexcept: _ptr(std::move(ptr._ptr))
+	{
+		ptr._ptr = nullptr;
 	}
 
 	template <class Other> 
@@ -139,7 +144,7 @@ public:
 		if (_ptr)
 		{
 			_ptr->release();
-			_ptr = 0;
+			_ptr = nullptr;
 		}
 	}
 
@@ -172,6 +177,14 @@ public:
 	AutoPtr& operator = (const AutoPtr& ptr)
 	{
 		return assign(ptr);
+	}
+
+	AutoPtr& operator = (AutoPtr&& ptr) noexcept
+	{
+		if (_ptr) _ptr->release();
+		_ptr = std::move(ptr._ptr);
+		ptr._ptr = nullptr;
+		return *this;
 	}
 	
 	template <class Other> 
@@ -264,12 +277,12 @@ public:
 	
 	bool operator ! () const
 	{
-		return _ptr == 0;
+		return _ptr == nullptr;
 	}
 
 	bool isNull() const
 	{
-		return _ptr == 0;
+		return _ptr == nullptr;
 	}
 	
 	C* duplicate()
@@ -377,6 +390,13 @@ template <class C>
 inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2)
 {
 	p1.swap(p2);
+}
+
+
+template<typename T, typename... Args>
+AutoPtr<T> makeAuto(Args&&... args)
+{
+    return AutoPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 

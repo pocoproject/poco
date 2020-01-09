@@ -37,8 +37,8 @@ class Data_API AbstractBinding
 	/// AbstractBinding connects a value with a placeholder via an AbstractBinder interface.
 {
 public:
-	typedef SharedPtr<AbstractBinding> Ptr;
-	typedef AbstractBinder::Ptr        BinderPtr;
+	using Ptr = SharedPtr<AbstractBinding>;
+	using BinderPtr = AbstractBinder::Ptr;
 
 	enum Direction
 	{
@@ -100,9 +100,9 @@ private:
 };
 
 
-typedef std::vector<AbstractBinding::Ptr> AbstractBindingVec;
-typedef std::deque<AbstractBinding::Ptr>  AbstractBindingDeq;
-typedef std::list<AbstractBinding::Ptr>   AbstractBindingLst;
+using AbstractBindingVec = std::vector<AbstractBinding::Ptr>;
+using AbstractBindingDeq = std::deque<AbstractBinding::Ptr>;
+using AbstractBindingLst = std::list<AbstractBinding::Ptr>;
 
 
 //

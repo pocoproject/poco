@@ -65,9 +65,9 @@ void OptionSet::addOption(const Option& option)
 bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 {
 	bool found = false;
-	for (Iterator it = _options.begin(); it != _options.end(); ++it)
+	for (const auto& opt: _options)
 	{
-		if ((matchShort && it->matchesShort(name)) || (!matchShort && it->matchesFull(name)))
+		if ((matchShort && opt.matchesShort(name)) || (!matchShort && opt.matchesFull(name)))
 		{
 			if (!found)
 				found = true;
@@ -82,19 +82,19 @@ bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 const Option& OptionSet::getOption(const std::string& name, bool matchShort) const
 {
 	const Option* pOption = 0;
-	for (Iterator it = _options.begin(); it != _options.end(); ++it)
+	for (const auto& opt: _options)
 	{
-		if ((matchShort && it->matchesShort(name)) || (!matchShort && it->matchesPartial(name)))
+		if ((matchShort && opt.matchesShort(name)) || (!matchShort && opt.matchesPartial(name)))
 		{
 			if (!pOption)
 			{
-				pOption = &*it;
-				if (!matchShort && it->matchesFull(name))
+				pOption = &opt;
+				if (!matchShort && opt.matchesFull(name))
 					break;
 			}
-			else if (!matchShort && it->matchesFull(name))
+			else if (!matchShort && opt.matchesFull(name))
 			{
-				pOption = &*it;
+				pOption = &opt;
 				break;
 			}
 			else throw AmbiguousOptionException(name);

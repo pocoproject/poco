@@ -47,7 +47,7 @@ class Net_API TCPServerConnectionFilter: public Poco::RefCountedObject
 	/// Subclasses must override the accept() method.
 {
 public:
-	typedef Poco::AutoPtr<TCPServerConnectionFilter> Ptr;
+	using Ptr = Poco::AutoPtr<TCPServerConnectionFilter>;
 	
 	virtual bool accept(const StreamSocket& socket) = 0;
 		/// Returns true if the given StreamSocket connection should

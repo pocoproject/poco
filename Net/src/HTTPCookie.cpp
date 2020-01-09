@@ -67,10 +67,10 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 	_httpOnly(false),
 	_sameSite(SAME_SITE_NOT_SPECIFIED)
 {
-	for (NameValueCollection::ConstIterator it = nvc.begin(); it != nvc.end(); ++it)
+	for (const auto& p: nvc)
 	{
-		const std::string& name  = it->first;
-		const std::string& value = it->second;
+		const std::string& name  = p.first;
+		const std::string& value = p.second;
 		if (icompare(name, "comment") == 0)
 		{
 			setComment(value);

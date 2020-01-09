@@ -21,6 +21,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Channel.h"
 #include "Poco/String.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -31,6 +32,8 @@ class Net_API SMTPChannel: public Poco::Channel
 	/// This Channel implements SMTP (email) logging.
 {
 public:
+	using Ptr = Poco::AutoPtr<SMTPChannel>;
+
 	SMTPChannel();
 		/// Creates a SMTPChannel.
 		

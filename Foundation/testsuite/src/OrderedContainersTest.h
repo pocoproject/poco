@@ -12,9 +12,6 @@
 
 
 #include "Poco/Foundation.h"
-
-#ifdef POCO_ENABLE_CPP11
-
 #include "Poco/CppUnit/TestCase.h"
 #include "Poco/OrderedMap.h"
 #include "Poco/OrderedSet.h"
@@ -335,6 +332,5 @@ private:
 #pragma warning(pop)
 #endif // POCO_COMPILER_MSVC
 
-#endif // POCO_ENABLE_CPP11
 
 #endif // OrderedContainersTest_INCLUDED

@@ -38,7 +38,7 @@ class Net_API HTTPRequestHandlerFactory
 	/// method.
 {
 public:
-	typedef Poco::SharedPtr<HTTPRequestHandlerFactory> Ptr;
+	using Ptr = Poco::SharedPtr<HTTPRequestHandlerFactory>;
 	
 	HTTPRequestHandlerFactory();
 		/// Creates the HTTPRequestHandlerFactory.

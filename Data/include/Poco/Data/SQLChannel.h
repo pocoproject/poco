@@ -61,6 +61,8 @@ class Data_API SQLChannel: public Poco::Channel
 	/// a risk of long blocking periods in case of remote server communication delays.
 {
 public:
+	using Ptr = Poco::AutoPtr<SQLChannel>;
+
 	SQLChannel();
 		/// Creates SQLChannel.
 
@@ -140,10 +142,10 @@ protected:
 	~SQLChannel();
 
 private:
-	typedef Poco::SharedPtr<Session>         SessionPtr;
-	typedef Poco::SharedPtr<Statement>       StatementPtr;
-	typedef Poco::Message::Priority          Priority;
-	typedef Poco::SharedPtr<ArchiveStrategy> StrategyPtr;
+	using SessionPtr = Poco::SharedPtr<Session>;
+	using StatementPtr = Poco::SharedPtr<Statement>;
+	using Priority = Poco::Message::Priority;
+	using StrategyPtr = Poco::SharedPtr<ArchiveStrategy>;
 
 	void initLogStatement();
 		/// Initiallizes the log statement.

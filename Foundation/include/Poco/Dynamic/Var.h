@@ -81,9 +81,9 @@ class Foundation_API Var
 	/// VarHolderImpl is available. For supported types, see VarHolder documentation.
 {
 public:
-	typedef SharedPtr<Var>             Ptr;
-	typedef Poco::Dynamic::VarIterator Iterator;
-	typedef const VarIterator          ConstIterator;
+	using Ptr = SharedPtr<Var>;
+	using Iterator = Poco::Dynamic::VarIterator;
+	using ConstIterator = const VarIterator;
 
 	Var();
 		/// Creates an empty Var.
@@ -798,8 +798,7 @@ inline bool Var::isEmpty() const
 
 inline bool Var::isArray() const
 {
-	if (isEmpty() || 
-		isString()) return false;
+	if (isEmpty() || isString()) return false;
 
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isArray() : false;
@@ -2228,6 +2227,110 @@ inline bool operator >= (const long& other, const Var& da)
 {
 	if (da.isEmpty()) return false;
 	return other >= da.convert<long>();
+}
+
+
+inline unsigned long operator + (const unsigned long& other, const Var& da)
+	/// Addition operator for adding Var to unsigned long
+{
+	return other + da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator - (const unsigned long& other, const Var& da)
+	/// Subtraction operator for subtracting Var from unsigned long
+{
+	return other - da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator * (const unsigned long& other, const Var& da)
+	/// Multiplication operator for multiplying Var with unsigned long
+{
+	return other * da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator / (const unsigned long& other, const Var& da)
+	/// Division operator for dividing Var with unsigned long
+{
+	return other / da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator += (unsigned long& other, const Var& da)
+	/// Addition assignment operator for adding Var to unsigned long
+{
+	return other += da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator -= (unsigned long& other, const Var& da)
+	/// Subtraction assignment operator for subtracting Var from unsigned long
+{
+	return other -= da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator *= (unsigned long& other, const Var& da)
+	/// Multiplication assignment operator for multiplying Var with unsigned long
+{
+	return other *= da.convert<unsigned long>();
+}
+
+
+inline unsigned long operator /= (unsigned long& other, const Var& da)
+	/// Division assignment operator for dividing Var with unsigned long
+{
+	return other /= da.convert<unsigned long>();
+}
+
+
+inline bool operator == (const unsigned long& other, const Var& da)
+	/// Equality operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other == da.convert<unsigned long>();
+}
+
+
+inline bool operator != (const unsigned long& other, const Var& da)
+	/// Inequality operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return true;
+	return other != da.convert<unsigned long>();
+}
+
+
+inline bool operator < (const unsigned long& other, const Var& da)
+	/// Less than operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other < da.convert<unsigned long>();
+}
+
+
+inline bool operator <= (const unsigned long& other, const Var& da)
+	/// Less than or equal operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other <= da.convert<unsigned long>();
+}
+
+
+inline bool operator > (const unsigned long& other, const Var& da)
+	/// Greater than operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other > da.convert<unsigned long>();
+}
+
+
+inline bool operator >= (const unsigned long& other, const Var& da)
+	/// Greater than or equal operator for comparing Var with unsigned long
+{
+	if (da.isEmpty()) return false;
+	return other >= da.convert<unsigned long>();
 }
 
 

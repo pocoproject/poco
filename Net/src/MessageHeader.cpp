@@ -127,9 +127,9 @@ bool MessageHeader::hasToken(const std::string& fieldName, const std::string& to
 	std::string field = get(fieldName, "");
 	std::vector<std::string> tokens;
 	splitElements(field, tokens, true);
-	for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
+	for (const auto& t: tokens)
 	{
-		if (Poco::icompare(*it, token) == 0)
+		if (Poco::icompare(t, token) == 0)
 			return true;
 	}
 	return false;

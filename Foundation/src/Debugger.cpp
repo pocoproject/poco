@@ -22,9 +22,7 @@
 	#include <unistd.h>
 	#include <signal.h>
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 // NOTE: In this module, we use the C library functions (fputs) for,
@@ -73,15 +71,10 @@ void Debugger::message(const std::string& msg)
 	#if defined(POCO_OS_FAMILY_WINDOWS)
 	if (isAvailable())
 	{
-		#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::wstring umsg;
 		UnicodeConverter::toUTF16(msg, umsg);
 		umsg += '\n';
 		OutputDebugStringW(umsg.c_str());
-		#else
-		OutputDebugStringA(msg.c_str());
-		OutputDebugStringA("\n");
-		#endif
 	}
 	#endif
 #endif

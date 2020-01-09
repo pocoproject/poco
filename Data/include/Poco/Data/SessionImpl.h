@@ -39,7 +39,7 @@ class Data_API SessionImpl: public Poco::RefCountedObject
 	/// SessionImpl objects are noncopyable.
 {
 public:
-	typedef Poco::AutoPtr<SessionImpl> Ptr;
+	using Ptr = Poco::AutoPtr<SessionImpl>;
 
 	static const std::size_t LOGIN_TIMEOUT_INFINITE = 0;
 		/// Infinite connection/login timeout.

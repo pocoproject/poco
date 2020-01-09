@@ -33,7 +33,7 @@ class NotificationStrategy
 	/// but does not need to inherit from NotificationStrategy.
 {
 public:
-	typedef TDelegate* DelegateHandle;
+	using DelegateHandle = TDelegate*;
 
 	NotificationStrategy()
 	{
@@ -74,7 +74,7 @@ class NotificationStrategy<void, TDelegate>
 	/// but does not need to inherit from NotificationStrategy.
 {
 public:
-	typedef TDelegate* DelegateHandle;
+	using DelegateHandle = TDelegate*;
 
 	NotificationStrategy()
 	{

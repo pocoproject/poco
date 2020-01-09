@@ -27,8 +27,8 @@ namespace Poco {
 class FileImpl
 {
 protected:
-
-	enum Options {
+	enum Options 
+	{
 		OPT_FAIL_ON_OVERWRITE_IMPL = 0x01
 	};
 

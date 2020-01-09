@@ -131,9 +131,9 @@ void PriorityNotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void PriorityNotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	for (auto p: _waitQueue)
 	{
-		(*it)->nfAvailable.set();
+		p->nfAvailable.set();
 	}
 	_waitQueue.clear();
 }

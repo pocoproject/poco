@@ -63,7 +63,7 @@ class ReleasePolicy
 public:
 	static void release(C* pObj)
 		/// Delete the object.
-		/// Note that pObj can be 0.
+		/// Note that pObj can be nullptr.
 	{
 		delete pObj;
 	}
@@ -77,14 +77,14 @@ class ReleaseArrayPolicy
 public:
 	static void release(C* pObj)
 		/// Delete the object.
-		/// Note that pObj can be 0.
+		/// Note that pObj can be nullptr.
 	{
 		delete [] pObj;
 	}
 };
 
 
-template <class C, class RC = ReferenceCounter, class RP = ReleasePolicy<C> >
+template <class C, class RC = ReferenceCounter, class RP = ReleasePolicy<C>>
 class SharedPtr
 	/// SharedPtr is a "smart" pointer for classes implementing
 	/// reference counting based garbage collection.
@@ -115,13 +115,13 @@ class SharedPtr
 public:
 	typedef C Type;
 
-	SharedPtr(): _pCounter(new RC), _ptr(0)
+	SharedPtr(): _pCounter(nullptr), _ptr(nullptr)
 	{
 	}
 
 	SharedPtr(C* ptr)
 	try:
-		_pCounter(new RC), 
+		_pCounter(ptr ? new RC : nullptr), 
 		_ptr(ptr)
 	{
 	}
@@ -133,12 +133,18 @@ public:
 	template <class Other, class OtherRP> 
 	SharedPtr(const SharedPtr<Other, RC, OtherRP>& ptr): _pCounter(ptr._pCounter), _ptr(const_cast<Other*>(ptr.get()))
 	{
-		_pCounter->duplicate();
+		if (_pCounter) _pCounter->duplicate();
 	}
 
 	SharedPtr(const SharedPtr& ptr): _pCounter(ptr._pCounter), _ptr(ptr._ptr)
 	{
-		_pCounter->duplicate();
+		if (_pCounter) _pCounter->duplicate();
+	}
+
+	SharedPtr(SharedPtr&& ptr) noexcept: _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	{
+		ptr._pCounter = nullptr;
+		ptr._ptr = nullptr;
 	}
 
 	~SharedPtr()
@@ -186,7 +192,7 @@ public:
 
 	void reset()
 	{
-		assign(0);
+		assign(nullptr);
 	}
 
 	void reset(C* ptr)
@@ -213,6 +219,15 @@ public:
 	SharedPtr& operator = (const SharedPtr& ptr)
 	{
 		return assign(ptr);
+	}
+
+	SharedPtr& operator = (SharedPtr&& ptr) noexcept
+	{
+		_ptr = std::move(ptr._ptr);
+		_pCounter = std::move(ptr._pCounter);
+		ptr._ptr = nullptr;
+		ptr._pCounter = nullptr;
+		return *this;
 	}
 
 	template <class Other, class OtherRP>
@@ -296,12 +311,12 @@ public:
 
 	bool operator ! () const
 	{
-		return _ptr == 0;
+		return _ptr == nullptr;
 	}
 
 	bool isNull() const
 	{
-		return _ptr == 0;
+		return _ptr == nullptr;
 	}
 
 	bool operator == (const SharedPtr& ptr) const
@@ -396,7 +411,7 @@ public:
 	
 	int referenceCount() const
 	{
-		return _pCounter->referenceCount();
+		return _pCounter ? _pCounter->referenceCount() : 0;
 	}
 
 private:
@@ -410,15 +425,13 @@ private:
 
 	void release()
 	{
-		poco_assert_dbg (_pCounter);
-		int i = _pCounter->release();
-		if (i == 0)
+		if (_pCounter && _pCounter->release() == 0)
 		{
 			RP::release(_ptr);
-			_ptr = 0;
+			_ptr = nullptr;
 
 			delete _pCounter;
-			_pCounter = 0;
+			_pCounter = nullptr;
 		}
 	}
 
@@ -441,6 +454,20 @@ template <class C, class RC, class RP>
 inline void swap(SharedPtr<C, RC, RP>& p1, SharedPtr<C, RC, RP>& p2)
 {
 	p1.swap(p2);
+}
+
+
+template <typename T, typename... Args>
+SharedPtr<T> makeShared(Args&&... args)
+{
+    return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
+
+
+template <typename T>
+SharedPtr<T, ReferenceCounter, ReleaseArrayPolicy<T>> makeSharedArray(std::size_t size)
+{
+	return new SharedPtr<T, ReferenceCounter, ReleaseArrayPolicy<T>>(new T[size]);
 }
 
 

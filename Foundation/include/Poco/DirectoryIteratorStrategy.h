@@ -31,8 +31,8 @@ namespace Poco {
 class Foundation_API TraverseBase
 {
 public:
-	typedef std::stack<DirectoryIterator> Stack;
-	typedef std::function<UInt16(const Stack&)> DepthFun;
+	using Stack = std::stack<DirectoryIterator>;
+	using DepthFun = std::function<UInt16(const Stack&)>;
 
 	enum
 	{
@@ -82,7 +82,7 @@ private:
 	SiblingsFirstTraverse(const SiblingsFirstTraverse&);
 	SiblingsFirstTraverse& operator=(const SiblingsFirstTraverse&);
 
-	std::stack<std::queue<std::string> > _dirsStack;
+	std::stack<std::queue<std::string>> _dirsStack;
 };
 
 

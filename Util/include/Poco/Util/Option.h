@@ -20,6 +20,7 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/Util/OptionCallback.h"
+#include "Poco/Util/AbstractConfiguration.h"
 
 
 namespace Poco {
@@ -28,7 +29,6 @@ namespace Util {
 
 class Application;
 class Validator;
-class AbstractConfiguration;
 
 
 class Util_API Option
@@ -189,7 +189,7 @@ public:
 		/// Returns the option's Validator, if one has been specified,
 		/// or NULL otherwise.	
 		
-	AbstractConfiguration* config() const;
+	AbstractConfiguration::Ptr config() const;
 		/// Returns the configuration, if specified, or NULL otherwise.
 		
 	bool matchesShort(const std::string& option) const;
@@ -239,7 +239,7 @@ private:
 	std::string _binding;
 	Validator*  _pValidator;
 	AbstractOptionCallback* _pCallback;
-	AbstractConfiguration*  _pConfig;
+	AbstractConfiguration::Ptr _pConfig;
 };
 
 
@@ -320,7 +320,7 @@ inline Validator* Option::validator() const
 }
 
 
-inline AbstractConfiguration* Option::config() const
+inline AbstractConfiguration::Ptr Option::config() const
 {
 	return _pConfig;
 }

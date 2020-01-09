@@ -32,8 +32,7 @@ URIStreamOpener::URIStreamOpener()
 
 URIStreamOpener::~URIStreamOpener()
 {
-	for (FactoryMap::iterator it = _map.begin(); it != _map.end(); ++it)
-		delete it->second;
+	for (auto& p: _map) delete p.second;
 }
 
 

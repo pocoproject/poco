@@ -42,9 +42,9 @@ HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt1
 
 HTTPSessionFactory::~HTTPSessionFactory()
 {
-	for (Instantiators::iterator it = _instantiators.begin(); it != _instantiators.end(); ++it)
+	for (auto& p: _instantiators)
 	{
-		delete it->second.pIn;
+		delete p.second.pIn;
 	}
 }
 

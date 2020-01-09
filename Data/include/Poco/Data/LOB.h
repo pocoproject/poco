@@ -41,10 +41,10 @@ class LOB
 	/// a convenient way to access the data in a LOB.
 {
 public:
-	typedef typename std::vector<T>::const_iterator Iterator;
-	typedef T ValueType;
-	typedef typename std::vector<T> Container;
-	typedef Poco::SharedPtr<Container> ContentPtr;
+	using Iterator = typename std::vector<T>::const_iterator;
+	using ValueType = T;
+	using Container = std::vector<T>;
+	using ContentPtr = Poco::SharedPtr<Container>;
 
 	LOB(): _pContent(new std::vector<T>())
 		/// Creates an empty LOB.
@@ -74,6 +74,10 @@ public:
 	{
 	}
 
+	LOB(LOB&& other) noexcept: _pContent(std::move(other._pContent))
+	{
+	}
+
 	~LOB()
 		/// Destroys the LOB.
 	{
@@ -84,6 +88,12 @@ public:
 	{
 		LOB tmp(other);
 		swap(tmp);
+		return *this;
+	}
+
+	LOB& operator = (LOB&& other) noexcept
+	{
+		_pContent = std::move(other._pContent);
 		return *this;
 	}
 
@@ -180,8 +190,8 @@ private:
 };
 
 
-typedef LOB<unsigned char> BLOB;
-typedef LOB<char> CLOB;
+using BLOB = LOB<unsigned char>;
+using CLOB = LOB<char>;
 
 
 //

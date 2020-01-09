@@ -35,6 +35,12 @@ NameValueCollection::NameValueCollection(const NameValueCollection& nvc):
 }
 
 
+NameValueCollection::NameValueCollection(NameValueCollection&& nvc) noexcept:
+	_map(std::move(nvc._map))
+{
+}
+
+
 NameValueCollection::~NameValueCollection()
 {
 }
@@ -42,10 +48,17 @@ NameValueCollection::~NameValueCollection()
 
 NameValueCollection& NameValueCollection::operator = (const NameValueCollection& nvc)
 {
-	if (&nvc != this)
-	{
-		_map = nvc._map;
-	}
+	NameValueCollection tmp(nvc);
+	swap(tmp);
+
+	return *this;
+}
+
+
+NameValueCollection& NameValueCollection::operator = (NameValueCollection&& nvc) noexcept
+{
+	_map = std::move(nvc._map);
+
 	return *this;
 }
 

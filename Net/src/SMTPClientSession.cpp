@@ -419,9 +419,9 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 	std::ostringstream recipient;
 	if (pRecipients)
 	{
-		for (Recipients::const_iterator it = pRecipients->begin(); it != pRecipients->end(); ++it)
+		for (const auto& rec: *pRecipients)
 		{
-			recipient << '<' << *it << '>';
+			recipient << '<' << rec << '>';
 			int status = sendCommand("RCPT TO:", recipient.str(), response);
 			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 			recipient.str("");
@@ -429,9 +429,9 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 	}
 	else
 	{
-		for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
+		for (const auto& rec: message.recipients())
 		{
-			recipient << '<' << it->getAddress() << '>';
+			recipient << '<' << rec.getAddress() << '>';
 			int status = sendCommand("RCPT TO:", recipient.str(), response);
 			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 			recipient.str("");
@@ -465,10 +465,9 @@ void SMTPClientSession::sendAddresses(const std::string& from, const Recipients&
 
 	std::ostringstream recipient;
 
-	for (Recipients::const_iterator it = recipients.begin(); it != recipients.end(); ++it)
+	for (const auto& rec: recipients)
 	{
-
-		recipient << '<' << *it << '>';
+		recipient << '<' << rec << '>';
 		int status = sendCommand("RCPT TO:", recipient.str(), response);
 		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 		recipient.str("");

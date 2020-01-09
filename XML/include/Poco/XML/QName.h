@@ -42,6 +42,12 @@ public:
 	QName(const std::string& name);
 	QName(const std::string& ns, const std::string& name);
 	QName(const std::string& ns, const std::string& name, const std::string& prefix);
+	QName(const QName& qname);
+	QName(QName&& qname) noexcept;
+
+	QName& operator = (const QName& qname);
+	QName& operator = (QName&& qname) noexcept;
+	void swap(QName& qname);
 
 	const std::string& namespaceURI() const;
 		/// Returns the namespace URI part of the name.

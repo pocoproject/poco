@@ -52,7 +52,7 @@ public:
 		int size;
 	};
 	
-	typedef std::vector<MessageInfo> MessageInfoVec;
+	using MessageInfoVec = std::vector<MessageInfo>;
 
 	explicit POP3ClientSession(const StreamSocket& socket);
 		/// Creates the POP3ClientSession using

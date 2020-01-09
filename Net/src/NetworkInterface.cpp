@@ -26,9 +26,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Format.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	#if defined(POCO_WIN32_UTF8)
-		#include "Poco/UnicodeConverter.h"
-	#endif
+	#include "Poco/UnicodeConverter.h"
 	#include "Poco/Error.h"
 	#include <wincrypt.h>
 	#include <iphlpapi.h>
@@ -70,9 +68,9 @@ namespace Net {
 class NetworkInterfaceImpl: public Poco::RefCountedObject
 {
 public:
-	typedef NetworkInterface::AddressTuple AddressTuple;
-	typedef NetworkInterface::AddressList  AddressList;
-	typedef NetworkInterface::Type         Type;
+	using AddressTuple = NetworkInterface::AddressTuple;
+	using AddressList = NetworkInterface::AddressList;
+	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
 	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
@@ -873,7 +871,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 		std::string adapterName = it->second.adapterName();
 		NetworkInterface::MACAddress mac = it->second.macAddress();
 
-		typedef NetworkInterface::AddressList List;
+		using List = NetworkInterface::AddressList;
 		const List& ipList = it->second.addressList();
 		if (ipList.size() > 0)
 		{
@@ -1007,7 +1005,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 		subKey += name;
 		std::string netmask;
 		HKEY hKey;
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::wstring usubKey;
 		Poco::UnicodeConverter::toUTF16(subKey, usubKey);
 		if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, usubKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
@@ -1023,21 +1020,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 			}
 		}
 		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
-#else
-		if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, subKey.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-			return IPAddress();
-		char unetmask[16];
-		DWORD size = sizeof(unetmask);
-		if (RegQueryValueExA(hKey, "DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
-		{
-			if (RegQueryValueExA(hKey, "SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
-			{
-				RegCloseKey(hKey);
-				return IPAddress();
-			}
-		}
-		netmask = unetmask;
-#endif
 		RegCloseKey(hKey);
 		return IPAddress::parse(netmask);
 #else
@@ -1151,17 +1133,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		std::string name;
 		std::string displayName;
 		std::string adapterName(pAddress->AdapterName);
-#ifdef POCO_WIN32_UTF8
 		Poco::UnicodeConverter::toUTF8(pAddress->FriendlyName, name);
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
-#else
-		char nameBuffer[1024];
-		int rc = WideCharToMultiByte(CP_ACP, 0, pAddress->FriendlyName, -1, nameBuffer, sizeof(nameBuffer), NULL, NULL);
-		if (rc) name = nameBuffer;
-		char displayNameBuffer[1024];
-		rc = WideCharToMultiByte(CP_ACP, 0, pAddress->Description, -1, displayNameBuffer, sizeof(displayNameBuffer), NULL, NULL);
-		if (rc) displayName = displayNameBuffer;
-#endif
 
 		bool isUp = (pAddress->OperStatus == IfOperStatusUp);
 		bool isIP = (0 != pAddress->FirstUnicastAddress);

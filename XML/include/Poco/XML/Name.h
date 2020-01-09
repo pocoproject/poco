@@ -46,12 +46,18 @@ public:
 		
 	Name(const Name& name);
 		/// Copy constructor.
+
+	Name(Name&& name) noexcept;
+		/// Move constructor.
 		
 	~Name();
 		/// Destroys the name.
 		
 	Name& operator = (const Name& name);
 		/// Assignment operator.
+
+	Name& operator = (Name&& name) noexcept;
+		/// Move assignment.
 		
 	void swap(Name& name);
 		/// Swaps the name with another one.	

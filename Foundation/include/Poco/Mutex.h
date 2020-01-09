@@ -61,7 +61,7 @@ class Foundation_API Mutex: private MutexImpl
 	/// lock and unlock a mutex.
 {
 public:
-	typedef Poco::ScopedLock<Mutex> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<Mutex>;
 	
 	Mutex();
 		/// creates the Mutex.
@@ -116,7 +116,7 @@ class Foundation_API FastMutex: private FastMutexImpl
 	/// lock and unlock a mutex.
 {
 public:
-	typedef Poco::ScopedLock<FastMutex> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<FastMutex>;
 
 	FastMutex();
 		/// creates the Mutex.
@@ -175,7 +175,7 @@ class Foundation_API SpinlockMutex
 	/// Works with the ScopedLock class.
 {
 public:
-	typedef Poco::ScopedLock<SpinlockMutex> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<SpinlockMutex>;
 
 	SpinlockMutex();
 		/// Creates the SpinlockMutex.
@@ -221,7 +221,7 @@ class Foundation_API NullMutex
 	/// Works with the ScopedLock class
 {
 public:
-	typedef Poco::ScopedLock<NullMutex> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<NullMutex>;
 	
 	NullMutex()
 		/// Creates the NullMutex.

@@ -168,10 +168,10 @@ int RegularExpression::split(const std::string& subject, std::string::size_type 
 	strings.clear();
 	int rc = match(subject, offset, matches, options);
 	strings.reserve(matches.size());
-	for (MatchVec::const_iterator it = matches.begin(); it != matches.end(); ++it)
+	for (const auto& m: matches)
 	{
-		if (it->offset != std::string::npos)
-			strings.push_back(subject.substr(it->offset, it->length));
+		if (m.offset != std::string::npos)
+			strings.push_back(subject.substr(m.offset, m.length));
 		else
 			strings.push_back(std::string());
 	}

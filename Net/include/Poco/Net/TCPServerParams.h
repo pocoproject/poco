@@ -36,7 +36,7 @@ class Net_API TCPServerParams: public Poco::RefCountedObject
 	/// Subclasses may add new parameters to the class.
 {
 public:
-	typedef Poco::AutoPtr<TCPServerParams> Ptr;
+	using Ptr = Poco::AutoPtr<TCPServerParams>;
 	
 	TCPServerParams();
 		/// Creates the TCPServerParams.

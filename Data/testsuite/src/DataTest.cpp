@@ -482,7 +482,7 @@ void DataTest::testColumnVector()
 	pData->push_back(4);
 	pData->push_back(5);
 	
-	Column<std::vector<int> > c(mc, pData);
+	Column<std::vector<int>> c(mc, pData);
 
 	assertTrue (c.rowCount() == 5);
 	assertTrue (c[0] == 1);
@@ -503,7 +503,7 @@ void DataTest::testColumnVector()
 	}
 	catch (RangeException&) { }
 
-	Column<std::vector<int> > c1 = c;
+	Column<std::vector<int>> c1 = c;
 
 	assertTrue (c1.rowCount() == 5);
 	assertTrue (c1[0] == 1);
@@ -512,7 +512,7 @@ void DataTest::testColumnVector()
 	assertTrue (c1[3] == 4);
 	assertTrue (c1[4] == 5);
 
-	Column<std::vector<int> > c2(c1);
+	Column<std::vector<int>> c2(c1);
 
 	assertTrue (c2.rowCount() == 5);
 	assertTrue (c2[0] == 1);
@@ -547,8 +547,8 @@ void DataTest::testColumnVector()
 	pV2->push_back(3);
 	pV2->push_back(2);
 	pV2->push_back(1);
-	Column<std::vector<int> > c3(mc, pV1);
-	Column<std::vector<int> > c4(mc, pV2);
+	Column<std::vector<int>> c3(mc, pV1);
+	Column<std::vector<int>> c4(mc, pV2);
 	
 	Poco::Data::swap(c3, c4);
 	assertTrue (c3[0] == 5);
@@ -589,7 +589,7 @@ void DataTest::testColumnVectorBool()
 	pData->push_back(false);
 	pData->push_back(true);
 	
-	Column<std::vector<bool> > c(mc, pData);
+	Column<std::vector<bool>> c(mc, pData);
 
 	assertTrue (c.rowCount() == 5);
 	assertTrue (c[0] == true);
@@ -606,7 +606,7 @@ void DataTest::testColumnVectorBool()
 	}
 	catch (RangeException&) { }
 
-	Column<std::vector<bool> > c1 = c;
+	Column<std::vector<bool>> c1 = c;
 
 	assertTrue (c1.rowCount() == 5);
 	assertTrue (c1[0] == true);
@@ -615,7 +615,7 @@ void DataTest::testColumnVectorBool()
 	assertTrue (c1[3] == false);
 	assertTrue (c1[4] == true);
 
-	Column<std::vector<bool> > c2(c1);
+	Column<std::vector<bool>> c2(c1);
 
 	assertTrue (c2.rowCount() == 5);
 	assertTrue (c2[0] == true);
@@ -642,8 +642,8 @@ void DataTest::testColumnVectorBool()
 
 void DataTest::testColumnDeque()
 {
-	typedef std::deque<int> ContainerType;
-	typedef Column<ContainerType> ColumnType;
+	using ContainerType = std::deque<int>;
+	using ColumnType = Column<ContainerType>;
 
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 
@@ -759,8 +759,8 @@ void DataTest::testColumnDeque()
 
 void DataTest::testColumnList()
 {
-	typedef std::list<int> ContainerType;
-	typedef Column<ContainerType> ColumnType;
+	using ContainerType = std::list<int>;
+	using ColumnType = Column<ContainerType>;
 
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
 

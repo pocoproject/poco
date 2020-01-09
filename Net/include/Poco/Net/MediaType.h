@@ -44,10 +44,16 @@ public:
 	MediaType(const MediaType& mediaType);
 		/// Creates a MediaType from another one.
 
+	MediaType(MediaType&& mediaType) noexcept;
+		/// Creates a MediaType by moving another one.
+
 	~MediaType();
 		/// Destroys the MediaType.
 
 	MediaType& operator = (const MediaType& mediaType);
+		/// Assigns another media type.
+
+	MediaType& operator = (MediaType&& mediaType) noexcept;
 		/// Assigns another media type.
 		
 	MediaType& operator = (const std::string& mediaType);

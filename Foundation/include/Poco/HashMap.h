@@ -78,7 +78,7 @@ private:
 };
 
 
-template <class Key, class Mapped, class HashFunc = Hash<Key> >
+template <class Key, class Mapped, class HashFunc = Hash<Key>>
 class HashMap
 	/// This class implements a map using a LinearHashTable.
 	///

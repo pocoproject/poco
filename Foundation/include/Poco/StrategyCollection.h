@@ -33,9 +33,9 @@ class StrategyCollection: public AbstractStrategy<TKey, TValue>
 	/// An StrategyCollection is a decorator masking n collections as a single one.
 {
 public:
-	typedef std::vector<SharedPtr<AbstractStrategy<TKey, TValue> > > Strategies;
-	typedef typename Strategies::iterator       Iterator;
-	typedef typename Strategies::const_iterator ConstIterator;
+	using Strategies = std::vector<SharedPtr<AbstractStrategy<TKey, TValue>>>;
+	using Iterator = typename Strategies::iterator;
+	using ConstIterator = typename Strategies::const_iterator;
 
 public:
 	StrategyCollection()
@@ -49,7 +49,7 @@ public:
 	void pushBack(AbstractStrategy<TKey, TValue>* pStrat)
 		/// Adds an AbstractStrategy to the collection. Class takes ownership of pointer
 	{
-		_strategies.push_back(SharedPtr<AbstractStrategy<TKey, TValue> >(pStrat));
+		_strategies.push_back(SharedPtr<AbstractStrategy<TKey, TValue>>(pStrat));
 	}
 
 	void popBack()

@@ -45,9 +45,9 @@ public:
 		/// Destroys the DynamicFactory and deletes the instantiators for
 		/// all registered classes.
 	{
-		for (typename FactoryMap::iterator it = _map.begin(); it != _map.end(); ++it)
+		for (auto& p: _map)
 		{
-			delete it->second;
+			delete p.second;
 		}
 	}
 

@@ -318,13 +318,13 @@ std::string OAuth10Credentials::createSignature(const Poco::Net::HTTPRequest& re
 	{
 		paramsMap["oauth_callback"] = percentEncode(_callback);
 	}
-	for (Poco::Net::HTMLForm::ConstIterator it = params.begin(); it != params.end(); ++it)
+	for (const auto& p: params)
 	{
-		paramsMap[percentEncode(it->first)] = percentEncode(it->second);
+		paramsMap[percentEncode(p.first)] = percentEncode(p.second);
 	}
 	
 	std::string paramsString;
-	for (std::map<std::string, std::string>::const_iterator it = paramsMap.begin(); it != paramsMap.end(); ++it)
+	for (auto it = paramsMap.begin(); it != paramsMap.end(); ++it)
 	{
 		if (it != paramsMap.begin()) paramsString += '&';
 		paramsString += it->first;

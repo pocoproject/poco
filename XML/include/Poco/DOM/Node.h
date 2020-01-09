@@ -208,7 +208,7 @@ public:
 		/// Returns whether this node (if it is an element) has any attributes.
 		
 	// Extensions
-	typedef Poco::XML::NamespaceSupport NSMap;
+	using NSMap = Poco::XML::NamespaceSupport;
 
 	virtual XMLString innerText() const = 0;
 		/// Returns a string containing the concatenated values of the node

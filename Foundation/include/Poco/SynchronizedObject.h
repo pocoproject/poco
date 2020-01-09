@@ -33,7 +33,7 @@ class Foundation_API SynchronizedObject
 	/// scenario.
 {
 public:
-	typedef Poco::ScopedLock<SynchronizedObject> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<SynchronizedObject>;
 	
 	SynchronizedObject();
 		/// Creates the object.

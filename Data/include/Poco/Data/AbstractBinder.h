@@ -37,7 +37,7 @@ namespace Poco {
 namespace Data {
 
 
-typedef NullType NullData;
+using NullData = NullType;
 
 
 namespace Keywords {
@@ -53,7 +53,7 @@ class Data_API AbstractBinder
 	/// Interface for Binding data types to placeholders.
 {
 public:
-	typedef SharedPtr<AbstractBinder> Ptr;
+	using Ptr = SharedPtr<AbstractBinder>;
 
 	enum Direction
 		/// Binding direction for a parameter.

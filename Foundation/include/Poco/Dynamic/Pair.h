@@ -33,7 +33,7 @@ class Pair
 	/// Pair allows to define a pair of values.
 {
 public:
-	typedef typename std::pair<K, Var> Data;
+	using Data = typename std::pair<K, Var>;
 
 	Pair(): _data()
 		/// Creates an empty Pair
@@ -96,7 +96,7 @@ public:
 	std::string toString()
 	{
 		std::string str;
-		Var(*this).convert<std::string>(str);
+		Var(*this).template convert<std::string>(str);
 		return str;
 	}
 
@@ -106,7 +106,7 @@ private:
 
 
 template <>
-class VarHolderImpl<Pair<std::string> >: public VarHolder
+class VarHolderImpl<Pair<std::string>>: public VarHolder
 {
 public:
 	VarHolderImpl(const Pair<std::string>& val): _val(val)
@@ -255,7 +255,7 @@ private:
 
 
 template <>
-class VarHolderImpl<Pair<int> >: public VarHolder
+class VarHolderImpl<Pair<int>>: public VarHolder
 {
 public:
 	VarHolderImpl(const Pair<int>& val): _val(val)

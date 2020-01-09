@@ -94,9 +94,9 @@ public:
 		Poco::UInt32 size(static_cast<Poco::UInt32>(value.size()));
 
 		*this << size;
-		for (typename std::vector<T>::const_iterator it = value.begin(); it != value.end(); ++it)
+		for (const auto& v: value)
 		{
-			*this << *it;
+			*this << v;
 		}
 
 		return *this;

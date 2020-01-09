@@ -720,8 +720,6 @@ void JSONTest::testObjectArray()
 	assertTrue (ds["test"]["test1"][2] == 3);
 	assertTrue (ds["test"]["test2"] == 4);
 
-#ifdef POCO_ENABLE_CPP11
-
 	object->set("test3", "another top level value");
 	ds = std::move(*object);
 	assertTrue (ds.size() == 2);
@@ -733,8 +731,6 @@ void JSONTest::testObjectArray()
 	assertTrue (ds["test"]["test1"][2] == 3);
 	assertTrue (ds["test"]["test2"] == 4);
 	assertTrue (ds["test3"] == "another top level value");
-
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -1086,15 +1082,11 @@ void JSONTest::testSetArrayElement()
 	assertTrue (array->getElement<int>(1) == 13);
 	assertTrue (array->getElement<std::string>(2) == "foo");
 
-#ifdef POCO_ENABLE_CPP11
-
 	dynArray = std::move(*array);
 	assertTrue (dynArray.size() == 3);
 	assertTrue (dynArray[0] == 7);
 	assertTrue (dynArray[1] == 13);
 	assertTrue (dynArray[2] == "foo");
-
-#endif // POCO_ENABLE_CPP11
 
 	dynArray.clear();
 	assertTrue (dynArray.size() == 0);
@@ -1697,7 +1689,6 @@ void JSONTest::testStringifyPreserveOrder()
 	assertTrue (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
 	assertTrue (ds["Simpsons"]["address"]["town"] == "Springfield");
 
-#ifdef POCO_ENABLE_CPP11
 	Poco::OrderedDynamicStruct ods = *result.extract<Object::Ptr>();
 	assertTrue(ods["Simpsons"].isStruct());
 	assertTrue(ods["Simpsons"].isOrdered());
@@ -1706,7 +1697,6 @@ void JSONTest::testStringifyPreserveOrder()
 		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 		"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", "
 		"\"town\" : \"Springfield\" } } }");
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2114,7 +2104,6 @@ void JSONTest::testCopy()
 
 void JSONTest::testMove()
 {
-#ifdef POCO_ENABLE_CPP11
 	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
@@ -2174,7 +2163,6 @@ void JSONTest::testMove()
 	assertTrue (nl[0] == "foo");
 	assertTrue (nl[1] == "bar");
 	assertTrue (nl[2] == "baz");
-#endif // POCO_ENABLE_CPP11
 }
 
 

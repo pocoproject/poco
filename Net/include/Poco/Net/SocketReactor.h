@@ -26,9 +26,7 @@
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
 #include <map>
-#ifdef POCO_ENABLE_CPP11
 #include <atomic>
-#endif
 
 
 namespace Poco {
@@ -224,11 +222,7 @@ private:
 		DEFAULT_TIMEOUT = 250000
 	};
 
-#ifdef POCO_ENABLE_CPP11
 	std::atomic<bool> _stop;
-#else
-	bool              _stop;
-#endif
 	Poco::Timespan    _timeout;
 	EventHandlerMap   _handlers;
 	PollSet           _pollSet;

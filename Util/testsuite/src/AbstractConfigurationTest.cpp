@@ -395,9 +395,9 @@ void AbstractConfigurationTest::testRemove()
 }
 
 
-Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfiguration() const
+AbstractConfiguration::Ptr AbstractConfigurationTest::createConfiguration() const
 {
-	Poco::AutoPtr<AbstractConfiguration> pConfig = allocConfiguration();
+	AbstractConfiguration::Ptr pConfig = allocConfiguration();
 	
 	pConfig->setString("prop1", "foo");
 	pConfig->setString("prop2", "bar");
@@ -411,9 +411,9 @@ Poco::AutoPtr<AbstractConfiguration> AbstractConfigurationTest::createConfigurat
 	pConfig->setString("prop4.bigint2", NumberFormatter::format(std::numeric_limits<Int64>::min()));
 	pConfig->setString("prop4.biguint", NumberFormatter::format(std::numeric_limits<UInt64>::max()));
 #else /// just to make sure property count is consistent
-	pConfig->setString("prop4.bigint1", 0));
-	pConfig->setString("prop4.bigint2", 0));
-	pConfig->setString("prop4.biguint", 0));
+	pConfig->setString("prop4.bigint1", 0);
+	pConfig->setString("prop4.bigint2", 0);
+	pConfig->setString("prop4.biguint", 0);
 #endif
 	pConfig->setString("prop4.hex", "0x1f");
 	pConfig->setString("prop4.double1", "1");

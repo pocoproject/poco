@@ -98,16 +98,16 @@ public:
 	SAXParseException(const SAXParseException& exc);
 		/// Creates a new SAXParseException from another one.
 
-	~SAXParseException() throw();
+	~SAXParseException() noexcept;
 		/// Destroy the exception.
 
 	SAXParseException& operator = (const SAXParseException& exc);
 		/// Assignment operator.
 		
-	const char* name() const throw();
+	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const throw();
+	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
 	Poco::Exception* clone() const;

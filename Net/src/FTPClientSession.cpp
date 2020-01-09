@@ -502,9 +502,9 @@ bool FTPClientSession::sendEPRT(const SocketAddress& addr)
 void FTPClientSession::sendPORT(const SocketAddress& addr)
 {
 	std::string arg(addr.host().toString());
-	for (std::string::iterator it = arg.begin(); it != arg.end(); ++it)
+	for (auto& ch: arg)
 	{
-		if (*it == '.') *it = ',';
+		if (ch == '.') ch = ',';
 	}
 	arg += ',';
 	Poco::UInt16 port = addr.port();

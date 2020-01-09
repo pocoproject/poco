@@ -81,7 +81,9 @@ void SortedDirectoryIterator::scan()
 		{
 			isDir = (*this)->isDirectory();
 		}
-		catch (...) {}
+		catch (...) 
+		{
+		}
 		if (isDir)
 			_directories.push_back(_path.toString());
 		else

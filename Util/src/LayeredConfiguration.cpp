@@ -35,101 +35,57 @@ LayeredConfiguration::~LayeredConfiguration()
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
 {
-	add(pConfig, highest(), false, true);
+	add(pConfig, highest(), false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label)
 {
-	add(pConfig, label, highest(), false, true);
+	add(pConfig, label, highest(), false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, bool shared)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, int priority)
 {
-	add(pConfig, highest(), false, shared);
+	add(pConfig, priority, false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, bool shared)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority)
 {
-	add(pConfig, label, highest(), false, shared);
+	add(pConfig, label, priority, false);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority)
+void LayeredConfiguration::addWriteable(AbstractConfiguration::Ptr pConfig, int priority)
 {
-	add(pConfig, priority, false, true);
+	add(pConfig, priority, true);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, int priority, bool writeable)
 {
-	add(pConfig, label, priority, false, true);
+	add(pConfig, std::string(), priority, writeable);
 }
 
 
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool shared)
-{
-	add(pConfig, priority, false, shared);
-}
-
-
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool shared)
-{
-	add(pConfig, label, priority, false, shared);
-}
-
-
-void LayeredConfiguration::addFront(AbstractConfiguration* pConfig)
-{
-	add(pConfig, lowest(), false, true);
-}
-
-
-void LayeredConfiguration::addFront(AbstractConfiguration* pConfig, bool shared)
-{
-	add(pConfig, lowest(), false, shared);
-}
-
-
-void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int priority)
-{
-	add(pConfig, priority, true, true);
-}
-
-
-void LayeredConfiguration::addWriteable(AbstractConfiguration* pConfig, int priority, bool shared)
-{
-	add(pConfig, priority, true, shared);
-}
-
-
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, int priority, bool writeable, bool shared)
-{
-	add(pConfig, std::string(), priority, writeable, shared);
-}
-
-
-void LayeredConfiguration::add(AbstractConfiguration* pConfig, const std::string& label, int priority, bool writeable, bool shared)
+void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority, bool writeable)
 {
 	ConfigItem item;
-	item.pConfig   = ConfigPtr(pConfig, shared);
+	item.pConfig   = pConfig;
 	item.priority  = priority;
 	item.writeable = writeable;
 	item.label     = label;
 	
 	ConfigList::iterator it = _configs.begin();
-	while (it != _configs.end() && it->priority < priority)
-		++it;
-		
+	while (it != _configs.end() && it->priority < priority) ++it;
 	_configs.insert(it, item);
 }
 
 
-void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
+void LayeredConfiguration::removeConfiguration(AbstractConfiguration::Ptr pConfig)
 {
 	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
 	{
@@ -142,14 +98,11 @@ void LayeredConfiguration::removeConfiguration(AbstractConfiguration* pConfig)
 }
 
 
-LayeredConfiguration::ConfigPtr LayeredConfiguration::find(const std::string& label) const
+AbstractConfiguration::Ptr LayeredConfiguration::find(const std::string& label) const
 {
-	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
+	for (const auto& conf: _configs)
 	{
-		if (it->label == label)
-		{
-			return it->pConfig;
-		}
+		if (conf.label == label) return conf.pConfig;
 	}
 	return 0;
 }
@@ -157,10 +110,9 @@ LayeredConfiguration::ConfigPtr LayeredConfiguration::find(const std::string& la
 
 bool LayeredConfiguration::getRaw(const std::string& key, std::string& value) const
 {
-	for (ConfigList::const_iterator it = _configs.begin(); it != _configs.end(); ++it)
+	for (const auto& conf: _configs)
 	{
-		if (it->pConfig->getRaw(key, value))
-			return true;
+		if (conf.pConfig->getRaw(key, value)) return true;
 	}
 	return false;
 }
@@ -168,11 +120,11 @@ bool LayeredConfiguration::getRaw(const std::string& key, std::string& value) co
 
 void LayeredConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	for (auto& conf: _configs)
 	{
-		if (it->writeable)
+		if (conf.writeable)
 		{
-			it->pConfig->setRaw(key, value);
+			conf.pConfig->setRaw(key, value); 
 			return;
 		}
 	}
@@ -183,16 +135,16 @@ void LayeredConfiguration::setRaw(const std::string& key, const std::string& val
 void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	std::set<std::string> keys;
-	for (ConfigList::const_iterator itc = _configs.begin(); itc != _configs.end(); ++itc)
+	for (const auto& conf: _configs)
 	{
 		Keys partRange;
-		itc->pConfig->enumerate(key, partRange);
-		for (Keys::const_iterator itr = partRange.begin(); itr != partRange.end(); ++itr)
+		conf.pConfig->enumerate(key, partRange);
+		for (const auto& k: partRange)
 		{
-			if (keys.find(*itr) == keys.end())
+			if (keys.find(k) == keys.end())
 			{
-				range.push_back(*itr);
-				keys.insert(*itr);
+				range.push_back(k);
+				keys.insert(k);
 			}
 		}
 	}
@@ -201,11 +153,11 @@ void LayeredConfiguration::enumerate(const std::string& key, Keys& range) const
 
 void LayeredConfiguration::removeRaw(const std::string& key)
 {
-	for (ConfigList::iterator it = _configs.begin(); it != _configs.end(); ++it)
+	for (auto& conf: _configs)
 	{
-		if (it->writeable)
+		if (conf.writeable)
 		{
-			it->pConfig->remove(key);
+			conf.pConfig->remove(key);
 			return;
 		}
 	}
