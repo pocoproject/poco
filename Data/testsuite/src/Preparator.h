@@ -57,11 +57,13 @@ public:
 	void prepare(std::size_t pos, const Poco::UInt64&);
 		/// Prepares an UInt64.
 
+#ifndef POCO_INT64_IS_LONG
 	void prepare(std::size_t pos, const long&);
 		/// Prepares a long.
 
 	void prepare(std::size_t pos, const unsigned long&);
 		/// Prepares an unsigned long.
+#endif
 
 	void prepare(std::size_t pos, const bool&);
 		/// Prepares a boolean.
