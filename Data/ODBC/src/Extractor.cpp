@@ -575,7 +575,6 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int64>& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	if (Preparator::DE_MANUAL == _dataExtraction)
@@ -619,7 +618,6 @@ bool Extractor::extract(std::size_t pos, std::list<long>& val)
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
 }
-#endif
 
 
 bool Extractor::extract(std::size_t pos, double& val)
