@@ -41,8 +41,6 @@ TextTestResult::TextTestResult(const std::string& ignore):
 					if (line[0] == '#')
 						continue;
 					std::string ignored(line);
-					std::string::const_iterator it = ignored.begin();
-					std::string::const_iterator end = ignored.end();
 					ignoring(ignored);
 				}
 				ifs.close();
@@ -78,8 +76,6 @@ TextTestResult::TextTestResult(std::ostream& ostr, const std::string& ignore) :
 				if (line[0] == '#')
 					continue;
 				std::string ignored(line);
-				std::string::const_iterator it = ignored.begin();
-				std::string::const_iterator end = ignored.end();
 				ignoring(ignored);
 			}
 			ifs.close();
@@ -113,8 +109,6 @@ void TextTestResult::setup()
 	if (env)
 	{
 		std::string ignored = env;
-		std::string::const_iterator it = ignored.begin();
-		std::string::const_iterator end = ignored.end();
 		ignoring(ignored);
 	}
 
