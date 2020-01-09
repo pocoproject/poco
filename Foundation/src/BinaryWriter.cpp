@@ -212,7 +212,7 @@ BinaryWriter& BinaryWriter::operator << (double value)
 }
 
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
+#if defined(POCO_HAVE_INT64)
 
 
 BinaryWriter& BinaryWriter::operator << (Int64 value)
@@ -271,7 +271,7 @@ BinaryWriter& BinaryWriter::operator << (const std::string& value)
 BinaryWriter& BinaryWriter::operator << (const char* value)
 {
 	poco_check_ptr (value);
-	
+
 	if (_pTextConverter)
 	{
 		std::string converted;

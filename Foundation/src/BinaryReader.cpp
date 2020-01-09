@@ -170,7 +170,7 @@ BinaryReader& BinaryReader::operator >> (double& value)
 }
 
 
-#if defined(POCO_HAVE_INT64) && !defined(POCO_LONG_IS_64_BIT)
+#if defined(POCO_HAVE_INT64)
 
 
 BinaryReader& BinaryReader::operator >> (Int64& value)

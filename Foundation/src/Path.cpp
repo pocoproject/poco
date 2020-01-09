@@ -599,7 +599,7 @@ std::string Path::configHome()
 #endif
 }
 
-	
+
 std::string Path::dataHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -609,7 +609,7 @@ std::string Path::dataHome()
 #endif
 }
 
-	
+
 std::string Path::tempHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -619,7 +619,7 @@ std::string Path::tempHome()
 #endif
 }
 
-	
+
 std::string Path::cacheHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -1077,8 +1077,8 @@ std::string Path::transcode(const std::string& path)
 			return std::string(buffer.begin(), buffer.size());
 		}
 	}
-	return path;
 #endif
+	return path;
 }
 
 

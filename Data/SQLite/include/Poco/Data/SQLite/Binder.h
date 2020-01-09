@@ -65,13 +65,11 @@ public:
 	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir);
 		/// Binds an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
 	void bind(std::size_t pos, const long &val, Direction dir);
 		/// Binds a long
 
 	void bind(std::size_t pos, const unsigned long &val, Direction dir);
 		/// Binds an unsigned long
-#endif
 
 	void bind(std::size_t pos, const bool &val, Direction dir);
 		/// Binds a boolean.

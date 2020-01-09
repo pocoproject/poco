@@ -77,7 +77,6 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	val = 0;
@@ -90,7 +89,6 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 	val = 0;
 	return true;
 }
-#endif
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)

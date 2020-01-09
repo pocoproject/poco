@@ -50,42 +50,40 @@ public:
 
 	virtual bool extract(std::size_t pos, Poco::Int8& val);
 		/// Extracts an Int8.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt8& val);
 		/// Extracts an UInt8.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int16& val);
 		/// Extracts an Int16.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt16& val);
 		/// Extracts an UInt16.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int32& val);
 		/// Extracts an Int32.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt32& val);
 		/// Extracts an UInt32.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int64& val);
 		/// Extracts an Int64.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
-		
-#ifndef POCO_LONG_IS_64_BIT
+
 	virtual bool extract(std::size_t pos, long& val);
 		/// Extracts a long. Returns false if null was received.
 
 	virtual bool extract(std::size_t pos, unsigned long& val);
 		/// Extracts an unsigned long. Returns false if null was received.
-#endif
 
 	virtual bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
-		
+
 	virtual bool extract(std::size_t pos, float& val);
 		/// Extracts a float.
-		
+
 	virtual bool extract(std::size_t pos, double& val);
 		/// Extracts a double.
 
@@ -125,7 +123,7 @@ public:
 	////////////
 	// Not implemented extract functions
 	////////////
-	
+
 	virtual bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
 		/// Extracts an Int8 vector.
 
@@ -198,7 +196,6 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
 		/// Extracts an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
 	virtual bool extract(std::size_t pos, std::vector<long>& val);
 		/// Extracts a long vector.
 
@@ -207,7 +204,6 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<long>& val);
 		/// Extracts a long list.
-#endif
 
 	virtual bool extract(std::size_t pos, std::vector<bool>& val);
 		/// Extracts a boolean vector.
@@ -316,7 +312,7 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<Dynamic::Var>& val);
 		/// Extracts a Dynamic::Var list.
-	
+
 private:
 
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);

@@ -68,7 +68,6 @@ void Preparator::prepare(std::size_t pos, const Poco::UInt64&)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
 void Preparator::prepare(std::size_t pos, const long&)
 {
 }
@@ -77,7 +76,6 @@ void Preparator::prepare(std::size_t pos, const long&)
 void Preparator::prepare(std::size_t pos, const unsigned long&)
 {
 }
-#endif
 
 
 void Preparator::prepare(std::size_t pos, const bool&)

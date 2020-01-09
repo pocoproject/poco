@@ -696,7 +696,7 @@ void ServerApplication::handleUMask(const std::string& name, const std::string& 
 	for (const auto ch: value)
 	{
 		mask *= 8;
-		if (*it >= '0' && ch <= '7')
+		if (ch >= '0' && ch <= '7')
 			mask += ch - '0';
 		else
 			throw Poco::InvalidArgumentException("umask contains non-octal characters", value);

@@ -23,7 +23,7 @@
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	#define I64_FMT "I64"
-#elif defined(__APPLE__) 
+#elif defined(__APPLE__)
 	#define I64_FMT "q"
 #else
 	#define I64_FMT "ll"
@@ -236,101 +236,6 @@ void NumberFormatter::appendHex(std::string& str, unsigned long value, int width
 
 #ifdef POCO_HAVE_INT64
 
-#ifdef POCO_LONG_IS_64_BIT
-
-
-void NumberFormatter::append(std::string& str, long long value)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz);
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::append(std::string& str, long long value, int width)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::append0(std::string& str, long long value, int width)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::appendHex(std::string& str, long long value)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(static_cast<unsigned long long>(value), 0x10, result, sz);
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::appendHex(std::string& str, long long value, int width)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(static_cast<unsigned long long>(value), 0x10, result, sz, false, width, '0');
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::append(std::string& str, unsigned long long value)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(value, 10, result, sz);
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::append(std::string& str, unsigned long long value, int width)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(value, 10, result, sz, false, width, '0');
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::append0(std::string& str, unsigned long long value, int width)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(value, 10, result, sz, false, width, '0');
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::appendHex(std::string& str, unsigned long long value)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(value, 0x10, result, sz);
-	str.append(result, sz);
-}
-
-
-void NumberFormatter::appendHex(std::string& str, unsigned long long value, int width)
-{
-	char result[NF_MAX_INT_STRING_LEN];
-	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(value, 0x10, result, sz, false, width, '0');
-	str.append(result, sz);
-}
-
-
-#else // ifndef POCO_LONG_IS_64_BIT
-
 
 void NumberFormatter::append(std::string& str, Int64 value)
 {
@@ -421,8 +326,6 @@ void NumberFormatter::appendHex(std::string& str, UInt64 value, int width)
 	str.append(result, sz);
 }
 
-
-#endif // ifdef POCO_LONG_IS_64_BIT
 
 #endif // ifdef POCO_HAVE_INT64
 

@@ -258,13 +258,12 @@ public:
 	Statement& operator , (Poco::Int32 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
-#ifndef POCO_LONG_IS_64_BIT
 	Statement& operator , (long value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
 	Statement& operator , (unsigned long value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
-#endif
+
 	Statement& operator , (Poco::UInt64 value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
@@ -573,7 +572,6 @@ inline Statement& Statement::operator , (Poco::Int32 value)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
 inline Statement& Statement::operator , (long value)
 {
 	return commaPODImpl(value);
@@ -584,7 +582,6 @@ inline Statement& Statement::operator , (unsigned long value)
 {
 	return commaPODImpl(value);
 }
-#endif
 
 
 inline Statement& Statement::operator , (Poco::UInt64 value)
@@ -815,8 +812,7 @@ inline void swap(Statement& s1, Statement& s2)
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1,
-		Poco::Data::Statement& s2)
+	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, Poco::Data::Statement& s2) noexcept
 		/// Full template specalization of std:::swap for Statement
 	{
 		s1.swap(s2);

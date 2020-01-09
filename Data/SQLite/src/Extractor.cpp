@@ -63,7 +63,6 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	if (isNull(pos)) return false;
@@ -78,7 +77,6 @@ bool Extractor::extract(std::size_t pos, unsigned long& val)
 	val = sqlite3_column_int(_pStmt, (int) pos);
 	return true;
 }
-#endif
 
 
 bool Extractor::extract(std::size_t pos, double& val)
@@ -230,7 +228,7 @@ bool Extractor::isNull(std::size_t pos, std::size_t)
 		_nulls[pos].first = true;
 		_nulls[pos].second = (SQLITE_NULL == sqlite3_column_type(_pStmt, static_cast<int>(pos)));
 	}
-	
+
 	return _nulls[pos].second;
 }
 

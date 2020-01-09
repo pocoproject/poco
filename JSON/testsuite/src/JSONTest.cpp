@@ -233,23 +233,23 @@ void JSONTest::testNumber64Property()
 	Var test = object.get("test");
 	assertTrue (test.isInteger());
 	Poco::Int64 value = test;
-	assertTrue (value == -5000000000000000);
+	assertTrue (value == -5000000000000000ll);
 
 	DynamicStruct ds = object;
 	assertTrue (!ds["test"].isEmpty());
 	assertTrue (ds["test"].isNumeric());
 	assertTrue (ds["test"].isInteger());
-	assertTrue (ds["test"] == -5000000000000000);
+	assertTrue (ds["test"] == -5000000000000000ll);
 	value = ds["test"];
-	assertTrue (value == -5000000000000000);
+	assertTrue (value == -5000000000000000ll);
 
 	const DynamicStruct& rds = object;
 	assertTrue (!rds["test"].isEmpty());
 	assertTrue (rds["test"].isNumeric());
 	assertTrue (rds["test"].isInteger());
-	assertTrue (rds["test"] == -5000000000000000);
+	assertTrue (rds["test"] == -5000000000000000ll);
 	value = rds["test"];
-	assertTrue (value == -5000000000000000);
+	assertTrue (value == -5000000000000000ll);
 }
 
 
@@ -277,12 +277,11 @@ void JSONTest::testUnsignedNumber64Property()
 	assertTrue (test.isInteger());
 	Poco::UInt64 value = test;
 	assertTrue (value == -1);
-/* TODO: clang has trouble here
 	DynamicStruct ds = *object;
 	assertTrue (!ds["test"].isEmpty());
 	assertTrue (ds["test"].isNumeric());
 	assertTrue (ds["test"].isInteger());
-	assertTrue (ds["test"] == 18446744073709551615);
+	assertTrue (ds["test"] == 18446744073709551615ull);
 	value = ds["test"];
 	assertTrue (value == -1);
 
@@ -290,10 +289,9 @@ void JSONTest::testUnsignedNumber64Property()
 	assertTrue (!rds["test"].isEmpty());
 	assertTrue (rds["test"].isNumeric());
 	assertTrue (rds["test"].isInteger());
-	assertTrue (rds["test"] == 18446744073709551615);
+	assertTrue (rds["test"] == 18446744073709551615ull);
 	value = rds["test"];
 	assertTrue (value == -1);
-*/
 }
 
 #endif
@@ -401,7 +399,7 @@ void JSONTest::testEmptyPropertyName()
 
 	const DynamicStruct& rds = *object;
 	assertTrue (rds.size() == 1);
-	
+
 	assertTrue (ds[""] == 42);
 }
 

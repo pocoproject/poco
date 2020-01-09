@@ -155,7 +155,6 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
 		/// Extracts an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
 	virtual bool extract(std::size_t pos, long& val) = 0;
 		/// Extracts a long. Returns false if null was received.
 
@@ -170,7 +169,6 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<long>& val);
 		/// Extracts a long list.
-#endif
 
 	virtual bool extract(std::size_t pos, bool& val) = 0;
 		/// Extracts a boolean. Returns false if null was received.

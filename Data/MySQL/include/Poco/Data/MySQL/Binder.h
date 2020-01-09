@@ -36,7 +36,7 @@ public:
 
 	Binder();
 		/// Creates the Binder.
-		
+
 	virtual ~Binder();
 		/// Destroys the Binder.
 
@@ -64,15 +64,11 @@ public:
 	virtual void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
 		/// Binds an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
-
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN);
 		/// Binds a long.
 
 	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN);
 		/// Binds an unsigned long.
-
-#endif // POCO_LONG_IS_64_BIT
 
 	virtual void bind(std::size_t pos, const bool& val, Direction dir);
 		/// Binds a boolean.
@@ -108,7 +104,7 @@ public:
 		/// Binds a null.
 
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir = PD_IN);
 
@@ -136,25 +132,25 @@ public:
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN); 
+	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::vector<bool>& val, Direction dir = PD_IN);
 
@@ -236,12 +232,12 @@ private:
 		/// Don't copy the binder
 
 	virtual void bind(std::size_t, const char* const&, Direction)
-		/// Binds a const char ptr. 
+		/// Binds a const char ptr.
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 	{
 	}
-	
+
 	void realBind(std::size_t pos, enum_field_types type, const void* buffer, int length, bool isUnsigned = false);
 		/// Common bind implementation
 
