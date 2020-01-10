@@ -59,16 +59,11 @@ void PKCS12ContainerTest::testFullPKCS12()
 		pkcs3 = pkcs2;
 		full(pkcs3);
 
-#ifdef POCO_ENABLE_CPP11
-
 		pkcs3 = std::move(pkcs);
 		full(pkcs3);
 
 		PKCS12Container pkcs4(std::move(pkcs2));
 		full(pkcs4);
-
-#endif // POCO_ENABLE_CPP11
-
 	}
 	catch (Poco::Exception& ex)
 	{
