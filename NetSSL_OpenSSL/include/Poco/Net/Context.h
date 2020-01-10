@@ -59,7 +59,7 @@ class NetSSL_API Context: public Poco::RefCountedObject
 	/// cipher configuration (cipherList).
 {
 public:
-	typedef Poco::AutoPtr<Context> Ptr;
+	using Ptr = Poco::AutoPtr<Context>;
 
 	enum Usage
 	{
@@ -412,9 +412,11 @@ inline Context::Usage Context::usage() const
 inline bool Context::isForServerUse() const
 {
 	return _usage == SERVER_USE
+		|| _usage == TLS_SERVER_USE
 		|| _usage == TLSV1_SERVER_USE
 		|| _usage == TLSV1_1_SERVER_USE
-		|| _usage == TLSV1_2_SERVER_USE;
+		|| _usage == TLSV1_2_SERVER_USE
+		|| _usage == TLSV1_3_SERVER_USE;
 }
 
 
