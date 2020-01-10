@@ -88,7 +88,7 @@ private:
 		/// Compresses the new file to outFile
 
 private:
-	typedef std::map<std::string, ZipOperation::Ptr> Changes;
+	using Changes = std::map<std::string, ZipOperation::Ptr>;
 
 	const std::string _zipFile;
 	bool              _backupOriginalFile;

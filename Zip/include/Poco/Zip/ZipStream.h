@@ -65,8 +65,9 @@ private:
 		STREAM_BUFFER_SIZE = 1024
 	};
 
-	typedef Poco::SharedPtr<std::istream> PtrIStream;
-	typedef Poco::SharedPtr<std::ostream> PtrOStream;
+	using PtrIStream = Poco::SharedPtr<std::istream>;
+	using PtrOStream = Poco::SharedPtr<std::ostream>;
+
 	std::istream*  _pIstr;
 	std::ostream*  _pOstr;
 	PtrIStream     _ptrBuf;
