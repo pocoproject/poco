@@ -32,7 +32,7 @@ class NetSSL_Win_API PrivateKeyFactoryMgr
 	/// A PrivateKeyFactoryMgr manages all existing PrivateKeyFactories.
 {
 public:
-	typedef std::map<std::string, Poco::SharedPtr<PrivateKeyFactory> > FactoriesMap;
+	using FactoriesMap = std::map<std::string, Poco::SharedPtr<PrivateKeyFactory>>;
 	
 	PrivateKeyFactoryMgr();
 		/// Creates the PrivateKeyFactoryMgr.

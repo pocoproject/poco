@@ -52,6 +52,7 @@ const std::string SSLManager::CFG_CLIENT_PREFIX("schannel.client.");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
+const std::string SSLManager::CFG_REQUIRE_TLSV1_3("requireTLSv1_3");
 
 
 SSLManager::SSLManager():
@@ -195,6 +196,7 @@ void SSLManager::initDefaultContext(bool server)
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
+	bool requireTLSv1_3 = config.getBool(prefix + CFG_REQUIRE_TLSV1_3, false);
 
 	// optional options for which we have defaults defined
 	Context::VerificationMode verMode = VAL_VER_MODE;
@@ -223,7 +225,9 @@ void SSLManager::initDefaultContext(bool server)
 	Context::Usage usage;
 	if (server)
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_SERVER_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_SERVER_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_SERVER_USE;
@@ -235,7 +239,9 @@ void SSLManager::initDefaultContext(bool server)
 	}
 	else
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_CLIENT_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_CLIENT_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_CLIENT_USE;

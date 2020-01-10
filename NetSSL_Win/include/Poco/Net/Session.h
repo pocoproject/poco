@@ -36,7 +36,7 @@ class NetSSL_Win_API Session: public Poco::RefCountedObject
 	/// if it wants to reuse it with a future connection.
 {
 public:
-	typedef Poco::AutoPtr<Session> Ptr;
+	using Ptr = Poco::AutoPtr<Session>;
 
 protected:	
 	Session();

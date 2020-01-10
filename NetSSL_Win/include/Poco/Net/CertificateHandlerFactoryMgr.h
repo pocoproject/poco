@@ -32,7 +32,7 @@ class NetSSL_Win_API CertificateHandlerFactoryMgr
 	/// A CertificateHandlerFactoryMgr manages all existing CertificateHandlerFactories.
 {
 public:
-	typedef std::map<std::string, Poco::SharedPtr<CertificateHandlerFactory> > FactoriesMap;
+	using FactoriesMap = std::map<std::string, Poco::SharedPtr<CertificateHandlerFactory>>;
 	
 	CertificateHandlerFactoryMgr();
 		/// Creates the CertificateHandlerFactoryMgr.
