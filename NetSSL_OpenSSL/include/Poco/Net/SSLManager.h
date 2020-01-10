@@ -157,8 +157,8 @@ class NetSSL_API SSLManager
 	/// Please see the Context class documentation regarding TLSv1.3 support.
 {
 public:
-	typedef Poco::SharedPtr<PrivateKeyPassphraseHandler> PrivateKeyPassphraseHandlerPtr;
-	typedef Poco::SharedPtr<InvalidCertificateHandler> InvalidCertificateHandlerPtr;
+	using PrivateKeyPassphraseHandlerPtr = Poco::SharedPtr<PrivateKeyPassphraseHandler>;
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Poco::BasicEvent<VerificationErrorArgs> ServerVerificationError;
 		/// Fired whenever a certificate verification error is detected by the server during a handshake.
