@@ -36,30 +36,17 @@ endif()
 #################################################################################
 # Setup C/C++ compiler options
 #################################################################################
-option(DISABLE_CPP11 "Disable C++11 if not available" OFF)
-option(DISABLE_CPP14 "Disable C++14 if not available" OFF)
 
-if(NOT DISABLE_CPP11 OR NOT DISABLE_CPP14)
-    # C++11/14 compiler flags
-    include(CXX1x)
-    check_for_cxx11_compiler(CXX11_COMPILER)
+# C++11/14 compiler flags
+include(CXX1x)
+check_for_cxx14_compiler(CXX14_COMPILER)
 
-    # If a C++11 compiler is available, then set the appropriate flags
-    if(CXX11_COMPILER)
-	set (CMAKE_CXX_STANDARD 11)
+# If a C++14 compiler is available, then set the appropriate flags
+if(CXX14_COMPILER)
+	set (CMAKE_CXX_STANDARD 14)
 	set (CMAKE_CXX_STANDARD_REQUIRED ON)
-
-        check_for_cxx14_compiler(CXX14_COMPILER)
-        # If a C++14 compiler is available, then set the appropriate flags
-        if(CXX14_COMPILER)
-	    set(CMAKE_CXX_STANDARD 14)
-	else()
-	    set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
-	endif()
-    else()
-	set(DISABLE_CPP11 ON CACHE BOOL "Disable C++11 if not available" FORCE)
-	set(DISABLE_CPP14 ON CACHE BOOL "Disable C++14 if not available" FORCE)
-    endif()
+else()
+	message(FATAL_ERROR "Compiler does not support C++14." )
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -84,13 +71,11 @@ if(MSVC)
     option(ENABLE_MSVC_MP
       "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
 
-
     # allow disabling of internally built OpenSSL# (see below for details)
     # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
     # the internal OpenSSL build will be used
     option(POCO_DISABLE_INTERNAL_OPENSSL "Disable internal OpensSSL binaries use" OFF)
 
-    
     if((NOT POCO_DISABLE_INTERNAL_OPENSSL) AND (ENABLE_NETSSL OR ENABLE_CRYPTO OR (ENABLE_DATA_MYSQL AND MINGW)))
       include(UseEmbeddedOpenSSL)
     endif()
@@ -493,11 +478,6 @@ message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
 string(TOUPPER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 message(STATUS "[cmake] Build with cxx flags:   ${CMAKE_CXX_FLAGS_${BUILD_TYPE}} ${CMAKE_CXX_FLAGS}")
 message(STATUS "[cmake] Build with c flags:     ${CMAKE_C_FLAGS_${BUILD_TYPE}} ${CMAKE_C_FLAGS}")
-if(NOT DISABLE_CPP14)
-	message(STATUS "Build with C++14 support")
-elseif(NOT DISABLE_CPP11)
-	message(STATUS "Build with C++11 support")
-endif()
 
 foreach(component ${Poco_COMPONENTS})
     message(STATUS "Building: ${component}")

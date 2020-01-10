@@ -108,8 +108,6 @@ void EVPTest::testRSAEVPPKey()
 		assertTrue (sizePub1 && (sizePub1 == sizePub2));
 		assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
-#ifdef POCO_ENABLE_CPP11
-
 		BIO_free(bioPub2);
 		BIO_free(bioPriv2);
 
@@ -127,8 +125,6 @@ void EVPTest::testRSAEVPPKey()
 		assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
 		assertTrue (sizePub1 && (sizePub1 == sizePub2));
 		assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
-
-#endif // POCO_ENABLE_CPP11
 
 		BIO_free(bioPub2);
 		BIO_free(bioPriv2);
@@ -274,8 +270,6 @@ void EVPTest::testECEVPPKey()
 			assertTrue (sizePub1 && (sizePub1 == sizePub2));
 			assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
 
-	#ifdef POCO_ENABLE_CPP11
-
 			BIO_free(bioPub2);
 			BIO_free(bioPriv2);
 
@@ -293,7 +287,6 @@ void EVPTest::testECEVPPKey()
 			assertTrue (0 == memcmp(pPrivData1, pPrivData2, sizePriv1));
 			assertTrue (sizePub1 && (sizePub1 == sizePub2));
 			assertTrue (0 == memcmp(pPubData1, pPubData2, sizePub1));
-	#endif // POCO_ENABLE_CPP11
 
 			BIO_free(bioPub2);
 			BIO_free(bioPriv2);
