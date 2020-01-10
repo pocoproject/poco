@@ -37,8 +37,8 @@ class CipherKeyImpl: public RefCountedObject
 	/// An implementation of the CipherKey class for OpenSSL's crypto library.
 {
 public:
-	typedef std::vector<unsigned char> ByteVec;
-	typedef Poco::AutoPtr<CipherKeyImpl> Ptr;
+	using Ptr = Poco::AutoPtr<CipherKeyImpl>;
+	using ByteVec = std::vector<unsigned char>;
 
 	enum Mode
 		/// Cipher mode of operation. This mode determines how multiple blocks

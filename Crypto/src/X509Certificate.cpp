@@ -90,10 +90,30 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 }
 
 
+X509Certificate::X509Certificate(X509Certificate&& cert) noexcept:
+	_issuerName(std::move(cert._issuerName)),
+	_subjectName(std::move(cert._subjectName)),
+	_serialNumber(std::move(cert._serialNumber)),
+	_pCert(cert._pCert)
+{
+	cert._pCert = nullptr;
+}
+
+
 X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 {
 	X509Certificate tmp(cert);
 	swap(tmp);
+	return *this;
+}
+
+
+X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
+{
+	_issuerName = std::move(cert._issuerName);
+	_subjectName = std::move(cert._subjectName);
+	_serialNumber = std::move(cert._serialNumber);
+	_pCert = cert._pCert; cert._pCert = nullptr;
 	return *this;
 }
 
@@ -110,7 +130,7 @@ void X509Certificate::swap(X509Certificate& cert)
 
 X509Certificate::~X509Certificate()
 {
-	X509_free(_pCert);
+	if (_pCert) X509_free(_pCert);
 }
 
 

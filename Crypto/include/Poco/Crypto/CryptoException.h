@@ -38,10 +38,10 @@ public:
 	OpenSSLException(const std::string& msg, const std::string& arg, int code = 0);
 	OpenSSLException(const std::string& msg, const Poco::Exception& exc, int code = 0);
 	OpenSSLException(const OpenSSLException& exc);
-	~OpenSSLException() throw();
+	~OpenSSLException() noexcept;
 	OpenSSLException& operator = (const OpenSSLException& exc);
-	const char* name() const throw();
-	const char* className() const throw();
+	const char* name() const noexcept;
+	const char* className() const noexcept;
 	Poco::Exception* clone() const;
 	void rethrow() const;
 

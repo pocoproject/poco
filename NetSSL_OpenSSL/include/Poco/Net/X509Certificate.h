@@ -60,8 +60,20 @@ public:
 	X509Certificate(const Poco::Crypto::X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
+	X509Certificate(const X509Certificate& cert);
+		/// Creates the certificate by copying another one.
+
+	X509Certificate(X509Certificate&& cert) noexcept;
+		/// Creates the certificate by moving another one.
+
 	X509Certificate& operator = (const Poco::Crypto::X509Certificate& cert);
 		/// Assigns a certificate.
+
+	X509Certificate& operator = (const X509Certificate& cert);
+		/// Assigns a certificate.
+
+	X509Certificate& operator = (X509Certificate&& cert) noexcept;
+		/// Moves a certificate.
 
 	~X509Certificate();
 		/// Destroys the X509Certificate.

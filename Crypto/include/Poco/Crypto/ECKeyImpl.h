@@ -44,8 +44,8 @@ class ECKeyImpl: public KeyPairImpl
 	/// Elliptic Curve key clas implementation.
 {
 public:
-	typedef Poco::AutoPtr<ECKeyImpl> Ptr;
-	typedef std::vector<unsigned char> ByteVec;
+	using Ptr = Poco::AutoPtr<ECKeyImpl>;
+	using ByteVec = std::vector<unsigned char>;
 
 	ECKeyImpl(const EVPPKey& key);
 		/// Constructs ECKeyImpl by extracting the EC key.

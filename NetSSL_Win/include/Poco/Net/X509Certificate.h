@@ -76,8 +76,14 @@ public:
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
+	X509Certificate(X509Certificate&& cert) noexcept;
+		/// Creates the certificate by moving another one.
+
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
+
+	X509Certificate& operator = (X509Certificate&& cert) noexcept;
+		/// Move-assigns a certificate.
  
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.

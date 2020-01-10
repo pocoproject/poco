@@ -88,36 +88,28 @@ PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 }
 
 
-#ifdef POCO_ENABLE_CPP11
-
-
-PKCS12Container::PKCS12Container(PKCS12Container&& other):
+PKCS12Container::PKCS12Container(PKCS12Container&& other) noexcept:
 	_pKey(other._pKey),
 	_pX509Cert(std::move(other._pX509Cert)),
 	_caCertList(std::move(other._caCertList)),
 	_caCertNames(std::move(other._caCertNames)),
 	_pkcsFriendlyName(std::move(other._pkcsFriendlyName))
 {
-	other._pKey = 0;
+	other._pKey = nullptr;
 }
 
 
-PKCS12Container& PKCS12Container::operator = (PKCS12Container&& other)
+PKCS12Container& PKCS12Container::operator = (PKCS12Container&& other) noexcept
 {
-	if (&other != this)
-	{
-		if (_pKey) EVP_PKEY_free(_pKey);
-		_pKey = other._pKey; other._pKey = 0;
-		_pX509Cert = std::move(other._pX509Cert);
-		_caCertList = std::move(other._caCertList);
-		_caCertNames = std::move(other._caCertNames);
-		_pkcsFriendlyName = std::move(other._pkcsFriendlyName);
-	}
+	if (_pKey) EVP_PKEY_free(_pKey);
+	_pKey = other._pKey; other._pKey = nullptr;
+	_pX509Cert = std::move(other._pX509Cert);
+	_caCertList = std::move(other._caCertList);
+	_caCertNames = std::move(other._caCertNames);
+	_pkcsFriendlyName = std::move(other._pkcsFriendlyName);
+
 	return *this;
 }
-
-
-#endif // POCO_ENABLE_CPP11
 
 
 PKCS12Container::~PKCS12Container()

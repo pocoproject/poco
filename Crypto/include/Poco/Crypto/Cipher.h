@@ -84,8 +84,8 @@ class Crypto_API Cipher: public Poco::RefCountedObject
 	///     sink.close();
 {
 public:
-	typedef Poco::AutoPtr<Cipher> Ptr;
-	typedef std::vector<unsigned char> ByteVec;
+	using Ptr = Poco::AutoPtr<Cipher>;
+	using ByteVec = std::vector<unsigned char>;
 
 	enum Encoding
 		/// Transport encoding to use for encryptString() and decryptString().

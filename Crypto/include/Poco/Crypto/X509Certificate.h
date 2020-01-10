@@ -36,7 +36,7 @@ class Crypto_API X509Certificate
 	/// This class represents a X509 Certificate.
 {
 public:
-	typedef std::vector<X509Certificate> List;
+	using List = std::vector<X509Certificate>;
 
 	enum NID
 		/// Name identifier for extracting information from
@@ -74,8 +74,14 @@ public:
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
+	X509Certificate(X509Certificate&& cert) noexcept;
+		/// Creates the certificate by moving another one.
+
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
+
+	X509Certificate& operator = (X509Certificate&& cert) noexcept;
+		/// Move assignment.
 
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.

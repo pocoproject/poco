@@ -44,7 +44,7 @@ namespace
 	class CryptoTransformImpl: public CryptoTransform
 	{
 	public:
-		typedef Cipher::ByteVec ByteVec;
+		using ByteVec = Cipher::ByteVec;
 
 		enum Direction
 		{
