@@ -16,6 +16,7 @@
 #include <mysql.h>
 #include <stdio.h>
 
+
 namespace Poco {
 namespace Data {
 namespace MySQL {
@@ -31,16 +32,14 @@ MySQLException::MySQLException(const MySQLException& exc) : Poco::Data::DataExce
 }
 
 
-MySQLException::~MySQLException() throw()
+MySQLException::~MySQLException() noexcept
 {
 }
 
 
-/////
 //
 // ConnectionException
 //
-/////
 
 
 ConnectionException::ConnectionException(const std::string& msg) : MySQLException(msg)
@@ -72,11 +71,9 @@ std::string ConnectionException::compose(const std::string& text, MYSQL* h)
 }
 
 
-/////
 //
 // TransactionException
 //
-/////
 
 
 TransactionException::TransactionException(const std::string& msg) : ConnectionException(msg)
@@ -134,5 +131,6 @@ std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, 
 
 	return str;
 }
+
 
 } } } // namespace Poco::Data::MySQL
