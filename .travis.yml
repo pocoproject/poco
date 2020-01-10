@@ -11,7 +11,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export PATH=$PWD/cmake-3.2.3-Linux-x86_64/bin:$PATH; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y libssl-dev unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang-3.5 libc++-dev ninja-build sloccount cppcheck; fi
- 
+
 services:
   - mongodb
   - redis-server
@@ -36,22 +36,6 @@ before_script:
 
 matrix:
   include:
-#    - env:    TEST_NAME="Gradle"
-#      os: osx
-#      compiler: clang
-#      script:
-#        - brew install mysql
-#        - brew install unixodbc
-#        - chmod 777 ./gradle/bin/gradle
-#        - sudo ./gradle/bin/gradle --console=plain -g travis -c travis/settings.gradle build check -Ptest=-all
-
-#    - env:    TEST_NAME="Gradle"
-#      os: linux
-#      compiler: gcc
-#      script:
-#        - chmod 777 ./gradle/bin/gradle
-#        - sudo ./gradle/bin/gradle --console=plain -g travis -c travis/settings.gradle build check -Ptest=-all
-
     - env:    TEST_NAME="android API level 19"
       addons:
         apt:
@@ -123,16 +107,6 @@ matrix:
     - env:    TEST_NAME="gcc-5.4.0 (CMake)"
       compiler: gcc
       script:
-        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
-
-    - env:    TEST_NAME="gcc-4.8 (CMake)"
-      compiler: gcc
-      script:
-        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-        - sudo apt-get update -qq
-        - sudo apt-get install -qq -y g++-4.8
-        - export CC="gcc-4.8"
-        - export CXX="g++-4.8"
         - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
 
     - env:    TEST_NAME="clang (CMake)"
