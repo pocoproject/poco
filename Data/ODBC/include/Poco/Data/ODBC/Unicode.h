@@ -33,7 +33,7 @@
 #include <sqlucode.h>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	#define POCO_ODBC_UNICODE
 	#define POCO_ODBC_UNICODE_WINDOWS
 #elif defined(POCO_OS_FAMILY_UNIX) && defined(UNICODE)
