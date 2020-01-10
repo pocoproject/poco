@@ -252,7 +252,7 @@ private:
 };
 
 
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+#elif (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && !defined(POCO_DW_FORCE_POLLING)
 
 
 class LinuxDirectoryWatcherStrategy: public DirectoryWatcherStrategy
@@ -572,7 +572,7 @@ void DirectoryWatcher::init()
 
 #if POCO_OS == POCO_OS_WINDOWS_NT
 	_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+#elif (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && !defined(POCO_DW_FORCE_POLLING)
 	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
 #elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
 	_pStrategy = new BSDDirectoryWatcherStrategy(*this);
