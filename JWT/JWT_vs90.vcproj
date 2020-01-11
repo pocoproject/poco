@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="NetSSL_OpenSSL"
-	ProjectGUID="{5AECC55E-A469-11DA-8DA6-005056C00008}"
-	RootNamespace="NetSSL_OpenSSL"
+	Name="JWT"
+	ProjectGUID="{EFE871AE-A00F-4EB5-B816-FA316EAB9DA7}"
+	RootNamespace="JWT"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -42,8 +42,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\JSON\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;JWT_EXPORTS"
 				StringPooling="true"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -71,15 +71,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="..\bin\PocoNetSSLd.dll"
+				AdditionalDependencies=""
+				OutputFile="..\bin\PocoJWTd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="..\bin\PocoNetSSLd.pdb"
+				ProgramDatabaseFile="..\bin\PocoJWTd.pdb"
 				SubSystem="1"
-				ImportLibrary="..\lib\PocoNetSSLd.lib"
+				ImportLibrary="..\lib\PocoJWTd.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -134,8 +134,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;NetSSL_EXPORTS"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\JSON\include;..\Crypto\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;JWT_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -161,8 +161,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
-				OutputFile="..\bin\PocoNetSSL.dll"
+				AdditionalDependencies=""
+				OutputFile="..\bin\PocoJWT.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\lib"
@@ -170,7 +170,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="..\lib\PocoNetSSL.lib"
+				ImportLibrary="..\lib\PocoJWT.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -221,7 +221,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\JSON\include;..\Crypto\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -232,7 +232,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoNetSSLMTd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoJWTmtd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -250,7 +250,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetSSLMTd.lib"
+				OutputFile="..\lib\PocoJWTmtd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -298,7 +298,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\JSON\include;..\Crypto\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -324,7 +324,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetSSLMT.lib"
+				OutputFile="..\lib\PocoJWTmt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -368,7 +368,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\JSON\include;..\Crypto\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				MinimalRebuild="true"
@@ -379,7 +379,7 @@
 				ForceConformanceInForLoopScope="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="..\lib\PocoNetSSLMDd.pdb"
+				ProgramDataBaseFileName="..\lib\PocoJWTmdd.pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
@@ -397,7 +397,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetSSLMDd.lib"
+				OutputFile="..\lib\PocoJWTmdd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -445,7 +445,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories=".\include;..\openssl\build\include;..\Foundation\include;..\Net\include;..\Util\include;..\Crypto\include"
+				AdditionalIncludeDirectories=".\include;..\Foundation\include;..\JSON\include;..\Crypto\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;POCO_STATIC;"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -471,7 +471,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetSSLMD.lib"
+				OutputFile="..\lib\PocoJWTmd.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -494,272 +494,56 @@
 	</References>
 	<Files>
 		<Filter
-			Name="SSLCore"
+			Name="Source Files"
 			>
-			<Filter
-				Name="Header Files"
+			<File
+				RelativePath=".\src\ECDSASignature.cpp"
 				>
-				<File
-					RelativePath=".\include\Poco\Net\AcceptCertificateHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\CertificateHandlerFactory.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\CertificateHandlerFactoryMgr.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\ConsoleCertificateHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\Context.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\InvalidCertificateHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\KeyConsoleHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\KeyFileHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\NetSSL.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\PrivateKeyFactory.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\PrivateKeyFactoryMgr.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\PrivateKeyPassphraseHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\RejectCertificateHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\Session.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\SSLException.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\SSLManager.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\Utility.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\VerificationErrorArgs.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\X509Certificate.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\src\JWTException.cpp"
 				>
-				<File
-					RelativePath=".\src\AcceptCertificateHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\CertificateHandlerFactory.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\CertificateHandlerFactoryMgr.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\ConsoleCertificateHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Context.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\InvalidCertificateHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\KeyConsoleHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\KeyFileHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PrivateKeyFactory.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PrivateKeyFactoryMgr.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\PrivateKeyPassphraseHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\RejectCertificateHandler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Session.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SSLException.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SSLManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\Utility.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\VerificationErrorArgs.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\X509Certificate.cpp"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\src\Serializer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Signer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Token.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
-			Name="HTTPSClient"
+			Name="Header Files"
 			>
-			<Filter
-				Name="Header Files"
+			<File
+				RelativePath=".\include\Poco\JWT\ECDSASignature.h"
 				>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPSClientSession.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPSSessionInstantiator.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPSStreamFactory.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\include\Poco\JWT\JWT.h"
 				>
-				<File
-					RelativePath=".\src\HTTPSClientSession.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\HTTPSSessionInstantiator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\HTTPSStreamFactory.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="SSLSockets"
-			>
-			<Filter
-				Name="Header Files"
+			</File>
+			<File
+				RelativePath=".\include\Poco\JWT\JWTException.h"
 				>
-				<File
-					RelativePath=".\include\Poco\Net\SecureServerSocket.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\SecureServerSocketImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\SecureSocketImpl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\SecureStreamSocket.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\Poco\Net\SecureStreamSocketImpl.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\include\Poco\JWT\Serializer.h"
 				>
-				<File
-					RelativePath=".\src\SecureServerSocket.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SecureServerSocketImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SecureSocketImpl.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SecureStreamSocket.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\SecureStreamSocketImpl.cpp"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Mail"
-			>
-			<Filter
-				Name="Header Files"
+			</File>
+			<File
+				RelativePath=".\include\Poco\JWT\Signer.h"
 				>
-				<File
-					RelativePath=".\include\Poco\Net\SecureSMTPClientSession.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Source Files"
+			</File>
+			<File
+				RelativePath=".\include\Poco\JWT\Token.h"
 				>
-				<File
-					RelativePath=".\src\SecureSMTPClientSession.cpp"
-					>
-				</File>
-			</Filter>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\DLLVersion.rc"

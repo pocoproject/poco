@@ -1,36 +1,47 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="PostgreSQL"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="PostgreSQL"
 	ProjectGUID="{73E19FDE-1570-488C-B3DB-72A60FADD408}"
 	RootNamespace="PostgreSQL"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#xA;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\..\postgresql\include;..\..\Foundation\include;..\..\Data\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PostgreSQL_EXPORTS"
@@ -48,60 +59,78 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\..\bin\PocoDataPostgreSQLd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\..\bin\PocoDataPostgreSQLd.pdb"
-				AdditionalLibraryDirectories="..\..\lib"
 				SubSystem="1"
 				ImportLibrary="..\..\lib\PocoDataPostgreSQLd.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#xA;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -121,61 +150,79 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies=""
 				OutputFile="..\..\bin\PocoDataPostgreSQL.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="false"
 				AdditionalLibraryDirectories="..\..\lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\lib\PocoDataPostgreSQL.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#xA;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\..\postgresql\include;..\..\Foundation\include;..\..\Data\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -194,46 +241,62 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataPostgreSQLMTd.lib"/>
+				OutputFile="..\..\lib\PocoDataPostgreSQLMTd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#xA;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -253,46 +316,62 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataPostgreSQLMT.lib"/>
+				OutputFile="..\..\lib\PocoDataPostgreSQLMT.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#xA;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\..\postgresql\include;..\..\Foundation\include;..\..\Data\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -311,46 +390,62 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataPostgreSQLMDd.lib"/>
+				OutputFile="..\..\lib\PocoDataPostgreSQLMDd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#xA;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#xA;exit 0"/>
+				CommandLine="xcopy /y ..\..\postgresql\lib\*.dll ..\..\bin\* 1&gt;nul&#x0D;&#x0A;xcopy /y ..\..\postgresql\lib\*.lib ..\..\lib\* 1&gt;nul&#x0D;&#x0A;exit 0&#x0D;&#x0A;"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -370,86 +465,173 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\PocoDataPostgreSQLMD.lib"/>
+				OutputFile="..\..\lib\PocoDataPostgreSQLMD.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\src\Binder.cpp"/>
+				RelativePath=".\src\Binder.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Connector.cpp"/>
+				RelativePath=".\src\Connector.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Extractor.cpp"/>
+				RelativePath=".\src\Extractor.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\PostgreSQLException.cpp"/>
+				RelativePath=".\src\PostgreSQLException.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\PostgreSQLStatementImpl.cpp"/>
+				RelativePath=".\src\PostgreSQLStatementImpl.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\PostgreSQLTypes.cpp"/>
+				RelativePath=".\src\PostgreSQLTypes.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\SessionHandle.cpp"/>
+				RelativePath=".\src\SessionHandle.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\SessionImpl.cpp"/>
+				RelativePath=".\src\SessionImpl.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\StatementExecutor.cpp"/>
+				RelativePath=".\src\StatementExecutor.cpp"
+				>
+			</File>
 			<File
-				RelativePath=".\src\Utility.cpp"/>
+				RelativePath=".\src\Utility.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\Binder.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\Binder.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\Connector.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\Connector.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\Extractor.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\Extractor.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQL.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQL.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLException.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLException.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLStatementImpl.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLStatementImpl.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLTypes.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\PostgreSQLTypes.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\SessionHandle.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\SessionHandle.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\SessionImpl.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\SessionImpl.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\StatementExecutor.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\StatementExecutor.h"
+				>
+			</File>
 			<File
-				RelativePath=".\include\Poco\Data\PostgreSQL\Utility.h"/>
+				RelativePath=".\include\Poco\Data\PostgreSQL\Utility.h"
+				>
+			</File>
 		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"/>
+		<File
+			RelativePath="..\..\DLLVersion.rc"
+			>
+			<FileConfiguration
+				Name="debug_static_mt|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCResourceCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_mt|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCResourceCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="debug_static_md|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCResourceCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="release_static_md|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCResourceCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>
