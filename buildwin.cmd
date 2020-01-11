@@ -7,7 +7,7 @@ rem
 rem POCO C++ Libraries command-line build script
 rem for MS Visual Studio 2015 to 2019
 rem
-rem Copyright (c) 2006-2019 by Applied Informatics Software Engineering GmbH
+rem Copyright (c) 2006-2020 by Applied Informatics Software Engineering GmbH
 rem and Contributors.
 rem
 rem Original version by Aleksandar Fabijanic.
@@ -86,13 +86,11 @@ if not "%CONFIGURATION%"=="release" (
 if not "%CONFIGURATION%"=="debug" (
 if not "%CONFIGURATION%"=="both" goto usage))
 
-rem PLATFORM [Win32|x64|WinCE|WEC2013]
+rem PLATFORM [Win32|x64]
 set PLATFORM=%3
 if "%PLATFORM%"=="" (set PLATFORM=Win32)
 if not "%PLATFORM%"=="Win32" (
-if not "%PLATFORM%"=="x64" (
-if not "%PLATFORM%"=="WinCE" (
-if not "%PLATFORM%"=="WEC2013" goto usage)))
+if not "%PLATFORM%"=="x64" goto usage)
 
 rem SAMPLES [samples|nosamples]
 set SAMPLES=%4
