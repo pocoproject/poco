@@ -26,7 +26,6 @@
 		AdditionalIncludeDirectories="..\include;${project.pocobase}\CppUnit\include;${configuration.compiler.includes}"
 		PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0600;POCO_STATIC;${configuration.compiler.defines}"
 		StringPooling="true"
-		MinimalRebuild="true"
 		BasicRuntimeChecks="3"
 		RuntimeLibrary="3"
 		BufferSecurityCheck="true"

@@ -26,7 +26,6 @@
 		AdditionalIncludeDirectories=".\include;${configuration.compiler.includes}"
 		PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0500;${configuration.compiler.defines}"
 		StringPooling="true"
-		MinimalRebuild="true"
 		BasicRuntimeChecks="3"
 		RuntimeLibrary="3"
 		BufferSecurityCheck="true"
