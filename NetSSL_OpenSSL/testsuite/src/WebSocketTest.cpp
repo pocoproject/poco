@@ -9,8 +9,8 @@
 
 
 #include "WebSocketTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/SocketStream.h"
 #include "Poco/Net/HTTPSClientSession.h"

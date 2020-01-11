@@ -158,18 +158,18 @@
   <PropertyGroup Label="UserMacros"/>
   <PropertyGroup>
     <_ProjectFileVersion>15.0.28307.799</_ProjectFileVersion>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">PocoCppUnitd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">PocoCppUnitmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">PocoCppUnitmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoCppUnit</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoCppUnitmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoCppUnitmt</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoCppUnitd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoCppUnitmdd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoCppUnitmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoCppUnit</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoCppUnitmd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoCppUnitmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">CppUnitd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">CppUnitmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">CppUnitmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">CppUnit</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">CppUnitmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">CppUnitmt</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">CppUnitd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">CppUnitmdd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">CppUnitmtd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">CppUnit</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">CppUnitmd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">CppUnitmt</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <OutDir>..\bin\</OutDir>
@@ -242,13 +242,13 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <OutputFile>..\bin\PocoCppUnitd.dll</OutputFile>
+      <OutputFile>..\bin\CppUnitd.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>..\bin\PocoCppUnitd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>..\bin\CppUnitd.pdb</ProgramDatabaseFile>
       <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>..\lib\PocoCppUnitd.lib</ImportLibrary>
+      <ImportLibrary>..\lib\CppUnitd.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -274,14 +274,14 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <OutputFile>..\bin\PocoCppUnit.dll</OutputFile>
+      <OutputFile>..\bin\CppUnit.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImportLibrary>..\lib\PocoCppUnit.lib</ImportLibrary>
+      <ImportLibrary>..\lib\CppUnit.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -298,14 +298,14 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib\PocoCppUnitmtd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\CppUnitmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmtd.lib</OutputFile>
+      <OutputFile>..\lib\CppUnitmtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
@@ -330,7 +330,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmt.lib</OutputFile>
+      <OutputFile>..\lib\CppUnitmt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
@@ -346,14 +346,14 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib\PocoCppUnitmdd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\CppUnitmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmdd.lib</OutputFile>
+      <OutputFile>..\lib\CppUnitmdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
@@ -372,14 +372,14 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib\PocoCppUnitmd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib\CppUnitmd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat/>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib\PocoCppUnitmd.lib</OutputFile>
+      <OutputFile>..\lib\CppUnitmd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">
@@ -401,13 +401,13 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <OutputFile>..\bin64\PocoCppUnit64d.dll</OutputFile>
+      <OutputFile>..\bin64\CppUnit64d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>..\bin64\PocoCppUnit64d.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>..\bin64\CppUnit64d.pdb</ProgramDatabaseFile>
       <AdditionalLibraryDirectories>..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>..\lib64\PocoCppUnitd.lib</ImportLibrary>
+      <ImportLibrary>..\lib64\CppUnitd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -433,14 +433,14 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <OutputFile>..\bin64\PocoCppUnit64.dll</OutputFile>
+      <OutputFile>..\bin64\CppUnit64.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImportLibrary>..\lib64\PocoCppUnit.lib</ImportLibrary>
+      <ImportLibrary>..\lib64\CppUnit.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -457,14 +457,14 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib64\PocoCppUnitmtd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib64\CppUnitmtd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib64\PocoCppUnitmtd.lib</OutputFile>
+      <OutputFile>..\lib64\CppUnitmtd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
@@ -489,7 +489,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib64\PocoCppUnitmt.lib</OutputFile>
+      <OutputFile>..\lib64\CppUnitmt.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
@@ -505,14 +505,14 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader/>
-      <ProgramDataBaseFileName>..\lib64\PocoCppUnitmdd.pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>..\lib64\CppUnitmdd.pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib64\PocoCppUnitmdd.lib</OutputFile>
+      <OutputFile>..\lib64\CppUnitmdd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
@@ -537,7 +537,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Lib>
-      <OutputFile>..\lib64\PocoCppUnitmd.lib</OutputFile>
+      <OutputFile>..\lib64\CppUnitmd.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

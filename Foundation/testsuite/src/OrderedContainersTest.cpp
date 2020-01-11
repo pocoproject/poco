@@ -9,8 +9,8 @@
 
 
 #include "OrderedContainersTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 
 #ifdef POCO_COMPILER_MSVC
