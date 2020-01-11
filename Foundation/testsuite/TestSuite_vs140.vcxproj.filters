@@ -2,181 +2,181 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Core">
-      <UniqueIdentifier>{7a2b435d-24da-4298-8441-f01a255c83e7}</UniqueIdentifier>
+      <UniqueIdentifier>{c254fb74-2784-4c8e-95f6-53ee94db67cc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Source Files">
-      <UniqueIdentifier>{08b5ed81-0827-4fbb-9e13-ba6924057d50}</UniqueIdentifier>
+      <UniqueIdentifier>{91e010f6-e5a3-4826-a89a-4f3e03bf5658}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Header Files">
-      <UniqueIdentifier>{20e372ac-ea70-44f3-abeb-25d3ddb95e8c}</UniqueIdentifier>
+      <UniqueIdentifier>{8c5576a1-ee73-4396-93ac-0d97bb8e70f5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Streams">
-      <UniqueIdentifier>{38c47087-b696-4539-91bc-cd5e13884cab}</UniqueIdentifier>
+      <UniqueIdentifier>{ba8e860b-2150-4fd3-ba91-cc5f0c01d7f5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Streams\Source Files">
-      <UniqueIdentifier>{e840dac7-8be9-4c8f-8b77-e1fe3061e2fc}</UniqueIdentifier>
+      <UniqueIdentifier>{b697dce9-78d0-47fc-9150-edbff5d65141}</UniqueIdentifier>
     </Filter>
     <Filter Include="Streams\Header Files">
-      <UniqueIdentifier>{048328a2-5841-4040-935d-956096499679}</UniqueIdentifier>
+      <UniqueIdentifier>{27ce8062-3d96-4c40-8abc-f078ed554dda}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypt">
-      <UniqueIdentifier>{506ea248-bc81-4ba1-9e74-1370f94129db}</UniqueIdentifier>
+      <UniqueIdentifier>{b7ffe702-1f32-4f5f-9105-3bd16a6d74d6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypt\Source Files">
-      <UniqueIdentifier>{2751f144-cb3e-448e-949a-f85b290c9a80}</UniqueIdentifier>
+      <UniqueIdentifier>{444eb94a-2116-4352-9160-c9c30d37f5e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Crypt\Header Files">
-      <UniqueIdentifier>{7d428e09-37de-4b9c-87a4-c898cbdf2c3c}</UniqueIdentifier>
+      <UniqueIdentifier>{c68e8fe7-9948-429a-8550-88b8d7a2244a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Notifications">
-      <UniqueIdentifier>{21f9b427-7af0-4de8-a2da-07765ef6f615}</UniqueIdentifier>
+      <UniqueIdentifier>{dde4bd48-4d67-44df-a04f-9cc80f77aed9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Notifications\Source Files">
-      <UniqueIdentifier>{52b9b83a-c638-4315-8e26-e9a503afbb5a}</UniqueIdentifier>
+      <UniqueIdentifier>{efd9b68d-41ac-4c1c-a557-33f577026511}</UniqueIdentifier>
     </Filter>
     <Filter Include="Notifications\Header Files">
-      <UniqueIdentifier>{57452818-6586-422c-8375-dd1e82e90a7c}</UniqueIdentifier>
+      <UniqueIdentifier>{210d5235-4319-43c7-9f2e-4a56538d2437}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading">
-      <UniqueIdentifier>{f8d2974b-52d3-41d1-843f-7a1ce3bf7fe9}</UniqueIdentifier>
+      <UniqueIdentifier>{6e0ab17a-7353-4efb-a2dc-93ea8b076f64}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading\Source Files">
-      <UniqueIdentifier>{a6225975-4e4a-447d-9980-315601b443f3}</UniqueIdentifier>
+      <UniqueIdentifier>{89e09a0b-1d4f-4d0a-a897-7fa550c9f6de}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading\Header Files">
-      <UniqueIdentifier>{3048f393-85df-4d03-84f8-30e54585689f}</UniqueIdentifier>
+      <UniqueIdentifier>{4a530598-6a3a-4cc2-b112-1f01f7d8f559}</UniqueIdentifier>
     </Filter>
     <Filter Include="SharedLibrary">
-      <UniqueIdentifier>{97247b45-8dfc-4ced-b733-b29d68027468}</UniqueIdentifier>
+      <UniqueIdentifier>{7667eba3-7299-44b5-9d10-2ea6cee1bf14}</UniqueIdentifier>
     </Filter>
     <Filter Include="SharedLibrary\Source Files">
-      <UniqueIdentifier>{6911740f-660c-45be-a994-4ae39e4d6764}</UniqueIdentifier>
+      <UniqueIdentifier>{bae73f4f-73bd-4907-a723-122191e7cf31}</UniqueIdentifier>
     </Filter>
     <Filter Include="SharedLibrary\Header Files">
-      <UniqueIdentifier>{34585884-c908-4426-ac57-abd4f29fde0f}</UniqueIdentifier>
+      <UniqueIdentifier>{79565aa1-ce80-428e-8ae5-0c09ea8a6e8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{600703e2-ac9d-44d3-94ee-c3ec6a2bc8ee}</UniqueIdentifier>
+      <UniqueIdentifier>{2e14b7b8-3eba-4b44-b405-7e1f17d5cba9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{60c5a4ad-8878-4194-93d4-3e12088883bb}</UniqueIdentifier>
+      <UniqueIdentifier>{9f6ac291-c393-4ee4-8477-640c8fb9bf2d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{a3a13699-93ea-4c62-8667-2001b59f6ff3}</UniqueIdentifier>
+      <UniqueIdentifier>{97672239-747b-488b-b928-9ad813acca9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Filesystem">
-      <UniqueIdentifier>{daa1be27-e9c7-4c46-b4b4-a5754523234a}</UniqueIdentifier>
+      <UniqueIdentifier>{75bcd396-a6a9-46eb-b6c7-02ff2a5b8fe9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Filesystem\Source Files">
-      <UniqueIdentifier>{f83cac86-513c-4aeb-9c06-33ed5feadcfb}</UniqueIdentifier>
+      <UniqueIdentifier>{d2d451ca-34d1-4100-91a5-5468d81c0321}</UniqueIdentifier>
     </Filter>
     <Filter Include="Filesystem\Header Files">
-      <UniqueIdentifier>{2bdd3156-142a-46f5-9def-008e0a8b94bf}</UniqueIdentifier>
+      <UniqueIdentifier>{b5897e3c-8098-4cf0-b14f-6afa51ed1a4e}</UniqueIdentifier>
     </Filter>
     <Filter Include="UUID">
-      <UniqueIdentifier>{ff0e8ba2-ef01-4fcf-abc2-986fa5689602}</UniqueIdentifier>
+      <UniqueIdentifier>{14309dd8-a90d-4936-8b26-f79c95950141}</UniqueIdentifier>
     </Filter>
     <Filter Include="UUID\Source Files">
-      <UniqueIdentifier>{9518b7a3-eb41-4952-920c-971259de7ce1}</UniqueIdentifier>
+      <UniqueIdentifier>{1962e88b-1868-4aea-8426-0e8e0f37abd7}</UniqueIdentifier>
     </Filter>
     <Filter Include="UUID\Header Files">
-      <UniqueIdentifier>{88f19dcd-2730-495f-a6ae-cef64b8e733f}</UniqueIdentifier>
+      <UniqueIdentifier>{65f4d59b-84d2-4a7e-b978-19467bd9b1df}</UniqueIdentifier>
     </Filter>
     <Filter Include="DateTime">
-      <UniqueIdentifier>{325d99c0-1787-42f0-9dee-c35cb986b8db}</UniqueIdentifier>
+      <UniqueIdentifier>{d86d214b-8be5-468e-9939-4512f71d4ec9}</UniqueIdentifier>
     </Filter>
     <Filter Include="DateTime\Source Files">
-      <UniqueIdentifier>{0eddd931-0c96-491e-b5be-b15b7e6048d2}</UniqueIdentifier>
+      <UniqueIdentifier>{d284c337-7256-401a-9b41-cd66dc7a6af2}</UniqueIdentifier>
     </Filter>
     <Filter Include="DateTime\Header Files">
-      <UniqueIdentifier>{b76898a1-04ac-4c2d-96ac-f51da9ba5ec9}</UniqueIdentifier>
+      <UniqueIdentifier>{b75c4782-23e2-4055-8e66-4653799bddab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Text">
-      <UniqueIdentifier>{201b7e9a-56d5-4f0a-a8e7-8ba9bb059cd0}</UniqueIdentifier>
+      <UniqueIdentifier>{d5434a99-a794-4517-aaf3-076e3c75a038}</UniqueIdentifier>
     </Filter>
     <Filter Include="Text\Source Files">
-      <UniqueIdentifier>{a6c9fec9-f342-44b5-b558-7e8f3c52bcb0}</UniqueIdentifier>
+      <UniqueIdentifier>{ffbb35b4-0378-47f7-be31-305b1f3bd0cc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Text\Header Files">
-      <UniqueIdentifier>{2bb53ebc-1bdd-479b-97e2-71fc1906ed0d}</UniqueIdentifier>
+      <UniqueIdentifier>{cdfebf04-d340-4f14-a195-e226878562fc}</UniqueIdentifier>
     </Filter>
     <Filter Include="URI">
-      <UniqueIdentifier>{c4c958dc-341a-4e2c-84c4-118c56e85c5d}</UniqueIdentifier>
+      <UniqueIdentifier>{57c234d6-808f-452d-873f-6a1101933eff}</UniqueIdentifier>
     </Filter>
     <Filter Include="URI\Source Files">
-      <UniqueIdentifier>{08e1a577-fdc1-4993-a39d-a95390deb2bc}</UniqueIdentifier>
+      <UniqueIdentifier>{3e068e8a-4f1a-4cde-9e73-d4dfdc3b9098}</UniqueIdentifier>
     </Filter>
     <Filter Include="URI\Header Files">
-      <UniqueIdentifier>{560ad073-3747-4936-92ec-57f2eb68cedd}</UniqueIdentifier>
+      <UniqueIdentifier>{c6bd7cbf-5785-4a19-bdca-2b28c6438a28}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite">
-      <UniqueIdentifier>{7068cdab-2cbb-4e5a-87b9-707b2b9f95d7}</UniqueIdentifier>
+      <UniqueIdentifier>{954b1cfb-ebd8-491c-8e3f-22fd0c8fbc02}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Source Files">
-      <UniqueIdentifier>{41d7c2af-4fea-461f-84b2-145a82c4b62b}</UniqueIdentifier>
+      <UniqueIdentifier>{d89d8d4d-2e20-4064-ba17-6c39c2496e0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Suite\Header Files">
-      <UniqueIdentifier>{28959b65-a866-4c17-ba50-688548e067eb}</UniqueIdentifier>
+      <UniqueIdentifier>{771fcb8a-ff27-499f-b70a-2eac2c9ec5dd}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver">
-      <UniqueIdentifier>{fce955ad-5712-4845-ae15-fc2134929ff5}</UniqueIdentifier>
+      <UniqueIdentifier>{91499529-42d3-43ad-878c-c61af9f0b539}</UniqueIdentifier>
     </Filter>
     <Filter Include="_Driver\Source Files">
-      <UniqueIdentifier>{8002f709-bd8a-4507-b7a1-da03b434d020}</UniqueIdentifier>
+      <UniqueIdentifier>{8648890b-3da0-43d5-aafa-5a2559863534}</UniqueIdentifier>
     </Filter>
     <Filter Include="Processes">
-      <UniqueIdentifier>{4ced3996-ce5f-4842-889a-d9221bde31f2}</UniqueIdentifier>
+      <UniqueIdentifier>{c9b7c1aa-b8fb-4ed3-8f34-c30baf8dac76}</UniqueIdentifier>
     </Filter>
     <Filter Include="Processes\Source Files">
-      <UniqueIdentifier>{93c60fbf-d044-4d63-be7d-655c42763678}</UniqueIdentifier>
+      <UniqueIdentifier>{136bfab7-9eb7-4667-8909-09cce2592fbf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Processes\Header Files">
-      <UniqueIdentifier>{d2180a49-353e-4fed-b3cd-92308589d34b}</UniqueIdentifier>
+      <UniqueIdentifier>{11dc9d56-a46d-4803-ae71-b20ab5ea9cf3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tasks">
-      <UniqueIdentifier>{80170e2a-f5b7-45e4-8ae3-992e5bf7910f}</UniqueIdentifier>
+      <UniqueIdentifier>{0c6eadb5-c05f-41db-bfb7-96fe360b8dd5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tasks\Source Files">
-      <UniqueIdentifier>{b119af21-c432-4d8f-8950-eac07dea87fb}</UniqueIdentifier>
+      <UniqueIdentifier>{e0ef7d11-b32f-4f28-ba46-e3ccfebacb8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tasks\Header Files">
-      <UniqueIdentifier>{4b2d417d-2fe2-4b12-8ff1-ded44001c1fa}</UniqueIdentifier>
+      <UniqueIdentifier>{f7ccb0db-e058-45a9-a930-5a99cb8a9b4e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Event">
-      <UniqueIdentifier>{dbc100ca-521a-4c98-a21e-14307b1cfa4f}</UniqueIdentifier>
+      <UniqueIdentifier>{c2a64b2a-b166-4280-9190-79a80ec94685}</UniqueIdentifier>
     </Filter>
     <Filter Include="Event\Header Files">
-      <UniqueIdentifier>{53acf946-b3e4-428d-bb4f-aa1eefecb319}</UniqueIdentifier>
+      <UniqueIdentifier>{c4233875-2d38-4b8e-a33e-4115db8d4c62}</UniqueIdentifier>
     </Filter>
     <Filter Include="Event\Source Files">
-      <UniqueIdentifier>{577aa7e5-d80a-4122-8ec3-8da22c860b3c}</UniqueIdentifier>
+      <UniqueIdentifier>{1f5aaa4e-83aa-47c6-9936-2145a0ae1c44}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cache">
-      <UniqueIdentifier>{03ccdcf2-3466-461f-a4b0-1c4cc1ca2e73}</UniqueIdentifier>
+      <UniqueIdentifier>{f9404832-7beb-4f52-a86e-6d426c1d7930}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cache\Header Files">
-      <UniqueIdentifier>{5e0ff704-0f96-451f-8c56-d7ae3ff7412b}</UniqueIdentifier>
+      <UniqueIdentifier>{ca515afb-ab5a-4f78-b85d-7da68d72d856}</UniqueIdentifier>
     </Filter>
     <Filter Include="Cache\Source Files">
-      <UniqueIdentifier>{6494aeee-6e5d-4237-91ce-533d2592b271}</UniqueIdentifier>
+      <UniqueIdentifier>{f311db5d-27a1-4fcf-95e2-b234804a7301}</UniqueIdentifier>
     </Filter>
     <Filter Include="Hashing">
-      <UniqueIdentifier>{cacc6258-42b4-4bb5-97af-26586b0dd243}</UniqueIdentifier>
+      <UniqueIdentifier>{043e1b1d-e5a5-49ca-8271-5d53359cca4e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Hashing\Header Files">
-      <UniqueIdentifier>{0337d5dc-9e55-4584-92b9-56e7b675d80e}</UniqueIdentifier>
+      <UniqueIdentifier>{67e6ba33-c28c-4af4-b5a0-4ff0a37064c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Hashing\Source Files">
-      <UniqueIdentifier>{72a3f11b-ced9-4619-a0ce-feadb449cc7b}</UniqueIdentifier>
+      <UniqueIdentifier>{9a79a304-9954-4fef-b4be-c6248f9189bf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Dynamic">
-      <UniqueIdentifier>{26f85b77-acb9-46c1-8cf4-f856388e0dde}</UniqueIdentifier>
+      <UniqueIdentifier>{a9306d5e-2d1f-4d3b-a683-b798f31e1759}</UniqueIdentifier>
     </Filter>
     <Filter Include="Dynamic\Source Files">
-      <UniqueIdentifier>{aa247696-fa59-4074-8a00-8d9a1c33e74f}</UniqueIdentifier>
+      <UniqueIdentifier>{2cf51843-7a90-47d3-84a9-67eff3cf0988}</UniqueIdentifier>
     </Filter>
     <Filter Include="Dynamic\Header Files">
-      <UniqueIdentifier>{d35febb7-7427-4104-ad20-262985a43bc2}</UniqueIdentifier>
+      <UniqueIdentifier>{0690feaa-baa2-4895-b1b2-a947f6a42576}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

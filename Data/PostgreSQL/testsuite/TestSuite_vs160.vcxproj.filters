@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="PostgreSQL">
+      <UniqueIdentifier>{b6f3d3f5-b5b2-4c15-a131-df3ee935872b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PostgreSQL\Header Files">
+      <UniqueIdentifier>{6bb23149-6b7f-42b0-a901-4e61ed394129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PostgreSQL\Source Files">
+      <UniqueIdentifier>{36411492-9256-430d-aa1b-38223048a0af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite">
+      <UniqueIdentifier>{a4e22462-529f-4f30-b398-6437d7979115}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Header Files">
+      <UniqueIdentifier>{52806c39-c63a-49c3-8bb4-620a54f485f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Suite\Source Files">
+      <UniqueIdentifier>{afb402a1-b537-4bc2-a9f0-a3d8f4137d23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver">
+      <UniqueIdentifier>{d343be75-be0c-4a63-97fe-0c999ff8cc77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Driver\Source Files">
+      <UniqueIdentifier>{e0f9283b-6fab-42b9-bc8d-bd19829ac627}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\PostgreSQLTest.h">
+      <Filter>PostgreSQL\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SQLExecutor.h">
+      <Filter>PostgreSQL\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PostgreSQLTestSuite.h">
+      <Filter>_Suite\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\PostgreSQLTest.cpp">
+      <Filter>PostgreSQL\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SQLExecutor.cpp">
+      <Filter>PostgreSQL\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PostgreSQLTestSuite.cpp">
+      <Filter>_Suite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Driver.cpp">
+      <Filter>_Driver\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

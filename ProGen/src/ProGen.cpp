@@ -271,9 +271,9 @@ protected:
 					{
 						Poco::AutoPtr<Poco::XML::Element> pNewFileConfigElem = static_cast<Poco::XML::Element*>(pPrototypeFileConfigElem->cloneNode(true));
 						pNewFileConfigElem->setAttribute("Name", conf + "|" + arch);
-						if (relativePath.getExtension() == "rc" && conf.find("static") != std::string::npos)
+						if (relativePath.getExtension() == "rc")
 						{
-							pNewFileConfigElem->setAttribute("ExcludedFromBuild", "true");
+							pNewFileConfigElem->setAttribute("ExcludedFromBuild", conf.find("static") != std::string::npos ? "true" : "false");
 						}
 						pFileElem->appendChild(pNewFileConfigElem);
 					}
@@ -481,6 +481,15 @@ protected:
 					pPropertyGroup->appendChild(pTargetName);
 				}
 			}
+		}
+		Poco::AutoPtr<Poco::XML::NodeList> pClCompileList = pProjectDoc->getElementsByTagName("ClCompile");
+		for (unsigned long i = 0; i < pClCompileList->length(); i++)
+		{
+			Poco::XML::Element* pClCompileElem = static_cast<Poco::XML::Element*>(pClCompileList->item(i));
+			Poco::AutoPtr<Poco::XML::Element> pMultiProcessorCompilationElem = pProjectDoc->createElement("MultiProcessorCompilation");
+			Poco::AutoPtr<Poco::XML::Text> pTrueText = pProjectDoc->createTextNode("true");
+			pMultiProcessorCompilationElem->appendChild(pTrueText);
+			pClCompileElem->appendChild(pMultiProcessorCompilationElem);
 		}
 	}
 	
