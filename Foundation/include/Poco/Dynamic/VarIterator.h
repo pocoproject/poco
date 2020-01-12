@@ -69,6 +69,18 @@ public:
 	bool operator != (const VarIterator& other) const;
 		/// Inequality operator.
 
+	bool operator < (const VarIterator& other) const;
+		/// Less than operator.
+
+	bool operator > (const VarIterator& other) const;
+		/// Greater than operator.
+
+	bool operator <= (const VarIterator& other) const;
+		/// Less than or equal to operator.
+
+	bool operator >= (const VarIterator& other) const;
+		/// Greater than or equal to operator.
+
 	Var& operator * () const;
 		/// Returns value at the current position.
 
@@ -79,11 +91,11 @@ public:
 		/// Advances by one position and returns current position.
 
 	VarIterator operator ++ (int) const;
-		/// Advances by one position and returns copy of the iterator with 
+		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
 	const VarIterator& operator -- () const;
-		/// Goes back by one position and returns copy of the iterator with 
+		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
 	VarIterator operator -- (int) const;
@@ -103,15 +115,15 @@ private:
 	VarIterator();
 
 	void increment() const;
-		/// Increments the iterator position by one. 
+		/// Increments the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void decrement() const;
-		/// Decrements the iterator position by one. 
+		/// Decrements the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void setPosition(std::size_t pos) const;
-		/// Sets the iterator position. 
+		/// Sets the iterator position.
 		/// Throws RangeException if position is out of range.
 
 	Var*                _pVar;
@@ -135,6 +147,30 @@ inline bool VarIterator::operator == (const VarIterator& other) const
 inline bool VarIterator::operator != (const VarIterator& other) const
 {
 	return _pVar != other._pVar || _position != other._position;
+}
+
+
+inline bool VarIterator::operator < (const VarIterator& other) const
+{
+	return _position < other._position;
+}
+
+
+inline bool VarIterator::operator > (const VarIterator& other) const
+{
+	return _position > other._position;
+}
+
+
+inline bool VarIterator::operator <= (const VarIterator& other) const
+{
+	return _position <= other._position;
+}
+
+
+inline bool VarIterator::operator >= (const VarIterator& other) const
+{
+	return _position >= other._position;
 }
 
 
