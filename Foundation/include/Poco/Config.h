@@ -182,7 +182,9 @@
 //   empty or other value:
 //     Do not link any OpenSSL libraries automatically. You will have to edit the
 //     Visual C++ project files for Crypto and NetSSL_OpenSSL.
-#define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
+#ifndef POCO_EXTERNAL_OPENSSL
+	#define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
+#endif
 
 
 // Define to prevent changing the suffix for shared libraries
