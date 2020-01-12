@@ -34,7 +34,7 @@ class JSON_API PrintHandler: public Handler
 	/// otherwise, the proper indentation is applied to elements.
 {
 public:
-	typedef SharedPtr<PrintHandler> Ptr;
+	using Ptr = SharedPtr<PrintHandler>;
 
 	static const unsigned JSON_PRINT_FLAT = 0;
 

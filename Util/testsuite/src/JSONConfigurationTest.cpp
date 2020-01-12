@@ -80,7 +80,6 @@ void JSONConfigurationTest::testLoad()
 	catch(NotFoundException nfe)
 	{
 	}
-
 }
 
 
@@ -114,7 +113,7 @@ void JSONConfigurationTest::testSetArrayElement()
 }
 
 
-AbstractConfiguration* JSONConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr JSONConfigurationTest::allocConfiguration() const
 {
 	return new JSONConfiguration;
 }

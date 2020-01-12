@@ -20,9 +20,6 @@ public:
 	void tearDown();
 
 	static CppUnit::Test* suite();
-
-private:
-	Poco::Util::WinService spoolerService_{ "Spooler" };
 };
 
 

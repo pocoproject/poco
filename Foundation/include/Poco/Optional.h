@@ -74,6 +74,14 @@ public:
 	{
 	}
 
+	Optional(Optional&& other) noexcept:
+		/// Creates a Optional by moving another one.
+		_value(std::move(other._value)),
+		_isSpecified(other._isSpecified)
+	{
+		other._isSpecified = false;
+	}
+
 	~Optional()
 		/// Destroys the Optional.
 	{
@@ -103,6 +111,14 @@ public:
 	Optional& operator = (const Optional& other)
 	{
 		return assign(other);
+	}
+
+	Optional& operator = (Optional&& other) noexcept
+	{
+		_value = std::move(other._value);
+		_isSpecified = other._isSpecified;
+		other._isSpecified = false;
+		return *this;
 	}
 
 	void swap(Optional& other)

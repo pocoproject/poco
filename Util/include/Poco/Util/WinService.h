@@ -23,13 +23,8 @@
 #include <vector>
 
 
-#if defined(POCO_WIN32_UTF8)
 #define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGW
 #define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSW
-#else
-#define POCO_LPQUERY_SERVICE_CONFIG LPQUERY_SERVICE_CONFIGA
-#define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSA
-#endif
 
 
 namespace Poco {
@@ -60,18 +55,17 @@ public:
 		SVC_RUN_COMMAND
 	};
 
-	struct FailureAction {
+	struct FailureAction 
+	{
 		FailureActionType type;
 		int delay;
 	};
 
-	typedef std::vector<FailureAction> FailureActionVector;
-	typedef std::vector<FailureActionType> FailureActionTypeVector;
-
+	using FailureActionVector = std::vector<FailureAction>;
+	using FailureActionTypeVector = std::vector<FailureActionType>;
 
 	WinService(const std::string& name);
 		/// Creates the WinService, using the given service name.
-
 
 	WinService(SC_HANDLE scmHandle, const std::string& name);
 		/// Creates the WinService, using the given connection to

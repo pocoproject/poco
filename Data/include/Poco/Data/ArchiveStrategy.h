@@ -70,8 +70,8 @@ public:
 		/// Sets the archive threshold.
 
 protected:
-	typedef Poco::SharedPtr<Session>   SessionPtr;
-	typedef Poco::SharedPtr<Statement> StatementPtr;
+	using SessionPtr = Poco::SharedPtr<Session>;
+	using StatementPtr = Poco::SharedPtr<Statement>;
 
 	Session& session();
 

@@ -35,6 +35,8 @@ class Foundation_API NullChannel: public Channel
 	/// other channel class in a logging configuration.
 {
 public:
+	using Ptr = AutoPtr<NullChannel>;
+
 	NullChannel();
 		/// Creates the NullChannel.
 

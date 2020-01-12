@@ -81,18 +81,14 @@ public:
 	EVPPKey(const EVPPKey& other);
 		/// Copy constructor.
 
-	EVPPKey& operator=(const EVPPKey& other);
-		/// Assignment operator.
-
-#ifdef POCO_ENABLE_CPP11
-
-	EVPPKey(EVPPKey&& other);
+	EVPPKey(EVPPKey&& other) noexcept;
 		/// Move constructor.
 
-	EVPPKey& operator=(EVPPKey&& other);
-		/// Assignment move operator.
+	EVPPKey& operator = (const EVPPKey& other);
+		/// Assignment operator.
 
-#endif // POCO_ENABLE_CPP11
+	EVPPKey& operator = (EVPPKey&& other) noexcept;
+		/// Assignment move operator.
 
 	~EVPPKey();
 		/// Destroys the EVPPKey.

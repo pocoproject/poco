@@ -42,6 +42,11 @@ void FormatTest::testChar()
 	s = format("%-2c", c);
 	assertTrue (s == "a ");
 
+	s = format("%*c", 2, c);
+	assertTrue (s == " a");
+	s = format("%-*c", 2, c);
+	assertTrue (s == "a ");
+
 	s = format("%c", std::string("foo"));
 	assertTrue (s == "[ERRFMT]");
 }
@@ -57,12 +62,22 @@ void FormatTest::testInt()
 	s = format("%04d", i);
 	assertTrue (s == "0042");
 
+	s = format("%*d", 4, i);
+	assertTrue (s == "  42");
+	s = format("%0*d", 4, i);
+	assertTrue (s == "0042");
+
 	short h = 42;
 	s = format("%hd", h);
 	assertTrue (s == "42");
 	s = format("%4hd", h);
 	assertTrue (s == "  42");
 	s = format("%04hd", h);
+	assertTrue (s == "0042");
+
+	s = format("%*hd", 4, h);
+	assertTrue (s == "  42");
+	s = format("%0*hd", 4, h);
 	assertTrue (s == "0042");
 
 	unsigned short hu = 42;
@@ -73,12 +88,22 @@ void FormatTest::testInt()
 	s = format("%04hu", hu);
 	assertTrue (s == "0042");
 	
+	s = format("%*hu", 4, hu);
+	assertTrue (s == "  42");
+	s = format("%0*hu", 4, hu);
+	assertTrue (s == "0042");
+	
 	unsigned x = 0x42;
 	s = format("%x", x);
 	assertTrue (s == "42");
 	s = format("%4x", x);
 	assertTrue (s == "  42");
 	s = format("%04x", x);
+	assertTrue (s == "0042");
+
+	s = format("%*x", 4, x);
+	assertTrue (s == "  42");
+	s = format("%0*x", 4, x);
 	assertTrue (s == "0042");
 
 	unsigned o = 042;
@@ -89,12 +114,22 @@ void FormatTest::testInt()
 	s = format("%04o", o);
 	assertTrue (s == "0042");
 
+	s = format("%*o", 4, o);
+	assertTrue (s == "  42");
+	s = format("%0*o", 4, o);
+	assertTrue (s == "0042");
+
 	unsigned u = 42;
 	s = format("%u", u);
 	assertTrue (s == "42");
 	s = format("%4u", u);
 	assertTrue (s == "  42");
 	s = format("%04u", u);
+	assertTrue (s == "0042");
+	
+	s = format("%*u", 4, u);
+	assertTrue (s == "  42");
+	s = format("%0*u", 4, u);
 	assertTrue (s == "0042");
 	
 	long l = 42;
@@ -105,12 +140,22 @@ void FormatTest::testInt()
 	s = format("%04ld", l);
 	assertTrue (s == "0042");
 
+	s = format("%*ld", 4, l);
+	assertTrue (s == "  42");
+	s = format("%0*ld", 4, l);
+	assertTrue (s == "0042");
+
 	unsigned long ul = 42;
 	s = format("%lu", ul);
 	assertTrue (s == "42");
 	s = format("%4lu", ul);
 	assertTrue (s == "  42");
 	s = format("%04lu", ul);
+	assertTrue (s == "0042");
+	
+	s = format("%*lu", 4, ul);
+	assertTrue (s == "  42");
+	s = format("%0*lu", 4, ul);
 	assertTrue (s == "0042");
 	
 	unsigned long xl = 0x42;
@@ -121,6 +166,11 @@ void FormatTest::testInt()
 	s = format("%04lx", xl);
 	assertTrue (s == "0042");
 	
+	s = format("%*lx", 4, xl);
+	assertTrue (s == "  42");
+	s = format("%0*lx", 4, xl);
+	assertTrue (s == "0042");
+	
 	Int64 i64 = 42;
 	s = format("%Ld", i64);
 	assertTrue (s == "42");
@@ -129,12 +179,22 @@ void FormatTest::testInt()
 	s = format("%04Ld", i64);
 	assertTrue (s == "0042");
 	
+	s = format("%*Ld", 4, i64);
+	assertTrue (s == "  42");
+	s = format("%0*Ld", 4, i64);
+	assertTrue (s == "0042");
+	
 	UInt64 ui64 = 42;
 	s = format("%Lu", ui64);
 	assertTrue (s == "42");
 	s = format("%4Lu", ui64);
 	assertTrue (s == "  42");
 	s = format("%04Lu", ui64);
+	assertTrue (s == "0042");
+	
+	s = format("%*Lu", 4, ui64);
+	assertTrue (s == "  42");
+	s = format("%0*Lu", 4, ui64);
 	assertTrue (s == "0042");
 	
 	x = 0xaa;
@@ -152,6 +212,10 @@ void FormatTest::testInt()
 	assertTrue (s == "-42");
 	s = format("%+04d", i);
 	assertTrue (s == "-042");
+
+	s = format("%+0*d", 4, i);
+	assertTrue (s == "-042");
+
 	s = format("%d", i);
 	assertTrue (s == "-42");
 
@@ -201,6 +265,11 @@ void FormatTest::testAnyInt()
 	std::string s(format("%?i", c));
 	assertTrue (s == "42");
 	
+	c = 43;
+	s.clear();
+	format(s, "%?i", c);
+	assertTrue (s == "43");
+
 	bool b = true;
 	s = format("%?i", b);
 	assertTrue (s == "1");
@@ -264,9 +333,17 @@ void FormatTest::testFloatFix()
 	s = format("%10f", d);
 	assertTrue (s.find(" 1.50") != std::string::npos);
 
+	s = format("%*f", 10, d);
+	assertTrue (s.find(" 1.50") != std::string::npos);
+
 	s = format("%6.2f", d);
 	assertTrue (s == "  1.50");
 	s = format("%-6.2f", d);
+	assertTrue (s == "1.50  ");
+	
+	s = format("%*.*f", 6, 2, d);
+	assertTrue (s == "  1.50");
+	s = format("%-*.*f", 6,2, d);
 	assertTrue (s == "1.50  ");
 	
 	float f = 1.5;
@@ -274,6 +351,9 @@ void FormatTest::testFloatFix()
 	assertTrue (s.find("1.50") == 0);
 
 	s = format("%.0f", 1.0);
+	assertTrue (s == "1");
+
+	s = format("%.*f", 0, 1.0);
 	assertTrue (s == "1");
 }
 
@@ -289,11 +369,22 @@ void FormatTest::testFloatSci()
 	assertTrue (s.find(" 1.50") != std::string::npos);
 	assertTrue (s.find("0e+0") != std::string::npos);
 
+	s = format("%*e", 20, d);
+	assertTrue (s.find(" 1.50") != std::string::npos);
+	assertTrue (s.find("0e+0") != std::string::npos);
+
 	s = format("%10.2e", d);
 	assertTrue (s == " 1.50e+000" || s == "  1.50e+00");
 	s = format("%-10.2e", d);
 	assertTrue (s == "1.50e+000 " || s == "1.50e+00  ");
 	s = format("%-10.2E", d);
+	assertTrue (s == "1.50E+000 " || s == "1.50E+00  ");
+
+	s = format("%*.*e", 10, 2, d);
+	assertTrue (s == " 1.50e+000" || s == "  1.50e+00");
+	s = format("%-*.*e", 10, 2, d);
+	assertTrue (s == "1.50e+000 " || s == "1.50e+00  ");
+	s = format("%-*.*E", 10, 2, d);
 	assertTrue (s == "1.50E+000 " || s == "1.50E+00  ");
 }
 
@@ -308,6 +399,12 @@ void FormatTest::testString()
 	assertTrue (s == "  foo");
 
 	s = format("%-5s", foo);
+	assertTrue (s == "foo  ");
+
+	s = format("%*s", 5, foo);
+	assertTrue (s == "  foo");
+
+	s = format("%-*s", 5, foo);
 	assertTrue (s == "foo  ");
 
 	s = format("%s%%a", foo);
@@ -334,6 +431,9 @@ void FormatTest::testMultiple()
 
 	s = format("%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6);
 	assertTrue (s == "123456");
+
+	s = format("%d%d%d%d%d%d%d%d%d%d", 1, 2, 3, 4, 5, 6, 7, 8, 9, 0);
+	assertTrue (s == "1234567890");
 }
 
 

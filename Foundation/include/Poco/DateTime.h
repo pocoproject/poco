@@ -107,9 +107,11 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 60 (allowing leap seconds).
+		///   * second is from 0 to 60.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		///
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	DateTime(double julianDay);
 		/// Creates a DateTime for the given Julian day.
@@ -141,9 +143,11 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 60 (allowing leap seconds).
+		///   * second is from 0 to 60.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		///
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	void swap(DateTime& dateTime);
 		/// Swaps the DateTime with another one.
@@ -164,11 +168,11 @@ public:
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
 		///
-		/// For 2007, which starts on a Monday, week 1 will be the week startung on Monday, January 1.
+		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
 	
 	int day() const;
-		/// Returns the day witin the month (1 to 31).
+		/// Returns the day within the month (1 to 31).
 		
 	int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
@@ -254,7 +258,7 @@ protected:
 		/// Computes the Julian day for an UTC time.
 	
 	static double toJulianDay(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
-		/// Computes the Julian day for a gregorian calendar date and time.
+		/// Computes the Julian day for a Gregorian calendar date and time.
 		/// See <http://vsg.cape.com/~pbaum/date/jdimp.htm>, section 2.3.1 for the algorithm.
 	
 	static Timestamp::UtcTimeVal toUtcTime(double julianDay);
@@ -287,6 +291,21 @@ private:
 //
 // inlines
 //
+
+
+inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
+{
+	double utcDays = double(utcTime)/864000000000.0;
+	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
+}
+
+
+inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
+{
+	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
+}
+
+
 inline Timestamp DateTime::timestamp() const
 {
 	return Timestamp::fromUtcTime(_utcTime);

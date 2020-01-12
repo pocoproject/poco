@@ -99,7 +99,7 @@ class Crypto_API ECDSASignature
 	/// A helper class for dealing with ECDSA signatures.
 {
 public:
-	typedef std::vector<unsigned char> ByteVec;
+	using ByteVec = std::vector<unsigned char>;
 
 	explicit ECDSASignature(const ByteVec& derSignature);
 		/// Creates the ECDSASignature from a DER-encoded signature.

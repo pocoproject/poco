@@ -575,7 +575,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int64>& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	if (Preparator::DE_MANUAL == _dataExtraction)

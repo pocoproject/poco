@@ -2257,7 +2257,6 @@ void VarTest::testDynamicStructBasics()
 
 void VarTest::testOrderedDynamicStructBasics()
 {
-#ifdef POCO_ENABLE_CPP11
 	OrderedDynamicStruct aStruct;
 	assertTrue(aStruct.empty());
 	assertTrue(aStruct.size() == 0);
@@ -2279,7 +2278,6 @@ void VarTest::testOrderedDynamicStructBasics()
 	assertTrue(*(aStruct.members().begin()) == "Last Name");
 	aStruct.clear();
 	assertTrue(aStruct.size() == 0);
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2319,7 +2317,6 @@ void VarTest::testDynamicStructString()
 
 void VarTest::testOrderedDynamicStructString()
 {
-#ifdef POCO_ENABLE_CPP11
 	OrderedDynamicStruct aStruct;
 	aStruct["First Name"] = "Junior";
 	aStruct["Last Name"] = "POCO";
@@ -2352,7 +2349,6 @@ void VarTest::testOrderedDynamicStructString()
 	assertTrue(m2["1"] == 1);
 	assertTrue(m2["2"] == 2);
 	assertTrue(m2["3"] == 3);
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2393,7 +2389,6 @@ void VarTest::testDynamicStructInt()
 
 void VarTest::testOrderedDynamicStructInt()
 {
-#ifdef POCO_ENABLE_CPP11
 	typedef Struct<int, OrderedMap<int, Var>, OrderedSet<int> > OrderedStruct;
 	OrderedStruct aStruct;
 	aStruct[0] = "POCO";
@@ -2428,7 +2423,6 @@ void VarTest::testOrderedDynamicStructInt()
 	assertTrue(m2[1] == "2");
 	assertTrue(m2[2] == "1");
 	assertTrue(m2[3] == "3");
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2523,7 +2517,6 @@ void VarTest::testStructToString()
 
 void VarTest::testOrderedStructToString()
 {
-#ifdef POCO_ENABLE_CPP11
 	OrderedDynamicStruct aStruct;
 	aStruct["First Name"] = "Junior";
 	aStruct["Last Name"] = "POCO";
@@ -2533,7 +2526,6 @@ void VarTest::testOrderedStructToString()
 	std::string expected = "{ \"First Name\" : \"Junior\", \"Last Name\" : \"POCO\", \"Age\" : 1 }";
 	assertTrue(res == expected);
 	assertTrue(aStruct.toString() == res);
-#endif // POCO_ENABLE_CPP11
 }
 
 

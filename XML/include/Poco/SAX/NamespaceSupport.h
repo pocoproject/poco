@@ -40,7 +40,7 @@ class XML_API NamespaceSupport
 	/// must be invoked between each session.
 {
 public:
-	typedef std::set<XMLString> PrefixSet;
+	using PrefixSet = std::set<XMLString>;
 
 	NamespaceSupport();
 		/// Creates a NamespaceSupport object.

@@ -258,7 +258,7 @@ public:
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
 		poco_socket_t fd = socket.impl()->sockfd();
-		for (std::vector<pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
+		for (auto it = _pollfds.begin(); it != _pollfds.end(); ++it)
 		{
 			if (it->fd == fd)
 			{
@@ -289,7 +289,7 @@ public:
 
 			if (!_removeSet.empty())
 			{
-				for (std::vector<pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end();)
+				for (auto it = _pollfds.begin(); it != _pollfds.end();)
 				{
 					if (_removeSet.find(it->fd) != _removeSet.end())
 					{
@@ -301,7 +301,7 @@ public:
 			}
 
 			_pollfds.reserve(_pollfds.size() + _addMap.size());
-			for (std::map<poco_socket_t, int>::iterator it = _addMap.begin(); it != _addMap.end(); ++it)
+			for (auto it = _addMap.begin(); it != _addMap.end(); ++it)
 			{
 				pollfd pfd;
 				pfd.fd = it->first;
@@ -347,7 +347,7 @@ public:
 
 			if (!_socketMap.empty())
 			{
-				for (std::vector<pollfd>::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
+				for (auto it = _pollfds.begin(); it != _pollfds.end(); ++it)
 				{
 					std::map<poco_socket_t, Socket>::const_iterator its = _socketMap.find(it->fd);
 					if (its != _socketMap.end())
@@ -439,7 +439,7 @@ public:
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
-			for (PollSet::SocketModeMap::const_iterator it = _map.begin(); it != _map.end(); ++it)
+			for (auto it = _map.begin(); it != _map.end(); ++it)
 			{
 				poco_socket_t fd = it->first.impl()->sockfd();
 				if (fd != POCO_INVALID_SOCKET && it->second)
@@ -490,7 +490,7 @@ public:
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
-			for (PollSet::SocketModeMap::const_iterator it = _map.begin(); it != _map.end(); ++it)
+			for (auto it = _map.begin(); it != _map.end(); ++it)
 			{
 				poco_socket_t fd = it->first.impl()->sockfd();
 				if (fd != POCO_INVALID_SOCKET)

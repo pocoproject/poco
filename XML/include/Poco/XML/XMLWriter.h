@@ -280,7 +280,7 @@ public:
 
 protected:
 	typedef std::map<XMLString, XMLString> AttributeMap;
-	typedef std::map<XMLString, std::pair<XMLString, XMLString> > CanonicalAttributeMap;
+	typedef std::map<XMLString, std::pair<XMLString, XMLString>> CanonicalAttributeMap;
 
 	void writeStartElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);
 	void writeCanonicalStartElement(const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const Attributes& attributes);

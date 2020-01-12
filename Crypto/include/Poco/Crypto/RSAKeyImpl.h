@@ -47,8 +47,8 @@ class RSAKeyImpl: public KeyPairImpl
 	/// class RSAKeyImpl
 {
 public:
-	typedef Poco::AutoPtr<RSAKeyImpl> Ptr;
-	typedef std::vector<unsigned char> ByteVec;
+	using Ptr = Poco::AutoPtr<RSAKeyImpl>;
+	using ByteVec = std::vector<unsigned char>;
 
 	RSAKeyImpl(const EVPPKey& key);
 		/// Constructs ECKeyImpl by extracting the EC key.

@@ -14,9 +14,6 @@
 //
 
 
-#ifdef POCO_HAVE_STD_ATOMICS
-
-
 #ifndef Foundation_AtomicFlag_INCLUDED
 #define Foundation_AtomicFlag_INCLUDED
 
@@ -67,10 +64,10 @@ class Foundation_API AtomicFlag
 	/// while (++i < 10) myClass.myFunc();
 {
 public:
-	AtomicFlag();
+	AtomicFlag() = default;
 		/// Creates AtomicFlag.
 
-	~AtomicFlag();
+	~AtomicFlag() = default;
 		/// Destroys AtomicFlag.
 
 	bool set();
@@ -98,6 +95,7 @@ private:
 // inlines
 //
 
+
 inline bool AtomicFlag::set()
 {
 	return _flag.test_and_set(std::memory_order_acquire);
@@ -121,5 +119,3 @@ inline AtomicFlag::operator bool ()
 
 #endif // Foundation_AtomicFlag_INCLUDED
 
-
-#endif // POCO_HAVE_STD_ATOMICS

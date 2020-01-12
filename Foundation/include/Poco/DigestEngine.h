@@ -36,7 +36,7 @@ class Foundation_API DigestEngine
 	/// digest.
 {
 public:
-	typedef std::vector<unsigned char> Digest;
+	using Digest = std::vector<unsigned char>;
 
 	DigestEngine();
 	virtual ~DigestEngine();

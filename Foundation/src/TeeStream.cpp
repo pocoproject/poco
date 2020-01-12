@@ -62,9 +62,9 @@ int TeeStreamBuf::readFromDevice()
 
 int TeeStreamBuf::writeToDevice(char c)
 {
-	for (StreamVec::iterator it = _streams.begin(); it != _streams.end(); ++it)
+	for (auto& pStream: _streams)
 	{
-		(*it)->put(c);
+		pStream->put(c);
 	}
 	return charToInt(c);
 }

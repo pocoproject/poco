@@ -75,6 +75,15 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 }
 
 
+X509Certificate::X509Certificate(X509Certificate&& cert) noexcept:
+	_issuerName(std::move(cert._issuerName)),
+	_subjectName(std::move(cert._subjectName)),
+	_pCert(cert._pCert)
+{
+	cert._pCert = nullptr;
+}
+
+
 X509Certificate::X509Certificate(PCCERT_CONTEXT pCert, bool shared):
 	_pCert(pCert)
 {
@@ -97,6 +106,16 @@ X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 }
 
 
+X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
+{
+	_issuerName = std::move(cert._issuerName);
+	_subjectName = std::move(cert._subjectName);
+	_pCert = cert._pCert; cert._pCert = nullptr;
+
+	return *this;
+}
+
+
 void X509Certificate::swap(X509Certificate& cert)
 {
 	using std::swap;
@@ -108,7 +127,7 @@ void X509Certificate::swap(X509Certificate& cert)
 
 X509Certificate::~X509Certificate()
 {
-	CertFreeCertificateContext(_pCert);
+	if (_pCert) CertFreeCertificateContext(_pCert);
 }
 
 

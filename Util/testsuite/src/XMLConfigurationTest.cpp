@@ -261,7 +261,7 @@ void XMLConfigurationTest::testOtherDelimiter()
 }
 
 
-AbstractConfiguration* XMLConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr XMLConfigurationTest::allocConfiguration() const
 {
 	XMLConfiguration* pConfig = new XMLConfiguration();
 	pConfig->loadEmpty("TestConfiguration");

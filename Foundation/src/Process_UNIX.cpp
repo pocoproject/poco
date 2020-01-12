@@ -97,8 +97,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		char** argv = new char*[args.size() + 2];
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
-		for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
-			argv[i++] = const_cast<char*>(it->c_str());
+		for (const auto& a: args) 
+			argv[i++] = const_cast<char*>(a.c_str());
 		argv[i] = NULL;
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
@@ -155,9 +155,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	std::vector<char*> argv(args.size() + 2);
 	int i = 0;
 	argv[i++] = const_cast<char*>(command.c_str());
-	for (ArgsImpl::const_iterator it = args.begin(); it != args.end(); ++it) 
+	for (const auto& a: args) 
 	{
-		argv[i++] = const_cast<char*>(it->c_str());
+		argv[i++] = const_cast<char*>(a.c_str());
 	}
 	argv[i] = NULL;
 	

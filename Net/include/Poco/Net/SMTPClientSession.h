@@ -37,7 +37,7 @@ class Net_API SMTPClientSession
 	/// client for sending e-mail messages.
 {
 public:
-	typedef std::vector<std::string> Recipients;
+	using Recipients = std::vector<std::string>;
 
 	enum
 	{

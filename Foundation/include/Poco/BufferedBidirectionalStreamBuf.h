@@ -29,7 +29,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch> > 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch>> 
 class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of a buffered bidirectional 
 	/// streambuf that greatly simplifies the implementation of
@@ -170,9 +170,9 @@ private:
 // instantiations in different libraries.
 //
 #if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS) 
-template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char> >;
+template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 #endif
-typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char> > BufferedBidirectionalStreamBuf;
+typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>> BufferedBidirectionalStreamBuf;
 
 
 } // namespace Poco

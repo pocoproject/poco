@@ -9,7 +9,7 @@
 
 #include "CppUnit/CppUnit.h"
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 
 
 namespace CppUnit {
@@ -33,7 +33,7 @@ inline std::string estring(std::string& expandedString)
 inline std::string estring(int number)
 {
 	char buffer[50]; 
-	sprintf(buffer, "%d", number); 
+	std::snprintf(buffer, sizeof(buffer), "%d", number); 
 	return std::string (buffer); 
 }
 
@@ -42,7 +42,7 @@ inline std::string estring(int number)
 inline std::string estring(long number)
 {
 	char buffer[50]; 
-	sprintf(buffer, "%ld", number); 
+	std::snprintf(buffer, sizeof(buffer), "%ld", number); 
 	return std::string (buffer); 
 }
 
@@ -51,7 +51,7 @@ inline std::string estring(long number)
 inline std::string estring(double number)
 {
 	char buffer[50]; 
-	sprintf(buffer, "%lf", number); 
+	std::snprintf(buffer, sizeof(buffer), "%lf", number); 
 	return std::string(buffer);
 }
 
@@ -60,7 +60,7 @@ inline std::string estring(double number)
 inline std::string estring(const void* ptr)
 {
 	char buffer[50]; 
-	sprintf(buffer, "%p", ptr); 
+	std::snprintf(buffer, sizeof(buffer), "%p", ptr); 
 	return std::string(buffer);
 }
 

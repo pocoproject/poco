@@ -70,9 +70,7 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(TypeListTest::suite());
 	pSuite->addTest(ObjectPoolTest::suite());
 	pSuite->addTest(ListMapTest::suite());
-#ifdef POCO_ENABLE_CPP11
 	pSuite->addTest(OrderedContainersTest::suite());
-#endif
 
 	return pSuite;
 }

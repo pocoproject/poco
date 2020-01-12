@@ -12,10 +12,7 @@
 
 
 #include "Poco/Foundation.h"
-
-#ifdef POCO_ENABLE_CPP11
-
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/OrderedMap.h"
 #include "Poco/OrderedSet.h"
 #include "ordered_map_util.h"
@@ -301,7 +298,7 @@ private:
 		}
 		assertEquals(set.size(), nb_values);
 
-		for(std::size_t i = 0; i < nb_values; i++) 
+		for(std::size_t i = 0; i < nb_values; i++)
 		{
 			const std::size_t insert_val = (i%2 == 0)?i:nb_values + i;
 			std::tie(it, inserted) = set.insert(utils::get_key<key_t>(insert_val));
@@ -335,6 +332,5 @@ private:
 #pragma warning(pop)
 #endif // POCO_COMPILER_MSVC
 
-#endif // POCO_ENABLE_CPP11
 
 #endif // OrderedContainersTest_INCLUDED

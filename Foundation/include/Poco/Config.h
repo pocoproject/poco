@@ -18,16 +18,6 @@
 #define Foundation_Config_INCLUDED
 
 
-// Define to enable Windows Unicode (UTF-8) support
-// NOTE: As of POCO C++ Libraries release 1.6.0, compiling POCO
-// without POCO_WIN32_UTF8 defined on Windows is deprecated.
-#define POCO_WIN32_UTF8
-
-
-// Define to enable C++11 support
-// #define POCO_ENABLE_CPP11
-
-
 // Define to disable implicit linking
 // #define POCO_NO_AUTOMATIC_LIBS
 
@@ -192,7 +182,7 @@
 //   empty or other value:
 //     Do not link any OpenSSL libraries automatically. You will have to edit the
 //     Visual C++ project files for Crypto and NetSSL_OpenSSL.
-// #define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
+#define POCO_EXTERNAL_OPENSSL POCO_EXTERNAL_OPENSSL_SLPRO
 
 
 // Define to prevent changing the suffix for shared libraries

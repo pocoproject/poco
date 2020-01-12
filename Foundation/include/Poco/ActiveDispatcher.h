@@ -55,7 +55,7 @@ class Foundation_API ActiveDispatcher: protected Runnable
 	///         {
 	///         }
 	///
-	///         ActiveMethod<std::string, std::string, ActiveObject, ActiveStarter<ActiveDispatcher> > exampleActiveMethod;
+	///         ActiveMethod<std::string, std::string, ActiveObject, ActiveStarter<ActiveDispatcher>> exampleActiveMethod;
 	///
 	///     protected:
 	///         std::string exampleActiveMethodImpl(const std::string& arg)

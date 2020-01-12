@@ -44,15 +44,15 @@ public:
 	EventException(const EventException& exc);
 		/// Creates an EventException by copying another one.
 
-	~EventException() throw();
+	~EventException() noexcept;
 		/// Destroys the EventException.
 
 	EventException& operator = (const EventException& exc);
 
-	const char* name() const throw();
+	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const throw();
+	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
 	unsigned short code() const;

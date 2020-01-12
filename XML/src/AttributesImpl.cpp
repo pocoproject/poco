@@ -19,24 +19,35 @@ namespace Poco {
 namespace XML {
 
 
+AttributesImpl::EmptyAttribute::EmptyAttribute()
+{
+	specified = false;
+	type = XML_LIT("CDATA");
+}
+
+
+AttributesImpl::EmptyAttribute AttributesImpl::_empty;
+
+
 AttributesImpl::AttributesImpl()
 {
-	_empty.specified = false;
-	_empty.type = XML_LIT("CDATA");
 }
 
 
 AttributesImpl::AttributesImpl(const Attributes& attributes)
 {
-	_empty.specified = false;
-	_empty.type = XML_LIT("CDATA");
 	setAttributes(attributes);
 }
 
 
 AttributesImpl::AttributesImpl(const AttributesImpl& attributes):
-	_attributes(attributes._attributes),
-	_empty(attributes._empty)
+	_attributes(attributes._attributes)
+{
+}
+
+
+AttributesImpl::AttributesImpl(AttributesImpl&& attributes) noexcept:
+	_attributes(std::move(attributes._attributes))
 {
 }
 
@@ -52,6 +63,14 @@ AttributesImpl& AttributesImpl::operator = (const AttributesImpl& attributes)
 	{
 		_attributes = attributes._attributes;
 	}
+	return *this;
+}
+
+
+AttributesImpl& AttributesImpl::operator = (AttributesImpl&& attributes) noexcept
+{
+	_attributes = std::move(attributes._attributes);
+
 	return *this;
 }
 

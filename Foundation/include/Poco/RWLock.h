@@ -50,9 +50,9 @@ class Foundation_API RWLock: private RWLockImpl
 	/// readers or one exclusive writer.
 {
 public:
-	typedef ScopedRWLock ScopedLock;
-	typedef ScopedReadRWLock ScopedReadLock;
-	typedef ScopedWriteRWLock ScopedWriteLock;
+	using ScopedLock = ScopedRWLock;
+	using ScopedReadLock = ScopedReadRWLock;
+	using ScopedWriteLock = ScopedWriteRWLock;
 
 	RWLock();
 		/// Creates the Reader/Writer lock.

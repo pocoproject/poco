@@ -68,11 +68,11 @@ public:
 	};
 
 	typedef bool (*CompT)(const Poco::Dynamic::Var&, const Poco::Dynamic::Var&);
-	typedef AutoPtr<RowFilter> Ptr;
-	typedef std::map<std::string, Comparison> Comparisons;
-	typedef Tuple<Poco::Dynamic::Var, Comparison, LogicOperator> ComparisonEntry;
-	typedef std::multimap<std::string, ComparisonEntry> ComparisonMap;
-	typedef std::map<AutoPtr<RowFilter>, LogicOperator> FilterMap;
+	using Ptr = AutoPtr<RowFilter>;
+	using Comparisons = std::map<std::string, Comparison>;
+	using ComparisonEntry = Tuple<Poco::Dynamic::Var, Comparison, LogicOperator>;
+	using ComparisonMap = std::multimap<std::string, ComparisonEntry>;
+	using FilterMap = std::map<AutoPtr<RowFilter>, LogicOperator>;
 
 	RowFilter(RecordSet* pRecordSet);
 		/// Creates the top-level RowFilter and associates it with the recordset.

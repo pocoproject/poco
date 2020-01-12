@@ -67,17 +67,6 @@
 #endif
 
 
-// Unicode Support
-#if defined(UNICODE) && !defined(POCO_WIN32_UTF8)
-	#define POCO_WIN32_UTF8
-#endif
-
-
-#if !defined(POCO_WIN32_UTF8)
-	#pragma message("Compiling POCO on Windows without #define POCO_WIN32_UTF8 is deprecated.")
-#endif
-
-
 // Turn off some annoying warnings
 #if defined(_MSC_VER)
 	#pragma warning(disable:4018)	// signed/unsigned comparison
@@ -90,12 +79,6 @@
 	#pragma warning(disable:4355)	// 'this' : used in base member initializer list
 	#pragma warning(disable:4675)	// resolved overload was found by argument-dependent lookup
 	#pragma warning(disable:4996)	// VC++ 8.0 deprecation warnings
-#endif
-
-
-// Enable C++11 support for VS 2010 and newer
-#if defined(_MSC_VER) && (_MSC_VER >= 1700) && !defined(POCO_ENABLE_CPP11)
-	#define POCO_ENABLE_CPP11
 #endif
 
 

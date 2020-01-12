@@ -29,7 +29,7 @@ class Foundation_API Timespan
 	/// A class that represents time spans up to microsecond resolution.
 {
 public:
-	typedef Timestamp::TimeDiff TimeDiff;
+	using TimeDiff = Timestamp::TimeDiff;
 
 	Timespan();
 		/// Creates a zero Timespan.

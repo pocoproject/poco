@@ -161,26 +161,26 @@ void AbstractBinder::bind(std::size_t pos, const std::list<Poco::Int64>& val, Di
 	throw NotImplementedException("std::list binder must be implemented.");
 }
 
-	
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
 }
 
-	
+
 void AbstractBinder::bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir)
 {
 	throw NotImplementedException("std::deque binder must be implemented.");
 }
 
-	
+
 void AbstractBinder::bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir)
 {
 	throw NotImplementedException("std::list binder must be implemented.");
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 void AbstractBinder::bind(std::size_t pos, const std::vector<long>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");
@@ -426,48 +426,46 @@ void AbstractBinder::bind(std::size_t pos, const Any& val, Direction dir)
 {
 	const std::type_info& type = val.type();
 
-	if(type == typeid(Int32))
+	if (type == typeid(Int32))
 		bind(pos, RefAnyCast<Int32>(val), dir);
-	else if(type == typeid(std::string))
+	else if (type == typeid(std::string))
 		bind(pos, RefAnyCast<std::string>(val), dir);
 	else if (type == typeid(Poco::UTF16String))
 		bind(pos, RefAnyCast<Poco::UTF16String>(val), dir);
 	else if (type == typeid(bool))
 		bind(pos, RefAnyCast<bool>(val), dir);
-	else if(type == typeid(char))
+	else if (type == typeid(char))
 		bind(pos, RefAnyCast<char>(val), dir);
-	else if(type == typeid(Int8))
+	else if (type == typeid(Int8))
 		bind(pos, RefAnyCast<Int8>(val), dir);
-	else if(type == typeid(UInt8))
+	else if (type == typeid(UInt8))
 		bind(pos, RefAnyCast<UInt8>(val), dir);
-	else if(type == typeid(Int16))
+	else if (type == typeid(Int16))
 		bind(pos, RefAnyCast<Int16>(val), dir);
-	else if(type == typeid(UInt16))
+	else if (type == typeid(UInt16))
 		bind(pos, RefAnyCast<UInt16>(val), dir);
-	else if(type == typeid(UInt32))
+	else if (type == typeid(UInt32))
 		bind(pos, RefAnyCast<UInt32>(val), dir);
-	else if(type == typeid(Int64))
+	else if (type == typeid(Int64))
 		bind(pos, RefAnyCast<Int64>(val), dir);
-	else if(type == typeid(UInt64))
+	else if (type == typeid(UInt64))
 		bind(pos, RefAnyCast<UInt64>(val), dir);
-	else if(type == typeid(float))
+	else if (type == typeid(float))
 		bind(pos, RefAnyCast<float>(val), dir);
-	else if(type == typeid(double))
+	else if (type == typeid(double))
 		bind(pos, RefAnyCast<double>(val), dir);
-	else if(type == typeid(DateTime))
+	else if (type == typeid(DateTime))
 		bind(pos, RefAnyCast<DateTime>(val), dir);
-	else if(type == typeid(Date))
+	else if (type == typeid(Date))
 		bind(pos, RefAnyCast<Date>(val), dir);
-	else if(type == typeid(Time))
+	else if (type == typeid(Time))
 		bind(pos, RefAnyCast<Time>(val), dir);
-	else if(type == typeid(BLOB))
+	else if (type == typeid(BLOB))
 		bind(pos, RefAnyCast<BLOB>(val), dir);
-	else if(type == typeid(void))
+	else if (type == typeid(void))
 		bind(pos, Keywords::null, dir);
-#ifndef POCO_LONG_IS_64_BIT
 	else if(type == typeid(long))
 		bind(pos, RefAnyCast<long>(val), dir);
-#endif
 	else
 		throw UnknownTypeException(std::string(val.type().name()));
 }
@@ -477,48 +475,46 @@ void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direct
 {
 	const std::type_info& type = val.type();
 
-	if(type == typeid(Int32))
+	if (type == typeid(Int32))
 		bind(pos, val.extract<Int32>(), dir);
-	else if(type == typeid(std::string))
+	else if (type == typeid(std::string))
 		bind(pos, val.extract<std::string>(), dir);
 	else if (type == typeid(Poco::UTF16String))
 		bind(pos, val.extract<Poco::UTF16String>(), dir);
 	else if (type == typeid(bool))
 		bind(pos, val.extract<bool>(), dir);
-	else if(type == typeid(char))
+	else if (type == typeid(char))
 		bind(pos, val.extract<char>(), dir);
-	else if(type == typeid(Int8))
+	else if (type == typeid(Int8))
 		bind(pos, val.extract<Int8>(), dir);
-	else if(type == typeid(UInt8))
+	else if (type == typeid(UInt8))
 		bind(pos, val.extract<UInt8>(), dir);
-	else if(type == typeid(Int16))
+	else if (type == typeid(Int16))
 		bind(pos, val.extract<Int16>(), dir);
-	else if(type == typeid(UInt16))
+	else if (type == typeid(UInt16))
 		bind(pos, val.extract<UInt16>(), dir);
-	else if(type == typeid(UInt32))
+	else if (type == typeid(UInt32))
 		bind(pos, val.extract<UInt32>(), dir);
-	else if(type == typeid(Int64))
+	else if (type == typeid(Int64))
 		bind(pos, val.extract<Int64>(), dir);
-	else if(type == typeid(UInt64))
+	else if (type == typeid(UInt64))
 		bind(pos, val.extract<UInt64>(), dir);
-	else if(type == typeid(float))
+	else if (type == typeid(float))
 		bind(pos, val.extract<float>(), dir);
-	else if(type == typeid(double))
+	else if (type == typeid(double))
 		bind(pos, val.extract<double>(), dir);
-	else if(type == typeid(DateTime))
+	else if (type == typeid(DateTime))
 		bind(pos, val.extract<DateTime>(), dir);
-	else if(type == typeid(Date))
+	else if (type == typeid(Date))
 		bind(pos, val.extract<Date>(), dir);
-	else if(type == typeid(Time))
+	else if (type == typeid(Time))
 		bind(pos, val.extract<Time>(), dir);
-	else if(type == typeid(BLOB))
+	else if (type == typeid(BLOB))
 		bind(pos, val.extract<BLOB>(), dir);
-	else if(type == typeid(void))
+	else if (type == typeid(void))
 		bind(pos, Keywords::null, dir);
-#ifndef POCO_LONG_IS_64_BIT
-	else if(type == typeid(long))
+	else if (type == typeid(long))
 		bind(pos, val.extract<long>(), dir);
-#endif
 	else
 		throw UnknownTypeException(std::string(val.type().name()));
 }

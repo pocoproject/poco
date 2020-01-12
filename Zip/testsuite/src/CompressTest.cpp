@@ -156,7 +156,8 @@ void CompressTest::createDataFile(const std::string& path, Poco::UInt64 size)
 
 void CompressTest::testZip64()
 {
-	typedef std::map<std::string, Poco::UInt64> FileMap;
+	using FileMap = std::map<std::string, Poco::UInt64>;
+
 	std::cout << std::endl;
 	FileMap files;
 	files["data1.bin"] = static_cast<Poco::UInt64>(KB)*4096+1;

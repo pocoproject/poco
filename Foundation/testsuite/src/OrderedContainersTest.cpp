@@ -9,11 +9,8 @@
 
 
 #include "OrderedContainersTest.h"
-
-#ifdef POCO_ENABLE_CPP11
-
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 
 #ifdef POCO_COMPILER_MSVC
@@ -21,6 +18,7 @@
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
 #endif // POCO_COMPILER_MSVC
+
 
 using Poco::OrderedMap;
 using Poco::OrderedSet;
@@ -1120,5 +1118,3 @@ CppUnit::Test* OrderedContainersTest::suite()
 #ifdef POCO_COMPILER_MSVC
 #pragma warning(pop)
 #endif // POCO_COMPILER_MSVC
-
-#endif // POCO_ENABLE_CPP11

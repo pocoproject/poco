@@ -47,6 +47,14 @@ MediaType::MediaType(const MediaType& mediaType):
 }
 
 
+MediaType::MediaType(MediaType&& mediaType) noexcept:
+	_type(std::move(mediaType._type)),
+	_subType(std::move(mediaType._subType)),
+	_parameters(std::move(mediaType._parameters))
+{
+}
+
+
 MediaType::~MediaType()
 {
 }
@@ -60,6 +68,16 @@ MediaType& MediaType::operator = (const MediaType& mediaType)
 		_subType    = mediaType._subType;
 		_parameters = mediaType._parameters;
 	}
+	return *this;
+}
+
+
+MediaType& MediaType::operator = (MediaType&& mediaType) noexcept
+{
+	_type       = std::move(mediaType._type);
+	_subType    = std::move(mediaType._subType);
+	_parameters = std::move(mediaType._parameters);
+
 	return *this;
 }
 

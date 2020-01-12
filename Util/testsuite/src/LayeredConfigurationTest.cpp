@@ -176,6 +176,7 @@ void LayeredConfigurationTest::testRemove()
 
 	AbstractConfiguration::Keys keys;
 	pLC->keys(keys);
+
 	assertTrue (keys.size() == 3);
 	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
@@ -188,8 +189,8 @@ void LayeredConfigurationTest::testRemove()
 	pLC->removeConfiguration(pMC2);
 	keys.clear();
 	pLC->keys(keys);
+
 	assertTrue (keys.size() == 2);
-	
 	assertTrue (pLC->getString("prop1") == "value1");
 	assertTrue (pLC->getString("prop2") == "value2");
 }
@@ -197,14 +198,14 @@ void LayeredConfigurationTest::testRemove()
 
 void LayeredConfigurationTest::testFind()
 {
-	AutoPtr<LayeredConfiguration> pLC = new LayeredConfiguration;
-	AutoPtr<AbstractConfiguration> pMC1 = new MapConfiguration;
-	AutoPtr<AbstractConfiguration> pMC2 = new MapConfiguration;
+	LayeredConfiguration::Ptr pLC = new LayeredConfiguration;
+	AbstractConfiguration::Ptr pMC1 = new MapConfiguration;
+	AbstractConfiguration::Ptr pMC2 = new MapConfiguration;
 	
 	pLC->add(pMC1, 0);
 	pLC->add(pMC2, "label", -1);
 	
-	AutoPtr<AbstractConfiguration> pFound = pLC->find("label");
+	AbstractConfiguration::Ptr pFound = pLC->find("label");
 	assertTrue (pFound == pMC2);
 	
 	pFound = pLC->find("notfound");
@@ -212,7 +213,7 @@ void LayeredConfigurationTest::testFind()
 }
 
 
-AbstractConfiguration* LayeredConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr LayeredConfigurationTest::allocConfiguration() const
 {
 	LayeredConfiguration* pLC = new LayeredConfiguration;
 	AutoPtr<MapConfiguration> pMC1 = new MapConfiguration;

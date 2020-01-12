@@ -173,7 +173,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
@@ -630,7 +630,7 @@ bool Extractor::extract(std::size_t , std::list<Poco::UInt64>&)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t , std::vector<long>&)
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");

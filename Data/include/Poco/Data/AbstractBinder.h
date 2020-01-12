@@ -37,7 +37,7 @@ namespace Poco {
 namespace Data {
 
 
-typedef NullType NullData;
+using NullData = NullType;
 
 
 namespace Keywords {
@@ -53,7 +53,7 @@ class Data_API AbstractBinder
 	/// Interface for Binding data types to placeholders.
 {
 public:
-	typedef SharedPtr<AbstractBinder> Ptr;
+	using Ptr = SharedPtr<AbstractBinder>;
 
 	enum Direction
 		/// Binding direction for a parameter.
@@ -140,7 +140,7 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir = PD_IN);
 		/// Binds an UInt32 list.
-		
+
 	virtual void bind(std::size_t pos, const Poco::Int64& val, Direction dir = PD_IN) = 0;
 		/// Binds an Int64.
 
@@ -165,7 +165,7 @@ public:
 	virtual void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir = PD_IN);
 		/// Binds an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	virtual void bind(std::size_t pos, const long& val, Direction dir = PD_IN) = 0;
 		/// Binds a long.
 
@@ -331,7 +331,7 @@ public:
 
 	void bind(std::size_t pos, const Any& val, Direction dir = PD_IN);
 		/// Binds an Any.
-	
+
 	void bind(std::size_t pos, const Poco::Dynamic::Var& val, Direction dir = PD_IN);
 	/// Binds a Var.
 

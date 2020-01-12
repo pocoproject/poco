@@ -78,7 +78,7 @@ public:
 	static void glob(const std::string& pathPattern, std::set<std::string>& files, int options = 0);
 		/// Creates a set of files that match the given pathPattern.
 		///
-		/// The path may be give in either Unix, Windows or VMS syntax and
+		/// The path may be give in either Unix or Windows syntax and
 		/// is automatically expanded by calling Path::expand().
 		///
 		/// The pattern may contain wildcard expressions even in intermediate
@@ -93,7 +93,7 @@ public:
 	static void glob(const char* pathPattern, std::set<std::string>& files, int options = 0);
 		/// Creates a set of files that match the given pathPattern.
 		///
-		/// The path may be give in either Unix, Windows or VMS syntax and
+		/// The path may be give in either Unix or Windows syntax and
 		/// is automatically expanded by calling Path::expand().
 		///
 		/// The pattern may contain wildcard expressions even in intermediate

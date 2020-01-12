@@ -47,36 +47,36 @@ public:
 		message(_error.toString());
 	}
 
-	HandleException(const H& handle, const std::string& msg): 
-		ODBCException(msg), 
+	HandleException(const H& handle, const std::string& msg):
+		ODBCException(msg),
 		_error(handle)
 		/// Creates HandleException
 	{
 		extendedMessage(_error.toString());
-	}							
+	}
 
-	HandleException(const H& handle, const std::string& msg, const std::string& arg): 
-		ODBCException(msg, arg), 
+	HandleException(const H& handle, const std::string& msg, const std::string& arg):
+		ODBCException(msg, arg),
 		_error(handle)
 		/// Creates HandleException
 	{
 	}
 
-	HandleException(const H& handle, const std::string& msg, const Poco::Exception& exc): 
+	HandleException(const H& handle, const std::string& msg, const Poco::Exception& exc):
 		ODBCException(msg, exc),
 		_error(handle)
 		/// Creates HandleException
 	{
 	}
 
-	HandleException(const HandleException& exc): 
+	HandleException(const HandleException& exc):
 		ODBCException(exc),
 		_error(exc._error)
 		/// Creates HandleException
 	{
 	}
 
-	~HandleException() throw()
+	~HandleException() noexcept
 		/// Destroys HandleException
 	{
 	}
@@ -89,13 +89,13 @@ public:
 		return *this;
 	}
 
-	const char* name() const throw()
+	const char* name() const noexcept
 		/// Returns the name of the exception
 	{
 		return "ODBC handle exception";
 	}
 
-	const char* className() const throw()
+	const char* className() const noexcept
 		/// Returns the HandleException class name.
 	{
 		return typeid(*this).name();

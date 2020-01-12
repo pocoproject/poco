@@ -30,7 +30,7 @@ namespace Poco {
 template <class TArgs, class TMutex = FastMutex> 
 class FIFOEvent: public AbstractEvent < 
 	TArgs, 
-	FIFOStrategy<TArgs, AbstractDelegate<TArgs> >,
+	FIFOStrategy<TArgs, AbstractDelegate<TArgs>>,
 	AbstractDelegate<TArgs>,
 	TMutex
 >

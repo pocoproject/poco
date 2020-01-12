@@ -33,6 +33,8 @@ class Foundation_API EventChannel: public Channel
 	/// the logging framework. 
 {
 public:
+	using Ptr = AutoPtr<EventChannel>;
+
 	Poco::BasicEvent<const Message> messageLogged;
 		/// Fired when a message is logged by calling the log() method.
 

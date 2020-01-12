@@ -49,10 +49,8 @@ Array &Array::operator=(const Array& other)
 	return *this;
 }
 
-#ifdef POCO_ENABLE_CPP11
 
-
-Array::Array(Array&& other) :
+Array::Array(Array&& other):
 	_values(std::move(other._values)),
 	_pArray(!other._modified ? other._pArray : 0),
 	_modified(other._modified)
@@ -60,20 +58,16 @@ Array::Array(Array&& other) :
 	_pArray = 0;
 }
 
-Array &Array::operator= (Array&& other)
+
+Array &Array::operator = (Array&& other)
 {
-	if (&other != this)
-	{
-		_values = std::move(other._values);
-		_pArray = other._pArray;
-		other._pArray = 0;
-		_modified = other._modified;
-	}
+	_values = std::move(other._values);
+	_pArray = other._pArray;
+	other._pArray = 0;
+	_modified = other._modified;
+
 	return *this;
 }
-
-
-#endif // POCO_ENABLE_CPP11
 
 
 Array::~Array()

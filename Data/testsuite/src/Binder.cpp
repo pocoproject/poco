@@ -68,7 +68,7 @@ void Binder::bind(std::size_t pos, const Poco::UInt64 &val, Direction dir)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 }

@@ -42,11 +42,11 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 //
 // Parameters for barebone-test
-#define MYSQL_USER "root"
-#define MYSQL_PWD  "poco"
+#define MYSQL_USER "pocotest"
+#define MYSQL_PWD  "pocotest"
 #define MYSQL_HOST "127.0.0.1"
 #define MYSQL_PORT 3306
-#define MYSQL_DB   "pocotestdb"
+#define MYSQL_DB   "pocotest"
 
 //
 // Connection string

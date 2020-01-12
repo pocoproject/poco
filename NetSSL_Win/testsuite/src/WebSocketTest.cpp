@@ -9,8 +9,8 @@
 
 
 #include "WebSocketTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/SocketStream.h"
 #include "Poco/Net/HTTPSClientSession.h"
@@ -82,7 +82,7 @@ namespace
 	private:
 		std::size_t _bufSize;
 	};
-	
+
 	class WebSocketRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 	{
 	public:
@@ -116,9 +116,9 @@ void WebSocketTest::testWebSocket()
 	Poco::Net::SecureServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
 	server.start();
-	
+
 	Poco::Thread::sleep(200);
-	
+
 	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;
@@ -159,19 +159,19 @@ void WebSocketTest::testWebSocket()
 	assertTrue (n == payload.size());
 	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
 	assertTrue (flags == WebSocket::FRAME_TEXT);
-	
+
 	payload = "Hello, universe!";
 	ws.sendFrame(payload.data(), (int) payload.size(), WebSocket::FRAME_BINARY);
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == payload.size());
 	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
-	assertTrue (flags == WebSocket::FRAME_BINARY);	
-	
+	assertTrue (flags == WebSocket::FRAME_BINARY);
+
 	ws.shutdown();
 	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
 	assertTrue (n == 2);
 	assertTrue ((flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE);
-	
+
 	server.stop();
 }
 
@@ -183,9 +183,9 @@ void WebSocketTest::testWebSocketLarge()
 	Poco::Net::SecureServerSocket ss(0);
 	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory(msgSize), ss, new Poco::Net::HTTPServerParams);
 	server.start();
-	
+
 	Poco::Thread::sleep(200);
-	
+
 	HTTPSClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws");
 	HTTPResponse response;

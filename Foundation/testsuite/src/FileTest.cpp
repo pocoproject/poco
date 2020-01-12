@@ -380,7 +380,7 @@ void FileTest::testCopy()
 	f1.setWriteable().remove();
 }
 
-void FileTest::testCopyFailIfDestinationFileExists() 	
+void FileTest::testCopyFailIfDestinationFileExists()
 {
 	std::ofstream ostr("testfile.dat");
 	ostr << "Hello, world!" << std::endl;
@@ -499,7 +499,7 @@ void FileTest::testCopyDirectory()
 	fd3.remove(true);
 }
 
-void FileTest::testCopyDirectoryFailIfExists() 
+void FileTest::testCopyDirectoryFailIfExists()
 {
 	Path pd1("testdir");
 	File fd1(pd1);
@@ -516,7 +516,7 @@ void FileTest::testCopyDirectoryFailIfExists()
 	std::ofstream ostr2(pf2.toString().c_str());
 	ostr2 << "Hello, world!" << std::endl;
 	ostr2.close();
-	   	 
+
 	Path pd2("destination");
 	File fd2(pd2);
 	try {
@@ -584,7 +584,7 @@ void FileTest::testRenameFailIfExists() {
 
 void FileTest::testLongPath()
 {
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8) && !defined(_WIN32_WCE)
+#if defined(_WIN32) && !defined(_WIN32_WCE)
 	Poco::Path p("longpathtest");
 	p.makeAbsolute();
 	std::string longpath(p.toString());
@@ -601,7 +601,7 @@ void FileTest::testLongPath()
 	assertTrue (d.isDirectory());
 
 	Poco::File f(p.toString());
-	f.remove(true);	
+	f.remove(true);
 #endif
 }
 

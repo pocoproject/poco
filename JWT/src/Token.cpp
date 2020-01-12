@@ -59,6 +59,14 @@ Token::Token(const Token& token):
 }
 
 
+Token::Token(Token&& token) noexcept:
+	_pHeader(std::move(token._pHeader)),
+	_pPayload(std::move(token._pPayload)),
+	_signature(std::move(token._signature))
+{
+}
+
+
 Token::Token(const std::string& header, const std::string& payload, const std::string& signature)
 {
 	assign(header, payload, signature);
@@ -82,6 +90,16 @@ Token& Token::operator = (const Token& token)
 		std::swap(_pPayload, pPayload);
 		std::swap(_signature, signature);
 	}
+	return *this;
+}
+
+
+Token& Token::operator = (Token&& token) noexcept
+{
+	_pHeader = std::move(token._pHeader);
+	_pPayload = std::move(token._pPayload);
+	_signature = std::move(token._signature);
+
 	return *this;
 }
 

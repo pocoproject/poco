@@ -57,9 +57,9 @@ MemoryPool::~MemoryPool()
 
 void MemoryPool::clear()
 {
-	for (BlockVec::iterator it = _blocks.begin(); it != _blocks.end(); ++it)
+	for (auto p: _blocks)
 	{
-		delete [] *it;
+		delete [] p;
 	}
 	_blocks.clear();
 }

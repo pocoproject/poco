@@ -35,7 +35,7 @@ template <
 >
 class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
 	/// A UniqueAccessExpireLRUCache combines LRU caching and time based per entry expire caching.
-	/// One can define for each cache entry a seperate timepoint
+	/// One can define for each cache entry a separate timepoint
 	/// but also limit the size of the cache (per default: 1024).
 	/// Each TValue object must thus offer the following method:
 	///    
@@ -48,7 +48,7 @@ class UniqueAccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCol
 	/// method to values that do not have a getExpiration function.
 {
 public:
-	UniqueAccessExpireLRUCache(long cacheSize = 1024): 
+	UniqueAccessExpireLRUCache(std::size_t cacheSize = 1024): 
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));

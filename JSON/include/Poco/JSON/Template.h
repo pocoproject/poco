@@ -87,7 +87,7 @@ class JSON_API Template
 	///  A query is passed to Poco::JSON::Query to get the value.
 {
 public:
-	typedef SharedPtr<Template> Ptr;
+	using Ptr = SharedPtr<Template>;
 
 	Template();
 		/// Creates a Template.

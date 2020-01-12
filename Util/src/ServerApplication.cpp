@@ -41,9 +41,7 @@
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 using Poco::NumberFormatter;
@@ -147,21 +145,13 @@ void ServerApplication::ServiceControlHandler(DWORD control)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
-#else
-void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
-#endif
 {
 	ServerApplication& app = static_cast<ServerApplication&>(Application::instance());
 
 	app.config().setBool("application.runAsService", true);
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
-#else
-	_serviceStatusHandle = RegisterServiceCtrlHandlerA("", ServiceControlHandler);
-#endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
 
@@ -176,7 +166,6 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 
 	try
 	{
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::vector<std::string> args;
 		for (DWORD i = 0; i < argc; ++i)
 		{
@@ -185,9 +174,6 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 			args.push_back(arg);
 		}
 		app.init(args);
-#else
-		app.init(argc, argv);
-#endif
 		_serviceStatus.dwCurrentState = SERVICE_RUNNING;
 		SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 		int rc = app.run();
@@ -291,7 +277,6 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	if (!hasConsole() && isService())
@@ -326,26 +311,16 @@ int ServerApplication::run(int argc, wchar_t** argv)
 		return rc;
 	}
 }
-#endif
 
 
 bool ServerApplication::isService()
 {
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
 	svcDispatchTable[0].lpServiceName = L"";
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
 	svcDispatchTable[1].lpServiceProc = NULL;
 	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0;
-#else
-	SERVICE_TABLE_ENTRY svcDispatchTable[2];
-	svcDispatchTable[0].lpServiceName = "";
-	svcDispatchTable[0].lpServiceProc = ServiceMain;
-	svcDispatchTable[1].lpServiceName = NULL;
-	svcDispatchTable[1].lpServiceProc = NULL;
-	return StartServiceCtrlDispatcherA(svcDispatchTable) != 0;
-#endif
 }
 
 
@@ -497,7 +472,6 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	try
@@ -511,7 +485,6 @@ int ServerApplication::run(int argc, wchar_t** argv)
 	}
 	return run();
 }
-#endif
 
 
 #endif // _WIN32_WCE
@@ -615,9 +588,9 @@ int ServerApplication::run(int argc, char** argv)
 int ServerApplication::run(const std::vector<std::string>& args)
 {
 	bool runAsDaemon = false;
-	for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+	for (const auto& arg: args)
 	{
-		if (*it == "--daemon")
+		if (arg == "--daemon")
 		{
 			runAsDaemon = true;
 			break;
@@ -720,11 +693,11 @@ void ServerApplication::handleDaemon(const std::string& name, const std::string&
 void ServerApplication::handleUMask(const std::string& name, const std::string& value)
 {
 	int mask = 0;
-	for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+	for (const auto ch: value)
 	{
 		mask *= 8;
-		if (*it >= '0' && *it <= '7')
-			mask += *it - '0';
+		if (ch >= '0' && ch <= '7')
+			mask += ch - '0';
 		else
 			throw Poco::InvalidArgumentException("umask contains non-octal characters", value);
 	}

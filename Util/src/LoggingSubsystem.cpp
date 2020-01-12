@@ -44,7 +44,7 @@ const char* LoggingSubsystem::name() const
 void LoggingSubsystem::initialize(Application& app)
 {
 	LoggingConfigurator configurator;
-	configurator.configure(&app.config());
+	configurator.configure(app.configPtr());
 	std::string logger = app.config().getString("application.logger", "Application");
 	app.setLogger(Logger::get(logger));
 }

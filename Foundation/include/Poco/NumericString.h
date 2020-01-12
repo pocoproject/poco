@@ -34,10 +34,8 @@
 	#include <locale>
 #endif
 
-#ifndef uintmax_t
+#if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
-#endif
-#ifndef intmax_t
 typedef Poco::Int64 intmax_t;
 #endif
 #if !defined (INTMAX_MAX)
@@ -143,7 +141,7 @@ inline char decimalSeparator()
 	/// default '.' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
+	return std::use_facet<std::numpunct<char>>(std::locale()).decimal_point();
 #else
 	return '.';
 #endif
@@ -155,7 +153,7 @@ inline char thousandSeparator()
 	/// default ',' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
+	return std::use_facet<std::numpunct<char>>(std::locale()).thousands_sep();
 #else
 	return ',';
 #endif
@@ -314,7 +312,7 @@ namespace Impl {
 		Ptr(char* ptr, std::size_t offset): _beg(ptr), _cur(ptr), _end(ptr + offset)
 		{
 		}
-	
+
 		char*& operator ++ () // prefix
 		{
 			checkBounds(_cur + 1);
@@ -327,7 +325,7 @@ namespace Impl {
 			char* tmp = _cur++;
 			return tmp;
 		}
-	
+
 		char*& operator -- () // prefix
 		{
 			checkBounds(_cur - 1);
@@ -372,7 +370,7 @@ namespace Impl {
 		const char* _beg;
 		char*       _cur;
 		const char* _end;
-};	
+};
 
 } // namespace Impl
 
@@ -477,7 +475,7 @@ bool uIntToStr(T value,
 		*result = '\0';
 		return false;
 	}
-	
+
 	Impl::Ptr ptr(result, size);
 	int thCount = 0;
 	T tmpVal;
@@ -492,31 +490,31 @@ bool uIntToStr(T value,
 			thCount = 0;
 		}
 	} while (value);
-	
+
 	if ('0' == fill)
 	{
 		if (prefix && base == 010) --width;
 		if (prefix && base == 0x10) width -= 2;
 		while ((ptr - result) < width) *ptr++ = fill;
 	}
-	
+
 	if (prefix && base == 010) *ptr++ = '0';
 	else if (prefix && base == 0x10)
 	{
 		*ptr++ = 'x';
 		*ptr++ = '0';
 	}
-	
+
 	if ('0' != fill)
 	{
 		while ((ptr - result) < width) *ptr++ = fill;
 	}
-	
+
 	size = ptr - result;
 	poco_assert_dbg (size <= ptr.span());
 	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
 	*ptr-- = '\0';
-	
+
 	char* ptrr = result;
 	char tmp;
 	while(ptrr < ptr)
@@ -525,7 +523,7 @@ bool uIntToStr(T value,
 		*ptr--  = *ptrr;
 		*ptrr++ = tmp;
 	}
-	
+
 	return true;
 }
 
@@ -541,8 +539,8 @@ bool intToStr (T number, unsigned short base, std::string& result, bool prefix =
 	result.assign(res, size);
 	return ret;
 }
-	
-	
+
+
 template <typename T>
 bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
 	/// Converts unsigned integer to string; This is a wrapper function, for details see see the

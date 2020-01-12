@@ -114,12 +114,8 @@
 // Cleanup inconsistencies
 //
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#if defined(POCO_WIN32_UTF8) && defined(POCO_NO_WSTRING)
-		#error POCO_WIN32_UTF8 and POCO_NO_WSTRING are mutually exclusive.
-	#endif
-#else
-	#ifdef POCO_WIN32_UTF8
-		#undef POCO_WIN32_UTF8
+	#if defined(POCO_NO_WSTRING)
+		#error POCO_NO_WSTRING is not supported on Windows.
 	#endif
 #endif
 

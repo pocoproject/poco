@@ -296,8 +296,8 @@ private:
 		PropertyGetter getter;
 	};
 	
-	typedef std::map<std::string, Feature>  FeatureMap;
-	typedef std::map<std::string, Property> PropertyMap;
+	using FeatureMap = std::map<std::string, Feature>;
+	using PropertyMap = std::map<std::string, Property>;
 	
 	FeatureMap  _features;
 	PropertyMap _properties;

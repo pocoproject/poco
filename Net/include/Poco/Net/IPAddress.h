@@ -54,12 +54,12 @@ class Net_API IPAddress
 	/// supports IPv6.
 {
 public:
-	typedef std::vector<IPAddress> List;
+	using List = std::vector<IPAddress>;
 
 	// The following declarations keep the Family type
 	// backwards compatible with the previously used
 	// enum declaration.
-	typedef AddressFamily::Family Family;
+	using Family = AddressFamily::Family;
 	static const Family IPv4 = AddressFamily::IPv4;
 #if defined(POCO_HAVE_IPv6)
 	static const Family IPv6 = AddressFamily::IPv6;

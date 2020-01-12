@@ -35,7 +35,7 @@ namespace Data {
 namespace MySQL {
 
 // End-user include this file and use in code ConnectionException/StatementException
-// So it need not know 
+// So it need not know
 
 class MySQL_API MySQLException: public Poco::Data::DataException
 	/// Base class for all MySQL exceptions
@@ -48,16 +48,16 @@ public:
 	MySQLException(const MySQLException& exc);
 		/// Creates MySQLException.
 
-	~MySQLException() throw();
+	~MySQLException() noexcept;
 		/// Destroys MySQLexception.
 
 	MySQLException& operator=(const MySQLException& exc);
 		/// Assignment operator.
 
-	const char* name() const throw();
+	const char* name() const noexcept;
 		/// Returns exception name.
 
-	const char* className() const throw();
+	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
 	Poco::Exception* clone() const;
@@ -133,12 +133,12 @@ inline MySQLException& MySQLException::operator=(const MySQLException& exc)
 	return *this;
 }
 
-inline const char* MySQLException::name() const throw()
+inline const char* MySQLException::name() const noexcept
 {
 	return "MySQL";
 }
 
-inline const char* MySQLException::className() const throw()
+inline const char* MySQLException::className() const noexcept
 {
 	return typeid(*this).name();
 }

@@ -36,16 +36,16 @@ class Buffer
 	/// is needed.
 {
 public:
-	Buffer(std::size_t capacity):
-		_capacity(capacity),
-		_used(capacity),
+	Buffer(std::size_t length):
+		_capacity(length),
+		_used(length),
 		_ptr(0),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
-		if (capacity > 0)
+		if (length > 0)
 		{
-			_ptr = new T[capacity];
+			_ptr = new T[length];
 		}
 	}
 
@@ -94,6 +94,19 @@ public:
 		}
 	}
 
+	Buffer(Buffer&& other) :
+		/// Copy constructor.
+		_capacity(other._capacity),
+		_used(other._used),
+		_ptr(other._ptr),
+		_ownMem(other._ownMem)
+	{
+		other._capacity = 0;
+		other._used = 0;
+		other._ownMem = false;
+		other._ptr = nullptr;
+	}
+
 	Buffer& operator = (const Buffer& other)
 		/// Assignment operator.
 	{
@@ -101,6 +114,25 @@ public:
 		{
 			Buffer tmp(other);
 			swap(tmp);
+		}
+
+		return *this;
+	}
+
+	Buffer& operator = (Buffer&& other)
+		/// Assignment operator.
+	{
+		if (this != &other)
+		{
+			_capacity = other._capacity;
+			_used = other._used;
+			_ptr = other._ptr;
+			_ownMem = other._ownMem;
+
+			other._capacity = 0;
+			other._used = 0;
+			other._ownMem = false;
+			other._ptr = nullptr;
 		}
 
 		return *this;
@@ -225,6 +257,7 @@ public:
 		swap(_ptr, other._ptr);
 		swap(_capacity, other._capacity);
 		swap(_used, other._used);
+		swap(_ownMem, other._ownMem);
 	}
 
 	bool operator == (const Buffer& other) const

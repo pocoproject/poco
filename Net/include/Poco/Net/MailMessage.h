@@ -52,7 +52,7 @@ class Net_API MailMessage: public MessageHeader
 	/// and base64.
 {
 public:
-	typedef std::vector<MailRecipient> Recipients;
+	using Recipients = std::vector<MailRecipient>;
 
 	enum ContentDisposition
 	{
@@ -76,7 +76,7 @@ public:
 		ContentTransferEncoding encoding;
 	};
 
-	typedef std::vector<Part> PartVec;
+	using PartVec = std::vector<Part>;
 
 	MailMessage(PartStoreFactory* pStoreFactory = 0);
 		/// Creates an empty MailMessage.

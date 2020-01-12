@@ -22,10 +22,8 @@
 #include "Poco/ScopedLock.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS) 
 #include "Poco/NamedMutex_WIN32U.h"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/NamedMutex_WIN32.h"
 #elif POCO_OS == POCO_OS_ANDROID
 #include "Poco/NamedMutex_Android.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -55,7 +53,7 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 	/// interfere with each other.
 {
 public:
-	typedef Poco::ScopedLock<NamedMutex> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<NamedMutex>;
 
 	NamedMutex(const std::string& name);
 		/// creates the Mutex.

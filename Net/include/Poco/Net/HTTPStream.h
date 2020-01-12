@@ -38,7 +38,7 @@ class Net_API HTTPStreamBuf: public HTTPBasicStreamBuf
 	/// HTTP message bodies.
 {
 public:
-	typedef HTTPBasicStreamBuf::openmode openmode;
+	using openmode = HTTPBasicStreamBuf::openmode;
 
 	HTTPStreamBuf(HTTPSession& session, openmode mode);
 	~HTTPStreamBuf();

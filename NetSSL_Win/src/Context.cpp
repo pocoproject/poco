@@ -46,6 +46,7 @@ Context::Context(Usage usage,
 	_usage(usage),
 	_mode(verMode),
 	_options(options),
+	_disabledProtocols(0),
 	_extendedCertificateVerification(true),
 	_certNameOrPath(certNameOrPath),
 	_certStoreName(certStore),
@@ -312,15 +313,15 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
 	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
-										NULL,
-										UNISP_NAME_W,
-										isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
-										NULL,
-										&schannelCred,
-										NULL,
-										NULL,
-										&credHandle,
-										&tsExpiry);
+		NULL,
+		UNISP_NAME_W,
+		isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
+		NULL,
+		&schannelCred,
+		NULL,
+		NULL,
+		&credHandle,
+		&tsExpiry);
 
 	if (status != SEC_E_OK)
 	{
@@ -331,10 +332,12 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 
 DWORD Context::proto() const
 {
+	DWORD result = 0;
 	switch (_usage)
 	{
+	case Context::TLS_CLIENT_USE:
 	case Context::CLIENT_USE:
-		return SP_PROT_SSL3_CLIENT
+		result = SP_PROT_SSL3_CLIENT
 			| SP_PROT_TLS1_CLIENT
 #if defined(SP_PROT_TLS1_1)
 			| SP_PROT_TLS1_1_CLIENT
@@ -342,9 +345,15 @@ DWORD Context::proto() const
 #if defined(SP_PROT_TLS1_2)
 			| SP_PROT_TLS1_2_CLIENT
 #endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
 			;
+			break;
+
+	case Context::TLS_SERVER_USE:
 	case Context::SERVER_USE:
-		return SP_PROT_SSL3_SERVER
+		result = SP_PROT_SSL3_SERVER
 			| SP_PROT_TLS1_SERVER
 #if defined(SP_PROT_TLS1_1)
 			| SP_PROT_TLS1_1_SERVER
@@ -352,48 +361,161 @@ DWORD Context::proto() const
 #if defined(SP_PROT_TLS1_2)
 			| SP_PROT_TLS1_2_SERVER
 #endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
 			;
+			break;
+
 	case Context::TLSV1_CLIENT_USE:
-		return SP_PROT_TLS1_CLIENT
+		result = SP_PROT_TLS1_CLIENT
 #if defined(SP_PROT_TLS1_1)
 			| SP_PROT_TLS1_1_CLIENT
 #endif
 #if defined(SP_PROT_TLS1_2)
 			| SP_PROT_TLS1_2_CLIENT
 #endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
 			;
+			break;
+
 	case Context::TLSV1_SERVER_USE:
-		return SP_PROT_TLS1_SERVER
+		result = SP_PROT_TLS1_SERVER
 #if defined(SP_PROT_TLS1_1)
 			| SP_PROT_TLS1_1_SERVER
 #endif
 #if defined(SP_PROT_TLS1_2)
 			| SP_PROT_TLS1_2_SERVER
 #endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
 			;
+			break;
+
 #if defined(SP_PROT_TLS1_1)
 	case Context::TLSV1_1_CLIENT_USE:
-		return SP_PROT_TLS1_1_CLIENT
+		result = SP_PROT_TLS1_1_CLIENT
 #if defined(SP_PROT_TLS1_2)
 			| SP_PROT_TLS1_2_CLIENT
 #endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
 			;
+			break;
+
 	case Context::TLSV1_1_SERVER_USE:
-		return SP_PROT_TLS1_1_SERVER
+		result = SP_PROT_TLS1_1_SERVER
 #if defined(SP_PROT_TLS1_2)
 			| SP_PROT_TLS1_2_SERVER
 #endif
-			;
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
 #endif
+			;
+			break;
+#endif
+
 #if defined(SP_PROT_TLS1_2)
 	case Context::TLSV1_2_CLIENT_USE:
-		return SP_PROT_TLS1_2_CLIENT;
-	case Context::TLSV1_2_SERVER_USE:
-		return SP_PROT_TLS1_2_SERVER;
+		result = SP_PROT_TLS1_2_CLIENT
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
 #endif
+			;
+			break;
+
+	case Context::TLSV1_2_SERVER_USE:
+		result = SP_PROT_TLS1_2_SERVER
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
+			;
+			break;
+#endif
+
+#if defined(SP_PROT_TLS1_3)
+	case Context::TLSV1_3_CLIENT_USE:
+		result = SP_PROT_TLS1_3_CLIENT;
+		break;
+
+	case Context::TLSV1_3_SERVER_USE:
+		result = SP_PROT_TLS1_3_SERVER;
+		break;
+#endif
+
 	default:
 		throw Poco::InvalidArgumentException("Unsupported SSL/TLS protocol version");
 	}
+
+	return result & enabledProtocols();
 }
+
+
+DWORD Context::enabledProtocols() const
+{
+	DWORD result = 0;
+	if (!(_disabledProtocols & PROTO_SSLV3))
+	{
+		result |= SP_PROT_SSL3_CLIENT | SP_PROT_SSL3_SERVER;
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1))
+	{
+		result |= SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_SERVER;
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1_1))
+	{
+#ifdef SP_PROT_TLS1_1_CLIENT
+		result |= SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_1_SERVER;
+#endif
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1_2))
+	{
+#ifdef SP_PROT_TLS1_2_CLIENT
+		result |= SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_2_SERVER;
+#endif
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1_3))
+	{
+#ifdef SP_PROT_TLS1_3_CLIENT
+		result |= SP_PROT_TLS1_3_CLIENT | SP_PROT_TLS1_3_SERVER;
+#endif
+	}
+	return result;
+}
+
+
+void Context::disableProtocols(int protocols)
+{
+	_disabledProtocols = protocols;
+}
+
+
+void Context::requireMinimumProtocol(Protocols protocol)
+{
+	_disabledProtocols = 0;
+	switch (protocol)
+	{
+	case PROTO_SSLV3:
+		_disabledProtocols = PROTO_SSLV2;
+		break;
+	case PROTO_TLSV1:  
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3;
+		break;
+	case PROTO_TLSV1_1: 
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1;
+		break;
+	case PROTO_TLSV1_2: 
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1;
+		break;
+	case PROTO_TLSV1_3: 
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1 | PROTO_TLSV1_2;
+		break;
+	}
+}
+
 
 } } // namespace Poco::Net

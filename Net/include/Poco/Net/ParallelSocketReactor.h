@@ -46,7 +46,7 @@ template <class SR>
 class ParallelSocketReactor: public SR
 {
 public:
-	typedef Poco::SharedPtr<ParallelSocketReactor> Ptr;
+	using Ptr = Poco::SharedPtr<ParallelSocketReactor>;
 
 	ParallelSocketReactor()
 	{

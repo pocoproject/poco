@@ -58,10 +58,10 @@ class JSON_API Array
 	/// ----
 {
 public:
-	typedef std::vector<Dynamic::Var>                 ValueVec;
-	typedef std::vector<Dynamic::Var>::iterator       Iterator;
-	typedef std::vector<Dynamic::Var>::const_iterator ConstIterator;
-	typedef SharedPtr<Array> Ptr;
+	using ValueVec = std::vector<Dynamic::Var>;
+	using Iterator = std::vector<Dynamic::Var>::iterator;
+	using ConstIterator = std::vector<Dynamic::Var>::const_iterator;
+	using Ptr = SharedPtr<Array>;
 
 	Array(int options = 0);
 		/// Creates an empty Array.
@@ -73,15 +73,11 @@ public:
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
 
-#ifdef POCO_ENABLE_CPP11
-
 	Array(Array&& other);
 		/// Move constructor
 
 	Array& operator=(Array&& other);
 		/// Move assignment operator.
-
-#endif // POCO_ENABLE_CPP11
 
 	Array& operator=(const Array& other);
 		/// Assignment operator.

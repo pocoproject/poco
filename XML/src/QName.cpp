@@ -49,6 +49,48 @@ QName::QName(const std::string& ns, const std::string& name, const std::string& 
 }
 
 
+QName::QName(const QName& qname):
+	_ns(qname._ns),
+	_name(qname._name),
+	_prefix(qname._prefix)
+{
+}
+
+
+QName::QName(QName&& qname) noexcept:
+	_ns(std::move(qname._ns)),
+	_name(std::move(qname._name)),
+	_prefix(std::move(qname._prefix))
+{
+}
+
+
+QName& QName::operator = (const QName& qname)
+{
+	QName tmp(qname);
+	swap(tmp);
+	return *this;
+}
+
+
+QName& QName::operator = (QName&& qname) noexcept
+{
+	_ns = std::move(qname._ns);
+	_name = std::move(qname._name);
+	_prefix = std::move(qname._prefix);
+	
+	return *this;
+}
+
+
+void QName::swap(QName& qname)
+{
+	std::swap(_ns, qname._ns);
+	std::swap(_name, qname._name);
+	std::swap(_prefix, qname._prefix);
+}
+
+
 std::string QName::toString() const
 {
 	std::string r;

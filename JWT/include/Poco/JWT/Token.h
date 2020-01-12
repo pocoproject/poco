@@ -61,11 +61,17 @@ public:
 	Token(const Token& token);
 		/// Creates a JSON Web Token by copying another one.
 
+	Token(Token&& token) noexcept;
+		/// Creates a JSON Web Token by moving another one.
+
 	~Token();
 		/// Destroys the Token.
 
 	Token& operator = (const Token& token);
 		/// Assignment operator.
+
+	Token& operator = (Token&& token) noexcept;
+		/// Move assignment operator.
 
 	Token& operator = (const std::string& token);
 		/// Parses and assigns serialized JWT.

@@ -155,7 +155,7 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
 		/// Extracts an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
 

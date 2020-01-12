@@ -19,7 +19,7 @@ namespace Poco {
 namespace Data {
 
 
-AbstractPreparator::AbstractPreparator(Poco::UInt32 length): 
+AbstractPreparator::AbstractPreparator(Poco::UInt32 length):
 	_length(length),
 	_bulk(false)
 {
@@ -175,7 +175,7 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::UInt64>&
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 void AbstractPreparator::prepare(std::size_t pos, const std::vector<long>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");

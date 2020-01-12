@@ -80,11 +80,11 @@ int NestedDiagnosticContext::depth() const
 std::string NestedDiagnosticContext::toString() const
 {
 	std::string result;
-	for (Stack::const_iterator it = _stack.begin(); it != _stack.end(); ++it)
+	for (const auto& i: _stack)
 	{
 		if (!result.empty())
 			result.append(":");
-		result.append(it->info);
+		result.append(i.info);
 	}
 	return result;
 }
@@ -98,11 +98,11 @@ void NestedDiagnosticContext::dump(std::ostream& ostr) const
 
 void NestedDiagnosticContext::dump(std::ostream& ostr, const std::string& delimiter) const
 {
-	for (Stack::const_iterator it = _stack.begin(); it != _stack.end(); ++it)
+	for (const auto& i: _stack)
 	{
-		ostr << it->info;
-		if (it->file)
-			ostr << " (in \"" << it->file << "\", line " << it->line << ")";
+		ostr << i.info;
+		if (i.file)
+			ostr << " (in \"" << i.file << "\", line " << i.line << ")";
 		ostr << delimiter;
 	}
 }

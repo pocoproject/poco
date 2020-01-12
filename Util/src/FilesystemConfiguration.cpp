@@ -116,9 +116,9 @@ Path FilesystemConfiguration::keyToPath(const std::string& key) const
 {
 	Path result(_path);
 	StringTokenizer tokenizer(key, ".", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-	for (StringTokenizer::Iterator it = tokenizer.begin(); it != tokenizer.end(); ++it)
+	for (const auto& tok: tokenizer)
 	{
-		result.pushDirectory(*it);
+		result.pushDirectory(tok);
 	}	
 	return result;
 }

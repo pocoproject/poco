@@ -35,7 +35,7 @@ public:
 	XMLStreamParserException(const XMLStreamParser&, const std::string& description);
 	virtual ~XMLStreamParserException() throw ();
 
-	const char* name() const throw();
+	const char* name() const noexcept;
 	Poco::UInt64 line() const;
 	Poco::UInt64 column() const;
 	const std::string& description() const;

@@ -55,7 +55,7 @@ void XMLStreamParserException::init()
 }
 
 
-const char* XMLStreamParserException::name() const throw()
+const char* XMLStreamParserException::name() const noexcept
 {
 	return _name.c_str();
 }

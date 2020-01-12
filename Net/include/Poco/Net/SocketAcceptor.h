@@ -68,7 +68,7 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	typedef Poco::Observer<SocketAcceptor, ReadableNotification> Observer;
+	using Observer = Poco::Observer<SocketAcceptor, ReadableNotification>;
 
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),

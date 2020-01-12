@@ -51,7 +51,7 @@ class Data_API AbstractExtractor
 	/// If an extractor receives null it is not allowed to change val!
 {
 public:
-	typedef SharedPtr<AbstractExtractor> Ptr;
+	using Ptr = SharedPtr<AbstractExtractor>;
 
 	AbstractExtractor();
 		/// Creates the AbstractExtractor.
@@ -155,7 +155,7 @@ public:
 	virtual bool extract(std::size_t pos, std::list<Poco::UInt64>& val);
 		/// Extracts an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	virtual bool extract(std::size_t pos, long& val) = 0;
 		/// Extracts a long. Returns false if null was received.
 

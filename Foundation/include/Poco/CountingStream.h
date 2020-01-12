@@ -46,34 +46,34 @@ public:
 	~CountingStreamBuf();
 		/// Destroys the CountingStream.
 		
-	int chars() const;
+	std::streamsize chars() const;
 		/// Returns the total number of characters.
 		
-	int lines() const;
+	std::streamsize lines() const;
 		/// Returns the total number of lines.
 		
-	int pos() const;
+	std::streamsize pos() const;
 		/// Returns the number of characters on the current line.
 		
 	void reset();
 		/// Resets all counters.
 		
-	void setCurrentLineNumber(int line);
+	void setCurrentLineNumber(std::streamsize line);
 		/// Sets the current line number.
 		///
 		/// This is mainly useful when parsing C/C++
 		/// preprocessed source code containing #line directives.
 		
-	int getCurrentLineNumber() const;
+	std::streamsize getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
-	void addChars(int chars);
+	void addChars(std::streamsize chars);
 		/// Add to the total number of characters.
 		
-	void addLines(int lines);
+	void addLines(std::streamsize lines);
 		/// Add to the total number of lines.
 		
-	void addPos(int pos);
+	void addPos(std::streamsize pos);
 		/// Add to the number of characters on the current line.
 
 protected:
@@ -83,9 +83,9 @@ protected:
 private:
 	std::istream* _pIstr;
 	std::ostream* _pOstr;
-	int _chars;
-	int _lines;
-	int _pos;
+	std::streamsize _chars;
+	std::streamsize _lines;
+	std::streamsize _pos;
 };
 
 
@@ -110,34 +110,34 @@ public:
 	~CountingIOS();
 		/// Destroys the stream.
 
-	int chars() const;
+	std::streamsize chars() const;
 		/// Returns the total number of characters.
 
-	int lines() const;
+	std::streamsize lines() const;
 		/// Returns the total number of lines.
 
-	int pos() const;
+	std::streamsize pos() const;
 		/// Returns the number of characters on the current line.
 
 	void reset();
 		/// Resets all counters.
 
-	void setCurrentLineNumber(int line);
+	void setCurrentLineNumber(std::streamsize line);
 		/// Sets the current line number.
 		///
 		/// This is mainly useful when parsing C/C++
 		/// preprocessed source code containing #line directives.
 		
-	int getCurrentLineNumber() const;
+	std::streamsize getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
-	void addChars(int chars);
+	void addChars(std::streamsize chars);
 		/// Add to the total number of characters.
 		
-	void addLines(int lines);
+	void addLines(std::streamsize lines);
 		/// Add to the total number of lines.
 		
-	void addPos(int pos);
+	void addPos(std::streamsize pos);
 		/// Add to the number of characters on the current line.
 
 	CountingStreamBuf* rdbuf();
@@ -183,49 +183,49 @@ public:
 //
 // inlines
 //
-inline int CountingStreamBuf::chars() const
+inline std::streamsize CountingStreamBuf::chars() const
 {
 	return _chars;
 }
 
 
-inline int CountingStreamBuf::lines() const
+inline std::streamsize CountingStreamBuf::lines() const
 {
 	return _lines;
 }
 
 
-inline int CountingStreamBuf::pos() const
+inline std::streamsize CountingStreamBuf::pos() const
 {
 	return _pos;
 }
 
 
-inline int CountingStreamBuf::getCurrentLineNumber() const
+inline std::streamsize CountingStreamBuf::getCurrentLineNumber() const
 {
 	return _lines;
 }
 
 
-inline int CountingIOS::chars() const
+inline std::streamsize CountingIOS::chars() const
 {
 	return _buf.chars();
 }
 
 
-inline int CountingIOS::lines() const
+inline std::streamsize CountingIOS::lines() const
 {
 	return _buf.lines();
 }
 
 
-inline int CountingIOS::pos() const
+inline std::streamsize CountingIOS::pos() const
 {
 	return _buf.pos();
 }
 
 
-inline int CountingIOS::getCurrentLineNumber() const
+inline std::streamsize CountingIOS::getCurrentLineNumber() const
 {
 	return _buf.getCurrentLineNumber();
 }

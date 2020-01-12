@@ -56,7 +56,7 @@ OpenSSLException::OpenSSLException(const OpenSSLException& exc): CryptoException
 }
 
 
-OpenSSLException::~OpenSSLException() throw()
+OpenSSLException::~OpenSSLException() noexcept
 {
 }
 
@@ -68,13 +68,13 @@ OpenSSLException& OpenSSLException::operator = (const OpenSSLException& exc)
 }
 
 
-const char* OpenSSLException::name() const throw()
+const char* OpenSSLException::name() const noexcept
 {
 	return "OpenSSLException";
 }
 
 
-const char* OpenSSLException::className() const throw()
+const char* OpenSSLException::className() const noexcept
 {
 	return typeid(*this).name();
 }

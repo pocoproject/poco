@@ -86,6 +86,8 @@ class Foundation_API Base64Decoder: public Base64DecoderIOS, public std::istream
 	/// This istream base64-decodes all data
 	/// read from the istream connected to it.
 	///
+	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
+	///
 	/// Note: For performance reasons, the characters 
 	/// are read directly from the given istream's 
 	/// underlying streambuf, so the state

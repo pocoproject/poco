@@ -57,8 +57,8 @@ class Crypto_API CipherKey
 	///
 {
 public:
-	typedef CipherKeyImpl::Mode Mode;
-	typedef CipherKeyImpl::ByteVec ByteVec;
+	using Mode = CipherKeyImpl::Mode;
+	using ByteVec = CipherKeyImpl::ByteVec;
 
 	enum
 	{

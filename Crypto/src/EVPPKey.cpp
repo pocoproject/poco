@@ -89,7 +89,15 @@ EVPPKey::EVPPKey(const EVPPKey& other)
 }
 
 
-EVPPKey& EVPPKey::operator=(const EVPPKey& other)
+EVPPKey::EVPPKey(EVPPKey&& other) noexcept: 
+	_pEVPPKey(other._pEVPPKey)
+{
+	other._pEVPPKey = nullptr;
+	poco_check_ptr(_pEVPPKey);
+}
+
+
+EVPPKey& EVPPKey::operator = (const EVPPKey& other)
 {
 	duplicate(other._pEVPPKey, &_pEVPPKey);
 	poco_check_ptr(_pEVPPKey);
@@ -97,16 +105,7 @@ EVPPKey& EVPPKey::operator=(const EVPPKey& other)
 }
 
 
-#ifdef POCO_ENABLE_CPP11
-
-EVPPKey::EVPPKey(EVPPKey&& other): _pEVPPKey(other._pEVPPKey)
-{
-	other._pEVPPKey = nullptr;
-	poco_check_ptr(_pEVPPKey);
-}
-
-
-EVPPKey& EVPPKey::operator=(EVPPKey&& other)
+EVPPKey& EVPPKey::operator = (EVPPKey&& other) noexcept
 {
 	_pEVPPKey = other._pEVPPKey;
 	other._pEVPPKey = nullptr;
@@ -114,7 +113,6 @@ EVPPKey& EVPPKey::operator=(EVPPKey&& other)
 	return *this;
 }
 
-#endif // POCO_ENABLE_CPP11
 
 EVPPKey::~EVPPKey()
 {

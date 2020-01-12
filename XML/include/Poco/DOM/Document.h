@@ -58,7 +58,7 @@ class XML_API Document: public AbstractContainerNode, public DocumentEvent
 	/// context they were created.
 {
 public:
-	typedef Poco::AutoReleasePool<DOMObject> AutoReleasePool;
+	using AutoReleasePool = Poco::AutoReleasePool<DOMObject>;
 
 	explicit Document(NamePool* pNamePool = 0);
 		/// Creates a new document. If pNamePool == 0, the document

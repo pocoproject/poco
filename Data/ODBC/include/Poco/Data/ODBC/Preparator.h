@@ -204,7 +204,7 @@ public:
 	void prepare(std::size_t pos, const std::list<Poco::UInt64>& val);
 		/// Prepares an UInt64 list.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	void prepare(std::size_t pos, const long& val);
 		/// Prepares a long.
 
@@ -877,7 +877,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::UInt64>& 
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 inline void Preparator::prepare(std::size_t pos, const long&)
 {
 	prepareFixedSize<long>(pos, SQL_C_SLONG);

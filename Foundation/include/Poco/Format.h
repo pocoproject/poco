@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Any.h"
 #include <vector>
+#include <type_traits>
 
 
 namespace Poco {
@@ -80,11 +81,13 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * h      argument is short (d, i), unsigned short (o, u, x, X) or float (e, E, f, g, G)
 	///   * ?      argument is any signed or unsigned int, short, long, or 64-bit integer (d, i, o, x, X)
 	///
-	/// The width argument is a nonnegative decimal integer controlling the minimum number of characters printed.
+	/// The width argument is a nonnegative decimal integer or '*' with an additional nonnegative integer value
+	/// preceding the value to be formated, controlling the minimum number of characters printed.
 	/// If the number of characters in the output value is less than the specified width, blanks or
 	/// leading zeros are added, according to the specified flags (-, +, 0).
 	///
-	/// Precision is a nonnegative decimal integer, preceded by a period (.), which specifies the number of characters 
+	/// Precision is a nonnegative decimal integer or '*' with an additional nonnegative integer value preceding
+	/// the value to be formated, preceded by a period (.), which specifies the number of characters
 	/// to be printed, the number of decimal places, or the number of significant digits.
 	///
 	/// Throws an InvalidArgumentException if an argument index is out of range.
@@ -102,34 +105,45 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///     std::string s1 = format("The answer to life, the universe, and everything is %d", 42);
 	///     std::string s2 = format("second: %[1]d, first: %[0]d", 1, 2);
 
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-std::string Foundation_API format(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
-
-
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value);
-	/// Appends the formatted string to result.
-	
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-void Foundation_API format(std::string& result, const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
-
+void Foundation_API format(std::string& result, const char *fmt, const std::vector<Any>& values);
+	/// Supports a variable number of arguments and is used by
+	/// all other variants of format().
 
 void Foundation_API format(std::string& result, const std::string& fmt, const std::vector<Any>& values);
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
+
+
+template <
+	typename T, 
+	typename... Args>
+void format(std::string &result, const std::string &fmt, T arg1, Args... args)
+	/// Appends the formatted string to result.
+{
+	std::vector<Any> values;
+	values.reserve(sizeof...(Args) + 1);
+	values.emplace_back(arg1);
+	values.insert(values.end(), { args... });
+	format(result, fmt, values);
+}
+	
+
+template <
+	typename FMT, 
+	typename T, 
+	typename... Args,
+	typename std::enable_if<std::is_const<typename std::remove_reference<FMT>::type>::value, int>::type = 0>
+std::string format(FMT &fmt, T arg1, Args... args)
+	/// Returns the formatted string.
+{
+	std::vector<Any> values;
+	values.reserve(sizeof...(Args) + 1);
+	values.emplace_back(arg1);
+	values.insert(values.end(), { args... });
+	std::string result;
+	format(result, fmt, values);
+	return result;
+}
 
 
 } // namespace Poco

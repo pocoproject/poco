@@ -78,7 +78,7 @@ public:
 	bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
 
@@ -124,15 +124,15 @@ public:
 
 	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW);
 		/// Returns true if the current row value at pos column is null.
-		/// Because of the loss of information about null-ness of the 
-		/// underlying database values due to the nature of SQLite engine, 
-		/// (once null value is converted to default value, SQLite API 
+		/// Because of the loss of information about null-ness of the
+		/// underlying database values due to the nature of SQLite engine,
+		/// (once null value is converted to default value, SQLite API
 		/// treats it  as non-null), a null indicator container member
-		/// variable is used to cache the indicators of the underlying nulls 
-		/// thus rendering this function idempotent. 
+		/// variable is used to cache the indicators of the underlying nulls
+		/// thus rendering this function idempotent.
 		/// The container is a vector of [bool, bool] pairs.
 		/// The vector index corresponds to the column position, the first
-		/// bool value in the pair is true if the null indicator has 
+		/// bool value in the pair is true if the null indicator has
 		/// been set and the second bool value in the pair is true if
 		/// the column is actually null.
 		/// The row argument, needed for connectors with bulk capabilities,
@@ -155,112 +155,112 @@ private:
 		case MetaColumn::FDT_BOOL:
 		{
 			bool i = false;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_INT8:
 		{
 			Poco::Int8 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_UINT8:
 		{
 			Poco::UInt8 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_INT16:
 		{
 			Poco::Int16 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_UINT16:
 		{
 			Poco::UInt16 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_INT32:
 		{
 			Poco::Int32 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_UINT32:
 		{
 			Poco::UInt32 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_INT64:
 		{
 			Poco::Int64 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_UINT64:
 		{
 			Poco::UInt64 i = 0;
-			ret = extract(pos, i); 
+			ret = extract(pos, i);
 			val = i;
 			break;
 		}
 		case MetaColumn::FDT_STRING:
 		{
 			std::string s;
-			ret = extract(pos, s); 
+			ret = extract(pos, s);
 			val = s;
 			break;
 		}
 		case MetaColumn::FDT_DOUBLE:
 		{
 			double d(0.0);
-			ret = extract(pos, d); 
+			ret = extract(pos, d);
 			val = d;
 			break;
 		}
 		case MetaColumn::FDT_FLOAT:
 		{
 			float f(0.0);
-			ret = extract(pos, f); 
+			ret = extract(pos, f);
 			val = f;
 			break;
 		}
 		case MetaColumn::FDT_BLOB:
 		{
 			BLOB b;
-			ret = extract(pos, b); 
+			ret = extract(pos, b);
 			val = b;
 			break;
 		}
 		case MetaColumn::FDT_DATE:
 		{
 			Date d;
-			ret = extract(pos, d); 
+			ret = extract(pos, d);
 			val = d;
 			break;
 		}
 		case MetaColumn::FDT_TIME:
 		{
 			Time t;
-			ret = extract(pos, t); 
+			ret = extract(pos, t);
 			val = t;
 			break;
 		}
 		case MetaColumn::FDT_TIMESTAMP:
 		{
 			DateTime dt;
-			ret = extract(pos, dt); 
+			ret = extract(pos, dt);
 			val = dt;
 			break;
 		}

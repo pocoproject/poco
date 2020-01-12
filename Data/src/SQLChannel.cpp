@@ -244,7 +244,7 @@ std::string SQLChannel::getProperty(const std::string& name) const
 	}
 	else if (name == PROP_ARCHIVE_TABLE)
 	{
-		return _pArchiveStrategy ? _pArchiveStrategy->getDestination() : "" ;
+		return _pArchiveStrategy ? _pArchiveStrategy->getDestination() : "";
 	}
 	else if (name == PROP_MAX_AGE)
 	{

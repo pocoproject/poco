@@ -36,7 +36,7 @@ class Zip_API ZipOperation: public Poco::RefCountedObject
 	/// Abstract super class for operations on individual zip entries
 {
 public:
-	typedef Poco::AutoPtr<ZipOperation> Ptr;
+	using Ptr = Poco::AutoPtr<ZipOperation>;
 
 	ZipOperation();
 		/// Creates the ZipOperation.

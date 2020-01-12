@@ -21,9 +21,6 @@
 #include "Poco/Foundation.h"
 
 
-#ifdef POCO_ENABLE_CPP11
-
-
 #ifdef min
 #undef min
 #endif
@@ -46,9 +43,6 @@ using OrderedSet = tsl::ordered_set<Key, Hash, KeyEqual, Allocator, ValueTypeCon
 	/// For documentation, see https://tessil.github.io/ordered-map/
 
 } // namespace Poco
-
-
-#endif // POCO_ENABLE_CPP11
 
 
 #endif // Foundation_OrderedSet_INCLUDED

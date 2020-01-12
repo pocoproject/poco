@@ -103,6 +103,9 @@ public:
 		/// Returns true iff the given character is an uppercase alphabetic
 		/// character.
 		
+	static bool isPrintable(int ch);
+		/// Returns true iff the given character is printable.
+
 	static int toLower(int ch);
 		/// If the given character is an uppercase character,
 		/// return its lowercase counterpart, otherwise return
@@ -193,6 +196,12 @@ inline bool Ascii::isLower(int ch)
 inline bool Ascii::isUpper(int ch)
 {
 	return hasProperties(ch, ACP_UPPER);
+}
+
+
+inline bool Ascii::isPrintable(int ch)
+{
+	return hasProperties(ch, ACP_PRINT);
 }
 
 

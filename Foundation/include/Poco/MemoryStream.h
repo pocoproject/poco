@@ -172,7 +172,7 @@ private:
 //
 // We provide an instantiation for char
 //
-typedef BasicMemoryStreamBuf<char, std::char_traits<char> > MemoryStreamBuf;
+typedef BasicMemoryStreamBuf<char, std::char_traits<char>> MemoryStreamBuf;
 
 
 class Foundation_API MemoryIOS: public virtual std::ios

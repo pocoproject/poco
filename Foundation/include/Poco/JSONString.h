@@ -42,7 +42,7 @@ enum JSONOptions
 		/// If specified, the object will preserve the items
 		/// insertion order. Otherwise, items will be sorted
 		/// by keys.
-	};
+};
 
 
 //@ deprecated

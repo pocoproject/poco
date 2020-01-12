@@ -47,8 +47,8 @@ class Foundation_API TaskManager
 	/// will only be sent out once in 100 milliseconds.
 {
 public:
-	typedef AutoPtr<Task>      TaskPtr;
-	typedef std::list<TaskPtr> TaskList;
+	using TaskPtr = AutoPtr<Task>;
+	using TaskList = std::list<TaskPtr>;
 
 	TaskManager();
 		/// Creates the TaskManager, using the

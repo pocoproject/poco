@@ -32,7 +32,7 @@ namespace Poco {
 
 
 //@ deprecated
-template <class Key, class Value, class KeyHashFunction = HashFunction<Key> >
+template <class Key, class Value, class KeyHashFunction = HashFunction<Key>>
 class HashTable
 	/// A HashTable stores a key value pair that can be looked up via a hashed key.
 	///

@@ -1,5 +1,0 @@
-[submodule "openssl"]
-	path = openssl
-	url = https://github.com/pocoproject/openssl
-	branch = develop
-

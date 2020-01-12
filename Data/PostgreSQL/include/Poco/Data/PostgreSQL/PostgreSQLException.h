@@ -41,16 +41,16 @@ public:
 	PostgreSQLException(const PostgreSQLException& exc);
 		/// Creates PostgreSQLException.
 
-	~PostgreSQLException() throw();
+	~PostgreSQLException() noexcept;
 		/// Destroys PostgreSQLexception.
 
 	PostgreSQLException& operator=(const PostgreSQLException& exc);
 		/// Assignment operator.
 
-	const char* name() const throw();
+	const char* name() const noexcept;
 		/// Returns exception name.
 
-	const char* className() const throw();
+	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
 	Poco::Exception* clone() const;
@@ -110,13 +110,13 @@ inline PostgreSQLException& PostgreSQLException::operator=(const PostgreSQLExcep
 }
 
 
-inline const char* PostgreSQLException::name() const throw()
+inline const char* PostgreSQLException::name() const noexcept
 {
 	return "PostgreSQL";
 }
 
 
-inline const char* PostgreSQLException::className() const throw()
+inline const char* PostgreSQLException::className() const noexcept
 {
 	return typeid(*this).name();
 }

@@ -141,8 +141,8 @@ protected:
 	void run();
 
 private:
-	volatile long _startInterval;
-	volatile long _periodicInterval;
+	long _startInterval;
+	long _periodicInterval;
 	Event         _wakeUp;
 	Event         _done;
 	long          _skipped;

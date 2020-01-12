@@ -33,16 +33,13 @@ namespace Dynamic {
 
 class Var;
 class VarHolder;
-template <class> class VarHolderImpl;
+template <class T> class VarHolderImpl;
 
 }
 
+
 #ifndef POCO_NO_SOO
 
-#ifndef POCO_ENABLE_CPP11
-	// C++11 needed for std::aligned_storage
-	#error "Any SOO can only be enabled with C++11 support"
-#endif
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
 union Placeholder
@@ -61,7 +58,7 @@ public:
 		static const unsigned int value = SizeV;
 	};
 
-	Placeholder ()
+	Placeholder()
 	{
 		erase();
 	}
@@ -96,7 +93,7 @@ private:
 	typedef typename std::aligned_storage<SizeV + 1>::type AlignerType;
 	
 	PlaceholderT* pHolder;
-	mutable char  holder [SizeV + 1];
+	mutable char  holder[SizeV + 1];
 	AlignerType   aligner;
 
 	friend class Any;
@@ -121,7 +118,6 @@ union Placeholder
 	/// where the object was allocated (0 => heap, 1 => local).
 {
 public:
-
 	Placeholder ()
 	{
 	}
@@ -136,7 +132,7 @@ public:
 private:
 #endif
 	
-	PlaceholderT*         pHolder;
+	PlaceholderT* pHolder;
 
 	friend class Any;
 	friend class Dynamic::Var;
@@ -201,7 +197,7 @@ public:
 	Any& swap(Any& other)
 		/// Swaps the content of the two Anys.
 		/// 
-		/// When small object optimizaton is enabled, swap only
+		/// When small object optimization is enabled, swap only
 		/// has no-throw guarantee when both (*this and other)
 		/// objects are allocated on the heap.
 	{
@@ -270,14 +266,10 @@ public:
 	}
 
 private:
-
 	class ValueHolder
 	{
 	public:
-	
-		virtual ~ValueHolder()
-		{
-		}
+		virtual ~ValueHolder() = default;
 
 		virtual const std::type_info & type() const = 0;
 		virtual void clone(Placeholder<ValueHolder>*) const = 0;
@@ -427,9 +419,7 @@ private:
 	class ValueHolder
 	{
 	public:
-		virtual ~ValueHolder()
-		{
-		}
+		virtual ~ValueHolder() = default;
 
 		virtual const std::type_info& type() const = 0;
 		virtual ValueHolder* clone() const = 0;
@@ -457,7 +447,7 @@ private:
 		ValueType _held;
 
 	private:
-		Holder & operator=(const Holder &);
+		Holder & operator = (const Holder &);
 	};
 
 	ValueHolder* content() const
@@ -476,6 +466,14 @@ private:
 	template <typename ValueType>
 	friend ValueType* UnsafeAnyCast(Any*);
 
+	template <typename ValueType>
+	friend const ValueType& RefAnyCast(const Any&);
+
+	template <typename ValueType>
+	friend ValueType& RefAnyCast(Any&);
+
+	template <typename ValueType>
+	friend ValueType AnyCast(Any&);
 };
 
 
@@ -514,14 +512,26 @@ ValueType AnyCast(Any& operand)
 	/// Example Usage: 
 	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
-	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
+	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
 	typedef typename TypeWrapper<ValueType>::TYPE NonRef;
 
 	NonRef* result = AnyCast<NonRef>(&operand);
-	if (!result) throw BadCastException("Failed to convert between Any types");
+	if (!result)
+	{
+		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		if (operand._pHolder)
+		{
+			s.append(1, '(');
+			s.append(operand._pHolder->type().name());
+			s.append(" => ");
+			s.append(typeid(ValueType).name());
+			s.append(1, ')');
+		}
+		throw BadCastException(s);
+	}
 	return *result;
 }
 
@@ -533,7 +543,7 @@ ValueType AnyCast(const Any& operand)
 	/// Example Usage: 
 	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
-	/// Dont use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
+	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
 	/// Some compilers will accept this code although a copy is returned. Use the RefAnyCast in
 	/// these cases.
 {
@@ -551,7 +561,15 @@ const ValueType& RefAnyCast(const Any & operand)
 	///	 const MyType& tmp = RefAnyCast<MyType>(anAny);
 {
 	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	if (!result) throw BadCastException("RefAnyCast: Failed to convert between const Any types");
+	std::string s = "RefAnyCast: Failed to convert between Any types ";
+	if (operand._pHolder)
+	{
+		s.append(1, '(');
+		s.append(operand._pHolder->type().name());
+		s.append(" => ");
+		s.append(typeid(ValueType).name());
+		s.append(1, ')');
+	}
 	return *result;
 }
 
@@ -564,7 +582,19 @@ ValueType& RefAnyCast(Any& operand)
 	///	 MyType& tmp = RefAnyCast<MyType>(anAny);
 {
 	ValueType* result = AnyCast<ValueType>(&operand);
-	if (!result) throw BadCastException("RefAnyCast: Failed to convert between Any types");
+	if (!result)
+	{
+		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		if (operand._pHolder)
+		{
+			s.append(1, '(');
+			s.append(operand._pHolder->type().name());
+			s.append(" => ");
+			s.append(typeid(ValueType).name());
+			s.append(1, ')');
+		}
+		throw BadCastException(s);
+	}
 	return *result;
 }
 

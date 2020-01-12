@@ -17,7 +17,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/Session.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 #include "SQLExecutor.h"
 
 
@@ -94,7 +94,7 @@ public:
 	void testNullableInt();
 	void testNullableString();
 	void testTupleWithNullable();
-	
+
 	void testSessionTransaction();
 	void testTransaction();
 

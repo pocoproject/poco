@@ -313,9 +313,9 @@ int ThreadPool::available() const
 	FastMutex::ScopedLock lock(_mutex);
 
 	int count = 0;
-	for (ThreadVec::const_iterator it = _threads.begin(); it != _threads.end(); ++it)
+	for (auto pThread: _threads)
 	{
-		if ((*it)->idle()) ++count;
+		if (pThread->idle()) ++count;
 	}
 	return (int) (count + _maxCapacity - _threads.size());
 }
@@ -326,9 +326,9 @@ int ThreadPool::used() const
 	FastMutex::ScopedLock lock(_mutex);
 
 	int count = 0;
-	for (ThreadVec::const_iterator it = _threads.begin(); it != _threads.end(); ++it)
+	for (auto pThread: _threads)
 	{
-		if (!(*it)->idle()) ++count;
+		if (!pThread->idle()) ++count;
 	}
 	return count;
 }
@@ -370,9 +370,9 @@ void ThreadPool::stopAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	for (ThreadVec::iterator it = _threads.begin(); it != _threads.end(); ++it)
+	for (auto pThread: _threads)
 	{
-		(*it)->release();
+		pThread->release();
 	}
 	_threads.clear();
 }
@@ -382,9 +382,9 @@ void ThreadPool::joinAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	for (ThreadVec::iterator it = _threads.begin(); it != _threads.end(); ++it)
+	for (auto pThread: _threads)
 	{
-		(*it)->join();
+		pThread->join();
 	}
 	housekeep();
 }
@@ -409,30 +409,30 @@ void ThreadPool::housekeep()
 	idleThreads.reserve(_threads.size());
 	activeThreads.reserve(_threads.size());
 	
-	for (ThreadVec::iterator it = _threads.begin(); it != _threads.end(); ++it)
+	for (auto pThread: _threads)
 	{
-		if ((*it)->idle())
+		if (pThread->idle())
 		{
-			if ((*it)->idleTime() < _idleTime)
-				idleThreads.push_back(*it);
+			if (pThread->idleTime() < _idleTime)
+				idleThreads.push_back(pThread);
 			else 
-				expiredThreads.push_back(*it);	
+				expiredThreads.push_back(pThread);	
 		}
-		else activeThreads.push_back(*it);
+		else activeThreads.push_back(pThread);
 	}
 	int n = (int) activeThreads.size();
 	int limit = (int) idleThreads.size() + n;
 	if (limit < _minCapacity) limit = _minCapacity;
 	idleThreads.insert(idleThreads.end(), expiredThreads.begin(), expiredThreads.end());
 	_threads.clear();
-	for (ThreadVec::iterator it = idleThreads.begin(); it != idleThreads.end(); ++it)
+	for (auto pIdle: idleThreads)
 	{
 		if (n < limit)
 		{
-			_threads.push_back(*it);
+			_threads.push_back(pIdle);
 			++n;
 		}
-		else (*it)->release();
+		else pIdle->release();
 	}
 	_threads.insert(_threads.end(), activeThreads.begin(), activeThreads.end());
 }

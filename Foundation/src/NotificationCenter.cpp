@@ -57,8 +57,8 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 {
 	Mutex::ScopedLock lock(_mutex);
-	for (ObserverList::const_iterator it = _observers.begin(); it != _observers.end(); ++it)
-		if (observer.equals(**it)) return true;
+	for (const auto& p: _observers)
+		if (observer.equals(*p)) return true;
 
 	return false;
 }
@@ -71,9 +71,9 @@ void NotificationCenter::postNotification(Notification::Ptr pNotification)
 	ScopedLockWithUnlock<Mutex> lock(_mutex);
 	ObserverList observersToNotify(_observers);
 	lock.unlock();
-	for (ObserverList::iterator it = observersToNotify.begin(); it != observersToNotify.end(); ++it)
+	for (auto& p: observersToNotify)
 	{
-		(*it)->notify(pNotification);
+		p->notify(pNotification);
 	}
 }
 

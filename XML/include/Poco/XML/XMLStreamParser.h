@@ -105,7 +105,7 @@ public:
 		EV_EOF
 	};
 
-	typedef unsigned short FeatureType;
+	using FeatureType = unsigned short;
 		/// If both receive_attributes_event and RECEIVE_ATTRIBUTE_MAP are
 		/// specified, then RECEIVE_ATTRIBUTES_EVENT is assumed.
 
@@ -116,20 +116,20 @@ public:
 	static const FeatureType RECEIVE_NAMESPACE_DECLS = 0x0010;
 	static const FeatureType RECEIVE_DEFAULT = RECEIVE_ELEMENTS | RECEIVE_CHARACTERS | RECEIVE_ATTRIBUTE_MAP;
 
-	struct XML_API AttributeValueType
+	struct AttributeValueType
 	{
 		std::string value;
 		mutable bool handled;
 	};
 
-	typedef std::map<QName, AttributeValueType> AttributeMapType;
+	using AttributeMapType = std::map<QName, AttributeValueType>;
 
 	struct XML_API Iterator
 		// C++11 range-based for support. Generally, the iterator interface
 		// doesn't make much sense for the XMLStreamParser so for now we have an
 		// implementation that is just enough to the range-based for.
 	{
-		typedef EventType value_type;
+		using value_type = EventType;
 
 		Iterator(XMLStreamParser* p = 0, EventType e = EV_EOF):
 			_parser(p),
@@ -575,7 +575,7 @@ inline void XMLStreamParser::content(Content c)
 	if (!_elementState.empty() && _elementState.back().depth == _depth)
 		_elementState.back().content = c;
 	else
-		_elementState.push_back(ElementEntry(_depth, c));
+		_elementState.emplace_back(_depth, c);
 }
 
 

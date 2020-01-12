@@ -39,7 +39,7 @@ class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollectio
 	/// but also limits the size of the cache (per default: 1024).
 {
 public:
-	AccessExpireLRUCache(long cacheSize = 1024, Timestamp::TimeDiff expire = 600000): 
+	AccessExpireLRUCache(std::size_t cacheSize = 1024, Timestamp::TimeDiff expire = 600000):
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex >(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));

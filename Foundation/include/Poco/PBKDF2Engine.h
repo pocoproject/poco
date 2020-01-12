@@ -29,7 +29,7 @@ namespace Poco {
 
 template <class PRF>
 class PBKDF2Engine: public DigestEngine
-	/// This class implementes the Password-Based Key Derivation Function 2,
+	/// This class implements the Password-Based Key Derivation Function 2,
 	/// as specified in RFC 2898. The underlying DigestEngine (HMACEngine, etc.),
 	/// which must accept the passphrase as constructor argument (std::string), 
 	/// must be given as template argument. 
@@ -56,7 +56,7 @@ class PBKDF2Engine: public DigestEngine
 	/// by calling update().
 	///
 	/// Example (WPA2):
-	///     PBKDF2Engine<HMACEngine<SHA1Engine> > pbkdf2(ssid, 4096, 256);
+	///     PBKDF2Engine<HMACEngine<SHA1Engine>> pbkdf2(ssid, 4096, 256);
 	///     pbkdf2.update(passphrase);
 	///     DigestEngine::Digest d = pbkdf2.digest();
 {

@@ -42,10 +42,7 @@ Object::Object(const Object& other) : _values(other._values),
 }
 
 
-#ifdef POCO_ENABLE_CPP11
-
-
-Object::Object(Object&& other) :
+Object::Object(Object&& other):
 	_values(std::move(other._values)),
 	_keys(std::move(other._keys)),
 	_preserveInsOrder(other._preserveInsOrder),
@@ -57,23 +54,18 @@ Object::Object(Object&& other) :
 }
 
 
-Object &Object::operator= (Object &&other)
+Object &Object::operator = (Object&& other)
 {
-	if (&other != this)
-	{
-		_values = other._values;
-		_preserveInsOrder = other._preserveInsOrder;
-		syncKeys(other._keys);
-		_escapeUnicode = other._escapeUnicode;
-		_pStruct = !other._modified ? other._pStruct : 0;
-		_modified = other._modified;
-		other.clear();
-	}
+	_values = other._values;
+	_preserveInsOrder = other._preserveInsOrder;
+	syncKeys(other._keys);
+	_escapeUnicode = other._escapeUnicode;
+	_pStruct = !other._modified ? other._pStruct : 0;
+	_modified = other._modified;
+	other.clear();
+
 	return *this;
 }
-
-
-#endif // POCO_ENABLE_CPP11
 
 
 Object::~Object()
@@ -224,9 +216,6 @@ Poco::DynamicStruct Object::makeStruct(const Object::Ptr& obj)
 }
 
 
-#ifdef POCO_ENABLE_CPP11
-
-
 Poco::OrderedDynamicStruct Object::makeOrderedStruct(const Object::Ptr& obj)
 {
 	return makeStructImpl<Poco::OrderedDynamicStruct>(obj);
@@ -242,7 +231,6 @@ void Object::resetOrdDynStruct() const
 }
 */
 
-#endif // POCO_ENABLE_CPP11
 
 /*
 void Object::resetDynStruct() const
@@ -284,9 +272,6 @@ Object::operator const Poco::DynamicStruct& () const
 
 	return *_pStruct;
 }
-
-
-#ifdef POCO_ENABLE_CPP11
 
 
 Object::operator const Poco::OrderedDynamicStruct& () const
@@ -343,9 +328,6 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 
 	return *_pOrdStruct;
 }
-
-
-#endif // POCO_ENABLE_CPP11
 
 
 void Object::clear()

@@ -233,23 +233,23 @@ void JSONTest::testNumber64Property()
 	Var test = object.get("test");
 	assertTrue (test.isInteger());
 	Poco::Int64 value = test;
-	assertTrue (value == -5000000000000000);
+	assertTrue (value == -5000000000000000ll);
 
 	DynamicStruct ds = object;
 	assertTrue (!ds["test"].isEmpty());
 	assertTrue (ds["test"].isNumeric());
 	assertTrue (ds["test"].isInteger());
-	assertTrue (ds["test"] == -5000000000000000);
+	assertTrue (ds["test"] == -5000000000000000ll);
 	value = ds["test"];
-	assertTrue (value == -5000000000000000);
+	assertTrue (value == -5000000000000000ll);
 
 	const DynamicStruct& rds = object;
 	assertTrue (!rds["test"].isEmpty());
 	assertTrue (rds["test"].isNumeric());
 	assertTrue (rds["test"].isInteger());
-	assertTrue (rds["test"] == -5000000000000000);
+	assertTrue (rds["test"] == -5000000000000000ll);
 	value = rds["test"];
-	assertTrue (value == -5000000000000000);
+	assertTrue (value == -5000000000000000ll);
 }
 
 
@@ -277,12 +277,11 @@ void JSONTest::testUnsignedNumber64Property()
 	assertTrue (test.isInteger());
 	Poco::UInt64 value = test;
 	assertTrue (value == -1);
-/* TODO: clang has trouble here
 	DynamicStruct ds = *object;
 	assertTrue (!ds["test"].isEmpty());
 	assertTrue (ds["test"].isNumeric());
 	assertTrue (ds["test"].isInteger());
-	assertTrue (ds["test"] == 18446744073709551615);
+	assertTrue (ds["test"] == 18446744073709551615ull);
 	value = ds["test"];
 	assertTrue (value == -1);
 
@@ -290,10 +289,9 @@ void JSONTest::testUnsignedNumber64Property()
 	assertTrue (!rds["test"].isEmpty());
 	assertTrue (rds["test"].isNumeric());
 	assertTrue (rds["test"].isInteger());
-	assertTrue (rds["test"] == 18446744073709551615);
+	assertTrue (rds["test"] == 18446744073709551615ull);
 	value = rds["test"];
 	assertTrue (value == -1);
-*/
 }
 
 #endif
@@ -401,7 +399,7 @@ void JSONTest::testEmptyPropertyName()
 
 	const DynamicStruct& rds = *object;
 	assertTrue (rds.size() == 1);
-	
+
 	assertTrue (ds[""] == 42);
 }
 
@@ -720,8 +718,6 @@ void JSONTest::testObjectArray()
 	assertTrue (ds["test"]["test1"][2] == 3);
 	assertTrue (ds["test"]["test2"] == 4);
 
-#ifdef POCO_ENABLE_CPP11
-
 	object->set("test3", "another top level value");
 	ds = std::move(*object);
 	assertTrue (ds.size() == 2);
@@ -733,8 +729,6 @@ void JSONTest::testObjectArray()
 	assertTrue (ds["test"]["test1"][2] == 3);
 	assertTrue (ds["test"]["test2"] == 4);
 	assertTrue (ds["test3"] == "another top level value");
-
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -1086,15 +1080,11 @@ void JSONTest::testSetArrayElement()
 	assertTrue (array->getElement<int>(1) == 13);
 	assertTrue (array->getElement<std::string>(2) == "foo");
 
-#ifdef POCO_ENABLE_CPP11
-
 	dynArray = std::move(*array);
 	assertTrue (dynArray.size() == 3);
 	assertTrue (dynArray[0] == 7);
 	assertTrue (dynArray[1] == 13);
 	assertTrue (dynArray[2] == "foo");
-
-#endif // POCO_ENABLE_CPP11
 
 	dynArray.clear();
 	assertTrue (dynArray.size() == 0);
@@ -1697,7 +1687,6 @@ void JSONTest::testStringifyPreserveOrder()
 	assertTrue (ds["Simpsons"]["address"]["street"] == "Evergreen Terrace");
 	assertTrue (ds["Simpsons"]["address"]["town"] == "Springfield");
 
-#ifdef POCO_ENABLE_CPP11
 	Poco::OrderedDynamicStruct ods = *result.extract<Object::Ptr>();
 	assertTrue(ods["Simpsons"].isStruct());
 	assertTrue(ods["Simpsons"].isOrdered());
@@ -1706,7 +1695,6 @@ void JSONTest::testStringifyPreserveOrder()
 		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
 		"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", "
 		"\"town\" : \"Springfield\" } } }");
-#endif // POCO_ENABLE_CPP11
 }
 
 
@@ -2114,7 +2102,6 @@ void JSONTest::testCopy()
 
 void JSONTest::testMove()
 {
-#ifdef POCO_ENABLE_CPP11
 	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
 	obj1.set("foo", 0);
 	obj1.set("bar", 0);
@@ -2174,7 +2161,6 @@ void JSONTest::testMove()
 	assertTrue (nl[0] == "foo");
 	assertTrue (nl[1] == "bar");
 	assertTrue (nl[2] == "baz");
-#endif // POCO_ENABLE_CPP11
 }
 
 

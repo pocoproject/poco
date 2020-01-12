@@ -145,7 +145,7 @@ private:
 
 
 template <class T>
-class TypeHandler<std::deque<T> >: public AbstractTypeHandler
+class TypeHandler<std::deque<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::deque.
 {
 public:
@@ -180,7 +180,7 @@ private:
 
 
 template <class T>
-class TypeHandler<std::vector<T> >: public AbstractTypeHandler
+class TypeHandler<std::vector<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::vector.
 {
 public:
@@ -215,7 +215,7 @@ private:
 
 
 template <class T>
-class TypeHandler<std::list<T> >: public AbstractTypeHandler
+class TypeHandler<std::list<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::list.
 {
 public:
@@ -249,7 +249,7 @@ private:
 };
 
 template <typename T>
-class TypeHandler<Nullable<T> > 
+class TypeHandler<Nullable<T>> 
 	/// Specialization of type handler for Nullable.
 {
 public:
@@ -363,11 +363,11 @@ template <class T0,
 	class T17, 
 	class T18, 
 	class T19>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -493,11 +493,11 @@ template <class T0,
 	class T16, 
 	class T17, 
 	class T18>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -618,11 +618,11 @@ template <class T0,
 	class T15, 
 	class T16, 
 	class T17>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -738,11 +738,11 @@ template <class T0,
 	class T14, 
 	class T15, 
 	class T16>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -853,11 +853,11 @@ template <class T0,
 	class T13, 
 	class T14, 
 	class T15>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -963,11 +963,11 @@ template <class T0,
 	class T12, 
 	class T13, 
 	class T14>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1068,11 +1068,11 @@ template <class T0,
 	class T11, 
 	class T12, 
 	class T13>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1168,11 +1168,11 @@ template <class T0,
 	class T10, 
 	class T11, 
 	class T12>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1263,11 +1263,11 @@ template <class T0,
 	class T9, 
 	class T10, 
 	class T11>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1353,11 +1353,11 @@ template <class T0,
 	class T8, 
 	class T9, 
 	class T10>
-class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >
+class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1429,11 +1429,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1501,11 +1501,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1569,11 +1569,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, T7, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1633,11 +1633,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3, class T4, class T5, class T6>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, T6, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1693,11 +1693,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3, class T4, class T5>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, T5, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1749,11 +1749,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3, class T4>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, T4, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1801,11 +1801,11 @@ private:
 
 
 template <class T0, class T1, class T2, class T3>
-class TypeHandler<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, T2, T3, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, T3, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1849,11 +1849,11 @@ private:
 
 
 template <class T0, class T1, class T2>
-	class TypeHandler<Poco::Tuple<T0, T1, T2, NullTypeList> >
+	class TypeHandler<Poco::Tuple<T0, T1, T2, NullTypeList>>
 {
 public:
-		typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, T2, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1893,11 +1893,11 @@ private:
 
 
 template <class T0, class T1>
-class TypeHandler<Poco::Tuple<T0, T1, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, T1, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, T1, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1933,11 +1933,11 @@ private:
 
 
 template <class T0>
-class TypeHandler<Poco::Tuple<T0, NullTypeList> >
+class TypeHandler<Poco::Tuple<T0, NullTypeList>>
 {
 public:
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::CONSTREFTYPE TupleConstRef;
-	typedef typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList> >::REFTYPE	  TupleRef;
+	using TupleConstRef = typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList>>::CONSTREFTYPE;
+	using TupleRef = typename Poco::TypeWrapper<Poco::Tuple<T0, NullTypeList>>::REFTYPE;
 
 	static void bind(std::size_t pos, TupleConstRef tuple, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
@@ -1970,7 +1970,7 @@ private:
 
 
 template <class K, class V>
-class TypeHandler<std::pair<K, V> >: public AbstractTypeHandler
+class TypeHandler<std::pair<K, V>>: public AbstractTypeHandler
 {
 public:
 	static void bind(std::size_t pos, const std::pair<K, V>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
@@ -2006,7 +2006,7 @@ private:
 
 
 template <class T>
-class TypeHandler<Poco::AutoPtr<T> >: public AbstractTypeHandler
+class TypeHandler<Poco::AutoPtr<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for Poco::AutoPtr
 {
 public:
@@ -2046,7 +2046,7 @@ private:
 
 
 template <class T>
-class TypeHandler<Poco::SharedPtr<T> >: public AbstractTypeHandler
+class TypeHandler<Poco::SharedPtr<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for Poco::SharedPtr
 {
 public:

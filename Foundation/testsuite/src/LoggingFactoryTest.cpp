@@ -18,7 +18,10 @@
 #if defined(_WIN32)
 #include "Poco/WindowsConsoleChannel.h"
 #endif
+#ifndef POCO_NO_FILECHANNEL
 #include "Poco/FileChannel.h"
+#include "Poco/SimpleFileChannel.h"
+#endif
 #include "Poco/SplitterChannel.h"
 #include "Poco/Formatter.h"
 #include "Poco/PatternFormatter.h"
@@ -31,7 +34,10 @@
 using Poco::LoggingFactory;
 using Poco::Channel;
 using Poco::ConsoleChannel;
+#ifndef POCO_NO_FILECHANNEL
 using Poco::FileChannel;
+using Poco::SimpleFileChannel;
+#endif
 using Poco::SplitterChannel;
 using Poco::Formatter;
 using Poco::PatternFormatter;
@@ -73,34 +79,39 @@ void LoggingFactoryTest::testBuiltins()
 {
 	LoggingFactory& fact = LoggingFactory::defaultFactory();
 
-	AutoPtr<Channel> pConsoleChannel = fact.createChannel("ConsoleChannel");
+	Channel::Ptr pConsoleChannel = fact.createChannel("ConsoleChannel");
 #if defined(_WIN32) && !defined(_WIN32_WCE)
-	assertTrue (dynamic_cast<Poco::WindowsConsoleChannel*>(pConsoleChannel.get()) != 0);
+	assertTrue (!pConsoleChannel.cast<Poco::WindowsConsoleChannel>().isNull());
 #else
-	assertTrue (dynamic_cast<ConsoleChannel*>(pConsoleChannel.get()) != 0);
+	assertTrue (!pConsoleChannel.cast<ConsoleChannel>().isNull());
 #endif
 
-	AutoPtr<Channel> pFileChannel = fact.createChannel("FileChannel");
-	assertTrue (dynamic_cast<FileChannel*>(pFileChannel.get()) != 0);
+#ifndef POCO_NO_FILECHANNEL
+	Channel::Ptr pFileChannel = fact.createChannel("FileChannel");
+	assertTrue (!pFileChannel.cast<FileChannel>().isNull());
 
-	AutoPtr<Channel> pSplitterChannel = fact.createChannel("SplitterChannel");
-	assertTrue (dynamic_cast<SplitterChannel*>(pSplitterChannel.get()) != 0);
+	Channel::Ptr pSimpleFileChannel = fact.createChannel("SimpleFileChannel");
+	assertTrue(!pSimpleFileChannel.cast<SimpleFileChannel>().isNull());
+#endif
+
+	Channel::Ptr pSplitterChannel = fact.createChannel("SplitterChannel");
+	assertTrue (!pSplitterChannel.cast<SplitterChannel>().isNull());
 
 	try
 	{
-		AutoPtr<Channel> pUnknownChannel = fact.createChannel("UnknownChannel");
+		Channel::Ptr pUnknownChannel = fact.createChannel("UnknownChannel");
 		fail("unknown class - must throw");
 	}
 	catch (Poco::NotFoundException&)
 	{
 	}
 
-	AutoPtr<Formatter> pPatternFormatter = fact.createFormatter("PatternFormatter");
-	assertTrue (dynamic_cast<PatternFormatter*>(pPatternFormatter.get()) != 0);
+	Formatter::Ptr pPatternFormatter = fact.createFormatter("PatternFormatter");
+	assertTrue (!pPatternFormatter.isNull());
 
 	try
 	{
-		AutoPtr<Formatter> pUnknownFormatter = fact.createFormatter("UnknownFormatter");
+		Formatter::Ptr pUnknownFormatter = fact.createFormatter("UnknownFormatter");
 		fail("unknown class - must throw");
 	}
 	catch (Poco::NotFoundException&)
@@ -116,11 +127,11 @@ void LoggingFactoryTest::testCustom()
 	fact->registerChannelClass("CustomChannel", new Instantiator<CustomChannel, Channel>);
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 
-	AutoPtr<Channel> pCustomChannel = fact->createChannel("CustomChannel");
+	Channel::Ptr pCustomChannel = fact->createChannel("CustomChannel");
 	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
 
-	AutoPtr<Formatter> pCustomFormatter = fact->createFormatter("CustomFormatter");
-	assertTrue (dynamic_cast<CustomFormatter*>(pCustomFormatter.get()) != 0);
+	Formatter::Ptr pCustomFormatter = fact->createFormatter("CustomFormatter");
+	assertTrue (!pCustomFormatter.isNull());
 }
 
 

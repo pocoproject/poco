@@ -36,11 +36,11 @@ class Data_API RowIterator
 	/// RowIterator class.
 {
 public:
-	typedef std::bidirectional_iterator_tag iterator_category;
-	typedef Row                             value_type;
-	typedef std::ptrdiff_t                  difference_type;
-	typedef Row*                            pointer;
-	typedef Row&                            reference;
+	using iterator_category = std::bidirectional_iterator_tag;
+	using value_type = Row;
+	using difference_type = std::ptrdiff_t;
+	using pointer = Row*;
+	using reference = Row&;
 
 	static const std::size_t POSITION_END;
 		/// End position indicator.
@@ -53,11 +53,17 @@ public:
 	RowIterator(const RowIterator& other);
 		/// Creates a copy of other RowIterator.
 
+	RowIterator(RowIterator&& other) noexcept;
+		/// Move constructor.
+
 	~RowIterator();
 		/// Destroys the RowIterator.
 
 	RowIterator& operator = (const RowIterator& other);
 		/// Assigns the other RowIterator.
+
+	RowIterator& operator = (RowIterator&& other) noexcept;
+		/// Move assignment.
 
 	bool operator == (const RowIterator& other) const;
 		/// Equality operator.
@@ -75,11 +81,11 @@ public:
 		/// Advances by one position and returns current position.
 
 	RowIterator operator ++ (int) const;
-		/// Advances by one position and returns copy of the iterator with 
+		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
 	const RowIterator& operator -- () const;
-		/// Goes back by one position and returns copy of the iterator with 
+		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
 	RowIterator operator -- (int) const;
@@ -99,15 +105,15 @@ private:
 	RowIterator();
 
 	void increment() const;
-		/// Increments the iterator position by one. 
+		/// Increments the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void decrement() const;
-		/// Decrements the iterator position by one. 
+		/// Decrements the iterator position by one.
 		/// Throws RangeException if position is out of range.
 
 	void setPosition(std::size_t pos) const;
-		/// Sets the iterator position. 
+		/// Sets the iterator position.
 		/// Throws RangeException if position is out of range.
 
 	RecordSet*          _pRecordSet;
@@ -138,8 +144,7 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, 
-		Poco::Data::RowIterator& s2)
+	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, Poco::Data::RowIterator& s2) noexcept
 		/// Full template specalization of std:::swap for RowIterator
 	{
 		s1.swap(s2);

@@ -78,7 +78,7 @@ public:
 		std::string::size_type offset; /// zero based offset (std::string::npos if subexpr does not match)
 		std::string::size_type length; /// length of substring
 	};
-	typedef std::vector<Match> MatchVec;
+	using MatchVec = std::vector<Match>;
 	
 	RegularExpression(const std::string& pattern, int options = 0, bool study = true);
 		/// Creates a regular expression and parses the given pattern.

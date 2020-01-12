@@ -111,7 +111,19 @@ URI::URI(const URI& uri):
 {
 }
 
-	
+
+URI::URI(URI&& uri) noexcept:
+	_scheme(std::move(uri._scheme)),
+	_userInfo(std::move(uri._userInfo)),
+	_host(std::move(uri._host)),
+	_port(std::move(uri._port)),
+	_path(std::move(uri._path)),
+	_query(std::move(uri._query)),
+	_fragment(std::move(uri._fragment))
+{
+}
+
+
 URI::URI(const URI& baseURI, const std::string& relativeURI):
 	_scheme(baseURI._scheme),
 	_userInfo(baseURI._userInfo),
@@ -152,6 +164,20 @@ URI& URI::operator = (const URI& uri)
 		_query    = uri._query;
 		_fragment = uri._fragment;
 	}
+	return *this;
+}
+
+
+URI& URI::operator = (URI&& uri) noexcept
+{
+	_scheme   = std::move(uri._scheme);
+	_userInfo = std::move(uri._userInfo);
+	_host     = std::move(uri._host);
+	_port     = std::move(uri._port);
+	_path     = std::move(uri._path);
+	_query    = std::move(uri._query);
+	_fragment = std::move(uri._fragment);
+
 	return *this;
 }
 
@@ -390,9 +416,9 @@ URI::QueryParameters URI::getQueryParameters() const
 void URI::setQueryParameters(const QueryParameters& params)
 {
 	_query.clear();
-	for (QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
+	for (const auto& p: params)
 	{
-		addQueryParameter(it->first, it->second);
+		addQueryParameter(p.first, p.second);
 	}
 }
 
@@ -567,25 +593,25 @@ void URI::removeDotSegments(bool removeLeading)
 	std::vector<std::string> segments;
 	std::vector<std::string> normalizedSegments;
 	getPathSegments(segments);
-	for (std::vector<std::string>::const_iterator it = segments.begin(); it != segments.end(); ++it)
+	for (const auto& s: segments)
 	{
-		if (*it == "..")
+		if (s == "..")
 		{
 			if (!normalizedSegments.empty())
 			{
 				if (normalizedSegments.back() == "..")
-					normalizedSegments.push_back(*it);
+					normalizedSegments.push_back(s);
 				else
 					normalizedSegments.pop_back();
 			}
 			else if (!removeLeading)
 			{
-				normalizedSegments.push_back(*it);
+				normalizedSegments.push_back(s);
 			}
 		}
-		else if (*it != ".")
+		else if (s != ".")
 		{
-			normalizedSegments.push_back(*it);
+			normalizedSegments.push_back(s);
 		}
 	}
 	buildPath(normalizedSegments, leadingSlash, trailingSlash);
@@ -623,9 +649,8 @@ void URI::getPathSegments(const std::string& path, std::vector<std::string>& seg
 
 void URI::encode(const std::string& str, const std::string& reserved, std::string& encodedStr)
 {
-	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+	for (auto c: str)
 	{
-		char c = *it;
 		if ((c >= 'a' && c <= 'z') || 
 		    (c >= 'A' && c <= 'Z') || 
 		    (c >= '0' && c <= '9') ||
@@ -883,18 +908,18 @@ void URI::mergePath(const std::string& path)
 	addLeadingSlash = addLeadingSlash || (!path.empty() && path[0] == '/');
 	bool hasTrailingSlash = (!path.empty() && *(path.rbegin()) == '/');
 	bool addTrailingSlash = false;
-	for (std::vector<std::string>::const_iterator it = segments.begin(); it != segments.end(); ++it)
+	for (const auto& s: segments)
 	{
-		if (*it == "..")
+		if (s == "..")
 		{
 			addTrailingSlash = true;
 			if (!normalizedSegments.empty())
 				normalizedSegments.pop_back();
 		}
-		else if (*it != ".")
+		else if (s != ".")
 		{
 			addTrailingSlash = false;
-			normalizedSegments.push_back(*it);
+			normalizedSegments.push_back(s);
 		}
 		else addTrailingSlash = true;
 	}
@@ -906,18 +931,18 @@ void URI::buildPath(const std::vector<std::string>& segments, bool leadingSlash,
 {
 	_path.clear();
 	bool first = true;
-	for (std::vector<std::string>::const_iterator it = segments.begin(); it != segments.end(); ++it)
+	for (const auto& s: segments)
 	{
 		if (first)
 		{
 			first = false;
 			if (leadingSlash)
 				_path += '/';
-			else if (_scheme.empty() && (*it).find(':') != std::string::npos)
+			else if (_scheme.empty() && s.find(':') != std::string::npos)
 				_path.append("./");
 		}
 		else _path += '/';
-		_path.append(*it);
+		_path.append(s);
 	}
 	if (trailingSlash) 
 		_path += '/';

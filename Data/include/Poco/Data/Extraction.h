@@ -42,10 +42,10 @@ class Extraction: public AbstractExtraction
 	/// Concrete Data Type specific extraction of values from a query result set.
 {
 public:
-	typedef T                   ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = T;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(T& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -129,15 +129,14 @@ private:
 
 
 template <class T>
-class Extraction<std::vector<T> >: public AbstractExtraction
+class Extraction<std::vector<T>>: public AbstractExtraction
 	/// Vector Data Type specialization for extraction of values from a query result set.
 {
 public:
-
-	typedef std::vector<T>      ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::vector<T>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::vector<T>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -220,14 +219,14 @@ private:
 
 
 template <>
-class Extraction<std::vector<bool> >: public AbstractExtraction
+class Extraction<std::vector<bool>>: public AbstractExtraction
 	/// Vector bool specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::vector<bool>   ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::vector<bool>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::vector<bool>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -312,14 +311,14 @@ private:
 
 
 template <class T>
-class Extraction<std::list<T> >: public AbstractExtraction
+class Extraction<std::list<T>>: public AbstractExtraction
 	/// List Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::list<T>        ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::list<T>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::list<T>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -402,14 +401,14 @@ private:
 
 
 template <class T>
-class Extraction<std::deque<T> >: public AbstractExtraction
+class Extraction<std::deque<T>>: public AbstractExtraction
 	/// Deque Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::deque<T>       ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::deque<T>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::deque<T>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -504,10 +503,10 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
-	typedef typename C::value_type ValType;
-	typedef SharedPtr<ValType>     ValPtr;
-	typedef Extraction<ValType>    Type;
-	typedef SharedPtr<Type>        Ptr;
+	using ValType = typename C::value_type;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 
 	InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)):
@@ -561,15 +560,15 @@ private:
 
 
 template <class T>
-class Extraction<std::set<T> >: public AbstractExtraction
+class Extraction<std::set<T>>: public AbstractExtraction
 	/// Set Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::set<T>                ValType;
-	typedef SharedPtr<ValType>         ValPtr;
-	typedef Extraction<ValType>        Type;
-	typedef SharedPtr<Type>            Ptr;
-	typedef typename ValType::iterator Iterator;
+	using ValType = std::set<T>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
+	using Iterator = typename ValType::iterator;
 
 	Extraction(std::set<T>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -626,14 +625,14 @@ private:
 
 
 template <class T>
-class Extraction<std::multiset<T> >: public AbstractExtraction
+class Extraction<std::multiset<T>>: public AbstractExtraction
 	/// Multiset Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::multiset<T>    ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::multiset<T>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::multiset<T>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -690,14 +689,14 @@ private:
 
 
 template <class K, class V>
-class Extraction<std::map<K, V> >: public AbstractExtraction
+class Extraction<std::map<K, V>>: public AbstractExtraction
 	/// Map Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::map<K, V>      ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::map<K, V>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::map<K, V>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),
@@ -754,14 +753,14 @@ private:
 
 
 template <class K, class V>
-class Extraction<std::multimap<K, V> >: public AbstractExtraction
+class Extraction<std::multimap<K, V>>: public AbstractExtraction
 	/// Multimap Data Type specialization for extraction of values from a query result set.
 {
 public:
-	typedef std::multimap<K, V> ValType;
-	typedef SharedPtr<ValType>  ValPtr;
-	typedef Extraction<ValType> Type;
-	typedef SharedPtr<Type>     Ptr;
+	using ValType = std::multimap<K, V>;
+	using ValPtr = SharedPtr<ValType>;
+	using Type = Extraction<ValType>;
+	using Ptr = SharedPtr<Type>;
 
 	Extraction(std::multimap<K, V>& result, const Position& pos = Position(0)):
 		AbstractExtraction(Limit::LIMIT_UNLIMITED, pos.value()),

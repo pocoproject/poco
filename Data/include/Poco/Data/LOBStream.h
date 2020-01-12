@@ -30,7 +30,7 @@ namespace Data {
 
 
 template <typename T>
-class LOBStreamBuf: public BasicUnbufferedStreamBuf<T, std::char_traits<T> >
+class LOBStreamBuf: public BasicUnbufferedStreamBuf<T, std::char_traits<T>>
 	/// This is the streambuf class used for reading from and writing to a LOB.
 {
 public:	
@@ -46,8 +46,8 @@ public:
 	}
 
 protected:
-	typedef std::char_traits<T> TraitsType;
-	typedef BasicUnbufferedStreamBuf<T, TraitsType> BaseType;
+	using TraitsType = std::char_traits<T>;
+	using BaseType = BasicUnbufferedStreamBuf<T, TraitsType>;
 
 	typename BaseType::int_type readFromDevice()
 	{
@@ -101,7 +101,7 @@ protected:
 
 
 template <typename T>
-class LOBOutputStream: public LOBIOS<T>, public std::basic_ostream<T, std::char_traits<T> >
+class LOBOutputStream: public LOBIOS<T>, public std::basic_ostream<T, std::char_traits<T>>
 	/// An output stream for writing to a LOB.
 {
 public:
@@ -120,7 +120,7 @@ public:
 
 
 template <typename T>
-class LOBInputStream: public LOBIOS<T>, public std::basic_istream<T, std::char_traits<T> >
+class LOBInputStream: public LOBIOS<T>, public std::basic_istream<T, std::char_traits<T>>
 	/// An input stream for reading from a LOB.
 {
 public:
@@ -138,11 +138,11 @@ public:
 };
 
 
-typedef LOBOutputStream<unsigned char> BLOBOutputStream;
-typedef LOBOutputStream<char> CLOBOutputStream;
+using BLOBOutputStream = LOBOutputStream<unsigned char>;
+using CLOBOutputStream = LOBOutputStream<char>;
 
-typedef LOBInputStream<unsigned char> BLOBInputStream;
-typedef LOBInputStream<char> CLOBInputStream;
+using BLOBInputStream = LOBInputStream<unsigned char>;
+using CLOBInputStream = LOBInputStream<char>;
 
 } } // namespace Poco::Data
 

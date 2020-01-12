@@ -39,12 +39,12 @@ class Column
 	/// This class owns the data assigned to it and deletes the storage on destruction.
 {
 public:
-	typedef C                                  Container;
-	typedef Poco::SharedPtr<C>                 ContainerPtr;
-	typedef typename C::const_iterator         Iterator;
-	typedef typename C::const_reverse_iterator RIterator;
-	typedef typename C::size_type              Size;
-	typedef typename C::value_type             Type;
+	using Container = C;
+	using ContainerPtr = Poco::SharedPtr<C>;
+	using Iterator = typename C::const_iterator;
+	using RIterator = typename C::const_reverse_iterator;
+	using Size = typename C::size_type;
+	using Type = typename C::value_type;
 
 	Column(const MetaColumn& metaColumn, Container* pData): 
 		_metaColumn(metaColumn),
@@ -62,6 +62,13 @@ public:
 	{
 	}
 
+	Column(Column&& col) noexcept: 
+		_metaColumn(std::move(col._metaColumn)), 
+		_pData(std::move(col._pData))
+		/// Creates the Column.
+	{
+	}
+
 	~Column()
 		/// Destroys the Column.
 	{
@@ -72,6 +79,14 @@ public:
 	{
 		Column tmp(col);
 		swap(tmp);
+		return *this;
+	}
+
+	Column& operator = (Column&& col) noexcept
+		/// Assignment operator.
+	{
+		_metaColumn = std::move(col._metaColumn);
+		_pData = std::move(col._pData);
 		return *this;
 	}
 
@@ -172,7 +187,7 @@ private:
 
 
 template <>
-class Column<std::vector<bool> >
+class Column<std::vector<bool>>
 	/// The std::vector<bool> specialization for the Column class.
 	/// 
 	/// This specialization is necessary due to the nature of std::vector<bool>.
@@ -186,11 +201,11 @@ class Column<std::vector<bool> >
 	/// column data.
 {
 public:
-	typedef std::vector<bool>                 Container;
-	typedef Poco::SharedPtr<Container>        ContainerPtr;
-	typedef Container::const_iterator         Iterator;
-	typedef Container::const_reverse_iterator RIterator;
-	typedef Container::size_type              Size;
+	using Container = std::vector<bool>;
+	using ContainerPtr = Poco::SharedPtr<Container>;
+	using Iterator = Container::const_iterator;
+	using RIterator = Container::const_reverse_iterator;
+	using Size = Container::size_type;
 
 	Column(const MetaColumn& metaColumn, Container* pData): 
 		_metaColumn(metaColumn), 
@@ -325,15 +340,15 @@ private:
 
 
 template <class T>
-class Column<std::list<T> >
+class Column<std::list<T>>
 	/// Column specialization for std::list
 {
 public:
-	typedef std::list<T>                               Container;
-	typedef Poco::SharedPtr<Container>                 ContainerPtr;
-	typedef typename Container::const_iterator         Iterator;
-	typedef typename Container::const_reverse_iterator RIterator;
-	typedef typename Container::size_type              Size;
+	using Container = std::list<T>;
+	using ContainerPtr = Poco::SharedPtr<Container>;
+	using Iterator = typename Container::const_iterator;
+	using RIterator = typename Container::const_reverse_iterator;
+	using Size = typename Container::size_type;
 
 	Column(const MetaColumn& metaColumn, std::list<T>* pData): 
 		_metaColumn(metaColumn), 

@@ -28,7 +28,7 @@ namespace Poco {
 
 template <class Engine>
 class HMACEngine: public DigestEngine
-	/// This class implementes the HMAC message
+	/// This class implements the HMAC message
 	/// authentication code algorithm, as specified
 	/// in RFC 2104. The underlying DigestEngine
 	/// (MD5Engine, SHA1Engine, etc.) must be given as 
@@ -80,8 +80,7 @@ public:
 		const DigestEngine::Digest& d = _engine.digest();
 		char db[DIGEST_SIZE];
 		char* pdb = db;
-		for (DigestEngine::Digest::const_iterator it = d.begin(); it != d.end(); ++it)
-			*pdb++ = *it;
+		for (auto v: d) *pdb++ = v;
 		_engine.reset();
 		_engine.update(_opad, BLOCK_SIZE);
 		_engine.update(db, DIGEST_SIZE);

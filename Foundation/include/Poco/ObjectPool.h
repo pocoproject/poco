@@ -90,7 +90,7 @@ public:
 
 
 template <class C>
-class PoolableObjectFactory <C, Poco::AutoPtr<C> >
+class PoolableObjectFactory <C, Poco::AutoPtr<C>>
 {
 public:
 	Poco::AutoPtr<C> createObject()
@@ -118,7 +118,7 @@ public:
 
 
 template <class C>
-class PoolableObjectFactory <C, Poco::SharedPtr<C> >
+class PoolableObjectFactory <C, Poco::SharedPtr<C>>
 {
 public:
 	Poco::SharedPtr<C> createObject()
@@ -145,7 +145,7 @@ public:
 };
 
 
-template <class C, class P = C*, class F = PoolableObjectFactory<C, P> >
+template <class C, class P = C*, class F = PoolableObjectFactory<C, P>>
 class ObjectPool
 	/// An ObjectPool manages a pool of objects of a certain class.
 	///
@@ -195,9 +195,9 @@ public:
 	{
 		try
 		{
-			for (typename std::vector<P>::iterator it = _pool.begin(); it != _pool.end(); ++it)
+			for (auto& p: _pool)
 			{
-				_factory.destroyObject(*it);
+				_factory.destroyObject(p);
 			}
 		}
 		catch (...)

@@ -33,7 +33,7 @@ class Net_API HTTPServerParams: public TCPServerParams
 	/// Subclasses may add new parameters to the class.
 {
 public:
-	typedef Poco::AutoPtr<HTTPServerParams> Ptr;
+	using Ptr = Poco::AutoPtr<HTTPServerParams>;
 	
 	HTTPServerParams();
 		/// Creates the HTTPServerParams.

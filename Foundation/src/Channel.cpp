@@ -38,7 +38,7 @@ void Channel::close()
 }
 
 
-void Channel::setProperty(const std::string& name, const std::string& value)
+void Channel::setProperty(const std::string& name, const std::string& /*value*/)
 {
 	throw PropertyNotSupportedException(name);
 }

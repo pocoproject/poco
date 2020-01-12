@@ -34,8 +34,8 @@ ConfigurationViewTest::~ConfigurationViewTest()
 
 void ConfigurationViewTest::testView()
 {
-	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
-	AutoPtr<AbstractConfiguration> pView = pConf->createView("");
+	AbstractConfiguration::Ptr pConf = createConfiguration();
+	AbstractConfiguration::Ptr pView = pConf->createView("");
 	assertTrue (pView->hasProperty("prop1"));
 	assertTrue (pView->hasProperty("prop2"));
 
@@ -101,7 +101,7 @@ void ConfigurationViewTest::testView()
 }
 
 
-AbstractConfiguration* ConfigurationViewTest::allocConfiguration() const
+AbstractConfiguration::Ptr ConfigurationViewTest::allocConfiguration() const
 {
 	return new MapConfiguration;
 }

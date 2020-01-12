@@ -55,7 +55,7 @@ DOMException::DOMException(const DOMException& exc):
 }
 
 	
-DOMException::~DOMException() throw()
+DOMException::~DOMException() noexcept
 {
 }
 
@@ -71,13 +71,13 @@ DOMException& DOMException::operator = (const DOMException& exc)
 }
 
 
-const char* DOMException::name() const throw()
+const char* DOMException::name() const noexcept
 {
 	return "DOMException";
 }
 
 
-const char* DOMException::className() const throw()
+const char* DOMException::className() const noexcept
 {
 	return typeid(*this).name();
 }

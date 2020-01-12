@@ -23,17 +23,17 @@ namespace
 		std::vector<char> envbuf;
 		std::size_t pos = 0;
 
-		for (Poco::Process::Env::const_iterator it = env.begin(); it != env.end(); ++it)
+		for (const auto& p: env)
 		{
-			std::size_t envlen = it->first.length() + it->second.length() + 1;
+			std::size_t envlen = p.first.length() + p.second.length() + 1;
 
 			envbuf.resize(pos + envlen + 1);
-			std::copy(it->first.begin(), it->first.end(), &envbuf[pos]);
-			pos += it->first.length();
+			std::copy(p.first.begin(), p.first.end(), &envbuf[pos]);
+			pos += p.first.length();
 			envbuf[pos] = '=';
 			++pos;
-			std::copy(it->second.begin(), it->second.end(), &envbuf[pos]);
-			pos += it->second.length();
+			std::copy(p.second.begin(), p.second.end(), &envbuf[pos]);
+			pos += p.second.length();
 
 			envbuf[pos] = '\0';
 			++pos;
@@ -47,14 +47,12 @@ namespace
 }
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Process_WINCE.cpp"
 #else
 #include "Process_WIN32U.cpp"
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Process_WIN32.cpp"
 #elif defined(POCO_VXWORKS)
 #include "Process_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)

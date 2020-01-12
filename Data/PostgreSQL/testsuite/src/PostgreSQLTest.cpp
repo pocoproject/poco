@@ -9,8 +9,8 @@
 
 
 #include "PostgreSQLTest.h"
-#include "Poco/CppUnit/TestCaller.h"
-#include "Poco/CppUnit/TestSuite.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
 #include "Poco/Environment.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
@@ -107,7 +107,7 @@ void PostgreSQLTest::testConnectNoDB()
 	dbConnString += " user=" + getUser();
 	dbConnString +=	" password=" + getPass();
 	dbConnString += " port=" + getPort();
-	
+
 	try
 	{
 		std::cout << "Attempting to Connect to [" << dbConnString << "] without database: " << std::endl;
@@ -127,7 +127,7 @@ void PostgreSQLTest::testConnectNoDB()
 		std::cout << ex.displayText() << std::endl;
 	}
 }
-	
+
 void PostgreSQLTest::testPostgreSQLOIDs()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -203,7 +203,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		"uuidcol			uuid,"
 		"xmlcol				xml"
 		")";
-	
+
 	Oid OIDArray[] = {
 		1042,
 		20,
@@ -275,7 +275,7 @@ void PostgreSQLTest::testPostgreSQLOIDs()
 		2950,
 		142
 	};
-	
+
 	 _pExecutor->oidPostgreSQLTest(getHost(), getUser(), getPass(), getBase(), getPort(), tableCreateString.c_str(), OIDArray);
 
 }
@@ -393,7 +393,7 @@ void PostgreSQLTest::testLimitOnce()
 
 	recreateIntsTable();
 	_pExecutor->limitOnce();
-	
+
 }
 
 
@@ -604,7 +604,7 @@ void PostgreSQLTest::testDateTime()
 void PostgreSQLTest::testBLOB()
 {
 	if (!_pSession) fail ("Test not available.");
-	
+
 	recreatePersonBLOBTable();
 	_pExecutor->blob();
 
@@ -830,7 +830,7 @@ void PostgreSQLTest::testTupleWithNullable()
 
 	Info info(0, std::string("Address"), 10);
 	*_pSession << "INSERT INTO NullableStringTest VALUES($1, $2, $3)", use(info), now;
-	
+
 	info.set<0>(info.get<0>()++);
 	info.set<1>(null);
 	*_pSession << "INSERT INTO NullableStringTest VALUES($1, $2, $3)", use(info), now;

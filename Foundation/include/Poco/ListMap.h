@@ -2,7 +2,7 @@
 // ListMap.h
 //
 // Library: Foundation
-// Package: Hashing
+// Package: Core
 // Module:  ListMap
 //
 // Definition of the ListMap class.
@@ -21,14 +21,14 @@
 #include "Poco/Foundation.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
-#include <list>
+#include <vector>
 #include <utility>
 
 
 namespace Poco {
 
 
-template <class Key, class Mapped, class Container = std::list<std::pair<Key, Mapped> >, bool CaseSensitive = false >
+template <class Key, class Mapped, class Container = std::vector<std::pair<Key, Mapped>>, bool CaseSensitive = false>
 class ListMap
 	/// This class implements a multimap in terms of a sequential container.
 	/// The use for this type of associative container is wherever automatic
@@ -39,26 +39,36 @@ class ListMap
 	/// header entry reordering.
 {
 public:
-	typedef Key                 KeyType;
-	typedef Mapped              MappedType;
-	typedef Mapped&             Reference;
-	typedef const Mapped&       ConstReference;
-	typedef Mapped*             Pointer;
-	typedef const Mapped*       ConstPointer;
+	using KeyType = Key;
+	using MappedType = Mapped;
+	using Reference = Mapped&;
+	using ConstReference = const Mapped&;
+	using Pointer = Mapped*;
+	using ConstPointer = const Mapped*;
 	
-	typedef typename Container::value_type     ValueType;
-	typedef typename Container::size_type      SizeType;
-	typedef typename Container::iterator       Iterator;
-	typedef typename Container::const_iterator ConstIterator;
+	using ValueType = typename Container::value_type;
+	using SizeType = typename Container::size_type;
+	using Iterator = typename Container::iterator;
+	using ConstIterator = typename Container::const_iterator;
 	
 	ListMap()
 		/// Creates an empty ListMap.
 	{
 	}
 	
-	ListMap(std::size_t initialReserve):
-		_list(initialReserve)
+	explicit ListMap(std::size_t initialReserve):
+		_container(initialReserve)
 		/// Creates the ListMap with room for initialReserve entries.
+	{
+	}
+
+	ListMap(const ListMap& other):
+		_container(other._container)
+	{
+	}
+
+	ListMap(ListMap&& other) noexcept:
+		_container(std::move(other._container))
 	{
 	}
 	
@@ -70,34 +80,41 @@ public:
 		return *this;
 	}
 	
+	ListMap& operator = (ListMap&& map) noexcept
+		/// Assigns another ListMap.
+	{
+		_container = std::move(map._container);
+		return *this;
+	}
+	
 	void swap(ListMap& map)
 		/// Swaps the ListMap with another one.
 	{
-		_list.swap(map._list);
+		_container.swap(map._container);
 	}
 	
 	ConstIterator begin() const
 		/// Returns the beginning of the map.
 	{
-		return _list.begin();
+		return _container.begin();
 	}
 	
 	ConstIterator end() const
 		/// Returns the end of the map.
 	{
-		return _list.end();
+		return _container.end();
 	}
 	
 	Iterator begin()
 		/// Returns the beginning of the map.
 	{
-		return _list.begin();
+		return _container.begin();
 	}
 	
 	Iterator end()
 		/// Returns the end of the map.
 	{
-		return _list.end();
+		return _container.end();
 	}
 	
 	ConstIterator find(const KeyType& key) const
@@ -106,8 +123,8 @@ public:
 		/// or iterator pointing to the end if entry is
 		/// not found.
 	{
-		typename Container::const_iterator it = _list.begin();
-		typename Container::const_iterator itEnd = _list.end();
+		typename Container::const_iterator it = _container.begin();
+		typename Container::const_iterator itEnd = _container.end();
 		for(; it != itEnd; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
@@ -121,8 +138,8 @@ public:
 		/// or iterator pointing to the end if entry is
 		/// not found.
 	{
-		typename Container::iterator it = _list.begin();
-		typename Container::iterator itEnd = _list.end();
+		typename Container::iterator it = _container.begin();
+		typename Container::iterator itEnd = _container.end();
 		for(; it != itEnd; ++it)
 		{
 			if (isEqual(it->first, key)) return it;
@@ -138,13 +155,13 @@ public:
 		/// Returns iterator pointing to the newly inserted value 
 	{
 		Iterator it = find(val.first);
-		while (it != _list.end() && isEqual(it->first, val.first)) ++it;
-		return _list.insert(it, val);
+		while (it != _container.end() && isEqual(it->first, val.first)) ++it;
+		return _container.insert(it, val);
 	}
 	
 	void erase(Iterator it)
 	{
-		_list.erase(it);
+		_container.erase(it);
 	}
 	
 	SizeType erase(const KeyType& key)
@@ -152,12 +169,12 @@ public:
 		SizeType count = 0;
 		Iterator it = find(key);
 		bool removed = false;
-		while (it != _list.end())
+		while (it != _container.end())
 		{
 			if (isEqual(it->first, key))
 			{
 				++count;
-				it = _list.erase(it);
+				it = _container.erase(it);
 				removed = true;
 			}
 			else
@@ -171,23 +188,23 @@ public:
 	
 	void clear()
 	{
-		_list.clear();
+		_container.clear();
 	}
 
 	std::size_t size() const
 	{
-		return _list.size();
+		return _container.size();
 	}
 
 	bool empty() const
 	{
-		return _list.empty();
+		return _container.empty();
 	}
 
 	ConstReference operator [] (const KeyType& key) const
 	{
 		ConstIterator it = find(key);
-		if (it != _list.end())
+		if (it != _container.end())
 			return it->second;
 		else
 			throw NotFoundException();
@@ -196,8 +213,10 @@ public:
 	Reference operator [] (const KeyType& key)
 	{
 		Iterator it = find(key);
-		if (it != _list.end())
+		if (it != _container.end())
+		{
 			return it->second;
+		}
 		else
 		{
 			ValueType value(key, Mapped());
@@ -236,7 +255,7 @@ private:
 		return isEqual(std::string(s1), std::string(s2));
 	}
 
-	Container _list;
+	Container _container;
 };
 
 

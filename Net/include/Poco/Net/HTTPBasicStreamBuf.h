@@ -27,7 +27,7 @@ namespace Poco {
 namespace Net {
 
 
-typedef Poco::BasicBufferedStreamBuf<char, std::char_traits<char>, HTTPBufferAllocator> HTTPBasicStreamBuf;
+using HTTPBasicStreamBuf = Poco::BasicBufferedStreamBuf<char, std::char_traits<char>, HTTPBufferAllocator>;
 
 
 } } // namespace Poco::Net

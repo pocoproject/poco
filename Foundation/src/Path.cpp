@@ -16,7 +16,7 @@
 #include "Poco/File.h"
 #include "Poco/Exception.h"
 #include "Poco/StringTokenizer.h"
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32)
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
 #endif
@@ -25,14 +25,12 @@
 
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Path_UNIX.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Path_WINCE.cpp"
 #else
 #include "Path_WIN32U.cpp"
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Path_WIN32.cpp"
 #endif
 
 
@@ -86,6 +84,17 @@ Path::Path(const Path& path):
 }
 
 
+Path::Path(Path&& path) noexcept:
+	_node(std::move(path._node)),
+	_device(std::move(path._device)),
+	_name(std::move(path._name)),
+	_version(std::move(path._version)),
+	_dirs(std::move(path._dirs)),
+	_absolute(std::move(path._absolute))
+{
+}
+
+
 Path::Path(const Path& parent, const std::string& fileName):
 	_node(parent._node),
 	_device(parent._device),
@@ -132,6 +141,18 @@ Path::~Path()
 Path& Path::operator = (const Path& path)
 {
 	return assign(path);
+}
+
+
+Path& Path::operator = (Path&& path) noexcept
+{
+	_node     = std::move(path._node);
+	_device   = std::move(path._device);
+	_name     = std::move(path._name);
+	_version  = std::move(path._version);
+	_dirs     = std::move(path._dirs);
+	_absolute = std::move(path._absolute);
+	return *this;
 }
 
 
@@ -325,9 +346,9 @@ Path& Path::makeAbsolute(const Path& base)
 	{
 		Path tmp = base;
 		tmp.makeDirectory();
-		for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+		for (const auto& d: _dirs)
 		{
-			tmp.pushDirectory(*it);
+			tmp.pushDirectory(d);
 		}
 		_node     = tmp._node;
 		_device   = tmp._device;
@@ -578,7 +599,7 @@ std::string Path::configHome()
 #endif
 }
 
-	
+
 std::string Path::dataHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -588,7 +609,7 @@ std::string Path::dataHome()
 #endif
 }
 
-	
+
 std::string Path::tempHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -598,7 +619,7 @@ std::string Path::tempHome()
 #endif
 }
 
-	
+
 std::string Path::cacheHome()
 {
 #if defined(POCO_OS_FAMILY_UNIX) || defined(POCO_OS_FAMILY_WINDOWS)
@@ -964,9 +985,9 @@ std::string Path::buildUnix() const
 	{
 		result.append("/");
 	}
-	for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+	for (const auto& d: _dirs)
 	{
-		result.append(*it);
+		result.append(d);
 		result.append("/");
 	}
 	result.append(_name);
@@ -992,9 +1013,9 @@ std::string Path::buildWindows() const
 	{
 		result.append("\\");
 	}
-	for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+	for (const auto& d: _dirs)
 	{
-		result.append(*it);
+		result.append(d);
 		result.append("\\");
 	}
 	result.append(_name);
@@ -1043,7 +1064,7 @@ std::string Path::buildVMS() const
 
 std::string Path::transcode(const std::string& path)
 {
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32)
 	std::wstring uniPath;
 	UnicodeConverter::toUTF16(path, uniPath);
 	DWORD len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), NULL, 0, NULL, NULL);

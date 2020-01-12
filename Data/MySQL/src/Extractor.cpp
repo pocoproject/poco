@@ -80,7 +80,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	return realExtractFixed(pos, MYSQL_TYPE_LONG, &val);
@@ -105,32 +105,32 @@ bool Extractor::extract(std::size_t pos, float& val)
 	return realExtractFixed(pos, MYSQL_TYPE_FLOAT, &val);
 }
 
-	
+
 bool Extractor::extract(std::size_t pos, double& val)
 {
 	return realExtractFixed(pos, MYSQL_TYPE_DOUBLE, &val);
 }
 
-	
+
 bool Extractor::extract(std::size_t pos, char& val)
 {
 	return realExtractFixed(pos, MYSQL_TYPE_TINY, &val);
 }
 
-	
+
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
 	if (_metadata.columnsReturned() <= pos)
 		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
-	
+
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
-	
+
 	//mysql reports TEXT types as FDT_BLOB when being extracted
 	MetaColumn::ColumnDataType columnType = _metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type();
 	if (columnType != Poco::Data::MetaColumn::FDT_STRING && columnType != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a string");
-		
+
 	val.assign(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
 }
@@ -140,13 +140,13 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	if (_metadata.columnsReturned() <= pos)
 		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
-	
+
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
-	
+
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
-	
+
 	val.assignRaw(_metadata.rawData(pos), _metadata.length(pos));
 	return true;
 }
@@ -156,13 +156,13 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 {
 	if (_metadata.columnsReturned() <= pos)
 		throw MySQLException("Extractor: attempt to extract more parameters, than query result contain");
-	
+
 	if (_metadata.isNull(static_cast<Poco::UInt32>(pos)))
 	return false;
-	
+
 	if (_metadata.metaColumn(static_cast<Poco::UInt32>(pos)).type() != Poco::Data::MetaColumn::FDT_BLOB)
 		throw MySQLException("Extractor: not a blob");
-	
+
 	val.assignRaw(reinterpret_cast<const char*>(_metadata.rawData(pos)), _metadata.length(pos));
 	return true;
 }
@@ -244,7 +244,7 @@ bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* b
 	bind.buffer_type   = type;
 	bind.buffer		= buffer;
 	bind.is_unsigned   = isUnsigned;
-	
+
 	if (!_stmt.fetchColumn(pos, &bind))
 		return false;
 
@@ -273,8 +273,8 @@ bool Extractor::extract(std::size_t , std::list<Poco::Int8>& )
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
-	
-	
+
+
 bool Extractor::extract(std::size_t , std::vector<Poco::UInt8>& )
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");
@@ -401,7 +401,7 @@ bool Extractor::extract(std::size_t , std::list<Poco::UInt64>& )
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t , std::vector<long>& )
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");

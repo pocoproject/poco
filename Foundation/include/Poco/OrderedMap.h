@@ -20,7 +20,6 @@
 
 #include "Poco/Foundation.h"
 
-#ifdef POCO_ENABLE_CPP11
 
 #ifdef min
 #undef min
@@ -47,6 +46,5 @@ using OrderedMap = tsl::ordered_map<Key, T, Hash, KeyEqual, Allocator, ValueType
 
 } // namespace Poco
 
-#endif // POCO_ENABLE_CPP11
 
 #endif // Foundation_OrderedMap_INCLUDED

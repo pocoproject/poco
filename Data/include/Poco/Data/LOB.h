@@ -41,10 +41,10 @@ class LOB
 	/// a convenient way to access the data in a LOB.
 {
 public:
-	typedef typename std::vector<T>::const_iterator Iterator;
-	typedef T ValueType;
-	typedef typename std::vector<T> Container;
-	typedef Poco::SharedPtr<Container> ContentPtr;
+	using Iterator = typename std::vector<T>::const_iterator;
+	using ValueType = T;
+	using Container = std::vector<T>;
+	using ContentPtr = Poco::SharedPtr<Container>;
 
 	LOB(): _pContent(new std::vector<T>())
 		/// Creates an empty LOB.
@@ -74,6 +74,10 @@ public:
 	{
 	}
 
+	LOB(LOB&& other) noexcept: _pContent(std::move(other._pContent))
+	{
+	}
+
 	~LOB()
 		/// Destroys the LOB.
 	{
@@ -84,6 +88,12 @@ public:
 	{
 		LOB tmp(other);
 		swap(tmp);
+		return *this;
+	}
+
+	LOB& operator = (LOB&& other) noexcept
+	{
+		_pContent = std::move(other._pContent);
 		return *this;
 	}
 
@@ -180,8 +190,8 @@ private:
 };
 
 
-typedef LOB<unsigned char> BLOB;
-typedef LOB<char> CLOB;
+using BLOB = LOB<unsigned char>;
+using CLOB = LOB<char>;
 
 
 //
@@ -201,16 +211,14 @@ inline void swap(LOB<T>& b1, LOB<T>& b2)
 namespace std
 {
 	template<>
-	inline void swap<Poco::Data::BLOB>(Poco::Data::BLOB& b1, 
-		Poco::Data::BLOB& b2)
+	inline void swap<Poco::Data::BLOB>(Poco::Data::BLOB& b1, Poco::Data::BLOB& b2) noexcept
 		/// Full template specalization of std:::swap for BLOB
 	{
 		b1.swap(b2);
 	}
 
 	template<>
-	inline void swap<Poco::Data::CLOB>(Poco::Data::CLOB& c1, 
-		Poco::Data::CLOB& c2)
+	inline void swap<Poco::Data::CLOB>(Poco::Data::CLOB& c1, Poco::Data::CLOB& c2) noexcept
 		/// Full template specalization of std:::swap for CLOB
 	{
 		c1.swap(c2);
@@ -238,7 +246,7 @@ public:
 	~VarHolderImpl()
 	{
 	}
-	
+
 	const std::type_info& type() const
 	{
 		return typeid(Poco::Data::BLOB);
@@ -253,7 +261,7 @@ public:
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
-	
+
 	const Poco::Data::BLOB& value() const
 	{
 		return _val;
@@ -276,7 +284,7 @@ public:
 	~VarHolderImpl()
 	{
 	}
-	
+
 	const std::type_info& type() const
 	{
 		return typeid(Poco::Data::CLOB);
@@ -291,7 +299,7 @@ public:
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
-	
+
 	const Poco::Data::CLOB& value() const
 	{
 		return _val;

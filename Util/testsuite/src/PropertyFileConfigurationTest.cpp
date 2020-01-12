@@ -105,7 +105,7 @@ void PropertyFileConfigurationTest::testSave()
 }
 
 
-AbstractConfiguration* PropertyFileConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
 }

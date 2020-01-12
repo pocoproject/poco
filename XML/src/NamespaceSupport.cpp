@@ -71,8 +71,8 @@ void NamespaceSupport::getDeclaredPrefixes(PrefixSet& prefixes) const
 {
 	prefixes.clear();
 	const Context& ctx = _contexts.back();
-	for (Context::const_iterator it = ctx.begin(); it != ctx.end(); ++it)
-		prefixes.insert(it->first);
+	for (const auto& p: ctx)
+		prefixes.insert(p.first);
 }
 
 
@@ -148,7 +148,7 @@ const XMLString& NamespaceSupport::getURI(const XMLString& prefix) const
 
 void NamespaceSupport::pushContext()
 {
-	_contexts.push_back(Context());
+	_contexts.emplace_back();
 }
 
 

@@ -62,7 +62,7 @@ public:
 	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
 		/// Extracts a Var.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
 

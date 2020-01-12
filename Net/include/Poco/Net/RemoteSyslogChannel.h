@@ -23,6 +23,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -45,6 +46,8 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	///     msg.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
 {
 public:
+	using Ptr = Poco::AutoPtr<RemoteSyslogChannel>;
+
 	static const std::string BSD_TIMEFORMAT;
 	static const std::string SYSLOG_TIMEFORMAT;
 

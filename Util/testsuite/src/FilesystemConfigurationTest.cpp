@@ -79,7 +79,7 @@ void FilesystemConfigurationTest::testFilesystemConfiguration()
 }
 
 
-AbstractConfiguration* FilesystemConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr FilesystemConfigurationTest::allocConfiguration() const
 {
 	return new FilesystemConfiguration(_path.toString());
 }
