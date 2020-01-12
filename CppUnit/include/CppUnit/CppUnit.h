@@ -69,7 +69,7 @@
 
 #if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
 	#if !defined(CppUnit_EXPORTS)
-		#pragma comment(lib, "PocoCppUnit" POCO_LIB_SUFFIX)
+		#pragma comment(lib, "CppUnit" POCO_LIB_SUFFIX)
 	#endif
 #endif
 
@@ -80,8 +80,8 @@
 	#pragma warning(disable:4503)  // decorated name length exceeded - mainly a problem with STLPort
 	#pragma warning(disable:4018)  // signed/unsigned comparison
 	#pragma warning(disable:4284)  // return type for operator -> is not UDT
-	#pragma warning(disable:4251)  // ... needs to have dll-interface warning 
-	#pragma warning(disable:4273) 
+	#pragma warning(disable:4251)  // ... needs to have dll-interface warning
+	#pragma warning(disable:4273)
 	#pragma warning(disable:4275)  // ... non dll-interface class used as base for dll-interface class
 #endif
 

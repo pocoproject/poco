@@ -11,7 +11,7 @@ add_library(Poco::CppUnit ALIAS CppUnit)
 set_target_properties(CppUnit
     PROPERTIES
     VERSION "1" SOVERSION "1"
-    OUTPUT_NAME PocoCppUnit
+    OUTPUT_NAME CppUnit
     DEFINE_SYMBOL CppUnit_EXPORTS
     )
 target_link_libraries(CppUnit PUBLIC Poco::Foundation)
