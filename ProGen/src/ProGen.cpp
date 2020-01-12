@@ -475,7 +475,7 @@ protected:
 					Poco::AutoPtr<Poco::XML::Element> pTargetName = pProjectDoc->createElement("TargetName");
 					pTargetName->setAttribute("Condition", Poco::format("'$(Configuration)|$(Platform)'=='%s|%s'", config, arch));
 					std::string target = projectProps.getString("project.target");
-					target += templateProps.getString(Poco::format("project.targetSuffix.%s", config), "");
+					target += templateProps.getString(Poco::format("project.targetSuffix.%s.%s", config, arch), templateProps.getString(Poco::format("project.targetSuffix.%s", config), ""));
 					Poco::AutoPtr<Poco::XML::Text> pText = pProjectDoc->createTextNode(target);
 					pTargetName->appendChild(pText);
 					pPropertyGroup->appendChild(pTargetName);

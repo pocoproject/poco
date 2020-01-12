@@ -164,10 +164,10 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoDataMySQL</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoDataMySQLmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoDataMySQLmt</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoDataMySQLd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoDataMySQL64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoDataMySQLmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoDataMySQLmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoDataMySQL</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoDataMySQL64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoDataMySQLmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoDataMySQLmt</TargetName>
   </PropertyGroup>

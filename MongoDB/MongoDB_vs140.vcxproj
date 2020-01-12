@@ -164,10 +164,10 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoMongoDB</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoMongoDBmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoMongoDBmt</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoMongoDBd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoMongoDB64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoMongoDBmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoMongoDBmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoMongoDB</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoMongoDB64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoMongoDBmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoMongoDBmt</TargetName>
   </PropertyGroup>

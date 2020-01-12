@@ -164,10 +164,10 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoPDF</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoPDFmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoPDFmt</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoPDFd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoPDF64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoPDFmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoPDFmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoPDF</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoPDF64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoPDFmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoPDFmt</TargetName>
   </PropertyGroup>

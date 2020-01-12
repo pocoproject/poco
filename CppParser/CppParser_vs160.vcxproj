@@ -164,10 +164,10 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoCppParser</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoCppParsermd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoCppParsermt</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoCppParserd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoCppParser64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoCppParsermdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoCppParsermtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoCppParser</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoCppParser64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoCppParsermd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoCppParsermt</TargetName>
   </PropertyGroup>

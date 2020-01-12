@@ -164,10 +164,10 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">PocoUtil</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">PocoUtilmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">PocoUtilmt</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoUtild</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_shared|x64'">PocoUtil64d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">PocoUtilmdd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">PocoUtilmtd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoUtil</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">PocoUtil64</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">PocoUtilmd</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">PocoUtilmt</TargetName>
   </PropertyGroup>

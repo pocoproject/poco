@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{8d7947b7-95ef-46f3-8e58-7d0785003114}</UniqueIdentifier>
+      <UniqueIdentifier>{6c162c5f-b7ae-436f-a1a5-ecf733b32d81}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{5812230b-25c7-4d93-abcf-fcb35f1d9e0b}</UniqueIdentifier>
+      <UniqueIdentifier>{1beac889-c2f5-48df-93de-07a0658b987e}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{0b05c54f-512d-4520-a3fb-dd1ab20a33ab}</UniqueIdentifier>
+      <UniqueIdentifier>{d6fccab3-e509-4d0f-be51-81116507be0d}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{bca06d8a-4715-49c0-8202-566e7487702e}</UniqueIdentifier>
+      <UniqueIdentifier>{3777237e-6510-4397-932b-8b99b2baf730}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{1c9cc5bf-4e6e-408c-8a72-5497a913214d}</UniqueIdentifier>
+      <UniqueIdentifier>{4f1ff28e-858b-432a-8c0d-adbf7515b180}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{5f3a7b05-122f-43d1-8645-832a7093be54}</UniqueIdentifier>
+      <UniqueIdentifier>{22669877-0409-48ce-9ef4-815bd034f536}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{3735960e-9e85-48ea-b1af-04c02c1cc21a}</UniqueIdentifier>
+      <UniqueIdentifier>{bd891b52-55cd-48f0-893f-4370dc2264ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{ca6a3ed3-f3d7-4344-a953-f5706f081fd5}</UniqueIdentifier>
+      <UniqueIdentifier>{ceffc496-da4c-44a3-9fab-95a41fde3cdc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{421e2dab-1a1f-4611-98eb-68cf58cbb21a}</UniqueIdentifier>
+      <UniqueIdentifier>{a80cd2cd-b1b2-40f1-96c9-fcdf376aeba4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
