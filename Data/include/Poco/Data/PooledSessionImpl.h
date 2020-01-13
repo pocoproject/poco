@@ -52,6 +52,7 @@ public:
 	void close();
 	void reset();
 	bool isConnected() const;
+	bool isGood() const;
 	void setConnectionTimeout(std::size_t timeout);
 	std::size_t getConnectionTimeout() const;
 	bool canTransact() const;

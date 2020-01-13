@@ -218,6 +218,9 @@ public:
 	void reconnect();
 		/// Closes the session and opens it.
 
+	bool isGood();
+		/// Returns true iff the session is good and can be used, false otherwise.
+
 	void setLoginTimeout(std::size_t timeout);
 		/// Sets the session login timeout value.
 
@@ -347,6 +350,12 @@ inline bool Session::isConnected()
 inline void Session::reconnect()
 {
 	_pImpl->reconnect();
+}
+
+
+inline bool Session::isGood()
+{
+	return _pImpl->isGood();
 }
 
 

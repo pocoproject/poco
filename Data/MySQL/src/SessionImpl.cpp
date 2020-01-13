@@ -49,10 +49,13 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	_connector("MySQL"),
 	_handle(0),
 	_connected(false),
-	_inTransaction(false)
+	_inTransaction(false),
+	_failIfInnoReadOnly(false),
+	_lastError(0)
 {
 	addProperty("insertId", &SessionImpl::setInsertId, &SessionImpl::getInsertId);
 	setProperty("handle", static_cast<MYSQL*>(_handle));
+	addFeature("failIfInnoReadOnly", &SessionImpl::setFailIfInnoReadOnly, &SessionImpl::getFailIfInnoReadOnly);
 	open();
 }
 
@@ -129,7 +132,7 @@ void SessionImpl::open(const std::string& connect)
 	else if (!options["auto-reconnect"].empty())
 		throw MySQLException("create session: specify correct auto-reconnect option (true or false) or skip it");
 
-#ifdef MYSQL_SECURE_AUTH 
+#ifdef MYSQL_SECURE_AUTH
 	if (options["secure-auth"] == "true")
 		_handle.options(MYSQL_SECURE_AUTH, true);
 	else if (options["secure-auth"] == "false")
@@ -263,6 +266,50 @@ void SessionImpl::reset()
 {
 	if (_connected)
 		_handle.reset();
+}
+
+
+inline bool SessionImpl::isConnected() const
+{
+	return _connected;
+}
+
+
+bool SessionImpl::isGood() const
+{
+	if (_connected)
+	{
+		if (_lastError)
+		{
+			if (_failIfInnoReadOnly)
+			{
+				try
+				{
+					int ro = 0;
+					if (0 == getSetting("innodb_read_only", ro))
+					{
+						_lastError = 0;
+						return true;
+					}
+				}
+				catch (...)
+				{
+				}
+				return false;
+			}
+			else
+			{
+				if (_handle.ping())
+				{
+					_lastError = 0;
+					return true;
+				}
+				return false;
+			}
+		}
+		else return true;
+	}
+	else return false;
 }
 
 

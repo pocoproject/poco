@@ -66,6 +66,12 @@ bool PooledSessionImpl::isConnected() const
 }
 
 
+bool PooledSessionImpl::isGood() const
+{
+	return access()->isGood();
+}
+
+
 void PooledSessionImpl::setConnectionTimeout(std::size_t timeout)
 {
 	return access()->setConnectionTimeout(timeout);
@@ -160,7 +166,7 @@ const std::string& PooledSessionImpl::connectorName() const
 }
 
 
-void PooledSessionImpl::setFeature(const std::string& name, bool state)	
+void PooledSessionImpl::setFeature(const std::string& name, bool state)
 {
 	access()->setFeature(name, state);
 }

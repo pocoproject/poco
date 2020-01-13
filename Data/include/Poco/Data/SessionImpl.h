@@ -35,7 +35,7 @@ class StatementImpl;
 
 
 class Data_API SessionImpl: public Poco::RefCountedObject
-	/// Interface for Session functionality that subclasses must extend. 
+	/// Interface for Session functionality that subclasses must extend.
 	/// SessionImpl objects are noncopyable.
 {
 public:
@@ -65,10 +65,10 @@ public:
 
 	virtual void open(const std::string& connectionString = "") = 0;
 		/// Opens the session using the supplied string.
-		/// Can also be used with default empty string to reconnect 
+		/// Can also be used with default empty string to reconnect
 		/// a disconnected session.
-		/// If the connection is not established within requested timeout 
-		/// (specified in seconds), a ConnectionFailedException is thrown. 
+		/// If the connection is not established within requested timeout
+		/// (specified in seconds), a ConnectionFailedException is thrown.
 		/// Zero timout means indefinite
 
 	virtual void close() = 0;
@@ -76,6 +76,11 @@ public:
 
 	virtual bool isConnected() const = 0;
 		/// Returns true if session is connected, false otherwise.
+
+	virtual bool isGood() const;
+		/// Returns true if session is good and can be used, false otherwise.
+		///
+		/// The default implementation returns result of isConnected().
 
 	void setLoginTimeout(std::size_t timeout);
 		/// Sets the session login timeout value.
@@ -144,7 +149,7 @@ public:
 		///
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
-	
+
 	virtual bool getFeature(const std::string& name) = 0;
 		/// Look up the state of a feature.
 		///

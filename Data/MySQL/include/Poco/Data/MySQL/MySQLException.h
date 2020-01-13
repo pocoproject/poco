@@ -44,6 +44,9 @@ public:
 	MySQLException(const MySQLException& exc);
 		/// Creates MySQLException.
 
+	MySQLException(const std::string& msg, int code);
+		/// Creates MySQLException.
+
 	~MySQLException() noexcept;
 		/// Destroys MySQLexception.
 

@@ -42,23 +42,23 @@ public:
 		if (pthread_key_create(&_key, &ThreadCleanupHelper::cleanup) != 0)
 			throw Poco::SystemException("cannot create TLS key for mysql cleanup");
 	}
-	
+
 	void init()
 	{
 		if (pthread_setspecific(_key, reinterpret_cast<void*>(1)))
 			throw Poco::SystemException("cannot set TLS key for mysql cleanup");
 	}
-	
+
 	static ThreadCleanupHelper& instance()
 	{
 		return *_sh.get();
 	}
-	
+
 	static void cleanup(void* data)
 	{
 		mysql_thread_end();
 	}
-	
+
 private:
 	pthread_key_t _key;
 	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
@@ -189,6 +189,13 @@ void SessionHandle::reset()
 	if (mysql_refresh(_pHandle, REFRESH_TABLES | REFRESH_STATUS | REFRESH_THREADS | REFRESH_READ_LOCK) != 0)
 #endif
 		throw TransactionException("Reset connection failed.", _pHandle);
+}
+
+
+bool SessionHandle::ping()
+{
+	int rc = mysql_ping(_pHandle);
+	return rc == 0;
 }
 
 

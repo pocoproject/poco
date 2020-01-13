@@ -70,6 +70,9 @@ public:
 	void reset();
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
+	bool ping();
+		/// Checks if the connection is alive.
+
 	operator MYSQL* ();
 
 private:

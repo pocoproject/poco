@@ -100,7 +100,7 @@ void SessionPool::purgeDeadSessions()
 	SessionList::iterator it = _idleSessions.begin();
 	for (; it != _idleSessions.end(); )
 	{
-		if (!(*it)->session()->isConnected())
+		if (!(*it)->session()->isGood())
 		{
 			it = _idleSessions.erase(it);
 			--_nSessions;
@@ -139,7 +139,7 @@ int SessionPool::dead()
 	SessionList::iterator itEnd = _activeSessions.end();
 	for (; it != itEnd; ++it)
 	{
-		if (!(*it)->session()->isConnected())
+		if (!(*it)->session()->isGood())
 			++count;
 	}
 
@@ -233,7 +233,7 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
 	if (it != _activeSessions.end())
 	{
-		if (pHolder->session()->isConnected())
+		if (pHolder->session()->isGood())
 		{
 			pHolder->session()->reset();
 
@@ -271,7 +271,7 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 	SessionList::iterator it = _idleSessions.begin(); 
 	while (_nSessions > _minSessions && it != _idleSessions.end())
 	{
-		if ((*it)->idle() > _idleTime || !(*it)->session()->isConnected())
+		if ((*it)->idle() > _idleTime || !(*it)->session()->isGood())
 		{	
 			try	{ (*it)->session()->close(); }
 			catch (...) { }

@@ -54,10 +54,10 @@ public:
 		/// for compress and auto-reconnect correct values are true/false
 		/// for port - numeric in decimal notation
 		///
-		
+
 	~SessionImpl();
 		/// Destroys the SessionImpl.
-		
+
 	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
 		/// Returns an MySQL StatementImpl
 
@@ -69,9 +69,21 @@ public:
 
 	void reset();
 		/// Reset connection with dababase and clears session state, but without disconnecting
-		
+
 	bool isConnected() const;
 		/// Returns true if connected, false otherwise.
+
+	bool isGood() const;
+		/// Returns true iff the database session is good.
+		/// For the session to be considered good:
+		///   - it must be connected
+		///   - and it's last error code must be 0,
+		///     or mysql_ping() must be okay.
+		///
+		/// Furthermore, if the "failIfInnoReadOnly" property
+		/// has been set to true, the innodb_read_only setting
+		/// must be false. The flag is only checked if the
+		/// session has a non-zero error code.
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
@@ -81,13 +93,13 @@ public:
 
 	void begin();
 		/// Starts a transaction
-	
+
 	void commit();
-		/// Commits and ends a transaction		
+		/// Commits and ends a transaction
 
 	void rollback();
 		/// Aborts a transaction
-		
+
 	bool canTransact() const;
 		/// Returns true if session has transaction capabilities.
 
@@ -107,7 +119,7 @@ public:
 	bool isTransactionIsolation(Poco::UInt32 ti) const;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
-		
+
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
 
@@ -116,9 +128,23 @@ public:
 
 	void setInsertId(const std::string&, const Poco::Any&);
 		/// Try to set insert id - do nothing.
-		
+
 	Poco::Any getInsertId(const std::string&) const;
 		/// Get insert id
+
+	void setFailIfInnoReadOnly(const std::string&, bool value);
+		/// Sets the "failIfInnoReadOnly" feature. If set, isGood() will
+		/// return false if the database is in read-only mode.
+
+	bool getFailIfInnoReadOnly(const std::string&) const;
+		/// Returns the state of the "failIfInnoReadOnly" feature.
+
+	void setLastError(int err);
+		/// Sets an error code. If a non-zero error code is set, the session
+		/// is considered bad.
+
+	int getLastError() const;
+		/// Returns the last set error code.
 
 	SessionHandle& handle();
 		// Get handle
@@ -158,7 +184,9 @@ private:
 	mutable SessionHandle _handle;
 	bool                  _connected;
 	bool                  _inTransaction;
+	bool                  _failIfInnoReadOnly;
 	std::size_t           _timeout;
+	mutable int           _lastError;
 	Poco::FastMutex       _mutex;
 };
 
@@ -180,6 +208,30 @@ inline void SessionImpl::setInsertId(const std::string&, const Poco::Any&)
 inline Poco::Any SessionImpl::getInsertId(const std::string&) const
 {
 	return Poco::Any(Poco::UInt64(mysql_insert_id(_handle)));
+}
+
+
+inline void SessionImpl::setFailIfInnoReadOnly(const std::string&, bool value)
+{
+	_failIfInnoReadOnly = value;
+}
+
+
+inline bool SessionImpl::getFailIfInnoReadOnly(const std::string&) const
+{
+	return _failIfInnoReadOnly;
+}
+
+
+inline void SessionImpl::setLastError(int err)
+{
+	_lastError = err;
+}
+
+
+inline int SessionImpl::getLastError() const
+{
+	return _lastError;
 }
 
 
@@ -206,12 +258,6 @@ inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 	return getTransactionIsolation() == ti;
 }
 
-
-inline bool SessionImpl::isConnected() const
-{
-	return _connected;
-}
-	
 
 inline std::size_t SessionImpl::getConnectionTimeout() const
 {
