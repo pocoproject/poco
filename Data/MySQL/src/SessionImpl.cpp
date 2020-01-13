@@ -129,12 +129,14 @@ void SessionImpl::open(const std::string& connect)
 	else if (!options["auto-reconnect"].empty())
 		throw MySQLException("create session: specify correct auto-reconnect option (true or false) or skip it");
 
+#ifdef MYSQL_SECURE_AUTH 
 	if (options["secure-auth"] == "true")
 		_handle.options(MYSQL_SECURE_AUTH, true);
 	else if (options["secure-auth"] == "false")
 		_handle.options(MYSQL_SECURE_AUTH, false);
 	else if (!options["secure-auth"].empty())
 		throw MySQLException("create session: specify correct secure-auth option (true or false) or skip it");
+#endif
 
 	if (!options["character-set"].empty())
 		_handle.options(MYSQL_SET_CHARSET_NAME, options["character-set"].c_str());
@@ -282,4 +284,4 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL

@@ -20,6 +20,11 @@
 #endif
 
 
+#if LIBMYSQL_VERSION_ID >= 80000
+typedef bool my_bool; // Workaround to make library work with MySQL client 8.0 as well as earlier versions
+#endif
+
+
 #define POCO_MYSQL_VERSION_NUMBER ((NDB_VERSION_MAJOR<<16) | (NDB_VERSION_MINOR<<8) | (NDB_VERSION_BUILD&0xFF))
 
 
@@ -187,4 +192,4 @@ void SessionHandle::reset()
 }
 
 
-}}} // Poco::Data::MySQL
+} } } // namespace Poco::Data::MySQL

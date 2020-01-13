@@ -127,7 +127,6 @@ public:
 		/// Returns the name of the connector.
 
 private:
-
 	template <typename T>
 	static inline T& getValue(MYSQL_BIND* pResult, T& val)
 	{

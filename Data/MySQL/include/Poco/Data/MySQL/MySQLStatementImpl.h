@@ -17,6 +17,7 @@
 #ifndef Data_MySQL_MySQLStatementImpl_INCLUDED
 #define Data_MySQL_MySQLStatementImpl_INCLUDED
 
+
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/Binder.h"
@@ -44,7 +45,6 @@ public:
 		/// Destroys the MySQLStatementImpl.
 		
 protected:
-
 	virtual std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 
@@ -93,7 +93,7 @@ private:
 	Binder::Ptr       _pBinder;
 	Extractor::Ptr    _pExtractor;
 	int               _hasNext;
-	};
+};
 
 
 } } } // namespace Poco::Data::MySQL

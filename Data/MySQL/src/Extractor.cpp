@@ -13,9 +13,9 @@
 
 
 #include "Poco/Data/MySQL/Extractor.h"
-
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+
 
 namespace Poco {
 namespace Data {
@@ -240,10 +240,10 @@ bool Extractor::realExtractFixed(std::size_t pos, enum_field_types type, void* b
 	MYSQL_BIND bind = {0};
 	my_bool isNull = 0;
 
-	bind.is_null	   = &isNull;
-	bind.buffer_type   = type;
-	bind.buffer		= buffer;
-	bind.is_unsigned   = isUnsigned;
+	bind.is_null     = &isNull;
+	bind.buffer_type = type;
+	bind.buffer      = buffer;
+	bind.is_unsigned = isUnsigned;
 
 	if (!_stmt.fetchColumn(pos, &bind))
 		return false;
@@ -635,7 +635,6 @@ bool Extractor::extract(std::size_t , std::list<Dynamic::Var>& )
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
-
 
 
 } } } // namespace Poco::Data::MySQL

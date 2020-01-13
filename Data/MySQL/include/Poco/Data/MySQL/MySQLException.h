@@ -17,31 +17,27 @@
 #ifndef Data_MySQL_MySQLException_INCLUDED
 #define Data_MySQL_MySQLException_INCLUDED
 
+
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/DataException.h"
 #include <typeinfo>
 #include <string>
+#include <mysql.h>
 
-#ifndef MYSQL
-typedef struct st_mysql MYSQL;
-#endif
-
-#ifndef MYSQL_STMT
-typedef struct st_mysql_stmt MYSQL_STMT;
-#endif
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 // End-user include this file and use in code ConnectionException/StatementException
 // So it need not know
+
 
 class MySQL_API MySQLException: public Poco::Data::DataException
 	/// Base class for all MySQL exceptions
 {
 public:
-
 	MySQLException(const std::string& msg);
 		/// Creates MySQLException.
 
@@ -79,7 +75,6 @@ class ConnectionException : public MySQLException
 	/// ConnectionException
 {
 public:
-
 	ConnectionException(const std::string& msg);
 		/// Creates ConnectionException from string.
 
@@ -87,9 +82,7 @@ public:
 		/// Creates ConnectionException from string and handle.
 
 private:
-
 	static std::string compose(const std::string& text, MYSQL* h);
-
 };
 
 
@@ -97,7 +90,6 @@ class TransactionException : public ConnectionException
 	/// TrabsactionException
 {
 public:
-
 	TransactionException(const std::string& msg);
 		/// Creates TransactionException from string.
 
@@ -110,7 +102,6 @@ class StatementException : public MySQLException
 	/// StatementException
 {
 public:
-
 	StatementException(const std::string& msg);
 		/// Creates StatementException from string.
 
@@ -118,7 +109,6 @@ public:
 		/// Creates StatementException from string and handle.
 
 private:
-
 	static std::string compose(const std::string& text, MYSQL_STMT* h, const std::string& stmt);
 };
 
@@ -126,6 +116,7 @@ private:
 //
 // inlines
 //
+
 
 inline MySQLException& MySQLException::operator=(const MySQLException& exc)
 {
@@ -155,5 +146,6 @@ inline void MySQLException::rethrow() const
 
 
 } } } // namespace Poco::Data::MySQL
+
 
 #endif //Data_MySQL_MySQLException_INCLUDED

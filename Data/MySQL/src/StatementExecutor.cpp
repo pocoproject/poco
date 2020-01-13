@@ -146,4 +146,4 @@ int StatementExecutor::getAffectedRowCount() const
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL

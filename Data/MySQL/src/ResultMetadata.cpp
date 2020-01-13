@@ -16,13 +16,13 @@
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <cstring>
 
+
 namespace
 {
 	class ResultMetadataHandle
 		/// Simple exception-safe wrapper
 	{
 	public:
-
 		explicit ResultMetadataHandle(MYSQL_STMT* stmt)
 		{
 			h = mysql_stmt_result_metadata(stmt);
@@ -42,7 +42,6 @@ namespace
 		}
 
 	private:
-
 		MYSQL_RES* h;
 	};
 
@@ -140,6 +139,7 @@ namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 void ResultMetadata::reset()
 {
 	_columns.resize(0);
@@ -148,6 +148,7 @@ void ResultMetadata::reset()
 	_lengths.resize(0);
 	_isNull.resize(0);
 }
+
 
 void ResultMetadata::init(MYSQL_STMT* stmt)
 {
@@ -199,41 +200,48 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 		_row[i].buffer_length = len;
 		_row[i].buffer        = (len > 0) ? (&_buffer[0] + offset) : 0;
 		_row[i].length        = &_lengths[i];
-		_row[i].is_null       = &_isNull[i];
+		_row[i].is_null       = reinterpret_cast<my_bool*>(&_isNull[i]); // workaround to make it work with both MySQL 8 and earlier
 		_row[i].is_unsigned   = (fields[i].flags & UNSIGNED_FLAG) > 0;
 		
 		offset += _row[i].buffer_length;
 	}
 }
 
+
 std::size_t ResultMetadata::columnsReturned() const
 {
 	return static_cast<std::size_t>(_columns.size());
 }
+
 
 const MetaColumn& ResultMetadata::metaColumn(std::size_t pos) const
 {
 	return _columns[pos];
 }
 
+
 MYSQL_BIND* ResultMetadata::row()
 {
 	return &_row[0];
 }
+
 
 std::size_t ResultMetadata::length(std::size_t pos) const
 {
 	return _lengths[pos];
 }
 
+
 const unsigned char* ResultMetadata::rawData(std::size_t pos) const 
 {
 	return reinterpret_cast<const unsigned char*>(_row[pos].buffer);
 }
+
 
 bool ResultMetadata::isNull(std::size_t pos) const 
 {
 	return (_isNull[pos] != 0);
 }
 
-}}} // namespace Poco::Data::MySQL
+
+} } } // namespace Poco::Data::MySQL

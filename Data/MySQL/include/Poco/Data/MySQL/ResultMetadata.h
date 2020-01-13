@@ -17,19 +17,29 @@
 #ifndef Data_MySQL_ResultMetadata_INCLUDED
 #define Data_MySQL_ResultMetadata_INCLUDED
 
+
 #include <mysql.h>
 #include <vector>
 #include "Poco/Data/MetaColumn.h"
+
+
+#if LIBMYSQL_VERSION_ID >= 80000
+typedef bool my_bool;  // Workaround to make library work with MySQL client 8.0 as well as earlier versions
+typedef char my_boolv; // Workaround for std::vector<bool>
+#else
+typedef my_bool my_boolv;
+#endif
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 class ResultMetadata
 	/// MySQL result metadata
 {
 public:
-
 	void reset();
 		/// Resets the metadata.
 
@@ -59,9 +69,11 @@ private:
 	std::vector<MYSQL_BIND>    _row;
 	std::vector<char>          _buffer;
 	std::vector<unsigned long> _lengths;
-	std::vector<my_bool>       _isNull;
+	std::vector<my_boolv>      _isNull; // using char instead of bool to avoid std::vector<bool> disaster
 };
 
-}}}
+
+} } } // namespace Poco::Data::MySQL
+
 
 #endif //Data_MySQL_ResultMetadata_INCLUDED

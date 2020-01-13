@@ -318,17 +318,16 @@ public:
 		/// Extracts a Dynamic::Var list.
 
 private:
-
 	bool realExtractFixed(std::size_t pos, enum_field_types type, void* buffer, bool isUnsigned = false);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
 
 private:
-
 	StatementExecutor& _stmt;
 	ResultMetadata& _metadata;
 };
+
 
 } } } // namespace Poco::Data::MySQL
 

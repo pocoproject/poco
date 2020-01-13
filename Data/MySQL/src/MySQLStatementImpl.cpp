@@ -14,6 +14,7 @@
 
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
 
+
 namespace Poco {
 namespace Data {
 namespace MySQL {

@@ -17,11 +17,13 @@
 #ifndef Data_MySQL_Binder_INCLUDED
 #define Data_MySQL_Binder_INCLUDED
 
+
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <mysql.h>
+
 
 namespace Poco {
 namespace Data {
@@ -104,7 +106,6 @@ public:
 
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null.
-
 
 	virtual void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir = PD_IN);
 
@@ -226,9 +227,6 @@ public:
 	MYSQL_BIND* getBindArray() const;
 		/// Return array
 
-	//void updateDates();
-		/// Update linked times
-
 private:
 	Binder(const Binder&);
 		/// Don't copy the binder
@@ -244,7 +242,6 @@ private:
 		/// Common bind implementation
 
 private:
-
 	std::vector<MYSQL_BIND> _bindArray;
 	std::vector<MYSQL_TIME*> _dates;
 };

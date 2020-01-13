@@ -17,18 +17,20 @@
 #ifndef Data_MySQL_SessionHandle_INCLUDED
 #define Data_MySQL_SessionHandle_INCLUDED
 
+
 #include <mysql.h>
 #include "Poco/Data/MySQL/MySQLException.h"
+
 
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
+
 class SessionHandle
 	/// MySQL session handle
 {
 public:
-
 	explicit SessionHandle(MYSQL* mysql);
 		/// Creates session handle
 
@@ -71,12 +73,10 @@ public:
 	operator MYSQL* ();
 
 private:
-
 	SessionHandle(const SessionHandle&);
 	SessionHandle& operator=(const SessionHandle&);
 
 private:
-
 	MYSQL* _pHandle;
 };
 
@@ -91,6 +91,7 @@ inline SessionHandle::operator MYSQL* ()
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL
+
 
 #endif // Data_MySQL_SessionHandle_INCLUDED
