@@ -11,5 +11,6 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS OFF
 )
 
 add_executable(DataPostgreSQL-testrunner ${TEST_SRCS} )
-add_test(NAME DataPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND DataPostgreSQL-testrunner -all)
+add_test(NAME DataPostgreSQL WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND DataPostgreSQL-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all)
+set_tests_properties(DataPostgreSQL PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 target_link_libraries(DataPostgreSQL-testrunner PUBLIC Poco::DataPostgreSQL CppUnit)
