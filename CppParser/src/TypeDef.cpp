@@ -80,6 +80,7 @@ std::string TypeAlias::baseType() const
 		std::string::size_type pos = 0;
 		while (pos < decl.size() && std::isspace(decl[pos])) pos++;
 		while (pos < decl.size() && decl[pos] != '=') pos++;
+		if (pos < decl.size() && decl[pos] == '=') pos++;
 		decl.erase(0, pos);
 		Poco::trimInPlace(decl);
 	}
