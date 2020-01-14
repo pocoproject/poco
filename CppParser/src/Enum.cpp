@@ -28,8 +28,9 @@ namespace CppParser {
 int Enum::_count = 0;
 
 
-Enum::Enum(const std::string& name, NameSpace* pNameSpace):
-	Symbol(processName(name), pNameSpace)
+Enum::Enum(const std::string& name, NameSpace* pNameSpace, int flags):
+	Symbol(processName(name), pNameSpace),
+	_flags(flags)
 {
 }
 
