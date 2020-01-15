@@ -15,7 +15,8 @@ POCO_SOURCES_AUTO_PLAT( TEST_SRCS WINCE
 )
 
 add_executable(NetSSLWin-testrunner ${TEST_SRCS} )
-add_test(NAME NetSSLWin WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND NetSSLWin-testrunner -all)
+add_test(NAME NetSSLWin WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COMMAND NetSSLWin-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all)
+set_tests_properties(NetSSLWin PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML CppUnit)
 
 # The test is run in the build directory. So the test data is copied there too

@@ -82,6 +82,14 @@ public:
 	{
 	}
 
+	Nullable(C&& value):
+		/// Creates a Nullable by moving the given value.
+		_value(value),
+		_isNull(false),
+		_null()
+	{
+	}
+
 	Nullable(const Nullable& other):
 		/// Creates a Nullable by copying another one.
 		_value(other._value),
@@ -112,6 +120,14 @@ public:
 		return *this;
 	}
 
+	Nullable& assign(C&& value)
+		/// Assigns a value to the Nullable.
+	{
+		_value  = value;
+		_isNull = false;
+		return *this;
+	}
+
 	Nullable& assign(const Nullable& other)
 		/// Assigns another Nullable.
 	{
@@ -129,6 +145,12 @@ public:
 
 	Nullable& operator = (const C& value)
 		/// Assigns a value to the Nullable.
+	{
+		return assign(value);
+	}
+
+	Nullable& operator = (C&& value)
+		/// Move-assigns a value to the Nullable.
 	{
 		return assign(value);
 	}
