@@ -329,6 +329,11 @@ protected:
 				logger().log(exc);
 				++errors;
 			}
+			catch (std::exception& exc)
+			{
+				logger().error(std::string(exc.what()));
+				++errors;
+			}
 		}
 		return errors;
 	}
