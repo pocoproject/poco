@@ -49,6 +49,7 @@ Page::Page(const Page& other):
 
 Page::~Page()
 {
+	delete _pCurrentFont;
 }
 
 
@@ -120,8 +121,11 @@ void Page::setTTFont(const std::string& name, float size, const std::string& enc
 
 const Font& Page::getFont() const
 {
-	delete _pCurrentFont;
-	return *(_pCurrentFont = new Font(&_pDocument->handle(), HPDF_Page_GetCurrentFont(_page)));
+	delete _pCurrentFont; _pCurrentFont = 0;
+	HPDF_Font pCurFont = HPDF_Page_GetCurrentFont(_page);
+	if (!pCurFont) throw Poco::NullPointerException("PDF::Page has no font set.");
+	_pCurrentFont = new Font(&_pDocument->handle(), pCurFont);
+	return *_pCurrentFont;
 }
 
 

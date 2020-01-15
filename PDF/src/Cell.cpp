@@ -15,19 +15,20 @@ Cell::Cell(const AttributedString& content, const std::string& name, FontMapPtr 
 	_outline(OUTLINE_NONE),
 	_lineWidth(1.0f),
 	_encoding("UTF-8"),
-	_trueType(true)
-
+	_trueType(true),
+	_widthAsPct(-1)
 {
 	setFonts(pFontMap);
 }
 
 
-Cell::Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding, bool trueType):
+Cell::Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding, bool trueType, int widthAsPct):
 	_content(content), 
 	_outline(OUTLINE_NONE),
 	_lineWidth(1.0f),
 	_encoding(encoding), 
-	_trueType(trueType)
+	_trueType(trueType),
+	_widthAsPct(widthAsPct)
 {
 	setFonts(pFontMap);
 }
@@ -71,15 +72,18 @@ void Cell::borderAll(bool show)
 void Cell::draw(Page& page, float x, float y, float width, float height)
 {
 	// uncomment to force showing of the cell outline regardless of settings
-	// _outline = 15;
+	//_outline = 15;
 
 	if (_outline != OUTLINE_NONE)
 	{
 		page.setLineWidth(_lineWidth);
 		page.moveTo(x, y);
 		if (_outline & OUTLINE_LEFT  ) page.lineTo(x,       y+height);
+		page.moveTo(x, y+height);
 		if (_outline & OUTLINE_TOP   ) page.lineTo(x+width, y+height);
+		page.moveTo(x+width, y+height);
 		if (_outline & OUTLINE_RIGHT ) page.lineTo(x+width, y       );
+		page.moveTo(x+width, y);
 		if (_outline & OUTLINE_BOTTOM) page.lineTo(x,       y       );
 		page.stroke();
 	}

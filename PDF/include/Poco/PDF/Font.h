@@ -30,7 +30,7 @@ class PDF_API Font: public Resource<HPDF_Font>
 	/// Font class represents font resource.
 {
 public:
-	Font(HPDF_Doc* pPDF, const HPDF_Font& resource);
+	Font(HPDF_Doc* pPDF, HPDF_Font resource);
 		/// Creates the font.
 
 	~Font();
