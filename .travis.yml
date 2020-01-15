@@ -107,12 +107,12 @@ matrix:
     - env:    TEST_NAME="gcc-5.4.0 (CMake)"
       compiler: gcc
       script:
-        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && sudo -s PWD=`pwd` PATH=$PWD/cmake-3.5.1-Linux-x86_64/bin:$PATH CTEST_OUTPUT_ON_FAILURE=1 cmake --build cmake-build --target test
+        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s ctest --output-on-failure -E Data/MySQL Data/ODBC MongoDB PDF
 
     - env:    TEST_NAME="clang (CMake)"
       compiler: clang
       script:
-        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && sudo -s PWD=`pwd` PATH=$PWD/cmake-3.5.1-Linux-x86_64/bin:$PATH CTEST_OUTPUT_ON_FAILURE=1 cmake --build cmake-build --target test
+        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s ctest --output-on-failure -E Data/MySQL Data/ODBC MongoDB PDF
 
     - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
       script:
