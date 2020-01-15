@@ -76,6 +76,7 @@ public:
 	void testEmptyDB();
 
 	void testCLOB();
+	void testBLOB();
 
 	void testTuple1();
 	void testTupleVector1();

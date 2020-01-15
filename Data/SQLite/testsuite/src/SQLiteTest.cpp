@@ -54,6 +54,7 @@ using Poco::Data::SQLChannel;
 using Poco::Data::LimitException;
 using Poco::Data::ConnectionFailedException;
 using Poco::Data::CLOB;
+using Poco::Data::BLOB;
 using Poco::Data::Date;
 using Poco::Data::Time;
 using Poco::Data::Transaction;
@@ -1415,6 +1416,47 @@ void SQLiteTest::testCLOB()
 	{
 		poco_assert (*resVec[i].begin() == (char) (0x30 + i));
 	}
+}
+
+
+void SQLiteTest::testBLOB()
+{
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	Session tmp(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Person", now;
+	tmp << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Image BLOB)", now;
+	typedef struct
+	{
+		int i = 0;
+		Poco::Int64 i64 = 1;
+		float f = 2.5;
+		double d = 3.5;
+		char c[16] = {0};
+	} DataStruct;
+	DataStruct ds;
+	strcpy(ds.c, "123456789ABCDEF");
+	BLOB img(reinterpret_cast<unsigned char*>(&ds), sizeof(ds));
+	assertTrue(img.size() == sizeof(ds));
+	int count = 0;
+	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use(lastName), use(firstName), use(address), use(img), now;
+	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assertTrue(count == 1);
+	BLOB res;
+	assertTrue(res.size() == 0);
+
+	tmp << "SELECT Image FROM Person WHERE LastName == :ln", bind("lastname"), into(res), now;
+	assertTrue(res.size() == img.size());
+	assertTrue(0 == std::memcmp(res.rawContent(), img.rawContent(), sizeof(img)));
+	assertTrue(0 == std::memcmp(res.rawContent(), &ds, sizeof(ds)));
+	DataStruct dsCopy;
+	std::memcpy(&dsCopy, res.rawContent(), sizeof(dsCopy));
+	assertTrue(ds.i == dsCopy.i);
+	assertTrue(ds.i64 == dsCopy.i64);
+	assertTrue(ds.f == dsCopy.f);
+	assertTrue(ds.d == dsCopy.d);
+	assertTrue(std::string(ds.c) == std::string(dsCopy.c));
 }
 
 
@@ -3432,6 +3474,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testSingleSelect);
 	CppUnit_addTest(pSuite, SQLiteTest, testEmptyDB);
 	CppUnit_addTest(pSuite, SQLiteTest, testCLOB);
+	CppUnit_addTest(pSuite, SQLiteTest, testBLOB);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple9);
