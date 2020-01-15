@@ -64,19 +64,31 @@ void Table::draw(Page& page, float x, float y, float width, float height)
 {
 	if (_cells.size())
 	{
-		int rows = _cells.size();
-		int cols = _cells[0].size();
+		int rows = static_cast<int>(_cells.size());
+		int cols = static_cast<int>(_cells[0].size());
 		int r = 0;
 		for (Cells::iterator it = _cells.begin(); it != _cells.end(); ++it)
 		{
 			TableRow& row(*it);
 			float h = height / rows;
 			int c = 0;
+			float lastX = x;
 			for (TableRow::iterator itr = row.begin(); itr != row.end(); ++itr)
 			{
 				Cell& cell(*itr);
 				float w = width / cols;
-				cell.draw(page, x + (w * c), y - (h * r), w, h);
+				if (!cell.hasWidth())
+				{
+					cell.draw(page, x + (w * c), y - (h * r), w, h);
+					lastX += (w * c);
+				}
+				else
+				{
+					w = width * cell.getWidthAsPct() / 100.0f;
+					cell.draw(page, lastX, y - (h * r), w, h);
+					lastX += w;
+				}
+
 				++c;
 			}
 			++r;

@@ -279,6 +279,16 @@ public:
 		_pPage->setLineWidth(0.2f);
 		RGBColor black = {0, 0, 0};
 		_pPage->setRGBStroke(black);
+
+		// read or force font, page must have default
+		std::string fontFamily = _styles.getString("font-family", "helvetica");
+		float fontSize = _styles.getFloat("font-size", 10.0);
+		std::string fontStyle = _styles.getString("font-style", "normal");
+		std::string fontWeight = _styles.getString("font-weight", "normal");
+
+		Font font = loadFont(fontFamily, fontStyle, fontWeight);
+		_pPage->setFont(font, fontSize);
+
 		_boxes.push_back(Box(0, 0, _pPage->getWidth(), _pPage->getHeight()));
 
 		float margin = _styles.getFloat("margin", 0);
@@ -323,7 +333,6 @@ public:
 		_text = transcode(_text);
 
 		Font font = loadFont(fontFamily, fontStyle, fontWeight);
-
 		_pPage->setFont(font, fontSize);
 
 		float width = static_cast<float>(font.textWidth(_text).width*fontSize / 1000);
@@ -448,12 +457,20 @@ public:
 		AttributedString::Alignment align = AttributedString::ALIGN_LEFT;
 		int style = AttributedString::STYLE_PLAIN;
 
+		
 		std::string fontFamily = _styles.getString("font-family");
 		float       fontSize = _styles.getFloat("font-size");
 		std::string textAlign = _styles.getString("text-align", "left");
 		std::string fontStyle = _styles.getString("font-style", "normal");
 		std::string fontWeight = _styles.getString("font-weight", "normal");
 		std::string textTransform = _styles.getString("text-transform", "none");
+		std::string widthPct = _styles.getString("width", "");
+		// solid only supported at this time
+		bool borderAll = _styles.getString("border-style", "") == "solid";
+		bool borderLeft = _styles.getString("border-left", "") == "solid";
+		bool borderTop = _styles.getString("border-top", "") == "solid";
+		bool borderRight = _styles.getString("border-right", "") == "solid";
+		bool borderBottom = _styles.getString("border-bottom", "") == "solid";
 
 		_text = transform(_text, textTransform);
 		_text = transcode(_text);
@@ -462,6 +479,8 @@ public:
 			align = AttributedString::ALIGN_RIGHT;
 		else if (textAlign == "left")
 			align = AttributedString::ALIGN_LEFT;
+		else if (textAlign == "center")
+			align = AttributedString::ALIGN_CENTER;
 
 		if (fontStyle == "italic" || fontStyle == "oblique")
 			style |= AttributedString::STYLE_ITALIC;
@@ -479,7 +498,25 @@ public:
 		(*pFontMap)[AttributedString::STYLE_ITALIC] = italicFontName(normalizedFontFamily);
 		(*pFontMap)[AttributedString::STYLE_BOLD | AttributedString::STYLE_ITALIC] = boldItalicFontName(normalizedFontFamily);
 
-		_row.push_back(Cell(content, pFontMap, _encoding, false));
+		int width = -1;
+		if (!widthPct.empty())
+		{
+			if (*widthPct.rbegin() != '%')
+				throw Poco::InvalidArgumentException("Only percentage widths supported for table cells.");
+			else
+			{
+				widthPct.erase(widthPct.length() - 1);
+				width = NumberParser::parse(widthPct);
+			}
+		}
+
+		Cell cell(content, pFontMap, _encoding, false, width);
+		if (borderAll) cell.borderAll(true);
+		if (borderLeft) cell.borderLeft(true);
+		if (borderTop) cell.borderTop(true);
+		if (borderRight) cell.borderRight(true);
+		if (borderBottom) cell.borderBottom(true);
+		_row.push_back(cell);
 
 		popStyle();
 	}
