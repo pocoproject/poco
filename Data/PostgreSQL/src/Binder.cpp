@@ -632,19 +632,19 @@ void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Data::Time>& /*val*
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::Data::NullData>& /*val*/, Direction /*dir*/, const std::type_info&)
+void Binder::bind(std::size_t /*pos*/, const std::vector<Poco::Data::NullData>& /*val*/, Direction /*dir*/)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::Data::NullData>& /*val*/, Direction /*dir*/, const std::type_info&)
+void Binder::bind(std::size_t /*pos*/, const std::deque<Poco::Data::NullData>& /*val*/, Direction /*dir*/)
 {
 	throw NotImplementedException();
 }
 
 
-void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Data::NullData>& /*val*/, Direction /*dir*/, const std::type_info&)
+void Binder::bind(std::size_t /*pos*/, const std::list<Poco::Data::NullData>& /*val*/, Direction /*dir*/)
 {
 	throw NotImplementedException();
 }

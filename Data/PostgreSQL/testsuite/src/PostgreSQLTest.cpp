@@ -26,6 +26,7 @@
 #include "Poco/Data/DataException.h"
 #include <iostream>
 
+
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 using Poco::Data::PostgreSQL::ConnectionException;
@@ -39,43 +40,54 @@ using Poco::Tuple;
 using Poco::NamedTuple;
 using Poco::Environment;
 
+
 Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = 0;
 Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
+
 
 //
 // Connection string
 std::string PostgreSQLTest::_dbConnString;
 
+
 //
 // Parameters for barebone-test
 //
-std::string PostgreSQLTest::getHost() {
+std::string PostgreSQLTest::getHost()
+{
 	return "localhost";
 }
-std::string PostgreSQLTest::getPort() {
+
+
+std::string PostgreSQLTest::getPort()
+{
 	return "5432";
 }
-std::string PostgreSQLTest::getBase(){
+
+
+std::string PostgreSQLTest::getBase()
+{
 	return "postgres";
 }
-std::string PostgreSQLTest::getUser(){
+
+
+std::string PostgreSQLTest::getUser()
+{
 	return "postgres";
 }
-std::string PostgreSQLTest::getPass(){
+
+
+std::string PostgreSQLTest::getPass()
+{
 	if (Environment::has("APPVEYOR"))
 	{
 		return "Password12!";
 	}
-	else if (Environment::has("JENKINS_HOME"))
+	else
 	{
 		return "postgres";
 	}
-	else
-	{
-		return "poco";
-	}
 }
-
 
 
 PostgreSQLTest::PostgreSQLTest(const std::string& name):

@@ -213,11 +213,11 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<Time>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN, const std::type_info& bindType = typeid(void));
+	virtual void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir = PD_IN, const std::type_info& bindType = typeid(void));
+	virtual void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir = PD_IN);
 
-	virtual void bind(std::size_t pos, const std::list<NullData>& val, Direction dir = PD_IN, const std::type_info& bindType = typeid(void));
+	virtual void bind(std::size_t pos, const std::list<NullData>& val, Direction dir = PD_IN);
 
 	virtual void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir = PD_IN);
 
