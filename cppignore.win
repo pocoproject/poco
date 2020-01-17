@@ -17,3 +17,5 @@ class CppUnit::TestCaller<class TimerTest>.testScheduleIntervalClock
 class CppUnit::TestCaller<class TimerTest>.testScheduleAtFixedRate
 class CppUnit::TestCaller<class SystemConfigurationTest>.testProperties
 class CppUnit::TestCaller<class WinServiceTest>.testServiceReturnsTrueIfStopped
+class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom
+class CppUnit::TestCaller<class ICMPSocketTest>.testMTU
