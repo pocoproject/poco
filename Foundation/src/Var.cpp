@@ -606,7 +606,6 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 					result += val[pos];
 					break;
 				}
-				break;
 			}
 			else
 			{
