@@ -435,7 +435,7 @@ void HTMLForm::writeMultipart(std::ostream& ostr)
 			// count only, don't move stream position
 			std::streamsize partlen = part.pSource->getContentLength();
 			if (partlen != PartSource::UNKNOWN_CONTENT_LENGTH)
-				pCountingOutputStream->addChars(static_cast<int>(partlen));
+				pCountingOutputStream->addChars(partlen);
 			else
 				pCountingOutputStream->setValid(false);
 		}
