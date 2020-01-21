@@ -305,7 +305,18 @@ Poco::DateTime X509Certificate::validFrom() const
 	const ASN1_TIME* certTime = X509_get0_notBefore(_pCert);
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
 	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	if (certTime->type == V_ASN1_UTCTIME)
+	{
+		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	}
+	else if (certTime->type == V_ASN1_GENERALIZEDTIME)
+	{
+		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
+	}
+	else
+	{
+		throw NotImplementedException("Unsupported date/time format in notBefore");
+	}
 }
 
 
@@ -314,7 +325,18 @@ Poco::DateTime X509Certificate::expiresOn() const
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
 	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	if (certTime->type == V_ASN1_UTCTIME)
+	{
+		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	}
+	else if (certTime->type == V_ASN1_GENERALIZEDTIME)
+	{
+		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
+	}
+	else
+	{
+		throw NotImplementedException("Unsupported date/time format in notBefore");
+	}
 }
 
 
