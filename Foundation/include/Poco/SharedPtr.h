@@ -44,7 +44,7 @@ public:
 	{
 		return --_cnt;
 	}
-	
+
 	int referenceCount() const
 	{
 		return _cnt.value();
@@ -61,7 +61,7 @@ class ReleasePolicy
 	/// simply uses the delete operator to delete an object.
 {
 public:
-	static void release(C* pObj)
+	static void release(C* pObj) noexcept
 		/// Delete the object.
 		/// Note that pObj can be nullptr.
 	{
@@ -75,7 +75,7 @@ class ReleaseArrayPolicy
 	/// The release policy for SharedPtr holding arrays.
 {
 public:
-	static void release(C* pObj)
+	static void release(C* pObj) noexcept
 		/// Delete the object.
 		/// Note that pObj can be nullptr.
 	{
@@ -94,11 +94,11 @@ class SharedPtr
 	/// can be used with any class. For this to work, a
 	/// SharedPtr manages a reference count for the object
 	/// it manages.
-	/// 
+	///
 	/// SharedPtr works in the following way:
 	/// If an SharedPtr is assigned an ordinary pointer to
 	/// an object (via the constructor or the assignment operator),
-	/// it takes ownership of the object and the object's reference 
+	/// it takes ownership of the object and the object's reference
 	/// count is initialized to one.
 	/// If the SharedPtr is assigned another SharedPtr, the
 	/// object's reference count is incremented by one.
@@ -115,33 +115,41 @@ class SharedPtr
 public:
 	typedef C Type;
 
-	SharedPtr(): _pCounter(nullptr), _ptr(nullptr)
+	SharedPtr():
+		_pCounter(nullptr),
+		_ptr(nullptr)
 	{
 	}
 
 	SharedPtr(C* ptr)
 	try:
-		_pCounter(ptr ? new RC : nullptr), 
+		_pCounter(ptr ? new RC : nullptr),
 		_ptr(ptr)
 	{
 	}
-	catch (...) 
+	catch (...)
 	{
 		RP::release(ptr);
 	}
 
-	template <class Other, class OtherRP> 
-	SharedPtr(const SharedPtr<Other, RC, OtherRP>& ptr): _pCounter(ptr._pCounter), _ptr(const_cast<Other*>(ptr.get()))
+	template <class Other, class OtherRP>
+	SharedPtr(const SharedPtr<Other, RC, OtherRP>& ptr):
+		_pCounter(ptr._pCounter),
+		_ptr(const_cast<Other*>(ptr.get()))
 	{
 		if (_pCounter) _pCounter->duplicate();
 	}
 
-	SharedPtr(const SharedPtr& ptr): _pCounter(ptr._pCounter), _ptr(ptr._ptr)
+	SharedPtr(const SharedPtr& ptr):
+		_pCounter(ptr._pCounter),
+		_ptr(ptr._ptr)
 	{
 		if (_pCounter) _pCounter->duplicate();
 	}
 
-	SharedPtr(SharedPtr&& ptr) noexcept: _pCounter(std::move(ptr._pCounter)), _ptr(std::move(ptr._ptr))
+	SharedPtr(SharedPtr&& ptr) noexcept:
+		_pCounter(ptr._pCounter),
+		_ptr(ptr._ptr)
 	{
 		ptr._pCounter = nullptr;
 		ptr._ptr = nullptr;
@@ -149,14 +157,7 @@ public:
 
 	~SharedPtr()
 	{
-		try
-		{
-			release();
-		}
-		catch (...)
-		{
-			poco_unexpected();
-		}
+		release();
 	}
 
 	SharedPtr& assign(C* ptr)
@@ -168,7 +169,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	SharedPtr& assign(const SharedPtr& ptr)
 	{
 		if (&ptr != this)
@@ -178,7 +179,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	template <class Other, class OtherRP>
 	SharedPtr& assign(const SharedPtr<Other, RC, OtherRP>& ptr)
 	{
@@ -223,9 +224,10 @@ public:
 
 	SharedPtr& operator = (SharedPtr&& ptr) noexcept
 	{
-		_ptr = std::move(ptr._ptr);
-		_pCounter = std::move(ptr._pCounter);
+		release();
+		_ptr = ptr._ptr;
 		ptr._ptr = nullptr;
+		_pCounter = ptr._pCounter;
 		ptr._pCounter = nullptr;
 		return *this;
 	}
@@ -242,7 +244,7 @@ public:
 		std::swap(_pCounter, ptr._pCounter);
 	}
 
-	template <class Other> 
+	template <class Other>
 	SharedPtr<Other, RC, RP> cast() const
 		/// Casts the SharedPtr via a dynamic cast to the given type.
 		/// Returns an SharedPtr containing NULL if the cast fails.
@@ -257,7 +259,7 @@ public:
 		return SharedPtr<Other, RC, RP>();
 	}
 
-	template <class Other> 
+	template <class Other>
 	SharedPtr<Other, RC, RP> unsafeCast() const
 		/// Casts the SharedPtr via a static cast to the given type.
 		/// Example: (assume class Sub: public Super)
@@ -303,7 +305,7 @@ public:
 	{
 		return _ptr;
 	}
-	
+
 	operator const C* () const
 	{
 		return _ptr;
@@ -408,7 +410,7 @@ public:
 	{
 		return get() >= ptr;
 	}
-	
+
 	int referenceCount() const
 	{
 		return _pCounter ? _pCounter->referenceCount() : 0;
@@ -423,7 +425,7 @@ private:
 		return _ptr;
 	}
 
-	void release()
+	void release() noexcept
 	{
 		if (_pCounter && _pCounter->release() == 0)
 		{

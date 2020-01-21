@@ -105,7 +105,7 @@ public:
 	Optional& assign(C&& value)
 		/// Moves a value into the Optional.
 	{
-		_value = value;
+		_value = std::move(value);
 		_isSpecified = true;
 		return *this;
 	}
@@ -125,7 +125,7 @@ public:
 
 	Optional& operator = (C&& value)
 	{
-		return assign(value);
+		return assign(std::move(value));
 	}
 
 	Optional& operator = (const Optional& other)
