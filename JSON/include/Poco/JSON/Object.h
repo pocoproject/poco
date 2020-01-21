@@ -84,17 +84,17 @@ public:
 		/// Struct is not copied to keep the operation as
 		/// efficient as possible (when needed, it will be generated upon request).
 
-	Object(Object&& other);
+	Object(Object&& other) noexcept;
 		/// Move constructor
 
-	Object &operator =(Object &&other);
-		// Move asignment operator
-
-	virtual ~Object();
+	~Object();
 		/// Destroys the Object.
 
-	Object &operator =(const Object &other);
+	Object &operator = (const Object &other);
 		// Assignment operator
+
+	Object &operator = (Object &&other) noexcept;
+		// Move asignment operator
 
 	void setEscapeUnicode(bool escape = true);
 		/// Sets the flag for escaping unicode.

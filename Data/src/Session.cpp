@@ -48,16 +48,16 @@ Session::Session(const std::string& connection,
 }
 
 
-Session::Session(const Session& other):	
+Session::Session(const Session& other):
 	_pImpl(other._pImpl),
-	_statementCreator(other._pImpl)
+	_statementCreator(other._statementCreator)
 {
 }
 
 
-Session::Session(Session&& other) noexcept:	
+Session::Session(Session&& other) noexcept:
 	_pImpl(std::move(other._pImpl)),
-	_statementCreator(std::move(other._pImpl))
+	_statementCreator(std::move(other._statementCreator))
 {
 }
 

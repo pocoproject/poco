@@ -73,16 +73,16 @@ public:
 	Array(const Array& copy);
 		/// Creates an Array by copying another one.
 
-	Array(Array&& other);
+	Array(Array&& other) noexcept;
 		/// Move constructor
 
-	Array& operator=(Array&& other);
-		/// Move assignment operator.
-
-	Array& operator=(const Array& other);
+	Array& operator = (const Array& other);
 		/// Assignment operator.
 
-	virtual ~Array();
+	Array& operator = (Array&& other) noexcept;
+		/// Move assignment operator.
+
+	~Array();
 		/// Destroys the Array.
 
 	void setEscapeUnicode(bool escape = true);

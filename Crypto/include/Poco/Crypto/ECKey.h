@@ -32,7 +32,7 @@ class X509Certificate;
 class PKCS12Container;
 
 
-class Crypto_API ECKey : public KeyPair
+class Crypto_API ECKey: public KeyPair
 	/// This class stores an EC key pair, consisting
 	/// of private and public key. Storage of the private
 	/// key is optional.
@@ -73,8 +73,20 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
+	ECKey(const ECKey& key);
+		/// Creates the ECKey by copying another one.
+
+	ECKey(ECKey&& key) noexcept;
+		/// Creates the ECKey by moving another one.
+
 	~ECKey();
 		/// Destroys the ECKey.
+
+	ECKey& operator = (const ECKey& other);
+		/// Assignment.
+
+	ECKey& operator = (ECKey&& other) noexcept;
+		/// Move assignment.
 
 	ECKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
@@ -97,9 +109,6 @@ public:
 	static bool hasCurve(const std::string& name);
 		/// Returns true if the named curve is found,
 		/// false otherwise.
-
-private:
-	ECKeyImpl::Ptr _pImpl;
 };
 
 
@@ -108,7 +117,7 @@ private:
 //
 inline ECKeyImpl::Ptr ECKey::impl() const
 {
-	return _pImpl;
+	return KeyPair::impl().cast<ECKeyImpl>();
 }
 
 

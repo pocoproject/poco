@@ -89,11 +89,10 @@ EVPPKey::EVPPKey(const EVPPKey& other)
 }
 
 
-EVPPKey::EVPPKey(EVPPKey&& other) noexcept: 
+EVPPKey::EVPPKey(EVPPKey&& other) noexcept:
 	_pEVPPKey(other._pEVPPKey)
 {
 	other._pEVPPKey = nullptr;
-	poco_check_ptr(_pEVPPKey);
 }
 
 
@@ -109,7 +108,6 @@ EVPPKey& EVPPKey::operator = (EVPPKey&& other) noexcept
 {
 	_pEVPPKey = other._pEVPPKey;
 	other._pEVPPKey = nullptr;
-	poco_check_ptr(_pEVPPKey);
 	return *this;
 }
 

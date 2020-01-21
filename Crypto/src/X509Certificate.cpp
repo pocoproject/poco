@@ -29,11 +29,13 @@
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 
+
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #define ASN1_STRING_get0_data ASN1_STRING_data
 #define X509_get0_notBefore X509_get_notBefore
 #define X509_get0_notAfter X509_get_notAfter
 #endif
+
 
 namespace Poco {
 namespace Crypto {
@@ -113,6 +115,7 @@ X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
 	_issuerName = std::move(cert._issuerName);
 	_subjectName = std::move(cert._subjectName);
 	_serialNumber = std::move(cert._serialNumber);
+	if (_pCert) X509_free(_pCert);
 	_pCert = cert._pCert; cert._pCert = nullptr;
 	return *this;
 }
