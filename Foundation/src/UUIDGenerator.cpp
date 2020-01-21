@@ -90,7 +90,7 @@ UUID UUIDGenerator::createFromName(const UUID& nsid, const std::string& name, Di
 	return UUID(buffer, version);
 }
 
-	
+
 UUID UUIDGenerator::createRandom()
 {
 	char buffer[16];
@@ -133,6 +133,22 @@ UUID UUIDGenerator::createOne()
 	{
 		return createRandom();
 	}
+}
+
+
+void UUIDGenerator::seed()
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	_random.seed();
+}
+
+
+void UUIDGenerator::seed(UInt32 n)
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	_random.seed(n);
 }
 
 
