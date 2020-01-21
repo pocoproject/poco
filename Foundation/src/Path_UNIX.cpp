@@ -64,7 +64,7 @@ std::string PathImpl::homeImpl()
 		pwd = getpwuid(geteuid());
 		if (pwd)
 			path = pwd->pw_dir;
-		else
+		else if (EnvironmentImpl::hasImpl("HOME"))
 			path = EnvironmentImpl::getImpl("HOME");
 	}
 	std::string::size_type n = path.size();
@@ -78,15 +78,23 @@ std::string PathImpl::configHomeImpl()
 {
 #if defined(POCO_VXWORKS)
 	return PathImpl::homeImpl();
-#else
+#elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Preferences/");
+		path.append("Library/Preferences/");
+	return path;
 #else
-	  path.append(".config/");
-#endif
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CONFIG_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CONFIG_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".config/");
 
 	return path;
 #endif
@@ -97,15 +105,23 @@ std::string PathImpl::dataHomeImpl()
 {
 #if defined(POCO_VXWORKS)
 	return PathImpl::homeImpl();
-#else
+#elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Application Support/");
+		path.append("Library/Application Support/");
+	return path;
 #else
-	  path.append(".local/share/");
-#endif
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_DATA_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_DATA_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".local/share/");
 
 	return path;
 #endif
@@ -116,15 +132,23 @@ std::string PathImpl::cacheHomeImpl()
 {
 #if defined(POCO_VXWORKS)
 	return PathImpl::tempImpl();
-#else
+#elif POCO_OS == POCO_OS_MAC_OS_X
 	std::string path = PathImpl::homeImpl();
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] == '/') 
-#if POCO_OS == POCO_OS_MAC_OS_X
-	  path.append("Library/Caches/");
+		path.append("Library/Caches/");
+	return path;
 #else
-	  path.append(".cache/");
-#endif
+	std::string path;
+	if (EnvironmentImpl::hasImpl("XDG_CACHE_HOME"))
+		path = EnvironmentImpl::getImpl("XDG_CACHE_HOME");
+	if (!path.empty())
+		return path;
+
+	path = PathImpl::homeImpl();
+	std::string::size_type n = path.size();
+	if (n > 0 && path[n - 1] == '/')
+		path.append(".cache/");
 
 	return path;
 #endif
@@ -219,7 +243,15 @@ std::string PathImpl::expandImpl(const std::string& path)
 	}
 	while (it != end)
 	{
-		if (*it == '$')
+		if (*it == '\\')
+		{
+			++it;
+			if (*it == '$')
+			{
+				result += *it++;
+			}
+		}
+		else if (*it == '$')
 		{
 			std::string var;
 			++it;
@@ -237,6 +269,12 @@ std::string PathImpl::expandImpl(const std::string& path)
 			if (val) result += val;
 		}
 		else result += *it++;
+	}
+	std::string::size_type found = result.find("//");
+	while (found != std::string::npos)
+	{
+		result.replace(found, 2, "/");
+		found = result.find("//", found+1);
 	}
 	return result;
 }
