@@ -26,7 +26,7 @@
 #if defined(_WIN32_WCE)
 #include "Environment_WINCE.cpp"
 #else
-#include "Environment_WIN32.cpp"
+#include "Environment_WIN32U.cpp"
 #endif
 #endif
 
