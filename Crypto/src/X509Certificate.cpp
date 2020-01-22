@@ -233,6 +233,7 @@ std::string _X509_NAME_oneline_utf8(X509_NAME *name)
 	return line;
 }
 
+
 void X509Certificate::init()
 {
 	_issuerName = _X509_NAME_oneline_utf8(X509_get_issuer_name(_pCert));
