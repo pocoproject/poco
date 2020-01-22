@@ -1388,9 +1388,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	try
+	for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
 	{
-		for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
+		try
 		{
 			if (!currIface->ifa_addr) continue;
 
@@ -1462,9 +1462,14 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 				}
 			}
 		}
-	}
-	catch (...)
-	{
+		catch (Poco::Exception&)
+		{
+		}
+		catch (...)
+		{
+			if (ifaces) freeifaddrs(ifaces);
+			throw;
+		}
 	}
 	if (ifaces) freeifaddrs(ifaces);
 
@@ -1601,9 +1606,9 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	try
+	for (iface = ifaces; iface; iface = iface->ifa_next)
 	{
-		for (iface = ifaces; iface; iface = iface->ifa_next)
+		try
 		{
 			if (!iface->ifa_addr) continue;
 
@@ -1678,13 +1683,16 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						ifIt->second.addAddress(address, subnetMask, broadcastAddress);
 				}
 			}
-		} // for interface
-	}
-	catch (...)
-	{
-		if (ifaces) freeifaddrs(ifaces);
-		throw;
-	}
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		catch (...)
+		{
+			if (ifaces) freeifaddrs(ifaces);
+			throw;
+		}
+	} // for interface
 
 	if (ifaces) freeifaddrs(ifaces);
 
