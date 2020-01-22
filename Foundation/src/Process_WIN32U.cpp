@@ -304,8 +304,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	UnicodeConverter::toUTF16(initialDirectory, uinitialDirectory);
 	const wchar_t* workingDirectory = uinitialDirectory.empty() ? 0 : uinitialDirectory.c_str();
 
-	const char* pEnv = 0;
-	std::vector<char> envChars;
+	const wchar_t* pEnv = 0;
+	std::vector<wchar_t> envChars;
 	if (!env.empty())
 	{
 		envChars = getUnicodeEnvironmentVariablesBuffer(env);
