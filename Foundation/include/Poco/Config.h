@@ -96,6 +96,9 @@
 // on platforms with no inotify.
 // #define POCO_NO_INOTIFY
 
+// Define to force the use of PollingDirectoryWatcher 
+// #define POCO_DW_FORCE_POLLING
+
 
 // Following are options to remove certain features
 // to reduce library/executable size for smaller

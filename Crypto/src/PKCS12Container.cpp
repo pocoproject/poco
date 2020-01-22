@@ -73,6 +73,17 @@ PKCS12Container::PKCS12Container(const PKCS12Container& other):
 }
 
 
+PKCS12Container::PKCS12Container(PKCS12Container&& other) noexcept:
+	_pKey(other._pKey),
+	_pX509Cert(std::move(other._pX509Cert)),
+	_caCertList(std::move(other._caCertList)),
+	_caCertNames(std::move(other._caCertNames)),
+	_pkcsFriendlyName(std::move(other._pkcsFriendlyName))
+{
+	other._pKey = nullptr;
+}
+
+
 PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 {
 	if (&other != this)
@@ -85,17 +96,6 @@ PKCS12Container& PKCS12Container::operator = (const PKCS12Container& other)
 		_pkcsFriendlyName = other._pkcsFriendlyName;
 	}
 	return *this;
-}
-
-
-PKCS12Container::PKCS12Container(PKCS12Container&& other) noexcept:
-	_pKey(other._pKey),
-	_pX509Cert(std::move(other._pX509Cert)),
-	_caCertList(std::move(other._caCertList)),
-	_caCertNames(std::move(other._caCertNames)),
-	_pkcsFriendlyName(std::move(other._pkcsFriendlyName))
-{
-	other._pKey = nullptr;
 }
 
 

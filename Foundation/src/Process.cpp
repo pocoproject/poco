@@ -110,6 +110,12 @@ int ProcessHandle::wait() const
 }
 
 
+int ProcessHandle::tryWait() const
+{
+	return _pImpl->tryWait();
+}
+
+
 //
 // Process
 //
@@ -163,6 +169,12 @@ ProcessHandle Process::launch(const std::string& command, const Args& args, cons
 int Process::wait(const ProcessHandle& handle)
 {
 	return handle.wait();
+}
+
+
+int Process::tryWait(const ProcessHandle& handle)
+{
+	return handle.tryWait();
 }
 
 

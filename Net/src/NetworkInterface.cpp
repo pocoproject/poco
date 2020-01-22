@@ -794,9 +794,9 @@ bool NetworkInterface::isUp() const
 
 NetworkInterface NetworkInterface::forName(const std::string& name, bool requireIPv6)
 {
-	if (requireIPv6) 
+	if (requireIPv6)
 		return forName(name, IPv6_ONLY);
-	else 
+	else
 		return forName(name, IPv4_OR_IPv6);
 }
 
@@ -1067,7 +1067,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 			throw SystemException(format("An error occurred while trying to obtain list of network interfaces: [%s]", Error::getMessage(dwRetVal)));
 		else
 			break;
-	} 
+	}
 	while ((ERROR_BUFFER_OVERFLOW == dwRetVal) && (++iterations <= 2));
 
 	poco_assert (NO_ERROR == dwRetVal);
@@ -1240,7 +1240,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 					{
 						ifIt->second.addAddress(address);
 					}
-				} 
+				}
 				break;
 #if defined(POCO_HAVE_IPv6)
 				case AF_INET6:
@@ -1357,14 +1357,17 @@ NetworkInterface::Type fromNative(u_char nativeType)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
-	struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
 	impl.setName(iface->ifa_name);
 	impl.setDisplayName(iface->ifa_name);
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
-	impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
-	impl.setType(fromNative(sdl->sdl_type));
+	if (iface->ifa_addr->sa_family == AF_LINK)
+	{
+		struct sockaddr_dl* sdl = (struct sockaddr_dl*) iface->ifa_addr;
+		impl.setMACAddress(LLADDR(sdl), sdl->sdl_alen);
+		impl.setType(fromNative(sdl->sdl_type));
+	}
 }
 
 
@@ -1536,16 +1539,19 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setPhyParams();
 
 #ifndef POCO_NO_LINUX_IF_PACKET_H
-	struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
-	impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
-	impl.setType(fromNative(sdl->sll_hatype));
+	if (iface->ifa_addr->sa_family == AF_PACKET)
+	{
+		struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
+		impl.setMACAddress(sdl->sll_addr, sdl->sll_halen);
+		impl.setType(fromNative(sdl->sll_hatype));
+	}
 #else
 	std::string ifPath("/sys/class/net/");
 	ifPath += iface->ifa_name;
 
 	std::string addrPath(ifPath);
 	addrPath += "/address";
-	
+
 	std::ifstream addrStream(addrPath.c_str());
 	if (addrStream.good())
 	{
@@ -1560,7 +1566,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 		impl.setMACAddress(&mac[0], mac.size());
 		addrStream.close();
 	}
-	
+
 	std::string typePath(ifPath);
 	typePath += "/type";
 	std::ifstream typeStream(typePath.c_str());

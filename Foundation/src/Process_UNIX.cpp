@@ -66,7 +66,31 @@ int ProcessHandleImpl::wait() const
 	while (rc < 0 && errno == EINTR);
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	return WEXITSTATUS(status);
+
+	if (WIFEXITED(status)) // normal termination
+		return WEXITSTATUS(status);
+	else // termination by a signal
+		return 256 + WTERMSIG(status);
+}
+
+
+int ProcessHandleImpl::tryWait() const
+{
+	int status;
+	int rc;
+	do
+	{
+		rc = waitpid(_pid, &status, WNOHANG);
+	}
+	while (rc < 0 && errno == EINTR);
+	if (rc == 0)
+		return -1;
+	if (rc != _pid)
+		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+	if (WIFEXITED(status)) // normal termination
+		return WEXITSTATUS(status);
+	else // termination by a signal
+		return 256 + WTERMSIG(status);
 }
 
 
@@ -97,7 +121,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		char** argv = new char*[args.size() + 2];
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
-		for (const auto& a: args) 
+		for (const auto& a: args)
 			argv[i++] = const_cast<char*>(a.c_str());
 		argv[i] = NULL;
 		struct inheritance inherit;
@@ -107,7 +131,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
 		fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
-	
+
 		char** envPtr = 0;
 		std::vector<char> envChars;
 		std::vector<char*> envPtrs;
@@ -125,10 +149,10 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			envPtrs.push_back(0);
 			envPtr = &envPtrs[0];
 		}
-	
+
 		int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
 		delete [] argv;
-		if (pid == -1) 
+		if (pid == -1)
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
@@ -155,18 +179,18 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	std::vector<char*> argv(args.size() + 2);
 	int i = 0;
 	argv[i++] = const_cast<char*>(command.c_str());
-	for (const auto& a: args) 
+	for (const auto& a: args)
 	{
 		argv[i++] = const_cast<char*>(a.c_str());
 	}
 	argv[i] = NULL;
-	
+
 	const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
 
 	int pid = fork();
 	if (pid < 0)
 	{
-		throw SystemException("Cannot fork process for", command);		
+		throw SystemException("Cannot fork process for", command);
 	}
 	else if (pid == 0)
 	{
@@ -247,19 +271,19 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 }
 
 
-bool ProcessImpl::isRunningImpl(PIDImpl pid)  
+bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0) 
+	if (kill(pid, 0) == 0)
 	{
 		return true;
-	} 
-	else 
+	}
+	else
 	{
 		return false;
 	}
 }
 
-				
+
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
 	if (kill(pid, SIGINT) != 0)

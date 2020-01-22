@@ -123,7 +123,6 @@ bool SystemConfiguration::getRaw(const std::string& key, std::string& value) con
 	{
 		value = Path::dataHome();
 	}
-
 	else if (key == TEMPHOMEDIR)
 	{
 		value = Path::tempHome();

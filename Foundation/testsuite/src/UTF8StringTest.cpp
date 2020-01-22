@@ -96,9 +96,11 @@ void UTF8StringTest::testUnescape()
 {
 	std::string s1("A \\t, a \\u000B, and an \\u0007 walk into a |, and the barman says \\u0402");
 	std::string s2("A \\t, a \\v, and an \\a walk into a |, and the barman says \\u0402");
+	std::string s3("\\\\");
 
 	assertTrue (UTF8::unescape(s1) == "A \t, a \v, and an \a walk into a |, and the barman says \xD0\x82");
 	assertTrue (UTF8::unescape(s2) == "A \t, a \v, and an \a walk into a |, and the barman says \xD0\x82");
+	assertTrue (UTF8::unescape(s3) == "\\");
 }
 
 

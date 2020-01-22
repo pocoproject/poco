@@ -84,7 +84,7 @@ private:
 	const PageReader* _pParent;
 	std::string _path;
 	std::string _attrs;
-	int _line;
+	std::streamsize _line;
 	bool _emitLineDirectives;
 };
 

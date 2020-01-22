@@ -123,7 +123,7 @@ public:
 	Nullable& assign(C&& value)
 		/// Assigns a value to the Nullable.
 	{
-		_value  = value;
+		_value  = std::move(value);
 		_isNull = false;
 		return *this;
 	}
@@ -152,7 +152,7 @@ public:
 	Nullable& operator = (C&& value)
 		/// Move-assigns a value to the Nullable.
 	{
-		return assign(value);
+		return assign(std::move(value));
 	}
 
 	Nullable& operator = (const Nullable& other)

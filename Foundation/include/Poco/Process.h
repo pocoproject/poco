@@ -21,7 +21,7 @@
 #include "Poco/Foundation.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) 
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #if defined(_WIN32_WCE)
 #include "Process_WINCE.h"
 #else
@@ -65,6 +65,11 @@ public:
 	int wait() const;
 		/// Waits for the process to terminate
 		/// and returns the exit code of the process.
+
+	int tryWait() const;
+ 		/// Checks that process is terminated
+ 		/// and returns the exit code of the process.
+ 		/// If the process is still running, returns -1.
 
 protected:
 	ProcessHandle(ProcessHandleImpl* pImpl);
@@ -210,6 +215,10 @@ public:
 	static int wait(const ProcessHandle& handle);
 		/// Waits for the process specified by handle to terminate
 		/// and returns the exit code of the process.
+
+	static int tryWait(const ProcessHandle& handle);
+ 		/// Checks that process is finished and returns the exit code of the
+ 		/// process. If the process is still running, returns -1.
 
 	static bool isRunning(const ProcessHandle& handle);
 		/// check if the process specified by handle is running or not

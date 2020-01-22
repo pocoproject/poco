@@ -310,7 +310,6 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 					networkException()->rethrow();
 				else
 					throw;
-				throw;
 			}
 		}
 		while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
