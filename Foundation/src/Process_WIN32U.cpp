@@ -23,6 +23,42 @@
 #include "Poco/String.h"
 
 
+namespace
+{
+	std::vector<wchar_t> getUnicodeEnvironmentVariablesBuffer(const Poco::Process::Env& env)
+	{
+		std::vector<wchar_t> envbuf;
+		std::size_t pos = 0;
+
+		for (const auto& p: env)
+		{
+			std::size_t envlen = p.first.length() + p.second.length() + 1;
+
+			std::wstring uname;
+			Poco::UnicodeConverter::convert(p.first, uname);
+			std::wstring uvalue;
+			Poco::UnicodeConverter::convert(p.second, uvalue);
+
+			envbuf.resize(pos + envlen + 1);
+			std::copy(uname.begin(), uname.end(), &envbuf[pos]);
+			pos += uname.length();
+			envbuf[pos] = L'=';
+			++pos;
+			std::copy(uvalue.begin(), uvalue.end(), &envbuf[pos]);
+			pos += uvalue.length();
+
+			envbuf[pos] = L'\0';
+			++pos;
+		}
+
+		envbuf.resize(pos + 1);
+		envbuf[pos] = L'\0';
+
+		return envbuf;
+	}
+}
+
+
 namespace Poco {
 
 
@@ -272,12 +308,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	std::vector<char> envChars;
 	if (!env.empty())
 	{
-		envChars = getEnvironmentVariablesBuffer(env);
+		envChars = getUnicodeEnvironmentVariablesBuffer(env);
 		pEnv = &envChars[0];
 	}
 
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
+	if (pEnv) creationFlags |= CREATE_UNICODE_ENVIRONMENT;
 	BOOL rc = CreateProcessW(
 		applicationName,
 		const_cast<wchar_t*>(ucommandLine.c_str()),
