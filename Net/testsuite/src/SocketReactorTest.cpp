@@ -87,7 +87,8 @@ namespace
 			_reactor(reactor),
 			_or(*this, &ClientServiceHandler::onReadable),
 			_ow(*this, &ClientServiceHandler::onWritable),
-			_ot(*this, &ClientServiceHandler::onTimeout)
+			_ot(*this, &ClientServiceHandler::onTimeout),
+			_os(*this, &ClientServiceHandler::onShutdown)
 		{
 			_timeout = false;
 			_readableError = false;
@@ -102,10 +103,15 @@ namespace
 			checkTimeoutObserverCount(0);
 			_reactor.addEventHandler(_socket, _ot);
 			checkTimeoutObserverCount(1);
+			_reactor.addEventHandler(_socket, _os);
 		}
 
 		~ClientServiceHandler()
 		{
+			_reactor.removeEventHandler(_socket, _or);
+			_reactor.removeEventHandler(_socket, _ow);
+			_reactor.removeEventHandler(_socket, _ot);
+			_reactor.removeEventHandler(_socket, _os);
 		}
 
 		void onReadable(ReadableNotification* pNf)
@@ -147,23 +153,29 @@ namespace
 		{
 			pNf->release();
 			_timeout = true;
-			if (_closeOnTimeout) 
+			if (_closeOnTimeout)
 			{
 				_reactor.stop();
 				delete this;
 			}
 		}
 
+		void onShutdown(ShutdownNotification* pNf)
+		{
+			pNf->release();
+			delete this;
+		}
+
 		static std::string data()
 		{
 			return _data;
 		}
-		
+
 		static void resetData()
 		{
 			_data.clear();
 		}
-		
+
 		static bool timeout()
 		{
 			return _timeout;
@@ -232,6 +244,7 @@ namespace
 		Observer<ClientServiceHandler, ReadableNotification> _or;
 		Observer<ClientServiceHandler, WritableNotification> _ow;
 		Observer<ClientServiceHandler, TimeoutNotification>  _ot;
+		Observer<ClientServiceHandler, ShutdownNotification> _os;
 		std::stringstream                                    _str;
 		static std::string                                   _data;
 		static bool                                          _readableError;
