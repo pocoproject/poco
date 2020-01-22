@@ -364,13 +364,13 @@ void FileChannelTest::purgeAge(const std::string& pa)
 		assertTrue (f1.exists());
 		File f2(name + ".2");
 		assertTrue (f2.exists());
-		
+
 		Thread::sleep(5000);
 		for (int i = 0; i < 50; ++i)
 		{
 			pChannel->log(msg);
 		}
-		
+
 		assertTrue (!f2.exists());
 	}
 	catch (...)
@@ -636,15 +636,15 @@ CppUnit::Test* FileChannelTest::suite()
 
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeDayLocal);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeHourUTC);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeHourLocal);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeMinUTC);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeMinLocal);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayLocal);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeHourUTC);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeHourLocal);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeMinUTC);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeMinLocal);
 	CppUnit_addTest(pSuite, FileChannelTest, testArchive);
 	CppUnit_addTest(pSuite, FileChannelTest, testCompress);
-	CppUnit_addTest(pSuite, FileChannelTest, testPurgeAge);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testPurgeAge);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeCount);
 	CppUnit_addTest(pSuite, FileChannelTest, testWrongPurgeOption);
 
