@@ -2440,7 +2440,7 @@ void SQLiteTest::testSQLLogger()
 	{
 		AutoPtr<SQLChannel> pChannel = new SQLChannel(Poco::Data::SQLite::Connector::KEY, "dummy.db", "TestSQLChannel");
 		Logger& root = Logger::root();
-		root.setChannel(pChannel.get());
+		root.setChannel(pChannel);
 		root.setLevel(Message::PRIO_INFORMATION);
 
 		root.information("Informational message");
