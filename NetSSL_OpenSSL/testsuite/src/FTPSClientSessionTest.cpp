@@ -108,7 +108,7 @@ void FTPSClientSessionTest::testLogin1()
 	server.clearCommands();
 	server.clearResponses();
 
-	session.tryFTPSmode(true);
+	session.enableFTPS(true);
 	login(server, session);
 	assertTrue (session.isOpen());
 	assertTrue (session.isLoggedIn());
@@ -143,7 +143,7 @@ void FTPSClientSessionTest::testLogin2()
 	server.addResponse("331 Password required");
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
-	session.tryFTPSmode(true);
+	session.enableFTPS(true);
 	session.open("127.0.0.1", serverPort, "user", "password");
 	assertTrue (session.isOpen());
 	assertTrue (session.isLoggedIn());

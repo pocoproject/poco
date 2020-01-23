@@ -35,9 +35,9 @@ FTPSClientSession::FTPSClientSession(Context::Ptr pContext):
 {
 }
 
-FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage, bool tryUseFTPS, Context::Ptr pContext):
-	FTPClientSession(socket, readWelcomeMessage), 
-	_tryFTPS(tryUseFTPS),
+FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage, bool enableFTPS, Context::Ptr pContext):
+	FTPClientSession(socket, readWelcomeMessage),
+	_enableFTPS(enableFTPS),
 	_pContext(pContext)
 {
 }
@@ -55,9 +55,9 @@ FTPSClientSession::~FTPSClientSession()
 }
 
 
-void FTPSClientSession::tryFTPSmode(bool tryFTPS)
+void FTPSClientSession::enableFTPS(bool enable)
 {
-	_tryFTPS = tryFTPS;
+	_enableFTPS = enable;
 }
 
 
@@ -81,7 +81,7 @@ void FTPSClientSession::beforeCreateDataSocket()
 
 void FTPSClientSession::afterCreateControlSocket()
 {
-	if (!_tryFTPS) return;
+	if (!_enableFTPS) return;
 	_pControlSocket->setNoDelay(true);
 	if (_pControlSocket->secure()) return;
 
@@ -106,7 +106,7 @@ void FTPSClientSession::afterCreateControlSocket()
 	}
 	else
 	{
-		_tryFTPS = false;
+		_enableFTPS = false;
 	}
 }
 

@@ -28,6 +28,9 @@ namespace Net {
 
 
 class NetSSL_API FTPSClientSession: public Poco::Net::FTPClientSession
+	/// This is an extension of FTPClientSession that supports
+	/// FTP over SSL/TLS using the AUTH SSL/AUTH TLS and PBSZ/PROT
+	/// commands according to RFC 4217.
 {
 public:
 	FTPSClientSession();
@@ -40,7 +43,7 @@ public:
 		///
 		/// Passive mode will be used for data transfers.
 
-	explicit FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage = true, bool tryUseFTPS = true, Context::Ptr pContext = nullptr);
+	FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage = true, bool enableFTPS = true, Context::Ptr pContext = nullptr);
 		/// Creates an FTPSClientSession using the given
 		/// connected socket for the control connection.
 		///
@@ -55,8 +58,8 @@ public:
 
 	virtual ~FTPSClientSession();
 
-	void tryFTPSmode(bool tryFTPS);
-		/// avoid or require TLS mode
+	void enableFTPS(bool enable = true);
+		/// Enable or disable FTPS (FTP over SSL/TLS).
 
 	bool isSecure() const;
 		/// Returns true if the session is FTPS.
@@ -75,7 +78,7 @@ private:
 	void afterCreateControlSocket();
 		///Send commands to make SSL negotiating of control channel
 
-	bool _tryFTPS = true;
+	bool _enableFTPS = true;
 	bool _secureDataConnection = false;
 	Context::Ptr _pContext;
 };
