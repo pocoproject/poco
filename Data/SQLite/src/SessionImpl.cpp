@@ -54,8 +54,8 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	open();
 	setConnectionTimeout(loginTimeout);
 	setProperty("handle", _pDB);
-	addFeature("autoCommit", 
-		&SessionImpl::autoCommit, 
+	addFeature("autoCommit",
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 	addProperty("connectionTimeout", &SessionImpl::setConnectionTimeout, &SessionImpl::getConnectionTimeout);
 }
@@ -163,14 +163,15 @@ void SessionImpl::open(const std::string& connect)
 			if (rc == SQLITE_OK) break;
 			if (sw.elapsedSeconds() >= tout)
 			{
-				close();
 				Utility::throwException(_pDB, rc);
 			}
-			else Thread::sleep(10);
+			Thread::sleep(10);
+			close();
 		}
-	} 
+	}
 	catch (SQLiteException& ex)
 	{
+		close();
 		throw ConnectionFailedException(ex.displayText());
 	}
 
