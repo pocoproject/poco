@@ -222,7 +222,7 @@ void CryptoTest::testEncryptDecryptGCM()
 	for (std::size_t n = 1; n < MAX_DATA_SIZE; n++)
 	{
 		std::stringstream str;
-		CryptoTransform* pEncryptor = pCipher->createEncryptor();
+		CryptoTransform::Ptr pEncryptor = pCipher->createEncryptor();
 		CryptoOutputStream encryptorStream(str, pEncryptor);
 		std::string in(n, 'x');
 		encryptorStream << in;
@@ -231,7 +231,7 @@ void CryptoTest::testEncryptDecryptGCM()
 
 		std::string tag = pEncryptor->getTag();
 
-		CryptoTransform* pDecryptor = pCipher->createDecryptor();
+		CryptoTransform::Ptr pDecryptor = pCipher->createDecryptor();
 		pDecryptor->setTag(tag);
 		CryptoInputStream decryptorStream(str, pDecryptor);
 		std::string out;
@@ -318,7 +318,7 @@ void CryptoTest::testStreams()
 	DecryptingInputStream decryptor(sstr, *pCipher);
 	std::string result;
 	Poco::StreamCopier::copyToString(decryptor, result);
-	
+
 	assertTrue (result == SECRET_MESSAGE);
 	assertTrue (decryptor.eof());
 	assertTrue (!decryptor.bad());

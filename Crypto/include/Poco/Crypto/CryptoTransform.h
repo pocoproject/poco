@@ -19,6 +19,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/SharedPtr.h"
 #include <ios>
 
 
@@ -35,6 +36,8 @@ class Crypto_API CryptoTransform
 	/// perform encryption or decryption of data.
 {
 public:
+	using Ptr = Poco::SharedPtr<CryptoTransform>;
+
 	CryptoTransform();
 		/// Creates a new CryptoTransform object.
 
