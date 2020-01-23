@@ -44,10 +44,19 @@ void LogFileImpl::writeImpl(const std::string& text, bool flush)
 {
 	if (INVALID_HANDLE_VALUE == _hFile)	createFile();
 
+	std::string logText;
+	logText.reserve(text.size() + 16); // keep some reserve for \n -> \r\n and terminating \r\n
+	for (char c: text)
+	{
+		if (c == '\n')
+			logText += "\r\n";
+		else
+			logText += c;
+	}
+	logText += "\r\n";
+
 	DWORD bytesWritten;
-	BOOL res = WriteFile(_hFile, text.data(), (DWORD) text.size(), &bytesWritten, NULL);
-	if (!res) throw WriteFileException(_path);
-	res = WriteFile(_hFile, "\r\n", 2, &bytesWritten, NULL);
+	BOOL res = WriteFile(_hFile, logText.data(), static_cast<DWORD>(logText.size()), &bytesWritten, NULL);
 	if (!res) throw WriteFileException(_path);
 	if (flush)
 	{
