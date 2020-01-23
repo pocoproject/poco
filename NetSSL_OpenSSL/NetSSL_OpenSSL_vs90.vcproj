@@ -761,23 +761,29 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="FTPSClient"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\FTPSClientSession.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\FTPSClientSession.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\DLLVersion.rc"
 			>
-			<FileConfiguration
-				Name="debug_shared|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-				/>
-			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
 				ExcludedFromBuild="true"

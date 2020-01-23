@@ -331,7 +331,7 @@ protected:
 	static bool isTransientNegative(int status);
 	static bool isPermanentNegative(int status);
 	std::string extractPath(const std::string& response);
-	StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
+	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket activeDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket passiveDataConnection(const std::string& command, const std::string& arg);
 	void sendPortCommand(const SocketAddress& addr);

@@ -198,8 +198,13 @@ void FTPClientSession::logout()
 
 	if (_isLoggedIn)
 	{
-		try { endTransfer(); }
-		catch (...) { }
+		try 
+		{ 
+			endTransfer(); 
+		}
+		catch (...) 
+		{ 
+		}
 		_isLoggedIn = false;
 		std::string response;
 		sendCommand("QUIT", response);

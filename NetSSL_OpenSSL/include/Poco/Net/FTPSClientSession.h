@@ -19,6 +19,7 @@
 
 
 #include "Poco/Net/NetSSL.h"
+#include "Poco/Net/Context.h"
 #include "Poco/Net/FTPClientSession.h"
 
 
@@ -34,13 +35,18 @@ public:
 		///
 		/// Passive mode will be used for data transfers.
 
-	explicit FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage = true, bool tryUseFTPS = true);
+	explicit FTPSClientSession(Context::Ptr pContext);
+		/// Creates an FTPSClientSession using the given Context.
+		///
+		/// Passive mode will be used for data transfers.
+
+	explicit FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage = true, bool tryUseFTPS = true, Context::Ptr pContext = nullptr);
 		/// Creates an FTPSClientSession using the given
 		/// connected socket for the control connection.
 		///
 		/// Passive mode will be used for data transfers.
 
-	FTPSClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT, const std::string& username = "", const std::string& password = "");
+	FTPSClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT, const std::string& username = "", const std::string& password = "", Context::Ptr pContext = nullptr);
 		/// Creates an FTPSClientSession using a socket connected
 		/// to the given host and port. If username is supplied,
 		/// login is attempted.
@@ -64,13 +70,14 @@ protected:
 
 private:
 	void beforeCreateDataSocket();
-	///Send commands to check if we can encrypt data socket
+		///Send commands to check if we can encrypt data socket
 
 	void afterCreateControlSocket();
-	///Send commands to make SSL negotiating of control channel
+		///Send commands to make SSL negotiating of control channel
 
 	bool _tryFTPS = true;
 	bool _secureDataConnection = false;
+	Context::Ptr _pContext;
 };
 
 

@@ -551,6 +551,7 @@
     <ClInclude Include="include\Poco\Net\CertificateHandlerFactoryMgr.h"/>
     <ClInclude Include="include\Poco\Net\ConsoleCertificateHandler.h"/>
     <ClInclude Include="include\Poco\Net\Context.h"/>
+    <ClInclude Include="include\Poco\Net\FTPSClientSession.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSClientSession.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSSessionInstantiator.h"/>
     <ClInclude Include="include\Poco\Net\HTTPSStreamFactory.h"/>
@@ -589,6 +590,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\Context.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientSession.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\HTTPSClientSession.cpp">

@@ -18,11 +18,34 @@
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/NetException.h"
 
+
 namespace Poco {
 namespace Net {
 
-FTPSClientSession::FTPSClientSession() :
+
+FTPSClientSession::FTPSClientSession():
 	FTPClientSession()
+{
+}
+
+
+FTPSClientSession::FTPSClientSession(Context::Ptr pContext):
+	FTPClientSession(),
+	_pContext(pContext)
+{
+}
+
+FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage, bool tryUseFTPS, Context::Ptr pContext):
+	FTPClientSession(socket, readWelcomeMessage), 
+	_tryFTPS(tryUseFTPS),
+	_pContext(pContext)
+{
+}
+
+
+FTPSClientSession::FTPSClientSession(const std::string& host, Poco::UInt16 port, const std::string& username, const std::string& password, Context::Ptr pContext):
+	FTPClientSession(host, port, username, password),
+	_pContext(pContext)
 {
 }
 
@@ -31,49 +54,36 @@ FTPSClientSession::~FTPSClientSession()
 {
 }
 
-FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcomeMessage, bool tryUseFTPS) :
-	FTPClientSession(socket, readWelcomeMessage), _tryFTPS(tryUseFTPS)
+
+void FTPSClientSession::tryFTPSmode(bool tryFTPS)
 {
+	_tryFTPS = tryFTPS;
 }
 
-
-FTPSClientSession::FTPSClientSession(const std::string& host,
-	Poco::UInt16 port,
-	const std::string& username,
-	const std::string& password) :
-	FTPClientSession(host, port, username, password)
-{
-}
-
-void FTPSClientSession::tryFTPSmode(bool bTryFTPS)
-{
-	_tryFTPS = bTryFTPS;
-}
 
 void FTPSClientSession::beforeCreateDataSocket()
 {
-	if (_secureDataConnection)
-		return;
+	if (_secureDataConnection) return;
 	_secureDataConnection = false;
-	if (!_pControlSocket->secure())
-		return;
+	if (!_pControlSocket->secure()) return;
 	std::string sResponse;
 	int status = sendCommand("PBSZ 0", sResponse);
 	if (isPositiveCompletion(status))
 	{
 		status = sendCommand("PROT P", sResponse);
 		if (isPositiveCompletion(status))
+		{
 			_secureDataConnection = true;
+		}
 	}
 }
 
+
 void FTPSClientSession::afterCreateControlSocket()
 {
-	if (!_tryFTPS)
-		return;
+	if (!_tryFTPS) return;
 	_pControlSocket->setNoDelay(true);
-	if (_pControlSocket->secure())
-		return;
+	if (_pControlSocket->secure()) return;
 
 	std::string sResponse;
 	int status = sendCommand("AUTH TLS", sResponse);
@@ -82,10 +92,11 @@ void FTPSClientSession::afterCreateControlSocket()
 
 	if (isPositiveCompletion(status))
 	{
-		//Server support FTPS
+		// Server support FTPS
 		try
 		{
-			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(*_pControlSocket, Poco::Net::SSLManager::instance().defaultClientContext()));
+			if (!_pContext) _pContext = Poco::Net::SSLManager::instance().defaultClientContext();
+			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(*_pControlSocket, _pContext));
 			*_pControlSocket = sss;
 		}
 		catch (Poco::Exception&)
@@ -99,6 +110,7 @@ void FTPSClientSession::afterCreateControlSocket()
 	}
 }
 
+
 StreamSocket FTPSClientSession::establishDataConnection(const std::string& command, const std::string& arg)
 {
 	beforeCreateDataSocket();
@@ -106,10 +118,10 @@ StreamSocket FTPSClientSession::establishDataConnection(const std::string& comma
 	StreamSocket ss = FTPClientSession::establishDataConnection(command, arg);
 	ss.setNoDelay(true);
 
-	//SSL nogotiating of data socket
-	if ((_secureDataConnection) && (_pControlSocket->secure()))
+	// SSL nogotiating of data socket
+	if (_secureDataConnection && _pControlSocket->secure())
 	{
-		//We need to reuse the control socket SSL session so the server can ensure that client that opened control socket is the same using data socket
+		// We need to reuse the control socket SSL session so the server can ensure that client that opened control socket is the same using data socket
 		Poco::Net::SecureStreamSocketImpl* pSecure = dynamic_cast<Poco::Net::SecureStreamSocketImpl*>(_pControlSocket->impl());
 		if (pSecure != nullptr)
 		{
@@ -120,11 +132,12 @@ StreamSocket FTPSClientSession::establishDataConnection(const std::string& comma
 	return ss;
 }
 
+
 void FTPSClientSession::receiveServerReadyReply()
 {
 	FTPClientSession::receiveServerReadyReply();
 	afterCreateControlSocket();
 }
 
-}
-} // namespace Poco::Net
+
+} } // namespace Poco::Net

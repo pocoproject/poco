@@ -72,7 +72,9 @@ void handleDataSSLrequest(DialogSocket& ds, bool ssl, Session::Ptr& sslSession)
 				ds = sss;
 			}
 		}
-		catch (Exception&) {
+		catch (Exception& exc) 
+		{
+			std::cout << exc.displayText() << std::endl;
 		}
 	}
 }
