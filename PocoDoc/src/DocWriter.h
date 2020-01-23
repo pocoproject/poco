@@ -155,7 +155,9 @@ protected:
 	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeClassSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
+	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
+	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType);
 	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum);
