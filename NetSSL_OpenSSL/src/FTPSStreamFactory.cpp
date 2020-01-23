@@ -1,8 +1,8 @@
 //
 // FTPSStreamFactory.cpp
 //
-// Library: Net
-// Package: FTP
+// Library: NetSSL_OpenSSL
+// Package: FTPS
 // Module:  FTPSStreamFactory
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

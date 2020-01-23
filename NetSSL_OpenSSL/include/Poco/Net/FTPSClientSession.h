@@ -1,8 +1,8 @@
 //
 // FTPSClientSession.h
 //
-// Library: Net
-// Package: FTP
+// Library: NetSSL_OpenSSL
+// Package: FTPS
 // Module:  FTPSClientSession
 //
 // Definition of the FTPSClientSession class.

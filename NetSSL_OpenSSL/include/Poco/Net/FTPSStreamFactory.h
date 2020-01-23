@@ -1,8 +1,8 @@
 //
 // FTPSStreamFactory.h
 //
-// Library: Net
-// Package: FTP
+// Library: NetSSL_OpenSSL
+// Package: FTPS
 // Module:  FTPSStreamFactory
 //
 // Definition of the FTPSStreamFactory class.
