@@ -16,6 +16,7 @@
 #include "Poco/StreamCopier.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include <memory>
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -41,12 +42,12 @@ void EVPTest::testRSAEVPPKey()
 {
 	try
 	{
-		RSAKey* key = new RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
+		std::unique_ptr<RSAKey> key(new RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
 		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
 		// construct EVPPKey from RSAKey*
-		EVPPKey* pKey = new EVPPKey(key);
+		EVPPKey* pKey = new EVPPKey(key.get());
 		// EVPPKey increments reference count, so freeing the original must be ok
-		delete key;
+		key.reset();
 
 		assertTrue (!pKey->isSupported(0));
 		assertTrue (!pKey->isSupported(-1));
@@ -54,11 +55,11 @@ void EVPTest::testRSAEVPPKey()
 		assertTrue (pKey->type() == EVP_PKEY_RSA);
 
 		// construct RSAKey from const EVPPKey&
-		key = new RSAKey(*pKey);
+		key.reset(new RSAKey(*pKey));
 		delete pKey;
 		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
 		// construct EVPPKey from RSAKey*
-		pKey = new EVPPKey(key);
+		pKey = new EVPPKey(key.get());
 		assertTrue (pKey->type() == EVP_PKEY_RSA);
 
 		BIO* bioPriv1 = BIO_new(BIO_s_mem());
