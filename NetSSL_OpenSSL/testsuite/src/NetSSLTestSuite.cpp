@@ -14,6 +14,7 @@
 #include "TCPServerTestSuite.h"
 #include "HTTPSServerTestSuite.h"
 #include "WebSocketTestSuite.h"
+#include "FTPSClientTestSuite.h"
 
 
 CppUnit::Test* NetSSLTestSuite::suite()
@@ -24,6 +25,7 @@ CppUnit::Test* NetSSLTestSuite::suite()
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(HTTPSServerTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
+	pSuite->addTest(FTPSClientTestSuite::suite());
 
 	return pSuite;
 }

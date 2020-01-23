@@ -598,6 +598,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\DialogServer.h"/>
+    <ClInclude Include="src\FTPSClientSessionTest.h"/>
+    <ClInclude Include="src\FTPSClientTestSuite.h"/>
     <ClInclude Include="src\HTTPSClientSessionTest.h"/>
     <ClInclude Include="src\HTTPSClientTestSuite.h"/>
     <ClInclude Include="src\HTTPSServerTest.h"/>
@@ -611,7 +614,16 @@
     <ClInclude Include="src\WebSocketTestSuite.h"/>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DialogServer.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
     <ClCompile Include="src\Driver.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientSessionTest.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\FTPSClientTestSuite.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\HTTPSClientSessionTest.cpp">

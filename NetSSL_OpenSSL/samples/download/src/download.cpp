@@ -19,6 +19,7 @@
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/HTTPSStreamFactory.h"
 #include "Poco/Net/FTPStreamFactory.h"
+#include "Poco/Net/FTPSStreamFactory.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/KeyConsoleHandler.h"
 #include "Poco/Net/ConsoleCertificateHandler.h"
@@ -35,6 +36,7 @@ using Poco::Exception;
 using Poco::Net::HTTPStreamFactory;
 using Poco::Net::HTTPSStreamFactory;
 using Poco::Net::FTPStreamFactory;
+using Poco::Net::FTPSStreamFactory;
 using Poco::Net::SSLManager;
 using Poco::Net::Context;
 using Poco::Net::KeyConsoleHandler;
@@ -64,6 +66,7 @@ int main(int argc, char** argv)
 	HTTPStreamFactory::registerFactory();
 	HTTPSStreamFactory::registerFactory();
 	FTPStreamFactory::registerFactory();
+	FTPSStreamFactory::registerFactory();
 
 	if (argc != 2)
 	{
