@@ -18,7 +18,7 @@
 #define Net_FTPSStreamFactory_INCLUDED
 
 
-#include "Poco/Net/Net.h"
+#include "Poco/Net/NetSSL.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/FTPStreamFactory.h"
 
@@ -27,7 +27,7 @@ namespace Poco {
 namespace Net {
 
 
-class Net_API FTPSStreamFactory: public Poco::Net::FTPStreamFactory
+class NetSSL_API FTPSStreamFactory: public Poco::Net::FTPStreamFactory
 	/// An implementation of the URIStreamFactory interface
 	/// that handles secure File Transfer Protocol (ftps) URIs
 	/// according to RFC 4217, based on the FTPSClientSession class.
