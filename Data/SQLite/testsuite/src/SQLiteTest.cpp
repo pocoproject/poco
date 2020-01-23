@@ -3410,7 +3410,7 @@ void SQLiteTest::testIllegalFilePath()
 {
 	try
 	{
-		Session tmp (Poco::Data::SQLite::Connector::KEY, "\\/some\\/illegal\\/path\\/dummy.db", 1);
+		Session tmp(Poco::Data::SQLite::Connector::KEY, "\\/some\\/illegal\\/path\\/dummy.db", 1);
 		fail("must fail");
 	}
 	catch (ConnectionFailedException&)

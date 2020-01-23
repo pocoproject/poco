@@ -255,14 +255,14 @@ CipherImpl::~CipherImpl()
 }
 
 
-CryptoTransform* CipherImpl::createEncryptor()
+CryptoTransform::Ptr CipherImpl::createEncryptor()
 {
 	CipherKeyImpl::Ptr p = _key.impl();
 	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(), CryptoTransformImpl::DIR_ENCRYPT);
 }
 
 
-CryptoTransform* CipherImpl::createDecryptor()
+CryptoTransform::Ptr CipherImpl::createDecryptor()
 {
 	CipherKeyImpl::Ptr p = _key.impl();
 	return new CryptoTransformImpl(p->cipher(), p->getKey(), p->getIV(), CryptoTransformImpl::DIR_DECRYPT);
