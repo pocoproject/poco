@@ -37,6 +37,13 @@
 #include "Poco/Windows936Encoding.h"
 #include "Poco/Windows949Encoding.h"
 #include "Poco/Windows950Encoding.h"
+#include "Poco/MacRomanEncoding.h"
+#include "Poco/MacCentralEurRomanEncoding.h"
+#include "Poco/MacCyrillicEncoding.h"
+#include "Poco/MacChineseTradEncoding.h"
+#include "Poco/MacChineseSimpEncoding.h"
+#include "Poco/MacJapaneseEncoding.h"
+#include "Poco/MacKoreanEncoding.h"
 
 
 namespace Poco {
@@ -67,6 +74,13 @@ void registerExtraEncodings()
 	TextEncoding::add(new Windows936Encoding);
 	TextEncoding::add(new Windows949Encoding);
 	TextEncoding::add(new Windows950Encoding);
+	TextEncoding::add(new MacRomanEncoding);
+	TextEncoding::add(new MacCentralEurRomanEncoding);
+	TextEncoding::add(new MacCyrillicEncoding);
+	TextEncoding::add(new MacChineseTradEncoding);
+	TextEncoding::add(new MacChineseSimpEncoding);
+	TextEncoding::add(new MacJapaneseEncoding);
+	TextEncoding::add(new MacKoreanEncoding);
 }
 
 

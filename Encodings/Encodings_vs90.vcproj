@@ -557,6 +557,34 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\Poco\MacCentralEurRomanEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MacChineseSimpEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MacChineseTradEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MacCyrillicEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MacJapaneseEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MacKoreanEncoding.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\MacRomanEncoding.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\Poco\Windows1253Encoding.h"
 					>
 				</File>
@@ -661,6 +689,34 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\MacCentralEurRomanEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MacChineseSimpEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MacChineseTradEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MacCyrillicEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MacJapaneseEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MacKoreanEncoding.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MacRomanEncoding.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\Windows1253Encoding.cpp"
 					>
 				</File>
@@ -709,20 +765,6 @@
 		<File
 			RelativePath="..\DLLVersion.rc"
 			>
-			<FileConfiguration
-				Name="debug_shared|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="release_shared|Win32"
-				>
-				<Tool
-					Name="VCResourceCompilerTool"
-				/>
-			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
 				ExcludedFromBuild="true"

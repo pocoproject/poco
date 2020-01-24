@@ -37,7 +37,8 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	HashSetTest HashMapTest SharedMemoryTest OrderedContainersTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
-	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest
+	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
+	DataURIStreamTest
 
 target         = testrunner
 target_version = 1
