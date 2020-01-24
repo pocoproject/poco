@@ -40,6 +40,7 @@
 namespace Poco {
 namespace Crypto {
 
+
 X509Certificate::X509Certificate(std::istream& istr):
 	_pCert(0)
 {
