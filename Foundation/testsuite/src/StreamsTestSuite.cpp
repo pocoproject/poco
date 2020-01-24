@@ -23,6 +23,7 @@
 #include "FileStreamTest.h"
 #include "MemoryStreamTest.h"
 #include "FIFOBufferStreamTest.h"
+#include "DataURIStreamTest.h"
 
 
 CppUnit::Test* StreamsTestSuite::suite()
@@ -43,6 +44,7 @@ CppUnit::Test* StreamsTestSuite::suite()
 	pSuite->addTest(FileStreamTest::suite());
 	pSuite->addTest(MemoryStreamTest::suite());
 	pSuite->addTest(FIFOBufferStreamTest::suite());
+	pSuite->addTest(DataURIStreamTest::suite());
 
 	return pSuite;
 }
