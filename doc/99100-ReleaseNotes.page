@@ -6,6 +6,9 @@ AAAIntroduction
 !!Summary of Changes
 
   - This release now requires a C++14 compiler (GCC 5, Clang 3.4, Visual C++ 2015).
+  - Visual Studio project and solution files for versions prior to 2015 have
+    been removed. Furthermore, the separate projects and solutions for 64-bit builds
+    have been removed and configurations have been merged in a single project file.
   - POCO's fixed-size integer types are now based on <cstdint> types. This changes
     the definition of Poco::Int64 and Poco::UInt64 on some platforms.
   - Many methods exposing raw pointers have been changed to use smart pointers
