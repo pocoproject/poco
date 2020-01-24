@@ -555,6 +555,13 @@
     <ClInclude Include="include\Poco\ISO8859_7Encoding.h"/>
     <ClInclude Include="include\Poco\ISO8859_8Encoding.h"/>
     <ClInclude Include="include\Poco\ISO8859_9Encoding.h"/>
+    <ClInclude Include="include\Poco\MacCentralEurRomanEncoding.h"/>
+    <ClInclude Include="include\Poco\MacChineseSimpEncoding.h"/>
+    <ClInclude Include="include\Poco\MacChineseTradEncoding.h"/>
+    <ClInclude Include="include\Poco\MacCyrillicEncoding.h"/>
+    <ClInclude Include="include\Poco\MacJapaneseEncoding.h"/>
+    <ClInclude Include="include\Poco\MacKoreanEncoding.h"/>
+    <ClInclude Include="include\Poco\MacRomanEncoding.h"/>
     <ClInclude Include="include\Poco\Windows1253Encoding.h"/>
     <ClInclude Include="include\Poco\Windows1254Encoding.h"/>
     <ClInclude Include="include\Poco\Windows1255Encoding.h"/>
@@ -608,6 +615,27 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\ISO8859_9Encoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacCentralEurRomanEncoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacChineseSimpEncoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacChineseTradEncoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacCyrillicEncoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacJapaneseEncoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacKoreanEncoding.cpp">
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\MacRomanEncoding.cpp">
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\Windows1253Encoding.cpp">
