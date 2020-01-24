@@ -909,6 +909,12 @@
     <ClCompile Include="src\SHA2Engine.cpp">
       <Filter>Crypt\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\DataURIStream.cpp">
+      <Filter>URI\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataURIStreamFactory.cpp">
+      <Filter>URI\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Poco\Any.h">
@@ -1864,6 +1870,12 @@
     </ClInclude>
     <ClInclude Include="include\Poco\SHA2Engine.h">
       <Filter>Crypt\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DataURIStream.h">
+      <Filter>URI\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\DataURIStreamFactory.h">
+      <Filter>URI\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
