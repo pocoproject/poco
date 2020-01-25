@@ -91,6 +91,7 @@ AAAIntroduction
   - GH #2408: add ordered containers
   - GH #2042: Android abstract namespace local socket address
   - GH #2088: Fix race condition in TCPServerDispatcher.cpp
+  - GH #2892: SocketImpl::bind --> bind wrong config
 
 !!Incompatible Changes and Possible Transition Issues
 
