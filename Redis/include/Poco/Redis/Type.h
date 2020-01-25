@@ -36,7 +36,7 @@ class Redis_API RedisType
 	/// element with different types in Array.
 {
 public:
-	enum Types 
+	enum Types
 	{
 		REDIS_INTEGER,       /// Redis Integer
 		REDIS_SIMPLE_STRING, /// Redis Simple String
@@ -45,7 +45,7 @@ public:
 		REDIS_ERROR          /// Redis Error
 	};
 
-	typedef SharedPtr<RedisType> Ptr;
+	using Ptr = SharedPtr<RedisType>;
 
 	RedisType();
 		/// Creates the RedisType.
@@ -132,9 +132,9 @@ struct RedisTypeTraits
 template<>
 struct RedisTypeTraits<Int64>
 {
-	enum 
+	enum
 	{
-		TypeId = RedisType::REDIS_INTEGER 
+		TypeId = RedisType::REDIS_INTEGER
 	};
 
 	static const char marker = ':';
@@ -155,9 +155,9 @@ struct RedisTypeTraits<Int64>
 template<>
 struct RedisTypeTraits<std::string>
 {
-	enum 
-	{ 
-		TypeId = RedisType::REDIS_SIMPLE_STRING 
+	enum
+	{
+		TypeId = RedisType::REDIS_SIMPLE_STRING
 	};
 
 	static const char marker = '+';
@@ -174,17 +174,17 @@ struct RedisTypeTraits<std::string>
 };
 
 
-typedef Nullable<std::string> BulkString;
+using BulkString = Nullable<std::string>;
 	/// A bulk string is a string that can contain a NULL value.
-	/// So, BulkString is a typedef for Nullable<std::string>.
+	/// So, BulkString is an alias for Nullable<std::string>.
 
 
 template<>
 struct RedisTypeTraits<BulkString>
 {
-	enum 
-	{ 
-		TypeId = RedisType::REDIS_BULK_STRING 
+	enum
+	{
+		TypeId = RedisType::REDIS_BULK_STRING
 	};
 
 	static const char marker = '$';
