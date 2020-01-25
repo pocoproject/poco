@@ -17,14 +17,12 @@
 #include "Poco/Data/SessionFactory.h"
 
 
-const PostgreSQLConnectorRegistrator pocoPostgreSQLConnectorRegistrator;
-
-
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
-std::string Connector::KEY = POCO_DATA_POSTGRESQL_CONNECTOR_NAME;
+
+const std::string Connector::KEY("postgresql");
 
 
 Connector::Connector()
@@ -36,28 +34,29 @@ Connector::~Connector()
 {
 }
 
-const std::string&
-Connector::name() const
+
+const std::string& Connector::name() const
 {
-	static const std::string n(POCO_DATA_POSTGRESQL_CONNECTOR_NAME);
-	return n;
+	return KEY;
 }
+
 
 SessionImpl::Ptr Connector::createSession(const std::string& aConnectionString, std::size_t aTimeout)
 {
 	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(aConnectionString, aTimeout));
 }
 
+
 void Connector::registerConnector()
 {
 	Poco::Data::SessionFactory::instance().add(new Connector());
 }
 
+
 void Connector::unregisterConnector()
 {
-	Poco::Data::SessionFactory::instance().remove(POCO_DATA_POSTGRESQL_CONNECTOR_NAME);
+	Poco::Data::SessionFactory::instance().remove(KEY);
 }
 
 
 } } } // namespace Poco::Data::PostgreSQL
-

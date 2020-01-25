@@ -13,6 +13,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #include "Poco/Data/PostgreSQL/Utility.h"
 #include "Poco/Data/PostgreSQL/SessionImpl.h"
 #include "Poco/NumberFormatter.h"

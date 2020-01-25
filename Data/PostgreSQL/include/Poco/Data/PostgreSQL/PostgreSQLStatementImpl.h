@@ -17,6 +17,7 @@
 #ifndef SQL_PostgreSQL_PostgreSQLStatementImpl_INCLUDED
 #define SQL_PostgreSQL_PostgreSQLStatementImpl_INCLUDED
 
+
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/PostgreSQL/SessionImpl.h"
 #include "Poco/Data/PostgreSQL/Binder.h"
@@ -43,7 +44,6 @@ public:
 		/// Destroys the PostgreSQLStatementImpl.
 
 protected:
-
 	virtual std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
 

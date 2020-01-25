@@ -17,15 +17,15 @@
 #ifndef SQL_PostgreSQL_StatementExecutor_INCLUDED
 #define SQL_PostgreSQL_StatementExecutor_INCLUDED
 
+
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 #include "Poco/Data/PostgreSQL/SessionHandle.h"
 #include "Poco/Data/MetaColumn.h"
-
 #include <libpq-fe.h>
-
 #include <string>
 #include <vector>
+
 
 namespace Poco {
 namespace Data {
@@ -81,9 +81,8 @@ public:
 		/// Cast operator to native result handle type.
 
 private:
-	
 	void clearResults();
-	
+
 	StatementExecutor(const StatementExecutor&);
 	StatementExecutor& operator= (const StatementExecutor&);
 
@@ -109,11 +108,14 @@ private:
 // inlines
 //
 
+
 inline StatementExecutor::operator PGresult* ()
 {
 	return _pResultHandle;
 }
-	
-}}}
+
+
+} } } // namespace Poco::Data::PostgreSQL
+
 
 #endif // SQL_PostgreSQL_StatementExecutor_INCLUDED

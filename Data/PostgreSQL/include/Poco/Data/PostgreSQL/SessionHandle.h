@@ -13,27 +13,30 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef SQL_PostgreSQL_SessionHandle_INCLUDED
 #define SQL_PostgreSQL_SessionHandle_INCLUDED
 
+
 #include "Poco/Mutex.h"
 #include "Poco/Types.h"
-
 #include <map>
 #include <string>
 #include <vector>
-
 #include <libpq-fe.h>
+
 
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
+
 class SessionParameters
-{
 	/// PostgreSQL session parameters
+{
 public:
-	enum HOW_TO_DISPLAY {
+	enum HowToDisplay
+	{
 		HTD_ASIS,   // as is
 		HTD_HIDE,   // do not display (e.g. passwords)
 		HID_DEBUG   // debug use only
@@ -49,32 +52,32 @@ public:
 
 	~SessionParameters();
 
-	std::string    keyword()const;
-	std::string    enviromentVariable() const;
-	std::string    compiledDefault()const;
-	std::string    currentValue() const;
-	std::string    displayLabel() const;
-	HOW_TO_DISPLAY howToDisplay() const;
-	int            displaySize()const;
+	std::string keyword() const;
+	std::string enviromentVariable() const;
+	std::string compiledDefault() const;
+	std::string currentValue() const;
+	std::string displayLabel() const;
+	HowToDisplay howToDisplay() const;
+	int displaySize() const;
 
 private:
-	std::string    _keyword;// The keyword of the option
-	std::string    _environmentVariable;// Fallback environment variable name
-	std::string    _compiledDefault;// Fallback compiled in default value
-	std::string    _currentValue;   // Option's current value, or NULL
-	std::string    _displayLabel;   // Label for field in a connect dialog
-	HOW_TO_DISPLAY _howToDisplay;   // Indicates how to display this field
-	int            _displaySize;// Field size in characters for connect dialog
+	std::string _keyword;             // The keyword of the option
+	std::string _environmentVariable; // Fallback environment variable name
+	std::string _compiledDefault;     // Fallback compiled in default value
+	std::string _currentValue;        // Option's current value, or NULL
+	std::string _displayLabel;        // Label for field in a connect dialog
+	HowToDisplay _howToDisplay;       // Indicates how to display this field
+	int _displaySize;                 // Field size in characters for connect dialog
 };
 
-typedef std::map<std::string, SessionParameters> SessionParametersMap;
+
+using SessionParametersMap = std::map<std::string, SessionParameters>;
 
 
 class SessionHandle
 	/// PostgreSQL connection(session) handle
 {
 public:
-
 	explicit SessionHandle();
 		/// Creates session handle
 
@@ -140,7 +143,7 @@ public:
 
 	void deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate);
 		/// deallocates a previously prepared statement
-	
+
 	int serverVersion() const;
 		/// remote server version
 
@@ -180,12 +183,10 @@ private:
 	bool isConnectedNoLock() const;
 	std::string lastErrorNoLock() const;
 
-
 	SessionHandle(const SessionHandle&);
 	SessionHandle& operator= (const SessionHandle&);
 
 private:
-
 	mutable Poco::FastMutex   _sessionMutex;
 	PGconn*                   _pConnection;
 	std::string               _connectionString;
@@ -206,7 +207,6 @@ private:
 // inlines
 //
 
-// SessionParameters
 
 inline SessionParameters::SessionParameters(const std::string& aKeyword,
 	const std::string& anEnvironmentVariable,
@@ -269,7 +269,7 @@ inline std::string SessionParameters::displayLabel() const
 }
 
 
-inline SessionParameters::HOW_TO_DISPLAY SessionParameters::howToDisplay() const
+inline SessionParameters::HowToDisplay SessionParameters::howToDisplay() const
 {
 	return _howToDisplay;
 }
@@ -279,8 +279,6 @@ inline int SessionParameters::displaySize() const
 	return _displaySize;
 }
 
-
-// SessionHandle
 
 inline SessionHandle::operator PGconn * ()
 {
@@ -318,7 +316,7 @@ inline bool SessionHandle::isAsynchronousCommit()
 }
 
 
-}}} // namespace Poco::Data::PostgreSQL
+} } } // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_SessionHandle_INCLUDED

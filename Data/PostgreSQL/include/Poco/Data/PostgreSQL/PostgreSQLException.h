@@ -17,25 +17,23 @@
 #ifndef SQL_PostgreSQL_PostgreSQLException_INCLUDED
 #define SQL_PostgreSQL_PostgreSQLException_INCLUDED
 
+
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/DataException.h"
-
 #include <typeinfo>
 #include <string>
+
 
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
-// End-user include this file and use in code ConnectionException/StatementException
-// So it need not know
 
 class PostgreSQL_API PostgreSQLException: public Poco::Data::DataException
 	/// Base class for all PostgreSQL exceptions
 {
 public:
-
-	PostgreSQLException(const std::string& aMessage);
+	explicit PostgreSQLException(const std::string& aMessage);
 		/// Creates PostgreSQLException.
 
 	PostgreSQLException(const PostgreSQLException& exc);
@@ -44,7 +42,7 @@ public:
 	~PostgreSQLException() noexcept;
 		/// Destroys PostgreSQLexception.
 
-	PostgreSQLException& operator=(const PostgreSQLException& exc);
+	PostgreSQLException& operator = (const PostgreSQLException& exc);
 		/// Assignment operator.
 
 	const char* name() const noexcept;
@@ -68,32 +66,28 @@ public:
 };
 
 
-class ConnectionException : public PostgreSQLException
+class ConnectionException: public PostgreSQLException
 	/// ConnectionException
 {
 public:
-
 	ConnectionException(const std::string& aMessage);
 		/// Creates ConnectionException from string.
-
 };
 
 
-class TransactionException : public ConnectionException
+class TransactionException: public ConnectionException
 	/// TrabsactionException
 {
 public:
-
 	TransactionException(const std::string& aMessage);
 		/// Creates TransactionException from string.
 };
 
 
-class StatementException : public PostgreSQLException
+class StatementException: public PostgreSQLException
 	/// StatementException
 {
 public:
-
 	StatementException(const std::string& aMessage);
 		/// Creates StatementException from string.
 };
@@ -103,9 +97,10 @@ public:
 // inlines
 //
 
-inline PostgreSQLException& PostgreSQLException::operator=(const PostgreSQLException& exc)
+
+inline PostgreSQLException& PostgreSQLException::operator = (const PostgreSQLException& exc)
 {
-	Poco::Data::DataException::operator=(exc);
+	Poco::Data::DataException::operator = (exc);
 	return *this;
 }
 
@@ -135,5 +130,6 @@ inline void PostgreSQLException::rethrow() const
 
 
 } } } // namespace Poco::Data::PostgreSQL
+
 
 #endif //SQL_PostgreSQL_PostgreSQLException_INCLUDED

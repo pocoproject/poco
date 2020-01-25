@@ -33,13 +33,15 @@ const std::string SessionHandle::POSTGRESQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionHandle::POSTGRESQL_SERIALIZABLE	= "SERIALIZABLE";
 
 
-SessionHandle::SessionHandle(): _pConnection(0),
+SessionHandle::SessionHandle():
+	_pConnection(0),
 	_inTransaction(false),
 	_isAutoCommit(true),
 	_isAsynchronousCommit(false),
 	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
 }
+
 
 SessionHandle::~SessionHandle()
 {
@@ -65,12 +67,10 @@ bool SessionHandle::isConnectedNoLock() const
 {
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
 
-	if (_pConnection
-		&& PQstatus(_pConnection) == CONNECTION_OK)
+	if (_pConnection && PQstatus(_pConnection) == CONNECTION_OK)
 	{
 		return true;
 	}
-
 	return false;
 }
 
@@ -85,7 +85,6 @@ void SessionHandle::connect(const std::string& aConnectionString)
 	}
 
 	_pConnection = PQconnectdb(aConnectionString.c_str());
-
 
 	if (! isConnectedNoLock())
 	{
@@ -376,8 +375,7 @@ void SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
 }
 
 
-Poco::UInt32
-SessionHandle::transactionIsolation()
+Poco::UInt32 SessionHandle::transactionIsolation()
 {
 	return _tranactionIsolationLevel;
 }
@@ -420,9 +418,9 @@ void SessionHandle::deallocatePreparedStatement(const std::string& aPreparedStat
 void SessionHandle::deallocatePreparedStatementNoLock(const std::string& aPreparedStatementToDeAllocate)
 {
 	PGresult* pPQResult = PQexec(_pConnection, (std::string("DEALLOCATE ") + aPreparedStatementToDeAllocate).c_str());
-	
+
 	PQResultClear resultClearer(pPQResult);
-	
+
 	if (PQresultStatus(pPQResult) != PGRES_COMMAND_OK)
 	{
 		throw StatementException(std::string("DEALLOCATE statement failed: ") + lastErrorNoLock());
@@ -562,4 +560,4 @@ SessionParametersMap SessionHandle::connectionParameters() const
 }
 
 
-}}} // Poco::Data::PostgreSQL
+} } } // Poco::Data::PostgreSQL

@@ -14,12 +14,14 @@
 
 #include "Poco/Data/PostgreSQL/PostgreSQLStatementImpl.h"
 
+
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
 
-PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl): Poco::Data::StatementImpl(aSessionImpl),
+PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl):
+	Poco::Data::StatementImpl(aSessionImpl),
 	_statementExecutor(aSessionImpl.handle()),
 	_pBinder(new Binder),
 	_pExtractor(new Extractor (_statementExecutor)),
@@ -69,11 +71,10 @@ bool PostgreSQLStatementImpl::hasNext()
 		_hasNext = NEXT_FALSE;
 		return false;
 	}
-	else
-		if (NEXT_TRUE == _hasNext)
-		{
-			return true;
-		}
+	else if (NEXT_TRUE == _hasNext)
+	{
+		return true;
+	}
 
 	return false;
 }
@@ -88,7 +89,7 @@ std::size_t PostgreSQLStatementImpl::next()
 
 	Poco::Data::AbstractExtractionVec::iterator it= extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
-	
+
 	std::size_t position = 0;
 
 	for (; it != itEnd; ++it)
@@ -108,7 +109,7 @@ bool PostgreSQLStatementImpl::canBind() const
 	bool ret = false;
 
 	if ((_statementExecutor.state() >= StatementExecutor::STMT_COMPILED)
-		 && ! bindings().empty())
+		 && !bindings().empty())
 	{
 		ret = (*bindings().begin())->canBind();
 	}

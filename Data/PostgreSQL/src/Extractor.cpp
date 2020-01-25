@@ -25,8 +25,8 @@ namespace Data {
 namespace PostgreSQL {
 
 
-Extractor::Extractor(StatementExecutor& st /*, ResultMetadata& md */)
-: _statementExecutor (st)
+Extractor::Extractor(StatementExecutor& st /*, ResultMetadata& md */):
+	_statementExecutor (st)
 {
 }
 
@@ -354,6 +354,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 	return true;
 }
 
+
 bool Extractor::extract(std::size_t pos, DateTime& val)
 {
 	OutputParameter outputParameter = extractPreamble(pos);
@@ -502,8 +503,8 @@ bool Extractor::extract(std::size_t , std::list<Poco::Int8>&)
 {
 	throw NotImplementedException("std::list extractor must be implemented.");
 }
-	
-	
+
+
 bool Extractor::extract(std::size_t , std::vector<Poco::UInt8>&)
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");
