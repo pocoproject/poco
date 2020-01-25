@@ -32,7 +32,6 @@ class PostgreSQL_API Utility
 	/// Various utility functions for PostgreSQL.
 {
 public:
-
 	static std::string serverInfo(SessionHandle* aHandlePtr);
 		/// Returns server info.
 

@@ -19,8 +19,7 @@
 #include "Poco/UUIDGenerator.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberParser.h"
-#include "Poco/RegularExpression.h"  // TODO: remove after C++ 11 implementation
-//#include <regex> // saved for C++ 11 implementation
+#include "Poco/RegularExpression.h"
 #include <algorithm>
 #include <set>
 
@@ -29,62 +28,42 @@ namespace
 {
 	std::size_t countOfPlaceHoldersInSQLStatement(const std::string& aSQLStatement)
 	{
+		// Find unique placeholders.
+		// Unique placeholders allow the same placeholder to be used multiple times in the same statement.
 
-	// Find unique placeholders.
-	// Unique placeholders allow the same placeholder to be used multiple times in the same statement.
+		// NON C++11 implementation
 
-	// NON C++11 implementation
+		//if (aSQLStatement.empty())
+		//{
+		//return 0;
+		//}
 
-	//if (aSQLStatement.empty())
-	//{
-	//return 0;
-	//}
+		// set to hold the unique placeholders ($1, $2, $3, etc.).
+		// A set is used because the same placeholder can be used muliple times
+		std::set<std::string> placeholderSet;
 
-	// set to hold the unique placeholders ($1, $2, $3, etc.).
-	// A set is used because the same placeholder can be used muliple times
-	std::set<std::string> placeholderSet;
+		Poco::RegularExpression placeholderRE("[$][0-9]+");
+		Poco::RegularExpression::Match match = { 0 , 0 }; // Match is a struct, not a class :-(
 
-	Poco::RegularExpression placeholderRE("[$][0-9]+");
-	Poco::RegularExpression::Match match = { 0 , 0 }; // Match is a struct, not a class :-(
+		std::size_t startingPosition = 0;
 
-	std::size_t startingPosition = 0;
-
-	while (match.offset != std::string::npos)
-	{
-		try
+		while (match.offset != std::string::npos)
 		{
-			if (placeholderRE.match(aSQLStatement, startingPosition, match))
+			try
 			{
-				placeholderSet.insert(aSQLStatement.substr(match.offset, match.length));
-				startingPosition = match.offset + match.length;
+				if (placeholderRE.match(aSQLStatement, startingPosition, match))
+				{
+					placeholderSet.insert(aSQLStatement.substr(match.offset, match.length));
+					startingPosition = match.offset + match.length;
+				}
+			}
+			catch (Poco::RegularExpressionException &)
+			{
+				break;
 			}
 		}
-		catch (Poco::RegularExpressionException &)
-		{
-			break;
-		}
 
-	}
-
-
-/*  C++ 11 implementation
-
-	std::regex const expression("[$][0-9]+");  // match literal dollar signs followed directly by one or more digits
-
-	std::sregex_iterator itr(aSQLStatement.begin(), aSQLStatement.end(), expression);
-	std::sregex_iterator eItr;
-
-	// set to hold the unique placeholders ($1, $2, $3, etc.).
-	// A set is used because the same placeholder can be used muliple times
-	std::set<std::string> placeholderSet;
-
-	while (itr != eItr)
-	{
-		placeholderSet.insert(itr->str());
-		++itr;
-	}
-*/
-	return placeholderSet.size();
+		return placeholderSet.size();
 	}
 } // namespace
 
@@ -94,7 +73,8 @@ namespace Data {
 namespace PostgreSQL {
 
 
-StatementExecutor::StatementExecutor(SessionHandle& sessionHandle):_sessionHandle(sessionHandle),
+StatementExecutor::StatementExecutor(SessionHandle& sessionHandle):
+	_sessionHandle(sessionHandle),
 	_state(STMT_INITED),
 	_pResultHandle(0),
 	_countPlaceholdersInSQLStatement(0),
@@ -116,7 +96,9 @@ StatementExecutor::~StatementExecutor()
 
 		PQResultClear resultClearer(_pResultHandle);
 	}
-	catch (...) { }
+	catch (...)
+	{
+	}
 }
 
 
@@ -366,7 +348,7 @@ bool StatementExecutor::fetch()
 	for (int i = 0; i < countColumns; ++i)
 	{
 		int fieldLength = PQgetlength(_pResultHandle, static_cast<int> (_currentRow), static_cast<int> (i));
-		
+
 		Oid columnInternalDataType = PQftype(_pResultHandle, i);  // Oid of column
 
 		_outputParameterVector.at(i).setValues(oidToColumnDataType(columnInternalDataType), // Poco::Data::MetaData version of the Column Data Type
@@ -429,4 +411,4 @@ void StatementExecutor::clearResults()
 }
 
 
-}}} // Poco::Data::PostgreSQL
+} } } // Poco::Data::PostgreSQL

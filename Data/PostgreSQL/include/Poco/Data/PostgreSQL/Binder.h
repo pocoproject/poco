@@ -17,16 +17,16 @@
 #ifndef SQL_PostgreSQL_Binder_INCLUDED
 #define SQL_PostgreSQL_Binder_INCLUDED
 
+
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
-
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Types.h"
-
 #include <libpq-fe.h>
+
 
 namespace Poco {
 namespace Data {
@@ -38,11 +38,11 @@ class PostgreSQL_API Binder: public Poco::Data::AbstractBinder
 	/// Allows data type mapping at statement execution time.
 {
 public:
-	typedef SharedPtr<Binder> Ptr;
+	using Ptr = SharedPtr<Binder>;
 
 	Binder();
 		/// Creates the Binder.
-		
+
 	virtual ~Binder();
 		/// Destroys the Binder.
 
@@ -244,12 +244,11 @@ private:
 		/// due to security risk.
 	{
 	}
-	
+
 	void realBind(std::size_t aPosition, Poco::Data::MetaColumn::ColumnDataType aFieldType, const void* aBufferPtr, std::size_t aLength);
 		/// Common bind implementation
 
 private:
-
 	InputParameterVector _bindVector;
 };
 

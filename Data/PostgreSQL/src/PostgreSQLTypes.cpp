@@ -14,14 +14,16 @@
 
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 
+
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
+
 Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 {
 	Poco::Data::MetaColumn::ColumnDataType cdt = Poco::Data::MetaColumn::FDT_UNKNOWN;
-	
+
 	switch (anOID)
 	{
 	// bool
@@ -101,5 +103,5 @@ Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 	return cdt;
 }
 
-} } } // namespace Poco::Data::PostgreSQL
 
+} } } // namespace Poco::Data::PostgreSQL

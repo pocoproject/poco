@@ -21,10 +21,8 @@
 #include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 #include "Poco/Data/PostgreSQL/StatementExecutor.h"
-
 #include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/LOB.h"
-
 #include "Poco/Types.h"
 #include "Poco/Any.h"
 #include "Poco/DynamicAny.h"
@@ -32,11 +30,6 @@
 
 
 namespace Poco {
-
-//namespace Dynamic {
-//	class Var;
-//}
-
 namespace Data {
 namespace PostgreSQL {
 
@@ -46,7 +39,7 @@ class PostgreSQL_API Extractor: public Poco::Data::AbstractExtractor
 	/// If NULL is received, the incoming val value is not changed and false is returned
 {
 public:
-	typedef SharedPtr<Extractor> Ptr;
+	using Ptr = SharedPtr<Extractor>;
 
 	Extractor(StatementExecutor& st);
 		/// Creates the Extractor.
@@ -56,28 +49,28 @@ public:
 
 	virtual bool extract(std::size_t pos, Poco::Int8& val);
 		/// Extracts an Int8.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt8& val);
 		/// Extracts an UInt8.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int16& val);
 		/// Extracts an Int16.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt16& val);
 		/// Extracts an UInt16.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int32& val);
 		/// Extracts an Int32.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt32& val);
 		/// Extracts an UInt32.
-		
+
 	virtual bool extract(std::size_t pos, Poco::Int64& val);
 		/// Extracts an Int64.
-		
+
 	virtual bool extract(std::size_t pos, Poco::UInt64& val);
 		/// Extracts an UInt64.
-		
+
 #ifndef POCO_INT64_IS_LONG
 	virtual bool extract(std::size_t pos, long& val);
 		/// Extracts a long. Returns false if null was received.
@@ -88,10 +81,10 @@ public:
 
 	virtual bool extract(std::size_t pos, bool& val);
 		/// Extracts a boolean.
-		
+
 	virtual bool extract(std::size_t pos, float& val);
 		/// Extracts a float.
-		
+
 	virtual bool extract(std::size_t pos, double& val);
 		/// Extracts a double.
 
@@ -131,7 +124,7 @@ public:
 	////////////
 	// Not implemented extract functions
 	////////////
-	
+
 	virtual bool extract(std::size_t pos, std::vector<Poco::Int8>& val);
 		/// Extracts an Int8 vector.
 
@@ -324,14 +317,12 @@ public:
 		/// Extracts a Dynamic::Var list.
 
 private:
-
 	const OutputParameter& extractPreamble(std::size_t aPosition) const;
-
 	bool isColumnNull(const OutputParameter& anOutputParameter) const;
 
 	template <typename T>
 	bool extractStringImpl(std::size_t pos, T& val)
-	/// Utility function for extraction of Any and DynamicAny.
+		/// Utility function for extraction of Any and DynamicAny.
 	{
 		OutputParameter outputParameter = extractPreamble(pos);
 
@@ -357,7 +348,6 @@ private:
 	Extractor& operator=(const Extractor&);
 
 private:
-
 	StatementExecutor& _statementExecutor;
 };
 

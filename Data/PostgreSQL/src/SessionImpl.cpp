@@ -19,8 +19,8 @@
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
-
 #include <map>
+
 
 namespace
 {
@@ -187,7 +187,7 @@ void SessionImpl::begin()
 }
 
 
- void SessionImpl::commit()
+void SessionImpl::commit()
 {
 	// Not an error to issue a COMMIT without a preceding BEGIN
 	_sessionHandle.commit();
@@ -243,4 +243,4 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 aTI) const
 }
 
 
-}}} // namespace Poco::Data::PostgreSQL
+} } } // namespace Poco::Data::PostgreSQL

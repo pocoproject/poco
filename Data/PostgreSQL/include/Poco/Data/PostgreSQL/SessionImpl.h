@@ -22,8 +22,8 @@
 #include "Poco/Data/PostgreSQL/SessionHandle.h"
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/Data/StatementImpl.h"
-
 #include <string>
+
 
 namespace Poco {
 namespace Data {
@@ -34,7 +34,6 @@ class PostgreSQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<Session
 	/// Implements SessionImpl interface
 {
 public:
-
 	SessionImpl(const std::string& aConnectionString,
 				std::size_t aLoginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database
@@ -128,6 +127,7 @@ private:
 //
 // inlines
 //
+
 
 inline bool SessionImpl::canTransact() const
 {

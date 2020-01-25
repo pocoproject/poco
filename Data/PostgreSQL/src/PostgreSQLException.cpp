@@ -14,19 +14,20 @@
 
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 
+
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
 
-PostgreSQLException::PostgreSQLException(const std::string& aMessage)
-: Poco::Data::DataException(std::string("[PostgreSQL]: ") + aMessage)
+PostgreSQLException::PostgreSQLException(const std::string& aMessage):
+	Poco::Data::DataException(std::string("[PostgreSQL]: ") + aMessage)
 {
 }
 
 
-PostgreSQLException::PostgreSQLException(const PostgreSQLException& anException)
-: Poco::Data::DataException(anException)
+PostgreSQLException::PostgreSQLException(const PostgreSQLException& anException):
+	Poco::Data::DataException(anException)
 {
 }
 
@@ -41,8 +42,8 @@ PostgreSQLException::~PostgreSQLException() throw()
 //
 
 
-ConnectionException::ConnectionException(const std::string& aMessage)
-: PostgreSQLException(aMessage)
+ConnectionException::ConnectionException(const std::string& aMessage):
+	PostgreSQLException(aMessage)
 {
 }
 
@@ -51,8 +52,8 @@ ConnectionException::ConnectionException(const std::string& aMessage)
 // TransactionException
 //
 
-TransactionException::TransactionException(const std::string& aMessage)
-: ConnectionException(aMessage)
+TransactionException::TransactionException(const std::string& aMessage):
+	ConnectionException(aMessage)
 {
 }
 
@@ -62,8 +63,8 @@ TransactionException::TransactionException(const std::string& aMessage)
 //
 
 
-StatementException::StatementException(const std::string& aMessage)
-: PostgreSQLException(aMessage)
+StatementException::StatementException(const std::string& aMessage):
+	PostgreSQLException(aMessage)
 {
 }
 

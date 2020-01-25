@@ -110,7 +110,7 @@ void Binder::bind(std::size_t pos, const bool& val, Direction dir)
 	realBind(pos, Poco::Data::MetaColumn::FDT_BOOL, &val, sizeof(bool));
 }
 
-	
+
 void Binder::bind(std::size_t pos, const float& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
@@ -301,10 +301,6 @@ void Binder::updateBindVectorToCurrentValues()
 	}
 }
 
-
-//
-// Private
-//
 
 void Binder::realBind(std::size_t aPosition, Poco::Data::MetaColumn::ColumnDataType aFieldType, const void* aBufferPtr, std::size_t aLength)
 {

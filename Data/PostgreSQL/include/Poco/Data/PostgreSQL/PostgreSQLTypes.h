@@ -13,21 +13,24 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+
 #ifndef SQL_PostgreSQL_Types_INCLUDED
 #define SQL_PostgreSQL_Types_INCLUDED
 
+
 #include "Poco/Data/MetaColumn.h"
-
 #include <vector>
-
 #include <libpq-fe.h>
+
 
 namespace Poco {
 namespace Data {
 namespace PostgreSQL {
 
+
 /// Oid constants duplicated from PostgreSQL "include/postgresql/server/catalog/pg_type.h"
 /// because PostgreSQL compile time definitions are too onerous to reproduce for this module
+
 
 const Oid BOOLOID		= 16;
 
@@ -59,23 +62,25 @@ const Oid CASHOID		= 790;
 const Oid MACADDROID	= 829;
 const Oid UUIDOID		= 2950;
 
+
 Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
+
 
 class InputParameter
 	/// PostgreSQL class to record values for input parameters to SQL statements
 {
 public:
-	typedef Poco::Data::MetaColumn::ColumnDataType CDT;
+	using CDT = Poco::Data::MetaColumn::ColumnDataType;
 
-	explicit InputParameter(CDT fieldType, const void* dataPtr, std::size_t dataLength);
-	explicit InputParameter();
+	InputParameter(CDT fieldType, const void* dataPtr, std::size_t dataLength);
+	InputParameter();
 
 	~InputParameter();
 
-	CDT         fieldType() const;
+	CDT fieldType() const;
 	const void* pData() const;
 	std::size_t size() const;
-	bool        isBinary() const;
+	bool isBinary() const;
 
 	void setStringVersionRepresentation(const std::string& aString);
 	void setNonStringVersionRepresentation(const void* aPtr, std::size_t theSize);
@@ -91,14 +96,15 @@ private:
 	void*       _pNonStringVersionRepresentation;
 };
 
-typedef std::vector <InputParameter> InputParameterVector;
+
+using InputParameterVector = std::vector <InputParameter>;
 
 
 class OutputParameter
 	/// PostgreSQL class to record values for output parameters to capture the results
 {
 public:
-	typedef Poco::Data::MetaColumn::ColumnDataType CDT;
+	using CDT = Poco::Data::MetaColumn::ColumnDataType;
 
 	OutputParameter(CDT aFieldType, Oid internalFieldType, std::size_t rowNumber,
 		const char* dataPtr, std::size_t size, bool isNull);
@@ -109,16 +115,14 @@ public:
 	void setValues(CDT fieldType, Oid internalFieldType, std::size_t rowNumber,
 		const char* dataPtr, std::size_t size, bool isNull);
 
-	CDT         fieldType() const;
-	Oid         internalFieldType() const;
+	CDT fieldType() const;
+	Oid internalFieldType() const;
 	std::size_t rowNumber() const;
 	const char* pData() const;
 	std::size_t size() const;
-	bool        isNull() const;
+	bool isNull() const;
 
 private:
-
-
 	CDT         _fieldType;
 	Oid         _internalFieldType;
 	std::size_t _rowNumber;
@@ -127,7 +131,8 @@ private:
 	bool        _isNull;
 };
 
-typedef std::vector <OutputParameter> OutputParameterVector;
+
+using OutputParameterVector = std::vector <OutputParameter>;
 
 
 class PQConnectionInfoOptionsFree
@@ -138,23 +143,24 @@ public:
 	~PQConnectionInfoOptionsFree();
 
 private:
-	PQConnectionInfoOptionsFree            (const PQConnectionInfoOptionsFree&);
-	PQConnectionInfoOptionsFree& operator= (const PQConnectionInfoOptionsFree&);
+	PQConnectionInfoOptionsFree(const PQConnectionInfoOptionsFree&);
+	PQConnectionInfoOptionsFree& operator = (const PQConnectionInfoOptionsFree&);
 
 private:
     PQconninfoOption* _pConnectionInfoOption;
 };
 
+
 class PQResultClear
 	/// PostgreSQL statement result free (RAII)
 {
 public:
-	explicit PQResultClear(PGresult * aPQResultPtr);
+	explicit PQResultClear(PGresult* aPQResultPtr);
 	~PQResultClear();
 
 private:
-	PQResultClear            (const PQResultClear&);
-	PQResultClear& operator= (const PQResultClear&);
+	PQResultClear(const PQResultClear&);
+	PQResultClear& operator = (const PQResultClear&);
 
 private:
 	PGresult* _pPQResult;
@@ -165,12 +171,12 @@ class PGCancelFree
 	/// PostgreSQL Cancel Info Options free (RAII)
 {
 public:
-	explicit PGCancelFree(PGcancel * aStatementCancelPtr);
+	explicit PGCancelFree(PGcancel* aStatementCancelPtr);
 	~PGCancelFree();
 
 private:
-	PGCancelFree            (const PGCancelFree&);
-	PGCancelFree& operator= (const PGCancelFree&);
+	PGCancelFree(const PGCancelFree&);
+	PGCancelFree& operator = (const PGCancelFree&);
 
 private:
 	PGcancel* _pPGCancel;
@@ -181,20 +187,14 @@ private:
 // inlines
 //
 
-// InputParameter
-
-inline InputParameter::InputParameter(Poco::Data::MetaColumn::ColumnDataType	aFieldType,
-	const void* aDataPtr, std::size_t theSize): _fieldType(aFieldType),
+inline InputParameter::InputParameter(Poco::Data::MetaColumn::ColumnDataType fieldType,
+	const void* aDataPtr, std::size_t theSize):
+	_fieldType(fieldType),
 	_pData(aDataPtr),
 	_size(theSize),
-	_isBinary(false),
+	_isBinary(Poco::Data::MetaColumn::FDT_BLOB == _fieldType || Poco::Data::MetaColumn::FDT_CLOB == _fieldType),
 	_pNonStringVersionRepresentation(0)
 {
-	if (Poco::Data::MetaColumn::FDT_BLOB == _fieldType
-	 || Poco::Data::MetaColumn::FDT_CLOB == _fieldType)
-	{
-		_isBinary = true;
-	}
 }
 
 
@@ -283,30 +283,29 @@ inline const void* InputParameter::pInternalRepresentation() const
 }
 
 
-// OutputParameter
-
 inline OutputParameter::OutputParameter(Poco::Data::MetaColumn::ColumnDataType aFieldType,
 	Oid anInternalFieldType,
 	std::size_t aRowNumber,
 	const char* aDataPtr,
 	std::size_t theSize,
-	bool anIsNull): _fieldType(aFieldType),
-		_internalFieldType(anInternalFieldType),
-		_rowNumber(aRowNumber),
-		_pData(aDataPtr),
-		_size(theSize),
-		_isNull(anIsNull)
+	bool anIsNull):
+	_fieldType(aFieldType),
+	_internalFieldType(anInternalFieldType),
+	_rowNumber(aRowNumber),
+	_pData(aDataPtr),
+	_size(theSize),
+	_isNull(anIsNull)
 {
 }
 
 
-inline OutputParameter::OutputParameter()
-    : _fieldType         (Poco::Data::MetaColumn::FDT_UNKNOWN),
-      _internalFieldType (static_cast<Oid>(-1)),
-      _rowNumber         (0),
-      _pData             (0),
-      _size              (0),
-      _isNull            (true)
+inline OutputParameter::OutputParameter():
+	_fieldType(Poco::Data::MetaColumn::FDT_UNKNOWN),
+	_internalFieldType(static_cast<Oid>(-1)),
+	_rowNumber(0),
+	_pData(0),
+	_size(0),
+	_isNull(true)
 {
 }
 
@@ -368,10 +367,8 @@ inline bool OutputParameter::isNull() const
 }
 
 
-// PQConnectionInfoOptionsFree
-
-inline PQConnectionInfoOptionsFree::PQConnectionInfoOptionsFree(PQconninfoOption* aConnectionInfoOptionPtr)
-    : _pConnectionInfoOption(aConnectionInfoOptionPtr)
+inline PQConnectionInfoOptionsFree::PQConnectionInfoOptionsFree(PQconninfoOption* aConnectionInfoOptionPtr):
+	_pConnectionInfoOption(aConnectionInfoOptionPtr)
 {
 }
 
@@ -386,10 +383,8 @@ inline PQConnectionInfoOptionsFree::~PQConnectionInfoOptionsFree()
 }
 
 
-// PQResultClear
-
-inline PQResultClear::PQResultClear(PGresult* aPQResultPtr)
-    : _pPQResult(aPQResultPtr)
+inline PQResultClear::PQResultClear(PGresult* aPQResultPtr):
+	_pPQResult(aPQResultPtr)
 {
 }
 
@@ -406,8 +401,8 @@ inline PQResultClear::~PQResultClear()
 
 // PGCancelFree
 
-inline PGCancelFree::PGCancelFree(PGcancel* aStatementCancelPtr)
-    : _pPGCancel(aStatementCancelPtr)
+inline PGCancelFree::PGCancelFree(PGcancel* aStatementCancelPtr):
+	_pPGCancel(aStatementCancelPtr)
 {
 }
 
@@ -422,6 +417,7 @@ inline PGCancelFree::~PGCancelFree()
 }
 
 
-}}}
+} } } // namespace Poco::Data::PostgreSQL
+
 
 #endif // SQL_PostgreSQL_Types_INCLUDED
