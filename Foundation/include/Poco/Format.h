@@ -70,7 +70,7 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * - left align the result within the given field width
 	///   * + prefix the output value with a sign (+ or -) if the output value is of a signed type
 	///   * 0 if width is prefixed with 0, zeros are added until the minimum width is reached
-	///   * # For o, x, X, the # flag prefixes any nonzero output value with 0, 0x, or 0X, respectively; 
+	///   * # For o, x, X, the # flag prefixes any nonzero output value with 0, 0x, or 0X, respectively;
 	///     for e, E, f, the # flag forces the output value to contain a decimal point in all cases.
 	///
 	/// The following modifiers are supported:
@@ -93,9 +93,9 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// Throws an InvalidArgumentException if an argument index is out of range.
 	///
 	/// Starting with release 1.4.3, an argument that does not match the format
-	/// specifier no longer results in a BadCastException. The string [ERRFMT] is 
+	/// specifier no longer results in a BadCastException. The string [ERRFMT] is
 	/// written to the result string instead.
-	/// 
+	///
 	/// If there are more format specifiers than values, the format specifiers without a corresponding value
 	/// are copied verbatim to output.
 	///
@@ -115,9 +115,9 @@ void Foundation_API format(std::string& result, const std::string& fmt, const st
 
 
 template <
-	typename T, 
+	typename T,
 	typename... Args>
-void format(std::string &result, const std::string &fmt, T arg1, Args... args)
+void format(std::string& result, const std::string& fmt, T arg1, Args... args)
 	/// Appends the formatted string to result.
 {
 	std::vector<Any> values;
@@ -126,14 +126,42 @@ void format(std::string &result, const std::string &fmt, T arg1, Args... args)
 	values.insert(values.end(), { args... });
 	format(result, fmt, values);
 }
-	
+
 
 template <
-	typename FMT, 
-	typename T, 
-	typename... Args,
-	typename std::enable_if<std::is_const<typename std::remove_reference<FMT>::type>::value, int>::type = 0>
-std::string format(FMT &fmt, T arg1, Args... args)
+	typename T,
+	typename... Args>
+void format(std::string& result, const char* fmt, T arg1, Args... args)
+	/// Appends the formatted string to result.
+{
+	std::vector<Any> values;
+	values.reserve(sizeof...(Args) + 1);
+	values.emplace_back(arg1);
+	values.insert(values.end(), { args... });
+	format(result, fmt, values);
+}
+
+
+template <
+	typename T,
+	typename... Args>
+std::string format(const std::string& fmt, T arg1, Args... args)
+	/// Returns the formatted string.
+{
+	std::vector<Any> values;
+	values.reserve(sizeof...(Args) + 1);
+	values.emplace_back(arg1);
+	values.insert(values.end(), { args... });
+	std::string result;
+	format(result, fmt, values);
+	return result;
+}
+
+
+template <
+	typename T,
+	typename... Args>
+std::string format(const char* fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
 	std::vector<Any> values;

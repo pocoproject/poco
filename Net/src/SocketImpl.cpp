@@ -229,7 +229,7 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reus
 
 void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
 {
-	bind6(address, reuseAddress, true, ipV6Only);
+	bind6(address, reuseAddress, reuseAddress, ipV6Only);
 }
 
 

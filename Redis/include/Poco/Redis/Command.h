@@ -49,7 +49,7 @@ class Redis_API Command: public Array
 	///
 {
 public:
-	typedef std::vector<std::string> StringVec;
+	using StringVec = std::vector<std::string>;
 
 	Command(const std::string& command);
 		/// Creates a command.

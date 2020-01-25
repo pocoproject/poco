@@ -35,7 +35,7 @@ class Redis_API Array
 	/// value.
 {
 public:
-	typedef std::vector<RedisType::Ptr>::const_iterator const_iterator;
+	using const_iterator = std::vector<RedisType::Ptr>::const_iterator;
 
 	Array();
 		/// Creates an Array. As long as there are no elements added,
@@ -99,7 +99,7 @@ public:
 		/// Adds a simple string (can't contain newline characters!).
 
 	const_iterator begin() const;
-		/// Returns an iterator to the start of the array. 
+		/// Returns an iterator to the start of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
 
@@ -107,7 +107,7 @@ public:
 		/// Removes all elements from the array.
 
 	const_iterator end() const;
-		/// Returns an iterator to the end of the array. 
+		/// Returns an iterator to the end of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
 
@@ -149,7 +149,7 @@ public:
 		/// Redis Protocol specification.
 
 	size_t size() const;
-		/// Returns the size of the array. 
+		/// Returns the size of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
 
@@ -157,7 +157,7 @@ private:
 	void checkNull();
 		/// Checks for null array and sets a new vector if true.
 
-	Nullable<std::vector<RedisType::Ptr> > _elements;
+	Nullable<std::vector<RedisType::Ptr>> _elements;
 };
 
 

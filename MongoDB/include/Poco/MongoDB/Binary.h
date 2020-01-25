@@ -38,7 +38,7 @@ class MongoDB_API Binary
 	/// A Binary stores its data in a Poco::Buffer<unsigned char>.
 {
 public:
-	typedef SharedPtr<Binary> Ptr;
+	using Ptr = SharedPtr<Binary>;
 
 	Binary();
 		/// Creates an empty Binary with subtype 0.
@@ -48,12 +48,12 @@ public:
 
 	Binary(const UUID& uuid);
 		/// Creates a Binary containing an UUID.
-		
+
 	Binary(const std::string& data, unsigned char subtype = 0);
 		/// Creates a Binary with the contents of the given string and the given subtype.
-		
+
 	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
-		/// Creates a Binary with the contents of the given buffer and the given subtype.		
+		/// Creates a Binary with the contents of the given buffer and the given subtype.
 
 	virtual ~Binary();
 		/// Destroys the Binary.
@@ -69,7 +69,7 @@ public:
 
 	std::string toString(int indent = 0) const;
 		/// Returns the contents of the Binary as Base64-encoded string.
-		
+
 	std::string toRawString() const;
 		/// Returns the raw content of the Binary as a string.
 
@@ -135,7 +135,7 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	unsigned char subtype;
 	_reader >> subtype;
 	to->subtype(subtype);
-	
+
 	_reader.readRaw((char*) to->buffer().begin(), size);
 }
 
