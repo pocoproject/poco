@@ -89,6 +89,7 @@ Release 1.10.0 (2020-01-xx)
 - GH #2408: add ordered containers
 - GH #2042: Android abstract namespace local socket address
 - GH #2088: Fix race condition in TCPServerDispatcher.cpp
+- GH #2892: SocketImpl::bind --> bind wrong config
 
 
 Release 1.9.4 (2019-09-18)
