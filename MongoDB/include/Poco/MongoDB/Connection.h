@@ -37,7 +37,7 @@ class MongoDB_API Connection
 	/// for more information on the wire protocol.
 {
 public:
-	typedef Poco::SharedPtr<Connection> Ptr;
+	using Ptr = Poco::SharedPtr<Connection>;
 
 	class MongoDB_API SocketFactory
 	{

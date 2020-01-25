@@ -43,7 +43,7 @@ class MongoDB_API Element
 	/// Represents an Element of a Document or an Array.
 {
 public:
-	typedef Poco::SharedPtr<Element> Ptr;
+	using Ptr = Poco::SharedPtr<Element>;
 
 	explicit Element(const std::string& name);
 		/// Creates the Element with the given name.
@@ -78,10 +78,10 @@ inline const std::string& Element::name() const
 }
 
 
-typedef std::list<Element::Ptr> ElementSet;
+using ElementSet = std::list<Element::Ptr>;
 
 
-template<typename T> 
+template<typename T>
 struct ElementTraits
 {
 };
@@ -259,7 +259,7 @@ inline void BSONWriter::write<Timestamp>(Timestamp& from)
 }
 
 
-typedef Nullable<unsigned char> NullValue;
+using NullValue = Nullable<unsigned char>;
 
 
 // BSON Null Value
@@ -288,7 +288,7 @@ inline void BSONWriter::write<NullValue>(NullValue& from)
 }
 
 
-struct BSONTimestamp 
+struct BSONTimestamp
 {
 	Poco::Timestamp ts;
 	Poco::Int32 inc;
@@ -355,7 +355,7 @@ class ConcreteElement: public Element
 {
 public:
 	ConcreteElement(const std::string& name, const T& init):
-		Element(name), 
+		Element(name),
 		_value(init)
 	{
 	}
@@ -364,7 +364,7 @@ public:
 	{
 	}
 
-	
+
 	T value() const
 	{
 		return _value;
@@ -376,7 +376,7 @@ public:
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
-	
+
 	int type() const
 	{
 		return ElementTraits<T>::TypeId;
