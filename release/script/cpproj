@@ -30,7 +30,6 @@ if [ -d ${src}/include ] ; then
 fi
 cp ${src}/src/* ${dst}/src >/dev/null 2>&1
 cp ${src}/*.sln ${dst} >/dev/null 2>&1
-cp ${src}/*.vcproj ${dst} >/dev/null 2>&1
 cp ${src}/*.vcxproj ${dst} >/dev/null 2>&1
 cp ${src}/*.vcxproj.filters ${dst} >/dev/null 2>&1
 cp ${src}/Makefile* ${dst} >/dev/null 2>&1
@@ -38,9 +37,6 @@ cp ${src}/*.make ${dst} >/dev/null 2>&1
 cp ${src}/*.progen ${dst} >/dev/null 2>&1
 cp ${src}/CMakeLists.txt ${dst} >/dev/null 2>&1
 
-if [ "`find ${src} -name '*.vxbuild'`" != "" ] ; then
-	cp ${src}/*.vxbuild ${dst} >/dev/null 2>&1
-fi
 if [ "`find ${src} -name '*.bndlspec'`" != "" ] ; then
 	cp ${src}/*.bndlspec ${dst} >/dev/null 2>&1
 fi
@@ -70,7 +66,6 @@ if [ -d ${src}/testsuite ] ; then
 	fi
 
 	cp ${src}/testsuite/src/* ${dst}/testsuite/src >/dev/null 2>&1
-	cp ${src}/testsuite/*.vcproj ${dst}/testsuite >/dev/null 2>&1
 	cp ${src}/testsuite/*.vcxproj ${dst}/testsuite >/dev/null 2>&1
 	cp ${src}/testsuite/*.vcxproj.filters ${dst}/testsuite >/dev/null 2>&1
 	cp ${src}/testsuite/Makefile* ${dst}/testsuite >/dev/null 2>&1
@@ -83,12 +78,6 @@ if [ -d ${src}/testsuite ] ; then
 		cp -R ${src}/testsuite/cmake/* ${dst}/testsuite/cmake >/dev/null 2>&1
 	fi
 
-	if [ "`find ${src}/testsuite -name '*.opt'`" != "" ] ; then
-		cp ${src}/testsuite/*.opt ${dst}/testsuite >/dev/null 2>&1
-	fi
-	if [ "`find ${src}/testsuite -name '*.vxbuild'`" != "" ] ; then
-		cp ${src}/testsuite/*.vxbuild ${dst}/testsuite >/dev/null 2>&1
-	fi
 	if [ "`find ${src}/testsuite -name '*.properties'`" != "" ] ; then
 		cp ${src}/testsuite/*.properties ${dst}/testsuite >/dev/null 2>&1
 	fi
@@ -119,9 +108,9 @@ if [ -d ${src}/samples ] ; then
 	cp ${src}/samples/Makefile* ${dst}/samples >/dev/null 2>&1
 	cp ${src}/samples/*.progen ${dst}/samples >/dev/null 2>&1
 	cp ${src}/samples/CMakeLists.txt ${dst}/samples >/dev/null 2>&1
-	
+
 	samples=`find ${src}/samples/* -type d -print -prune | sed "s:^.*/::"`
-	
+
 	for sample in $samples ;
 	do
 		if [ -d "${src}/samples/${sample}/src" ] ; then
@@ -150,8 +139,7 @@ if [ -d ${src}/samples ] ; then
 				mkdir -p ${dst}/samples/${sample}/media
 				cp -R ${src}/samples/${sample}/media/* ${dst}/samples/${sample}/media >/dev/null 2>&1
 			fi
-			
-			cp ${src}/samples/${sample}/*.vcproj ${dst}/samples/${sample} >/dev/null 2>&1
+
 			cp ${src}/samples/${sample}/*.vcxproj ${dst}/samples/${sample} >/dev/null 2>&1
 			cp ${src}/samples/${sample}/*.vcxproj.filters ${dst}/samples/${sample} >/dev/null 2>&1
 			cp ${src}/samples/${sample}/Makefile* ${dst}/samples/${sample} >/dev/null 2>&1
@@ -163,16 +151,7 @@ if [ -d ${src}/samples ] ; then
 				mkdir -p ${dst}/samples/${sample}/cmake
 				cp -R ${src}/samples/${sample}/cmake/* ${dst}/samples/${sample}/cmake >/dev/null 2>&1
 			fi
-			
-			if [ "`find ${src}/samples/${sample}/ -name '*.vmsbuild'`" != "" ] ; then
-				cp ${src}/samples/${sample}/*.vmsbuild ${dst}/samples/${sample} >/dev/null 2>&1
-			fi
-			if [ "`find ${src}/samples/${sample}/ -name '*.opt'`" != "" ] ; then
-				cp ${src}/samples/${sample}/*.opt ${dst}/samples/${sample} >/dev/null 2>&1
-			fi
-			if [ "`find ${src}/samples/${sample}/ -name '*.vxbuild'`" != "" ] ; then
-				cp ${src}/samples/${sample}/*.vxbuild ${dst}/samples/${sample} >/dev/null 2>&1
-			fi
+
 			if [ "`find ${src}/samples/${sample}/ -name '*.properties'`" != "" ] ; then
 				cp ${src}/samples/${sample}/*.properties ${dst}/samples/${sample} >/dev/null 2>&1
 			fi
@@ -191,12 +170,12 @@ if [ -d ${src}/samples ] ; then
 			if [ "`find ${src}/samples/${sample}/ -name '*.bndlspec'`" != "" ] ; then
 				cp ${src}/samples/${sample}/*.bndlspec ${dst}/samples/${sample} >/dev/null 2>&1
 			fi
-			
+
 			if [ -d ${src}/samples/${sample}/include ] ; then
 				mkdir -p ${dst}/samples/${sample}/include
 				cp -R ${src}/samples/${sample}/include/* ${dst}/samples/${sample}/include >/dev/null 2>&1
-			fi	
-	
+			fi
+
 			if [ -d ${src}/samples/${sample}/bin ] ; then
 				mkdir -p ${dst}/samples/${sample}/bin
 				if [ "`find ${src}/samples/${sample}/bin/ -name '*.properties'`" != "" ] ; then
