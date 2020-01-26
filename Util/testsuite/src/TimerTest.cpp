@@ -260,6 +260,21 @@ void TimerTest::testCancelAllWaitStop()
 }
 
 
+void TimerTest::testFunc()
+{
+	Timer timer;
+
+	int count = 0;
+	timer.schedule(Timer::func([&count]()
+	{
+		count++;
+	}), Poco::Clock());
+	Poco::Thread::sleep(100);
+
+	assertTrue (count == 1);
+}
+
+
 void TimerTest::setUp()
 {
 }
@@ -290,6 +305,7 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testCancel);
 	CppUnit_addTest(pSuite, TimerTest, testCancelAllStop);
 	CppUnit_addTest(pSuite, TimerTest, testCancelAllWaitStop);
+	CppUnit_addTest(pSuite, TimerTest, testFunc);
 
 	return pSuite;
 }

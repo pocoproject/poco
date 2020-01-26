@@ -30,9 +30,9 @@ namespace Util {
 
 
 class Util_API Timer: protected Poco::Runnable
-	/// A Timer allows to schedule tasks (TimerTask objects) for future execution 
-	/// in a background thread. Tasks may be scheduled for one-time execution, 
-	/// or for repeated execution at regular intervals. 
+	/// A Timer allows to schedule tasks (TimerTask objects) for future execution
+	/// in a background thread. Tasks may be scheduled for one-time execution,
+	/// or for repeated execution at regular intervals.
 	///
 	/// The Timer object creates a thread that executes all scheduled tasks
 	/// sequentially. Therefore, tasks should complete their work as quickly
@@ -41,20 +41,29 @@ class Util_API Timer: protected Poco::Runnable
 	/// Timer is safe for multithreaded use - multiple threads can schedule
 	/// new tasks simultaneously.
 	///
+	/// Via the func() helper function template, a functor or
+	/// lambda can be used as timer task:
+	///
+	///    timer.schedule(Timer::func([]()
+	///        {
+	///            std::cout << "Timer!\n";
+	///        }),
+	///        Poco::Clock());
+	///
 	/// Acknowledgement: The interface of this class has been inspired by
 	/// the java.util.Timer class from Java 1.3.
 {
 public:
 	Timer();
 		/// Creates the Timer.
-	
+
 	explicit Timer(Poco::Thread::Priority priority);
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
-	
+
 	~Timer();
 		/// Destroys the Timer, cancelling all pending tasks.
-		
+
 	void cancel(bool wait = false);
 		/// Cancels all pending tasks.
 		///
@@ -65,7 +74,7 @@ public:
 		/// task queue will be purged as soon as the currently
 		/// running task finishes. If wait is true, waits
 		/// until the queue has been purged.
-	
+
 	void schedule(TimerTask::Ptr pTask, Poco::Timestamp time);
 		/// Schedules a task for execution at the specified time.
 		///
@@ -84,7 +93,7 @@ public:
 		///
 		/// If the time lies in the past, the task is executed
 		/// immediately.
-		
+
 	void schedule(TimerTask::Ptr pTask, long delay, long interval);
 		/// Schedules a task for periodic execution.
 		///
@@ -112,12 +121,12 @@ public:
 		/// The task is first executed at the given time.
 		/// Subsequently, the task is executed periodically with
 		/// the given interval in milliseconds between invocations.
-		
+
 	void scheduleAtFixedRate(TimerTask::Ptr pTask, long delay, long interval);
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed after the given delay.
-		/// Subsequently, the task is executed periodically 
+		/// Subsequently, the task is executed periodically
 		/// every number of milliseconds specified by interval.
 		///
 		/// If task execution takes longer than the given interval,
@@ -127,7 +136,7 @@ public:
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed at the given time.
-		/// Subsequently, the task is executed periodically 
+		/// Subsequently, the task is executed periodically
 		/// every number of milliseconds specified by interval.
 		///
 		/// If task execution takes longer than the given interval,
@@ -144,20 +153,36 @@ public:
 		/// Schedules a task for periodic execution at a fixed rate.
 		///
 		/// The task is first executed at the given time.
-		/// Subsequently, the task is executed periodically 
+		/// Subsequently, the task is executed periodically
 		/// every number of milliseconds specified by interval.
 		///
 		/// If task execution takes longer than the given interval,
 		/// further executions are delayed.
 
+	template <typename Fn>
+	static TimerTask::Ptr func(const Fn& fn)
+		/// Helper function template to use a functor or lambda
+		/// with Timer::schedule() and Timer::scheduleAtFixedRate().
+	{
+		return new TimerFunc<Fn>(fn);
+	}
+
+	template <typename Fn>
+	static TimerTask::Ptr func(Fn&& fn)
+		/// Helper function template to use a functor or lambda
+		/// with Timer::schedule() and Timer::scheduleAtFixedRate().
+	{
+		return new TimerFunc<Fn>(std::move(fn));
+	}
+
 protected:
 	void run();
 	static void validateTask(const TimerTask::Ptr& pTask);
-	
+
 private:
 	Timer(const Timer&);
 	Timer& operator = (const Timer&);
-	
+
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
 };

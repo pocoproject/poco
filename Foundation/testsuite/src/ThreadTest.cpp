@@ -36,7 +36,7 @@ public:
 	MyRunnable(): _ran(false)
 	{
 	}
-	
+
 	void run()
 	{
 		Thread* pThread = Thread::current();
@@ -45,22 +45,22 @@ public:
 		_ran = true;
 		_event.wait();
 	}
-	
+
 	bool ran() const
 	{
 		return _ran;
 	}
-	
+
 	const std::string& threadName() const
 	{
 		return _threadName;
 	}
-	
+
 	void notify()
 	{
 		_event.set();
 	}
-	
+
 	static void staticFunc()
 	{
 		++_staticVar;
@@ -96,17 +96,17 @@ public:
 	NonJoinRunnable() : _finished(false)
 	{
 	}
-	
+
 	void run()
 	{
 		_finished = true;
 	}
-	
+
 	bool finished() const
 	{
 		return _finished;
 	}
-	
+
 private:
 	bool _finished;
 };
@@ -264,12 +264,12 @@ void ThreadTest::testNotJoin()
 	Thread thread;
 	NonJoinRunnable r;
 	thread.start(r);
-	
+
 	while (!r.finished())
 	{
 		Thread::sleep(10);
 	}
-	
+
 	Thread::sleep(100);
 	assertTrue (!thread.isRunning());
 }
@@ -383,20 +383,19 @@ void ThreadTest::testThreadFunctor()
 
 	assertTrue (!thread.isRunning());
 
-#if __cplusplus >= 201103L
-
 	Thread thread2;
 
 	assertTrue (!thread2.isRunning());
 
 	MyRunnable::_staticVar = 0;
-	thread.startFunc([] () {MyRunnable::_staticVar++;});
+	thread.startFunc([] ()
+	{
+		MyRunnable::_staticVar++;
+	});
 	thread.join();
 	assertTrue (1 == MyRunnable::_staticVar);
 
 	assertTrue (!thread2.isRunning());
-
-#endif
 }
 
 
