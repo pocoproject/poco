@@ -154,10 +154,17 @@ public:
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>
-	void startFunc(Functor fn)
+	void startFunc(const Functor& fn)
 		/// Starts the thread with the given functor object or lambda.
 	{
 		startImpl(new FunctorRunnable<Functor>(fn));
+	}
+
+	template <class Functor>
+	void startFunc(Functor&& fn)
+		/// Starts the thread with the given functor object or lambda.
+	{
+		startImpl(new FunctorRunnable<Functor>(std::move(fn)));
 	}
 
 	void join();
@@ -239,6 +246,11 @@ protected:
 	public:
 		FunctorRunnable(const Functor& functor):
 			_functor(functor)
+		{
+		}
+
+		FunctorRunnable(Functor&& functor):
+			_functor(std::move(functor))
 		{
 		}
 
