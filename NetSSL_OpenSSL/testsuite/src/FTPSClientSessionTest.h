@@ -15,7 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
-#include "Poco/CppUnit/TestCase.h"
+#include "CppUnit/TestCase.h"
 
 
 namespace Poco {
