@@ -1,6 +1,6 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.10.0 (2020-01-xx)
+Release 1.10.0 (2020-01-27)
 ==========================
 
 - This release now requires a C++14 compiler (GCC 5, Clang 3.4, Visual C++ 2015).
