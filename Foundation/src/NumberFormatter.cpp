@@ -19,6 +19,7 @@
 #include <locale>
 #endif
 #include <cstdio>
+#include <cinttypes>
 
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
@@ -475,13 +476,9 @@ void NumberFormatter::append(std::string& str, const void* ptr)
 {
 	char buffer[24];
 #if defined(POCO_PTR_IS_64_BIT)
-	#if defined(POCO_LONG_IS_64_BIT)
-		std::sprintf(buffer, "%016lX", (UIntPtr) ptr);
-	#else
-		std::sprintf(buffer, "%016" I64_FMT "X", (UIntPtr) ptr);
-	#endif
+	std::sprintf(buffer, "%016" PRIXPTR, (UIntPtr) ptr);
 #else
-	std::sprintf(buffer, "%08lX", (UIntPtr) ptr);
+	std::sprintf(buffer, "%08" PRIXPTR, (UIntPtr) ptr);
 #endif
 	str.append(buffer);
 }
