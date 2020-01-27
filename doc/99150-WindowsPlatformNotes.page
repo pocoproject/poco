@@ -7,12 +7,9 @@ The Windows versions of the POCO C++ Libraries are built with Visual Studio.
 Basic support for building with MinGW is there as well, but at this time
 is not officially supported and may or may not work.
 
-Starting with release 1.4.0 the POCO C++ Libraries support new
-build configurations for Visual Studio. Furthermore, Visual Studio 2010
-and 64-bit (x64) builds are now supported in addition to Visual Studio 2008,
-2005 and .NET 2003, as previously supported. 
-64-bit (x64) builds are only supported with Visual
-Studio 2008 and Visual Studio 2010.
+Starting with release 1.10.0 the POCO C++ Libraries support new
+build configurations in the solution files for Visual Studio 2015 and newer,
+for building Win32 (32-bit) and x64 (64-bit) variants.
 
 The following build configurations are available:
   * debug_shared, release_shared: dynamic link libraries (DLL) and dynamically linked executables, with DLL C/C++ runtime libraries.

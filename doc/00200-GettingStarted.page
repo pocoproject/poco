@@ -172,14 +172,14 @@ Usage:
                                      [-library    shared | static]
 ----
 
-Example: Building OpenSSL 1.1.0, DLL release build for x64 with Visual Studio 2013:
+Example: Building OpenSSL 1.1.0, DLL release build for x64 with Visual Studio 2015:
 
-    C:\%POCO_BASE%\openssl\build.ps1 -openssl_release 1.1.0 -vs_version 120 -config release -platform x64 -library shared
+    C:\%POCO_BASE%\openssl\build.ps1 -openssl_release 1.1.0 -vs_version 140 -config release -platform x64 -library shared
 ----
 
 The above command will download all the necessary packages (perl, nasm, etc)
 and build OpenSSL in <*C:\%POCO_BASE%\openssl\build*> directory; the built OpenSSL
-binaries can be linked from EXEs and DLLs built with Visual Studio 2008 to 2017.
+binaries can be linked from EXEs and DLLs built with Visual Studio 2015 to 2019.
 
 Pre-generated POCO Visual Studio projects are configured to use headers and
 libraries from <*C:\%POCO_BASE%\openssl\build*> directory.
@@ -233,15 +233,15 @@ source.
 !!Building using CMake
 
 As an alternative to the platform specific Makefiles and Solutions, CMake can be used
-to do build POCO C++ Libraries on any platform with any compiler. CMake is a meta build system and it 
-generate native makefiles and workspaces that can be used in the compiler environment of 
+to do build POCO C++ Libraries on any platform with any compiler. CMake is a meta build system and it
+generate native makefiles and workspaces that can be used in the compiler environment of
 your choice. For a quick overview see http://cgold.readthedocs.io/en/latest/overview/cmake-can.html
 
 POCO C++ Libraries requires CMake 3.2 or higher. Static binaries for many platforms can be downloaded from http://www.cmake.org/
 
 CMake supports out of source builds and this is the recommended way to build POCO C++ Libraries using CMake.
 
-Assuming the POCO C++ Libraries source is located in /path/to/poco directory and you like to build POCO C++ Libraries just type the 
+Assuming the POCO C++ Libraries source is located in /path/to/poco directory and you like to build POCO C++ Libraries just type the
 following commands (Command parameters are all the same on any platform).
 
     $ cmake -H/path/to/poco -B/path/to/poco-build
@@ -259,11 +259,11 @@ For Makefile (default on Unix systems) and Ninja based build system (and all oth
  * MinSizeRel            (Release build with size optimisation)
 
 As default, POCO is build RelWithDebInfo. See cmake output like:
-   
+
    ...
    -- [cmake] Build type:             RelWithDebInfo
    ...
-   
+
 You can change this with following parameter: <*CMAKE_BUILD_TYPE=....*>
 
 For example to build with debug symbols:
@@ -281,7 +281,7 @@ For example to build with debug symbols:
 
    $ cmake -H/path/to/poco -B/path/to/poco-build
    $ cmake --build /path/to/poco-build --config Debug
-   
+
 
 Installation path of Poco is as defaults to /usr/local on UNIX and c:/Program Files/Poco on Windows.
 
@@ -318,12 +318,12 @@ To set some additional compiler flags, you can use following parameters:
 
  * CMAKE_C_FLAGS         For C compiler
  * CMAKE_CXX_FLAGS       For C++ compiler
- 
+
 For example:
 
    $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_CXX_FLAGS=-fstack-protector
    $ cmake --build /path/to/poco-build
-    
+
 For default compile flags, see cmake output like:
    ...
    -- [cmake] Build with cxx flags:   -O2 -g -DNDEBUG
@@ -337,16 +337,16 @@ To use the compiler of your choice, you can use following paramters:
 
   * CMAKE_C_COMPILER           C compiler
   * CMAKE_CXX_COMPILER         C++ compiler
-  
+
 For example to use the clang compiler, execute following cmake command:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_C_COMPILER=/path/to/clang -DCMAKE_CXX_COMPILER=/path/to/clang++
     $ cmake --build /path/to/poco-build
-    
+
 To cross compile POCO C++ Libraries for another architecture/device you should have a <*cmake toolchain file*> and execute following command:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -DCMAKE_TOOLCHAIN_FILE=/path/to/toolchainfile
-    $ cmake --build /path/to/poco-build   
+    $ cmake --build /path/to/poco-build
 
 See https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html for more information.
 
@@ -393,7 +393,7 @@ Windows only parameter:
     * POCO_MT                          Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD
     * ENABLE_MSVC_MP                   Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC
     * ENABLE_NETSSL_WIN                Set to OFF|ON (default is OFF) to build NetSSL support library(Need installed openssl libraries For Windows only)
-    
+
 You can also see and enable or disable available options execute following command:
 
     $ cmake-gui /path/to/poco-build
@@ -414,34 +414,34 @@ To find PostgreSQL:
   or
   * PostgreSQL_ROOT_INCLUDE_DIRS                - Set include paths where to find PostgreSQL headers
   * PostgreSQL_ROOT_LIBRARY_DIRS                 - Set library paths where to find PostgreSQL libraries
-  
+
 To find ODBC:
   * ODBC_ROOT_DIR                                            - Set root installation path where to find include path and libraries of ODBC
   or
   * ODBC_ROOT_INCLUDE_DIRS                           - Set include paths where to find ODBC headers
   * ODBC_ROOT_LIBRARY_DIRS                            - Set library paths where to find ODBC libraries
-  
+
 To find MySQL or MariaDB:
   * MYSQL_ROOT_DIR                                            - Set root installation path where to find include path and libraries of MySQL or MariaDB
   or
   * MYSQL_ROOT_INCLUDE_DIRS                          - Set include paths where to find MySQL or MariaDB headers
   * MYSQL_ROOT_LIBRARY_DIRS                           - Set library paths where to find MySQL or MariaDB libraries
-  
+
   * APRUTIL_ROOT_DIR                                         - Set root installation path where to find include path and libraries of apr util
   or
   * APRUTIL_ROOT_INCLUDE_DIRS                       - Set include paths where to find apr util headers
   * APRUTIL_ROOT_LIBRARY_DIRS                        - Set library paths where to find apr util libraries
-  
+
   * APR_ROOT_DIR                                                 - Set root installation path where to find include path and libraries of apr
   or
   * APR_ROOT_INCLUDE_DIRS                                - Set include paths where to find apr headers
   * APR_ROOT_LIBRARY_DIRS                                - Set library paths where to find apr libraries
-  
+
   * APACHE2_ROOT_DIR                                        - Set root installation path where to find include path and libraries of apache2
   or
   * APACHE2_ROOT_INCLUDE_DIRS                        - Set include paths where to find apache2 headers
 
-  
+
 For example set installation path of MySQL:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -DMYSQL_ROOT_DIR=/usr/local/mysql
@@ -451,7 +451,7 @@ or
     $ cmake --build /path/to/poco-build
 
 
-    
+
 
 !!!How to use POCO in your cmake project:
 
@@ -461,17 +461,17 @@ To use POCO C++ Libraries in your cmake project, add following line in your proj
     ....
     target_link_libraries(yourTargetName ... Poco::Crypto)
 
-If you get an error like 'By not providing "FindPoco.cmake"', then you should set CMAKE_PREFIX_PATH to the installation directory of your POCO C++ Libraries. For example: 
+If you get an error like 'By not providing "FindPoco.cmake"', then you should set CMAKE_PREFIX_PATH to the installation directory of your POCO C++ Libraries. For example:
 
     $ cmake -H/path/to/yourProject -B/path/to/yourProject-build -DCMAKE_PREFIX_PATH=/path/to/installationOf/poco
-    
+
 !!!Some other Hints:
 
 For a faster build, use ninja as build system. See https://ninja-build.org/
 For example on Ubuntu execute following commands:
 
     $ sudo apt-get install ninja-build
-    
+
 This install <*ninja*> command. To use ninja-build execute following cmake commands:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -GNinja
@@ -490,20 +490,20 @@ Some more infos about cmake see:
 $ cmake --help-full
 https://cmake.org/cmake/help/latest/
 http://cgold.readthedocs.io/en/latest/index.html
-    
+
 
 !!Building On Windows
 
-Microsoft Visual Studio 2008 or newer is required to build the
+Microsoft Visual Studio 2015 or newer is required to build the
 POCO C++ Libraries on Windows platforms.
 Solution and project files for all versions are included.
 64-bit (x64) builds are supported as well.
 You can either build from within Visual Studio (<*Build->Batch
 Build->Select All;Rebuild*>) or from the command line. To build from the
-command line, start the Visual Studio 2008 (or 2010, 2013, etc.) Command
+command line, start the Visual Studio 2015 (or 2017, 2019, etc.) Command
 Prompt and go (<[cd]>) to the directory where you have extracted the POCO
 C++ Libraries sources. Then, simply start the <*buildwin.cmd*> script and
-pass as argument the version of visual studio (90, 100, 110, ... 150). You
+pass as argument the version of Visual Studio (140, 150, 160). You
 can customize what is being built by <*buildwin.cmd*> by passing appropriate
 command line arguments to it. Call <*buildwin.cmd*> without arguments to see
 what is available. Build environment is set up by the buildwin.cmd; to avoid
