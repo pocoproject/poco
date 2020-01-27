@@ -152,7 +152,6 @@ done
 # Create components file
 #
 echo "CppUnit" >${target}/components
-echo "CppUnit/WinTestRunner" >>${target}/components
 for comp in $comps ;
 do
 	echo $comp >>${target}/components
