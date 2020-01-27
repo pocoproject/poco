@@ -153,14 +153,14 @@ described in the following.
 BUILDING ON WINDOWS
 ===================
 
-Microsoft Visual Studio 2008 or newer is required to build the POCO C++ Libraries on
-Windows platforms. Solution and project files for all versions from 2008 to 2017 are included.
+Microsoft Visual Studio 2015 or newer is required to build the POCO C++ Libraries on
+Windows platforms. Solution and project files for all versions from 2015 to 2019 are included.
 64-bit (x64) builds are supported as well.
 You can either build from within Visual Studio (Build->Batch Build->Select All;Rebuild)
 or from the command line. To build from the command line, start the
 Visual Studio Command Prompt and cd to the directory where you
 have extracted the POCO C++ Libraries sources. Then, simply start the buildwin.cmd script
-and pass as argument the version of visual studio (90, 100, 110, etc.). You can customize
+and pass as argument the version of visual studio (140, 150, 160, etc.). You can customize
 what is being built by buildwin.cmd by passing appropriate command line arguments to
 it. Call buildwin.cmd without arguments to see what is available.
 
@@ -180,17 +180,6 @@ the shared libraries must be in the PATH environment variable.
 IMPORTANT NOTE: Please make sure that the path to the directory containing the
 POCO C++ Libraries source tree does not contain spaces. Otherwise, the Microsoft
 message compiler may fail when building the Foundation library.
-
-
-BUILDING FOR WINDOWS CE
-
-Building for Windows CE 6.0 and Windows Embedded Compact 2013 is supported with
-Microsoft Visual Studio 2008 (CE 6.0), and Visual Studio 2012/2013 (WEC 2013), respectively.
-For CE 6.0, unless you have the Digi JumpStart Windows CE 6.0 SDK installed, you'll
-have to modify the included Visual Studio project and solution files. Same applies
-to the WEC2013 projects, which are based on the AM335X SDK.
-Please see the SDK Reference Documentation (http://pocoproject.org/documentation)
-for instructions.
 
 
 BUILDING ON UNIX/LINUX/macOS
