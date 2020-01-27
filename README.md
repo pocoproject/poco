@@ -28,32 +28,116 @@ and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) do
 
 - CMake 3.5 or newer
 - A C++14 compiler (Visual C++ 2015, GCC 5.0, Clang 3.4, or newer)
-- OpenSSL headers and libraries (optional, but recommended; on macOS, via Homebrew: `brew install openssl`)
+- OpenSSL headers and libraries (optional, but recommended)
+- MySQL, PostgreSQL and ODBC client libraries (optional)
 
-### Building
+Most Unix/Linux systems already have OpenSSL preinstalled. If your system
+does not have OpenSSL, please get it from <http://www.openssl.org> or
+another source. You do not have to build OpenSSL yourself - a binary
+distribution is fine. For example, via Debian APT:
+
+```
+$ apt-get install openssl libssl-dev
+```
+
+On macOS, the easiest way to install OpenSSL is via [Homebrew](https://brew.sh):
+
+```
+$ brew install openssl
+```
+
+The easiest way to install OpenSSL on Windows is to use a binary
+(prebuild) release, for example the one from Shining Light
+Productions that comes with a
+[Windows installer](https://www.slproweb.com/products/Win32OpenSSL.html).
+
+On Windows, POCO can also use the native Windows TLS APIs (SChannel).
+
+### Installing All Dependencies (Linux and macOS)
+
+All dependencies can be installed with the following commands:
+
+#### Debian Linux (including Ubuntu and Raspbian)
+
+```
+$ sudo apt-get -y update && sudo apt-get -y install git g++ make cmake libssl-dev
+```
+
+#### RedHat Linux
+
+```
+$ sudo yum install -y git gcc-c++ make cmake3 openssl-devel
+```
+
+#### macOS (with Homebrew)
+
+```
+$ brew install cmake openssl
+```
+
+### Building with CMake (Linux, macOS, Windows)
+
+[CMake](https://cmake.org) (version 3.5 or newer) is the recommended build system for
+building the POCO C++ Libraries.
 
 ```
 $ git clone -b master https://github.com/pocoproject/poco.git
 $ cd poco
 $ mkdir cmake-build
 $ cd cmake-build
-$ cmake .. && cmake --build .
+$ cmake ..
+$ cmake --build . --config Release
 ```
 
-You can also run:
+On macOS, it's necessary to tell CMake where to find the OpenSSL headers
+and libraries by setting the `OPENSSL_ROOT_DIR` CMake variable.
+For example, if OpenSSL has been installed with Homebrew,
+the `cmake` invocation becomes:
+
+```
+$ cmake .. -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+```
+
+Other common ways of building with CMake (e.g., `cmake-gui`) will also work.
+
+There are also a number of project-specific CMake variables that can be changed.
+
+
+#### Cross-Compiling
+
+With a proper CMake toolchain file (specified via the `CMAKE_TOOLCHAIN_FILE` CMake variable),
+the POCO C++ Libraries can be cross-compiled for embedded Linux systems:
+
+```
+$ cmake .. -DCMAKE_TOOLCHAIN_FILE=/path/to/mytoolchain.cmake -DCMAKE_INSTALL_PREFIX=/path/to/target
+```
+
+
+#### Installing
+
+The POCO C++ Libraries headers and libraries can be optionally be installed by building the `install` target.
 
 ```
 $ sudo cmake --build . --target install
 ```
 
-in the `cmake-build` directory to install POCO (default `/usr/local` on Linux or macOS).
+The default install location is `/usr/local/` on Linux and macOS and
+`C:\Program Files (x64)\` on Windows and can be overridden by setting
+the `CMAKE_INSTALL_PREFIX` CMake variable.
+
+
+### Building Without CMake
 
 If you do not want to or cannot use CMake, POCO can also be built with Visual Studio
-(project and solution files included) or GNU Make.
+(project and solution files included) or GNU Make (Linux, macOS and other supported Unix platforms).
 
 Please refer to the [documentation](https://pocoproject.org/docs) for more information.
 
+
+### Getting POCO via a Package Manager
+
 POCO can also be obtained via different [package managers](https://pocoproject.org/download.html).
+
 
 ## Community and Contributing
 
