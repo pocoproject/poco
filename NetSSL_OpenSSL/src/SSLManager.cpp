@@ -25,6 +25,8 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
 
+#include <openssl/ocsp.h>
+#include <openssl/tls1.h>
 
 namespace Poco {
 namespace Net {
@@ -234,7 +236,23 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int /*flag*/,
 	return size;
 }
 
+int SSLManager::verifyOCSPResponse(SSL *s, void *arg)
+{
+	const unsigned char *p;
+    int len;
+    OCSP_RESPONSE *rsp;
+    len = SSL_get_tlsext_status_ocsp_resp(s, &p);    
+    if (p == NULL) {        
+        return 1;
+    }
+    rsp = d2i_OCSP_RESPONSE(NULL, &p, len);
+    if (rsp == NULL) {                
+        return 0;
+    }   
+    OCSP_RESPONSE_free(rsp);
+    return 1;
 
+}
 void SSLManager::initDefaultContext(bool server)
 {
 	if (server && _ptrDefaultServerContext) return;

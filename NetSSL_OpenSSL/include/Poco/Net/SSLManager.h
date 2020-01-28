@@ -278,6 +278,11 @@ protected:
 		/// Throws a InvalidStateException if not application instance
 		/// is available.
 
+	static int verifyOCSPResponse(SSL *s, void *arg);
+		/// The return value of this method defines how errors in
+		/// verification are handled. Return 0 to terminate the handshake,
+		/// or 1 to continue .
+
 private:
 	SSLManager();
 		/// Creates the SSLManager.

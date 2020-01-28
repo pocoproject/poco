@@ -163,6 +163,9 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str());
 	}
 #endif
+	
+	if(_pContext->ocspStaplingResponseVerificationEnabled())
+		SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp);
 
 	if (_pSession)
 	{
