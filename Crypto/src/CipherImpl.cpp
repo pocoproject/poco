@@ -117,9 +117,9 @@ namespace
 		if (_iv.size() != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, _iv.size(), NULL);
+			int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), NULL);
 #else
-			int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_IVLEN, _iv.size(), NULL);
+			int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), NULL);
 #endif
 			if (rc == 0) throwError();
 		}
@@ -130,7 +130,7 @@ namespace
 	CryptoTransformImpl::~CryptoTransformImpl()
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		EVP_CIPHER_CTX_cleanup(_pContext);
+		EVP_CIPHER_CTX_reset(_pContext);
 		EVP_CIPHER_CTX_free(_pContext);
 #else
 		EVP_CIPHER_CTX_cleanup(&_context);
@@ -164,9 +164,9 @@ namespace
 #if OPENSSL_VERSION_NUMBER >= 0x10001000L
 		Poco::Buffer<char> buffer(tagSize);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_GET_TAG, tagSize, buffer.begin());
+		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_GET_TAG, static_cast<int>(tagSize), buffer.begin());
 #else
-		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_GET_TAG, tagSize, buffer.begin());
+		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_GET_TAG, static_cast<int>(tagSize), buffer.begin());
 #endif
 		if (rc == 0) throwError();
 		tag.assign(buffer.begin(), tagSize);
@@ -178,9 +178,9 @@ namespace
 	void CryptoTransformImpl::setTag(const std::string& tag)
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_TAG, tag.size(), const_cast<char*>(tag.data()));
+		int rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_TAG, static_cast<int>(tag.size()), const_cast<char*>(tag.data()));
 #elif OPENSSL_VERSION_NUMBER >= 0x10001000L
-		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_TAG, tag.size(), const_cast<char*>(tag.data()));
+		int rc = EVP_CIPHER_CTX_ctrl(&_context, EVP_CTRL_GCM_SET_TAG, static_cast<int>(tag.size()), const_cast<char*>(tag.data()));
 #else
 		int rc = 0;
 #endif

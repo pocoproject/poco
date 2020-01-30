@@ -40,6 +40,7 @@ public:
 	void testEncryptInterop();
 	void testDecryptInterop();
 	void testCertificate();
+	void testCertificateUTF8();
 	
 	void setUp();
 	void tearDown();

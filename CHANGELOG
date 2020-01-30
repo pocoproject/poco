@@ -3,7 +3,9 @@ This is the changelog file for the POCO C++ Libraries.
 Release 1.9.5 (2020-XX-XX)
 ==========================
 
-- TODO
+- GH #2869: X509Certificate does not render UTF-8 characters in subjectName
+- GH #2879: Add support for SameSite attribute in HTTPCookie
+- GH #2743: X509Certificate validFrom expiresOn Date parsing
 
 
 Release 1.9.4 (2019-09-18)

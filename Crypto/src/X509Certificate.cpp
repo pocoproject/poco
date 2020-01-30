@@ -27,6 +27,14 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <openssl/bn.h>
+
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+#define ASN1_STRING_get0_data ASN1_STRING_data
+#define X509_get0_notBefore X509_get_notBefore
+#define X509_get0_notAfter X509_get_notAfter
+#endif
 
 
 namespace Poco {
@@ -194,13 +202,22 @@ void X509Certificate::save(const std::string& path) const
 }
 
 
+std::string _X509_NAME_oneline_utf8(X509_NAME *name)
+{
+	BIO * bio_out = BIO_new(BIO_s_mem());
+	X509_NAME_print_ex(bio_out, name, 0, (ASN1_STRFLGS_RFC2253 | XN_FLAG_SEP_COMMA_PLUS | XN_FLAG_FN_SN | XN_FLAG_DUMP_UNKNOWN_FIELDS) & ~ASN1_STRFLGS_ESC_MSB);
+	BUF_MEM *bio_buf;
+	BIO_get_mem_ptr(bio_out, &bio_buf);
+	std::string line = std::string(bio_buf->data, bio_buf->length);
+	BIO_free(bio_out);
+	return line;
+}
+
+
 void X509Certificate::init()
 {
-	char buffer[NAME_BUFFER_SIZE];
-	X509_NAME_oneline(X509_get_issuer_name(_pCert), buffer, sizeof(buffer));
-	_issuerName = buffer;
-	X509_NAME_oneline(X509_get_subject_name(_pCert), buffer, sizeof(buffer));
-	_subjectName = buffer;
+	_issuerName = _X509_NAME_oneline_utf8(X509_get_issuer_name(_pCert));
+	_subjectName = _X509_NAME_oneline_utf8(X509_get_subject_name(_pCert));
 	BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509*>(_pCert)), 0);
 	if (pBN)
 	{
@@ -255,7 +272,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
 			if (name->type == GEN_DNS)
 			{
-				const char* data = reinterpret_cast<char*>(ASN1_STRING_data(name->d.ia5));
+				const char* data = reinterpret_cast<const char*>(ASN1_STRING_get0_data(name->d.ia5));
 				std::size_t len = ASN1_STRING_length(name->d.ia5);
 				domainNames.insert(std::string(data, len));
 			}
@@ -273,19 +290,41 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 
 Poco::DateTime X509Certificate::validFrom() const
 {
-	ASN1_TIME* certTime = X509_get_notBefore(_pCert);
+	const ASN1_TIME* certTime = X509_get0_notBefore(_pCert);
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
 	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	if (certTime->type == V_ASN1_UTCTIME)
+	{
+		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	}
+	else if (certTime->type == V_ASN1_GENERALIZEDTIME)
+	{
+		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
+	}
+	else
+	{
+		throw NotImplementedException("Unsupported date/time format in notBefore");
+	}
 }
 
 	
 Poco::DateTime X509Certificate::expiresOn() const
 {
-	ASN1_TIME* certTime = X509_get_notAfter(_pCert);
+	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
 	std::string dateTime(reinterpret_cast<char*>(certTime->data));
 	int tzd;
-	return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	if (certTime->type == V_ASN1_UTCTIME)
+	{
+		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+	}
+	else if (certTime->type == V_ASN1_GENERALIZEDTIME)
+	{
+		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
+	}
+	else
+	{
+		throw NotImplementedException("Unsupported date/time format in notBefore");
+	}
 }
 
 
