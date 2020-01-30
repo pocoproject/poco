@@ -68,7 +68,7 @@ void SocketAddressTest::testSocketAddress()
 	}
 
 	SocketAddress sa4("pocoproject.org", 80);
-	assert (sa4.host().toString() == "104.130.199.50");
+	assert (sa4.host().toString() == "54.93.62.90");
 	assert (sa4.port() == 80);
 
 	try
@@ -119,10 +119,10 @@ void SocketAddressTest::testSocketAddress()
 	}
 
 	SocketAddress sa10("www6.pocoproject.org", 80);
-	assert (sa10.host().toString() == "104.130.199.50" || sa10.host().toString() == "2001:4801:7828:101:be76:4eff:fe10:1455");
+	assert (sa10.host().toString() == "54.93.62.90" || sa10.host().toString() == "[2001:4801:7828:101:be76:4eff:fe10:1455]");
 
 	SocketAddress sa11(SocketAddress::IPv4, "www6.pocoproject.org", 80);
-	assert (sa11.host().toString() == "104.130.199.50");
+	assert (sa11.host().toString() == "54.93.62.90");
 
 #ifdef POCO_HAVE_IPv6
 	try
