@@ -774,7 +774,7 @@ void Context::initECDH(const std::string& curve)
 #if OPENSSL_VERSION_NUMBER >= 0x1000200fL
  	const std::string groups(curve.empty() ?
  #if   OPENSSL_VERSION_NUMBER >= 0x1010100fL
- 				   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
+ 				   "X448:X25519:P-521:P-384:P-256"
  #elif OPENSSL_VERSION_NUMBER >= 0x1010000fL
  	// while OpenSSL 1.1.0 didn't support Ed25519 (EdDSA using Curve25519),
  	// it did support X25519 (ECDH using Curve25516).
