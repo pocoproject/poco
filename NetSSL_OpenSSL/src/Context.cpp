@@ -717,17 +717,19 @@ void Context::initDH(bool use2048Bits, const std::string& dhParamsFile)
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+		BIGNUM* p = nullptr;
+		BIGNUM* g = nullptr;
 		if (use2048Bits)
 		{
-			BIGNUM* p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
-			BIGNUM* g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
+			p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
+			g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
 			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 256);
 		}
 		else
 		{
-			BIGNUM* p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
-			BIGNUM* g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
+			p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
+			g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
 			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 160);
 		}
