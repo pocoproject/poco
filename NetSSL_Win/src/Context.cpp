@@ -163,14 +163,14 @@ Poco::Net::X509Certificate Context::certificate()
 
 void Context::loadCertificate()
 {
-	std::wstring wcertStore;
-	Poco::UnicodeConverter::convert(_certStoreName, wcertStore);
+	std::wstring wcertStoreName;
+	Poco::UnicodeConverter::convert(_certStoreName, wcertStoreName);
 	if (!_hCertStore)
 	{
 		if (_options & OPT_USE_MACHINE_STORE)
-			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, _certStoreName.c_str());
+			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStoreName.c_str());
 		else
-			_hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
+			_hCertStore = CertOpenSystemStoreW(0, wcertStoreName.c_str());
 	}
 	if (!_hCertStore) throw CertificateException("Failed to open certificate store", _certStoreName, GetLastError());
 
@@ -502,16 +502,16 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	case PROTO_SSLV3:
 		_disabledProtocols = PROTO_SSLV2;
 		break;
-	case PROTO_TLSV1:  
+	case PROTO_TLSV1:
 		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3;
 		break;
-	case PROTO_TLSV1_1: 
+	case PROTO_TLSV1_1:
 		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1;
 		break;
-	case PROTO_TLSV1_2: 
+	case PROTO_TLSV1_2:
 		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1;
 		break;
-	case PROTO_TLSV1_3: 
+	case PROTO_TLSV1_3:
 		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1 | PROTO_TLSV1_2;
 		break;
 	}
