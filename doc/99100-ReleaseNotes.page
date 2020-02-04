@@ -5,6 +5,7 @@ AAAIntroduction
 
 !!Summary of Changes
 
+  - Upgraded bundled SQLite to version 3.31.1.
   - GH #2894: Poco 1.10.0 doesn't build with cmake & POCO_UNBUNDLED
   - GH #2898: poco 1.10/ NetSSL / openssl < 1.1 : default server usage changed (compare to 1.9.4)
   - GH #2834: Wrong cancelation of the fix: incorrect type of store name parameter in
