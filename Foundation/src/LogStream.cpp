@@ -23,10 +23,11 @@ namespace Poco {
 //
 
 
-LogStreamBuf::LogStreamBuf(Logger& logger, Message::Priority priority):
+LogStreamBuf::LogStreamBuf(Logger& logger, Message::Priority priority, std::size_t bufferCapacity):
 	_logger(logger),
 	_priority(priority)
 {
+	_message.reserve(bufferCapacity);
 }
 
 
@@ -38,6 +39,12 @@ LogStreamBuf::~LogStreamBuf()
 void LogStreamBuf::setPriority(Message::Priority priority)
 {
 	_priority = priority;
+}
+
+
+void LogStreamBuf::reserve(std::size_t capacity)
+{
+	_message.reserve(capacity);
 }
 
 
@@ -62,8 +69,8 @@ int LogStreamBuf::writeToDevice(char c)
 //
 
 
-LogIOS::LogIOS(Logger& logger, Message::Priority priority):
-	_buf(logger, priority)
+LogIOS::LogIOS(Logger& logger, Message::Priority priority, std::size_t bufferCapacity):
+	_buf(logger, priority, bufferCapacity)
 {
 	poco_ios_init(&_buf);
 }
@@ -85,25 +92,25 @@ LogStreamBuf* LogIOS::rdbuf()
 //
 
 
-LogStream::LogStream(Logger& logger, Message::Priority priority):
-	LogIOS(logger, priority),
+LogStream::LogStream(Logger& logger, Message::Priority priority, std::size_t bufferCapacity):
+	LogIOS(logger, priority, bufferCapacity),
 	std::ostream(&_buf)
 {
 }
 
 
-LogStream::LogStream(const std::string& loggerName, Message::Priority priority):
-	LogIOS(Logger::get(loggerName), priority),
+LogStream::LogStream(const std::string& loggerName, Message::Priority priority, std::size_t bufferCapacity):
+	LogIOS(Logger::get(loggerName), priority, bufferCapacity),
 	std::ostream(&_buf)
 {
 }
 
-	
+
 LogStream::~LogStream()
 {
 }
 
-	
+
 LogStream& LogStream::fatal()
 {
 	return priority(Message::PRIO_FATAL);
@@ -116,7 +123,7 @@ LogStream& LogStream::fatal(const std::string& message)
 	return priority(Message::PRIO_FATAL);
 }
 
-	
+
 LogStream& LogStream::critical()
 {
 	return priority(Message::PRIO_CRITICAL);

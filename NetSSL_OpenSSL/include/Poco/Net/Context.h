@@ -164,10 +164,28 @@ public:
 			/// Specifies a file containing Diffie-Hellman parameters.
 			/// If empty, the default parameters are used.
 
+		bool dhUse2048Bits;
+			/// If set to true, will use 2048-bit MODP Group with 256-bit
+			/// prime order subgroup (RFC5114) instead of 1024-bit for DH.
+
 		std::string ecdhCurve;
-			/// Specifies the name of the curve to use for ECDH, based
-			/// on the curve names specified in RFC 4492.
-			/// Defaults to "prime256v1".
+			/// OpenSSL 1.0.1 and earlier:
+			///   Specifies the name of the curve to use for ECDH, based
+			///   on the curve names specified in RFC 4492.
+			///   Defaults to "prime256v1".
+			/// OpenSSL 1.0.2 to 1.1.0:
+			///   Specifies the colon-separated list of curves
+			///   to be used for ECDH, based on the curve names
+			///   defined by OpenSSL, such as
+			///   "X448:X25519:P-521:P-384:P-256"
+			///   Defaults to the subset supported by the OpenSSL version
+			///   among the above.
+			/// OpenSSL 1.1.1 and above:
+			///   Specifies the colon-separated list of groups
+			///   (some of which can be curves) to be used for ECDH
+			///   and other TLSv1.3 ephemeral key negotiation, based
+			///   on the group names defined by OpenSSL. Defaults to
+			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
 	};
 
 	Context(Usage usage, const Params& params);
@@ -383,7 +401,7 @@ private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
 
-	void initDH(const std::string& dhFile);
+	void initDH(bool use2048Bits, const std::string& dhFile);
 		/// Initializes the Context with Diffie-Hellman parameters.
 
 	void initECDH(const std::string& curve);

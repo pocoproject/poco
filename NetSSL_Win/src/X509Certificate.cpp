@@ -381,13 +381,13 @@ void* X509Certificate::nid2oid(NID nid)
 
 void X509Certificate::loadCertificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore)
 {
-	std::wstring wcertStore;
-	Poco::UnicodeConverter::convert(certStoreName, wcertStore);
+	std::wstring wcertStoreName;
+	Poco::UnicodeConverter::convert(certStoreName, wcertStoreName);
 	HCERTSTORE hCertStore;
 	if (useMachineStore)
-		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStoreName.c_str());
+		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStoreName.c_str());
 	else
-		hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
+		hCertStore = CertOpenSystemStoreW(0, wcertStoreName.c_str());
 
 	if (!hCertStore) throw CertificateException("Failed to open certificate store", certStoreName, GetLastError());
 

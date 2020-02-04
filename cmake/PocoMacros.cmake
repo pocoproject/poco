@@ -233,20 +233,27 @@ configure_file("cmake/Poco${target_name}Config.cmake"
   @ONLY
 )
 
-set(ConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+# Set config script install location in a location that find_package() will
+# look for, which is different on MS Windows than for UNIX
+# Note: also set in root CMakeLists.txt
+if (WIN32)
+	set(PocoConfigPackageLocation "cmake")
+else()
+	set(PocoConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+endif()
 
 install(
     EXPORT "${target_name}Targets"
     FILE "${PROJECT_NAME}${target_name}Targets.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"
+    DESTINATION "${PocoConfigPackageLocation}"
     )
 
 install(
     FILES
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
-    DESTINATION "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"
+    DESTINATION "${PocoConfigPackageLocation}"
     COMPONENT Devel
     )
 

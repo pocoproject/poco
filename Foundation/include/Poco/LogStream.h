@@ -37,20 +37,26 @@ class Foundation_API LogStreamBuf: public UnbufferedStreamBuf
 	/// priority.
 {
 public:
-	LogStreamBuf(Logger& logger, Message::Priority priority);
+	LogStreamBuf(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
 		/// Creates the LogStream.
 
 	~LogStreamBuf();
 		/// Destroys the LogStream.
-		
+
 	void setPriority(Message::Priority priority);
 		/// Sets the priority for log messages.
-		
+
 	Message::Priority getPriority() const;
 		/// Returns the priority for log messages.
 
 	Logger& logger() const;
 		/// Returns a reference to the Logger.
+
+	std::size_t capacity() const;
+		/// Returns the internal message buffer capacity.
+
+	void reserve(std::size_t capacity);
+		/// Sets the capacity of the internal message buffer to the given size.
 
 private:
 	int writeToDevice(char c);
@@ -69,7 +75,7 @@ class Foundation_API LogIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	LogIOS(Logger& logger, Message::Priority priority);
+	LogIOS(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
 	~LogIOS();
 	LogStreamBuf* rdbuf();
 
@@ -93,23 +99,25 @@ class Foundation_API LogStream: public LogIOS, public std::ostream
 	///     ls.error() << "Some error message" << std::endl;
 {
 public:
-	LogStream(Logger& logger, Message::Priority priority = Message::PRIO_INFORMATION);
+	static const std::size_t DEFAULT_BUFFER_CAPACITY = 255;
+
+	LogStream(Logger& logger, Message::Priority priority = Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
 		/// Creates the LogStream, using the given logger and priority.
 
-	LogStream(const std::string& loggerName, Message::Priority priority = Message::PRIO_INFORMATION);
+	LogStream(const std::string& loggerName, Message::Priority priority = Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
 		/// Creates the LogStream, using the logger identified
 		/// by loggerName, and sets the priority.
-		
+
 	~LogStream();
 		/// Destroys the LogStream.
-		
+
 	LogStream& fatal();
 		/// Sets the priority for log messages to Message::PRIO_FATAL.
-		
+
 	LogStream& fatal(const std::string& message);
 		/// Sets the priority for log messages to Message::PRIO_FATAL
 		/// and writes the given message.
-		
+
 	LogStream& critical();
 		/// Sets the priority for log messages to Message::PRIO_CRITICAL.
 
@@ -167,6 +175,12 @@ public:
 //
 // inlines
 //
+inline std::size_t LogStreamBuf::capacity() const
+{
+	return _message.capacity();
+}
+
+
 inline Message::Priority LogStreamBuf::getPriority() const
 {
 	return _priority;
