@@ -1,13 +1,19 @@
 This is the changelog file for the POCO C++ Libraries.
 
-Release 1.10.1 (2020-02-xx)
-==========================
+Release 1.10.1 (2020-02-10)
+===========================
 
-- TODO
+- GH #2894: Poco 1.10.0 doesn't build with cmake & POCO_UNBUNDLED
+- GH #2898: poco 1.10/ NetSSL / openssl < 1.1 : default server usage changed (compare to 1.9.4)
+- GH #2834: Wrong cancelation of the fix: incorrect type of store name parameter in
+  CertOpenStore API call into NetSSL_Win. Release 1.10.0
+- GH #2791: allow pre-allocation of the buffer in Poco::LogStreamBuf.
+- GH #2816: Modernise TLS configuration
+- GH #2818: Add getSpecifiedPort() method in Poco::URI.
 
 
 Release 1.10.0 (2020-01-27)
-==========================
+===========================
 
 - This release now requires a C++14 compiler (GCC 5, Clang 3.4, Visual C++ 2015).
 - Visual Studio project and solution files for versions prior to 2015 have
