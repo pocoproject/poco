@@ -422,20 +422,33 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	{
 	case PROTO_SSLV2:
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
+
 	case PROTO_SSLV3:
 		disableProtocols(PROTO_SSLV2);
 		break;
+
 	case PROTO_TLSV1:
 		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3);
 		break;
+
 	case PROTO_TLSV1_1:
+#if defined(SSL_OP_NO_TLSv1_1) && !defined(OPENSSL_NO_TLS1)
 		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1);
+#else
+		throw Poco::InvalidArgumentException("TLSv1.1 is not supported by the available OpenSSL library");
+#endif
 		break;
+
 	case PROTO_TLSV1_2:
+#if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
 		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1);
+#else
+		throw Poco::InvalidArgumentException("TLSv1.2 is not supported by the available OpenSSL library");
+#endif
 		break;
+
 	case PROTO_TLSV1_3:
-		disableProtocols(PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1 | PROTO_TLSV1_2);
+		throw Poco::InvalidArgumentException("TLSv1.3 is not supported by the available OpenSSL library");
 		break;
 	}
 #endif
@@ -468,6 +481,24 @@ void Context::createSSLContext()
 		{
 		case CLIENT_USE:
 		case TLS_CLIENT_USE:
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+			_pSSLContext = SSL_CTX_new(TLS_client_method());
+			minTLSVersion = TLS1_VERSION;
+#else
+			_pSSLContext = SSL_CTX_new(SSLv23_client_method());
+#endif
+			break;
+
+		case SERVER_USE:
+		case TLS_SERVER_USE:
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+			_pSSLContext = SSL_CTX_new(TLS_server_method());
+			minTLSVersion = TLS1_VERSION;
+#else
+			_pSSLContext = SSL_CTX_new(SSLv23_server_method());
+#endif
+			break;
+
 		case TLSV1_CLIENT_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_client_method());
@@ -477,8 +508,6 @@ void Context::createSSLContext()
 #endif
 			break;
 
-		case SERVER_USE:
-		case TLS_SERVER_USE:
 		case TLSV1_SERVER_USE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 			_pSSLContext = SSL_CTX_new(TLS_server_method());
