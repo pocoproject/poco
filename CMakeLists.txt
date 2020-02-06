@@ -443,7 +443,7 @@ write_basic_package_version_file(
 if (WIN32)
   set(PocoConfigPackageLocation "cmake")
 else()
-  set(PocoConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+  set(PocoConfigPackageLocation "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}")
 endif()
 
 configure_file(cmake/${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake" @ONLY)
