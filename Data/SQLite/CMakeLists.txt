@@ -44,7 +44,10 @@ target_include_directories(DataSQLite
 
 if(POCO_UNBUNDLED)
         target_link_libraries(DataSQLite PUBLIC SQLite::SQLite3)
-	target_compile_definitions(DataSQLite PUBLIC POCO_UNBUNDLED)
+	target_compile_definitions(DataSQLite PUBLIC
+		POCO_UNBUNDLED
+		SQLITE_THREADSAFE=1
+	)
 else()
 	if(WINCE)
 		target_compile_definitions(DataSQLite PRIVATE SQLITE_MSVC_LOCALTIME_API)
