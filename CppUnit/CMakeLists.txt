@@ -33,6 +33,3 @@ elseif(MINGW)
 		PUBLIC
 			_DLL)
 endif()
-
-POCO_INSTALL(CppUnit)
-

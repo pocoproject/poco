@@ -239,7 +239,7 @@ configure_file("cmake/Poco${target_name}Config.cmake"
 if (WIN32)
 	set(PocoConfigPackageLocation "cmake")
 else()
-	set(PocoConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+	set(PocoConfigPackageLocation "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}")
 endif()
 
 install(
