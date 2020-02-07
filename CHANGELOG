@@ -11,6 +11,8 @@ Release 1.10.1 (2020-02-10)
 - GH #2791: allow pre-allocation of the buffer in Poco::LogStreamBuf.
 - GH #2816: Modernise TLS configuration
 - GH #2818: Add getSpecifiedPort() method in Poco::URI.
+- MySQL: resetting the session when putting it back into a SessionPool is now optional
+  (and disabled by default) due to a bug in MySQL messing up the character encoding when doing so.
 
 
 Release 1.10.0 (2020-01-27)
