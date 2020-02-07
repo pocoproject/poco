@@ -46,7 +46,7 @@ TextTestResult::TextTestResult(const std::string& ignore):
 				ifs.close();
 			}
 		}
-		catch (std::exception e)
+		catch (std::exception& e)
 		{
 			std::cout << e.what() << std::endl;
 		}
