@@ -3,10 +3,6 @@ language: cpp
 cache:
  - apt
 
-#before_install:
-#  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update -qq; fi
-#  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -qq -y cmake libssl-dev unixodbc-dev libmysqlclient-dev g++-arm-linux-gnueabi g++-arm-linux-gnueabihf clang libc++-dev sloccount cppcheck; fi
-
 services:
   - mongodb
   - redis
@@ -23,15 +19,9 @@ notifications:
   slack:
     secure: "EKysuMlTU3Uv5XFX+zuwHK/ej4wtD8+UjO5xvchCFMkRgM0V3rERVT1rV6NocNBH4hjTcvue9DEKdWAtqdDh06vTOHGKdnZ/e204jA38HfcIA0SPVbQXzjckQXALvKl51OPOmGuI7Feo4wyohzUyGoDLo1bom02xqDfC3caQB5Q="
 
-env:
-  global: TEST_NAME=""
-
-before_script:
- - echo ${TEST_NAME}
-
 jobs:
   include:
-    - env:    TEST_NAME="android API level 19"
+    - name: Android (API level 19)
       os: linux
       dist: bionic
       arch: amd64
@@ -63,7 +53,7 @@ jobs:
           /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
           #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
 
-    - env:    TEST_NAME="android API level 24 arm64-v8a"
+    - name: Android (API level 24 arm64-v8a)
       os: linux
       dist: bionic
       arch: amd64
@@ -95,7 +85,7 @@ jobs:
           /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
           #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
 
-    - env: TEST_NAME="clang (make)"
+    - name: Linux (clang, make)
       os: linux
       dist: bionic
       arch: amd64
@@ -110,7 +100,7 @@ jobs:
         - ./configure --everything --omit=PDF --config=Linux-clang && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
-    - env:    TEST_NAME="gcc (make)"
+    - name: Linux (gcc, make)
       os: linux
       dist: bionic
       arch: amd64
@@ -129,7 +119,7 @@ jobs:
         - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
-    - env:    TEST_NAME="gcc (make) arm64"
+    - name: Linux (gcc, make, arm64)
       os: linux
       dist: bionic
       arch: arm64
@@ -144,7 +134,7 @@ jobs:
         - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
-    - env:    TEST_NAME="gcc (make) x390x"
+    - name: Linux (gcc, make, s390x)
       os: linux
       dist: bionic
       arch: s390x
@@ -159,11 +149,7 @@ jobs:
         - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
-#    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
-#      script:
-#        - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make all -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
-
-    - env:    TEST_NAME="gcc (CMake)"
+    - name: Linux (gcc, cmake)
       os: linux
       dist: bionic
       arch: amd64
@@ -179,7 +165,7 @@ jobs:
       script:
         - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` PATH=$PWD/cmake-3.5.1-Linux-x86_64/bin:$PATH ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
 
-    - env:    TEST_NAME="clang (CMake)"
+    - name: Linux (clang, cmake)
       os: linux
       dist: bionic
       arch: amd64
@@ -195,7 +181,7 @@ jobs:
       script:
         - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` PATH=$PWD/cmake-3.5.1-Linux-x86_64/bin:$PATH ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
 
-    - env:    TEST_NAME="arm-linux-gnueabi-g++ (CMake)"
+    - name: Linux cross (arm-linux-gnueabi-g++, cmake)
       os: linux
       dist: bionic
       arch: amd64
@@ -213,7 +199,7 @@ jobs:
         - export CXX="arm-linux-gnueabi-g++"
         - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
 
-    - env:    TEST_NAME="arm-linux-gnueabihf-g++ (CMake)"
+    - name: Linux cross (arm-linux-gnueabihf-g++, cmake)
       os: linux
       dist: bionic
       arch: amd64
@@ -221,6 +207,7 @@ jobs:
         apt:
           packages:
             - cmake
+            - ninja-build
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
@@ -241,7 +228,7 @@ jobs:
     #    - sudo -E build/script/runtests.sh
 
     # build documentation and release
-    - env:    TEST_NAME="documentation & release"
+    - name: Documentation & Release
       os: linux
       dist: bionic
       arch: amd64
@@ -252,35 +239,35 @@ jobs:
 
     # QA jobs for code analytics and metrics
     # static code analysis with cppcheck (we can add --enable=all later)
-    - env:    TEST_NAME="cppcheck"
+    - name: CppCheck
       os: linux
       dist: bionic
       arch: amd64
       script: cppcheck --force --quiet --inline-suppr -j2 -iData/SQLite/src/sqlite3.c .
 
     # search for TODO within source tree
-    - env:    TEST_NAME="TODO"
+    - name: TODO
       os: linux
       dist: bionic
       arch: amd64
       script: grep -r TODO *
 
     # search for FIXME within source tree
-    - env:    TEST_NAME="FIXME"
+    - name: FIXME
       os: linux
       dist: bionic
       arch: amd64
       script: grep -r FIXME *
 
     # search for HACK within source tree
-    - env:    TEST_NAME="HACK"
+    - name: HACK
       os: linux
       dist: bionic
       arch: amd64
       script: grep -r HACK *
 
     # some statistics about the code base
-    - env:    TEST_NAME="sloccount"
+    - name: Sloccount
       os: linux
       dist: bionic
       arch: amd64
