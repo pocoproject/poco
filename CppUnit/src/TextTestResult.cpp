@@ -147,7 +147,7 @@ void TextTestResult::addFailure(Test* test, CppUnitException* e)
 void TextTestResult::startTest(Test* test)
 {
 	TestResult::startTest(test);
-	_ostr << "\n" << shortName(test->toString()) << ": ";
+	_ostr << "\n" << shortName(test->toString()) << ": " << std::flush;
 }
 
 
