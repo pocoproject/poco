@@ -113,11 +113,41 @@ jobs:
     - env:    TEST_NAME="gcc (make)"
       os: linux
       dist: bionic
-      arch:
+      arch: amd64
         - amd64
         - ppc64le
         - s390x
         - arm64
+      addons:
+        apt:
+          packages:
+            - libssl-dev
+            - unixodbc-dev
+            - libmysqlclient-dev
+      compiler: gcc
+      script:
+        - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
+        - sudo -s ./travis/runtests.sh
+
+    - env:    TEST_NAME="gcc (make) arm64"
+      os: linux
+      dist: bionic
+      arch: arm64
+      addons:
+        apt:
+          packages:
+            - libssl-dev
+            - unixodbc-dev
+            - libmysqlclient-dev
+      compiler: gcc
+      script:
+        - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
+        - sudo -s ./travis/runtests.sh
+
+    - env:    TEST_NAME="gcc (make) x390x"
+      os: linux
+      dist: bionic
+      arch: s390x
       addons:
         apt:
           packages:
@@ -142,6 +172,7 @@ jobs:
         apt:
           packages:
             - cmake
+            - ninja
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
@@ -157,6 +188,7 @@ jobs:
         apt:
           packages:
             - cmake
+            - ninja
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
@@ -171,6 +203,7 @@ jobs:
         apt:
           packages:
             - cmake
+            - ninja
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
