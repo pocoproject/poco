@@ -172,7 +172,7 @@ jobs:
         apt:
           packages:
             - cmake
-            - ninja
+            - ninja-build
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
@@ -188,7 +188,7 @@ jobs:
         apt:
           packages:
             - cmake
-            - ninja
+            - ninja-build
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
@@ -203,7 +203,7 @@ jobs:
         apt:
           packages:
             - cmake
-            - ninja
+            - ninja-build
             - libssl-dev
             - unixodbc-dev
             - libmysqlclient-dev
