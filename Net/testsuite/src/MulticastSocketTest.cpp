@@ -47,10 +47,11 @@ MulticastSocketTest::~MulticastSocketTest()
 
 void MulticastSocketTest::testMulticast()
 {
-	try 
+	try
 	{
 		MulticastEchoServer echoServer;
 		MulticastSocket ms(SocketAddress::IPv4);
+		ms.setReceiveTimeout(Poco::Timespan(5, 0));
 		int n = ms.sendTo("hello", 5, echoServer.group());
 		assertTrue (n == 5);
 		char buffer[256];
