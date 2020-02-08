@@ -367,18 +367,11 @@ void SocketTest::testBufferSize()
 
 void SocketTest::testOptions()
 {
-	std::cout << "entering testOptions..." << std::endl;
-
-	std::cout << "testOptions: creating echoServer..." << std::endl;
 	EchoServer echoServer;
-	std::cout << "testOptions: echoServer ready" << std::endl;
 
 	StreamSocket ss;
-	std::cout << "connecting..." << std::endl;
 
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
-
-	std::cout << "connected." << std::endl;
 
 	ss.setLinger(true, 20);
 	bool f;
@@ -403,8 +396,6 @@ void SocketTest::testOptions()
 	assertTrue (ss.getOOBInline());
 	ss.setOOBInline(false);
 	assertTrue (!ss.getOOBInline());
-
-	std::cout << "testOptions done." << std::endl;
 }
 
 
@@ -418,37 +409,53 @@ void SocketTest::testSelect()
 	StreamSocket ss;
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
+
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
+
 	readList.push_back(ss);
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 0);
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
 
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	ss.sendBytes("hello", 5);
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 
 	ss.poll(timeout, Socket::SELECT_READ);
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 
 	readList.push_back(ss);
 	writeList.push_back(ss);
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 2);
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	assertTrue (!readList.empty());
 	assertTrue (!writeList.empty());
 	assertTrue (exceptList.empty());
 
 	char buffer[256];
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	std::cout << "EchoServer: " << __LINE__ << std::endl;
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
+	std::cout << "EchoServer DONE: " << __LINE__ << std::endl;
 }
 
 
 void SocketTest::testSelect2()
 {
+	std::cout << "entering testSelect2..." << std::endl;
+
 	Timespan timeout(100000);
 
 	EchoServer echoServer1;
