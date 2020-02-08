@@ -243,6 +243,10 @@ jobs:
       os: linux
       dist: bionic
       arch: amd64
+      addons:
+        apt:
+          packages:
+            - cppcheck
       script: cppcheck --force --quiet --inline-suppr -j2 -iData/SQLite/src/sqlite3.c .
 
     # search for TODO within source tree
@@ -271,4 +275,8 @@ jobs:
       os: linux
       dist: bionic
       arch: amd64
+      addons:
+        apt:
+          packages:
+            - sloccount
       script: sloccount .
