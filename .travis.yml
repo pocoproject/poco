@@ -1,5 +1,13 @@
 language: cpp
 
+arch:
+  - amd64
+  - ppc64le
+  - s390x
+  - arm64
+
+dist: bionic
+
 cache:
  - apt
 
@@ -102,11 +110,6 @@ matrix:
 
     - env:    TEST_NAME="gcc (make)"
       compiler: gcc
-      arch:
-        - amd64
-        - ppc64le
-        - s390x
-        - arm64
 
       script:
         - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
