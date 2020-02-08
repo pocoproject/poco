@@ -25,28 +25,6 @@
 #include <iostream>
 
 
-class Tracer
-{
-public:
-	Tracer(const char* func): _func(func)
-	{
-		std::cout << "TRACE: Entering " << _func << std::endl;
-	}
-
-	~Tracer()
-	{
-		std::cout << "TRACE: Exiting " << _func << std::endl;
-	}
-
-private:
-	const char* _func;
-};
-
-
-#define TRACE() std::cout << "TRACE: " << __FUNCTION__ << ": " << __LINE__ << std::endl
-#define TRACE_ENTER_EXIT() Tracer _tRaCeR(__FUNCTION__)
-
-
 using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
@@ -166,7 +144,7 @@ void SocketTest::testFIFOBuffer()
 
 	n = ss.receiveBytes(f);
 	assertTrue (n == 5);
-
+	
 	assertTrue (2 == _notToReadable);
 	assertTrue (1 == _readableToNot);
 	assertTrue (1 == _notToWritable);
@@ -279,14 +257,14 @@ void SocketTest::testAssign()
 	ServerSocket serv;
 	StreamSocket ss1;
 	StreamSocket ss2;
-
+	
 	assertTrue (ss1 != ss2);
 	StreamSocket ss3(ss1);
 	assertTrue (ss1 == ss3);
 	ss3 = ss2;
 	assertTrue (ss1 != ss3);
 	assertTrue (ss2 == ss3);
-
+	
 	try
 	{
 		ss1 = serv;
@@ -295,7 +273,7 @@ void SocketTest::testAssign()
 	catch (InvalidArgumentException&)
 	{
 	}
-
+	
 	try
 	{
 		StreamSocket ss4(serv);
@@ -313,7 +291,7 @@ void SocketTest::testAssign()
 	catch (InvalidArgumentException&)
 	{
 	}
-
+	
 	try
 	{
 		ServerSocket serv2(ss1);
@@ -330,7 +308,7 @@ void SocketTest::testTimeout()
 	EchoServer echoServer;
 	StreamSocket ss;
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
-
+	
 	Timespan timeout0 = ss.getReceiveTimeout();
 	Timespan timeout(250000);
 	ss.setReceiveTimeout(timeout);
@@ -338,7 +316,7 @@ void SocketTest::testTimeout()
 	std::cout << "original receive timeout:  " << timeout0.totalMicroseconds() << std::endl;
 	std::cout << "requested receive timeout: " << timeout.totalMicroseconds() << std::endl;
 	std::cout << "actual receive timeout:    " << timeout1.totalMicroseconds() << std::endl;
-
+	
 	// some socket implementations adjust the timeout value
 	// assertTrue (ss.getReceiveTimeout() == timeout);
 	Stopwatch sw;
@@ -353,7 +331,7 @@ void SocketTest::testTimeout()
 	{
 	}
 	assertTrue (sw.elapsed() < 1000000);
-
+	
 	timeout0 = ss.getSendTimeout();
 	ss.setSendTimeout(timeout);
 	timeout1 = ss.getSendTimeout();
@@ -369,7 +347,7 @@ void SocketTest::testBufferSize()
 	EchoServer echoServer;
 	SocketAddress sa("127.0.0.1", 1234);
 	StreamSocket ss(sa.family());
-
+	
 	int osz = ss.getSendBufferSize();
 	int rsz = 32000;
 	ss.setSendBufferSize(rsz);
@@ -377,7 +355,7 @@ void SocketTest::testBufferSize()
 	std::cout << "original send buffer size:  " << osz << std::endl;
 	std::cout << "requested send buffer size: " << rsz << std::endl;
 	std::cout << "actual send buffer size:    " << asz << std::endl;
-
+	
 	osz = ss.getReceiveBufferSize();
 	ss.setReceiveBufferSize(rsz);
 	asz = ss.getReceiveBufferSize();
@@ -389,12 +367,8 @@ void SocketTest::testBufferSize()
 
 void SocketTest::testOptions()
 {
-	TRACE_ENTER_EXIT();
-
 	EchoServer echoServer;
-
 	StreamSocket ss;
-
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
 	ss.setLinger(true, 20);
@@ -405,17 +379,17 @@ void SocketTest::testOptions()
 	ss.setLinger(false, 0);
 	ss.getLinger(f, t);
 	assertTrue (!f);
-
+	
 	ss.setNoDelay(true);
 	assertTrue (ss.getNoDelay());
 	ss.setNoDelay(false);
 	assertTrue (!ss.getNoDelay());
-
+	
 	ss.setKeepAlive(true);
 	assertTrue (ss.getKeepAlive());
 	ss.setKeepAlive(false);
 	assertTrue (!ss.getKeepAlive());
-
+	
 	ss.setOOBInline(true);
 	assertTrue (ss.getOOBInline());
 	ss.setOOBInline(false);
@@ -425,50 +399,35 @@ void SocketTest::testOptions()
 
 void SocketTest::testSelect()
 {
-	TRACE_ENTER_EXIT();
-
 	Timespan timeout(250000);
 
 	EchoServer echoServer;
 	StreamSocket ss;
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
-	TRACE();
-
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 
-	TRACE();
-
 	readList.push_back(ss);
-	TRACE();
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 0);
-	TRACE();
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
-
-	TRACE();
+	
 	ss.sendBytes("hello", 5);
-	TRACE();
 
 	ss.poll(timeout, Socket::SELECT_READ);
-	TRACE();
 
 	readList.push_back(ss);
 	writeList.push_back(ss);
-	TRACE();
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 2);
-	TRACE();
 	assertTrue (!readList.empty());
 	assertTrue (!writeList.empty());
 	assertTrue (exceptList.empty());
 
 	char buffer[256];
-	TRACE();
 	int n = ss.receiveBytes(buffer, sizeof(buffer));
-	TRACE();
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
@@ -477,49 +436,31 @@ void SocketTest::testSelect()
 
 void SocketTest::testSelect2()
 {
-	TRACE_ENTER_EXIT();
-
 	Timespan timeout(100000);
 
-	TRACE();
-
 	EchoServer echoServer1;
-	TRACE();
-
 	EchoServer echoServer2;
-	TRACE();
-
 	StreamSocket ss1(SocketAddress("127.0.0.1", echoServer1.port()));
-	TRACE();
 	StreamSocket ss2(SocketAddress("127.0.0.1", echoServer2.port()));
-	TRACE();
-
+	
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 
 	readList.push_back(ss1);
 	readList.push_back(ss2);
-	TRACE();
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 0);
-	TRACE();
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
-
-	TRACE();
+	
 	ss1.sendBytes("hello", 5);
-	TRACE();
 
-	TRACE();
 	ss1.poll(timeout, Socket::SELECT_READ);
-	TRACE();
 
 	readList.push_back(ss1);
 	readList.push_back(ss2);
-	TRACE();
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 1);
-	TRACE();
 
 	assertTrue (readList.size() == 1);
 	assertTrue (readList[0] == ss1);
@@ -527,9 +468,7 @@ void SocketTest::testSelect2()
 	assertTrue (exceptList.empty());
 
 	char buffer[256];
-	TRACE();
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
-	TRACE();
 	assertTrue (n == 5);
 
 	readList.clear();
@@ -537,42 +476,32 @@ void SocketTest::testSelect2()
 	exceptList.clear();
 	writeList.push_back(ss1);
 	writeList.push_back(ss2);
-	TRACE();
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 2);
-	TRACE();
 	assertTrue (readList.empty());
 	assertTrue (writeList.size() == 2);
 	assertTrue (writeList[0] == ss1);
 	assertTrue (writeList[1] == ss2);
 	assertTrue (exceptList.empty());
 
-	TRACE();
 	ss1.close();
 	ss2.close();
-	TRACE();
 }
 
 
 void SocketTest::testSelect3()
 {
-	TRACE_ENTER_EXIT();
-
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 	Timespan timeout(1000);
 
-	TRACE();
 	int rc = Socket::select(readList, writeList, exceptList, timeout);
 	assertTrue (rc == 0);
-	TRACE();
 }
 
 
 void SocketTest::testEchoUnixLocal()
 {
-	TRACE_ENTER_EXIT();
-
 #if defined(POCO_OS_FAMILY_UNIX)
 #if POCO_OS == POCO_OS_ANDROID
 	Poco::File socketFile("/data/local/tmp/SocketTest.sock");
