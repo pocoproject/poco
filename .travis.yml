@@ -157,7 +157,7 @@ jobs:
             - libmysqlclient-dev
       compiler: gcc
       script:
-        - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
+        - ./configure --everything --omit=PDF,Redis,MongoDB && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: macOS (clang, make)
@@ -167,9 +167,8 @@ jobs:
         homebrew:
           packages:
             - openssl
-            - mysql-client
       script:
-        - ./configure --everything --omit=PDF,Data/ODBC,Data/PostgreSQL && make all -s -j2  && sudo make install
+        - ./configure --everything --no-prefix --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, cmake)
