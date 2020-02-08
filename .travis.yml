@@ -123,14 +123,14 @@ jobs:
         apt:
           packages:
             - libssl-dev
-            - unixodbc-dev
             - libmysqlclient-dev
       compiler: gcc
       script:
-        - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
+        # skip some libs due to build timeout
+        - ./configure --everything --omit=PDF,Data/ODBC,Data/PostgreSQL,MongoDB,Redis && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
-    - name: Linux (gcc, make)
+    - name: Linux (gcc, make, ppc64le)
       os: linux
       dist: bionic
       arch: ppc64le
@@ -142,7 +142,7 @@ jobs:
             - libmysqlclient-dev
       compiler: gcc
       script:
-        - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
+        - ./configure --everything --omit=PDF,Redis,MongoDB && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, make, s390x)
@@ -239,16 +239,6 @@ jobs:
         - export CC="arm-linux-gnueabihf-gcc"
         - export CXX="arm-linux-gnueabihf-g++"
         - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
-
-    # TODO osx build
-    # TODO run test suite
-    #  script:
-    #    - ./configure && make all -s -j2
-    #    - sudo ifconfig -a
-    #    - sudo ifconfig venet0 multicast
-    #    - sudo ifconfig -a
-    #    - export POCO_BASE=`pwd`
-    #    - sudo -E build/script/runtests.sh
 
     # build documentation and release
     - name: Documentation & Release
