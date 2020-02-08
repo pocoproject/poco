@@ -92,6 +92,7 @@ void SessionImpl::open(const std::string& connect)
 	options["secure-auth"] = "";
 	options["character-set"] = "utf8";
 	options["reset"] = "";
+	options["fail-readonly"] = "";
 
 	const std::string& connString = connectionString();
 	for (std::string::const_iterator start = connString.begin();;)
@@ -152,6 +153,13 @@ void SessionImpl::open(const std::string& connect)
 		_reset = false;
 	else if (!options["reset"].empty())
 		throw MySQLException("create session: specify correct reset option (true or false)");
+
+	if (options["fail-readonly"] == "true")
+		_failIfInnoReadOnly = true;
+	else if (options["fail-readonly"] == "false")
+		_failIfInnoReadOnly = false;
+	else if (!options["fail-readonly"].empty())
+		throw MySQLException("create session: specify correct fail-readonly option (true or false)");
 
 	// Real connect
 	_handle.connect(options["host"].c_str(),

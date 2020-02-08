@@ -103,7 +103,7 @@ public:
 
 	void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
 		/// Binds an Int16.
-	
+
 	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir);
 		/// Binds an Int16 vector.
 
@@ -344,7 +344,7 @@ public:
 		/// Returns bound data size for parameter at specified position.
 
 	void synchronize();
-		/// Transfers the results of non-POD outbound parameters from internal 
+		/// Transfers the results of non-POD outbound parameters from internal
 		/// holders back into the externally supplied buffers.
 
 	void reset();
@@ -375,7 +375,7 @@ private:
 		/// Sets the description field for the parameter, if needed.
 
 	void bind(std::size_t pos, const char* const& pVal, Direction dir);
-		/// Binds a const char ptr. 
+		/// Binds a const char ptr.
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 
@@ -392,11 +392,11 @@ private:
 
 		_lengthIndicator.push_back(0);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			cDataType, 
-			Utility::sqlDataType(cDataType), 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			cDataType,
+			Utility::sqlDataType(cDataType),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &val, 0, 0)))
@@ -413,7 +413,7 @@ private:
 
 		SQLPOINTER pVal = (SQLPOINTER) val.rawContent();
 		SQLINTEGER size = (SQLINTEGER) val.size();
-			
+
 		_inParams.insert(ParamMap::value_type(pVal, size));
 
 		SQLLEN* pLenIn = new SQLLEN;
@@ -424,15 +424,15 @@ private:
 
 		_lengthIndicator.push_back(pLenIn);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			SQL_PARAM_INPUT, 
-			SQL_C_BINARY, 
-			SQL_LONGVARBINARY, 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			SQL_PARAM_INPUT,
+			SQL_C_BINARY,
+			SQL_LONGVARBINARY,
 			(SQLUINTEGER) size,
 			0,
 			pVal,
-			(SQLINTEGER) size, 
+			(SQLINTEGER) size,
 			_lengthIndicator.back())))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(LOB)");
@@ -457,15 +457,15 @@ private:
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			cDataType, 
-			Utility::sqlDataType(cDataType), 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			cDataType,
+			Utility::sqlDataType(cDataType),
 			colSize,
 			decDigits,
-			(SQLPOINTER) &val[0], 
-			0, 
+			(SQLPOINTER) &val[0],
+			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
@@ -518,15 +518,15 @@ private:
 		typename C::const_iterator end = val.end();
 		for (int i = 0; it != end; ++it, ++i) _boolPtrs[pos][i] = *it;
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			cDataType, 
-			Utility::sqlDataType(cDataType), 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			cDataType,
+			Utility::sqlDataType(cDataType),
 			colSize,
 			decDigits,
-			(SQLPOINTER) &_boolPtrs[pos][0], 
-			0, 
+			(SQLPOINTER) &_boolPtrs[pos][0],
+			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
@@ -571,7 +571,7 @@ private:
 			_charPtrs.resize(pos + 1, 0);
 
 		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
-		
+
 		std::size_t strSize;
 		std::size_t offset = 0;
 		typename C::const_iterator it = val.begin();
@@ -579,21 +579,21 @@ private:
 		for (; it != end; ++it)
 		{
 			strSize = it->size();
-			if (strSize > size)	
+			if (strSize > size)
 				throw LengthExceededException("SQLBindParameter(std::vector<std::string>)");
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
 			offset += size;
 		}
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			SQL_C_CHAR, 
-			SQL_LONGVARCHAR, 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			SQL_C_CHAR,
+			SQL_LONGVARCHAR,
 			(SQLUINTEGER) size - 1,
 			0,
-			_charPtrs[pos], 
-			(SQLINTEGER) size, 
+			_charPtrs[pos],
+			(SQLINTEGER) size,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<std::string>)");
@@ -696,7 +696,7 @@ private:
 		std::vector<SQLLEN>::iterator lIt = _vecLengthIndicator[pos]->begin();
 		std::vector<SQLLEN>::iterator lEnd = _vecLengthIndicator[pos]->end();
 		typename C::const_iterator cIt = val.begin();
-		for (; lIt != lEnd; ++lIt, ++cIt) 
+		for (; lIt != lEnd; ++lIt, ++cIt)
 		{
 			SQLLEN sz = static_cast<SQLLEN>(cIt->size());
 			if (sz > size) size = static_cast<SQLINTEGER>(sz);
@@ -716,21 +716,21 @@ private:
 		for (; cIt != cEnd; ++cIt)
 		{
 			blobSize = cIt->size();
-			if (blobSize > size)	
+			if (blobSize > size)
 				throw LengthExceededException("SQLBindParameter(std::vector<BLOB>)");
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
 		}
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			SQL_PARAM_INPUT, 
-			SQL_C_BINARY, 
-			SQL_LONGVARBINARY, 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			SQL_PARAM_INPUT,
+			SQL_C_BINARY,
+			SQL_LONGVARBINARY,
 			(SQLUINTEGER) size,
 			0,
-			_charPtrs[pos], 
-			(SQLINTEGER) size, 
+			_charPtrs[pos],
+			(SQLINTEGER) size,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(std::vector<BLOB>)");
@@ -753,8 +753,6 @@ private:
 
 		setParamSetSize(length);
 
-		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_DATE_STRUCT);
-
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
@@ -773,15 +771,15 @@ private:
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, SQL_TYPE_DATE, colSize, decDigits);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			SQL_C_TYPE_DATE, 
-			SQL_TYPE_DATE, 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			SQL_C_TYPE_DATE,
+			SQL_TYPE_DATE,
 			colSize,
 			decDigits,
-			(SQLPOINTER) &(*_dateVecVec[pos])[0], 
-			0, 
+			(SQLPOINTER) &(*_dateVecVec[pos])[0],
+			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(Date[])");
@@ -803,8 +801,6 @@ private:
 
 		setParamSetSize(val.size());
 
-		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIME_STRUCT);
-
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
@@ -823,15 +819,15 @@ private:
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, SQL_TYPE_TIME, colSize, decDigits);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			SQL_C_TYPE_TIME, 
-			SQL_TYPE_TIME, 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			SQL_C_TYPE_TIME,
+			SQL_TYPE_TIME,
 			colSize,
 			decDigits,
-			(SQLPOINTER) &(*_timeVecVec[pos])[0], 
-			0, 
+			(SQLPOINTER) &(*_timeVecVec[pos])[0],
+			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
@@ -854,8 +850,6 @@ private:
 
 		setParamSetSize(length);
 
-		SQLINTEGER size = (SQLINTEGER) sizeof(SQL_TIMESTAMP_STRUCT);
-
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
@@ -874,15 +868,15 @@ private:
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, SQL_TYPE_TIMESTAMP, colSize, decDigits);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			toODBCDirection(dir), 
-			SQL_C_TYPE_TIMESTAMP, 
-			SQL_TYPE_TIMESTAMP, 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			toODBCDirection(dir),
+			SQL_C_TYPE_TIMESTAMP,
+			SQL_TYPE_TIMESTAMP,
 			colSize,
 			decDigits,
-			(SQLPOINTER) &(*_dateTimeVecVec[pos])[0], 
-			0, 
+			(SQLPOINTER) &(*_dateTimeVecVec[pos])[0],
+			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
@@ -905,8 +899,6 @@ private:
 
 		setParamSetSize(length);
 
-		SQLINTEGER size = SQL_NULL_DATA;
-
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, 0);
@@ -917,32 +909,32 @@ private:
 		SQLSMALLINT decDigits = 0;
 		getColSizeAndPrecision(pos, SQL_C_STINYINT, colSize, decDigits);
 
-		if (Utility::isError(SQLBindParameter(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
-			SQL_PARAM_INPUT, 
-			SQL_C_STINYINT, 
-			Utility::sqlDataType(SQL_C_STINYINT), 
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			SQL_PARAM_INPUT,
+			SQL_C_STINYINT,
+			Utility::sqlDataType(SQL_C_STINYINT),
 			colSize,
 			decDigits,
-			0, 
-			0, 
+			0,
+			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "SQLBindParameter()");
 		}
 	}
 
-	void getColSizeAndPrecision(std::size_t pos, 
-		SQLSMALLINT cDataType, 
-		SQLINTEGER& colSize, 
+	void getColSizeAndPrecision(std::size_t pos,
+		SQLSMALLINT cDataType,
+		SQLINTEGER& colSize,
 		SQLSMALLINT& decDigits,
 		std::size_t actualSize = 0);
 		/// Used to retrieve column size and precision.
 		/// Not all drivers cooperate with this inquiry under all circumstances
-		/// This function runs for query and stored procedure parameters (in and 
-		/// out-bound). Some drivers, however, do not care about knowing this 
-		/// information to start with. For that reason, after all the attempts 
-		/// to discover the required values are unsuccesfully exhausted, the values 
+		/// This function runs for query and stored procedure parameters (in and
+		/// out-bound). Some drivers, however, do not care about knowing this
+		/// information to start with. For that reason, after all the attempts
+		/// to discover the required values are unsuccesfully exhausted, the values
 		/// are both set to zero and no exception is thrown.
 		/// However, if the colSize is succesfully retrieved and it is greater than
 		/// session-wide maximum allowed field size, LengthExceededException is thrown.
@@ -953,7 +945,7 @@ private:
 	void getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size);
 		/// Fills the column or parameter size into the 'size' argument.
 		/// Does nothing if neither can be obtained from the driver, so
-		/// size should be set to some default value prior to calling this 
+		/// size should be set to some default value prior to calling this
 		/// function in order to avoid undefined size value.
 
 	void freeMemory();
@@ -962,9 +954,9 @@ private:
 	template<typename T>
 	void getMinValueSize(T& val, SQLINTEGER& size)
 		/// Some ODBC drivers return DB-wide maximum allowed size for variable size columns,
-		/// rather than the allowed size for the actual column. In such cases, the length is 
+		/// rather than the allowed size for the actual column. In such cases, the length is
 		/// automatically resized to the maximum field size allowed by the session.
-		/// This function, in order to prevent unnecessary memory allocation, does further 
+		/// This function, in order to prevent unnecessary memory allocation, does further
 		/// optimization, looking for the maximum length within supplied data container and
 		/// uses the smaller of maximum found and maximum predefined data length.
 	{
@@ -1000,7 +992,7 @@ private:
 	ParamMap         _inParams;
 	ParamMap         _outParams;
 	ParameterBinding _paramBinding;
-	
+
 	DateMap          _dates;
 	TimeMap          _times;
 	TimestampMap     _timestamps;

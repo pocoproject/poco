@@ -50,7 +50,7 @@ public:
 		/// for the given address family.
 		///
 		/// This is useful if certain socket options
-		/// (like send and receive buffer) sizes, that must 
+		/// (like send and receive buffer) sizes, that must
 		/// be set before connecting the socket, will be
 		/// set later on.
 
@@ -68,10 +68,10 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
 
 	void connect(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address.
 		///
 		/// Can also be used for UDP sockets. In this case, no
@@ -79,24 +79,24 @@ public:
 		/// packets are restricted to the specified address.
 
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-		/// Initializes the socket, sets the socket timeout and 
+		/// Initializes the socket, sets the socket timeout and
 		/// establishes a connection to the TCP server at the given address.
 
 	void connectNB(const SocketAddress& address);
-		/// Initializes the socket and establishes a connection to 
+		/// Initializes the socket and establishes a connection to
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
 	void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
-		
+
 	void shutdownSend();
 		/// Shuts down the sending part of the socket connection.
-		
+
 	void shutdown();
 		/// Shuts down both the receiving and the sending part
 		/// of the socket connection.
-	
+
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
 		/// the socket.
@@ -106,6 +106,9 @@ public:
 		///
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
+		///
+		/// The flags parameter can be used to pass system-defined flags
+		/// for send() like MSG_OOB.
 
 	int sendBytes(const SocketBufVec& buffer, int flags = 0);
 		/// Sends the contents of the given buffers through
@@ -113,6 +116,9 @@ public:
 		///
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
+		///
+		/// The flags parameter can be used to pass system-defined flags
+		/// for send() like MSG_OOB.
 
 	int sendBytes(Poco::FIFOBuffer& buffer);
 		/// Sends the contents of the given buffer through
@@ -126,38 +132,50 @@ public:
 		///
 		/// Certain socket implementations may also return a negative
 		/// value denoting a certain condition.
+		///
+		/// The flags parameter can be used to pass system-defined flags
+		/// for send() like MSG_OOB.
 
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
-		/// Returns the number of bytes received. 
-		/// A return value of 0 means a graceful shutdown 
+		/// Returns the number of bytes received.
+		/// A return value of 0 means a graceful shutdown
 		/// of the connection from the peer.
 		///
 		/// Throws a TimeoutException if a receive timeout has
 		/// been set and nothing is received within that interval.
 		/// Throws a NetException (or a subclass) in case of other errors.
+		///
+		/// The flags parameter can be used to pass system-defined flags
+		/// for recv() like MSG_OOB, MSG_PEEK or MSG_WAITALL.
 
 	int receiveBytes(SocketBufVec& buffer, int flags = 0);
 		/// Receives data from the socket and stores it in buffers.
 		///
 		/// Returns the number of bytes received.
+		///
+		/// The flags parameter can be used to pass system-defined flags
+		/// for recv() like MSG_OOB, MSG_PEEK or MSG_WAITALL.
 
 	int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000);
 		/// Receives data from the socket and stores it in buffers.
 		///
 		/// Returns the number of bytes received.
+		///
+		/// The flags parameter can be used to pass system-defined flags
+		/// for recv() like MSG_OOB, MSG_PEEK or MSG_WAITALL.
 
 	int receiveBytes(Poco::FIFOBuffer& buffer);
 		/// Receives data from the socket and stores it
-		/// in buffer. Up to length bytes are received. FIFOBuffer has 
-		/// writable/readable transition notifications which may be enabled 
-		/// to notify the caller when the buffer transitions between empty, 
+		/// in buffer. Up to length bytes are received. FIFOBuffer has
+		/// writable/readable transition notifications which may be enabled
+		/// to notify the caller when the buffer transitions between empty,
 		/// partially full and full states.
 		///
-		/// Returns the number of bytes received. 
-		/// A return value of 0 means a graceful shutdown 
+		/// Returns the number of bytes received.
+		/// A return value of 0 means a graceful shutdown
 		/// of the connection from the peer.
 		///
 		/// Throws a TimeoutException if a receive timeout has

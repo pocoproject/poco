@@ -46,7 +46,7 @@ TextTestResult::TextTestResult(const std::string& ignore):
 				ifs.close();
 			}
 		}
-		catch (std::exception e)
+		catch (std::exception& e)
 		{
 			std::cout << e.what() << std::endl;
 		}
@@ -147,7 +147,7 @@ void TextTestResult::addFailure(Test* test, CppUnitException* e)
 void TextTestResult::startTest(Test* test)
 {
 	TestResult::startTest(test);
-	_ostr << "\n" << shortName(test->toString()) << ": ";
+	_ostr << "\n" << shortName(test->toString()) << ": " << std::flush;
 }
 
 

@@ -47,7 +47,7 @@ public:
 		/// Connection string format:
 		///     <str> == <assignment> | <assignment> ';' <str>
 		///     <assignment> == <name> '=' <value>
-		///     <name> == 'host' | 'port' | 'user' | 'password' | 'db' | 'compress' | 'auto-reconnect' | 'reset'
+		///     <name> == 'host' | 'port' | 'user' | 'password' | 'db' | 'compress' | 'auto-reconnect' | 'reset' | 'fail-readonly'
 		///     <value> == [~;]*
 		///
 		/// The following settings are supported:
@@ -61,6 +61,9 @@ public:
 		///   - character-set: connection character set (default: utf8)
 		///   - reset: reset connection when returned to SessionPool by calling
 		///     mysql_reset_connection().
+		///   - fail-readonly: if set to true, the session will fail
+		///     if the database becomes read-only. This corresponds to
+		///     setFailIfInnoReadOnly(true).
 		///
 		/// Warning: Due to a bug in MySQL, resetting the connection with mysql_reset_connection()
 		/// could change the character encoding used for the connection. Therefore the
