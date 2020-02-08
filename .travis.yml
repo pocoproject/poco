@@ -100,6 +100,18 @@ matrix:
         - ./configure --everything --omit=PDF --config=Linux-clang && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
+    - env:    TEST_NAME="gcc (make)"
+      compiler: gcc
+      arch:
+        - amd64
+        - ppc64le
+        - s390x
+        - arm64
+
+      script:
+        - ./configure --everything --omit=PDF && make all -s -j2  && sudo make install
+        - sudo -s ./travis/runtests.sh
+
 #    - env:    TEST_NAME="arm-linux-gnueabi- (make)"
 #      script:
 #        - ./configure --omit=PDF,Data/ODBC,Data/MySQL,Crypto,NetSSL,PageCompiler && make all -s -j2 CROSS_COMPILE=arm-linux-gnueabi- POCO_TARGET_OSARCH=armv7l
