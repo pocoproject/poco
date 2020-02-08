@@ -11,6 +11,9 @@ Release 1.10.1 (2020-02-10)
 - GH #2791: allow pre-allocation of the buffer in Poco::LogStreamBuf.
 - GH #2816: Modernise TLS configuration
 - GH #2818: Add getSpecifiedPort() method in Poco::URI.
+- GH #2909: Test failures on s390x architecture with 1.10.0
+- GH #2911: Poco::UTF16Encoding and Poco::UTF32Encoding byte order conversion bug
+- GH #2912: Poco::SHA2Engine computes incorrect hash on big-endian systems
 - MySQL: resetting the session when putting it back into a SessionPool is now optional
   (and disabled by default) due to a bug in MySQL messing up the character encoding when doing so.
 - Poco::AutoPtr and Poco::SharedPtr now support comparison with nullptr.
