@@ -409,46 +409,46 @@ void SocketTest::testSelect()
 	StreamSocket ss;
 	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
 
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	readList.push_back(ss);
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 0);
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
 
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	ss.sendBytes("hello", 5);
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	ss.poll(timeout, Socket::SELECT_READ);
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	readList.push_back(ss);
 	writeList.push_back(ss);
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 2);
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (!readList.empty());
 	assertTrue (!writeList.empty());
 	assertTrue (exceptList.empty());
 
 	char buffer[256];
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	int n = ss.receiveBytes(buffer, sizeof(buffer));
-	std::cout << "EchoServer: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
-	std::cout << "EchoServer DONE: " << __LINE__ << std::endl;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 }
 
 
@@ -458,10 +458,18 @@ void SocketTest::testSelect2()
 
 	Timespan timeout(100000);
 
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
+
 	EchoServer echoServer1;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
+
 	EchoServer echoServer2;
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
+
 	StreamSocket ss1(SocketAddress("127.0.0.1", echoServer1.port()));
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	StreamSocket ss2(SocketAddress("127.0.0.1", echoServer2.port()));
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
@@ -469,18 +477,26 @@ void SocketTest::testSelect2()
 
 	readList.push_back(ss1);
 	readList.push_back(ss2);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 0);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (readList.empty());
 	assertTrue (writeList.empty());
 	assertTrue (exceptList.empty());
 
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	ss1.sendBytes("hello", 5);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	ss1.poll(timeout, Socket::SELECT_READ);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	readList.push_back(ss1);
 	readList.push_back(ss2);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 1);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 
 	assertTrue (readList.size() == 1);
 	assertTrue (readList[0] == ss1);
@@ -488,7 +504,9 @@ void SocketTest::testSelect2()
 	assertTrue (exceptList.empty());
 
 	char buffer[256];
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (n == 5);
 
 	readList.clear();
@@ -496,32 +514,40 @@ void SocketTest::testSelect2()
 	exceptList.clear();
 	writeList.push_back(ss1);
 	writeList.push_back(ss2);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (Socket::select(readList, writeList, exceptList, timeout) == 2);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	assertTrue (readList.empty());
 	assertTrue (writeList.size() == 2);
 	assertTrue (writeList[0] == ss1);
 	assertTrue (writeList[1] == ss2);
 	assertTrue (exceptList.empty());
 
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	ss1.close();
 	ss2.close();
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 }
 
 
 void SocketTest::testSelect3()
 {
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	Socket::SocketList readList;
 	Socket::SocketList writeList;
 	Socket::SocketList exceptList;
 	Timespan timeout(1000);
 
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 	int rc = Socket::select(readList, writeList, exceptList, timeout);
 	assertTrue (rc == 0);
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 }
 
 
 void SocketTest::testEchoUnixLocal()
 {
+	std::cout << __FUNCTION__ << ": " << __LINE__ << std::endl;
 #if defined(POCO_OS_FAMILY_UNIX)
 #if POCO_OS == POCO_OS_ANDROID
 	Poco::File socketFile("/data/local/tmp/SocketTest.sock");
