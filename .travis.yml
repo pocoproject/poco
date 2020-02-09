@@ -127,7 +127,7 @@ jobs:
       compiler: gcc
       script:
         # skip some libs due to build timeout
-        - ./configure --everything --omit=PDF,Data/ODBC,Data/PostgreSQL,MongoDB,Redis && make all -s -j2  && sudo make install
+        - ./configure --everything --omit=PDF,Data/ODBC,Data/PostgreSQL,Redis && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, make, ppc64le)
@@ -138,11 +138,10 @@ jobs:
         apt:
           packages:
             - libssl-dev
-            - unixodbc-dev
             - libmysqlclient-dev
       compiler: gcc
       script:
-        - ./configure --everything --omit=PDF,Redis,MongoDB && make all -s -j2  && sudo make install
+        - ./configure --everything --omit=PDF,Data/ODBC,Data/PostgreSQL,Redis && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, make, s390x)
@@ -157,7 +156,7 @@ jobs:
             - libmysqlclient-dev
       compiler: gcc
       script:
-        - ./configure --everything --omit=PDF,Redis,MongoDB && make all -s -j2  && sudo make install
+        - ./configure --everything --omit=PDF,Redis && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: macOS (clang, make)
@@ -168,7 +167,7 @@ jobs:
           packages:
             - openssl
       script:
-        - ./configure --everything --no-prefix --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL && make all -s -j2  && sudo make install
+        - ./configure --everything --no-prefix --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL,Redis && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, cmake)
