@@ -184,7 +184,7 @@ jobs:
             - unixodbc-dev
             - libmysqlclient-dev
       script:
-        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` PATH=$PWD/cmake-3.5.1-Linux-x86_64/bin:$PATH ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
+        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
 
     - name: Linux (clang, cmake)
       os: linux
@@ -200,7 +200,7 @@ jobs:
             - unixodbc-dev
             - libmysqlclient-dev
       script:
-        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` PATH=$PWD/cmake-3.5.1-Linux-x86_64/bin:$PATH ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
+        - cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
 
     - name: Linux cross (arm-linux-gnueabi-g++, cmake)
       os: linux
