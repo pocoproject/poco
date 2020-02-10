@@ -68,13 +68,14 @@ void CodeWriter::writeImpl(std::ostream& ostr, const std::string& headerFileName
 		ostr << "#include \"Poco/StreamCopier.h\"\n";
 		ostr << "#include <sstream>\n";
 	}
-	ostr << "\n\nusing namespace std::string_literals;\n\n";
 
 	std::string decls(_page.implDecls().str());
 	if (!decls.empty())
 	{
 		ostr << decls << "\n\n";
 	}
+
+	ostr << "using namespace std::string_literals;\n\n\n";
 
 	beginNamespace(ostr);
 
