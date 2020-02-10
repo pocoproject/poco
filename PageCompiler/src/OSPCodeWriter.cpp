@@ -107,14 +107,14 @@ void OSPCodeWriter::writeSession(std::ostream& ostr)
 		std::string sessionCode;
 		if (session.empty()) return;
 		if (session[0] == '@')
-			sessionCode = "context()->thisBundle()->properties().getString(\"" + session.substr(1) + "\")";
+			sessionCode = "context()->thisBundle()->properties().getString(\"" + session.substr(1) + "\"s)";
 		else
-			sessionCode = "\"" + session + "\"";
+			sessionCode = "\"" + session + "\"s";
 		std::string sessionTimeoutCode = page().get("page.sessionTimeout", "30");
 		int sessionTimeout;
 		if (!Poco::NumberParser::tryParse(sessionTimeoutCode, sessionTimeout))
 		{
-			sessionTimeoutCode = "context()->thisBundle()->properties().getInt(\"" + sessionTimeoutCode + "\")";
+			sessionTimeoutCode = "context()->thisBundle()->properties().getInt(\"" + sessionTimeoutCode + "\"s)";
 		}
 		ostr << "\tPoco::OSP::Web::WebSession::Ptr session;\n";
 		ostr << "\t{\n";
