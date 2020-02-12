@@ -24,7 +24,7 @@ POCO_SOURCES_AUTO_PLAT( SRCS WIN32
 endif()
 
 # Version Resource
-if(MSVC AND NOT POCO_STATIC)
+if(MSVC AND BUILD_SHARED_LIBS)
     source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
     list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
@@ -226,7 +226,7 @@ POCO_INSTALL(Foundation)
 POCO_GENERATE_PACKAGE(Foundation)
 
 if (ENABLE_TESTS)
-	if(POCO_STATIC)
+	if(NOT BUILD_SHARED_LIBS)
 	  set_property(TARGET Foundation PROPERTY POSITION_INDEPENDENT_CODE ON) # This is needed to build TestLibrary.so as shared.
 	endif()
 	add_subdirectory(samples)

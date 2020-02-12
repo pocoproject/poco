@@ -53,20 +53,15 @@ endif()
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-option(POCO_STATIC
-  "Set to OFF|ON (default is OFF) to control build of POCO as STATIC library" OFF)
-if(POCO_STATIC)
-    option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-else()
-    option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-endif()
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
 if(MSVC)
-    option(POCO_MT
-      "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
-
-    option(ENABLE_MSVC_MP
-      "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" OFF)
+    option(POCO_MT "Set to OFF|ON (default is OFF) to control build of POCO as /MT instead of /MD" OFF)
+    option(ENABLE_MSVC_MP "Set to OFF|ON (default is OFF) to control parallel build of POCO with MSVC" ON)
+    
+    if(BUILD_SHARED_LIBS AND POCO_MT)
+      message(FATAL_ERROR "Cannot have both BUILD_SHARED_LIBS and POCO_MT")
+    endif()
 
     # allow disabling of internally built OpenSSL# (see below for details)
     # if POCO pre-built OpenSSL directory is found, and POCO_DISABLE_INTERNAL_OPENSSL=OFF,
