@@ -7,7 +7,7 @@ file(GLOB_RECURSE HDRS_G "include/*.h" )
 POCO_HEADERS_AUTO( MYSQL_SRCS ${HDRS_G})
 
 # Version Resource
-if(MSVC AND NOT POCO_STATIC)
+if(MSVC AND BUILD_SHARED_LIBS)
     source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
     list(APPEND MYSQL_SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()

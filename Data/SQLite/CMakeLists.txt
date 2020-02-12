@@ -20,7 +20,7 @@ else()
 endif()
 
 # Version Resource
-if(MSVC AND NOT POCO_STATIC)
+if(MSVC AND BUILD_SHARED_LIBS)
     source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
     list(APPEND SQLITE_SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
