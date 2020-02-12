@@ -125,6 +125,7 @@ void WinService::unregisterService()
 	open();
 	if (!DeleteService(_svcHandle))
 		throw SystemException("cannot unregister service", _name);
+	close();
 }
 
 
@@ -236,10 +237,17 @@ WinService::Startup WinService::getStartup() const
 
 void WinService::setFailureActions(FailureActionVector failureActions, const std::string& command, const std::string& rebootMessage)
 {
+
+	if (failureActions.size() > 3) {
+		throw InvalidArgumentException{ "Only 0-3 Failure Actions are supported" };
+	}
+
 	open();
-	auto actions = new SC_ACTION[3];
+	auto actions = new SC_ACTION[failureActions.size()];
 	SERVICE_FAILURE_ACTIONSW ac;
-	
+	ac.lpCommand = NULL;
+	ac.lpRebootMsg = NULL;
+
 	std::wstring urebootMessage;
 	Poco::UnicodeConverter::toUTF16(rebootMessage, urebootMessage);
 	std::vector<wchar_t> rebootMessageVector{ urebootMessage.begin(), urebootMessage.end() };
@@ -250,7 +258,7 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 	std::vector<wchar_t> commandVector{ uComamnd.begin(), uComamnd.end() };
 	commandVector.push_back('\0');
 
-	for (auto i = 0; i < 3; i++) 		
+	for (auto i = 0; i < failureActions.size(); i++) 		
 	{
 		switch (failureActions[i].type) 
 		{
@@ -276,7 +284,7 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 	}
 
 	ac.dwResetPeriod = 0;
-	ac.cActions = 3;
+	ac.cActions = failureActions.size();
 	ac.lpsaActions = actions;
 
 	if (!ChangeServiceConfig2W(_svcHandle, SERVICE_CONFIG_FAILURE_ACTIONS, &ac))
