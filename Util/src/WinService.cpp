@@ -125,6 +125,7 @@ void WinService::unregisterService()
 	open();
 	if (!DeleteService(_svcHandle))
 		throw SystemException("cannot unregister service", _name);
+	close();
 }
 
 
