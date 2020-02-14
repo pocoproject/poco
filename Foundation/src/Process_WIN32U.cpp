@@ -176,14 +176,14 @@ bool ProcessImpl::mustEscapeArg(const std::string& arg)
 			inQuotes = !inQuotes;
 		}
 	}
-	return result && !inQuotes;
+	return result || inQuotes;
 }
 
 
 // Based on code from https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
 std::string ProcessImpl::escapeArg(const std::string& arg)
 {
-	if (mostEscapeArg(arg))
+	if (mustEscapeArg(arg))
 	{
 		std::string quotedArg("\"");
 		for (std::string::const_iterator it = arg.begin(); ; ++it)
@@ -214,10 +214,7 @@ std::string ProcessImpl::escapeArg(const std::string& arg)
 		quotedArg.push_back('"');
 		return quotedArg;
 	}
-	else
-	{
-		return arg;
-	}
+	else return arg;
 }
 
 
