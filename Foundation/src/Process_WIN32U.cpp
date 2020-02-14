@@ -164,16 +164,25 @@ bool ProcessImpl::mustEscapeArg(const std::string& arg)
 {
 	bool result = false;
 	bool inQuotes = false;
+	bool escaped = false;
 	for (char c: arg)
 	{
-		if (Poco::Ascii::isSpace(c) && !inQuotes)
+		if (Poco::Ascii::isSpace(c) && !inQuotes && !escaped)
 		{
 			result = true;
 			break;
 		}
-		else if (c == '"')
+		else if (c == '"' && !escaped)
 		{
 			inQuotes = !inQuotes;
+		}
+		else if (c == '\\' && !escaped)
+		{
+			escaped = true;
+		}
+		else
+		{
+			escaped = false;
 		}
 	}
 	return result || inQuotes;
