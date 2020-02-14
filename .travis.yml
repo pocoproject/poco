@@ -123,11 +123,10 @@ jobs:
         apt:
           packages:
             - libssl-dev
-            - libmysqlclient-dev
       compiler: gcc
       script:
         # skip some libs due to build timeout
-        - ./configure --everything --omit=PDF,Data/ODBC,Data/PostgreSQL,Redis && make all -s -j2  && sudo make install
+        - ./configure --everything --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL,MongoDB,Redis && make all -s -j2  && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, make, ppc64le)

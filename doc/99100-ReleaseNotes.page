@@ -16,6 +16,11 @@ AAAIntroduction
   - GH #2909: Test failures on s390x architecture with 1.10.0
   - GH #2911: Poco::UTF16Encoding and Poco::UTF32Encoding byte order conversion bug
   - GH #2912: Poco::SHA2Engine computes incorrect hash on big-endian systems
+  - GH #2923: cmake: Version 1.10.0 not parsed correctly from VERSION file
+  - GH #2908: [Windows] Process arguments quoting is broken.
+  - GH #2894: Poco 1.10.0 doesn't build with cmake & POCO_UNBUNDLED
+  - GH #2920: Close Service Handle after DeleteService Function call
+  - GH #2919: Fixed Crash in WinService::setFailureActions
   - MySQL: resetting the session when putting it back into a SessionPool is now optional
     (and disabled by default) due to a bug in MySQL messing up the character encoding when doing so.
   - Poco::AutoPtr and Poco::SharedPtr now support comparison with nullptr.

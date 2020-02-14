@@ -21,6 +21,7 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
+#include "Poco/Ascii.h"
 
 
 namespace
@@ -159,21 +160,30 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-static bool argNeedsEscaping(const std::string& arg)
+bool ProcessImpl::mustEscapeArg(const std::string& arg)
 {
-	bool containsQuotableChar = std::string::npos != arg.find_first_of(" \t\n\v\"");
-	// Assume args that start and end with quotes are already quoted and do not require further quoting.
-	// There is probably code out there written before launch() escaped the arguments that does its own
-	// escaping of arguments. This ensures we do not interfere with those arguments.
-	bool isAlreadyQuoted = arg.size() > 1 && '\"' == arg[0] && '\"' == arg[arg.size() - 1];
-	return containsQuotableChar && !isAlreadyQuoted;
+	bool result = false;
+	bool inQuotes = false;
+	for (char c: arg)
+	{
+		if (Poco::Ascii::isSpace(c) && !inQuotes)
+		{
+			result = true;
+			break;
+		}
+		else if (c == '"')
+		{
+			inQuotes = !inQuotes;
+		}
+	}
+	return result || inQuotes;
 }
 
 
 // Based on code from https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
-static std::string escapeArg(const std::string& arg)
+std::string ProcessImpl::escapeArg(const std::string& arg)
 {
-	if (argNeedsEscaping(arg))
+	if (mustEscapeArg(arg))
 	{
 		std::string quotedArg("\"");
 		for (std::string::const_iterator it = arg.begin(); ; ++it)
@@ -204,10 +214,7 @@ static std::string escapeArg(const std::string& arg)
 		quotedArg.push_back('"');
 		return quotedArg;
 	}
-	else
-	{
-		return arg;
-	}
+	else return arg;
 }
 
 

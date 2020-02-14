@@ -1,8 +1,8 @@
 
 if(EXISTS "$ENV{ANDROID_HOME}")
-  set(ANDROID_SDK "$ENV{ANDROID_HOME}")
+	set(ANDROID_SDK "$ENV{ANDROID_HOME}")
 else()
-  set(ANDROID_SDK "${ANDROID_NDK}/..")
+	set(ANDROID_SDK "${ANDROID_NDK}/..")
 endif()
 message(STATUS "ANDROID_SDK path .... ${ANDROID_SDK}")
 get_filename_component(UNITTEST_FILENAME ${UNITTEST} NAME)
@@ -15,7 +15,7 @@ endforeach()
 message(STATUS "Push ignored.sh to android ...")
 execute_process(COMMAND ${ANDROID_SDK}/platform-tools/adb push ${CMAKE_CURRENT_LIST_DIR}/../travis/ignored.sh /data/local/tmp/ OUTPUT_QUIET)
 message(STATUS "Push ${LIBRARY_DIR} to android ...")
-execute_process(COMMAND ${ANDROID_SDK}/platform-tools/adb push ${LIBRARY_DIR} /data/local/tmp/ OUTPUT_QUIET)                       
+execute_process(COMMAND ${ANDROID_SDK}/platform-tools/adb push ${LIBRARY_DIR} /data/local/tmp/ OUTPUT_QUIET)
 message(STATUS "Push ${UNITTEST} to android ...")
 execute_process(COMMAND ${ANDROID_SDK}/platform-tools/adb push ${UNITTEST} /data/local/tmp/ OUTPUT_QUIET)
 message(STATUS "Execute ${UNITTEST_FILENAME} ${TEST_PARAMETER} on android ...")
@@ -25,7 +25,7 @@ execute_process(
    OUTPUT_VARIABLE _OUT
    ERROR_VARIABLE _ERR
 )
-                
+
 if(_RESULT)
     execute_process(COMMAND ls -l ${UNITTEST})
     execute_process(COMMAND ${ANDROID_SDK}/platform-tools/adb shell "ls -R /data/local/tmp")

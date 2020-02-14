@@ -45,8 +45,8 @@ template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
 union Placeholder
 	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
 	/// object optimization, when enabled).
-	/// 
-	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
+	///
+	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
 	/// it will be placement-new-allocated into the local buffer
 	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
 	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
@@ -91,7 +91,7 @@ public:
 private:
 #endif
 	typedef typename std::aligned_storage<SizeV + 1>::type AlignerType;
-	
+
 	PlaceholderT* pHolder;
 	mutable char  holder[SizeV + 1];
 	AlignerType   aligner;
@@ -110,8 +110,8 @@ template <typename PlaceholderT>
 union Placeholder
 	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
 	/// object optimization, when enabled).
-	/// 
-	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage, 
+	///
+	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
 	/// it will be placement-new-allocated into the local buffer
 	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
 	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
@@ -131,7 +131,7 @@ public:
 #if !defined(POCO_MSVC_VERSION) || (defined(POCO_MSVC_VERSION) && (POCO_MSVC_VERSION > 80))
 private:
 #endif
-	
+
 	PlaceholderT* pHolder;
 
 	friend class Any;
@@ -167,8 +167,8 @@ public:
 	Any(const ValueType & value)
 		/// Creates an any which stores the init parameter inside.
 		///
-		/// Example: 
-		///   Any a(13); 
+		/// Example:
+		///   Any a(13);
 		///   Any a(string("12345"));
 	{
 		construct(value);
@@ -196,7 +196,7 @@ public:
 
 	Any& swap(Any& other)
 		/// Swaps the content of the two Anys.
-		/// 
+		///
 		/// When small object optimization is enabled, swap only
 		/// has no-throw guarantee when both (*this and other)
 		/// objects are allocated on the heap.
@@ -230,14 +230,14 @@ public:
 	Any& operator = (const ValueType& rhs)
 		/// Assignment operator for all types != Any.
 		///
-		/// Example: 
-		///   Any a = 13; 
+		/// Example:
+		///   Any a = 13;
 		///   Any a = string("12345");
 	{
 		construct(rhs);
 		return *this;
 	}
-	
+
 	Any& operator = (const Any& rhs)
 		/// Assignment operator for Any.
 	{
@@ -248,14 +248,14 @@ public:
 
 		return *this;
 	}
-	
+
 	bool empty() const
 		/// Returns true if the Any is empty.
 	{
 		char buf[POCO_SMALL_OBJECT_SIZE] = { 0 };
 		return 0 == std::memcmp(_valueHolder.holder, buf, POCO_SMALL_OBJECT_SIZE);
 	}
-	
+
 	const std::type_info & type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
@@ -335,7 +335,7 @@ private:
 		else
 			_valueHolder.erase();
 	}
-	
+
 	void destruct()
 	{
 		content()->~ValueHolder();
@@ -357,8 +357,8 @@ private:
 		_pHolder(new Holder<ValueType>(value))
 		/// Creates an any which stores the init parameter inside.
 		///
-		/// Example: 
-		///	 Any a(13); 
+		/// Example:
+		///	 Any a(13);
 		///	 Any a(string("12345"));
 	{
 	}
@@ -385,8 +385,8 @@ private:
 	Any& operator = (const ValueType& rhs)
 		/// Assignment operator for all types != Any.
 		///
-		/// Example: 
-		///   Any a = 13; 
+		/// Example:
+		///   Any a = 13;
 		///   Any a = string("12345");
 	{
 		Any(rhs).swap(*this);
@@ -428,7 +428,7 @@ private:
 	template <typename ValueType>
 	class Holder: public ValueHolder
 	{
-	public: 
+	public:
 		Holder(const ValueType& value):
 			_held(value)
 		{
@@ -480,9 +480,9 @@ private:
 template <typename ValueType>
 ValueType* AnyCast(Any* operand)
 	/// AnyCast operator used to extract the ValueType from an Any*. Will return a pointer
-	/// to the stored value. 
+	/// to the stored value.
 	///
-	/// Example Usage: 
+	/// Example Usage:
 	///	 MyType* pTmp = AnyCast<MyType*>(pAny).
 	/// Will return NULL if the cast fails, i.e. types don't match.
 {
@@ -495,7 +495,7 @@ ValueType* AnyCast(Any* operand)
 template <typename ValueType>
 const ValueType* AnyCast(const Any* operand)
 	/// AnyCast operator used to extract a const ValueType pointer from an const Any*. Will return a const pointer
-	/// to the stored value. 
+	/// to the stored value.
 	///
 	/// Example Usage:
 	///	 const MyType* pTmp = AnyCast<MyType*>(pAny).
@@ -509,7 +509,7 @@ template <typename ValueType>
 ValueType AnyCast(Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an Any&.
 	///
-	/// Example Usage: 
+	/// Example Usage:
 	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
 	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& tmp = ...
@@ -540,7 +540,7 @@ template <typename ValueType>
 ValueType AnyCast(const Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
 	///
-	/// Example Usage: 
+	/// Example Usage:
 	///	 MyType tmp = AnyCast<MyType>(anAny).
 	/// Will throw a BadCastException if the cast fails.
 	/// Do not use an AnyCast in combination with references, i.e. MyType& tmp = ... or const MyType& = ...
@@ -555,20 +555,24 @@ ValueType AnyCast(const Any& operand)
 
 template <typename ValueType>
 const ValueType& RefAnyCast(const Any & operand)
-	/// AnyCast operator used to return a const reference to the internal data. 
+	/// AnyCast operator used to return a const reference to the internal data.
 	///
-	/// Example Usage: 
+	/// Example Usage:
 	///	 const MyType& tmp = RefAnyCast<MyType>(anAny);
 {
 	ValueType* result = AnyCast<ValueType>(const_cast<Any*>(&operand));
-	std::string s = "RefAnyCast: Failed to convert between Any types ";
-	if (operand._pHolder)
+	if (!result)
 	{
-		s.append(1, '(');
-		s.append(operand._pHolder->type().name());
-		s.append(" => ");
-		s.append(typeid(ValueType).name());
-		s.append(1, ')');
+		std::string s = "RefAnyCast: Failed to convert between Any types ";
+		if (operand._pHolder)
+		{
+			s.append(1, '(');
+			s.append(operand._pHolder->type().name());
+			s.append(" => ");
+			s.append(typeid(ValueType).name());
+			s.append(1, ')');
+		}
+		throw BadCastException(s);
 	}
 	return *result;
 }
@@ -578,7 +582,7 @@ template <typename ValueType>
 ValueType& RefAnyCast(Any& operand)
 	/// AnyCast operator used to return a reference to the internal data.
 	///
-	/// Example Usage: 
+	/// Example Usage:
 	///	 MyType& tmp = RefAnyCast<MyType>(anAny);
 {
 	ValueType* result = AnyCast<ValueType>(&operand);
