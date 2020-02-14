@@ -75,6 +75,8 @@ public:
 	static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 	static std::string terminationEventName(PIDImpl pid);
+	static bool mustEscapeArg(const std::string& arg);
+	static std::string escapeArg(const std::string& arg);
 };
 
 
