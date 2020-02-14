@@ -142,7 +142,7 @@ int HelpFormatter::calcIndent() const
 		}
 		n += 2;
 		if (n > indent)
-			indent = n;
+			indent = static_cast<int>(n);
 	}
 	return indent;
 }
