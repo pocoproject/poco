@@ -453,7 +453,7 @@ install(
 		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}Config.cmake
 		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
 	DESTINATION
-		"lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}"
+		"${PocoConfigPackageLocation}"
 	COMPONENT
 		Devel
 )
