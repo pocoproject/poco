@@ -21,6 +21,7 @@ AAAIntroduction
   - GH #2894: Poco 1.10.0 doesn't build with cmake & POCO_UNBUNDLED
   - GH #2920: Close Service Handle after DeleteService Function call
   - GH #2919: Fixed Crash in WinService::setFailureActions
+  - GH #2922: 1.10 cmake build fails on FreeBSD 11.2 Release
   - MySQL: resetting the session when putting it back into a SessionPool is now optional
     (and disabled by default) due to a bug in MySQL messing up the character encoding when doing so.
   - Poco::AutoPtr and Poco::SharedPtr now support comparison with nullptr.
