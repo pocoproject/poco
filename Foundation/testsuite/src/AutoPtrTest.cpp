@@ -37,39 +37,39 @@ namespace
 		TestObj(int value1, const std::string& value2): _rc(1)
 		{
 		}
-				
+
 		void duplicate()
 		{
 			++_rc;
 		}
-		
+
 		void release()
 		{
 			if (--_rc == 0)
 				delete this;
 		}
-		
+
 		int rc() const
 		{
 			return _rc;
 		}
-		
+
 		static int count()
 		{
 			return _count;
 		}
-		
+
 	protected:
 		~TestObj()
 		{
 			--_count;
 		}
-		
+
 	private:
 		int _rc;
 		static int _count;
 	};
-	
+
 	int TestObj::_count = 0;
 }
 
@@ -137,27 +137,27 @@ void AutoPtrTest::testOps()
 	assertTrue (ptr2 == pTO2);
 	assertTrue (ptr3.get() == pTO1);
 	assertTrue (ptr3 == pTO1);
-	
+
 	assertTrue (ptr1 == pTO1);
 	assertTrue (ptr1 != pTO2);
 	assertTrue (ptr1 < pTO2);
 	assertTrue (ptr1 <= pTO2);
 	assertTrue (ptr2 > pTO1);
 	assertTrue (ptr2 >= pTO1);
-	
+
 	assertTrue (ptr1 == ptr3);
 	assertTrue (ptr1 != ptr2);
 	assertTrue (ptr1 < ptr2);
 	assertTrue (ptr1 <= ptr2);
 	assertTrue (ptr2 > ptr1);
 	assertTrue (ptr2 >= ptr1);
-	
+
 	ptr1 = pTO1;
 	ptr2 = pTO2;
 	ptr1.swap(ptr2);
 	assertTrue (ptr2.get() == pTO1);
 	assertTrue (ptr1.get() == pTO2);
-		
+
 	try
 	{
 		assertTrue (ptr4->rc() > 0);
@@ -171,14 +171,17 @@ void AutoPtrTest::testOps()
 	assertTrue (!(ptr4 == ptr2));
 	assertTrue (ptr4 != ptr1);
 	assertTrue (ptr4 != ptr2);
-	
+
 	ptr4 = ptr2;
 	assertTrue (ptr4 == ptr2);
 	assertTrue (!(ptr4 != ptr2));
-	
+
 	assertTrue (!(!ptr1));
 	ptr1 = 0;
 	assertTrue (!ptr1);
+
+	assertTrue (ptr1 == nullptr);
+	assertTrue (ptr2 != nullptr);
 }
 
 

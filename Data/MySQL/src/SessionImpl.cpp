@@ -48,6 +48,7 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
 	_connector("MySQL"),
 	_handle(0),
+	_reset(false),
 	_connected(false),
 	_inTransaction(false),
 	_failIfInnoReadOnly(false),
@@ -90,6 +91,8 @@ void SessionImpl::open(const std::string& connect)
 	options["auto-reconnect"] = "";
 	options["secure-auth"] = "";
 	options["character-set"] = "utf8";
+	options["reset"] = "";
+	options["fail-readonly"] = "";
 
 	const std::string& connString = connectionString();
 	for (std::string::const_iterator start = connString.begin();;)
@@ -123,14 +126,14 @@ void SessionImpl::open(const std::string& connect)
 	else if (options["compress"] == "false")
 		;
 	else if (!options["compress"].empty())
-		throw MySQLException("create session: specify correct compress option (true or false) or skip it");
+		throw MySQLException("create session: specify correct compress option (true or false)");
 
 	if (options["auto-reconnect"] == "true")
 		_handle.options(MYSQL_OPT_RECONNECT, true);
 	else if (options["auto-reconnect"] == "false")
 		_handle.options(MYSQL_OPT_RECONNECT, false);
 	else if (!options["auto-reconnect"].empty())
-		throw MySQLException("create session: specify correct auto-reconnect option (true or false) or skip it");
+		throw MySQLException("create session: specify correct auto-reconnect option (true or false)");
 
 #ifdef MYSQL_SECURE_AUTH
 	if (options["secure-auth"] == "true")
@@ -138,11 +141,25 @@ void SessionImpl::open(const std::string& connect)
 	else if (options["secure-auth"] == "false")
 		_handle.options(MYSQL_SECURE_AUTH, false);
 	else if (!options["secure-auth"].empty())
-		throw MySQLException("create session: specify correct secure-auth option (true or false) or skip it");
+		throw MySQLException("create session: specify correct secure-auth option (true or false)");
 #endif
 
 	if (!options["character-set"].empty())
 		_handle.options(MYSQL_SET_CHARSET_NAME, options["character-set"].c_str());
+
+	if (options["reset"] == "true")
+		_reset = true;
+	else if (options["reset"] == "false")
+		_reset = false;
+	else if (!options["reset"].empty())
+		throw MySQLException("create session: specify correct reset option (true or false)");
+
+	if (options["fail-readonly"] == "true")
+		_failIfInnoReadOnly = true;
+	else if (options["fail-readonly"] == "false")
+		_failIfInnoReadOnly = false;
+	else if (!options["fail-readonly"].empty())
+		throw MySQLException("create session: specify correct fail-readonly option (true or false)");
 
 	// Real connect
 	_handle.connect(options["host"].c_str(),
@@ -264,8 +281,10 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 
 void SessionImpl::reset()
 {
-	if (_connected)
+	if (_connected && _reset)
+	{
 		_handle.reset();
+	}
 }
 
 

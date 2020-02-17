@@ -28,27 +28,27 @@ namespace
 		{
 			++_count;
 		}
-		
+
 		virtual ~TestObject()
 		{
 			--_count;
 		}
-		
+
 		const std::string& data()
 		{
 			return _data;
 		}
-		
+
 		static int count()
 		{
 			return _count;
 		}
-		
+
 	private:
 		std::string _data;
 		static int _count;
 	};
-	
+
 	int TestObject::_count = 0;
 
 	class DerivedObject: public TestObject
@@ -62,7 +62,7 @@ namespace
 		{
 			return _number;
 		}
-		
+
 	private:
 		int _number;
 	};
@@ -83,7 +83,10 @@ void SharedPtrTest::testSharedPtr()
 {
 	SharedPtr<TestObject> ptr1;
 	assertNull(ptr1.get());
+	assertTrue (ptr1 == nullptr);
+
 	TestObject* pTO1 = new TestObject("one");
+
 	TestObject* pTO2 = new TestObject("two");
 	if (pTO2 < pTO1)
 	{
@@ -93,6 +96,8 @@ void SharedPtrTest::testSharedPtr()
 	}
 	assertTrue (pTO1 < pTO2);
 	ptr1 = pTO1;
+	assertTrue (ptr1 != nullptr);
+
 	assertTrue (ptr1.referenceCount() == 1);
 	SharedPtr<TestObject> ptr2 = pTO2;
 	SharedPtr<TestObject> ptr3 = ptr1;
@@ -104,27 +109,27 @@ void SharedPtrTest::testSharedPtr()
 	assertTrue (ptr2 == pTO2);
 	assertTrue (ptr3.get() == pTO1);
 	assertTrue (ptr3 == pTO1);
-	
+
 	assertTrue (ptr1 == pTO1);
 	assertTrue (ptr1 != pTO2);
 	assertTrue (ptr1 < pTO2);
 	assertTrue (ptr1 <= pTO2);
 	assertTrue (ptr2 > pTO1);
 	assertTrue (ptr2 >= pTO1);
-	
+
 	assertTrue (ptr1 == ptr3);
 	assertTrue (ptr1 != ptr2);
 	assertTrue (ptr1 < ptr2);
 	assertTrue (ptr1 <= ptr2);
 	assertTrue (ptr2 > ptr1);
 	assertTrue (ptr2 >= ptr1);
-	
+
 	ptr1.swap(ptr2);
 	assertTrue (ptr2 < ptr1);
 	ptr2.swap(ptr1);
 
 	assertTrue ((ptr1->data() == "one" && ptr2->data() == "two") || (ptr1->data() == "two" && ptr2->data() == "one"));
-	
+
 	try
 	{
 		assertTrue (ptr4->data() == "four");
@@ -133,23 +138,23 @@ void SharedPtrTest::testSharedPtr()
 	catch (NullPointerException&)
 	{
 	}
-	
+
 	assertTrue (!(ptr4 == ptr1));
 	assertTrue (!(ptr4 == ptr2));
 	assertTrue (ptr4 != ptr1);
 	assertTrue (ptr4 != ptr2);
-	
+
 	ptr4 = ptr2;
 	assertTrue (ptr4 == ptr2);
 	assertTrue (!(ptr4 != ptr2));
-	
+
 	assertTrue (TestObject::count() == 2);
 	ptr1 = 0;
 	ptr2 = 0;
 	ptr3 = 0;
 	ptr4 = 0;
 	assertTrue (TestObject::count() == 0);
-	
+
 	{
 		SharedPtr<TestObject> ptr = new TestObject("");
 		assertTrue (TestObject::count() == 1);

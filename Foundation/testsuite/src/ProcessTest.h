@@ -24,6 +24,7 @@ public:
 	ProcessTest(const std::string& name);
 	~ProcessTest();
 
+	void testEscapeArgs();
 	void testLaunch();
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();

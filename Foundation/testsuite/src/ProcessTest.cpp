@@ -16,6 +16,7 @@
 #include "Poco/PipeStream.h"
 
 
+using namespace std::string_literals;
 using Poco::Process;
 using Poco::ProcessHandle;
 using Poco::Pipe;
@@ -30,6 +31,24 @@ ProcessTest::ProcessTest(const std::string& name): CppUnit::TestCase(name)
 
 ProcessTest::~ProcessTest()
 {
+}
+
+
+void ProcessTest::testEscapeArgs()
+{
+#if defined(_WIN32)
+	assertTrue (Poco::ProcessImpl::mustEscapeArg("a b"));
+	assertFalse (Poco::ProcessImpl::mustEscapeArg("abc"));
+	assertFalse (Poco::ProcessImpl::mustEscapeArg("\"a b \""));
+	assertFalse (Poco::ProcessImpl::mustEscapeArg("\"abc\""));
+	assertTrue (Poco::ProcessImpl::mustEscapeArg("\"a b "));
+	assertFalse (Poco::ProcessImpl::mustEscapeArg("/arg=\"a b c\""));
+
+	assertEquals ("abc"s, Poco::ProcessImpl::escapeArg("abc"));
+	assertEquals ("\"a b c\""s, Poco::ProcessImpl::escapeArg("a b c"));
+	assertEquals ("\"a b \\\" c\""s, Poco::ProcessImpl::escapeArg("a b \" c"));
+	assertEquals ("/arg=\"a b c\""s, Poco::ProcessImpl::escapeArg("/arg=\"a b c\""));
+#endif
 }
 
 
@@ -253,6 +272,7 @@ CppUnit::Test* ProcessTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ProcessTest");
 
+	CppUnit_addTest(pSuite, ProcessTest, testEscapeArgs);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunch);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectIn);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);

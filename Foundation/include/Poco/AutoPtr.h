@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <cstddef>
 
 
 namespace Poco {
@@ -306,6 +307,11 @@ public:
 		return _ptr == ptr;
 	}
 
+	bool operator == (std::nullptr_t ptr) const
+	{
+		return _ptr == ptr;
+	}
+
 	bool operator != (const AutoPtr& ptr) const
 	{
 		return _ptr != ptr._ptr;
@@ -317,6 +323,11 @@ public:
 	}
 
 	bool operator != (C* ptr) const
+	{
+		return _ptr != ptr;
+	}
+
+	bool operator != (std::nullptr_t ptr) const
 	{
 		return _ptr != ptr;
 	}

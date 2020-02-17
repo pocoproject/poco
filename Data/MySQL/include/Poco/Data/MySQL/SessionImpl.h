@@ -41,19 +41,33 @@ public:
 	static const std::string MYSQL_REPEATABLE_READ;
 	static const std::string MYSQL_SERIALIZABLE;
 
-	SessionImpl(const std::string& connectionString,
-		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
-		/// Creates the SessionImpl. Opens a connection to the database
+	SessionImpl(const std::string& connectionString, std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
+		/// Creates the SessionImpl. Opens a connection to the database.
 		///
 		/// Connection string format:
 		///     <str> == <assignment> | <assignment> ';' <str>
 		///     <assignment> == <name> '=' <value>
-		///     <name> == 'host' | 'port' | 'user' | 'password' | 'db' } 'compress' | 'auto-reconnect'
+		///     <name> == 'host' | 'port' | 'user' | 'password' | 'db' | 'compress' | 'auto-reconnect' | 'reset' | 'fail-readonly'
 		///     <value> == [~;]*
 		///
-		/// for compress and auto-reconnect correct values are true/false
-		/// for port - numeric in decimal notation
+		/// The following settings are supported:
+		///   - host: MySQL server hostname or IP address (default: localhost)
+		///   - port: MySQL server port number (default: 3306)
+		///   - user: MySQL user name
+		///   - password: MySQL password
+		///   - compress: enable compression (true/false; default: false)
+		///   - auto-reconnect: enable automatic reconnect (true/false; default: false)
+		///   - secure-auth: use secure authentication (true/false; default: false)
+		///   - character-set: connection character set (default: utf8)
+		///   - reset: reset connection when returned to SessionPool by calling
+		///     mysql_reset_connection().
+		///   - fail-readonly: if set to true, the session will fail
+		///     if the database becomes read-only. This corresponds to
+		///     setFailIfInnoReadOnly(true).
 		///
+		/// Warning: Due to a bug in MySQL, resetting the connection with mysql_reset_connection()
+		/// could change the character encoding used for the connection. Therefore the
+		/// reset option should be used with caution.
 
 	~SessionImpl();
 		/// Destroys the SessionImpl.
@@ -182,6 +196,7 @@ private:
 
 	std::string           _connector;
 	mutable SessionHandle _handle;
+	bool                  _reset;
 	bool                  _connected;
 	bool                  _inTransaction;
 	bool                  _failIfInnoReadOnly;

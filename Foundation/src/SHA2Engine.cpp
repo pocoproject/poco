@@ -151,52 +151,6 @@ static const unsigned char padding[128] = { 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	temp2 = S642(a) + F640(a,b,c);             \
 	d += temp1; h = temp1 + temp2;             \
 }
-#ifdef POCO_ARCH_BIG_ENDIAN
-#ifndef GET_UINT32
-#define GET_UINT32(n,b,i)                        \
-do {                                             \
-	(n) = ( (Poco::UInt32) (b)[(i)    ]       )  \
-		| ( (Poco::UInt32) (b)[(i) + 1] <<  8 )  \
-		| ( (Poco::UInt32) (b)[(i) + 2] << 16 )  \
-		| ( (Poco::UInt32) (b)[(i) + 3] << 24 ); \
-} while( 0 )
-#endif
-#ifndef PUT_UINT32
-#define PUT_UINT32(n,b,i)                         \
-do {                                              \
-	(b)[(i)    ] = (unsigned char) ( (n)       ); \
-	(b)[(i) + 1] = (unsigned char) ( (n) >>  8 ); \
-	(b)[(i) + 2] = (unsigned char) ( (n) >> 16 ); \
-	(b)[(i) + 3] = (unsigned char) ( (n) >> 24 ); \
-} while( 0 )
-#endif
-#ifndef GET_UINT64
-#define GET_UINT64(n,b,i)                        \
-{                                                \
-	(n) = ( (Poco::UInt64) (b)[(i)    ]       )  \
-		| ( (Poco::UInt64) (b)[(i) + 1] <<  8 )  \
-		| ( (Poco::UInt64) (b)[(i) + 2] << 16 )  \
-		| ( (Poco::UInt64) (b)[(i) + 3] << 24 )  \
-		| ( (Poco::UInt64) (b)[(i) + 4] << 32 )  \
-		| ( (Poco::UInt64) (b)[(i) + 5] << 40 )  \
-		| ( (Poco::UInt64) (b)[(i) + 6] << 48 )  \
-		| ( (Poco::UInt64) (b)[(i) + 7] << 56 ); \
-}
-#endif
-#ifndef PUT_UINT64
-#define PUT_UINT64(n,b,i)                         \
-{                                                 \
-	(b)[(i)    ] = (unsigned char) ( (n)       ); \
-	(b)[(i) + 1] = (unsigned char) ( (n) >>  8 ); \
-	(b)[(i) + 2] = (unsigned char) ( (n) >> 16 ); \
-	(b)[(i) + 3] = (unsigned char) ( (n) >> 24 ); \
-	(b)[(i) + 4] = (unsigned char) ( (n) >> 32 ); \
-	(b)[(i) + 5] = (unsigned char) ( (n) >> 40 ); \
-	(b)[(i) + 6] = (unsigned char) ( (n) >> 48 ); \
-	(b)[(i) + 7] = (unsigned char) ( (n) >> 56 ); \
-}
-#endif
-#else
 #ifndef GET_UINT32
 #define GET_UINT32(n,b,i)                        \
 do {                                             \
@@ -240,7 +194,6 @@ do {                                              \
 	(b)[(i) + 6] = (unsigned char) ( (n) >>  8 ); \
 	(b)[(i) + 7] = (unsigned char) ( (n)       ); \
 }
-#endif
 #endif
 
 

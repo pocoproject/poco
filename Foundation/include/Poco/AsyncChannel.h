@@ -50,14 +50,14 @@ public:
 	void setChannel(Channel::Ptr pChannel);
 		/// Connects the AsyncChannel to the given target channel.
 		/// All messages will be forwarded to this channel.
-		
+
 	Channel::Ptr getChannel() const;
 		/// Returns the target channel.
 
 	void open();
-		/// Opens the channel and creates the 
+		/// Opens the channel and creates the
 		/// background logging thread.
-		
+
 	void close();
 		/// Closes the channel and stops the background
 		/// logging thread.
@@ -69,7 +69,7 @@ public:
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets or changes a configuration property.
 		///
-		/// The "channel" property allows setting the target 
+		/// The "channel" property allows setting the target
 		/// channel via the LoggingRegistry.
 		/// The "channel" property is set-only.
 		///
@@ -82,18 +82,34 @@ public:
 		///    * highest
 		///
 		/// The "priority" property is set-only.
+		///
+		/// The "queueSize" property allows to limit the number
+		/// of messages in the queue. If the queue is full and
+		/// new messages are logged, these are dropped until the
+		/// queue has free capacity again. The number of dropped
+		/// messages is recorded, and a log message indicating the
+		/// number of dropped messages will be generated when the
+		/// queue has free capacity again.
+		/// In addition to an unsigned integer specifying the size,
+		/// this property can have the values "none" or "unlimited",
+		/// which disable the queue size limit. A size of 0 also
+		/// removes the limit.
+		///
+		/// The "queueSize" property is set-only.
 
 protected:
 	~AsyncChannel();
 	void run();
 	void setPriority(const std::string& value);
-		
+
 private:
-	Channel::Ptr      _pChannel;
+	Channel::Ptr _pChannel;
 	Thread    _thread;
 	FastMutex _threadMutex;
 	FastMutex _channelMutex;
 	NotificationQueue _queue;
+	std::size_t _queueSize = 0;
+	std::size_t _dropCount = 0;
 };
 
 

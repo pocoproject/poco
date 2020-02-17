@@ -68,13 +68,14 @@ void CodeWriter::writeImpl(std::ostream& ostr, const std::string& headerFileName
 		ostr << "#include \"Poco/StreamCopier.h\"\n";
 		ostr << "#include <sstream>\n";
 	}
-	ostr << "\n\n";
 
 	std::string decls(_page.implDecls().str());
 	if (!decls.empty())
 	{
 		ostr << decls << "\n\n";
 	}
+
+	ostr << "using namespace std::string_literals;\n\n\n";
 
 	beginNamespace(ostr);
 
@@ -328,24 +329,24 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 		ostr << "\tresponse.setChunkedTransferEncoding(true);\n";
 	}
 
-	ostr << "\tresponse.setContentType(\"" << contentType << "\");\n";
+	ostr << "\tresponse.setContentType(\"" << contentType << "\"s);\n";
 	if (!contentLang.empty())
 	{
-		ostr << "\tif (request.has(\"Accept-Language\"))\n"
-			 << "\t\tresponse.set(\"Content-Language\", \"" << contentLang << "\");\n";
+		ostr << "\tif (request.has(\"Accept-Language\"s))\n"
+			 << "\t\tresponse.set(\"Content-Language\"s, \"" << contentLang << "\"s);\n";
 	}
 	if (!contentSecurityPolicy.empty())
 	{
-		ostr << "\tresponse.set(\"Content-Secure-Policy\", \"" << contentSecurityPolicy << "\");\n";
+		ostr << "\tresponse.set(\"Content-Secure-Policy\"s, \"" << contentSecurityPolicy << "\"s);\n";
 	}
 	if (compressed)
 	{
-		ostr << "\tbool _compressResponse(request.hasToken(\"Accept-Encoding\", \"gzip\"));\n"
-		     << "\tif (_compressResponse) response.set(\"Content-Encoding\", \"gzip\");\n";
+		ostr << "\tbool _compressResponse(request.hasToken(\"Accept-Encoding\"s, \"gzip\"s));\n"
+		     << "\tif (_compressResponse) response.set(\"Content-Encoding\"s, \"gzip\"s);\n";
 	}
 	if (!cacheControl.empty())
 	{
-		ostr << "\tresponse.set(\"Cache-Control\", \"" << cacheControl << "\");\n";
+		ostr << "\tresponse.set(\"Cache-Control\"s, \"" << cacheControl << "\"s);\n";
 	}
 	ostr << "\n";
 }

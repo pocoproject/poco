@@ -429,7 +429,7 @@ std::string FTPClientSession::extractPath(const std::string& response)
 			if (*it == '"')
 			{
 				++it;
-				if (it == end || (it != end && *it != '"')) break;
+				if (it == end || *it != '"') break;
 			}
 			path += *it++;
 		}

@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include "Poco/AtomicCounter.h"
 #include <algorithm>
+#include <cstddef>
 
 
 namespace Poco {
@@ -336,6 +337,11 @@ public:
 		return get() == ptr;
 	}
 
+	bool operator == (std::nullptr_t ptr) const
+	{
+		return get() == ptr;
+	}
+
 	bool operator != (const SharedPtr& ptr) const
 	{
 		return get() != ptr.get();
@@ -347,6 +353,11 @@ public:
 	}
 
 	bool operator != (C* ptr) const
+	{
+		return get() != ptr;
+	}
+
+	bool operator != (std::nullptr_t ptr) const
 	{
 		return get() != ptr;
 	}
