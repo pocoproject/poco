@@ -34,6 +34,7 @@ Context::Params::Params():
 	verificationMode(VERIFY_RELAXED),
 	verificationDepth(9),
 	loadDefaultCAs(false),
+	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
 	dhUse2048Bits(false)
 {
@@ -44,7 +45,8 @@ Context::Context(Usage usage, const Params& params):
 	_usage(usage),
 	_mode(params.verificationMode),
 	_pSSLContext(0),
-	_extendedCertificateVerification(true)
+	_extendedCertificateVerification(true),
+	_ocspStaplingResponseVerification(false)	
 {
 	init(params);
 }
@@ -62,7 +64,8 @@ Context::Context(
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0),
-	_extendedCertificateVerification(true)
+	_extendedCertificateVerification(true),
+	_ocspStaplingResponseVerification(false)	
 {
 	Params params;
 	params.privateKeyFile = privateKeyFile;
@@ -86,7 +89,8 @@ Context::Context(
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0),
-	_extendedCertificateVerification(true)
+	_extendedCertificateVerification(true),
+	_ocspStaplingResponseVerification(false)	
 {
 	Params params;
 	params.caLocation = caLocation;
@@ -175,6 +179,11 @@ void Context::init(const Params& params)
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 
+		if (!isForServerUse() && params.ocspStaplingVerification){
+			_ocspStaplingResponseVerification = true;
+			SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponse);
+			SSL_CTX_set_tlsext_status_arg(_pSSLContext, this);
+		}
 		initDH(params.dhUse2048Bits, params.dhParamsFile);
 		initECDH(params.ecdhCurve);
 	}
