@@ -55,7 +55,6 @@
     <ProjectGuid>{6C41E55D-C0FC-4E01-AA8D-B7DA40E31D3A}</ProjectGuid>
     <RootNamespace>TestApp</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'" Label="Configuration">
