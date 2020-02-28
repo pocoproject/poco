@@ -272,16 +272,16 @@ protected:
 		/// The request is delegated to the PrivatekeyPassword event. This method returns the
 		/// length of the password.
 
+	static int verifyOCSPResponseCallback(SSL* pSSL, void* arg);
+		/// The return value of this method defines how errors in
+		/// verification are handled. Return 0 to terminate the handshake,
+		/// or 1 to continue despite the error.
+
 	static Poco::Util::AbstractConfiguration& appConfig();
 		/// Returns the application configuration.
 		///
 		/// Throws a InvalidStateException if not application instance
 		/// is available.
-
-	static int verifyOCSPResponse(SSL *s, void *arg);
-		/// The return value of this method defines how errors in
-		/// verification are handled. Return 0 to terminate the handshake,
-		/// or 1 to continue despite the error.
 
 private:
 	SSLManager();

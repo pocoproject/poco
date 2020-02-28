@@ -46,7 +46,7 @@ Context::Context(Usage usage, const Params& params):
 	_mode(params.verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true),
-	_ocspStaplingResponseVerification(false)	
+	_ocspStaplingResponseVerification(false)
 {
 	init(params);
 }
@@ -65,7 +65,7 @@ Context::Context(
 	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true),
-	_ocspStaplingResponseVerification(false)	
+	_ocspStaplingResponseVerification(false)
 {
 	Params params;
 	params.privateKeyFile = privateKeyFile;
@@ -90,7 +90,7 @@ Context::Context(
 	_mode(verificationMode),
 	_pSSLContext(0),
 	_extendedCertificateVerification(true),
-	_ocspStaplingResponseVerification(false)	
+	_ocspStaplingResponseVerification(false)
 {
 	Params params;
 	params.caLocation = caLocation;
@@ -179,11 +179,17 @@ void Context::init(const Params& params)
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
 
-		if (!isForServerUse() && params.ocspStaplingVerification){
+		if (!isForServerUse() && params.ocspStaplingVerification)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 			_ocspStaplingResponseVerification = true;
-			SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponse);
+			SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponseCallback);
 			SSL_CTX_set_tlsext_status_arg(_pSSLContext, this);
+#else
+			throw SSLContextException("OCSP Stapling is not supported by this OpenSSL version");
+#endif
 		}
+
 		initDH(params.dhUse2048Bits, params.dhParamsFile);
 		initECDH(params.ecdhCurve);
 	}

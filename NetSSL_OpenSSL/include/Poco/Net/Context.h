@@ -399,8 +399,8 @@ public:
 		/// When choosing a cipher, use the server's preferences instead of the client
 		/// preferences. When not called, the SSL server will always follow the clients
 		/// preferences. When called, the SSL/TLS server will choose following its own
-		/// preferences.	
-		
+		/// preferences.
+
 	bool ocspStaplingResponseVerificationEnabled() const;
 		/// Returns true if automatic OCSP response
 		/// reception and verification is enabled for client connections
@@ -462,6 +462,12 @@ inline SSL_CTX* Context::sslContext() const
 inline bool Context::extendedCertificateVerificationEnabled() const
 {
 	return _extendedCertificateVerification;
+}
+
+
+inline bool Context::ocspStaplingResponseVerificationEnabled() const
+{
+	return _ocspStaplingResponseVerification;
 }
 
 
