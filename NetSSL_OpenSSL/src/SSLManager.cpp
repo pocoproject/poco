@@ -25,6 +25,8 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
 
+#include <openssl/ocsp.h>
+#include <openssl/tls1.h>
 
 namespace Poco {
 namespace Net {
@@ -234,6 +236,123 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 	return size;
 }
 
+int SSLManager::verifyOCSPResponse(SSL *ssl, void *arg)
+{	
+	Poco::Net::Context* pocoCtx = (Poco::Net::Context*)arg;	
+	//Fetch the OSCP verify flag
+	bool ocspverifyFlag = pocoCtx->ocspStaplingResponseVerificationEnabled(); 
+
+	const unsigned char *resp;
+	int len = SSL_get_tlsext_status_ocsp_resp(ssl,&resp);
+	if (!resp) {
+		//OCSP response not received				
+		return ocspverifyFlag ? 0 : 1;
+	}	
+
+	OCSP_RESPONSE *ocspResp = d2i_OCSP_RESPONSE(NULL,&resp,len);
+	if (!ocspResp) {
+		return 0;
+	}	
+	
+	if (OCSP_response_status(ocspResp) != OCSP_RESPONSE_STATUS_SUCCESSFUL) {
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+
+	OCSP_BASICRESP *basicResp = OCSP_response_get1_basic(ocspResp);
+	if (!basicResp) {
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+
+	X509 *peerCert = SSL_get_peer_certificate(ssl);
+	if (!peerCert) {
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}	
+	
+	X509 *peerIssuerCert = NULL;			
+	STACK_OF(X509) *certChain = SSL_get_peer_cert_chain(ssl);
+	unsigned certChainLen = sk_X509_num(certChain);
+	for (int i= 0; i < certChainLen ; i++)	{
+		if(!peerIssuerCert){
+			X509 *issuer = sk_X509_value(certChain,i);
+			if (X509_check_issued(issuer,peerCert) == X509_V_OK){
+				peerIssuerCert = issuer;
+				break;
+			}		
+		}
+	}	
+	if (!peerIssuerCert) {
+		X509_free(peerCert);
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+
+	STACK_OF(X509) *certs = sk_X509_new_null();
+	if (certs) {
+		X509 *cert = X509_dup(peerIssuerCert);
+		if (cert && !sk_X509_push(certs,cert)) {
+			X509_free(cert);
+			sk_X509_free(certs);
+			certs = NULL;
+		}		
+	}
+		
+	
+	X509_STORE *store = SSL_CTX_get_cert_store(SSL_get_SSL_CTX(ssl));
+
+	int verifyStatus = OCSP_basic_verify(basicResp,certs,store,OCSP_TRUSTOTHER);	
+
+	sk_X509_pop_free(certs, X509_free);
+
+	if (verifyStatus <= 0) {
+		X509_free(peerCert);
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}		
+
+	OCSP_CERTID *certId = OCSP_cert_to_id(NULL,peerCert,peerIssuerCert);
+	if (!certId) {
+		X509_free(peerCert);
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+
+	X509_free(peerCert);
+
+	ASN1_GENERALIZEDTIME *revtime, *thisupd, *nextupd;
+	int certstatus,reason;	
+	if (!OCSP_resp_find_status(basicResp,certId,&certstatus,&reason,&revtime,&thisupd,&nextupd)) {			
+		OCSP_CERTID_free(certId);	
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+
+	OCSP_CERTID_free(certId);
+
+	if (certstatus != V_OCSP_CERTSTATUS_GOOD){		
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+
+	if (!OCSP_check_validity(thisupd,nextupd,5*60,-1)) {		
+		OCSP_BASICRESP_free(basicResp);
+		OCSP_RESPONSE_free(ocspResp);
+		return 0;
+	}
+	
+	OCSP_BASICRESP_free(basicResp);
+	OCSP_RESPONSE_free(ocspResp);	
+			
+	return 1;
+}
 
 void SSLManager::initDefaultContext(bool server)
 {
