@@ -2974,7 +2974,17 @@ void VarTest::testIterator()
 {
 	Var da;
 	assertTrue (da.isEmpty());
-	assertTrue (da.begin() == da.end());
+	bool thrown = false;
+	try {
+		auto it = da.begin();
+	}
+	catch (const InvalidAccessException&) {
+		thrown = true;
+	}
+	assertTrue(thrown);
+
+	da = Poco::Dynamic::Array();
+	assertTrue(da.begin() == da.end());
 
 	da = 1;
 	assertTrue (!da.isEmpty());
