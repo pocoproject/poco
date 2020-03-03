@@ -2973,8 +2973,6 @@ void VarTest::testEmpty()
 void VarTest::testIterator()
 {
 	Var da;
-	assertTrue (da.isEmpty());
-	bool thrown = false;
 	try
 	{
 		auto it = da.begin();
