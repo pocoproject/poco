@@ -40,15 +40,18 @@ class Foundation_API URI
 	/// The class automatically performs a few normalizations on
 	/// all URIs and URI parts passed to it:
 	///   * scheme identifiers are converted to lower case
-	///   * percent-encoded characters are decoded (except for the query string)
+	///   * percent-encoded characters are decoded (except for the query string and fragment string)
 	///   * optionally, dot segments are removed from paths (see normalize())
 	///
-	/// Note that dealing with query strings requires some precautions, as, internally,
-	/// query strings are stored in percent-encoded form, while all other parts of the URI
-	/// are stored in decoded form. While parsing query strings from properly encoded URLs
-	/// generally works, explicitly setting query strings with setQuery() or extracting
-	/// query strings with getQuery() may lead to ambiguities. See the descriptions of
-	/// setQuery(), setRawQuery(), getQuery() and getRawQuery() for more information.
+	/// Note that dealing with query strings and fragment strings requires some precautions,
+	/// as, internally, query strings and fragment strings are stored in percent-encoded
+	/// form, while all other parts of the URI are stored in decoded form. While parsing
+	/// query strings and fragment strings from properly encoded URLs generally works,
+	/// explicitly setting query strings (fragment strings) with setQuery() (setFragment())
+	/// or extracting query strings (fragment strings) with getQuery() (getFragment()) may
+	/// lead to ambiguities. See the descriptions of setQuery(), setRawQuery(), getQuery(),
+	/// getRawQuery(), setFragment(), setRawFragment(), getFragment() and getRawFragment()
+	/// for more information.
 {
 public:
 	using QueryParameters = std::vector<std::pair<std::string, std::string>>;
@@ -230,11 +233,19 @@ public:
 		///
 		/// Calls addQueryParameter() for each parameter name and value.
 
-	const std::string& getFragment() const;
+	std::string getFragment() const;
 		/// Returns the fragment part of the URI.
 
 	void setFragment(const std::string& fragment);
 		/// Sets the fragment part of the URI.
+
+	std::string getRawFragment() const;
+		/// Returns the fragment part of the URI in raw form.
+
+	void setRawFragment(const std::string& fragment);
+		/// Sets the fragment part of the URI.
+		///
+		/// The given fragment string must be properly percent-encoded
 
 	void setPathEtc(const std::string& pathEtc);
 		/// Sets the path, query and fragment parts of the URI.
@@ -400,7 +411,7 @@ inline const std::string& URI::getRawQuery() const
 }
 
 
-inline const std::string& URI::getFragment() const
+inline std::string URI::getRawFragment() const
 {
 	return _fragment;
 }
