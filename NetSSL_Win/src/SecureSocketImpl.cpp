@@ -552,10 +552,10 @@ SECURITY_STATUS SecureSocketImpl::decodeMessage(BYTE* pBuffer, DWORD bufSize, Au
 	{
 		for (int i = 1; i < 4; ++i)
 		{
-			if (pDataBuffer == 0 && msg[i].BufferType == SECBUFFER_DATA)
+			if (!pDataBuffer && msg[i].BufferType == SECBUFFER_DATA)
 				pDataBuffer = &msg[i];
 
-			if (pExtraBuffer == NULL && msg[i].BufferType == SECBUFFER_EXTRA)
+			if (!pExtraBuffer && msg[i].BufferType == SECBUFFER_EXTRA)
 				pExtraBuffer = &msg[i];
 		}
 	}
@@ -631,15 +631,15 @@ SECURITY_STATUS SecureSocketImpl::decodeBufferFull(BYTE* pBuffer, DWORD bufSize,
 		}
 		else
 		{
-			// everything decoded
-			if (securityStatus != SEC_E_OK && securityStatus != SEC_E_INCOMPLETE_MESSAGE && securityStatus != SEC_I_RENEGOTIATE && securityStatus != SEC_I_CONTEXT_EXPIRED)
+			if (securityStatus == SEC_E_OK)
 			{
-				throw SSLException("Failed to decode data", Utility::formatError(securityStatus));
-			}
-			else if (securityStatus == SEC_E_OK)
-			{
+				// everything decoded
 				pBuffer = 0;
 				bufSize = 0;
+			}
+			else if (securityStatus != SEC_E_INCOMPLETE_MESSAGE && securityStatus != SEC_I_RENEGOTIATE && securityStatus != SEC_I_CONTEXT_EXPIRED)
+			{
+				return securityStatus;
 			}
 		}
 
