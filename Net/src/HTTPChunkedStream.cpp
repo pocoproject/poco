@@ -14,6 +14,7 @@
 
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Ascii.h"
@@ -55,36 +56,80 @@ void HTTPChunkedStreamBuf::close()
 	}
 }
 
+static inline int assertNonEOF(int c)
+{
+	if (c == std::char_traits<char>::eof())
+		throw MessageException("Unexpected EOF");
+    return c;
+}
+
+static inline bool isCRLF(char c1, char c2)
+{
+	return c1 == '\r' && c2 == '\n';
+}
+
+unsigned int HTTPChunkedStreamBuf::parseChunkLen()
+{
+	const size_t maxLineLength = 4096;
+	std::string line;
+	while (line.size() < maxLineLength)
+	{
+		int c = assertNonEOF(_session.get());
+		line += static_cast<char>(c);
+		if (c == '\n') break;
+	}
+
+	const size_t n = line.size();
+	if (n >= 2 && isCRLF(line[n-2], line[n-1]))
+		line.resize(n-2);
+	else
+		throw MessageException("Malformed chunked encoding");
+
+	if (size_t pos = line.find(';'); pos != std::string::npos)
+		line.resize(pos);
+
+	unsigned chunkLen;
+	if (NumberParser::tryParseHex(line, chunkLen))
+		return chunkLen;
+	else
+		throw MessageException("Invalid chunk length");
+}
+
+void HTTPChunkedStreamBuf::skipCRLF()
+{
+	int c1 = assertNonEOF(_session.get());
+	int c2 = assertNonEOF(_session.get());
+	if (!isCRLF(c1, c2))
+		throw MessageException("Malformed chunked encoding");
+}
 
 int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	static const int eof = std::char_traits<char>::eof();
+	if (_chunk == eof)
+		return 0;
 
 	if (_chunk == 0)
 	{
-		int ch = _session.get();
-		while (Poco::Ascii::isSpace(ch)) ch = _session.get();
-		std::string chunkLen;
-		while (Poco::Ascii::isHexDigit(ch) && chunkLen.size() < 8) { chunkLen += (char) ch; ch = _session.get(); }
-		if (ch != eof && !(Poco::Ascii::isSpace(ch) || ch == ';')) return eof;
-		while (ch != eof && ch != '\n') ch = _session.get();
-		unsigned chunk;
-		if (NumberParser::tryParseHex(chunkLen, chunk))
-			_chunk = (std::streamsize) chunk;
-		else
-			return eof;
+		_chunk = parseChunkLen();
 	}
+
 	if (_chunk > 0)
 	{
 		if (length > _chunk) length = _chunk;
 		int n = _session.read(buffer, length);
-		if (n > 0) _chunk -= n;
+		if (n > 0)
+			_chunk -= n;
+		else
+			throw MessageException("Unexpected EOF");
+
+		if (_chunk == 0) skipCRLF();
 		return n;
 	}
 	else 
 	{
-		int ch = _session.get();
-		while (ch != eof && ch != '\n') ch = _session.get();
+		skipCRLF();
+		_chunk = eof;
 		return 0;
 	}
 }

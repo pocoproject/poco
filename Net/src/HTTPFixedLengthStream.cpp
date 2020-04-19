@@ -14,6 +14,7 @@
 
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/NetException.h"
 
 
 using Poco::BufferedStreamBuf;
@@ -50,7 +51,10 @@ int HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize lengt
 		if (_count + length > _length)
 			length = static_cast<std::streamsize>(_length - _count);
 		n = _session.read(buffer, length);
-		if (n > 0) _count += n;
+		if (n > 0)
+			_count += n;
+		else
+			throw MessageException("Unexpected EOF");
 	}
 	return n;
 }

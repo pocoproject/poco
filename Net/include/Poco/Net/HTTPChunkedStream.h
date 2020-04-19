@@ -48,6 +48,9 @@ protected:
 	int readFromDevice(char* buffer, std::streamsize length);
 	int writeToDevice(const char* buffer, std::streamsize length);
 
+	unsigned int parseChunkLen();
+	void skipCRLF();
+
 private:
 	HTTPSession&    _session;
 	openmode        _mode;
