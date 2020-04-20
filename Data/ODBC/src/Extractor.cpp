@@ -12,6 +12,7 @@
 //
 
 
+#include "Poco/Foundation.h"
 #include "Poco/Data/ODBC/Extractor.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
