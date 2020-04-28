@@ -28,7 +28,8 @@ namespace Net {
 HTTPHeaderStreamBuf::HTTPHeaderStreamBuf(HTTPSession& session, openmode mode):
 	HTTPBasicStreamBuf(HTTPBufferAllocator::BUFFER_SIZE, mode),
 	_session(session),
-	_end(false)
+	_end(false),
+	_line_ended(true)
 {
 }
 
@@ -55,8 +56,9 @@ int HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (ch != eof)
 	{
 		*buffer++ = (char) ch; ++n;
-		if (n == 2) _end = true;
+		if (n == 2) _end = _line_ended;
 	}
+	_line_ended = (ch == '\n');
 	return n;
 }
 
