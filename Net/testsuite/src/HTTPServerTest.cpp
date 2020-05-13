@@ -103,7 +103,22 @@ namespace
 			response.sendBuffer(data.data(), data.length());
 		}
 	};
-	
+
+	class StreamBufferReadHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			auto streambuf = request.stream().rdbuf();
+
+			char buffer[4096];
+			streambuf->sgetn(buffer, sizeof(buffer));
+			streambuf->sgetn(buffer, sizeof(buffer));
+
+			response.send();
+		}
+	};
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -119,6 +134,8 @@ namespace
 				return new AuthRequestHandler();
 			else if (request.getURI() == "/buffer")
 				return new BufferRequestHandler();
+			else if (request.getURI() == "/streamBufferRead")
+				return new StreamBufferReadHandler();
 			else
 				return 0;
 		}
@@ -289,6 +306,35 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 	assertTrue (response.getChunkedTransferEncoding());
 	assertTrue (!response.getKeepAlive());
 	assertTrue (rbody == body);
+}
+
+
+void HTTPServerTest::testChunkedRequestFreeze()
+{
+	ServerSocket svs(0);
+	HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+
+	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
+	std::string body(50, 'x');
+	HTTPRequest request("POST", "/streamBufferRead", HTTPMessage::HTTP_1_1);
+	request.setContentType("text/plain");
+	request.setChunkedTransferEncoding(true);
+	cs.sendRequest(request) << body;
+
+	bool timeoutOccured = false;
+	HTTPResponse response;
+	try
+	{
+		cs.receiveResponse(response);
+	}
+   	catch (Poco::TimeoutException&)
+	{
+		timeoutOccured = true;
+	}
+
+	assertFalse (timeoutOccured);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
 }
 
 
@@ -536,6 +582,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAlive);
+	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestFreeze);
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testMaxKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testKeepAliveTimeout);
