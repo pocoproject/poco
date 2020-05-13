@@ -30,6 +30,7 @@ public:
 	void testClosedRequest();
 	void testIdentityRequestKeepAlive();
 	void testChunkedRequestKeepAlive();
+	void testChunkedRequestKeepAliveTrailers();
 	void testClosedRequestKeepAlive();
 	void testMaxKeepAlive();
 	void testKeepAliveTimeout();

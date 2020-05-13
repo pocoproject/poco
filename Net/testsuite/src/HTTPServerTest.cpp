@@ -20,7 +20,9 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
 
@@ -36,7 +38,10 @@ using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
+using Poco::Net::HTTPChunkedInputStream;
 using Poco::Net::ServerSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::StreamSocket;
 using Poco::StreamCopier;
 
 
@@ -292,6 +297,48 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 }
 
 
+// TODO: rewrite test when Chunked Encoding trailer is supported
+void HTTPServerTest::testChunkedRequestKeepAliveTrailers()
+{
+	const int msgSize = 50;
+
+	ServerSocket svs(0);
+	HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+
+	StreamSocket socket(SocketAddress("127.0.0.1", srv.socket().address().port()));
+
+	// HTTPRequest doesn't support trailers in chunked requests
+	std::string body(msgSize, 'x');
+	std::stringstream ss;
+	ss << "POST /echoBody HTTP/1.1\r\n"
+	   << "Content-Type: text/plain\r\n"
+	   << "Transfer-Encoding: chunked\r\n"
+	   << "Connection: Keep-Alive\r\n"
+	   << "Host: 127.0.0.1:" << std::dec << srv.socket().address().port() << "\r\n"
+	   << "\r\n"
+	   << std::hex << msgSize << "\r\n"
+	   << body << "\r\n"
+	   << "0\r\n"
+	   << "Trailer 1\r\n"
+	   << "Trailer 2\r\n"
+	   << "\r\n";
+
+	HTTPClientSession cs(socket);
+	for(int i = 0; i < 2; ++i)
+	{
+		socket.sendBytes(ss.str().data(), ss.str().size());
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response);
+		// HTTPClientSession::_expectResponseBody was not properly set and
+		// HTTPClientSession::receiveResponse returned HTTPFixedLengthInputStream
+		HTTPChunkedInputStream(cs) >> rbody;
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	}
+}
+
+
 void HTTPServerTest::testClosedRequestKeepAlive()
 {
 	HTTPServer srv(new RequestHandlerFactory, 8010);
@@ -536,6 +583,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAlive);
+	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAliveTrailers);
 	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testMaxKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testKeepAliveTimeout);
