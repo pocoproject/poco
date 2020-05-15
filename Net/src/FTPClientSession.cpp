@@ -121,6 +121,10 @@ void FTPClientSession::setPassive(bool flag, bool useRFC1738)
 	_supports1738 = useRFC1738;
 }
 
+void FTPClientSession::setActiveDataPort(Poco::UInt16 port)
+{
+	_activeDataPort = port;
+}
 
 bool FTPClientSession::getPassive() const
 {
@@ -452,7 +456,7 @@ StreamSocket FTPClientSession::activeDataConnection(const std::string& command, 
 	if (!isOpen())
 		throw FTPException("Connection is closed.");
 
-	ServerSocket server(SocketAddress(_pControlSocket->address().host(), 0));
+	ServerSocket server(SocketAddress(_pControlSocket->address().host(), _activeDataPort));
 	sendPortCommand(server.address());
 	std::string response;
 	int status = sendCommand(command, arg, response);
