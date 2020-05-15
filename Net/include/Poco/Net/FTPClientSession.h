@@ -350,6 +350,7 @@ private:
 
 	std::string _host;
 	Poco::UInt16 _port = FTP_PORT;
+	Poco::UInt16 _activeDataPort = 0;
 	bool _passiveMode = true;
 	FileType _fileType = TYPE_BINARY;
 	bool _supports1738 = true;
