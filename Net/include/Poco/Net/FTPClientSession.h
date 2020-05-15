@@ -96,6 +96,9 @@ public:
 	bool getPassive() const;
 		/// Returns true iff passive mode is enabled for this connection.
 
+	void setActiveDataPort(Poco::UInt16 port);
+		/// Set port to use for active connections
+	
 	virtual void open(const std::string& host, Poco::UInt16 port, const std::string& username = "", const std::string& password = "");
 		/// Opens the FTP connection to the given host and port.
 		/// If username is supplied, login is attempted.
