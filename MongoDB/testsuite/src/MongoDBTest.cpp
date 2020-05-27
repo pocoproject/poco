@@ -10,6 +10,7 @@
 
 #include "Poco/DateTime.h"
 #include "Poco/ObjectPool.h"
+#include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/InsertRequest.h"
 #include "Poco/MongoDB/QueryRequest.h"
 #include "Poco/MongoDB/DeleteRequest.h"
@@ -75,6 +76,31 @@ void MongoDBTest::testInsertRequest()
 	Poco::MongoDB::InsertRequest request("team.players");
 	request.documents().push_back(player);
 	_mongo->sendRequest(request);
+}
+
+void MongoDBTest::testArray()
+{
+	Poco::MongoDB::Array::Ptr arr = new Poco::MongoDB::Array();
+	arr->add(std::string("First"));
+
+	Poco::DateTime birthdate;
+	birthdate.assign(1969, 3, 9);
+	arr->add(birthdate.timestamp());
+
+	arr->add(static_cast<int>(1993));
+	arr->add(false);
+
+	assertEqual(arr->size(), 4);
+	assertTrue(arr->exists("0"));
+	assertTrue(arr->exists("1"));
+	assertTrue(arr->exists("2"));
+	assertTrue(arr->exists("3"));
+	assertFalse(arr->exists("4"));
+
+	assertEqual(arr->get<std::string>(0), "First");
+	assertEqual(arr->get<Poco::Timestamp>(1).raw(), birthdate.timestamp().raw());
+	assertEqual(arr->get<int>(2), 1993);
+	assertEqual(arr->get<bool>(3), false);
 }
 
 
@@ -472,6 +498,7 @@ CppUnit::Test* MongoDBTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTest");
 	CppUnit_addTest(pSuite, MongoDBTest, testBuildInfo);
 	CppUnit_addTest(pSuite, MongoDBTest, testInsertRequest);
+	CppUnit_addTest(pSuite, MongoDBTest, testArray);
 	CppUnit_addTest(pSuite, MongoDBTest, testQueryRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testDBQueryRequest);
 	CppUnit_addTest(pSuite, MongoDBTest, testCountCommand);
