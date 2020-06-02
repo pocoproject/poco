@@ -217,22 +217,15 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
-		if (!_pool.empty())
-		{
-			P pObject = _pool.back();
-			_pool.pop_back();
-			return activateObject(pObject);
-		}
-
-		if (_size >= _peakCapacity)
+		if (_size >= _peakCapacity && _pool.empty())
 		{
 			if (timeoutMilliseconds == 0)
 			{
 				return 0;
 			}
-			while (_size >= _peakCapacity)
+			while (_size >= _peakCapacity && _pool.empty())
 			{
-				if ( !_availableCondition.tryWait(_mutex, timeoutMilliseconds))
+				if (!_availableCondition.tryWait(_mutex, timeoutMilliseconds))
 				{
 					// timeout
 					return 0;
@@ -240,10 +233,19 @@ public:
 			}
 		}
 
+		if (!_pool.empty())
+		{
+			P pObject = _pool.back();
+			_pool.pop_back();
+
+			return activateObject(pObject);
+		}
+
 		// _size < _peakCapacity
 		P pObject = _factory.createObject();
 		activateObject(pObject);
 		_size++;
+
 		return pObject;
 	}
 
@@ -260,6 +262,7 @@ public:
 				try
 				{
 					_pool.push_back(pObject);
+					_availableCondition.signal();
 					return;
 				}
 				catch (...)

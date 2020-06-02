@@ -9,6 +9,9 @@
 
 
 #include "ObjectPoolTest.h"
+
+#include <thread>
+
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/ObjectPool.h"
@@ -87,6 +90,21 @@ void ObjectPoolTest::testObjectPool()
 	assertTrue (pool.available() == 4);
 }
 
+void ObjectPoolTest::testObjectPoolWaitOnBorrowObject() 
+{
+	ObjectPool<std::string, Poco::SharedPtr<std::string> > pool(1, 1);
+	
+	Poco::SharedPtr<std::string> objectToReturnDuringBorrow = pool.borrowObject();
+
+	std::thread threadToReturnObject { [&pool, &objectToReturnDuringBorrow]() {
+		pool.returnObject(objectToReturnDuringBorrow);
+	}};
+
+	Poco::SharedPtr<std::string> object = pool.borrowObject(1000);
+
+	threadToReturnObject.join();
+	assertFalse(object.isNull());
+}
 
 void ObjectPoolTest::setUp()
 {
@@ -103,6 +121,7 @@ CppUnit::Test* ObjectPoolTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ObjectPoolTest");
 
 	CppUnit_addTest(pSuite, ObjectPoolTest, testObjectPool);
+	CppUnit_addTest(pSuite, ObjectPoolTest, testObjectPoolWaitOnBorrowObject);
 
 	return pSuite;
 }
