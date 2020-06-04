@@ -38,10 +38,12 @@ class Foundation_API SHA2Engine: public DigestEngine
 public:
 	enum ALGORITHM
 	{
-		SHA_224 = 224,
-		SHA_256 = 256,
-		SHA_384 = 384,
-		SHA_512 = 512
+		SHA_224 = 1,
+		SHA_256,
+		SHA_384,
+		SHA_512,
+		SHA_512_224,
+		SHA_512_256
 	};
 
 	SHA2Engine(ALGORITHM algorithm = SHA_256);
