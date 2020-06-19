@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPSSessionInstantiator.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureStreamSocketImpl.h"
 #include "Poco/Net/SSLManager.h"
@@ -36,6 +37,7 @@ HTTPSClientSession::HTTPSClientSession():
 	_pContext(SSLManager::instance().defaultClientContext())
 {
 	setPort(HTTPS_PORT);
+	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
 }
 
 
@@ -45,6 +47,7 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, const s
 {
 	setHost(host);
 	setPort(port);
+	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
 }
 
 
@@ -54,6 +57,7 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session
 	_pSession(pSession)
 {
 	setPort(HTTPS_PORT);
+    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
 }
 
 
@@ -63,6 +67,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
+    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
 }
 
 
@@ -70,6 +75,7 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext):
 	HTTPClientSession(SecureStreamSocket(pContext)),
 	_pContext(pContext)
 {
+    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
@@ -78,6 +84,7 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext, Session::Ptr pSess
 	_pContext(pContext),
 	_pSession(pSession)
 {
+    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
@@ -87,6 +94,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
+    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
@@ -97,11 +105,13 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
+    _proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 
 HTTPSClientSession::~HTTPSClientSession()
 {
+    _proxySessionFactory.unregisterProtocol("https");
 }
 
 
@@ -127,7 +137,11 @@ X509Certificate HTTPSClientSession::serverCertificate()
 
 std::string HTTPSClientSession::proxyRequestPrefix() const
 {
-	return std::string();
+    std::string result("https://");
+    result.append(getHost());
+    result.append(":");
+    NumberFormatter::append(result, getPort());
+    return result;
 }
 
 
@@ -138,33 +152,35 @@ void HTTPSClientSession::proxyAuthenticate(HTTPRequest& request)
 
 void HTTPSClientSession::connect(const SocketAddress& address)
 {
-	if (getProxyHost().empty() || bypassProxy())
-	{
-		SecureStreamSocket sss(socket());
-		if (sss.getPeerHostName().empty())
-		{
-			sss.setPeerHostName(getHost());
-		}
-		if (_pContext->sessionCacheEnabled())
-		{
-			sss.useSession(_pSession);
-		}
-		HTTPSession::connect(address);
-		if (_pContext->sessionCacheEnabled())
-		{
-			_pSession = sss.currentSession();
-		}
-	}
-	else
-	{
-		StreamSocket proxySocket(proxyConnect());
-		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
-		attachSocket(secureSocket);
-		if (_pContext->sessionCacheEnabled())
-		{
-			_pSession = secureSocket.currentSession();
-		}
-	}
+    bool useProxy = !getProxyHost().empty() && !bypassProxy();
+
+	if (useProxy && isProxyTunnel())
+    {
+        StreamSocket proxySocket(proxyConnect());
+        SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
+        attachSocket(secureSocket);
+        if (_pContext->sessionCacheEnabled())
+        {
+            _pSession = secureSocket.currentSession();
+        }
+    }
+    else
+    {
+        SecureStreamSocket sss(socket());
+        if (sss.getPeerHostName().empty())
+        {
+            sss.setPeerHostName(useProxy ? getProxyHost() : getHost());
+        }
+        if (_pContext->sessionCacheEnabled())
+        {
+            sss.useSession(_pSession);
+        }
+        HTTPSession::connect(address);
+        if (_pContext->sessionCacheEnabled())
+        {
+            _pSession = sss.currentSession();
+        }
+    }
 }
 
 
