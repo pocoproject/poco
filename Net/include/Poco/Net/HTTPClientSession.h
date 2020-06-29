@@ -79,9 +79,9 @@ public:
 	{
 		ProxyConfig():
 			port(HTTP_PORT),
-			authMethod(PROXY_AUTH_HTTP_BASIC),
 			protocol("http"),
-			tunnel(true)
+			tunnel(true),
+			authMethod(PROXY_AUTH_HTTP_BASIC)
 		{
 		}
 
