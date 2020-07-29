@@ -339,7 +339,7 @@ public:
 		{
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 			++it;
 		}
@@ -348,7 +348,7 @@ public:
 			val.append(", ");
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 		}
 		val.append(" }");
@@ -525,7 +525,7 @@ public:
 		{
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 			++it;
 		}
@@ -534,7 +534,7 @@ public:
 			val.append(", ");
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 		}
 		val.append(" }");
@@ -711,7 +711,7 @@ public:
 		{
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 			++it;
 		}
@@ -720,7 +720,7 @@ public:
 			val.append(", ");
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 		}
 		val.append(" }");
@@ -897,7 +897,7 @@ public:
 		{
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 			++it;
 		}
@@ -906,7 +906,7 @@ public:
 			val.append(", ");
 			Var key(it->first);
 			Impl::appendJSONKey(val, key);
-			val.append(" : ");
+			val.append(": ");
 			Impl::appendJSONValue(val, it->second);
 		}
 		val.append(" }");
