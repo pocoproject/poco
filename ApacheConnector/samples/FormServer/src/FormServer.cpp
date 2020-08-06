@@ -100,7 +100,8 @@ public:
 		MyPartHandler partHandler;
 		HTMLForm form(request, request.stream(), partHandler);
 
-		response.setChunkedTransferEncoding(true);
+		// chunked transfer encoding is not supported by ApacheStream
+		// response.setChunkedTransferEncoding(true);
 		response.setContentType("text/html");
 
 		std::ostream& ostr = response.send();

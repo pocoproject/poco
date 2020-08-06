@@ -35,8 +35,14 @@ find_path(APRUTIL_INCLUDE_DIR apu.h
 		apr-1.0
 )
 
+if(WIN32)
+	set(APRUTIL_PRIMARY_NAME "libaprutil-1")
+else(WIN32)
+	set(APRUTIL_PRIMARY_NAME "aprutil-1")
+endif(WIN32)
+
 find_library(APRUTIL_LIBRARY
-  NAMES aprutil-1 ${APRUTIL_NAMES}
+  NAMES ${APRUTIL_PRIMARY_NAME}  ${APRUTIL_NAMES}
   HINTS
 	${APRUTIL_ROOT_DIR}/lib
 	${APRUTIL_ROOT_LIBRARY_DIRS}

@@ -65,8 +65,18 @@ void ApacheRequestHandlerFactory::handleURIs(const std::string& uris)
 	std::string factoryName = (*it);
 	it++;
 	std::string dllName = (*it);
-	it++;
 
+	// Handle quoted string
+	while ((dllName.find('"') == 0) && (dllName.rfind('"') != dllName.length() - 1) && (it != itEnd)) {
+		it++;
+		dllName.append(" ");
+		dllName.append(*it);
+	}
+	if ((dllName.find('"') == 0) && (dllName.rfind('"') == dllName.length() - 1)) {
+		dllName = dllName.substr(1, dllName.length() - 2);
+	}
+
+	it++;
 	for (; it != itEnd; it++)
 	{
 		addRequestHandlerFactory(dllName, factoryName, *it);

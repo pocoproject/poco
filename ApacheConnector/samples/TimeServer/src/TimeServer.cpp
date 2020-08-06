@@ -41,7 +41,8 @@ public:
 		Timestamp now;
 		std::string dt(DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
 
-		response.setChunkedTransferEncoding(true);
+		// chunked transfer encoding is not supported by ApacheStream
+		// response.setChunkedTransferEncoding(true);
 		response.setContentType("text/html");
 
 		std::ostream& ostr = response.send();
