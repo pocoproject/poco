@@ -233,28 +233,44 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
 	if (it != _activeSessions.end())
 	{
-		if (pHolder->session()->isGood())
+		try
 		{
-			pHolder->session()->reset();
+			if (pHolder->session()->isGood())
+			{
+				pHolder->session()->reset();
 
-			// reverse settings applied at acquisition time, if any
-			AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
-			if (pIt != _addPropertyMap.end())
-				pHolder->session()->setProperty(pIt->second.first, pIt->second.second);
+				// reverse settings applied at acquisition time, if any
+				AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
+				if (pIt != _addPropertyMap.end())
+					pHolder->session()->setProperty(pIt->second.first, pIt->second.second);
 
-			AddFeatureMap::iterator fIt = _addFeatureMap.find(pHolder->session());
-			if (fIt != _addFeatureMap.end())
-				pHolder->session()->setFeature(fIt->second.first, fIt->second.second);
+				AddFeatureMap::iterator fIt = _addFeatureMap.find(pHolder->session());
+				if (fIt != _addFeatureMap.end())
+					pHolder->session()->setFeature(fIt->second.first, fIt->second.second);
 
-			// re-apply the default pool settings
-			applySettings(pHolder->session());
+				// re-apply the default pool settings
+				applySettings(pHolder->session());
 
-			pHolder->access();
-			_idleSessions.push_front(pHolder);
+				pHolder->access();
+				_idleSessions.push_front(pHolder);
+			}
+			else --_nSessions;
+
+			_activeSessions.erase(it);
+
 		}
-		else --_nSessions;
-
-		_activeSessions.erase(it);
+		catch (const Poco::Exception& e)
+		{
+			--_nSessions;
+			_activeSessions.erase(it);
+			poco_bugcheck_msg(format("Exception in SessionPool::putBack(): %s", e.displayText()).c_str());
+		}
+		catch (...)
+		{
+			--_nSessions;
+			_activeSessions.erase(it);
+			poco_bugcheck_msg("Unknown exception in SessionPool::putBack()");
+		}
 	}
 	else
 	{
