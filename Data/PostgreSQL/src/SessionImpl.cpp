@@ -21,7 +21,6 @@
 #include "Poco/String.h"
 #include <map>
 
-
 namespace
 {
 	std::string copyStripped(std::string::const_iterator aFromStringCItr, std::string::const_iterator aToStringCItr)
