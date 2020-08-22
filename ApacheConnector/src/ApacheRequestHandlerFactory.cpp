@@ -116,7 +116,7 @@ bool ApacheRequestHandlerFactory::mustHandle(const std::string& uri)
 		// handler is registered with: /download
 		// uri: /download/xyz
 		// uri: /download
-		if (uri.find(it->first) == 0 || it->first.find(uri) == 0)
+		if (0 == uri.find(it->first))
 			return true;
 	}
 
