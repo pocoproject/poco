@@ -11,7 +11,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
+#include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/PostgreSQL/SessionImpl.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLStatementImpl.h"
@@ -20,7 +20,6 @@
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
 #include <map>
-
 
 namespace
 {
@@ -57,7 +56,8 @@ namespace PostgreSQL {
 
 
 SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout):
-	Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout)
+	Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout),
+	_connectorName(Connector::KEY)
 {
 	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
