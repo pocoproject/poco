@@ -78,6 +78,9 @@
     // QNX with Dinkumware but not GNU C++ Library
 #	elif defined(__QNX__) && !defined(__GLIBCPP__)
 #		define POCO_IOS_INIT_HACK 1
+    // Linux with libc++
+#	elif defined(__linux) && defined(_LIBCPP_VERSION)
+#		define POCO_IOS_INIT_HACK 1
 #	endif
 #endif
 
