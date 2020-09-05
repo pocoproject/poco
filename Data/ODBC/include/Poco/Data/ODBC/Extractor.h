@@ -462,7 +462,7 @@ private:
 	bool extractManualImpl(std::size_t pos, T& val, SQLSMALLINT cType)
 	{
 		SQLRETURN rc = 0;
-		T value = (T) 0;
+		T value;
 
 		resizeLengths(pos);
 
