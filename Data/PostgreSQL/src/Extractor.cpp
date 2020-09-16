@@ -439,7 +439,7 @@ bool Extractor::extract(std::size_t pos, Any& val)
 
 bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 {
-	return extractStringImpl (pos, val);
+	return extractToDynamic (pos, val);
 }
 
 
