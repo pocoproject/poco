@@ -482,6 +482,114 @@ Extractor::isColumnNull (const OutputParameter& anOutputParameter) const
 }
 
 
+bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
+{
+    OutputParameter outputParameter = _statementExecutor.resultColumn(pos);
+
+    if (isColumnNull(outputParameter))
+    {
+        return false;
+    }
+
+    std::string tempString { outputParameter.pData(), outputParameter.size() };
+    const Oid oid = outputParameter.internalFieldType();
+
+    Dynamic::Var resultValue;
+    bool success = false;
+
+    switch (oid)
+    {
+        case BOOLOID:
+        {
+            bool tempValue = false;
+            success = (tempString[0] == 't');
+            if (success)
+                val = tempValue;
+            break;
+        }
+        case INT2OID:
+        case INT4OID:
+        case INT8OID:
+        {
+            Poco::Int64 tempValue = 0;
+            success = Poco::NumberParser::tryParse64(tempString, tempValue);
+            if (success)
+                val = tempValue;
+            break;
+        }
+        // floating point
+        case FLOAT8OID:
+        case FLOAT4OID:
+        case NUMERICOID:
+        {
+            double tempValue = 0;
+            success = Poco::NumberParser::tryParseFloat(tempString, tempValue);
+            if (success)
+                val = tempValue;
+            break;
+        }
+        // character strings
+        case CHAROID:
+        case BPCHAROID:
+        case VARCHAROID:
+        default:
+        {
+            success = true;
+            val = tempString;
+            break;
+        }
+        // BLOB, CLOB
+        case BYTEAOID:
+        {
+            Poco::Data::BLOB blob;
+            success = extract(pos, blob);
+            if (success)
+                val = blob;
+            break;
+        }
+        case TEXTOID:
+        {
+            Poco::Data::CLOB clob;
+            success = extract(pos, clob);
+            if (success)
+                val = clob;
+            break;
+        }
+        // date
+        case DATEOID:
+        {
+            Date d;
+            success = extract(pos, d);
+            if (success)
+                val = d;
+            break;
+        }
+        // time
+        case TIMEOID:
+        case TIMETZOID:
+        {
+            Time t;
+            success = extract(pos, t);
+            if (success)
+                val = t;
+            break;
+        }
+        //timestamp
+        case TIMESTAMPOID:
+        case TIMESTAMPZOID:
+        {
+            DateTime dt;
+            success = extract(pos, dt);
+            if (success)
+                val = dt;
+            break;
+        }
+    }
+
+    return success;
+}
+
+
 //////////////
 // Not implemented
 //////////////
