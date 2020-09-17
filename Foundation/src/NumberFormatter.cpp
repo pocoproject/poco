@@ -82,20 +82,20 @@ void NumberFormatter::append0(std::string& str, int value, int width)
 }
 
 
-void NumberFormatter::appendHex(std::string& str, int value)
+void NumberFormatter::appendHex(std::string& str, int value, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(static_cast<unsigned int>(value), 0x10, result, sz);
+	uIntToStr(static_cast<unsigned int>(value), 0x10, result, sz, false, -1, ' ', 0, lowercase);
 	str.append(result, sz);
 }
 
 
-void NumberFormatter::appendHex(std::string& str, int value, int width)
+void NumberFormatter::appendHex(std::string& str, int value, int width, bool lowercase)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	uIntToStr(static_cast<unsigned int>(value), 0x10, result, sz, false, width, '0');
+	uIntToStr(static_cast<unsigned int>(value), 0x10, result, sz, false, width, '0', 0, lowercase);
 	str.append(result, sz);
 }
 
