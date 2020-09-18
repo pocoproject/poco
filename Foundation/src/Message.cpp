@@ -17,6 +17,10 @@
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
 #endif
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <unistd.h>
+#include <sys/syscall.h>
+#endif
 #include "Poco/Thread.h"
 #include <algorithm>
 
@@ -127,12 +131,21 @@ void Message::init()
 #if !defined(POCO_VXWORKS)
 	_pid = Process::id();
 #endif
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+    static thread_local auto tid = (long)::GetCurrentThreadId();
+    _tid = tid;
+#elif defined(POCO_OS_FAMILY_UNIX)
+    static thread_local auto tid = (long)syscall(SYS_gettid);
+    _tid = tid;
+#else
 	Thread* pThread = Thread::current();
 	if (pThread)
 	{
 		_tid    = pThread->id();
 		_thread = pThread->name();
 	}
+#endif
 }
 
 
