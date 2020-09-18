@@ -232,6 +232,11 @@ public:
 
 protected:
 	~FileChannel();
+
+	void setRotationStrategy(RotateStrategy* strategy);
+	void setArchiveStrategy(ArchiveStrategy* strategy);
+	void setPurgeStrategy(PurgeStrategy* strategy);
+
 	void setRotation(const std::string& rotation);
 	void setArchive(const std::string& archive);
 	void setCompress(const std::string& compress);
@@ -241,11 +246,15 @@ protected:
 	void setRotateOnOpen(const std::string& rotateOnOpen);
 	void purge();
 
+
 private:
 	bool setNoPurge(const std::string& value);
 	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = NULL) const;
-	void setPurgeStrategy(PurgeStrategy* strategy);
 	Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
+
+
+	virtual RotateStrategy* createRotation(const std::string& rotation, const std::string& times);
+	virtual ArchiveStrategy* createArchive(const std::string& archive, const std::string& times);
 
 	std::string      _path;
 	std::string      _times;
