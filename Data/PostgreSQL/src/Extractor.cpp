@@ -501,10 +501,11 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
     {
         case BOOLOID:
         {
-            bool tempValue = false;
-            success = (tempString[0] == 't');
-            if (success)
-                val = tempValue;
+            success = true;
+            if (tempString[0] == 't')
+                val = true;
+            else
+                val = false;
             break;
         }
         case INT2OID:
