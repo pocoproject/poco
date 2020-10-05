@@ -179,12 +179,14 @@ bool SocketReactor::hasEventHandler(const Socket& socket, const Poco::AbstractOb
 
 SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool makeNew)
 {
-	if (socket.impl() == nullptr) return 0;
+	const SocketImpl* pImpl = socket.impl();
+	if (pImpl == nullptr) return 0;
+	poco_socket_t sockfd = pImpl->sockfd();
 	ScopedLock lock(_mutex);
 
-	EventHandlerMap::iterator it = _handlers.find(socket.impl()->sockfd());
+	EventHandlerMap::iterator it = _handlers.find(sockfd);
 	if (it != _handlers.end()) return it->second;
-	else if (makeNew) return (_handlers[socket.impl()->sockfd()] = new SocketNotifier(socket));
+	else if (makeNew) return (_handlers[sockfd] = new SocketNotifier(socket));
 
 	return 0;
 }
@@ -192,7 +194,8 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 
 void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
-	if (socket.impl() == nullptr) return;
+	const SocketImpl* pImpl = socket.impl();
+	if (pImpl == nullptr) return;
 	NotifierPtr pNotifier = getNotifier(socket);
 	if (pNotifier && pNotifier->hasObserver(observer))
 	{
@@ -200,7 +203,7 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 		{
 			{
 				ScopedLock lock(_mutex);
-				_handlers.erase(socket.impl()->sockfd());
+				_handlers.erase(pImpl->sockfd());
 			}
 			_pollSet.remove(socket);
 		}
