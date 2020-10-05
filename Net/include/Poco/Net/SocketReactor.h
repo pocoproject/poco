@@ -209,7 +209,7 @@ protected:
 private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
-	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
+	typedef std::map<poco_socket_t, NotifierPtr>     EventHandlerMap;
 	typedef Poco::FastMutex                   MutexType;
 	typedef MutexType::ScopedLock             ScopedLock;
 
