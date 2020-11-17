@@ -248,7 +248,7 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, NULL);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI, NULL);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");
