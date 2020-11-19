@@ -66,7 +66,7 @@ std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::strin
 
 	std::ostringstream str;
 	std::string line(std::string::size_type(pNames->size()*_colWidth + (pNames->size() - 1)*_spacing), '-');
-	std::string space(_spacing, ' ');
+	std::string space(static_cast<std::size_t>(_spacing), ' ');
 	NameVec::const_iterator it = pNames->begin();
 	NameVec::const_iterator end = pNames->end();
 	for (; it != end; ++it)
@@ -83,7 +83,7 @@ std::string& SimpleRowFormatter::formatNames(const NameVecPtr pNames, std::strin
 std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string& formattedValues)
 {
 	std::ostringstream str;
-	std::string space(_spacing, ' ');
+	std::string space(static_cast<std::size_t>(_spacing), ' ');
 	ValueVec::const_iterator it = vals.begin();
 	ValueVec::const_iterator end = vals.end();
 	for (; it != end; ++it)

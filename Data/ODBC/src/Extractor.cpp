@@ -18,7 +18,6 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
-#include "Poco/Exception.h"
 #include <typeinfo>
 
 
@@ -34,10 +33,13 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 
 
 Extractor::Extractor(const StatementHandle& rStmt, 
-	Preparator::Ptr pPreparator): 
+	Preparator::Ptr pPreparator,
+	const std::string& dbEncoding):
 	_rStmt(rStmt), 
 	_pPreparator(pPreparator),
-	_dataExtraction(pPreparator->getDataExtraction())
+	_dataExtraction(pPreparator->getDataExtraction()),
+	_dbEncoding(dbEncoding),
+	_toEncoding("UTF-8")
 {
 }
 
@@ -660,37 +662,47 @@ bool Extractor::extract(std::size_t pos, std::list<double>& val)
 
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
-	if (Preparator::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_CHAR);
+	bool ret = false;
+
+	if (_dbEncoding == _toEncoding)
+	{
+		if (Preparator::DE_MANUAL == _dataExtraction)
+			ret = extractManualImpl(pos, val, SQL_C_CHAR);
+		else
+			ret = extractBoundImpl(pos, val);
+	}
 	else
-		return extractBoundImpl(pos, val);
+	{
+		std::string result;
+		if (Preparator::DE_MANUAL == _dataExtraction)
+			ret = extractManualImpl(pos, result, SQL_C_CHAR);
+		else
+			ret = extractBoundImpl(pos, result);
+		Poco::TextEncoding::Ptr pDataEncoding = Poco::TextEncoding::find(_dbEncoding);
+		Poco::TextEncoding::Ptr pToEncoding = Poco::TextEncoding::find(_toEncoding);
+		Poco::TextConverter converter(*pDataEncoding, *pToEncoding);
+		converter.convert(result, val);
+	}
+
+	return ret;
 }
 
 
 bool Extractor::extract(std::size_t pos, std::vector<std::string>& val)
 {
-	if (Preparator::DE_BOUND == _dataExtraction)
-		return extractBoundImplContainer(pos, val);
-	else
-		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+	return stringContainerExtract(pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::deque<std::string>& val)
 {
-	if (Preparator::DE_BOUND == _dataExtraction)
-		return extractBoundImplContainer(pos, val);
-	else
-		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+	return stringContainerExtract(pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
 {
-	if (Preparator::DE_BOUND == _dataExtraction)
-		return extractBoundImplContainer(pos, val);
-	else
-		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+	return stringContainerExtract(pos, val);
 }
 
 

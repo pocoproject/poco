@@ -162,6 +162,16 @@ public:
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
 
+	void setDBEncoding(const std::string&, const Poco::Any& value);
+		/// Sets the database encoding.
+		/// Value must be of type std::string.
+
+	Poco::Any getDBEncoding(const std::string&) const;
+		/// Returns the database encoding.
+
+	const std::string& dbEncoding() const;
+		/// Returns the database encoding.
+
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
 
@@ -193,6 +203,7 @@ private:
 	mutable char           _canTransact;
 	bool                   _inTransaction;
 	int                    _queryTimeout;
+	std::string            _dbEncoding;
 	Poco::FastMutex        _mutex;
 };
 
@@ -288,6 +299,24 @@ inline Poco::Any SessionImpl::getQueryTimeout(const std::string&) const
 inline int SessionImpl::queryTimeout() const
 {
 	return _queryTimeout;
+}
+
+
+inline void SessionImpl::setDBEncoding(const std::string&, const Poco::Any& value)
+{
+	_dbEncoding = Poco::AnyCast<std::string>(value);
+}
+
+
+inline Poco::Any SessionImpl::getDBEncoding(const std::string&) const
+{
+	return _dbEncoding;
+}
+
+
+inline const std::string& SessionImpl::dbEncoding() const
+{
+	return _dbEncoding;
 }
 
 

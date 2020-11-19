@@ -32,6 +32,8 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Nullable.h"
 #include "Poco/UTFString.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/TextConverter.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -53,7 +55,8 @@ public:
 	typedef Preparator::Ptr PreparatorPtr;
 
 	Extractor(const StatementHandle& rStmt, 
-		Preparator::Ptr pPreparator);
+		Preparator::Ptr pPreparator,
+		const std::string& dbEncoding = "UTF-8");
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -574,6 +577,50 @@ private:
 		return false;
 	}
 
+	template <typename C>
+	bool stringContainerExtractConvert(std::size_t pos, C& val)
+	{
+		bool ret = false;
+		C result;
+		if (Preparator::DE_BOUND == _dataExtraction)
+			ret = extractBoundImplContainer(pos, result);
+		else
+			throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+		val.clear();
+		if (ret)
+		{
+			val.resize(result.size());
+			C::iterator vIt = val.begin();
+			C::iterator it = result.begin();
+			for (; it != result.end(); ++it, ++vIt)
+			{
+				Poco::TextEncoding::Ptr pDataEncoding = Poco::TextEncoding::find(_dbEncoding);
+				Poco::TextEncoding::Ptr pToEncoding = Poco::TextEncoding::find(_toEncoding);
+				Poco::TextConverter converter(*pDataEncoding, *pToEncoding);
+				converter.convert(*it, *vIt);
+			}
+		}
+		return ret;
+	}
+
+	template <typename C>
+	bool stringContainerExtract(std::size_t pos, C& val)
+	{
+		bool ret = false;
+		if (_dbEncoding == _toEncoding)
+		{
+			if (Preparator::DE_BOUND == _dataExtraction)
+				ret = extractBoundImplContainer(pos, val);
+			else
+				throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+		}
+		else
+		{
+			ret = stringContainerExtractConvert(pos, val);
+		}
+		return ret;
+	}
+
 	bool isNullLengthIndicator(SQLLEN val) const;
 		/// The reason for this utility wrapper are platforms where 
 		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value, 
@@ -585,6 +632,8 @@ private:
 	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
 	std::vector<SQLLEN>        _lengths;
+	std::string                _dbEncoding;
+	const std::string          _toEncoding;
 };
 
 
