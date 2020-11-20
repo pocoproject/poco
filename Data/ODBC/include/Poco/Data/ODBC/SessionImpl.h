@@ -25,6 +25,7 @@
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractSessionImpl.h"
+#include "Poco/TextEncoding.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -299,12 +300,6 @@ inline Poco::Any SessionImpl::getQueryTimeout(const std::string&) const
 inline int SessionImpl::queryTimeout() const
 {
 	return _queryTimeout;
-}
-
-
-inline void SessionImpl::setDBEncoding(const std::string&, const Poco::Any& value)
-{
-	_dbEncoding = Poco::AnyCast<std::string>(value);
 }
 
 

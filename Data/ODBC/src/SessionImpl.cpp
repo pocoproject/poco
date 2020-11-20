@@ -170,6 +170,14 @@ void SessionImpl::open(const std::string& connect)
 }
 
 
+void SessionImpl::setDBEncoding(const std::string&, const Poco::Any& value)
+{
+	const std::string& enc = Poco::RefAnyCast<std::string>(value);
+	Poco::TextEncoding::byName(enc); // throws if not found
+	_dbEncoding = enc;
+}
+
+
 bool SessionImpl::isConnected() const
 {
 	SQLULEN value = 0;

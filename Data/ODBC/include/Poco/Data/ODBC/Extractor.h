@@ -56,7 +56,7 @@ public:
 
 	Extractor(const StatementHandle& rStmt, 
 		Preparator::Ptr pPreparator,
-		const std::string& dbEncoding = "UTF-8");
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -586,7 +586,7 @@ private:
 		val.clear();
 		if (ret)
 		{
-			Poco::TextConverter conv(_dbEncoding, _toEncoding);
+			Poco::TextConverter conv(*_pDBEncoding, *_pToEncoding);
 			val.resize(res.size());
 			C::iterator vIt = val.begin();
 			C::iterator it = res.begin();
@@ -622,9 +622,9 @@ private:
 	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
 	std::vector<SQLLEN>        _lengths;
-	Poco::TextEncoding&        _dbEncoding;
-	Poco::TextEncoding&        _toEncoding;
+	Poco::TextEncoding::Ptr    _pDBEncoding;
 	bool                       _transcode;
+	Poco::TextEncoding::Ptr    _pToEncoding;
 };
 
 
