@@ -38,8 +38,9 @@ Extractor::Extractor(const StatementHandle& rStmt,
 	_rStmt(rStmt), 
 	_pPreparator(pPreparator),
 	_dataExtraction(pPreparator->getDataExtraction()),
-	_dbEncoding(dbEncoding),
-	_toEncoding("UTF-8")
+	_dbEncoding(Poco::TextEncoding::byName(dbEncoding)),
+	_toEncoding(Poco::TextEncoding::byName("UTF-8")),
+	_transcode(!_dbEncoding.isA("UTF-8"))
 {
 }
 
@@ -664,7 +665,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 {
 	bool ret = false;
 
-	if (_dbEncoding == _toEncoding)
+	if (!_transcode)
 	{
 		if (Preparator::DE_MANUAL == _dataExtraction)
 			ret = extractManualImpl(pos, val, SQL_C_CHAR);
@@ -678,9 +679,7 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 			ret = extractManualImpl(pos, result, SQL_C_CHAR);
 		else
 			ret = extractBoundImpl(pos, result);
-		Poco::TextEncoding::Ptr pDataEncoding = Poco::TextEncoding::find(_dbEncoding);
-		Poco::TextEncoding::Ptr pToEncoding = Poco::TextEncoding::find(_toEncoding);
-		Poco::TextConverter converter(*pDataEncoding, *pToEncoding);
+		Poco::TextConverter converter(_dbEncoding, _toEncoding);
 		converter.convert(result, val);
 	}
 

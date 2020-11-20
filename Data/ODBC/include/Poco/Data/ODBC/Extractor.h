@@ -581,24 +581,16 @@ private:
 	bool stringContainerExtractConvert(std::size_t pos, C& val)
 	{
 		bool ret = false;
-		C result;
-		if (Preparator::DE_BOUND == _dataExtraction)
-			ret = extractBoundImplContainer(pos, result);
-		else
-			throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+		C res;
+		ret = extractBoundImplContainer(pos, res);
 		val.clear();
 		if (ret)
 		{
-			val.resize(result.size());
+			Poco::TextConverter conv(_dbEncoding, _toEncoding);
+			val.resize(res.size());
 			C::iterator vIt = val.begin();
-			C::iterator it = result.begin();
-			for (; it != result.end(); ++it, ++vIt)
-			{
-				Poco::TextEncoding::Ptr pDataEncoding = Poco::TextEncoding::find(_dbEncoding);
-				Poco::TextEncoding::Ptr pToEncoding = Poco::TextEncoding::find(_toEncoding);
-				Poco::TextConverter converter(*pDataEncoding, *pToEncoding);
-				converter.convert(*it, *vIt);
-			}
+			C::iterator it = res.begin();
+			for (; it != res.end(); ++it, ++vIt) conv.convert(*it, *vIt);
 		}
 		return ret;
 	}
@@ -607,17 +599,15 @@ private:
 	bool stringContainerExtract(std::size_t pos, C& val)
 	{
 		bool ret = false;
-		if (_dbEncoding == _toEncoding)
+		if (Preparator::DE_BOUND == _dataExtraction)
 		{
-			if (Preparator::DE_BOUND == _dataExtraction)
+			if (!_transcode)
 				ret = extractBoundImplContainer(pos, val);
 			else
-				throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+				ret = stringContainerExtractConvert(pos, val);
 		}
 		else
-		{
-			ret = stringContainerExtractConvert(pos, val);
-		}
+			throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
 		return ret;
 	}
 
@@ -632,8 +622,9 @@ private:
 	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
 	std::vector<SQLLEN>        _lengths;
-	std::string                _dbEncoding;
-	const std::string          _toEncoding;
+	Poco::TextEncoding&        _dbEncoding;
+	Poco::TextEncoding&        _toEncoding;
+	bool                       _transcode;
 };
 
 
