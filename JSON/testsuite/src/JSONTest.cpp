@@ -2163,6 +2163,47 @@ void JSONTest::testMove()
 	assertTrue (nl[2] == "baz");
 }
 
+void JSONTest::testRemove()
+{
+	Object obj1;
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "bar");
+	assertTrue(nl[1] == "baz");
+	assertTrue(nl[2] == "foo");
+
+	obj1.remove("baz");
+
+	nl = obj1.getNames();
+	assertTrue(nl.size() == 2);
+	assertTrue(nl[0] == "bar");
+	assertTrue(nl[1] == "foo");
+
+	Object obj2(Poco::JSON_PRESERVE_KEY_ORDER);
+	obj2.set("foo", 0);
+	obj2.set("bar", 0);
+	obj2.set("baz", 0);
+
+	nl = obj2.getNames();
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "bar");
+	assertTrue(nl[2] == "baz");
+
+	obj2.remove("bar");
+	nl = obj2.getNames();
+
+	assertTrue(nl.size() == 2);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "baz");
+
+}
+
 
 CppUnit::Test* JSONTest::suite()
 {
@@ -2214,6 +2255,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
+	CppUnit_addTest(pSuite, JSONTest, testRemove);
 
 	return pSuite;
 }
