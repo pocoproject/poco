@@ -588,8 +588,8 @@ private:
 		{
 			Poco::TextConverter conv(*_pDBEncoding, *_pToEncoding);
 			val.resize(res.size());
-			C::iterator vIt = val.begin();
-			C::iterator it = res.begin();
+			typename C::iterator vIt = val.begin();
+			typename C::iterator it = res.begin();
 			for (; it != res.end(); ++it, ++vIt) conv.convert(*it, *vIt);
 		}
 		return ret;
