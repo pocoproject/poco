@@ -94,7 +94,7 @@ private:
 //
 
 // Macro defining the default initial size of any
-// FastMemoryPool; can be overriden by specifying
+// FastMemoryPool; can be overridden by specifying
 // FastMemoryPool pre-alloc at runtime.
 #define POCO_FAST_MEMORY_POOL_PREALLOC 1000
 

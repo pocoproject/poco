@@ -279,7 +279,7 @@ protected:
 		/// usually the case when stored procedures are called). In such cases
 		/// no storage is needed because output parameters serve as storage.
 		/// At the Data framework level, this function always returns false.
-		/// When connector-specific behavior is desired, it should be overriden 
+		/// When connector-specific behavior is desired, it should be overridden 
 		/// by the statement implementation.
 
 	std::size_t currentDataSet() const;
