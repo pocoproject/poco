@@ -1936,6 +1936,15 @@ void JSONTest::testEscape0()
 	json->stringify(ss);
 
 	assertTrue (ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
+
+	// parse the JSON containing the escaped string
+	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
+	Var result = parser.parse(ss.str());
+
+	assert(result.type() == typeid(Object::Ptr));
+
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assert(object->get("name").extract<std::string>() == nullString);
 }
 
 
