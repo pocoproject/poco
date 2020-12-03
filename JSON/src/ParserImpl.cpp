@@ -209,7 +209,7 @@ void ParserImpl::handle()
 			{
 				std::size_t length = 0;
 				const char* val = json_get_string(_pJSON, &length);
-				_pHandler->value(std::string(val, length == 0 ? 0 : --length)); // Decrease the length by 1 because it also contains the terminating null character
+				_pHandler->value(std::string(val, length == 0 ? 0 : length-1)); // Decrease the length by 1 because it also contains the terminating null character
 			}
 			break;
 		}
