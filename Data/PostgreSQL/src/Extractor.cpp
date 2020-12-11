@@ -317,6 +317,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 
 	const char * pBLOB = reinterpret_cast<const char*>(outputParameter.pData());
 	std::size_t BLOBSize  = outputParameter.size();
+	val = Poco::Data::BLOB(); // don't share contents with _default
 
 	if	(	'\\' == pBLOB[0]
 		 && 'x'  == pBLOB[1]	// preamble to BYTEA data format in text form is \x
