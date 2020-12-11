@@ -436,6 +436,9 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 				if (str == "true")
 					return true;
 
+				if (str == "null")
+					return Var();
+
 				bool isNumber = false;
 				bool isSigned = false;
 				int separators = 0;
