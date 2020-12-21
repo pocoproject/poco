@@ -1,0 +1,11 @@
+	</dependencies>
+  </metadata>
+  <files>
+    <file src='..\..\poco.png' 					target='image\poco.png' />
+	<file src='..\..\..\lib\Poco$id$MD*.*' 		target='build\native\lib\' />
+ 	<file src='..\..\..\lib\Poco$id$MT*.*' 		target='build\native\lib\' />
+	<file src='..\..\..\lib64\Poco$id$MD*.*' 	target='build\native\lib64\' />
+    <file src='..\..\..\lib64\Poco$id$MT*.*' 	target='build\native\lib64\' />
+    <file src='Poco.static.targets' 			target='build\native\Poco.$id$.vs$vs$.static.targets' />
+   </files>
+</package>
