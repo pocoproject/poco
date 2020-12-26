@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Poco.$id$.$vs$.noarch</id>
+    <id>Poco.$id$.vs$vs$.noarch</id>
     <version>$version$</version>
-    <title>Pocoproject Poco $vs$ noarch</title>
+    <title>Pocoproject Poco $id$ vs$vs$ noarch</title>
     <authors>Applied Informatics &amp; Contributors</authors>
     <owners>Guenter Obiltschnig &amp; Aleksandar Fabijanic</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -20,6 +20,6 @@
   <files>
     <file src="..\..\poco.png" 						target="image\poco.png" />
     <file src="..\..\..\$inc$\include\**\*.h" 		target="build\native\inc" />
-    <file src="Poco.noarch.targets" 				target="build\native\Poco.$id$.$vs$.noarch.targets" />
+    <file src="Poco.noarch.targets" 				target="build\native\Poco.$id$.vs$vs$.noarch.targets" />
   </files>
 </package>
