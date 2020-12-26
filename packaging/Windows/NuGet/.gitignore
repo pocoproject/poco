@@ -1,3 +1,6 @@
 *.nupkg
 *.snupkg
+Poco.shared.nuspec
+Poco.static.nuspec
+foo
 
