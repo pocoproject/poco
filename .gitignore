@@ -93,7 +93,6 @@ Thumbs.db
 # VS generated files #
 ######################
 *.obj
-*.exe
 *.pdb
 *.user
 *.aps
@@ -144,3 +143,5 @@ cmake-build/
 *.bak
 stage/
 releases/
+/.vscode/
+/cmake-vsc-build/
