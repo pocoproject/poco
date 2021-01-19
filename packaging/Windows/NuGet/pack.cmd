@@ -10,8 +10,8 @@ if "%3"=="" goto usage
 
 del *.noarch.%3.nupkg *.%1.%3.nupkg *.%1.%3.symbols.nupkg
 
-rem for %%G in (Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL NetSSL_Win Data  Zip JWT PDF CppParser MongoDB Redis) do (
-for %%G in (Foundation) do (
+for %%G in (Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL NetSSL_Win Data  Zip JWT PDF CppParser MongoDB Redis) do (
+rem for %%G in (Foundation) do (
 	@copy Poco.front foo
 	if exist ..\..\..\%%G\dependencies (
 		for /f "delims=" %%M in (..\..\..\%%G\dependencies) do (
