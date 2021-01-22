@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?> 														
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">						
-<PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">	
-<FOUNDATION>$(MSBuildThisFileDirectory)bin\</FOUNDATION>												
+<PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">	
+<CPPUNIT>$(MSBuildThisFileDirectory)bin\</CPPUNIT>												
 </PropertyGroup>												
-<PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">	
-<FOUNDATION>$(MSBuildThisFileDirectory)bin\</FOUNDATION>												
+<PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x86'">	
+<CPPUNIT>$(MSBuildThisFileDirectory)bin\</CPPUNIT>												
 </PropertyGroup>	
-<PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">	
-<FOUNDATION>$(MSBuildThisFileDirectory)bin64\</FOUNDATION>												
+<PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">	
+<CPPUNIT>$(MSBuildThisFileDirectory)bin64\</CPPUNIT>												
 </PropertyGroup>	
 </Project>	

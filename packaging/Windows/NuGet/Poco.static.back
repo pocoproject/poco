@@ -2,14 +2,14 @@
   </metadata>
   <files>
     <file src='..\..\poco.png' 					target='image\poco.png' />
-	<file src='..\..\..\lib\Poco$id$MD.*' 		target='build\native\lib\' />
-	<file src='..\..\..\lib\Poco$id$MDd.*' 		target='build\native\lib\' />
- 	<file src='..\..\..\lib\Poco$id$MT.*' 		target='build\native\lib\' />
- 	<file src='..\..\..\lib\Poco$id$MTd.*' 		target='build\native\lib\' />
-	<file src='..\..\..\lib64\Poco$id$MD.*' 	target='build\native\lib64\' />
-	<file src='..\..\..\lib64\Poco$id$MDd.*' 	target='build\native\lib64\' />
-    <file src='..\..\..\lib64\Poco$id$MT.*' 	target='build\native\lib64\' />
-    <file src='..\..\..\lib64\Poco$id$MTd.*' 	target='build\native\lib64\' />
+	<file src='..\..\..\lib\$prefix$$id$MD.*' 		target='build\native\lib\' />
+	<file src='..\..\..\lib\$prefix$$id$MDd.*' 		target='build\native\lib\' />
+ 	<file src='..\..\..\lib\$prefix$$id$MT.*' 		target='build\native\lib\' />
+ 	<file src='..\..\..\lib\$prefix$$id$MTd.*' 		target='build\native\lib\' />
+	<file src='..\..\..\lib64\$prefix$$id$MD.*' 	target='build\native\lib64\' />
+	<file src='..\..\..\lib64\$prefix$$id$MDd.*' 	target='build\native\lib64\' />
+    <file src='..\..\..\lib64\$prefix$$id$MT.*' 	target='build\native\lib64\' />
+    <file src='..\..\..\lib64\$prefix$$id$MTd.*' 	target='build\native\lib64\' />
     <file src='Poco.static.targets' 			target='build\native\Poco.$id$.vs$vs$.static.targets' />
  	<file src="..\..\..\$inc$\src\**\*.cpp" 	target="src" />
 	<file src="..\..\..\$inc$\src\**\*.c" 		target="src" />
