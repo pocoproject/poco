@@ -1,8 +1,6 @@
 //
 // PurgeStrategy.cpp
 //
-// $Id: //poco/1.4/Foundation/src/PurgeStrategy.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel
@@ -78,11 +76,11 @@ void PurgeByAgeStrategy::purge(const std::string& path)
 {
 	std::vector<File> files;
 	list(path, files);
-	for (std::vector<File>::iterator it = files.begin(); it != files.end(); ++it)
+	for (auto& f: files)
 	{
-		if (it->getLastModified().isElapsed(_age.totalMicroseconds()))
+		if (f.getLastModified().isElapsed(_age.totalMicroseconds()))
 		{
-			it->remove();
+			f.remove();
 		}
 	}
 }

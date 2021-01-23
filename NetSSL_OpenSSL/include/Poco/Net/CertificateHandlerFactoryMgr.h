@@ -1,8 +1,6 @@
 //
 // CertificateHandlerFactoryMgr.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/CertificateHandlerFactoryMgr.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  CertificateHandlerFactoryMgr
@@ -34,8 +32,8 @@ class NetSSL_API CertificateHandlerFactoryMgr
 	/// A CertificateHandlerFactoryMgr manages all existing CertificateHandlerFactories.
 {
 public:
-	typedef std::map<std::string, Poco::SharedPtr<CertificateHandlerFactory> > FactoriesMap;
-	
+	using FactoriesMap = std::map<std::string, Poco::SharedPtr<CertificateHandlerFactory>>;
+
 	CertificateHandlerFactoryMgr();
 		/// Creates the CertificateHandlerFactoryMgr.
 
@@ -48,12 +46,12 @@ public:
 
 	bool hasFactory(const std::string& name) const;
 		/// Returns true if for the given name a factory is already registered
-	
+
 	const CertificateHandlerFactory* getFactory(const std::string& name) const;
 		/// Returns NULL if for the given name a factory does not exist, otherwise the factory is returned
 
 	void removeFactory(const std::string& name);
-		/// Removes the factory from the manager. 
+		/// Removes the factory from the manager.
 
 private:
 	FactoriesMap _factories;

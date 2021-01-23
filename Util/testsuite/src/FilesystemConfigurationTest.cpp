@@ -1,8 +1,6 @@
 //
 // FilesystemConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/FilesystemConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -46,42 +44,42 @@ void FilesystemConfigurationTest::testFilesystemConfiguration()
 	config->setString("logging.formatters.f1.pattern", "[%p] %t");
 	config->setString("logging.channels.c1.class", "ConsoleChannel");
 
-	assert (config->getString("logging.loggers.root.channel.class") == "ConsoleChannel");
-	assert (config->getString("logging.loggers.app.name") == "Application");
-	assert (config->getString("logging.loggers.app.channel") == "c1");
-	assert (config->getString("logging.formatters.f1.class") == "PatternFormatter");
-	assert (config->getString("logging.formatters.f1.pattern") == "[%p] %t");
+	assertTrue (config->getString("logging.loggers.root.channel.class") == "ConsoleChannel");
+	assertTrue (config->getString("logging.loggers.app.name") == "Application");
+	assertTrue (config->getString("logging.loggers.app.channel") == "c1");
+	assertTrue (config->getString("logging.formatters.f1.class") == "PatternFormatter");
+	assertTrue (config->getString("logging.formatters.f1.pattern") == "[%p] %t");
 
 	config->setString("logging.loggers.app.channel", "c2");
-	assert (config->getString("logging.loggers.app.channel") == "c2");
+	assertTrue (config->getString("logging.loggers.app.channel") == "c2");
 	
 	AbstractConfiguration::Keys keys;
 	config->keys(keys);
-	assert (keys.size() == 1);
-	assert (std::find(keys.begin(), keys.end(), "logging") != keys.end());
+	assertTrue (keys.size() == 1);
+	assertTrue (std::find(keys.begin(), keys.end(), "logging") != keys.end());
 
 	config->keys("logging", keys);
-	assert (keys.size() == 3);
-	assert (std::find(keys.begin(), keys.end(), "loggers") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "formatters") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "channels") != keys.end());
+	assertTrue (keys.size() == 3);
+	assertTrue (std::find(keys.begin(), keys.end(), "loggers") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "formatters") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "channels") != keys.end());
 
 	config->keys("logging.formatters", keys);
-	assert (keys.size() == 1);
-	assert (std::find(keys.begin(), keys.end(), "f1") != keys.end());
+	assertTrue (keys.size() == 1);
+	assertTrue (std::find(keys.begin(), keys.end(), "f1") != keys.end());
 
 	config->keys("logging.formatters.f1", keys);
-	assert (keys.size() == 2);
-	assert (std::find(keys.begin(), keys.end(), "class") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "pattern") != keys.end());
+	assertTrue (keys.size() == 2);
+	assertTrue (std::find(keys.begin(), keys.end(), "class") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "pattern") != keys.end());
 	
-	assert (config->hasProperty("logging.loggers.root.channel.class"));
+	assertTrue (config->hasProperty("logging.loggers.root.channel.class"));
 	config->clear();
-	assert (!config->hasProperty("logging.loggers.root.channel.class"));
+	assertTrue (!config->hasProperty("logging.loggers.root.channel.class"));
 }
 
 
-AbstractConfiguration* FilesystemConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr FilesystemConfigurationTest::allocConfiguration() const
 {
 	return new FilesystemConfiguration(_path.toString());
 }

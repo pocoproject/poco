@@ -1,8 +1,6 @@
 //
 // MessageHeaderTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/MessageHeaderTest.h#2 $
-//
 // Definition of the MessageHeaderTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -42,6 +40,7 @@ public:
 	void testSplitElements();
 	void testSplitParameters();
 	void testFieldLimit();
+	void testDecodeWord();
 
 	void setUp();
 	void tearDown();

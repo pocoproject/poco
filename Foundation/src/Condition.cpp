@@ -1,8 +1,6 @@
 //
 // Condition.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Condition.cpp#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Condition
@@ -45,9 +43,9 @@ void Condition::broadcast()
 {
 	FastMutex::ScopedLock lock(_mutex);
 	
-	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	for (auto p: _waitQueue)
 	{
-		(*it)->set();
+		p->set();
 	}
 	_waitQueue.clear();
 }

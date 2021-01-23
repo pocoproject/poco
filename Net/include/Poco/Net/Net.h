@@ -1,8 +1,6 @@
 //
 // Net.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/Net.h#2 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  Net
@@ -83,7 +81,12 @@ void Net_API uninitializeNetwork();
 	/// (Windows only, no-op elsewhere)
 
 
-}} // namespace Poco::Net
+std::string htmlize(const std::string& str);
+	/// Returns a copy of html with reserved HTML
+	/// characters (<, >, ", &) propery escaped.
+
+
+} } // namespace Poco::Net
 
 
 //
@@ -95,13 +98,13 @@ void Net_API uninitializeNetwork();
 extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
 
 #if defined(Net_EXPORTS)
-	#if defined(_WIN64) || defined(_WIN32_WCE)
+	#if defined(_WIN64) || (defined(_WIN32_WCE) && !defined(x86))
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
 	#elif defined(_WIN32)
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
 	#endif
 #else  // !Net_EXPORTS
-	#if defined(_WIN64) || defined(_WIN32_WCE)
+	#if defined(_WIN64) || (defined(_WIN32_WCE) && !defined(x86))
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
 	#elif defined(_WIN32)
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
@@ -116,7 +119,7 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 //
 // Define POCO_NET_HAS_INTERFACE for platforms that have network interface detection implemented.
 //
-#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+#if defined(POCO_OS_FAMILY_WINDOWS) || (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID) || defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 	#define POCO_NET_HAS_INTERFACE
 #endif
 

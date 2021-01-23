@@ -1,8 +1,6 @@
 //
 // PrettyPrint.cpp
 //
-// $Id: //poco/1.4/XML/samples/PrettyPrint/src/PrettyPrint.cpp#1 $
-//
 // This sample demonstrates the SAXParser, WhitespaceFilter,
 // InputSource and XMLWriter classes.
 //

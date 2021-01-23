@@ -1,8 +1,6 @@
 //
 // DatagramSocketTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/DatagramSocketTest.h#1 $
-//
 // Definition of the DatagramSocketTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -27,8 +25,12 @@ public:
 	~DatagramSocketTest();
 
 	void testEcho();
+	void testEchoBuffer();
 	void testSendToReceiveFrom();
+	void testUnbound();
 	void testBroadcast();
+	void testGatherScatterFixed();
+	void testGatherScatterVariable();
 
 	void setUp();
 	void tearDown();
@@ -36,6 +38,16 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	// "STRF" are sendto/recvfrom versions of the same functionality
+	void testGatherScatterFixedWin();
+	void testGatherScatterSTRFFixedWin();
+	void testGatherScatterVariableWin();
+	void testGatherScatterSTRFVariableWin();
+
+	void testGatherScatterFixedUNIX();
+	void testGatherScatterSTRFFixedUNIX();
+	void testGatherScatterVariableUNIX();
+	void testGatherScatterSTRFVariableUNIX();
 };
 
 

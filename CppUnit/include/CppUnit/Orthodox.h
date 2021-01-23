@@ -1,8 +1,6 @@
 //
 // Orthodox.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/Orthodox.h#1 $
-//
 
 
 #ifndef CppUnit_Orthodox_INCLUDED

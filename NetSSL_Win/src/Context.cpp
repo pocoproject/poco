@@ -1,8 +1,6 @@
 //
 // Context.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  Context
@@ -41,13 +39,14 @@ const std::string Context::CERT_STORE_USERDS("USERDS");
 
 
 Context::Context(Usage usage,
-		const std::string& certNameOrPath, 
+		const std::string& certNameOrPath,
 		VerificationMode verMode,
 		int options,
 		const std::string& certStore):
 	_usage(usage),
 	_mode(verMode),
 	_options(options),
+	_disabledProtocols(0),
 	_extendedCertificateVerification(true),
 	_certNameOrPath(certNameOrPath),
 	_certStoreName(certStore),
@@ -164,14 +163,14 @@ Poco::Net::X509Certificate Context::certificate()
 
 void Context::loadCertificate()
 {
-	std::wstring wcertStore;
-	Poco::UnicodeConverter::convert(_certStoreName, wcertStore);
+	std::wstring wcertStoreName;
+	Poco::UnicodeConverter::convert(_certStoreName, wcertStoreName);
 	if (!_hCertStore)
 	{
 		if (_options & OPT_USE_MACHINE_STORE)
-			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, _certStoreName.c_str());
+			_hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStoreName.c_str());
 		else
-			_hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
+			_hCertStore = CertOpenSystemStoreW(0, wcertStoreName.c_str());
 	}
 	if (!_hCertStore) throw CertificateException("Failed to open certificate store", _certStoreName, GetLastError());
 
@@ -195,7 +194,6 @@ void Context::importCertificate()
 	Poco::File certFile(_certNameOrPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(_certNameOrPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certNameOrPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(_certNameOrPath);
 	istr.read(buffer.begin(), buffer.size());
@@ -210,7 +208,7 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 	SSLManager::instance().PrivateKeyPassphraseRequired.notify(&SSLManager::instance(), password);
 	std::wstring wpassword;
 	Poco::UnicodeConverter::toUTF16(password, wpassword);
-	
+
 	// clear UTF-8 password
 	std::fill(const_cast<char*>(password.data()), const_cast<char*>(password.data() + password.size()), 'X');
 
@@ -219,7 +217,7 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 	blob.pbData = reinterpret_cast<BYTE*>(const_cast<char*>(pBuffer));
 
 	HCERTSTORE hTempStore =  PFXImportCertStore(&blob, wpassword.data(), PKCS12_ALLOW_OVERWRITE_KEY | PKCS12_INCLUDE_EXTENDED_PROPERTIES);
-	
+
 	// clear UTF-16 password
 	std::fill(const_cast<wchar_t*>(wpassword.data()), const_cast<wchar_t*>(wpassword.data() + password.size()), L'X');
 
@@ -304,26 +302,26 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 		if (!_extendedCertificateVerification)
 			schannelCred.dwFlags |= SCH_CRED_NO_SERVERNAME_CHECK;
 	}
-	
+
 #if defined(SCH_USE_STRONG_CRYPTO)
 	if (_options & Context::OPT_USE_STRONG_CRYPTO)
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = _hCollectionCertStore;
+	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : NULL;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
 	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
-										NULL,
-										UNISP_NAME_W,
-										isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND, 
-										NULL,
-										&schannelCred,
-										NULL,
-										NULL,
-										&credHandle,
-										&tsExpiry);
+		NULL,
+		UNISP_NAME_W,
+		isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
+		NULL,
+		&schannelCred,
+		NULL,
+		NULL,
+		&credHandle,
+		&tsExpiry);
 
 	if (status != SEC_E_OK)
 	{
@@ -334,31 +332,190 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 
 DWORD Context::proto() const
 {
+	DWORD result = 0;
 	switch (_usage)
 	{
+	case Context::TLS_CLIENT_USE:
 	case Context::CLIENT_USE:
-		return SP_PROT_SSL3_CLIENT | SP_PROT_TLS1_CLIENT;
-	case Context::SERVER_USE:
-		return SP_PROT_SSL3_SERVER | SP_PROT_TLS1_SERVER;
-	case Context::TLSV1_CLIENT_USE:
-		return SP_PROT_TLS1_CLIENT;
-	case Context::TLSV1_SERVER_USE:
-		return SP_PROT_TLS1_SERVER;
+		result = SP_PROT_SSL3_CLIENT
+			| SP_PROT_TLS1_CLIENT
 #if defined(SP_PROT_TLS1_1)
-	case Context::TLSV1_1_CLIENT_USE:
-		return SP_PROT_TLS1_1_CLIENT;
-	case Context::TLSV1_1_SERVER_USE:
-		return SP_PROT_TLS1_1_SERVER;
+			| SP_PROT_TLS1_1_CLIENT
 #endif
 #if defined(SP_PROT_TLS1_2)
-	case Context::TLSV1_2_CLIENT_USE:
-		return SP_PROT_TLS1_2_CLIENT;
-	case Context::TLSV1_2_SERVER_USE:
-		return SP_PROT_TLS1_2_SERVER;
+			| SP_PROT_TLS1_2_CLIENT
 #endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
+			;
+			break;
+
+	case Context::TLS_SERVER_USE:
+	case Context::SERVER_USE:
+		result = SP_PROT_SSL3_SERVER
+			| SP_PROT_TLS1_SERVER
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_SERVER
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_SERVER
+#endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
+			;
+			break;
+
+	case Context::TLSV1_CLIENT_USE:
+		result = SP_PROT_TLS1_CLIENT
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_CLIENT
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_CLIENT
+#endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
+			;
+			break;
+
+	case Context::TLSV1_SERVER_USE:
+		result = SP_PROT_TLS1_SERVER
+#if defined(SP_PROT_TLS1_1)
+			| SP_PROT_TLS1_1_SERVER
+#endif
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_SERVER
+#endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
+			;
+			break;
+
+#if defined(SP_PROT_TLS1_1)
+	case Context::TLSV1_1_CLIENT_USE:
+		result = SP_PROT_TLS1_1_CLIENT
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_CLIENT
+#endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
+			;
+			break;
+
+	case Context::TLSV1_1_SERVER_USE:
+		result = SP_PROT_TLS1_1_SERVER
+#if defined(SP_PROT_TLS1_2)
+			| SP_PROT_TLS1_2_SERVER
+#endif
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
+			;
+			break;
+#endif
+
+#if defined(SP_PROT_TLS1_2)
+	case Context::TLSV1_2_CLIENT_USE:
+		result = SP_PROT_TLS1_2_CLIENT
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_CLIENT
+#endif
+			;
+			break;
+
+	case Context::TLSV1_2_SERVER_USE:
+		result = SP_PROT_TLS1_2_SERVER
+#if defined(SP_PROT_TLS1_3)
+			| SP_PROT_TLS1_3_SERVER
+#endif
+			;
+			break;
+#endif
+
+#if defined(SP_PROT_TLS1_3)
+	case Context::TLSV1_3_CLIENT_USE:
+		result = SP_PROT_TLS1_3_CLIENT;
+		break;
+
+	case Context::TLSV1_3_SERVER_USE:
+		result = SP_PROT_TLS1_3_SERVER;
+		break;
+#endif
+
 	default:
 		throw Poco::InvalidArgumentException("Unsupported SSL/TLS protocol version");
 	}
+
+	return result & enabledProtocols();
 }
+
+
+DWORD Context::enabledProtocols() const
+{
+	DWORD result = 0;
+	if (!(_disabledProtocols & PROTO_SSLV3))
+	{
+		result |= SP_PROT_SSL3_CLIENT | SP_PROT_SSL3_SERVER;
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1))
+	{
+		result |= SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_SERVER;
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1_1))
+	{
+#ifdef SP_PROT_TLS1_1_CLIENT
+		result |= SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_1_SERVER;
+#endif
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1_2))
+	{
+#ifdef SP_PROT_TLS1_2_CLIENT
+		result |= SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_2_SERVER;
+#endif
+	}
+	if (!(_disabledProtocols & PROTO_TLSV1_3))
+	{
+#ifdef SP_PROT_TLS1_3_CLIENT
+		result |= SP_PROT_TLS1_3_CLIENT | SP_PROT_TLS1_3_SERVER;
+#endif
+	}
+	return result;
+}
+
+
+void Context::disableProtocols(int protocols)
+{
+	_disabledProtocols = protocols;
+}
+
+
+void Context::requireMinimumProtocol(Protocols protocol)
+{
+	_disabledProtocols = 0;
+	switch (protocol)
+	{
+	case PROTO_SSLV3:
+		_disabledProtocols = PROTO_SSLV2;
+		break;
+	case PROTO_TLSV1:
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3;
+		break;
+	case PROTO_TLSV1_1:
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1;
+		break;
+	case PROTO_TLSV1_2:
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1;
+		break;
+	case PROTO_TLSV1_3:
+		_disabledProtocols = PROTO_SSLV2 | PROTO_SSLV3 | PROTO_TLSV1 | PROTO_TLSV1_1 | PROTO_TLSV1_2;
+		break;
+	}
+}
+
 
 } } // namespace Poco::Net

@@ -1,8 +1,6 @@
 //
 // PriorityStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/PriorityStrategy.h#2 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  PrioritytStrategy
@@ -36,10 +34,10 @@ class PriorityStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// by their priority.
 {
 public:
-	typedef TDelegate*                   DelegateHandle;
-	typedef SharedPtr<TDelegate>         DelegatePtr;
-	typedef std::vector<DelegatePtr>     Delegates;
-	typedef typename Delegates::iterator Iterator;
+	using DelegateHandle = TDelegate*;
+	using DelegatePtr = SharedPtr<TDelegate>;
+	using Delegates = std::vector<DelegatePtr>;
+	using Iterator = typename Delegates::iterator;
 
 public:
 	PriorityStrategy()
@@ -141,10 +139,10 @@ class PriorityStrategy<void, TDelegate>
 	/// by their priority.
 {
 public:
-	typedef TDelegate*                   DelegateHandle;
-	typedef SharedPtr<TDelegate>         DelegatePtr;
-	typedef std::vector<DelegatePtr>     Delegates;
-	typedef typename Delegates::iterator Iterator;
+	using DelegateHandle = TDelegate*;
+	using DelegatePtr = SharedPtr<TDelegate>;
+	using Delegates = std::vector<DelegatePtr>;
+	using Iterator = typename Delegates::iterator;
 
 public:
 

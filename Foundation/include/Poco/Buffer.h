@@ -1,8 +1,6 @@
 //
 // Buffer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Buffer.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Buffer
@@ -31,23 +29,23 @@ namespace Poco {
 
 template <class T>
 class Buffer
-	/// A buffer class that allocates a buffer of a given type and size 
+	/// A buffer class that allocates a buffer of a given type and size
 	/// in the constructor and deallocates the buffer in the destructor.
 	///
 	/// This class is useful everywhere where a temporary buffer
 	/// is needed.
 {
 public:
-	Buffer(std::size_t capacity):
-		_capacity(capacity),
-		_used(capacity),
+	Buffer(std::size_t length):
+		_capacity(length),
+		_used(length),
 		_ptr(0),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
-		if (capacity > 0)
+		if (length > 0)
 		{
-			_ptr = new T[capacity];
+			_ptr = new T[length];
 		}
 	}
 
@@ -59,8 +57,8 @@ public:
 		/// Creates the Buffer. Length argument specifies the length
 		/// of the supplied memory pointed to by pMem in the number
 		/// of elements of type T. Supplied pointer is considered
-		/// blank and not owned by Buffer, so in this case Buffer 
-		/// only acts as a wrapper around externally supplied 
+		/// blank and not owned by Buffer, so in this case Buffer
+		/// only acts as a wrapper around externally supplied
 		/// (and lifetime-managed) memory.
 	{
 	}
@@ -96,6 +94,19 @@ public:
 		}
 	}
 
+	Buffer(Buffer&& other) noexcept:
+		/// Move constructor.
+		_capacity(other._capacity),
+		_used(other._used),
+		_ptr(other._ptr),
+		_ownMem(other._ownMem)
+	{
+		other._capacity = 0;
+		other._used = 0;
+		other._ownMem = false;
+		other._ptr = nullptr;
+	}
+
 	Buffer& operator = (const Buffer& other)
 		/// Assignment operator.
 	{
@@ -108,20 +119,38 @@ public:
 		return *this;
 	}
 
+	Buffer& operator = (Buffer&& other) noexcept
+		/// Move assignment operator.
+	{
+		if (_ownMem) delete [] _ptr;
+
+		_capacity = other._capacity;
+		_used = other._used;
+		_ptr = other._ptr;
+		_ownMem = other._ownMem;
+
+		other._capacity = 0;
+		other._used = 0;
+		other._ownMem = false;
+		other._ptr = nullptr;
+
+		return *this;
+	}
+
 	~Buffer()
 		/// Destroys the Buffer.
 	{
 		if (_ownMem) delete [] _ptr;
 	}
-	
+
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer capacity and size. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
 		/// the current one; if it is smaller, capacity will remain intact.
 		/// Size will always be set to the new capacity.
-		///  
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
@@ -138,19 +167,19 @@ public:
 			_ptr = ptr;
 			_capacity = newCapacity;
 		}
-		
+
 		_used = newCapacity;
 	}
-	
+
 	void setCapacity(std::size_t newCapacity, bool preserveContent = true)
 		/// Sets the buffer capacity. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
 		/// new buffer. The new capacity can be larger or smaller than
-		/// the current one; size will be set to the new capacity only if 
+		/// the current one; size will be set to the new capacity only if
 		/// new capacity is smaller than the current size, otherwise it will
 		/// remain intact.
-		/// 
-		/// Buffers only wrapping externally owned storage can not be 
+		///
+		/// Buffers only wrapping externally owned storage can not be
 		/// resized. If resize is attempted on those, IllegalAccessException
 		/// is thrown.
 	{
@@ -227,6 +256,7 @@ public:
 		swap(_ptr, other._ptr);
 		swap(_capacity, other._capacity);
 		swap(_used, other._used);
+		swap(_ownMem, other._ownMem);
 	}
 
 	bool operator == (const Buffer& other) const
@@ -270,13 +300,13 @@ public:
 	{
 		return _used * sizeof(T);
 	}
-	
+
 	T* begin()
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
-	
+
 	const T* begin() const
 		/// Returns a pointer to the beginning of the buffer.
 	{
@@ -288,13 +318,13 @@ public:
 	{
 		return _ptr + _used;
 	}
-	
+
 	const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
 		return _ptr + _used;
 	}
-	
+
 	bool empty() const
 		/// Return true if buffer is empty.
 	{
@@ -304,14 +334,14 @@ public:
 	T& operator [] (std::size_t index)
 	{
 		poco_assert (index < _used);
-		
+
 		return _ptr[index];
 	}
 
 	const T& operator [] (std::size_t index) const
 	{
 		poco_assert (index < _used);
-		
+
 		return _ptr[index];
 	}
 

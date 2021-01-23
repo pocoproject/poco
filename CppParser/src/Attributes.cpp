@@ -1,8 +1,6 @@
 //
 // Attributes.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Attributes.cpp#2 $
-//
 // Library: CppParser
 // Package: Attributes
 // Module:  Attributes

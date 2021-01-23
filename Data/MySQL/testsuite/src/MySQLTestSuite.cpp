@@ -1,8 +1,6 @@
 //
 // ODBCTestSuite.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/MySQLTestSuite.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

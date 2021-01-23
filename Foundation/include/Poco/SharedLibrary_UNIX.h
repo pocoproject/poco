@@ -1,8 +1,6 @@
 //
 // SharedLibrary_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedLibrary_UNIX.h#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -33,7 +31,7 @@ protected:
 	enum Flags
 	{
 		SHLIB_GLOBAL_IMPL = 1,
-		SHLIB_LOCAL_IMPL  = 2  
+		SHLIB_LOCAL_IMPL  = 2
 	};
 
 	SharedLibraryImpl();
@@ -44,6 +42,7 @@ protected:
 	void* findSymbolImpl(const std::string& name);
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
+	static bool setSearchPathImpl(const std::string& path);
 
 private:
 	std::string _path;

@@ -1,8 +1,6 @@
 //
 // BasicEventTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/BasicEventTest.h#1 $
-//
 // Tests for BasicEvent
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

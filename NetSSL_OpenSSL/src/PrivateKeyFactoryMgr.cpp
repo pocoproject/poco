@@ -1,8 +1,6 @@
 //
 // PrivateKeyFactoryMgr.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/PrivateKeyFactoryMgr.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  PrivateKeyFactoryMgr

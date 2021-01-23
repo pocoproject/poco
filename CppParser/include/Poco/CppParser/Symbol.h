@@ -1,8 +1,6 @@
 //
 // Symbol.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Symbol.h#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Symbol
@@ -48,6 +46,7 @@ public:
 		SYM_PARAMETER,  /// A function parameter
 		SYM_STRUCT,     /// A struct or class
 		SYM_TYPEDEF,    /// A typedef
+		SYM_TYPEALIAS,  /// A type alias (using)
 		SYM_BUILTIN,    /// A built-in type
 		SYM_VARIABLE    /// A (member) variable
 	};

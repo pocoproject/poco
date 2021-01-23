@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/ELDK#1 $
-#
 # ELDK
 #
 # Make settings for Denx Embedded Linux Development Kit (ELDK)
@@ -40,10 +38,10 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -Isrc
+CFLAGS          = -std=c99 -Isrc
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = 
+CXXFLAGS        =
 CXXFLAGS32      =
 CXXFLAGS64      =
 LINKFLAGS       =
@@ -52,7 +50,7 @@ LINKFLAGS64     =
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  = -static
-SHAREDOPT_CC    = -fPIC 
+SHAREDOPT_CC    = -fPIC
 SHAREDOPT_CXX   = -fPIC
 SHAREDOPT_LINK  = -Wl,-rpath,$(LIBPATH)
 DEBUGOPT_CC     = -g -D_DEBUG

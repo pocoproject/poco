@@ -1,8 +1,6 @@
 //
 // ExpireLRUCache.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ExpireLRUCache.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  ExpireLRUCache
@@ -41,7 +39,7 @@ class ExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey
 	/// but also limits the size of the cache (per default: 1024).
 {
 public:
-	ExpireLRUCache(long cacheSize = 1024, Timestamp::TimeDiff expire = 600000): 
+	ExpireLRUCache(std::size_t cacheSize = 1024, Timestamp::TimeDiff expire = 600000):
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));

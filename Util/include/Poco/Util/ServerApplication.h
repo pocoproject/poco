@@ -1,8 +1,6 @@
 //
 // ServerApplication.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ServerApplication.h#3 $
-//
 // Library: Util
 // Package: Application
 // Module:  ServerApplication
@@ -62,8 +60,7 @@ class Util_API ServerApplication: public Application
 	///   }
 	///
 	/// The POCO_SERVER_MAIN macro can be used to implement main(argc, argv).
-	/// If POCO has been built with POCO_WIN32_UTF8, POCO_SERVER_MAIN supports
-	/// Unicode command line arguments.
+	/// POCO_SERVER_MAIN supports Unicode command line arguments.
 	///
 	/// On Windows platforms, an application built on top of the
 	/// ServerApplication class can be run both from the command line
@@ -146,7 +143,7 @@ public:
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
+#if defined(_WIN32)
 	int run(int argc, wchar_t** argv);
 		/// Runs the application by performing additional initializations
 		/// and calling the main() method.
@@ -173,10 +170,11 @@ private:
 	static Poco::Event _terminate;
 #elif defined(POCO_OS_FAMILY_UNIX)
 	void handleDaemon(const std::string& name, const std::string& value);
+	void handleUMask(const std::string& name, const std::string& value);
 	void handlePidFile(const std::string& name, const std::string& value);
 	bool isDaemon(int argc, char** argv);
 	void beDaemon();
-#if defined(POCO_ANDROID)
+#if POCO_OS == POCO_OS_ANDROID
 	static Poco::Event _terminate;
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
@@ -189,11 +187,7 @@ private:
 	};
 	static BOOL __stdcall ConsoleCtrlHandler(DWORD ctrlType);
 	static void __stdcall ServiceControlHandler(DWORD control);
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
-#else
-	static void __stdcall ServiceMain(DWORD argc, LPTSTR* argv);
-#endif
 
 	bool hasConsole();
 	bool isService();
@@ -226,7 +220,7 @@ private:
 //
 // Macro to implement main()
 //
-#if defined(_WIN32) && defined(POCO_WIN32_UTF8)
+#if defined(_WIN32)
 	#define POCO_SERVER_MAIN(App) \
 	int wmain(int argc, wchar_t** argv)	\
 	{									\

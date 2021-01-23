@@ -1,8 +1,6 @@
 //
 // RowFilter.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RowFilter.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowFilter
@@ -21,7 +19,6 @@
 
 
 #include "Poco/Data/Data.h"
-#include "Poco/Data/RecordSet.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Tuple.h"
 #include "Poco/String.h"
@@ -34,6 +31,9 @@
 
 namespace Poco {
 namespace Data {
+
+
+class RecordSet;
 
 
 class Data_API RowFilter: public RefCountedObject
@@ -68,11 +68,11 @@ public:
 	};
 
 	typedef bool (*CompT)(const Poco::Dynamic::Var&, const Poco::Dynamic::Var&);
-	typedef AutoPtr<RowFilter> Ptr;
-	typedef std::map<std::string, Comparison> Comparisons;
-	typedef Tuple<Poco::Dynamic::Var, Comparison, LogicOperator> ComparisonEntry;
-	typedef std::multimap<std::string, ComparisonEntry> ComparisonMap;
-	typedef std::map<AutoPtr<RowFilter>, LogicOperator> FilterMap;
+	using Ptr = AutoPtr<RowFilter>;
+	using Comparisons = std::map<std::string, Comparison>;
+	using ComparisonEntry = Tuple<Poco::Dynamic::Var, Comparison, LogicOperator>;
+	using ComparisonMap = std::multimap<std::string, ComparisonEntry>;
+	using FilterMap = std::map<AutoPtr<RowFilter>, LogicOperator>;
 
 	RowFilter(RecordSet* pRecordSet);
 		/// Creates the top-level RowFilter and associates it with the recordset.
@@ -83,17 +83,20 @@ public:
 	~RowFilter();
 		/// Destroys the RowFilter.
 
-	void addFilter(const Ptr& pFilter, LogicOperator comparison);
+	void addFilter(Ptr pFilter, LogicOperator comparison);
 		/// Appends another filter to this one.
 
-	void removeFilter(const Ptr& pFilter);
+	void removeFilter(Ptr pFilter);
 		/// Removes filter from this filter.
+
+	bool has(Ptr pFilter) const;
+		/// Returns true if this filter is parent of pFilter;
 
 	template <typename T>
 	void add(const std::string& name, Comparison comparison, const T& value, LogicOperator op = OP_OR)
 		/// Adds value to the filter.
 	{
-		if (_pRecordSet) _pRecordSet->moveFirst();
+		rewindRecordSet();
 		_comparisonMap.insert(ComparisonMap::value_type(toUpper(name),
 			ComparisonEntry(value, comparison, op)));
 	}
@@ -164,6 +167,8 @@ private:
 	RecordSet& recordSet() const;
 
 	Comparison getComparison(const std::string& comp) const;
+	
+	void rewindRecordSet();
 
 	Comparisons        _comparisons;
 	ComparisonMap      _comparisonMap;
@@ -179,6 +184,12 @@ private:
 ///
 /// inlines
 ///
+
+
+inline bool RowFilter::has(Ptr pFilter) const
+{
+	return _filterMap.find(pFilter) != _filterMap.end();
+}
 
 
 inline bool RowFilter::isEmpty() const

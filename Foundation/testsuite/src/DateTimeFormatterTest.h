@@ -1,8 +1,6 @@
 //
 // DateTimeFormatterTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DateTimeFormatterTest.h#2 $
-//
 // Definition of the DateTimeFormatterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

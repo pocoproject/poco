@@ -1,8 +1,6 @@
 //
 // JSONConfiguration.cpp
 //
-// $Id$
-//
 // Library: Util
 // Package: JSON
 // Module:  JSONConfiguration

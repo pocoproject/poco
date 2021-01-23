@@ -1,8 +1,6 @@
 //
 // DOMTestSuite.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/DOMTestSuite.h#1 $
-//
 // Definition of the DOMTestSuite class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

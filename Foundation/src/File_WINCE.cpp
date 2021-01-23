@@ -1,8 +1,6 @@
 //
 // File_WIN32U.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_WINCE.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -64,7 +62,7 @@ FileImpl::FileImpl(const std::string& path): _path(path)
 	{
 		_path.resize(n - 1);
 	}
-	UnicodeConverter::toUTF16(_path, _upath);
+	convertPath(_path, _upath);
 }
 
 
@@ -88,7 +86,7 @@ void FileImpl::setPathImpl(const std::string& path)
 	{
 		_path.resize(n - 1);
 	}
-	UnicodeConverter::toUTF16(_path, _upath);
+	convertPath(_path, _upath);
 }
 
 
@@ -279,25 +277,37 @@ void FileImpl::setExecutableImpl(bool flag)
 }
 
 
-void FileImpl::copyToImpl(const std::string& path) const
+void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
-	UnicodeConverter::toUTF16(path, upath);
-	if (CopyFileW(_upath.c_str(), upath.c_str(), FALSE) == 0)
+	convertPath(path, upath);
+	if (CopyFileW(_upath.c_str(), upath.c_str(), (options & OPT_FAIL_ON_OVERWRITE_IMPL) != 0) == 0)
 		handleLastErrorImpl(_path);
 }
 
 
-void FileImpl::renameToImpl(const std::string& path)
+void FileImpl::renameToImpl(const std::string& path, int options)
 {
 	poco_assert (!_path.empty());
 
 	std::wstring upath;
-	UnicodeConverter::toUTF16(path, upath);
-	if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
-		handleLastErrorImpl(_path);
+	convertPath(path, upath);
+	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
+		if (MoveFileW(_upath.c_str(), upath.c_str()) == 0)
+			handleLastErrorImpl(_path);
+	} else {
+		if (MoveFileW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
+			handleLastErrorImpl(_path);
+	}
+	
+}
+
+
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	throw Poco::NotImplementedException("File::linkTo() is not available on this platform");
 }
 
 
@@ -348,6 +358,39 @@ bool FileImpl::createDirectoryImpl()
 }
 
 
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	ULARGE_INTEGER space;
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, &space, NULL))
+		handleLastErrorImpl(_path);
+	return space.QuadPart;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	ULARGE_INTEGER space;
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, NULL, NULL))
+		handleLastErrorImpl(_path);
+	return space.QuadPart;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	ULARGE_INTEGER space;
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, NULL, &space))
+		handleLastErrorImpl(_path);
+	return space.QuadPart;
+}
+
+
 void FileImpl::handleLastErrorImpl(const std::string& path)
 {
 	switch (GetLastError())
@@ -374,7 +417,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ERROR_CANNOT_MAKE:
 		throw CreateFileException(path);
 	case ERROR_DIR_NOT_EMPTY:
-		throw FileException("directory not empty", path);
+		throw DirectoryNotEmptyException(path);
 	case ERROR_WRITE_FAULT:
 		throw WriteFileException(path);
 	case ERROR_READ_FAULT:
@@ -395,5 +438,10 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	}
 }
 
+
+void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
+{
+	UnicodeConverter::toUTF16(utf8Path, utf16Path);
+}
 
 } // namespace Poco

@@ -1,8 +1,6 @@
 //
 // ICMPClientTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/ICMPClientTest.h#1 $
-//
 // Definition of the ICMPClientTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -20,6 +18,7 @@
 #include "CppUnit/TestCase.h"
 #include "Poco/Net/ICMPClient.h"
 #include "Poco/Net/ICMPEventArgs.h"
+#include "Poco/Mutex.h"
 
 
 class ICMPClientTest: public CppUnit::TestCase
@@ -29,6 +28,7 @@ public:
 	~ICMPClientTest();
 
 	void testPing();
+	void testBigPing();
 
 	void setUp();
 	void tearDown();
@@ -41,7 +41,9 @@ public:
 	void onEnd(const void* pSender, Poco::Net::ICMPEventArgs& args);
 
 private:
-	Poco::Net::ICMPClient _icmpClient;
+	void registerDelegates(const Poco::Net::ICMPClient& icmpClient);
+	void unregisterDelegates(const Poco::Net::ICMPClient& icmpClient);
+	static Poco::FastMutex _mutex;
 };
 
 

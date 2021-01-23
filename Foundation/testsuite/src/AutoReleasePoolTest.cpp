@@ -1,8 +1,6 @@
 //
 // AutoReleasePoolTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/AutoReleasePoolTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -80,9 +78,9 @@ void AutoReleasePoolTest::testAutoReleasePool()
 	AutoReleasePool<TestObj> arp;
 	arp.add(new TestObj);
 	arp.add(new TestObj);
-	assert (TestObj::count() == 2);
+	assertTrue (TestObj::count() == 2);
 	arp.release();
-	assert (TestObj::count() == 0);
+	assertTrue (TestObj::count() == 0);
 }
 
 

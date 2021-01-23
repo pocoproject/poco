@@ -1,8 +1,6 @@
 //
 // Thread_WINCE.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Thread_WINCE.h#3 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread

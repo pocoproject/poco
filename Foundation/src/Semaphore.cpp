@@ -1,8 +1,6 @@
 //
 // Semaphore.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Semaphore.cpp#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Semaphore

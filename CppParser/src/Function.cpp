@@ -1,8 +1,6 @@
 //
 // Function.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Function.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Function
@@ -54,9 +52,9 @@ Function::Function(const std::string& decl, NameSpace* pNameSpace):
 		_retParam = replace(_retParam, "inline ", "");
 		if (_flags & FN_TEMPLATE)
 		{
-			std::size_t pos = _retParam.find(">");
-			poco_assert (pos != std::string::npos);
-			_retParam = _retParam.substr(pos+1);
+			std::size_t pos2 = _retParam.find(">");
+			poco_assert (pos2 != std::string::npos);
+			_retParam = _retParam.substr(pos2+1);
 		}
 		Poco::trimInPlace(_retParam);
 	}
@@ -216,7 +214,6 @@ bool Function::isVirtual() const
 		return pClass && pClass->hasVirtualDestructor();
 	}
 	else return getOverridden() != 0;
-	return false;
 }
 
 

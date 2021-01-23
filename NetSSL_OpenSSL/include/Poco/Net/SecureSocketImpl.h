@@ -1,8 +1,6 @@
 //
 // SecureSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureSocketImpl.h#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureSocketImpl
@@ -80,7 +78,7 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -88,6 +86,9 @@ public:
 		/// specific address.
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 		
 	void listen(int backlog = 64);
@@ -196,7 +197,21 @@ protected:
 	static bool isLocalHost(const std::string& hostName);
 		/// Returns true iff the given host name is the local host 
 		/// (either "localhost" or "127.0.0.1").
-		
+
+	bool mustRetry(int rc);
+		/// Returns true if the last operation should be retried,
+		/// otherwise false.
+		///
+		/// In case of an SSL_ERROR_WANT_READ error, and if the socket is 
+		/// blocking, waits for the underlying socket to become readable.
+		///
+		/// In case of an SSL_ERROR_WANT_WRITE error, and if the socket is
+		/// blocking, waits for the underlying socket to become writable.
+		///
+		/// Can also throw a Poco::TimeoutException if the socket does
+		/// not become readable or writable within the sockets
+		/// receive or send timeout.
+
 	int handleError(int rc);
 		/// Handles an SSL error by throwing an appropriate exception.
 

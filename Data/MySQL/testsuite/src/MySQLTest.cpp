@@ -1,8 +1,6 @@
 //
 // MySQLTest.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/testsuite/src/MySQLTest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -44,11 +42,11 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 
 //
 // Parameters for barebone-test
-#define MYSQL_USER "root"
-#define MYSQL_PWD  "poco"
-#define MYSQL_HOST "localhost"
+#define MYSQL_USER "pocotest"
+#define MYSQL_PWD  "pocotest"
+#define MYSQL_HOST "127.0.0.1"
 #define MYSQL_PORT 3306
-#define MYSQL_DB   "pocotestdb"
+#define MYSQL_DB   "pocotest"
 
 //
 // Connection string
@@ -58,7 +56,8 @@ std::string MySQLTest::_dbConnString = "host=" MYSQL_HOST
 	";db=" MYSQL_DB
 	";compress=true"
 	";auto-reconnect=true"
-	";secure-auth=true";
+	";secure-auth=true"
+	";protocol=tcp";
 
 
 MySQLTest::MySQLTest(const std::string& name):
@@ -87,7 +86,7 @@ void MySQLTest::connectNoDB()
 	std::string dbConnString = "host=" MYSQL_HOST
 		";user=" MYSQL_USER
 		";password=" MYSQL_PWD
-		";compress=true;auto-reconnect=true";
+		";compress=true;auto-reconnect=true;protocol=tcp";
 
 	try
 	{
@@ -577,30 +576,30 @@ void MySQLTest::testNullableInt()
 
 	int count = 0;
 	*_pSession << "SELECT COUNT(*) FROM NullableIntTest", into(count), now;
-	assert (count == 3);
+	assertTrue (count == 3);
 
 	Nullable<Int32> ci1;
 	Nullable<Int32> ci2;
 	Nullable<Int32> ci3;
 	id = 1;
 	*_pSession << "SELECT Value FROM NullableIntTest WHERE Id = ?", into(ci1), use(id), now;
-	assert (ci1 == i1);
+	assertTrue (ci1 == i1);
 	id = 2;
 	*_pSession << "SELECT Value FROM NullableIntTest WHERE Id = ?", into(ci2), use(id), now;
-	assert (ci2.isNull());
-	assert (!(0 == ci2));
-	assert (0 != ci2);
-	assert (!(ci2 == 0));
-	assert (ci2 != 0);
+	assertTrue (ci2.isNull());
+	assertTrue (!(0 == ci2));
+	assertTrue (0 != ci2);
+	assertTrue (!(ci2 == 0));
+	assertTrue (ci2 != 0);
 	ci2 = 10;
-	assert (10 == ci2);
-	assert (ci2 == 10);
-	assert (!ci2.isNull());
+	assertTrue (10 == ci2);
+	assertTrue (ci2 == 10);
+	assertTrue (!ci2.isNull());
 	id = 3;
 	*_pSession << "SELECT Value FROM NullableIntTest WHERE Id = ?", into(ci3), use(id), now;
-	assert (!ci3.isNull());
-	assert (ci3 == 3);
-	assert (3 == ci3);
+	assertTrue (!ci3.isNull());
+	assertTrue (ci3 == 3);
+	assertTrue (3 == ci3);
 }
 
 
@@ -622,18 +621,18 @@ void MySQLTest::testNullableString()
 	Nullable<std::string> resAddress;
 	Nullable<Int32> resAge;
 	*_pSession << "SELECT Address, Age FROM NullableStringTest WHERE Id = ?", into(resAddress), into(resAge), use(id), now;
-	assert(resAddress == address);
-	assert(resAge == age);
-	assert(resAddress.isNull());
-	assert(null == resAddress);
-	assert(resAddress == null);
+	assertTrue (resAddress == address);
+	assertTrue (resAge == age);
+	assertTrue (resAddress.isNull());
+	assertTrue (null == resAddress);
+	assertTrue (resAddress == null);
 
 	resAddress = std::string("Test");
-	assert(!resAddress.isNull());
-	assert(resAddress == std::string("Test"));
-	assert(std::string("Test") == resAddress);
-	assert(null != resAddress);
-	assert(resAddress != null);
+	assertTrue (!resAddress.isNull());
+	assertTrue (resAddress == std::string("Test"));
+	assertTrue (std::string("Test") == resAddress);
+	assertTrue (null != resAddress);
+	assertTrue (resAddress != null);
 }
 
 
@@ -668,23 +667,23 @@ void MySQLTest::testTupleWithNullable()
 
 	*_pSession << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now;
 
-	assert(result[0].get<1>() == std::string("Address"));
-	assert(result[0].get<2>() == 10);
+	assertTrue (result[0].get<1>() == std::string("Address"));
+	assertTrue (result[0].get<2>() == 10);
 
-	assert(result[1].get<1>() == null);
-	assert(result[1].get<2>() == 10);
+	assertTrue (result[1].get<1>() == null);
+	assertTrue (result[1].get<2>() == 10);
 
-	assert(result[2].get<1>() == std::string("Address!"));
-	assert(result[2].get<2>() == null);
+	assertTrue (result[2].get<1>() == std::string("Address!"));
+	assertTrue (result[2].get<2>() == null);
 
-	assert(result[3].get<1>() == std::string("A"));
-	assert(result[3].get<2>() == 0);
+	assertTrue (result[3].get<1>() == std::string("A"));
+	assertTrue (result[3].get<2>() == 0);
 
-	assert(result[4].get<1>() == null);
-	assert(result[4].get<2>() == 12);
+	assertTrue (result[4].get<1>() == null);
+	assertTrue (result[4].get<2>() == 12);
 
-	assert(result[5].get<1>() == std::string("B"));
-	assert(result[5].get<2>() == null);
+	assertTrue (result[5].get<1>() == std::string("B"));
+	assertTrue (result[5].get<2>() == null);
 
 }
 
@@ -718,7 +717,7 @@ void MySQLTest::recreatePersonBLOBTable()
 void MySQLTest::recreatePersonDateTimeTable()
 {
 	dropTable("Person");
-	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME)", now; }
+	try { *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Birthday DATETIME(6))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreatePersonDateTimeTable()"); }
 }

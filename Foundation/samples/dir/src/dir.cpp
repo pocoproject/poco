@@ -1,8 +1,6 @@
 //
 // dir.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/dir/src/dir.cpp#1 $
-//
 // This sample demonstrates the DirectoryIterator, File and Path classes.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

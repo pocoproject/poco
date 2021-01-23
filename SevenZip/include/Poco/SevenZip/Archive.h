@@ -1,8 +1,6 @@
 //
 // Archive.h
 //
-// $Id$
-//
 // Library: SevenZip
 // Package: Archive
 // Module:  Archive

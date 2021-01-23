@@ -1,8 +1,6 @@
 //
 // DNSTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/DNSTest.h#1 $
-//
 // Definition of the DNSTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -29,6 +27,8 @@ public:
 	void testHostByName();
 	void testHostByAddress();
 	void testResolve();
+	void testEncodeIDN();
+	void testDecodeIDN();
 
 	void setUp();
 	void tearDown();

@@ -1,8 +1,6 @@
 //
 // Channel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Channel.cpp#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Channel
@@ -40,7 +38,7 @@ void Channel::close()
 }
 
 
-void Channel::setProperty(const std::string& name, const std::string& value)
+void Channel::setProperty(const std::string& name, const std::string& /*value*/)
 {
 	throw PropertyNotSupportedException(name);
 }

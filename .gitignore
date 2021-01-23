@@ -16,10 +16,35 @@
 *.vsp
 *.psess
 
+# Gradle #
+##########
+!gradle.properties
+!settings.gradle
+!build.gradle
+!build.gradle.win
+!travis/.gradle/gradle.properties
+.gradle/
+**/guild/
+coverage/
+
+# NuGet #
+#########
+*.nupkg
+
+# WiX #
+#######
+*.msi
+*.wixobj
+*.wixpdb
+
 # Make #
 ########
 config.build
 config.make
+
+# CLion #
+########
+.idea/
 
 # CMake #
 ########
@@ -30,6 +55,7 @@ CMakeCache.txt
 CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
+cmake-build-*
 
 # Packages #
 ############
@@ -89,6 +115,8 @@ Thumbs.db
 *.tlog
 *.lastbuildstate
 *.unsuccessfulbuild
+*.opendb
+.vs/
 release_shared/
 debug_shared/
 release_static/
@@ -102,9 +130,10 @@ bin64/
 lib/
 lib64/
 pocomsg.h
+**/UpgradeLog*.XML
 
 # Eclipse generated files #
-######################
+###########################
 .project
 .cproject
 .settings
@@ -113,3 +142,5 @@ cmake-build/
 # Temporary files #
 ###################
 *.bak
+stage/
+releases/

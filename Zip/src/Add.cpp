@@ -1,8 +1,6 @@
 //
 // Add.cpp
 //
-// $Id: //poco/1.4/Zip/src/Add.cpp#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  Add

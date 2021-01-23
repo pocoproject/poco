@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/Linux#2 $
-#
 # FreeBSD-Linux-Compat
 #
 # Make settings for FreeBSD Linux Compatibility Mode (linux_base_fc10)

@@ -1,8 +1,6 @@
 //
 // MailRecipient.cpp
 //
-// $Id: //poco/1.4/Net/src/MailRecipient.cpp#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailRecipient

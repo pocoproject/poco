@@ -1,8 +1,6 @@
 //
 // Mutex_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Mutex_VX.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Mutex

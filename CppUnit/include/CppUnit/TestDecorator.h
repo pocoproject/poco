@@ -1,8 +1,6 @@
 //
 // TestDecorator.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestDecorator.h#1 $
-//
 
 
 #ifndef CppUnit_TestDecorator_INCLUDED
@@ -35,11 +33,11 @@ public:
 
 	virtual ~TestDecorator();
 
-	int countTestCases();
+	int countTestCases() const;
 
 	void run(TestResult* result);
 
-	std::string toString();
+	std::string toString() const;
 
 protected:
 	Test* _test;

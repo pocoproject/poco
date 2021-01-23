@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Net/samples/TwitterClient/Makefile#1 $
-#
 # Makefile for Poco Twitter Client
 #
 
@@ -12,7 +10,11 @@ include $(POCO_BASE)/build/rules/global
 ifeq ($(POCO_CONFIG),FreeBSD)
 SYSLIBS += -lssl -lcrypto -lz
 else
+ifeq ($(POCO_CONFIG),QNX)
+SYSLIBS += -lssl -lcrypto -lz
+else
 SYSLIBS += -lssl -lcrypto -lz -ldl
+endif
 endif
 
 objects = Twitter TweetApp

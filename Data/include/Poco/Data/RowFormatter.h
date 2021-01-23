@@ -1,8 +1,6 @@
 //
 // RowFormatter.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RowFormatter.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowFormatter
@@ -70,10 +68,10 @@ class Data_API RowFormatter
 	///
 {
 public:
-	typedef SharedPtr<RowFormatter>              Ptr;
-	typedef std::vector<std::string>             NameVec;
-	typedef SharedPtr<std::vector<std::string> > NameVecPtr;
-	typedef std::vector<Poco::Dynamic::Var>      ValueVec;
+	using Ptr = SharedPtr<RowFormatter>;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<std::vector<std::string>>;
+	using ValueVec = std::vector<Poco::Dynamic::Var>;
 
 	static const int INVALID_ROW_COUNT = -1;
 

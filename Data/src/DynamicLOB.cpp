@@ -1,8 +1,6 @@
 //
 // DynamicLOB.cpp
 //
-// $Id: //poco/Main/Data/src/DynamicLOB.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  DynamicLOB

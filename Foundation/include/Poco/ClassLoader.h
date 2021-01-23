@@ -1,8 +1,6 @@
 //
 // ClassLoader.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ClassLoader.h#1 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  ClassLoader
@@ -134,10 +132,10 @@ public:
 	virtual ~ClassLoader()
 		/// Destroys the ClassLoader.
 	{
-		for (typename LibraryMap::const_iterator it = _map.begin(); it != _map.end(); ++it)
+		for (auto& p: _map)
 		{
-			delete it->second.pLibrary;
-			delete it->second.pManifest;
+			delete p.second.pLibrary;
+			delete p.second.pManifest;
 		}
 	}
 
@@ -158,11 +156,13 @@ public:
 		if (it == _map.end())
 		{
 			LibraryInfo li;
-			li.pLibrary  = new SharedLibrary(path);
-			li.pManifest = new Manif();
+			li.pLibrary  = 0;
+			li.pManifest = 0;
 			li.refCount  = 1;
 			try
 			{
+				li.pLibrary  = new SharedLibrary(path);
+				li.pManifest = new Manif();
 				std::string pocoBuildManifestSymbol("pocoBuildManifest");
 				pocoBuildManifestSymbol.append(manifest);
 				if (li.pLibrary->hasSymbol("pocoInitializeLibrary"))
@@ -247,9 +247,9 @@ public:
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
-		for (typename LibraryMap::const_iterator it = _map.begin(); it != _map.end(); ++it)
+		for (const auto& p: _map)
 		{
-			const Manif* pManif = it->second.pManifest;
+			const Manif* pManif = p.second.pManifest;
 			typename Manif::Iterator itm = pManif->find(className);
 			if (itm != pManif->end())
 				return *itm;

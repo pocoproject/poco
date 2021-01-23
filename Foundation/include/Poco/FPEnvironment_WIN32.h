@@ -1,8 +1,6 @@
 //
 // FPEnvironment_WIN32.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FPEnvironment_WIN32.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  FPEnvironment
@@ -71,16 +69,16 @@ protected:
 	FPEnvironmentImpl& operator = (const FPEnvironmentImpl& env);
 	void keepCurrentImpl();
 	static void clearFlagsImpl();
-	static bool isFlagImpl(FlagImpl flag);	
+	static bool isFlagImpl(FlagImpl flag);
 	static void setRoundingModeImpl(RoundingModeImpl mode);
 	static RoundingModeImpl getRoundingModeImpl();
-	static bool isInfiniteImpl(float value);		
+	static bool isInfiniteImpl(float value);
 	static bool isInfiniteImpl(double value);
 	static bool isInfiniteImpl(long double value);
-	static bool isNaNImpl(float value);		
+	static bool isNaNImpl(float value);
 	static bool isNaNImpl(double value);
 	static bool isNaNImpl(long double value);
-	static float copySignImpl(float target, float source);		
+	static float copySignImpl(float target, float source);
 	static double copySignImpl(double target, double source);
 	static long double copySignImpl(long double target, long double source);
 
@@ -94,18 +92,21 @@ private:
 //
 inline bool FPEnvironmentImpl::isInfiniteImpl(float value)
 {
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(double value)
 {
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 }
 
 
 inline bool FPEnvironmentImpl::isInfiniteImpl(long double value)
 {
+	if (_isnan(value) != 0) return false;
 	return _finite(value) == 0;
 }
 

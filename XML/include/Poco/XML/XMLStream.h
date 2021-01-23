@@ -1,8 +1,6 @@
 //
 // XMLStream.h
 //
-// $Id: //poco/1.4/XML/include/Poco/XML/XMLStream.h#1 $
-//
 // Library: XML
 // Package: XML
 // Module:  XMLStream
@@ -30,8 +28,8 @@ namespace XML {
 
 
 // The byte input stream is always a narrow stream.
-typedef std::istream XMLByteInputStream;
-typedef std::ostream XMLByteOutputStream;
+using XMLByteInputStream = std::istream;
+using XMLByteOutputStream = std::ostream;
 
 
 //
@@ -51,8 +49,8 @@ typedef std::ostream XMLByteOutputStream;
 #if defined(XML_UNICODE_WCHAR_T)
 
 	// Unicode - use wide streams
-	typedef std::wistream XMLCharInputStream;
-	typedef std::wostream XMLCharOutputStream;
+	using XMLCharInputStream = std::wistream;
+	using XMLCharOutputStream = std::wostream;
 
 #elif defined(XML_UNICODE)
 
@@ -61,8 +59,8 @@ typedef std::ostream XMLByteOutputStream;
 #else
 
 	// Characters are UTF-8 encoded
-	typedef std::istream XMLCharInputStream;
-	typedef std::ostream XMLCharOutputStream;
+	using XMLCharInputStream = std::istream;
+	using XMLCharOutputStream = std::ostream;
 
 #endif
 

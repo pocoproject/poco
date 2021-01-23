@@ -1,8 +1,6 @@
 //
 // DeflatingStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DeflatingStream.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  ZLibStream
@@ -139,7 +137,7 @@ protected:
 };
 
 
-class Foundation_API DeflatingOutputStream: public DeflatingIOS, public std::ostream
+class Foundation_API DeflatingOutputStream: public std::ostream, public DeflatingIOS
 	/// This stream compresses all data passing through it
 	/// using zlib's deflate algorithm.
 	/// After all data has been written to the stream, close()
@@ -176,7 +174,7 @@ protected:
 };
 
 
-class Foundation_API DeflatingInputStream: public DeflatingIOS, public std::istream
+class Foundation_API DeflatingInputStream: public std::istream, public DeflatingIOS
 	/// This stream compresses all data passing through it
 	/// using zlib's deflate algorithm.
 {

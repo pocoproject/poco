@@ -1,8 +1,6 @@
 //
 // HTTPAuthenticationParams.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPAuthenticationParams.cpp#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:	HTTPAuthenticationParams
@@ -15,20 +13,20 @@
 //
 
 
-#include "Poco/Exception.h"
 #include "Poco/Net/HTTPAuthenticationParams.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
+#include "Poco/Exception.h"
 
 
 using Poco::icompare;
 using Poco::Ascii;
 
 
-namespace 
+namespace
 {
 	bool mustBeQuoted(const std::string& name)
 	{
@@ -43,19 +41,19 @@ namespace
 			icompare(name, "uri") == 0 ||
 			icompare(name, "username") == 0;
 	}
-	
-	
+
+
 	void formatParameter(std::string& result, const std::string& name, const std::string& value)
 	{
 		result += name;
 		result += '=';
-		if (mustBeQuoted(name)) 
+		if (mustBeQuoted(name))
 		{
 			result += '"';
 			result += value;
 			result += '"';
-		} 
-		else 
+		}
+		else
 		{
 			result += value;
 		}
@@ -68,6 +66,7 @@ namespace Net {
 
 
 const std::string HTTPAuthenticationParams::REALM("realm");
+const std::string HTTPAuthenticationParams::NTLM("NTLM");
 const std::string HTTPAuthenticationParams::WWW_AUTHENTICATE("WWW-Authenticate");
 const std::string HTTPAuthenticationParams::PROXY_AUTHENTICATE("Proxy-Authenticate");
 
@@ -121,7 +120,7 @@ void HTTPAuthenticationParams::fromRequest(const HTTPRequest& request)
 
 	request.getCredentials(scheme, authInfo);
 
-	if (icompare(scheme, "Digest") != 0) 
+	if (icompare(scheme, "Digest") != 0)
 		throw InvalidArgumentException("Could not parse non-Digest authentication information", scheme);
 
 	fromAuthInfo(authInfo);
@@ -137,20 +136,25 @@ void HTTPAuthenticationParams::fromResponse(const HTTPResponse& response, const 
 	bool found = false;
 	while (!found && it != response.end() && icompare(it->first, header) == 0)
 	{
-		const std::string& header = it->second;
-		if (icompare(header, 0, 6, "Basic ") == 0) 
+		const std::string& headerValue = it->second;
+		if (icompare(headerValue, 0, 6, "Basic ") == 0)
 		{
-			parse(header.begin() + 6, header.end());
+			parse(headerValue.begin() + 6, headerValue.end());
 			found = true;
-		} 
-		else if (icompare(header, 0, 7, "Digest ") == 0)
+		}
+		else if (icompare(headerValue, 0, 7, "Digest ") == 0)
 		{
-			parse(header.begin() + 7, header.end());
+			parse(headerValue.begin() + 7, headerValue.end());
 			found = true;
-		} 
+		}
+		else if (icompare(headerValue, 0, 5, "NTLM ") == 0)
+		{
+			set(NTLM, headerValue.substr(5));
+			found = true;
+		}
 		++it;
 	}
-	if (!found) throw NotAuthenticatedException("No Basic or Digest authentication header found");
+	if (!found) throw NotAuthenticatedException("No Basic, Digest or NTLM authentication header found");
 }
 
 
@@ -168,28 +172,34 @@ void HTTPAuthenticationParams::setRealm(const std::string& realm)
 
 std::string HTTPAuthenticationParams::toString() const
 {
-	ConstIterator iter = begin();
 	std::string result;
-
-	if (iter != end()) 
+	if (size() == 1 && find(NTLM) != end())
 	{
-		formatParameter(result, iter->first, iter->second);
-		++iter;
+		result = get(NTLM);
 	}
-
-	for (; iter != end(); ++iter) 
+	else
 	{
-		result.append(", ");
-		formatParameter(result, iter->first, iter->second);
-	}
+		ConstIterator iter = begin();
 
+		if (iter != end())
+		{
+			formatParameter(result, iter->first, iter->second);
+			++iter;
+		}
+
+		for (; iter != end(); ++iter)
+		{
+			result.append(", ");
+			formatParameter(result, iter->first, iter->second);
+		}
+	}
 	return result;
 }
 
 
 void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::string::const_iterator last)
 {
-	enum State 
+	enum State
 	{
 		STATE_INITIAL = 0x0100,
 		STATE_FINAL = 0x0200,
@@ -207,61 +217,61 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 	std::string token;
 	std::string value;
 
-	for (std::string::const_iterator it = first; it != last; ++it) 
+	for (std::string::const_iterator it = first; it != last; ++it)
 	{
-		switch (state) 
+		switch (state)
 		{
 		case STATE_SPACE:
-			if (Ascii::isAlphaNumeric(*it) || *it == '_') 
+			if (Ascii::isAlphaNumeric(*it) || *it == '_' || *it == '-')
 			{
 				token += *it;
 				state = STATE_TOKEN;
-			} 
-			else if (Ascii::isSpace(*it)) 
+			}
+			else if (Ascii::isSpace(*it))
 			{
 				// Skip
-			} 
+			}
 			else throw SyntaxException("Invalid authentication information");
 			break;
 
 		case STATE_TOKEN:
-			if (*it == '=') 
+			if (*it == '=')
 			{
 				state = STATE_EQUALS;
-			} 
-			else if (Ascii::isAlphaNumeric(*it) || *it == '_') 
+			}
+			else if (Ascii::isAlphaNumeric(*it) || *it == '_' || *it == '-')
 			{
 				token += *it;
-			} 
+			}
 			else throw SyntaxException("Invalid authentication information");
 			break;
 
 		case STATE_EQUALS:
-			if (Ascii::isAlphaNumeric(*it) || *it == '_') 
+			if (Ascii::isAlphaNumeric(*it) || *it == '_')
 			{
 				value += *it;
 				state = STATE_VALUE;
-			} 
-			else if (*it == '"') 
+			}
+			else if (*it == '"')
 			{
 				state = STATE_VALUE_QUOTED;
-			} 
+			}
 			else throw SyntaxException("Invalid authentication information");
 			break;
 
 		case STATE_VALUE_QUOTED:
-			if (*it == '\\') 
+			if (*it == '\\')
 			{
 				state = STATE_VALUE_ESCAPE;
-			} 
-			else if (*it == '"') 
+			}
+			else if (*it == '"')
 			{
 				add(token, value);
 				token.clear();
 				value.clear();
 				state = STATE_COMMA;
-			} 
-			else 
+			}
+			else
 			{
 				value += *it;
 			}
@@ -273,21 +283,21 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 			break;
 
 		case STATE_VALUE:
-			if (Ascii::isSpace(*it)) 
+			if (Ascii::isSpace(*it))
 			{
 				add(token, value);
 				token.clear();
 				value.clear();
 				state = STATE_COMMA;
-			} 
-			else if (*it == ',') 
+			}
+			else if (*it == ',')
 			{
 				add(token, value);
 				token.clear();
 				value.clear();
 				state = STATE_SPACE;
-			} 
-			else 
+			}
+			else
 			{
 				value += *it;
 			}
@@ -297,11 +307,11 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 			if (*it == ',')
 			{
 				state = STATE_SPACE;
-			} 
-			else if (Ascii::isSpace(*it)) 
+			}
+			else if (Ascii::isSpace(*it))
 			{
 				// Skip
-			} 
+			}
 			else throw SyntaxException("Invalid authentication information");
 			break;
 		}

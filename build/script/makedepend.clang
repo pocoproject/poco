@@ -1,7 +1,5 @@
 #! /bin/bash
 #
-# $Id: //poco/1.4/build/script/makedepend.clang#1 $
-#
 # makedepend.clang
 #
 # Create dependency file, Clang version
@@ -28,4 +26,4 @@ else
 	CLANG=clang++
 fi
 
-$CLANG -MM $@ $source | sed "s#\(.*\.o$\)#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1#" >$target
+$CLANG -MM $@ $source | sed "s#\(.*\.o\):#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1:#" >$target

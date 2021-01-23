@@ -1,8 +1,6 @@
 #
 # vxprogen
 #
-# $Id: //poco/1.4/build/script/vxprogen#1 $
-#
 # Project file generator for WindRiver Tornado 2.2/VxWorks 5.5
 #
 # Usage: vxprogen <buildspec>...

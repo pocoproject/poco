@@ -1,8 +1,6 @@
 //
 // Bugcheck.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Bugcheck.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Bugcheck
@@ -22,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include <string>
+#include <cstdlib>
 #if defined(_DEBUG)
 #	include <iostream>
 #endif
@@ -81,6 +80,28 @@ protected:
 //
 // useful macros (these automatically supply line number and file name)
 //
+#if defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+
+// Short-circuit these macros when under static analysis.
+// Ideally, static analysis tools should understand and reason correctly about
+// noreturn methods such as Bugcheck::bugcheck(). In practice, they don't.
+// Help them by turning these macros into std::abort() as described here:
+// https://developer.klocwork.com/documentation/en/insight/10-1/tuning-cc-analysis#Usingthe__KLOCWORK__macro
+
+#include <cstdlib> // for abort
+#define poco_assert_dbg(cond)           do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert_msg_dbg(cond, text) do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert(cond)               do { if (!(cond)) std::abort(); } while (0)
+#define poco_assert_msg(cond, text)     do { if (!(cond)) std::abort(); } while (0)
+#define poco_check_ptr(ptr)             do { if (!(ptr)) std::abort(); } while (0)
+#define poco_bugcheck()                 do { std::abort(); } while (0)
+#define poco_bugcheck_msg(msg)          do { std::abort(); } while (0)
+
+
+#else // defined(__KLOCWORK__) || defined(__clang_analyzer__)
+
+
 #if defined(_DEBUG)
 	#define poco_assert_dbg(cond) \
 		if (!(cond)) Poco::Bugcheck::assertion(#cond, __FILE__, __LINE__); else (void) 0
@@ -111,6 +132,9 @@ protected:
 
 #define poco_bugcheck_msg(msg) \
 	Poco::Bugcheck::bugcheck(msg, __FILE__, __LINE__)
+
+
+#endif // defined(__KLOCWORK__) || defined(__clang_analyzer__)
 
 
 #define poco_unexpected() \
@@ -148,11 +172,6 @@ protected:
 //
 
 
-#if defined(POCO_COMPILER_GCC) && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
-	GCC_DIAG_OFF(unused-local-typedefs) // supress numerous gcc warnings
-#endif // POCO_COMPILER_GCC && (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
-
-
 template <bool x>
 struct POCO_STATIC_ASSERTION_FAILURE;
 
@@ -180,7 +199,7 @@ struct poco_static_assert_test
 #else
 #define poco_static_assert(B) \
 	typedef poco_static_assert_test<sizeof(POCO_STATIC_ASSERTION_FAILURE<(bool) (B)>)> \
-		POCO_JOIN(poco_static_assert_typedef_, __LINE__)
+		POCO_JOIN(poco_static_assert_typedef_, __LINE__) POCO_UNUSED
 #endif
 
 

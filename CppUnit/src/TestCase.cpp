@@ -1,8 +1,6 @@
 //
 // TestCase.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestCase.cpp#1 $
-//
 
 
 #include <stdexcept>
@@ -130,13 +128,11 @@ void TestCase::run(TestResult *result)
 		result->addError(this, new CppUnitException(msg));
 
 	}
-#if !defined(_WIN32)
 	catch (...)
 	{
 		CppUnitException *e = new CppUnitException ("unknown exception");
 		result->addError (this, e);
 	}
-#endif
 	tearDown ();
 	result->endTest(this);
 }

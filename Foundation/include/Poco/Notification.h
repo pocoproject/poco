@@ -1,8 +1,6 @@
 //
 // Notification.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Notification.h#1 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  Notification
@@ -37,7 +35,7 @@ class Foundation_API Notification: public RefCountedObject
 	/// template class.
 {
 public:
-	typedef AutoPtr<Notification> Ptr;
+	using Ptr = AutoPtr<Notification>;
 	
 	Notification();
 		/// Creates the notification.

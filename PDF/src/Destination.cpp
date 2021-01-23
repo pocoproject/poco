@@ -1,8 +1,6 @@
 //
 // Destination.cpp
 //
-// $Id: //poco/Main/PDF/src/Destination.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Destination

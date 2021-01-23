@@ -1,8 +1,6 @@
 //
 // SimpleFileChannelTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SimpleFileChannelTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -57,10 +55,10 @@ void SimpleFileChannelTest::testRotate()
 			pChannel->log(msg);
 		}
 		File f(name);
-		assert (f.exists());
+		assertTrue (f.exists());
 		f = name + ".0";
-		assert (f.exists());
-		assert (f.getSize() >= 2048);
+		assertTrue (f.exists());
+		assertTrue (f.getSize() >= 2048);
 	}
 	catch (...)
 	{

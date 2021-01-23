@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/CEGCCARM#2 $
-#
 # CYGWIN
 #
 # Make settings for Cygwin on WinXP/gcc 3.4 

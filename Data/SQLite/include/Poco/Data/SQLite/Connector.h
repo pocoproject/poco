@@ -1,9 +1,7 @@
 //
 // Connector.h
 //
-// $Id: //poco/Main/Data/SQLite/include/Poco/Data/SQLite/Connector.h#2 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Connector
 //
@@ -24,12 +22,6 @@
 #include "Poco/Data/Connector.h"
 
 
-// Note: to avoid static (de)initialization problems,
-// during connector automatic (un)registration, it is 
-// best to have this as a macro.
-#define POCO_DATA_SQLITE_CONNECTOR_NAME "sqlite"
-
-
 namespace Poco {
 namespace Data {
 namespace SQLite {
@@ -40,7 +32,7 @@ class SQLite_API Connector: public Poco::Data::Connector
 {
 public:
 	static const std::string KEY;
-		/// Keyword for creating SQLite sessions ("SQLite").
+		/// Keyword for creating SQLite sessions ("sqlite").
 
 	Connector();
 		/// Creates the Connector.
@@ -77,69 +69,11 @@ public:
 ///
 inline const std::string& Connector::name() const
 {
-	static const std::string n(POCO_DATA_SQLITE_CONNECTOR_NAME);
-	return n;
+	return KEY;
 }
 
 
 } } } // namespace Poco::Data::SQLite
 
-
-// 
-// Automatic Connector registration
-// 
-
-struct SQLite_API SQLiteConnectorRegistrator
-	/// Connector registering class.
-	/// A global instance of this class is instantiated
-	/// with sole purpose to automatically register the 
-	/// SQLite connector with central Poco Data registry.
-{
-	SQLiteConnectorRegistrator()
-		/// Calls Poco::Data::SQLite::registerConnector();
-	{
-		Poco::Data::SQLite::Connector::registerConnector();
-	}
-
-	~SQLiteConnectorRegistrator()
-		/// Calls Poco::Data::SQLite::unregisterConnector();
-	{
-		try
-		{
-			Poco::Data::SQLite::Connector::unregisterConnector();
-		}
-		catch (...)
-		{
-			poco_unexpected();
-		}
-	}
-};
-
-
-#if !defined(POCO_NO_AUTOMATIC_LIB_INIT)
-	#if defined(POCO_OS_FAMILY_WINDOWS) && !defined(__GNUC__)
-		extern "C" const struct SQLite_API SQLiteConnectorRegistrator pocoSQLiteConnectorRegistrator;
-		#if defined(SQLite_EXPORTS)
-			#if defined(_WIN64) || defined(_WIN32_WCE)
-				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
-			#elif defined(_WIN32)
-				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
-			#endif
-		#else  // !SQLite_EXPORTS
-			#if defined(_WIN64) || defined(_WIN32_WCE)
-				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
-			#elif defined(_WIN32)
-				#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
-			#endif
-		#endif // SQLite_EXPORTS
-	#else // !POCO_OS_FAMILY_WINDOWS
-			#define POCO_DATA_SQLITE_FORCE_SYMBOL(s) extern "C" const struct SQLiteConnectorRegistrator s;
-	#endif // POCO_OS_FAMILY_WINDOWS
-	POCO_DATA_SQLITE_FORCE_SYMBOL(pocoSQLiteConnectorRegistrator)
-#endif // POCO_NO_AUTOMATIC_LIB_INIT
-
-// 
-// End automatic Connector registration
-// 
 
 #endif // Data_SQLite_Connector_INCLUDED

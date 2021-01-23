@@ -1,8 +1,6 @@
 //
 // PageReader.h
 //
-// $Id: //poco/1.4/PageCompiler/src/PageReader.h#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -55,6 +53,7 @@ protected:
 		STATE_PREHANDLER,
 		STATE_BLOCK,
 		STATE_EXPR,
+		STATE_ESC_EXPR,
 		STATE_COMMENT,
 		STATE_ATTR
 	};
@@ -63,12 +62,15 @@ protected:
 	static const std::string MARKUP_END;
 	static const std::string EXPR_BEGIN;
 	static const std::string EXPR_END;
+	static const std::string ESC_EXPR_BEGIN;
+	static const std::string ESC_EXPR_END;
 
 	void include(const std::string& path);
 	void parseAttributes();
 	void nextToken(std::istream& istr, std::string& token);
 	void handleAttribute(const std::string& name, const std::string& value);
 	std::string where() const;
+	bool escape() const;
 
 protected:
 	void generateLineDirective(std::ostream& ostr);
@@ -82,7 +84,7 @@ private:
 	const PageReader* _pParent;
 	std::string _path;
 	std::string _attrs;
-	int _line;
+	std::streamsize _line;
 	bool _emitLineDirectives;
 };
 

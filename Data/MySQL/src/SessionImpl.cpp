@@ -1,9 +1,7 @@
 //
 // SessionImpl.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/SessionImpl.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  SessionImpl
 //
@@ -46,16 +44,20 @@ const std::string SessionImpl::MYSQL_REPEATABLE_READ = "REPEATABLE READ";
 const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) : 
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
+	_connector("MySQL"),
 	_handle(0),
+	_reset(false),
 	_connected(false),
-	_inTransaction(false)
+	_inTransaction(false),
+	_failIfInnoReadOnly(false),
+	_lastError(0)
 {
 	addProperty("insertId", &SessionImpl::setInsertId, &SessionImpl::getInsertId);
 	setProperty("handle", static_cast<MYSQL*>(_handle));
+	addFeature("failIfInnoReadOnly", &SessionImpl::setFailIfInnoReadOnly, &SessionImpl::getFailIfInnoReadOnly);
 	open();
-	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 }
 
 
@@ -73,7 +75,7 @@ void SessionImpl::open(const std::string& connect)
 	poco_assert_dbg (!connectionString().empty());
 
 	_handle.init();
-	
+
 	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 	_handle.options(MYSQL_OPT_CONNECT_TIMEOUT, timeout);
 
@@ -89,9 +91,11 @@ void SessionImpl::open(const std::string& connect)
 	options["auto-reconnect"] = "";
 	options["secure-auth"] = "";
 	options["character-set"] = "utf8";
+	options["reset"] = "";
+	options["fail-readonly"] = "";
 
 	const std::string& connString = connectionString();
-	for (std::string::const_iterator start = connString.begin();;) 
+	for (std::string::const_iterator start = connString.begin();;)
 	{
 		std::string::const_iterator finish = std::find(start, connString.end(), ';');
 		std::string::const_iterator middle = std::find(start, finish, '=');
@@ -104,7 +108,7 @@ void SessionImpl::open(const std::string& connect)
 		if ((finish == connString.end()) || (finish + 1 == connString.end())) break;
 
 		start = finish + 1;
-	} 
+	}
 
 	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
@@ -122,50 +126,66 @@ void SessionImpl::open(const std::string& connect)
 	else if (options["compress"] == "false")
 		;
 	else if (!options["compress"].empty())
-		throw MySQLException("create session: specify correct compress option (true or false) or skip it");
+		throw MySQLException("create session: specify correct compress option (true or false)");
 
 	if (options["auto-reconnect"] == "true")
 		_handle.options(MYSQL_OPT_RECONNECT, true);
 	else if (options["auto-reconnect"] == "false")
 		_handle.options(MYSQL_OPT_RECONNECT, false);
 	else if (!options["auto-reconnect"].empty())
-		throw MySQLException("create session: specify correct auto-reconnect option (true or false) or skip it");
+		throw MySQLException("create session: specify correct auto-reconnect option (true or false)");
 
+#ifdef MYSQL_SECURE_AUTH
 	if (options["secure-auth"] == "true")
 		_handle.options(MYSQL_SECURE_AUTH, true);
 	else if (options["secure-auth"] == "false")
 		_handle.options(MYSQL_SECURE_AUTH, false);
 	else if (!options["secure-auth"].empty())
-		throw MySQLException("create session: specify correct secure-auth option (true or false) or skip it");
+		throw MySQLException("create session: specify correct secure-auth option (true or false)");
+#endif
 
 	if (!options["character-set"].empty())
 		_handle.options(MYSQL_SET_CHARSET_NAME, options["character-set"].c_str());
 
+	if (options["reset"] == "true")
+		_reset = true;
+	else if (options["reset"] == "false")
+		_reset = false;
+	else if (!options["reset"].empty())
+		throw MySQLException("create session: specify correct reset option (true or false)");
+
+	if (options["fail-readonly"] == "true")
+		_failIfInnoReadOnly = true;
+	else if (options["fail-readonly"] == "false")
+		_failIfInnoReadOnly = false;
+	else if (!options["fail-readonly"].empty())
+		throw MySQLException("create session: specify correct fail-readonly option (true or false)");
+
 	// Real connect
-	_handle.connect(options["host"].c_str(), 
-			options["user"].c_str(), 
-			options["password"].c_str(), 
-			db, 
+	_handle.connect(options["host"].c_str(),
+			options["user"].c_str(),
+			options["password"].c_str(),
+			db,
 			port);
 
-	addFeature("autoCommit", 
-		&SessionImpl::autoCommit, 
+	addFeature("autoCommit",
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
 	_connected = true;
 }
-	
+
 
 SessionImpl::~SessionImpl()
 {
 	close();
 }
-	
 
-Poco::Data::StatementImpl* SessionImpl::createStatementImpl()
+
+Poco::Data::StatementImpl::Ptr SessionImpl::createStatementImpl()
 {
 	return new MySQLStatementImpl(*this);
-}	
+}
 
 
 void SessionImpl::begin()
@@ -185,7 +205,7 @@ void SessionImpl::commit()
 	_handle.commit();
 	_inTransaction = false;
 }
-	
+
 
 void SessionImpl::rollback()
 {
@@ -202,7 +222,7 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&)
+bool SessionImpl::isAutoCommit(const std::string&) const
 {
 	int ac = 0;
 	return 1 == getSetting("autocommit", ac);
@@ -232,7 +252,7 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 }
 
 
-Poco::UInt32 SessionImpl::getTransactionIsolation()
+Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	std::string isolation;
 	getSetting("tx_isolation", isolation);
@@ -250,14 +270,67 @@ Poco::UInt32 SessionImpl::getTransactionIsolation()
 }
 
 
-bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti)
+bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
 	return Session::TRANSACTION_READ_UNCOMMITTED == ti ||
 		Session::TRANSACTION_READ_COMMITTED == ti ||
 		Session::TRANSACTION_REPEATABLE_READ == ti ||
 		Session::TRANSACTION_SERIALIZABLE == ti;
 }
-	
+
+
+void SessionImpl::reset()
+{
+	if (_connected && _reset)
+	{
+		_handle.reset();
+	}
+}
+
+
+inline bool SessionImpl::isConnected() const
+{
+	return _connected;
+}
+
+
+bool SessionImpl::isGood() const
+{
+	if (_connected)
+	{
+		if (_lastError)
+		{
+			if (_failIfInnoReadOnly)
+			{
+				try
+				{
+					int ro = 0;
+					if (0 == getSetting("innodb_read_only", ro))
+					{
+						_lastError = 0;
+						return true;
+					}
+				}
+				catch (...)
+				{
+				}
+				return false;
+			}
+			else
+			{
+				if (_handle.ping())
+				{
+					_lastError = 0;
+					return true;
+				}
+				return false;
+			}
+		}
+		else return true;
+	}
+	else return false;
+}
+
 
 void SessionImpl::close()
 {
@@ -277,4 +350,4 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-}}}
+} } } // namespace Poco::Data::MySQL

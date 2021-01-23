@@ -1,17 +1,15 @@
 //
 // WebNotifier.cpp
 //
-// $Id: //poco/Main/Data/samples/WebNotifier/src/WebNotifier.cpp#2 $
-//
 // This sample demonstrates a combination of Data and Net libraries by
-// creating a database, registering callbacks for insert/update events 
+// creating a database, registering callbacks for insert/update events
 // and sending database modifications to the web client through web socket.
 // Since callbacks are only registered for session, in order to see the
 // effects, database updates should be done through the shell provided by
-// this example. 
-// 
+// this example.
+//
 // This is only a demo. For production-grade a better web socket management
-// facility as well as persisting notification functionality (e.g. via 
+// facility as well as persisting notification functionality (e.g. via
 // triggers and external functions) should be used.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -37,7 +35,9 @@
 #include "Poco/Data/RowFormatter.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/SQLite/Notifier.h"
+#include "Poco/Data/SQLite/Connector.h"
 #include <iostream>
+
 
 using Poco::delegate;
 using Poco::Timespan;
@@ -128,7 +128,7 @@ public:
 			std::cout << std::endl << "WebSocket connection established." << std::endl << PROMPT;
 
 			char buffer[1024];
-			int n, count = 0;
+			int n;
 			do
 			{
 				n = _pWS->receiveFrame(buffer, sizeof(buffer), _flags);
@@ -184,7 +184,7 @@ public:
 
 		if (uri != "/favicon.ico")
 			std::cout << "Unknown URI: " << uri << std::endl;
-		
+
 		return 0;
 	}
 
@@ -250,7 +250,7 @@ public:
 		_notifier.insert -= delegate(this, &DBEventHandler::onInsert);
 		_notifier.update -= delegate(this, &DBEventHandler::onUpdate);
 	}
-	
+
 	std::size_t execute(const std::string& sql)
 		/// Exectutes the SQL statement.
 	{
@@ -368,6 +368,9 @@ void doShell(DBEventHandler& dbEventHandler)
 
 int main(int argc, char** argv)
 {
+	// register SQLite connector
+	Poco::Data::SQLite::Connector::registerConnector();
+
 	// HTTPServer instance
 	RequestHandlerFactory* pFactory = new RequestHandlerFactory;
 	HTTPServer srv(pFactory, 9980);

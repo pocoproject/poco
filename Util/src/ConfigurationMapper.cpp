@@ -1,8 +1,6 @@
 //
 // ConfigurationMapper.cpp
 //
-// $Id: //poco/1.4/Util/src/ConfigurationMapper.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationMapper
@@ -21,7 +19,7 @@ namespace Poco {
 namespace Util {
 
 
-ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration* pConfig):
+ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig):
 	_fromPrefix(fromPrefix),
 	_toPrefix(toPrefix),
 	_pConfig(pConfig)
@@ -30,14 +28,11 @@ ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const st
 
 	if (!_fromPrefix.empty()) _fromPrefix += '.';
 	if (!_toPrefix.empty()) _toPrefix += '.';
-
-	_pConfig->duplicate();
 }
 
 
 ConfigurationMapper::~ConfigurationMapper()
 {
-	_pConfig->release();
 }
 
 

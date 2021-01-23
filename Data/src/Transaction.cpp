@@ -1,8 +1,6 @@
 //
 // Transaction.cpp
 //
-// $Id: //poco/Main/Data/src/Transaction.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Transaction
@@ -51,6 +49,11 @@ Transaction::~Transaction()
 
 				_rSession.rollback();
 			}
+			catch (Poco::Exception& exc)
+			{
+				if (_pLogger) 
+					_pLogger->error("Error while rolling back database transaction: %s", exc.displayText());
+			}
 			catch (...)
 			{
 				if (_pLogger) 
@@ -93,7 +96,7 @@ void Transaction::execute(const std::vector<std::string>& sql)
 	}
 	catch (Exception& ex)
 	{
-		if (_pLogger) _pLogger->error(ex.displayText());
+		if (_pLogger) _pLogger->log(ex);
 	}
 
 	rollback();

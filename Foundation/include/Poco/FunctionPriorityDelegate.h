@@ -1,8 +1,6 @@
 //
 // FunctionPriorityDelegate.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FunctionPriorityDelegate.h#5 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  FunctionPriorityDelegate

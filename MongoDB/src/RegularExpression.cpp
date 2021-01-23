@@ -1,13 +1,9 @@
 //
 // RegularExpression.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  RegularExpression
-//
-// Implementation of the RegularExpression class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -29,7 +25,9 @@ RegularExpression::RegularExpression()
 }
 
 
-RegularExpression::RegularExpression(const std::string& pattern, const std::string& options) : _pattern(pattern), _options(options)
+RegularExpression::RegularExpression(const std::string& pattern, const std::string& options): 
+	_pattern(pattern), 
+	_options(options)
 {
 }
 
@@ -42,9 +40,9 @@ RegularExpression::~RegularExpression()
 SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 {
 	int options = 0;
-	for(std::string::const_iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
+	for (std::string::const_iterator optIt = _options.begin(); optIt != _options.end(); ++optIt)
 	{
-		switch(*optIt)
+		switch (*optIt)
 		{
 		case 'i': // Case Insensitive
 			options |= Poco::RegularExpression::RE_CASELESS;

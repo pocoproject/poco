@@ -1,8 +1,6 @@
 //
 // ExpireCache.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ExpireCache.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  ExpireCache

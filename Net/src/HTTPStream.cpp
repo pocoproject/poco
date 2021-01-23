@@ -1,8 +1,6 @@
 //
 // HTTPStream.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPStream.cpp#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPStream

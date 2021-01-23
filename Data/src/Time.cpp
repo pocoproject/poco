@@ -1,8 +1,6 @@
 //
 // Time.cpp
 //
-// $Id: //poco/Main/Data/src/Time.cpp#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Time

@@ -1,8 +1,6 @@
 //
 // MediaType.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/MediaType.h#2 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MediaType
@@ -46,10 +44,16 @@ public:
 	MediaType(const MediaType& mediaType);
 		/// Creates a MediaType from another one.
 
+	MediaType(MediaType&& mediaType) noexcept;
+		/// Creates a MediaType by moving another one.
+
 	~MediaType();
 		/// Destroys the MediaType.
 
 	MediaType& operator = (const MediaType& mediaType);
+		/// Assigns another media type.
+
+	MediaType& operator = (MediaType&& mediaType) noexcept;
 		/// Assigns another media type.
 		
 	MediaType& operator = (const std::string& mediaType);
@@ -109,7 +113,7 @@ public:
 		/// Returns true if the type and subtype match
 		/// the type and subtype of the given media type.
 		/// If the MIME type is a range of types it matches
-		/// any media type withing the range (e.g. "image/*" matches
+		/// any media type within the range (e.g. "image/*" matches
 		/// any image media type, "*/*" matches anything).
 		/// Matching is case insensitive.
 
@@ -117,7 +121,7 @@ public:
 		/// Returns true if the type and subtype match
 		/// the given type and subtype.
 		/// If the MIME type is a range of types it matches
-		/// any media type withing the range (e.g. "image/*" matches
+		/// any media type within the range (e.g. "image/*" matches
 		/// any image media type, "*/*" matches anything).
 		/// Matching is case insensitive.
 

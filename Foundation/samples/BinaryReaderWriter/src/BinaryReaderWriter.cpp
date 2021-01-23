@@ -1,8 +1,6 @@
 //
 // BinaryReaderWriter.cpp
 //
-// $Id: //poco/1.4/Foundation/samples/BinaryReaderWriter/src/BinaryReaderWriter.cpp#1 $
-//
 // This sample demonstrates the BinaryWriter and BinaryReader classes.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

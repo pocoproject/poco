@@ -1,8 +1,6 @@
 //
 // Units.cpp
 //
-// $Id: //poco/svn/Util/samples/Units/src/Units.cpp#1 $
-//
 // This sample demonstrates the Units.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

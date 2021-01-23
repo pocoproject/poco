@@ -1,8 +1,6 @@
 //
 // Row.cpp
 //
-// $Id: //poco/Main/Data/src/Row.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Row
@@ -109,27 +107,9 @@ std::size_t Row::getPosition(const std::string& name)
 }
 
 
-void Row::checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val)
-{
-	bool empty = true;
-	SortMap::const_iterator it = _pSortMap->begin();
-	SortMap::const_iterator end = _pSortMap->end();
-	for (std::size_t cnt = 0; it != end; ++it, ++cnt)
-	{
-		if (cnt != pos)
-			empty = empty && _values[it->get<0>()].isEmpty();
-	}
-
-	if (empty && val.isEmpty())
-		throw IllegalStateException("All values are empty.");
-}
-
-
 void Row::addSortField(std::size_t pos)
 {
 	poco_assert (pos <= _values.size());
-
-	checkEmpty(std::numeric_limits<std::size_t>::max(), _values[pos]);
 
 	SortMap::iterator it = _pSortMap->begin();
 	SortMap::iterator end = _pSortMap->end();
@@ -177,8 +157,6 @@ void Row::addSortField(const std::string& name)
 
 void Row::removeSortField(std::size_t pos)
 {
-	checkEmpty(pos, Poco::Dynamic::Var());
-
 	SortMap::iterator it = _pSortMap->begin();
 	SortMap::iterator end = _pSortMap->end();
 	for (; it != end; ++it)

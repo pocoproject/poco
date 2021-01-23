@@ -1,8 +1,6 @@
 //
 // HelpFormatter.cpp
 //
-// $Id: //poco/1.4/Util/src/HelpFormatter.cpp#2 $
-//
 // Library: Util
 // Package: Options
 // Module:  HelpFormatter
@@ -124,27 +122,27 @@ void HelpFormatter::setUnixStyle(bool flag)
 int HelpFormatter::calcIndent() const
 {
 	int indent = 0;
-	for (OptionSet::Iterator it = _options.begin(); it != _options.end(); ++it)
+	for (const auto& opt: _options)
 	{
-		int shortLen = (int) it->shortName().length();
-		int fullLen  = (int) it->fullName().length();
-		int n = 0;
+		auto shortLen = opt.shortName().length();
+		auto fullLen  = opt.fullName().length();
+		std::size_t n = 0;
 		if (_unixStyle && shortLen > 0)
 		{
-			n += shortLen + (int) shortPrefix().length();
-			if (it->takesArgument())
-				n += (int) it->argumentName().length() + (it->argumentRequired() ? 0 : 2);
+			n += shortLen + shortPrefix().length();
+			if (opt.takesArgument())
+				n += opt.argumentName().length() + (opt.argumentRequired() ? 0 : 2);
 			if (fullLen > 0) n += 2;
 		}
 		if (fullLen > 0)
 		{
-			n += fullLen + (int) longPrefix().length();
-			if (it->takesArgument())
-				n += 1 + (int) it->argumentName().length() + (it->argumentRequired() ? 0 : 2);
+			n += fullLen + longPrefix().length();
+			if (opt.takesArgument())
+				n += 1 + opt.argumentName().length() + (opt.argumentRequired() ? 0 : 2);
 		}
 		n += 2;
 		if (n > indent)
-			indent = n;
+			indent = static_cast<int>(n);
 	}
 	return indent;
 }
@@ -153,17 +151,17 @@ int HelpFormatter::calcIndent() const
 void HelpFormatter::formatOptions(std::ostream& ostr) const
 {
 	int optWidth = calcIndent();
-	for (OptionSet::Iterator it = _options.begin(); it != _options.end(); ++it)
+	for (const auto& opt: _options)
 	{
-		formatOption(ostr, *it, optWidth);
+		formatOption(ostr, opt, optWidth);
 		if (_indent < optWidth)
 		{
 			ostr << '\n' << std::string(_indent, ' ');
-			formatText(ostr, it->description(), _indent, _indent);
+			formatText(ostr, opt.description(), _indent, _indent);
 		}
 		else
 		{
-			formatText(ostr, it->description(), _indent, optWidth);
+			formatText(ostr, opt.description(), _indent, optWidth);
 		}
 		ostr << '\n';
 	}
@@ -218,16 +216,16 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 	int pos = firstIndent;
 	int maxWordLen = _width - indent;
 	std::string word;
-	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	for (auto ch: text)
 	{
-		if (*it == '\n')
+		if (ch == '\n')
 		{
 			clearWord(ostr, pos, word, indent);
 			ostr << '\n';
 			pos = 0;
 			while (pos < indent) { ostr << ' '; ++pos; }
 		}
-		else if (*it == '\t')
+		else if (ch == '\t')
 		{
 			clearWord(ostr, pos, word, indent);
 			if (pos < _width) ++pos;
@@ -237,7 +235,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 				++pos;
 			}
 		}
-		else if (*it == ' ')
+		else if (ch == ' ')
 		{
 			clearWord(ostr, pos, word, indent);
 			if (pos < _width) { ostr << ' '; ++pos; }
@@ -248,7 +246,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 			{
 				clearWord(ostr, pos, word, indent);
 			}
-			else word += *it;
+			else word += ch;
 		}
 	}
 	clearWord(ostr, pos, word, indent);

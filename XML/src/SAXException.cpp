@@ -1,8 +1,6 @@
 //
 // SAXException.cpp
 //
-// $Id: //poco/1.4/XML/src/SAXException.cpp#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX
@@ -79,7 +77,7 @@ SAXParseException::SAXParseException(const SAXParseException& exc):
 }
 
 
-SAXParseException::~SAXParseException() throw()
+SAXParseException::~SAXParseException() noexcept
 {
 }
 
@@ -98,13 +96,13 @@ SAXParseException& SAXParseException::operator = (const SAXParseException& exc)
 }
 
 	
-const char* SAXParseException::name() const throw()
+const char* SAXParseException::name() const noexcept
 {
 	return "SAXParseException";
 }
 
 
-const char* SAXParseException::className() const throw()
+const char* SAXParseException::className() const noexcept
 {
 	return typeid(*this).name();
 }

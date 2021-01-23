@@ -1,8 +1,6 @@
 //
 // NullChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NullChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  NullChannel
@@ -37,6 +35,8 @@ class Foundation_API NullChannel: public Channel
 	/// other channel class in a logging configuration.
 {
 public:
+	using Ptr = AutoPtr<NullChannel>;
+
 	NullChannel();
 		/// Creates the NullChannel.
 

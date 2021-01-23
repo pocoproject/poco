@@ -1,8 +1,6 @@
 //
 // HTTPBasicStreamBuf.h
 //
-// $Id: //poco/Main/template/class.h#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPBasicStreamBuf
@@ -29,7 +27,7 @@ namespace Poco {
 namespace Net {
 
 
-typedef Poco::BasicBufferedStreamBuf<char, std::char_traits<char>, HTTPBufferAllocator> HTTPBasicStreamBuf;
+using HTTPBasicStreamBuf = Poco::BasicBufferedStreamBuf<char, std::char_traits<char>, HTTPBufferAllocator>;
 
 
 } } // namespace Poco::Net

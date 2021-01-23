@@ -1,8 +1,6 @@
 //
 // ListMapTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ListMapTest.h#1 $
-//
 // Definition of the ListMapTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -27,6 +25,7 @@ public:
 	~ListMapTest();
 
 	void testInsert();
+	void testInsertOrder();
 	void testErase();
 	void testIterator();
 	void testConstIterator();

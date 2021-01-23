@@ -1,8 +1,6 @@
 //
 // OptionSet.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/OptionSet.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionSet
@@ -33,8 +31,8 @@ class Util_API OptionSet
 	/// A collection of Option objects.
 {
 public:
-	typedef std::vector<Option> OptionVec;
-	typedef OptionVec::const_iterator Iterator;
+	using OptionVec = std::vector<Option>;
+	using Iterator = OptionVec::const_iterator;
 
 	OptionSet();
 		/// Creates the OptionSet.

@@ -1,8 +1,6 @@
 //
 // ParseCallback.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ParseCallback.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  ParseCallback

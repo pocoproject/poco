@@ -1,8 +1,6 @@
 //
 // NotificationStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NotificationStrategy.h#2 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  NotificationStrategy
@@ -35,7 +33,7 @@ class NotificationStrategy
 	/// but does not need to inherit from NotificationStrategy.
 {
 public:
-	typedef TDelegate* DelegateHandle;
+	using DelegateHandle = TDelegate*;
 
 	NotificationStrategy()
 	{
@@ -76,7 +74,7 @@ class NotificationStrategy<void, TDelegate>
 	/// but does not need to inherit from NotificationStrategy.
 {
 public:
-	typedef TDelegate* DelegateHandle;
+	using DelegateHandle = TDelegate*;
 
 	NotificationStrategy()
 	{

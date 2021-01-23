@@ -1,8 +1,6 @@
 //
 // ICMPSocketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPSocketImpl.cpp#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocketImpl
@@ -15,10 +13,10 @@
 
 
 #include "Poco/Net/ICMPSocketImpl.h"
+#include "Poco/Net/ICMPv4PacketImpl.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
-#include "Poco/Exception.h"
+#include "Poco/Format.h"
+#include "Poco/Buffer.h"
 
 
 using Poco::TimeoutException;
@@ -33,9 +31,11 @@ namespace Net {
 ICMPSocketImpl::ICMPSocketImpl(IPAddress::Family family, int dataSize, int ttl, int timeout):
 	RawSocketImpl(family, IPPROTO_ICMP),
 	_icmpPacket(family, dataSize),
+	_ttl(ttl),
 	_timeout(timeout)
 {
 	setOption(IPPROTO_IP, IP_TTL, ttl);
+	setBlocking(true);
 	setReceiveTimeout(Timespan(timeout));
 }
 
@@ -52,47 +52,78 @@ int ICMPSocketImpl::sendTo(const void*, int, const SocketAddress& address, int f
 }
 
 
+void ICMPSocketImpl::checkFragmentation(const std::string& err, int type, int code)
+{
+	if (type == ICMPv4PacketImpl::DESTINATION_UNREACHABLE &&
+		code == ICMPv4PacketImpl::FRAGMENTATION_NEEDED_AND_DF_SET)
+	{
+		throw ICMPFragmentationException(err);
+	}
+}
+
+
 int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 {
 	int maxPacketSize = _icmpPacket.maxPacketSize();
-	unsigned char* buffer = new unsigned char[maxPacketSize];
+	Poco::Buffer<unsigned char> buffer(maxPacketSize);
+	int expected = _icmpPacket.packetSize();
+	int type = 0, code = 0;
 
 	try
 	{
 		Poco::Timestamp ts;
+		int rc;
 		do
 		{
-			if (ts.isElapsed(_timeout)) 
+			// guard against a DoS attack
+			if (ts.isElapsed(_timeout)) throw TimeoutException();
+			buffer.clear();
+			SocketAddress respAddr;
+			rc = SocketImpl::receiveFrom(buffer.begin(), maxPacketSize, respAddr, flags);
+			if (rc == 0) break;
+			if (respAddr == address)
 			{
-				// This guards against a possible DoS attack, where sending
-				// fake ping responses will cause an endless loop.
-				throw TimeoutException();
+				expected -= rc;
+				if (expected <= 0)
+				{
+					if (_icmpPacket.validReplyID(buffer.begin(), maxPacketSize)) break;
+					std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
+					if (address.family() == IPAddress::IPv4) checkFragmentation(err, type, code);
+					if (!err.empty()) throw ICMPException(err);
+					throw ICMPException("Invalid ICMP reply");
+				}
 			}
-			SocketImpl::receiveFrom(buffer, maxPacketSize, address, flags);
+			else continue;
 		}
-		while (!_icmpPacket.validReplyID(buffer, maxPacketSize));
+		while (expected > 0 && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
+	}
+	catch (ICMPException&)
+	{
+		throw;
 	}
 	catch (TimeoutException&)
 	{
-		delete [] buffer;			
 		throw;
 	}
 	catch (Exception&)
 	{
-		std::string err = _icmpPacket.errorDescription(buffer, maxPacketSize);
-		delete [] buffer;
-		if (!err.empty()) 
-			throw ICMPException(err);
-		else 
-			throw;
+		std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
+		if (address.family() == IPAddress::IPv4) checkFragmentation(err, type, code);
+		if (!err.empty()) throw ICMPException(err);
+		else throw;
 	}
 
-	struct timeval then = _icmpPacket.time(buffer, maxPacketSize);
+	if (expected > 0)
+	{
+		throw ICMPException(Poco::format("No response: expected %d, received: %d", _icmpPacket.packetSize(),
+				_icmpPacket.packetSize() - expected));
+	}
+
+	struct timeval then = _icmpPacket.time(buffer.begin(), maxPacketSize);
 	struct timeval now  = _icmpPacket.time();
 
 	int elapsed	= (((now.tv_sec * 1000000) + now.tv_usec) - ((then.tv_sec * 1000000) + then.tv_usec))/1000;
 
-	delete[] buffer;
 	return elapsed;
 }
 

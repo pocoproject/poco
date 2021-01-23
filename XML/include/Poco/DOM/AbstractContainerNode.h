@@ -1,8 +1,6 @@
 //
 // AbstractContainerNode.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/AbstractContainerNode.h#2 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -63,6 +61,8 @@ protected:
 	bool hasAttributeValue(const XMLString& name, const XMLString& value, const NSMap* pNSMap) const;
 	static bool namesAreEqual(const Node* pNode1, const Node* pNode2, const NSMap* pNSMap);
 	static bool namesAreEqual(const Node* pNode, const XMLString& name, const NSMap* pNSMap);
+
+	static const XMLString WILDCARD;
 
 private:
 	AbstractNode* _pFirstChild;

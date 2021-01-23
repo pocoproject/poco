@@ -1,8 +1,6 @@
 //
 // UUID.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UUID.h#2 $
-//
 // Library: Foundation
 // Package: UUID
 // Module:  UUID

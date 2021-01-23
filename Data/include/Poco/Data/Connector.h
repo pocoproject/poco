@@ -1,8 +1,6 @@
 //
 // Connector.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Connector.h#4 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Connector

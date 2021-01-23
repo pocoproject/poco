@@ -1,8 +1,6 @@
 //
 // ICMPPacketImpl.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPPacketImpl.cpp#2 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPPacketImpl
@@ -35,8 +33,9 @@ namespace Poco {
 namespace Net {
 
 
-const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE = 4096;
-const UInt16 ICMPPacketImpl::MAX_SEQ_VALUE   = 65535;
+const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE  = 65535;
+const UInt16 ICMPPacketImpl::MAX_PAYLOAD_SIZE = 65507;
+const UInt16 ICMPPacketImpl::MAX_SEQ_VALUE    = 65535;
 
 
 ICMPPacketImpl::ICMPPacketImpl(int dataSize):

@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_fontdef_jp.c
+ * << Haru Free PDF Library >> -- hpdf_fontdef_jp.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -777,7 +780,7 @@ static const HPDF_CID_Width MS_PGothic_W_ARRAY[] = {
 };
 
 
-static const HPDF_CID_Width MS_Mincyo_W_ARRAY[] = {
+static const HPDF_CID_Width MS_Mincho_W_ARRAY[] = {
     {1, 500},
     {2, 500},
     {3, 500},
@@ -1036,7 +1039,7 @@ static const HPDF_CID_Width MS_Mincyo_W_ARRAY[] = {
 
 
 
-static const HPDF_CID_Width MS_PMincyo_W_ARRAY[] = {
+static const HPDF_CID_Width MS_PMincho_W_ARRAY[] = {
     {1, 304},
     {2, 304},
     {3, 460},
@@ -1542,7 +1545,7 @@ static const HPDF_CID_Width MS_PMincyo_W_ARRAY[] = {
 
 
 /*---------------------------------------------------------------------------*/
-/*----- Mincyo Font ---------------------------------------------------------*/
+/*----- Mincho Font ---------------------------------------------------------*/
 
 
 static HPDF_STATUS
@@ -1668,11 +1671,11 @@ MS_PGothic_BoldItalic_Init  (HPDF_FontDef   fontdef)
 
 
 static HPDF_STATUS
-MS_Mincyo_Init  (HPDF_FontDef   fontdef)
+MS_Mincho_Init  (HPDF_FontDef   fontdef)
 {
     HPDF_STATUS ret;
 
-    HPDF_PTRACE ((" HPDF_FontDef_MS_Mincyo_Init\n"));
+    HPDF_PTRACE ((" HPDF_FontDef_MS_Mincho_Init\n"));
 
     fontdef->ascent = 859;
     fontdef->descent = -140;
@@ -1695,9 +1698,9 @@ MS_Mincyo_Init  (HPDF_FontDef   fontdef)
 
 
 static HPDF_STATUS
-MS_Mincyo_Bold_Init  (HPDF_FontDef   fontdef)
+MS_Mincho_Bold_Init  (HPDF_FontDef   fontdef)
 {
-    HPDF_STATUS ret = MS_Mincyo_Init (fontdef);
+    HPDF_STATUS ret = MS_Mincho_Init (fontdef);
 
     if (ret != HPDF_OK)
         return ret;
@@ -1707,9 +1710,9 @@ MS_Mincyo_Bold_Init  (HPDF_FontDef   fontdef)
 
 
 static HPDF_STATUS
-MS_Mincyo_Italic_Init  (HPDF_FontDef   fontdef)
+MS_Mincho_Italic_Init  (HPDF_FontDef   fontdef)
 {
-    HPDF_STATUS ret = MS_Mincyo_Init (fontdef);
+    HPDF_STATUS ret = MS_Mincho_Init (fontdef);
 
     if (ret != HPDF_OK)
         return ret;
@@ -1718,9 +1721,9 @@ MS_Mincyo_Italic_Init  (HPDF_FontDef   fontdef)
 }
 
 static HPDF_STATUS
-MS_Mincyo_BoldItalic_Init  (HPDF_FontDef   fontdef)
+MS_Mincho_BoldItalic_Init  (HPDF_FontDef   fontdef)
 {
-    HPDF_STATUS ret = MS_Mincyo_Init (fontdef);
+    HPDF_STATUS ret = MS_Mincho_Init (fontdef);
 
     if (ret != HPDF_OK)
         return ret;
@@ -1730,11 +1733,11 @@ MS_Mincyo_BoldItalic_Init  (HPDF_FontDef   fontdef)
 
 
 static HPDF_STATUS
-MS_PMincyo_Init  (HPDF_FontDef   fontdef)
+MS_PMincho_Init  (HPDF_FontDef   fontdef)
 {
     HPDF_STATUS ret;
 
-    HPDF_PTRACE ((" HPDF_FontDef_MS_PMincyo_Init\n"));
+    HPDF_PTRACE ((" HPDF_FontDef_MS_PMincho_Init\n"));
 
     fontdef->ascent = 859;
     fontdef->descent = -140;
@@ -1756,9 +1759,9 @@ MS_PMincyo_Init  (HPDF_FontDef   fontdef)
 
 
 static HPDF_STATUS
-MS_PMincyo_Bold_Init  (HPDF_FontDef   fontdef)
+MS_PMincho_Bold_Init  (HPDF_FontDef   fontdef)
 {
-    HPDF_STATUS ret = MS_PMincyo_Init (fontdef);
+    HPDF_STATUS ret = MS_PMincho_Init (fontdef);
 
     if (ret != HPDF_OK)
         return ret;
@@ -1768,9 +1771,9 @@ MS_PMincyo_Bold_Init  (HPDF_FontDef   fontdef)
 
 
 static HPDF_STATUS
-MS_PMincyo_Italic_Init  (HPDF_FontDef   fontdef)
+MS_PMincho_Italic_Init  (HPDF_FontDef   fontdef)
 {
-    HPDF_STATUS ret = MS_PMincyo_Init (fontdef);
+    HPDF_STATUS ret = MS_PMincho_Init (fontdef);
 
     if (ret != HPDF_OK)
         return ret;
@@ -1779,9 +1782,9 @@ MS_PMincyo_Italic_Init  (HPDF_FontDef   fontdef)
 }
 
 static HPDF_STATUS
-MS_PMincyo_BoldItalic_Init  (HPDF_FontDef   fontdef)
+MS_PMincho_BoldItalic_Init  (HPDF_FontDef   fontdef)
 {
-    HPDF_STATUS ret = MS_PMincyo_Init (fontdef);
+    HPDF_STATUS ret = MS_PMincho_Init (fontdef);
 
     if (ret != HPDF_OK)
         return ret;
@@ -1849,52 +1852,52 @@ HPDF_UseJPFonts   (HPDF_Doc   pdf)
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    /* MS-Mincyo */
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincyo",
-                MS_Mincyo_Init);
+    /* MS-Mincho */
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincho",
+                MS_Mincho_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincyo,Bold",
-                MS_Mincyo_Bold_Init);
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincho,Bold",
+                MS_Mincho_Bold_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincyo,Italic",
-                MS_Mincyo_Italic_Init);
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincho,Italic",
+                MS_Mincho_Italic_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincyo,BoldItalic",
-                MS_Mincyo_BoldItalic_Init);
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-Mincho,BoldItalic",
+                MS_Mincho_BoldItalic_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    /* MS-PMincyo */
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincyo",
-                MS_PMincyo_Init);
+    /* MS-PMincho */
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincho",
+                MS_PMincho_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincyo,Bold",
-                MS_PMincyo_Bold_Init);
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincho,Bold",
+                MS_PMincho_Bold_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincyo,Italic",
-                MS_PMincyo_Italic_Init);
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincho,Italic",
+                MS_PMincho_Italic_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;
 
-    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincyo,BoldItalic",
-                MS_PMincyo_BoldItalic_Init);
+    fontdef = HPDF_CIDFontDef_New (pdf->mmgr,  "MS-PMincho,BoldItalic",
+                MS_PMincho_BoldItalic_Init);
 
     if ((ret = HPDF_Doc_RegisterFontDef (pdf, fontdef)) != HPDF_OK)
         return ret;

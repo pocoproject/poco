@@ -1,8 +1,6 @@
 //
 // DigestStream.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DigestStream.h#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  DigestStream

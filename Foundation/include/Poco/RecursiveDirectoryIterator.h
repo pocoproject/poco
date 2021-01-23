@@ -1,8 +1,6 @@
 //
 // RecursiveDirectoryIterator.h
 //
-// $Id$
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  RecursiveDirectoryIterator
@@ -53,7 +51,7 @@ class RecursiveDirectoryIterator
 	/// The class can follow different traversal strategies:
 	///     * depth-first strategy;
 	///     * siblings-first strategy.
-	/// The stategies are set by template parameter.
+	/// The strategies are set by template parameter.
 	/// There are two corresponding typedefs:
 	///     * SimpleRecursiveDirectoryIterator;
 	///     * SiblingsFirstRecursiveDirectoryIterator.

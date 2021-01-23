@@ -1,8 +1,6 @@
 //
 // TestDecorator.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestDecorator.cpp#1 $
-//
 
 
 #include "CppUnit/TestDecorator.h"
@@ -22,7 +20,7 @@ TestDecorator::~TestDecorator()
 }
 
 
-int TestDecorator::countTestCases()
+int TestDecorator::countTestCases() const
 {
 	return _test->countTestCases();
 }
@@ -31,10 +29,10 @@ int TestDecorator::countTestCases()
 void TestDecorator::run(TestResult* result)
 {
 	_test->run(result);
-} 
+}
 
 
-std::string TestDecorator::toString()
+std::string TestDecorator::toString() const
 {
 	return _test->toString();
 }

@@ -1,8 +1,6 @@
 //
 // ConsoleChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ConsoleChannel.cpp#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  ConsoleChannel

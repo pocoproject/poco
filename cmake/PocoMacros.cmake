@@ -8,33 +8,49 @@
 
 # Find the Microsoft mc.exe message compiler
 #
-#  CMAKE_MC_COMPILER - where to find mc.exe
-if (WIN32)
-  # cmake has CMAKE_RC_COMPILER, but no message compiler
-  if ("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
-    # this path is only present for 2008+, but we currently require PATH to
-    # be set up anyway
-    get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
-    get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
-    if (X64)
-      set(sdk_bindir "${sdk_dir}/bin/x64")
-      set(kit_bindir "${kit_dir}/bin/x64")
-    else (X64)
-      set(sdk_bindir "${sdk_dir}/bin")
-      set(kit_bindir "${kit_dir}/bin/x86")
-    endif (X64)
-  endif ()
-  find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}"
-    DOC "path to message compiler")
-  if (NOT CMAKE_MC_COMPILER)
-    message(FATAL_ERROR "message compiler not found: required to build")
-  endif (NOT CMAKE_MC_COMPILER)
-  message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
-  mark_as_advanced(CMAKE_MC_COMPILER)
+# CMAKE_MC_COMPILER - where to find mc.exe
+if(WIN32)
+	# cmake has CMAKE_RC_COMPILER, but no message compiler
+	if("${CMAKE_GENERATOR}" MATCHES "Visual Studio")
+		# this path is only present for 2008+, but we currently require PATH to
+		# be set up anyway
+		get_filename_component(sdk_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]" REALPATH)
+		get_filename_component(kit_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot]" REALPATH)
+		get_filename_component(kit81_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot81]" REALPATH)
+		get_filename_component(kit10_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot10]" REALPATH)
+		get_filename_component(kit10wow_dir "[HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows Kits\\Installed Roots;KitsRoot10]" REALPATH)
+		file(GLOB kit10_list ${kit10_dir}/bin/10.* ${kit10wow_dir}/bin/10.*)
+		if(X64)
+			set(sdk_bindir "${sdk_dir}/bin/x64")
+			set(kit_bindir "${kit_dir}/bin/x64")
+			set(kit81_bindir "${kit81_dir}/bin/x64")
+			foreach(tmp_elem ${kit10_list})
+				if(IS_DIRECTORY ${tmp_elem})
+			list(APPEND kit10_bindir "${tmp_elem}/x64")
+				endif()
+			endforeach()
+		else(X64)
+			set(sdk_bindir "${sdk_dir}/bin")
+			set(kit_bindir "${kit_dir}/bin/x86")
+			set(kit81_bindir "${kit81_dir}/bin/x86")
+			foreach(tmp_elem ${kit10_list})
+				if(IS_DIRECTORY ${tmp_elem})
+			list(APPEND kit10_bindir "${tmp_elem}/x86")
+				endif()
+			endforeach()
+		endif(X64)
+	endif()
+	find_program(CMAKE_MC_COMPILER mc.exe HINTS "${sdk_bindir}" "${kit_bindir}" "${kit81_bindir}" ${kit10_bindir}
+		DOC "path to message compiler")
+	if(NOT CMAKE_MC_COMPILER)
+		message(FATAL_ERROR "message compiler not found: required to build")
+	endif(NOT CMAKE_MC_COMPILER)
+	message(STATUS "Found message compiler: ${CMAKE_MC_COMPILER}")
+	mark_as_advanced(CMAKE_MC_COMPILER)
 endif(WIN32)
 
 #===============================================================================
-# Macros for Source file management
+#  Macros for Source file management
 #
 #  POCO_SOURCES_PLAT - Adds a list of files to the sources of a components
 #    Usage: POCO_SOURCES_PLAT( out name platform sources)
@@ -82,11 +98,10 @@ endif(WIN32)
 #    Example: POCO_MESSAGES( HDRS Foundation include/Poco/Foundation.mc )
 #
 
-
 macro(POCO_SOURCES_PLAT out name platform)
     source_group("${name}\\Source Files" FILES ${ARGN})
     list(APPEND ${out} ${ARGN})
-    if(NOT (${platform}))
+    if(NOT(${platform}))
         set_source_files_properties(${ARGN} PROPERTIES HEADER_FILE_ONLY TRUE)
     endif()
 endmacro()
@@ -100,8 +115,7 @@ macro(POCO_SOURCES_AUTO out)
 endmacro()
 
 macro(POCO_SOURCES_AUTO_PLAT out platform)
-    foreach( f ${ARGN})
-
+    foreach(f ${ARGN})
         get_filename_component(fname ${f} NAME)
 
         # Read the package name from the source file
@@ -124,10 +138,8 @@ macro(POCO_SOURCES_AUTO_PLAT out platform)
     endforeach()
 endmacro()
 
-
 macro(POCO_HEADERS_AUTO out)
-    foreach( f ${ARGN})
-
+    foreach(f ${ARGN})
         get_filename_component(fname ${f} NAME)
 
         # Read the package name from the source file
@@ -149,9 +161,8 @@ macro(POCO_HEADERS out name)
     list(APPEND ${out} ${ARGN})
 endmacro()
 
-
 macro(POCO_MESSAGES out name)
-    if (WIN32)
+    if(WIN32)
         foreach(msg ${ARGN})
             get_filename_component(msg_name ${msg} NAME)
             get_filename_component(msg_path ${msg} ABSOLUTE)
@@ -180,9 +191,8 @@ macro(POCO_MESSAGES out name)
         source_group("${name}\\Message Files" FILES ${ARGN})
         list(APPEND ${out} ${ARGN})
 
-    endif (WIN32)
+    endif(WIN32)
 endmacro()
-
 
 #===============================================================================
 # Macros for Package generation
@@ -195,35 +205,51 @@ endmacro()
 macro(POCO_GENERATE_PACKAGE target_name)
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-  "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY AnyNewerVersion
+	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY AnyNewerVersion
 )
-export(EXPORT "${target_name}Targets"
-  FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
-  NAMESPACE "${PROJECT_NAME}::"
-)
+if("${CMAKE_VERSION}" VERSION_LESS "3.0.0")
+	if(NOT EXISTS "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake")
+		export(TARGETS "${target_name}" APPEND
+			FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
+			NAMESPACE "${PROJECT_NAME}::"
+    	)
+    endif()
+else()
+	export(EXPORT "${target_name}Targets"
+		FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
+		NAMESPACE "${PROJECT_NAME}::"
+    )
+endif()
 configure_file("cmake/Poco${target_name}Config.cmake"
-  "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
-  @ONLY
+	"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
+	@ONLY
 )
 
-set(ConfigPackageLocation "lib/cmake/${PROJECT_NAME}")
+# Set config script install location in a location that find_package() will
+# look for, which is different on MS Windows than for UNIX
+# Note: also set in root CMakeLists.txt
+if(WIN32)
+	set(PocoConfigPackageLocation "cmake")
+else()
+	set(PocoConfigPackageLocation "lib${LIB_SUFFIX}/cmake/${PROJECT_NAME}")
+endif()
 
 install(
     EXPORT "${target_name}Targets"
     FILE "${PROJECT_NAME}${target_name}Targets.cmake"
     NAMESPACE "${PROJECT_NAME}::"
-    DESTINATION "lib/cmake/${PROJECT_NAME}"
-    )
+    DESTINATION "${PocoConfigPackageLocation}"
+)
 
 install(
     FILES
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
         "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
-    DESTINATION "lib/cmake/${PROJECT_NAME}"
+    DESTINATION "${PocoConfigPackageLocation}"
     COMPONENT Devel
-    )
+)
 
 endmacro()
 
@@ -241,7 +267,7 @@ install(
     DESTINATION include
     COMPONENT Devel
     PATTERN ".svn" EXCLUDE
-    )
+)
 
 install(
     TARGETS "${target_name}" EXPORT "${target_name}Targets"
@@ -249,5 +275,30 @@ install(
     ARCHIVE DESTINATION lib${LIB_SUFFIX}
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
-    )
+)
+
+if(MSVC)
+# install the targets pdb
+	POCO_INSTALL_PDB(${target_name})
+endif()
+
+endmacro()
+
+#  POCO_INSTALL_PDB - Install the given target's companion pdb file (if present)
+#    Usage: POCO_INSTALL_PDB(target_name)
+#      INPUT:
+#           target_name             the name of the target. e.g. Foundation for PocoFoundation
+#    Example: POCO_INSTALL_PDB(Foundation)
+#
+#    This is an internal macro meant only to be used by POCO_INSTALL.
+macro(POCO_INSTALL_PDB target_name)
+    get_property(type TARGET ${target_name} PROPERTY TYPE)
+    if("${type}" STREQUAL "SHARED_LIBRARY" OR "${type}" STREQUAL "EXECUTABLE")
+        install(
+            FILES $<TARGET_PDB_FILE:${target_name}>
+            DESTINATION bin
+            COMPONENT Devel
+            OPTIONAL
+        )
+	endif()
 endmacro()

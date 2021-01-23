@@ -1,8 +1,6 @@
 //
 // Row.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Row.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Row
@@ -59,9 +57,9 @@ class Data_API Row
 	/// The stream operator is provided for Row data type as a free-standing function.
 {
 public:
-	typedef RowFormatter::NameVec    NameVec;
-	typedef RowFormatter::NameVecPtr NameVecPtr;
-	typedef RowFormatter::ValueVec   ValueVec;
+	using NameVec = RowFormatter::NameVec;
+	using NameVecPtr = RowFormatter::NameVecPtr;
+	using ValueVec = RowFormatter::ValueVec;
 
 	enum ComparisonType
 	{
@@ -71,14 +69,14 @@ public:
 		COMPARE_AS_STRING
 	};
 
-	typedef Tuple<std::size_t, ComparisonType> SortTuple;
-	typedef std::vector<SortTuple>             SortMap;
+	using SortTuple = Tuple<std::size_t, ComparisonType>;
+	using SortMap = std::vector<SortTuple>;
 		/// The type for map holding fields used for sorting criteria.
 		/// Fields are added sequentially and have precedence that
 		/// corresponds to field adding sequence order (rather than field's 
 		/// position in the row).
 		/// This requirement rules out use of std::map due to its sorted nature.
-	typedef SharedPtr<SortMap> SortMapPtr;
+	using SortMapPtr = SharedPtr<SortMap>;
 
 	Row();
 		/// Creates the Row.
@@ -121,7 +119,8 @@ public:
 		try
 		{
 			_values.at(pos) = val;
-		}catch (std::out_of_range&)
+		}
+		catch (std::out_of_range&)
 		{
 			throw RangeException("Invalid column number.");
 		}
@@ -217,10 +216,6 @@ public:
 
 private:
 	void init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter);
-
-	void checkEmpty(std::size_t pos, const Poco::Dynamic::Var& val);
-		/// Check if row contains only empty values and throws IllegalStateException
-		/// if that is the case.
 
 	ValueVec& values();
 		/// Returns the reference to values vector.

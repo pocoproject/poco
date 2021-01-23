@@ -1,8 +1,6 @@
 //
 // MongoDBTest.h
 //
-// $Id$
-//
 // Definition of the MongoDBTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -18,7 +16,6 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
-
 #include "CppUnit/TestCase.h"
 
 
@@ -26,7 +23,6 @@ class MongoDBTest: public CppUnit::TestCase
 {
 public:
 	MongoDBTest(const std::string& name);
-
 
 	virtual ~MongoDBTest();
 
@@ -41,18 +37,16 @@ public:
 	void testConnectionPool();
 	void testCursorRequest();
 	void testObjectID();
+	void testCommand();
+	void testUUID();
+	void testConnectURI();
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
 
 private:
-
-	std::string _host;
-	unsigned    _port;
-	static bool _connected;
-	static Poco::MongoDB::Connection _mongo;
-
+	static Poco::MongoDB::Connection::Ptr _mongo;
 };
 
 

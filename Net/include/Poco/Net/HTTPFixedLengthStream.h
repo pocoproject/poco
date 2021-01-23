@@ -1,8 +1,6 @@
 //
 // HTTPFixedLengthStream.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPFixedLengthStream.h#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPFixedLengthStream
@@ -41,12 +39,12 @@ class Net_API HTTPFixedLengthStreamBuf: public HTTPBasicStreamBuf
 	/// At most a given number of bytes are read or written.
 {
 public:
-	typedef HTTPBasicStreamBuf::openmode openmode;
+	using openmode = HTTPBasicStreamBuf::openmode;
 
 #if defined(POCO_HAVE_INT64)
-	typedef Poco::Int64 ContentLength;
+	using ContentLength = Poco::Int64;
 #else
-	typedef std::streamsize ContentLength;
+	using ContentLength = std::streamsize;
 #endif
 
 	HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode);

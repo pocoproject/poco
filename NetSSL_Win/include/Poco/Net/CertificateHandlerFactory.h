@@ -1,8 +1,6 @@
 //
 // CertificateHandlerFactory.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  CertificateHandlerFactory

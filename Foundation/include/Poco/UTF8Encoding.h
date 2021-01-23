@@ -1,8 +1,6 @@
 //
 // UTF8Encoding.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UTF8Encoding.h#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UTF8Encoding

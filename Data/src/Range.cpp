@@ -1,8 +1,6 @@
 //
 // Range.cpp
 //
-// $Id: //poco/Main/Data/src/Range.cpp#2 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Range

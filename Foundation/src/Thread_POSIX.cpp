@@ -1,8 +1,6 @@
 //
 // Thread_POSIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Thread_POSIX.cpp#5 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Thread
@@ -26,7 +24,7 @@
 #		define __EXTENSIONS__
 #	endif
 #endif
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
 #endif
 
@@ -43,7 +41,7 @@ namespace
 		{
 			sigset_t sset;
 			sigemptyset(&sset);
-			sigaddset(&sset, SIGPIPE); 
+			sigaddset(&sset, SIGPIPE);
 			pthread_sigmask(SIG_BLOCK, &sset, 0);
 		}
 		~SignalBlocker()
@@ -59,16 +57,21 @@ namespace
 #if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 
 
-namespace
+namespace {
+void setThreadName(pthread_t thread, const std::string& threadName)
 {
-    void setThreadName(pthread_t thread, const char* threadName)
-    {
-#   if (POCO_OS == POCO_OS_MAC_OS_X)
-        pthread_setname_np(threadName); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
-#   else
-        pthread_setname_np(thread, threadName);
-#   endif
-    }
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+#else
+	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
+	{
+		std::string truncName(threadName, 0, 7);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - 7, 7);
+		pthread_setname_np(thread, truncName.c_str());
+	}
+#endif
+}
 }
 
 
@@ -138,7 +141,7 @@ int ThreadImpl::getMinOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MIN)
 	return POCO_THREAD_PRIORITY_MIN;
-#elif defined(__VMS) || defined(__digital__)
+#elif defined(__digital__)
 	return PRI_OTHER_MIN;
 #else
 	return sched_get_priority_min(policy);
@@ -150,7 +153,7 @@ int ThreadImpl::getMaxOSPriorityImpl(int policy)
 {
 #if defined(POCO_THREAD_PRIORITY_MAX)
 	return POCO_THREAD_PRIORITY_MAX;
-#elif defined(__VMS) || defined(__digital__)
+#elif defined(__digital__)
 	return PRI_OTHER_MAX;
 #else
 	return sched_get_priority_max(policy);
@@ -170,10 +173,8 @@ void ThreadImpl::setStackSizeImpl(int size)
 		const int STACK_PAGE_SIZE = 4096;
 		size = ((size + STACK_PAGE_SIZE - 1)/STACK_PAGE_SIZE)*STACK_PAGE_SIZE;
 #endif
-#if !defined(POCO_ANDROID)
  		if (size < PTHREAD_STACK_MIN)
  			size = PTHREAD_STACK_MIN;
-#endif
 	}
  	_pData->stackSize = size;
 #endif
@@ -267,13 +268,13 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 
 void ThreadImpl::sleepImpl(long milliseconds)
 {
-#if defined(__VMS) || defined(__digital__)
+#if defined(__digital__)
 		// This is specific to DECThreads
 		struct timespec interval;
 		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000; 
+		interval.tv_nsec = (milliseconds % 1000)*1000000;
 		pthread_delay_np(&interval);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
+#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
 	int rc;
 	do
@@ -295,7 +296,7 @@ void ThreadImpl::sleepImpl(long milliseconds)
 	}
 	while (remainingTime > 0 && rc < 0 && errno == EINTR);
 	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
-#else 
+#else
 	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
 	int rc;
 	do
@@ -330,13 +331,13 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigemptyset(&sset);
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
-	sigaddset(&sset, SIGPIPE); 
+	sigaddset(&sset, SIGPIPE);
 	pthread_sigmask(SIG_BLOCK, &sset, 0);
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
 #if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName().c_str());
+	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try

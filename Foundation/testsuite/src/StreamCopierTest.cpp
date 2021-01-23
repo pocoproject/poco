@@ -1,8 +1,6 @@
 //
 // StreamCopierTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/StreamCopierTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -38,8 +36,8 @@ void StreamCopierTest::testBufferedCopy()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		std::streamsize n = StreamCopier::copyStream(istr, ostr);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 	{
 		std::string src;
@@ -47,8 +45,8 @@ void StreamCopierTest::testBufferedCopy()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		std::streamsize n = StreamCopier::copyStream(istr, ostr, 100);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 	{
 		std::string src;
@@ -56,8 +54,8 @@ void StreamCopierTest::testBufferedCopy()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		std::streamsize n = StreamCopier::copyStream(istr, ostr, 128);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 	{
 		std::string src;
@@ -65,8 +63,8 @@ void StreamCopierTest::testBufferedCopy()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		std::streamsize n = StreamCopier::copyStream(istr, ostr, 512);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 }
 
@@ -78,8 +76,8 @@ void StreamCopierTest::testUnbufferedCopy()
 	std::istringstream istr(src);
 	std::ostringstream ostr;
 	std::streamsize n = StreamCopier::copyStreamUnbuffered(istr, ostr);
-	assert (ostr.str() == src);
-	assert (n == src.size());
+	assertTrue (ostr.str() == src);
+	assertTrue (n == src.size());
 }
 
 
@@ -90,8 +88,8 @@ void StreamCopierTest::testCopyToString()
 	std::istringstream istr(src);
 	std::string dest;
 	std::streamsize n = StreamCopier::copyToString(istr, dest, 100);
-	assert (src == dest);
-	assert (n == src.size());
+	assertTrue (src == dest);
+	assertTrue (n == src.size());
 }
 
 
@@ -104,8 +102,8 @@ void StreamCopierTest::testBufferedCopy64()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		Poco::UInt64 n = StreamCopier::copyStream64(istr, ostr);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 	{
 		std::string src;
@@ -113,8 +111,8 @@ void StreamCopierTest::testBufferedCopy64()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		Poco::UInt64 n = StreamCopier::copyStream64(istr, ostr, 100);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 	{
 		std::string src;
@@ -122,8 +120,8 @@ void StreamCopierTest::testBufferedCopy64()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		Poco::UInt64 n = StreamCopier::copyStream64(istr, ostr, 128);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 	{
 		std::string src;
@@ -131,8 +129,8 @@ void StreamCopierTest::testBufferedCopy64()
 		std::istringstream istr(src);
 		std::ostringstream ostr;
 		Poco::UInt64 n = StreamCopier::copyStream64(istr, ostr, 512);
-		assert (ostr.str() == src);
-		assert (n == src.size());
+		assertTrue (ostr.str() == src);
+		assertTrue (n == src.size());
 	}
 }
 
@@ -144,8 +142,8 @@ void StreamCopierTest::testUnbufferedCopy64()
 	std::istringstream istr(src);
 	std::ostringstream ostr;
 	Poco::UInt64 n = StreamCopier::copyStreamUnbuffered64(istr, ostr);
-	assert (ostr.str() == src);
-	assert (n == src.size());
+	assertTrue (ostr.str() == src);
+	assertTrue (n == src.size());
 }
 
 
@@ -156,8 +154,8 @@ void StreamCopierTest::testCopyToString64()
 	std::istringstream istr(src);
 	std::string dest;
 	Poco::UInt64 n = StreamCopier::copyToString64(istr, dest, 100);
-	assert (src == dest);
-	assert (n == src.size());
+	assertTrue (src == dest);
+	assertTrue (n == src.size());
 }
 #endif
 

@@ -1,8 +1,6 @@
 //
 // StatementCreator.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/StatementCreator.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  StatementCreator
@@ -43,10 +41,16 @@ public:
 	StatementCreator(const StatementCreator& other);
 		/// Creates a StatementCreator by copying another one.
 
+	StatementCreator(StatementCreator&& other) noexcept;
+		/// Creates a StatementCreator by moving another one.
+
 	~StatementCreator();
 		/// Destroys the StatementCreator.
 
 	StatementCreator& operator = (const StatementCreator& other);
+		/// Assignment operator.
+
+	StatementCreator& operator = (StatementCreator&& other) noexcept;
 		/// Assignment operator.
 		
 	void swap(StatementCreator& other);

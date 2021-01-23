@@ -1,8 +1,6 @@
 //
 // ApacheConnector.cpp
 //
-// $Id: //poco/1.4/ApacheConnector/src/ApacheConnector.cpp#2 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -133,6 +131,18 @@ int ApacheRequestRec::sendFile(const std::string& path, unsigned int fileSize, c
 }
 
 
+bool ApacheRequestRec::secure()
+{
+	return DEFAULT_HTTPS_PORT == ap_default_port(_pRec) && ap_http_scheme(_pRec) == "https";
+}
+
+
+void ApacheRequestRec::setStatus(int status)
+{
+	_pRec->status = status;
+}
+
+
 void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 {
 	const apr_array_header_t* arr = apr_table_elts(_pRec->headers_in);
@@ -151,7 +161,13 @@ void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 
 void ApacheConnector::log(const char* file, int line, int level, int status, const char *text)
 {
-	ap_log_error(file, line, level, 0, NULL, "%s", text);
+	// ap_log_error() has undergone significant changes in Apache 2.4.
+	// Validate Apache version for using a proper ap_log_error() version.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+		ap_log_error(file, line, level, 0, NULL, "%s", text);
+#else
+	ap_log_error(file, line, level, 0, 0, 0, text);
+#endif
 }
 
 
@@ -159,39 +175,49 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 {
 	ApacheRequestRec rec(r);
 	ApacheApplication& app(ApacheApplication::instance());
-	
+
 	try
 	{
 		// ensure application is ready
 		app.setup();
-		
+
 		// if the ApacheRequestHandler declines handling - we stop
 		// request handling here and let other modules do their job!
 		if (!app.factory().mustHandle(r->uri))
 			return DECLINED;
 
 	    apr_status_t rv;
-		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK))) 
-			return rv; 
+		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK)))
+			return rv;
 
-		std::auto_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-			&rec, 
-			r->connection->local_ip, 
-			r->connection->local_addr->port,
-			r->connection->remote_ip, 
-			r->connection->remote_addr->port));
+                // The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
+                // Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+                const char* clientIp = r->connection->remote_ip;
+                apr_port_t clientPort = r->connection->remote_addr->port;
+#else
+                const char* clientIp = r->connection->client_ip;
+                apr_port_t clientPort = r->connection->client_addr->port;
+#endif
+                std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+                        &rec,
+                        r->connection->local_ip,
+                        r->connection->local_addr->port,
+                        clientIp,
+                        clientPort));
 
-		std::auto_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+                std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
-		
+
 		try
 		{
-			std::auto_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
+
+			std::unique_ptr<HTTPRequestHandler> pHandler(app.factory().createRequestHandler(*pRequest));
 
 			if (pHandler.get())
-			{				
+			{
 				pHandler->handleRequest(*pRequest, *pResponse);
 			}
 			else
@@ -259,25 +285,25 @@ extern "C" const char* ApacheConnector_config(cmd_parms *cmd, void *in_dconf, co
 }
 
 
-extern "C" const command_rec ApacheConnector_cmds[] = 
+extern "C" const command_rec ApacheConnector_cmds[] =
 {
     AP_INIT_RAW_ARGS(
-		"AddPocoRequestHandler", 
-		reinterpret_cast<cmd_func>(ApacheConnector_uris), 
+		"AddPocoRequestHandler",
+		reinterpret_cast<cmd_func>(ApacheConnector_uris),
 		NULL,
-		RSRC_CONF, 
+		RSRC_CONF,
 		"POCO RequestHandlerFactory class name followed by shared library path followed by a list of ' ' separated URIs that must be handled by this module."),
     AP_INIT_RAW_ARGS(
-		"AddPocoConfig", 
-		reinterpret_cast<cmd_func>(ApacheConnector_config), 
+		"AddPocoConfig",
+		reinterpret_cast<cmd_func>(ApacheConnector_config),
 		NULL,
-		RSRC_CONF, 
+		RSRC_CONF,
 		"Path of the POCO configuration file."),
     { NULL }
 };
 
 
-module AP_MODULE_DECLARE_DATA poco_module = 
+module AP_MODULE_DECLARE_DATA poco_module =
 {
 	STANDARD20_MODULE_STUFF,
 	NULL,

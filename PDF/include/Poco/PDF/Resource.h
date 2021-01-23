@@ -1,8 +1,6 @@
 //
 // Resource.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/Resource.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Resource

@@ -1,94 +1,85 @@
-# -*- cmake -*-
+# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
+# file Copyright.txt or https://cmake.org/licensing for details.
 
-# - Find Apache Portable Runtime
-# Find the APR includes and libraries
-# This module defines
-#  APR_INCLUDE_DIR and APRUTIL_INCLUDE_DIR, where to find apr.h, etc.
-#  APR_LIBRARIES and APRUTIL_LIBRARIES, the libraries needed to use APR.
-#  APR_FOUND and APRUTIL_FOUND, If false, do not try to use APR.
-# also defined, but not for general use are
-#  APR_LIBRARY and APRUTIL_LIBRARY, where to find the APR library.
+#.rst:
+# FindAPR
+# -------
+#
+# Find Apache Portable Runtime
+#
+# This will define the following variables::
+#
+#   APR_FOUND           - True if the system has the libraries
+#   APR_INCLUDE_DIRS    - where to find the headers
+#   APR_LIBRARIES       - where to find the libraries
+#   APR_DEFINITIONS     - compile definitions
+#
+# and the following imported targets::
+#
+#   Apache::Apr   - The library
+#
+# Hints:
+# Set ``APR_ROOT_DIR`` to the root directory of an installation.
+#
+include(FindPackageHandleStandardArgs)
 
-# APR first.
+find_package(PkgConfig QUIET)
+pkg_check_modules(PC_APR QUIET apr-1)
 
-FIND_PATH(APR_INCLUDE_DIR apr.h
-/usr/local/include/apr-1
-/usr/local/include/apr-1.0
-/usr/include/apr-1
-/usr/include/apr-1.0
+find_path(APR_INCLUDE_DIR apr.h
+	HINTS
+		${APR_ROOT_DIR}/include
+		${APR_ROOT_INCLUDE_DIRS}
+	PATHS
+		${PC_APR_INCLUDE_DIRS}
+		/usr/local/include
+		/usr/include
+	PATH_SUFFIXES
+		apr-1
+		apr-1.0
 )
 
-SET(APR_NAMES ${APR_NAMES} apr-1)
-FIND_LIBRARY(APR_LIBRARY
-  NAMES ${APR_NAMES}
-  PATHS /usr/lib /usr/local/lib
+find_library(APR_LIBRARY
+  NAMES apr-1 ${APR_NAMES}
+  HINTS
+	${APR_ROOT_DIR}/lib
+	${APR_ROOT_LIBRARY_DIRS}
+  PATHS
+	${PC_APR_LIBRARY_DIRS}
+	/usr/lib
+	/usr/local/lib
   )
 
-IF (APR_LIBRARY AND APR_INCLUDE_DIR)
-    SET(APR_LIBRARIES ${APR_LIBRARY})
-    SET(APR_FOUND "YES")
-ELSE (APR_LIBRARY AND APR_INCLUDE_DIR)
-  SET(APR_FOUND "NO")
-ENDIF (APR_LIBRARY AND APR_INCLUDE_DIR)
+set(APR_VERSION ${PC_APR_VERSION})
 
+find_package_handle_standard_args(APR
+  FOUND_VAR APR_FOUND
+  REQUIRED_VARS
+	APR_INCLUDE_DIR
+	APR_LIBRARY
+  VERSION_VAR APR_VERSION
+)
 
-IF (APR_FOUND)
-   IF (NOT APR_FIND_QUIETLY)
-      MESSAGE(STATUS "Found APR: ${APR_LIBRARIES}")
-   ENDIF (NOT APR_FIND_QUIETLY)
-ELSE (APR_FOUND)
-   IF (APR_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Could not find APR library")
-   ENDIF (APR_FIND_REQUIRED)
-ENDIF (APR_FOUND)
+if(APR_FOUND)
+  set(APR_LIBRARIES ${APR_LIBRARY})
+  set(APR_INCLUDE_DIRS ${APR_INCLUDE_DIR})
+  set(APR_DEFINITIONS ${PC_APR_CFLAGS_OTHER})
 
-# Deprecated declarations.
-SET (NATIVE_APR_INCLUDE_PATH ${APR_INCLUDE_DIR} )
-GET_FILENAME_COMPONENT (NATIVE_APR_LIB_PATH ${APR_LIBRARY} PATH)
+  # Deprecated declarations.
+  SET (NATIVE_APR_INCLUDE_PATH ${APR_INCLUDE_DIR} )
+  GET_FILENAME_COMPONENT (NATIVE_APR_LIB_PATH ${APR_LIBRARY} PATH)
+endif()
 
-MARK_AS_ADVANCED(
+if(APR_FOUND AND NOT TARGET Apache::Apr)
+  add_library(Apache::Apr UNKNOWN IMPORTED)
+  set_target_properties(Apache::Apr PROPERTIES
+	IMPORTED_LOCATION "${APR_LIBRARY}"
+	INTERFACE_COMPILE_OPTIONS "${PC_APR_CFLAGS_OTHER}"
+	INTERFACE_INCLUDE_DIRECTORIES "${APR_INCLUDE_DIR}"
+  )
+endif()
+
+mark_as_advanced(
   APR_LIBRARY
   APR_INCLUDE_DIR
-  )
-
-# Next, APRUTIL.
-
-FIND_PATH(APRUTIL_INCLUDE_DIR apu.h
-/usr/local/include/apr-1
-/usr/local/include/apr-1.0
-/usr/include/apr-1
-/usr/include/apr-1.0
 )
-
-SET(APRUTIL_NAMES ${APRUTIL_NAMES} aprutil-1)
-FIND_LIBRARY(APRUTIL_LIBRARY
-  NAMES ${APRUTIL_NAMES}
-  PATHS /usr/lib /usr/local/lib
-  )
-
-IF (APRUTIL_LIBRARY AND APRUTIL_INCLUDE_DIR)
-    SET(APRUTIL_LIBRARIES ${APRUTIL_LIBRARY})
-    SET(APRUTIL_FOUND "YES")
-ELSE (APRUTIL_LIBRARY AND APRUTIL_INCLUDE_DIR)
-  SET(APRUTIL_FOUND "NO")
-ENDIF (APRUTIL_LIBRARY AND APRUTIL_INCLUDE_DIR)
-
-
-IF (APRUTIL_FOUND)
-   IF (NOT APRUTIL_FIND_QUIETLY)
-      MESSAGE(STATUS "Found APRUTIL: ${APRUTIL_LIBRARIES}")
-   ENDIF (NOT APRUTIL_FIND_QUIETLY)
-ELSE (APRUTIL_FOUND)
-   IF (APRUTIL_FIND_REQUIRED)
-      MESSAGE(STATUS "Could not find APRUTIL library")
-   ENDIF (APRUTIL_FIND_REQUIRED)
-ENDIF (APRUTIL_FOUND)
-
-# Deprecated declarations.
-SET (NATIVE_APRUTIL_INCLUDE_PATH ${APRUTIL_INCLUDE_DIR} )
-GET_FILENAME_COMPONENT (NATIVE_APRUTIL_LIB_PATH ${APRUTIL_LIBRARY} PATH)
-
-MARK_AS_ADVANCED(
-  APRUTIL_LIBRARY
-  APRUTIL_INCLUDE_DIR
-  )

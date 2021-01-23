@@ -1,8 +1,6 @@
 //
 // TCPServerTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/TCPServerTest.h#1 $
-//
 // Definition of the TCPServerTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -30,6 +28,7 @@ public:
 	void testTwoConnections();
 	void testMultiConnections();
 	void testThreadCapacity();
+	void testFilter();
 
 	void setUp();
 	void tearDown();

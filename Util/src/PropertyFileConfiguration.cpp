@@ -1,8 +1,6 @@
 //
 // PropertyFileConfiguration.cpp
 //
-// $Id: //poco/1.4/Util/src/PropertyFileConfiguration.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  PropertyFileConfiguration
@@ -80,9 +78,9 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 	while (it != ed)
 	{
 		ostr << it->first << ": ";
-		for (std::string::const_iterator its = it->second.begin(); its != it->second.end(); ++its)
+		for (auto ch: it->second)
 		{
-			switch (*its)
+			switch (ch)
 			{
 			case '\t':
 				ostr << "\\t";
@@ -100,7 +98,7 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 				ostr << "\\\\";
 				break;
 			default:
-				ostr << *its;
+				ostr << ch;
 				break;
 			}
 		}

@@ -1,8 +1,6 @@
 
 // Environment_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Environment_VX.cpp#3 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment
@@ -48,7 +46,7 @@ FastMutex EnvironmentImpl::_mutex;
 std::string EnvironmentImpl::getImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	const char* val = getenv(name.c_str());
 	if (val)
 		return std::string(val);
@@ -68,11 +66,11 @@ bool EnvironmentImpl::hasImpl(const std::string& name)
 void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	std::string var = name;
 	var.append("=");
 	var.append(value);
-	_map[name] = var;
+	std::swap(_map[name], var);
 	if (putenv((char*) _map[name].c_str()))
 	{
 		std::string msg = "cannot set environment variable: ";
@@ -114,7 +112,7 @@ std::string EnvironmentImpl::osArchitectureImpl()
 	return "sh";
 #else
 	return "unknown";
-#endif	
+#endif
 }
 
 
@@ -151,7 +149,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 				return;
 			}
 		}
-		else break;	
+		else break;
 		++ifIndex;
 	}
 	throw SystemException("cannot get Ethernet hardware address");

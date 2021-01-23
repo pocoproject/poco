@@ -1,8 +1,6 @@
 //
 // HelpFormatter.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/HelpFormatter.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  HelpFormatter

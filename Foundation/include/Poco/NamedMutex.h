@@ -1,8 +1,6 @@
 //
 // NamedMutex.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedMutex.h#2 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex
@@ -24,16 +22,12 @@
 #include "Poco/ScopedLock.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS) 
 #include "Poco/NamedMutex_WIN32U.h"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/NamedMutex_WIN32.h"
-#elif defined(POCO_ANDROID)
+#elif POCO_OS == POCO_OS_ANDROID
 #include "Poco/NamedMutex_Android.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/NamedMutex_UNIX.h"
-#else
-#include "Poco/NamedMutex_VMS.h"
 #endif
 
 
@@ -41,7 +35,7 @@ namespace Poco {
 
 
 class Foundation_API NamedMutex: private NamedMutexImpl
-	/// A NamedMutex (mutual exclusion) is a global synchronization 
+	/// A NamedMutex (mutual exclusion) is a global synchronization
 	/// mechanism used to control access to a shared resource
 	/// in a concurrent (multi process) scenario.
 	/// Using the ScopedLock class is the preferred way to automatically
@@ -59,11 +53,11 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 	/// interfere with each other.
 {
 public:
-	typedef Poco::ScopedLock<NamedMutex> ScopedLock;
-	
+	using ScopedLock = Poco::ScopedLock<NamedMutex>;
+
 	NamedMutex(const std::string& name);
 		/// creates the Mutex.
-		
+
 	~NamedMutex();
 		/// destroys the Mutex.
 
@@ -79,7 +73,7 @@ public:
 	void unlock();
 		/// Unlocks the mutex so that it can be acquired by
 		/// other threads.
-	
+
 private:
 	NamedMutex();
 	NamedMutex(const NamedMutex&);

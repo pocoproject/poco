@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/SQLite/testsuite/Makefile#1 $
-#
 # Makefile for Poco SQLite testsuite
 #
 

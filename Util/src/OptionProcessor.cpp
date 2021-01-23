@@ -1,8 +1,6 @@
 //
 // OptionProcessor.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionProcessor.cpp#2 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionProcessor
@@ -62,10 +60,10 @@ bool OptionProcessor::process(const std::string& argument, std::string& optionNa
 
 void OptionProcessor::checkRequired() const
 {
-	for (OptionSet::Iterator it = _options.begin(); it != _options.end(); ++it)
+	for (const auto& opt: _options)
 	{
-		if (it->required() && _specifiedOptions.find(it->fullName()) == _specifiedOptions.end())
-			throw MissingOptionException(it->fullName());
+		if (opt.required() && _specifiedOptions.find(opt.fullName()) == _specifiedOptions.end())
+			throw MissingOptionException(opt.fullName());
 	}
 	if (!_deferredOption.empty())
 	{

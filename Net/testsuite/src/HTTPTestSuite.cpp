@@ -1,8 +1,6 @@
 //
 // HTTPTestSuite.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPTestSuite.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -15,6 +13,7 @@
 #include "HTTPResponseTest.h"
 #include "HTTPCookieTest.h"
 #include "HTTPCredentialsTest.h"
+#include "NTLMCredentialsTest.h"
 
 
 CppUnit::Test* HTTPTestSuite::suite()
@@ -25,6 +24,7 @@ CppUnit::Test* HTTPTestSuite::suite()
 	pSuite->addTest(HTTPResponseTest::suite());
 	pSuite->addTest(HTTPCookieTest::suite());
 	pSuite->addTest(HTTPCredentialsTest::suite());
+	pSuite->addTest(NTLMCredentialsTest::suite());
 
 	return pSuite;
 }

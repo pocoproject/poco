@@ -1,8 +1,6 @@
 //
 // DOMParser.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DOMParser.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMParser
@@ -40,9 +38,16 @@ class XML_API DOMParser
 	/// support of a WhitespaceFilter.
 {
 public:
-	DOMParser(NamePool* pNamePool = 0);
+	explicit DOMParser(NamePool* pNamePool = 0);
 		/// Creates a new DOMParser. 
 		/// If a NamePool is given, it becomes the Document's NamePool.
+		
+	explicit DOMParser(unsigned long namePoolSize);
+		/// Creates a new DOMParser, using the given NamePool size.
+		///
+		/// The given namePoolSize should be a suitable prime number, 
+		/// e.g. 251, 509, 1021 or 4093, depending on the expected
+		/// size of the document.
 
 	~DOMParser();
 		/// Destroys the DOMParser.

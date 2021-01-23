@@ -1,8 +1,6 @@
 //
 // SSLManager.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  SSLManager
@@ -29,6 +27,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/SharedPtr.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <wincrypt.h>
 #include <schannel.h>
 #ifndef SECURITY_WIN32
@@ -36,6 +35,7 @@
 #endif
 #include <security.h>
 #include <sspi.h>
+#endif
 
 
 namespace Poco {
@@ -126,8 +126,8 @@ class NetSSL_Win_API SSLManager
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection. Not supported on Windows Embedded Compact.
 {
 public:
-	typedef Poco::SharedPtr<PrivateKeyPassphraseHandler> PrivateKeyPassphraseHandlerPtr;
-	typedef Poco::SharedPtr<InvalidCertificateHandler> InvalidCertificateHandlerPtr;
+	using PrivateKeyPassphraseHandlerPtr = Poco::SharedPtr<PrivateKeyPassphraseHandler>;
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Poco::BasicEvent<VerificationErrorArgs>  ServerVerificationError;
 		/// Fired whenever a certificate verification error is detected by the server during a handshake.
@@ -292,6 +292,7 @@ private:
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;
+	static const std::string CFG_REQUIRE_TLSV1_3;
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class SecureSocketImpl;

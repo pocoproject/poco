@@ -1,8 +1,6 @@
 //
 // SecureServerSocketImpl.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/SecureServerSocketImpl.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureServerSocketImpl
@@ -65,7 +63,7 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 	
-	void bind(const SocketAddress& address, bool reuseAddress = false);
+	void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -74,6 +72,10 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
+		/// socket option.
+
 		
 	void listen(int backlog = 64);
 		/// Puts the socket into listening state.

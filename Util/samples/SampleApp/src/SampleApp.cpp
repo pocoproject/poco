@@ -1,8 +1,6 @@
 //
 // SampleApp.cpp
 //
-// $Id: //poco/1.4/Util/samples/SampleApp/src/SampleApp.cpp#1 $
-//
 // This sample demonstrates the Application class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

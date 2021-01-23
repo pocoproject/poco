@@ -1,8 +1,6 @@
 //
 // OAuth10Credentials.h
 //
-// $Id$
-//
 // Library: Net
 // Package: OAuth
 // Module:	OAuth10Credentials

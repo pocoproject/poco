@@ -1,8 +1,6 @@
 //
 // NamedMutexTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NamedMutexTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -89,15 +87,24 @@ NamedMutexTest::~NamedMutexTest()
 
 void NamedMutexTest::testLock()
 {
-	testMutex.lock();
-	Thread thr;
-	TestLock tl;
-	thr.start(tl);
-	Timestamp now;
-	Thread::sleep(2000);
-	testMutex.unlock();
-	thr.join();
-	assert (tl.timestamp() > now);
+	try 
+	{
+		testMutex.lock();
+		Thread thr;
+		TestLock tl;
+		thr.start(tl);
+		Timestamp now;
+		Thread::sleep(2000);
+		testMutex.unlock();
+		thr.join();
+		assertTrue (tl.timestamp() > now);
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#if POCO_OS != POCO_OS_ANDROID
+		throw e;
+#endif
+	}
 }
 
 
@@ -107,15 +114,25 @@ void NamedMutexTest::testTryLock()
 	TestTryLock ttl1;
 	thr1.start(ttl1);
 	thr1.join();
-	assert (ttl1.locked());
-	
-	testMutex.lock();
-	Thread thr2;
-	TestTryLock ttl2;
-	thr2.start(ttl2);
-	thr2.join();
-	testMutex.unlock();
-	assert (!ttl2.locked());
+#if POCO_OS != POCO_OS_ANDROID
+	assertTrue (ttl1.locked());
+#endif
+	try 
+	{
+		testMutex.lock();
+		Thread thr2;
+		TestTryLock ttl2;
+		thr2.start(ttl2);
+		thr2.join();
+		testMutex.unlock();
+		assertTrue (!ttl2.locked());
+	}
+	catch(Poco::NotImplementedException e)
+	{
+#if POCO_OS != POCO_OS_ANDROID
+		throw e;
+#endif
+	}
 }
 
 

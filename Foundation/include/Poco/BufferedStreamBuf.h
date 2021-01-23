@@ -1,8 +1,6 @@
 //
 // BufferedStreamBuf.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BufferedStreamBuf.h#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamBuf
@@ -31,7 +29,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch> > 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch>> 
 class BasicBufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of a buffered streambuf
 	/// that greatly simplifies the implementation of
@@ -61,25 +59,32 @@ public:
 		_pBuffer(Allocator::allocate(_bufsize)),
 		_mode(mode)
 	{
-		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);
-		this->setp(_pBuffer, _pBuffer + (_bufsize - 1));
+		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);	
+		this->setp(_pBuffer, _pBuffer + _bufsize);
 	}
 
 	~BasicBufferedStreamBuf()
 	{
-		Allocator::deallocate(_pBuffer, _bufsize);
+		try
+		{
+			Allocator::deallocate(_pBuffer, _bufsize);
+		} 
+		catch (...)
+		{
+			poco_unexpected();
+		}
 	}
 
 	virtual int_type overflow(int_type c)
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
+		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 		if (c != char_traits::eof()) 
 		{
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
 		}
-		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
 
 		return c;
 	}
@@ -157,9 +162,16 @@ private:
 
 
 //
-// We provide an instantiation for char
+// We provide an instantiation for char.
 //
-typedef BasicBufferedStreamBuf<char, std::char_traits<char> > BufferedStreamBuf;
+// Visual C++ needs a workaround - explicitly importing the template
+// instantiation - to avoid duplicate symbols due to multiple
+// instantiations in different libraries.
+//
+#if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
+template class Foundation_API BasicBufferedStreamBuf<char, std::char_traits<char>>;
+#endif
+typedef BasicBufferedStreamBuf<char, std::char_traits<char>> BufferedStreamBuf;
 
 
 } // namespace Poco

@@ -1,8 +1,6 @@
 //
 // KeyConsoleHandler.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/KeyConsoleHandler.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  KeyConsoleHandler

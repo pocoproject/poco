@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- hpdf_mmgr.c
+ * << Haru Free PDF Library >> -- hpdf_mmgr.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -104,11 +107,15 @@ HPDF_MMgr_New  (HPDF_Error       error,
             }
 
 #ifdef HPDF_MEM_DEBUG
-            mmgr->alloc_cnt += 1;
+            if (mmgr) {
+                mmgr->alloc_cnt += 1;
+            }
 #endif
         }
 
-        mmgr->buf_size = buf_size;
+        if (mmgr) {
+            mmgr->buf_size = buf_size;
+        }
     } else
         HPDF_SetError(error, HPDF_FAILD_TO_ALLOC_MEM, HPDF_NOERROR);
 

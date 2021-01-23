@@ -1,8 +1,6 @@
 //
 // NodeIteratorTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/NodeIteratorTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -73,19 +71,19 @@ void NodeIteratorTest::testShowAll()
 	
 	NodeIterator it(pRoot, NodeFilter::SHOW_ALL);
 	
-	assert (it.nextNode() == pRoot);
-	assert (it.nextNode() == pElem1);
-	assert (it.nextNode() == pText1);
-	assert (it.nextNode() == pElem2);
-	assert (it.nextNode() == pText2);
-	assert (it.nextNode() == 0);
+	assertTrue (it.nextNode() == pRoot);
+	assertTrue (it.nextNode() == pElem1);
+	assertTrue (it.nextNode() == pText1);
+	assertTrue (it.nextNode() == pElem2);
+	assertTrue (it.nextNode() == pText2);
+	assertTrue (it.nextNode() == 0);
 	
-	assert (it.previousNode() == pText2);
-	assert (it.previousNode() == pElem2);
-	assert (it.previousNode() == pText1);
-	assert (it.previousNode() == pElem1);
-	assert (it.previousNode() == pRoot);
-	assert (it.previousNode() == 0);
+	assertTrue (it.previousNode() == pText2);
+	assertTrue (it.previousNode() == pElem2);
+	assertTrue (it.previousNode() == pText1);
+	assertTrue (it.previousNode() == pElem1);
+	assertTrue (it.previousNode() == pRoot);
+	assertTrue (it.previousNode() == 0);
 }
 
 
@@ -106,15 +104,15 @@ void NodeIteratorTest::testShowElements()
 	
 	NodeIterator it(pRoot, NodeFilter::SHOW_ELEMENT);
 	
-	assert (it.nextNode() == pRoot);
-	assert (it.nextNode() == pElem1);
-	assert (it.nextNode() == pElem2);
-	assert (it.nextNode() == 0);
+	assertTrue (it.nextNode() == pRoot);
+	assertTrue (it.nextNode() == pElem1);
+	assertTrue (it.nextNode() == pElem2);
+	assertTrue (it.nextNode() == 0);
 	
-	assert (it.previousNode() == pElem2);
-	assert (it.previousNode() == pElem1);
-	assert (it.previousNode() == pRoot);
-	assert (it.previousNode() == 0);
+	assertTrue (it.previousNode() == pElem2);
+	assertTrue (it.previousNode() == pElem1);
+	assertTrue (it.previousNode() == pRoot);
+	assertTrue (it.previousNode() == 0);
 }
 
 
@@ -136,11 +134,11 @@ void NodeIteratorTest::testFilter()
 	TestNodeFilter filter;
 	NodeIterator it(pRoot, NodeFilter::SHOW_ELEMENT, &filter);
 	
-	assert (it.nextNode() == pElem1);
-	assert (it.nextNode() == 0);
+	assertTrue (it.nextNode() == pElem1);
+	assertTrue (it.nextNode() == 0);
 	
-	assert (it.previousNode() == pElem1);
-	assert (it.previousNode() == 0);
+	assertTrue (it.previousNode() == pElem1);
+	assertTrue (it.previousNode() == 0);
 }
 
 
@@ -161,9 +159,9 @@ void NodeIteratorTest::testShowNothing()
 	
 	NodeIterator it(pRoot, 0);
 	
-	assert (it.nextNode() == 0);
+	assertTrue (it.nextNode() == 0);
 	
-	assert (it.previousNode() == 0);
+	assertTrue (it.previousNode() == 0);
 }
 
 

@@ -1,8 +1,6 @@
 //
 // ODBCMySQLTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCMySQLTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -40,12 +38,13 @@ using Poco::Tuple;
 using Poco::NotFoundException;
 
 
-#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.2 Driver"
+#define MYSQL_ODBC_DRIVER "MySQL ODBC 5.3 Unicode Driver"
 #define MYSQL_DSN "PocoDataMySQLTest"
 #define MYSQL_SERVER POCO_ODBC_TEST_DATABASE_SERVER
 #define MYSQL_DB "test"
 #define MYSQL_UID "root"
 #define MYSQL_PWD "poco"
+#define MYSQL_DB "test"
 
 
 ODBCTest::SessionPtr ODBCMySQLTest::_pSession;
@@ -54,6 +53,7 @@ std::string          ODBCMySQLTest::_driver = MYSQL_ODBC_DRIVER;
 std::string          ODBCMySQLTest::_dsn = MYSQL_DSN;
 std::string          ODBCMySQLTest::_uid = MYSQL_UID;
 std::string          ODBCMySQLTest::_pwd = MYSQL_PWD;
+std::string          ODBCMySQLTest::_db  = MYSQL_DB;
 std::string          ODBCMySQLTest::_connectString = "DRIVER={" MYSQL_ODBC_DRIVER "};"
 	"DATABASE=" MYSQL_DB ";"
 	"SERVER=" MYSQL_SERVER ";"
@@ -164,7 +164,7 @@ void ODBCMySQLTest::testNull()
 		recreateNullsTable("NOT NULL");
 		_pSession->setFeature("autoBind", bindValue(i));
 		_pSession->setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HYT00");
+		_pExecutor->notNulls("HY000");
 		i += 2;
 	}
 
@@ -412,7 +412,7 @@ void ODBCMySQLTest::recreateLogTable()
 
 CppUnit::Test* ODBCMySQLTest::suite()
 {
-	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
+	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
 	{
 		std::cout << "*** Connected to [" << _driver << "] test database." << std::endl;
 
@@ -446,7 +446,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitPrepare);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testLimitZero);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testPrepare);
-		//CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
+		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCMySQLTest, testSetComplex);

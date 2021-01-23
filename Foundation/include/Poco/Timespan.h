@@ -1,8 +1,6 @@
 //
 // Timespan.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timespan.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timespan
@@ -31,7 +29,7 @@ class Foundation_API Timespan
 	/// A class that represents time spans up to microsecond resolution.
 {
 public:
-	typedef Timestamp::TimeDiff TimeDiff;
+	using TimeDiff = Timestamp::TimeDiff;
 
 	Timespan();
 		/// Creates a zero Timespan.
@@ -291,6 +289,11 @@ inline bool Timespan::operator <= (TimeDiff microSeconds) const
 inline void swap(Timespan& s1, Timespan& s2)
 {
 	s1.swap(s2);
+}
+
+
+inline Timespan::~Timespan()
+{
 }
 
 

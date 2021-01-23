@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Util/samples/Makefile#2 $
-#
 # Makefile for Poco Util Samples
 #
 

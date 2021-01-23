@@ -1,8 +1,6 @@
 //
 // DataTestSuite.h
 //
-// $Id: //poco/Main/Data/testsuite/src/DataTestSuite.h#1 $
-//
 // Definition of the DataTestSuite class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

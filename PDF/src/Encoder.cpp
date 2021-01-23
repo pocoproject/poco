@@ -1,8 +1,6 @@
 //
 // Encoder.cpp
 //
-// $Id: //poco/Main/PDF/src/Encoder.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Encoder

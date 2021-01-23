@@ -1,9 +1,7 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/SessionImpl.h#4 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  SessionImpl
 //
@@ -72,7 +70,7 @@ public:
 	~SessionImpl();
 		/// Destroys the SessionImpl.
 
-	Poco::Data::StatementImpl* createStatementImpl();
+	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
 		/// Returns an ODBC StatementImpl
 
 	void open(const std::string& connect = "");
@@ -81,13 +79,13 @@ public:
 	void close();
 		/// Closes the connection
 
-	bool isConnected();
+	bool isConnected() const;
 		/// Returns true if session is connected
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout();
+	std::size_t getConnectionTimeout() const;
 		/// Returns the session connection timeout value.
 
 	void begin();
@@ -99,61 +97,64 @@ public:
 	void rollback();
 		/// Aborts a transaction
 
-	bool isTransaction();
+	void reset();
+		/// Do nothing
+
+	bool isTransaction() const;
 		/// Returns true iff a transaction is in progress.
 
 	const std::string& connectorName() const;
 		/// Returns the name of the connector.
 
-	bool canTransact();
+	bool canTransact() const;
 		/// Returns true if connection is transaction-capable.
 
 	void setTransactionIsolation(Poco::UInt32 ti);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation();
+	Poco::UInt32 getTransactionIsolation() const;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32);
+	bool hasTransactionIsolation(Poco::UInt32) const;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32);
+	bool isTransactionIsolation(Poco::UInt32) const;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& name="");
+	bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
 
 	void autoBind(const std::string&, bool val);
 		/// Sets automatic binding for the session.
 
-	bool isAutoBind(const std::string& name="");
+	bool isAutoBind(const std::string& name="") const;
 		/// Returns true if binding is automatic for this session.
 
 	void autoExtract(const std::string&, bool val);
 		/// Sets automatic extraction for the session.
 
-	bool isAutoExtract(const std::string& name="");
+	bool isAutoExtract(const std::string& name="") const;
 		/// Returns true if extraction is automatic for this session.
 
 	void setMaxFieldSize(const std::string& rName, const Poco::Any& rValue);
 		/// Sets the max field size (the default used when column size is unknown).
 		
-	Poco::Any getMaxFieldSize(const std::string& rName="");
+	Poco::Any getMaxFieldSize(const std::string& rName="") const;
 		/// Returns the max field size (the default used when column size is unknown).
 
-	int maxStatementLength();
+	int maxStatementLength() const;
 		/// Returns maximum length of SQL statement allowed by driver.
 
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
 		/// Value must be of type int.
 		
-	Poco::Any getQueryTimeout(const std::string&);
+	Poco::Any getQueryTimeout(const std::string&) const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
 		
@@ -164,7 +165,7 @@ public:
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
 
-	Poco::Any dataTypeInfo(const std::string& rName="");
+	Poco::Any dataTypeInfo(const std::string& rName="") const;
 		/// Returns the data types information.
 
 private:
@@ -173,19 +174,23 @@ private:
 
 	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 
-	void checkError(SQLRETURN rc, const std::string& msg="");
+	void checkError(SQLRETURN rc, const std::string& msg="") const;
 
-	Poco::UInt32 getDefaultTransactionIsolation();
+	Poco::UInt32 getDefaultTransactionIsolation() const;
 
-	Poco::UInt32 transactionIsolation(SQLULEN isolation);
+	static Poco::UInt32 transactionIsolation(SQLULEN isolation);
+
+	void setTransactionIsolationImpl(Poco::UInt32 ti) const;
+		/// Sets the transaction isolation level.
+		/// Called internally from getTransactionIsolation()
 
 	std::string            _connector;
-	const ConnectionHandle _db;
+	mutable ConnectionHandle _db;
 	Poco::Any              _maxFieldSize;
 	bool                   _autoBind;
 	bool                   _autoExtract;
 	TypeInfo               _dataTypes;
-	char                   _canTransact;
+	mutable char           _canTransact;
 	bool                   _inTransaction;
 	int                    _queryTimeout;
 	Poco::FastMutex        _mutex;
@@ -195,7 +200,7 @@ private:
 ///
 /// inlines
 ///
-inline void SessionImpl::checkError(SQLRETURN rc, const std::string& msg)
+inline void SessionImpl::checkError(SQLRETURN rc, const std::string& msg) const
 {
 	if (Utility::isError(rc))
 		throw ConnectionException(_db, msg);
@@ -214,7 +219,7 @@ inline void SessionImpl::setMaxFieldSize(const std::string& rName, const Poco::A
 }
 
 		
-inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName)
+inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName) const
 {
 	return _maxFieldSize;
 }
@@ -226,7 +231,7 @@ inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::A
 }
 
 		
-inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName)
+inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName) const
 {
 	return &_dataTypes;
 }
@@ -238,7 +243,7 @@ inline void SessionImpl::autoBind(const std::string&, bool val)
 }
 
 
-inline bool SessionImpl::isAutoBind(const std::string& name)
+inline bool SessionImpl::isAutoBind(const std::string& name) const
 {
 	return _autoBind;
 }
@@ -250,7 +255,7 @@ inline void SessionImpl::autoExtract(const std::string&, bool val)
 }
 
 
-inline bool SessionImpl::isAutoExtract(const std::string& name)
+inline bool SessionImpl::isAutoExtract(const std::string& name) const
 {
 	return _autoExtract;
 }
@@ -262,7 +267,7 @@ inline const std::string& SessionImpl::connectorName() const
 }
 
 
-inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti)
+inline bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 {
 	return 0 != (ti & getTransactionIsolation());
 }
@@ -274,7 +279,7 @@ inline void SessionImpl::setQueryTimeout(const std::string&, const Poco::Any& va
 }
 
 
-inline Poco::Any SessionImpl::getQueryTimeout(const std::string&)
+inline Poco::Any SessionImpl::getQueryTimeout(const std::string&) const
 {
 	return _queryTimeout;
 }

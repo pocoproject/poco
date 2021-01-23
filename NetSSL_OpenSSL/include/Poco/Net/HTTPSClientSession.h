@@ -1,8 +1,6 @@
 //
 // HTTPSClientSession.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/HTTPSClientSession.h#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: HTTPSClient
 // Module:  HTTPSClientSession
@@ -46,7 +44,7 @@ class NetSSL_API HTTPSClientSession: public HTTPClientSession
 	/// specify the server's host name and port number.
 	///
 	/// Then create a HTTPRequest object, fill it accordingly,
-	/// and pass it as argument to the sendRequst() method.
+	/// and pass it as argument to the sendRequest() method.
 	///
 	/// sendRequest() will return an output stream that can
 	/// be used to send the request body, if there is any.

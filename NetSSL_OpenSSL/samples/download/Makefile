@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/template/sample.make#4 $
-#
 # Makefile for Poco download
 #
 
@@ -12,7 +10,11 @@ include $(POCO_BASE)/build/rules/global
 ifeq ($(POCO_CONFIG),FreeBSD)
 SYSLIBS += -lssl -lcrypto -lz
 else
+ifeq ($(POCO_CONFIG),QNX)
+SYSLIBS += -lssl -lcrypto -lz
+else
 SYSLIBS += -lssl -lcrypto -lz -ldl
+endif
 endif
 
 objects = download

@@ -1,8 +1,6 @@
 //
 // Bulk.cpp
 //
-// $Id: //poco/Main/Data/src/Bulk.cpp#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Bulk

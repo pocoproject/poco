@@ -1,7 +1,7 @@
-set(SAMPLE_NAME "download-ssl-win")
+set(SAMPLE_NAME "")
 
 set(LOCAL_SRCS "")
 aux_source_directory(src LOCAL_SRCS)
 
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoNetSSLWin PocoCrypto PocoUtil PocoNet PocoXML PocoFoundation )
+add_executable(download-ssl-win src/download.cpp)
+target_link_libraries(download-ssl-win PUBLIC Poco::NetSSLWin Poco::Crypto Poco::XML)

@@ -1,8 +1,6 @@
 //
 // Driver.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/Driver.cpp#1 $
-//
 // Console-based test driver for Poco XML.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // ArchiveStrategy.cpp
 //
-// $Id: //poco/Main/Data/src/ArchiveStrategy.cpp#8 $
-//
 // Library: Data
 // Package: Logging
 // Module:  ArchiveStrategy

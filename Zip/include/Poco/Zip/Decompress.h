@@ -1,8 +1,6 @@
 //
 // Decompress.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/Decompress.h#1 $
-//
 // Library: Zip
 // Package: Zip
 // Module:  Decompress
@@ -38,11 +36,13 @@ class Zip_API Decompress: public ParseCallback
 	/// Decompress extracts files from zip files, can be used to extract single files or all files
 {
 public:
-	typedef std::map<std::string, Poco::Path> ZipMapping;
+	using ZipMapping = std::map<std::string, Poco::Path>;
 		/// Maps key of FileInfo entries to their local decompressed representation
-	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const std::string> > EError;
+
+	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const std::string>> EError;
 		/// Thrown whenever an error is detected when handling a ZipLocalFileHeader entry. The string contains an error message
-	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const Poco::Path> > EOk;
+
+	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const Poco::Path>> EOk;
 		/// Thrown whenever a file was successfully decompressed
 
 	Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs = false, bool keepIncompleteFiles = false);

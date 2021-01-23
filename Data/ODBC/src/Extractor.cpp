@@ -1,9 +1,7 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Extractor.cpp#5 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Extractor
 //
@@ -21,6 +19,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <typeinfo>
 
 
 namespace Poco {
@@ -70,7 +69,23 @@ bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
 	typedef UTF16String::value_type CharT;
 	if (isNull(pos)) return false;
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	CharT* sp = AnyCast<CharT*>(_pPreparator->at(pos));
+	CharT* sp = 0;
+	UTF16String us;
+	const std::type_info& ti = _pPreparator->at(pos).type();
+	if (ti == typeid(CharT*))
+	{
+		sp = AnyCast<CharT*>(_pPreparator->at(pos));
+	}
+	else if (ti == typeid(char*))
+	{
+		std::string s(AnyCast<char*>(_pPreparator->at(pos)));
+		Poco::UnicodeConverter::convert(s, us);
+		sp = const_cast<CharT*>(us.c_str());
+	}
+	else
+	{
+		throw Poco::Data::ExtractException("Unsupported string type: " + std::string(ti.name()));
+	}
 	std::size_t len = Poco::UnicodeConverter::UTFStrlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
@@ -560,7 +575,7 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Int64>& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	if (Preparator::DE_MANUAL == _dataExtraction)
@@ -1292,7 +1307,8 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 		try
 		{
 			return isNullLengthIndicator(_lengths.at(col));
-		} catch (std::out_of_range& ex)
+		} 
+		catch (std::out_of_range& ex)
 		{
 			throw RangeException(ex.what()); 
 		}

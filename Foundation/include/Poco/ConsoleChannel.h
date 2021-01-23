@@ -1,8 +1,6 @@
 //
 // ConsoleChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ConsoleChannel.h#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  ConsoleChannel
@@ -45,6 +43,8 @@ class Foundation_API ConsoleChannel: public Channel
 	/// same stream.
 {
 public:
+	using Ptr = AutoPtr<ConsoleChannel>;
+
 	ConsoleChannel();
 		/// Creates the channel and attaches std::clog.
 		

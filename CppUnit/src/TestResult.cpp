@@ -1,8 +1,6 @@
 //
 // TestResult.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TestResult.cpp#1 $
-//
 
 
 #include "CppUnit/TestResult.h"

@@ -1,8 +1,6 @@
 //
 // AccessExpirationDecorator.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AccessExpirationDecorator.h#2 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  AccessExpirationDecorator

@@ -1,8 +1,6 @@
 //
 // TextTestResult.cpp
 //
-// $Id: //poco/1.4/CppUnit/src/TextTestResult.cpp#1 $
-//
 
 
 #include "CppUnit/TextTestResult.h"
@@ -10,17 +8,50 @@
 #include "CppUnit/Test.h"
 #include "CppUnit/estring.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <iomanip>
 #include <cstdlib>
 #include <cctype>
+#include <exception>
 
 
 namespace CppUnit {
 
 
-TextTestResult::TextTestResult():
+TextTestResult::TextTestResult() :
 	_ostr(std::cout)
 {
+}
+
+
+TextTestResult::TextTestResult(const std::string& ignore):
+	_ostr(std::cout)
+{
+	if (!ignore.empty())
+	{
+		try
+		{
+			std::ifstream ifs(ignore);
+			if (ifs.is_open())
+			{
+				char line[256];
+				while (ifs.getline(line, sizeof(line)))
+				{
+					if (line[0] == '#')
+						continue;
+					std::string ignored(line);
+					ignoring(ignored);
+				}
+				ifs.close();
+			}
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
+
+	}
 	setup();
 }
 
@@ -28,7 +59,46 @@ TextTestResult::TextTestResult():
 TextTestResult::TextTestResult(std::ostream& ostr):
 	_ostr(ostr)
 {
+}
+
+
+TextTestResult::TextTestResult(std::ostream& ostr, const std::string& ignore) :
+	_ostr(ostr)
+{
+	if (!ignore.empty())
+	{
+		std::ifstream ifs(ignore);
+		if (ifs.is_open())
+		{
+			char line[256];
+			while (ifs.getline(line, sizeof(line)))
+			{
+				if (line[0] == '#')
+					continue;
+				std::string ignored(line);
+				ignoring(ignored);
+			}
+			ifs.close();
+		}
+	}
 	setup();
+}
+
+
+void TextTestResult::ignoring(const std::string ignore)
+{
+	std::string::const_iterator it = ignore.begin();
+	std::string::const_iterator end = ignore.end();
+	for (;;)
+	{
+		while (it != end && (std::isspace(*it) || *it == '"' || *it == ',' || *it == '\'')) ++it;
+		if (it == end)
+			break;
+
+		std::string test;
+		while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
+		if (!test.empty()) _ignored.insert(test.erase(test.find_last_not_of(" \n\r\t") + 1));
+	}
 }
 
 
@@ -39,16 +109,9 @@ void TextTestResult::setup()
 	if (env)
 	{
 		std::string ignored = env;
-		std::string::const_iterator it = ignored.begin();
-		std::string::const_iterator end = ignored.end();
-		while (it != end)
-		{
-			while (it != end && std::isspace(*it)) ++it;
-			std::string test;
-			while (it != end && !std::isspace(*it)) test += *it++;
-			if (!test.empty()) _ignored.insert(test);
-		}
+		ignoring(ignored);
 	}
+
 #endif
 }
 
@@ -84,13 +147,13 @@ void TextTestResult::addFailure(Test* test, CppUnitException* e)
 void TextTestResult::startTest(Test* test)
 {
 	TestResult::startTest(test);
-	_ostr << "\n" << shortName(test->toString()) << ": ";
+	_ostr << "\n" << shortName(test->toString()) << ": " << std::flush;
 }
 
 
 void TextTestResult::printErrors(std::ostream& stream)
 {
-	if (testErrors() != 0) 
+	if (testErrors() != 0)
 	{
 		stream << "\n";
 
@@ -109,7 +172,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 			       << ": "
 			       << failure->failedTest()->toString() << "\n"
 			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \"" 
+			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
 			if (e == 0)
@@ -129,7 +192,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 					stream << " data line " << e->data1LineNumber();
 				}
 			}
-			stream << "\n";
+			stream << std::endl;
 			i++;
 		}
 	}
@@ -157,7 +220,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 			       << ": "
 			       << failure->failedTest()->toString() << "\n"
 			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \"" 
+			       << "    in \""
 			       << (e ? e->fileName() : std::string())
 			       << "\", line ";
 			if (e == 0)
@@ -169,7 +232,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 				stream << e->lineNumber();
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
-					stream << " data lines " 
+					stream << " data lines "
 					       << e->data1LineNumber()
                            << ", " << e->data2LineNumber();
 				}
@@ -178,7 +241,7 @@ void TextTestResult::printFailures(std::ostream& stream)
 					stream << " data line " << e->data1LineNumber();
 				}
 			}
-			stream << "\n";
+			stream << std::endl;
 			i++;
 		}
 	}
@@ -197,11 +260,11 @@ void TextTestResult::printHeader(std::ostream& stream)
 {
 	stream << "\n\n";
 	if (wasSuccessful())
-		stream << "OK (" 
-		          << runTests() << " tests)" 
+		stream << "OK ("
+		          << runTests() << " tests)"
 		          << std::endl;
 	else
-		stream << "!!!FAILURES!!!" << std::endl
+		stream << "!!!FAILURES!!!" << "\n"
 		          << "Runs: "
 		          << runTests ()
 		          << "   Failures: "

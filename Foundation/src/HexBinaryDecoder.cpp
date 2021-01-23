@@ -1,8 +1,6 @@
 //
 // HexBinaryDecoder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/HexBinaryDecoder.cpp#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  HexBinary

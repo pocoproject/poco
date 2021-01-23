@@ -1,8 +1,6 @@
 //
 // ActivityTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ActivityTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -73,14 +71,14 @@ ActivityTest::~ActivityTest()
 void ActivityTest::testActivity()
 {
 	ActiveObject activeObj;
-	assert (activeObj.activity().isStopped());
+	assertTrue (activeObj.activity().isStopped());
 	activeObj.activity().start();
-	assert (!activeObj.activity().isStopped());
+	assertTrue (!activeObj.activity().isStopped());
 	Thread::sleep(1000);
-	assert (activeObj.activity().isRunning());
+	assertTrue (activeObj.activity().isRunning());
 	activeObj.activity().stop();
 	activeObj.activity().wait();
-	assert (activeObj.count() > 0);
+	assertTrue (activeObj.count() > 0);
 }
 
 

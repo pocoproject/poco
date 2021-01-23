@@ -1,8 +1,6 @@
 //
 // JSONTest.h
 //
-// $Id: //poco/1.4/JSON/testsuite/src/JSONTest.h#1 $
-//
 // Definition of the JSONTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -46,6 +44,7 @@ public:
 #endif
 	void testStringProperty();
 	void testEmptyObject();
+	void testEmptyPropertyName();
 	void testComplexObject();
 	void testDoubleProperty();
 	void testDouble2Property();
@@ -73,10 +72,15 @@ public:
 	void testValidJanssonFiles();
 	void testInvalidJanssonFiles();
 	void testTemplate();
-	void testItunes();
-	void testUnicode(); 
+	void testUnicode();
 	void testInvalidUnicodeJanssonFiles();
 	void testSmallBuffer();
+	void testEscape0();
+	void testNonEscapeUnicode();
+	void testEscapeUnicode();
+
+	void testCopy();
+	void testMove();
 
 	void setUp();
 	void tearDown();
@@ -102,26 +106,26 @@ private:
 		catch (Poco::JSON::JSONException& jsone)
 		{
 			std::cout << jsone.message() << std::endl;
-			assert(false);
+			assertTrue  (false);
 		}
 
-		assert(result.type() == typeid(Poco::JSON::Object::Ptr));
+		assertTrue  (result.type() == typeid(Poco::JSON::Object::Ptr));
 
 		Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
 		Poco::Dynamic::Var test = object->get("test");
-		assert(test.isNumeric());
+		assertTrue  (test.isNumeric());
 		T value = test;
-		assert(value == number);
+		assertTrue  (value == number);
 
 		Poco::DynamicStruct ds = *object;
-		assert(!ds["test"].isEmpty());
-		assert(ds["test"].isNumeric());
-		assert(ds["test"] == number);
+		assertTrue  (!ds["test"].isEmpty());
+		assertTrue  (ds["test"].isNumeric());
+		assertTrue  (ds["test"] == number);
 
 		const Poco::DynamicStruct& rds = *object;
-		assert(!rds["test"].isEmpty());
-		assert(rds["test"].isNumeric());
-		assert(rds["test"] == number);
+		assertTrue  (!rds["test"].isEmpty());
+		assertTrue  (rds["test"].isNumeric());
+		assertTrue  (rds["test"] == number);
 	}
 };
 

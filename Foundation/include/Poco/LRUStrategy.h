@@ -1,8 +1,6 @@
 //
 // LRUStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/LRUStrategy.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  LRUStrategy

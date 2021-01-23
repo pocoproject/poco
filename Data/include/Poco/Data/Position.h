@@ -1,8 +1,6 @@
 //
 // PositionExtraction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Position.h#9 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Position

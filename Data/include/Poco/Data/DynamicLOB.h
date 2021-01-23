@@ -1,8 +1,6 @@
 //
 // DynamicLOB.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/DynamicLOB.h#12 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  DynamicLOB
@@ -29,8 +27,8 @@ namespace Poco {
 namespace Data {
 
 template <typename T> class LOB;
-typedef LOB<unsigned char> BLOB;
-typedef LOB<char> CLOB;
+using BLOB = LOB<unsigned char>;
+using CLOB = LOB<char>;
 
 } } // namespace Poco::Data
 

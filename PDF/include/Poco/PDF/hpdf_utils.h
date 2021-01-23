@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.0 >> -- fpdf_utils.h
+ * << Haru Free PDF Library >> -- fpdf_utils.h
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -15,6 +18,7 @@
 #ifndef _HPDF_UTILS_H
 #define _HPDF_UTILS_H
 
+#include "hpdf_config.h"
 #include "hpdf_types.h"
 
 #ifdef __cplusplus
@@ -114,7 +118,7 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value);
 }
 #endif /* __cplusplus */
 
-#define HPDF_NEEDS_ESCAPE(c)    (c < 0x21 || \
+#define HPDF_NEEDS_ESCAPE(c)    (c < 0x20 || \
                                  c > 0x7e || \
                                  c == '\\' || \
                                  c == '%' || \
@@ -139,11 +143,11 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value);
 /*----------------------------------------------------------------------------*/
 /*----- macros for debug -----------------------------------------------------*/
 
-#ifdef HPDF_DEBUG
+#ifdef LIBHPDF_DEBUG_TRACE
 #ifndef HPDF_PTRACE_ON
 #define HPDF_PTRACE_ON
 #endif /* HPDF_PTRACE_ON */
-#endif /* HPDF_DEBUG */
+#endif /* LIBHPDF_DEBUG_TRACE */
 
 #ifdef HPDF_PTRACE_ON
 #define HPDF_PTRACE(ARGS)  HPDF_PRINTF ARGS
@@ -151,7 +155,7 @@ HPDF_UInt16Swap  (HPDF_UINT16  *value);
 #define HPDF_PTRACE(ARGS)  /* do nothing */
 #endif /* HPDF_PTRACE */
 
-#ifdef HPDF_DEBUG
+#ifdef LIBHPDF_DEBUG
 #define HPDF_PRINT_BINARY(BUF, LEN, CAPTION) HPDF_PrintBinary(BUF, LEN, CAPTION)
 #else
 #define HPDF_PRINT_BINARY(BUF, LEN, CAPTION) /* do nothing */

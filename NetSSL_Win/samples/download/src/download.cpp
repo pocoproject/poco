@@ -1,8 +1,6 @@
 //
 // download.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/samples/download/src/download.cpp#1 $
-//
 // This sample demonstrates the URIStreamOpener class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -50,7 +48,7 @@ public:
 	{
 		Poco::Net::initializeSSL();
 	}
-	
+
 	~SSLInitializer()
 	{
 		Poco::Net::uninitializeSSL();
@@ -64,7 +62,7 @@ int main(int argc, char** argv)
 	HTTPStreamFactory::registerFactory();
 	HTTPSStreamFactory::registerFactory();
 	FTPStreamFactory::registerFactory();
-	
+
 	if (argc != 2)
 	{
 		Path p(argv[0]);
@@ -81,7 +79,7 @@ int main(int argc, char** argv)
 	try
 	{
 		URI uri(argv[1]);
-		std::auto_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
+		std::unique_ptr<std::istream> pStr(URIStreamOpener::defaultOpener().open(uri));
 		StreamCopier::copyStream(*pStr.get(), std::cout);
 	}
 	catch (Exception& exc)
@@ -89,6 +87,6 @@ int main(int argc, char** argv)
 		std::cerr << exc.displayText() << std::endl;
 		return 1;
 	}
-		
+
 	return 0;
 }

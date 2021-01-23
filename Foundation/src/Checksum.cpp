@@ -1,8 +1,6 @@
 //
 // Checksum.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Checksum.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Checksum

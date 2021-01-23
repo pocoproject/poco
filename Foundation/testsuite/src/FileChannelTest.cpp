@@ -1,8 +1,6 @@
 //
 // FileChannelTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileChannelTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -72,11 +70,11 @@ void FileChannelTest::testRotateBySize()
 			pChannel->log(msg);
 		}
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 		f = name + ".1";
-		assert (f.exists());
+		assertTrue (f.exists());
 		f = name + ".2";
-		assert (!f.exists());
+		assertTrue (!f.exists());
 	}
 	catch (...)
 	{
@@ -102,9 +100,9 @@ void FileChannelTest::testRotateByAge()
 			Thread::sleep(300);
 		}
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 		f = name + ".1";
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -133,7 +131,7 @@ void FileChannelTest::testRotateAtTimeDayUTC()
 		}
 		pChannel->log(msg);
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -162,7 +160,7 @@ void FileChannelTest::testRotateAtTimeDayLocal()
 		}
 		pChannel->log(msg);
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -191,7 +189,7 @@ void FileChannelTest::testRotateAtTimeHourUTC()
 		}
 		pChannel->log(msg);
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -220,7 +218,7 @@ void FileChannelTest::testRotateAtTimeHourLocal()
 		}
 		pChannel->log(msg);
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -249,7 +247,7 @@ void FileChannelTest::testRotateAtTimeMinUTC()
 		}
 		pChannel->log(msg);
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -278,7 +276,7 @@ void FileChannelTest::testRotateAtTimeMinLocal()
 		}
 		pChannel->log(msg);
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -304,7 +302,7 @@ void FileChannelTest::testArchive()
 			pChannel->log(msg);
 		}
 		File f(name + ".0");
-		assert (f.exists());
+		assertTrue (f.exists());
 	}
 	catch (...)
 	{
@@ -332,9 +330,9 @@ void FileChannelTest::testCompress()
 		}
 		Thread::sleep(3000); // allow time for background compression
 		File f0(name + ".0.gz");
-		assert (f0.exists());
+		assertTrue (f0.exists());
 		File f1(name + ".1.gz");
-		assert (f1.exists());
+		assertTrue (f1.exists());
 	}
 	catch (...)
 	{
@@ -361,19 +359,19 @@ void FileChannelTest::purgeAge(const std::string& pa)
 			pChannel->log(msg);
 		}
 		File f0(name + ".0");
-		assert(f0.exists());
+		assertTrue (f0.exists());
 		File f1(name + ".1");
-		assert(f1.exists());
+		assertTrue (f1.exists());
 		File f2(name + ".2");
-		assert(f2.exists());
-		
+		assertTrue (f2.exists());
+
 		Thread::sleep(5000);
 		for (int i = 0; i < 50; ++i)
 		{
 			pChannel->log(msg);
 		}
-		
-		assert(!f2.exists());
+
+		assertTrue (!f2.exists());
 	}
 	catch (...)
 	{
@@ -401,11 +399,11 @@ void FileChannelTest::noPurgeAge(const std::string& npa)
 			pChannel->log(msg);
 		}
 		File f0(name + ".0");
-		assert(f0.exists());
+		assertTrue (f0.exists());
 		File f1(name + ".1");
-		assert(f1.exists());
+		assertTrue (f1.exists());
 		File f2(name + ".2");
-		assert(f2.exists());
+		assertTrue (f2.exists());
 
 		Thread::sleep(5000);
 		for (int i = 0; i < 50; ++i)
@@ -413,7 +411,7 @@ void FileChannelTest::noPurgeAge(const std::string& npa)
 			pChannel->log(msg);
 		}
 
-		assert(f2.exists());
+		assertTrue (f2.exists());
 	}
 	catch (...)
 	{
@@ -457,11 +455,11 @@ void FileChannelTest::purgeCount(const std::string& pc)
 			Thread::sleep(50);
 		}
 		File f0(name + ".0");
-		assert(f0.exists());
+		assertTrue (f0.exists());
 		File f1(name + ".1");
-		assert(f1.exists());
+		assertTrue (f1.exists());
 		File f2(name + ".2");
-		assert(!f2.exists());
+		assertTrue (!f2.exists());
 	} catch (...)
 	{
 		remove(name);
@@ -488,11 +486,11 @@ void FileChannelTest::noPurgeCount(const std::string& npc)
 			Thread::sleep(50);
 		}
 		File f0(name + ".0");
-		assert(f0.exists());
+		assertTrue (f0.exists());
 		File f1(name + ".1");
-		assert(f1.exists());
+		assertTrue (f1.exists());
 		File f2(name + ".2");
-		assert(f2.exists());
+		assertTrue (f2.exists());
 	} catch (...)
 	{
 		remove(name);
@@ -515,6 +513,34 @@ void FileChannelTest::testPurgeCount()
 
 	noPurgeCount("");
 	noPurgeCount("none");
+}
+
+
+void FileChannelTest::testWrongPurgeOption()
+{
+	std::string name = filename();
+	AutoPtr<FileChannel> pChannel = new FileChannel(name);
+	pChannel->setProperty(FileChannel::PROP_PURGEAGE, "5 seconds");
+
+	try
+	{
+		pChannel->setProperty(FileChannel::PROP_PURGEAGE, "peace");
+		fail("must fail");
+	} catch (InvalidArgumentException)
+	{
+		assertTrue (pChannel->getProperty(FileChannel::PROP_PURGEAGE) == "5 seconds");
+	}
+
+	try
+	{
+		pChannel->setProperty(FileChannel::PROP_PURGECOUNT, "peace");
+		fail("must fail");
+	} catch (InvalidArgumentException)
+	{
+		assertTrue (pChannel->getProperty(FileChannel::PROP_PURGEAGE) == "5 seconds");
+	}
+
+	remove(name);
 }
 
 
@@ -610,16 +636,17 @@ CppUnit::Test* FileChannelTest::suite()
 
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeDayLocal);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeHourUTC);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeHourLocal);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeMinUTC);
-	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeMinLocal);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayLocal);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeHourUTC);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeHourLocal);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeMinUTC);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeMinLocal);
 	CppUnit_addTest(pSuite, FileChannelTest, testArchive);
 	CppUnit_addTest(pSuite, FileChannelTest, testCompress);
-	CppUnit_addTest(pSuite, FileChannelTest, testPurgeAge);
+	CppUnit_addLongTest(pSuite, FileChannelTest, testPurgeAge);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeCount);
+	CppUnit_addTest(pSuite, FileChannelTest, testWrongPurgeOption);
 
 	return pSuite;
 }

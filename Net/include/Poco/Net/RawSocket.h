@@ -1,8 +1,6 @@
 //
 // RawSocket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/RawSocket.h#1 $
-//
 // Library: Net
 // Package: Sockets
 // Module:  RawSocket
@@ -36,7 +34,7 @@ public:
 	RawSocket();
 		/// Creates an unconnected IPv4 raw socket.
 
-	RawSocket(IPAddress::Family family, int proto = IPPROTO_RAW);
+	RawSocket(SocketAddress::Family family, int proto = IPPROTO_RAW);
 		/// Creates an unconnected raw socket.
 		///
 		/// The socket will be created for the
@@ -82,6 +80,20 @@ public:
 		///
 		/// Calls to connect() cannot come before calls to bind().
 
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket. 
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
+		/// socket option.
+		///
+		/// Calls to connect() cannot come before calls to bind().
+
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
 		/// the socket.
@@ -121,7 +133,7 @@ public:
 protected:
 	RawSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
-		/// The socket takes owership of the SocketImpl.
+		/// The socket takes ownership of the SocketImpl.
 		///
 		/// The SocketImpl must be a StreamSocketImpl, otherwise
 		/// an InvalidArgumentException will be thrown.

@@ -1,8 +1,6 @@
 //
 // Font.cpp
 //
-// $Id: //poco/Main/PDF/src/Font.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Font
@@ -21,7 +19,7 @@ namespace Poco {
 namespace PDF {
 
 
-Font::Font(HPDF_Doc* pPDF, const HPDF_Font& font): 
+Font::Font(HPDF_Doc* pPDF, HPDF_Font font): 
 	Resource<HPDF_Font>(pPDF, font, HPDF_Font_GetFontName(font))
 {
 }

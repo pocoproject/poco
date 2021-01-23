@@ -1,8 +1,6 @@
 //
 // ClockTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ClockTest.h#1 $
-//
 // Definition of the ClockTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

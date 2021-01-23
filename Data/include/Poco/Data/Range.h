@@ -1,8 +1,6 @@
 //
 // Range.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Range.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Range

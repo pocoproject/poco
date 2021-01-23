@@ -1,8 +1,6 @@
 //
 // Observer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Observer.h#2 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationCenter
@@ -72,7 +70,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	void notify(Notification* pNf) const
 	{
 		Poco::Mutex::ScopedLock lock(_mutex);

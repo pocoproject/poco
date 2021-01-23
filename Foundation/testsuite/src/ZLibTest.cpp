@@ -1,8 +1,6 @@
 //
 // ZLibTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -50,9 +48,9 @@ void ZLibTest::testDeflate1()
 	InflatingInputStream inflater(buffer);
 	std::string data;
 	inflater >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	inflater >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 }
 
 
@@ -69,9 +67,9 @@ void ZLibTest::testDeflate2()
 	inflater.close();
 	std::string data;
 	buffer2 >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	buffer2 >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 }
 
 
@@ -89,9 +87,9 @@ void ZLibTest::testDeflate3()
 	inflater.close();
 	std::string data;
 	buffer3 >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	buffer3 >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 }
 
 
@@ -107,7 +105,7 @@ void ZLibTest::testDeflate4()
 	InflatingInputStream inflater(istr, -10);
 	std::string data2;
 	inflater >> data2;
-	assert (data2 == data);
+	assertTrue (data2 == data);
 }
 
 
@@ -121,9 +119,9 @@ void ZLibTest::testGzip1()
 	InflatingInputStream inflater(buffer, InflatingStreamBuf::STREAM_GZIP);
 	std::string data;
 	inflater >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	inflater >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 }
 
 
@@ -142,9 +140,9 @@ void ZLibTest::testGzip2()
 	InflatingInputStream inflater(istr, InflatingStreamBuf::STREAM_GZIP);
 	std::string data;
 	inflater >> data;
-	assert (data == "Hello,");
+	assertTrue (data == "Hello,");
 	inflater >> data;
-	assert (data == "world!");	
+	assertTrue (data == "world!");	
 }
 
 
@@ -162,18 +160,18 @@ void ZLibTest::testGzip3()
 	InflatingInputStream inflater(buffer, InflatingStreamBuf::STREAM_GZIP);
 	std::string data;
 	inflater >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	inflater >> data;
-	assert (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
 	data.clear();
 	inflater >> data;
-	assert (data.empty());
-	assert (inflater.eof());
+	assertTrue (data.empty());
+	assertTrue (inflater.eof());
 	inflater.reset();
 	inflater >> data;
-	assert (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");
+	assertTrue (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");
 	inflater >> data;
-	assert (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");	
+	assertTrue (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");	
 }
 
 

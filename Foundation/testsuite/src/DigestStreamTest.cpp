@@ -1,8 +1,6 @@
 //
 // DigestStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DigestStreamTest.cpp#1 $
-
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -42,8 +40,8 @@ void DigestStreamTest::testInputStream()
 	DigestInputStream ds(md5, istr);
 	std::string s;
 	ds >> s;
-	assert (DigestEngine::digestToHex(md5.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
-	assert (s == "abcdefghijklmnopqrstuvwxyz");
+	assertTrue (DigestEngine::digestToHex(md5.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
+	assertTrue (s == "abcdefghijklmnopqrstuvwxyz");
 }
 
 
@@ -53,12 +51,12 @@ void DigestStreamTest::testOutputStream1()
 	DigestOutputStream ds(md5);
 	ds << "abcdefghijklmnopqrstuvwxyz";
 	ds.close();
-	assert (DigestEngine::digestToHex(md5.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
+	assertTrue (DigestEngine::digestToHex(md5.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
 
 	ds << "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	ds << "abcdefghijklmnopqrstuvwxyz0123456789";
 	ds.close();
-	assert (DigestEngine::digestToHex(md5.digest()) == "d174ab98d277d9f5a5611c2c9f419d9f");
+	assertTrue (DigestEngine::digestToHex(md5.digest()) == "d174ab98d277d9f5a5611c2c9f419d9f");
 }
 
 
@@ -69,8 +67,8 @@ void DigestStreamTest::testOutputStream2()
 	DigestOutputStream ds(md5, ostr);
 	ds << "abcdefghijklmnopqrstuvwxyz";
 	ds.close();
-	assert (DigestEngine::digestToHex(md5.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
-	assert (ostr.str() == "abcdefghijklmnopqrstuvwxyz");
+	assertTrue (DigestEngine::digestToHex(md5.digest()) == "c3fcd3d76192e4007dfb496cca67e13b");
+	assertTrue (ostr.str() == "abcdefghijklmnopqrstuvwxyz");
 }
 
 
@@ -79,7 +77,7 @@ void DigestStreamTest::testToFromHex()
 	std::string digest("c3fcd3d76192e4007dfb496cca67e13b");
 	Poco::DigestEngine::Digest dig = DigestEngine::digestFromHex(digest);
 	std::string digest2 = DigestEngine::digestToHex(dig);
-	assert (digest == digest2);
+	assertTrue (digest == digest2);
 }
 
 

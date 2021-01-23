@@ -1,9 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Binder.cpp#5 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Binder
 //
@@ -58,7 +56,7 @@ void Binder::bind(std::size_t pos, const Poco::Int64 &val, Direction dir)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 void Binder::bind(std::size_t pos, const long &val, Direction dir)
 {
 	long tmp = static_cast<long>(val);
@@ -115,14 +113,14 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const NullData&, Direction)
 {
-	sqlite3_bind_null(_pStmt, pos);
+	sqlite3_bind_null(_pStmt, static_cast<int>(pos));
 }
 
 
 void Binder::checkReturn(int rc)
 {
 	if (rc != SQLITE_OK)
-		Utility::throwException(rc);
+		Utility::throwException(sqlite3_db_handle(_pStmt), rc);
 }
 
 

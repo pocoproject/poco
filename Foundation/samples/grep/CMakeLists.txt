@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "grep")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoFoundation )
+add_executable(grep src/grep.cpp)
+target_link_libraries(grep PUBLIC Poco::Foundation)

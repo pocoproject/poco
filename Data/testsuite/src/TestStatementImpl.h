@@ -1,8 +1,6 @@
 //
 // TestStatementImpl.h
 //
-// $Id: //poco/Main/Data/testsuite/src/TestStatementImpl.h#2 $
-//
 // Definition of the TestStatementImpl class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

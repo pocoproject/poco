@@ -1,8 +1,6 @@
 //
 // HTTPServerTestSuite.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/HTTPServerTestSuite.h#1 $
-//
 // Definition of the HTTPServerTestSuite class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

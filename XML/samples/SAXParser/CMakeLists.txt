@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "SAXParser")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoXML PocoFoundation )
+add_executable(SAXParser src/SAXParser.cpp)
+target_link_libraries(SAXParser PUBLIC Poco::XML)

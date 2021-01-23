@@ -1,8 +1,6 @@
 //
 // NodeAppenderTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/NodeAppenderTest.h#1 $
-//
 // Definition of the NodeAppenderTest class.
 //
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.

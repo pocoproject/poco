@@ -1,8 +1,6 @@
 //
 // Connector.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Connector.h#2 $
-//
 // Definition of the Connector class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

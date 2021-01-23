@@ -1,8 +1,6 @@
 //
 // FileChannelTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/FileChannelTest.h#1 $
-//
 // Definition of the FileChannelTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -45,6 +43,7 @@ public:
 	void testCompress();
 	void testPurgeAge();
 	void testPurgeCount();
+	void testWrongPurgeOption();
 
 	void setUp();
 	void tearDown();

@@ -1,8 +1,6 @@
 //
 // Enum.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Enum.h#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Enum
@@ -42,7 +40,12 @@ public:
 	typedef std::vector<EnumValue*> Values;
 	typedef Values::const_iterator Iterator;
 
-	Enum(const std::string& name, NameSpace* pNameSpace);
+	enum Flags
+	{
+		ENUM_IS_CLASS = 0x01 // C++11 enum class
+	};
+
+	Enum(const std::string& name, NameSpace* pNameSpace, int flags = 0);
 		/// Creates the Enum.
 		///
 		/// If name is the empty string, an internal name
@@ -61,6 +64,8 @@ public:
 	Iterator end() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
 	
+	int flags() const;
+
 	Symbol::Kind kind() const;
 	std::string toString() const;
 
@@ -69,8 +74,18 @@ protected:
 
 private:	
 	Values _values;
+	int _flags;
 	static int _count;
 };
+
+
+//
+// inlines
+//
+inline int Enum::flags() const
+{
+	return _flags;
+}
 
 
 } } // namespace Poco::CppParser

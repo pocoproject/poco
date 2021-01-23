@@ -1,8 +1,6 @@
 //
 // MailMessage.cpp
 //
-// $Id: //poco/1.4/Net/src/MailMessage.cpp#2 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailMessage
@@ -94,32 +92,49 @@ namespace
 						cte = MailMessage::ENCODING_BASE64;
 				}
 
+				std::string contentType = header.get(MailMessage::HEADER_CONTENT_TYPE, "");
+				std::string contentDisp = header.get(MailMessage::HEADER_CONTENT_DISPOSITION, "");
+				std::string filename;
+				if (!contentDisp.empty())
+					filename = getParamFromHeader(contentDisp, "filename");
+				if (filename.empty()) 
+					filename = getParamFromHeader(contentType, "name");
+				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
+				poco_check_ptr (pPS);
 				NameValueCollection::ConstIterator it = header.begin();
 				NameValueCollection::ConstIterator end = header.end();
-				PartSource* pPS = _pMsg->createPartStore(tmp, 
-					header[MailMessage::HEADER_CONTENT_TYPE], 
-					getFileNameFromDisp(it->second));
-				poco_check_ptr (pPS);
+				bool added = false;
 				for (; it != end; ++it)
 				{
-					if (MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
+					if (!added && MailMessage::HEADER_CONTENT_DISPOSITION == it->first)
 					{
-						if (it->second == "inline") _pMsg->addContent(pPS, cte);
-						else _pMsg->addAttachment("", pPS, cte);
+						if (it->second == "inline") 
+							_pMsg->addContent(pPS, cte);
+						else 
+							_pMsg->addAttachment("", pPS, cte);
+						added = true;
 					}
 					
 					pPS->headers().set(it->first, it->second);
 				}
+
+				if (contentDisp.empty())
+				{
+					_pMsg->addContent(pPS, cte);
+					added = true;
+				}
+
+				if (!added) delete pPS;
 			}
 		}
 		
 	private:
-		std::string getFileNameFromDisp(const std::string& str)
+		std::string getParamFromHeader(const std::string& header, const std::string& param)
 		{
-			StringTokenizer st(str, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+			StringTokenizer st(header, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 			StringTokenizer::Iterator it = st.begin();
 			StringTokenizer::Iterator end = st.end();
-			for (; it != end; ++it) { if (*it == "filename") break; }
+			for (; it != end; ++it) { if (*it == param) break; }
 			if (it != end)
 			{
 				++it;
@@ -184,6 +199,7 @@ const std::string MailMessage::CTE_BASE64("base64");
 
 
 MailMessage::MailMessage(PartStoreFactory* pStoreFactory): 
+	_encoding(),
 	_pStoreFactory(pStoreFactory)
 {
 	Poco::Timestamp now;
@@ -194,9 +210,9 @@ MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 
 MailMessage::~MailMessage()
 {
-	for (PartVec::iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (auto& part: _parts)
 	{
-		delete it->pSource;
+		delete part.pSource;
 	}
 }
 
@@ -394,15 +410,15 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 	writeHeader(header, ostr);
 	
 	MultipartWriter writer(ostr, _boundary);
-	for (PartVec::const_iterator it = _parts.begin(); it != _parts.end(); ++it)
+	for (const auto& part: _parts)
 	{
-		writePart(writer, *it);
+		writePart(writer, part);
 	}
 	writer.close();
 }
 
 
-void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
+void MailMessage::writePart(MultipartWriter& writer, const Part& part)
 {
 	MessageHeader partHeader(part.pSource->headers());
 	MediaType mediaType(part.pSource->mediaType());
@@ -428,7 +444,7 @@ void MailMessage::writePart(MultipartWriter& writer, const Part& part) const
 }
 
 
-void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding) const
+void MailMessage::writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding)
 {
 	switch (encoding)
 	{
@@ -479,29 +495,36 @@ void MailMessage::readMultipart(std::istream& istr, PartHandler& handler)
 
 void MailMessage::readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler)
 {
-	std::string encoding;
-	if (header.has(HEADER_CONTENT_TRANSFER_ENCODING))
-	{
-		encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
-		// get rid of a parameter if one is set
-		std::string::size_type pos = encoding.find(';');
-		if (pos != std::string::npos)
-			encoding.resize(pos);
-	}
-	if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
-	{
-		QuotedPrintableDecoder decoder(istr);
-		handlePart(decoder, header, handler);
-	}
-	else if (icompare(encoding, CTE_BASE64) == 0)
-	{
-		Base64Decoder decoder(istr);
-		handlePart(decoder, header, handler);
-	}
-	else
-	{
-		handlePart(istr, header, handler);
-	}
+    std::string encoding;
+    if (header.has(HEADER_CONTENT_TRANSFER_ENCODING))
+    {
+        encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
+        // get rid of a parameter if one is set
+        std::string::size_type pos = encoding.find(';');
+        if (pos != std::string::npos)
+            encoding.resize(pos);
+    }
+    if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
+    {
+        QuotedPrintableDecoder decoder(istr);
+        handlePart(decoder, header, handler);
+        _encoding = ENCODING_QUOTED_PRINTABLE;
+    }
+    else if (icompare(encoding, CTE_BASE64) == 0)
+    {
+        Base64Decoder decoder(istr);
+        handlePart(decoder, header, handler);
+        _encoding = ENCODING_BASE64;
+    }
+    else
+    {
+        if (icompare(encoding, CTE_7BIT) == 0)
+            _encoding = ENCODING_7BIT;
+        else if (icompare(encoding, CTE_8BIT) == 0)
+            _encoding = ENCODING_8BIT;
+
+        handlePart(istr, header, handler);
+    }
 }
 
 
@@ -520,15 +543,15 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 	std::string cc;
 	std::string bcc;
 	
-	for (Recipients::const_iterator it = _recipients.begin(); it != _recipients.end(); ++it)
+	for (const auto& rec: _recipients)
 	{
-		switch (it->getType())
+		switch (rec.getType())
 		{
 		case MailRecipient::PRIMARY_RECIPIENT:
-			appendRecipient(*it, to);
+			appendRecipient(rec, to);
 			break;
 		case MailRecipient::CC_RECIPIENT:
-			appendRecipient(*it, cc);
+			appendRecipient(rec, cc);
 			break;
 		case MailRecipient::BCC_RECIPIENT:
 			break;
@@ -590,9 +613,9 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
 {
 	bool containsNonASCII = false;
-	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	for (auto ch: text)
 	{
-		if (static_cast<unsigned char>(*it) > 127)
+		if (static_cast<unsigned char>(ch) > 127)
 		{
 			containsNonASCII = true;
 			break;
@@ -602,7 +625,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 	
 	std::string encodedText;
 	std::string::size_type lineLength = 0;
-	for (std::string::const_iterator it = text.begin(); it != text.end(); ++it)
+	for (auto ch: text)
 	{
 		if (lineLength == 0)
 		{
@@ -611,7 +634,7 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 			encodedText += "?q?";
 			lineLength += charset.length() + 5;
 		}
-		switch (*it)
+		switch (ch)
 		{
 		case ' ':
 			encodedText += '_';
@@ -632,23 +655,23 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 		case '.':
 		case '@':
 			encodedText += '=';
-			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
 			lineLength += 3;
 			break;
 		default:
-			if (*it > 32 && *it < 127)
+			if (ch > 32 && ch < 127)
 			{
-				encodedText += *it;
+				encodedText += ch;
 				lineLength++;
 			}
 			else
 			{
 				encodedText += '=';
-				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(*it)), 2);
+				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
 				lineLength += 3;
 			}
 		}
-		if ((lineLength >= 64 && (*it == ' ' || *it == '\t' || *it == '\r' || *it == '\n')) || lineLength >= 72)
+		if ((lineLength >= 64 && (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')) || lineLength >= 72)
 		{
 			encodedText += "?=\r\n ";
 			lineLength = 0;
@@ -666,6 +689,59 @@ PartSource* MailMessage::createPartStore(const std::string& content, const std::
 {
 	if (!_pStoreFactory) return new StringPartSource(content, mediaType, filename);
 	else return _pStoreFactory->createPartStore(content, mediaType, filename);
+}
+
+
+MultipartSource::MultipartSource(const std::string contentType):
+	PartSource(contentTypeWithBoundary(contentType))
+{
+}
+
+
+MultipartSource::~MultipartSource()
+{
+	for (auto& part: _parts)
+	{
+		delete part.pSource;
+	}
+}
+
+
+void MultipartSource::addPart(const std::string& name,
+	PartSource* pSource,
+	MailMessage::ContentDisposition disposition,
+	MailMessage::ContentTransferEncoding encoding)
+{
+	MailMessage::Part part;
+	part.name        = name;
+	part.pSource     = pSource;
+	part.disposition = disposition;
+	part.encoding    = encoding;
+	_parts.push_back(part);
+}
+
+
+std::istream& MultipartSource::stream()
+{
+	MediaType mt(mediaType());
+	std::string boundary = mt.getParameter("boundary");
+
+	MultipartWriter writer(_content, boundary);
+	for (const auto& part: _parts)
+	{
+		MailMessage::writePart(writer, part);
+	}
+	writer.close();
+
+	return _content;
+}
+
+
+std::string MultipartSource::contentTypeWithBoundary(const std::string& contentType)
+{
+	MediaType mediaType(contentType);
+	mediaType.setParameter("boundary", MultipartWriter::createBoundary());
+	return mediaType.toString();
 }
 
 

@@ -1,8 +1,6 @@
 //
 // TestSetup.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestSetup.h#1 $
-//
 
 
 #ifndef CppUnit_TestSetup_INCLUDED

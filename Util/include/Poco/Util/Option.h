@@ -1,8 +1,6 @@
 //
 // Option.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/Option.h#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  Option
@@ -22,6 +20,7 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/Util/OptionCallback.h"
+#include "Poco/Util/AbstractConfiguration.h"
 
 
 namespace Poco {
@@ -30,7 +29,6 @@ namespace Util {
 
 class Application;
 class Validator;
-class AbstractConfiguration;
 
 
 class Util_API Option
@@ -60,7 +58,7 @@ class Util_API Option
 	///
 	/// Option instances are value objects.
 	///
-	/// Typcally, after construction, an Option object is immediately
+	/// Typically, after construction, an Option object is immediately
 	/// passed to an Options object.
 	///
 	/// An Option object can be created by chaining the constructor
@@ -191,7 +189,7 @@ public:
 		/// Returns the option's Validator, if one has been specified,
 		/// or NULL otherwise.	
 		
-	AbstractConfiguration* config() const;
+	AbstractConfiguration::Ptr config() const;
 		/// Returns the configuration, if specified, or NULL otherwise.
 		
 	bool matchesShort(const std::string& option) const;
@@ -241,7 +239,7 @@ private:
 	std::string _binding;
 	Validator*  _pValidator;
 	AbstractOptionCallback* _pCallback;
-	AbstractConfiguration*  _pConfig;
+	AbstractConfiguration::Ptr _pConfig;
 };
 
 
@@ -322,7 +320,7 @@ inline Validator* Option::validator() const
 }
 
 
-inline AbstractConfiguration* Option::config() const
+inline AbstractConfiguration::Ptr Option::config() const
 {
 	return _pConfig;
 }

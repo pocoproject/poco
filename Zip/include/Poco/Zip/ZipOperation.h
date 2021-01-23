@@ -1,8 +1,6 @@
 //
 // ZipOperation.h
 //
-// $Id: //poco/1.4/Zip/include/Poco/Zip/ZipOperation.h#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  ZipOperation
@@ -38,7 +36,7 @@ class Zip_API ZipOperation: public Poco::RefCountedObject
 	/// Abstract super class for operations on individual zip entries
 {
 public:
-	typedef Poco::AutoPtr<ZipOperation> Ptr;
+	using Ptr = Poco::AutoPtr<ZipOperation>;
 
 	ZipOperation();
 		/// Creates the ZipOperation.

@@ -1,8 +1,6 @@
 //
 // HashMap.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/HashMap.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  HashMap
@@ -80,7 +78,7 @@ private:
 };
 
 
-template <class Key, class Mapped, class HashFunc = Hash<Key> >
+template <class Key, class Mapped, class HashFunc = Hash<Key>>
 class HashMap
 	/// This class implements a map using a LinearHashTable.
 	///

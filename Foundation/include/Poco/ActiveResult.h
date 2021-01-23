@@ -1,8 +1,6 @@
 //
 // ActiveResult.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ActiveResult.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects
@@ -43,7 +41,7 @@ public:
 	ActiveResultHolder():
 		_pData(0),
 		_pExc(0),
-		_event(false)
+		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.
 	{
 	}
@@ -149,7 +147,7 @@ class ActiveResultHolder<void>: public RefCountedObject
 public:
 	ActiveResultHolder():
 		_pExc(0),
-		_event(false)
+		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.
 	{
 	}

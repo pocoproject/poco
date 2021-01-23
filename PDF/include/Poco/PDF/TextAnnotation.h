@@ -1,8 +1,6 @@
 //
 // TextAnnotation.h
 //
-// $Id: //poco/Main/PDF/include/Poco/PDF/TextAnnotation.h#4 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  TextAnnotation

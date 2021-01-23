@@ -1,8 +1,6 @@
 //
 // Logger.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Logger.h#5 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Logger
@@ -24,9 +22,11 @@
 #include "Poco/Channel.h"
 #include "Poco/Message.h"
 #include "Poco/Format.h"
+#include "Poco/AutoPtr.h"
 #include <map>
 #include <vector>
 #include <cstddef>
+#include <memory>
 
 
 namespace Poco {
@@ -55,17 +55,16 @@ class Foundation_API Logger: public Channel
 	/// The name of a logger determines the logger's place within the logger hierarchy.
 	/// The name of the root logger is always "", the empty string. For all other
 	/// loggers, the name is made up of one or more components, separated by a period.
-	/// For example, the loggers with the name HTTPServer.RequestHandler and HTTPServer.Listener
-	/// are descendants of the logger HTTPServer, which itself is a descendant of
-	/// the root logger. There is not limit as to how deep
-	/// the logger hierarchy can become. Once a logger has been created and it has
-	/// inherited the channel and level from its ancestor, it loses the connection
-	/// to it. So changes to the level or channel of a logger do not affect its
-	/// descendants. This greatly simplifies the implementation of the framework
-	/// and is no real restriction, because almost always levels and channels are
-	/// set up at application startup and never changed afterwards. Nevertheless,
-	/// there are methods to simultaneously change the level and channel of all
-	/// loggers in a certain hierarchy.
+	/// For example, the loggers with the name HTTPServer.RequestHandler and
+	/// HTTPServer.Listener are descendants of the logger HTTPServer, which itself is a
+	/// descendant of the root logger. There is no limit as to how deep the logger hierarchy
+	/// can become. Once a logger has been created and it has inherited the channel and level
+	/// from its ancestor, it loses the connection to it. So, changes to the level or
+	/// channel of a logger do not affect its descendants. This greatly simplifies the
+	/// implementation of the framework and is no real restriction, because almost always
+	/// levels and channels are set up at application startup and never changed afterwards.
+	/// Nevertheless, there are methods to simultaneously change the level and channel of
+	/// all loggers in a certain hierarchy.
 	///
 	/// There are also convenience macros available that wrap the actual
 	/// logging statement into a check whether the Logger's log level
@@ -74,33 +73,35 @@ class Foundation_API Logger: public Channel
 	/// are used. The macros also add the source file path and line
 	/// number into the log message so that it is available to formatters.
 	/// Variants of these macros that allow message formatting with Poco::format()
-	/// are also available. Up to four arguments are supported.
+	/// are also available.
 	///
 	/// Examples:
 	///     poco_warning(logger, "This is a warning");
-	///     poco_information_f2(logger, "An informational message with args: %d, %d", 1, 2);
+	///     poco_information_f(logger, "An informational message with args: %d, %d", 1, 2);
 {
 public:
+	using Ptr = AutoPtr<Logger>;
+
 	const std::string& name() const;
 		/// Returns the name of the logger, which is set as the
 		/// message source on all messages created by the logger.
 
-	void setChannel(Channel* pChannel);
+	void setChannel(Channel::Ptr pChannel);
 		/// Attaches the given Channel to the Logger.
-		
-	Channel* getChannel() const;
+
+	Channel::Ptr getChannel() const;
 		/// Returns the Channel attached to the logger.
-		
+
 	void setLevel(int level);
 		/// Sets the Logger's log level.
 		///
 		/// See Message::Priority for valid log levels.
 		/// Setting the log level to zero turns off
 		/// logging for that Logger.
-		
+
 	int getLevel() const;
 		/// Returns the Logger's log level.
-		
+
 	void setLevel(const std::string& level);
 		/// Sets the Logger's log level using a symbolic value.
 		///
@@ -125,17 +126,17 @@ public:
 	void log(const Message& msg);
 		/// Logs the given message if its priority is
 		/// greater than or equal to the Logger's log level.
-		
+
 	void log(const Exception& exc);
-		/// Logs the given exception with priority PRIO_ERROR.	
+		/// Logs the given exception with priority PRIO_ERROR.
 
 	void log(const Exception& exc, const char* file, int line);
-		/// Logs the given exception with priority PRIO_ERROR.	
+		/// Logs the given exception with priority PRIO_ERROR.
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
-		
+		/// internally for performance reasons.
+
 	void fatal(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_FATAL,
 		/// creates a Message with priority PRIO_FATAL
@@ -150,18 +151,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void fatal(const std::string& fmt, const Any& value1);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void fatal(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
+	}
 
 	void critical(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_CRITICAL,
@@ -177,18 +173,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void critical(const std::string& fmt, const Any& value1);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void critical(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
+	}
 
 	void error(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_ERROR,
@@ -204,18 +195,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void error(const std::string& fmt, const Any& value1);
-	void error(const std::string& fmt, const Any& value1, const Any& value2);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void error(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
+	}
 
 	void warning(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_WARNING,
@@ -231,18 +217,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void warning(const std::string& fmt, const Any& value1);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void warning(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
+	}
 
 	void notice(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_NOTICE,
@@ -258,18 +239,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void notice(const std::string& fmt, const Any& value1);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void notice(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
+	}
 
 	void information(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_INFORMATION,
@@ -285,18 +261,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void information(const std::string& fmt, const Any& value1);
-	void information(const std::string& fmt, const Any& value1, const Any& value2);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void information(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
+	}
 
 	void debug(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_DEBUG,
@@ -312,18 +283,13 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void debug(const std::string& fmt, const Any& value1);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void debug(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
+	}
 
 	void trace(const std::string& msg);
 		/// If the Logger's log level is at least PRIO_TRACE,
@@ -339,34 +305,29 @@ public:
 		///
 		/// File must be a static string, such as the value of
 		/// the __FILE__ macro. The string is not copied
-		/// internally for performance reasons.	
+		/// internally for performance reasons.
 
-	void trace(const std::string& fmt, const Any& value1);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9);
-	void trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10);
+	template <typename T, typename... Args>
+	void trace(const std::string& fmt, T arg1, Args&&... args)
+	{
+		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
+	}
 
 	void dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio = Message::PRIO_DEBUG);
 		/// Logs the given message, followed by the data in buffer.
 		///
 		/// The data in buffer is written in canonical hex+ASCII form:
-		/// Offset (4 bytes) in hexadecimal, followed by sixteen 
+		/// Offset (4 bytes) in hexadecimal, followed by sixteen
 		/// space-separated, two column, hexadecimal bytes,
 		/// followed by the same sixteen bytes as ASCII characters.
 		/// For bytes outside the range 32 .. 127, a dot is printed.
 
 	bool is(int level) const;
 		/// Returns true if at least the given log level is set.
-		
+
 	bool fatal() const;
 		/// Returns true if the log level is at least PRIO_FATAL.
-		
+
 	bool critical() const;
 		/// Returns true if the log level is at least PRIO_CRITICAL.
 
@@ -389,34 +350,34 @@ public:
 		/// Returns true if the log level is at least PRIO_TRACE.
 
 	static std::string format(const std::string& fmt, const std::string& arg);
-		/// Replaces all occurences of $0 in fmt with the string given in arg and
+		/// Replaces all occurrences of $0 in fmt with the string given in arg and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
-		
+
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1);
-		/// Replaces all occurences of $<n> in fmt with the string given in arg<n> and
+		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
-	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2);	
-		/// Replaces all occurences of $<n> in fmt with the string given in arg<n> and
+	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2);
+		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
-	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2, const std::string& arg3);	
-		/// Replaces all occurences of $<n> in fmt with the string given in arg<n> and
+	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2, const std::string& arg3);
+		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
 	static void formatDump(std::string& message, const void* buffer, std::size_t length);
 		/// Creates a hex-dump of the given buffer and appends it to the
 		/// given message string.
-		
+
 	static void setLevel(const std::string& name, int level);
 		/// Sets the given log level on all loggers that are
 		/// descendants of the Logger with the given name.
-		
-	static void setChannel(const std::string& name, Channel* pChannel);
+
+	static void setChannel(const std::string& name, Channel::Ptr pChannel);
 		/// Attaches the given Channel to all loggers that are
 		/// descendants of the Logger with the given name.
 
@@ -438,35 +399,35 @@ public:
 		/// probably use get() instead.
 		/// The only time this method should be used is during
 		/// program initialization, when only one thread is running.
-		
-	static Logger& create(const std::string& name, Channel* pChannel, int level = Message::PRIO_INFORMATION);
+
+	static Logger& create(const std::string& name, Channel::Ptr pChannel, int level = Message::PRIO_INFORMATION);
 		/// Creates and returns a reference to a Logger with the
 		/// given name. The Logger's Channel and log level as set as
 		/// specified.
-		
+
 	static Logger& root();
 		/// Returns a reference to the root logger, which is the ultimate
 		/// ancestor of all Loggers.
-		
-	static Logger* has(const std::string& name);
+
+	static Ptr has(const std::string& name);
 		/// Returns a pointer to the Logger with the given name if it
-		/// exists, or a null pointer otherwse.
-		
+		/// exists, or a null pointer otherwise.
+
 	static void destroy(const std::string& name);
 		/// Destroys the logger with the specified name. Does nothing
 		/// if the logger is not found.
 		///
 		/// After a logger has been destroyed, all references to it
-		/// become invalid.	
-		
+		/// become invalid.
+
 	static void shutdown();
 		/// Shuts down the logging framework and releases all
 		/// Loggers.
-		
+
 	static void names(std::vector<std::string>& names);
 		/// Fills the given vector with the names
 		/// of all currently defined loggers.
-		
+
 	static int parseLevel(const std::string& level);
 		/// Parses a symbolic log level from a string and
 		/// returns the resulting numeric level.
@@ -483,33 +444,36 @@ public:
 		///   - trace
 		///
 		/// The level is not case sensitive.
-		
-	static const std::string ROOT; /// The name of the root logger ("").	
-		
-protected:
-	typedef std::map<std::string, Logger*> LoggerMap;
 
-	Logger(const std::string& name, Channel* pChannel, int level);
+	static const std::string ROOT; /// The name of the root logger ("").
+
+protected:
+	typedef std::map<std::string, Ptr> LoggerMap;
+
+	Logger(const std::string& name, Channel::Ptr pChannel, int level);
 	~Logger();
-	
+
 	void log(const std::string& text, Message::Priority prio);
 	void log(const std::string& text, Message::Priority prio, const char* file, int line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
 	static Logger& parent(const std::string& name);
-	static void add(Logger* pLogger);
-	static Logger* find(const std::string& name);
+	static void add(Ptr pLogger);
+	static Ptr find(const std::string& name);
 
 private:
+	typedef std::unique_ptr<LoggerMap> LoggerMapPtr;
+
 	Logger();
 	Logger(const Logger&);
 	Logger& operator = (const Logger&);
-	
+
 	std::string _name;
-	Channel*    _pChannel;
+	Channel::Ptr _pChannel;
 	int         _level;
 
-	static LoggerMap* _pLoggerMap;
+	// definitions in Foundation.cpp
+	static LoggerMapPtr _pLoggerMap;
 	static Mutex      _mapMtx;
 };
 
@@ -532,6 +496,9 @@ private:
 #define poco_fatal_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
+#define poco_fatal_f(logger, fmt, ...) \
+	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+
 #define poco_critical(logger, msg) \
 	if ((logger).critical()) (logger).critical(msg, __FILE__, __LINE__); else (void) 0
 
@@ -546,6 +513,9 @@ private:
 
 #define poco_critical_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+
+#define poco_critical_f(logger, fmt, ...) \
+	if ((logger).critical()) (logger).critical(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
 
 #define poco_error(logger, msg) \
 	if ((logger).error()) (logger).error(msg, __FILE__, __LINE__); else (void) 0
@@ -562,6 +532,9 @@ private:
 #define poco_error_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
+#define poco_error_f(logger, fmt, ...) \
+	if ((logger).error()) (logger).error(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+
 #define poco_warning(logger, msg) \
 	if ((logger).warning()) (logger).warning(msg, __FILE__, __LINE__); else (void) 0
 
@@ -576,7 +549,10 @@ private:
 
 #define poco_warning_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
-	
+
+#define poco_warning_f(logger, fmt, ...) \
+	if ((logger).warning()) (logger).warning(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+
 #define poco_notice(logger, msg) \
 	if ((logger).notice()) (logger).notice(msg, __FILE__, __LINE__); else (void) 0
 
@@ -592,6 +568,9 @@ private:
 #define poco_notice_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
+#define poco_notice_f(logger, fmt, ...) \
+	if ((logger).notice()) (logger).notice(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+
 #define poco_information(logger, msg) \
 	if ((logger).information()) (logger).information(msg, __FILE__, __LINE__); else (void) 0
 
@@ -606,6 +585,9 @@ private:
 
 #define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+
+#define poco_information_f(logger, fmt, ...) \
+	if ((logger).information()) (logger).information(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
 
 #if defined(_DEBUG) || defined(POCO_LOG_DEBUG)
 	#define poco_debug(logger, msg) \
@@ -623,6 +605,9 @@ private:
 	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
 
+	#define poco_debug_f(logger, fmt, ...) \
+		if ((logger).debug()) (logger).debug(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+
 	#define poco_trace(logger, msg) \
 		if ((logger).trace()) (logger).trace(msg, __FILE__, __LINE__); else (void) 0
 
@@ -637,17 +622,22 @@ private:
 
 	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
 		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+
+	#define poco_trace_f(logger, fmt, ...) \
+		if ((logger).trace()) (logger).trace(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
 #else
 	#define poco_debug(logger, msg)
 	#define poco_debug_f1(logger, fmt, arg1)
 	#define poco_debug_f2(logger, fmt, arg1, arg2)
 	#define poco_debug_f3(logger, fmt, arg1, arg2, arg3)
 	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4)
+	#define poco_debug_f(logger, fmt, ...)
 	#define poco_trace(logger, msg)
 	#define poco_trace_f1(logger, fmt, arg1)
 	#define poco_trace_f2(logger, fmt, arg1, arg2)
 	#define poco_trace_f3(logger, fmt, arg1, arg2, arg3)
 	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4)
+	#define poco_trace_f(logger, fmt, ...)
 #endif
 
 
@@ -696,65 +686,6 @@ inline void Logger::fatal(const std::string& msg, const char* file, int line)
 }
 
 
-inline void Logger::fatal(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_FATAL);
-}
-
-
-inline void Logger::fatal(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_FATAL);
-}
-
 
 inline void Logger::critical(const std::string& msg)
 {
@@ -765,66 +696,6 @@ inline void Logger::critical(const std::string& msg)
 inline void Logger::critical(const std::string& msg, const char* file, int line)
 {
 	log(msg, Message::PRIO_CRITICAL, file, line);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_CRITICAL);
-}
-
-
-inline void Logger::critical(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_CRITICAL);
 }
 
 
@@ -840,66 +711,6 @@ inline void Logger::error(const std::string& msg, const char* file, int line)
 }
 
 
-inline void Logger::error(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_ERROR);
-}
-
-
-inline void Logger::error(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_ERROR);
-}
-
-
 inline void Logger::warning(const std::string& msg)
 {
 	log(msg, Message::PRIO_WARNING);
@@ -909,66 +720,6 @@ inline void Logger::warning(const std::string& msg)
 inline void Logger::warning(const std::string& msg, const char* file, int line)
 {
 	log(msg, Message::PRIO_WARNING, file, line);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_WARNING);
-}
-
-
-inline void Logger::warning(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_WARNING);
 }
 
 
@@ -984,66 +735,6 @@ inline void Logger::notice(const std::string& msg, const char* file, int line)
 }
 
 
-inline void Logger::notice(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_NOTICE);
-}
-
-
-inline void Logger::notice(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_NOTICE);
-}
-
-
 inline void Logger::information(const std::string& msg)
 {
 	log(msg, Message::PRIO_INFORMATION);
@@ -1053,66 +744,6 @@ inline void Logger::information(const std::string& msg)
 inline void Logger::information(const std::string& msg, const char* file, int line)
 {
 	log(msg, Message::PRIO_INFORMATION, file, line);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_INFORMATION);
-}
-
-
-inline void Logger::information(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_INFORMATION);
 }
 
 
@@ -1128,66 +759,6 @@ inline void Logger::debug(const std::string& msg, const char* file, int line)
 }
 
 
-inline void Logger::debug(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_DEBUG);
-}
-
-
-inline void Logger::debug(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_DEBUG);
-}
-
-
 inline void Logger::trace(const std::string& msg)
 {
 	log(msg, Message::PRIO_TRACE);
@@ -1197,66 +768,6 @@ inline void Logger::trace(const std::string& msg)
 inline void Logger::trace(const std::string& msg, const char* file, int line)
 {
 	log(msg, Message::PRIO_TRACE, file, line);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1)
-{
-	log(Poco::format(fmt, value1), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2)
-{
-	log(Poco::format(fmt, value1, value2), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3)
-{
-	log(Poco::format(fmt, value1, value2, value3), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9), Message::PRIO_TRACE);
-}
-
-
-inline void Logger::trace(const std::string& fmt, const Any& value1, const Any& value2, const Any& value3, const Any& value4, const Any& value5, const Any& value6, const Any& value7, const Any& value8, const Any& value9, const Any& value10)
-{
-	log(Poco::format(fmt, value1, value2, value3, value4, value5, value6, value7, value8, value9, value10), Message::PRIO_TRACE);
 }
 
 

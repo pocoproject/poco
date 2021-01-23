@@ -1,8 +1,6 @@
 //
 // SMTPClientSessionTest.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/SMTPClientSessionTest.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -42,13 +40,13 @@ void SMTPClientSessionTest::testLoginEHLO()
 	server.addResponse("220 localhost SMTP ready");
 	server.addResponse("250 Hello localhost");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 	std::string cmd = server.popCommand();
-	assert (cmd == "EHLO localhost");
+	assertTrue (cmd == "EHLO localhost");
 	session.close();
 	cmd = server.popCommand();
-	assert (cmd == "QUIT");
+	assertTrue (cmd == "QUIT");
 }
 
 
@@ -59,15 +57,15 @@ void SMTPClientSessionTest::testLoginHELO()
 	server.addResponse("500 EHLO not understood");
 	server.addResponse("250 Hello localhost");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 	std::string cmd = server.popCommand();
-	assert (cmd == "EHLO localhost");
+	assertTrue (cmd == "EHLO localhost");
 	cmd = server.popCommand();
-	assert (cmd == "HELO localhost");
+	assertTrue (cmd == "HELO localhost");
 	session.close();
 	cmd = server.popCommand();
-	assert (cmd == "QUIT");
+	assertTrue (cmd == "QUIT");
 }
 
 
@@ -76,7 +74,7 @@ void SMTPClientSessionTest::testLoginFailed()
 	DialogServer server;
 	server.addResponse("500 No SMTP service here");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	try
 	{
 		session.login("localhost");
@@ -99,7 +97,7 @@ void SMTPClientSessionTest::testSend()
 	server.addResponse("354 Send data");
 	server.addResponse("250 OK");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;
@@ -110,31 +108,31 @@ void SMTPClientSessionTest::testSend()
 	server.clearCommands();
 	session.sendMessage(message);
 	std::string cmd = server.popCommandWait();
-	assert (cmd == "MAIL FROM: <john.doe@no.where>");
+	assertTrue (cmd == "MAIL FROM: <john.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <jane.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <jane.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "DATA");
+	assertTrue (cmd == "DATA");
 	cmd = server.popCommandWait();
-	assert (cmd.substr(0, 4) == "Date");
+	assertTrue (cmd.substr(0, 4) == "Date");
 	cmd = server.popCommandWait();
-	assert (cmd == "Content-Type: text/plain");
+	assertTrue (cmd == "Content-Type: text/plain");
 	cmd = server.popCommandWait();
-	assert (cmd == "From: john.doe@no.where");
+	assertTrue (cmd == "From: john.doe@no.where");
 	cmd = server.popCommandWait();
-	assert (cmd == "Subject: Test Message");
+	assertTrue (cmd == "Subject: Test Message");
 	cmd = server.popCommandWait();
-	assert (cmd == "Content-Transfer-Encoding: quoted-printable");
+	assertTrue (cmd == "Content-Transfer-Encoding: quoted-printable");
 	cmd = server.popCommandWait();
-	assert (cmd == "To: Jane Doe <jane.doe@no.where>");
+	assertTrue (cmd == "To: Jane Doe <jane.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "Hello");
+	assertTrue (cmd == "Hello");
 	cmd = server.popCommandWait();
-	assert (cmd == "blah blah");
+	assertTrue (cmd == "blah blah");
 	cmd = server.popCommandWait();
-	assert (cmd == "John");
+	assertTrue (cmd == "John");
 	cmd = server.popCommandWait();
-	assert (cmd == ".");
+	assertTrue (cmd == ".");
 
 	session.close();
 }
@@ -153,7 +151,7 @@ void SMTPClientSessionTest::testSendMultiRecipient()
 	server.addResponse("250 OK");
 	server.addResponse("250 OK");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;
@@ -169,37 +167,37 @@ void SMTPClientSessionTest::testSendMultiRecipient()
 	server.clearCommands();
 	session.sendMessage(message);
 	std::string cmd = server.popCommandWait();
-	assert (cmd == "MAIL FROM: <john.doe@no.where>");
+	assertTrue (cmd == "MAIL FROM: <john.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <jane.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <jane.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <jack.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <jack.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <joe.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <joe.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "DATA");
+	assertTrue (cmd == "DATA");
 	cmd = server.popCommandWait();
-	assert (cmd.substr(0, 4) == "Date");
+	assertTrue (cmd.substr(0, 4) == "Date");
 	cmd = server.popCommandWait();
-	assert (cmd == "Content-Type: text/plain");
+	assertTrue (cmd == "Content-Type: text/plain");
 	cmd = server.popCommandWait();
-	assert (cmd == "From: john.doe@no.where");
+	assertTrue (cmd == "From: john.doe@no.where");
 	cmd = server.popCommandWait();
-	assert (cmd == "Subject: Test Message");
+	assertTrue (cmd == "Subject: Test Message");
 	cmd = server.popCommandWait();
-	assert (cmd == "Content-Transfer-Encoding: quoted-printable");
+	assertTrue (cmd == "Content-Transfer-Encoding: quoted-printable");
 	cmd = server.popCommandWait();
-	assert (cmd == "To: Jane Doe <jane.doe@no.where>");
+	assertTrue (cmd == "To: Jane Doe <jane.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "CC: Jack Doe <jack.doe@no.where>");
+	assertTrue (cmd == "CC: Jack Doe <jack.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "Hello");
+	assertTrue (cmd == "Hello");
 	cmd = server.popCommandWait();
-	assert (cmd == "blah blah");
+	assertTrue (cmd == "blah blah");
 	cmd = server.popCommandWait();
-	assert (cmd == "John");
+	assertTrue (cmd == "John");
 	cmd = server.popCommandWait();
-	assert (cmd == ".");
+	assertTrue (cmd == ".");
 
 	session.close();
 }
@@ -218,7 +216,7 @@ void SMTPClientSessionTest::testMultiSeparateRecipient()
 	server.addResponse("250 OK");
 	server.addResponse("250 OK");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;
@@ -239,37 +237,37 @@ void SMTPClientSessionTest::testMultiSeparateRecipient()
 	server.clearCommands();
 	session.sendMessage(message, recipients);
 	std::string cmd = server.popCommandWait();
-	assert (cmd == "MAIL FROM: <john.doe@no.where>");
+	assertTrue (cmd == "MAIL FROM: <john.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <jill.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <jill.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <josh.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <josh.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "RCPT TO: <jake.doe@no.where>");
+	assertTrue (cmd == "RCPT TO: <jake.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "DATA");
+	assertTrue (cmd == "DATA");
 	cmd = server.popCommandWait();
-	assert (cmd.substr(0, 4) == "Date");
+	assertTrue (cmd.substr(0, 4) == "Date");
 	cmd = server.popCommandWait();
-	assert (cmd == "Content-Type: text/plain");
+	assertTrue (cmd == "Content-Type: text/plain");
 	cmd = server.popCommandWait();
-	assert (cmd == "From: john.doe@no.where");
+	assertTrue (cmd == "From: john.doe@no.where");
 	cmd = server.popCommandWait();
-	assert (cmd == "Subject: Test Message");
+	assertTrue (cmd == "Subject: Test Message");
 	cmd = server.popCommandWait();
-	assert (cmd == "Content-Transfer-Encoding: quoted-printable");
+	assertTrue (cmd == "Content-Transfer-Encoding: quoted-printable");
 	cmd = server.popCommandWait();
-	assert (cmd == "To: Jane Doe <jane.doe@no.where>");
+	assertTrue (cmd == "To: Jane Doe <jane.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "CC: Jack Doe <jack.doe@no.where>, Joe Doe <joe.doe@no.where>");
+	assertTrue (cmd == "CC: Jack Doe <jack.doe@no.where>, Joe Doe <joe.doe@no.where>");
 	cmd = server.popCommandWait();
-	assert (cmd == "Hello");
+	assertTrue (cmd == "Hello");
 	cmd = server.popCommandWait();
-	assert (cmd == "blah blah");
+	assertTrue (cmd == "blah blah");
 	cmd = server.popCommandWait();
-	assert (cmd == "John");
+	assertTrue (cmd == "John");
 	cmd = server.popCommandWait();
-	assert (cmd == ".");
+	assertTrue (cmd == ".");
 
 	session.close();
 }
@@ -285,7 +283,7 @@ void SMTPClientSessionTest::testSendFailed()
 	server.addResponse("354 Send data");
 	server.addResponse("500 Error");
 	server.addResponse("221 Bye");
-	SMTPClientSession session("localhost", server.port());
+	SMTPClientSession session("127.0.0.1", server.port());
 	session.login("localhost");
 
 	MailMessage message;

@@ -1,8 +1,6 @@
 //
 // Base32Decoder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Base32Decoder.cpp#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  Base32
@@ -48,7 +46,7 @@ Base32DecoderBuf::Base32DecoderBuf(std::istream& istr):
 		}
 		for (unsigned i = 0; i < sizeof(Base32EncoderBuf::OUT_ENCODING); i++)
 		{
-			IN_ENCODING[Base32EncoderBuf::OUT_ENCODING[i]] = i;
+			IN_ENCODING[Base32EncoderBuf::OUT_ENCODING[i]] = static_cast<UInt8>(i);
 		}
 		IN_ENCODING[static_cast<unsigned char>('=')] = '\0';
 		IN_ENCODING_INIT = true;

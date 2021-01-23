@@ -1,8 +1,6 @@
 //
 // Utility.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Utility.h#1 $
-//
 // Library: CppParser
 // Package: CppParser
 // Module:  Utility

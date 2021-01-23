@@ -1,8 +1,6 @@
 //
 // Parameter.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Parameter.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Parameter
@@ -30,7 +28,7 @@ namespace CppParser {
 int Parameter::_count(0);
 
 
-Parameter::Parameter(const std::string& decl, Function* pFunction):
+Parameter::Parameter(const std::string& decl, Function* /*pFunction*/):
 	Decl(handleDecl(decl), 0), // handle init values
 	_type(),
 	_isRef(false),
@@ -110,7 +108,12 @@ bool Parameter::vectorType(const std::string& type, NameSpace* pNS)
 			if (pSym->kind() == Symbol::SYM_TYPEDEF)
 			{
 				TypeDef* pType = static_cast<TypeDef*>(pSym);
-				ret = pType->declaration().find("vector") != std::string::npos;
+				ret = pType->baseType().find("vector") != std::string::npos;
+			}
+			else if (pSym->kind() == Symbol::SYM_TYPEALIAS)
+			{
+				TypeAlias* pType = static_cast<TypeAlias*>(pSym);
+				ret = pType->baseType().find("vector") != std::string::npos;
 			}
 		}
 	}

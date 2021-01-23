@@ -1,8 +1,6 @@
 //
 // DateTime.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTime.cpp#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTime
@@ -18,22 +16,10 @@
 #include "Poco/Timespan.h"
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 
 
 namespace Poco {
-
-
-inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
-{
-	double utcDays = double(utcTime)/864000000000.0;
-	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
-}
-
-
-inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
-{
-	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
-}
 
 
 DateTime::DateTime()
@@ -45,6 +31,27 @@ DateTime::DateTime()
 }
 
 
+DateTime::DateTime(const tm& tmStruct):
+	_year(tmStruct.tm_year + 1900),
+	_month(tmStruct.tm_mon + 1),
+	_day(tmStruct.tm_mday),
+	_hour(tmStruct.tm_hour),
+	_minute(tmStruct.tm_min),
+	_second(tmStruct.tm_sec),
+	_millisecond(0),
+	_microsecond(0)
+{
+	poco_assert (_year >= 0 && _year <= 9999);
+	poco_assert (_month >= 1 && _month <= 12);
+	poco_assert (_day >= 1 && _day <= daysOfMonth(_year, _month));
+	poco_assert (_hour >= 0 && _hour <= 23);
+	poco_assert (_minute >= 0 && _minute <= 59);
+	poco_assert (_second >= 0 && _second <= 60);
+
+	_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) + 10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS);
+}
+
+
 DateTime::DateTime(const Timestamp& timestamp):
 	_utcTime(timestamp.utcTime())
 {
@@ -52,7 +59,7 @@ DateTime::DateTime(const Timestamp& timestamp):
 	computeDaytime();
 }
 
-	
+
 DateTime::DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond):
 	_year(year),
 	_month(month),
@@ -68,7 +75,7 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 	poco_assert (day >= 1 && day <= daysOfMonth(year, month));
 	poco_assert (hour >= 0 && hour <= 23);
 	poco_assert (minute >= 0 && minute <= 59);
-	poco_assert (second >= 0 && second <= 59);
+	poco_assert (second >= 0 && second <= 60); // allow leap seconds
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
 	
@@ -152,7 +159,7 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 	poco_assert (day >= 1 && day <= daysOfMonth(year, month));
 	poco_assert (hour >= 0 && hour <= 23);
 	poco_assert (minute >= 0 && minute <= 59);
-	poco_assert (second >= 0 && second <= 59);
+	poco_assert (second >= 0 && second <= 60); // allow leap seconds
 	poco_assert (millisecond >= 0 && millisecond <= 999);
 	poco_assert (microsecond >= 0 && microsecond <= 999);
 
@@ -221,7 +228,7 @@ bool DateTime::isValid(int year, int month, int day, int hour, int minute, int s
 		(day >= 1 && day <= daysOfMonth(year, month)) &&
 		(hour >= 0 && hour <= 23) &&
 		(minute >= 0 && minute <= 59) &&
-		(second >= 0 && second <= 59) &&
+		(second >= 0 && second <= 60) &&
 		(millisecond >= 0 && millisecond <= 999) &&
 		(microsecond >= 0 && microsecond <= 999);
 }
@@ -283,6 +290,28 @@ DateTime& DateTime::operator -= (const Timespan& span)
 	computeGregorian(julianDay());
 	computeDaytime();
 	return *this;
+}
+
+
+tm DateTime::makeTM() const
+{
+	tm tmStruct;
+
+	tmStruct.tm_sec = _second;
+	tmStruct.tm_min = _minute;
+	tmStruct.tm_hour = _hour;
+	tmStruct.tm_mday = _day;
+	poco_assert (_month > 0);
+	tmStruct.tm_mon = _month - 1;
+	poco_assert (_year >= 1900);
+	tmStruct.tm_year = _year - 1900;
+	tmStruct.tm_wday = dayOfWeek();
+	int doy = dayOfYear();
+	poco_assert (_year >0);
+	tmStruct.tm_yday = doy - 1;
+	tmStruct.tm_isdst = -1;
+
+	return tmStruct;
 }
 
 

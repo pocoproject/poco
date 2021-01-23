@@ -1,8 +1,6 @@
 //
 // ChildNodesTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/ChildNodesTest.h#1 $
-//
 // Definition of the ChildNodesTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

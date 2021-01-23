@@ -1,8 +1,6 @@
 //
 // ODBCMySQLTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCMySQLTest.h#4 $
-//
 // Definition of the ODBCMySQLTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -73,6 +71,7 @@ private:
 	static std::string _dsn;
 	static std::string _uid;
 	static std::string _pwd;
+	static std::string _db;
 	static std::string _connectString;
 };
 

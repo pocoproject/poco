@@ -1,8 +1,6 @@
 //
 // SyslogChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SyslogChannel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  SyslogChannel
@@ -31,6 +29,8 @@ class Foundation_API SyslogChannel: public Channel
 	/// This Unix-only channel works with the Unix syslog service.
 {
 public:
+	using Ptr = AutoPtr<SyslogChannel>;
+
 	enum Option
 	{
 		SYSLOG_PID    = 0x01, /// log the pid with each message

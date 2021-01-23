@@ -1,8 +1,6 @@
 //
 // HostEntry.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HostEntry.h#4 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  HostEntry
@@ -36,8 +34,8 @@ class Net_API HostEntry
 	/// of IP addresses.
 {
 public:
-	typedef std::vector<std::string> AliasList;
-	typedef std::vector<IPAddress>   AddressList;
+	using AliasList = std::vector<std::string>;
+	using AddressList = std::vector<IPAddress>;
 	
 	HostEntry();
 		/// Creates an empty HostEntry.

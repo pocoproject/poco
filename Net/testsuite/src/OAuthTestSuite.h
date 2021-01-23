@@ -1,8 +1,6 @@
 //
 // OAuthTestSuite.h
 //
-// $Id$
-//
 // Definition of the OAuthTestSuite class.
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.

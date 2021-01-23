@@ -1,8 +1,6 @@
 //
 // MetaProgramming.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/MetaProgramming.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  MetaProgramming

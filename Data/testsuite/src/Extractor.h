@@ -1,8 +1,6 @@
 //
 // Extractor.h
 //
-// $Id: //poco/Main/Data/testsuite/src/Extractor.h#5 $
-//
 // Definition of the Extractor class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -64,7 +62,7 @@ public:
 	bool extract(std::size_t pos, Poco::Dynamic::Var& val);
 		/// Extracts a Var.
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 	bool extract(std::size_t pos, long& val);
 		/// Extracts a long.
 

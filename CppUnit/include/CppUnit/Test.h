@@ -1,8 +1,6 @@
 //
 // Test.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/Test.h#1 $
-//
 
 
 #ifndef CppUnit_Test_INCLUDED
@@ -11,6 +9,7 @@
 
 #include "CppUnit/CppUnit.h"
 #include <string>
+#include <vector>
 
 
 namespace CppUnit {
@@ -27,10 +26,24 @@ class TestResult;
 class CppUnit_API Test
 {
 public:
+	enum Type {
+		Suite, // Only set on CppUnit::TestSuite
+		Normal, // Default TestCase always run
+		Long // Such TestCase will only be run if the `-long` command line argument is set
+	};
+
+public:
 	virtual ~Test() = 0;
 	virtual void run(TestResult* result) = 0;
-	virtual int countTestCases() = 0;
-	virtual std::string toString() = 0;
+	virtual int countTestCases() const = 0;
+	virtual std::string toString() const = 0;
+	virtual Test::Type getType() const = 0;
+
+	void addSetup(const std::vector<std::string>& setup);
+	const std::vector<std::string>& setup() const;
+
+private:
+	std::vector<std::string>	_setup;
 };
 
 
@@ -46,16 +59,35 @@ inline void Test::run(TestResult *result)
 
 
 // Counts the number of test cases that will be run by this test.
-inline int Test::countTestCases()
+inline int Test::countTestCases() const
 {
 	return 0; 
 }
 
 
 // Returns the name of the test instance.
-inline std::string Test::toString()
+inline std::string Test::toString() const
 {
 	return "";
+}
+
+
+// Returns the type of the test, see Test::Type
+inline Test::Type Test::getType() const
+{
+	return Test::Normal;
+}
+
+
+inline void Test::addSetup(const std::vector<std::string>& setup)
+{
+	_setup = setup;
+}
+
+
+inline const std::vector<std::string>& Test::setup() const
+{
+	return _setup;
 }
 
 

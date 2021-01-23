@@ -1,8 +1,6 @@
 //
 // RSADigestEngine.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/RSADigestEngine.h#1 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSADigestEngine
@@ -86,7 +84,7 @@ public:
 
 	const DigestEngine::Digest& signature();
 		/// Signs the digest using the RSA algorithm
-		/// and the private key (teh first time it's
+		/// and the private key (the first time it's
 		/// called) and returns the result.
 		///
 		/// Can be called multiple times.

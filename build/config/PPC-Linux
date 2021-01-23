@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/PPC-Linux#2 $
-#
 # PPC-Linux
 #
 # Make settings for Cross compiling in to unknown, PPC-based embedded Linux
@@ -40,7 +38,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -Isrc
+CFLAGS          = -std=c99 -Isrc
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        =

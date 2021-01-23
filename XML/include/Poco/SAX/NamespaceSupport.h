@@ -1,8 +1,6 @@
 //
 // NamespaceSupport.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/NamespaceSupport.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX
@@ -42,7 +40,7 @@ class XML_API NamespaceSupport
 	/// must be invoked between each session.
 {
 public:
-	typedef std::set<XMLString> PrefixSet;
+	using PrefixSet = std::set<XMLString>;
 
 	NamespaceSupport();
 		/// Creates a NamespaceSupport object.

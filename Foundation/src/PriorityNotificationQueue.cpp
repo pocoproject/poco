@@ -1,8 +1,6 @@
 //
 // PriorityNotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/src/PriorityNotificationQueue.cpp#1 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  PriorityNotificationQueue
@@ -133,9 +131,9 @@ void PriorityNotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void PriorityNotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+	for (auto p: _waitQueue)
 	{
-		(*it)->nfAvailable.set();
+		p->nfAvailable.set();
 	}
 	_waitQueue.clear();
 }

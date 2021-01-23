@@ -1,8 +1,6 @@
 //
 // ICMPClient.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/ICMPClient.h#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPClient
@@ -46,7 +44,7 @@ public:
 	mutable Poco::BasicEvent<ICMPEventArgs> pingError;
 	mutable Poco::BasicEvent<ICMPEventArgs> pingEnd;
 
-	explicit ICMPClient(IPAddress::Family family);
+	explicit ICMPClient(SocketAddress::Family family, int dataSize = 48, int ttl = 128, int timeout = 50000);
 		/// Creates an ICMP client.
 
 	~ICMPClient();
@@ -64,20 +62,32 @@ public:
 		/// 
 		/// Returns the number of valid replies.
 
-	static int ping(SocketAddress& address, IPAddress::Family family, int repeat = 1);
+	static int ping(SocketAddress& address,
+		SocketAddress::Family family,
+		int repeat = 1,
+		int dataSize = 48,
+		int ttl = 128,
+		int timeout = 100000);
 		/// Pings the specified address [repeat] times.
 		/// Notifications are not posted for events.
 		/// 
 		/// Returns the number of valid replies.
 
-	static int pingIPv4(const std::string& address, int repeat = 1);
+	static int pingIPv4(const std::string& address,
+		int repeat = 1,
+		int dataSize = 48,
+		int ttl = 128,
+		int timeout = 100000);
 		/// Calls ICMPClient::ping(SocketAddress&, int) and
 		/// returns the result.
 		/// 
 		/// Returns the number of valid replies.
 
 private:
-	mutable IPAddress::Family _family;
+	mutable SocketAddress::Family _family;
+	int _dataSize;
+	int _ttl;
+	int _timeout;
 };
 
 

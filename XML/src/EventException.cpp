@@ -1,8 +1,6 @@
 //
 // EventException.cpp
 //
-// $Id: //poco/1.4/XML/src/EventException.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMEvents
@@ -34,7 +32,7 @@ EventException::EventException(const EventException& exc):
 }
 
 
-EventException::~EventException() throw()
+EventException::~EventException() noexcept
 {
 }
 
@@ -46,13 +44,13 @@ EventException& EventException::operator = (const EventException& exc)
 }
 
 
-const char* EventException::name() const throw()
+const char* EventException::name() const noexcept
 {
 	return "EventException";
 }
 
 
-const char* EventException::className() const throw()
+const char* EventException::className() const noexcept
 {
 	return typeid(*this).name();
 }

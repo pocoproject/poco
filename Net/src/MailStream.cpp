@@ -1,8 +1,6 @@
 //
 // MailStream.cpp
 //
-// $Id: //poco/1.4/Net/src/MailStream.cpp#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  MailStream

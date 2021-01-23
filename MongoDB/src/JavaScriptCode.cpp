@@ -1,13 +1,9 @@
 //
 // JavaScriptCode.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  JavaScriptCode
-//
-// Implementation of the JavaScriptCode class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.

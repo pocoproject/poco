@@ -1,8 +1,6 @@
 //
 // DocWriter.h
 //
-// $Id: //poco/1.4/PocoDoc/src/DocWriter.h#2 $
-//
 // Definition of the DocWriter class.
 //
 // Copyright (c) 2005-2007, Applied Informatics Software Engineering GmbH.
@@ -157,7 +155,9 @@ protected:
 	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeClassSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
+	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
+	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType);
 	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace);
 	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum);
@@ -187,10 +187,12 @@ protected:
 	static const std::string& tr(const std::string& id);
 	static void loadStrings(const std::string& language);
 	static void loadString(const std::string& id, const std::string& def, const std::string& language);
+	static std::string projectURI(const std::string& id);
 
 	static Poco::Logger& logger();
 	
 	static const std::string RFC_URI;
+	static const std::string GITHUB_POCO_URI;
 	
 private:	
 	bool _prettifyCode;

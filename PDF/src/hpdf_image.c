@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.3 >> -- hpdf_image.c
+ * << Haru Free PDF Library >> -- hpdf_image.c
+ *
+ * URL: http://libharu.org
  *
  * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -10,7 +13,6 @@
  * in supporting documentation.
  * It is provided "as is" without express or implied warranty.
  *
- * 2006.08.12 modified.
  */
 
 #include "hpdf_conf.h"
@@ -219,6 +221,36 @@ HPDF_Image_LoadJpegImage  (HPDF_MMgr        mmgr,
     return image;
 }
 
+HPDF_Image
+HPDF_Image_LoadJpegImageFromMem  (HPDF_MMgr    mmgr,
+                            const HPDF_BYTE   *buf,
+                                  HPDF_UINT    size,
+                                  HPDF_Xref    xref)
+{
+	HPDF_Stream jpeg_data;
+	HPDF_Image image;
+
+	HPDF_PTRACE ((" HPDF_Image_LoadJpegImageFromMem\n"));
+
+	jpeg_data = HPDF_MemStream_New(mmgr,size);
+	if (!HPDF_Stream_Validate (jpeg_data)) {
+		HPDF_RaiseError (mmgr->error, HPDF_INVALID_STREAM, 0);
+		return NULL;
+	}
+
+	if (HPDF_Stream_Write (jpeg_data, buf, size) != HPDF_OK) {
+		HPDF_Stream_Free (jpeg_data);
+		return NULL;
+	}
+
+	image = HPDF_Image_LoadJpegImage(mmgr,jpeg_data,xref);
+
+	/* destroy file stream */
+	HPDF_Stream_Free (jpeg_data);
+
+	return image;
+}
+
 
 HPDF_Image
 HPDF_Image_LoadRawImage (HPDF_MMgr          mmgr,
@@ -297,12 +329,13 @@ HPDF_Image_LoadRawImageFromMem  (HPDF_MMgr          mmgr,
 {
     HPDF_Dict image;
     HPDF_STATUS ret = HPDF_OK;
-    HPDF_UINT size;
+    HPDF_UINT size=0;
 
     HPDF_PTRACE ((" HPDF_Image_LoadRawImageFromMem\n"));
 
     if (color_space != HPDF_CS_DEVICE_GRAY &&
-            color_space != HPDF_CS_DEVICE_RGB) {
+            color_space != HPDF_CS_DEVICE_RGB &&
+            color_space != HPDF_CS_DEVICE_CMYK) {
         HPDF_SetError (mmgr->error, HPDF_INVALID_COLOR_SPACE, 0);
         return NULL;
     }
@@ -323,13 +356,22 @@ HPDF_Image_LoadRawImageFromMem  (HPDF_MMgr          mmgr,
     if (ret != HPDF_OK)
         return NULL;
 
-    if (color_space == HPDF_CS_DEVICE_GRAY) {
-        size = (HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876;
-        ret = HPDF_Dict_AddName (image, "ColorSpace", COL_GRAY);
-    } else {
-        size = (HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876;
-        size *= 3;
-        ret = HPDF_Dict_AddName (image, "ColorSpace", COL_RGB);
+    switch (color_space) {
+        case HPDF_CS_DEVICE_GRAY:
+            size = (HPDF_UINT)((HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876);
+            ret = HPDF_Dict_AddName (image, "ColorSpace", COL_GRAY);
+            break;
+        case HPDF_CS_DEVICE_RGB:
+            size = (HPDF_UINT)((HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876);
+            size *= 3;
+            ret = HPDF_Dict_AddName (image, "ColorSpace", COL_RGB);
+            break;
+        case HPDF_CS_DEVICE_CMYK:
+            size = (HPDF_UINT)((HPDF_DOUBLE)width * height / (8 / bits_per_component) + 0.876);
+            size *= 4;
+            ret = HPDF_Dict_AddName (image, "ColorSpace", COL_CMYK);
+            break;
+        default:;
     }
 
     if (ret != HPDF_OK)
@@ -394,8 +436,8 @@ HPDF_Image_GetSize (HPDF_Image  image)
     height = HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
 
     if (width && height) {
-      ret.x = width->value;
-      ret.y = height->value;
+      ret.x = (HPDF_REAL)width->value;
+      ret.y = (HPDF_REAL)height->value;
     }
 
     return ret;
@@ -418,8 +460,8 @@ HPDF_Image_GetSize2 (HPDF_Image  image, HPDF_Point *size)
     height = HPDF_Dict_GetItem (image, "Height", HPDF_OCLASS_NUMBER);
 
     if (width && height) {
-      size->x = width->value;
-      size->y = height->value;
+      size->x = (HPDF_REAL)width->value;
+      size->y = (HPDF_REAL)height->value;
     }
 
     return HPDF_OK;
@@ -446,30 +488,42 @@ HPDF_Image_GetBitsPerComponent (HPDF_Image  image)
 HPDF_EXPORT(const char*)
 HPDF_Image_GetColorSpace (HPDF_Image  image)
 {
-    HPDF_Name n;
+	HPDF_Name n;
 
-    HPDF_PTRACE ((" HPDF_Image_GetColorSpace\n"));
+	HPDF_PTRACE ((" HPDF_Image_GetColorSpace\n"));
 
-    n = HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_NAME);
+	n = HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_NAME);
 
-    if (!n) {
-        HPDF_CheckError (image->error);
-        return NULL;
-    }
+	if (!n) {
+		HPDF_Array a;
 
-    return n->value;
+		HPDF_Error_Reset(image->error);
+
+		a = HPDF_Dict_GetItem (image, "ColorSpace", HPDF_OCLASS_ARRAY);
+
+		if (a) {
+			n = HPDF_Array_GetItem (a, 0, HPDF_OCLASS_NAME);
+		}
+	}
+
+	if (!n) {
+		HPDF_CheckError (image->error);
+		return NULL;
+	}
+
+	return n->value;
 }
 
 HPDF_EXPORT(HPDF_UINT)
 HPDF_Image_GetWidth  (HPDF_Image   image)
 {
-    return HPDF_Image_GetSize (image).x;
+    return (HPDF_UINT)HPDF_Image_GetSize (image).x;
 }
 
 HPDF_EXPORT(HPDF_UINT)
 HPDF_Image_GetHeight  (HPDF_Image   image)
 {
-    return HPDF_Image_GetSize (image).y;
+    return (HPDF_UINT)HPDF_Image_GetSize (image).y;
 }
 
 HPDF_STATUS
@@ -565,4 +619,46 @@ HPDF_Image_SetColorMask (HPDF_Image   image,
     return HPDF_OK;
 }
 
+HPDF_EXPORT(HPDF_STATUS)
+HPDF_Image_AddSMask  (HPDF_Image  image,
+                      HPDF_Image  smask)
+{
+
+   const char *name;
+
+   if (!HPDF_Image_Validate (image))
+       return HPDF_INVALID_IMAGE;
+   if (!HPDF_Image_Validate (smask))
+       return HPDF_INVALID_IMAGE;
+
+   if (HPDF_Dict_GetItem (image, "SMask", HPDF_OCLASS_BOOLEAN))
+       return HPDF_RaiseError (image->error, HPDF_INVALID_OPERATION, 0);
+
+   name = HPDF_Image_GetColorSpace (smask);
+   if (!name || HPDF_StrCmp (COL_GRAY, name) != 0)
+       return HPDF_RaiseError (smask->error, HPDF_INVALID_COLOR_SPACE, 0);
+
+   return HPDF_Dict_Add (image, "SMask", smask);
+}
+
+HPDF_STATUS
+HPDF_Image_SetColorSpace  (HPDF_Image   image,
+                          HPDF_Array   colorspace)
+{
+    if (!HPDF_Image_Validate (image))
+        return HPDF_INVALID_IMAGE;
+
+    return HPDF_Dict_Add (image, "ColorSpace", colorspace);
+}
+
+
+HPDF_STATUS
+HPDF_Image_SetRenderingIntent  (HPDF_Image   image,
+                          const char* intent)
+{
+    if (!HPDF_Image_Validate (image))
+        return HPDF_INVALID_IMAGE;
+
+    return HPDF_Dict_AddName (image, "Intent", intent);
+}
 

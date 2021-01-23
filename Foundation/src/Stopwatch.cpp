@@ -1,8 +1,6 @@
 //
 // Stopwatch.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Stopwatch.cpp#2 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Stopwatch

@@ -1,8 +1,6 @@
 //
 // AbstractObserver.cpp
 //
-// $Id: //poco/1.4/Foundation/src/AbstractObserver.cpp#1 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationCenter
@@ -25,7 +23,7 @@ AbstractObserver::AbstractObserver()
 }
 
 
-AbstractObserver::AbstractObserver(const AbstractObserver& observer)
+AbstractObserver::AbstractObserver(const AbstractObserver& /*observer*/)
 {
 }
 
@@ -35,7 +33,7 @@ AbstractObserver::~AbstractObserver()
 }
 
 	
-AbstractObserver& AbstractObserver::operator = (const AbstractObserver& observer)
+AbstractObserver& AbstractObserver::operator = (const AbstractObserver& /*observer*/)
 {
 	return *this;
 }

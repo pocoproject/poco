@@ -1,8 +1,6 @@
 //
 // RSAKey.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSAKey.cpp#2 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSAKey
@@ -22,31 +20,50 @@ namespace Poco {
 namespace Crypto {
 
 
+RSAKey::RSAKey(const EVPPKey& key):
+	KeyPair(new RSAKeyImpl(key))
+{
+}
+
+
 RSAKey::RSAKey(const X509Certificate& cert):
-	_pImpl(new RSAKeyImpl(cert))
+	KeyPair(new RSAKeyImpl(cert))
+{
+}
+
+
+RSAKey::RSAKey(const PKCS12Container& cont):
+	KeyPair(new RSAKeyImpl(cont))
 {
 }
 
 
 RSAKey::RSAKey(KeyLength keyLength, Exponent exp):
-	_pImpl(0)
+	KeyPair(new RSAKeyImpl(keyLength, (exp == EXP_LARGE) ? RSA_F4 : RSA_3))
 {
-	int keyLen = keyLength;
-	unsigned long expVal = RSA_3;
-	if (exp == EXP_LARGE)
-		expVal = RSA_F4;
-	_pImpl = new RSAKeyImpl(keyLen, expVal);
 }
 
 
 RSAKey::RSAKey(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase):
-	_pImpl(new RSAKeyImpl(publicKeyFile, privateKeyFile, privateKeyPassphrase))
+	KeyPair(new RSAKeyImpl(publicKeyFile, privateKeyFile, privateKeyPassphrase))
 {
 }
 
 
 RSAKey::RSAKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase):
-	_pImpl(new RSAKeyImpl(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase))
+	KeyPair(new RSAKeyImpl(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase))
+{
+}
+
+
+RSAKey::RSAKey(const RSAKey& other):
+	KeyPair(other)
+{
+}
+
+
+RSAKey::RSAKey(RSAKey&& other) noexcept:
+	KeyPair(std::move(other))
 {
 }
 
@@ -56,51 +73,35 @@ RSAKey::~RSAKey()
 }
 
 
-int RSAKey::size() const
+RSAKey& RSAKey::operator = (const RSAKey& other)
 {
-	return _pImpl->size();
+	KeyPair::operator = (other);
+	return *this;
+}
+
+
+RSAKey& RSAKey::operator = (RSAKey&& other) noexcept
+{
+	KeyPair::operator = (std::move(other));
+	return *this;
 }
 
 
 RSAKeyImpl::ByteVec RSAKey::modulus() const
 {
-	return _pImpl->modulus();
+	return impl()->modulus();
 }
 
 
 RSAKeyImpl::ByteVec RSAKey::encryptionExponent() const
 {
-	return _pImpl->encryptionExponent();
+	return impl()->encryptionExponent();
 }
 
 
 RSAKeyImpl::ByteVec RSAKey::decryptionExponent() const
 {
-	return _pImpl->decryptionExponent();
-}
-
-
-void RSAKey::save(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase)
-{
-	_pImpl->save(publicKeyFile, privateKeyFile, privateKeyPassphrase);
-}
-
-
-void RSAKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStream, const std::string& privateKeyPassphrase)
-{
-	_pImpl->save(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase);
-}
-
-
-namespace
-{
-	static const std::string RSA("rsa");
-}
-
-
-const std::string& RSAKey::name() const
-{
-	return RSA;
+	return impl()->decryptionExponent();
 }
 
 

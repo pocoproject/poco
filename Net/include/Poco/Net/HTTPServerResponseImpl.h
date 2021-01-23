@@ -1,8 +1,6 @@
 //
 // HTTPServerResponseImpl.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPServerResponseImpl.h#1 $
-//
 // Library: Net
 // Package: HTTPServer
 // Module:  HTTPServerResponseImpl

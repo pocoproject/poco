@@ -1,8 +1,6 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/WinDriver.cpp#1 $
-//
 // Windows test driver for Poco Crypto.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.

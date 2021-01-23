@@ -1,8 +1,6 @@
 //
 // Base32Decoder.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Base32Decoder.h#2 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  Base32
@@ -83,6 +81,8 @@ private:
 class Foundation_API Base32Decoder: public Base32DecoderIOS, public std::istream
 	/// This istream base32-decodes all data
 	/// read from the istream connected to it.
+	///
+	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
 	///
 	/// Note: For performance reasons, the characters 
 	/// are read directly from the given istream's 

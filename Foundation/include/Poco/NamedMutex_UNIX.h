@@ -1,8 +1,6 @@
 //
 // NamedMutex_UNIX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NamedMutex_UNIX.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex
@@ -47,9 +45,8 @@ private:
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	sem_t* _sem;
 #else
-	int _lockfd; // lock file descriptor
-	int _semfd;  // file used to identify semaphore
 	int _semid;  // semaphore id
+	bool _owned;
 #endif
 };
 

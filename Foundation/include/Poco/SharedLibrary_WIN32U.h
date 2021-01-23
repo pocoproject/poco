@@ -1,8 +1,6 @@
 //
 // SharedLibrary_WIN32U.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SharedLibrary_WIN32U.h#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -38,6 +36,7 @@ protected:
 	void* findSymbolImpl(const std::string& name);
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
+	static bool setSearchPathImpl(const std::string& path);
 
 private:
 	std::string _path;

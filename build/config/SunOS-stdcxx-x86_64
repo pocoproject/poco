@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/SunOS-stdcxx-x86_64#2 $
-#
 # SunOS
 #
 # Build settings for SunOS 5.10/Sun Studio 12 C++ 5.9/Apache stdcxx/AMD Opteron 64 bit

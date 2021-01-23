@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/shlibln#1 $
-#
 # shlibln
 #
 # Create a symbolic link for a shared library

@@ -1,8 +1,6 @@
 //
 // FilesystemConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/FilesystemConfiguration.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  FilesystemConfiguration

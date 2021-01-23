@@ -1,8 +1,6 @@
 //
 // Context.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  Context
@@ -26,6 +24,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
 #include <vector>
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #include <wincrypt.h>
 #include <schannel.h>
@@ -34,6 +33,7 @@
 #endif
 #include <security.h>
 #include <sspi.h>
+#endif
 
 
 namespace Poco {
@@ -50,18 +50,22 @@ class NetSSL_Win_API Context: public Poco::RefCountedObject
 	/// SSL session caching on the server and client side.
 {
 public:
-	typedef Poco::AutoPtr<Context> Ptr;
+	using Ptr = Poco::AutoPtr<Context>;
 
 	enum Usage
 	{
-		CLIENT_USE, 	    /// Context is used by a client.
-		SERVER_USE,         /// Context is used by a server.
-		TLSV1_CLIENT_USE,   /// Context is used by a client requiring TLSv1.
-		TLSV1_SERVER_USE,   /// Context is used by a server requiring TLSv1.
-		TLSV1_1_CLIENT_USE, /// Context is used by a client requiring TLSv1.1. Not supported on Windows Embedded Compact.
-		TLSV1_1_SERVER_USE, /// Context is used by a server requiring TLSv1.1. Not supported on Windows Embedded Compact.
-		TLSV1_2_CLIENT_USE, /// Context is used by a client requiring TLSv1.2. Not supported on Windows Embedded Compact.
-		TLSV1_2_SERVER_USE  /// Context is used by a server requiring TLSv1.2. Not supported on Windows Embedded Compact.
+		TLS_CLIENT_USE,     /// Context is used by a client for TLSv1 or higher. Use requireMinimumProtocol() or disableProtocols() to disable undesired older versions.
+		TLS_SERVER_USE,     /// Context is used by a client for TLSv1 or higher. Use requireMinimumProtocol() or disableProtocols() to disable undesired older versions.
+		CLIENT_USE, 	    /// DEPRECATED. Context is used by a client.
+		SERVER_USE,         /// DEPRECATED. Context is used by a server.
+		TLSV1_CLIENT_USE,   /// DEPRECATED. Context is used by a client requiring TLSv1.
+		TLSV1_SERVER_USE,   /// DEPRECATED. Context is used by a server requiring TLSv1.
+		TLSV1_1_CLIENT_USE, /// DEPRECATED. Context is used by a client requiring TLSv1.1. Not supported on Windows Embedded Compact.
+		TLSV1_1_SERVER_USE, /// DEPRECATED. Context is used by a server requiring TLSv1.1. Not supported on Windows Embedded Compact.
+		TLSV1_2_CLIENT_USE, /// DEPRECATED. Context is used by a client requiring TLSv1.2. Not supported on Windows Embedded Compact.
+		TLSV1_2_SERVER_USE, /// DEPRECATED. Context is used by a server requiring TLSv1.2. Not supported on Windows Embedded Compact.
+		TLSV1_3_CLIENT_USE, /// DEPRECATED. Context is used by a client requiring TLSv1.3. Not supported on Windows Embedded Compact.
+		TLSV1_3_SERVER_USE  /// DEPRECATED. Context is used by a server requiring TLSv1.3. Not supported on Windows Embedded Compact.
 	};
 
 	enum VerificationMode 
@@ -96,6 +100,16 @@ public:
 		VERIFY_ONCE    = 1
 			/// Same as VERIFY_RELAXED (provided for interface compatibility with 
 			/// the OpenSSL implementation.
+	};
+
+	enum Protocols
+	{
+		PROTO_SSLV2   = 0x01,
+		PROTO_SSLV3   = 0x02,
+		PROTO_TLSV1   = 0x04,
+		PROTO_TLSV1_1 = 0x08,
+		PROTO_TLSV1_2 = 0x10,
+		PROTO_TLSV1_3 = 0x20
 	};
 
 	enum Options
@@ -173,6 +187,20 @@ public:
 	void addTrustedCert(const Poco::Net::X509Certificate& cert);
 		/// Adds the certificate to the trusted certs. Takes ownership of pCert.
 
+	void disableProtocols(int protocols);
+		/// Disables the given protocols.
+		///
+		/// The protocols to be disabled are specified by OR-ing
+		/// values from the Protocols enumeration, e.g.:
+		///
+		///   context.disableProtocols(PROTO_SSLV2 | PROTO_SSLV3);
+
+	void requireMinimumProtocol(Protocols protocol);
+		/// Disables all protocol version lower than the given one.
+		/// To require at least TLS 1.2 or later:
+		///
+		///   context.requireMinimumProtocol(PROTO_TLSV1_2);
+
 	Poco::Net::X509Certificate certificate();
 		/// Loads or imports and returns the certificate specified in the constructor.
 		///
@@ -201,6 +229,7 @@ protected:
 	void importCertificate(const char* pBuffer, std::size_t size);
 	void acquireSchannelCredentials(CredHandle& credHandle) const;
 	DWORD proto() const;
+	DWORD enabledProtocols() const;
 
 private:
 	Context(const Context&);
@@ -209,6 +238,7 @@ private:
 	Usage                      _usage;
 	Context::VerificationMode  _mode;
 	int                        _options;
+	int                        _disabledProtocols;
 	bool                       _extendedCertificateVerification;
 	std::string                _certNameOrPath;
 	std::string                _certStoreName;
@@ -247,9 +277,11 @@ inline int Context::options() const
 inline bool Context::isForServerUse() const
 {
 	return _usage == SERVER_USE
+		|| _usage == TLS_SERVER_USE
 		|| _usage == TLSV1_SERVER_USE
 		|| _usage == TLSV1_1_SERVER_USE
-		|| _usage == TLSV1_2_SERVER_USE;
+		|| _usage == TLSV1_2_SERVER_USE
+		|| _usage == TLSV1_3_SERVER_USE;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // RegularExpression.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/RegularExpression.h#2 $
-//
 // Library: Foundation
 // Package: RegExp
 // Module:  RegularExpression
@@ -27,18 +25,6 @@
 #include <vector>
 
 
-//
-// Copy these definitions from pcre.h
-// to avoid pulling in the entire header file
-//
-extern "C"
-{
-	struct real_pcre8_or_16;                 /* declaration; the definition is private  */
-	typedef struct real_pcre8_or_16 pcre;
-	struct pcre_extra;
-}
-
-
 namespace Poco {
 
 
@@ -49,7 +35,7 @@ class Foundation_API RegularExpression
 	/// (see http://www.pcre.org).
 {
 public:
-	enum Options // These must match the corresponsing options in pcre.h!
+	enum Options // These must match the corresponding options in pcre.h!
 		/// Some of the following options can only be passed to the constructor;
 		/// some can be passed only to matching functions, and some can be used
 		/// everywhere.
@@ -92,7 +78,7 @@ public:
 		std::string::size_type offset; /// zero based offset (std::string::npos if subexpr does not match)
 		std::string::size_type length; /// length of substring
 	};
-	typedef std::vector<Match> MatchVec;
+	using MatchVec = std::vector<Match>;
 	
 	RegularExpression(const std::string& pattern, int options = 0, bool study = true);
 		/// Creates a regular expression and parses the given pattern.
@@ -187,19 +173,19 @@ public:
 		/// Substitute in subject all matches of the pattern with replacement.
 		/// If RE_GLOBAL is specified as option, all matches are replaced. Otherwise,
 		/// only the first match is replaced.
-		/// Occurences of $<n> (for example, $1, $2, ...) in replacement are replaced 
+		/// Occurrences of $<n> (for example, $1, $2, ...) in replacement are replaced
 		/// with the corresponding captured string. $0 is the original subject string.
-		/// Returns the number of replaced occurences.
+		/// Returns the number of replaced occurrences.
 
 	int subst(std::string& subject, std::string::size_type offset, const std::string& replacement, int options = 0) const;
 		/// Substitute in subject all matches of the pattern with replacement,
 		/// starting at offset.
 		/// If RE_GLOBAL is specified as option, all matches are replaced. Otherwise,
 		/// only the first match is replaced.
-		/// Unless RE_NO_VARS is specified, occurences of $<n> (for example, $0, $1, $2, ... $9) 
+		/// Unless RE_NO_VARS is specified, occurrences of $<n> (for example, $0, $1, $2, ... $9)
 		/// in replacement are replaced with the corresponding captured string. 
-		/// $0 is the captured substring. $1 ... $n are the substrings maching the subpatterns.
-		/// Returns the number of replaced occurences.
+		/// $0 is the captured substring. $1 ... $n are the substrings matching the subpatterns.
+		/// Returns the number of replaced occurrences.
 
 	static bool match(const std::string& subject, const std::string& pattern, int options = 0);
 		/// Matches the given subject string against the regular expression given in pattern,
@@ -209,8 +195,10 @@ protected:
 	std::string::size_type substOne(std::string& subject, std::string::size_type offset, const std::string& replacement, int options) const;
 
 private:
-	pcre*       _pcre;
-	pcre_extra* _extra;
+	// Note: to avoid a dependency on the pcre.h header the following are 
+	// declared as void* and casted to the correct type in the implementation file.
+	void* _pcre;  // Actual type is pcre*
+	void* _extra; // Actual type is struct pcre_extra*
 	
 	static const int OVEC_SIZE;
 	

@@ -1,8 +1,6 @@
 //
 // Rename.cpp
 //
-// $Id: //poco/1.4/Zip/src/Rename.cpp#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  Rename

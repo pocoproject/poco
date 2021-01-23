@@ -1,8 +1,6 @@
 //
 // TimedNotificationQueue.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TimedNotificationQueue.cpp#2 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  TimedNotificationQueue

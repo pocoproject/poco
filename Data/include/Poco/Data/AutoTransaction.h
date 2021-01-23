@@ -1,10 +1,8 @@
 //
 // AutoTransaction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AutoTransaction.h#2 $
-//
 // Library: Data
-// Package: Core
+// Package: DataCore
 // Module:  AutoTransaction
 //
 // Forward header for the Transaction class.
@@ -28,7 +26,7 @@ namespace Poco {
 namespace Data {
 
 
-typedef Transaction AutoTransaction;
+using AutoTransaction = Transaction;
 
 
 } } // namespace Poco::Data

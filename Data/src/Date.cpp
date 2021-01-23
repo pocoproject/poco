@@ -1,8 +1,6 @@
 //
 // Date.cpp
 //
-// $Id: //poco/Main/Data/src/Date.cpp#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Date

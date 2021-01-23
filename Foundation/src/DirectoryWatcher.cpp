@@ -1,8 +1,6 @@
 //
 // DirectoryWatcher.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DirectoryWatcher.cpp#4 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryWatcher
@@ -26,10 +24,7 @@
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
 #include "Poco/Buffer.h"
-#if defined(POCO_WIN32_UTF8)
-	#include "Poco/UnicodeConverter.h"
-#endif
-#if POCO_OS == POCO_OS_LINUX
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 	#include <sys/inotify.h>
 	#include <sys/select.h>
 	#include <unistd.h>
@@ -112,16 +107,16 @@ protected:
 	
 	void compare(ItemInfoMap& oldEntries, ItemInfoMap& newEntries)
 	{
-		for (ItemInfoMap::iterator itn = newEntries.begin(); itn != newEntries.end(); ++itn)
+		for (auto& np: newEntries)
 		{
-			ItemInfoMap::iterator ito = oldEntries.find(itn->first);
+			ItemInfoMap::iterator ito = oldEntries.find(np.first);
 			if (ito != oldEntries.end())
 			{
 				if ((owner().eventMask() & DirectoryWatcher::DW_ITEM_MODIFIED) && !owner().eventsSuspended())
 				{
-					if (itn->second.size != ito->second.size || itn->second.lastModified != ito->second.lastModified)
+					if (np.second.size != ito->second.size || np.second.lastModified != ito->second.lastModified)
 					{
-						Poco::File f(itn->second.path);
+						Poco::File f(np.second.path);
 						DirectoryWatcher::DirectoryEvent ev(f, DirectoryWatcher::DW_ITEM_MODIFIED);
 						owner().itemModified(&owner(), ev);
 					}
@@ -130,16 +125,16 @@ protected:
 			}
 			else if ((owner().eventMask() & DirectoryWatcher::DW_ITEM_ADDED) && !owner().eventsSuspended())
 			{
-				Poco::File f(itn->second.path);
+				Poco::File f(np.second.path);
 				DirectoryWatcher::DirectoryEvent ev(f, DirectoryWatcher::DW_ITEM_ADDED);
 				owner().itemAdded(&owner(), ev);
 			}
 		}
 		if ((owner().eventMask() & DirectoryWatcher::DW_ITEM_REMOVED) && !owner().eventsSuspended())
 		{
-			for (ItemInfoMap::iterator it = oldEntries.begin(); it != oldEntries.end(); ++it)
+			for (const auto& i: oldEntries)
 			{
-				Poco::File f(it->second.path);
+				Poco::File f(i.second.path);
 				DirectoryWatcher::DirectoryEvent ev(f, DirectoryWatcher::DW_ITEM_REMOVED);
 				owner().itemRemoved(&owner(), ev);
 			}
@@ -155,7 +150,7 @@ private:
 };
 
 
-#if POCO_OS == POCO_OS_WINDOWS_NT
+#if (POCO_OS == POCO_OS_WINDOWS_NT) && !defined(POCO_DW_FORCE_POLLING)
 
 
 class WindowsDirectoryWatcherStrategy: public DirectoryWatcherStrategy
@@ -184,13 +179,9 @@ public:
 			filter |= FILE_NOTIFY_CHANGE_SIZE | FILE_NOTIFY_CHANGE_LAST_WRITE;
 		
 		std::string path(owner().directory().path());
-#if defined(POCO_WIN32_UTF8)
 		std::wstring upath;
-		Poco::UnicodeConverter::toUTF16(path.c_str(), upath);
+		FileImpl::convertPath(path.c_str(), upath);
 		HANDLE hChange = FindFirstChangeNotificationW(upath.c_str(), FALSE, filter);
-#else
-		HANDLE hChange = FindFirstChangeNotificationA(path.c_str(), FALSE, filter);
-#endif
 
 		if (hChange == INVALID_HANDLE_VALUE)
 		{
@@ -257,7 +248,7 @@ private:
 };
 
 
-#elif POCO_OS == POCO_OS_LINUX
+#elif (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && !defined(POCO_DW_FORCE_POLLING)
 
 
 class LinuxDirectoryWatcherStrategy: public DirectoryWatcherStrategy
@@ -385,7 +376,7 @@ private:
 };
 
 
-#elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
+#elif (POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD)  && !defined(POCO_DW_FORCE_POLLING)
 
 
 class BSDDirectoryWatcherStrategy: public DirectoryWatcherStrategy
@@ -575,11 +566,11 @@ void DirectoryWatcher::init()
 	if (!_directory.isDirectory())
 		throw Poco::InvalidArgumentException("not a directory", _directory.path());
 
-#if POCO_OS == POCO_OS_WINDOWS_NT
+#if (POCO_OS == POCO_OS_WINDOWS_NT) && !defined(POCO_DW_FORCE_POLLING)
 	_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
-#elif POCO_OS == POCO_OS_LINUX
+#elif (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && !defined(POCO_DW_FORCE_POLLING)
 	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
-#elif POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD
+#elif (POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD) && !defined(POCO_DW_FORCE_POLLING)
 	_pStrategy = new BSDDirectoryWatcherStrategy(*this);
 #else
 	_pStrategy = new PollingDirectoryWatcherStrategy(*this);

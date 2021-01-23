@@ -1,8 +1,6 @@
 //
 // TCPServerDispatcher.cpp
 //
-// $Id: //poco/1.4/Net/src/TCPServerDispatcher.cpp#1 $
-//
 // Library: Net
 // Package: TCPServer
 // Module:  TCPServerDispatcher
@@ -37,11 +35,11 @@ public:
 		_socket(socket)
 	{
 	}
-	
+
 	~TCPConnectionNotification()
 	{
 	}
-	
+
 	const StreamSocket& socket() const
 	{
 		return _socket;
@@ -68,7 +66,7 @@ TCPServerDispatcher::TCPServerDispatcher(TCPServerConnectionFactory::Ptr pFactor
 
 	if (!_pParams)
 		_pParams = new TCPServerParams;
-	
+
 	if (_pParams->getMaxThreads() == 0)
 		_pParams->setMaxThreads(threadPool.capacity());
 }
@@ -98,7 +96,7 @@ void TCPServerDispatcher::release()
 
 void TCPServerDispatcher::run()
 {
-	AutoPtr<TCPServerDispatcher> guard(this, true); // ensure object stays alive
+	AutoPtr<TCPServerDispatcher> guard(this); // ensure _rc is decreased when function exits; it was incremented in enqueue()
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
@@ -110,14 +108,14 @@ void TCPServerDispatcher::run()
 			TCPConnectionNotification* pCNf = dynamic_cast<TCPConnectionNotification*>(pNf.get());
 			if (pCNf)
 			{
-				std::auto_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
+				std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
 				poco_check_ptr(pConnection.get());
 				beginConnection();
 				pConnection->start();
 				endConnection();
 			}
 		}
-	
+
 		FastMutex::ScopedLock lock(_mutex);
 		if (_stopped || (_currentThreads > 1 && _queue.empty()))
 		{
@@ -133,7 +131,7 @@ namespace
 	static const std::string threadName("TCPServerConnection");
 }
 
-	
+
 void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -147,6 +145,10 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 			{
 				_threadPool.startWithPriority(_pParams->getThreadPriority(), *this, threadName);
 				++_currentThreads;
+				// Ensure this object lives at least until run() starts
+				// Small chance of leaking if threadpool is stopped before this
+				// work runs, but better than a dangling pointer and crash!
+				++_rc;
 			}
 			catch (Poco::Exception&)
 			{
@@ -173,14 +175,14 @@ void TCPServerDispatcher::stop()
 int TCPServerDispatcher::currentThreads() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _currentThreads;
 }
 
 int TCPServerDispatcher::maxThreads() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _threadPool.capacity();
 }
 
@@ -188,7 +190,7 @@ int TCPServerDispatcher::maxThreads() const
 int TCPServerDispatcher::totalConnections() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _totalConnections;
 }
 
@@ -196,7 +198,7 @@ int TCPServerDispatcher::totalConnections() const
 int TCPServerDispatcher::currentConnections() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _currentConnections;
 }
 
@@ -204,7 +206,7 @@ int TCPServerDispatcher::currentConnections() const
 int TCPServerDispatcher::maxConcurrentConnections() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _maxConcurrentConnections;
 }
 
@@ -218,7 +220,7 @@ int TCPServerDispatcher::queuedConnections() const
 int TCPServerDispatcher::refusedConnections() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	return _refusedConnections;
 }
 
@@ -226,7 +228,7 @@ int TCPServerDispatcher::refusedConnections() const
 void TCPServerDispatcher::beginConnection()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	++_totalConnections;
 	++_currentConnections;
 	if (_currentConnections > _maxConcurrentConnections)

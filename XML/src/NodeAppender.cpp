@@ -1,8 +1,6 @@
 //
 // NodeAppender.cpp
 //
-// $Id: //poco/1.4/XML/src/NodeAppender.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  NodeAppender

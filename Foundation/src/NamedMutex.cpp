@@ -1,8 +1,6 @@
 //
 // NamedMutex.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedMutex.cpp#2 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedMutex
@@ -17,16 +15,12 @@
 #include "Poco/NamedMutex.h"
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "NamedMutex_WIN32U.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "NamedMutex_WIN32.cpp"
-#elif defined(POCO_ANDROID)
+#elif POCO_OS == POCO_OS_ANDROID
 #include "NamedMutex_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedMutex_UNIX.cpp"
-#else
-#include "NamedMutex_VMS.cpp"
 #endif
 
 

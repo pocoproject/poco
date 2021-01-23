@@ -1,8 +1,6 @@
 //
 // Task.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Task.h#2 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -107,6 +105,16 @@ protected:
 		/// return value is false.
 		///
 		/// A Task should use this method in favor of Thread::sleep().
+
+	bool yield();
+	    /// Yields cpu to other threads
+		///
+		/// If the task is cancelled while it is suspended,
+		/// yield() will return true. If the tasks resumes
+		/// without being cancelled, the
+		/// return value is false.
+		///
+		/// A Task should use this method in favor of Thread::yield().
 
 	void setProgress(float progress);
 		/// Sets the task's progress.

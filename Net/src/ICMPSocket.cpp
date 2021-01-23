@@ -1,8 +1,6 @@
 //
 // ICMPSocket.cpp
 //
-// $Id: //poco/1.4/Net/src/ICMPSocket.cpp#1 $
-//
 // Library: Net
 // Package: ICMP
 // Module:  ICMPSocket
@@ -17,6 +15,7 @@
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/ICMPSocketImpl.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/NetException.h"
 
 
 using Poco::InvalidArgumentException;
@@ -27,10 +26,7 @@ namespace Net {
 
 
 ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout): 
-	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout)),
-	_dataSize(dataSize), 
-	_ttl(ttl),
-	_timeout(timeout)
+	Socket(new ICMPSocketImpl(family, dataSize, ttl, timeout))
 {
 }
 
@@ -75,6 +71,76 @@ int ICMPSocket::sendTo(const SocketAddress& address, int flags)
 int ICMPSocket::receiveFrom(SocketAddress& address, int flags)
 {
 	return impl()->receiveFrom(0, 0, address, flags);
+}
+
+
+int ICMPSocket::dataSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->dataSize();
+}
+
+
+int ICMPSocket::packetSize() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->packetSize();
+}
+
+
+int ICMPSocket::ttl() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->ttl();
+}
+
+
+int ICMPSocket::timeout() const
+{
+	return static_cast<ICMPSocketImpl*>(impl())->timeout();
+}
+
+
+Poco::UInt16 ICMPSocket::mtu(const SocketAddress& address, Poco::UInt16 sz)
+{
+	if (address.family() != IPAddress::IPv4) return 0;
+
+	SocketAddress returnAddress(address);
+	for (; sz >= 68 /*RFC791*/; --sz)
+	{
+		ICMPSocket icmpSocket(address.family(), sz);
+
+#ifdef IP_DONTFRAGMENT
+		icmpSocket.setOption(IPPROTO_IP, IP_DONTFRAGMENT, 1);
+#elif defined(IP_MTU_DISCOVER)
+		icmpSocket.setOption(IPPROTO_IP, IP_MTU_DISCOVER, IP_PMTUDISC_DO);
+#elif defined(IP_DONTFRAG)
+		icmpSocket.setOption(IPPROTO_IP, IP_DONTFRAG, 1);
+#else
+		throw NotImplementedException("ICMPSocket::mtu()");
+#endif
+
+		try
+		{
+			icmpSocket.sendTo(address);
+			icmpSocket.receiveFrom(returnAddress);
+			poco_assert_dbg (returnAddress == address);
+			return sz;
+		}
+		catch (ICMPFragmentationException&)
+		{
+			// PMTU fragmentation, continue discovery
+			continue;
+		}
+		catch (NetException& ex)
+		{
+			// local MTU limit, continue discovery
+			if (ex.code() == POCO_EMSGSIZE)
+				continue;
+		}
+		catch (Exception&)
+		{
+			return 0;
+		}
+	}
+	return 0;
 }
 
 

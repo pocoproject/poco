@@ -1,8 +1,6 @@
 //
 // Statement.cpp
 //
-// $Id: //poco/Main/Data/src/Statement.cpp#11 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Statement
@@ -55,6 +53,17 @@ Statement::Statement(const Statement& stmt):
 }
 
 
+Statement::Statement(Statement&& stmt) noexcept:
+	_pImpl(std::move(stmt._pImpl)),
+	_async(std::move(stmt._async)),
+	_pResult(std::move(stmt._pResult)),
+	_pAsyncExec(std::move(stmt._pAsyncExec)),
+	_arguments(std::move(stmt._arguments)),
+	_pRowFormatter(std::move(stmt._pRowFormatter))
+{
+}
+
+
 Statement::~Statement()
 {
 }
@@ -67,6 +76,18 @@ Statement& Statement::operator = (const Statement& stmt)
 	return *this;
 }
 
+
+Statement& Statement::operator = (Statement&& stmt) noexcept
+{
+	_pImpl = std::move(stmt._pImpl);
+	_async = std::move(stmt._async);
+	_pResult = std::move(stmt._pResult);
+	_pAsyncExec = std::move(stmt._pAsyncExec);
+	_arguments = std::move(stmt._arguments);
+	_pRowFormatter = std::move(stmt._pRowFormatter);
+
+	return *this;
+}
 
 void Statement::swap(Statement& other)
 {
@@ -111,8 +132,8 @@ std::size_t Statement::execute(bool reset)
 			doAsyncExec();
 			return 0;
 		}
-	} else
-		throw InvalidAccessException("Statement still executing.");
+	} 
+	else throw InvalidAccessException("Statement still executing.");
 }
 
 

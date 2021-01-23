@@ -1,8 +1,6 @@
 //
 // SessionPool.cpp
 //
-// $Id: //poco/Main/Data/src/SessionPool.cpp#3 $
-//
 // Library: Data
 // Package: SessionPooling
 // Module:  SessionPool
@@ -76,12 +74,13 @@ Session SessionPool::get()
 		{
 			Session newSession(SessionFactory::instance().create(_connector, _connectionString));
 			applySettings(newSession.impl());
+			customizeSession(newSession);
 
 			PooledSessionHolderPtr pHolder(new PooledSessionHolder(*this, newSession.impl()));
 			_idleSessions.push_front(pHolder);
 			++_nSessions;
 		}
-		else throw SessionPoolExhaustedException(_connector, _connectionString);
+		else throw SessionPoolExhaustedException(_connector);
 	}
 
 	PooledSessionHolderPtr pHolder(_idleSessions.front());
@@ -101,7 +100,7 @@ void SessionPool::purgeDeadSessions()
 	SessionList::iterator it = _idleSessions.begin();
 	for (; it != _idleSessions.end(); )
 	{
-		if (!(*it)->session()->isConnected())
+		if (!(*it)->session()->isGood())
 		{
 			it = _idleSessions.erase(it);
 			--_nSessions;
@@ -140,7 +139,7 @@ int SessionPool::dead()
 	SessionList::iterator itEnd = _activeSessions.end();
 	for (; it != itEnd; ++it)
 	{
-		if (!(*it)->session()->isConnected())
+		if (!(*it)->session()->isGood())
 			++count;
 	}
 
@@ -221,6 +220,11 @@ void SessionPool::applySettings(SessionImpl* pImpl)
 }
 
 
+void SessionPool::customizeSession(Session&)
+{
+}
+
+
 void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
@@ -229,8 +233,10 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
 	if (it != _activeSessions.end())
 	{
-		if (pHolder->session()->isConnected())
+		if (pHolder->session()->isGood())
 		{
+			pHolder->session()->reset();
+
 			// reverse settings applied at acquisition time, if any
 			AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
 			if (pIt != _addPropertyMap.end())
@@ -265,7 +271,7 @@ void SessionPool::onJanitorTimer(Poco::Timer&)
 	SessionList::iterator it = _idleSessions.begin(); 
 	while (_nSessions > _minSessions && it != _idleSessions.end())
 	{
-		if ((*it)->idle() > _idleTime || !(*it)->session()->isConnected())
+		if ((*it)->idle() > _idleTime || !(*it)->session()->isGood())
 		{	
 			try	{ (*it)->session()->close(); }
 			catch (...) { }

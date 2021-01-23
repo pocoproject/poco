@@ -1,8 +1,6 @@
 //
 // AbstractStrategy.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/AbstractStrategy.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  AbstractCache
@@ -69,7 +67,7 @@ public:
 	virtual void onReplace(const void* pSender, std::set<TKey>& elemsToRemove) = 0;
 		/// Used by the Strategy to indicate which elements should be removed from
 		/// the cache. Note that onReplace does not change the current list of keys.
-		/// The cache object is reponsible to remove the elements.
+		/// The cache object is responsible to remove the elements.
 };
 
 

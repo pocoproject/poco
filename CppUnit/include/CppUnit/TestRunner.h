@@ -1,8 +1,6 @@
 //
 // TestRunner.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestRunner.h#2 $
-//
 
 
 #ifndef CppUnit_TestRunner_INCLUDED
@@ -35,7 +33,7 @@ class Test;
  *
  * Here is the synopsis:
  *
- * TestRunner [-all] [-print] [-wait] ExampleTestCase
+ * TestRunner [-all] [-long] [-print] [-wait] ExampleTestCase
  *
  */
 class CppUnit_API TestRunner
@@ -52,10 +50,10 @@ public:
 	void addTest(const std::string& name, Test* test);
 
 protected:
-	bool run(Test* test);
 	void printBanner();
 	void print(const std::string& name, Test* pTest, int indent);
 	Test* find(const std::string& name, Test* pTest, const std::string& testName);
+	int collectAllTestCases(Test* pTest, std::vector<Test*>& tests);
 
 private:
 	std::ostream& _ostr;

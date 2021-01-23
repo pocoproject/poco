@@ -1,8 +1,6 @@
 //
 // TimeServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/TimeServer/src/TimeServer.cpp#1 $
-//
 // This sample demonstrates the TCPServer and ServerSocket classes.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

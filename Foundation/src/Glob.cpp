@@ -1,8 +1,6 @@
 //
 // Glob.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Glob.cpp#3 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  Glob

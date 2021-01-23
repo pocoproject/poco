@@ -1,8 +1,6 @@
 //
 // BasicEvent.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/BasicEvent.h#2 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  BasicEvent
@@ -31,7 +29,7 @@ namespace Poco {
 
 template <class TArgs, class TMutex = FastMutex> 
 class BasicEvent: public AbstractEvent < 
-	TArgs, DefaultStrategy<TArgs, AbstractDelegate<TArgs> >,
+	TArgs, DefaultStrategy<TArgs, AbstractDelegate<TArgs>>,
 	AbstractDelegate<TArgs>,
 	TMutex
 >

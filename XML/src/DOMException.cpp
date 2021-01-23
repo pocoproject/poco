@@ -1,8 +1,6 @@
 //
 // DOMException.cpp
 //
-// $Id: //poco/1.4/XML/src/DOMException.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM
@@ -57,7 +55,7 @@ DOMException::DOMException(const DOMException& exc):
 }
 
 	
-DOMException::~DOMException() throw()
+DOMException::~DOMException() noexcept
 {
 }
 
@@ -73,13 +71,13 @@ DOMException& DOMException::operator = (const DOMException& exc)
 }
 
 
-const char* DOMException::name() const throw()
+const char* DOMException::name() const noexcept
 {
 	return "DOMException";
 }
 
 
-const char* DOMException::className() const throw()
+const char* DOMException::className() const noexcept
 {
 	return typeid(*this).name();
 }

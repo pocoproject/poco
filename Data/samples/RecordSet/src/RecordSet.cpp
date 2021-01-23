@@ -1,8 +1,6 @@
 //
 // RecordSet.cpp
 //
-// $Id: //poco/Main/Data/samples/RecordSet/src/RecordSet.cpp#2 $
-//
 // This sample demonstrates the Data library.
 //
 /// Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -30,6 +28,9 @@ using Poco::Data::RecordSet;
 
 int main(int argc, char** argv)
 {
+	// register SQLite connector
+	Poco::Data::SQLite::Connector::registerConnector();
+
 	// create a session
 	Session session("SQLite", "sample.db");
 

@@ -1,8 +1,6 @@
 //
 // AbstractConfiguration.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/AbstractConfiguration.h#2 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  AbstractConfiguration
@@ -23,6 +21,7 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/BasicEvent.h"
 #include <vector>
 #include <utility>
@@ -48,7 +47,8 @@ class Util_API AbstractConfiguration: public Poco::RefCountedObject
 	/// Subclasses must override the getRaw(), setRaw() and enumerate() methods.
 {
 public:
-	typedef std::vector<std::string> Keys;
+	using Keys = std::vector<std::string>;
+	using Ptr = AutoPtr<AbstractConfiguration>;
 	
 	class KeyValue
 		/// A key-value pair, used as event argument.
@@ -295,14 +295,14 @@ public:
 		/// Returns in range the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
 	
-	const AbstractConfiguration* createView(const std::string& prefix) const;
+	const Ptr createView(const std::string& prefix) const;
 		/// Creates a non-mutable view (see ConfigurationView) into the configuration.
 
-	AbstractConfiguration* createView(const std::string& prefix);
+	Ptr createView(const std::string& prefix);
 		/// Creates a view (see ConfigurationView) into the configuration.
 	
 	std::string expand(const std::string& value) const;
-		/// Replaces all occurences of ${<property>} in value with the
+		/// Replaces all occurrences of ${<property>} in value with the
 		/// value of the <property>. If <property> does not exist,
 		/// nothing is changed.
 		///
@@ -346,12 +346,22 @@ protected:
 		/// implementation throws a Poco::NotImplementedException.
 
 	static int parseInt(const std::string& value);
-	static int parseUInt(const std::string& value);
+		/// Returns string as signed integer.
+		/// Decimal and hexadecimal notation is supported.
+
+	static unsigned parseUInt(const std::string& value);
+		/// Returns string as unsigned integer.
+		/// Decimal and hexadecimal notation is supported.
 
 #if defined(POCO_HAVE_INT64)
 
 	static Int64 parseInt64(const std::string& value);
+		/// Returns string as 64-bit signed integer.
+		/// Decimal and hexadecimal notation is supported.
+
 	static UInt64 parseUInt64(const std::string& value);
+		/// Returns string as 64-bit unsigned integer.
+		/// Decimal and hexadecimal notation is supported.
 
 #endif // defined(POCO_HAVE_INT64)
 

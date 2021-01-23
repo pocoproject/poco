@@ -1,8 +1,6 @@
 //
 // OptionException.cpp
 //
-// $Id: //poco/1.4/Util/src/OptionException.cpp#1 $
-//
 // Library: Util
 // Package: Options
 // Module:  OptionException

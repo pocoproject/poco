@@ -1,8 +1,6 @@
 //
 // TeeStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/TeeStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  TeeStream
@@ -64,9 +62,9 @@ int TeeStreamBuf::readFromDevice()
 
 int TeeStreamBuf::writeToDevice(char c)
 {
-	for (StreamVec::iterator it = _streams.begin(); it != _streams.end(); ++it)
+	for (auto& pStream: _streams)
 	{
-		(*it)->put(c);
+		pStream->put(c);
 	}
 	return charToInt(c);
 }

@@ -1,8 +1,6 @@
 //
 // HTTPResponse.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPResponse.h#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPResponse
@@ -47,6 +45,7 @@ public:
 	{
 		HTTP_CONTINUE                        = 100,
 		HTTP_SWITCHING_PROTOCOLS             = 101,
+		HTTP_PROCESSING                      = 102,
 		HTTP_OK                              = 200,
 		HTTP_CREATED                         = 201,
 		HTTP_ACCEPTED                        = 202,
@@ -54,14 +53,19 @@ public:
 		HTTP_NO_CONTENT                      = 204,
 		HTTP_RESET_CONTENT                   = 205,
 		HTTP_PARTIAL_CONTENT                 = 206,
+		HTTP_MULTI_STATUS                    = 207,
+		HTTP_ALREADY_REPORTED                = 208,
+		HTTP_IM_USED                         = 226,
 		HTTP_MULTIPLE_CHOICES                = 300,
 		HTTP_MOVED_PERMANENTLY               = 301,
 		HTTP_FOUND                           = 302,
 		HTTP_SEE_OTHER                       = 303,
 		HTTP_NOT_MODIFIED                    = 304,
-		HTTP_USEPROXY                        = 305,
+		HTTP_USE_PROXY                       = 305,
+		HTTP_USEPROXY                        = 305, /// @deprecated
 		// UNUSED: 306
 		HTTP_TEMPORARY_REDIRECT              = 307,
+		HTTP_PERMANENT_REDIRECT              = 308,
 		HTTP_BAD_REQUEST                     = 400,
 		HTTP_UNAUTHORIZED                    = 401,
 		HTTP_PAYMENT_REQUIRED                = 402,
@@ -75,22 +79,41 @@ public:
 		HTTP_GONE                            = 410,
 		HTTP_LENGTH_REQUIRED                 = 411,
 		HTTP_PRECONDITION_FAILED             = 412,
-		HTTP_REQUESTENTITYTOOLARGE           = 413,
-		HTTP_REQUESTURITOOLONG               = 414,
-		HTTP_UNSUPPORTEDMEDIATYPE            = 415,
+		HTTP_REQUEST_ENTITY_TOO_LARGE        = 413,
+		HTTP_REQUESTENTITYTOOLARGE           = 413, /// @deprecated
+		HTTP_REQUEST_URI_TOO_LONG            = 414,
+		HTTP_REQUESTURITOOLONG               = 414, /// @deprecated
+		HTTP_UNSUPPORTED_MEDIA_TYPE          = 415,
+		HTTP_UNSUPPORTEDMEDIATYPE            = 415, /// @deprecated
 		HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
 		HTTP_EXPECTATION_FAILED              = 417,
+		HTTP_IM_A_TEAPOT                     = 418,
+		HTTP_ENCHANCE_YOUR_CALM              = 420,
+		HTTP_MISDIRECTED_REQUEST             = 421,
+		HTTP_UNPROCESSABLE_ENTITY            = 422,
+		HTTP_LOCKED                          = 423,
+		HTTP_FAILED_DEPENDENCY               = 424,
+		HTTP_UPGRADE_REQUIRED                = 426,
+		HTTP_PRECONDITION_REQUIRED           = 428,
+		HTTP_TOO_MANY_REQUESTS               = 429,
+		HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
+		HTTP_UNAVAILABLE_FOR_LEGAL_REASONS   = 451,
 		HTTP_INTERNAL_SERVER_ERROR           = 500,
 		HTTP_NOT_IMPLEMENTED                 = 501,
 		HTTP_BAD_GATEWAY                     = 502,
 		HTTP_SERVICE_UNAVAILABLE             = 503,
 		HTTP_GATEWAY_TIMEOUT                 = 504,
-		HTTP_VERSION_NOT_SUPPORTED           = 505
+		HTTP_VERSION_NOT_SUPPORTED           = 505,
+		HTTP_VARIANT_ALSO_NEGOTIATES         = 506,
+		HTTP_INSUFFICIENT_STORAGE            = 507,
+		HTTP_LOOP_DETECTED                   = 508,
+		HTTP_NOT_EXTENDED                    = 510,
+		HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511
 	};
 
 	HTTPResponse();
 		/// Creates the HTTPResponse with OK status.
-		
+
 	HTTPResponse(HTTPStatus status, const std::string& reason);
 		/// Creates the HTTPResponse with the given status
 		/// and reason phrase.
@@ -98,41 +121,47 @@ public:
 	HTTPResponse(const std::string& version, HTTPStatus status, const std::string& reason);
 		/// Creates the HTTPResponse with the given version, status
 		/// and reason phrase.
-		
-	HTTPResponse(HTTPStatus status);
+
+	explicit HTTPResponse(HTTPStatus status);
 		/// Creates the HTTPResponse with the given status
-		/// an an appropriate reason phrase.
+		/// and an appropriate reason phrase.
 
 	HTTPResponse(const std::string& version, HTTPStatus status);
 		/// Creates the HTTPResponse with the given version, status
-		/// an an appropriate reason phrase.
+		/// and an appropriate reason phrase.
+
+	HTTPResponse(const HTTPResponse& other);
+		/// Creates the HTTPResponse by copying another one.
 
 	virtual ~HTTPResponse();
 		/// Destroys the HTTPResponse.
+
+	HTTPResponse& operator = (const HTTPResponse& other);
+		/// Assignment operator.
 
 	void setStatus(HTTPStatus status);
 		/// Sets the HTTP status code.
 		///
 		/// Does not change the reason phrase.
-		
+
 	HTTPStatus getStatus() const;
 		/// Returns the HTTP status code.
-		
+
 	void setStatus(const std::string& status);
 		/// Sets the HTTP status code.
 		///
 		/// The string must contain a valid
 		/// HTTP numerical status code.
-		
+
 	void setReason(const std::string& reason);
 		/// Sets the HTTP reason phrase.
-		
+
 	const std::string& getReason() const;
 		/// Returns the HTTP reason phrase.
 
 	void setStatusAndReason(HTTPStatus status, const std::string& reason);
 		/// Sets the HTTP status code and reason phrase.
-		
+
 	void setStatusAndReason(HTTPStatus status);
 		/// Sets the HTTP status code and reason phrase.
 		///
@@ -140,7 +169,7 @@ public:
 
 	void setDate(const Poco::Timestamp& dateTime);
 		/// Sets the Date header to the given date/time value.
-		
+
 	Poco::Timestamp getDate() const;
 		/// Returns the value of the Date header.
 
@@ -164,13 +193,14 @@ public:
 		/// given input stream.
 		///
 		/// 100 Continue responses are ignored.
-	
+
 	static const std::string& getReasonForStatus(HTTPStatus status);
 		/// Returns an appropriate reason phrase
 		/// for the given status code.
 
 	static const std::string HTTP_REASON_CONTINUE;
 	static const std::string HTTP_REASON_SWITCHING_PROTOCOLS;
+	static const std::string HTTP_REASON_PROCESSING;
 	static const std::string HTTP_REASON_OK;
 	static const std::string HTTP_REASON_CREATED;
 	static const std::string HTTP_REASON_ACCEPTED;
@@ -178,13 +208,17 @@ public:
 	static const std::string HTTP_REASON_NO_CONTENT;
 	static const std::string HTTP_REASON_RESET_CONTENT;
 	static const std::string HTTP_REASON_PARTIAL_CONTENT;
+	static const std::string HTTP_REASON_MULTI_STATUS;
+	static const std::string HTTP_REASON_ALREADY_REPORTED;
+	static const std::string HTTP_REASON_IM_USED;
 	static const std::string HTTP_REASON_MULTIPLE_CHOICES;
 	static const std::string HTTP_REASON_MOVED_PERMANENTLY;
 	static const std::string HTTP_REASON_FOUND;
 	static const std::string HTTP_REASON_SEE_OTHER;
 	static const std::string HTTP_REASON_NOT_MODIFIED;
-	static const std::string HTTP_REASON_USEPROXY;
+	static const std::string HTTP_REASON_USE_PROXY;
 	static const std::string HTTP_REASON_TEMPORARY_REDIRECT;
+	static const std::string HTTP_REASON_PERMANENT_REDIRECT;
 	static const std::string HTTP_REASON_BAD_REQUEST;
 	static const std::string HTTP_REASON_UNAUTHORIZED;
 	static const std::string HTTP_REASON_PAYMENT_REQUIRED;
@@ -198,19 +232,35 @@ public:
 	static const std::string HTTP_REASON_GONE;
 	static const std::string HTTP_REASON_LENGTH_REQUIRED;
 	static const std::string HTTP_REASON_PRECONDITION_FAILED;
-	static const std::string HTTP_REASON_REQUESTENTITYTOOLARGE;
-	static const std::string HTTP_REASON_REQUESTURITOOLONG;
-	static const std::string HTTP_REASON_UNSUPPORTEDMEDIATYPE;
+	static const std::string HTTP_REASON_REQUEST_ENTITY_TOO_LARGE;
+	static const std::string HTTP_REASON_REQUEST_URI_TOO_LONG;
+	static const std::string HTTP_REASON_UNSUPPORTED_MEDIA_TYPE;
 	static const std::string HTTP_REASON_REQUESTED_RANGE_NOT_SATISFIABLE;
 	static const std::string HTTP_REASON_EXPECTATION_FAILED;
+	static const std::string HTTP_REASON_IM_A_TEAPOT;
+	static const std::string HTTP_REASON_ENCHANCE_YOUR_CALM;
+	static const std::string HTTP_REASON_MISDIRECTED_REQUEST;
+	static const std::string HTTP_REASON_UNPROCESSABLE_ENTITY;
+	static const std::string HTTP_REASON_LOCKED;
+	static const std::string HTTP_REASON_FAILED_DEPENDENCY;
+	static const std::string HTTP_REASON_UPGRADE_REQUIRED;
+	static const std::string HTTP_REASON_PRECONDITION_REQUIRED;
+	static const std::string HTTP_REASON_TOO_MANY_REQUESTS;
+	static const std::string HTTP_REASON_REQUEST_HEADER_FIELDS_TOO_LARGE;
+	static const std::string HTTP_REASON_UNAVAILABLE_FOR_LEGAL_REASONS;
 	static const std::string HTTP_REASON_INTERNAL_SERVER_ERROR;
 	static const std::string HTTP_REASON_NOT_IMPLEMENTED;
 	static const std::string HTTP_REASON_BAD_GATEWAY;
 	static const std::string HTTP_REASON_SERVICE_UNAVAILABLE;
 	static const std::string HTTP_REASON_GATEWAY_TIMEOUT;
 	static const std::string HTTP_REASON_VERSION_NOT_SUPPORTED;
+	static const std::string HTTP_REASON_VARIANT_ALSO_NEGOTIATES;
+	static const std::string HTTP_REASON_INSUFFICIENT_STORAGE;
+	static const std::string HTTP_REASON_LOOP_DETECTED;
+	static const std::string HTTP_REASON_NOT_EXTENDED;
+	static const std::string HTTP_REASON_NETWORK_AUTHENTICATION_REQUIRED;
 	static const std::string HTTP_REASON_UNKNOWN;
-	
+
 	static const std::string DATE;
 	static const std::string SET_COOKIE;
 
@@ -221,12 +271,9 @@ private:
 		MAX_STATUS_LENGTH  = 3,
 		MAX_REASON_LENGTH  = 512
 	};
-	
+
 	HTTPStatus  _status;
 	std::string _reason;
-	
-	HTTPResponse(const HTTPResponse&);
-	HTTPResponse& operator = (const HTTPResponse&);
 };
 
 

@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/makedepend.SunCC#1 $
-#
 # makedepend.SunCC
 #
 # Create dependency file, Sun Forte C++ version

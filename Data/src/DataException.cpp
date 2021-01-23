@@ -1,8 +1,6 @@
 //
 // DataException.cpp
 //
-// $Id: //poco/Main/Data/src/DataException.cpp#8 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  DataException

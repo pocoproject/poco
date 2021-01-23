@@ -1,8 +1,6 @@
 //
 // X509Certificate.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: Certificate
 // Module:  X509Certificate
@@ -77,11 +75,20 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 }
 
 
+X509Certificate::X509Certificate(X509Certificate&& cert) noexcept:
+	_issuerName(std::move(cert._issuerName)),
+	_subjectName(std::move(cert._subjectName)),
+	_pCert(cert._pCert)
+{
+	cert._pCert = nullptr;
+}
+
+
 X509Certificate::X509Certificate(PCCERT_CONTEXT pCert, bool shared):
 	_pCert(pCert)
 {
 	poco_check_ptr(_pCert);
-	
+
 	if (shared)
 	{
 		_pCert = CertDuplicateCertificateContext(_pCert);
@@ -99,6 +106,16 @@ X509Certificate& X509Certificate::operator = (const X509Certificate& cert)
 }
 
 
+X509Certificate& X509Certificate::operator = (X509Certificate&& cert) noexcept
+{
+	_issuerName = std::move(cert._issuerName);
+	_subjectName = std::move(cert._subjectName);
+	_pCert = cert._pCert; cert._pCert = nullptr;
+
+	return *this;
+}
+
+
 void X509Certificate::swap(X509Certificate& cert)
 {
 	using std::swap;
@@ -110,7 +127,7 @@ void X509Certificate::swap(X509Certificate& cert)
 
 X509Certificate::~X509Certificate()
 {
-	CertFreeCertificateContext(_pCert);
+	if (_pCert) CertFreeCertificateContext(_pCert);
 }
 
 
@@ -221,7 +238,7 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear(); 
+	domainNames.clear();
 	cmnName = commonName();
 	PCERT_EXTENSION pExt = _pCert->pCertInfo->rgExtension;
 	for (int i = 0; i < _pCert->pCertInfo->cExtension; i++, pExt++)
@@ -233,9 +250,9 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
 #endif
 			Poco::Buffer<char> buffer(256);
-			DWORD bufferSize = buffer.sizeBytes();
+			DWORD bufferSize = static_cast<DWORD>(buffer.sizeBytes());
 			BOOL rc = CryptDecodeObjectEx(
-					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 					pExt->pszObjId,
 					pExt->Value.pbData,
 					pExt->Value.cbData,
@@ -247,7 +264,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			{
 				buffer.resize(bufferSize);
 				rc = CryptDecodeObjectEx(
-					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 
+					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
 					pExt->pszObjId,
 					pExt->Value.pbData,
 					pExt->Value.cbData,
@@ -282,7 +299,7 @@ Poco::DateTime X509Certificate::validFrom() const
 	return Poco::DateTime(ts);
 }
 
-	
+
 Poco::DateTime X509Certificate::expiresOn() const
 {
 	Poco::Timestamp ts = Poco::Timestamp::fromFileTimeNP(_pCert->pCertInfo->NotAfter.dwLowDateTime, _pCert->pCertInfo->NotAfter.dwHighDateTime);
@@ -364,13 +381,13 @@ void* X509Certificate::nid2oid(NID nid)
 
 void X509Certificate::loadCertificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore)
 {
-	std::wstring wcertStore;
-	Poco::UnicodeConverter::convert(certStoreName, wcertStore);
+	std::wstring wcertStoreName;
+	Poco::UnicodeConverter::convert(certStoreName, wcertStoreName);
 	HCERTSTORE hCertStore;
 	if (useMachineStore)
-		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, certStoreName.c_str());
+		hCertStore = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0, CERT_SYSTEM_STORE_LOCAL_MACHINE, wcertStoreName.c_str());
 	else
-		hCertStore = CertOpenSystemStoreW(0, wcertStore.c_str());
+		hCertStore = CertOpenSystemStoreW(0, wcertStoreName.c_str());
 
 	if (!hCertStore) throw CertificateException("Failed to open certificate store", certStoreName, GetLastError());
 
@@ -385,7 +402,7 @@ void X509Certificate::loadCertificate(const std::string& certName, const std::st
 	cert_rdn.rgRDNAttr = &cert_rdn_attr;
 
 	_pCert = CertFindCertificateInStore(hCertStore, X509_ASN_ENCODING, 0, CERT_FIND_SUBJECT_ATTR, &cert_rdn, NULL);
-	if (!_pCert) 
+	if (!_pCert)
 	{
 		CertCloseStore(hCertStore, 0);
 		throw NoCertificateException(Poco::format("Failed to find certificate %s in store %s", certName, certStoreName));
@@ -399,7 +416,6 @@ void X509Certificate::importCertificate(const std::string& certPath)
 	Poco::File certFile(certPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(certPath);
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("certificate file too large", certPath);
 	if (size < 32) throw Poco::DataFormatException("certificate file too small", certPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(certPath);
@@ -447,7 +463,7 @@ void X509Certificate::importPEMCertificate(const char* pBuffer, std::size_t size
 	char* derEnd = derBegin;
 
 	int ch = dec.get();
-	while (ch != -1) 
+	while (ch != -1)
 	{
 		*derEnd++ = static_cast<char>(ch);
 		ch = dec.get();
@@ -474,7 +490,7 @@ bool X509Certificate::verify(const std::string& hostName) const
 
 
 bool X509Certificate::verify(const Poco::Net::X509Certificate& certificate, const std::string& hostName)
-{		
+{
 	std::string commonName;
 	std::set<std::string> dnsNames;
 	certificate.extractNames(commonName, dnsNames);

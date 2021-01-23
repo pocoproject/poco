@@ -1,8 +1,6 @@
 //
 // HashSet.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/HashSet.h#1 $
-//
 // Library: Foundation
 // Package: Hashing
 // Module:  HashSet
@@ -27,7 +25,7 @@
 namespace Poco {
 
 
-template <class Value, class HashFunc = Hash<Value> >
+template <class Value, class HashFunc = Hash<Value>>
 class HashSet
 	/// This class implements a set using a LinearHashTable.
 	///

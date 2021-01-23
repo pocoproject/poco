@@ -1,8 +1,6 @@
 //
 // HTTPCookie.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPCookie.cpp#3 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPCookie
@@ -45,17 +43,19 @@ HTTPCookie::HTTPCookie():
 	_version(0),
 	_secure(false),
 	_maxAge(-1),
-	_httpOnly(false)
+	_httpOnly(false),
+	_sameSite(SAME_SITE_NOT_SPECIFIED)
 {
 }
 
-	
+
 HTTPCookie::HTTPCookie(const std::string& name):
 	_version(0),
 	_name(name),
 	_secure(false),
 	_maxAge(-1),
-	_httpOnly(false)
+	_httpOnly(false),
+	_sameSite(SAME_SITE_NOT_SPECIFIED)
 {
 }
 
@@ -64,12 +64,13 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 	_version(0),
 	_secure(false),
 	_maxAge(-1),
-	_httpOnly(false)
+	_httpOnly(false),
+	_sameSite(SAME_SITE_NOT_SPECIFIED)
 {
-	for (NameValueCollection::ConstIterator it = nvc.begin(); it != nvc.end(); ++it)
+	for (const auto& p: nvc)
 	{
-		const std::string& name  = it->first;
-		const std::string& value = it->second;
+		const std::string& name  = p.first;
+		const std::string& value = p.second;
 		if (icompare(name, "comment") == 0)
 		{
 			setComment(value);
@@ -101,6 +102,15 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 			Timestamp now;
 			setMaxAge((int) ((exp.timestamp() - now) / Timestamp::resolution()));
 		}
+		else if (icompare(name, "SameSite") == 0)
+		{
+			if (icompare(value, "None") == 0)
+				_sameSite = SAME_SITE_NONE;
+			else if (icompare(value, "Lax") == 0)
+				_sameSite = SAME_SITE_LAX;
+			else if (icompare(value, "Strict") == 0)
+				_sameSite = SAME_SITE_STRICT;
+		}
 		else if (icompare(name, "version") == 0)
 		{
 			setVersion(NumberParser::parse(value));
@@ -117,18 +127,19 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 	}
 }
 
-	
+
 HTTPCookie::HTTPCookie(const std::string& name, const std::string& value):
 	_version(0),
 	_name(name),
 	_value(value),
 	_secure(false),
 	_maxAge(-1),
-	_httpOnly(false)
+	_httpOnly(false),
+	_sameSite(SAME_SITE_NOT_SPECIFIED)
 {
 }
 
-	
+
 HTTPCookie::HTTPCookie(const HTTPCookie& cookie):
 	_version(cookie._version),
 	_name(cookie._name),
@@ -139,7 +150,8 @@ HTTPCookie::HTTPCookie(const HTTPCookie& cookie):
 	_priority(cookie._priority),
 	_secure(cookie._secure),
 	_maxAge(cookie._maxAge),
-	_httpOnly(cookie._httpOnly)
+	_httpOnly(cookie._httpOnly),
+	_sameSite(cookie._sameSite)
 {
 }
 
@@ -148,7 +160,7 @@ HTTPCookie::~HTTPCookie()
 {
 }
 
-	
+
 HTTPCookie& HTTPCookie::operator = (const HTTPCookie& cookie)
 {
 	if (&cookie != this)
@@ -163,29 +175,30 @@ HTTPCookie& HTTPCookie::operator = (const HTTPCookie& cookie)
 		_secure   = cookie._secure;
 		_maxAge   = cookie._maxAge;
 		_httpOnly = cookie._httpOnly;
+		_sameSite = cookie._sameSite;
 	}
 	return *this;
 }
 
-	
+
 void HTTPCookie::setVersion(int version)
 {
 	_version = version;
 }
 
-	
+
 void HTTPCookie::setName(const std::string& name)
 {
 	_name = name;
 }
 
-	
+
 void HTTPCookie::setValue(const std::string& value)
 {
 	_value = value;
 }
 
-	
+
 void HTTPCookie::setComment(const std::string& comment)
 {
 	_comment = comment;
@@ -216,7 +229,7 @@ void HTTPCookie::setSecure(bool secure)
 }
 
 
-void HTTPCookie::setMaxAge(int maxAge) 
+void HTTPCookie::setMaxAge(int maxAge)
 {
 	_maxAge = maxAge;
 }
@@ -225,6 +238,12 @@ void HTTPCookie::setMaxAge(int maxAge)
 void HTTPCookie::setHttpOnly(bool flag)
 {
 	_httpOnly = flag;
+}
+
+
+void HTTPCookie::setSameSite(SameSite value)
+{
+	_sameSite = value;
 }
 
 
@@ -259,6 +278,20 @@ std::string HTTPCookie::toString() const
 			ts += _maxAge * Timestamp::resolution();
 			result.append("; expires=");
 			DateTimeFormatter::append(result, ts, DateTimeFormat::HTTP_FORMAT);
+		}
+		switch (_sameSite)
+		{
+		case SAME_SITE_NONE:
+			result.append("; SameSite=None");
+			break;
+		case SAME_SITE_LAX:
+			result.append("; SameSite=Lax");
+			break;
+		case SAME_SITE_STRICT:
+			result.append("; SameSite=Strict");
+			break;
+		case SAME_SITE_NOT_SPECIFIED:
+			break;
 		}
 		if (_secure)
 		{
@@ -305,6 +338,20 @@ std::string HTTPCookie::toString() const
 			result.append("; Max-Age=\"");
 			NumberFormatter::append(result, _maxAge);
 			result.append("\"");
+		}
+		switch (_sameSite)
+		{
+		case SAME_SITE_NONE:
+			result.append("; SameSite=None");
+			break;
+		case SAME_SITE_LAX:
+			result.append("; SameSite=Lax");
+			break;
+		case SAME_SITE_STRICT:
+			result.append("; SameSite=Strict");
+			break;
+		case SAME_SITE_NOT_SPECIFIED:
+			break;
 		}
 		if (_secure)
 		{

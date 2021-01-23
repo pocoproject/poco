@@ -32,10 +32,13 @@
 			<options>
 				${Includes},
 				-I/usr/local/mysql/include,
+				-I/usr/include/mysql,
 				-D_DEBUG,
 				-E,
 				-C,
-				-DPOCO_NO_GCC_API_ATTRIBUTE
+                -DPOCO_NO_WINDOWS_H,
+				-DPOCO_NO_GCC_API_ATTRIBUTE,
+				-xc++
 			</options>
 			<path></path>
 			<usePipe>true</usePipe>

@@ -1,8 +1,6 @@
 //
 // NodeFilter.cpp
 //
-// $Id: //poco/1.4/XML/src/NodeFilter.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  NodeFilter

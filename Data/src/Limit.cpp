@@ -1,8 +1,6 @@
 //
 // Limit.cpp
 //
-// $Id: //poco/Main/Data/src/Limit.cpp#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Limit

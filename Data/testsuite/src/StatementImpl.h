@@ -1,8 +1,6 @@
 //
 // StatementImpl.h
 //
-// $Id: //poco/Main/Data/testsuite/src/StatementImpl.h#2 $
-//
 // Definition of the StatementImpl class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

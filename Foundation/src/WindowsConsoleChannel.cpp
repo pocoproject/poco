@@ -1,8 +1,6 @@
 //
 // WindowsConsoleChannel.cpp
 //
-// $Id: //poco/1.4/Foundation/src/WindowsConsoleChannel.cpp#2 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  WindowsConsoleChannel
@@ -16,9 +14,7 @@
 
 #include "Poco/WindowsConsoleChannel.h"
 #include "Poco/Message.h"
-#if defined(POCO_WIN32_UTF8)
 #include "Poco/UnicodeConverter.h"
-#endif
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 
@@ -47,7 +43,6 @@ void WindowsConsoleChannel::log(const Message& msg)
 	std::string text = msg.getText();
 	text += "\r\n";
 	
-#if defined(POCO_WIN32_UTF8)
 	if (_isFile)
 	{
 		DWORD written;
@@ -60,10 +55,6 @@ void WindowsConsoleChannel::log(const Message& msg)
 		DWORD written;
 		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, NULL);
 	}
-#else
-	DWORD written;
-	WriteFile(_hConsole, text.data(), text.size(), &written, NULL);	
-#endif
 }
 
 
@@ -98,7 +89,6 @@ void WindowsColorConsoleChannel::log(const Message& msg)
 		SetConsoleTextAttribute(_hConsole, attr);
 	}
 
-#if defined(POCO_WIN32_UTF8)
 	if (_isFile)
 	{
 		DWORD written;
@@ -111,10 +101,6 @@ void WindowsColorConsoleChannel::log(const Message& msg)
 		DWORD written;
 		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, NULL);
 	}
-#else
-	DWORD written;
-	WriteFile(_hConsole, text.data(), text.size(), &written, NULL);	
-#endif
 
 	if (_enableColors && !_isFile)
 	{

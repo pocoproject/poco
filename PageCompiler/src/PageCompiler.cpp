@@ -1,8 +1,6 @@
 //
 // PageCompiler.cpp
 //
-// $Id: //poco/1.4/PageCompiler/src/PageCompiler.cpp#4 $
-//
 // A compiler that compiler HTML pages containing JSP directives into C++ classes.
 //
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
@@ -56,21 +54,22 @@ using Poco::OutputLineEndingConverter;
 class CompilerApp: public Application
 {
 public:
-	CompilerApp(): 
+	CompilerApp():
 		_helpRequested(false),
 		_generateOSPCode(false),
 		_generateApacheCode(false),
-		_emitLineDirectives(true)
+		_emitLineDirectives(true),
+		_escape(false)
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -82,7 +81,7 @@ protected:
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleHelp)));
 
 		options.addOption(
-			Option("define", "D", 
+			Option("define", "D",
 				"Define a configuration property. A configuration property "
 				"defined with this option can be referenced in the input "
 				"page file, using the following syntax: ${<name>}.")
@@ -90,7 +89,7 @@ protected:
 				.repeatable(true)
 				.argument("<name>=<value>")
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleDefine)));
-				
+
 		options.addOption(
 			Option("config-file", "f", "Load configuration data from the given file.")
 				.required(false)
@@ -143,19 +142,25 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleNoLine)));
+
+		options.addOption(
+			Option("escape", "e", "Escape special HTML characters (<, >, \", &) in <%= %> expressions.")
+				.required(false)
+				.repeatable(false)
+				.callback(OptionCallback<CompilerApp>(this, &CompilerApp::handleEscape)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		stopOptionsProcessing();
 	}
-	
+
 	void handleDefine(const std::string& name, const std::string& value)
 	{
 		defineProperty(value);
 	}
-	
+
 	void handleConfig(const std::string& name, const std::string& value)
 	{
 		loadConfiguration(value);
@@ -185,19 +190,24 @@ protected:
 
 	void handleOSP(const std::string& name, const std::string& value)
 	{
-		_generateOSPCode = true;	
+		_generateOSPCode = true;
 	}
 
 	void handleApache(const std::string& name, const std::string& value)
 	{
 		_generateApacheCode = true;
 	}
-	
+
 	void handleNoLine(const std::string& name, const std::string& value)
 	{
 		_emitLineDirectives = false;
 	}
-	
+
+	void handleEscape(const std::string& name, const std::string& value)
+	{
+		_escape = true;
+	}
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -206,7 +216,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2012 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2020 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "
@@ -220,7 +230,7 @@ protected:
 		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);
 	}
-	
+
 	void defineProperty(const std::string& def)
 	{
 		std::string name;
@@ -247,7 +257,7 @@ protected:
 		{
 			compile(*it);
 		}
-		
+
 		return Application::EXIT_OK;
 	}
 
@@ -259,7 +269,7 @@ protected:
 		pageReader.parse(srcStream);
 
 		Path p(path);
-		
+
 		if (page.has("page.class"))
 		{
 			clazz = page.get("page.class");
@@ -268,15 +278,15 @@ protected:
 		{
 			clazz = p.getBaseName() + "Handler";
 			clazz[0] = Poco::Ascii::toUpper(clazz[0]);
-		}			
+		}
 	}
-	
+
 	void write(const std::string& path, const Page& page, const std::string& clazz)
 	{
 		Path p(path);
 		config().setString("inputFileName", p.getFileName());
 		config().setString("inputFilePath", p.toString());
-		
+
 		DateTime now;
 		config().setString("dateTime", DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
 
@@ -285,18 +295,18 @@ protected:
 			p.setBaseName(clazz);
 		}
 
-		std::auto_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
+		std::unique_ptr<CodeWriter> pCodeWriter(createCodeWriter(page, clazz));
 
 		if (!_outputDir.empty())
 		{
 			p = Path(_outputDir, p.getBaseName());
 		}
-		
+
 		if (!_base.empty())
 		{
 			p.setBaseName(_base);
 		}
-		
+
 		p.setExtension("cpp");
 		std::string implPath = p.toString();
 		std::string implFileName = p.getFileName();
@@ -323,10 +333,16 @@ protected:
 		writeFileHeader(headerLEC);
 		pCodeWriter->writeHeader(headerLEC, headerFileName);
 	}
-	
+
 	void compile(const std::string& path)
 	{
 		Page page;
+
+		if (_escape)
+		{
+			page.set("page.escape", "true");
+		}
+
 		std::string clazz;
 		parse(path, page, clazz);
 		write(path, page, clazz);
@@ -363,6 +379,7 @@ private:
 	bool _generateOSPCode;
 	bool _generateApacheCode;
 	bool _emitLineDirectives;
+	bool _escape;
 	std::string _outputDir;
 	std::string _headerOutputDir;
 	std::string _headerPrefix;

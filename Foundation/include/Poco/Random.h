@@ -1,8 +1,6 @@
 //
 // Random.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Random.h#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  Random

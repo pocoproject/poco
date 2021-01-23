@@ -1,8 +1,6 @@
 //
 // HTTPSessionFactory.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPSessionFactory.cpp#1 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPSessionFactory
@@ -44,9 +42,9 @@ HTTPSessionFactory::HTTPSessionFactory(const std::string& proxyHost, Poco::UInt1
 
 HTTPSessionFactory::~HTTPSessionFactory()
 {
-	for (Instantiators::iterator it = _instantiators.begin(); it != _instantiators.end(); ++it)
+	for (auto& p: _instantiators)
 	{
-		delete it->second.pIn;
+		delete p.second.pIn;
 	}
 }
 

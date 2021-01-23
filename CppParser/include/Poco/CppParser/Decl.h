@@ -1,8 +1,6 @@
 //
 // Decl.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/Decl.h#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Decl

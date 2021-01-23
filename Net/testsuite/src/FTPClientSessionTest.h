@@ -1,8 +1,6 @@
 //
 // FTPClientSessionTest.h
 //
-// $Id: //poco/svn/Net/testsuite/src/FTPClientSessionTest.h#2 $
-//
 // Definition of the FTPClientSessionTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

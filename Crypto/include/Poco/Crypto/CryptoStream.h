@@ -1,8 +1,6 @@
 //
 // CryptoStream.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CryptoStream.h#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CryptoStream
@@ -22,6 +20,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/Crypto/CryptoTransform.h"
 #include "Poco/BufferedStreamBuf.h"
 #include "Poco/Buffer.h"
 #include <iostream>
@@ -40,8 +39,8 @@ class Crypto_API CryptoStreamBuf: public Poco::BufferedStreamBuf
 	/// going through it.
 {
 public:
-	CryptoStreamBuf(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
-	CryptoStreamBuf(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
+	CryptoStreamBuf(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
+	CryptoStreamBuf(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 
 	virtual ~CryptoStreamBuf();
 
@@ -53,7 +52,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	CryptoTransform* _pTransform;
+	CryptoTransform::Ptr _pTransform;
 	std::istream*	 _pIstr;
 	std::ostream*	 _pOstr;
 	bool			 _eof;
@@ -72,8 +71,8 @@ class Crypto_API CryptoIOS: public virtual std::ios
 	/// stream buffer and base classes.
 {
 public:
-	CryptoIOS(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
-	CryptoIOS(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
+	CryptoIOS(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
+	CryptoIOS(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 	~CryptoIOS();
 	CryptoStreamBuf* rdbuf();
 
@@ -91,7 +90,7 @@ class Crypto_API CryptoInputStream: public CryptoIOS, public std::istream
 	/// respectively.
 {
 public:
-	CryptoInputStream(std::istream& istr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
+	CryptoInputStream(std::istream& istr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 		/// Create a new CryptoInputStream object. The CryptoInputStream takes the
 		/// ownership of the given CryptoTransform object.
 
@@ -115,7 +114,7 @@ class Crypto_API CryptoOutputStream: public CryptoIOS, public std::ostream
 	/// to ensure completion of cryptographic transformation.
 {
 public:
-	CryptoOutputStream(std::ostream& ostr, CryptoTransform* pTransform, std::streamsize bufferSize = 8192);
+	CryptoOutputStream(std::ostream& ostr, CryptoTransform::Ptr pTransform, std::streamsize bufferSize = 8192);
 		/// Create a new CryptoOutputStream object. The CryptoOutputStream takes the
 		/// ownership of the given CryptoTransform object.
 

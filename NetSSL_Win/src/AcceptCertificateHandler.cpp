@@ -1,8 +1,6 @@
 //
 // AcceptCertificateHandler.cpp
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: SSLCore
 // Module:  AcceptCertificateHandler

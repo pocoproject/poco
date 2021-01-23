@@ -1,8 +1,6 @@
 //
 // ApacheServerResponse.cpp
 //
-// $Id: //poco/1.4/ApacheConnector/src/ApacheServerResponse.cpp#3 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -49,6 +47,9 @@ void ApacheServerResponse::initApacheOutputStream()
 
 	_pApacheRequest->setContentType(getContentType());
 
+	int statusCode = static_cast<std::underlying_type<Poco::Net::HTTPResponse::HTTPStatus>::type>(getStatus());
+	_pApacheRequest->setStatus(statusCode);
+
 	std::vector<HTTPCookie> cookies;
 	getCookies(cookies);
 	
@@ -56,6 +57,11 @@ void ApacheServerResponse::initApacheOutputStream()
 	for (int c = 0; c < cnt; c++)
 	{
 		_pApacheRequest->addHeader("Set-Cookie", cookies[c].toString());
+	}
+
+	for (Poco::Net::NameValueCollection::ConstIterator it = begin(); it != end(); ++it)
+	{
+		_pApacheRequest->addHeader(it->first, it->second);
 	}
 
 	_pStream = new ApacheOutputStream(_pApacheRequest);

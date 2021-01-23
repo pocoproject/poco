@@ -1,8 +1,6 @@
 //
 // UniqueExpireLRUCache.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UniqueExpireLRUCache.h#1 $
-//
 // Library: Foundation
 // Package: Cache
 // Module:  UniqueExpireLRUCache
@@ -37,7 +35,7 @@ template <
 >
 class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
 	/// A UniqueExpireLRUCache combines LRU caching and time based per entry expire caching.
-	/// One can define for each cache entry a seperate timepoint
+	/// One can define for each cache entry a separate timepoint
 	/// but also limit the size of the cache (per default: 1024).
 	/// Each TValue object must thus offer the following method:
 	///    
@@ -49,7 +47,7 @@ class UniqueExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollectio
 	/// method to values that do not have a getExpiration function.
 {
 public:
-	UniqueExpireLRUCache(long cacheSize = 1024): 
+	UniqueExpireLRUCache(std::size_t cacheSize = 1024):
 		AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>(StrategyCollection<TKey, TValue>())
 	{
 		this->_strategy.pushBack(new LRUStrategy<TKey, TValue>(cacheSize));

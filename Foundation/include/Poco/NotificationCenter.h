@@ -1,8 +1,6 @@
 //
 // NotificationCenter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NotificationCenter.h#2 $
-//
 // Library: Foundation
 // Package: Notifications
 // Module:  NotificationCenter

@@ -1,9 +1,7 @@
 //
 // ConnectionHandle.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ConnectionHandle.h#3 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ConnectionHandle
 //
@@ -32,6 +30,7 @@ namespace Poco {
 namespace Data {
 namespace ODBC {
 
+class SessionImpl;
 
 class ODBC_API ConnectionHandle
 /// ODBC connection handle class
@@ -62,6 +61,8 @@ private:
 	const EnvironmentHandle* _pEnvironment;
 	SQLHDBC                  _hdbc;
 	bool                     _ownsEnvironment;
+
+	friend class Poco::Data::ODBC::SessionImpl;
 };
 
 

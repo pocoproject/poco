@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/MySQLStatementImpl.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLStatementImpl
 //
@@ -16,16 +14,17 @@
 
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
 
+
 namespace Poco {
 namespace Data {
 namespace MySQL {
 
 
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
-	Poco::Data::StatementImpl(h), 
-	_stmt(h.handle()), 
+	Poco::Data::StatementImpl(h),
+	_stmt(h.handle()),
 	_pBinder(new Binder),
-	_pExtractor(new Extractor(_stmt, _metadata)), 
+	_pExtractor(new Extractor(_stmt, _metadata)),
 	_hasNext(NEXT_DONTKNOW)
 {
 }
@@ -47,13 +46,13 @@ int MySQLStatementImpl::affectedRowCount() const
 	return _stmt.getAffectedRowCount();
 }
 
-	
+
 const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos) const
 {
 	return _metadata.metaColumn(pos);
 }
 
-	
+
 bool MySQLStatementImpl::hasNext()
 {
 	if (_hasNext == NEXT_DONTKNOW)
@@ -80,11 +79,11 @@ bool MySQLStatementImpl::hasNext()
 	return false;
 }
 
-	
+
 std::size_t MySQLStatementImpl::next()
 {
 	if (!hasNext())
-		throw StatementException("No data received");	
+		throw StatementException("No data received");
 
 	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
 	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
@@ -120,12 +119,21 @@ bool MySQLStatementImpl::canCompile() const
 
 void MySQLStatementImpl::compileImpl()
 {
-	_metadata.reset();
-	_stmt.prepare(toString());
-	_metadata.init(_stmt);
+	try
+	{
+		_metadata.reset();
+		_stmt.prepare(toString());
+		_metadata.init(_stmt);
 
-	if (_metadata.columnsReturned() > 0)
-		_stmt.bindResult(_metadata.row());
+		if (_metadata.columnsReturned() > 0)
+			_stmt.bindResult(_metadata.row());
+	}
+	catch (MySQLException& exc)
+	{
+		static_cast<SessionImpl&>(session()).setLastError(exc.code());
+		throw;
+	}
+	static_cast<SessionImpl&>(session()).setLastError(0);
 }
 
 
@@ -142,8 +150,17 @@ void MySQLStatementImpl::bindImpl()
 	}
 
 	_stmt.bindParams(_pBinder->getBindArray(), _pBinder->size());
-	_stmt.execute();
+	try
+	{
+		_stmt.execute();
+	}
+	catch (MySQLException& exc)
+	{
+		static_cast<SessionImpl&>(session()).setLastError(exc.code());
+		throw;
+	}
 	_hasNext = NEXT_DONTKNOW;
+	static_cast<SessionImpl&>(session()).setLastError(0);
 }
 
 

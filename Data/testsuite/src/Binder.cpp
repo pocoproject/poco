@@ -1,8 +1,6 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/Binder.cpp#4 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -70,7 +68,7 @@ void Binder::bind(std::size_t pos, const Poco::UInt64 &val, Direction dir)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 void Binder::bind(std::size_t pos, const long& val, Direction dir)
 {
 }

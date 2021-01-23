@@ -1,8 +1,6 @@
 //
 // Limit.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Limit.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Limit
@@ -31,7 +29,7 @@ class Data_API Limit
 	/// Limit stores information how many rows a query should return.
 {
 public:
-	typedef Poco::UInt32 SizeT;
+	using SizeT = Poco::UInt32;
 
 	enum Type
 	{

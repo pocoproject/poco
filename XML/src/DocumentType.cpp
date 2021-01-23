@@ -1,8 +1,6 @@
 //
 // DocumentType.cpp
 //
-// $Id: //poco/1.4/XML/src/DocumentType.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOM

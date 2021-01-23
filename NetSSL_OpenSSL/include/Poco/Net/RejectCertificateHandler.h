@@ -1,8 +1,6 @@
 //
 // RejectCertificateHandler.h
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/include/Poco/Net/RejectCertificateHandler.h#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  RejectCertificateHandler

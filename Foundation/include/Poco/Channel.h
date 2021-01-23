@@ -1,8 +1,6 @@
 //
 // Channel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Channel.h#1 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  Channel
@@ -24,6 +22,7 @@
 #include "Poco/Configurable.h"
 #include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -40,6 +39,8 @@ class Foundation_API Channel: public Configurable, public RefCountedObject
 	/// of getProperty() and setProperty().
 {
 public:
+	using Ptr = AutoPtr<Channel>;
+
 	Channel();
 		/// Creates the channel and initializes
 		/// the reference count to one.

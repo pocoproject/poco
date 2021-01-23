@@ -1,8 +1,6 @@
 //
 // Extractor.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/Extractor.cpp#4 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -79,7 +77,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 }
 
 
-#ifndef POCO_LONG_IS_64_BIT
+#ifndef POCO_INT64_IS_LONG
 bool Extractor::extract(std::size_t pos, long& val)
 {
 	val = 0;

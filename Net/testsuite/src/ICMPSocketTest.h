@@ -1,8 +1,6 @@
 //
 // ICMPSocketTest.h
 //
-// $Id: //poco/1.4/Net/testsuite/src/ICMPSocketTest.h#1 $
-//
 // Definition of the ICMPSocketTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -28,6 +26,7 @@ public:
 
 	void testSendToReceiveFrom();
 	void testAssign();
+	void testMTU();
 
 	void setUp();
 	void tearDown();

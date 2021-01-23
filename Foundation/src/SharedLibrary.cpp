@@ -1,8 +1,6 @@
 //
 // SharedLibrary.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary.cpp#3 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -24,12 +22,8 @@
 #include "SharedLibrary_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "SharedLibrary_UNIX.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS) && defined(POCO_WIN32_UTF8)
+#elif defined(POCO_OS_FAMILY_WINDOWS) 
 #include "SharedLibrary_WIN32U.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-#include "SharedLibrary_WIN32.cpp"
-#elif defined(POCO_OS_FAMILY_VMS)
-#include "SharedLibrary_VMS.cpp"
 #endif
 
 
@@ -107,6 +101,12 @@ const std::string& SharedLibrary::getPath() const
 std::string SharedLibrary::suffix()
 {
 	return suffixImpl();
+}
+
+
+bool SharedLibrary::setSearchPath(const std::string& path)
+{
+	return setSearchPathImpl(path);
 }
 
 

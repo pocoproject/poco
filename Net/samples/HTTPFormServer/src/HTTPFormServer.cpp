@@ -1,8 +1,6 @@
 //
 // HTTPFormServer.cpp
 //
-// $Id: //poco/Main/Net/samples/HTTPFormServer/src/HTTPFormServer.cpp#5 $
-//
 // This sample demonstrates the HTTPServer and HTMLForm classes.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

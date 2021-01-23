@@ -1,8 +1,6 @@
 //
 // DigestEngineTest.h
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/DigestEngineTest.h#1 $
-//
 // Definition of the DigestEngineTest class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.

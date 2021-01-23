@@ -1,9 +1,7 @@
 //
 // Connector.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Connector.cpp#2 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Connector
 //
@@ -24,15 +22,12 @@
 #endif
 
 
-const SQLiteConnectorRegistrator pocoSQLiteConnectorRegistrator;
-
-
 namespace Poco {
 namespace Data {
 namespace SQLite {
 
 
-const std::string Connector::KEY(POCO_DATA_SQLITE_CONNECTOR_NAME);
+const std::string Connector::KEY("sqlite");
 
 
 Connector::Connector()
@@ -60,7 +55,7 @@ void Connector::registerConnector()
 
 void Connector::unregisterConnector()
 {
-	Poco::Data::SessionFactory::instance().remove(POCO_DATA_SQLITE_CONNECTOR_NAME);
+	Poco::Data::SessionFactory::instance().remove(KEY);
 }
 
 

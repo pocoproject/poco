@@ -1,8 +1,6 @@
 //
 // NumberParserTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NumberParserTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -60,52 +58,44 @@ void NumberParserTest::testParse()
 	{
 		char ts = sep[i];
 
-		assert(NumberParser::parse("123") == 123);
-		assert(NumberParser::parse(format("123%c456", ts), ts) == 123456);
-		assert(NumberParser::parse(format("1%c234%c567", ts, ts), ts) == 1234567);
+		assertTrue (NumberParser::parse("123") == 123);
+		assertTrue (NumberParser::parse(format("123%c456", ts), ts) == 123456);
+		assertTrue (NumberParser::parse(format("1%c234%c567", ts, ts), ts) == 1234567);
 	}
 
-	assert(NumberParser::parse("+123") == 123);
-	assert(NumberParser::parse("-123") == -123);
-	assert(NumberParser::parse("0") == 0);
-	assert(NumberParser::parse("000") == 0);
-	assert(NumberParser::parse("  123  ") == 123);
-	assert(NumberParser::parse(" 123") == 123);
-	assert(NumberParser::parse("123 ") == 123);
-	assert(NumberParser::parse("0123") == 123);
-	assert(NumberParser::parse("+0123") == 123);
-	assert(NumberParser::parse("-0123") == -123);
-	assert(NumberParser::parse("-123") == -123);
-	assert(NumberParser::parseUnsigned("123") == 123);
-	assert(NumberParser::parseHex("12AB") == 0x12ab);
-	assert(NumberParser::parseHex("0X12AB") == 0x12ab);
-	assert(NumberParser::parseHex("0x12AB") == 0x12ab);
-	assert(NumberParser::parseHex("0x12aB") == 0x12ab);
-	assert(NumberParser::parseHex("0X98Fe") == 0x98fe);
-	assert(NumberParser::parseHex("0x0") == 0);
-	assert(NumberParser::parseHex("00") == 0);
-	assert(NumberParser::parseOct("123") == 0123);
-	assert(NumberParser::parseOct("0123") == 0123);
-	assert(NumberParser::parseOct("0") == 0);
-	assert(NumberParser::parseOct("000") == 0);
+	assertTrue (NumberParser::parse("+123") == 123);
+	assertTrue (NumberParser::parse("-123") == -123);
+	assertTrue (NumberParser::parse("0") == 0);
+	assertTrue (NumberParser::parse("000") == 0);
+	assertTrue (NumberParser::parse("0123") == 123);
+	assertTrue (NumberParser::parse("+0123") == 123);
+	assertTrue (NumberParser::parse("-0123") == -123);
+	assertTrue (NumberParser::parseUnsigned("123") == 123);
+	assertTrue (NumberParser::parseHex("12AB") == 0x12ab);
+	assertTrue (NumberParser::parseHex("0x12AB") == 0x12ab);
+	assertTrue (NumberParser::parseHex("0X12AB") == 0x12ab);
+	assertTrue (NumberParser::parseHex("00") == 0);
+	assertTrue (NumberParser::parseOct("123") == 0123);
+	assertTrue (NumberParser::parseOct("0123") == 0123);
+	assertTrue (NumberParser::parseOct("0") == 0);
+	assertTrue (NumberParser::parseOct("000") == 0);
 
-	assert(NumberParser::parseBool("0") == false);
-	assert(NumberParser::parseBool("FALSE") == false);
-	assert(NumberParser::parseBool("no") == false);
-	assert(NumberParser::parseBool("1") == true);
-	assert(NumberParser::parseBool("True") == true);
-	assert(NumberParser::parseBool("YeS") == true);
+	assertTrue (NumberParser::parseBool("0") == false);
+	assertTrue (NumberParser::parseBool("FALSE") == false);
+	assertTrue (NumberParser::parseBool("no") == false);
+	assertTrue (NumberParser::parseBool("1") == true);
+	assertTrue (NumberParser::parseBool("True") == true);
+	assertTrue (NumberParser::parseBool("YeS") == true);
 
 #if defined(POCO_HAVE_INT64)
-	assert(NumberParser::parse64("123") == 123);
-	assert(NumberParser::parse64("-123") == -123);
-	assert(NumberParser::parse64("0123") == 123);
-	assert(NumberParser::parse64("-0123") == -123);
-	assert(NumberParser::parseUnsigned64("123") == 123);
-	assert(NumberParser::parseHex64("12AB") == 0x12ab);
-	assert(NumberParser::parseHex64("0x12AB") == 0x12ab);
-	assert(NumberParser::parseOct64("123") == 0123);
-	assert(NumberParser::parseOct64("0123") == 0123);
+	assertTrue (NumberParser::parse64("123") == 123);
+	assertTrue (NumberParser::parse64("-123") == -123);
+	assertTrue (NumberParser::parse64("0123") == 123);
+	assertTrue (NumberParser::parse64("-0123") == -123);
+	assertTrue (NumberParser::parseUnsigned64("123") == 123);
+	assertTrue (NumberParser::parseHex64("12AB") == 0x12ab);
+	assertTrue (NumberParser::parseOct64("123") == 0123);
+	assertTrue (NumberParser::parseOct64("0123") == 0123);
 #endif
 
 #ifndef POCO_NO_FPENVIRONMENT
@@ -155,35 +145,26 @@ void NumberParserTest::testParse()
 				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234e+100", dp), dp, ts), 0.01);
 				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234E100", dp), dp, ts), 0.01);
 		
-				d = 1.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234e-100 ", dp), dp, ts), 0.01);
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234e-100 ", dp), dp, ts), 0.01);
-				assertEqualDelta(d, NumberParser::parseFloat(format("  1%c234e-100 ", dp), dp, ts), 0.01);
-
 				d = 1234.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 1%c234%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("1%c234%c234e-100", ts, dp), dp, ts), 0.01);
 				d = 12345.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" 12%c345%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("12%c345%c234e-100", ts, dp), dp, ts), 0.01);
 				d = 123456.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format("  123%c456%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("123%c456%c234e-100", ts, dp), dp, ts), 0.01);
 
 				d = -1234.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" -1%c234%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("-1%c234%c234e-100", ts, dp), dp, ts), 0.01);
 				d = -12345.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format(" -12%c345%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("-12%c345%c234e-100", ts, dp), dp, ts), 0.01);
 				d = -123456.234e-100;
-				assertEqualDelta(d, NumberParser::parseFloat(format("  -123%c456%c234e-100 ", ts, dp), dp, ts), 0.01);
+				assertEqualDelta(d, NumberParser::parseFloat(format("-123%c456%c234e-100", ts, dp), dp, ts), 0.01);
 			}
 
 			double d = 12.34e-10;
 			assertEqualDelta(d, NumberParser::parseFloat(format("12%c34e-10", dp), dp, ts), 0.01);
 			assertEqualDelta(-12.34, NumberParser::parseFloat(format("-12%c34", dp), dp, ts), 0.01);
 	
-			assertEqualDelta(12.34, NumberParser::parseFloat(format("   12%c34", dp),dp, ts), 0.01);
-			assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34   ", dp), dp, ts), 0.01);
-			assertEqualDelta(12.34, NumberParser::parseFloat(format(" 12%c34  ", dp), dp, ts), 0.01);
-
-			assertEqualDelta(12.34, NumberParser::parseFloat(format("\t\n 12%c34  \v\f\r", dp), dp, ts), 0.01);
+			assertEqualDelta(12.34, NumberParser::parseFloat(format("12%c34", dp), dp, ts), 0.01);
 		}
 	}
 #endif // POCO_NO_FPENVIRONMENT
@@ -192,20 +173,20 @@ void NumberParserTest::testParse()
 
 void NumberParserTest::testLimits()
 {
-	assert(testUpperLimit<Int8>());
-	assert(testLowerLimit<Int8>());
-	assert(testUpperLimit<UInt8>());
-	assert(testUpperLimit<Int16>());
-	assert(testLowerLimit<Int16>());
-	assert(testUpperLimit<UInt16>());
-	assert(testUpperLimit<Int32>());
-	assert(testLowerLimit<Int32>());
-	assert(testUpperLimit<UInt32>());
+	assertTrue (testUpperLimit<Int8>());
+	assertTrue (testLowerLimit<Int8>());
+	assertTrue (testUpperLimit<UInt8>());
+	assertTrue (testUpperLimit<Int16>());
+	assertTrue (testLowerLimit<Int16>());
+	assertTrue (testUpperLimit<UInt16>());
+	assertTrue (testUpperLimit<Int32>());
+	assertTrue (testLowerLimit<Int32>());
+	assertTrue (testUpperLimit<UInt32>());
 
 #if defined(POCO_HAVE_INT64)
-	assert(testUpperLimit64<Int64>());
-	assert(testLowerLimit64<Int64>());
-	assert(testUpperLimit64<UInt64>());
+	assertTrue (testUpperLimit64<Int64>());
+	assertTrue (testLowerLimit64<Int64>());
+	assertTrue (testUpperLimit64<UInt64>());
 #endif
 }
 
@@ -216,7 +197,7 @@ void NumberParserTest::testParseError()
 	if (dp == 0) dp = '.';
 	char ts = thousandSeparator();
 	if (ts == 0) ts = ',';
-	assert (dp != ts);
+	assertTrue (dp != ts);
 
 	try
 	{
@@ -228,6 +209,13 @@ void NumberParserTest::testParseError()
 	try
 	{
 		NumberParser::parse(" ");
+		NumberParser::parseBool("");
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
+
+	try
+	{
+		NumberParser::parse(" 123");
 		NumberParser::parseBool("");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }

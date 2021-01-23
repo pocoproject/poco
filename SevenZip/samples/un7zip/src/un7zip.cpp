@@ -1,8 +1,6 @@
 //
 // un7zip.cpp
 //
-// $Id$
-//
 // This sample demonstrates the Archive class.
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.

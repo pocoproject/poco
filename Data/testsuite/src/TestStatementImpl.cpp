@@ -1,8 +1,6 @@
 //
 // TestStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/testsuite/src/TestStatementImpl.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -50,7 +48,7 @@ bool TestStatementImpl::canBind() const
 void TestStatementImpl::bindImpl()
 {
 	// bind
-	typedef Poco::Data::AbstractBindingVec Bindings;
+	using Bindings = Poco::Data::AbstractBindingVec;
 	Bindings& binds = bindings();
 	if (binds.empty())
 		return;

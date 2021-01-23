@@ -1,8 +1,6 @@
 //
 // HTTPStreamFactory.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPStreamFactory.cpp#2 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPStreamFactory
@@ -26,6 +24,8 @@
 #include "Poco/UnbufferedStreamBuf.h"
 #include "Poco/NullStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Format.h"
+#include "Poco/Version.h"
 
 
 using Poco::URIStreamFactory;
@@ -115,6 +115,12 @@ std::istream* HTTPStreamFactory::open(const URI& uri)
 				cred.authenticate(req, res);
 			}
 			
+			req.set("User-Agent", Poco::format("poco/%d.%d.%d", 
+				(POCO_VERSION >> 24) & 0xFF,
+				(POCO_VERSION >> 16) & 0xFF,
+				(POCO_VERSION >> 8) & 0xFF));
+			req.set("Accept", "*/*");
+			
 			pSession->sendRequest(req);
 			std::istream& rs = pSession->receiveResponse(res);
 			bool moved = (res.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY || 
@@ -134,7 +140,7 @@ std::istream* HTTPStreamFactory::open(const URI& uri)
 			{
 				return new HTTPResponseStream(rs, pSession);
 			}
-			else if (res.getStatus() == HTTPResponse::HTTP_USEPROXY && !retry)
+			else if (res.getStatus() == HTTPResponse::HTTP_USE_PROXY && !retry)
 			{
 				// The requested resource MUST be accessed through the proxy 
 				// given by the Location field. The Location field gives the 

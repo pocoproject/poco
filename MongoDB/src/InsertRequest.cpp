@@ -1,13 +1,9 @@
 //
 // InsertRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  InsertRequest
-//
-// Implementation of the InsertRequest class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -23,8 +19,8 @@ namespace Poco {
 namespace MongoDB {
 
 
-InsertRequest::InsertRequest(const std::string& collectionName, Flags flags) 
-	: RequestMessage(MessageHeader::Insert), 
+InsertRequest::InsertRequest(const std::string& collectionName, Flags flags):
+	RequestMessage(MessageHeader::OP_INSERT), 
 	_flags(flags),
 	_fullCollectionName(collectionName)
 {
@@ -38,12 +34,12 @@ InsertRequest::~InsertRequest()
 
 void InsertRequest::buildRequest(BinaryWriter& writer)
 {
-	//TODO: throw exception when no document is added
+	poco_assert (!_documents.empty());
 
 	writer << _flags;
 	BSONWriter bsonWriter(writer);
 	bsonWriter.writeCString(_fullCollectionName);
-	for(Document::Vector::iterator it = _documents.begin(); it != _documents.end(); ++it)
+	for (Document::Vector::iterator it = _documents.begin(); it != _documents.end(); ++it)
 	{
 		bsonWriter.write(*it);
 	}

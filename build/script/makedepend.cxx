@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/makedepend.cxx#1 $
-#
 # makedepend.cxx
 #
 # Create dependency file, Compaq C++ version

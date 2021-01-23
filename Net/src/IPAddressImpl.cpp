@@ -1,8 +1,6 @@
 //
 // IPAddress.cpp
 //
-// $Id: //poco/1.4/Net/src/IPAddress.cpp#5 $
-//
 // Library: Net
 // Package: NetCore
 // Module:  IPAddress
@@ -107,8 +105,8 @@ IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& addr)
 
 IPv4AddressImpl& IPv4AddressImpl::operator = (const IPv4AddressImpl& addr)
 {
-    if (this == &addr)
-        return *this;
+	if (this == &addr)
+		return *this;
 
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
 	return *this;
@@ -145,7 +143,7 @@ const void* IPv4AddressImpl::addr() const
 
 IPAddressImpl::Family IPv4AddressImpl::family() const
 {
-	return IPAddressImpl::IPv4;
+	return AddressFamily::IPv4;
 }
 
 
@@ -377,8 +375,8 @@ IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& addr): _scope(addr._scop
 
 IPv6AddressImpl& IPv6AddressImpl::operator = (const IPv6AddressImpl& addr)
 {
-    if (this == &addr)
-        return *this;
+	if (this == &addr)
+		return *this;
 
 	_scope = addr._scope;
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
@@ -432,13 +430,16 @@ std::string IPv6AddressImpl::toString() const
 		else
 			result.append("::ffff:");
 		const UInt8* bytes = reinterpret_cast<const UInt8*>(&_addr);
-		NumberFormatter::append(result, bytes[12]);
-		result.append(".");
-		NumberFormatter::append(result, bytes[13]);
-		result.append(".");
-		NumberFormatter::append(result, bytes[14]);
-		result.append(".");
-		NumberFormatter::append(result, bytes[15]);
+		if (bytes[12] != 0) // only 0.0.0.0 can start with zero
+		{
+			NumberFormatter::append(result, bytes[12]);
+			result.append(".");
+			NumberFormatter::append(result, bytes[13]);
+			result.append(".");
+			NumberFormatter::append(result, bytes[14]);
+			result.append(".");
+			NumberFormatter::append(result, bytes[15]);
+		}
 		return result;
 	}
 	else
@@ -499,7 +500,7 @@ const void* IPv6AddressImpl::addr() const
 
 IPAddressImpl::Family IPv6AddressImpl::family() const
 {
-	return IPAddressImpl::IPv6;
+	return AddressFamily::IPv6;
 }
 
 
@@ -534,6 +535,8 @@ unsigned IPv6AddressImpl::prefixLength() const
 	throw NotImplementedException("prefixLength() not implemented");
 #endif
 }
+
+
 Poco::UInt32 IPv6AddressImpl::scope() const
 {
 	return _scope;
@@ -696,8 +699,8 @@ IPAddressImpl* IPv6AddressImpl::clone() const
 
 IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 {
-    if (_scope != addr._scope)
-        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
+	if (_scope != addr._scope)
+		throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
 
 	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -721,8 +724,8 @@ IPv6AddressImpl IPv6AddressImpl::operator & (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 {
-    if (_scope != addr._scope) 
-        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
+	if (_scope != addr._scope) 
+		throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match with the source one.");
     
 	IPv6AddressImpl result(*this);
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -746,8 +749,8 @@ IPv6AddressImpl IPv6AddressImpl::operator | (const IPv6AddressImpl& addr) const
 
 IPv6AddressImpl IPv6AddressImpl::operator ^ (const IPv6AddressImpl& addr) const
 {
-    if (_scope != addr._scope)
-        throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match  with the source one.");
+	if (_scope != addr._scope)
+		throw Poco::InvalidArgumentException("Scope ID of passed IPv6 address does not match  with the source one.");
     
 	IPv6AddressImpl result(*this);
 

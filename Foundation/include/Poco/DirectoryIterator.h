@@ -1,8 +1,6 @@
 //
 // DirectoryIterator.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryIterator.h#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  DirectoryIterator

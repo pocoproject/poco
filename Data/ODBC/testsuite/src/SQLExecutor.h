@@ -1,8 +1,6 @@
 //
 // SQLExecutor.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/SQLExecutor.h#4 $
-//
 // Definition of the SQLExecutor class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

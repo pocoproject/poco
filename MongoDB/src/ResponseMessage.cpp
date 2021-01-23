@@ -1,13 +1,9 @@
 //
 // ResponseMessage.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  ResponseMessage
-//
-// Implementation of the ResponseMessage class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -24,7 +20,12 @@ namespace Poco {
 namespace MongoDB {
 
 
-ResponseMessage::ResponseMessage() : Message(MessageHeader::Reply), _responseFlags(0), _cursorID(0), _startingFrom(0), _numberReturned(0)
+ResponseMessage::ResponseMessage():
+	Message(MessageHeader::OP_REPLY), 
+	_responseFlags(0), 
+	_cursorID(0), 
+	_startingFrom(0), 
+	_numberReturned(0)
 {
 }
 
@@ -57,7 +58,7 @@ void ResponseMessage::read(std::istream& istr)
 	reader >> _startingFrom;
 	reader >> _numberReturned;
 
-	for(int i = 0; i < _numberReturned; ++i)
+	for (int i = 0; i < _numberReturned; ++i)
 	{
 		Document::Ptr doc = new Document();
 		doc->read(reader);

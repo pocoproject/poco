@@ -1,8 +1,6 @@
 //
 // VarIterator.cpp
 //
-// $Id: //poco/Main/Data/src/VarIterator.cpp#1 $
-//
 // Library: Foundation
 // Package: Dynamic
 // Module:  VarIterator
@@ -16,7 +14,7 @@
 
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Dynamic/Var.h"
-#include "Poco/Dynamic/Struct.h"
+//#include "Poco/Dynamic/Struct.h"
 #undef min
 #undef max
 #include <limits>
@@ -43,6 +41,13 @@ VarIterator::VarIterator(const VarIterator& other):
 }
 
 
+VarIterator::VarIterator(VarIterator&& other) noexcept:
+	_pVar(std::move(other._pVar)),
+	_position(std::move(other._position))
+{
+}
+
+
 VarIterator::~VarIterator()
 {
 }
@@ -52,6 +57,14 @@ VarIterator& VarIterator::operator = (const VarIterator& other)
 {
 	VarIterator tmp(other);
 	swap(tmp);
+	return *this;
+}
+
+
+VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
+{
+	_pVar = std::move(other._pVar);
+	_position = std::move(other._position);
 	return *this;
 }
 

@@ -1,8 +1,6 @@
 //
 // X509Certificate.h
 //
-// $Id$
-//
 // Library: NetSSL_Win
 // Package: Certificate
 // Module:  X509Certificate
@@ -24,7 +22,9 @@
 #include "Poco/DateTime.h"
 #include <set>
 #include <istream>
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include <wincrypt.h>
+#endif
 
 
 namespace Poco {
@@ -76,8 +76,14 @@ public:
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
 
+	X509Certificate(X509Certificate&& cert) noexcept;
+		/// Creates the certificate by moving another one.
+
 	X509Certificate& operator = (const X509Certificate& cert);
 		/// Assigns a certificate.
+
+	X509Certificate& operator = (X509Certificate&& cert) noexcept;
+		/// Move-assigns a certificate.
  
 	void swap(X509Certificate& cert);
 		/// Exchanges the certificate with another one.

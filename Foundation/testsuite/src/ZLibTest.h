@@ -1,8 +1,6 @@
 //
 // ZLibTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/ZLibTest.h#1 $
-//
 // Definition of the ZLibTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

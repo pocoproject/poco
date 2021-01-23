@@ -1,8 +1,6 @@
 //
 // Windows1250Encoding.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Windows1250Encoding.cpp#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  Windows1250Encoding

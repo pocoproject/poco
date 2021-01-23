@@ -1,8 +1,6 @@
 //
 // CryptoTransform.h
 //
-// $Id: //poco/1.4/Crypto/include/Poco/Crypto/CryptoTransform.h#2 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CryptoTransform
@@ -21,6 +19,7 @@
 
 
 #include "Poco/Crypto/Crypto.h"
+#include "Poco/SharedPtr.h"
 #include <ios>
 
 
@@ -37,6 +36,8 @@ class Crypto_API CryptoTransform
 	/// perform encryption or decryption of data.
 {
 public:
+	using Ptr = Poco::SharedPtr<CryptoTransform>;
+
 	CryptoTransform();
 		/// Creates a new CryptoTransform object.
 
@@ -47,11 +48,22 @@ public:
 		/// Returns the block size for this CryptoTransform.
 
 	virtual int setPadding(int padding);
-		/// Enables or disables padding. By default encryption operations are padded using standard block 
-		/// padding and the padding is checked and removed when decrypting. If the padding parameter is zero then 
-		/// no padding is performed, the total amount of data encrypted or decrypted must then be a multiple of 
+		/// Enables or disables padding. By default encryption operations are padded using standard block
+		/// padding and the padding is checked and removed when decrypting. If the padding parameter is zero then
+		/// no padding is performed, the total amount of data encrypted or decrypted must then be a multiple of
 		/// the block size or an error will occur.
-		
+
+	virtual std::string getTag(std::size_t tagSize = 16) = 0;
+		/// Returns the GCM tag after encrypting using GCM mode.
+		///
+		/// Must be called after finalize().
+
+	virtual void setTag(const std::string& tag) = 0;
+		/// Sets the GCM tag for authenticated decryption using GCM mode.
+		///
+		/// Must be set before finalize() is called, otherwise
+		/// decryption will fail.
+
 	virtual std::streamsize transform(
 		const unsigned char* input,
 		std::streamsize		 inputLength,

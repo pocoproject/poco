@@ -1,8 +1,6 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.4/Net/testsuite/src/EchoServer.cpp#1 $
-//
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -24,6 +22,16 @@ using Poco::Net::SocketAddress;
 
 EchoServer::EchoServer():
 	_socket(SocketAddress()),
+	_thread("EchoServer"),
+	_stop(false)
+{
+	_thread.start(*this);
+	_ready.wait();
+}
+
+
+EchoServer::EchoServer(const Poco::Net::SocketAddress& address):
+	_socket(address),
 	_thread("EchoServer"),
 	_stop(false)
 {

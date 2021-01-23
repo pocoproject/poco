@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/BeagleBoard#1 $
-#
 # BeagleBoard
 #
 # Make settings for Open Embedded/Angstrom BeagleBoard
@@ -40,7 +38,7 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -mfpu=neon -mfloat-abi=softfp -march=armv7-a
+CFLAGS          = -std=c99 -mfpu=neon -mfloat-abi=softfp -march=armv7-a
 CFLAGS32        =
 CFLAGS64        =
 CXXFLAGS        = -mfpu=neon -mfloat-abi=softfp -march=armv7-a
@@ -65,7 +63,7 @@ RELEASEOPT_LINK = -O2
 #
 # System Specific Flags
 #
-SYSFLAGS = -D_XOPEN_SOURCE=500 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE -DPOCO_NO_FPENVIRONMENT
+SYSFLAGS = -D_XOPEN_SOURCE=600 -D_BSD_SOURCE -D_REENTRANT -D_THREAD_SAFE -DPOCO_NO_FPENVIRONMENT
 
 #
 # System Specific Libraries

@@ -1,8 +1,6 @@
 //
 // SecureStreamSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/SecureStreamSocketImpl.cpp#6 $
-//
 // Library: NetSSL_Win
 // Package: SSLSockets
 // Module:  SecureStreamSocketImpl

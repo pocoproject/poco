@@ -1,8 +1,6 @@
 //
 // EchoServer.cpp
 //
-// $Id: //poco/1.4/Net/samples/EchoServer/src/EchoServer.cpp#1 $
-//
 // This sample demonstrates the SocketReactor and SocketAcceptor classes.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
@@ -111,18 +109,38 @@ public:
 	
 	void onSocketReadable(const AutoPtr<ReadableNotification>& pNf)
 	{
-		// some socket implementations (windows) report available 
-		// bytes on client disconnect, so we  double-check here
-		if (_socket.available())
+		try
 		{
 			int len = _socket.receiveBytes(_fifoIn);
-			_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), _fifoIn.used()));
+			if (len > 0)
+			{
+				_fifoIn.drain(_fifoOut.write(_fifoIn.buffer(), _fifoIn.used()));
+			}
+			else
+			{
+				delete this;
+			}
+		}
+		catch (Poco::Exception& exc)
+		{
+			Application& app = Application::instance();
+			app.logger().log(exc);
+			delete this;
 		}
 	}
 	
 	void onSocketWritable(const AutoPtr<WritableNotification>& pNf)
 	{
-		_socket.sendBytes(_fifoOut);
+		try
+		{
+			_socket.sendBytes(_fifoOut);
+		}
+		catch (Poco::Exception& exc)
+		{
+			Application& app = Application::instance();
+			app.logger().log(exc);
+			delete this;
+		}
 	}
 
 	void onSocketShutdown(const AutoPtr<ShutdownNotification>& pNf)

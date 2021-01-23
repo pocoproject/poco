@@ -1,8 +1,6 @@
 //
 // RSATest.cpp
 //
-// $Id: //poco/1.4/Crypto/testsuite/src/RSATest.cpp#1 $
-//
 // Copyright (c) 2008, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -104,7 +102,7 @@ void RSATest::testNewKeys()
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -127,7 +125,7 @@ void RSATest::testNewKeysNoPassphrase()
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
-	assert (pubFromPrivate == pubKey);
+	assertTrue (pubFromPrivate == pubKey);
 }
 
 
@@ -148,7 +146,7 @@ void RSATest::testSign()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub);
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
+	assertTrue (eng2.verify(sig));
 }
 
 
@@ -169,7 +167,7 @@ void RSATest::testSignSha256()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub, "SHA256");
 	eng2.update(msg.c_str(), static_cast<unsigned>(msg.length()));
-	assert (eng2.verify(sig));
+	assertTrue (eng2.verify(sig));
 }
 
 
@@ -191,7 +189,7 @@ void RSATest::testSignManipulated()
 	RSAKey keyPub(&iPub);
 	RSADigestEngine eng2(keyPub);
 	eng2.update(msgManip.c_str(), static_cast<unsigned>(msgManip.length()));
-	assert (!eng2.verify(sig));
+	assertTrue (!eng2.verify(sig));
 }
 
 
@@ -203,7 +201,7 @@ void RSATest::testRSACipher()
 		std::string val(n, 'x');
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
-		assert (dec == val);
+		assertTrue (dec == val);
 	}
 }
 
@@ -230,7 +228,7 @@ void RSATest::testRSACipherLarge()
 		std::string val(*it, 'x');
 		std::string enc = pCipher->encryptString(val);
 		std::string dec = pCipher->decryptString(enc);
-		assert (dec == val);
+		assertTrue (dec == val);
 	}
 }
 
@@ -248,7 +246,7 @@ void RSATest::testCertificate()
 	
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
-	assert (dec == val);
+	assertTrue (dec == val);
 }
 
 

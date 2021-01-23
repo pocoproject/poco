@@ -1,7 +1,10 @@
 /*
- * << Haru Free PDF Library 2.0.5 >> -- HPDF_Dict.c
+ * << Haru Free PDF Library >> -- hpdf_dict.c
  *
- * Copyright (c) 1999-2004 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * URL: http://libharu.org
+ *
+ * Copyright (c) 1999-2006 Takeshi Kanno <takeshi_kanno@est.hi-ho.ne.jp>
+ * Copyright (c) 2007-2009 Antony Dovgal <tony@daylessday.org>
  *
  * Permission to use, copy, modify, distribute and sell this software
  * and its documentation for any purpose is hereby granted without fee,
@@ -113,6 +116,25 @@ HPDF_Dict_Free  (HPDF_Dict  dict)
     HPDF_FreeMem (dict->mmgr, dict);
 }
 
+HPDF_STATUS
+HPDF_Dict_Add_FilterParams(HPDF_Dict    dict, HPDF_Dict filterParam)
+{
+    HPDF_Array paramArray;
+    /* prepare params object */
+    paramArray = HPDF_Dict_GetItem (dict, "DecodeParms",
+                                              HPDF_OCLASS_ARRAY);
+    if(paramArray==NULL) {
+        paramArray = HPDF_Array_New (dict->mmgr);
+       if (!paramArray)
+            return HPDF_Error_GetCode (dict->error);
+
+        /* add parameters */
+        HPDF_Dict_Add(dict, "DecodeParms", paramArray);
+    }
+    HPDF_Array_Add(paramArray, filterParam);
+    return HPDF_OK;
+}
+
 
 HPDF_STATUS
 HPDF_Dict_Write  (HPDF_Dict     dict,
@@ -155,13 +177,21 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
 
             HPDF_Array_Clear (array);
 
-#ifndef HPDF_NOZLIB
+#ifndef LIBHPDF_HAVE_NOZLIB
             if (dict->filter & HPDF_STREAM_FILTER_FLATE_DECODE)
                 HPDF_Array_AddName (array, "FlateDecode");
-#endif /* HPDF_NOZLIB */
+#endif /* LIBHPDF_HAVE_NOZLIB */
 
             if (dict->filter & HPDF_STREAM_FILTER_DCT_DECODE)
                 HPDF_Array_AddName (array, "DCTDecode");
+
+            if(dict->filter & HPDF_STREAM_FILTER_CCITT_DECODE)
+                HPDF_Array_AddName (array, "CCITTFaxDecode");
+
+            if(dict->filterParams!=NULL)
+            {
+                HPDF_Dict_Add_FilterParams(dict, dict->filterParams);
+            }
         }
     }
 
@@ -220,7 +250,7 @@ HPDF_Dict_Write  (HPDF_Dict     dict,
                     0);
         }
 
-        if ((ret = HPDF_Stream_WriteStr (stream, "\012stream\015\012"))
+        if ((ret = HPDF_Stream_WriteStr (stream, "\012stream\015\012")) /* Acrobat 8.15 requires both \r and \n here */
                 != HPDF_OK)
             return ret;
 

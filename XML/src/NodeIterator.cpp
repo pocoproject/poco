@@ -1,8 +1,6 @@
 //
 // NodeIterator.cpp
 //
-// $Id: //poco/1.4/XML/src/NodeIterator.cpp#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  NodeIterator

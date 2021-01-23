@@ -1,8 +1,6 @@
 //
 // ConfigurationView.cpp
 //
-// $Id: //poco/1.4/Util/src/ConfigurationView.cpp#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationView
@@ -21,19 +19,16 @@ namespace Poco {
 namespace Util {
 
 
-ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfiguration* pConfig):
+ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig):
 	_prefix(prefix),
 	_pConfig(pConfig)
 {
 	poco_check_ptr (pConfig);
-
-	_pConfig->duplicate();
 }
 
 
 ConfigurationView::~ConfigurationView()
 {
-	_pConfig->release();
 }
 
 

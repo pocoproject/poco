@@ -1,8 +1,6 @@
 //
 // CipherKey.cpp
 //
-// $Id: //poco/1.4/Crypto/src/CipherKey.cpp#1 $
-//
 // Library: Crypto
 // Package: Cipher
 // Module:  CipherKey
@@ -21,8 +19,12 @@ namespace Poco {
 namespace Crypto {
 
 
-CipherKey::CipherKey(const std::string& name, const std::string& passphrase,  const std::string& salt, int iterationCount):
-	_pImpl(new CipherKeyImpl(name, passphrase, salt, iterationCount))
+CipherKey::CipherKey(const std::string& name,
+	const std::string& passphrase,
+	const std::string& salt,
+	int iterationCount,
+	const std::string &digest):
+		_pImpl(new CipherKeyImpl(name, passphrase, salt, iterationCount, digest))
 {
 }
 
@@ -39,8 +41,37 @@ CipherKey::CipherKey(const std::string& name):
 }
 
 
+CipherKey::CipherKey(const CipherKey& other):
+	_pImpl(other._pImpl)
+{
+}
+
+
+CipherKey::CipherKey(CipherKey&& other) noexcept:
+	_pImpl(std::move(other._pImpl))
+{
+}
+
+
 CipherKey::~CipherKey()
 {
+}
+
+
+CipherKey& CipherKey::operator = (const CipherKey& other)
+{
+	if (&other != this)
+	{
+		_pImpl = other._pImpl;
+	}
+	return *this;
+}
+
+
+CipherKey& CipherKey::operator = (CipherKey&& other) noexcept
+{
+	_pImpl = std::move(other._pImpl);
+	return *this;
 }
 
 

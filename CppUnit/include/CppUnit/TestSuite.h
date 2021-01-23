@@ -1,8 +1,6 @@
 //
 // TestSuite.h
 //
-// $Id: //poco/1.4/CppUnit/include/CppUnit/TestSuite.h#1 $
-//
 
 
 #ifndef CppUnit_TestSuite_INCLUDED
@@ -44,9 +42,10 @@ public:
 	~TestSuite();
 
 	void run(TestResult* result);
-	int countTestCases();
+	int countTestCases() const;
 	void addTest(Test* test);
-	std::string toString();
+	std::string toString() const;
+	Test::Type getType() const;
 
 	virtual void deleteContents();
 	
@@ -79,11 +78,16 @@ inline void TestSuite::addTest(Test* test)
 
 
 // Returns a std::string representation of the test suite.
-inline std::string TestSuite::toString()
+inline std::string TestSuite::toString() const
 {
 	return "suite " + _name; 
 }
 
+// Returns the type of the test, see Test::Type
+inline Test::Type TestSuite::getType() const
+{
+	return Test::Suite;
+}
 
 // Returns all tests
 inline const std::vector<Test*> TestSuite::tests() const

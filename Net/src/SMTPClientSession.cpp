@@ -1,8 +1,6 @@
 //
 // SMTPClientSession.cpp
 //
-// $Id: //poco/1.4/Net/src/SMTPClientSession.cpp#1 $
-//
 // Library: Net
 // Package: Mail
 // Module:  SMTPClientSession
@@ -21,8 +19,10 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/SocketStream.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Environment.h"
 #include "Poco/Net/NetworkInterface.h"
+#include "Poco/Net/NTLMCredentials.h"
+#include "Poco/Net/SSPINTLMCredentials.h"
+#include "Poco/Environment.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
@@ -59,6 +59,7 @@ SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
 
 
 SMTPClientSession::SMTPClientSession(const std::string& host, Poco::UInt16 port):
+	_host(host),
 	_socket(SocketAddress(host, port)),
 	_isOpen(false)
 {
@@ -82,7 +83,7 @@ void SMTPClientSession::setTimeout(const Poco::Timespan& timeout)
 	_socket.setReceiveTimeout(timeout);
 }
 
-	
+
 Poco::Timespan SMTPClientSession::getTimeout() const
 {
 	return _socket.getReceiveTimeout();
@@ -133,26 +134,27 @@ void SMTPClientSession::loginUsingCRAM(const std::string& username, const std::s
 
 	if (!isPositiveIntermediate(status)) throw SMTPException(std::string("Cannot authenticate using ") + method, response, status);
 	std::string challengeBase64 = response.substr(4);
-	
+
 	std::istringstream istr(challengeBase64);
 	Base64Decoder decoder(istr);
 	std::string challenge;
 	StreamCopier::copyToString(decoder, challenge);
-	
+
 	hmac.update(challenge);
-	
+
 	const DigestEngine::Digest& digest = hmac.digest();
 	std::string digestString(DigestEngine::digestToHex(digest));
-	
+
 	std::string challengeResponse = username + " " + digestString;
-	
+
 	std::ostringstream challengeResponseBase64;
 	Base64Encoder encoder(challengeResponseBase64);
+	encoder.rdbuf()->setLineLength(0);
 	encoder << challengeResponse;
 	encoder.close();
-	
+
 	status = sendCommand(challengeResponseBase64.str(), response);
-  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);  
+  	if (!isPositiveCompletion(status)) throw SMTPException(std::string("Login using ") + method + " failed", response, status);
 }
 
 
@@ -161,17 +163,19 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	std::string response;
 	int status = sendCommand("AUTH LOGIN", response);
 	if (!isPositiveIntermediate(status)) throw SMTPException("Cannot authenticate using LOGIN", response, status);
-	
+
 	std::ostringstream usernameBase64;
 	Base64Encoder usernameEncoder(usernameBase64);
+	usernameEncoder.rdbuf()->setLineLength(0);
 	usernameEncoder << username;
 	usernameEncoder.close();
-	
+
 	std::ostringstream passwordBase64;
 	Base64Encoder passwordEncoder(passwordBase64);
+	passwordEncoder.rdbuf()->setLineLength(0);
 	passwordEncoder << password;
 	passwordEncoder.close();
-	
+
 	//Server request for username/password not defined could be either
 	//S: login:
 	//C: user_login
@@ -182,40 +186,123 @@ void SMTPClientSession::loginUsingLogin(const std::string& username, const std::
 	//C: user_password
 	//S: login:
 	//C: user_login
-	
+
 	std::string decodedResponse;
 	std::istringstream responseStream(response.substr(4));
 	Base64Decoder responseDecoder(responseStream);
 	StreamCopier::copyToString(responseDecoder, decodedResponse);
-	
+
 	if (Poco::icompare(decodedResponse, 0, 8, "username") == 0) // username first (md5("Username:"))
 	{
 		status = sendCommand(usernameBase64.str(), response);
 		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN username failed", response, status);
-		
+
 		status = sendCommand(passwordBase64.str(), response);
-		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response, status);  
+		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN password failed", response, status);
 	}
 	else if  (Poco::icompare(decodedResponse, 0, 8, "password") == 0) // password first (md5("Password:"))
 	{
 		status = sendCommand(passwordBase64.str(), response);
-		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response, status);  
-		
+		if (!isPositiveIntermediate(status)) throw SMTPException("Login using LOGIN password failed", response, status);
+
 		status = sendCommand(usernameBase64.str(), response);
 		if (!isPositiveCompletion(status)) throw SMTPException("Login using LOGIN username failed", response, status);
 	}
 }
 
+
 void SMTPClientSession::loginUsingPlain(const std::string& username, const std::string& password)
 {
 	std::ostringstream credentialsBase64;
 	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder.rdbuf()->setLineLength(0);
 	credentialsEncoder << '\0' << username << '\0' << password;
 	credentialsEncoder.close();
 
 	std::string response;
 	int status = sendCommand("AUTH PLAIN", credentialsBase64.str(), response);
 	if (!isPositiveCompletion(status)) throw SMTPException("Login using PLAIN failed", response, status);
+}
+
+
+void SMTPClientSession::loginUsingXOAUTH2(const std::string& username, const std::string& password)
+{
+	std::ostringstream credentialsBase64;
+	Base64Encoder credentialsEncoder(credentialsBase64);
+	credentialsEncoder.rdbuf()->setLineLength(0);
+	credentialsEncoder << "user=" << username << "\001auth=Bearer " << password << "\001\001";
+	credentialsEncoder.close();
+
+	std::string response;
+	int status = sendCommand("AUTH XOAUTH2", credentialsBase64.str(), response);
+	if (!isPositiveCompletion(status)) throw SMTPException("Login using XOAUTH2 failed", response, status);
+}
+
+
+void SMTPClientSession::loginUsingNTLM(const std::string& username, const std::string& password)
+{
+	// Implementation is based on:
+	// [MS-SMTPNTLM]: NT LAN Manager (NTLM) Authentication: Simple Mail Transfer Protocol (SMTP) Extension
+	// https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smtpntlm/50c668f6-5ffc-4616-96df-b5a3f4b3311d
+
+	std::string user;
+	std::string domain;
+	std::vector<unsigned char> negotiateBuf;
+	Poco::SharedPtr<NTLMContext> pNTLMContext;
+	if (username.empty() && password.empty() && !_host.empty() && SSPINTLMCredentials::available())
+	{
+		pNTLMContext = SSPINTLMCredentials::createNTLMContext(_host, SSPINTLMCredentials::SERVICE_SMTP);
+		negotiateBuf = SSPINTLMCredentials::negotiate(*pNTLMContext);
+	}
+	else
+	{
+		NTLMCredentials::NegotiateMessage negotiateMsg;
+		NTLMCredentials::splitUsername(username, user, domain);
+		negotiateMsg.domain = domain;
+		negotiateBuf = NTLMCredentials::formatNegotiateMessage(negotiateMsg);
+	}
+	std::string response;
+	int status = sendCommand("AUTH NTLM", NTLMCredentials::toBase64(negotiateBuf), response);
+	if (status == 334)
+	{
+		std::vector<unsigned char> authenticateBuf;
+		std::vector<unsigned char> buffer = NTLMCredentials::fromBase64(response.substr(4));
+		if (buffer.empty()) throw SMTPException("Invalid NTLM challenge");
+		if (pNTLMContext)
+		{
+			authenticateBuf = SSPINTLMCredentials::authenticate(*pNTLMContext, buffer);
+		}
+		else
+		{
+			NTLMCredentials::ChallengeMessage challengeMsg;
+			if (NTLMCredentials::parseChallengeMessage(&buffer[0], buffer.size(), challengeMsg))
+			{
+				if ((challengeMsg.flags & NTLMCredentials::NTLM_FLAG_NEGOTIATE_NTLM2_KEY) == 0)
+				{
+					throw SMTPException("Server does not support NTLMv2 authentication");
+				}
+
+				NTLMCredentials::AuthenticateMessage authenticateMsg;
+				authenticateMsg.flags = challengeMsg.flags;
+				authenticateMsg.target = challengeMsg.target;
+				authenticateMsg.username = user;
+
+				std::vector<unsigned char> lmNonce = NTLMCredentials::createNonce();
+				std::vector<unsigned char> ntlmNonce = NTLMCredentials::createNonce();
+				Poco::UInt64 timestamp = NTLMCredentials::createTimestamp();
+				std::vector<unsigned char> ntlm2Hash = NTLMCredentials::createNTLMv2Hash(user, challengeMsg.target, password);
+
+				authenticateMsg.lmResponse = NTLMCredentials::createLMv2Response(ntlm2Hash, challengeMsg.challenge, lmNonce);
+				authenticateMsg.ntlmResponse = NTLMCredentials::createNTLMv2Response(ntlm2Hash, challengeMsg.challenge, ntlmNonce, challengeMsg.targetInfo, timestamp);
+
+				authenticateBuf = NTLMCredentials::formatAuthenticateMessage(authenticateMsg);
+			}
+			else throw SMTPException("Invalid NTLM challenge");
+		}
+		status = sendCommand(NTLMCredentials::toBase64(authenticateBuf), response);
+		if (status != 235) throw SMTPException("NTLM authentication failed", response, status);
+	}
+	else throw SMTPException("Server does not support NTLM authentication");
 }
 
 
@@ -229,7 +316,7 @@ void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMeth
 {
 	std::string response;
 	login(hostname, response);
-	
+
 	if (loginMethod == AUTH_CRAM_MD5)
 	{
 		if (response.find("CRAM-MD5", 0) != std::string::npos)
@@ -261,6 +348,22 @@ void SMTPClientSession::login(const std::string& hostname, LoginMethod loginMeth
 			loginUsingPlain(username, password);
 		}
 		else throw SMTPException("The mail service does not support PLAIN authentication", response);
+	}
+	else if (loginMethod == AUTH_XOAUTH2)
+	{
+		if (response.find("XOAUTH2", 0) != std::string::npos)
+		{
+			loginUsingXOAUTH2(username, password);
+		}
+		else throw SMTPException("The mail service does not support XOAUTH2 authentication", response);
+	}
+	else if (loginMethod == AUTH_NTLM)
+	{
+		if (response.find("NTLM", 0) != std::string::npos)
+		{
+			loginUsingNTLM(username, password);
+		}
+		else throw SMTPException("The mail service does not support NTLM authentication", response);
 	}
 	else if (loginMethod != AUTH_NONE)
 	{
@@ -312,13 +415,13 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 	}
 
 	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response, status);
-	
+
 	std::ostringstream recipient;
 	if (pRecipients)
 	{
-		for (Recipients::const_iterator it = pRecipients->begin(); it != pRecipients->end(); ++it)
+		for (const auto& rec: *pRecipients)
 		{
-			recipient << '<' << *it << '>';
+			recipient << '<' << rec << '>';
 			int status = sendCommand("RCPT TO:", recipient.str(), response);
 			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 			recipient.str("");
@@ -326,9 +429,9 @@ void SMTPClientSession::sendCommands(const MailMessage& message, const Recipient
 	}
 	else
 	{
-		for (MailMessage::Recipients::const_iterator it = message.recipients().begin(); it != message.recipients().end(); ++it)
+		for (const auto& rec: message.recipients())
 		{
-			recipient << '<' << it->getAddress() << '>';
+			recipient << '<' << rec.getAddress() << '>';
 			int status = sendCommand("RCPT TO:", recipient.str(), response);
 			if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 			recipient.str("");
@@ -359,13 +462,12 @@ void SMTPClientSession::sendAddresses(const std::string& from, const Recipients&
 	}
 
 	if (!isPositiveCompletion(status)) throw SMTPException("Cannot send message", response, status);
-	
+
 	std::ostringstream recipient;
 
-	for (Recipients::const_iterator it = recipients.begin(); it != recipients.end(); ++it)
+	for (const auto& rec: recipients)
 	{
-
-		recipient << '<' << *it << '>';
+		recipient << '<' << rec << '>';
 		int status = sendCommand("RCPT TO:", recipient.str(), response);
 		if (!isPositiveCompletion(status)) throw SMTPException(std::string("Recipient rejected: ") + recipient.str(), response, status);
 		recipient.str("");
@@ -402,7 +504,7 @@ void SMTPClientSession::transportMessage(const MailMessage& message)
 	message.write(mailStream);
 	mailStream.close();
 	socketStream.flush();
-	
+
 	std::string response;
 	int status = _socket.receiveStatusMessage(response);
 	if (!isPositiveCompletion(status)) throw SMTPException("The server rejected the message", response, status);
@@ -427,7 +529,7 @@ void SMTPClientSession::sendMessage(std::istream& istr)
 {
 	std::string response;
 	int status = 0;
-	
+
 	SocketOutputStream socketStream(_socket);
 	MailOutputStream mailStream(socketStream);
 	StreamCopier::copyStream(istr, mailStream);

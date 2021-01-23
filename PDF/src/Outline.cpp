@@ -1,8 +1,6 @@
 //
 // Outline.cpp
 //
-// $Id: //poco/Main/PDF/src/Outline.cpp#2 $
-//
 // Library: PDF
 // Package: PDFCore
 // Module:  Outline

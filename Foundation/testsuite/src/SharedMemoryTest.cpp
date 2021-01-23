@@ -1,14 +1,11 @@
 //
 // SharedMemoryTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/SharedMemoryTest.cpp#1 $
-//
 // Copyright (c) 2007, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
-
 
 #include "SharedMemoryTest.h"
 #include "CppUnit/TestCaller.h"
@@ -35,7 +32,7 @@ SharedMemoryTest::~SharedMemoryTest()
 void SharedMemoryTest::testCreate()
 {
 	SharedMemory mem("hi", 4096, SharedMemory::AM_WRITE);
-	assert (mem.end()-mem.begin() == 4096);
+	assertTrue (mem.end()- mem.begin() == 4096);
 	mem.begin()[0] = 'A';
 	mem.end()[-1] = 'Z';
 }
@@ -45,12 +42,12 @@ void SharedMemoryTest::testCreateFromFile()
 {
 	Poco::Path p = findDataFile("testdata.txt");
 	Poco::File f(p);
-	assert (f.exists() && f.isFile());
+	assertTrue (f.exists() && f.isFile());
 	SharedMemory mem(f, SharedMemory::AM_READ);
-	assert (mem.end() > mem.begin()); // valid?
-	assert (mem.end() - mem.begin() == f.getSize());
-	assert (mem.begin()[0] == 'A');
-	assert (mem.end()[-5] == 'Z');
+	assertTrue (mem.end() > mem.begin()); // valid?
+	assertTrue (mem.end() - mem.begin() == f.getSize());
+	assertTrue (mem.begin()[0] == 'A');
+	assertTrue (mem.end()[-5] == 'Z');
 }
 
 
@@ -89,8 +86,9 @@ CppUnit::Test* SharedMemoryTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SharedMemoryTest");
 
+#if !defined(POCO_NO_SHAREDMEMORY)
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreate);
 	CppUnit_addTest(pSuite, SharedMemoryTest, testCreateFromFile);
-
+#endif
 	return pSuite;
 }

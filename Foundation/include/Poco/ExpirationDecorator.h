@@ -1,8 +1,6 @@
 //
 // ExpirationDecorator.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ExpirationDecorator.h#1 $
-//
 // Library: Foundation
 // Package: Events
 // Module:  ExpirationDecorator

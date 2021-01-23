@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/makedepend.qcc#1 $
-#
 # makedepend.gcc
 #
 # Create dependency file, QNX Neutrino QCC version

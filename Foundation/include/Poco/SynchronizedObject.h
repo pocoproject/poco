@@ -1,8 +1,6 @@
 //
 // SynchronizedObject.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/SynchronizedObject.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  SynchronizedObject
@@ -35,7 +33,7 @@ class Foundation_API SynchronizedObject
 	/// scenario.
 {
 public:
-	typedef Poco::ScopedLock<SynchronizedObject> ScopedLock;
+	using ScopedLock = Poco::ScopedLock<SynchronizedObject>;
 	
 	SynchronizedObject();
 		/// Creates the object.

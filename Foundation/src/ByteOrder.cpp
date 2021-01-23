@@ -1,8 +1,6 @@
 //
 // ByteOrder.cpp
 //
-// $Id: //poco/1.4/Foundation/src/ByteOrder.cpp#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  ByteOrder

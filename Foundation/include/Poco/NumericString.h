@@ -1,8 +1,6 @@
 //
 // NumericString.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/NumericString.h#1 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  NumericString
@@ -31,9 +29,23 @@
 #endif
 #include <limits>
 #include <cmath>
+#include <cctype>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
+
+#if defined(POCO_NOINTMAX)
+typedef Poco::UInt64 uintmax_t;
+typedef Poco::Int64 intmax_t;
+#endif
+#if !defined (INTMAX_MAX)
+#define INTMAX_MAX std::numeric_limits<intmax_t>::max()
+#endif
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4146)
+#endif // POCO_COMPILER_MSVC
+
 
 // binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
 #define POCO_MAX_INT_STRING_LEN 65
@@ -48,12 +60,88 @@
 namespace Poco {
 
 
+namespace Impl {
+
+	template<bool SIGNED, typename T>
+	class IsNegativeImpl;
+
+	template<typename T>
+	class IsNegativeImpl<true, T>
+	{
+	public:
+		bool operator()(T x) { return x < 0; }
+	};
+
+	template<typename T>
+	class IsNegativeImpl<false, T>
+	{
+	public:
+		bool operator()(T) { return false; }
+	};
+
+}
+
+
+template<typename T>
+inline bool isNegative(T x)
+{
+	using namespace Impl;
+	return IsNegativeImpl<std::numeric_limits<T>::is_signed, T>()(x);
+}
+
+
+template<typename To, typename From>
+inline bool isIntOverflow(From val)
+{
+	poco_assert_dbg (std::numeric_limits<From>::is_integer);
+	poco_assert_dbg (std::numeric_limits<To>::is_integer);
+	bool ret;
+	if (std::numeric_limits<To>::is_signed)
+	{
+		ret = (!std::numeric_limits<From>::is_signed &&
+			  (uintmax_t)val > (uintmax_t)INTMAX_MAX) ||
+			  (intmax_t)val  < (intmax_t)std::numeric_limits<To>::min() ||
+			  (intmax_t)val  > (intmax_t)std::numeric_limits<To>::max();
+	}
+	else
+	{
+		ret = isNegative(val) ||
+				(uintmax_t)val > (uintmax_t)std::numeric_limits<To>::max();
+	}
+	return ret;
+}
+
+
+template <typename F, typename T>
+inline T& isSafeIntCast(F from)
+	/// Returns true if it is safe to cast
+	/// integer from F to T.
+{
+	if (!isIntOverflow<T, F>(from)) return true;
+	return false;
+}
+
+
+template <typename F, typename T>
+inline T& safeIntCast(F from, T& to)
+	/// Returns csted value if it is safe
+	/// to cast integer from F to T,
+	/// otherwise throws BadCastException.
+{
+	if (!isIntOverflow<T, F>(from))
+	{
+		to = static_cast<T>(from);
+		return to;
+	}
+	throw BadCastException("safeIntCast: Integer overflow");
+}
+
 inline char decimalSeparator()
 	/// Returns decimal separator from global locale or
 	/// default '.' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).decimal_point();
+	return std::use_facet<std::numpunct<char>>(std::locale()).decimal_point();
 #else
 	return '.';
 #endif
@@ -65,7 +153,7 @@ inline char thousandSeparator()
 	/// default ',' for platforms where locale is unavailable.
 {
 #if !defined(POCO_NO_LOCALE)
-	return std::use_facet<std::numpunct<char> >(std::locale()).thousands_sep();
+	return std::use_facet<std::numpunct<char>>(std::locale()).thousands_sep();
 #else
 	return ',';
 #endif
@@ -77,83 +165,91 @@ inline char thousandSeparator()
 //
 
 template <typename I>
-bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
+bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
-	/// it is silently skipped but not verified for correct positioning.
-	/// Function returns true if succesful. If parsing was unsuccesful,
+	/// they are silently skipped and not verified for correct positioning.
+	/// It is not allowed to convert a negative number to unsigned integer.
+	///
+	/// Function returns true if successful. If parsing was unsuccessful,
 	/// the return value is false with the result value undetermined.
 {
+	poco_assert_dbg (base == 2 || base == 8 || base == 10 || base == 16);
+
 	if (!pStr) return false;
-	while (isspace(*pStr)) ++pStr;
+	while (std::isspace(*pStr)) ++pStr;
 	if (*pStr == '\0') return false;
-	short sign = 1;
+	bool negative = false;
 	if ((base == 10) && (*pStr == '-'))
 	{
-		// Unsigned types can't be negative so abort parsing
-		if (std::numeric_limits<I>::min() >= 0) return false;
-		sign = -1;
+		if (!std::numeric_limits<I>::is_signed) return false;
+		negative = true;
 		++pStr;
 	}
 	else if (*pStr == '+') ++pStr;
 
-	// parser states:
-	const char STATE_SIGNIFICANT_DIGITS = 1;
-	char state = 0;
-	
-	result = 0;
-	I limitCheck = std::numeric_limits<I>::max() / base;
+	// all numbers are parsed as positive; the sign
+	// for negative numbers is adjusted after parsing
+	uintmax_t limitCheck = std::numeric_limits<I>::max();
+	if (negative)
+	{
+		poco_assert_dbg(std::numeric_limits<I>::is_signed);
+		// to cover the entire range, (-min > max) has to be
+		// taken into account;
+		// to avoid overflow for the largest int size,
+		// we resort to FPEnvironment::copySign() (ie. floating-point)
+		if (sizeof(I) == sizeof(intmax_t))
+			limitCheck = static_cast<uintmax_t>(FPEnvironment::copySign(static_cast<double>(std::numeric_limits<I>::min()), 1));
+		else
+		{
+			intmax_t i = std::numeric_limits<I>::min();
+			limitCheck = -i;
+		}
+	}
+
+	uintmax_t result = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
+		if  (result > (limitCheck / base)) return false;
 		switch (*pStr)
 		{
-		case 'x': case 'X': 
-			if (base != 0x10) return false;
-
-		case '0': 
-			if (state < STATE_SIGNIFICANT_DIGITS) break;
-
-		case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7':
-			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-			if (result > limitCheck) return false;
-			result = result * base + (*pStr - '0');
-
+		case '0': case '1': case '2': case '3':
+		case '4': case '5': case '6': case '7':
+			{
+				char add = (*pStr - '0');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + add;
+			}
 			break;
 
 		case '8': case '9':
 			if ((base == 10) || (base == 0x10))
 			{
-				if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-				if (result > limitCheck) return false;
-				result = result * base + (*pStr - '0');
+				char  add = (*pStr - '0');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + add;
 			}
 			else return false;
 
 			break;
 
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			if (base != 0x10) return false;
-			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-			if (result > limitCheck) return false;
-			result = result * base + (10 + *pStr - 'a');
-
+			{
+				if (base != 0x10) return false;
+				char  add = (*pStr - 'a');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + (10 + add);
+			}
 			break;
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			if (base != 0x10) return false;
-
-			if (state < STATE_SIGNIFICANT_DIGITS) state = STATE_SIGNIFICANT_DIGITS;
-			if (result > limitCheck) return false;
-			result = result * base + (10 + *pStr - 'A');
-
+			{
+				if (base != 0x10) return false;
+				char add = (*pStr - 'A');
+				if ((limitCheck - result) < add) return false;
+				result = result * base + (10 + add);
+			}
 			break;
-
-		case 'U':
-		case 'u':
-		case 'L':
-		case 'l':
-			goto done;
 
 		case '.':
 			if ((base == 10) && (thSep == '.')) break;
@@ -165,20 +261,28 @@ bool strToInt(const char* pStr, I& result, short base, char thSep = ',')
 
 		case ' ':
 			if ((base == 10) && (thSep == ' ')) break;
-		case '\t':
-		case '\n':
-		case '\v':
-		case '\f':
-		case '\r':
-			goto done;
 
 		default:
 			return false;
 		}
 	}
 
-done:
-	if ((sign < 0) && (base == 10)) result *= sign;
+	if (negative && (base == 10))
+	{
+		poco_assert_dbg(std::numeric_limits<I>::is_signed);
+		intmax_t i;
+		if (sizeof(I) == sizeof(intmax_t))
+			i = static_cast<intmax_t>(FPEnvironment::copySign(static_cast<double>(result), -1));
+		else
+			i = static_cast<intmax_t>(-result);
+		if (isIntOverflow<I>(i)) return false;
+		outResult = static_cast<I>(i);
+	}
+	else
+	{
+		if (isIntOverflow<I>(result)) return false;
+		outResult = static_cast<I>(result);
+	}
 
 	return true;
 }
@@ -208,42 +312,42 @@ namespace Impl {
 		Ptr(char* ptr, std::size_t offset): _beg(ptr), _cur(ptr), _end(ptr + offset)
 		{
 		}
-	
+
 		char*& operator ++ () // prefix
 		{
-			check(_cur + 1);
+			checkBounds(_cur + 1);
 			return ++_cur;
 		}
 
 		char* operator ++ (int) // postfix
 		{
-			check(_cur + 1);
+			checkBounds(_cur + 1);
 			char* tmp = _cur++;
 			return tmp;
 		}
-	
+
 		char*& operator -- () // prefix
 		{
-			check(_cur - 1);
+			checkBounds(_cur - 1);
 			return --_cur;
 		}
 
 		char* operator -- (int) // postfix
 		{
-			check(_cur - 1);
+			checkBounds(_cur - 1);
 			char* tmp = _cur--;
 			return tmp;
 		}
 
 		char*& operator += (int incr)
 		{
-			check(_cur + incr);
+			checkBounds(_cur + incr);
 			return _cur += incr;
 		}
 
 		char*& operator -= (int decr)
 		{
-			check(_cur - decr);
+			checkBounds(_cur - decr);
 			return _cur -= decr;
 		}
 
@@ -258,7 +362,7 @@ namespace Impl {
 		}
 
 	private:
-		void check(char* ptr)
+		void checkBounds(char* ptr)
 		{
 			if (ptr > _end) throw RangeException();
 		}
@@ -266,7 +370,7 @@ namespace Impl {
 		const char* _beg;
 		char*       _cur;
 		const char* _end;
-};	
+};
 
 } // namespace Impl
 
@@ -284,7 +388,7 @@ bool intToStr(T value,
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
 	/// paddings are prepended to the formatted result with minus sign or base prefix included
-	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal, 
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
 {
@@ -371,7 +475,7 @@ bool uIntToStr(T value,
 		*result = '\0';
 		return false;
 	}
-	
+
 	Impl::Ptr ptr(result, size);
 	int thCount = 0;
 	T tmpVal;
@@ -386,31 +490,31 @@ bool uIntToStr(T value,
 			thCount = 0;
 		}
 	} while (value);
-	
+
 	if ('0' == fill)
 	{
 		if (prefix && base == 010) --width;
 		if (prefix && base == 0x10) width -= 2;
 		while ((ptr - result) < width) *ptr++ = fill;
 	}
-	
+
 	if (prefix && base == 010) *ptr++ = '0';
 	else if (prefix && base == 0x10)
 	{
 		*ptr++ = 'x';
 		*ptr++ = '0';
 	}
-	
+
 	if ('0' != fill)
 	{
 		while ((ptr - result) < width) *ptr++ = fill;
 	}
-	
+
 	size = ptr - result;
 	poco_assert_dbg (size <= ptr.span());
 	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
 	*ptr-- = '\0';
-	
+
 	char* ptrr = result;
 	char tmp;
 	while(ptrr < ptr)
@@ -419,7 +523,7 @@ bool uIntToStr(T value,
 		*ptr--  = *ptrr;
 		*ptrr++ = tmp;
 	}
-	
+
 	return true;
 }
 
@@ -435,8 +539,8 @@ bool intToStr (T number, unsigned short base, std::string& result, bool prefix =
 	result.assign(res, size);
 	return ret;
 }
-	
-	
+
+
 template <typename T>
 bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
 	/// Converts unsigned integer to string; This is a wrapper function, for details see see the
@@ -457,15 +561,24 @@ bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix 
 // http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
 //
 
+
 Foundation_API void floatToStr(char* buffer,
 	int bufferSize,
 	float value,
-	int lowDec = -std::numeric_limits<double>::digits10,
-	int highDec = std::numeric_limits<double>::digits10);
+	int lowDec = -std::numeric_limits<float>::digits10,
+	int highDec = std::numeric_limits<float>::digits10);
 	/// Converts a float value to string. Converted string must be shorter than bufferSize.
 	/// Conversion is done by computing the shortest string of digits that correctly represents
 	/// the input number. Depending on lowDec and highDec values, the function returns
 	/// decimal or exponential representation.
+
+Foundation_API void floatToFixedStr(char* buffer,
+	int bufferSize,
+	float value,
+	int precision);
+	/// Converts a float value to string. Converted string must be shorter than bufferSize.
+	/// Computes a decimal representation with a fixed number of digits after the
+  	/// decimal point.
 
 
 Foundation_API std::string& floatToStr(std::string& str,
@@ -476,8 +589,19 @@ Foundation_API std::string& floatToStr(std::string& str,
 	char decSep = 0);
 	/// Converts a float value, assigns it to the supplied string and returns the reference.
 	/// This function calls floatToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument)
 	/// and width (total length of formatted string).
+
+
+Foundation_API std::string& floatToFixedStr(std::string& str,
+	float value,
+	int precision,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a float value, assigns it to the supplied string and returns the reference.
+	/// This function calls floatToFixedStr(char*, int, float, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
 
 
 Foundation_API void doubleToStr(char* buffer,
@@ -491,6 +615,15 @@ Foundation_API void doubleToStr(char* buffer,
 	/// decimal or exponential representation.
 
 
+Foundation_API void doubleToFixedStr(char* buffer,
+	int bufferSize,
+	double value,
+	int precision);
+	/// Converts a double value to string. Converted string must be shorter than bufferSize.
+	/// Computes a decimal representation with a fixed number of digits after the
+  	/// decimal point.
+
+
 Foundation_API std::string& doubleToStr(std::string& str,
 	double value,
 	int precision = -1,
@@ -498,43 +631,61 @@ Foundation_API std::string& doubleToStr(std::string& str,
 	char thSep = 0,
 	char decSep = 0);
 	/// Converts a double value, assigns it to the supplied string and returns the reference.
-	/// This function calls doubleToStr(char*, int, float, int, int) and formats the result according to
-	/// precision (total number of digits after the decimal point, -1 means ignore precision argument) 
+	/// This function calls doubleToStr(char*, int, double, int, int) and formats the result according to
+	/// precision (total number of digits after the decimal point, -1 means ignore precision argument)
 	/// and width (total length of formatted string).
 
 
-Foundation_API float strToFloat(const char* str);
+Foundation_API std::string& doubleToFixedStr(std::string& str,
+	double value,
+	int precision = -1,
+	int width = 0,
+	char thSep = 0,
+	char decSep = 0);
+	/// Converts a double value, assigns it to the supplied string and returns the reference.
+	/// This function calls doubleToFixedStr(char*, int, double, int) and formats the result according to
+	/// precision (total number of digits after the decimal point) and width (total length of formatted string).
+
+
+Foundation_API float strToFloat(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
-	/// Function uses double_convesrion::DoubleToStringConverter to do the conversion.
+	/// Function uses double_conversion::DoubleToStringConverter to do the conversion.
 
 
-Foundation_API bool strToFloat(const std::string&, float& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToFloat(const std::string&, float& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into single-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
-	/// 
-	/// Returns true if succesful, false otherwise.
+	///
+	/// Returns true if successful, false otherwise.
 
 
-Foundation_API double strToDouble(const char* str);
+Foundation_API double strToDouble(const char* str,
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 
 
-Foundation_API bool strToDouble(const std::string& str, double& result, char decSep = '.', char thSep = ',');
+Foundation_API bool strToDouble(const std::string& str, double& result,
+	char decSep = '.', char thSep = ',',
+	const char* inf = POCO_FLT_INF, const char* nan = POCO_FLT_NAN);
 	/// Converts the string of characters into double-precision floating point number.
 	/// The conversion result is assigned to the result parameter.
 	/// If decimal separator and/or thousand separator are different from defaults, they should be
 	/// supplied to ensure proper conversion.
-	/// 
-	/// Returns true if succesful, false otherwise.
-
-//
-// end double-conversion functions declarations
-//
+	///
+	/// Returns true if successful, false otherwise.
 
 
 } // namespace Poco
+
+
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#endif // POCO_COMPILER_MSVC
 
 
 #endif // Foundation_NumericString_INCLUDED

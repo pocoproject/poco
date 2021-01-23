@@ -1,8 +1,6 @@
 //
 // FileChannel.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/FileChannel.h#5 $
-//
 // Library: Foundation
 // Package: Logging
 // Module:  FileChannel
@@ -23,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Channel.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include "Poco/Mutex.h"
 
 
@@ -243,6 +242,11 @@ protected:
 	void purge();
 
 private:
+	bool setNoPurge(const std::string& value);
+	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = NULL) const;
+	void setPurgeStrategy(PurgeStrategy* strategy);
+	Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
+
 	std::string      _path;
 	std::string      _times;
 	std::string      _rotation;

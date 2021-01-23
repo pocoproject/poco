@@ -1,8 +1,6 @@
 //
 // StatementImpl.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/StatementImpl.h#15 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  StatementImpl
@@ -50,7 +48,7 @@ class Data_API StatementImpl
 	/// StatementImpl's are noncopyable.
 {
 public:
-	typedef Poco::SharedPtr<StatementImpl> Ptr;
+	using Ptr = Poco::SharedPtr<StatementImpl>;
 
 	enum State
 	{
@@ -319,7 +317,7 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	SharedPtr<InternalExtraction<C> > createExtract(const MetaColumn& mc)
+	SharedPtr<InternalExtraction<C>> createExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -327,7 +325,7 @@ private:
 	}
 
 	template <class C>
-	SharedPtr<InternalBulkExtraction<C> > createBulkExtract(const MetaColumn& mc)
+	SharedPtr<InternalBulkExtraction<C>> createBulkExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -348,7 +346,7 @@ private:
 		/// overrides the session setting for storage, otherwise the
 		/// session setting is used.
 		/// If neither this statement nor the session have the storage
-		/// type set, std::deque is the default container type used.
+		/// type set, std::vector is the default container type used.
 	{
 		std::string storage;
 	
@@ -370,23 +368,23 @@ private:
 		if (0 == icompare(DEQUE, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::deque<T> >(mc));
+				addExtract(createExtract<std::deque<T>>(mc));
 			else
-				addExtract(createBulkExtract<std::deque<T> >(mc));
+				addExtract(createBulkExtract<std::deque<T>>(mc));
 		}
 		else if (0 == icompare(VECTOR, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::vector<T> >(mc));
+				addExtract(createExtract<std::vector<T>>(mc));
 			else
-				addExtract(createBulkExtract<std::vector<T> >(mc));
+				addExtract(createBulkExtract<std::vector<T>>(mc));
 		}
 		else if (0 == icompare(LIST, storage))
 		{
 			if (!isBulkExtraction())
-				addExtract(createExtract<std::list<T> >(mc));
+				addExtract(createExtract<std::list<T>>(mc));
 			else
-				addExtract(createBulkExtract<std::list<T> >(mc));
+				addExtract(createBulkExtract<std::list<T>>(mc));
 		}
 	}
 
@@ -432,7 +430,7 @@ private:
 	StatementImpl(const StatementImpl& stmt);
 	StatementImpl& operator = (const StatementImpl& stmt);
 
-	typedef std::vector<std::size_t> CountVec;
+	using CountVec = std::vector<std::size_t>;
 
 	State                    _state;
 	Limit                    _extrLimit;
@@ -543,7 +541,8 @@ inline bool StatementImpl::isNull(std::size_t col, std::size_t row) const
 	try 
 	{
 		return extractions().at(col)->isNull(row);
-	}catch (std::out_of_range& ex)
+	}
+	catch (std::out_of_range& ex)
 	{ 
 		throw RangeException(ex.what()); 
 	}

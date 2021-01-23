@@ -1,8 +1,6 @@
 //
 // Symbol.cpp
 //
-// $Id: //poco/1.4/CppParser/src/Symbol.cpp#2 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  Symbol
@@ -121,7 +119,7 @@ std::string Symbol::extractName(const std::string& decl)
 		return "operator ()";
 	else if (decl.find("operator[]") != std::string::npos)
 		return "operator []";
-		
+
 	std::string::size_type pos = decl.find('(');
 	// another special case: function pointer
 	if (pos != std::string::npos && pos < decl.size() - 1)
@@ -139,7 +137,7 @@ std::string Symbol::extractName(const std::string& decl)
 	}
 	if (pos == std::string::npos || (pos > 0 && decl[pos - 1] == '('))
 		pos = decl.size();
-	--pos;
+	if (pos > 0) --pos;
 	// check for constant; start searching after template
 	std::string::size_type eqStart = 0;
 	if (decl.compare(0, 8, "template") == 0)
@@ -206,13 +204,16 @@ std::string Symbol::extractName(const std::string& decl)
 		while (pos > 0 && isIdent(decl[pos - 1])) --pos;
 		if (pos > 0 && decl[pos - 1] == '~') --pos;
 	}
-	
+
 	while (pos > 2 && decl[pos - 1] == ':')
 	{
 		pos -= 3;
 		while (pos > 0 && isIdent(decl[pos - 1])) --pos;
 	}
-	return decl.substr(pos, end - pos + 1);
+	if (pos != std::string::npos)
+		return decl.substr(pos, end - pos + 1);
+	else
+		return std::string();
 }
 
 

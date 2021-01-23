@@ -1,8 +1,6 @@
 //
 // Unicode.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Unicode.cpp#2 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  Unicode
@@ -20,7 +18,6 @@
 extern "C"
 {
 #include "pcre_config.h"
-GCC_DIAG_OFF(unused-function) // pcre_memmove unused function warning
 #include "pcre_internal.h"
 }
 

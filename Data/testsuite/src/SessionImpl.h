@@ -1,8 +1,6 @@
 //
 // SessionImpl.h
 //
-// $Id: //poco/Main/Data/testsuite/src/SessionImpl.h#2 $
-//
 // Definition of the SessionImpl class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
@@ -17,6 +15,7 @@
 
 
 #include "Poco/Data/AbstractSessionImpl.h"
+#include "Poco/Data/StatementImpl.h"
 #include "Poco/SharedPtr.h"
 #include "Binder.h"
 
@@ -37,7 +36,7 @@ public:
 	~SessionImpl();
 		/// Destroys the SessionImpl.
 
-	Poco::Data::StatementImpl* createStatementImpl();
+	StatementImpl::Ptr createStatementImpl();
 		/// Returns an test StatementImpl.
 
 	void open(const std::string& connectionString = "");
@@ -46,14 +45,17 @@ public:
 	void close();
 		/// Closes the session.
 
-	bool isConnected();
+	void reset();
+		/// Reset connection with dababase and clears session state, but without disconnecting
+
+	bool isConnected() const;
 		/// Returns true if session is connected to the database, 
 		/// false otherwise.
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout();
+	std::size_t getConnectionTimeout() const;
 		/// Returns the session connection timeout value.
 
 	void begin();
@@ -65,23 +67,23 @@ public:
 	void rollback();
 		/// Aborts a transaction.
 
-	bool canTransact();
+	bool canTransact() const;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction();
+	bool isTransaction() const;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	void setTransactionIsolation(Poco::UInt32);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation();
+	Poco::UInt32 getTransactionIsolation() const;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32);
+	bool hasTransactionIsolation(Poco::UInt32) const;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32);
+	bool isTransactionIsolation(Poco::UInt32) const;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
@@ -89,15 +91,15 @@ public:
 		/// Returns the name of the connector.
 
 	void setConnected(const std::string& name, bool value);
-	bool getConnected(const std::string& name);
+	bool getConnected(const std::string& name) const;
 		/// Sets/gets the connected property.
 		/// This is normally done by implementation
 		/// when a database connection loss is detected.
 
 	void setF(const std::string& name, bool value);
-	bool getF(const std::string& name);
+	bool getF(const std::string& name) const;
 	void setP(const std::string& name, const Poco::Any& value);
-	Poco::Any getP(const std::string& name);
+	Poco::Any getP(const std::string& name) const;
 
 private:
 	bool         _f;

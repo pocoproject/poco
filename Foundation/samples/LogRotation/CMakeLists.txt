@@ -1,7 +1,2 @@
-set(SAMPLE_NAME "LogRotation")
-
-set(LOCAL_SRCS "")
-aux_source_directory(src LOCAL_SRCS)
-
-add_executable( ${SAMPLE_NAME} ${LOCAL_SRCS} )
-target_link_libraries( ${SAMPLE_NAME} PocoFoundation )
+add_executable(LogRotation src/LogRotation.cpp)
+target_link_libraries(LogRotation PUBLIC Poco::Foundation)

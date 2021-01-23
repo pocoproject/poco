@@ -1,8 +1,6 @@
 //
 // DOMBuilder.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DOMBuilder.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMBuilder

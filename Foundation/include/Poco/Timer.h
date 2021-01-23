@@ -1,8 +1,6 @@
 //
 // Timer.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timer.h#2 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  Timer
@@ -143,8 +141,8 @@ protected:
 	void run();
 
 private:
-	volatile long _startInterval;
-	volatile long _periodicInterval;
+	long _startInterval;
+	long _periodicInterval;
 	Event         _wakeUp;
 	Event         _done;
 	long          _skipped;

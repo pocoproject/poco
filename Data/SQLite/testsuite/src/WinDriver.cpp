@@ -1,8 +1,6 @@
 //
 // WinDriver.cpp
 //
-// $Id: //poco/Main/Data/SQLite/testsuite/src/WinDriver.cpp#2 $
-//
 // Windows test driver for Poco SQLite.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

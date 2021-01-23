@@ -1,8 +1,6 @@
 //
 // SecureServerSocketImpl.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureServerSocketImpl.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureServerSocketImpl
@@ -64,9 +62,9 @@ void SecureServerSocketImpl::connectNB(const SocketAddress& address)
 }
 	
 
-void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
-	_impl.bind(address, reuseAddress);
+	_impl.bind(address, reuseAddress, reusePort);
 	reset(_impl.sockfd());
 }
 

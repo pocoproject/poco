@@ -1,9 +1,7 @@
 //
 // SQLiteStatementImpl.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/SQLiteStatementImpl.cpp#8 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  SQLiteStatementImpl
 //
@@ -90,7 +88,7 @@ void SQLiteStatementImpl::compileImpl()
 			if (pStmt) sqlite3_finalize(pStmt);
 			pStmt = 0;
 			std::string errMsg = sqlite3_errmsg(_pDB);
-			Utility::throwException(rc, errMsg);
+			Utility::throwException(_pDB, rc, errMsg);
 		}
 		else if (rc == SQLITE_OK && pStmt)
 		{
@@ -160,13 +158,13 @@ void SQLiteStatementImpl::bindImpl()
 	sqlite3_reset(_pStmt);
 
 	int paramCount = sqlite3_bind_parameter_count(_pStmt);
-	BindIt bindEnd = bindings().end();
-	if (0 == paramCount || bindEnd == _bindBegin) 
+	if (0 == paramCount)
 	{
 		_canBind = false;
 		return;
 	}
 
+	BindIt bindEnd = bindings().end();
 	std::size_t availableCount = 0;
 	Bindings::difference_type bindCount = 0;
 	Bindings::iterator it = _bindBegin;
@@ -176,6 +174,9 @@ void SQLiteStatementImpl::bindImpl()
 		if (availableCount <= paramCount) ++bindCount;
 		else break;
 	}
+
+	if (availableCount < paramCount)
+		throw ParameterCountMismatchException();
 
 	Bindings::difference_type remainingBindCount = bindEnd - _bindBegin;
 	if (bindCount < remainingBindCount)
@@ -247,7 +248,7 @@ bool SQLiteStatementImpl::hasNext()
 		_affectedRowCount += sqlite3_changes(_pDB);
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
-		Utility::throwException(_nextResponse);
+		Utility::throwException(_pDB, _nextResponse);
 
 	_pExtractor->reset();//clear the cached null indicators
 
@@ -273,7 +274,10 @@ std::size_t SQLiteStatementImpl::next()
 		}
 		_stepCalled = false;
 		if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
-		_affectedRowCount += (*extracts.begin())->numOfRowsHandled();
+		if (extracts.begin() != extracts.end())
+		{
+			_affectedRowCount += static_cast<int>((*extracts.begin())->numOfRowsHandled());
+		}
 	}
 	else if (SQLITE_DONE == _nextResponse)
 	{
@@ -281,7 +285,7 @@ std::size_t SQLiteStatementImpl::next()
 	}
 	else
 	{
-		Utility::throwException(_nextResponse, std::string("Iterator Error: trying to access the next value"));
+		Utility::throwException(_pDB, _nextResponse, std::string("Iterator Error: trying to access the next value"));
 	}
 	
 	return 1u;

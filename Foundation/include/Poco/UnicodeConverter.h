@@ -1,8 +1,6 @@
 //
 // UnicodeConverter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/UnicodeConverter.h#1 $
-//
 // Library: Foundation
 // Package: Text
 // Module:  UnicodeConverter

@@ -1,8 +1,6 @@
 //
 // HTTPStream.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPStream.h#1 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPStream
@@ -40,7 +38,7 @@ class Net_API HTTPStreamBuf: public HTTPBasicStreamBuf
 	/// HTTP message bodies.
 {
 public:
-	typedef HTTPBasicStreamBuf::openmode openmode;
+	using openmode = HTTPBasicStreamBuf::openmode;
 
 	HTTPStreamBuf(HTTPSession& session, openmode mode);
 	~HTTPStreamBuf();

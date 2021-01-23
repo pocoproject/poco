@@ -1,13 +1,9 @@
 //
 // DeleteRequest.cpp
 //
-// $Id$
-//
 // Library: MongoDB
 // Package: MongoDB
 // Module:  DeleteRequest
-//
-// Implementation of the DeleteRequest class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -23,8 +19,8 @@ namespace Poco {
 namespace MongoDB {
 
 
-DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::Flags flags) 
-	: RequestMessage(MessageHeader::Delete), 
+DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::Flags flags):
+	RequestMessage(MessageHeader::OP_DELETE), 
 	_flags(flags), 
 	_fullCollectionName(collectionName),
 	_selector()
@@ -32,9 +28,9 @@ DeleteRequest::DeleteRequest(const std::string& collectionName, DeleteRequest::F
 }
 
 
-DeleteRequest::DeleteRequest(const std::string& collectionName, bool justOne)
-	: RequestMessage(MessageHeader::Delete),
-	_flags(justOne ? DELETE_SINGLE_REMOVE : DELETE_NONE),
+DeleteRequest::DeleteRequest(const std::string& collectionName, bool justOne):
+	RequestMessage(MessageHeader::OP_DELETE),
+	_flags(justOne ? DELETE_SINGLE_REMOVE : DELETE_DEFAULT),
 	_fullCollectionName(collectionName),
 	_selector()
 {

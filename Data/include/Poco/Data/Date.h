@@ -1,8 +1,6 @@
 //
 // Date.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Date.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Date

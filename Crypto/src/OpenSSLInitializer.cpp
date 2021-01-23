@@ -1,8 +1,6 @@
 //
 // OpenSSLInitializer.cpp
 //
-// $Id: //poco/1.4/Crypto/src/OpenSSLInitializer.cpp#3 $
-//
 // Library: Crypto
 // Package: CryptoCore
 // Module:  OpenSSLInitializer
@@ -24,10 +22,36 @@
 #if OPENSSL_VERSION_NUMBER >= 0x0907000L
 #include <openssl/conf.h>
 #endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#define POCO_STR_HELPER(x) #x
+	#define POCO_STR(x) POCO_STR_HELPER(x)
+	#if defined POCO_INTERNAL_OPENSSL_MSVC_VER
+		#define POCO_INTERNAL_OPENSSL_BUILD          \
+				" (POCO internal build, MSVC version " \
+				POCO_STR(POCO_INTERNAL_OPENSSL_MSVC_VER) ")"
+	#else
+		#define POCO_INTERNAL_OPENSSL_BUILD ""
+	#endif
+	#pragma message (OPENSSL_VERSION_TEXT POCO_INTERNAL_OPENSSL_BUILD)
+#endif
 
 
 using Poco::RandomInputStream;
 using Poco::Thread;
+
+
+#if defined(_MSC_VER) && !defined(_DLL) && defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
+
+	#if (POCO_MSVS_VERSION >= 2015)
+		FILE _iob[] = { *stdin, *stdout, *stderr };
+		extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
+	#endif // (POCO_MSVS_VERSION >= 2015)
+
+	#if (POCO_MSVS_VERSION < 2012)
+		extern "C" __declspec(noreturn) void __cdecl __report_rangecheckfailure(void) { ::ExitProcess(1); }
+	#endif // (POCO_MSVS_VERSION < 2012)
+
+#endif // _MSC_VER && _MT && !POCO_EXTERNAL_OPENSSL && (POCO_MSVS_VERSION < 2013)
 
 
 namespace Poco {
@@ -61,7 +85,9 @@ void OpenSSLInitializer::initialize()
 {
 	if (++_rc == 1)
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x0907000L
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+		CONF_modules_load(NULL, NULL, 0);
+#elif OPENSSL_VERSION_NUMBER >= 0x0907000L
 		OPENSSL_config(NULL);
 #endif
 		SSL_library_init();

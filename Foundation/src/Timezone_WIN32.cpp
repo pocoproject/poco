@@ -1,8 +1,6 @@
 //
 // Timezone_WIN32.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Timezone_WIN32.cpp#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timezone
@@ -55,13 +53,7 @@ std::string Timezone::name()
 	TIME_ZONE_INFORMATION tzInfo;
 	DWORD dstFlag = GetTimeZoneInformation(&tzInfo);
 	WCHAR* ptr = dstFlag == TIME_ZONE_ID_DAYLIGHT ? tzInfo.DaylightName : tzInfo.StandardName;
-#if defined(POCO_WIN32_UTF8)
 	UnicodeConverter::toUTF8(ptr, result);
-#else
-	char buffer[256];
-	DWORD rc = WideCharToMultiByte(CP_ACP, 0, ptr, -1, buffer, sizeof(buffer), NULL, NULL);
-	if (rc) result = buffer;
-#endif
 	return result;
 }
 
@@ -72,13 +64,7 @@ std::string Timezone::standardName()
 	TIME_ZONE_INFORMATION tzInfo;
 	DWORD dstFlag = GetTimeZoneInformation(&tzInfo);
 	WCHAR* ptr = tzInfo.StandardName;
-#if defined(POCO_WIN32_UTF8)
 	UnicodeConverter::toUTF8(ptr, result);
-#else
-	char buffer[256];
-	DWORD rc = WideCharToMultiByte(CP_ACP, 0, ptr, -1, buffer, sizeof(buffer), NULL, NULL);
-	if (rc) result = buffer;
-#endif
 	return result;
 }
 
@@ -89,13 +75,7 @@ std::string Timezone::dstName()
 	TIME_ZONE_INFORMATION tzInfo;
 	DWORD dstFlag = GetTimeZoneInformation(&tzInfo);
 	WCHAR* ptr = tzInfo.DaylightName;
-#if defined(POCO_WIN32_UTF8)
 	UnicodeConverter::toUTF8(ptr, result);
-#else
-	char buffer[256];
-	DWORD rc = WideCharToMultiByte(CP_ACP, 0, ptr, -1, buffer, sizeof(buffer), NULL, NULL);
-	if (rc) result = buffer;
-#endif
 	return result;
 }
 

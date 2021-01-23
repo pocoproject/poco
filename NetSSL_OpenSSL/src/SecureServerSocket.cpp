@@ -1,8 +1,6 @@
 //
 // SecureServerSocket.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SecureServerSocket.cpp#1 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLSockets
 // Module:  SecureServerSocket

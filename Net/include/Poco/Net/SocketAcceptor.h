@@ -1,8 +1,6 @@
 //
 // SocketAcceptor.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketAcceptor.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketAcceptor
@@ -22,6 +20,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/SocketNotification.h"
+#include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Observer.h"
@@ -69,6 +68,8 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
+	using Observer = Poco::Observer<SocketAcceptor, ReadableNotification>;
+
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
 		_pReactor(0)
@@ -82,8 +83,7 @@ public:
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 		/// The SocketAcceptor registers itself with the given SocketReactor.
 	{
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketAcceptor,
-			ReadableNotification>(*this, &SocketAcceptor::onAccept));
+		_pReactor->addEventHandler(_socket, Observer(*this, &SocketAcceptor::onAccept));
 	}
 
 	virtual ~SocketAcceptor()
@@ -93,8 +93,7 @@ public:
 		{
 			if (_pReactor)
 			{
-				_pReactor->removeEventHandler(_socket, Poco::Observer<SocketAcceptor,
-					ReadableNotification>(*this, &SocketAcceptor::onAccept));
+				_pReactor->removeEventHandler(_socket, Observer(*this, &SocketAcceptor::onAccept));
 			}
 		}
 		catch (...)
@@ -106,12 +105,7 @@ public:
 	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
 	{
-		_pReactor = &reactor;
-		if (!_pReactor->hasEventHandler(_socket, Poco::Observer<SocketAcceptor,
-			ReadableNotification>(*this, &SocketAcceptor::onAccept)))
-		{
-			registerAcceptor(reactor);
-		}
+		registerAcceptor(reactor);
 	}
 
 	virtual void registerAcceptor(SocketReactor& reactor)
@@ -125,11 +119,11 @@ public:
 		/// implementation or directly register the accept handler with
 		/// the reactor.
 	{
-		if (_pReactor)
-			throw Poco::InvalidAccessException("Acceptor already registered.");
-
 		_pReactor = &reactor;
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketAcceptor, ReadableNotification>(*this, &SocketAcceptor::onAccept));
+		if (!_pReactor->hasEventHandler(_socket, Observer(*this, &SocketAcceptor::onAccept)))
+		{
+			_pReactor->addEventHandler(_socket, Observer(*this, &SocketAcceptor::onAccept));
+		}
 	}
 	
 	virtual void unregisterAcceptor()
@@ -144,7 +138,7 @@ public:
 	{
 		if (_pReactor)
 		{
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketAcceptor, ReadableNotification>(*this, &SocketAcceptor::onAccept));
+			_pReactor->removeEventHandler(_socket, Observer(*this, &SocketAcceptor::onAccept));
 		}
 	}
 	

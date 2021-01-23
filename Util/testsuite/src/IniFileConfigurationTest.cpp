@@ -1,8 +1,6 @@
 //
 // IniFileConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/IniFileConfigurationTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -57,38 +55,38 @@ void IniFileConfigurationTest::testLoad()
 	std::istringstream istr(iniFile);	
 	AutoPtr<IniFileConfiguration> pConf = new IniFileConfiguration(istr);
 	
-	assert (pConf->getString("prop1") == "value1");
-	assert (pConf->getString("prop2") == "value2");
-	assert (pConf->getString("section1.prop1") == "value3");
-	assert (pConf->getString("Section1.Prop2") == "value4");
-	assert (pConf->getString("section 2.prop1") == "value 5");
-	assert (pConf->getString("section 2.prop2") == "value6");
-	assert (pConf->getString("SECTION 2.PROP2") == "value6");
+	assertTrue (pConf->getString("prop1") == "value1");
+	assertTrue (pConf->getString("prop2") == "value2");
+	assertTrue (pConf->getString("section1.prop1") == "value3");
+	assertTrue (pConf->getString("Section1.Prop2") == "value4");
+	assertTrue (pConf->getString("section 2.prop1") == "value 5");
+	assertTrue (pConf->getString("section 2.prop2") == "value6");
+	assertTrue (pConf->getString("SECTION 2.PROP2") == "value6");
 	
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 4);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "section1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
+	assertTrue (keys.size() == 4);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "section1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
 	
 	pConf->keys("Section1", keys);
-	assert (keys.size() == 2);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (keys.size() == 2);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
 	
 	pConf->setString("prop1", "value11");
-	assert (pConf->getString("PROP1") == "value11");
+	assertTrue (pConf->getString("PROP1") == "value11");
 	pConf->setString("Prop1", "value12");
-	assert (pConf->getString("prop1") == "value12");
+	assertTrue (pConf->getString("prop1") == "value12");
 	pConf->keys(keys);
-	assert (keys.size() == 4);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "section1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "Prop1") == keys.end());
+	assertTrue (keys.size() == 4);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "section1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "section 2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "Prop1") == keys.end());
 }
 
 
@@ -97,38 +95,38 @@ void IniFileConfigurationTest::testCaseInsensitiveRemove()
 	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
 	AbstractConfiguration::Keys keys;
 
-	assert (pConf->hasProperty("Prop1"));
-	assert (pConf->hasProperty("prop4.BOOL1"));
-	assert (pConf->hasProperty("Prop4.bool2"));
-	assert (pConf->hasProperty("PROP4.Bool3"));
+	assertTrue (pConf->hasProperty("Prop1"));
+	assertTrue (pConf->hasProperty("prop4.BOOL1"));
+	assertTrue (pConf->hasProperty("Prop4.bool2"));
+	assertTrue (pConf->hasProperty("PROP4.Bool3"));
 	pConf->keys(keys);
-	assert (keys.size() == 13);
+	assertTrue (keys.size() == 13);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 17);
+	assertTrue (keys.size() == 17);
 
 	pConf->remove("PROP4.Bool1");
-	assert (pConf->hasProperty("Prop1"));
-	assert (!pConf->hasProperty("prop4.BOOL1"));
-	assert (pConf->hasProperty("Prop4.bool2"));
-	assert (pConf->hasProperty("PROP4.Bool3"));
+	assertTrue (pConf->hasProperty("Prop1"));
+	assertTrue (!pConf->hasProperty("prop4.BOOL1"));
+	assertTrue (pConf->hasProperty("Prop4.bool2"));
+	assertTrue (pConf->hasProperty("PROP4.Bool3"));
 	pConf->keys(keys);
-	assert (keys.size() == 13);
+	assertTrue (keys.size() == 13);
 	pConf->keys("PROP4", keys);
-	assert (keys.size() == 16);
+	assertTrue (keys.size() == 16);
 
 	pConf->remove("Prop4");
-	assert (pConf->hasProperty("Prop1"));
-	assert (!pConf->hasProperty("prop4.BOOL1"));
-	assert (!pConf->hasProperty("Prop4.bool2"));
-	assert (!pConf->hasProperty("PROP4.Bool3"));
+	assertTrue (pConf->hasProperty("Prop1"));
+	assertTrue (!pConf->hasProperty("prop4.BOOL1"));
+	assertTrue (!pConf->hasProperty("Prop4.bool2"));
+	assertTrue (!pConf->hasProperty("PROP4.Bool3"));
 	pConf->keys(keys);
-	assert (keys.size() == 12);
+	assertTrue (keys.size() == 12);
 	pConf->keys("prop4", keys);
-	assert (keys.size() == 0);
+	assertTrue (keys.size() == 0);
 }
 
 
-AbstractConfiguration* IniFileConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr IniFileConfigurationTest::allocConfiguration() const
 {
 	return new IniFileConfiguration;
 }

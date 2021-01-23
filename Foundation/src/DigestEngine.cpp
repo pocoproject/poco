@@ -1,8 +1,6 @@
 //
 // DigestEngine.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DigestEngine.cpp#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  DigestEngine
@@ -36,11 +34,10 @@ std::string DigestEngine::digestToHex(const Digest& bytes)
 	static const char digits[] = "0123456789abcdef";
 	std::string result;
 	result.reserve(bytes.size() * 2);
-	for (Digest::const_iterator it = bytes.begin(); it != bytes.end(); ++it)
+	for (auto b: bytes)
 	{
-		unsigned char c = *it;
-		result += digits[(c >> 4) & 0xF];
-		result += digits[c & 0xF];
+		result += digits[(b >> 4) & 0xF];
+		result += digits[b & 0xF];
 	}
 	return result;
 }
@@ -78,6 +75,22 @@ DigestEngine::Digest DigestEngine::digestFromHex(const std::string& digest)
 		result.push_back(static_cast<unsigned char>(c));
 	}
 	return result;
+}
+
+
+bool DigestEngine::constantTimeEquals(const Digest& d1, const Digest& d2)
+{
+	if (d1.size() != d2.size()) return false;
+
+	int result = 0;
+	Digest::const_iterator it1 = d1.begin();
+	Digest::const_iterator it2 = d2.begin();
+	Digest::const_iterator end1 = d1.end();
+	while (it1 != end1)
+	{
+		result |= *it1++ ^ *it2++;
+	}
+	return result == 0;
 }
 
 

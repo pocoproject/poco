@@ -1,8 +1,6 @@
 //
 // RowIterator.cpp
 //
-// $Id: //poco/Main/Data/src/RowIterator.cpp#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RowIterator
@@ -42,6 +40,12 @@ RowIterator::RowIterator(const RowIterator& other):
 }
 
 
+RowIterator::RowIterator(RowIterator&& other) noexcept:
+	_pRecordSet(std::move(other._pRecordSet)),
+	_position(std::move(other._position))
+{
+}
+
 RowIterator::~RowIterator()
 {
 }
@@ -51,6 +55,14 @@ RowIterator& RowIterator::operator = (const RowIterator& other)
 {
 	RowIterator tmp(other);
 	swap(tmp);
+	return *this;
+}
+
+
+RowIterator& RowIterator::operator = (RowIterator&& other) noexcept
+{
+	_pRecordSet = std::move(other._pRecordSet);
+	_position = std::move(other._position);
 	return *this;
 }
 

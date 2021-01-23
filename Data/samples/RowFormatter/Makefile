@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/RowFormatter/Makefile#1 $
-#
 # Makefile for Poco Data RowFormatter sample
 #
 

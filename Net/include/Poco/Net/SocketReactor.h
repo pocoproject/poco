@@ -1,8 +1,6 @@
 //
 // SocketReactor.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/SocketReactor.h#1 $
-//
 // Library: Net
 // Package: Reactor
 // Module:  SocketReactor
@@ -22,11 +20,13 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/Socket.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timespan.h"
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
 #include <map>
+#include <atomic>
 
 
 namespace Poco {
@@ -83,7 +83,7 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// becomes writable. The ErrorNotification will be dispatched if
 	/// there is an error condition on a socket.
 	///
-	/// If the timeout expires and no event has occured, a
+	/// If the timeout expires and no event has occurred, a
 	/// TimeoutNotification will be dispatched to all event handlers
 	/// registered for it. This is done in the onTimeout() method
 	/// which can be overridden by subclasses to perform custom
@@ -158,7 +158,7 @@ public:
 		///     reactor.addEventHandler(obs);
 
 	bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
-		/// Returns true if the observer is reistered with SocketReactor for the given socket.
+		/// Returns true if the observer is registered with SocketReactor for the given socket.
 
 	void removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
 		/// Unregisters an event handler with the SocketReactor.
@@ -166,6 +166,9 @@ public:
 		/// Usage:
 		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.removeEventHandler(obs);
+
+	bool has(const Socket& socket) const;
+		/// Returns true if socket is registered with this rector.
 
 protected:
 	virtual void onTimeout();
@@ -207,26 +210,31 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
 	typedef std::map<Socket, NotifierPtr>     EventHandlerMap;
+	typedef Poco::FastMutex                   MutexType;
+	typedef MutexType::ScopedLock             ScopedLock;
 
+	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
+	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	enum
 	{
 		DEFAULT_TIMEOUT = 250000
 	};
 
-	bool            _stop;
-	Poco::Timespan  _timeout;
-	EventHandlerMap _handlers;
-	NotificationPtr _pReadableNotification;
-	NotificationPtr _pWritableNotification;
-	NotificationPtr _pErrorNotification;
-	NotificationPtr _pTimeoutNotification;
-	NotificationPtr _pIdleNotification;
-	NotificationPtr _pShutdownNotification;
-	Poco::FastMutex _mutex;
-	Poco::Thread*   _pThread;
-	
+	std::atomic<bool> _stop;
+	Poco::Timespan    _timeout;
+	EventHandlerMap   _handlers;
+	PollSet           _pollSet;
+	NotificationPtr   _pReadableNotification;
+	NotificationPtr   _pWritableNotification;
+	NotificationPtr   _pErrorNotification;
+	NotificationPtr   _pTimeoutNotification;
+	NotificationPtr   _pIdleNotification;
+	NotificationPtr   _pShutdownNotification;
+	MutexType         _mutex;
+	Poco::Thread*     _pThread;
+
 	friend class SocketNotifier;
 };
 

@@ -1,8 +1,6 @@
 //
 // ODBCAccessTest.cpp
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCAccessTest.cpp#5 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -45,7 +43,6 @@ Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 ODBCAccessTest::ODBCAccessTest(const std::string& name): 
 	CppUnit::TestCase(name)
 {
-	Poco::Data::ODBC::Connector::registerConnector();
 }
 
 
@@ -73,17 +70,17 @@ void ODBCAccessTest::testSimpleAccess()
 	try { *_pSession << "SELECT COUNT(*) FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (count == 1);
+	assertTrue (count == 1);
 
 	try { *_pSession << "SELECT LastName FROM PERSON", into(result), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (lastName == result);
+	assertTrue (lastName == result);
 
 	try { *_pSession << "SELECT Age FROM PERSON", into(count), now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("testSimpleAccess()"); }
 	catch(StatementException& ex){ std::cout << ex.toString() << std::endl; fail ("testSimpleAccess()"); }
-	assert (count == age);
+	assertTrue (count == age);
 }
 
 
@@ -185,7 +182,6 @@ bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 	Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn)) return false;
 
-	Poco::Data::ODBC::Connector::registerConnector();
 	try
 	{
 		_pSession = new Session(Poco::Data::ODBC::Connector::KEY, _dbConnString);

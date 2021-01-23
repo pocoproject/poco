@@ -1,8 +1,6 @@
 //
 // MediaType.cpp
 //
-// $Id: //poco/1.4/Net/src/MediaType.cpp#2 $
-//
 // Library: Net
 // Package: Messages
 // Module:  MediaType
@@ -33,7 +31,7 @@ MediaType::MediaType(const std::string& mediaType)
 	parse(mediaType);
 }
 
-	
+
 MediaType::MediaType(const std::string& type, const std::string& subType):
 	_type(type),
 	_subType(subType)
@@ -45,6 +43,14 @@ MediaType::MediaType(const MediaType& mediaType):
 	_type(mediaType._type),
 	_subType(mediaType._subType),
 	_parameters(mediaType._parameters)
+{
+}
+
+
+MediaType::MediaType(MediaType&& mediaType) noexcept:
+	_type(std::move(mediaType._type)),
+	_subType(std::move(mediaType._subType)),
+	_parameters(std::move(mediaType._parameters))
 {
 }
 
@@ -65,7 +71,17 @@ MediaType& MediaType::operator = (const MediaType& mediaType)
 	return *this;
 }
 
-	
+
+MediaType& MediaType::operator = (MediaType&& mediaType) noexcept
+{
+	_type       = std::move(mediaType._type);
+	_subType    = std::move(mediaType._subType);
+	_parameters = std::move(mediaType._parameters);
+
+	return *this;
+}
+
+
 MediaType& MediaType::operator = (const std::string& mediaType)
 {
 	parse(mediaType);
@@ -80,43 +96,43 @@ void MediaType::swap(MediaType& mediaType)
 	_parameters.swap(mediaType._parameters);
 }
 
-	
+
 void MediaType::setType(const std::string& type)
 {
 	_type = type;
 }
 
-	
+
 void MediaType::setSubType(const std::string& subType)
 {
 	_subType = subType;
 }
 
-	
+
 void MediaType::setParameter(const std::string& name, const std::string& value)
 {
 	_parameters.set(name, value);
 }
 
-	
+
 const std::string& MediaType::getParameter(const std::string& name) const
 {
 	return _parameters.get(name);
 }
 
-	
+
 bool MediaType::hasParameter(const std::string& name) const
 {
 	return _parameters.has(name);
 }
 
-	
+
 void MediaType::removeParameter(const std::string& name)
 {
 	_parameters.erase(name);
 }
 
-	
+
 std::string MediaType::toString() const
 {
 	std::string result;
@@ -139,7 +155,7 @@ bool MediaType::matches(const MediaType& mediaType) const
 	return matches(mediaType._type, mediaType._subType);
 }
 
-	
+
 bool MediaType::matches(const std::string& type, const std::string& subType) const
 {
 	return icompare(_type, type) == 0 && icompare(_subType, subType) == 0;
@@ -160,7 +176,7 @@ bool MediaType::matchesRange(const MediaType& mediaType) const
 
 bool MediaType::matchesRange(const std::string& type, const std::string& subType) const
 {
-	if (_type == "*" || type == "*" || icompare(_type, type) == 0) 
+	if (_type == "*" || type == "*" || icompare(_type, type) == 0)
 	{
 		return _subType == "*" || subType == "*" || icompare(_subType, subType) == 0;
 	}
@@ -186,6 +202,7 @@ void MediaType::parse(const std::string& mediaType)
 	if (it != end) ++it;
 	while (it != end && *it != ';' && !Poco::Ascii::isSpace(*it)) _subType += *it++;
 	while (it != end && *it != ';') ++it;
+	if (it != end) ++it; // skip semicolon
 	MessageHeader::splitParameters(it, end, _parameters);
 }
 

@@ -1,8 +1,6 @@
 //
 // File_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/File_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Filesystem
 // Module:  File
@@ -17,15 +15,33 @@
 #include "Poco/File_UNIX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
+#if defined(POCO_OS_FAMILY_BSD)
+#include <sys/param.h>
+#include <sys/mount.h>
+#elif (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+#include <sys/statvfs.h>
+#else
+#include <sys/statfs.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <utime.h>
 #include <cstring>
+
+#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
+#define STATFSFN statvfs
+#define STATFSSTRUCT statvfs
+#else
+#define STATFSFN statfs
+#define STATFSSTRUCT statfs
+#endif
 
 
 namespace Poco {
@@ -208,7 +224,7 @@ Timestamp FileImpl::createdImpl() const
 	struct stat st;
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_ctime);
-#endif 
+#endif
 	else
 		handleLastErrorImpl(_path);
 	return 0;
@@ -267,7 +283,7 @@ void FileImpl::setWriteableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -279,7 +295,7 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode_t wmask = S_IWUSR | S_IWGRP | S_IWOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -289,24 +305,28 @@ void FileImpl::setExecutableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0) 
+	if (stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
 	{
 		mode = st.st_mode | S_IXUSR;
+		if (st.st_mode & S_IRGRP)
+			mode |= S_IXGRP;
+		if (st.st_mode & S_IROTH)
+			mode |= S_IXOTH;
 	}
 	else
 	{
 		mode_t wmask = S_IXUSR | S_IXGRP | S_IXOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0) 
+	if (chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
 
-void FileImpl::copyToImpl(const std::string& path) const
+void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
@@ -314,14 +334,18 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0) 
+	if (fstat(sd, &st) != 0)
 	{
 		close(sd);
 		handleLastErrorImpl(_path);
 	}
 	const long blockSize = st.st_blksize;
-
-	int dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
+	int dd;
+	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
+		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode); 
+	} else {
+		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
+	}
 	if (dd == -1)
 	{
 		close(sd);
@@ -333,7 +357,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		int n;
 		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n) 
+			if (write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -346,7 +370,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 		throw;
 	}
 	close(sd);
-	if (fsync(dd) != 0) 
+	if (fsync(dd) != 0)
 	{
 		close(dd);
 		handleLastErrorImpl(path);
@@ -356,12 +380,34 @@ void FileImpl::copyToImpl(const std::string& path) const
 }
 
 
-void FileImpl::renameToImpl(const std::string& path)
+void FileImpl::renameToImpl(const std::string& path, int options)
 {
 	poco_assert (!_path.empty());
 
+	struct stat st;
+
+	if (stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
+		throw FileExistsException(path, EEXIST);		
+
 	if (rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);
+}
+
+
+void FileImpl::linkToImpl(const std::string& path, int type) const
+{
+	poco_assert (!_path.empty());
+
+	if (type == 0)
+	{
+		if (link(_path.c_str(), path.c_str()) != 0)
+			handleLastErrorImpl(_path);
+	}
+	else
+	{
+		if (symlink(_path.c_str(), path.c_str()) != 0)
+			handleLastErrorImpl(_path);
+	}
 }
 
 
@@ -381,7 +427,7 @@ void FileImpl::removeImpl()
 bool FileImpl::createFileImpl()
 {
 	poco_assert (!_path.empty());
-	
+
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
@@ -402,9 +448,45 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
+	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 		handleLastErrorImpl(_path);
 	return true;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_blocks * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bavail * (FileSizeImpl)stats.f_bsize;
+}
+
+
+FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
+{
+	poco_assert(!_path.empty());
+
+	struct STATFSSTRUCT stats;
+	if (STATFSFN(const_cast<char*>(_path.c_str()), &stats) != 0)
+		handleLastErrorImpl(_path);
+
+	return (FileSizeImpl)stats.f_bfree * (FileSizeImpl)stats.f_bsize;
 }
 
 
@@ -434,7 +516,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw FileException("disk quota exceeded", path, errno);
 #if !defined(_AIX)
 	case ENOTEMPTY:
-		throw FileException("directory not empty", path, errno);
+		throw DirectoryNotEmptyException(path, errno);
 #endif
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path, errno);
@@ -442,7 +524,7 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path, errno);
 	default:
-		throw FileException(std::strerror(errno), path, errno);
+		throw FileException(Error::getMessage(errno), path, errno);
 	}
 }
 

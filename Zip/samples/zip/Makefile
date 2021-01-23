@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/1.4/Zip/samples/zip/Makefile#1 $
-#
 # Makefile for Poco SampleApp
 #
 

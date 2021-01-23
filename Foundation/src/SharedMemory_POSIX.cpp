@@ -1,8 +1,6 @@
 //
 // SharedMemoryImpl.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedMemory_POSIX.cpp#2 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  SharedMemoryImpl

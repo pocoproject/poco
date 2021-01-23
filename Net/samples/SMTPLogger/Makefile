@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Net/samples/SMTPLogger/Makefile#2 $
-#
 # Makefile for Poco SMTPLogger
 #
 

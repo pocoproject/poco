@@ -1,8 +1,6 @@
 //
 // RandomStream.cpp
 //
-// $Id: //poco/1.4/Foundation/src/RandomStream.cpp#1 $
-//
 // Library: Foundation
 // Package: Crypt
 // Module:  RandomStream
@@ -90,7 +88,7 @@ int RandomBuf::readFromDevice(char* buffer, std::streamsize length)
 			for (DigestEngine::Digest::const_iterator it = d.begin(); it != d.end() && n < length; ++it, ++n)
 			{
 				engine.update(*it);
-				*buffer++ = *it++;
+				*buffer++ = *it;
 			}
 		}
 	}

@@ -1,8 +1,6 @@
 //
 // XMLWriterTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/XMLWriterTest.h#2 $
-//
 // Definition of the XMLWriterTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
@@ -54,12 +52,15 @@ public:
 	void testQNamespaces();
 	void testQNamespacesNested();
 	void testNamespaces();
+	void testNamespacesCanonical();
+	void testAttributeNamespaces();
+	void testAttributeNamespacesCanonical();
 	void testNamespacesNested();
+	void testNamespacesNestedCanonical();
 	void testExplicitNamespaces();
 	void testWellformed();
 	void testWellformedNested();
 	void testWellformedNamespace();
-	void testAttributeNamespaces();
 	void testEmpty();
 
 	void setUp();

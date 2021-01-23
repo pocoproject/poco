@@ -1,8 +1,6 @@
 //
 // XMLConfigurationTest.cpp
 //
-// $Id: //poco/1.4/Util/testsuite/src/XMLConfigurationTest.cpp#2 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -60,41 +58,41 @@ void XMLConfigurationTest::testLoad()
 	std::istringstream istr(xmlFile);	
 	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration(istr);
 	
-	assert (pConf->getString("prop1") == "value1");
-	assert (pConf->getString("prop2") == "value2");
-	assert (pConf->getString("prop3.prop4[@attr]") == "value3");
-	assert (pConf->getString("prop3.prop4[1][@attr]") == "value4");
-	assert (pConf->getString("prop5") == "value5");
-	assert (pConf->getString("prop5[0]") == "value5");
-	assert (pConf->getString("prop5[1]") == "value6");
-	assert (pConf->getString("prop5[@id=1]") == "value5");
-	assert (pConf->getString("prop5[@id='2']") == "value6");
-	assert (pConf->getString("prop6[@id=foo].prop7") == "value7");
-	assert (pConf->getString("prop6[@id='bar'].prop7") == "value8");
+	assertTrue (pConf->getString("prop1") == "value1");
+	assertTrue (pConf->getString("prop2") == "value2");
+	assertTrue (pConf->getString("prop3.prop4[@attr]") == "value3");
+	assertTrue (pConf->getString("prop3.prop4[1][@attr]") == "value4");
+	assertTrue (pConf->getString("prop5") == "value5");
+	assertTrue (pConf->getString("prop5[0]") == "value5");
+	assertTrue (pConf->getString("prop5[1]") == "value6");
+	assertTrue (pConf->getString("prop5[@id=1]") == "value5");
+	assertTrue (pConf->getString("prop5[@id='2']") == "value6");
+	assertTrue (pConf->getString("prop6[@id=foo].prop7") == "value7");
+	assertTrue (pConf->getString("prop6[@id='bar'].prop7") == "value8");
 	
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
-	assert (keys.size() == 7);
-	assert (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop5[1]") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop6") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop6[1]") != keys.end());
+	assertTrue (keys.size() == 7);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop1") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop2") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop5[1]") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop6") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop6[1]") != keys.end());
 	
 	pConf->keys("prop3", keys);
-	assert (keys.size() == 2);
-	assert (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
-	assert (std::find(keys.begin(), keys.end(), "prop4[1]") != keys.end());
+	assertTrue (keys.size() == 2);
+	assertTrue (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
+	assertTrue (std::find(keys.begin(), keys.end(), "prop4[1]") != keys.end());
 
-	assert (pConf->hasProperty("prop3.prop4[@attr]"));
+	assertTrue (pConf->hasProperty("prop3.prop4[@attr]"));
 	pConf->remove("prop3.prop4[@attr]");
-	assert (!pConf->hasProperty("prop3.prop4[@attr]"));
+	assertTrue (!pConf->hasProperty("prop3.prop4[@attr]"));
 
-	assert (pConf->hasProperty("prop3"));
+	assertTrue (pConf->hasProperty("prop3"));
 	pConf->remove("prop3");
-	assert (!pConf->hasProperty("prop3"));
+	assertTrue (!pConf->hasProperty("prop3"));
 	
 	try
 	{
@@ -124,29 +122,29 @@ void XMLConfigurationTest::testSave()
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string s(ostr.str());
-	assert (s == "<config/>\n");
+	assertTrue (s == "<config/>\n");
 	
 	pConf->setString("prop1", "value1");
-	assert (pConf->getString("prop1") == "value1");
+	assertTrue (pConf->getString("prop1") == "value1");
 
 	pConf->setString("prop2", "value2");
-	assert (pConf->getString("prop2") == "value2");
+	assertTrue (pConf->getString("prop2") == "value2");
 	
 	pConf->setString("prop3.prop4[@attr]", "value3");
-	assert (pConf->getString("prop3.prop4[@attr]") == "value3");
+	assertTrue (pConf->getString("prop3.prop4[@attr]") == "value3");
 
 	pConf->setString("prop3.prop4[1][@attr]", "value4");
-	assert (pConf->getString("prop3.prop4[1][@attr]") == "value4");
+	assertTrue (pConf->getString("prop3.prop4[1][@attr]") == "value4");
 
 	pConf->setString("prop5", "value5a");
-	assert (pConf->getString("prop5") == "value5a");
+	assertTrue (pConf->getString("prop5") == "value5a");
 
 	pConf->setString("prop5[0]", "value5");
-	assert (pConf->getString("prop5[0]") == "value5");
-	assert (pConf->getString("prop5") == "value5");
+	assertTrue (pConf->getString("prop5[0]") == "value5");
+	assertTrue (pConf->getString("prop5") == "value5");
 
 	pConf->setString("prop5[1]", "value6");
-	assert (pConf->getString("prop5[1]") == "value6");
+	assertTrue (pConf->getString("prop5[1]") == "value6");
 
 	try
 	{
@@ -161,7 +159,7 @@ void XMLConfigurationTest::testSave()
 	pConf->save(ostr2);
 	s = ostr2.str();
 	
-	assert (s ==
+	assertTrue (s ==
 		"<config>\n"
 		"\t<prop1>value1</prop1>\n"
 		"\t<prop2>value2</prop2>\n"
@@ -174,21 +172,21 @@ void XMLConfigurationTest::testSave()
 		"</config>\n");
 		
 	pConf->setString("prop1", "value11");
-	assert (pConf->getString("prop1") == "value11");
+	assertTrue (pConf->getString("prop1") == "value11");
 
 	pConf->setString("prop2", "value21");
-	assert (pConf->getString("prop2") == "value21");
+	assertTrue (pConf->getString("prop2") == "value21");
 
 	pConf->setString("prop3.prop4[1][@attr]", "value41");
-	assert (pConf->getString("prop3.prop4[1][@attr]") == "value41");
+	assertTrue (pConf->getString("prop3.prop4[1][@attr]") == "value41");
 
 	pConf->setString("prop3.prop4[2][@attr]", "value42");
-	assert (pConf->getString("prop3.prop4[2][@attr]") == "value42");
+	assertTrue (pConf->getString("prop3.prop4[2][@attr]") == "value42");
 
 	std::ostringstream ostr3;
 	pConf->save(ostr3);
 	s = ostr3.str();
-	assert (s ==
+	assertTrue (s ==
 		"<config>\n"
 		"\t<prop1>value11</prop1>\n"
 		"\t<prop2>value21</prop2>\n"
@@ -212,13 +210,13 @@ void XMLConfigurationTest::testLoadAppendSave()
 	pConf->load(istr);
 
 	pConf->setString("prop2", "value2");
-	assert (pConf->getString("prop2") == "value2");
+	assertTrue (pConf->getString("prop2") == "value2");
 
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string s(ostr.str());
 
-	assert (s ==
+	assertTrue (s ==
 		"<config>\n"
 		"\t<prop1>value1</prop1>\n"
 		"\t<prop2>value2</prop2>\n"
@@ -249,26 +247,56 @@ void XMLConfigurationTest::testOtherDelimiter()
 	std::istringstream istr(xmlFile);	
 	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration(istr, '/');
 	
-	assert (pConf->getString("prop1") == "value1");
-	assert (pConf->getString("prop2") == "value2");
-	assert (pConf->getString("prop3/prop4[@attr]") == "value3");
-	assert (pConf->getString("prop3/prop4[1][@attr]") == "value4");
-	assert (pConf->getString("prop5") == "value5");
-	assert (pConf->getString("prop5[0]") == "value5");
-	assert (pConf->getString("prop5[1]") == "value6");
-	assert (pConf->getString("prop5[@id=1]") == "value5");
-	assert (pConf->getString("prop5[@id='2']") == "value6");
-	assert (pConf->getString("prop6[@id=foo]/prop7") == "value7");
-	assert (pConf->getString("prop6[@id='bar']/prop7") == "value8");
+	assertTrue (pConf->getString("prop1") == "value1");
+	assertTrue (pConf->getString("prop2") == "value2");
+	assertTrue (pConf->getString("prop3/prop4[@attr]") == "value3");
+	assertTrue (pConf->getString("prop3/prop4[1][@attr]") == "value4");
+	assertTrue (pConf->getString("prop5") == "value5");
+	assertTrue (pConf->getString("prop5[0]") == "value5");
+	assertTrue (pConf->getString("prop5[1]") == "value6");
+	assertTrue (pConf->getString("prop5[@id=1]") == "value5");
+	assertTrue (pConf->getString("prop5[@id='2']") == "value6");
+	assertTrue (pConf->getString("prop6[@id=foo]/prop7") == "value7");
+	assertTrue (pConf->getString("prop6[@id='bar']/prop7") == "value8");
 }
 
 
-AbstractConfiguration* XMLConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr XMLConfigurationTest::allocConfiguration() const
 {
 	XMLConfiguration* pConfig = new XMLConfiguration();
 	pConfig->loadEmpty("TestConfiguration");
 
 	return pConfig;
+}
+
+
+void XMLConfigurationTest::testSaveEmpty()
+{
+	Poco::AutoPtr<XMLConfiguration> pConfig = new XMLConfiguration;
+	std::ostringstream ostr;
+	pConfig->save(ostr);
+	assertTrue (ostr.str() == "<config/>\n");
+}
+
+
+void XMLConfigurationTest::testFromScratch()
+{
+	Poco::AutoPtr<XMLConfiguration> pConfig = new XMLConfiguration;
+	pConfig->setString("foo", "bar");
+	std::ostringstream ostr;
+	pConfig->save(ostr);
+	assertTrue (ostr.str() == "<config>\n\t<foo>bar</foo>\n</config>\n");
+}
+
+
+void XMLConfigurationTest::testLoadEmpty()
+{
+	Poco::AutoPtr<XMLConfiguration> pConfig = new XMLConfiguration;
+	pConfig->loadEmpty("AppConfig");
+	pConfig->setString("foo", "bar");
+	std::ostringstream ostr;
+	pConfig->save(ostr);
+	assertTrue (ostr.str() == "<AppConfig>\n\t<foo>bar</foo>\n</AppConfig>\n");
 }
 
 
@@ -291,6 +319,9 @@ CppUnit::Test* XMLConfigurationTest::suite()
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadAppendSave);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testOtherDelimiter);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testSaveEmpty);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testFromScratch);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadEmpty);
 
 	return pSuite;
 }

@@ -1,8 +1,6 @@
 //
 // Mail.cpp
 //
-// $Id: //poco/1.4/Net/samples/Mail/src/Mail.cpp#2 $
-//
 // This sample demonstrates the MailMessage and SMTPClientSession classes.
 //
 // Copyright (c) 2005-2011, Applied Informatics Software Engineering GmbH.

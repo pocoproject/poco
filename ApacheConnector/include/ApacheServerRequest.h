@@ -1,8 +1,6 @@
 //
 // ApacheServerRequest.h
 //
-// $Id: //poco/1.4/ApacheConnector/include/ApacheServerRequest.h#2 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -59,6 +57,12 @@ public:
 
 	Poco::Net::HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response
+
+	bool secure() const;
+		/// Returns true if the request is using a secure
+		/// connection. Returns false if no secure connection
+		/// is used, or if it is not known whether a secure
+		/// connection is used.
 
 protected:
 	void setResponse(ApacheServerResponse* pResponse);

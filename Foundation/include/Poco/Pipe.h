@@ -1,8 +1,6 @@
 //
 // Pipe.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Pipe.h#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Pipe

@@ -1,8 +1,6 @@
 //
 // PDFTestSuite.cpp
 //
-// $Id: //poco/Main/PDF/testsuite/src/PDFTestSuite.cpp#2 $
-//
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

@@ -1,8 +1,6 @@
 //
 // Environment_VX.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Environment_VX.h#2 $
-//
 // Library: Foundation
 // Package: Core
 // Module:  Environment

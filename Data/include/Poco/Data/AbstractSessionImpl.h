@@ -1,8 +1,6 @@
 //
 // AbstractSessionImpl.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/AbstractSessionImpl.h#5 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  AbstractSessionImpl
@@ -43,13 +41,13 @@ public:
 	typedef void (C::*FeatureSetter)(const std::string&, bool);
 		/// The setter method for a feature.
 		
-	typedef bool (C::*FeatureGetter)(const std::string&);
+	typedef bool (C::*FeatureGetter)(const std::string&) const;
 		/// The getter method for a feature.
 		
 	typedef void (C::*PropertySetter)(const std::string&, const Poco::Any&);
 		/// The setter method for a property.
 		
-	typedef Poco::Any (C::*PropertyGetter)(const std::string&);
+	typedef Poco::Any (C::*PropertyGetter)(const std::string&) const;
 		/// The getter method for a property.
 
 	AbstractSessionImpl(const std::string& connectionString,
@@ -189,7 +187,7 @@ public:
 		_storage = Poco::RefAnyCast<std::string>(value);
 	}
 		
-	Poco::Any getStorage(const std::string& name="")
+	Poco::Any getStorage(const std::string& name="") const
 		/// Returns the storage type
 	{
 		return _storage;
@@ -201,7 +199,7 @@ public:
 		_handle = handle;
 	}
 		
-	Poco::Any getHandle(const std::string& name="")
+	Poco::Any getHandle(const std::string& name="") const
 		/// Returns the native session handle. 
 	{
 		return _handle;
@@ -213,7 +211,7 @@ public:
 		_bulk = bulk;
 	}
 		
-	bool getBulk(const std::string& name="")
+	bool getBulk(const std::string& name="") const
 		/// Returns the execution type
 	{
 		return _bulk;
@@ -231,7 +229,7 @@ public:
 		_emptyStringIsNull = emptyStringIsNull;
 	}
 		
-	bool getEmptyStringIsNull(const std::string& name="")
+	bool getEmptyStringIsNull(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -252,7 +250,7 @@ public:
 		_forceEmptyString = forceEmptyString;
 	}
 		
-	bool getForceEmptyString(const std::string& name="")
+	bool getForceEmptyString(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setForceEmptyString(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -298,8 +296,8 @@ private:
 		PropertyGetter getter;
 	};
 	
-	typedef std::map<std::string, Feature>  FeatureMap;
-	typedef std::map<std::string, Property> PropertyMap;
+	using FeatureMap = std::map<std::string, Feature>;
+	using PropertyMap = std::map<std::string, Property>;
 	
 	FeatureMap  _features;
 	PropertyMap _properties;

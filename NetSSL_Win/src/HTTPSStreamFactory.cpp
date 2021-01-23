@@ -1,8 +1,6 @@
 //
 // HTTPSStreamFactory.cpp
 //
-// $Id: //poco/1.4/NetSSL_Win/src/HTTPSStreamFactory.cpp#2 $
-//
 // Library: NetSSL_Win
 // Package: HTTPSClient
 // Module:  HTTPSStreamFactory

@@ -1,8 +1,6 @@
 //
 // NullStreamTest.cpp
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/NullStreamTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -33,20 +31,20 @@ NullStreamTest::~NullStreamTest()
 void NullStreamTest::testInput()
 {
 	NullInputStream istr;
-	assert (istr.good());
-	assert (!istr.eof());
+	assertTrue (istr.good());
+	assertTrue (!istr.eof());
 	int c = istr.get();
-	assert (c == -1);
-	assert (istr.eof());
+	assertTrue (c == -1);
+	assertTrue (istr.eof());
 }
 
 
 void NullStreamTest::testOutput()
 {
 	NullOutputStream ostr;
-	assert (ostr.good());
+	assertTrue (ostr.good());
 	ostr << "Hello, world!";
-	assert (ostr.good());
+	assertTrue (ostr.good());
 }
 
 

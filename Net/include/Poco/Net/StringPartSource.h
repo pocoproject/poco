@@ -1,8 +1,6 @@
 //
 // StringPartSource.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/StringPartSource.h#1 $
-//
 // Library: Net
 // Package: Messages
 // Module:  StringPartSource

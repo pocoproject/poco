@@ -1,8 +1,6 @@
 //
 // MetaObject.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/MetaObject.h#1 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  ClassLoader
@@ -46,9 +44,9 @@ public:
 
 	virtual ~AbstractMetaObject()
 	{
-		for (typename ObjectSet::iterator it = _deleteSet.begin(); it != _deleteSet.end(); ++it)
+		for (auto p: _deleteSet)
 		{
-			delete *it;
+			delete p;
 		}
 	}
 

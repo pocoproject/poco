@@ -1,8 +1,6 @@
 //
 // JSONConfigurationTest.cpp
 //
-// $Id$
-//
 // Copyright (c) 2004-2012, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -56,33 +54,32 @@ void JSONConfigurationTest::testLoad()
 	catch(JSONException jsone)
 	{
 		std::cout << jsone.message() << std::endl;
-		assert(false);
+		assertTrue (false);
 	}
 
 	std::string property1 = config.getString("config.prop1");
-	assert(property1.compare("value1") == 0);
+	assertTrue (property1.compare("value1") == 0);
 
 	int property2 = config.getInt("config.prop2");
-	assert(property2 == 10);
+	assertTrue (property2 == 10);
 
 	int nonExistingProperty = config.getInt("config.prop7", 5);
-	assert(nonExistingProperty == 5);
+	assertTrue (nonExistingProperty == 5);
 
 	std::string arrProperty = config.getString("config.prop3[1]");
-	assert(arrProperty.compare("element2") == 0);
+	assertTrue (arrProperty.compare("element2") == 0);
 
 	bool property35 = config.getBool("config.prop4.prop5");
-	assert(! property35);
+	assertTrue (! property35);
 
 	try
 	{
 		config.getString("propertyUnknown");
-		assert(true);
+		assertTrue (true);
 	}
 	catch(NotFoundException nfe)
 	{
 	}
-
 }
 
 
@@ -104,19 +101,19 @@ void JSONConfigurationTest::testSetArrayElement()
 
 	// config.prop3[0] = "foo"
 	config.setString("config.prop3[0]", "foo");
-	assert(config.getString("config.prop3[0]") == "foo");
+	assertTrue (config.getString("config.prop3[0]") == "foo");
 
 	// config.prop3[1] = "bar"
 	config.setString("config.prop3[1]", "bar");
-	assert(config.getString("config.prop3[1]") == "bar");
+	assertTrue (config.getString("config.prop3[1]") == "bar");
 
 	// config.prop3[3] = "baz"
 	config.setString("config.prop3[3]", "baz");
-	assert(config.getString("config.prop3[3]") == "baz");
+	assertTrue (config.getString("config.prop3[3]") == "baz");
 }
 
 
-AbstractConfiguration* JSONConfigurationTest::allocConfiguration() const
+AbstractConfiguration::Ptr JSONConfigurationTest::allocConfiguration() const
 {
 	return new JSONConfiguration;
 }

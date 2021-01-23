@@ -1,8 +1,6 @@
 //
 // Task.cpp
 //
-// $Id: //poco/1.4/Foundation/src/Task.cpp#1 $
-//
 // Library: Foundation
 // Package: Tasks
 // Module:  Tasks
@@ -16,6 +14,7 @@
 
 #include "Poco/Task.h"
 #include "Poco/TaskManager.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
 
 
@@ -27,7 +26,7 @@ Task::Task(const std::string& name):
 	_pOwner(0),
 	_progress(0),
 	_state(TASK_IDLE),
-	_cancelEvent(false)
+	_cancelEvent(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -91,13 +90,23 @@ bool Task::sleep(long milliseconds)
 }
 
 
+bool Task::yield()
+{
+	Thread::yield();
+	return isCancelled();
+}
+
+
 void Task::setProgress(float progress)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	_progress = progress;
-	if (_pOwner)
-		_pOwner->taskProgress(this, _progress);
+	if (_progress != progress)
+	{
+		_progress = progress;
+		if (_pOwner)
+			_pOwner->taskProgress(this, _progress);
+	}
 }
 
 

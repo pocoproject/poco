@@ -1,8 +1,6 @@
 //
 // LoggingSubsystem.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/LoggingSubsystem.h#1 $
-//
 // Library: Util
 // Package: Application
 // Module:  LoggingSubsystem

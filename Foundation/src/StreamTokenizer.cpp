@@ -1,8 +1,6 @@
 //
 // StreamTokenizer.cpp
 //
-// $Id: //poco/1.4/Foundation/src/StreamTokenizer.cpp#1 $
-//
 // Library: Foundation
 // Package: Streams
 // Module:  StreamTokenizer
@@ -34,9 +32,9 @@ StreamTokenizer::StreamTokenizer(std::istream& istr):
 
 StreamTokenizer::~StreamTokenizer()
 {
-	for (TokenVec::iterator it = _tokens.begin(); it != _tokens.end(); ++it)
+	for (auto& t: _tokens)
 	{
-		delete it->pToken;
+		delete t.pToken;
 	}
 }
 

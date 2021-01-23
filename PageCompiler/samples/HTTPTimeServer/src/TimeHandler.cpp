@@ -1,7 +1,7 @@
 //
 // TimeHandler.cpp
 //
-// This file has been generated from TimeHandler.cpsp on 2010-01-28 08:49:54.
+// This file has been generated from TimeHandler.cpsp on 2016-05-08 21:03:48.
 //
 
 
@@ -28,7 +28,7 @@ void TimeHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net
 	responseStream << "\n";
 	responseStream << "\n";
 	responseStream << "";
-#line 6 "/ws/poco-1.3/PageCompiler/samples/HTTPTimeServer/src/TimeHandler.cpsp"
+#line 6 "Z:\\git\\poco-1.7.3\\PageCompiler\\samples\\HTTPTimeServer\\src\\TimeHandler.cpsp"
 
     Poco::DateTime now;
     std::string dt(Poco::DateTimeFormatter::format(now, "%W, %e %b %y %H:%M:%S %Z"));
@@ -40,7 +40,7 @@ void TimeHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net
 	responseStream << "</head>\n";
 	responseStream << "<body>\n";
 	responseStream << "<p style=\"text-align: center; font-size: 48px;\">";
-#line 16 "/ws/poco-1.3/PageCompiler/samples/HTTPTimeServer/src/TimeHandler.cpsp"
+#line 16 "Z:\\git\\poco-1.7.3\\PageCompiler\\samples\\HTTPTimeServer\\src\\TimeHandler.cpsp"
 	responseStream << ( dt );
 	responseStream << "</p>\n";
 	responseStream << "</body>\n";

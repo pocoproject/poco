@@ -1,8 +1,6 @@
 //
 // Data.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Constants.h#4 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  Constants

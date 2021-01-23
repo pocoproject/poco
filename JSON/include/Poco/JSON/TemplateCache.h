@@ -1,8 +1,6 @@
 //
 // TemplateCache.h
 //
-// $Id$
-//
 // Library: JSON
 // Package: JSON
 // Module:  TemplateCache
@@ -14,6 +12,7 @@
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
+
 
 #ifndef JSON_JSONTemplateCache_INCLUDED
 #define JSON_JSONTemplateCache_INCLUDED
@@ -41,11 +40,13 @@ class JSON_API TemplateCache
 {
 public:
 	TemplateCache();
-		/// Constructor. The cache must be created
-		/// and not destroyed as long as it is used.
+		/// Creates an empty TemplateCache.
+		///
+		/// The cache must be created and not destroyed 
+		/// as long as it is used.
 
 	virtual ~TemplateCache();
-		/// Destructor.
+		/// Destroys the TemplateCache.
 
 	void addPath(const Path& path);
 		/// Add a path for resolving template paths.
@@ -61,22 +62,25 @@ public:
 		/// the cache.
 
 	static TemplateCache* instance();
-		/// Returns the only instance of this cache
+		/// Returns the only instance of this cache.
 
 	void setLogger(Logger& logger);
 		/// Sets the logger for the cache.
 
 private:
-	static TemplateCache*                _instance;
-	std::vector<Path>                    _includePaths;
-	std::map<std::string, Template::Ptr> _cache;
-	Logger*                              _logger;
-	
 	void setup();
 	Path resolvePath(const Path& path) const;
+
+	static TemplateCache*                _pInstance;
+	std::vector<Path>                    _includePaths;
+	std::map<std::string, Template::Ptr> _cache;
+	Logger*                              _pLogger;
 };
 
 
+//
+// inlines
+//
 inline void TemplateCache::addPath(const Path& path)
 {
 	_includePaths.push_back(path);
@@ -85,17 +89,17 @@ inline void TemplateCache::addPath(const Path& path)
 
 inline TemplateCache* TemplateCache::instance()
 {
-	return _instance;
+	return _pInstance;
 }
 
 
 inline void TemplateCache::setLogger(Logger& logger)
 {
-	_logger = &logger;
+	_pLogger = &logger;
 }
 
 
-}} // Namespace Poco::JSON
+} } // namespace Poco::JSON
 
 
 #endif // JSON_JSONTemplateCache_INCLUDED

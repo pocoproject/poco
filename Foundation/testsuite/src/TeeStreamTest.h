@@ -1,8 +1,6 @@
 //
 // TeeStreamTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/TeeStreamTest.h#1 $
-//
 // Definition of the TeeStreamTest class.
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

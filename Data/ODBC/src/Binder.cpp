@@ -1,9 +1,7 @@
 //
 // Binder.cpp
 //
-// $Id: //poco/Main/Data/ODBC/src/Binder.cpp#4 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  Binder
 //
@@ -16,6 +14,7 @@
 
 #include "Poco/Data/ODBC/Binder.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
@@ -31,7 +30,7 @@ namespace ODBC {
 Binder::Binder(const StatementHandle& rStmt,
 	std::size_t maxFieldSize,
 	Binder::ParameterBinding dataBinding,
-	TypeInfo* pDataTypes):
+	const TypeInfo* pDataTypes):
 	_rStmt(rStmt),
 	_paramBinding(dataBinding),
 	_pTypeInfo(pDataTypes),
@@ -103,6 +102,9 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER) val.size();
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits, val.size());
 
 	if (isOutBound(dir))
 	{
@@ -120,11 +122,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
 
-	SQLLEN* pLenIn = new SQLLEN;
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
-	*pLenIn = SQL_NTS;
+	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
 
 	if (PB_AT_EXEC == _paramBinding)
 		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
@@ -135,7 +133,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		(SQLUSMALLINT) pos + 1, 
 		toODBCDirection(dir), 
 		SQL_C_CHAR, 
-		SQL_LONGVARCHAR, 
+		Connector::stringBoundToLongVarChar() ? SQL_LONGVARCHAR : SQL_VARCHAR, 
 		(SQLUINTEGER) colSize,
 		0,
 		pVal, 
@@ -153,6 +151,9 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 
 	SQLPOINTER pVal = 0;
 	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
+	SQLINTEGER colSize = 0;
+	SQLSMALLINT decDigits = 0;
+	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);
 
 	if (isOutBound(dir))
 	{
@@ -170,11 +171,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 	else
 		throw InvalidArgumentException("Parameter must be [in] OR [out] bound.");
 
-	SQLLEN* pLenIn = new SQLLEN;
-	SQLINTEGER colSize = 0;
-	SQLSMALLINT decDigits = 0;
-	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);
-	*pLenIn = SQL_NTS;
+	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
 
 	if (PB_AT_EXEC == _paramBinding)
 	{
@@ -421,7 +418,8 @@ void Binder::reset()
 void Binder::getColSizeAndPrecision(std::size_t pos, 
 	SQLSMALLINT cDataType, 
 	SQLINTEGER& colSize, 
-	SQLSMALLINT& decDigits)
+	SQLSMALLINT& decDigits,
+	std::size_t actualSize)
 {
 	// Not all drivers are equally willing to cooperate in this matter.
 	// Hence the funky flow control.
@@ -431,6 +429,11 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	{
 		found = _pTypeInfo->tryGetInfo(cDataType, "COLUMN_SIZE", tmp);
 		if (found) colSize = tmp;
+		if (actualSize > colSize)
+		{
+			throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
+					pos, actualSize, static_cast<long>(colSize)));
+		}
 		found = _pTypeInfo->tryGetInfo(cDataType, "MINIMUM_SCALE", tmp);
 		if (found)
 		{
@@ -445,7 +448,10 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		colSize = (SQLINTEGER) p.columnSize();
 		decDigits = (SQLSMALLINT) p.decimalDigits();
 		return;
-	} catch (StatementException&) { }
+	} 
+	catch (StatementException&)
+	{ 
+	}
 
 	try
 	{
@@ -453,7 +459,17 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 		colSize = (SQLINTEGER) c.length();
 		decDigits = (SQLSMALLINT) c.precision();
 		return;
-	} catch (StatementException&) { }
+	} 
+	catch (StatementException&) 
+	{ 
+	}
+
+	// last check, just in case
+	if ((0 != colSize) && (actualSize > colSize))
+	{
+		throw LengthExceededException(Poco::format("Error binding column %z size=%z, max size=%ld)",
+				pos, actualSize, static_cast<long>(colSize)));
+	}
 
 	// no success, set to zero and hope for the best
 	// (most drivers do not require these most of the times anyway)

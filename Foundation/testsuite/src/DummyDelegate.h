@@ -1,8 +1,6 @@
 //
 // DummyDelegate.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DummyDelegate.h#1 $
-//
 // Definition of DummyDelegate class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

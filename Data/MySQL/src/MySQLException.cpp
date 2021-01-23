@@ -1,9 +1,7 @@
 //
 // MySQLException.cpp
 //
-// $Id: //poco/1.4/Data/MySQL/src/MySQLException.cpp#1 $
-//
-// Library: Data
+// Library: Data/MySQL
 // Package: MySQL
 // Module:  MySQLException
 //
@@ -17,6 +15,7 @@
 #include "Poco/Data/MySQL/MySQLException.h"
 #include <mysql.h>
 #include <stdio.h>
+
 
 namespace Poco {
 namespace Data {
@@ -33,16 +32,19 @@ MySQLException::MySQLException(const MySQLException& exc) : Poco::Data::DataExce
 }
 
 
-MySQLException::~MySQLException() throw()
+MySQLException::MySQLException(const std::string& msg, int code) : Poco::Data::DataException(std::string("[MySQL]: ") + msg, code)
 {
 }
 
 
-/////
+MySQLException::~MySQLException() noexcept
+{
+}
+
+
 //
 // ConnectionException
 //
-/////
 
 
 ConnectionException::ConnectionException(const std::string& msg) : MySQLException(msg)
@@ -74,11 +76,9 @@ std::string ConnectionException::compose(const std::string& text, MYSQL* h)
 }
 
 
-/////
 //
 // TransactionException
 //
-/////
 
 
 TransactionException::TransactionException(const std::string& msg) : ConnectionException(msg)
@@ -136,5 +136,6 @@ std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, 
 
 	return str;
 }
+
 
 } } } // namespace Poco::Data::MySQL

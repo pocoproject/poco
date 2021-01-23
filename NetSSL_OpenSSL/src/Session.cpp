@@ -1,8 +1,6 @@
 //
 // Session.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/Session.cpp#2 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  Session

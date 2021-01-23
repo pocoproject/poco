@@ -1,8 +1,6 @@
 //
 // Timezone.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Timezone.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  Timezone

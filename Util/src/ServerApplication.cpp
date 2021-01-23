@@ -1,8 +1,6 @@
 //
 // ServerApplication.cpp
 //
-// $Id: //poco/1.4/Util/src/ServerApplication.cpp#6 $
-//
 // Library: Util
 // Package: Application
 // Module:  ServerApplication
@@ -18,6 +16,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/OptionException.h"
+#include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
@@ -42,9 +41,7 @@
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 #include "Poco/UnicodeConverter.h"
-#endif
 
 
 using Poco::NumberFormatter;
@@ -60,11 +57,11 @@ namespace Util {
 Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminationEventName(Poco::Process::id()));
 #if !defined(_WIN32_WCE)
 Poco::Event           ServerApplication::_terminated;
-SERVICE_STATUS        ServerApplication::_serviceStatus; 
-SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0; 
+SERVICE_STATUS        ServerApplication::_serviceStatus;
+SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = 0;
 #endif
 #endif
-#if defined(POCO_VXWORKS) || defined(POCO_ANDROID)
+#if defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
 Poco::Event ServerApplication::_terminate;
 #endif
 
@@ -102,7 +99,7 @@ void ServerApplication::terminate()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	_terminate.set();
-#elif defined(POCO_VXWORKS) || defined(POCO_ANDROID)
+#elif defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
 	_terminate.set();
 #else
 	Poco::Process::requestTermination(Process::id());
@@ -119,65 +116,56 @@ void ServerApplication::terminate()
 //
 BOOL ServerApplication::ConsoleCtrlHandler(DWORD ctrlType)
 {
-	switch (ctrlType) 
-	{ 
-	case CTRL_C_EVENT: 
-	case CTRL_CLOSE_EVENT: 
+	switch (ctrlType)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
 	case CTRL_BREAK_EVENT:
 		terminate();
 		return _terminated.tryWait(10000) ? TRUE : FALSE;
-	default: 
-		return FALSE; 
+	default:
+		return FALSE;
 	}
 }
 
 
 void ServerApplication::ServiceControlHandler(DWORD control)
 {
-	switch (control) 
-	{ 
+	switch (control)
+	{
 	case SERVICE_CONTROL_STOP:
 	case SERVICE_CONTROL_SHUTDOWN:
 		terminate();
 		_serviceStatus.dwCurrentState = SERVICE_STOP_PENDING;
 		break;
-	case SERVICE_CONTROL_INTERROGATE: 
-		break; 
-	} 
+	case SERVICE_CONTROL_INTERROGATE:
+		break;
+	}
 	SetServiceStatus(_serviceStatusHandle,  &_serviceStatus);
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
-#else
-void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
-#endif
 {
 	ServerApplication& app = static_cast<ServerApplication&>(Application::instance());
 
 	app.config().setBool("application.runAsService", true);
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	_serviceStatusHandle = RegisterServiceCtrlHandlerW(L"", ServiceControlHandler);
-#else
-	_serviceStatusHandle = RegisterServiceCtrlHandlerA("", ServiceControlHandler);
-#endif
 	if (!_serviceStatusHandle)
 		throw SystemException("cannot register service control handler");
 
-	_serviceStatus.dwServiceType             = SERVICE_WIN32; 
-	_serviceStatus.dwCurrentState            = SERVICE_START_PENDING; 
+	_serviceStatus.dwServiceType             = SERVICE_WIN32;
+	_serviceStatus.dwCurrentState            = SERVICE_START_PENDING;
 	_serviceStatus.dwControlsAccepted        = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
-	_serviceStatus.dwWin32ExitCode           = 0; 
-	_serviceStatus.dwServiceSpecificExitCode = 0; 
-	_serviceStatus.dwCheckPoint              = 0; 
-	_serviceStatus.dwWaitHint                = 0; 
+	_serviceStatus.dwWin32ExitCode           = 0;
+	_serviceStatus.dwServiceSpecificExitCode = 0;
+	_serviceStatus.dwCheckPoint              = 0;
+	_serviceStatus.dwWaitHint                = 0;
 	SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 
 	try
 	{
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 		std::vector<std::string> args;
 		for (DWORD i = 0; i < argc; ++i)
 		{
@@ -186,26 +174,23 @@ void ServerApplication::ServiceMain(DWORD argc, LPTSTR* argv)
 			args.push_back(arg);
 		}
 		app.init(args);
-#else
-		app.init(argc, argv);
-#endif
-		_serviceStatus.dwCurrentState = SERVICE_RUNNING; 
+		_serviceStatus.dwCurrentState = SERVICE_RUNNING;
 		SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
 		int rc = app.run();
 		_serviceStatus.dwWin32ExitCode           = rc ? ERROR_SERVICE_SPECIFIC_ERROR : 0;
-		_serviceStatus.dwServiceSpecificExitCode = rc; 
+		_serviceStatus.dwServiceSpecificExitCode = rc;
 	}
 	catch (Exception& exc)
 	{
 		app.logger().log(exc);
 		_serviceStatus.dwWin32ExitCode           = ERROR_SERVICE_SPECIFIC_ERROR;
-		_serviceStatus.dwServiceSpecificExitCode = EXIT_CONFIG; 
+		_serviceStatus.dwServiceSpecificExitCode = EXIT_CONFIG;
 	}
 	catch (...)
 	{
 		app.logger().error("fatal error - aborting");
 		_serviceStatus.dwWin32ExitCode           = ERROR_SERVICE_SPECIFIC_ERROR;
-		_serviceStatus.dwServiceSpecificExitCode = EXIT_SOFTWARE; 
+		_serviceStatus.dwServiceSpecificExitCode = EXIT_SOFTWARE;
 	}
 	_serviceStatus.dwCurrentState = SERVICE_STOPPED;
 	SetServiceStatus(_serviceStatusHandle, &_serviceStatus);
@@ -226,7 +211,7 @@ int ServerApplication::run(int argc, char** argv)
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		int rc = EXIT_OK;
 		try
@@ -262,7 +247,7 @@ int ServerApplication::run(const std::vector<std::string>& args)
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		int rc = EXIT_OK;
 		try
@@ -292,14 +277,13 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	if (!hasConsole() && isService())
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		int rc = EXIT_OK;
 		try
@@ -327,26 +311,16 @@ int ServerApplication::run(int argc, wchar_t** argv)
 		return rc;
 	}
 }
-#endif
 
 
 bool ServerApplication::isService()
 {
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 	SERVICE_TABLE_ENTRYW svcDispatchTable[2];
 	svcDispatchTable[0].lpServiceName = L"";
 	svcDispatchTable[0].lpServiceProc = ServiceMain;
 	svcDispatchTable[1].lpServiceName = NULL;
-	svcDispatchTable[1].lpServiceProc = NULL; 
-	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0; 
-#else
-	SERVICE_TABLE_ENTRY svcDispatchTable[2];
-	svcDispatchTable[0].lpServiceName = "";
-	svcDispatchTable[0].lpServiceProc = ServiceMain;
-	svcDispatchTable[1].lpServiceName = NULL;
-	svcDispatchTable[1].lpServiceProc = NULL; 
-	return StartServiceCtrlDispatcherA(svcDispatchTable) != 0; 
-#endif
+	svcDispatchTable[1].lpServiceProc = NULL;
+	return StartServiceCtrlDispatcherW(svcDispatchTable) != 0;
 }
 
 
@@ -361,7 +335,7 @@ void ServerApplication::registerService()
 {
 	std::string name = config().getString("application.baseName");
 	std::string path = config().getString("application.path");
-	
+
 	WinService service(name);
 	if (_displayName.empty())
 		service.registerService(path);
@@ -380,7 +354,7 @@ void ServerApplication::registerService()
 void ServerApplication::unregisterService()
 {
 	std::string name = config().getString("application.baseName");
-	
+
 	WinService service(name);
 	service.unregisterService();
 	logger().information("The service has been successfully unregistered.");
@@ -498,7 +472,6 @@ int ServerApplication::run(const std::vector<std::string>& args)
 }
 
 
-#if defined(POCO_WIN32_UTF8) && !defined(POCO_NO_WSTRING)
 int ServerApplication::run(int argc, wchar_t** argv)
 {
 	try
@@ -512,7 +485,6 @@ int ServerApplication::run(int argc, wchar_t** argv)
 	}
 	return run();
 }
-#endif
 
 
 #endif // _WIN32_WCE
@@ -570,7 +542,7 @@ void ServerApplication::defineOptions(OptionSet& options)
 //
 void ServerApplication::waitForTerminationRequest()
 {
-#ifndef POCO_ANDROID
+#if POCO_OS != POCO_OS_ANDROID
 	sigset_t sset;
 	sigemptyset(&sset);
 	if (!std::getenv("POCO_ENABLE_DEBUGGER"))
@@ -582,7 +554,7 @@ void ServerApplication::waitForTerminationRequest()
 	sigprocmask(SIG_BLOCK, &sset, NULL);
 	int sig;
 	sigwait(&sset, &sig);
-#else // POCO_ANDROID
+#else // POCO_OS != POCO_OS_ANDROID
 	_terminate.wait();
 #endif
 }
@@ -616,14 +588,14 @@ int ServerApplication::run(int argc, char** argv)
 int ServerApplication::run(const std::vector<std::string>& args)
 {
 	bool runAsDaemon = false;
-	for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+	for (const auto& arg: args)
 	{
-		if (*it == "--daemon")
+		if (arg == "--daemon")
 		{
 			runAsDaemon = true;
 			break;
 		}
-	}		
+	}
 	if (runAsDaemon)
 	{
 		beDaemon();
@@ -660,15 +632,16 @@ bool ServerApplication::isDaemon(int argc, char** argv)
 
 void ServerApplication::beDaemon()
 {
+#if !defined(POCO_NO_FORK_EXEC)
 	pid_t pid;
 	if ((pid = fork()) < 0)
 		throw SystemException("cannot fork daemon process");
 	else if (pid != 0)
 		exit(0);
-	
+
 	setsid();
-	umask(0);
-	
+	umask(027);
+
 	// attach stdin, stdout, stderr to /dev/null
 	// instead of just closing them. This avoids
 	// issues with third party/legacy code writing
@@ -679,6 +652,9 @@ void ServerApplication::beDaemon()
 	if (!fout) throw Poco::OpenFileException("Cannot attach stdout to /dev/null");
 	FILE* ferr = freopen("/dev/null", "r+", stderr);
 	if (!ferr) throw Poco::OpenFileException("Cannot attach stderr to /dev/null");
+#else
+	throw Poco::NotImplementedException("platform does not allow fork/exec");
+#endif
 }
 
 
@@ -691,6 +667,13 @@ void ServerApplication::defineOptions(OptionSet& options)
 			.required(false)
 			.repeatable(false)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleDaemon)));
+
+	options.addOption(
+		Option("umask", "", "Set the daemon's umask (octal, e.g. 027).")
+			.required(false)
+			.repeatable(false)
+			.argument("mask")
+			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleUMask)));
 
 	options.addOption(
 		Option("pidfile", "", "Write the process ID of the application to given file.")
@@ -707,99 +690,29 @@ void ServerApplication::handleDaemon(const std::string& name, const std::string&
 }
 
 
+void ServerApplication::handleUMask(const std::string& name, const std::string& value)
+{
+	int mask = 0;
+	for (const auto ch: value)
+	{
+		mask *= 8;
+		if (ch >= '0' && ch <= '7')
+			mask += ch - '0';
+		else
+			throw Poco::InvalidArgumentException("umask contains non-octal characters", value);
+	}
+	umask(mask);
+}
+
+
 void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
 {
-	std::ofstream ostr(value.c_str());
+	Poco::FileOutputStream ostr(value);
 	if (ostr.good())
 		ostr << Poco::Process::id() << std::endl;
 	else
 		throw Poco::CreateFileException("Cannot write PID to file", value);
 	Poco::TemporaryFile::registerForDeletion(value);
-}
-
-
-#elif defined(POCO_OS_FAMILY_VMS)
-
-
-//
-// VMS specific code
-//
-namespace
-{
-	static void handleSignal(int sig)
-	{
-		ServerApplication::terminate();
-	}
-}
-
-
-void ServerApplication::waitForTerminationRequest()
-{
-	struct sigaction handler;
-	handler.sa_handler = handleSignal;
-	handler.sa_flags   = 0;
-	sigemptyset(&handler.sa_mask);
-	sigaction(SIGINT, &handler, NULL);
-	sigaction(SIGQUIT, &handler, NULL);                                       
-
-	long ctrlY = LIB$M_CLI_CTRLY;
-	unsigned short ioChan;
-	$DESCRIPTOR(ttDsc, "TT:");
-
-	lib$disable_ctrl(&ctrlY);
-	sys$assign(&ttDsc, &ioChan, 0, 0);
-	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLYAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
-	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLCAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
-
-	std::string evName("POCOTRM");
-	NumberFormatter::appendHex(evName, Poco::Process::id(), 8);
-	Poco::NamedEvent ev(evName);
-	try
-	{
-		ev.wait();
-    }
-	catch (...)
-	{
-		// CTRL-C will cause an exception to be raised
-	}
-	sys$dassgn(ioChan);
-	lib$enable_ctrl(&ctrlY);
-}
-
-
-int ServerApplication::run(int argc, char** argv)
-{
-	try
-	{
-		init(argc, argv);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-int ServerApplication::run(const std::vector<std::string>& args)
-{
-	try
-	{
-		init(args);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-void ServerApplication::defineOptions(OptionSet& options)
-{
-	Application::defineOptions(options);
 }
 
 

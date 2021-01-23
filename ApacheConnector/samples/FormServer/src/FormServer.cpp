@@ -1,8 +1,6 @@
 //
 // FormServer.cpp
 //
-// $Id: //poco/1.4/ApacheConnector/samples/FormServer/src/FormServer.cpp#2 $
-//
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //

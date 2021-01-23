@@ -1,8 +1,6 @@
 //
 // DateTime.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/DateTime.h#1 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTime
@@ -23,6 +21,9 @@
 #include "Poco/Foundation.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
+
+
+struct tm;
 
 
 namespace Poco {
@@ -88,9 +89,12 @@ public:
 		FRIDAY,
 		SATURDAY
 	};
-		
+
 	DateTime();
 		/// Creates a DateTime for the current date and time.
+
+	DateTime(const tm& tmStruct);
+		/// Creates a DateTime from tm struct.
 
 	DateTime(const Timestamp& timestamp);
 		/// Creates a DateTime for the date and time given in
@@ -103,9 +107,11 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 59.
+		///   * second is from 0 to 60.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		///
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	DateTime(double julianDay);
 		/// Creates a DateTime for the given Julian day.
@@ -137,9 +143,11 @@ public:
 		///   * day is from 1 to 31.
 		///   * hour is from 0 to 23.
 		///   * minute is from 0 to 59.
-		///   * second is from 0 to 59.
+		///   * second is from 0 to 60.
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
+		///
+		/// Throws an InvalidArgumentException if an argument date is out of range.
 
 	void swap(DateTime& dateTime);
 		/// Swaps the DateTime with another one.
@@ -160,11 +168,11 @@ public:
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
 		///
-		/// For 2007, which starts on a Monday, week 1 will be the week startung on Monday, January 1.
+		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
 	
 	int day() const;
-		/// Returns the day witin the month (1 to 31).
+		/// Returns the day within the month (1 to 31).
 		
 	int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
@@ -208,7 +216,7 @@ public:
 		/// Returns the date and time expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
-		
+
 	bool operator == (const DateTime& dateTime) const;	
 	bool operator != (const DateTime& dateTime) const;	
 	bool operator <  (const DateTime& dateTime) const;	
@@ -221,33 +229,36 @@ public:
 	Timespan  operator -  (const DateTime& dateTime) const;
 	DateTime& operator += (const Timespan& span);
 	DateTime& operator -= (const Timespan& span);
-	
+
+	tm makeTM() const;
+		/// Converts DateTime to tm struct.
+
 	void makeUTC(int tzd);
 		/// Converts a local time into UTC, by applying the given time zone differential.
-		
+
 	void makeLocal(int tzd);
 		/// Converts a UTC time into a local time, by applying the given time zone differential.
-	
+
 	static bool isLeapYear(int year);
 		/// Returns true if the given year is a leap year;
 		/// false otherwise.
-		
+
 	static int daysOfMonth(int year, int month);
 		/// Returns the number of days in the given month
 		/// and year. Month is from 1 to 12.
-		
+
 	static bool isValid(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Checks if the given date and time is valid
 		/// (all arguments are within a proper range).
 		///
 		/// Returns true if all arguments are valid, false otherwise.
-		
-protected:	
+
+protected:
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 	
 	static double toJulianDay(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
-		/// Computes the Julian day for a gregorian calendar date and time.
+		/// Computes the Julian day for a Gregorian calendar date and time.
 		/// See <http://vsg.cape.com/~pbaum/date/jdimp.htm>, section 2.3.1 for the algorithm.
 	
 	static Timestamp::UtcTimeVal toUtcTime(double julianDay);
@@ -266,20 +277,35 @@ private:
 		///utility functions used to correct the overflow in computeGregorian
 
 	Timestamp::UtcTimeVal _utcTime;
-	short  _year;
-	short  _month;
-	short  _day;
-	short  _hour;
-	short  _minute;
-	short  _second;
-	short  _millisecond;
-	short  _microsecond;
+	short _year;
+	short _month;
+	short _day;
+	short _hour;
+	short _minute;
+	short _second;
+	short _millisecond;
+	short _microsecond;
 };
 
 
 //
 // inlines
 //
+
+
+inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
+{
+	double utcDays = double(utcTime)/864000000000.0;
+	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
+}
+
+
+inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
+{
+	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
+}
+
+
 inline Timestamp DateTime::timestamp() const
 {
 	return Timestamp::fromUtcTime(_utcTime);

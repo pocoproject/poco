@@ -1,8 +1,6 @@
 //
 // FileStreamFactory.cpp
 //
-// $Id: //poco/1.4/Foundation/src/FileStreamFactory.cpp#1 $
-//
 // Library: Foundation
 // Package: URI
 // Module:  FileStreamFactory

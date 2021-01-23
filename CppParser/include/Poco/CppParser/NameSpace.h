@@ -1,8 +1,6 @@
 //
 // NameSpace.h
 //
-// $Id: //poco/1.4/CppParser/include/Poco/CppParser/NameSpace.h#1 $
-//
 // Library: CppParser
 // Package: SymbolTable
 // Module:  NameSpace
@@ -66,7 +64,7 @@ public:
 	
 	Symbol* lookup(const std::string& name) const;
 		/// Looks up the given name in the symbol table
-		/// and returns the corresponsing symbol, or null
+		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include
 		/// a namespace.
 		
@@ -79,6 +77,9 @@ public:
 	void typeDefs(SymbolTable& table) const;
 		/// Fills the symbol table with all type definitions.
 		
+	void typeAliases(SymbolTable& table) const;
+		/// Fills the symbol table with all type alias (using) definitions.
+
 	void enums(SymbolTable& table) const;
 		/// Fills the symbol table with all enums.
 		
@@ -104,7 +105,7 @@ public:
 private:
 	Symbol* lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const;
 		/// Looks up the given name in the symbol table
-		/// and returns the corresponsing symbol, or null
+		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include
 		/// a namespace.
 

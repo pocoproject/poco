@@ -1,8 +1,6 @@
 //
 // RSACipherImpl.cpp
 //
-// $Id: //poco/1.4/Crypto/src/RSACipherImpl.cpp#3 $
-//
 // Library: Crypto
 // Package: RSA
 // Module:  RSACipherImpl
@@ -32,7 +30,7 @@ namespace
 	{
 		unsigned long err;
 		std::string msg;
-		
+
 		while ((err = ERR_get_error()))
 		{
 			if (!msg.empty())
@@ -68,16 +66,18 @@ namespace
 	public:
 		RSAEncryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSAEncryptImpl();
-		
+
 		std::size_t blockSize() const;
 		std::size_t maxDataSize() const;
+		std::string getTag(std::size_t);
+		void setTag(const std::string&);
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
 			std::streamsize		 outputLength);
-		
+
 		std::streamsize finalize(unsigned char*	output, std::streamsize length);
 
 	private:
@@ -129,6 +129,17 @@ namespace
 	}
 
 
+	std::string RSAEncryptImpl::getTag(std::size_t)
+	{
+		return std::string();
+	}
+
+
+	void RSAEncryptImpl::setTag(const std::string&)
+	{
+	}
+
+
 	std::streamsize RSAEncryptImpl::transform(
 		const unsigned char* input,
 		std::streamsize		 inputLength,
@@ -156,7 +167,7 @@ namespace
 				output += n;
 				outputLength -= n;
 				_pos = 0;
-				
+
 			}
 			else
 			{
@@ -192,15 +203,17 @@ namespace
 	public:
 		RSADecryptImpl(const RSA* pRSA, RSAPaddingMode paddingMode);
 		~RSADecryptImpl();
-		
+
 		std::size_t blockSize() const;
+		std::string getTag(std::size_t);
+		void setTag(const std::string&);
 
 		std::streamsize transform(
 			const unsigned char* input,
 			std::streamsize		 inputLength,
 			unsigned char*		 output,
 			std::streamsize		 outputLength);
-		
+
 		std::streamsize finalize(
 			unsigned char*	output,
 			std::streamsize length);
@@ -235,13 +248,24 @@ namespace
 	}
 
 
+	std::string RSADecryptImpl::getTag(std::size_t)
+	{
+		return std::string();
+	}
+
+
+	void RSADecryptImpl::setTag(const std::string&)
+	{
+	}
+
+
 	std::streamsize RSADecryptImpl::transform(
 		const unsigned char* input,
 		std::streamsize		 inputLength,
 		unsigned char*		 output,
 		std::streamsize		 outputLength)
 	{
-		
+
 		// always fill up the buffer before decrypting!
 		std::streamsize rsaSize = static_cast<std::streamsize>(blockSize());
 		poco_assert_dbg(_pos <= rsaSize);
@@ -261,7 +285,7 @@ namespace
 				output += tmp;
 				outputLength -= tmp;
 				_pos = 0;
-				
+
 			}
 			else
 			{
@@ -305,13 +329,13 @@ RSACipherImpl::~RSACipherImpl()
 }
 
 
-CryptoTransform* RSACipherImpl::createEncryptor()
+CryptoTransform::Ptr RSACipherImpl::createEncryptor()
 {
 	return new RSAEncryptImpl(_key.impl()->getRSA(), _paddingMode);
 }
 
 
-CryptoTransform* RSACipherImpl::createDecryptor()
+CryptoTransform::Ptr RSACipherImpl::createDecryptor()
 {
 	return new RSADecryptImpl(_key.impl()->getRSA(), _paddingMode);
 }

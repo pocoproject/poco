@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Main/Data/samples/Binding/Makefile#1 $
-#
 # Makefile for Poco Data Binding sample
 #
 

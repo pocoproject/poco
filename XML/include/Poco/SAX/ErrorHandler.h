@@ -1,8 +1,6 @@
 //
 // ErrorHandler.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/ErrorHandler.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  SAX

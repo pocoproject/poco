@@ -1,8 +1,6 @@
 //
 // DOMSerializer.h
 //
-// $Id: //poco/1.4/XML/include/Poco/DOM/DOMSerializer.h#1 $
-//
 // Library: XML
 // Package: DOM
 // Module:  DOMSerializer

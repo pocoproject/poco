@@ -1,8 +1,6 @@
 //
 // HTTPMessage.cpp
 //
-// $Id: //poco/1.4/Net/src/HTTPMessage.cpp#4 $
-//
 // Library: Net
 // Package: HTTP
 // Module:  HTTPMessage
@@ -40,6 +38,7 @@ const std::string HTTPMessage::CONTENT_LENGTH             = "Content-Length";
 const std::string HTTPMessage::CONTENT_TYPE               = "Content-Type";
 const std::string HTTPMessage::TRANSFER_ENCODING          = "Transfer-Encoding";
 const std::string HTTPMessage::CONNECTION                 = "Connection";
+const std::string HTTPMessage::PROXY_CONNECTION           = "Proxy-Connection";
 const std::string HTTPMessage::CONNECTION_KEEP_ALIVE      = "Keep-Alive";
 const std::string HTTPMessage::CONNECTION_CLOSE           = "Close";
 const std::string HTTPMessage::EMPTY;
@@ -57,8 +56,26 @@ HTTPMessage::HTTPMessage(const std::string& version):
 }
 
 
+HTTPMessage::HTTPMessage(const HTTPMessage& other):
+	MessageHeader(other),
+	_version(other._version)
+{
+}
+
+
 HTTPMessage::~HTTPMessage()
 {
+}
+
+
+HTTPMessage& HTTPMessage::operator = (const HTTPMessage& other)
+{
+	if (this != &other)
+	{
+		MessageHeader::operator = (other);
+		_version = other._version;
+	}
+	return *this;
 }
 
 
@@ -76,7 +93,7 @@ void HTTPMessage::setContentLength(std::streamsize length)
 		erase(CONTENT_LENGTH);
 }
 
-	
+
 std::streamsize HTTPMessage::getContentLength() const
 {
 	const std::string& contentLength = get(CONTENT_LENGTH, EMPTY);
@@ -91,7 +108,7 @@ std::streamsize HTTPMessage::getContentLength() const
 }
 
 
-#if defined(POCO_HAVE_INT64)	
+#if defined(POCO_HAVE_INT64)
 void HTTPMessage::setContentLength64(Poco::Int64 length)
 {
 	if (length != UNKNOWN_CONTENT_LENGTH)
@@ -100,7 +117,7 @@ void HTTPMessage::setContentLength64(Poco::Int64 length)
 		erase(CONTENT_LENGTH);
 }
 
-	
+
 Poco::Int64 HTTPMessage::getContentLength64() const
 {
 	const std::string& contentLength = get(CONTENT_LENGTH, EMPTY);
@@ -110,7 +127,7 @@ Poco::Int64 HTTPMessage::getContentLength64() const
 	}
 	else return UNKNOWN_CONTENT_LENGTH;
 }
-#endif // defined(POCO_HAVE_INT64)	
+#endif // defined(POCO_HAVE_INT64)
 
 
 void HTTPMessage::setTransferEncoding(const std::string& transferEncoding)
@@ -136,13 +153,13 @@ void HTTPMessage::setChunkedTransferEncoding(bool flag)
 		setTransferEncoding(IDENTITY_TRANSFER_ENCODING);
 }
 
-	
+
 bool HTTPMessage::getChunkedTransferEncoding() const
 {
 	return icompare(getTransferEncoding(), CHUNKED_TRANSFER_ENCODING) == 0;
 }
 
-	
+
 void HTTPMessage::setContentType(const std::string& mediaType)
 {
 	if (mediaType.empty())
@@ -157,7 +174,7 @@ void HTTPMessage::setContentType(const MediaType& mediaType)
 	setContentType(mediaType.toString());
 }
 
-	
+
 const std::string& HTTPMessage::getContentType() const
 {
 	return get(CONTENT_TYPE, UNKNOWN_CONTENT_TYPE);

@@ -1,8 +1,6 @@
 //
 // Replace.cpp
 //
-// $Id: //poco/1.4/Zip/src/Replace.cpp#1 $
-//
 // Library: Zip
 // Package: Manipulation
 // Module:  Replace

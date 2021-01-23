@@ -1,8 +1,6 @@
 //
 // Process_WIN32U.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/Process_WIN32U.h#3 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  Process
@@ -38,10 +36,11 @@ class Foundation_API ProcessHandleImpl: public RefCountedObject
 public:
 	ProcessHandleImpl(HANDLE _hProcess, UInt32 pid);
 	~ProcessHandleImpl();
-	
+
 	UInt32 id() const;
 	HANDLE process() const;
 	int wait() const;
+	int tryWait() const;
 	void closeHandle();
 
 private:
@@ -59,15 +58,15 @@ public:
 	typedef UInt32 PIDImpl;
 	typedef std::vector<std::string> ArgsImpl;
 	typedef std::map<std::string, std::string> EnvImpl;
-	
+
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static ProcessHandleImpl* launchImpl(
-		const std::string& command, 
-		const ArgsImpl& args, 
+		const std::string& command,
+		const ArgsImpl& args,
 		const std::string& initialDirectory,
-		Pipe* inPipe, 
-		Pipe* outPipe, 
+		Pipe* inPipe,
+		Pipe* outPipe,
 		Pipe* errPipe,
 		const EnvImpl& env);
 	static void killImpl(ProcessHandleImpl& handle);
@@ -76,6 +75,8 @@ public:
 	static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 	static std::string terminationEventName(PIDImpl pid);
+	static bool mustEscapeArg(const std::string& arg);
+	static std::string escapeArg(const std::string& arg);
 };
 
 

@@ -1,8 +1,6 @@
 //
 // ActiveRunnable.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ActiveRunnable.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects
@@ -35,7 +33,7 @@ class ActiveRunnableBase: public Runnable, public RefCountedObject
 	/// The base class for all ActiveRunnable instantiations.
 {
 public:
-	typedef AutoPtr<ActiveRunnableBase> Ptr;
+	using Ptr = AutoPtr<ActiveRunnableBase>;
 };
 
 

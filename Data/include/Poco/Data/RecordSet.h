@@ -1,8 +1,6 @@
 //
 // RecordSet.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/RecordSet.h#7 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  RecordSet
@@ -26,10 +24,12 @@
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
 #include <ostream>
 #include <limits>
 
@@ -69,9 +69,9 @@ class Data_API RecordSet: private Statement
 	/// a limit for the Statement.
 {
 public:
-	typedef std::map<std::size_t, Row*> RowMap;
-	typedef const RowIterator           ConstIterator;
-	typedef RowIterator                 Iterator;
+	using RowMap = std::map<std::size_t, Row*>;
+	using ConstIterator = const RowIterator;
+	using Iterator = RowIterator;
 
 	using Statement::isNull;
 	using Statement::subTotalRowCount;
@@ -98,7 +98,6 @@ public:
 		_currentRow(0),
 		_pBegin(new RowIterator(this, 0 == rowsExtracted())),
 		_pEnd(new RowIterator(this, true)),
-		_pFilter(0),
 		_totalRowCount(UNKNOWN_TOTAL_ROW_COUNT)
 		/// Creates the RecordSet.
 	{
@@ -108,14 +107,23 @@ public:
 	RecordSet(const RecordSet& other);
 		/// Copy-creates the recordset.
 
+	RecordSet(RecordSet&& other) noexcept;
+		/// Move-creates the recordset.
+
 	~RecordSet();
 		/// Destroys the RecordSet.
 
 	void setRowFormatter(RowFormatter::Ptr pRowFormatter);
 		/// Assigns the row formatter to the statement and all recordset rows.
 
-	Statement& operator = (const Statement& stmt);
+	RecordSet& operator = (const Statement& stmt);
 		/// Assignment operator.
+
+	RecordSet& operator = (const RecordSet& other);
+		/// Assignment operator.
+
+	RecordSet& operator = (RecordSet&& other) noexcept;
+		/// Move assignment.
 
 	std::size_t rowCount() const;
 		/// Returns the number of rows in the RecordSet.
@@ -160,12 +168,12 @@ public:
 	{
 		if (isBulkExtraction())
 		{
-			typedef InternalBulkExtraction<C> E;
+			using E = InternalBulkExtraction<C>;
 			return columnImpl<C,E>(name);
 		}
 		else
 		{
-			typedef InternalExtraction<C> E;
+			using E = InternalExtraction<C>;
 			return columnImpl<C,E>(name);
 		}
 	}
@@ -176,12 +184,12 @@ public:
 	{
 		if (isBulkExtraction())
 		{
-			typedef InternalBulkExtraction<C> E;
+			using E = InternalBulkExtraction<C>;
 			return columnImpl<C,E>(pos);
 		}
 		else
 		{
-			typedef InternalExtraction<C> E;
+			using E = InternalExtraction<C>;
 			return columnImpl<C,E>(pos);
 		}
 	}
@@ -201,18 +209,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef typename std::vector<T> C;
+				using C = typename std::vector<T>;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef typename std::list<T> C;
+				using C = typename std::list<T>;
 				return column<C>(col).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef typename std::deque<T> C;
+				using C = typename std::deque<T>;
 				return column<C>(col).value(row);
 			}
 			default:
@@ -231,18 +239,18 @@ public:
 		{
 			case STORAGE_VECTOR:
 			{
-				typedef typename std::vector<T> C;
+				using C = typename std::vector<T>;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_LIST:
 			{
-				typedef typename std::list<T> C;
+				using C = typename std::list<T>;
 				return column<C>(name).value(row);
 			}
 			case STORAGE_DEQUE:
 			case STORAGE_UNKNOWN:
 			{
-				typedef typename std::deque<T> C;
+				using C = typename std::deque<T>;
 				return column<C>(name).value(row);
 			}
 			default:
@@ -314,6 +322,16 @@ public:
 		///
 		/// Returns true if there is at least one row in the RecordSet,
 		/// false otherwise.
+
+	using Statement::reset;
+		/// Don't hide base class method.
+
+	void reset(const Statement& stmt);
+		/// Resets the RecordSet and assigns a new statement.
+		/// Should be called after the given statement has been reset,
+		/// assigned a new SQL statement, and executed.
+		///
+		/// Does not remove the associated RowFilter or RowFormatter.
 
 	Poco::Dynamic::Var value(const std::string& name);
 		/// Returns the value in the named column of the current row.
@@ -395,8 +413,8 @@ private:
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
+		using T = typename C::value_type;
+		using ExtractionVecPtr = const E*;
 
 		bool typeFound = false;
 
@@ -434,8 +452,8 @@ private:
 	const Column<C>& columnImpl(std::size_t pos) const
 		/// Returns the reference to column at specified position.
 	{
-		typedef typename C::value_type T;
-		typedef const E* ExtractionVecPtr;
+		using T = typename C::value_type;
+		using ExtractionVecPtr = const E*;
 
 		const AbstractExtractionVec& rExtractions = extractions();
 
@@ -461,18 +479,17 @@ private:
 		/// Returns true if the specified row is allowed by the
 		/// currently active filter.
 
-	void filter(RowFilter* pFilter);
+	void filter(const Poco::AutoPtr<RowFilter>& pFilter);
 		/// Sets the filter for the RecordSet.
 
-	
-	const RowFilter* getFilter() const;
+	const Poco::AutoPtr<RowFilter>& getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
 	std::size_t  _currentRow;
 	RowIterator* _pBegin;
 	RowIterator* _pEnd;
 	RowMap       _rowMap;
-	RowFilter*   _pFilter;
+	Poco::AutoPtr<RowFilter> _pFilter;
 	std::size_t  _totalRowCount;
 
 	friend class RowIterator;
@@ -483,6 +500,7 @@ private:
 ///
 /// inlines
 ///
+
 
 inline Data_API std::ostream& operator << (std::ostream &os, const RecordSet& rs)
 {
@@ -523,10 +541,17 @@ inline std::size_t RecordSet::columnCount() const
 }
 
 
-inline Statement& RecordSet::operator = (const Statement& stmt)
+inline RecordSet& RecordSet::operator = (const Statement& stmt)
 {
-	_currentRow = 0;
-	return Statement::operator = (stmt);
+	reset(stmt);
+	return *this;
+}
+
+
+inline RecordSet& RecordSet::operator = (const RecordSet& other)
+{
+	reset(other);
+	return *this;
 }
 
 
@@ -626,7 +651,7 @@ inline RecordSet::Iterator RecordSet::end()
 }
 
 
-inline const RowFilter* RecordSet::getFilter() const
+inline const Poco::AutoPtr<RowFilter>& RecordSet::getFilter() const
 {
 	return _pFilter;
 }
@@ -637,37 +662,6 @@ inline void RecordSet::formatNames() const
 	(*_pBegin)->formatNames();
 }
 
-
-/* TODO
-namespace Keywords {
-
-
-inline const std::string& select(const std::string& str)
-{
-	return str;
-}
-
-
-inline const RecordSet& from(const RecordSet& rs)
-{
-	return rs;
-}
-
-
-inline RecordSet from(const Statement& stmt)
-{
-	return RecordSet(stmt);
-}
-
-
-inline const std::string& where(const std::string& str)
-{
-	return str;
-}
-
-
-} // namespace Keywords
-*/
 
 } } // namespace Poco::Data
 

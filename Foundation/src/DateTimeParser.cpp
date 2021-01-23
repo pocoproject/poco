@@ -1,8 +1,6 @@
 //
 // DateTimeParser.cpp
 //
-// $Id: //poco/1.4/Foundation/src/DateTimeParser.cpp#5 $
-//
 // Library: Foundation
 // Package: DateTime
 // Module:  DateTimeParser

@@ -1,8 +1,6 @@
 #
 # Makefile
 #
-# $Id: //poco/Foundation/samples/Activity/Makefile#2 $
-#
 # Makefile for Poco Activity
 #
 

@@ -1,8 +1,6 @@
 //
 // RowFormatter.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/SimpleRowFormatter.h#1 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  SimpleRowFormatter
@@ -32,9 +30,9 @@ class Data_API SimpleRowFormatter: public RowFormatter
 	/// A simple row formatting class.
 {
 public:
-	//typedef RowFormatter::NameVec    NameVec;
-	//typedef RowFormatter::NameVecPtr NameVecPtr;
-	//typedef RowFormatter::ValueVec   ValueVec;
+	//using NameVec = RowFormatter::NameVec;
+	//using NameVecPtr = RowFormatter::NameVecPtr;
+	//using ValueVec = RowFormatter::ValueVec;
 
 	static const int DEFAULT_COLUMN_WIDTH = 16;
 	static const int DEFAULT_SPACING = 1;

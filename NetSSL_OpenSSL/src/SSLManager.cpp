@@ -1,8 +1,6 @@
 //
 // SSLManager.cpp
 //
-// $Id: //poco/1.4/NetSSL_OpenSSL/src/SSLManager.cpp#3 $
-//
 // Library: NetSSL_OpenSSL
 // Package: SSLCore
 // Module:  SSLManager
@@ -18,10 +16,12 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Utility.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/SingletonHolder.h"
 #include "Poco/Delegate.h"
+#include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
 
@@ -34,14 +34,15 @@ const std::string SSLManager::CFG_PRIV_KEY_FILE("privateKeyFile");
 const std::string SSLManager::CFG_CERTIFICATE_FILE("certificateFile");
 const std::string SSLManager::CFG_CA_LOCATION("caConfig");
 const std::string SSLManager::CFG_VER_MODE("verificationMode");
-const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_STRICT);
+const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_RELAXED);
 const std::string SSLManager::CFG_VER_DEPTH("verificationDepth");
 const int         SSLManager::VAL_VER_DEPTH(9);
 const std::string SSLManager::CFG_ENABLE_DEFAULT_CA("loadDefaultCAFile");
-const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(false);
+const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(true);
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
 const std::string SSLManager::VAL_CIPHER_LIST("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+const std::string SSLManager::CFG_PREFER_SERVER_CIPHERS("preferServerCiphers");
 const std::string SSLManager::CFG_DELEGATE_HANDLER("privateKeyPassphraseHandler.name");
 const std::string SSLManager::VAL_DELEGATE_HANDLER("KeyConsoleHandler");
 const std::string SSLManager::CFG_CERTIFICATE_HANDLER("invalidCertificateHandler.name");
@@ -56,6 +57,10 @@ const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
+const std::string SSLManager::CFG_REQUIRE_TLSV1_3("requireTLSv1_3");
+const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
+const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
+const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
 #ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
 const bool        SSLManager::VAL_FIPS_MODE(false);
@@ -121,7 +126,7 @@ void SSLManager::initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHa
 Context::Ptr SSLManager::defaultServerContext()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (!_ptrDefaultServerContext)
 		initDefaultContext(true);
 
@@ -134,7 +139,18 @@ Context::Ptr SSLManager::defaultClientContext()
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
 	if (!_ptrDefaultClientContext)
-		initDefaultContext(false);
+	{
+		try
+		{
+			initDefaultContext(false);
+		}
+		catch (Poco::IllegalStateException&)
+		{
+			_ptrClientCertificateHandler = new RejectCertificateHandler(false);
+			_ptrDefaultClientContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_RELAXED, 9, true);
+			_ptrDefaultClientContext->disableProtocols(Context::PROTO_SSLV2 | Context::PROTO_SSLV3);
+		}
+	}
 
 	return _ptrDefaultClientContext;
 }
@@ -238,35 +254,43 @@ void SSLManager::initDefaultContext(bool server)
 
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 
+	Context::Params params;
 	// mandatory options
-	std::string privKeyFile = config.getString(prefix + CFG_PRIV_KEY_FILE, "");
-	std::string certFile = config.getString(prefix + CFG_CERTIFICATE_FILE, privKeyFile);	
-	std::string caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
+	params.privateKeyFile = config.getString(prefix + CFG_PRIV_KEY_FILE, "");
+	params.certificateFile = config.getString(prefix + CFG_CERTIFICATE_FILE, params.privateKeyFile);
+	params.caLocation = config.getString(prefix + CFG_CA_LOCATION, "");
 
-	if (server && certFile.empty() && privKeyFile.empty())
+	if (server && params.certificateFile.empty() && params.privateKeyFile.empty())
 		throw SSLException("Configuration error: no certificate file has been specified");
 
 	// optional options for which we have defaults defined
-	Context::VerificationMode verMode = VAL_VER_MODE;
+	params.verificationMode = VAL_VER_MODE;
 	if (config.hasProperty(prefix + CFG_VER_MODE))
 	{
 		// either: none, relaxed, strict, once
 		std::string mode = config.getString(prefix + CFG_VER_MODE);
-		verMode = Utility::convertVerificationMode(mode);
+		params.verificationMode = Utility::convertVerificationMode(mode);
 	}
 
-	int verDepth = config.getInt(prefix + CFG_VER_DEPTH, VAL_VER_DEPTH);
-	bool loadDefCA = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
-	std::string cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
-	cipherList = config.getString(prefix + CFG_CYPHER_LIST, cipherList); // for backwards compatibility
+	params.verificationDepth = config.getInt(prefix + CFG_VER_DEPTH, VAL_VER_DEPTH);
+	params.loadDefaultCAs = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
+	params.cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
+	params.cipherList = config.getString(prefix + CFG_CYPHER_LIST, params.cipherList); // for backwards compatibility
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
+	bool requireTLSv1_3 = config.getBool(prefix + CFG_REQUIRE_TLSV1_3, false);
+
+	params.dhParamsFile = config.getString(prefix + CFG_DH_PARAMS_FILE, "");
+	params.ecdhCurve    = config.getString(prefix + CFG_ECDH_CURVE, "");
+
 	Context::Usage usage;
-	
+
 	if (server)
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_SERVER_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_SERVER_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_SERVER_USE;
@@ -274,11 +298,13 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_SERVER_USE;
 		else
 			usage = Context::SERVER_USE;
-		_ptrDefaultServerContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+		_ptrDefaultServerContext = new Context(usage, params);
 	}
 	else
 	{
-		if (requireTLSv1_2)
+		if (requireTLSv1_3)
+			usage = Context::TLSV1_3_CLIENT_USE;
+		else if (requireTLSv1_2)
 			usage = Context::TLSV1_2_CLIENT_USE;
 		else if (requireTLSv1_1)
 			usage = Context::TLSV1_1_CLIENT_USE;
@@ -286,10 +312,32 @@ void SSLManager::initDefaultContext(bool server)
 			usage = Context::TLSV1_CLIENT_USE;
 		else
 			usage = Context::CLIENT_USE;
-		_ptrDefaultClientContext = new Context(usage, privKeyFile, certFile, caLocation, verMode, verDepth, loadDefCA, cipherList);
+		_ptrDefaultClientContext = new Context(usage, params);
 	}
-	
-		
+
+	std::string disabledProtocolsList = config.getString(prefix + CFG_DISABLE_PROTOCOLS, "");
+	Poco::StringTokenizer dpTok(disabledProtocolsList, ";,", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+	int disabledProtocols = 0;
+	for (Poco::StringTokenizer::Iterator it = dpTok.begin(); it != dpTok.end(); ++it)
+	{
+		if (*it == "sslv2")
+			disabledProtocols |= Context::PROTO_SSLV2;
+		else if (*it == "sslv3")
+			disabledProtocols |= Context::PROTO_SSLV3;
+		else if (*it == "tlsv1")
+			disabledProtocols |= Context::PROTO_TLSV1;
+		else if (*it == "tlsv1_1")
+			disabledProtocols |= Context::PROTO_TLSV1_1;
+		else if (*it == "tlsv1_2")
+			disabledProtocols |= Context::PROTO_TLSV1_2;
+		else if (*it == "tlsv1_3")
+			disabledProtocols |= Context::PROTO_TLSV1_3;
+	}
+	if (server)
+		_ptrDefaultServerContext->disableProtocols(disabledProtocols);
+	else
+		_ptrDefaultClientContext->disableProtocols(disabledProtocols);
+
 	bool cacheSessions = config.getBool(prefix + CFG_CACHE_SESSIONS, false);
 	if (server)
 	{
@@ -315,6 +363,15 @@ void SSLManager::initDefaultContext(bool server)
 		_ptrDefaultServerContext->enableExtendedCertificateVerification(extendedVerification);
 	else
 		_ptrDefaultClientContext->enableExtendedCertificateVerification(extendedVerification);
+
+	bool preferServerCiphers = config.getBool(prefix + CFG_PREFER_SERVER_CIPHERS, false);
+	if (preferServerCiphers)
+	{
+		if (server)
+			_ptrDefaultServerContext->preferServerCiphers();
+		else
+			_ptrDefaultClientContext->preferServerCiphers();
+	}
 }
 
 
@@ -329,7 +386,7 @@ void SSLManager::initPassphraseHandler(bool server)
 {
 	if (server && _ptrServerPassphraseHandler) return;
 	if (!server && _ptrClientPassphraseHandler) return;
-	
+
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 	Poco::Util::AbstractConfiguration& config = appConfig();
 
@@ -350,7 +407,7 @@ void SSLManager::initPassphraseHandler(bool server)
 	}
 	else throw Poco::Util::UnknownOptionException(std::string("No passphrase handler known with the name ") + className);
 }
-	
+
 
 void SSLManager::initCertificateHandler(bool server)
 {

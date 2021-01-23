@@ -1,8 +1,6 @@
 //
 // Benchmark.cpp
 //
-// $Id$
-//
 // This sample shows a benchmark of the JSON parser.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.

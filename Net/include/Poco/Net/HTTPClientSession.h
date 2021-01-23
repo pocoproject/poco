@@ -1,8 +1,6 @@
 //
 // HTTPClientSession.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/HTTPClientSession.h#8 $
-//
 // Library: Net
 // Package: HTTPClient
 // Module:  HTTPClientSession
@@ -22,6 +20,9 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPDigestCredentials.h"
+#include "Poco/Net/HTTPNTLMCredentials.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/SharedPtr.h"
 #include <istream>
@@ -45,7 +46,7 @@ class Net_API HTTPClientSession: public HTTPSession
 	/// specify the server's host name and port number.
 	///
 	/// Then create a HTTPRequest object, fill it accordingly,
-	/// and pass it as argument to the sendRequst() method.
+	/// and pass it as argument to the sendRequest() method.
 	///
 	/// sendRequest() will return an output stream that can
 	/// be used to send the request body, if there is any.
@@ -64,11 +65,20 @@ class Net_API HTTPClientSession: public HTTPSession
 	/// set up a session through a proxy.
 {
 public:
+	enum ProxyAuthentication
+	{
+		PROXY_AUTH_NONE,        /// No proxy authentication
+		PROXY_AUTH_HTTP_BASIC,  /// HTTP Basic proxy authentication (default, if username and password are supplied)
+		PROXY_AUTH_HTTP_DIGEST, /// HTTP Digest proxy authentication
+		PROXY_AUTH_NTLM         /// NTLMv2 proxy authentication
+	};
+
 	struct ProxyConfig
 		/// HTTP proxy server configuration.
 	{
 		ProxyConfig():
-			port(HTTP_PORT)
+			port(HTTP_PORT),
+			authMethod(PROXY_AUTH_HTTP_BASIC)
 		{
 		}
 
@@ -84,6 +94,9 @@ public:
 			/// A regular expression defining hosts for which the proxy should be bypassed,
 			/// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
 			/// string to disable proxy bypassing.
+
+		ProxyAuthentication authMethod;
+			/// The authentication method to use - HTTP Basic or NTLM.
 	};
 
 	HTTPClientSession();
@@ -112,47 +125,47 @@ public:
 		///
 		/// The host must not be changed once there is an
 		/// open connection to the server.
-		
+
 	const std::string& getHost() const;
 		/// Returns the host name of the target HTTP server.
-		
+
 	void setPort(Poco::UInt16 port);
 		/// Sets the port number of the target HTTP server.
 		///
 		/// The port number must not be changed once there is an
 		/// open connection to the server.
-	
+
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT);
 		/// Sets the proxy host name and port number.
-		
+
 	void setProxyHost(const std::string& host);
 		/// Sets the host name of the proxy server.
-		
+
 	void setProxyPort(Poco::UInt16 port);
 		/// Sets the port number of the proxy server.
-		
+
 	const std::string& getProxyHost() const;
 		/// Returns the proxy host name.
-		
+
 	Poco::UInt16 getProxyPort() const;
 		/// Returns the proxy port number.
-		
+
 	void setProxyCredentials(const std::string& username, const std::string& password);
 		/// Sets the username and password for proxy authentication.
 		/// Only Basic authentication is supported.
-		
+
 	void setProxyUsername(const std::string& username);
 		/// Sets the username for proxy authentication.
 		/// Only Basic authentication is supported.
 
 	const std::string& getProxyUsername() const;
 		/// Returns the username for proxy authentication.
-		
+
 	void setProxyPassword(const std::string& password);
-		/// Sets the password for proxy authentication.	
+		/// Sets the password for proxy authentication.
 		/// Only Basic authentication is supported.
 
 	const std::string& getProxyPassword() const;
@@ -179,10 +192,10 @@ public:
 
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
 		/// Sets the connection timeout for HTTP connections.
-		
+
 	const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
-		
+
 	virtual std::ostream& sendRequest(HTTPRequest& request);
 		/// Sends the header for the given HTTP request to
 		/// the server.
@@ -202,9 +215,9 @@ public:
 		/// be reused and persistent connections are enabled
 		/// to ensure a new connection will be set up
 		/// for the next request.
-		
+
 	virtual std::istream& receiveResponse(HTTPResponse& response);
-		/// Receives the header for the response to the previous 
+		/// Receives the header for the response to the previous
 		/// HTTP request.
 		///
 		/// The returned input stream can be used to read
@@ -215,7 +228,7 @@ public:
 		/// It must be ensured that the response stream
 		/// is fully consumed before sending a new request
 		/// and persistent connections are enabled. Otherwise,
-		/// the unread part of the response body may be treated as 
+		/// the unread part of the response body may be treated as
 		/// part of the next request's response header, resulting
 		/// in a Poco::Net::MessageException being thrown.
 		///
@@ -226,7 +239,33 @@ public:
 		/// be reused and persistent connections are enabled
 		/// to ensure a new connection will be set up
 		/// for the next request.
-		
+
+	virtual bool peekResponse(HTTPResponse& response);
+		/// If the request contains a "Expect: 100-continue" header,
+		/// (see HTTPRequest::setExpectContinue()) this method can be
+		/// used to check whether the server has sent a 100 Continue response
+		/// before continuing with the request, i.e. sending the request body,
+		/// after calling sendRequest().
+		///
+		/// Returns true if the server has responded with 100 Continue,
+		/// otherwise false. The HTTPResponse object contains the
+		/// response sent by the server.
+		///
+		/// In any case, receiveResponse() must be called afterwards as well in
+		/// order to complete the request. The same HTTPResponse object
+		/// passed to peekResponse() must also be passed to receiveResponse().
+		///
+		/// This method should only be called if the request contains
+		/// a "Expect: 100-continue" header.
+
+	void flushRequest();
+		/// Flushes the request stream.
+		///
+		/// Normally this method does not need to be called.
+		/// It can be used to ensure the request has been
+		/// fully sent if receiveResponse() is not called, e.g.,
+		/// because the underlying socket will be detached.
+
 	void reset();
 		/// Resets the session and closes the socket.
 		///
@@ -238,11 +277,11 @@ public:
 		/// or receiveResponse() throws an exception, or
 		/// the request or response stream changes into
 		/// fail or bad state, but not eof state).
-		
+
 	virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
-		
+
 	bool bypassProxy() const;
 		/// Returns true if the proxy should be bypassed
 		/// for the current host.
@@ -252,32 +291,45 @@ protected:
 	{
 		DEFAULT_KEEP_ALIVE_TIMEOUT = 8
 	};
-	
+
 	void reconnect();
 		/// Connects the underlying socket to the HTTP server.
 
 	int write(const char* buffer, std::streamsize length);
 		/// Tries to re-connect if keep-alive is on.
-	
+
+	std::ostream& sendRequestImpl(const HTTPRequest& request);
+		/// Sends the given HTTPRequest over an existing connection.
+
 	virtual std::string proxyRequestPrefix() const;
 		/// Returns the prefix prepended to the URI for proxy requests
 		/// (e.g., "http://myhost.com").
 
 	virtual bool mustReconnect() const;
 		/// Checks if we can reuse a persistent connection.
-		
+
 	virtual void proxyAuthenticate(HTTPRequest& request);
 		/// Sets the proxy credentials (Proxy-Authorization header), if
 		/// proxy username and password have been set.
 
-	void proxyAuthenticateImpl(HTTPRequest& request);
+	void proxyAuthenticateImpl(HTTPRequest& request, const ProxyConfig& proxyConfig);
 		/// Sets the proxy credentials (Proxy-Authorization header), if
 		/// proxy username and password have been set.
-		
+
+	void proxyAuthenticateDigest(HTTPRequest& request);
+		/// Initiates a HTTP Digest authentication handshake with the proxy.
+
+	void proxyAuthenticateNTLM(HTTPRequest& request);
+		/// Initiates a HTTP NTLM authentication handshake with the proxy.
+
+	void sendChallengeRequest(const HTTPRequest& request, HTTPResponse& response);
+		/// Sends a probe request for Digest and NTLM authentication
+		/// to obtain the server challenge.
+
 	StreamSocket proxyConnect();
 		/// Sends a CONNECT request to the proxy server and returns
 		/// a StreamSocket for the resulting connection.
-		
+
 	void proxyTunnel();
 		/// Calls proxyConnect() and attaches the resulting StreamSocket
 		/// to the HTTPClientSession.
@@ -291,11 +343,16 @@ private:
 	bool            _reconnect;
 	bool            _mustReconnect;
 	bool            _expectResponseBody;
+	bool            _responseReceived;
 	Poco::SharedPtr<std::ostream> _pRequestStream;
 	Poco::SharedPtr<std::istream> _pResponseStream;
+	HTTPBasicCredentials  _proxyBasicCreds;
+	HTTPDigestCredentials _proxyDigestCreds;
+	HTTPNTLMCredentials   _proxyNTLMCreds;
+	bool            _ntlmProxyAuthenticated;
 
 	static ProxyConfig _globalProxyConfig;
-	
+
 	HTTPClientSession(const HTTPClientSession&);
 	HTTPClientSession& operator = (const HTTPClientSession&);
 

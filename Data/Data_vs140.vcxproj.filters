@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="DataCore">
-      <UniqueIdentifier>{ffcda100-7abb-4db3-ba1f-808599e493a5}</UniqueIdentifier>
+      <UniqueIdentifier>{4630cfec-6a3b-45dd-9d9e-0fd2052abb2d}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Header Files">
-      <UniqueIdentifier>{f165cafd-2256-43a5-a19a-e3b0d74e2dcf}</UniqueIdentifier>
+      <UniqueIdentifier>{48fbd0eb-1cb1-4f72-8fff-4ae28eb87945}</UniqueIdentifier>
     </Filter>
     <Filter Include="DataCore\Source Files">
-      <UniqueIdentifier>{1150acd7-fe33-4391-b26e-2fed763d486f}</UniqueIdentifier>
+      <UniqueIdentifier>{e4421ebf-77eb-439f-9377-260010e240a3}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling">
-      <UniqueIdentifier>{048cf4c9-95ce-43b4-849c-6c0fbee6d32c}</UniqueIdentifier>
+      <UniqueIdentifier>{d68a747a-68d9-4d71-8b63-96e0a839ce19}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Header Files">
-      <UniqueIdentifier>{5e6a0bf3-368f-4e9e-ae73-f6b1bc8e631a}</UniqueIdentifier>
+      <UniqueIdentifier>{20822f2a-f72a-4717-8315-788b6ea4a799}</UniqueIdentifier>
     </Filter>
     <Filter Include="SessionPooling\Source Files">
-      <UniqueIdentifier>{60ee947b-9ba2-434b-8b08-8f9d85c0ed03}</UniqueIdentifier>
+      <UniqueIdentifier>{12285d08-05f2-4daf-8b48-7fe113c43626}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging">
-      <UniqueIdentifier>{f4331f23-e4f0-4018-b8d5-1bca043e5a70}</UniqueIdentifier>
+      <UniqueIdentifier>{6f51ecaf-0e63-4626-b373-9b9a635f32a3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Header Files">
-      <UniqueIdentifier>{1037d090-6abc-4c5f-ae03-ab57f5b220c0}</UniqueIdentifier>
+      <UniqueIdentifier>{62eedc44-364a-408f-918e-dd2fb360f554}</UniqueIdentifier>
     </Filter>
     <Filter Include="Logging\Source Files">
-      <UniqueIdentifier>{a19b5ff8-0236-47ae-86c6-8489ca2100b1}</UniqueIdentifier>
+      <UniqueIdentifier>{4252b3e7-3a2f-4690-b64d-56cbf0a07396}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -284,5 +284,8 @@
     <ClCompile Include="src\SQLChannel.cpp">
       <Filter>Logging\Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,6 @@
 //
 // NamedEvent_UNIX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/NamedEvent_UNIX.cpp#1 $
-//
 // Library: Foundation
 // Package: Processes
 // Module:  NamedEvent
@@ -33,7 +31,7 @@
 namespace Poco {
 
 
-#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_CYGWIN) || (POCO_OS == POCO_OS_FREE_BSD)
+#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID) || (POCO_OS == POCO_OS_CYGWIN) || (POCO_OS == POCO_OS_FREE_BSD)
 	union semun
 	{
 		int                 val;
@@ -57,15 +55,15 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	std::string fileName = getFileName();
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX)
 	_sem = sem_open(fileName.c_str(), O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO, 0);
-	if ((long) _sem == (long) SEM_FAILED) 
+	if ((long) _sem == (long) SEM_FAILED)
 		throw SystemException(Poco::format("cannot create named mutex %s (sem_open() failed, errno=%d)", fileName, errno), _name);
 #else
-	int fd = open(fileName.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	int fd = open(fileName.c_str(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd != -1)
 		close(fd);
-	else 
+	else
 		throw SystemException(Poco::format("cannot create named event %s (lockfile)", fileName), _name);
-	key_t key = ftok(fileName.c_str(), 0);
+	key_t key = ftok(fileName.c_str(), 'p');
 	if (key == -1)
 		throw SystemException(Poco::format("cannot create named mutex %s (ftok() failed, errno=%d)", fileName, errno), _name);
 	_semid = semget(key, 1, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH | IPC_CREAT | IPC_EXCL);
@@ -128,7 +126,7 @@ void NamedEventImpl::waitImpl()
 	{
 		err = semop(_semid, &op, 1);
 	}
-	while (err && errno == EINTR); 
+	while (err && errno == EINTR);
 	if (err) throw SystemException("cannot wait for named event", _name);
 #endif
 }

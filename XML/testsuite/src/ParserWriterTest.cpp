@@ -1,8 +1,6 @@
 //
 // ParserWriterTest.cpp
 //
-// $Id: //poco/1.4/XML/testsuite/src/ParserWriterTest.cpp#1 $
-//
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
@@ -53,7 +51,7 @@ void ParserWriterTest::testParseWriteXHTML()
 	writer.writeNode(ostr, pDoc);
 	
 	std::string xml = ostr.str();
-	assert (xml == XHTML);
+	assertTrue (xml == XHTML);
 }
 
 
@@ -68,7 +66,7 @@ void ParserWriterTest::testParseWriteXHTML2()
 	writer.writeNode(ostr, pDoc);
 	
 	std::string xml = ostr.str();
-	assert (xml == XHTML2);
+	assertTrue (xml == XHTML2);
 }
 
 
@@ -99,10 +97,10 @@ void ParserWriterTest::testParseWriteSimple()
 		numChildren++;
 		child = child->nextSibling();
 	}
-	assert (numChildren == 2);
+	assertTrue (numChildren == 2);
 
 	std::string xml = ostr.str();
-	assert (xml == simple);
+	assertTrue (xml == simple);
 }
 
 

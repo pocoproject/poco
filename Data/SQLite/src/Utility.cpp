@@ -1,9 +1,7 @@
 //
 // Utility.cpp
 //
-// $Id: //poco/Main/Data/SQLite/src/Utility.cpp#5 $
-//
-// Library: SQLite
+// Library: Data/SQLite
 // Package: SQLite
 // Module:  Utility
 //
@@ -61,6 +59,20 @@ Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 
 
+Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex((pDB) ? sqlite3_db_mutex(pDB) : 0)
+{
+	if (_pMutex)
+		sqlite3_mutex_enter(_pMutex);
+}
+
+
+Utility::SQLiteMutex::~SQLiteMutex()
+{
+	if (_pMutex)
+		sqlite3_mutex_leave(_pMutex);
+}
+
+
 Utility::Utility()
 {
 	if (_types.empty())
@@ -83,10 +95,11 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("INTEGER16", MetaColumn::FDT_INT16));
 		_types.insert(TypeMap::value_type("UINT", MetaColumn::FDT_UINT32));
 		_types.insert(TypeMap::value_type("UINT32", MetaColumn::FDT_UINT32));
+		_types.insert(TypeMap::value_type("UINTEGER", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("UINTEGER32", MetaColumn::FDT_UINT32));
 		_types.insert(TypeMap::value_type("INT", MetaColumn::FDT_INT32));
 		_types.insert(TypeMap::value_type("INT32", MetaColumn::FDT_INT32));
-		_types.insert(TypeMap::value_type("INTEGER", MetaColumn::FDT_INT32));
+		_types.insert(TypeMap::value_type("INTEGER", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("INTEGER32", MetaColumn::FDT_INT32));
 		_types.insert(TypeMap::value_type("UINT64", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("ULONG", MetaColumn::FDT_INT64));
@@ -97,6 +110,7 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("TINYINT", MetaColumn::FDT_INT8));
 		_types.insert(TypeMap::value_type("SMALLINT", MetaColumn::FDT_INT16));
 		_types.insert(TypeMap::value_type("BIGINT", MetaColumn::FDT_INT64));
+		_types.insert(TypeMap::value_type("LONGINT", MetaColumn::FDT_INT64));
 		_types.insert(TypeMap::value_type("COUNTER", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("AUTOINCREMENT", MetaColumn::FDT_UINT64));
 		_types.insert(TypeMap::value_type("REAL", MetaColumn::FDT_DOUBLE));
@@ -114,6 +128,7 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("NCLOB", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("NTEXT", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("NVARCHAR", MetaColumn::FDT_STRING));
+		_types.insert(TypeMap::value_type("LONGVARCHAR", MetaColumn::FDT_STRING));
 		_types.insert(TypeMap::value_type("BLOB", MetaColumn::FDT_BLOB));
 		_types.insert(TypeMap::value_type("DATE", MetaColumn::FDT_DATE));
 		_types.insert(TypeMap::value_type("TIME", MetaColumn::FDT_TIME));
@@ -125,7 +140,11 @@ Utility::Utility()
 
 std::string Utility::lastError(sqlite3* pDB)
 {
-	return std::string(sqlite3_errmsg(pDB));
+	std::string errStr;
+	SQLiteMutex m(pDB);
+	const char* pErr = sqlite3_errmsg(pDB);
+	if (pErr) errStr = pErr;
+	return errStr;
 }
 
 
@@ -138,7 +157,7 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 		Poco::Mutex::ScopedLock lock(_mutex);
 		static Utility u;
 	}
-	
+
 	const char* pc = sqlite3_column_decltype(pStmt, (int) pos);
 	std::string sqliteType = pc ? pc : "";
 	Poco::toUpperInPlace(sqliteType);
@@ -151,72 +170,74 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 }
 
 
-void Utility::throwException(int rc, const std::string& addErrMsg)
+void Utility::throwException(sqlite3* pDB, int rc, const std::string& addErrMsg)
 {
 	switch (rc)
 	{
 	case SQLITE_OK:
 		break;
 	case SQLITE_ERROR:
-		throw InvalidSQLStatementException(std::string("SQL error or missing database"), addErrMsg);
+		throw InvalidSQLStatementException(lastError(pDB), addErrMsg);
 	case SQLITE_INTERNAL:
-		throw InternalDBErrorException(std::string("An internal logic error in SQLite"), addErrMsg);
+		throw InternalDBErrorException(lastError(pDB), addErrMsg);
 	case SQLITE_PERM:
-		throw DBAccessDeniedException(std::string("Access permission denied"), addErrMsg);
+		throw DBAccessDeniedException(lastError(pDB), addErrMsg);
 	case SQLITE_ABORT:
-		throw ExecutionAbortedException(std::string("Callback routine requested an abort"), addErrMsg);
+		throw ExecutionAbortedException(lastError(pDB), addErrMsg);
 	case SQLITE_BUSY:
 	case SQLITE_BUSY_RECOVERY:
+#if defined(SQLITE_BUSY_SNAPSHOT)
 	case SQLITE_BUSY_SNAPSHOT:
-		throw DBLockedException(std::string("The database file is locked"), addErrMsg);
+#endif
+		throw DBLockedException(lastError(pDB), addErrMsg);
 	case SQLITE_LOCKED:
-		throw TableLockedException(std::string("A table in the database is locked"), addErrMsg);
+		throw TableLockedException(lastError(pDB), addErrMsg);
 	case SQLITE_NOMEM:
-		throw NoMemoryException(std::string("A malloc() failed"), addErrMsg);
+		throw NoMemoryException(lastError(pDB), addErrMsg);
 	case SQLITE_READONLY:
-		throw ReadOnlyException(std::string("Attempt to write a readonly database"), addErrMsg);
+		throw ReadOnlyException(lastError(pDB), addErrMsg);
 	case SQLITE_INTERRUPT:
-		throw InterruptException(std::string("Operation terminated by sqlite_interrupt()"), addErrMsg);
+		throw InterruptException(lastError(pDB), addErrMsg);
 	case SQLITE_IOERR:
-		throw IOErrorException(std::string("Some kind of disk I/O error occurred"), addErrMsg);
+		throw IOErrorException(lastError(pDB), addErrMsg);
 	case SQLITE_CORRUPT:
-		throw CorruptImageException(std::string("The database disk image is malformed"), addErrMsg);
+		throw CorruptImageException(lastError(pDB), addErrMsg);
 	case SQLITE_NOTFOUND:
-		throw TableNotFoundException(std::string("Table or record not found"), addErrMsg);
+		throw TableNotFoundException(lastError(pDB), addErrMsg);
 	case SQLITE_FULL:
-		throw DatabaseFullException(std::string("Insertion failed because database is full"), addErrMsg);
+		throw DatabaseFullException(lastError(pDB), addErrMsg);
 	case SQLITE_CANTOPEN:
-		throw CantOpenDBFileException(std::string("Unable to open the database file"), addErrMsg);
+		throw CantOpenDBFileException(lastError(pDB), addErrMsg);
 	case SQLITE_PROTOCOL:
-		throw LockProtocolException(std::string("Database lock protocol error"), addErrMsg);
+		throw LockProtocolException(lastError(pDB), addErrMsg);
 	case SQLITE_EMPTY:
-		throw InternalDBErrorException(std::string("(Internal Only) Database table is empty"), addErrMsg);
+		throw InternalDBErrorException(lastError(pDB), addErrMsg);
 	case SQLITE_SCHEMA:
-		throw SchemaDiffersException(std::string("The database schema changed"), addErrMsg);
+		throw SchemaDiffersException(lastError(pDB), addErrMsg);
 	case SQLITE_TOOBIG:
-		throw RowTooBigException(std::string("Too much data for one row of a table"), addErrMsg);
+		throw RowTooBigException(lastError(pDB), addErrMsg);
 	case SQLITE_CONSTRAINT:
-		throw ConstraintViolationException(std::string("Abort due to constraint violation"), addErrMsg);
+		throw ConstraintViolationException(lastError(pDB), addErrMsg);
 	case SQLITE_MISMATCH:
-		throw DataTypeMismatchException(std::string("Data type mismatch"), addErrMsg);
+		throw DataTypeMismatchException(lastError(pDB), addErrMsg);
 	case SQLITE_MISUSE:
-		throw InvalidLibraryUseException(std::string("Library used incorrectly"), addErrMsg);
+		throw InvalidLibraryUseException(lastError(pDB), addErrMsg);
 	case SQLITE_NOLFS:
-		throw OSFeaturesMissingException(std::string("Uses OS features not supported on host"), addErrMsg);
+		throw OSFeaturesMissingException(lastError(pDB), addErrMsg);
 	case SQLITE_AUTH:
-		throw AuthorizationDeniedException(std::string("Authorization denied"), addErrMsg);
+		throw AuthorizationDeniedException(lastError(pDB), addErrMsg);
 	case SQLITE_FORMAT:
-		throw CorruptImageException(std::string("Auxiliary database format error"), addErrMsg);
+		throw CorruptImageException(lastError(pDB), addErrMsg);
 	case SQLITE_NOTADB:
-		throw CorruptImageException(std::string("File opened that is not a database file"), addErrMsg);
+		throw CorruptImageException(lastError(pDB), addErrMsg);
 	case SQLITE_RANGE:
-		throw InvalidSQLStatementException(std::string("Bind Parameter out of range (Access of invalid position 0? bind starts with 1!)"), addErrMsg);
+		throw InvalidSQLStatementException(lastError(pDB), addErrMsg);
 	case SQLITE_ROW:
 		break; // sqlite_step() has another row ready
 	case SQLITE_DONE:
 		break; // sqlite_step() has finished executing
 	default:
-		throw SQLiteException(std::string("Unknown error code: ") + Poco::NumberFormatter::format(rc), addErrMsg);
+		throw SQLiteException(Poco::format("Unknown error code: %d", rc), addErrMsg);
 	}
 }
 

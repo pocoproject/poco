@@ -1,8 +1,6 @@
 //
 // ODBCPostgreSQLTest.h
 //
-// $Id: //poco/Main/Data/ODBC/testsuite/src/ODBCPostgreSQLTest.h#4 $
-//
 // Definition of the ODBCPostgreSQLTest class.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.

@@ -1,8 +1,6 @@
 //
 // EventTest.h
 //
-// $Id: //poco/1.4/XML/testsuite/src/EventTest.h#1 $
-//
 // Definition of the EventTest class.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.

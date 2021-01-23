@@ -1,8 +1,6 @@
 //
 // StatementImpl.cpp
 //
-// $Id: //poco/Main/Data/src/StatementImpl.cpp#20 $
-//
 // Library: Data
 // Package: DataCore
 // Module:  StatementImpl
@@ -115,9 +113,9 @@ void StatementImpl::assignSubTotal(bool reset)
 			if (_extractors[counter].size())
 			{
 				if (reset)
-					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
-				else
 					*it = CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
+				else
+					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
 			}
 		}
 	}

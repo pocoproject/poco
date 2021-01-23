@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $Id: //poco/1.4/build/script/makedepend.aCC#1 $
-#
 # makedepend.aCC
 #
 # Create dependency file, HP ANSI C++ version

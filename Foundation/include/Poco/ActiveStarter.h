@@ -1,8 +1,6 @@
 //
 // ActiveStarter.h
 //
-// $Id: //poco/1.4/Foundation/include/Poco/ActiveStarter.h#1 $
-//
 // Library: Foundation
 // Package: Threading
 // Module:  ActiveObjects

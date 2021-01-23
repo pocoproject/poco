@@ -1,6 +1,4 @@
 #
-# $Id: //poco/1.4/build/config/Linux-nios2#1 $
-#
 # Linux
 #
 # Make settings for Nios2 Linux with gcc 4.1.2

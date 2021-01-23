@@ -1,8 +1,6 @@
 //
 // NTPPacket.h
 //
-// $Id: //poco/1.4/Net/include/Poco/Net/NTPPacket.h#1 $
-//
 // Library: Net
 // Package: NTP
 // Module:  NTPPacket

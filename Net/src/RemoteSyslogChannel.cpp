@@ -1,8 +1,6 @@
 //
 // RemoteSyslogChannel.cpp
 //
-// $Id: //poco/1.4/Net/src/RemoteSyslogChannel.cpp#2 $
-//
 // Library: Net
 // Package: Logging
 // Module:  RemoteSyslogChannel
@@ -36,6 +34,7 @@ const std::string RemoteSyslogChannel::PROP_FACILITY("facility");
 const std::string RemoteSyslogChannel::PROP_FORMAT("format");
 const std::string RemoteSyslogChannel::PROP_LOGHOST("loghost");
 const std::string RemoteSyslogChannel::PROP_HOST("host");
+const std::string RemoteSyslogChannel::STRUCTURED_DATA("structured-data");
 
 
 RemoteSyslogChannel::RemoteSyslogChannel():
@@ -76,13 +75,13 @@ void RemoteSyslogChannel::open()
 {
 	if (_open) return;
 
-	// reset socket for the case that it has been previously closed
-	_socket = DatagramSocket();
-
 	if (_logHost.find(':') != std::string::npos)
 		_socketAddress = SocketAddress(_logHost);
 	else
 		_socketAddress = SocketAddress(_logHost, SYSLOG_PORT);
+
+	// reset socket for the case that it has been previously closed
+	_socket = DatagramSocket(_socketAddress.family());
 
 	if (_host.empty())
 	{
@@ -139,6 +138,15 @@ void RemoteSyslogChannel::log(const Message& msg)
 		Poco::NumberFormatter::append(m, msg.getPid());
 		m += ' ';
 		m += msg.getSource();
+		m += ' ';
+		if (msg.has(STRUCTURED_DATA))
+		{
+			m += msg.get(STRUCTURED_DATA);
+		}
+		else
+		{
+			m += "-";
+		}
 	}
 	m += ' ';
 	m += msg.getText();

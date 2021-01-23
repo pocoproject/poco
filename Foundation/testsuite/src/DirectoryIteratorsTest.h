@@ -1,8 +1,6 @@
 //
 // DirectoryIteratorsTest.h
 //
-// $Id: //poco/1.4/Foundation/testsuite/src/DirectoryIteratorsTest.h#1 $
-//
 // Definition of the DirectoryIteratorsTest class.
 //
 // Copyright (c) 2012, Applied Informatics Software Engineering GmbH.

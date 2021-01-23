@@ -1,10 +1,8 @@
 //
 // Transaction.h
 //
-// $Id: //poco/Main/Data/include/Poco/Data/Transaction.h#2 $
-//
 // Library: Data
-// Package: Core
+// Package: DataCore
 // Module:  Transaction
 //
 // Definition of the Transaction class.
@@ -36,7 +34,7 @@ class Data_API Transaction
 	/// transaction is in progress. If not, a new transaction is created.
 	/// When the Transaction is destroyed, and commit() has been called,
 	/// nothing is done. Otherwise, the current transaction is rolled back.
-	/// See Transaction for more detaisl nad purpose of this template.
+	/// See Transaction for more details and purpose of this template.
 {
 public:
 	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = 0);

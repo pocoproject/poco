@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	Name="Net"
-	Version="9.00"
 	ProjectType="Visual C++"
+	Version="9.00"
+	Name="Net"
 	ProjectGUID="{B057A1FE-09F7-465E-B8B5-E1B659051D76}"
 	RootNamespace="Net"
-	Keyword="Win32Proj">
+	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
-	<ToolFiles/>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="debug_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;Net_EXPORTS"
@@ -47,59 +58,77 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\PocoNetd.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\bin\PocoNetd.pdb"
-				AdditionalLibraryDirectories="..\lib"
 				SubSystem="1"
 				ImportLibrary="..\lib\PocoNetd.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_shared|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -119,60 +148,78 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=""
 				AdditionalDependencies="ws2_32.lib iphlpapi.lib"
 				OutputFile="..\bin\PocoNet.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				GenerateDebugInformation="false"
 				AdditionalLibraryDirectories="..\lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\lib\PocoNet.lib"
 				TargetMachine="1"
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManifestTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCAppVerifierTool"/>
+				Name="VCAppVerifierTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -191,45 +238,61 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmtd.lib"/>
+				OutputFile="..\lib\PocoNetmtd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_mt|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -249,45 +312,61 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmt.lib"/>
+				OutputFile="..\lib\PocoNetmt.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="debug_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="0"
 				AdditionalIncludeDirectories=".\include;..\Foundation\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;POCO_STATIC;"
@@ -306,45 +385,61 @@
 				DebugInformationFormat="3"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmdd.lib"/>
+				OutputFile="..\lib\PocoNetmdd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="release_static_md|Win32"
 			OutputDirectory="obj\$(ConfigurationName)"
 			IntermediateDirectory="obj\$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
-				Name="VCMIDLTool"/>
+				Name="VCMIDLTool"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions=""
 				Optimization="4"
 				InlineFunctionExpansion="1"
 				EnableIntrinsicFunctions="true"
@@ -364,621 +459,1191 @@
 				DebugInformationFormat="0"
 				CompileAs="0"
 				DisableSpecificWarnings=""
-				AdditionalOptions=""/>
+			/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCResourceCompilerTool"/>
+				Name="VCResourceCompilerTool"
+			/>
 			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\lib\PocoNetmd.lib"/>
+				OutputFile="..\lib\PocoNetmd.lib"
+			/>
 			<Tool
-				Name="VCALinkTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCXDCMakeTool"/>
+				Name="VCXDCMakeTool"
+			/>
 			<Tool
-				Name="VCBscMakeTool"/>
+				Name="VCBscMakeTool"
+			/>
 			<Tool
-				Name="VCFxCopTool"/>
+				Name="VCFxCopTool"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
-	<References/>
+	<References>
+	</References>
 	<Files>
 		<Filter
-			Name="NetCore">
+			Name="NetCore"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Net\DNS.h"/>
+					RelativePath=".\include\Poco\Net\DNS.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HostEntry.h"/>
+					RelativePath=".\include\Poco\Net\HostEntry.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\IPAddress.h"/>
+					RelativePath=".\include\Poco\Net\IPAddress.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\IPAddressImpl.h"/>
+					RelativePath=".\include\Poco\Net\IPAddressImpl.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\Net.h"/>
+					RelativePath=".\include\Poco\Net\Net.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\NetException.h"/>
+					RelativePath=".\include\Poco\Net\NetException.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\NetworkInterface.h"/>
+					RelativePath=".\include\Poco\Net\NetworkInterface.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketAddress.h"/>
+					RelativePath=".\include\Poco\Net\SocketAddress.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketAddressImpl.h"/>
+					RelativePath=".\include\Poco\Net\SocketAddressImpl.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketDefs.h"/>
+					RelativePath=".\include\Poco\Net\SocketDefs.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\DNS.cpp"/>
+					RelativePath=".\src\DNS.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\HostEntry.cpp"/>
+					RelativePath=".\src\HostEntry.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\IPAddress.cpp"/>
+					RelativePath=".\src\IPAddress.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\IPAddressImpl.cpp"/>
+					RelativePath=".\src\IPAddressImpl.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\Net.cpp"/>
+					RelativePath=".\src\Net.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\NetException.cpp"/>
+					RelativePath=".\src\NetException.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\NetworkInterface.cpp"/>
+					RelativePath=".\src\NetworkInterface.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SocketAddress.cpp"/>
+					RelativePath=".\src\SocketAddress.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SocketAddressImpl.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Sockets">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Net\DatagramSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\DatagramSocketImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\DialogSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\MulticastSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\RawSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\RawSocketImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ServerSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ServerSocketImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\Socket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\SocketImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\SocketStream.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\StreamSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\StreamSocketImpl.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\DatagramSocket.cpp"/>
-				<File
-					RelativePath=".\src\DatagramSocketImpl.cpp"/>
-				<File
-					RelativePath=".\src\DialogSocket.cpp"/>
-				<File
-					RelativePath=".\src\MulticastSocket.cpp"/>
-				<File
-					RelativePath=".\src\RawSocket.cpp"/>
-				<File
-					RelativePath=".\src\RawSocketImpl.cpp"/>
-				<File
-					RelativePath=".\src\ServerSocket.cpp"/>
-				<File
-					RelativePath=".\src\ServerSocketImpl.cpp"/>
-				<File
-					RelativePath=".\src\Socket.cpp"/>
-				<File
-					RelativePath=".\src\SocketImpl.cpp"/>
-				<File
-					RelativePath=".\src\SocketStream.cpp"/>
-				<File
-					RelativePath=".\src\StreamSocket.cpp"/>
-				<File
-					RelativePath=".\src\StreamSocketImpl.cpp"/>
+					RelativePath=".\src\SocketAddressImpl.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Messages">
+			Name="Sockets"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Net\FilePartSource.h"/>
+					RelativePath=".\include\Poco\Net\DatagramSocket.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MediaType.h"/>
+					RelativePath=".\include\Poco\Net\DatagramSocketImpl.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MessageHeader.h"/>
+					RelativePath=".\include\Poco\Net\DialogSocket.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MultipartReader.h"/>
+					RelativePath=".\include\Poco\Net\MulticastSocket.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MultipartWriter.h"/>
+					RelativePath=".\include\Poco\Net\PollSet.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\NameValueCollection.h"/>
+					RelativePath=".\include\Poco\Net\RawSocket.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\NullPartHandler.h"/>
+					RelativePath=".\include\Poco\Net\RawSocketImpl.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\PartHandler.h"/>
+					RelativePath=".\include\Poco\Net\ServerSocket.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\PartSource.h"/>
+					RelativePath=".\include\Poco\Net\ServerSocketImpl.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\PartStore.h"/>
+					RelativePath=".\include\Poco\Net\Socket.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\QuotedPrintableDecoder.h"/>
+					RelativePath=".\include\Poco\Net\SocketImpl.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\QuotedPrintableEncoder.h"/>
+					RelativePath=".\include\Poco\Net\SocketStream.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\StringPartSource.h"/>
+					RelativePath=".\include\Poco\Net\StreamSocket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\StreamSocketImpl.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\FilePartSource.cpp"/>
+					RelativePath=".\src\DatagramSocket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\MediaType.cpp"/>
+					RelativePath=".\src\DatagramSocketImpl.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\MessageHeader.cpp"/>
+					RelativePath=".\src\DialogSocket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\MultipartReader.cpp"/>
+					RelativePath=".\src\MulticastSocket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\MultipartWriter.cpp"/>
+					RelativePath=".\src\PollSet.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\NameValueCollection.cpp"/>
+					RelativePath=".\src\RawSocket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\NullPartHandler.cpp"/>
+					RelativePath=".\src\RawSocketImpl.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\PartHandler.cpp"/>
+					RelativePath=".\src\ServerSocket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\PartSource.cpp"/>
+					RelativePath=".\src\ServerSocketImpl.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\PartStore.cpp"/>
+					RelativePath=".\src\Socket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\QuotedPrintableDecoder.cpp"/>
+					RelativePath=".\src\SocketImpl.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\QuotedPrintableEncoder.cpp"/>
+					RelativePath=".\src\SocketStream.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\StringPartSource.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="HTTP">
-			<Filter
-				Name="Header Files">
+					RelativePath=".\src\StreamSocket.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPAuthenticationParams.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPBasicCredentials.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPBasicStreamBuf.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPBufferAllocator.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPChunkedStream.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPCookie.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPCredentials.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPDigestCredentials.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPFixedLengthStream.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPHeaderStream.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPMessage.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPRequest.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPResponse.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPSession.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPStream.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\HTTPAuthenticationParams.cpp"/>
-				<File
-					RelativePath=".\src\HTTPBasicCredentials.cpp"/>
-				<File
-					RelativePath=".\src\HTTPBufferAllocator.cpp"/>
-				<File
-					RelativePath=".\src\HTTPChunkedStream.cpp"/>
-				<File
-					RelativePath=".\src\HTTPCookie.cpp"/>
-				<File
-					RelativePath=".\src\HTTPCredentials.cpp"/>
-				<File
-					RelativePath=".\src\HTTPDigestCredentials.cpp"/>
-				<File
-					RelativePath=".\src\HTTPFixedLengthStream.cpp"/>
-				<File
-					RelativePath=".\src\HTTPHeaderStream.cpp"/>
-				<File
-					RelativePath=".\src\HTTPMessage.cpp"/>
-				<File
-					RelativePath=".\src\HTTPRequest.cpp"/>
-				<File
-					RelativePath=".\src\HTTPResponse.cpp"/>
-				<File
-					RelativePath=".\src\HTTPSession.cpp"/>
-				<File
-					RelativePath=".\src\HTTPStream.cpp"/>
+					RelativePath=".\src\StreamSocketImpl.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="TCPServer">
+			Name="Messages"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Net\TCPServer.h"/>
+					RelativePath=".\include\Poco\Net\FilePartSource.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\TCPServerConnection.h"/>
+					RelativePath=".\include\Poco\Net\MediaType.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\TCPServerConnectionFactory.h"/>
+					RelativePath=".\include\Poco\Net\MessageHeader.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\TCPServerDispatcher.h"/>
+					RelativePath=".\include\Poco\Net\MultipartReader.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\TCPServerParams.h"/>
+					RelativePath=".\include\Poco\Net\MultipartWriter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\NameValueCollection.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\NullPartHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\PartHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\PartSource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\PartStore.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\QuotedPrintableDecoder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\QuotedPrintableEncoder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\StringPartSource.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\TCPServer.cpp"/>
+					RelativePath=".\src\FilePartSource.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\TCPServerConnection.cpp"/>
+					RelativePath=".\src\MediaType.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\TCPServerConnectionFactory.cpp"/>
+					RelativePath=".\src\MessageHeader.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\TCPServerDispatcher.cpp"/>
+					RelativePath=".\src\MultipartReader.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\TCPServerParams.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="HTTPServer">
-			<Filter
-				Name="Header Files">
+					RelativePath=".\src\MultipartWriter.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\AbstractHTTPRequestHandler.h"/>
+					RelativePath=".\src\NameValueCollection.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPRequestHandler.h"/>
+					RelativePath=".\src\NullPartHandler.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPRequestHandlerFactory.h"/>
+					RelativePath=".\src\PartHandler.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPServer.h"/>
+					RelativePath=".\src\PartSource.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPServerConnection.h"/>
+					RelativePath=".\src\PartStore.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPServerConnectionFactory.h"/>
+					RelativePath=".\src\QuotedPrintableDecoder.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPServerParams.h"/>
+					RelativePath=".\src\QuotedPrintableEncoder.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\HTTPServerRequest.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPServerRequestImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPServerResponse.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPServerResponseImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPServerSession.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\AbstractHTTPRequestHandler.cpp"/>
-				<File
-					RelativePath=".\src\HTTPRequestHandler.cpp"/>
-				<File
-					RelativePath=".\src\HTTPRequestHandlerFactory.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServer.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerConnection.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerConnectionFactory.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerParams.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerRequest.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerRequestImpl.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerResponse.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerResponseImpl.cpp"/>
-				<File
-					RelativePath=".\src\HTTPServerSession.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="HTTPClient">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Net\HTTPClientSession.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPIOStream.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPSessionFactory.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPSessionInstantiator.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\HTTPStreamFactory.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\HTTPClientSession.cpp"/>
-				<File
-					RelativePath=".\src\HTTPIOStream.cpp"/>
-				<File
-					RelativePath=".\src\HTTPSessionFactory.cpp"/>
-				<File
-					RelativePath=".\src\HTTPSessionInstantiator.cpp"/>
-				<File
-					RelativePath=".\src\HTTPStreamFactory.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="HTML">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Net\HTMLForm.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\HTMLForm.cpp"/>
+					RelativePath=".\src\StringPartSource.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="FTPClient">
+			Name="HTTP"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Net\FTPClientSession.h"/>
+					RelativePath=".\include\Poco\Net\HTTPAuthenticationParams.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\FTPStreamFactory.h"/>
+					RelativePath=".\include\Poco\Net\HTTPBasicCredentials.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPBasicStreamBuf.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPBufferAllocator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPChunkedStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPCookie.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPCredentials.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPDigestCredentials.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPFixedLengthStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPHeaderStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPMessage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPNTLMCredentials.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPRequest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPResponse.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPSession.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPStream.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\FTPClientSession.cpp"/>
+					RelativePath=".\src\HTTPAuthenticationParams.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\FTPStreamFactory.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Reactor">
-			<Filter
-				Name="Header Files">
+					RelativePath=".\src\HTTPBasicCredentials.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\ParallelSocketAcceptor.h"/>
+					RelativePath=".\src\HTTPBufferAllocator.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\ParallelSocketReactor.h"/>
+					RelativePath=".\src\HTTPChunkedStream.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketAcceptor.h"/>
+					RelativePath=".\src\HTTPCookie.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketConnector.h"/>
+					RelativePath=".\src\HTTPCredentials.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketNotification.h"/>
+					RelativePath=".\src\HTTPDigestCredentials.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketNotifier.h"/>
+					RelativePath=".\src\HTTPFixedLengthStream.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\SocketReactor.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
+					RelativePath=".\src\HTTPHeaderStream.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SocketNotification.cpp"/>
+					RelativePath=".\src\HTTPMessage.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SocketNotifier.cpp"/>
+					RelativePath=".\src\HTTPNTLMCredentials.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\SocketReactor.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Mail">
-			<Filter
-				Name="Header Files">
+					RelativePath=".\src\HTTPRequest.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MailMessage.h"/>
+					RelativePath=".\src\HTTPResponse.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MailRecipient.h"/>
+					RelativePath=".\src\HTTPSession.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\MailStream.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\POP3ClientSession.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\SMTPClientSession.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\MailMessage.cpp"/>
-				<File
-					RelativePath=".\src\MailRecipient.cpp"/>
-				<File
-					RelativePath=".\src\MailStream.cpp"/>
-				<File
-					RelativePath=".\src\POP3ClientSession.cpp"/>
-				<File
-					RelativePath=".\src\SMTPClientSession.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="ICMP">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Net\ICMPClient.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ICMPEventArgs.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ICMPPacket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ICMPPacketImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ICMPSocket.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ICMPSocketImpl.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\ICMPv4PacketImpl.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\ICMPClient.cpp"/>
-				<File
-					RelativePath=".\src\ICMPEventArgs.cpp"/>
-				<File
-					RelativePath=".\src\ICMPPacket.cpp"/>
-				<File
-					RelativePath=".\src\ICMPPacketImpl.cpp"/>
-				<File
-					RelativePath=".\src\ICMPSocket.cpp"/>
-				<File
-					RelativePath=".\src\ICMPSocketImpl.cpp"/>
-				<File
-					RelativePath=".\src\ICMPv4PacketImpl.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="NTP">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Net\NTPClient.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\NTPEventArgs.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\NTPPacket.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\NTPClient.cpp"/>
-				<File
-					RelativePath=".\src\NTPEventArgs.cpp"/>
-				<File
-					RelativePath=".\src\NTPPacket.cpp"/>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Logging">
-			<Filter
-				Name="Header Files">
-				<File
-					RelativePath=".\include\Poco\Net\RemoteSyslogChannel.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\RemoteSyslogListener.h"/>
-				<File
-					RelativePath=".\include\Poco\Net\SMTPChannel.h"/>
-			</Filter>
-			<Filter
-				Name="Source Files">
-				<File
-					RelativePath=".\src\RemoteSyslogChannel.cpp"/>
-				<File
-					RelativePath=".\src\RemoteSyslogListener.cpp"/>
-				<File
-					RelativePath=".\src\SMTPChannel.cpp"/>
+					RelativePath=".\src\HTTPStream.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="WebSocket">
+			Name="TCPServer"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Net\WebSocket.h"/>
+					RelativePath=".\include\Poco\Net\TCPServer.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\WebSocketImpl.h"/>
+					RelativePath=".\include\Poco\Net\TCPServerConnection.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\TCPServerConnectionFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\TCPServerDispatcher.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\TCPServerParams.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\WebSocket.cpp"/>
+					RelativePath=".\src\TCPServer.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\WebSocketImpl.cpp"/>
+					RelativePath=".\src\TCPServerConnection.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TCPServerConnectionFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TCPServerDispatcher.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\TCPServerParams.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="OAuth">
+			Name="HTTPServer"
+			>
 			<Filter
-				Name="Header Files">
+				Name="Header Files"
+				>
 				<File
-					RelativePath=".\include\Poco\Net\OAuth10Credentials.h"/>
+					RelativePath=".\include\Poco\Net\AbstractHTTPRequestHandler.h"
+					>
+				</File>
 				<File
-					RelativePath=".\include\Poco\Net\OAuth20Credentials.h"/>
+					RelativePath=".\include\Poco\Net\HTTPRequestHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPRequestHandlerFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerConnection.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerConnectionFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerParams.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerRequest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerRequestImpl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerResponse.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerResponseImpl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPServerSession.h"
+					>
+				</File>
 			</Filter>
 			<Filter
-				Name="Source Files">
+				Name="Source Files"
+				>
 				<File
-					RelativePath=".\src\OAuth10Credentials.cpp"/>
+					RelativePath=".\src\AbstractHTTPRequestHandler.cpp"
+					>
+				</File>
 				<File
-					RelativePath=".\src\OAuth20Credentials.cpp"/>
+					RelativePath=".\src\HTTPRequestHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPRequestHandlerFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerConnection.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerConnectionFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerParams.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerRequest.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerRequestImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerResponse.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerResponseImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPServerSession.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="HTTPClient"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPClientSession.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPIOStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPSessionFactory.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPSessionInstantiator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\HTTPStreamFactory.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\HTTPClientSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPIOStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSessionFactory.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPSessionInstantiator.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\HTTPStreamFactory.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="HTML"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\HTMLForm.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\HTMLForm.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="FTPClient"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\FTPClientSession.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\FTPStreamFactory.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\FTPClientSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\FTPStreamFactory.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Reactor"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\ParallelSocketAcceptor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ParallelSocketReactor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SocketAcceptor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SocketConnector.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SocketNotification.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SocketNotifier.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SocketReactor.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\SocketNotification.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SocketNotifier.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SocketReactor.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Mail"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\MailMessage.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\MailRecipient.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\MailStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\POP3ClientSession.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SMTPClientSession.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\MailMessage.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MailRecipient.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\MailStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\POP3ClientSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SMTPClientSession.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="ICMP"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPClient.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPEventArgs.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPPacket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPPacketImpl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPSocket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPSocketImpl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\ICMPv4PacketImpl.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\ICMPClient.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPEventArgs.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPPacket.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPPacketImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPSocketImpl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\ICMPv4PacketImpl.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="NTP"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\NTPClient.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\NTPEventArgs.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\NTPPacket.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\NTPClient.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\NTPEventArgs.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\NTPPacket.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Logging"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\RemoteSyslogChannel.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\RemoteSyslogListener.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SMTPChannel.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\RemoteSyslogChannel.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\RemoteSyslogListener.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SMTPChannel.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="WebSocket"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\WebSocket.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\WebSocketImpl.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\WebSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebSocketImpl.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="OAuth"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\OAuth10Credentials.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\OAuth20Credentials.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\OAuth10Credentials.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\OAuth20Credentials.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="UDP"
+			>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\UDPClient.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\UDPServerParams.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\MultiSocketPoller.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SingleSocketPoller.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\UDPClient.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\UDPHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\UDPServer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\UDPServerParams.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\UDPSocketReader.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="NTLM"
+			>
+			<Filter
+				Name="Header Files"
+				>
+				<File
+					RelativePath=".\include\Poco\Net\NTLMCredentials.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\Poco\Net\SSPINTLMCredentials.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Source Files"
+				>
+				<File
+					RelativePath=".\src\NTLMCredentials.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\SSPINTLMCredentials.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\DLLVersion.rc">
+			RelativePath="..\DLLVersion.rc"
+			>
 			<FileConfiguration
 				Name="debug_shared|Win32"
-				ExcludedFromBuild="true">
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_shared|Win32"
-				ExcludedFromBuild="true">
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_mt|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="debug_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="release_static_md|Win32"
-				ExcludedFromBuild="true">
+				ExcludedFromBuild="true"
+				>
 				<Tool
-					Name="VCResourceCompilerTool"/>
+					Name="VCResourceCompilerTool"
+				/>
 			</FileConfiguration>
 		</File>
 	</Files>
-	<Globals/>
+	<Globals>
+	</Globals>
 </VisualStudioProject>

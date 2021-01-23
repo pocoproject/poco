@@ -1,8 +1,6 @@
 //
 // ConfigurationView.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ConfigurationView.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationView
@@ -55,9 +53,9 @@ class Util_API ConfigurationView: public AbstractConfiguration
 	/// still works as expected given a ConfigurationView.
 {
 public:
-	ConfigurationView(const std::string& prefix, AbstractConfiguration* pConfig);
-		/// Creates the ConfigurationView. The ConfigurationView does not take
-		/// ownership of the passed configuration.
+	ConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig);
+		/// Creates the ConfigurationView. The ConfigurationView
+		/// retains (shared) ownership of the passed configuration.
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const;
@@ -74,7 +72,7 @@ private:
 	ConfigurationView& operator = (const ConfigurationView&);
 
 	std::string _prefix;
-	AbstractConfiguration* _pConfig;
+	AbstractConfiguration::Ptr _pConfig;
 };
 
 

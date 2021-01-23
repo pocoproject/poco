@@ -1,8 +1,6 @@
 //
 // WhitespaceFilter.h
 //
-// $Id: //poco/1.4/XML/include/Poco/SAX/WhitespaceFilter.h#1 $
-//
 // Library: XML
 // Package: SAX
 // Module:  WhitespaceFilter

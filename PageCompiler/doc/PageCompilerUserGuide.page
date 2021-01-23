@@ -2,11 +2,16 @@ POCO C++ Server Page Compiler User Guide
 POCO PageCompiler
 
 !!!Introduction
+
 PageCompiler is a command line tool that translates HTML files (and other kinds of files) into
 C++ code, more precisely, subclasses of Poco::Net::HTTPRequestHandler.
-The source files can contain special directives that allow embedding of C++ code. 
-The syntax of these directives is based on the syntax used for 
-Java Server Pages (JSP) and Active Server Pages (ASP).
+The source files can contain special directives that allow embedding of C++ code.
+The syntax of these directives is based on the syntax used for
+Java Server Pages (JSP), Active Server Pages (ASP) or Embedded JavaScript (EJS) templating.
+
+This makes PageCompiler a C++-based HTML templating system. Since the translation of
+the HTML template into a C++ class happens at compile time, runtime performance is
+excellent.
 
 The following introductory sample shows the code for a simple page that displays the
 current date and time.
@@ -16,13 +21,13 @@ current date and time.
         #include "Poco/DateTime.h"
         #include "Poco/DateTimeFormatter.h"
         #include "Poco/DateTimeFormat.h"
-        
-        
+
+
         using Poco::DateTime;
         using Poco::DateTimeFormatter;
         using Poco::DateTimeFormat;
     %>
-    
+
     <%
         DateTime now;
         std::string dt(DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
@@ -36,14 +41,14 @@ current date and time.
     <p><%= dt %></p>
     </body>
     </html>
-----    
+----
 
 Sending the above code to the page compiler will generate two files, a header file
 (<[TimeHandler.h]>) and an implementation file (<[TimeHandler.cpp]>).
 The files define a subclass of Poco::Net::HTTPRequestHandler named <[TimeHandler]>.
 The generated <[handleRequest]> member function contains code to send the HTML
-code contained in the source file to the client, as well as the C++ code fragments found 
-in between the Scriptlet tags. 
+code contained in the source file to the client, as well as the C++ code fragments found
+in between the Scriptlet tags.
 
 
 !!!C++ Server Page Syntax
@@ -88,10 +93,23 @@ is required.
 
 The result of any valid C++ expression can be directly inserted into the page,
 provided the result can be written to an output stream. Note that the expression
-must not end with a semicolon.
+must not end with a semicolon. If HTML escape mode is enabled (new in POCO C++ Libraries
+release 1.10.0), HTML special characters < > " &
+will be replaced with corresponding character entities.
 
     <%= <expression> %>
 ----
+
+An alternative form of this is:
+
+    <%- <expression> %>
+----
+
+The latter form always copies the result of expression to the page verbatim,
+without escaping special HTML characters.
+
+Note that if escape mode is disabled, both forms are equivalent.
+
 
 !!Scriptlet
 
@@ -124,11 +142,16 @@ Example:
         	return response.redirect("/");
         }
     %>
- 
+
 !!Include Directive
 
 Another CPSP file can be included into the current file using the Include
 Directive.
+
+    <%@ include file="<path>" %>
+----
+
+Alternatively, this can also be written as:
 
     <%@ include page="<path>" %>
 ----
@@ -140,7 +163,7 @@ Include a C++ header file in the generated header file.
 
 This corresponds to:
     <%!! #include "<path>" %>
-    
+
 A variant of this directive is:
     <%@ header sinclude="<path>" %>
 
@@ -155,7 +178,7 @@ Include a C++ header file in the generated implementation file.
 
 This corresponds to:
     <%! #include "<path>" %>
-    
+
 A variant of this directive is:
     <%@ impl sinclude="<path>" %>
 
@@ -185,7 +208,7 @@ No namespace will be used if omitted.
 
 !baseClass
 
-Specifies the name of the class used as the base class for the generated 
+Specifies the name of the class used as the base class for the generated
 request handler class.
 Defaults to Poco::Net::HTTPRequestHandler. Do not forget to add a Header Declaration
 containing an <[#include]> directive for the header file containing the definition
@@ -204,10 +227,17 @@ Cannot be used together with <[ctorArg]>.
 
 Allows to specify the type of a single argument being passed to the constructor
 of the generated request handler class. Can only be used together with <[baseClass]>.
-The argument is passed on to the constructor of the base class, therefore, one of the 
+The argument is passed on to the constructor of the base class, therefore, one of the
 constructors of the base class must also accept a single argument of the specified type.
 
 Cannot be used together with <[context]>.
+
+!escape
+
+Enable (set to <[true]>) or disable (<[false]>, default) HTML escape mode.
+If enabled, the result of any expression enclosed in <%= %> tags will be HTML-escaped,
+which means HTML special characters < > " & will be replaced by corresponding
+character entities.
 
 !export
 
@@ -224,9 +254,9 @@ Set the value to <[false]> to disable form handling.
 
 !formPartHandler
 
-Allows you to pass a Poco::Net::PartHandler object to the form object for 
+Allows you to pass a Poco::Net::PartHandler object to the form object for
 processing file uploads. A subclass of Poco::Net::PartHandler must be
-defined (using an Implementation Declaration), and the constructor of the part 
+defined (using an Implementation Declaration), and the constructor of the part
 handler must take a (const) reference to the request handler instance as argument.
 
 !contentType
@@ -236,8 +266,12 @@ Allows you to specify the MIME content type for the page. Defaults to text/html.
 !contentLanguage
 
 Allows to specify a language tag (e.g., "en") that will be sent in the
-response Content-Language header if the client sends an Accept-Language 
+response Content-Language header if the client sends an Accept-Language
 header in the request.
+
+!contentSecurityPolicy
+
+Allows to specify the value of the HTTP Content-Security-Policy header.
 
 !chunked
 
@@ -250,7 +284,7 @@ Set the value to <[false]> to disable chunked transfer encoding.
 Enables or disables response body compression. If set to <[true]>, and the client supports
 the "gzip" content encoding (indicated by the "Accept-Encoding" header),
 the response body will be compressed using the "gzip" format and the
-"Content-Encoding" header will be set accordingly. 
+"Content-Encoding" header will be set accordingly.
 Defaults to <[false]>. Cannot be enabled together with response buffering.
 
 !compressionLevel
@@ -264,8 +298,13 @@ Enables or disables response buffering. Response buffering is disabled by defaul
 Set to <[true]> to enable buffering, or to <[false]> to disable it.
 If response buffering is enabled, everything written to the response stream
 is actually written to a string stream (<[std::ostringstream]>).
-Sending of the HTTP response back to the client is deferred to 
+Sending of the HTTP response back to the client is deferred to
 when the page is complete.
+
+!cacheControl
+
+If set to a non-empty string (e.g., "no-cache, no-store"), adds a "Cache-Control"
+header to the response with the given argument as value.
 
 !session (OSP only)
 
@@ -290,10 +329,10 @@ and the timeout value is read from the respective bundle property.
 
 For use with the POCO Open Service Platform only.
 
-If set to <[true]>, which is the default if the attribute is not specified, 
+If set to <[true]>, which is the default if the attribute is not specified,
 a new session will be created if the request does not contain a (valid) session cookie.
 If set to <[false]> and there is no existing session that matches the session
-cookie. the <[session]> variable will be null. 
+cookie. the <[session]> variable will be null.
 
 !precondition
 
@@ -364,11 +403,15 @@ system (e.g., <[/help]> on Windows, <[--help]> or <[-h]> on Unix).
   * config-file (f): load configuration properties from a file
   * osp (O): add factory class definition/implementation for use with OSP
   * apache (A): add factory class definition/implementation and shared library manifest for use with ApacheConnector
+  * escape (e): make HTML-escape mode default for all pages
+
+Run the PageCompiler with the --help option to see all available options.
+
 
 !!Configuration Properties
 
 The Page Compiler supports one configuration property, named
-<[PageCompiler.fileHeader]>, to optionally specify a header that is 
+<[PageCompiler.fileHeader]>, to optionally specify a header that is
 included in every generated file.
 
 The file header can contain references to other configuration properties,

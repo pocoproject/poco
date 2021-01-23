@@ -1,9 +1,7 @@
 //
 // ODBCMetaColumn.h
 //
-// $Id: //poco/Main/Data/ODBC/include/Poco/Data/ODBC/ODBCMetaColumn.h#3 $
-//
-// Library: ODBC
+// Library: Data/ODBC
 // Package: ODBC
 // Module:  ODBCMetaColumn
 //
@@ -51,6 +49,9 @@ public:
 		/// or the actual character length for a variable-length data type. Its value always excludes the 
 		/// null-termination byte that ends the character string. 
 		/// This information is returned from the SQL_DESC_LENGTH record field of the IRD.
+
+	bool isUnsigned() const;
+		/// Returns true if column is unsigned or a non-numeric data type.
 
 private:
 	ODBCMetaColumn();

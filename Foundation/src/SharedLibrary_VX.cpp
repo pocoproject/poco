@@ -1,8 +1,6 @@
 //
 // SharedLibrary_VX.cpp
 //
-// $Id: //poco/1.4/Foundation/src/SharedLibrary_VX.cpp#2 $
-//
 // Library: Foundation
 // Package: SharedLibrary
 // Module:  SharedLibrary
@@ -101,14 +99,14 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
-	return _moduleId != 0; 
+	return _moduleId != 0;
 }
 
 
 void* SharedLibraryImpl::findSymbolImpl(const std::string& name)
 {
 	poco_assert (_moduleId != 0);
-	
+
 	FastMutex::ScopedLock lock(_mutex);
 
 	MODULE_INFO mi;
@@ -131,6 +129,12 @@ const std::string& SharedLibraryImpl::getPathImpl() const
 std::string SharedLibraryImpl::suffixImpl()
 {
 	return ".out";
+}
+
+
+bool SharedLibraryImpl::setSearchPathImpl(const std::string&)
+{
+	return false;
 }
 
 

@@ -1,8 +1,6 @@
 //
 // ConfigurationMapper.h
 //
-// $Id: //poco/1.4/Util/include/Poco/Util/ConfigurationMapper.h#1 $
-//
 // Library: Util
 // Package: Configuration
 // Module:  ConfigurationMapper
@@ -66,9 +64,9 @@ class Util_API ConfigurationMapper: public AbstractConfiguration
 	/// LayeredConfiguration.
 {
 public:
-	ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration* pConfig);
-		/// Creates the ConfigurationMapper. The ConfigurationMapper does not take
-		/// ownership of the passed configuration.
+	ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig);
+		/// Creates the ConfigurationMapper. The ConfigurationMapper
+		/// retains (shared) ownership of the passed configuration.
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const;
@@ -86,7 +84,7 @@ private:
 
 	std::string _fromPrefix;
 	std::string _toPrefix;
-	AbstractConfiguration* _pConfig;
+	AbstractConfiguration::Ptr _pConfig;
 };
 
 
