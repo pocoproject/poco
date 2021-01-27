@@ -21,7 +21,7 @@ set_target_properties(MongoDB
 	DEFINE_SYMBOL MongoDB_EXPORTS
 )
 
-target_link_libraries(MongoDB PUBLIC Poco::Net)
+target_link_libraries(MongoDB PUBLIC Poco::Net Poco::NetSSL)
 target_include_directories(MongoDB
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

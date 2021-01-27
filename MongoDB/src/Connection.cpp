@@ -13,6 +13,10 @@
 
 
 #include "Poco/Net/SocketStream.h"
+#include "Poco/Net/SecureStreamSocket.h"
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/InvalidCertificateHandler.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Database.h"
 #include "Poco/URI.h"
@@ -37,17 +41,23 @@ Connection::SocketFactory::~SocketFactory()
 
 Poco::Net::StreamSocket Connection::SocketFactory::createSocket(const std::string& host, int port, Poco::Timespan connectTimeout, bool secure)
 {
-	if (!secure)
-	{
-		Poco::Net::SocketAddress addr(host, port);
-		Poco::Net::StreamSocket socket;
-		if (connectTimeout > 0)
-			socket.connect(addr, connectTimeout);
-		else
-			socket.connect(addr);
-		return socket;
+	Poco::Net::SocketAddress addr(host, port);
+	Poco::Net::StreamSocket socket;
+	if (connectTimeout > 0)
+		socket.connect(addr, connectTimeout);
+	else
+		socket.connect(addr);
+
+	if (secure) {
+		SharedPtr<Poco::Net::InvalidCertificateHandler> pCert = new Poco::Net::AcceptCertificateHandler(false);
+		Net::Context::Ptr pContext = new Poco::Net::Context(Net::Context::CLIENT_USE, "", "", "",
+		                                                    Net::Context::VERIFY_NONE, 9, false,
+		                                                    "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		Poco::Net::SSLManager::instance().initializeClient(0, pCert, pContext);
+		Poco::Net::SecureStreamSocket *pSSLSocket = new Poco::Net::SecureStreamSocket(pContext);
+		socket = pSSLSocket->attach(socket);
 	}
-	else throw Poco::NotImplementedException("Default SocketFactory implementation does not support SecureStreamSocket");
+	return socket;
 }
 
 
