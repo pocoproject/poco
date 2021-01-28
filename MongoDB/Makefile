@@ -16,6 +16,6 @@ objects = Array Binary Connection Cursor DeleteRequest  Database \
 
 target         = PocoMongoDB
 target_version = $(LIBVERSION)
-target_libs    = PocoFoundation PocoNet
+target_libs    = PocoFoundation PocoNet PocoNetSSL
 
 include $(POCO_BASE)/build/rules/lib

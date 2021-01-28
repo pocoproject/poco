@@ -52,9 +52,6 @@ public:
 			/// Creates a Poco::Net::StreamSocket (if secure is false), or a
 			/// Poco::Net::SecureStreamSocket (if secure is true) connected to the
 			/// given host and port number.
-			///
-			/// The default implementation will throw a Poco::NotImplementedException
-			/// if secure is true.
 	};
 
 	Connection();
