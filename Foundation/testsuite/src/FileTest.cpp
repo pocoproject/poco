@@ -236,9 +236,12 @@ void FileTest::testFileAttributes3()
 #endif
 
 #if !defined(_WIN32_WCE)
-	assertTrue (f.isDevice());
-	assertTrue (!f.isFile());
-	assertTrue (!f.isDirectory());
+	// do not test if console does not exist e.g. container environment
+	if (f.exists()) {
+	  assertTrue (f.isDevice());
+	  assertTrue (!f.isFile());
+	  assertTrue (!f.isDirectory());
+	}
 #endif
 }
 

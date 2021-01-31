@@ -350,7 +350,7 @@ PDF-clean:
 	$(MAKE) -C $(POCO_BASE)/PDF/testsuite clean
 	$(MAKE) -C $(POCO_BASE)/PDF/samples clean
 
-MongoDB-libexec:  Foundation-libexec Net-libexec
+MongoDB-libexec:  Foundation-libexec Net-libexec NetSSL_OpenSSL-libexec
 	$(MAKE) -C $(POCO_BASE)/MongoDB
 
 MongoDB-tests: MongoDB-libexec cppunit

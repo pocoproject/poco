@@ -424,15 +424,6 @@ void MongoDBTest::testConnectURI()
 	{
 	}
 
-	try
-	{
-		conn.connect("mongodb://" + host + "?ssl=true", sf);
-		fail("SSL not supported, must throw");
-	}
-	catch (Poco::NotImplementedException&)
-	{
-	}
-
 	conn.connect("mongodb://" + host + "/admin?ssl=false&connectTimeoutMS=10000&socketTimeoutMS=10000", sf);
 	conn.disconnect();
 
