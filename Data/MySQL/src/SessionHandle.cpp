@@ -183,11 +183,21 @@ void SessionHandle::rollback()
 
 void SessionHandle::reset()
 {
-#if ((defined (MYSQL_VERSION_ID)) && (MYSQL_VERSION_ID >= 50700)) || ((defined (MARIADB_PACKAGE_VERSION_ID)) && (MARIADB_PACKAGE_VERSION_ID >= 30000))
-	if (mysql_reset_connection(_pHandle) != 0)
-#else
-	if (mysql_refresh(_pHandle, REFRESH_TABLES | REFRESH_STATUS | REFRESH_THREADS | REFRESH_READ_LOCK) != 0)
-#endif
+/*
+  We have to somehow reset sessions before getting session from session pool, because sometimes
+  used session has some remains from previous usage. 
+
+  First, we tried call mysql_refresh() (now obsolete) and then mysql_reset_connection(). Both of
+  these functions caused unintended reseting of variables holding charset/encoding (internal variables
+  like "session.collation_connection" etc., was reseted to default value which is "latin1_swedish_ci").
+
+  Executing query FLUSH seems that it resets session and does not harm encoding.
+  I have tried few flush options (PRIVILEGES, USER_RESOURCES, QUERY CACHE, STATUS) and every of
+  these worked. Only option which did not work was FLUSH TABLES - it caused deadlocks. So I decided
+  call only FLUSH STATUS.
+*/
+
+if (mysql_query(_pHandle, "FLUSH STATUS;") != 0)
 		throw TransactionException("Reset connection failed.", _pHandle);
 }
 

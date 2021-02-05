@@ -77,6 +77,7 @@ public:
 	void testSingleSelect();
 	void testEmptyDB();
 	void testDateTime();
+	void testSessionPoolAndUnicode();
 	void testBLOB();
 	void testBLOBStmt();
 
