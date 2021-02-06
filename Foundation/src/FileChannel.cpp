@@ -101,6 +101,7 @@ void FileChannel::open()
 				_pFile = new LogFile(_path);
 			}
 		}
+		_pFile = _pArchiveStrategy->open(_pFile);
 	}
 }
 
@@ -224,7 +225,7 @@ const std::string& FileChannel::path() const
 }
 
 
-void FileChannel::setRotation(const std::string& rotation)
+RotateStrategy* FileChannel::createRotation(const std::string& rotation, const std::string& times)
 {
 	std::string::const_iterator it  = rotation.begin();
 	std::string::const_iterator end = rotation.end();
@@ -238,9 +239,9 @@ void FileChannel::setRotation(const std::string& rotation)
 	RotateStrategy* pStrategy = 0;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
-		if (_times == "utc")
+		if (times == "utc")
 			pStrategy = new RotateAtTimeStrategy<DateTime>(rotation);
-		else if (_times == "local")
+		else if (times == "local")
 			pStrategy = new RotateAtTimeStrategy<LocalDateTime>(rotation);
 		else
 			throw PropertyNotSupportedException("times", _times);
@@ -271,13 +272,25 @@ void FileChannel::setRotation(const std::string& rotation)
 		pStrategy = new RotateBySizeStrategy(n);
 	else if (unit != "never")
 		throw InvalidArgumentException("rotation", rotation);
-	delete _pRotateStrategy;
-	_pRotateStrategy = pStrategy;
-	_rotation = rotation;
+
+    return pStrategy;
 }
 
 
-void FileChannel::setArchive(const std::string& archive)
+void FileChannel::setRotationStrategy(RotateStrategy* strategy)
+{
+	delete _pRotateStrategy;
+	_pRotateStrategy = strategy;
+}
+
+
+void FileChannel::setRotation(const std::string& rotation)
+{
+	setRotationStrategy(createRotation(rotation, _times));
+	_rotation = rotation;
+}
+
+ArchiveStrategy* FileChannel::createArchive(const std::string& archive, const std::string& times)
 {
 	ArchiveStrategy* pStrategy = 0;
 	if (archive == "number")
@@ -286,17 +299,28 @@ void FileChannel::setArchive(const std::string& archive)
 	}
 	else if (archive == "timestamp")
 	{
-		if (_times == "utc")
+		if (times == "utc")
 			pStrategy = new ArchiveByTimestampStrategy<DateTime>;
-		else if (_times == "local")
+		else if (times == "local")
 			pStrategy = new ArchiveByTimestampStrategy<LocalDateTime>;
 		else
 			throw PropertyNotSupportedException("times", _times);
 	}
 	else throw InvalidArgumentException("archive", archive);
+	return pStrategy;
+}
+
+
+void FileChannel::setArchiveStrategy(ArchiveStrategy* strategy)
+{
 	delete _pArchiveStrategy;
-	pStrategy->compress(_compress);
-	_pArchiveStrategy = pStrategy;
+	_pArchiveStrategy = strategy;
+}
+
+
+void FileChannel::setArchive(const std::string& archive)
+{
+	setArchiveStrategy(createArchive(archive, _times));
 	_archive = archive;
 }
 
