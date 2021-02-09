@@ -84,6 +84,11 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	else 
 	{
 		int ch = _session.get();
+		while (!Poco::Ascii::isSpace(ch)) // ignore trailer
+		{
+			while (ch != eof && ch != '\n') ch = _session.get();
+			ch = _session.get();
+		}
 		while (ch != eof && ch != '\n') ch = _session.get();
 		return 0;
 	}
