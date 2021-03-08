@@ -201,9 +201,9 @@ if(PostgreSQL_FOUND)
 	set(PostgreSQL_LIBRARIES ${PostgreSQL_LIBRARY})
 endif()
 
-if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::client)
-	add_library(PostgreSQL::client UNKNOWN IMPORTED)
-	set_target_properties(PostgreSQL::client PROPERTIES
+if(PostgreSQL_FOUND AND NOT TARGET PostgreSQL::PostgreSQL)
+	add_library(PostgreSQL::PostgreSQL UNKNOWN IMPORTED)
+	set_target_properties(PostgreSQL::PostgreSQL PROPERTIES
 		IMPORTED_LOCATION "${PostgreSQL_LIBRARY}"
 		INTERFACE_INCLUDE_DIRECTORIES "${PostgreSQL_INCLUDE_DIR}"
 	)
