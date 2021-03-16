@@ -49,10 +49,6 @@ enum RSAPaddingMode
 		/// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an empty 
 		/// encoding parameter. This mode is recommended for all new applications.
 		
-	RSA_PADDING_SSLV23,
-		/// PKCS #1 v1.5 padding with an SSL-specific modification that denotes 
-		/// that the server is SSL3 capable. 
-		
 	RSA_PADDING_NONE
 		/// Raw RSA encryption. This mode should only be used to implement cryptographically 
 		/// sound padding modes in the application code. Encrypting user data directly with RSA 
