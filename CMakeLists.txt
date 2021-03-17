@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5.0)
 project(Poco)
 
 if(APPLE)
+    set(MYSQL_ROOT_DIR /usr/local/opt/mysql-client)
     set(OPENSSL_ROOT_DIR /usr/local/opt/openssl)
 endif()
 
