@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(Poco)
 
+if(APPLE)
+    set(OPENSSL_ROOT_DIR /usr/local/opt/openssl)
+endif()
+
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
 # Read the version information from the VERSION file
 file(STRINGS "${PROJECT_SOURCE_DIR}/VERSION" PACKAGE_VERSION)
