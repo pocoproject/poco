@@ -10,7 +10,7 @@
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
-// HashRange Copyright 2005-2014 Daniel James.
+// hashRange Copyright 2005-2014 Daniel James.
 // (Extracted from Boost 1.75.0 lib and adapted for poco on 2021-03-31)
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -114,13 +114,13 @@ namespace Impl {
 
 
 template <typename SizeT>
-inline void HashCombine(SizeT& seed, SizeT value)
+inline void hashCombine(SizeT& seed, SizeT value)
 {
     seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
 }
 
 
-inline void HashCombine(Poco::UInt32& h1, Poco::UInt32 k1)
+inline void hashCombine(Poco::UInt32& h1, Poco::UInt32 k1)
 {
     const uint32_t c1 = 0xcc9e2d51;
     const uint32_t c2 = 0x1b873593;
@@ -138,7 +138,7 @@ inline void HashCombine(Poco::UInt32& h1, Poco::UInt32 k1)
 #if defined(POCO_PTR_IS_64_BIT) && !(defined(__GNUC__) && ULONG_MAX == 0xffffffff)
 
 
-inline void HashCombine(Poco::UInt64& h, Poco::UInt64 k)
+inline void hashCombine(Poco::UInt64& h, Poco::UInt64 k)
 {
     const Poco::UInt64 m = UINT64_C(0xc6a4a7935bd1e995);
     const int r = 47;
@@ -163,21 +163,21 @@ inline void HashCombine(Poco::UInt64& h, Poco::UInt64 k)
 
 
 template <class T>
-inline void HashCombine(std::size_t& seed, T const& v)
+inline void hashCombine(std::size_t& seed, T const& v)
 {
     Hash<T> hasher;
-    Impl::HashCombine(seed, hasher(v));
+    Impl::hashCombine(seed, hasher(v));
 }
 
 
 template <class It>
-inline std::size_t HashRange(It first, It last)
+inline std::size_t hashRange(It first, It last)
 {
     std::size_t seed = 0;
 
     for(; first != last; ++first)
     {
-        HashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
+        hashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
     }
 
     return seed;
@@ -185,11 +185,11 @@ inline std::size_t HashRange(It first, It last)
 
 
 template <class It>
-inline void HashRange(std::size_t& seed, It first, It last)
+inline void hashRange(std::size_t& seed, It first, It last)
 {
     for(; first != last; ++first)
     {
-        HashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
+        hashCombine<typename std::iterator_traits<It>::value_type>(seed, *first);
     }
 }
 

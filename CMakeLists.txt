@@ -50,7 +50,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-# Include some common macros to simpilfy the Poco CMake files
+# Include some common macros to simplify the Poco CMake files
 include(PocoMacros)
 
 if(POCO_STATIC)
