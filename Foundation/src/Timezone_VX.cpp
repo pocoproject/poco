@@ -35,7 +35,11 @@ int Timezone::dst()
 {
 	std::time_t now = std::time(NULL);
 	struct std::tm t;
+#if (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9)))) || defined(_VXWORKS_COMPATIBILITY_MODE)
 	if (localtime_r(&now, &t) != OK)
+#else
+	if (!localtime_r(&now, &t))
+#endif
 		throw Poco::SystemException("cannot get local time DST offset");
 	return t.tm_isdst == 1 ? 3600 : 0;
 }
