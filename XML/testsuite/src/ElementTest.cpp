@@ -628,6 +628,7 @@ void ElementTest::testNodeByPath()
 		</elem2>
 		<elem2>
 			<elemB attr1="value4"/>
+			<elemD attr1="value1"/>
 		</elem2>
 	</root>
 	*/
@@ -646,6 +647,7 @@ void ElementTest::testNodeByPath()
 	AutoPtr<Element> pElem25 = pDoc->createElement("elemC");
 	AutoPtr<Element> pElem3  = pDoc->createElement("elem2");
 	AutoPtr<Element> pElem31 = pDoc->createElement("elemB");
+	AutoPtr<Element> pElem32 = pDoc->createElement("elemD");
 	
 	pElem21->setAttribute("attr1", "value1");
 	pElem22->setAttribute("attr1", "value2");
@@ -655,6 +657,7 @@ void ElementTest::testNodeByPath()
 	pElem25->setAttribute("attr1", "value2");
 	
 	pElem31->setAttribute("attr1", "value4");
+	pElem32->setAttribute("attr1", "value1");
 	
 	AutoPtr<Element> pElem241 = pDoc->createElement("elemC1");
 	AutoPtr<Element> pElem242 = pDoc->createElement("elemC2");
@@ -671,6 +674,7 @@ void ElementTest::testNodeByPath()
 	pElem2->appendChild(pElem25);
 	
 	pElem3->appendChild(pElem31);
+	pElem3->appendChild(pElem32);
 
 	pRoot->appendChild(pElem1);
 	pRoot->appendChild(pElem2);	
@@ -750,11 +754,26 @@ void ElementTest::testNodeByPath()
 	pNode = pDoc->getNodeByPath("//[@attr1='value1']");
 	assertTrue (pNode == pElem21);
 
+	pNode = pDoc->getNodeByPath("//[@attr1='value4']");
+	assertTrue (pNode == pElem31);
+
 	pNode = pDoc->getNodeByPath("//[@attr1='value2']");
 	assertTrue (pNode == pElem22);
 
 	pNode = pRoot->getNodeByPath("/elem2/*[@attr1='value2']");
 	assertTrue (pNode == pElem22);
+
+	pNode = pDoc->getNodeByPath("/root/elem2[0]/elemC");
+	assertTrue (pNode == pElem24);
+
+	pNode = pDoc->getNodeByPath("/root/elem2[1]/elemC");
+	assertTrue (pNode == 0);
+
+	pNode = pDoc->getNodeByPath("/root/elem2[0]/elemD");
+	assertTrue (pNode == 0);
+
+	pNode = pDoc->getNodeByPath("/root/elem2[1]/elemD");
+	assertTrue (pNode == pElem32);
 }
 
 

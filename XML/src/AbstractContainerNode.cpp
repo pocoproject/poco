@@ -438,10 +438,9 @@ const Node* AbstractContainerNode::findNode(XMLString::const_iterator& it, const
 			XMLString::const_iterator itStart(it);
 			const Node* pFound = 0;
 			const Node* pElem = findElement(key, pNode->firstChild(), pNSMap);
-			while (!pFound && pElem)
+			if (!pFound && pElem)
 			{
 				pFound = findNode(it, end, pElem, pNSMap);
-				if (!pFound) pElem = findElement(key, pElem->nextSibling(), pNSMap);
 				it = itStart;
 			}
 			return pFound;
