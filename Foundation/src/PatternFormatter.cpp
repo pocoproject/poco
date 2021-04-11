@@ -232,6 +232,7 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 		return Formatter::getProperty(name);
 }
 
+
 void PatternFormatter::parsePriorityNames()
 {
 	StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
@@ -244,6 +245,7 @@ void PatternFormatter::parsePriorityNames()
 	}
 	else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
 }
+
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {
