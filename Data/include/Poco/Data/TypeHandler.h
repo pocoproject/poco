@@ -292,7 +292,7 @@ public:
 	
 		if (pExt->extract(pos++, val)) 
 		{
-			obj = val;
+			obj = std::move(val);
 		}
 		else 
 		{
