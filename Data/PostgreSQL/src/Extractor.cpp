@@ -69,7 +69,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 		return false;
 	}
 
-	val = static_cast<Int8>(tempVal);
+	val = static_cast<UInt8>(tempVal);
 
 	return true;
 }
@@ -88,7 +88,7 @@ bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 		return false;
 	}
 
-	val = static_cast<Int8>(tempVal);
+	val = static_cast<Int16>(tempVal);
 
 	return true;
 }
@@ -107,7 +107,7 @@ bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 		return false;
 	}
 
-	val = static_cast<Int8>(tempVal);
+	val = static_cast<UInt16>(tempVal);
 
 	return true;
 }
