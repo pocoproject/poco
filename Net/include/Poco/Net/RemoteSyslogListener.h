@@ -73,6 +73,8 @@ public:
 		///     * threads: The number of parser threads processing
 		///       received syslog messages. Defaults to 1. A maximum
 		///       of 16 threads is supported.
+		///     * buffer: The UDP socket receive buffer size in bytes. If not
+		///       specified, the system default is used.
 
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
@@ -96,6 +98,7 @@ public:
 
 	static const std::string PROP_PORT;
 	static const std::string PROP_THREADS;
+	static const std::string PROP_BUFFER;
 
     static const std::string LOG_PROP_APP;
     static const std::string LOG_PROP_HOST;
@@ -112,6 +115,7 @@ private:
 	Poco::NotificationQueue _queue;
 	Poco::UInt16            _port;
 	int                     _threads;
+	int                     _buffer;
 };
 
 

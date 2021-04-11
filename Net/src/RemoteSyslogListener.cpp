@@ -87,7 +87,7 @@ public:
 		BUFFER_SIZE = 65536
 	};
 	
-	RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port);
+	RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, int buffer);
 	~RemoteUDPListener();
 
 	void run();
@@ -100,11 +100,15 @@ private:
 };
 
 
-RemoteUDPListener::RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port):
+RemoteUDPListener::RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, int buffer):
 	_queue(queue),
 	_socket(Poco::Net::SocketAddress(Poco::Net::IPAddress(), port)),
 	_stopped(false)
 {
+	if (buffer > 0)
+	{
+		_socket.setReceiveBufferSize(buffer);
+	}
 }
 
 
@@ -494,6 +498,7 @@ Poco::Message::Priority SyslogParser::convert(RemoteSyslogChannel::Severity seve
 
 const std::string RemoteSyslogListener::PROP_PORT("port");
 const std::string RemoteSyslogListener::PROP_THREADS("threads");
+const std::string RemoteSyslogListener::PROP_BUFFER("buffer");
 
 const std::string RemoteSyslogListener::LOG_PROP_APP("app");
 const std::string RemoteSyslogListener::LOG_PROP_HOST("host");
@@ -504,7 +509,8 @@ RemoteSyslogListener::RemoteSyslogListener():
 	_pListener(0),
 	_pParser(0),
 	_port(RemoteSyslogChannel::SYSLOG_PORT),
-	_threads(1)
+	_threads(1),
+	_buffer(0)
 {
 }
 
@@ -513,7 +519,8 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
 	_pListener(0),
 	_pParser(0),
 	_port(port),
-	_threads(1)
+	_threads(1),
+	_buffer(0)
 {
 }
 
@@ -522,7 +529,8 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
 	_pListener(0),
 	_pParser(0),
 	_port(port),
-	_threads(threads)
+	_threads(threads),
+	_buffer(0)
 {
 }
 
@@ -564,6 +572,10 @@ void RemoteSyslogListener::setProperty(const std::string& name, const std::strin
 		else
 			throw Poco::InvalidArgumentException("Invalid number of threads", value);
 	}
+	else if (name == PROP_BUFFER)
+	{
+		_buffer = Poco::NumberParser::parse(value);
+	}
 	else 
 	{
 		SplitterChannel::setProperty(name, value);
@@ -577,6 +589,8 @@ std::string RemoteSyslogListener::getProperty(const std::string& name) const
 		return Poco::NumberFormatter::format(_port);
 	else if (name == PROP_THREADS)
 		return Poco::NumberFormatter::format(_threads);
+	else if (name == PROP_BUFFER)
+		return Poco::NumberFormatter::format(_buffer);
 	else	
 		return SplitterChannel::getProperty(name);
 }
@@ -588,7 +602,7 @@ void RemoteSyslogListener::open()
 	_pParser = new SyslogParser(_queue, this);
 	if (_port > 0)
 	{
-		_pListener = new RemoteUDPListener(_queue, _port);
+		_pListener = new RemoteUDPListener(_queue, _port, _buffer);
 	}
 	for (int i = 0; i < _threads; i++)
 	{
