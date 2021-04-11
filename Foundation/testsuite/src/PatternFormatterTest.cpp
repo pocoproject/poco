@@ -91,6 +91,17 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.setProperty("pattern", "start %v[8] end");
 	fmt.format(msg, result);
 	assertTrue (result == "start stSource end");
+
+	result.clear();
+	fmt.setProperty("pattern", "%O");
+	fmt.format(msg, result);
+	assertTrue (result == "PatternFormatterTest.cpp");
+
+	result.clear();
+	fmt.setProperty("priorityNames", "FATAL,CRITICAL,SPECIAL_ERROR_NAME,WARN,NOTICE,INFO,DEBUG,TRACE");
+	fmt.setProperty("pattern", "%p");
+	fmt.format(msg, result);
+	assertTrue (result == "SPECIAL_ERROR_NAME");
 }
 
 
