@@ -40,6 +40,8 @@
 #endif
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
+#include <stdio.h>
+#include <sys/ioctl.h>
 #endif
 #include "Poco/UnicodeConverter.h"
 
@@ -321,13 +323,37 @@ void Application::stopOptionsProcessing()
 }
 
 
+Application::WindowSize Application::windowSize()
+{
+	WindowSize size{0, 0};
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
+    {
+    	size.width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+    	size.height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+    }
+#elif defined(POCO_OS_FAMILY_UNIX)
+	struct winsize winsz;
+    if (ioctl(0, TIOCGWINSZ , &winsz) != -1)
+    {
+    	size.width  = winsz.ws_col;
+    	size.height = winsz.ws_row;
+    }
+#endif
+
+	return size;
+}
+
+
 int Application::run()
 {
 	int rc = EXIT_CONFIG;
-	initialize(*this);
 
 	try
 	{
+		initialize(*this);
 		rc = EXIT_SOFTWARE;
 		rc = main(_unprocessedArgs);
 	}
