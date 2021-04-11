@@ -236,6 +236,7 @@ WebSocketImpl* WebSocket::completeHandshake(HTTPClientSession& cs, HTTPResponse&
 std::string WebSocket::createKey()
 {
 	Poco::Random rnd;
+	rnd.seed();
 	std::ostringstream ostr;
 	Poco::Base64Encoder base64(ostr);
 	Poco::BinaryWriter writer(base64);
