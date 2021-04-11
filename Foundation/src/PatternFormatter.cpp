@@ -25,6 +25,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Path.h"
 
+
 namespace Poco {
 
 
@@ -81,7 +82,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'I': NumberFormatter::append(text, msg.getTid()); break;
 		case 'N': text.append(Environment::nodeName()); break;
 		case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
-		case 'O': text.append(msg.getSourceFile() ? Path{ msg.getSourceFile() }.getFileName() : ""); break;
+		case 'O': text.append(msg.getSourceFile() ? Path(msg.getSourceFile()).getFileName() : ""); break;
 		case 'u': NumberFormatter::append(text, msg.getSourceLine()); break;
 		case 'w': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
 		case 'W': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
