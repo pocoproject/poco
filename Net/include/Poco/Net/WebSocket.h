@@ -150,6 +150,9 @@ public:
 		///
 		/// The result of the handshake can be obtained from the response
 		/// object.
+		///
+		/// The HTTPClientSession session object must no longer be used after setting
+		/// up the WebSocket.
 
 	WebSocket(HTTPClientSession& cs, HTTPRequest& request, HTTPResponse& response, HTTPCredentials& credentials);
 		/// Creates a client-side WebSocket, using the given
@@ -165,6 +168,9 @@ public:
 		///
 		/// The result of the handshake can be obtained from the response
 		/// object.
+		///
+		/// The HTTPClientSession session object must no longer be used after setting
+		/// up the WebSocket.
 
 	WebSocket(const Socket& socket);
 		/// Creates a WebSocket from another Socket, which must be a WebSocket,
@@ -218,9 +224,11 @@ public:
 		/// A WebSocketException will also be thrown if a malformed
 		/// or incomplete frame is received.
 		///
-		/// Returns the number of bytes received.
-		/// A return value of 0 means that the peer has
+		/// Returns the number of payload bytes received.
+		/// A return value of 0, with flags also 0, means that the peer has
 		/// shut down or closed the connection.
+		/// A return value of 0, with non-zero flags, indicates an
+		/// reception of an empty frame (e.g., in case of a PING).
 		///
 		/// Throws a TimeoutException if a receive timeout has
 		/// been set and nothing is received within that interval.
@@ -248,9 +256,11 @@ public:
 		/// DoS attack (memory exhaustion) by sending a WebSocket frame
 		/// header with a huge payload size.
 		///
-		/// Returns the number of bytes received.
-		/// A return value of 0 means that the peer has
+		/// Returns the number of payload bytes received.
+		/// A return value of 0, with flags also 0, means that the peer has
 		/// shut down or closed the connection.
+		/// A return value of 0, with non-zero flags, indicates an
+		/// reception of an empty frame (e.g., in case of a PING).
 		///
 		/// Throws a TimeoutException if a receive timeout has
 		/// been set and nothing is received within that interval.
