@@ -42,6 +42,7 @@ void PatternFormatterTest::testPatternFormatter()
 	msg.setThread("TestThread");
 	msg.setPriority(Message::PRIO_ERROR);
 	msg.setTime(DateTime(2005, 1, 1, 14, 30, 15, 500).timestamp());
+	msg.setSourceFile(__FILE__);
 	msg["testParam"] = "Test Parameter";
 	
 	std::string result;
