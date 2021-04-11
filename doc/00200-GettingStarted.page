@@ -23,6 +23,9 @@ team and may not always be up to date.*>
 Up-to-date [[https://conan.io Conan]] packages are available via
 [[https://bintray.com/pocoproject/conan/Poco%3Apocoproject Bintray]].
 
+<%
+<?-PocoDoc.adContent?>
+%>
 
 !!Source Code Distribution Format
 

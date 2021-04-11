@@ -222,6 +222,11 @@ public:
 class ECDSAAlgorithm: public Algorithm
 {
 public:
+	enum
+	{
+		RS_PADDING = 32
+	};
+
 	ECDSAAlgorithm(const std::string& digestType):
 		_digestType(digestType)
 	{
@@ -237,11 +242,16 @@ public:
 		ecdsa.update(payload);
 
 		Poco::Crypto::ECDSASignature ecdsaSig(ecdsa.signature());
-		Poco::DigestEngine::Digest jwtSig(ecdsaSig.rawR());
+		Poco::DigestEngine::Digest rawR(ecdsaSig.rawR());
 		Poco::DigestEngine::Digest rawS(ecdsaSig.rawS());
+		Poco::DigestEngine::Digest jwtSig;
+		jwtSig.reserve(RS_PADDING*2);
+		for (std::size_t i = rawR.size(); i < RS_PADDING; i++) jwtSig.push_back(0);
+		jwtSig.insert(jwtSig.end(), rawR.begin(), rawR.end());
+		for (std::size_t i = rawS.size(); i < RS_PADDING; i++) jwtSig.push_back(0);
 		jwtSig.insert(jwtSig.end(), rawS.begin(), rawS.end());
-		return jwtSig;
 
+		return jwtSig;
 	}
 
 	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
@@ -498,6 +508,7 @@ Poco::DigestEngine::Digest Signer::decode(const std::string& signature)
 		digest.push_back(static_cast<unsigned char>(static_cast<unsigned>(ch)));
 		ch = decoder.get();
 	}
+
 	return digest;
 }
 

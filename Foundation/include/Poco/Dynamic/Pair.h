@@ -189,7 +189,7 @@ public:
 		val.append("{ ");
 		Var key(_val.first());
 		Impl::appendJSONKey(val, key);
-		val.append(" : ");
+		val.append(": ");
 		Impl::appendJSONValue(val, _val.second());
 		val.append(" }");	
 	}
@@ -338,7 +338,7 @@ public:
 		val.append("{ ");
 		Var key(_val.first());
 		Impl::appendJSONKey(val, key);
-		val.append(" : ");
+		val.append(": ");
 		Impl::appendJSONValue(val, _val.second());
 		val.append(" }");	
 	}
