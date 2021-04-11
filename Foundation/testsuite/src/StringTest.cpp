@@ -1378,7 +1378,6 @@ void StringTest::testJSONString()
 {
 	assertTrue (toJSON("\\", false) == "\\\\");
 	assertTrue (toJSON("\"", false) == "\\\"");
-	assertTrue (toJSON("/", false) == "\\/");
 	assertTrue (toJSON("\a", false) == "\\u0007");
 	assertTrue (toJSON("\b", false) == "\\b");
 	assertTrue (toJSON("\f", false) == "\\f");
@@ -1395,7 +1394,7 @@ void StringTest::testJSONString()
 	std::string str = "\"foo\\\\\"";
 	assertTrue (toJSON("foo\\") == str);
 
-	assertTrue (toJSON("bar/") == "\"bar\\/\"");
+	assertTrue (toJSON("bar/") == "\"bar/\"");
 	assertTrue (toJSON("baz") == "\"baz\"");
 	assertTrue (toJSON("q\"uote\"d") == "\"q\\\"uote\\\"d\"");
 	assertTrue (toJSON("bs\b") == "\"bs\\b\"");
@@ -1412,7 +1411,7 @@ void StringTest::testJSONString()
 	ostr.str("");
 
 	toJSON("foo\\", ostr);
-	assertTrue (toJSON("bar/") == "\"bar\\/\"");
+	assertTrue (toJSON("bar/") == "\"bar/\"");
 	ostr.str("");
 	toJSON("baz", ostr);
 	assertTrue (ostr.str() == "\"baz\"");
