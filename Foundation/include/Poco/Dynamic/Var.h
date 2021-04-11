@@ -737,7 +737,7 @@ inline const std::type_info& Var::type() const
 
 inline Var::ConstIterator Var::begin() const
 {
-	if (isEmpty()) return ConstIterator(const_cast<Var*>(this), true);
+	if (size() == 0) return ConstIterator(const_cast<Var*>(this), true);
 
 	return ConstIterator(const_cast<Var*>(this), false);
 }
@@ -749,7 +749,7 @@ inline Var::ConstIterator Var::end() const
 
 inline Var::Iterator Var::begin()
 {
-	if (isEmpty()) return Iterator(const_cast<Var*>(this), true);
+	if (size() == 0) return Iterator(const_cast<Var*>(this), true);
 
 	return Iterator(const_cast<Var*>(this), false);
 }

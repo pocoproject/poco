@@ -31,6 +31,7 @@ VarIterator::VarIterator(Var* pVar, bool positionEnd):
 	_pVar(pVar),
 	_position(positionEnd ? POSITION_END : 0)
 {
+    if (!_pVar || _pVar->isEmpty()) throw InvalidAccessException("Cannot create iterator on empty Var");
 }
 
 
