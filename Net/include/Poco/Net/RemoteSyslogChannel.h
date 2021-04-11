@@ -124,6 +124,7 @@ public:
 		///                  by a colon) can also be specified.
 		///     * host:      (optional) Host name included in syslog messages. If not specified, the host's real domain name or
 		///                  IP address will be used.
+		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
@@ -136,6 +137,7 @@ public:
 	static const std::string PROP_FORMAT;
 	static const std::string PROP_LOGHOST;
 	static const std::string PROP_HOST;
+	static const std::string PROP_BUFFER;
 	static const std::string STRUCTURED_DATA;
 
 protected:
@@ -148,6 +150,7 @@ private:
 	std::string _host;
 	int  _facility;
 	bool _bsdFormat;
+	int _buffer;
 	DatagramSocket _socket;
 	SocketAddress _socketAddress;
 	bool _open;
