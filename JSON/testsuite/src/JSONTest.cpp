@@ -791,9 +791,11 @@ void JSONTest::testEmptyArray()
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	assertTrue (array->size() == 0);
+	assertTrue (array->empty());
 
 	Poco::Dynamic::Array da = *array;
 	assertTrue (da.size() == 0);
+	assertTrue (da.empty());
 }
 
 
@@ -817,10 +819,12 @@ void JSONTest::testNestedArray()
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	assertTrue (array->size() == 1);
+	assertTrue (!array->empty());
 
 	Poco::Dynamic::Array da = *array;
 	assertTrue (da.size() == 1);
 	assertTrue (da[0].size() == 1);
+	assertTrue (!da.empty());
 	assertTrue (da[0][0].size() == 1);
 	assertTrue (da[0][0][0].size() == 0);
 }
