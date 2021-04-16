@@ -12,7 +12,6 @@
 //
 
 
-#include "Poco/Foundation.h"
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Exception.h"
