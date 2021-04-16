@@ -18,13 +18,13 @@
 #define Data_ODBC_Extractor_INCLUDED
 
 
-#include "Poco/Data/Constants.h"
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/ODBC/Utility.h"
+#include "Poco/Data/Constants.h"
+#include "Poco/Data/AbstractExtractor.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
@@ -52,7 +52,7 @@ class ODBC_API Extractor: public Poco::Data::AbstractExtractor
 public:
 	typedef Preparator::Ptr PreparatorPtr;
 
-	Extractor(const StatementHandle& rStmt, 
+	Extractor(const StatementHandle& rStmt,
 		Preparator::Ptr pPreparator);
 		/// Creates the Extractor.
 
@@ -304,7 +304,7 @@ public:
 
 	bool extract(std::size_t pos, std::list<Poco::DateTime>& val);
 		/// Extracts a DateTime list.
-	
+
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
@@ -339,7 +339,7 @@ public:
 		/// Returns true if the value at [col,row] is null.
 
 	void reset();
-		/// Resets the internally cached length indicators. 
+		/// Resets the internally cached length indicators.
 
 private:
 	static const int CHUNK_SIZE = 1024;
@@ -365,7 +365,7 @@ private:
 	{
 		if (isNull(pos)) return false;
 		poco_assert_dbg (typeid(T) == _pPreparator->at(pos).type());
-		val = *AnyCast<T>(&_pPreparator->at(pos)); 
+		val = *AnyCast<T>(&_pPreparator->at(pos));
 		return true;
 	}
 
@@ -384,7 +384,7 @@ private:
 
 	bool extractBoundImplContainer(std::size_t pos, std::vector<std::string>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::deque<std::string>& values);
-	bool extractBoundImplContainer(std::size_t pos, std::list<std::string>& values); 
+	bool extractBoundImplContainer(std::size_t pos, std::list<std::string>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::vector<Poco::UTF16String>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::deque<Poco::UTF16String>& values);
 	bool extractBoundImplContainer(std::size_t pos, std::list<Poco::UTF16String>& values);
@@ -466,8 +466,8 @@ private:
 
 		resizeLengths(pos);
 
-		rc = SQLGetData(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
+		rc = SQLGetData(_rStmt,
+			(SQLUSMALLINT) pos + 1,
 			cType,  //C data type
 			&value, //returned value
 			0,      //buffer length (ignored)
@@ -475,10 +475,10 @@ private:
 
 		if (Utility::isError(rc))
 			throw StatementException(_rStmt, "SQLGetData()");
-		
-		if (isNullLengthIndicator(_lengths[pos])) 
+
+		if (isNullLengthIndicator(_lengths[pos]))
 			return false;
-		else 
+		else
 		{
 			//for fixed-length data, buffer must be large enough
 			//otherwise, driver may write past the end
@@ -567,7 +567,7 @@ private:
 			case MetaColumn::FDT_TIMESTAMP:
 			{ return extAny<T, Poco::DateTime>(pos, val); }
 
-			default: 
+			default:
 				throw DataFormatException("Unsupported data type.");
 		}
 
@@ -575,8 +575,8 @@ private:
 	}
 
 	bool isNullLengthIndicator(SQLLEN val) const;
-		/// The reason for this utility wrapper are platforms where 
-		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value, 
+		/// The reason for this utility wrapper are platforms where
+		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value,
 		/// while SQL_NULL_DATA (#define'd as -1 literal) remains 32-bit.
 
 	SQLINTEGER columnSize(std::size_t pos) const;
@@ -640,42 +640,42 @@ inline bool Extractor::extractBoundImplContainer(std::size_t pos, std::list<Poco
 }
 
 
-inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 	std::vector<Poco::Data::CLOB>& values)
 {
 	return extractBoundImplContainerLOB(pos, values);
 }
 
 
-inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 	std::deque<Poco::Data::CLOB>& values)
 {
 	return extractBoundImplContainerLOB(pos, values);
 }
 
 
-inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 	std::list<Poco::Data::CLOB>& values)
 {
 	return extractBoundImplContainerLOB(pos, values);
 }
 
 
-inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 	std::vector<Poco::Data::BLOB>& values)
 {
 	return extractBoundImplContainerLOB(pos, values);
 }
 
 
-inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 	std::deque<Poco::Data::BLOB>& values)
 {
 	return extractBoundImplContainerLOB(pos, values);
 }
 
 
-inline bool Extractor::extractBoundImplContainer(std::size_t pos, 
+inline bool Extractor::extractBoundImplContainer(std::size_t pos,
 	std::list<Poco::Data::BLOB>& values)
 {
 	return extractBoundImplContainerLOB(pos, values);
@@ -702,7 +702,7 @@ inline void Extractor::reset()
 
 inline void Extractor::resizeLengths(std::size_t pos)
 {
-	if (pos >= _lengths.size()) 
+	if (pos >= _lengths.size())
 		_lengths.resize(pos + 1, (SQLLEN) 0);
 }
 
