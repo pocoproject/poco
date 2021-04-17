@@ -14,7 +14,7 @@ set_target_properties(mod_poco
 target_include_directories(mod_poco
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE
 		${APACHE2_INCLUDE_DIRS}
 		${CMAKE_CURRENT_SOURCE_DIR}/src
