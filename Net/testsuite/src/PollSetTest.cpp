@@ -128,6 +128,7 @@ void PollSetTest::testPoll()
 
 void PollSetTest::testPollNoServer()
 {
+#ifndef POCO_OS_FAMILY_WINDOWS
 	StreamSocket ss1;
 	StreamSocket ss2;
 
@@ -150,11 +151,13 @@ void PollSetTest::testPollNoServer()
 	assertTrue(sm.size() == 2);
 	for (auto s : sm)
 		assertTrue(0 != (s.second | PollSet::POLL_ERROR));
+#endif // POCO_OS_FAMILY_WINDOWS
 }
 
 
 void PollSetTest::testPollClosedServer()
 {
+#ifndef POCO_OS_FAMILY_WINDOWS
 	EchoServer echoServer1;
 	EchoServer echoServer2;
 	StreamSocket ss1;
@@ -162,6 +165,7 @@ void PollSetTest::testPollClosedServer()
 
 	ss1.connect(SocketAddress("127.0.0.1", echoServer1.port()));
 	ss2.connect(SocketAddress("127.0.0.1", echoServer2.port()));
+
 	PollSet ps;
 	assertTrue(ps.empty());
 	ps.add(ss1, PollSet::POLL_READ);
@@ -181,10 +185,12 @@ void PollSetTest::testPollClosedServer()
 	do
 	{
 		sm = ps.poll(Timespan(1000000));
+		if (sw.elapsedSeconds() > 10) fail();
 	} while (sm.size() < 2);
 	assertTrue(sm.size() == 2);
 	assertTrue(0 == ss1.receiveBytes(0, 0));
 	assertTrue(0 == ss2.receiveBytes(0, 0));
+#endif // POCO_OS_FAMILY_WINDOWS
 }
 
 
