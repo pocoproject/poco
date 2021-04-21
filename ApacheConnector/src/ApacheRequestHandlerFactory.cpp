@@ -65,8 +65,18 @@ void ApacheRequestHandlerFactory::handleURIs(const std::string& uris)
 	std::string factoryName = (*it);
 	it++;
 	std::string dllName = (*it);
-	it++;
 
+	// Handle quoted string
+	while ((dllName.find('"') == 0) && (dllName.rfind('"') != dllName.length() - 1) && (it != itEnd)) {
+		it++;
+		dllName.append(" ");
+		dllName.append(*it);
+	}
+	if ((dllName.find('"') == 0) && (dllName.rfind('"') == dllName.length() - 1)) {
+		dllName = dllName.substr(1, dllName.length() - 2);
+	}
+
+	it++;
 	for (; it != itEnd; it++)
 	{
 		addRequestHandlerFactory(dllName, factoryName, *it);
@@ -106,7 +116,7 @@ bool ApacheRequestHandlerFactory::mustHandle(const std::string& uri)
 		// handler is registered with: /download
 		// uri: /download/xyz
 		// uri: /download
-		if (uri.find(it->first) == 0 || it->first.find(uri) == 0)
+		if (0 == uri.find(it->first))
 			return true;
 	}
 

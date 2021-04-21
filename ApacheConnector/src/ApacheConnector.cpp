@@ -159,18 +159,6 @@ void ApacheRequestRec::copyHeaders(ApacheServerRequest& request)
 }
 
 
-void ApacheConnector::log(const char* file, int line, int level, int status, const char *text)
-{
-	// ap_log_error() has undergone significant changes in Apache 2.4.
-	// Validate Apache version for using a proper ap_log_error() version.
-#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
-		ap_log_error(file, line, level, 0, NULL, "%s", text);
-#else
-	ap_log_error(file, line, level, 0, 0, 0, text);
-#endif
-}
-
-
 extern "C" int ApacheConnector_handler(request_rec *r)
 {
 	ApacheRequestRec rec(r);
@@ -271,7 +259,12 @@ extern "C" const char* ApacheConnector_config(cmd_parms *cmd, void *in_dconf, co
 {
 	try
 	{
-		ApacheApplication::instance().loadConfiguration(in_str);
+        std::string cfg(in_str);
+        // Strip optional quotes
+        if ((cfg.find('"') == 0) && (cfg.rfind('"') == cfg.length() - 1)) {
+                cfg = cfg.substr(1, cfg.length() - 2);
+        }
+		ApacheApplication::instance().loadConfiguration(cfg);
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -302,9 +295,12 @@ extern "C" const command_rec ApacheConnector_cmds[] =
     { NULL }
 };
 
-
-module AP_MODULE_DECLARE_DATA poco_module =
-{
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+module AP_MODULE_DECLARE_DATA poco_module
+#else
+AP_DECLARE_MODULE(poco)
+#endif
+= {
 	STANDARD20_MODULE_STUFF,
 	NULL,
 	NULL,
@@ -313,3 +309,15 @@ module AP_MODULE_DECLARE_DATA poco_module =
 	ApacheConnector_cmds,
 	ApacheConnector_register_hooks
 };
+
+// This must come *after* AP_DECLARE_MODULE, because that declares aplog_module_index
+void ApacheConnector::log(const char* file, int line, int level, int status, const char *text)
+{
+	// ap_log_error() has undergone significant changes in Apache 2.4.
+	// Validate Apache version for using a proper ap_log_error() version.
+#if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
+		ap_log_error(file, line, level, 0, NULL, "%s", text);
+#else
+	ap_log_error(file, line, APLOG_MODULE_INDEX, level, 0, NULL, "%s", text);
+#endif
+}
