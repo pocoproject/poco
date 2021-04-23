@@ -118,6 +118,12 @@ public:
 		PRIO_SYSTEM      = 100
 	};
 
+	struct WindowSize
+	{
+		int width;
+		int height;
+	};
+
 	Application();
 		/// Creates the Application.
 
@@ -293,6 +299,15 @@ public:
 		/// This is useful, for example, if an option for displaying
 		/// help information has been encountered and no other things
 		/// besides displaying help shall be done.
+
+	static WindowSize windowSize();
+		/// Returns the current window size of the console window,
+		/// if available.
+		///
+		/// Currently implemented for POSIX platforms (via TIOCGWINSZ ioctl())
+		/// and Windows (GetConsoleScreenBufferInfo()).
+		///
+		/// Returns zero width and height if the window size cannot be determined.
 
 	const char* name() const;
 
