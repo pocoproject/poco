@@ -42,7 +42,7 @@ typedef int UDPMsgSizeT;
 
 template <std::size_t S = POCO_UDP_BUF_SIZE>
 class UDPHandlerImpl: public Runnable, public RefCountedObject
-	/// UDP handler handles the data that arives to the UDP server.
+	/// UDP handler handles the data that arrives to the UDP server.
 	/// The class is thread-safe and runs in its own thread, so many handlers
 	/// can be used in parallel.Handler manages and provides the storage
 	/// (fixed-size memory blocks of S size) to the reader, which signals back
