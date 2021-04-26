@@ -11,7 +11,7 @@ SHAREDOPT_CXX += -DNet_EXPORTS
 objects = \
 	Net DNS HTTPResponse HostEntry Socket \
 	DatagramSocket HTTPServer IPAddress IPAddressImpl SocketAddress SocketAddressImpl \
-	HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
+	Endpoint HTTPBasicCredentials HTTPCookie HTMLForm MediaType DialogSocket \
 	DatagramSocketImpl FilePartSource HTTPServerConnection MessageHeader \
 	HTTPChunkedStream HTTPServerConnectionFactory MulticastSocket SocketStream \
 	HTTPClientSession HTTPServerParams MultipartReader StreamSocket SocketImpl \

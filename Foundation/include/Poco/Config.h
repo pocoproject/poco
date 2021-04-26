@@ -151,6 +151,11 @@
 // #define POCO_NET_NO_IPv6
 
 
+// No UNIX socket support
+// Define to disable unix sockets
+// #define POCO_NET_NO_UNIX_SOCKET
+
+
 // Windows CE has no locale support
 #if defined(_WIN32_WCE)
 	#define POCO_NO_LOCALE
