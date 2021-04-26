@@ -61,6 +61,45 @@ SocketReactor::~SocketReactor()
 }
 
 
+int SocketReactor::poll()
+{
+	int handled = 0;
+	if (!hasSocketHandlers()) onIdle();
+	else
+	{
+		bool readable = false;
+		PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
+		if (sm.size() > 0)
+		{
+			onBusy();
+			PollSet::SocketModeMap::iterator it = sm.begin();
+			PollSet::SocketModeMap::iterator end = sm.end();
+			for (; it != end; ++it)
+			{
+				if (it->second & PollSet::POLL_READ)
+				{
+					dispatch(it->first, _pReadableNotification);
+					readable = true;
+					++handled;
+				}
+				if (it->second & PollSet::POLL_WRITE)
+				{
+					dispatch(it->first, _pWritableNotification);
+					++handled;
+				}
+				if (it->second & PollSet::POLL_ERROR)
+				{
+					dispatch(it->first, _pErrorNotification);
+					++handled;
+				}
+			}
+		}
+		if (!readable) onTimeout();
+	}
+	return handled;
+}
+
+
 void SocketReactor::run()
 {
 	_pThread = Thread::current();
@@ -68,32 +107,10 @@ void SocketReactor::run()
 	{
 		try
 		{
-			if (!hasSocketHandlers())
+			if (!poll())
 			{
-				onIdle();
-				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
-			}
-			else
-			{
-				bool readable = false;
-				PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
-				if (sm.size() > 0)
-				{
-					onBusy();
-					PollSet::SocketModeMap::iterator it = sm.begin();
-					PollSet::SocketModeMap::iterator end = sm.end();
-					for (; it != end; ++it)
-					{
-						if (it->second & PollSet::POLL_READ)
-						{
-							dispatch(it->first, _pReadableNotification);
-							readable = true;
-						}
-						if (it->second & PollSet::POLL_WRITE) dispatch(it->first, _pWritableNotification);
-						if (it->second & PollSet::POLL_ERROR) dispatch(it->first, _pErrorNotification);
-					}
-				}
-				if (!readable) onTimeout();
+				if (!hasSocketHandlers())
+					Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
 			}
 		}
 		catch (Exception& exc)

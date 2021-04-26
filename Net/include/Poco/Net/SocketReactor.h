@@ -123,6 +123,12 @@ public:
 	virtual ~SocketReactor();
 		/// Destroys the SocketReactor.
 
+	int poll();
+		/// Polls all registered sockets and calls their respective handlers.
+		/// If there are no handlers, an idle notification is dispatched.
+		/// If there are no readable sockets, a timeout notification is dispatched.
+		/// Returns the total number of read/write/error handlers called.
+
 	void run();
 		/// Runs the SocketReactor. The reactor will run
 		/// until stop() is called (in a separate thread).
