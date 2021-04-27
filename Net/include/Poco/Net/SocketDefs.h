@@ -371,15 +371,17 @@ struct AddressFamily
 	enum Family
 		/// Possible address families for socket addresses.
 	{
-		IPv4,
+		UNKNOWN = AF_UNSPEC,
+			/// Unspecified family
+	#if defined(POCO_OS_FAMILY_UNIX)
+		UNIX_LOCAL = AF_UNIX,
+			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
+	#endif
+		IPv4 = AF_INET,
 			/// IPv4 address family.
 	#if defined(POCO_HAVE_IPv6)
-		IPv6,
+		IPv6 = AF_INET6
 			/// IPv6 address family.
-	#endif
-	#if defined(POCO_OS_FAMILY_UNIX)
-		UNIX_LOCAL
-			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
 	#endif
 	};
 };

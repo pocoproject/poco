@@ -154,7 +154,7 @@ void EndpointTest::testSocketRelationals()
 
 void EndpointTest::testEndpoint6()
 {
-#ifdef POCO_NET_ENABLE_IPv6
+#ifdef POCO_HAVE_IPv6
 	Endpoint sa1("FE80::E6CE:8FFF:FE4A:EDD0", 100);
 	assertTrue (sa1.af() == AF_INET6);
 	assertTrue (sa1.family() == Endpoint::IPv6);
@@ -168,13 +168,15 @@ void EndpointTest::testEndpoint6()
 	assertTrue (sa2.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
 	assertTrue (sa2.port() == 100);
 	assertTrue (sa2.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
+#else
+	std::cout << "[IPv6 DISABLED]";
 #endif
 }
 
 
 void EndpointTest::testEndpointUnixLocal()
 {
-#ifdef POCO_NET_ENABLE_UNIX_SOCKET
+#ifdef POCO_HAVE_UNIX_SOCKET
 	Endpoint sa1(Endpoint::UNIX_LOCAL, "/tmp/sock1");
 	assertTrue (sa1.af() == AF_UNIX);
 	assertTrue (sa1.family() == Endpoint::UNIX_LOCAL);
@@ -191,6 +193,8 @@ void EndpointTest::testEndpointUnixLocal()
 	Endpoint sa4("/tmp/sock1");
 	assertTrue (sa1 == sa4);
 	assertTrue (sa4.toString() == "/tmp/sock1");
+#else
+	std::cout << "[UNIX LOCAL DISABLED]";
 #endif
 }
 

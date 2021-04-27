@@ -168,6 +168,8 @@ void SocketAddressTest::testSocketAddress6()
 	assertTrue (sa2.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
 	assertTrue (sa2.port() == 100);
 	assertTrue (sa2.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
+#else
+	std::cout << "[IPv6 DISABLED]" << std::endl;
 #endif
 }
 
@@ -191,6 +193,8 @@ void SocketAddressTest::testSocketAddressUnixLocal()
 	SocketAddress sa4("/tmp/sock1");
 	assertTrue (sa1 == sa4);
 	assertTrue (sa4.toString() == "/tmp/sock1");
+#else
+	std::cout << "[UNIX LOCAL DISABLED]" << std::endl;
 #endif
 }
 

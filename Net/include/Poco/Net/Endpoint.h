@@ -19,16 +19,19 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/Endpoint.h"
 #include "Poco/Format.h"
 #include <ostream>
 
 
-// force no local sockets here for now
+// force no local sockets
 #define POCO_NET_NO_UNIX_SOCKET
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NET_NO_UNIX_SOCKET)
 #define POCO_HAVE_UNIX_SOCKET
+#elif defined(POCO_HAVE_UNIX_SOCKET)
+#undef POCO_HAVE_UNIX_SOCKET
 #endif
 
 
@@ -56,7 +59,7 @@ public:
 #if defined(POCO_HAVE_IPv6)
 	static const Family IPv6 = AddressFamily::IPv6;
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAVE_UNIX_SOCKET)
 	static const Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
 #endif
 

@@ -13,6 +13,7 @@
 
 
 #include "Poco/Net/Endpoint.h"
+
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/DNS.h"
@@ -146,10 +147,10 @@ Endpoint::Endpoint(const Endpoint& socketAddress): _addr()
 
 Endpoint::Endpoint(const struct sockaddr* sockAddr, poco_socklen_t length): _addr()
 {
-	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
+	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == Family::IPv4)
 		makeIPv4(reinterpret_cast<const struct sockaddr_in*>(sockAddr));
 #if defined(POCO_HAVE_IPv6)
-	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == AF_INET6)
+	else if (length == sizeof(struct sockaddr_in6) && sockAddr->sa_family == Family::IPv6)
 		makeIPv6(reinterpret_cast<const struct sockaddr_in6*>(sockAddr));
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
@@ -194,78 +195,68 @@ Endpoint& Endpoint::operator = (const Endpoint& socketAddress)
 
 IPAddress Endpoint::host() const
 {
-	switch (_addr.base.sa_family)
+	switch (family())
 	{
-		case AF_INET:
+		case Family::IPv4:
 			return IPAddress(&_addr.v4.sin_addr, sizeof(_addr.v4.sin_addr));
 #if defined(POCO_HAVE_IPv6)
-		case AF_INET6:
+		case Family::IPv6:
 			return IPAddress(&_addr.v6.sin6_addr, sizeof(_addr.v6.sin6_addr), _addr.v6.sin6_scope_id);
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
-		case PF_LOCAL:
+		case Family::UNIX_LOCAL:
 			throw Poco::InvalidAccessException("local socket address does not have host IP address");
 #endif
 		default:
 			unsupportedFamilyError(__func__);
 	}
+	return IPAddress();
 }
 
 
 UInt16 Endpoint::port() const
 {
-	switch (_addr.base.sa_family)
+	switch (family())
 	{
-		case AF_INET:
+		case Family::IPv4:
 			return ntohs(_addr.v4.sin_port);
 #if defined(POCO_HAVE_IPv6)
-		case AF_INET6:
+		case Family::IPv6:
 			return ntohs(_addr.v6.sin6_port);
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
-		case PF_LOCAL:
+		case Family::UNIX_LOCAL:
 			throw Poco::InvalidAccessException("local socket address does not have port number");
 #endif
 		default: unsupportedFamilyError(__func__);
 	}
+	return 0;
 }
 
 
 poco_socklen_t Endpoint::length() const
 {
-	switch (_addr.base.sa_family)
+	switch (family())
 	{
-		case AF_INET:
+		case Family::IPv4:
 			return sizeof(_addr.v4);
 #if defined(POCO_HAVE_IPv6)
-		case AF_INET6:
+		case Family::IPv6:
 			return sizeof(_addr.v6);
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
-		case PF_LOCAL:
+		case Family::UNIX_LOCAL:
 			return sizeof(_addr.local);
 #endif
 		default: unsupportedFamilyError(__func__);
 	}
+	return 0;
 }
 
 
 int Endpoint::af() const
 {
-	switch (_addr.base.sa_family)
-	{
-		case AF_INET:
-			return _addr.v4.sin_family;
-#if defined(POCO_HAVE_IPv6)
-		case AF_INET6:
-			return _addr.v6.sin6_family;
-#endif
-#if defined(POCO_HAVE_UNIX_SOCKET)
-		case PF_LOCAL:
-			return _addr.local.sun_family;
-#endif
-		default: unsupportedFamilyError(__func__);
-	}
+	return family();
 }
 
 
@@ -274,51 +265,53 @@ Endpoint::Family Endpoint::family() const
 	switch (_addr.base.sa_family)
 	{
 		case AF_INET:
-			return AddressFamily::IPv4;
+			return Family::IPv4;
 #if defined(POCO_HAVE_IPv6)
 		 case AF_INET6:
-			 return AddressFamily::IPv6;
+			 return Family::IPv6;
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
-		 case PF_LOCAL:
-			 return AddressFamily::UNIX_LOCAL;
+		 case AF_UNIX:
+			 return Family::UNIX_LOCAL;
 #endif
 		default: unsupportedFamilyError(__func__);
 	}
+	return Family::UNKNOWN;
 }
 
 
 const char* Endpoint::path() const
 {
-	switch (_addr.base.sa_family)
+	switch (family())
 	{
-		case AF_INET:
+		case Family::IPv4:
 			throw Poco::InvalidAccessException("IPv4 socket address does not have path");
 #if defined(POCO_HAVE_IPv6)
-		case AF_INET6:
+		case Family::IPv6:
 			throw Poco::InvalidAccessException("IPv6 socket address does not have path");
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
-		case PF_LOCAL:
+		case Family::UNIX_LOCAL:
 			return _addr.local.sun_path;
 #endif
 		default: unsupportedFamilyError(__func__);
 	}
+	return "";
 }
 
 
 std::string Endpoint::toString() const
 {
 	std::string result;
-	switch (_addr.base.sa_family)
+	switch (family())
 	{
-		case AF_INET:
+		case Family::IPv4:
 			result.append(host().toString());
 			result.append(":");
 			NumberFormatter::append(result, port());
 			break;
 #if defined(POCO_HAVE_IPv6)
-		case AF_INET6:
+		case Family::IPv6:
 			result.append("[");
 			result.append(host().toString());
 			result.append("]");
@@ -327,7 +320,7 @@ std::string Endpoint::toString() const
 			break;
 #endif
 #if defined(POCO_HAVE_UNIX_SOCKET)
-		 case PF_LOCAL:
+		 case Family::UNIX_LOCAL:
 			 result = path();
 			 break;
 #endif
@@ -501,8 +494,8 @@ Poco::UInt16 Endpoint::resolveService(const std::string& service)
 
 void Endpoint::makeIPv4()
 {
-	_addr.v4.sin_family = AF_INET;
-	poco_set_sin_len(&_addr);
+	_addr.v4.sin_family = Family::IPv4;
+	poco_set_sin_len(&_addr.v4);
 }
 
 
@@ -515,8 +508,8 @@ void Endpoint::makeIPv4(const sockaddr_in* sockAddr)
 
 void Endpoint::makeIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
 {
-	_addr.v4.sin_family = AF_INET;
-	poco_set_sin_len(&_addr);
+	_addr.v4.sin_family = Family::IPv4;
+	poco_set_sin_len(&_addr.v4);
 	std::memcpy(&_addr.v4.sin_addr, hostAddress.addr(), sizeof(_addr.v4.sin_addr));
 	_addr.v4.sin_port = htons(portNumber);
 }
@@ -532,7 +525,7 @@ void Endpoint::makeIPv6(const sockaddr_in6* sockAddr)
 
 void Endpoint::makeIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
 {
-   _addr.v6.sin6_family = AF_INET6;
+   _addr.v6.sin6_family = Family::IPv6;
 	poco_set_sin6_len(&_addr.v6);
 	std::memcpy(&_addr.v6.sin6_addr, hostAddress.addr(), sizeof(_addr.v6.sin6_addr));
 	_addr.v6.sin6_port = htons(portNumber);
@@ -552,7 +545,7 @@ void Endpoint::makeLocal(const std::string& path)
 {
 	poco_assert (path.length() < sizeof(_addr.local.sun_path));
 
-	poco_set_sun_len(&_addr.local, std::strlen(path) + sizeof(struct sockaddr_un) - sizeof(_addr.local.sun_path) + 1);
+	poco_set_sun_len(&_addr.local, path.length() + sizeof(struct sockaddr_un) - sizeof(_addr.local.sun_path) + 1);
 	_addr.local.sun_family = AF_UNIX;
 	std::strcpy(_addr.local.sun_path, path.c_str());
 }
