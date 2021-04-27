@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/Endpoint.h"
 #include "Poco/Net/NetException.h"
+#include <iostream>
 
 
 using Poco::Net::Endpoint;
