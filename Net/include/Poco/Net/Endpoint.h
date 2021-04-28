@@ -63,6 +63,14 @@ public:
 	static const Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
 #endif
 
+	using SockaddrIPv4 = struct sockaddr_in;
+#if defined(POCO_HAVE_IPv6)
+	using SockaddrIPv6 = struct sockaddr_in6;
+#endif
+#if defined(POCO_HAVE_UNIX_SOCKET)
+	using SockaddrLocal = struct sockaddr_un;
+#endif
+
 	Endpoint();
 		/// Creates a wildcard (all zero) IPv4 Endpoint.
 
@@ -156,6 +164,56 @@ public:
 
 	Endpoint& operator = (const Endpoint& socketAddress);
 		/// Assigns another Endpoint.
+
+	const SockaddrIPv4& toIPv4() const
+	{
+		poco_assert (family() == IPv4);
+		return _addr.v4;
+	}
+#if defined(POCO_HAVE_IPv6)
+	const SockaddrIPv6& toIPv6() const
+	{
+		poco_assert (family() == IPv6);
+		return _addr.v6;
+	}
+#endif
+#if defined(POCO_HAVE_UNIX_SOCKET)
+	const SockaddrLocal& toLocal() const
+	{
+		poco_assert (family() == UNIX_LOCAL);
+		return _addr.local;
+	}
+#endif
+
+	std::vector<unsigned char> toBytes() const
+	{
+		std::size_t sz = 0;
+		std::vector<unsigned char> bytes;
+		const void* ptr = 0;
+		switch (family())
+		{
+			case IPv4:
+				sz = sizeof(_addr.v4.sin_addr);
+				ptr = &_addr.v4.sin_addr;
+				break;
+#if defined(POCO_HAVE_IPv6)
+			case IPv6:
+				sz = sizeof(_addr.v6.sin6_addr);
+				ptr = &_addr.v6.sin6_addr;
+				break;
+#endif
+#if defined(POCO_HAVE_UNIX_SOCKET)
+			case UNIX_LOCAL:
+				sz = sizeof(_addr.local.sun_path);
+				ptr = &local.sun_path;
+				break;
+#endif
+			default:
+				throw Poco::IllegalStateException(Poco::format("Endpoint::toBytes(%d)", (int)family()));
+		}
+		std::memcpy(&bytes[0], ptr, sz);
+		return bytes;
+	}
 
 	IPAddress host() const;
 		/// Returns the host IP address.

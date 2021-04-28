@@ -121,7 +121,9 @@ public:
 
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
-		
+
+	std::vector<unsigned char> toBytes() const;
+
 	Family family() const;
 		/// Returns the address family (IPv4 or IPv6) of the address.
 

@@ -19,6 +19,7 @@
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/String.h"
+#include "Poco/Format.h"
 #include "Poco/Types.h"
 
 
@@ -569,6 +570,31 @@ IPAddress IPAddress::broadcast()
 	struct in_addr ia;
 	ia.s_addr = INADDR_NONE;
 	return IPAddress(&ia, sizeof(ia));
+}
+
+
+std::vector<unsigned char> IPAddress::toBytes() const
+{
+	std::size_t sz = 0;
+	std::vector<unsigned char> bytes;
+	const void* ptr = 0;
+	switch (family())
+	{
+		case IPv4:
+			sz = sizeof(in_addr);
+			ptr = addr();
+			break;
+#if defined(POCO_HAVE_IPv6)
+		case IPv6:
+			sz = sizeof(in6_addr);
+			ptr = addr();
+			break;
+#endif
+		default:
+			throw Poco::IllegalStateException(Poco::format("IPAddress::toBytes(%d)", (int)family()));
+	}
+	std::memcpy(&bytes[0], ptr, sz);
+	return bytes;
 }
 
 
