@@ -271,11 +271,6 @@ void LocalDateTime::determineTzd(bool adjust)
 #else
 		std::tm broken;
 #if (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9)))) || defined(_VXWORKS_COMPATIBILITY_MODE)
-                if (localtime_r(&now, &t) != OK)
-#else
-                if (!localtime_r(&now, &t))
-#endif
-
 		if (localtime_r(&epochTime, &broken) != OK)
 			throw Poco::SystemException("cannot get local time");
 #else
