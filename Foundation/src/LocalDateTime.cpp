@@ -284,8 +284,7 @@ void LocalDateTime::determineTzd(bool adjust)
 #endif
 		_tzd = (Timezone::utcOffset() + ((broken.tm_isdst == 1) ? 3600 : 0));
 #endif
-		adjustForTzd();#if (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9)))) || defined(_VXWORKS_COMPATIBILITY_MODE)
-40
+		adjustForTzd();
 
 	}
 	else
