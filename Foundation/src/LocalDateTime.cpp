@@ -271,7 +271,7 @@ void LocalDateTime::determineTzd(bool adjust)
 #else
 		std::tm broken;
 #if defined(POCO_VXWORKS)
-#if defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR > 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR > 9))) && !defined(_VXWORKS_COMPATIBILITY_MODE)
+#if defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR > 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR >= 9))) && !defined(_VXWORKS_COMPATIBILITY_MODE)
 		if (!localtime_r(&epochTime, &broken))
 			throw Poco::SystemException("cannot get local time");
 #else
@@ -284,7 +284,9 @@ void LocalDateTime::determineTzd(bool adjust)
 #endif
 		_tzd = (Timezone::utcOffset() + ((broken.tm_isdst == 1) ? 3600 : 0));
 #endif
-		adjustForTzd();
+		adjustForTzd();#if (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9)))) || defined(_VXWORKS_COMPATIBILITY_MODE)
+40
+
 	}
 	else
 	{
