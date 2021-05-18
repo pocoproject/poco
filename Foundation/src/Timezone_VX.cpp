@@ -35,7 +35,7 @@ int Timezone::dst()
 {
 	std::time_t now = std::time(NULL);
 	struct std::tm t;
-#if defined(_VXWORKS_COMPATIBILITY_MODE) || (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9)))
+#if defined(_VXWORKS_COMPATIBILITY_MODE) || (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9))))
 	if (localtime_r(&now, &t) != OK)
 #else
 	if (!localtime_r(&now, &t))
