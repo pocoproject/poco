@@ -143,7 +143,7 @@
   8388608 // 8 MiB, 2^23
 /* NOTE END */
 
-#include "expat.h" // so we can use type XML_Parser below
+#include "Poco/XML/expat.h" // so we can use type XML_Parser below
 
 #ifdef __cplusplus
 extern "C" {
