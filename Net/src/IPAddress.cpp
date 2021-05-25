@@ -573,6 +573,28 @@ IPAddress IPAddress::broadcast()
 }
 
 
+IPAddress::RawIPv4 IPAddress::toV4Bytes() const
+{
+	if (family() != IPv4)
+		throw Poco::InvalidAccessException(Poco::format("IPAddress::toV4Bytes(%d)", (int)family()));
+
+	RawIPv4 bytes;
+	std::memcpy(&bytes[0], addr(), IPv4Size);
+	return bytes;
+}
+
+
+IPAddress::RawIPv6 IPAddress::toV6Bytes() const
+{
+	if (family() != IPv6)
+		throw Poco::InvalidAccessException(Poco::format("IPAddress::toV6Bytes(%d)", (int)family()));
+
+	RawIPv6 bytes;
+	std::memcpy(&bytes[0], addr(), IPv6Size);
+	return bytes;
+}
+
+
 std::vector<unsigned char> IPAddress::toBytes() const
 {
 	std::size_t sz = 0;
@@ -593,6 +615,7 @@ std::vector<unsigned char> IPAddress::toBytes() const
 		default:
 			throw Poco::IllegalStateException(Poco::format("IPAddress::toBytes(%d)", (int)family()));
 	}
+	bytes.resize(sz);
 	std::memcpy(&bytes[0], ptr, sz);
 	return bytes;
 }

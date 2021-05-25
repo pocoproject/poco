@@ -24,6 +24,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include <vector>
+#include <array>
 #include <ostream>
 
 
@@ -55,6 +56,13 @@ class Net_API IPAddress
 {
 public:
 	using List = std::vector<IPAddress>;
+
+	using RawIP = std::vector<unsigned char>;
+
+	static const unsigned IPv4Size = sizeof(in_addr);
+	static const unsigned IPv6Size = sizeof(in6_addr);
+	using RawIPv4 = std::array<unsigned char, IPv4Size>;
+	using RawIPv6 = std::array<unsigned char, IPv6Size>;
 
 	// The following declarations keep the Family type
 	// backwards compatible with the previously used
@@ -122,7 +130,11 @@ public:
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
 
-	std::vector<unsigned char> toBytes() const;
+	bool isV4() const;
+	bool isV6() const;
+	RawIPv4 toV4Bytes() const;
+	RawIPv6 toV6Bytes() const;
+	RawIP toBytes() const;
 
 	Family family() const;
 		/// Returns the address family (IPv4 or IPv6) of the address.
@@ -386,6 +398,19 @@ private:
 //
 // inlines
 //
+
+inline bool IPAddress::isV4() const
+{
+	return family() == IPv4;
+}
+
+
+inline bool IPAddress::isV6() const
+{
+	return family() == IPv6;
+}
+
+
 inline IPAddress::Ptr IPAddress::pImpl() const
 {
 	if (_pImpl) return _pImpl;
