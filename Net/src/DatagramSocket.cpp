@@ -34,9 +34,12 @@ DatagramSocket::DatagramSocket(SocketAddress::Family family): Socket(new Datagra
 }
 
 
-DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress): Socket(new DatagramSocketImpl(address.family()))
+DatagramSocket::DatagramSocket(const SocketAddress& address, bool reuseAddress, bool ipV6Only):
+	Socket(new DatagramSocketImpl(address.family()))
 {
-	bind(address, reuseAddress);
+	if (address.family() == SocketAddress::IPv6)
+		bind6(address, reuseAddress, reuseAddress, ipV6Only);
+	else bind(address, reuseAddress);
 }
 
 
@@ -84,6 +87,12 @@ void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress)
 void DatagramSocket::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
 	impl()->bind(address, reuseAddress, reusePort);
+}
+
+
+void DatagramSocket::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	impl()->bind6(address, reuseAddress, reusePort, ipV6Only);
 }
 
 

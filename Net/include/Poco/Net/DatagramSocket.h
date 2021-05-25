@@ -48,12 +48,14 @@ public:
 		/// The socket will be created for the
 		/// given address family.
 
-	DatagramSocket(const SocketAddress& address, bool reuseAddress = false);
+	DatagramSocket(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
 		/// Creates a datagram socket and binds it
 		/// to the given address.
 		///
 		/// Depending on the address family, the socket
 		/// will be either an IPv4 or an IPv6 socket.
+		/// If ipV6Only is true, socket will be bound
+		/// to the IPv6 address only.
 
 	DatagramSocket(const Socket& socket);
 		/// Creates the DatagramSocket with the SocketImpl
@@ -99,6 +101,23 @@ public:
 		///
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
+		///
+		/// Calls to connect cannot() come before calls to bind().
+
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only = false);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
+		/// socket option.
+		///
+		/// Sets the IPV6_V6ONLY socket option in accordance with
+		/// the supplied ipV6Only value.
 		///
 		/// Calls to connect cannot() come before calls to bind().
 
