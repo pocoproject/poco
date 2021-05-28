@@ -38,10 +38,14 @@ enum JSONOptions
 		/// unicode characters will be escaped in the resulting
 		/// string.
 
-	JSON_WRAP_STRINGS = 4
+	JSON_WRAP_STRINGS = 4,
 		/// If specified, the object will preserve the items
 		/// insertion order. Otherwise, items will be sorted
 		/// by keys.
+	
+	JSON_LOWERCASE_HEX = 8
+		/// If specified, all encoding happens with lowercase
+		/// HEX characters instead of capitals
 };
 
 

@@ -461,7 +461,8 @@ bool uIntToStr(T value,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
-	char thSep = 0)
+	char thSep = 0,
+	bool lowercase = false)
 	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
@@ -483,7 +484,7 @@ bool uIntToStr(T value,
 	{
 		tmpVal = value;
 		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
 		if (thSep && (base == 10) && (++thCount == 3))
 		{
 			*ptr++ = thSep;

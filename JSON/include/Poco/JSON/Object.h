@@ -101,7 +101,13 @@ public:
 
 	bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.
+	
+	void setLowercaseHex(bool lowercaseHex);
+		/// Sets the flag for using lowercase hex numbers
 
+	bool getLowercaseHex() const;
+		/// Returns the flag for using lowercase hex numbers
+	
 	Iterator begin();
 		/// Returns begin iterator for values.
 
@@ -255,6 +261,7 @@ private:
 	{
 		int options = Poco::JSON_WRAP_STRINGS;
 		options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
+		options |= _lowercaseHex ? Poco::JSON_LOWERCASE_HEX : 0;
 
 		out << '{';
 
@@ -349,6 +356,7 @@ private:
 	//  because Object can be returned stringified from Dynamic::Var::toString(),
 	//  so it must know whether to escape unicode or not.
 	bool              _escapeUnicode;
+	bool              _lowercaseHex;
 	mutable StructPtr    _pStruct;
 	mutable OrdStructPtr _pOrdStruct;
 	mutable bool         _modified;
@@ -368,6 +376,17 @@ inline void Object::setEscapeUnicode(bool escape)
 inline bool Object::getEscapeUnicode() const
 {
 	return _escapeUnicode;
+}
+
+inline void Object::setLowercaseHex(bool lowercaseHex)
+{
+	_lowercaseHex = lowercaseHex;
+}
+
+
+inline bool Object::getLowercaseHex() const
+{
+	return _lowercaseHex;
 }
 
 

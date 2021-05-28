@@ -90,6 +90,12 @@ public:
 
 	bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.
+	
+	void setLowercaseHex(bool lowercaseHex);
+		/// Sets the flag for using lowercase hex numbers
+
+	bool getLowercaseHex() const;
+		/// Returns the flag for using lowercase hex numbers
 
 	ValueVec::const_iterator begin() const;
 		/// Returns the begin iterator for values.
@@ -206,6 +212,7 @@ private:
 	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
 	//  so it must know whether to escape unicode or not.
 	bool             _escapeUnicode;
+	bool             _lowercaseHex;
 };
 
 
@@ -222,6 +229,17 @@ inline void Array::setEscapeUnicode(bool escape)
 inline bool Array::getEscapeUnicode() const
 {
 	return _escapeUnicode;
+}
+
+inline void Array::setLowercaseHex(bool lowercaseHex)
+{
+	_lowercaseHex = lowercaseHex;
+}
+
+
+inline bool Array::getLowercaseHex() const
+{
+	return _lowercaseHex;
 }
 
 
