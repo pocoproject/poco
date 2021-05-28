@@ -18,6 +18,7 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include <memory>
 
 
 using Poco::Exception;
@@ -96,7 +97,26 @@ int SocketReactor::poll()
 		}
 		if (!readable) onTimeout();
 	}
+	onComplete();
 	return handled;
+}
+
+
+void SocketReactor::onComplete()
+{
+	std::unique_ptr<CompletionHandler> pCH;
+	while (!_complHandlers.empty())
+	{
+		// A completion handler may add new
+		// completion handler(s), so the mutex must
+		// be unlocked before the call execution.
+		{
+			ScopedLock lock(_mutex);
+			pCH.reset(new CompletionHandler(std::move(_complHandlers.front())));
+			_complHandlers.pop_front();
+		}
+		if (pCH) (*pCH)();
+	}
 }
 
 
@@ -168,6 +188,19 @@ void SocketReactor::setTimeout(const Poco::Timespan& timeout)
 const Poco::Timespan& SocketReactor::getTimeout() const
 {
 	return _timeout;
+}
+
+
+void SocketReactor::addCompletionHandler(const CompletionHandler& ch)
+{
+	addCompletionHandler(CompletionHandler(ch));
+}
+
+
+void SocketReactor::addCompletionHandler(CompletionHandler&& ch)
+{
+	ScopedLock lock(_mutex);
+	_complHandlers.push_back(std::move(ch));
 }
 
 

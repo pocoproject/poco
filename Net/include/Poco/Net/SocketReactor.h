@@ -27,6 +27,8 @@
 #include "Poco/AutoPtr.h"
 #include <map>
 #include <atomic>
+#include <functional>
+#include <deque>
 
 
 namespace Poco {
@@ -114,6 +116,8 @@ class Net_API SocketReactor: public Poco::Runnable
 	/// from event handlers.
 {
 public:
+	typedef std::function<void()> CompletionHandler;
+
 	SocketReactor();
 		/// Creates the SocketReactor.
 
@@ -122,6 +126,14 @@ public:
 
 	virtual ~SocketReactor();
 		/// Destroys the SocketReactor.
+
+	void addCompletionHandler(const CompletionHandler& ch);
+		/// Adds a completion handler to the list of handlers
+		/// to be called after the next poll() completion.
+
+	void addCompletionHandler(CompletionHandler&& ch);
+		/// Adds a completion handler to the list of handlers
+		/// to be called after the next poll() completion.
 
 	int poll();
 		/// Polls all registered sockets and calls their respective handlers.
@@ -205,6 +217,10 @@ protected:
 		/// Can be overridden by subclasses to perform additional
 		/// periodic tasks. The default implementation does nothing.
 
+	void onComplete();
+		/// Called after poll() completes processing.
+		/// All completion handlers are called and deleted.
+
 	void dispatch(const Socket& socket, SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers
 		/// registered for the given socket.
@@ -213,11 +229,12 @@ protected:
 		/// Dispatches the given notification to all observers.
 
 private:
-	typedef Poco::AutoPtr<SocketNotifier>     NotifierPtr;
-	typedef Poco::AutoPtr<SocketNotification> NotificationPtr;
-	typedef std::map<poco_socket_t, NotifierPtr>     EventHandlerMap;
-	typedef Poco::FastMutex                   MutexType;
-	typedef MutexType::ScopedLock             ScopedLock;
+	typedef Poco::AutoPtr<SocketNotifier>        NotifierPtr;
+	typedef Poco::AutoPtr<SocketNotification>    NotificationPtr;
+	typedef std::map<poco_socket_t, NotifierPtr> EventHandlerMap;
+	typedef Poco::FastMutex                      MutexType;
+	typedef MutexType::ScopedLock                ScopedLock;
+	typedef std::deque<CompletionHandler>        HandlerList;
 
 	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
@@ -238,6 +255,7 @@ private:
 	NotificationPtr   _pTimeoutNotification;
 	NotificationPtr   _pIdleNotification;
 	NotificationPtr   _pShutdownNotification;
+	HandlerList       _complHandlers;
 	MutexType         _mutex;
 	Poco::Thread*     _pThread;
 

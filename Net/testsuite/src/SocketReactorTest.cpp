@@ -22,7 +22,6 @@
 #include "Poco/Exception.h"
 #include <sstream>
 
-
 using Poco::Net::SocketReactor;
 using Poco::Net::SocketConnector;
 using Poco::Net::SocketAcceptor;
@@ -374,6 +373,41 @@ namespace
 	};
 
 	DataServiceHandler::Data DataServiceHandler::_data;
+
+	class CompletionHandlerTestObject
+	{
+	public:
+		CompletionHandlerTestObject() = delete;
+
+		CompletionHandlerTestObject(SocketReactor& reactor):
+			_reactor(reactor),
+			_counter(0)
+		{
+			auto handler = [this] () { ++_counter; };
+			_reactor.addCompletionHandler(handler);
+			_reactor.addCompletionHandler(std::move(handler));
+		}
+
+		void addRecursiveCompletionHandler(int count)
+		{
+			_count = count;
+			const std::function<void()> handler = [&handler, this] ()
+			{
+				if (++_counter < _count) _reactor.addCompletionHandler(handler);
+			};
+			_reactor.addCompletionHandler(handler);
+		}
+
+		int counter()
+		{
+			return _counter;
+		}
+
+	private:
+		SocketReactor& _reactor;
+		int _counter;
+		int _count;
+	};
 }
 
 
@@ -576,6 +610,19 @@ void SocketReactorTest::testDataCollection()
 }
 
 
+void SocketReactorTest::testCompletionHandler()
+{
+	SocketReactor reactor;
+	CompletionHandlerTestObject ch(reactor);
+	assertTrue(ch.counter() == 0);
+	reactor.poll();
+	assertTrue(ch.counter() == 2);
+	ch.addRecursiveCompletionHandler(5);
+	reactor.poll();
+	assertTrue(ch.counter() == 5);
+}
+
+
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -598,6 +645,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorFail);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorTimeout);
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
+	CppUnit_addTest(pSuite, SocketReactorTest, testCompletionHandler);
 
 	return pSuite;
 }

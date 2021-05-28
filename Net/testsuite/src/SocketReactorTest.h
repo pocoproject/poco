@@ -36,6 +36,7 @@ public:
 	void testSocketConnectorFail();
 	void testSocketConnectorTimeout();
 	void testDataCollection();
+	void testCompletionHandler();
 
 	void setUp();
 	void tearDown();

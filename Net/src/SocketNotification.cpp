@@ -29,7 +29,7 @@ SocketNotification::~SocketNotification()
 {
 }
 
-	
+
 void SocketNotification::setSocket(const Socket& socket)
 {
 	_socket = socket;
