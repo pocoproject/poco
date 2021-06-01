@@ -19,6 +19,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
 #include <memory>
+#include <limits>
 
 
 using Poco::Exception;
@@ -27,6 +28,10 @@ using Poco::ErrorHandler;
 
 namespace Poco {
 namespace Net {
+
+
+const Timestamp::TimeDiff SocketReactor::PERMANENT_COMPLETION_HANDLER =
+	std::numeric_limits<Timestamp::TimeDiff>::max();
 
 
 SocketReactor::SocketReactor():
@@ -102,21 +107,50 @@ int SocketReactor::poll()
 }
 
 
-void SocketReactor::onComplete()
+int SocketReactor::onComplete(bool handleOne)
 {
 	std::unique_ptr<CompletionHandler> pCH;
-	while (!_complHandlers.empty())
+	int handled = 0;
+	for (HandlerList::iterator it = _complHandlers.begin(); it != _complHandlers.end();)
 	{
 		// A completion handler may add new
 		// completion handler(s), so the mutex must
-		// be unlocked before the call execution.
+		// be unlocked before the invocation.
 		{
 			ScopedLock lock(_mutex);
-			pCH.reset(new CompletionHandler(std::move(_complHandlers.front())));
-			_complHandlers.pop_front();
+			bool alwaysRun = isPermanentCompletionHandler(*it);
+			bool isExpired = !alwaysRun && (Timestamp() > it->second);
+			if (isExpired)
+			{
+				pCH.reset(new CompletionHandler(std::move(it->first)));
+				it = _complHandlers.erase(it);
+			}
+			else if (alwaysRun)
+			{
+				pCH.reset(new CompletionHandler(it->first));
+				++it;
+			} else ++it;
 		}
-		if (pCH) (*pCH)();
+		if (pCH)
+		{
+			(*pCH)();
+			++handled;
+			if (handleOne) break;
+		}
 	}
+	return handled;
+}
+
+
+int SocketReactor::runOne()
+{
+	try
+	{
+		while (0 == onComplete(true));
+		return 1;
+	}
+	catch(...) {}
+	return 0;
 }
 
 
@@ -191,16 +225,66 @@ const Poco::Timespan& SocketReactor::getTimeout() const
 }
 
 
-void SocketReactor::addCompletionHandler(const CompletionHandler& ch)
+void SocketReactor::addCompletionHandler(const CompletionHandler& ch, Timestamp::TimeDiff ms)
 {
-	addCompletionHandler(CompletionHandler(ch));
+	addCompletionHandler(CompletionHandler(ch), ms);
 }
 
 
-void SocketReactor::addCompletionHandler(CompletionHandler&& ch)
+void SocketReactor::addCompletionHandler(CompletionHandler&& ch, Timestamp::TimeDiff ms, int pos)
+{
+	Poco::Timestamp expires = (ms != PERMANENT_COMPLETION_HANDLER) ? Timestamp() + ms*1000 : Timestamp(0);
+	if (pos == -1)
+	{
+		ScopedLock lock(_mutex);
+		_complHandlers.push_back({std::move(ch), expires});
+	}
+	else
+	{
+		if (pos < 0) throw Poco::InvalidArgumentException("SocketReactor::addCompletionHandler()");
+		ScopedLock lock(_mutex);
+		_complHandlers.insert(_complHandlers.begin() + pos, {std::move(ch), expires});
+	}
+}
+
+
+void SocketReactor::removeCompletionHandlers()
 {
 	ScopedLock lock(_mutex);
-	_complHandlers.push_back(std::move(ch));
+	_complHandlers.clear();
+}
+
+
+int SocketReactor::scheduledCompletionHandlers()
+{
+	int cnt = 0;
+	ScopedLock lock(_mutex);
+	HandlerList::iterator it = _complHandlers.begin();
+	for (; it != _complHandlers.end(); ++it)
+	{
+		if (it->second != Timestamp(0)) ++cnt;
+	}
+	return cnt;
+}
+
+
+int SocketReactor::removeScheduledCompletionHandlers(int count)
+{
+	auto isScheduled = [](const Timestamp& ts) { return ts != Timestamp(0); };
+	return removeCompletionHandlers(isScheduled, count);
+}
+
+
+int SocketReactor::removePermanentCompletionHandlers(int count)
+{
+	auto isPermanent = [](const Timestamp& ts) { return ts == Timestamp(0); };
+	return removeCompletionHandlers(isPermanent, count);
+}
+
+
+bool SocketReactor::isPermanentCompletionHandler(const CompletionHandlerEntry& entry) const
+{
+	return entry.second == Timestamp(0);
 }
 
 

@@ -19,6 +19,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 #include <sstream>
 
@@ -38,6 +39,7 @@ using Poco::Net::ShutdownNotification;
 using Poco::Observer;
 using Poco::IllegalStateException;
 using Poco::Thread;
+using Poco::Timestamp;
 
 
 namespace
@@ -379,13 +381,13 @@ namespace
 	public:
 		CompletionHandlerTestObject() = delete;
 
-		CompletionHandlerTestObject(SocketReactor& reactor):
+		CompletionHandlerTestObject(SocketReactor& reactor, int ms = SocketReactor::PERMANENT_COMPLETION_HANDLER):
 			_reactor(reactor),
 			_counter(0)
 		{
 			auto handler = [this] () { ++_counter; };
-			_reactor.addCompletionHandler(handler);
-			_reactor.addCompletionHandler(std::move(handler));
+			_reactor.addCompletionHandler(handler, ms);
+			_reactor.addCompletionHandler(std::move(handler), ms);
 		}
 
 		void addRecursiveCompletionHandler(int count)
@@ -620,6 +622,26 @@ void SocketReactorTest::testCompletionHandler()
 	ch.addRecursiveCompletionHandler(5);
 	reactor.poll();
 	assertTrue(ch.counter() == 5);
+	reactor.removePermanentCompletionHandlers();
+	reactor.poll();
+	assertTrue(ch.counter() == 5);
+}
+
+
+void SocketReactorTest::testTimedCompletionHandler()
+{
+	SocketReactor reactor;
+	CompletionHandlerTestObject ch(reactor, 500);
+	assertTrue(ch.counter() == 0);
+	reactor.poll();
+	assertTrue(ch.counter() == 0);
+	reactor.poll();
+
+	Thread::sleep(500);
+	reactor.poll();
+	assertTrue(ch.counter() == 2);
+	reactor.poll();
+	assertTrue(ch.counter() == 2);
 }
 
 
@@ -646,6 +668,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorTimeout);
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
 	CppUnit_addTest(pSuite, SocketReactorTest, testCompletionHandler);
+	CppUnit_addTest(pSuite, SocketReactorTest, testTimedCompletionHandler);
 
 	return pSuite;
 }

@@ -37,6 +37,7 @@ public:
 	void testSocketConnectorTimeout();
 	void testDataCollection();
 	void testCompletionHandler();
+	void testTimedCompletionHandler();
 
 	void setUp();
 	void tearDown();
@@ -140,7 +141,6 @@ private:
 
 		ServerType echoServer;
 		SocketType ds;
-		char buffer[256];
 		ds.connect(SocketAddress("127.0.0.1", echoServer.port()));
 		SocketReactor reactor;
 		IOHandler<SocketType> ih(ds, reactor);
