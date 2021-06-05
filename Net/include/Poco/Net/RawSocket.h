@@ -53,6 +53,20 @@ public:
 		/// a RawSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
+	RawSocket(Socket&& socket);
+		/// Creates the RawSocket with the SocketImpl
+		/// from another socket. The SocketImpl must be
+		/// a RawSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	RawSocket(const RawSocket& socket);
+		/// Creates the RawSocket with the SocketImpl
+		/// from another socket.
+
+	RawSocket(RawSocket&& socket);
+		/// Creates the RawSocket with the SocketImpl
+		/// from another socket.
+
 	~RawSocket();
 		/// Destroys the RawSocket.
 
@@ -61,7 +75,26 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
+
+	RawSocket& operator = (Socket&& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket.
+
+	RawSocket& operator = (const RawSocket& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
+
+	RawSocket& operator = (RawSocket&& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket.
 
 	void connect(const SocketAddress& address);
 		/// Restricts incoming and outgoing

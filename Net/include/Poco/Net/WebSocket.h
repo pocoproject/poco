@@ -176,6 +176,16 @@ public:
 		/// Creates a WebSocket from another Socket, which must be a WebSocket,
 		/// otherwise a Poco::InvalidArgumentException will be thrown.
 
+	WebSocket(Socket&& socket);
+		/// Creates a WebSocket from another Socket, which must be a WebSocket,
+		/// otherwise a Poco::InvalidArgumentException will be thrown.
+
+	WebSocket(const WebSocket& socket);
+		/// Creates a WebSocket from another WebSocket.
+
+	WebSocket(WebSocket&& socket);
+		/// Creates a WebSocket from another WebSocket.
+
 	virtual ~WebSocket();
 		/// Destroys the StreamSocket.
 
@@ -184,6 +194,18 @@ public:
 		///
 		/// The other socket must be a WebSocket, otherwise a Poco::InvalidArgumentException
 		/// will be thrown.
+
+	WebSocket& operator = (Socket&& socket);
+		/// Assignment operator.
+		///
+		/// The other socket must be a WebSocket, otherwise a Poco::InvalidArgumentException
+		/// will be thrown.
+
+	WebSocket& operator = (const WebSocket& socket);
+		/// Assignment operator.
+
+	WebSocket& operator = (WebSocket&& socket);
+		/// Move-assignment operator.
 
 	void shutdown();
 		/// Sends a Close control frame to the server end of

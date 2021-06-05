@@ -55,13 +55,26 @@ public:
 		///
 		/// Attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
-		
+
+	Socket(Socket&& socket);
+		/// Move constructor.
+		///
+		/// Attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
 	Socket& operator = (const Socket& socket);
 		/// Assignment operator.
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
+
+	Socket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
 		
 	virtual ~Socket();
 		/// Destroys the Socket and releases the
@@ -630,7 +643,7 @@ inline SocketAddress Socket::address() const
 	return _pImpl->address();
 }
 
-	
+
 inline SocketAddress Socket::peerAddress() const
 {
 	return _pImpl->peerAddress();

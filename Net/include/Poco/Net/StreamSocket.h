@@ -60,11 +60,39 @@ public:
 		/// a StreamSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
+	StreamSocket(Socket&& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket. The SocketImpl must be
+		/// a StreamSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	StreamSocket(const StreamSocket& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket.
+
+	StreamSocket(StreamSocket&& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket.
+
 	virtual ~StreamSocket();
 		/// Destroys the StreamSocket.
 
 	StreamSocket& operator = (const Socket& socket);
 		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
+
+	StreamSocket& operator = (const StreamSocket& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
+
+	StreamSocket& operator = (StreamSocket&& socket);
+		/// Move-assignment operator.
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and

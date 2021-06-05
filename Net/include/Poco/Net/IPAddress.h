@@ -79,6 +79,9 @@ public:
 	IPAddress(const IPAddress& addr);
 		/// Creates an IPAddress by copying another one.
 
+	IPAddress(IPAddress&& addr);
+		/// Creates an IPAddress by moving another one.
+
 	explicit IPAddress(Family family);
 		/// Creates a wildcard (zero) IPAddress for the
 		/// given address family.
@@ -129,6 +132,9 @@ public:
 
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
+
+	IPAddress& operator = (IPAddress&& addr);
+		/// Move-assigns an IPAddress.
 
 	bool isV4() const;
 	bool isV6() const;

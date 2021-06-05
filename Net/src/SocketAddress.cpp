@@ -150,6 +150,13 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 }
 
 
+SocketAddress::SocketAddress(SocketAddress&& socketAddress):
+	_pImpl(std::move(socketAddress._pImpl))
+{
+	socketAddress._pImpl = nullptr;
+}
+
+
 SocketAddress::SocketAddress(const struct sockaddr* sockAddr, poco_socklen_t length)
 {
 	if (length == sizeof(struct sockaddr_in) && sockAddr->sa_family == AF_INET)
@@ -199,6 +206,14 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 			newLocal(reinterpret_cast<const sockaddr_un*>(socketAddress.addr()));
 #endif
 	}
+	return *this;
+}
+
+
+SocketAddress& SocketAddress::operator = (SocketAddress&& socketAddress)
+{
+	_pImpl = std::move(socketAddress._pImpl);
+	socketAddress._pImpl = nullptr;
 	return *this;
 }
 

@@ -70,6 +70,12 @@ IPAddress::IPAddress(const IPAddress& addr)
 }
 
 
+IPAddress::IPAddress(IPAddress&& addr): _pImpl(std::move(addr._pImpl))
+{
+	addr._pImpl = nullptr;
+}
+
+
 IPAddress::IPAddress(Family family)
 {
 	if (family == IPv4)
@@ -234,6 +240,14 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 		else 
 			throw Poco::InvalidArgumentException("Invalid or unsupported address family");
 	}
+	return *this;
+}
+
+
+IPAddress& IPAddress::operator = (IPAddress&& addr)
+{
+	_pImpl = std::move(addr._pImpl);
+	addr._pImpl = nullptr;
 	return *this;
 }
 

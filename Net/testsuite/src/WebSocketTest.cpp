@@ -121,7 +121,9 @@ void WebSocketTest::testWebSocket()
 	HTTPClientSession cs("127.0.0.1", ss.address().port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	HTTPResponse response;
-	WebSocket ws(cs, request, response);
+	WebSocket ws0 = WebSocket(cs, request, response);
+	WebSocket ws(std::move(ws0));
+	assertTrue(ws0.impl() == nullptr);
 
 	std::string payload("x");
 	ws.sendFrame(payload.data(), (int) payload.size());

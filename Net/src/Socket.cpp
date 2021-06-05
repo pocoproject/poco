@@ -51,6 +51,15 @@ Socket::Socket(const Socket& socket):
 }
 
 
+Socket::Socket(Socket&& socket):
+	_pImpl(socket._pImpl)
+{
+	poco_check_ptr (_pImpl);
+
+	socket._pImpl = nullptr;
+}
+
+
 Socket& Socket::operator = (const Socket& socket)
 {
 	if (&socket != this)
@@ -63,9 +72,21 @@ Socket& Socket::operator = (const Socket& socket)
 }
 
 
+Socket& Socket::operator = (Socket&& socket)
+{
+	if (&socket != this)
+	{
+		if (_pImpl) _pImpl->release();
+		_pImpl = socket._pImpl;
+		socket._pImpl = nullptr;
+	}
+	return *this;
+}
+
+
 Socket::~Socket()
 {
-	_pImpl->release();
+	if (_pImpl) _pImpl->release();
 }
 
 

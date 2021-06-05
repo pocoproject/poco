@@ -63,6 +63,20 @@ public:
 		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
+	DatagramSocket(Socket&& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket. The SocketImpl must be
+		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	DatagramSocket(const DatagramSocket& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket.
+
+	DatagramSocket(DatagramSocket&& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket.
+
 	~DatagramSocket();
 		/// Destroys the DatagramSocket.
 
@@ -72,6 +86,27 @@ public:
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
+
+	DatagramSocket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+	DatagramSocket& operator = (const DatagramSocket& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
+
+	DatagramSocket& operator = (DatagramSocket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
 
 	void connect(const SocketAddress& address);
 		/// Restricts incoming and outgoing
@@ -243,7 +278,7 @@ protected:
 		/// Creates the Socket and attaches the given SocketImpl.
 		/// The socket takes ownership of the SocketImpl.
 		///
-		/// The SocketImpl must be a StreamSocketImpl, otherwise
+		/// The SocketImpl must be a DatagramSocketImpl, otherwise
 		/// an InvalidArgumentException will be thrown.
 };
 

@@ -50,6 +50,23 @@ DatagramSocket::DatagramSocket(const Socket& socket): Socket(socket)
 }
 
 
+DatagramSocket::DatagramSocket(Socket&& socket): Socket(std::move(socket))
+{
+	if (!dynamic_cast<DatagramSocketImpl*>(impl()))
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+}
+
+
+DatagramSocket::DatagramSocket(const DatagramSocket& socket): Socket(socket)
+{
+}
+
+
+DatagramSocket::DatagramSocket(DatagramSocket&& socket): Socket(std::move(socket))
+{
+}
+
+
 DatagramSocket::DatagramSocket(SocketImpl* pImpl): Socket(pImpl)
 {
 	if (!dynamic_cast<DatagramSocketImpl*>(impl()))
@@ -68,6 +85,30 @@ DatagramSocket& DatagramSocket::operator = (const Socket& socket)
 		Socket::operator = (socket);
 	else
 		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
+}
+
+
+DatagramSocket& DatagramSocket::operator = (Socket&& socket)
+{
+	if (dynamic_cast<DatagramSocketImpl*>(socket.impl()))
+		Socket::operator = (std::move(socket));
+	else
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
+}
+
+
+DatagramSocket& DatagramSocket::operator = (const DatagramSocket& socket)
+{
+	Socket::operator = (socket);
+	return *this;
+}
+
+
+DatagramSocket& DatagramSocket::operator = (DatagramSocket&& socket)
+{
+	Socket::operator = (std::move(socket));
 	return *this;
 }
 

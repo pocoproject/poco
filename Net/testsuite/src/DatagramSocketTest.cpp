@@ -62,6 +62,38 @@ void DatagramSocketTest::testEcho()
 }
 
 
+void DatagramSocketTest::testMoveDatagramSocket()
+{
+	UDPEchoServer echoServer;
+	DatagramSocket ss0 = DatagramSocket();
+	char buffer[256];
+	ss0.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	DatagramSocket ss(std::move(ss0));
+	assertTrue (ss0.impl() == nullptr);
+	int n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+
+	std::memset(buffer, 0, sizeof(buffer));
+	ss0 = ss;
+	assertTrue (ss0.impl());
+	assertTrue (ss.impl());
+	assertTrue (ss0.impl() == ss.impl());
+	ss = std::move(ss0);
+	assertTrue (ss0.impl() == nullptr);
+	assertTrue (ss.impl());
+	n = ss.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	ss.close();
+	ss0.close();
+}
+
+
 void DatagramSocketTest::testEchoBuffer()
 {
 	UDPEchoServer echoServer;
@@ -607,6 +639,7 @@ CppUnit::Test* DatagramSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DatagramSocketTest");
 
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEcho);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testMoveDatagramSocket);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testEchoBuffer);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testSendToReceiveFrom);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testUnbound);
