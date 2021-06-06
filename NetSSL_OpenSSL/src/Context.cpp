@@ -174,6 +174,7 @@ void Context::init(const Params& params)
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+		SSL_CTX_set_ex_data(_pSSLContext, SSLManager::instance().contextIndex(), this);
 
 		initDH(params.dhUse2048Bits, params.dhParamsFile);
 		initECDH(params.ecdhCurve);
@@ -460,6 +461,12 @@ void Context::preferServerCiphers()
 #if defined(SSL_OP_CIPHER_SERVER_PREFERENCE)
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_CIPHER_SERVER_PREFERENCE);
 #endif
+}
+
+
+void Context::setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificateHandler)
+{
+	_pInvalidCertificateHandler = pInvalidCertificateHandler;
 }
 
 

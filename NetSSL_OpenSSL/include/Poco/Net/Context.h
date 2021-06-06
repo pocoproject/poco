@@ -20,10 +20,12 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SocketDefs.h"
+#include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
 #include <cstdlib>
@@ -187,6 +189,8 @@ public:
 			///   on the group names defined by OpenSSL. Defaults to
 			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
 	};
+
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Context(Usage usage, const Params& params);
 		/// Creates a Context using the given parameters.
@@ -397,6 +401,16 @@ public:
 		/// preferences. When called, the SSL/TLS server will choose following its own
 		/// preferences.
 
+	void setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificageHandler);
+		/// Sets a Context-specific InvalidCertificateHandler.
+		///
+		/// If specified, this InvalidCertificateHandler will be used instead of the
+		/// one globally set in the SSLManager.
+
+	InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
+		/// Returns the InvalidCertificateHandler set for this Context,
+		/// or a null pointer if none has been set.
+
 private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
@@ -415,6 +429,7 @@ private:
 	VerificationMode _mode;
 	SSL_CTX* _pSSLContext;
 	bool _extendedCertificateVerification;
+	InvalidCertificateHandlerPtr _pInvalidCertificateHandler;
 };
 
 
@@ -453,6 +468,12 @@ inline SSL_CTX* Context::sslContext() const
 inline bool Context::extendedCertificateVerificationEnabled() const
 {
 	return _extendedCertificateVerification;
+}
+
+
+inline Context::InvalidCertificateHandlerPtr Context::getInvalidCertificateHandler() const
+{
+	return _pInvalidCertificateHandler;
 }
 
 
