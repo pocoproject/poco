@@ -243,8 +243,12 @@ NetworkInterfaceImpl::NetworkInterfaceImpl(const std::string& name,
 void NetworkInterfaceImpl::setPhyParams()
 {
 #if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_VXWORKS)
-	struct ifreq ifr;
-	std::strncpy(ifr.ifr_name, _name.c_str(), IFNAMSIZ);
+	struct ifreq ifr{};
+	std::size_t szFrom = _name.size();
+	std::size_t szTo = IFNAMSIZ - 1;
+	std::size_t sz = szFrom <= szTo ? szFrom : szTo;
+	std::strncpy(ifr.ifr_name, _name.c_str(), sz);
+
 	DatagramSocket ds(SocketAddress::IPv4);
 
 	ds.impl()->ioctl(SIOCGIFFLAGS, &ifr);
