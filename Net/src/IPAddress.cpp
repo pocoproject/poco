@@ -72,7 +72,6 @@ IPAddress::IPAddress(const IPAddress& addr)
 
 IPAddress::IPAddress(IPAddress&& addr): _pImpl(std::move(addr._pImpl))
 {
-	addr._pImpl = nullptr;
 }
 
 
@@ -247,7 +246,6 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 IPAddress& IPAddress::operator = (IPAddress&& addr)
 {
 	_pImpl = std::move(addr._pImpl);
-	addr._pImpl = nullptr;
 	return *this;
 }
 

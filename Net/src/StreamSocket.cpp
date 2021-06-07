@@ -51,19 +51,7 @@ StreamSocket::StreamSocket(const Socket& socket): Socket(socket)
 }
 
 
-StreamSocket::StreamSocket(Socket&& socket): Socket(std::move(socket))
-{
-	if (!dynamic_cast<StreamSocketImpl*>(impl()))
-		throw InvalidArgumentException("Cannot assign incompatible socket");
-}
-
-
 StreamSocket::StreamSocket(const StreamSocket& socket): Socket(socket)
-{
-}
-
-
-StreamSocket::StreamSocket(StreamSocket&& socket): Socket(std::move(socket))
 {
 }
 
@@ -96,6 +84,25 @@ StreamSocket& StreamSocket::operator = (const StreamSocket& socket)
 	return *this;
 }
 
+#if POCO_NEW_STATE_ON_MOVE
+
+StreamSocket::StreamSocket(Socket&& socket): Socket(std::move(socket))
+{
+	if (!dynamic_cast<StreamSocketImpl*>(impl()))
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+}
+
+
+StreamSocket::StreamSocket(StreamSocket&& socket): Socket(std::move(socket))
+{
+}
+
+StreamSocket& StreamSocket::operator = (Socket&& socket)
+{
+	Socket::operator = (std::move(socket));
+	return *this;
+}
+
 
 StreamSocket& StreamSocket::operator = (StreamSocket&& socket)
 {
@@ -103,6 +110,7 @@ StreamSocket& StreamSocket::operator = (StreamSocket&& socket)
 	return *this;
 }
 
+#endif // POCO_NEW_STATE_ON_MOVE
 
 void StreamSocket::connect(const SocketAddress& address)
 {

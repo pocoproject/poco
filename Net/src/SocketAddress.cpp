@@ -153,7 +153,6 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 SocketAddress::SocketAddress(SocketAddress&& socketAddress):
 	_pImpl(std::move(socketAddress._pImpl))
 {
-	socketAddress._pImpl = nullptr;
 }
 
 
@@ -213,7 +212,6 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 SocketAddress& SocketAddress::operator = (SocketAddress&& socketAddress)
 {
 	_pImpl = std::move(socketAddress._pImpl);
-	socketAddress._pImpl = nullptr;
 	return *this;
 }
 

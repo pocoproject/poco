@@ -156,6 +156,16 @@
 // #define POCO_NET_NO_UNIX_SOCKET
 
 
+// Define to nonzero to enable move
+// semantics on classes where it
+// introduces a new state.
+// For explanation, see
+// https://github.com/pocoproject/poco/wiki/Move-Semantics-in-POCO
+#ifndef POCO_NEW_STATE_ON_MOVE
+#define POCO_NEW_STATE_ON_MOVE 1
+#endif
+
+
 // Windows CE has no locale support
 #if defined(_WIN32_WCE)
 	#define POCO_NO_LOCALE

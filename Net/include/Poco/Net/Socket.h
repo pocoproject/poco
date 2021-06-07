@@ -56,12 +56,6 @@ public:
 		/// Attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
-	Socket(Socket&& socket);
-		/// Move constructor.
-		///
-		/// Attaches the SocketImpl from the other socket and
-		/// zeroes the other socket's SocketImpl.
-
 	Socket& operator = (const Socket& socket);
 		/// Assignment operator.
 		///
@@ -69,13 +63,23 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
+#if POCO_NEW_STATE_ON_MOVE
+
+	Socket(Socket&& socket);
+		/// Move constructor.
+		///
+		/// Attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
 	Socket& operator = (Socket&& socket);
 		/// Assignment move operator.
 		///
-		/// Releases the socket's SocketImpl and
-		/// attaches the SocketImpl from the other socket and
-		/// zeroes the other socket's SocketImpl.
-		
+		/// Releases the socket's SocketImpl,
+		/// attaches the SocketImpl from the other socket,
+		/// and zeroes the other socket's SocketImpl.
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
 	virtual ~Socket();
 		/// Destroys the Socket and releases the
 		/// SocketImpl.
@@ -99,7 +103,10 @@ public:
 
 	bool operator >= (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
-		
+
+	bool isNull() const;
+		/// Returns true if pointer to implementation is null.
+
 	void close();
 		/// Closes the socket.
 
@@ -416,212 +423,286 @@ inline bool Socket::operator >= (const Socket& socket) const
 }
 
 
+inline bool Socket::isNull() const
+{
+	return _pImpl == nullptr;
+}
+
+
 inline void Socket::close()
 {
-	_pImpl->close();
+	if (_pImpl) _pImpl->close();
 }
 
 
 inline bool Socket::poll(const Poco::Timespan& timeout, int mode) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->poll(timeout, mode);
 }
 
 
 inline int Socket::available() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->available();
 }
 
 
 inline void Socket::setSendBufferSize(int size)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setSendBufferSize(size);
 }
 
 	
 inline int Socket::getSendBufferSize() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getSendBufferSize();
 }
 
 
 inline void Socket::setReceiveBufferSize(int size)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setReceiveBufferSize(size);
 }
 
 	
 inline int Socket::getReceiveBufferSize() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getReceiveBufferSize();
 }
 
 
 inline void Socket::setSendTimeout(const Poco::Timespan& timeout)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setSendTimeout(timeout);
 }
 
 
 inline Poco::Timespan Socket::getSendTimeout() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getSendTimeout();
 }
 
 
 inline void Socket::setReceiveTimeout(const Poco::Timespan& timeout)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setReceiveTimeout(timeout);
 }
 
 
 inline Poco::Timespan Socket::getReceiveTimeout() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getReceiveTimeout();
 }
 
 
 inline void Socket::setOption(int level, int option, int value)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::setOption(int level, int option, unsigned value)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::setOption(int level, int option, unsigned char value)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::setOption(int level, int option, const Poco::Timespan& value)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setOption(level, option, value);
 }
 
 	
 inline void Socket::setOption(int level, int option, const IPAddress& value)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, int& value) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, unsigned& value) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, unsigned char& value) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, Poco::Timespan& value) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::getOption(int level, int option, IPAddress& value) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->getOption(level, option, value);
 }
 
 
 inline void Socket::setLinger(bool on, int seconds)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setLinger(on, seconds);
 }
 
 	
 inline void Socket::getLinger(bool& on, int& seconds) const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->getLinger(on, seconds);
 }
 
 
 inline void Socket::setNoDelay(bool flag)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setNoDelay(flag);
 }
 
 	
 inline bool Socket::getNoDelay() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getNoDelay();
 }
 
 
 inline void Socket::setKeepAlive(bool flag)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setKeepAlive(flag);
 }
 
 	
 inline bool Socket::getKeepAlive() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getKeepAlive();
 }
 
 
 inline void Socket::setReuseAddress(bool flag)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setReuseAddress(flag);
 }
 
 
 inline bool Socket::getReuseAddress() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getReuseAddress();
 }
 
 
 inline void Socket::setReusePort(bool flag)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setReusePort(flag);
 }
 
 
 inline bool Socket::getReusePort() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getReusePort();
 }
 
 	
 inline void Socket::setOOBInline(bool flag)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setOOBInline(flag);
 }
 
 
 inline bool Socket::getOOBInline() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getOOBInline();
 }
 
 
 inline void Socket::setBlocking(bool flag)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->setBlocking(flag);
 }
 
 
 inline bool Socket::getBlocking() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->getBlocking();
 }
 
@@ -634,24 +715,32 @@ inline SocketImpl* Socket::impl() const
 
 inline poco_socket_t Socket::sockfd() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->sockfd();
 }
 
 
 inline SocketAddress Socket::address() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->address();
 }
 
 
 inline SocketAddress Socket::peerAddress() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->peerAddress();
 }
 
 
 inline bool Socket::secure() const
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	return _pImpl->secure();
 }
 
@@ -674,6 +763,8 @@ inline bool Socket::supportsIPv6()
 
 inline void Socket::init(int af)
 {
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
 	_pImpl->init(af);
 }
 

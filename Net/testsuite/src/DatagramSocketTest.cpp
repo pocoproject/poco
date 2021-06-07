@@ -69,7 +69,11 @@ void DatagramSocketTest::testMoveDatagramSocket()
 	char buffer[256];
 	ss0.connect(SocketAddress("127.0.0.1", echoServer.port()));
 	DatagramSocket ss(std::move(ss0));
-	assertTrue (ss0.impl() == nullptr);
+#if POCO_NEW_STATE_ON_MOVE
+	assertTrue (ss0.isNull());
+#else
+	assertFalse (ss0.isNull());
+#endif
 	int n = ss.sendBytes("hello", 5);
 	assertTrue (n == 5);
 	n = ss.receiveBytes(buffer, sizeof(buffer));
@@ -82,7 +86,11 @@ void DatagramSocketTest::testMoveDatagramSocket()
 	assertTrue (ss.impl());
 	assertTrue (ss0.impl() == ss.impl());
 	ss = std::move(ss0);
-	assertTrue (ss0.impl() == nullptr);
+#if POCO_NEW_STATE_ON_MOVE
+	assertTrue (ss0.isNull());
+#else
+	assertFalse (ss0.isNull());
+#endif
 	assertTrue (ss.impl());
 	n = ss.sendBytes("hello", 5);
 	assertTrue (n == 5);

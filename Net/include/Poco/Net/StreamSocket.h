@@ -60,17 +60,7 @@ public:
 		/// a StreamSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	StreamSocket(Socket&& socket);
-		/// Creates the StreamSocket with the SocketImpl
-		/// from another socket. The SocketImpl must be
-		/// a StreamSocketImpl, otherwise an InvalidArgumentException
-		/// will be thrown.
-
 	StreamSocket(const StreamSocket& socket);
-		/// Creates the StreamSocket with the SocketImpl
-		/// from another socket.
-
-	StreamSocket(StreamSocket&& socket);
 		/// Creates the StreamSocket with the SocketImpl
 		/// from another socket.
 
@@ -91,12 +81,35 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
-	StreamSocket& operator = (StreamSocket&& socket);
-		/// Move-assignment operator.
+#if POCO_NEW_STATE_ON_MOVE
+
+	StreamSocket(Socket&& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.The SocketImpl must be
+		/// a StreamSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	StreamSocket(StreamSocket&& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.
+
+	StreamSocket& operator = (Socket&& socket);
+		/// Assignment move operator.
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.
+		/// zeroes the other socket's SocketImpl.
+
+	StreamSocket& operator = (StreamSocket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+#endif //POCO_NEW_STATE_ON_MOVE
 
 	void connect(const SocketAddress& address);
 		/// Initializes the socket and establishes a connection to

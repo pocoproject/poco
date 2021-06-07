@@ -63,17 +63,7 @@ public:
 		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	DatagramSocket(Socket&& socket);
-		/// Creates the DatagramSocket with the SocketImpl
-		/// from another socket. The SocketImpl must be
-		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
-		/// will be thrown.
-
 	DatagramSocket(const DatagramSocket& socket);
-		/// Creates the DatagramSocket with the SocketImpl
-		/// from another socket.
-
-	DatagramSocket(DatagramSocket&& socket);
 		/// Creates the DatagramSocket with the SocketImpl
 		/// from another socket.
 
@@ -87,6 +77,20 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
+#if POCO_NEW_STATE_ON_MOVE
+
+	DatagramSocket(Socket&& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.The SocketImpl must be
+		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	DatagramSocket(DatagramSocket&& socket);
+		/// Creates the DatagramSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.
+
 	DatagramSocket& operator = (Socket&& socket);
 		/// Assignment move operator.
 		///
@@ -94,19 +98,21 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// zeroes the other socket's SocketImpl.
 
-	DatagramSocket& operator = (const DatagramSocket& socket);
-		/// Assignment operator.
-		///
-		/// Releases the socket's SocketImpl and
-		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.
-
 	DatagramSocket& operator = (DatagramSocket&& socket);
 		/// Assignment move operator.
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// zeroes the other socket's SocketImpl.
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+	DatagramSocket& operator = (const DatagramSocket& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
 
 	void connect(const SocketAddress& address);
 		/// Restricts incoming and outgoing

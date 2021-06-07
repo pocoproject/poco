@@ -176,26 +176,13 @@ public:
 		/// Creates a WebSocket from another Socket, which must be a WebSocket,
 		/// otherwise a Poco::InvalidArgumentException will be thrown.
 
-	WebSocket(Socket&& socket);
-		/// Creates a WebSocket from another Socket, which must be a WebSocket,
-		/// otherwise a Poco::InvalidArgumentException will be thrown.
-
 	WebSocket(const WebSocket& socket);
 		/// Creates a WebSocket from another WebSocket.
 
-	WebSocket(WebSocket&& socket);
-		/// Creates a WebSocket from another WebSocket.
-
 	virtual ~WebSocket();
-		/// Destroys the StreamSocket.
+		/// Destroys the WebSocket.
 
 	WebSocket& operator = (const Socket& socket);
-		/// Assignment operator.
-		///
-		/// The other socket must be a WebSocket, otherwise a Poco::InvalidArgumentException
-		/// will be thrown.
-
-	WebSocket& operator = (Socket&& socket);
 		/// Assignment operator.
 		///
 		/// The other socket must be a WebSocket, otherwise a Poco::InvalidArgumentException
@@ -204,8 +191,35 @@ public:
 	WebSocket& operator = (const WebSocket& socket);
 		/// Assignment operator.
 
+#if POCO_NEW_STATE_ON_MOVE
+
+	WebSocket(Socket&& socket);
+		/// Creates the WebSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.The SocketImpl must be
+		/// a WebSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	WebSocket(WebSocket&& socket);
+		/// Creates the WebSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.
+
+	WebSocket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
 	WebSocket& operator = (WebSocket&& socket);
-		/// Move-assignment operator.
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+#endif //POCO_NEW_STATE_ON_MOVE
 
 	void shutdown();
 		/// Sends a Close control frame to the server end of
