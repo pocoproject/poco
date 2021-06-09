@@ -25,11 +25,11 @@ HostEntry::HostEntry()
 {
 }
 
-	
+
 HostEntry::HostEntry(struct hostent* entry)
 {
 	poco_check_ptr (entry);
-	
+
 	_name = entry->h_name;	
 	char** alias = entry->h_aliases;
 	if (alias)
@@ -40,6 +40,8 @@ HostEntry::HostEntry(struct hostent* entry)
 			++alias;
 		}
 	}
+	removeDuplicates(_aliases);
+
 	char** address = entry->h_addr_list;
 	if (address)
 	{
@@ -49,6 +51,7 @@ HostEntry::HostEntry(struct hostent* entry)
 			++address;
 		}
 	}
+	removeDuplicates(_addresses);
 }
 
 
@@ -80,6 +83,7 @@ HostEntry::HostEntry(struct addrinfo* ainfo)
 			}
 		}
 	}
+	removeDuplicates(_addresses);
 }
 
 
