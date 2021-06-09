@@ -88,6 +88,17 @@ void DNSTest::testHostByAddress()
 
 void DNSTest::testResolve()
 {
+	HostEntry he1 = DNS::hostByName("localhost");
+
+	auto a = he1.addresses();
+	sort(a.begin(), a.end());
+	auto itA = std::unique(a.begin(), a.end());
+	assertTrue (itA == a.end());
+
+	auto b = he1.aliases();
+	sort(b.begin(), b.end());
+	auto itB = std::unique(b.begin(), b.end());
+	assertTrue (itB == b.end());
 }
 
 
