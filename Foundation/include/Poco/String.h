@@ -58,7 +58,7 @@ S trimRight(const S& str)
 	/// Returns a copy of str with all trailing
 	/// whitespace removed.
 {
-	int pos = int(str.size()) - 1;
+	std::ptrdiff_t pos = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	return S(str, 0, pos + 1);
@@ -69,7 +69,7 @@ template <class S>
 S& trimRightInPlace(S& str)
 	/// Removes all trailing whitespace in str.
 {
-	int pos = int(str.size()) - 1;
+	std::ptrdiff_t pos = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (pos >= 0 && Ascii::isSpace(str[pos])) --pos;
 	str.resize(pos + 1);
@@ -83,8 +83,8 @@ S trim(const S& str)
 	/// Returns a copy of str with all leading and
 	/// trailing whitespace removed.
 {
-	int first = 0;
-	int last  = int(str.size()) - 1;
+	std::ptrdiff_t first = 0;
+	std::ptrdiff_t last  = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;
@@ -97,8 +97,8 @@ template <class S>
 S& trimInPlace(S& str)
 	/// Removes all leading and trailing whitespace in str.
 {
-	int first = 0;
-	int last  = int(str.size()) - 1;
+	std::ptrdiff_t first = 0;
+	std::ptrdiff_t last  = static_cast<std::ptrdiff_t>(str.size()) - 1;
 
 	while (first <= last && Ascii::isSpace(str[first])) ++first;
 	while (last >= first && Ascii::isSpace(str[last])) --last;

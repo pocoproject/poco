@@ -89,8 +89,12 @@ void StringTest::testTrimLeft()
 		std::string s = " abc ";
 		assertTrue (trimLeft(s) == "abc ");
 	{
-	std::string s = "  ab c ";
-	assertTrue (trimLeft(s) == "ab c ");
+		std::string s = "  ab c ";
+		assertTrue (trimLeft(s) == "ab c ");
+	}
+	{
+		std::string s;
+		assertTrue (trimLeft(s) == "");
 	}
 }
 
@@ -109,6 +113,10 @@ void StringTest::testTrimLeftInPlace()
 		std::string s = "  ab c ";
 		assertTrue (trimLeftInPlace(s) == "ab c ");
 	}
+	{
+		std::string s;
+		assertTrue (trimLeftInPlace(s) == "");
+	}
 }
 
 
@@ -125,6 +133,10 @@ void StringTest::testTrimRight()
 	{
 		std::string s = "  ab c  ";
 		assertTrue (trimRight(s) == "  ab c");
+	}
+	{
+		std::string s;
+		assertTrue (trimRight(s) == "");
 	}
 }
 
@@ -143,6 +155,10 @@ void StringTest::testTrimRightInPlace()
 		std::string s = "  ab c  ";
 		assertTrue (trimRightInPlace(s) == "  ab c");
 	}
+	{
+		std::string s;
+		assertTrue (trimRightInPlace(s) == "");
+	}
 }
 
 
@@ -160,6 +176,10 @@ void StringTest::testTrim()
 		std::string s = "  ab c  ";
 		assertTrue (trim(s) == "ab c");
 	}
+	{
+		std::string s;
+		assertTrue (trim(s) == "");
+	}
 }
 
 
@@ -176,6 +196,10 @@ void StringTest::testTrimInPlace()
 	{
 		std::string s = "  ab c  ";
 		assertTrue (trimInPlace(s) == "ab c");
+	}
+	{
+		std::string s;
+		assertTrue (trimInPlace(s) == "");
 	}
 }
 
