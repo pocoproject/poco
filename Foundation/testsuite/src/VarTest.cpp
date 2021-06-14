@@ -2623,9 +2623,9 @@ void VarTest::testJSONDeserializeString()
 	a = Var::parse(tst);
 	assertTrue (a.toString() == "{ \"a\": \"1\", \"b\": \"2\" }");
 
-	tst = "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"\\/dev\\/null\" }";
+	tst = "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"\\/dev\\/null\", \"zero\": null }";
 	a = Var::parse(tst);
-	assertTrue(a.toString() == "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"/dev/null\" }");
+	assertTrue(a.toString() == "{ \"message\": \"escape\\b\\f\\n\\r\\t\", \"path\": \"/dev/null\", \"zero\": null }");
 }
 
 
