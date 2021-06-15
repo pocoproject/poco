@@ -743,6 +743,7 @@ void URITest::testOther()
 	assertTrue (uri.getQuery() == "q=hello%world");
 	assertTrue (uri.getRawQuery() == "q=hello%25world");
 	assertTrue (uri.getFragment() == "frag ment");
+	assertTrue (uri.getRawFragment() == "frag%20ment");
 	assertTrue (uri.toString() == "http://google.com/search?q=hello%25world#frag%20ment");
 	assertTrue (uri.getPathEtc() == "/search?q=hello%25world#frag%20ment");
 
@@ -783,8 +784,20 @@ void URITest::testOther()
 	assertTrue (uri.getQuery() == "q=hello+world");
 	assertTrue (uri.getRawQuery() == "q=hello+world");
 	assertTrue (uri.getFragment() == "frag ment");
+	assertTrue (uri.getRawFragment() == "frag%20ment");
 	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#frag%20ment");
 	assertTrue (uri.getPathEtc() == "/search?q=hello+world#frag%20ment");
+
+	uri.setFragment("foo/bar");
+	assertTrue (uri.getFragment() == "foo/bar");
+	assertTrue (uri.getRawFragment() == "foo/bar");
+	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#foo/bar");
+	assertTrue (uri.getPathEtc() == "/search?q=hello+world#foo/bar");
+	uri.setRawFragment("foo%2Fbar");
+	assertTrue (uri.getFragment() == "foo/bar");
+	assertTrue (uri.getRawFragment() == "foo%2Fbar");
+	assertTrue (uri.toString() == "http://google.com/search?q=hello+world#foo%2Fbar");
+	assertTrue (uri.getPathEtc() == "/search?q=hello+world#foo%2Fbar");
 }
 
 
