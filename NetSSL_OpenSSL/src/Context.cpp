@@ -155,13 +155,15 @@ void Context::init(const Params& params)
 			}
 		}
 
-		if (!params.certificateFile.empty())
+		std::string certificateFile = params.certificateFile;
+		if (certificateFile.empty()) certificateFile = params.privateKeyFile;
+		if (!certificateFile.empty())
 		{
-			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(params.certificateFile).c_str());
+			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
 			if (errCode != 1)
 			{
 				std::string errMsg = Utility::getLastError();
-				throw SSLContextException(std::string("Error loading certificate from file ") + params.certificateFile, errMsg);
+				throw SSLContextException(std::string("Error loading certificate from file ") + certificateFile, errMsg);
 			}
 		}
 

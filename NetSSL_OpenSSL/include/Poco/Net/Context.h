@@ -137,6 +137,7 @@ public:
 
 		std::string certificateFile;
 			/// Path to the certificate file (in PEM format).
+			///
 			/// If the private key and the certificate are stored in the same file, this
 			/// can be empty if privateKeyFile is given.
 
