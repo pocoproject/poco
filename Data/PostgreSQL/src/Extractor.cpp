@@ -316,16 +316,17 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 	//
 
 	const char * pBLOB = reinterpret_cast<const char*>(outputParameter.pData());
-	std::size_t BLOBSize  = outputParameter.size();
+	std::size_t blobSize = outputParameter.size();
+	val = Poco::Data::BLOB(); // don't share contents with _default
 
 	if	(	'\\' == pBLOB[0]
 		 && 'x'  == pBLOB[1]	// preamble to BYTEA data format in text form is \x
 		)
 	{
-		BLOBSize -= 2;  // lose the preamble
-		BLOBSize /= 2;   // each byte is encoded as two text characters
+		blobSize -= 2;  // lose the preamble
+		blobSize /= 2;   // each byte is encoded as two text characters
 
-		for (int i = 0; i < BLOBSize * 2; i += 2)
+		for (int i = 0; i < blobSize * 2; i += 2)
 		{
 			std::string buffer(&pBLOB[i + 2], 2);
 			unsigned int binaryBuffer = 0;
