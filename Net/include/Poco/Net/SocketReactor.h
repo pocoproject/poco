@@ -156,16 +156,21 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all scheduled handlers.
 
+	int permanentCompletionHandlers();
+		/// Returns the number of scheduled completion handlers.
+
 	int removePermanentCompletionHandlers(int count = -1);
 		/// Removes the count permanent completion handlers
 		/// from the front of the schedule queue.
 		/// Default is removal of all scheduled handlers.
 
-	int poll();
+	int poll(int* pHandled = 0);
 		/// Polls all registered sockets and calls their respective handlers.
 		/// If there are no handlers, an idle notification is dispatched.
 		/// If there are no readable sockets, a timeout notification is dispatched.
-		/// Returns the total number of read/write/error handlers called.
+		/// If pHandled is not null, after the call it contains the total number
+		/// of read/write/error socket handlers called.
+		/// Returns the number of completion handlers invoked.
 
 	int runOne();
 		/// Runs one handler, scheduled or permanent.
@@ -269,30 +274,35 @@ private:
 	typedef Poco::AutoPtr<SocketNotifier>                 NotifierPtr;
 	typedef Poco::AutoPtr<SocketNotification>             NotificationPtr;
 	typedef std::map<poco_socket_t, NotifierPtr>          EventHandlerMap;
-	typedef Poco::FastMutex                               MutexType;
-	typedef MutexType::ScopedLock                         ScopedLock;
+	typedef Poco::FastMutex                               FastMutexType;
+	typedef FastMutexType::ScopedLock                     FastScopedLock;
+	typedef Poco::SpinlockMutex                           SpinMutexType;
+	typedef SpinMutexType::ScopedLock                     SpinScopedLock;
 	typedef std::pair<CompletionHandler, Poco::Timestamp> CompletionHandlerEntry;
 	typedef std::deque<CompletionHandlerEntry>            HandlerList;
 
 	bool hasSocketHandlers();
 	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
 	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
-	bool isPermanentCompletionHandler(const CompletionHandlerEntry& entry) const;
+	bool isPermanent(const Poco::Timestamp& entry) const;
 
 	template <typename F>
 	int removeCompletionHandlers(F isType, int count)
+		/// Removes `count` completion handlers of the specified
+		/// type; if count is -1, removes all completion handlers
+		/// of the specified type.
 	{
 		int removed = 0;
-		ScopedLock lock(_mutex);
+		SpinScopedLock lock(_completionMutex);
 		int left = count > -1 ? count : _complHandlers.size();
 		HandlerList::iterator it = _complHandlers.begin();
-		for (; it != _complHandlers.end();)
+		while (left && it != _complHandlers.end())
 		{
 			if (isType(it->second))
 			{
 				++removed;
 				it = _complHandlers.erase((it));
-				if (--left == 0) break;
+				--left;
 			}
 			else ++it;
 		}
@@ -315,7 +325,8 @@ private:
 	NotificationPtr   _pIdleNotification;
 	NotificationPtr   _pShutdownNotification;
 	HandlerList       _complHandlers;
-	MutexType         _mutex;
+	FastMutexType     _ioMutex;
+	SpinMutexType     _completionMutex;
 	Poco::Thread*     _pThread;
 
 	friend class SocketNotifier;

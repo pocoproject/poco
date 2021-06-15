@@ -22,6 +22,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 #include <sstream>
+#include <iostream>
 
 using Poco::Net::SocketReactor;
 using Poco::Net::SocketConnector;
@@ -381,11 +382,14 @@ namespace
 	public:
 		CompletionHandlerTestObject() = delete;
 
-		CompletionHandlerTestObject(SocketReactor& reactor, int ms = SocketReactor::PERMANENT_COMPLETION_HANDLER):
+		CompletionHandlerTestObject(SocketReactor& reactor, Timestamp::TimeDiff ms = SocketReactor::PERMANENT_COMPLETION_HANDLER):
 			_reactor(reactor),
 			_counter(0)
 		{
-			auto handler = [this] () { ++_counter; };
+			auto handler = [this] ()
+			{
+				++_counter;
+			};
 			_reactor.addCompletionHandler(handler, ms);
 			_reactor.addCompletionHandler(std::move(handler), ms);
 		}
@@ -393,11 +397,15 @@ namespace
 		void addRecursiveCompletionHandler(int count)
 		{
 			_count = count;
-			const std::function<void()> handler = [&handler, this] ()
+			if (!_handler)
 			{
-				if (++_counter < _count) _reactor.addCompletionHandler(handler);
-			};
-			_reactor.addCompletionHandler(handler);
+				_handler = [&] ()
+				{
+					if (_counter++ < _count)
+						_reactor.addCompletionHandler(_handler);
+				};
+			}
+			_reactor.addCompletionHandler(_handler);
 		}
 
 		int counter()
@@ -409,6 +417,7 @@ namespace
 		SocketReactor& _reactor;
 		int _counter;
 		int _count;
+		std::function<void()> _handler = nullptr;
 	};
 }
 
@@ -616,15 +625,22 @@ void SocketReactorTest::testCompletionHandler()
 {
 	SocketReactor reactor;
 	CompletionHandlerTestObject ch(reactor);
+	assert (reactor.permanentCompletionHandlers() == 2);
+	assert (reactor.scheduledCompletionHandlers() == 0);
 	assertTrue(ch.counter() == 0);
-	reactor.poll();
+	assertTrue(reactor.poll() == 2);
 	assertTrue(ch.counter() == 2);
 	ch.addRecursiveCompletionHandler(5);
-	reactor.poll();
-	assertTrue(ch.counter() == 5);
+	assertTrue (reactor.permanentCompletionHandlers() == 3);
+	assertTrue (reactor.scheduledCompletionHandlers() == 0);
+	assertTrue(reactor.poll() == 7);
+	assertTrue(ch.counter() == 9);
+	assertTrue (reactor.permanentCompletionHandlers() == 4);
+	assertTrue (reactor.scheduledCompletionHandlers() == 0);
+
 	reactor.removePermanentCompletionHandlers();
-	reactor.poll();
-	assertTrue(ch.counter() == 5);
+	assertTrue (reactor.poll() == 0);
+	assertTrue(ch.counter() == 9);
 }
 
 
@@ -632,6 +648,8 @@ void SocketReactorTest::testTimedCompletionHandler()
 {
 	SocketReactor reactor;
 	CompletionHandlerTestObject ch(reactor, 500);
+	assert (reactor.permanentCompletionHandlers() == 0);
+	assert (reactor.scheduledCompletionHandlers() == 2);
 	assertTrue(ch.counter() == 0);
 	reactor.poll();
 	assertTrue(ch.counter() == 0);
@@ -640,6 +658,8 @@ void SocketReactorTest::testTimedCompletionHandler()
 	Thread::sleep(500);
 	reactor.poll();
 	assertTrue(ch.counter() == 2);
+	assert (reactor.permanentCompletionHandlers() == 0);
+	assert (reactor.scheduledCompletionHandlers() == 0);
 	reactor.poll();
 	assertTrue(ch.counter() == 2);
 }

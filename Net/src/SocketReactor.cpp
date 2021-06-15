@@ -67,7 +67,7 @@ SocketReactor::~SocketReactor()
 }
 
 
-int SocketReactor::poll()
+int SocketReactor::poll(int* pHandled)
 {
 	int handled = 0;
 	if (!hasSocketHandlers()) onIdle();
@@ -102,8 +102,8 @@ int SocketReactor::poll()
 		}
 		if (!readable) onTimeout();
 	}
-	onComplete();
-	return handled;
+	if (pHandled) *pHandled = handled;
+	return onComplete();
 }
 
 
@@ -111,31 +111,46 @@ int SocketReactor::onComplete(bool handleOne)
 {
 	std::unique_ptr<CompletionHandler> pCH;
 	int handled = 0;
-	for (HandlerList::iterator it = _complHandlers.begin(); it != _complHandlers.end();)
 	{
-		// A completion handler may add new
-		// completion handler(s), so the mutex must
-		// be unlocked before the invocation.
+		HandlerList::iterator it = _complHandlers.begin();
+		while (it != _complHandlers.end())
 		{
-			ScopedLock lock(_mutex);
-			bool alwaysRun = isPermanentCompletionHandler(*it);
-			bool isExpired = !alwaysRun && (Timestamp() > it->second);
-			if (isExpired)
+			std::size_t prevSize = 0;
+			// A completion handler may add new
+			// completion handler(s), so the mutex must
+			// be unlocked before the invocation.
 			{
-				pCH.reset(new CompletionHandler(std::move(it->first)));
-				it = _complHandlers.erase(it);
+				SpinScopedLock lock(_completionMutex);
+				bool alwaysRun = isPermanent(it->second);
+				bool isExpired = !alwaysRun && (Timestamp() > it->second);
+				if (isExpired)
+				{
+					pCH.reset(new CompletionHandler(std::move(it->first)));
+					it = _complHandlers.erase(it);
+				}
+				else if (alwaysRun)
+				{
+					pCH.reset(new CompletionHandler(it->first));
+					++it;
+				}
+				else ++it;
+				prevSize = _complHandlers.size();
 			}
-			else if (alwaysRun)
+
+			if (pCH)
 			{
-				pCH.reset(new CompletionHandler(it->first));
-				++it;
-			} else ++it;
-		}
-		if (pCH)
-		{
-			(*pCH)();
-			++handled;
-			if (handleOne) break;
+				(*pCH)();
+				pCH.reset();
+				++handled;
+				if (handleOne) break;
+			}
+			// handler call may add or remove handlers;
+			// if so, we must start from the beginning
+			{
+				SpinScopedLock lock(_completionMutex);
+				if (prevSize != _complHandlers.size())
+					it = _complHandlers.begin();
+			}
 		}
 	}
 	return handled;
@@ -188,7 +203,7 @@ bool SocketReactor::hasSocketHandlers()
 {
 	if (!_pollSet.empty())
 	{
-		ScopedLock lock(_mutex);
+		FastScopedLock lock(_ioMutex);
 		for (auto& p: _handlers)
 		{
 			if (p.second->accepts(_pReadableNotification) ||
@@ -233,16 +248,17 @@ void SocketReactor::addCompletionHandler(const CompletionHandler& ch, Timestamp:
 
 void SocketReactor::addCompletionHandler(CompletionHandler&& ch, Timestamp::TimeDiff ms, int pos)
 {
-	Poco::Timestamp expires = (ms != PERMANENT_COMPLETION_HANDLER) ? Timestamp() + ms*1000 : Timestamp(0);
+	Poco::Timestamp expires = (ms != PERMANENT_COMPLETION_HANDLER) ? Timestamp() + ms*1000 : Timestamp(PERMANENT_COMPLETION_HANDLER);
+
 	if (pos == -1)
 	{
-		ScopedLock lock(_mutex);
+		SpinScopedLock lock(_completionMutex);
 		_complHandlers.push_back({std::move(ch), expires});
 	}
 	else
 	{
 		if (pos < 0) throw Poco::InvalidArgumentException("SocketReactor::addCompletionHandler()");
-		ScopedLock lock(_mutex);
+		SpinScopedLock lock(_completionMutex);
 		_complHandlers.insert(_complHandlers.begin() + pos, {std::move(ch), expires});
 	}
 }
@@ -250,7 +266,7 @@ void SocketReactor::addCompletionHandler(CompletionHandler&& ch, Timestamp::Time
 
 void SocketReactor::removeCompletionHandlers()
 {
-	ScopedLock lock(_mutex);
+	SpinScopedLock lock(_completionMutex);
 	_complHandlers.clear();
 }
 
@@ -258,11 +274,11 @@ void SocketReactor::removeCompletionHandlers()
 int SocketReactor::scheduledCompletionHandlers()
 {
 	int cnt = 0;
-	ScopedLock lock(_mutex);
+	SpinScopedLock lock(_completionMutex);
 	HandlerList::iterator it = _complHandlers.begin();
 	for (; it != _complHandlers.end(); ++it)
 	{
-		if (it->second != Timestamp(0)) ++cnt;
+		if (!isPermanent(it->second)/*it->second != Timestamp(0)*/) ++cnt;
 	}
 	return cnt;
 }
@@ -270,21 +286,35 @@ int SocketReactor::scheduledCompletionHandlers()
 
 int SocketReactor::removeScheduledCompletionHandlers(int count)
 {
-	auto isScheduled = [](const Timestamp& ts) { return ts != Timestamp(0); };
+	auto isScheduled = [this](const Timestamp& ts) { return !isPermanent(ts); };
 	return removeCompletionHandlers(isScheduled, count);
+}
+
+
+int SocketReactor::permanentCompletionHandlers()
+{
+	int cnt = 0;
+	SpinScopedLock lock(_completionMutex);
+	HandlerList::iterator it = _complHandlers.begin();
+	for (; it != _complHandlers.end(); ++it)
+	{
+		if (isPermanent(it->second))
+			++cnt;
+	}
+	return cnt;
 }
 
 
 int SocketReactor::removePermanentCompletionHandlers(int count)
 {
-	auto isPermanent = [](const Timestamp& ts) { return ts == Timestamp(0); };
-	return removeCompletionHandlers(isPermanent, count);
+	auto perm = [this](const Timestamp& ts) { return isPermanent(ts); };
+	return removeCompletionHandlers(perm, count);
 }
 
 
-bool SocketReactor::isPermanentCompletionHandler(const CompletionHandlerEntry& entry) const
+bool SocketReactor::isPermanent(const Timestamp& entry) const
 {
-	return entry.second == Timestamp(0);
+	return entry == Timestamp(PERMANENT_COMPLETION_HANDLER);
 }
 
 
@@ -292,7 +322,10 @@ void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractOb
 {
 	NotifierPtr pNotifier = getNotifier(socket, true);
 
-	if (!pNotifier->hasObserver(observer)) pNotifier->addObserver(this, observer);
+	if (!pNotifier->hasObserver(observer))
+	{
+		pNotifier->addObserver(this, observer);
+	}
 
 	int mode = 0;
 	if (pNotifier->accepts(_pReadableNotification)) mode |= PollSet::POLL_READ;
@@ -316,7 +349,7 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 	const SocketImpl* pImpl = socket.impl();
 	if (pImpl == nullptr) return 0;
 	poco_socket_t sockfd = pImpl->sockfd();
-	ScopedLock lock(_mutex);
+	FastScopedLock lock(_ioMutex);
 
 	EventHandlerMap::iterator it = _handlers.find(sockfd);
 	if (it != _handlers.end()) return it->second;
@@ -329,14 +362,14 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
 	const SocketImpl* pImpl = socket.impl();
-	if (pImpl == nullptr) return;
+	if (pImpl == nullptr) { return; }
 	NotifierPtr pNotifier = getNotifier(socket);
 	if (pNotifier && pNotifier->hasObserver(observer))
 	{
 		if(pNotifier->countObservers() == 1)
 		{
 			{
-				ScopedLock lock(_mutex);
+				FastScopedLock lock(_ioMutex);
 				_handlers.erase(pImpl->sockfd());
 			}
 			_pollSet.remove(socket);
@@ -387,7 +420,7 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 {
 	std::vector<NotifierPtr> delegates;
 	{
-		ScopedLock lock(_mutex);
+		FastScopedLock lock(_ioMutex);
 		delegates.reserve(_handlers.size());
 		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
 			delegates.push_back(it->second);
@@ -403,6 +436,7 @@ void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotifi
 {
 	try
 	{
+		Socket s = pNotification->socket();
 		pNotifier->dispatch(pNotification);
 	}
 	catch (Exception& exc)
