@@ -396,7 +396,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	case PROTO_SSLV2:
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
 	case PROTO_SSLV3:
-		version = SSL3_VERSION;
+		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
 		break;
 	case PROTO_TLSV1:
 		version = TLS1_VERSION;
@@ -425,7 +425,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
 
 	case PROTO_SSLV3:
-		disableProtocols(PROTO_SSLV2);
+		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
 		break;
 
 	case PROTO_TLSV1:
