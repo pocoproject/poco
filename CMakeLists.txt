@@ -54,7 +54,7 @@ endif()
 include(PocoMacros)
 
 if(POCO_STATIC)
-	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS instead.")
+	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
 	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 else()
 	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
