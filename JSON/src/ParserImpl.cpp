@@ -38,14 +38,14 @@ extern "C"
 {
 	static int istream_get(void* ptr)
 	{
-		std::istream* pIstr = reinterpret_cast<std::istream*>(ptr);
-		return pIstr->get();
+		std::streambuf* pBuf = reinterpret_cast<std::streambuf*>(ptr);
+		return pBuf->sbumpc();
 	}
 
 	static int istream_peek(void* ptr)
 	{
-		std::istream* pIstr = reinterpret_cast<std::istream*>(ptr);
-		return pIstr->peek();
+		std::streambuf* pBuf = reinterpret_cast<std::streambuf*>(ptr);
+		return pBuf->sgetc();
 	}
 }
 
@@ -102,7 +102,7 @@ void ParserImpl::handle(std::istream& json)
 {
 	try
 	{
-		json_open_user(_pJSON, istream_get, istream_peek, &json);
+		json_open_user(_pJSON, istream_get, istream_peek, json.rdbuf());
 		checkError();
 		json_set_streaming(_pJSON, false);
 		handle();
@@ -193,6 +193,9 @@ void ParserImpl::stripComments(std::string& json)
 
 void ParserImpl::handleArray()
 {
+	if (json_get_depth(_pJSON) > _depth)
+		throw JSONException("Maximum depth exceeded");
+
 	json_type tok = json_peek(_pJSON);
 	while (tok != JSON_ARRAY_END && checkError())
 	{
@@ -210,6 +213,9 @@ void ParserImpl::handleArray()
 
 void ParserImpl::handleObject()
 {
+	if (json_get_depth(_pJSON) > _depth)
+		throw JSONException("Maximum depth exceeded");
+
 	json_type tok = json_peek(_pJSON);
 	while (tok != JSON_OBJECT_END && checkError())
 	{
@@ -229,9 +235,6 @@ void ParserImpl::handleObject()
 
 void ParserImpl::handle()
 {
-	if (json_get_depth(_pJSON) > _depth)
-		throw JSONException("Maximum depth exceeded");
-
 	enum json_type type = json_next(_pJSON);
 	switch (type)
 	{
