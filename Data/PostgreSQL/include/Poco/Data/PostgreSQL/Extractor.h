@@ -343,6 +343,7 @@ private:
 		return returnValue;
 	}
 
+	bool extractToDynamic(std::size_t pos, Dynamic::Var& val);
 
 	// Prevent VC8 warning "operator= could not be generated"
 	Extractor& operator=(const Extractor&);
