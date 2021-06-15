@@ -96,12 +96,12 @@ Application::~Application()
 void Application::setup()
 {
 	poco_assert (_pInstance == 0);
-	
+
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true);
-	
+
 	addSubsystem(new LoggingSubsystem);
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	_workingDirAtLaunch = Path::current();
 
@@ -188,18 +188,19 @@ void Application::initialize(Application& self)
 	_initialized = true;
 }
 
-	
+
 void Application::uninitialize()
 {
 	if (_initialized)
 	{
-		for (auto& pSub: _subsystems)
+		for (SubsystemVec::reverse_iterator it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
 		{
-			_pLogger->debug(std::string("Uninitializing subsystem: ") + pSub->name());
-			pSub->uninitialize();
+			_pLogger->debug(std::string("Uninitializing subsystem: ") + (*it)->name());
+			(*it)->uninitialize();
 		}
 		_initialized = false;
 	}
+
 }
 
 
@@ -399,7 +400,7 @@ void Application::setArgs(int argc, char* argv[])
 void Application::setArgs(const ArgVec& args)
 {
 	poco_assert (!args.empty());
-	
+
 	_command = args[0];
 	_pConfig->setInt("application.argc", (int) args.size());
 	_unprocessedArgs = args;
@@ -479,7 +480,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
-	
+
 	Path appPath;
 	getApplicationPath(appPath);
 	Path base = appPath.parent();
@@ -525,7 +526,7 @@ bool Application::findAppConfigFile(const std::string& appName, const std::strin
 bool Application::findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Path& path) const
 {
 	poco_assert (!appName.empty());
-	
+
 	Path p(basePath,appName);
 	p.setExtension(extension);
 	bool found = findFile(p);
