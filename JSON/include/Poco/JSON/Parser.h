@@ -65,7 +65,7 @@ class JSON_API Parser: private ParserImpl
 {
 public:
 
-	Parser(const Handler::Ptr& pHandler = new ParseHandler, std::size_t bufSize = JSON_PARSE_BUFFER_SIZE);
+	Parser(const Handler::Ptr& pHandler = new ParseHandler);
 		/// Creates JSON Parser, using the given Handler and buffer size.
 
 	virtual ~Parser();
@@ -76,6 +76,10 @@ public:
 
 	void setAllowComments(bool comments);
 		/// Allow or disallow comments. By default, comments are not allowed.
+		///
+		/// If set to true, comments will be filtered out of the input data
+		/// before passing the JSON on to the parser. This will impact performance,
+		/// especially when reading from a std::istream.
 
 	bool getAllowComments() const;
 		/// Returns true if comments are allowed, false otherwise.
@@ -85,7 +89,11 @@ public:
 	void setAllowNullByte(bool nullByte);
 		/// Allow or disallow null byte in strings.
 		///
-		/// By default, null byte is allowed.
+		/// By default, null byte is allowed (true).
+		///
+		/// If set to false, an additional check for "\u0000" will be performed
+		/// before passing the JSON on to the parser. This will impact performance,
+		/// especially when reading from a std::istream.
 
 	bool getAllowNullByte() const;
 		/// Returns true if null byte is allowed, false otherwise.
@@ -94,6 +102,10 @@ public:
 
 	void setDepth(std::size_t depth);
 		/// Sets the allowed JSON depth.
+		///
+		/// Default maximum depth is 128. Setting this value too high
+		/// may result in a stack overflow when parsing a (malicious)
+		/// JSON document.
 
 	std::size_t getDepth() const;
 		/// Returns the allowed JSON depth.
