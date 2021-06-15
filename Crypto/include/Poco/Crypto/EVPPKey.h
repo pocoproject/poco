@@ -195,9 +195,10 @@ private:
 							poco_assert_dbg (typeid(K*) == typeid(EVP_PKEY*));
 							*ppKey = (K*)pKey;
 						}
-						if(!*ppKey) goto error;
+						if (!*ppKey) goto error;
 						return true;
 					}
+					if (getFunc) EVP_PKEY_free(pKey);
 					goto error;
 				}
 				else
