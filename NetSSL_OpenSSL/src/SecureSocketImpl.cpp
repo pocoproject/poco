@@ -192,11 +192,35 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 }
 
 
+void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind(address, reuseAddress);
+}
+
+
 void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
 	poco_check_ptr (_pSocket);
 
 	_pSocket->bind(address, reuseAddress, reusePort);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, ipV6Only);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, reusePort, ipV6Only);
 }
 
 

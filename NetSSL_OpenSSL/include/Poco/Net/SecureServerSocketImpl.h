@@ -47,7 +47,7 @@ public:
 		/// with the client.
 		///
 		/// The client socket's address is returned in clientAddr.
-	
+
 	void connect(const SocketAddress& address);
 		/// Not supported by this kind of socket.
 		///
@@ -62,8 +62,18 @@ public:
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
-	
-	void bind(const SocketAddress& address, bool reuseAddress = false, bool reusePort = false);
+
+	void bind(const SocketAddress& address, bool reuseAddress = false);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket. TCP clients should not bind a socket to a
+		/// specific address.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
 		/// Bind a local address to the socket.
 		///
 		/// This is usually only done when establishing a server
@@ -76,7 +86,43 @@ public:
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 
-		
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+		/// Bind a local IPv6 address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket. TCP clients should not bind a socket to a
+		/// specific address.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// The given address must be an IPv6 address. The
+		/// IPPROTO_IPV6/IPV6_V6ONLY option is set on the socket
+		/// according to the ipV6Only parameter.
+		///
+		/// If the library has not been built with IPv6 support,
+		/// a Poco::NotImplementedException will be thrown.
+
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only);
+		/// Bind a local IPv6 address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket. TCP clients should not bind a socket to a
+		/// specific address.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+		///
+		/// If reusePort is true, sets the SO_REUSEPORT
+		/// socket option.
+		///
+		/// The given address must be an IPv6 address. The
+		/// IPPROTO_IPV6/IPV6_V6ONLY option is set on the socket
+		/// according to the ipV6Only parameter.
+		///
+		/// If the library has not been built with IPv6 support,
+		/// a Poco::NotImplementedException will be thrown.
+
 	void listen(int backlog = 64);
 		/// Puts the socket into listening state.
 		///
@@ -89,27 +135,27 @@ public:
 
 	void close();
 		/// Close the socket.
-	
+
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
-	
+
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
-	
+
 	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
-	
+
 	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 		/// Not supported by this kind of socket.
 		///
 		/// Throws a Poco::InvalidAccessException.
-	
+
 	void sendUrgent(unsigned char data);
 		/// Not supported by this kind of socket.
 		///
@@ -118,7 +164,7 @@ public:
 	bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
-		
+
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 
