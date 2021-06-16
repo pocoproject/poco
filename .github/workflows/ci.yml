@@ -35,7 +35,7 @@ jobs:
   macos-clang-make:
     runs-on: macos-10.15
     env:
-      CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
+      CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
       EXCLUDE_TESTS: Redis
     steps:
       - uses: actions/checkout@v2
@@ -46,7 +46,7 @@ jobs:
   macos-clang-cmake:
     runs-on: macos-10.15
     env:
-      CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
+      CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl
