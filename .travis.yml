@@ -21,38 +21,6 @@ notifications:
 
 jobs:
   include:
-    - name: Android (API level 19)
-      os: linux
-      dist: bionic
-      arch: amd64
-      addons:
-        apt:
-          packages:
-            - openjdk-8-jdk
-      before_install:
-        - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-        - wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
-        - unzip -qq sdk-tools-linux-4333796.zip -d /opt/android-sdk
-        - rm sdk-tools-linux-4333796.zip
-        - echo "y" | /opt/android-sdk/tools/bin/sdkmanager "platform-tools" "system-images;android-24;default;armeabi-v7a" "platforms;android-24" "emulator" "ndk-bundle" "cmake;3.10.2.4988404" > /dev/null
-      before_script:
-        - export TERM=dumb
-        - export _NO_CHECK_SIGNATURE=true
-        - export ANDROID_SDK_ROOT=/opt/android-sdk
-        - echo no | /opt/android-sdk/tools/bin/avdmanager create avd -n test -k "system-images;android-24;default;armeabi-v7a"
-        - /opt/android-sdk/emulator/emulator -avd test -no-audio -no-window -dns-server 8.8.8.8 &
-        #- android-wait-for-emulator || android-wait-for-emulator
-        - /opt/android-sdk/platform-tools/adb shell input keyevent 82 &
-      script:
-        # Mandatory cmake parameter to set API level and platform for the android toolchain:
-        # /usr/local/android-sdk/cmake/3.6.4111459/bin/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-22
-        # See also in /usr/local/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake
-
-        # Using the ninja build command. Is much faster then make build command.
-        - /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake -H. -Bcmake-build -GNinja -DANDROID_ABI=armeabi-v7a -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/android-sdk/ndk-bundle/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DCMAKE_MAKE_PROGRAM=/opt/android-sdk/cmake/3.10.2.4988404/bin/ninja -DANDROID_STL="c++_static" -DANDROID_CPP_FEATURES="exceptions rtti" -DENABLE_APACHECONNECTOR=OFF -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON -DENABLE_LONG_RUNNING_TESTS=OFF -DOLD_REDIS_VERSION=ON &&
-          /opt/android-sdk/cmake/3.10.2.4988404/bin/cmake --build cmake-build --target all #&&
-          #cd cmake-build && travis_wait 30 /opt/android-sdk/cmake/3.10.2.4988404/bin/ctest -E Foundation --output-on-failure FIXME Android emulator hangs
-
     - name: Android (API level 24 arm64-v8a)
       os: linux
       dist: bionic
@@ -98,6 +66,36 @@ jobs:
       compiler: clang
       script:
         - ./configure --everything --omit=PDF --config=Linux-clang && make all -s -j2  && sudo make install
+        - sudo -s ./travis/runtests.sh
+
+    - name: Linux (gcc, make, address sanitizer)
+      os: linux
+      dist: bionic
+      arch: amd64
+      addons:
+        apt:
+          packages:
+            - libssl-dev
+            - unixodbc-dev
+            - libmysqlclient-dev
+      compiler: gcc
+      script:
+        - ./configure --everything --omit=PDF && make all -s -j2 SANITIZEFLAGS=-fsanitize=address && sudo make install
+        - sudo -s ./travis/runtests.sh
+
+    - name: Linux (gcc, make, UB sanitizer)
+      os: linux
+      dist: bionic
+      arch: amd64
+      addons:
+        apt:
+          packages:
+            - libssl-dev
+            - unixodbc-dev
+            - libmysqlclient-dev
+      compiler: gcc
+      script:
+        - ./configure --everything --omit=PDF && make all -s -j2 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
         - sudo -s ./travis/runtests.sh
 
     - name: Linux (gcc, make)
