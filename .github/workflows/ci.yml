@@ -51,7 +51,7 @@ jobs:
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
+      - run: echo $Env:Path
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release
-      - run: echo $Env:Path
       - run: cd cmake-build; ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
