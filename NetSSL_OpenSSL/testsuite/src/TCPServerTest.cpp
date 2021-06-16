@@ -82,7 +82,7 @@ namespace
 
 		void run()
 		{
-			SecureStreamSocket& ss = static_cast<SecureStreamSocket&>(socket());
+			SecureStreamSocket ss = socket();
 			try
 			{
 				ss.completeHandshake();
