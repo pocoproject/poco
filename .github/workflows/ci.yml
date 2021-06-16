@@ -6,6 +6,50 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev
-      - run: ls -l
       - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
       - run: sudo -s ./travis/runtests.sh
+
+  linux-gcc-make-asan:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: ./configure --everything --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
+      - run: sudo -s ./travis/runtests.sh
+
+  linux-gcc-make-ubsan:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: ./configure --everything --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
+      - run: sudo -s ./travis/runtests.sh
+
+  linux-gcc-cmake:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt update && sudo apt install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
+
+  macos-clang-make:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew install openssl
+      - run: ./configure --everything --no-prefix --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL && make all -s -j4 && sudo make install
+      - run: sudo -s ./travis/runtests.sh
+
+  macos-clang-cmake:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew install openssl
+      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
+
+  windows-msvc-cmake:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+      - run: cmake -H. -Bcmake-build -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF
+      - run: cmake --build cmake-build
