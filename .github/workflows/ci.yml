@@ -1,0 +1,10 @@
+name: poco-ci
+on: [push]
+jobs:
+  linux-gcc-make
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev
+      - run: cd poco && ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: cd poco && sudo -s ./travis/runtests.sh
