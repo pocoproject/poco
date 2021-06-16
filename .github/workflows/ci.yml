@@ -3,6 +3,8 @@ on: [push]
 jobs:
   linux-gcc-make:
     runs-on: ubuntu-20.04
+    env:
+      EXCLUDE_TESTS: Data/MySQL Data/ODBC Data/PostgreSQL MongoDB
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
@@ -11,6 +13,8 @@ jobs:
 
   linux-gcc-make-asan:
     runs-on: ubuntu-20.04
+    env:
+      EXCLUDE_TESTS: Data/MySQL Data/ODBC Data/PostgreSQL MongoDB
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
@@ -19,6 +23,8 @@ jobs:
 
   linux-gcc-make-ubsan:
     runs-on: ubuntu-20.04
+    env:
+      EXCLUDE_TESTS: Data/MySQL Data/ODBC Data/PostgreSQL MongoDB
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
@@ -36,7 +42,7 @@ jobs:
     runs-on: macos-10.15
     env:
       CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
-      EXCLUDE_TESTS: Redis
+      EXCLUDE_TESTS: Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl
