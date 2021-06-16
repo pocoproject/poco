@@ -6,5 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev
-      - run: cd poco && ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
-      - run: cd poco && sudo -s ./travis/runtests.sh
+      - run: ls -l
+      - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
+      - run: sudo -s ./travis/runtests.sh
