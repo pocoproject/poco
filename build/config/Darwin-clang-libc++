@@ -12,6 +12,7 @@
 LINKMODE ?= SHARED
 
 ARCHFLAGS          ?= -arch $(OSARCH)
+SANITIZEFLAGS      ?=
 OSFLAGS            ?= -mmacosx-version-min=10.11 -isysroot $(shell xcrun --show-sdk-path)
 
 OPENSSL_DIR        ?= /usr/local/opt/openssl
@@ -43,11 +44,11 @@ SHAREDLIBLINKEXT = .dylib
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) -std=c99
-CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) -std=c++14 -stdlib=libc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
-LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
-SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
-DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) -stdlib=libc++
+CFLAGS          = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c11
+CXXFLAGS        = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -std=c++14 -stdlib=libc++ -Wall -Wno-sign-compare -Wno-unused-variable -Wno-unused-function -Wno-unneeded-internal-declaration
+LINKFLAGS       = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+SHLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
+DYLIBFLAGS      = $(ARCHFLAGS) $(OSFLAGS) $(SANITIZEFLAGS) -stdlib=libc++
 STATICOPT_CC    =
 STATICOPT_CXX   =
 STATICOPT_LINK  =

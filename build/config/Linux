@@ -1,7 +1,7 @@
 #
 # Linux
 #
-# Make settings for Linux 2.6/gcc 3.3
+# Make settings for Linux/gcc
 #
 #
 
@@ -9,6 +9,8 @@
 # General Settings
 #
 LINKMODE ?= SHARED
+
+SANITIZEFLAGS ?=
 
 #
 # Define Tools
@@ -36,13 +38,13 @@ SHAREDLIBLINKEXT = .so
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = -std=c99
+CFLAGS          = $(SANITIZEFLAGS) -std=c11
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -std=c++14 -Wall -Wno-sign-compare
+CXXFLAGS        = $(SANITIZEFLAGS) -std=c++14 -Wall -Wno-sign-compare
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       =
+LINKFLAGS       = $(SANITIZEFLAGS)
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
