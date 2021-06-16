@@ -30,9 +30,6 @@
 using Poco::Path;
 using Poco::PathSyntaxException;
 using Poco::Environment;
-using std::clog;
-using std::cout;
-using std::endl;
 
 
 PathTest::PathTest(const std::string& name): CppUnit::TestCase(name)
@@ -1239,7 +1236,6 @@ void PathTest::testParseVMS4()
 	assertTrue (p[0] == "foo");
 	assertTrue (!p.isDirectory());
 	assertTrue (p.isFile());
-	cout << "p.toString(Path::PATH_VMS)=" << p.toString(Path::PATH_VMS) << endl;
 	assertTrue (p.toString(Path::PATH_VMS) == "[foo]bar.txt;5");
 	assertTrue (p.version() == "5");
 
@@ -1301,7 +1297,6 @@ void PathTest::testParseGuess()
 	assertTrue (p.getDevice() == "foo");
 	assertTrue (!p.isDirectory());
 	assertTrue (p.isFile());
-	cout << "p.toString(Path::PATH_VMS)=" << p.toString(Path::PATH_VMS) << endl;
 	assertTrue (p.toString(Path::PATH_VMS) == "foo:bar.txt;5");
 	assertTrue (p.version() == "5");
 
@@ -1549,6 +1544,8 @@ void PathTest::testListRoots()
 
 void PathTest::testFind()
 {
+	try
+	{
 	Path p;
 #if defined(POCO_OS_FAMILY_UNIX)
 	bool found = Path::find(Environment::get("PATH"), "ls", p);
@@ -1568,6 +1565,11 @@ void PathTest::testFind()
 
 	std::string fn = p.toString();
 	assertTrue (fn.size() > 0);
+	}
+	catch (Poco::Exception& exc)
+	{
+		std::cout << "********\n" << exc.displayText() << "\n**********\n";
+	}
 }
 
 
