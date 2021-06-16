@@ -1569,6 +1569,7 @@ void PathTest::testFind()
 	catch (Poco::Exception& exc)
 	{
 		std::cout << "********\n" << exc.displayText() << "\n**********\n";
+		throw;
 	}
 }
 
