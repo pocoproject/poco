@@ -1544,8 +1544,6 @@ void PathTest::testListRoots()
 
 void PathTest::testFind()
 {
-	try
-	{
 	Path p;
 #if defined(POCO_OS_FAMILY_UNIX)
 	bool found = Path::find(Environment::get("PATH"), "ls", p);
@@ -1565,12 +1563,6 @@ void PathTest::testFind()
 
 	std::string fn = p.toString();
 	assertTrue (fn.size() > 0);
-	}
-	catch (Poco::Exception& exc)
-	{
-		std::cout << "********\n" << exc.displayText() << "\n**********\n";
-		throw;
-	}
 }
 
 

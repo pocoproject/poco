@@ -30,10 +30,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install cmake ninja-build libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
-      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
+      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   macos-clang-make:
     runs-on: macos-10.15
+    env:
+      CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
+      EXCLUDE_TESTS: Redis
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl
@@ -42,16 +45,19 @@ jobs:
 
   macos-clang-cmake:
     runs-on: macos-10.15
+    env:
+      CPPUNIT_IGNORE: N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)"
+      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
   windows-msvc-cmake:
     runs-on: windows-2019
+    env:
+      CPPUNIT_IGNORE: class CppUnit::TestCaller<class PathTest>.testFind,class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,class CppUnit::TestCaller<class ICMPClientTest>.testPing,class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
     steps:
       - uses: actions/checkout@v2
-      - run: echo $Env:Path
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release
       - run: cd cmake-build; ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
