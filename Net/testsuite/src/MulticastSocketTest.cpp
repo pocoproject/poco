@@ -60,7 +60,7 @@ void MulticastSocketTest::testMulticast()
 		assertTrue (std::string(buffer, n) == "hello");
 		ms.close();
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 #if POCO_OS != POCO_OS_ANDROID
 		throw;
