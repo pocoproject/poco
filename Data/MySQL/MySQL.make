@@ -8,12 +8,8 @@ ifndef POCO_MYSQL_INCLUDE
 ifeq (0, $(shell test -d /usr/local/include/mysql; echo $$?))
 POCO_MYSQL_INCLUDE = /usr/local/include
 else
-ifeq (0, $(shell test -d /usr/local/opt/mysql-client; echo $$?))
+ifeq (0, $(shell test -d /usr/local/opt/mysql-client/include; echo $$?))
 POCO_MYSQL_INCLUDE = /usr/local/opt/mysql-client/include
-else
-ifeq (0, $(shell test -d /usr/local/opt/mysql; echo $$?))
-POCO_MYSQL_INCLUDE = /usr/local/opt/mysql/include
-endif
 endif
 endif
 endif
@@ -23,11 +19,7 @@ ifeq (0, $(shell test -d /usr/local/include/mysql; echo $$?))
 POCO_MYSQL_LIB = /usr/local/lib
 else
 ifeq (0, $(shell test -d /usr/local/opt/mysql-client/lib; echo $$?))
-POCO_MYSQL_INCLUDE = /usr/local/opt/mysql-client/lib
-else
-ifeq (0, $(shell test -d /usr/local/opt/mysql/lib; echo $$?))
-POCO_MYSQL_INCLUDE = /usr/local/opt/mysql/lib
-endif
+POCO_MYSQL_LIB = /usr/local/opt/mysql-client/lib
 endif
 endif
 endif
