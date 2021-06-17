@@ -50,12 +50,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev
       - run: >-
           sudo dpkg --add-architecture armhf &&
           sudo apt-get update &&
-          sudo apt-get install crossbuild-essential-armhf &&
-          sudo apt-get install libssl-dev:armhf
+          sudo apt-get install crossbuild-essential-armhf libssl-dev:armhf
+
       - run: >-
           ./configure --config=ARM-Linux --everything --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL &&
           make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
@@ -77,7 +76,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl && cmake --build cmake-build --target all
+      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
           sudo -s
