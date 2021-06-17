@@ -45,7 +45,9 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 #define MYSQL_USER "pocotest"
 #define MYSQL_PWD  "pocotest"
 #define MYSQL_HOST "127.0.0.1"
+#ifndef MYSQL_PORT
 #define MYSQL_PORT 3306
+#endif
 #define MYSQL_DB   "pocotest"
 
 //

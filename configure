@@ -102,6 +102,12 @@ Options:
   --odbc-include=<path>
     Specify the directory where ODBC header files are located.
 
+  --mysql-lib=<path>
+    Specify the directory where MySQL library is located.
+
+  --mysql-include=<path>
+    Specify the directory where MySQL header files are located.
+
   --cflags=<flags>
     Pass additional flags to compiler.
     Example: --cflags=-wall
@@ -177,6 +183,12 @@ while [ $# -ge 1 ]; do
 
 	--odbc-include=*)
 		odbcinclude="`echo ${1} | awk '{print substr($0,16)}'`" ;;
+
+	--mysql-lib=*)
+		mysqllib="`echo ${1} | awk '{print substr($0,13)}'`" ;;
+
+	--mysql-include=*)
+		mysqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
 
 	--cflags=*)
 		flags="$flags `echo ${1} | awk '{print substr($0,10)}'`" ;;
@@ -314,6 +326,12 @@ if [ -n "$odbclib" ] ; then
 fi
 if [ -n "$odbcinclude" ] ; then
         echo "POCO_ODBC_INCLUDE = $odbcinclude" >>$build/config.make
+fi
+if [ -n "$mysqllib" ] ; then
+        echo "POCO_MYSQL_LIB = $mysqllib" >>$build/config.make
+fi
+if [ -n "$mysqlinclude" ] ; then
+        echo "POCO_MYSQL_INCLUDE = $mysqlinclude" >>$build/config.make
 fi
 if [ -n "$unbundled" ] ; then
 	echo "POCO_UNBUNDLED = 1" >>$build/config.make

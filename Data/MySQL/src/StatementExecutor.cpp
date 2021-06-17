@@ -12,9 +12,9 @@
 //
 
 
-#include <mysql.h>
 #include "Poco/Data/MySQL/StatementExecutor.h"
 #include "Poco/Format.h"
+#include <mysql/mysql.h>
 
 
 namespace Poco {
@@ -52,7 +52,7 @@ void StatementExecutor::prepare(const std::string& query)
 		_state = STMT_COMPILED;
 		return;
 	}
-	
+
 	int rc = mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length()));
 	if (rc != 0)
 	{
@@ -119,7 +119,7 @@ bool StatementExecutor::fetch()
 	int res = mysql_stmt_fetch(_pHandle);
 
 	// we have specified zero buffers for BLOBs, so DATA_TRUNCATED is normal in this case
-	if ((res != 0) && (res != MYSQL_NO_DATA) && (res != MYSQL_DATA_TRUNCATED)) 
+	if ((res != 0) && (res != MYSQL_NO_DATA) && (res != MYSQL_DATA_TRUNCATED))
 		throw StatementException("mysql_stmt_fetch error", _pHandle, _query);
 
 	return (res == 0) || (res == MYSQL_DATA_TRUNCATED);

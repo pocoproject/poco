@@ -22,7 +22,7 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/MySQL/MySQLException.h"
-#include <mysql.h>
+#include <mysql/mysql.h>
 
 
 namespace Poco {
@@ -72,7 +72,7 @@ public:
 
 	virtual void bind(std::size_t pos, const unsigned long& val, Direction dir = PD_IN);
 		/// Binds an unsigned long.
-#endif 
+#endif
 
 	virtual void bind(std::size_t pos, const bool& val, Direction dir);
 		/// Binds a boolean.
