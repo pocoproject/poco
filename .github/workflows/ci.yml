@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --omit=PDF && make all -s -j4 && sudo make install
       - run: >-
           sudo -s
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=address && sudo make install
       - run: >-
           sudo -s
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt update && sudo apt install libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: ./configure --everything --omit=PDF && make all -s -j4 SANITIZEFLAGS=-fsanitize=undefined && sudo make install
       - run: >-
           sudo -s
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt update && sudo apt install cmake ninja-build libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
+      - run: sudo apt update && sudo apt install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
@@ -46,12 +46,26 @@ jobs:
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
+   linux-gcc-make-cross-arm:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt update && sudo apt install libssl-dev
+      - run: >-
+          sudo dpkg --add-architecture armhf &&
+          sudo apt-get update &&
+          sudo apt-get install crossbuild-essential-armhf &&
+          sudo apt-get install libssl-dev:armhf
+      - run: >-
+          ./configure --config=ARM-Linux --everything --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL &&
+          make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
+
   macos-clang-make:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      - run: brew install openssl
-      - run: ./configure --everything --no-prefix --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL && make all -s -j4
+      - run: brew install openssl mysql-client unixodbc libpq
+      - run: ./configure --everything --no-prefix --omit=PDF && make all -s -j4
       - run: >-
           sudo -s
           CPPUNIT_IGNORE="N7CppUnit10TestCallerI10ThreadTestEE.testTrySleep,N7CppUnit10TestCallerI13TimestampTestEE.testTimestamp,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
@@ -62,7 +76,7 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      - run: brew install openssl
+      - run: brew install openssl mysql-client unixodbc libpq
       - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
