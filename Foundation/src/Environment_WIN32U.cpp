@@ -25,6 +25,11 @@
 #include <iphlpapi.h>
 
 
+#if defined(_MSC_VER)
+#pragma warning(disable:4996) // deprecation warnings
+#endif
+
+
 namespace Poco {
 
 

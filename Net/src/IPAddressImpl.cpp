@@ -12,6 +12,11 @@
 //
 
 
+#if defined(_MSC_VER) && !defined(_WINSOCK_DEPRECATED_NO_WARNINGS)
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
+
+
 #include "Poco/Net/IPAddressImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/RefCountedObject.h"

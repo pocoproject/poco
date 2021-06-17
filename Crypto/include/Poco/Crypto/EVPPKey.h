@@ -177,7 +177,15 @@ private:
 			EVP_PKEY* pKey = getFunc ? EVP_PKEY_new() : (EVP_PKEY*)*ppKey;
 			if (pKey)
 			{
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4996) // deprecation warnings
+#endif				
 				pFile = fopen(keyFile.c_str(), "r");
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
+
 				if (pFile)
 				{
 					pem_password_cb* pCB = pass.empty() ? (pem_password_cb*)0 : &passCB;
