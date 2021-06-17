@@ -30,7 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt update && sudo apt install cmake ninja-build libssl-dev ca-certificates unixodbc-dev libmysqlclient-dev redis-server
-      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all && cd cmake-build && sudo -s PWD=`pwd` ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+      - run: cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON && cmake --build cmake-build --target all
+      - run: >-
+          cd cmake-build &&
+          sudo -s
+          PWD=`pwd`
+          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
   macos-clang-make:
     runs-on: macos-10.15
@@ -40,7 +45,7 @@ jobs:
       - run: ./configure --everything --no-prefix --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL && make all -s -j4
       - run: >-
           sudo -s
-          CPPUNIT_IGNORE="N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
+          CPPUNIT_IGNORE="N7CppUnit10TestCallerI13TimestampTestEE.testTimestamp,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
           EXCLUDE_TESTS="Redis Data/MySQL Data/ODBC Data/PostgreSQL MongoDB PDF"
           ./ci/runtests.sh
 
@@ -51,9 +56,9 @@ jobs:
       - run: brew install openssl
       - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl && cmake --build cmake-build --target all
       - run: >-
-          sudo -s
           cd cmake-build &&
-          CPPUNIT_IGNORE="N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
+          sudo -s
+          CPPUNIT_IGNORE="N7CppUnit10TestCallerI13TimestampTestEE.testTimestamp,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
@@ -65,4 +70,6 @@ jobs:
       - uses: actions/checkout@v2
       - run: cmake -S. -Bcmake-build -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
       - run: cmake --build cmake-build --config Release
-      - run: cd cmake-build; ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+      - run: >-
+          cd cmake-build;
+          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
