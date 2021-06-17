@@ -46,7 +46,7 @@ jobs:
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
-   linux-gcc-make-cross-arm:
+  linux-gcc-make-cross-arm:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
