@@ -26,6 +26,7 @@
 #include "Poco/NotificationQueue.h"
 #include "Poco/ThreadPool.h"
 #include "Poco/Mutex.h"
+#include <atomic>
 
 
 namespace Poco {
