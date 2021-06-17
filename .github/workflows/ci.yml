@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl mysql-client unixodbc libpq
-      - run: ./configure --everything --no-prefix --omit=PDF && make all -s -j4
+      - run: ./configure --everything --no-prefix --omit=PDF --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib && make all -s -j4
       - run: >-
           sudo -s
           CPPUNIT_IGNORE="N7CppUnit10TestCallerI10ThreadTestEE.testTrySleep,N7CppUnit10TestCallerI13TimestampTestEE.testTimestamp,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
