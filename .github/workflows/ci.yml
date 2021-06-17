@@ -46,15 +46,13 @@ jobs:
           PWD=`pwd`
           ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
-  linux-gcc-make-cross-arm:
+  linux-gcc-make-cross-armhf:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - run: >-
-          sudo dpkg --add-architecture armhf &&
           sudo apt-get update &&
           sudo apt-get install crossbuild-essential-armhf libssl-dev:armhf
-
       - run: >-
           ./configure --config=ARM-Linux --everything --omit=PDF,Data/MySQL,Data/ODBC,Data/PostgreSQL &&
           make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
