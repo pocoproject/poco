@@ -26,7 +26,7 @@ pkg_check_modules(PC_MARIADB QUIET mariadb)
 SET(BINDIR32_ENV_NAME "ProgramFiles(x86)")
 SET(BINDIR32 $ENV{${BINDIR32_ENV_NAME}})
 
-find_path(MYSQL_INCLUDE_DIR mysql.h
+find_path(MYSQL_INCLUDE_DIR mysql/mysql.h
 	HINTS
 		${MYSQL_ROOT_DIR}/include
 		${MYSQL_ROOT_INCLUDE_DIRS}
