@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ActiveRecord">
+      <UniqueIdentifier>{ceead541-8bf8-4ce1-9bc2-20efb73de1e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ActiveRecord\Header Files">
+      <UniqueIdentifier>{f0cd499d-26dc-4a15-950b-713fefc2140e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ActiveRecord\Source Files">
+      <UniqueIdentifier>{07561f15-f350-4d4d-bd7c-8108cc3f72ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\ActiveRecord\ActiveRecord.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\ActiveRecordLib.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\Context.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\IDTraits.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\Query.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\StatementPlaceholderProvider.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\TypeHandler.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ActiveRecord.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Context.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDTraits.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StatementPlaceholderProvider.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
+  </ItemGroup>
+</Project>

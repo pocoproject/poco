@@ -16,6 +16,7 @@
 #define ActiveRecord_IDTraits_INCLUDED
 
 
+#include "Poco/ActiveRecord/ActiveRecordLib.h"
 #include "Poco/Types.h"
 #include "Poco/UUID.h"
 #include "Poco/NumberFormatter.h"
@@ -37,7 +38,7 @@ template <>
 class IDTraits<Poco::UInt64>
 {
 public:
-	static const Poco::UInt64 INVALID_ID;
+	static constexpr Poco::UInt64 INVALID_ID = std::numeric_limits<Poco::UInt64>::max();
 
 	static bool isValid(Poco::UInt64 id)
 	{
@@ -55,7 +56,7 @@ template <>
 class IDTraits<Poco::Int64>
 {
 public:
-	static const Poco::Int64 INVALID_ID;
+	static constexpr Poco::Int64 INVALID_ID = std::numeric_limits<Poco::Int64>::max();
 
 	static bool isValid(Poco::Int64 id)
 	{
@@ -73,7 +74,7 @@ template <>
 class IDTraits<Poco::UInt32>
 {
 public:
-	static const Poco::UInt32 INVALID_ID;
+	static constexpr Poco::UInt32 INVALID_ID = std::numeric_limits<Poco::UInt32>::max();
 
 	static bool isValid(Poco::UInt32 id)
 	{
@@ -91,7 +92,7 @@ template <>
 class IDTraits<Poco::Int32>
 {
 public:
-	static const Poco::Int32 INVALID_ID;
+	static const Poco::Int32 INVALID_ID = std::numeric_limits<Poco::Int32>::max();
 
 	static bool isValid(Poco::Int32 id)
 	{
@@ -109,7 +110,7 @@ template <>
 class IDTraits<Poco::UInt16>
 {
 public:
-	static const Poco::UInt16 INVALID_ID;
+	static constexpr Poco::UInt16 INVALID_ID = std::numeric_limits<Poco::UInt16>::max();
 
 	static bool isValid(Poco::UInt16 id)
 	{
@@ -127,7 +128,7 @@ template <>
 class IDTraits<Poco::Int16>
 {
 public:
-	static const Poco::Int16 INVALID_ID;
+	static constexpr Poco::Int16 INVALID_ID = std::numeric_limits<Poco::Int16>::max();
 
 	static bool isValid(Poco::Int16 id)
 	{
@@ -145,7 +146,7 @@ template <>
 class IDTraits<std::string>
 {
 public:
-	static const std::string INVALID_ID;
+	static ActiveRecordLib_API const std::string INVALID_ID;
 
 	static bool isValid(const std::string& id)
 	{
@@ -163,7 +164,7 @@ template <>
 class IDTraits<Poco::UUID>
 {
 public:
-	static const Poco::UUID INVALID_ID;
+	static ActiveRecordLib_API const Poco::UUID INVALID_ID;
 
 	static bool isValid(const Poco::UUID& id)
 	{

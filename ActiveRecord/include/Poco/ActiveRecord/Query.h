@@ -103,7 +103,7 @@ public:
 					if (index >= _offset && (_limit == 0 || result.size() < _limit))
 					{
 						typename ActRec::Ptr pClone = new ActRec(*pObject);
-						result.push_back(ActiveRecord<ActRec>::withContext(pClone, _pContext));
+						result.push_back(ActRec::withContext(pClone, _pContext));
 					}
 					index++;
 				}

@@ -22,5 +22,6 @@ CppParser
 MongoDB
 Redis
 ActiveRecord
+ActiveRecord/Compiler
 PocoDoc
 ProGen
