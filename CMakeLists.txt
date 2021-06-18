@@ -175,6 +175,14 @@ option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PAGECOMPILER "Enable PageCompiler" ON)
 option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ON)
 
+if(ENABLE_DATA)
+	option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ON)
+	option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ON)
+else()
+	option(ENABLE_ACTIVERECORD "Enable ActiveRecord" OFF)
+	option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" OFF)
+endif()
+
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests & samples" OFF)
 
@@ -325,6 +333,16 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Redis AND ENABLE_REDIS)
 	add_subdirectory(Redis)
 	list(APPEND Poco_COMPONENTS "Redis")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord AND ENABLE_ACTIVERECORD)
+	add_subdirectory(ActiveRecord)
+	list(APPEND Poco_COMPONENTS "ActiveRecord")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/ActiveRecord/Compiler AND ENABLE_ACTIVERECORD_COMPILER)
+	add_subdirectory(ActiveRecord/Compiler)
+	list(APPEND Poco_COMPONENTS "ActiveRecordCompiler")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PDF AND ENABLE_PDF)
