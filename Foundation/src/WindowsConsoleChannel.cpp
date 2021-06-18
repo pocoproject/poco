@@ -26,7 +26,7 @@ WindowsConsoleChannel::WindowsConsoleChannel():
 	_isFile(false),
 	_hConsole(INVALID_HANDLE_VALUE)
 {
-	_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	_hConsole = GetStdHandle(STD_ERROR_HANDLE);
 	// check whether the console has been redirected
 	DWORD mode;	
 	_isFile = (GetConsoleMode(_hConsole, &mode) == 0);
@@ -63,7 +63,7 @@ WindowsColorConsoleChannel::WindowsColorConsoleChannel():
 	_isFile(false),
 	_hConsole(INVALID_HANDLE_VALUE)
 {
-	_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	_hConsole = GetStdHandle(STD_ERROR_HANDLE);
 	// check whether the console has been redirected
 	DWORD mode;	
 	_isFile = (GetConsoleMode(_hConsole, &mode) == 0);
