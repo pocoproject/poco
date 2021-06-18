@@ -216,7 +216,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The POCO C++ Server Page Compiler.\n"
-			"Copyright (c) 2008-2020 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2021 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program compiles web pages containing embedded C++ code "
 			"into a C++ class that can be used with the HTTP server "
@@ -225,7 +225,7 @@ protected:
 		);
 		helpFormatter.setFooter(
 			"For more information, please see the POCO C++ Libraries "
-			"documentation at <http://pocoproject.org/docs/>."
+			"documentation at <https://pocoproject.org/docs/>."
 		);
 		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);

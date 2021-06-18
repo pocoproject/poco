@@ -73,8 +73,22 @@ protected:
 	{
 		HelpFormatter helpFormatter(options());
 		helpFormatter.setCommand(commandName());
-		helpFormatter.setUsage("OPTIONS");
-		helpFormatter.setHeader("POCO C++ Libraries ORM Compiler");
+		helpFormatter.setUsage("[<option> ...] <file>");
+		helpFormatter.setHeader("POCO C++ Libraries ActiveRecord ORM Compiler");
+		helpFormatter.setHeader(
+			"\n"
+			"The POCO C++ Libraries ActiveRecord ORM Compiler.\n"
+			"Copyright (c) 2020-2021 by Applied Informatics Software Engineering GmbH.\n"
+			"All rights reserved.\n\n"
+			"This program generates C++ source code from an ActiveRecord "
+			"XML definition. "
+			"The following command line options are supported:"
+		);
+		helpFormatter.setFooter(
+			"For more information, please see the POCO C++ Libraries "
+			"documentation at <https://pocoproject.org/docs/>."
+		);
+		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);
 	}
 
