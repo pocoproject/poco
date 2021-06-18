@@ -160,8 +160,8 @@ void PollSetTest::testPollClosedServer()
 	StreamSocket ss1;
 	StreamSocket ss2;
 
-	ss1.connectNB(SocketAddress("127.0.0.1", echoServer1.port()));
-	ss2.connectNB(SocketAddress("127.0.0.1", echoServer2.port()));
+	ss1.connect(SocketAddress("127.0.0.1", echoServer1.port()));
+	ss2.connect(SocketAddress("127.0.0.1", echoServer2.port()));
 	PollSet ps;
 	assertTrue(ps.empty());
 	ps.add(ss1, PollSet::POLL_READ);
