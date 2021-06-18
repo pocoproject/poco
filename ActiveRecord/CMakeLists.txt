@@ -18,7 +18,7 @@ set_target_properties(ActiveRecord
 	PROPERTIES
 	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
 	OUTPUT_NAME PocoActiveRecord
-	DEFINE_SYMBOL ActiveRecord_EXPORTS
+	DEFINE_SYMBOL ActiveRecordLib_EXPORTS
 )
 
 target_link_libraries(ActiveRecord PUBLIC Poco::Data Poco::Foundation)
