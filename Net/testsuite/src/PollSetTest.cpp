@@ -181,7 +181,6 @@ void PollSetTest::testPollClosedServer()
 	do
 	{
 		sm = ps.poll(Timespan(1000000));
-		if (sw.elapsedSeconds() > 10) fail();
 	} while (sm.size() < 2);
 	assertTrue(sm.size() == 2);
 	assertTrue(0 == ss1.receiveBytes(0, 0));
