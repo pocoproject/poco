@@ -31,11 +31,12 @@ class Query
 	/// A Query is used to retrieve ActiveRecord objects from a table.
 	///
 	/// As the name implies, Query supports selection of database rows
-	/// based on a WHERE clause (see where()). Furthermore, results can
-	/// be sorted (see orderBy()) and filtered based on a lambda expression
-	/// (see filter()).
+	/// based on a WHERE clause (see where()).
 	///
-	/// Optional result paging is controlled by offest() and limit().
+	/// Furthermore, results can be sorted (see orderBy()) and
+	/// filtered based on a lambda expression (see filter()).
+	///
+	/// Optional result paging is controlled by offset() and limit().
 	/// The total number of results is available via totalResults().
 {
 public:
@@ -73,7 +74,11 @@ public:
 
 	template <typename T>
 	Query& bind(const T& value)
-		/// Bind a value to a placeholder in the where clause.
+		/// Bind a value to a placeholder in the where() clause.
+		///
+		/// For each placeholder (?) in the where() clause,
+		/// a value must be bound with bind() before the query
+		/// can be executed.
 	{
 		_select, Poco::Data::Keywords::bind(value);
 		return *this;
@@ -88,7 +93,7 @@ public:
 	}
 
 	Query& limit(std::size_t limit)
-		/// specify the maximum number of rows to return for paging.
+		/// Specify the maximum number of rows to return for paging.
 	{
 		_limit = limit;
 		return *this;
