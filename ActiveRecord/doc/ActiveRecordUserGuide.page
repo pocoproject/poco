@@ -1,5 +1,5 @@
-POCO C++ Libraries ActiveRecord Framework
 POCO ActiveRecord User Guide
+POCO ActiveRecord Framework
 
 !!!Introduction
 
@@ -9,8 +9,9 @@ to relieve developers from having to write lots of boilerplate database
 query code for common operations like finding an object by ID, updating an object, deleting
 an object or running paged queries. As its name implies, the framework follows
 the well-known [[https://en.wikipedia.org/wiki/Active_record_pattern Active Record]]
-architectural pattern. It's based on a code generator (named *Active Record Compiler*,
+architectural pattern. It's based on a code generator (named <*ActiveRecord Compiler*>,
 or <[arc]>) and uses a convention-over-configuration approach.
+
 
 !!!Getting Started
 
@@ -21,9 +22,9 @@ generates corresponding header and source files defining and implementing
 the respective C++ classes, as well as type handlers for the POCO Data
 library.
 
-Following is a first example for such an XML file. The file defines two
+Following is an example for such an XML file. The file defines two
 classes, an `Employee` class (mapped to a table named `employees`), and
-a `Role` class (mapped to a table names `roles`).
+a `Role` class (mapped to a table named `roles`).
 
   <project namespace="Sample">
     <class name="Employee" table="employees">
@@ -46,6 +47,11 @@ There is a n:1 relationship between `Employee` and `Role` (each employee
 has exactly one role). Furthermore, each employee can optionally have
 a manager, which is again an `Employee`.
 
+Properties named `id` are considered to be primary keys, unless a different
+property has been designated the primary key (with the `key` attribute in
+the `class` element). It's also possible to have objects without a primary key
+or ID column (keyless active records).
+
 The generated C++ classes will be in the `Sample` namespace, as specified
 in the <[project]> element.
 
@@ -53,7 +59,7 @@ The definitions in the XML file correspond to the database schema built
 by the following <[CREATE TABLE]> statements:
 
   CREATE TABLE employees (
-    id CHAR(36),
+    id CHAR(36) PRIMARY KEY,
     name VARCHAR(64),
     ssn VARCHAR(32),
     role INTEGER,
@@ -66,6 +72,9 @@ by the following <[CREATE TABLE]> statements:
     description VARCHAR(256)
   );
 ----
+
+If the database engine supports it, the `id` column of the `employees` table can be
+an UUID as well.
 
 Running the ActiveRecord Compiler with the above XML file (sample.xml) with the
 following statement:
@@ -85,8 +94,8 @@ will create the following files in the current working directory:
 ----
 
 The generated classes are derived from the Poco::ActiveRecord::ActiveRecord class
-template and have accessor methods for all properties, as well as methods
-for creating, updating and deleting instances in the database.
+template and have accessor methods for all properties defined in the XML file,
+as well as methods for creating, updating and deleting instances in the database.
 
 ActiveRecord objects are reference counted, and every generated class contains
 a `Ptr` type alias for an appropriate Poco::AutoPtr<>.
@@ -264,6 +273,10 @@ allows some additional flexibility.
     const auto result = query.execute();
 ----
 
+The lambda expression is passed a const reference to an ActiveRecord object and
+must return a `bool`. If `true` is returned, the object is included in the result,
+otherwise not.
+
 !Relations
 
 Relations (defined in the XML file as properties with a `references` attribute)
@@ -284,7 +297,7 @@ In the following sample, the `role` property is set with the key value, whereas 
     pEmployee->create(pContext);
 ----
 
-!Auto-increment Keys and Auto-generated UUIDs on Insert
+!Auto-Increment Keys and Auto-Generated UUIDs on Insert
 
 ActiveRecord supports auto-incrementing keys when inserting an ActiveRecord. T
 o enable this feature, the `autoIncrementID` attribute in the `class` element needs
@@ -297,7 +310,16 @@ mechanisms.
 When inserting an ActiveRecord with an all-null UUID, a random UUID will be generated
 before executing the `INSERT` statement.
 
-!!!XML Reference
+!Keyless Active Records
+
+It is possible to define classes without an ID or primary key property. For these objects,
+no `find()` method will be generated, and updating these objects is also not possible
+(`update()` will throw a Poco::NotImplementedException).
+
+Keyless ActiveRecord objects can be retrieved by executing a Poco::ActiveRecord::Query.
+
+
+!!!Compiler XML Reference
 
 !!Supported Data Types
 

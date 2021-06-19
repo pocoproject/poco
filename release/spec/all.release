@@ -11,3 +11,5 @@ PageCompiler
 PageCompiler/File2Page
 MongoDB
 Redis
+ActiveRecord
+ActiveRecord/Compiler

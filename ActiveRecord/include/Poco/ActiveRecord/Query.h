@@ -28,6 +28,15 @@ namespace ActiveRecord {
 
 template <typename ActRec>
 class Query
+	/// A Query is used to retrieve ActiveRecord objects from a table.
+	///
+	/// As the name implies, Query supports selection of database rows
+	/// based on a WHERE clause (see where()). Furthermore, results can
+	/// be sorted (see orderBy()) and filtered based on a lambda expression
+	/// (see filter()).
+	///
+	/// Optional result paging is controlled by offest() and limit().
+	/// The total number of results is available via totalResults().
 {
 public:
 	explicit Query(Context::Ptr pContext):
@@ -43,12 +52,20 @@ public:
 	Query& operator = (const Query&) = delete;
 
 	Query& where(const std::string& clause)
+		/// Specify a WHERE clause (without the WHERE keyword)
+		/// to select only rows matching the clause.
+		///
+		/// Placeholders (?) can be used in the clause. For each
+		/// placeholder, an actual value must be bound before
+		/// the query is executed (see bind()).
 	{
 		_select << " WHERE " << fixPlaceholders(clause);
 		return *this;
 	}
 
 	Query& orderBy(const std::string& order)
+		/// Specify a column name and optional direction (ASC, DESC)
+		/// to order the result by.
 	{
 		_select << " ORDER BY " << order;
 		return *this;
@@ -56,24 +73,34 @@ public:
 
 	template <typename T>
 	Query& bind(const T& value)
+		/// Bind a value to a placeholder in the where clause.
 	{
 		_select, Poco::Data::Keywords::bind(value);
 		return *this;
 	}
 
 	Query& offset(std::size_t offset)
+		/// Specify the index or offset of the first row
+		/// to return for paging.
 	{
 		_offset = offset;
 		return *this;
 	}
 
 	Query& limit(std::size_t limit)
+		/// specify the maximum number of rows to return for paging.
 	{
 		_limit = limit;
 		return *this;
 	}
 
 	Query& filter(const std::function<bool(const ActRec&)>& fn)
+		/// Specify a lambda expression for filtering results.
+		///
+		/// The lamda takes a const reference to the ActiveRecord
+		/// (template argument) as parameter and must return a
+		/// bool. If the lambda returns true, the respective ActiveRecord
+		/// is included in the query result.
 	{
 		_filter = fn;
 		return *this;
@@ -86,6 +113,8 @@ public:
 	}
 
 	std::vector<typename ActRec::Ptr> execute()
+		/// Execute the query and return a vector with the
+		/// results.
 	{
 		std::vector<typename ActRec::Ptr> result;
 
@@ -115,11 +144,15 @@ public:
 	}
 
 	std::size_t totalResults() const
+		/// In case of a paged query, returns the total number of results
+		/// that would be returned without paging.
 	{
 		return _totalResults;
 	}
 
 	void reset()
+		/// Resets the query so that it can be executed again, with
+		/// potentially different parameters.
 	{
 		_offset = 0;
 		_limit = 0;
