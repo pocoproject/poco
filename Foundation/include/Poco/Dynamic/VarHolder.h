@@ -31,6 +31,7 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UTFString.h"
 #include "Poco/UTF8String.h"
+#include "Poco/UUID.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <vector>
@@ -178,6 +179,10 @@ public:
 		/// Throws BadCastException. Must be overridden in a type
 		/// specialization in order to support the conversion.
 
+	virtual void convert(UUID& val) const;
+		/// Throws BadCastException. Must be overridden in a type
+		/// specialization in order to support the conversion.
+
 #ifndef POCO_INT64_IS_LONG
 
 	void convert(long& val) const;
@@ -274,6 +279,10 @@ public:
 		/// specialization in order to support the diagnostic.
 
 	virtual bool isDateTime() const;
+		/// Returns false. Must be properly overridden in a type
+		/// specialization in order to support the diagnostic.
+
+	virtual bool isUUID() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
@@ -519,7 +528,15 @@ inline void VarHolder::convert(Timestamp& /*val*/) const
 	throw BadCastException("Can not convert to Timestamp");
 }
 
+
+inline void VarHolder::convert(UUID& /*val*/) const
+{
+	throw BadCastException("Can not convert to UUID");
+}
+
+
 #ifndef POCO_INT64_IS_LONG
+
 
 inline void VarHolder::convert(long& val) const
 {
@@ -536,7 +553,9 @@ inline void VarHolder::convert(unsigned long& val) const
 	val = tmp;
 }
 
+
 #else
+
 
 inline void VarHolder::convert(long long& /*val*/) const
 {
@@ -549,7 +568,9 @@ inline void VarHolder::convert(unsigned long long& /*val*/) const
 	throw BadCastException("Can not convert to unsigned long long");
 }
 
+
 #endif
+
 
 inline void VarHolder::convert(bool& /*val*/) const
 {
@@ -666,6 +687,12 @@ inline bool VarHolder::isTime() const
 
 
 inline bool VarHolder::isDateTime() const
+{
+	return false;
+}
+
+
+inline bool VarHolder::isUUID() const
 {
 	return false;
 }
@@ -1025,7 +1052,6 @@ public:
 	{
 		return std::numeric_limits<Int16>::is_specialized;
 	}
-
 
 	bool isString() const
 	{
@@ -2750,6 +2776,11 @@ public:
 		ts = tmp.timestamp();
 	}
 
+	void convert(UUID& uuid) const
+	{
+		uuid.parse(_val);
+	}
+
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
 	{
 		return cloneHolder(pVarHolder, _val);
@@ -3917,6 +3948,11 @@ public:
 		return true;
 	}
 
+	bool isUUID() const
+	{
+		return false;
+	}
+
 private:
 	VarHolderImpl();
 	VarHolderImpl(const VarHolderImpl&);
@@ -4045,6 +4081,11 @@ public:
 	bool isDateTime() const
 	{
 		return true;
+	}
+
+	bool isUUID() const
+	{
+		return false;
 	}
 
 private:
@@ -4177,12 +4218,113 @@ public:
 		return true;
 	}
 
+	bool isUUID() const
+	{
+		return false;
+	}
+
 private:
 	VarHolderImpl();
 	VarHolderImpl(const VarHolderImpl&);
 	VarHolderImpl& operator = (const VarHolderImpl&);
 
 	Timestamp _val;
+};
+
+
+template <>
+class VarHolderImpl<UUID>: public VarHolder
+{
+public:
+	VarHolderImpl(const UUID& val): _val(val)
+	{
+	}
+
+	~VarHolderImpl()
+	{
+	}
+
+	const std::type_info& type() const
+	{
+		return typeid(UUID);
+	}
+
+	void convert(std::string& val) const
+	{
+		val = _val.toString();
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	{
+		return cloneHolder(pVarHolder, _val);
+	}
+
+	const UUID& value() const
+	{
+		return _val;
+	}
+
+	bool isArray() const
+	{
+		return false;
+	}
+
+	bool isStruct() const
+	{
+		return false;
+	}
+
+	bool isInteger() const
+	{
+		return false;
+	}
+
+	bool isSigned() const
+	{
+		return false;
+	}
+
+	bool isNumeric() const
+	{
+		return false;
+	}
+
+	bool isBoolean() const
+	{
+		return false;
+	}
+
+	bool isString() const
+	{
+		return false;
+	}
+
+	bool isDate() const
+	{
+		return false;
+	}
+
+	bool isTime() const
+	{
+		return false;
+	}
+
+	bool isDateTime() const
+	{
+		return false;
+	}
+
+	bool isUUID() const
+	{
+		return true;
+	}
+
+private:
+	VarHolderImpl();
+	VarHolderImpl(const VarHolderImpl&);
+	VarHolderImpl& operator = (const VarHolderImpl&);
+
+	Poco::UUID _val;
 };
 
 

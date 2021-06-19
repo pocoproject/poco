@@ -104,6 +104,9 @@ public:
 	virtual void bind(std::size_t pos, const Time& val, Direction dir);
 		/// Binds a Time.
 
+	virtual void bind(std::size_t pos, const UUID& val, Direction dir);
+		/// Binds a UUID.
+
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null.
 

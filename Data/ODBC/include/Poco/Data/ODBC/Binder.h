@@ -322,6 +322,9 @@ public:
 	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir);
 		/// Binds a DateTime list.
 
+	void bind(std::size_t pos, const UUID& val, Direction dir);
+		/// Binds a UUID.
+
 	void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null. In-bound only.
 
@@ -367,6 +370,7 @@ private:
 	typedef std::vector<AnyVec>                              AnyVecVec;
 	typedef std::map<char*, std::string*>                    StringMap;
 	typedef std::map<UTF16String::value_type*, UTF16String*> UTF16StringMap;
+	typedef std::map<char*, UUID*>                           UUIDMap;
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
 	typedef std::map<SQL_TIME_STRUCT*, Time*>                TimeMap;
 	typedef std::map<SQL_TIMESTAMP_STRUCT*, DateTime*>       TimestampMap;
@@ -998,6 +1002,7 @@ private:
 	TimestampMap     _timestamps;
 	StringMap        _strings;
 	UTF16StringMap   _utf16Strings;
+	UUIDMap          _uuids;
 
 	DateVecVec       _dateVecVec;
 	TimeVecVec       _timeVecVec;

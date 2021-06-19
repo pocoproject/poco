@@ -225,6 +225,20 @@ bool Extractor::extractBoundImplContainer<std::list<Poco::DateTime> >(std::size_
 
 
 template<>
+bool Extractor::extractBoundImpl<Poco::UUID>(std::size_t pos, Poco::UUID& val)
+{
+	if (isNull(pos)) return false;
+
+	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	checkDataSize(dataSize);
+	char* pBuffer = *AnyCast<char*>(&_pPreparator->at(pos));
+	val.copyFrom(pBuffer);
+
+	return true;
+}
+
+
+template<>
 bool Extractor::extractBoundImplContainer<std::vector<bool> >(std::size_t pos,
 	std::vector<bool>& val)
 {
@@ -499,6 +513,33 @@ bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos,
 		return false;
 	else
 		Utility::dateTimeSync(val, ts);
+
+	return true;
+}
+
+
+template<>
+bool Extractor::extractManualImpl<Poco::UUID>(std::size_t pos,
+	Poco::UUID& val,
+	SQLSMALLINT cType)
+{
+	char buffer[16];
+	resizeLengths(pos);
+
+	SQLRETURN rc = SQLGetData(_rStmt,
+		(SQLUSMALLINT) pos + 1,
+		cType, //C data type
+		&buffer, //returned value
+		sizeof(buffer), //buffer length
+		&_lengths[pos]); //length indicator
+
+	if (Utility::isError(rc))
+		throw StatementException(_rStmt, "SQLGetData()");
+
+	if (isNullLengthIndicator(_lengths[pos]))
+		return false;
+	else
+		val.copyFrom(buffer);
 
 	return true;
 }
@@ -908,6 +949,15 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::DateTime>& val)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::UUID& val)
+{
+	if (Preparator::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_BINARY);
+	else
+		return extractBoundImpl(pos, val);
 }
 
 

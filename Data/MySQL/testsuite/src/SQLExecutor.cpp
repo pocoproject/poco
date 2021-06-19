@@ -545,6 +545,29 @@ void SQLExecutor::doubles()
 }
 
 
+void SQLExecutor::uuids()
+{
+	std::string funct = "uuids()";
+	Poco::UUID data("da8b9c4d-faa0-44e1-b834-ece1e7d31cd5");
+	Poco::UUID ret;
+
+	try { *_pSession << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+
+	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (ret == data);
+}
+
+
 void SQLExecutor::insertSingleBulkVec()
 {
 	std::string funct = "insertSingleBulkVec()";

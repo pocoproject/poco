@@ -25,7 +25,7 @@ public:
 		PB_IMMEDIATE,
 		PB_AT_EXEC
 	};
-	
+
 	enum DataExtraction
 	{
 		DE_MANUAL,
@@ -37,7 +37,7 @@ public:
 
 	void oidPostgreSQLTest(std::string host, std::string user, std::string pwd, std::string db, std::string port, const char* tableCreateString, const Oid anOIDArray[]);
 		/// This function verifies the PostgreSQL Column type OIDs are consistent between releases
-	
+
 	void barebonePostgreSQLTest(std::string host, std::string user, std::string pwd, std::string db, std::string port, const char* tableCreateString);
 		/// This function uses "bare bone"  API calls (i.e. calls are not
 		/// "wrapped" in PocoSQL framework structures).
@@ -89,6 +89,7 @@ public:
 	void unsignedInts();
 	void floats();
 	void doubles();
+	void uuids();
 	void tuples();
 	void tupleVector();
 

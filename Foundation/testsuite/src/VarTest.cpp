@@ -2859,6 +2859,32 @@ void VarTest::testDate()
 }
 
 
+void VarTest::testUUID()
+{
+	Poco::UUID uuid("f1881be4-c3b7-4a47-9619-5169db5108a7");
+
+	Var vuuid(uuid);
+	assertTrue (vuuid.isUUID());
+
+	assert (vuuid.convert<std::string>() == "f1881be4-c3b7-4a47-9619-5169db5108a7");
+
+	assert (vuuid.extract<Poco::UUID>() == uuid);
+
+	Var vstr(std::string("f1881be4-c3b7-4a47-9619-5169db5108a7"));
+	assert (vstr.convert<Poco::UUID>() == uuid);
+
+	Var vstr2(std::string("notAnUUID"));
+	try
+	{
+		Poco::UUID uuid2 = vstr2.convert<Poco::UUID>();
+		fail("not a valid UUID, must fail");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+}
+
+
 void VarTest::testGetIdxNoThrow(Var& a1, std::vector<Var>::size_type n)
 {
 	Var val1 = a1[n];
@@ -3104,6 +3130,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
 	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
 	CppUnit_addTest(pSuite, VarTest, testDate);
+	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
 

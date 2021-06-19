@@ -19,7 +19,6 @@
 #include "Poco/ActiveRecord/ActiveRecordLib.h"
 #include "Poco/ActiveRecord/Context.h"
 #include "Poco/ActiveRecord/IDTraits.h"
-#include "Poco/ActiveRecord/TypeHandler.h"
 #include "Poco/DateTime.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"

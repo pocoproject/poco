@@ -404,6 +404,24 @@ void AbstractBinder::bind(std::size_t pos, const std::list<Time>& val, Direction
 }
 
 
+void AbstractBinder::bind(std::size_t pos, const std::vector<UUID>& val, Direction dir)
+{
+	throw NotImplementedException("std::vector binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::deque<UUID>& val, Direction dir)
+{
+	throw NotImplementedException("std::deque binder must be implemented.");
+}
+
+
+void AbstractBinder::bind(std::size_t pos, const std::list<UUID>& val, Direction dir)
+{
+	throw NotImplementedException("std::list binder must be implemented.");
+}
+
+
 void AbstractBinder::bind(std::size_t pos, const std::vector<NullData>& val, Direction dir)
 {
 	throw NotImplementedException("std::vector binder must be implemented.");

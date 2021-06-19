@@ -82,6 +82,7 @@ public:
 	void testUnsignedInts();
 	void testFloat();
 	void testDouble();
+	void testUUID();
 
 	void testTuple();
 	void testTupleVector();
@@ -118,6 +119,7 @@ private:
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();
 	void recreateFloatsTable();
+	void recreateUUIDsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();
 	void recreateNullableIntTable();

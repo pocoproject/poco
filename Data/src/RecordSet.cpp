@@ -159,6 +159,7 @@ Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFi
 	case MetaColumn::FDT_DATE:      return value<Date>(col, row, useFilter);
 	case MetaColumn::FDT_TIME:      return value<Time>(col, row, useFilter);
 	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, row);
+	case MetaColumn::FDT_UUID:      return value<UUID>(col, row);
 	default:
 		throw UnknownTypeException("Data type not supported.");
 	}
@@ -192,6 +193,7 @@ Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t row, bo
 	case MetaColumn::FDT_DATE:      return value<Date>(name, row, useFilter);
 	case MetaColumn::FDT_TIME:      return value<Time>(name, row, useFilter);
 	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, row, useFilter);
+	case MetaColumn::FDT_UUID:      return value<UUID>(name, row, useFilter);
 	default:
 		throw UnknownTypeException("Data type not supported.");
 	}

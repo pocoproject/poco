@@ -432,6 +432,19 @@ bool Extractor::extract(std::size_t pos, Time& val)
 }
 
 
+bool Extractor::extract(std::size_t pos, UUID& val)
+{
+	OutputParameter outputParameter = extractPreamble(pos);
+
+	if (isColumnNull(outputParameter))
+	{
+		return false;
+	}
+
+	return val.tryParse(outputParameter.pData());
+}
+
+
 bool Extractor::extract(std::size_t pos, Any& val)
 {
 	return extractStringImpl(pos, val);
@@ -581,6 +594,14 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 			success = extract(pos, dt);
 			if (success)
 				val = dt;
+			break;
+		}
+		case UUIDOID:
+		{
+			UUID uuid;
+			success = extract(pos, uuid);
+			if (success)
+				val = uuid;
 			break;
 		}
 	}

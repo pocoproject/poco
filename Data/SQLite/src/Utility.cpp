@@ -134,6 +134,8 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("TIME", MetaColumn::FDT_TIME));
 		_types.insert(TypeMap::value_type("DATETIME", MetaColumn::FDT_TIMESTAMP));
 		_types.insert(TypeMap::value_type("TIMESTAMP", MetaColumn::FDT_TIMESTAMP));
+		_types.insert(TypeMap::value_type("UUID", MetaColumn::FDT_UUID));
+		_types.insert(TypeMap::value_type("GUID", MetaColumn::FDT_UUID));
 	}
 }
 
