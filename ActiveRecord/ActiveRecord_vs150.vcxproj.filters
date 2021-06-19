@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ActiveRecord">
-      <UniqueIdentifier>{ceead541-8bf8-4ce1-9bc2-20efb73de1e6}</UniqueIdentifier>
+      <UniqueIdentifier>{a4ef5b7c-1517-45e6-8856-e9a6c0a9193c}</UniqueIdentifier>
     </Filter>
     <Filter Include="ActiveRecord\Header Files">
-      <UniqueIdentifier>{f0cd499d-26dc-4a15-950b-713fefc2140e}</UniqueIdentifier>
+      <UniqueIdentifier>{28638692-307b-4c80-9fed-23bcf87f7cc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="ActiveRecord\Source Files">
-      <UniqueIdentifier>{07561f15-f350-4d4d-bd7c-8108cc3f72ed}</UniqueIdentifier>
+      <UniqueIdentifier>{0b612e41-e6c4-48fa-9e02-ba01ee09fb19}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -28,9 +28,6 @@
       <Filter>ActiveRecord\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Poco\ActiveRecord\StatementPlaceholderProvider.h">
-      <Filter>ActiveRecord\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Poco\ActiveRecord\TypeHandler.h">
       <Filter>ActiveRecord\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -547,7 +547,6 @@
     <ClInclude Include="include\Poco\ActiveRecord\IDTraits.h"/>
     <ClInclude Include="include\Poco\ActiveRecord\Query.h"/>
     <ClInclude Include="include\Poco\ActiveRecord\StatementPlaceholderProvider.h"/>
-    <ClInclude Include="include\Poco\ActiveRecord\TypeHandler.h"/>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ActiveRecord.cpp">

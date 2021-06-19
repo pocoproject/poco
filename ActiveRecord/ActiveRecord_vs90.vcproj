@@ -524,10 +524,6 @@
 					RelativePath=".\include\Poco\ActiveRecord\StatementPlaceholderProvider.h"
 					>
 				</File>
-				<File
-					RelativePath=".\include\Poco\ActiveRecord\TypeHandler.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Source Files"
