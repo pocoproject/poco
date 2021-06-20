@@ -159,10 +159,6 @@ public:
 			/// Specifies whether the builtin CA certificates from OpenSSL are used.
 			/// Defaults to false.
 
-		bool ocspStaplingVerification;
-			/// Specifies whether Client should verify OCSP Response
-			/// Defaults to false.
-
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
 			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
