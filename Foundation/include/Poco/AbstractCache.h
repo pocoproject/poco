@@ -176,6 +176,23 @@ public:
 		return result;
 	}
 
+	template <typename Fn>
+	void forEach(Fn&& fn) const
+		/// Iterates over all key-value pairs in the
+		/// cache, using a functor or lambda expression.
+		///
+		/// The given functor must take the key and value
+		/// as parameters. Note that the value is passed
+		/// as the actual value (or reference),
+		/// not a Poco::SharedPtr.
+	{
+		typename TMutex::ScopedLock lock(_mutex);
+		for (const auto& p: _data)
+		{
+			fn(p.first, *p.second);
+		}
+	}
+
 protected:
 	mutable FIFOEvent<ValidArgs<TKey>> IsValid;
 	mutable FIFOEvent<KeySet>          Replace;

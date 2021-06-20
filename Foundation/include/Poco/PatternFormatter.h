@@ -144,6 +144,8 @@ private:
 
 	void parsePriorityNames();
 
+	static const std::string DEFAULT_PRIORITY_NAMES;
+
 	std::vector<PatternAction> _patternActions;
 	bool _localTime;
 	std::string _pattern;
