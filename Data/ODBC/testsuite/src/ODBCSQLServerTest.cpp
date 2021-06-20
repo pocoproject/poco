@@ -612,6 +612,15 @@ void ODBCSQLServerTest::recreateFloatsTable()
 }
 
 
+void ODBCSQLServerTest::recreateUUIDsTable()
+{
+	dropObject("TABLE", "Strings");
+	try { session() << "CREATE TABLE Strings (str UNIQUEIDENTIFIER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateUUIDsTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateUUIDsTable()"); }
+}
+
+
 void ODBCSQLServerTest::recreateTuplesTable()
 {
 	dropObject("TABLE", "Tuples");
@@ -787,6 +796,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDouble);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUUID);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTuple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);

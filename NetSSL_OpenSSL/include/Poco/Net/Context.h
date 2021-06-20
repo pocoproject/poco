@@ -20,10 +20,12 @@
 
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/SocketDefs.h"
+#include "Poco/Net/InvalidCertificateHandler.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include <openssl/ssl.h>
 #include <cstdlib>
@@ -135,6 +137,7 @@ public:
 
 		std::string certificateFile;
 			/// Path to the certificate file (in PEM format).
+			///
 			/// If the private key and the certificate are stored in the same file, this
 			/// can be empty if privateKeyFile is given.
 
@@ -191,6 +194,8 @@ public:
 			///   on the group names defined by OpenSSL. Defaults to
 			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
 	};
+
+	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
 
 	Context(Usage usage, const Params& params);
 		/// Creates a Context using the given parameters.
@@ -401,9 +406,15 @@ public:
 		/// preferences. When called, the SSL/TLS server will choose following its own
 		/// preferences.
 
-	bool ocspStaplingResponseVerificationEnabled() const;
-		/// Returns true if automatic OCSP response
-		/// reception and verification is enabled for client connections
+	void setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificageHandler);
+		/// Sets a Context-specific InvalidCertificateHandler.
+		///
+		/// If specified, this InvalidCertificateHandler will be used instead of the
+		/// one globally set in the SSLManager.
+
+	InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
+		/// Returns the InvalidCertificateHandler set for this Context,
+		/// or a null pointer if none has been set.
 
 private:
 	void init(const Params& params);
@@ -423,7 +434,7 @@ private:
 	VerificationMode _mode;
 	SSL_CTX* _pSSLContext;
 	bool _extendedCertificateVerification;
-	bool _ocspStaplingResponseVerification;
+	InvalidCertificateHandlerPtr _pInvalidCertificateHandler;
 };
 
 
@@ -465,9 +476,9 @@ inline bool Context::extendedCertificateVerificationEnabled() const
 }
 
 
-inline bool Context::ocspStaplingResponseVerificationEnabled() const
+inline Context::InvalidCertificateHandlerPtr Context::getInvalidCertificateHandler() const
 {
-	return _ocspStaplingResponseVerification;
+	return _pInvalidCertificateHandler;
 }
 
 

@@ -308,6 +308,9 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::DateTime>& val);
 		/// Extracts a DateTime list.
 
+	bool extract(std::size_t pos, Poco::UUID& val);
+		/// Extracts a UUID.
+
 	bool extract(std::size_t pos, Poco::Any& val);
 		/// Extracts an Any.
 
@@ -465,7 +468,7 @@ private:
 	bool extractManualImpl(std::size_t pos, T& val, SQLSMALLINT cType)
 	{
 		SQLRETURN rc = 0;
-		T value = (T) 0;
+		T value{};
 
 		resizeLengths(pos);
 
@@ -569,6 +572,9 @@ private:
 
 			case MetaColumn::FDT_TIMESTAMP:
 			{ return extAny<T, Poco::DateTime>(pos, val); }
+
+			case MetaColumn::FDT_UUID:
+			{ return extAny<T, Poco::UUID>(pos, val); }
 
 			default:
 				throw DataFormatException("Unsupported data type.");

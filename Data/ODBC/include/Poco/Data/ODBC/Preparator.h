@@ -353,6 +353,9 @@ public:
 	void prepare(std::size_t pos, const std::list<Poco::DateTime>& val);
 		/// Prepares a DateTime list.
 
+	void prepare(std::size_t pos, const Poco::UUID& val);
+		/// Prepares a UUID.
+
 	void prepare(std::size_t pos, const Poco::Any& val);
 		/// Prepares an Any.
 
@@ -547,6 +550,12 @@ private:
 					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP, pVal->size());
 				else
 					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP);
+
+			case MetaColumn::FDT_UUID:
+				if (pVal)
+					return prepareFixedSize<DateTime>(pos, SQL_C_BINARY, 16);
+				else
+					return prepareFixedSize<DateTime>(pos, SQL_C_BINARY);
 
 			default:
 				throw DataFormatException("Unsupported data type.");
@@ -1170,6 +1179,12 @@ inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::DateTime
 inline void Preparator::prepare(std::size_t pos, const std::list<Poco::DateTime>& val)
 {
 	prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP, val.size());
+}
+
+
+inline void Preparator::prepare(std::size_t pos, const Poco::UUID&)
+{
+	prepareCharArray<char, DT_CHAR_ARRAY>(pos, SQL_C_BINARY, 16, 16);
 }
 
 

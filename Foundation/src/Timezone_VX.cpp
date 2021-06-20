@@ -30,12 +30,16 @@ int Timezone::utcOffset()
 	return now - utc;
 }
 
-	
+
 int Timezone::dst()
 {
 	std::time_t now = std::time(NULL);
 	struct std::tm t;
+#if defined(_VXWORKS_COMPATIBILITY_MODE) || (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9))))
 	if (localtime_r(&now, &t) != OK)
+#else
+	if (!localtime_r(&now, &t))
+#endif
 		throw Poco::SystemException("cannot get local time DST offset");
 	return t.tm_isdst == 1 ? 3600 : 0;
 }
@@ -49,7 +53,7 @@ bool Timezone::isDst(const Timestamp& timestamp)
 	return tms->tm_isdst > 0;
 }
 
-	
+
 std::string Timezone::name()
 {
 	// format of TIMEZONE environment variable:
@@ -62,13 +66,13 @@ std::string Timezone::name()
 		return tz;
 }
 
-	
+
 std::string Timezone::standardName()
 {
 	return name();
 }
 
-	
+
 std::string Timezone::dstName()
 {
 	return name();

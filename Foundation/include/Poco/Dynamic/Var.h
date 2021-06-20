@@ -523,6 +523,9 @@ public:
 	bool isDateTime() const;
 		/// Returns true if stored value represents a date/time.
 
+	bool isUUID() const;
+		/// Returns true if stored value is a Poco::UUID.
+
 	std::size_t size() const;
 		/// Returns the size of this Var.
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
@@ -893,6 +896,13 @@ inline bool Var::isDateTime() const
 {
 	VarHolder* pHolder = content();
 	return pHolder ? pHolder->isDateTime() : false;
+}
+
+
+inline bool Var::isUUID() const
+{
+	VarHolder* pHolder = content();
+	return pHolder ? pHolder->isUUID() : false;
 }
 
 

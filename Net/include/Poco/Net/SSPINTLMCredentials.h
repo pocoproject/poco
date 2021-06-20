@@ -49,7 +49,7 @@ private:
 	NTLMContext();
 	NTLMContext(const NTLMContext&);
 	NTLMContext& operator = (const NTLMContext&);
-	
+
 	friend class SSPINTLMProvider;
 };
 

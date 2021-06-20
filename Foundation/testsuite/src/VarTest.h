@@ -71,12 +71,12 @@ public:
 	void testJSONDeserializePrimitives();
 	void testJSONDeserializeArray();
 	void testJSONDeserializeStruct();
-	void testJSONRoundtripStruct(); 
+	void testJSONRoundtripStruct();
 	void testJSONDeserializeComplex();
 	void testDate();
+	void testUUID();
 	void testEmpty();
 	void testIterator();
-
 
 	void setUp();
 	void tearDown();

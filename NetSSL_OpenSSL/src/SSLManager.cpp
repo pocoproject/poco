@@ -12,6 +12,11 @@
 //
 
 
+#if defined(_MSC_VER)
+#pragma warning(disable:4996) // deprecation warnings
+#endif
+
+
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Utility.h"
@@ -28,6 +33,7 @@
 #include <openssl/ocsp.h>
 #include <openssl/tls1.h>
 #endif
+
 
 
 namespace Poco {
@@ -71,7 +77,8 @@ const bool        SSLManager::VAL_FIPS_MODE(false);
 #endif
 
 
-SSLManager::SSLManager()
+SSLManager::SSLManager():
+	_contextIndex(SSL_CTX_get_ex_new_index(0, NULL, NULL, NULL, NULL))
 {
 }
 
@@ -208,16 +215,45 @@ int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 {
 	if (!ok)
 	{
+		SSLManager& sslManager = SSLManager::instance();
+		SSL* pSSL = reinterpret_cast<SSL*>(X509_STORE_CTX_get_ex_data(pStore, SSL_get_ex_data_X509_STORE_CTX_idx()));
+		poco_assert_dbg (pSSL);
+		SSL_CTX* pSSLContext = SSL_get_SSL_CTX(pSSL);
+		poco_assert_dbg (pSSLContext);
+
+		Context* pContext = reinterpret_cast<Context*>(SSL_CTX_get_ex_data(pSSLContext, sslManager.contextIndex()));
+		poco_assert_dbg (pContext);
+
 		X509* pCert = X509_STORE_CTX_get_current_cert(pStore);
 		X509Certificate x509(pCert, true);
 		int depth = X509_STORE_CTX_get_error_depth(pStore);
 		int err = X509_STORE_CTX_get_error(pStore);
 		std::string error(X509_verify_cert_error_string(err));
-		VerificationErrorArgs args(x509, depth, err, error);
+		VerificationErrorArgs args(Context::Ptr(pContext, true), x509, depth, err, error);
 		if (server)
-			SSLManager::instance().ServerVerificationError.notify(&SSLManager::instance(), args);
+		{
+			if (pContext->getInvalidCertificateHandler())
+			{
+				pContext->getInvalidCertificateHandler()->onInvalidCertificate(&sslManager, args);
+			}
+			else if (sslManager._ptrServerCertificateHandler)
+			{
+				sslManager._ptrServerCertificateHandler->onInvalidCertificate(&sslManager, args);
+			}
+			sslManager.ServerVerificationError.notify(&sslManager, args);
+		}
 		else
-			SSLManager::instance().ClientVerificationError.notify(&SSLManager::instance(), args);
+		{
+			if (pContext->getInvalidCertificateHandler())
+			{
+				pContext->getInvalidCertificateHandler()->onInvalidCertificate(&sslManager, args);
+			}
+			else if (sslManager._ptrClientCertificateHandler)
+			{
+				sslManager._ptrClientCertificateHandler->onInvalidCertificate(&sslManager, args);
+			}
+			sslManager.ClientVerificationError.notify(&sslManager, args);
+		}
 		ok = args.getIgnoreError() ? 1 : 0;
 	}
 

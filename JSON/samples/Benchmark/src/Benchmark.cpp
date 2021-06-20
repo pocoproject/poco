@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 		else
 		{
 			std::cout << filePath.toString() << " doesn't exist!" << std::endl;
-			return 1; 
+			return 1;
 		}
 	}
 
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 		std::cout << "-----------------------------------" << std::endl;
 		std::cout << std::endl;
 	}
-	catch(Poco::JSON::JSONException jsone)
+	catch(Poco::JSON::JSONException& jsone)
 	{
 		std::cout << jsone.message() << std::endl;
 	}

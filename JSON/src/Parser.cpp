@@ -29,8 +29,8 @@ namespace Poco {
 namespace JSON {
 
 
-Parser::Parser(const Handler::Ptr& pHandler, std::size_t bufSize):
-	ParserImpl(pHandler, bufSize)
+Parser::Parser(const Handler::Ptr& pHandler):
+	ParserImpl(pHandler)
 {
 }
 

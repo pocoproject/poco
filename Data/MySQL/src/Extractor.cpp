@@ -204,6 +204,18 @@ bool Extractor::extract(std::size_t pos, Time& val)
 }
 
 
+bool Extractor::extract(std::size_t pos, UUID& val)
+{
+	std::string str;
+	if (extract(pos, str))
+	{
+		val.parse(str);
+		return true;
+	}
+	else return false;
+}
+
+
 bool Extractor::extract(std::size_t pos, Any& val)
 {
 	return false;

@@ -28,7 +28,7 @@ namespace XML {
 
 
 class XML_API SAXParser: public XMLReader
-	/// This class provides a SAX2 (Simple API for XML) interface to expat, 
+	/// This class provides a SAX2 (Simple API for XML) interface to expat,
 	/// the XML parser toolkit.
 	/// The following SAX2 features and properties are supported:
 	///   * http://xml.org/sax/features/external-general-entities
@@ -41,6 +41,14 @@ class XML_API SAXParser: public XMLReader
 	/// The following proprietary extensions are supported:
 	///   * http://www.appinf.com/features/enable-partial-reads --
 	///     see ParserEngine::setEnablePartialReads()
+	///   * http://www.appinf.com/properties/bla-maximum-amplification
+	///     see ParserEngine::setBillionLaughsAttackProtectionMaximumAmplification();
+	///     argument must be a float >= 1.0 formatted as string;
+	///     property is set-only.
+	///   * http://www.appinf.com/properties/bla-activation-threshold
+	///     see ParserEngine::setBillionLaughsAttackProtectionActivationThreshold();
+	///     argument must be a 64-bit unsigned integer formatted as string;
+	///     property is set-only.
 {
 public:
 	SAXParser();
@@ -48,14 +56,14 @@ public:
 
 	SAXParser(const XMLString& encoding);
 		/// Creates an SAXParser with the given encoding.
-		
+
 	~SAXParser();
 		/// Destroys the SAXParser.
-	
+
 	void setEncoding(const XMLString& encoding);
 		/// Sets the encoding used by the parser if no
 		/// encoding is specified in the XML document.
-		
+
 	const XMLString& getEncoding() const;
 		/// Returns the name of the encoding used by
 		/// the parser if no encoding is specified in
@@ -81,11 +89,13 @@ public:
 	void parse(InputSource* pSource);
 	void parse(const XMLString& systemId);
 	void parseMemoryNP(const char* xml, std::size_t size);
-	
+
 	/// Extensions
 	void parseString(const std::string& xml);
-	
+
 	static const XMLString FEATURE_PARTIAL_READS;
+	static const XMLString PROPERTY_BLA_MAXIMUM_AMPLIFICATION;
+	static const XMLString PROPERTY_BLA_ACTIVATION_THRESHOLD;
 
 protected:
 	void setupParse();

@@ -18,9 +18,9 @@
 #define Data_MySQL_ResultMetadata_INCLUDED
 
 
-#include <mysql.h>
-#include <vector>
 #include "Poco/Data/MetaColumn.h"
+#include <mysql/mysql.h>
+#include <vector>
 
 
 #if LIBMYSQL_VERSION_ID >= 80000

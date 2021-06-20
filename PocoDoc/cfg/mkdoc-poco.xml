@@ -47,7 +47,8 @@
 		<charset>utf-8</charset>
 		<software>POCO C++ Libraries</software>
 		<company>Applied Informatics Software Engineering GmbH and Contributors</company>
-		<companyURI>http://pocoproject.org/</companyURI>
+		<companyURI>https://pocoproject.org/
+</companyURI>
 	</PocoDoc>
 	<Translations>
 		<EN>

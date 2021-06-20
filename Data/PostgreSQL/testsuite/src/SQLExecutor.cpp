@@ -712,6 +712,29 @@ void SQLExecutor::floats()
 }
 
 
+void SQLExecutor::uuids()
+{
+	std::string funct = "uuids()";
+	Poco::UUID data("264a1c6f-7af5-43a5-a593-377aff3d2d7d");
+	Poco::UUID ret;
+
+	try { *_pSession << "INSERT INTO Strings VALUES ($1)", use(data), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	int count = 0;
+	try { *_pSession << "SELECT COUNT(*) FROM Strings", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+
+	try { *_pSession << "SELECT str FROM Strings", into(ret), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (ret == data);
+}
+
+
 void SQLExecutor::doubles()
 {
 	std::string funct = "floats()";
@@ -1611,7 +1634,7 @@ void SQLExecutor::blobStmt()
 	std::string lastName("lastname");
 	std::string firstName("firstname");
 	std::string address("Address");
-unsigned char BLOBData[ 10 ] = { 0,1,2,3,4,5,6,7,14,15 };
+	unsigned char BLOBData[ 10 ] = { 0,1,2,3,4,5,6,7,14,15 };
 	Poco::Data::BLOB blob(BLOBData, 10);
 
 	int count = 0;

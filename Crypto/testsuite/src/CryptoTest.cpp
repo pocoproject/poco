@@ -357,6 +357,9 @@ void CryptoTest::testCertificate()
 	assertTrue (organizationName == "Applied Informatics Software Engineering GmbH");
 	assertTrue (organizationUnitName == "Development");
 
+	const auto fingerprint = cert.fingerprint();
+	assertTrue (Poco::DigestEngine::digestToHex(fingerprint) == "ac84e4eb72c861ccb20f2900f3f17a9ac11f6579");
+
 	// fails with recent OpenSSL versions:
 	// assert (cert.issuedBy(cert));
 

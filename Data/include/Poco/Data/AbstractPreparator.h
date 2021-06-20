@@ -21,6 +21,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/UUID.h"
 #include "Poco/UTFString.h"
 #include <vector>
 #include <deque>
@@ -309,6 +310,18 @@ public:
 
 	virtual void prepare(std::size_t pos, const std::list<Time>& val);
 		/// Prepares a Time list.
+
+	virtual void prepare(std::size_t pos, const UUID&) = 0;
+		/// Prepares a UUID.
+
+	virtual void prepare(std::size_t pos, const std::vector<UUID>& val);
+		/// Prepares a UUID vector.
+
+	virtual void prepare(std::size_t pos, const std::deque<UUID>& val);
+		/// Prepares a UUID deque.
+
+	virtual void prepare(std::size_t pos, const std::list<UUID>& val);
+		/// Prepares a UUID list.
 
 	virtual void prepare(std::size_t pos, const Any&) = 0;
 		/// Prepares an Any.
