@@ -284,6 +284,16 @@ if(ENABLE_POCODOC)
 	set(ENABLE_CPPPARSER ON CACHE BOOL "Enable C++ parser" FORCE)
 endif()
 
+if(ENABLE_SEVENZIP OR ENABLE_ZIP)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
+if(ENABLE_UTIL AND ENABLE_TESTS)
+	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
+endif()
+
 if(ENABLE_JWT)
 	set(ENABLE_CRYPTO ON CACHE BOOL "Enable Crypto" FORCE)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
@@ -427,9 +437,7 @@ add_custom_target(uninstall
 #############################################################
 # Enable packaging
 
-if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-	include(InstallRequiredSystemLibraries)
-endif()
+include(InstallRequiredSystemLibraries)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Poco Libraries")
 set(CPACK_PACKAGE_VENDOR "Applied Informatics Software Engineering GmbH")
