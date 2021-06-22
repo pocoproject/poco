@@ -136,8 +136,6 @@ private:
 		/// Called whenever SQLExecute returns SQL_NEED_DATA. This is expected 
 		/// behavior for PB_AT_EXEC binding mode. 
 
-	void getData();
-
 	void addPreparator();
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");

@@ -32,6 +32,8 @@
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Nullable.h"
 #include "Poco/UTFString.h"
+#include "Poco/TextEncoding.h"
+#include "Poco/TextConverter.h"
 #include "Poco/Exception.h"
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -53,7 +55,8 @@ public:
 	typedef Preparator::Ptr PreparatorPtr;
 
 	Extractor(const StatementHandle& rStmt,
-		Preparator::Ptr pPreparator);
+		Preparator::Ptr pPreparator,
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Extractor.
 
 	~Extractor();
@@ -580,6 +583,40 @@ private:
 		return false;
 	}
 
+	template <typename C>
+	bool stringContainerExtractConvert(std::size_t pos, C& val)
+	{
+		bool ret = false;
+		C res;
+		ret = extractBoundImplContainer(pos, res);
+		val.clear();
+		if (ret)
+		{
+			Poco::TextConverter conv(*_pDBEncoding, *_pToEncoding);
+			val.resize(res.size());
+			typename C::iterator vIt = val.begin();
+			typename C::iterator it = res.begin();
+			for (; it != res.end(); ++it, ++vIt) conv.convert(*it, *vIt);
+		}
+		return ret;
+	}
+
+	template <typename C>
+	bool stringContainerExtract(std::size_t pos, C& val)
+	{
+		bool ret = false;
+		if (Preparator::DE_BOUND == _dataExtraction)
+		{
+			if (!_transcode)
+				ret = extractBoundImplContainer(pos, val);
+			else
+				ret = stringContainerExtractConvert(pos, val);
+		}
+		else
+			throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+		return ret;
+	}
+
 	bool isNullLengthIndicator(SQLLEN val) const;
 		/// The reason for this utility wrapper are platforms where
 		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value,
@@ -591,6 +628,9 @@ private:
 	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
 	std::vector<SQLLEN>        _lengths;
+	Poco::TextEncoding::Ptr    _pDBEncoding;
+	bool                       _transcode;
+	Poco::TextEncoding::Ptr    _pToEncoding;
 };
 
 
