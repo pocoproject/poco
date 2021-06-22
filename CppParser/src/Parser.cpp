@@ -810,7 +810,7 @@ const Token* Parser::parseEnum(const Token* pNext)
 	int line = _istr.getCurrentLineNumber();
 	pNext = next();
 
-	if (isKeyword(pNext, IdentifierToken::KW_CLASS))
+	if (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT))
 	{
 		flags = Enum::ENUM_IS_CLASS;
 		pNext = next();
@@ -826,7 +826,19 @@ const Token* Parser::parseEnum(const Token* pNext)
 	if (isOperator(pNext, OperatorToken::OP_COLON))
 	{
 		pNext = next();
-		pNext = parseIdentifier(pNext, baseType);
+		if (pNext->is(Token::KEYWORD_TOKEN))
+		{
+			while (pNext->is(Token::KEYWORD_TOKEN)) // int, unsigned int, etc.
+			{
+				if (!baseType.empty()) baseType += ' ';
+				baseType += pNext->tokenString();
+				pNext = next();
+			}
+		}
+		else
+		{
+			pNext = parseIdentifier(pNext, baseType);
+		}
 	}
 
 	expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
