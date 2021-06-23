@@ -29,7 +29,10 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
-
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+#include <openssl/ocsp.h>
+#include <openssl/tls1.h>
+#endif
 
 
 namespace Poco {
@@ -268,6 +271,145 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 		size = (int) pwd.length();
 
 	return size;
+}
+
+
+int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
+{
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+	const long OCSP_VALIDITY_LEEWAY = 5*60;
+
+	Poco::Net::Context* pContext = static_cast<Poco::Net::Context*>(arg);
+
+	// Fetch the OSCP verify flag
+	bool ocspVerifyFlag = pContext->ocspStaplingResponseVerificationEnabled();
+
+	const unsigned char* pResp;
+	int len = SSL_get_tlsext_status_ocsp_resp(pSSL, &pResp);
+	if (!pResp)
+	{
+		// OCSP response not received
+		return ocspVerifyFlag ? 0 : 1;
+	}
+
+	OCSP_RESPONSE* pOcspResp = d2i_OCSP_RESPONSE(NULL, &pResp, len);
+	if (!pOcspResp) return 0;
+
+	if (OCSP_response_status(pOcspResp) != OCSP_RESPONSE_STATUS_SUCCESSFUL)
+	{
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	OCSP_BASICRESP* pBasicResp = OCSP_response_get1_basic(pOcspResp);
+	if (!pBasicResp)
+	{
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	X509* pPeerCert = SSL_get_peer_certificate(pSSL);
+	if (!pPeerCert)
+	{
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	X509* pPeerIssuerCert = NULL;
+	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
+	unsigned certChainLen = sk_X509_num(pCertChain);
+	for (int i= 0; i < certChainLen ; i++)
+	{
+		if (!pPeerIssuerCert)
+		{
+			X509* pIssuerCert = sk_X509_value(pCertChain, i);
+			if (X509_check_issued(pIssuerCert, pPeerCert) == X509_V_OK)
+			{
+				pPeerIssuerCert = pIssuerCert;
+				break;
+			}
+		}
+	}
+	if (!pPeerIssuerCert)
+	{
+		X509_free(pPeerCert);
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	STACK_OF(X509)* pCerts = sk_X509_new_null();
+	if (pCerts)
+	{
+		X509* pCert = X509_dup(pPeerIssuerCert);
+		if (pCert && !sk_X509_push(pCerts, pCert))
+		{
+			X509_free(pCert);
+			sk_X509_free(pCerts);
+			pCerts = NULL;
+		}
+	}
+
+	X509_STORE* pStore = SSL_CTX_get_cert_store(SSL_get_SSL_CTX(pSSL));
+
+	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, OCSP_TRUSTOTHER);
+
+	sk_X509_pop_free(pCerts, X509_free);
+
+	if (verifyStatus <= 0)
+	{
+		X509_free(pPeerCert);
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	OCSP_CERTID* pCertId = OCSP_cert_to_id(NULL, pPeerCert, pPeerIssuerCert);
+	if (!pCertId)
+	{
+		X509_free(pPeerCert);
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	X509_free(pPeerCert);
+
+	ASN1_GENERALIZEDTIME* pRevTime;
+	ASN1_GENERALIZEDTIME* pThisUpdate;
+	ASN1_GENERALIZEDTIME* pNextUpdate;
+	int certStatus;
+	int reason;
+	if (!OCSP_resp_find_status(pBasicResp, pCertId, &certStatus, &reason, &pRevTime, &pThisUpdate, &pNextUpdate))
+	{
+		OCSP_CERTID_free(pCertId);
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	OCSP_CERTID_free(pCertId);
+
+	if (certStatus != V_OCSP_CERTSTATUS_GOOD)
+	{
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	if (!OCSP_check_validity(pThisUpdate, pNextUpdate, OCSP_VALIDITY_LEEWAY, -1))
+	{
+		OCSP_BASICRESP_free(pBasicResp);
+		OCSP_RESPONSE_free(pOcspResp);
+		return 0;
+	}
+
+	OCSP_BASICRESP_free(pBasicResp);
+	OCSP_RESPONSE_free(pOcspResp);
+#endif
+
+	return 1;
 }
 
 
