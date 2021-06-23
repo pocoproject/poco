@@ -578,10 +578,10 @@ SECURITY_STATUS SecureSocketImpl::decodeMessage(BYTE* pBuffer, DWORD bufSize, Au
 	{
 		for (int i = 1; i < 4; ++i)
 		{
-			if (pDataBuffer == 0 && msg[i].BufferType == SECBUFFER_DATA)
+			if (!pDataBuffer && msg[i].BufferType == SECBUFFER_DATA)
 				pDataBuffer = &msg[i];
 
-			if (pExtraBuffer == NULL && msg[i].BufferType == SECBUFFER_EXTRA)
+			if (!pExtraBuffer && msg[i].BufferType == SECBUFFER_EXTRA)
 				pExtraBuffer = &msg[i];
 		}
 	}
