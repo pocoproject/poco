@@ -200,7 +200,6 @@ void Application::uninitialize()
 		}
 		_initialized = false;
 	}
-
 }
 
 
