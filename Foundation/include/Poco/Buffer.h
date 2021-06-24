@@ -191,7 +191,7 @@ public:
 			if (newCapacity > 0)
 			{
 				ptr = new T[newCapacity];
-				if (preserveContent)
+				if (preserveContent && _ptr)
 				{
 					std::size_t newSz = _used < newCapacity ? _used : newCapacity;
 					std::memcpy(ptr, _ptr, newSz * sizeof(T));
