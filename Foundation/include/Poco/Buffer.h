@@ -159,7 +159,7 @@ public:
 		if (newCapacity > _capacity)
 		{
 			T* ptr = new T[newCapacity];
-			if (preserveContent)
+			if (preserveContent && _ptr)
 			{
 				std::memcpy(ptr, _ptr, _used * sizeof(T));
 			}
@@ -266,10 +266,11 @@ public:
 		{
 			if (_used == other._used)
 			{
-				if (std::memcmp(_ptr, other._ptr, _used * sizeof(T)) == 0)
+				if (_ptr && other._ptr && std::memcmp(_ptr, other._ptr, _used * sizeof(T)) == 0)
 				{
 					return true;
 				}
+				else return _used == 0;
 			}
 			return false;
 		}
