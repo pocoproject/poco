@@ -5,8 +5,9 @@ POCO Data Library
 
 POCO Data is POCO's database abstraction layer which allows users to
 easily send/retrieve data to/from various databases. Currently supported
-database connectors are SQLite, MySQL and ODBC. Framework is opened
-for extension, so additional native connectors (Oracle, PostgreSQL, ...)
+database connectors are SQLite, MySQL/MariaDB, PostgreSQL and ODBC (which
+covers SQL Server and other databases).
+Framework is opened for extension, so additional native connectors (Oracle, Db2, ...)
 can be added. The intent behind the Poco::Data framework is to produce the
 integration between C++ and relational databses in a simple and natural way.
 
@@ -123,7 +124,10 @@ a complete ODBC driver-specific connection string defining all the necessary con
 
 For MySQL, the connection string is a semicolon-delimited list of name-value pairs
 specifying various parameters like host, port, user, password, database, compression and
-automatic reconnect. Example: <["host=localhost;port=3306;db=mydb;user=alice;password=s3cr3t;compress=true;auto-reconnect=true"]>
+automatic reconnect. Example:
+
+    "host=localhost;port=3306;db=mydb;user=alice;password=s3cr3t;compress=true;auto-reconnect=true"
+----
 
 
 !!!Inserting and Retrieving Data
@@ -139,17 +143,17 @@ Assume we have a table that stores only forenames:
 If we want to insert one single forename we could simply write:
 
     std::string aName("Peter");
-    session << "INSERT INTO FORENAME VALUES(" << aName << ")", now;
+    session << "INSERT INTO FORENAME VALUES('" << aName << "')", now;
 ----
 
 However, a better solution is to use <*placeholders*> and connect each
-placeholder via a <[use]> expression with a variable that will provide
+placeholder via a `use` expression with a variable that will provide
 the value during execution. Placeholders, depending on your database are
-recognized by having either a colon(<[:]>) in front of the name or
-simply by a question mark (<[?]>) as a placeholder. While having the
+recognized by having either a colon (`:`) in front of the name or
+simply by a question mark (`?`) as a placeholder. While having the
 placeholders marked with a colon followed by a human-readable name is
 very convenient due to readability, not all SQL dialects support this and
-universally accepted standard placeholder is  (<[?]>). Consult your database
+universally accepted standard placeholder is `?`. Consult your database
 SQL documentation to determine the valid placeholder syntax.
 
 Rewriting the above code now simply gives:
@@ -609,8 +613,8 @@ not!> be used in conjunction with <[out]> and <[io]> under any
 circumstances: <[std::vector<bool>]> . The details are beyond the scope
 of this manual. For those interested to learn more about it, there is an
 excellent explanation in S. Meyers book "Efective STL", Item 18 or Gotw
-#50, [[http://www.gotw.ca/gotw/050.htm When Is a Container Not a
-Container]] paragraph.
+#50, [[http://www.gotw.ca/gotw/050.htm When Is a Container Not a Container]]
+paragraph.
 
 
 !!!Tuples
@@ -771,8 +775,8 @@ size of data set we want to fetch, either explicitly as in the code
 above or implicitly, through size of the supplied container as in
 following example:
 
-std::vector<int> ints(100, 1);
-session << "SELECT * FROM Test", into(ints, bulk), now;
+    std::vector<int> ints(100, 1);
+    session << "SELECT * FROM Test", into(ints, bulk), now;
 ----
 
 For statements that generate their ow internal extraction storage (see
