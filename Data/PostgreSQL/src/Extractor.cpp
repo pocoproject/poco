@@ -502,15 +502,14 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 		return false;
 	}
 
-	std::string tempString { outputParameter.pData(), outputParameter.size() };
+	const std::string tempString{outputParameter.pData(), outputParameter.size()};
 	const Oid oid = outputParameter.internalFieldType();
 
-	Dynamic::Var resultValue;
 	bool success = false;
 
 	switch (oid)
 	{
-		case BOOLOID:
+	case BOOLOID:
 		{
 			success = true;
 			if (tempString[0] == 't')
@@ -519,9 +518,9 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = false;
 			break;
 		}
-		case INT2OID:
-		case INT4OID:
-		case INT8OID:
+	case INT2OID:
+	case INT4OID:
+	case INT8OID:
 		{
 			Poco::Int64 tempValue = 0;
 			success = Poco::NumberParser::tryParse64(tempString, tempValue);
@@ -529,10 +528,10 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = tempValue;
 			break;
 		}
-		// floating point
-		case FLOAT8OID:
-		case FLOAT4OID:
-		case NUMERICOID:
+	// floating point
+	case FLOAT8OID:
+	case FLOAT4OID:
+	case NUMERICOID:
 		{
 			double tempValue = 0;
 			success = Poco::NumberParser::tryParseFloat(tempString, tempValue);
@@ -540,18 +539,18 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = tempValue;
 			break;
 		}
-		// character strings
-		case CHAROID:
-		case BPCHAROID:
-		case VARCHAROID:
-		default:
+	// character strings
+	case CHAROID:
+	case BPCHAROID:
+	case VARCHAROID:
+	default:
 		{
 			success = true;
 			val = tempString;
 			break;
 		}
-		// BLOB, CLOB
-		case BYTEAOID:
+	// BLOB, CLOB
+	case BYTEAOID:
 		{
 			Poco::Data::BLOB blob;
 			success = extract(pos, blob);
@@ -559,7 +558,7 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = blob;
 			break;
 		}
-		case TEXTOID:
+	case TEXTOID:
 		{
 			Poco::Data::CLOB clob;
 			success = extract(pos, clob);
@@ -567,8 +566,8 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = clob;
 			break;
 		}
-		// date
-		case DATEOID:
+	// date
+	case DATEOID:
 		{
 			Date d;
 			success = extract(pos, d);
@@ -576,9 +575,9 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = d;
 			break;
 		}
-		// time
-		case TIMEOID:
-		case TIMETZOID:
+	// time
+	case TIMEOID:
+	case TIMETZOID:
 		{
 			Time t;
 			success = extract(pos, t);
@@ -586,9 +585,9 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = t;
 			break;
 		}
-		//timestamp
-		case TIMESTAMPOID:
-		case TIMESTAMPZOID:
+	//timestamp
+	case TIMESTAMPOID:
+	case TIMESTAMPZOID:
 		{
 			DateTime dt;
 			success = extract(pos, dt);
@@ -596,7 +595,7 @@ bool Extractor::extractToDynamic(std::size_t pos, Dynamic::Var& val)
 				val = dt;
 			break;
 		}
-		case UUIDOID:
+	case UUIDOID:
 		{
 			UUID uuid;
 			success = extract(pos, uuid);
