@@ -329,15 +329,10 @@ private:
 	{
 		OutputParameter outputParameter = extractPreamble(pos);
 
-		if (isColumnNull(outputParameter))
-		{
-			return false;
-		}
+		if (isColumnNull(outputParameter)) return false;
 
 		std::string tempString;  // since the postgreSQL API in use is all about strings...
-
 		bool returnValue = extract(pos, tempString);
-
 		if (returnValue)
 		{
 			val = tempString;
@@ -349,7 +344,7 @@ private:
 	bool extractToDynamic(std::size_t pos, Dynamic::Var& val);
 
 	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator=(const Extractor&);
+	Extractor& operator = (const Extractor&);
 
 private:
 	StatementExecutor& _statementExecutor;
