@@ -156,8 +156,8 @@ struct timeval ICMPv4PacketImpl::time(Poco::UInt8* buffer, int length) const
 	}
 	else
 	{
-		struct timeval* ptv = (struct timeval*) data(buffer, length);
-		if (ptv) tv = *ptv;
+		struct timeval* ptv = reinterpret_cast<struct timeval*>(data(buffer, length));
+		if (ptv) std::memcpy(&tv, ptv, sizeof(tv));
 		else throw InvalidArgumentException("Invalid packet.");
 	}
 	return tv;
@@ -172,13 +172,13 @@ ICMPv4PacketImpl::Header* ICMPv4PacketImpl::header(Poco::UInt8* buffer, int leng
 	if ((offset + sizeof(Header)) > length) return 0;
 
 	buffer += offset;
-	return (Header *) buffer;
+	return reinterpret_cast<Header*>(buffer);
 }
 
 
 Poco::UInt8* ICMPv4PacketImpl::data(Poco::UInt8* buffer, int length) const
 {
-	return ((Poco::UInt8*) header(buffer, length)) + sizeof(Header);
+	return (reinterpret_cast<Poco::UInt8*>(header(buffer, length))) + sizeof(Header);
 }
 
 
