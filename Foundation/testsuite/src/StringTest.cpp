@@ -812,6 +812,7 @@ void StringTest::testNumericStringPadding()
 {
 	std::string str;
 	assertTrue (floatToStr(str, 0.999f, 2, 4) == "1.00");
+	assertTrue (floatToStr(str, 0.999f, 2, 4, '.', ',') == "1,00");
 	assertTrue (floatToStr(str, 0.945f, 2, 4) == "0.95");
 	assertTrue (floatToStr(str, 0.944f, 2, 4) == "0.94");
 	assertTrue (floatToStr(str, 12.45f, 2, 5) == "12.45");
@@ -829,6 +830,7 @@ void StringTest::testNumericStringPadding()
 	assertTrue (doubleToStr(str, 12.45, 2, 6) == " 12.45");
 	assertTrue (doubleToStr(str, 12.455, 3, 7) == " 12.455");
 	assertTrue (doubleToStr(str, 12.455, 2, 6) == " 12.46");
+	assertTrue (doubleToStr(str, 12345.678, 3, 6, '.', ',') == "12.345,678");
 	assertTrue (doubleToStr(str, 1.23556E-16, 2, 6) == "1.24e-16");
 }
 
