@@ -279,7 +279,8 @@ inline const void* InputParameter::pInternalRepresentation() const
 		return _pNonStringVersionRepresentation;
 
 	case Poco::Data::MetaColumn::FDT_UNKNOWN:
-	default: return 0;
+	default:
+		return 0;
     }
 }
 

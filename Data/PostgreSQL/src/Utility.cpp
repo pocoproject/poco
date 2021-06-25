@@ -27,13 +27,9 @@ namespace PostgreSQL {
 std::string Utility::serverInfo(SessionHandle* aHandlePtr)
 {
 	std::string srvrInfo = "Process ID: ";
-
 	srvrInfo.append(Poco::NumberFormatter::format(aHandlePtr->serverProcessID()));
-
 	srvrInfo.append(" Protocol Version: ");
-
 	srvrInfo.append(Poco::NumberFormatter::format(aHandlePtr->protocoVersion()));
-
 	return srvrInfo;
 }
 
@@ -61,7 +57,6 @@ std::string Utility::hostInfo(SessionHandle* aHandlePtr)
 	SessionParametersMap parametersMap = aHandlePtr->connectionParameters();
 
 	SessionParametersMap::const_iterator cItr = parametersMap.find("host");
-
 	if (parametersMap.end() == cItr)
 	{
 		return std::string();

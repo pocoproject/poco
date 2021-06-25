@@ -205,8 +205,8 @@ Binder::bindVector() const
 
 void Binder::updateBindVectorToCurrentValues()
 {
-	InputParameterVector::iterator itr		= _bindVector.begin();
-	InputParameterVector::iterator itrEnd	= _bindVector.end();
+	InputParameterVector::iterator itr    = _bindVector.begin();
+	InputParameterVector::iterator itrEnd = _bindVector.end();
 
 	for (; itr != itrEnd; ++itr)
 	{
