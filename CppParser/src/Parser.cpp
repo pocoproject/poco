@@ -273,7 +273,7 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 
 	_pCurrentSymbol = 0;
 	bool isClass = isKeyword(pNext, IdentifierToken::KW_CLASS);
-	int line = _istr.getCurrentLineNumber();
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	Symbol::Access prevAccess = _access;
 	append(decl, pNext);
 	Symbol::Access access;
@@ -480,7 +480,7 @@ const Token* Parser::parseTypeDef(const Token* pNext)
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_TYPEDEF));
 
 	_pCurrentSymbol = 0;
-	int line = _istr.getCurrentLineNumber();
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	std::string decl;
 	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
 	{
@@ -501,7 +501,7 @@ const Token* Parser::parseUsing(const Token* pNext)
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_USING));
 
 	_pCurrentSymbol = 0;
-	int line = _istr.getCurrentLineNumber();
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	pNext = next();
 	if (isKeyword(pNext, IdentifierToken::KW_NAMESPACE))
 	{
@@ -595,7 +595,7 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 			if (!currentNameSpace()->lookup(name))
 			{
 				Variable* pVar = new Variable(decl, currentNameSpace());
-				addSymbol(pVar, _istr.getCurrentLineNumber());
+				addSymbol(pVar, static_cast<int>(_istr.getCurrentLineNumber()));
 			}
 			pNext = next();
 		}
@@ -644,7 +644,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENPARENT));
 
-	int line = _istr.getCurrentLineNumber();
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	Function* pFunc = 0;
 	std::string name = Symbol::extractName(decl);
 	if (name.find(':') == std::string::npos)
@@ -807,7 +807,7 @@ const Token* Parser::parseEnum(const Token* pNext)
 	std::string baseType;
 	int flags = 0;
 	_pCurrentSymbol = 0;
-	int line = _istr.getCurrentLineNumber();
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	pNext = next();
 
 	if (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT))
@@ -862,7 +862,7 @@ const Token* Parser::parseEnumValue(const Token* pNext, Enum* pEnum)
 {
 	_pCurrentSymbol = 0;
 	_doc.clear();
-	int line = _istr.getCurrentLineNumber();
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
 	std::string name = pNext->tokenString();
 	std::string value;
 	pNext = next();
