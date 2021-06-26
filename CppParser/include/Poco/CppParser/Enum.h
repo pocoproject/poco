@@ -64,13 +64,13 @@ public:
 
 	void addValue(EnumValue* pValue);
 		/// Adds an enum value. The Enum takes ownership of the value.
-		
+
 	Iterator begin() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
-		
+
 	Iterator end() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
-	
+
 	const std::string& baseType() const;
 		/// Returns the base type or an empty string if no base type has been specified.
 
@@ -83,7 +83,7 @@ public:
 protected:
 	static std::string processName(const std::string& name);
 
-private:	
+private:
 	Values _values;
 	std::string _baseType;
 	int _flags;

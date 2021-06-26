@@ -58,7 +58,7 @@ Parser::Parser(NameSpace::SymbolTable& gst, const std::string& file, std::istrea
 	p.makeAbsolute();
 	_path = p.toString();
 	_currentPath = _path;
-	
+
 	_nsStack.push_back(NameSpace::root());
 }
 
@@ -205,7 +205,7 @@ const Token* Parser::parseFile(const Token* pNext)
 const Token* Parser::parseNameSpace(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_NAMESPACE));
-	
+
 	pNext = next();
 	if (pNext->is(Token::IDENTIFIER_TOKEN))
 	{
@@ -213,11 +213,11 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		std::string name = pNext->tokenString();
 		pNext = next();
 		expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
-		
+
 		std::string fullName = currentNameSpace()->fullName();
 		if (!fullName.empty()) fullName += "::";
 		fullName += name;
-		
+
 		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(fullName));
 		bool undefined = (pNS == 0);
 		if (undefined) pNS = new NameSpace(name, currentNameSpace());
@@ -377,7 +377,7 @@ const Token* Parser::parseBaseClassList(const Token* pNext, Struct* pClass)
 const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
-	
+
 	pNext = next();
 	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_COMPL))
 	{
@@ -456,7 +456,7 @@ const Token* Parser::parseTemplate(const Token* pNext)
 const Token* Parser::parseTemplateArgs(const Token* pNext, std::string& decl)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_LT));
-	
+
 	append(decl, pNext);
 	int depth = 1;
 	pNext = next();
@@ -499,7 +499,7 @@ const Token* Parser::parseTypeDef(const Token* pNext)
 const Token* Parser::parseUsing(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_USING));
-	
+
 	_pCurrentSymbol = 0;
 	int line = _istr.getCurrentLineNumber();
 	pNext = next();
@@ -538,7 +538,7 @@ const Token* Parser::parseUsing(const Token* pNext)
 			{
 				currentNameSpace()->importSymbol(id);
 			}
-		}	
+		}
 	}
 
 	if (!isOperator(pNext, OperatorToken::OP_SEMICOLON))
@@ -552,7 +552,7 @@ const Token* Parser::parseUsing(const Token* pNext)
 const Token* Parser::parseFriend(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_FRIEND));
-	
+
 	pNext = next();
 
 	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
@@ -621,7 +621,7 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 const Token* Parser::parseExtern(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_EXTERN));
-	
+
 	pNext = next();
 	if (pNext->is(Token::STRING_LITERAL_TOKEN))
 		pNext = next();
@@ -656,7 +656,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 	expectOperator(pNext, OperatorToken::OP_CLOSPARENT, ")");
 	pNext = next();
 	while (pNext->is(Poco::Token::IDENTIFIER_TOKEN) || pNext->is(Poco::Token::KEYWORD_TOKEN))
-	{ 
+	{
 		if (isKeyword(pNext, IdentifierToken::KW_CONST))
 		{
 			if (pFunc) pFunc->makeConst();
@@ -664,7 +664,7 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 		}
 		if (isKeyword(pNext, IdentifierToken::KW_THROW))
 		{
-			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) && 
+			while (!isOperator(pNext, OperatorToken::OP_ASSIGN) && !isOperator(pNext, OperatorToken::OP_SEMICOLON) &&
 				   !isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
 				pNext = next();
 		}
@@ -721,16 +721,16 @@ const Token* Parser::parseFunc(const Token* pNext, std::string& decl)
 				pNext = next();
 
 			pNext = parseBlock(pNext);
-			
+
 			if (isKeyword(pNext, IdentifierToken::KW_CATCH))
 			{
 				while (!isOperator(pNext, OperatorToken::OP_OPENBRACE) && !isEOF(pNext))
 					pNext = next();
-	
+
 				pNext = parseBlock(pNext);
 			}
 			else syntaxError("expected catch block");
-			
+
 			if (!pFunc)
 				pFunc = dynamic_cast<Function*>(currentNameSpace()->lookup(name));
 			if (pFunc)
@@ -785,7 +785,7 @@ const Token* Parser::parseParameters(const Token* pNext, Function* pFunc)
 const Token* Parser::parseBlock(const Token* pNext)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
-	
+
 	pNext = next();
 	int depth = 1;
 	while (depth > 0 && !isEOF(pNext))

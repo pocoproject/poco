@@ -172,7 +172,7 @@ public:
 	{
 		_data.clear();
 	}
-	
+
 	inline void swap(Struct& other)
 		/// Swap content of Struct with another Struct
 	{
@@ -264,7 +264,7 @@ public:
 	~VarHolderImpl()
 	{
 	}
-	
+
 	const std::type_info& type() const
 	{
 		return typeid(ValueType);
@@ -279,7 +279,7 @@ public:
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
-	
+
 	void convert(Int32&) const
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
@@ -299,7 +299,7 @@ public:
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
-	
+
 	void convert(UInt32&) const
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
@@ -373,7 +373,7 @@ public:
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
-	
+
 	const ValueType& value() const
 	{
 		return _val;
@@ -413,7 +413,7 @@ public:
 	{
 		return false;
 	}
-	
+
 	std::size_t size() const
 	{
 		return _val.size();

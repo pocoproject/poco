@@ -51,11 +51,11 @@ Enum::~Enum()
 void Enum::addValue(EnumValue* pValue)
 {
 	poco_check_ptr (pValue);
-	
+
 	_values.push_back(pValue);
 }
 
-	
+
 Enum::Iterator Enum::begin() const
 {
 	return _values.begin();
