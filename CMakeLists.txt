@@ -250,6 +250,7 @@ endif()
 if(ENABLE_ACTIVERECORD AND ENABLE_TESTS)
 	set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
 endif()
+
 if(ENABLE_NETSSL_WIN)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 	if(ENABLE_TESTS)
@@ -302,6 +303,7 @@ endif()
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
 endif()
+
 if(ENABLE_ENCODINGS)
 	add_subdirectory(Encodings)
 	list(APPEND Poco_COMPONENTS "Encodings")
@@ -348,7 +350,6 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/JWT AND ENABLE_JWT)
 endif()
 
 #NetSSL
-
 
 if(WIN32 AND EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_Win AND ENABLE_NETSSL_WIN)
 	add_subdirectory(NetSSL_Win)
