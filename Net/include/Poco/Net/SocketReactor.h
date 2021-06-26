@@ -255,7 +255,7 @@ protected:
 		/// Can be overridden by subclasses to perform additional
 		/// periodic tasks. The default implementation does nothing.
 
-	int onComplete(bool handleOne = false);
+	int onComplete(bool handleOne = false, bool expiredOnly = false);
 		/// Calls completion handler(s) (after poll() completes processing
 		/// or on runOne() invocation). If handleOne is true, returns
 		/// after first handler invocation.

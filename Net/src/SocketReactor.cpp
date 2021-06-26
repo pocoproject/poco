@@ -70,6 +70,7 @@ SocketReactor::~SocketReactor()
 int SocketReactor::poll(int* pHandled)
 {
 	int handled = 0;
+	int completed = 0;
 	if (!hasSocketHandlers()) onIdle();
 	else
 	{
@@ -103,11 +104,16 @@ int SocketReactor::poll(int* pHandled)
 		if (!readable) onTimeout();
 	}
 	if (pHandled) *pHandled = handled;
-	return onComplete();
+	if (hasSocketHandlers())
+	{
+		if (handled) completed = onComplete();
+	}
+	else completed = onComplete(false, true);
+	return completed;
 }
 
 
-int SocketReactor::onComplete(bool handleOne)
+int SocketReactor::onComplete(bool handleOne, bool expiredOnly)
 {
 	std::unique_ptr<CompletionHandler> pCH;
 	int handled = 0;
@@ -121,7 +127,7 @@ int SocketReactor::onComplete(bool handleOne)
 			// be unlocked before the invocation.
 			{
 				SpinScopedLock lock(_completionMutex);
-				bool alwaysRun = isPermanent(it->second);
+				bool alwaysRun = isPermanent(it->second) && !expiredOnly;
 				bool isExpired = !alwaysRun && (Timestamp() > it->second);
 				if (isExpired)
 				{
