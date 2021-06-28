@@ -399,6 +399,24 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<Time>& val)
 }
 
 
+void AbstractPreparator::prepare(std::size_t pos, const std::vector<UUID>& val)
+{
+	throw NotImplementedException("std::vector preparator must be implemented.");
+}
+
+
+void AbstractPreparator::prepare(std::size_t pos, const std::deque<UUID>& val)
+{
+	throw NotImplementedException("std::deque preparator must be implemented.");
+}
+
+
+void AbstractPreparator::prepare(std::size_t pos, const std::list<UUID>& val)
+{
+	throw NotImplementedException("std::list preparator must be implemented.");
+}
+
+
 void AbstractPreparator::prepare(std::size_t pos, const std::vector<Any>& val)
 {
 	throw NotImplementedException("std::vector preparator must be implemented.");

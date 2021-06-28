@@ -111,11 +111,11 @@ void TestCase::run(TestResult *result)
 	result->startTest(this);
 
 	setUp();
-	try 
+	try
 	{
 		runTest();
 	}
-	catch (CppUnitException& e) 
+	catch (CppUnitException& e)
 	{
 		CppUnitException* copy = new CppUnitException(e);
 		result->addFailure(this, copy);
@@ -126,7 +126,6 @@ void TestCase::run(TestResult *result)
 		msg.append(": ");
 		msg.append(e.what());
 		result->addError(this, new CppUnitException(msg));
-
 	}
 	catch (...)
 	{

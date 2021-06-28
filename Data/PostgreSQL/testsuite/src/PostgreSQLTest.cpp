@@ -690,6 +690,14 @@ void PostgreSQLTest::testDouble()
 }
 
 
+void PostgreSQLTest::testUUID()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateUUIDsTable();
+	_pExecutor->uuids();
+}
+
 void PostgreSQLTest::testTuple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -986,6 +994,15 @@ void PostgreSQLTest::recreateFloatsTable()
 }
 
 
+void PostgreSQLTest::recreateUUIDsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str UUID)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateUUIDsTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateUUIDsTable()"); }
+}
+
+
 void PostgreSQLTest::recreateTuplesTable()
 {
 	dropTable("Tuples");
@@ -1110,6 +1127,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testFloat);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testDouble);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testUUID);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTuple);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTupleVector);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testInternalExtraction);

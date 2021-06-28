@@ -16,8 +16,8 @@
 
 
 // +++ double conversion +++
-#define double_conversion poco_double_conversion	// don't collide with standalone double_conversion library
-#define UNREACHABLE poco_bugcheck
+// don't collide with standalone double_conversion library
+#define double_conversion poco_double_conversion
 #define UNIMPLEMENTED poco_bugcheck
 #include "diy-fp.cc"
 #include "cached-powers.cc"
@@ -51,7 +51,7 @@ void pad(std::string& str, int precision, int width, char prefix = ' ', char dec
 	std::string::size_type decSepPos = str.find(decSep);
 	if (decSepPos == std::string::npos)
 	{
-		str.append(1, '.');
+		str.append(1, decSep);
 		decSepPos = str.size() - 1;
 	}
 

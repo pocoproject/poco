@@ -398,6 +398,24 @@ bool AbstractExtractor::extract(std::size_t pos, std::list<Time>& val)
 }
 
 
+bool AbstractExtractor::extract(std::size_t pos, std::vector<UUID>& val)
+{
+	throw NotImplementedException("std::vector extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::deque<UUID>& val)
+{
+	throw NotImplementedException("std::deque extractor must be implemented.");
+}
+
+
+bool AbstractExtractor::extract(std::size_t pos, std::list<UUID>& val)
+{
+	throw NotImplementedException("std::list extractor must be implemented.");
+}
+
+
 bool AbstractExtractor::extract(std::size_t pos, std::vector<Any>& val)
 {
 	throw NotImplementedException("std::vector extractor must be implemented.");

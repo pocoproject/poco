@@ -164,6 +164,13 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	}
 #endif
 
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+	if(_pContext->ocspStaplingResponseVerificationEnabled())
+	{
+		SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp);
+	}
+#endif
+
 	if (_pSession)
 	{
 		SSL_set_session(_pSSL, _pSession->sslSession());
@@ -192,11 +199,35 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 }
 
 
+void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind(address, reuseAddress);
+}
+
+
 void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
 	poco_check_ptr (_pSocket);
 
 	_pSocket->bind(address, reuseAddress, reusePort);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, ipV6Only);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, reusePort, ipV6Only);
 }
 
 

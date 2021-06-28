@@ -26,7 +26,7 @@ public:
 		PB_IMMEDIATE,
 		PB_AT_EXEC
 	};
-	
+
 	enum DataExtraction
 	{
 		DE_MANUAL,
@@ -37,7 +37,7 @@ public:
 	~SQLExecutor();
 
 	void bareboneMySQLTest(const char* host, const char* user, const char* pwd, const char* db, int port, const char* tableCreateString);
-		/// This function uses "bare bone" MySQL API calls (i.e. calls are not 
+		/// This function uses "bare bone" MySQL API calls (i.e. calls are not
 		/// "wrapped" in PocoData framework structures).
 		/// The purpose of the function is to verify that driver behaves
 		/// correctly. If this test passes, subsequent tests failures are likely ours.
@@ -86,6 +86,7 @@ public:
 	void unsignedInts();
 	void floats();
 	void doubles();
+	void uuids();
 	void tuples();
 	void tupleVector();
 

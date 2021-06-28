@@ -74,13 +74,13 @@ public:
 	void testTemplate();
 	void testUnicode();
 	void testInvalidUnicodeJanssonFiles();
-	void testSmallBuffer();
 	void testEscape0();
 	void testNonEscapeUnicode();
 	void testEscapeUnicode();
 
 	void testCopy();
 	void testMove();
+	void testRemove();
 
 	void setUp();
 	void tearDown();

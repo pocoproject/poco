@@ -138,10 +138,7 @@ void ParseHandler::setValue(const Var& value)
 			_key.clear();
 		}
 	}
-	else
-	{
-		throw JSONException("Attempt to set value on an empty stack");
-	}
+	else throw JSONException("Attempt to set value on an empty stack");
 }
 
 

@@ -443,7 +443,6 @@ inline std::size_t Object::size() const
 
 inline void Object::remove(const std::string& key)
 {
-	_values.erase(key);
 	if (_preserveInsOrder)
 	{
 		KeyList::iterator it = _keys.begin();
@@ -457,6 +456,7 @@ inline void Object::remove(const std::string& key)
 			}
 		}
 	}
+	_values.erase(key);
 	_modified = true;
 }
 

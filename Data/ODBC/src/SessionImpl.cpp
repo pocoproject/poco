@@ -39,7 +39,8 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_autoExtract(autoExtract),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
-		_queryTimeout(-1)
+		_queryTimeout(-1),
+		_dbEncoding("UTF-8")
 {
 	setFeature("bulk", true);
 	open();
@@ -58,7 +59,8 @@ SessionImpl::SessionImpl(const std::string& connect,
 		_autoExtract(autoExtract),
 		_canTransact(ODBC_TXN_CAPABILITY_UNKNOWN),
 		_inTransaction(false),
-		_queryTimeout(-1)
+		_queryTimeout(-1),
+		_dbEncoding("UTF-8")
 {
 	setFeature("bulk", true);
 	open();
@@ -158,9 +160,21 @@ void SessionImpl::open(const std::string& connect)
 		&SessionImpl::setQueryTimeout,
 		&SessionImpl::getQueryTimeout);
 
+	addProperty("dbEncoding",
+		&SessionImpl::setDBEncoding,
+		&SessionImpl::getDBEncoding);
+
 	Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, 0, 0);
 
 	if (!canTransact()) autoCommit("", true);
+}
+
+
+void SessionImpl::setDBEncoding(const std::string&, const Poco::Any& value)
+{
+	const std::string& enc = Poco::RefAnyCast<std::string>(value);
+	Poco::TextEncoding::byName(enc); // throws if not found
+	_dbEncoding = enc;
 }
 
 

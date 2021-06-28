@@ -40,6 +40,8 @@
 #endif
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
+#include <stdio.h>
+#include <sys/ioctl.h>
 #endif
 #include "Poco/UnicodeConverter.h"
 
@@ -94,12 +96,12 @@ Application::~Application()
 void Application::setup()
 {
 	poco_assert (_pInstance == 0);
-	
+
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true);
-	
+
 	addSubsystem(new LoggingSubsystem);
-	
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	_workingDirAtLaunch = Path::current();
 
@@ -186,15 +188,15 @@ void Application::initialize(Application& self)
 	_initialized = true;
 }
 
-	
+
 void Application::uninitialize()
 {
 	if (_initialized)
 	{
-		for (auto& pSub: _subsystems)
+		for (SubsystemVec::reverse_iterator it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
 		{
-			_pLogger->debug(std::string("Uninitializing subsystem: ") + pSub->name());
-			pSub->uninitialize();
+			_pLogger->debug(std::string("Uninitializing subsystem: ") + (*it)->name());
+			(*it)->uninitialize();
 		}
 		_initialized = false;
 	}
@@ -321,13 +323,37 @@ void Application::stopOptionsProcessing()
 }
 
 
+Application::WindowSize Application::windowSize()
+{
+	WindowSize size{0, 0};
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
+    {
+    	size.width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+    	size.height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+    }
+#elif defined(POCO_OS_FAMILY_UNIX)
+	struct winsize winsz;
+    if (ioctl(0, TIOCGWINSZ , &winsz) != -1)
+    {
+    	size.width  = winsz.ws_col;
+    	size.height = winsz.ws_row;
+    }
+#endif
+
+	return size;
+}
+
+
 int Application::run()
 {
 	int rc = EXIT_CONFIG;
-	initialize(*this);
 
 	try
 	{
+		initialize(*this);
 		rc = EXIT_SOFTWARE;
 		rc = main(_unprocessedArgs);
 	}
@@ -373,7 +399,7 @@ void Application::setArgs(int argc, char* argv[])
 void Application::setArgs(const ArgVec& args)
 {
 	poco_assert (!args.empty());
-	
+
 	_command = args[0];
 	_pConfig->setInt("application.argc", (int) args.size());
 	_unprocessedArgs = args;
@@ -453,7 +479,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
-	
+
 	Path appPath;
 	getApplicationPath(appPath);
 	Path base = appPath.parent();
@@ -499,7 +525,7 @@ bool Application::findAppConfigFile(const std::string& appName, const std::strin
 bool Application::findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Path& path) const
 {
 	poco_assert (!appName.empty());
-	
+
 	Path p(basePath,appName);
 	p.setExtension(extension);
 	bool found = findFile(p);

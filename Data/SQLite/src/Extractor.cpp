@@ -208,6 +208,16 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 }
 
 
+bool Extractor::extract(std::size_t pos, UUID& val)
+{
+	if (isNull(pos)) return false;
+	std::string str;
+	extract(pos, str);
+	val.parse(str);
+	return true;
+}
+
+
 bool Extractor::extract(std::size_t pos, Poco::Any& val)
 {
 	return extractImpl(pos, val);

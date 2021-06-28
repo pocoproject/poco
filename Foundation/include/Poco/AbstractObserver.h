@@ -38,7 +38,7 @@ public:
 
 	virtual void notify(Notification* pNf) const = 0;
 	virtual bool equals(const AbstractObserver& observer) const = 0;
-	virtual bool accepts(Notification* pNf) const = 0;
+	virtual bool accepts(Notification* pNf, const char* pName = 0) const = 0;
 	virtual AbstractObserver* clone() const = 0;
 	virtual void disable() = 0;
 };

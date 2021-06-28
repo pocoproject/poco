@@ -212,7 +212,33 @@ void SecureSocketImpl::connectNB(const SocketAddress& address)
 
 void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
 {
+	poco_check_ptr (_pSocket);
+
 	_pSocket->bind(address, reuseAddress);
+}
+
+
+void SecureSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind(address, reuseAddress, reusePort);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, ipV6Only);
+}
+
+
+void SecureSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	poco_check_ptr (_pSocket);
+
+	_pSocket->bind6(address, reuseAddress, reusePort, ipV6Only);
 }
 
 
@@ -552,10 +578,10 @@ SECURITY_STATUS SecureSocketImpl::decodeMessage(BYTE* pBuffer, DWORD bufSize, Au
 	{
 		for (int i = 1; i < 4; ++i)
 		{
-			if (pDataBuffer == 0 && msg[i].BufferType == SECBUFFER_DATA)
+			if (!pDataBuffer && msg[i].BufferType == SECBUFFER_DATA)
 				pDataBuffer = &msg[i];
 
-			if (pExtraBuffer == NULL && msg[i].BufferType == SECBUFFER_EXTRA)
+			if (!pExtraBuffer && msg[i].BufferType == SECBUFFER_EXTRA)
 				pExtraBuffer = &msg[i];
 		}
 	}
@@ -700,7 +726,7 @@ void SecureSocketImpl::connectSSL(bool completeHandshake)
 
 	if (_peerHostName.empty())
 	{
-		_peerHostName = _pSocket->address().host().toString();
+		_peerHostName = _pSocket->peerAddress().host().toString();
 	}
 
 	initClientContext();
@@ -1522,7 +1548,7 @@ void SecureSocketImpl::stateIllegal()
 
 void SecureSocketImpl::stateConnected()
 {
-	_peerHostName = _pSocket->address().host().toString();
+	_peerHostName = _pSocket->peerAddress().host().toString();
 	initClientContext();
 	performInitialClientHandshake();
 }

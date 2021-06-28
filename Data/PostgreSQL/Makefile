@@ -37,6 +37,9 @@ endif
 ifeq (0, $(shell test -e /opt/postgresql/lib$(LIB64SUFFIX); echo $$?))
 SYSLIBS += -L/opt/postgresql/lib$(LIB64SUFFIX)
 endif
+ifeq (0, $(shell test -e /usr/local/opt/libpq/lib; echo $$?))
+SYSLIBS += -L/usr/local/opt/libpq/lib$(LIB64SUFFIX)
+endif
 SYSLIBS += -lpq
 
 objects = Extractor Binder SessionImpl Connector \

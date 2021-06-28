@@ -13,6 +13,11 @@
 //
 
 
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+
 #include "Poco/Crypto/PKCS12Container.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
@@ -155,6 +160,7 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 			{
 				_pX509Cert.reset(new X509Certificate(pCert, true));
 				_pkcsFriendlyName = extractFriendlyName(pCert);
+				X509_free(pCert);
 			}
 			else _pX509Cert.reset();
 
@@ -171,17 +177,22 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 						_caCertList.push_back(X509Certificate(pX509, true));
 						_caCertNames.push_back(extractFriendlyName(pX509));
 					}
-					else throw OpenSSLException("PKCS12Container::load()");
+					else
+					{
+						sk_X509_pop_free(pCA, X509_free);
+						PKCS12_free(pPKCS12);
+						throw OpenSSLException("PKCS12Container::load()");
+					}
 				}
+				sk_X509_pop_free(pCA, X509_free);
 			}
 		}
 		else
 		{
+			PKCS12_free(pPKCS12);
 			throw OpenSSLException();
 		}
 		PKCS12_free(pPKCS12);
-		sk_X509_pop_free(pCA, X509_free);
-		if (pCert) X509_free(pCert);
 		poco_assert_dbg (_caCertList.size() == _caCertNames.size());
 	}
 	else

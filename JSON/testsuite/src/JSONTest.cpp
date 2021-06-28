@@ -791,9 +791,11 @@ void JSONTest::testEmptyArray()
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	assertTrue (array->size() == 0);
+	assertTrue (array->empty());
 
 	Poco::Dynamic::Array da = *array;
 	assertTrue (da.size() == 0);
+	assertTrue (da.empty());
 }
 
 
@@ -817,10 +819,12 @@ void JSONTest::testNestedArray()
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	assertTrue (array->size() == 1);
+	assertTrue (!array->empty());
 
 	Poco::Dynamic::Array da = *array;
 	assertTrue (da.size() == 1);
 	assertTrue (da[0].size() == 1);
+	assertTrue (!da.empty());
 	assertTrue (da[0][0].size() == 1);
 	assertTrue (da[0][0][0].size() == 0);
 }
@@ -1917,13 +1921,6 @@ void JSONTest::testUnicode()
 }
 
 
-void JSONTest::testSmallBuffer()
-{
-	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler(), 4);
-	std::string jsonStr = "{ \"x\" : \"123456789012345678901234567890123456789012345678901234567890\" }";
-	parser.parse(jsonStr);
-}
-
 void JSONTest::testEscape0()
 {
 	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
@@ -1935,6 +1932,15 @@ void JSONTest::testEscape0()
 	json->stringify(ss);
 
 	assertTrue (ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
+
+	// parse the JSON containing the escaped string
+ 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
+ 	Var result = parser.parse(ss.str());
+
+ 	assert(result.type() == typeid(Object::Ptr));
+
+ 	Object::Ptr object = result.extract<Object::Ptr>();
+ 	assert(object->get("name").extract<std::string>() == nullString);
 }
 
 
@@ -2162,6 +2168,47 @@ void JSONTest::testMove()
 	assertTrue (nl[2] == "baz");
 }
 
+void JSONTest::testRemove()
+{
+	Object obj1;
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "bar");
+	assertTrue(nl[1] == "baz");
+	assertTrue(nl[2] == "foo");
+
+	obj1.remove("baz");
+
+	nl = obj1.getNames();
+	assertTrue(nl.size() == 2);
+	assertTrue(nl[0] == "bar");
+	assertTrue(nl[1] == "foo");
+
+	Object obj2(Poco::JSON_PRESERVE_KEY_ORDER);
+	obj2.set("foo", 0);
+	obj2.set("bar", 0);
+	obj2.set("baz", 0);
+
+	nl = obj2.getNames();
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "bar");
+	assertTrue(nl[2] == "baz");
+
+	obj2.remove("bar");
+	nl = obj2.getNames();
+
+	assertTrue(nl.size() == 2);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "baz");
+
+}
+
 
 CppUnit::Test* JSONTest::suite()
 {
@@ -2207,12 +2254,12 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
-	CppUnit_addTest(pSuite, JSONTest, testSmallBuffer);
 	CppUnit_addTest(pSuite, JSONTest, testEscape0);
 	CppUnit_addTest(pSuite, JSONTest, testNonEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
+	CppUnit_addTest(pSuite, JSONTest, testRemove);
 
 	return pSuite;
 }

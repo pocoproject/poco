@@ -1,27 +1,25 @@
 #ifndef PDJSON_H
 #define PDJSON_H
 
-#if defined(__cplusplus)
+#ifndef PDJSON_SYMEXPORT
+#   define PDJSON_SYMEXPORT
+#endif
+
+#ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
-
-#include <stdio.h>
-
-#if !defined(__cplusplus) && !defined(_MSC_VER) // for poco 1.8.x we must compile as C++
-	#if defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901L)
+#else
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 		#include <stdbool.h>
 	#else
 	#ifndef bool
 		#define bool int
-	#endif
-	#ifndef true
 		#define true 1
-	#endif
-	#ifndef false
 		#define false 0
-	#endif
-	#endif // __STDC_VERSION__
-#endif
+    #endif /* bool */
+#endif /* __STDC_VERSION__ */
+#endif /* __cplusplus */
+
+#include <stdio.h>
 
 enum json_type {
     JSON_ERROR = 1, JSON_DONE,
@@ -40,27 +38,33 @@ typedef int (*json_user_io) (void *user);
 typedef struct json_stream json_stream;
 typedef struct json_allocator json_allocator;
 
-//extern const char *json_typename[];
+PDJSON_SYMEXPORT void json_open_buffer(json_stream *json, const void *buffer, size_t size);
+PDJSON_SYMEXPORT void json_open_string(json_stream *json, const char *string);
+PDJSON_SYMEXPORT void json_open_stream(json_stream *json, FILE *stream);
+PDJSON_SYMEXPORT void json_open_user(json_stream *json, json_user_io get, json_user_io peek, void *user);
+PDJSON_SYMEXPORT void json_close(json_stream *json);
 
-void json_open_buffer(json_stream *json, const void *buffer, size_t size);
-void json_open_string(json_stream *json, const char *string);
-void json_open_stream(json_stream *json, FILE *stream);
-void json_open_user(json_stream *json, json_user_io get, json_user_io peek, void *user);
-void json_close(json_stream *json);
+PDJSON_SYMEXPORT void json_set_allocator(json_stream *json, json_allocator *a);
+PDJSON_SYMEXPORT void json_set_streaming(json_stream *json, bool mode);
 
-void json_set_allocator(json_stream *json, json_allocator *a);
-void json_set_streaming(json_stream *json, bool strict);
+PDJSON_SYMEXPORT enum json_type json_next(json_stream *json);
+PDJSON_SYMEXPORT enum json_type json_peek(json_stream *json);
+PDJSON_SYMEXPORT void json_reset(json_stream *json);
+PDJSON_SYMEXPORT const char *json_get_string(json_stream *json, size_t *length);
+PDJSON_SYMEXPORT double json_get_number(json_stream *json);
 
-enum json_type json_next(json_stream *json);
-enum json_type json_peek(json_stream *json);
-void json_reset(json_stream *json);
-const char *json_get_string(json_stream *json, size_t *length);
-double json_get_number(json_stream *json);
+PDJSON_SYMEXPORT enum json_type json_skip(json_stream *json);
+PDJSON_SYMEXPORT enum json_type json_skip_until(json_stream *json, enum json_type type);
 
-size_t json_get_lineno(json_stream *json);
-size_t json_get_position(json_stream *json);
-size_t json_get_depth(json_stream *json);
-const char *json_get_error(json_stream *json);
+PDJSON_SYMEXPORT size_t json_get_lineno(json_stream *json);
+PDJSON_SYMEXPORT size_t json_get_position(json_stream *json);
+PDJSON_SYMEXPORT size_t json_get_depth(json_stream *json);
+PDJSON_SYMEXPORT enum json_type json_get_context(json_stream *json, size_t *count);
+PDJSON_SYMEXPORT const char *json_get_error(json_stream *json);
+
+PDJSON_SYMEXPORT int json_source_get(json_stream *json);
+PDJSON_SYMEXPORT int json_source_peek(json_stream *json);
+PDJSON_SYMEXPORT bool json_isspace(int c);
 
 /* internal */
 
@@ -106,8 +110,8 @@ struct json_stream {
     char errmsg[128];
 };
 
-#if defined(__cplusplus)
-} // extern "C"
-#endif // __cplusplus
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 
 #endif
