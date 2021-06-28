@@ -144,6 +144,10 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
     return taskIdSelf();
 }
 
+long ThreadImpl::currentOsTidImpl()
+{
+	return taskIdSelf();
+}
 
 void ThreadImpl::sleepImpl(long milliseconds)
 {

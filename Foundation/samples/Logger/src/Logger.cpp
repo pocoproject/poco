@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 {
 	// set up two channel chains - one to the
 	// console and the other one to a log file.
-	FormattingChannel* pFCConsole = new FormattingChannel(new PatternFormatter("%s: %p: %t"));
+	FormattingChannel* pFCConsole = new FormattingChannel(new PatternFormatter("[%O] %s: %p: %t"));
 	pFCConsole->setChannel(new ConsoleChannel);
 	pFCConsole->open();
 	

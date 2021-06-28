@@ -30,6 +30,16 @@ ResponseMessage::ResponseMessage():
 }
 
 
+ResponseMessage::ResponseMessage(const Int64& cursorID):
+	Message(MessageHeader::OP_REPLY),
+	_responseFlags(0),
+	_cursorID(cursorID),
+	_startingFrom(0),
+	_numberReturned(0)
+{
+}
+
+
 ResponseMessage::~ResponseMessage()
 {
 }

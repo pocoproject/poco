@@ -80,6 +80,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'P': NumberFormatter::append(text, msg.getPid()); break;
 		case 'T': text.append(msg.getThread()); break;
 		case 'I': NumberFormatter::append(text, msg.getTid()); break;
+		case 'J': NumberFormatter::append(text, msg.getOsTid()); break;
 		case 'N': text.append(Environment::nodeName()); break;
 		case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
 		case 'O': text.append(msg.getSourceFile() ? Path(msg.getSourceFile()).getFileName() : ""); break;

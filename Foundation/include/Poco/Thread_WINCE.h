@@ -73,6 +73,7 @@ public:
 	static void yieldImpl();
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
+	static long currentOsTidImpl();
 
 protected:
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
