@@ -41,7 +41,6 @@ if(ENABLE_DATA_SQLITE)
 	# SQlite3 is built in any case
 	message(STATUS "SQLite Support Enabled")
 	add_subdirectory(SQLite)
-	add_subdirectory(SQLiteBDB)
 else(ENABLE_DATA_SQLITE)
 	message(STATUS "SQLite Support Disabled")
 endif()

@@ -114,9 +114,9 @@ else()
 endif()
 
 if(ENABLE_DATA_MYSQL)
-	find_package(MYSQL REQUIRED)
+	find_package(MySQL REQUIRED)
 else()
-	find_package(MYSQL)
+	find_package(MySQL)
 endif()
 
 if(MYSQL_FOUND)
