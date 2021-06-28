@@ -28,6 +28,12 @@
 #	include <time.h>
 #endif
 
+#if POCO_OS == POCO_OS_LINUX
+	#define _GNU_SOURCE         /* See feature_test_macros(7) */
+	#include <unistd.h>
+	#include <sys/syscall.h>   /* For SYS_xxx definitions */
+#endif
+
 //
 // Block SIGPIPE in main thread.
 //
@@ -262,6 +268,16 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 	return pthread_self();
 }
 
+long ThreadImpl::currentOsTidImpl()
+{
+#if POCO_OS == POCO_OS_LINUX
+    return ::syscall(SYS_gettid);
+#elif POCO_OS == POCO_OS_MAC_OS_X
+    return ::pthread_mach_thread_np(::pthread_self());
+#else
+    return ::pthread_self();
+#endif
+}
 
 void ThreadImpl::sleepImpl(long milliseconds)
 {
