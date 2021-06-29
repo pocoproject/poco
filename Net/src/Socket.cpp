@@ -487,4 +487,10 @@ SocketBufVec Socket::makeBufVec(const std::vector<std::string>& vec)
 }
 
 
+int Socket::lastError()
+{
+	return SocketImpl::lastError();
+}
+
+
 } } // namespace Poco::Net

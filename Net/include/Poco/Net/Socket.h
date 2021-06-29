@@ -354,6 +354,9 @@ public:
 		/// of buffers used for writing (ie. reading from socket
 		/// into buffers).
 
+	static int lastError();
+		/// Returns the last socket error.
+
 protected:
 	Socket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.
