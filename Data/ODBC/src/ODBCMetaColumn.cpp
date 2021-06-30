@@ -102,9 +102,6 @@ void ODBCMetaColumn::init()
 	case SQL_CHAR:
 	case SQL_VARCHAR:
 	case SQL_LONGVARCHAR:
-#ifdef SQL_GUID
-	case SQL_GUID:
-#endif
 		setType(MetaColumn::FDT_STRING); break;
 
 	case SQL_WCHAR:
@@ -167,6 +164,9 @@ void ODBCMetaColumn::init()
 
 	case SQL_TYPE_TIMESTAMP:
 		setType(MetaColumn::FDT_TIMESTAMP); break;
+
+	case SQL_GUID:
+		setType(MetaColumn::FDT_UUID); break;
 
 	default:
 		throw DataFormatException("Unsupported data type.");

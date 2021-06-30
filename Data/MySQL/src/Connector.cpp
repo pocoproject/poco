@@ -16,7 +16,7 @@
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Exception.h"
-#include <mysql.h>
+#include <mysql/mysql.h>
 
 
 namespace Poco {
@@ -46,7 +46,7 @@ const std::string& Connector::name() const
 Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString,
 	std::size_t timeout)
 {
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));	
+	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));
 }
 
 

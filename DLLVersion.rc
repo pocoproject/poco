@@ -4,8 +4,8 @@
 
 #include "winres.h"
 
-#define POCO_VERSION 1,10,1,0
-#define POCO_VERSION_STR "1.10.1"
+#define POCO_VERSION 1,11,0,0
+#define POCO_VERSION_STR "1.11.0"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION POCO_VERSION
@@ -28,8 +28,8 @@ BEGIN
             VALUE "FileDescription", "This file is part of the POCO C++ Libraries."
             VALUE "FileVersion", POCO_VERSION_STR
             VALUE "InternalName", "POCO"
-            VALUE "LegalCopyright", "Copyright (C) 2004-2020, Applied Informatics Software Engineering GmbH and Contributors."
-            VALUE "ProductName", "POCO C++ Libraries - http://pocoproject.org"
+            VALUE "LegalCopyright", "Copyright (C) 2004-2021, Applied Informatics Software Engineering GmbH and Contributors."
+            VALUE "ProductName", "POCO C++ Libraries - https://pocoproject.org"
             VALUE "ProductVersion", POCO_VERSION_STR
         END
     END

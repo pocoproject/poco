@@ -49,8 +49,7 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 	{
 		for(std::string::const_iterator it = value.begin(), end = value.end(); it != end; ++it)
 		{
-			// Forward slash isn't strictly required by JSON spec, but some parsers expect it
-			if((*it >= 0 && *it <= 31) || (*it == '"') || (*it == '\\') || (*it == '/'))
+			if((*it >= 0 && *it <= 31) || (*it == '"') || (*it == '\\'))
 			{
 				std::string str = Poco::UTF8::escape(it, it + 1, true);
 				(obj.*write)(str.c_str(), str.size());

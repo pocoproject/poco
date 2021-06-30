@@ -203,6 +203,7 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 {
 	char mask[4];
 	bool useMask;
+	_frameFlags = 0;
 	int payloadLength = receiveHeader(mask, useMask);
 	if (payloadLength <= 0)
 		return payloadLength;
@@ -216,6 +217,7 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 {
 	char mask[4];
 	bool useMask;
+	_frameFlags = 0;
 	int payloadLength = receiveHeader(mask, useMask);
 	if (payloadLength <= 0)
 		return payloadLength;

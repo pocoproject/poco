@@ -42,7 +42,7 @@ Cell::~Cell()
 void Cell::setFonts(FontMapPtr pFontMap)
 {
 	_pFontMap = pFontMap;
-	if (_pFontMap) poco_assert(_pFontMap->size() == 4);
+	poco_assert(!_pFontMap || (_pFontMap->size() == 4));
 }
 
 

@@ -441,6 +441,134 @@ void SignerTest::testVerifyES256()
 }
 
 
+void SignerTest::testSignVerifyES384()
+{
+	// Note: ECDSA is a strange beast and does not return a "known" signature.
+	// That's why we do the signing and verification in a single test.
+
+	Token token;
+	token.setType("JWT");
+	token.setSubject("1234567890");
+	token.payload().set("name", std::string("John Doe"));
+	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
+
+	std::istringstream privateKeyStream(ECDSA_PRIVATE_KEY);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(0, &privateKeyStream);
+
+	Signer signer(pKey);
+	std::string jwt = signer.sign(token, Signer::ALGO_ES384);
+
+	std::istringstream publicKeyStream(ECDSA_PUBLIC_KEY);
+	pKey = new Poco::Crypto::ECKey(&publicKeyStream);
+
+	Signer verifier(pKey);
+	verifier.addAlgorithm(Signer::ALGO_ES384);
+	try
+	{
+		Token token2 = verifier.verify(jwt);
+		assert (token2.getAlgorithm() == "ES384");
+		assert (token2.getType() == "JWT");
+		assert (token2.getSubject() == "1234567890");
+		assert (token2.getIssuedAt().epochTime() == 1516239022);
+		assert (token2.payload().getValue<std::string>("name") == "John Doe");
+	}
+	catch (JWTException&)
+	{
+		fail("Verification must succeed");
+	}
+}
+
+
+void SignerTest::testVerifyES384()
+{
+	std::string jwt("eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.ROGmzbopY2GfjSUKih4MmgZ5_1jLQdEc2db3ITYCDOZSHzeGM_14KtY-61qvx4BXxmeUiXfoInPZWlA75VL6dA");
+
+	std::istringstream publicKeyStream(ECDSA_PUBLIC_KEY);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(&publicKeyStream);
+
+	Signer signer(pKey);
+	signer.addAlgorithm(Signer::ALGO_ES384);
+	try
+	{
+		Token token = signer.verify(jwt);
+		assert (token.getAlgorithm() == "ES384");
+		assert (token.getType() == "JWT");
+		assert (token.getSubject() == "1234567890");
+		assert (token.getIssuedAt().epochTime() == 1516239022);
+		assert (token.payload().getValue<std::string>("name") == "John Doe");
+		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+	}
+	catch (JWTException&)
+	{
+		fail("Verification must succeed");
+	}
+}
+
+
+void SignerTest::testSignVerifyES512()
+{
+	// Note: ECDSA is a strange beast and does not return a "known" signature.
+	// That's why we do the signing and verification in a single test.
+
+	Token token;
+	token.setType("JWT");
+	token.setSubject("1234567890");
+	token.payload().set("name", std::string("John Doe"));
+	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
+
+	std::istringstream privateKeyStream(ECDSA_PRIVATE_KEY);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(0, &privateKeyStream);
+
+	Signer signer(pKey);
+	std::string jwt = signer.sign(token, Signer::ALGO_ES512);
+
+	std::istringstream publicKeyStream(ECDSA_PUBLIC_KEY);
+	pKey = new Poco::Crypto::ECKey(&publicKeyStream);
+
+	Signer verifier(pKey);
+	verifier.addAlgorithm(Signer::ALGO_ES512);
+	try
+	{
+		Token token2 = verifier.verify(jwt);
+		assert (token2.getAlgorithm() == "ES512");
+		assert (token2.getType() == "JWT");
+		assert (token2.getSubject() == "1234567890");
+		assert (token2.getIssuedAt().epochTime() == 1516239022);
+		assert (token2.payload().getValue<std::string>("name") == "John Doe");
+	}
+	catch (JWTException&)
+	{
+		fail("Verification must succeed");
+	}
+}
+
+
+void SignerTest::testVerifyES512()
+{
+	std::string jwt("eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.8AYb9WDk3x2U-69Hi2DHou06L8VavXJlMqyH8dF-uiekm926CNM7D3pkgnWD6e_OfV_p2XIkdfIV018PjZtfuA");
+
+	std::istringstream publicKeyStream(ECDSA_PUBLIC_KEY);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(&publicKeyStream);
+
+	Signer signer(pKey);
+	signer.addAlgorithm(Signer::ALGO_ES512);
+	try
+	{
+		Token token = signer.verify(jwt);
+		assert (token.getAlgorithm() == "ES512");
+		assert (token.getType() == "JWT");
+		assert (token.getSubject() == "1234567890");
+		assert (token.getIssuedAt().epochTime() == 1516239022);
+		assert (token.payload().getValue<std::string>("name") == "John Doe");
+		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+	}
+	catch (JWTException&)
+	{
+		fail("Verification must succeed");
+	}
+}
+
+
 CppUnit::Test* SignerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SignerTest");
@@ -460,7 +588,11 @@ CppUnit::Test* SignerTest::suite()
 	CppUnit_addTest(pSuite, SignerTest, testVerifyRS384);
 	CppUnit_addTest(pSuite, SignerTest, testVerifyRS512);
 	CppUnit_addTest(pSuite, SignerTest, testSignVerifyES256);
+	CppUnit_addTest(pSuite, SignerTest, testSignVerifyES384);
+	CppUnit_addTest(pSuite, SignerTest, testSignVerifyES512);
 	CppUnit_addTest(pSuite, SignerTest, testVerifyES256);
+	CppUnit_addTest(pSuite, SignerTest, testVerifyES384);
+	CppUnit_addTest(pSuite, SignerTest, testVerifyES512);
 
 	return pSuite;
 }

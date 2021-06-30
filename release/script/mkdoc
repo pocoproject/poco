@@ -26,12 +26,12 @@ case `uname` in
 esac
 
 spec=""
-docConfig=$POCO_BASE/PocoDoc/cfg/mkdoc-poco.xml
+docConfig=""
 while [ "$1" != "" ] ;
 do
 	if [ "$1" = "-C" ] ; then
 		shift
-		docConfig=$1
+		docConfig="$docConfig -C $1"
 		shift
 	elif [ "$1" = "-v" ] ; then
 		shift
@@ -42,6 +42,10 @@ do
 		shift
 	fi
 done
+
+if [ -z "$docConfig" ] ; then
+	docConfig="-C $POCO_BASE/PocoDoc/cfg/mkdoc-poco.xml"
+fi
 
 if [ "$spec" != "" ] ; then
   relspec="-f release/spec/${spec}.release"
@@ -105,4 +109,4 @@ export PATH=$tools/PocoDoc/bin/$osname/$osarch:$PATH
 echo PATH=$PATH
 
 echo "Building documentation $release (using $docConfig)"
-mkdocumentation $reltag $relspec -C $docConfig -v $version
+mkdocumentation $reltag $relspec $docConfig -v $version

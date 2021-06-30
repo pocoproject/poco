@@ -42,6 +42,7 @@
 #include <cstring>
 #endif
 #include "Poco/UnicodeConverter.h"
+#include "Poco/Format.h"
 
 
 using Poco::NumberFormatter;
@@ -334,7 +335,7 @@ bool ServerApplication::hasConsole()
 void ServerApplication::registerService()
 {
 	std::string name = config().getString("application.baseName");
-	std::string path = config().getString("application.path");
+	std::string path = Poco::format("\"%s\"", config().getString("application.path"));
 
 	WinService service(name);
 	if (_displayName.empty())

@@ -34,7 +34,7 @@ const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::
 
 
 RecordSet::RecordSet(const Statement& rStatement,
-	RowFormatter::Ptr pRowFormatter): 
+	RowFormatter::Ptr pRowFormatter):
 	Statement(rStatement),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -45,9 +45,9 @@ RecordSet::RecordSet(const Statement& rStatement,
 }
 
 
-RecordSet::RecordSet(Session& rSession, 
-	const std::string& query, 
-	RowFormatter::Ptr pRowFormatter): 
+RecordSet::RecordSet(Session& rSession,
+	const std::string& query,
+	RowFormatter::Ptr pRowFormatter):
 	Statement((rSession << query, now)),
 	_currentRow(0),
 	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
@@ -119,7 +119,7 @@ void RecordSet::reset(const Statement& stmt)
 	_pEnd = 0;
 	_currentRow = 0;
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
-	
+
 	RowMap::iterator it = _rowMap.begin();
 	RowMap::iterator end = _rowMap.end();
 	for (; it != end; ++it) delete it->second;
@@ -159,6 +159,7 @@ Poco::Dynamic::Var RecordSet::value(std::size_t col, std::size_t row, bool useFi
 	case MetaColumn::FDT_DATE:      return value<Date>(col, row, useFilter);
 	case MetaColumn::FDT_TIME:      return value<Time>(col, row, useFilter);
 	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(col, row);
+	case MetaColumn::FDT_UUID:      return value<UUID>(col, row);
 	default:
 		throw UnknownTypeException("Data type not supported.");
 	}
@@ -188,9 +189,11 @@ Poco::Dynamic::Var RecordSet::value(const std::string& name, std::size_t row, bo
 	case MetaColumn::FDT_STRING:    return value<std::string>(name, row, useFilter);
 	case MetaColumn::FDT_WSTRING:   return value<UTF16String>(name, row, useFilter);
 	case MetaColumn::FDT_BLOB:      return value<BLOB>(name, row, useFilter);
+	case MetaColumn::FDT_CLOB:      return value<CLOB>(name, row, useFilter);
 	case MetaColumn::FDT_DATE:      return value<Date>(name, row, useFilter);
 	case MetaColumn::FDT_TIME:      return value<Time>(name, row, useFilter);
 	case MetaColumn::FDT_TIMESTAMP: return value<DateTime>(name, row, useFilter);
+	case MetaColumn::FDT_UUID:      return value<UUID>(name, row, useFilter);
 	default:
 		throw UnknownTypeException("Data type not supported.");
 	}
@@ -210,7 +213,7 @@ Row& RecordSet::row(std::size_t pos)
 	{
 		if (_rowMap.size())
 		{
-			//reuse first row column names and sorting fields to save some memory 
+			//reuse first row column names and sorting fields to save some memory
 			pRow = new Row(_rowMap.begin()->second->names(),
 				_rowMap.begin()->second->getSortMap(),
 				getRowFormatter());
@@ -218,7 +221,7 @@ Row& RecordSet::row(std::size_t pos)
 			for (std::size_t col = 0; col < columns; ++col)
 				pRow->set(col, value(col, pos));
 		}
-		else 
+		else
 		{
 			pRow = new Row;
 			pRow->setFormatter(getRowFormatter());
@@ -228,7 +231,7 @@ Row& RecordSet::row(std::size_t pos)
 
 		_rowMap.insert(RowMap::value_type(pos, pRow));
 	}
-	else 
+	else
 	{
 		pRow = it->second;
 		poco_check_ptr (pRow);

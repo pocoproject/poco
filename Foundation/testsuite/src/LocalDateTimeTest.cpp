@@ -8,6 +8,11 @@
 //
 
 
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+
 #include "LocalDateTimeTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -23,6 +28,7 @@
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
 #endif
+
 
 using Poco::LocalDateTime;
 using Poco::DateTime;

@@ -25,6 +25,8 @@ public:
 	~PollSetTest();
 
 	void testPoll();
+	void testPollNoServer();
+	void testPollClosedServer();
 
 	void setUp();
 	void tearDown();

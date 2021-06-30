@@ -102,7 +102,7 @@ public:
 	void setContentType(const std::string& mediaType);
 		/// Sets the content type for this message.
 		///
-		/// Specify NO_CONTENT_TYPE to remove the
+		/// Specify UNKNOWN_CONTENT_TYPE to remove the
 		/// Content-Type header.
 
 	void setContentType(const MediaType& mediaType);

@@ -18,6 +18,8 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/Context.h"
+#include "Poco/Net/RejectCertificateHandler.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Util/Application.h"
@@ -67,6 +69,26 @@ namespace
 			catch (Poco::Exception& exc)
 			{
 				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
+			}
+		}
+	};
+
+	class NullConnection: public TCPServerConnection
+	{
+	public:
+		NullConnection(const StreamSocket& s): TCPServerConnection(s)
+		{
+		}
+
+		void run()
+		{
+			SecureStreamSocket ss = socket();
+			try
+			{
+				ss.completeHandshake();
+			}
+			catch (...)
+			{
 			}
 		}
 	};
@@ -381,6 +403,50 @@ void TCPServerTest::testReuseSession()
 }
 
 
+void TCPServerTest::testContextInvalidCertificateHandler()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<NullConnection>(), svs);
+	srv.start();
+
+	Context::Ptr pClientContext = new Context(
+		Context::CLIENT_USE,
+		"",
+		"",
+		"",
+		Context::VERIFY_RELAXED,
+		9,
+		true,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+
+	pClientContext->setInvalidCertificateHandler(new Poco::Net::RejectCertificateHandler(false));
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+
+	try
+	{
+		SecureStreamSocket ss1(sa, pClientContext);
+		fail("must throw with RejectCertificateHandler");
+	}
+	catch (...)
+	{
+	}
+
+	pClientContext->setInvalidCertificateHandler(new Poco::Net::AcceptCertificateHandler(false));
+
+	try
+	{
+		SecureStreamSocket ss1(sa, pClientContext);
+	}
+	catch (...)
+	{
+		fail("must not throw with AcceptCertificateHandler");
+	}
+
+	srv.stop();
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -400,6 +466,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSocket);
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSession);
+	CppUnit_addTest(pSuite, TCPServerTest, testContextInvalidCertificateHandler);
 
 	return pSuite;
 }

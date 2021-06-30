@@ -34,6 +34,7 @@ Context::Params::Params():
 	verificationMode(VERIFY_RELAXED),
 	verificationDepth(9),
 	loadDefaultCAs(false),
+	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
 	dhUse2048Bits(false)
 {
@@ -44,7 +45,8 @@ Context::Context(Usage usage, const Params& params):
 	_usage(usage),
 	_mode(params.verificationMode),
 	_pSSLContext(0),
-	_extendedCertificateVerification(true)
+	_extendedCertificateVerification(true),
+	_ocspStaplingResponseVerification(false)
 {
 	init(params);
 }
@@ -62,7 +64,8 @@ Context::Context(
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0),
-	_extendedCertificateVerification(true)
+	_extendedCertificateVerification(true),
+	_ocspStaplingResponseVerification(false)
 {
 	Params params;
 	params.privateKeyFile = privateKeyFile;
@@ -86,7 +89,8 @@ Context::Context(
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0),
-	_extendedCertificateVerification(true)
+	_extendedCertificateVerification(true),
+	_ocspStaplingResponseVerification(false)
 {
 	Params params;
 	params.caLocation = caLocation;
@@ -155,13 +159,15 @@ void Context::init(const Params& params)
 			}
 		}
 
-		if (!params.certificateFile.empty())
+		std::string certificateFile = params.certificateFile;
+		if (certificateFile.empty()) certificateFile = params.privateKeyFile;
+		if (!certificateFile.empty())
 		{
-			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(params.certificateFile).c_str());
+			errCode = SSL_CTX_use_certificate_chain_file(_pSSLContext, Poco::Path::transcode(certificateFile).c_str());
 			if (errCode != 1)
 			{
 				std::string errMsg = Utility::getLastError();
-				throw SSLContextException(std::string("Error loading certificate from file ") + params.certificateFile, errMsg);
+				throw SSLContextException(std::string("Error loading certificate from file ") + certificateFile, errMsg);
 			}
 		}
 
@@ -174,6 +180,18 @@ void Context::init(const Params& params)
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
+		SSL_CTX_set_ex_data(_pSSLContext, SSLManager::instance().contextIndex(), this);
+
+		if (!isForServerUse() && params.ocspStaplingVerification)
+		{
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+			_ocspStaplingResponseVerification = true;
+			SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponseCallback);
+			SSL_CTX_set_tlsext_status_arg(_pSSLContext, this);
+#else
+			throw SSLContextException("OCSP Stapling is not supported by this OpenSSL version");
+#endif
+		}
 
 		initDH(params.dhUse2048Bits, params.dhParamsFile);
 		initECDH(params.ecdhCurve);
@@ -395,7 +413,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	case PROTO_SSLV2:
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
 	case PROTO_SSLV3:
-		version = SSL3_VERSION;
+		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
 		break;
 	case PROTO_TLSV1:
 		version = TLS1_VERSION;
@@ -424,7 +442,7 @@ void Context::requireMinimumProtocol(Protocols protocol)
 		throw Poco::InvalidArgumentException("SSLv2 is no longer supported");
 
 	case PROTO_SSLV3:
-		disableProtocols(PROTO_SSLV2);
+		throw Poco::InvalidArgumentException("SSLv3 is no longer supported");
 		break;
 
 	case PROTO_TLSV1:
@@ -460,6 +478,12 @@ void Context::preferServerCiphers()
 #if defined(SSL_OP_CIPHER_SERVER_PREFERENCE)
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_CIPHER_SERVER_PREFERENCE);
 #endif
+}
+
+
+void Context::setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalidCertificateHandler)
+{
+	_pInvalidCertificateHandler = pInvalidCertificateHandler;
 }
 
 

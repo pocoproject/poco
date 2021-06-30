@@ -42,6 +42,7 @@ void PatternFormatterTest::testPatternFormatter()
 	msg.setThread("TestThread");
 	msg.setPriority(Message::PRIO_ERROR);
 	msg.setTime(DateTime(2005, 1, 1, 14, 30, 15, 500).timestamp());
+	msg.setSourceFile(__FILE__);
 	msg["testParam"] = "Test Parameter";
 	
 	std::string result;
@@ -91,6 +92,17 @@ void PatternFormatterTest::testPatternFormatter()
 	fmt.setProperty("pattern", "start %v[8] end");
 	fmt.format(msg, result);
 	assertTrue (result == "start stSource end");
+
+	result.clear();
+	fmt.setProperty("pattern", "%O");
+	fmt.format(msg, result);
+	assertTrue (result == "PatternFormatterTest.cpp");
+
+	result.clear();
+	fmt.setProperty("priorityNames", "FATAL,CRITICAL,SPECIAL_ERROR_NAME,WARN,NOTICE,INFO,DEBUG,TRACE");
+	fmt.setProperty("pattern", "%p");
+	fmt.format(msg, result);
+	assertTrue (result == "SPECIAL_ERROR_NAME");
 }
 
 

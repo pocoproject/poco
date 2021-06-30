@@ -615,7 +615,7 @@ void URI::removeDotSegments(bool removeLeading)
 }
 
 
-void URI::getPathSegments(std::vector<std::string>& segments)
+void URI::getPathSegments(std::vector<std::string>& segments) const
 {
 	getPathSegments(_path, segments);
 }
