@@ -19,6 +19,9 @@
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
 #include <memory>
+#ifdef POCO_OS_FAMILY_WINDOWS
+#undef max
+#endif
 #include <limits>
 
 

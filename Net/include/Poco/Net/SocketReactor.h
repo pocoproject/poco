@@ -26,6 +26,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Mutex.h"
 #include <map>
 #include <atomic>
 #include <functional>
@@ -276,8 +277,13 @@ private:
 	typedef std::map<poco_socket_t, NotifierPtr>          EventHandlerMap;
 	typedef Poco::FastMutex                               FastMutexType;
 	typedef FastMutexType::ScopedLock                     FastScopedLock;
+#ifdef POCO_HAVE_STD_ATOMICS
 	typedef Poco::SpinlockMutex                           SpinMutexType;
 	typedef SpinMutexType::ScopedLock                     SpinScopedLock;
+#else
+	typedef Poco::FastMutex                               SpinMutexType;
+	typedef SpinMutexType::ScopedLock                     SpinScopedLock;
+#endif // POCO_HAVE_STD_ATOMICS
 	typedef std::pair<CompletionHandler, Poco::Timestamp> CompletionHandlerEntry;
 	typedef std::deque<CompletionHandlerEntry>            HandlerList;
 
@@ -294,7 +300,7 @@ private:
 	{
 		int removed = 0;
 		SpinScopedLock lock(_completionMutex);
-		int left = count > -1 ? count : _complHandlers.size();
+		int left = count > -1 ? count : static_cast<int>(_complHandlers.size());
 		HandlerList::iterator it = _complHandlers.begin();
 		while (left && it != _complHandlers.end())
 		{
