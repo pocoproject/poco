@@ -9,7 +9,6 @@
 
 
 #include "NetCoreTestSuite.h"
-#include "EndpointTest.h"
 #include "IPAddressTest.h"
 #include "SocketAddressTest.h"
 #include "DNSTest.h"
@@ -20,7 +19,6 @@ CppUnit::Test* NetCoreTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetCoreTestSuite");
 
-	pSuite->addTest(EndpointTest::suite());
 	pSuite->addTest(IPAddressTest::suite());
 	pSuite->addTest(SocketAddressTest::suite());
 	pSuite->addTest(DNSTest::suite());
