@@ -58,5 +58,22 @@
 	#endif
 #endif
 
+//
+// SQLite Transaction type
+//
+
+namespace Poco {
+namespace Data {
+namespace SQLite {
+
+	extern const std::string TRANSACTION_TYPE_PROPERTY_KEY;
+
+	enum class TransactionType {
+		deferred,
+		exclusive,
+		immediate
+	};
+
+} } } // namespace Poco::Data::SQLite
 
 #endif // SQLite_SQLite_INCLUDED
