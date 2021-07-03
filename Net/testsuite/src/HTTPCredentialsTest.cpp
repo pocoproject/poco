@@ -214,6 +214,45 @@ void HTTPCredentialsTest::testDigestCredentialsQoP()
 	assertTrue (params.size() == 9);
 }
 
+void HTTPCredentialsTest::testDigestCredentialsQoPSHA256()
+{
+	HTTPDigestCredentials creds("user", "s3cr3t");
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/digest/");
+	HTTPResponse response;
+	response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\", algorithm=SHA-256");
+	creds.authenticate(request, response);
+	
+	HTTPAuthenticationParams params(request);
+	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
+	assertTrue (params["realm"] == "TestDigest");
+	assertTrue (params["response"] != "40e4889cfbd0e561f71e3107a2863bc4");
+	assertTrue (params["uri"] == "/digest/");
+	assertTrue (params["username"] == "user");
+	assertTrue (params["opaque"] == "opaque");
+	assertTrue (params["cnonce"] != "");
+	assertTrue (params["nc"] == "00000001");
+	assertTrue (params["qop"] == "auth");
+	assertTrue (params["algorithm"] == "SHA-256");
+	assertTrue (params.size() == 10);
+
+	std::string cnonce = params["cnonce"];
+	std::string aresp = params["response"];
+
+	params.clear();
+
+	creds.updateAuthInfo(request);
+	params.fromRequest(request);
+	assertTrue (params["nonce"] == "212573bb90170538efad012978ab811f%lu");
+	assertTrue (params["realm"] == "TestDigest");
+	assertTrue (params["response"] != aresp);
+	assertTrue (params["uri"] == "/digest/");
+	assertTrue (params["username"] == "user");
+	assertTrue (params["opaque"] == "opaque");
+	assertTrue (params["cnonce"] == cnonce);
+	assertTrue (params["nc"] == "00000002");
+	assertTrue (params["qop"] == "auth");
+	assertTrue (params.size() == 10);
+}
 
 void HTTPCredentialsTest::testCredentialsBasic()
 {
@@ -311,6 +350,43 @@ void HTTPCredentialsTest::testVerifyAuthInfoQoP()
 	assertTrue (!creds.verifyAuthInfo(request));
 }
 
+void HTTPCredentialsTest::testVerifyAuthInfoQoPSHA256() {
+	HTTPDigestCredentials sha256Creds("user", "s3cr3t");
+	HTTPRequest sha256Request(HTTPRequest::HTTP_GET, "/digest/");
+	HTTPResponse sha256Response;
+	sha256Response.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\", algorithm=SHA-256");
+	sha256Creds.authenticate(sha256Request, sha256Response);
+	assertTrue (sha256Creds.verifyAuthInfo(sha256Request));
+
+	sha256Request.set("Authorization", "Digest cnonce=\"f9c80ffd1c3bc4ee47ed92b704ba75a4\", nc=00000001, nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth\", realm=\"TestDigest\", response=\"ff0e90b9aa019120ea0ed6e23ce95d9a\", uri=\"/digest/\", username=\"user\", algorithm=SHA-256");
+	assertTrue (!sha256Creds.verifyAuthInfo(sha256Request));
+
+	HTTPDigestCredentials sha256SessCreds("user", "s3cr3t");
+	HTTPRequest sha256SessRequest(HTTPRequest::HTTP_GET, "/digest/");
+	HTTPResponse sha256SessResponse;
+	sha256SessResponse.set("WWW-Authenticate", "Digest realm=\"TestDigest\", nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth,auth-int\", algorithm=SHA-256-sess");
+	sha256SessCreds.authenticate(sha256SessRequest, sha256SessResponse);
+	assertTrue (sha256SessCreds.verifyAuthInfo(sha256SessRequest));
+
+	sha256SessRequest.set("Authorization", "Digest cnonce=\"f9c80ffd1c3bc4ee47ed92b704ba75a4\", nc=00000001, nonce=\"212573bb90170538efad012978ab811f%lu\", opaque=\"opaque\", qop=\"auth\", realm=\"TestDigest\", response=\"ff0e90b9aa019120ea0ed6e23ce95d9a\", uri=\"/digest/\", username=\"user\", algorithm=SHA-256-sess");
+	assertTrue (!sha256SessCreds.verifyAuthInfo(sha256SessRequest));
+}
+
+void HTTPCredentialsTest::testIsAlgorithmSupported() {
+	HTTPDigestCredentials sha256Creds("user", "s3cr3t");
+
+	assertTrue (sha256Creds.isAlgorithmSupported("MD5"));
+	assertTrue (sha256Creds.isAlgorithmSupported("MD5-sess"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-sess"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-256"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-256-sess"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-512-256"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-512-256-sess"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-512"));
+	assertTrue (sha256Creds.isAlgorithmSupported("SHA-512-sess"));
+	assertFalse (sha256Creds.isAlgorithmSupported("random_algorithm"));
+}
 
 void HTTPCredentialsTest::setUp()
 {
@@ -333,6 +409,7 @@ CppUnit::Test* HTTPCredentialsTest::suite()
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testAuthenticationParamsMultipleHeaders);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentialsQoP);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentialsQoPSHA256);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsBasic);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyCredentialsBasic);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testCredentialsDigest);
@@ -341,6 +418,8 @@ CppUnit::Test* HTTPCredentialsTest::suite()
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testExtractCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testVerifyAuthInfo);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testVerifyAuthInfoQoP);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testVerifyAuthInfoQoPSHA256);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testIsAlgorithmSupported);
 
 	return pSuite;
 }
