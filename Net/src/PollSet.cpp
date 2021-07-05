@@ -15,12 +15,16 @@
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Mutex.h"
+#include "Poco/Format.h"
+#include "Poco/Thread.h"
+#include "Poco/Stopwatch.h"
 #include <set>
 
 
 #if defined(_WIN32) && _WIN32_WINNT >= 0x0600
-#ifndef POCO_HAVE_FD_POLL
-#define POCO_HAVE_FD_POLL 1
+#include "Poco/OrderedMap.h"
+#ifndef POCO_HAVE_WSAEventSelect
+#define POCO_HAVE_WSAEventSelect 1
 #endif
 #elif defined(POCO_OS_FAMILY_BSD)
 #ifndef POCO_HAVE_FD_POLL
@@ -42,7 +46,298 @@ namespace Poco {
 namespace Net {
 
 
-#if defined(POCO_HAVE_FD_EPOLL)
+#if defined(POCO_HAVE_WSAEventSelect)
+
+
+//
+// implementation using WSAEventSelect
+//
+class PollSetImpl
+{
+public:
+	void add(const Socket& socket, int mode)
+	{
+		poco_socket_t fd = socket.impl()->sockfd();
+		_sockets.add(socket, mode);
+	}
+
+	void remove(const Socket& socket)
+	{
+		poco_socket_t fd = socket.impl()->sockfd();
+		_sockets.remove(fd);
+	}
+
+	bool has(const Socket& socket) const
+	{
+		return _sockets.has(socket);
+	}
+
+	bool empty() const
+	{
+		return _sockets.empty();
+	}
+
+	void update(const Socket& socket, int mode)
+	{
+		_sockets.update(socket, mode);
+	}
+
+	void clear()
+	{
+		_sockets.clear();
+	}
+
+	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
+	{
+		Poco::FastMutex::ScopedLock lock(_sockets.mutex());
+		PollSet::SocketModeMap result;
+
+		if (_sockets.empty()) return result;
+
+		EventList& events = _sockets.events();
+		DWORD sz = static_cast<DWORD>(events.size());
+
+		if (timeout.totalMilliseconds() > 10)
+			Poco::Thread::sleep(static_cast<long>(timeout.totalMilliseconds())-10);
+
+		int ret = WSAWaitForMultipleEvents(sz, &(events[0]), FALSE, 0, FALSE);
+		
+		if (ret == WSA_WAIT_FAILED) SocketImpl::error();
+		else if (ret == WSA_WAIT_TIMEOUT) return result;
+		else if (ret == WSA_WAIT_IO_COMPLETION)
+		{
+			throw Poco::IllegalStateException("PollSet::poll(): thread alertable state enabled");
+		}
+		else
+		{
+			int firstEvent = ret - WSA_WAIT_EVENT_0;
+			if (firstEvent < 0 || firstEvent >= events.size() || firstEvent >= _sockets.map().size())
+			{
+				throw Poco::IllegalStateException(
+					Poco::format("PollSet::poll(): firstEvent=%d", firstEvent));
+			}
+			WSANETWORKEVENTS netEvents;
+			auto it = _sockets.getFDIterator(firstEvent);
+			for (int i = firstEvent; i < events.size(); ++i, ++it)
+			{
+				if (it == _sockets.map().end())
+					throw Poco::IllegalStateException("PollSet::poll(): end of socket map reached");
+				std::memset(&netEvents, 0, sizeof(netEvents));
+				if (WSAEnumNetworkEvents(it->first, _sockets.events()[i], &netEvents) == SOCKET_ERROR)
+					SocketImpl::error();
+				if ((netEvents.iErrorCode[FD_CONNECT_BIT] != 0) ||
+					(netEvents.iErrorCode[FD_READ_BIT] != 0) ||
+					(netEvents.iErrorCode[FD_WRITE_BIT] != 0) ||
+					(netEvents.iErrorCode[FD_CLOSE_BIT] != 0))
+				{
+					result[it->second] |= PollSet::POLL_ERROR;
+				}
+				if (netEvents.lNetworkEvents & FD_CONNECT)
+				{
+					//result[it->second] |= PollSet::POLL_WRITE;
+				}
+				if (netEvents.lNetworkEvents & FD_READ)
+				{
+					result[it->second] |= PollSet::POLL_READ;
+				}
+				if (netEvents.lNetworkEvents & FD_WRITE)
+				{
+					result[it->second] |= PollSet::POLL_WRITE;
+				}
+				if (netEvents.lNetworkEvents & FD_CLOSE)
+				{
+					result[it->second] |= PollSet::POLL_READ;
+				}
+			}
+		}
+
+		return result;
+	}
+
+private:
+	using EventList = std::vector<HANDLE>;
+
+	class Sockets
+	{
+	public:
+		using SocketMap = Poco::OrderedMap<poco_socket_t, Socket>;
+
+		Sockets() = default;
+
+		~Sockets()
+		{
+			clear();
+		}
+
+		void add(const Socket& sock, int mode)
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			if (_events.size() >= WSA_MAXIMUM_WAIT_EVENTS)
+			{
+				throw Poco::IllegalStateException(
+					Poco::format("PollSet::Sockets::add(): max wait event limit (%d) reached",
+						static_cast<int>(WSA_MAXIMUM_WAIT_EVENTS)));
+			}
+			poco_socket_t fd = getFD(sock);
+			auto ins = _socketMap.insert({ fd, sock});
+			HANDLE* pEvent = 0;
+			if (ins.second)
+			{
+				_events.push_back(WSACreateEvent());
+				if (_events.back() == WSA_INVALID_EVENT)
+					throw Poco::IllegalStateException("PollSet::Sockets::add(): invalid event");
+				pEvent = std::addressof(_events.back());
+			}
+			else
+			{
+				ptrdiff_t pos = std::distance(_socketMap.begin(), ins.first);
+				pEvent = std::addressof(_events[pos]);
+			}
+			update(fd, mode, *pEvent);
+			poco_assert_dbg(_events.size() == _socketMap.size());
+		}
+
+		void update(poco_socket_t fd, int mode, HANDLE& evt)
+		{
+			if (!has(fd))
+				throw Poco::NotFoundException("PollSet::Sockets::update()");
+			long netEvents = 0;
+			setMode(netEvents, mode);
+			if (WSAEventSelect(fd, evt, netEvents) == SOCKET_ERROR)
+				Socket::error();
+		}
+
+		void update(const Socket& sock, int mode)
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			poco_socket_t fd = getFD(sock);
+			update(fd, mode, getEvent(fd));
+		}
+
+		void remove(poco_socket_t fd)
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			auto it = _socketMap.find(fd);
+			if (it != _socketMap.end())
+			{
+				ptrdiff_t pos = std::distance(_socketMap.begin(), it);
+				if (pos >= _events.size() || pos < 0)
+					throw Poco::IllegalStateException(
+						Poco::format("PollSet::Sockets::remove(): event position (%d) out of bounds(0-%d)",
+							static_cast<int>(pos), static_cast<int>(_events.size())));
+				_socketMap.erase(fd);
+				WSACloseEvent(_events[pos]);
+				_events.erase(_events.begin() + pos);
+			}
+			poco_assert_dbg(_events.size() == _socketMap.size());
+		}
+
+		bool has(poco_socket_t fd) const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _socketMap.find(fd) != _socketMap.end();
+		}
+
+		bool has(const Socket& sock) const
+		{
+			return has(getFD(sock));
+		}
+
+		bool empty() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _socketMap.empty();
+		}
+
+		void clear()
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			for (auto& ev : _events) WSACloseEvent(ev);
+			_socketMap.clear();
+			_events.clear();
+		}
+
+		EventList& events()
+		{
+			return _events;
+		}
+
+		const Socket& socket(poco_socket_t fd)
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			auto it = _socketMap.find(fd);
+			if (it == _socketMap.end())
+				throw Poco::NotFoundException("PollSet::Sockets::socket(): descriptor not found");
+			return it->second;
+		}
+
+		SocketMap::iterator getFDIterator(int idx)
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			if (idx >= _socketMap.size())
+			{
+				throw Poco::InvalidAccessException(
+					Poco::format("PollSet::Sockets::getFDIterator(%d); "
+						"socket map size=%d", idx, static_cast<int>(_socketMap.size())));
+			}
+			return _socketMap.begin() + idx;
+		}
+
+		const SocketMap& map() const
+		{
+			return _socketMap;
+		}
+
+		Poco::FastMutex& mutex()
+		{
+			return _mutex;
+		}
+
+	private:
+		HANDLE& getEvent(poco_socket_t fd)
+		{
+			auto it = _socketMap.find(fd);
+			if (it != _socketMap.end())
+			{
+				ptrdiff_t pos = std::distance(_socketMap.begin(), it);
+				if (pos >= _events.size() || pos < 0)
+				{
+					throw Poco::IllegalStateException(
+						Poco::format("PollSet::Sockets::getEventPos(): event position (%d) out of bounds(0-%d)",
+							static_cast<int>(pos), static_cast<int>(_events.size())));
+				}
+				return _events[pos];
+			}
+			throw Poco::NotFoundException("PollSet::Sockets::getEvent()");
+		}
+
+		static void setMode(long& target, int mode)
+		{
+			target |= FD_CONNECT;
+			if (mode & PollSet::POLL_READ) target |= FD_READ;
+			if (mode & PollSet::POLL_WRITE) target |= FD_WRITE;
+			target |= FD_CLOSE;
+		}
+
+		static poco_socket_t getFD(const Socket& sock)
+		{
+			Poco::Net::SocketImpl* pImpl = sock.impl();
+			if (!pImpl)
+				throw Poco::NullPointerException("PollSet::getFD(): impl is null");
+			return pImpl->sockfd();
+		}
+
+		mutable Poco::FastMutex _mutex;
+		SocketMap               _socketMap;
+		EventList               _events;
+	};
+
+	Sockets                      _sockets;
+	
+};
+
+
+#elif defined(POCO_HAVE_FD_EPOLL)
 
 
 //
@@ -214,7 +509,7 @@ private:
 
 
 //
-// BSD/Windows implementation using poll/WSAPoll
+// implementation using poll
 //
 class PollSetImpl
 {
