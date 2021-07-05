@@ -493,4 +493,10 @@ int Socket::lastError()
 }
 
 
+void Socket::error()
+{
+	SocketImpl::error();
+}
+
+
 } } // namespace Poco::Net

@@ -355,7 +355,10 @@ public:
 		/// into buffers).
 
 	static int lastError();
-		/// Returns the last socket error.
+		/// Returns the last error code.
+
+	static void error();
+		/// Throws an appropriate exception for the last error.
 
 protected:
 	Socket(SocketImpl* pImpl);
