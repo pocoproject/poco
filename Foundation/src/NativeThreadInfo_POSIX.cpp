@@ -15,6 +15,16 @@
 #include "Poco/NativeThreadInfo_POSIX.h"
 #include <cstring>
 #include <unistd.h>
+#include <sys/types.h>
+
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
+#include <sys/syscall.h>
+#ifdef SYS_gettid
+#define gettid() syscall(SYS_gettid)
+#else
+#define gettid() (0)
+#endif
+#endif
 
 namespace Poco {
 
