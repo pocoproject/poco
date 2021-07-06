@@ -18,11 +18,7 @@
 #include <set>
 
 
-#if defined(_WIN32) && _WIN32_WINNT >= 0x0600
-#ifndef POCO_HAVE_FD_POLL
-#define POCO_HAVE_FD_POLL 1
-#endif
-#elif defined(POCO_OS_FAMILY_BSD)
+#if defined(POCO_OS_FAMILY_BSD)
 #ifndef POCO_HAVE_FD_POLL
 #define POCO_HAVE_FD_POLL 1
 #endif
@@ -320,12 +316,6 @@ public:
 			Poco::Timestamp start;
 #ifdef _WIN32
 			rc = WSAPoll(&_pollfds[0], static_cast<ULONG>(_pollfds.size()), static_cast<INT>(remainingTime.totalMilliseconds()));
-			// see https://github.com/pocoproject/poco/issues/3248
-			if ((remainingTime > 0) && (rc > 0) && !hasSignaledFDs())
-			{
-				rc = -1;
-				WSASetLastError(WSAEINTR);
-			}
 #else
 			rc = ::poll(&_pollfds[0], _pollfds.size(), remainingTime.totalMilliseconds());
 #endif
@@ -358,11 +348,7 @@ public:
 #endif
 							)
 							result[its->second] |= PollSet::POLL_READ;
-						if ((it->revents & POLLOUT)
-#ifdef _WIN32
-							&& (_wantPOLLOUT.find(it->fd) != _wantPOLLOUT.end())
-#endif
-							)
+						if (it->revents & POLLOUT)
 							result[its->second] |= PollSet::POLL_WRITE;
 						if (it->revents & POLLERR)
 							result[its->second] |= PollSet::POLL_ERROR;
@@ -376,36 +362,6 @@ public:
 	}
 
 private:
-
-#ifdef _WIN32
-
-	void setMode(poco_socket_t fd, short& target, int mode)
-	{
-		if (mode & PollSet::POLL_READ)
-			target |= POLLIN;
-
-		if (mode & PollSet::POLL_WRITE)
-			_wantPOLLOUT.insert(fd);
-		else
-			_wantPOLLOUT.erase(fd);
-		target |= POLLOUT;
-	}
-
-	bool hasSignaledFDs()
-	{
-		for (const auto& pollfd : _pollfds)
-		{
-			if ((pollfd.revents | POLLOUT) &&
-				(_wantPOLLOUT.find(pollfd.fd) != _wantPOLLOUT.end()))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-#else
-
 	void setMode(poco_socket_t fd, short& target, int mode)
 	{
 		if (mode & PollSet::POLL_READ)
@@ -415,16 +371,276 @@ private:
 			target |= POLLOUT;
 	}
 
-#endif
-
 	mutable Poco::FastMutex         _mutex;
 	std::map<poco_socket_t, Socket> _socketMap;
-#ifdef _WIN32
-	std::set<poco_socket_t>         _wantPOLLOUT;
-#endif
 	std::map<poco_socket_t, int>    _addMap;
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;
+};
+
+
+#else
+
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+
+
+//
+// Windows-specific implementation using select()
+// The size of select set is determined at compile
+// time (see FD_SETSIZE in SocketDefs.h).
+//
+// This implementation works around that limit by
+// having multiple socket descriptor sets and,
+// when needed, calling select() multiple times.
+// To avoid multiple sets situtation, the FD_SETSIZE
+// can be increased, however then Poco::Net library
+// must be recompiled in order for the new setting
+// to be in effect.
+//
+
+
+class PollSetImpl
+{
+public:
+	PollSetImpl() : _fdRead(1, {0, {0}}),
+		_fdWrite(1, {0, {0}}),
+		_fdExcept(1, {0, {0}}),
+		_pFDRead(std::make_unique<fd_set>()),
+		_pFDWrite(std::make_unique<fd_set>()),
+		_pFDExcept(std::make_unique<fd_set>()),
+		_nfd(0)
+	{
+	}
+
+	void add(const Socket& socket, int mode)
+	{
+		Poco::Net::SocketImpl* pImpl = socket.impl();
+		poco_check_ptr(pImpl);
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		_map[socket] = mode;
+		setMode(pImpl->sockfd(), mode);
+	}
+
+	void remove(const Socket& socket)
+	{
+		Poco::Net::SocketImpl* pImpl = socket.impl();
+		poco_check_ptr(pImpl);
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		remove(pImpl->sockfd());
+		_map.erase(socket);
+	}
+
+	bool has(const Socket& socket) const
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		return _map.find(socket) != _map.end();
+	}
+
+	bool empty() const
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		return _map.empty();
+	}
+
+	void update(const Socket& socket, int mode)
+	{
+		Poco::Net::SocketImpl* pImpl = socket.impl();
+		poco_check_ptr(pImpl);
+		SOCKET fd = pImpl->sockfd();
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		_map[socket] = mode;
+		setMode(fd, mode);
+		if (!(mode & PollSet::POLL_READ)) remove(fd, _fdRead);
+		if (!(mode & PollSet::POLL_WRITE)) remove(fd, _fdWrite);
+		if (!(mode & PollSet::POLL_ERROR)) remove(fd, _fdExcept);
+	}
+
+	void clear()
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		_map.clear();
+		for (auto& fd : _fdRead) std::memset(&fd, 0, sizeof(fd));
+		for (auto& fd : _fdWrite) std::memset(&fd, 0, sizeof(fd));
+		for (auto& fd : _fdExcept) std::memset(&fd, 0, sizeof(fd));
+		_nfd = 0;
+	}
+
+	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
+	{
+		Poco::Timestamp start;
+		poco_assert_dbg(_fdRead.size() == _fdWrite.size());
+		poco_assert_dbg(_fdWrite.size() == _fdExcept.size());
+
+		PollSet::SocketModeMap result;
+		if (_nfd == 0) return result;
+
+		Poco::Timespan remainingTime(timeout);
+		struct timeval tv {0, 1000};
+
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		auto readIt = _fdRead.begin();
+		auto writeIt = _fdWrite.begin();
+		auto exceptIt = _fdExcept.begin();
+		do
+		{
+			std::memcpy(_pFDRead.get(), &*readIt, sizeof(fd_set));
+			std::memcpy(_pFDWrite.get(), &*writeIt, sizeof(fd_set));
+			std::memcpy(_pFDExcept.get(), &*exceptIt, sizeof(fd_set));
+
+			int rc;
+			do
+			{
+				rc = ::select((int)_nfd + 1, _pFDRead.get(), _pFDWrite.get(), _pFDExcept.get(), &tv);
+			} while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+			if (rc < 0) SocketImpl::error();
+			else if (rc > 0) break;
+
+			Timespan elapsed = Timestamp() - start;
+			if (timeout.totalMicroseconds() < elapsed.totalMicroseconds())
+				break;
+
+			Poco::UInt64 tOut = (((Poco::UInt64)tv.tv_sec * 1000000) + tv.tv_usec)*2;
+			Poco::Timespan left = timeout - elapsed;
+			if (tOut > left.totalMicroseconds())
+				tOut = left.totalMicroseconds();
+
+			tv.tv_sec = static_cast<long>(tOut / 1000000);
+			tv.tv_usec = tOut % 1000000;
+
+			if (++readIt == _fdRead.end())
+			{
+				readIt = _fdRead.begin();
+				writeIt = _fdWrite.begin();
+				exceptIt = _fdExcept.begin();
+			}
+			else
+			{
+				++writeIt;
+				++exceptIt;
+			}
+		} while (true);
+
+		for (auto it = _map.begin(); it != _map.end(); ++it)
+		{
+			poco_socket_t fd = it->first.impl()->sockfd();
+			if (fd != POCO_INVALID_SOCKET)
+			{
+				if (FD_ISSET(fd, _pFDRead.get()))
+				{
+					result[it->first] |= PollSet::POLL_READ;
+				}
+				if (FD_ISSET(fd, _pFDWrite.get()))
+				{
+					result[it->first] |= PollSet::POLL_WRITE;
+				}
+				if (FD_ISSET(fd, _pFDExcept.get()))
+				{
+					result[it->first] |= PollSet::POLL_ERROR;
+				}
+			}
+		}
+
+		return result;
+	}
+
+private:
+
+	void setMode(std::vector<fd_set>& fdSet, SOCKET fd)
+	{
+		SOCKET* pFD = 0;
+		for (auto& fdr : fdSet)
+		{
+			SOCKET* begin = fdr.fd_array;
+			SOCKET* end = fdr.fd_array + fdr.fd_count;
+			pFD = std::find(begin, end, fd);
+			if (end != pFD)
+			{
+				FD_SET(fd, &fdr);
+				if (fd > _nfd) _nfd = fd;
+				return;
+			}
+		}
+		// not found, insert at first free location
+		for (auto& fdr : fdSet)
+		{
+			if (fdr.fd_count < FD_SETSIZE)
+			{
+				fdr.fd_count++;
+				fdr.fd_array[fdr.fd_count-1] = fd;
+				if (fd > _nfd) _nfd = fd;
+				return;
+			}
+		}
+		// all fd sets are full; insert another one
+		fdSet.push_back({0, {0}});
+		fd_set& fds = fdSet.back();
+		fds.fd_count = 1;
+		fds.fd_array[0] = fd;
+		if (fd > _nfd) _nfd = fd;
+	}
+
+	void setMode(SOCKET fd, int mode)
+	{
+		if (mode & PollSet::POLL_READ) setMode(_fdRead, fd);
+		if (mode & PollSet::POLL_WRITE) setMode(_fdWrite, fd);
+		if (mode & PollSet::POLL_ERROR) setMode(_fdExcept, fd);
+	}
+
+	void remove(SOCKET fd, std::vector<fd_set>& fdSets)
+	{
+		for (auto& fdSet : fdSets)
+		{
+			if (fdSet.fd_count)
+			{
+				bool newNFD = (fd == _nfd);
+				if (newNFD) _nfd = 0;
+				int i = 0;
+				for (; i < fdSet.fd_count; ++i)
+				{
+					if (fdSet.fd_array[i] == fd)
+					{
+						if (i == (fdSet.fd_count-1))
+						{
+							fdSet.fd_array[i] = 0;
+						}
+						else
+						{
+							for (; i < fdSet.fd_count-1; ++i)
+							{
+								fdSet.fd_array[i] = fdSet.fd_array[i+1];
+								if (newNFD && fdSet.fd_array[i] > _nfd)
+									_nfd = fdSet.fd_array[i];
+							}
+						}
+						fdSet.fd_array[fdSet.fd_count-1] = 0;
+						fdSet.fd_count--;
+						break;
+					}
+					if (newNFD && fdSet.fd_array[i] > _nfd)
+						_nfd = fdSet.fd_array[i];
+				}
+			}
+		}
+	}
+
+	void remove(SOCKET fd)
+	{
+		remove(fd, _fdRead);
+		remove(fd, _fdWrite);
+		remove(fd, _fdExcept);
+	}
+
+	mutable Poco::FastMutex _mutex;
+	PollSet::SocketModeMap  _map;
+	SOCKET                  _nfd;
+	std::vector<fd_set>     _fdRead;
+	std::vector<fd_set>     _fdWrite;
+	std::vector<fd_set>     _fdExcept;
+	std::unique_ptr<fd_set> _pFDRead;
+	std::unique_ptr<fd_set> _pFDWrite;
+	std::unique_ptr<fd_set> _pFDExcept;
 };
 
 
@@ -566,6 +782,9 @@ private:
 	mutable Poco::FastMutex _mutex;
 	PollSet::SocketModeMap  _map;
 };
+
+
+#endif // POCO_OS_FAMILY_WINDOWS
 
 
 #endif

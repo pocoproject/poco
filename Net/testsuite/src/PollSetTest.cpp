@@ -41,6 +41,33 @@ PollSetTest::~PollSetTest()
 }
 
 
+void PollSetTest::testTimeout()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+	Timespan timeout(1000000);
+	Stopwatch sw; sw.start();
+	PollSet::SocketModeMap sm = ps.poll(timeout);
+	sw.stop();
+	assertTrue(ps.poll(timeout).empty());
+	assertTrue(sw.elapsed() >= 999000);
+
+	ss.sendBytes("hello", 5);
+	sw.restart();
+	sm = ps.poll(timeout);
+	sw.stop();
+	assertTrue(ps.poll(timeout).size() == 1);
+	assertTrue(sw.elapsed() < 900000);
+
+	// just here to prevent server exception on connection reset
+	char buffer[5];
+	ss.receiveBytes(buffer, sizeof(buffer));
+}
+
+
 void PollSetTest::testPoll()
 {
 	EchoServer echoServer1;
@@ -135,8 +162,8 @@ void PollSetTest::testPollNoServer()
 	ss2.connectNB(SocketAddress("127.0.0.1", 0xFEFF));
 	PollSet ps;
 	assertTrue(ps.empty());
-	ps.add(ss1, PollSet::POLL_READ);
-	ps.add(ss2, PollSet::POLL_READ);
+	ps.add(ss1, PollSet::POLL_READ | PollSet::POLL_ERROR);
+	ps.add(ss2, PollSet::POLL_READ | PollSet::POLL_ERROR);
 	assertTrue(!ps.empty());
 	assertTrue(ps.has(ss1));
 	assertTrue(ps.has(ss2));
@@ -203,6 +230,7 @@ CppUnit::Test* PollSetTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PollSetTest");
 
+	CppUnit_addTest(pSuite, PollSetTest, testTimeout);
 	CppUnit_addTest(pSuite, PollSetTest, testPoll);
 	CppUnit_addTest(pSuite, PollSetTest, testPollNoServer);
 	CppUnit_addTest(pSuite, PollSetTest, testPollClosedServer);
