@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include <iostream>
 
 
 using Poco::Net::SocketAddress;
