@@ -459,7 +459,7 @@ void GlobTest::testGlob()
 #if !defined(_WIN32_WCE)
 	// won't work if current directory is root dir
 	files.clear();
-	Glob::glob("globtest/../*/testsuite/*/", files);
+	Glob::glob("globtest/../g*/testsuite/*/", files);
 	translatePaths(files);
 	assertTrue (files.size() == 1);
 #endif
