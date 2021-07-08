@@ -50,6 +50,7 @@ public:
 		FDT_DATE,
 		FDT_TIME,
 		FDT_TIMESTAMP,
+		FDT_UUID,
 		FDT_UNKNOWN
 	};
 

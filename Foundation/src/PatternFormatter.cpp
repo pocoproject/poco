@@ -23,6 +23,7 @@
 #include "Poco/Environment.h"
 #include "Poco/NumberParser.h"
 #include "Poco/StringTokenizer.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
@@ -31,10 +32,11 @@ namespace Poco {
 const std::string PatternFormatter::PROP_PATTERN = "pattern";
 const std::string PatternFormatter::PROP_TIMES   = "times";
 const std::string PatternFormatter::PROP_PRIORITY_NAMES = "priorityNames";
-
+const std::string PatternFormatter::DEFAULT_PRIORITY_NAMES = "Fatal,Critical,Error,Warning,Notice,Information,Debug,Trace";
 
 PatternFormatter::PatternFormatter():
-	_localTime(false)
+	_localTime(false),
+	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
 	parsePriorityNames();
 }
@@ -42,7 +44,8 @@ PatternFormatter::PatternFormatter():
 
 PatternFormatter::PatternFormatter(const std::string& format):
 	_localTime(false),
-	_pattern(format)
+	_pattern(format),
+	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
 	parsePriorityNames();
 	parsePattern();
@@ -79,6 +82,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'I': NumberFormatter::append(text, msg.getTid()); break;
 		case 'N': text.append(Environment::nodeName()); break;
 		case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
+		case 'O': text.append(msg.getSourceFile() ? Path(msg.getSourceFile()).getFileName() : ""); break;
 		case 'u': NumberFormatter::append(text, msg.getSourceLine()); break;
 		case 'w': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
 		case 'W': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
@@ -230,48 +234,24 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 }
 
 
-namespace
-{
-	static std::string priorities[] = 
-	{
-		"",
-		"Fatal",
-		"Critical",
-		"Error",
-		"Warning",
-		"Notice",
-		"Information",
-		"Debug",
-		"Trace"
-	};
-}
-
-
 void PatternFormatter::parsePriorityNames()
 {
-	for (int i = 0; i <= 8; i++)
+	StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
+	if (st.count() == 8)
 	{
-		_priorities[i] = priorities[i];
-	}
-	if (!_priorityNames.empty())
-	{
-		StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
-		if (st.count() == 8)
+		for (int i = 1; i <= 8; i++)
 		{
-			for (int i = 1; i <= 8; i++)
-			{
-				_priorities[i] = st[i - 1];
-			}
+			_priorities[i] = st[i - 1];
 		}
-		else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
 	}
+	else throw Poco::SyntaxException("priorityNames property must specify a comma-separated list of 8 property names");
 }
 
 
 const std::string& PatternFormatter::getPriorityName(int prio)
 {
 	poco_assert (1 <= prio && prio <= 8);	
-	return priorities[prio];
+	return _priorities[prio];
 }
 
 

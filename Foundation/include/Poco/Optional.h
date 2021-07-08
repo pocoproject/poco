@@ -69,7 +69,7 @@ public:
 
 	Optional(C&& value):
 		/// Creates a Optional by moving the given value.
-		_value(value),
+		_value(std::forward<C>(value)),
 		_isSpecified(true)
 	{
 	}

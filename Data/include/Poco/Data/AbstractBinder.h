@@ -24,6 +24,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/DateTime.h"
 #include "Poco/Nullable.h"
+#include "Poco/UUID.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/UTFString.h"
@@ -316,6 +317,18 @@ public:
 
 	virtual void bind(std::size_t pos, const std::list<Time>& val, Direction dir = PD_IN);
 		/// Binds a Time list.
+
+	virtual void bind(std::size_t pos, const UUID& val, Direction dir = PD_IN) = 0;
+		/// Binds a UUID.
+
+	virtual void bind(std::size_t pos, const std::vector<UUID>& val, Direction dir = PD_IN);
+		/// Binds a UUID vector.
+
+	virtual void bind(std::size_t pos, const std::deque<UUID>& val, Direction dir = PD_IN);
+		/// Binds a UUID deque.
+
+	virtual void bind(std::size_t pos, const std::list<UUID>& val, Direction dir = PD_IN);
+		/// Binds a UUID list.
 
 	virtual void bind(std::size_t pos, const NullData& val, Direction dir = PD_IN) = 0;
 		/// Binds a null.

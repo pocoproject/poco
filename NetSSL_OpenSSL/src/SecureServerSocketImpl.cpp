@@ -54,13 +54,20 @@ void SecureServerSocketImpl::connect(const SocketAddress& address, const Poco::T
 {
 	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
 }
-	
+
 
 void SecureServerSocketImpl::connectNB(const SocketAddress& address)
 {
 	throw Poco::InvalidAccessException("Cannot connect() a SecureServerSocket");
 }
-	
+
+
+void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddress)
+{
+	_impl.bind(address, reuseAddress);
+	reset(_impl.sockfd());
+}
+
 
 void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reusePort)
 {
@@ -68,20 +75,34 @@ void SecureServerSocketImpl::bind(const SocketAddress& address, bool reuseAddres
 	reset(_impl.sockfd());
 }
 
-	
+
+void SecureServerSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool ipV6Only)
+{
+	_impl.bind6(address, reuseAddress, ipV6Only);
+	reset(_impl.sockfd());
+}
+
+
+void SecureServerSocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only)
+{
+	_impl.bind6(address, reuseAddress, reusePort, ipV6Only);
+	reset(_impl.sockfd());
+}
+
+
 void SecureServerSocketImpl::listen(int backlog)
 {
 	_impl.listen(backlog);
 	reset(_impl.sockfd());
 }
-	
+
 
 void SecureServerSocketImpl::close()
 {
 	reset();
 	_impl.close();
 }
-	
+
 
 int SecureServerSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {

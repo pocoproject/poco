@@ -917,6 +917,21 @@ void ODBCTest::testDouble()
 }
 
 
+void ODBCTest::testUUID()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateUUIDsTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->uuids();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testTuple()
 {
 	if (!_pSession) fail ("Test not available.");

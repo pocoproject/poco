@@ -113,6 +113,12 @@ public:
 	bool isConst() const;
 		/// Returns true iff the method is const.
 		
+	bool isDefault() const;
+		/// Returns true iff the method has a default implementation.
+
+	bool isDeleted() const;
+		/// Returns true iff the method has been deleted.
+
 	int countParameters() const;
 		/// Returns the number of parameters.
 	
@@ -157,6 +163,18 @@ inline const std::string& Function::getReturnParameter() const
 inline bool Function::isConst() const
 {
 	return (flags() & FN_CONST) != 0;
+}
+
+
+inline bool Function::isDefault() const
+{
+	return (flags() & FN_DEFAULT) != 0;
+}
+
+
+inline bool Function::isDeleted() const
+{
+	return (flags() & FN_DELETE) != 0;
 }
 
 

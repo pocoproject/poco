@@ -791,9 +791,11 @@ void JSONTest::testEmptyArray()
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	assertTrue (array->size() == 0);
+	assertTrue (array->empty());
 
 	Poco::Dynamic::Array da = *array;
 	assertTrue (da.size() == 0);
+	assertTrue (da.empty());
 }
 
 
@@ -817,10 +819,12 @@ void JSONTest::testNestedArray()
 
 	Poco::JSON::Array::Ptr array = result.extract<Poco::JSON::Array::Ptr>();
 	assertTrue (array->size() == 1);
+	assertTrue (!array->empty());
 
 	Poco::Dynamic::Array da = *array;
 	assertTrue (da.size() == 1);
 	assertTrue (da[0].size() == 1);
+	assertTrue (!da.empty());
 	assertTrue (da[0][0].size() == 1);
 	assertTrue (da[0][0][0].size() == 0);
 }
@@ -1382,7 +1386,6 @@ void JSONTest::testStringify()
 	Poco::JSON::Stringifier::stringify(obj1, oss1);
 	Poco::JSON::Stringifier::stringify(obj2, oss2);
 	assertTrue (oss1.str() == "{\"payload\":\"\\r\"}");
-	std::cout << "\"" << oss1.str() << "\"" << std::endl;
 	assertTrue (oss2.str() == "{\"payload\":\"\\n\"}");
 
 	Object jObj(false);
@@ -1397,7 +1400,7 @@ void JSONTest::testStringify()
 	std::stringstream ss;
 	jObj.stringify(ss);
 
-	assertTrue (ss.str() == "{\"backspace\":\"bs\\b\",\"bar\\/\":0,\"baz\":0,\"foo\\\\\":0,"
+	assertTrue (ss.str() == "{\"backspace\":\"bs\\b\",\"bar/\":0,\"baz\":0,\"foo\\\\\":0,"
 		"\"newline\":\"nl\\n\",\"q\\\"uote\\\"d\":0,\"tab\":\"tb\\t\"}");
 
 	std::string json = "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\" , \"age\" : 38 }, \"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
@@ -1448,24 +1451,24 @@ void JSONTest::testStringify()
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 1);
 	str = "{\n"
-		" \"Simpsons\" : {\n"
-		"  \"address\" : {\n"
-		"   \"number\" : 742,\n"
-		"   \"street\" : \"Evergreen Terrace\",\n"
-		"   \"town\" : \"Springfield\"\n"
+		" \"Simpsons\": {\n"
+		"  \"address\": {\n"
+		"   \"number\": 742,\n"
+		"   \"street\": \"Evergreen Terrace\",\n"
+		"   \"town\": \"Springfield\"\n"
 		"  },\n"
-		"  \"children\" : [\n"
+		"  \"children\": [\n"
 		"   \"Bart\",\n"
 		"   \"Lisa\",\n"
 		"   \"Maggie\"\n"
 		"  ],\n"
-		"  \"husband\" : {\n"
-		"   \"age\" : 38,\n"
-		"   \"name\" : \"Homer\"\n"
+		"  \"husband\": {\n"
+		"   \"age\": 38,\n"
+		"   \"name\": \"Homer\"\n"
 		"  },\n"
-		"  \"wife\" : {\n"
-		"   \"age\" : 36,\n"
-		"   \"name\" : \"Marge\"\n"
+		"  \"wife\": {\n"
+		"   \"age\": 36,\n"
+		"   \"name\": \"Marge\"\n"
 		"  }\n"
 		" }\n"
 		"}";
@@ -1474,24 +1477,24 @@ void JSONTest::testStringify()
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 2);
 	str = "{\n"
-		"  \"Simpsons\" : {\n"
-		"    \"address\" : {\n"
-		"      \"number\" : 742,\n"
-		"      \"street\" : \"Evergreen Terrace\",\n"
-		"      \"town\" : \"Springfield\"\n"
+		"  \"Simpsons\": {\n"
+		"    \"address\": {\n"
+		"      \"number\": 742,\n"
+		"      \"street\": \"Evergreen Terrace\",\n"
+		"      \"town\": \"Springfield\"\n"
 		"    },\n"
-		"    \"children\" : [\n"
+		"    \"children\": [\n"
 		"      \"Bart\",\n"
 		"      \"Lisa\",\n"
 		"      \"Maggie\"\n"
 		"    ],\n"
-		"    \"husband\" : {\n"
-		"      \"age\" : 38,\n"
-		"      \"name\" : \"Homer\"\n"
+		"    \"husband\": {\n"
+		"      \"age\": 38,\n"
+		"      \"name\": \"Homer\"\n"
 		"    },\n"
-		"    \"wife\" : {\n"
-		"      \"age\" : 36,\n"
-		"      \"name\" : \"Marge\"\n"
+		"    \"wife\": {\n"
+		"      \"age\": 36,\n"
+		"      \"name\": \"Marge\"\n"
 		"    }\n"
 		"  }\n"
 		"}";
@@ -1500,24 +1503,24 @@ void JSONTest::testStringify()
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 4);
 	str = "{\n"
-		"    \"Simpsons\" : {\n"
-		"        \"address\" : {\n"
-		"            \"number\" : 742,\n"
-		"            \"street\" : \"Evergreen Terrace\",\n"
-		"            \"town\" : \"Springfield\"\n"
+		"    \"Simpsons\": {\n"
+		"        \"address\": {\n"
+		"            \"number\": 742,\n"
+		"            \"street\": \"Evergreen Terrace\",\n"
+		"            \"town\": \"Springfield\"\n"
 		"        },\n"
-		"        \"children\" : [\n"
+		"        \"children\": [\n"
 		"            \"Bart\",\n"
 		"            \"Lisa\",\n"
 		"            \"Maggie\"\n"
 		"        ],\n"
-		"        \"husband\" : {\n"
-		"            \"age\" : 38,\n"
-		"            \"name\" : \"Homer\"\n"
+		"        \"husband\": {\n"
+		"            \"age\": 38,\n"
+		"            \"name\": \"Homer\"\n"
 		"        },\n"
-		"        \"wife\" : {\n"
-		"            \"age\" : 36,\n"
-		"            \"name\" : \"Marge\"\n"
+		"        \"wife\": {\n"
+		"            \"age\": 36,\n"
+		"            \"name\": \"Marge\"\n"
 		"        }\n"
 		"    }\n"
 		"}";
@@ -1590,24 +1593,24 @@ void JSONTest::testStringifyPreserveOrder()
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 1);
 	assertTrue (ostr.str() == "{\n"
-						" \"Simpsons\" : {\n"
-						"  \"husband\" : {\n"
-						"   \"name\" : \"Homer\",\n"
-						"   \"age\" : 38\n"
+						" \"Simpsons\": {\n"
+						"  \"husband\": {\n"
+						"   \"name\": \"Homer\",\n"
+						"   \"age\": 38\n"
 						"  },\n"
-						"  \"wife\" : {\n"
-						"   \"name\" : \"Marge\",\n"
-						"   \"age\" : 36\n"
+						"  \"wife\": {\n"
+						"   \"name\": \"Marge\",\n"
+						"   \"age\": 36\n"
 						"  },\n"
-						"  \"children\" : [\n"
+						"  \"children\": [\n"
 						"   \"Bart\",\n"
 						"   \"Lisa\",\n"
 						"   \"Maggie\"\n"
 						"  ],\n"
-						"  \"address\" : {\n"
-						"   \"number\" : 742,\n"
-						"   \"street\" : \"Evergreen Terrace\",\n"
-						"   \"town\" : \"Springfield\"\n"
+						"  \"address\": {\n"
+						"   \"number\": 742,\n"
+						"   \"street\": \"Evergreen Terrace\",\n"
+						"   \"town\": \"Springfield\"\n"
 						"  }\n"
 						" }\n"
 						"}");
@@ -1615,24 +1618,24 @@ void JSONTest::testStringifyPreserveOrder()
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 2);
 	assertTrue (ostr.str() == "{\n"
-						"  \"Simpsons\" : {\n"
-						"    \"husband\" : {\n"
-						"      \"name\" : \"Homer\",\n"
-						"      \"age\" : 38\n"
+						"  \"Simpsons\": {\n"
+						"    \"husband\": {\n"
+						"      \"name\": \"Homer\",\n"
+						"      \"age\": 38\n"
 						"    },\n"
-						"    \"wife\" : {\n"
-						"      \"name\" : \"Marge\",\n"
-						"      \"age\" : 36\n"
+						"    \"wife\": {\n"
+						"      \"name\": \"Marge\",\n"
+						"      \"age\": 36\n"
 						"    },\n"
-						"    \"children\" : [\n"
+						"    \"children\": [\n"
 						"      \"Bart\",\n"
 						"      \"Lisa\",\n"
 						"      \"Maggie\"\n"
 						"    ],\n"
-						"    \"address\" : {\n"
-						"      \"number\" : 742,\n"
-						"      \"street\" : \"Evergreen Terrace\",\n"
-						"      \"town\" : \"Springfield\"\n"
+						"    \"address\": {\n"
+						"      \"number\": 742,\n"
+						"      \"street\": \"Evergreen Terrace\",\n"
+						"      \"town\": \"Springfield\"\n"
 						"    }\n"
 						"  }\n"
 						"}");
@@ -1640,33 +1643,33 @@ void JSONTest::testStringifyPreserveOrder()
 	ostr.str("");
 	Stringifier::stringify(result, ostr, 4);
 	assertTrue (ostr.str() == "{\n"
-						"    \"Simpsons\" : {\n"
-						"        \"husband\" : {\n"
-						"            \"name\" : \"Homer\",\n"
-						"            \"age\" : 38\n"
+						"    \"Simpsons\": {\n"
+						"        \"husband\": {\n"
+						"            \"name\": \"Homer\",\n"
+						"            \"age\": 38\n"
 						"        },\n"
-						"        \"wife\" : {\n"
-						"            \"name\" : \"Marge\",\n"
-						"            \"age\" : 36\n"
+						"        \"wife\": {\n"
+						"            \"name\": \"Marge\",\n"
+						"            \"age\": 36\n"
 						"        },\n"
-						"        \"children\" : [\n"
+						"        \"children\": [\n"
 						"            \"Bart\",\n"
 						"            \"Lisa\",\n"
 						"            \"Maggie\"\n"
 						"        ],\n"
-						"        \"address\" : {\n"
-						"            \"number\" : 742,\n"
-						"            \"street\" : \"Evergreen Terrace\",\n"
-						"            \"town\" : \"Springfield\"\n"
+						"        \"address\": {\n"
+						"            \"number\": 742,\n"
+						"            \"street\": \"Evergreen Terrace\",\n"
+						"            \"town\": \"Springfield\"\n"
 						"        }\n"
 						"    }\n"
 						"}");
 
 	Poco::DynamicStruct ds = *result.extract<Object::Ptr>();
-	assertTrue(ds.toString() == "{ \"Simpsons\" : { \"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", \"town\" : \"Springfield\" }, "
-		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
-		"\"husband\" : { \"age\" : 38, \"name\" : \"Homer\" }, "
-		"\"wife\" : { \"age\" : 36, \"name\" : \"Marge\" } } }");
+	assertTrue(ds.toString() == "{ \"Simpsons\": { \"address\": { \"number\": 742, \"street\": \"Evergreen Terrace\", \"town\": \"Springfield\" }, "
+		"\"children\": [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+		"\"husband\": { \"age\": 38, \"name\": \"Homer\" }, "
+		"\"wife\": { \"age\": 36, \"name\": \"Marge\" } } }");
 	assertTrue (ds["Simpsons"].isStruct());
 	assertFalse(ds["Simpsons"].isOrdered());
 	assertTrue (ds["Simpsons"]["husband"].isStruct());
@@ -1690,11 +1693,11 @@ void JSONTest::testStringifyPreserveOrder()
 	Poco::OrderedDynamicStruct ods = *result.extract<Object::Ptr>();
 	assertTrue(ods["Simpsons"].isStruct());
 	assertTrue(ods["Simpsons"].isOrdered());
-	assertTrue(ods.toString() == "{ \"Simpsons\" : { \"husband\" : { \"name\" : \"Homer\", \"age\" : 38 }, "
-		"\"wife\" : { \"name\" : \"Marge\", \"age\" : 36 }, "
-		"\"children\" : [ \"Bart\", \"Lisa\", \"Maggie\" ], "
-		"\"address\" : { \"number\" : 742, \"street\" : \"Evergreen Terrace\", "
-		"\"town\" : \"Springfield\" } } }");
+	assertTrue(ods.toString() == "{ \"Simpsons\": { \"husband\": { \"name\": \"Homer\", \"age\": 38 }, "
+		"\"wife\": { \"name\": \"Marge\", \"age\": 36 }, "
+		"\"children\": [ \"Bart\", \"Lisa\", \"Maggie\" ], "
+		"\"address\": { \"number\": 742, \"street\": \"Evergreen Terrace\", "
+		"\"town\": \"Springfield\" } } }");
 }
 
 
@@ -1918,13 +1921,6 @@ void JSONTest::testUnicode()
 }
 
 
-void JSONTest::testSmallBuffer()
-{
-	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler(), 4);
-	std::string jsonStr = "{ \"x\" : \"123456789012345678901234567890123456789012345678901234567890\" }";
-	parser.parse(jsonStr);
-}
-
 void JSONTest::testEscape0()
 {
 	Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
@@ -1936,6 +1932,15 @@ void JSONTest::testEscape0()
 	json->stringify(ss);
 
 	assertTrue (ss.str().compare("{\"name\":\"B\\u0000b\"}") == 0);
+
+	// parse the JSON containing the escaped string
+ 	Poco::JSON::Parser parser(new Poco::JSON::ParseHandler());
+ 	Var result = parser.parse(ss.str());
+
+ 	assert(result.type() == typeid(Object::Ptr));
+
+ 	Object::Ptr object = result.extract<Object::Ptr>();
+ 	assert(object->get("name").extract<std::string>() == nullString);
 }
 
 
@@ -2163,6 +2168,47 @@ void JSONTest::testMove()
 	assertTrue (nl[2] == "baz");
 }
 
+void JSONTest::testRemove()
+{
+	Object obj1;
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "bar");
+	assertTrue(nl[1] == "baz");
+	assertTrue(nl[2] == "foo");
+
+	obj1.remove("baz");
+
+	nl = obj1.getNames();
+	assertTrue(nl.size() == 2);
+	assertTrue(nl[0] == "bar");
+	assertTrue(nl[1] == "foo");
+
+	Object obj2(Poco::JSON_PRESERVE_KEY_ORDER);
+	obj2.set("foo", 0);
+	obj2.set("bar", 0);
+	obj2.set("baz", 0);
+
+	nl = obj2.getNames();
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "bar");
+	assertTrue(nl[2] == "baz");
+
+	obj2.remove("bar");
+	nl = obj2.getNames();
+
+	assertTrue(nl.size() == 2);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "baz");
+
+}
+
 
 CppUnit::Test* JSONTest::suite()
 {
@@ -2208,12 +2254,12 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testInvalidUnicodeJanssonFiles);
 	CppUnit_addTest(pSuite, JSONTest, testTemplate);
 	CppUnit_addTest(pSuite, JSONTest, testUnicode);
-	CppUnit_addTest(pSuite, JSONTest, testSmallBuffer);
 	CppUnit_addTest(pSuite, JSONTest, testEscape0);
 	CppUnit_addTest(pSuite, JSONTest, testNonEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
+	CppUnit_addTest(pSuite, JSONTest, testRemove);
 
 	return pSuite;
 }

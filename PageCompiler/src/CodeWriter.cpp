@@ -337,7 +337,7 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 	}
 	if (!contentSecurityPolicy.empty())
 	{
-		ostr << "\tresponse.set(\"Content-Secure-Policy\"s, \"" << contentSecurityPolicy << "\"s);\n";
+		ostr << "\tresponse.set(\"Content-Security-Policy\"s, \"" << contentSecurityPolicy << "\"s);\n";
 	}
 	if (compressed)
 	{

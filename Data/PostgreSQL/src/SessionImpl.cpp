@@ -38,7 +38,7 @@ namespace
 	{
 		std::string connectionString;
 
-		for (std::map<std::string, std::string>::const_iterator citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
+		for (auto citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
 		{
 			connectionString.append(citr->first);
 			connectionString.append("=");
@@ -57,7 +57,8 @@ namespace PostgreSQL {
 
 
 SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout):
-	Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout)
+	Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout),
+	_connectorName("postgresql")
 {
 	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
@@ -92,7 +93,7 @@ void SessionImpl::open(const std::string& aConnectionString)
 			throw ConnectionException("Session already connected");
 		}
 
-		if (! aConnectionString.empty())
+		if (!aConnectionString.empty())
 		{
 			setConnectionString(aConnectionString);
 		}

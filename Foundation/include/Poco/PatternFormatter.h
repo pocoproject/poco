@@ -45,6 +45,7 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %I - message thread identifier (numeric)
 	///   * %N - node or host name
 	///   * %U - message source file path (empty string if not set)
+	///	  * %O - message source file filename (empty string if not set)
 	///   * %u - message source line number (0 if not set)
 	///   * %w - message date/time abbreviated weekday (Mon, Tue, ...)
 	///   * %W - message date/time full weekday (Monday, Tuesday, ...)
@@ -142,6 +143,8 @@ private:
 		/// a property in case of %[] and required length.
 
 	void parsePriorityNames();
+
+	static const std::string DEFAULT_PRIORITY_NAMES;
 
 	std::vector<PatternAction> _patternActions;
 	bool _localTime;

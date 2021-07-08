@@ -84,7 +84,7 @@ public:
 
 	Nullable(C&& value):
 		/// Creates a Nullable by moving the given value.
-		_value(value),
+		_value(std::forward<C>(value)),
 		_isNull(false),
 		_null()
 	{

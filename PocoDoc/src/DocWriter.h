@@ -82,6 +82,12 @@ protected:
 		NAMESPACE_INDEX_COLUMNS = 4
 	};
 	
+	enum
+	{
+		NO_CUSTOM_HTML = 1,
+		NO_TRACKING = 2
+	};
+
 	struct TOCEntry
 	{
 		std::string title;
@@ -117,9 +123,9 @@ protected:
 	static std::string headerFor(const Poco::CppParser::Symbol* pSymbol);
 	static std::string titleFor(const Poco::CppParser::Symbol* pSymbol);
 
-	void writeHeader(std::ostream& ostr, const std::string& title, const std::string& extraScript = "");
+	void writeHeader(std::ostream& ostr, const std::string& title, const std::string& extraScript = "", int options = 0);
 	void writeNavigationFrame(std::ostream& ostr, const std::string& group, const std::string& item);
-	static void writeFooter(std::ostream& ostr);
+	static void writeFooter(std::ostream& ostr, int options = 0);
 	void writeCopyright(std::ostream& ostr);
 	static void writeTitle(std::ostream& ostr, const std::string& category, const std::string& title);
 	static void writeTitle(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, const std::string& title);

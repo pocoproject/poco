@@ -43,6 +43,10 @@ public:
 	void testVerifyRS512();
 	void testSignVerifyES256();
 	void testVerifyES256();
+	void testSignVerifyES384();
+	void testVerifyES384();
+	void testSignVerifyES512();
+	void testVerifyES512();
 
 	static CppUnit::Test* suite();
 

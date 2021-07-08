@@ -16,6 +16,7 @@
 #include "Poco/Message.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/LoggingFactory.h"
@@ -34,6 +35,7 @@ const std::string RemoteSyslogChannel::PROP_FACILITY("facility");
 const std::string RemoteSyslogChannel::PROP_FORMAT("format");
 const std::string RemoteSyslogChannel::PROP_LOGHOST("loghost");
 const std::string RemoteSyslogChannel::PROP_HOST("host");
+const std::string RemoteSyslogChannel::PROP_BUFFER("buffer");
 const std::string RemoteSyslogChannel::STRUCTURED_DATA("structured-data");
 
 
@@ -42,6 +44,7 @@ RemoteSyslogChannel::RemoteSyslogChannel():
 	_name("-"),
 	_facility(SYSLOG_USER),
 	_bsdFormat(false),
+	_buffer(0),
 	_open(false)
 {
 }
@@ -52,6 +55,7 @@ RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::
 	_name(name),
 	_facility(facility),
 	_bsdFormat(bsdFormat),
+	_buffer(0),
 	_open(false)
 {
 	if (_name.empty()) _name = "-";
@@ -93,6 +97,11 @@ void RemoteSyslogChannel::open()
 		{
 			_host = _socket.address().host().toString();
 		}
+	}
+
+	if (_buffer)
+	{
+		_socket.setSendBufferSize(_buffer);
 	}
 
 	_open = true;
@@ -233,6 +242,10 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	{
 		_bsdFormat = (value == "bsd" || value == "rfc3164");
 	}
+	else if (name == PROP_BUFFER)
+	{
+		_buffer = Poco::NumberParser::parse(value);
+	}
 	else
 	{
 		Channel::setProperty(name, value);
@@ -313,6 +326,10 @@ std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 	else if (name == PROP_FORMAT)
 	{
 		return _bsdFormat ? "rfc3164" : "rfc5424";
+	}
+	else if (name == PROP_BUFFER)
+	{
+		return Poco::NumberFormatter::format(_buffer);
 	}
 	else
 	{

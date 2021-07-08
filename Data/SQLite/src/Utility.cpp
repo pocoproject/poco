@@ -134,6 +134,8 @@ Utility::Utility()
 		_types.insert(TypeMap::value_type("TIME", MetaColumn::FDT_TIME));
 		_types.insert(TypeMap::value_type("DATETIME", MetaColumn::FDT_TIMESTAMP));
 		_types.insert(TypeMap::value_type("TIMESTAMP", MetaColumn::FDT_TIMESTAMP));
+		_types.insert(TypeMap::value_type("UUID", MetaColumn::FDT_UUID));
+		_types.insert(TypeMap::value_type("GUID", MetaColumn::FDT_UUID));
 	}
 }
 
@@ -248,7 +250,9 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, NULL);
+	// Note: SQLITE_OPEN_READWRITE is required to correctly handle an existing hot journal.
+	// See #3135
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI, NULL);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");

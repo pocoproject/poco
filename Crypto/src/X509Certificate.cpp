@@ -349,6 +349,24 @@ Poco::DateTime X509Certificate::expiresOn() const
 }
 
 
+Poco::DigestEngine::Digest X509Certificate::fingerprint(const std::string& algorithm) const
+{
+	unsigned char buffer[EVP_MAX_MD_SIZE];
+	unsigned int length;
+	const EVP_MD* md = EVP_get_digestbyname(algorithm.c_str());
+	if (!md) throw Poco::InvalidArgumentException(algorithm);
+
+	if (X509_digest(_pCert, md, buffer, &length))
+	{
+		return Poco::DigestEngine::Digest(buffer, buffer + length);
+	}
+	else
+	{
+		throw OpenSSLException("failed to compute fingerprint");
+	}
+}
+
+
 bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 {
 	X509* pCert = const_cast<X509*>(_pCert);

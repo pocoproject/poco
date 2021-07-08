@@ -119,7 +119,7 @@ void SocketAddressTest::testSocketAddress()
 	}
 
 	SocketAddress sa10("www6.pocoproject.org", 80);
-	assertTrue (sa10.host().toString() == "54.93.62.90" || sa10.host().toString() == "[2001:4801:7828:101:be76:4eff:fe10:1455]");
+	assertTrue (sa10.host().toString() == "54.93.62.90" || sa10.host().toString() == "2001:4801:7828:101:be76:4eff:fe10:1455");
 
 	SocketAddress sa11(SocketAddress::IPv4, "www6.pocoproject.org", 80);
 	assertTrue (sa11.host().toString() == "54.93.62.90");
