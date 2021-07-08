@@ -461,7 +461,7 @@ or
 
 To use POCO C++ Libraries in your cmake project, add following line in your project for example to use crypto:
 
-    find_package(Poco REQUIRED PocoCrypto)
+    find_package(Poco REQUIRED Crypto)
     ....
     target_link_libraries(yourTargetName ... Poco::Crypto)
 
