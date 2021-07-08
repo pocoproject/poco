@@ -332,6 +332,15 @@ void tuplePrepare(std::size_t& pos, TupleType tuple, AbstractPreparator::Ptr pPr
 	pos += TypeHandler<Type>::size();
 }
 
+template <typename TupleType, typename DefValType, typename Type, int N>
+POCO_TUPLE_TYPE_HANDLER_INLINE
+void tupleExtract(std::size_t& pos, TupleType tuple, DefValType defVal, AbstractExtractor::Ptr pExt)
+{
+        Poco::Data::TypeHandler<Type>::extract(pos, tuple.template get<N>(),
+        defVal.template get<N>(), pExt);
+        pos += TypeHandler<Type>::size();
+}
+
 template <class T0,
 	class T1,
 	class T2,
@@ -553,6 +562,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tupleExtract<TupleRef, TupleConstRef, T35, 35>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T36, 36>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T37, 37>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T38, 38>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T39, 39>(pos, tuple, defVal, pExt);
 	}
 
