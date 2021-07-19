@@ -204,6 +204,14 @@ endif()
 
 include(DefinePlatformSpecifc)
 
+# Disable fork exec
+option(POCO_NO_FORK_EXEC
+	"Set to OFF|ON (default is OFF) to control disable fork exec" OFF)
+
+if(POCO_NO_FORK_EXEC)
+	add_definitions(-DPOCO_NO_FORK_EXEC=1)
+endif()
+
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
 
