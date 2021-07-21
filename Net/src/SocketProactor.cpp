@@ -1,0 +1,721 @@
+//
+// SocketProactor.cpp
+//
+// Library: Net
+// Package: Reactor
+// Module:  SocketProactor
+//
+// Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#include "Poco/Net/SocketProactor.h"
+#include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/DatagramSocketImpl.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Thread.h"
+#include "Poco/Exception.h"
+#ifdef POCO_OS_FAMILY_WINDOWS
+#ifdef max
+#undef max
+#endif // max
+#endif // POCO_OS_FAMILY_WINDOWS
+#include <limits>
+
+
+using Poco::Exception;
+using Poco::ErrorHandler;
+
+
+namespace Poco {
+namespace Net {
+
+
+//
+// Worker
+//
+
+class Worker
+	/// Worker is a utility class that executes work (functions).
+	/// Workload can be permanent (executed on every doWork() call),
+	/// or "one-shot" (scheduled for a single execution at a point
+	/// in the future).
+{
+public:
+	using MutexType = SocketProactor::MutexType;
+	using ScopedLock = SocketProactor::ScopedLock;
+	using Work = SocketProactor::Work;
+	using WorkEntry = std::pair<Work, Poco::Timestamp>;
+	using WorkList = std::deque<WorkEntry>;
+
+	void addWork(const Work& ch, Timestamp::TimeDiff ms = SocketProactor::PERMANENT_COMPLETION_HANDLER)
+	{
+		addWork(Work(ch), ms);
+	}
+
+	void addWork(Work&& ch, Timestamp::TimeDiff ms, int pos = -1)
+	{
+		auto pch = SocketProactor::PERMANENT_COMPLETION_HANDLER;
+		Poco::Timestamp expires = (ms != pch) ? Timestamp() + ms * 1000 : Timestamp(pch);
+
+		if (pos == -1)
+		{
+			ScopedLock lock(_mutex);
+			_funcList.push_back({std::move(ch), expires});
+		}
+		else
+		{
+			if (pos < 0) throw Poco::InvalidArgumentException("SocketProactor::addWork()");
+			ScopedLock lock(_mutex);
+			_funcList.insert(_funcList.begin() + pos, {std::move(ch), expires});
+		}
+	}
+
+	void removeWork()
+	{
+		ScopedLock lock(_mutex);
+		_funcList.clear();
+	}
+
+	int scheduledWork()
+	{
+		int cnt = 0;
+		ScopedLock lock(_mutex);
+		WorkList::iterator it = _funcList.begin();
+		for (; it != _funcList.end(); ++it)
+		{
+			if (!isPermanent(it->second)) ++cnt;
+		}
+		return cnt;
+	}
+
+	int removeScheduledWork(int count)
+	{
+		auto isScheduled = [this](const Timestamp &ts)
+		{ return !isPermanent(ts); };
+		return removeWork(isScheduled, count);
+	}
+
+	int permanentWork()
+	{
+		int cnt = 0;
+		ScopedLock lock(_mutex);
+		WorkList::iterator it = _funcList.begin();
+		for (; it != _funcList.end(); ++it)
+		{
+			if (isPermanent(it->second))
+				++cnt;
+		}
+		return cnt;
+	}
+
+
+	int removePermanentWork(int count)
+	{
+		auto perm = [this](const Timestamp &ts)
+		{ return isPermanent(ts); };
+		return removeWork(perm, count);
+	}
+
+	static bool isPermanent(const Timestamp &entry)
+	{
+		return entry == Timestamp(SocketProactor::PERMANENT_COMPLETION_HANDLER);
+	}
+
+	int doWork(bool handleOne, bool expiredOnly)
+	{
+		std::unique_ptr<Work> pCH;
+		int handled = 0;
+		{
+			WorkList::iterator it = _funcList.begin();
+			while (it != _funcList.end())
+			{
+				std::size_t prevSize = 0;
+				// A completion handler may add new
+				// completion handler(s), so the mutex must
+				// be unlocked before the invocation.
+				{
+					ScopedLock lock(_mutex);
+					bool alwaysRun = isPermanent(it->second) && !expiredOnly;
+					bool isExpired = !alwaysRun && (Timestamp() > it->second);
+					if (isExpired)
+					{
+						pCH.reset(new Work(std::move(it->first)));
+						it = _funcList.erase(it);
+					}
+					else if (alwaysRun)
+					{
+						pCH.reset(new Work(it->first));
+						++it;
+					}
+					else ++it;
+					prevSize = _funcList.size();
+				}
+
+				if (pCH)
+				{
+					(*pCH)();
+					pCH.reset();
+					++handled;
+					if (handleOne) break;
+				}
+				// handler call may add or remove handlers;
+				// if so, we must start from the beginning
+				{
+					ScopedLock lock(_mutex);
+					if (prevSize != _funcList.size())
+						it = _funcList.begin();
+				}
+			}
+		}
+		return handled;
+	}
+
+	int runOne()
+	{
+		try
+		{
+			while (0 == doWork(true, false));
+			return 1;
+		}
+		catch(...) {}
+		return 0;
+	}
+
+private:
+	template <typename F>
+	int removeWork(F isType, int count)
+		/// Removes `count` functions of the specified type;
+		/// if count is -1, removes all the functions of the
+		/// specified type.
+	{
+		int removed = 0;
+		ScopedLock lock(_mutex);
+		int left = count > -1 ? count : static_cast<int>(_funcList.size());
+		WorkList::iterator it = _funcList.begin();
+		while (left && it != _funcList.end())
+		{
+			if (isType(it->second))
+			{
+				++removed;
+				it = _funcList.erase((it));
+				--left;
+			}
+			else ++it;
+		}
+		return removed;
+	}
+
+	WorkList  _funcList;
+	MutexType _mutex;
+};
+
+
+//
+// SocketProactor
+//
+
+const Timestamp::TimeDiff SocketProactor::PERMANENT_COMPLETION_HANDLER =
+	std::numeric_limits<Timestamp::TimeDiff>::max();
+
+
+SocketProactor::SocketProactor(bool worker):
+	_stop(false),
+	_timeout(0),
+	_maxTimeout(DEFAULT_MAX_TIMEOUT_MS),
+	_pThread(nullptr),
+	_ioCompletion(_maxTimeout),
+	_pWorker(worker ? new Worker : nullptr)
+{
+}
+
+
+SocketProactor::SocketProactor(const Poco::Timespan& timeout, bool worker):
+	_stop(false),
+	_timeout(0),
+	_maxTimeout(timeout.totalMilliseconds()),
+	_pThread(nullptr),
+	_ioCompletion(_maxTimeout),
+	_pWorker(worker ? new Worker : nullptr)
+{
+}
+
+
+SocketProactor::~SocketProactor()
+{
+	_ioCompletion.stop();
+	_ioCompletion.wakeUp();
+	_ioCompletion.wait();
+}
+
+
+int SocketProactor::poll(int* pHandled)
+{
+	int handled = 0;
+	int worked = 0;
+	PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
+	if (sm.size() > 0)
+	{
+		auto it = sm.begin();
+		auto end = sm.end();
+		for (; it != end; ++it)
+		{
+			if (it->second & PollSet::POLL_READ)
+			{
+				Socket sock = it->first;
+				handled += receive(sock);
+			}
+			if (it->second & PollSet::POLL_WRITE)
+			{
+				Socket sock = it->first;
+				handled += send(sock);
+			}
+			/*if (it->second & PollSet::POLL_ERROR)
+			{
+				//dispatch(it->first, _pErrorNotification);
+				++handled;
+			}*/
+		}
+	}
+
+	if (pHandled) *pHandled = handled;
+	if (_pWorker)
+	{
+		if (hasSocketHandlers())
+		{
+			if (handled) worked = doWork();
+		}
+		else worked = doWork(false, true);
+	}
+	return worked;
+}
+
+
+void SocketProactor::addSocket(Socket socket, int mode)
+{
+	_pollSet.add(socket, mode);
+}
+
+
+void SocketProactor::addReceiveFrom(Socket socket, Buffer& buf, Poco::Net::SocketAddress& addr, Callback&& onCompletion)
+{
+	if (!socket.isDatagram())
+		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");
+	std::unique_ptr<Handler> pHandler(new Handler);
+	pHandler->_pAddr = std::addressof(addr);
+	pHandler->_pBuf = std::addressof(buf);
+	pHandler->_onCompletion = std::move(onCompletion);
+
+	Poco::Mutex::ScopedLock l(_readMutex);
+	_readHandlers[socket.impl()->sockfd()].push_back(std::move(pHandler));
+}
+
+
+void SocketProactor::addSendTo(Socket socket, const Buffer& message, const SocketAddress& addr, Callback&& onCompletion)
+{
+	if (!socket.isDatagram())
+		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");
+	Buffer* pMessage = nullptr;
+	SocketAddress* pAddr = nullptr;
+	try
+	{
+		pMessage = new Buffer(message);
+		pAddr = new SocketAddress(addr);
+	}
+	catch(...)
+	{
+		delete pMessage;
+		delete pAddr;
+		throw;
+	}
+	addSend(socket, pMessage, pAddr, std::move(onCompletion), true);
+}
+
+
+void SocketProactor::addSendTo(Socket socket, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion)
+{
+	if (!socket.isDatagram())
+		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");
+	Buffer* pMessage = nullptr;
+	SocketAddress* pAddr = nullptr;
+	try
+	{
+		pMessage = new Buffer(std::move(message));
+		pAddr = new SocketAddress(std::move(addr));
+	}
+	catch(...)
+	{
+		delete pMessage;
+		delete pAddr;
+		throw;
+	}
+	addSend(socket, pMessage, pAddr, std::move(onCompletion), true);
+}
+
+
+void SocketProactor::addReceive(Socket socket, Buffer& buf, Callback&& onCompletion)
+{
+	if (!socket.isStream())
+		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
+	std::unique_ptr<Handler> pHandler(new Handler);
+	pHandler->_pAddr = nullptr;
+	pHandler->_pBuf = std::addressof(buf);
+	pHandler->_onCompletion = std::move(onCompletion);
+
+	Poco::Mutex::ScopedLock l(_readMutex);
+	_readHandlers[socket.impl()->sockfd()].push_back(std::move(pHandler));
+}
+
+
+void SocketProactor::addSend(Socket socket, const Buffer& message, Callback&& onCompletion)
+{
+	if (!socket.isStream())
+		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
+	Buffer* pMessage = nullptr;
+	try
+	{
+		pMessage = new Buffer(message);
+	}
+	catch(...)
+	{
+		delete pMessage;
+		throw;
+	}
+	addSend(socket, pMessage, nullptr, std::move(onCompletion), true);
+}
+
+
+void SocketProactor::addSend(Socket socket, const Buffer&& message, Callback&& onCompletion)
+{
+	if (!socket.isStream())
+		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
+	Buffer* pMessage = nullptr;
+	try
+	{
+		pMessage = new Buffer(std::move(message));
+	}
+	catch(...)
+	{
+		delete pMessage;
+		throw;
+	}
+	addSend(socket, pMessage, nullptr, std::move(onCompletion), true);
+}
+
+
+void SocketProactor::addSend(Socket socket, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own)
+{
+	std::unique_ptr<Handler> pHandler(new Handler);
+	pHandler->_pAddr = pAddr;
+	pHandler->_pBuf = pMessage;
+	pHandler->_onCompletion = std::move(onCompletion);
+	pHandler->_owner = own;
+	Poco::Mutex::ScopedLock l(_writeMutex);
+	_writeHandlers[socket.impl()->sockfd()].push_back(std::move(pHandler));
+}
+
+
+int SocketProactor::send(Socket& socket)
+{
+	Poco::Mutex::ScopedLock l(_writeMutex);
+	auto hIt = _writeHandlers.find(socket.impl()->sockfd());
+	if (hIt == _writeHandlers.end()) return 0;
+	IOHandlerList& handlers = hIt->second;
+	int handled = static_cast<int>(handlers.size());
+	auto it = handlers.begin();
+	auto end = handlers.end();
+	while (it != end)
+	{
+		if (socket.isDatagram())
+			sendTo(*socket.impl(), it);
+		else if (socket.isStream())
+			send(*socket.impl(), it);
+		else
+			throw Poco::InvalidArgumentException("Unknown socket type.");
+
+		++it;
+		handlers.pop_front();
+		// end iterator is invalidated when the last member
+		// is removed, so make sure we don't check for it
+		if (handlers.empty()) break;
+	}
+	handled -= handlers.size();
+	if (handled) _ioCompletion.wakeUp();
+	return handled;
+}
+
+
+void SocketProactor::sendTo(SocketImpl& socket, IOHandlerIt& it)
+{
+	Buffer* pBuf = (*it)->_pBuf;
+	if (pBuf && pBuf->size())
+	{
+		SocketAddress *pAddr = (*it)->_pAddr;
+		int n = 0, err = 0;
+		try
+		{
+			n = socket.sendTo(&(*pBuf)[0], pBuf->size(), *pAddr);
+		}
+		catch(std::exception&)
+		{
+			err = Socket::lastError();
+		}
+		enqueueIONotification(std::move((*it)->_onCompletion), n, err);
+		if ((*it)->_owner)
+		{
+			delete pBuf; (*it)->_pBuf = nullptr;
+			delete pAddr; (*it)->_pAddr = nullptr;
+		}
+	}
+	else
+	{
+		if (!pBuf)
+			throw Poco::NullPointerException("SocketProactor::sendTo(): null buffer");
+		else if (pBuf->empty())
+			throw Poco::NullPointerException("SocketProactor::sendTo(): empty buffer");
+		else
+			throw Poco::NullPointerException("SocketProactor::sendTo(): unexpected error");
+	}
+}
+
+
+void SocketProactor::send(SocketImpl& socket, IOHandlerIt& it)
+{
+	Buffer* pBuf = (*it)->_pBuf;
+	if (pBuf && pBuf->size())
+	{
+		int n = 0, err = 0;
+		try
+		{
+			n = socket.sendBytes(&(*pBuf)[0], pBuf->size());
+		}
+		catch(std::exception&)
+		{
+			err = Socket::lastError();
+		}
+		enqueueIONotification(std::move((*it)->_onCompletion), n, err);
+		if ((*it)->_owner)
+		{
+			delete pBuf; (*it)->_pBuf = nullptr;
+		}
+	}
+	else throw Poco::NullPointerException("SocketProactor::sendTo(): null or empty buffer");
+}
+
+
+int SocketProactor::receive(Socket& socket)
+{
+	Poco::Mutex::ScopedLock l(_readMutex);
+	auto hIt = _readHandlers.find(socket.impl()->sockfd());
+	if (hIt == _readHandlers.end()) return 0;
+	IOHandlerList& handlers = hIt->second;
+	int handled = static_cast<int>(handlers.size());
+	int avail = 0;
+	auto it = handlers.begin();
+	auto end = handlers.end();
+	for (; it != end;)
+	{
+		if ((avail = socket.available()))
+		{
+			if (socket.isDatagram())
+				receiveFrom(*socket.impl(), it, avail);
+			else if (socket.isStream())
+				receive(*socket.impl(), it, avail);
+			else
+				throw Poco::InvalidArgumentException("Unknown socket type.");
+
+			++it;
+			handlers.pop_front();
+			// end iterator is invalidated when the last member
+			// is removed, so make sure we don't check for it
+			if (handlers.size() == 0) break;
+		}
+		else break;
+	}
+	handled -= handlers.size();
+	if (handled) _ioCompletion.wakeUp();
+	return handled;
+}
+
+
+void SocketProactor::receiveFrom(SocketImpl& socket, IOHandlerIt& it, int available)
+{
+	Buffer *pBuf = (*it)->_pBuf;
+	SocketAddress *pAddr = (*it)->_pAddr;
+	poco_check_ptr(pBuf);
+	if (pBuf->size() < available) pBuf->resize(available);
+	int n = 0, err = 0;
+	try
+	{
+		n = socket.receiveFrom(&(*pBuf)[0], available, *pAddr);
+	}
+	catch(std::exception&)
+	{
+		err = Socket::lastError();
+	}
+	enqueueIONotification(std::move((*it)->_onCompletion), n, err);
+}
+
+
+void SocketProactor::receive(SocketImpl& socket, IOHandlerIt& it, int available)
+{
+	Buffer *pBuf = (*it)->_pBuf;
+	poco_check_ptr(pBuf);
+	if (pBuf->size() < available) pBuf->resize(available);
+	int n = 0, err = 0;
+	try
+	{
+		n = socket.receiveBytes(&(*pBuf)[0], available);
+	}
+	catch(std::exception&)
+	{
+		err = Socket::lastError();
+	}
+	enqueueIONotification(std::move((*it)->_onCompletion), n, err);
+}
+
+
+int SocketProactor::doWork(bool handleOne, bool expiredOnly)
+{
+	return worker().doWork(handleOne, expiredOnly);
+}
+
+
+int SocketProactor::runOne()
+{
+	return worker().runOne();
+}
+
+
+void SocketProactor::runImpl(bool runCond, long &sleepMS, long maxSleep)
+{
+	try
+	{
+		if (runCond) sleepMS = 0;
+		else
+			Thread::trySleep((sleepMS >= maxSleep) ? maxSleep : ++sleepMS);
+	}
+	catch (Exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		ErrorHandler::handle();
+	}
+}
+
+
+void SocketProactor::run()
+{
+	_pThread = Thread::current();
+	int handled = 0;
+	while (!_stop)
+		runImpl((poll(&handled) || handled), _timeout, _maxTimeout);
+
+	onShutdown();
+}
+
+
+bool SocketProactor::hasSocketHandlers()
+{
+	if (_readHandlers.size() || _writeHandlers.size())
+		return true;
+	return false;
+}
+
+
+void SocketProactor::stop()
+{
+	_stop = true;
+}
+
+
+void SocketProactor::wakeUp()
+{
+	if (_pThread) _pThread->wakeUp();
+}
+
+
+void SocketProactor::setTimeout(const Poco::Timespan& timeout)
+{
+	_timeout = static_cast<long>(timeout.totalMilliseconds());
+}
+
+
+Poco::Timespan SocketProactor::getTimeout() const
+{
+	return _maxTimeout;
+}
+
+
+Worker& SocketProactor::worker()
+{
+	poco_check_ptr(_pWorker);
+	return *_pWorker;
+}
+
+
+void SocketProactor::addWork(const Work& ch, Timestamp::TimeDiff ms)
+{
+	worker().addWork(Work(ch), ms);
+}
+
+
+void SocketProactor::addWork(Work&& ch, Timestamp::TimeDiff ms, int pos)
+{
+	worker().addWork(std::move(ch), ms);
+}
+
+
+void SocketProactor::removeWork()
+{
+	worker().removeWork();
+}
+
+
+int SocketProactor::scheduledWork()
+{
+	return worker().scheduledWork();
+}
+
+
+int SocketProactor::removeScheduledWork(int count)
+{
+	return worker().removeScheduledWork(count);
+}
+
+
+int SocketProactor::permanentWork()
+{
+	return worker().permanentWork();
+}
+
+
+int SocketProactor::removePermanentWork(int count)
+{
+	return worker().removePermanentWork(count);
+}
+
+
+bool SocketProactor::has(const Socket& socket) const
+{
+	return _pollSet.has(socket);
+}
+
+
+void SocketProactor::onShutdown()
+{
+	_ioCompletion.stop();
+	_ioCompletion.wait();
+}
+
+
+} } // namespace Poco::Net

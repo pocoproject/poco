@@ -113,10 +113,10 @@ public:
 
 	void wakeUpAll();
 		/// Wakes up all threads that wait for a notification.
-	
+
 	bool empty() const;
 		/// Returns true iff the queue is empty.
-		
+
 	int size() const;
 		/// Returns the number of notifications in the queue.
 
@@ -127,17 +127,17 @@ public:
 		/// Removes a notification from the queue.
 		/// Returns true if remove succeeded, false otherwise
 
-	bool hasIdleThreads() const;	
+	bool hasIdleThreads() const;
 		/// Returns true if the queue has at least one thread waiting 
 		/// for a notification.
-		
+
 	static NotificationQueue& defaultQueue();
 		/// Returns a reference to the default
 		/// NotificationQueue.
 
 protected:
 	Notification::Ptr dequeueOne();
-	
+
 private:
 	typedef std::deque<Notification::Ptr> NfQueue;
 	struct WaitInfo

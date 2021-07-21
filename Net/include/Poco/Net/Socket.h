@@ -36,6 +36,8 @@ class Net_API Socket
 {
 public:
 	using BufVec = SocketBufVec;
+	using Type = SocketImpl::Type;
+	using SocketList = std::vector<Socket>;
 
 	enum SelectMode
 		/// The mode argument to poll() and select().
@@ -44,8 +46,6 @@ public:
 		SELECT_WRITE = 2,
 		SELECT_ERROR = 4
 	};
-	
-	using SocketList = std::vector<Socket>;
 
 	Socket();
 		/// Creates an uninitialized socket.
@@ -106,6 +106,21 @@ public:
 
 	bool isNull() const;
 		/// Returns true if pointer to implementation is null.
+
+	Type type() const;
+		/// Returns the socket type.
+
+	bool isStream() const;
+		/// Returns true if socket is a stream socket,
+		/// false otherwise.
+
+	bool isDatagram() const;
+		/// Returns true if socket is a datagram socket,
+		/// false otherwise.
+
+	bool isRaw() const;
+		/// Returns true if socket is a raw socket,
+		/// false otherwise.
 
 	void close();
 		/// Closes the socket.
@@ -429,6 +444,30 @@ inline bool Socket::operator >= (const Socket& socket) const
 }
 
 
+inline Socket::Type Socket::type() const
+{
+	return _pImpl->type();
+}
+
+
+inline bool Socket::isStream() const
+{
+	return type() == Type::SOCKET_TYPE_STREAM;
+}
+
+
+inline bool Socket::isDatagram() const
+{
+	return type() == Type::SOCKET_TYPE_DATAGRAM;
+}
+
+
+inline bool Socket::isRaw() const
+{
+	return type() == Type::SOCKET_TYPE_RAW;
+}
+
+
 inline bool Socket::isNull() const
 {
 	return _pImpl == nullptr;
@@ -552,7 +591,7 @@ inline void Socket::setOption(int level, int option, const Poco::Timespan& value
 	_pImpl->setOption(level, option, value);
 }
 
-	
+
 inline void Socket::setOption(int level, int option, const IPAddress& value)
 {
 	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);

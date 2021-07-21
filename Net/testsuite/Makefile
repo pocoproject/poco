@@ -14,12 +14,12 @@ objects = \
 	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
-	HTTPServerTest MulticastEchoServer SocketAddressTest EndpointTest \
+	HTTPServerTest MulticastEchoServer SocketAddressTest \
 	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
 	FTPStreamFactoryTest DialogServer \
-	SocketReactorTest ReactorTestSuite \
+	SocketReactorTest ReactorTestSuite SocketProactorTest \
 	MailTestSuite MailMessageTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
