@@ -90,7 +90,7 @@ Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 	case TIMESTAMPOID:
 		cdt = Poco::Data::MetaColumn::FDT_TIMESTAMP;
 		break;
-	case TIMESTAMPZOID:
+	case TIMESTAMPTZOID:
 		cdt = Poco::Data::MetaColumn::FDT_TIMESTAMP;
 		break;
 

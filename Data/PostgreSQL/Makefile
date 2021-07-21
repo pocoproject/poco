@@ -42,7 +42,7 @@ SYSLIBS += -L/usr/local/opt/libpq/lib$(LIB64SUFFIX)
 endif
 SYSLIBS += -lpq
 
-objects = Extractor Binder SessionImpl Connector \
+objects = Extractor BinaryExtractor Binder SessionImpl Connector \
 	PostgreSQLStatementImpl PostgreSQLException \
 	SessionHandle StatementExecutor PostgreSQLTypes Utility
 
