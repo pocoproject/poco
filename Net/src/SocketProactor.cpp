@@ -2,7 +2,7 @@
 // SocketProactor.cpp
 //
 // Library: Net
-// Package: Reactor
+// Package: Sockets
 // Module:  SocketProactor
 //
 // Copyright (c) 2005-2006, Applied Informatics Software Engineering GmbH.

@@ -2,7 +2,7 @@
 // SocketProactor.h
 //
 // Library: Net
-// Package: Reactor
+// Package: Sockets
 // Module:  SocketProactor
 //
 // Definition of the SocketProactor class.
