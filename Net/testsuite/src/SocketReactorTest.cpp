@@ -9,27 +9,27 @@
 
 
 #include "SocketReactorTest.h"
-#include "EchoServer.h"
-#include "UDPEchoServer.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/SocketConnector.h"
 #include "Poco/Net/SocketAcceptor.h"
 #include "Poco/Net/ParallelSocketAcceptor.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/Timestamp.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Observer.h"
 #include "Poco/Exception.h"
+#include "Poco/Thread.h"
 #include <sstream>
-#include <iostream>
+
 
 using Poco::Net::SocketReactor;
 using Poco::Net::SocketConnector;
 using Poco::Net::SocketAcceptor;
 using Poco::Net::ParallelSocketAcceptor;
 using Poco::Net::StreamSocket;
-using Poco::Net::DatagramSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::SocketNotification;
@@ -40,7 +40,6 @@ using Poco::Net::ShutdownNotification;
 using Poco::Observer;
 using Poco::IllegalStateException;
 using Poco::Thread;
-using Poco::Timestamp;
 
 
 namespace
@@ -240,20 +239,20 @@ namespace
 			}
 		}
 
-		StreamSocket _socket;
-		SocketReactor& _reactor;
+		StreamSocket                                         _socket;
+		SocketReactor&                                       _reactor;
 		Observer<ClientServiceHandler, ReadableNotification> _or;
 		Observer<ClientServiceHandler, WritableNotification> _ow;
-		Observer<ClientServiceHandler, TimeoutNotification> _ot;
+		Observer<ClientServiceHandler, TimeoutNotification>  _ot;
 		Observer<ClientServiceHandler, ShutdownNotification> _os;
-		std::stringstream _str;
-		static std::string _data;
-		static bool _readableError;
-		static bool _writableError;
-		static bool _timeoutError;
-		static bool _timeout;
-		static bool _closeOnTimeout;
-		static bool _once;
+		std::stringstream                                    _str;
+		static std::string                                   _data;
+		static bool                                          _readableError;
+		static bool                                          _writableError;
+		static bool                                          _timeoutError;
+		static bool                                          _timeout;
+		static bool                                          _closeOnTimeout;
+		static bool                                          _once;
 	};
 
 
@@ -370,55 +369,12 @@ namespace
 		static Data _data;
 
 	private:
-		StreamSocket _socket;
+		StreamSocket   _socket;
 		SocketReactor& _reactor;
-		int _pos;
+		int            _pos;
 	};
 
 	DataServiceHandler::Data DataServiceHandler::_data;
-
-	class CompletionHandlerTestObject
-	{
-	public:
-		CompletionHandlerTestObject() = delete;
-
-		CompletionHandlerTestObject(SocketReactor& reactor, Timestamp::TimeDiff ms = SocketReactor::PERMANENT_COMPLETION_HANDLER):
-			_reactor(reactor),
-			_counter(0)
-		{
-			auto handler = [this] ()
-			{
-				++_counter;
-			};
-			_reactor.addCompletionHandler(handler, ms);
-			_reactor.addCompletionHandler(std::move(handler), ms);
-		}
-
-		void addRecursiveCompletionHandler(int count)
-		{
-			_count = count;
-			if (!_handler)
-			{
-				_handler = [&] ()
-				{
-					if (_counter++ < _count)
-						_reactor.addCompletionHandler(_handler);
-				};
-			}
-			_reactor.addCompletionHandler(_handler);
-		}
-
-		int counter()
-		{
-			return _counter;
-		}
-
-	private:
-		SocketReactor& _reactor;
-		int _counter;
-		int _count;
-		std::function<void()> _handler = nullptr;
-	};
 }
 
 
@@ -448,13 +404,6 @@ void SocketReactorTest::testSocketReactor()
 	assertTrue (!ClientServiceHandler::readableError());
 	assertTrue (!ClientServiceHandler::writableError());
 	assertTrue (!ClientServiceHandler::timeoutError());
-}
-
-
-void SocketReactorTest::testSocketReactorPoll()
-{
-	testIOHandler<EchoServer, StreamSocket>();
-	testIOHandler<UDPEchoServer, DatagramSocket>();
 }
 
 
@@ -559,11 +508,11 @@ void SocketReactorTest::testDataCollection()
 					  "  \"data\":"
 					  "  ["
 					  "   {"
-					  "	 \"tag1\":"
-					  "	 ["
-					  "	  {\"val1\":123},"
-					  "	  {\"val2\":\"abc\"}"
-					  "	 ]"
+					  "     \"tag1\":"
+					  "     ["
+					  "      {\"val1\":123},"
+					  "      {\"val2\":\"abc\"}"
+					  "     ]"
 					  "   }"
 					  "  ]"
 					  "}\n");
@@ -575,33 +524,33 @@ void SocketReactorTest::testDataCollection()
 						"  \"ts\":\"1524864652654321\","
 						"  \"data\":"
 						"  ["
-						"	{"
-						"	 \"tag1\":"
-						"	 ["
-						"	  {"
-						"	   \"val1\":123,"
-						"	   \"val2\":\"abc\","
-						"	   \"val3\":42.123"
-						"	  },"
-						"	  {"
-						"	   \"val1\":987,"
-						"	   \"val2\":\"xyz\","
-						"	   \"val3\":24.321"
-						"	  }"
-						"	 ],"
-						"	 \"tag2\":"
-						"	 ["
-						"	  {"
-						"	   \"val1\":42.123,"
-						"	   \"val2\":123,"
-						"	   \"val3\":\"abc\""
-						"	  },"
-						"	  {"
-						"	   \"val1\":24.321,"
-						"	   \"val2\":987,"
-						"	   \"val3\":\"xyz\""
-						"	  }"
-						"	]"
+						"    {"
+						"     \"tag1\":"
+						"     ["
+						"      {"
+						"       \"val1\":123,"
+						"       \"val2\":\"abc\","
+						"       \"val3\":42.123"
+						"      },"
+						"      {"
+						"       \"val1\":987,"
+						"       \"val2\":\"xyz\","
+						"       \"val3\":24.321"
+						"      }"
+						"     ],"
+						"     \"tag2\":"
+						"     ["
+						"      {"
+						"       \"val1\":42.123,"
+						"       \"val2\":123,"
+						"       \"val3\":\"abc\""
+						"      },"
+						"      {"
+						"       \"val1\":24.321,"
+						"       \"val2\":987,"
+						"       \"val3\":\"xyz\""
+						"      }"
+						"    ]"
 						"   }"
 						" ]"
 						"}\n";
@@ -621,50 +570,6 @@ void SocketReactorTest::testDataCollection()
 }
 
 
-void SocketReactorTest::testCompletionHandler()
-{/*
-	SocketReactor reactor;
-	CompletionHandlerTestObject ch(reactor);
-	assert (reactor.permanentCompletionHandlers() == 2);
-	assert (reactor.scheduledCompletionHandlers() == 0);
-	assertTrue(ch.counter() == 0);
-	assertTrue(reactor.poll() == 2);
-	assertTrue(ch.counter() == 2);
-	ch.addRecursiveCompletionHandler(5);
-	assertTrue (reactor.permanentCompletionHandlers() == 3);
-	assertTrue (reactor.scheduledCompletionHandlers() == 0);
-	assertTrue(reactor.poll() == 7);
-	assertTrue(ch.counter() == 9);
-	assertTrue (reactor.permanentCompletionHandlers() == 4);
-	assertTrue (reactor.scheduledCompletionHandlers() == 0);
-
-	reactor.removePermanentCompletionHandlers();
-	assertTrue (reactor.poll() == 0);
-	assertTrue(ch.counter() == 9);
-*/}
-
-
-void SocketReactorTest::testTimedCompletionHandler()
-{
-	SocketReactor reactor;
-	CompletionHandlerTestObject ch(reactor, 500);
-	assert (reactor.permanentCompletionHandlers() == 0);
-	assert (reactor.scheduledCompletionHandlers() == 2);
-	assertTrue(ch.counter() == 0);
-	reactor.poll();
-	assertTrue(ch.counter() == 0);
-	reactor.poll();
-
-	Thread::sleep(500);
-	reactor.poll();
-	assertTrue(ch.counter() == 2);
-	assert (reactor.permanentCompletionHandlers() == 0);
-	assert (reactor.scheduledCompletionHandlers() == 0);
-	reactor.poll();
-	assertTrue(ch.counter() == 2);
-}
-
-
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -681,14 +586,11 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SocketReactorTest");
 
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactor);
-	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorPoll);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSetSocketReactor);
 	CppUnit_addTest(pSuite, SocketReactorTest, testParallelSocketReactor);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorFail);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorTimeout);
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
-	CppUnit_addTest(pSuite, SocketReactorTest, testCompletionHandler);
-	CppUnit_addTest(pSuite, SocketReactorTest, testTimedCompletionHandler);
 
 	return pSuite;
 }

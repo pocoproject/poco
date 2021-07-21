@@ -18,11 +18,6 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#include <memory>
-#ifdef POCO_OS_FAMILY_WINDOWS
-#undef max
-#endif
-#include <limits>
 
 
 using Poco::Exception;
@@ -31,10 +26,6 @@ using Poco::ErrorHandler;
 
 namespace Poco {
 namespace Net {
-
-
-const Timestamp::TimeDiff SocketReactor::PERMANENT_COMPLETION_HANDLER =
-	std::numeric_limits<Timestamp::TimeDiff>::max();
 
 
 SocketReactor::SocketReactor():
@@ -70,114 +61,6 @@ SocketReactor::~SocketReactor()
 }
 
 
-int SocketReactor::poll(int* pHandled)
-{
-	int handled = 0;
-	int completed = 0;
-	if (!hasSocketHandlers()) onIdle();
-	else
-	{
-		bool readable = false;
-		PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
-		if (sm.size() > 0)
-		{
-			onBusy();
-			PollSet::SocketModeMap::iterator it = sm.begin();
-			PollSet::SocketModeMap::iterator end = sm.end();
-			for (; it != end; ++it)
-			{
-				if (it->second & PollSet::POLL_READ)
-				{
-					dispatch(it->first, _pReadableNotification);
-					readable = true;
-					++handled;
-				}
-				if (it->second & PollSet::POLL_WRITE)
-				{
-					dispatch(it->first, _pWritableNotification);
-					++handled;
-				}
-				if (it->second & PollSet::POLL_ERROR)
-				{
-					dispatch(it->first, _pErrorNotification);
-					++handled;
-				}
-			}
-		}
-		if (!readable) onTimeout();
-	}
-	if (pHandled) *pHandled = handled;
-	if (hasSocketHandlers())
-	{
-		if (handled) completed = onComplete();
-	}
-	else completed = onComplete(false, true);
-	return completed;
-}
-
-
-int SocketReactor::onComplete(bool handleOne, bool expiredOnly)
-{
-	std::unique_ptr<CompletionHandler> pCH;
-	int handled = 0;
-	{
-		HandlerList::iterator it = _complHandlers.begin();
-		while (it != _complHandlers.end())
-		{
-			std::size_t prevSize = 0;
-			// A completion handler may add new
-			// completion handler(s), so the mutex must
-			// be unlocked before the invocation.
-			{
-				SpinScopedLock lock(_completionMutex);
-				bool alwaysRun = isPermanent(it->second) && !expiredOnly;
-				bool isExpired = !alwaysRun && (Timestamp() > it->second);
-				if (isExpired)
-				{
-					pCH.reset(new CompletionHandler(std::move(it->first)));
-					it = _complHandlers.erase(it);
-				}
-				else if (alwaysRun)
-				{
-					pCH.reset(new CompletionHandler(it->first));
-					++it;
-				}
-				else ++it;
-				prevSize = _complHandlers.size();
-			}
-
-			if (pCH)
-			{
-				(*pCH)();
-				pCH.reset();
-				++handled;
-				if (handleOne) break;
-			}
-			// handler call may add or remove handlers;
-			// if so, we must start from the beginning
-			{
-				SpinScopedLock lock(_completionMutex);
-				if (prevSize != _complHandlers.size())
-					it = _complHandlers.begin();
-			}
-		}
-	}
-	return handled;
-}
-
-
-int SocketReactor::runOne()
-{
-	try
-	{
-		while (0 == onComplete(true));
-		return 1;
-	}
-	catch(...) {}
-	return 0;
-}
-
-
 void SocketReactor::run()
 {
 	_pThread = Thread::current();
@@ -185,10 +68,32 @@ void SocketReactor::run()
 	{
 		try
 		{
-			if (!poll())
+			if (!hasSocketHandlers())
 			{
-				if (!hasSocketHandlers())
-					Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
+				onIdle();
+				Thread::trySleep(static_cast<long>(_timeout.totalMilliseconds()));
+			}
+			else
+			{
+				bool readable = false;
+				PollSet::SocketModeMap sm = _pollSet.poll(_timeout);
+				if (sm.size() > 0)
+				{
+					onBusy();
+					PollSet::SocketModeMap::iterator it = sm.begin();
+					PollSet::SocketModeMap::iterator end = sm.end();
+					for (; it != end; ++it)
+					{
+						if (it->second & PollSet::POLL_READ)
+						{
+							dispatch(it->first, _pReadableNotification);
+							readable = true;
+						}
+						if (it->second & PollSet::POLL_WRITE) dispatch(it->first, _pWritableNotification);
+						if (it->second & PollSet::POLL_ERROR) dispatch(it->first, _pErrorNotification);
+					}
+				}
+				if (!readable) onTimeout();
 			}
 		}
 		catch (Exception& exc)
@@ -212,7 +117,7 @@ bool SocketReactor::hasSocketHandlers()
 {
 	if (!_pollSet.empty())
 	{
-		FastScopedLock lock(_ioMutex);
+		ScopedLock lock(_mutex);
 		for (auto& p: _handlers)
 		{
 			if (p.second->accepts(_pReadableNotification) ||
@@ -249,92 +154,11 @@ const Poco::Timespan& SocketReactor::getTimeout() const
 }
 
 
-void SocketReactor::addCompletionHandler(const CompletionHandler& ch, Timestamp::TimeDiff ms)
-{
-	addCompletionHandler(CompletionHandler(ch), ms);
-}
-
-
-void SocketReactor::addCompletionHandler(CompletionHandler&& ch, Timestamp::TimeDiff ms, int pos)
-{
-	Poco::Timestamp expires = (ms != PERMANENT_COMPLETION_HANDLER) ? Timestamp() + ms*1000 : Timestamp(PERMANENT_COMPLETION_HANDLER);
-
-	if (pos == -1)
-	{
-		SpinScopedLock lock(_completionMutex);
-		_complHandlers.push_back({std::move(ch), expires});
-	}
-	else
-	{
-		if (pos < 0) throw Poco::InvalidArgumentException("SocketReactor::addCompletionHandler()");
-		SpinScopedLock lock(_completionMutex);
-		_complHandlers.insert(_complHandlers.begin() + pos, {std::move(ch), expires});
-	}
-}
-
-
-void SocketReactor::removeCompletionHandlers()
-{
-	SpinScopedLock lock(_completionMutex);
-	_complHandlers.clear();
-}
-
-
-int SocketReactor::scheduledCompletionHandlers()
-{
-	int cnt = 0;
-	SpinScopedLock lock(_completionMutex);
-	HandlerList::iterator it = _complHandlers.begin();
-	for (; it != _complHandlers.end(); ++it)
-	{
-		if (!isPermanent(it->second)/*it->second != Timestamp(0)*/) ++cnt;
-	}
-	return cnt;
-}
-
-
-int SocketReactor::removeScheduledCompletionHandlers(int count)
-{
-	auto isScheduled = [this](const Timestamp& ts) { return !isPermanent(ts); };
-	return removeCompletionHandlers(isScheduled, count);
-}
-
-
-int SocketReactor::permanentCompletionHandlers()
-{
-	int cnt = 0;
-	SpinScopedLock lock(_completionMutex);
-	HandlerList::iterator it = _complHandlers.begin();
-	for (; it != _complHandlers.end(); ++it)
-	{
-		if (isPermanent(it->second))
-			++cnt;
-	}
-	return cnt;
-}
-
-
-int SocketReactor::removePermanentCompletionHandlers(int count)
-{
-	auto perm = [this](const Timestamp& ts) { return isPermanent(ts); };
-	return removeCompletionHandlers(perm, count);
-}
-
-
-bool SocketReactor::isPermanent(const Timestamp& entry) const
-{
-	return entry == Timestamp(PERMANENT_COMPLETION_HANDLER);
-}
-
-
 void SocketReactor::addEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
 	NotifierPtr pNotifier = getNotifier(socket, true);
 
-	if (!pNotifier->hasObserver(observer))
-	{
-		pNotifier->addObserver(this, observer);
-	}
+	if (!pNotifier->hasObserver(observer)) pNotifier->addObserver(this, observer);
 
 	int mode = 0;
 	if (pNotifier->accepts(_pReadableNotification)) mode |= PollSet::POLL_READ;
@@ -358,7 +182,7 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 	const SocketImpl* pImpl = socket.impl();
 	if (pImpl == nullptr) return 0;
 	poco_socket_t sockfd = pImpl->sockfd();
-	FastScopedLock lock(_ioMutex);
+	ScopedLock lock(_mutex);
 
 	EventHandlerMap::iterator it = _handlers.find(sockfd);
 	if (it != _handlers.end()) return it->second;
@@ -371,14 +195,14 @@ SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool
 void SocketReactor::removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer)
 {
 	const SocketImpl* pImpl = socket.impl();
-	if (pImpl == nullptr) { return; }
+	if (pImpl == nullptr) return;
 	NotifierPtr pNotifier = getNotifier(socket);
 	if (pNotifier && pNotifier->hasObserver(observer))
 	{
 		if(pNotifier->countObservers() == 1)
 		{
 			{
-				FastScopedLock lock(_ioMutex);
+				ScopedLock lock(_mutex);
 				_handlers.erase(pImpl->sockfd());
 			}
 			_pollSet.remove(socket);
@@ -429,7 +253,7 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 {
 	std::vector<NotifierPtr> delegates;
 	{
-		FastScopedLock lock(_ioMutex);
+		ScopedLock lock(_mutex);
 		delegates.reserve(_handlers.size());
 		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
 			delegates.push_back(it->second);
@@ -445,7 +269,6 @@ void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotifi
 {
 	try
 	{
-		Socket s = pNotification->socket();
 		pNotifier->dispatch(pNotification);
 	}
 	catch (Exception& exc)
