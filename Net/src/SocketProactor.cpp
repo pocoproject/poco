@@ -247,6 +247,12 @@ SocketProactor::SocketProactor(const Poco::Timespan& timeout, bool worker):
 SocketProactor::~SocketProactor()
 {
 	_ioCompletion.stop();
+	wait();
+}
+
+
+void SocketProactor::wait()
+{
 	_ioCompletion.wakeUp();
 	_ioCompletion.wait();
 }
@@ -273,11 +279,11 @@ int SocketProactor::poll(int* pHandled)
 				Socket sock = it->first;
 				handled += send(sock);
 			}
-			/*if (it->second & PollSet::POLL_ERROR)
+			if (it->second & PollSet::POLL_ERROR)
 			{
-				//dispatch(it->first, _pErrorNotification);
-				++handled;
-			}*/
+				Socket sock = it->first;
+				handled += error(sock);
+			}
 		}
 	}
 
@@ -294,15 +300,9 @@ int SocketProactor::poll(int* pHandled)
 }
 
 
-void SocketProactor::addSocket(Socket socket, int mode)
+void SocketProactor::addReceiveFrom(Socket sock, Buffer& buf, Poco::Net::SocketAddress& addr, Callback&& onCompletion)
 {
-	_pollSet.add(socket, mode);
-}
-
-
-void SocketProactor::addReceiveFrom(Socket socket, Buffer& buf, Poco::Net::SocketAddress& addr, Callback&& onCompletion)
-{
-	if (!socket.isDatagram())
+	if (!sock.isDatagram())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");
 	std::unique_ptr<Handler> pHandler(new Handler);
 	pHandler->_pAddr = std::addressof(addr);
@@ -310,13 +310,13 @@ void SocketProactor::addReceiveFrom(Socket socket, Buffer& buf, Poco::Net::Socke
 	pHandler->_onCompletion = std::move(onCompletion);
 
 	Poco::Mutex::ScopedLock l(_readMutex);
-	_readHandlers[socket.impl()->sockfd()].push_back(std::move(pHandler));
+	_readHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
 }
 
 
-void SocketProactor::addSendTo(Socket socket, const Buffer& message, const SocketAddress& addr, Callback&& onCompletion)
+void SocketProactor::addSendTo(Socket sock, const Buffer& message, const SocketAddress& addr, Callback&& onCompletion)
 {
-	if (!socket.isDatagram())
+	if (!sock.isDatagram())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");
 	Buffer* pMessage = nullptr;
 	SocketAddress* pAddr = nullptr;
@@ -331,13 +331,13 @@ void SocketProactor::addSendTo(Socket socket, const Buffer& message, const Socke
 		delete pAddr;
 		throw;
 	}
-	addSend(socket, pMessage, pAddr, std::move(onCompletion), true);
+	addSend(sock, pMessage, pAddr, std::move(onCompletion), true);
 }
 
 
-void SocketProactor::addSendTo(Socket socket, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion)
+void SocketProactor::addSendTo(Socket sock, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion)
 {
-	if (!socket.isDatagram())
+	if (!sock.isDatagram())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");
 	Buffer* pMessage = nullptr;
 	SocketAddress* pAddr = nullptr;
@@ -352,13 +352,13 @@ void SocketProactor::addSendTo(Socket socket, const Buffer&& message, const Sock
 		delete pAddr;
 		throw;
 	}
-	addSend(socket, pMessage, pAddr, std::move(onCompletion), true);
+	addSend(sock, pMessage, pAddr, std::move(onCompletion), true);
 }
 
 
-void SocketProactor::addReceive(Socket socket, Buffer& buf, Callback&& onCompletion)
+void SocketProactor::addReceive(Socket sock, Buffer& buf, Callback&& onCompletion)
 {
-	if (!socket.isStream())
+	if (!sock.isStream())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
 	std::unique_ptr<Handler> pHandler(new Handler);
 	pHandler->_pAddr = nullptr;
@@ -366,13 +366,13 @@ void SocketProactor::addReceive(Socket socket, Buffer& buf, Callback&& onComplet
 	pHandler->_onCompletion = std::move(onCompletion);
 
 	Poco::Mutex::ScopedLock l(_readMutex);
-	_readHandlers[socket.impl()->sockfd()].push_back(std::move(pHandler));
+	_readHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
 }
 
 
-void SocketProactor::addSend(Socket socket, const Buffer& message, Callback&& onCompletion)
+void SocketProactor::addSend(Socket sock, const Buffer& message, Callback&& onCompletion)
 {
-	if (!socket.isStream())
+	if (!sock.isStream())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
 	Buffer* pMessage = nullptr;
 	try
@@ -384,13 +384,13 @@ void SocketProactor::addSend(Socket socket, const Buffer& message, Callback&& on
 		delete pMessage;
 		throw;
 	}
-	addSend(socket, pMessage, nullptr, std::move(onCompletion), true);
+	addSend(sock, pMessage, nullptr, std::move(onCompletion), true);
 }
 
 
-void SocketProactor::addSend(Socket socket, const Buffer&& message, Callback&& onCompletion)
+void SocketProactor::addSend(Socket sock, const Buffer&& message, Callback&& onCompletion)
 {
-	if (!socket.isStream())
+	if (!sock.isStream())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
 	Buffer* pMessage = nullptr;
 	try
@@ -402,26 +402,35 @@ void SocketProactor::addSend(Socket socket, const Buffer&& message, Callback&& o
 		delete pMessage;
 		throw;
 	}
-	addSend(socket, pMessage, nullptr, std::move(onCompletion), true);
+	addSend(sock, pMessage, nullptr, std::move(onCompletion), true);
 }
 
 
-void SocketProactor::addSend(Socket socket, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own)
+void SocketProactor::addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own)
 {
 	std::unique_ptr<Handler> pHandler(new Handler);
 	pHandler->_pAddr = pAddr;
 	pHandler->_pBuf = pMessage;
 	pHandler->_onCompletion = std::move(onCompletion);
 	pHandler->_owner = own;
+
 	Poco::Mutex::ScopedLock l(_writeMutex);
-	_writeHandlers[socket.impl()->sockfd()].push_back(std::move(pHandler));
+	_writeHandlers[sock.impl()->sockfd()].push_back(std::move(pHandler));
 }
 
 
-int SocketProactor::send(Socket& socket)
+int SocketProactor::error(Socket& sock)
+{
+	int cnt = errorImpl(sock, _readHandlers, _readMutex);
+	cnt += errorImpl(sock, _writeHandlers, _writeMutex);
+	return cnt;
+}
+
+
+int SocketProactor::send(Socket& sock)
 {
 	Poco::Mutex::ScopedLock l(_writeMutex);
-	auto hIt = _writeHandlers.find(socket.impl()->sockfd());
+	auto hIt = _writeHandlers.find(sock.impl()->sockfd());
 	if (hIt == _writeHandlers.end()) return 0;
 	IOHandlerList& handlers = hIt->second;
 	int handled = static_cast<int>(handlers.size());
@@ -429,10 +438,10 @@ int SocketProactor::send(Socket& socket)
 	auto end = handlers.end();
 	while (it != end)
 	{
-		if (socket.isDatagram())
-			sendTo(*socket.impl(), it);
-		else if (socket.isStream())
-			send(*socket.impl(), it);
+		if (sock.isDatagram())
+			sendTo(*sock.impl(), it);
+		else if (sock.isStream())
+			send(*sock.impl(), it);
 		else
 			throw Poco::InvalidArgumentException("Unknown socket type.");
 
@@ -448,7 +457,7 @@ int SocketProactor::send(Socket& socket)
 }
 
 
-void SocketProactor::sendTo(SocketImpl& socket, IOHandlerIt& it)
+void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 {
 	Buffer* pBuf = (*it)->_pBuf;
 	if (pBuf && pBuf->size())
@@ -457,7 +466,7 @@ void SocketProactor::sendTo(SocketImpl& socket, IOHandlerIt& it)
 		int n = 0, err = 0;
 		try
 		{
-			n = socket.sendTo(&(*pBuf)[0], pBuf->size(), *pAddr);
+			n = sock.sendTo(&(*pBuf)[0], pBuf->size(), *pAddr);
 		}
 		catch(std::exception&)
 		{
@@ -475,14 +484,14 @@ void SocketProactor::sendTo(SocketImpl& socket, IOHandlerIt& it)
 		if (!pBuf)
 			throw Poco::NullPointerException("SocketProactor::sendTo(): null buffer");
 		else if (pBuf->empty())
-			throw Poco::NullPointerException("SocketProactor::sendTo(): empty buffer");
-		else
-			throw Poco::NullPointerException("SocketProactor::sendTo(): unexpected error");
+			throw Poco::InvalidArgumentException("SocketProactor::sendTo(): empty buffer");
+		else // we shouldn't be here
+			throw Poco::InvalidAccessException("SocketProactor::sendTo(): unexpected error");
 	}
 }
 
 
-void SocketProactor::send(SocketImpl& socket, IOHandlerIt& it)
+void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 {
 	Buffer* pBuf = (*it)->_pBuf;
 	if (pBuf && pBuf->size())
@@ -490,7 +499,7 @@ void SocketProactor::send(SocketImpl& socket, IOHandlerIt& it)
 		int n = 0, err = 0;
 		try
 		{
-			n = socket.sendBytes(&(*pBuf)[0], pBuf->size());
+			n = sock.sendBytes(&(*pBuf)[0], pBuf->size());
 		}
 		catch(std::exception&)
 		{
@@ -502,14 +511,22 @@ void SocketProactor::send(SocketImpl& socket, IOHandlerIt& it)
 			delete pBuf; (*it)->_pBuf = nullptr;
 		}
 	}
-	else throw Poco::NullPointerException("SocketProactor::sendTo(): null or empty buffer");
+	else
+	{
+		if (!pBuf)
+			throw Poco::NullPointerException("SocketProactor::sendTo(): null buffer");
+		else if (pBuf->empty())
+			throw Poco::InvalidArgumentException("SocketProactor::sendTo(): empty buffer");
+		else // we shouldn't be here
+			throw Poco::InvalidAccessException("SocketProactor::sendTo(): unexpected error");
+	}
 }
 
 
-int SocketProactor::receive(Socket& socket)
+int SocketProactor::receive(Socket& sock)
 {
 	Poco::Mutex::ScopedLock l(_readMutex);
-	auto hIt = _readHandlers.find(socket.impl()->sockfd());
+	auto hIt = _readHandlers.find(sock.impl()->sockfd());
 	if (hIt == _readHandlers.end()) return 0;
 	IOHandlerList& handlers = hIt->second;
 	int handled = static_cast<int>(handlers.size());
@@ -518,12 +535,12 @@ int SocketProactor::receive(Socket& socket)
 	auto end = handlers.end();
 	for (; it != end;)
 	{
-		if ((avail = socket.available()))
+		if ((avail = sock.available()))
 		{
-			if (socket.isDatagram())
-				receiveFrom(*socket.impl(), it, avail);
-			else if (socket.isStream())
-				receive(*socket.impl(), it, avail);
+			if (sock.isDatagram())
+				receiveFrom(*sock.impl(), it, avail);
+			else if (sock.isStream())
+				receive(*sock.impl(), it, avail);
 			else
 				throw Poco::InvalidArgumentException("Unknown socket type.");
 
@@ -541,7 +558,7 @@ int SocketProactor::receive(Socket& socket)
 }
 
 
-void SocketProactor::receiveFrom(SocketImpl& socket, IOHandlerIt& it, int available)
+void SocketProactor::receiveFrom(SocketImpl& sock, IOHandlerIt& it, int available)
 {
 	Buffer *pBuf = (*it)->_pBuf;
 	SocketAddress *pAddr = (*it)->_pAddr;
@@ -550,7 +567,7 @@ void SocketProactor::receiveFrom(SocketImpl& socket, IOHandlerIt& it, int availa
 	int n = 0, err = 0;
 	try
 	{
-		n = socket.receiveFrom(&(*pBuf)[0], available, *pAddr);
+		n = sock.receiveFrom(&(*pBuf)[0], available, *pAddr);
 	}
 	catch(std::exception&)
 	{
@@ -560,7 +577,7 @@ void SocketProactor::receiveFrom(SocketImpl& socket, IOHandlerIt& it, int availa
 }
 
 
-void SocketProactor::receive(SocketImpl& socket, IOHandlerIt& it, int available)
+void SocketProactor::receive(SocketImpl& sock, IOHandlerIt& it, int available)
 {
 	Buffer *pBuf = (*it)->_pBuf;
 	poco_check_ptr(pBuf);
@@ -568,7 +585,7 @@ void SocketProactor::receive(SocketImpl& socket, IOHandlerIt& it, int available)
 	int n = 0, err = 0;
 	try
 	{
-		n = socket.receiveBytes(&(*pBuf)[0], available);
+		n = sock.receiveBytes(&(*pBuf)[0], available);
 	}
 	catch(std::exception&)
 	{
@@ -705,9 +722,9 @@ int SocketProactor::removePermanentWork(int count)
 }
 
 
-bool SocketProactor::has(const Socket& socket) const
+bool SocketProactor::has(const Socket& sock) const
 {
-	return _pollSet.has(socket);
+	return _pollSet.has(sock);
 }
 
 

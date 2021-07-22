@@ -136,6 +136,10 @@ public:
 	void wakeUp();
 		/// Wakes up idle reactor.
 
+	void wait();
+		/// Blocks and waits for the scheduled I/O completion
+		/// handlers loop to end.
+
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout. 
 		///
@@ -150,28 +154,34 @@ public:
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout.
 
-	void addSocket(Socket socket, int mode);
+	void addSocket(Socket sock, int mode);
 		/// Adds the socket to the poll set.
 
-	void addReceiveFrom(Socket socket, Buffer& buf, SocketAddress& addr, Callback&& onCompletion);
+	void updateSocket(Socket sock, int mode);
+		/// Updates the socket mode in the poll set.
+
+	void removeSocket(Socket sock);
+		/// Removes the socket from the poll set.
+
+	void addReceiveFrom(Socket sock, Buffer& buf, SocketAddress& addr, Callback&& onCompletion);
 		/// Adds the datagram socket and the completion handler to the I/O receive queue.
 
-	void addSendTo(Socket socket, const Buffer& message, const SocketAddress& addr, Callback&& onCompletion);
+	void addSendTo(Socket sock, const Buffer& message, const SocketAddress& addr, Callback&& onCompletion);
 		/// Adds the datagram socket and the completion handler to the I/O send queue.
 
-	void addSendTo(Socket socket, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion);
+	void addSendTo(Socket sock, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion);
 		/// Adds the datagram socket and the completion handler to the I/O send queue.
 
-	void addReceive(Socket socket, Buffer& buf, Callback&& onCompletion);
+	void addReceive(Socket sock, Buffer& buf, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O receive queue.
 
-	void addSend(Socket socket, const Buffer& message, Callback&& onCompletion);
+	void addSend(Socket sock, const Buffer& message, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O send queue.
 
-	void addSend(Socket socket, const Buffer&& message, Callback&& onCompletion);
+	void addSend(Socket sock, const Buffer&& message, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O send queue.
 
-	bool has(const Socket& socket) const;
+	bool has(const Socket& sock) const;
 		/// Returns true if socket is registered with this proactor.
 
 private:
@@ -319,35 +329,65 @@ private:
 
 	static void runImpl(bool runCond, long &sleepMS, long maxSleep);
 
-	int send(Socket& socket);
+	int error(Socket& sock);
+		/// Enqueues the completion handlers and removes
+		/// them from the handlers list after the operation
+		/// successfully completes.
+
+	template <typename T>
+	int errorImpl(Socket& sock, T& handlerMap, Poco::Mutex& mutex)
+	{
+		Poco::Mutex::ScopedLock l(mutex);
+		auto hIt = handlerMap.find(sock.impl()->sockfd());
+		if (hIt == handlerMap.end()) return 0;
+		IOHandlerList& handlers = hIt->second;
+		int handled = static_cast<int>(handlers.size());
+		auto it = handlers.begin();
+		auto end = handlers.end();
+		while (it != end)
+		{
+			enqueueIONotification(std::move((*it)->_onCompletion), 0,
+					Socket::lastError());
+			++it;
+			handlers.pop_front();
+			// end iterator is invalidated when the last member
+			// is removed, so make sure we don't check for it
+			if (handlers.empty()) break;
+		}
+		handled -= handlers.size();
+		if (handled) _ioCompletion.wakeUp();
+		return handled;
+	}
+
+	int send(Socket& sock);
 		/// Calls the appropriate output function; enqueues
 		/// the accompanying completion handler and removes
 		/// it from the handlers list after the operation
 		/// successfully completes.
 
-	int receive(Socket& socket);
+	int receive(Socket& sock);
 		/// Calls the appropriate input function; enqueues
 		/// the accompanying completion handler and removes
 		/// it from the handlers list after the operation
 		/// successfully completes.
 
-	void addSend(Socket socket, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own = false);
+	void addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own = false);
 		/// Adds the datagram socket and the completion handler to the I/O send queue.
 		/// If `own` is true, message and address are deleted after the I/O completion.
 
-	void sendTo(SocketImpl& socket, IOHandlerIt& it);
+	void sendTo(SocketImpl& sock, IOHandlerIt& it);
 		/// Sends data to the datagram socket and enqueues the
 		/// accompanying completion handler.
 
-	void send(SocketImpl& socket, IOHandlerIt& it);
+	void send(SocketImpl& sock, IOHandlerIt& it);
 		/// Sends data to the stream socket and enqueues the
 		/// accompanying completion handler.
 
-	void receiveFrom(SocketImpl& socket, IOHandlerIt& it, int available);
+	void receiveFrom(SocketImpl& sock, IOHandlerIt& it, int available);
 		/// Reads data from the datagram socket and enqueues the
 		/// accompanying completion handler.
 
-	void receive(SocketImpl& socket, IOHandlerIt& it, int available);
+	void receive(SocketImpl& sock, IOHandlerIt& it, int available);
 		/// Reads data from the stream socket and enqueues the
 		/// accompanying completion handler.
 
@@ -376,6 +416,24 @@ private:
 //
 // inlines
 //
+
+inline void SocketProactor::addSocket(Socket sock, int mode)
+{
+	_pollSet.add(sock, mode);
+}
+
+
+inline void SocketProactor::updateSocket(Socket sock, int mode)
+{
+	_pollSet.update(sock, mode);
+}
+
+
+inline void SocketProactor::removeSocket(Socket sock)
+{
+	_pollSet.remove(sock);
+}
+
 
 inline void SocketProactor::enqueueIONotification(Callback&& onCompletion, int n, int err)
 {

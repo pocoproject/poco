@@ -40,10 +40,10 @@ SocketProactorTest::~SocketProactorTest()
 void SocketProactorTest::testTCPSocketProactor()
 {
 	EchoServer echoServer;
+	SocketProactor proactor(false);
 	StreamSocket s;
 	s.connect(SocketAddress("127.0.0.1", echoServer.port()));
-	SocketProactor proactor(false);
-	int mode = SocketProactor::POLL_READ | SocketProactor::POLL_WRITE;
+	int mode = SocketProactor::POLL_READ | SocketProactor::POLL_WRITE | SocketProactor::POLL_ERROR;
 	proactor.addSocket(s, mode);
 	std::string hello = "hello proactor world";
 	bool sent = false, sendPassed = false;
@@ -58,8 +58,8 @@ void SocketProactorTest::testTCPSocketProactor()
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
 	{
 		receivePassed = (err.value() == 0) &&
-			(bytes == hello.length()) &&
-			(std::string(buf.begin(), buf.end()) == hello);
+						(bytes == hello.length()) &&
+						(std::string(buf.begin(), buf.end()) == hello);
 		received = true;
 	};
 	proactor.addReceive(s, buf, onRecvCompletion);
@@ -86,13 +86,32 @@ void SocketProactorTest::testTCPSocketProactor()
 	{
 		proactor.poll(&handled);
 		handledTot += handled;
-	} while (handledTot < 2);
+	}
+	while (handledTot < 2);
 
 	assertTrue(std::string(buf.begin(), buf.end()) == hello);
 	assertFalse (sent);
 	assertFalse (sendPassed);
 	assertFalse (received);
 	assertFalse (receivePassed);
+
+	bool error = false;
+	bool errorPassed = false;
+	auto onError = [&](std::error_code err, int bytes)
+	{
+		errorPassed = (err.value() != 0) && (bytes == 0);
+		error = true;
+	};
+
+	StreamSocket errSock(SocketAddress::IPv4);
+	proactor.addSocket(errSock, SocketProactor::POLL_ERROR);
+	proactor.addSend(errSock, SocketProactor::Buffer(hello.begin(), hello.end()), onError);
+	errSock.connectNB(SocketAddress("127.0.0.1", 0xFFEE));
+	Thread::sleep(100);
+	while (!error)
+		proactor.poll();
+	assertTrue (error);
+	assertTrue(errorPassed);
 }
 
 
