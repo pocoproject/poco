@@ -730,6 +730,7 @@ bool SocketProactor::has(const Socket& sock) const
 
 void SocketProactor::onShutdown()
 {
+	_pollSet.wakeUp();
 	_ioCompletion.stop();
 	_ioCompletion.wait();
 }

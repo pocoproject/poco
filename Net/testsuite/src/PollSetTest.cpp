@@ -31,6 +31,38 @@ using Poco::Stopwatch;
 using Poco::Thread;
 
 
+namespace {
+
+class Poller : public Poco::Runnable
+{
+public:
+	Poller(PollSet& pollSet, const Timespan& timeout): _pollSet(pollSet),
+		_timeout(timeout)
+	{
+	}
+
+	void run()
+	{
+		_running = true;
+		_pollSet.poll(_timeout);
+		_running = false;
+	}
+
+	bool isRunning()
+	{
+		return _running;
+	}
+
+private:
+	PollSet& _pollSet;
+	Timespan _timeout;
+	bool _running = false;
+};
+
+
+}
+
+
 PollSetTest::PollSetTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -216,6 +248,28 @@ void PollSetTest::testPollClosedServer()
 }
 
 
+void PollSetTest::testPollSetWakeUp()
+{
+#if defined(POCO_HAVE_FD_EPOLL)
+	PollSet ps;
+	Timespan timeout(100000000); // 100 seconds
+	Poller poller(ps, timeout);
+	Thread t;
+	Stopwatch sw;
+	sw.start();
+	t.start(poller);
+	while (!poller.isRunning()) Thread::sleep(100);
+	ps.wakeUp();
+	t.join();
+	sw.stop();
+	assertFalse (poller.isRunning());
+	assertTrue(sw.elapsedSeconds() < 1);
+#else // TODO: other implementations
+	std::cout << "not implemented" << std::endl;
+#endif // POCO_HAVE_FD_EPOLL
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -234,6 +288,7 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testPoll);
 	CppUnit_addTest(pSuite, PollSetTest, testPollNoServer);
 	CppUnit_addTest(pSuite, PollSetTest, testPollClosedServer);
+	CppUnit_addTest(pSuite, PollSetTest, testPollSetWakeUp);
 
 	return pSuite;
 }

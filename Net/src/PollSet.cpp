@@ -27,6 +27,7 @@
 
 #if defined(POCO_HAVE_FD_EPOLL)
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 #elif defined(POCO_HAVE_FD_POLL)
 #ifndef _WIN32
 #include <poll.h>
@@ -47,12 +48,12 @@ namespace Net {
 class PollSetImpl
 {
 public:
-	PollSetImpl():
-		_epollfd(-1),
-		_events(1024)
+	PollSetImpl(): _epollfd(epoll_create(1)),
+		_events(1024),
+		_eventfd(eventfd(0, 0))
 	{
-		_epollfd = epoll_create(1);
-		if (_epollfd < 0)
+		int err = addImpl(_eventfd, PollSet::POLL_READ, 0);
+		if ((err) || (_epollfd < 0))
 		{
 			SocketImpl::error();
 		}
@@ -60,8 +61,8 @@ public:
 
 	~PollSetImpl()
 	{
-		if (_epollfd >= 0)
-			::close(_epollfd);
+		if (_epollfd >= 0) ::close(_epollfd);
+		if (_eventfd >= 0) ::close(_eventfd);
 	}
 
 	void add(const Socket& socket, int mode)
@@ -69,17 +70,8 @@ public:
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
 		SocketImpl* sockImpl = socket.impl();
-		poco_socket_t fd = sockImpl->sockfd();
-		struct epoll_event ev;
-		ev.events = 0;
-		if (mode & PollSet::POLL_READ)
-			ev.events |= EPOLLIN;
-		if (mode & PollSet::POLL_WRITE)
-			ev.events |= EPOLLOUT;
-		if (mode & PollSet::POLL_ERROR)
-			ev.events |= EPOLLERR;
-		ev.data.ptr = socket.impl();
-		int err = epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
+
+		int err = addImpl(sockImpl->sockfd(), mode, sockImpl);
 
 		if (err)
 		{
@@ -154,18 +146,13 @@ public:
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
 		PollSet::SocketModeMap result;
-
-		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
-			if(_socketMap.empty()) return result;
-		}
-
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 		do
 		{
 			Poco::Timestamp start;
 			rc = epoll_wait(_epollfd, &_events[0], _events.size(), remainingTime.totalMilliseconds());
+			if (rc == 0) return result;
 			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
 				Poco::Timestamp end;
@@ -183,26 +170,51 @@ public:
 
 		for (int i = 0; i < rc; i++)
 		{
-			std::map<void*, Socket>::iterator it = _socketMap.find(_events[i].data.ptr);
-			if (it != _socketMap.end())
+			if (_events[i].data.ptr) // skip eventfd
 			{
-				if (_events[i].events & EPOLLIN)
-					result[it->second] |= PollSet::POLL_READ;
-				if (_events[i].events & EPOLLOUT)
-					result[it->second] |= PollSet::POLL_WRITE;
-				if (_events[i].events & EPOLLERR)
-					result[it->second] |= PollSet::POLL_ERROR;
+				std::map<void *, Socket>::iterator it = _socketMap.find(_events[i].data.ptr);
+				if (it != _socketMap.end())
+				{
+					if (_events[i].events & EPOLLIN)
+						result[it->second] |= PollSet::POLL_READ;
+					if (_events[i].events & EPOLLOUT)
+						result[it->second] |= PollSet::POLL_WRITE;
+					if (_events[i].events & EPOLLERR)
+						result[it->second] |= PollSet::POLL_ERROR;
+				}
 			}
 		}
 
 		return result;
 	}
 
+	void wakeUp()
+	{
+		uint64_t val = 1;
+		int n = ::write(_eventfd, &val, sizeof(val));
+		if (n < 0) Socket::error();
+	}
+
 private:
+	int addImpl(int fd, int mode, void* ptr)
+	{
+		struct epoll_event ev;
+		ev.events = 0;
+		if (mode & PollSet::POLL_READ)
+			ev.events |= EPOLLIN;
+		if (mode & PollSet::POLL_WRITE)
+			ev.events |= EPOLLOUT;
+		if (mode & PollSet::POLL_ERROR)
+			ev.events |= EPOLLERR;
+		ev.data.ptr = ptr;
+		return epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &ev);
+	}
+
 	mutable Poco::FastMutex         _mutex;
 	int                             _epollfd;
 	std::map<void*, Socket>         _socketMap;
 	std::vector<struct epoll_event> _events;
+	int                             _eventfd;
 };
 
 
@@ -359,6 +371,11 @@ public:
 		}
 
 		return result;
+	}
+
+	void wakeUp()
+	{
+		// TODO
 	}
 
 private:
@@ -543,6 +560,11 @@ public:
 		}
 
 		return result;
+	}
+
+	void wakeUp()
+	{
+		// TODO
 	}
 
 private:
@@ -778,6 +800,11 @@ public:
 		return result;
 	}
 
+	void wakeUp()
+	{
+		// TODO
+	}
+
 private:
 	mutable Poco::FastMutex _mutex;
 	PollSet::SocketModeMap  _map;
@@ -841,6 +868,12 @@ void PollSet::clear()
 PollSet::SocketModeMap PollSet::poll(const Poco::Timespan& timeout)
 {
 	return _pImpl->poll(timeout);
+}
+
+
+void PollSet::wakeUp()
+{
+	_pImpl->wakeUp();
 }
 
 

@@ -28,6 +28,7 @@ public:
 	void testPoll();
 	void testPollNoServer();
 	void testPollClosedServer();
+	void testPollSetWakeUp();
 
 	void setUp();
 	void tearDown();
