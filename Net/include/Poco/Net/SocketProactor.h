@@ -172,6 +172,11 @@ public:
 	void addSendTo(Socket sock, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion);
 		/// Adds the datagram socket and the completion handler to the I/O send queue.
 
+	void addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own = false);
+		/// Adds the socket and the completion handler to the I/O send queue.
+		/// For stream socket, pAddr can be nullptr.
+		/// If `own` is true, message and address are deleted after the I/O completion.
+
 	void addReceive(Socket sock, Buffer& buf, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O receive queue.
 
@@ -364,10 +369,6 @@ private:
 		/// the accompanying completion handler and removes
 		/// it from the handlers list after the operation
 		/// successfully completes.
-
-	void addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own = false);
-		/// Adds the datagram socket and the completion handler to the I/O send queue.
-		/// If `own` is true, message and address are deleted after the I/O completion.
 
 	void sendTo(SocketImpl& sock, IOHandlerIt& it);
 		/// Sends data to the datagram socket and enqueues the
