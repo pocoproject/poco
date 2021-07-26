@@ -607,13 +607,21 @@ int SocketProactor::runOne()
 }
 
 
-void SocketProactor::runImpl(bool runCond, long &sleepMS, long maxSleep)
+void SocketProactor::sleep(bool isAtWork)
 {
 	try
 	{
-		if (runCond) sleepMS = 0;
+		if (isAtWork)
+		{
+			_timeout = 0;
+			return;
+		}
 		else
-			Thread::trySleep((sleepMS >= maxSleep) ? maxSleep : ++sleepMS);
+		{
+			_timeout = (_timeout >= _maxTimeout) ? _maxTimeout : ++_timeout;
+		}
+		if (_pThread) _pThread->trySleep(_timeout);
+		else Thread::sleep(_timeout);
 	}
 	catch (Exception& exc)
 	{
@@ -635,7 +643,7 @@ void SocketProactor::run()
 	_pThread = Thread::current();
 	int handled = 0;
 	while (!_stop)
-		runImpl((poll(&handled) || handled), _timeout, _maxTimeout);
+		this->sleep(poll(&handled) || handled);
 
 	onShutdown();
 }

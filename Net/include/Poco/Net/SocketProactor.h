@@ -326,7 +326,19 @@ private:
 	using IOHandlerIt = IOHandlerList::iterator;
 	using SubscriberMap = std::unordered_map<poco_socket_t, std::deque<std::unique_ptr<Handler>>>;
 
-	static void runImpl(bool runCond, long &sleepMS, long maxSleep);
+	void sleep(bool isAtWork);
+		/// Sleep policy implementation.
+		/// If there is currently any work being done,
+		/// timeout is kept at zero (ie. no timeout),
+		/// otherwise, the timeout is incremented and
+		///  - trySleep() is called if proactor runs
+		///    in a Poco::Thread, which is necessary
+		///    for trySleep call to be interruptable
+		/// or
+		///  - sleep() is called (not interruptable)
+		///
+		/// The value of _timeout can grow up to
+		/// _maxTimeout value.
 
 	int error(Socket& sock);
 		/// Enqueues the completion handlers and removes
