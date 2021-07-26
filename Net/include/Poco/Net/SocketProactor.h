@@ -265,12 +265,18 @@ private:
 			_activity(this, &IOCompletion::run)
 			/// Creates IOCompletion.
 		{
-			_activity.start();
+			start();
 		}
 
 		~IOCompletion()
 		{
 			wakeUp();
+		}
+
+		void start()
+			/// Starts the I/O completion execution.
+		{
+			_activity.start();
 		}
 
 		void stop()

@@ -32,6 +32,7 @@ public:
 
 	void testTCPSocketProactor();
 	void testUDPSocketProactor();
+	void testSocketProactorStartStop();
 
 	void testWork();
 	void testTimedWork();

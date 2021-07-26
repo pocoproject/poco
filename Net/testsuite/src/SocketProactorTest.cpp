@@ -183,6 +183,75 @@ void SocketProactorTest::testUDPSocketProactor()
 }
 
 
+void SocketProactorTest::testSocketProactorStartStop()
+{
+	UDPEchoServer echoServer;
+	DatagramSocket s(SocketAddress::IPv4);
+	SocketProactor proactor(false);
+	int mode = SocketProactor::POLL_READ | SocketProactor::POLL_WRITE;
+	proactor.addSocket(s, mode);
+	std::string hello = "hello proactor world";
+	bool sent = false, sendPassed = false;
+	auto onSendCompletion = [&](std::error_code err, int bytes)
+	{
+		sendPassed = (err.value() == 0) &&
+			(bytes == hello.length());
+		sent = true;
+	};
+	proactor.addSendTo(s,
+		SocketProactor::Buffer(hello.begin(), hello.end()),
+		SocketAddress("127.0.0.1", echoServer.port()),
+		onSendCompletion);
+	Poco::Net::SocketProactor::Buffer buf(0, hello.size());
+	bool received = false, receivePassed = false;
+	SocketAddress sa;
+	auto onRecvCompletion = [&](std::error_code err, int bytes)
+	{
+		receivePassed = (err.value() == 0) &&
+			(bytes == hello.length()) &&
+			(sa.host().toString() == "127.0.0.1") &&
+			(sa.port() == echoServer.port()) &&
+			(std::string(buf.begin(), buf.end()) == hello);
+		received = true;
+		proactor.stop();
+	};
+	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
+	proactor.run();
+
+	assertTrue (sent);
+	assertTrue (sendPassed);
+	assertTrue (received);
+	assertTrue (receivePassed);
+
+	buf.clear();
+	buf.resize(hello.size());
+	assertFalse(std::string(buf.begin(), buf.end()) == hello);
+
+	sent = false;
+	sendPassed = false;
+	received = false;
+	receivePassed = false;
+
+	assertFalse (sent);
+	assertFalse (sendPassed);
+	assertFalse (received);
+	assertFalse (receivePassed);
+
+	proactor.addSendTo(s,
+		SocketProactor::Buffer(hello.begin(), hello.end()),
+		SocketAddress("127.0.0.1", echoServer.port()),
+		onSendCompletion);
+	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
+	proactor.run();
+
+	assertTrue(std::string(buf.begin(), buf.end()) == hello);
+	assertTrue (sent);
+	assertTrue (sendPassed);
+	assertTrue (received);
+	assertTrue (receivePassed);
+}
+
+
 void SocketProactorTest::testWork()
 {
 	SocketProactor proactor;
@@ -238,6 +307,7 @@ CppUnit::Test* SocketProactorTest::suite()
 
 	CppUnit_addTest(pSuite, SocketProactorTest, testTCPSocketProactor);
 	CppUnit_addTest(pSuite, SocketProactorTest, testUDPSocketProactor);
+	CppUnit_addTest(pSuite, SocketProactorTest, testSocketProactorStartStop);
 	CppUnit_addTest(pSuite, SocketProactorTest, testWork);
 	CppUnit_addTest(pSuite, SocketProactorTest, testTimedWork);
 

@@ -640,7 +640,9 @@ void SocketProactor::sleep(bool isAtWork)
 
 void SocketProactor::run()
 {
+	_stop = false;
 	_pThread = Thread::current();
+	_ioCompletion.start();
 	int handled = 0;
 	while (!_stop)
 		this->sleep(poll(&handled) || handled);
