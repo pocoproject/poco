@@ -6,6 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
+ifndef POCO_PGSQL_INCLUDE
 ifeq (0, $(shell test -e /usr/include/postgresql; echo $$?))
 INCLUDE += -I/usr/include/postgresql
 endif
@@ -21,7 +22,9 @@ endif
 ifeq (0, $(shell test -e /usr/local/opt/libpq/include; echo $$?))
 INCLUDE += -I/usr/local/opt/libpq/include
 endif
+endif
 
+ifndef POCO_PGSQL_LIB
 ifeq (0, $(shell test -e /usr/lib$(LIB64SUFFIX)/postgresql; echo $$?))
 SYSLIBS += -L/usr/lib$(LIB64SUFFIX)/postgresql
 endif
@@ -40,7 +43,15 @@ endif
 ifeq (0, $(shell test -e /usr/local/opt/libpq/lib; echo $$?))
 SYSLIBS += -L/usr/local/opt/libpq/lib$(LIB64SUFFIX)
 endif
+endif
 SYSLIBS += -lpq
+
+ifdef POCO_PGSQL_INCLUDE
+INCLUDE += -I$(POCO_PGSQL_INCLUDE)
+endif
+ifdef POCO_PGSQL_LIB
+SYSLIBS += -L$(POCO_PGSQL_LIB)
+endif
 
 objects = Extractor Binder SessionImpl Connector \
 	PostgreSQLStatementImpl PostgreSQLException \

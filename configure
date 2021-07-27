@@ -108,6 +108,12 @@ Options:
   --mysql-include=<path>
     Specify the directory where MySQL header files are located.
 
+  --pgsql-lib=<path>
+    Specify the directory where PostGreSQL library is located.
+
+  --pgsql-include=<path>
+    Specify the directory where PostGreSQL header files are located.
+
   --cflags=<flags>
     Pass additional flags to compiler.
     Example: --cflags=-wall
@@ -189,6 +195,12 @@ while [ $# -ge 1 ]; do
 
 	--mysql-include=*)
 		mysqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
+
+	--pgsql-lib=*)
+		pgsqllib="`echo ${1} | awk '{print substr($0,13)}'`" ;;
+
+	--pgsql-include=*)
+		pgsqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
 
 	--cflags=*)
 		flags="$flags `echo ${1} | awk '{print substr($0,10)}'`" ;;
@@ -333,6 +345,13 @@ fi
 if [ -n "$mysqlinclude" ] ; then
         echo "POCO_MYSQL_INCLUDE = $mysqlinclude" >>$build/config.make
 fi
+if [ -n "$pgsqllib" ] ; then
+        echo "POCO_PGSQL_LIB = $pgsqllib" >>$build/config.make
+fi
+if [ -n "$pgsqlinclude" ] ; then
+        echo "POCO_PGSQL_INCLUDE = $pgsqlinclude" >>$build/config.make
+fi
+
 if [ -n "$unbundled" ] ; then
 	echo "POCO_UNBUNDLED = 1" >>$build/config.make
 fi
