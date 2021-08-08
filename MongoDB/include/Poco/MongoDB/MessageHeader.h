@@ -25,6 +25,7 @@
 namespace Poco {
 namespace MongoDB {
 
+class Message;
 
 class MongoDB_API MessageHeader
 	/// Represents the message header which is always prepended to a 

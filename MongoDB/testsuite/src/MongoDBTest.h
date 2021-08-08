@@ -15,6 +15,7 @@
 
 
 #include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Util/Application.h"
 #include "Poco/MongoDB/Connection.h"
 #include "CppUnit/TestCase.h"
 
