@@ -11,7 +11,6 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
-
 #include "Poco/Net/HTTPServerResponseImpl.h"
 #include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPServerSession.h"
@@ -53,7 +52,8 @@ HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPServerSession& session):
 
 HTTPServerResponseImpl::~HTTPServerResponseImpl()
 {
-	delete _pStream;
+	if (_pStream != 0)
+		delete _pStream;
 }
 
 
@@ -128,7 +128,15 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 		write(*_pStream);
 		if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
 		{
+#if (POCO_OS == POCO_OS_LINUX)
+			// delete the stream to flush the HTTP headers to the socket, required by HTTP 1.0 and above
+			delete _pStream;
+			_pStream = 0;
+			// send the file via socket handle
+			_session.socket().sendFile(path, length);
+#else
 			StreamCopier::copyStream(istr, *_pStream);
+#endif
 		}
 	}
 	else throw OpenFileException(path);

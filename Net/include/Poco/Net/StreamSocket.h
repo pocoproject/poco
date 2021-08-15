@@ -198,6 +198,9 @@ public:
 		/// The flags parameter can be used to pass system-defined flags
 		/// for send() like MSG_OOB.
 
+	virtual void sendFile(const std::string& filePath, const size_t fileSize);
+		/// Sends the given file to the socket
+
 	int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.

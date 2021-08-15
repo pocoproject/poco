@@ -12,6 +12,14 @@
 //
 
 
+#ifdef __linux__
+#include <fcntl.h>
+#include <sys/sendfile.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <iostream>
+#endif
+
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/StreamSocketImpl.h"
@@ -367,6 +375,26 @@ int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
 	return rc;
+}
+
+
+void SocketImpl::sendFile(const std::string& filePath, const size_t fileSize)
+{
+#if (POCO_OS == POCO_OS_LINUX)
+	int filefd = ::open(filePath.data(), O_RDONLY);
+	size_t remaining = fileSize;
+	while (remaining > 0)
+	{
+		ssize_t sent = ::sendfile64(_sockfd, filefd, 0, remaining);
+		if (sent >= 0)
+			remaining -= sent;
+		else
+			break;
+	}
+	// instruct the kernel to drop the file cache
+	::posix_fadvise(filefd, 0, 0, POSIX_FADV_DONTNEED);
+	::close(filefd);
+#endif
 }
 
 

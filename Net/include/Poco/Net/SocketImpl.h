@@ -182,6 +182,16 @@ public:
 		///
 		/// Always returns zero for platforms where not implemented.
 
+	virtual void sendFile(const std::string& filePath, const size_t fileSize);
+		/// Implemented only on Linux. Noop on other platforms.
+		///
+		/// Sends the given file via sendfile system call.
+		/// Blocks the calling thread until the file is sent or the connection
+		/// is closed by the client.
+		///
+		/// @param filePath [i] path of the file on file system.
+		/// @param fileSize [i] size of the file being sent.
+
 	virtual int receiveBytes(void* buffer, int length, int flags = 0);
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.

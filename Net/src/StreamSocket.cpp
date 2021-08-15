@@ -180,6 +180,12 @@ int StreamSocket::sendBytes(FIFOBuffer& fifoBuf)
 }
 
 
+void StreamSocket::sendFile(const std::string& filePath, const size_t fileSize)
+{
+	impl()->sendFile(filePath, fileSize);
+}
+
+
 int StreamSocket::receiveBytes(void* buffer, int length, int flags)
 {
 	return impl()->receiveBytes(buffer, length, flags);
