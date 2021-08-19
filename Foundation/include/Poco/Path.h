@@ -300,13 +300,13 @@ public:
 		/// Returns the user's config directory.
 		///
 		/// On Unix systems, this is the '~/.config/'. On Windows systems,
-		/// this is '%APPDATA%'.
+		/// this is '%APPDATA%/Roaming'.
 
 	static std::string dataHome();
 		/// Returns the user's data directory.
 		///
 		/// On Unix systems, this is the '~/.local/share/'. On Windows systems,
-		/// this is '%APPDATA%'.
+		/// this is '%APPDATA%/Local'.
 
 	static std::string tempHome();
 		/// Returns the user's temp directory.
