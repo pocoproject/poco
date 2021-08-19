@@ -278,6 +278,12 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 				PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
 				for (int i = 0; i < pNameInfo->cAltEntry; i++)
 				{
+                    // Some certificates have an empty value here.
+                    // Check if this indicates an invalid cert. If so, consider an exception.
+                    if (pNameInfo->rgAltEntry[i].pwszDNSName == NULL) {
+                        continue;
+                    }
+                    
 					std::wstring waltName(pNameInfo->rgAltEntry[i].pwszDNSName);
 					std::string altName;
 					Poco::UnicodeConverter::toUTF8(waltName, altName);
