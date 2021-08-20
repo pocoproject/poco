@@ -279,7 +279,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 				for (int i = 0; i < pNameInfo->cAltEntry; i++)
 				{
                     // Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
-                    if (pNameInfo->rgAltEntry[i].pwszDNSName != NULL) {
+                    if (pNameInfo->rgAltEntry[i].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME) {
                         std::wstring waltName(pNameInfo->rgAltEntry[i].pwszDNSName);
                         std::string altName;
                         Poco::UnicodeConverter::toUTF8(waltName, altName);
