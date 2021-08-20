@@ -513,6 +513,9 @@
     <ClInclude Include="include\Poco\Net\SSPINTLMCredentials.h">
       <Filter>NTLM\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Poco\Net\SocketProactor.h">
+      <Filter>Sockets\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DNS.cpp">
@@ -829,6 +832,9 @@
     </ClCompile>
     <ClCompile Include="src\SSPINTLMCredentials.cpp">
       <Filter>NTLM\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SocketProactor.cpp">
+      <Filter>Sockets\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

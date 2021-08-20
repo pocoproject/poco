@@ -53,7 +53,7 @@ void SocketProactorTest::testTCPSocketProactor()
 		sent = true;
 	};
 	proactor.addSend(s, SocketProactor::Buffer(hello.begin(), hello.end()), onSendCompletion);
-	SocketProactor::Buffer buf(0, hello.size());
+	SocketProactor::Buffer buf(hello.size(), 0);
 	bool received = false, receivePassed = false;
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
 	{
@@ -108,8 +108,7 @@ void SocketProactorTest::testTCPSocketProactor()
 	proactor.addSend(errSock, SocketProactor::Buffer(hello.begin(), hello.end()), onError);
 	errSock.connectNB(SocketAddress("127.0.0.1", 0xFFEE));
 	Thread::sleep(100);
-	while (!error)
-		proactor.poll();
+	while (!error) proactor.poll();
 	assertTrue (error);
 	assertTrue(errorPassed);
 }
@@ -134,7 +133,7 @@ void SocketProactorTest::testUDPSocketProactor()
 		SocketProactor::Buffer(hello.begin(), hello.end()),
 		SocketAddress("127.0.0.1", echoServer.port()),
 		onSendCompletion);
-	Poco::Net::SocketProactor::Buffer buf(0, hello.size());
+	Poco::Net::SocketProactor::Buffer buf(hello.size(), 0);
 	bool received = false, receivePassed = false;
 	SocketAddress sa;
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
@@ -202,7 +201,7 @@ void SocketProactorTest::testSocketProactorStartStop()
 		SocketProactor::Buffer(hello.begin(), hello.end()),
 		SocketAddress("127.0.0.1", echoServer.port()),
 		onSendCompletion);
-	Poco::Net::SocketProactor::Buffer buf(0, hello.size());
+	Poco::Net::SocketProactor::Buffer buf(hello.size(), 0);
 	bool received = false, receivePassed = false;
 	SocketAddress sa;
 	auto onRecvCompletion = [&](std::error_code err, int bytes)
@@ -282,10 +281,10 @@ void SocketProactorTest::testTimedWork()
 	int executed = 0;
 	SocketProactor::Work work = [&]() { ++executed; };
 	proactor.addWork(work, 0);
-	proactor.addWork(work, 500);
+	proactor.addWork(work, 1000);
 	assertTrue (proactor.poll() == 1);
 	assertEquals (executed, 1);
-	Thread::sleep(500);
+	Thread::sleep(1000);
 	assertTrue (proactor.poll() == 1);
 	assertEquals (executed, 2);
 }

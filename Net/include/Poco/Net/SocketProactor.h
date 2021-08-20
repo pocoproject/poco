@@ -57,7 +57,7 @@ class Net_API SocketProactor final: public Poco::Runnable
 public:
 	using Buffer = std::vector<std::uint8_t>;
 	using Work = std::function<void()>;
-	using Callback = std::function<void (const std::error_code& failure, std::size_t bytesReceived)>;
+	using Callback = std::function<void (const std::error_code& failure, int bytesReceived)>;
 
 	static const int POLL_READ = PollSet::POLL_READ;
 	static const int POLL_WRITE = PollSet::POLL_WRITE;
@@ -183,7 +183,7 @@ public:
 	void addSend(Socket sock, const Buffer& message, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O send queue.
 
-	void addSend(Socket sock, const Buffer&& message, Callback&& onCompletion);
+	void addSend(Socket sock, Buffer&& message, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O send queue.
 
 	bool has(const Socket& sock) const;
@@ -357,21 +357,22 @@ private:
 		Poco::Mutex::ScopedLock l(mutex);
 		auto hIt = handlerMap.find(sock.impl()->sockfd());
 		if (hIt == handlerMap.end()) return 0;
+		unsigned err = 0;
+		sock.getOption(SOL_SOCKET, SO_ERROR, err);
 		IOHandlerList& handlers = hIt->second;
 		int handled = static_cast<int>(handlers.size());
 		auto it = handlers.begin();
 		auto end = handlers.end();
 		while (it != end)
 		{
-			enqueueIONotification(std::move((*it)->_onCompletion), 0,
-					Socket::lastError());
+			enqueueIONotification(std::move((*it)->_onCompletion), 0, err);
 			++it;
 			handlers.pop_front();
 			// end iterator is invalidated when the last member
 			// is removed, so make sure we don't check for it
 			if (handlers.empty()) break;
 		}
-		handled -= handlers.size();
+		handled -= static_cast<int>(handlers.size());
 		if (handled) _ioCompletion.wakeUp();
 		return handled;
 	}

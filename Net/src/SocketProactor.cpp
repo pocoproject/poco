@@ -60,7 +60,6 @@ public:
 	{
 		auto pch = SocketProactor::PERMANENT_COMPLETION_HANDLER;
 		Poco::Timestamp expires = (ms != pch) ? Timestamp() + ms * 1000 : Timestamp(pch);
-
 		if (pos == -1)
 		{
 			ScopedLock lock(_mutex);
@@ -140,7 +139,7 @@ public:
 				{
 					ScopedLock lock(_mutex);
 					bool alwaysRun = isPermanent(it->second) && !expiredOnly;
-					bool isExpired = !alwaysRun && (Timestamp() > it->second);
+					bool isExpired = !alwaysRun && (Timestamp() >= it->second);
 					if (isExpired)
 					{
 						pCH.reset(new Work(std::move(it->first)));
@@ -236,7 +235,7 @@ SocketProactor::SocketProactor(bool worker):
 SocketProactor::SocketProactor(const Poco::Timespan& timeout, bool worker):
 	_stop(false),
 	_timeout(0),
-	_maxTimeout(timeout.totalMilliseconds()),
+	_maxTimeout(static_cast<long>(timeout.totalMilliseconds())),
 	_pThread(nullptr),
 	_ioCompletion(_maxTimeout),
 	_pWorker(worker ? new Worker : nullptr)
@@ -388,7 +387,7 @@ void SocketProactor::addSend(Socket sock, const Buffer& message, Callback&& onCo
 }
 
 
-void SocketProactor::addSend(Socket sock, const Buffer&& message, Callback&& onCompletion)
+void SocketProactor::addSend(Socket sock, Buffer&& message, Callback&& onCompletion)
 {
 	if (!sock.isStream())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): TCP socket required");
@@ -451,7 +450,7 @@ int SocketProactor::send(Socket& sock)
 		// is removed, so make sure we don't check for it
 		if (handlers.empty()) break;
 	}
-	handled -= handlers.size();
+	handled -= static_cast<int>(handlers.size());
 	if (handled) _ioCompletion.wakeUp();
 	return handled;
 }
@@ -466,7 +465,7 @@ void SocketProactor::sendTo(SocketImpl& sock, IOHandlerIt& it)
 		int n = 0, err = 0;
 		try
 		{
-			n = sock.sendTo(&(*pBuf)[0], pBuf->size(), *pAddr);
+			n = sock.sendTo(&(*pBuf)[0], static_cast<int>(pBuf->size()), *pAddr);
 		}
 		catch(std::exception&)
 		{
@@ -499,7 +498,7 @@ void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 		int n = 0, err = 0;
 		try
 		{
-			n = sock.sendBytes(&(*pBuf)[0], pBuf->size());
+			n = sock.sendBytes(&(*pBuf)[0], static_cast<int>(pBuf->size()));
 		}
 		catch(std::exception&)
 		{
@@ -552,7 +551,7 @@ int SocketProactor::receive(Socket& sock)
 		}
 		else break;
 	}
-	handled -= handlers.size();
+	handled -= static_cast<int>(handlers.size());
 	if (handled) _ioCompletion.wakeUp();
 	return handled;
 }
