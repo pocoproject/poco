@@ -411,6 +411,7 @@ private:
 
 	Worker& worker();
 
+	std::atomic<bool> _isStopped;
 	std::atomic<bool> _stop;
 	long              _timeout;
 	long              _maxTimeout;

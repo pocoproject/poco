@@ -222,6 +222,7 @@ const Timestamp::TimeDiff SocketProactor::PERMANENT_COMPLETION_HANDLER =
 
 
 SocketProactor::SocketProactor(bool worker):
+	_isStopped(false),
 	_stop(false),
 	_timeout(0),
 	_maxTimeout(DEFAULT_MAX_TIMEOUT_MS),
@@ -233,6 +234,7 @@ SocketProactor::SocketProactor(bool worker):
 
 
 SocketProactor::SocketProactor(const Poco::Timespan& timeout, bool worker):
+	_isStopped(false),
 	_stop(false),
 	_timeout(0),
 	_maxTimeout(static_cast<long>(timeout.totalMilliseconds())),
@@ -617,7 +619,7 @@ void SocketProactor::sleep(bool isAtWork)
 		}
 		else
 		{
-			_timeout = (_timeout >= _maxTimeout) ? _maxTimeout : ++_timeout;
+			if (_timeout < _maxTimeout) ++_timeout;
 		}
 		if (_pThread) _pThread->trySleep(_timeout);
 		else Thread::sleep(_timeout);
@@ -639,13 +641,13 @@ void SocketProactor::sleep(bool isAtWork)
 
 void SocketProactor::run()
 {
-	_stop = false;
 	_pThread = Thread::current();
 	_ioCompletion.start();
 	int handled = 0;
-	while (!_stop)
+	if (!_isStopped) _stop = false;
+	_isStopped = false;
+	while(!_stop)
 		this->sleep(poll(&handled) || handled);
-
 	onShutdown();
 }
 
@@ -660,7 +662,12 @@ bool SocketProactor::hasSocketHandlers()
 
 void SocketProactor::stop()
 {
+	// the reason for two flags is to prevent a race
+	// when stop() is called before run() (which sets
+	// stop to false before entering the polling loop
+	// in order to allow multiple run()/stop() cycles)
 	_stop = true;
+	_isStopped = true;
 }
 
 
