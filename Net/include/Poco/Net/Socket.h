@@ -169,6 +169,9 @@ public:
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 
+	int getError() const;
+		/// Returns the socket error.
+
 	void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
 		
@@ -493,6 +496,14 @@ inline int Socket::available() const
 	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
 
 	return _pImpl->available();
+}
+
+
+inline int Socket::getError() const
+{
+	poco_assert_dbg(POCO_NEW_STATE_ON_MOVE && _pImpl);
+
+	return _pImpl->getError();
 }
 
 

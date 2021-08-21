@@ -214,10 +214,8 @@ void SocketImpl::bind(const SocketAddress& address, bool reuseAddress, bool reus
 	{
 		init(address.af());
 	}
-	if (reuseAddress)
-		setReuseAddress(true);
-	if (reusePort)
-		setReusePort(true);
+	setReuseAddress(reuseAddress);
+	setReusePort(reusePort);
 #if defined(POCO_VXWORKS)
 	int rc = ::bind(_sockfd, (sockaddr*) address.addr(), address.length());
 #else
@@ -248,10 +246,8 @@ void SocketImpl::bind6(const SocketAddress& address, bool reuseAddress, bool reu
 #else
 	if (ipV6Only) throw Poco::NotImplementedException("IPV6_V6ONLY not defined.");
 #endif
-	if (reuseAddress)
-		setReuseAddress(true);
-	if (reusePort)
-		setReusePort(true);
+	setReuseAddress(reuseAddress);
+	setReusePort(reusePort);
 	int rc = ::bind(_sockfd, address.addr(), address.length());
 	if (rc != 0) error(address.toString());
 #else
@@ -754,6 +750,14 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 }
 
 
+int SocketImpl::getError()
+{
+	int result;
+	getOption(SOL_SOCKET, SO_ERROR, result);
+	return result;
+}
+
+
 void SocketImpl::setSendBufferSize(int size)
 {
 	setOption(SOL_SOCKET, SO_SNDBUF, size);
@@ -1022,14 +1026,25 @@ void SocketImpl::setReuseAddress(bool flag)
 {
 	int value = flag ? 1 : 0;
 	setOption(SOL_SOCKET, SO_REUSEADDR, value);
+#ifdef POCO_OS_FAMILY_WINDOWS
+	value = flag ? 0 : 1;
+	setOption(SOL_SOCKET, SO_EXCLUSIVEADDRUSE, value);
+#endif
 }
 
 
 bool SocketImpl::getReuseAddress()
 {
+	bool ret = false;
 	int value(0);
 	getOption(SOL_SOCKET, SO_REUSEADDR, value);
-	return value != 0;
+	ret = (value != 0);
+#ifdef POCO_OS_FAMILY_WINDOWS
+	value = 0;
+	getOption(SOL_SOCKET, SO_EXCLUSIVEADDRUSE, value);
+	ret = ret && (value == 0);
+#endif
+	return ret;
 }
 
 
