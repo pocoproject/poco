@@ -336,7 +336,7 @@ void SocketProactor::addSendTo(Socket sock, const Buffer& message, const SocketA
 }
 
 
-void SocketProactor::addSendTo(Socket sock, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion)
+void SocketProactor::addSendTo(Socket sock, Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion)
 {
 	if (!sock.isDatagram())
 		throw Poco::InvalidArgumentException("SocketProactor::addSend(): UDP socket required");

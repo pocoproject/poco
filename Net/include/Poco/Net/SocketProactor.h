@@ -169,7 +169,7 @@ public:
 	void addSendTo(Socket sock, const Buffer& message, const SocketAddress& addr, Callback&& onCompletion);
 		/// Adds the datagram socket and the completion handler to the I/O send queue.
 
-	void addSendTo(Socket sock, const Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion);
+	void addSendTo(Socket sock, Buffer&& message, const SocketAddress&& addr, Callback&& onCompletion);
 		/// Adds the datagram socket and the completion handler to the I/O send queue.
 
 	void addSend(Socket sock, Buffer* pMessage, SocketAddress* pAddr, Callback&& onCompletion, bool own = false);
