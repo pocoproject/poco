@@ -281,6 +281,9 @@ public:
 	Type type();
 		/// Returns the socket type.
 
+	virtual int getError();
+		/// Returns the socket error.
+
 	virtual void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
 

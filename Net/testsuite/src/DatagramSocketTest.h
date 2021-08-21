@@ -15,6 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketAddress.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -29,6 +30,8 @@ public:
 	void testEchoBuffer();
 	void testSendToReceiveFrom();
 	void testUnbound();
+	void testReuseAddressPortWildcard();
+	void testReuseAddressPortSpecific();
 	void testBroadcast();
 	void testGatherScatterFixed();
 	void testGatherScatterVariable();
@@ -39,6 +42,8 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	static Poco::UInt16 getFreePort(Poco::Net::SocketAddress::Family family, std::uint16_t port);
+
 	// "STRF" are sendto/recvfrom versions of the same functionality
 	void testGatherScatterFixedWin();
 	void testGatherScatterSTRFFixedWin();
