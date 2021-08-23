@@ -64,6 +64,9 @@ public:
 	bool isSecure() const;
 		/// Returns true if the session is FTPS.
 
+	void forceSessionReuse(bool enable);
+		/// Enable disable FTPS check reuse session (enabled by default)
+		
 protected:
 	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 		/// Create secure data connection
@@ -78,6 +81,7 @@ private:
 	void afterCreateControlSocket();
 		///Send commands to make SSL negotiating of control channel
 
+	bool _forceSessionReuse = true;
 	bool _enableFTPS = true;
 	bool _secureDataConnection = false;
 	Context::Ptr _pContext;
