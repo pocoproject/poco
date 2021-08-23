@@ -60,7 +60,11 @@ void FTPSClientSession::enableFTPS(bool enable)
 	_enableFTPS = enable;
 }
 
-
+void FTPSClientSession::forceSessionReuse(bool enable) 
+{
+	_forceSessionReuse = enable;
+}
+	
 void FTPSClientSession::beforeCreateDataSocket()
 {
 	if (_secureDataConnection) return;
