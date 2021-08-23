@@ -93,7 +93,7 @@ public:
 
 	int removeScheduledWork(int count)
 	{
-		auto isScheduled = [this](const Timestamp &ts)
+		auto isScheduled = [](const Timestamp &ts)
 		{ return !isPermanent(ts); };
 		return removeWork(isScheduled, count);
 	}
@@ -114,7 +114,7 @@ public:
 
 	int removePermanentWork(int count)
 	{
-		auto perm = [this](const Timestamp &ts)
+		auto perm = [](const Timestamp &ts)
 		{ return isPermanent(ts); };
 		return removeWork(perm, count);
 	}
