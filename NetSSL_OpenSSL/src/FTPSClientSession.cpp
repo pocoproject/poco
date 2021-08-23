@@ -127,6 +127,18 @@ StreamSocket FTPSClientSession::establishDataConnection(const std::string& comma
 		{
 			Poco::Net::SecureStreamSocket sss(Poco::Net::SecureStreamSocket::attach(ss, pSecure->context(), pSecure->currentSession()));
 			ss = sss;
+			if (_forceSessionReuse) 
+			{
+				sss.setLazyHandshake(false);
+				if (sss.completeHandshake() != 1) 
+				{
+					throw Poco::Net::FTPException("SSL Session HANSHAKE error");
+				}
+				if (!sss.sessionWasReused()) 
+				{
+					throw Poco::Net::FTPException("SSL Session for data connection was not reused");
+				}
+			}
 		}
 	}
 	return ss;
