@@ -62,9 +62,6 @@ namespace
 #endif
 
 
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-
-
 namespace {
 void setThreadName(pthread_t thread, const std::string& threadName)
 {
@@ -81,9 +78,6 @@ void setThreadName(pthread_t thread, const std::string& threadName)
 #endif
 }
 }
-
-
-#endif
 
 
 namespace Poco {
@@ -357,9 +351,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
 	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
-#endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 	try
 	{
