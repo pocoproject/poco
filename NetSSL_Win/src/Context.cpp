@@ -275,11 +275,10 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 
 	schannelCred.grbitEnabledProtocols = proto();
 
-	// Windows NT and Windows Me/98/95: revocation checking not supported via flags
-	if (_options & Context::OPT_PERFORM_REVOCATION_CHECK)
-		schannelCred.dwFlags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
-	else
-		schannelCred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK | SCH_CRED_IGNORE_REVOCATION_OFFLINE;
+    // Always use soft server revocation checks to enable MITM proxies
+    // https://github.com/curl/curl/issues/3727
+    // https://github.com/adobe/chromium/blob/master/net/socket/ssl_client_socket_win.cc
+    schannelCred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK | SCH_CRED_IGNORE_REVOCATION_OFFLINE;
 
 	if (isForServerUse())
 	{
