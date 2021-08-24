@@ -99,8 +99,9 @@ void IPAddressTest::testStringConv6()
 void IPAddressTest::testParse()
 {
 	IPAddress ip;
+	assertTrue (IPAddress::tryParse("0.0.0.0", ip));
+	assertTrue (IPAddress::tryParse("255.255.255.255", ip));
 	assertTrue (IPAddress::tryParse("192.168.1.120", ip));
-	
 	assertTrue (!IPAddress::tryParse("192.168.1.280", ip));
 
 	ip = IPAddress::parse("192.168.1.120");
@@ -108,10 +109,37 @@ void IPAddressTest::testParse()
 	{
 		ip = IPAddress::parse("192.168.1.280");
 		fail("bad address - must throw");
-	}	
+	}
 	catch (InvalidAddressException&)
 	{
 	}
+
+#ifdef POCO_HAVE_IPv6
+	assertTrue (IPAddress::tryParse("::", ip));
+	assertFalse (IPAddress::tryParse(":::", ip));
+	assertTrue (IPAddress::tryParse("0::", ip));
+	assertTrue (IPAddress::tryParse("0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0:0:0::", ip));
+	assertTrue (IPAddress::tryParse("0:0:0:0:0:0:0:0", ip));
+	assertFalse (IPAddress::tryParse("0:0:0:0:0:0:0:0:", ip));
+	assertFalse (IPAddress::tryParse("::0:0::", ip));
+	assertFalse (IPAddress::tryParse("::0::0::", ip));
+
+	assertTrue (IPAddress::tryParse("::1", ip));
+	assertTrue (IPAddress::tryParse("1080:0:0:0:8:600:200a:425c", ip));
+	assertTrue (IPAddress::tryParse("1080::8:600:200a:425c", ip));
+	assertTrue (IPAddress::tryParse("1080::8:600:200A:425C", ip));
+	assertTrue (IPAddress::tryParse("1080::8:600:200a:425c", ip));
+	assertTrue (IPAddress::tryParse("::192.168.1.120", ip));
+	assertTrue (IPAddress::tryParse("::ffff:192.168.1.120", ip));
+	assertTrue (IPAddress::tryParse("::ffff:192.168.1.120", ip));
+	assertTrue (IPAddress::tryParse("ffff:ffff:ffff:ffff::", ip));
+	assertTrue (IPAddress::tryParse("ffff:ffff::", ip));
+#endif
 }
 
 

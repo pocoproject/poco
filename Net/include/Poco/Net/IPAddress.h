@@ -396,6 +396,8 @@ private:
 	void newIPv6(const void* hostAddr);
 	void newIPv6(const void* hostAddr, Poco::UInt32 scope);
 	void newIPv6(unsigned prefix);
+	static std::string& compressV6(std::string& v6addr);
+	static std::string trimIPv6(const std::string v6Addr);
 #endif
 	Ptr _pImpl;
 };
