@@ -1317,7 +1317,7 @@ void SecureSocketImpl::verifyCertificateChainClient(PCCERT_CONTEXT pServerCert)
 
 			// Revocation check of the root certificate may fail due to missing CRL points, etc.
 			// We ignore all errors checking the root certificate except CRYPT_E_REVOKED.
-			if (!ok && (revStat.dwIndex < certs.size() - 1 || revStat.dwError == CRYPT_E_REVOKED))
+            if (!ok && revStat.dwIndex < certs.size() - 1 && revStat.dwError == CRYPT_E_REVOKED)
 			{
 				VerificationErrorArgs args(cert, revStat.dwIndex, revStat.dwReason, Utility::formatError(revStat.dwError));
 				SSLManager::instance().ClientVerificationError(this, args);
