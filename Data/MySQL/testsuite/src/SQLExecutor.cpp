@@ -551,7 +551,7 @@ void SQLExecutor::uuids()
 	Poco::UUID data("da8b9c4d-faa0-44e1-b834-ece1e7d31cd5");
 	Poco::UUID ret;
 
-	try { *_pSession << "INSERT INTO Strings VALUES (?)", use(data), now; }
+	try { *_pSession << "INSERT INTO Strings VALUES (?)", use(data.toString()), now; }
 	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 

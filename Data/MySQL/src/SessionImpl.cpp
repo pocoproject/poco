@@ -14,6 +14,7 @@
 
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
+#include "Poco/Data/MySQL/Utility.h"
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
@@ -254,16 +255,26 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
+	unsigned long sversion = Utility::serverVersion(static_cast<MYSQL*>(_handle));
+	
 	std::string isolation;
-	getSetting("tx_isolation", isolation);
+	if (sversion > 80000)
+	{
+		getSetting("transaction_isolation", isolation); // mysql8
+	}
+	else
+	{
+		getSetting("tx_isolation", isolation); // mysql5.7
+	}
+	
 	Poco::replaceInPlace(isolation, "-", " ");
-	if (MYSQL_READ_UNCOMMITTED == isolation)
+	if (MYSQL_READ_UNCOMMITTED == isolation.c_str())
 		return Session::TRANSACTION_READ_UNCOMMITTED;
-	else if (MYSQL_READ_COMMITTED == isolation)
+	else if (MYSQL_READ_COMMITTED == isolation.c_str())
 		return Session::TRANSACTION_READ_COMMITTED;
-	else if (MYSQL_REPEATABLE_READ == isolation)
+	else if (MYSQL_REPEATABLE_READ == isolation.c_str())
 		return Session::TRANSACTION_REPEATABLE_READ;
-	else if (MYSQL_SERIALIZABLE == isolation)
+	else if (MYSQL_SERIALIZABLE == isolation.c_str())
 		return Session::TRANSACTION_SERIALIZABLE;
 
 	throw InvalidArgumentException("getTransactionIsolation()");
