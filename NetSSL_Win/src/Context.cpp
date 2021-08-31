@@ -275,11 +275,11 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 
 	schannelCred.grbitEnabledProtocols = proto();
 
-    // Windows NT and Windows Me/98/95: revocation checking not supported via flags
-    if (_options & Context::OPT_PERFORM_REVOCATION_CHECK)
-        schannelCred.dwFlags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
-    else
-        schannelCred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK | SCH_CRED_IGNORE_REVOCATION_OFFLINE;
+	// Windows NT and Windows Me/98/95: revocation checking not supported via flags
+	if (_options & Context::OPT_PERFORM_REVOCATION_CHECK)
+		schannelCred.dwFlags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
+	else
+		schannelCred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK | SCH_CRED_IGNORE_REVOCATION_OFFLINE;
 
 	if (isForServerUse())
 	{
