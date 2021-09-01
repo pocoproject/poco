@@ -304,6 +304,9 @@ public:
 
 	const std::string& welcomeMessage();
 		/// Returns the welcome message.
+	
+	void setActiveDataPort(Poco::UInt16 port);
+		/// Set port to use for active connections
 
 protected:
 	virtual void receiveServerReadyReply();
@@ -358,6 +361,7 @@ private:
 	Poco::Timespan _timeout = DEFAULT_TIMEOUT;
 	std::string _welcomeMessage;
 	Poco::FastMutex _wmMutex;
+	Poco::UInt16   _activeDataPort = 0;
 };
 
 
