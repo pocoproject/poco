@@ -20,6 +20,8 @@
 #include <ctime>
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 #include "wce_time.h"
+#elif defined(_WIN32)
+#include <time.h>
 #endif
 
 
@@ -264,7 +266,11 @@ void LocalDateTime::determineTzd(bool adjust)
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x800
 		std::tm* broken = wceex_localtime(&epochTime);
 #else
-		std::tm* broken = std::localtime(&epochTime);
+		std::tm bufDest;
+		std::tm* broken = &bufDest;
+		errno_t err = localtime_s(broken, &epochTime);
+		if (err)
+			broken = nullptr;
 #endif
 		if (!broken) throw Poco::SystemException("cannot get local time");
 		_tzd = (Timezone::utcOffset() + ((broken->tm_isdst == 1) ? 3600 : 0));
