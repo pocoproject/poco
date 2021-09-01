@@ -201,13 +201,8 @@ private:
 		/// If expiredOnly is true, only expired temporary functions
 		/// are called.
 
-#ifdef POCO_HAVE_STD_ATOMICS
-	typedef Poco::SpinlockMutex   MutexType;
+	typedef Poco::Mutex MutexType;
 	typedef MutexType::ScopedLock ScopedLock;
-#else
-	typedef Poco::FastMutex       MutexType;
-	typedef MutexType::ScopedLock ScopedLock;
-#endif // POCO_HAVE_STD_ATOMICS
 
 	bool hasSocketHandlers();
 	static const long DEFAULT_MAX_TIMEOUT_MS = 250;
