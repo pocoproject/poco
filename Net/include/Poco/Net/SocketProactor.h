@@ -28,6 +28,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Activity.h"
 #include "Poco/NotificationQueue.h"
+#include "Poco/ErrorHandler.h"
 #include <unordered_map>
 #include <atomic>
 #include <functional>
@@ -311,9 +312,25 @@ private:
 			IONotification* pNf = dynamic_cast<IONotification*>(_nq.waitDequeueNotification());
 			if (pNf)
 			{
-				pNf->call();
-				pNf->release();
-				return true;
+				try
+				{
+					pNf->call();
+					pNf->release();
+					return true;
+				}
+				catch (Exception& exc)
+				{
+					ErrorHandler::handle(exc);
+				}
+				catch (std::exception& exc)
+				{
+					ErrorHandler::handle(exc);
+				}
+				catch (...)
+				{
+					ErrorHandler::handle();
+				}
+
 			}
 			return false;
 		}

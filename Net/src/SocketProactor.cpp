@@ -15,7 +15,6 @@
 #include "Poco/Net/SocketProactor.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/DatagramSocketImpl.h"
-#include "Poco/ErrorHandler.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -129,15 +128,13 @@ public:
 		std::unique_ptr<Work> pCH;
 		int handled = 0;
 		{
+			ScopedLock lock(_mutex);
 			WorkList::iterator it = _funcList.begin();
-			while (it != _funcList.end())
+			try
 			{
-				std::size_t prevSize = 0;
-				// A completion handler may add new
-				// completion handler(s), so the mutex must
-				// be unlocked before the invocation.
+				while (it != _funcList.end())
 				{
-					ScopedLock lock(_mutex);
+					std::size_t prevSize = 0;
 					bool alwaysRun = isPermanent(it->second) && !expiredOnly;
 					bool isExpired = !alwaysRun && (Timestamp() >= it->second);
 					if (isExpired)
@@ -152,22 +149,31 @@ public:
 					}
 					else ++it;
 					prevSize = _funcList.size();
-				}
 
-				if (pCH)
-				{
-					(*pCH)();
-					pCH.reset();
-					++handled;
-					if (handleOne) break;
-				}
-				// handler call may add or remove handlers;
-				// if so, we must start from the beginning
-				{
-					ScopedLock lock(_mutex);
+					if (pCH)
+					{
+						(*pCH)();
+						pCH.reset();
+						++handled;
+						if (handleOne) break;
+					}
+					// handler call may add or remove handlers;
+					// if so, we must start from the beginning
 					if (prevSize != _funcList.size())
 						it = _funcList.begin();
 				}
+			}
+			catch (Exception& exc)
+			{
+				ErrorHandler::handle(exc);
+			}
+			catch (std::exception& exc)
+			{
+				ErrorHandler::handle(exc);
+			}
+			catch (...)
+			{
+				ErrorHandler::handle();
 			}
 		}
 		return handled;
