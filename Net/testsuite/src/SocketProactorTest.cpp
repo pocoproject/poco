@@ -215,7 +215,8 @@ void SocketProactorTest::testSocketProactorStartStop()
 		proactor.stop();
 	};
 	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
-	proactor.run();
+
+	while (!received) proactor.poll();
 
 	assertTrue (sent);
 	assertTrue (sendPassed);
@@ -241,7 +242,7 @@ void SocketProactorTest::testSocketProactorStartStop()
 		SocketAddress("127.0.0.1", echoServer.port()),
 		onSendCompletion);
 	proactor.addReceiveFrom(s, buf, sa, onRecvCompletion);
-	proactor.run();
+	while (!received) proactor.poll();
 
 	assertTrue(std::string(buf.begin(), buf.end()) == hello);
 	assertTrue (sent);
