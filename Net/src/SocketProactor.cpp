@@ -58,18 +58,20 @@ public:
 	void addWork(Work&& ch, Timestamp::TimeDiff ms, int pos = -1)
 	{
 		auto pch = SocketProactor::PERMANENT_COMPLETION_HANDLER;
-		Poco::Timestamp expires = (ms != pch) ? Timestamp() + ms * 1000 : Timestamp(pch);
-		if (pos == -1)
+		Poco::Timestamp expires = (ms != pch) ? Timestamp() + (ms * 1000) : Timestamp(pch);
+		if (pos == -1 || (pos + 1) > _funcList.size())
 		{
 			ScopedLock lock(_mutex);
 			_funcList.push_back({std::move(ch), expires});
 		}
 		else
 		{
-			if (pos < 0) throw Poco::InvalidArgumentException("SocketProactor::addWork()");
+			if (pos < 0)
+				throw Poco::InvalidArgumentException("SocketProactor::addWork()");
 			ScopedLock lock(_mutex);
 			_funcList.insert(_funcList.begin() + pos, {std::move(ch), expires});
 		}
+
 	}
 
 	void removeWork()
@@ -294,15 +296,13 @@ int SocketProactor::poll(int* pHandled)
 		}
 	}
 
-	if (pHandled) *pHandled = handled;
 	if (_pWorker)
 	{
-		if (hasSocketHandlers())
-		{
-			if (handled) worked = doWork();
-		}
+		if (hasSocketHandlers() && handled) worked = doWork();
 		else worked = doWork(false, true);
 	}
+
+	if (pHandled) *pHandled = handled;
 	return worked;
 }
 
@@ -710,7 +710,7 @@ void SocketProactor::addWork(const Work& ch, Timestamp::TimeDiff ms)
 
 void SocketProactor::addWork(Work&& ch, Timestamp::TimeDiff ms, int pos)
 {
-	worker().addWork(std::move(ch), ms);
+	worker().addWork(std::move(ch), ms, pos);
 }
 
 
