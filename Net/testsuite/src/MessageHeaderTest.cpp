@@ -360,6 +360,38 @@ void MessageHeaderTest::testFieldLimit()
 }
 
 
+void MessageHeaderTest::testNameLengthLimit()
+{
+	std::string s("name1: value1\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setNameLengthLimit(2);
+	try
+	{
+		mh.read(istr);
+		fail("Name length limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+void MessageHeaderTest::testValueLengthLimit()
+{
+	std::string s("name1: value1\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setValueLengthLimit(2);
+	try
+	{
+		mh.read(istr);
+		fail("Value length limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
 void MessageHeaderTest::testDecodeWord()
 {
 	std::string coded("this is pure ASCII");
