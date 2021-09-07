@@ -315,7 +315,7 @@ function Exec-Devenv([string] $projectConfig, [string] $vsProject)
 }
 
 
-function Build-Devenv([string] $vsProject, [switch] $skipStatic)
+function Build-Devenv([string] $vsProject, [string]  $Platform, [switch] $skipStatic)
 {
   if ($linkmode -contains "static" -and $skipStatic) { Return }
 
@@ -334,12 +334,12 @@ function Build-Devenv([string] $vsProject, [switch] $skipStatic)
         $configArr = 'release', 'debug'
         foreach ($cfg in $configArr)
         {
-          Exec-Devenv "$($cfg)_$($mode)" $vsProject
+          Exec-Devenv "`"$($cfg)_$($mode)|$Platform`"" $vsProject
         }
       }
       else #config
       {
-        Exec-Devenv "$($config)_$($mode)" $vsProject
+        Exec-Devenv "`"$($config)_$($mode)|$Platform`"" $vsProject
       }
     }
   }
@@ -350,12 +350,12 @@ function Build-Devenv([string] $vsProject, [switch] $skipStatic)
       $configArr = 'release', 'debug'
       foreach ($cfg in $configArr)
       {
-        Exec-Devenv "$($cfg)_$($linkmode)" $vsProject
+        Exec-Devenv "`"$($cfg)_$($linkmode)|$Platform`"" $vsProject
       }
     }
     else #config
     {
-      Exec-Devenv "$($config)_$($linkmode)" $vsProject
+      Exec-Devenv "`"$($config)_$($linkmode)|$Platform`"" $vsProject
     }
   }
 }
@@ -373,7 +373,7 @@ function Build-samples
 }
 
 
-function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
+function Build-Exec([string] $tool, [string] $vsProject, [string] $Platform, [switch] $skipStatic)
 {
    if (!(Test-Path -Path $vsProject)) # not found
    {
@@ -382,7 +382,7 @@ function Build-Exec([string] $tool, [string] $vsProject, [switch] $skipStatic)
       Write-Host "+------------------------------------------------------------------"
       Return
    }
-   if     ($tool -eq 'devenv')  { Build-Devenv $vsProject -skipStatic:$skipStatic }
+   if     ($tool -eq 'devenv')  { Build-Devenv $vsProject $Platform -skipStatic:$skipStatic }
    elseif ($tool -eq 'msbuild') { Build-MSBuild $vsProject -skipStatic:$skipStatic }
    else
    {
@@ -410,11 +410,11 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
     if ($omitArray -NotContains $component)
     {
-      $vsProject = "$poco_base\$componentDir\$componentName$($platformName)$($suffix).$($extension)"
+      $vsProject = "$poco_base\$componentDir\$componentName$($suffix).$($extension)"
 
       if (!(Test-Path -Path $vsProject)) # when VS project name is not same as directory name
       {
-        $vsProject = "$poco_base\$componentDir$($platformName)$($suffix).$($extension)"
+        $vsProject = "$poco_base\$componentDir$($suffix).$($extension)"
         if (!(Test-Path -Path $vsProject)) # not found
         {
           Write-Host "+------------------------------------------------------------------"
@@ -430,11 +430,11 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
       if ($type -eq "lib")
       {
-        Build-Exec $tool $vsProject
+        Build-Exec $tool $vsProject $Platform
       }
       ElseIf ($tests -and ($type -eq "test"))
       {
-        $vsTestProject = "$poco_base\$componentDir\testsuite\TestSuite$($platformName)$($suffix).$($extension)"
+        $vsTestProject = "$poco_base\$componentDir\testsuite\TestSuite$($suffix).$($extension)"
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         Write-Host "| Building $vsTestProject"
         Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -442,13 +442,13 @@ function Build-Components([string] $extension, [string] $platformName, [string] 
 
         if ($component -eq "Foundation") # special case for Foundation, which needs test app and dll
         {
-          $vsTestProject = "$poco_base\$componentDir\testsuite\TestApp$($platformName)$($suffix).$($extension)"
+          $vsTestProject = "$poco_base\$componentDir\testsuite\TestApp$($suffix).$($extension)"
           Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
           Write-Host "| Building $vsTestProject"
           Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
           Build-Exec $tool $vsTestProject
 
-          $vsTestProject = "$poco_base\$componentDir\testsuite\TestLibrary$($platformName)$($suffix).$($extension)"
+          $vsTestProject = "$poco_base\$componentDir\testsuite\TestLibrary$($suffix).$($extension)"
           Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
           Write-Host "| Building $vsTestProject"
           Write-Host "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
