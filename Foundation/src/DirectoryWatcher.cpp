@@ -544,7 +544,7 @@ DirectoryWatcher::~DirectoryWatcher()
 }
 
 	
-void DirectoryWatcher::suspendEvents()
+void DirectoryWatcher::resumeEvents()
 {
 	poco_assert (_eventsSuspended > 0);
 	
@@ -552,7 +552,7 @@ void DirectoryWatcher::suspendEvents()
 }
 
 
-void DirectoryWatcher::resumeEvents()
+void DirectoryWatcher::suspendEvents()
 {
 	_eventsSuspended++;
 }

@@ -35,6 +35,9 @@ public:
 	void testRemoved();
 	void testModified();
 	void testMoved();
+	void testSuspend();
+	void testResume();
+	void testSuspendMultipleTimes();
 	
 	void setUp();
 	void tearDown();
