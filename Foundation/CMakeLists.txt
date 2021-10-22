@@ -137,6 +137,9 @@ endif()
 
 if(WIN32)
 	target_compile_definitions(Foundation PUBLIC POCO_OS_FAMILY_WINDOWS UNICODE _UNICODE)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		target_compile_definitions(Foundation PUBLIC POCO_NO_AUTOMATIC_LIBS)
+	endif()
 	target_link_libraries(Foundation PUBLIC iphlpapi)
 endif()
 
