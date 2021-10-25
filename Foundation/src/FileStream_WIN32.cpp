@@ -101,7 +101,14 @@ int FileStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	DWORD bytesRead(0);
 	BOOL rc = ReadFile(_handle, buffer, static_cast<DWORD>(length), &bytesRead, NULL);
 	if (rc == 0)
+	{
+		if (GetLastError() == ERROR_BROKEN_PIPE)
+		{
+			// Read from closed pipe -> treat as EOF
+			return 0;
+		}
 		File::handleLastError(_path);
+	}
 
 	_pos += bytesRead;
 
