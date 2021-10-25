@@ -47,6 +47,12 @@ class Foundation_API FileIOS: public virtual std::ios
 	/// On Windows platforms, UTF-8 encoded Unicode paths are correctly handled.
 {
 public:
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	using NativeHandle = HANDLE;
+#else
+	using NativeHandle = int;
+#endif
+
 	FileIOS(std::ios::openmode defaultMode);
 		/// Creates the basic stream.
 		
@@ -59,6 +65,9 @@ public:
 		/// Throws a FileException (or a similar exception) if the file 
 		/// does not exist or is not accessible for other reasons and
 		/// a new file cannot be created.
+
+	void open_handle(NativeHandle handle, std::ios::openmode mode);
+		/// Takes ownership of the handle.
 
 	void close();
 		/// Closes the file stream.
