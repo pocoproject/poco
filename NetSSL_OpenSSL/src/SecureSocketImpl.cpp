@@ -483,7 +483,16 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
+	// SSL_GET_ERROR(3ossl):
+	// On an unexpected EOF, versions before OpenSSL 3.0 returned
+	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
+	// errno was 0.  Since OpenSSL 3.0 the returned error is
+	// SSL_ERROR_SSL with a meaningful error on the error stack.
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	case SSL_ERROR_SSL:
+#else
 	case SSL_ERROR_SYSCALL:
+#endif
 		if (error != 0)
 		{
 			SocketImpl::error(error);
@@ -492,7 +501,17 @@ int SecureSocketImpl::handleError(int rc)
 	default:
 		{
 			long lastError = ERR_get_error();
+			std::string msg;
+			if (lastError) {
+				char buffer[256];
+				ERR_error_string_n(lastError, buffer, sizeof(buffer));
+				msg = buffer;
+			}
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+			if (sslError == SSL_ERROR_SSL)
+#else
 			if (lastError == 0)
+#endif
 			{
 				if (rc == 0)
 				{
@@ -500,11 +519,11 @@ int SecureSocketImpl::handleError(int rc)
 					if (_pContext->isForServerUse())
 						return 0;
 					else
-						throw SSLConnectionUnexpectedlyClosedException();
+						throw SSLConnectionUnexpectedlyClosedException(msg);
 				}
 				else if (rc == -1)
 				{
-					throw SSLConnectionUnexpectedlyClosedException();
+					throw SSLConnectionUnexpectedlyClosedException(msg);
 				}
 				else
 				{
@@ -513,9 +532,6 @@ int SecureSocketImpl::handleError(int rc)
 			}
 			else
 			{
-				char buffer[256];
-				ERR_error_string_n(lastError, buffer, sizeof(buffer));
-				std::string msg(buffer);
 				throw SSLException(msg);
 			}
 		}
