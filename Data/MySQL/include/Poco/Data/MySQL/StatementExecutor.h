@@ -18,8 +18,8 @@
 #define Data_MySQL_StatementHandle_INCLUDED
 
 
-#include <mysql.h>
 #include "Poco/Data/MySQL/MySQLException.h"
+#include <mysql/mysql.h>
 
 
 namespace Poco {
@@ -66,7 +66,7 @@ public:
 		/// Fetches the column.
 
 	int getAffectedRowCount() const;
-		
+
 	operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
 

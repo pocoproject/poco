@@ -12,13 +12,13 @@
 //
 
 
+#include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/Extractor.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
-#include "Poco/Exception.h"
 #include <typeinfo>
 
 
@@ -33,11 +33,15 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 	"to increase the maximum allowed data size\n";
 
 
-Extractor::Extractor(const StatementHandle& rStmt, 
-	Preparator::Ptr pPreparator): 
-	_rStmt(rStmt), 
+Extractor::Extractor(const StatementHandle& rStmt,
+	Preparator::Ptr pPreparator,
+	TextEncoding::Ptr pDBEncoding):
+	_rStmt(rStmt),
 	_pPreparator(pPreparator),
-	_dataExtraction(pPreparator->getDataExtraction())
+	_dataExtraction(pPreparator->getDataExtraction()),
+	_pDBEncoding(pDBEncoding),
+	_transcode(_pDBEncoding && !_pDBEncoding->isA("UTF-8")),
+	_pToEncoding(_transcode ? Poco::TextEncoding::find("UTF-8") : nullptr)
 {
 }
 
@@ -106,7 +110,7 @@ bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Date> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Date> >(std::size_t pos,
 	std::vector<Poco::Data::Date>& val)
 {
 	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_pPreparator->at(pos));
@@ -116,7 +120,7 @@ bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Date> >(std::s
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Date> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Date> >(std::size_t pos,
 	std::deque<Poco::Data::Date>& val)
 {
 	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_pPreparator->at(pos));
@@ -126,7 +130,7 @@ bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Date> >(std::si
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Date> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Date> >(std::size_t pos,
 	std::list<Poco::Data::Date>& val)
 {
 	std::vector<SQL_DATE_STRUCT>& ds = RefAnyCast<std::vector<SQL_DATE_STRUCT> >(_pPreparator->at(pos));
@@ -150,7 +154,7 @@ bool Extractor::extractBoundImpl<Poco::Data::Time>(std::size_t pos, Poco::Data::
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Time> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Time> >(std::size_t pos,
 	std::vector<Poco::Data::Time>& val)
 {
 	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_pPreparator->at(pos));
@@ -160,7 +164,7 @@ bool Extractor::extractBoundImplContainer<std::vector<Poco::Data::Time> >(std::s
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Time> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Time> >(std::size_t pos,
 	std::deque<Poco::Data::Time>& val)
 {
 	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_pPreparator->at(pos));
@@ -170,7 +174,7 @@ bool Extractor::extractBoundImplContainer<std::deque<Poco::Data::Time> >(std::si
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Time> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::list<Poco::Data::Time> >(std::size_t pos,
 	std::list<Poco::Data::Time>& val)
 {
 	std::vector<SQL_TIME_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIME_STRUCT> >(_pPreparator->at(pos));
@@ -194,7 +198,7 @@ bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::vector<Poco::DateTime> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::vector<Poco::DateTime> >(std::size_t pos,
 	std::vector<Poco::DateTime>& val)
 {
 	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_pPreparator->at(pos));
@@ -204,7 +208,7 @@ bool Extractor::extractBoundImplContainer<std::vector<Poco::DateTime> >(std::siz
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::deque<Poco::DateTime> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::deque<Poco::DateTime> >(std::size_t pos,
 	std::deque<Poco::DateTime>& val)
 {
 	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_pPreparator->at(pos));
@@ -214,7 +218,7 @@ bool Extractor::extractBoundImplContainer<std::deque<Poco::DateTime> >(std::size
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::list<Poco::DateTime> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::list<Poco::DateTime> >(std::size_t pos,
 	std::list<Poco::DateTime>& val)
 {
 	std::vector<SQL_TIMESTAMP_STRUCT>& ds = RefAnyCast<std::vector<SQL_TIMESTAMP_STRUCT> >(_pPreparator->at(pos));
@@ -224,7 +228,21 @@ bool Extractor::extractBoundImplContainer<std::list<Poco::DateTime> >(std::size_
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::vector<bool> >(std::size_t pos, 
+bool Extractor::extractBoundImpl<Poco::UUID>(std::size_t pos, Poco::UUID& val)
+{
+	if (isNull(pos)) return false;
+
+	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	checkDataSize(dataSize);
+	char* pBuffer = *AnyCast<char*>(&_pPreparator->at(pos));
+	val.copyFrom(pBuffer);
+
+	return true;
+}
+
+
+template<>
+bool Extractor::extractBoundImplContainer<std::vector<bool> >(std::size_t pos,
 	std::vector<bool>& val)
 {
 	std::size_t length = _pPreparator->getLength();
@@ -235,7 +253,7 @@ bool Extractor::extractBoundImplContainer<std::vector<bool> >(std::size_t pos,
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::deque<bool> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::deque<bool> >(std::size_t pos,
 	std::deque<bool>& val)
 {
 	std::size_t length = _pPreparator->getLength();
@@ -246,7 +264,7 @@ bool Extractor::extractBoundImplContainer<std::deque<bool> >(std::size_t pos,
 
 
 template<>
-bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos, 
+bool Extractor::extractBoundImplContainer<std::list<bool> >(std::size_t pos,
 	std::list<bool>& val)
 {
 	std::size_t length = _pPreparator->getLength();
@@ -262,13 +280,13 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 	std::size_t totalSize = 0;
-	
+
 	SQLLEN len;
 	const int bufSize = CHUNK_SIZE;
 	Poco::Buffer<char> apChar(bufSize);
 	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
-	
+
 	val.clear();
 	resizeLengths(pos);
 
@@ -276,8 +294,8 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 	{
 		std::memset(pChar, 0, bufSize);
 		len = 0;
-		rc = SQLGetData(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
+		rc = SQLGetData(_rStmt,
+			(SQLUSMALLINT) pos + 1,
 			cType, //C data type
 			pChar, //returned value
 			bufSize, //buffer length
@@ -301,9 +319,9 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 		_lengths[pos] += len;
 		fetchedSize = _lengths[pos] > CHUNK_SIZE ? CHUNK_SIZE : _lengths[pos];
 		totalSize += fetchedSize;
-		if (totalSize <= maxSize) 
+		if (totalSize <= maxSize)
 			val.append(pChar, fetchedSize);
-		else 
+		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 	}while (true);
 
@@ -367,8 +385,8 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos, 
-	Poco::Data::CLOB& val, 
+bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
+	Poco::Data::CLOB& val,
 	SQLSMALLINT cType)
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
@@ -380,7 +398,7 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 	Poco::Buffer<char> apChar(bufSize);
 	char* pChar = apChar.begin();
 	SQLRETURN rc = 0;
-	
+
 	val.clear();
 	resizeLengths(pos);
 
@@ -388,13 +406,13 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 	{
 		std::memset(pChar, 0, bufSize);
 		len = 0;
-		rc = SQLGetData(_rStmt, 
-			(SQLUSMALLINT) pos + 1, 
+		rc = SQLGetData(_rStmt,
+			(SQLUSMALLINT) pos + 1,
 			cType, //C data type
 			pChar, //returned value
 			bufSize, //buffer length
 			&len); //length indicator
-		
+
 		_lengths[pos] += len;
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
@@ -411,9 +429,9 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 
 		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
 		totalSize += fetchedSize;
-		if (totalSize <= maxSize) 
+		if (totalSize <= maxSize)
 			val.appendRaw(pChar, fetchedSize);
-		else 
+		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
 
 	}while (true);
@@ -423,26 +441,26 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::Data::Date>(std::size_t pos, 
-	Poco::Data::Date& val, 
+bool Extractor::extractManualImpl<Poco::Data::Date>(std::size_t pos,
+	Poco::Data::Date& val,
 	SQLSMALLINT cType)
 {
 	SQL_DATE_STRUCT ds;
 	resizeLengths(pos);
 
-	SQLRETURN rc = SQLGetData(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
+	SQLRETURN rc = SQLGetData(_rStmt,
+		(SQLUSMALLINT) pos + 1,
 		cType, //C data type
 		&ds, //returned value
 		sizeof(ds), //buffer length
 		&_lengths[pos]); //length indicator
-	
+
 	if (Utility::isError(rc))
 		throw StatementException(_rStmt, "SQLGetData()");
 
-	if (isNullLengthIndicator(_lengths[pos])) 
+	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
-	else 
+	else
 		Utility::dateSync(val, ds);
 
 	return true;
@@ -450,26 +468,26 @@ bool Extractor::extractManualImpl<Poco::Data::Date>(std::size_t pos,
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::Data::Time>(std::size_t pos, 
-	Poco::Data::Time& val, 
+bool Extractor::extractManualImpl<Poco::Data::Time>(std::size_t pos,
+	Poco::Data::Time& val,
 	SQLSMALLINT cType)
 {
 	SQL_TIME_STRUCT ts;
 	resizeLengths(pos);
 
-	SQLRETURN rc = SQLGetData(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
+	SQLRETURN rc = SQLGetData(_rStmt,
+		(SQLUSMALLINT) pos + 1,
 		cType, //C data type
 		&ts, //returned value
 		sizeof(ts), //buffer length
 		&_lengths[pos]); //length indicator
-	
+
 	if (Utility::isError(rc))
 		throw StatementException(_rStmt, "SQLGetData()");
 
-	if (isNullLengthIndicator(_lengths[pos])) 
+	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
-	else 
+	else
 		Utility::timeSync(val, ts);
 
 	return true;
@@ -477,27 +495,54 @@ bool Extractor::extractManualImpl<Poco::Data::Time>(std::size_t pos,
 
 
 template<>
-bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos, 
-	Poco::DateTime& val, 
+bool Extractor::extractManualImpl<Poco::DateTime>(std::size_t pos,
+	Poco::DateTime& val,
 	SQLSMALLINT cType)
 {
 	SQL_TIMESTAMP_STRUCT ts;
 	resizeLengths(pos);
 
-	SQLRETURN rc = SQLGetData(_rStmt, 
-		(SQLUSMALLINT) pos + 1, 
+	SQLRETURN rc = SQLGetData(_rStmt,
+		(SQLUSMALLINT) pos + 1,
 		cType, //C data type
 		&ts, //returned value
 		sizeof(ts), //buffer length
 		&_lengths[pos]); //length indicator
-	
+
 	if (Utility::isError(rc))
 		throw StatementException(_rStmt, "SQLGetData()");
 
-	if (isNullLengthIndicator(_lengths[pos])) 
+	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
-	else 
+	else
 		Utility::dateTimeSync(val, ts);
+
+	return true;
+}
+
+
+template<>
+bool Extractor::extractManualImpl<Poco::UUID>(std::size_t pos,
+	Poco::UUID& val,
+	SQLSMALLINT cType)
+{
+	char buffer[16];
+	resizeLengths(pos);
+
+	SQLRETURN rc = SQLGetData(_rStmt,
+		(SQLUSMALLINT) pos + 1,
+		cType, //C data type
+		&buffer, //returned value
+		sizeof(buffer), //buffer length
+		&_lengths[pos]); //length indicator
+
+	if (Utility::isError(rc))
+		throw StatementException(_rStmt, "SQLGetData()");
+
+	if (isNullLengthIndicator(_lengths[pos]))
+		return false;
+	else
+		val.copyFrom(buffer);
 
 	return true;
 }
@@ -660,37 +705,45 @@ bool Extractor::extract(std::size_t pos, std::list<double>& val)
 
 bool Extractor::extract(std::size_t pos, std::string& val)
 {
-	if (Preparator::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_CHAR);
+	bool ret = false;
+
+	if (!_transcode)
+	{
+		if (Preparator::DE_MANUAL == _dataExtraction)
+			ret = extractManualImpl(pos, val, SQL_C_CHAR);
+		else
+			ret = extractBoundImpl(pos, val);
+	}
 	else
-		return extractBoundImpl(pos, val);
+	{
+		std::string result;
+		if (Preparator::DE_MANUAL == _dataExtraction)
+			ret = extractManualImpl(pos, result, SQL_C_CHAR);
+		else
+			ret = extractBoundImpl(pos, result);
+		Poco::TextConverter converter(*_pDBEncoding, *_pToEncoding);
+		converter.convert(result, val);
+	}
+
+	return ret;
 }
 
 
 bool Extractor::extract(std::size_t pos, std::vector<std::string>& val)
 {
-	if (Preparator::DE_BOUND == _dataExtraction)
-		return extractBoundImplContainer(pos, val);
-	else
-		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+	return stringContainerExtract(pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::deque<std::string>& val)
 {
-	if (Preparator::DE_BOUND == _dataExtraction)
-		return extractBoundImplContainer(pos, val);
-	else
-		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+	return stringContainerExtract(pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
 {
-	if (Preparator::DE_BOUND == _dataExtraction)
-		return extractBoundImplContainer(pos, val);
-	else
-		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+	return stringContainerExtract(pos, val);
 }
 
 
@@ -907,6 +960,15 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::DateTime>& val)
 		return extractBoundImplContainer(pos, val);
 	else
 		throw InvalidAccessException("Direct container extraction only allowed for bound mode.");
+}
+
+
+bool Extractor::extract(std::size_t pos, Poco::UUID& val)
+{
+	if (Preparator::DE_MANUAL == _dataExtraction)
+		return extractManualImpl(pos, val, SQL_C_BINARY);
+	else
+		return extractBoundImpl(pos, val);
 }
 
 
@@ -1307,10 +1369,10 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 		try
 		{
 			return isNullLengthIndicator(_lengths.at(col));
-		} 
+		}
 		catch (std::out_of_range& ex)
 		{
-			throw RangeException(ex.what()); 
+			throw RangeException(ex.what());
 		}
 	}
 	else

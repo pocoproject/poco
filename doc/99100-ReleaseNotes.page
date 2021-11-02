@@ -1,6 +1,136 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.11.0
+
+!!Summary of Changes
+
+  - This release introduces ActiveRecord, a simple and lightweight object-relational mapping
+    (ORM) framework based on the Active Record pattern and the Data library.
+  - Upgraded bundled expat to 2.4.1
+  - Upgraded bundled PCRE to 8.44
+  - Upgraded bundled pdjson to latest master
+  - Upgraded bundled SQLite to 3.35.5
+  - GH #2205: Start POCO as Windows service with parameters fix #2190
+  - GH #2418: SecureServerSocket doesn't work with IpV6
+  - GH #2677: Fix CLOB type support in StatementImpl and RecordSet
+  - GH #2746: Race in TCPServerDispatcher::stop
+  - GH #2783: Invalid condition [ICMPv4PacketImpl.cpp:234]
+  - GH #2825: riscv: Enable double operations when using double float abi
+  - GH #2895: Settings to verify OCSP stapling response (if received any) for client connections
+  - GH #2904: Support environments without hardware floating point
+  - GH #2906: Support environments without hardware floating point
+  - GH #2927: Fix assigned value to wrong pointer
+  - GH #2928: Fix clang issue
+  - GH #2929: Zip and SevenZip do not depend on Util, XML, JSON
+  - GH #2932: Poco::Net::NTLMContext is missing dllexport/dllimport symbols
+  - GH #2935: Configuration to receive OCSP stapling response for client connection…
+  - GH #2942: Avoid clang 10 -Wimplicit-int-float-conversion warning/error when con…
+  - GH #2945: Iterating over Var containing empty container throws "Out of range" exception
+  - GH #2970: Poco::Data::TypeHandler<Poco::Nullable<T>>::prepare() must prepare with underlying type, not Poco::Data::Keywords::null
+  - GH #2982: Poco::Net - return value from close needs to be checked in SocketImpl
+  - GH #2984: Fixed linking with Data ODBC error on some platforms
+  - GH #2989: setting priorityNames property on PatternFormatter has no effect
+  - GH #2992: CryptoTransformImpl::setPadding(int padding) incorrect for OpenSSL >= 1.1
+  - GH #2993: The Sec-WebSocket-Key of WebSocket is always the same one
+  - GH #3019: ObjectPool wait on borrow condition fix
+  - GH #3021: PatternFormatter priorityNames fix
+  - GH #3022: Process::isRunning(PID pid) causes handle leak on Windows
+  - GH #3023: Link to "discussion forums" on "How to get help" advice broken
+  - GH #3025: PKCS12Container: fix memory leaks on exceptions (1.10.1)
+  - GH #3027: PKCS12Container: fix memory leaks on exceptions (devel)
+  - GH #3037: Poco::toJSON: Don't escape forward slash in JSON strings
+  - GH #3041: PostgreSQL and TEXT column type
+  - GH #3044: Upgrading PCRE to 8.44 is it in immediate plan?
+  - GH #3045: PostgreSQL and BYTEA column type
+  - GH #3057: Poco::Data::PostgreSQL::SessionImpl::connectorName() returns empty string
+  - GH #3059: MessageHeader::splitParameters fails on 'httponly' cookie with 'string too long' exception
+  - GH #3061: SocketImpl::bind --> bind wrong config
+  - GH #3064: PostgreSQL: Extraction of 16-bit integers corrupts result
+  - GH #3066: CMake warning about MYSQL casing
+  - GH #3067: Fix pkg-name in find_package_handle_standard_args
+  - GH #3068: Documented ENABLE_JWT option
+  - GH #3074: Fix sessions may not return back to the pool
+  - GH #3076: Avoid access to already freed memory in JSON code
+  - GH #3078: Fix typo in the ThreadPool's docs
+  - GH #3086: Use POCO_IOS_INIT_HACK for Linux in combination with libc++
+  - GH #3089: HTTPSessionFactory does not support HTTPClientSession::ProxyConfig
+  - GH #3090: Do not initialize value with undefined behavior
+  - GH #3091: feat(SharedLibrary): add more detailed error description when LoadLib…
+  - GH #3092: feat(SharedLibrary): add more detailed error description when LoadLib…
+  - GH #3095: Digest proxy authentication does not work in 1.10.1
+  - GH #3097: Support for building Arm64 Apple Silicon
+  - GH #3099: Fixed Postgres extraction into Dynamic::Var
+  - GH #3107: unused variable
+  - GH #3114: Added JSON Array::empty() method
+  - GH #3116: Changed EventHandlerMap key
+  - GH #3130: Possible use-after-free bug on the method copyToImpl
+  - GH #3133: POCO_STATIC has been deprecated
+  - GH #3135: Poco::Data::SQLite::Utility::fileToMemory unsuccessful if journal exists
+  - GH #3136: Fixed null character issue when parsing a JSON
+  - GH #3138: Add support of arch riscv32
+  - GH #3141: allow to handle hot-journal (fixes #3135)
+  - GH #3151: fix(JSON::Object): crash when a key is removed from object with JSON_PRESERVE_KEY_ORDER
+  - GH #3153: Poco::Data::ODBC [N]VARCHAR(MAX) wrong maxDataSize() result
+  - GH #3155: Fixed typo in overridden
+  - GH #3157: fix(openssl): add missing dependency to OpenSSL components
+  - GH #3159: Bug in NumericString with decSep != '.'
+  - GH #3163: Correct Var::parse null value
+  - GH #3166: Fix PostgresSQL BLOB extractor
+  - GH #3168: Reference documentation contains invalid links.
+  - GH #3169: #2746: Fix race condition on TCPServerDispatcher stop
+  - GH #3182: Poco::Process:launch on MacOS BigSur
+  - GH #3183: fix setPadding
+  - GH #3190: [NetSSL_Win]: SSL-connection fails with "Host name verification failed error" (Regression bug)
+  - GH #3191: Fixing a bug in the NetSSL_Win module (Host name verification failed error)
+  - GH #3193: ServerApplication::registerService() unquoted path security vulnerability
+  - GH #3196: std::forward for Poco::Optional ctor with rvalue
+  - GH #3202: JWT: ESxxx signature must include padding for ECDSA R and S values
+  - GH #3204: CryptoTransformImpl::setPadding wrong call
+  - GH #3215: XML parser returns item from different element in a array
+  - GH #3217: CMake: warning message with -DPOCO_STATIC confusing
+  - GH #3219: SMTPClientSession: invalid SMTP command if empty recipients list in MailMessage
+  - GH #3223: Compilation failure since OpenSSL (alpha 13)
+  - GH #3224: Remove SSL23 support from Poco/Crypto
+  - GH #3229: Upgrade bundled expat to 2.3.0
+  - GH #3230: ECDSADigestEngine: include missing header
+  - GH #3233: Feat/hash range
+  - GH #3237: An error in the documentation for Poco/JSON/Parser.h
+  - GH #3239: XML parser returns item from different element in a array #3215
+  - GH #3242: RemoteSyslogListener: add reusePort option
+  - GH #3245: find_package(Poco REQUIRED COMPONENTS ... NetSSL) requires an aditional find_package(OpenSSL) since poco-10
+  - GH #3248: PollSet not working as intended on Windows
+  - GH #3249: PollSet - poll() timeout not properly used
+  - GH #3250: fix(PollSet): #3248 #3249
+  - GH #3260: Memory leak in EVPPKey::loadKey used with files & wrong password
+  - GH #3266: Order of Util::Application::uninitialize() is not in reverse as documented
+  - GH #3269: Poco::Net::Context initialization with empty certificateFile
+  - GH #3274: Fix localtime_r for VxWorks 6.9 and later
+  - GH #3278: Fixing no hardware floating point support - Part II
+  - GH #3279: Update bundled expat to 2.4.0
+  - GH #3282: Update constant in setContentType documentation
+  - GH #3284: JSON Fuzzing: Undefined-shift in poco_double_conversion::DiyFpStrtod
+  - GH #3285: JSON Fuzzing: Stack-overflow in Poco::JSON::ParserImpl::handle
+  - GH #3291: JSON Fuzzing: Stack-overflow with empty stacktrace
+  - GH #3292: JSON Fuzzing: Stack-overflow in Poco::JSON::Array::~Array
+  - GH #3295: A variation on Issue 949 comes back to life?
+  - GH #3299: NetSSL: Allow per-Context InvalidCertificateHandler
+  - GH #3301: Unterminated string possible  in NetworkInterfaceImpl::setPhyParams()
+  - GH #3302: MSVC: Poco hides warnings (C4996) for the C++14 attribute [[deprecated]]
+  - GH #3303: DNS HostEntry returns multiple entries
+  - GH #3307: Poco::Crypto::X509Certificate: obtain certificate fingerprint
+  - GH #3309: JSON parser copies entire JSON document to memory when parsing from stream.
+  - GH #3310: Upgrade bundled SQLite to 3.35.5.
+  - GH #3313: Upgrade bundled double-conversion
+  - GH #3314: NetSSL_OpenSSL: any.pem certificate error: ca md too weak
+  - GH #3315: Unintended sign/type conversion out of RecordSet
+  - GH #3317: Data::MySQL MySQL headers and library search paths
+  - GH #3318: Data: Support Poco::UUID for data binding
+  - GH #3321: Feat/data db encoding
+  - GH #3322: why is  useless MyStruct present in Thread_posix.cpp :: ThreadImpl::setPriorityImpl (easy to fix I guess)
+  - GH #3326: [asan] Undefined behavior in ICMPv4PacketImpl.cpp
+
+
 !!!Release 1.10.1
 
 !!Summary of Changes

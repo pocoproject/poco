@@ -21,6 +21,7 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Constants.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/UUID.h"
 #include "Poco/UTFString.h"
 #include <vector>
 #include <deque>
@@ -303,6 +304,18 @@ public:
 
 	virtual bool extract(std::size_t pos, std::list<Time>& val);
 		/// Extracts a Time list.
+
+	virtual bool extract(std::size_t pos, UUID& val) = 0;
+		/// Extracts a UUID. Returns false if null was received.
+
+	virtual bool extract(std::size_t pos, std::vector<UUID>& val);
+		/// Extracts a UUID vector.
+
+	virtual bool extract(std::size_t pos, std::deque<UUID>& val);
+		/// Extracts a UUID deque.
+
+	virtual bool extract(std::size_t pos, std::list<UUID>& val);
+		/// Extracts a UUID list.
 
 	virtual bool extract(std::size_t pos, Any& val) = 0;
 		/// Extracts an Any. Returns false if null was received.

@@ -63,6 +63,13 @@ public:
 		/// Creates the RemoteSyslogListener, listening on the given port number
 		/// and using the number of threads for message processing.
 
+	RemoteSyslogListener(Poco::UInt16 port, bool reusePort, int threads);
+		/// Creates the RemoteSyslogListener, listening on the given port number
+		/// and using the number of threads for message processing.
+		///
+		/// If reusePort is true, the underlying UDP socket will bind
+		/// with the reusePort flag set.
+
 	void setProperty(const std::string& name, const std::string& value);
 		/// Sets the property with the given value.
 		///
@@ -70,9 +77,13 @@ public:
 		///     * port: The UDP port number where to listen for UDP packets
 		///       containing syslog messages. If 0 is specified, does not
 		///       listen for UDP messages.
+		///     * reusePort: If set to true, allows multiple instances
+		///       binding to the same port number.
 		///     * threads: The number of parser threads processing
 		///       received syslog messages. Defaults to 1. A maximum
 		///       of 16 threads is supported.
+		///     * buffer: The UDP socket receive buffer size in bytes. If not
+		///       specified, the system default is used.
 
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
@@ -95,7 +106,9 @@ public:
 		/// Registers the channel with the global LoggingFactory.
 
 	static const std::string PROP_PORT;
+	static const std::string PROP_REUSE_PORT;
 	static const std::string PROP_THREADS;
+	static const std::string PROP_BUFFER;
 
     static const std::string LOG_PROP_APP;
     static const std::string LOG_PROP_HOST;
@@ -111,7 +124,9 @@ private:
 	Poco::ThreadPool        _threadPool;
 	Poco::NotificationQueue _queue;
 	Poco::UInt16            _port;
+	bool                    _reusePort;
 	int                     _threads;
+	int                     _buffer;
 };
 
 

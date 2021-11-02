@@ -5,7 +5,7 @@
 
 #ifdef MY_CPU_X86_OR_AMD64
 
-#if (defined(_MSC_VER) && !defined(MY_CPU_AMD64)) || defined(__GNUC__)
+#if (defined(_MSC_VER) && !defined(MY_CPU_AMD64)) || defined(__GNUC__) || defined(__clang__)
 #define USE_ASM
 #endif
 

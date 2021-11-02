@@ -469,6 +469,7 @@ public:
 	void time();
 	void floats();
 	void doubles();
+	void uuids();
 	void tuples();
 	void tupleVector();
 

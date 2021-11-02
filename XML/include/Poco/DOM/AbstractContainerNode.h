@@ -52,8 +52,8 @@ protected:
 
 	void dispatchNodeRemovedFromDocument();
 	void dispatchNodeInsertedIntoDocument();
-	
-	static const Node* findNode(XMLString::const_iterator& it, const XMLString::const_iterator& end, const Node* pNode, const NSMap* pNSMap);
+
+	static const Node* findNode(XMLString::const_iterator& it, const XMLString::const_iterator& end, const Node* pNode, const NSMap* pNSMap, bool& indexBound);
 	static const Node* findElement(const XMLString& name, const Node* pNode, const NSMap* pNSMap);
 	static const Node* findElement(int index, const Node* pNode, const NSMap* pNSMap);
 	static const Node* findElement(const XMLString& attr, const XMLString& value, const Node* pNode, const NSMap* pNSMap);

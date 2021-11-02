@@ -5,8 +5,9 @@ POCO Data Library
 
 POCO Data is POCO's database abstraction layer which allows users to
 easily send/retrieve data to/from various databases. Currently supported
-database connectors are SQLite, MySQL and ODBC. Framework is opened
-for extension, so additional native connectors (Oracle, PostgreSQL, ...)
+database connectors are SQLite, MySQL/MariaDB, PostgreSQL and ODBC (which
+covers SQL Server and other databases).
+Framework is opened for extension, so additional native connectors (Oracle, Db2, ...)
 can be added. The intent behind the Poco::Data framework is to produce the
 integration between C++ and relational databses in a simple and natural way.
 
@@ -16,54 +17,54 @@ The following complete example shows how to use POCO Data:
     #include "Poco/Data/SQLite/Connector.h"
     #include <vector>
     #include <iostream>
-    
+
     using namespace Poco::Data::Keywords;
     using Poco::Data::Session;
     using Poco::Data::Statement;
-    
+
     struct Person
     {
         std::string name;
         std::string address;
         int         age;
     };
-    
+
     int main(int argc, char** argv)
     {
         // register SQLite connector
         Poco::Data::SQLite::Connector::registerConnector();
-        
+
         // create a session
         Session session("SQLite", "sample.db");
-    
+
         // drop sample table, if it exists
         session << "DROP TABLE IF EXISTS Person", now;
-        
+
         // (re)create table
         session << "CREATE TABLE Person (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3))", now;
-    
+
         // insert some rows
-        Person person = 
+        Person person =
         {
             "Bart Simpson",
             "Springfield",
             12
         };
-        
+
         Statement insert(session);
         insert << "INSERT INTO Person VALUES(?, ?, ?)",
             use(person.name),
             use(person.address),
             use(person.age);
-            
+
         insert.execute();
-    
+
         person.name    = "Lisa Simpson";
         person.address = "Springfield";
         person.age     = 10;
-    
+
         insert.execute();
-    
+
         // a simple query
         Statement select(session);
         select << "SELECT Name, Address, Age FROM Person",
@@ -71,24 +72,24 @@ The following complete example shows how to use POCO Data:
             into(person.address),
             into(person.age),
             range(0, 1); //  iterate over result set one row at a time
-    
+
         while (!select.done())
         {
             select.execute();
             std::cout << person.name << " " << person.address << " " << person.age << std::endl;
         }
-    
+
         return 0;
     }
 ----
 
-The above example is pretty much self explanatory. 
+The above example is pretty much self explanatory.
 
 The <[using namespace Poco::Data ]> is for convenience only but highly
 recommended for good readable code. While <[ses << "SELECT COUNT(*)
-FROM PERSON", Poco::Data::Keywords::into(count), Poco::Data::Keywords::now;]> 
+FROM PERSON", Poco::Data::Keywords::into(count), Poco::Data::Keywords::now;]>
 is valid, the aesthetic aspect of the code is improved by eliminating the need
-for full namespace qualification; this document uses convention introduced in 
+for full namespace qualification; this document uses convention introduced in
 the example above.
 
 The remainder of this tutorial is split up into the following parts:
@@ -117,20 +118,23 @@ parameter contains the connection string.
 
 In the case of SQLite, the path of the database file is sufficient as connection string.
 
-For ODBC, the connection string may be a simple "DSN=MyDSNName" when a DSN is configured or 
-a complete ODBC driver-specific connection string defining all the necessary connection parameters 
-(for details, consult your ODBC driver documentation). 
+For ODBC, the connection string may be a simple "DSN=MyDSNName" when a DSN is configured or
+a complete ODBC driver-specific connection string defining all the necessary connection parameters
+(for details, consult your ODBC driver documentation).
 
-For MySQL, the connection string is a semicolon-delimited list of name-value pairs 
-specifying various parameters like host, port, user, password, database, compression and 
-automatic reconnect. Example: <["host=localhost;port=3306;db=mydb;user=alice;password=s3cr3t;compress=true;auto-reconnect=true"]>
+For MySQL, the connection string is a semicolon-delimited list of name-value pairs
+specifying various parameters like host, port, user, password, database, compression and
+automatic reconnect. Example:
+
+    "host=localhost;port=3306;db=mydb;user=alice;password=s3cr3t;compress=true;auto-reconnect=true"
+----
 
 
 !!!Inserting and Retrieving Data
 
 !!Single Data Sets
 
-Inserting data works by <[using]> the content of other variables. 
+Inserting data works by <[using]> the content of other variables.
 Assume we have a table that stores only forenames:
 
     ForeName (Name VARCHAR(30))
@@ -139,17 +143,17 @@ Assume we have a table that stores only forenames:
 If we want to insert one single forename we could simply write:
 
     std::string aName("Peter");
-    session << "INSERT INTO FORENAME VALUES(" << aName << ")", now;
+    session << "INSERT INTO FORENAME VALUES('" << aName << "')", now;
 ----
 
 However, a better solution is to use <*placeholders*> and connect each
-placeholder via a <[use]> expression with a variable that will provide
+placeholder via a `use` expression with a variable that will provide
 the value during execution. Placeholders, depending on your database are
-recognized by having either a colon(<[:]>) in front of the name or
-simply by a question mark (<[?]>) as a placeholder. While having the
+recognized by having either a colon (`:`) in front of the name or
+simply by a question mark (`?`) as a placeholder. While having the
 placeholders marked with a colon followed by a human-readable name is
 very convenient due to readability, not all SQL dialects support this and
-universally accepted standard placeholder is  (<[?]>). Consult your database
+universally accepted standard placeholder is `?`. Consult your database
 SQL documentation to determine the valid placeholder syntax.
 
 Rewriting the above code now simply gives:
@@ -159,8 +163,8 @@ Rewriting the above code now simply gives:
 ----
 
 In this example the <[use]> expression matches the placeholder with the
-<[Peter]> value. Note that apart from the nicer syntax, the real benefits of 
-placeholders -- which are performance and protection against SQL injection 
+<[Peter]> value. Note that apart from the nicer syntax, the real benefits of
+placeholders -- which are performance and protection against SQL injection
 attacks -- don't show here. Check the <[Statements]> section to find out more.
 
 Retrieving data from the Database works similar. The <[into]>
@@ -172,14 +176,14 @@ database:
     ses << "SELECT NAME FROM FORENAME", into(aName), now;
     ses << "SELECT NAME FROM FORENAME", into(aName, 0, "default"), now;
 
-You'll note the integer zero argument in the second into() call. The reason for 
-that is that Poco::Data supports multiple result sets for those databases/drivers 
-that have such capbility and we have to indicate the resultset we are referring to. 
-Attempting to create sufficient overloads of <[into()]> creates more trouble than 
-what it's worth and null values can effectively be dealt with through use of either 
-Poco::Nullable wrapper (see Handling Null Entries later in this document) or 
-Poco::Dynamic::Var, which will be set as empty for null values when used as query 
-output target. 
+You'll note the integer zero argument in the second into() call. The reason for
+that is that Poco::Data supports multiple result sets for those databases/drivers
+that have such capbility and we have to indicate the resultset we are referring to.
+Attempting to create sufficient overloads of <[into()]> creates more trouble than
+what it's worth and null values can effectively be dealt with through use of either
+Poco::Nullable wrapper (see Handling Null Entries later in this document) or
+Poco::Dynamic::Var, which will be set as empty for null values when used as query
+output target.
 ----
 
 It is also possible to combine into and use expressions:
@@ -224,18 +228,18 @@ To accomodate for NULL, use the Poco::Nullable template:
     if (!lastName.isNull()) { ... }
 ----
 
-The above used Poco::Nullable is a lightweight template class, wrapping any type 
+The above used Poco::Nullable is a lightweight template class, wrapping any type
 for the purpose of allowing it to have null value.
 
 If the returned value was null, age.isNull() will return true. Whether empty
 string is null or not is more of a philosophical question (a topic for discussion
-in some other time and place); for the purpose of this document, suffice it to say 
-that different databases handle it differently and Poco::Data provides a way to 
+in some other time and place); for the purpose of this document, suffice it to say
+that different databases handle it differently and Poco::Data provides a way to
 tweak it to user's needs through folowing <[Session]> features:
 
   *emptyStringIsNull
   *forceEmptyString
-  
+
 So, if your database does not treat empty strings as null but you want Poco::Data
 to emulate such behavior, modify the session like this:
 
@@ -259,7 +263,7 @@ set it belongs to:
     std::vector<Person> people;
     Person pHomer, pLisa;
     int aHomer(42), aLisa(10), aBart(0);
-    
+
     session << "SELECT * FROM Person WHERE Age = ?; "
         "SELECT Age FROM Person WHERE FirstName = 'Bart'; "
         "SELECT * FROM Person WHERE Age = ?",
@@ -293,7 +297,7 @@ More on statements and manipulators in the chapters that follow.
 Most of the modern database systems support stored procedures and/or
 functions. Does Poco::Data provide any support there? You bet.
 While the specifics on what exactly is possible (e.g. the data types
-passed in and out, automatic or manual data binding, binding direction, 
+passed in and out, automatic or manual data binding, binding direction,
 etc.) is ultimately database dependent, POCO Data does it's
 best to provide reasonable access to such functionality through <[in]>,
 <[out]> and <[io]> binding functions. As their names imply, these
@@ -306,7 +310,7 @@ here's an Oracle ODBC example:
         " temp NUMBER := param1; "
         " BEGIN param1 := param2; param2 := temp; RETURN(param1+param2); "
         " END storedFunction;" , now;
-    
+
     int i = 1, j = 2, result = 0;
     session << "{? = call storedFunction(?, ?)}", out(result), io(i), io(j), now; // i = 2, j = 1, result = 3
 ----
@@ -322,10 +326,10 @@ Stored procedures are allowed to return data sets (a.k.a. cursors):
         " ret SYS_REFCURSOR; "
         "BEGIN "
         " OPEN ret FOR "
-        " SELECT *  FROM Person  WHERE Age < ageLimit; " 
+        " SELECT *  FROM Person  WHERE Age < ageLimit; "
         " RETURN ret; "
         "END storedCursorFunction;" , now;
-    
+
     session << "{call storedCursorFunction(?)}", in(age), into(people), now;
 ----
 
@@ -387,8 +391,8 @@ Here's how we control when to actually execute the statement:
 ----
 
 By calling <[execute]> we asserted that our query was executed and that
-the value was inserted. The check to <[stmt.done()]> simply guarantees that the 
-statement was fully completed. 
+the value was inserted. The check to <[stmt.done()]> simply guarantees that the
+statement was fully completed.
 
 
 
@@ -479,7 +483,7 @@ return value is because, for asynchronous statements, <[execute()]>
 always returns zero. This makes sense, because it does not know the
 number of returned rows (remember, asynchronous <[execute()]> call
 returns <[immediately]> and does not wait for the completion of the
-execution). 
+execution).
 
 !A Word of Warning
 
@@ -513,7 +517,7 @@ later during execution. Thus, one should never pass temporaries to <[use()]>:
 ----
 
 It is possible to use <[bind()]> instead of <[use()]>. The <[bind()]> call will always create a
-copy of the supplied argument. Also, it is possible to execute a statement returning 
+copy of the supplied argument. Also, it is possible to execute a statement returning
 data without supplying the storage and have the statement itself store the returned
 data for later retrieval through <[RecordSet]>. For details, see <[RecordSet]> chapter.
 
@@ -538,7 +542,7 @@ well-known source of many security problems in C and C++ code, do not
 worry. Poco::format() family of functions is <[safe]> (and, admittedly,
 slower than printf).
 
-For cases where this type of formatting is used with queries containing 
+For cases where this type of formatting is used with queries containing
 the percent sign, use double percent ("%%"):
 
     Statement stmt = (ses << "SELECT * FROM %s WHERE Name LIKE 'Simp%%'", "Person");
@@ -609,8 +613,8 @@ not!> be used in conjunction with <[out]> and <[io]> under any
 circumstances: <[std::vector<bool>]> . The details are beyond the scope
 of this manual. For those interested to learn more about it, there is an
 excellent explanation in S. Meyers book "Efective STL", Item 18 or Gotw
-#50, [[http://www.gotw.ca/gotw/050.htm When Is a Container Not a
-Container]] paragraph.
+#50, [[http://www.gotw.ca/gotw/050.htm When Is a Container Not a Container]]
+paragraph.
 
 
 !!!Tuples
@@ -696,13 +700,13 @@ object until <[statement.done()]> returns true.
 For the next example, we assume that our system knows about 101 forenames:
 
     std::vector<std::string> names;
-    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(names), limit(50)); 
+    Statement stmt = (ses << "SELECT NAME FROM FORENAME", into(names), limit(50));
     stmt.execute(); //names.size() == 50
     poco_assert (!stmt.done());
     stmt.execute(); //names.size() == 100
     poco_assert (!stmt.done());
     stmt.execute(); //names.size() == 101
-    poco_assert (stmt.done()); 
+    poco_assert (stmt.done());
 ----
 
 We previously stated that if no data is returned this is valid too. Thus, executing the following statement on an
@@ -750,14 +754,14 @@ off.
 
 The <[bulk]> keyword allows to boost performance for the connectors that
 support column-wise operation and arrays of values and/or parameters
-(e.g. ODBC). 
+(e.g. ODBC).
 Here's how to signal bulk insertion to the statement:
 
     std::vector<int> ints(100, 1);
     session << "INSERT INTO Test VALUES (?)", use(ints, bulk), now;
 ----
 
-The above code will execute a "one-shot" insertion into the target table. 
+The above code will execute a "one-shot" insertion into the target table.
 
 
 Selection in bulk mode looks like this:
@@ -771,8 +775,8 @@ size of data set we want to fetch, either explicitly as in the code
 above or implicitly, through size of the supplied container as in
 following example:
 
-std::vector<int> ints(100, 1);
-session << "SELECT * FROM Test", into(ints, bulk), now;
+    std::vector<int> ints(100, 1);
+    session << "SELECT * FROM Test", into(ints, bulk), now;
 ----
 
 For statements that generate their ow internal extraction storage (see
@@ -827,7 +831,7 @@ feature.
 !!! RecordSets, Iterators and Rows
 
 In all the examples so far the programmer had to supply the storage for
-data to be inserted or retrieved from a database. 
+data to be inserted or retrieved from a database.
 
 It is usually desirable to avoid that and let the framework take care of
 it, something like this:
@@ -840,16 +844,16 @@ No worries -- that's what the RecordSet class does:
     Statement select(session); // we need a Statement for later RecordSet creation
     select << "SELECT * FROM Person", now;
 
-    // create a RecordSet 
+    // create a RecordSet
     RecordSet rs(select);
     std::size_t cols = rs.columnCount();
 
     // print all column names
     for (std::size_t col = 0; col < cols; ++col)
         std::cout << rs.columnName(col) << std::endl;
-    
+
     // iterate over all rows and columns
-    for (RecordSet::Iterator it = rs.begin(); it != rs.end(); ++it) 
+    for (RecordSet::Iterator it = rs.begin(); it != rs.end(); ++it)
         std::cout << *it << " ";
 ----
 
@@ -889,7 +893,7 @@ used for sorting purposes. However, the sort criteria can be modified at
 runtime. For example, an additional field may be added to sort fields
 (think "... ORDER BY Name ASC, Age DESC"):
 
-    row.addSortField("Field1"); // now Field0 and Field1 are used for sorting 
+    row.addSortField("Field1"); // now Field0 and Field1 are used for sorting
     row.replaceSortField("Field0", "Field2");// now Field1 and Field2 are used for sorting
 ----
 
@@ -914,7 +918,7 @@ Valid storage type manipulators are:
 
 So, if neither data storage, nor storage type are explicitly specified,
 the data will internally be kept in standard deques. This can be changed
-through use of storage type manipulators. 
+through use of storage type manipulators.
 
 
 !!!Complex Data Types
@@ -930,19 +934,19 @@ Assume you have a class Person:
         // default constructor+destr.
         // getter and setter methods for all members
         // ...
-        
+
         bool operator <(const Person&amp; p) const
             /// we need this for set and multiset support
         {
             return _socialSecNr < p._socialSecNr;
         }
-        
+
         Poco::UInt64 operator()() const
             /// we need this operator to return the key for the map and multimap
         {
             return _socialSecNr;
         }
-        
+
     private:
         std::string _firstName;
         std::string _lastName;
@@ -953,12 +957,12 @@ Assume you have a class Person:
 Ideally, one would like to use a Person as simple as one used a string.
 All that is needed is a template specialization of the <[TypeHandler]>
 template. Note that template specializations must be declared in the
-<*same namespace*> as the original template, i.e. <[Poco::Data]>. 
+<*same namespace*> as the original template, i.e. <[Poco::Data]>.
 The template specialization must implement the following methods:
 
     namespace Poco {
     namespace Data {
-    
+
     template <>
     class TypeHandler<class Person>
     {
@@ -972,12 +976,12 @@ The template specialization must implement the following methods:
             TypeHandler<std::string>::bind(pos++, obj.getLastName(), pBinder, dir);
             TypeHandler<Poco::UInt64>::bind(pos++, obj.getSocialSecNr(), pBinder, dir);
         }
-    
+
         static std::size_t size()
         {
             return 3; // we handle three columns of the Table!
         }
-    
+
         static void prepare(std::size_t pos, const Person&amp; obj, AbstractPreparator::Ptr pPrepare)
         {
             poco_assert_dbg (!pPrepare.isNull());
@@ -987,7 +991,7 @@ The template specialization must implement the following methods:
             TypeHandler<std::string>::prepare(pos++, obj.getLastName(), pPrepare);
             TypeHandler<Poco::UInt64>::prepare(pos++, obj.getSocialSecNr(), pPrepare);
         }
-    
+
         static void extract(std::size_t pos, Person&amp; obj, const Person&amp; defVal, AbstractExtractor::Ptr pExt)
             /// obj will contain the result, defVal contains values we should use when one column is NULL
         {
@@ -1002,14 +1006,14 @@ The template specialization must implement the following methods:
             obj.setLastName(lastName);
             obj.setSocialSecNr(socialSecNr);
         }
-    
+
     private:
         TypeHandler();
         ~TypeHandler();
         TypeHandler(const TypeHandler&amp;);
         TypeHandler&amp; operator=(const TypeHandler&amp;);
     };
-    
+
     } } // namespace Poco::Data
 ----
 
@@ -1022,8 +1026,9 @@ working with a string:
 
 
 !!!Session Pooling
+
 Creating a connection to a database is often a time consuming
-operation. Therefore it makes sense to save a session object for 
+operation. Therefore it makes sense to save a session object for
 later reuse once it is no longer needed.
 
 A Poco::Data::SessionPool manages a collection of sessions.
@@ -1046,7 +1051,7 @@ Pooled sessions are automatically returned to the pool when the
 Session variable holding them is destroyed.
 
 One session pool, of course, holds sessions for one database
-connection. For sessions to multiple databases, there is 
+connection. For sessions to multiple databases, there is
 SessionPoolContainer:
 
     SessionPoolContainer spc;
@@ -1060,15 +1065,15 @@ SessionPoolContainer:
 
 This document provides an overview of the most important features
 offered by the POCO Data framework. The framework also supports LOB
-(specialized to BLOB and CLOB) type as well as Poco::DateTime binding. 
-The usage of these data types is no different than any C++ type, so we 
+(specialized to BLOB and CLOB) type as well as Poco::DateTime binding.
+The usage of these data types is no different than any C++ type, so we
 did not go into details here.
 
 The great deal of <[RecordSet]> and <[Row]> runtime "magic" is achieved
 through employment of Poco::Dynamic::Var, which is the POCO
 equivalent of dynamic language data type. Obviously, due to its nature,
 there is a run time performance penalty associated with Poco::Dynamic::Var,
-but the internal details are beyond the scope of this document. 
+but the internal details are beyond the scope of this document.
 
 POCO Data tries to provide a broad spectrum of functionality,
 with configurable efficiency/convenience ratio, providing a solid

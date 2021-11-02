@@ -75,7 +75,7 @@ void NetworkInterfaceTest::testMap()
 			std::cout << "=============" << std::endl << std::endl;
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -119,7 +119,7 @@ void NetworkInterfaceTest::testList()
 			std::cout << "==============" << std::endl << std::endl;
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -139,7 +139,7 @@ void NetworkInterfaceTest::testForName()
 			assertTrue (ifc.name() == it->second.name());
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -184,7 +184,7 @@ void NetworkInterfaceTest::testForAddress()
 			}
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -204,7 +204,7 @@ void NetworkInterfaceTest::testForIndex()
 			assertTrue (ifc.index() == it->second.index());
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -231,7 +231,7 @@ void NetworkInterfaceTest::testMapIpOnly()
 				std::cout << "MAC Address:" << mac << std::endl;
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -251,7 +251,7 @@ void NetworkInterfaceTest::testMapUpOnly()
 			assertTrue (it->second.isUp());
 		}
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -298,7 +298,7 @@ void NetworkInterfaceTest::testListMapConformance()
 
 		assertTrue (counter == l.size());
 	}
-	catch (Poco::NotImplementedException e)
+	catch (Poco::NotImplementedException&)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;

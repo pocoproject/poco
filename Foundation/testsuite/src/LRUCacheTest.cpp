@@ -221,6 +221,29 @@ void LRUCacheTest::testUpdate()
 }
 
 
+void LRUCacheTest::testForEach()
+{
+	LRUCache<int, int> aCache(3);
+
+	std::map<int, int> values;
+	aCache.add(1, 100);
+	aCache.add(2, 200);
+	aCache.add(3, 300);
+
+	aCache.forEach(
+		[&values](int key, int value)
+		{
+			values[key] = value;
+		}
+	);
+
+	assertEquals (values.size(), 3);
+	assertEquals (values[1], 100);
+	assertEquals (values[2], 200);
+	assertEquals (values[3], 300);
+}
+
+
 void LRUCacheTest::onUpdate(const void* pSender, const Poco::KeyValueArgs<int, int>& args)
 {
 	++updateCnt;
@@ -260,6 +283,7 @@ CppUnit::Test* LRUCacheTest::suite()
 	CppUnit_addTest(pSuite, LRUCacheTest, testCacheSizeN);
 	CppUnit_addTest(pSuite, LRUCacheTest, testDuplicateAdd);
 	CppUnit_addTest(pSuite, LRUCacheTest, testUpdate);
+	CppUnit_addTest(pSuite, LRUCacheTest, testForEach);
 
 	return pSuite;
 }

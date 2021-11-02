@@ -71,12 +71,12 @@ public:
 	void testJSONDeserializePrimitives();
 	void testJSONDeserializeArray();
 	void testJSONDeserializeStruct();
-	void testJSONRoundtripStruct(); 
+	void testJSONRoundtripStruct();
 	void testJSONDeserializeComplex();
 	void testDate();
+	void testUUID();
 	void testEmpty();
 	void testIterator();
-
 
 	void setUp();
 	void tearDown();
@@ -184,14 +184,29 @@ private:
 	void testContainerIterator()
 	{
 		C cont;
+		Poco::Dynamic::Var arr(cont);
+		int counter = 0;
+
+		// test empty
+		assertTrue (arr.size() == 0);
+		Poco::Dynamic::Var::Iterator it = arr.begin();
+		Poco::Dynamic::Var::Iterator end = arr.end();
+
+		for (; it != end; ++it)
+		{
+			*it = ++counter;
+		}
+		assertTrue(counter == 0);
+
+		// test non-empty
 		cont.push_back(1);
 		cont.push_back("2");
 		cont.push_back(3.5);
-		Poco::Dynamic::Var arr(cont);
+		arr = cont;
 		assertTrue (arr.size() == 3);
-		Poco::Dynamic::Var::Iterator it = arr.begin();
-		Poco::Dynamic::Var::Iterator end = arr.end();
-		int counter = 0;
+		it = arr.begin();
+		end = arr.end();
+		counter = 0;
 		for (; it != end; ++it)
 		{
 			switch (++counter)

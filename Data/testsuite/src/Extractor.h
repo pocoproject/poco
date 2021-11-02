@@ -100,8 +100,11 @@ public:
 	bool extract(std::size_t pos, Time& val);
 		/// Extracts a Time.
 
-	bool extract(std::size_t pos, Poco::DateTime& val);
+	bool extract(std::size_t pos, DateTime& val);
 		/// Extracts a DateTime.
+
+	bool extract(std::size_t pos, UUID& val);
+		/// Extracts a UUID.
 
 	bool isNull(std::size_t col, std::size_t row = -1);
 		/// Returns true if the current row value at pos column is null.

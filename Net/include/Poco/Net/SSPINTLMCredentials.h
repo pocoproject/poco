@@ -34,7 +34,7 @@ namespace Net {
 struct NTLMContextImpl;
 
 
-class NTLMContext
+class Net_API NTLMContext
 	/// An opaque context class for working with SSPI NTLM authentication.
 {
 public:
@@ -49,7 +49,7 @@ private:
 	NTLMContext();
 	NTLMContext(const NTLMContext&);
 	NTLMContext& operator = (const NTLMContext&);
-	
+
 	friend class SSPINTLMProvider;
 };
 

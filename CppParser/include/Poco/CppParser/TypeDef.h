@@ -37,7 +37,7 @@ public:
 		/// Destroys the TypeDef.
 
 	Symbol::Kind kind() const;
-	
+
 	std::string baseType() const;
 		/// Returns the underlying base type.
 };

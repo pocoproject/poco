@@ -55,6 +55,11 @@ if [ -d ${src}/testsuite ] ; then
 	mkdir -p ${dst}/testsuite
 	mkdir -p ${dst}/testsuite/src
 
+	if [ -d ${src}/testsuite/include ] ; then
+		mkdir -p ${dst}/testsuite/include
+		cp -R ${src}/testsuite/include/* ${dst}/testsuite/include >/dev/null 2>&1
+	fi
+
 	if [ -d ${src}/testsuite/data ] ; then
 		mkdir -p ${dst}/testsuite/data
 		cp -R ${src}/testsuite/data/* ${dst}/testsuite/data >/dev/null 2>&1

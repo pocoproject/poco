@@ -45,7 +45,9 @@ Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
 #define MYSQL_USER "pocotest"
 #define MYSQL_PWD  "pocotest"
 #define MYSQL_HOST "127.0.0.1"
+#ifndef MYSQL_PORT
 #define MYSQL_PORT 3306
+#endif
 #define MYSQL_DB   "pocotest"
 
 //
@@ -494,6 +496,15 @@ void MySQLTest::testDouble()
 }
 
 
+void MySQLTest::testUUID()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateUUIDsTable();
+	_pExecutor->uuids();
+}
+
+
 void MySQLTest::testTuple()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -777,6 +788,15 @@ void MySQLTest::recreateFloatsTable()
 }
 
 
+void MySQLTest::recreateUUIDsTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str CHAR(36))", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateUUIDsTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateUUIDsTable()"); }
+}
+
+
 void MySQLTest::recreateTuplesTable()
 {
 	dropTable("Tuples");
@@ -902,6 +922,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testUnsignedInts);
 	CppUnit_addTest(pSuite, MySQLTest, testFloat);
 	CppUnit_addTest(pSuite, MySQLTest, testDouble);
+	CppUnit_addTest(pSuite, MySQLTest, testUUID);
 	CppUnit_addTest(pSuite, MySQLTest, testTuple);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleVector);
 	CppUnit_addTest(pSuite, MySQLTest, testInternalExtraction);
