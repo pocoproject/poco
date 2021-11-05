@@ -108,6 +108,12 @@ Options:
   --mysql-include=<path>
     Specify the directory where MySQL header files are located.
 
+  --pgsql-lib=<path>
+    Specify the directory where PostgreSQL library is located.
+
+  --pgsql-include=<path>
+    Specify the directory where PostgreSQL header files are located.
+
   --cflags=<flags>
     Pass additional flags to compiler.
     Example: --cflags=-wall
@@ -189,6 +195,12 @@ while [ $# -ge 1 ]; do
 
 	--mysql-include=*)
 		mysqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
+
+	--pgsql-lib=*)
+ 		pgsqllib="`echo ${1} | awk '{print substr($0,13)}'`" ;;
+
+	--pgsql-include=*)
+		pgsqlinclude="`echo ${1} | awk '{print substr($0,17)}'`" ;;
 
 	--cflags=*)
 		flags="$flags `echo ${1} | awk '{print substr($0,10)}'`" ;;
@@ -322,16 +334,22 @@ if [ -n "$librarypath" ] ; then
 	echo "POCO_ADD_LIBRARY = $librarypath" >>$build/config.make
 fi
 if [ -n "$odbclib" ] ; then
-        echo "POCO_ODBC_LIB = $odbclib" >>$build/config.make
+	echo "POCO_ODBC_LIB = $odbclib" >>$build/config.make
 fi
 if [ -n "$odbcinclude" ] ; then
-        echo "POCO_ODBC_INCLUDE = $odbcinclude" >>$build/config.make
+	echo "POCO_ODBC_INCLUDE = $odbcinclude" >>$build/config.make
 fi
 if [ -n "$mysqllib" ] ; then
-        echo "POCO_MYSQL_LIB = $mysqllib" >>$build/config.make
+	echo "POCO_MYSQL_LIB = $mysqllib" >>$build/config.make
 fi
 if [ -n "$mysqlinclude" ] ; then
-        echo "POCO_MYSQL_INCLUDE = $mysqlinclude" >>$build/config.make
+	echo "POCO_MYSQL_INCLUDE = $mysqlinclude" >>$build/config.make
+fi
+if [ -n "$pgsqllib" ] ; then
+	echo "POCO_PGSQL_LIB = $pgsqllib" >>$build/config.make
+fi
+if [ -n "$pgsqlinclude" ] ; then
+	echo "POCO_PGSQL_INCLUDE = $pgsqlinclude" >>$build/config.make
 fi
 if [ -n "$unbundled" ] ; then
 	echo "POCO_UNBUNDLED = 1" >>$build/config.make
@@ -360,10 +378,22 @@ if [ -n "$librarypath" ] ; then
 	echo "export POCO_ADD_LIBRARY" >>$build/config.make
 fi
 if [ -n "$odbclib" ] ; then
-        echo "export POCO_ODBC_LIB" >>$build/config.make
+	echo "export POCO_ODBC_LIB" >>$build/config.make
 fi
 if [ -n "$odbcinclude" ] ; then
-        echo "export POCO_ODBC_INCLUDE" >>$build/config.make
+	echo "export POCO_ODBC_INCLUDE" >>$build/config.make
+fi
+if [ -n "$mysqllib" ] ; then
+	echo "export POCO_MYSQL_LIB" >>$build/config.make
+fi
+if [ -n "$mysqlinclude" ] ; then
+	echo "export POCO_MYSQL_INCLUDE" >>$build/config.make
+fi
+if [ -n "$pgsqllib" ] ; then
+	echo "export POCO_PGSQL_LIB" >>$build/config.make
+fi
+if [ -n "$pgsqlinclude" ] ; then
+	echo "export POCO_PGSQL_INCLUDE" >>$build/config.make
 fi
 if [ -n "$unbundled" ] ; then
 	echo "export POCO_UNBUNDLED" >>$build/config.make
