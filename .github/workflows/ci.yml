@@ -61,7 +61,7 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      - run: brew install openssl mysql-client unixodbc libpq
+      - run: brew install openssl@1.1.1l mysql-client unixodbc libpq
       - run: ./configure --everything --no-prefix --omit=PDF --odbc-include=/usr/local/opt/unixodbc/include --odbc-lib=/usr/local/opt/unixodbc/lib && make all -s -j4
       - run: >-
           sudo -s
@@ -73,7 +73,7 @@ jobs:
     runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
-      - run: brew install openssl mysql-client unixodbc libpq
+      - run: brew install openssl@1.1.1l mysql-client unixodbc libpq
       - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
