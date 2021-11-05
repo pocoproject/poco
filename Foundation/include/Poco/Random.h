@@ -14,7 +14,7 @@
 //
 //
 // Based on the FreeBSD random number generator.
-// src/lib/libc/stdlib/random.c,v 1.25 
+// src/lib/libc/stdlib/random.c,v 1.25
 //
 // Copyright (c) 1983, 1993
 // The Regents of the University of California.  All rights reserved.
@@ -91,16 +91,16 @@ public:
 
 	UInt32 next(UInt32 n);
 		/// Returns the next 31-bit pseudo random number modulo n.
-	
+
 	char nextChar();
 		/// Returns the next pseudo random character.
-	
+
 	bool nextBool();
 		/// Returns the next boolean pseudo random value.
-		
+
 	float nextFloat();
 		/// Returns the next float pseudo random number between 0.0 and 1.0.
-		
+
 	double nextDouble();
 		/// Returns the next double pseudo random number between 0.0 and 1.0.
 
@@ -146,16 +146,16 @@ inline bool Random::nextBool()
 	return (next() & 0x1000) != 0;
 }
 
-	
+
 inline float Random::nextFloat()
 {
-	return float(next()) / 0x7FFFFFFF;
+	return static_cast<float>(nextDouble());
 }
 
-	
+
 inline double Random::nextDouble()
 {
-	return double(next()) / 0x7FFFFFFF;
+	return static_cast<double>(next()) / static_cast<double>(0x7FFFFFFF);
 }
 
 

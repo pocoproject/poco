@@ -504,7 +504,7 @@ void ParserEngine::init()
 	XML_SetParamEntityParsing(_parser, _externalParameterEntities ? XML_PARAM_ENTITY_PARSING_ALWAYS : XML_PARAM_ENTITY_PARSING_NEVER);
 	XML_SetUnknownEncodingHandler(_parser, handleUnknownEncoding, this);
 
-#if XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4)
+#if defined(XML_DTD) && (XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
 	if (_maximumAmplificationFactor > 1.0)
 	{
 		XML_SetBillionLaughsAttackProtectionMaximumAmplification(_parser, _maximumAmplificationFactor);
