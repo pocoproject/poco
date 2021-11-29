@@ -1,5 +1,30 @@
 This is the changelog file for the POCO C++ Libraries.
 
+Release 1.11.1 (2021-11-05)
+===========================
+
+- Upgraded bundled PCRE to 8.45
+- Upgraded bundled SQLite to 3.36.0
+- GH #2823: error: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648
+- GH #2966: SocketReactor loads one core of CPU up to 100%
+- GH #3221: Crash reported on Windows in X509Certificate verification
+- GH #3330: Poco::Data::ODBC::ODBCStatementImpl causes crash
+- GH #3334: Fork error on tvOS and watchOS
+- GH #3335: XML error when build 1.11.0
+- GH #3344: [bug] MacOS bundle destination path is not set
+- GH #3345: fix cmake bundle
+- GH #3347: The definition POCO_NO_FORK_EXEC is not respected or something like this
+- GH #3353: fix fork option
+- GH #3360: Add POCO_PGSQL_{INCLUDE,LIB} variables
+- GH #3363: Fixed compilation error with MongoDB::Connection and Util::Application
+- GH #3377: Updates comments for windows
+- GH #3381: DNS::hostByAddress not thread-safe
+- GH #3397: Fix crash due to X.509 certificates with Subject Alternative Name other than DNS Host
+- GH #3400: fix std::localtime not thread safe
+- GH #3414: fix missing expat definition
+- GH #3425: Fixed suspend/resumeEvents pair in DirectoryWatcher
+
+
 Release 1.11.0 (2021-06-28)
 ===========================
 

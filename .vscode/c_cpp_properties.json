@@ -16,6 +16,7 @@
 			"${POCO_BASE}/Data/ODBC/include",
 			"${POCO_BASE}/Data/MySQL/include",
 			"${POCO_BASE}/Data/PostgreSQL/include",
+      "${POCO_BASE}/ActiveRecord/include",
 			"${POCO_BASE}/Zip/include",
 			"${POCO_BASE}/CppParser/include",
 			"${POCO_BASE}/JWT/include",
