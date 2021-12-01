@@ -61,6 +61,10 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
+if(BROKEN_MYSQL_RESET)
+	add_definitions(-DBROKEN_MYSQL_RESET=1)
+endif()
+
 if(POCO_STATIC)
 	message(WARNING "POCO_STATIC has been deprecated. Please use BUILD_SHARED_LIBS=NO to build static libraries.")
 	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
