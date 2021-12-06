@@ -79,6 +79,7 @@ public:
 	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
+	void testLongText();
 
 	void testUnsignedInts();
 	void testFloat();
@@ -115,6 +116,7 @@ private:
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
+	void recreatePersonLongTextTable();
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();

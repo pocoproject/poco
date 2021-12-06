@@ -83,6 +83,7 @@ public:
 	void dateTime();
 	void date();
 	void time();
+	void longText();
 	void unsignedInts();
 	void floats();
 	void doubles();

@@ -1412,6 +1412,36 @@ void SQLExecutor::blobStmt()
 }
 
 
+void SQLExecutor::longText()
+{
+	std::string funct = "longText()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string biography(
+		"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+		"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
+		"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. "
+		"Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+
+	int count = 0;
+	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(biography));
+	ins.execute();
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (count == 1);
+
+	std::string res;
+	poco_assert (res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Biography FROM Person", into(res));
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	poco_assert (res == biography);
+}
+
+
 void SQLExecutor::tuples()
 {
 	typedef Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> TupleType;
