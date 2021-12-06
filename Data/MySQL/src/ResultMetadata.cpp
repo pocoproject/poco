@@ -171,7 +171,6 @@ void ResultMetadata::init(MYSQL_STMT* stmt)
 	for (std::size_t i = 0; i < count; i++)
 	{
 		std::size_t size = fieldSize(fields[i]);
-		if (size == 0xFFFFFFFF) size = 0;
 
 		_columns.push_back(MetaColumn(
 			i,                               // position
