@@ -35,6 +35,7 @@
 #include <deque>
 #include <utility>
 #include <memory>
+#include <iostream>
 
 
 namespace Poco {
@@ -104,7 +105,7 @@ public:
 		/// Default is removal of all scheduled functions.
 
 	int permanentWork();
-		/// Returns the number of scheduled functions.
+		/// Returns the number of permanent functions.
 
 	int removePermanentWork(int count = -1);
 		/// Removes the count permanent functions
@@ -187,8 +188,17 @@ public:
 	void addSend(Socket sock, Buffer&& message, Callback&& onCompletion);
 		/// Adds the stream socket and the completion handler to the I/O send queue.
 
+	bool hasSocketHandlers() const;
+		/// Returns true if proactor had at least one I/O completion handler.
+
 	bool has(const Socket& sock) const;
 		/// Returns true if socket is registered with this proactor.
+
+	bool isRunning() const;
+		/// Returns true if this proactor is running
+
+	bool ioCompletionInProgress() const;
+		/// Returns true if there are not executed handlers from last IO..
 
 private:
 	void onShutdown();
@@ -204,7 +214,6 @@ private:
 	typedef Poco::Mutex MutexType;
 	typedef MutexType::ScopedLock ScopedLock;
 
-	bool hasSocketHandlers();
 	static const long DEFAULT_MAX_TIMEOUT_MS = 250;
 
 	struct Handler
@@ -300,6 +309,11 @@ private:
 			_nq.wakeUpAll();
 		}
 
+		int queueSize() const
+		{
+			return _nq.size();
+		}
+
 	private:
 		bool runOne()
 			/// Runs the next I/O completion handler in the queue.
@@ -325,7 +339,6 @@ private:
 				{
 					ErrorHandler::handle();
 				}
-
 			}
 			return false;
 		}
@@ -423,6 +436,7 @@ private:
 
 	Worker& worker();
 
+	std::atomic<bool> _isRunning;
 	std::atomic<bool> _isStopped;
 	std::atomic<bool> _stop;
 	long              _timeout;
@@ -470,6 +484,12 @@ inline void SocketProactor::enqueueIONotification(Callback&& onCompletion, int n
 				std::move(onCompletion), n,
 				std::error_code(err, std::generic_category())));
 	}
+}
+
+
+inline bool SocketProactor::isRunning() const
+{
+	return _isRunning;
 }
 
 

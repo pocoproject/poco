@@ -230,6 +230,7 @@ const Timestamp::TimeDiff SocketProactor::PERMANENT_COMPLETION_HANDLER =
 
 
 SocketProactor::SocketProactor(bool worker):
+	_isRunning(false),
 	_isStopped(false),
 	_stop(false),
 	_timeout(0),
@@ -242,6 +243,7 @@ SocketProactor::SocketProactor(bool worker):
 
 
 SocketProactor::SocketProactor(const Poco::Timespan& timeout, bool worker):
+	_isRunning(false),
 	_isStopped(false),
 	_stop(false),
 	_timeout(0),
@@ -569,6 +571,7 @@ void SocketProactor::receiveFrom(SocketImpl& sock, IOHandlerIt& it, int availabl
 {
 	Buffer *pBuf = (*it)->_pBuf;
 	SocketAddress *pAddr = (*it)->_pAddr;
+	SocketAddress addr = *pAddr;
 	poco_check_ptr(pBuf);
 	if (pBuf->size() < available) pBuf->resize(available);
 	int n = 0, err = 0;
@@ -652,13 +655,17 @@ void SocketProactor::run()
 	int handled = 0;
 	if (!_isStopped) _stop = false;
 	_isStopped = false;
-	while(!_stop)
+	while (!_stop)
+	{
 		this->sleep(poll(&handled) || handled);
+		_isRunning = true;
+	}
+	_isRunning = false;
 	onShutdown();
 }
 
 
-bool SocketProactor::hasSocketHandlers()
+bool SocketProactor::hasSocketHandlers() const
 {
 	if (_readHandlers.size() || _writeHandlers.size())
 		return true;
@@ -747,6 +754,12 @@ int SocketProactor::removePermanentWork(int count)
 bool SocketProactor::has(const Socket& sock) const
 {
 	return _pollSet.has(sock);
+}
+
+
+bool SocketProactor::ioCompletionInProgress() const
+{
+	return _ioCompletion.queueSize();
 }
 
 
