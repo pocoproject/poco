@@ -96,7 +96,12 @@ std::string EnvironmentImpl::osDisplayNameImpl()
 		switch (vi.dwMinorVersion)
 		{
 		case 0:
-			return vi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016";
+			if (vi.dwBuildNumber >= 22000)
+				return "Windows 11";
+			else if (vi.dwBuildNumber == 20348 && vi.wProductType != VER_NT_WORKSTATION)
+				return "Windows Server 2022";
+			else
+				return vi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016";
 		}
 	case 6:
 		switch (vi.dwMinorVersion)
