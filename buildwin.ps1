@@ -4,7 +4,7 @@
 # Usage:
 # ------
 # buildwin.ps1 [-poco_base    dir]
-#              [-vs           140 | 150 | 160]
+#              [-vs           140 | 150 | 160 | 170]
 #              [-action       build | rebuild | clean]
 #              [-linkmode     shared | static_mt | static_md | all]
 #              [-config       release | debug | both]
@@ -25,7 +25,7 @@ Param
   [string] $poco_base,
 
   [Parameter()]
-  [ValidateSet(140, 150, 160)]
+  [ValidateSet(140, 150, 160, 170)]
   [int] $vs = 140,
 
   [Parameter()]
@@ -89,6 +89,10 @@ function Add-VSCOMNTOOLS([int] $vsver)
 		{
 			$range='[16.0,17.0)'
 		}
+		if ($vsver -eq 170)
+		{
+			$range='[17.0,18.0)'
+		}
 		
 		$installationPath = Get-VSSetupInstance | Select-VSSetupInstance -Version $range -Latest -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 | select InstallationPath
 		$vscomntools = $installationPath.psobject.properties.Value;
@@ -102,7 +106,11 @@ function Add-VSCOMNTOOLS([int] $vsver)
 			set-item -force -path "ENV:VS160COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
 			Write-Host "`nVS160COMNTOOLS=$env:VS160COMNTOOLS" -ForegroundColor Yellow
 		}
-		
+		if ($vsver -eq 170)
+		{
+			set-item -force -path "ENV:VS170COMNTOOLS"  -value "$vscomntools\Common7\Tools\"
+			Write-Host "`nVS170COMNTOOLS=$env:VS170COMNTOOLS" -ForegroundColor Yellow
+		}
 	}
 }
 
@@ -163,16 +171,25 @@ function Set-Environment
     $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
     $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\15.0\Bin\MSBuild.exe"
   } else {
-  if ($vs -eq 160)
-  {
-    $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
-    $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\Current\Bin\MSBuild.exe"
+    if ($vs -eq 160)
+    {
+      $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
+      $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\Current\Bin\MSBuild.exe"
+    }
+    else
+    {
+      if ($vs -eq 170)
+      {
+        $Command = Resolve-Path "$($vsdir)\..\..\VC\Auxiliary\Build\vcvarsall.bat"
+        $script:msbuild_exe = Resolve-Path "$($vsdir)\..\..\MSBuild\Current\Bin\MSBuild.exe"
+      }
+      else
+      {
+        $Command = Resolve-Path "$($vsdir)\..\..\VC\vcvarsall.bat"
+        $script:msbuild_exe = "MSBuild.exe"
+      }
+    }
   }
-  else
-  {
-    $Command = Resolve-Path "$($vsdir)\..\..\VC\vcvarsall.bat"
-    $script:msbuild_exe = "MSBuild.exe"
-  }}
 
   $tempFile = [IO.Path]::GetTempFileName()
   cmd /c " `"$Command`" $CommandArg && set > `"$tempFile`" "
@@ -193,7 +210,7 @@ function Process-Input
     Write-Host 'Usage:'
     Write-Host '------'
     Write-Host 'buildwin.ps1 [-poco_base    <dir>]'
-    Write-Host '             [-vs           140 | 150 | 160]'
+    Write-Host '             [-vs           140 | 150 | 160 | 170]'
     Write-Host '             [-action       build | rebuild | clean]'
     Write-Host '             [-linkmode     shared | static_mt | static_md | all]'
     Write-Host '             [-config       release | debug | both]'
