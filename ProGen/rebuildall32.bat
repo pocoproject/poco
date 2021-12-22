@@ -14,6 +14,8 @@ rd /q /s lib bin     & call buildwin 110 rebuild all both Win32 samples tests ms
 rd /q /s lib bin     & call buildwin 120 rebuild all both Win32 samples tests msbuild > ProGen\log\120.x32.log 2>&1
 rd /q /s lib bin     & call buildwin 140 rebuild all both Win32 samples tests msbuild > ProGen\log\140.x32.log 2>&1
 rd /q /s lib bin     & call buildwin 150 rebuild all both Win32 samples tests msbuild > ProGen\log\150.x32.log 2>&1
+rd /q /s lib bin     & call buildwin 160 rebuild all both Win32 samples tests msbuild > ProGen\log\160.x32.log 2>&1
+rd /q /s lib bin     & call buildwin 170 rebuild all both Win32 samples tests msbuild > ProGen\log\170.x32.log 2>&1
 popd
 :exit
 endlocal

@@ -14,6 +14,8 @@ rd /q /s lib64 bin64 & call buildwin 110 rebuild all both x64   samples tests ms
 rd /q /s lib64 bin64 & call buildwin 120 rebuild all both x64   samples tests msbuild > ProGen\log\120.x64.log 2>&1
 rd /q /s lib64 bin64 & call buildwin 140 rebuild all both x64   samples tests msbuild > ProGen\log\140.x64.log 2>&1
 rd /q /s lib64 bin64 & call buildwin 150 rebuild all both x64   samples tests msbuild > ProGen\log\150.x64.log 2>&1
+rd /q /s lib64 bin64 & call buildwin 160 rebuild all both x64   samples tests msbuild > ProGen\log\160.x64.log 2>&1
+rd /q /s lib64 bin64 & call buildwin 170 rebuild all both x64   samples tests msbuild > ProGen\log\170.x64.log 2>&1
 popd
 :exit
 endlocal
