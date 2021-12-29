@@ -221,7 +221,7 @@ private:
 
 using BLOB = LOB<unsigned char>;
 using CLOB = LOB<char>;
-
+using JSON = std::string;
 
 //
 // inlines

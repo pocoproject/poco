@@ -71,6 +71,7 @@ namespace
 		case MYSQL_TYPE_MEDIUM_BLOB:
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
+		case MYSQL_TYPE_JSON:
 			return field.length;
 
 		default:
@@ -128,6 +129,8 @@ namespace
 		case MYSQL_TYPE_LONG_BLOB:
 		case MYSQL_TYPE_BLOB:
 			return Poco::Data::MetaColumn::FDT_BLOB;
+		case MYSQL_TYPE_JSON:
+			return Poco::Data::MetaColumn::FDT_JSON;
 		default:
 			return Poco::Data::MetaColumn::FDT_UNKNOWN;
 		}
