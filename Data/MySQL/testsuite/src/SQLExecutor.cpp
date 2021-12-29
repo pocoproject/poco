@@ -1460,6 +1460,31 @@ void SQLExecutor::longBlob()
 	poco_assert (res == biography);
 }
 
+void SQLExecutor::json()
+{
+	std::string funct = "json()";
+	std::string lastName("lastname");
+	std::string firstName("firstname");
+	std::string address("Address");
+	std::string biography(R"({"biography": {"count": 42, "title": "Lorem Ipsum", "released": true}})");
+
+	int count = 0;
+	Statement ins = (*_pSession << "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(biography));
+	ins.execute();
+	try { *_pSession << "SELECT COUNT(*) FROM Person", into(count), now; }
+	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail(funct); }
+	assertTrue(count == 1);
+
+	Poco::Data::JSON res;
+	poco_assert(res.size() == 0);
+	Statement stmt = (*_pSession << "SELECT Biography FROM Person", into(res));
+	try { stmt.execute(); }
+	catch (ConnectionException& ce) { std::cout << ce.displayText() << std::endl; fail(funct); }
+	catch (StatementException& se) { std::cout << se.displayText() << std::endl; fail(funct); }
+	poco_assert(res == biography);
+}
+
 
 void SQLExecutor::tuples()
 {
