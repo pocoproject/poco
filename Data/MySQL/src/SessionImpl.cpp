@@ -14,6 +14,7 @@
 
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
+#include "Poco/Data/MySQL/Utility.h"
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
@@ -255,7 +256,11 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	std::string isolation;
-	getSetting("tx_isolation", isolation);
+	unsigned long version = Utility::serverVersion(_handle);
+	if (version >= 80000)
+		getSetting("transaction_isolation", isolation);
+	else
+		getSetting("tx_isolation", isolation);
 	Poco::replaceInPlace(isolation, "-", " ");
 	if (MYSQL_READ_UNCOMMITTED == isolation)
 		return Session::TRANSACTION_READ_UNCOMMITTED;
