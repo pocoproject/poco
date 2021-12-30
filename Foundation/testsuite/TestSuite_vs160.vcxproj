@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|ARM64">
@@ -261,6 +261,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|ARM64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>bin64\</OutDir>
+    <IntDir>obj64\TestSuite\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|Win32'">
     <OutDir>bin\</OutDir>
@@ -274,6 +276,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|ARM64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>bin64\</OutDir>
+    <IntDir>obj64\TestSuite\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|Win32'">
     <OutDir>bin\static_mt\</OutDir>
@@ -287,6 +291,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|ARM64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>bin64\static_mt\</OutDir>
+    <IntDir>obj64\TestSuite\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|Win32'">
     <OutDir>bin\static_mt\</OutDir>
@@ -300,6 +306,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|ARM64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>bin64\static_mt\</OutDir>
+    <IntDir>obj64\TestSuite\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|Win32'">
     <OutDir>bin\static_md\</OutDir>
@@ -313,6 +321,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|ARM64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>bin64\static_md\</OutDir>
+    <IntDir>obj64\TestSuite\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|Win32'">
     <OutDir>bin\static_md\</OutDir>
@@ -326,6 +336,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|ARM64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>bin64\static_md\</OutDir>
+    <IntDir>obj64\TestSuite\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|Win32'">
     <ClCompile>

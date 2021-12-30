@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_shared|ARM64">
@@ -320,8 +320,15 @@
     <OutDir>bin64\</OutDir>
     <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|ARM64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|ARM64'">
+    <OutDir>bin64\</OutDir>
+    <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
+    <OutDir>bin64\static_md\</OutDir>
+    <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|ARM64'">
     <OutDir>bin64\static_md\</OutDir>
     <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -329,7 +336,15 @@
     <OutDir>bin64\static_mt\</OutDir>
     <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|ARM64'">
+    <OutDir>bin64\static_mt\</OutDir>
+    <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
+    <OutDir>bin64\</OutDir>
+    <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|ARM64'">
     <OutDir>bin64\</OutDir>
     <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -337,7 +352,15 @@
     <OutDir>bin64\static_md\</OutDir>
     <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|ARM64'">
+    <OutDir>bin64\static_md\</OutDir>
+    <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|x64'">
+    <OutDir>bin64\static_mt\</OutDir>
+    <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|ARM64'">
     <OutDir>bin64\static_mt\</OutDir>
     <IntDir>obj64\TestApp\$(Configuration)\</IntDir>
   </PropertyGroup>

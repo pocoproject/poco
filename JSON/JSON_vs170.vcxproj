@@ -283,6 +283,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_shared|ARM64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\bin64\</OutDir>
+    <IntDir>obj64\JSON\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|x64'">
     <OutDir>..\bin64\</OutDir>
@@ -291,8 +293,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_shared|ARM64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\bin64\</OutDir>
+    <IntDir>obj64\JSON\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|x64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\JSON\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_mt|ARM64'">
     <OutDir>..\lib64\</OutDir>
     <IntDir>obj64\JSON\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -300,11 +308,23 @@
     <OutDir>..\lib64\</OutDir>
     <IntDir>obj64\JSON\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_mt|ARM64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\JSON\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|x64'">
     <OutDir>..\lib64\</OutDir>
     <IntDir>obj64\JSON\$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_static_md|ARM64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\JSON\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|x64'">
+    <OutDir>..\lib64\</OutDir>
+    <IntDir>obj64\JSON\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_static_md|ARM64'">
     <OutDir>..\lib64\</OutDir>
     <IntDir>obj64\JSON\$(Configuration)\</IntDir>
   </PropertyGroup>
