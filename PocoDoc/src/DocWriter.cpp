@@ -795,7 +795,7 @@ void DocWriter::writeNavigationFrame(std::ostream& ostr, const std::string& grou
 		query += item;
 	}
 	ostr << "<div id=\"navigation\">\n";
-	ostr << "<iframe src=\"navigation.html" << query << "\" onload=\"iFrameResize(this);\" scrolling=\"no\"></iframe>\n";
+	ostr << "<iframe sandbox src=\"navigation.html" << query << "\" onload=\"iFrameResize(this);\" scrolling=\"no\"></iframe>\n";
 	ostr << "</div>\n";
 }
 
