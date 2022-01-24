@@ -88,7 +88,8 @@ protected:
 	AbstractBinding::BinderPtr binder();
 		/// Returns the concrete binder used by the statement.
 
-    void execDirectImpl(std::string query);
+	void execDirectImpl(const std::string& query);
+		/// Execute query directly impl
 
 	std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.

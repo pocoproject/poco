@@ -136,25 +136,25 @@ std::size_t Statement::execute(bool reset)
 	else throw InvalidAccessException("Statement still executing.");
 }
 
-void Statement::executeDirect(const std::string &query)
+void Statement::executeDirect(const std::string& query)
 {
-    Mutex::ScopedLock lock(_mutex);
-    bool isDone = done();
-    if (initialized() || paused() || isDone)
-    {
+	Mutex::ScopedLock lock(_mutex);
+	bool isDone = done();
+	if (initialized() || paused() || isDone)
+	{
 
-        if (!isAsync())
-        {
-            if (isDone) _pImpl->reset();
-            return _pImpl->executeDirect(query);
-        }
-//        else
-//        {
-//            doAsyncExec();
-//            return;
-//        }
-    }
-    else throw InvalidAccessException("Statement still executing.");
+		if (!isAsync())
+		{
+			if (isDone) _pImpl->reset();
+			return _pImpl->executeDirect(query);
+		}
+//		else
+//		{
+//          doAsyncExec();
+//          return;
+//		}
+	}
+	else throw InvalidAccessException("Statement still executing.");
 }
 
 

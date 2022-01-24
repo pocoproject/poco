@@ -133,7 +133,8 @@ public:
 		/// this execution step. When reset is false, data is appended to the
 		/// bound containers during multiple execute calls.
 
-    void executeDirect(const std::string &query);
+	void executeDirect(const std::string& query);
+		/// Execute query directly.
 
 	void reset();
 		/// Resets the statement, so that we can reuse all bindings and re-execute again.
@@ -201,7 +202,8 @@ protected:
 	virtual void bindImpl() = 0;
 		/// Binds parameters.
 
-    virtual void execDirectImpl(std::string query);
+	virtual void execDirectImpl(const std::string& query);
+		/// Execute query directly.
 
 	virtual AbstractExtraction::ExtractorPtr extractor() = 0;
 		/// Returns the concrete extractor used by the statement.
