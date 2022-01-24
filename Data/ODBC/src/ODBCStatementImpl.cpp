@@ -228,6 +228,16 @@ void ODBCStatementImpl::bindImpl()
 	_pBinder->synchronize();
 }
 
+void ODBCStatementImpl::execDirectImpl(std::string query)
+{
+    auto data=&query.at(0);
+    SQLCHAR * statementText=reinterpret_cast<unsigned char*>(data);
+    SQLINTEGER textLength=query.size();
+    SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);
+
+    checkError(rc, "SQLExecute()");
+}
+
 
 void ODBCStatementImpl::putData()
 {
