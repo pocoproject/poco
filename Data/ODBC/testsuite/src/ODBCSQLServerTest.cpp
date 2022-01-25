@@ -148,6 +148,21 @@ void ODBCSQLServerTest::testBareboneODBC()
 	executor().bareboneODBCMultiResultTest(dbConnString(), tableCreateString, SQLExecutor::PB_AT_EXEC, SQLExecutor::DE_BOUND);
 }
 
+void ODBCSQLServerTest::testTempTable()
+{
+	session() << "IF(OBJECT_ID('tempdb..#test') is not null) drop table #test;", now;
+
+	std::string query("create table #test (s1 int,s2 int ,s3 int);");
+	Statement stmt(session());
+	stmt.executeDirect(query);
+	session() << "insert into #test select 1,2,3;", now;
+
+	typedef Poco::Tuple<int, int, int> testParam;
+	std::vector<testParam> testParams;
+	session() << ("select * from #test;"), into(testParams), now;
+
+	assertEquals(1, testParams.size());
+}
 
 void ODBCSQLServerTest::testBLOB()
 {
