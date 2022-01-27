@@ -230,9 +230,8 @@ void ODBCStatementImpl::bindImpl()
 
 void ODBCStatementImpl::execDirectImpl(const std::string& query)
 {
-	auto data = query;
-	SQLCHAR * statementText=reinterpret_cast<unsigned char*>(&data.at(0));
-	SQLINTEGER textLength=query.size();
+	SQLCHAR * statementText = (SQLCHAR*) query.c_str();
+	SQLINTEGER textLength = query.size();
 	SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);
 
 	checkError(rc, "SQLExecute()");

@@ -109,12 +109,14 @@ std::size_t StatementImpl::execute(const bool& reset)
 
 void StatementImpl::executeDirect(const std::string &query)
 {
-    if (!_rSession.isConnected())
-    {
-        _state = ST_DONE;
-        throw NotConnectedException(_rSession.connectionString());
-    }
-    execDirectImpl(query);
+	if (!_rSession.isConnected())
+	{
+		_state = ST_DONE;
+		throw NotConnectedException(_rSession.connectionString());
+	}
+	_ostr.str("");
+	_ostr << query;
+	execDirectImpl(_ostr.str());
 }
 
 
