@@ -201,8 +201,11 @@ Option& Option::binding(const std::string& propertyName)
 Option& Option::binding(const std::string& propertyName, AbstractConfiguration* pConfig)
 {
 	_binding = propertyName;
-	_pConfig = pConfig;
-	if (_pConfig) _pConfig->duplicate();
+	if (pConfig != _pConfig)
+	{
+		_pConfig = pConfig;
+		if (_pConfig) _pConfig->duplicate();
+	}
 	return *this;
 }
 

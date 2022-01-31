@@ -29,6 +29,10 @@ public:
 	void testMatches2();
 	void testProcess1();
 	void testProcess2();
+	void testBindingRefCountingSingleBind();
+	void testBindingRefCountingCopyWithBinding();
+	void testBindingRefCountingMultipleBinds1();
+	void testBindingRefCountingMultipleBinds2();
 
 	void setUp();
 	void tearDown();
