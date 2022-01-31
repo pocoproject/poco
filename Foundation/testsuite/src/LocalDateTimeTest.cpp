@@ -447,6 +447,35 @@ void LocalDateTimeTest::testTimezone()
 #endif
 }
 
+void LocalDateTimeTest::testTimezone2()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::vector<std::string> timezones = {
+		"/usr/share/zoneinfo/America/Los_Angeles",
+		"/usr/share/zoneinfo/Europe/London",
+		"/usr/share/zoneinfo/Europe/Dublin", // special winter time of Ireland
+		"/usr/share/zoneinfo/Europe/Prague",
+	};
+
+	std::cout << "\n";
+
+	for (const std::string& tz : timezones) {
+		setenv("TZ", tz.c_str(), 1); // POSIX-specific
+		std::vector<LocalDateTime> times = {
+			LocalDateTime(2022, 06, 29), // summer period
+			LocalDateTime(2022, 01, 29), // winter period
+		};
+		for (const LocalDateTime& ldt : times) {
+			std::time_t t = ldt.timestamp().epochTime();
+			std::tm then;
+			then = *std::localtime(&t);
+			assertTrue (then.tm_gmtoff == ldt.tzd());
+		}
+		unsetenv("TZ");
+	}
+#endif
+}
+
 
 void LocalDateTimeTest::setUp()
 {
@@ -473,6 +502,7 @@ CppUnit::Test* LocalDateTimeTest::suite()
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testArithmetics2);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testSwap);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone);
+	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone2);
 
 	return pSuite;
 }
