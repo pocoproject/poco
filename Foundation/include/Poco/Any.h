@@ -522,10 +522,10 @@ ValueType AnyCast(Any& operand)
 	if (!result)
 	{
 		std::string s = "RefAnyCast: Failed to convert between Any types ";
-		if (operand._pHolder)
+		if (operand._valueHolder.content())
 		{
 			s.append(1, '(');
-			s.append(operand._pHolder->type().name());
+			s.append(operand._valueHolder.content()->type().name());
 			s.append(" => ");
 			s.append(typeid(ValueType).name());
 			s.append(1, ')');
@@ -564,10 +564,10 @@ const ValueType& RefAnyCast(const Any & operand)
 	if (!result)
 	{
 		std::string s = "RefAnyCast: Failed to convert between Any types ";
-		if (operand._pHolder)
+		if (operand._valueHolder.content())
 		{
 			s.append(1, '(');
-			s.append(operand._pHolder->type().name());
+			s.append(operand._valueHolder.content()->type().name());
 			s.append(" => ");
 			s.append(typeid(ValueType).name());
 			s.append(1, ')');
@@ -589,10 +589,10 @@ ValueType& RefAnyCast(Any& operand)
 	if (!result)
 	{
 		std::string s = "RefAnyCast: Failed to convert between Any types ";
-		if (operand._pHolder)
+		if (operand._valueHolder.content())
 		{
 			s.append(1, '(');
-			s.append(operand._pHolder->type().name());
+			s.append(operand._valueHolder.content()->type().name());
 			s.append(" => ");
 			s.append(typeid(ValueType).name());
 			s.append(1, ')');
