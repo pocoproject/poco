@@ -1,4 +1,4 @@
-/* 8539b9040d9d901366a62560a064af7cb99811335784b363abc039c5b0ebc416 (2.4.1+)
+/* 2e2c8ce5f11a473d65ec313ab20ceee6afefb355f5405afc06e7204e2e41c8c0 (2.4.4+)
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -32,6 +32,8 @@
    Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
    Copyright (c) 2019-2020 Ben Wagner <bungeman@chromium.org>
    Copyright (c) 2019      Vadim Zeitlin <vadim@zeitlins.org>
+   Copyright (c) 2021      Dong-hee Na <donghee.na@python.org>
+   Copyright (c) 2022      Samanta Navarro <ferivoz@riseup.net>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -2086,6 +2088,11 @@ XML_GetBuffer(XML_Parser parser, int len) {
     keep = (int)EXPAT_SAFE_PTR_DIFF(parser->m_bufferPtr, parser->m_buffer);
     if (keep > XML_CONTEXT_BYTES)
       keep = XML_CONTEXT_BYTES;
+    /* Detect and prevent integer overflow */
+    if (keep > INT_MAX - neededSize) {
+      parser->m_errorCode = XML_ERROR_NO_MEMORY;
+      return NULL;
+    }
     neededSize += keep;
 #endif /* defined XML_CONTEXT_BYTES */
     if (neededSize
@@ -3996,7 +4003,7 @@ initializeEncoding(XML_Parser parser) {
   const char *s;
 #ifdef XML_UNICODE
   char encodingBuf[128];
-  /* See comments abount `protoclEncodingName` in parserInit() */
+  /* See comments about `protocolEncodingName` in parserInit() */
   if (! parser->m_protocolEncodingName)
     s = NULL;
   else {
@@ -5256,7 +5263,7 @@ doProlog(XML_Parser parser, const ENCODING *enc, const char *s, const char *end,
       if (dtd->in_eldecl) {
         ELEMENT_TYPE *el;
         const XML_Char *name;
-        int nameLen;
+        size_t nameLen;
         const char *nxt
             = (quant == XML_CQUANT_NONE ? next : next - enc->minBytesPerChar);
         int myindex = nextScaffoldPart(parser);
@@ -5272,7 +5279,13 @@ doProlog(XML_Parser parser, const ENCODING *enc, const char *s, const char *end,
         nameLen = 0;
         for (; name[nameLen++];)
           ;
-        dtd->contentStringLen += nameLen;
+
+        /* Detect and prevent integer overflow */
+        if (nameLen > UINT_MAX - dtd->contentStringLen) {
+          return XML_ERROR_NO_MEMORY;
+        }
+
+        dtd->contentStringLen += (unsigned)nameLen;
         if (parser->m_elementDeclHandler)
           handleDefault = XML_FALSE;
       }
