@@ -60,7 +60,7 @@ namespace Crypto {
 
 Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 Poco::AtomicCounter OpenSSLInitializer::_rc;
-#if OPENSSL_VERSION_NUMBER >= 0x0907000L
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(0);
 OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
 #endif
