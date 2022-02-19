@@ -191,7 +191,7 @@
 	#else
 		#define POCO_ARCH_LITTLE_ENDIAN 1
 	#endif
-#elif defined(__arm64__) || defined(__arm64)
+#elif defined(__arm64__) || defined(__arm64) || defined(_M_ARM64)
 	#define POCO_ARCH POCO_ARCH_ARM64
 	#if defined(__ARMEB__)
 		#define POCO_ARCH_BIG_ENDIAN 1
