@@ -492,6 +492,8 @@
 				<File
 					RelativePath=".\src\LayeredConfigurationTest.h"/>
 				<File
+					RelativePath=".\src\LocalConfigurationTest.h"/>
+				<File
 					RelativePath=".\src\LoggingConfiguratorTest.h"/>
 				<File
 					RelativePath=".\src\MapConfigurationTest.h"/>
@@ -520,6 +522,8 @@
 					RelativePath=".\src\JSONConfigurationTest.cpp"/>
 				<File
 					RelativePath=".\src\LayeredConfigurationTest.cpp"/>
+				<File
+					RelativePath=".\src\LocalConfigurationViewTest.cpp"/>
 				<File
 					RelativePath=".\src\LoggingConfiguratorTest.cpp"/>
 				<File

@@ -300,6 +300,12 @@ public:
 
 	Ptr createView(const std::string& prefix);
 		/// Creates a view (see ConfigurationView) into the configuration.
+
+	const Ptr createLocalView(const std::string& prefix) const;
+		/// Creates a non-mutable view (see LocalConfigurationView) into the configuration.
+
+	Ptr createLocalView(const std::string& prefix);
+		/// Creates a view (see LocalConfigurationView) into the configuration.
 	
 	std::string expand(const std::string& value) const;
 		/// Replaces all occurrences of ${<property>} in value with the
@@ -383,6 +389,7 @@ private:
 	
 	friend class LayeredConfiguration;
 	friend class ConfigurationView;
+	friend class LocalConfigurationView;
 	friend class ConfigurationMapper;
 };
 
