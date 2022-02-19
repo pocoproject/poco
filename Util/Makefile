@@ -7,7 +7,8 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = AbstractConfiguration Application ConfigurationMapper \
-	ConfigurationView HelpFormatter IniFileConfiguration LayeredConfiguration \
+	ConfigurationView HelpFormatter IniFileConfiguration LocalConfigurationView \
+        LayeredConfiguration
 	LoggingConfigurator LoggingSubsystem MapConfiguration \
 	Option OptionException OptionProcessor OptionSet \
 	PropertyFileConfiguration Subsystem SystemConfiguration \
