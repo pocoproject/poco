@@ -8,7 +8,7 @@ include $(POCO_BASE)/build/rules/global
 
 objects = AbstractConfigurationTest ConfigurationTestSuite \
 	ConfigurationMapperTest ConfigurationViewTest Driver  \
-	HelpFormatterTest IniFileConfigurationTest LayeredConfigurationTest \
+	HelpFormatterTest IniFileConfigurationTest LayeredConfigurationTest LocalConfigurationViewTest \
 	LoggingConfiguratorTest MapConfigurationTest \
 	OptionProcessorTest OptionSetTest OptionTest \
 	OptionsTestSuite PropertyFileConfigurationTest \
