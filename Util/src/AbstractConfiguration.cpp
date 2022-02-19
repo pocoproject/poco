@@ -14,6 +14,7 @@
 
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/ConfigurationView.h"
+#include "Poco/Util/LocalConfigurationView.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
@@ -345,6 +346,18 @@ const AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::st
 AbstractConfiguration::Ptr AbstractConfiguration::createView(const std::string& prefix)
 {
 	return new ConfigurationView(prefix, AbstractConfiguration::Ptr(this, true));
+}
+
+
+const AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::string& prefix) const
+{
+	return new LocalConfigurationView(prefix, AbstractConfiguration::Ptr(const_cast<AbstractConfiguration*>(this), true));
+}
+
+
+AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::string& prefix)
+{
+	return new LocalConfigurationView(prefix, AbstractConfiguration::Ptr(this, true));
 }
 
 
