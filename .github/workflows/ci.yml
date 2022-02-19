@@ -54,7 +54,7 @@ jobs:
           sudo apt-get update &&
           sudo apt-get install crossbuild-essential-armhf
       - run: >-
-          ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL &&
+          ./configure --config=ARM-Linux --everything --omit=PDF,Crypto,NetSSL_OpenSSL,JWT,Data/MySQL,Data/ODBC,Data/PostgreSQL,PageCompiler,PageCompiler/File2Page &&
           make all -s -j4 ARCHFLAGS="-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon" TOOL=arm-linux-gnueabihf
 
   macos-clang-make:
