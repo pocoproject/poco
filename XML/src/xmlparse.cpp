@@ -1,4 +1,4 @@
-/* 042615face2b8727e23bb27cf4f56baa292a1f91df47c1bca8f09dff49067888 (2.4.5+)
+/* a30d2613dcfdef81475a9d1a349134d2d42722172fdaa7d5bb12ed2aa74b9596 (2.4.6+)
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -7393,39 +7393,58 @@ build_model(XML_Parser parser) {
    *
    * The iterative approach works as follows:
    *
-   * - We use space in the target array for building a temporary stack structure
-   *   while that space is still unused.
-   *   The stack grows from the array's end downwards and the "actual data"
-   *   grows from the start upwards, sequentially.
-   *   (Because stack grows downwards, pushing onto the stack is a decrement
-   *   while popping off the stack is an increment.)
+   * - We have two writing pointers, both walking up the result array; one does
+   *   the work, the other creates "jobs" for its colleague to do, and leads
+   *   the way:
    *
-   * - A stack element appears as a regular XML_Content node on the outside,
-   *   but only uses a single field -- numchildren -- to store the source
-   *   tree node array index.  These are the breadcrumbs leading the way back
-   *   during pre-order (node first) depth-first traversal.
+   *   - The faster one, pointer jobDest, always leads and writes "what job
+   *     to do" by the other, once they reach that place in the
+   *     array: leader "jobDest" stores the source node array index (relative
+   *     to array dtd->scaffold) in field "numchildren".
    *
-   * - The reason we know the stack will never grow into (or overlap with)
-   *   the area with data of value at the start of the array is because
-   *   the overall number of elements to process matches the size of the array,
-   *   and the sum of fully processed nodes and yet-to-be processed nodes
-   *   on the stack, cannot be more than the total number of nodes.
-   *   It is possible for the top of the stack and the about-to-write node
-   *   to meet, but that is safe because we get the source index out
-   *   before doing any writes on that node.
+   *   - The slower one, pointer dest, looks at the value stored in the
+   *     "numchildren" field (which actually holds a source node array index
+   *     at that time) and puts the real data from dtd->scaffold in.
+   *
+   * - Before the loop starts, jobDest writes source array index 0
+   *   (where the root node is located) so that dest will have something to do
+   *   when it starts operation.
+   *
+   * - Whenever nodes with children are encountered, jobDest appends
+   *   them as new jobs, in order.  As a result, tree node siblings are
+   *   adjacent in the resulting array, for example:
+   *
+   *     [0] root, has two children
+   *       [1] first child of 0, has three children
+   *         [3] first child of 1, does not have children
+   *         [4] second child of 1, does not have children
+   *         [5] third child of 1, does not have children
+   *       [2] second child of 0, does not have children
+   *
+   *   Or (the same data) presented in flat array view:
+   *
+   *     [0] root, has two children
+   *
+   *     [1] first child of 0, has three children
+   *     [2] second child of 0, does not have children
+   *
+   *     [3] first child of 1, does not have children
+   *     [4] second child of 1, does not have children
+   *     [5] third child of 1, does not have children
+   *
+   * - The algorithm repeats until all target array indices have been processed.
    */
   XML_Content *dest = ret; /* tree node writing location, moves upwards */
   XML_Content *const destLimit = &ret[dtd->scaffCount];
-  XML_Content *const stackBottom = &ret[dtd->scaffCount];
-  XML_Content *stackTop = stackBottom; /* i.e. stack is initially empty */
+  XML_Content *jobDest = ret; /* next free writing location in target array */
   str = (XML_Char *)&ret[dtd->scaffCount];
 
-  /* Push source tree root node index onto the stack */
-  (--stackTop)->numchildren = 0;
+  /* Add the starting job, the root node (index 0) of the source tree  */
+  (jobDest++)->numchildren = 0;
 
   for (; dest < destLimit; dest++) {
-    /* Pop source tree node index off the stack */
-    const int src_node = (int)(stackTop++)->numchildren;
+    /* Retrieve source tree array index from job storage */
+    const int src_node = (int)dest->numchildren;
 
     /* Convert item */
     dest->type = dtd->scaffold[src_node].type;
@@ -7447,16 +7466,12 @@ build_model(XML_Parser parser) {
       int cn;
       dest->name = NULL;
       dest->numchildren = dtd->scaffold[src_node].childcnt;
-      dest->children = &dest[1];
+      dest->children = jobDest;
 
-      /* Push children to the stack
-       * in a way where the first child ends up at the top of the
-       * (downwards growing) stack, in order to be processed first. */
-      stackTop -= dest->numchildren;
+      /* Append scaffold indices of children to array */
       for (i = 0, cn = dtd->scaffold[src_node].firstchild;
-           i < dest->numchildren; i++, cn = dtd->scaffold[cn].nextsib) {
-        (stackTop + i)->numchildren = (unsigned int)cn;
-      }
+           i < dest->numchildren; i++, cn = dtd->scaffold[cn].nextsib)
+        (jobDest++)->numchildren = (unsigned int)cn;
     }
   }
 
