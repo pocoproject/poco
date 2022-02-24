@@ -2526,7 +2526,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tuplePrepare<TupleConstRef, T26, 26>(pos, tuple, pPreparator);
 		tuplePrepare<TupleConstRef, T27, 27>(pos, tuple, pPreparator);
 		tuplePrepare<TupleConstRef, T28, 28>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T29, 28>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T29, 29>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -3175,7 +3175,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tupleBind<TupleConstRef, T22, 22>(pos, tuple, pBinder, dir);
 		tupleBind<TupleConstRef, T23, 23>(pos, tuple, pBinder, dir);
 		tupleBind<TupleConstRef, T24, 24>(pos, tuple, pBinder, dir);
-		tupleBind<TupleConstRef, T25, 24>(pos, tuple, pBinder, dir);
+		tupleBind<TupleConstRef, T25, 25>(pos, tuple, pBinder, dir);
 	}
 
 	static void prepare(std::size_t pos, TupleConstRef tuple, AbstractPreparator::Ptr pPreparator)
@@ -3206,7 +3206,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tuplePrepare<TupleConstRef, T22, 22>(pos, tuple, pPreparator);
 		tuplePrepare<TupleConstRef, T23, 23>(pos, tuple, pPreparator);
 		tuplePrepare<TupleConstRef, T24, 24>(pos, tuple, pPreparator);
-		tuplePrepare<TupleConstRef, T25, 24>(pos, tuple, pPreparator);
+		tuplePrepare<TupleConstRef, T25, 25>(pos, tuple, pPreparator);
 	}
 
 	static std::size_t size()
@@ -3266,8 +3266,8 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tupleExtract<TupleRef, TupleConstRef, T21, 21>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T22, 22>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T23, 23>(pos, tuple, defVal, pExt);
-		tupleExtract<TupleRef, TupleConstRef, T24, 23>(pos, tuple, defVal, pExt);
-		tupleExtract<TupleRef, TupleConstRef, T25, 23>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T24, 24>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T25, 25>(pos, tuple, defVal, pExt);
 	}
 
   private:
@@ -3422,7 +3422,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tupleExtract<TupleRef, TupleConstRef, T21, 21>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T22, 22>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T23, 23>(pos, tuple, defVal, pExt);
-		tupleExtract<TupleRef, TupleConstRef, T24, 23>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T24, 24>(pos, tuple, defVal, pExt);
 	}
 
   private:
@@ -3861,7 +3861,7 @@ class TypeHandler<Poco::Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,
 		tupleExtract<TupleRef, TupleConstRef, T18, 18>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T19, 19>(pos, tuple, defVal, pExt);
 		tupleExtract<TupleRef, TupleConstRef, T20, 20>(pos, tuple, defVal, pExt);
-		tupleExtract<TupleRef, TupleConstRef, T20, 21>(pos, tuple, defVal, pExt);
+		tupleExtract<TupleRef, TupleConstRef, T21, 21>(pos, tuple, defVal, pExt);
 	}
 
   private:
