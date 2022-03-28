@@ -86,7 +86,7 @@ int Timezone::dst(const Poco::Timestamp& timestamp)
 	{
 #if defined(__CYGWIN__)
 		return local.__TM_GMTOFF - utcOffset();
-#elif defined(_BSD_SOURCE) || defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID
+#elif defined(_BSD_SOURCE) || defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 		return local.tm_gmtoff - utcOffset();
 #else
 		return 3600;
