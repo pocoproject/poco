@@ -38,6 +38,11 @@ public:
 		/// daylight saving time is in use.
 		///     local time = UTC + utcOffset() + dst().
 
+	static int dst(const Poco::Timestamp& timestamp);
+		/// Returns the daylight saving time offset in seconds if
+		/// daylight saving time is in use for the given time.
+		///     local time = UTC + utcOffset() + dst().
+
 	static bool isDst(const Timestamp& timestamp);
 		/// Returns true if daylight saving time is in effect
 		/// for the given time. Depending on the operating system
@@ -58,18 +63,6 @@ public:
 
 	static std::string dstName();
 		/// Returns the timezone name if daylight saving time is in effect.
-
-#if !defined(POCO_OS_FAMILY_WINDOWS)
-	static int utcOffset(const Poco::Timestamp& timestamp);
-		/// Returns the offset of local time to UTC
-		/// for the given time, in seconds.
-		///     local time = UTC + utcOffset() + dst().
-
-	static int dst(const Poco::Timestamp& timestamp);
-		/// Returns the daylight saving time offset in seconds if
-		/// daylight saving time is in use for the given time.
-		///     local time = UTC + utcOffset() + dst().
-#endif
 };
 
 

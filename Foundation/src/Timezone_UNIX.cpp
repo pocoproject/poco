@@ -29,12 +29,22 @@ public:
 		tzset();
 	}
 
-	static long gmtOffset(const struct std::tm& t)
+	int timeZone()
 	{
-	#if defined(__CYGWIN__)
-		return t.__TM_GMTOFF;
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+	#if defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID // no timezone global var
+		std::time_t now = std::time(NULL);
+		struct std::tm t;
+		gmtime_r(&now, &t);
+		std::time_t utc = std::mktime(&t);
+		return now - utc;
+	#elif defined(__CYGWIN__)
+		tzset();
+		return -_timezone;
 	#else
-		return t.tm_gmtoff;
+		tzset();
+		return -timezone;
 	#endif
 	}
 
@@ -54,22 +64,9 @@ private:
 static TZInfo tzInfo;
 
 
-int Timezone::utcOffset(const Poco::Timestamp& timestamp)
-{
-	std::time_t time = timestamp.epochTime();
-	struct std::tm local;
-	if (!localtime_r(&time, &local))
-		throw Poco::SystemException("cannot get UTC offset");
-	struct std::tm utc;
-	gmtime_r(&time, &utc);
-	std::time_t utctime = std::mktime(&utc);
-	return time - utctime;
-}
-
-
 int Timezone::utcOffset()
 {
-	return utcOffset(Poco::Timestamp());
+	return tzInfo.timeZone();
 }
 
 
@@ -85,8 +82,17 @@ int Timezone::dst(const Poco::Timestamp& timestamp)
 	struct std::tm local;
 	if (!localtime_r(&time, &local))
 		throw Poco::SystemException("cannot get local time DST offset");
-	long dst = TZInfo::gmtOffset(local) - utcOffset(timestamp);
-	return local.tm_isdst == 1 ? dst : 0;
+	if (local.tm_isdst > 0)
+	{
+#if defined(__CYGWIN__)
+		return local.__TM_GMTOFF - utcOffset();
+#elif defined(_BSD_SOURCE) || defined(__APPLE__)  || defined(__FreeBSD__) || defined (__OpenBSD__) || POCO_OS == POCO_OS_ANDROID
+		return local.tm_gmtoff - utcOffset();
+#else
+		return 3600;
+#endif
+	}
+	else return 0;
 }
 
 
