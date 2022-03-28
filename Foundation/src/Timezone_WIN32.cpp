@@ -60,20 +60,6 @@ bool Timezone::isDst(const Timestamp& timestamp)
 }
 
 
-int Timezone::utcOffset(const Poco::Timestamp& timestamp)
-{
-	std::time_t time = timestamp.epochTime();
-	struct tm local;
-	if (localtime_s(&local, &time))
-		throw Poco::SystemException("cannot get UTC offset");
-	struct tm utc;
-	if (gmtime_s(&utc, &time))
-		throw Poco::SystemException("cannot get UTC offset");
-	std::time_t utctime = std::mktime(&utc);
-	return time - utctime;
-}
-
-
 std::string Timezone::name()
 {
 	std::string result;
