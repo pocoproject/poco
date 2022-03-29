@@ -467,7 +467,7 @@ int SecureSocketImpl::handleError(int rc)
 	if (rc > 0) return rc;
 
 	int sslError = SSL_get_error(_pSSL, rc);
-	int error = SocketImpl::lastError();
+	int socketError = SocketImpl::lastError();
 
 	switch (sslError)
 	{
@@ -483,26 +483,27 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
-	// SSL_GET_ERROR(3ossl):
-	// On an unexpected EOF, versions before OpenSSL 3.0 returned
-	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
-	// errno was 0.  Since OpenSSL 3.0 the returned error is
-	// SSL_ERROR_SSL with a meaningful error on the error stack.
+// SSL_GET_ERROR(3ossl):
+// On an unexpected EOF, versions before OpenSSL 3.0 returned
+// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
+// errno was 0.  Since OpenSSL 3.0 the returned error is
+// SSL_ERROR_SSL with a meaningful error on the error stack.
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	case SSL_ERROR_SSL:
 #else
 	case SSL_ERROR_SYSCALL:
 #endif
-		if (error != 0)
+		if (socketError)
 		{
-			SocketImpl::error(error);
+			SocketImpl::error(socketError);
 		}
 		// fallthrough
 	default:
 		{
 			long lastError = ERR_get_error();
 			std::string msg;
-			if (lastError) {
+			if (lastError)
+			{
 				char buffer[256];
 				ERR_error_string_n(lastError, buffer, sizeof(buffer));
 				msg = buffer;
@@ -530,7 +531,7 @@ int SecureSocketImpl::handleError(int rc)
 					SecureStreamSocketImpl::error(Poco::format("The BIO reported an error: %d", rc));
 				}
 			}
-			else
+			else if (lastError)
 			{
 				throw SSLException(msg);
 			}

@@ -34,12 +34,24 @@ int Timezone::utcOffset()
 	return -tzInfo.Bias*60;
 }
 
-	
+
 int Timezone::dst()
 {
 	TIME_ZONE_INFORMATION tzInfo;
 	DWORD dstFlag = GetTimeZoneInformation(&tzInfo);
 	return dstFlag == TIME_ZONE_ID_DAYLIGHT ? -tzInfo.DaylightBias*60 : 0;
+}
+
+
+int Timezone::dst(const Poco::Timestamp& timestamp)
+{
+	if (isDst(timestamp))
+	{
+		TIME_ZONE_INFORMATION tzInfo;
+		GetTimeZoneInformation(&tzInfo);
+		return -tzInfo.DaylightBias*60;
+	}
+	else return 0;
 }
 
 
@@ -55,7 +67,7 @@ bool Timezone::isDst(const Timestamp& timestamp)
 	return tms->tm_isdst > 0;
 }
 
-	
+
 std::string Timezone::name()
 {
 	std::string result;
@@ -66,7 +78,7 @@ std::string Timezone::name()
 	return result;
 }
 
-	
+
 std::string Timezone::standardName()
 {
 	std::string result;
@@ -77,7 +89,7 @@ std::string Timezone::standardName()
 	return result;
 }
 
-	
+
 std::string Timezone::dstName()
 {
 	std::string result;

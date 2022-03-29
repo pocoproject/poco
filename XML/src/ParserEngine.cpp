@@ -504,7 +504,7 @@ void ParserEngine::init()
 	XML_SetParamEntityParsing(_parser, _externalParameterEntities ? XML_PARAM_ENTITY_PARSING_ALWAYS : XML_PARAM_ENTITY_PARSING_NEVER);
 	XML_SetUnknownEncodingHandler(_parser, handleUnknownEncoding, this);
 
-#if XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4)
+#if defined(XML_DTD) && (XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
 	if (_maximumAmplificationFactor > 1.0)
 	{
 		XML_SetBillionLaughsAttackProtectionMaximumAmplification(_parser, _maximumAmplificationFactor);
@@ -604,7 +604,7 @@ void ParserEngine::handleError(int errorNo)
 			throw SAXParseException("Reserved prefix 'xmlns' must not be declared or undeclared", locator());
 		case XML_ERROR_RESERVED_NAMESPACE_URI:
 			throw SAXParseException("Prefix must not be bound to one of the reserved namespace names", locator());
-	#if XML_MAJOR_VERSION > 2 || XML_MINOR_VERSION >= 1
+	#if XML_MAJOR_VERSION > 2 || (XML_MINOR_VERSION >= 2 && XML_MICRO_VERSION >= 1)
 		case XML_ERROR_INVALID_ARGUMENT:
 			throw SAXParseException("Invalid argument", locator());
 	#endif

@@ -202,6 +202,13 @@ else()
 	message(STATUS "Using internal sqlite, zlib, pcre, expat, ...")
 endif()
 
+# Disable fork exec
+option(POCO_NO_FORK_EXEC "Set to OFF|ON (default is OFF) to disable use of fork() and exec*() which are not allowed on some Apple platforms (iOS, watchOS, iPadOS, tvOS)." OFF)
+
+if(POCO_NO_FORK_EXEC)
+  add_definitions(-DPOCO_NO_FORK_EXEC=1)
+endif()
+
 include(DefinePlatformSpecifc)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
@@ -211,10 +218,6 @@ if(ENABLE_TESTS)
 	add_subdirectory(CppUnit)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 	set(ENABLE_JSON ON CACHE BOOL "Enable JSON" FORCE)
-
-	if(ENABLE_ZIP)
-		set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
-	endif()
 endif()
 
 if(ENABLE_ENCODINGS_COMPILER OR ENABLE_APACHECONNECTOR)
@@ -283,11 +286,6 @@ if(ENABLE_POCODOC)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 	set(ENABLE_CPPPARSER ON CACHE BOOL "Enable C++ parser" FORCE)
-endif()
-
-if(ENABLE_SEVENZIP OR ENABLE_ZIP)
-	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 if(ENABLE_UTIL AND ENABLE_TESTS)

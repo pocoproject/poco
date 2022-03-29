@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ActiveRecord">
+      <UniqueIdentifier>{9cca8535-cf0a-4522-9de3-ea3b7be7f991}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ActiveRecord\Header Files">
+      <UniqueIdentifier>{bd01a2c1-30a0-4c11-b18c-70c3151b477b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ActiveRecord\Source Files">
+      <UniqueIdentifier>{5e2b163d-82cb-47c5-9df3-11bdd30c15c0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Poco\ActiveRecord\ActiveRecord.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\ActiveRecordLib.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\Context.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\IDTraits.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\Query.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Poco\ActiveRecord\StatementPlaceholderProvider.h">
+      <Filter>ActiveRecord\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ActiveRecord.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Context.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IDTraits.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StatementPlaceholderProvider.cpp">
+      <Filter>ActiveRecord\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\DLLVersion.rc" />
+  </ItemGroup>
+</Project>

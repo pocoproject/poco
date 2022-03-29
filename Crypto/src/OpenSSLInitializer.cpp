@@ -60,6 +60,10 @@ namespace Crypto {
 
 Poco::FastMutex* OpenSSLInitializer::_mutexes(0);
 Poco::AtomicCounter OpenSSLInitializer::_rc;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(0);
+OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(0);
+#endif
 
 
 OpenSSLInitializer::OpenSSLInitializer()
@@ -93,12 +97,17 @@ void OpenSSLInitializer::initialize()
 		SSL_library_init();
 		SSL_load_error_strings();
 		OpenSSL_add_all_algorithms();
-		
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+		_defaultProvider = OSSL_PROVIDER_load(NULL, "default");
+		_legacyProvider  = OSSL_PROVIDER_load(NULL, "legacy");
+#endif
+
 		char seed[SEEDSIZE];
 		RandomInputStream rnd;
 		rnd.read(seed, sizeof(seed));
 		RAND_seed(seed, SEEDSIZE);
-		
+
 		int nMutexes = CRYPTO_num_locks();
 		_mutexes = new Poco::FastMutex[nMutexes];
 		CRYPTO_set_locking_callback(&OpenSSLInitializer::lock);
@@ -107,8 +116,8 @@ void OpenSSLInitializer::initialize()
 // https://sourceforge.net/p/poco/bugs/110/
 //
 // From http://www.openssl.org/docs/crypto/threads.html :
-// "If the application does not register such a callback using CRYPTO_THREADID_set_callback(), 
-//  then a default implementation is used - on Windows and BeOS this uses the system's 
+// "If the application does not register such a callback using CRYPTO_THREADID_set_callback(),
+//  then a default implementation is used - on Windows and BeOS this uses the system's
 //  default thread identifying APIs"
 		CRYPTO_set_id_callback(&OpenSSLInitializer::id);
 #endif
@@ -130,8 +139,13 @@ void OpenSSLInitializer::uninitialize()
 		CRYPTO_set_id_callback(0);
 #endif
 		delete [] _mutexes;
-		
+
 		CONF_modules_free();
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+		OSSL_PROVIDER_unload(_defaultProvider);
+		OSSL_PROVIDER_unload(_legacyProvider);
+#endif
 	}
 }
 
