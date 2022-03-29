@@ -496,7 +496,7 @@ void SignerTest::testVerifyES384()
 		assert (token.getSubject() == "1234567890");
 		assert (token.getIssuedAt().epochTime() == 1516239022);
 		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+		assert (token.signature() == "ROGmzbopY2GfjSUKih4MmgZ5_1jLQdEc2db3ITYCDOZSHzeGM_14KtY-61qvx4BXxmeUiXfoInPZWlA75VL6dA");
 	}
 	catch (JWTException&)
 	{
@@ -560,7 +560,7 @@ void SignerTest::testVerifyES512()
 		assert (token.getSubject() == "1234567890");
 		assert (token.getIssuedAt().epochTime() == 1516239022);
 		assert (token.payload().getValue<std::string>("name") == "John Doe");
-		assert (token.signature() == "kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
+		assert (token.signature() == "8AYb9WDk3x2U-69Hi2DHou06L8VavXJlMqyH8dF-uiekm926CNM7D3pkgnWD6e_OfV_p2XIkdfIV018PjZtfuA");
 	}
 	catch (JWTException&)
 	{
