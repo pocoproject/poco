@@ -193,6 +193,8 @@ public:
 			///   and other TLSv1.3 ephemeral key negotiation, based
 			///   on the group names defined by OpenSSL. Defaults to
 			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
+			
+		int securityLevel;
 	};
 
 	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
@@ -211,7 +213,8 @@ public:
 		VerificationMode verificationMode = VERIFY_RELAXED,
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
-		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH",
+		int securityLevel = -1);
 		/// Creates a Context.
 		///
 		///   * usage specifies whether the context is used by a client or server.
@@ -239,7 +242,8 @@ public:
 		VerificationMode verificationMode = VERIFY_RELAXED,
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
-		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH",
+		int securityLevel = -1);
 		/// Creates a Context.
 		///
 		///   * usage specifies whether the context is used by a client or server.
