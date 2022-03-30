@@ -36,7 +36,8 @@ Context::Params::Params():
 	loadDefaultCAs(false),
 	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
-	dhUse2048Bits(false)
+	dhUse2048Bits(false),
+	securityLevel(-1)
 {
 }
 
@@ -60,7 +61,8 @@ Context::Context(
 	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
-	const std::string& cipherList):
+	const std::string& cipherList,
+	int securityLevel):
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0),
@@ -75,6 +77,7 @@ Context::Context(
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
+	params.securityLevel = securityLevel;
 	init(params);
 }
 
