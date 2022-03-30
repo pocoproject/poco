@@ -385,6 +385,7 @@ public:
 		/// session resumption.
 		///
 		/// The feature can be disabled by calling this method.
+		
 
 	void disableProtocols(int protocols);
 		/// Disables the given protocols.
@@ -393,7 +394,13 @@ public:
 		/// values from the Protocols enumeration, e.g.:
 		///
 		///   context.disableProtocols(PROTO_SSLV2 | PROTO_SSLV3);
-
+		
+	void setSecurityLevel(int level);
+		/// Set Openssl security level
+		///
+		/// use SSL_CTX_set_security_level to set compatibility
+		/// with old https server/client
+		
 	void requireMinimumProtocol(Protocols protocol);
 		/// Disables all protocol version lower than the given one.
 		/// To require at least TLS 1.2 or later:
