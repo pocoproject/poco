@@ -281,6 +281,7 @@ private:
 	bool _needHandshake;
 	std::string _peerHostName;
 	Session::Ptr _pSession;
+	bool _bidirectionalShutdown;
 
 	friend class SecureStreamSocketImpl;
 };
