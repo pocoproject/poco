@@ -85,7 +85,8 @@ Context::Context(
 	VerificationMode verificationMode,
 	int verificationDepth,
 	bool loadDefaultCAs,
-	const std::string& cipherList):
+	const std::string& cipherList,
+	int securityLevel):
 	_usage(usage),
 	_mode(verificationMode),
 	_pSSLContext(0),
@@ -98,6 +99,7 @@ Context::Context(
 	params.verificationDepth = verificationDepth;
 	params.loadDefaultCAs = loadDefaultCAs;
 	params.cipherList = cipherList;
+	params.securityLevel = securityLevel;
 	init(params);
 }
 
@@ -121,6 +123,8 @@ void Context::init(const Params& params)
 	Poco::Crypto::OpenSSLInitializer::initialize();
 
 	createSSLContext();
+	
+	setSecurityLevel(params.securityLevel);
 
 	try
 	{
@@ -362,7 +366,15 @@ void Context::disableStatelessSessionResumption()
 #endif
 }
 
-
+void Context::setSecurityLevel(int level)
+{
+	if (level < 0)
+		return;
+#if OPENSSL_VERSION_NUMBER >= 0x030000000L
+	SSL_CTX_set_security_level(_pSSLContext, level);
+#endif
+}
+	
 void Context::disableProtocols(int protocols)
 {
 	if (protocols & PROTO_SSLV2)
