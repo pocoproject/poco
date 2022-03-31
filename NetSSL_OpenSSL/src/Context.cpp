@@ -36,7 +36,8 @@ Context::Params::Params():
 	loadDefaultCAs(false),
 	ocspStaplingVerification(false),
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
-	dhUse2048Bits(false)
+	dhUse2048Bits(false),
+	securityLevel(SECURITY_LEVEL_NONE)
 {
 }
 
@@ -125,6 +126,9 @@ void Context::init(const Params& params)
 	try
 	{
 		int errCode = 0;
+
+		setSecurityLevel(params.securityLevel);
+
 		if (!params.caLocation.empty())
 		{
 			Poco::File aFile(params.caLocation);
@@ -201,6 +205,14 @@ void Context::init(const Params& params)
 		SSL_CTX_free(_pSSLContext);
 		throw;
 	}
+}
+
+
+void Context::setSecurityLevel(SecurityLevel level)
+{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+	SSL_CTX_set_security_level(_pSSLContext, static_cast<int>(level));
+#endif
 }
 
 
