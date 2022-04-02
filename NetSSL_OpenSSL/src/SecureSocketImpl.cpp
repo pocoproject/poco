@@ -518,11 +518,11 @@ int SecureSocketImpl::handleError(int rc)
 		// these should not occur
 		poco_bugcheck();
 		return rc;
-// SSL_GET_ERROR(3ossl):
-// On an unexpected EOF, versions before OpenSSL 3.0 returned
-// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
-// errno was 0.  Since OpenSSL 3.0 the returned error is
-// SSL_ERROR_SSL with a meaningful error on the error stack.
+	// SSL_GET_ERROR(3ossl):
+	// On an unexpected EOF, versions before OpenSSL 3.0 returned
+	// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
+	// errno was 0.  Since OpenSSL 3.0 the returned error is
+	// SSL_ERROR_SSL with a meaningful error on the error stack.
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	case SSL_ERROR_SSL:
 #else
