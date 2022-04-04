@@ -24,6 +24,15 @@
 #define POCO_EXTERNAL_OPENSSL_SLPRO 2
 
 
+//
+// Temporarily suppress deprecation warnings coming
+// from OpenSSL 3.0, until we have updated our code.
+//
+#if !defined(POCO_DONT_SUPPRESS_OPENSSL_DEPRECATED)
+#define OPENSSL_SUPPRESS_DEPRECATED
+#endif
+
+
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
 
