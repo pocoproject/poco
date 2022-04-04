@@ -416,7 +416,7 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 {
 	List caCertList;
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
-	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::readPEM()", pemFileName));
+	if (pBIO == NULL) throw OpenFileException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
 	X509* x = PEM_read_bio_X509(pBIO, NULL, 0, NULL);
 	if (!x)
 	{
