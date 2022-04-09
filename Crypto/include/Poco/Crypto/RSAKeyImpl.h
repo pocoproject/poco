@@ -51,13 +51,13 @@ public:
 	using ByteVec = std::vector<unsigned char>;
 
 	RSAKeyImpl(const EVPPKey& key);
-		/// Constructs ECKeyImpl by extracting the EC key.
+		/// Constructs RSAKeyImpl by extracting the RSA key.
 
 	RSAKeyImpl(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
 
 	RSAKeyImpl(const PKCS12Container& cert);
-		/// Extracts the EC private key from the given certificate.
+		/// Extracts the RSA private key from the given certificate.
 
 	RSAKeyImpl(int keyLength, unsigned long exponent);
 		/// Creates the RSAKey. Creates a new public/private keypair using the given parameters.

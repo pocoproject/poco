@@ -18,6 +18,7 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/RSACipherImpl.h"
+#include "Poco/Crypto/EVPCipherImpl.h"
 #include "Poco/Exception.h"
 #include "Poco/SingletonHolder.h"
 #include <openssl/evp.h>
@@ -66,6 +67,12 @@ Cipher* CipherFactory::createCipher(const CipherKey& key)
 Cipher* CipherFactory::createCipher(const RSAKey& key, RSAPaddingMode paddingMode)
 {
 	return new RSACipherImpl(key, paddingMode);
+}
+
+
+Cipher* CipherFactory::createCipher(const EVPPKey& key)
+{
+	return new EVPCipherImpl(key);
 }
 
 
