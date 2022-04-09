@@ -106,6 +106,7 @@ EVPPKey::EVPPKey(int type, int param): _pEVPPKey(0)
 			throw OpenSSLException(getError(msg));
 		}
 	}
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	ret = EVP_PKEY_generate(pCtx, &_pEVPPKey);
 	if (ret != 1)
 	{
@@ -113,6 +114,15 @@ EVPPKey::EVPPKey(int type, int param): _pEVPPKey(0)
 			"EVPPKey(%d, %d):EVP_PKEY_generate()\n", type, param);
 		throw OpenSSLException(getError(msg));
 	}
+#else
+	ret = EVP_PKEY_keygen(pCtx, &_pEVPPKey);
+	if (ret != 1)
+	{
+		std::string msg = Poco::format(
+			"EVPPKey(%d, %d):EVP_PKEY_keygen()\n", type, param);
+		throw OpenSSLException(getError(msg));
+	}
+#endif
 	EVP_PKEY_CTX_free(pCtx);
 	checkType();
 }

@@ -708,10 +708,14 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadStreamNoPass);
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadFile);
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadFileNoPass);
-	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromX509);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromPKCS12);
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyByLength);
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
+#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
+#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 	return pSuite;
 }
