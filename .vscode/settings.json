@@ -87,7 +87,9 @@
 		"memory_resource": "cpp",
 		"random": "cpp",
 		"ranges": "cpp",
-		"cfenv": "cpp"
+		"cfenv": "cpp",
+		"__bits": "cpp",
+		"variant": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,

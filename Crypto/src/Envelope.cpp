@@ -62,14 +62,14 @@ void Envelope::addKey(const EVPPKey& key)
 
 const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 {
-	Byte* pEncKeys[_encKeys.size()] = {};
-	int encKeysSizes[_encKeys.size()] = {};
+	std::vector<Byte*> pEncKeys(_encKeys.size(), 0);
+	std::vector<int> encKeysSizes(_encKeys.size(), 0);
 	int i = 0;
 	for (const auto& k : _encKeys)
 		pEncKeys[i++] = new Byte[k.size()];
 
 	int noOfKeys = static_cast<int>(_pubKeys.size());
-	if (_encKeys.size() != EVP_SealInit(_pCtx, _pCipher, pEncKeys, encKeysSizes, &_iv[0], &_pubKeys[0], noOfKeys))
+	if (_encKeys.size() != EVP_SealInit(_pCtx, _pCipher, &pEncKeys[0], &encKeysSizes[0], &_iv[0], &_pubKeys[0], noOfKeys))
 	{
 		i = 0;
 		for (; i < _encKeys.size(); ++i) delete [] pEncKeys[i];
