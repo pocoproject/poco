@@ -80,7 +80,14 @@
 		"unordered_map": "cpp",
 		"unordered_set": "cpp",
 		"utility": "cpp",
-		"vector": "cpp"
+		"vector": "cpp",
+		"*.tcc": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"memory_resource": "cpp",
+		"random": "cpp",
+		"ranges": "cpp",
+		"cfenv": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,

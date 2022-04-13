@@ -169,7 +169,7 @@ public:
 
 	static EVP_PKEY* duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey);
 		/// Duplicates pFromKey into *pToKey and returns
-		// the pointer to duplicated EVP_PKEY.
+		/// the pointer to duplicated EVP_PKEY.
 
 private:
 	EVPPKey();
