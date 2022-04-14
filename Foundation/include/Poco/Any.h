@@ -68,9 +68,20 @@ public:
 		static const unsigned int value = SizeV;
 	};
 
-	Placeholder()
+	Placeholder(): pHolder(0)
 	{
-		erase();
+		std::memset(holder, 0, sizeof(Placeholder));
+	}
+
+	~Placeholder()
+	{
+		if (!isLocal())
+			delete pHolder;
+		else
+		{
+			if (!isEmpty())
+				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
+		}
 	}
 
 	void swap(Placeholder& other)
@@ -83,6 +94,7 @@ public:
 
 	void erase()
 	{
+		if (!isLocal()) delete pHolder;
 		std::memset(holder, 0, sizeof(Placeholder));
 	}
 
@@ -105,6 +117,7 @@ public:
 	template <typename T, typename V>
 	PlaceholderT* assignStack(const V& value)
 	{
+		erase();
 		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
 		setLocal(true);
 		return reinterpret_cast<PlaceholderT*>(holder);
@@ -113,6 +126,7 @@ public:
 	template <typename T, typename V>
 	PlaceholderT* assignHeap(const V& value)
 	{
+		erase();
 		pHolder = new T(value);
 		setLocal(false);
 		return pHolder;
@@ -217,13 +231,6 @@ public:
 		/// Destructor. If Any is locally held, calls ValueHolder destructor;
 		/// otherwise, deletes the placeholder from the heap.
 	{
-		if (!empty())
-		{
-			if (_valueHolder.isLocal())
-				destruct();
-			else
-				delete content();
-		}
 	}
 
 	Any& swap(Any& other)
@@ -244,7 +251,6 @@ public:
 			Any tmp(*this);
 			try
 			{
-				if (_valueHolder.isLocal()) destruct();
 				construct(other);
 				other = tmp;
 			}
@@ -370,11 +376,6 @@ private:
 			other.content()->clone(&_valueHolder);
 		else
 			_valueHolder.erase();
-	}
-
-	void destruct()
-	{
-		content()->~ValueHolder();
 	}
 
 	Placeholder<ValueHolder> _valueHolder;

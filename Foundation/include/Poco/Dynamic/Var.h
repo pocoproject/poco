@@ -661,21 +661,9 @@ private:
 
 	void construct(const Var& other)
 	{
+		_placeholder.erase();
 		if (!other.isEmpty())
 			other.content()->clone(&_placeholder);
-		else
-			_placeholder.erase();
-	}
-
-	void destruct()
-	{
-		if (!isEmpty())
-		{
-			if (_placeholder.isLocal())
-				content()->~VarHolder();
-			else
-				delete content();
-		}
 	}
 
 	Placeholder<VarHolder> _placeholder;
@@ -712,7 +700,6 @@ inline void Var::swap(Var& other)
 		Var tmp(*this);
 		try
 		{
-			if (_placeholder.isLocal()) destruct();
 			construct(other);
 			other = tmp;
 		}

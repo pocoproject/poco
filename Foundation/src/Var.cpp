@@ -60,7 +60,6 @@ Var::Var(const Var& other)
 
 Var::~Var()
 {
-	destruct();
 }
 
 
@@ -330,8 +329,6 @@ void Var::empty()
 	delete _pHolder;
 	_pHolder = 0;
 #else
-	if (_placeholder.isLocal()) this->~Var();
-	else delete content();
 	_placeholder.erase();
 #endif
 }
@@ -343,8 +340,6 @@ void Var::clear()
 	delete _pHolder;
 	_pHolder = 0;
 #else
-	if (_placeholder.isLocal()) this->~Var();
-	else delete content();
 	_placeholder.erase();
 #endif
 }

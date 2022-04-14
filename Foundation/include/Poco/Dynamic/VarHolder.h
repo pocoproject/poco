@@ -307,8 +307,8 @@ protected:
 		(void)pVarHolder;
 		return new VarHolderImpl<T>(val);
 #else
-	poco_check_ptr (pVarHolder);
-	return makeSOOHolder(pVarHolder, val);
+		poco_check_ptr (pVarHolder);
+		return makeSOOHolder(pVarHolder, val);
 #endif
 	}
 
