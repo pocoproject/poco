@@ -74,7 +74,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: brew install openssl@1.1 mysql-client unixodbc libpq
-      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
+      - run: >-
+          cd cmake-build &&
+          sudo -s
+          CPPUNIT_IGNORE="N7CppUnit10TestCallerI10ThreadTestEE.testTrySleep,N7CppUnit10TestCallerI13TimestampTestEE.testTimestamp,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI24UniqueExpireLRUCacheTestEE.testExpireN,N7CppUnit10TestCallerI18ExpireLRUCacheTestEE.testAccessExpireN,N7CppUnit10TestCallerI11PollSetTestEE.testPollClosedServer"
+          PWD=`pwd`
+          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+
+  macos-clang-cmake-openssl3:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: cmake -H. -Bcmake-build -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client && cmake --build cmake-build --target all
       - run: >-
           cd cmake-build &&
           sudo -s

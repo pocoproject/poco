@@ -49,6 +49,11 @@
 #endif
 
 
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+#error "OpenSSL version too old. At least OpenSSL 1.0.0 is required."
+#endif
+
+
 enum RSAPaddingMode
 	/// The padding mode used for RSA public key encryption.
 {
