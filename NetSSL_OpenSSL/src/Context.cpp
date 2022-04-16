@@ -812,7 +812,7 @@ void Context::initECDH(const std::string& curve)
  		throw SSLContextException("Cannot set ECDH groups", groups);
  	}
  	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
- #elif OPENSSL_VERSION_NUMBER >= 0x0090800fL
+ #else
 	int nid = 0;
 	if (!curve.empty())
 	{

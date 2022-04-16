@@ -20,11 +20,9 @@
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
 #include <openssl/err.h>
-
-
-#if OPENSSL_VERSION_NUMBER >= 0x0907000L
 #include <openssl/conf.h>
-#endif
+
+
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#define POCO_STR_HELPER(x) #x
 	#define POCO_STR(x) POCO_STR_HELPER(x)
@@ -98,7 +96,7 @@ void OpenSSLInitializer::initialize()
 	{
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		CONF_modules_load(NULL, NULL, 0);
-#elif OPENSSL_VERSION_NUMBER >= 0x0907000L
+#else
 		OPENSSL_config(NULL);
 #endif
 
