@@ -83,7 +83,7 @@ void ODBCStatementImpl::compileImpl()
 
 	addPreparator();
 
-	Binder::ParameterBinding bind = session().getFeature("autoBind") ? 
+	Binder::ParameterBinding bind = session().getFeature("autoBind") ?
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
 
 	const TypeInfo* pDT = 0;
@@ -92,14 +92,14 @@ void ODBCStatementImpl::compileImpl()
 		Poco::Any dti = session().getProperty("dataTypeInfo");
 		pDT = AnyCast<const TypeInfo*>(dti);
 	}
-	catch (NotSupportedException&) 
+	catch (NotSupportedException&)
 	{
 	}
 
 	std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
-	
+
 	_pBinder = new Binder(_stmt, maxFieldSize, bind, pDT);
-	
+
 	makeInternalExtractors();
 	doPrepare();
 
@@ -109,12 +109,12 @@ void ODBCStatementImpl::compileImpl()
 
 void ODBCStatementImpl::makeInternalExtractors()
 {
-	if (hasData() && !extractions().size()) 
+	if (hasData() && !extractions().size())
 	{
 		try
 		{
 			fillColumns();
-		} 
+		}
 		catch (DataFormatException&)
 		{
 			if (isStoredProcedure()) return;
@@ -135,7 +135,7 @@ void ODBCStatementImpl::addPreparator()
 		if (statement.empty())
 			throw ODBCException("Empty statements are illegal");
 
-		Preparator::DataExtraction ext = session().getFeature("autoExtract") ? 
+		Preparator::DataExtraction ext = session().getFeature("autoExtract") ?
 			Preparator::DE_BOUND : Preparator::DE_MANUAL;
 
 		std::size_t maxFieldSize = AnyCast<std::size_t>(session().getProperty("maxFieldSize"));
@@ -164,7 +164,7 @@ void ODBCStatementImpl::doPrepare()
 		if (it != itEnd && (*it)->isBulk())
 		{
 			std::size_t limit = getExtractionLimit();
-			if (limit == Limit::LIMIT_UNLIMITED) 
+			if (limit == Limit::LIMIT_UNLIMITED)
 				throw InvalidArgumentException("Bulk operation not allowed without limit.");
 			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
@@ -239,13 +239,13 @@ void ODBCStatementImpl::putData()
 		{
 			dataSize = (SQLINTEGER) _pBinder->parameterSize(pParam);
 
-			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize))) 
+			if (Utility::isError(SQLPutData(_stmt, pParam, dataSize)))
 				throw StatementException(_stmt, "SQLPutData()");
 		}
 		else // if pParam is null pointer, do a dummy call
 		{
 			char dummy = 0;
-			if (Utility::isError(SQLPutData(_stmt, &dummy, 0))) 
+			if (Utility::isError(SQLPutData(_stmt, &dummy, 0)))
 				throw StatementException(_stmt, "SQLPutData()");
 		}
 	}
@@ -399,10 +399,10 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 	if (Utility::isError(rc))
 	{
 		std::ostringstream os;
-		os << std::endl << "Requested SQL statement: " << toString() << std::endl; 	 
-		os << "Native SQL statement: " << nativeSQL() << std::endl; 	 
+		os << std::endl << "Requested SQL statement: " << toString() << std::endl;
+		os << "Native SQL statement: " << nativeSQL() << std::endl;
 		std::string str(msg); str += os.str();
-		
+
 		throw StatementException(_stmt, str);
 	}
 }
@@ -420,26 +420,28 @@ void ODBCStatementImpl::fillColumns()
 }
 
 
-bool ODBCStatementImpl::isStoredProcedure() const 	 
-{ 	 
-	std::string str = toString(); 	 
-	if (trimInPlace(str).size() < 2) return false; 	 
+bool ODBCStatementImpl::isStoredProcedure() const
+{
+	std::string str = toString();
+	if (trimInPlace(str).size() < 2) return false;
 
-	return ('{' == str[0] && '}' == str[str.size()-1]); 	 
+	return ('{' == str[0] && '}' == str[str.size()-1]);
 }
 
 
 const MetaColumn& ODBCStatementImpl::metaColumn(std::size_t pos) const
 {
 	std::size_t curDataSet = currentDataSet();
-	poco_assert_dbg (curDataSet < _columnPtrs.size());
+	if (curDataSet < _columnPtrs.size())
+	{
+		std::size_t sz = _columnPtrs[curDataSet].size();
 
-	std::size_t sz = _columnPtrs[curDataSet].size();
+		if (0 == sz || pos > sz - 1)
+			throw InvalidAccessException(format("Invalid column number: %u", pos));
 
-	if (0 == sz || pos > sz - 1)
-		throw InvalidAccessException(format("Invalid column number: %u", pos));
-
-	return *_columnPtrs[curDataSet][pos];
+		return *_columnPtrs[curDataSet][pos];
+	}
+	else throw Poco::IllegalStateException("currentDataSet index out of range");
 }
 
 
