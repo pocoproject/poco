@@ -68,6 +68,11 @@ public:
 		static const unsigned int value = SizeV;
 	};
 
+	Placeholder(const Placeholder&) = delete;
+	Placeholder(Placeholder&&) = delete;
+	Placeholder& operator=(const Placeholder&) = delete;
+	Placeholder& operator=(Placeholder&&) = delete;
+
 	Placeholder(): pHolder(0)
 	{
 		std::memset(holder, 0, sizeof(Placeholder));
@@ -75,13 +80,7 @@ public:
 
 	~Placeholder()
 	{
-		if (!isLocal())
-			delete pHolder;
-		else
-		{
-			if (!isEmpty())
-				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
-		}
+		destruct(false);
 	}
 
 	void swap(Placeholder& other)
@@ -94,8 +93,7 @@ public:
 
 	void erase()
 	{
-		if (!isLocal()) delete pHolder;
-		std::memset(holder, 0, sizeof(Placeholder));
+		destruct(true);
 	}
 
 	bool isEmpty() const
@@ -142,6 +140,19 @@ public:
 
 private:
 	typedef typename std::aligned_storage<SizeV+1>::type AlignerType;
+
+	void destruct(bool clear)
+	{
+		if (!isEmpty())
+		{
+			if (!isLocal())
+				delete pHolder;
+			else
+				reinterpret_cast<PlaceholderT*>(holder)->~PlaceholderT();
+
+			if (clear) std::memset(holder, 0, sizeof(Placeholder));
+		}
+	}
 
 	PlaceholderT*         pHolder;
 	mutable unsigned char holder[SizeV+1];

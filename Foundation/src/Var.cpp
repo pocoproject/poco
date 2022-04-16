@@ -47,7 +47,9 @@ Var::Var(const char* pVal)
 
 Var::Var(const Var& other)
 #ifdef POCO_NO_SOO
-	: _pHolder(other._pHolder ? other._pHolder->clone() : 0)
+	:_pHolder((this != &other) ?
+		(other._pHolder ? other._pHolder->clone() : nullptr) :
+		other._pHolder)
 {
 }
 #else
@@ -60,6 +62,7 @@ Var::Var(const Var& other)
 
 Var::~Var()
 {
+	destruct();
 }
 
 
@@ -69,9 +72,10 @@ Var& Var::operator = (const Var& rhs)
 	Var tmp(rhs);
 	swap(tmp);
 #else
-	if ((this != &rhs) && !rhs.isEmpty())
+	if (this == &rhs) return *this;
+	if (!rhs.isEmpty())
 		construct(rhs);
-	else if ((this != &rhs) && rhs.isEmpty())
+	else
 		_placeholder.erase();
 #endif
 	return *this;

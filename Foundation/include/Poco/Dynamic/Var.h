@@ -621,16 +621,20 @@ private:
 
 	void destruct()
 	{
-		if (!isEmpty()) delete content();
+		delete _pHolder;
 	}
 
-	VarHolder* _pHolder;
+	VarHolder* _pHolder = nullptr;
 
 #else
 
 	VarHolder* content() const
 	{
 		return _placeholder.content();
+	}
+
+	void destruct()
+	{
 	}
 
 	template<typename ValueType,

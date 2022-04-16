@@ -295,13 +295,15 @@ protected:
 
 	template <typename T>
 	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
-		/// Instantiates value holder wrapper. If size of the wrapper is
-		/// larger than POCO_SMALL_OBJECT_SIZE, holder is instantiated on
+		/// Instantiates value holder wrapper.
+		///
+		/// Called from clone() member function of the implementation.
+		///
+		/// When the smal object optimization is enabled (POCO_NO_SOO not
+		/// defined), if size of the wrapper is larger than
+		/// POCO_SMALL_OBJECT_SIZE, holder is instantiated on
 		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
-		///
-		/// Called from clone() member function of the implementation when
-		/// small object optimization is enabled.
 	{
 #ifdef POCO_NO_SOO
 		(void)pVarHolder;
